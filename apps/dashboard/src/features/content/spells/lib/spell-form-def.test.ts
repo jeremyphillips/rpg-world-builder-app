@@ -18,6 +18,20 @@ function findRow(fields: GroupConfig['fields']): RowConfig | undefined {
   return fields.find((field): field is RowConfig => 'kind' in field && field.kind === 'row')
 }
 
+function collectFieldNames(fields: FormItem[]): string[] {
+  const names: string[] = []
+  for (const field of fields) {
+    if ('name' in field) {
+      names.push(field.name)
+    } else if ('kind' in field && field.kind === 'row') {
+      names.push(...collectFieldNames(field.fields))
+    } else if ('kind' in field && field.kind === 'group') {
+      names.push(...collectFieldNames(field.fields))
+    }
+  }
+  return names
+}
+
 it('type: toInput return type matches CreateSpellInput', () => {
   expectTypeOf(spellFormDef.toInput).returns.toEqualTypeOf<CreateSpellInput>()
 })
@@ -67,11 +81,7 @@ describe('spellFormDef area of effect fields', () => {
     const areaGroup = findGroup(castingTab?.fields ?? [], 'Area of effect')
     expect(areaGroup?.kind).toBe('group')
 
-    const fieldNames = (areaGroup?.fields ?? [])
-      .filter((field): field is Extract<typeof field, { name: string }> => 'name' in field)
-      .map((field) => field.name)
-
-    expect(fieldNames).toEqual(
+    expect(collectFieldNames(areaGroup?.fields ?? [])).toEqual(
       expect.arrayContaining([
         'areaOfEffect.shape',
         'areaOfEffect.radius',
@@ -82,6 +92,27 @@ describe('spellFormDef area of effect fields', () => {
         'areaOfEffect.description',
       ]),
     )
+  })
+
+  it('lays out shape and radius in an auto-width row with the shape hint below the control', () => {
+    const castingTab = spellFormDef.buildTabs!({}).find((tab) => tab.id === 'casting')
+    const areaGroup = findGroup(castingTab?.fields ?? [], 'Area of effect')
+    const row = findRow(areaGroup?.fields ?? [])
+
+    expect(row?.kind).toBe('row')
+    expect(row?.fields).toEqual([
+      expect.objectContaining({
+        type: 'select',
+        name: 'areaOfEffect.shape',
+        width: 'auto',
+        hintPosition: 'below-control',
+      }),
+      expect.objectContaining({
+        type: 'inputSelect',
+        name: 'areaOfEffect.radius',
+        width: 'auto',
+      }),
+    ])
   })
 })
 

@@ -457,20 +457,26 @@ function castingFields(): FormItem[] {
       legend: 'Area of effect',
       fields: [
         {
-          type: 'select',
-          name: 'areaOfEffect.shape',
-          label: 'Shape',
-          options: areaGeometryShapeOptions,
-          hint: 'Optional structured area geometry. Origin and movement are not modeled yet.',
-          width: 'lg',
+          kind: 'row',
+          fields: [
+            {
+              type: 'select',
+              name: 'areaOfEffect.shape',
+              label: 'Shape',
+              options: areaGeometryShapeOptions,
+              hint: 'Optional structured area geometry. Origin and movement are not modeled yet.',
+              hintPosition: 'below-control',
+              width: 'auto',
+            },
+            distanceInputSelectField({
+              name: 'areaOfEffect.radius',
+              label: 'Radius',
+              required: true,
+              valueDigits: SPELL_RANGE_DISTANCE_INLINE_COUNT_DIGITS,
+              visibility: visibleWhenAreaShape(['sphere', 'emanation', 'cylinder']),
+            }),
+          ],
         },
-        distanceInputSelectField({
-          name: 'areaOfEffect.radius',
-          label: 'Radius',
-          required: true,
-          valueDigits: SPELL_RANGE_DISTANCE_INLINE_COUNT_DIGITS,
-          visibility: visibleWhenAreaShape(['sphere', 'emanation', 'cylinder']),
-        }),
         distanceInputSelectField({
           name: 'areaOfEffect.height',
           label: 'Height',
@@ -513,7 +519,7 @@ function castingFields(): FormItem[] {
       name: 'deliveryMethod',
       label: 'Delivery method',
       options: deliveryMethodOptions,
-      hint: 'Attack-roll delivery for cantrips and spells that use spell attacks.',
+      hint: 'Attack-roll delivery for spells that use spell attacks.',
       width: 'xl',
     },
   ]

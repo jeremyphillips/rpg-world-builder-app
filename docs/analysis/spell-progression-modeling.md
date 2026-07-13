@@ -5,7 +5,7 @@ this document records catalog evidence, recommended vocabularies, exploratory sc
 shapes, a staged roadmap, and open decisions.
 
 Date: 2026-07-13. Catalog snapshot: `packages/catalog/src/spells/data/srd-cc-5.2.1/`
-(67 spells: 20 cantrips, 32 L1, 7 L2, 2 L3, 2 L4, 2 L5, 1 L6, 0 L7, 0 L8, 1 L9).
+(92 spells: 20 cantrips, 33 L1, 8 L2, 8 L3, 4 L4, 8 L5, 3 L6, 3 L7, 1 L8, 4 L9).
 
 ---
 
@@ -18,14 +18,15 @@ and tags, while every mechanical fact — damage dice, healing, save abilities, 
 lives in TipTap HTML (`description`, `cantripScaling`, `higherLevelSlotEffect`).
 Nothing in the repo currently models a spell effect, a damage roll on a spell, or a
 progression of either. The catalog is small and heavily skewed toward levels 0–1;
-levels 2–9 hold only 15 spells, and entire families (area blast damage like Fireball,
-summoning, condition-centric control at high levels) are absent. Any vocabulary derived
+levels 2–9 hold 39 spells, and entire families (summoning, condition-centric control at
+high levels) remain thin. Fireball and Burning Hands are now seeded with structured
+`areaOfEffect` geometry (dimensions only — origin not modeled). Any vocabulary derived
 today must therefore be treated as a floor, not a ceiling.
 
-**Is a shared progression model justified?** Yes. 28 of 67 spells scale, and they
+**Is a shared progression model justified?** Yes. 30 of 92 spells scale, and they
 collapse into ~12 recurring families; the top five families (cantrip damage dice,
-slot damage dice, slot healing dice, slot target count, duration tiers) cover 24 of
-the 28. Cantrip scaling and slot scaling share the same conceptual shape — a base
+slot damage dice, slot healing dice, slot target count, duration tiers) cover 26 of
+the 30. Cantrip scaling and slot scaling share the same conceptual shape — a base
 effect plus a basis plus entries — and the repo already repeats a sparse
 `{ level, value }` breakpoint pattern in four places (`classResourceSchema`,
 `cantripsKnownEntrySchema`, `spellsAvailableEntrySchema`, plus the runtime
@@ -45,19 +46,19 @@ resolving to the same display output.
 
 **How far to go now.** Stages 0–2 (audit metadata, display-safe progression
 container, typed values for the common families) are justified by current evidence
-and unlock formatted rendering plus current/next-threshold resolution for all 28
+and unlock formatted rendering plus current/next-threshold resolution for all 30
 scaling spells. Stage 3 (application semantics, modifier source, save-based
 resolution structure) is justified narrowly — 3 healing spells need
 `spellcasting-ability`, 3 spells need per-hit/per-projectile semantics — and should
-be scoped to exactly that. Stage 4 (area geometry, summons, conditions, choices)
+be scoped to exactly that. Stage 4 (area origin, summons, conditions, choices)
 has thin catalog evidence today and should wait for catalog growth.
 
 **Major risks.**
 
-1. **Premature universal effect schema.** 39 of 67 spells have no progression and
+1. **Premature universal effect schema.** 62 of 92 spells have no progression and
    many (Prestidigitation, Druidcraft, Thaumaturgy) are choice-menus of prose
    micro-effects that no reasonable schema should chase. Prose must stay first-class.
-2. **Patch/homebrew round-tripping.** Overlay patches deep-merge objects but replace
+2. **Patch/homebrew round-trippi**Telekinesis**ng.** Overlay patches deep-merge objects but replace
    arrays wholesale (`apps/api/src/features/content/lib/deep-merge.ts`); a structured
    `effects[]` array in a patch replaces the whole array. Acceptable, but validation
    must check effect-id references against the _merged_ body. There is no patch
@@ -72,7 +73,7 @@ has thin catalog evidence today and should wait for catalog growth.
 
 ---
 
-## 2. Catalog classification (all 67 spells)
+## 2. Catalog classification (all 92 spells)
 
 Status abbreviations (definitions in §11): **PO** prose-only, **PM**
 partially-modeled, **SD** sufficient-for-display, **SCS**
@@ -117,6 +118,7 @@ attack. Mod = personal modifier applies to effect value.
 | Spell                     | Scaling | Basis | Target               | Value                          | Application    | Resolution      | Mod                  | Ceiling     | Gaps / notes                                                                          |
 | ------------------------- | ------- | ----- | -------------------- | ------------------------------ | -------------- | --------------- | -------------------- | ----------- | ------------------------------------------------------------------------------------- |
 | bless                     | yes     | slot  | target-count         | count 3+1/slot                 | —              | auto            | —                    | SCS (S2)    | 1d4 buff effect structurable later                                                    |
+| burning-hands             | yes     | slot  | primary-damage       | dice 3d6 +1d6/slot             | 1×             | save(DEX)       | —                    | SCS (S3)    | cone `areaOfEffect` (15 ft); direct caster-origin AoE exemplar                        |
 | create-or-destroy-water   | yes     | slot  | custom               | text                           | —              | auto            | —                    | SD (S1)     | choice of two scaling quantities (`choice-model`); custom track + prose               |
 | cure-wounds               | yes     | slot  | healing              | roll 2d8 + mod, +2d8/slot      | 1×             | auto            | spellcasting-ability | SCS (S3)    |                                                                                       |
 | detect-evil-and-good      | no      | —     | —                    | —                              | —              | auto            | —                    | SD-terminal |                                                                                       |
@@ -126,7 +128,7 @@ attack. Mod = personal modifier applies to effect value.
 | faerie-fire               | no      | —     | —                    | —                              | save(DEX)      | —               | —                    | SD-terminal | area + advantage rider prose                                                          |
 | false-life                | yes     | slot  | temporary-hit-points | roll 2d4+4, +5 flat/slot       | 1×             | auto            | —                    | SCS (S2)    | mixed dice+flat base, flat increment                                                  |
 | feather-fall              | no      | —     | —                    | —                              | —              | auto            | —                    | SD-terminal |                                                                                       |
-| fog-cloud                 | yes     | slot  | area-size            | distance 20-ft radius +20/slot | —              | auto            | —                    | SCS (S2)    | area geometry itself prose until S4                                                   |
+| fog-cloud                 | yes     | slot  | area-size            | distance 20-ft radius +20/slot | —              | auto            | —                    | SCS (S2)    | sphere `areaOfEffect` (20 ft); radius scaling still prose-only                        |
 | hellish-rebuke            | yes     | slot  | primary-damage       | dice 2d10 +1d10/slot           | 1×             | save(DEX)       | —                    | SCS (S3)    | reaction trigger already structured                                                   |
 | hex                       | yes     | slot  | duration             | duration tiers (1h/4h/8h/24h)  | —              | auto            | —                    | SCS (S3)    | base extra-damage 1d6 is per-hit; irregular thresholds (2, 3–4, 5+)                   |
 | hideous-laughter          | yes     | slot  | target-count         | count 1+1/slot                 | —              | save(WIS)       | —                    | SCS (S2)    | conditions rider prose                                                                |
@@ -151,44 +153,46 @@ attack. Mod = personal modifier applies to effect value.
 
 ### Levels 2–9
 
-| Spell               | Lvl | Scaling | Basis | Target                    | Value                             | Application     | Resolution | Mod                  | Ceiling                 | Gaps / notes                                                            |
-| ------------------- | --- | ------- | ----- | ------------------------- | --------------------------------- | --------------- | ---------- | -------------------- | ----------------------- | ----------------------------------------------------------------------- |
-| aid                 | 2   | yes     | slot  | custom (HP max + current) | numeric +5/slot                   | —               | auto       | —                    | SCS (S2, custom target) | not temp HP; candidate future target `hit-point-maximum`                |
-| darkness            | 2   | no      | —     | —                         | —                                 | —               | auto       | —                    | SD-terminal             | area/light interaction prose                                            |
-| lesser-restoration  | 2   | no      | —     | —                         | —                                 | —               | auto       | —                    | SD-terminal             | condition-removal choice prose                                          |
-| levitate            | 2   | no      | —     | —                         | —                                 | save(CON)       | —          | —                    | SD-terminal             |                                                                         |
-| misty-step          | 2   | no      | —     | —                         | —                                 | —               | auto       | —                    | SD-terminal             |                                                                         |
-| pass-without-trace  | 2   | no      | —     | —                         | —                                 | —               | auto       | —                    | SD-terminal             | +10 stealth rider prose                                                 |
-| ray-of-enfeeblement | 2   | no      | —     | —                         | —                                 | save(CON)       | —          | —                    | SD-terminal             |                                                                         |
-| mass-healing-word   | 3   | yes     | slot  | healing                   | roll 2d4 + mod, +1d4/slot         | 1× (per target) | auto       | spellcasting-ability | SCS (S3)                | 6 targets fixed                                                         |
-| revivify            | 3   | no      | —     | —                         | —                                 | —               | auto       | —                    | SD-terminal             |                                                                         |
-| aura-of-life        | 4   | no      | —     | —                         | —                                 | —               | auto       | —                    | SD-terminal             | emanation + regen riders prose                                          |
-| death-ward          | 4   | no      | —     | —                         | —                                 | —               | auto       | —                    | SD-terminal             |                                                                         |
-| greater-restoration | 5   | no      | —     | —                         | —                                 | —               | auto       | —                    | SD-terminal             | choice-menu prose                                                       |
-| mass-cure-wounds    | 5   | yes     | slot  | healing                   | roll 5d8 + mod, +1d8/slot         | 1× (per target) | auto       | spellcasting-ability | SCS (S3)                |                                                                         |
-| mass-suggestion     | 6   | yes     | slot  | duration                  | duration tiers (24h/10d/30d/366d) | —               | save(WIS)  | —                    | SCS (S2)                | duration values exceed current `DurationUnit` needs (`day` exists — OK) |
-| power-word-heal     | 9   | no      | —     | —                         | —                                 | —               | auto       | —                    | SD-terminal             | "all HP" not a roll; conditional riders prose                           |
+| Spell               | Lvl | Scaling | Basis | Target                    | Value                             | Application     | Resolution | Mod                  | Ceiling                 | Gaps / notes                                                                                                                   |
+| ------------------- | --- | ------- | ----- | ------------------------- | --------------------------------- | --------------- | ---------- | -------------------- | ----------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| aid                 | 2   | yes     | slot  | custom (HP max + current) | numeric +5/slot                   | —               | auto       | —                    | SCS (S2, custom target) | not temp HP; candidate future target `hit-point-maximum`                                                                       |
+| darkness            | 2   | no      | —     | —                         | —                                 | —               | auto       | —                    | SD-terminal             | sphere `areaOfEffect` (15 ft) for point-centered mode only; object-centered emanation prose-only (`area-origin-model-missing`) |
+| dragons-breath      | 2   | yes     | slot  | primary-damage            | dice 3d6 +1d6/slot                | 1×              | save(DEX)  | —                    | SCS (S3)                | granted-action cone prose; no spell-root `areaOfEffect` (intentional)                                                          |
+| lesser-restoration  | 2   | no      | —     | —                         | —                                 | —               | auto       | —                    | SD-terminal             | condition-removal choice prose                                                                                                 |
+| levitate            | 2   | no      | —     | —                         | —                                 | save(CON)       | —          | —                    | SD-terminal             |                                                                                                                                |
+| misty-step          | 2   | no      | —     | —                         | —                                 | —               | auto       | —                    | SD-terminal             |                                                                                                                                |
+| pass-without-trace  | 2   | no      | —     | —                         | —                                 | —               | auto       | —                    | SD-terminal             | emanation `areaOfEffect` (30 ft); caster attachment/movement under-modeled (`area-origin-model-missing`)                       |
+| ray-of-enfeeblement | 2   | no      | —     | —                         | —                                 | save(CON)       | —          | —                    | SD-terminal             |                                                                                                                                |
+| mass-healing-word   | 3   | yes     | slot  | healing                   | roll 2d4 + mod, +1d4/slot         | 1× (per target) | auto       | spellcasting-ability | SCS (S3)                | 6 targets fixed                                                                                                                |
+| fireball            | 3   | yes     | slot  | primary-damage            | dice 8d6 +1d6/slot                | 1×              | save(DEX)  | —                    | SCS (S3)                | sphere `areaOfEffect` (20 ft); slot-damage + AoE exemplar                                                                      |
+| revivify            | 3   | no      | —     | —                         | —                                 | —               | auto       | —                    | SD-terminal             |                                                                                                                                |
+| aura-of-life        | 4   | no      | —     | —                         | —                                 | —               | auto       | —                    | SD-terminal             | emanation + regen riders prose                                                                                                 |
+| death-ward          | 4   | no      | —     | —                         | —                                 | —               | auto       | —                    | SD-terminal             |                                                                                                                                |
+| greater-restoration | 5   | no      | —     | —                         | —                                 | —               | auto       | —                    | SD-terminal             | choice-menu prose                                                                                                              |
+| mass-cure-wounds    | 5   | yes     | slot  | healing                   | roll 5d8 + mod, +1d8/slot         | 1× (per target) | auto       | spellcasting-ability | SCS (S3)                |                                                                                                                                |
+| mass-suggestion     | 6   | yes     | slot  | duration                  | duration tiers (24h/10d/30d/366d) | —               | save(WIS)  | —                    | SCS (S2)                | duration values exceed current `DurationUnit` needs (`day` exists — OK)                                                        |
+| power-word-heal     | 9   | no      | —     | —                         | —                                 | —               | auto       | —                    | SD-terminal             | "all HP" not a roll; conditional riders prose                                                                                  |
 
 ---
 
 ## 3. Pattern frequency
 
-28 scaling spells across 12 families:
+28 scaling spells across 12 families (30 after burning-hands and fireball):
 
-| Family                                                      | Basis | Count | Spells                                                                              |
-| ----------------------------------------------------------- | ----- | ----- | ----------------------------------------------------------------------------------- |
-| Cantrip damage dice (5/11/17 thresholds)                    | char  | 5     | acid-splash, chill-touch, fire-bolt, poison-spray, sacred-flame                     |
-| Cantrip extra-damage dice (appears at 5)                    | char  | 1     | true-strike                                                                         |
-| Cantrip projectile count                                    | char  | 1     | eldritch-blast                                                                      |
-| Cantrip range scaling                                       | char  | 1     | spare-the-dying                                                                     |
-| Slot: +N damage dice per slot (linear)                      | slot  | 5     | hellish-rebuke, inflict-wounds, ray-of-sickness, thunderwave, ice-knife (secondary) |
-| Slot: +N healing dice per slot (linear, + ability mod base) | slot  | 3     | cure-wounds, mass-healing-word, mass-cure-wounds                                    |
-| Slot: +1 target per slot (linear)                           | slot  | 4     | bless, hideous-laughter, jump, longstrider                                          |
-| Slot: +1 projectile per slot (linear)                       | slot  | 1     | magic-missile                                                                       |
-| Slot: flat numeric per slot (linear)                        | slot  | 2     | false-life (+5 temp HP), aid (+5 HP)                                                |
-| Slot: area-size per slot (linear)                           | slot  | 1     | fog-cloud (+20 ft radius)                                                           |
-| Slot: duration tiers (irregular thresholds)                 | slot  | 3     | hex, hunters-mark, mass-suggestion                                                  |
-| Slot: custom prose (choice of quantities)                   | slot  | 1     | create-or-destroy-water                                                             |
+| Family                                                      | Basis | Count | Spells                                                                                                       |
+| ----------------------------------------------------------- | ----- | ----- | ------------------------------------------------------------------------------------------------------------ |
+| Cantrip damage dice (5/11/17 thresholds)                    | char  | 5     | acid-splash, chill-touch, fire-bolt, poison-spray, sacred-flame                                              |
+| Cantrip extra-damage dice (appears at 5)                    | char  | 1     | true-strike                                                                                                  |
+| Cantrip projectile count                                    | char  | 1     | eldritch-blast                                                                                               |
+| Cantrip range scaling                                       | char  | 1     | spare-the-dying                                                                                              |
+| Slot: +N damage dice per slot (linear)                      | slot  | 7     | hellish-rebuke, inflict-wounds, ray-of-sickness, thunderwave, ice-knife (secondary), burning-hands, fireball |
+| Slot: +N healing dice per slot (linear, + ability mod base) | slot  | 3     | cure-wounds, mass-healing-word, mass-cure-wounds                                                             |
+| Slot: +1 target per slot (linear)                           | slot  | 4     | bless, hideous-laughter, jump, longstrider                                                                   |
+| Slot: +1 projectile per slot (linear)                       | slot  | 1     | magic-missile                                                                                                |
+| Slot: flat numeric per slot (linear)                        | slot  | 2     | false-life (+5 temp HP), aid (+5 HP)                                                                         |
+| Slot: area-size per slot (linear)                           | slot  | 1     | fog-cloud (+20 ft radius)                                                                                    |
+| Slot: duration tiers (irregular thresholds)                 | slot  | 3     | hex, hunters-mark, mass-suggestion                                                                           |
+| Slot: custom prose (choice of quantities)                   | slot  | 1     | create-or-destroy-water                                                                                      |
 
 Observations:
 
@@ -238,8 +242,9 @@ Distinctions worth keeping separate:
   invites the "3d10" aggregation error. `beam-count`/`dart-count` fold into
   `projectile-count`; resolution method (attack vs automatic) stays orthogonal.
 - **range vs area-size** — range is the existing structured `spellRangeSchema` field
-  (spare-the-dying overrides it); area-size has no structured home yet (fog-cloud) and
-  is a display-only distance until Stage 4 geometry.
+  (spare-the-dying overrides it); area-size has a structured geometry home in
+  `areaOfEffect` (fog-cloud, fireball, burning-hands) but radius scaling and origin
+  semantics remain prose-only until `area-origin-model-missing` is addressed.
 - **duration vs repeated-effect count** — duration tiers change `spellDurationSchema`
   values; nothing in the catalog scales a number of repetitions. Keep only duration.
 
@@ -252,8 +257,8 @@ Distinctions worth keeping separate:
   - `distance` — reuse `distanceSchema { value, unit: 'ft' }`.
   - `duration` — reuse the `timed` variant of `spellDurationSchema`.
   - `text` — summary string (custom tracks).
-- Recommendation on Damage/Healing: **semantic effect kinds wrapping a shared
-  `roll`**, not distinct value shapes. `SpellEffect` of kind `damage` carries
+- Recommendation on Damage/Healing: **semantic effect kinds wrapping a shared**
+  `roll`, not distinct value shapes. `SpellEffect` of kind `damage` carries
   `{ roll, damageType: DamageTypeId }`; kind `healing` carries `{ roll }`. The
   progression track then overrides the `roll`. This mirrors the existing
   `weaponDamageSchema` split (roll shape vs damage type) and avoids a parallel
@@ -309,14 +314,37 @@ Required distinctions and why:
 ### H. Modeling gap codes
 
 - Now (S0): `effect-schema-missing`, `progression-schema-missing`,
-  `application-model-missing`, `modifier-model-missing`, `area-model-missing`,
-  `conditional-effect-model-missing`, `choice-model-missing`,
-  `manual-review-required`.
+  `application-model-missing`, `modifier-model-missing`, `area-model-missing`
+  (partially addressed — `areaOfEffect` geometry and dimensions only),
+  `area-origin-model-missing`, `conditional-effect-model-missing`,
+  `choice-model-missing`, `manual-review-required`.
 - Reserve: `targeting-model-missing`, `duration-model-missing`,
   `summoning-model-missing`, `ambiguous-rules-text`, `catalog-data-incomplete`,
   `other`.
 - Rationale: every "now" code maps to at least one audited spell (§2 notes);
-  summoning has zero catalog spells yet.
+  summoning has zero catalog spells yet. `area-model-missing` now covers spells whose
+  area shape is entirely prose (acid-splash 5-ft sphere, thunderwave cube, faerie-fire
+  cube, dragons-breath granted cone). `area-origin-model-missing` covers spells with
+  structured geometry but under-modeled anchoring or movement (darkness object-centered
+  emanation, pass-without-trace caster-following emanation).
+
+### I. Area geometry foundation (shipped)
+
+`areaGeometrySchema` / `areaOfEffect` on `spellBodySchema` models shape and
+dimensions only; range stays separate. Formatter and spell detail display use
+`formatAreaGeometry` from `@rpg/contracts`.
+
+| Capability / gap            | Status after area-geometry branch                                                                                                            |
+| --------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| `spell.effect.area`         | Foundation in place (display/filter metadata)                                                                                                |
+| `area-model-missing`        | Partially addressed — geometry + dimensions only                                                                                             |
+| `area-origin-model-missing` | Still missing — origin, anchoring, movement                                                                                                  |
+| **Fog Cloud**               | Point-centered sphere structured (20 ft)                                                                                                     |
+| **Fireball**                | Sphere + slot-damage exemplar (20 ft)                                                                                                        |
+| **Burning Hands**           | Cone exemplar (15 ft); replaces Dragon's Breath as direct-cone sample                                                                        |
+| **Darkness**                | Primary point-centered sphere structured (15 ft); object-centered movable emanation prose-only — prime `area-origin-model-missing` candidate |
+| **Pass without Trace**      | Emanation geometry modeled (30 ft); attachment/movement under-modeled                                                                        |
+| **Dragon's Breath**         | Intentionally not structured at spell root (granted-action geometry)                                                                         |
 
 ---
 
@@ -525,11 +553,12 @@ flowchart TD
 
 ### Stage 4 — Advanced effect families (catalog-driven, not scheduled)
 
-- **Scope candidates and capability IDs:** area geometry (`spell.effect.area` —
-  needed before Fireball-class seeds), condition riders
-  (`spell.effect.conditional`), summoning (`spell.effect.summoning`), choice-menu
-  effects (`spell.effect.choice`), persistent/repeating zones
-  (`spell.effect.repeating`).
+- **Scope candidates and capability IDs:** area origin and movement
+  (`spell.effect.area-origin` — complements shipped `areaOfEffect` geometry),
+  condition riders (`spell.effect.conditional`), summoning (`spell.effect.summoning`),
+  choice-menu effects (`spell.effect.choice`), persistent/repeating zones
+  (`spell.effect.repeating`). Area geometry dimensions (`spell.effect.area`) shipped
+  ahead of this stage for display and catalog authoring.
 - **Trigger:** seed data arriving that a Stage ≤3 model cannot represent, in enough
   volume to justify the family. Each family gets its own mini-roadmap entry.
 - **Non-goals:** speculative implementation ahead of catalog evidence.
@@ -538,23 +567,23 @@ flowchart TD
 
 ## 8. Prioritized capability matrix
 
-| Capability (ID)                                               | Current spells unlocked  | Future value                                       | Authoring cost         | Technical risk                                  | Priority                               |
-| ------------------------------------------------------------- | ------------------------ | -------------------------------------------------- | ---------------------- | ----------------------------------------------- | -------------------------------------- |
-| Progression container + basis (`spell.progression.container`) | 28                       | high — every scaling spell ever                    | low (presets)          | low — mirrors existing `{level,value}` pattern  | **1**                                  |
-| Roll value primitive (`mech.value.roll`)                      | ~25                      | high — weapons, breath weapons, sneak attack reuse | low                    | low — wraps existing `diceSchema`               | **2**                                  |
-| Core spell effects (`spell.effect.core`)                      | ~25                      | high — prerequisite for all math                   | medium                 | medium — kind proliferation risk                | **3**                                  |
-| Typed progression values (`spell.progression.typed`)          | 26 of 28 tracks          | high                                               | low once effects exist | low                                             | **4**                                  |
-| Linear slot tracks (`spell.progression.linear`)               | 15                       | high                                               | low                    | low — but easy to wrongly force into thresholds | **4** (with container)                 |
-| Save-based resolution (`spell.resolution.save`)               | ~10                      | high — save DC display                             | low                    | medium — touches existing `deliveryMethod` enum | **5**                                  |
-| Modifier source (`mech.modifier.source`)                      | 3                        | medium-high (sheet trust)                          | low                    | low — tightly scoped                            | **6**                                  |
-| Application semantics (`mech.application`)                    | 5                        | medium — correctness guard                         | low                    | low                                             | **6**                                  |
-| Count/distance/duration values                                | 12                       | medium                                             | low                    | low                                             | with Stage 2                           |
-| Area geometry (`spell.effect.area`)                           | ~6 (display nicety only) | high _later_ (Fireball et al.)                     | medium                 | high — geometry vocabulary is a rabbit hole     | defer to S4                            |
-| Condition riders (`spell.effect.conditional`)                 | ~8                       | medium                                             | medium                 | high — trigger/duration semantics explode       | defer                                  |
-| Choice-menu effects (`spell.effect.choice`)                   | ~6                       | low-medium                                         | high                   | high                                            | defer — prose is genuinely better here |
-| Summoning (`spell.effect.summoning`)                          | 0                        | high eventually                                    | high                   | high                                            | defer — zero evidence                  |
-| Property-path overrides                                       | —                        | —                                                  | —                      | very high                                       | **do not implement**                   |
-| Dice-expression string parser                                 | —                        | —                                                  | —                      | high (prose inference)                          | **do not implement**                   |
+| Capability (ID)                                               | Current spells unlocked                                              | Future value                                       | Authoring cost         | Technical risk                                  | Priority                               |
+| ------------------------------------------------------------- | -------------------------------------------------------------------- | -------------------------------------------------- | ---------------------- | ----------------------------------------------- | -------------------------------------- |
+| Progression container + basis (`spell.progression.container`) | 28                                                                   | high — every scaling spell ever                    | low (presets)          | low — mirrors existing `{level,value}` pattern  | **1**                                  |
+| Roll value primitive (`mech.value.roll`)                      | ~25                                                                  | high — weapons, breath weapons, sneak attack reuse | low                    | low — wraps existing `diceSchema`               | **2**                                  |
+| Core spell effects (`spell.effect.core`)                      | ~25                                                                  | high — prerequisite for all math                   | medium                 | medium — kind proliferation risk                | **3**                                  |
+| Typed progression values (`spell.progression.typed`)          | 26 of 28 tracks                                                      | high                                               | low once effects exist | low                                             | **4**                                  |
+| Linear slot tracks (`spell.progression.linear`)               | 15                                                                   | high                                               | low                    | low — but easy to wrongly force into thresholds | **4** (with container)                 |
+| Save-based resolution (`spell.resolution.save`)               | ~10                                                                  | high — save DC display                             | low                    | medium — touches existing `deliveryMethod` enum | **5**                                  |
+| Modifier source (`mech.modifier.source`)                      | 3                                                                    | medium-high (sheet trust)                          | low                    | low — tightly scoped                            | **6**                                  |
+| Application semantics (`mech.application`)                    | 5                                                                    | medium — correctness guard                         | low                    | low                                             | **6**                                  |
+| Count/distance/duration values                                | 12                                                                   | medium                                             | low                    | low                                             | with Stage 2                           |
+| Area geometry (`spell.effect.area`)                           | 5 (fog-cloud, fireball, burning-hands, darkness, pass-without-trace) | high _later_ (scaling, combat)                     | medium (shipped)       | medium — origin semantics remain a gap          | **shipped** (dimensions); origin defer |
+| Condition riders (`spell.effect.conditional`)                 | ~8                                                                   | medium                                             | medium                 | high — trigger/duration semantics explode       | defer                                  |
+| Choice-menu effects (`spell.effect.choice`)                   | ~6                                                                   | low-medium                                         | high                   | high                                            | defer — prose is genuinely better here |
+| Summoning (`spell.effect.summoning`)                          | 0                                                                    | high eventually                                    | high                   | high                                            | defer — zero evidence                  |
+| Property-path overrides                                       | —                                                                    | —                                                  | —                      | very high                                       | **do not implement**                   |
+| Dice-expression string parser                                 | —                                                                    | —                                                  | —                      | high (prose inference)                          | **do not implement**                   |
 
 High-value foundational: container, roll, core effects. Useful but deferrable:
 area, conditions. Edge-case traps: choice menus, per-turn zones, aid's HP-maximum
@@ -575,8 +604,7 @@ Builds on the existing schema-driven form system (`spell-form-fields.ts`,
 - Extra damage progression (cantrip), damage/healing per-slot (linear increment),
   projectile count, target count, range, duration tiers, custom text progression.
 
-Target experience for the common cantrip case: `Progression: Damage · Base effect:
-Primary damage · Basis: Character level · L5 → 2d10 · L11 → 3d10 · L17 → 4d10` —
+Target experience for the common cantrip case: `Progression: Damage · Base effect: Primary damage · Basis: Character level · L5 → 2d10 · L11 → 3d10 · L17 → 4d10` —
 damage type entered once on the base effect, inherited everywhere.
 
 **Custom fallback:** progression type "Custom" = lead-in + per-threshold summary
@@ -608,13 +636,16 @@ upgraded at level 5. Next: 3d10 at level 11." Needs Stage 2 only; the save/attac
 line ("ranged spell attack, +7") needs Stage 3 resolution + existing
 `spellAttackBonus`.
 
-**Multiple beams — Eldritch Blast.** Effects: `damage { 1d10 force, application:
-per-projectile }`, `projectiles { count: 1 }` + count track (5→2, 11→3, 17→4).
+**Area blast — Fireball.** Effect `damage { roll: 8d6, fire }` + linear track
+(+1d6/slot above 3). Structured `areaOfEffect: { shape: 'sphere', radius: 20 ft }`
+renders "Area: 20-ft-radius sphere" on detail; origin (chosen point within range)
+remains prose. Needs Stages 2–3 for damage; area dimensions already structured.
+
+**Multiple beams — Eldritch Blast.** Effects: `damage { 1d10 force, application: per-projectile }`, `projectiles { count: 1 }` + count track (5→2, 11→3, 17→4).
 Sheet: "**2 beams — 1d10 Force damage per beam** (separate attack rolls)." The
 `per-projectile` application is what forbids rendering "2d10". Needs Stage 3.
 
-**Extra damage — True Strike.** Effect `damage { roll: 0, radiant, label: 'extra',
-application: once-on-the-attack }` + track (5→1d6, 11→2d6, 17→3d6). Sheet: "Weapon
+**Extra damage — True Strike.** Effect `damage { roll: 0, radiant, label: 'extra', application: once-on-the-attack }` + track (5→1d6, 11→2d6, 17→3d6). Sheet: "Weapon
 attack using your spellcasting ability, **+1d6 Radiant damage**." Base-zero effects
 must be legal (progression introduces the value). Needs Stages 2–3.
 
@@ -624,8 +655,7 @@ your level)" instead of the static 15. Needs Stage 2; note this is the one case
 where a progression overrides existing structured metadata rather than an effect —
 worth a dedicated track target (`range`) rather than an effect reference.
 
-**Modifier — Cure Wounds (contrast).** Effect `healing { roll: 2d8, modifier:
-{ spellcasting-ability, once } }` + linear track (+2d8/slot). Sheet: "**2d8 + 4
+**Modifier — Cure Wounds (contrast).** Effect `healing { roll: 2d8, modifier: { spellcasting-ability, once } }` + linear track (+2d8/slot). Sheet: "**2d8 + 4
 healing**, +2d8 per slot level above 1." Without the explicit modifier field the
 sheet must show only "2d8 + spellcasting modifier" as text. Needs Stage 3.
 
@@ -729,7 +759,7 @@ BENCH tickets, giving one level of indirection.
 
 ## 13. Open decisions (product / architecture input required)
 
-1. **`deliveryMethod` evolution.** Extend the existing spell-level enum into the
+1. `deliveryMethod` **evolution.** Extend the existing spell-level enum into the
    full resolution union (adding `saving-throw { ability }`, `automatic`,
    `weapon-attack`) vs adding a new `resolution` field and deprecating
    `deliveryMethod`. Affects existing form, picker labels, and stored patches.

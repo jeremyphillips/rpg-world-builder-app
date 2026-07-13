@@ -46,6 +46,49 @@
     "higherLevelSlotEffect": "<p>You can target one additional creature for each spell slot level above 1.</p>"
   },
   {
+    "id": "srd-cc-5.2.1:burning-hands",
+    "slug": "burning-hands",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Burning Hands",
+    "level": 1,
+    "description": "<p>A thin sheet of flames shoots forth from you. Each creature in a 15-foot Cone makes a Dexterity saving throw, taking 3d6 Fire damage on a failed save or half as much damage on a successful one.</p><p>Flammable objects in the Cone that aren't being worn or carried start burning.</p>",
+    "school": "evocation",
+    "classIds": ["sorcerer", "wizard"],
+    "tags": {
+      "damageTypes": ["fire"],
+      "roles": ["damage"]
+    },
+    "castingTime": {
+      "normal": {
+        "value": 1,
+        "unit": "action"
+      },
+      "canBeCastAsRitual": false
+    },
+    "range": {
+      "kind": "self"
+    },
+    "areaOfEffect": {
+      "shape": "cone",
+      "length": {
+        "value": 15,
+        "unit": "ft"
+      }
+    },
+    "duration": {
+      "kind": "instantaneous"
+    },
+    "components": {
+      "verbal": true,
+      "somatic": true
+    },
+    "higherLevelSlotEffect": "<p>The damage increases by 1d6 for each spell slot level above 1.</p>"
+  },
+  {
     "id": "srd-cc-5.2.1:create-or-destroy-water",
     "slug": "create-or-destroy-water",
     "rulesetId": "srd-cc-5.2.1",
@@ -424,6 +467,13 @@
       "kind": "distance",
       "value": {
         "value": 120,
+        "unit": "ft"
+      }
+    },
+    "areaOfEffect": {
+      "shape": "sphere",
+      "radius": {
+        "value": 20,
         "unit": "ft"
       }
     },

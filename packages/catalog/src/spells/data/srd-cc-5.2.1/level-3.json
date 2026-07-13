@@ -159,6 +159,56 @@
     "higherLevelSlotEffect": "<p>You automatically end a spell on the target if the spell's level is equal to or less than the level of the spell slot you use.</p>"
   },
   {
+    "id": "srd-cc-5.2.1:fireball",
+    "slug": "fireball",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Fireball",
+    "level": 3,
+    "description": "<p>A bright streak flashes from you to a point you choose within range and then blossoms with a low roar into a fiery explosion. Each creature in a 20-foot-radius Sphere centered on that point makes a Dexterity saving throw, taking 8d6 Fire damage on a failed save or half as much damage on a successful one.</p><p>Flammable objects in the area that aren't being worn or carried start burning.</p>",
+    "school": "evocation",
+    "classIds": ["sorcerer", "wizard"],
+    "tags": {
+      "damageTypes": ["fire"],
+      "roles": ["damage"]
+    },
+    "castingTime": {
+      "normal": {
+        "value": 1,
+        "unit": "action"
+      },
+      "canBeCastAsRitual": false
+    },
+    "range": {
+      "kind": "distance",
+      "value": {
+        "value": 150,
+        "unit": "ft"
+      }
+    },
+    "areaOfEffect": {
+      "shape": "sphere",
+      "radius": {
+        "value": 20,
+        "unit": "ft"
+      }
+    },
+    "duration": {
+      "kind": "instantaneous"
+    },
+    "components": {
+      "verbal": true,
+      "somatic": true,
+      "material": {
+        "description": "a ball of bat guano and sulfur"
+      }
+    },
+    "higherLevelSlotEffect": "<p>The damage increases by 1d6 for each spell slot level above 3.</p>"
+  },
+  {
     "id": "srd-cc-5.2.1:glyph-of-warding",
     "slug": "glyph-of-warding",
     "rulesetId": "srd-cc-5.2.1",
