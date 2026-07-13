@@ -4,7 +4,6 @@ import { useState } from 'react'
 import { Badge } from './badge'
 import { Button } from './button.client'
 import { CatalogPickerSheet } from './catalog-picker-sheet.client'
-import { PreviewCard } from './preview-card.client'
 import { Text } from './text'
 
 type DemoItem = {
@@ -12,6 +11,7 @@ type DemoItem = {
   name: string
   group: 'featured' | 'catalog'
   summary: string
+  price: string
   details: string
 }
 
@@ -21,6 +21,7 @@ const demoItems: DemoItem[] = [
     name: 'Alpha Lantern',
     group: 'featured',
     summary: 'Bright light, 30 ft radius',
+    price: '5 GP',
     details: 'A hooded brass lantern fueled by oil.',
   },
   {
@@ -28,6 +29,7 @@ const demoItems: DemoItem[] = [
     name: 'Beta Rope',
     group: 'catalog',
     summary: '50 feet of hempen rope',
+    price: '1 GP',
     details: 'Standard adventuring rope with a knotted end.',
   },
   {
@@ -35,6 +37,7 @@ const demoItems: DemoItem[] = [
     name: 'Gamma Cloak',
     group: 'featured',
     summary: 'Traveler’s cloak',
+    price: '8 GP',
     details: 'A weatherproof wool cloak with deep pockets.',
   },
 ]
@@ -57,26 +60,27 @@ export const Default: Story = {
     items: demoItems,
     getItemKey: (item) => item.id,
     getSearchText: (item) => `${item.name} ${item.summary}`,
+    getItemToolbarLabel: (item) => item.name,
     getItemTab: (item) => item.group,
     defaultTabId: 'featured',
     tabs: [
       { id: 'featured', label: 'Featured' },
       { id: 'catalog', label: 'All' },
     ],
-    renderItem: (item) => (
-      <PreviewCard
-        title={item.name}
-        description={item.summary}
-        tone="transparent"
-        density="compact"
-        endSlot={
-          <Button type="button" size="sm" variant="outline">
-            Add
-          </Button>
-        }
-      />
+    renderItemHeader: (item) => (
+      <span className="truncate text-sm font-medium">{item.name} · Gear</span>
     ),
-    renderItemDetails: (item) => <p>{item.details}</p>,
+    renderItemActions: (item) => (
+      <div className="flex items-center gap-2">
+        <Text as="span" variant="muted" className="tabular-nums shrink-0">
+          {item.price}
+        </Text>
+        <Button type="button" size="sm" variant="outline">
+          Add
+        </Button>
+      </div>
+    ),
+    renderItemDetails: (item) => <p className="text-sm text-muted-foreground">{item.details}</p>,
   },
   render: function Render(args) {
     const [open, setOpen] = useState(args.open)
@@ -90,15 +94,38 @@ export const Default: Story = {
           {...args}
           open={open}
           onOpenChange={setOpen}
-          filters={
+          toolbarControls={
             <Text variant="muted" className="text-sm">
-              Filters render here without the shell interpreting them.
+              Toolbar controls render here without the shell interpreting them.
             </Text>
           }
           footer={<Button onClick={() => setOpen(false)}>Done</Button>}
         />
       </>
     )
+  },
+}
+
+export const LegacyRows: Story = {
+  args: {
+    open: true,
+    onOpenChange: () => undefined,
+    title: 'Legacy catalog rows',
+    description: 'Right-side chevron rows until callers migrate.',
+    items: demoItems,
+    getItemKey: (item) => item.id,
+    getSearchText: (item) => `${item.name} ${item.summary}`,
+    renderItem: (item) => (
+      <div className="space-y-1">
+        <Text as="p" variant="emphasis">
+          {item.name}
+        </Text>
+        <Text as="p" variant="muted">
+          {item.summary}
+        </Text>
+      </div>
+    ),
+    renderItemDetails: (item) => <p>{item.details}</p>,
   },
 }
 
@@ -110,8 +137,7 @@ export const Loading: Story = {
     items: [],
     getItemKey: () => 'loading',
     getSearchText: () => '',
-    renderItem: () => null,
-    loading: true,
+    renderItemHeader: () => null,
   },
 }
 
@@ -124,10 +150,12 @@ export const Empty: Story = {
     items: [],
     getItemKey: () => 'empty',
     getSearchText: () => '',
-    renderItem: () => null,
+    renderItemHeader: () => null,
     emptyState: (
       <div className="rounded-md border border-dashed p-8 text-center">
-        <Badge variant="secondary">Custom empty state</Badge>
+        <Badge appearance="neutral" tone="neutral">
+          Custom empty state
+        </Badge>
       </div>
     ),
   },

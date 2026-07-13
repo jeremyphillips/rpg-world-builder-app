@@ -1,5 +1,5 @@
 export const STARTING_EQUIPMENT_OPTION_DESCRIPTION_HINT =
-  'For cross-references tied to another proficiency pick (e.g. Monk tool/instrument), describe the choice in prose and include FOLLOWUP: proficiencyLinkedChoice when structured support is deferred.'
+  'Optional display prose for the package card. Linkage to proficiency choices is configured on grant rows, not in description text.'
 
 export const ADD_STARTING_EQUIPMENT_LABEL = 'Add starting equipment'
 export const STARTING_EQUIPMENT_EMPTY_MESSAGE =

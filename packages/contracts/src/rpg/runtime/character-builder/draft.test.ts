@@ -99,6 +99,38 @@ describe('characterBuilderDraftSchema', () => {
     })
   })
 
+  it('normalizes legacy purchases on persisted rehydrate', () => {
+    const draft = {
+      ...createEmptyCharacterBuilderDraft(),
+      class: { classId: 'srd-cc-5.2.1:fighter', level: 1 as const },
+      equipment: {
+        mode: 'gold' as const,
+        purchases: [
+          {
+            equipmentId: 'srd-cc-5.2.1:rope',
+            quantity: 2,
+            sourceMode: 'startingGold' as const,
+            origin: 'picker' as const,
+          },
+        ],
+        removedPackageItemKeys: [],
+        customized: false,
+      },
+    }
+    const persisted = createPersistedCharacterBuilderState(draft)
+    const rehydrated = parsePersistedCharacterBuilderState(JSON.parse(JSON.stringify(persisted)))
+
+    expect(rehydrated?.equipment?.purchases[0]).toEqual(
+      expect.objectContaining({
+        equipmentId: 'srd-cc-5.2.1:rope',
+        quantity: 2,
+        sourceMode: 'startingGold',
+        origin: 'picker',
+        id: expect.stringMatching(/^legacy-purchase:/),
+      }),
+    )
+  })
+
   it('rehydrates persisted drafts without an equipment section', () => {
     const draft = makeDraftInProgress()
     expect(characterBuilderDraftSchema.safeParse(draft).success).toBe(true)

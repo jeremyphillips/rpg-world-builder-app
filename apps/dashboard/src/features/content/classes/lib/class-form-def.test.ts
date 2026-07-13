@@ -84,6 +84,17 @@ describe('classFormDef round-trips', () => {
       expect(input.characterCreation?.proficiencies?.skills?.choices).toEqual(expectedChoices)
     })
 
+    it(`${characterClass.slug}: character creation tool choices round-trip`, () => {
+      const formValues = classFormDef.toFormValues(characterClass) as ClassFormValues
+      const input = classFormDef.toInput(formValues, { entity: characterClass })
+      const expectedChoices = characterClass.characterCreation?.proficiencies?.tools?.choices
+      if (!expectedChoices?.length) {
+        expect(input.characterCreation?.proficiencies?.tools).toBeUndefined()
+        return
+      }
+      expect(input.characterCreation?.proficiencies?.tools?.choices).toEqual(expectedChoices)
+    })
+
     it(`${characterClass.slug}: starting equipment round-trips`, () => {
       const formValues = classFormDef.toFormValues(characterClass) as ClassFormValues
       const input = classFormDef.toInput(formValues, { entity: characterClass })
@@ -142,19 +153,15 @@ describe('classFormDef round-trips', () => {
     expect(input.proficiencies.tools).toEqual(rogue.proficiencies.tools)
   })
 
-  it('sorcerer: specific weapon proficiencies round-trip as slug arrays', () => {
+  it('sorcerer: weaponProficiencyMode is categories when only simple weapons are granted', () => {
     const sorcerer = SRD_CLASSES.find((c) => c.slug === 'sorcerer')!
     const formValues = classFormDef.toFormValues(sorcerer) as ClassFormValues
-    expect(formValues.weaponProficiencyMode).toBe('individual')
-    expect(formValues.proficiencies.weapons.items).toEqual([
-      'dagger',
-      'dart',
-      'sling',
-      'quarterstaff',
-      'light-crossbow',
-    ])
+    expect(formValues.weaponProficiencyMode).toBe('categories')
+    expect(formValues.proficiencies.weapons.categories).toEqual(['simple'])
+    expect(formValues.proficiencies.weapons.items).toEqual([])
     const input = classFormDef.toInput(formValues)
-    expect(input.proficiencies.weapons.items).toEqual(sorcerer.proficiencies.weapons.items)
+    expect(input.proficiencies.weapons.categories).toEqual(['simple'])
+    expect(input.proficiencies.weapons.items).toEqual([])
   })
 
   it('fighter: weaponProficiencyMode is categories when only categories are granted', () => {
@@ -179,6 +186,23 @@ describe('classFormDef round-trips', () => {
     ])
   })
 
+  it('bard: tool proficiency choices round-trip through characterCreation', () => {
+    const bard = SRD_CLASSES.find((c) => c.slug === 'bard')!
+    const formValues = classFormDef.toFormValues(bard) as ClassFormValues
+    expect(formValues.characterCreation?.proficiencies?.tools).toMatchObject({
+      choose: 3,
+      poolSource: 'filtered',
+      poolToolCategories: ['musical_instrument'],
+    })
+    const input = classFormDef.toInput(formValues, { entity: bard })
+    expect(input.characterCreation?.proficiencies?.tools?.choices?.[0]).toMatchObject({
+      id: 'class-tools',
+      label: 'Musical Instruments',
+      choose: 3,
+      pool: { source: 'filtered', toolCategories: ['musical_instrument'] },
+    })
+  })
+
   it('bard: pool choice items round-trip through the class form', () => {
     const bard = SRD_CLASSES.find((c) => c.slug === 'bard')!
     const formValues = classFormDef.toFormValues(bard) as ClassFormValues
@@ -194,6 +218,29 @@ describe('classFormDef round-trips', () => {
     const input = classFormDef.toInput(formValues, { entity: bard })
     expect(input.characterCreation?.startingEquipment).toEqual(
       bard.characterCreation?.startingEquipment,
+    )
+  })
+
+  it('monk: proficiency-linked grant round-trips through the class form', () => {
+    const monk = SRD_CLASSES.find((c) => c.slug === 'monk')!
+    const formValues = classFormDef.toFormValues(monk) as ClassFormValues
+    const linkedGrant = formValues.characterCreation?.startingEquipment?.options
+      .find((option) => option.id === 'standard')
+      ?.items.find(
+        (item) =>
+          item.itemKind === 'grant' &&
+          item.grantTargetSource === 'proficiency_choice' &&
+          item.proficiencyChoiceId === 'class-tools',
+      )
+    expect(linkedGrant).toMatchObject({
+      itemKind: 'grant',
+      grantTargetSource: 'proficiency_choice',
+      proficiencyChoiceId: 'class-tools',
+      quantity: 1,
+    })
+    const input = classFormDef.toInput(formValues, { entity: monk })
+    expect(input.characterCreation?.startingEquipment).toEqual(
+      monk.characterCreation?.startingEquipment,
     )
   })
 

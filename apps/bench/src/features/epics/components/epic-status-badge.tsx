@@ -1,11 +1,12 @@
 import type { EpicStatus } from '@rpg/contracts/dev-bench'
 import { getEpicStatusLabel } from '@rpg/contracts/dev-bench'
-import { Badge, cn } from '@rpg/ui'
+import type { BadgeAppearance, BadgeTone } from '@rpg/ui'
+import { Badge } from '@rpg/ui'
 
-const statusClassName: Record<EpicStatus, string> = {
-  active: 'border-transparent bg-primary text-primary-foreground',
-  paused: 'border-border bg-background text-foreground',
-  done: 'border-transparent bg-secondary text-secondary-foreground',
+const statusBadge: Record<EpicStatus, { appearance: BadgeAppearance; tone: BadgeTone }> = {
+  active: { appearance: 'soft', tone: 'informative' },
+  paused: { appearance: 'outline', tone: 'neutral' },
+  done: { appearance: 'neutral', tone: 'neutral' },
 }
 
 interface EpicStatusBadgeProps {
@@ -14,8 +15,10 @@ interface EpicStatusBadgeProps {
 }
 
 export function EpicStatusBadge({ status, className }: EpicStatusBadgeProps) {
+  const { appearance, tone } = statusBadge[status]
+
   return (
-    <Badge variant="outline" size="sm" className={cn(statusClassName[status], className)}>
+    <Badge appearance={appearance} tone={tone} size="sm" className={className}>
       {getEpicStatusLabel(status)}
     </Badge>
   )

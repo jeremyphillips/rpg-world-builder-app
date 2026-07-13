@@ -130,6 +130,50 @@ describe('character-builder-store', () => {
     expect(store.getState().draft).toEqual(createEmptyCharacterBuilderDraft())
   })
 
+  it('rehydrates legacy equipment purchases with stable ids', async () => {
+    const classId = 'srd-cc-5.2.1:fighter'
+    const persistedDraft = {
+      ...createEmptyCharacterBuilderDraft(),
+      class: { classId, level: 1 as const },
+      equipment: {
+        mode: 'gold' as const,
+        purchases: [
+          {
+            equipmentId: 'srd-cc-5.2.1:rations',
+            quantity: 2,
+            sourceMode: 'startingGold' as const,
+            origin: 'picker' as const,
+          },
+        ],
+        removedPackageItemKeys: [],
+        customized: false,
+      },
+      touchedStepIds: ['equipment' as const],
+    }
+    sessionStorage.setItem(
+      'character-builder:test:standalone:ruleset-legacy-purchases',
+      JSON.stringify({
+        state: createPersistedCharacterBuilderState(persistedDraft),
+        version: 0,
+      }),
+    )
+
+    const store = createCharacterBuilderStore(
+      'character-builder:test:standalone:ruleset-legacy-purchases',
+    )
+
+    await vi.waitFor(() => {
+      expect(store.getState()._hasHydrated).toBe(true)
+    })
+
+    expect(store.getState().pendingRestoredDraft?.equipment?.purchases[0]).toEqual(
+      expect.objectContaining({
+        id: expect.stringMatching(/^legacy-purchase:/),
+        origin: 'picker',
+      }),
+    )
+  })
+
   it('continues or clears a pending restore', async () => {
     const persistedDraft = {
       ...createEmptyCharacterBuilderDraft(),

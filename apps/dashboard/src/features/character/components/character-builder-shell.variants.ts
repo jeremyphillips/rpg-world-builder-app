@@ -15,7 +15,7 @@ export const characterBuilderShellHeaderClasses = 'flex shrink-0 items-center ju
 export const characterBuilderShellBodyClasses =
   'grid min-h-0 flex-1 grid-cols-1 gap-6 overflow-hidden lg:grid-cols-[minmax(12rem,16rem)_minmax(0,1fr)_minmax(14rem,18rem)]'
 
-export const characterBuilderShellColumnClasses = 'min-h-0 min-w-0 overflow-y-auto'
+export const characterBuilderShellColumnClasses = 'scrollbar-slim min-h-0 min-w-0 overflow-y-auto'
 
 /** Preview column — defers scroll to the panel body so the eyebrow stays visible. */
 export const characterBuilderShellPreviewColumnClasses =
@@ -49,7 +49,7 @@ export const characterBuilderPreviewPanelRootClasses = 'flex min-h-0 min-w-0 fle
 
 /** Scrollable bordered preview body — eyebrow sits above this container. */
 export const characterBuilderPreviewPanelBodyClasses =
-  'flex min-h-0 flex-1 flex-col overflow-y-auto rounded-lg border border-border bg-muted/20'
+  'scrollbar-slim flex min-h-0 flex-1 flex-col overflow-y-auto rounded-lg border border-border bg-muted/20'
 
 export const characterBuilderPreviewPanelBodyInnerClasses = 'min-w-0 p-4'
 

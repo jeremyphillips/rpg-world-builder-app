@@ -104,7 +104,7 @@ import {
   TableHeader,
   TableRow,
 } from './table'
-import { Badge } from './badge'
+import { Badge, type BadgeAppearance, type BadgeTone } from './badge'
 import { dataTableWidthMeta } from './data-table-meta'
 import type {
   BooleanFilterDef,
@@ -523,7 +523,7 @@ function DataTableToolbar<TData>({
             <Filter className="size-3.5" />
             Filters
             {activeSecondaryCount > 0 && (
-              <Badge variant="secondary" className="ml-0.5 px-1.5 py-0">
+              <Badge appearance="neutral" tone="neutral" size="sm" className="ml-0.5">
                 {activeSecondaryCount}
               </Badge>
             )}
@@ -740,13 +740,18 @@ export function NameCell({ children }: NameCellProps) {
 // ---------------------------------------------------------------------------
 
 export interface TableBadgeCellProps {
-  variant: React.ComponentProps<typeof Badge>['variant']
+  appearance?: BadgeAppearance
+  tone?: BadgeTone
   children: React.ReactNode
 }
 
-export function TableBadgeCell({ variant, children }: TableBadgeCellProps) {
+export function TableBadgeCell({
+  appearance = 'neutral',
+  tone = 'neutral',
+  children,
+}: TableBadgeCellProps) {
   return (
-    <Badge size="sm" variant={variant}>
+    <Badge size="sm" appearance={appearance} tone={tone}>
       {children}
     </Badge>
   )

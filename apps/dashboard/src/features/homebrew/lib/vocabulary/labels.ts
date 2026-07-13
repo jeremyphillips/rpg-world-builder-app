@@ -9,8 +9,16 @@ export const VOCABULARY_SOURCE_LABELS = {
 } as const satisfies Record<VocabularyOptionSource, string>
 
 export const VOCABULARY_SOURCE_BADGE = {
-  system: { variant: 'secondary', label: VOCABULARY_SOURCE_LABELS.system },
-  campaign: { variant: 'outline', label: VOCABULARY_SOURCE_LABELS.campaign },
+  system: {
+    appearance: 'neutral',
+    tone: 'neutral',
+    label: VOCABULARY_SOURCE_LABELS.system,
+  },
+  campaign: {
+    appearance: 'outline',
+    tone: 'neutral',
+    label: VOCABULARY_SOURCE_LABELS.campaign,
+  },
 } as const satisfies SourceBadgeMap<VocabularyOptionSource>
 
 export const VOCABULARY_STATUS_LABELS = {

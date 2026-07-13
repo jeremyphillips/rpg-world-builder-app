@@ -12,7 +12,7 @@ export function MasterDetailRowBadges({ badges }: MasterDetailRowBadgesProps) {
   return (
     <span className="mt-1 flex flex-wrap items-center gap-1">
       {badges.map((badge) => (
-        <Badge key={badge.label} variant={badge.variant ?? 'outline'} className="text-[10px]">
+        <Badge key={badge.label} appearance={badge.appearance} tone={badge.tone} size="sm">
           {badge.label}
         </Badge>
       ))}

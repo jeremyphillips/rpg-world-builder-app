@@ -92,8 +92,18 @@ const storedDruid: ClassStored = {
           id: 'standard',
           label: 'Standard Equipment',
           items: [
-            { kind: 'grant', equipmentSlug: 'leather-armor', quantity: 1, equipped: true },
-            { kind: 'grant', equipmentSlug: 'shield', quantity: 1, equipped: true },
+            {
+              kind: 'grant',
+              target: { source: 'equipment', equipmentSlug: 'leather-armor' },
+              quantity: 1,
+              equipped: true,
+            },
+            {
+              kind: 'grant',
+              target: { source: 'equipment', equipmentSlug: 'shield' },
+              quantity: 1,
+              equipped: true,
+            },
           ],
           wealth: { gp: 9 },
         },
@@ -206,7 +216,7 @@ describe('deriveEquipmentDraftEntries', () => {
     ])
   })
 
-  it('adds purchases with startingGold and manual sources', () => {
+  it('preserves purchase quantities in derived equipment entries', () => {
     const draft = {
       ...createEmptyCharacterBuilderDraft(),
       class: { classId: storedDruid.id, level: 1 as const },
@@ -216,8 +226,18 @@ describe('deriveEquipmentDraftEntries', () => {
       equipment: {
         mode: 'gold' as const,
         purchases: [
-          { equipmentId: rope.id, quantity: 2, sourceMode: 'startingGold' as const },
-          { equipmentId: shield.id, quantity: 1, sourceMode: 'manual' as const },
+          {
+            equipmentId: rope.id,
+            quantity: 4,
+            sourceMode: 'startingGold' as const,
+            origin: 'picker' as const,
+          },
+          {
+            equipmentId: shield.id,
+            quantity: 1,
+            sourceMode: 'manual' as const,
+            origin: 'picker' as const,
+          },
         ],
         removedPackageItemKeys: [],
         customized: true,
@@ -229,7 +249,7 @@ describe('deriveEquipmentDraftEntries', () => {
     expect(equipment.gear).toEqual([
       {
         equipmentId: rope.id,
-        quantity: 2,
+        quantity: 4,
         sources: [{ kind: 'startingGold', sourceId: storedDruid.id, grantId: 'gold' }],
       },
     ])

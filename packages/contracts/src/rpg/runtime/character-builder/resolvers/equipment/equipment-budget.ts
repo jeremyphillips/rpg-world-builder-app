@@ -1,5 +1,13 @@
-import { moneyToCp, type Money } from '../../../../primitives/units'
 import type { Equipment } from '../../../../content/equipment'
+import {
+  copperToWealth,
+  formatWealth,
+  formatWealthAsGold,
+  moneyToCopper,
+  subtractFromWealth,
+  wealthToCopper,
+  type CoinWealth,
+} from '../../../../primitives/wealth'
 import {
   characterWealthFromGrant,
   type CharacterWealth,
@@ -15,58 +23,25 @@ export type EquipmentBudgetSummary = {
   remaining: CharacterWealth
 }
 
-const COPPER_PER_SILVER = 10
-const COPPER_PER_GOLD = 100
-const COPPER_PER_PLATINUM = 1000
-
-/** Normalizes multi-denomination wealth to copper pieces for comparisons. */
-export function wealthToCopper(wealth: CharacterWealth): number {
-  return (
-    wealth.cp +
-    wealth.sp * COPPER_PER_SILVER +
-    wealth.gp * COPPER_PER_GOLD +
-    wealth.pp * COPPER_PER_PLATINUM
-  )
+export {
+  copperToWealth,
+  formatWealth,
+  formatWealthAsGold,
+  moneyToCopper,
+  subtractFromWealth,
+  wealthToCopper,
 }
 
-/** Normalizes a catalog price to copper pieces. */
-export function moneyToCopper(money: Money): number {
-  return moneyToCp(money)
+/** Returns true when the item cost fits in the starting (package) budget. */
+export function isEquipmentAffordableAtStartingBudget(
+  equipment: Equipment,
+  budget: EquipmentBudgetSummary,
+): boolean {
+  return moneyToCopper(equipment.cost) <= wealthToCopper(budget.starting)
 }
 
-/** Converts a copper total back into the stored character wealth shape. */
-export function copperToWealth(totalCopper: number): CharacterWealth {
-  let cp = Math.max(0, Math.floor(totalCopper))
-  const pp = Math.floor(cp / COPPER_PER_PLATINUM)
-  cp %= COPPER_PER_PLATINUM
-  const gp = Math.floor(cp / COPPER_PER_GOLD)
-  cp %= COPPER_PER_GOLD
-  const sp = Math.floor(cp / COPPER_PER_SILVER)
-  cp %= COPPER_PER_SILVER
-  return { cp, sp, gp, pp }
-}
-
-/** Subtracts a price (or copper total) from wealth, flooring at zero. */
-export function subtractFromWealth(
-  wealth: CharacterWealth,
-  amount: Money | number,
-): CharacterWealth {
-  const costCp = typeof amount === 'number' ? amount : moneyToCopper(amount)
-  return copperToWealth(wealthToCopper(wealth) - costCp)
-}
-
-/** Formats multi-denomination wealth for compact UI display. */
-export function formatWealth(wealth: CharacterWealth): string {
-  const parts: string[] = []
-  if (wealth.pp > 0) parts.push(`${wealth.pp} PP`)
-  if (wealth.gp > 0) parts.push(`${wealth.gp} GP`)
-  if (wealth.sp > 0) parts.push(`${wealth.sp} SP`)
-  if (wealth.cp > 0) parts.push(`${wealth.cp} CP`)
-  return parts.length > 0 ? parts.join(', ') : '0 GP'
-}
-
-/** Returns true when the item cost fits in the remaining budget. */
-export function isEquipmentAffordable(
+/** Returns true when the item cost fits in the remaining budget after purchases. */
+export function isEquipmentWithinRemainingBudget(
   equipment: Equipment,
   budget: EquipmentBudgetSummary,
 ): boolean {
@@ -124,3 +99,5 @@ export function deriveEquipmentBudgetSummary(
 
   return { starting, spent, remaining }
 }
+
+export type { CoinWealth }

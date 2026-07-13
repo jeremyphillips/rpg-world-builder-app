@@ -2,11 +2,16 @@ import { z } from 'zod'
 import {
   ABILITY_ENTRIES,
   ABILITY_IDS,
+  SPELLCASTING_FOCUS_GEAR_KINDS,
+  SPELLCASTING_GEAR_KINDS,
+  SPELLCASTING_GEAR_KIND_ENTRIES,
   SPELLCASTING_PROGRESSIONS,
   SPELL_PREPARATION_MODES,
   SPELL_PREPARATION_MODE_LABELS,
   abilitySchema,
   campaignLevelSchema,
+  spellcastingFocusGearKindSchema,
+  spellcastingGearKindSchema,
 } from '@rpg/contracts'
 import {
   toOptions,
@@ -40,6 +45,20 @@ const spellcastingProgressionOptions = toOptions(
 
 const spellPreparationOptions = toOptions(SPELL_PREPARATION_MODES, SPELL_PREPARATION_MODE_LABELS)
 
+const spellcastingGearKindOptions = toOptions(
+  SPELLCASTING_GEAR_KINDS,
+  Object.fromEntries(
+    SPELLCASTING_GEAR_KINDS.map((kind) => [kind, SPELLCASTING_GEAR_KIND_ENTRIES[kind].label]),
+  ) as Record<(typeof SPELLCASTING_GEAR_KINDS)[number], string>,
+)
+
+const spellcastingFocusKindOptions = toOptions(
+  SPELLCASTING_FOCUS_GEAR_KINDS,
+  Object.fromEntries(
+    SPELLCASTING_FOCUS_GEAR_KINDS.map((kind) => [kind, SPELLCASTING_GEAR_KIND_ENTRIES[kind].label]),
+  ) as Record<(typeof SPELLCASTING_FOCUS_GEAR_KINDS)[number], string>,
+)
+
 export const progressionTableFormSchema = z.object({
   cantrips: z.array(z.number().int().min(0).nullable()),
   spellsAvailable: z.array(z.number().int().min(0).nullable()),
@@ -57,6 +76,9 @@ export function createSpellcastingFormSchema(maxLevel: number) {
     progression: z.enum(SPELLCASTING_PROGRESSIONS).optional(),
     ability: abilitySchema.optional(),
     preparation: z.enum(SPELL_PREPARATION_MODES).optional(),
+    requiredGear: z.array(spellcastingGearKindSchema).optional(),
+    focusKinds: z.array(spellcastingFocusGearKindSchema).optional(),
+    recommendedGear: z.array(spellcastingGearKindSchema).optional(),
     progressionTable: progressionTableFormSchema.optional(),
   })
 }
@@ -157,6 +179,33 @@ export function spellcastingFields(ctx: ContentFormCtx): FormItem[] {
             required: true,
           },
         ],
+      },
+      {
+        type: 'combobox',
+        name: 'spellcasting.requiredGear',
+        label: 'Required gear',
+        options: spellcastingGearKindOptions,
+        multiple: true,
+        visibility: visibleWhenSpellcasting(),
+        hint: 'Class-critical spellcasting items (e.g. Wizard spellbook).',
+      },
+      {
+        type: 'combobox',
+        name: 'spellcasting.focusKinds',
+        label: 'Focus kinds',
+        options: spellcastingFocusKindOptions,
+        multiple: true,
+        visibility: visibleWhenSpellcasting(),
+        hint: 'Spellcasting foci this class can use.',
+      },
+      {
+        type: 'combobox',
+        name: 'spellcasting.recommendedGear',
+        label: 'Recommended gear',
+        options: spellcastingGearKindOptions,
+        multiple: true,
+        visibility: visibleWhenSpellcasting(),
+        hint: 'Strong-tier spellcasting gear suggestions.',
       },
       {
         type: 'richtext',

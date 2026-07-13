@@ -7,8 +7,12 @@ import { Button } from '@rpg/ui'
 import { EquipmentPickerDrawer } from './equipment-picker-drawer.client'
 import {
   equipmentPickerBudgetFixture,
+  equipmentPickerDefaultPathItemsFixture,
   equipmentPickerItemsFixture,
+  equipmentPickerLowRemainingBudgetFixture,
+  equipmentPickerRopeFixture,
 } from './equipment-picker-drawer.fixtures'
+import { EQUIPMENT_PICKER_PURCHASE_ADD_ANOTHER_LABEL } from './equipment-picker-purchase.lib'
 
 const meta = {
   title: 'Character Builder/EquipmentPickerDrawer',
@@ -39,6 +43,30 @@ export const Default: Story = {
         <EquipmentPickerDrawer {...args} open={open} onOpenChange={setOpen} />
       </>
     )
+  },
+}
+
+export const DefaultPathAffordableNow: Story = {
+  args: {
+    open: true,
+    onOpenChange: () => undefined,
+    items: equipmentPickerDefaultPathItemsFixture,
+    budget: equipmentPickerLowRemainingBudgetFixture,
+    filterOutUnaffordable: true,
+    defaultTab: 'all',
+    onAddItem: () => undefined,
+  },
+}
+
+export const LowRemainingBudget: Story = {
+  args: {
+    open: true,
+    onOpenChange: () => undefined,
+    items: equipmentPickerDefaultPathItemsFixture,
+    budget: equipmentPickerLowRemainingBudgetFixture,
+    filterOutUnaffordable: false,
+    defaultTab: 'all',
+    onAddItem: () => undefined,
   },
 }
 
@@ -81,5 +109,49 @@ export const CharacterPreview: Story = {
       budget: equipmentPickerBudgetFixture,
     },
     onAddItem: () => undefined,
+  },
+}
+
+export const ClearFilters: Story = {
+  args: {
+    open: true,
+    onOpenChange: () => undefined,
+    items: equipmentPickerItemsFixture,
+    budget: equipmentPickerBudgetFixture,
+    filterOutUnaffordable: false,
+    defaultTab: 'all',
+    toolbarResetMode: 'clear_filters',
+    onAddItem: () => undefined,
+  },
+}
+
+export const SortByPrice: Story = {
+  args: {
+    open: true,
+    onOpenChange: () => undefined,
+    items: equipmentPickerDefaultPathItemsFixture,
+    budget: equipmentPickerLowRemainingBudgetFixture,
+    filterOutUnaffordable: false,
+    defaultTab: 'all',
+    onAddItem: () => undefined,
+  },
+}
+
+export const OwnedStackable: Story = {
+  args: {
+    open: true,
+    onOpenChange: () => undefined,
+    items: [equipmentPickerItemsFixture[2]!],
+    budget: equipmentPickerBudgetFixture,
+    ownedPurchaseQuantities: { [equipmentPickerRopeFixture.id]: 2 },
+    defaultTab: 'all',
+    onAddItem: () => undefined,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: `Owned stackables show ${EQUIPMENT_PICKER_PURCHASE_ADD_ANOTHER_LABEL} in the header rail.`,
+      },
+    },
   },
 }

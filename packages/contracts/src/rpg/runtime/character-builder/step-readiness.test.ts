@@ -8,12 +8,16 @@ import { createEmptyCharacterBuilderDraft } from './draft'
 import type { CharacterBuilderDraft } from './draft'
 import { indexCharacterBuildCatalog, type CharacterBuildCatalog } from './context'
 import { resolveAvailableChoices } from './resolvers/registry/resolve-choices'
+import { buildChoiceSetId } from './choice-set'
 import { startingEquipmentChoiceSetId } from './resolvers/equipment/resolve-starting-equipment-choice-sets'
 import {
   proficiencyTestContext,
   rogueClass,
   stealthSkill,
   acrobaticsSkill,
+  luteTool,
+  fluteTool,
+  monkClass,
 } from './proficiency-test-fixtures'
 import { ORIGIN_LANGUAGES_CHOICE_ID } from '../../content/character-creation-proficiencies'
 import {
@@ -47,6 +51,22 @@ const leatherArmor = equipmentSchema.parse({
   stealthDisadvantage: false,
 })
 
+const rations = equipmentSchema.parse({
+  id: `${RULESET}:rations`,
+  slug: 'rations',
+  rulesetId: RULESET,
+  source: 'system',
+  campaignId: null,
+  createdAt: '2026-01-01T00:00:00.000Z',
+  updatedAt: '2026-01-01T00:00:00.000Z',
+  name: 'Rations',
+  description: '',
+  kind: 'adventuring_gear',
+  gearKind: 'consumable',
+  cost: { amount: 5, currency: 'sp' },
+  weight: { value: 2, unit: 'lb' },
+})
+
 const equipmentBardClass: ClassStored = {
   id: `${RULESET}:bard`,
   slug: 'bard',
@@ -72,7 +92,37 @@ const equipmentBardClass: ClassStored = {
         {
           id: 'standard',
           label: 'Standard Equipment',
-          items: [{ kind: 'grant', equipmentSlug: 'leather-armor', quantity: 1, equipped: true }],
+          items: [
+            {
+              kind: 'grant',
+              target: { source: 'equipment', equipmentSlug: 'leather-armor' },
+              quantity: 1,
+              equipped: true,
+            },
+          ],
+        },
+      ],
+    },
+  },
+}
+
+const equipmentMonkClass: ClassStored = {
+  ...monkClass,
+  characterCreation: {
+    ...monkClass.characterCreation,
+    startingEquipment: {
+      choose: 1,
+      options: [
+        {
+          id: 'standard',
+          label: 'Standard Equipment',
+          items: [
+            {
+              kind: 'grant',
+              target: { source: 'proficiency_choice', choiceId: 'class-tools' },
+              quantity: 1,
+            },
+          ],
         },
       ],
     },
@@ -84,7 +134,7 @@ const equipmentTestContext = {
   catalog: {
     ...builderTestContext.catalog,
     classes: [fighterClass, equipmentBardClass],
-    equipment: [leatherArmor],
+    equipment: [leatherArmor, rations],
   },
 }
 
@@ -97,7 +147,7 @@ function catalogFor(classes: ClassStored[]): CharacterBuildCatalog {
     species: [],
     classes,
     spells: [],
-    equipment: [leatherArmor],
+    equipment: [leatherArmor, rations],
     skillProficiencies: [],
     languages: [],
   }
@@ -267,9 +317,109 @@ describe('resolveBuilderStepReadiness', () => {
         resolveBuilderStepReadiness('equipment', draft, equipmentTestContext, choiceSets),
       ).toEqual({
         readiness: 'complete',
+      })
+    })
+
+    it('stays complete when gold purchases include multi-quantity stackables', () => {
+      const draft = draftWith({
+        class: { classId: equipmentBardClass.id, level: 1 },
+        choiceSelections: {
+          [startingEquipmentChoiceSetId(equipmentBardClass.id)]: ['gold'],
+        },
+        equipment: {
+          mode: 'gold',
+          purchases: [
+            {
+              equipmentId: rations.id,
+              quantity: 4,
+              sourceMode: 'startingGold',
+              origin: 'picker',
+            },
+          ],
+          removedPackageItemKeys: [],
+          customized: false,
+        },
+      })
+      const choiceSets = resolveAvailableChoices(draft, equipmentTestContext)
+
+      expect(
+        resolveBuilderStepReadiness('equipment', draft, equipmentTestContext, choiceSets),
+      ).toEqual({
+        readiness: 'complete',
+      })
+    })
+
+    it('stays incomplete when a linked proficiency grant is still pending', () => {
+      const draft = draftWith({
+        class: { classId: equipmentMonkClass.id, level: 1 },
+        choiceSelections: {
+          [startingEquipmentChoiceSetId(equipmentMonkClass.id)]: ['standard'],
+        },
+      })
+      const monkContext = {
+        ...equipmentTestContext,
+        catalog: {
+          ...equipmentTestContext.catalog,
+          classes: [...equipmentTestContext.catalog.classes, equipmentMonkClass],
+          equipment: [leatherArmor, luteTool, fluteTool],
+        },
+      }
+      const choiceSets = resolveAvailableChoices(draft, monkContext)
+
+      expect(resolveBuilderStepReadiness('equipment', draft, monkContext, choiceSets)).toEqual({
+        readiness: 'readyWithChoices',
         message: formatFieldMessage(
-          characterBuilderStepReadinessMessages.equipmentReviewComplete(),
+          characterBuilderStepReadinessMessages.equipmentPendingIncludedTool(),
         ),
+      })
+    })
+
+    it('completes when the linked proficiency answer is satisfied', () => {
+      const monkToolChoiceSetId = buildChoiceSetId('class', equipmentMonkClass.id, 'class-tools')
+      const draft = draftWith({
+        class: { classId: equipmentMonkClass.id, level: 1 },
+        choiceSelections: {
+          [startingEquipmentChoiceSetId(equipmentMonkClass.id)]: ['standard'],
+          [monkToolChoiceSetId]: [luteTool.id],
+        },
+      })
+      const monkContext = {
+        ...equipmentTestContext,
+        catalog: {
+          ...equipmentTestContext.catalog,
+          classes: [...equipmentTestContext.catalog.classes, equipmentMonkClass],
+          equipment: [leatherArmor, luteTool, fluteTool],
+        },
+      }
+      const choiceSets = resolveAvailableChoices(draft, monkContext)
+
+      expect(resolveBuilderStepReadiness('equipment', draft, monkContext, choiceSets)).toEqual({
+        readiness: 'complete',
+      })
+    })
+
+    it('reports invalid linked proficiency answers separately from pending guidance', () => {
+      const monkToolChoiceSetId = buildChoiceSetId('class', equipmentMonkClass.id, 'class-tools')
+      const draft = draftWith({
+        class: { classId: equipmentMonkClass.id, level: 1 },
+        choiceSelections: {
+          [startingEquipmentChoiceSetId(equipmentMonkClass.id)]: ['standard'],
+          [monkToolChoiceSetId]: [luteTool.id, fluteTool.id],
+        },
+      })
+      const monkContext = {
+        ...equipmentTestContext,
+        catalog: {
+          ...equipmentTestContext.catalog,
+          classes: [...equipmentTestContext.catalog.classes, equipmentMonkClass],
+          equipment: [leatherArmor, luteTool, fluteTool],
+        },
+      }
+      const choiceSets = resolveAvailableChoices(draft, monkContext)
+
+      expect(resolveBuilderStepReadiness('equipment', draft, monkContext, choiceSets)).toEqual({
+        readiness: 'readyWithChoices',
+        message: 'Proficiency choice must have exactly one selected option.',
       })
     })
   })

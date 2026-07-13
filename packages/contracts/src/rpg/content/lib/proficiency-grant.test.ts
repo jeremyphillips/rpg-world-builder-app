@@ -63,6 +63,50 @@ describe('toolProficiencyGrantSchema', () => {
       }),
     ).toEqual({ kind: 'choice', choose: 3, pool: { source: 'any' } })
   })
+
+  it('parses a filtered tool pool with multiple categories', () => {
+    expect(
+      toolProficiencyGrantSchema.parse({
+        kind: 'choice',
+        choose: 1,
+        pool: {
+          source: 'filtered',
+          toolCategories: ['artisan', 'musical_instrument'],
+        },
+      }),
+    ).toEqual({
+      kind: 'choice',
+      choose: 1,
+      pool: {
+        source: 'filtered',
+        toolCategories: ['artisan', 'musical_instrument'],
+      },
+    })
+  })
+
+  it('coerces legacy single toolCategory to toolCategories', () => {
+    expect(
+      toolProficiencyGrantSchema.parse({
+        kind: 'choice',
+        choose: 3,
+        pool: { source: 'filtered', toolCategory: 'musical_instrument' },
+      }),
+    ).toEqual({
+      kind: 'choice',
+      choose: 3,
+      pool: { source: 'filtered', toolCategories: ['musical_instrument'] },
+    })
+  })
+
+  it('rejects filtered pools with no categories or slugs', () => {
+    expect(
+      toolProficiencyGrantSchema.safeParse({
+        kind: 'choice',
+        choose: 1,
+        pool: { source: 'filtered' },
+      }).success,
+    ).toBe(false)
+  })
 })
 
 describe('skillProficiencyGrantSchema', () => {
@@ -163,7 +207,7 @@ describe('format proficiency grant sentences', () => {
       formatToolProficiencyGrantSentence({
         kind: 'choice',
         choose: 2,
-        pool: { source: 'filtered', toolCategory: 'thieves' },
+        pool: { source: 'filtered', toolCategories: ['thieves'] },
       }),
     ).toBe("Character chooses 2 tool proficiencies from sets of thieves' tools.")
   })

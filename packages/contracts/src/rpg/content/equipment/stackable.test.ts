@@ -17,45 +17,7 @@ const baseMeta = {
 }
 
 describe('isEquipmentStackable', () => {
-  it('treats ammunition and consumable adventuring gear as stackable', () => {
-    const arrows = {
-      ...baseMeta,
-      id: 'srd-cc-5.2.1:arrows',
-      slug: 'arrows',
-      name: 'Arrows',
-      kind: 'adventuring_gear',
-      gearKind: 'ammunition',
-      bundleSize: 20,
-    } satisfies Equipment
-
-    const rations = {
-      ...baseMeta,
-      id: 'srd-cc-5.2.1:rations',
-      slug: 'rations',
-      name: 'Rations',
-      kind: 'adventuring_gear',
-      gearKind: 'consumable',
-    } satisfies Equipment
-
-    expect(isEquipmentStackable(arrows)).toBe(true)
-    expect(isEquipmentStackable(rations)).toBe(true)
-  })
-
-  it('treats bundled general gear as stackable', () => {
-    const spikes = {
-      ...baseMeta,
-      id: 'srd-cc-5.2.1:spikes-iron',
-      slug: 'spikes-iron',
-      name: 'Spikes, Iron',
-      kind: 'adventuring_gear',
-      gearKind: 'general',
-      bundleSize: 10,
-    } satisfies Equipment
-
-    expect(isEquipmentStackable(spikes)).toBe(true)
-  })
-
-  it('treats weapons, armor, and unique gear as not stackable', () => {
+  it('is permissive by default until stack rules are authored', () => {
     const longsword = {
       ...baseMeta,
       id: 'srd-cc-5.2.1:longsword',
@@ -70,16 +32,16 @@ describe('isEquipmentStackable', () => {
       mastery: 'sap',
     } satisfies Equipment
 
-    const rope = {
+    const rations = {
       ...baseMeta,
-      id: 'srd-cc-5.2.1:rope',
-      slug: 'rope',
-      name: 'Rope',
+      id: 'srd-cc-5.2.1:rations',
+      slug: 'rations',
+      name: 'Rations',
       kind: 'adventuring_gear',
-      gearKind: 'general',
+      gearKind: 'consumable',
     } satisfies Equipment
 
-    expect(isEquipmentStackable(longsword)).toBe(false)
-    expect(isEquipmentStackable(rope)).toBe(false)
+    expect(isEquipmentStackable(longsword)).toBe(true)
+    expect(isEquipmentStackable(rations)).toBe(true)
   })
 })

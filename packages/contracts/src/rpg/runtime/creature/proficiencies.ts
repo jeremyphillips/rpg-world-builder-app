@@ -8,7 +8,9 @@ import type {
   WeaponProficiencyPool,
 } from '../../content/lib/proficiency-grant'
 import { getSkillName } from '../../content/skill-proficiency'
+import type { ToolCategory } from '../../vocab/equipment/tool-category'
 import type { CreatureEquipmentCatalog } from './equipment'
+import { equipmentIdMatchesReference } from './equipment-id-match'
 import { toEquipmentContentId } from './equipment'
 
 // ---------------------------------------------------------------------------
@@ -18,6 +20,37 @@ import { toEquipmentContentId } from './equipment'
 // ---------------------------------------------------------------------------
 
 export type CreatureSkillCatalog = ReadonlyMap<string, SkillProficiency>
+
+/** Neutral tool-proficiency target shared by character sheets and future monster stat blocks. */
+export type CreatureToolProficiencyTarget = {
+  toolId?: string
+  toolCategory?: ToolCategory
+}
+
+function toolIdMatchesEquipment(
+  toolId: string,
+  equipment: Extract<Equipment, { kind: 'tool' }>,
+): boolean {
+  return equipmentIdMatchesReference({
+    reference: toolId,
+    equipment,
+    rulesetId: equipment.rulesetId,
+  })
+}
+
+/** Returns true when proficiency rows cover a catalog tool row. */
+export function isToolProficient(args: {
+  equipment: Extract<Equipment, { kind: 'tool' }>
+  proficiencies: readonly CreatureToolProficiencyTarget[]
+}): boolean {
+  const { equipment, proficiencies } = args
+
+  return proficiencies.some(
+    (entry) =>
+      (entry.toolCategory !== undefined && entry.toolCategory === equipment.toolCategory) ||
+      (entry.toolId !== undefined && toolIdMatchesEquipment(entry.toolId, equipment)),
+  )
+}
 
 function findSkillByIdOrSlug(
   skills: CreatureSkillCatalog,
@@ -82,9 +115,8 @@ export function listToolsMatchingPool(args: {
 
   if (pool.source === 'explicit') {
     return pool.toolSlugs.flatMap((slug) => {
-      const equipmentId = toEquipmentContentId(rulesetId, slug)
-      const row = equipment.get(equipmentId)
-      return row?.kind === 'tool' ? [row] : []
+      const row = findToolEquipmentBySlug(slug, equipment, rulesetId)
+      return row ? [row] : []
     })
   }
 
@@ -92,9 +124,51 @@ export function listToolsMatchingPool(args: {
     return [...equipment.values()].filter((row) => row.kind === 'tool')
   }
 
-  return [...equipment.values()].filter(
-    (row) => row.kind === 'tool' && (!pool.toolCategory || row.toolCategory === pool.toolCategory),
-  )
+  const categories = new Set(pool.toolCategories ?? [])
+  const explicitSlugs = pool.toolSlugs ?? []
+
+  const fromExplicit = explicitSlugs.flatMap((slug) => {
+    const row = findToolEquipmentBySlug(slug, equipment, rulesetId)
+    return row ? [row] : []
+  })
+
+  const fromCategories =
+    categories.size === 0
+      ? []
+      : [...equipment.values()].filter(
+          (row) => row.kind === 'tool' && categories.has(row.toolCategory),
+        )
+
+  return dedupeToolsByEquipmentId([...fromExplicit, ...fromCategories])
+}
+
+function findToolEquipmentBySlug(
+  slug: string,
+  equipment: CreatureEquipmentCatalog,
+  rulesetId: string,
+): Extract<Equipment, { kind: 'tool' }> | undefined {
+  const equipmentId = toEquipmentContentId(rulesetId, slug)
+  const byId = equipment.get(equipmentId)
+  if (byId?.kind === 'tool') return byId
+
+  for (const row of equipment.values()) {
+    if (row.kind === 'tool' && row.slug === slug) return row
+  }
+
+  return undefined
+}
+
+function dedupeToolsByEquipmentId(tools: readonly Equipment[]): Equipment[] {
+  const seen = new Set<string>()
+  const deduped: Equipment[] = []
+
+  for (const row of tools) {
+    if (row.kind !== 'tool' || seen.has(row.id)) continue
+    seen.add(row.id)
+    deduped.push(row)
+  }
+
+  return deduped
 }
 
 /** Returns catalog armor equipment rows matching an armor training grant pool. */

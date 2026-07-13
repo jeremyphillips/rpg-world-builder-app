@@ -11,6 +11,9 @@ import { ClassCharacterCreationTab } from './class-character-creation-tab.client
 const monkStartingEquipment = startingEquipmentToFormValues(
   pickClass('monk').characterCreation!.startingEquipment!,
 )
+const monkProficiencies = characterCreationProficienciesToFormValues(
+  pickClass('monk').characterCreation,
+)
 const bardStartingEquipment = startingEquipmentToFormValues(
   pickClass('bard').characterCreation!.startingEquipment!,
 )
@@ -58,7 +61,13 @@ export const Empty: Story = {
 }
 
 export const MonkStartingEquipment: Story = {
-  render: () => <TabStory entitySource="system" startingEquipment={monkStartingEquipment} />,
+  render: () => (
+    <TabStory
+      entitySource="system"
+      proficiencies={monkProficiencies}
+      startingEquipment={monkStartingEquipment}
+    />
+  ),
 }
 
 export const BardStartingEquipment: Story = {
@@ -89,6 +98,7 @@ export const HomebrewWithStartingEquipment: Story = {
             items: [
               {
                 itemKind: 'grant',
+                grantTargetSource: 'equipment',
                 equipmentSlug: 'dagger',
                 quantity: 1,
                 equipped: true,

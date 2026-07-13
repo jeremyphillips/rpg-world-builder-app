@@ -10,6 +10,7 @@ import {
   currencySchema,
   gearKindSchema,
   holySymbolUsageSchema,
+  spellcastingGearKindSchema,
   magicItemCategorySchema,
   magicItemRaritySchema,
   massUnitSchema,
@@ -114,6 +115,7 @@ export const armorEquipmentFormSchema = physicalEquipmentBaseFormSchema.extend({
 export const adventuringGearEquipmentFormSchema = physicalEquipmentBaseFormSchema.extend({
   kind: z.literal('adventuring_gear'),
   gearKind: gearKindSchema,
+  spellcastingGearKind: spellcastingGearKindSchema.optional(),
   bundleSize: z.coerce.number().int().min(1).optional(),
   storage: z.string().optional(),
   propertiesText: z.string().optional(),
@@ -238,6 +240,7 @@ export const equipmentFormSchema = z.object({
 
   // adventuring gear
   gearKind: gearKindSchema.optional(),
+  spellcastingGearKind: spellcastingGearKindSchema.optional(),
   bundleSize: z.coerce.number().int().min(1).optional(),
   storage: z.string().optional(),
   propertiesText: z.string().optional(),

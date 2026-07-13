@@ -1,10 +1,15 @@
 import type { Equipment } from '../../../content/equipment'
-import type {
-  EquipmentChoiceGrant,
-  GrantedEquipmentItem,
-} from '../../../content/lib/equipment-grant'
+import type { EquipmentChoiceGrant } from '../../../content/lib/equipment-grant'
 import type { CharacterWealthGrant } from '../../../content/lib/wealth-grant'
-import type { StartingEquipmentOption } from '../../../content/starting-equipment'
+import type {
+  StartingEquipmentGrantedItem,
+  StartingEquipmentOption,
+} from '../../../content/starting-equipment'
+import {
+  isProficiencyLinkedStartingEquipmentGrant,
+  startingEquipmentGrantEquipmentSlug,
+  startingEquipmentGrantProficiencyChoiceId,
+} from '../../../content/starting-equipment'
 import type { CharacterClass } from '../../../content/classes/class'
 import { toEquipmentContentId } from '../../creature/equipment'
 import {
@@ -20,6 +25,7 @@ import type { CharacterBuildCatalogIndex } from '../context'
 import type { CharacterBuilderDraft } from '../draft'
 import { deriveEquipmentBudgetSummary } from '../resolvers/equipment/equipment-budget'
 import { deriveEquipmentDraftEntries } from '../resolvers/equipment/derive-equipment-draft-entries'
+import { resolveProficiencyLinkedEquipmentGrant } from '../resolvers/equipment/resolve-proficiency-linked-equipment-grant'
 import {
   nestedStartingEquipmentChoiceSetId,
   readSelectedStartingEquipmentOptionId,
@@ -32,9 +38,19 @@ import {
 
 export type ResolvedStartingEquipmentGrantedItem = {
   kind: 'grant'
-  grant: GrantedEquipmentItem
+  grant: StartingEquipmentGrantedItem
   equipmentId: string
   equipment: Equipment | undefined
+}
+
+export type ResolvedStartingEquipmentProficiencyLinkedGrant = {
+  kind: 'proficiency_linked_grant'
+  grant: StartingEquipmentGrantedItem
+  choiceId: string
+  status: 'resolved' | 'pending' | 'invalid'
+  equipmentId?: string
+  equipment?: Equipment
+  issue?: string
 }
 
 export type ResolvedStartingEquipmentItemChoice = {
@@ -47,6 +63,7 @@ export type ResolvedStartingEquipmentItemChoice = {
 
 export type ResolvedStartingEquipmentItem =
   | ResolvedStartingEquipmentGrantedItem
+  | ResolvedStartingEquipmentProficiencyLinkedGrant
   | ResolvedStartingEquipmentItemChoice
 
 /** Resolved starting-equipment option with catalog lookups for finalize and BENCH-095. */
@@ -63,17 +80,66 @@ function classStartingEquipmentSource(
   return [{ kind: 'classStartingEquipment', sourceId: classId, grantId: optionId }]
 }
 
-function resolveGrantedItem(
-  grant: GrantedEquipmentItem,
+function resolveEquipmentGrant(
+  grant: StartingEquipmentGrantedItem,
   rulesetId: string,
   catalogIndex: CharacterBuildCatalogIndex,
 ): ResolvedStartingEquipmentGrantedItem {
-  const equipmentId = toEquipmentContentId(rulesetId, grant.equipmentSlug)
+  const equipmentSlug = startingEquipmentGrantEquipmentSlug(grant)
+  if (!equipmentSlug) {
+    throw new Error('Expected equipment starting-equipment grant target')
+  }
+
+  const equipmentId = toEquipmentContentId(rulesetId, equipmentSlug)
   return {
     kind: 'grant',
     grant,
     equipmentId,
     equipment: catalogIndex.equipment.get(equipmentId),
+  }
+}
+
+function resolveProficiencyLinkedGrant(
+  grant: StartingEquipmentGrantedItem,
+  classId: string,
+  characterClass: CharacterClass,
+  draft: CharacterBuilderDraft,
+  catalogIndex: CharacterBuildCatalogIndex,
+): ResolvedStartingEquipmentProficiencyLinkedGrant {
+  const choiceId = startingEquipmentGrantProficiencyChoiceId(grant)!
+  const result = resolveProficiencyLinkedEquipmentGrant({
+    source: { ownerType: 'class', ownerId: classId, choiceId },
+    draft,
+    characterClass,
+    catalogIndex,
+  })
+
+  if (result.status === 'resolved') {
+    return {
+      kind: 'proficiency_linked_grant',
+      grant,
+      choiceId,
+      status: 'resolved',
+      equipmentId: result.equipmentId,
+      equipment: result.equipment,
+    }
+  }
+
+  if (result.status === 'invalid') {
+    return {
+      kind: 'proficiency_linked_grant',
+      grant,
+      choiceId,
+      status: 'invalid',
+      issue: result.issue,
+    }
+  }
+
+  return {
+    kind: 'proficiency_linked_grant',
+    grant,
+    choiceId,
+    status: 'pending',
   }
 }
 
@@ -108,17 +174,30 @@ export function resolveStartingEquipmentOption(
   return {
     option,
     wealth: option.wealth,
-    items: option.items.map((item, itemIndex) =>
-      item.kind === 'grant'
-        ? resolveGrantedItem(item, rulesetId, catalogIndex)
-        : resolveItemChoice(item, characterClass.id, option.id, itemIndex, draft, catalogIndex),
-    ),
+    items: option.items.flatMap((item, itemIndex): ResolvedStartingEquipmentItem[] => {
+      if (item.kind === 'grant') {
+        if (isProficiencyLinkedStartingEquipmentGrant(item)) {
+          return [
+            resolveProficiencyLinkedGrant(
+              item,
+              characterClass.id,
+              characterClass,
+              draft,
+              catalogIndex,
+            ),
+          ]
+        }
+        return [resolveEquipmentGrant(item, rulesetId, catalogIndex)]
+      }
+
+      return [resolveItemChoice(item, characterClass.id, option.id, itemIndex, draft, catalogIndex)]
+    }),
   }
 }
 
 function equipmentEntryFromGrant(
   equipmentId: string,
-  grant: GrantedEquipmentItem,
+  grant: StartingEquipmentGrantedItem,
   sources: CharacterSelectionSource[],
 ): CharacterEquipmentEntry {
   return {
@@ -137,6 +216,15 @@ function appendResolvedItem(
 ): CharacterEquipment {
   if (item.kind === 'grant') {
     if (!item.equipment) return inventory
+    return appendEquipmentEntry(
+      inventory,
+      item.equipment,
+      equipmentEntryFromGrant(item.equipmentId, item.grant, sources),
+    )
+  }
+
+  if (item.kind === 'proficiency_linked_grant') {
+    if (item.status !== 'resolved' || !item.equipmentId || !item.equipment) return inventory
     return appendEquipmentEntry(
       inventory,
       item.equipment,

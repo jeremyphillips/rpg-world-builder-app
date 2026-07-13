@@ -231,7 +231,9 @@ export function SpeciesStep({
             isDetailsSpeciesSelected ? (
               detailsSpeciesHasHeritage ? (
                 <div className="flex flex-wrap items-center gap-2">
-                  <Badge variant="secondary">{SELECTED_SPECIES_LABEL}</Badge>
+                  <Badge appearance="neutral" tone="neutral">
+                    {SELECTED_SPECIES_LABEL}
+                  </Badge>
                   <Button
                     type="button"
                     onClick={() => {
@@ -243,7 +245,9 @@ export function SpeciesStep({
                   </Button>
                 </div>
               ) : (
-                <Badge variant="secondary">{SELECTED_SPECIES_LABEL}</Badge>
+                <Badge appearance="neutral" tone="neutral">
+                  {SELECTED_SPECIES_LABEL}
+                </Badge>
               )
             ) : (
               <Button

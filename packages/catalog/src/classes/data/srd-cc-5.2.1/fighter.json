@@ -1,0 +1,425 @@
+{
+  "id": "srd-cc-5.2.1:fighter",
+  "slug": "fighter",
+  "rulesetId": "srd-cc-5.2.1",
+  "source": "system",
+  "campaignId": null,
+  "createdAt": "2024-05-21T00:00:00.000Z",
+  "updatedAt": "2024-05-21T00:00:00.000Z",
+  "name": "Fighter",
+  "description": "<p>A master of martial combat, skilled with a variety of weapons and armor.</p>",
+  "primaryAbilities": ["str", "dex"],
+  "hitDie": 10,
+  "proficiencies": {
+    "savingThrows": ["str", "con"],
+    "armor": {
+      "categories": ["light", "medium", "heavy", "shields"],
+      "items": []
+    },
+    "weapons": {
+      "categories": ["simple", "martial"],
+      "items": []
+    },
+    "skills": {
+      "categories": [],
+      "items": []
+    }
+  },
+  "characterCreation": {
+    "startingEquipment": {
+      "choose": 1,
+      "options": [
+        {
+          "id": "heavy",
+          "label": "Heavy Armor",
+          "description": "Chain Mail, Greatsword, Flail, 8 Javelins, Dungeoneer's Pack, and 4 GP.",
+          "items": [
+            {
+              "kind": "grant",
+              "equipmentSlug": "chain-mail",
+              "quantity": 1,
+              "equipped": true
+            },
+            {
+              "kind": "grant",
+              "equipmentSlug": "greatsword",
+              "quantity": 1,
+              "equipped": true
+            },
+            {
+              "kind": "grant",
+              "equipmentSlug": "flail",
+              "quantity": 1
+            },
+            {
+              "kind": "grant",
+              "equipmentSlug": "javelin",
+              "quantity": 8
+            },
+            {
+              "kind": "grant",
+              "equipmentSlug": "dungeoneers-pack",
+              "quantity": 1
+            }
+          ],
+          "wealth": {
+            "gp": 4
+          }
+        },
+        {
+          "id": "skirmisher",
+          "label": "Skirmisher",
+          "description": "Studded Leather Armor, Scimitar, Shortsword, Longbow, 20 Arrows, Quiver, Dungeoneer's Pack, and 11 GP.",
+          "items": [
+            {
+              "kind": "grant",
+              "equipmentSlug": "studded-leather",
+              "quantity": 1,
+              "equipped": true
+            },
+            {
+              "kind": "grant",
+              "equipmentSlug": "scimitar",
+              "quantity": 1,
+              "equipped": true
+            },
+            {
+              "kind": "grant",
+              "equipmentSlug": "shortsword",
+              "quantity": 1
+            },
+            {
+              "kind": "grant",
+              "equipmentSlug": "longbow",
+              "quantity": 1,
+              "equipped": true
+            },
+            {
+              "kind": "grant",
+              "equipmentSlug": "arrows",
+              "quantity": 20
+            },
+            {
+              "kind": "grant",
+              "equipmentSlug": "quiver",
+              "quantity": 1
+            },
+            {
+              "kind": "grant",
+              "equipmentSlug": "dungeoneers-pack",
+              "quantity": 1
+            }
+          ],
+          "wealth": {
+            "gp": 11
+          }
+        },
+        {
+          "id": "gold",
+          "label": "Starting Gold",
+          "description": "Take 155 GP instead of standard equipment.",
+          "items": [],
+          "wealth": {
+            "gp": 155
+          }
+        }
+      ]
+    },
+    "proficiencies": {
+      "skills": {
+        "choices": [
+          {
+            "id": "class-skills",
+            "label": "Fighter Skills",
+            "choose": 2,
+            "from": ["acrobatics", "athletics", "history", "intimidation", "perception"]
+          }
+        ]
+      }
+    }
+  },
+  "features": [
+    {
+      "id": "fighting-style",
+      "name": "Fighting Style",
+      "level": 1,
+      "description": "<p>You have honed your martial prowess and gain a Fighting Style feat of your choice (see \"Feats\").</p><p>Whenever you gain a Fighter level, you can replace the feat you chose with a different Fighting Style feat.</p>",
+      "grantGroups": [
+        {
+          "grants": [
+            {
+              "kind": "featChoice",
+              "category": "fighting-style",
+              "choose": 1,
+              "replaceable": true,
+              "recommendedFeatIds": ["defense"]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "second-wind",
+      "name": "Second Wind",
+      "level": 1,
+      "description": "<p>You have a limited well of physical and mental stamina that you can draw on. As a Bonus Action, you can use it to regain Hit Points equal to 1d10 plus your Fighter level.</p><p>You can use this feature twice. You regain one expended use when you finish a Short Rest, and you regain all expended uses when you finish a Long Rest.</p><p>When you reach certain Fighter levels, you gain more uses of this feature, as shown in the Second Wind column of the Fighter Features table.</p>"
+    },
+    {
+      "id": "weapon-mastery",
+      "name": "Weapon Mastery",
+      "level": 1,
+      "description": "<p>Your training with weapons allows you to use the mastery properties of three kinds of Simple or Martial weapons of your choice. Whenever you finish a Long Rest, you can practice weapon drills and change one of those weapon choices.</p><p>When you reach certain Fighter levels, you gain the ability to use the mastery properties of more kinds of weapons, as shown in the Weapon Mastery column of the Fighter Features table.</p>"
+    },
+    {
+      "id": "action-surge",
+      "name": "Action Surge",
+      "level": 2,
+      "description": "<p>You can push yourself beyond your normal limits for a moment. On your turn, you can take one additional action, except the Magic action.</p><p>Once you use this feature, you can't do so again until you finish a Short or Long Rest. Starting at level 17, you can use it twice before a rest but only once on a turn.</p>"
+    },
+    {
+      "id": "tactical-mind",
+      "name": "Tactical Mind",
+      "level": 2,
+      "description": "<p>You have a mind for tactics on and off the battlefield. When you fail an ability check, you can expend a use of your Second Wind to push yourself toward success. Rather than regaining Hit Points, you roll 1d10 and add the number rolled to the ability check, potentially turning it into a success. If the check still fails, this use of Second Wind isn't expended.</p>"
+    },
+    {
+      "kind": "subclass-choice",
+      "id": "fighter-subclass",
+      "name": "Fighter Subclass",
+      "level": 3,
+      "description": ""
+    },
+    {
+      "id": "ability-score-improvement-4",
+      "name": "Ability Score Improvement",
+      "level": 4,
+      "description": "<p>You gain the Ability Score Improvement feat or another feat of your choice for which you qualify.</p>",
+      "grantGroups": [
+        {
+          "grants": [
+            {
+              "kind": "featChoice",
+              "category": "general",
+              "choose": 1,
+              "allowAnyQualifying": true,
+              "recommendedFeatIds": ["ability-score-improvement"]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "extra-attack",
+      "name": "Extra Attack",
+      "level": 5,
+      "description": "<p>You can attack twice instead of once whenever you take the Attack action on your turn.</p>"
+    },
+    {
+      "id": "tactical-shift",
+      "name": "Tactical Shift",
+      "level": 5,
+      "description": "<p>Whenever you activate your Second Wind with a Bonus Action, you can move up to half your Speed without provoking Opportunity Attacks.</p>"
+    },
+    {
+      "id": "ability-score-improvement-6",
+      "name": "Ability Score Improvement",
+      "level": 6,
+      "description": "<p>You gain the Ability Score Improvement feat or another feat of your choice for which you qualify.</p>",
+      "grantGroups": [
+        {
+          "grants": [
+            {
+              "kind": "featChoice",
+              "category": "general",
+              "choose": 1,
+              "allowAnyQualifying": true,
+              "recommendedFeatIds": ["ability-score-improvement"]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ability-score-improvement-8",
+      "name": "Ability Score Improvement",
+      "level": 8,
+      "description": "<p>You gain the Ability Score Improvement feat or another feat of your choice for which you qualify.</p>",
+      "grantGroups": [
+        {
+          "grants": [
+            {
+              "kind": "featChoice",
+              "category": "general",
+              "choose": 1,
+              "allowAnyQualifying": true,
+              "recommendedFeatIds": ["ability-score-improvement"]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indomitable",
+      "name": "Indomitable",
+      "level": 9,
+      "description": "<p>If you fail a saving throw, you can reroll it with a bonus equal to your Fighter level. You must use the new roll, and you can't use this feature again until you finish a Long Rest.</p><p>You can use this feature twice before a Long Rest starting at level 13 and three times before a Long Rest starting at level 17.</p>"
+    },
+    {
+      "id": "tactical-master",
+      "name": "Tactical Master",
+      "level": 9,
+      "description": "<p>When you attack with a weapon whose mastery property you can use, you can replace that property with the Push, Sap, or Slow property for that attack.</p>"
+    },
+    {
+      "id": "two-extra-attacks",
+      "name": "Two Extra Attacks",
+      "level": 11,
+      "description": "<p>You can attack three times instead of once whenever you take the Attack action on your turn.</p>"
+    },
+    {
+      "id": "ability-score-improvement-12",
+      "name": "Ability Score Improvement",
+      "level": 12,
+      "description": "<p>You gain the Ability Score Improvement feat or another feat of your choice for which you qualify.</p>",
+      "grantGroups": [
+        {
+          "grants": [
+            {
+              "kind": "featChoice",
+              "category": "general",
+              "choose": 1,
+              "allowAnyQualifying": true,
+              "recommendedFeatIds": ["ability-score-improvement"]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "studied-attacks",
+      "name": "Studied Attacks",
+      "level": 13,
+      "description": "<p>You study your opponents and learn from each attack you make. If you make an attack roll against a creature and miss, you have Advantage on your next attack roll against that creature before the end of your next turn.</p>"
+    },
+    {
+      "id": "ability-score-improvement-14",
+      "name": "Ability Score Improvement",
+      "level": 14,
+      "description": "<p>You gain the Ability Score Improvement feat or another feat of your choice for which you qualify.</p>",
+      "grantGroups": [
+        {
+          "grants": [
+            {
+              "kind": "featChoice",
+              "category": "general",
+              "choose": 1,
+              "allowAnyQualifying": true,
+              "recommendedFeatIds": ["ability-score-improvement"]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ability-score-improvement-16",
+      "name": "Ability Score Improvement",
+      "level": 16,
+      "description": "<p>You gain the Ability Score Improvement feat or another feat of your choice for which you qualify.</p>",
+      "grantGroups": [
+        {
+          "grants": [
+            {
+              "kind": "featChoice",
+              "category": "general",
+              "choose": 1,
+              "allowAnyQualifying": true,
+              "recommendedFeatIds": ["ability-score-improvement"]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "epic-boon",
+      "name": "Epic Boon",
+      "level": 19,
+      "description": "<p>You gain an Epic Boon feat (see \"Feats\") or another feat of your choice for which you qualify.</p>",
+      "grantGroups": [
+        {
+          "grants": [
+            {
+              "kind": "featChoice",
+              "category": "epic-boon",
+              "choose": 1,
+              "allowAnyQualifying": true,
+              "recommendedFeatIds": ["boon-of-combat-prowess"]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "three-extra-attacks",
+      "name": "Three Extra Attacks",
+      "level": 20,
+      "description": "<p>You can attack four times instead of once whenever you take the Attack action on your turn.</p>"
+    }
+  ],
+  "resources": [
+    {
+      "name": "Second Wind",
+      "entries": [
+        {
+          "level": 1,
+          "value": 2
+        },
+        {
+          "level": 4,
+          "value": 3
+        },
+        {
+          "level": 10,
+          "value": 4
+        }
+      ]
+    },
+    {
+      "name": "Weapon Mastery",
+      "entries": [
+        {
+          "level": 1,
+          "value": 3
+        },
+        {
+          "level": 4,
+          "value": 4
+        },
+        {
+          "level": 10,
+          "value": 5
+        },
+        {
+          "level": 16,
+          "value": 6
+        }
+      ]
+    },
+    {
+      "name": "Indomitable",
+      "entries": [
+        {
+          "level": 9,
+          "value": 1
+        },
+        {
+          "level": 13,
+          "value": 2
+        },
+        {
+          "level": 17,
+          "value": 3
+        }
+      ]
+    }
+  ]
+}

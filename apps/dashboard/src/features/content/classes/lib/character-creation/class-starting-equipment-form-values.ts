@@ -4,6 +4,10 @@ import type {
   StartingEquipmentItem,
   StartingEquipmentOption,
 } from '@rpg/contracts'
+import {
+  startingEquipmentGrantEquipmentSlug,
+  startingEquipmentGrantProficiencyChoiceId,
+} from '@rpg/contracts'
 import { buildItemDefaultValues } from '@rpg/ui/form'
 
 import {
@@ -25,14 +29,26 @@ import {
 
 function startingEquipmentItemToFormRow(item: StartingEquipmentItem): StartingEquipmentItemForm {
   if (item.kind === 'grant') {
+    const proficiencyChoiceId = startingEquipmentGrantProficiencyChoiceId(item)
+    if (proficiencyChoiceId) {
+      return {
+        itemKind: 'grant',
+        grantTargetSource: 'proficiency_choice',
+        proficiencyChoiceId,
+        quantity: item.quantity,
+        equipped: item.equipped,
+      }
+    }
+
     return {
       itemKind: 'grant',
-      equipmentSlug: item.equipmentSlug,
+      grantTargetSource: 'equipment',
+      equipmentSlug: startingEquipmentGrantEquipmentSlug(item) ?? '',
       quantity: item.quantity,
       equipped: item.equipped,
       modifiers: item.modifiers?.map((modifier) => ({
         kind: modifier.kind,
-        focusKind: modifier.focusKind,
+        spellcastingGearKind: modifier.spellcastingGearKind,
       })),
     }
   }
@@ -41,13 +57,37 @@ function startingEquipmentItemToFormRow(item: StartingEquipmentItem): StartingEq
 
 function startingEquipmentItemFromFormRow(row: StartingEquipmentItemForm): StartingEquipmentItem {
   if (row.itemKind === 'grant') {
-    const grant = equipmentGrantFromFormRow(row) as StartingEquipmentGrantedItem
-    if (row.modifiers?.length) {
-      grant.modifiers = row.modifiers
+    if (row.grantTargetSource === 'proficiency_choice') {
+      const item: StartingEquipmentGrantedItem = {
+        kind: 'grant',
+        target: { source: 'proficiency_choice', choiceId: row.proficiencyChoiceId! },
+        quantity: row.quantity ?? 1,
+      }
+      if (row.equipped !== undefined) {
+        item.equipped = row.equipped
+      }
+      return item
     }
-    return grant
+
+    const grant = equipmentGrantFromFormRow(row)
+    if (grant.kind !== 'grant') {
+      throw new Error('Starting equipment grant rows require an equipment slug in v1')
+    }
+
+    const item: StartingEquipmentGrantedItem = {
+      kind: 'grant',
+      target: { source: 'equipment', equipmentSlug: grant.equipmentSlug },
+      quantity: grant.quantity ?? 1,
+    }
+    if (grant.equipped !== undefined) {
+      item.equipped = grant.equipped
+    }
+    if (row.modifiers?.length) {
+      item.modifiers = row.modifiers
+    }
+    return item
   }
-  return equipmentGrantFromFormRow(row)
+  return equipmentGrantFromFormRow(row) as StartingEquipmentItem
 }
 
 export function startingEquipmentOptionToFormRow(

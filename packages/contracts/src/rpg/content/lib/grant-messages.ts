@@ -39,7 +39,10 @@ export const grantValidationMessages = {
     () =>
       'Grant traits must include exactly one atomic grant (one sense, resistance, movement bonus, or language).',
   ),
-  categoryFilterNotAllowedForKind: defineMessage<{ filterLabel: string; equipmentKindLabel: string }>(
+  categoryFilterNotAllowedForKind: defineMessage<{
+    filterLabel: string
+    equipmentKindLabel: string
+  }>(
     'validation.grant.categoryFilterNotAllowedForKind',
     ({ filterLabel, equipmentKindLabel }) =>
       `${filterLabel} filters are not allowed for ${equipmentKindLabel}.`,
@@ -52,5 +55,9 @@ export const grantValidationMessages = {
   fixedProficiencyRequiresTarget: defineMessage(
     'validation.grant.fixedProficiencyRequiresTarget',
     () => 'Add at least one specific item or category.',
+  ),
+  filteredToolPoolRequiresTarget: defineMessage(
+    'validation.grant.filteredToolPoolRequiresTarget',
+    () => 'Filtered tool pools require at least one category or specific tool.',
   ),
 }

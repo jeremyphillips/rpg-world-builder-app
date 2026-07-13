@@ -5,10 +5,10 @@ import * as PopoverPrimitive from '@radix-ui/react-popover'
 import { ChevronDown, Search } from 'lucide-react'
 
 import { cn } from '../../lib/utils'
-import { DismissibleBadge } from './dismissible-badge.client'
+import { Chip } from './chip.client'
 import { Field, type FieldSize } from './field.client'
 import { fieldControlVariants } from './field-control.variants'
-import { fieldSizeToBadgeSize } from './field-sizing.variants'
+import { fieldSizeToChipSize } from './field-sizing.variants'
 import { Spinner } from './spinner'
 import { isComboboxOptionDisabled } from './combobox-field.lib'
 import type { ComboboxFieldOption, ComboboxRenderSelectedItem } from './combobox-field.types'
@@ -286,7 +286,7 @@ export function ComboboxSelectedItems({
 }: ComboboxSelectedItemsProps) {
   if (options.length === 0) return null
 
-  const badgeSize = fieldSizeToBadgeSize[size]
+  const chipSize = fieldSizeToChipSize[size]
   const listClassName = renderSelectedItem
     ? comboboxSelectedListVariants()
     : comboboxSelectedItemsRowVariants()
@@ -302,12 +302,15 @@ export function ComboboxSelectedItems({
               size,
             })
           ) : (
-            <DismissibleBadge
-              label={option.label}
-              size={badgeSize}
+            <Chip
+              mode="removable"
+              size={chipSize}
               disabled={disabled}
-              onDismiss={() => onRemove(option.value)}
-            />
+              onRemove={() => onRemove(option.value)}
+              removeLabel={`Remove ${option.label}`}
+            >
+              {option.label}
+            </Chip>
           )}
         </div>
       ))}

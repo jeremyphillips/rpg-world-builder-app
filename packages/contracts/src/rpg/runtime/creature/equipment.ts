@@ -1,7 +1,9 @@
 import type { Equipment } from '../../content/equipment'
 import { isArmorEquipment } from '../../content/equipment'
+import { getEquipmentSpellcastingGearKind } from '../../content/equipment/adventuring-gear-variant'
 import type { EquipmentPool } from '../../content/lib/equipment-grant'
 import { resolveEquipmentContentId } from '../../content/starting-equipment'
+import { equipmentIdMatchesReference } from './equipment-id-match'
 
 // ---------------------------------------------------------------------------
 // Creature equipment primitives — resolves equipment ids and catalog rows from
@@ -40,10 +42,15 @@ function matchesArmorPool(equipment: Equipment, pool: FilteredEquipmentPool): bo
 }
 
 function matchesGearPool(equipment: Equipment, pool: FilteredEquipmentPool): boolean {
-  return (
-    equipment.kind === 'adventuring_gear' &&
-    (!pool.gearKind || equipment.gearKind === pool.gearKind)
-  )
+  if (equipment.kind !== 'adventuring_gear') return false
+  if (pool.gearKind && equipment.gearKind !== pool.gearKind) return false
+  if (
+    pool.spellcastingGearKind &&
+    getEquipmentSpellcastingGearKind(equipment) !== pool.spellcastingGearKind
+  ) {
+    return false
+  }
+  return true
 }
 
 function matchesMagicItemPool(equipment: Equipment, pool: FilteredEquipmentPool): boolean {
@@ -86,6 +93,25 @@ const FILTERED_POOL_MATCHERS: Record<
 function equipmentMatchesFilteredPool(equipment: Equipment, pool: FilteredEquipmentPool): boolean {
   if (equipment.kind !== pool.equipmentKind) return false
   return FILTERED_POOL_MATCHERS[pool.equipmentKind](equipment, pool)
+}
+
+/** Returns true when a catalog row matches a filtered equipment pool predicate. */
+export function equipmentMatchesEquipmentPool(
+  equipment: Equipment,
+  pool: EquipmentPool,
+  rulesetId: string,
+): boolean {
+  if (pool.source === 'explicit') {
+    return pool.equipmentSlugs.some((slugOrId) =>
+      equipmentIdMatchesReference({
+        reference: slugOrId,
+        equipment,
+        rulesetId,
+      }),
+    )
+  }
+
+  return equipmentMatchesFilteredPool(equipment, pool)
 }
 
 /** Returns catalog equipment records matching a pool definition. */

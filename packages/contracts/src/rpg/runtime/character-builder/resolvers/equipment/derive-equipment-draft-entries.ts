@@ -145,6 +145,15 @@ function appendResolvedPackageItem(
     )
   }
 
+  if (item.kind === 'proficiency_linked_grant') {
+    if (item.status !== 'resolved' || !item.equipmentId || !item.equipment) return inventory
+    return appendEquipmentEntry(
+      inventory,
+      item.equipment,
+      equipmentEntryFromGrant(item.equipmentId, item.grant, sources),
+    )
+  }
+
   if (!item.selectedEquipmentId || !item.equipment) return inventory
 
   return appendEquipmentEntry(inventory, item.equipment, {

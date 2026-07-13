@@ -1,18 +1,15 @@
-import { Link } from 'react-router-dom'
 import { Heading, Text } from '@rpg/ui'
 import type { SkillProficiency } from '@rpg/contracts'
 
 import { ROUTES } from '@/app/routes'
 
+import { ContentLinkBadge, ContentStaticBadge } from '../../lib/detail/content-link-badge'
 import {
   CLASS_DISPLAY_NONE,
   CLASS_PROFICIENCY_GROUP_LABELS,
   type ClassDisplayVocabulary,
   type ClassProficienciesViewModel,
 } from '../lib/class-display'
-
-const PROFICIENCY_CHOICE_CHIP_CLASS =
-  'rounded-md border px-2 py-1 text-sm hover:underline focus-visible:underline'
 
 type ClassProficienciesSectionProps = {
   section: ClassProficienciesViewModel
@@ -75,14 +72,11 @@ function SkillChoiceLinks({
         return (
           <li key={slug}>
             {skill ? (
-              <Link
-                to={ROUTES.content.skillProficiencies.detail(campaignId, skill.id)}
-                className={PROFICIENCY_CHOICE_CHIP_CLASS}
-              >
+              <ContentLinkBadge to={ROUTES.content.skillProficiencies.detail(campaignId, skill.id)}>
                 {skill.name}
-              </Link>
+              </ContentLinkBadge>
             ) : (
-              <span className={PROFICIENCY_CHOICE_CHIP_CLASS}>{slug}</span>
+              <ContentStaticBadge>{slug}</ContentStaticBadge>
             )}
           </li>
         )
@@ -127,7 +121,11 @@ function ProficiencyChoiceRow({
       </Heading>
       <dd className="space-y-2">
         {isEmpty ? (
-          <Text variant="muted">{CLASS_DISPLAY_NONE}</Text>
+          row.compactSummary !== CLASS_DISPLAY_NONE ? (
+            <Text variant="muted">{row.compactSummary}</Text>
+          ) : (
+            <Text variant="muted">{CLASS_DISPLAY_NONE}</Text>
+          )
         ) : row.id === 'skills' ? (
           <div className="flex flex-wrap items-center gap-x-2 gap-y-2">
             <Text variant="muted" as="span">
@@ -141,12 +139,16 @@ function ProficiencyChoiceRow({
             />
           </div>
         ) : row.id === 'tools' ? (
-          <div className="flex flex-wrap items-center gap-x-2 gap-y-2">
-            <Text variant="muted" as="span">
-              {row.choicePrefix}
-            </Text>
-            <ToolChoiceLabels optionSlugs={row.optionSlugs} vocabulary={vocabulary} />
-          </div>
+          row.optionSlugs.length > 0 ? (
+            <div className="flex flex-wrap items-center gap-x-2 gap-y-2">
+              <Text variant="muted" as="span">
+                {row.choicePrefix}
+              </Text>
+              <ToolChoiceLabels optionSlugs={row.optionSlugs} vocabulary={vocabulary} />
+            </div>
+          ) : (
+            <Text variant="muted">{row.compactSummary}</Text>
+          )
         ) : (
           <Text variant="muted">{row.compactSummary}</Text>
         )}

@@ -35,12 +35,13 @@
       "currency": "gp"
     },
     "kind": "adventuring_gear",
-    "gearKind": "arcane_focus",
+    "gearKind": "spellcasting",
     "weight": {
       "value": 4,
       "unit": "lb"
     },
-    "alsoWeaponSlug": "quarterstaff"
+    "alsoWeaponSlug": "quarterstaff",
+    "spellcastingGearKind": "arcane_focus"
   },
   {
     "id": "srd-cc-5.2.1:arrows",
@@ -542,7 +543,8 @@
       "currency": "gp"
     },
     "kind": "adventuring_gear",
-    "gearKind": "general",
+    "gearKind": "spellcasting",
+    "spellcastingGearKind": "component_pouch",
     "weight": {
       "value": 2,
       "unit": "lb"
@@ -628,11 +630,12 @@
       "currency": "gp"
     },
     "kind": "adventuring_gear",
-    "gearKind": "arcane_focus",
+    "gearKind": "spellcasting",
     "weight": {
       "value": 1,
       "unit": "lb"
-    }
+    },
+    "spellcastingGearKind": "arcane_focus"
   },
   {
     "id": "srd-cc-5.2.1:diplomats-pack",
@@ -797,15 +800,13 @@
       "currency": "gp"
     },
     "kind": "adventuring_gear",
-    "gearKind": "holy_symbol",
+    "gearKind": "spellcasting",
     "weight": {
       "value": 1,
       "unit": "lb"
     },
-    "holySymbolUsage": [
-      "worn",
-      "held"
-    ]
+    "holySymbolUsage": ["worn", "held"],
+    "spellcastingGearKind": "holy_symbol"
   },
   {
     "id": "srd-cc-5.2.1:holy-symbol-emblem",
@@ -822,11 +823,9 @@
       "currency": "gp"
     },
     "kind": "adventuring_gear",
-    "gearKind": "holy_symbol",
-    "holySymbolUsage": [
-      "borne_on_fabric",
-      "borne_on_shield"
-    ]
+    "gearKind": "spellcasting",
+    "holySymbolUsage": ["borne_on_fabric", "borne_on_shield"],
+    "spellcastingGearKind": "holy_symbol"
   },
   {
     "id": "srd-cc-5.2.1:holy-symbol-reliquary",
@@ -843,14 +842,13 @@
       "currency": "gp"
     },
     "kind": "adventuring_gear",
-    "gearKind": "holy_symbol",
+    "gearKind": "spellcasting",
     "weight": {
       "value": 2,
       "unit": "lb"
     },
-    "holySymbolUsage": [
-      "held"
-    ]
+    "holySymbolUsage": ["held"],
+    "spellcastingGearKind": "holy_symbol"
   },
   {
     "id": "srd-cc-5.2.1:holy-water",
@@ -1167,11 +1165,12 @@
       "currency": "gp"
     },
     "kind": "adventuring_gear",
-    "gearKind": "arcane_focus",
+    "gearKind": "spellcasting",
     "weight": {
       "value": 3,
       "unit": "lb"
-    }
+    },
+    "spellcastingGearKind": "arcane_focus"
   },
   {
     "id": "srd-cc-5.2.1:paper",
@@ -1427,11 +1426,12 @@
       "currency": "gp"
     },
     "kind": "adventuring_gear",
-    "gearKind": "arcane_focus",
+    "gearKind": "spellcasting",
     "weight": {
       "value": 2,
       "unit": "lb"
-    }
+    },
+    "spellcastingGearKind": "arcane_focus"
   },
   {
     "id": "srd-cc-5.2.1:rope-hempen",
@@ -1550,11 +1550,12 @@
       "currency": "gp"
     },
     "kind": "adventuring_gear",
-    "gearKind": "general",
+    "gearKind": "spellcasting",
     "weight": {
       "value": 3,
       "unit": "lb"
-    }
+    },
+    "spellcastingGearKind": "spellbook"
   },
   {
     "id": "srd-cc-5.2.1:spikes-iron",
@@ -1593,7 +1594,8 @@
       "currency": "gp"
     },
     "kind": "adventuring_gear",
-    "gearKind": "druidic_focus"
+    "gearKind": "spellcasting",
+    "spellcastingGearKind": "druidic_focus"
   },
   {
     "id": "srd-cc-5.2.1:spyglass",
@@ -1729,11 +1731,12 @@
       "currency": "gp"
     },
     "kind": "adventuring_gear",
-    "gearKind": "arcane_focus",
+    "gearKind": "spellcasting",
     "weight": {
       "value": 1,
       "unit": "lb"
-    }
+    },
+    "spellcastingGearKind": "arcane_focus"
   },
   {
     "id": "srd-cc-5.2.1:waterskin",
@@ -1772,12 +1775,13 @@
       "currency": "gp"
     },
     "kind": "adventuring_gear",
-    "gearKind": "druidic_focus",
+    "gearKind": "spellcasting",
     "weight": {
       "value": 4,
       "unit": "lb"
     },
-    "alsoWeaponSlug": "quarterstaff"
+    "alsoWeaponSlug": "quarterstaff",
+    "spellcastingGearKind": "druidic_focus"
   },
   {
     "id": "srd-cc-5.2.1:yew-wand",
@@ -1794,10 +1798,11 @@
       "currency": "gp"
     },
     "kind": "adventuring_gear",
-    "gearKind": "druidic_focus",
+    "gearKind": "spellcasting",
     "weight": {
       "value": 1,
       "unit": "lb"
-    }
+    },
+    "spellcastingGearKind": "druidic_focus"
   }
 ]

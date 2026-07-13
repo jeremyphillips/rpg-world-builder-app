@@ -1,5 +1,10 @@
 import type { AdventuringGearEquipment } from '@rpg/contracts'
-import { GEAR_KINDS, formatWeight, getGearKindLabel } from '@rpg/contracts'
+import {
+  GEAR_KINDS,
+  formatWeight,
+  getGearKindLabel,
+  getSpellcastingGearKindLabel,
+} from '@rpg/contracts'
 import { SortableHeader } from '@rpg/ui'
 import type { ColumnDef, FilterDef } from '@rpg/ui'
 
@@ -10,11 +15,18 @@ import {
   costColumn,
 } from '../../../lib/overview/content-table-config'
 
+function formatAdventuringGearKindLabel(item: AdventuringGearEquipment): string {
+  if (item.gearKind === 'spellcasting' && item.spellcastingGearKind) {
+    return getSpellcastingGearKindLabel(item.spellcastingGearKind)
+  }
+  return getGearKindLabel(item.gearKind)
+}
+
 const ADVENTURING_GEAR_MIDDLE_COLUMNS: ColumnDef<AdventuringGearEquipment>[] = [
   {
     accessorKey: 'gearKind',
     header: ({ column }) => <SortableHeader column={column}>Gear kind</SortableHeader>,
-    cell: ({ row }) => getGearKindLabel(row.getValue<string>('gearKind')),
+    cell: ({ row }) => formatAdventuringGearKindLabel(row.original),
     filterFn: 'equalsString',
     meta: { label: 'Gear kind' },
   },

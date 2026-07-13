@@ -1,132 +1,62 @@
 'use client'
 
 import * as React from 'react'
-import { ChevronDown, Search } from 'lucide-react'
 
-import { cn } from '../../lib/utils'
-import { Button } from './button.client'
-import { Input } from './input.client'
 import { Sheet } from './sheet.client'
 import { Spinner } from './spinner'
-import { Tabs, TabsList, TabsTrigger } from './tabs.client'
-import { Text } from './text'
-import {
-  countPickerItemsByTab,
-  filterPickerItemsByTab,
-  rankPickerItems,
-} from './catalog-picker-sheet.lib'
+import { CatalogPickerSheetResults } from './catalog-picker-sheet-rows.client'
+import { CatalogPickerSheetToolbar } from './catalog-picker-sheet-toolbar.client'
+import { useCatalogPickerSheetState } from './catalog-picker-sheet.use.client'
 import type { CatalogPickerSheetProps } from './catalog-picker-sheet.types'
 import {
   catalogPickerSheetBodyVariants,
   catalogPickerSheetContentVariants,
   catalogPickerSheetEmptyVariants,
-  catalogPickerSheetItemDetailsVariants,
-  catalogPickerSheetItemMainVariants,
-  catalogPickerSheetItemVariants,
-  catalogPickerSheetListVariants,
   catalogPickerSheetLoadingVariants,
-  catalogPickerSheetSearchRowVariants,
-  catalogPickerSheetToolbarVariants,
 } from './catalog-picker-sheet.variants'
 
-export type { CatalogPickerSheetProps, CatalogPickerTab } from './catalog-picker-sheet.types'
+export type {
+  CatalogPickerSheetFilterContext,
+  CatalogPickerSheetProps,
+  CatalogPickerSheetToolbarContext,
+  CatalogPickerTab,
+} from './catalog-picker-sheet.types'
 
 const DEFAULT_SEARCH_PLACEHOLDER = 'Search catalog'
 const DEFAULT_NO_RESULTS_MESSAGE = 'No items match your search.'
+const DEFAULT_NO_SCOPED_ITEMS_MESSAGE = 'No items match this view.'
 const DEFAULT_NO_ITEMS_MESSAGE = 'No items are available.'
 
-function CatalogPickerItemRow<TItem>({
-  item,
-  itemKey,
-  renderItem,
-  renderItemDetails,
+function resolveEmptyMessage({
+  hasSearchOrFilters,
+  isScopedView,
+  noResultsMessage,
+  noScopedItemsMessage,
+  noItemsMessage,
 }: {
-  item: TItem
-  itemKey: string
-  renderItem: (item: TItem) => React.ReactNode
-  renderItemDetails?: (item: TItem) => React.ReactNode
-}) {
-  const detailsId = `${itemKey}-details`
-  const [expanded, setExpanded] = React.useState(false)
-  const hasDetails = Boolean(renderItemDetails)
-
-  return (
-    <article className={catalogPickerSheetItemVariants()} data-picker-item-key={itemKey}>
-      <div className={catalogPickerSheetItemMainVariants()}>
-        <div className="min-w-0 flex-1">{renderItem(item)}</div>
-        {hasDetails ? (
-          <Button
-            type="button"
-            variant="ghost"
-            size="icon"
-            className="shrink-0"
-            aria-expanded={expanded}
-            aria-controls={detailsId}
-            aria-label={expanded ? 'Hide details' : 'Show details'}
-            onClick={() => setExpanded((current) => !current)}
-          >
-            <ChevronDown
-              className={cn(
-                'size-4 transition-transform duration-200',
-                expanded ? 'rotate-180' : undefined,
-              )}
-              aria-hidden
-            />
-          </Button>
-        ) : null}
-      </div>
-      {hasDetails && expanded ? (
-        <div id={detailsId} className={catalogPickerSheetItemDetailsVariants()}>
-          {renderItemDetails?.(item)}
-        </div>
-      ) : null}
-    </article>
-  )
+  hasSearchOrFilters: boolean
+  isScopedView: boolean
+  noResultsMessage: string
+  noScopedItemsMessage: string
+  noItemsMessage: string
+}): string {
+  if (hasSearchOrFilters) return noResultsMessage
+  if (isScopedView) return noScopedItemsMessage
+  return noItemsMessage
 }
 
-function CatalogPickerResults<TItem>({
-  items,
-  getItemKey,
-  renderItem,
-  renderItemDetails,
+function CatalogPickerSheetEmpty({
   emptyState,
-  noResultsMessage,
-  noItemsMessage,
-  hasActiveFilters,
+  message,
 }: {
-  items: readonly TItem[]
-  getItemKey: (item: TItem) => string
-  renderItem: (item: TItem) => React.ReactNode
-  renderItemDetails?: (item: TItem) => React.ReactNode
   emptyState?: React.ReactNode
-  noResultsMessage: string
-  noItemsMessage: string
-  hasActiveFilters: boolean
+  message: string
 }) {
-  if (items.length === 0) {
-    if (emptyState) return <>{emptyState}</>
-    return (
-      <div className={catalogPickerSheetEmptyVariants()} role="status">
-        {hasActiveFilters ? noResultsMessage : noItemsMessage}
-      </div>
-    )
-  }
+  if (emptyState) return <>{emptyState}</>
 
   return (
-    <div className={catalogPickerSheetListVariants()} role="list">
-      {items.map((item) => {
-        const itemKey = getItemKey(item)
-        return (
-          <div key={itemKey} role="listitem">
-            <CatalogPickerItemRow
-              item={item}
-              itemKey={itemKey}
-              renderItem={renderItem}
-              renderItemDetails={renderItemDetails}
-            />
-          </div>
-        )
-      })}
+    <div className={catalogPickerSheetEmptyVariants()} role="status">
+      {message}
     </div>
   )
 }
@@ -140,113 +70,118 @@ export function CatalogPickerSheet<TItem>({
   onOpenChange,
   title,
   description,
+  headlineClassName,
   items,
   getItemKey,
   getSearchText,
   renderItem,
+  renderItemHeader,
+  renderItemSummary,
+  renderItemActions,
   renderItemDetails,
+  getItemToolbarLabel,
   tabs,
   defaultTabId,
   getItemTab,
-  filters,
+  toolbarControls,
+  tabToolbarActions,
+  transformVisibleItems,
+  hasStructuredFilters = false,
   headerExtra,
   footer,
   emptyState,
   loading = false,
   searchPlaceholder = DEFAULT_SEARCH_PLACEHOLDER,
   noResultsMessage = DEFAULT_NO_RESULTS_MESSAGE,
+  noScopedItemsMessage = DEFAULT_NO_SCOPED_ITEMS_MESSAGE,
   noItemsMessage = DEFAULT_NO_ITEMS_MESSAGE,
+  rowTone,
+  toolbarCompact,
+  sheetContentClassName,
+  sheetBodyClassName,
+  rowBodyClassName,
+  rowShellClassName,
 }: CatalogPickerSheetProps<TItem>) {
-  const [searchQuery, setSearchQuery] = React.useState('')
-  const [activeTabId, setActiveTabId] = React.useState(() => defaultTabId ?? tabs?.[0]?.id ?? '')
+  const {
+    searchQuery,
+    setSearchQuery,
+    activeTabId,
+    setActiveTabId,
+    resetActiveTab,
+    tabCounts,
+    visibleItems,
+    hasSearchOrFilters,
+    isScopedView,
+  } = useCatalogPickerSheetState({
+    items,
+    getSearchText,
+    getItemTab,
+    tabs,
+    defaultTabId,
+    hasStructuredFilters,
+    transformVisibleItems,
+  })
 
-  React.useEffect(() => {
-    if (!open) {
-      setSearchQuery('')
-      setActiveTabId(defaultTabId ?? tabs?.[0]?.id ?? '')
-    }
-  }, [defaultTabId, open, tabs])
+  const emptyMessage = resolveEmptyMessage({
+    hasSearchOrFilters,
+    isScopedView,
+    noResultsMessage,
+    noScopedItemsMessage,
+    noItemsMessage,
+  })
 
-  const tabIds = React.useMemo(() => tabs?.map((tab) => tab.id) ?? [], [tabs])
-  const tabCounts = React.useMemo(
-    () => countPickerItemsByTab(items, tabIds, getItemTab),
-    [getItemTab, items, tabIds],
-  )
+  const rowProps = {
+    renderItem,
+    renderItemHeader,
+    renderItemSummary,
+    renderItemActions,
+    renderItemDetails,
+    getItemToolbarLabel,
+    rowTone,
+    toolbarCompact,
+    rowBodyClassName,
+    rowShellClassName,
+  } as CatalogPickerSheetProps<TItem>
 
-  const tabFilteredItems = React.useMemo(
-    () => filterPickerItemsByTab(items, activeTabId, getItemTab),
-    [activeTabId, getItemTab, items],
-  )
-  const visibleItems = React.useMemo(
-    () => rankPickerItems(tabFilteredItems, searchQuery, getSearchText),
-    [getSearchText, searchQuery, tabFilteredItems],
-  )
-  const hasActiveFilters = searchQuery.trim().length > 0 || Boolean(tabs?.length)
-
-  const results = (
-    <CatalogPickerResults
-      items={visibleItems}
-      getItemKey={getItemKey}
-      renderItem={renderItem}
-      renderItemDetails={renderItemDetails}
-      emptyState={emptyState}
-      noResultsMessage={noResultsMessage}
-      noItemsMessage={noItemsMessage}
-      hasActiveFilters={hasActiveFilters}
-    />
+  const bodyContent = loading ? (
+    <div className={catalogPickerSheetLoadingVariants()}>
+      <Spinner size="lg" />
+    </div>
+  ) : visibleItems.length === 0 ? (
+    <CatalogPickerSheetEmpty emptyState={emptyState} message={emptyMessage} />
+  ) : (
+    <CatalogPickerSheetResults items={visibleItems} getItemKey={getItemKey} rowProps={rowProps} />
   )
 
   return (
     <Sheet.Root open={open} onOpenChange={onOpenChange}>
-      <Sheet.Content className={catalogPickerSheetContentVariants()}>
-        <Sheet.Header headline={title} description={description}>
+      <Sheet.Content
+        className={catalogPickerSheetContentVariants({ className: sheetContentClassName })}
+      >
+        <Sheet.Header
+          headline={title}
+          description={description}
+          headlineClassName={headlineClassName}
+        >
           {headerExtra ? <div className="mt-4">{headerExtra}</div> : null}
         </Sheet.Header>
 
-        <div className={catalogPickerSheetToolbarVariants()}>
-          <div className={catalogPickerSheetSearchRowVariants()}>
-            <Search
-              className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground"
-              aria-hidden
-            />
-            <Input
-              value={searchQuery}
-              onChange={(event) => setSearchQuery(event.target.value)}
-              placeholder={searchPlaceholder}
-              aria-label={searchPlaceholder}
-              className="pl-9"
-            />
-          </div>
+        <CatalogPickerSheetToolbar
+          title={title}
+          searchQuery={searchQuery}
+          onSearchQueryChange={setSearchQuery}
+          searchPlaceholder={searchPlaceholder}
+          tabs={tabs}
+          activeTabId={activeTabId}
+          onActiveTabIdChange={setActiveTabId}
+          onResetActiveTab={resetActiveTab}
+          tabCounts={tabCounts}
+          tabToolbarActions={tabToolbarActions}
+          toolbarControls={toolbarControls}
+        />
 
-          {tabs && tabs.length > 0 ? (
-            <Tabs value={activeTabId} onValueChange={setActiveTabId}>
-              <TabsList aria-label={`${title} views`}>
-                {tabs.map((tab) => {
-                  const count = tab.count ?? tabCounts[tab.id] ?? 0
-                  return (
-                    <TabsTrigger key={tab.id} value={tab.id}>
-                      {tab.label}
-                      <Text as="span" variant="muted" className="tabular-nums">
-                        ({count})
-                      </Text>
-                    </TabsTrigger>
-                  )
-                })}
-              </TabsList>
-            </Tabs>
-          ) : null}
-
-          {filters ? <div>{filters}</div> : null}
-        </div>
-
-        <Sheet.Body className={catalogPickerSheetBodyVariants()}>
-          {loading ? (
-            <div className={catalogPickerSheetLoadingVariants()}>
-              <Spinner size="lg" />
-            </div>
-          ) : (
-            results
-          )}
+        <Sheet.Body className={catalogPickerSheetBodyVariants({ className: sheetBodyClassName })}>
+          {bodyContent}
         </Sheet.Body>
 
         {footer ? <Sheet.Footer>{footer}</Sheet.Footer> : null}

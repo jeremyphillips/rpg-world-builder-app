@@ -2,6 +2,10 @@ import { z } from 'zod'
 
 import { abilitySchema } from '../../vocab/ability'
 import { absoluteLevelSchema } from '../../primitives/level'
+import {
+  spellcastingFocusGearKindSchema,
+  spellcastingGearKindSchema,
+} from '../../vocab/equipment/spellcasting-gear-kind'
 
 // ---------------------------------------------------------------------------
 // Spellcasting — progressions and preparation modes shared by class records
@@ -57,6 +61,19 @@ export const spellcastingSchema = z.object({
   progression: z.enum(SPELLCASTING_PROGRESSIONS),
   ability: abilitySchema,
   preparation: spellPreparationModeSchema,
+  /**
+   * Class-critical spellcasting gear (e.g. Wizard spellbook). Drives essential
+   * equipment picker recommendations; not level-gated by spellcasting unlock.
+   */
+  requiredGear: z.array(spellcastingGearKindSchema).min(1).optional(),
+  /**
+   * Spellcasting focus kinds this class can use (arcane/druidic focus, holy
+   * symbol). Drives equipment picker recommendations; when absent, focus kinds
+   * are inferred from starting-equipment package contents.
+   */
+  focusKinds: z.array(spellcastingFocusGearKindSchema).min(1).optional(),
+  /** Strong-tier spellcasting gear suggestions beyond required gear and foci. */
+  recommendedGear: z.array(spellcastingGearKindSchema).min(1).optional(),
   cantrips: cantripsProgressionSchema.optional(),
   spellsAvailable: spellsAvailableProgressionSchema.optional(),
 })

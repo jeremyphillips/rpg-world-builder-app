@@ -9,12 +9,26 @@ const BASE = {
   description: '',
 }
 
+const SPELLCASTING = {
+  gearKind: 'spellcasting' as const,
+}
+
 describe('adventuringGearBodySchema', () => {
+  it('requires spellcastingGearKind on spellcasting gear', () => {
+    const result = adventuringGearBodySchema.safeParse({
+      ...BASE,
+      kind: 'adventuring_gear',
+      ...SPELLCASTING,
+    })
+    expect(result.success).toBe(false)
+  })
+
   it('requires holySymbolUsage on holy symbol gear', () => {
     const result = adventuringGearBodySchema.safeParse({
       ...BASE,
       kind: 'adventuring_gear',
-      gearKind: 'holy_symbol',
+      ...SPELLCASTING,
+      spellcastingGearKind: 'holy_symbol',
     })
     expect(result.success).toBe(false)
   })
@@ -24,11 +38,13 @@ describe('adventuringGearBodySchema', () => {
       adventuringGearBodySchema.parse({
         ...BASE,
         kind: 'adventuring_gear',
-        gearKind: 'holy_symbol',
+        ...SPELLCASTING,
+        spellcastingGearKind: 'holy_symbol',
         holySymbolUsage: ['worn', 'held'],
       }),
     ).toMatchObject({
-      gearKind: 'holy_symbol',
+      gearKind: 'spellcasting',
+      spellcastingGearKind: 'holy_symbol',
       holySymbolUsage: ['worn', 'held'],
     })
   })
@@ -43,16 +59,41 @@ describe('adventuringGearBodySchema', () => {
     expect(result.success).toBe(false)
   })
 
+  it('rejects spellcastingGearKind on non-spellcasting gear', () => {
+    const result = adventuringGearBodySchema.safeParse({
+      ...BASE,
+      kind: 'adventuring_gear',
+      gearKind: 'general',
+      spellcastingGearKind: 'arcane_focus',
+    })
+    expect(result.success).toBe(false)
+  })
+
   it('accepts alsoWeaponSlug on arcane focus staff gear', () => {
     expect(
       adventuringGearBodySchema.parse({
         ...BASE,
         kind: 'adventuring_gear',
-        gearKind: 'arcane_focus',
+        ...SPELLCASTING,
+        spellcastingGearKind: 'arcane_focus',
         alsoWeaponSlug: 'quarterstaff',
         weight: { value: 4, unit: 'lb' },
       }),
     ).toMatchObject({ alsoWeaponSlug: 'quarterstaff' })
+  })
+
+  it('accepts spellbook spellcasting gear', () => {
+    expect(
+      adventuringGearBodySchema.parse({
+        ...BASE,
+        kind: 'adventuring_gear',
+        ...SPELLCASTING,
+        spellcastingGearKind: 'spellbook',
+        weight: { value: 3, unit: 'lb' },
+      }),
+    ).toMatchObject({
+      spellcastingGearKind: 'spellbook',
+    })
   })
 
   it('rejects alsoWeaponSlug on general gear', () => {

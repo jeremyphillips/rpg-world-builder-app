@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 
 import {
+  buildChoiceSetId,
   createEmptyCharacterBuilderDraft,
   resolveAvailableChoices,
   startingEquipmentChoiceSetId,
@@ -10,6 +11,8 @@ import { createStandaloneBuilderContextFixture } from '../../lib/character-build
 import {
   equipmentStepBardClassFixture,
   equipmentStepCatalogFixture,
+  equipmentStepLuteFixture,
+  equipmentStepMonkClassFixture,
 } from '../../lib/equipment-step.fixtures'
 import { EquipmentStep } from './equipment-step.client'
 
@@ -70,6 +73,57 @@ export const GoldShopping: Story = {
         purchases: [],
         removedPackageItemKeys: [],
         customized: false,
+      },
+    }
+
+    return (
+      <EquipmentStep
+        context={context}
+        draft={draft}
+        resolvedChoiceSets={resolveAvailableChoices(draft, context)}
+        validationIssues={[]}
+        onDraftChange={() => undefined}
+      />
+    )
+  },
+}
+
+const monkToolChoiceSetId = buildChoiceSetId(
+  'class',
+  equipmentStepMonkClassFixture.id,
+  'class-tools',
+)
+
+export const MonkLinkedGrantPending: Story = {
+  render: () => {
+    const draft = {
+      ...createEmptyCharacterBuilderDraft(),
+      class: { classId: equipmentStepMonkClassFixture.id, level: 1 as const },
+      choiceSelections: {
+        [startingEquipmentChoiceSetId(equipmentStepMonkClassFixture.id)]: ['standard'],
+      },
+    }
+
+    return (
+      <EquipmentStep
+        context={context}
+        draft={draft}
+        resolvedChoiceSets={resolveAvailableChoices(draft, context)}
+        validationIssues={[]}
+        onDraftChange={() => undefined}
+      />
+    )
+  },
+}
+
+export const MonkLinkedGrantResolved: Story = {
+  render: () => {
+    const draft = {
+      ...createEmptyCharacterBuilderDraft(),
+      class: { classId: equipmentStepMonkClassFixture.id, level: 1 as const },
+      choiceSelections: {
+        [startingEquipmentChoiceSetId(equipmentStepMonkClassFixture.id)]: ['standard'],
+        [monkToolChoiceSetId]: [equipmentStepLuteFixture.id],
       },
     }
 

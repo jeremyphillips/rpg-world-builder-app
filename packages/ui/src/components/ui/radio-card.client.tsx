@@ -74,6 +74,8 @@ export interface RadioCardItemProps extends React.ComponentPropsWithoutRef<
   summaryLines?: string[]
   density?: RadioCardDensity
   variant?: RadioCardVariant
+  /** Merged onto the option title label. */
+  titleClassName?: string
   /** Horizontal placement of the decorative radio control within the card. */
   controlPosition?: 'left' | 'right'
 }
@@ -97,6 +99,7 @@ type RadioCardItemContentProps = Pick<
   | 'summaryLines'
   | 'density'
   | 'variant'
+  | 'titleClassName'
   | 'controlPosition'
 >
 
@@ -148,15 +151,21 @@ type RadioCardTitleRowContentProps = {
   label: string
   titleMeta?: string
   badge?: string
+  titleClassName?: string
 }
 
-function RadioCardTitleRowContent({ label, titleMeta, badge }: RadioCardTitleRowContentProps) {
+function RadioCardTitleRowContent({
+  label,
+  titleMeta,
+  badge,
+  titleClassName,
+}: RadioCardTitleRowContentProps) {
   return (
     <div className={radioCardTitleRowVariants()}>
-      <span className={radioCardTitleVariants()}>{label}</span>
+      <span className={cn(radioCardTitleVariants(), titleClassName)}>{label}</span>
       {titleMeta ? <RadioCardTitleMeta titleMeta={titleMeta} /> : null}
       {badge ? (
-        <Badge variant="default" size="sm">
+        <Badge appearance="soft" tone="informative" size="sm">
           {badge}
         </Badge>
       ) : null}
@@ -196,7 +205,7 @@ function RadioCardSecondaryContent({
         <ul className={radioCardMetaListVariants()} aria-hidden="true">
           {meta.map((chip) => (
             <li key={chip}>
-              <Badge variant="secondary" size="sm">
+              <Badge appearance="neutral" tone="neutral" size="sm">
                 {chip}
               </Badge>
             </li>
@@ -217,6 +226,7 @@ function RadioCardItemContent({
   summaryLines,
   density = 'default',
   variant = 'card',
+  titleClassName,
   controlPosition = 'left',
 }: RadioCardItemContentProps) {
   const isCompact = density === 'compact'
@@ -229,7 +239,12 @@ function RadioCardItemContent({
     <div className={radioCardRootLayoutVariants({ controlPosition, density })}>
       <RadioCardControl variant={variant} />
       <div className={radioCardBodyVariants({ density })}>
-        <RadioCardTitleRowContent label={label} titleMeta={titleMeta} badge={badge} />
+        <RadioCardTitleRowContent
+          label={label}
+          titleMeta={titleMeta}
+          badge={badge}
+          titleClassName={titleClassName}
+        />
         <RadioCardSecondaryContent
           description={description}
           summaryText={summaryText}
@@ -258,6 +273,7 @@ const RadioCardItem = React.forwardRef<
       summaryLines,
       density = 'default',
       variant = 'card',
+      titleClassName,
       controlPosition = 'left',
       disabled,
       ...props
@@ -280,6 +296,7 @@ const RadioCardItem = React.forwardRef<
         summaryLines={summaryLines}
         density={density}
         variant={variant}
+        titleClassName={titleClassName}
         controlPosition={controlPosition}
       />
     </RadioGroupPrimitive.Item>

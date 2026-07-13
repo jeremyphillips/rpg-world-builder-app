@@ -26,11 +26,21 @@ export const WithMetaAndRemove: Story = {
     label: <Text as="span">Stealth</Text>,
     itemLabel: 'Stealth',
     meta: (
-      <Badge variant="secondary" size="sm">
+      <Badge appearance="neutral" tone="neutral" size="sm">
         Stale
       </Badge>
     ),
     sourceLabel: 'Chosen from Rogue Skills',
+    onRemove: () => undefined,
+  },
+}
+
+export const Dense: Story = {
+  args: {
+    variant: 'dense',
+    label: <Text as="span">Rations</Text>,
+    itemLabel: 'Rations',
+    provenance: <Text variant="caption">Purchased with starting gold · 5 SP each</Text>,
     onRemove: () => undefined,
   },
 }

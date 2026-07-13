@@ -82,12 +82,13 @@ export function resolveAvailabilityBadge(
 
   const reasons = availability.reasons ?? []
   if (reasons.length === 0) {
-    return { variant: 'outline', label: INACTIVE_ROW_BADGE_LABEL }
+    return { appearance: 'outline', tone: 'caution', label: INACTIVE_ROW_BADGE_LABEL }
   }
 
   const primaryCode = pickPrimaryReasonCode(reasons)
   return {
-    variant: 'outline',
+    appearance: 'outline',
+    tone: 'caution',
     label: getAvailabilityReasonDefinition(primaryCode).badgeLabel,
   }
 }

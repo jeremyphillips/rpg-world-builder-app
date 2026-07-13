@@ -1,12 +1,12 @@
 'use client'
 
-import type { EquipmentBudgetSummary } from '@rpg/contracts'
+import { formatWealthAsGold, type EquipmentBudgetSummary } from '@rpg/contracts'
+import { Text } from '@rpg/ui'
 
-import { formatEquipmentBudgetWealth } from './equipment-picker-drawer.lib'
 import {
-  equipmentBudgetHeaderClasses,
-  equipmentBudgetHeaderLabelClasses,
-  equipmentBudgetHeaderValueClasses,
+  equipmentBudgetHeaderMetaClasses,
+  equipmentBudgetHeaderPanelClasses,
+  equipmentBudgetHeaderRemainingClasses,
 } from './equipment-budget-header.variants'
 
 export type EquipmentBudgetHeaderProps = {
@@ -15,25 +15,13 @@ export type EquipmentBudgetHeaderProps = {
 
 export function EquipmentBudgetHeader({ budget }: EquipmentBudgetHeaderProps) {
   return (
-    <dl className={equipmentBudgetHeaderClasses}>
-      <div>
-        <dt className={equipmentBudgetHeaderLabelClasses}>Starting</dt>
-        <dd className={equipmentBudgetHeaderValueClasses}>
-          {formatEquipmentBudgetWealth(budget.starting)}
-        </dd>
-      </div>
-      <div>
-        <dt className={equipmentBudgetHeaderLabelClasses}>Spent</dt>
-        <dd className={equipmentBudgetHeaderValueClasses}>
-          {formatEquipmentBudgetWealth(budget.spent)}
-        </dd>
-      </div>
-      <div>
-        <dt className={equipmentBudgetHeaderLabelClasses}>Remaining</dt>
-        <dd className={equipmentBudgetHeaderValueClasses}>
-          {formatEquipmentBudgetWealth(budget.remaining)}
-        </dd>
-      </div>
-    </dl>
+    <div className={equipmentBudgetHeaderPanelClasses}>
+      <Text as="p" className={equipmentBudgetHeaderRemainingClasses}>
+        {formatWealthAsGold(budget.remaining)} remaining
+      </Text>
+      <Text as="p" className={equipmentBudgetHeaderMetaClasses}>
+        {formatWealthAsGold(budget.starting)} starting · {formatWealthAsGold(budget.spent)} spent
+      </Text>
+    </div>
   )
 }

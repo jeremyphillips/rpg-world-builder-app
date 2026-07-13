@@ -48,6 +48,10 @@ export interface ContentFormOptionSets {
   armor: FieldOption[]
   /** All campaign-resolved equipment (weapons, armor, tools, gear, …), sorted by label. */
   equipment: FieldOption[]
+  /** Full equipment entities for authoring-time pool expansion. */
+  equipmentEntities?: Equipment[]
+  /** Eligible tool proficiency choices for starting-equipment linked grants. */
+  proficiencyChoiceTargets?: FieldOption[]
   spells: FieldOption[]
   feats: FieldOption[]
   skills: FieldOption[]
@@ -183,6 +187,7 @@ export function buildContentFormOptionSets(input: {
     weapons: toSortedContentFieldOptions(input.equipment?.filter(isWeaponEquipment)),
     armor: toSortedContentFieldOptions(input.equipment?.filter(isArmorEquipment)),
     equipment: toSortedContentFieldOptions(input.equipment),
+    equipmentEntities: input.equipment,
     spells: toSortedContentFieldOptions(input.spells),
     feats: toSortedContentFieldOptions(input.feats),
     skills: toSortedContentFieldOptions(input.skills),

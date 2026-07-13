@@ -91,7 +91,9 @@ export function ClassStep({ context, draft, validationIssues, onDraftChange }: C
           sections={detailsContent.sections}
           primaryAction={
             isDetailsClassSelected ? (
-              <Badge variant="secondary">{SELECTED_CLASS_LABEL}</Badge>
+              <Badge appearance="neutral" tone="neutral">
+                {SELECTED_CLASS_LABEL}
+              </Badge>
             ) : (
               <Button
                 onClick={() => {

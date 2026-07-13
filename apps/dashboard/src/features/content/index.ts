@@ -10,6 +10,15 @@ export {
   equipmentQueryKey,
   EQUIPMENT_FAMILY_PATHS,
   getEquipmentFamilyLabel,
+  buildEquipmentDetailViewModel,
+  buildEquipmentPickerHeaderViewModel,
+  buildEquipmentPickerRowViewModel,
+  EQUIPMENT_DETAILS_SECTION_TITLES,
+  EQUIPMENT_STAT_LABELS,
+  type EquipmentCardViewModel,
+  type EquipmentDetailViewModel,
+  type EquipmentPickerRowViewModel,
+  EquipmentDetailMetadata,
 } from './equipment'
 export { EquipmentEdit } from './equipment/routes/equipment-edit'
 export {

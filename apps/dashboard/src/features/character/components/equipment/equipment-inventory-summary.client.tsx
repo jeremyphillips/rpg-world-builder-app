@@ -2,78 +2,98 @@
 
 import { useMemo } from 'react'
 
-import type {
-  CharacterBuildCatalogIndex,
-  CharacterBuilderDraft,
-  EquipmentBudgetSummary,
-} from '@rpg/contracts'
-import { Heading, Text } from '@rpg/ui'
+import type { CharacterBuildCatalogIndex, CharacterBuilderDraft } from '@rpg/contracts'
+import { Text } from '@rpg/ui'
 
-import {
-  listEquipmentInventoryRowsFromDraft,
-  type EquipmentInventoryQuantityTarget,
-  type EquipmentInventoryRemoveTarget,
+import type {
+  EquipmentInventoryQuantityTarget,
+  EquipmentInventoryRemoveTarget,
 } from '../../lib/equipment-step.lib'
-import { EquipmentInventoryRowItem } from './equipment-inventory-row.client'
-import { equipmentInventoryRowKey } from './equipment-inventory-summary.lib'
+import { EquipmentPurchasedInventoryColumn } from './equipment-purchased-inventory-column.client'
+import { EquipmentStartingPackageSection } from './equipment-starting-package-section.client'
+import {
+  buildEquipmentInventoryLayout,
+  shouldRenderEquipmentInventorySummary,
+} from './equipment-inventory-summary.lib'
 import {
   equipmentInventorySummaryClasses,
-  equipmentInventorySummaryGroupClasses,
-  equipmentInventorySummaryListClasses,
+  equipmentInventorySummaryGridClasses,
 } from './equipment-inventory-summary.variants'
 
 export type EquipmentInventorySummaryProps = {
   draft: CharacterBuilderDraft
   catalogIndex: CharacterBuildCatalogIndex
-  budget?: EquipmentBudgetSummary
+  conversionEditorOpen?: boolean
+  selectedPackageItemKeys?: ReadonlySet<string>
+  conversionCommitStatusMessage?: string
   onRemoveItem?: (target: EquipmentInventoryRemoveTarget) => void
   onSetPurchaseQuantity?: (target: EquipmentInventoryQuantityTarget, quantity: number) => void
+  onCustomizePackage?: () => void
+  onChangeEquipmentOption?: () => void
+  onSelectedPackageItemKeysChange?: (keys: ReadonlySet<string>) => void
+  onCancelConversion?: () => void
+  onCommitConversion?: (preview: import('@rpg/contracts').StartingPackageConversionPreview) => void
+  showBrowseEquipment?: boolean
+  onOpenPicker?: () => void
 }
 
 export function EquipmentInventorySummary({
   draft,
   catalogIndex,
-  budget,
+  conversionEditorOpen = false,
+  selectedPackageItemKeys = new Set(),
+  conversionCommitStatusMessage,
   onRemoveItem,
   onSetPurchaseQuantity,
+  onCustomizePackage,
+  onChangeEquipmentOption,
+  onSelectedPackageItemKeysChange,
+  onCancelConversion,
+  onCommitConversion,
+  showBrowseEquipment = false,
+  onOpenPicker,
 }: EquipmentInventorySummaryProps) {
-  const rows = useMemo(
-    () => listEquipmentInventoryRowsFromDraft(draft, catalogIndex),
+  const layout = useMemo(
+    () => buildEquipmentInventoryLayout(draft, catalogIndex),
     [catalogIndex, draft],
   )
 
-  if (rows.length === 0) {
+  if (!shouldRenderEquipmentInventorySummary(layout, showBrowseEquipment)) {
     return <Text variant="muted">No equipment selected yet.</Text>
   }
 
-  const groupedRows = rows.reduce<Map<string, typeof rows>>((groups, row) => {
-    const current = groups.get(row.groupLabel) ?? []
-    current.push(row)
-    groups.set(row.groupLabel, current)
-    return groups
-  }, new Map())
+  const isPackageMode = layout.mode === 'package'
 
   return (
-    <div className={equipmentInventorySummaryClasses}>
-      {[...groupedRows.entries()].map(([groupLabel, groupRows]) => (
-        <section key={groupLabel} className={equipmentInventorySummaryGroupClasses}>
-          <Heading variant="subsection" as="h3">
-            {groupLabel}
-          </Heading>
-          <ul className={equipmentInventorySummaryListClasses}>
-            {groupRows.map((row) => (
-              <li key={equipmentInventoryRowKey(row)}>
-                <EquipmentInventoryRowItem
-                  row={row}
-                  budget={budget}
-                  onRemoveItem={onRemoveItem}
-                  onSetPurchaseQuantity={onSetPurchaseQuantity}
-                />
-              </li>
-            ))}
-          </ul>
-        </section>
-      ))}
+    <div
+      className={
+        isPackageMode ? equipmentInventorySummaryGridClasses : equipmentInventorySummaryClasses
+      }
+    >
+      {isPackageMode ? (
+        <EquipmentStartingPackageSection
+          packageGroup={layout.startingPackage}
+          draft={draft}
+          catalogIndex={catalogIndex}
+          conversionEditorOpen={conversionEditorOpen}
+          selectedPackageItemKeys={selectedPackageItemKeys}
+          commitStatusMessage={conversionCommitStatusMessage}
+          onCustomize={onCustomizePackage ?? (() => undefined)}
+          onChangeEquipmentOption={onChangeEquipmentOption ?? (() => undefined)}
+          onSelectedPackageItemKeysChange={onSelectedPackageItemKeysChange ?? (() => undefined)}
+          onCancelConversion={onCancelConversion ?? (() => undefined)}
+          onCommitConversion={onCommitConversion ?? (() => undefined)}
+        />
+      ) : null}
+
+      <EquipmentPurchasedInventoryColumn
+        purchased={layout.purchased}
+        isPackageMode={isPackageMode}
+        showBrowseEquipment={showBrowseEquipment}
+        onOpenPicker={onOpenPicker}
+        onRemoveItem={onRemoveItem}
+        onSetPurchaseQuantity={onSetPurchaseQuantity}
+      />
     </div>
   )
 }

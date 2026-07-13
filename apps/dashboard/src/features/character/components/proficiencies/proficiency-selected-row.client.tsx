@@ -19,7 +19,7 @@ export function ProficiencySelectedRow({ row, onRemove }: ProficiencySelectedRow
       itemLabel={row.label}
       meta={
         row.isStale ? (
-          <Badge variant="secondary" size="sm" title={row.staleReason}>
+          <Badge appearance="neutral" tone="neutral" size="sm" title={row.staleReason}>
             {PROFICIENCY_SELECTED_ROW_STALE_BADGE_LABEL}
           </Badge>
         ) : undefined

@@ -32,7 +32,6 @@ import {
   spellPickerDetailsClasses,
   spellPickerDisabledRowClasses,
   spellPickerEmptyStateClasses,
-  spellPickerMarkerBadgeClasses,
   spellPickerMarkerRowClasses,
 } from './spell-picker-drawer.variants'
 
@@ -45,7 +44,7 @@ function SpellPickerMarkers({ item }: { item: SpellPickerItem }) {
   return (
     <div className={spellPickerMarkerRowClasses}>
       {markers.map((marker) => (
-        <Badge key={marker} variant="outline" className={spellPickerMarkerBadgeClasses}>
+        <Badge key={marker} appearance="outline" tone="neutral" size="sm">
           {marker}
         </Badge>
       ))}

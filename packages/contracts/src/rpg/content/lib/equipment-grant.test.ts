@@ -159,11 +159,11 @@ describe('grantedEquipmentItemSchema', () => {
         equipmentSlug: 'quarterstaff',
         quantity: 1,
         equipped: false,
-        modifiers: [{ kind: 'spellcasting_focus', focusKind: 'druidic_focus' }],
+        modifiers: [{ kind: 'spellcasting_focus', spellcastingGearKind: 'druidic_focus' }],
       }),
     ).toMatchObject({
       kind: 'grant',
-      modifiers: [{ kind: 'spellcasting_focus', focusKind: 'druidic_focus' }],
+      modifiers: [{ kind: 'spellcasting_focus', spellcastingGearKind: 'druidic_focus' }],
     })
   })
 })
@@ -509,6 +509,16 @@ describe('formatEquipmentGrantSentence', () => {
 
   it('returns an empty string for incomplete granted items', () => {
     expect(formatEquipmentGrantSentence({ kind: 'grant', equipmentSlug: '', quantity: 1 })).toBe('')
+  })
+
+  it('returns an empty string for filtered pool choices missing equipment kind', () => {
+    expect(
+      formatEquipmentGrantSentence({
+        kind: 'choice',
+        choose: 1,
+        pool: { source: 'filtered', equipmentKind: undefined as unknown as 'tool' },
+      }),
+    ).toBe('')
   })
 })
 

@@ -66,7 +66,7 @@ describe('IdentityStep', () => {
 
     expect(screen.getByRole('heading', { name: 'Identity' })).toBeInTheDocument()
     expect(screen.getByLabelText(/Character name/i)).toBeInTheDocument()
-    expect(screen.getByLabelText(/Alignment/i)).toBeInTheDocument()
+    expect(screen.getByRole('group', { name: 'Alignment' })).toBeInTheDocument()
     expect(await screen.findByLabelText(/Backstory/i)).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /Add trait/i })).toBeInTheDocument()
   })

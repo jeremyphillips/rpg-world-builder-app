@@ -10,8 +10,10 @@ import {
   buildEquipmentSkipPatch,
 } from '../../lib/equipment-step.lib'
 import { showsBuilderStepReviewMessage } from '../../lib/builder-step-readiness.lib'
+import { EquipmentPackageSwitchResolutionModal } from '../equipment/equipment-package-switch-resolution-modal.client'
 import { EquipmentPickerDrawer } from '../equipment/equipment-picker-drawer.client'
-import { StartingEquipmentOptionCards } from '../equipment/starting-equipment-option-cards.client'
+import { StartingEquipmentOptionSection } from '../equipment/starting-equipment-option-section.client'
+import { equipmentStepSwitchConfirmHeadlineClasses } from './equipment-step-interactive.variants'
 import {
   EquipmentStepFallback,
   EquipmentStepInventorySection,
@@ -39,24 +41,34 @@ export function EquipmentStepInteractive({
     summaries,
     selectedOptionId,
     showFallback,
+    showBudget,
     showShopping,
     budget,
     pickerItems,
+    pickerBrowseSortContext,
     characterPreviewContext,
-    activePickerFlow,
     ownedPurchaseQuantities,
     pendingSelection,
     setPendingSelection,
+    pendingPackageSwitch,
+    packageSwitchEvaluation,
+    dismissPackageSwitch,
+    handleDraftPackageSwitchQuantity,
+    handleCommitPackageSwitch,
+    isPackageSwitchCommitting,
     pickerOpen,
     setPickerOpen,
     requestSelection,
     openPicker,
     handleAddItem,
     handleSetPurchaseQuantity,
+    handleRemoveFromInventory,
+    handleRemoveOneFromInventory,
     applySelection,
     onRemoveItem,
     onNestedPoolChange,
-    isUniqueEquipmentOwned,
+    onChoiceSelectionChange,
+    resolvedChoiceSets,
   } = step
 
   return (
@@ -71,32 +83,46 @@ export function EquipmentStepInteractive({
             onContinueWithout={() => onDraftChange({ equipment: buildEquipmentSkipPatch() })}
           />
         ) : equipmentChoiceSets.length > 0 && summaries.length > 0 ? (
-          <StartingEquipmentOptionCards
+          <StartingEquipmentOptionSection
             characterClass={characterClass!}
             catalogIndex={catalogIndex}
             summaries={summaries}
             draft={draft}
+            resolvedChoiceSets={resolvedChoiceSets}
             selectedOptionId={selectedOptionId}
+            isPackageChooserExpanded={step.isPackageChooserExpanded}
             onSelectOption={requestSelection}
             onNestedPoolChange={onNestedPoolChange}
+            onChoiceSelectionChange={onChoiceSelectionChange}
+            onChangePackage={step.expandPackageChooser}
+            onCollapseChooser={step.collapsePackageChooser}
           />
         ) : null}
 
-        {showShopping && budget ? (
-          <EquipmentStepShoppingSection
-            budget={budget}
-            activePickerFlow={activePickerFlow}
-            customized={draft.equipment?.customized}
-            onOpenPicker={openPicker}
-          />
-        ) : null}
+        {showBudget && budget ? <EquipmentStepShoppingSection budget={budget} /> : null}
 
         <EquipmentStepInventorySection
           draft={draft}
           catalogIndex={catalogIndex}
-          budget={budget}
+          conversionEditorOpen={step.conversionEditorOpen}
+          selectedPackageItemKeys={step.selectedPackageItemKeys}
+          conversionCommitStatusMessage={step.conversionCommitStatusMessage}
           onRemoveItem={onRemoveItem}
           onSetPurchaseQuantity={handleSetPurchaseQuantity}
+          showBrowseEquipment={showBudget}
+          onOpenPicker={openPicker}
+          onCustomizePackage={() => step.openConversionEditor()}
+          onChangeEquipmentOption={() => {
+            step.expandPackageChooser()
+            document.getElementById('starting-equipment-options')?.scrollIntoView?.({
+              behavior: 'smooth',
+              block: 'start',
+            })
+            document.getElementById('starting-equipment-options')?.focus()
+          }}
+          onSelectedPackageItemKeysChange={step.setSelectedPackageItemKeys}
+          onCancelConversion={() => step.setConversionEditorOpen(false)}
+          onCommitConversion={step.handleCommitConversion}
         />
       </div>
 
@@ -104,13 +130,16 @@ export function EquipmentStepInteractive({
         open={pickerOpen}
         onOpenChange={setPickerOpen}
         items={pickerItems}
+        browseSortContext={pickerBrowseSortContext}
         budget={budget}
         defaultTab="recommended"
         showCharacterPreview
         characterPreviewContext={characterPreviewContext}
         ownedPurchaseQuantities={ownedPurchaseQuantities}
-        isUniqueEquipmentOwned={isUniqueEquipmentOwned}
+        isGoldShoppingPath={showShopping}
         onAddItem={handleAddItem}
+        onRemoveFromInventory={handleRemoveFromInventory}
+        onRemoveOneFromInventory={handleRemoveOneFromInventory}
       />
 
       <ConfirmDialog
@@ -119,6 +148,7 @@ export function EquipmentStepInteractive({
           if (!open) setPendingSelection(null)
         }}
         headline={EQUIPMENT_STEP_SWITCH_CONFIRM_HEADLINE}
+        headlineClassName={equipmentStepSwitchConfirmHeadlineClasses}
         description={EQUIPMENT_STEP_SWITCH_CONFIRM_DESCRIPTION}
         confirmLabel="Switch equipment"
         cancelLabel="Keep current selection"
@@ -129,6 +159,23 @@ export function EquipmentStepInteractive({
         }}
         onCancel={() => setPendingSelection(null)}
       />
+
+      {pendingPackageSwitch && packageSwitchEvaluation ? (
+        <EquipmentPackageSwitchResolutionModal
+          open
+          catalogIndex={catalogIndex}
+          evaluation={packageSwitchEvaluation}
+          draftQuantitiesByPurchaseId={pendingPackageSwitch.draftQuantitiesByPurchaseId}
+          commitErrorReason={pendingPackageSwitch.commitErrorReason}
+          staleNotice={pendingPackageSwitch.staleNotice}
+          isCommitting={isPackageSwitchCommitting}
+          onOpenChange={(open) => {
+            if (!open) dismissPackageSwitch()
+          }}
+          onDraftQuantityChange={handleDraftPackageSwitchQuantity}
+          onConfirm={handleCommitPackageSwitch}
+        />
+      ) : null}
     </>
   )
 }

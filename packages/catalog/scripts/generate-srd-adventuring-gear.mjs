@@ -37,6 +37,20 @@ const sp = (amount) => ({ amount, currency: 'sp' })
 const cp = (amount) => ({ amount, currency: 'cp' })
 
 function gear(slug, name, description, cost, weight, gearKind, extra = {}) {
+  const spellcastingSubKinds = new Set([
+    'arcane_focus',
+    'druidic_focus',
+    'holy_symbol',
+    'spellbook',
+    'component_pouch',
+  ])
+  if (spellcastingSubKinds.has(gearKind)) {
+    return base(slug, name, description, cost, weight, 'adventuring_gear', {
+      gearKind: 'spellcasting',
+      spellcastingGearKind: gearKind,
+      ...extra,
+    })
+  }
   return base(slug, name, description, cost, weight, 'adventuring_gear', { gearKind, ...extra })
 }
 
@@ -244,7 +258,7 @@ const adventuringGear = [
     'A Component Pouch is watertight and filled with compartments that hold all the free Material components of your spells.',
     gp(25),
     lb(2),
-    'general',
+    'component_pouch',
   ),
   gear(
     'costume',

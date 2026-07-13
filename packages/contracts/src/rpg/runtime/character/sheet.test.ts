@@ -309,7 +309,7 @@ describe('characterEquipmentEntrySchema', () => {
           weapons: [
             {
               equipmentId: 'srd-cc-5.2.1:quarterstaff',
-              modifiers: [{ kind: 'spellcasting_focus', focusKind: 'druidic_focus' }],
+              modifiers: [{ kind: 'spellcasting_focus', spellcastingGearKind: 'druidic_focus' }],
               sources: [
                 {
                   kind: 'classStartingEquipment',

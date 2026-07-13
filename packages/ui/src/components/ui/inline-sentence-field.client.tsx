@@ -5,7 +5,7 @@ import { useMemo } from 'react'
 
 import { isFieldOptionGroup, type FieldOption } from '../../form/field-config'
 import { ChipsFieldOptions } from './chips-field.client'
-import type { ChipSize } from './chips-field.variants'
+import type { CompactLabelSize } from './compact-label.lib'
 import { ChooseCountFieldShell } from './choose-count-field-shell.client'
 import { parseChooseCount } from './choose-count-field.lib'
 import type { FieldSize } from './field.client'
@@ -61,7 +61,7 @@ export interface InlineSentenceFieldProps {
   size?: FieldSize
   width?: FieldWidth
   hideLabel?: boolean
-  chipSize?: ChipSize
+  chipSize?: CompactLabelSize
 }
 
 function renderSelectOption(option: FieldOption) {
@@ -139,10 +139,7 @@ function InlineSentenceSelectControl({
   size: FieldSize
   disabled?: boolean
 }) {
-  const optionNodes = useMemo(
-    () => renderSelectContent(control.options),
-    [control.options],
-  )
+  const optionNodes = useMemo(() => renderSelectContent(control.options), [control.options])
   const triggerWidthClassName =
     control.digits == null ? inlineSentenceSelectTriggerWidthClasses(control.width) : undefined
 

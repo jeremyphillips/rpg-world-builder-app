@@ -1,89 +1,57 @@
-import { cva } from 'class-variance-authority'
-
 import { cn } from '../../lib/utils'
-import { fieldSurfaceToneVariants } from '../../components/ui/field-stack.variants'
 import {
-  resolveArrayItemLeadingChrome,
-  type ArrayItemLeadingChromeOptions,
-} from '../config/array-item-leading-chrome.lib'
+  collapsibleListItemActionsRailClasses,
+  collapsibleListItemBodyClasses,
+  collapsibleListItemChromeButtonClasses,
+  collapsibleListItemCollapseButtonClasses,
+  collapsibleListItemDraggingClasses,
+  collapsibleListItemDragHandleClasses,
+  collapsibleListItemMainClasses,
+  collapsibleListItemShellClasses,
+  collapsibleListItemShellInsetClasses,
+  collapsibleListItemShellVariants,
+  collapsibleListItemToolbarContentClasses,
+  collapsibleListItemToolbarRowClasses,
+  resolveCollapsibleListItemLeadingChrome,
+  type CollapsibleListItemLeadingChromeOptions,
+} from '../../components/ui/collapsible-list-item/collapsible-list-item.variants'
 
 export {
-  arrayItemChromeColumnClasses,
-  resolveArrayItemLeadingChrome,
-  type ArrayItemLeadingChromeOptions,
-  type ResolvedArrayItemLeadingChrome,
-} from '../config/array-item-leading-chrome.lib'
+  collapsibleListItemChromeColumnClasses as arrayItemChromeColumnClasses,
+  resolveCollapsibleListItemLeadingChrome as resolveArrayItemLeadingChrome,
+  type CollapsibleListItemLeadingChromeOptions as ArrayItemLeadingChromeOptions,
+  type ResolvedCollapsibleListItemLeadingChrome as ResolvedArrayItemLeadingChrome,
+} from '../../components/ui/collapsible-list-item/collapsible-list-item-leading-chrome.lib'
 
 /**
- * Array item chrome geometry — single source of truth for shell padding and action hit targets.
+ * Array item chrome geometry — re-exports shared collapsible list item layout tokens.
  *
- * Layout contract: content flows in the main column; trailing actions (remove, future issue
- * summary) live in a top-aligned rail pinned to the shell's top-right corner. Leading inset for
- * grip/caret is resolved via `resolveArrayItemLeadingChrome`.
+ * Layout contract: content flows in the main column; trailing actions (remove, issue
+ * summary) live in a top-aligned rail pinned to the shell's top-right corner. Leading inset
+ * for grip/caret is resolved via `resolveArrayItemLeadingChrome`.
  */
-export const arrayItemShellInsetClasses = 'calc(var(--spacing) * 2)'
+export const arrayItemShellInsetClasses = collapsibleListItemShellInsetClasses
 
 /** Shared 24×24 hit target for grip, collapse caret, and remove (WCAG 2.2 AA minimum). */
-export const arrayItemChromeButtonClasses =
-  'flex size-6 shrink-0 items-center justify-center rounded-sm p-0 text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring'
+export const arrayItemChromeButtonClasses = collapsibleListItemChromeButtonClasses
 
 /** Item shell — border, left/bottom inset; actions rail occupies the top-right with no inset. */
-export const arrayItemShellVariants = cva(cn('relative rounded-md border'), {
-  variants: {
-    layout: {
-      default: cn(
-        'grid grid-cols-[minmax(0,1fr)_auto] items-start',
-        'pl-2 pb-[calc(var(--spacing)*2)] pt-0 pr-0',
-      ),
-      /** Compact inline row — single column; actions live inside the row grid. */
-      compactRow: 'p-2 pt-[calc(var(--spacing)*2)]',
-    },
-    tone: {
-      default: 'border-border',
-      subtle: fieldSurfaceToneVariants({ tone: 'subtle' }),
-      warning: fieldSurfaceToneVariants({ tone: 'warning' }),
-      error: fieldSurfaceToneVariants({ tone: 'error' }),
-    },
-  },
-  defaultVariants: {
-    layout: 'default',
-    tone: 'default',
-  },
-})
+export const arrayItemShellVariants = collapsibleListItemShellVariants
 
 /** Default shell classes — backward-compatible alias for tests and non-context usage. */
-export const arrayItemShellClasses = arrayItemShellVariants({ tone: 'default' })
+export const arrayItemShellClasses = collapsibleListItemShellClasses
 
 /** Main content column — top inset matches shell vertical rhythm. */
-export const arrayItemMainClasses = 'min-w-0 pt-[calc(var(--spacing)*2)]'
+export const arrayItemMainClasses = collapsibleListItemMainClasses
 
-/**
- * Trailing actions rail — top-right of the shell, independent of content height.
- *
- * When `embedded`, the rail sits inside the compact row grid's actions column.
- */
-export function arrayItemActionsRailClasses(
-  options: { compact?: boolean; embedded?: boolean } = {},
-): string {
-  return cn(
-    'flex shrink-0 items-center gap-1',
-    options.embedded
-      ? 'justify-self-end'
-      : cn('self-start', options.compact ? 'mt-1 mr-1' : 'mt-2 mr-1'),
-  )
-}
+/** Trailing actions rail — top-right of the shell, independent of content height. */
+export const arrayItemActionsRailClasses = collapsibleListItemActionsRailClasses
 
 /** Inline drag handle — first leading chrome column when sortable. */
-export function arrayItemDragHandleClasses(options: { compact?: boolean } = {}): string {
-  return cn(
-    arrayItemChromeButtonClasses,
-    'cursor-grab active:cursor-grabbing',
-    options.compact && '-mt-1',
-  )
-}
+export const arrayItemDragHandleClasses = collapsibleListItemDragHandleClasses
 
 /** Collapse caret in detailed item headers. */
-export const arrayItemCollapseButtonClasses = arrayItemChromeButtonClasses
+export const arrayItemCollapseButtonClasses = collapsibleListItemCollapseButtonClasses
 
 /** Remove control — destructive hover; always last in the actions rail. */
 export const arrayItemRemoveButtonClasses = cn(
@@ -112,28 +80,20 @@ export const arrayItemHeaderSummaryClasses =
   'truncate pb-1 text-xs leading-none text-muted-foreground'
 
 /** Leading toolbar row — grip, caret, and title/compact fields only (no trailing actions). */
-export function arrayItemToolbarRowClasses(
-  options: ArrayItemLeadingChromeOptions & { compact?: boolean },
-): string {
-  return cn('flex min-w-0 gap-0', options.compact ? 'items-start' : 'items-center')
-}
+export const arrayItemToolbarRowClasses = collapsibleListItemToolbarRowClasses
 
 /** Gap before the toolbar content grid cell when leading chrome is visible. */
-export function arrayItemToolbarContentClasses(options: ArrayItemLeadingChromeOptions): string {
-  return cn('min-w-0', resolveArrayItemLeadingChrome(options).toolbarContentGapClasses)
-}
+export const arrayItemToolbarContentClasses = collapsibleListItemToolbarContentClasses
 
 /** Aligns summary text with the toolbar content column. */
 export function arrayItemHeaderSummaryIndentClasses(
-  options: ArrayItemLeadingChromeOptions,
+  options: CollapsibleListItemLeadingChromeOptions,
 ): string {
-  return resolveArrayItemLeadingChrome(options).contentColumnIndentClasses
+  return resolveCollapsibleListItemLeadingChrome(options).contentColumnIndentClasses
 }
 
 /** Aligns detailed item bodies with the toolbar content column. */
-export function arrayItemBodyClasses(options: ArrayItemLeadingChromeOptions): string {
-  return cn(resolveArrayItemLeadingChrome(options).contentColumnIndentClasses, 'pt-3')
-}
+export const arrayItemBodyClasses = collapsibleListItemBodyClasses
 
 /** Inline field region for compact items (same row as toolbar). */
 export const arrayItemCompactFieldsClasses = 'min-w-0 flex-1'
@@ -167,4 +127,4 @@ export function buildArrayItemCompactRowGridTemplate(
 }
 
 /** Applied to the item wrapper while it is being dragged. */
-export const arrayItemDraggingClasses = 'opacity-50'
+export const arrayItemDraggingClasses = collapsibleListItemDraggingClasses

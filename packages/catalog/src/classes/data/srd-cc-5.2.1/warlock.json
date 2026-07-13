@@ -1,0 +1,368 @@
+{
+  "id": "srd-cc-5.2.1:warlock",
+  "slug": "warlock",
+  "rulesetId": "srd-cc-5.2.1",
+  "source": "system",
+  "campaignId": null,
+  "createdAt": "2024-05-21T00:00:00.000Z",
+  "updatedAt": "2024-05-21T00:00:00.000Z",
+  "name": "Warlock",
+  "description": "<p>A wielder of magic that is derived from a bargain with an extraplanar entity.</p>",
+  "primaryAbilities": ["cha"],
+  "hitDie": 8,
+  "spellcasting": {
+    "progression": "pact",
+    "ability": "cha",
+    "preparation": "prepared",
+    "description": "<p>Through occult ceremony, you have formed a pact with a mysterious entity to gain magical powers. The entity is a voice in the shadows—its identity unclear—but its boon to you is concrete: the ability to cast spells. See \"Spells\" for the rules on spellcasting. The information below details how you use those rules with Warlock spells, which appear in the Warlock spell list later in the class's description.</p><p><strong>Cantrips.</strong> You know two Warlock cantrips of your choice. Eldritch Blast and Prestidigitation are recommended. Whenever you gain a Warlock level, you can replace one of your cantrips from this feature with another Warlock cantrip of your choice.</p><p>When you reach Warlock levels 4 and 10, you learn another Warlock cantrip of your choice, as shown in the Cantrips column of the Warlock Features table.</p><p><strong>Spell Slots.</strong> The Warlock Features table shows how many spell slots you have to cast your Warlock spells of levels 1–5. The table also shows the level of those slots, all of which are the same level. You regain all expended Pact Magic spell slots when you finish a Short or Long Rest.</p><p>For example, when you're a level 5 Warlock, you have two level 3 spell slots. To cast the level 1 spell Charm Person, you must spend one of those slots, and you cast it as a level 3 spell.</p><p><strong>Prepared Spells of Level 1+.</strong> You prepare the list of level 1+ spells that are available for you to cast with this feature. To start, choose two level 1 Warlock spells. Charm Person and Hex are recommended.</p><p>The number of spells on your list increases as you gain Warlock levels, as shown in the Prepared Spells column of the Warlock Features table. Whenever that number increases, choose additional Warlock spells until the number of spells on your list matches the number in the table. The chosen spells must be of a level no higher than what's shown in the table's Slot Level column for your level. When you reach level 6, for example, you learn a new Warlock spell, which can be of levels 1–3.</p><p>If another Warlock feature gives you spells that you always have prepared, those spells don't count against the number of spells you can prepare with this feature, but those spells otherwise count as Warlock spells for you.</p><p><strong>Changing Your Prepared Spells.</strong> Whenever you gain a Warlock level, you can replace one spell on your list with another Warlock spell of an eligible level.</p><p><strong>Spellcasting Ability.</strong> Charisma is the spellcasting ability for your Warlock spells.</p><p><strong>Spellcasting Focus.</strong> You can use an Arcane Focus as a Spellcasting Focus for your Warlock spells.</p>",
+    "cantrips": [
+      {
+        "level": 1,
+        "known": 2
+      },
+      {
+        "level": 4,
+        "known": 3
+      },
+      {
+        "level": 10,
+        "known": 4
+      }
+    ],
+    "spellsAvailable": [
+      {
+        "level": 1,
+        "count": 2
+      },
+      {
+        "level": 2,
+        "count": 3
+      },
+      {
+        "level": 3,
+        "count": 4
+      },
+      {
+        "level": 4,
+        "count": 5
+      },
+      {
+        "level": 5,
+        "count": 6
+      },
+      {
+        "level": 6,
+        "count": 7
+      },
+      {
+        "level": 7,
+        "count": 8
+      },
+      {
+        "level": 8,
+        "count": 9
+      },
+      {
+        "level": 9,
+        "count": 10
+      },
+      {
+        "level": 11,
+        "count": 11
+      },
+      {
+        "level": 13,
+        "count": 12
+      },
+      {
+        "level": 15,
+        "count": 13
+      },
+      {
+        "level": 17,
+        "count": 14
+      },
+      {
+        "level": 19,
+        "count": 15
+      }
+    ]
+  },
+  "proficiencies": {
+    "savingThrows": ["wis", "cha"],
+    "armor": {
+      "categories": ["light"],
+      "items": []
+    },
+    "weapons": {
+      "categories": ["simple"],
+      "items": []
+    },
+    "skills": {
+      "categories": [],
+      "items": []
+    }
+  },
+  "characterCreation": {
+    "startingEquipment": {
+      "choose": 1,
+      "options": [
+        {
+          "id": "standard",
+          "label": "Standard Equipment",
+          "description": "Leather Armor, Sickle, 2 Daggers, Arcane Focus (orb), Book (occult lore), Scholar's Pack, and 15 GP.",
+          "items": [
+            {
+              "kind": "grant",
+              "equipmentSlug": "leather-armor",
+              "quantity": 1,
+              "equipped": true
+            },
+            {
+              "kind": "grant",
+              "equipmentSlug": "sickle",
+              "quantity": 1,
+              "equipped": true
+            },
+            {
+              "kind": "grant",
+              "equipmentSlug": "dagger",
+              "quantity": 2
+            },
+            {
+              "kind": "grant",
+              "equipmentSlug": "orb",
+              "quantity": 1
+            },
+            {
+              "kind": "grant",
+              "equipmentSlug": "book-occult-lore",
+              "quantity": 1
+            },
+            {
+              "kind": "grant",
+              "equipmentSlug": "scholars-pack",
+              "quantity": 1
+            }
+          ],
+          "wealth": {
+            "gp": 15
+          }
+        },
+        {
+          "id": "gold",
+          "label": "Starting Gold",
+          "description": "Take 100 GP instead of standard equipment.",
+          "items": [],
+          "wealth": {
+            "gp": 100
+          }
+        }
+      ]
+    },
+    "proficiencies": {
+      "skills": {
+        "choices": [
+          {
+            "id": "class-skills",
+            "label": "Warlock Skills",
+            "choose": 2,
+            "from": ["arcana", "history", "intimidation", "investigation", "nature", "religion"]
+          }
+        ]
+      }
+    }
+  },
+  "features": [
+    {
+      "id": "eldritch-invocations",
+      "name": "Eldritch Invocations",
+      "level": 1,
+      "description": "<p>You have unearthed Eldritch Invocations, pieces of forbidden knowledge that imbue you with an abiding magical ability or other lessons. You gain one invocation of your choice, such as Pact of the Tome. Invocations are described in the \"Eldritch Invocation Options\" section later in this class's description.</p><p><strong>Prerequisites.</strong> If an invocation has a prerequisite, you must meet it to learn that invocation. For example, if an invocation requires you to be a level 5+ Warlock, you can select the invocation once you reach Warlock level 5.</p><p><strong>Replacing and Gaining Invocations.</strong> Whenever you gain a Warlock level, you can replace one of your invocations with another one for which you qualify. You can't replace an invocation if it's a prerequisite for another invocation that you have.</p><p>When you gain certain Warlock levels, you gain more invocations of your choice, as shown in the Invocations column of the Warlock Features table.</p><p>You can't pick the same invocation more than once unless its description says otherwise.</p>"
+    },
+    {
+      "id": "magical-cunning",
+      "name": "Magical Cunning",
+      "level": 2,
+      "description": "<p>You can perform an esoteric rite for 1 minute. At the end of it, you regain expended Pact Magic spell slots but no more than a number equal to half your maximum (round up). Once you use this feature, you can't do so again until you finish a Long Rest.</p>"
+    },
+    {
+      "kind": "subclass-choice",
+      "id": "warlock-subclass",
+      "name": "Warlock Subclass",
+      "level": 3,
+      "description": ""
+    },
+    {
+      "id": "ability-score-improvement-4",
+      "name": "Ability Score Improvement",
+      "level": 4,
+      "description": "<p>You gain the Ability Score Improvement feat or another feat of your choice for which you qualify.</p>",
+      "grantGroups": [
+        {
+          "grants": [
+            {
+              "kind": "featChoice",
+              "category": "general",
+              "choose": 1,
+              "allowAnyQualifying": true,
+              "recommendedFeatIds": ["ability-score-improvement"]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ability-score-improvement-8",
+      "name": "Ability Score Improvement",
+      "level": 8,
+      "description": "<p>You gain the Ability Score Improvement feat or another feat of your choice for which you qualify.</p>",
+      "grantGroups": [
+        {
+          "grants": [
+            {
+              "kind": "featChoice",
+              "category": "general",
+              "choose": 1,
+              "allowAnyQualifying": true,
+              "recommendedFeatIds": ["ability-score-improvement"]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "contact-patron",
+      "name": "Contact Patron",
+      "level": 9,
+      "description": "<p>In the past, you usually contacted your patron through intermediaries. Now you can communicate directly; you always have the <em>Contact Other Plane</em> spell prepared. With this feature, you can cast the spell without expending a spell slot to contact your patron, and you automatically succeed on the spell's saving throw.</p><p>Once you cast the spell with this feature, you can't do so in this way again until you finish a Long Rest.</p>",
+      "grantGroups": [
+        {
+          "grants": [
+            {
+              "kind": "spells",
+              "ability": "cha",
+              "mode": "always_prepared",
+              "spellIds": ["contact-other-plane"]
+            },
+            {
+              "kind": "spells",
+              "ability": "cha",
+              "mode": "free_cast",
+              "spellIds": ["contact-other-plane"],
+              "frequency": "once_per_long_rest"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "mystic-arcanum",
+      "name": "Mystic Arcanum",
+      "level": 11,
+      "description": "<p>Your patron grants you a magical secret called an arcanum. Choose one level 6 Warlock spell as this arcanum.</p><p>You can cast your arcanum spell once without expending a spell slot, and you must finish a Long Rest before you can cast it in this way again.</p><p>As shown in the Warlock Features table, you gain another Warlock spell of your choice that can be cast in this way when you reach Warlock levels 13 (level 7 spell), 15 (level 8 spell), and 17 (level 9 spell). You regain all uses of your Mystic Arcanum when you finish a Long Rest.</p><p>Whenever you gain a Warlock level, you can replace one of your arcanum spells with another Warlock spell of the same level.</p>"
+    },
+    {
+      "id": "ability-score-improvement-12",
+      "name": "Ability Score Improvement",
+      "level": 12,
+      "description": "<p>You gain the Ability Score Improvement feat or another feat of your choice for which you qualify.</p>",
+      "grantGroups": [
+        {
+          "grants": [
+            {
+              "kind": "featChoice",
+              "category": "general",
+              "choose": 1,
+              "allowAnyQualifying": true,
+              "recommendedFeatIds": ["ability-score-improvement"]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ability-score-improvement-16",
+      "name": "Ability Score Improvement",
+      "level": 16,
+      "description": "<p>You gain the Ability Score Improvement feat or another feat of your choice for which you qualify.</p>",
+      "grantGroups": [
+        {
+          "grants": [
+            {
+              "kind": "featChoice",
+              "category": "general",
+              "choose": 1,
+              "allowAnyQualifying": true,
+              "recommendedFeatIds": ["ability-score-improvement"]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "epic-boon",
+      "name": "Epic Boon",
+      "level": 19,
+      "description": "<p>You gain an Epic Boon feat (see \"Feats\") or another feat of your choice for which you qualify.</p>",
+      "grantGroups": [
+        {
+          "grants": [
+            {
+              "kind": "featChoice",
+              "category": "epic-boon",
+              "choose": 1,
+              "allowAnyQualifying": true,
+              "recommendedFeatIds": ["boon-of-fate"]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "eldritch-master",
+      "name": "Eldritch Master",
+      "level": 20,
+      "description": "<p>When you use your Magical Cunning feature, you regain all your expended Pact Magic spell slots.</p>"
+    }
+  ],
+  "resources": [
+    {
+      "name": "Eldritch Invocations",
+      "entries": [
+        {
+          "level": 1,
+          "value": 1
+        },
+        {
+          "level": 2,
+          "value": 3
+        },
+        {
+          "level": 5,
+          "value": 5
+        },
+        {
+          "level": 7,
+          "value": 6
+        },
+        {
+          "level": 9,
+          "value": 7
+        },
+        {
+          "level": 12,
+          "value": 8
+        },
+        {
+          "level": 15,
+          "value": 9
+        },
+        {
+          "level": 18,
+          "value": 10
+        }
+      ]
+    }
+  ]
+}
