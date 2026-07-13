@@ -35,6 +35,8 @@ export function useProficienciesStep({
     )
   }, [context, draft, preview, resolvedChoiceSets])
 
+  const catalogIndex = useMemo(() => indexCharacterBuildCatalog(context.catalog), [context.catalog])
+
   const model = useMemo(
     () =>
       resolveProficiencyStepModel({
@@ -98,6 +100,7 @@ export function useProficienciesStep({
     readiness,
     activeChoiceSet,
     pickerItems,
+    catalogIndex,
     openChoiceSet,
     closeChoiceSet,
     addChoiceSelection,

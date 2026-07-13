@@ -1,8 +1,6 @@
+import { formatSlugAsLabel } from '@rpg/contracts'
 import { describe, expect, it } from 'vitest'
 
-import { formatSlugAsLabel } from '@rpg/contracts'
-
-import { pickSpell } from '../../lib/fixtures/pick'
 import {
   buildSeedDamageTypeVocabulary,
   buildSeedSpellSchoolVocabulary,
@@ -10,8 +8,14 @@ import {
   getSpellSchoolDescriptionFromVocabulary,
   getSpellSchoolLabelFromVocabulary,
 } from '@/features/homebrew'
+import { pickSpell } from '../../lib/fixtures/pick'
 import { DETECT_MAGIC, FIRE_BOLT } from '../fixtures'
-import { buildSpellDetailViewModel, SPELL_SECTION_LABELS, SPELL_STAT_LABELS } from './spell-display'
+import {
+  buildSpellDetailViewModel,
+  SPELL_SECTION_LABELS,
+  SPELL_STAT_LABELS,
+  splitSpellDescriptionSections,
+} from './spell-display'
 import {
   formatCastingTime,
   formatSpellComponents,
@@ -21,6 +25,7 @@ import {
 } from './format-spell-metadata'
 
 const HELLISH_REBUKE = pickSpell('hellish-rebuke')
+const cureWounds = pickSpell('cure-wounds')
 const spellSchoolVocabulary = buildSeedSpellSchoolVocabulary()
 const damageTypeVocabulary = buildSeedDamageTypeVocabulary()
 
@@ -91,6 +96,21 @@ describe('formatSpellComponents', () => {
   })
 })
 
+describe('splitSpellDescriptionSections', () => {
+  it('splits higher-level spell slot prose from the main description', () => {
+    const description =
+      '<p>A creature you touch regains a number of Hit Points equal to 2d8 plus your spellcasting ability modifier.</p>' +
+      '<p><strong>Using a Higher-Level Spell Slot.</strong> The healing increases by 2d8 for each spell slot level above 1.</p>'
+
+    expect(splitSpellDescriptionSections(description)).toEqual({
+      mainHtml:
+        '<p>A creature you touch regains a number of Hit Points equal to 2d8 plus your spellcasting ability modifier.</p>',
+      higherLevelHtml:
+        '<p><strong>Using a Higher-Level Spell Slot.</strong> The healing increases by 2d8 for each spell slot level above 1.</p>',
+    })
+  })
+})
+
 describe('buildSpellDetailViewModel', () => {
   const vocabulary = testVocabulary()
 
@@ -143,13 +163,15 @@ describe('buildSpellDetailViewModel', () => {
         { slug: 'wizard', label: 'Wizard' },
       ],
     })
+    expect(viewModel.classLabels).toEqual(['Sorcerer', 'Wizard'])
   })
 
   it('omits classes section when classIds is empty', () => {
     const spellWithoutClasses = { ...FIRE_BOLT, classIds: [] as string[] }
-    expect(
-      buildSpellDetailViewModel(spellWithoutClasses, vocabulary).classesSection,
-    ).toBeUndefined()
+    const viewModel = buildSpellDetailViewModel(spellWithoutClasses, vocabulary)
+
+    expect(viewModel.classesSection).toBeUndefined()
+    expect(viewModel.classLabels).toEqual([])
   })
 
   it('builds tags section from roles, functions, damage types, and conditions', () => {
@@ -159,11 +181,15 @@ describe('buildSpellDetailViewModel', () => {
       title: SPELL_SECTION_LABELS.tags,
       labels: ['Damage', 'Fire'],
     })
+    expect(viewModel.tagLabels).toEqual(['Damage', 'Fire'])
   })
 
   it('omits tags section when spell has no tags', () => {
     const spellWithoutTags = { ...DETECT_MAGIC, tags: undefined }
-    expect(buildSpellDetailViewModel(spellWithoutTags, vocabulary).tagsSection).toBeUndefined()
+    const viewModel = buildSpellDetailViewModel(spellWithoutTags, vocabulary)
+
+    expect(viewModel.tagsSection).toBeUndefined()
+    expect(viewModel.tagLabels).toEqual([])
   })
 
   it('includes descriptionHtml when description is present', () => {
@@ -185,13 +211,8 @@ describe('buildSpellDetailViewModel', () => {
   it('builds cantrip scaling prose section', () => {
     const viewModel = buildSpellDetailViewModel(FIRE_BOLT, vocabulary)
 
-    expect(viewModel.proseSections).toEqual([
-      {
-        id: 'cantripScaling',
-        title: SPELL_SECTION_LABELS.cantripScaling,
-        bodyHtml: FIRE_BOLT.cantripScaling,
-      },
-    ])
+    expect(viewModel.proseSections.cantripScaling).toBe(FIRE_BOLT.cantripScaling)
+    expect(viewModel.proseSections.higherLevelSlotEffect).toBeUndefined()
     expect(viewModel.descriptionHtml).not.toContain('Cantrip Upgrade')
   })
 
@@ -202,19 +223,29 @@ describe('buildSpellDetailViewModel', () => {
     }
     const viewModel = buildSpellDetailViewModel(spell, vocabulary)
 
-    expect(viewModel.proseSections).toEqual([
-      {
-        id: 'higherLevelSlotEffect',
-        title: SPELL_SECTION_LABELS.higherLevelSlotEffect,
-        bodyHtml: spell.higherLevelSlotEffect,
-      },
-    ])
+    expect(viewModel.proseSections.higherLevelSlotEffect).toBe(spell.higherLevelSlotEffect)
+    expect(viewModel.proseSections.cantripScaling).toBeUndefined()
   })
 
   it('omits prose sections when scaling fields are absent or empty', () => {
-    expect(buildSpellDetailViewModel(DETECT_MAGIC, vocabulary).proseSections).toBeUndefined()
-    expect(
-      buildSpellDetailViewModel({ ...FIRE_BOLT, cantripScaling: '' }, vocabulary).proseSections,
-    ).toBeUndefined()
+    const detectMagicViewModel = buildSpellDetailViewModel(DETECT_MAGIC, vocabulary)
+    expect(detectMagicViewModel.proseSections.cantripScaling).toBeUndefined()
+    expect(detectMagicViewModel.proseSections.higherLevelSlotEffect).toBeUndefined()
+
+    const fireBoltViewModel = buildSpellDetailViewModel(
+      { ...FIRE_BOLT, cantripScaling: '' },
+      vocabulary,
+    )
+    expect(fireBoltViewModel.proseSections.cantripScaling).toBeUndefined()
+  })
+
+  it('builds a detail view model with stat rows and higher-level prose for cure wounds', () => {
+    const viewModel = buildSpellDetailViewModel(cureWounds)
+
+    expect(viewModel.statRows.some((row) => row.label === 'Components')).toBe(true)
+    expect(viewModel.descriptionHtml).toContain('2d8 plus your spellcasting ability modifier')
+    expect(viewModel.proseSections.higherLevelSlotEffect).toContain(
+      '2d8 for each spell slot level above 1',
+    )
   })
 })

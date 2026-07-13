@@ -1,18 +1,11 @@
 'use client'
 
 import * as React from 'react'
-import { CircleAlert, RotateCcw } from 'lucide-react'
+import { CircleAlert } from 'lucide-react'
 
 import {
-  Button,
   CatalogPickerSheet,
-  Checkbox,
   EmphasisDetailLine,
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
   Text,
   type CatalogPickerSheetToolbarContext,
 } from '@rpg/ui'
@@ -27,6 +20,19 @@ import {
 
 import { buildEquipmentPickerRowViewModel } from '@/features/content'
 
+import { CatalogPickerFilterCheckbox } from '../picker/catalog-picker-filter-checkbox.client'
+import {
+  CatalogPickerFilterGroup,
+  CatalogPickerFilterSelectItem,
+} from '../picker/catalog-picker-filter-group.client'
+import {
+  catalogPickerFiltersMainClasses,
+  catalogPickerFiltersRowClasses,
+  catalogPickerSortActionsGroupClasses,
+} from '../picker/catalog-picker-filter-toolbar.variants'
+import { catalogPickerShellProps } from '../picker/catalog-picker-shell.lib'
+import { CatalogPickerSortGroup } from '../picker/catalog-picker-sort-group.client'
+import { CatalogPickerToolbarResetButton } from '../picker/catalog-picker-toolbar-reset-button.client'
 import {
   countEquipmentPickerAffordableHiddenImpact,
   countEquipmentPickerClearableCriteria,
@@ -68,23 +74,6 @@ import {
   clampEquipmentStepQuantity,
   resolveEquipmentStepPurchaseMaxQuantity,
 } from '../../lib/equipment-quantity.lib'
-import {
-  equipmentPickerAffordableFilterClasses,
-  equipmentPickerAffordableHiddenCountClasses,
-  equipmentPickerAffordableLabelClasses,
-  equipmentPickerCategoryFilterClasses,
-  equipmentPickerCategoryLabelClasses,
-  equipmentPickerFiltersMainClasses,
-  equipmentPickerFiltersRowClasses,
-  equipmentPickerHeadlineClasses,
-  equipmentPickerRowBodyClasses,
-  equipmentPickerRowShellClasses,
-  equipmentPickerSheetContentClasses,
-  equipmentPickerSortActionsGroupClasses,
-  equipmentPickerSortFilterClasses,
-  equipmentPickerSortLabelClasses,
-  equipmentPickerTabActionButtonClasses,
-} from './equipment-picker-drawer.variants'
 
 export type { EquipmentPickerDrawerProps } from './equipment-picker-drawer.types'
 
@@ -137,30 +126,18 @@ function EquipmentPickerTabToolbarActions({
 
   if (showClearFilters) {
     return (
-      <Button
-        type="button"
-        variant="ghost"
-        size="sm"
-        className={equipmentPickerTabActionButtonClasses}
+      <CatalogPickerToolbarResetButton
+        label={EQUIPMENT_PICKER_CLEAR_FILTERS_LABEL}
         onClick={handleClearFilters}
-      >
-        <RotateCcw aria-hidden className="size-3" />
-        {EQUIPMENT_PICKER_CLEAR_FILTERS_LABEL}
-      </Button>
+      />
     )
   }
 
   return (
-    <Button
-      type="button"
-      variant="ghost"
-      size="sm"
-      className={equipmentPickerTabActionButtonClasses}
+    <CatalogPickerToolbarResetButton
+      label={EQUIPMENT_PICKER_RESET_VIEW_LABEL}
       onClick={onResetView}
-    >
-      <RotateCcw aria-hidden className="size-3" />
-      {EQUIPMENT_PICKER_RESET_VIEW_LABEL}
-    </Button>
+    />
   )
 }
 
@@ -188,77 +165,50 @@ function EquipmentPickerFilterToolbarControls({
   const showCategoryFilter = kinds.length > 1
 
   return (
-    <div className={equipmentPickerFiltersRowClasses}>
-      <div className={equipmentPickerFiltersMainClasses}>
+    <div className={catalogPickerFiltersRowClasses}>
+      <div className={catalogPickerFiltersMainClasses}>
         {showCategoryFilter ? (
-          <div
-            className={equipmentPickerCategoryFilterClasses}
-            role="group"
-            aria-label="Filter by category"
+          <CatalogPickerFilterGroup
+            label={EQUIPMENT_PICKER_CATEGORY_LABEL}
+            ariaLabel="Filter by category"
+            value={selectedKind}
+            onValueChange={(value) => onSelectedKindChange(value as EquipmentPickerKindFilter)}
+            triggerAriaLabel="Equipment category"
           >
-            <Text as="span" className={equipmentPickerCategoryLabelClasses}>
-              {EQUIPMENT_PICKER_CATEGORY_LABEL}
-            </Text>
-            <Select value={selectedKind} onValueChange={onSelectedKindChange}>
-              <SelectTrigger size="sm" aria-label="Equipment category">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value={EQUIPMENT_PICKER_KIND_ALL}>All</SelectItem>
-                {kinds.map((kind) => (
-                  <SelectItem key={kind} value={kind}>
-                    {getEquipmentKindLabel(kind)}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+            <CatalogPickerFilterSelectItem value={EQUIPMENT_PICKER_KIND_ALL}>
+              All
+            </CatalogPickerFilterSelectItem>
+            {kinds.map((kind) => (
+              <CatalogPickerFilterSelectItem key={kind} value={kind}>
+                {getEquipmentKindLabel(kind)}
+              </CatalogPickerFilterSelectItem>
+            ))}
+          </CatalogPickerFilterGroup>
         ) : null}
 
         {showAffordableFilter ? (
-          <div className={equipmentPickerAffordableFilterClasses}>
-            <Checkbox
-              id="equipment-picker-affordable-now"
-              checked={showAffordableOnly}
-              onCheckedChange={(checked) => onShowAffordableOnlyChange(checked === true)}
-            />
-            <Text
-              as="label"
-              htmlFor="equipment-picker-affordable-now"
-              className={equipmentPickerAffordableLabelClasses}
-            >
-              {EQUIPMENT_PICKER_AFFORDABLE_NOW_LABEL}
-            </Text>
-            {showAffordableOnly && affordableHiddenCount > 0 ? (
-              <Text as="span" className={equipmentPickerAffordableHiddenCountClasses}>
-                {affordableHiddenCount} hidden
-              </Text>
-            ) : null}
-          </div>
+          <CatalogPickerFilterCheckbox
+            id="equipment-picker-affordable-now"
+            label={EQUIPMENT_PICKER_AFFORDABLE_NOW_LABEL}
+            checked={showAffordableOnly}
+            onCheckedChange={onShowAffordableOnlyChange}
+            hiddenCount={showAffordableOnly ? affordableHiddenCount : undefined}
+          />
         ) : null}
       </div>
 
-      <div className={equipmentPickerSortActionsGroupClasses}>
-        <div className={equipmentPickerSortFilterClasses} role="group" aria-label="Sort equipment">
-          <Text as="span" className={equipmentPickerSortLabelClasses}>
-            {EQUIPMENT_PICKER_SORT_LABEL}
-          </Text>
-          <Select
-            value={sortMode}
-            onValueChange={(value) => onSortModeChange(value as EquipmentPickerSortMode)}
-          >
-            <SelectTrigger size="sm" aria-label="Equipment sort order">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {EQUIPMENT_PICKER_SORT_MODES.map((mode) => (
-                <SelectItem key={mode} value={mode}>
-                  {EQUIPMENT_PICKER_SORT_LABELS[mode]}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+      <div className={catalogPickerSortActionsGroupClasses}>
+        <CatalogPickerSortGroup
+          value={sortMode}
+          label={EQUIPMENT_PICKER_SORT_LABEL}
+          ariaLabel="Sort equipment"
+          triggerAriaLabel="Equipment sort order"
+          options={EQUIPMENT_PICKER_SORT_MODES.map((mode) => ({
+            value: mode,
+            label: EQUIPMENT_PICKER_SORT_LABELS[mode],
+          }))}
+          onValueChange={(value) => onSortModeChange(value as EquipmentPickerSortMode)}
+        />
       </div>
     </div>
   )
@@ -423,15 +373,10 @@ export function EquipmentPickerDrawer({
       onOpenChange={onOpenChange}
       title="Add equipment"
       description="Search the catalog and add items to your loadout."
-      headlineClassName={equipmentPickerHeadlineClasses}
+      {...catalogPickerShellProps()}
       items={filteredItems}
       getItemKey={(item) => item.equipment.id}
       getItemToolbarLabel={(item) => item.equipment.name}
-      rowTone="catalog"
-      toolbarCompact
-      sheetContentClassName={equipmentPickerSheetContentClasses}
-      rowBodyClassName={equipmentPickerRowBodyClasses}
-      rowShellClassName={equipmentPickerRowShellClasses}
       getSearchText={(item) => item.searchText}
       getItemTab={getEquipmentPickerItemTab}
       defaultTabId={defaultTab}

@@ -64,7 +64,7 @@ type CatalogPickerSheetBaseProps<TItem> = {
   rowShellClassName?: string
 }
 
-/** Legacy row API — right-side chevron expander; used until spell/proficiency pickers migrate. */
+/** @deprecated Legacy row API — right-side chevron expander. Spell and proficiency pickers migrated; reserved for backward compatibility until removal. */
 export type CatalogPickerSheetLegacyRowProps<TItem> = {
   renderItem: (item: TItem) => ReactNode
   renderItemDetails?: (item: TItem) => ReactNode

@@ -1,116 +1,91 @@
 'use client'
 
-import {
-  Badge,
-  Button,
-  CatalogPickerSheet,
-  Heading,
-  PreviewCard,
-  RichTextContent,
-  Text,
-  cn,
-} from '@rpg/ui'
-import { formatSpellPickerComponents } from '@rpg/contracts'
+import * as React from 'react'
 
+import { getSpellSchoolLabel } from '@rpg/contracts'
+
+import { CatalogPickerSheet, Text, type CatalogPickerSheetToolbarContext } from '@rpg/ui'
+
+import { hasCatalogPickerResetViewCriteria } from '../picker/catalog-picker-filter-state.lib'
+import {
+  CatalogPickerFilterGroup,
+  CatalogPickerFilterSelectItem,
+} from '../picker/catalog-picker-filter-group.client'
+import {
+  catalogPickerFiltersMainClasses,
+  catalogPickerFiltersRowClasses,
+  catalogPickerSortActionsGroupClasses,
+} from '../picker/catalog-picker-filter-toolbar.variants'
+import { CatalogPickerItemHeader } from '../picker/catalog-picker-item-header.client'
+import { CatalogPickerItemMarkers } from '../picker/catalog-picker-item-markers.client'
+import { CatalogPickerSelectionActions } from '../picker/catalog-picker-selection-actions.client'
+import { catalogPickerShellProps } from '../picker/catalog-picker-shell.lib'
+import { catalogPickerEmptyStateClasses } from '../picker/catalog-picker-shell.variants'
+import { CatalogPickerSortGroup } from '../picker/catalog-picker-sort-group.client'
+import { CatalogPickerToolbarResetButton } from '../picker/catalog-picker-toolbar-reset-button.client'
 import {
   collectSpellPickerMarkers,
+  countSpellPickerStructuredFilters,
+  filterAndSortSpellPickerItems,
+  filterSpellPickerItems,
   formatSpellPickerDrawerDescription,
   formatSpellPickerDrawerTitle,
+  formatSpellPickerLevelFilterLabel,
   getSpellPickerDisabledNote,
   isSpellPickerRowDimmed,
   resolveSpellPickerEmptyStateKind,
   resolveSpellPickerEmptyStateMessage,
-  splitSpellDescriptionHtml,
+  resolveSpellPickerLevelFilterOptions,
+  resolveSpellPickerSchoolFilterOptions,
+  SPELL_PICKER_VIEW_DEFAULTS,
 } from './spell-picker-drawer.lib'
+import { SpellPickerItemDetails } from './spell-picker-item-details.client'
 import {
+  SPELL_PICKER_LEVEL_ALL,
+  SPELL_PICKER_LEVEL_LABEL,
   SPELL_PICKER_NO_OPTIONS_MESSAGE,
   SPELL_PICKER_NO_RESULTS_MESSAGE,
+  SPELL_PICKER_RESET_VIEW_LABEL,
+  SPELL_PICKER_SCHOOL_ALL,
+  SPELL_PICKER_SCHOOL_LABEL,
+  SPELL_PICKER_SORT_LABELS,
+  SPELL_PICKER_SORT_MODES,
   type SpellPickerDrawerProps,
-  type SpellPickerItem,
+  type SpellPickerLevelFilter,
+  type SpellPickerSchoolFilter,
+  type SpellPickerSortMode,
 } from './spell-picker-drawer.types'
-import {
-  spellPickerDetailsClasses,
-  spellPickerDisabledRowClasses,
-  spellPickerEmptyStateClasses,
-  spellPickerMarkerRowClasses,
-} from './spell-picker-drawer.variants'
 
 export type { SpellPickerDrawerProps } from './spell-picker-drawer.types'
 
-function SpellPickerMarkers({ item }: { item: SpellPickerItem }) {
-  const markers = collectSpellPickerMarkers(item.spell)
-  if (markers.length === 0) return null
-
-  return (
-    <div className={spellPickerMarkerRowClasses}>
-      {markers.map((marker) => (
-        <Badge key={marker} appearance="outline" tone="neutral" size="sm">
-          {marker}
-        </Badge>
-      ))}
-    </div>
-  )
-}
-
-function SpellPickerRow({
-  item,
-  onAdd,
-  onRemove,
+function SpellPickerToolbarReset({
+  selectedLevel,
+  selectedSchool,
+  sortMode,
+  toolbarContext,
+  onResetView,
 }: {
-  item: SpellPickerItem
-  onAdd: () => void
-  onRemove: () => void
+  selectedLevel: SpellPickerLevelFilter
+  selectedSchool: SpellPickerSchoolFilter
+  sortMode: SpellPickerSortMode
+  toolbarContext: CatalogPickerSheetToolbarContext
+  onResetView: () => void
 }) {
-  const dimmed = isSpellPickerRowDimmed(item)
-  const disabledNote = getSpellPickerDisabledNote(item)
-  const selected = item.state.isAlreadySelected
+  const structuredFilterCount = countSpellPickerStructuredFilters({
+    selectedLevel,
+    selectedSchool,
+  })
+  const showResetView = hasCatalogPickerResetViewCriteria({
+    structuredFilterCount,
+    searchQuery: toolbarContext.searchQuery,
+    sortMode,
+    defaultSortMode: SPELL_PICKER_VIEW_DEFAULTS.sortMode,
+  })
+
+  if (!showResetView) return null
 
   return (
-    <div className={cn(dimmed ? spellPickerDisabledRowClasses : undefined)}>
-      <PreviewCard
-        title={item.spell.name}
-        description={item.summaryLine}
-        tone={selected ? 'selected' : 'transparent'}
-        density="compact"
-        footerSlot={
-          <>
-            <SpellPickerMarkers item={item} />
-            {disabledNote ? <Text variant="muted">{disabledNote}</Text> : null}
-          </>
-        }
-        endSlot={
-          selected ? (
-            <Button type="button" size="sm" variant="outline" onClick={onRemove}>
-              Remove
-            </Button>
-          ) : (
-            <Button type="button" size="sm" disabled={!item.state.canSelect} onClick={onAdd}>
-              Add
-            </Button>
-          )
-        }
-      />
-    </div>
-  )
-}
-
-function SpellPickerDetails({ item }: { item: SpellPickerItem }) {
-  const { mainHtml, higherLevelHtml } = splitSpellDescriptionHtml(item.spell.description ?? '')
-  const components = formatSpellPickerComponents(item.spell.components)
-
-  return (
-    <div className={spellPickerDetailsClasses}>
-      {mainHtml ? <RichTextContent html={mainHtml} size="sm" tone="muted" /> : null}
-      {higherLevelHtml ? (
-        <>
-          <Heading as="h4" variant="section">
-            At higher levels
-          </Heading>
-          <RichTextContent html={higherLevelHtml} size="sm" tone="muted" />
-        </>
-      ) : null}
-      {components ? <Text variant="muted">Components: {components}</Text> : null}
-    </div>
+    <CatalogPickerToolbarResetButton label={SPELL_PICKER_RESET_VIEW_LABEL} onClick={onResetView} />
   )
 }
 
@@ -121,11 +96,60 @@ export function SpellPickerDrawer({
   choiceSet,
   selectedIds,
   items,
+  displayVocabulary,
   onSelectSpell,
   onRemoveSpell,
 }: SpellPickerDrawerProps) {
+  const levelOptions = React.useMemo(() => resolveSpellPickerLevelFilterOptions(items), [items])
+  const schoolOptions = React.useMemo(() => resolveSpellPickerSchoolFilterOptions(items), [items])
+  const [selectedLevel, setSelectedLevel] = React.useState<SpellPickerLevelFilter>(
+    SPELL_PICKER_VIEW_DEFAULTS.selectedLevel,
+  )
+  const [selectedSchool, setSelectedSchool] = React.useState<SpellPickerSchoolFilter>(
+    SPELL_PICKER_VIEW_DEFAULTS.selectedSchool,
+  )
+  const [sortMode, setSortMode] = React.useState<SpellPickerSortMode>(
+    SPELL_PICKER_VIEW_DEFAULTS.sortMode,
+  )
+
+  React.useEffect(() => {
+    setSelectedLevel((current) => {
+      if (current === SPELL_PICKER_LEVEL_ALL) return current
+      return levelOptions.includes(current) ? current : SPELL_PICKER_LEVEL_ALL
+    })
+  }, [levelOptions])
+
+  React.useEffect(() => {
+    setSelectedSchool((current) => {
+      if (current === SPELL_PICKER_SCHOOL_ALL) return current
+      return schoolOptions.includes(current) ? current : SPELL_PICKER_SCHOOL_ALL
+    })
+  }, [schoolOptions])
+
+  const structuredFilterCount = countSpellPickerStructuredFilters({
+    selectedLevel,
+    selectedSchool,
+  })
+
+  const filteredItems = React.useMemo(
+    () => filterSpellPickerItems(items, { selectedLevel, selectedSchool }),
+    [items, selectedLevel, selectedSchool],
+  )
+
+  const transformVisibleItems = React.useCallback(
+    (visibleItems: readonly (typeof items)[number][], context: { searchQuery: string }) =>
+      filterAndSortSpellPickerItems(visibleItems, {
+        searchQuery: context.searchQuery,
+        sortMode,
+      }),
+    [sortMode],
+  )
+
   const emptyStateKind = resolveSpellPickerEmptyStateKind(items.length, choiceSet, selectedIds)
   const emptyStateMessage = resolveSpellPickerEmptyStateMessage(emptyStateKind)
+
+  const showLevelFilter = levelOptions.length > 1
+  const showSchoolFilter = schoolOptions.length > 1
 
   return (
     <CatalogPickerSheet
@@ -133,27 +157,131 @@ export function SpellPickerDrawer({
       onOpenChange={onOpenChange}
       title={formatSpellPickerDrawerTitle(choiceSet)}
       description={formatSpellPickerDrawerDescription(choiceSet, selectedIds)}
-      items={items}
+      {...catalogPickerShellProps()}
+      items={filteredItems}
       getItemKey={(item) => item.spell.id}
+      getItemToolbarLabel={(item) => item.spell.name}
       getSearchText={(item) => item.searchText}
       searchPlaceholder="Search spells"
       noResultsMessage={SPELL_PICKER_NO_RESULTS_MESSAGE}
       noItemsMessage={SPELL_PICKER_NO_OPTIONS_MESSAGE}
+      hasStructuredFilters={structuredFilterCount > 0}
+      transformVisibleItems={transformVisibleItems}
       emptyState={
         emptyStateMessage ? (
-          <div className={spellPickerEmptyStateClasses} role="status">
+          <div className={catalogPickerEmptyStateClasses} role="status">
             {emptyStateMessage}
           </div>
         ) : undefined
       }
-      renderItem={(item) => (
-        <SpellPickerRow
-          item={item}
-          onAdd={() => onSelectSpell(item.spell.id)}
-          onRemove={() => onRemoveSpell(item.spell.id)}
-        />
+      tabToolbarActions={(toolbarContext) => {
+        const handleResetView = () => {
+          setSelectedLevel(SPELL_PICKER_VIEW_DEFAULTS.selectedLevel)
+          setSelectedSchool(SPELL_PICKER_VIEW_DEFAULTS.selectedSchool)
+          setSortMode(SPELL_PICKER_VIEW_DEFAULTS.sortMode)
+          toolbarContext.clearSearchQuery()
+        }
+
+        return (
+          <SpellPickerToolbarReset
+            selectedLevel={selectedLevel}
+            selectedSchool={selectedSchool}
+            sortMode={sortMode}
+            toolbarContext={toolbarContext}
+            onResetView={handleResetView}
+          />
+        )
+      }}
+      toolbarControls={() => (
+        <div className={catalogPickerFiltersRowClasses}>
+          <div className={catalogPickerFiltersMainClasses}>
+            {showLevelFilter ? (
+              <CatalogPickerFilterGroup
+                label={SPELL_PICKER_LEVEL_LABEL}
+                ariaLabel="Filter by level"
+                value={String(selectedLevel)}
+                onValueChange={(value) =>
+                  setSelectedLevel(
+                    value === SPELL_PICKER_LEVEL_ALL ? SPELL_PICKER_LEVEL_ALL : Number(value),
+                  )
+                }
+                triggerAriaLabel="Spell level"
+              >
+                <CatalogPickerFilterSelectItem value={SPELL_PICKER_LEVEL_ALL}>
+                  All
+                </CatalogPickerFilterSelectItem>
+                {levelOptions.map((level) => (
+                  <CatalogPickerFilterSelectItem key={level} value={String(level)}>
+                    {formatSpellPickerLevelFilterLabel(level)}
+                  </CatalogPickerFilterSelectItem>
+                ))}
+              </CatalogPickerFilterGroup>
+            ) : null}
+
+            {showSchoolFilter ? (
+              <CatalogPickerFilterGroup
+                label={SPELL_PICKER_SCHOOL_LABEL}
+                ariaLabel="Filter by school"
+                value={selectedSchool}
+                onValueChange={(value) => setSelectedSchool(value as SpellPickerSchoolFilter)}
+                triggerAriaLabel="Spell school"
+              >
+                <CatalogPickerFilterSelectItem value={SPELL_PICKER_SCHOOL_ALL}>
+                  All
+                </CatalogPickerFilterSelectItem>
+                {schoolOptions.map((school) => (
+                  <CatalogPickerFilterSelectItem key={school} value={school}>
+                    {displayVocabulary?.resolveSpellSchoolLabel?.(school) ??
+                      getSpellSchoolLabel(school)}
+                  </CatalogPickerFilterSelectItem>
+                ))}
+              </CatalogPickerFilterGroup>
+            ) : null}
+          </div>
+
+          <div className={catalogPickerSortActionsGroupClasses}>
+            <CatalogPickerSortGroup
+              value={sortMode}
+              options={SPELL_PICKER_SORT_MODES.map((mode) => ({
+                value: mode,
+                label: SPELL_PICKER_SORT_LABELS[mode],
+              }))}
+              onValueChange={setSortMode}
+              triggerAriaLabel="Spell sort order"
+              ariaLabel="Sort spells"
+            />
+          </div>
+        </div>
       )}
-      renderItemDetails={(item) => <SpellPickerDetails item={item} />}
+      renderItemHeader={(item) => {
+        const disabledNote = getSpellPickerDisabledNote(item)
+        const markers = collectSpellPickerMarkers(item.spell)
+
+        return (
+          <CatalogPickerItemHeader
+            name={item.spell.name}
+            metadataLine={item.summaryLine}
+            disabled={isSpellPickerRowDimmed(item)}
+            footer={
+              <>
+                <CatalogPickerItemMarkers markers={markers} />
+                {disabledNote ? <Text variant="muted">{disabledNote}</Text> : null}
+              </>
+            }
+            actions={
+              <CatalogPickerSelectionActions
+                selected={item.state.isAlreadySelected}
+                canSelect={item.state.canSelect}
+                onAdd={() => onSelectSpell(item.spell.id)}
+                onRemove={() => onRemoveSpell(item.spell.id)}
+              />
+            }
+          />
+        )
+      }}
+      renderItemDetails={(item) => (
+        <SpellPickerItemDetails item={item} displayVocabulary={displayVocabulary} />
+      )}
     />
   )
 }

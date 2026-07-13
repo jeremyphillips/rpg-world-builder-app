@@ -1,11 +1,32 @@
 import type { ChoiceSet, ProficiencyPickerItem } from '@rpg/contracts'
 
+import { normalizeSearchQuery, scoreItem } from '@rpg/ui'
+
 import { formatChoiceSetDrawerTriggerLabel } from '../../lib/selection-counter.lib'
 import {
   PROFICIENCY_PICKER_NO_OPTIONS_MESSAGE,
   PROFICIENCY_PICKER_SELECTION_FULL_MESSAGE,
+  PROFICIENCY_PICKER_SORT_BEST_MATCH,
+  PROFICIENCY_PICKER_SORT_NAME_ASC,
+  PROFICIENCY_PICKER_SORT_NAME_DESC,
   type ProficiencyPickerDrawerProps,
+  type ProficiencyPickerSortMode,
+  type ProficiencyPickerViewDefaults,
 } from './proficiency-picker-drawer.types'
+
+export const PROFICIENCY_PICKER_VIEW_DEFAULTS = {
+  sortMode: PROFICIENCY_PICKER_SORT_BEST_MATCH,
+} as const satisfies ProficiencyPickerViewDefaults
+
+const proficiencyNameCollator = new Intl.Collator(undefined, {
+  sensitivity: 'base',
+  numeric: true,
+})
+
+type ProficiencyPickerScoredItem = {
+  item: ProficiencyPickerItem
+  searchScore: number
+}
 
 export function formatProficiencyPickerDrawerTitle(
   choiceSet: ChoiceSet,
@@ -84,4 +105,54 @@ export function isProficiencySelectionFull(
   choiceSet: ChoiceSet,
 ): boolean {
   return selectedIds.length >= choiceSet.max
+}
+
+function scoreProficiencyPickerItem(item: ProficiencyPickerItem, searchQuery: string): number {
+  return scoreItem({ fields: [{ text: item.label, weight: 1, role: 'label' }] }, searchQuery)
+}
+
+function compareProficiencyPickerScoredItems(
+  left: ProficiencyPickerScoredItem,
+  right: ProficiencyPickerScoredItem,
+  options: { searchQuery: string; sortMode: ProficiencyPickerSortMode },
+): number {
+  const hasQuery = normalizeSearchQuery(options.searchQuery).length > 0
+
+  const compareAfterPrimary = (primaryCmp: number): number => {
+    if (primaryCmp !== 0) return primaryCmp
+    if (hasQuery) return right.searchScore - left.searchScore
+    return proficiencyNameCollator.compare(left.item.label, right.item.label)
+  }
+
+  switch (options.sortMode) {
+    case PROFICIENCY_PICKER_SORT_BEST_MATCH:
+      if (hasQuery) {
+        const scoreDiff = right.searchScore - left.searchScore
+        if (scoreDiff !== 0) return scoreDiff
+      }
+      return proficiencyNameCollator.compare(left.item.label, right.item.label)
+    case PROFICIENCY_PICKER_SORT_NAME_ASC:
+      return compareAfterPrimary(proficiencyNameCollator.compare(left.item.label, right.item.label))
+    case PROFICIENCY_PICKER_SORT_NAME_DESC:
+      return compareAfterPrimary(proficiencyNameCollator.compare(right.item.label, left.item.label))
+  }
+}
+
+export function filterAndSortProficiencyPickerItems(
+  items: readonly ProficiencyPickerItem[],
+  options: {
+    searchQuery: string
+    sortMode: ProficiencyPickerSortMode
+  },
+): ProficiencyPickerItem[] {
+  const normalizedQuery = normalizeSearchQuery(options.searchQuery)
+  const scored = items.map((item) => ({
+    item,
+    searchScore: scoreProficiencyPickerItem(item, options.searchQuery),
+  }))
+  const filtered = normalizedQuery ? scored.filter((row) => row.searchScore > 0) : scored
+
+  return [...filtered]
+    .sort((left, right) => compareProficiencyPickerScoredItems(left, right, options))
+    .map((row) => row.item)
 }

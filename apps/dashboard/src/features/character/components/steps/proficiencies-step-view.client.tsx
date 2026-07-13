@@ -23,6 +23,7 @@ export function ProficienciesStepView({
     readiness,
     activeChoiceSet,
     pickerItems,
+    catalogIndex,
     draft,
     openChoiceSet,
     closeChoiceSet,
@@ -69,6 +70,7 @@ export function ProficienciesStepView({
           choiceSet={activeChoiceSet}
           selectedIds={draft.choiceSelections[activeChoiceSet.id] ?? []}
           items={pickerItems}
+          catalogIndex={catalogIndex}
           onSelectOption={(optionId) => addChoiceSelection(activeChoiceSet.id, optionId)}
           onRemoveOption={(optionId) => removeChoiceSelection(activeChoiceSet.id, optionId)}
         />

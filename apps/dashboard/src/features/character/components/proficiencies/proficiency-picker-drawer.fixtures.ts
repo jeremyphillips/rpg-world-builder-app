@@ -25,6 +25,8 @@ export const proficiencyPickerAcrobaticsOptionId = proficienciesStepAcrobaticsSk
 export const proficiencyPickerPerceptionOptionId = proficienciesStepPerceptionSkill.id
 
 const catalogIndex = indexCharacterBuildCatalog(rogueFixture.context.catalog)
+export { catalogIndex as proficiencyPickerCatalogIndexFixture }
+
 const proficiencies = assembleCharacterProficiencies(
   rogueFixture.draft,
   catalogIndex,
@@ -78,6 +80,7 @@ export const proficiencyPickerLanguageChoiceSetFixture =
   )! satisfies ChoiceSet
 
 const originCatalogIndex = indexCharacterBuildCatalog(originLanguagesFixture.context.catalog)
+export { originCatalogIndex as proficiencyPickerLanguageCatalogIndexFixture }
 const originProficiencies = assembleCharacterProficiencies(
   originLanguagesFixture.draft,
   originCatalogIndex,

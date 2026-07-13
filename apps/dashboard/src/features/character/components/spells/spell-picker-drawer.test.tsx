@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react'
+import { cleanup, render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { expectNoAxeViolations } from '@rpg/ui/test-utils'
 import { describe, expect, it, vi } from 'vitest'
@@ -18,7 +18,7 @@ import {
 } from './spell-picker-drawer.types'
 
 describe('SpellPickerDrawer', () => {
-  it('renders search without tabs and ranks rows via searchText', async () => {
+  it('renders search without tabs, sort toolbar, and ranks rows via searchText', async () => {
     const user = userEvent.setup()
 
     render(
@@ -34,6 +34,7 @@ describe('SpellPickerDrawer', () => {
     )
 
     expect(screen.queryByRole('tab')).not.toBeInTheDocument()
+    expect(screen.getByRole('group', { name: 'Sort spells' })).toBeInTheDocument()
     expect(screen.getByText('Mage Hand')).toBeInTheDocument()
     expect(screen.getByText('Detect Magic')).toBeInTheDocument()
 
@@ -78,8 +79,13 @@ describe('SpellPickerDrawer', () => {
       />,
     )
 
-    await user.click(screen.getAllByRole('button', { name: 'Add' })[0]!)
+    const mageHandRow = screen
+      .getByText('Mage Hand')
+      .closest('[data-picker-item-key]') as HTMLElement
+    await user.click(within(mageHandRow).getByRole('button', { name: 'Add' }))
     expect(onSelectSpell).toHaveBeenCalledWith(spellPickerMageHandFixture.id)
+
+    cleanup()
 
     render(
       <SpellPickerDrawer
@@ -93,7 +99,8 @@ describe('SpellPickerDrawer', () => {
       />,
     )
 
-    await user.click(screen.getAllByRole('button', { name: 'Remove' })[0]!)
+    const removeRow = screen.getByText('Mage Hand').closest('[data-picker-item-key]') as HTMLElement
+    await user.click(within(removeRow).getByRole('button', { name: 'Remove' }))
     expect(onRemoveSpell).toHaveBeenCalledWith(spellPickerMageHandFixture.id)
   })
 
@@ -144,7 +151,7 @@ describe('SpellPickerDrawer', () => {
     expect(screen.getByText(SPELL_PICKER_NO_RESULTS_MESSAGE)).toBeInTheDocument()
   })
 
-  it('expands independently scrollable spell details with higher-level text and components', async () => {
+  it('expands spell details from the display view model', async () => {
     const user = userEvent.setup()
 
     render(
@@ -159,11 +166,11 @@ describe('SpellPickerDrawer', () => {
       />,
     )
 
-    await user.click(screen.getByRole('button', { name: 'Show details' }))
+    await user.click(screen.getByRole('button', { name: 'Expand Cure Wounds' }))
 
-    expect(screen.getByText('At higher levels')).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'At higher levels' })).toBeInTheDocument()
     expect(screen.getByText(/Using a Higher-Level Spell Slot/i)).toBeInTheDocument()
-    expect(screen.getByText(/Components: V, S/i)).toBeInTheDocument()
+    expect(screen.getByText(/^Components$/)).toBeInTheDocument()
     expect(screen.getByText(/2d8 \+ modifier Hit Points/i)).toBeInTheDocument()
   })
 
