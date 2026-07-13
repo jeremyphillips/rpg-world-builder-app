@@ -63,26 +63,6 @@ export function buildEquipmentPickerRowViewModel(
   }
 }
 
-/** @deprecated Use {@link buildEquipmentPickerRowViewModel}. */
-export function buildEquipmentPickerHeaderViewModel(equipment: Equipment): {
-  name: string
-  kindLabel: string
-  priceLabel: string
-} {
-  const viewModel = buildEquipmentPickerRowViewModel(equipment)
-  return {
-    name: viewModel.name,
-    kindLabel: viewModel.kindLabel,
-    priceLabel: viewModel.priceLabel,
-  }
-}
-
-/** @deprecated Use {@link EquipmentPickerRowViewModel}. */
-export type EquipmentCardViewModel = Pick<
-  EquipmentPickerRowViewModel,
-  'name' | 'kindLabel' | 'priceLabel'
->
-
 export function buildEquipmentDetailViewModel(equipment: Equipment): EquipmentDetailViewModel {
   return {
     detailsSectionTitle: EQUIPMENT_DETAILS_SECTION_TITLES[equipment.kind],

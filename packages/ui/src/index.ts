@@ -361,7 +361,6 @@ export {
 } from './components/ui/collapsible-list-item'
 export {
   CatalogPickerSheet,
-  type CatalogPickerSheetFilterContext,
   type CatalogPickerSheetProps,
   type CatalogPickerSheetToolbarContext,
   type CatalogPickerTab,

@@ -168,7 +168,6 @@ describe('SpellPickerDrawer', () => {
 
     await user.click(screen.getByRole('button', { name: 'Expand Cure Wounds' }))
 
-    expect(screen.getByRole('heading', { name: 'At higher levels' })).toBeInTheDocument()
     expect(screen.getByText(/Using a Higher-Level Spell Slot/i)).toBeInTheDocument()
     expect(screen.getByText(/^Components$/)).toBeInTheDocument()
     expect(screen.getByText(/2d8 \+ modifier Hit Points/i)).toBeInTheDocument()

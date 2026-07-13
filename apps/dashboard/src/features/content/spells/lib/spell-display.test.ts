@@ -14,7 +14,6 @@ import {
   buildSpellDetailViewModel,
   SPELL_SECTION_LABELS,
   SPELL_STAT_LABELS,
-  splitSpellDescriptionSections,
 } from './spell-display'
 import {
   formatCastingTime,
@@ -93,21 +92,6 @@ describe('formatSpellDuration', () => {
 describe('formatSpellComponents', () => {
   it('formats verbal and somatic components', () => {
     expect(formatSpellComponents(FIRE_BOLT.components)).toBe('V, S')
-  })
-})
-
-describe('splitSpellDescriptionSections', () => {
-  it('splits higher-level spell slot prose from the main description', () => {
-    const description =
-      '<p>A creature you touch regains a number of Hit Points equal to 2d8 plus your spellcasting ability modifier.</p>' +
-      '<p><strong>Using a Higher-Level Spell Slot.</strong> The healing increases by 2d8 for each spell slot level above 1.</p>'
-
-    expect(splitSpellDescriptionSections(description)).toEqual({
-      mainHtml:
-        '<p>A creature you touch regains a number of Hit Points equal to 2d8 plus your spellcasting ability modifier.</p>',
-      higherLevelHtml:
-        '<p><strong>Using a Higher-Level Spell Slot.</strong> The healing increases by 2d8 for each spell slot level above 1.</p>',
-    })
   })
 })
 
@@ -208,15 +192,14 @@ describe('buildSpellDetailViewModel', () => {
     ).toBeUndefined()
   })
 
-  it('builds cantrip scaling prose section', () => {
+  it('builds cantrip scaling prose section from dedicated fields', () => {
     const viewModel = buildSpellDetailViewModel(FIRE_BOLT, vocabulary)
 
     expect(viewModel.proseSections.cantripScaling).toBe(FIRE_BOLT.cantripScaling)
     expect(viewModel.proseSections.higherLevelSlotEffect).toBeUndefined()
-    expect(viewModel.descriptionHtml).not.toContain('Cantrip Upgrade')
   })
 
-  it('builds higher-level slot effect prose section', () => {
+  it('builds higher-level slot effect prose section from dedicated fields', () => {
     const spell = {
       ...DETECT_MAGIC,
       higherLevelSlotEffect: '<p>Targets one additional creature for each slot above 1.</p>',

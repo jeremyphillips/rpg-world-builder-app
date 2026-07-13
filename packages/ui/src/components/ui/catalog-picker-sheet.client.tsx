@@ -16,7 +16,6 @@ import {
 } from './catalog-picker-sheet.variants'
 
 export type {
-  CatalogPickerSheetFilterContext,
   CatalogPickerSheetProps,
   CatalogPickerSheetToolbarContext,
   CatalogPickerTab,
@@ -74,7 +73,6 @@ export function CatalogPickerSheet<TItem>({
   items,
   getItemKey,
   getSearchText,
-  renderItem,
   renderItemHeader,
   renderItemSummary,
   renderItemActions,
@@ -131,7 +129,6 @@ export function CatalogPickerSheet<TItem>({
   })
 
   const rowProps = {
-    renderItem,
     renderItemHeader,
     renderItemSummary,
     renderItemActions,

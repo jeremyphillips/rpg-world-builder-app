@@ -16,11 +16,7 @@ export type CatalogPickerSheetToolbarContext = {
   activeTabId: string
   resetActiveTab: () => void
 }
-
-/** @deprecated Use {@link CatalogPickerSheetToolbarContext}. */
-export type CatalogPickerSheetFilterContext = CatalogPickerSheetToolbarContext
-
-type CatalogPickerSheetBaseProps<TItem> = {
+export type CatalogPickerSheetProps<TItem> = {
   open: boolean
   onOpenChange: (open: boolean) => void
   title: string
@@ -30,6 +26,12 @@ type CatalogPickerSheetBaseProps<TItem> = {
   items: readonly TItem[]
   getItemKey: (item: TItem) => string
   getSearchText: (item: TItem) => string
+  renderItemHeader: (item: TItem) => ReactNode
+  renderItemSummary?: (item: TItem) => ReactNode
+  renderItemActions?: (item: TItem) => ReactNode
+  renderItemDetails?: (item: TItem) => ReactNode
+  /** Collapse button label suffix; defaults to `getItemKey`. */
+  getItemToolbarLabel?: (item: TItem) => string
   tabs?: readonly CatalogPickerTab[]
   defaultTabId?: string
   getItemTab?: (item: TItem) => string
@@ -62,34 +64,4 @@ type CatalogPickerSheetBaseProps<TItem> = {
   rowBodyClassName?: string
   /** Optional class merged onto each collapsible row shell (`role="group"`). */
   rowShellClassName?: string
-}
-
-/** @deprecated Legacy row API — right-side chevron expander. Spell and proficiency pickers migrated; reserved for backward compatibility until removal. */
-export type CatalogPickerSheetLegacyRowProps<TItem> = {
-  renderItem: (item: TItem) => ReactNode
-  renderItemDetails?: (item: TItem) => ReactNode
-  renderItemHeader?: never
-  renderItemSummary?: never
-  renderItemActions?: never
-  getItemToolbarLabel?: never
-}
-
-/** Preferred row API — `CollapsibleListItem` with leading caret and actions rail. */
-export type CatalogPickerSheetCollapsibleRowProps<TItem> = {
-  renderItemHeader: (item: TItem) => ReactNode
-  renderItemSummary?: (item: TItem) => ReactNode
-  renderItemActions?: (item: TItem) => ReactNode
-  renderItemDetails?: (item: TItem) => ReactNode
-  /** Collapse button label suffix; defaults to `getItemKey`. */
-  getItemToolbarLabel?: (item: TItem) => string
-  renderItem?: never
-}
-
-export type CatalogPickerSheetProps<TItem> = CatalogPickerSheetBaseProps<TItem> &
-  (CatalogPickerSheetLegacyRowProps<TItem> | CatalogPickerSheetCollapsibleRowProps<TItem>)
-
-export function usesCatalogPickerCollapsibleRows<TItem>(
-  props: Pick<CatalogPickerSheetProps<TItem>, 'renderItem' | 'renderItemHeader'>,
-): props is CatalogPickerSheetCollapsibleRowProps<TItem> {
-  return typeof props.renderItemHeader === 'function'
 }

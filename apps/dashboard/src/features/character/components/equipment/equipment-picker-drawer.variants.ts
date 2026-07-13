@@ -6,14 +6,3 @@ export const equipmentPickerBudgetLabelClasses = 'text-muted-foreground'
 export const equipmentPickerBudgetValueClasses = 'font-body-emphasis tabular-nums'
 
 export const EQUIPMENT_PICKER_HEADER_DIVIDER = '·'
-
-export const equipmentPickerHeaderTitleClasses =
-  'flex min-w-0 items-center gap-1.5 text-sm font-medium'
-
-export const equipmentPickerHeaderTextClasses = 'truncate'
-
-export const equipmentPickerHeaderDividerClasses = 'mx-1.5 text-muted-foreground'
-
-export const equipmentPickerHeaderKindClasses = 'text-xs font-normal text-muted-foreground'
-
-export const equipmentPickerDisabledRowClasses = 'opacity-60'

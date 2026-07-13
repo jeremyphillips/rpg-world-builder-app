@@ -19,10 +19,6 @@ import {
   spellRequiresConcentration,
 } from './format-spell-metadata'
 
-const CANTrip_UPGRADE_SPLIT = /<p><strong>Cantrip Upgrade\./i
-const HIGHER_LEVEL_DESCRIPTION_SPLIT =
-  /<p><strong>(?:Using a Higher-Level Spell Slot|At Higher Levels)\./i
-
 export const SPELL_STAT_LABELS = {
   level: 'Level',
   school: 'School',
@@ -43,8 +39,6 @@ export const SPELL_SECTION_LABELS = {
 } as const
 
 export const SPELL_DETAIL_SECTION_LABELS = {
-  cantripScaling: 'Cantrip upgrade',
-  higherLevelSlotEffect: 'At higher levels',
   tags: 'Tags',
   classes: 'Classes',
 } as const
@@ -80,58 +74,6 @@ export type SpellDetailViewModel = {
   tagsSection?: {
     title: string
     labels: string[]
-  }
-}
-
-export type SpellDescriptionSections = {
-  mainHtml: string
-  cantripScalingHtml?: string
-  higherLevelHtml?: string
-}
-
-/** Splits spell description HTML into main prose and optional scaling sections. */
-export function splitSpellDescriptionSections(description: string): SpellDescriptionSections {
-  const cantripMatch = description.match(CANTrip_UPGRADE_SPLIT)
-  const higherLevelMatch = description.match(HIGHER_LEVEL_DESCRIPTION_SPLIT)
-
-  const markers = [
-    cantripMatch?.index !== undefined
-      ? { type: 'cantrip' as const, index: cantripMatch.index }
-      : null,
-    higherLevelMatch?.index !== undefined
-      ? { type: 'higher' as const, index: higherLevelMatch.index }
-      : null,
-  ]
-    .filter((marker): marker is { type: 'cantrip' | 'higher'; index: number } => marker !== null)
-    .sort((left, right) => left.index - right.index)
-
-  if (markers.length === 0) {
-    return { mainHtml: description }
-  }
-
-  const first = markers[0]!
-  const mainHtml = description.slice(0, first.index).trim()
-  const tail = description.slice(first.index).trim()
-
-  if (first.type === 'cantrip') {
-    const higherInTail = tail.match(HIGHER_LEVEL_DESCRIPTION_SPLIT)
-    if (higherInTail?.index !== undefined) {
-      return {
-        mainHtml,
-        cantripScalingHtml: tail.slice(0, higherInTail.index).trim(),
-        higherLevelHtml: tail.slice(higherInTail.index).trim(),
-      }
-    }
-
-    return {
-      mainHtml,
-      cantripScalingHtml: tail,
-    }
-  }
-
-  return {
-    mainHtml,
-    higherLevelHtml: tail,
   }
 }
 
@@ -198,34 +140,11 @@ function resolveClassLabels(spell: Spell, vocabulary: SpellDisplayVocabulary): s
   )
 }
 
-function buildProseSections(
-  spell: Spell,
-  splitSections: SpellDescriptionSections,
-): SpellDetailProseSections {
+function buildProseSections(spell: Spell): SpellDetailProseSections {
   return {
-    cantripScaling: spell.cantripScaling?.trim() || splitSections.cantripScalingHtml,
-    higherLevelSlotEffect:
-      spell.higherLevelSlotEffect?.trim() || splitSections.higherLevelHtml,
+    cantripScaling: spell.cantripScaling?.trim() || undefined,
+    higherLevelSlotEffect: spell.higherLevelSlotEffect?.trim() || undefined,
   }
-}
-
-function buildDescriptionHtml(
-  spell: Spell,
-  splitSections: SpellDescriptionSections,
-): string | undefined {
-  const rawDescription = spell.description ?? ''
-  if (!rawDescription) return undefined
-
-  const hasDedicatedFields =
-    Boolean(spell.cantripScaling?.trim()) || Boolean(spell.higherLevelSlotEffect?.trim())
-  const hasEmbeddedSections =
-    Boolean(splitSections.cantripScalingHtml) || Boolean(splitSections.higherLevelHtml)
-
-  if (hasDedicatedFields || hasEmbeddedSections) {
-    return splitSections.mainHtml || undefined
-  }
-
-  return rawDescription
 }
 
 export function buildSpellDetailViewModel(
@@ -233,21 +152,16 @@ export function buildSpellDetailViewModel(
   vocabulary: SpellDisplayVocabulary = {},
 ): SpellDetailViewModel {
   const resolveSchoolLabel = vocabulary.resolveSpellSchoolLabel ?? getSpellSchoolLabel
-  const rawDescription = spell.description ?? ''
-  const splitSections = rawDescription
-    ? splitSpellDescriptionSections(rawDescription)
-    : { mainHtml: '' }
-
   const tagLabels = spell.tags ? collectTagLabels(spell.tags, vocabulary) : []
   const classLabels = resolveClassLabels(spell, vocabulary)
-  const proseSections = buildProseSections(spell, splitSections)
+  const proseSections = buildProseSections(spell)
 
   return {
     statRows: buildSpellStatRows(spell, {
       resolveSpellSchoolLabel: resolveSchoolLabel,
       resolveSpellSchoolDescription: vocabulary.resolveSpellSchoolDescription,
     }),
-    descriptionHtml: buildDescriptionHtml(spell, splitSections),
+    descriptionHtml: spell.description || undefined,
     proseSections,
     tagLabels,
     classLabels,
@@ -268,17 +182,5 @@ export function buildSpellDetailViewModel(
             labels: tagLabels,
           }
         : undefined,
-  }
-}
-
-/** @deprecated Use {@link splitSpellDescriptionSections} via spell-display. */
-export function splitSpellDescriptionHtml(description: string): {
-  mainHtml: string
-  higherLevelHtml: string | undefined
-} {
-  const sections = splitSpellDescriptionSections(description)
-  return {
-    mainHtml: sections.mainHtml,
-    higherLevelHtml: sections.higherLevelHtml,
   }
 }

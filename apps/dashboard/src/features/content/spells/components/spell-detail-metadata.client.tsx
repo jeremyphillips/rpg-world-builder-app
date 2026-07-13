@@ -46,28 +46,6 @@ export function SpellDetailMetadata({
         <RichTextContent html={viewModel.descriptionHtml} size="sm" tone="muted" />
       ) : null}
 
-      {viewModel.proseSections.cantripScaling ? (
-        <>
-          <Heading as="h4" variant="section">
-            {SPELL_DETAIL_SECTION_LABELS.cantripScaling}
-          </Heading>
-          <RichTextContent html={viewModel.proseSections.cantripScaling} size="sm" tone="muted" />
-        </>
-      ) : null}
-
-      {viewModel.proseSections.higherLevelSlotEffect ? (
-        <>
-          <Heading as="h4" variant="section">
-            {SPELL_DETAIL_SECTION_LABELS.higherLevelSlotEffect}
-          </Heading>
-          <RichTextContent
-            html={viewModel.proseSections.higherLevelSlotEffect}
-            size="sm"
-            tone="muted"
-          />
-        </>
-      ) : null}
-
       {viewModel.tagLabels.length > 0 ? (
         <section aria-labelledby={`${sectionId}-tags-heading`}>
           <Heading variant="label" as="h4" id={`${sectionId}-tags-heading`} className="mb-2">

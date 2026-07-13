@@ -1,13 +1,5 @@
 import { cn } from '@rpg/ui'
 
-export const EQUIPMENT_PICKER_ITEM_HEADER_NAME_CLASSES = 'text-base font-medium text-foreground'
-
-export const EQUIPMENT_PICKER_ITEM_HEADER_METADATA_CLASSES = 'text-sm text-muted-foreground'
-
-export const equipmentPickerItemHeaderRowClasses = 'flex min-w-0 w-full items-start gap-3 pb-3'
-
-export const EQUIPMENT_PICKER_ITEM_HEADER_INFO_CLASSES = 'flex min-w-0 flex-1 flex-col gap-0.5'
-
 export const EQUIPMENT_PICKER_ITEM_HEADER_FOOTER_META_CLASSES =
   'flex min-w-0 flex-wrap items-center gap-x-1.5 text-xs'
 
@@ -42,5 +34,3 @@ export const equipmentPickerCommerceAddAnotherButtonClasses = cn(
   'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background',
   'disabled:pointer-events-none disabled:opacity-50',
 )
-
-export const equipmentPickerItemHeaderDisabledClasses = 'opacity-60'
