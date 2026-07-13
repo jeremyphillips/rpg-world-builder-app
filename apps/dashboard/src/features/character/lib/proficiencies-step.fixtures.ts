@@ -59,6 +59,7 @@ export const proficienciesStepStealthSkill = {
   ...timestamps,
   name: 'Stealth',
   ability: 'dex',
+  examples: ['Escape notice by moving quietly and hiding behind things'],
 } as const satisfies SkillProficiency
 
 export const proficienciesStepAcrobaticsSkill = {
@@ -70,6 +71,7 @@ export const proficienciesStepAcrobaticsSkill = {
   ...timestamps,
   name: 'Acrobatics',
   ability: 'dex',
+  examples: ['Stay on your feet in a tricky situation', 'Perform an acrobatic stunt'],
 } as const satisfies SkillProficiency
 
 export const proficienciesStepPerceptionSkill = {
@@ -81,6 +83,7 @@ export const proficienciesStepPerceptionSkill = {
   ...timestamps,
   name: 'Perception',
   ability: 'wis',
+  examples: ["Using a combination of senses, notice something that's easy to miss"],
 } as const satisfies SkillProficiency
 
 export const proficienciesStepRogueClass = {

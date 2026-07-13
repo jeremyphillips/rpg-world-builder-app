@@ -25,11 +25,12 @@ describe('skillProficiencyFormDef round-trips', () => {
       expect(() => createSkillProficiencyInputSchema.parse(input)).not.toThrow()
     })
 
-    it(`${skill.slug}: name and ability preserved`, () => {
+    it(`${skill.slug}: name, ability, and examples preserved`, () => {
       const formValues = skillProficiencyFormDef.toFormValues(skill) as SkillProficiencyFormValues
       const input = skillProficiencyFormDef.toInput(formValues)
       expect(input.name).toBe(skill.name)
       expect(input.ability).toBe(skill.ability)
+      expect(input.examples).toEqual(skill.examples)
     })
   }
 })
@@ -39,6 +40,7 @@ describe('skillProficiencyFormDef create vs update modes', () => {
     const formValues: SkillProficiencyFormValues = {
       name: 'Custom Skill',
       ability: 'dex',
+      examples: [{ value: 'Perform a custom check' }],
     }
     const input = skillProficiencyFormDef.toInput(formValues)
     expect(input.slug).toBe(deriveContentKey('Custom Skill'))

@@ -43,6 +43,32 @@ function renderSkillDetail(skill: typeof ATHLETICS) {
   )
 }
 
+describe('SkillDetailContent summary and examples', () => {
+  beforeEach(() => {
+    useClasses.mockReset()
+    mockClassesQuery({ data: [] })
+  })
+
+  it('renders the summary lead sentence', () => {
+    renderSkillDetail(ATHLETICS)
+
+    expect(
+      screen.getByText(
+        'Athletics covers physical challenges involving strength, movement, and force.',
+      ),
+    ).toBeInTheDocument()
+  })
+
+  it('renders the examples section with list items', () => {
+    renderSkillDetail(ATHLETICS)
+
+    expect(screen.getByRole('heading', { name: 'Examples' })).toBeInTheDocument()
+    expect(screen.getByText('Jump farther than normal')).toBeInTheDocument()
+    expect(screen.getByText('Stay afloat in rough water')).toBeInTheDocument()
+    expect(screen.getByText('Break something')).toBeInTheDocument()
+  })
+})
+
 describe('SkillDetailContent class skill choices', () => {
   beforeEach(() => {
     useClasses.mockReset()

@@ -47,6 +47,7 @@ const athleticsSkill = {
   updatedAt: '2026-01-01T00:00:00.000Z',
   name: 'Athletics',
   ability: 'str',
+  examples: ['Jump farther than normal', 'Stay afloat in rough water', 'Break something'],
 } as const satisfies SkillProficiency
 
 const completeInput: CharacterDerivationInput = {

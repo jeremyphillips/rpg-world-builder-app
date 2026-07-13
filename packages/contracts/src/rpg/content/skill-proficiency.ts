@@ -44,6 +44,8 @@ export function getSkillSentenceForm(id: string, count = 1, label = getSkillName
 export const skillProficiencyBodySchema = contentBodyBaseSchema.extend({
   /** The ability score used when making this skill check (e.g. `str` for Athletics). */
   ability: abilitySchema,
+  /** Concrete use-case phrases shown as a bulleted list on detail surfaces. */
+  examples: z.array(z.string().min(1)).min(1),
 })
 
 export type SkillProficiencyBody = z.infer<typeof skillProficiencyBodySchema>
