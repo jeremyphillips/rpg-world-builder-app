@@ -38,6 +38,7 @@ describe('EquipmentPickerItemHeader', () => {
     )
 
     expect(screen.getByText('Dagger')).toBeInTheDocument()
+    expect(screen.getByText('Dagger')).toHaveClass('text-base')
     expect(screen.getByText('1d4 Piercing · Finesse · Light · Thrown')).toBeInTheDocument()
     expect(screen.getByText('Weapon')).toBeInTheDocument()
     expect(screen.getByText(EQUIPMENT_PICKER_ESSENTIAL_LABEL)).toBeInTheDocument()

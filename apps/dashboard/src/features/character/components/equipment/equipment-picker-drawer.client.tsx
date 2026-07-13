@@ -77,6 +77,7 @@ import {
   equipmentPickerFiltersMainClasses,
   equipmentPickerFiltersRowClasses,
   equipmentPickerRowBodyClasses,
+  equipmentPickerRowShellClasses,
   equipmentPickerSheetContentClasses,
   equipmentPickerSortActionsGroupClasses,
   equipmentPickerSortFilterClasses,
@@ -322,6 +323,9 @@ export function EquipmentPickerDrawer({
   const [selectedKind, setSelectedKind] = React.useState<EquipmentPickerKindFilter>(
     EQUIPMENT_PICKER_VIEW_DEFAULTS.selectedKind,
   )
+  const [showAffordableOnly, setShowAffordableOnly] = React.useState<boolean>(
+    EQUIPMENT_PICKER_VIEW_DEFAULTS.showAffordableOnly,
+  )
   const [sortMode, setSortMode] = React.useState<EquipmentPickerSortMode>(
     EQUIPMENT_PICKER_VIEW_DEFAULTS.sortMode,
   )
@@ -344,7 +348,7 @@ export function EquipmentPickerDrawer({
 
   const structuredFilterCount = countEquipmentPickerStructuredFilters({
     selectedKind,
-    showAffordableOnly: false,
+    showAffordableOnly,
   })
 
   const filteredItems = React.useMemo(
@@ -353,9 +357,15 @@ export function EquipmentPickerDrawer({
         filterOutUnaffordable,
         filterOutNonProficient,
         selectedKind,
-        showAffordableOnly: false,
+        showAffordableOnly,
       }),
-    [filterOutNonProficient, filterOutUnaffordable, supportedItems, selectedKind],
+    [
+      filterOutNonProficient,
+      filterOutUnaffordable,
+      showAffordableOnly,
+      supportedItems,
+      selectedKind,
+    ],
   )
 
   const transformVisibleItems = React.useCallback(
@@ -374,6 +384,7 @@ export function EquipmentPickerDrawer({
 
   const handleClearStructuredFilters = React.useCallback(() => {
     setSelectedKind(EQUIPMENT_PICKER_VIEW_DEFAULTS.selectedKind)
+    setShowAffordableOnly(EQUIPMENT_PICKER_VIEW_DEFAULTS.showAffordableOnly)
   }, [])
 
   const handleQuickAdd = React.useCallback(
@@ -414,10 +425,11 @@ export function EquipmentPickerDrawer({
       items={filteredItems}
       getItemKey={(item) => item.equipment.id}
       getItemToolbarLabel={(item) => item.equipment.name}
-      rowTone="subtle"
+      rowTone="catalog"
       toolbarCompact
       sheetContentClassName={equipmentPickerSheetContentClasses}
       rowBodyClassName={equipmentPickerRowBodyClasses}
+      rowShellClassName={equipmentPickerRowShellClasses}
       getSearchText={(item) => item.searchText}
       getItemTab={getEquipmentPickerItemTab}
       defaultTabId={defaultTab}
@@ -432,6 +444,7 @@ export function EquipmentPickerDrawer({
       tabToolbarActions={(toolbarContext) => {
         const handleResetView = () => {
           setSelectedKind(EQUIPMENT_PICKER_VIEW_DEFAULTS.selectedKind)
+          setShowAffordableOnly(EQUIPMENT_PICKER_VIEW_DEFAULTS.showAffordableOnly)
           setSortMode(EQUIPMENT_PICKER_VIEW_DEFAULTS.sortMode)
           toolbarContext.clearSearchQuery()
           toolbarContext.resetActiveTab()
@@ -442,7 +455,7 @@ export function EquipmentPickerDrawer({
             toolbarResetMode={toolbarResetMode}
             defaultTabId={defaultTab}
             selectedKind={selectedKind}
-            showAffordableOnly={false}
+            showAffordableOnly={showAffordableOnly}
             sortMode={sortMode}
             toolbarContext={toolbarContext}
             onClearStructuredFilters={handleClearStructuredFilters}
@@ -455,16 +468,16 @@ export function EquipmentPickerDrawer({
           kinds={kindOptions}
           selectedKind={selectedKind}
           onSelectedKindChange={handleSelectedKindChange}
-          showAffordableOnly={false}
-          onShowAffordableOnlyChange={() => undefined}
-          showAffordableFilter={false}
+          showAffordableOnly={showAffordableOnly}
+          onShowAffordableOnlyChange={setShowAffordableOnly}
+          showAffordableFilter={Boolean(budget)}
           affordableHiddenCount={countEquipmentPickerAffordableHiddenImpact(supportedItems, {
             activeTabId: toolbarContext.activeTabId,
             searchQuery: toolbarContext.searchQuery,
             filterOutUnaffordable,
             filterOutNonProficient,
             selectedKind,
-            showAffordableOnly: false,
+            showAffordableOnly,
           })}
           sortMode={sortMode}
           onSortModeChange={setSortMode}

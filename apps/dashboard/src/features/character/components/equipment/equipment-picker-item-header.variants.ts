@@ -1,10 +1,10 @@
 import { cn } from '@rpg/ui'
 
-export const EQUIPMENT_PICKER_ITEM_HEADER_NAME_CLASSES = 'text-sm font-medium text-foreground'
+export const EQUIPMENT_PICKER_ITEM_HEADER_NAME_CLASSES = 'text-base font-medium text-foreground'
 
-export const EQUIPMENT_PICKER_ITEM_HEADER_METADATA_CLASSES = 'text-xs text-muted-foreground'
+export const EQUIPMENT_PICKER_ITEM_HEADER_METADATA_CLASSES = 'text-sm text-muted-foreground'
 
-export const equipmentPickerItemHeaderRowClasses = 'flex min-w-0 w-full items-start gap-3'
+export const equipmentPickerItemHeaderRowClasses = 'flex min-w-0 w-full items-start gap-3 pb-3'
 
 export const EQUIPMENT_PICKER_ITEM_HEADER_INFO_CLASSES = 'flex min-w-0 flex-1 flex-col gap-0.5'
 

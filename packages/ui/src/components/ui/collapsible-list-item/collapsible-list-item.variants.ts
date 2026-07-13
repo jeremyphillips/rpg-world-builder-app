@@ -52,6 +52,8 @@ export const collapsibleListItemShellVariants = cva(cn('relative rounded-md bord
       subtle: fieldSurfaceToneVariants({ tone: 'subtle' }),
       warning: fieldSurfaceToneVariants({ tone: 'warning' }),
       error: fieldSurfaceToneVariants({ tone: 'error' }),
+      /** Catalog picker row header — muted wash tuned for collapsible item shells. */
+      catalog: 'border-border bg-catalog-picker-row-surface',
     },
   },
   defaultVariants: {

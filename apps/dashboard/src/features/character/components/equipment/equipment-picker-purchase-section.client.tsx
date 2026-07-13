@@ -7,6 +7,10 @@ import {
   type EquipmentPickerPurchaseViewModel,
 } from './equipment-picker-purchase.lib'
 import { EquipmentPickerPurchaseDetailsRows } from './equipment-picker-purchase-rows.client'
+import {
+  equipmentPickerPurchaseInsetPanelClasses,
+  equipmentPickerPurchaseInsetPanelContentClasses,
+} from './equipment-picker-purchase.variants'
 
 export type EquipmentPickerPurchaseSectionProps = {
   equipmentName: string
@@ -28,26 +32,30 @@ export function EquipmentPickerPurchaseSection({
 }: EquipmentPickerPurchaseSectionProps) {
   return (
     <section aria-labelledby={`${equipmentName}-purchase-heading`} className="space-y-3">
-      <Heading variant="subsection" as="h3" id={`${equipmentName}-purchase-heading`}>
+      <Heading variant="group" as="h3" id={`${equipmentName}-purchase-heading`}>
         {EQUIPMENT_PICKER_PURCHASE_SECTION_LABEL}
       </Heading>
 
-      {bundleLabel ? (
-        <Text as="p" variant="caption">
-          {bundleLabel}
-        </Text>
-      ) : null}
+      <div className={equipmentPickerPurchaseInsetPanelClasses}>
+        <div className={equipmentPickerPurchaseInsetPanelContentClasses}>
+          {bundleLabel ? (
+            <Text as="p" variant="caption">
+              {bundleLabel}
+            </Text>
+          ) : null}
 
-      <EquipmentPickerPurchaseDetailsRows
-        equipmentName={equipmentName}
-        viewModel={viewModel}
-        disabled={disabled}
-        onQuantityChange={onQuantityChange}
-      />
+          <EquipmentPickerPurchaseDetailsRows
+            equipmentName={equipmentName}
+            viewModel={viewModel}
+            disabled={disabled}
+            onQuantityChange={onQuantityChange}
+          />
 
-      <Button type="button" size="sm" disabled={disabled} onClick={onCommit}>
-        {viewModel.commitLabel}
-      </Button>
+          <Button type="button" size="sm" disabled={disabled} onClick={onCommit}>
+            {viewModel.commitLabel}
+          </Button>
+        </div>
+      </div>
     </section>
   )
 }

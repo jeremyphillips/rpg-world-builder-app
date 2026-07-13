@@ -83,7 +83,6 @@ export function CatalogPickerSheet<TItem>({
   defaultTabId,
   getItemTab,
   toolbarControls,
-  filters,
   tabToolbarActions,
   transformVisibleItems,
   hasStructuredFilters = false,
@@ -100,6 +99,7 @@ export function CatalogPickerSheet<TItem>({
   sheetContentClassName,
   sheetBodyClassName,
   rowBodyClassName,
+  rowShellClassName,
 }: CatalogPickerSheetProps<TItem>) {
   const {
     searchQuery,
@@ -139,6 +139,7 @@ export function CatalogPickerSheet<TItem>({
     rowTone,
     toolbarCompact,
     rowBodyClassName,
+    rowShellClassName,
   } as CatalogPickerSheetProps<TItem>
 
   const bodyContent = loading ? (
@@ -171,8 +172,7 @@ export function CatalogPickerSheet<TItem>({
           onResetActiveTab={resetActiveTab}
           tabCounts={tabCounts}
           tabToolbarActions={tabToolbarActions}
-          toolbarControls={toolbarControls ?? filters}
-          filters={filters}
+          toolbarControls={toolbarControls}
         />
 
         <Sheet.Body className={catalogPickerSheetBodyVariants({ className: sheetBodyClassName })}>

@@ -37,6 +37,14 @@ describe('EquipmentDetailMetadata', () => {
     expect(screen.getByText(/Category/)).toBeInTheDocument()
   })
 
+  it('uses compact stat row typography for picker collapsible bodies', () => {
+    render(
+      <EquipmentDetailMetadata viewModel={longswordDetail} omitSectionTitle statRowSize="sm" />,
+    )
+
+    expect(screen.getByText(/^Category/)).toHaveClass('text-sm')
+  })
+
   it('has no axe accessibility violations', async () => {
     const { container } = render(<EquipmentDetailMetadata viewModel={longswordDetail} />)
 

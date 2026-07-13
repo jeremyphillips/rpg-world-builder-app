@@ -2,7 +2,7 @@
 
 import { Heading, RichTextContent } from '@rpg/ui'
 
-import { ContentStatRow } from '../../lib/detail/content-stat-row.client'
+import { ContentStatRow, type ContentStatRowSize } from '../../lib/detail/content-stat-row.client'
 import { type EquipmentDetailViewModel } from '../lib/equipment-display'
 
 export type EquipmentDetailMetadataProps = {
@@ -12,6 +12,8 @@ export type EquipmentDetailMetadataProps = {
   omitSectionTitle?: boolean
   /** Base id for section labelling; defaults to `equipment-detail-metadata`. */
   sectionId?: string
+  /** Stat row density — picker collapsible bodies use `sm` (14px). */
+  statRowSize?: ContentStatRowSize
 }
 
 /** Kind-specific metadata block for equipment detail surfaces and picker collapsible bodies. */
@@ -20,6 +22,7 @@ export function EquipmentDetailMetadata({
   omitStatLabels = [],
   omitSectionTitle = false,
   sectionId = 'equipment-detail-metadata',
+  statRowSize = 'default',
 }: EquipmentDetailMetadataProps) {
   const omitted = new Set(omitStatLabels)
   const statRows = viewModel.statRows.filter((row) => !omitted.has(row.label))
@@ -42,6 +45,7 @@ export function EquipmentDetailMetadata({
           {statRows.map((row) => (
             <ContentStatRow
               key={row.label}
+              size={statRowSize}
               label={row.label}
               value={row.value}
               info={row.info}

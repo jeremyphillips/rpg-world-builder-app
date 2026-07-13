@@ -28,8 +28,6 @@ type CatalogPickerSheetToolbarProps = {
   tabCounts: Record<string, number>
   tabToolbarActions?: ReactNode | ((context: CatalogPickerSheetToolbarContext) => ReactNode)
   toolbarControls?: ReactNode | ((context: CatalogPickerSheetToolbarContext) => ReactNode)
-  /** @deprecated Use {@link CatalogPickerSheetToolbarProps.toolbarControls}. */
-  filters?: ReactNode | ((context: CatalogPickerSheetToolbarContext) => ReactNode)
 }
 
 export function CatalogPickerSheetToolbar({
@@ -44,7 +42,6 @@ export function CatalogPickerSheetToolbar({
   tabCounts,
   tabToolbarActions,
   toolbarControls,
-  filters,
 }: CatalogPickerSheetToolbarProps) {
   const toolbarContext: CatalogPickerSheetToolbarContext = {
     searchQuery,
@@ -54,8 +51,8 @@ export function CatalogPickerSheetToolbar({
     resetActiveTab: onResetActiveTab,
   }
 
-  const controls = toolbarControls ?? filters
-  const renderedControls = typeof controls === 'function' ? controls(toolbarContext) : controls
+  const renderedControls =
+    typeof toolbarControls === 'function' ? toolbarControls(toolbarContext) : toolbarControls
   const renderedTabActions =
     typeof tabToolbarActions === 'function' ? tabToolbarActions(toolbarContext) : tabToolbarActions
 

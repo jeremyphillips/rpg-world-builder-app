@@ -48,5 +48,9 @@ export const equipmentPickerDisabledRowClasses = 'opacity-60'
 
 export const equipmentPickerSheetContentClasses = 'bg-background'
 
+/** Collapsible row shell — drop default bottom pad; expanded body owns vertical rhythm. */
+export const equipmentPickerRowShellClasses = 'pb-0'
+
+/** Expanded panel wash — bleeds to shell edges; inner details pad restores copy alignment with header. */
 export const equipmentPickerRowBodyClasses =
-  'rounded-b-md border-t border-border/60 bg-muted/50 pt-3'
+  'border-t border-border/40 bg-muted/20 -ml-2 -mr-3 pb-3 pt-0'

@@ -15,10 +15,12 @@ import {
   EQUIPMENT_PICKER_PURCHASE_ADD_ANOTHER_LABEL,
   EQUIPMENT_PICKER_PURCHASE_COMMIT_LABEL,
   EQUIPMENT_PICKER_PURCHASE_INVENTORY_LABEL,
+  EQUIPMENT_PICKER_PURCHASE_QUANTITY_LABEL,
   EQUIPMENT_PICKER_PURCHASE_REMOVE_ALL_LABEL,
   EQUIPMENT_PICKER_PURCHASE_REMOVE_ONE_LABEL,
   EQUIPMENT_PICKER_PURCHASE_SECTION_LABEL,
 } from './equipment-picker-purchase.lib'
+import { equipmentPickerPurchaseInsetPanelClasses } from './equipment-picker-purchase.variants'
 import { EQUIPMENT_PICKER_CHARACTER_PREVIEW_SECTION_LABEL } from './equipment-picker-character-preview.lib'
 
 describe('EquipmentPickerItemDetails', () => {
@@ -57,6 +59,29 @@ describe('EquipmentPickerItemDetails', () => {
     ).toBeInTheDocument()
     expect(screen.getByText(/Remaining after purchase/)).toBeInTheDocument()
     expect(screen.getByText(/Quantity to add/)).toBeInTheDocument()
+  })
+
+  it('styles the purchase section in a soft inset panel without a divider below quantity', () => {
+    render(
+      <EquipmentPickerItemDetails
+        equipment={longswordItem.equipment}
+        itemState={longswordItem.state}
+        budget={equipmentPickerBudgetFixture}
+        ownedQuantity={0}
+        addQuantity={1}
+        onAddQuantityChange={vi.fn()}
+        onCommit={vi.fn()}
+      />,
+    )
+
+    const quantityRow = screen.getByText(EQUIPMENT_PICKER_PURCHASE_QUANTITY_LABEL).closest('div')
+    const purchasePanel = screen.getByRole('heading', {
+      name: EQUIPMENT_PICKER_PURCHASE_SECTION_LABEL,
+    }).nextElementSibling
+
+    expect(quantityRow).toHaveClass('mb-4')
+    expect(purchasePanel).toHaveClass(equipmentPickerPurchaseInsetPanelClasses)
+    expect(quantityRow?.nextElementSibling?.textContent).toContain('Unit price')
   })
 
   it('shows owned stackable purchase controls while stack rules are permissive', () => {

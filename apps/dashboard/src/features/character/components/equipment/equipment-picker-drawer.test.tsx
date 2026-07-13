@@ -153,7 +153,7 @@ describe('EquipmentPickerDrawer', () => {
     expect(within(list).getByText('Rope')).toBeInTheDocument()
   })
 
-  it('does not render the Affordable now filter control', () => {
+  it('renders the Affordable now filter control when a budget is present', () => {
     render(
       <EquipmentPickerDrawer
         open
@@ -167,8 +167,50 @@ describe('EquipmentPickerDrawer', () => {
     )
 
     expect(
+      screen.getByRole('checkbox', { name: EQUIPMENT_PICKER_AFFORDABLE_NOW_LABEL }),
+    ).toBeInTheDocument()
+  })
+
+  it('does not render the Affordable now filter control without a budget', () => {
+    render(
+      <EquipmentPickerDrawer
+        open
+        onOpenChange={vi.fn()}
+        items={equipmentPickerDefaultPathItemsFixture}
+        filterOutUnaffordable={false}
+        defaultTab="all"
+        onAddItem={vi.fn()}
+      />,
+    )
+
+    expect(
       screen.queryByRole('checkbox', { name: EQUIPMENT_PICKER_AFFORDABLE_NOW_LABEL }),
     ).not.toBeInTheDocument()
+  })
+
+  it('filters to affordable rows when Affordable now is checked', async () => {
+    const user = userEvent.setup()
+
+    render(
+      <EquipmentPickerDrawer
+        open
+        onOpenChange={vi.fn()}
+        items={equipmentPickerDefaultPathItemsFixture}
+        budget={equipmentPickerLowRemainingBudgetFixture}
+        filterOutUnaffordable={false}
+        defaultTab="all"
+        onAddItem={vi.fn()}
+      />,
+    )
+
+    const list = screen.getByRole('list')
+    expect(within(list).getByText('Cheap Gear')).toBeInTheDocument()
+    expect(within(list).getByText('Mid Gear')).toBeInTheDocument()
+
+    await user.click(screen.getByRole('checkbox', { name: EQUIPMENT_PICKER_AFFORDABLE_NOW_LABEL }))
+
+    expect(within(list).getByText('Cheap Gear')).toBeInTheDocument()
+    expect(within(list).queryByText('Mid Gear')).not.toBeInTheDocument()
   })
 
   it('clears search and category filters together with clear_filters mode', async () => {
@@ -190,6 +232,7 @@ describe('EquipmentPickerDrawer', () => {
     await user.type(screen.getByRole('textbox', { name: 'Search catalog' }), 'rope')
     await user.click(screen.getByRole('combobox', { name: 'Equipment category' }))
     await user.click(screen.getByRole('option', { name: 'Weapon' }))
+    await user.click(screen.getByRole('checkbox', { name: EQUIPMENT_PICKER_AFFORDABLE_NOW_LABEL }))
 
     expect(
       screen.getByRole('button', { name: EQUIPMENT_PICKER_CLEAR_FILTERS_LABEL }),
@@ -202,6 +245,9 @@ describe('EquipmentPickerDrawer', () => {
 
     expect(screen.getByRole('textbox', { name: 'Search catalog' })).toHaveValue('')
     expect(screen.getByRole('combobox', { name: 'Equipment category' })).toHaveTextContent('All')
+    expect(
+      screen.getByRole('checkbox', { name: EQUIPMENT_PICKER_AFFORDABLE_NOW_LABEL }),
+    ).not.toBeChecked()
     expect(
       screen.queryByRole('button', { name: EQUIPMENT_PICKER_CLEAR_FILTERS_LABEL }),
     ).not.toBeInTheDocument()
@@ -229,6 +275,7 @@ describe('EquipmentPickerDrawer', () => {
     await user.type(screen.getByRole('textbox', { name: 'Search catalog' }), 'rope')
     await user.click(screen.getByRole('combobox', { name: 'Equipment category' }))
     await user.click(screen.getByRole('option', { name: 'Weapon' }))
+    await user.click(screen.getByRole('checkbox', { name: EQUIPMENT_PICKER_AFFORDABLE_NOW_LABEL }))
     await user.click(screen.getByRole('combobox', { name: 'Equipment sort order' }))
     await user.click(screen.getByRole('option', { name: 'Price: Low to high' }))
     await user.click(screen.getByRole('tab', { name: /Recommended/i }))
@@ -241,6 +288,9 @@ describe('EquipmentPickerDrawer', () => {
 
     expect(screen.getByRole('textbox', { name: 'Search catalog' })).toHaveValue('')
     expect(screen.getByRole('combobox', { name: 'Equipment category' })).toHaveTextContent('All')
+    expect(
+      screen.getByRole('checkbox', { name: EQUIPMENT_PICKER_AFFORDABLE_NOW_LABEL }),
+    ).not.toBeChecked()
     expect(screen.getByRole('combobox', { name: 'Equipment sort order' })).toHaveTextContent(
       'Best match',
     )

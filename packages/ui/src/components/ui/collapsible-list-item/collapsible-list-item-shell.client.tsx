@@ -15,7 +15,13 @@ import {
   type CollapsibleListItemLeadingChromeOptions,
 } from './collapsible-list-item.variants'
 
-export type CollapsibleListItemShellTone = 'default' | 'main' | 'subtle' | 'warning' | 'error'
+export type CollapsibleListItemShellTone =
+  | 'default'
+  | 'main'
+  | 'subtle'
+  | 'warning'
+  | 'error'
+  | 'catalog'
 
 export type CollapsibleListItemActionsAlign = 'start' | 'center'
 

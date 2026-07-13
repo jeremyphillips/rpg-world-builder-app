@@ -76,6 +76,7 @@ function CatalogPickerCollapsibleItemRow<TItem>({
   rowTone = 'main',
   toolbarCompact = false,
   rowBodyClassName,
+  rowShellClassName,
 }: {
   item: TItem
   itemKey: string
@@ -87,6 +88,7 @@ function CatalogPickerCollapsibleItemRow<TItem>({
   rowTone?: CollapsibleListItemShellTone
   toolbarCompact?: boolean
   rowBodyClassName?: string
+  rowShellClassName?: string
 }) {
   const titleId = `${itemKey}-title`
   const bodyId = `${itemKey}-body`
@@ -102,6 +104,7 @@ function CatalogPickerCollapsibleItemRow<TItem>({
         toolbarAriaLabel={toolbarLabel}
         tone={rowTone}
         toolbarCompact={toolbarCompact}
+        className={rowShellClassName}
         bodyClassName={rowBodyClassName}
         actionsAlign="center"
         collapsible={hasDetails}
@@ -147,6 +150,7 @@ export function CatalogPickerSheetResults<TItem>({
                 rowTone={rowProps.rowTone}
                 toolbarCompact={rowProps.toolbarCompact}
                 rowBodyClassName={rowProps.rowBodyClassName}
+                rowShellClassName={rowProps.rowShellClassName}
               />
             ) : (
               <CatalogPickerLegacyItemRow

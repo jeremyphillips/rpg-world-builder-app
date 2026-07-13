@@ -126,6 +126,24 @@ describe('CollapsibleListItem', () => {
     expect(container.firstChild).toHaveClass('flex-col', collapsibleListItemShellPaddingClasses)
   })
 
+  it('applies catalog picker row surface tone on the shell', () => {
+    const { container } = render(
+      <CollapsibleListItem
+        itemId="catalog-row"
+        titleId="catalog-row-title"
+        toolbarAriaLabel="Catalog row"
+        tone="catalog"
+        collapsible={false}
+        collapsed={false}
+        onToggleCollapse={vi.fn()}
+        header={<span>Catalog header</span>}
+      />,
+    )
+
+    const shell = container.firstChild
+    expect(shell).toHaveClass('border-border', 'bg-catalog-picker-row-surface')
+  })
+
   it('has no axe accessibility violations', async () => {
     const { container } = render(
       <CollapsibleListItem

@@ -34,8 +34,6 @@ type CatalogPickerSheetBaseProps<TItem> = {
   toolbarControls?: ReactNode | ((context: CatalogPickerSheetToolbarContext) => ReactNode)
   /** Trailing actions rendered inline with the tab row (e.g. Reset view). */
   tabToolbarActions?: ReactNode | ((context: CatalogPickerSheetToolbarContext) => ReactNode)
-  /** @deprecated Use {@link CatalogPickerSheetBaseProps.toolbarControls}. */
-  filters?: ReactNode | ((context: CatalogPickerSheetToolbarContext) => ReactNode)
   transformVisibleItems?: (
     items: readonly TItem[],
     context: { searchQuery: string },
@@ -50,7 +48,7 @@ type CatalogPickerSheetBaseProps<TItem> = {
   noResultsMessage?: string
   noScopedItemsMessage?: string
   noItemsMessage?: string
-  /** Collapsible row shell tone — defaults to `main`. */
+  /** Collapsible row shell tone — defaults to `main`; equipment picker uses `catalog`. */
   rowTone?: CollapsibleListItemShellTone
   /** Top-align caret/grip with the first header line for multi-line headers. */
   toolbarCompact?: boolean
@@ -60,6 +58,8 @@ type CatalogPickerSheetBaseProps<TItem> = {
   sheetBodyClassName?: string
   /** Optional class merged onto each collapsible row expanded body. */
   rowBodyClassName?: string
+  /** Optional class merged onto each collapsible row shell (`role="group"`). */
+  rowShellClassName?: string
 }
 
 /** Legacy row API — right-side chevron expander; used until spell/proficiency pickers migrate. */

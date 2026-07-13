@@ -15,6 +15,8 @@ import {
 } from './equipment-picker-purchase.lib'
 import {
   equipmentPickerPurchaseDividerClasses,
+  equipmentPickerPurchaseQuantityRowClasses,
+  equipmentPickerPurchaseQuantityStepperShimClasses,
   equipmentPickerPurchaseRowClasses,
 } from './equipment-picker-purchase.variants'
 
@@ -51,23 +53,25 @@ export function PurchaseQuantityRow({
   onQuantityChange,
 }: PurchaseQuantityRowProps) {
   return (
-    <div className={equipmentPickerPurchaseRowClasses}>
+    <div className={equipmentPickerPurchaseQuantityRowClasses}>
       <Text as="span" variant="muted">
         {EQUIPMENT_PICKER_PURCHASE_QUANTITY_LABEL}
       </Text>
-      <NumberStepper
-        aria-label={`${EQUIPMENT_PICKER_PURCHASE_QUANTITY_LABEL} for ${equipmentName}`}
-        size="sm"
-        bordered={true}
-        digits={EQUIPMENT_STEP_QUANTITY_INPUT_DIGITS}
-        min={1}
-        max={maxQuantity}
-        value={quantity}
-        disabled={disabled}
-        onChange={(next) => {
-          onQuantityChange(clampEquipmentStepQuantity(next, maxQuantity))
-        }}
-      />
+      <div className={equipmentPickerPurchaseQuantityStepperShimClasses}>
+        <NumberStepper
+          aria-label={`${EQUIPMENT_PICKER_PURCHASE_QUANTITY_LABEL} for ${equipmentName}`}
+          size="sm"
+          bordered={true}
+          digits={EQUIPMENT_STEP_QUANTITY_INPUT_DIGITS}
+          min={1}
+          max={maxQuantity}
+          value={quantity}
+          disabled={disabled}
+          onChange={(next) => {
+            onQuantityChange(clampEquipmentStepQuantity(next, maxQuantity))
+          }}
+        />
+      </div>
     </div>
   )
 }
@@ -94,7 +98,6 @@ export function EquipmentPickerPurchaseDetailsRows({
         disabled={disabled}
         onQuantityChange={onQuantityChange}
       />
-      <PurchaseDivider />
       <PurchaseRow
         label={EQUIPMENT_PICKER_PURCHASE_UNIT_PRICE_LABEL}
         value={viewModel.unitPriceLabel}

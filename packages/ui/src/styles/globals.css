@@ -86,6 +86,7 @@
   --color-selected-control: var(--selected-control);
   --color-selected-control-foreground: var(--selected-control-foreground);
   --color-selected-control-border: var(--selected-control-border);
+  --color-catalog-picker-row-surface: var(--catalog-picker-row-surface);
 
   --font-sans: var(--font-body, 'Inter Variable'), 'Inter', ui-sans-serif, system-ui, sans-serif;
   --font-display:
@@ -303,6 +304,7 @@
   --selected-control: var(--foreground);
   --selected-control-foreground: var(--background);
   --selected-control-border: var(--foreground);
+  --catalog-picker-row-surface: color-mix(in oklab, var(--muted) 20%, transparent);
 }
 
 .dark {
@@ -360,6 +362,7 @@
   --selected-control: var(--foreground);
   --selected-control-foreground: var(--background);
   --selected-control-border: var(--foreground);
+  --catalog-picker-row-surface: oklab(0.27 0.0065 0.0112583 / 0.2);
 }
 
 /*

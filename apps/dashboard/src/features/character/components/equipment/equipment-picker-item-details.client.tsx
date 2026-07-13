@@ -23,7 +23,10 @@ import {
   EquipmentPickerCharacterPreviewSection,
   EquipmentPickerPurchasePanel,
 } from './equipment-picker-item-details-sections.client'
-import { equipmentPickerItemDetailsSectionClasses } from './equipment-picker-item-details.variants'
+import {
+  equipmentPickerItemDetailsPurchaseSectionClasses,
+  equipmentPickerItemDetailsSectionClasses,
+} from './equipment-picker-item-details.variants'
 
 export type EquipmentPickerItemDetailsProps = {
   equipment: Equipment
@@ -79,6 +82,7 @@ export function EquipmentPickerItemDetails({
         sectionId={`${equipment.id}-detail-metadata`}
         omitStatLabels={[EQUIPMENT_STAT_LABELS.kind, EQUIPMENT_STAT_LABELS.cost]}
         omitSectionTitle
+        statRowSize="sm"
       />
 
       {previewLines ? (
@@ -88,18 +92,20 @@ export function EquipmentPickerItemDetails({
         />
       ) : null}
 
-      <EquipmentPickerPurchasePanel
-        equipment={equipment}
-        ownedQuantity={ownedQuantity}
-        stackable={isEquipmentStackable(equipment)}
-        disabled={disabled}
-        bundleLabel={formatEquipmentBundleLabel(equipment)}
-        purchaseViewModel={purchaseViewModel}
-        onAddQuantityChange={onAddQuantityChange}
-        onCommit={onCommit}
-        onRemoveFromInventory={onRemoveFromInventory}
-        onRemoveOneFromInventory={onRemoveOneFromInventory}
-      />
+      <div className={equipmentPickerItemDetailsPurchaseSectionClasses}>
+        <EquipmentPickerPurchasePanel
+          equipment={equipment}
+          ownedQuantity={ownedQuantity}
+          stackable={isEquipmentStackable(equipment)}
+          disabled={disabled}
+          bundleLabel={formatEquipmentBundleLabel(equipment)}
+          purchaseViewModel={purchaseViewModel}
+          onAddQuantityChange={onAddQuantityChange}
+          onCommit={onCommit}
+          onRemoveFromInventory={onRemoveFromInventory}
+          onRemoveOneFromInventory={onRemoveOneFromInventory}
+        />
+      </div>
     </div>
   )
 }

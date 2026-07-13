@@ -17,6 +17,8 @@ import {
   PurchaseRow,
 } from './equipment-picker-purchase-rows.client'
 import {
+  equipmentPickerPurchaseInsetPanelClasses,
+  equipmentPickerPurchaseInsetPanelContentClasses,
   equipmentPickerPurchaseRemoveActionClasses,
   equipmentPickerPurchaseRemoveActionsClasses,
 } from './equipment-picker-purchase.variants'
@@ -33,7 +35,7 @@ export function EquipmentPickerCharacterPreviewSection({
   if (previewLines.length === 0) return null
 
   return (
-    <section aria-labelledby={`${equipmentId}-character-preview-heading`} className="space-y-2">
+    <section aria-labelledby={`${equipmentId}-character-preview-heading`} className="space-y-3">
       <Heading variant="subsection" as="h3" id={`${equipmentId}-character-preview-heading`}>
         {EQUIPMENT_PICKER_CHARACTER_PREVIEW_SECTION_LABEL}
       </Heading>
@@ -92,44 +94,48 @@ export function EquipmentPickerOwnedStackableSection({
 
   return (
     <section aria-labelledby={`${equipment.id}-purchase-owned-heading`} className="space-y-3">
-      <Heading variant="subsection" as="h3" id={`${equipment.id}-purchase-owned-heading`}>
+      <Heading variant="group" as="h3" id={`${equipment.id}-purchase-owned-heading`}>
         {EQUIPMENT_PICKER_PURCHASE_SECTION_LABEL}
       </Heading>
 
-      <PurchaseRow
-        label={EQUIPMENT_PICKER_PURCHASE_INVENTORY_LABEL}
-        value={String(viewModel.ownedQuantity)}
-      />
+      <div className={equipmentPickerPurchaseInsetPanelClasses}>
+        <div className={equipmentPickerPurchaseInsetPanelContentClasses}>
+          <PurchaseRow
+            label={EQUIPMENT_PICKER_PURCHASE_INVENTORY_LABEL}
+            value={String(viewModel.ownedQuantity)}
+          />
 
-      {showRemoveOne || onRemoveFromInventory ? (
-        <div className={equipmentPickerPurchaseRemoveActionsClasses}>
-          {showRemoveOne ? (
-            <InventoryRemoveTextButton
-              label={EQUIPMENT_PICKER_PURCHASE_REMOVE_ONE_LABEL}
-              disabled={disabled}
-              onClick={onRemoveOneFromInventory}
-            />
+          {showRemoveOne || onRemoveFromInventory ? (
+            <div className={equipmentPickerPurchaseRemoveActionsClasses}>
+              {showRemoveOne ? (
+                <InventoryRemoveTextButton
+                  label={EQUIPMENT_PICKER_PURCHASE_REMOVE_ONE_LABEL}
+                  disabled={disabled}
+                  onClick={onRemoveOneFromInventory}
+                />
+              ) : null}
+              {onRemoveFromInventory ? (
+                <InventoryRemoveTextButton
+                  label={EQUIPMENT_PICKER_PURCHASE_REMOVE_ALL_LABEL}
+                  disabled={disabled}
+                  onClick={onRemoveFromInventory}
+                />
+              ) : null}
+            </div>
           ) : null}
-          {onRemoveFromInventory ? (
-            <InventoryRemoveTextButton
-              label={EQUIPMENT_PICKER_PURCHASE_REMOVE_ALL_LABEL}
-              disabled={disabled}
-              onClick={onRemoveFromInventory}
-            />
-          ) : null}
+
+          <EquipmentPickerPurchaseDetailsRows
+            equipmentName={equipment.name}
+            viewModel={viewModel}
+            disabled={disabled}
+            onQuantityChange={onAddQuantityChange}
+          />
+
+          <Button type="button" size="sm" disabled={disabled} onClick={onCommit}>
+            {viewModel.commitLabel}
+          </Button>
         </div>
-      ) : null}
-
-      <EquipmentPickerPurchaseDetailsRows
-        equipmentName={equipment.name}
-        viewModel={viewModel}
-        disabled={disabled}
-        onQuantityChange={onAddQuantityChange}
-      />
-
-      <Button type="button" size="sm" disabled={disabled} onClick={onCommit}>
-        {viewModel.commitLabel}
-      </Button>
+      </div>
     </section>
   )
 }
@@ -149,24 +155,28 @@ export function EquipmentPickerOwnedUniqueSection({
 }: EquipmentPickerOwnedUniqueSectionProps) {
   return (
     <section aria-labelledby={`${equipmentId}-purchase-owned-heading`} className="space-y-3">
-      <Heading variant="subsection" as="h3" id={`${equipmentId}-purchase-owned-heading`}>
+      <Heading variant="group" as="h3" id={`${equipmentId}-purchase-owned-heading`}>
         {EQUIPMENT_PICKER_PURCHASE_SECTION_LABEL}
       </Heading>
 
-      <PurchaseRow
-        label={EQUIPMENT_PICKER_PURCHASE_INVENTORY_LABEL}
-        value={String(ownedQuantity)}
-      />
-
-      {onRemoveFromInventory ? (
-        <div className={equipmentPickerPurchaseRemoveActionsClasses}>
-          <InventoryRemoveTextButton
-            label={EQUIPMENT_PICKER_PURCHASE_REMOVE_ALL_LABEL}
-            disabled={disabled}
-            onClick={onRemoveFromInventory}
+      <div className={equipmentPickerPurchaseInsetPanelClasses}>
+        <div className={equipmentPickerPurchaseInsetPanelContentClasses}>
+          <PurchaseRow
+            label={EQUIPMENT_PICKER_PURCHASE_INVENTORY_LABEL}
+            value={String(ownedQuantity)}
           />
+
+          {onRemoveFromInventory ? (
+            <div className={equipmentPickerPurchaseRemoveActionsClasses}>
+              <InventoryRemoveTextButton
+                label={EQUIPMENT_PICKER_PURCHASE_REMOVE_ALL_LABEL}
+                disabled={disabled}
+                onClick={onRemoveFromInventory}
+              />
+            </div>
+          ) : null}
         </div>
-      ) : null}
+      </div>
     </section>
   )
 }
