@@ -8,8 +8,11 @@ Spell catalog: overview table, detail pages, and create/edit authoring for syste
   HTML description, optional cantrip scaling / higher-level slot effect prose,
   class links, tag chips, create/edit routes, form modules under
   `lib/spell-form-*.ts`, row actions.
-- **Form:** tabbed shell (Basics / Casting / Tags); class availability via combobox
-  (spellcasting classes only — see below); tag vocabularies via chips.
+- **Form:** tabbed shell (Basics / Casting / Effects / Tags); class availability via
+  combobox (spellcasting classes only — see below); tag vocabularies via chips.
+- **Effects (authoring only):** grants-style atomic effect array (damage, healing,
+  temporary hit points, projectile count); local normalization + preview; **not
+  persisted** until `spell.effect.persistence` lands.
 
 ### Class options
 
@@ -31,6 +34,45 @@ Save is blocked by API validation until all invalid classes are removed.
 **Future polish:** Union orphan selected slugs into options with `formatSlugAsLabel` and
 a description such as “Does not have spellcasting”.
 
+### Atomic effects (local authoring)
+
+The **Effects** tab authors optional `effects` rows that match
+`spellAtomicEffectSchema` on the read model. Four kinds are supported this pass:
+damage, healing, temporary hit points, and projectile count. Prose in the Basics
+tab (`description`, scaling fields) remains the escape hatch — there is no
+`custom` effect kind.
+
+| Concern         | Behavior                                                                    |
+| --------------- | --------------------------------------------------------------------------- |
+| Form shape      | Contract `SpellAtomicEffect[]` via `effect-form-schema.ts` rows             |
+| Normalization   | `normalizeSpellEffects` in `effect-form-values.ts`                          |
+| Preview         | `SpellEffectsPreview` + `formatAtomicEffectSummary` (local form state)      |
+| Modeling status | **Derived** via `deriveEffectsModelingStatus` — not a persisted field       |
+| Save            | **Disabled** — banner: "Effects are not saved yet."                         |
+| Catalog seed    | No structured effects in SRD JSON; audit asserts all 92 spells → prose-only |
+
+Shared roll/damage form atoms live under
+[`content/lib/forms/mechanics/`](../../lib/forms/mechanics/) (`roll-value-fields`,
+`damage-type-field`, `damage-effect-fields`).
+
+#### Persistence boundary (`spell.effect.persistence`)
+
+Create/update API input **omits** `effects` today. `buildSpellCreateInput` strips
+the field with a `TODO(spell.effect.persistence)` comment; `createSpellInputSchema`
+and `updateSpellInputSchema` are built from `spellPersistedBodySchema`
+(`spellBodySchema.omit({ effects: true })`).
+
+When persistence ships, touch these files:
+
+| Layer       | File                                                                                     |
+| ----------- | ---------------------------------------------------------------------------------------- |
+| Contracts   | `packages/contracts/src/rpg/content/spell.ts` — merge `effects` into create/update input |
+| Form values | `lib/spell-form-values.ts` — remove omission; map `effectsFromFormValues`                |
+| Mongo model | `apps/api/.../homebrew-spell.model.ts` — `effects: Mixed`                                |
+| API mapper  | `apps/api/.../spells.config.ts` — `toHomebrewSpell`                                      |
+| Patch merge | `apps/api/.../lib/deep-merge.ts` — array replace for `effects[]`                         |
+| Integration | `apps/api/.../spell-effects-persistence.test.ts` — replace `it.todo` stubs               |
+
 ### Scaling prose fields
 
 Optional `cantripScaling` (level 0) and `higherLevelSlotEffect` (level 1–9) store
@@ -46,15 +88,20 @@ rich-text body prose for cantrip upgrades and upcast effects. Section headings
 
 ## Key files
 
-| Piece                     | Path                       |
-| ------------------------- | -------------------------- |
-| Display registry (detail) | `lib/spell-display.ts`     |
-| Form def                  | `lib/spell-form-def.ts`    |
-| Form fields               | `lib/spell-form-fields.ts` |
-| Form values               | `lib/spell-form-values.ts` |
-| Form labels               | `lib/spell-form-labels.ts` |
-| Create route              | `routes/spell-create.tsx`  |
-| Edit route                | `routes/spell-edit.tsx`    |
+| Piece                     | Path                                                                   |
+| ------------------------- | ---------------------------------------------------------------------- |
+| Display registry (detail) | `lib/spell-display.ts`                                                 |
+| Form def                  | `lib/spell-form-def.ts`                                                |
+| Form fields               | `lib/spell-form-fields.ts`                                             |
+| Form values               | `lib/spell-form-values.ts`                                             |
+| Form labels               | `lib/spell-form-labels.ts`                                             |
+| Effect form fields        | `lib/effect-form-fields.ts`                                            |
+| Effect form values        | `lib/effect-form-values.ts`                                            |
+| Effect display/preview    | `lib/effect-display.ts`, `components/spell-effects-preview.client.tsx` |
+| Effects editor (stories)  | `components/spell-effects-editor.client.tsx`                           |
+| Seed effects audit        | `packages/catalog/src/spells/spell-effects-coverage-inventory.ts`      |
+| Create route              | `routes/spell-create.tsx`                                              |
+| Edit route                | `routes/spell-edit.tsx`                                                |
 
 ## Related docs
 
