@@ -7,7 +7,8 @@ import type { ContentFormCtx } from '../../lib/forms/content-form-registry'
 import { buildEffectArrayAddMenu } from './effect-add-menu.lib'
 import { formatEffectRowPrimary, formatEffectRowSummary } from './effect-display'
 
-const rollBearingKinds = ['damage', 'healing', 'temporary-hit-points'] as const
+const rollOnlyKinds = ['healing', 'temporary-hit-points'] as const
+const effectLabelKinds = ['damage', ...rollOnlyKinds] as const
 
 function visibleWhenEffectKind(
   kinds: readonly (typeof SPELL_ATOMIC_EFFECT_KINDS)[number][],
@@ -36,7 +37,7 @@ function effectItemFields(ctx: ContentFormCtx): FormItem[] {
     },
     ...fieldsWithVisibility(
       rollValueFieldConfigs({ namePrefix: 'roll', label: 'Roll', required: true }),
-      visibleWhenEffectKind(rollBearingKinds),
+      visibleWhenEffectKind(rollOnlyKinds),
     ),
     {
       kind: 'row',
@@ -69,8 +70,8 @@ function effectItemFields(ctx: ContentFormCtx): FormItem[] {
       name: 'label',
       label: 'Effect label',
       hint: 'Optional name used to distinguish this effect, such as "Clenched Fist".',
-      width: 'lg',
-      visibility: visibleWhenEffectKind(rollBearingKinds),
+      width: 'full',
+      visibility: visibleWhenEffectKind(effectLabelKinds),
     },
     {
       type: 'richtext',
@@ -89,7 +90,7 @@ export function effectArrayFields(ctx: ContentFormCtx): FormItem[] {
     {
       kind: 'array',
       name: 'effects',
-      legend: 'Atomic effects',
+      legend: 'Effects',
       addLabel: 'Add effect',
       itemCollapsible: true,
       itemHeader: {

@@ -90,7 +90,9 @@ export type SpellPatch = z.infer<typeof spellPatchSchema>
 export {
   deriveEffectsModelingStatus,
   EFFECTS_MODELING_STATUS,
+  EFFECTS_MODELING_STATUS_LABELS,
   effectKindPrefix,
+  getEffectsModelingStatusLabel,
   formatAtomicEffectSummaries,
   formatAtomicEffectSummary,
   formatDamageValue,

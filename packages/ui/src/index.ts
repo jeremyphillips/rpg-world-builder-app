@@ -489,6 +489,7 @@ export {
 export type {
   BooleanCellProps,
   NameCellProps,
+  RowActionsMenuLinkProps,
   RowActionsMenuProps,
   TableBadgeCellProps,
 } from './components/ui/data-table.client'

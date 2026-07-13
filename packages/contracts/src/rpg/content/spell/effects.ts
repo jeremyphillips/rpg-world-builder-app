@@ -156,9 +156,22 @@ export function formatAtomicEffectSummaries(effects: readonly SpellAtomicEffect[
   return effects.map((effect) => formatAtomicEffectSummary(effect))
 }
 
-export const EFFECTS_MODELING_STATUS = ['prose-only', 'partially-modeled', 'modeled'] as const
+export const EFFECTS_MODELING_STATUS_LABELS = {
+  'prose-only': 'Prose only',
+  'partially-modeled': 'Partially modeled',
+  modeled: 'Modeled',
+} as const
 
-export type EffectsModelingStatus = (typeof EFFECTS_MODELING_STATUS)[number]
+export type EffectsModelingStatus = keyof typeof EFFECTS_MODELING_STATUS_LABELS
+
+export const EFFECTS_MODELING_STATUS = Object.keys(EFFECTS_MODELING_STATUS_LABELS) as [
+  EffectsModelingStatus,
+  ...EffectsModelingStatus[],
+]
+
+export function getEffectsModelingStatusLabel(status: EffectsModelingStatus): string {
+  return EFFECTS_MODELING_STATUS_LABELS[status]
+}
 
 /** Derives effects-layer modeling status from present structure (not persisted). */
 export function deriveEffectsModelingStatus(spell: {

@@ -43,12 +43,37 @@ describe('effectArrayFields', () => {
 
     expect(itemFields.find((field) => !('kind' in field) && field.name === 'label')).toMatchObject({
       label: 'Effect label',
+      width: 'full',
     })
     expect(
       itemFields.find((field) => !('kind' in field) && field.name === 'unitLabel'),
     ).toMatchObject({
       label: 'Projectile label',
     })
+  })
+
+  it('renders damage type and damage roll in one row without a duplicate roll field', () => {
+    const itemFields = findEffectsArray(effectArrayFields({}))?.fields ?? []
+
+    const damageRow = itemFields.find(
+      (field): field is Extract<(typeof itemFields)[number], { kind: 'row' }> =>
+        'kind' in field &&
+        field.kind === 'row' &&
+        field.visibility?.visibleWhen != null &&
+        field.fields.some((child) => !('kind' in child) && child.name === 'damageType'),
+    )
+    expect(damageRow).toBeDefined()
+
+    const rollFields = itemFields.filter(
+      (field) => !('kind' in field) && field.type === 'rollValue' && field.name === 'roll',
+    )
+    expect(rollFields).toHaveLength(1)
+    expect(rollFields[0]).toMatchObject({ label: 'Roll' })
+
+    const damageRollField = damageRow?.fields.find(
+      (field) => !('kind' in field) && field.type === 'rollValue',
+    )
+    expect(damageRollField).toMatchObject({ name: 'roll', label: 'Damage roll' })
   })
 })
 

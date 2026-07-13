@@ -1,6 +1,18 @@
-import { RowActionsMenu } from '@rpg/ui'
+import { forwardRef } from 'react'
+import { Link } from 'react-router-dom'
+import { RowActionsMenu, type RowActionsMenuLinkProps } from '@rpg/ui'
 
 import { useCanManageCampaign } from '@/features/campaign'
+
+const DashboardRowActionsEditLink = forwardRef<HTMLAnchorElement, RowActionsMenuLinkProps>(
+  function DashboardRowActionsEditLink({ href, className, children }, ref) {
+    return (
+      <Link ref={ref} to={href} className={className}>
+        {children}
+      </Link>
+    )
+  },
+)
 
 export interface ContentOverviewRowActionsProps {
   campaignId: string
@@ -25,6 +37,7 @@ export function ContentOverviewRowActions({
   return (
     <RowActionsMenu
       editHref={editHref}
+      EditLink={DashboardRowActionsEditLink}
       enabled={enabled}
       onToggleEnabled={onToggleEnabled}
       itemLabel={itemLabel}
