@@ -1,12 +1,7 @@
 import { useParams } from 'react-router-dom'
 import { Heading, RichTextContent, Text } from '@rpg/ui'
-import {
-  formatSlugAsLabel,
-  getEffectConditionLabel,
-  getSpellFunctionTagLabel,
-  getSpellRoleTagLabel,
-} from '@rpg/contracts'
-import type { Spell, SpellTags } from '@rpg/contracts'
+import { formatSlugAsLabel } from '@rpg/contracts'
+import type { Spell } from '@rpg/contracts'
 
 import { ROUTES } from '@/app/routes'
 import { useSetBreadcrumbLabel } from '@/components/layout/use-breadcrumb-label'
@@ -14,6 +9,8 @@ import { WidePage } from '@/components/layout/wide-page'
 import { useClasses } from '../../classes/hooks/use-classes'
 import {
   getDamageTypeLabelFromVocabulary,
+  getSpellSchoolDescriptionFromVocabulary,
+  getSpellSchoolLabelFromVocabulary,
   useDamageTypeVocabulary,
   useSpellSchoolVocabulary,
 } from '@/features/homebrew'
@@ -22,35 +19,42 @@ import { ContentDetailLayout } from '../../lib/detail/content-detail-layout'
 import { ContentDetailResolver } from '../../lib/detail/content-detail-resolver'
 import { contentEditHref } from '../../lib/detail/content-edit-href'
 import { getContentImageUrl } from '../../lib/detail/content-image-url'
-import { buildSpellStatRows } from '../lib/spell-stat-rows'
+import { buildSpellDetailViewModel, type SpellDetailViewModel } from '../lib/spell-display'
 import { ContentLinkBadge, ContentStaticBadge } from '../../lib/detail/content-link-badge'
 
-function SpellClassesList({ campaignId, classIds }: { campaignId: string; classIds: string[] }) {
+// ---------------------------------------------------------------------------
+// Sub-components (markup only — labels and formatting live in spell-display)
+// ---------------------------------------------------------------------------
+
+function SpellClassesList({
+  campaignId,
+  section,
+}: {
+  campaignId: string
+  section: NonNullable<SpellDetailViewModel['classesSection']>
+}) {
   const { data: classes = [], isPending } = useClasses(campaignId)
-
-  if (classIds.length === 0) return null
-
   const classesBySlug = new Map(classes.map((cls) => [cls.slug, cls]))
 
   return (
     <section aria-labelledby="spell-classes-heading">
       <Heading variant="section" as="h2" id="spell-classes-heading" className="mb-3">
-        Classes
+        {section.title}
       </Heading>
       {isPending ? (
         <Text variant="muted">Loading…</Text>
       ) : (
         <ul className="flex flex-wrap gap-2" role="list">
-          {classIds.map((slug) => {
-            const cls = classesBySlug.get(slug)
+          {section.items.map((item) => {
+            const cls = classesBySlug.get(item.slug)
             return (
-              <li key={slug}>
+              <li key={item.slug}>
                 {cls ? (
                   <ContentLinkBadge to={ROUTES.content.classes.detail(campaignId, cls.id)}>
                     {cls.name}
                   </ContentLinkBadge>
                 ) : (
-                  <ContentStaticBadge>{formatSlugAsLabel(slug)}</ContentStaticBadge>
+                  <ContentStaticBadge>{item.label}</ContentStaticBadge>
                 )}
               </li>
             )
@@ -61,39 +65,18 @@ function SpellClassesList({ campaignId, classIds }: { campaignId: string; classI
   )
 }
 
-function collectTagLabels(
-  tags: SpellTags,
-  damageTypeVocabulary: ReturnType<typeof useDamageTypeVocabulary>['vocabulary'],
-): string[] {
-  const labels: string[] = []
-  tags.roles?.forEach((role) => labels.push(getSpellRoleTagLabel(role)))
-  tags.functions?.forEach((fn) => labels.push(getSpellFunctionTagLabel(fn)))
-  tags.damageTypes?.forEach((type) =>
-    labels.push(getDamageTypeLabelFromVocabulary(damageTypeVocabulary, type)),
-  )
-  tags.conditions?.forEach((condition) => labels.push(getEffectConditionLabel(condition)))
-  return labels
-}
-
 function SpellTagsSection({
-  tags,
-  damageTypeVocabulary,
+  section,
 }: {
-  tags?: SpellTags
-  damageTypeVocabulary: ReturnType<typeof useDamageTypeVocabulary>['vocabulary']
+  section: NonNullable<SpellDetailViewModel['tagsSection']>
 }) {
-  if (!tags) return null
-
-  const labels = collectTagLabels(tags, damageTypeVocabulary)
-  if (labels.length === 0) return null
-
   return (
     <section aria-labelledby="spell-tags-heading">
       <Heading variant="section" as="h2" id="spell-tags-heading" className="mb-3">
-        Tags
+        {section.title}
       </Heading>
       <ul className="flex flex-wrap gap-2" role="list">
-        {labels.map((label) => (
+        {section.labels.map((label) => (
           <li key={label}>
             <ContentStaticBadge>{label}</ContentStaticBadge>
           </li>
@@ -102,6 +85,10 @@ function SpellTagsSection({
     </section>
   )
 }
+
+// ---------------------------------------------------------------------------
+// Main detail component
+// ---------------------------------------------------------------------------
 
 type SpellDetailContentProps = {
   spell: Spell
@@ -114,9 +101,16 @@ export function SpellDetailContent({ spell, campaignId }: SpellDetailContentProp
   const { vocabulary: damageTypeVocabulary } = useDamageTypeVocabulary(campaignId)
   const { vocabulary: spellSchoolVocabulary } = useSpellSchoolVocabulary(campaignId)
   const classesBySlug = new Map(classes.map((cls) => [cls.slug, cls]))
-  const statRows = buildSpellStatRows(spell, { classesBySlug, spellSchoolVocabulary }).filter(
-    (row) => row.label !== 'Classes',
-  )
+
+  const viewModel = buildSpellDetailViewModel(spell, {
+    resolveSpellSchoolLabel: (schoolId) =>
+      getSpellSchoolLabelFromVocabulary(spellSchoolVocabulary, schoolId),
+    resolveSpellSchoolDescription: (schoolId) =>
+      getSpellSchoolDescriptionFromVocabulary(spellSchoolVocabulary, schoolId),
+    resolveDamageTypeLabel: (typeId) =>
+      getDamageTypeLabelFromVocabulary(damageTypeVocabulary, typeId),
+    resolveClassLabel: (slug) => classesBySlug.get(slug)?.name ?? formatSlugAsLabel(slug),
+  })
 
   return (
     <WidePage>
@@ -126,15 +120,17 @@ export function SpellDetailContent({ spell, campaignId }: SpellDetailContentProp
         imageName={spell.name}
         campaignId={campaignId}
         editHref={contentEditHref('spells', campaignId, spell.id)}
-        statRows={statRows}
+        statRows={viewModel.statRows}
         descriptionContent={
-          spell.description ? (
-            <RichTextContent html={spell.description} size="md" tone="muted" />
+          viewModel.descriptionHtml ? (
+            <RichTextContent html={viewModel.descriptionHtml} size="md" tone="muted" />
           ) : undefined
         }
       >
-        <SpellClassesList campaignId={campaignId} classIds={spell.classIds} />
-        <SpellTagsSection tags={spell.tags} damageTypeVocabulary={damageTypeVocabulary} />
+        {viewModel.classesSection ? (
+          <SpellClassesList campaignId={campaignId} section={viewModel.classesSection} />
+        ) : null}
+        {viewModel.tagsSection ? <SpellTagsSection section={viewModel.tagsSection} /> : null}
       </ContentDetailLayout>
     </WidePage>
   )

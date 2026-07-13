@@ -38,14 +38,15 @@ a description such as “Does not have spellcasting”.
 
 ## Key files
 
-| Piece        | Path                       |
-| ------------ | -------------------------- |
-| Form def     | `lib/spell-form-def.ts`    |
-| Form fields  | `lib/spell-form-fields.ts` |
-| Form values  | `lib/spell-form-values.ts` |
-| Form labels  | `lib/spell-form-labels.ts` |
-| Create route | `routes/spell-create.tsx`  |
-| Edit route   | `routes/spell-edit.tsx`    |
+| Piece                     | Path                       |
+| ------------------------- | -------------------------- |
+| Display registry (detail) | `lib/spell-display.ts`     |
+| Form def                  | `lib/spell-form-def.ts`    |
+| Form fields               | `lib/spell-form-fields.ts` |
+| Form values               | `lib/spell-form-values.ts` |
+| Form labels               | `lib/spell-form-labels.ts` |
+| Create route              | `routes/spell-create.tsx`  |
+| Edit route                | `routes/spell-edit.tsx`    |
 
 ## Related docs
 
