@@ -1,8 +1,8 @@
 import { z } from 'zod'
 
+import { rollFormObjectSchema } from '../../lib/forms/mechanics/roll-form-values'
 import {
   damageTypeIdSchema,
-  dieFaceSchema,
   SPELL_ATOMIC_EFFECT_KINDS,
   type SpellAtomicEffectKind,
 } from '@rpg/contracts'
@@ -14,17 +14,7 @@ export const SPELL_ATOMIC_EFFECT_KIND_LABELS: Record<SpellAtomicEffectKind, stri
   'projectile-count': 'Projectile count',
 }
 
-const effectFormRollSchema = z
-  .object({
-    dice: z
-      .object({
-        count: z.coerce.number().int().min(1).optional(),
-        faces: dieFaceSchema.optional(),
-      })
-      .optional(),
-    flat: z.coerce.number().int().optional(),
-  })
-  .optional()
+const effectFormRollSchema = rollFormObjectSchema.optional()
 
 /** Permissive row schema for in-progress effect array editing. */
 export function createEffectFormRowSchema() {

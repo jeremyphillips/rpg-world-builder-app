@@ -8,7 +8,6 @@ import {
   armorCategorySchema,
   armorMaterialSchema,
   currencySchema,
-  dieFaceSchema,
   gearKindSchema,
   holySymbolUsageSchema,
   spellcastingGearKindSchema,
@@ -35,6 +34,7 @@ import { toOptions, type FormItem } from '@rpg/ui/form'
 import { economyFields } from '../../lib/forms/fields/content-economy-form-fields'
 import { identityFields } from '../../lib/forms/fields/content-identity-form-fields'
 import type { ContentFormCtx } from '../../lib/forms/content-form-registry'
+import { rollFormObjectSchema } from '../../lib/forms/mechanics/roll-form-values'
 import {
   allRegisteredKindFieldGroups,
   fieldGroupsForEquipmentKind,
@@ -85,17 +85,7 @@ export const weaponEquipmentFormSchema = physicalEquipmentBaseFormSchema.extend(
   mastery: weaponMasterySchema,
   properties: z.array(weaponPropertySchema).optional(),
   hasDamage: z.boolean().optional(),
-  damage: z
-    .object({
-      dice: z
-        .object({
-          count: z.coerce.number().int().min(1).optional(),
-          faces: dieFaceSchema.optional(),
-        })
-        .optional(),
-      flat: z.coerce.number().int().optional(),
-    })
-    .optional(),
+  damage: rollFormObjectSchema.optional(),
   damageType: weaponDamageTypeSchema.optional(),
   versatileDamage: diceSchema.optional(),
   rangeNormal: z.coerce.number().int().min(0).optional(),
@@ -303,17 +293,7 @@ export const equipmentFormSchema = z.object({
   category: weaponCategorySchema.optional(),
   mode: weaponModeSchema.optional(),
   hasDamage: z.boolean().optional(),
-  damage: z
-    .object({
-      dice: z
-        .object({
-          count: z.coerce.number().int().min(1).optional(),
-          faces: dieFaceSchema.optional(),
-        })
-        .optional(),
-      flat: z.coerce.number().int().optional(),
-    })
-    .optional(),
+  damage: rollFormObjectSchema.optional(),
   damageType: weaponDamageTypeSchema.optional(),
   versatileDamage: diceSchema.optional(),
   properties: z.array(weaponPropertySchema).optional(),

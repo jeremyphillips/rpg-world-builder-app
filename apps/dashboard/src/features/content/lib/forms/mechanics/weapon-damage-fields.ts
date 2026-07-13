@@ -45,6 +45,7 @@ export function weaponDamageFields({
         damageTypeField({
           name: damageTypeName,
           ctx,
+          scope: 'physical',
           label: 'Type',
           visibility: dealsDamageVisibility,
           required: true,

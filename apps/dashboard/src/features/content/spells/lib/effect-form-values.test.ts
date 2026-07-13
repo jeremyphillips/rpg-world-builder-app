@@ -22,7 +22,7 @@ describe('normalizeSpellEffects', () => {
       {
         id: 'fx-2',
         kind: 'temporary-hit-points',
-        roll: { dice: { count: 2, faces: 4 }, flat: 4 },
+        roll: { dice: { count: 2, faces: 4 }, flatOperator: '+', flatAmount: 4 },
       },
     ])
     expect(falseLife[0]?.kind).toBe('temporary-hit-points')
@@ -38,7 +38,7 @@ describe('normalizeSpellEffects', () => {
         kind: 'projectile-count',
         count: 3,
         label: 'darts',
-        roll: { dice: { count: 1, faces: 4 }, flat: 1 },
+        roll: { dice: { count: 1, faces: 4 }, flatOperator: '+', flatAmount: 1 },
         damageType: 'force',
       },
     ])
@@ -64,7 +64,7 @@ describe('normalizeSpellEffects', () => {
       {
         id: 'fx-damage',
         kind: 'damage',
-        roll: { dice: { count: 1, faces: 4 }, flat: 1 },
+        roll: { dice: { count: 1, faces: 4 }, flatOperator: '+', flatAmount: 1 },
         damageType: 'force',
       },
     ])
@@ -82,7 +82,31 @@ describe('spellEffectsToFormValues', () => {
         roll: { dice: { count: 2, faces: 8 as const } },
       },
     ]
-    expect(spellEffectsToFormValues(effects)).toEqual(effects)
+    expect(spellEffectsToFormValues(effects)).toEqual([
+      {
+        id: 'fx-1',
+        kind: 'healing',
+        roll: { dice: { count: 2, faces: 8 }, flatOperator: '+', flatAmount: 0 },
+      },
+    ])
     expect(spellEffectsFromFormValues(spellEffectsToFormValues(effects))).toEqual(effects)
+  })
+
+  it('splits signed flat into operator and amount for form rows', () => {
+    expect(
+      spellEffectsToFormValues([
+        {
+          id: 'fx-2',
+          kind: 'temporary-hit-points',
+          roll: { dice: { count: 2, faces: 4 }, flat: 4 },
+        },
+      ]),
+    ).toEqual([
+      {
+        id: 'fx-2',
+        kind: 'temporary-hit-points',
+        roll: { dice: { count: 2, faces: 4 }, flatOperator: '+', flatAmount: 4 },
+      },
+    ])
   })
 })

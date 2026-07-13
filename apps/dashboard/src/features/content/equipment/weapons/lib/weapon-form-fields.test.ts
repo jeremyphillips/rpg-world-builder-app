@@ -8,6 +8,7 @@ import {
   seedEquipmentOfKind,
   toEquipmentFormValues,
 } from '../../lib/test-utils/equipment-form-test-utils'
+import { rollToFormShape } from '../../../lib/forms/mechanics/roll-form-values'
 import { weaponFormFieldGroup } from './weapon-form-fields'
 import { damageToForm } from './weapon-form-values'
 
@@ -72,18 +73,39 @@ describe('weapon kindFieldGroups', () => {
       throw new Error('expected damage roll row')
     }
 
+    const inlineSentence = damageRow.fields.find(
+      (field) => !('kind' in field) && field.type === 'inlineSentence' && field.name === 'damage',
+    )
+    if (!inlineSentence || !('segments' in inlineSentence)) {
+      throw new Error('expected damage inline sentence')
+    }
+
+    expect(inlineSentence.segments).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ kind: 'number', name: 'damage.dice.count', digits: 2 }),
+        expect.objectContaining({ kind: 'select', name: 'damage.dice.faces', digits: 3 }),
+        expect.objectContaining({ kind: 'select', name: 'damage.flatOperator', defaultValue: '+' }),
+        expect.objectContaining({ kind: 'number', name: 'damage.flatAmount', digits: 3 }),
+      ]),
+    )
+
     expect(
       damageRow.fields.find((field) => !('kind' in field) && field.name === 'damage.flat'),
-    ).toMatchObject({
-      label: 'Flat modifier',
-      width: 'auto',
-    })
+    ).toBeUndefined()
+    expect(
+      damageRow.fields.find((field) => !('kind' in field) && field.name === 'damage.flatAmount'),
+    ).toBeUndefined()
 
     expect(
       damageRow.fields.find((field) => !('kind' in field) && field.name === 'damageType'),
     ).toMatchObject({
       label: 'Type',
       placeholder: 'Choose…',
+      options: [
+        { value: 'bludgeoning', label: 'Bludgeoning' },
+        { value: 'piercing', label: 'Piercing' },
+        { value: 'slashing', label: 'Slashing' },
+      ],
     })
   })
 
@@ -163,21 +185,21 @@ describe('damageToForm', () => {
   it('maps dice damage to RollValue form shape', () => {
     expect(damageToForm({ dice: { count: 2, faces: 6 } })).toEqual({
       hasDamage: true,
-      damage: { dice: { count: 2, faces: 6 } },
+      damage: { dice: { count: 2, faces: 6 }, flatOperator: '+', flatAmount: 0 },
     })
   })
 
   it('maps flat damage to RollValue form shape', () => {
     expect(damageToForm({ flat: 1 })).toEqual({
       hasDamage: true,
-      damage: { flat: 1 },
+      damage: { flatOperator: '+', flatAmount: 1 },
     })
   })
 
   it('maps combined dice and flat damage', () => {
     expect(damageToForm({ dice: { count: 1, faces: 8 }, flat: 2 })).toEqual({
       hasDamage: true,
-      damage: { dice: { count: 1, faces: 8 }, flat: 2 },
+      damage: { dice: { count: 1, faces: 8 }, flatOperator: '+', flatAmount: 2 },
     })
   })
 
@@ -201,11 +223,11 @@ describe('weapon form round-trips', () => {
       expect(formValues.properties).toEqual(item.properties)
     })
 
-    it(`${item.slug}: preserves damage as RollValue`, () => {
+    it(`${item.slug}: preserves damage as RollValue form shape`, () => {
       if (item.kind !== 'weapon' || !item.damage) return
       const formValues = toEquipmentFormValues(item)
       expect(formValues.hasDamage).toBe(true)
-      expect(formValues.damage).toEqual(item.damage)
+      expect(formValues.damage).toEqual(rollToFormShape(item.damage))
     })
 
     it(`${item.slug}: preserves versatile damage as versatileDamage`, () => {

@@ -1,39 +1,7 @@
-import {
-  dieFaceSchema,
-  rollSchema,
-  spellAtomicEffectSchema,
-  type RollValue,
-  type SpellAtomicEffect,
-} from '@rpg/contracts'
+import { spellAtomicEffectSchema, type SpellAtomicEffect } from '@rpg/contracts'
 
+import { normalizeRollFormValue, rollToFormShape } from '../../lib/forms/mechanics/roll-form-values'
 import type { EffectFormRow } from './effect-form-schema'
-
-type RollFormShape = {
-  dice?: { count?: number; faces?: number }
-  flat?: number
-}
-
-function normalizeRollFormValue(roll: RollFormShape | undefined): RollValue | undefined {
-  if (!roll) return undefined
-
-  const normalized: RollValue = {}
-  const count = roll.dice?.count
-  const faces = roll.dice?.faces
-
-  if (count !== undefined && faces !== undefined) {
-    const parsedFaces = dieFaceSchema.safeParse(faces)
-    if (parsedFaces.success) {
-      normalized.dice = { count, faces: parsedFaces.data }
-    }
-  }
-
-  if (roll.flat !== undefined && roll.flat !== ('' as unknown as number)) {
-    normalized.flat = roll.flat
-  }
-
-  const parsed = rollSchema.safeParse(normalized)
-  return parsed.success ? parsed.data : undefined
-}
 
 function parseSpellEffect(payload: Record<string, unknown>): SpellAtomicEffect | undefined {
   const parsed = spellAtomicEffectSchema.safeParse(payload)
@@ -125,7 +93,16 @@ export function normalizeSpellEffects(
 export function spellEffectsToFormValues(
   effects: readonly SpellAtomicEffect[] | undefined,
 ): EffectFormRow[] {
-  return (effects ?? []).map((effect) => ({ ...effect }))
+  return (effects ?? []).map((effect) => {
+    if (!('roll' in effect) || effect.roll === undefined) {
+      return { ...effect } as EffectFormRow
+    }
+
+    return {
+      ...effect,
+      roll: rollToFormShape(effect.roll),
+    } as EffectFormRow
+  })
 }
 
 export function spellEffectsFromFormValues(

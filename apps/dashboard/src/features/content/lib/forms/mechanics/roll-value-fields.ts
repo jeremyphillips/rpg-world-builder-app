@@ -6,9 +6,16 @@ import type {
   InlineSentenceFieldConfig,
 } from '@rpg/ui/form'
 
+import { ROLL_FLAT_OPERATORS } from './roll-form-values'
+
 const dieFaceOptions = DIE_FACES.map((face) => ({
   value: String(face),
-  label: `d${face}`,
+  label: String(face),
+}))
+
+const rollFlatOperatorOptions = ROLL_FLAT_OPERATORS.map((operator) => ({
+  value: operator,
+  label: operator,
 }))
 
 export type RollValueFieldsOptions = {
@@ -41,15 +48,31 @@ function rollDiceInlineSentence({
         defaultValue: 1,
         ariaLabel: 'Dice count',
       },
-      { kind: 'text', value: 'd', tone: 'label' },
+      { kind: 'text', value: 'd', tone: 'mono' },
       {
         kind: 'select',
         name: `${namePrefix}.dice.faces`,
         options: dieFaceOptions,
-        width: 'auto',
-        digits: 2,
+        digits: 3,
         defaultValue: '6',
         ariaLabel: 'Die faces',
+      },
+      {
+        kind: 'select',
+        name: `${namePrefix}.flatOperator`,
+        options: rollFlatOperatorOptions,
+        defaultValue: '+',
+        ariaLabel: 'Flat sign',
+        width: 'auto',
+        digits: 1,
+      },
+      {
+        kind: 'number',
+        name: `${namePrefix}.flatAmount`,
+        min: 0,
+        digits: 3,
+        defaultValue: 0,
+        ariaLabel: 'Flat modifier',
       },
     ],
   }
@@ -60,21 +83,7 @@ function rollDiceInlineSentence({
  * Prefer this over DiceFormulaValue adapters for contract-shaped rolls.
  */
 export function rollValueFieldConfigs(options: RollValueFieldsOptions): FieldConfig[] {
-  const { namePrefix, label, visibility, required } = options
-
-  return [
-    rollDiceInlineSentence({ namePrefix, label, visibility, required }),
-    {
-      type: 'number',
-      name: `${namePrefix}.flat`,
-      label: 'Flat modifier',
-      hint: 'Optional signed flat bonus or penalty (e.g. +1 or -1).',
-      hintPosition: 'below-control',
-      digits: 3,
-      width: 'auto',
-      visibility,
-    },
-  ]
+  return [rollDiceInlineSentence(options)]
 }
 
 /** Form-item wrapper when roll atoms are not placed inside a row. */

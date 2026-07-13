@@ -7,6 +7,7 @@ import {
 } from '@rpg/contracts'
 
 import { pickEquipment } from '../../../lib/fixtures/pick'
+import { rollToFormShape } from '../../../lib/forms/mechanics/roll-form-values'
 import { toEquipmentFormValues } from '../../lib/test-utils/equipment-form-test-utils'
 import { equipmentFormDef } from '../../lib/equipment-form-def'
 
@@ -51,7 +52,7 @@ describe('weapon RollValue form round trips', () => {
         expect(input).not.toHaveProperty('damage')
       } else {
         expect(formValues.hasDamage).toBe(true)
-        expect(formValues.damage).toEqual(fixture.damage)
+        expect(formValues.damage).toEqual(rollToFormShape(fixture.damage))
         expect(input).toMatchObject({ damage: fixture.damage })
       }
     })
