@@ -219,14 +219,14 @@ describe('weapon kindFieldGroups', () => {
 
 describe('damageToForm', () => {
   it('maps dice damage to damageDice', () => {
-    expect(damageToForm({ kind: 'dice', count: 2, faces: 6 })).toEqual({
+    expect(damageToForm({ dice: { count: 2, faces: 6 } })).toEqual({
       damageKind: 'dice',
       damageDice: { count: 2, faces: 6 },
     })
   })
 
   it('maps flat damage to damageAmount', () => {
-    expect(damageToForm({ kind: 'flat', amount: 1 })).toEqual({
+    expect(damageToForm({ flat: 1 })).toEqual({
       damageKind: 'flat',
       damageAmount: 1,
     })
@@ -253,11 +253,11 @@ describe('weapon form round-trips', () => {
     })
 
     it(`${item.slug}: preserves dice damage as damageDice`, () => {
-      if (item.kind !== 'weapon' || item.damage?.kind !== 'dice') return
+      if (item.kind !== 'weapon' || !item.damage?.dice) return
       const formValues = toEquipmentFormValues(item)
       expect(formValues.damageDice).toEqual({
-        count: item.damage.count,
-        faces: item.damage.faces,
+        count: item.damage.dice.count,
+        faces: item.damage.dice.faces,
       })
     })
 

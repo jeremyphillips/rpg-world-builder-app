@@ -113,11 +113,11 @@ export const equipmentStepSpearFixture = {
   kind: 'weapon',
   category: 'simple',
   mode: 'melee',
-  damage: { kind: 'dice', count: 1, faces: 6 },
+  damage: { dice: { count: 1, faces: 6 } },
   damageType: 'piercing',
   properties: ['thrown', 'versatile'],
   mastery: 'sap',
-  versatileDamage: { kind: 'dice', count: 1, faces: 8 },
+  versatileDamage: { count: 1, faces: 8 },
   range: { normal: 20, long: 60 },
 } as const satisfies Equipment
 
@@ -136,7 +136,7 @@ export const equipmentStepDaggerFixture = {
   kind: 'weapon',
   category: 'simple',
   mode: 'melee',
-  damage: { kind: 'dice', count: 1, faces: 4 },
+  damage: { dice: { count: 1, faces: 4 } },
   damageType: 'piercing',
   properties: ['finesse', 'light', 'thrown'],
   mastery: 'nick',

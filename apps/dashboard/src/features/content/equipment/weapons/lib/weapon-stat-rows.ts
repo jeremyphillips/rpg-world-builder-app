@@ -1,5 +1,6 @@
 import type { WeaponEquipment } from '@rpg/contracts'
 import {
+  formatDice,
   formatMoney,
   formatWeight,
   formatWeaponDamage,
@@ -27,7 +28,7 @@ export function getWeaponStatRows(item: WeaponEquipment): ContentStatRowData[] {
         ]
       : []),
     ...(item.versatileDamage
-      ? [{ label: 'Versatile', value: formatWeaponDamage(item.versatileDamage) }]
+      ? [{ label: 'Versatile', value: formatDice(item.versatileDamage) }]
       : []),
     { label: 'Properties', value: formatWeaponProperties(item.properties) },
     {

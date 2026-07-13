@@ -18,16 +18,25 @@ export function damageToForm(
   damage: WeaponDamage | undefined,
 ): Pick<WeaponEquipmentFormValues, 'damageKind' | 'damageDice' | 'damageAmount'> {
   if (!damage) return { damageKind: 'none' }
-  if (damage.kind === 'dice') {
+  if (damage.dice !== undefined && damage.flat === undefined) {
     return {
       damageKind: 'dice',
-      damageDice: { count: damage.count, faces: damage.faces },
+      damageDice: { count: damage.dice.count, faces: damage.dice.faces },
     }
   }
-  return {
-    damageKind: 'flat',
-    damageAmount: damage.amount,
+  if (damage.flat !== undefined && damage.dice === undefined) {
+    return {
+      damageKind: 'flat',
+      damageAmount: damage.flat,
+    }
   }
+  if (damage.dice !== undefined) {
+    return {
+      damageKind: 'dice',
+      damageDice: { count: damage.dice.count, faces: damage.dice.faces },
+    }
+  }
+  return { damageKind: 'none' }
 }
 
 export function weaponFormValuesFromEntity(
@@ -66,15 +75,14 @@ export function weaponFormValuesFromEntity(
 function damageFromForm(values: EquipmentInputBuildCtx<'weapon'>['values']): WeaponInput['damage'] {
   if (values.damageKind === 'none' || values.damageKind === undefined) return undefined
   if (values.damageKind === 'flat') {
-    return values.damageAmount !== undefined
-      ? { kind: 'flat', amount: values.damageAmount }
-      : undefined
+    return values.damageAmount !== undefined ? { flat: values.damageAmount } : undefined
   }
   if (values.damageDice?.count !== undefined && values.damageDice?.faces !== undefined) {
     return {
-      kind: 'dice',
-      count: values.damageDice.count,
-      faces: dieFaceSchema.parse(values.damageDice.faces),
+      dice: {
+        count: values.damageDice.count,
+        faces: dieFaceSchema.parse(values.damageDice.faces),
+      },
     }
   }
   return undefined
@@ -100,7 +108,6 @@ function optionalVersatileDamage(
   }
   return {
     versatileDamage: {
-      kind: 'dice',
       count: values.versatileDamage.count,
       faces: dieFaceSchema.parse(values.versatileDamage.faces),
     },

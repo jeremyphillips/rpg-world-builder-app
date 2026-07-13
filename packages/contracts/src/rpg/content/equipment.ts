@@ -20,8 +20,6 @@ import { refineWeaponEquipment, weaponEquipmentKindFields } from './equipment/we
 // Re-export weapon/armor helpers and damage schemas for consumers.
 export {
   averageWeaponDamage,
-  diceDamageSchema,
-  flatDamageSchema,
   formatWeaponDamage,
   formatWeaponProperties,
   formatWeaponRange,

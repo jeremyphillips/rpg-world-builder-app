@@ -270,3 +270,43 @@ describe('spellContentLevelSchema', () => {
     expect(spellSchema.safeParse({ ...fireBolt, level: -1 }).success).toBe(false)
   })
 })
+
+describe('spell effects schema', () => {
+  const sampleEffect = {
+    id: 'fx-1',
+    kind: 'damage' as const,
+    roll: { dice: { count: 1, faces: 10 } },
+    damageType: 'fire',
+  }
+
+  it('accepts optional effects on the stored spell shape', () => {
+    expect(spellSchema.parse({ ...fireBolt, effects: [sampleEffect] }).effects).toEqual([
+      sampleEffect,
+    ])
+  })
+
+  it('omits effects from create/update input schemas until persistence lands', () => {
+    expect('effects' in createSpellInputSchema.shape).toBe(false)
+    expect('effects' in updateSpellInputSchema.shape).toBe(false)
+    const parsed = createSpellInputSchema.parse({
+      slug: 'fire-bolt',
+      ...fireBoltBody,
+      effects: [sampleEffect],
+    } as Parameters<typeof createSpellInputSchema.parse>[0] & {
+      effects: (typeof sampleEffect)[]
+    })
+    expect('effects' in parsed).toBe(false)
+  })
+
+  it('allows effects in patch bodies for future overlay authoring', () => {
+    expect(
+      spellPatchSchema.parse({
+        id: 'patch_1',
+        campaignId: 'camp_1',
+        targetId: 'srd-cc-5.2.1:fire-bolt',
+        patch: { effects: [sampleEffect] },
+        ...timestamps,
+      }).patch.effects,
+    ).toEqual([sampleEffect])
+  })
+})

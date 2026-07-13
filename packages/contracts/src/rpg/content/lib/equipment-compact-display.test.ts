@@ -24,7 +24,7 @@ const dagger = {
   mode: 'melee',
   properties: ['finesse', 'light', 'thrown'],
   mastery: 'nick',
-  damage: { kind: 'dice', count: 1, faces: 4 },
+  damage: { dice: { count: 1, faces: 4 } },
   damageType: 'piercing',
 } satisfies Equipment
 

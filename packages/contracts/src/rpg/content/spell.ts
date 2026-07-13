@@ -17,6 +17,7 @@ import {
   slugSchema,
 } from './lib/envelope'
 import { classSlugSchema } from './classes/class'
+import { spellAtomicEffectSchema } from './spell/effects'
 
 // ---------------------------------------------------------------------------
 // Spell level — 0 (cantrip) through 9. Distinct from `spellLevelSchema` in
@@ -57,15 +58,25 @@ export const spellBodySchema = contentBodyBaseSchema.extend({
   cantripScaling: z.string().optional(),
   /** Rich-text HTML (TipTap). Upcast body prose — no "Using a Higher-Level Spell Slot" heading. */
   higherLevelSlotEffect: z.string().optional(),
+  /** Structured atomic effects; optional until catalog/homebrew authoring lands. */
+  effects: z.array(spellAtomicEffectSchema).optional(),
 })
 
 export type SpellBody = z.infer<typeof spellBodySchema>
+
+/**
+ * Spell body fields included in create/update API input today.
+ * Effects are intentionally omitted until `spell.effect.persistence` lands.
+ */
+export const spellPersistedBodySchema = spellBodySchema.omit({ effects: true })
+
+export type SpellPersistedBody = z.infer<typeof spellPersistedBodySchema>
 
 /** Stored shape = ownership envelope + body. */
 export const spellSchema = contentMetaSchema.extend(spellBodySchema.shape)
 export type Spell = z.infer<typeof spellSchema>
 
-export const createSpellInputSchema = spellBodySchema.extend({ slug: slugSchema })
+export const createSpellInputSchema = spellPersistedBodySchema.extend({ slug: slugSchema })
 export type CreateSpellInput = z.infer<typeof createSpellInputSchema>
 
 export const updateSpellInputSchema = createSpellInputSchema.partial()
@@ -75,3 +86,20 @@ export const spellPatchSchema = contentPatchBaseSchema.extend({
   patch: spellBodySchema.partial(),
 })
 export type SpellPatch = z.infer<typeof spellPatchSchema>
+
+export {
+  deriveEffectsModelingStatus,
+  EFFECTS_MODELING_STATUS,
+  formatAtomicEffectSummaries,
+  formatAtomicEffectSummary,
+  formatDamageValue,
+  spellAtomicEffectSchema,
+  SPELL_ATOMIC_EFFECT_KINDS,
+  type EffectsModelingStatus,
+  type SpellAtomicEffect,
+  type SpellAtomicEffectKind,
+  type SpellDamageEffect,
+  type SpellHealingEffect,
+  type SpellProjectileCountEffect,
+  type SpellTemporaryHitPointsEffect,
+} from './spell/effects'
