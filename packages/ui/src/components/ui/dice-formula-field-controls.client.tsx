@@ -1,6 +1,6 @@
 'use client'
 
-import type { ReactNode } from 'react'
+import type { ComponentProps, ReactNode } from 'react'
 
 import { cn } from '../../lib/utils'
 import { Button } from './button.client'
@@ -33,8 +33,16 @@ import {
 } from './dice-formula-field.variants'
 import { inputSelectDividerVariants } from './input-select-field.variants'
 
-const ADD_MODIFIER_LABEL = 'Add modifier'
-const REMOVE_MODIFIER_LABEL = 'Remove modifier'
+export const ADD_MODIFIER_LABEL = 'Add modifier'
+export const REMOVE_MODIFIER_LABEL = 'Remove modifier'
+export const ADD_DICE_LABEL = 'Add dice'
+
+export type DiceFormulaControlLabels = {
+  count?: string
+  faces?: string
+  operator?: string
+  modifierAmount?: string
+}
 
 export type { DiceFormulaCurrencyUnitOption }
 
@@ -52,7 +60,12 @@ interface DiceFormulaControlsProps {
   modifierMin: number
   modifierMax: number
   modifierOperators: readonly DiceFormulaTailOperator[]
-  modifierAmountLabel: string
+  modifierAmountLabel?: string
+  controlLabels?: DiceFormulaControlLabels
+  facesNotation?: boolean
+  showDiceFields?: boolean
+  onAddDice?: () => void
+  addDiceLabel?: string
   labelPosition: DiceFormulaLabelPosition
   inlineLabelId: string
   currencyUnit?: {
@@ -83,6 +96,10 @@ function DiceFormulaControlCell({
   )
 }
 
+function formatDieFaceLabel(face: number, facesNotation: boolean): string {
+  return facesNotation ? `d${face}` : String(face)
+}
+
 function DiceFormulaCountControl({
   id,
   size,
@@ -91,6 +108,7 @@ function DiceFormulaCountControl({
   countMax,
   disabled,
   hasError,
+  countLabel = 'Count',
   onBlur,
   onUpdate,
 }: Pick<
@@ -104,11 +122,13 @@ function DiceFormulaCountControl({
   | 'hasError'
   | 'onBlur'
   | 'onUpdate'
->) {
+> & {
+  countLabel?: string
+}) {
   const digits = fieldDigitsForMax(countMax)
 
   return (
-    <DiceFormulaControlCell id={id} label="Count">
+    <DiceFormulaControlCell id={id} label={countLabel}>
       <NumberInput
         id={id}
         grouped
@@ -137,17 +157,22 @@ function DiceFormulaFacesControl({
   faces,
   disabled,
   hasError,
+  facesLabel = 'Die faces',
+  facesNotation = false,
   onBlur,
   onUpdate,
 }: Pick<
   DiceFormulaControlsProps,
   'id' | 'size' | 'resolved' | 'faces' | 'disabled' | 'hasError' | 'onBlur' | 'onUpdate'
->) {
+> & {
+  facesLabel?: string
+  facesNotation?: boolean
+}) {
   const maxFace = faces.reduce((max, face) => Math.max(max, face), 0)
   const digits = fieldDigitsForMax(maxFace)
 
   return (
-    <DiceFormulaControlCell id={id} label="Die faces">
+    <DiceFormulaControlCell id={id} label={facesLabel}>
       <Select
         value={String(resolved.faces)}
         onValueChange={(next) => onUpdate({ faces: Number(next) })}
@@ -162,12 +187,12 @@ function DiceFormulaFacesControl({
           className={diceFormulaGroupedFacesSegmentVariants({ size })}
           onBlur={onBlur}
         >
-          <SelectValue />
+          <SelectValue>{formatDieFaceLabel(resolved.faces, facesNotation)}</SelectValue>
         </SelectTrigger>
         <SelectContent>
           {faces.map((face) => (
             <SelectItem key={face} value={String(face)}>
-              {face}
+              {formatDieFaceLabel(face, facesNotation)}
             </SelectItem>
           ))}
         </SelectContent>
@@ -186,6 +211,9 @@ function DiceFormulaCoreControls({
   hasError,
   countMin,
   countMax,
+  countLabel,
+  facesLabel,
+  facesNotation,
   onBlur,
   onUpdate,
 }: {
@@ -198,6 +226,9 @@ function DiceFormulaCoreControls({
   hasError: boolean
   countMin: number
   countMax: number
+  countLabel?: string
+  facesLabel?: string
+  facesNotation?: boolean
   onBlur?: () => void
   onUpdate: (patch: DiceFormulaPatch) => void
 }) {
@@ -211,17 +242,24 @@ function DiceFormulaCoreControls({
         countMax={countMax}
         disabled={disabled}
         hasError={hasError}
+        countLabel={countLabel}
         onBlur={onBlur}
         onUpdate={onUpdate}
       />
 
-      <div aria-hidden className={inputSelectDividerVariants()} />
+      {!facesNotation ? (
+        <>
+          <div aria-hidden className={inputSelectDividerVariants()} />
 
-      <InlineSentenceConnector size={size} tone="mono" aria-hidden>
-        d
-      </InlineSentenceConnector>
+          <InlineSentenceConnector size={size} tone="mono" aria-hidden>
+            d
+          </InlineSentenceConnector>
 
-      <div aria-hidden className={inputSelectDividerVariants()} />
+          <div aria-hidden className={inputSelectDividerVariants()} />
+        </>
+      ) : (
+        <div aria-hidden className={inputSelectDividerVariants()} />
+      )}
 
       <DiceFormulaFacesControl
         id={facesId}
@@ -230,6 +268,8 @@ function DiceFormulaCoreControls({
         faces={faces}
         disabled={disabled}
         hasError={hasError}
+        facesLabel={facesLabel}
+        facesNotation={facesNotation}
         onBlur={onBlur}
         onUpdate={onUpdate}
       />
@@ -281,6 +321,7 @@ function DiceFormulaOperatorSegment({
   disabled,
   hasError,
   modifierOperators,
+  operatorLabel = 'Operator',
   onBlur,
   onUpdate,
 }: Pick<
@@ -293,7 +334,9 @@ function DiceFormulaOperatorSegment({
   | 'modifierOperators'
   | 'onBlur'
   | 'onUpdate'
->) {
+> & {
+  operatorLabel?: string
+}) {
   const singleOperator = modifierOperators.length === 1
   const resolvedOperator = resolved.modifier?.operator ?? modifierOperators[0] ?? '+'
 
@@ -302,7 +345,7 @@ function DiceFormulaOperatorSegment({
   }
 
   return (
-    <DiceFormulaControlCell id={operatorId} label="Operator">
+    <DiceFormulaControlCell id={operatorId} label={operatorLabel}>
       <Select
         value={resolvedOperator}
         onValueChange={(next) =>
@@ -455,12 +498,14 @@ function DiceFormulaModifierControls({
   modifierMode,
   modifierOperators,
   modifierAmountLabel,
+  operatorLabel,
   currencyUnit,
   onBlur,
   onUpdate,
   onRemoveModifier,
 }: DiceFormulaModifierSegmentProps & {
   modifierMode: DiceFormulaModifierMode
+  operatorLabel?: string
   onRemoveModifier: () => void
 }) {
   const singleOperator = modifierOperators.length === 1
@@ -476,6 +521,7 @@ function DiceFormulaModifierControls({
           disabled={disabled}
           hasError={hasError}
           modifierOperators={modifierOperators}
+          operatorLabel={operatorLabel}
           onBlur={onBlur}
           onUpdate={onUpdate}
         />
@@ -522,6 +568,85 @@ function DiceFormulaModifierControls({
   )
 }
 
+function DiceFormulaAddActionButton({
+  label,
+  disabled,
+  onClick,
+}: {
+  label: string
+  disabled: boolean
+  onClick: () => void
+}) {
+  return (
+    <Button
+      type="button"
+      variant="ghost"
+      size="sm"
+      className="shrink-0 px-2"
+      disabled={disabled}
+      onClick={onClick}
+    >
+      {label}
+    </Button>
+  )
+}
+
+function DiceFormulaDiceSegment({
+  showDiceFields,
+  onAddDice,
+  addDiceLabel,
+  disabled,
+  coreProps,
+}: {
+  showDiceFields: boolean
+  onAddDice?: () => void
+  addDiceLabel: string
+  disabled: boolean
+  coreProps: ComponentProps<typeof DiceFormulaCoreControls>
+}) {
+  if (showDiceFields) {
+    return <DiceFormulaCoreControls {...coreProps} />
+  }
+
+  if (!onAddDice) return null
+
+  return <DiceFormulaAddActionButton label={addDiceLabel} disabled={disabled} onClick={onAddDice} />
+}
+
+function DiceFormulaTailSegment({
+  showModifierFields,
+  showDiceFields,
+  modifierMode,
+  modifierOperators,
+  disabled,
+  onUpdate,
+  modifierProps,
+}: {
+  showModifierFields: boolean
+  showDiceFields: boolean
+  modifierMode: DiceFormulaModifierMode
+  modifierOperators: readonly DiceFormulaTailOperator[]
+  disabled: boolean
+  onUpdate: (patch: DiceFormulaPatch) => void
+  modifierProps: ComponentProps<typeof DiceFormulaModifierControls> & {
+    onRemoveModifier: () => void
+  }
+}) {
+  if (showModifierFields) {
+    return <DiceFormulaModifierControls {...modifierProps} />
+  }
+
+  if (modifierMode !== 'optional' || !showDiceFields) return null
+
+  return (
+    <DiceFormulaAddActionButton
+      label={ADD_MODIFIER_LABEL}
+      disabled={disabled}
+      onClick={() => onUpdate({ modifier: defaultModifierForOperators(modifierOperators) })}
+    />
+  )
+}
+
 export function DiceFormulaControls({
   id,
   size,
@@ -531,12 +656,17 @@ export function DiceFormulaControls({
   hasError,
   modifierMode,
   showModifierFields,
+  showDiceFields = true,
   countMin,
   countMax,
   modifierMin,
   modifierMax,
   modifierOperators = DICE_FORMULA_OPERATORS,
   modifierAmountLabel = 'Modifier',
+  controlLabels,
+  facesNotation = false,
+  onAddDice,
+  addDiceLabel = ADD_DICE_LABEL,
   labelPosition,
   inlineLabelId,
   currencyUnit,
@@ -548,57 +678,66 @@ export function DiceFormulaControls({
   const operatorId = `${id}-operator`
   const modifierId = `${id}-modifier`
   const currencyId = `${id}-currency`
+  const countLabel = controlLabels?.count ?? 'Count'
+  const facesLabel = controlLabels?.faces ?? 'Die faces'
+  const operatorLabel = controlLabels?.operator ?? 'Operator'
+  const resolvedModifierAmountLabel = controlLabels?.modifierAmount ?? modifierAmountLabel
 
   return (
     <InlineSentenceRow
       role={labelPosition === 'inline' ? 'group' : undefined}
       aria-labelledby={labelPosition === 'inline' ? inlineLabelId : undefined}
     >
-      <DiceFormulaCoreControls
-        countId={countId}
-        facesId={facesId}
-        size={size}
-        resolved={resolved}
-        faces={faces}
+      <DiceFormulaDiceSegment
+        showDiceFields={showDiceFields}
+        onAddDice={onAddDice}
+        addDiceLabel={addDiceLabel}
         disabled={disabled}
-        hasError={hasError}
-        countMin={countMin}
-        countMax={countMax}
-        onBlur={onBlur}
-        onUpdate={onUpdate}
+        coreProps={{
+          countId,
+          facesId,
+          size,
+          resolved,
+          faces,
+          disabled,
+          hasError,
+          countMin,
+          countMax,
+          countLabel,
+          facesLabel,
+          facesNotation,
+          onBlur,
+          onUpdate,
+        }}
       />
 
-      {showModifierFields ? (
-        <DiceFormulaModifierControls
-          operatorId={operatorId}
-          modifierId={modifierId}
-          currencyId={currencyId}
-          size={size}
-          resolved={resolved}
-          disabled={disabled}
-          hasError={hasError}
-          modifierMin={modifierMin}
-          modifierMax={modifierMax}
-          modifierMode={modifierMode}
-          modifierOperators={modifierOperators}
-          modifierAmountLabel={modifierAmountLabel}
-          currencyUnit={currencyUnit}
-          onBlur={onBlur}
-          onUpdate={onUpdate}
-          onRemoveModifier={() => onUpdate({ clearModifier: true })}
-        />
-      ) : modifierMode === 'optional' ? (
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          className="shrink-0 px-2"
-          disabled={disabled}
-          onClick={() => onUpdate({ modifier: defaultModifierForOperators(modifierOperators) })}
-        >
-          {ADD_MODIFIER_LABEL}
-        </Button>
-      ) : null}
+      <DiceFormulaTailSegment
+        showModifierFields={showModifierFields}
+        showDiceFields={showDiceFields}
+        modifierMode={modifierMode}
+        modifierOperators={modifierOperators}
+        disabled={disabled}
+        onUpdate={onUpdate}
+        modifierProps={{
+          operatorId,
+          modifierId,
+          currencyId,
+          size,
+          resolved,
+          disabled,
+          hasError,
+          modifierMin,
+          modifierMax,
+          modifierMode,
+          modifierOperators,
+          modifierAmountLabel: resolvedModifierAmountLabel,
+          operatorLabel,
+          currencyUnit,
+          onBlur,
+          onUpdate,
+          onRemoveModifier: () => onUpdate({ clearModifier: true }),
+        }}
+      />
     </InlineSentenceRow>
   )
 }

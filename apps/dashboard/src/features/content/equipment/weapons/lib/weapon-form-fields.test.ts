@@ -65,29 +65,26 @@ describe('weapon kindFieldGroups', () => {
         'kind' in field &&
         field.kind === 'row' &&
         field.fields.some(
-          (child) =>
-            !('kind' in child) && child.type === 'inlineSentence' && child.name === 'damage',
+          (child) => !('kind' in child) && child.type === 'rollValue' && child.name === 'damage',
         ),
     )
     if (!damageRow || !('fields' in damageRow)) {
       throw new Error('expected damage roll row')
     }
 
-    const inlineSentence = damageRow.fields.find(
-      (field) => !('kind' in field) && field.type === 'inlineSentence' && field.name === 'damage',
+    const rollValueField = damageRow.fields.find(
+      (field) => !('kind' in field) && field.type === 'rollValue' && field.name === 'damage',
     )
-    if (!inlineSentence || !('segments' in inlineSentence)) {
-      throw new Error('expected damage inline sentence')
+    if (!rollValueField) {
+      throw new Error('expected damage roll value field')
     }
 
-    expect(inlineSentence.segments).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({ kind: 'number', name: 'damage.dice.count', digits: 2 }),
-        expect.objectContaining({ kind: 'select', name: 'damage.dice.faces', digits: 3 }),
-        expect.objectContaining({ kind: 'select', name: 'damage.flatOperator', defaultValue: '+' }),
-        expect.objectContaining({ kind: 'number', name: 'damage.flatAmount', digits: 3 }),
-      ]),
-    )
+    expect(rollValueField).toMatchObject({
+      type: 'rollValue',
+      name: 'damage',
+      label: 'Damage roll',
+      width: 'auto',
+    })
 
     expect(
       damageRow.fields.find((field) => !('kind' in field) && field.name === 'damage.flat'),
@@ -96,9 +93,18 @@ describe('weapon kindFieldGroups', () => {
       damageRow.fields.find((field) => !('kind' in field) && field.name === 'damage.flatAmount'),
     ).toBeUndefined()
 
-    expect(
-      damageRow.fields.find((field) => !('kind' in field) && field.name === 'damageType'),
-    ).toMatchObject({
+    const damageTypeFieldConfig = damageRow.fields.find(
+      (field) => !('kind' in field) && field.name === 'damageType',
+    )
+    const rollFieldIndex = damageRow.fields.findIndex(
+      (field) => !('kind' in field) && field.type === 'rollValue',
+    )
+    const damageTypeIndex = damageRow.fields.findIndex(
+      (field) => !('kind' in field) && field.name === 'damageType',
+    )
+
+    expect(damageTypeIndex).toBeLessThan(rollFieldIndex)
+    expect(damageTypeFieldConfig).toMatchObject({
       label: 'Type',
       placeholder: 'Choose…',
       options: [
@@ -185,7 +191,7 @@ describe('damageToForm', () => {
   it('maps dice damage to RollValue form shape', () => {
     expect(damageToForm({ dice: { count: 2, faces: 6 } })).toEqual({
       hasDamage: true,
-      damage: { dice: { count: 2, faces: 6 }, flatOperator: '+', flatAmount: 0 },
+      damage: { dice: { count: 2, faces: 6 } },
     })
   })
 

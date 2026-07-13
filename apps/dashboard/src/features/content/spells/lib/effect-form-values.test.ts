@@ -86,7 +86,7 @@ describe('spellEffectsToFormValues', () => {
       {
         id: 'fx-1',
         kind: 'healing',
-        roll: { dice: { count: 2, faces: 8 }, flatOperator: '+', flatAmount: 0 },
+        roll: { dice: { count: 2, faces: 8 } },
       },
     ])
     expect(spellEffectsFromFormValues(spellEffectsToFormValues(effects))).toEqual(effects)

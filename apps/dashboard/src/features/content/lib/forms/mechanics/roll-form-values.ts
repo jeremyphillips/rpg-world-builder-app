@@ -102,7 +102,6 @@ export function rollToFormShape(roll: RollValue | undefined): RollFormShape | un
 
   return {
     ...(roll.dice ? { dice: { count: roll.dice.count, faces: roll.dice.faces } } : {}),
-    flatOperator,
-    ...(flatAmount !== undefined ? { flatAmount } : { flatAmount: 0 }),
+    ...(roll.flat !== undefined ? { flatOperator, flatAmount } : {}),
   }
 }

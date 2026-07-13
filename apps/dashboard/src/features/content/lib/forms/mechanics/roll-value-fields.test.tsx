@@ -22,43 +22,20 @@ const schema = z.object({
 })
 
 describe('rollValueFields', () => {
-  it('binds dice count, faces, operator, and amount to RollValue paths', () => {
+  it('emits a rollValue field bound to the roll object path', () => {
     const fields = rollValueFields({ namePrefix: 'damage' })
-    const inlineSentence = fields.find(
-      (field) => !('kind' in field) && field.type === 'inlineSentence',
-    )
 
-    expect(inlineSentence).toMatchObject({
-      name: 'damage',
-      type: 'inlineSentence',
-      segments: [
-        expect.objectContaining({
-          kind: 'number',
-          name: 'damage.dice.count',
-          digits: 2,
-        }),
-        { kind: 'text', value: 'd', tone: 'mono' },
-        expect.objectContaining({
-          kind: 'select',
-          name: 'damage.dice.faces',
-          digits: 3,
-        }),
-        expect.objectContaining({
-          kind: 'select',
-          name: 'damage.flatOperator',
-          defaultValue: '+',
-        }),
-        expect.objectContaining({
-          kind: 'number',
-          name: 'damage.flatAmount',
-          digits: 3,
-          defaultValue: 0,
-        }),
-      ],
-    })
+    expect(fields).toEqual([
+      {
+        type: 'rollValue',
+        name: 'damage',
+        label: 'Roll',
+        width: 'auto',
+      },
+    ])
   })
 
-  it('always renders flat operator and amount with defaults', () => {
+  it('renders dice-only defaults without flat modifier controls', () => {
     render(
       <Form
         schema={schema}
@@ -70,8 +47,9 @@ describe('rollValueFields', () => {
       />,
     )
 
-    expect(screen.getByRole('combobox', { name: 'Flat sign' })).toHaveTextContent('+')
-    expect(screen.getByRole('spinbutton', { name: 'Flat modifier' })).toHaveValue(0)
+    expect(screen.getByLabelText('Number of dice')).toHaveValue(1)
+    expect(screen.queryByLabelText('Modifier sign')).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Add modifier' })).toBeInTheDocument()
   })
 
   it('renders existing dice and flat values on mount', () => {
@@ -90,9 +68,9 @@ describe('rollValueFields', () => {
       />,
     )
 
-    expect(screen.getByRole('spinbutton', { name: 'Dice count' })).toHaveValue(1)
-    expect(screen.getByRole('combobox', { name: 'Die faces' })).toHaveTextContent('10')
-    expect(screen.getByRole('combobox', { name: 'Flat sign' })).toHaveTextContent('+')
-    expect(screen.getByRole('spinbutton', { name: 'Flat modifier' })).toHaveValue(1)
+    expect(screen.getByLabelText('Number of dice')).toHaveValue(1)
+    expect(screen.getByLabelText('Die size')).toBeInTheDocument()
+    expect(screen.getByLabelText('Modifier sign')).toBeInTheDocument()
+    expect(screen.getByLabelText('Flat modifier value')).toHaveValue(1)
   })
 })

@@ -36,17 +36,17 @@ export function weaponDamageFields({
       kind: 'row',
       visibility: dealsDamageVisibility,
       fields: [
-        ...rollValueFieldConfigs({
-          namePrefix: rollPrefix,
-          label: 'Damage roll',
-          visibility: dealsDamageVisibility,
-          required: true,
-        }),
         damageTypeField({
           name: damageTypeName,
           ctx,
           scope: 'physical',
           label: 'Type',
+          visibility: dealsDamageVisibility,
+          required: true,
+        }),
+        ...rollValueFieldConfigs({
+          namePrefix: rollPrefix,
+          label: 'Damage roll',
           visibility: dealsDamageVisibility,
           required: true,
         }),

@@ -98,8 +98,6 @@ describe('rollToFormShape', () => {
     expect(normalizeRollFormValue(rollToFormShape(roll))).toEqual(roll)
     expect(rollToFormShape({ dice: { count: 1, faces: 8 as const } })).toEqual({
       dice: { count: 1, faces: 8 },
-      flatOperator: '+',
-      flatAmount: 0,
     })
     expect(rollToFormShape({ flat: -2 })).toEqual({
       flatOperator: '-',

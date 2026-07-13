@@ -65,6 +65,7 @@ export type FieldType =
   | 'inlineChooseCount'
   | 'inlineSentence'
   | 'levelRange'
+  | 'rollValue'
 
 /** Option for the `select`, `radio`, `radioCard`, `chips`, and `combobox` field types. */
 export interface FieldOption {
@@ -498,6 +499,17 @@ export interface DiceFormulaFieldConfig extends BaseFieldConfig {
   defaultValue?: DiceFormulaValue
 }
 
+export interface RollValueFieldConfig extends BaseFieldConfig {
+  type: 'rollValue'
+  faces?: readonly number[]
+  countMin?: number
+  countMax?: number
+  modifierMin?: number
+  modifierMax?: number
+  defaultCount?: number
+  defaultFaces?: number
+}
+
 /**
  * Value + unit composite bound to a nested object field (e.g. `{ amount, currency }`).
  * `valueKey` / `unitKey` name the object properties the control reads and writes.
@@ -572,6 +584,7 @@ export type FieldConfig =
   | ComboboxFieldConfig
   | EditableGridFieldConfig
   | DiceFormulaFieldConfig
+  | RollValueFieldConfig
   | InputSelectFieldConfig
   | InputUnitFieldConfig
 export interface RowConfig {
@@ -895,6 +908,7 @@ const TYPE_DEFAULTS: Record<FieldType, unknown> = {
   inlineChooseCount: undefined,
   inlineSentence: undefined,
   levelRange: undefined,
+  rollValue: undefined,
 }
 
 function assignInlineSentenceDefaults(
@@ -992,6 +1006,15 @@ function assignDependentFieldDefaults(field: FieldConfig, values: Record<string,
     inlineField.selectDefaultValue ?? (inlineField.selectRequired ? '' : undefined)
 }
 
+function assignRollValueDefaults(
+  field: RollValueFieldConfig,
+  values: Record<string, unknown>,
+): void {
+  const base = field.name
+  values[`${base}.dice.count`] = field.defaultCount ?? 1
+  values[`${base}.dice.faces`] = field.defaultFaces ?? 6
+}
+
 function assignFieldDefaultValues(field: FieldConfig, values: Record<string, unknown>): void {
   if (field.type === 'inlineSentence') {
     assignInlineSentenceDefaults(field, values)
@@ -1000,6 +1023,11 @@ function assignFieldDefaultValues(field: FieldConfig, values: Record<string, unk
 
   if (field.type === 'levelRange') {
     assignLevelRangeDefaults(field as LevelRangeFieldConfig, values)
+    return
+  }
+
+  if (field.type === 'rollValue') {
+    assignRollValueDefaults(field as RollValueFieldConfig, values)
     return
   }
 

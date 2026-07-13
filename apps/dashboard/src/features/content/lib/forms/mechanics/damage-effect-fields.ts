@@ -19,8 +19,8 @@ export function damageEffectFieldConfigs({
   const damageTypePath = namePrefix ? `${namePrefix}.damageType` : 'damageType'
 
   return [
-    ...rollValueFieldConfigs({ namePrefix: rollPath, label: 'Damage roll', required: true }),
     damageTypeField({ name: damageTypePath, ctx, required: true }),
+    ...rollValueFieldConfigs({ namePrefix: rollPath, label: 'Damage roll', required: true }),
     ...(modifierField ?? []),
   ]
 }
