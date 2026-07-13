@@ -490,6 +490,129 @@ describe('EquipmentStep', () => {
     expect(screen.getByRole('heading', { name: /Customize Starting Gold/i })).toBeInTheDocument()
   })
 
+  describe('package switch resolution', () => {
+    function goldDraftWithRations(quantity: number) {
+      const rationsId = equipmentStepRationsFixture.id
+
+      return {
+        ...createEmptyCharacterBuilderDraft(),
+        class: { classId: equipmentStepBardClassFixture.id, level: 1 as const },
+        choiceSelections: {
+          [startingEquipmentChoiceSetId(equipmentStepBardClassFixture.id)]: ['gold'],
+        },
+        equipment: {
+          mode: 'gold' as const,
+          purchases: [
+            {
+              id: 'purchase-rations',
+              equipmentId: rationsId,
+              quantity,
+              sourceMode: 'startingGold' as const,
+              origin: 'picker' as const,
+            },
+          ],
+          removedPackageItemKeys: [],
+          customized: false,
+        },
+      }
+    }
+
+    async function openPackageSwitchToStandard(user: ReturnType<typeof userEvent.setup>) {
+      await user.click(screen.getByRole('button', { name: EQUIPMENT_CHANGE_PACKAGE_LABEL }))
+      await user.click(screen.getByRole('radio', { name: /Standard Equipment/i }))
+    }
+
+    it('opens the resolution modal when gold purchases exceed the target allowance', async () => {
+      const user = userEvent.setup()
+      const { onDraftChange } = renderEquipmentStep(goldDraftWithRations(40))
+
+      await openPackageSwitchToStandard(user)
+
+      expect(
+        screen.getByRole('heading', { name: 'Resolve purchases before switching' }),
+      ).toBeInTheDocument()
+      expect(onDraftChange).not.toHaveBeenCalled()
+    })
+
+    it('does not commit draft changes from the modal until confirmed', async () => {
+      const user = userEvent.setup()
+      const { onDraftChange } = renderEquipmentStep(goldDraftWithRations(40))
+
+      await openPackageSwitchToStandard(user)
+      await user.click(screen.getByRole('button', { name: 'Decrease Rations quantity' }))
+      await user.click(screen.getByRole('button', { name: 'Cancel' }))
+
+      expect(onDraftChange).not.toHaveBeenCalled()
+      expect(
+        screen.queryByRole('heading', { name: 'Resolve purchases before switching' }),
+      ).not.toBeInTheDocument()
+    })
+
+    it('shows the blocked modal when non-editable purchases exceed the allowance', async () => {
+      const user = userEvent.setup()
+      const draft = {
+        ...createEmptyCharacterBuilderDraft(),
+        class: { classId: equipmentStepBardClassFixture.id, level: 1 as const },
+        choiceSelections: {
+          [startingEquipmentChoiceSetId(equipmentStepBardClassFixture.id)]: ['gold'],
+        },
+        equipment: {
+          mode: 'gold' as const,
+          purchases: [
+            {
+              id: 'purchase-breastplate',
+              equipmentId: equipmentStepBreastplateFixture.id,
+              quantity: 1,
+              sourceMode: 'manual' as const,
+              origin: 'picker' as const,
+            },
+          ],
+          removedPackageItemKeys: [],
+          customized: false,
+        },
+      }
+      const { onDraftChange } = renderEquipmentStep(draft)
+
+      await openPackageSwitchToStandard(user)
+
+      expect(screen.getByRole('heading', { name: 'Cannot switch packages' })).toBeInTheDocument()
+      expect(screen.queryByRole('button', { name: 'Switch package' })).not.toBeInTheDocument()
+      expect(
+        screen.queryByRole('button', { name: 'Decrease Breastplate quantity' }),
+      ).not.toBeInTheDocument()
+      expect(onDraftChange).not.toHaveBeenCalled()
+    })
+
+    it('commits the package switch when draft purchases fit the target allowance', async () => {
+      const user = userEvent.setup()
+      const rationsId = equipmentStepRationsFixture.id
+      const { onDraftChange } = renderEquipmentStep(goldDraftWithRations(40))
+
+      await openPackageSwitchToStandard(user)
+      await user.click(screen.getByRole('button', { name: 'Decrease Rations quantity' }))
+      await user.click(screen.getByRole('button', { name: 'Decrease Rations quantity' }))
+      await user.click(screen.getByRole('button', { name: 'Switch package' }))
+
+      expect(onDraftChange).toHaveBeenCalledWith(
+        expect.objectContaining({
+          choiceSelections: expect.objectContaining({
+            [startingEquipmentChoiceSetId(equipmentStepBardClassFixture.id)]: ['standard'],
+          }),
+          equipment: expect.objectContaining({
+            mode: 'package',
+            purchases: [
+              expect.objectContaining({
+                equipmentId: rationsId,
+                quantity: 38,
+                sourceMode: 'startingGold',
+              }),
+            ],
+          }),
+        }),
+      )
+    })
+  })
+
   it('has no axe accessibility violations', async () => {
     const { container } = renderEquipmentStep()
 

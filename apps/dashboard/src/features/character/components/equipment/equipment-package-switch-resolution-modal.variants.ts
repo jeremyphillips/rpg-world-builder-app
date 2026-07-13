@@ -1,5 +1,9 @@
 import { cva } from 'class-variance-authority'
 
+/** Modal title — 24px (`heading-style-sheet-title`). */
+export const equipmentPackageSwitchResolutionModalHeadlineClasses =
+  'outline-none heading-style-sheet-title'
+
 export const equipmentPackageSwitchResolutionModalBodyClasses = 'flex flex-col gap-4'
 
 export const equipmentPackageSwitchResolutionModalInventoryScrollClasses =

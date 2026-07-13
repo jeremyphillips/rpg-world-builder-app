@@ -10,6 +10,7 @@ import {
   buildEquipmentSkipPatch,
 } from '../../lib/equipment-step.lib'
 import { showsBuilderStepReviewMessage } from '../../lib/builder-step-readiness.lib'
+import { EquipmentPackageSwitchResolutionModal } from '../equipment/equipment-package-switch-resolution-modal.client'
 import { EquipmentPickerDrawer } from '../equipment/equipment-picker-drawer.client'
 import { StartingEquipmentOptionSection } from '../equipment/starting-equipment-option-section.client'
 import { equipmentStepSwitchConfirmHeadlineClasses } from './equipment-step-interactive.variants'
@@ -49,6 +50,12 @@ export function EquipmentStepInteractive({
     ownedPurchaseQuantities,
     pendingSelection,
     setPendingSelection,
+    pendingPackageSwitch,
+    packageSwitchEvaluation,
+    dismissPackageSwitch,
+    handleDraftPackageSwitchQuantity,
+    handleCommitPackageSwitch,
+    isPackageSwitchCommitting,
     pickerOpen,
     setPickerOpen,
     requestSelection,
@@ -152,6 +159,23 @@ export function EquipmentStepInteractive({
         }}
         onCancel={() => setPendingSelection(null)}
       />
+
+      {pendingPackageSwitch && packageSwitchEvaluation ? (
+        <EquipmentPackageSwitchResolutionModal
+          open
+          catalogIndex={catalogIndex}
+          evaluation={packageSwitchEvaluation}
+          draftQuantitiesByPurchaseId={pendingPackageSwitch.draftQuantitiesByPurchaseId}
+          commitErrorReason={pendingPackageSwitch.commitErrorReason}
+          staleNotice={pendingPackageSwitch.staleNotice}
+          isCommitting={isPackageSwitchCommitting}
+          onOpenChange={(open) => {
+            if (!open) dismissPackageSwitch()
+          }}
+          onDraftQuantityChange={handleDraftPackageSwitchQuantity}
+          onConfirm={handleCommitPackageSwitch}
+        />
+      ) : null}
     </>
   )
 }

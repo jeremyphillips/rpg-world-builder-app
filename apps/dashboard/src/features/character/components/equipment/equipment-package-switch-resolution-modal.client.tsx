@@ -20,7 +20,10 @@ import {
 } from './equipment-package-switch-resolution.lib'
 import { EquipmentPackageSwitchResolutionModalBody } from './equipment-package-switch-resolution-modal-body.client'
 import { EquipmentPackageSwitchResolutionModalFooter } from './equipment-package-switch-resolution-modal-footer.client'
-import { equipmentPackageSwitchResolutionModalBodyClasses } from './equipment-package-switch-resolution-modal.variants'
+import {
+  equipmentPackageSwitchResolutionModalBodyClasses,
+  equipmentPackageSwitchResolutionModalHeadlineClasses,
+} from './equipment-package-switch-resolution-modal.variants'
 
 export type EquipmentPackageSwitchResolutionModalProps = {
   open: boolean
@@ -101,7 +104,7 @@ export function EquipmentPackageSwitchResolutionModal({
           tabIndex={-1}
           headline={modalState.title}
           description={modalState.description}
-          headlineClassName="outline-none"
+          headlineClassName={equipmentPackageSwitchResolutionModalHeadlineClasses}
         />
         <Modal.Body className={equipmentPackageSwitchResolutionModalBodyClasses}>
           <EquipmentPackageSwitchResolutionModalBody

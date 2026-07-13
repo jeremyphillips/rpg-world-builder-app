@@ -115,18 +115,62 @@ Remaining after purchase                        …
 - Header rail still shows quick **Add another** for owned stackables; bulk
   quantity is chosen in the expanded body.
 
+## Package switch resolution
+
+When the player changes starting-equipment options, retained `startingGold`
+purchases may exceed the **target option's wealth allowance**. The Equipment step
+opens a transactional resolution modal instead of applying the switch immediately.
+
+### Guard order
+
+1. Same option selected → collapse the chooser (unchanged).
+2. `evaluateEquipmentPackageSwitch` reports a conflict → open the resolution modal;
+   committed draft is unchanged until confirm.
+3. Else if `equipment.customized` → existing customized switch confirm dialog.
+4. Else → apply the selection immediately.
+
+Resolution **supersedes** the customized confirm: the player is already explicitly
+resolving inventory to switch.
+
+### Draft model
+
+Ephemeral state in `useEquipmentStep` (`pendingPackageSwitch`):
+
+- `draftQuantitiesByPurchaseId` — local qty map for editable purchases only.
+- `committedInventorySnapshot` — fingerprint for staleness while the modal is open.
+
+Qty `0` means **staged for removal** (row stays visible, restorable via increment).
+Trash sets draft qty to `0`; Cancel / Escape discards the draft with no
+`onDraftChange`.
+
+### Modal modes
+
+| `evaluation.status`                 | UI                                                                                                                    |
+| ----------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| `resolvable`                        | Budget summary + editable purchased inventory (`showGroupHeadings={false}`, `allowZeroQuantity`) + **Switch package** |
+| `blocked` (`nonEditableOverBudget`) | Cost breakdown only — no steppers; **Cancel** / close only                                                            |
+
+Confirm calls `buildEquipmentPackageSwitchPatch` with the snapshot. Stale
+committed inventory rejects the patch, shows an inline alert, and rebuilds draft
+quantities from the live draft.
+
+`equipment.customized` is **preserved** on package switch (required reductions are
+conflict resolution, not a new customization signal).
+
 ## Key modules
 
-| Area                  | Path                                                                    |
-| --------------------- | ----------------------------------------------------------------------- |
-| Layout VM             | `components/equipment/equipment-inventory-summary.lib.ts`               |
-| Package card + editor | `components/equipment/equipment-starting-package-*.client.tsx`          |
-| Purchased rows        | `components/equipment/equipment-purchased-inventory-section.client.tsx` |
-| Purchase drawer rows  | `components/equipment/equipment-picker-purchase-rows.client.tsx`        |
-| Purchase VM           | `components/equipment/equipment-picker-purchase.lib.ts`                 |
-| NumberStepper         | `packages/ui/src/components/ui/number-stepper.client.tsx`               |
-| Step wiring           | `components/steps/use-equipment-step.client.ts`                         |
-| Conversion contracts  | `packages/contracts/.../starting-package-conversion.ts`                 |
+| Area                     | Path                                                                    |
+| ------------------------ | ----------------------------------------------------------------------- |
+| Layout VM                | `components/equipment/equipment-inventory-summary.lib.ts`               |
+| Package card + editor    | `components/equipment/equipment-starting-package-*.client.tsx`          |
+| Purchased rows           | `components/equipment/equipment-purchased-inventory-section.client.tsx` |
+| Purchase drawer rows     | `components/equipment/equipment-picker-purchase-rows.client.tsx`        |
+| Purchase VM              | `components/equipment/equipment-picker-purchase.lib.ts`                 |
+| NumberStepper            | `packages/ui/src/components/ui/number-stepper.client.tsx`               |
+| Step wiring              | `components/steps/use-equipment-step.client.ts`                         |
+| Package-switch modal     | `components/equipment/equipment-package-switch-resolution-modal.*`      |
+| Conversion contracts     | `packages/contracts/.../starting-package-conversion.ts`                 |
+| Package-switch contracts | `packages/contracts/.../equipment-package-switch.ts`                    |
 
 ## Related docs
 

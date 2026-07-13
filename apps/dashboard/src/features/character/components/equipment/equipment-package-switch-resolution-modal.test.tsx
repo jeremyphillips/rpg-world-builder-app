@@ -29,6 +29,27 @@ const rope = equipmentSchema.parse({
   gearKind: 'general',
 })
 
+const dagger = equipmentSchema.parse({
+  id: `${RULESET}:dagger`,
+  slug: 'dagger',
+  rulesetId: RULESET,
+  source: 'system',
+  campaignId: null,
+  createdAt: '2026-01-01T00:00:00.000Z',
+  updatedAt: '2026-01-01T00:00:00.000Z',
+  name: 'Dagger',
+  description: '',
+  cost: { amount: 2, currency: 'gp' },
+  weight: { value: 1, unit: 'lb' },
+  kind: 'weapon',
+  category: 'simple',
+  mode: 'melee',
+  damage: { kind: 'dice', count: 1, faces: 4 },
+  damageType: 'piercing',
+  properties: [],
+  mastery: 'nick',
+})
+
 const storedDruid: ClassStored = {
   id: `${RULESET}:druid`,
   slug: 'druid',
@@ -72,7 +93,7 @@ const catalogIndex = indexCharacterBuildCatalog({
   species: [],
   classes: [storedDruid],
   spells: [],
-  equipment: [rope],
+  equipment: [rope, dagger],
   skillProficiencies: [],
   languages: [],
 })
@@ -140,5 +161,45 @@ describe('EquipmentPackageSwitchResolutionModal', () => {
     )
 
     await expectNoAxeViolations(container)
+  })
+
+  it('renders the blocked package-switch dialog without inventory controls', () => {
+    const blockedEvaluation = evaluateEquipmentPackageSwitch({
+      draft: {
+        ...goldDraft,
+        equipment: {
+          ...goldDraft.equipment!,
+          purchases: [
+            {
+              id: 'purchase-dagger',
+              equipmentId: dagger.id,
+              quantity: 10,
+              sourceMode: 'manual' as const,
+              origin: 'picker' as const,
+            },
+          ],
+        },
+      },
+      catalogIndex,
+      targetOptionId: 'standard',
+    })!
+
+    render(
+      <EquipmentPackageSwitchResolutionModal
+        open
+        catalogIndex={catalogIndex}
+        evaluation={blockedEvaluation}
+        draftQuantitiesByPurchaseId={{}}
+        onOpenChange={vi.fn()}
+        onDraftQuantityChange={vi.fn()}
+        onConfirm={vi.fn()}
+      />,
+    )
+
+    expect(screen.getByRole('heading', { name: 'Cannot switch packages' })).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Switch package' })).not.toBeInTheDocument()
+    expect(
+      screen.queryByRole('button', { name: 'Decrease Dagger quantity' }),
+    ).not.toBeInTheDocument()
   })
 })
