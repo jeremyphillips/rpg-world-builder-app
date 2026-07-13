@@ -10,12 +10,12 @@ import {
   type StartingPackageInventoryGroup,
 } from '../../lib/equipment-step.lib'
 import { EquipmentInventoryRowItem } from './equipment-inventory-row.client'
+import { equipmentInventoryRowListClasses } from './equipment-inventory-summary.variants'
 import {
   equipmentStartingPackageCardBodyClasses,
   equipmentStartingPackageCardClasses,
   equipmentStartingPackageCategoryClasses,
   equipmentStartingPackageFooterClasses,
-  equipmentStartingPackageRowListClasses,
 } from './equipment-starting-package.variants'
 
 export type EquipmentStartingPackageCardProps = {
@@ -50,7 +50,7 @@ export function EquipmentStartingPackageInventory({
         {packageGroup.categoryGroups.map((category) => (
           <div key={category.groupLabel} className={equipmentStartingPackageCategoryClasses}>
             <Eyebrow size="sm">{category.groupLabel}</Eyebrow>
-            <ul className={equipmentStartingPackageRowListClasses}>
+            <ul className={equipmentInventoryRowListClasses}>
               {category.rows.map((row: EquipmentInventoryRow) => (
                 <li
                   key={

@@ -35,6 +35,9 @@ export const equipmentPurchasedInventoryCategoryListClasses = 'divide-y divide-b
 
 export const equipmentPurchasedInventoryCategoryClasses = 'space-y-1 py-3 first:pt-0 last:pb-0'
 
+/** Vertical spacing between inventory row cards in a category list. */
+export const equipmentInventoryRowListClasses = 'flex flex-col gap-2'
+
 export const equipmentInventoryRowClasses = 'py-1'
 
 export const equipmentInventoryRowQuantityClasses = 'flex items-center gap-1.5'

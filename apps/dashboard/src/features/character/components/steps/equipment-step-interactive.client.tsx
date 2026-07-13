@@ -12,6 +12,7 @@ import {
 import { showsBuilderStepReviewMessage } from '../../lib/builder-step-readiness.lib'
 import { EquipmentPickerDrawer } from '../equipment/equipment-picker-drawer.client'
 import { StartingEquipmentOptionSection } from '../equipment/starting-equipment-option-section.client'
+import { equipmentStepSwitchConfirmHeadlineClasses } from './equipment-step-interactive.variants'
 import {
   EquipmentStepFallback,
   EquipmentStepInventorySection,
@@ -140,6 +141,7 @@ export function EquipmentStepInteractive({
           if (!open) setPendingSelection(null)
         }}
         headline={EQUIPMENT_STEP_SWITCH_CONFIRM_HEADLINE}
+        headlineClassName={equipmentStepSwitchConfirmHeadlineClasses}
         description={EQUIPMENT_STEP_SWITCH_CONFIRM_DESCRIPTION}
         confirmLabel="Switch equipment"
         cancelLabel="Keep current selection"

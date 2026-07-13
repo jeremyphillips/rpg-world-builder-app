@@ -19,6 +19,8 @@ import {
   equipmentPackageConversionEditorClasses,
   equipmentPackageConversionEditorEmbeddedClasses,
   equipmentPackageConversionEditorHeaderClasses,
+  equipmentPackageConversionEditorHeadingClasses,
+  equipmentPackageConversionEditorDescriptionClasses,
   equipmentPackageConversionEditorListClasses,
   equipmentPackageConversionStatusClasses,
 } from './equipment-starting-package.variants'
@@ -100,11 +102,16 @@ export function EquipmentPackageConversionEditor({
     >
       <header className={equipmentPackageConversionEditorHeaderClasses}>
         <div ref={headingRef} tabIndex={-1} className="outline-none">
-          <Heading variant="subsection" as="h4" id={`${resolvedEditorId}-heading`}>
+          <Heading
+            variant="subsection"
+            as="h4"
+            id={`${resolvedEditorId}-heading`}
+            className={equipmentPackageConversionEditorHeadingClasses}
+          >
             Customize {preview.goldOptionLabel}
           </Heading>
         </div>
-        <Text as="p" variant="muted">
+        <Text as="p" className={equipmentPackageConversionEditorDescriptionClasses}>
           Choose which package items to keep as starting-gold purchases.
         </Text>
       </header>
