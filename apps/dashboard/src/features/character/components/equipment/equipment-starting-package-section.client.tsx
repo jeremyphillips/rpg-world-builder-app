@@ -7,13 +7,10 @@ import type {
   CharacterBuilderDraft,
   StartingPackageConversionPreview,
 } from '@rpg/contracts'
-import { Heading, Text } from '@rpg/ui'
+import { Text } from '@rpg/ui'
 
 import type { StartingPackageInventoryGroup } from '../../lib/equipment-step.lib'
-import {
-  equipmentInventoryColumnClasses,
-  equipmentInventoryColumnHeaderClasses,
-} from './equipment-inventory-summary.variants'
+import { EquipmentInventoryColumn } from './equipment-inventory-column.client'
 import { EquipmentPackageConversionEditor } from './equipment-package-conversion-editor.client'
 import {
   EquipmentStartingPackageCard,
@@ -53,12 +50,9 @@ export function EquipmentStartingPackageSection({
   const customizeDisabled = packageGroup.customize.status === 'disabled'
 
   return (
-    <div className={equipmentInventoryColumnClasses}>
-      <div className={equipmentInventoryColumnHeaderClasses}>
-        <Heading variant="subsection" as="h3">
-          {packageGroup.optionLabel}
-        </Heading>
-
+    <EquipmentInventoryColumn
+      title={packageGroup.optionLabel}
+      toolbar={
         <EquipmentStartingPackageToolbar
           customizeDisabled={customizeDisabled}
           conversionEditorOpen={conversionEditorOpen}
@@ -66,8 +60,8 @@ export function EquipmentStartingPackageSection({
           onCustomize={onCustomize}
           onChangeEquipmentOption={onChangeEquipmentOption}
         />
-      </div>
-
+      }
+    >
       {packageGroup.customize.status === 'disabled' ? (
         <Text as="p" className={equipmentStartingPackageCustomizeReasonClasses}>
           {packageGroup.customize.reason}
@@ -92,6 +86,6 @@ export function EquipmentStartingPackageSection({
           <EquipmentStartingPackageInventory packageGroup={packageGroup} />
         )}
       </EquipmentStartingPackageCard>
-    </div>
+    </EquipmentInventoryColumn>
   )
 }

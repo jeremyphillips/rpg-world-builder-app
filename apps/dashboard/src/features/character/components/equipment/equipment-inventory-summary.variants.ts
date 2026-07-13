@@ -10,6 +10,9 @@ export const equipmentInventoryColumnHeaderClasses = 'space-y-1'
 export const equipmentInventoryColumnTitleRowClasses =
   'flex flex-wrap items-center justify-between gap-2'
 
+/** Inventory column title — 19px (`heading-style-subsection`). */
+export const EQUIPMENT_INVENTORY_COLUMN_TITLE_VARIANT = 'subsection' as const
+
 /** Matches toolbar row height so purchased column boxes align in the two-column grid. */
 export const equipmentInventoryColumnToolbarClasses = 'flex min-h-5 flex-wrap items-center gap-x-1'
 
@@ -44,7 +47,7 @@ export const equipmentInventoryRowDetailLineClasses = 'mt-0.5'
 
 export const equipmentInventoryRowPriceLineClasses = 'min-w-0 text-muted-foreground opacity-80'
 
-export const equipmentInventoryRowNameClasses = 'font-body-emphasis text-sm text-foreground'
+export const equipmentInventoryRowNameClasses = 'font-body-emphasis text-base text-foreground'
 
 export const equipmentInventoryRowQtyLabelClasses = 'shrink-0 text-xs tabular-nums text-foreground'
 

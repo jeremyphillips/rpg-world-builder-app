@@ -25,6 +25,8 @@ type CatalogPickerSheetBaseProps<TItem> = {
   onOpenChange: (open: boolean) => void
   title: string
   description?: string
+  /** Merged onto the sheet headline — defaults to card title (19px). */
+  headlineClassName?: string
   items: readonly TItem[]
   getItemKey: (item: TItem) => string
   getSearchText: (item: TItem) => string

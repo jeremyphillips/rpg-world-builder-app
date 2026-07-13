@@ -1,6 +1,6 @@
 'use client'
 
-import { Button, Heading } from '@rpg/ui'
+import { Button } from '@rpg/ui'
 
 import {
   EQUIPMENT_PURCHASED_INVENTORY_SECTION_LABEL,
@@ -8,15 +8,10 @@ import {
   type EquipmentInventoryQuantityTarget,
   type EquipmentInventoryRemoveTarget,
 } from '../../lib/equipment-step.lib'
+import { EquipmentInventoryColumn } from './equipment-inventory-column.client'
 import { EquipmentPurchasedInventorySection } from './equipment-purchased-inventory-section.client'
 import type { PurchasedCategoryGroup } from './equipment-inventory-summary.lib'
-import {
-  equipmentInventoryColumnClasses,
-  equipmentInventoryColumnHeaderClasses,
-  equipmentInventoryColumnTitleRowClasses,
-  equipmentInventoryColumnToolbarSpacerClasses,
-  equipmentPurchasedInventoryPanelClasses,
-} from './equipment-inventory-summary.variants'
+import { equipmentPurchasedInventoryPanelClasses } from './equipment-inventory-summary.variants'
 
 export type EquipmentPurchasedInventoryColumnProps = {
   purchased: PurchasedCategoryGroup[]
@@ -36,22 +31,17 @@ export function EquipmentPurchasedInventoryColumn({
   onSetPurchaseQuantity,
 }: EquipmentPurchasedInventoryColumnProps) {
   return (
-    <section className={equipmentInventoryColumnClasses}>
-      <div className={equipmentInventoryColumnHeaderClasses}>
-        <div className={equipmentInventoryColumnTitleRowClasses}>
-          <Heading variant="subsection" as="h3">
-            {EQUIPMENT_PURCHASED_INVENTORY_SECTION_LABEL}
-          </Heading>
-          {showBrowseEquipment && onOpenPicker ? (
-            <Button type="button" size="sm" onClick={onOpenPicker}>
-              {EQUIPMENT_STEP_BROWSE_LABEL}
-            </Button>
-          ) : null}
-        </div>
-        {isPackageMode ? (
-          <div className={equipmentInventoryColumnToolbarSpacerClasses} aria-hidden />
-        ) : null}
-      </div>
+    <EquipmentInventoryColumn
+      title={EQUIPMENT_PURCHASED_INVENTORY_SECTION_LABEL}
+      titleActions={
+        showBrowseEquipment && onOpenPicker ? (
+          <Button type="button" size="sm" onClick={onOpenPicker}>
+            {EQUIPMENT_STEP_BROWSE_LABEL}
+          </Button>
+        ) : undefined
+      }
+      reserveToolbarRow={isPackageMode}
+    >
       <div className={equipmentPurchasedInventoryPanelClasses}>
         <EquipmentPurchasedInventorySection
           purchased={purchased}
@@ -59,6 +49,6 @@ export function EquipmentPurchasedInventoryColumn({
           onSetPurchaseQuantity={onSetPurchaseQuantity}
         />
       </div>
-    </section>
+    </EquipmentInventoryColumn>
   )
 }

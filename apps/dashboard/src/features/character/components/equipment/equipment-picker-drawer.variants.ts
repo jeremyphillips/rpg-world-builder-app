@@ -46,6 +46,8 @@ export const equipmentPickerHeaderKindClasses = 'text-xs font-normal text-muted-
 
 export const equipmentPickerDisabledRowClasses = 'opacity-60'
 
+export const equipmentPickerHeadlineClasses = 'heading-style-sheet-title'
+
 export const equipmentPickerSheetContentClasses = 'bg-background'
 
 /** Collapsible row shell — drop default bottom pad; expanded body owns vertical rhythm. */

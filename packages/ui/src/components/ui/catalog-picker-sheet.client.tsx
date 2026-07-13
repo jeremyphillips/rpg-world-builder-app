@@ -70,6 +70,7 @@ export function CatalogPickerSheet<TItem>({
   onOpenChange,
   title,
   description,
+  headlineClassName,
   items,
   getItemKey,
   getSearchText,
@@ -157,7 +158,11 @@ export function CatalogPickerSheet<TItem>({
       <Sheet.Content
         className={catalogPickerSheetContentVariants({ className: sheetContentClassName })}
       >
-        <Sheet.Header headline={title} description={description}>
+        <Sheet.Header
+          headline={title}
+          description={description}
+          headlineClassName={headlineClassName}
+        >
           {headerExtra ? <div className="mt-4">{headerExtra}</div> : null}
         </Sheet.Header>
 

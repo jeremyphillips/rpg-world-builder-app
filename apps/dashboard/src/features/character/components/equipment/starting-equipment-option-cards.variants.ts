@@ -10,3 +10,9 @@ export const startingEquipmentOptionCardReasonsClasses = 'space-y-1 px-4 pb-4'
 
 export const startingEquipmentOptionCardNestedFieldsClasses =
   'space-y-4 border-t border-border px-4 pb-4 pt-4'
+
+export const startingEquipmentOptionCardRadioItemClasses =
+  'border-0 bg-transparent p-4 shadow-none sm:p-4 data-[state=checked]:border-0 data-[state=checked]:bg-transparent data-[state=checked]:ring-0'
+
+/** Package option title — 16px (`text-base`). */
+export const startingEquipmentOptionCardTitleClasses = 'text-base font-bold'

@@ -32,9 +32,11 @@ import {
 import {
   startingEquipmentOptionCardListClasses,
   startingEquipmentOptionCardNestedFieldsClasses,
+  startingEquipmentOptionCardRadioItemClasses,
   startingEquipmentOptionCardReasonsClasses,
   startingEquipmentOptionCardSelectedShellClasses,
   startingEquipmentOptionCardShellClasses,
+  startingEquipmentOptionCardTitleClasses,
 } from './starting-equipment-option-cards.variants'
 
 export type StartingEquipmentOptionCardsProps = {
@@ -212,7 +214,8 @@ function PackageOptionCard({
         label={summary.label}
         description={summary.description}
         meta={meta}
-        className="border-0 bg-transparent p-4 shadow-none sm:p-4 data-[state=checked]:border-0 data-[state=checked]:bg-transparent data-[state=checked]:ring-0"
+        className={startingEquipmentOptionCardRadioItemClasses}
+        titleClassName={startingEquipmentOptionCardTitleClasses}
         onClick={() => {
           if (isPackageChooserExpanded && isSelected) onCollapseChooser()
         }}
@@ -323,7 +326,8 @@ function GoldOptionCard({
         label={summary.label}
         description={summary.description ?? 'Buy your own gear with starting gold.'}
         meta={wealth ? [wealth] : undefined}
-        className="border-0 bg-transparent p-4 shadow-none sm:p-4 data-[state=checked]:border-0 data-[state=checked]:bg-transparent data-[state=checked]:ring-0"
+        className={startingEquipmentOptionCardRadioItemClasses}
+        titleClassName={startingEquipmentOptionCardTitleClasses}
         onClick={() => {
           if (isPackageChooserExpanded && isSelected) onCollapseChooser()
         }}

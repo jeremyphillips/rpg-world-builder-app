@@ -76,6 +76,7 @@ import {
   equipmentPickerCategoryLabelClasses,
   equipmentPickerFiltersMainClasses,
   equipmentPickerFiltersRowClasses,
+  equipmentPickerHeadlineClasses,
   equipmentPickerRowBodyClasses,
   equipmentPickerRowShellClasses,
   equipmentPickerSheetContentClasses,
@@ -422,6 +423,7 @@ export function EquipmentPickerDrawer({
       onOpenChange={onOpenChange}
       title="Add equipment"
       description="Search the catalog and add items to your loadout."
+      headlineClassName={equipmentPickerHeadlineClasses}
       items={filteredItems}
       getItemKey={(item) => item.equipment.id}
       getItemToolbarLabel={(item) => item.equipment.name}
