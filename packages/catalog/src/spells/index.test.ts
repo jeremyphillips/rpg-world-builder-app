@@ -12,8 +12,8 @@ const SPELL_OPTION_HEADROOM = 2
 describe('SRD 5.2.1 spell seed', () => {
   const spells = loadSeedSpells(RULESET)
 
-  it('ships 67 curated spells (validated against the schema at load)', () => {
-    expect(spells).toHaveLength(67)
+  it('ships 90 curated spells (validated against the schema at load)', () => {
+    expect(spells).toHaveLength(90)
   })
 
   it('uses deterministic system ids and null campaignId', () => {
@@ -28,7 +28,7 @@ describe('SRD 5.2.1 spell seed', () => {
   it('has globally unique slugs', () => {
     const slugs = spells.map((s) => s.slug)
     expect(new Set(slugs).size).toBe(slugs.length)
-    expect(seedSpellSlugs(RULESET).size).toBe(67)
+    expect(seedSpellSlugs(RULESET).size).toBe(90)
   })
 
   it('stores each spell in the level file matching its level field', () => {

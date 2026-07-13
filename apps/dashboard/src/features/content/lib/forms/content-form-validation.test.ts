@@ -248,6 +248,7 @@ function invalidValueFor(routeKey: string): unknown {
         range: { kind: 'self' },
         duration: { kind: 'instant' },
         components: {},
+        areaOfEffect: { shape: 'none' },
       }
     case 'feats':
       return {

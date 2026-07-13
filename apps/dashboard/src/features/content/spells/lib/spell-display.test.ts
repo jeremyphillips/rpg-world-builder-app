@@ -10,11 +10,7 @@ import {
 } from '@/features/homebrew'
 import { pickSpell } from '../../lib/fixtures/pick'
 import { DETECT_MAGIC, FIRE_BOLT } from '../fixtures'
-import {
-  buildSpellDetailViewModel,
-  SPELL_SECTION_LABELS,
-  SPELL_STAT_LABELS,
-} from './spell-display'
+import { buildSpellDetailViewModel, SPELL_SECTION_LABELS, SPELL_STAT_LABELS } from './spell-display'
 import {
   formatCastingTime,
   formatSpellComponents,
@@ -130,6 +126,22 @@ describe('buildSpellDetailViewModel', () => {
     expect(statRows.find((r) => r.label === SPELL_STAT_LABELS.delivery)?.value).toBe(
       'Ranged spell attack',
     )
+  })
+
+  it('includes area of effect when present', () => {
+    const spell = {
+      ...FIRE_BOLT,
+      areaOfEffect: { shape: 'sphere' as const, radius: { value: 20, unit: 'ft' as const } },
+    }
+    const { statRows } = buildSpellDetailViewModel(spell, vocabulary)
+    expect(statRows.find((r) => r.label === SPELL_STAT_LABELS.area)?.value).toBe(
+      '20-ft-radius sphere',
+    )
+  })
+
+  it('omits area row when areaOfEffect is absent', () => {
+    const { statRows } = buildSpellDetailViewModel(FIRE_BOLT, vocabulary)
+    expect(statRows.some((row) => row.label === SPELL_STAT_LABELS.area)).toBe(false)
   })
 
   it('omits classes row from stat rows', () => {

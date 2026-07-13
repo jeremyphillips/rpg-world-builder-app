@@ -1,5 +1,6 @@
 import { z } from 'zod'
 import {
+  AREA_GEOMETRY_SHAPES,
   castingTimeUnitSchema,
   damageTypeIdSchema,
   durationUnitSchema,
@@ -24,6 +25,7 @@ import {
   identityFields,
   SPELL_RANGE_DISTANCE_INLINE_COUNT_DIGITS,
 } from '../../lib/forms/fields/content-identity-form-fields'
+import { distanceInputSelectField } from '../../lib/forms/fields/content-speed-form-fields'
 import type { ContentFormCtx } from '../../lib/forms/content-form-registry'
 import {
   castingTimeUnitOptions,
@@ -32,6 +34,7 @@ import {
   durationKindOptions,
   durationUnitOptions,
   functionTagOptions,
+  areaGeometryShapeOptions,
   rangeKindOptions,
   roleTagOptions,
   SPELL_DURATION_KINDS,
@@ -95,6 +98,18 @@ function visibleWhenLeveledSpell(): FieldVisibility {
   }
 }
 
+function visibleWhenAreaShape(shapes: (typeof AREA_GEOMETRY_SHAPES)[number][]): FieldVisibility {
+  return {
+    dependsOn: ['areaOfEffect.shape'],
+    visibleWhen: (v) => {
+      const shape = v['areaOfEffect.shape']
+      return (
+        typeof shape === 'string' && shapes.includes(shape as (typeof AREA_GEOMETRY_SHAPES)[number])
+      )
+    },
+  }
+}
+
 export const spellFormSchema = z
   .object({
     name: z.string().min(1),
@@ -143,6 +158,40 @@ export const spellFormSchema = z
           description: z.string().optional(),
         })
         .optional(),
+    }),
+    areaOfEffect: z.object({
+      shape: z.string(),
+      radius: z
+        .object({
+          value: z.coerce.number(),
+          unit: z.literal('ft').optional(),
+        })
+        .optional(),
+      length: z
+        .object({
+          value: z.coerce.number(),
+          unit: z.literal('ft').optional(),
+        })
+        .optional(),
+      width: z
+        .object({
+          value: z.coerce.number(),
+          unit: z.literal('ft').optional(),
+        })
+        .optional(),
+      size: z
+        .object({
+          value: z.coerce.number(),
+          unit: z.literal('ft').optional(),
+        })
+        .optional(),
+      height: z
+        .object({
+          value: z.coerce.number(),
+          unit: z.literal('ft').optional(),
+        })
+        .optional(),
+      description: z.string().optional(),
     }),
     deliveryMethod: z.string().optional(),
   })
@@ -399,6 +448,62 @@ function castingFields(): FormItem[] {
           label: 'Material description',
           hint: 'Describe the material component.',
           visibility: visibleWhenMaterialEnabled(),
+          required: true,
+        },
+      ],
+    },
+    {
+      kind: 'group',
+      legend: 'Area of effect',
+      fields: [
+        {
+          type: 'select',
+          name: 'areaOfEffect.shape',
+          label: 'Shape',
+          options: areaGeometryShapeOptions,
+          hint: 'Optional structured area geometry. Origin and movement are not modeled yet.',
+          width: 'lg',
+        },
+        distanceInputSelectField({
+          name: 'areaOfEffect.radius',
+          label: 'Radius',
+          required: true,
+          valueDigits: SPELL_RANGE_DISTANCE_INLINE_COUNT_DIGITS,
+          visibility: visibleWhenAreaShape(['sphere', 'emanation', 'cylinder']),
+        }),
+        distanceInputSelectField({
+          name: 'areaOfEffect.height',
+          label: 'Height',
+          required: true,
+          valueDigits: SPELL_RANGE_DISTANCE_INLINE_COUNT_DIGITS,
+          visibility: visibleWhenAreaShape(['cylinder']),
+        }),
+        distanceInputSelectField({
+          name: 'areaOfEffect.length',
+          label: 'Length',
+          required: true,
+          valueDigits: SPELL_RANGE_DISTANCE_INLINE_COUNT_DIGITS,
+          visibility: visibleWhenAreaShape(['cone', 'line']),
+        }),
+        distanceInputSelectField({
+          name: 'areaOfEffect.width',
+          label: 'Width',
+          required: true,
+          valueDigits: SPELL_RANGE_DISTANCE_INLINE_COUNT_DIGITS,
+          visibility: visibleWhenAreaShape(['line']),
+        }),
+        distanceInputSelectField({
+          name: 'areaOfEffect.size',
+          label: 'Side length',
+          required: true,
+          valueDigits: SPELL_RANGE_DISTANCE_INLINE_COUNT_DIGITS,
+          visibility: visibleWhenAreaShape(['cube']),
+        }),
+        {
+          type: 'text',
+          name: 'areaOfEffect.description',
+          label: 'Special area description',
+          visibility: visibleWhenAreaShape(['special']),
           required: true,
         },
       ],

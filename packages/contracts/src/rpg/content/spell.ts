@@ -1,5 +1,6 @@
 import { z } from 'zod'
 
+import { areaGeometrySchema } from '../primitives/area-geometry'
 import {
   spellCastingTimeSchema,
   spellComponentsSchema,
@@ -47,6 +48,8 @@ export const spellBodySchema = contentBodyBaseSchema.extend({
   tags: spellTagsSchema.optional(),
   castingTime: spellCastingTimeSchema,
   range: spellRangeSchema,
+  /** Structured area geometry; supplements description prose. Origin not modeled. */
+  areaOfEffect: areaGeometrySchema.optional(),
   duration: spellDurationSchema,
   components: spellComponentsSchema,
   deliveryMethod: spellDeliveryMethodSchema.optional(),

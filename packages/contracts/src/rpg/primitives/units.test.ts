@@ -2,6 +2,8 @@ import { describe, expect, it } from 'vitest'
 import {
   CURRENCIES,
   currencySchema,
+  distanceSchema,
+  positiveDistanceSchema,
   formatMass,
   formatMoney,
   formatSpeedRate,
@@ -22,6 +24,37 @@ import {
   weightSchema,
   weightToLb,
 } from './units'
+
+describe('distanceSchema', () => {
+  it('accepts zero and fractional feet', () => {
+    expect(distanceSchema.parse({ value: 0, unit: 'ft' })).toEqual({ value: 0, unit: 'ft' })
+    expect(distanceSchema.parse({ value: 0.5, unit: 'ft' })).toEqual({ value: 0.5, unit: 'ft' })
+    expect(distanceSchema.parse({ value: 120, unit: 'ft' })).toEqual({ value: 120, unit: 'ft' })
+  })
+
+  it('rejects negative values and non-ft units', () => {
+    expect(distanceSchema.safeParse({ value: -1, unit: 'ft' }).success).toBe(false)
+    expect(distanceSchema.safeParse({ value: 10, unit: 'm' }).success).toBe(false)
+  })
+})
+
+describe('positiveDistanceSchema', () => {
+  it('accepts positive whole and fractional feet', () => {
+    expect(positiveDistanceSchema.parse({ value: 0.5, unit: 'ft' })).toEqual({
+      value: 0.5,
+      unit: 'ft',
+    })
+    expect(positiveDistanceSchema.parse({ value: 20, unit: 'ft' })).toEqual({
+      value: 20,
+      unit: 'ft',
+    })
+  })
+
+  it('rejects zero and negative values', () => {
+    expect(positiveDistanceSchema.safeParse({ value: 0, unit: 'ft' }).success).toBe(false)
+    expect(positiveDistanceSchema.safeParse({ value: -1, unit: 'ft' }).success).toBe(false)
+  })
+})
 
 describe('currencySchema', () => {
   it('accepts every standard coin denomination', () => {

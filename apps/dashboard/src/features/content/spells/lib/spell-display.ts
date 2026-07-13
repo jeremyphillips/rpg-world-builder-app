@@ -1,4 +1,5 @@
 import {
+  formatAreaGeometry,
   formatSlugAsLabel,
   getEffectConditionLabel,
   getSpellDeliveryMethodLabel,
@@ -24,6 +25,7 @@ export const SPELL_STAT_LABELS = {
   school: 'School',
   castingTime: 'Casting Time',
   range: 'Range',
+  area: 'Area',
   duration: 'Duration',
   components: 'Components',
   ritual: 'Ritual',
@@ -108,6 +110,9 @@ function buildSpellStatRows(
     },
     { label: SPELL_STAT_LABELS.castingTime, value: formatCastingTime(spell.castingTime) },
     { label: SPELL_STAT_LABELS.range, value: formatSpellRange(spell.range) },
+    ...(spell.areaOfEffect
+      ? [{ label: SPELL_STAT_LABELS.area, value: formatAreaGeometry(spell.areaOfEffect) }]
+      : []),
     { label: SPELL_STAT_LABELS.duration, value: formatSpellDuration(spell.duration) },
     { label: SPELL_STAT_LABELS.components, value: formatSpellComponents(spell.components) },
     {

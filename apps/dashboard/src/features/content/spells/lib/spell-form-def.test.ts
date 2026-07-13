@@ -37,6 +37,52 @@ describe('spellFormDef round-trips', () => {
       expect(input.school).toBe(spell.school)
     })
   }
+
+  const fireballWithArea = {
+    ...SRD_SPELLS[0]!,
+    slug: 'fireball',
+    name: 'Fireball',
+    level: 3,
+    range: { kind: 'distance' as const, value: { value: 150, unit: 'ft' as const } },
+    areaOfEffect: { shape: 'sphere' as const, radius: { value: 20, unit: 'ft' as const } },
+  }
+
+  it('preserves areaOfEffect through form round-trip', () => {
+    const formValues = spellFormDef.toFormValues(fireballWithArea) as SpellFormValues
+    const input = spellFormDef.toInput(formValues)
+    expect(input.areaOfEffect).toEqual(fireballWithArea.areaOfEffect)
+  })
+
+  it('omits areaOfEffect when shape is none', () => {
+    const formValues = spellFormDef.toFormValues(fireballWithArea) as SpellFormValues
+    formValues.areaOfEffect = { shape: 'none' }
+    const input = spellFormDef.toInput(formValues)
+    expect(input.areaOfEffect).toBeUndefined()
+  })
+})
+
+describe('spellFormDef area of effect fields', () => {
+  it('includes shape select and conditional distance fields in the casting tab', () => {
+    const castingTab = spellFormDef.buildTabs!({}).find((tab) => tab.id === 'casting')
+    const areaGroup = findGroup(castingTab?.fields ?? [], 'Area of effect')
+    expect(areaGroup?.kind).toBe('group')
+
+    const fieldNames = (areaGroup?.fields ?? [])
+      .filter((field): field is Extract<typeof field, { name: string }> => 'name' in field)
+      .map((field) => field.name)
+
+    expect(fieldNames).toEqual(
+      expect.arrayContaining([
+        'areaOfEffect.shape',
+        'areaOfEffect.radius',
+        'areaOfEffect.length',
+        'areaOfEffect.width',
+        'areaOfEffect.size',
+        'areaOfEffect.height',
+        'areaOfEffect.description',
+      ]),
+    )
+  })
 })
 
 describe('spellFormDef casting fields', () => {

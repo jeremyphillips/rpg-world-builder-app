@@ -33,6 +33,39 @@ const fireBoltBody = {
   deliveryMethod: 'ranged-spell-attack',
 } as const
 
+const fireballBody = {
+  name: 'Fireball',
+  description:
+    "<p>A bright streak flashes from you to a point you choose within range and then blossoms with a low roar into a fiery explosion. Each creature in a 20-foot-radius Sphere centered on that point makes a Dexterity saving throw, taking 8d6 Fire damage on a failed save or half as much damage on a successful one.</p><p>Flammable objects in the area that aren't being worn or carried start burning.</p>",
+  higherLevelSlotEffect: '<p>The damage increases by 1d6 for each spell slot level above 3.</p>',
+  school: 'evocation',
+  level: 3,
+  classIds: ['sorcerer', 'wizard'],
+  tags: {
+    damageTypes: ['fire'],
+    roles: ['damage'],
+  },
+  castingTime: { normal: { value: 1, unit: 'action' }, canBeCastAsRitual: false },
+  range: { kind: 'distance', value: { value: 150, unit: 'ft' } },
+  areaOfEffect: { shape: 'sphere', radius: { value: 20, unit: 'ft' } },
+  duration: { kind: 'instantaneous' },
+  components: {
+    verbal: true,
+    somatic: true,
+    material: { description: 'a ball of bat guano and sulfur' },
+  },
+} as const
+
+const fireball = {
+  id: 'srd-cc-5.2.1:fireball',
+  slug: 'fireball',
+  rulesetId: 'srd-cc-5.2.1',
+  source: 'system',
+  campaignId: null,
+  ...timestamps,
+  ...fireballBody,
+} as const
+
 const fireBolt = {
   id: 'srd-cc-5.2.1:fire-bolt',
   slug: 'fire-bolt',
@@ -126,11 +159,68 @@ describe('spellSchema', () => {
     }
     expect(spellSchema.parse(hellishRebuke)).toEqual(hellishRebuke)
   })
+
+  it('parses a spell with range and areaOfEffect kept separate', () => {
+    expect(spellSchema.parse(fireball)).toEqual(fireball)
+  })
+
+  it('allows omitting optional areaOfEffect', () => {
+    expect(spellSchema.parse(fireBolt)).toEqual(fireBolt)
+    expect(spellSchema.parse(fireBolt).areaOfEffect).toBeUndefined()
+  })
+
+  it('rejects invalid areaOfEffect shapes', () => {
+    expect(
+      spellSchema.safeParse({
+        ...fireball,
+        areaOfEffect: { shape: 'sphere' },
+      }).success,
+    ).toBe(false)
+
+    expect(
+      spellSchema.safeParse({
+        ...fireball,
+        areaOfEffect: {
+          shape: 'cone',
+          length: { value: 15, unit: 'ft' },
+          radius: { value: 15, unit: 'ft' },
+        },
+      }).success,
+    ).toBe(false)
+
+    expect(
+      spellSchema.safeParse({
+        ...fireball,
+        areaOfEffect: {
+          shape: 'line',
+          length: { value: 30, unit: 'ft' },
+        },
+      }).success,
+    ).toBe(false)
+
+    expect(
+      spellSchema.safeParse({
+        ...fireball,
+        areaOfEffect: { shape: 'special', description: '   ' },
+      }).success,
+    ).toBe(false)
+
+    expect(
+      spellSchema.safeParse({
+        ...fireball,
+        areaOfEffect: { shape: 'hexagon', radius: { value: 10, unit: 'ft' } },
+      }).success,
+    ).toBe(false)
+  })
 })
 
 describe('spellBodySchema', () => {
   it('parses the editable body without envelope fields', () => {
     expect(spellBodySchema.parse(fireBoltBody)).toEqual(fireBoltBody)
+  })
+
+  it('parses areaOfEffect on the body', () => {
+    expect(spellBodySchema.parse(fireballBody)).toEqual(fireballBody)
   })
 })
 
