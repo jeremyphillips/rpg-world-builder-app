@@ -63,6 +63,34 @@ describe('SRD 5.2.1 spell seed', () => {
     }
   })
 
+  it('keeps scaling prose out of descriptions', () => {
+    for (const spell of spells) {
+      expect(spell.description).not.toMatch(/Cantrip Upgrade/i)
+      expect(spell.description).not.toMatch(/Using a Higher-Level Spell Slot/i)
+    }
+  })
+
+  it('stores scaling prose in dedicated fields without headings', () => {
+    for (const spell of spells) {
+      if (spell.cantripScaling) {
+        expect(spell.level).toBe(0)
+        expectRichTextHtml(spell.cantripScaling)
+        expect(spell.cantripScaling).not.toMatch(/Cantrip Upgrade/i)
+      }
+      if (spell.higherLevelSlotEffect) {
+        expect(spell.level).toBeGreaterThan(0)
+        expectRichTextHtml(spell.higherLevelSlotEffect)
+        expect(spell.higherLevelSlotEffect).not.toMatch(/Using a Higher-Level Spell Slot/i)
+      }
+    }
+  })
+
+  it('spot-checks fire-bolt cantrip scaling migration', () => {
+    const fireBolt = spells.find((s) => s.slug === 'fire-bolt')
+    expect(fireBolt?.cantripScaling).toContain('The damage increases by 1d10')
+    expect(fireBolt?.description).not.toContain('Cantrip Upgrade')
+  })
+
   it('spot-checks deliveryMethod and ritual casting', () => {
     const poisonSpray = spells.find((s) => s.slug === 'poison-spray')
     expect(poisonSpray?.deliveryMethod).toBe('ranged-spell-attack')

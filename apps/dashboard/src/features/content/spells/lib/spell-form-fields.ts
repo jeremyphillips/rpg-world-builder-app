@@ -37,6 +37,7 @@ import {
   SPELL_DURATION_KINDS,
   spellLevelOptions,
 } from './spell-form-labels'
+import { SPELL_SECTION_LABELS } from './spell-display'
 
 function visibleWhenRangeDistance(): FieldVisibility {
   return {
@@ -80,11 +81,27 @@ function visibleWhenReactionCastingTime(): FieldVisibility {
   }
 }
 
+function visibleWhenCantripLevel(): FieldVisibility {
+  return {
+    dependsOn: ['level'],
+    visibleWhen: (v) => v.level === 0,
+  }
+}
+
+function visibleWhenLeveledSpell(): FieldVisibility {
+  return {
+    dependsOn: ['level'],
+    visibleWhen: (v) => typeof v.level === 'number' && v.level > 0,
+  }
+}
+
 export const spellFormSchema = z
   .object({
     name: z.string().min(1),
     slug: slugSchema.optional(),
     description: z.string().optional(),
+    cantripScaling: z.string().optional(),
+    higherLevelSlotEffect: z.string().optional(),
     school: spellSchoolIdSchema,
     level: spellContentLevelSchema,
     classIds: z.array(z.string()).min(1),
@@ -164,6 +181,24 @@ function basicsFields(ctx: ContentFormCtx): FormItem[] {
 
   return [
     ...identityFields(ctx),
+    {
+      type: 'richtext',
+      name: 'cantripScaling',
+      label: SPELL_SECTION_LABELS.cantripScaling,
+      linkable: true,
+      internalLinkOptions: ctx.options?.richTextInternalLinkOptions,
+      contentTypeOptions: ctx.options?.richTextContentTypeOptions,
+      visibility: visibleWhenCantripLevel(),
+    },
+    {
+      type: 'richtext',
+      name: 'higherLevelSlotEffect',
+      label: SPELL_SECTION_LABELS.higherLevelSlotEffect,
+      linkable: true,
+      internalLinkOptions: ctx.options?.richTextInternalLinkOptions,
+      contentTypeOptions: ctx.options?.richTextContentTypeOptions,
+      visibility: visibleWhenLeveledSpell(),
+    },
     {
       kind: 'row',
       fields: [

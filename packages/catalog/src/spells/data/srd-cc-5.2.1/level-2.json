@@ -8,21 +8,40 @@
     "createdAt": "2024-05-21T00:00:00.000Z",
     "updatedAt": "2024-05-21T00:00:00.000Z",
     "name": "Aid",
-    "description": "<p>Choose up to three creatures within range. Each target's Hit Point maximum and current Hit Points increase by 5 for the duration.</p><p><strong>Using a Higher-Level Spell Slot.</strong> Each target's Hit Points increase by 5 for each spell slot level above 2.</p>",
+    "description": "<p>Choose up to three creatures within range. Each target's Hit Point maximum and current Hit Points increase by 5 for the duration.</p>",
     "school": "abjuration",
     "level": 2,
     "classIds": ["bard", "cleric", "druid", "paladin", "ranger"],
     "tags": {
       "roles": ["buff", "healing", "warding"]
     },
-    "castingTime": { "normal": { "value": 1, "unit": "action" }, "canBeCastAsRitual": false },
-    "range": { "kind": "distance", "value": { "value": 30, "unit": "ft" } },
-    "duration": { "kind": "timed", "value": 8, "unit": "hour" },
+    "castingTime": {
+      "normal": {
+        "value": 1,
+        "unit": "action"
+      },
+      "canBeCastAsRitual": false
+    },
+    "range": {
+      "kind": "distance",
+      "value": {
+        "value": 30,
+        "unit": "ft"
+      }
+    },
+    "duration": {
+      "kind": "timed",
+      "value": 8,
+      "unit": "hour"
+    },
     "components": {
       "verbal": true,
       "somatic": true,
-      "material": { "description": "a strip of white cloth" }
-    }
+      "material": {
+        "description": "a strip of white cloth"
+      }
+    },
+    "higherLevelSlotEffect": "<p>Each target's Hit Points increase by 5 for each spell slot level above 2.</p>"
   },
   {
     "id": "srd-cc-5.2.1:darkness",
@@ -41,8 +60,20 @@
       "roles": ["control", "debuff"],
       "functions": ["environment"]
     },
-    "castingTime": { "normal": { "value": 1, "unit": "action" }, "canBeCastAsRitual": false },
-    "range": { "kind": "distance", "value": { "value": 60, "unit": "ft" } },
+    "castingTime": {
+      "normal": {
+        "value": 1,
+        "unit": "action"
+      },
+      "canBeCastAsRitual": false
+    },
+    "range": {
+      "kind": "distance",
+      "value": {
+        "value": 60,
+        "unit": "ft"
+      }
+    },
     "duration": {
       "kind": "timed",
       "value": 10,
@@ -52,7 +83,9 @@
     },
     "components": {
       "verbal": true,
-      "material": { "description": "bat fur and a piece of coal" }
+      "material": {
+        "description": "bat fur and a piece of coal"
+      }
     }
   },
   {
@@ -72,10 +105,23 @@
       "conditions": ["blinded", "deafened", "paralyzed", "poisoned"],
       "roles": ["healing"]
     },
-    "castingTime": { "normal": { "value": 1, "unit": "bonus-action" }, "canBeCastAsRitual": false },
-    "range": { "kind": "touch" },
-    "duration": { "kind": "instantaneous" },
-    "components": { "verbal": true, "somatic": true }
+    "castingTime": {
+      "normal": {
+        "value": 1,
+        "unit": "bonus-action"
+      },
+      "canBeCastAsRitual": false
+    },
+    "range": {
+      "kind": "touch"
+    },
+    "duration": {
+      "kind": "instantaneous"
+    },
+    "components": {
+      "verbal": true,
+      "somatic": true
+    }
   },
   {
     "id": "srd-cc-5.2.1:levitate",
@@ -93,8 +139,20 @@
     "tags": {
       "roles": ["control", "movement"]
     },
-    "castingTime": { "normal": { "value": 1, "unit": "action" }, "canBeCastAsRitual": false },
-    "range": { "kind": "distance", "value": { "value": 60, "unit": "ft" } },
+    "castingTime": {
+      "normal": {
+        "value": 1,
+        "unit": "action"
+      },
+      "canBeCastAsRitual": false
+    },
+    "range": {
+      "kind": "distance",
+      "value": {
+        "value": 60,
+        "unit": "ft"
+      }
+    },
     "duration": {
       "kind": "timed",
       "value": 10,
@@ -105,7 +163,9 @@
     "components": {
       "verbal": true,
       "somatic": true,
-      "material": { "description": "a metal spring" }
+      "material": {
+        "description": "a metal spring"
+      }
     }
   },
   {
@@ -125,10 +185,22 @@
       "roles": ["movement"],
       "functions": ["teleportation"]
     },
-    "castingTime": { "normal": { "value": 1, "unit": "bonus-action" }, "canBeCastAsRitual": false },
-    "range": { "kind": "self" },
-    "duration": { "kind": "instantaneous" },
-    "components": { "verbal": true }
+    "castingTime": {
+      "normal": {
+        "value": 1,
+        "unit": "bonus-action"
+      },
+      "canBeCastAsRitual": false
+    },
+    "range": {
+      "kind": "self"
+    },
+    "duration": {
+      "kind": "instantaneous"
+    },
+    "components": {
+      "verbal": true
+    }
   },
   {
     "id": "srd-cc-5.2.1:pass-without-trace",
@@ -147,8 +219,16 @@
       "roles": ["buff"],
       "functions": ["deception", "utility"]
     },
-    "castingTime": { "normal": { "value": 1, "unit": "action" }, "canBeCastAsRitual": false },
-    "range": { "kind": "self" },
+    "castingTime": {
+      "normal": {
+        "value": 1,
+        "unit": "action"
+      },
+      "canBeCastAsRitual": false
+    },
+    "range": {
+      "kind": "self"
+    },
     "duration": {
       "kind": "timed",
       "value": 1,
@@ -159,7 +239,9 @@
     "components": {
       "verbal": true,
       "somatic": true,
-      "material": { "description": "ashes from burned mistletoe" }
+      "material": {
+        "description": "ashes from burned mistletoe"
+      }
     }
   },
   {
@@ -178,8 +260,20 @@
     "tags": {
       "roles": ["debuff"]
     },
-    "castingTime": { "normal": { "value": 1, "unit": "action" }, "canBeCastAsRitual": false },
-    "range": { "kind": "distance", "value": { "value": 60, "unit": "ft" } },
+    "castingTime": {
+      "normal": {
+        "value": 1,
+        "unit": "action"
+      },
+      "canBeCastAsRitual": false
+    },
+    "range": {
+      "kind": "distance",
+      "value": {
+        "value": 60,
+        "unit": "ft"
+      }
+    },
     "duration": {
       "kind": "timed",
       "value": 1,
@@ -187,6 +281,9 @@
       "concentration": true,
       "upTo": true
     },
-    "components": { "verbal": true, "somatic": true }
+    "components": {
+      "verbal": true,
+      "somatic": true
+    }
   }
 ]

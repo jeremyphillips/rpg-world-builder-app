@@ -50,6 +50,10 @@ export const spellBodySchema = contentBodyBaseSchema.extend({
   duration: spellDurationSchema,
   components: spellComponentsSchema,
   deliveryMethod: spellDeliveryMethodSchema.optional(),
+  /** Rich-text HTML (TipTap). Cantrip scaling body prose — no "Cantrip Upgrade" heading. */
+  cantripScaling: z.string().optional(),
+  /** Rich-text HTML (TipTap). Upcast body prose — no "Using a Higher-Level Spell Slot" heading. */
+  higherLevelSlotEffect: z.string().optional(),
 })
 
 export type SpellBody = z.infer<typeof spellBodySchema>

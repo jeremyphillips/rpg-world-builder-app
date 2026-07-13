@@ -5,7 +5,8 @@ Spell catalog: overview table, detail pages, and create/edit authoring for syste
 ## Scope
 
 - **In:** list (`useSpells`), overview table (level/school filters), detail stat rows,
-  HTML description, class links, tag chips, create/edit routes, form modules under
+  HTML description, optional cantrip scaling / higher-level slot effect prose,
+  class links, tag chips, create/edit routes, form modules under
   `lib/spell-form-*.ts`, row actions.
 - **Form:** tabbed shell (Basics / Casting / Tags); class availability via combobox
   (spellcasting classes only — see below); tag vocabularies via chips.
@@ -30,6 +31,13 @@ Save is blocked by API validation until all invalid classes are removed.
 **Future polish:** Union orphan selected slugs into options with `formatSlugAsLabel` and
 a description such as “Does not have spellcasting”.
 
+### Scaling prose fields
+
+Optional `cantripScaling` (level 0) and `higherLevelSlotEffect` (level 1–9) store
+rich-text body prose for cantrip upgrades and upcast effects. Section headings
+(`Cantrip Upgrade`, `Using a Higher-Level Spell Slot`) are display-owned in
+`lib/spell-display.ts` — do not embed them in stored HTML.
+
 ## API
 
 - `GET /api/campaigns/:campaignId/content/spells` → `{ spells: Spell[] }`
@@ -38,14 +46,15 @@ a description such as “Does not have spellcasting”.
 
 ## Key files
 
-| Piece        | Path                       |
-| ------------ | -------------------------- |
-| Form def     | `lib/spell-form-def.ts`    |
-| Form fields  | `lib/spell-form-fields.ts` |
-| Form values  | `lib/spell-form-values.ts` |
-| Form labels  | `lib/spell-form-labels.ts` |
-| Create route | `routes/spell-create.tsx`  |
-| Edit route   | `routes/spell-edit.tsx`    |
+| Piece                     | Path                       |
+| ------------------------- | -------------------------- |
+| Display registry (detail) | `lib/spell-display.ts`     |
+| Form def                  | `lib/spell-form-def.ts`    |
+| Form fields               | `lib/spell-form-fields.ts` |
+| Form values               | `lib/spell-form-values.ts` |
+| Form labels               | `lib/spell-form-labels.ts` |
+| Create route              | `routes/spell-create.tsx`  |
+| Edit route                | `routes/spell-edit.tsx`    |
 
 ## Related docs
 
