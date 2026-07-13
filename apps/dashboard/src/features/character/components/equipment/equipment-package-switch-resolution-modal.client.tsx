@@ -1,0 +1,131 @@
+'use client'
+
+import { useEffect, useMemo, useRef, useState } from 'react'
+
+import type {
+  CharacterBuildCatalogIndex,
+  EquipmentPackageSwitchBlockingReason,
+  EquipmentPackageSwitchEvaluation,
+} from '@rpg/contracts'
+import { Modal } from '@rpg/ui'
+
+import {
+  type EquipmentInventoryQuantityTarget,
+  type EquipmentInventoryRemoveTarget,
+} from '../../lib/equipment-step.lib'
+
+import {
+  buildPackageSwitchDraftPurchasedGroups,
+  resolvePackageSwitchModalState,
+} from './equipment-package-switch-resolution.lib'
+import { EquipmentPackageSwitchResolutionModalBody } from './equipment-package-switch-resolution-modal-body.client'
+import { EquipmentPackageSwitchResolutionModalFooter } from './equipment-package-switch-resolution-modal-footer.client'
+import { equipmentPackageSwitchResolutionModalBodyClasses } from './equipment-package-switch-resolution-modal.variants'
+
+export type EquipmentPackageSwitchResolutionModalProps = {
+  open: boolean
+  catalogIndex: CharacterBuildCatalogIndex
+  evaluation: EquipmentPackageSwitchEvaluation
+  draftQuantitiesByPurchaseId: Record<string, number>
+  commitErrorReason?: EquipmentPackageSwitchBlockingReason
+  staleNotice?: boolean
+  isCommitting?: boolean
+  onOpenChange: (open: boolean) => void
+  onDraftQuantityChange: (purchaseId: string, quantity: number) => void
+  onConfirm: () => void
+}
+
+export function EquipmentPackageSwitchResolutionModal({
+  open,
+  catalogIndex,
+  evaluation,
+  draftQuantitiesByPurchaseId,
+  commitErrorReason,
+  staleNotice = false,
+  isCommitting = false,
+  onOpenChange,
+  onDraftQuantityChange,
+  onConfirm,
+}: EquipmentPackageSwitchResolutionModalProps) {
+  const headingRef = useRef<HTMLDivElement>(null)
+  const [returnFocusElement] = useState(() =>
+    typeof document === 'undefined' ? null : document.activeElement,
+  )
+  const purchasedGroups = useMemo(
+    () =>
+      buildPackageSwitchDraftPurchasedGroups({
+        evaluation,
+        draftQuantitiesByPurchaseId,
+        catalogIndex,
+      }),
+    [catalogIndex, draftQuantitiesByPurchaseId, evaluation],
+  )
+  const modalState = resolvePackageSwitchModalState({
+    evaluation,
+    commitErrorReason,
+    staleNotice,
+    isCommitting,
+  })
+
+  useEffect(() => {
+    if (!open) return
+    headingRef.current?.focus()
+  }, [open])
+
+  useEffect(() => {
+    if (!open) return
+    return () => {
+      if (returnFocusElement instanceof HTMLElement) {
+        returnFocusElement.focus()
+      }
+    }
+  }, [open, returnFocusElement])
+
+  const handleSetPurchaseQuantity = (
+    target: EquipmentInventoryQuantityTarget,
+    quantity: number,
+  ) => {
+    onDraftQuantityChange(target.purchaseId, quantity)
+  }
+
+  const handleRemoveItem = (target: EquipmentInventoryRemoveTarget) => {
+    if (target.kind !== 'purchase') return
+    onDraftQuantityChange(target.purchaseId, 0)
+  }
+
+  return (
+    <Modal.Root open={open} onOpenChange={onOpenChange}>
+      <Modal.Content size="lg">
+        <Modal.Header
+          ref={headingRef}
+          tabIndex={-1}
+          headline={modalState.title}
+          description={modalState.description}
+          headlineClassName="outline-none"
+        />
+        <Modal.Body className={equipmentPackageSwitchResolutionModalBodyClasses}>
+          <EquipmentPackageSwitchResolutionModalBody
+            evaluation={evaluation}
+            draftQuantitiesByPurchaseId={draftQuantitiesByPurchaseId}
+            purchasedGroups={purchasedGroups}
+            isBlocked={modalState.isBlocked}
+            staleMessage={modalState.staleMessage}
+            inlineError={modalState.inlineError}
+            onSetPurchaseQuantity={handleSetPurchaseQuantity}
+            onRemoveItem={handleRemoveItem}
+          />
+        </Modal.Body>
+        <Modal.Footer>
+          <EquipmentPackageSwitchResolutionModalFooter
+            isBlocked={modalState.isBlocked}
+            confirmDisabled={modalState.confirmDisabled}
+            isCommitting={isCommitting}
+            helperMessage={modalState.helperMessage}
+            onCancel={() => onOpenChange(false)}
+            onConfirm={onConfirm}
+          />
+        </Modal.Footer>
+      </Modal.Content>
+    </Modal.Root>
+  )
+}

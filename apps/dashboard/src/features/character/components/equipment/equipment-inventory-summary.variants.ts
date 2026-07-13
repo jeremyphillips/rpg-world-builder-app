@@ -52,6 +52,9 @@ export const equipmentInventoryRowPriceLineClasses = 'min-w-0 text-muted-foregro
 
 export const equipmentInventoryRowNameClasses = 'font-body-emphasis text-base text-foreground'
 
+export const equipmentInventoryRowStagedRemovalNameClasses =
+  'font-body-emphasis text-base text-muted-foreground line-through'
+
 export const equipmentInventoryRowQtyLabelClasses = 'shrink-0 text-xs tabular-nums text-foreground'
 
 export const equipmentInventoryRowRemoveButtonClasses =

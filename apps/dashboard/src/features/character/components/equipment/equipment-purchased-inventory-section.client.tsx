@@ -21,12 +21,16 @@ import {
 
 export type EquipmentPurchasedInventorySectionProps = {
   purchased: PurchasedCategoryGroup[]
+  showGroupHeadings?: boolean
+  allowZeroQuantity?: boolean
   onRemoveItem?: (target: EquipmentInventoryRemoveTarget) => void
   onSetPurchaseQuantity?: (target: EquipmentInventoryQuantityTarget, quantity: number) => void
 }
 
 export function EquipmentPurchasedInventorySection({
   purchased,
+  showGroupHeadings = true,
+  allowZeroQuantity = false,
   onRemoveItem,
   onSetPurchaseQuantity,
 }: EquipmentPurchasedInventorySectionProps) {
@@ -40,23 +44,37 @@ export function EquipmentPurchasedInventorySection({
     )
   }
 
+  const renderRowList = (displays: PurchasedCategoryGroup['displays']) => (
+    <ul className={equipmentInventoryRowListClasses}>
+      {displays.map((display) => (
+        <li key={equipmentInventoryDisplayItemKey(display)}>
+          <EquipmentInventoryRowItem
+            display={display}
+            allowZeroQuantity={allowZeroQuantity}
+            onRemoveItem={onRemoveItem}
+            onSetPurchaseQuantity={onSetPurchaseQuantity}
+          />
+        </li>
+      ))}
+    </ul>
+  )
+
+  if (!showGroupHeadings) {
+    const flatDisplays = purchased.flatMap((group) => group.displays)
+    return (
+      <div className={equipmentPurchasedInventoryCategoryListClasses}>
+        {renderRowList(flatDisplays)}
+      </div>
+    )
+  }
+
   return (
     <div className={equipmentPurchasedInventoryCategoryListClasses}>
       {purchased.map((group) =>
         group.displays.length === 0 ? null : (
           <section key={group.groupLabel} className={equipmentPurchasedInventoryCategoryClasses}>
             <Eyebrow size="sm">{group.groupLabel}</Eyebrow>
-            <ul className={equipmentInventoryRowListClasses}>
-              {group.displays.map((display) => (
-                <li key={equipmentInventoryDisplayItemKey(display)}>
-                  <EquipmentInventoryRowItem
-                    display={display}
-                    onRemoveItem={onRemoveItem}
-                    onSetPurchaseQuantity={onSetPurchaseQuantity}
-                  />
-                </li>
-              ))}
-            </ul>
+            {renderRowList(group.displays)}
           </section>
         ),
       )}

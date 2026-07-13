@@ -24,16 +24,19 @@ import {
   equipmentInventoryRowPriceLineClasses,
   equipmentInventoryRowQtyLabelClasses,
   equipmentInventoryRowRemoveButtonClasses,
+  equipmentInventoryRowStagedRemovalNameClasses,
 } from './equipment-inventory-summary.variants'
 import { builderInventoryRowMetaClasses } from '../builder/builder-inventory-row.variants'
 
 export type EquipmentInventoryRowProps = {
   display: EquipmentInventoryDisplayItem
+  allowZeroQuantity?: boolean
   onRemoveItem?: (target: EquipmentInventoryRemoveTarget) => void
   onSetPurchaseQuantity?: (target: EquipmentInventoryQuantityTarget, quantity: number) => void
 }
 
 function resolveDetailLineLabel(row: EquipmentInventoryRow): string | undefined {
+  if (row.stagedRemoval) return row.sourceLabel
   if (row.priceLineLabel) return row.priceLineLabel
   if (row.bundleLabel) return `${row.sourceLabel} · ${row.bundleLabel}`
   return row.sourceLabel
@@ -67,10 +70,12 @@ function InventoryRemoveIconButton({
 
 function InventoryRowActions({
   row,
+  allowZeroQuantity = false,
   onRemoveItem,
   onSetPurchaseQuantity,
 }: {
   row: EquipmentInventoryRow
+  allowZeroQuantity?: boolean
   onRemoveItem?: (target: EquipmentInventoryRemoveTarget) => void
   onSetPurchaseQuantity?: (target: EquipmentInventoryQuantityTarget, quantity: number) => void
 }) {
@@ -85,6 +90,7 @@ function InventoryRowActions({
       {showStepper ? (
         <EquipmentInventoryQuantityControl
           row={row}
+          allowZeroQuantity={allowZeroQuantity}
           onSetPurchaseQuantity={onSetPurchaseQuantity}
         />
       ) : null}
@@ -106,16 +112,25 @@ function InventoryRowActions({
 function InventoryRowHeader({
   equipmentName,
   equipped,
+  stagedRemoval = false,
   actions,
 }: {
   equipmentName: string
   equipped: boolean
+  stagedRemoval?: boolean
   actions?: ReactNode
 }) {
   return (
     <div className={equipmentInventoryRowHeaderClasses}>
       <div className={builderInventoryRowMetaClasses}>
-        <Text as="p" className={equipmentInventoryRowNameClasses}>
+        <Text
+          as="p"
+          className={
+            stagedRemoval
+              ? equipmentInventoryRowStagedRemovalNameClasses
+              : equipmentInventoryRowNameClasses
+          }
+        >
           {equipmentName}
         </Text>
         {equipped ? (
@@ -143,6 +158,7 @@ function InventoryRowDetailLine({ label }: { label?: string }) {
 
 export function EquipmentInventoryRowItem({
   display,
+  allowZeroQuantity = false,
   onRemoveItem,
   onSetPurchaseQuantity,
 }: EquipmentInventoryRowProps) {
@@ -152,6 +168,7 @@ export function EquipmentInventoryRowItem({
     const actions = (
       <InventoryRowActions
         row={row}
+        allowZeroQuantity={allowZeroQuantity}
         onRemoveItem={onRemoveItem}
         onSetPurchaseQuantity={onSetPurchaseQuantity}
       />
@@ -162,6 +179,7 @@ export function EquipmentInventoryRowItem({
         <InventoryRowHeader
           equipmentName={row.equipmentName}
           equipped={Boolean(row.entry.equipped)}
+          stagedRemoval={row.stagedRemoval}
           actions={actions}
         />
         <InventoryRowDetailLine label={detailLabel} />
@@ -186,6 +204,7 @@ export function EquipmentInventoryRowItem({
           actionsRow ? (
             <InventoryRowActions
               row={actionsRow}
+              allowZeroQuantity={allowZeroQuantity}
               onRemoveItem={onRemoveItem}
               onSetPurchaseQuantity={onSetPurchaseQuantity}
             />

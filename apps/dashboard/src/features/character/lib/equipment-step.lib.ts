@@ -147,6 +147,8 @@ export type EquipmentInventoryRow = {
   removeLabel: string
   removeTarget?: EquipmentInventoryRemoveTarget
   quantityTarget?: EquipmentInventoryQuantityTarget
+  /** Package-switch modal: row is staged at quantity zero but still visible. */
+  stagedRemoval?: boolean
 }
 
 export function formatEquipmentInventoryRemoveLabel(name: string, quantity: number): string {

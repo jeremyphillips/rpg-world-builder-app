@@ -41,11 +41,9 @@ describe('EquipmentInventoryRowItem', () => {
 
     expect(screen.getByText('5 SP each · 1 GP total')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Remove all 2 Rations' })).toBeInTheDocument()
-    expect(
-      screen.getByRole('button', { name: 'Increase Quantity for Rations' }),
-    ).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Increase Rations quantity' })).toBeInTheDocument()
 
-    await user.click(screen.getByRole('button', { name: 'Increase Quantity for Rations' }))
+    await user.click(screen.getByRole('button', { name: 'Increase Rations quantity' }))
     expect(onSetPurchaseQuantity).toHaveBeenCalledWith(
       { kind: 'purchase', purchaseId: 'purchase-row-test-0' },
       3,
@@ -69,9 +67,7 @@ describe('EquipmentInventoryRowItem', () => {
       />,
     )
 
-    expect(
-      screen.getByRole('button', { name: 'Increase Quantity for Rations' }),
-    ).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Increase Rations quantity' })).toBeInTheDocument()
     expect(
       screen.queryByRole('button', { name: 'Edit quantity for Rations' }),
     ).not.toBeInTheDocument()
@@ -110,7 +106,70 @@ describe('EquipmentInventoryRowItem', () => {
     expect(screen.queryByRole('button', { name: /Remove all/ })).not.toBeInTheDocument()
   })
 
+  it('allows zero quantity when allowZeroQuantity is enabled', async () => {
+    const user = userEvent.setup()
+    const onSetPurchaseQuantity = vi.fn()
+
+    render(
+      <EquipmentInventoryRowItem
+        display={{
+          kind: 'single',
+          row: {
+            ...editableStackableRow,
+            entry: { ...editableStackableRow.entry, quantity: 1 },
+            removeLabel: 'Remove Rations',
+          },
+        }}
+        allowZeroQuantity
+        onSetPurchaseQuantity={onSetPurchaseQuantity}
+        onRemoveItem={vi.fn()}
+      />,
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Decrease Rations quantity' }))
+    expect(onSetPurchaseQuantity).toHaveBeenCalledWith(
+      { kind: 'purchase', purchaseId: 'purchase-row-test-0' },
+      0,
+    )
+  })
+
+  it('renders staged removal rows visibly with muted styling', () => {
+    render(
+      <EquipmentInventoryRowItem
+        display={{
+          kind: 'single',
+          row: {
+            ...editableStackableRow,
+            entry: { ...editableStackableRow.entry, quantity: 0 },
+            sourceLabel: 'Staged for removal',
+            stagedRemoval: true,
+            removeLabel: 'Remove Rations',
+          },
+        }}
+        allowZeroQuantity
+        onSetPurchaseQuantity={vi.fn()}
+        onRemoveItem={vi.fn()}
+      />,
+    )
+
+    expect(screen.getByText('Rations')).toBeInTheDocument()
+    expect(screen.getByText('Staged for removal')).toBeInTheDocument()
+    expect(screen.getByRole('spinbutton', { name: 'Rations quantity' })).toHaveValue(0)
+  })
+
   it('has no axe accessibility violations', async () => {
+    const { container } = render(
+      <EquipmentInventoryRowItem
+        display={{ kind: 'single', row: editableStackableRow }}
+        onSetPurchaseQuantity={vi.fn()}
+        onRemoveItem={vi.fn()}
+      />,
+    )
+
+    await expectNoAxeViolations(container)
+  })
+
+  it('has no axe accessibility violations with staged removal', async () => {
     const { container } = render(
       <EquipmentInventoryRowItem
         display={{ kind: 'single', row: editableStackableRow }}

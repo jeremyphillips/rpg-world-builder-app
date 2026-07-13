@@ -436,7 +436,7 @@ describe('EquipmentStep', () => {
     }
     const { onDraftChange } = renderEquipmentStep(draft)
 
-    await user.click(screen.getByRole('button', { name: 'Increase Quantity for Rations' }))
+    await user.click(screen.getByRole('button', { name: 'Increase Rations quantity' }))
 
     expect(onDraftChange).toHaveBeenCalledWith(
       expect.objectContaining({

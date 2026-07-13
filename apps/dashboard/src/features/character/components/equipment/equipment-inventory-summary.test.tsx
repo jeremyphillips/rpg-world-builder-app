@@ -111,7 +111,7 @@ describe('EquipmentInventorySummary', () => {
     expect(screen.getByText('5 SP each · 1 GP total')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Remove all 2 Rations' })).toBeInTheDocument()
 
-    await user.click(screen.getByRole('button', { name: 'Increase Quantity for Rations' }))
+    await user.click(screen.getByRole('button', { name: 'Increase Rations quantity' }))
 
     expect(onSetPurchaseQuantity).toHaveBeenCalledWith(
       {
@@ -126,7 +126,7 @@ describe('EquipmentInventorySummary', () => {
     )
   })
 
-  it('renders editable starting-gold non-stackable rows with quantity controls', async () => {
+  it('renders starting-gold armor rows with quantity controls on the gold path', async () => {
     const user = userEvent.setup()
     const onSetPurchaseQuantity = vi.fn()
     const draft = {
@@ -161,10 +161,10 @@ describe('EquipmentInventorySummary', () => {
 
     expect(screen.getByText('Leather Armor')).toBeInTheDocument()
     expect(
-      screen.getByRole('button', { name: 'Increase Quantity for Leather Armor' }),
+      screen.getByRole('button', { name: 'Increase Leather Armor quantity' }),
     ).toBeInTheDocument()
 
-    await user.click(screen.getByRole('button', { name: 'Increase Quantity for Leather Armor' }))
+    await user.click(screen.getByRole('button', { name: 'Increase Leather Armor quantity' }))
 
     expect(onSetPurchaseQuantity).toHaveBeenCalled()
   })
@@ -234,8 +234,8 @@ describe('EquipmentInventorySummary', () => {
       />,
     )
 
-    expect(screen.getByRole('spinbutton', { name: 'Quantity for Rations' })).toHaveValue(12)
-    await user.click(screen.getByRole('button', { name: 'Increase Quantity for Rations' }))
+    expect(screen.getByRole('spinbutton', { name: 'Rations quantity' })).toHaveValue(12)
+    await user.click(screen.getByRole('button', { name: 'Increase Rations quantity' }))
     expect(onSetPurchaseQuantity).toHaveBeenCalledWith(
       { kind: 'purchase', purchaseId: 'purchase-test-0' },
       13,

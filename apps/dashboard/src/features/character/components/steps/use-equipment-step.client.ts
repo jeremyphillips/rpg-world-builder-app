@@ -1,16 +1,24 @@
 'use client'
 
-import { useMemo, useState, type ComponentProps } from 'react'
+import { useEffect, useMemo, useState, type ComponentProps } from 'react'
 
 import {
+  buildEquipmentPackageSwitchPatch,
   buildStartingPackageConversionPatch,
   buildStartingPackageConversionPreview,
+  createEquipmentPackageSwitchInventorySnapshot,
+  equipmentPackageSwitchSnapshotsEqual,
+  evaluateEquipmentPackageSwitch,
   indexCharacterBuildCatalog,
+  initPackageSwitchDraftQuantities,
+  rebuildPackageSwitchDraftQuantities,
   resolveBuilderStepReadiness,
   resolveStartingEquipmentOptionSummaries,
   type CharacterBuildContext,
   type CharacterBuilderDraft,
   type ChoiceSet,
+  type EquipmentPackageSwitchBlockingReason,
+  type EquipmentPackageSwitchInventorySnapshot,
   type StartingPackageConversionPreview,
 } from '@rpg/contracts'
 
@@ -42,6 +50,15 @@ type PendingEquipmentSelection = {
   nestedSelections: CharacterBuilderDraft['choiceSelections']
 }
 
+export type PendingEquipmentPackageSwitch = {
+  targetOptionId: string
+  nestedSelections: CharacterBuilderDraft['choiceSelections']
+  draftQuantitiesByPurchaseId: Record<string, number>
+  committedInventorySnapshot: EquipmentPackageSwitchInventorySnapshot
+  commitErrorReason?: EquipmentPackageSwitchBlockingReason
+  staleNotice?: boolean
+}
+
 export function useEquipmentStep(args: {
   context: CharacterBuildContext
   draft: CharacterBuilderDraft
@@ -50,6 +67,9 @@ export function useEquipmentStep(args: {
 }) {
   const { context, draft, resolvedChoiceSets, onDraftChange } = args
   const [pendingSelection, setPendingSelection] = useState<PendingEquipmentSelection | null>(null)
+  const [pendingPackageSwitch, setPendingPackageSwitch] =
+    useState<PendingEquipmentPackageSwitch | null>(null)
+  const [isPackageSwitchCommitting, setIsPackageSwitchCommitting] = useState(false)
   const [pickerOpen, setPickerOpen] = useState(false)
   const [conversionEditorOpen, setConversionEditorOpen] = useState(false)
   const [selectedPackageItemKeys, setSelectedPackageItemKeys] = useState<ReadonlySet<string>>(
@@ -142,6 +162,146 @@ export function useEquipmentStep(args: {
     setIsPackageChooserExpanded(false)
   }
 
+  const openPackageSwitchResolution = (
+    optionId: string,
+    nestedSelections: CharacterBuilderDraft['choiceSelections'],
+  ) => {
+    const evaluation = evaluateEquipmentPackageSwitch({
+      draft,
+      catalogIndex,
+      targetOptionId: optionId,
+      nestedSelections,
+    })
+
+    if (!evaluation || evaluation.status === 'noConflict') return
+
+    setPendingPackageSwitch({
+      targetOptionId: optionId,
+      nestedSelections,
+      draftQuantitiesByPurchaseId: initPackageSwitchDraftQuantities(evaluation),
+      committedInventorySnapshot: createEquipmentPackageSwitchInventorySnapshot(draft),
+    })
+  }
+
+  const dismissPackageSwitch = () => {
+    setPendingPackageSwitch(null)
+    setIsPackageSwitchCommitting(false)
+  }
+
+  const handleDraftPackageSwitchQuantity = (purchaseId: string, quantity: number) => {
+    setPendingPackageSwitch((prev) => {
+      if (!prev) return prev
+
+      return {
+        ...prev,
+        draftQuantitiesByPurchaseId: {
+          ...prev.draftQuantitiesByPurchaseId,
+          [purchaseId]: quantity,
+        },
+        commitErrorReason: undefined,
+        staleNotice: false,
+      }
+    })
+  }
+
+  const handleCommitPackageSwitch = () => {
+    if (!pendingPackageSwitch || !startingEquipmentChoiceSet) return
+
+    setIsPackageSwitchCommitting(true)
+
+    const result = buildEquipmentPackageSwitchPatch({
+      draft,
+      catalogIndex,
+      targetOptionId: pendingPackageSwitch.targetOptionId,
+      choiceSetId: startingEquipmentChoiceSet.id,
+      nestedSelections: pendingPackageSwitch.nestedSelections,
+      draftQuantitiesByPurchaseId: pendingPackageSwitch.draftQuantitiesByPurchaseId,
+      committedInventorySnapshot: pendingPackageSwitch.committedInventorySnapshot,
+    })
+
+    if (result.status === 'failure') {
+      if (result.commitError.kind === 'staleCommittedInventory') {
+        const evaluation = evaluateEquipmentPackageSwitch({
+          draft,
+          catalogIndex,
+          targetOptionId: pendingPackageSwitch.targetOptionId,
+          nestedSelections: pendingPackageSwitch.nestedSelections,
+        })
+
+        if (!evaluation) {
+          dismissPackageSwitch()
+          return
+        }
+
+        setPendingPackageSwitch({
+          ...pendingPackageSwitch,
+          committedInventorySnapshot: createEquipmentPackageSwitchInventorySnapshot(draft),
+          draftQuantitiesByPurchaseId: rebuildPackageSwitchDraftQuantities({
+            previousDraftQuantities: pendingPackageSwitch.draftQuantitiesByPurchaseId,
+            evaluation,
+          }),
+          commitErrorReason: result.commitError,
+          staleNotice: true,
+        })
+      } else {
+        setPendingPackageSwitch({
+          ...pendingPackageSwitch,
+          commitErrorReason: result.commitError,
+        })
+      }
+
+      setIsPackageSwitchCommitting(false)
+      return
+    }
+
+    onDraftChange(result.patch)
+    dismissPackageSwitch()
+    setIsPackageChooserExpanded(false)
+  }
+
+  const packageSwitchEvaluation = useMemo(() => {
+    if (!pendingPackageSwitch) return undefined
+
+    return evaluateEquipmentPackageSwitch({
+      draft,
+      catalogIndex,
+      targetOptionId: pendingPackageSwitch.targetOptionId,
+      nestedSelections: pendingPackageSwitch.nestedSelections,
+      draftQuantitiesByPurchaseId: pendingPackageSwitch.draftQuantitiesByPurchaseId,
+    })
+  }, [catalogIndex, draft, pendingPackageSwitch])
+
+  useEffect(() => {
+    setPendingPackageSwitch((prev) => {
+      if (!prev) return null
+
+      const actualSnapshot = createEquipmentPackageSwitchInventorySnapshot(draft)
+      if (equipmentPackageSwitchSnapshotsEqual(prev.committedInventorySnapshot, actualSnapshot)) {
+        return prev
+      }
+
+      const evaluation = evaluateEquipmentPackageSwitch({
+        draft,
+        catalogIndex,
+        targetOptionId: prev.targetOptionId,
+        nestedSelections: prev.nestedSelections,
+      })
+
+      if (!evaluation) return null
+
+      return {
+        ...prev,
+        committedInventorySnapshot: actualSnapshot,
+        draftQuantitiesByPurchaseId: rebuildPackageSwitchDraftQuantities({
+          previousDraftQuantities: prev.draftQuantitiesByPurchaseId,
+          evaluation,
+        }),
+        staleNotice: true,
+        commitErrorReason: undefined,
+      }
+    })
+  }, [catalogIndex, draft])
+
   const requestSelection = (
     optionId: string,
     nestedSelections: CharacterBuilderDraft['choiceSelections'],
@@ -153,6 +313,18 @@ export function useEquipmentStep(args: {
     }
 
     const nextSelection = { optionId, nestedSelections }
+    const packageSwitchPreview = evaluateEquipmentPackageSwitch({
+      draft,
+      catalogIndex,
+      targetOptionId: optionId,
+      nestedSelections,
+    })
+
+    if (packageSwitchPreview && packageSwitchPreview.status !== 'noConflict') {
+      openPackageSwitchResolution(optionId, nestedSelections)
+      return
+    }
+
     if (draft.equipment?.customized) {
       setPendingSelection(nextSelection)
       return
@@ -300,6 +472,12 @@ export function useEquipmentStep(args: {
     ownedPurchaseQuantities,
     pendingSelection,
     setPendingSelection,
+    pendingPackageSwitch,
+    packageSwitchEvaluation,
+    dismissPackageSwitch,
+    handleDraftPackageSwitchQuantity,
+    handleCommitPackageSwitch,
+    isPackageSwitchCommitting,
     pickerOpen,
     setPickerOpen,
     conversionEditorOpen,
