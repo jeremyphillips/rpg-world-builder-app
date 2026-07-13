@@ -8,7 +8,7 @@
     "createdAt": "2024-05-21T00:00:00.000Z",
     "updatedAt": "2024-05-21T00:00:00.000Z",
     "name": "Bless",
-    "description": "<p>You bless up to three creatures within range. Whenever a target makes an attack roll or a saving throw before the spell ends, the target adds 1d4 to the attack roll or save.</p><p><strong>Using a Higher-Level Spell Slot.</strong> You can target one additional creature for each spell slot level above 1.</p>",
+    "description": "<p>You bless up to three creatures within range. Whenever a target makes an attack roll or a saving throw before the spell ends, the target adds 1d4 to the attack roll or save.</p>",
     "school": "enchantment",
     "level": 1,
     "classIds": ["cleric", "paladin"],
@@ -42,7 +42,8 @@
       "material": {
         "description": "a Holy Symbol worth 5+ GP"
       }
-    }
+    },
+    "higherLevelSlotEffect": "<p>You can target one additional creature for each spell slot level above 1.</p>"
   },
   {
     "id": "srd-cc-5.2.1:create-or-destroy-water",
@@ -54,7 +55,7 @@
     "updatedAt": "2024-05-21T00:00:00.000Z",
     "name": "Create or Destroy Water",
     "level": 1,
-    "description": "<p>You do one of the following:</p><p><strong>Create Water.</strong> You create up to 10 gallons of clean water within range in an open container. Alternatively, the water falls as rain in a 30-foot Cube within range, extinguishing exposed flames there.</p><p><strong>Destroy Water.</strong> You destroy up to 10 gallons of water in an open container within range. Alternatively, you destroy fog in a 30-foot Cube within range.</p><p><strong>Using a Higher-Level Spell Slot.</strong> You create or destroy 10 additional gallons of water, or the size of the Cube increases by 5 feet, for each spell slot level above 1.</p>",
+    "description": "<p>You do one of the following:</p><p><strong>Create Water.</strong> You create up to 10 gallons of clean water within range in an open container. Alternatively, the water falls as rain in a 30-foot Cube within range, extinguishing exposed flames there.</p><p><strong>Destroy Water.</strong> You destroy up to 10 gallons of water in an open container within range. Alternatively, you destroy fog in a 30-foot Cube within range.</p>",
     "school": "transmutation",
     "classIds": ["cleric", "druid"],
     "tags": {
@@ -83,7 +84,8 @@
       "material": {
         "description": "a mix of water and sand"
       }
-    }
+    },
+    "higherLevelSlotEffect": "<p>You create or destroy 10 additional gallons of water, or the size of the Cube increases by 5 feet, for each spell slot level above 1.</p>"
   },
   {
     "id": "srd-cc-5.2.1:cure-wounds",
@@ -94,7 +96,7 @@
     "createdAt": "2024-05-21T00:00:00.000Z",
     "updatedAt": "2024-05-21T00:00:00.000Z",
     "name": "Cure Wounds",
-    "description": "<p>A creature you touch regains a number of Hit Points equal to 2d8 plus your spellcasting ability modifier.</p><p><strong>Using a Higher-Level Spell Slot.</strong> The healing increases by 2d8 for each spell slot level above 1.</p>",
+    "description": "<p>A creature you touch regains a number of Hit Points equal to 2d8 plus your spellcasting ability modifier.</p>",
     "school": "abjuration",
     "level": 1,
     "classIds": ["bard", "cleric", "druid", "paladin", "ranger"],
@@ -117,7 +119,8 @@
     "components": {
       "verbal": true,
       "somatic": true
-    }
+    },
+    "higherLevelSlotEffect": "<p>The healing increases by 2d8 for each spell slot level above 1.</p>"
   },
   {
     "id": "srd-cc-5.2.1:detect-evil-and-good",
@@ -322,7 +325,7 @@
     "createdAt": "2024-05-21T00:00:00.000Z",
     "updatedAt": "2024-05-21T00:00:00.000Z",
     "name": "False Life",
-    "description": "<p>You gain 2d4 + 4 Temporary Hit Points.</p><p><strong>Using a Higher-Level Spell Slot.</strong> You gain 5 additional Temporary Hit Points for each spell slot level above 1.</p>",
+    "description": "<p>You gain 2d4 + 4 Temporary Hit Points.</p>",
     "school": "necromancy",
     "level": 1,
     "classIds": ["sorcerer", "wizard"],
@@ -348,7 +351,8 @@
       "material": {
         "description": "a drop of alcohol"
       }
-    }
+    },
+    "higherLevelSlotEffect": "<p>You gain 5 additional Temporary Hit Points for each spell slot level above 1.</p>"
   },
   {
     "id": "srd-cc-5.2.1:feather-fall",
@@ -403,7 +407,7 @@
     "updatedAt": "2024-05-21T00:00:00.000Z",
     "name": "Fog Cloud",
     "level": 1,
-    "description": "<p>You create a 20-foot-radius Sphere of fog centered on a point within range. The Sphere is Heavily Obscured. It lasts for the duration or until a strong wind (such as one created by Gust of Wind) disperses it.</p><p><strong>Using a Higher-Level Spell Slot.</strong> The fog's radius increases by 20 feet for each spell slot level above 1.</p>",
+    "description": "<p>You create a 20-foot-radius Sphere of fog centered on a point within range. The Sphere is Heavily Obscured. It lasts for the duration or until a strong wind (such as one created by Gust of Wind) disperses it.</p>",
     "school": "conjuration",
     "classIds": ["druid", "ranger", "sorcerer", "wizard"],
     "tags": {
@@ -433,7 +437,8 @@
     "components": {
       "verbal": true,
       "somatic": true
-    }
+    },
+    "higherLevelSlotEffect": "<p>The fog's radius increases by 20 feet for each spell slot level above 1.</p>"
   },
   {
     "id": "srd-cc-5.2.1:hellish-rebuke",
@@ -444,7 +449,7 @@
     "createdAt": "2024-05-21T00:00:00.000Z",
     "updatedAt": "2024-05-21T00:00:00.000Z",
     "name": "Hellish Rebuke",
-    "description": "<p>The creature that damaged you is momentarily surrounded by green flames. It makes a Dexterity saving throw, taking 2d10 Fire damage on a failed save or half as much damage on a successful one.</p><p><strong>Using a Higher-Level Spell Slot.</strong> The damage increases by 1d10 for each spell slot level above 1.</p>",
+    "description": "<p>The creature that damaged you is momentarily surrounded by green flames. It makes a Dexterity saving throw, taking 2d10 Fire damage on a failed save or half as much damage on a successful one.</p>",
     "school": "evocation",
     "level": 1,
     "classIds": ["warlock"],
@@ -473,7 +478,8 @@
     "components": {
       "verbal": true,
       "somatic": true
-    }
+    },
+    "higherLevelSlotEffect": "<p>The damage increases by 1d10 for each spell slot level above 1.</p>"
   },
   {
     "id": "srd-cc-5.2.1:hex",
@@ -485,7 +491,7 @@
     "updatedAt": "2024-05-21T00:00:00.000Z",
     "name": "Hex",
     "level": 1,
-    "description": "<p>You place a curse on a creature that you can see within range. Until the spell ends, you deal an extra 1d6 Necrotic damage to the target whenever you hit it with an attack roll. Also, choose one ability when you cast the spell. The target has Disadvantage on ability checks made with the chosen ability.</p><p>If the target drops to 0 Hit Points before this spell ends, you can take a Bonus Action on a later turn to curse a new creature.</p><p><strong>Using a Higher-Level Spell Slot.</strong> Your Concentration can last longer with a spell slot of level 2 (up to 4 hours), 3–4 (up to 8 hours), or 5+ (24 hours).</p>",
+    "description": "<p>You place a curse on a creature that you can see within range. Until the spell ends, you deal an extra 1d6 Necrotic damage to the target whenever you hit it with an attack roll. Also, choose one ability when you cast the spell. The target has Disadvantage on ability checks made with the chosen ability.</p><p>If the target drops to 0 Hit Points before this spell ends, you can take a Bonus Action on a later turn to curse a new creature.</p>",
     "school": "enchantment",
     "classIds": ["warlock"],
     "tags": {
@@ -519,7 +525,8 @@
       "material": {
         "description": "the petrified eye of a newt"
       }
-    }
+    },
+    "higherLevelSlotEffect": "<p>Your Concentration can last longer with a spell slot of level 2 (up to 4 hours), 3–4 (up to 8 hours), or 5+ (24 hours).</p>"
   },
   {
     "id": "srd-cc-5.2.1:hideous-laughter",
@@ -531,7 +538,7 @@
     "updatedAt": "2024-05-21T00:00:00.000Z",
     "name": "Hideous Laughter",
     "level": 1,
-    "description": "<p>One creature of your choice that you can see within range makes a Wisdom saving throw. On a failed save, it has the Prone and Incapacitated conditions for the duration. During that time, it laughs uncontrollably if it's capable of laughter, and it can't end the Prone condition on itself.</p><p>At the end of each of its turns and each time it takes damage, it makes another Wisdom saving throw. The target has Advantage on the save if the save is triggered by damage. On a successful save, the spell ends.</p><p><strong>Using a Higher-Level Spell Slot.</strong> You can target one additional creature for each spell slot level above 1.</p>",
+    "description": "<p>One creature of your choice that you can see within range makes a Wisdom saving throw. On a failed save, it has the Prone and Incapacitated conditions for the duration. During that time, it laughs uncontrollably if it's capable of laughter, and it can't end the Prone condition on itself.</p><p>At the end of each of its turns and each time it takes damage, it makes another Wisdom saving throw. The target has Advantage on the save if the save is triggered by damage. On a successful save, the spell ends.</p>",
     "school": "enchantment",
     "classIds": ["bard", "warlock", "wizard"],
     "tags": {
@@ -565,7 +572,8 @@
       "material": {
         "description": "a tart and a feather"
       }
-    }
+    },
+    "higherLevelSlotEffect": "<p>You can target one additional creature for each spell slot level above 1.</p>"
   },
   {
     "id": "srd-cc-5.2.1:hunters-mark",
@@ -577,7 +585,7 @@
     "updatedAt": "2024-05-21T00:00:00.000Z",
     "name": "Hunter's Mark",
     "level": 1,
-    "description": "<p>You magically mark one creature you can see within range as your quarry. Until the spell ends, you deal an extra 1d6 Force damage to the target whenever you hit it with an attack roll. You also have Advantage on any Wisdom (Perception or Survival) check you make to find it.</p><p>If the target drops to 0 Hit Points before this spell ends, you can take a Bonus Action to move the mark to a new creature you can see within range.</p><p><strong>Using a Higher-Level Spell Slot.</strong> Your Concentration can last longer with a spell slot of level 3–4 (up to 8 hours) or 5+ (up to 24 hours).</p>",
+    "description": "<p>You magically mark one creature you can see within range as your quarry. Until the spell ends, you deal an extra 1d6 Force damage to the target whenever you hit it with an attack roll. You also have Advantage on any Wisdom (Perception or Survival) check you make to find it.</p><p>If the target drops to 0 Hit Points before this spell ends, you can take a Bonus Action to move the mark to a new creature you can see within range.</p>",
     "school": "divination",
     "classIds": ["ranger"],
     "tags": {
@@ -607,7 +615,8 @@
     },
     "components": {
       "verbal": true
-    }
+    },
+    "higherLevelSlotEffect": "<p>Your Concentration can last longer with a spell slot of level 3–4 (up to 8 hours) or 5+ (up to 24 hours).</p>"
   },
   {
     "id": "srd-cc-5.2.1:ice-knife",
@@ -619,7 +628,7 @@
     "updatedAt": "2024-05-21T00:00:00.000Z",
     "name": "Ice Knife",
     "level": 1,
-    "description": "<p>You create a shard of ice and fling it at one creature within range. Make a ranged spell attack against the target. On a hit, the target takes 1d10 Piercing damage. Hit or miss, the shard then explodes. The target and each creature within 5 feet of it must succeed on a Dexterity saving throw or take 2d6 Cold damage.</p><p><strong>Using a Higher-Level Spell Slot.</strong> The Cold damage increases by 1d6 for each spell slot level above 1.</p>",
+    "description": "<p>You create a shard of ice and fling it at one creature within range. Make a ranged spell attack against the target. On a hit, the target takes 1d10 Piercing damage. Hit or miss, the shard then explodes. The target and each creature within 5 feet of it must succeed on a Dexterity saving throw or take 2d6 Cold damage.</p>",
     "school": "conjuration",
     "classIds": ["druid", "sorcerer", "wizard"],
     "tags": {
@@ -649,7 +658,8 @@
         "description": "a drop of water or a piece of ice"
       }
     },
-    "deliveryMethod": "ranged-spell-attack"
+    "deliveryMethod": "ranged-spell-attack",
+    "higherLevelSlotEffect": "<p>The Cold damage increases by 1d6 for each spell slot level above 1.</p>"
   },
   {
     "id": "srd-cc-5.2.1:identify",
@@ -737,7 +747,7 @@
     "updatedAt": "2024-05-21T00:00:00.000Z",
     "name": "Inflict Wounds",
     "level": 1,
-    "description": "<p>A creature you touch makes a Constitution saving throw, taking 2d10 Necrotic damage on a failed save or half as much damage on a successful one.</p><p><strong>Using a Higher-Level Spell Slot.</strong> The damage increases by 1d10 for each spell slot level above 1.</p>",
+    "description": "<p>A creature you touch makes a Constitution saving throw, taking 2d10 Necrotic damage on a failed save or half as much damage on a successful one.</p>",
     "school": "necromancy",
     "classIds": ["cleric"],
     "tags": {
@@ -760,7 +770,8 @@
     "components": {
       "verbal": true,
       "somatic": true
-    }
+    },
+    "higherLevelSlotEffect": "<p>The damage increases by 1d10 for each spell slot level above 1.</p>"
   },
   {
     "id": "srd-cc-5.2.1:jump",
@@ -772,7 +783,7 @@
     "updatedAt": "2024-05-21T00:00:00.000Z",
     "name": "Jump",
     "level": 1,
-    "description": "<p>You touch a willing creature. Once on each of its turns until the spell ends, that creature can jump up to 30 feet by spending 10 feet of movement.</p><p><strong>Using a Higher-Level Spell Slot.</strong> You can target one additional creature for each spell slot level above 1.</p>",
+    "description": "<p>You touch a willing creature. Once on each of its turns until the spell ends, that creature can jump up to 30 feet by spending 10 feet of movement.</p>",
     "school": "transmutation",
     "classIds": ["druid", "ranger", "sorcerer", "wizard"],
     "tags": {
@@ -799,7 +810,8 @@
       "material": {
         "description": "a grasshopper's hind leg"
       }
-    }
+    },
+    "higherLevelSlotEffect": "<p>You can target one additional creature for each spell slot level above 1.</p>"
   },
   {
     "id": "srd-cc-5.2.1:longstrider",
@@ -810,7 +822,7 @@
     "createdAt": "2024-05-21T00:00:00.000Z",
     "updatedAt": "2024-05-21T00:00:00.000Z",
     "name": "Longstrider",
-    "description": "<p>You touch a creature. The target's Speed increases by 10 feet until the spell ends.</p><p><strong>Using a Higher-Level Spell Slot.</strong> You can target one additional creature for each spell slot level above 1.</p>",
+    "description": "<p>You touch a creature. The target's Speed increases by 10 feet until the spell ends.</p>",
     "school": "transmutation",
     "level": 1,
     "classIds": ["bard", "druid", "ranger", "wizard"],
@@ -839,7 +851,8 @@
       "material": {
         "description": "a pinch of dirt"
       }
-    }
+    },
+    "higherLevelSlotEffect": "<p>You can target one additional creature for each spell slot level above 1.</p>"
   },
   {
     "id": "srd-cc-5.2.1:mage-armor",
@@ -890,7 +903,7 @@
     "updatedAt": "2024-05-21T00:00:00.000Z",
     "name": "Magic Missile",
     "level": 1,
-    "description": "<p>You create three glowing darts of magical force. Each dart strikes a creature of your choice that you can see within range. A dart deals 1d4 + 1 Force damage to its target. The darts all strike simultaneously, and you can direct them to hit one creature or several.</p><p><strong>Using a Higher-Level Spell Slot.</strong> The spell creates one more dart for each spell slot level above 1.</p>",
+    "description": "<p>You create three glowing darts of magical force. Each dart strikes a creature of your choice that you can see within range. A dart deals 1d4 + 1 Force damage to its target. The darts all strike simultaneously, and you can direct them to hit one creature or several.</p>",
     "school": "evocation",
     "classIds": ["sorcerer", "wizard"],
     "tags": {
@@ -917,7 +930,8 @@
     "components": {
       "verbal": true,
       "somatic": true
-    }
+    },
+    "higherLevelSlotEffect": "<p>The spell creates one more dart for each spell slot level above 1.</p>"
   },
   {
     "id": "srd-cc-5.2.1:purify-food-and-drink",
@@ -967,7 +981,7 @@
     "updatedAt": "2024-05-21T00:00:00.000Z",
     "name": "Ray of Sickness",
     "level": 1,
-    "description": "<p>You shoot a greenish ray at a creature within range. Make a ranged spell attack against the target. On a hit, the target takes 2d8 Poison damage and has the Poisoned condition until the end of your next turn.</p><p><strong>Using a Higher-Level Spell Slot.</strong> The damage increases by 1d8 for each spell slot level above 1.</p>",
+    "description": "<p>You shoot a greenish ray at a creature within range. Make a ranged spell attack against the target. On a hit, the target takes 2d8 Poison damage and has the Poisoned condition until the end of your next turn.</p>",
     "school": "necromancy",
     "classIds": ["sorcerer", "wizard"],
     "tags": {
@@ -996,7 +1010,8 @@
       "verbal": true,
       "somatic": true
     },
-    "deliveryMethod": "ranged-spell-attack"
+    "deliveryMethod": "ranged-spell-attack",
+    "higherLevelSlotEffect": "<p>The damage increases by 1d8 for each spell slot level above 1.</p>"
   },
   {
     "id": "srd-cc-5.2.1:sanctuary",
@@ -1260,7 +1275,7 @@
     "updatedAt": "2024-05-21T00:00:00.000Z",
     "name": "Thunderwave",
     "level": 1,
-    "description": "<p>You unleash a wave of thunderous energy. Each creature in a 15-foot Cube originating from you makes a Constitution saving throw. On a failed save, a creature takes 2d8 Thunder damage and is pushed 10 feet away from you. On a successful save, a creature takes half as much damage only.</p><p>In addition, unsecured objects that are entirely within the Cube are pushed 10 feet away from you, and a thunderous boom is audible within 300 feet.</p><p><strong>Using a Higher-Level Spell Slot.</strong> The damage increases by 1d8 for each spell slot level above 1.</p>",
+    "description": "<p>You unleash a wave of thunderous energy. Each creature in a 15-foot Cube originating from you makes a Constitution saving throw. On a failed save, a creature takes 2d8 Thunder damage and is pushed 10 feet away from you. On a successful save, a creature takes half as much damage only.</p><p>In addition, unsecured objects that are entirely within the Cube are pushed 10 feet away from you, and a thunderous boom is audible within 300 feet.</p>",
     "school": "evocation",
     "classIds": ["bard", "druid", "sorcerer", "wizard"],
     "tags": {
@@ -1283,6 +1298,7 @@
     "components": {
       "verbal": true,
       "somatic": true
-    }
+    },
+    "higherLevelSlotEffect": "<p>The damage increases by 1d8 for each spell slot level above 1.</p>"
   }
 ]

@@ -32,6 +32,8 @@ export const SPELL_STAT_LABELS = {
 export const SPELL_SECTION_LABELS = {
   classes: 'Classes',
   tags: 'Tags',
+  cantripScaling: 'Cantrip Upgrade',
+  higherLevelSlotEffect: 'Using a Higher-Level Spell Slot',
 } as const
 
 const SPELL_STAT_RITUAL_INFO =
@@ -50,6 +52,11 @@ export type SpellDisplayVocabulary = {
 export type SpellDetailViewModel = {
   statRows: ContentStatRowData[]
   descriptionHtml?: string
+  proseSections?: Array<{
+    id: 'cantripScaling' | 'higherLevelSlotEffect'
+    title: string
+    bodyHtml: string
+  }>
   classesSection?: {
     title: string
     items: Array<{ slug: string; label: string }>
@@ -112,6 +119,28 @@ function buildSpellStatRows(
   return rows
 }
 
+function buildProseSections(spell: Spell): SpellDetailViewModel['proseSections'] {
+  const sections: NonNullable<SpellDetailViewModel['proseSections']> = []
+
+  if (spell.cantripScaling?.trim()) {
+    sections.push({
+      id: 'cantripScaling',
+      title: SPELL_SECTION_LABELS.cantripScaling,
+      bodyHtml: spell.cantripScaling,
+    })
+  }
+
+  if (spell.higherLevelSlotEffect?.trim()) {
+    sections.push({
+      id: 'higherLevelSlotEffect',
+      title: SPELL_SECTION_LABELS.higherLevelSlotEffect,
+      bodyHtml: spell.higherLevelSlotEffect,
+    })
+  }
+
+  return sections.length > 0 ? sections : undefined
+}
+
 export function buildSpellDetailViewModel(
   spell: Spell,
   vocabulary: SpellDisplayVocabulary,
@@ -121,6 +150,7 @@ export function buildSpellDetailViewModel(
   return {
     statRows: buildSpellStatRows(spell, vocabulary),
     descriptionHtml: spell.description || undefined,
+    proseSections: buildProseSections(spell),
     classesSection:
       spell.classIds.length > 0
         ? {

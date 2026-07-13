@@ -8,17 +8,34 @@
     "createdAt": "2024-05-21T00:00:00.000Z",
     "updatedAt": "2024-05-21T00:00:00.000Z",
     "name": "Mass Healing Word",
-    "description": "<p>Up to six creatures of your choice that you can see within range regain Hit Points equal to 2d4 plus your spellcasting ability modifier.</p><p><strong>Using a Higher-Level Spell Slot.</strong> The healing increases by 1d4 for each spell slot level above 3.</p>",
+    "description": "<p>Up to six creatures of your choice that you can see within range regain Hit Points equal to 2d4 plus your spellcasting ability modifier.</p>",
     "school": "abjuration",
     "level": 3,
     "classIds": ["bard", "cleric"],
     "tags": {
       "roles": ["healing"]
     },
-    "castingTime": { "normal": { "value": 1, "unit": "bonus-action" }, "canBeCastAsRitual": false },
-    "range": { "kind": "distance", "value": { "value": 60, "unit": "ft" } },
-    "duration": { "kind": "instantaneous" },
-    "components": { "verbal": true }
+    "castingTime": {
+      "normal": {
+        "value": 1,
+        "unit": "bonus-action"
+      },
+      "canBeCastAsRitual": false
+    },
+    "range": {
+      "kind": "distance",
+      "value": {
+        "value": 60,
+        "unit": "ft"
+      }
+    },
+    "duration": {
+      "kind": "instantaneous"
+    },
+    "components": {
+      "verbal": true
+    },
+    "higherLevelSlotEffect": "<p>The healing increases by 1d4 for each spell slot level above 3.</p>"
   },
   {
     "id": "srd-cc-5.2.1:revivify",
@@ -36,13 +53,25 @@
     "tags": {
       "roles": ["healing"]
     },
-    "castingTime": { "normal": { "value": 1, "unit": "action" }, "canBeCastAsRitual": false },
-    "range": { "kind": "touch" },
-    "duration": { "kind": "instantaneous" },
+    "castingTime": {
+      "normal": {
+        "value": 1,
+        "unit": "action"
+      },
+      "canBeCastAsRitual": false
+    },
+    "range": {
+      "kind": "touch"
+    },
+    "duration": {
+      "kind": "instantaneous"
+    },
     "components": {
       "verbal": true,
       "somatic": true,
-      "material": { "description": "a diamond worth 300+ GP, which the spell consumes" }
+      "material": {
+        "description": "a diamond worth 300+ GP, which the spell consumes"
+      }
     }
   }
 ]

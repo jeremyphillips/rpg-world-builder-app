@@ -16,13 +16,25 @@
       "conditions": ["charmed", "petrified"],
       "roles": ["healing"]
     },
-    "castingTime": { "normal": { "value": 1, "unit": "action" }, "canBeCastAsRitual": false },
-    "range": { "kind": "touch" },
-    "duration": { "kind": "instantaneous" },
+    "castingTime": {
+      "normal": {
+        "value": 1,
+        "unit": "action"
+      },
+      "canBeCastAsRitual": false
+    },
+    "range": {
+      "kind": "touch"
+    },
+    "duration": {
+      "kind": "instantaneous"
+    },
     "components": {
       "verbal": true,
       "somatic": true,
-      "material": { "description": "diamond dust worth 100+ GP, which the spell consumes" }
+      "material": {
+        "description": "diamond dust worth 100+ GP, which the spell consumes"
+      }
     }
   },
   {
@@ -34,16 +46,34 @@
     "createdAt": "2024-05-21T00:00:00.000Z",
     "updatedAt": "2024-05-21T00:00:00.000Z",
     "name": "Mass Cure Wounds",
-    "description": "<p>A wave of healing energy washes out from a point you can see within range. Choose up to six creatures in a 30-foot-radius Sphere centered on that point. Each target regains Hit Points equal to 5d8 plus your spellcasting ability modifier.</p><p><strong>Using a Higher-Level Spell Slot.</strong> The healing increases by 1d8 for each spell slot level above 5.</p>",
+    "description": "<p>A wave of healing energy washes out from a point you can see within range. Choose up to six creatures in a 30-foot-radius Sphere centered on that point. Each target regains Hit Points equal to 5d8 plus your spellcasting ability modifier.</p>",
     "school": "abjuration",
     "level": 5,
     "classIds": ["bard", "cleric", "druid"],
     "tags": {
       "roles": ["healing"]
     },
-    "castingTime": { "normal": { "value": 1, "unit": "action" }, "canBeCastAsRitual": false },
-    "range": { "kind": "distance", "value": { "value": 60, "unit": "ft" } },
-    "duration": { "kind": "instantaneous" },
-    "components": { "verbal": true, "somatic": true }
+    "castingTime": {
+      "normal": {
+        "value": 1,
+        "unit": "action"
+      },
+      "canBeCastAsRitual": false
+    },
+    "range": {
+      "kind": "distance",
+      "value": {
+        "value": 60,
+        "unit": "ft"
+      }
+    },
+    "duration": {
+      "kind": "instantaneous"
+    },
+    "components": {
+      "verbal": true,
+      "somatic": true
+    },
+    "higherLevelSlotEffect": "<p>The healing increases by 1d8 for each spell slot level above 5.</p>"
   }
 ]

@@ -16,7 +16,9 @@ const timestamps = {
 const fireBoltBody = {
   name: 'Fire Bolt',
   description:
-    '<p>You hurl a mote of fire at a creature or an object within range. Make a ranged spell attack against the target. On a hit, the target takes 1d10 Fire damage.</p>',
+    "<p>You hurl a mote of fire at a creature or an object within range. Make a ranged spell attack against the target. On a hit, the target takes 1d10 Fire damage. A flammable object hit by this spell starts burning if it isn't being worn or carried.</p>",
+  cantripScaling:
+    '<p>The damage increases by 1d10 when you reach levels 5 (2d10), 11 (3d10), and 17 (4d10).</p>',
   school: 'evocation',
   level: 0,
   classIds: ['sorcerer', 'wizard'],
@@ -49,6 +51,15 @@ describe('spellSchema', () => {
   it('parses a homebrew spell with a campaignId', () => {
     const homebrew = { ...fireBolt, source: 'homebrew', campaignId: 'camp_1' }
     expect(spellSchema.parse(homebrew)).toEqual(homebrew)
+  })
+
+  it('allows optional scaling prose fields', () => {
+    const withScaling = {
+      ...fireBolt,
+      higherLevelSlotEffect:
+        '<p>The healing increases by 2d8 for each spell slot level above 1.</p>',
+    }
+    expect(spellSchema.parse(withScaling)).toEqual(withScaling)
   })
 
   it('allows omitting optional tags and deliveryMethod', () => {

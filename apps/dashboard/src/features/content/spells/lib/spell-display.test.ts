@@ -181,4 +181,40 @@ describe('buildSpellDetailViewModel', () => {
       buildSpellDetailViewModel({ ...FIRE_BOLT, description: '' }, vocabulary).descriptionHtml,
     ).toBeUndefined()
   })
+
+  it('builds cantrip scaling prose section', () => {
+    const viewModel = buildSpellDetailViewModel(FIRE_BOLT, vocabulary)
+
+    expect(viewModel.proseSections).toEqual([
+      {
+        id: 'cantripScaling',
+        title: SPELL_SECTION_LABELS.cantripScaling,
+        bodyHtml: FIRE_BOLT.cantripScaling,
+      },
+    ])
+    expect(viewModel.descriptionHtml).not.toContain('Cantrip Upgrade')
+  })
+
+  it('builds higher-level slot effect prose section', () => {
+    const spell = {
+      ...DETECT_MAGIC,
+      higherLevelSlotEffect: '<p>Targets one additional creature for each slot above 1.</p>',
+    }
+    const viewModel = buildSpellDetailViewModel(spell, vocabulary)
+
+    expect(viewModel.proseSections).toEqual([
+      {
+        id: 'higherLevelSlotEffect',
+        title: SPELL_SECTION_LABELS.higherLevelSlotEffect,
+        bodyHtml: spell.higherLevelSlotEffect,
+      },
+    ])
+  })
+
+  it('omits prose sections when scaling fields are absent or empty', () => {
+    expect(buildSpellDetailViewModel(DETECT_MAGIC, vocabulary).proseSections).toBeUndefined()
+    expect(
+      buildSpellDetailViewModel({ ...FIRE_BOLT, cantripScaling: '' }, vocabulary).proseSections,
+    ).toBeUndefined()
+  })
 })

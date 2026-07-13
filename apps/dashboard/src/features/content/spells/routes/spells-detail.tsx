@@ -86,6 +86,35 @@ function SpellTagsSection({
   )
 }
 
+function SpellProseSection({
+  section,
+}: {
+  section: NonNullable<SpellDetailViewModel['proseSections']>[number]
+}) {
+  return (
+    <section aria-labelledby={`spell-${section.id}-heading`}>
+      <Heading variant="section" as="h2" id={`spell-${section.id}-heading`} className="mb-3">
+        {section.title}
+      </Heading>
+      <RichTextContent html={section.bodyHtml} size="md" tone="muted" />
+    </section>
+  )
+}
+
+function SpellProseSections({
+  sections,
+}: {
+  sections: NonNullable<SpellDetailViewModel['proseSections']>
+}) {
+  return (
+    <>
+      {sections.map((section) => (
+        <SpellProseSection key={section.id} section={section} />
+      ))}
+    </>
+  )
+}
+
 // ---------------------------------------------------------------------------
 // Main detail component
 // ---------------------------------------------------------------------------
@@ -127,6 +156,7 @@ export function SpellDetailContent({ spell, campaignId }: SpellDetailContentProp
           ) : undefined
         }
       >
+        {viewModel.proseSections ? <SpellProseSections sections={viewModel.proseSections} /> : null}
         {viewModel.classesSection ? (
           <SpellClassesList campaignId={campaignId} section={viewModel.classesSection} />
         ) : null}
