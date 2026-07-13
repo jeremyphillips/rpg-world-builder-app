@@ -7,11 +7,18 @@ import { CatalogPickerItemHeader } from './catalog-picker-item-header.client'
 import { CatalogPickerSelectionActions } from './catalog-picker-selection-actions.client'
 
 describe('CatalogPickerItemHeader', () => {
-  it('renders name, metadata, footer, and actions', () => {
-    render(
+  it('renders name, metadata lines, footer, and actions', () => {
+    const { container } = render(
       <CatalogPickerItemHeader
         name="Mage Hand"
-        metadataLine="Cantrip · Conjuration"
+        metadataLines={[
+          {
+            segments: [
+              { type: 'badge', text: 'Cantrip', tone: 'neutral', appearance: 'neutral' },
+              { type: 'text', text: 'Conjuration' },
+            ],
+          },
+        ]}
         footer={<span>Ritual</span>}
         actions={
           <CatalogPickerSelectionActions
@@ -25,7 +32,8 @@ describe('CatalogPickerItemHeader', () => {
     )
 
     expect(screen.getByText('Mage Hand')).toBeInTheDocument()
-    expect(screen.getByText('Cantrip · Conjuration')).toBeInTheDocument()
+    expect(container).toHaveTextContent('Cantrip')
+    expect(screen.getByText('Conjuration')).toBeInTheDocument()
     expect(screen.getByText('Ritual')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Add' })).toBeInTheDocument()
   })

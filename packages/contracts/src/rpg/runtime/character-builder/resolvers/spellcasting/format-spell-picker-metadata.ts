@@ -8,43 +8,49 @@ import type {
   SpellDuration,
   SpellRange,
 } from '../../../../vocab/spell'
+import { getCompactSpellDeliveryMethodLabel } from '../../../../vocab/spell/delivery-method'
 import { getDurationUnitLabel } from '../../../../vocab/spell/duration'
 import { getSpellRangeKindLabel } from '../../../../vocab/spell/range'
 import { getSpellSchoolLabel } from '../../../../vocab/spell/school'
 
 export const SPELL_PICKER_CANTrip_LEVEL_LABEL = 'Cantrip'
 
-const SUMMARY_SEPARATOR = ' · '
+export type SpellPickerCompactSummary = {
+  /** Casting time, range, and duration — ordered usage/mechanics facts for line 1. */
+  castingSummary: readonly string[]
+  classification: {
+    levelLabel: string
+    descriptors: readonly string[]
+  }
+}
 
-/** Returns "Cantrip" for level 0, otherwise `Level N` (e.g. "Level 1"). */
+/** Returns "Cantrip" for level 0, otherwise an ordinal level label (e.g. "1st level"). */
 export function formatSpellPickerLevelLabel(level: number): string {
   if (level === 0) return SPELL_PICKER_CANTrip_LEVEL_LABEL
-  return `Level ${level}`
+  return `${formatSpellLevel(level)} level`
 }
 
 const CASTING_TIME_UNIT_FORMATTERS: Record<string, (value: number) => string> = {
-  action: (value) => (value === 1 ? 'Action' : `${value} Actions`),
-  'bonus-action': (value) => (value === 1 ? 'Bonus action' : `${value} Bonus actions`),
-  reaction: (value) => (value === 1 ? 'Reaction' : `${value} Reactions`),
-  minute: (value) => (value === 1 ? '1 Minute' : `${value} Minutes`),
-  hour: (value) => (value === 1 ? '1 Hour' : `${value} Hours`),
+  action: (value) => (value === 1 ? 'Action' : `${value} actions`),
+  'bonus-action': (value) => (value === 1 ? 'Bonus action' : `${value} bonus actions`),
+  reaction: (value) => (value === 1 ? 'Reaction' : `${value} reactions`),
+  minute: (value) => (value === 1 ? '1 minute' : `${value} minutes`),
+  hour: (value) => (value === 1 ? '1 hour' : `${value} hours`),
 }
 
-/** Compact casting time for picker rows (e.g. "Action", "1 Minute"). */
+/** Compact casting time for picker rows (e.g. "Action", "1 minute"). Omits reaction triggers. */
 export function formatSpellPickerCastingTime(castingTime: SpellCastingTime): string {
   const { value, unit } = castingTime.normal
   const formatter = CASTING_TIME_UNIT_FORMATTERS[unit]
   if (formatter) return formatter(value)
-  return `${value} ${getCastingTimeUnitLabel(unit)}`
+  return `${value} ${getCastingTimeUnitLabel(unit).toLowerCase()}`
 }
 
-/** Formats spell range for picker rows (e.g. "Self", "120 ft."). */
+/** Formats spell range for picker rows (e.g. "Self", "120 ft"). */
 export function formatSpellPickerRange(range: SpellRange): string {
   switch (range.kind) {
-    case 'distance': {
-      const unit = formatSpellPickerRangeUnit(range.value.unit)
-      return `${range.value.value} ${unit}`
-    }
+    case 'distance':
+      return `${range.value.value} ${range.value.unit}`
     case 'special':
       return range.description
     default:
@@ -109,31 +115,27 @@ function flattenSpellTags(tags: SpellTags | undefined): string[] {
   ]
 }
 
-function formatSpellPickerRangeUnit(unit: string): string {
-  return unit.endsWith('.') ? unit : `${unit}.`
+function buildSpellPickerClassificationDescriptors(spell: Spell): string[] {
+  const descriptors = [getSpellSchoolLabel(spell.school)]
+  if (spell.deliveryMethod) {
+    descriptors.push(getCompactSpellDeliveryMethodLabel(spell.deliveryMethod))
+  }
+  return descriptors
 }
 
-/** Builds the compact metadata line for spell picker rows. */
-export function formatSpellPickerSummaryLine(spell: Spell): string {
-  const parts = [
-    formatSpellPickerLevelLabel(spell.level),
-    getSpellSchoolLabel(spell.school),
-    formatSpellPickerCastingTime(spell.castingTime),
-    formatSpellPickerRange(spell.range),
-    formatSpellPickerDuration(spell.duration),
-  ]
-
-  const concentrationMarker = formatSpellConcentrationMarker(spell.duration)
-  if (concentrationMarker) parts.push(concentrationMarker)
-
-  const ritualMarker = formatSpellRitualMarker(spell.castingTime)
-  if (ritualMarker) parts.push(ritualMarker)
-
-  if (spell.tags) {
-    parts.push(...flattenSpellTags(spell.tags))
+/** Builds structured compact summary facts for spell picker rows. */
+export function buildSpellPickerCompactSummary(spell: Spell): SpellPickerCompactSummary {
+  return {
+    castingSummary: [
+      formatSpellPickerCastingTime(spell.castingTime),
+      formatSpellPickerRange(spell.range),
+      formatSpellPickerDuration(spell.duration),
+    ],
+    classification: {
+      levelLabel: formatSpellPickerLevelLabel(spell.level),
+      descriptors: buildSpellPickerClassificationDescriptors(spell),
+    },
   }
-
-  return parts.filter(Boolean).join(SUMMARY_SEPARATOR)
 }
 
 function stripHtmlTags(html: string): string {

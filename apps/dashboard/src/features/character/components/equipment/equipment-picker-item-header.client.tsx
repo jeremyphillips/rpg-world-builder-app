@@ -3,17 +3,15 @@
 import type { ReactNode } from 'react'
 import { Check, TriangleAlert } from 'lucide-react'
 
-import { EQUIPMENT_COMPACT_SEPARATOR } from '@rpg/contracts'
 import { Badge } from '@rpg/ui'
 
 import type { EquipmentPickerRowViewModel } from '@/features/content'
 
 import { CatalogPickerItemHeader } from '../picker/catalog-picker-item-header.client'
+import { mapEquipmentCompactSummaryToMetadataLines } from '../picker/catalog-picker-metadata'
 import { getEquipmentCalloutPresentation } from './equipment-picker-callout-presentation.lib'
-import { EQUIPMENT_PICKER_HEADER_DIVIDER } from './equipment-picker-drawer.variants'
 import type { EquipmentPickerCallout } from './equipment-picker-drawer.types'
 import {
-  EQUIPMENT_PICKER_ITEM_HEADER_DIVIDER_CLASSES,
   EQUIPMENT_PICKER_ITEM_HEADER_FOOTER_META_CLASSES,
   EQUIPMENT_PICKER_ITEM_HEADER_KIND_CLASSES,
 } from './equipment-picker-item-header.variants'
@@ -32,25 +30,20 @@ export function EquipmentPickerItemHeader({
   commerce,
   disabled = false,
 }: EquipmentPickerItemHeaderProps) {
-  const metadataLine =
-    item.metadata.length > 0 ? item.metadata.join(EQUIPMENT_COMPACT_SEPARATOR) : undefined
+  const metadataLines = mapEquipmentCompactSummaryToMetadataLines({
+    kindLabel: item.kindLabel,
+    comparisonGroups: item.comparisonGroups,
+  })
 
   return (
     <CatalogPickerItemHeader
       name={item.name}
-      metadataLine={metadataLine}
+      metadataLines={metadataLines}
       disabled={disabled}
       footer={
         <div className={EQUIPMENT_PICKER_ITEM_HEADER_FOOTER_META_CLASSES}>
           <span className={EQUIPMENT_PICKER_ITEM_HEADER_KIND_CLASSES}>{item.kindLabel}</span>
-          {callout ? (
-            <>
-              <span className={EQUIPMENT_PICKER_ITEM_HEADER_DIVIDER_CLASSES} aria-hidden>
-                {EQUIPMENT_PICKER_HEADER_DIVIDER}
-              </span>
-              <EquipmentPickerCalloutBadge callout={callout} />
-            </>
-          ) : null}
+          {callout ? <EquipmentPickerCalloutBadge callout={callout} /> : null}
         </div>
       }
       actions={commerce}

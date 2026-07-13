@@ -104,38 +104,38 @@ describe('equipment-compact-display', () => {
     expect(joinCompactSegments('AC 16', undefined, 'Heavy armor')).toBe('AC 16 · Heavy armor')
   })
 
-  it('builds weapon metadata segments', () => {
+  it('builds weapon comparison groups', () => {
     expect(buildEquipmentCompactSummary(dagger)).toEqual({
       kindLabel: 'Weapon',
-      metadata: ['1d4 Piercing', 'Finesse · Light · Thrown'],
+      comparisonGroups: ['1d4 Piercing', 'Finesse · Light · Thrown'],
     })
   })
 
-  it('caps armor metadata and prefers restriction over weight', () => {
+  it('caps armor comparison groups and prefers restriction over weight', () => {
     expect(buildEquipmentCompactSummary(plateArmor)).toEqual({
       kindLabel: 'Armor',
-      metadata: ['AC 18', 'Heavy Armor', 'Str 15 required'],
+      comparisonGroups: ['AC 18', 'Heavy Armor', 'Str 15 required'],
     })
   })
 
   it('formats holy symbol spellcasting gear without the parent gear kind', () => {
     expect(buildEquipmentCompactSummary(holySymbolAmulet)).toEqual({
       kindLabel: 'Adventuring Gear',
-      metadata: ['Holy Symbol', 'Worn or held'],
+      comparisonGroups: ['Holy Symbol', 'Worn or held'],
     })
   })
 
-  it('builds magic item metadata segments', () => {
+  it('builds magic item comparison groups', () => {
     expect(buildEquipmentCompactSummary(bracersOfDefense)).toEqual({
       kindLabel: 'Magic Item',
-      metadata: ['Wondrous Item', 'Rare', 'Requires attunement'],
+      comparisonGroups: ['Wondrous Item', 'Rare', 'Requires attunement'],
     })
   })
 
-  it('builds mount metadata with speed before carrying capacity', () => {
+  it('builds mount comparison groups with speed before carrying capacity', () => {
     expect(buildEquipmentCompactSummary(ridingHorse)).toEqual({
       kindLabel: 'Mount',
-      metadata: ['60 ft.', 'Carrying capacity 480 lb'],
+      comparisonGroups: ['60 ft.', 'Carrying capacity 480 lb'],
     })
   })
 

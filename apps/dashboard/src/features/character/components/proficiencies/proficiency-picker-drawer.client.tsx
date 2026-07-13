@@ -10,6 +10,7 @@ import {
   catalogPickerSortActionsGroupClasses,
 } from '../picker/catalog-picker-filter-toolbar.variants'
 import { CatalogPickerItemHeader } from '../picker/catalog-picker-item-header.client'
+import { mapSkillProficiencyCompactSummaryToMetadataLines } from '../picker/catalog-picker-metadata'
 import { CatalogPickerSelectionActions } from '../picker/catalog-picker-selection-actions.client'
 import { catalogPickerShellProps } from '../picker/catalog-picker-shell.lib'
 import { catalogPickerEmptyStateClasses } from '../picker/catalog-picker-shell.variants'
@@ -155,6 +156,11 @@ export function ProficiencyPickerDrawer({
         return (
           <CatalogPickerItemHeader
             name={item.label}
+            metadataLines={
+              item.compactSummary
+                ? mapSkillProficiencyCompactSummaryToMetadataLines(item.compactSummary)
+                : undefined
+            }
             disabled={isProficiencyPickerRowDimmed(item)}
             footer={disabledNote ? <Text variant="muted">{disabledNote}</Text> : undefined}
             actions={

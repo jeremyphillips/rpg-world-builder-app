@@ -32,7 +32,7 @@ export type EquipmentPickerRowViewModel = {
   name: string
   priceLabel: string
   kindLabel: string
-  metadata: string[]
+  comparisonGroups: readonly string[]
 }
 
 export type EquipmentDetailViewModel = {
@@ -53,13 +53,13 @@ function buildEquipmentStatRows(equipment: Equipment): ContentStatRowData[] {
 export function buildEquipmentPickerRowViewModel(
   equipment: Equipment,
 ): EquipmentPickerRowViewModel {
-  const { kindLabel, metadata } = buildEquipmentCompactSummary(equipment)
+  const { kindLabel, comparisonGroups } = buildEquipmentCompactSummary(equipment)
 
   return {
     name: equipment.name,
     priceLabel: formatMoney(equipment.cost),
     kindLabel,
-    metadata,
+    comparisonGroups,
   }
 }
 

@@ -18,6 +18,7 @@ import {
 } from '../picker/catalog-picker-filter-toolbar.variants'
 import { CatalogPickerItemHeader } from '../picker/catalog-picker-item-header.client'
 import { CatalogPickerItemMarkers } from '../picker/catalog-picker-item-markers.client'
+import { mapSpellPickerCompactSummaryToMetadataLines } from '../picker/catalog-picker-metadata'
 import { CatalogPickerSelectionActions } from '../picker/catalog-picker-selection-actions.client'
 import { catalogPickerShellProps } from '../picker/catalog-picker-shell.lib'
 import { catalogPickerEmptyStateClasses } from '../picker/catalog-picker-shell.variants'
@@ -255,12 +256,12 @@ export function SpellPickerDrawer({
       )}
       renderItemHeader={(item) => {
         const disabledNote = getSpellPickerDisabledNote(item)
-        const markers = collectSpellPickerMarkers(item.spell)
+        const markers = collectSpellPickerMarkers(item.spell, item.compactSummary)
 
         return (
           <CatalogPickerItemHeader
             name={item.spell.name}
-            metadataLine={item.summaryLine}
+            metadataLines={mapSpellPickerCompactSummaryToMetadataLines(item.compactSummary)}
             disabled={isSpellPickerRowDimmed(item)}
             footer={
               <>

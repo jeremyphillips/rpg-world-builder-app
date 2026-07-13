@@ -4,9 +4,10 @@ import type { ReactNode } from 'react'
 
 import { Text, cn } from '@rpg/ui'
 
+import { CatalogPickerMetadataRenderer } from './catalog-picker-metadata/catalog-picker-metadata-renderer.client'
+import type { CatalogPickerMetadataLine } from './catalog-picker-metadata/catalog-picker-metadata.types'
 import {
   CATALOG_PICKER_ITEM_HEADER_INFO_CLASSES,
-  CATALOG_PICKER_ITEM_HEADER_METADATA_CLASSES,
   CATALOG_PICKER_ITEM_HEADER_NAME_CLASSES,
   catalogPickerItemHeaderDisabledClasses,
   catalogPickerItemHeaderRowClasses,
@@ -14,7 +15,7 @@ import {
 
 export type CatalogPickerItemHeaderProps = {
   name: string
-  metadataLine?: string
+  metadataLines?: readonly CatalogPickerMetadataLine[]
   footer?: ReactNode
   actions: ReactNode
   disabled?: boolean
@@ -22,7 +23,7 @@ export type CatalogPickerItemHeaderProps = {
 
 export function CatalogPickerItemHeader({
   name,
-  metadataLine,
+  metadataLines,
   footer,
   actions,
   disabled = false,
@@ -38,10 +39,8 @@ export function CatalogPickerItemHeader({
         <Text as="span" className={CATALOG_PICKER_ITEM_HEADER_NAME_CLASSES}>
           {name}
         </Text>
-        {metadataLine ? (
-          <Text as="span" className={CATALOG_PICKER_ITEM_HEADER_METADATA_CLASSES}>
-            {metadataLine}
-          </Text>
+        {metadataLines && metadataLines.length > 0 ? (
+          <CatalogPickerMetadataRenderer lines={metadataLines} />
         ) : null}
         {footer}
       </div>

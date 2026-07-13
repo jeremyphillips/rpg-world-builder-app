@@ -123,4 +123,38 @@ describe('resolveProficiencyPickerItems', () => {
     expect(dwarvish?.state.isRecommended).toBe(true)
     expect(elvish?.state.isRecommended).toBe(false)
   })
+
+  it('includes compactSummary for skill proficiency rows', () => {
+    const choiceSets = resolveClassSkillChoiceSets(
+      {
+        ...createEmptyCharacterBuilderDraft(),
+        class: { classId: rogueClass.id, level: 1 },
+      },
+      catalogIndex,
+    )
+    const choiceSetId = choiceSets[0]!.id
+    const draft = {
+      ...createEmptyCharacterBuilderDraft(),
+      class: { classId: rogueClass.id, level: 1 as const },
+    }
+    const proficiencies = assembleCharacterProficiencies(
+      draft,
+      catalogIndex,
+      choiceSets,
+      rogueClass,
+    )
+
+    const items = resolveProficiencyPickerItems({
+      draft,
+      context: proficiencyTestContext,
+      choiceSetId,
+      proficiencies,
+    })
+
+    const stealth = items.find((item) => item.optionId === stealthSkill.id)
+    expect(stealth?.compactSummary).toEqual({
+      abilityLabel: 'Dexterity',
+      exampleUses: stealthSkill.examples,
+    })
+  })
 })

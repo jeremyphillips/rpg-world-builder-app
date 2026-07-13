@@ -1,4 +1,6 @@
 import type { CharacterProficiencies } from '../../../character/proficiencies'
+import type { SkillProficiencyCompactSummary } from '../../../../content/lib/skill-proficiency-compact-display'
+import { buildSkillProficiencyCompactSummary } from '../../../../content/lib/skill-proficiency-compact-display'
 import type { ChoiceSet } from '../../choice-set'
 import type { CharacterBuildCatalogIndex, CharacterBuildContext } from '../../context'
 import { indexCharacterBuildCatalog } from '../../context'
@@ -23,6 +25,7 @@ export type ProficiencyPickerItem = {
   optionId: string
   label: string
   state: ProficiencyPickerItemState
+  compactSummary?: SkillProficiencyCompactSummary
 }
 
 export type ResolveProficiencyPickerItemsArgs = {
@@ -141,16 +144,24 @@ export function resolveProficiencyPickerItems({
         })
       : new Set<string>()
 
-  return choiceSet.options.map((option) => ({
-    optionId: option.id,
-    label: option.label,
-    state: resolveProficiencyPickerItemState(
-      option.id,
-      choiceSet,
-      selectedIds,
-      proficiencies,
-      catalogIndex,
-      recommendedLanguageIds,
-    ),
-  }))
+  return choiceSet.options.map((option) => {
+    const skillRow =
+      choiceSet.choiceType === 'skillProficiency'
+        ? catalogIndex.skillProficiencies.get(option.id)
+        : undefined
+
+    return {
+      optionId: option.id,
+      label: option.label,
+      state: resolveProficiencyPickerItemState(
+        option.id,
+        choiceSet,
+        selectedIds,
+        proficiencies,
+        catalogIndex,
+        recommendedLanguageIds,
+      ),
+      ...(skillRow ? { compactSummary: buildSkillProficiencyCompactSummary(skillRow) } : {}),
+    }
+  })
 }

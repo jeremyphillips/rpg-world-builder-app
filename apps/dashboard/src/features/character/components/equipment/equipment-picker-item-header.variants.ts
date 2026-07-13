@@ -5,8 +5,6 @@ export const EQUIPMENT_PICKER_ITEM_HEADER_FOOTER_META_CLASSES =
 
 export const EQUIPMENT_PICKER_ITEM_HEADER_KIND_CLASSES = 'text-muted-foreground font-normal'
 
-export const EQUIPMENT_PICKER_ITEM_HEADER_DIVIDER_CLASSES = 'text-muted-foreground'
-
 export const EQUIPMENT_PICKER_ITEM_HEADER_COMMERCE_CLASSES =
   'flex shrink-0 items-center gap-2 self-center'
 

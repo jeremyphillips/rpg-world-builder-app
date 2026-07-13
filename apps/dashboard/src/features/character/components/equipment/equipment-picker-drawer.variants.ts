@@ -4,5 +4,3 @@ export const equipmentPickerBudgetClasses =
 export const equipmentPickerBudgetLabelClasses = 'text-muted-foreground'
 
 export const equipmentPickerBudgetValueClasses = 'font-body-emphasis tabular-nums'
-
-export const EQUIPMENT_PICKER_HEADER_DIVIDER = '·'

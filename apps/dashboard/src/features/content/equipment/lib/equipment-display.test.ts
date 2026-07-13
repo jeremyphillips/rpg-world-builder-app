@@ -42,12 +42,12 @@ describe('equipment-display', () => {
       expect(viewModel.name).toBe(equipment.name)
       expect(viewModel.priceLabel).toBe(formatMoney(equipment.cost))
       expect(viewModel.kindLabel).toBe(getEquipmentKindLabel(kind))
-      expect(viewModel.metadata.length).toBeLessThanOrEqual(3)
+      expect(viewModel.comparisonGroups.length).toBeLessThanOrEqual(3)
     })
 
     it('builds dagger compact metadata segments', () => {
       const equipment = pickEquipment('dagger')
-      expect(buildEquipmentPickerRowViewModel(equipment).metadata).toEqual([
+      expect(buildEquipmentPickerRowViewModel(equipment).comparisonGroups).toEqual([
         '1d4 Piercing',
         'Finesse · Light · Thrown',
       ])
@@ -55,7 +55,7 @@ describe('equipment-display', () => {
 
     it('builds plate armor compact metadata segments with restriction over weight', () => {
       const equipment = pickEquipment('plate-armor')
-      expect(buildEquipmentPickerRowViewModel(equipment).metadata).toEqual([
+      expect(buildEquipmentPickerRowViewModel(equipment).comparisonGroups).toEqual([
         'AC 18',
         'Heavy Armor',
         'Str 15 required',
@@ -64,7 +64,7 @@ describe('equipment-display', () => {
 
     it('builds holy symbol compact metadata segments', () => {
       const equipment = pickEquipment('holy-symbol-amulet')
-      expect(buildEquipmentPickerRowViewModel(equipment).metadata).toEqual([
+      expect(buildEquipmentPickerRowViewModel(equipment).comparisonGroups).toEqual([
         'Holy Symbol',
         'Worn or held',
       ])
@@ -72,7 +72,7 @@ describe('equipment-display', () => {
 
     it('builds magic item compact metadata segments', () => {
       const equipment = pickEquipment('bracers-of-defense')
-      expect(buildEquipmentPickerRowViewModel(equipment).metadata).toEqual([
+      expect(buildEquipmentPickerRowViewModel(equipment).comparisonGroups).toEqual([
         'Wondrous Item',
         'Rare',
         'Requires attunement',

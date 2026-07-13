@@ -5,6 +5,7 @@ import {
   PICKER_DISABLED_REASON_SELECTION_FULL,
   type ChoiceSet,
   type Spell,
+  type SpellPickerCompactSummary,
   type SpellPickerItem,
 } from '@rpg/contracts'
 
@@ -38,6 +39,10 @@ const spellNameCollator = new Intl.Collator(undefined, {
   numeric: true,
 })
 
+function castingSummaryIncludesConcentration(castingSummary: readonly string[]): boolean {
+  return castingSummary.some((entry) => entry.includes('Concentration'))
+}
+
 type SpellPickerScoredItem = {
   item: SpellPickerItem
   searchScore: number
@@ -60,10 +65,15 @@ export function formatSpellPickerDrawerDescription(
   return `Selected ${selectedIds.length} of ${choiceSet.max}. Choose ${remaining} more.`
 }
 
-export function collectSpellPickerMarkers(spell: Spell): string[] {
+export function collectSpellPickerMarkers(
+  spell: Spell,
+  compactSummary: SpellPickerCompactSummary,
+): string[] {
   const markers: string[] = []
   const concentration = formatSpellConcentrationMarker(spell.duration)
-  if (concentration) markers.push(concentration)
+  if (concentration && !castingSummaryIncludesConcentration(compactSummary.castingSummary)) {
+    markers.push(concentration)
+  }
   const ritual = formatSpellRitualMarker(spell.castingTime)
   if (ritual) markers.push(ritual)
   return markers

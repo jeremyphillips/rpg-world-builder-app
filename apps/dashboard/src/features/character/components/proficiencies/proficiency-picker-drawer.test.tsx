@@ -40,6 +40,7 @@ describe('ProficiencyPickerDrawer', () => {
 
     expect(screen.getByRole('group', { name: 'Sort proficiencies' })).toBeInTheDocument()
     expect(screen.getByText('Stealth')).toBeInTheDocument()
+    expect(screen.getAllByText('Dexterity').length).toBeGreaterThan(0)
     expect(screen.getByText('Acrobatics')).toBeInTheDocument()
     expect(screen.getByText('Perception')).toBeInTheDocument()
 
@@ -135,7 +136,7 @@ describe('ProficiencyPickerDrawer', () => {
 
     const stealthRow = screen.getByText('Stealth').closest('[data-picker-item-key]') as HTMLElement
     expect(within(stealthRow).getByText(/^Governing Ability$/)).toBeInTheDocument()
-    expect(within(stealthRow).getByText('Dexterity')).toBeInTheDocument()
+    expect(within(stealthRow).getAllByText('Dexterity').length).toBeGreaterThanOrEqual(2)
   })
 
   it('does not render expand controls for language rows', () => {

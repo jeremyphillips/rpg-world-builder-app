@@ -1,3 +1,4 @@
+import { buildSpellPickerCompactSummary } from '@rpg/contracts'
 import { describe, expect, it } from 'vitest'
 
 import {
@@ -19,9 +20,11 @@ import {
 } from './spell-picker-drawer.types'
 
 describe('spell-picker-drawer.lib', () => {
-  it('collects concentration and ritual markers', () => {
-    expect(collectSpellPickerMarkers(spellPickerDetectMagicFixture)).toEqual([
-      'Concentration',
+  it('omits the concentration marker when casting summary already includes concentration phrasing', () => {
+    const compactSummary = buildSpellPickerCompactSummary(spellPickerDetectMagicFixture)
+
+    expect(compactSummary.castingSummary).toContain('Concentration, up to 10 minutes')
+    expect(collectSpellPickerMarkers(spellPickerDetectMagicFixture, compactSummary)).toEqual([
       'Ritual',
     ])
   })

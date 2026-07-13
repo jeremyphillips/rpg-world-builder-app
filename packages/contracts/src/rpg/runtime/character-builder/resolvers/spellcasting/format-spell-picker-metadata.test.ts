@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import type { Spell } from '../../../../content/spell'
 import {
+  buildSpellPickerCompactSummary,
   buildSpellPickerSearchText,
   formatSpellConcentrationMarker,
   formatSpellPickerCastingTime,
@@ -9,7 +10,6 @@ import {
   formatSpellPickerDuration,
   formatSpellPickerLevelLabel,
   formatSpellPickerRange,
-  formatSpellPickerSummaryLine,
   formatSpellRitualMarker,
   SPELL_PICKER_CANTrip_LEVEL_LABEL,
 } from './format-spell-picker-metadata'
@@ -38,11 +38,30 @@ const baseSpell = {
   },
 } satisfies Spell
 
+const detectMagic = {
+  ...baseSpell,
+  id: 'srd-cc-5.2.1:detect-magic',
+  slug: 'detect-magic',
+  name: 'Detect Magic',
+  school: 'divination',
+  level: 1,
+  tags: { roles: ['detection'] },
+  castingTime: { normal: { value: 1, unit: 'action' }, canBeCastAsRitual: true },
+  range: { kind: 'self' },
+  duration: {
+    kind: 'timed',
+    value: 10,
+    unit: 'minute',
+    concentration: true,
+    upTo: true,
+  },
+} satisfies Spell
+
 describe('formatSpellPickerLevelLabel', () => {
   it('labels cantrips and leveled spells', () => {
     expect(formatSpellPickerLevelLabel(0)).toBe(SPELL_PICKER_CANTrip_LEVEL_LABEL)
-    expect(formatSpellPickerLevelLabel(1)).toBe('Level 1')
-    expect(formatSpellPickerLevelLabel(3)).toBe('Level 3')
+    expect(formatSpellPickerLevelLabel(1)).toBe('1st level')
+    expect(formatSpellPickerLevelLabel(3)).toBe('3rd level')
   })
 })
 
@@ -59,15 +78,15 @@ describe('formatSpellPickerCastingTime', () => {
         normal: { value: 10, unit: 'minute' },
         canBeCastAsRitual: true,
       }),
-    ).toBe('10 Minutes')
+    ).toBe('10 minutes')
   })
 })
 
 describe('formatSpellPickerRange', () => {
-  it('formats distance and self ranges', () => {
+  it('formats distance and self ranges without trailing periods', () => {
     expect(formatSpellPickerRange({ kind: 'self' })).toBe('Self')
     expect(formatSpellPickerRange({ kind: 'distance', value: { value: 120, unit: 'ft' } })).toBe(
-      '120 ft.',
+      '120 ft',
     )
   })
 })
@@ -120,11 +139,38 @@ describe('formatSpellRitualMarker', () => {
   })
 })
 
-describe('formatSpellPickerSummaryLine', () => {
-  it('joins level, school, casting time, range, duration, and tags', () => {
-    expect(formatSpellPickerSummaryLine(baseSpell)).toBe(
-      'Level 3 · Evocation · Action · 150 ft. · Instantaneous · damage',
+describe('buildSpellPickerCompactSummary', () => {
+  it('builds casting summary and classification without tags', () => {
+    expect(buildSpellPickerCompactSummary(baseSpell)).toEqual({
+      castingSummary: ['Action', '150 ft', 'Instantaneous'],
+      classification: {
+        levelLabel: '3rd level',
+        descriptors: ['Evocation'],
+      },
+    })
+  })
+
+  it('includes delivery method in classification descriptors when present', () => {
+    expect(
+      buildSpellPickerCompactSummary({
+        ...baseSpell,
+        level: 0,
+        deliveryMethod: 'ranged-spell-attack',
+      }).classification.descriptors,
+    ).toEqual(['Evocation', 'Ranged attack'])
+  })
+
+  it('includes concentration phrasing in casting summary for detect magic', () => {
+    expect(buildSpellPickerCompactSummary(detectMagic).castingSummary).toContain(
+      'Concentration, up to 10 minutes',
     )
+    expect(buildSpellPickerCompactSummary(detectMagic)).toEqual({
+      castingSummary: ['Action', 'Self', 'Concentration, up to 10 minutes'],
+      classification: {
+        levelLabel: '1st level',
+        descriptors: ['Divination'],
+      },
+    })
   })
 })
 
