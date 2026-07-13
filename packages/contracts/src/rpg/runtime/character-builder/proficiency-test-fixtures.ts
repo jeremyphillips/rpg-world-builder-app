@@ -19,6 +19,7 @@ export const stealthSkill = {
   updatedAt: '2026-01-01T00:00:00.000Z',
   name: 'Stealth',
   ability: 'dex',
+  examples: ['Escape notice by moving quietly and hiding behind things'],
 } as const satisfies SkillProficiency
 
 export const acrobaticsSkill = {
@@ -31,6 +32,7 @@ export const acrobaticsSkill = {
   updatedAt: '2026-01-01T00:00:00.000Z',
   name: 'Acrobatics',
   ability: 'dex',
+  examples: ['Stay on your feet in a tricky situation', 'Perform an acrobatic stunt'],
 } as const satisfies SkillProficiency
 
 export const perceptionSkill = {
@@ -43,6 +45,7 @@ export const perceptionSkill = {
   updatedAt: '2026-01-01T00:00:00.000Z',
   name: 'Perception',
   ability: 'wis',
+  examples: ["Using a combination of senses, notice something that's easy to miss"],
 } as const satisfies SkillProficiency
 
 export const rogueClass: ClassStored = {

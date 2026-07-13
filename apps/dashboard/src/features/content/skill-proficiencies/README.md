@@ -11,6 +11,7 @@ Folder name matches the API content type key (`skill-proficiencies`). URLs,
 
 | Area                 | Path                                                                       |
 | -------------------- | -------------------------------------------------------------------------- |
+| Display              | `lib/skill-proficiency-display.ts`                                         |
 | Form def             | `lib/skill-proficiency-form-def.ts`                                        |
 | Form fields / values | `lib/skill-proficiency-form-fields.ts`, `skill-proficiency-form-values.ts` |
 | Overview columns     | `lib/skill-proficiencies-overview-columns.tsx`                             |

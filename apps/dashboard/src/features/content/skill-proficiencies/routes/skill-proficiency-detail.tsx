@@ -1,6 +1,6 @@
 import { useParams } from 'react-router-dom'
 import { Heading, Text } from '@rpg/ui'
-import { classesOfferingSkillChoice, getAbilityLabel } from '@rpg/contracts'
+import { classesOfferingSkillChoice } from '@rpg/contracts'
 import type { SkillProficiency } from '@rpg/contracts'
 
 import { ROUTES } from '@/app/routes'
@@ -14,6 +14,30 @@ import { contentEditHref } from '../../lib/detail/content-edit-href'
 import { ContentStatRow } from '../../lib/detail/content-stat-row.client'
 import { getContentImageUrl } from '../../lib/detail/content-image-url'
 import { ContentLinkBadge } from '../../lib/detail/content-link-badge'
+import { buildSkillProficiencyDetailViewModel } from '../lib/skill-proficiency-display'
+
+function SkillExamplesList({
+  examples,
+  sectionTitle,
+}: {
+  examples: string[]
+  sectionTitle: string
+}) {
+  return (
+    <section aria-labelledby="skill-examples-heading">
+      <Heading variant="label" as="h2" id="skill-examples-heading" className="mb-3">
+        {sectionTitle}
+      </Heading>
+      <ul className="list-disc space-y-1 pl-5" role="list">
+        {examples.map((example) => (
+          <li key={example}>
+            <Text variant="muted">{example}</Text>
+          </li>
+        ))}
+      </ul>
+    </section>
+  )
+}
 
 function ClassSkillChoicesList({
   campaignId,
@@ -57,6 +81,7 @@ type SkillDetailContentProps = {
 
 export function SkillDetailContent({ skill, campaignId, skillId }: SkillDetailContentProps) {
   useSetBreadcrumbLabel(skill.name)
+  const viewModel = buildSkillProficiencyDetailViewModel(skill)
 
   return (
     <WidePage>
@@ -68,8 +93,14 @@ export function SkillDetailContent({ skill, campaignId, skillId }: SkillDetailCo
         editHref={contentEditHref('skillProficiencies', campaignId, skillId)}
         metadata={
           <div className="space-y-8">
-            <ContentStatRow label="Governing Ability" value={getAbilityLabel(skill.ability)} />
-            {skill.description ? <Text variant="muted">{skill.description}</Text> : null}
+            <ContentStatRow label="Governing Ability" value={viewModel.governingAbilityLabel} />
+            {viewModel.summarySentence ? (
+              <Text variant="muted">{viewModel.summarySentence}</Text>
+            ) : null}
+            <SkillExamplesList
+              examples={viewModel.examples}
+              sectionTitle={viewModel.examplesSectionTitle}
+            />
             <ClassSkillChoicesList campaignId={campaignId} skillSlug={skill.slug} />
           </div>
         }

@@ -136,6 +136,7 @@ export const spellsStepAthleticsSkill = {
   ...timestamps,
   name: 'Athletics',
   ability: 'str',
+  examples: ['Jump farther than normal', 'Stay afloat in rough water', 'Break something'],
 } as const satisfies SkillProficiency
 
 export function createSpellsStepContextFixture(
