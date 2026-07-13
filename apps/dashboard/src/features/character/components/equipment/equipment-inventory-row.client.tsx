@@ -119,7 +119,7 @@ function InventoryRowHeader({
           {equipmentName}
         </Text>
         {equipped ? (
-          <Badge appearance="neutral" tone="neutral" size="sm">
+          <Badge appearance="soft" tone="positive" size="sm">
             Equipped
           </Badge>
         ) : null}

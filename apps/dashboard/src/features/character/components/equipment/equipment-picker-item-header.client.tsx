@@ -1,10 +1,10 @@
 'use client'
 
 import type { ReactNode } from 'react'
-import { TriangleAlert } from 'lucide-react'
+import { Check, TriangleAlert } from 'lucide-react'
 
 import { EQUIPMENT_COMPACT_SEPARATOR } from '@rpg/contracts'
-import { SemanticText, Text, cn } from '@rpg/ui'
+import { Badge, Text, cn } from '@rpg/ui'
 
 import type { EquipmentPickerRowViewModel } from '@/features/content'
 
@@ -64,7 +64,7 @@ export function EquipmentPickerItemHeader({
               <span className={EQUIPMENT_PICKER_ITEM_HEADER_DIVIDER_CLASSES} aria-hidden>
                 {EQUIPMENT_PICKER_HEADER_DIVIDER}
               </span>
-              <EquipmentPickerCalloutText callout={callout} />
+              <EquipmentPickerCalloutBadge callout={callout} />
             </>
           ) : null}
         </div>
@@ -74,13 +74,23 @@ export function EquipmentPickerItemHeader({
   )
 }
 
-function EquipmentPickerCalloutText({ callout }: { callout: EquipmentPickerCallout }) {
+function EquipmentPickerCalloutBadge({ callout }: { callout: EquipmentPickerCallout }) {
   const presentation = getEquipmentCalloutPresentation(callout)
-  const icon = presentation.icon === 'warning' ? <TriangleAlert aria-hidden /> : undefined
+  const leadingIcon =
+    presentation.leadingIcon === 'check' ? (
+      <Check aria-hidden />
+    ) : presentation.leadingIcon === 'warning' ? (
+      <TriangleAlert aria-hidden />
+    ) : undefined
 
   return (
-    <SemanticText tone={presentation.tone} emphasis={presentation.emphasis} icon={icon}>
+    <Badge
+      appearance={presentation.appearance}
+      tone={presentation.tone}
+      size={presentation.size}
+      leadingIcon={leadingIcon}
+    >
       {callout.label}
-    </SemanticText>
+    </Badge>
   )
 }

@@ -1,50 +1,101 @@
 import { describe, expect, it } from 'vitest'
 
-import type { EquipmentPickerCallout } from './equipment-picker-drawer.types'
+import {
+  EQUIPMENT_PICKER_CANNOT_AFFORD_LABEL,
+  EQUIPMENT_PICKER_CLASS_TOOL_LABEL,
+  EQUIPMENT_PICKER_COMMON_FOR_CLASS_LABEL,
+  EQUIPMENT_PICKER_ESSENTIAL_LABEL,
+  EQUIPMENT_PICKER_NOT_PROFICIENT_LABEL,
+  EQUIPMENT_PICKER_PROFICIENCY_AVAILABLE_LABEL,
+  EQUIPMENT_PICKER_PROFICIENT_LABEL,
+  EQUIPMENT_PICKER_SPELLCASTING_FOCUS_LABEL,
+  EQUIPMENT_PICKER_STANDARD_GEAR_LABEL,
+  EQUIPMENT_PICKER_STARTING_OPTION_LABEL,
+} from './equipment-picker-drawer.types'
 import { getEquipmentCalloutPresentation } from './equipment-picker-callout-presentation.lib'
 
 describe('equipment-picker-callout-presentation.lib', () => {
-  function presentationFor(
-    intent: EquipmentPickerCallout['intent'],
-    importance: EquipmentPickerCallout['importance'] = 'medium',
-  ) {
-    return getEquipmentCalloutPresentation({ label: 'Test', intent, importance })
+  function presentationFor(label: string) {
+    return getEquipmentCalloutPresentation({
+      label,
+      intent: 'informative',
+      importance: 'medium',
+    })
   }
 
-  it('maps informative and recommended intents to informative tone without icon', () => {
-    expect(presentationFor('informative')).toEqual({
+  it('maps low-emphasis informative labels to outline informative badges', () => {
+    expect(presentationFor(EQUIPMENT_PICKER_STANDARD_GEAR_LABEL)).toEqual({
+      appearance: 'outline',
       tone: 'informative',
-      emphasis: 'medium',
-      icon: 'none',
+      size: 'sm',
     })
-    expect(presentationFor('recommended', 'high')).toEqual({
+    expect(presentationFor(EQUIPMENT_PICKER_PROFICIENCY_AVAILABLE_LABEL)).toEqual({
+      appearance: 'outline',
       tone: 'informative',
-      emphasis: 'high',
-      icon: 'none',
+      size: 'sm',
+    })
+    expect(presentationFor(EQUIPMENT_PICKER_COMMON_FOR_CLASS_LABEL)).toEqual({
+      appearance: 'outline',
+      tone: 'informative',
+      size: 'sm',
     })
   })
 
-  it('maps compatible intent to positive tone without icon', () => {
-    expect(presentationFor('compatible')).toEqual({
+  it('maps recommended-source labels to accent-outline informative badges', () => {
+    expect(presentationFor(EQUIPMENT_PICKER_STARTING_OPTION_LABEL)).toEqual({
+      appearance: 'accent-outline',
+      tone: 'informative',
+      size: 'sm',
+    })
+    expect(presentationFor(EQUIPMENT_PICKER_SPELLCASTING_FOCUS_LABEL)).toEqual({
+      appearance: 'accent-outline',
+      tone: 'informative',
+      size: 'sm',
+    })
+  })
+
+  it('maps essential blockers to soft informative badges', () => {
+    expect(presentationFor(EQUIPMENT_PICKER_ESSENTIAL_LABEL)).toEqual({
+      appearance: 'soft',
+      tone: 'informative',
+      size: 'sm',
+    })
+    expect(presentationFor(EQUIPMENT_PICKER_CLASS_TOOL_LABEL)).toEqual({
+      appearance: 'soft',
+      tone: 'informative',
+      size: 'sm',
+    })
+  })
+
+  it('maps proficiency-state labels to soft badges with icons', () => {
+    expect(presentationFor(EQUIPMENT_PICKER_PROFICIENT_LABEL)).toEqual({
+      appearance: 'soft',
       tone: 'positive',
-      emphasis: 'medium',
-      icon: 'none',
+      size: 'sm',
+      leadingIcon: 'check',
     })
-  })
-
-  it('maps caution intent to caution tone with warning icon', () => {
-    expect(presentationFor('caution')).toEqual({
+    expect(presentationFor(EQUIPMENT_PICKER_NOT_PROFICIENT_LABEL)).toEqual({
+      appearance: 'soft',
       tone: 'caution',
-      emphasis: 'medium',
-      icon: 'warning',
+      size: 'sm',
+      leadingIcon: 'warning',
     })
   })
 
-  it('maps blocking intent to negative tone with warning icon', () => {
-    expect(presentationFor('blocking', 'high')).toEqual({
+  it('maps cannot afford to soft negative with warning icon', () => {
+    expect(presentationFor(EQUIPMENT_PICKER_CANNOT_AFFORD_LABEL)).toEqual({
+      appearance: 'soft',
       tone: 'negative',
-      emphasis: 'high',
-      icon: 'warning',
+      size: 'sm',
+      leadingIcon: 'warning',
+    })
+  })
+
+  it('falls back authored recommendation labels to outline informative badges', () => {
+    expect(presentationFor('Alternative option')).toEqual({
+      appearance: 'outline',
+      tone: 'informative',
+      size: 'sm',
     })
   })
 })
