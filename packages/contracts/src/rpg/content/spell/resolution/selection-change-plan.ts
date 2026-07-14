@@ -9,6 +9,11 @@ import type {
   ResolutionWarning,
 } from './selection-types'
 import {
+  outcomeApplicationsReferenceEffect,
+  planOutcomeMethodChange,
+  stripEffectFromOutcomes,
+} from './outcome-change-plan'
+import {
   applyMethodOptionPatch,
   getApplicationPatternAvailability,
   getMethodAvailability,
@@ -185,6 +190,8 @@ function buildRequestedPatch(
       return applyMethodOptionPatch(before, change.value)
     case 'applicationPatternKind':
       return { applicationPatternKind: change.value }
+    case 'removeEffect':
+      return {}
     default: {
       const _exhaustive: never = change
       return _exhaustive
@@ -192,9 +199,23 @@ function buildRequestedPatch(
   }
 }
 
+function findEffectRemovalTargets(
+  state: ResolutionSelectionState,
+  effectId: string,
+): ResolutionEffectRef[] {
+  const effect = state.effects?.find((entry) => entry.id === effectId)
+  if (!effect) return []
+  if (!outcomeApplicationsReferenceEffect(state.outcomes, effectId)) return []
+  return [effect]
+}
+
 /** Returns true when author confirmation is required before applying the plan. */
 export function resolutionChangeRequiresConfirm(plan: ResolutionChangePlan): boolean {
-  return plan.incompatibleSelections.length > 0 || plan.effectsToRemove.length > 0
+  return (
+    plan.incompatibleSelections.length > 0 ||
+    plan.effectsToRemove.length > 0 ||
+    plan.discardedOutcomeBranches.length > 0
+  )
 }
 
 /**
@@ -205,6 +226,21 @@ export function planResolutionChange(
   before: ResolutionSelectionState,
   change: ResolutionChangeRequest,
 ): ResolutionChangePlan {
+  if (change.field === 'removeEffect') {
+    const effectsToRemove = findEffectRemovalTargets(before, change.effectId)
+    return {
+      requestedPatch: {},
+      cleanupPatch: {},
+      incompatibleSelections: [],
+      effectsToRemove,
+      discardedOutcomeBranches: [],
+      outcomePatch: effectsToRemove.length
+        ? { outcomes: stripEffectFromOutcomes(before.outcomes ?? [], change.effectId) }
+        : undefined,
+      warnings: collectWarnings(before),
+    }
+  }
+
   const requestedPatch = buildRequestedPatch(before, change)
   let after = stateAfterPatch(before, requestedPatch)
 
@@ -234,11 +270,19 @@ export function planResolutionChange(
   const effectsToRemove = findEffectsToRemove(after)
   const warnings = collectWarnings(after)
 
+  const outcomePlan =
+    change.field === 'methodOption'
+      ? planOutcomeMethodChange(before, change.value)
+      : { discardedBranches: [], mappedOutcomes: before.outcomes ?? [] }
+
   return {
     requestedPatch,
     cleanupPatch,
     incompatibleSelections,
     effectsToRemove,
+    discardedOutcomeBranches: outcomePlan.discardedBranches,
+    outcomePatch:
+      change.field === 'methodOption' ? { outcomes: outcomePlan.mappedOutcomes } : undefined,
     warnings,
   }
 }

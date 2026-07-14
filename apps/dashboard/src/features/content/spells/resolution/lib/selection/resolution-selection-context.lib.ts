@@ -22,6 +22,7 @@ export function resolutionFormToSelectionContext(
     projectileUnitLabelSingular: values.projectileUnitLabelSingular,
     projectileUnitLabelPlural: values.projectileUnitLabelPlural,
     effects: values.effects,
+    outcomes: values.outcomes,
   }
 }
 

@@ -113,6 +113,30 @@ export {
 } from './vocab'
 export { spellResolutionValidationMessages } from './validation-messages'
 export {
+  getSpellResolutionOutcomeAuthoringLabel,
+  SPELL_RESOLUTION_CONVENTIONAL_PRIMARY_OUTCOME,
+  SPELL_RESOLUTION_OUTCOME_AUTHORING_LABELS,
+} from './outcome-display'
+export {
+  buildDefaultOutcomeSlots,
+  effectKindsSupportingPartialApplication,
+  ensureOutcomeSlotsForMethod,
+  findOutcomeByResult,
+  getOutcomeResultsForMethod,
+  hasMeaningfulOutcomeContent,
+  isOutcomeEmpty,
+  normalizeOutcomeOrder,
+  stripEmptyOutcomeSlots,
+  supportsPartialApplicationForEffectKind,
+  type OutcomeLike,
+} from './outcome-slots'
+export {
+  outcomeApplicationsReferenceEffect,
+  planOutcomeMethodChange,
+  stripEffectFromOutcomes,
+  type OutcomeMethodChangePlan,
+} from './outcome-change-plan'
+export {
   deriveDefaultEffectRecipient,
   isResolutionTargetConfigured,
   type EffectRecipient,
@@ -143,6 +167,7 @@ export type {
   ResolutionEffectKind,
   ResolutionEffectRef,
   ResolutionMethodOption,
+  ResolutionOutcomeRef,
   ResolutionPatch,
   ResolutionSelectionField,
   ResolutionSelectionState,

@@ -15,6 +15,7 @@ import {
   buildMethodKind,
   buildResolutionMethod,
 } from './resolution-method-values'
+import { buildDefaultOutcomeFormSlots } from './resolution-outcome-slots.lib'
 import { buildOutcomes, storedOutcomesToForm } from './resolution-outcome-values'
 import { applyProximityFields, buildTargetProximity } from './resolution-target-values'
 
@@ -33,11 +34,11 @@ export function resolutionToForm(
     proximityKind: resolution.target.proximity.kind,
     methodKind: buildMethodKind(resolution.method),
     effects: resolution.effects.map(effectToForm),
-    outcomes: storedOutcomesToForm(resolution.outcomes),
+    outcomes: storedOutcomesToForm(resolution.method, resolution.outcomes),
     ...applicationPatternToForm(resolution.applicationPattern),
   }
 
-  applyMethodFields(form, resolution.method, resolution.outcomes)
+  applyMethodFields(form, resolution.method)
   applyProximityFields(form, resolution.target.proximity)
   return form
 }
@@ -94,10 +95,17 @@ function defaultDamageEffect(): ResolutionEffectFormItem {
   }
 }
 
+function withDefaultOutcomes(values: ResolutionFormValues): ResolutionFormValues {
+  return {
+    ...values,
+    outcomes: buildDefaultOutcomeFormSlots(values),
+  }
+}
+
 export function createDefaultAttackResolutionFormValues(
   attackType: ResolutionFormValues['attackType'] = 'ranged-spell',
 ): ResolutionFormValues {
-  return {
+  return withDefaultOutcomes({
     targetCount: 1,
     targetKind: 'creature-or-object',
     proximityKind: attackType === 'ranged-spell' ? 'distance' : 'reach',
@@ -106,7 +114,7 @@ export function createDefaultAttackResolutionFormValues(
     attackType,
     applicationPatternKind: 'none',
     effects: [defaultDamageEffect()],
-  }
+  })
 }
 
 /** Default attack-preset resolution slice for unmodeled spells (Add resolution). */
@@ -115,7 +123,7 @@ export function createDefaultResolutionFormValues(): ResolutionFormValues {
 }
 
 export function createDefaultSavingThrowResolutionFormValues(): ResolutionFormValues {
-  return {
+  return withDefaultOutcomes({
     targetCount: 1,
     targetKind: 'creature',
     proximityKind: 'touch',
@@ -130,11 +138,11 @@ export function createDefaultSavingThrowResolutionFormValues(): ResolutionFormVa
         damageType: 'necrotic',
       },
     ],
-  }
+  })
 }
 
 export function createDefaultAutomaticHealingResolutionFormValues(): ResolutionFormValues {
-  return {
+  return withDefaultOutcomes({
     targetCount: 1,
     targetKind: 'creature',
     proximityKind: 'touch',
@@ -147,5 +155,5 @@ export function createDefaultAutomaticHealingResolutionFormValues(): ResolutionF
         roll: { dice: { count: 2, faces: 8 } },
       },
     ],
-  }
+  })
 }

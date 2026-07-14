@@ -51,6 +51,10 @@ export const SPELL_RESOLUTION_OUTCOME_RESULT_ENTRIES = {
     label: 'Hit',
     description: 'The attack roll succeeded against the target.',
   },
+  miss: {
+    label: 'Miss',
+    description: 'The attack roll failed against the target.',
+  },
   'failed-save': {
     label: 'Failed save',
     description: 'The target failed its saving throw.',
@@ -161,7 +165,7 @@ export function getSpellResolutionRangeKindLabel(kind: string): string {
 
 /** Outcome results permitted for each resolution method kind (structural allowlist). */
 export const SPELL_RESOLUTION_OUTCOME_RESULTS_BY_METHOD = {
-  attack: ['hit'],
+  attack: ['hit', 'miss'],
   'saving-throw': ['failed-save', 'successful-save'],
   automatic: ['applied'],
 } as const satisfies Record<string, readonly SpellResolutionOutcomeResult[]>

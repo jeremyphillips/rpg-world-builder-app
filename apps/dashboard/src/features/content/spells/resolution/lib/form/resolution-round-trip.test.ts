@@ -12,6 +12,7 @@ import {
   SPELL_RESOLUTION_FIXTURES,
 } from '@rpg/contracts'
 import { resolutionFormSchema } from './resolution-form-schema'
+import { formOutcomesToStoredShape } from './resolution-outcome-slots.lib'
 import {
   resolutionToForm,
   resolutionToStored,
@@ -41,6 +42,30 @@ describe('spell resolution round trips', () => {
     })
   }
 
+  it('eldritch-blast: hydrates attack miss slot but omits it from stored output', () => {
+    const formValues = resolutionToForm(ELDRITCH_BLAST_RESOLUTION)
+    expect(formValues?.outcomes?.map((outcome) => outcome.result)).toEqual(['hit', 'miss'])
+    expect(resolutionToStored(formValues)?.outcomes).toEqual(ELDRITCH_BLAST_RESOLUTION.outcomes)
+  })
+
+  it('strips empty form outcome slots before stored normalization', () => {
+    const method = { kind: 'attack' as const, attackType: 'ranged-spell' as const }
+    const storedShape = formOutcomesToStoredShape(method, [
+      {
+        result: 'hit',
+        applications: [{ effectId: 'damage', amount: 'full' }],
+      },
+      { result: 'miss', applications: [] },
+    ])
+
+    expect(storedShape).toEqual([
+      {
+        result: 'hit',
+        applications: [{ effectId: 'damage', amount: 'full' }],
+      },
+    ])
+  })
+
   it('eldritch-blast: preserves ranged attack distance range', () => {
     const formValues = resolutionToForm(ELDRITCH_BLAST_RESOLUTION)
     expect(formValues?.methodKind).toBe('attack')
@@ -49,18 +74,26 @@ describe('spell resolution round trips', () => {
     expect(formValues?.proximityDistanceFt).toBe(120)
   })
 
-  it('chill-touch: preserves melee reach and hit outcome note', () => {
+  it('chill-touch: preserves melee reach and hit outcome note in outcomes', () => {
     const formValues = resolutionToForm(CHILL_TOUCH_RESOLUTION)
     expect(formValues?.attackType).toBe('melee-spell')
     expect(formValues?.proximityKind).toBe('reach')
-    expect(formValues?.hitNote).toContain("can't regain Hit Points")
+    const hitOutcome = formValues?.outcomes?.find((outcome) => outcome.result === 'hit')
+    expect(hitOutcome?.note).toContain("can't regain Hit Points")
+    expect(formValues?.outcomes?.find((outcome) => outcome.result === 'miss')).toEqual({
+      result: 'miss',
+      applications: [],
+    })
   })
 
-  it('inflict-wounds: maps saving-throw preset without hit note', () => {
+  it('inflict-wounds: hydrates saving-throw outcome slots', () => {
     const formValues = resolutionToForm(INFlict_WOUNDS_RESOLUTION)
     expect(formValues?.methodKind).toBe('saving-throw')
     expect(formValues?.saveAbility).toBe('con')
-    expect(formValues?.hitNote).toBeUndefined()
+    expect(formValues?.outcomes?.map((outcome) => outcome.result)).toEqual([
+      'failed-save',
+      'successful-save',
+    ])
   })
 
   it('cure-wounds: maps automatic healing effects array', () => {

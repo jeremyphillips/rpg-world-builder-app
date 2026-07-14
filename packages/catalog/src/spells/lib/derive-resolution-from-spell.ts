@@ -1,9 +1,11 @@
 import {
+  buildDefaultOutcomeSlots,
   spellResolutionSchema,
   spellSchema,
   SPELL_RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID,
   SPELL_RESOLUTION_PRIMARY_HEALING_EFFECT_ID,
   SPELL_RESOLUTION_PRIMARY_TEMPORARY_HIT_POINTS_EFFECT_ID,
+  stripEmptyOutcomeSlots,
   type Ability,
   type Spell,
   type SpellAtomicEffect,
@@ -27,8 +29,9 @@ export type ResolutionDerivationOverrides = {
     kind?: SpellResolutionTarget['kind']
     proximity?: SpellResolutionTargetProximity
   }
-  hitNote?: string
   outcomes?: SpellResolution['outcomes']
+  /** @deprecated Use outcomes with a hit-branch note instead */
+  hitNote?: string
   /** @deprecated Use proximity */
   range?: SpellResolutionTargetProximity
 }
@@ -185,61 +188,6 @@ function buildTarget(
   }
 }
 
-function buildAttackOutcomes(
-  effectId: SpellResolutionEffectId,
-  hitNote: string | undefined,
-): SpellResolution['outcomes'] {
-  return [
-    {
-      result: 'hit',
-      applications: [
-        {
-          effectId,
-          amount: 'full',
-        },
-      ],
-      ...(hitNote ? { note: hitNote } : {}),
-    },
-  ]
-}
-
-function buildSavingThrowOutcomes(effectId: SpellResolutionEffectId): SpellResolution['outcomes'] {
-  return [
-    {
-      result: 'failed-save',
-      applications: [
-        {
-          effectId,
-          amount: 'full',
-        },
-      ],
-    },
-    {
-      result: 'successful-save',
-      applications: [
-        {
-          effectId,
-          amount: 'half',
-        },
-      ],
-    },
-  ]
-}
-
-function buildAutomaticOutcomes(effectId: SpellResolutionEffectId): SpellResolution['outcomes'] {
-  return [
-    {
-      result: 'applied',
-      applications: [
-        {
-          effectId,
-          amount: 'full',
-        },
-      ],
-    },
-  ]
-}
-
 function buildOutcomes(
   method: SpellResolutionMethod,
   effectId: SpellResolutionEffectId,
@@ -247,16 +195,18 @@ function buildOutcomes(
 ): SpellResolution['outcomes'] {
   if (overrides.outcomes) return overrides.outcomes
 
-  if (method.kind === 'attack') {
-    const note = overrides.hitNote?.trim()
-    return buildAttackOutcomes(effectId, note || undefined)
+  const defaults = buildDefaultOutcomeSlots(method, effectId)
+  const hitNote = overrides.hitNote?.trim()
+
+  if (method.kind === 'attack' && hitNote) {
+    return stripEmptyOutcomeSlots(
+      defaults.map((outcome) =>
+        outcome.result === 'hit' ? { ...outcome, note: hitNote } : outcome,
+      ),
+    )
   }
 
-  if (method.kind === 'saving-throw') {
-    return buildSavingThrowOutcomes(effectId)
-  }
-
-  return buildAutomaticOutcomes(effectId)
+  return stripEmptyOutcomeSlots(defaults)
 }
 
 /** Derives a contract resolution envelope from spell metadata and atomic effects. */

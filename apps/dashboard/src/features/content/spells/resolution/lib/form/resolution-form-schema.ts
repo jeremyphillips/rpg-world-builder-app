@@ -12,6 +12,7 @@ import {
 
 import { rollFormObjectSchema } from '../../../../lib/forms/mechanics/roll-form-values'
 import { RESOLUTION_APPLICATION_PATTERN_FORM_KINDS } from '../application-pattern/resolution-application-pattern.lib'
+import { validateResolutionFormOutcomes } from './resolution-form-outcome-validation'
 import { resolutionFormValidationMessages } from './resolution-form-messages'
 
 export const RESOLUTION_METHOD_KINDS = ['attack', 'saving-throw', 'automatic'] as const
@@ -78,7 +79,6 @@ export const resolutionFormSchema = z
     projectileUnitLabelPlural: z.string().trim().min(1).optional(),
     effects: z.array(resolutionEffectFormItemSchema).min(1),
     outcomes: z.array(resolutionOutcomeFormItemSchema).optional(),
-    hitNote: z.string().optional(),
   })
   .superRefine((values, ctx) => {
     if (values.methodKind === 'attack' && !values.attackType) {
@@ -114,6 +114,8 @@ export const resolutionFormSchema = z
         })
       }
     }
+
+    validateResolutionFormOutcomes(values, ctx)
   })
 
 export type ResolutionFormValues = z.infer<typeof resolutionFormSchema>

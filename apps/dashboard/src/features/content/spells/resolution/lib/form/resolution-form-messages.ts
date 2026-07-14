@@ -34,4 +34,28 @@ export const resolutionFormValidationMessages = {
     'validation.spellResolutionForm.projectileCountRequired',
     () => 'Enter a projectile count.',
   ),
+  duplicateOutcomeResult: defineMessage(
+    'validation.spellResolutionForm.duplicateOutcomeResult',
+    () => 'Each outcome must have a unique result.',
+  ),
+  unknownEffectReference: defineMessage<{ effectId: string }>(
+    'validation.spellResolutionForm.unknownEffectReference',
+    ({ effectId }) => `Outcome references unknown effect "${effectId}".`,
+  ),
+  outcomeResultNotAllowedForMethod: defineMessage<{ result: string }>(
+    'validation.spellResolutionForm.outcomeResultNotAllowedForMethod',
+    ({ result }) => `Outcome result "${result}" is not allowed for this resolution method.`,
+  ),
+  resolutionRequiresMeaningfulOutcome: defineMessage(
+    'validation.spellResolutionForm.resolutionRequiresMeaningfulOutcome',
+    () => 'Add at least one outcome with an effect application or additional behavior.',
+  ),
+  duplicateOutcomeApplicationEffectId: defineMessage(
+    'validation.spellResolutionForm.duplicateOutcomeApplicationEffectId',
+    () => 'Each effect can only be applied once per outcome.',
+  ),
+  halfNotSupportedForEffectKind: defineMessage<{ kind: string }>(
+    'validation.spellResolutionForm.halfNotSupportedForEffectKind',
+    ({ kind }) => `Half application is not supported for "${kind}" effects in this version.`,
+  ),
 }

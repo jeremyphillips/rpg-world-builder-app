@@ -93,7 +93,6 @@ const SPELLS_SCHEMA_EXEMPT = [
   'resolution.applicationPatternKind',
   'resolution.attackType',
   'resolution.saveAbility',
-  'resolution.hitNote',
   /^resolution\.outcomes\b/,
 ] as const
 

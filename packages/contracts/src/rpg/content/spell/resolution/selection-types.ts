@@ -1,4 +1,8 @@
-import type { SpellResolutionAttackType, SpellResolutionProximityKind } from './vocab'
+import type {
+  SpellResolutionAttackType,
+  SpellResolutionOutcomeResult,
+  SpellResolutionProximityKind,
+} from './vocab'
 
 /** Combined method select value used by resolution authoring UI. */
 export type ResolutionMethodOption = SpellResolutionAttackType | 'saving-throw' | 'automatic'
@@ -11,6 +15,13 @@ export type ResolutionEffectKind = 'damage' | 'healing' | 'temporary-hit-points'
 export type ResolutionEffectRef = {
   id: string
   kind: ResolutionEffectKind | string
+}
+
+/** Minimal outcome row for selection policy and change planning. */
+export type ResolutionOutcomeRef = {
+  result: SpellResolutionOutcomeResult
+  applications: readonly { effectId: string; amount: string }[]
+  note?: string
 }
 
 /** Flattened resolution slice used by availability predicates and change planning. */
@@ -28,6 +39,7 @@ export type ResolutionSelectionState = {
   projectileUnitLabelSingular?: string
   projectileUnitLabelPlural?: string
   effects?: readonly ResolutionEffectRef[]
+  outcomes?: readonly ResolutionOutcomeRef[]
 }
 
 export type ResolutionSelectionField = 'proximityKind' | 'methodOption' | 'applicationPatternKind'
@@ -36,6 +48,7 @@ export type ResolutionChangeRequest =
   | { field: 'proximityKind'; value: SpellResolutionProximityKind }
   | { field: 'methodOption'; value: ResolutionMethodOption }
   | { field: 'applicationPatternKind'; value: ResolutionApplicationPatternFormKind }
+  | { field: 'removeEffect'; effectId: string }
 
 export type ResolutionPatch = Partial<ResolutionSelectionState>
 
@@ -82,5 +95,9 @@ export type ResolutionChangePlan = {
   incompatibleSelections: IncompatibleSelection[]
   /** Effect rows that would be removed if the change is applied */
   effectsToRemove: ResolutionEffectRef[]
+  /** Outcome branches that would lose authored content on method change */
+  discardedOutcomeBranches: readonly SpellResolutionOutcomeResult[]
+  /** Mapped outcomes after a method change (form-shaped, includes empty slots) */
+  outcomePatch?: { outcomes: readonly ResolutionOutcomeRef[] }
   warnings: ResolutionWarning[]
 }

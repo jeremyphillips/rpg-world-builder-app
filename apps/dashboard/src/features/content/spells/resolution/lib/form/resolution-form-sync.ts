@@ -2,6 +2,7 @@ import { applyResolutionStructuralCleanup } from '@rpg/contracts'
 import type { FormValueSync } from '@rpg/ui/form'
 
 import { resolutionFormToSelectionContext } from '../selection/resolution-selection-context.lib'
+import { buildDefaultOutcomeFormSlots } from './resolution-outcome-slots.lib'
 import type { ResolutionFormValues } from './resolution-form-schema'
 import { RESOLUTION_FIELD_NAME } from './resolution-form-values'
 
@@ -32,6 +33,17 @@ export function applyResolutionFormStructuralCleanup(
   }
 }
 
+function applyDefaultOutcomesWhenMissing(
+  resolution: ResolutionFormValues,
+): Partial<ResolutionFormValues> | undefined {
+  if (resolution.outcomes?.length || !resolution.effects.length) return undefined
+
+  const defaults = buildDefaultOutcomeFormSlots(resolution)
+  if (!defaults?.length) return undefined
+
+  return { outcomes: defaults }
+}
+
 /** Pass to `<Form valueSyncs={…}>` on spell create/edit routes. */
 export const resolutionFormValueSyncs: FormValueSync[] = [
   {
@@ -50,6 +62,23 @@ export const resolutionFormValueSyncs: FormValueSync[] = [
       ]
       if (!changedKeys.some((key) => resolutionKeys.includes(key))) return undefined
       return applyResolutionFormStructuralCleanup(values)
+    },
+  },
+  {
+    dependsOn: [`${RESOLUTION_FIELD_NAME}.effects`],
+    apply: (values) => {
+      const resolution = resolutionSlice(values)
+      if (!resolution) return undefined
+
+      const outcomePatch = applyDefaultOutcomesWhenMissing(resolution)
+      if (!outcomePatch) return undefined
+
+      return {
+        [RESOLUTION_FIELD_NAME]: {
+          ...resolution,
+          ...outcomePatch,
+        },
+      }
     },
   },
 ]

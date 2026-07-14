@@ -25,4 +25,16 @@ export const spellResolutionValidationMessages = {
     'validation.spellResolution.outcomeRequiresApplicationOrNote',
     () => 'Add an effect application or describe the outcome.',
   ),
+  resolutionRequiresMeaningfulOutcome: defineMessage(
+    'validation.spellResolution.resolutionRequiresMeaningfulOutcome',
+    () => 'Add at least one outcome with an effect application or additional behavior.',
+  ),
+  duplicateOutcomeApplicationEffectId: defineMessage(
+    'validation.spellResolution.duplicateOutcomeApplicationEffectId',
+    () => 'Each effect can only be applied once per outcome.',
+  ),
+  halfNotSupportedForEffectKind: defineMessage<{ kind: string }>(
+    'validation.spellResolution.halfNotSupportedForEffectKind',
+    ({ kind }) => `Half application is not supported for "${kind}" effects in this version.`,
+  ),
 }

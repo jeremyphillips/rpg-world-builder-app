@@ -7,10 +7,14 @@ import {
   SPELL_RESOLUTION_APPLICATION_AMOUNTS,
   SPELL_RESOLUTION_ATTACK_TYPES,
   SPELL_RESOLUTION_OUTCOME_RESULTS,
-  SPELL_RESOLUTION_OUTCOME_RESULTS_BY_METHOD,
   SPELL_RESOLUTION_TARGET_KINDS,
   type SpellResolutionOutcomeResult,
 } from './vocab'
+import {
+  getOutcomeResultsForMethod,
+  hasMeaningfulOutcomeContent,
+  supportsPartialApplicationForEffectKind,
+} from './outcome-slots'
 import { spellResolutionValidationMessages } from './validation-messages'
 
 // ---------------------------------------------------------------------------
@@ -164,20 +168,22 @@ export type SpellApplicationPattern = z.infer<typeof spellApplicationPatternSche
 function allowedOutcomeResultsForMethod(
   method: SpellResolutionMethod,
 ): readonly SpellResolutionOutcomeResult[] {
-  return SPELL_RESOLUTION_OUTCOME_RESULTS_BY_METHOD[method.kind]
+  return getOutcomeResultsForMethod(method)
 }
 
 export function validateSpellResolutionReferences(
   resolution: {
     method: SpellResolutionMethod
-    effects: readonly { id: SpellResolutionEffectId }[]
+    effects: readonly SpellResolutionEffect[]
     outcomes: readonly {
       result: SpellResolutionOutcomeResult
-      applications: readonly { effectId: SpellResolutionEffectId }[]
+      applications: readonly { effectId: SpellResolutionEffectId; amount: string }[]
+      note?: string
     }[]
   },
   ctx: z.RefinementCtx,
 ): void {
+  const effectById = new Map(resolution.effects.map((effect) => [effect.id, effect]))
   const effectIds = resolution.effects.map((effect) => effect.id)
   const uniqueEffectIds = new Set(effectIds)
   if (uniqueEffectIds.size !== effectIds.length) {
@@ -185,6 +191,14 @@ export function validateSpellResolutionReferences(
       code: 'custom',
       message: spellResolutionValidationMessages.duplicateEffectId(),
       path: ['effects'],
+    })
+  }
+
+  if (!resolution.outcomes.some(hasMeaningfulOutcomeContent)) {
+    ctx.addIssue({
+      code: 'custom',
+      message: spellResolutionValidationMessages.resolutionRequiresMeaningfulOutcome(),
+      path: ['outcomes'],
     })
   }
 
@@ -211,14 +225,36 @@ export function validateSpellResolutionReferences(
       })
     }
 
+    const applicationEffectIds = outcome.applications.map((application) => application.effectId)
+    const uniqueApplicationEffectIds = new Set(applicationEffectIds)
+    if (uniqueApplicationEffectIds.size !== applicationEffectIds.length) {
+      ctx.addIssue({
+        code: 'custom',
+        message: spellResolutionValidationMessages.duplicateOutcomeApplicationEffectId(),
+        path: ['outcomes', outcomeIndex, 'applications'],
+      })
+    }
+
     outcome.applications.forEach((application, applicationIndex) => {
-      if (!uniqueEffectIds.has(application.effectId)) {
+      const effect = effectById.get(application.effectId)
+      if (!effect) {
         ctx.addIssue({
           code: 'custom',
           message: spellResolutionValidationMessages.unknownEffectReference({
             effectId: application.effectId,
           }),
           path: ['outcomes', outcomeIndex, 'applications', applicationIndex, 'effectId'],
+        })
+        return
+      }
+
+      if (application.amount === 'half' && !supportsPartialApplicationForEffectKind(effect.kind)) {
+        ctx.addIssue({
+          code: 'custom',
+          message: spellResolutionValidationMessages.halfNotSupportedForEffectKind({
+            kind: effect.kind,
+          }),
+          path: ['outcomes', outcomeIndex, 'applications', applicationIndex, 'amount'],
         })
       }
     })

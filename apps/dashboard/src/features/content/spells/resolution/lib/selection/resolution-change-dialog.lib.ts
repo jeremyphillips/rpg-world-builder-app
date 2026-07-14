@@ -1,6 +1,7 @@
 import {
   getSpellApplicationPatternKindLabel,
   getSpellResolutionAttackTypeLabel,
+  getSpellResolutionOutcomeAuthoringLabel,
   getSpellResolutionProximityKindLabel,
   type ResolutionChangePlan,
   type ResolutionChangeRequest,
@@ -28,6 +29,7 @@ const CHANGE_FIELD_HEADLINES: Record<ResolutionChangeRequest['field'], string> =
   proximityKind: 'Change target proximity?',
   methodOption: 'Change resolution method?',
   applicationPatternKind: 'Change application pattern?',
+  removeEffect: 'Remove effect?',
 }
 
 export type ResolutionChangeDialogCopy = {
@@ -47,6 +49,9 @@ export function formatChangePlanForDialog(
   const consequences = [
     ...plan.incompatibleSelections.map((selection) => formatIncompatibleSelectionLine(selection)),
     ...plan.effectsToRemove.map((effect) => `remove ${describeEffectForConfirm(effect)}`),
+    ...plan.discardedOutcomeBranches.map(
+      (result) => `discard authored content for ${getSpellResolutionOutcomeAuthoringLabel(result)}`,
+    ),
   ]
 
   let intro = 'Applying this change will:'
