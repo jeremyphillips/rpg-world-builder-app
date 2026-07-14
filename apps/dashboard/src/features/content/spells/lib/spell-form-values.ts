@@ -90,6 +90,7 @@ export const EMPTY_SPELL_TAGS: SpellFormTags = {
   conditions: [],
 }
 
+/** Create defaults intentionally omit `resolution` — authors enable via Add resolution. */
 export const spellCreateDefaultValues: Partial<SpellFormValues> = {
   classIds: [],
   tags: { ...EMPTY_SPELL_TAGS },

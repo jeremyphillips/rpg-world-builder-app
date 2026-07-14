@@ -1,9 +1,16 @@
 import { describe, expect, expectTypeOf, it } from 'vitest'
 import { loadSeedSpells } from '@rpg/catalog/spells'
-import { createSpellInputSchema, deriveContentKey, type CreateSpellInput } from '@rpg/contracts'
+import {
+  createSpellInputSchema,
+  deriveContentKey,
+  ELDRITCH_BLAST_RESOLUTION,
+  type CreateSpellInput,
+  type Spell,
+} from '@rpg/contracts'
 import type { FormItem, GroupConfig, RowConfig } from '@rpg/ui/form'
 
-import { spellFormDef, type SpellFormValues } from './spell-form-def'
+import { RESOLUTION_FORM_FIXTURES } from '../resolution/lib/resolution-fixtures'
+import { spellFormDef, spellFormSchema, type SpellFormValues } from './spell-form-def'
 
 const SRD_SPELLS = loadSeedSpells('srd-cc-5.2.1')
 
@@ -206,6 +213,7 @@ describe('spellFormDef resolution tab', () => {
   it('includes persistence banner, preview slot, empty state, and resolution groups', () => {
     const resolutionTab = spellFormDef.buildTabs!({}).find((tab) => tab.id === 'resolution')
     expect(resolutionTab).toBeDefined()
+    expect(resolutionTab?.label).toBe('Resolution')
 
     const names = collectFieldNames(resolutionTab?.fields ?? [])
     expect(names).toContain('_resolutionPersistenceNotice')
@@ -214,6 +222,43 @@ describe('spellFormDef resolution tab', () => {
     expect(names).toContain('resolution.targetKind')
     expect(names).toContain('resolution.damageType')
     expect(names).toContain('resolution.damageRoll')
+  })
+})
+
+describe('spellFormDef resolution integration', () => {
+  const spellWithResolution: Spell = {
+    ...SRD_SPELLS[0]!,
+    resolution: ELDRITCH_BLAST_RESOLUTION,
+  }
+
+  it('createDefaultValues omits resolution', () => {
+    expect(spellFormDef.createDefaultValues).not.toHaveProperty('resolution')
+  })
+
+  it('spellFormSchema accepts optional resolution', () => {
+    const parsed = spellFormSchema.parse({
+      ...spellFormDef.createDefaultValues,
+      name: 'Test',
+      school: 'evocation',
+      level: 0,
+      classIds: ['wizard'],
+      resolution: RESOLUTION_FORM_FIXTURES.eldritchBlast,
+    })
+    expect(parsed.resolution).toEqual(RESOLUTION_FORM_FIXTURES.eldritchBlast)
+  })
+
+  it('toFormValues hydrates resolution from the read model', () => {
+    const formValues = spellFormDef.toFormValues(spellWithResolution) as SpellFormValues
+    expect(formValues.resolution).toEqual(RESOLUTION_FORM_FIXTURES.eldritchBlast)
+  })
+
+  it('toInput omits resolution until persistence ships', () => {
+    const formValues = spellFormDef.toFormValues(spellWithResolution) as SpellFormValues
+    expect(formValues.resolution).toBeDefined()
+
+    const input = spellFormDef.toInput(formValues)
+    expect(input).not.toHaveProperty('resolution')
+    expect(() => createSpellInputSchema.parse(input)).not.toThrow()
   })
 })
 
