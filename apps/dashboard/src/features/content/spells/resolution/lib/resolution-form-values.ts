@@ -4,7 +4,7 @@ import {
   type SpellResolution,
   type SpellResolutionDamageEffect,
   type SpellResolutionMethod,
-  type SpellResolutionRange,
+  type SpellResolutionTargetProximity,
 } from '@rpg/contracts'
 
 import {
@@ -26,25 +26,29 @@ function buildResolutionMethod(values: ResolutionFormValues): SpellResolutionMet
   return { kind: 'saving-throw', ability: values.saveAbility }
 }
 
-function buildResolutionRange(values: ResolutionFormValues): SpellResolutionRange | undefined {
-  switch (values.rangeKind) {
+function buildTargetProximity(
+  values: ResolutionFormValues,
+): SpellResolutionTargetProximity | undefined {
+  switch (values.proximityKind) {
     case 'touch':
       return { kind: 'touch' }
     case 'reach':
-      return values.reachDistanceFt !== undefined
+      return values.proximityReachDistanceFt !== undefined
         ? {
             kind: 'reach',
-            distance: { value: values.reachDistanceFt, unit: 'ft' },
+            distance: { value: values.proximityReachDistanceFt, unit: 'ft' },
           }
         : { kind: 'reach' }
     case 'distance':
-      if (values.rangeDistanceFt === undefined) return undefined
+      if (values.proximityDistanceFt === undefined) return undefined
       return {
         kind: 'distance',
-        value: { value: values.rangeDistanceFt, unit: 'ft' },
+        distance: { value: values.proximityDistanceFt, unit: 'ft' },
       }
+    case 'self':
+      return { kind: 'self' }
     default: {
-      const _exhaustive: never = values.rangeKind
+      const _exhaustive: never = values.proximityKind
       return _exhaustive
     }
   }
@@ -100,14 +104,8 @@ function buildOutcomes(values: ResolutionFormValues): SpellResolution['outcomes'
 function findPrimaryDamageEffect(
   resolution: SpellResolution,
 ): SpellResolutionDamageEffect | undefined {
-  return (
-    resolution.effects.find(
-      (effect) =>
-        effect.kind === 'damage' && effect.id === SPELL_RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID,
-    ) ??
-    resolution.effects.find(
-      (effect): effect is SpellResolutionDamageEffect => effect.kind === 'damage',
-    )
+  return resolution.effects.find(
+    (effect): effect is SpellResolutionDamageEffect => effect.kind === 'damage',
   )
 }
 
@@ -121,8 +119,8 @@ function buildBaseResolutionFormValues(
   return {
     targetCount: resolution.target.count,
     targetKind: resolution.target.kind,
+    proximityKind: resolution.target.proximity.kind,
     methodKind,
-    rangeKind: resolution.range.kind,
     damageRoll: (damageEffect ? rollToFormShape(damageEffect.roll) : undefined) ?? {},
     ...(damageEffect ? { damageType: damageEffect.damageType } : {}),
   }
@@ -140,17 +138,22 @@ function applyMethodFields(
     return
   }
 
-  form.saveAbility = method.ability
+  if (method.kind === 'saving-throw') {
+    form.saveAbility = method.ability
+  }
 }
 
-function applyRangeFields(form: ResolutionFormValues, range: SpellResolutionRange): void {
-  if (range.kind === 'distance') {
-    form.rangeDistanceFt = range.value.value
+function applyProximityFields(
+  form: ResolutionFormValues,
+  proximity: SpellResolutionTargetProximity,
+): void {
+  if (proximity.kind === 'distance') {
+    form.proximityDistanceFt = proximity.distance.value
     return
   }
 
-  if (range.kind === 'reach' && range.distance) {
-    form.reachDistanceFt = range.distance.value
+  if (proximity.kind === 'reach' && proximity.distance) {
+    form.proximityReachDistanceFt = proximity.distance.value
   }
 }
 
@@ -159,10 +162,14 @@ export function resolutionToForm(
   resolution: SpellResolution | undefined | null,
 ): ResolutionFormValues | undefined {
   if (!resolution) return undefined
+  if (resolution.method.kind === 'automatic') return undefined
 
-  const form = buildBaseResolutionFormValues(resolution, findPrimaryDamageEffect(resolution))
+  const damageEffect = findPrimaryDamageEffect(resolution)
+  if (!damageEffect) return undefined
+
+  const form = buildBaseResolutionFormValues(resolution, damageEffect)
   applyMethodFields(form, resolution.method, resolution.outcomes)
-  applyRangeFields(form, resolution.range)
+  applyProximityFields(form, resolution.target.proximity)
   return form
 }
 
@@ -176,17 +183,17 @@ export function resolutionToStored(
   if (!roll || !values.damageType) return undefined
 
   const method = buildResolutionMethod(values)
-  const range = buildResolutionRange(values)
+  const proximity = buildTargetProximity(values)
   const outcomes = buildOutcomes(values)
-  if (!method || !range || !outcomes?.length) return undefined
+  if (!method || !proximity || !outcomes?.length) return undefined
 
   const candidate = {
     target: {
       count: values.targetCount,
       kind: values.targetKind,
+      proximity,
     },
     method,
-    range,
     effects: [
       {
         id: SPELL_RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID,
@@ -215,10 +222,10 @@ export function createDefaultAttackResolutionFormValues(
   return {
     targetCount: 1,
     targetKind: 'creature-or-object',
+    proximityKind: attackType === 'ranged-spell' ? 'distance' : 'reach',
+    ...(attackType === 'ranged-spell' ? { proximityDistanceFt: 120 } : {}),
     methodKind: 'attack',
     attackType,
-    rangeKind: attackType === 'ranged-spell' ? 'distance' : 'reach',
-    ...(attackType === 'ranged-spell' ? { rangeDistanceFt: 120 } : {}),
     damageRoll: { dice: { count: 1, faces: 10 } },
     damageType: 'force',
   }
@@ -233,9 +240,9 @@ export function createDefaultSavingThrowResolutionFormValues(): ResolutionFormVa
   return {
     targetCount: 1,
     targetKind: 'creature',
+    proximityKind: 'touch',
     methodKind: 'saving-throw',
     saveAbility: 'con',
-    rangeKind: 'touch',
     damageRoll: { dice: { count: 2, faces: 10 } },
     damageType: 'necrotic',
   }

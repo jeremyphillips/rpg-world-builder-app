@@ -1,5 +1,6 @@
 import {
   CHILL_TOUCH_RESOLUTION,
+  ELDRITCH_BLAST_RESOLUTION,
   INFlict_WOUNDS_RESOLUTION,
   SPELL_RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID,
 } from '@rpg/contracts'
@@ -10,6 +11,7 @@ import {
   deriveAndValidateSpellResolution,
   deriveResolutionFromSpell,
   findPrimaryDamageEffect,
+  findPrimaryResolutionEffect,
 } from './derive-resolution-from-spell'
 import {
   resolveSpellSeedResolution,
@@ -46,9 +48,9 @@ describe('deriveResolutionFromSpell (Tier A)', () => {
     const resolution = deriveAndValidateSpellResolution(spell)
 
     expect(resolution.method).toEqual({ kind: 'attack', attackType: 'ranged-spell' })
-    expect(resolution.range).toEqual({
+    expect(resolution.target.proximity).toEqual({
       kind: 'distance',
-      value: { value: 120, unit: 'ft' },
+      distance: { value: 120, unit: 'ft' },
     })
     expect(resolution.outcomes).toEqual([
       {
@@ -73,11 +75,37 @@ describe('deriveResolutionFromSpell (Tier A)', () => {
     const spell = spellBySlug('burning-hands')
     const resolution = deriveAndValidateSpellResolution(spell, {
       saveAbility: 'dex',
-      range: { kind: 'reach' },
+      proximity: { kind: 'reach' },
     })
 
-    expect(resolution.range).toEqual({ kind: 'reach' })
+    expect(resolution.target.proximity).toEqual({ kind: 'reach' })
     expect(resolution.method).toEqual({ kind: 'saving-throw', ability: 'dex' })
+  })
+
+  it('derives automatic healing resolution for cure wounds', () => {
+    const spell = spellBySlug('cure-wounds')
+    const resolution = deriveAndValidateSpellResolution(spell, {
+      method: { kind: 'automatic' },
+      target: { kind: 'creature' },
+    })
+
+    expect(resolution.method).toEqual({ kind: 'automatic' })
+    expect(resolution.effects[0]).toMatchObject({
+      kind: 'healing',
+      roll: { dice: { count: 2, faces: 8 } },
+    })
+    expect(resolution.outcomes[0]?.result).toBe('applied')
+  })
+
+  it('derives automatic self temporary hit points for false life', () => {
+    const spell = spellBySlug('false-life')
+    const resolution = deriveAndValidateSpellResolution(spell, {
+      method: { kind: 'automatic' },
+      target: { kind: 'creature' },
+    })
+
+    expect(resolution.target.proximity).toEqual({ kind: 'self' })
+    expect(resolution.effects[0]?.kind).toBe('temporary-hit-points')
   })
 })
 
@@ -87,23 +115,35 @@ describe('resolveSpellSeedResolution manifest parity', () => {
     expect(resolveSpellSeedResolution(spellBySlug('inflict-wounds'))).toEqual(
       INFlict_WOUNDS_RESOLUTION,
     )
+    expect(resolveSpellSeedResolution(spellBySlug('eldritch-blast'))).toEqual(
+      ELDRITCH_BLAST_RESOLUTION,
+    )
   })
 
-  it('derives every Tier A manifest slug with primary damage parity', () => {
+  it('derives every applicable manifest slug with primary damage parity', () => {
     for (const slug of SRD_521_SPELL_SEED_RESOLUTION_SLUGS) {
       const spell = spellBySlug(slug)
       const resolution = resolveSpellSeedResolution(spell)
       const entry = SRD_521_SPELL_SEED_RESOLUTION[slug]
-      const primary = findPrimaryDamageEffect(spell.effects)
+      const primary = findPrimaryResolutionEffect(spell.effects)
 
       expect(resolution, slug).toBeDefined()
       expect(primary, slug).toBeDefined()
 
-      const resolutionDamage = resolution!.effects[0]
-      expect(resolutionDamage?.kind).toBe('damage')
-      if (resolutionDamage?.kind === 'damage' && primary?.kind === 'damage') {
-        expect(resolutionDamage.roll).toEqual(primary.roll)
-        expect(resolutionDamage.damageType).toBe(primary.damageType)
+      const resolutionEffect = resolution!.effects[0]
+      expect(resolutionEffect?.kind).toBe(primary?.kind)
+      if (resolutionEffect?.kind === 'damage' && primary?.kind === 'damage') {
+        expect(resolutionEffect.roll).toEqual(primary.roll)
+        expect(resolutionEffect.damageType).toBe(primary.damageType)
+      }
+      if (resolutionEffect?.kind === 'healing' && primary?.kind === 'healing') {
+        expect(resolutionEffect.roll).toEqual(primary.roll)
+      }
+      if (
+        resolutionEffect?.kind === 'temporary-hit-points' &&
+        primary?.kind === 'temporary-hit-points'
+      ) {
+        expect(resolutionEffect.roll).toEqual(primary.roll)
       }
 
       if (entry.kind === 'derived') {

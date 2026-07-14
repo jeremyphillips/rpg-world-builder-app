@@ -1,3 +1,14 @@
+/**
+ * Effects-layer migration coverage audit for catalog seed spells.
+ *
+ * Tracks how many SRD slugs have structured root `effects[]` versus prose-only
+ * descriptions. Status comes from `deriveEffectsModelingStatus()` in
+ * `@rpg/contracts` (`partially-modeled` when any atomic effects exist).
+ *
+ * Companion to `spell-resolution-coverage-inventory.ts`, which audits the optional
+ * `resolution` envelope on top of those effects. Use in tests to monitor atomic
+ * effects seed progress; not persisted on spell records.
+ */
 import {
   deriveEffectsModelingStatus,
   type EffectsModelingStatus,

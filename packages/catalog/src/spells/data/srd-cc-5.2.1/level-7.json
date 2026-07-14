@@ -61,18 +61,18 @@
     "resolution": {
       "target": {
         "count": 1,
-        "kind": "creature-or-object"
+        "kind": "creature-or-object",
+        "proximity": {
+          "kind": "distance",
+          "distance": {
+            "value": 150,
+            "unit": "ft"
+          }
+        }
       },
       "method": {
         "kind": "saving-throw",
         "ability": "dex"
-      },
-      "range": {
-        "kind": "distance",
-        "value": {
-          "value": 150,
-          "unit": "ft"
-        }
       },
       "effects": [
         {

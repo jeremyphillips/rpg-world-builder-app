@@ -2,20 +2,22 @@ import {
   ABILITY_IDS,
   getAbilityLabel,
   getSpellResolutionAttackTypeLabel,
-  getSpellResolutionRangeKindLabel,
+  getSpellResolutionProximityKindLabel,
   getSpellResolutionTargetKindLabel,
   SPELL_RESOLUTION_ATTACK_TYPES,
-  SPELL_RESOLUTION_RANGE_KINDS,
+  SPELL_RESOLUTION_PROXIMITY_KINDS,
   SPELL_RESOLUTION_TARGET_KINDS,
   type SpellResolutionAttackType,
-  type SpellResolutionRangeKind,
+  type SpellResolutionProximityKind,
   type SpellResolutionTargetKind,
 } from '@rpg/contracts'
 import { toOptions, type FieldOption } from '@rpg/ui/form'
 
 export const RESOLUTION_SECTION_LABELS = {
   target: 'Target',
+  check: 'Check',
   resolution: 'Resolution',
+  effects: 'Effects',
   damage: 'Damage',
   outcomes: 'Outcomes',
   preview: 'Preview',
@@ -26,14 +28,16 @@ export const RESOLUTION_SECTION_LABELS = {
 } as const
 
 export const RESOLUTION_FIELD_LABELS = {
+  target: '',
   targetCount: 'Target count',
   targetKind: 'Target kind',
-  methodKind: 'Resolution method',
+  proximityKind: 'Proximity',
+  proximityDistance: 'Distance',
+  proximityReachDistance: 'Reach distance',
+  method: 'Method',
+  methodKind: 'Method',
   attackType: 'Attack type',
-  saveAbility: 'Saving throw ability',
-  rangeKind: 'Range',
-  rangeDistanceFt: 'Distance (feet)',
-  reachDistanceFt: 'Reach distance (feet)',
+  saveAbility: 'Saving throw',
   damageRoll: 'Damage roll',
   damageType: 'Damage type',
   hitNote: RESOLUTION_SECTION_LABELS.hitNote,
@@ -66,9 +70,12 @@ export const resolutionSaveAbilityOptions: FieldOption[] = ABILITY_IDS.map((abil
   label: getAbilityLabel(ability),
 }))
 
-export const resolutionRangeKindOptions: FieldOption[] = toOptions(
-  SPELL_RESOLUTION_RANGE_KINDS,
+export const resolutionProximityKindOptions: FieldOption[] = toOptions(
+  SPELL_RESOLUTION_PROXIMITY_KINDS,
   Object.fromEntries(
-    SPELL_RESOLUTION_RANGE_KINDS.map((kind) => [kind, getSpellResolutionRangeKindLabel(kind)]),
-  ) as Record<SpellResolutionRangeKind, string>,
+    SPELL_RESOLUTION_PROXIMITY_KINDS.map((kind) => [
+      kind,
+      getSpellResolutionProximityKindLabel(kind),
+    ]),
+  ) as Record<SpellResolutionProximityKind, string>,
 )

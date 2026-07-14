@@ -13,9 +13,14 @@ export const resolutionFormValidationMessages = {
     'validation.spellResolutionForm.saveAbilityRequired',
     () => 'Select a saving throw ability.',
   ),
+  proximityDistanceRequired: defineMessage(
+    'validation.spellResolutionForm.proximityDistanceRequired',
+    () => 'Enter a distance in feet.',
+  ),
+  /** @deprecated Use proximityDistanceRequired */
   rangeDistanceRequired: defineMessage(
     'validation.spellResolutionForm.rangeDistanceRequired',
-    () => 'Enter a range distance in feet.',
+    () => 'Enter a distance in feet.',
   ),
   damageRollRequired: defineMessage(
     'validation.spellResolutionForm.damageRollRequired',

@@ -2,36 +2,110 @@ import {
   spellResolutionSchema,
   spellSchema,
   SPELL_RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID,
+  SPELL_RESOLUTION_PRIMARY_HEALING_EFFECT_ID,
+  SPELL_RESOLUTION_PRIMARY_TEMPORARY_HIT_POINTS_EFFECT_ID,
   type Ability,
   type Spell,
+  type SpellAtomicEffect,
   type SpellDamageEffect,
+  type SpellHealingEffect,
   type SpellResolution,
+  type SpellResolutionEffect,
+  type SpellResolutionEffectId,
   type SpellResolutionMethod,
-  type SpellResolutionRange,
   type SpellResolutionTarget,
+  type SpellResolutionTargetProximity,
+  type SpellTemporaryHitPointsEffect,
 } from '@rpg/contracts'
 
 export type ResolutionDerivationOverrides = {
   method?: SpellResolutionMethod
   saveAbility?: Ability
-  range?: SpellResolutionRange
-  target?: SpellResolutionTarget
+  proximity?: SpellResolutionTargetProximity
+  target?: {
+    count?: number
+    kind?: SpellResolutionTarget['kind']
+    proximity?: SpellResolutionTargetProximity
+  }
   hitNote?: string
   outcomes?: SpellResolution['outcomes']
+  /** @deprecated Use proximity */
+  range?: SpellResolutionTargetProximity
 }
 
-const DEFAULT_TARGET: SpellResolutionTarget = {
-  count: 1,
-  kind: 'creature-or-object',
-}
+const DEFAULT_TARGET_KIND = 'creature-or-object' as const
 
-/** First unlabeled damage effect — excludes hex-style extra-damage riders. */
+const PRIMARY_RESOLUTION_EFFECT_KINDS = [
+  'damage',
+  'healing',
+  'temporary-hit-points',
+] as const satisfies readonly SpellAtomicEffect['kind'][]
+
+type PrimaryResolutionEffectKind = (typeof PRIMARY_RESOLUTION_EFFECT_KINDS)[number]
+
+type PrimaryResolutionEffect = Extract<SpellAtomicEffect, { kind: PrimaryResolutionEffectKind }>
+
+/** First unlabeled roll-bearing effect — excludes hex-style extra-damage riders. */
 export function findPrimaryDamageEffect(effects: Spell['effects']): SpellDamageEffect | undefined {
+  const primary = findPrimaryResolutionEffect(effects)
+  return primary?.kind === 'damage' ? primary : undefined
+}
+
+export function findPrimaryResolutionEffect(
+  effects: Spell['effects'],
+): PrimaryResolutionEffect | undefined {
   if (!effects?.length) return undefined
 
   return effects.find(
-    (effect): effect is SpellDamageEffect => effect.kind === 'damage' && !effect.label,
+    (effect): effect is PrimaryResolutionEffect =>
+      PRIMARY_RESOLUTION_EFFECT_KINDS.includes(effect.kind as PrimaryResolutionEffectKind) &&
+      !('label' in effect && effect.label),
   )
+}
+
+function primaryEffectIdForKind(kind: PrimaryResolutionEffectKind): SpellResolutionEffectId {
+  switch (kind) {
+    case 'damage':
+      return SPELL_RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID
+    case 'healing':
+      return SPELL_RESOLUTION_PRIMARY_HEALING_EFFECT_ID
+    case 'temporary-hit-points':
+      return SPELL_RESOLUTION_PRIMARY_TEMPORARY_HIT_POINTS_EFFECT_ID
+    default: {
+      const _exhaustive: never = kind
+      return _exhaustive
+    }
+  }
+}
+
+function buildResolutionEffect(primary: PrimaryResolutionEffect): SpellResolutionEffect {
+  const id = primaryEffectIdForKind(primary.kind)
+
+  switch (primary.kind) {
+    case 'damage':
+      return {
+        id,
+        kind: 'damage',
+        roll: primary.roll,
+        damageType: primary.damageType,
+      }
+    case 'healing':
+      return {
+        id,
+        kind: 'healing',
+        roll: (primary as SpellHealingEffect).roll,
+      }
+    case 'temporary-hit-points':
+      return {
+        id,
+        kind: 'temporary-hit-points',
+        roll: (primary as SpellTemporaryHitPointsEffect).roll,
+      }
+    default: {
+      const _exhaustive: never = primary
+      return _exhaustive
+    }
+  }
 }
 
 function mapDeliveryMethodToResolutionMethod(
@@ -46,11 +120,13 @@ function mapDeliveryMethodToResolutionMethod(
   return undefined
 }
 
-function mapSpellRangeToResolutionRange(
+function mapSpellRangeToTargetProximity(
   spellRange: Spell['range'],
   method: SpellResolutionMethod | undefined,
-): SpellResolutionRange | undefined {
+): SpellResolutionTargetProximity | undefined {
   switch (spellRange.kind) {
+    case 'self':
+      return { kind: 'self' }
     case 'touch':
       if (method?.kind === 'attack' && method.attackType === 'melee-spell') {
         return { kind: 'reach' }
@@ -59,14 +135,15 @@ function mapSpellRangeToResolutionRange(
     case 'distance':
       return {
         kind: 'distance',
-        value: { value: spellRange.value.value, unit: 'ft' },
+        distance: { value: spellRange.value.value, unit: 'ft' },
       }
     default:
       return undefined
   }
 }
 
-function buildMethod(
+function defaultMethodForPrimaryEffect(
+  primary: PrimaryResolutionEffect,
   spell: Pick<Spell, 'deliveryMethod'>,
   overrides: ResolutionDerivationOverrides,
 ): SpellResolutionMethod | undefined {
@@ -74,16 +151,50 @@ function buildMethod(
   if (overrides.saveAbility) {
     return { kind: 'saving-throw', ability: overrides.saveAbility }
   }
+
+  if (primary.kind === 'healing' || primary.kind === 'temporary-hit-points') {
+    return { kind: 'automatic' }
+  }
+
   return mapDeliveryMethodToResolutionMethod(spell.deliveryMethod)
 }
 
-function buildAttackOutcomes(hitNote: string | undefined): SpellResolution['outcomes'] {
+function buildMethod(
+  spell: Pick<Spell, 'deliveryMethod'>,
+  overrides: ResolutionDerivationOverrides,
+  primary: PrimaryResolutionEffect,
+): SpellResolutionMethod | undefined {
+  return defaultMethodForPrimaryEffect(primary, spell, overrides)
+}
+
+function buildTarget(
+  spell: Pick<Spell, 'range'>,
+  method: SpellResolutionMethod,
+  overrides: ResolutionDerivationOverrides,
+): SpellResolutionTarget {
+  const proximityOverride = overrides.proximity ?? overrides.range ?? overrides.target?.proximity
+  const proximity =
+    proximityOverride ??
+    mapSpellRangeToTargetProximity(spell.range, method) ??
+    ({ kind: 'touch' } as const)
+
+  return {
+    count: overrides.target?.count ?? 1,
+    kind: overrides.target?.kind ?? DEFAULT_TARGET_KIND,
+    proximity,
+  }
+}
+
+function buildAttackOutcomes(
+  effectId: SpellResolutionEffectId,
+  hitNote: string | undefined,
+): SpellResolution['outcomes'] {
   return [
     {
       result: 'hit',
       applications: [
         {
-          effectId: SPELL_RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID,
+          effectId,
           amount: 'full',
         },
       ],
@@ -92,13 +203,13 @@ function buildAttackOutcomes(hitNote: string | undefined): SpellResolution['outc
   ]
 }
 
-function buildSavingThrowDamageOutcomes(): SpellResolution['outcomes'] {
+function buildSavingThrowOutcomes(effectId: SpellResolutionEffectId): SpellResolution['outcomes'] {
   return [
     {
       result: 'failed-save',
       applications: [
         {
-          effectId: SPELL_RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID,
+          effectId,
           amount: 'full',
         },
       ],
@@ -107,8 +218,22 @@ function buildSavingThrowDamageOutcomes(): SpellResolution['outcomes'] {
       result: 'successful-save',
       applications: [
         {
-          effectId: SPELL_RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID,
+          effectId,
           amount: 'half',
+        },
+      ],
+    },
+  ]
+}
+
+function buildAutomaticOutcomes(effectId: SpellResolutionEffectId): SpellResolution['outcomes'] {
+  return [
+    {
+      result: 'applied',
+      applications: [
+        {
+          effectId,
+          amount: 'full',
         },
       ],
     },
@@ -117,16 +242,21 @@ function buildSavingThrowDamageOutcomes(): SpellResolution['outcomes'] {
 
 function buildOutcomes(
   method: SpellResolutionMethod,
+  effectId: SpellResolutionEffectId,
   overrides: ResolutionDerivationOverrides,
 ): SpellResolution['outcomes'] {
   if (overrides.outcomes) return overrides.outcomes
 
   if (method.kind === 'attack') {
     const note = overrides.hitNote?.trim()
-    return buildAttackOutcomes(note || undefined)
+    return buildAttackOutcomes(effectId, note || undefined)
   }
 
-  return buildSavingThrowDamageOutcomes()
+  if (method.kind === 'saving-throw') {
+    return buildSavingThrowOutcomes(effectId)
+  }
+
+  return buildAutomaticOutcomes(effectId)
 }
 
 /** Derives a contract resolution envelope from spell metadata and atomic effects. */
@@ -134,34 +264,22 @@ export function deriveResolutionFromSpell(
   spell: Pick<Spell, 'effects' | 'deliveryMethod' | 'range'>,
   overrides: ResolutionDerivationOverrides = {},
 ): SpellResolution {
-  const primaryEffect = findPrimaryDamageEffect(spell.effects)
+  const primaryEffect = findPrimaryResolutionEffect(spell.effects)
   if (!primaryEffect) {
-    throw new Error('Spell has no primary damage effect for resolution derivation.')
+    throw new Error('Spell has no primary resolution effect for derivation.')
   }
 
-  const method = buildMethod(spell, overrides)
+  const resolutionEffect = buildResolutionEffect(primaryEffect)
+  const method = buildMethod(spell, overrides, primaryEffect)
   if (!method) {
     throw new Error('Could not derive resolution method from spell metadata.')
   }
 
-  const range = overrides.range ?? mapSpellRangeToResolutionRange(spell.range, method)
-  if (!range) {
-    throw new Error('Could not derive resolution range from spell metadata.')
-  }
-
   const candidate = {
-    target: overrides.target ?? DEFAULT_TARGET,
+    target: buildTarget(spell, method, overrides),
     method,
-    range,
-    effects: [
-      {
-        id: SPELL_RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID,
-        kind: 'damage' as const,
-        roll: primaryEffect.roll,
-        damageType: primaryEffect.damageType,
-      },
-    ],
-    outcomes: buildOutcomes(method, overrides),
+    effects: [resolutionEffect],
+    outcomes: buildOutcomes(method, resolutionEffect.id, overrides),
   }
 
   return spellResolutionSchema.parse(candidate)

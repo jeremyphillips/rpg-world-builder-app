@@ -41,22 +41,25 @@ The **Resolution** tab authors an optional `resolution` envelope matching
 `resolution` object — enable via **Add resolution** when absent — with no
 parallel boolean flag.
 
-| Concern        | Behavior                                                                 |
-| -------------- | ------------------------------------------------------------------------ |
-| Form shape     | Flattened `ResolutionFormValues` via `resolution-form-schema.ts`         |
-| Normalization  | `resolutionToStored` in `resolution-form-values.ts`                      |
-| Preview        | `SpellResolutionPreview` + `@rpg/contracts` resolution formatters        |
-| Attack preset  | Melee/ranged method + `hit` / full damage + optional additional behavior |
-| Save preset    | Saving throw + failed/full + successful/half from one damage entry       |
-| Save           | **Disabled** — banner: "Resolution is not saved yet."                    |
-| Legacy effects | Flat `effects[]` modules remain for catalog detail; tab replaced         |
+| Concern          | Behavior                                                                                                |
+| ---------------- | ------------------------------------------------------------------------------------------------------- |
+| Form shape       | Flattened `ResolutionFormValues` via `resolution-form-schema.ts`                                        |
+| Normalization    | `resolutionToStored` in `resolution-form-values.ts`                                                     |
+| Preview          | `SpellResolutionPreview` + `@rpg/contracts` resolution formatters                                       |
+| Attack preset    | Melee/ranged method + `hit` / full damage + optional additional behavior                                |
+| Save preset      | Saving throw + failed/full + successful/half from one damage entry                                      |
+| Save             | **Disabled** — banner: "Resolution is not saved yet."                                                   |
+| Legacy effects   | Flat `effects[]` on the read model for catalog detail; Resolution tab reads `resolution.effects[]` only |
+| Target proximity | `resolution.target.proximity` (touch / reach / distance) — separate from Check method                   |
 
 Modules live under [`resolution/`](resolution/) (`resolution-form-fields.ts`,
 `resolution-form-values.ts`, `components/spell-resolution-*.client.tsx`).
 
-Catalog seeds for Tier A single-damage spells ship optional `resolution` on the
-read model via `packages/catalog/src/spells/spell-seed-resolution.ts` (13 slugs in
-SRD 5.2.1). Apply with `pnpm exec tsx packages/catalog/scripts/apply-spell-seed-resolution.mjs`.
+Catalog seeds ship optional `resolution` on the read model via
+`packages/catalog/src/spells/spell-seed-resolution.ts` (18 applicable slugs in SRD 5.2.1:
+13 Tier A damage spells, Eldritch Blast hybrid, and 4 Tier D healing/temporary-HP spells).
+Six effect spells remain explicitly deferred in the manifest with documented reason codes.
+Apply with `pnpm exec tsx packages/catalog/scripts/apply-spell-seed-resolution.mjs`.
 Flat `effects[]` remain on migrated spells until consolidation.
 
 Shared roll/damage form atoms live under
@@ -82,9 +85,16 @@ When persistence ships, touch these files:
 ### Atomic effects (catalog read model)
 
 Optional flat `effects[]` on the spell read model (`spellAtomicEffectSchema`) remains
-for catalog seed data and spell detail display. Authoring UI for flat effects was
-replaced by the Resolution tab; `effect-*` modules are unchanged for detail rendering
-and future `spell.effect.persistence`.
+for catalog seed data and spell detail display. The Resolution tab hydrates from
+`spell.resolution.effects[]` only — it does not read or sync root `effects[]`.
+Authoring UI for flat effects was replaced by the Resolution tab; `effect-*` modules
+are unchanged for detail rendering and future `spell.effect.persistence`.
+
+**Dual-model spells (Tier A + hybrid):** Migrated catalog spells carry both root
+`effects[]` (legacy flat model) and `resolution` (envelope). The Resolution tab
+shows envelope damage only. Eldritch Blast is hybrid: resolution models one beam;
+beam scaling stays in root `effects[]`. Manifest-deferred spells (e.g. Hex) render
+the empty state until resolution modeling lands.
 
 ### Scaling prose fields
 

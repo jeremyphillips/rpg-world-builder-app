@@ -4,7 +4,7 @@ import {
   abilitySchema,
   damageTypeIdSchema,
   SPELL_RESOLUTION_ATTACK_TYPES,
-  SPELL_RESOLUTION_RANGE_KINDS,
+  SPELL_RESOLUTION_PROXIMITY_KINDS,
   SPELL_RESOLUTION_TARGET_KINDS,
 } from '@rpg/contracts'
 
@@ -19,12 +19,12 @@ export const resolutionFormSchema = z
   .object({
     targetCount: z.coerce.number().int().min(1),
     targetKind: z.enum(SPELL_RESOLUTION_TARGET_KINDS),
+    proximityKind: z.enum(SPELL_RESOLUTION_PROXIMITY_KINDS),
+    proximityDistanceFt: z.coerce.number().min(0).optional(),
+    proximityReachDistanceFt: z.coerce.number().min(0).optional(),
     methodKind: z.enum(RESOLUTION_METHOD_KINDS),
     attackType: z.enum(SPELL_RESOLUTION_ATTACK_TYPES).optional(),
     saveAbility: abilitySchema.optional(),
-    rangeKind: z.enum(SPELL_RESOLUTION_RANGE_KINDS),
-    rangeDistanceFt: z.coerce.number().min(0).optional(),
-    reachDistanceFt: z.coerce.number().min(0).optional(),
     damageRoll: rollFormObjectSchema,
     damageType: damageTypeIdSchema.optional(),
     hitNote: z.string().optional(),
@@ -46,11 +46,11 @@ export const resolutionFormSchema = z
       })
     }
 
-    if (values.rangeKind === 'distance' && values.rangeDistanceFt === undefined) {
+    if (values.proximityKind === 'distance' && values.proximityDistanceFt === undefined) {
       ctx.addIssue({
         code: 'custom',
-        message: resolutionFormValidationMessages.rangeDistanceRequired(),
-        path: ['rangeDistanceFt'],
+        message: resolutionFormValidationMessages.proximityDistanceRequired(),
+        path: ['proximityDistanceFt'],
       })
     }
   })

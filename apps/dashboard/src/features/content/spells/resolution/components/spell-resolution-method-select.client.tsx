@@ -1,11 +1,14 @@
 'use client'
 
 import { useId } from 'react'
-import { useFormContext, useWatch } from 'react-hook-form'
-import { SelectField } from '@rpg/ui'
+import { useController, useFormContext, useWatch } from 'react-hook-form'
+import { FieldRow, SelectField } from '@rpg/ui'
 
 import type { ResolutionFormValues } from '../lib/resolution-form-schema'
-import { RESOLUTION_FIELD_LABELS } from '../lib/resolution-form-labels'
+import {
+  RESOLUTION_FIELD_LABELS,
+  resolutionSaveAbilityOptions,
+} from '../lib/resolution-form-labels'
 import { RESOLUTION_FIELD_NAME } from '../lib/resolution-form-values'
 
 const RESOLUTION_METHOD_OPTIONS = [
@@ -31,29 +34,6 @@ function applySavingThrowMethod(resolution: ResolutionFormValues): ResolutionFor
   }
 }
 
-function syncRangeForAttackType(
-  resolution: ResolutionFormValues,
-  attackType: Exclude<ResolutionMethodOption, 'saving-throw'>,
-): Pick<ResolutionFormValues, 'rangeKind' | 'rangeDistanceFt' | 'reachDistanceFt'> {
-  if (attackType === 'melee-spell' && resolution.rangeKind === 'distance') {
-    return { rangeKind: 'reach', rangeDistanceFt: undefined, reachDistanceFt: undefined }
-  }
-
-  if (attackType === 'ranged-spell' && resolution.rangeKind === 'reach') {
-    return {
-      rangeKind: 'distance',
-      rangeDistanceFt: resolution.rangeDistanceFt ?? 120,
-      reachDistanceFt: undefined,
-    }
-  }
-
-  return {
-    rangeKind: resolution.rangeKind,
-    rangeDistanceFt: resolution.rangeDistanceFt,
-    reachDistanceFt: resolution.reachDistanceFt,
-  }
-}
-
 function applyAttackMethod(
   resolution: ResolutionFormValues,
   attackType: Exclude<ResolutionMethodOption, 'saving-throw'>,
@@ -63,7 +43,6 @@ function applyAttackMethod(
     methodKind: 'attack',
     attackType,
     saveAbility: undefined,
-    ...syncRangeForAttackType(resolution, attackType),
   }
 }
 
@@ -78,30 +57,50 @@ function applyMethodOption(
   return applyAttackMethod(resolution, option)
 }
 
-/** Combined melee / ranged / saving-throw method picker for the resolution tab. */
+/** Method and conditional saving-throw ability on one row. */
 export function SpellResolutionMethodSelect() {
-  const selectId = useId()
-  const { setValue } = useFormContext()
+  const methodId = useId()
+  const saveAbilityId = useId()
+  const { control, setValue } = useFormContext()
   const resolution = useWatch({ name: RESOLUTION_FIELD_NAME }) as ResolutionFormValues | undefined
+  const { field: saveAbilityField } = useController({
+    control,
+    name: `${RESOLUTION_FIELD_NAME}.saveAbility`,
+  })
 
   if (!resolution) return null
 
   const value = toMethodOption(resolution)
+  const showSaveAbility = resolution.methodKind === 'saving-throw'
 
   return (
-    <SelectField
-      id={selectId}
-      label={RESOLUTION_FIELD_LABELS.methodKind}
-      value={value}
-      onValueChange={(next) => {
-        setValue(
-          RESOLUTION_FIELD_NAME,
-          applyMethodOption(resolution, next as ResolutionMethodOption),
-          { shouldDirty: true, shouldValidate: true },
-        )
-      }}
-      options={[...RESOLUTION_METHOD_OPTIONS]}
-      width="lg"
-    />
+    <FieldRow>
+      <SelectField
+        id={methodId}
+        label={RESOLUTION_FIELD_LABELS.method}
+        value={value}
+        onValueChange={(next) => {
+          setValue(
+            RESOLUTION_FIELD_NAME,
+            applyMethodOption(resolution, next as ResolutionMethodOption),
+            { shouldDirty: true, shouldValidate: true },
+          )
+        }}
+        options={[...RESOLUTION_METHOD_OPTIONS]}
+        width="lg"
+      />
+      {showSaveAbility ? (
+        <SelectField
+          id={saveAbilityId}
+          label={RESOLUTION_FIELD_LABELS.saveAbility}
+          value={saveAbilityField.value}
+          onValueChange={saveAbilityField.onChange}
+          onBlur={saveAbilityField.onBlur}
+          options={resolutionSaveAbilityOptions}
+          width="md"
+          required
+        />
+      ) : null}
+    </FieldRow>
   )
 }

@@ -14,8 +14,8 @@ import {
 import { spellResolutionValidationMessages } from './validation-messages'
 
 // ---------------------------------------------------------------------------
-// Spell resolution — contextual envelope for targets, method, range, effects,
-// and outcome applications. Optional on spell body until persistence lands.
+// Spell resolution — contextual envelope for targets (with proximity), method,
+// effects, and outcome applications. Optional on spell body until persistence lands.
 // ---------------------------------------------------------------------------
 
 export const spellResolutionEffectIdSchema = z.string().min(1).brand<'SpellResolutionEffectId'>()
@@ -31,6 +31,9 @@ export const spellResolutionMethodSchema = z.discriminatedUnion('kind', [
     kind: z.literal('saving-throw'),
     ability: abilitySchema,
   }),
+  z.object({
+    kind: z.literal('automatic'),
+  }),
 ])
 
 export type SpellResolutionMethod = z.infer<typeof spellResolutionMethodSchema>
@@ -40,7 +43,8 @@ const spellResolutionDistanceSchema = z.object({
   unit: z.literal('ft'),
 })
 
-export const spellResolutionRangeSchema = z.discriminatedUnion('kind', [
+export const spellResolutionTargetProximitySchema = z.discriminatedUnion('kind', [
+  z.object({ kind: z.literal('self') }),
   z.object({ kind: z.literal('touch') }),
   z.object({
     kind: z.literal('reach'),
@@ -48,11 +52,17 @@ export const spellResolutionRangeSchema = z.discriminatedUnion('kind', [
   }),
   z.object({
     kind: z.literal('distance'),
-    value: spellResolutionDistanceSchema,
+    distance: spellResolutionDistanceSchema,
   }),
 ])
 
-export type SpellResolutionRange = z.infer<typeof spellResolutionRangeSchema>
+export type SpellResolutionTargetProximity = z.infer<typeof spellResolutionTargetProximitySchema>
+
+/** @deprecated Use spellResolutionTargetProximitySchema */
+export const spellResolutionRangeSchema = spellResolutionTargetProximitySchema
+
+/** @deprecated Use SpellResolutionTargetProximity */
+export type SpellResolutionRange = SpellResolutionTargetProximity
 
 export const spellResolutionDamageEffectSchema = z.object({
   id: spellResolutionEffectIdSchema,
@@ -63,8 +73,28 @@ export const spellResolutionDamageEffectSchema = z.object({
 
 export type SpellResolutionDamageEffect = z.infer<typeof spellResolutionDamageEffectSchema>
 
+export const spellResolutionHealingEffectSchema = z.object({
+  id: spellResolutionEffectIdSchema,
+  kind: z.literal('healing'),
+  roll: rollSchema,
+})
+
+export type SpellResolutionHealingEffect = z.infer<typeof spellResolutionHealingEffectSchema>
+
+export const spellResolutionTemporaryHitPointsEffectSchema = z.object({
+  id: spellResolutionEffectIdSchema,
+  kind: z.literal('temporary-hit-points'),
+  roll: rollSchema,
+})
+
+export type SpellResolutionTemporaryHitPointsEffect = z.infer<
+  typeof spellResolutionTemporaryHitPointsEffectSchema
+>
+
 export const spellResolutionEffectSchema = z.discriminatedUnion('kind', [
   spellResolutionDamageEffectSchema,
+  spellResolutionHealingEffectSchema,
+  spellResolutionTemporaryHitPointsEffectSchema,
 ])
 
 export type SpellResolutionEffect = z.infer<typeof spellResolutionEffectSchema>
@@ -91,6 +121,7 @@ export type SpellResolutionOutcome = z.infer<typeof spellResolutionOutcomeSchema
 export const spellResolutionTargetSchema = z.object({
   count: z.number().int().min(1),
   kind: z.enum(SPELL_RESOLUTION_TARGET_KINDS),
+  proximity: spellResolutionTargetProximitySchema,
 })
 
 export type SpellResolutionTarget = z.infer<typeof spellResolutionTargetSchema>
@@ -163,7 +194,6 @@ export const spellResolutionSchema = z
   .object({
     target: spellResolutionTargetSchema,
     method: spellResolutionMethodSchema,
-    range: spellResolutionRangeSchema,
     effects: z.array(spellResolutionEffectSchema).min(1),
     outcomes: z.array(spellResolutionOutcomeSchema).min(1),
   })
@@ -174,3 +204,11 @@ export type SpellResolution = z.infer<typeof spellResolutionSchema>
 /** Primary damage effect id used by MVP authoring presets. */
 export const SPELL_RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID =
   spellResolutionEffectIdSchema.parse('damage')
+
+/** Primary healing effect id used by catalog resolution seeds. */
+export const SPELL_RESOLUTION_PRIMARY_HEALING_EFFECT_ID =
+  spellResolutionEffectIdSchema.parse('healing')
+
+/** Primary temporary hit points effect id used by catalog resolution seeds. */
+export const SPELL_RESOLUTION_PRIMARY_TEMPORARY_HIT_POINTS_EFFECT_ID =
+  spellResolutionEffectIdSchema.parse('temporary-hit-points')

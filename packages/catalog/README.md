@@ -60,5 +60,8 @@ pnpm exec tsx packages/catalog/scripts/apply-spell-seed-resolution.mjs
 ```
 
 Manifests live in `src/spells/spell-seed-effects.ts` and `spell-seed-resolution.ts`.
-Migrated spells keep both `effects[]` and optional `resolution` until a later
-consolidation phase.
+The resolution manifest covers all 24 structured-effect slugs: Tier A applicable entries,
+Tier B hybrid (Eldritch Blast), Tier D healing/temporary-HP entries, and explicit
+`kind: 'defer'` rows with documented reason codes in `spell-resolution-defer-reasons.ts`.
+Primary-effect parity is audited by `spell-resolution-parity.lib.ts`. Migrated spells keep
+both `effects[]` and optional `resolution` until a later consolidation phase.

@@ -1,8 +1,15 @@
 import { describe, expect, it } from 'vitest'
 
-import { formatResolutionOutcomes, formatResolutionSummary, formatResolutionTarget } from './format'
+import {
+  formatResolutionMethod,
+  formatResolutionOutcomes,
+  formatResolutionSummary,
+  formatResolutionTarget,
+  formatResolutionTargetProximityPhrase,
+} from './format'
 import {
   CHILL_TOUCH_RESOLUTION,
+  CURE_WOUNDS_RESOLUTION,
   ELDRITCH_BLAST_RESOLUTION,
   INFlict_WOUNDS_RESOLUTION,
   SPELL_RESOLUTION_FIXTURES,
@@ -15,7 +22,7 @@ import {
 import { spellResolutionValidationMessages } from './validation-messages'
 
 describe('spellResolutionSchema', () => {
-  it('accepts the three scoped spell fixtures', () => {
+  it('accepts the scoped spell fixtures', () => {
     for (const resolution of Object.values(SPELL_RESOLUTION_FIXTURES)) {
       expect(spellResolutionSchema.parse(resolution)).toEqual(resolution)
     }
@@ -23,9 +30,8 @@ describe('spellResolutionSchema', () => {
 
   it('defaults outcome applications to an empty array', () => {
     const parsed = spellResolutionSchema.parse({
-      target: { count: 1, kind: 'creature' },
+      target: { count: 1, kind: 'creature', proximity: { kind: 'touch' } },
       method: { kind: 'attack', attackType: 'melee-spell' },
-      range: { kind: 'touch' },
       effects: [
         {
           id: SPELL_RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID,
@@ -49,9 +55,8 @@ describe('spellResolutionSchema', () => {
   it('accepts a saving-throw resolution with only a failed-save outcome', () => {
     expect(
       spellResolutionSchema.parse({
-        target: { count: 1, kind: 'creature' },
+        target: { count: 1, kind: 'creature', proximity: { kind: 'touch' } },
         method: { kind: 'saving-throw', ability: 'wis' },
-        range: { kind: 'touch' },
         effects: [
           {
             id: SPELL_RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID,
@@ -72,13 +77,20 @@ describe('spellResolutionSchema', () => {
     })
   })
 
-  it('accepts reach range with an optional explicit distance', () => {
+  it('accepts reach proximity with an optional explicit distance', () => {
     expect(
       spellResolutionSchema.parse({
         ...CHILL_TOUCH_RESOLUTION,
-        range: { kind: 'reach', distance: { value: 10, unit: 'ft' } },
-      }).range,
+        target: {
+          ...CHILL_TOUCH_RESOLUTION.target,
+          proximity: { kind: 'reach', distance: { value: 10, unit: 'ft' } },
+        },
+      }).target.proximity,
     ).toEqual({ kind: 'reach', distance: { value: 10, unit: 'ft' } })
+  })
+
+  it('accepts automatic healing resolutions', () => {
+    expect(spellResolutionSchema.parse(CURE_WOUNDS_RESOLUTION)).toEqual(CURE_WOUNDS_RESOLUTION)
   })
 
   it('rejects outcomes with neither applications nor note', () => {
@@ -201,8 +213,16 @@ describe('spellResolutionSchema', () => {
 })
 
 describe('spell resolution formatters', () => {
-  it('formats target, outcomes, and summary for scoped spells', () => {
-    expect(formatResolutionTarget(ELDRITCH_BLAST_RESOLUTION)).toBe('One creature or object')
+  it('formats target proximity phrases and outcomes for scoped spells', () => {
+    expect(formatResolutionTarget(ELDRITCH_BLAST_RESOLUTION)).toBe(
+      'One creature or object within 120 feet',
+    )
+    expect(formatResolutionTargetProximityPhrase(INFlict_WOUNDS_RESOLUTION.target.proximity)).toBe(
+      'you touch',
+    )
+    expect(formatResolutionTargetProximityPhrase(CHILL_TOUCH_RESOLUTION.target.proximity)).toBe(
+      'within your reach',
+    )
     expect(formatResolutionOutcomes(INFlict_WOUNDS_RESOLUTION)).toEqual([
       'Failed save: Full damage',
       'Successful save: Half damage',
@@ -210,9 +230,16 @@ describe('spell resolution formatters', () => {
 
     const summary = formatResolutionSummary(CHILL_TOUCH_RESOLUTION)
     expect(summary).toContain('Target')
+    expect(summary).toContain('within your reach')
     expect(summary).toContain('Melee spell attack')
-    expect(summary).toContain('Range: Reach')
     expect(summary).toContain('1d10 Necrotic damage')
     expect(summary).toContain("can't regain Hit Points")
+  })
+
+  it('formats automatic healing and self proximity', () => {
+    expect(formatResolutionTarget(CURE_WOUNDS_RESOLUTION)).toBe('One creature you touch')
+    expect(formatResolutionMethod(CURE_WOUNDS_RESOLUTION)).toBe('Automatic')
+    expect(formatResolutionSummary(CURE_WOUNDS_RESOLUTION)).toContain('2d8 healing')
+    expect(formatResolutionOutcomes(CURE_WOUNDS_RESOLUTION)).toEqual(['Applied: Full healing'])
   })
 })

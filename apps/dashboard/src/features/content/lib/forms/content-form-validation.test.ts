@@ -90,6 +90,7 @@ const SPELLS_SCHEMA_EXEMPT = [
   /^effects\b/,
   'resolution.methodKind',
   'resolution.attackType',
+  'resolution.saveAbility',
   'resolution.hitNote',
 ] as const
 

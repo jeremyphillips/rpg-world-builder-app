@@ -202,7 +202,46 @@
           }
         }
       }
-    ]
+    ],
+    "resolution": {
+      "target": {
+        "count": 6,
+        "kind": "creature",
+        "proximity": {
+          "kind": "distance",
+          "distance": {
+            "value": 60,
+            "unit": "ft"
+          }
+        }
+      },
+      "method": {
+        "kind": "automatic"
+      },
+      "effects": [
+        {
+          "id": "healing",
+          "kind": "healing",
+          "roll": {
+            "dice": {
+              "count": 5,
+              "faces": 8
+            }
+          }
+        }
+      ],
+      "outcomes": [
+        {
+          "result": "applied",
+          "applications": [
+            {
+              "effectId": "healing",
+              "amount": "full"
+            }
+          ]
+        }
+      ]
+    }
   },
   {
     "id": "srd-cc-5.2.1:planar-binding",

@@ -59,6 +59,10 @@ export const SPELL_RESOLUTION_OUTCOME_RESULT_ENTRIES = {
     label: 'Successful save',
     description: 'The target succeeded on its saving throw.',
   },
+  applied: {
+    label: 'Applied',
+    description: 'The effect applies automatically without an attack or saving throw.',
+  },
 } as const satisfies Record<string, GameTermEntry>
 
 export type SpellResolutionOutcomeResult = keyof typeof SPELL_RESOLUTION_OUTCOME_RESULT_ENTRIES
@@ -69,11 +73,11 @@ export const SPELL_RESOLUTION_OUTCOME_RESULTS = Object.keys(
 
 export const SPELL_RESOLUTION_APPLICATION_AMOUNT_ENTRIES = {
   full: {
-    label: 'Full damage',
+    label: 'Full effect',
     description: 'Apply the full effect value.',
   },
   half: {
-    label: 'Half damage',
+    label: 'Half effect',
     description: 'Apply half the effect value (rounded down).',
   },
 } as const satisfies Record<string, GameTermEntry>
@@ -85,27 +89,40 @@ export const SPELL_RESOLUTION_APPLICATION_AMOUNTS = Object.keys(
   SPELL_RESOLUTION_APPLICATION_AMOUNT_ENTRIES,
 ) as [SpellResolutionApplicationAmount, ...SpellResolutionApplicationAmount[]]
 
-export const SPELL_RESOLUTION_RANGE_KIND_ENTRIES = {
+export const SPELL_RESOLUTION_PROXIMITY_KIND_ENTRIES = {
+  self: {
+    label: 'Self',
+    description: 'The effect applies to the caster.',
+  },
   touch: {
     label: 'Touch',
-    description: 'The spell requires touching a target.',
+    description: 'The target must be touched.',
   },
   reach: {
     label: 'Reach',
-    description: 'The spell targets a creature or object within reach.',
+    description:
+      'The target must be within reach. Omit distance to use the caster’s default reach.',
   },
   distance: {
     label: 'Distance',
-    description: 'The spell reaches a target within a measured distance.',
+    description: 'The target must be within a measured distance.',
   },
 } as const satisfies Record<string, GameTermEntry>
 
-export type SpellResolutionRangeKind = keyof typeof SPELL_RESOLUTION_RANGE_KIND_ENTRIES
+export type SpellResolutionProximityKind = keyof typeof SPELL_RESOLUTION_PROXIMITY_KIND_ENTRIES
 
-export const SPELL_RESOLUTION_RANGE_KINDS = Object.keys(SPELL_RESOLUTION_RANGE_KIND_ENTRIES) as [
-  SpellResolutionRangeKind,
-  ...SpellResolutionRangeKind[],
-]
+export const SPELL_RESOLUTION_PROXIMITY_KINDS = Object.keys(
+  SPELL_RESOLUTION_PROXIMITY_KIND_ENTRIES,
+) as [SpellResolutionProximityKind, ...SpellResolutionProximityKind[]]
+
+/** @deprecated Use SPELL_RESOLUTION_PROXIMITY_KIND_ENTRIES */
+export const SPELL_RESOLUTION_RANGE_KIND_ENTRIES = SPELL_RESOLUTION_PROXIMITY_KIND_ENTRIES
+
+/** @deprecated Use SpellResolutionProximityKind */
+export type SpellResolutionRangeKind = SpellResolutionProximityKind
+
+/** @deprecated Use SPELL_RESOLUTION_PROXIMITY_KINDS */
+export const SPELL_RESOLUTION_RANGE_KINDS = SPELL_RESOLUTION_PROXIMITY_KINDS
 
 export function getSpellResolutionTargetKindLabel(kind: string): string {
   return SPELL_RESOLUTION_TARGET_KIND_ENTRIES[kind as SpellResolutionTargetKind]?.label ?? kind
@@ -131,12 +148,20 @@ export function getSpellResolutionApplicationAmountLabel(amount: string): string
   )
 }
 
+export function getSpellResolutionProximityKindLabel(kind: string): string {
+  return (
+    SPELL_RESOLUTION_PROXIMITY_KIND_ENTRIES[kind as SpellResolutionProximityKind]?.label ?? kind
+  )
+}
+
+/** @deprecated Use getSpellResolutionProximityKindLabel */
 export function getSpellResolutionRangeKindLabel(kind: string): string {
-  return SPELL_RESOLUTION_RANGE_KIND_ENTRIES[kind as SpellResolutionRangeKind]?.label ?? kind
+  return getSpellResolutionProximityKindLabel(kind)
 }
 
 /** Outcome results permitted for each resolution method kind (structural allowlist). */
 export const SPELL_RESOLUTION_OUTCOME_RESULTS_BY_METHOD = {
   attack: ['hit'],
   'saving-throw': ['failed-save', 'successful-save'],
+  automatic: ['applied'],
 } as const satisfies Record<string, readonly SpellResolutionOutcomeResult[]>

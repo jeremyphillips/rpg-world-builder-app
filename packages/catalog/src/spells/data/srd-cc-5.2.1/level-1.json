@@ -103,14 +103,14 @@
     "resolution": {
       "target": {
         "count": 1,
-        "kind": "creature-or-object"
+        "kind": "creature-or-object",
+        "proximity": {
+          "kind": "reach"
+        }
       },
       "method": {
         "kind": "saving-throw",
         "ability": "dex"
-      },
-      "range": {
-        "kind": "reach"
       },
       "effects": [
         {
@@ -234,7 +234,42 @@
           }
         }
       }
-    ]
+    ],
+    "resolution": {
+      "target": {
+        "count": 1,
+        "kind": "creature",
+        "proximity": {
+          "kind": "touch"
+        }
+      },
+      "method": {
+        "kind": "automatic"
+      },
+      "effects": [
+        {
+          "id": "healing",
+          "kind": "healing",
+          "roll": {
+            "dice": {
+              "count": 2,
+              "faces": 8
+            }
+          }
+        }
+      ],
+      "outcomes": [
+        {
+          "result": "applied",
+          "applications": [
+            {
+              "effectId": "healing",
+              "amount": "full"
+            }
+          ]
+        }
+      ]
+    }
   },
   {
     "id": "srd-cc-5.2.1:detect-evil-and-good",
@@ -479,7 +514,43 @@
           "flat": 4
         }
       }
-    ]
+    ],
+    "resolution": {
+      "target": {
+        "count": 1,
+        "kind": "creature",
+        "proximity": {
+          "kind": "self"
+        }
+      },
+      "method": {
+        "kind": "automatic"
+      },
+      "effects": [
+        {
+          "id": "temporary-hit-points",
+          "kind": "temporary-hit-points",
+          "roll": {
+            "dice": {
+              "count": 2,
+              "faces": 4
+            },
+            "flat": 4
+          }
+        }
+      ],
+      "outcomes": [
+        {
+          "result": "applied",
+          "applications": [
+            {
+              "effectId": "temporary-hit-points",
+              "amount": "full"
+            }
+          ]
+        }
+      ]
+    }
   },
   {
     "id": "srd-cc-5.2.1:feather-fall",
@@ -630,18 +701,18 @@
     "resolution": {
       "target": {
         "count": 1,
-        "kind": "creature"
+        "kind": "creature",
+        "proximity": {
+          "kind": "distance",
+          "distance": {
+            "value": 60,
+            "unit": "ft"
+          }
+        }
       },
       "method": {
         "kind": "saving-throw",
         "ability": "dex"
-      },
-      "range": {
-        "kind": "distance",
-        "value": {
-          "value": 60,
-          "unit": "ft"
-        }
       },
       "effects": [
         {
@@ -1039,14 +1110,14 @@
     "resolution": {
       "target": {
         "count": 1,
-        "kind": "creature"
+        "kind": "creature",
+        "proximity": {
+          "kind": "touch"
+        }
       },
       "method": {
         "kind": "saving-throw",
         "ability": "con"
-      },
-      "range": {
-        "kind": "touch"
       },
       "effects": [
         {
@@ -1358,18 +1429,18 @@
     "resolution": {
       "target": {
         "count": 1,
-        "kind": "creature-or-object"
+        "kind": "creature-or-object",
+        "proximity": {
+          "kind": "distance",
+          "distance": {
+            "value": 60,
+            "unit": "ft"
+          }
+        }
       },
       "method": {
         "kind": "attack",
         "attackType": "ranged-spell"
-      },
-      "range": {
-        "kind": "distance",
-        "value": {
-          "value": 60,
-          "unit": "ft"
-        }
       },
       "effects": [
         {
@@ -1700,14 +1771,14 @@
     "resolution": {
       "target": {
         "count": 1,
-        "kind": "creature-or-object"
+        "kind": "creature-or-object",
+        "proximity": {
+          "kind": "reach"
+        }
       },
       "method": {
         "kind": "saving-throw",
         "ability": "con"
-      },
-      "range": {
-        "kind": "reach"
       },
       "effects": [
         {

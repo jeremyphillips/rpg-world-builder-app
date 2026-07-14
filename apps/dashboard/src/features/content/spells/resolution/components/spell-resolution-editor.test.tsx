@@ -61,6 +61,22 @@ describe('SpellResolutionEditor', () => {
 
     await waitFor(() => {
       expect(screen.getAllByText('Target').length).toBeGreaterThan(0)
+      expect(screen.getAllByText('Check').length).toBeGreaterThan(0)
+      expect(screen.getAllByText('Effects').length).toBeGreaterThan(0)
+    })
+  })
+
+  it('does not render Outcomes editing for configured resolution', async () => {
+    render(
+      <SpellResolutionEditor
+        formCtx={formCtx}
+        defaultResolution={RESOLUTION_FORM_FIXTURES.inflictWounds}
+      />,
+    )
+
+    await waitFor(() => {
+      expect(screen.getAllByText('Effects').length).toBeGreaterThan(0)
+      expect(screen.queryByText('Outcomes are generated')).not.toBeInTheDocument()
     })
   })
 

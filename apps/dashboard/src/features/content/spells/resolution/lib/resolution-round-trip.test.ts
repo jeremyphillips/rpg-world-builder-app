@@ -5,7 +5,9 @@ import { describe, expect, it } from 'vitest'
 
 import {
   CHILL_TOUCH_RESOLUTION,
+  CURE_WOUNDS_RESOLUTION,
   ELDRITCH_BLAST_RESOLUTION,
+  FALSE_LIFE_RESOLUTION,
   INFlict_WOUNDS_RESOLUTION,
   SPELL_RESOLUTION_FIXTURES,
 } from './resolution-fixtures'
@@ -21,8 +23,14 @@ const resolutionFormValuesPath = join(
   'resolution-form-values.ts',
 )
 
+const DAMAGE_AUTHORING_FIXTURES = {
+  'eldritch-blast': ELDRITCH_BLAST_RESOLUTION,
+  'chill-touch': CHILL_TOUCH_RESOLUTION,
+  'inflict-wounds': INFlict_WOUNDS_RESOLUTION,
+} as const satisfies Partial<typeof SPELL_RESOLUTION_FIXTURES>
+
 describe('spell resolution round trips', () => {
-  for (const [slug, resolution] of Object.entries(SPELL_RESOLUTION_FIXTURES)) {
+  for (const [slug, resolution] of Object.entries(DAMAGE_AUTHORING_FIXTURES)) {
     it(`${slug}: contract resolution → form → stored → contract`, () => {
       const formValues = resolutionToForm(resolution)
       expect(formValues).toBeDefined()
@@ -37,14 +45,14 @@ describe('spell resolution round trips', () => {
     const formValues = resolutionToForm(ELDRITCH_BLAST_RESOLUTION)
     expect(formValues?.methodKind).toBe('attack')
     expect(formValues?.attackType).toBe('ranged-spell')
-    expect(formValues?.rangeKind).toBe('distance')
-    expect(formValues?.rangeDistanceFt).toBe(120)
+    expect(formValues?.proximityKind).toBe('distance')
+    expect(formValues?.proximityDistanceFt).toBe(120)
   })
 
   it('chill-touch: preserves melee reach and hit outcome note', () => {
     const formValues = resolutionToForm(CHILL_TOUCH_RESOLUTION)
     expect(formValues?.attackType).toBe('melee-spell')
-    expect(formValues?.rangeKind).toBe('reach')
+    expect(formValues?.proximityKind).toBe('reach')
     expect(formValues?.hitNote).toContain("can't regain Hit Points")
   })
 
@@ -70,8 +78,13 @@ describe('spell resolution round trips', () => {
     ).toBeUndefined()
   })
 
-  it('parsed form schema round-trips through stored normalization for fixtures', () => {
-    for (const resolution of Object.values(SPELL_RESOLUTION_FIXTURES)) {
+  it('returns undefined for automatic non-damage resolutions until authoring expands', () => {
+    expect(resolutionToForm(CURE_WOUNDS_RESOLUTION)).toBeUndefined()
+    expect(resolutionToForm(FALSE_LIFE_RESOLUTION)).toBeUndefined()
+  })
+
+  it('parsed form schema round-trips through stored normalization for damage fixtures', () => {
+    for (const resolution of Object.values(DAMAGE_AUTHORING_FIXTURES)) {
       const formValues = resolutionToForm(resolution)
       const parsedForm = resolutionFormSchema.parse(formValues)
       expect(resolutionToStored(parsedForm)).toEqual(resolution)

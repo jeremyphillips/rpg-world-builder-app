@@ -55,10 +55,10 @@ describe('resolutionFormSchema', () => {
     )
   })
 
-  it('requires rangeDistanceFt when rangeKind is distance', () => {
+  it('requires proximityDistanceFt when proximityKind is distance', () => {
     const result = resolutionFormSchema.safeParse({
       ...createDefaultAttackResolutionFormValues(),
-      rangeDistanceFt: undefined,
+      proximityDistanceFt: undefined,
     })
 
     expect(result.success).toBe(false)
@@ -66,8 +66,8 @@ describe('resolutionFormSchema', () => {
 
     expect(result.error.issues).toContainEqual(
       expect.objectContaining({
-        path: ['rangeDistanceFt'],
-        message: resolutionFormValidationMessages.rangeDistanceRequired(),
+        path: ['proximityDistanceFt'],
+        message: resolutionFormValidationMessages.proximityDistanceRequired(),
       }),
     )
   })

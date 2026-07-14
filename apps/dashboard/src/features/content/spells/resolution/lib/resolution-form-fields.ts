@@ -1,19 +1,20 @@
 import { createElement } from 'react'
-import type { FieldVisibility, FormItem } from '@rpg/ui/form'
+import type { FieldVisibility, FormItem, InlineSentenceFieldConfig } from '@rpg/ui/form'
 
+import {
+  feetInputUnitField,
+  SPELL_RANGE_DISTANCE_INLINE_COUNT_DIGITS,
+} from '../../../lib/forms/fields/content-identity-form-fields'
 import { damageTypeField } from '../../../lib/forms/mechanics/damage-type-field'
 import { rollValueFieldConfigs } from '../../../lib/forms/mechanics/roll-value-fields'
 import type { ContentFormCtx } from '../../../lib/forms/content-form-registry'
 import { SpellResolutionEmptyState } from '../components/spell-resolution-empty-state.client'
 import { SpellResolutionMethodSelect } from '../components/spell-resolution-method-select.client'
-import { SpellResolutionOutcomes } from '../components/spell-resolution-outcomes.client'
 import { SpellResolutionPreview } from '../components/spell-resolution-preview.client'
-import { SpellResolutionTargetCount } from '../components/spell-resolution-target-count.client'
 import {
   RESOLUTION_FIELD_LABELS,
   RESOLUTION_SECTION_LABELS,
-  resolutionRangeKindOptions,
-  resolutionSaveAbilityOptions,
+  resolutionProximityKindOptions,
   resolutionTargetKindOptions,
 } from './resolution-form-labels'
 import {
@@ -25,29 +26,105 @@ import { RESOLUTION_FIELD_NAME } from './resolution-form-values'
 
 const RESOLUTION_PREFIX = RESOLUTION_FIELD_NAME
 
-function visibleWhenResolutionSavingThrow(): FieldVisibility {
+function visibleWhenProximityKind(kind: 'touch' | 'reach' | 'distance'): FieldVisibility {
   return {
-    dependsOn: [`${RESOLUTION_PREFIX}.methodKind`],
-    visibleWhen: (values) => values[`${RESOLUTION_PREFIX}.methodKind`] === 'saving-throw',
+    dependsOn: [`${RESOLUTION_PREFIX}.proximityKind`],
+    visibleWhen: (values) => values[`${RESOLUTION_PREFIX}.proximityKind`] === kind,
   }
 }
 
-function visibleWhenResolutionRangeDistance(): FieldVisibility {
+function visibleWhenResolutionTargetCountEditable(): FieldVisibility {
   return {
-    dependsOn: [`${RESOLUTION_PREFIX}.rangeKind`],
-    visibleWhen: (values) => values[`${RESOLUTION_PREFIX}.rangeKind`] === 'distance',
+    dependsOn: [`${RESOLUTION_PREFIX}.targetCount`],
+    visibleWhen: (values) => {
+      const count = values[`${RESOLUTION_PREFIX}.targetCount`]
+      return typeof count === 'number' && count !== 1
+    },
   }
 }
 
-function visibleWhenResolutionRangeReach(): FieldVisibility {
+function targetKindSegment() {
   return {
-    dependsOn: [`${RESOLUTION_PREFIX}.rangeKind`],
-    visibleWhen: (values) => values[`${RESOLUTION_PREFIX}.rangeKind`] === 'reach',
+    kind: 'select' as const,
+    name: `${RESOLUTION_PREFIX}.targetKind`,
+    options: resolutionTargetKindOptions,
+    ariaLabel: RESOLUTION_FIELD_LABELS.targetKind,
+    width: 'lg' as const,
   }
 }
 
-function withVisibility(fields: FormItem[], visibility: FieldVisibility): FormItem[] {
-  return fields.map((field) => ({ ...field, visibility }))
+/** One [creature] you touch */
+function resolutionTouchTargetField(): InlineSentenceFieldConfig {
+  return {
+    type: 'inlineSentence',
+    name: `${RESOLUTION_PREFIX}.targetKind`,
+    label: RESOLUTION_FIELD_LABELS.target,
+    visibility: visibleWhenProximityKind('touch'),
+    segments: [
+      { kind: 'text', value: 'One', tone: 'label' },
+      targetKindSegment(),
+      { kind: 'text', value: 'you touch', tone: 'label' },
+    ],
+  }
+}
+
+/** One [creature] within your reach */
+function resolutionReachTargetField(): InlineSentenceFieldConfig {
+  return {
+    type: 'inlineSentence',
+    name: `${RESOLUTION_PREFIX}.targetKind`,
+    label: RESOLUTION_FIELD_LABELS.target,
+    visibility: visibleWhenProximityKind('reach'),
+    segments: [
+      { kind: 'text', value: 'One', tone: 'label' },
+      targetKindSegment(),
+      { kind: 'text', value: 'within your reach', tone: 'label' },
+    ],
+  }
+}
+
+/** One [creature] within [60] feet */
+function resolutionDistanceTargetField(): InlineSentenceFieldConfig {
+  return {
+    type: 'inlineSentence',
+    name: `${RESOLUTION_PREFIX}.targetKind`,
+    label: RESOLUTION_FIELD_LABELS.target,
+    visibility: visibleWhenProximityKind('distance'),
+    segments: [
+      { kind: 'text', value: 'One', tone: 'label' },
+      targetKindSegment(),
+      { kind: 'text', value: 'within', tone: 'label' },
+      {
+        kind: 'number',
+        name: `${RESOLUTION_PREFIX}.proximityDistanceFt`,
+        min: 0,
+        digits: SPELL_RANGE_DISTANCE_INLINE_COUNT_DIGITS,
+        ariaLabel: RESOLUTION_FIELD_LABELS.proximityDistance,
+      },
+      { kind: 'text', value: 'feet', tone: 'label' },
+    ],
+  }
+}
+
+/** Shared damage atoms bound to flattened resolution paths. */
+function resolutionDamageFields(ctx: ContentFormCtx): FormItem[] {
+  return [
+    {
+      kind: 'row',
+      fields: [
+        damageTypeField({
+          name: `${RESOLUTION_PREFIX}.damageType`,
+          ctx,
+          required: true,
+        }),
+        ...rollValueFieldConfigs({
+          namePrefix: `${RESOLUTION_PREFIX}.damageRoll`,
+          label: RESOLUTION_FIELD_LABELS.damageRoll,
+          required: true,
+        }),
+      ],
+    },
+  ]
 }
 
 function configuredResolutionFields(ctx: ContentFormCtx): FormItem[] {
@@ -66,18 +143,26 @@ function configuredResolutionFields(ctx: ContentFormCtx): FormItem[] {
       visibility: configured,
       fields: [
         {
-          kind: 'slot',
-          name: '_resolutionTargetCount',
-          render: () => createElement(SpellResolutionTargetCount),
-        },
-        {
           type: 'select',
-          name: `${RESOLUTION_PREFIX}.targetKind`,
-          label: RESOLUTION_FIELD_LABELS.targetKind,
-          options: resolutionTargetKindOptions,
-          width: 'lg',
+          name: `${RESOLUTION_PREFIX}.proximityKind`,
+          label: RESOLUTION_FIELD_LABELS.proximityKind,
+          options: resolutionProximityKindOptions,
+          width: 'md',
           required: true,
         },
+        resolutionTouchTargetField(),
+        resolutionReachTargetField(),
+        resolutionDistanceTargetField(),
+        feetInputUnitField(
+          `${RESOLUTION_PREFIX}.proximityReachDistanceFt`,
+          RESOLUTION_FIELD_LABELS.proximityReachDistance,
+          {
+            valueDigits: SPELL_RANGE_DISTANCE_INLINE_COUNT_DIGITS,
+            width: 'auto',
+            visibility: visibleWhenProximityKind('reach'),
+            hint: 'Optional explicit reach distance in feet. Omit to use the caster’s default reach.',
+          },
+        ),
         {
           type: 'number',
           name: `${RESOLUTION_PREFIX}.targetCount`,
@@ -86,107 +171,34 @@ function configuredResolutionFields(ctx: ContentFormCtx): FormItem[] {
           digits: 2,
           width: 'auto',
           required: true,
-          visibility: {
-            dependsOn: [`${RESOLUTION_PREFIX}.targetCount`],
-            visibleWhen: (values) => {
-              const count = values[`${RESOLUTION_PREFIX}.targetCount`]
-              return typeof count === 'number' && count !== 1
-            },
-          },
-        },
-      ],
-    },
-    {
-      kind: 'slot',
-      name: '_resolutionMethodSelect',
-      visibility: configured,
-      render: () => createElement(SpellResolutionMethodSelect),
-    },
-    ...withVisibility(
-      [
-        {
-          type: 'select',
-          name: `${RESOLUTION_PREFIX}.saveAbility`,
-          label: RESOLUTION_FIELD_LABELS.saveAbility,
-          options: resolutionSaveAbilityOptions,
-          width: 'md',
-          required: true,
-        },
-      ],
-      combineFieldVisibility(configured, visibleWhenResolutionSavingThrow()),
-    ),
-    ...withVisibility(
-      [
-        {
-          type: 'select',
-          name: `${RESOLUTION_PREFIX}.rangeKind`,
-          label: RESOLUTION_FIELD_LABELS.rangeKind,
-          options: resolutionRangeKindOptions,
-          width: 'md',
-          required: true,
-        },
-      ],
-      configured,
-    ),
-    ...withVisibility(
-      [
-        {
-          type: 'number',
-          name: `${RESOLUTION_PREFIX}.rangeDistanceFt`,
-          label: RESOLUTION_FIELD_LABELS.rangeDistanceFt,
-          min: 0,
-          digits: 3,
-          width: 'auto',
-          required: true,
-        },
-      ],
-      combineFieldVisibility(configured, visibleWhenResolutionRangeDistance()),
-    ),
-    ...withVisibility(
-      [
-        {
-          type: 'number',
-          name: `${RESOLUTION_PREFIX}.reachDistanceFt`,
-          label: RESOLUTION_FIELD_LABELS.reachDistanceFt,
-          min: 0,
-          digits: 3,
-          width: 'auto',
-          hint: 'Optional explicit reach distance in feet.',
-        },
-      ],
-      combineFieldVisibility(configured, visibleWhenResolutionRangeReach()),
-    ),
-    {
-      kind: 'group',
-      legend: RESOLUTION_SECTION_LABELS.damage,
-      visibility: configured,
-      fields: [
-        {
-          kind: 'row',
-          fields: [
-            damageTypeField({
-              name: `${RESOLUTION_PREFIX}.damageType`,
-              ctx,
-              required: true,
-            }),
-            ...rollValueFieldConfigs({
-              namePrefix: `${RESOLUTION_PREFIX}.damageRoll`,
-              label: RESOLUTION_FIELD_LABELS.damageRoll,
-              required: true,
-            }),
-          ],
+          visibility: combineFieldVisibility(
+            configured,
+            visibleWhenResolutionTargetCountEditable(),
+          ),
         },
       ],
     },
     {
       kind: 'group',
-      legend: RESOLUTION_SECTION_LABELS.outcomes,
+      legend: RESOLUTION_SECTION_LABELS.check,
       visibility: configured,
       fields: [
         {
           kind: 'slot',
-          name: '_resolutionOutcomes',
-          render: () => createElement(SpellResolutionOutcomes),
+          name: '_resolutionMethodSelect',
+          render: () => createElement(SpellResolutionMethodSelect),
+        },
+      ],
+    },
+    {
+      kind: 'group',
+      legend: RESOLUTION_SECTION_LABELS.effects,
+      visibility: configured,
+      fields: [
+        {
+          kind: 'group',
+          legend: RESOLUTION_SECTION_LABELS.damage,
+          fields: resolutionDamageFields(ctx),
         },
       ],
     },

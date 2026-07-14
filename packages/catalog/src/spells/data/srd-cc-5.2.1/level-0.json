@@ -54,18 +54,18 @@
     "resolution": {
       "target": {
         "count": 1,
-        "kind": "creature-or-object"
+        "kind": "creature-or-object",
+        "proximity": {
+          "kind": "distance",
+          "distance": {
+            "value": 60,
+            "unit": "ft"
+          }
+        }
       },
       "method": {
         "kind": "saving-throw",
         "ability": "dex"
-      },
-      "range": {
-        "kind": "distance",
-        "value": {
-          "value": 60,
-          "unit": "ft"
-        }
       },
       "effects": [
         {
@@ -154,14 +154,14 @@
     "resolution": {
       "target": {
         "count": 1,
-        "kind": "creature-or-object"
+        "kind": "creature-or-object",
+        "proximity": {
+          "kind": "reach"
+        }
       },
       "method": {
         "kind": "attack",
         "attackType": "melee-spell"
-      },
-      "range": {
-        "kind": "reach"
       },
       "effects": [
         {
@@ -332,7 +332,48 @@
         },
         "damageType": "force"
       }
-    ]
+    ],
+    "resolution": {
+      "target": {
+        "count": 1,
+        "kind": "creature-or-object",
+        "proximity": {
+          "kind": "distance",
+          "distance": {
+            "value": 120,
+            "unit": "ft"
+          }
+        }
+      },
+      "method": {
+        "kind": "attack",
+        "attackType": "ranged-spell"
+      },
+      "effects": [
+        {
+          "id": "damage",
+          "kind": "damage",
+          "roll": {
+            "dice": {
+              "count": 1,
+              "faces": 10
+            }
+          },
+          "damageType": "force"
+        }
+      ],
+      "outcomes": [
+        {
+          "result": "hit",
+          "applications": [
+            {
+              "effectId": "damage",
+              "amount": "full"
+            }
+          ]
+        }
+      ]
+    }
   },
   {
     "id": "srd-cc-5.2.1:elementalism",
@@ -428,18 +469,18 @@
     "resolution": {
       "target": {
         "count": 1,
-        "kind": "creature-or-object"
+        "kind": "creature-or-object",
+        "proximity": {
+          "kind": "distance",
+          "distance": {
+            "value": 120,
+            "unit": "ft"
+          }
+        }
       },
       "method": {
         "kind": "attack",
         "attackType": "ranged-spell"
-      },
-      "range": {
-        "kind": "distance",
-        "value": {
-          "value": 120,
-          "unit": "ft"
-        }
       },
       "effects": [
         {
@@ -756,18 +797,18 @@
     "resolution": {
       "target": {
         "count": 1,
-        "kind": "creature-or-object"
+        "kind": "creature-or-object",
+        "proximity": {
+          "kind": "distance",
+          "distance": {
+            "value": 30,
+            "unit": "ft"
+          }
+        }
       },
       "method": {
         "kind": "attack",
         "attackType": "ranged-spell"
-      },
-      "range": {
-        "kind": "distance",
-        "value": {
-          "value": 30,
-          "unit": "ft"
-        }
       },
       "effects": [
         {
@@ -926,18 +967,18 @@
     "resolution": {
       "target": {
         "count": 1,
-        "kind": "creature-or-object"
+        "kind": "creature-or-object",
+        "proximity": {
+          "kind": "distance",
+          "distance": {
+            "value": 60,
+            "unit": "ft"
+          }
+        }
       },
       "method": {
         "kind": "saving-throw",
         "ability": "dex"
-      },
-      "range": {
-        "kind": "distance",
-        "value": {
-          "value": 60,
-          "unit": "ft"
-        }
       },
       "effects": [
         {

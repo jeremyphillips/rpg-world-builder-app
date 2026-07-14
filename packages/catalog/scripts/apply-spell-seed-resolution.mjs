@@ -26,6 +26,7 @@ const levelFiles = [
 ]
 
 let applied = 0
+let stripped = 0
 
 for (const fileName of levelFiles) {
   const filePath = join(dataDir, fileName)
@@ -35,6 +36,15 @@ for (const fileName of levelFiles) {
   for (const spell of spells) {
     const entry = SRD_521_SPELL_SEED_RESOLUTION[spell.slug]
     if (!entry) {
+      continue
+    }
+
+    if (entry.kind === 'defer') {
+      if (spell.resolution !== undefined) {
+        delete spell.resolution
+        stripped++
+        changed = true
+      }
       continue
     }
 
@@ -52,3 +62,6 @@ for (const fileName of levelFiles) {
 }
 
 console.log(`Applied structured resolution to ${applied} spells.`)
+if (stripped > 0) {
+  console.log(`Stripped resolution from ${stripped} explicitly deferred spells.`)
+}
