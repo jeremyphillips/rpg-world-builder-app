@@ -127,7 +127,7 @@ function resolutionEffectsArrayField(ctx: ContentFormCtx): FormItem {
   return {
     kind: 'array',
     name: `${RESOLUTION_PREFIX}.effects`,
-    legend: '',
+    legend: RESOLUTION_SECTION_LABELS.effects,
     addLabel: 'Add effect',
     itemCollapsible: true,
     itemHeader: {
@@ -259,20 +259,14 @@ function configuredResolutionFields(ctx: ContentFormCtx): FormItem[] {
     },
     ...resolutionProjectilesFields(),
     {
-      kind: 'group',
-      legend: RESOLUTION_SECTION_LABELS.effects,
+      kind: 'slot',
+      name: '_resolutionEffectsApplicationLabel',
       visibility: configured,
-      fields: [
-        {
-          kind: 'slot',
-          name: '_resolutionEffectsApplicationLabel',
-          render: () => createElement(SpellResolutionEffectsApplicationLabel),
-        },
-        {
-          ...resolutionEffectsArrayField(ctx),
-          visibility: undefined,
-        },
-      ],
+      render: () => createElement(SpellResolutionEffectsApplicationLabel),
+    },
+    {
+      ...resolutionEffectsArrayField(ctx),
+      visibility: configured,
     },
     {
       kind: 'group',

@@ -52,7 +52,10 @@ describe('SpellResolutionEditor', () => {
     await waitFor(() => {
       expect(screen.getAllByText('Effects').length).toBeGreaterThan(0)
       expect(screen.getByText('Applied once')).toBeInTheDocument()
-      expect(screen.getAllByText('Damage').length).toBeGreaterThan(0)
+      expect(
+        screen.getByRole('button', { name: /(Collapse|Expand) Effects · Damage/ }),
+      ).toBeInTheDocument()
+      expect(screen.getByText('Inflicts 1d10 Force damage.')).toBeInTheDocument()
     })
   })
 
