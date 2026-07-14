@@ -197,6 +197,7 @@ export { MarkdownField, type MarkdownFieldProps } from './components/ui/markdown
 
 export {
   FieldGroup,
+  type FieldGroupFieldsChrome,
   type FieldGroupLegendSize,
   type FieldGroupProps,
 } from './components/ui/field-group'

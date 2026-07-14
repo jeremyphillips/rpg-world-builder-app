@@ -38,7 +38,7 @@ describe('Form section rendering', () => {
   it('renders group and array legends with expected typography', () => {
     render(<Form schema={schema} fields={fields} onSubmit={vi.fn()} />)
 
-    expect(screen.getByText('Identity')).toHaveClass('text-field-group-legend')
+    expect(screen.getByText('Identity').closest('legend')).toHaveClass('text-field-group-legend')
     expect(screen.getByText('Tags')).toHaveClass('text-sm')
     expect(screen.getByText('Tags')).not.toHaveClass('text-field-array-legend')
   })

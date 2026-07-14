@@ -15,6 +15,12 @@ describe('fieldSurfaceToneVariants', () => {
   it('applies subtle tone classes', () => {
     const classes = fieldSurfaceToneVariants({ tone: 'subtle' })
     expect(classes).toContain('border-border')
+    expect(classes).toContain('bg-muted/10')
+  })
+
+  it('applies medium tone classes', () => {
+    const classes = fieldSurfaceToneVariants({ tone: 'medium' })
+    expect(classes).toContain('border-border')
     expect(classes).toContain('bg-muted/30')
   })
 
@@ -35,7 +41,7 @@ describe('fieldStackDependentsChromeVariants', () => {
   it('applies subtle tone classes by default', () => {
     const classes = fieldStackDependentsChromeVariants()
     expect(classes).toContain('border-border')
-    expect(classes).toContain('bg-muted/30')
+    expect(classes).toContain('bg-muted/10')
   })
 
   it('applies error tone classes', () => {

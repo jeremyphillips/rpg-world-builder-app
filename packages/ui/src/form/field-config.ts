@@ -31,6 +31,7 @@ import type {
   FieldStackDependentsChromeScope,
   FieldStackDependentsTone,
 } from '../components/ui/field-stack.variants'
+import type { FieldGroupFieldsChrome } from '../components/ui/field-group-chrome.variants'
 import type {
   FieldRowLayout,
   FieldHintPosition,
@@ -40,6 +41,8 @@ import type {
   FieldStackLayout,
   FieldStackRhythm,
 } from '../components/ui/field.variants'
+
+export type { FieldGroupFieldsChrome } from '../components/ui/field-group-chrome.variants'
 
 /** The set of control types the schema-driven `<Form>` renderer can render. */
 export type FieldType =
@@ -661,6 +664,8 @@ export interface GroupConfig {
   rhythm?: FieldStackRhythm
   /** When hidden, the whole group unmounts and nested field values clear. */
   visibility?: FieldVisibility
+  /** Visual treatment for legend + field stack — variants are mutually exclusive. */
+  fieldsChrome?: FieldGroupFieldsChrome
 }
 
 /** Layout profile for repeatable array item chrome. */

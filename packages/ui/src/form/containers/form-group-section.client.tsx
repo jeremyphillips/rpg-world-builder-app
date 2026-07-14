@@ -9,6 +9,7 @@ import {
   buildFormSectionChildContext,
   useFormSectionContext,
 } from '../context/form-section.context'
+import { useFormUiContext } from '../context/form-ui.context'
 import type {
   GroupConfig,
   GroupFieldItem,
@@ -34,12 +35,15 @@ export function GroupFieldSection({
   renderNestedItems,
 }: GroupFieldSectionProps) {
   const parentContext = useFormSectionContext()
+  const { uiStateKey } = useFormUiContext()
+  const legendSize = item.legendSize ?? (parentContext.inGroup ? 'subsection' : 'section')
   const groupRhythm = resolveFieldStackRhythm({
     explicit: item.rhythm,
     inherited: parentContext.rhythm,
   })
   const childContext = React.useMemo(
-    () => buildFormSectionChildContext(parentContext, depth, { rhythm: groupRhythm }),
+    () =>
+      buildFormSectionChildContext(parentContext, depth, { rhythm: groupRhythm, inGroup: true }),
     [parentContext, depth, groupRhythm],
   )
 
@@ -47,10 +51,13 @@ export function GroupFieldSection({
     <FieldGroup
       id={item.id}
       legend={item.legend}
-      legendSize={item.legendSize}
+      legendSize={legendSize}
       rhythm={groupRhythm}
       description={item.description}
       className={item.className}
+      fieldsChrome={item.fieldsChrome}
+      uiStateKey={uiStateKey}
+      collapseKey={item.id}
     >
       <FormSectionContext.Provider value={childContext}>
         {renderNestedItems({

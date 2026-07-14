@@ -82,7 +82,7 @@ describe('array item shell variants', () => {
     expect(arrayItemShellVariants({ tone: 'default' })).not.toContain('bg-muted/30')
     const classes = arrayItemShellVariants({ tone: 'subtle' })
     expect(classes).toContain(fieldSurfaceToneVariants({ tone: 'subtle' }))
-    expect(classes).toContain('bg-muted/30')
+    expect(classes).toContain('bg-muted/10')
   })
 
   it('uses a single-column shell for compact inline rows', () => {

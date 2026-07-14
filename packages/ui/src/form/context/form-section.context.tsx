@@ -22,6 +22,8 @@ export interface FormSectionContextValue {
   size: FieldSize
   /** Surface tone for array item shells when stack scope is `arrayItems`. */
   arrayItemTone?: FieldStackDependentsTone
+  /** True when the current section is nested inside a group fieldset. */
+  inGroup?: boolean
 }
 
 export const FormSectionContext = React.createContext<FormSectionContextValue>({
@@ -38,6 +40,7 @@ export interface FormSectionContextOverrides {
   rhythm?: FieldStackRhythm
   size?: FieldSize
   arrayItemTone?: FieldStackDependentsTone
+  inGroup?: boolean
 }
 
 /** Child section context — inherits rhythm and size unless overridden. */
@@ -51,6 +54,7 @@ export function buildFormSectionChildContext(
     rhythm: overrides?.rhythm ?? parent.rhythm,
     size: overrides?.size ?? parent.size,
     arrayItemTone: overrides?.arrayItemTone ?? parent.arrayItemTone,
+    inGroup: overrides?.inGroup ?? parent.inGroup,
   }
 }
 

@@ -19,6 +19,7 @@ export type CollapsibleListItemShellTone =
   | 'default'
   | 'main'
   | 'subtle'
+  | 'medium'
   | 'warning'
   | 'error'
   | 'catalog'

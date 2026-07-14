@@ -167,10 +167,10 @@ describe('ArrayFieldRenderer', () => {
     await waitFor(() => expect(screen.getByRole('textbox', { name: 'Class' })).toBeInTheDocument())
 
     const itemShell = screen.getByRole('group', { name: /Item #1/ })
-    expect(itemShell).toHaveClass('bg-muted/30')
+    expect(itemShell).toHaveClass('bg-muted/10')
     const dependentsRegion = addButton.closest('[data-field-stack-dependents]')
     expect(dependentsRegion?.querySelector(':scope > .p-3')).toBeNull()
-    expect(dependentsRegion?.querySelector('.bg-muted\\/30')).toBe(itemShell)
+    expect(dependentsRegion?.querySelector('.bg-muted\\/10')).toBe(itemShell)
   })
 
   it('uses gap-3 between sm comfortable array items while keeping gap-6 inside item bodies', async () => {

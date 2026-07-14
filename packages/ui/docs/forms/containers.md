@@ -16,7 +16,8 @@ and size defaults: [forms hub — Form rhythm](../forms.md#form-rhythm).
 ## Groups
 
 Semantic `<fieldset>` + `<legend>`. Top-level: section scale (`text-field-group-legend`).
-Nested: `legendSize: 'subsection'`.
+Nested groups inside another group default to `legendSize: 'subsection'` (override when
+needed).
 
 ```ts
 {
@@ -24,15 +25,43 @@ Nested: `legendSize: 'subsection'`.
   legend: 'Weapon',
   fields: [
     { /* … */ },
-    { kind: 'group', legend: 'Damage', legendSize: 'subsection', fields: [/* … */] },
+    { kind: 'group', legend: 'Damage', fields: [/* … */] },
   ],
 }
 ```
 
-`FieldGroup` (standalone) accepts the same `legendSize` and `size`. Groups may declare
-`visibility` — hidden groups unmount and clear nested values.
+`FieldGroup` (standalone) accepts the same `legendSize`, `size`, and `fieldsChrome`.
+Groups may declare `visibility` — hidden groups unmount and clear nested values.
 
 `rhythm` overrides inherited form rhythm.
+
+### Group `fieldsChrome`
+
+Optional visual treatment for the legend + field stack. Variants are **mutually
+exclusive** — omit for plain fieldset behavior.
+
+| `variant`     | Use                                                                                                                                                                                     |
+| ------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `inset`       | Left rail + indent on the **field stack** only — legend stays outside. Tones: `border` (default), `primary`.                                                                            |
+| `panel`       | Rounded border box around the **field stack** only. Tones: `subtle` (default, `bg-muted/10`), `medium` (`/30`), `emphasis`, `main`, `warning`, `error`, or semantic (`informative`, …). |
+| `outline`     | Border-only box around the **field stack** — no background wash. Tones: `border` (default), `primary`, `destructive`, `warning`.                                                        |
+| `divider`     | Section separator on the fieldset. `edge`: `top` (default) or `bottom`; adds `pt-7` / `pb-7` (28px) with `border-t` / `border-b`.                                                       |
+| `callout`     | Alert-shaped surface on the **field stack** only. Tones: `info` (default), `warning`, `destructive`, … or semantic compact-label tones.                                                 |
+| `accent`      | Light emphasis — `edge: 'top'` (`border-t-2 pt-4`) or `edge: 'legendRail'` (primary/semantic rail on legend only).                                                                      |
+| `collapsible` | Legend becomes a disclosure trigger; fields stay registered when collapsed. `defaultOpen`; optional `collapseKey` for `uiStateKey` persistence.                                         |
+
+```ts
+{
+  kind: 'group',
+  legend: 'Target',
+  fieldsChrome: { variant: 'panel' },
+  fields: [/* … */],
+}
+```
+
+Legend header margin (`mb-5` / `mb-4`) lives on the legend header block; `<legend>` is `w-full`
+and sits **outside** panel, outline, inset, and callout boxes. Divider and accent-top chrome
+apply to the `<fieldset>`. Token source: `field-group-chrome.variants.ts`.
 
 ## Rows
 

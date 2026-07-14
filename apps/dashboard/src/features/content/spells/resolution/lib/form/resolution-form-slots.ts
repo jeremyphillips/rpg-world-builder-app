@@ -120,7 +120,6 @@ function resolutionOutcomeBranchesGroup(): FormItem {
   return {
     kind: 'group',
     legend: RESOLUTION_SECTION_LABELS.outcomeBranches,
-    legendSize: 'subsection',
     description: RESOLUTION_SECTION_LABELS.outcomesHint,
     fields: [
       {
@@ -137,12 +136,12 @@ function resolutionEffectsAndOutcomesGroup(ctx: ContentFormCtx): FormItem {
     kind: 'group',
     legend: RESOLUTION_SECTION_LABELS.effectsAndOutcomes,
     description: RESOLUTION_SECTION_LABELS.effectsAndOutcomesHint,
+    fieldsChrome: { variant: 'inset' },
     visibility: visibleWhenResolutionConfigured(),
     fields: [
       {
         kind: 'group',
         legend: RESOLUTION_SECTION_LABELS.authoredEffects,
-        legendSize: 'subsection',
         fields: [
           {
             kind: 'slot',
@@ -193,6 +192,7 @@ export function configuredResolutionFields(ctx: ContentFormCtx): FormItem[] {
     {
       kind: 'group',
       legend: RESOLUTION_SECTION_LABELS.target,
+      fieldsChrome: { variant: 'panel' },
       visibility: configured,
       fields: [
         {
@@ -206,6 +206,7 @@ export function configuredResolutionFields(ctx: ContentFormCtx): FormItem[] {
     {
       kind: 'group',
       legend: RESOLUTION_SECTION_LABELS.check,
+      fieldsChrome: { variant: 'panel' },
       visibility: configured,
       fields: [
         {

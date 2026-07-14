@@ -108,6 +108,7 @@ export {
   type RowConfig,
   type GroupConfig,
   type GroupFieldItem,
+  type FieldGroupFieldsChrome,
   type StackConfig,
   type ArrayConfig,
   type ArrayItemHeaderConfig,

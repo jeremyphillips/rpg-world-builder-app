@@ -123,7 +123,7 @@ describe('dependent stack', () => {
 
     await waitFor(() => {
       const shell = queryChromeShell(container)
-      expect(shell).toHaveClass('bg-muted/30')
+      expect(shell).toHaveClass('bg-muted/10')
       expect(queryDependentsRegion(container)).toHaveClass(fieldToggleDependentIndentClasses)
     })
   })
@@ -262,7 +262,7 @@ describe('dependent stack', () => {
       expect(queryChromeShell(container)).toBeNull()
 
       const itemShell = screen.getByRole('group', { name: /Item #1/ })
-      expect(itemShell).toHaveClass('bg-muted/30')
+      expect(itemShell).toHaveClass('bg-muted/10')
       expect(itemShell).toHaveClass('border-border')
     })
   })
