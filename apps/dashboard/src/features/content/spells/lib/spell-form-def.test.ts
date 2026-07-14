@@ -256,6 +256,7 @@ describe('spellFormDef resolution tab', () => {
     expect(effectsArray).toBeDefined()
     expect(effectsArray?.legend).toBe('')
     expect(effectsArray?.itemVariant).toBe('detailed')
+    expect(effectsArray?.itemChrome).toBe('elevated')
     expect(effectsArray?.itemCollapsible).toBe(true)
     expect(effectsArray?.itemHeader?.primary).toBeTypeOf('function')
     expect(effectsArray?.itemHeader?.summary).toBeTypeOf('function')

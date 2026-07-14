@@ -173,6 +173,35 @@ describe('ArrayFieldRenderer', () => {
     expect(dependentsRegion?.querySelector('.bg-muted\\/10')).toBe(itemShell)
   })
 
+  it('applies itemChrome tone on array item shells', async () => {
+    const user = userEvent.setup()
+    const elevatedFields: FormItem[] = [
+      {
+        kind: 'array',
+        name: 'traits',
+        legend: 'Traits',
+        itemChrome: 'elevated',
+        fields: traitFields,
+        addLabel: 'Add trait',
+      },
+    ]
+
+    render(
+      <Form<Values>
+        schema={schema}
+        fields={elevatedFields}
+        onSubmit={vi.fn()}
+        footer={<button type="submit">Save</button>}
+      />,
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Add trait' }))
+
+    const itemShell = screen.getByRole('group', { name: 'Trait #1' })
+    expect(itemShell).toHaveClass('bg-card')
+    expect(itemShell).toHaveClass('border-border')
+  })
+
   it('uses gap-3 between sm comfortable array items while keeping gap-6 inside item bodies', async () => {
     const user = userEvent.setup()
     const comfortableFields: FormItem[] = [

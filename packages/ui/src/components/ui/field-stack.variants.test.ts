@@ -24,6 +24,12 @@ describe('fieldSurfaceToneVariants', () => {
     expect(classes).toContain('bg-muted/30')
   })
 
+  it('applies elevated tone classes', () => {
+    const classes = fieldSurfaceToneVariants({ tone: 'elevated' })
+    expect(classes).toContain('border-border')
+    expect(classes).toContain('bg-card')
+  })
+
   it('applies error tone classes', () => {
     const classes = fieldSurfaceToneVariants({ tone: 'error' })
     expect(classes).toContain('border-destructive/50')

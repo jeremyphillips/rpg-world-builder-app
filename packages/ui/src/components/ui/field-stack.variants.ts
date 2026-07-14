@@ -16,7 +16,13 @@ export {
 } from './field-surface.variants'
 
 /** Surface tone for dependents-only chrome on toggle-dependent stacks. */
-export type FieldStackDependentsTone = 'main' | 'subtle' | 'medium' | 'warning' | 'error'
+export type FieldStackDependentsTone =
+  | 'main'
+  | 'elevated'
+  | 'subtle'
+  | 'medium'
+  | 'warning'
+  | 'error'
 
 /** Where `dependentsChrome` tone applies on toggle-dependent stacks. */
 export type FieldStackDependentsChromeScope = 'wrapper' | 'arrayItems'
@@ -35,6 +41,7 @@ export const fieldStackDependentsChromeVariants = cva('rounded-md border p-3', {
   variants: {
     tone: {
       main: '',
+      elevated: '',
       subtle: '',
       medium: '',
       warning: '',
@@ -43,6 +50,7 @@ export const fieldStackDependentsChromeVariants = cva('rounded-md border p-3', {
   },
   compoundVariants: [
     { tone: 'main', class: fieldSurfaceToneVariants({ tone: 'main' }) },
+    { tone: 'elevated', class: fieldSurfaceToneVariants({ tone: 'elevated' }) },
     { tone: 'subtle', class: fieldSurfaceToneVariants({ tone: 'subtle' }) },
     { tone: 'medium', class: fieldSurfaceToneVariants({ tone: 'medium' }) },
     { tone: 'warning', class: fieldSurfaceToneVariants({ tone: 'warning' }) },

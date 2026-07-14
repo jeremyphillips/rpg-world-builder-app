@@ -49,6 +49,7 @@ export const collapsibleListItemShellVariants = cva(cn('relative rounded-md bord
     tone: {
       default: 'border-border',
       main: fieldSurfaceToneVariants({ tone: 'main' }),
+      elevated: fieldSurfaceToneVariants({ tone: 'elevated' }),
       subtle: fieldSurfaceToneVariants({ tone: 'subtle' }),
       medium: fieldSurfaceToneVariants({ tone: 'medium' }),
       warning: fieldSurfaceToneVariants({ tone: 'warning' }),

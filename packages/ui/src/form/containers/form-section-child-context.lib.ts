@@ -26,6 +26,7 @@ export function buildArraySectionChildContext(
       inherited: parent.size,
       sectionDefault: DEFAULT_ARRAY_SECTION_SIZE,
     }),
+    arrayItemTone: config.itemChrome ?? parent.arrayItemTone,
   })
 }
 

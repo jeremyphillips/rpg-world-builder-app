@@ -6,7 +6,7 @@ import { compactLabelAppearanceToneClasses, type CompactLabelTone } from './comp
 export const fieldGroupBodyShellLayoutClasses = 'min-w-0 rounded-md border p-3'
 
 /** Surface tone for stack dependents and array item shells. */
-export type FieldSurfaceTone = 'main' | 'subtle' | 'medium' | 'warning' | 'error'
+export type FieldSurfaceTone = 'main' | 'elevated' | 'subtle' | 'medium' | 'warning' | 'error'
 
 /**
  * Border/bg tone only — no layout padding. Shared by stack dependents wrapper
@@ -16,6 +16,8 @@ export const fieldSurfaceToneVariants = cva('', {
   variants: {
     tone: {
       main: 'border-border bg-background',
+      /** Opaque lift above the page plane — maps to the card surface token. */
+      elevated: 'border-border bg-card',
       /** Very light wash — default for dependents and group panels. */
       subtle: 'border-border bg-muted/10',
       /** Medium wash — former `subtle` / `muted` panel strength. */
@@ -37,6 +39,7 @@ export type FieldGroupPanelTone =
   | 'medium'
   | 'emphasis'
   | 'main'
+  | 'elevated'
   | 'warning'
   | 'error'
   | CompactLabelTone
@@ -55,6 +58,7 @@ const PANEL_TONE_CLASS: Record<Exclude<FieldGroupPanelTone, CompactLabelTone>, s
   subtle20: 'border-border bg-muted/10',
   emphasis: 'border-border bg-muted/50',
   main: 'border-border bg-background',
+  elevated: 'border-border bg-card',
   warning: 'border-border bg-accent/30',
   error: 'border-destructive/50 bg-destructive/10',
 }

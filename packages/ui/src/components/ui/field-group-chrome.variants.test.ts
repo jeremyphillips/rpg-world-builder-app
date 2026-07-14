@@ -40,6 +40,11 @@ describe('resolveFieldGroupChromeClassNames', () => {
     expect(classes.body).toContain('bg-muted/30')
   })
 
+  it('applies elevated panel tone', () => {
+    const classes = resolveFieldGroupChromeClassNames({ variant: 'panel', tone: 'elevated' })
+    expect(classes.body).toContain('bg-card')
+  })
+
   it('applies outline body classes with border default', () => {
     const classes = resolveFieldGroupChromeClassNames({ variant: 'outline' })
     expect(classes.fieldset).toBe('')

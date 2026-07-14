@@ -756,6 +756,12 @@ export interface ArrayConfig {
   max?: number
   /** Item row layout — `auto` picks compact when item fields fit a single row. */
   itemVariant?: ArrayItemVariant
+  /**
+   * Border/background tone on each item shell (`main` | `elevated` | `subtle` | `medium` |
+   * `warning` | `error`). Overrides inherited stack `dependentsChrome` when
+   * `dependentsChromeScope` is `arrayItems`.
+   */
+  itemChrome?: FieldStackDependentsTone
   /** Header labels and optional collapsed summary for each item row. */
   itemHeader?: ArrayItemHeaderConfig
   /** When true, detailed items collapse to their header row. Ignored for compact/nested. */

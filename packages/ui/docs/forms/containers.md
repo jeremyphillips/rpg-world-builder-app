@@ -79,7 +79,7 @@ controller field gates indented dependents:
 - `dependentsVisibility` gates fields `[1..]`. When omitted and `[0]` is a switch, defaults
   to "switch is true". For select/other controllers, pass an explicit predicate for hide
   behavior; omit for indent/chrome only (dependents always shown).
-- Optional `dependentsChrome`: `main` | `subtle` | `warning` | `error`.
+- Optional `dependentsChrome`: `main` | `elevated` | `subtle` | `medium` | `warning` | `error`.
 - Optional `dependentsChromeScope`: `wrapper` (default) | `arrayItems`.
   - `wrapper` — tone on the dependents container; use for scalar dependents (selects, numbers).
   - `arrayItems` — tone on array item shells only; avoids double borders when dependents include arrays.
@@ -248,6 +248,7 @@ Optional hooks:
 | Property                          | Purpose                                                                                                       |
 | --------------------------------- | ------------------------------------------------------------------------------------------------------------- |
 | `itemVariant`                     | `'auto'` \| `'compact'` \| `'detailed'` — row layout (default `auto`).                                        |
+| `itemChrome`                      | Item shell surface tone (`main` \| `elevated` \| `subtle` \| `medium` \| `warning` \| `error`).               |
 | `itemHeader`                      | Primary/fallback labels; optional `summary` on a second row below the title (detailed).                       |
 | `itemHeader.showFallbackInHeader` | When true, appends ` · {fallback}` after the primary title (default `false`).                                 |
 | `itemCollapsible`                 | Detailed items only — collapse body into header row.                                                          |
