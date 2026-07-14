@@ -85,6 +85,7 @@ describe('array item shell variants', () => {
     expect(classes).toContain('bg-muted/10')
     const elevated = arrayItemShellVariants({ tone: 'elevated' })
     expect(elevated).toContain('bg-card')
+    expect(elevated).toContain('shadow-surface-raised')
   })
 
   it('uses a single-column shell for compact inline rows', () => {

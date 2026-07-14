@@ -200,6 +200,7 @@ describe('ArrayFieldRenderer', () => {
     const itemShell = screen.getByRole('group', { name: 'Trait #1' })
     expect(itemShell).toHaveClass('bg-card')
     expect(itemShell).toHaveClass('border-border')
+    expect(itemShell).toHaveClass('shadow-surface-raised')
   })
 
   it('uses gap-3 between sm comfortable array items while keeping gap-6 inside item bodies', async () => {

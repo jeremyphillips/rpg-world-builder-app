@@ -1,9 +1,13 @@
 import { cva, type VariantProps } from 'class-variance-authority'
 
+import { cn } from '../../lib/utils'
 import { compactLabelAppearanceToneClasses, type CompactLabelTone } from './compact-label.lib'
 
 /** Shared rounded box layout for group panel and outline body chrome. */
 export const fieldGroupBodyShellLayoutClasses = 'min-w-0 rounded-md border p-3'
+
+/** Subtle raised emboss for card-plane surfaces — inset highlight + drop shadow. */
+export const fieldSurfaceRaisedShadowClasses = 'shadow-surface-raised'
 
 /** Surface tone for stack dependents and array item shells. */
 export type FieldSurfaceTone = 'main' | 'elevated' | 'subtle' | 'medium' | 'warning' | 'error'
@@ -17,7 +21,7 @@ export const fieldSurfaceToneVariants = cva('', {
     tone: {
       main: 'border-border bg-background',
       /** Opaque lift above the page plane — maps to the card surface token. */
-      elevated: 'border-border bg-card',
+      elevated: cn('border-border bg-card', fieldSurfaceRaisedShadowClasses),
       /** Very light wash — default for dependents and group panels. */
       subtle: 'border-border bg-muted/10',
       /** Medium wash — former `subtle` / `muted` panel strength. */
@@ -58,7 +62,7 @@ const PANEL_TONE_CLASS: Record<Exclude<FieldGroupPanelTone, CompactLabelTone>, s
   subtle20: 'border-border bg-muted/10',
   emphasis: 'border-border bg-muted/50',
   main: 'border-border bg-background',
-  elevated: 'border-border bg-card',
+  elevated: cn('border-border bg-card', fieldSurfaceRaisedShadowClasses),
   warning: 'border-border bg-accent/30',
   error: 'border-destructive/50 bg-destructive/10',
 }

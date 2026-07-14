@@ -1,7 +1,8 @@
 import { cva } from 'class-variance-authority'
 
-const radioCardCardBase =
-  'group relative flex w-full cursor-pointer flex-col rounded-xl border border-border bg-card text-left text-card-foreground shadow-sm transition-colors hover:border-primary/50 hover:bg-accent/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:border-primary data-[state=checked]:bg-accent/30 data-[state=checked]:ring-1 data-[state=checked]:ring-primary/20 aria-invalid:border-destructive'
+import { fieldSurfaceRaisedShadowClasses } from './field-surface.variants'
+
+const radioCardCardBase = `group relative flex w-full cursor-pointer flex-col rounded-xl border border-border bg-card text-left text-card-foreground ${fieldSurfaceRaisedShadowClasses} transition-colors hover:border-primary/50 hover:bg-accent/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:border-primary data-[state=checked]:bg-accent/30 data-[state=checked]:ring-1 data-[state=checked]:ring-primary/20 aria-invalid:border-destructive`
 
 const radioCardRowBase =
   'group relative flex w-full cursor-pointer flex-col rounded-md border-0 bg-transparent text-left text-card-foreground transition-colors hover:bg-muted/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-muted/50 aria-invalid:border aria-invalid:border-destructive'
@@ -32,7 +33,7 @@ export const radioCardVariants = cva('', {
 
 /** Outer shell when a details action sits beside the radio item (avoids nested interactives). */
 export const radioCardShellVariants = cva(
-  'relative overflow-hidden rounded-xl border border-border bg-card text-left text-card-foreground shadow-sm transition-colors has-[:focus-visible]:outline-none has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-ring has-[:focus-visible]:ring-offset-2 has-[:focus-visible]:ring-offset-background',
+  `relative overflow-hidden rounded-xl border border-border bg-card text-left text-card-foreground ${fieldSurfaceRaisedShadowClasses} transition-colors has-[:focus-visible]:outline-none has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-ring has-[:focus-visible]:ring-offset-2 has-[:focus-visible]:ring-offset-background`,
   {
     variants: {
       density: {
