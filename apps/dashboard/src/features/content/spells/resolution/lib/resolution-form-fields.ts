@@ -15,16 +15,19 @@ import {
 } from '../components/spell-resolution-how-it-resolves.client'
 import { SpellResolutionOutcomesPreview } from '../components/spell-resolution-outcomes-preview.client'
 import { SpellResolutionPreview } from '../components/spell-resolution-preview.client'
-import { buildResolutionEffectArrayAddMenu } from './resolution-effect-add-menu.lib'
+import { ResolutionEffectAddControl } from '../components/resolution-effect-add-control.client'
+import { SpellResolutionChangeNotice } from '../components/spell-resolution-change-notice.client'
+import { SpellResolutionProximitySelect } from '../components/spell-resolution-proximity-select.client'
+import { ResolutionChangeConfirmDialog } from '../lib/use-resolution-change-confirm.client'
+import { formatResolutionEffectRowPrimary } from './resolution-effect-display'
 import {
-  formatResolutionEffectRowPrimary,
   formatResolutionEffectRowSummary,
-} from './resolution-effect-display'
+  resolutionSelectionContextFromWatched,
+} from './resolution-selection-context.lib'
 import { resolutionEffectItemFields } from './resolution-effect-form-fields'
 import {
   RESOLUTION_FIELD_LABELS,
   RESOLUTION_SECTION_LABELS,
-  resolutionProximityKindOptions,
   resolutionTargetKindOptions,
 } from './resolution-form-labels'
 import {
@@ -123,19 +126,32 @@ function resolutionDistanceTargetField(): InlineSentenceFieldConfig {
   }
 }
 
+const RESOLUTION_SUMMARY_DEPENDS_ON = [
+  `${RESOLUTION_PREFIX}.proximityKind`,
+  `${RESOLUTION_PREFIX}.targetKind`,
+  `${RESOLUTION_PREFIX}.targetCount`,
+  `${RESOLUTION_PREFIX}.methodKind`,
+  `${RESOLUTION_PREFIX}.attackType`,
+] as const
+
 function resolutionEffectsArrayField(ctx: ContentFormCtx): FormItem {
   return {
     kind: 'array',
     name: `${RESOLUTION_PREFIX}.effects`,
     legend: RESOLUTION_SECTION_LABELS.effects,
     addLabel: 'Add effect',
+    hideAddControl: true,
     itemCollapsible: true,
     itemHeader: {
       fallback: (index) => `Effect ${index + 1}`,
       primary: (values, index) => formatResolutionEffectRowPrimary(values, index),
-      summary: (values) => formatResolutionEffectRowSummary(values),
+      summaryDependsOn: [...RESOLUTION_SUMMARY_DEPENDS_ON],
+      summary: (values, _index, watched) =>
+        formatResolutionEffectRowSummary(
+          values,
+          resolutionSelectionContextFromWatched(watched ?? {}),
+        ),
     },
-    addMenu: buildResolutionEffectArrayAddMenu(),
     fields: resolutionEffectItemFields(ctx),
   }
 }
@@ -194,6 +210,18 @@ function configuredResolutionFields(ctx: ContentFormCtx): FormItem[] {
   return [
     {
       kind: 'slot',
+      name: '_resolutionChangeConfirm',
+      visibility: configured,
+      render: () => createElement(ResolutionChangeConfirmDialog),
+    },
+    {
+      kind: 'slot',
+      name: '_resolutionChangeNotice',
+      visibility: configured,
+      render: () => createElement(SpellResolutionChangeNotice),
+    },
+    {
+      kind: 'slot',
       name: '_resolutionHybridNotice',
       visibility: configured,
       render: () => createElement(SpellResolutionHybridNotice),
@@ -210,12 +238,9 @@ function configuredResolutionFields(ctx: ContentFormCtx): FormItem[] {
       visibility: configured,
       fields: [
         {
-          type: 'select',
-          name: `${RESOLUTION_PREFIX}.proximityKind`,
-          label: RESOLUTION_FIELD_LABELS.proximityKind,
-          options: resolutionProximityKindOptions,
-          width: 'md',
-          required: true,
+          kind: 'slot',
+          name: '_resolutionProximitySelect',
+          render: () => createElement(SpellResolutionProximitySelect),
         },
         resolutionTouchTargetField(),
         resolutionReachTargetField(),
@@ -263,6 +288,12 @@ function configuredResolutionFields(ctx: ContentFormCtx): FormItem[] {
       name: '_resolutionEffectsApplicationLabel',
       visibility: configured,
       render: () => createElement(SpellResolutionEffectsApplicationLabel),
+    },
+    {
+      kind: 'slot',
+      name: '_resolutionEffectAddControl',
+      visibility: configured,
+      render: () => createElement(ResolutionEffectAddControl),
     },
     {
       ...resolutionEffectsArrayField(ctx),

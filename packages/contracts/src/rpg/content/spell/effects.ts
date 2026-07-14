@@ -7,12 +7,20 @@ import {
 } from '../../primitives/mechanics/effect-base'
 import { formatRollValue, rollSchema, type RollValue } from '../../primitives/mechanics/roll'
 import { damageTypeIdSchema, getDamageTypeLabel } from '../../vocab/damage/vocabulary'
+import { HIT_POINTS_TERM } from '../../primitives/mechanics/hit-points-term'
 import {
   getSpellAtomicEffectKindLabel,
-  HIT_POINTS_TERM,
   SPELL_ATOMIC_EFFECT_KINDS,
   type SpellAtomicEffectKind,
 } from '../../vocab/spell/atomic-effect-kind'
+
+export {
+  formatEffectRowSentence,
+  formatEffectRowSentenceFromParts,
+  type EffectRecipient,
+  type EffectRowFormatOptions,
+  type EffectRowParts,
+} from './effects/format'
 
 export { SPELL_ATOMIC_EFFECT_KINDS, type SpellAtomicEffectKind }
 
@@ -102,27 +110,6 @@ export function formatDamageValue(roll: RollValue, damageTypeId: string): string
 
 function formatProjectileCountCompact(effect: SpellProjectileCountEffect): string {
   return `${effect.count} ${effect.unitLabel}`
-}
-
-/**
- * Full sentence for an effect array item summary (grant-style authoring headers).
- * Returns empty string when required fields for the kind are absent.
- */
-export function formatEffectRowSentence(effect: SpellAtomicEffect): string {
-  switch (effect.kind) {
-    case 'damage':
-      return `Inflicts ${formatDamageValue(effect.roll, effect.damageType)}.`
-    case 'healing':
-      return `Character heals ${formatRollValue(effect.roll)} ${HIT_POINTS_TERM.plural}.`
-    case 'temporary-hit-points':
-      return `Character gains ${formatRollValue(effect.roll)} temporary ${HIT_POINTS_TERM.plural}.`
-    case 'projectile-count':
-      return `Creates ${effect.count} ${effect.unitLabel}.`
-    default: {
-      const _exhaustive: never = effect
-      return _exhaustive
-    }
-  }
 }
 
 /**

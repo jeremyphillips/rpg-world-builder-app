@@ -23,14 +23,10 @@ function findResolutionEffectsArray(fields: FormItem[]): ArrayConfig | undefined
 }
 
 describe('resolutionFields effects array', () => {
-  it('registers a searchable add menu with three resolution templates', () => {
+  it('hides the generic add control in favor of the resolution-specific add slot', () => {
     const arrayField = findResolutionEffectsArray(resolutionFields({}))
-    expect(arrayField?.addMenu?.items).toHaveLength(3)
-    expect(arrayField?.addMenu?.items.map((item) => item.id)).toEqual([
-      'damage',
-      'healing',
-      'temporary-hit-points',
-    ])
+    expect(arrayField?.hideAddControl).toBe(true)
+    expect(arrayField?.addMenu).toBeUndefined()
   })
 
   it('does not expose a kind selector; kind is fixed at add time via templates', () => {
@@ -38,11 +34,12 @@ describe('resolutionFields effects array', () => {
     expect(itemFields.find((field) => !('kind' in field) && field.name === 'kind')).toBeUndefined()
   })
 
-  it('wires grant-style collapsible item headers', () => {
+  it('wires grant-style collapsible item headers with parent context summaries', () => {
     const arrayField = findResolutionEffectsArray(resolutionFields({}))
     const itemHeader = arrayField?.itemHeader
 
     expect(itemHeader).toBeDefined()
+    expect(itemHeader?.summaryDependsOn).toContain('resolution.proximityKind')
     expect(itemHeader?.fallback(0)).toBe('Effect 1')
     expect(
       itemHeader?.primary?.(
@@ -64,8 +61,24 @@ describe('resolutionFields effects array', () => {
           damageType: 'fire',
         },
         0,
+        {
+          'resolution.proximityKind': 'touch',
+          'resolution.targetKind': 'creature',
+          'resolution.targetCount': 1,
+        },
       ),
     ).toBe('Inflicts 1d6 Fire damage.')
+    expect(
+      itemHeader?.summary?.(
+        {
+          id: 'fx-2',
+          kind: 'healing',
+          roll: { dice: { count: 3, faces: 8 } },
+        },
+        0,
+        { 'resolution.proximityKind': 'self' },
+      ),
+    ).toBe('You heal 3d8 Hit Points.')
   })
 })
 

@@ -112,3 +112,40 @@ export {
   type SpellResolutionTargetKind,
 } from './vocab'
 export { spellResolutionValidationMessages } from './validation-messages'
+export {
+  deriveDefaultEffectRecipient,
+  isResolutionTargetConfigured,
+  type EffectRecipient,
+} from './effect-context'
+export {
+  formatResolutionAvailabilityReason,
+  type ResolutionAvailabilityTone,
+} from './availability-reasons'
+export {
+  applyMethodOptionPatch,
+  applyResolutionStructuralCleanup,
+  buildIncompatibleSelectionClearPatch,
+  getApplicationPatternAvailability,
+  getEffectKindAvailability,
+  getMethodAvailability,
+  planResolutionChange,
+  resolutionChangeRequiresConfirm,
+  RESOLUTION_METHOD_OPTIONS,
+  toMethodOption,
+} from './selection-policy'
+export type {
+  IncompatibleSelection,
+  OptionAvailability,
+  ResolutionApplicationPatternFormKind,
+  ResolutionAvailabilityReason,
+  ResolutionChangePlan,
+  ResolutionChangeRequest,
+  ResolutionEffectKind,
+  ResolutionEffectRef,
+  ResolutionMethodOption,
+  ResolutionPatch,
+  ResolutionSelectionField,
+  ResolutionSelectionState,
+  ResolutionWarning,
+  ResolutionWarningCode,
+} from './selection-types'

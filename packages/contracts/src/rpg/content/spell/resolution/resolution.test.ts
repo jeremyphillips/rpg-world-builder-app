@@ -242,7 +242,7 @@ describe('spell resolution formatters', () => {
   it('formats automatic healing and self proximity', () => {
     expect(formatResolutionTarget(CURE_WOUNDS_RESOLUTION)).toBe('One creature you touch')
     expect(formatResolutionMethod(CURE_WOUNDS_RESOLUTION)).toBe('Automatic')
-    expect(formatResolutionSummary(CURE_WOUNDS_RESOLUTION)).toContain('2d8 healing')
+    expect(formatResolutionSummary(CURE_WOUNDS_RESOLUTION)).toContain('Target heals 2d8 Hit Points')
     expect(formatResolutionOutcomes(CURE_WOUNDS_RESOLUTION)).toEqual(['Applied: Full healing'])
   })
 

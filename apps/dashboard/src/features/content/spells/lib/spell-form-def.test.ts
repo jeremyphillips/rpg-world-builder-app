@@ -221,7 +221,7 @@ describe('spellFormDef resolution tab', () => {
     expect(names).toContain('_resolutionPreview')
     expect(names).toContain('_resolutionEmptyState')
     expect(names).toContain('resolution.targetKind')
-    expect(names).toContain('resolution.proximityKind')
+    expect(names).toContain('_resolutionProximitySelect')
     expect(names).toContain('resolution.proximityReachDistanceFt')
     expect(names).toContain('_resolutionHowItResolves')
     expect(names).toContain('resolution.effects')

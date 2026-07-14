@@ -1,31 +1,23 @@
 'use client'
 
-import { formatResolutionProjectilesPreview } from '@rpg/contracts'
-import { FieldRow, SelectField, Text } from '@rpg/ui'
+import { FieldRow, SelectField } from '@rpg/ui'
 import { useId } from 'react'
 import { useController, useFormContext, useWatch } from 'react-hook-form'
 
 import {
-  applicationPatternFromForm,
-  createDefaultProjectilesFormFields,
-  type ResolutionApplicationPatternFormKind,
-} from '../lib/resolution-application-pattern.lib'
+  buildResolutionApplicationPatternOptions,
+  buildResolutionMethodOptions,
+  resolutionFormToSelectionContext,
+} from '../lib/resolution-selection-context.lib'
+import type { ResolutionApplicationPatternFormKind } from '../lib/resolution-application-pattern.lib'
 import type { ResolutionFormValues } from '../lib/resolution-form-schema'
 import {
-  RESOLUTION_APPLICATION_PATTERN_OPTIONS,
   RESOLUTION_FIELD_LABELS,
   resolutionSaveAbilityOptions,
 } from '../lib/resolution-form-labels'
 import { RESOLUTION_FIELD_NAME } from '../lib/resolution-form-values'
-
-const RESOLUTION_METHOD_OPTIONS = [
-  { value: 'melee-spell', label: 'Melee spell attack' },
-  { value: 'ranged-spell', label: 'Ranged spell attack' },
-  { value: 'saving-throw', label: 'Saving throw' },
-  { value: 'automatic', label: 'Automatic' },
-] as const
-
-type ResolutionMethodOption = (typeof RESOLUTION_METHOD_OPTIONS)[number]['value']
+import { useResolutionEditorContext } from '../lib/use-resolution-change-confirm.client'
+import type { ResolutionMethodOption } from '@rpg/contracts'
 
 function toMethodOption(resolution: ResolutionFormValues | undefined): ResolutionMethodOption {
   if (!resolution) return 'ranged-spell'
@@ -34,83 +26,15 @@ function toMethodOption(resolution: ResolutionFormValues | undefined): Resolutio
   return resolution.attackType ?? 'ranged-spell'
 }
 
-function applyAutomaticMethod(resolution: ResolutionFormValues): ResolutionFormValues {
-  return {
-    ...resolution,
-    methodKind: 'automatic',
-    attackType: undefined,
-    saveAbility: undefined,
-  }
-}
-
-function applySavingThrowMethod(resolution: ResolutionFormValues): ResolutionFormValues {
-  return {
-    ...resolution,
-    methodKind: 'saving-throw',
-    saveAbility: resolution.saveAbility ?? 'con',
-    attackType: undefined,
-  }
-}
-
-function applyAttackMethod(
-  resolution: ResolutionFormValues,
-  attackType: Exclude<ResolutionMethodOption, 'saving-throw' | 'automatic'>,
-): ResolutionFormValues {
-  return {
-    ...resolution,
-    methodKind: 'attack',
-    attackType,
-    saveAbility: undefined,
-  }
-}
-
-function applyMethodOption(
-  resolution: ResolutionFormValues,
-  option: ResolutionMethodOption,
-): ResolutionFormValues {
-  if (option === 'automatic') {
-    return applyAutomaticMethod(resolution)
-  }
-
-  if (option === 'saving-throw') {
-    return applySavingThrowMethod(resolution)
-  }
-
-  return applyAttackMethod(resolution, option)
-}
-
-function applyApplicationPatternOption(
-  resolution: ResolutionFormValues,
-  kind: ResolutionApplicationPatternFormKind,
-): ResolutionFormValues {
-  if (kind === 'none') {
-    return {
-      ...resolution,
-      applicationPatternKind: 'none',
-      projectileCount: undefined,
-      projectileUnitLabelSingular: undefined,
-      projectileUnitLabelPlural: undefined,
-    }
-  }
-
-  if (resolution.applicationPatternKind === 'projectiles') {
-    return { ...resolution, applicationPatternKind: 'projectiles' }
-  }
-
-  return {
-    ...resolution,
-    applicationPatternKind: 'projectiles',
-    ...createDefaultProjectilesFormFields(),
-  }
-}
-
 /** Method and application pattern on one row, with optional saving-throw follow-up. */
 export function SpellResolutionHowItResolves() {
   const methodId = useId()
   const applicationPatternId = useId()
   const saveAbilityId = useId()
-  const { control, setValue } = useFormContext()
+  const { control } = useFormContext()
   const resolution = useWatch({ name: RESOLUTION_FIELD_NAME }) as ResolutionFormValues | undefined
+  const { requestResolutionChange } = useResolutionEditorContext()
+  const context = resolutionFormToSelectionContext(resolution)
   const { field: saveAbilityField } = useController({
     control,
     name: `${RESOLUTION_FIELD_NAME}.saveAbility`,
@@ -129,13 +53,12 @@ export function SpellResolutionHowItResolves() {
           label={RESOLUTION_FIELD_LABELS.method}
           value={methodValue}
           onValueChange={(next) => {
-            setValue(
-              RESOLUTION_FIELD_NAME,
-              applyMethodOption(resolution, next as ResolutionMethodOption),
-              { shouldDirty: true, shouldValidate: true },
-            )
+            requestResolutionChange({
+              field: 'methodOption',
+              value: next as ResolutionMethodOption,
+            })
           }}
-          options={[...RESOLUTION_METHOD_OPTIONS]}
+          options={buildResolutionMethodOptions(context)}
           width="lg"
         />
         <SelectField
@@ -143,16 +66,12 @@ export function SpellResolutionHowItResolves() {
           label={RESOLUTION_FIELD_LABELS.applicationPattern}
           value={resolution.applicationPatternKind ?? 'none'}
           onValueChange={(next) => {
-            setValue(
-              RESOLUTION_FIELD_NAME,
-              applyApplicationPatternOption(
-                resolution,
-                next as ResolutionApplicationPatternFormKind,
-              ),
-              { shouldDirty: true, shouldValidate: true },
-            )
+            requestResolutionChange({
+              field: 'applicationPatternKind',
+              value: next as ResolutionApplicationPatternFormKind,
+            })
           }}
-          options={[...RESOLUTION_APPLICATION_PATTERN_OPTIONS]}
+          options={buildResolutionApplicationPatternOptions(context)}
           width="lg"
           hint={RESOLUTION_FIELD_LABELS.applicationPatternHint}
           hintPosition="below-control"
@@ -176,16 +95,4 @@ export function SpellResolutionHowItResolves() {
   )
 }
 
-/** Live preview sentence for the projectiles conditional group. */
-export function SpellResolutionProjectilesPreview() {
-  const resolution = useWatch({ name: RESOLUTION_FIELD_NAME }) as ResolutionFormValues | undefined
-  const pattern = resolution ? applicationPatternFromForm(resolution) : undefined
-
-  if (pattern?.kind !== 'projectiles') return null
-
-  return (
-    <Text as="p" variant="muted" className="text-sm" role="status">
-      {formatResolutionProjectilesPreview(pattern)}
-    </Text>
-  )
-}
+export { SpellResolutionProjectilesPreview } from './spell-resolution-how-it-resolves-projectiles.client'

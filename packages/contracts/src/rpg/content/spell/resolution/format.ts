@@ -1,7 +1,8 @@
 import { formatRollValue } from '../../../primitives/mechanics/roll'
 import { getAbilityLabel } from '../../../vocab/ability'
-import { HIT_POINTS_TERM } from '../../../vocab/spell/atomic-effect-kind'
 import { formatDamageValue } from '../effects'
+import { formatEffectRowSentenceFromParts } from '../effects/format'
+import { deriveDefaultEffectRecipient } from './effect-context'
 import type {
   SpellApplicationPattern,
   SpellApplicationPatternProjectiles,
@@ -172,18 +173,34 @@ export function findResolutionTemporaryHitPointsEffects(
   )
 }
 
-/** e.g. "2d8 healing" */
+/** e.g. "2d8 healing" or recipient-aware sentence in summary sections. */
 export function formatResolutionHealing(resolution: SpellResolution): string {
   const healing = findResolutionHealingEffects(resolution)[0]
   if (!healing) return ''
-  return `${formatRollValue(healing.roll)} healing`
+  const recipient = deriveDefaultEffectRecipient({
+    proximityKind: resolution.target.proximity.kind,
+    targetKind: resolution.target.kind,
+    targetCount: resolution.target.count,
+  })
+  return formatEffectRowSentenceFromParts(
+    { kind: 'healing', roll: healing.roll },
+    { recipient },
+  ).replace(/\.$/, '')
 }
 
-/** e.g. "2d4+4 temporary hit points" */
+/** e.g. "2d4+4 temporary hit points" or recipient-aware sentence. */
 export function formatResolutionTemporaryHitPoints(resolution: SpellResolution): string {
   const temporaryHitPoints = findResolutionTemporaryHitPointsEffects(resolution)[0]
   if (!temporaryHitPoints) return ''
-  return `${formatRollValue(temporaryHitPoints.roll)} temporary ${HIT_POINTS_TERM.plural}`
+  const recipient = deriveDefaultEffectRecipient({
+    proximityKind: resolution.target.proximity.kind,
+    targetKind: resolution.target.kind,
+    targetCount: resolution.target.count,
+  })
+  return formatEffectRowSentenceFromParts(
+    { kind: 'temporary-hit-points', roll: temporaryHitPoints.roll },
+    { recipient },
+  ).replace(/\.$/, '')
 }
 
 /** e.g. "2d10 Necrotic" — uses the first damage effect when several exist. */

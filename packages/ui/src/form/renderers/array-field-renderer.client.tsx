@@ -87,7 +87,7 @@ export function ArrayFieldRenderer({ config, idPrefix, fullName }: ArrayFieldRen
           onMove={move}
         />
         <ArrayFieldAddControl
-          canAdd={state.canAdd}
+          canAdd={state.canAdd && !config.hideAddControl}
           addLabel={state.addLabel}
           addMenu={config.addMenu}
           addMenuItems={state.addMenuItems}

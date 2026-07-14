@@ -44,3 +44,18 @@ export const MagicMissile: Story = {
   name: 'Magic Missile',
   args: { defaultResolution: RESOLUTION_FORM_FIXTURES.magicMissile },
 }
+
+/** Self proximity with automatic resolution — recipient-aware healing summaries. */
+export const SelfAutomaticHealing: Story = {
+  name: 'Self automatic healing',
+  args: {
+    defaultResolution: {
+      targetCount: 1,
+      targetKind: 'creature',
+      proximityKind: 'self',
+      methodKind: 'automatic',
+      applicationPatternKind: 'none',
+      effects: [{ id: 'healing', kind: 'healing', roll: { dice: { count: 2, faces: 8 } } }],
+    },
+  },
+}

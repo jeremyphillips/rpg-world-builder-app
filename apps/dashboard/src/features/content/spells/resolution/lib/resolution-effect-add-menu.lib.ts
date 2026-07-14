@@ -26,7 +26,9 @@ function createEffectId(): string {
   return crypto.randomUUID()
 }
 
-function createResolutionEffectAppendDefaults(kind: ResolutionEffectKind): Record<string, unknown> {
+export function createResolutionEffectAppendDefaults(
+  kind: ResolutionEffectKind,
+): Record<string, unknown> {
   const id = createEffectId()
 
   switch (kind) {

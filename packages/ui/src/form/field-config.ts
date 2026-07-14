@@ -697,7 +697,13 @@ export interface ArrayItemHeaderConfig {
   primary?: (values: Record<string, unknown>, index: number) => string | undefined
   fallback: (index: number) => string
   /** Shown on its own row below the header title on detailed items. */
-  summary?: (values: Record<string, unknown>, index: number) => string
+  summary?: (
+    values: Record<string, unknown>,
+    index: number,
+    watchedContext?: Record<string, unknown>,
+  ) => string
+  /** Root-relative field paths whose values are passed as `watchedContext` to `summary`. */
+  summaryDependsOn?: string[]
   /**
    * When true, appends ` · {fallback}` after the primary label in the header title.
    * Defaults to false — fallback still drives aria labels and empty-primary titles.
@@ -767,6 +773,9 @@ export interface ArrayConfig {
 
   /** Supplies default values for a newly appended row. */
   appendDefaults?: (items: unknown[]) => Record<string, unknown>
+
+  /** When true, hides the default array add control (use an external slot instead). */
+  hideAddControl?: boolean
 
   /** Searchable template menu for the add control; replaces the plain add button when set. */
   addMenu?: {

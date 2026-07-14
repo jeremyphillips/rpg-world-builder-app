@@ -125,6 +125,18 @@ describe('formatEffectRowSentence', () => {
     ).toBe('Inflicts 5d8 Force damage.')
 
     expect(
+      formatEffectRowSentence(
+        {
+          id: 'fx-3',
+          kind: 'healing',
+          label: 'Mass restoration',
+          roll: { dice: { count: 3, faces: 8 } },
+        },
+        { recipient: 'self' },
+      ),
+    ).toBe('You heal 3d8 Hit Points.')
+
+    expect(
       formatEffectRowSentence({
         id: 'fx-3',
         kind: 'healing',

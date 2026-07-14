@@ -52,9 +52,3 @@ export const SPELL_ATOMIC_EFFECT_KIND_ENTRIES = {
 export function getSpellAtomicEffectKindLabel(kind: SpellAtomicEffectKind): string {
   return SPELL_ATOMIC_EFFECT_KIND_ENTRIES[kind].label
 }
-
-/** Hit Points — shared capitalization for effect sentences and compact summaries. */
-export const HIT_POINTS_TERM = {
-  singular: 'Hit Point',
-  plural: 'Hit Points',
-} as const

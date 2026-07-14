@@ -222,6 +222,7 @@ export interface ArrayItemToolbarProps {
   headerConfig: ArrayItemHeaderConfig
   itemValues: Record<string, unknown>
   watchedPrimary: unknown
+  watchedSummaryContext?: Record<string, unknown>
   showDragHandle: boolean
   dragHandleProps?: ArrayItemDragHandleProps
   collapsible: boolean
@@ -242,6 +243,7 @@ export function ArrayItemToolbar({
   headerConfig,
   itemValues,
   watchedPrimary,
+  watchedSummaryContext,
   showDragHandle,
   dragHandleProps,
   collapsible,
@@ -261,7 +263,9 @@ export function ArrayItemToolbar({
     legend,
   )
   const summary =
-    !compact && headerConfig.summary ? headerConfig.summary(itemValues, index) : undefined
+    !compact && headerConfig.summary
+      ? headerConfig.summary(itemValues, index, watchedSummaryContext)
+      : undefined
 
   const gripVisible = showDragHandle && Boolean(dragHandleProps)
   const leadingChrome: ArrayItemLeadingChromeOptions = { showDragHandle: gripVisible, collapsible }
