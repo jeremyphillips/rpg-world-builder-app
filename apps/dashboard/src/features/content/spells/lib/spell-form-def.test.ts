@@ -9,7 +9,7 @@ import {
 } from '@rpg/contracts'
 import type { FormItem, GroupConfig, RowConfig, ArrayConfig } from '@rpg/ui/form'
 
-import { RESOLUTION_FORM_FIXTURES } from '../resolution/lib/resolution-fixtures'
+import { RESOLUTION_FORM_FIXTURES } from '../resolution/fixtures'
 import { spellFormDef, spellFormSchema, type SpellFormValues } from './spell-form-def'
 
 const SRD_SPELLS = loadSeedSpells('srd-cc-5.2.1')

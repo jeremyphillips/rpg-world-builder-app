@@ -51,8 +51,8 @@ parallel boolean flag.
 | Legacy effects   | Flat `effects[]` on the read model for catalog detail; Resolution tab reads `resolution.effects[]` only         |
 | Target proximity | `resolution.target.proximity` (touch / reach / distance) — separate from Check method                           |
 
-Modules live under [`resolution/`](resolution/) (`resolution-form-fields.ts`,
-`resolution-form-values.ts`, `components/spell-resolution-*.client.tsx`).
+Modules live under [`resolution/`](resolution/) (`lib/form/resolution-form-*.ts`,
+`fixtures.ts`, `components/spell-resolution-*.client.tsx`).
 
 Catalog seeds ship optional `resolution` on the read model via
 `packages/catalog/src/spells/spell-seed-resolution.ts` (21 applicable slugs in SRD 5.2.1:
@@ -114,22 +114,23 @@ rich-text body prose for cantrip upgrades and upcast effects. Section headings
 
 ## Key files
 
-| Piece                     | Path                                                                                                      |
-| ------------------------- | --------------------------------------------------------------------------------------------------------- |
-| Display registry (detail) | `lib/spell-display.ts`                                                                                    |
-| Form def                  | `lib/spell-form-def.ts`                                                                                   |
-| Form fields               | `lib/spell-form-fields.ts`                                                                                |
-| Form values               | `lib/spell-form-values.ts`                                                                                |
-| Form labels               | `lib/spell-form-labels.ts`                                                                                |
-| Resolution form fields    | `resolution/lib/resolution-form-fields.ts`                                                                |
-| Resolution form values    | `resolution/lib/resolution-form-values.ts`                                                                |
-| Resolution preview/editor | `resolution/components/spell-resolution-preview.client.tsx`, `spell-resolution-editor.client.tsx`         |
-| Resolution stories / a11y | `resolution/lib/spell-resolution-editor.stories.tsx`, `resolution/components/spell-resolution-*.test.tsx` |
-| Effect display (detail)   | `lib/effect-display.ts`                                                                                   |
-| Effects editor (stories)  | `components/spell-effects-editor.client.tsx`                                                              |
-| Seed effects audit        | `packages/catalog/src/spells/spell-effects-coverage-inventory.ts`                                         |
-| Create route              | `routes/spell-create.tsx`                                                                                 |
-| Edit route                | `routes/spell-edit.tsx`                                                                                   |
+| Piece                     | Path                                                                                                                                   |
+| ------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| Display registry (detail) | `lib/spell-display.ts`                                                                                                                 |
+| Form def                  | `lib/spell-form-def.ts`                                                                                                                |
+| Form fields               | `lib/spell-form-fields.ts`                                                                                                             |
+| Form values               | `lib/spell-form-values.ts`                                                                                                             |
+| Form labels               | `lib/spell-form-labels.ts`                                                                                                             |
+| Resolution form fields    | `resolution/lib/form/resolution-form-fields.ts`                                                                                        |
+| Resolution form values    | `resolution/lib/form/resolution-form-values.ts`                                                                                        |
+| Resolution fixtures       | `resolution/fixtures.ts`                                                                                                               |
+| Resolution preview/editor | `resolution/components/preview/spell-resolution-preview.client.tsx`, `resolution/components/editor/spell-resolution-editor.client.tsx` |
+| Resolution stories / a11y | `resolution/components/editor/spell-resolution-editor.stories.tsx`, `resolution/components/**/*.test.tsx`                              |
+| Effect display (detail)   | `lib/effect-display.ts`                                                                                                                |
+| Effects editor (stories)  | `components/spell-effects-editor.client.tsx`                                                                                           |
+| Seed effects audit        | `packages/catalog/src/spells/spell-effects-coverage-inventory.ts`                                                                      |
+| Create route              | `routes/spell-create.tsx`                                                                                                              |
+| Edit route                | `routes/spell-edit.tsx`                                                                                                                |
 
 ## Related docs
 

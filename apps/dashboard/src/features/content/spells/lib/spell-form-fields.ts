@@ -41,8 +41,8 @@ import {
   spellLevelOptions,
 } from './spell-form-labels'
 import { SPELL_SECTION_LABELS } from './spell-display'
-import { optionalResolutionFormSchema } from '../resolution/lib/resolution-form-schema'
-import { resolutionFields } from '../resolution/lib/resolution-form-fields'
+import { optionalResolutionFormSchema } from '../resolution/lib/form/resolution-form-schema'
+import { resolutionFields } from '../resolution/lib/form/resolution-form-fields'
 import { spellEffectsFormSchema } from './effect-form-schema'
 
 function visibleWhenRangeDistance(): FieldVisibility {
