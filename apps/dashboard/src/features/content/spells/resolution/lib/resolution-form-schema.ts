@@ -11,6 +11,7 @@ import {
 } from '@rpg/contracts'
 
 import { rollFormObjectSchema } from '../../../lib/forms/mechanics/roll-form-values'
+import { RESOLUTION_APPLICATION_PATTERN_FORM_KINDS } from './resolution-application-pattern.lib'
 import { resolutionFormValidationMessages } from './resolution-form-messages'
 
 export const RESOLUTION_METHOD_KINDS = ['attack', 'saving-throw', 'automatic'] as const
@@ -71,6 +72,10 @@ export const resolutionFormSchema = z
     methodKind: z.enum(RESOLUTION_METHOD_KINDS),
     attackType: z.enum(SPELL_RESOLUTION_ATTACK_TYPES).optional(),
     saveAbility: abilitySchema.optional(),
+    applicationPatternKind: z.enum(RESOLUTION_APPLICATION_PATTERN_FORM_KINDS).default('none'),
+    projectileCount: z.coerce.number().int().min(1).optional(),
+    projectileUnitLabelSingular: z.string().trim().min(1).optional(),
+    projectileUnitLabelPlural: z.string().trim().min(1).optional(),
     effects: z.array(resolutionEffectFormItemSchema).min(1),
     outcomes: z.array(resolutionOutcomeFormItemSchema).optional(),
     hitNote: z.string().optional(),
@@ -98,6 +103,16 @@ export const resolutionFormSchema = z
         message: resolutionFormValidationMessages.proximityDistanceRequired(),
         path: ['proximityDistanceFt'],
       })
+    }
+
+    if (values.applicationPatternKind === 'projectiles') {
+      if (values.projectileCount === undefined) {
+        ctx.addIssue({
+          code: 'custom',
+          message: resolutionFormValidationMessages.projectileCountRequired(),
+          path: ['projectileCount'],
+        })
+      }
     }
   })
 

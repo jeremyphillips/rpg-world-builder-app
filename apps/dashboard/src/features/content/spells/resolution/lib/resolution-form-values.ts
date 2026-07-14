@@ -14,6 +14,10 @@ import {
   rollToFormShape,
   type RollFormShape,
 } from '../../../lib/forms/mechanics/roll-form-values'
+import {
+  applicationPatternFromForm,
+  applicationPatternToForm,
+} from './resolution-application-pattern.lib'
 import type {
   ResolutionEffectFormItem,
   ResolutionFormValues,
@@ -276,6 +280,7 @@ export function resolutionToForm(
     methodKind: buildMethodKind(resolution.method),
     effects: resolution.effects.map(effectToForm),
     outcomes: storedOutcomesToForm(resolution.outcomes),
+    ...applicationPatternToForm(resolution.applicationPattern),
   }
 
   applyMethodFields(form, resolution.method, resolution.outcomes)
@@ -299,6 +304,8 @@ export function resolutionToStored(
   const outcomes = buildOutcomes(values)
   if (!method || !proximity || !outcomes?.length) return undefined
 
+  const applicationPattern = applicationPatternFromForm(values)
+
   const candidate = {
     target: {
       count: values.targetCount,
@@ -306,6 +313,7 @@ export function resolutionToStored(
       proximity,
     },
     method,
+    ...(applicationPattern ? { applicationPattern } : {}),
     effects,
     outcomes,
   }
@@ -340,6 +348,7 @@ export function createDefaultAttackResolutionFormValues(
     ...(attackType === 'ranged-spell' ? { proximityDistanceFt: 120 } : {}),
     methodKind: 'attack',
     attackType,
+    applicationPatternKind: 'none',
     effects: [defaultDamageEffect()],
   }
 }
@@ -356,6 +365,7 @@ export function createDefaultSavingThrowResolutionFormValues(): ResolutionFormVa
     proximityKind: 'touch',
     methodKind: 'saving-throw',
     saveAbility: 'con',
+    applicationPatternKind: 'none',
     effects: [
       {
         id: SPELL_RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID,
@@ -373,6 +383,7 @@ export function createDefaultAutomaticHealingResolutionFormValues(): ResolutionF
     targetKind: 'creature',
     proximityKind: 'touch',
     methodKind: 'automatic',
+    applicationPatternKind: 'none',
     effects: [
       {
         id: 'healing',

@@ -258,6 +258,28 @@ describe('spell resolution tab hydration', () => {
     expect(eldritchBlast.effects?.length).toBeGreaterThan(1)
   })
 
+  it('hides hybrid notice for magic-missile when application pattern is projectiles', async () => {
+    const magicMissile = loadSeedSpells('srd-cc-5.2.1').find(
+      (spell) => spell.slug === 'magic-missile',
+    )!
+
+    render(
+      <TabbedForm
+        schema={spellFormSchema}
+        tabs={buildSpellTabs(formCtx).filter((tab) => tab.id === 'resolution')}
+        defaultValues={spellToFormValues(magicMissile)}
+        onSubmit={() => undefined}
+      />,
+    )
+
+    await waitFor(() => {
+      expect(screen.getAllByText('Projectiles').length).toBeGreaterThan(0)
+      expect(screen.getAllByText('Applied per dart').length).toBeGreaterThan(0)
+    })
+    expect(screen.queryByText(RESOLUTION_SECTION_LABELS.hybridNoticeTitle)).not.toBeInTheDocument()
+    expect(magicMissile.resolution?.applicationPattern?.kind).toBe('projectiles')
+  })
+
   it('renders automatic healing for cure-wounds without marking dirty', async () => {
     const cureWounds = loadSeedSpells('srd-cc-5.2.1').find((spell) => spell.slug === 'cure-wounds')!
     let isDirty = false

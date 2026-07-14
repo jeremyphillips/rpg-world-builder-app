@@ -126,6 +126,41 @@ export const spellResolutionTargetSchema = z.object({
 
 export type SpellResolutionTarget = z.infer<typeof spellResolutionTargetSchema>
 
+export const spellApplicationPatternUnitLabelSchema = z.object({
+  singular: z.string().min(1),
+  plural: z.string().min(1),
+})
+
+export type SpellApplicationPatternUnitLabel = z.infer<
+  typeof spellApplicationPatternUnitLabelSchema
+>
+
+export const spellApplicationPatternFixedCountSchema = z.object({
+  type: z.literal('fixed'),
+  value: z.number().int().min(1),
+})
+
+export type SpellApplicationPatternFixedCount = z.infer<
+  typeof spellApplicationPatternFixedCountSchema
+>
+
+export const spellApplicationPatternProjectilesSchema = z.object({
+  kind: z.literal('projectiles'),
+  count: spellApplicationPatternFixedCountSchema,
+  unitLabel: spellApplicationPatternUnitLabelSchema.optional(),
+  applicationMode: z.literal('per-projectile'),
+})
+
+export type SpellApplicationPatternProjectiles = z.infer<
+  typeof spellApplicationPatternProjectilesSchema
+>
+
+export const spellApplicationPatternSchema = z.discriminatedUnion('kind', [
+  spellApplicationPatternProjectilesSchema,
+])
+
+export type SpellApplicationPattern = z.infer<typeof spellApplicationPatternSchema>
+
 function allowedOutcomeResultsForMethod(
   method: SpellResolutionMethod,
 ): readonly SpellResolutionOutcomeResult[] {
@@ -194,6 +229,7 @@ export const spellResolutionSchema = z
   .object({
     target: spellResolutionTargetSchema,
     method: spellResolutionMethodSchema,
+    applicationPattern: spellApplicationPatternSchema.optional(),
     effects: z.array(spellResolutionEffectSchema).min(1),
     outcomes: z.array(spellResolutionOutcomeSchema).min(1),
   })

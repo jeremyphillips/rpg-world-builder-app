@@ -8,6 +8,7 @@ import {
   FALSE_LIFE_RESOLUTION,
   ICE_KNIFE_RESOLUTION,
   INFlict_WOUNDS_RESOLUTION,
+  MAGIC_MISSILE_RESOLUTION,
   SPELL_RESOLUTION_FIXTURES,
 } from './resolution-fixtures'
 import { resolutionFormSchema } from './resolution-form-schema'
@@ -25,6 +26,7 @@ const AUTHORING_FIXTURES = {
   'false-life': FALSE_LIFE_RESOLUTION,
   'ice-knife': ICE_KNIFE_RESOLUTION,
   'arcane-hand': ARCANE_HAND_RESOLUTION,
+  'magic-missile': MAGIC_MISSILE_RESOLUTION,
 } as const satisfies Partial<typeof SPELL_RESOLUTION_FIXTURES>
 
 describe('spell resolution round trips', () => {
@@ -96,5 +98,53 @@ describe('spell resolution round trips', () => {
       const parsedForm = resolutionFormSchema.parse(formValues)
       expect(resolutionToStored(parsedForm)).toEqual(resolution)
     }
+  })
+
+  it('magic-missile: preserves automatic method and projectiles application pattern', () => {
+    const formValues = resolutionToForm(MAGIC_MISSILE_RESOLUTION)
+    expect(formValues?.methodKind).toBe('automatic')
+    expect(formValues?.applicationPatternKind).toBe('projectiles')
+    expect(formValues?.projectileCount).toBe(3)
+    expect(formValues?.projectileUnitLabelSingular).toBe('dart')
+    expect(formValues?.projectileUnitLabelPlural).toBe('darts')
+    expect(resolutionToStored(formValues)).toEqual(MAGIC_MISSILE_RESOLUTION)
+  })
+
+  it('omits applicationPattern when the form pattern kind is none', () => {
+    const formValues = resolutionToForm(ELDRITCH_BLAST_RESOLUTION)!
+    expect(formValues.applicationPatternKind).toBe('none')
+    expect(resolutionToStored(formValues)?.applicationPattern).toBeUndefined()
+  })
+
+  it('clears applicationPattern when projectiles are removed in the form', () => {
+    const formValues = resolutionToForm(MAGIC_MISSILE_RESOLUTION)!
+    const cleared = {
+      ...formValues,
+      applicationPatternKind: 'none' as const,
+      projectileCount: undefined,
+      projectileUnitLabelSingular: undefined,
+      projectileUnitLabelPlural: undefined,
+    }
+    const stored = resolutionToStored(cleared)
+    expect(stored?.applicationPattern).toBeUndefined()
+    expect(stored?.method.kind).toBe('automatic')
+  })
+
+  it('initializes projectiles defaults when adding the pattern in the form', () => {
+    const formValues = resolutionToForm(ELDRITCH_BLAST_RESOLUTION)!
+    const withProjectiles = {
+      ...formValues,
+      applicationPatternKind: 'projectiles' as const,
+      projectileCount: 3,
+      projectileUnitLabelSingular: 'projectile',
+      projectileUnitLabelPlural: 'projectiles',
+    }
+    const stored = resolutionToStored(withProjectiles)
+    expect(stored?.applicationPattern).toEqual({
+      kind: 'projectiles',
+      count: { type: 'fixed', value: 3 },
+      unitLabel: { singular: 'projectile', plural: 'projectiles' },
+      applicationMode: 'per-projectile',
+    })
   })
 })

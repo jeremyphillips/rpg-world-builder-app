@@ -30,4 +30,8 @@ export const resolutionFormValidationMessages = {
     'validation.spellResolutionForm.damageTypeRequired',
     () => 'Select a damage type.',
   ),
+  projectileCountRequired: defineMessage(
+    'validation.spellResolutionForm.projectileCountRequired',
+    () => 'Enter a projectile count.',
+  ),
 }

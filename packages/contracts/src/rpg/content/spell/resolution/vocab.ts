@@ -165,3 +165,31 @@ export const SPELL_RESOLUTION_OUTCOME_RESULTS_BY_METHOD = {
   'saving-throw': ['failed-save', 'successful-save'],
   automatic: ['applied'],
 } as const satisfies Record<string, readonly SpellResolutionOutcomeResult[]>
+
+export const SPELL_APPLICATION_PATTERN_KIND_ENTRIES = {
+  projectiles: {
+    label: 'Projectiles',
+    description:
+      'Each projectile or beam applies the resolution effects separately (e.g. Magic Missile darts).',
+  },
+} as const satisfies Record<string, GameTermEntry>
+
+export type SpellApplicationPatternKind = keyof typeof SPELL_APPLICATION_PATTERN_KIND_ENTRIES
+
+export const SPELL_APPLICATION_PATTERN_KINDS = Object.keys(
+  SPELL_APPLICATION_PATTERN_KIND_ENTRIES,
+) as [SpellApplicationPatternKind, ...SpellApplicationPatternKind[]]
+
+export const SPELL_APPLICATION_PATTERN_COUNT_TYPES = ['fixed'] as const
+
+export type SpellApplicationPatternCountType =
+  (typeof SPELL_APPLICATION_PATTERN_COUNT_TYPES)[number]
+
+export const SPELL_APPLICATION_PATTERN_APPLICATION_MODES = ['per-projectile'] as const
+
+export type SpellApplicationPatternApplicationMode =
+  (typeof SPELL_APPLICATION_PATTERN_APPLICATION_MODES)[number]
+
+export function getSpellApplicationPatternKindLabel(kind: string): string {
+  return SPELL_APPLICATION_PATTERN_KIND_ENTRIES[kind as SpellApplicationPatternKind]?.label ?? kind
+}

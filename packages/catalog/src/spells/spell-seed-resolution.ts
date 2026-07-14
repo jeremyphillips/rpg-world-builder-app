@@ -22,6 +22,7 @@ import {
   ELDRITCH_BLAST_RESOLUTION,
   ICE_KNIFE_RESOLUTION,
   INFlict_WOUNDS_RESOLUTION,
+  MAGIC_MISSILE_RESOLUTION,
   spellResolutionSchema,
   type Spell,
   type SpellResolution,
@@ -87,9 +88,9 @@ export const SRD_521_SPELL_SEED_RESOLUTION = {
 
   // Tier B — hybrid resolution + legacy effects[]
   'eldritch-blast': { kind: 'full', resolution: ELDRITCH_BLAST_RESOLUTION },
+  'magic-missile': { kind: 'full', resolution: MAGIC_MISSILE_RESOLUTION },
 
   // Tier B — explicit deferrals
-  'magic-missile': { kind: 'defer', reason: 'automatic-method' },
   hex: { kind: 'defer', reason: 'extra-damage-rider' },
   'hunters-mark': { kind: 'defer', reason: 'extra-damage-rider' },
 

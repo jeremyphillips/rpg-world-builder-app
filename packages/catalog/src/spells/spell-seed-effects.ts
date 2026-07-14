@@ -151,12 +151,6 @@ export const SRD_521_SPELL_SEED_EFFECTS = {
   ],
   'magic-missile': [
     {
-      id: effectId('magic-missile', 'darts'),
-      kind: 'projectile-count',
-      count: 3,
-      unitLabel: 'darts',
-    },
-    {
       id: effectId('magic-missile', 'damage'),
       kind: 'damage',
       roll: { dice: { count: 1, faces: 4 }, flat: 1 },

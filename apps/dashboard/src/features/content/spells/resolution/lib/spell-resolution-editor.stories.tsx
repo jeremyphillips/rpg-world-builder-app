@@ -38,3 +38,9 @@ export const ChillTouchWithNote: Story = {
 export const InflictWounds: Story = {
   args: { defaultResolution: RESOLUTION_FORM_FIXTURES.inflictWounds },
 }
+
+/** Automatic preset with three force darts applied per projectile. */
+export const MagicMissile: Story = {
+  name: 'Magic Missile',
+  args: { defaultResolution: RESOLUTION_FORM_FIXTURES.magicMissile },
+}

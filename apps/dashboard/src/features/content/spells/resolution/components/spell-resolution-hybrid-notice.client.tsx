@@ -12,12 +12,20 @@ function hasProjectileCountEffect(effects: readonly EffectFormRow[] | undefined)
   return effects?.some((effect) => effect.kind === 'projectile-count') ?? false
 }
 
-/** Notifies authors when beam/dart scaling lives in legacy root effects. */
+function hasProjectilesApplicationPattern(resolution: ResolutionFormValues | undefined): boolean {
+  return resolution?.applicationPatternKind === 'projectiles'
+}
+
+/** Notifies authors when beam/dart scaling lives in legacy root effects only. */
 export function SpellResolutionHybridNotice() {
   const resolution = useWatch({ name: RESOLUTION_FIELD_NAME }) as ResolutionFormValues | undefined
   const rootEffects = useWatch({ name: 'effects' }) as EffectFormRow[] | undefined
 
-  if (!resolution || !hasProjectileCountEffect(rootEffects)) {
+  if (
+    !resolution ||
+    !hasProjectileCountEffect(rootEffects) ||
+    hasProjectilesApplicationPattern(resolution)
+  ) {
     return null
   }
 

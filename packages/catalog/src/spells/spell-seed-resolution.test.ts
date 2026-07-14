@@ -48,18 +48,19 @@ describe('SRD 5.2.1 spell seed resolution manifest', () => {
     expect(SRD_521_SPELL_SEED_RESOLUTION_TIER_A_SLUGS).toHaveLength(13)
   })
 
-  it('applies resolution to 20 slugs (13 Tier A + Eldritch Blast + 4 Tier D + 2 Tier C)', () => {
-    expect(SRD_521_SPELL_SEED_RESOLUTION_SLUGS).toHaveLength(20)
+  it('applies resolution to 21 slugs (13 Tier A + Eldritch Blast + Magic Missile + 4 Tier D + 2 Tier C)', () => {
+    expect(SRD_521_SPELL_SEED_RESOLUTION_SLUGS).toHaveLength(21)
     expect(SRD_521_SPELL_SEED_RESOLUTION_SLUGS).toContain('eldritch-blast')
+    expect(SRD_521_SPELL_SEED_RESOLUTION_SLUGS).toContain('magic-missile')
     expect(SRD_521_SPELL_SEED_RESOLUTION_SLUGS).toContain('cure-wounds')
     expect(SRD_521_SPELL_SEED_RESOLUTION_SLUGS).toContain('false-life')
     expect(SRD_521_SPELL_SEED_RESOLUTION_SLUGS).toContain('ice-knife')
     expect(SRD_521_SPELL_SEED_RESOLUTION_SLUGS).toContain('arcane-hand')
   })
 
-  it('documents four explicit deferrals across Tier B/D', () => {
+  it('documents three explicit deferrals across Tier B/D', () => {
     expect(SRD_521_SPELL_SEED_RESOLUTION_DEFERRED_SLUGS.sort()).toEqual(
-      ['hex', 'hunters-mark', 'magic-missile', 'true-strike'].sort(),
+      ['hex', 'hunters-mark', 'true-strike'].sort(),
     )
     expect(SRD_521_SPELL_SEED_RESOLUTION_MANIFEST_SLUGS).toHaveLength(24)
   })

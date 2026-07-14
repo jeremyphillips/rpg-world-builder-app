@@ -223,12 +223,18 @@ describe('spellFormDef resolution tab', () => {
     expect(names).toContain('resolution.targetKind')
     expect(names).toContain('resolution.proximityKind')
     expect(names).toContain('resolution.proximityReachDistanceFt')
-    expect(names).toContain('_resolutionMethodSelect')
+    expect(names).toContain('_resolutionHowItResolves')
     expect(names).toContain('resolution.effects')
+    expect(names).toContain('_resolutionEffectsApplicationLabel')
     expect(names).toContain('_resolutionOutcomesPreview')
     expect(findGroup(resolutionTab?.fields ?? [], 'Target')).toBeDefined()
-    expect(findGroup(resolutionTab?.fields ?? [], 'Resolution method')).toBeDefined()
-    const effectsArray = resolutionTab?.fields.find(
+    expect(findGroup(resolutionTab?.fields ?? [], 'How it resolves')).toBeDefined()
+    const effectsGroup = resolutionTab?.fields.find(
+      (field): field is GroupConfig =>
+        'kind' in field && field.kind === 'group' && field.legend === 'Effects',
+    )
+    expect(effectsGroup).toBeDefined()
+    const effectsArray = effectsGroup?.fields.find(
       (field): field is ArrayConfig =>
         'kind' in field && field.kind === 'array' && field.name === 'resolution.effects',
     )

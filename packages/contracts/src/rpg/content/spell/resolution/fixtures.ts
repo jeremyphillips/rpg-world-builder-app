@@ -203,6 +203,36 @@ export const ARCANE_HAND_RESOLUTION: SpellResolution = {
   ],
 }
 
+/** Magic Missile — automatic force darts with per-projectile damage. */
+export const MAGIC_MISSILE_RESOLUTION: SpellResolution = {
+  target: {
+    count: 1,
+    kind: 'creature',
+    proximity: { kind: 'distance', distance: { value: 120, unit: 'ft' } },
+  },
+  method: { kind: 'automatic' },
+  applicationPattern: {
+    kind: 'projectiles',
+    count: { type: 'fixed', value: 3 },
+    unitLabel: { singular: 'dart', plural: 'darts' },
+    applicationMode: 'per-projectile',
+  },
+  effects: [
+    {
+      id: SPELL_RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID,
+      kind: 'damage',
+      roll: { dice: { count: 1, faces: 4 }, flat: 1 },
+      damageType: 'force',
+    },
+  ],
+  outcomes: [
+    {
+      result: 'applied',
+      applications: [{ effectId: SPELL_RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID, amount: 'full' }],
+    },
+  ],
+}
+
 export const SPELL_RESOLUTION_FIXTURES = {
   'eldritch-blast': ELDRITCH_BLAST_RESOLUTION,
   'chill-touch': CHILL_TOUCH_RESOLUTION,
@@ -211,4 +241,5 @@ export const SPELL_RESOLUTION_FIXTURES = {
   'false-life': FALSE_LIFE_RESOLUTION,
   'ice-knife': ICE_KNIFE_RESOLUTION,
   'arcane-hand': ARCANE_HAND_RESOLUTION,
+  'magic-missile': MAGIC_MISSILE_RESOLUTION,
 } as const satisfies Record<string, SpellResolution>

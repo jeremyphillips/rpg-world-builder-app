@@ -7,8 +7,12 @@ import {
 } from '../../../lib/forms/fields/content-identity-form-fields'
 import type { ContentFormCtx } from '../../../lib/forms/content-form-registry'
 import { SpellResolutionEmptyState } from '../components/spell-resolution-empty-state.client'
+import { SpellResolutionEffectsApplicationLabel } from '../components/spell-resolution-effects-application-label.client'
 import { SpellResolutionHybridNotice } from '../components/spell-resolution-hybrid-notice.client'
-import { SpellResolutionMethodSelect } from '../components/spell-resolution-method-select.client'
+import {
+  SpellResolutionHowItResolves,
+  SpellResolutionProjectilesPreview,
+} from '../components/spell-resolution-how-it-resolves.client'
 import { SpellResolutionOutcomesPreview } from '../components/spell-resolution-outcomes-preview.client'
 import { SpellResolutionPreview } from '../components/spell-resolution-preview.client'
 import { buildResolutionEffectArrayAddMenu } from './resolution-effect-add-menu.lib'
@@ -46,6 +50,13 @@ function visibleWhenResolutionTargetCountEditable(): FieldVisibility {
       const count = values[`${RESOLUTION_PREFIX}.targetCount`]
       return typeof count === 'number' && count !== 1
     },
+  }
+}
+
+function visibleWhenApplicationPatternKind(kind: 'projectiles'): FieldVisibility {
+  return {
+    dependsOn: [`${RESOLUTION_PREFIX}.applicationPatternKind`],
+    visibleWhen: (values) => values[`${RESOLUTION_PREFIX}.applicationPatternKind`] === kind,
   }
 }
 
@@ -116,7 +127,7 @@ function resolutionEffectsArrayField(ctx: ContentFormCtx): FormItem {
   return {
     kind: 'array',
     name: `${RESOLUTION_PREFIX}.effects`,
-    legend: RESOLUTION_SECTION_LABELS.effects,
+    legend: '',
     addLabel: 'Add effect',
     itemCollapsible: true,
     itemHeader: {
@@ -127,6 +138,54 @@ function resolutionEffectsArrayField(ctx: ContentFormCtx): FormItem {
     addMenu: buildResolutionEffectArrayAddMenu(),
     fields: resolutionEffectItemFields(ctx),
   }
+}
+
+function resolutionProjectilesFields(): FormItem[] {
+  const projectilesVisibility = combineFieldVisibility(
+    visibleWhenResolutionConfigured(),
+    visibleWhenApplicationPatternKind('projectiles'),
+  )
+
+  return [
+    {
+      kind: 'group',
+      legend: RESOLUTION_SECTION_LABELS.projectiles,
+      visibility: projectilesVisibility,
+      fields: [
+        {
+          kind: 'slot',
+          name: '_resolutionProjectilesPreview',
+          render: () => createElement(SpellResolutionProjectilesPreview),
+        },
+        {
+          kind: 'row',
+          fields: [
+            {
+              type: 'number',
+              name: `${RESOLUTION_PREFIX}.projectileCount`,
+              label: RESOLUTION_FIELD_LABELS.projectileCount,
+              min: 1,
+              digits: 2,
+              width: 'auto',
+              required: true,
+            },
+            {
+              type: 'text',
+              name: `${RESOLUTION_PREFIX}.projectileUnitLabelSingular`,
+              label: RESOLUTION_FIELD_LABELS.projectileUnitLabelSingular,
+              width: 'xl',
+            },
+            {
+              type: 'text',
+              name: `${RESOLUTION_PREFIX}.projectileUnitLabelPlural`,
+              label: RESOLUTION_FIELD_LABELS.projectileUnitLabelPlural,
+              width: 'xl',
+            },
+          ],
+        },
+      ],
+    },
+  ]
 }
 
 function configuredResolutionFields(ctx: ContentFormCtx): FormItem[] {
@@ -193,14 +252,27 @@ function configuredResolutionFields(ctx: ContentFormCtx): FormItem[] {
       fields: [
         {
           kind: 'slot',
-          name: '_resolutionMethodSelect',
-          render: () => createElement(SpellResolutionMethodSelect),
+          name: '_resolutionHowItResolves',
+          render: () => createElement(SpellResolutionHowItResolves),
         },
       ],
     },
+    ...resolutionProjectilesFields(),
     {
-      ...resolutionEffectsArrayField(ctx),
+      kind: 'group',
+      legend: RESOLUTION_SECTION_LABELS.effects,
       visibility: configured,
+      fields: [
+        {
+          kind: 'slot',
+          name: '_resolutionEffectsApplicationLabel',
+          render: () => createElement(SpellResolutionEffectsApplicationLabel),
+        },
+        {
+          ...resolutionEffectsArrayField(ctx),
+          visibility: undefined,
+        },
+      ],
     },
     {
       kind: 'group',

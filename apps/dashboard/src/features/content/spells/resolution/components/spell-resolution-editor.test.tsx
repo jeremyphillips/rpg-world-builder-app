@@ -41,7 +41,7 @@ describe('SpellResolutionEditor', () => {
     })
   })
 
-  it('renders grant-style collapsible effect rows with dynamic header summary', async () => {
+  it('renders grant-style effect rows with application label and damage fields', async () => {
     render(
       <SpellResolutionEditor
         formCtx={formCtx}
@@ -50,9 +50,9 @@ describe('SpellResolutionEditor', () => {
     )
 
     await waitFor(() => {
-      expect(screen.getByRole('group', { name: 'Effects' })).toBeInTheDocument()
-      expect(screen.getByText('Inflicts 1d10 Force damage.')).toBeInTheDocument()
-      expect(screen.getByRole('button', { name: /Collapse Effects · Damage/i })).toBeInTheDocument()
+      expect(screen.getAllByText('Effects').length).toBeGreaterThan(0)
+      expect(screen.getByText('Applied once')).toBeInTheDocument()
+      expect(screen.getAllByText('Damage').length).toBeGreaterThan(0)
     })
   })
 
@@ -77,7 +77,7 @@ describe('SpellResolutionEditor', () => {
 
     await waitFor(() => {
       expect(screen.getAllByText('Target').length).toBeGreaterThan(0)
-      expect(screen.getAllByText('Check').length).toBeGreaterThan(0)
+      expect(screen.getAllByText('How it resolves').length).toBeGreaterThan(0)
       expect(screen.getAllByText('Effects').length).toBeGreaterThan(0)
     })
   })
@@ -131,6 +131,38 @@ describe('SpellResolutionEditor', () => {
 
     await waitFor(() => {
       expect(screen.getAllByText(/can't regain Hit Points/i).length).toBeGreaterThan(0)
+    })
+
+    await expectNoAxeViolations(container)
+  })
+
+  it('renders magic missile automatic projectiles and applied-per-dart effects label', async () => {
+    render(
+      <SpellResolutionEditor
+        formCtx={formCtx}
+        defaultResolution={RESOLUTION_FORM_FIXTURES.magicMissile}
+      />,
+    )
+
+    await waitFor(() => {
+      expect(screen.getAllByText('Automatic').length).toBeGreaterThan(0)
+      expect(screen.getAllByText('Projectiles').length).toBeGreaterThan(0)
+      expect(screen.getAllByText('Creates 3 darts.').length).toBeGreaterThan(0)
+      expect(screen.getByText('Applied per dart')).toBeInTheDocument()
+      expect(screen.getAllByText('1d4+1 Force damage').length).toBeGreaterThan(0)
+    })
+  })
+
+  it('has no axe accessibility violations with magic missile fixture', async () => {
+    const { container } = render(
+      <SpellResolutionEditor
+        formCtx={formCtx}
+        defaultResolution={RESOLUTION_FORM_FIXTURES.magicMissile}
+      />,
+    )
+
+    await waitFor(() => {
+      expect(screen.getByText('Applied per dart')).toBeInTheDocument()
     })
 
     await expectNoAxeViolations(container)

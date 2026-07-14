@@ -6,6 +6,7 @@ import {
   FALSE_LIFE_RESOLUTION,
   ICE_KNIFE_RESOLUTION,
   INFlict_WOUNDS_RESOLUTION,
+  MAGIC_MISSILE_RESOLUTION,
   SPELL_RESOLUTION_FIXTURES,
   type SpellResolution,
 } from '@rpg/contracts'
@@ -21,6 +22,7 @@ export {
   FALSE_LIFE_RESOLUTION,
   ICE_KNIFE_RESOLUTION,
   INFlict_WOUNDS_RESOLUTION,
+  MAGIC_MISSILE_RESOLUTION,
   SPELL_RESOLUTION_FIXTURES,
 }
 
@@ -32,6 +34,7 @@ export const RESOLUTION_FORM_FIXTURES = {
   falseLife: resolutionToForm(FALSE_LIFE_RESOLUTION)!,
   iceKnife: resolutionToForm(ICE_KNIFE_RESOLUTION)!,
   arcaneHand: resolutionToForm(ARCANE_HAND_RESOLUTION)!,
+  magicMissile: resolutionToForm(MAGIC_MISSILE_RESOLUTION)!,
 } as const satisfies Record<string, ResolutionFormValues>
 
 export function spellResolutionFixture(

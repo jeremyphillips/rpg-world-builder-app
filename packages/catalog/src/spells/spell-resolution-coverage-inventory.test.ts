@@ -19,12 +19,12 @@ describe('spell resolution coverage inventory (srd-cc-5.2.1)', () => {
     expect(inventory.entries).toHaveLength(92)
   })
 
-  it('reports 17 migrated single-effect resolution spells', () => {
+  it('reports 18 migrated single-effect resolution spells', () => {
     const tierA = SRD_521_SPELL_SEED_RESOLUTION_SLUGS.filter(
       (slug) => slug !== 'eldritch-blast' && slug !== 'ice-knife' && slug !== 'arcane-hand',
     )
     expect(inventory.byStatus.migrated.sort()).toEqual([...tierA].sort())
-    expect(inventory.byStatus.migrated).toHaveLength(17)
+    expect(inventory.byStatus.migrated).toHaveLength(18)
   })
 
   it('reports Eldritch Blast, Ice Knife, and Arcane Hand as hybrid', () => {
@@ -42,8 +42,8 @@ describe('spell resolution coverage inventory (srd-cc-5.2.1)', () => {
     expect(arcaneHand?.effectCount).toBe(2)
   })
 
-  it('reports four deferred effect spells and 68 prose-only spells', () => {
-    expect(inventory.byStatus.deferred).toHaveLength(4)
+  it('reports three deferred effect spells and 68 prose-only spells', () => {
+    expect(inventory.byStatus.deferred).toHaveLength(3)
     expect(inventory.byStatus['prose-only']).toHaveLength(68)
 
     const deferredFromEffects = SRD_521_SPELL_SEED_EFFECT_SLUGS.filter(
@@ -56,7 +56,7 @@ describe('spell resolution coverage inventory (srd-cc-5.2.1)', () => {
   })
 
   it('groups manifest deferrals by documented reason codes', () => {
-    expect(inventory.byDeferReason['automatic-method']).toEqual(['magic-missile'])
+    expect(inventory.byDeferReason['automatic-method']).toBeUndefined()
     expect(inventory.byDeferReason['extra-damage-rider']?.sort()).toEqual(['hex', 'hunters-mark'])
     expect(inventory.byDeferReason['placeholder-damage']).toEqual(['true-strike'])
     expect(inventory.byDeferReason['multi-effect']).toBeUndefined()

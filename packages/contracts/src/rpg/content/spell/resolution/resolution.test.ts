@@ -1,8 +1,10 @@
 import { describe, expect, it } from 'vitest'
 
 import {
+  formatResolutionEffectsApplicationLabel,
   formatResolutionMethod,
   formatResolutionOutcomes,
+  formatResolutionProjectilesPreview,
   formatResolutionSummary,
   formatResolutionTarget,
   formatResolutionTargetProximityPhrase,
@@ -12,6 +14,7 @@ import {
   CURE_WOUNDS_RESOLUTION,
   ELDRITCH_BLAST_RESOLUTION,
   INFlict_WOUNDS_RESOLUTION,
+  MAGIC_MISSILE_RESOLUTION,
   SPELL_RESOLUTION_FIXTURES,
 } from './fixtures'
 import {
@@ -241,5 +244,31 @@ describe('spell resolution formatters', () => {
     expect(formatResolutionMethod(CURE_WOUNDS_RESOLUTION)).toBe('Automatic')
     expect(formatResolutionSummary(CURE_WOUNDS_RESOLUTION)).toContain('2d8 healing')
     expect(formatResolutionOutcomes(CURE_WOUNDS_RESOLUTION)).toEqual(['Applied: Full healing'])
+  })
+
+  it('formats projectiles preview and effects application labels', () => {
+    const pattern = MAGIC_MISSILE_RESOLUTION.applicationPattern
+    expect(pattern?.kind).toBe('projectiles')
+    if (pattern?.kind !== 'projectiles') return
+
+    expect(formatResolutionProjectilesPreview(pattern)).toBe('Creates 3 darts.')
+    expect(formatResolutionEffectsApplicationLabel(MAGIC_MISSILE_RESOLUTION)).toBe(
+      'Applied per dart',
+    )
+    expect(formatResolutionEffectsApplicationLabel(ELDRITCH_BLAST_RESOLUTION)).toBe('Applied once')
+    expect(formatResolutionSummary(MAGIC_MISSILE_RESOLUTION)).toContain('Creates 3 darts.')
+  })
+
+  it('uses generic projectile copy when unit labels are absent', () => {
+    const pattern = {
+      kind: 'projectiles' as const,
+      count: { type: 'fixed' as const, value: 2 },
+      applicationMode: 'per-projectile' as const,
+    }
+
+    expect(formatResolutionProjectilesPreview(pattern)).toBe('Creates 2 projectiles.')
+    expect(formatResolutionEffectsApplicationLabel({ applicationPattern: pattern })).toBe(
+      'Applied per projectile',
+    )
   })
 })

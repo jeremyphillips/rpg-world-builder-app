@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import type { ArrayConfig, FormItem } from '@rpg/ui/form'
+import type { ArrayConfig, FormItem, GroupConfig } from '@rpg/ui/form'
 
 import {
   formatResolutionEffectRowPrimary,
@@ -8,10 +8,18 @@ import {
 import { resolutionFields } from './resolution-form-fields'
 
 function findResolutionEffectsArray(fields: FormItem[]): ArrayConfig | undefined {
-  return fields.find(
-    (field): field is ArrayConfig =>
-      'kind' in field && field.kind === 'array' && field.name === 'resolution.effects',
-  )
+  for (const field of fields) {
+    if ('kind' in field && field.kind === 'array' && field.name === 'resolution.effects') {
+      return field
+    }
+
+    if ('kind' in field && field.kind === 'group') {
+      const nested = findResolutionEffectsArray((field as GroupConfig).fields)
+      if (nested) return nested
+    }
+  }
+
+  return undefined
 }
 
 describe('resolutionFields effects array', () => {

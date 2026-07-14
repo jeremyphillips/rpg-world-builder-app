@@ -1368,12 +1368,6 @@
     "higherLevelSlotEffect": "<p>The spell creates one more dart for each spell slot level above 1.</p>",
     "effects": [
       {
-        "id": "srd-cc-5.2.1:magic-missile:darts",
-        "kind": "projectile-count",
-        "count": 3,
-        "unitLabel": "darts"
-      },
-      {
         "id": "srd-cc-5.2.1:magic-missile:damage",
         "kind": "damage",
         "roll": {
@@ -1385,7 +1379,60 @@
         },
         "damageType": "force"
       }
-    ]
+    ],
+    "resolution": {
+      "target": {
+        "count": 1,
+        "kind": "creature",
+        "proximity": {
+          "kind": "distance",
+          "distance": {
+            "value": 120,
+            "unit": "ft"
+          }
+        }
+      },
+      "method": {
+        "kind": "automatic"
+      },
+      "applicationPattern": {
+        "kind": "projectiles",
+        "count": {
+          "type": "fixed",
+          "value": 3
+        },
+        "unitLabel": {
+          "singular": "dart",
+          "plural": "darts"
+        },
+        "applicationMode": "per-projectile"
+      },
+      "effects": [
+        {
+          "id": "damage",
+          "kind": "damage",
+          "roll": {
+            "dice": {
+              "count": 1,
+              "faces": 4
+            },
+            "flat": 1
+          },
+          "damageType": "force"
+        }
+      ],
+      "outcomes": [
+        {
+          "result": "applied",
+          "applications": [
+            {
+              "effectId": "damage",
+              "amount": "full"
+            }
+          ]
+        }
+      ]
+    }
   },
   {
     "id": "srd-cc-5.2.1:purify-food-and-drink",
