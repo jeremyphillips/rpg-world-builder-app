@@ -11,8 +11,8 @@ import { magicItemFormFieldGroup } from './magic-item-form-fields'
 const MAGIC_ITEM_SEEDS = seedEquipmentOfKind('magic_item')
 
 describe('magic item kindFieldGroups', () => {
-  it('buildFields composes identity, economy, and registered magic item group', () => {
-    expectComposedKindGroups('magic_item', 'Magic Item')
+  it('buildFields composes name, kind group, economy, and description', () => {
+    expectComposedKindGroups('magic_item', '')
   })
 
   it('uses a responsive two-column layout for base equipment', () => {

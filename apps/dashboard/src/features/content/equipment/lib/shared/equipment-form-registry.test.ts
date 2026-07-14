@@ -11,19 +11,19 @@ describe('kindFieldGroups', () => {
   it('registers service field group', () => {
     const groups = fieldGroupsForEquipmentKind('service')
     expect(groups).toHaveLength(1)
-    expect(groups?.[0]).toMatchObject({ kind: 'group', legend: 'Service' })
+    expect(groups?.[0]).toMatchObject({ kind: 'group', legend: '' })
   })
 
   it('registers mount field group', () => {
     const groups = fieldGroupsForEquipmentKind('mount')
     expect(groups).toHaveLength(1)
-    expect(groups?.[0]).toMatchObject({ kind: 'group', legend: 'Mount' })
+    expect(groups?.[0]).toMatchObject({ kind: 'group', legend: '' })
   })
 
   it('registers tool field group', () => {
     const groups = fieldGroupsForEquipmentKind('tool')
     expect(groups).toHaveLength(2)
-    expect(groups?.[0]).toMatchObject({ kind: 'group', legend: 'Tool' })
+    expect(groups?.[0]).toMatchObject({ kind: 'group', legend: '' })
     expect(groups?.[1]).toMatchObject({
       kind: 'array',
       name: 'utilizes',
@@ -34,7 +34,7 @@ describe('kindFieldGroups', () => {
   it('registers magic item field group', () => {
     const groups = fieldGroupsForEquipmentKind('magic_item')
     expect(groups).toHaveLength(1)
-    expect(groups?.[0]).toMatchObject({ kind: 'group', legend: 'Magic Item' })
+    expect(groups?.[0]).toMatchObject({ kind: 'group', legend: '' })
   })
 
   it('registers adventuring gear field group', () => {
@@ -46,7 +46,7 @@ describe('kindFieldGroups', () => {
   it('registers vehicle field group', () => {
     const groups = fieldGroupsForEquipmentKind('vehicle')
     expect(groups).toHaveLength(1)
-    expect(groups?.[0]).toMatchObject({ kind: 'group', legend: 'Vehicle' })
+    expect(groups?.[0]).toMatchObject({ kind: 'group', legend: '' })
   })
 
   it('registers armor field group', () => {

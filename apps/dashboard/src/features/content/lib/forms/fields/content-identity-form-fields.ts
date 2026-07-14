@@ -42,17 +42,24 @@ export function feetInputUnitField(
   }
 }
 
-/** Identity fields shared by every catalog content type (slug is derived, not authored). */
+/** Catalog content name field (slug is derived, not authored). */
+export function nameField(): FieldConfig {
+  return { type: 'text', name: 'name', label: 'Name', required: true }
+}
+
+/** Catalog content description field with rich-text internal linking. */
+export function descriptionField(ctx?: ContentFormCtx): FieldConfig {
+  return {
+    type: 'richtext',
+    name: 'description',
+    label: 'Description',
+    linkable: true,
+    internalLinkOptions: ctx?.options?.richTextInternalLinkOptions,
+    contentTypeOptions: ctx?.options?.richTextContentTypeOptions,
+  }
+}
+
+/** Name + description pair for forms that keep both fields together without a group legend. */
 export function identityFields(ctx?: ContentFormCtx): GroupField[] {
-  return [
-    { type: 'text', name: 'name', label: 'Name', required: true },
-    {
-      type: 'richtext',
-      name: 'description',
-      label: 'Description',
-      linkable: true,
-      internalLinkOptions: ctx?.options?.richTextInternalLinkOptions,
-      contentTypeOptions: ctx?.options?.richTextContentTypeOptions,
-    },
-  ]
+  return [nameField(), descriptionField(ctx)]
 }

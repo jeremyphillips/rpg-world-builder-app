@@ -141,7 +141,7 @@ export function buildSpeciesTabs(ctx: ContentFormCtx): TabbedFormTab[] {
     {
       id: 'basics',
       label: 'Basics',
-      fields: [...identityFields(ctx), ...attributesFields(ctx)],
+      fields: [...attributesFields(ctx), ...identityFields(ctx)],
     },
     {
       id: 'traits',

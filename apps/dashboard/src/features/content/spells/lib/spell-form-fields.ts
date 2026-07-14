@@ -21,8 +21,9 @@ import {
 } from '@/features/homebrew'
 
 import {
+  descriptionField,
   feetInputUnitField,
-  identityFields,
+  nameField,
   SPELL_RANGE_DISTANCE_INLINE_COUNT_DIGITS,
 } from '../../lib/forms/fields/content-identity-form-fields'
 import { distanceInputSelectField } from '../../lib/forms/fields/content-speed-form-fields'
@@ -234,25 +235,7 @@ function basicsFields(ctx: ContentFormCtx): FormItem[] {
   const schoolOptions = buildActiveSpellSchoolFieldOptions(ctx.spellSchoolVocabulary)
 
   return [
-    ...identityFields(ctx),
-    {
-      type: 'richtext',
-      name: 'cantripScaling',
-      label: SPELL_SECTION_LABELS.cantripScaling,
-      linkable: true,
-      internalLinkOptions: ctx.options?.richTextInternalLinkOptions,
-      contentTypeOptions: ctx.options?.richTextContentTypeOptions,
-      visibility: visibleWhenCantripLevel(),
-    },
-    {
-      type: 'richtext',
-      name: 'higherLevelSlotEffect',
-      label: SPELL_SECTION_LABELS.higherLevelSlotEffect,
-      linkable: true,
-      internalLinkOptions: ctx.options?.richTextInternalLinkOptions,
-      contentTypeOptions: ctx.options?.richTextContentTypeOptions,
-      visibility: visibleWhenLeveledSpell(),
-    },
+    nameField(),
     {
       kind: 'row',
       fields: [
@@ -287,6 +270,25 @@ function basicsFields(ctx: ContentFormCtx): FormItem[] {
           width: '1/2',
         },
       ],
+    },
+    descriptionField(ctx),
+    {
+      type: 'richtext',
+      name: 'cantripScaling',
+      label: SPELL_SECTION_LABELS.cantripScaling,
+      linkable: true,
+      internalLinkOptions: ctx.options?.richTextInternalLinkOptions,
+      contentTypeOptions: ctx.options?.richTextContentTypeOptions,
+      visibility: visibleWhenCantripLevel(),
+    },
+    {
+      type: 'richtext',
+      name: 'higherLevelSlotEffect',
+      label: SPELL_SECTION_LABELS.higherLevelSlotEffect,
+      linkable: true,
+      internalLinkOptions: ctx.options?.richTextInternalLinkOptions,
+      contentTypeOptions: ctx.options?.richTextContentTypeOptions,
+      visibility: visibleWhenLeveledSpell(),
     },
   ]
 }

@@ -10,7 +10,12 @@ import {
   weightFromForm,
   weightToForm,
 } from './content-economy-form-fields'
-import { feetInputUnitField } from './content-identity-form-fields'
+import {
+  descriptionField,
+  feetInputUnitField,
+  identityFields,
+  nameField,
+} from './content-identity-form-fields'
 import { mountCapacitySpeedFields, vehicleCargoSpeedFields } from './content-speed-form-fields'
 import { EQUIPMENT_COST_VALUE_DIGITS } from '../../../equipment/lib/equipment-cost-config'
 import { EQUIPMENT_WEIGHT_VALUE_DIGITS } from '../../../equipment/lib/equipment-weight-config'
@@ -199,7 +204,13 @@ describe('feetInputUnitField', () => {
       name: 'range.value.value',
       label: 'Distance',
       segments: [
-        { kind: 'number', name: 'range.value.value', min: 0, digits: 2, ariaLabel: 'Distance value' },
+        {
+          kind: 'number',
+          name: 'range.value.value',
+          min: 0,
+          digits: 2,
+          ariaLabel: 'Distance value',
+        },
         { kind: 'text', value: 'ft.', tone: 'label' },
       ],
     })
@@ -215,5 +226,11 @@ describe('feetInputUnitField', () => {
         { kind: 'text', value: 'ft.', tone: 'label' },
       ],
     })
+  })
+})
+
+describe('catalog identity fields', () => {
+  it('identityFields returns name then description without a group wrapper', () => {
+    expect(identityFields()).toEqual([nameField(), descriptionField()])
   })
 })

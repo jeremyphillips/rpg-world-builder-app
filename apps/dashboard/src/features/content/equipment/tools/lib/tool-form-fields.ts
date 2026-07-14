@@ -23,7 +23,7 @@ export function toolFormFieldGroup(): FormItem[] {
   return [
     {
       kind: 'group',
-      legend: 'Tool',
+      legend: '',
       fields: [
         {
           kind: 'row',

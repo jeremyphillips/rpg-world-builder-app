@@ -4,7 +4,7 @@ import {
   MAGIC_ITEM_RARITIES,
   MAGIC_ITEM_RARITY_ENTRIES,
 } from '@rpg/contracts'
-import { toOptions, type FieldVisibility, type FormItem } from '@rpg/ui/form'
+import { toOptions, type FormItem } from '@rpg/ui/form'
 
 import type { ContentFormCtx } from '../../../lib/forms/content-form-registry'
 import { labelsFromEntries } from '../../lib/equipment-form-field-helpers'
@@ -19,18 +19,11 @@ const magicItemCategoryOptions = toOptions(
   labelsFromEntries(MAGIC_ITEM_CATEGORY_ENTRIES),
 )
 
-function visibleWhenAttunementRequired(): FieldVisibility {
-  return {
-    dependsOn: ['requiresAttunement'],
-    visibleWhen: (v) => v.requiresAttunement === true,
-  }
-}
-
 /** Magic item-specific form field group for the unified equipment form. */
 export function magicItemFormFieldGroup(ctx: ContentFormCtx = {}): FormItem {
   return {
     kind: 'group',
-    legend: 'Magic Item',
+    legend: '',
     fields: [
       {
         kind: 'row',
@@ -50,15 +43,21 @@ export function magicItemFormFieldGroup(ctx: ContentFormCtx = {}): FormItem {
         ],
       },
       {
-        type: 'switch',
-        name: 'requiresAttunement',
-        label: 'Requires attunement',
-      },
-      {
-        type: 'text',
-        name: 'attunementRequirement',
-        label: 'Attunement requirement',
-        visibility: visibleWhenAttunementRequired(),
+        kind: 'stack',
+        layout: 'dependent',
+        dependentsChrome: 'subtle',
+        fields: [
+          {
+            type: 'switch',
+            name: 'requiresAttunement',
+            label: 'Requires attunement',
+          },
+          {
+            type: 'text',
+            name: 'attunementRequirement',
+            label: 'Attunement requirement',
+          },
+        ],
       },
       {
         kind: 'row',

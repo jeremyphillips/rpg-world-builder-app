@@ -11,9 +11,12 @@ import { fieldGroupsForEquipmentKind } from '../../lib/shared/equipment-form-reg
 const SERVICE_SEEDS = seedEquipmentOfKind('service')
 
 describe('service kindFieldGroups', () => {
-  it('buildFields composes identity, economy, and registered service group', () => {
-    const fields = expectComposedKindGroups('service', 'Service')
-    expect(fields.at(-1)).toEqual(fieldGroupsForEquipmentKind('service')?.[0])
+  it('buildFields composes name, kind group, economy, and description', () => {
+    const fields = expectComposedKindGroups('service', '')
+    const kindGroup = fields.find(
+      (field) => 'kind' in field && field.kind === 'group' && field.legend === '',
+    )
+    expect(kindGroup).toEqual(fieldGroupsForEquipmentKind('service')?.[0])
   })
 })
 

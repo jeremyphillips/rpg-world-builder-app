@@ -11,9 +11,12 @@ import { fieldGroupsForEquipmentKind } from '../../lib/shared/equipment-form-reg
 const MOUNT_SEEDS = seedEquipmentOfKind('mount')
 
 describe('mount kindFieldGroups', () => {
-  it('buildFields composes identity, economy, and registered mount group', () => {
-    const fields = expectComposedKindGroups('mount', 'Mount')
-    expect(fields.at(-1)).toEqual(fieldGroupsForEquipmentKind('mount')?.[0])
+  it('buildFields composes name, kind group, economy, and description', () => {
+    const fields = expectComposedKindGroups('mount', '')
+    const kindGroup = fields.find(
+      (field) => 'kind' in field && field.kind === 'group' && field.legend === '',
+    )
+    expect(kindGroup).toEqual(fieldGroupsForEquipmentKind('mount')?.[0])
   })
 })
 

@@ -35,6 +35,7 @@ function serviceDurationField(): FieldConfig {
     width: 'auto',
     unitPlaceholder: 'Select…',
     hint: 'Leave blank for no duration',
+    hintPosition: 'below-control',
     defaultValue: { unit: 'day' },
   }
 }
@@ -43,7 +44,7 @@ function serviceDurationField(): FieldConfig {
 export function serviceFormFieldGroup(): FormItem {
   return {
     kind: 'group',
-    legend: 'Service',
+    legend: '',
     fields: [
       {
         kind: 'row',

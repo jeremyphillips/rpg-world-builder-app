@@ -32,7 +32,7 @@ import {
 import { toOptions, type FormItem } from '@rpg/ui/form'
 
 import { economyFields } from '../../lib/forms/fields/content-economy-form-fields'
-import { identityFields } from '../../lib/forms/fields/content-identity-form-fields'
+import { descriptionField, nameField } from '../../lib/forms/fields/content-identity-form-fields'
 import type { ContentFormCtx } from '../../lib/forms/content-form-registry'
 import { rollFormObjectSchema } from '../../lib/forms/mechanics/roll-form-values'
 import {
@@ -318,9 +318,18 @@ export const equipmentFormSchema = z.object({
     .optional(),
 })
 
+function economyGroup(ctx?: ContentFormCtx): FormItem {
+  return {
+    kind: 'group',
+    legend: 'Economy',
+    fieldsChrome: { variant: 'panel' },
+    fields: economyFields({ kind: ctx?.equipmentKind }),
+  }
+}
+
 function buildUnscopedEquipmentFields(): FormItem[] {
   return [
-    { kind: 'group', legend: 'Identity', fields: identityFields() },
+    nameField(),
     {
       type: 'select',
       name: 'kind',
@@ -328,23 +337,9 @@ function buildUnscopedEquipmentFields(): FormItem[] {
       options: equipmentKindOptions,
       required: true,
     },
-    {
-      kind: 'group',
-      legend: 'Economy',
-      fields: economyFields(),
-    },
     ...allRegisteredKindFieldGroups(),
-  ]
-}
-
-function identityAndEconomyGroups(ctx: ContentFormCtx): FormItem[] {
-  return [
-    { kind: 'group', legend: 'Identity', fields: identityFields(ctx) },
-    {
-      kind: 'group',
-      legend: 'Economy',
-      fields: economyFields({ kind: ctx.equipmentKind }),
-    },
+    economyGroup(),
+    descriptionField(),
   ]
 }
 
@@ -352,5 +347,5 @@ export function buildEquipmentFields(ctx: ContentFormCtx): FormItem[] {
   if (!ctx.equipmentKind) return buildUnscopedEquipmentFields()
 
   const registered = fieldGroupsForEquipmentKind(ctx.equipmentKind, ctx)
-  return [...identityAndEconomyGroups(ctx), ...(registered ?? [])]
+  return [nameField(), ...(registered ?? []), economyGroup(ctx), descriptionField(ctx)]
 }

@@ -13,7 +13,8 @@ const vehicleCategoryOptions = toOptions(
 export function vehicleFormFieldGroup(): FormItem {
   return {
     kind: 'group',
-    legend: 'Vehicle',
+    legend: '',
+    fieldsChrome: { variant: 'panel' },
     fields: [
       {
         type: 'select',
