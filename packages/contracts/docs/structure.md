@@ -180,6 +180,12 @@ Pattern: `*_ENTRIES` map → derived id tuple → `z.enum` schema →
 
 Entity-specific fields stay on the content schema in `rpg/content/`, not in vocab maps.
 
+Spell resolution (`rpg/content/spell/resolution/`) is an optional envelope on
+`spellBodySchema` — target, method, range, base effects, and outcome applications.
+Vocab for resolution-specific closed sets lives alongside the module; formatters
+return semantic preview strings. Like `effects`, `resolution` is on the read model
+but omitted from `spellPersistedBodySchema` until API persistence lands.
+
 ## Adding a schema
 
 1. Pick the layer (table above).

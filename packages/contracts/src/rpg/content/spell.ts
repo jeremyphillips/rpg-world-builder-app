@@ -18,6 +18,7 @@ import {
 } from './lib/envelope'
 import { classSlugSchema } from './classes/class'
 import { spellAtomicEffectSchema } from './spell/effects'
+import { spellResolutionSchema } from './spell/resolution'
 
 // ---------------------------------------------------------------------------
 // Spell level — 0 (cantrip) through 9. Distinct from `spellLevelSchema` in
@@ -60,15 +61,17 @@ export const spellBodySchema = contentBodyBaseSchema.extend({
   higherLevelSlotEffect: z.string().optional(),
   /** Structured atomic effects; optional until catalog/homebrew authoring lands. */
   effects: z.array(spellAtomicEffectSchema).optional(),
+  /** Structured resolution envelope; optional until resolution authoring persistence lands. */
+  resolution: spellResolutionSchema.optional(),
 })
 
 export type SpellBody = z.infer<typeof spellBodySchema>
 
 /**
  * Spell body fields included in create/update API input today.
- * Effects are intentionally omitted until `spell.effect.persistence` lands.
+ * Effects and resolution are intentionally omitted until persistence lands.
  */
-export const spellPersistedBodySchema = spellBodySchema.omit({ effects: true })
+export const spellPersistedBodySchema = spellBodySchema.omit({ effects: true, resolution: true })
 
 export type SpellPersistedBody = z.infer<typeof spellPersistedBodySchema>
 
@@ -109,6 +112,65 @@ export {
   type SpellProjectileCountEffect,
   type SpellTemporaryHitPointsEffect,
 } from './spell/effects'
+export {
+  formatResolutionDamage,
+  formatResolutionDamageRoll,
+  formatResolutionMethod,
+  formatResolutionOutcomeLine,
+  formatResolutionOutcomes,
+  formatResolutionRange,
+  formatResolutionSummary,
+  formatResolutionSummarySections,
+  formatResolutionTarget,
+  findResolutionDamageEffects,
+  SPELL_RESOLUTION_APPLICATION_AMOUNT_ENTRIES,
+  SPELL_RESOLUTION_APPLICATION_AMOUNTS,
+  SPELL_RESOLUTION_ATTACK_TYPE_ENTRIES,
+  SPELL_RESOLUTION_ATTACK_TYPES,
+  SPELL_RESOLUTION_FIXTURES,
+  SPELL_RESOLUTION_OUTCOME_RESULT_ENTRIES,
+  SPELL_RESOLUTION_OUTCOME_RESULTS,
+  SPELL_RESOLUTION_OUTCOME_RESULTS_BY_METHOD,
+  SPELL_RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID,
+  SPELL_RESOLUTION_RANGE_KIND_ENTRIES,
+  SPELL_RESOLUTION_RANGE_KINDS,
+  SPELL_RESOLUTION_TARGET_KIND_ENTRIES,
+  SPELL_RESOLUTION_TARGET_KINDS,
+  spellResolutionApplicationSchema,
+  spellResolutionDamageEffectSchema,
+  spellResolutionEffectIdSchema,
+  spellResolutionEffectSchema,
+  spellResolutionMethodSchema,
+  spellResolutionOutcomeSchema,
+  spellResolutionRangeSchema,
+  spellResolutionSchema,
+  spellResolutionTargetSchema,
+  spellResolutionValidationMessages,
+  validateSpellResolutionReferences,
+  getSpellResolutionApplicationAmountLabel,
+  getSpellResolutionAttackTypeLabel,
+  getSpellResolutionOutcomeResultLabel,
+  getSpellResolutionRangeKindLabel,
+  getSpellResolutionTargetKindLabel,
+  CHILL_TOUCH_RESOLUTION,
+  ELDRITCH_BLAST_RESOLUTION,
+  INFlict_WOUNDS_RESOLUTION,
+  type SpellResolution,
+  type SpellResolutionApplication,
+  type SpellResolutionApplicationAmount,
+  type SpellResolutionAttackType,
+  type SpellResolutionDamageEffect,
+  type SpellResolutionEffect,
+  type SpellResolutionEffectId,
+  type SpellResolutionMethod,
+  type SpellResolutionOutcome,
+  type SpellResolutionOutcomeResult,
+  type SpellResolutionRange,
+  type SpellResolutionRangeKind,
+  type SpellResolutionSummarySection,
+  type SpellResolutionTarget,
+  type SpellResolutionTargetKind,
+} from './spell/resolution'
 export {
   getSpellAtomicEffectKindLabel,
   HIT_POINTS_TERM,
