@@ -26,6 +26,12 @@
  * warm charcoal (dark). All neutrals carry a whisper of chroma at hue ~60–85
  * so the theme reads warm rather than sterile gray.
  *
+ * Color tokens use two layers in `:root` / `.dark`:
+ * 1. `--palette-*` primitives — oklch source of truth (tune hue/chroma here).
+ *    Neutral, brand (`--palette-primary`), and status (`--palette-info`, …) scales.
+ * 2. Semantic roles (`--background`, `--card`, …) — stable API for components
+ *    and `@theme inline`; map to primitives via `var()`.
+ *
  * Fonts: apps provide the actual font faces. The public app (Next.js) sets
  * `--font-body` via `next/font`; the dashboard (Vite) loads `@fontsource-variable/inter`.
  * `--font-display` is a semantic alias for the same Inter family (weight/size
@@ -247,46 +253,81 @@
 :root {
   --radius: 0.625rem;
 
-  --background: oklch(0.985 0.008 85);
-  --foreground: oklch(0.21 0.012 60);
-  --card: oklch(0.995 0.005 90);
-  --card-foreground: oklch(0.21 0.012 60);
-  --popover: oklch(0.995 0.005 90);
-  --popover-foreground: oklch(0.21 0.012 60);
+  /*
+   * Layer 1 — palette primitives (oklch SSOT). Tune warmth and neutrality here;
+   * semantic roles below stay stable for components and Tailwind.
+   */
+  --palette-neutral-0: oklch(0.995 0.005 90);
+  --palette-neutral-50: oklch(0.985 0.008 85);
+  --palette-neutral-100: oklch(0.95 0.014 85);
+  --palette-neutral-150: oklch(0.945 0.018 85);
+  --palette-neutral-200: oklch(0.93 0.03 80);
+  --palette-neutral-300: oklch(0.9 0.02 80);
+  --palette-neutral-500: oklch(0.5 0.025 70);
+  --palette-neutral-700: oklch(0.28 0.02 60);
+  --palette-neutral-750: oklch(0.28 0.025 60);
+  --palette-neutral-900: oklch(0.21 0.012 60);
+  --palette-neutral-border-selected: oklch(0.95 0.02 80 / 30%);
+  --palette-neutral-overlay: oklch(0.2 0.015 60 / 0.5);
   /* Deep bronze-gold: dark enough to double as AA link text on the parchment
      background (5.4:1) while warm white stays readable on top of it (5.4:1). */
-  --primary: oklch(0.52 0.11 70);
-  --primary-foreground: oklch(0.985 0.005 85);
-  --secondary: oklch(0.945 0.018 85);
-  --secondary-foreground: oklch(0.28 0.02 60);
-  --muted: oklch(0.95 0.014 85);
-  --muted-foreground: oklch(0.5 0.025 70);
-  --accent: oklch(0.93 0.03 80);
-  --accent-foreground: oklch(0.28 0.025 60);
-  --destructive: oklch(0.577 0.245 27.325);
-  --destructive-foreground: oklch(0.985 0 0);
+  --palette-primary: oklch(0.52 0.11 70);
+  --palette-primary-foreground: oklch(0.985 0.005 85);
+  --palette-on-solid: oklch(0.985 0 0);
+  --palette-destructive: oklch(0.577 0.245 27.325);
+  --palette-destructive-muted: oklch(0.577 0.245 27.325 / 70%);
+  --palette-destructive-subtle: oklch(0.577 0.245 27.325 / 50%);
+  --palette-info: oklch(0.52 0.14 250);
+  --palette-info-muted: oklch(0.52 0.14 250 / 70%);
+  --palette-info-subtle: oklch(0.52 0.14 250 / 12%);
+  --palette-success: oklch(0.52 0.14 145);
+  --palette-success-muted: oklch(0.52 0.14 145 / 70%);
+  --palette-success-subtle: oklch(0.52 0.14 145 / 12%);
+  --palette-warning: oklch(0.62 0.14 75);
+  --palette-warning-muted: oklch(0.62 0.14 75 / 70%);
+  --palette-warning-subtle: oklch(0.62 0.14 75 / 14%);
+
+  /*
+   * Layer 2 — semantic color roles (component / Tailwind API).
+   */
+  --background: var(--palette-neutral-50);
+  --foreground: var(--palette-neutral-900);
+  --card: var(--palette-neutral-0);
+  --card-foreground: var(--palette-neutral-900);
+  --popover: var(--palette-neutral-0);
+  --popover-foreground: var(--palette-neutral-900);
+  --primary: var(--palette-primary);
+  --primary-foreground: var(--palette-primary-foreground);
+  --secondary: var(--palette-neutral-150);
+  --secondary-foreground: var(--palette-neutral-700);
+  --muted: var(--palette-neutral-100);
+  --muted-foreground: var(--palette-neutral-500);
+  --accent: var(--palette-neutral-200);
+  --accent-foreground: var(--palette-neutral-750);
+  --destructive: var(--palette-destructive);
+  --destructive-foreground: var(--palette-on-solid);
   /* Error prominence tiers — nav (hidden descendants) and aggregate (parent count). */
-  --destructive-muted: oklch(0.577 0.245 27.325 / 70%);
-  --destructive-subtle: oklch(0.577 0.245 27.325 / 50%);
-  --info: oklch(0.52 0.14 250);
-  --info-foreground: oklch(0.985 0 0);
-  --info-muted: oklch(0.52 0.14 250 / 70%);
-  --info-subtle: oklch(0.52 0.14 250 / 12%);
-  --success: oklch(0.52 0.14 145);
-  --success-foreground: oklch(0.985 0 0);
-  --success-muted: oklch(0.52 0.14 145 / 70%);
-  --success-subtle: oklch(0.52 0.14 145 / 12%);
-  --warning: oklch(0.62 0.14 75);
-  --warning-foreground: oklch(0.21 0.012 60);
-  --warning-muted: oklch(0.62 0.14 75 / 70%);
-  --warning-subtle: oklch(0.62 0.14 75 / 14%);
-  --border: oklch(0.9 0.02 80);
-  --card-selected-border: oklch(0.95 0.02 80 / 30%);
-  --input: oklch(0.9 0.02 80);
-  --ring: oklch(0.52 0.11 70);
-  --overlay: oklch(0.2 0.015 60 / 0.5);
+  --destructive-muted: var(--palette-destructive-muted);
+  --destructive-subtle: var(--palette-destructive-subtle);
+  --info: var(--palette-info);
+  --info-foreground: var(--palette-on-solid);
+  --info-muted: var(--palette-info-muted);
+  --info-subtle: var(--palette-info-subtle);
+  --success: var(--palette-success);
+  --success-foreground: var(--palette-on-solid);
+  --success-muted: var(--palette-success-muted);
+  --success-subtle: var(--palette-success-subtle);
+  --warning: var(--palette-warning);
+  --warning-foreground: var(--palette-neutral-900);
+  --warning-muted: var(--palette-warning-muted);
+  --warning-subtle: var(--palette-warning-subtle);
+  --border: var(--palette-neutral-300);
+  --card-selected-border: var(--palette-neutral-border-selected);
+  --input: var(--palette-neutral-300);
+  --ring: var(--palette-primary);
+  --overlay: var(--palette-neutral-overlay);
   /* Inline semantic text — tuned for base and muted/subtle surfaces (AA on parchment). */
-  --semantic-neutral: oklch(0.5 0.025 70);
+  --semantic-neutral: var(--palette-neutral-500);
   --semantic-informative: oklch(0.48 0.13 250);
   --semantic-informative-muted: oklch(0.42 0.07 250);
   --semantic-positive: oklch(0.48 0.13 145);
@@ -317,42 +358,76 @@
 }
 
 .dark {
-  --background: oklch(0.165 0.01 60);
-  --foreground: oklch(0.96 0.01 85);
-  --card: oklch(0.215 0.012 60);
-  --card-foreground: oklch(0.96 0.01 85);
-  --popover: oklch(0.215 0.012 60);
-  --popover-foreground: oklch(0.96 0.01 85);
-  --primary: oklch(0.78 0.13 75);
-  --primary-foreground: oklch(0.2 0.035 70);
-  --secondary: oklch(0.27 0.015 60);
-  --secondary-foreground: oklch(0.96 0.01 85);
-  --muted: oklch(0.27 0.013 60);
-  --muted-foreground: oklch(0.85 0.025 80);
-  --accent: oklch(0.3 0.025 70);
-  --accent-foreground: oklch(0.96 0.01 85);
-  --destructive: oklch(0.704 0.191 22.216);
-  --destructive-foreground: oklch(0.985 0 0);
-  --destructive-muted: oklch(0.704 0.191 22.216 / 70%);
-  --destructive-subtle: oklch(0.704 0.191 22.216 / 50%);
-  --info: oklch(0.72 0.12 250);
-  --info-foreground: oklch(0.165 0.01 60);
-  --info-muted: oklch(0.72 0.12 250 / 70%);
-  --info-subtle: oklch(0.72 0.12 250 / 14%);
-  --success: oklch(0.72 0.12 145);
-  --success-foreground: oklch(0.165 0.01 60);
-  --success-muted: oklch(0.72 0.12 145 / 70%);
-  --success-subtle: oklch(0.72 0.12 145 / 14%);
-  --warning: oklch(0.78 0.13 75);
-  --warning-foreground: oklch(0.165 0.01 60);
-  --warning-muted: oklch(0.78 0.13 75 / 70%);
-  --warning-subtle: oklch(0.78 0.13 75 / 14%);
-  --border: oklch(0.95 0.02 80 / 12%);
-  --card-selected-border: oklch(0.95 0.02 80 / 30%);
-  --input: oklch(0.95 0.02 80 / 16%);
-  --ring: oklch(0.78 0.13 75);
-  --overlay: oklch(0.05 0.005 60 / 0.7);
-  --semantic-neutral: oklch(0.72 0.02 80);
+  /*
+   * Layer 1 — palette primitives (dark).
+   */
+  --palette-neutral-50: oklch(0.96 0.01 85);
+  --palette-neutral-200: oklch(0.85 0.025 80);
+  --palette-neutral-700: oklch(0.72 0.02 80);
+  --palette-neutral-750: oklch(0.3 0.025 70);
+  --palette-neutral-800: oklch(0.27 0.015 60);
+  --palette-neutral-800-muted: oklch(0.27 0.013 60);
+  --palette-neutral-900: oklch(0.215 0.012 60);
+  --palette-neutral-950: oklch(0.165 0.01 60);
+  --palette-neutral-border-subtle: oklch(0.95 0.02 80 / 12%);
+  --palette-neutral-border-input: oklch(0.95 0.02 80 / 16%);
+  --palette-neutral-border-selected: oklch(0.95 0.02 80 / 30%);
+  --palette-neutral-overlay: oklch(0.05 0.005 60 / 0.7);
+  --palette-catalog-picker-row-surface: oklab(0.27 0.0065 0.0112583 / 0.2);
+  --palette-primary: oklch(0.78 0.13 75);
+  --palette-primary-foreground: oklch(0.2 0.035 70);
+  --palette-destructive: oklch(0.704 0.191 22.216);
+  --palette-destructive-muted: oklch(0.704 0.191 22.216 / 70%);
+  --palette-destructive-subtle: oklch(0.704 0.191 22.216 / 50%);
+  --palette-info: oklch(0.72 0.12 250);
+  --palette-info-muted: oklch(0.72 0.12 250 / 70%);
+  --palette-info-subtle: oklch(0.72 0.12 250 / 14%);
+  --palette-success: oklch(0.72 0.12 145);
+  --palette-success-muted: oklch(0.72 0.12 145 / 70%);
+  --palette-success-subtle: oklch(0.72 0.12 145 / 14%);
+  --palette-warning: oklch(0.78 0.13 75);
+  --palette-warning-muted: oklch(0.78 0.13 75 / 70%);
+  --palette-warning-subtle: oklch(0.78 0.13 75 / 14%);
+
+  /*
+   * Layer 2 — semantic color roles (dark).
+   */
+  --background: var(--palette-neutral-950);
+  --foreground: var(--palette-neutral-50);
+  --card: var(--palette-neutral-900);
+  --card-foreground: var(--palette-neutral-50);
+  --popover: var(--palette-neutral-900);
+  --popover-foreground: var(--palette-neutral-50);
+  --primary: var(--palette-primary);
+  --primary-foreground: var(--palette-primary-foreground);
+  --secondary: var(--palette-neutral-800);
+  --secondary-foreground: var(--palette-neutral-50);
+  --muted: var(--palette-neutral-800-muted);
+  --muted-foreground: var(--palette-neutral-200);
+  --accent: var(--palette-neutral-750);
+  --accent-foreground: var(--palette-neutral-50);
+  --destructive: var(--palette-destructive);
+  --destructive-foreground: var(--palette-on-solid);
+  --destructive-muted: var(--palette-destructive-muted);
+  --destructive-subtle: var(--palette-destructive-subtle);
+  --info: var(--palette-info);
+  --info-foreground: var(--palette-neutral-950);
+  --info-muted: var(--palette-info-muted);
+  --info-subtle: var(--palette-info-subtle);
+  --success: var(--palette-success);
+  --success-foreground: var(--palette-neutral-950);
+  --success-muted: var(--palette-success-muted);
+  --success-subtle: var(--palette-success-subtle);
+  --warning: var(--palette-warning);
+  --warning-foreground: var(--palette-neutral-950);
+  --warning-muted: var(--palette-warning-muted);
+  --warning-subtle: var(--palette-warning-subtle);
+  --border: var(--palette-neutral-border-subtle);
+  --card-selected-border: var(--palette-neutral-border-selected);
+  --input: var(--palette-neutral-border-input);
+  --ring: var(--palette-primary);
+  --overlay: var(--palette-neutral-overlay);
+  --semantic-neutral: var(--palette-neutral-700);
   --semantic-informative: oklch(0.62 0.08 250);
   --semantic-informative-muted: oklch(0.55 0.05 250);
   --semantic-positive: oklch(0.72 0.11 145);
@@ -373,7 +448,7 @@
   --selected-control: var(--foreground);
   --selected-control-foreground: var(--background);
   --selected-control-border: var(--foreground);
-  --catalog-picker-row-surface: oklab(0.27 0.0065 0.0112583 / 0.2);
+  --catalog-picker-row-surface: var(--palette-catalog-picker-row-surface);
   --surface-raised-shadow:
     inset 0 1px 0 0 color-mix(in oklab, var(--foreground) 6%, transparent),
     0 1px 3px 0 color-mix(in oklab, var(--background) 55%, black);
