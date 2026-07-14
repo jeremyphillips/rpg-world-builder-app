@@ -6,8 +6,8 @@ import {
   spellPatchSchema,
   spellSchema,
   updateSpellInputSchema,
-} from './spell'
-import { CHILL_TOUCH_RESOLUTION, ELDRITCH_BLAST_RESOLUTION } from './spell/resolution/fixtures'
+} from './body'
+import { CHILL_TOUCH_RESOLUTION, ELDRITCH_BLAST_RESOLUTION } from './resolution/fixtures'
 
 const timestamps = {
   createdAt: '2026-01-01T00:00:00.000Z',

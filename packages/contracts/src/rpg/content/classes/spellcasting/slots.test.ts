@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { getSlotRow, FULL_CASTER_SLOTS } from '@rpg/contracts'
+import { getSlotRow, FULL_CASTER_SLOTS } from './slots'
 
 describe('getSlotRow', () => {
   it('returns the row for a valid level', () => {

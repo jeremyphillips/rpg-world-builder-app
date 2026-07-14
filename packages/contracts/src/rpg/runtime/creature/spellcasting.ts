@@ -1,5 +1,5 @@
 import type { Spellcasting } from '../../content/classes/spellcasting'
-import { getSlotRow, SLOT_TABLES } from '../../content/spell-slots'
+import { getSlotRow, SLOT_TABLES } from '../../content/classes/spellcasting/slots'
 
 // ---------------------------------------------------------------------------
 // Creature spellcasting primitives — level progression math from class

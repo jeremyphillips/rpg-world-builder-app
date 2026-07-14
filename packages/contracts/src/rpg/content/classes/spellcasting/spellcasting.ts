@@ -1,11 +1,11 @@
 import { z } from 'zod'
 
-import { abilitySchema } from '../../vocab/ability'
-import { absoluteLevelSchema } from '../../primitives/level'
+import { abilitySchema } from '../../../vocab/ability'
+import { absoluteLevelSchema } from '../../../primitives/level'
 import {
   spellcastingFocusGearKindSchema,
   spellcastingGearKindSchema,
-} from '../../vocab/equipment/spellcasting-gear-kind'
+} from '../../../vocab/equipment/spellcasting-gear-kind'
 
 // ---------------------------------------------------------------------------
 // Spellcasting — progressions and preparation modes shared by class records
