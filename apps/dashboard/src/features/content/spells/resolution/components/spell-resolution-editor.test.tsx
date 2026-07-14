@@ -41,6 +41,21 @@ describe('SpellResolutionEditor', () => {
     })
   })
 
+  it('renders grant-style collapsible effect rows with dynamic header summary', async () => {
+    render(
+      <SpellResolutionEditor
+        formCtx={formCtx}
+        defaultResolution={RESOLUTION_FORM_FIXTURES.eldritchBlast}
+      />,
+    )
+
+    await waitFor(() => {
+      expect(screen.getByRole('group', { name: 'Effects' })).toBeInTheDocument()
+      expect(screen.getByText('Inflicts 1d10 Force damage.')).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: /Collapse Effects · Damage/i })).toBeInTheDocument()
+    })
+  })
+
   it('shows chill touch additional behavior in preview', async () => {
     render(
       <SpellResolutionEditor

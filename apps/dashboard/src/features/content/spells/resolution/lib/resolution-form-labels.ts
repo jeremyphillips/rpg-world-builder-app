@@ -15,7 +15,7 @@ import { toOptions, type FieldOption } from '@rpg/ui/form'
 
 export const RESOLUTION_SECTION_LABELS = {
   target: 'Target',
-  check: 'Check',
+  check: 'Resolution method',
   resolution: 'Resolution',
   effects: 'Effects',
   damage: 'Damage',

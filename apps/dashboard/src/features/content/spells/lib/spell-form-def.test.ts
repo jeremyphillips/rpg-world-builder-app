@@ -210,15 +210,12 @@ describe('spellFormDef duration fields', () => {
 })
 
 describe('spellFormDef resolution tab', () => {
-  it('includes persistence banner, preview slot, empty state, and nested resolution groups', () => {
+  it('includes persistence banner, preview slot, empty state, and resolution sections', () => {
     const resolutionTab = spellFormDef.buildTabs!({}).find((tab) => tab.id === 'resolution')
     expect(resolutionTab).toBeDefined()
     expect(resolutionTab?.label).toBe('Resolution')
 
-    const resolutionGroup = findGroup(resolutionTab?.fields ?? [], 'Resolution')
-    expect(resolutionGroup).toBeDefined()
-
-    const names = collectFieldNames(resolutionGroup?.fields ?? [])
+    const names = collectFieldNames(resolutionTab?.fields ?? [])
     expect(names).toContain('_resolutionPersistenceNotice')
     expect(names).toContain('_resolutionHybridNotice')
     expect(names).toContain('_resolutionPreview')
@@ -229,16 +226,17 @@ describe('spellFormDef resolution tab', () => {
     expect(names).toContain('_resolutionMethodSelect')
     expect(names).toContain('resolution.effects')
     expect(names).toContain('_resolutionOutcomesPreview')
-    expect(findGroup(resolutionGroup?.fields ?? [], 'Target')).toBeDefined()
-    expect(findGroup(resolutionGroup?.fields ?? [], 'Check')).toBeDefined()
-    const effectsGroup = findGroup(resolutionGroup?.fields ?? [], 'Effects')
-    expect(effectsGroup).toBeDefined()
-    const effectsArray = effectsGroup?.fields.find(
+    expect(findGroup(resolutionTab?.fields ?? [], 'Target')).toBeDefined()
+    expect(findGroup(resolutionTab?.fields ?? [], 'Resolution method')).toBeDefined()
+    const effectsArray = resolutionTab?.fields.find(
       (field): field is ArrayConfig =>
         'kind' in field && field.kind === 'array' && field.name === 'resolution.effects',
     )
     expect(effectsArray).toBeDefined()
-    expect(findGroup(resolutionGroup?.fields ?? [], 'Outcomes')).toBeDefined()
+    expect(effectsArray?.itemCollapsible).toBe(true)
+    expect(effectsArray?.itemHeader?.primary).toBeTypeOf('function')
+    expect(effectsArray?.itemHeader?.summary).toBeTypeOf('function')
+    expect(findGroup(resolutionTab?.fields ?? [], 'Outcomes')).toBeDefined()
   })
 })
 

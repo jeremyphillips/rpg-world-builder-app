@@ -199,10 +199,8 @@ function configuredResolutionFields(ctx: ContentFormCtx): FormItem[] {
       ],
     },
     {
-      kind: 'group',
-      legend: RESOLUTION_SECTION_LABELS.effects,
+      ...resolutionEffectsArrayField(ctx),
       visibility: configured,
-      fields: [resolutionEffectsArrayField(ctx)],
     },
     {
       kind: 'group',
@@ -223,27 +221,21 @@ function configuredResolutionFields(ctx: ContentFormCtx): FormItem[] {
 export function resolutionFields(ctx: ContentFormCtx): FormItem[] {
   return [
     {
-      kind: 'group',
-      legend: RESOLUTION_SECTION_LABELS.resolution,
-      fields: [
-        {
-          kind: 'slot',
-          name: '_resolutionPersistenceNotice',
-          render: () =>
-            createElement(
-              'p',
-              { className: 'text-sm text-muted-foreground', role: 'status' },
-              RESOLUTION_SECTION_LABELS.notSavedBanner,
-            ),
-        },
-        {
-          kind: 'slot',
-          name: '_resolutionEmptyState',
-          visibility: visibleWhenNoResolution(),
-          render: () => createElement(SpellResolutionEmptyState),
-        },
-        ...configuredResolutionFields(ctx),
-      ],
+      kind: 'slot',
+      name: '_resolutionPersistenceNotice',
+      render: () =>
+        createElement(
+          'p',
+          { className: 'text-sm text-muted-foreground', role: 'status' },
+          RESOLUTION_SECTION_LABELS.notSavedBanner,
+        ),
     },
+    {
+      kind: 'slot',
+      name: '_resolutionEmptyState',
+      visibility: visibleWhenNoResolution(),
+      render: () => createElement(SpellResolutionEmptyState),
+    },
+    ...configuredResolutionFields(ctx),
   ]
 }
