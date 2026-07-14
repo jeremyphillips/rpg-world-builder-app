@@ -777,6 +777,9 @@ export interface ArrayConfig {
   /** When true, hides the default array add control (use an external slot instead). */
   hideAddControl?: boolean
 
+  /** When true, hides per-item remove controls (use a custom slot instead). */
+  hideItemRemove?: boolean
+
   /** Searchable template menu for the add control; replaces the plain add button when set. */
   addMenu?: {
     groups: { id: string; label: string }[]

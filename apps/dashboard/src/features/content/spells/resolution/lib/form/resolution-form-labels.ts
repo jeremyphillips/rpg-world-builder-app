@@ -32,8 +32,20 @@ export const RESOLUTION_SECTION_LABELS = {
   hybridNoticeBody:
     'Projectile or beam scaling is still on legacy root effects. Use Application pattern → Projectiles on this tab when you can, or edit root effects on the read model until catalog consolidation completes.',
   outcomesIncomplete: 'Complete target, method, and effects to preview generated outcomes.',
+  outcomesHint:
+    'Choose which authored effects apply to each resolution branch and add optional prose.',
+  outcomeEmptySummary: 'No modeled effect',
+  configureMissOutcome: 'Configure miss outcome',
+  addOutcomeApplication: 'Add effect application',
+  primaryOutcomeEmptyWarning:
+    'The primary outcome for this resolution method has no modeled effects or additional behavior.',
   hitNote: 'Additional behavior',
 } as const
+
+export const RESOLUTION_OUTCOME_AMOUNT_OPTIONS = [
+  { value: 'full', label: 'Full' },
+  { value: 'half', label: 'Half' },
+] as const
 
 export const RESOLUTION_FIELD_LABELS = {
   target: '',

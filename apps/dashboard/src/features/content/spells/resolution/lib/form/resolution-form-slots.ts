@@ -9,7 +9,7 @@ import { SpellResolutionProjectilesPreview } from '../../components/method/spell
 import { SpellResolutionChangeNotice } from '../../components/notices/spell-resolution-change-notice.client'
 import { SpellResolutionHybridNotice } from '../../components/notices/spell-resolution-hybrid-notice.client'
 import { ResolutionChangeConfirmDialog } from '../../components/notices/resolution-change-confirm-dialog.client'
-import { SpellResolutionOutcomesPreview } from '../../components/preview/spell-resolution-outcomes-preview.client'
+import { SpellResolutionOutcomes } from '../../components/outcomes/spell-resolution-outcomes.client'
 import { SpellResolutionPreview } from '../../components/preview/spell-resolution-preview.client'
 import { SpellResolutionProximitySelect } from '../../components/target/spell-resolution-proximity-select.client'
 import { formatEffectRowPrimary } from '../../../lib/effects/effect-display'
@@ -44,6 +44,7 @@ function resolutionEffectsArrayField(ctx: ContentFormCtx): FormItem {
     legend: RESOLUTION_SECTION_LABELS.effects,
     addLabel: 'Add effect',
     hideAddControl: true,
+    hideItemRemove: true,
     itemCollapsible: true,
     itemHeader: {
       fallback: (index) => `Effect ${index + 1}`,
@@ -131,12 +132,6 @@ export function configuredResolutionFields(ctx: ContentFormCtx): FormItem[] {
       render: () => createElement(SpellResolutionHybridNotice),
     },
     {
-      kind: 'slot',
-      name: '_resolutionPreview',
-      visibility: configured,
-      render: () => createElement(SpellResolutionPreview),
-    },
-    {
       kind: 'group',
       legend: RESOLUTION_SECTION_LABELS.target,
       visibility: configured,
@@ -185,10 +180,16 @@ export function configuredResolutionFields(ctx: ContentFormCtx): FormItem[] {
       fields: [
         {
           kind: 'slot',
-          name: '_resolutionOutcomesPreview',
-          render: () => createElement(SpellResolutionOutcomesPreview),
+          name: '_resolutionOutcomes',
+          render: () => createElement(SpellResolutionOutcomes),
         },
       ],
+    },
+    {
+      kind: 'slot',
+      name: '_resolutionPreview',
+      visibility: configured,
+      render: () => createElement(SpellResolutionPreview),
     },
   ]
 }

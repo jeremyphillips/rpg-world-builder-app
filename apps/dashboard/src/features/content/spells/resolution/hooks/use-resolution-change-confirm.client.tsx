@@ -6,13 +6,23 @@ import { useFormContext } from 'react-hook-form'
 
 import {
   buildIncompatibleSelectionClearPatch,
+  outcomeApplicationsReferenceEffect,
   planResolutionChange,
   resolutionChangeRequiresConfirm,
+  type ResolutionChangePlan,
   type ResolutionChangeRequest,
+  type ResolutionOutcomeRef,
 } from '@rpg/contracts'
 
 import { createDefaultProjectilesFormFields } from '../lib/application-pattern/resolution-application-pattern.lib'
-import type { ResolutionFormValues } from '../lib/form/resolution-form-schema'
+import type {
+  ResolutionFormValues,
+  ResolutionOutcomeFormItem,
+} from '../lib/form/resolution-form-schema'
+import {
+  hydrateOutcomeFormSlots,
+  resolutionMethodFromForm,
+} from '../lib/form/resolution-outcome-slots.lib'
 import { RESOLUTION_FIELD_NAME } from '../lib/form/resolution-form-values'
 import { resolutionFormToSelectionContext } from '../lib/selection/resolution-selection-context.lib'
 
@@ -59,6 +69,49 @@ function mergeResolutionPatch(
   return toResolutionFormPatch(
     enrichAppliedPatch(resolution, change, Object.assign({}, ...patches)),
   )
+}
+
+function mapOutcomeRefsToForm(
+  outcomes: readonly ResolutionOutcomeRef[],
+): ResolutionOutcomeFormItem[] {
+  return outcomes.map((outcome) => ({
+    result: outcome.result,
+    ...(outcome.note ? { note: outcome.note } : {}),
+    applications: outcome.applications.map((application) => ({
+      effectId: application.effectId,
+      amount: application.amount as ResolutionOutcomeFormItem['applications'][number]['amount'],
+    })),
+  }))
+}
+
+function applyOutcomePlanPatch(
+  resolution: ResolutionFormValues,
+  plan: ResolutionChangePlan,
+): Partial<ResolutionFormValues> {
+  if (!plan.outcomePatch) return {}
+
+  const method = resolutionMethodFromForm({
+    ...resolution,
+    ...plan.requestedPatch,
+    ...plan.cleanupPatch,
+  } as ResolutionFormValues)
+  const mapped = mapOutcomeRefsToForm(plan.outcomePatch.outcomes)
+  if (!method) {
+    return { outcomes: mapped }
+  }
+
+  return {
+    outcomes: hydrateOutcomeFormSlots(method, mapped),
+  }
+}
+
+function removeEffectPatch(
+  resolution: ResolutionFormValues,
+  effectId: string,
+): Partial<ResolutionFormValues> {
+  return {
+    effects: resolution.effects.filter((effect) => effect.id !== effectId),
+  }
 }
 
 type ResolutionChangeListener = () => void
@@ -127,12 +180,33 @@ function createController(
       const before = resolutionFormToSelectionContext(resolution)
       if (!before || !resolution) return
 
+      if (change.field === 'removeEffect') {
+        const effect = resolution.effects.find((entry) => entry.id === change.effectId)
+        if (!effect) return
+
+        if (!outcomeApplicationsReferenceEffect(resolution.outcomes, change.effectId)) {
+          applyPatch(removeEffectPatch(resolution, change.effectId))
+          return
+        }
+      }
+
       const plan = planResolutionChange(before, change)
       if (!resolutionChangeRequiresConfirm(plan)) {
         applyPatch(
           mergeResolutionPatch(resolution, change, {
             ...plan.requestedPatch,
             ...plan.cleanupPatch,
+            ...applyOutcomePlanPatch(
+              {
+                ...resolution,
+                ...plan.requestedPatch,
+                ...plan.cleanupPatch,
+              } as ResolutionFormValues,
+              plan,
+            ),
+            ...(change.field === 'removeEffect'
+              ? removeEffectPatch(resolution, change.effectId)
+              : {}),
           }),
         )
         return
@@ -153,19 +227,29 @@ function createController(
       }
 
       const plan = planResolutionChange(before, pending.change)
+      const pendingChange = pending.change
       const incompatibleClear = buildIncompatibleSelectionClearPatch(plan.incompatibleSelections)
+      const mergedResolution = {
+        ...resolution,
+        ...plan.requestedPatch,
+        ...plan.cleanupPatch,
+        ...incompatibleClear,
+      } as ResolutionFormValues
       const nextEffects =
-        plan.effectsToRemove.length > 0
-          ? resolution.effects.filter(
-              (effect) => !plan.effectsToRemove.some((removed) => removed.id === effect.id),
+        plan.effectsToRemove.length > 0 || pendingChange.field === 'removeEffect'
+          ? mergedResolution.effects.filter(
+              (effect) =>
+                !plan.effectsToRemove.some((removed) => removed.id === effect.id) &&
+                !(pendingChange.field === 'removeEffect' && effect.id === pendingChange.effectId),
             )
-          : resolution.effects
+          : mergedResolution.effects
 
       applyPatch(
         mergeResolutionPatch(resolution, pending.change, {
           ...plan.requestedPatch,
           ...plan.cleanupPatch,
           ...incompatibleClear,
+          ...applyOutcomePlanPatch(mergedResolution, plan),
           effects: nextEffects,
         }),
       )

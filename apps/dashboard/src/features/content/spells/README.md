@@ -46,7 +46,7 @@ parallel boolean flag.
 | Form shape       | `ResolutionFormValues` with `effects[]` array + optional stored `outcomes[]` via `resolution-form-schema.ts`    |
 | Effects editor   | Searchable 3-template add menu (`damage`, `healing`, `temporary-hit-points`) mirroring root `effectArrayFields` |
 | Automatic method | Tier D healing/temp-HP seeds use `method: automatic` with `applied` outcomes                                    |
-| Outcomes         | Read-only preview of stored or synthesized outcomes (`SpellResolutionOutcomesPreview`)                          |
+| Outcomes         | Interactive method-derived outcome groups (`SpellResolutionOutcomes`)                                           |
 | Save             | **Disabled** — banner: "Resolution is not saved yet."                                                           |
 | Legacy effects   | Flat `effects[]` on the read model for catalog detail; Resolution tab reads `resolution.effects[]` only         |
 | Target proximity | `resolution.target.proximity` (touch / reach / distance) — separate from Check method                           |

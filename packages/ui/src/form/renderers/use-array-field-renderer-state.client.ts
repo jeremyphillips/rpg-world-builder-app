@@ -85,7 +85,7 @@ export function useArrayFieldRendererState({
     getItemValues,
   })
 
-  const canRemove = fields.length > min
+  const canRemove = !config.hideItemRemove && fields.length > min
   const canAdd = max === undefined || fields.length < max
   const invalidRowCount = validation.hasAttemptedSubmit
     ? countInvalidArrayItems(validation.issues, fullName)

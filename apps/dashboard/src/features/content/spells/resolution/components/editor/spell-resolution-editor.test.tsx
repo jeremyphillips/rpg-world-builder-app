@@ -59,7 +59,7 @@ describe('SpellResolutionEditor', () => {
     })
   })
 
-  it('shows chill touch additional behavior in preview', async () => {
+  it('shows chill touch additional behavior in outcomes editor', async () => {
     render(
       <SpellResolutionEditor
         formCtx={formCtx}
@@ -68,7 +68,7 @@ describe('SpellResolutionEditor', () => {
     )
 
     await waitFor(() => {
-      expect(screen.getAllByText(/can't regain Hit Points/i).length).toBeGreaterThan(0)
+      expect(screen.getByDisplayValue(/can't regain Hit Points/i)).toBeInTheDocument()
     })
   })
 
@@ -85,7 +85,7 @@ describe('SpellResolutionEditor', () => {
     })
   })
 
-  it('renders read-only outcomes preview for inflict wounds fixture', async () => {
+  it('renders interactive outcomes for inflict wounds fixture', async () => {
     render(
       <SpellResolutionEditor
         formCtx={formCtx}
@@ -95,7 +95,8 @@ describe('SpellResolutionEditor', () => {
 
     await waitFor(() => {
       expect(screen.getAllByText(RESOLUTION_SECTION_LABELS.outcomes).length).toBeGreaterThan(0)
-      expect(screen.getAllByText(/Failed save/i).length).toBeGreaterThan(0)
+      expect(screen.getByRole('heading', { name: 'On failed save' })).toBeInTheDocument()
+      expect(screen.getByRole('heading', { name: 'On successful save' })).toBeInTheDocument()
     })
   })
 

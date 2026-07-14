@@ -20,6 +20,12 @@ export {
   type ErrorPlacement,
 } from './context/array-item-presentation.context'
 export {
+  ArrayFieldContext,
+  useArrayFieldContext,
+  type ArrayFieldContextValue,
+  type FilterSelectOptionsContext,
+} from './context/array-field.context'
+export {
   FormUiContext,
   FormUiProvider,
   useFormUiContext,

@@ -226,7 +226,7 @@ describe('spellFormDef resolution tab', () => {
     expect(names).toContain('_resolutionHowItResolves')
     expect(names).toContain('resolution.effects')
     expect(names).toContain('_resolutionEffectsApplicationLabel')
-    expect(names).toContain('_resolutionOutcomesPreview')
+    expect(names).toContain('_resolutionOutcomes')
     expect(findGroup(resolutionTab?.fields ?? [], 'Target')).toBeDefined()
     expect(findGroup(resolutionTab?.fields ?? [], 'How it resolves')).toBeDefined()
     const effectsArray = resolutionTab?.fields.find(

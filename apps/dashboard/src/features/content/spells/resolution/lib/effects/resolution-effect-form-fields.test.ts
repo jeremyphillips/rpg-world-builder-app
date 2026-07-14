@@ -23,7 +23,18 @@ describe('resolutionFields effects array', () => {
   it('hides the generic add control in favor of the resolution-specific add slot', () => {
     const arrayField = findResolutionEffectsArray(resolutionFields({}))
     expect(arrayField?.hideAddControl).toBe(true)
+    expect(arrayField?.hideItemRemove).toBe(true)
     expect(arrayField?.addMenu).toBeUndefined()
+  })
+
+  it('includes a custom remove slot for each effect row', () => {
+    const itemFields = findResolutionEffectsArray(resolutionFields({}))?.fields ?? []
+    expect(
+      itemFields.find(
+        (field) =>
+          'kind' in field && field.kind === 'slot' && field.name === '_resolutionEffectRemove',
+      ),
+    ).toBeDefined()
   })
 
   it('does not expose a kind selector; kind is fixed at add time via templates', () => {
