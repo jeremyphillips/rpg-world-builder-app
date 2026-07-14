@@ -84,7 +84,7 @@ const COMMON_SCHEMA_EXEMPT = [
 
 const EQUIPMENT_SCHEMA_EXEMPT = [...COMMON_SCHEMA_EXEMPT, ...EQUIPMENT_KIND_EXEMPT] as const
 
-/** Legacy flat effects tab removed; resolution method/note wired via slots. */
+/** Legacy flat effects tab removed; resolution method/note/outcomes wired via slots. */
 const SPELLS_SCHEMA_EXEMPT = [
   ...COMMON_SCHEMA_EXEMPT,
   /^effects\b/,
@@ -92,6 +92,7 @@ const SPELLS_SCHEMA_EXEMPT = [
   'resolution.attackType',
   'resolution.saveAbility',
   'resolution.hitNote',
+  /^resolution\.outcomes\b/,
 ] as const
 
 describe.each(registryEntries)('ContentFormDef[%s] validation', (routeKey, def) => {

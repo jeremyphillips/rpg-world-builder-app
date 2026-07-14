@@ -10,6 +10,7 @@ import {
   RESOLUTION_NOT_SAVED_BANNER,
   SpellResolutionEditor,
 } from '../components/spell-resolution-editor.client'
+import { RESOLUTION_SECTION_LABELS } from '../lib/resolution-form-labels'
 import { RESOLUTION_FORM_FIXTURES } from '../lib/resolution-fixtures'
 
 const formCtx = makeContentFormCtx({
@@ -66,7 +67,7 @@ describe('SpellResolutionEditor', () => {
     })
   })
 
-  it('does not render Outcomes editing for configured resolution', async () => {
+  it('renders read-only outcomes preview for inflict wounds fixture', async () => {
     render(
       <SpellResolutionEditor
         formCtx={formCtx}
@@ -75,8 +76,8 @@ describe('SpellResolutionEditor', () => {
     )
 
     await waitFor(() => {
-      expect(screen.getAllByText('Effects').length).toBeGreaterThan(0)
-      expect(screen.queryByText('Outcomes are generated')).not.toBeInTheDocument()
+      expect(screen.getAllByText(RESOLUTION_SECTION_LABELS.outcomes).length).toBeGreaterThan(0)
+      expect(screen.getAllByText(/Failed save/i).length).toBeGreaterThan(0)
     })
   })
 

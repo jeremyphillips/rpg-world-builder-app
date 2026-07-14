@@ -3,7 +3,9 @@ import { z } from 'zod'
 import {
   abilitySchema,
   damageTypeIdSchema,
+  SPELL_RESOLUTION_APPLICATION_AMOUNTS,
   SPELL_RESOLUTION_ATTACK_TYPES,
+  SPELL_RESOLUTION_OUTCOME_RESULTS,
   SPELL_RESOLUTION_PROXIMITY_KINDS,
   SPELL_RESOLUTION_TARGET_KINDS,
 } from '@rpg/contracts'
@@ -11,9 +13,53 @@ import {
 import { rollFormObjectSchema } from '../../../lib/forms/mechanics/roll-form-values'
 import { resolutionFormValidationMessages } from './resolution-form-messages'
 
-export const RESOLUTION_METHOD_KINDS = ['attack', 'saving-throw'] as const
+export const RESOLUTION_METHOD_KINDS = ['attack', 'saving-throw', 'automatic'] as const
 
 export type ResolutionMethodKind = (typeof RESOLUTION_METHOD_KINDS)[number]
+
+const resolutionDamageEffectFormSchema = z.object({
+  id: z.string().min(1),
+  kind: z.literal('damage'),
+  roll: rollFormObjectSchema,
+  damageType: damageTypeIdSchema,
+})
+
+const resolutionHealingEffectFormSchema = z.object({
+  id: z.string().min(1),
+  kind: z.literal('healing'),
+  roll: rollFormObjectSchema,
+})
+
+const resolutionTemporaryHitPointsEffectFormSchema = z.object({
+  id: z.string().min(1),
+  kind: z.literal('temporary-hit-points'),
+  roll: rollFormObjectSchema,
+})
+
+export const resolutionEffectFormItemSchema = z.discriminatedUnion('kind', [
+  resolutionDamageEffectFormSchema,
+  resolutionHealingEffectFormSchema,
+  resolutionTemporaryHitPointsEffectFormSchema,
+])
+
+export type ResolutionEffectFormItem = z.infer<typeof resolutionEffectFormItemSchema>
+
+export const resolutionOutcomeApplicationFormSchema = z.object({
+  effectId: z.string().min(1),
+  amount: z.enum(SPELL_RESOLUTION_APPLICATION_AMOUNTS),
+})
+
+export type ResolutionOutcomeApplicationFormItem = z.infer<
+  typeof resolutionOutcomeApplicationFormSchema
+>
+
+export const resolutionOutcomeFormItemSchema = z.object({
+  result: z.enum(SPELL_RESOLUTION_OUTCOME_RESULTS),
+  note: z.string().optional(),
+  applications: z.array(resolutionOutcomeApplicationFormSchema).default([]),
+})
+
+export type ResolutionOutcomeFormItem = z.infer<typeof resolutionOutcomeFormItemSchema>
 
 export const resolutionFormSchema = z
   .object({
@@ -25,8 +71,8 @@ export const resolutionFormSchema = z
     methodKind: z.enum(RESOLUTION_METHOD_KINDS),
     attackType: z.enum(SPELL_RESOLUTION_ATTACK_TYPES).optional(),
     saveAbility: abilitySchema.optional(),
-    damageRoll: rollFormObjectSchema,
-    damageType: damageTypeIdSchema.optional(),
+    effects: z.array(resolutionEffectFormItemSchema).min(1),
+    outcomes: z.array(resolutionOutcomeFormItemSchema).optional(),
     hitNote: z.string().optional(),
   })
   .superRefine((values, ctx) => {

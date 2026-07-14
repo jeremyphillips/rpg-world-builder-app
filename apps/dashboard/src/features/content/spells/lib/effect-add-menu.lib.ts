@@ -1,5 +1,6 @@
 import type { WeightedSearchField } from '@rpg/ui'
 import type { ArrayConfig } from '@rpg/ui/form'
+import type { SpellAtomicEffectKind } from '@rpg/contracts'
 
 import {
   EFFECT_TEMPLATE_GROUPS,
@@ -28,8 +29,10 @@ function buildTemplateSearchTerms(template: EffectTemplate): WeightedSearchField
 }
 
 /** Builds the searchable effect template add menu for spell atomic effects. */
-export function buildEffectArrayAddMenu(): EffectArrayAddMenuConfig {
-  const templates = getEffectTemplatesForKinds()
+export function buildEffectArrayAddMenu(
+  kinds?: readonly SpellAtomicEffectKind[],
+): EffectArrayAddMenuConfig {
+  const templates = getEffectTemplatesForKinds(kinds)
   const groupIds = new Set(templates.map((template) => template.groupId))
 
   return {

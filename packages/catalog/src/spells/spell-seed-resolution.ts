@@ -17,8 +17,10 @@
  * in tests and `SRD_521_SPELL_SEED_RESOLUTION_SLUGS` for slugs the apply script writes.
  */
 import {
+  ARCANE_HAND_RESOLUTION,
   CHILL_TOUCH_RESOLUTION,
   ELDRITCH_BLAST_RESOLUTION,
+  ICE_KNIFE_RESOLUTION,
   INFlict_WOUNDS_RESOLUTION,
   spellResolutionSchema,
   type Spell,
@@ -91,9 +93,9 @@ export const SRD_521_SPELL_SEED_RESOLUTION = {
   hex: { kind: 'defer', reason: 'extra-damage-rider' },
   'hunters-mark': { kind: 'defer', reason: 'extra-damage-rider' },
 
-  // Tier C — multi-damage / choice-model deferrals
-  'ice-knife': { kind: 'defer', reason: 'multi-effect' },
-  'arcane-hand': { kind: 'defer', reason: 'choice-model' },
+  // Tier C — multi-damage spells
+  'ice-knife': { kind: 'full', resolution: ICE_KNIFE_RESOLUTION },
+  'arcane-hand': { kind: 'full', resolution: ARCANE_HAND_RESOLUTION },
 
   // Tier D — healing / temporary hit points
   'cure-wounds': {

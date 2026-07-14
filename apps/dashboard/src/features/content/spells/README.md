@@ -41,24 +41,24 @@ The **Resolution** tab authors an optional `resolution` envelope matching
 `resolution` object — enable via **Add resolution** when absent — with no
 parallel boolean flag.
 
-| Concern          | Behavior                                                                                                |
-| ---------------- | ------------------------------------------------------------------------------------------------------- |
-| Form shape       | Flattened `ResolutionFormValues` via `resolution-form-schema.ts`                                        |
-| Normalization    | `resolutionToStored` in `resolution-form-values.ts`                                                     |
-| Preview          | `SpellResolutionPreview` + `@rpg/contracts` resolution formatters                                       |
-| Attack preset    | Melee/ranged method + `hit` / full damage + optional additional behavior                                |
-| Save preset      | Saving throw + failed/full + successful/half from one damage entry                                      |
-| Save             | **Disabled** — banner: "Resolution is not saved yet."                                                   |
-| Legacy effects   | Flat `effects[]` on the read model for catalog detail; Resolution tab reads `resolution.effects[]` only |
-| Target proximity | `resolution.target.proximity` (touch / reach / distance) — separate from Check method                   |
+| Concern          | Behavior                                                                                                        |
+| ---------------- | --------------------------------------------------------------------------------------------------------------- |
+| Form shape       | `ResolutionFormValues` with `effects[]` array + optional stored `outcomes[]` via `resolution-form-schema.ts`    |
+| Effects editor   | Searchable 3-template add menu (`damage`, `healing`, `temporary-hit-points`) mirroring root `effectArrayFields` |
+| Automatic method | Tier D healing/temp-HP seeds use `method: automatic` with `applied` outcomes                                    |
+| Outcomes         | Read-only preview of stored or synthesized outcomes (`SpellResolutionOutcomesPreview`)                          |
+| Save             | **Disabled** — banner: "Resolution is not saved yet."                                                           |
+| Legacy effects   | Flat `effects[]` on the read model for catalog detail; Resolution tab reads `resolution.effects[]` only         |
+| Target proximity | `resolution.target.proximity` (touch / reach / distance) — separate from Check method                           |
 
 Modules live under [`resolution/`](resolution/) (`resolution-form-fields.ts`,
 `resolution-form-values.ts`, `components/spell-resolution-*.client.tsx`).
 
 Catalog seeds ship optional `resolution` on the read model via
-`packages/catalog/src/spells/spell-seed-resolution.ts` (18 applicable slugs in SRD 5.2.1:
-13 Tier A damage spells, Eldritch Blast hybrid, and 4 Tier D healing/temporary-HP spells).
-Six effect spells remain explicitly deferred in the manifest with documented reason codes.
+`packages/catalog/src/spells/spell-seed-resolution.ts` (20 applicable slugs in SRD 5.2.1:
+13 Tier A damage spells, Eldritch Blast hybrid, 4 Tier D healing/temporary-HP spells,
+Ice Knife and Arcane Hand multi-effect). Four effect spells remain explicitly deferred
+in the manifest with documented reason codes.
 Apply with `pnpm exec tsx packages/catalog/scripts/apply-spell-seed-resolution.mjs`.
 Flat `effects[]` remain on migrated spells until consolidation.
 
@@ -92,9 +92,11 @@ are unchanged for detail rendering and future `spell.effect.persistence`.
 
 **Dual-model spells (Tier A + hybrid):** Migrated catalog spells carry both root
 `effects[]` (legacy flat model) and `resolution` (envelope). The Resolution tab
-shows envelope damage only. Eldritch Blast is hybrid: resolution models one beam;
-beam scaling stays in root `effects[]`. Manifest-deferred spells (e.g. Hex) render
-the empty state until resolution modeling lands.
+authors `resolution.effects[]` via the add menu. Eldritch Blast is hybrid: resolution
+models one beam; beam scaling stays in root `effects[]` (see hybrid notice in the tab).
+Projectile-count is not in the resolution add menu yet — it remains on root `effects[]`
+for hybrid spells. Manifest-deferred spells (e.g. Hex) render the empty state until
+resolution modeling lands.
 
 ### Scaling prose fields
 

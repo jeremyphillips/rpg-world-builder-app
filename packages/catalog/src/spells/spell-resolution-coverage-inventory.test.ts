@@ -20,17 +20,30 @@ describe('spell resolution coverage inventory (srd-cc-5.2.1)', () => {
   })
 
   it('reports 17 migrated single-effect resolution spells', () => {
-    const tierA = SRD_521_SPELL_SEED_RESOLUTION_SLUGS.filter((slug) => slug !== 'eldritch-blast')
+    const tierA = SRD_521_SPELL_SEED_RESOLUTION_SLUGS.filter(
+      (slug) => slug !== 'eldritch-blast' && slug !== 'ice-knife' && slug !== 'arcane-hand',
+    )
     expect(inventory.byStatus.migrated.sort()).toEqual([...tierA].sort())
     expect(inventory.byStatus.migrated).toHaveLength(17)
   })
 
-  it('reports Eldritch Blast as hybrid', () => {
-    expect(inventory.byStatus.hybrid).toEqual(['eldritch-blast'])
+  it('reports Eldritch Blast, Ice Knife, and Arcane Hand as hybrid', () => {
+    expect(inventory.byStatus.hybrid.sort()).toEqual(
+      ['arcane-hand', 'eldritch-blast', 'ice-knife'].sort(),
+    )
   })
 
-  it('reports six deferred effect spells and 68 prose-only spells', () => {
-    expect(inventory.byStatus.deferred).toHaveLength(6)
+  it('reports ice-knife and arcane-hand with multi-effect resolution envelopes', () => {
+    const iceKnife = inventory.entries.find((entry) => entry.slug === 'ice-knife')
+    const arcaneHand = inventory.entries.find((entry) => entry.slug === 'arcane-hand')
+    expect(iceKnife?.hasResolution).toBe(true)
+    expect(arcaneHand?.hasResolution).toBe(true)
+    expect(iceKnife?.effectCount).toBe(2)
+    expect(arcaneHand?.effectCount).toBe(2)
+  })
+
+  it('reports four deferred effect spells and 68 prose-only spells', () => {
+    expect(inventory.byStatus.deferred).toHaveLength(4)
     expect(inventory.byStatus['prose-only']).toHaveLength(68)
 
     const deferredFromEffects = SRD_521_SPELL_SEED_EFFECT_SLUGS.filter(
@@ -38,16 +51,16 @@ describe('spell resolution coverage inventory (srd-cc-5.2.1)', () => {
     )
     expect(inventory.byStatus.deferred.sort()).toEqual(deferredFromEffects.sort())
     expect(spellSlugsDeferredResolution(inventory).sort()).toEqual(
-      [...deferredFromEffects, 'eldritch-blast'].sort(),
+      [...deferredFromEffects, 'eldritch-blast', 'ice-knife', 'arcane-hand'].sort(),
     )
   })
 
   it('groups manifest deferrals by documented reason codes', () => {
     expect(inventory.byDeferReason['automatic-method']).toEqual(['magic-missile'])
     expect(inventory.byDeferReason['extra-damage-rider']?.sort()).toEqual(['hex', 'hunters-mark'])
-    expect(inventory.byDeferReason['multi-effect']).toEqual(['ice-knife'])
-    expect(inventory.byDeferReason['choice-model']).toEqual(['arcane-hand'])
     expect(inventory.byDeferReason['placeholder-damage']).toEqual(['true-strike'])
+    expect(inventory.byDeferReason['multi-effect']).toBeUndefined()
+    expect(inventory.byDeferReason['choice-model']).toBeUndefined()
 
     for (const slug of SRD_521_SPELL_SEED_RESOLUTION_DEFERRED_SLUGS) {
       const entry = inventory.entries.find((item) => item.slug === slug)

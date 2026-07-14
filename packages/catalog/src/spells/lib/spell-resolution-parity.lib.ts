@@ -1,8 +1,8 @@
 /**
  * Primary-effect parity checks for resolution catalog seeds.
  *
- * Compares `spell.resolution.effects[0]` against the primary unlabeled entry in
- * root `effects[]` (roll, damage type, or kind). Consumed by catalog tests to
+ * Compares each `spell.resolution.effects[]` entry against a matching root
+ * `effects[]` row (roll, damage type, or kind). Consumed by catalog tests to
  * catch manifest/apply drift without hand-maintaining per-spell assertions.
  *
  * Temporary migration guardrail — intended for seed validation, not runtime use.
@@ -16,12 +16,6 @@ export type ResolutionEffectParityIssue = {
   message: string
 }
 
-type ParityPair = {
-  slug: string
-  atomic: SpellAtomicEffect
-  resolutionEffect: SpellResolutionEffect
-}
-
 function issue(slug: string, message: string): ResolutionEffectParityIssue {
   return { slug, message }
 }
@@ -30,44 +24,64 @@ function rollsMatch(left: unknown, right: unknown): boolean {
   return JSON.stringify(left) === JSON.stringify(right)
 }
 
-function parityPair(spell: Spell): ParityPair | undefined {
-  const atomic = findPrimaryResolutionEffect(spell.effects)
-  const resolutionEffect = spell.resolution?.effects[0]
-  if (!spell.resolution || !atomic || !resolutionEffect) return undefined
-  return { slug: spell.slug, atomic, resolutionEffect }
+function atomicEffectsMatchResolution(
+  atomic: SpellAtomicEffect,
+  resolutionEffect: SpellResolutionEffect,
+): boolean {
+  if (atomic.kind !== resolutionEffect.kind) return false
+
+  if (!rollsMatch(atomic.roll, resolutionEffect.roll)) return false
+
+  if (atomic.kind === 'damage' && resolutionEffect.kind === 'damage') {
+    return atomic.damageType === resolutionEffect.damageType
+  }
+
+  return true
 }
 
-function compareDamageParity({
-  slug,
-  atomic,
-  resolutionEffect,
-}: ParityPair): ResolutionEffectParityIssue[] {
+function findMatchingAtomicEffect(
+  atomicEffects: readonly SpellAtomicEffect[] | null | undefined,
+  resolutionEffect: SpellResolutionEffect,
+): SpellAtomicEffect | undefined {
+  if (!atomicEffects?.length) return undefined
+
+  return atomicEffects.find((atomic) => atomicEffectsMatchResolution(atomic, resolutionEffect))
+}
+
+function compareDamageParity(
+  slug: string,
+  atomic: SpellAtomicEffect,
+  resolutionEffect: SpellResolutionEffect,
+): ResolutionEffectParityIssue[] {
   if (atomic.kind !== 'damage' || resolutionEffect.kind !== 'damage') return []
 
   const issues: ResolutionEffectParityIssue[] = []
   if (!rollsMatch(atomic.roll, resolutionEffect.roll)) {
-    issues.push(issue(slug, 'Resolution damage roll diverges from primary atomic damage roll.'))
+    issues.push(issue(slug, 'Resolution damage roll diverges from matching atomic damage roll.'))
   }
   if (atomic.damageType !== resolutionEffect.damageType) {
-    issues.push(issue(slug, 'Resolution damage type diverges from primary atomic damage type.'))
+    issues.push(issue(slug, 'Resolution damage type diverges from matching atomic damage type.'))
   }
   return issues
 }
 
 function compareRollOnlyParity(
-  pair: ParityPair,
+  slug: string,
+  atomic: SpellAtomicEffect,
+  resolutionEffect: SpellResolutionEffect,
   kind: 'healing' | 'temporary-hit-points',
 ): ResolutionEffectParityIssue[] {
-  const { slug, atomic, resolutionEffect } = pair
   if (atomic.kind !== kind || resolutionEffect.kind !== kind) return []
   if (rollsMatch(atomic.roll, resolutionEffect.roll)) return []
 
-  return [issue(slug, `Resolution ${kind} roll diverges from primary atomic roll.`)]
+  return [issue(slug, `Resolution ${kind} roll diverges from matching atomic roll.`)]
 }
 
-function compareMatchedKindParity(pair: ParityPair): ResolutionEffectParityIssue[] {
-  const { slug, atomic, resolutionEffect } = pair
-
+function compareMatchedKindParity(
+  slug: string,
+  atomic: SpellAtomicEffect,
+  resolutionEffect: SpellResolutionEffect,
+): ResolutionEffectParityIssue[] {
   if (atomic.kind !== resolutionEffect.kind) {
     return [
       issue(
@@ -79,23 +93,54 @@ function compareMatchedKindParity(pair: ParityPair): ResolutionEffectParityIssue
 
   switch (atomic.kind) {
     case 'damage':
-      return compareDamageParity(pair)
+      return compareDamageParity(slug, atomic, resolutionEffect)
     case 'healing':
-      return compareRollOnlyParity(pair, 'healing')
+      return compareRollOnlyParity(slug, atomic, resolutionEffect, 'healing')
     case 'temporary-hit-points':
-      return compareRollOnlyParity(pair, 'temporary-hit-points')
+      return compareRollOnlyParity(slug, atomic, resolutionEffect, 'temporary-hit-points')
     default:
       return []
   }
 }
 
-/** Compares seeded resolution.effects[0] against the primary root atomic effect. */
-export function findResolutionEffectParityIssues(spell: Spell): ResolutionEffectParityIssue[] {
-  const pair = parityPair(spell)
-  return pair ? compareMatchedKindParity(pair) : []
+function compareResolutionEffectParity(
+  spell: Spell,
+  resolutionEffect: SpellResolutionEffect,
+): ResolutionEffectParityIssue[] {
+  const atomic = findMatchingAtomicEffect(spell.effects, resolutionEffect)
+  if (!atomic) {
+    return [
+      issue(
+        spell.slug,
+        `No matching root atomic effect for resolution effect ${resolutionEffect.id} (${resolutionEffect.kind}).`,
+      ),
+    ]
+  }
+
+  return compareMatchedKindParity(spell.slug, atomic, resolutionEffect)
 }
 
-/** Audits every applicable resolution seed for primary-effect parity. */
+/** Compares seeded resolution.effects[] against matching root atomic effects. */
+export function findResolutionEffectParityIssues(spell: Spell): ResolutionEffectParityIssue[] {
+  if (!spell.resolution?.effects.length) return []
+
+  return spell.resolution.effects.flatMap((resolutionEffect) =>
+    compareResolutionEffectParity(spell, resolutionEffect),
+  )
+}
+
+/** @deprecated Use findResolutionEffectParityIssues — kept for primary-only call sites. */
+export function findPrimaryResolutionEffectParityIssues(
+  spell: Spell,
+): ResolutionEffectParityIssue[] {
+  const atomic = findPrimaryResolutionEffect(spell.effects)
+  const resolutionEffect = spell.resolution?.effects[0]
+  if (!spell.resolution || !atomic || !resolutionEffect) return []
+
+  return compareMatchedKindParity(spell.slug, atomic, resolutionEffect)
+}
+
+/** Audits every applicable resolution seed for effect parity. */
 export function findResolutionSeedParityIssues(
   spells: readonly Spell[],
 ): ResolutionEffectParityIssue[] {

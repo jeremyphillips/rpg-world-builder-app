@@ -5,12 +5,18 @@ import {
   feetInputUnitField,
   SPELL_RANGE_DISTANCE_INLINE_COUNT_DIGITS,
 } from '../../../lib/forms/fields/content-identity-form-fields'
-import { damageTypeField } from '../../../lib/forms/mechanics/damage-type-field'
-import { rollValueFieldConfigs } from '../../../lib/forms/mechanics/roll-value-fields'
 import type { ContentFormCtx } from '../../../lib/forms/content-form-registry'
 import { SpellResolutionEmptyState } from '../components/spell-resolution-empty-state.client'
+import { SpellResolutionHybridNotice } from '../components/spell-resolution-hybrid-notice.client'
 import { SpellResolutionMethodSelect } from '../components/spell-resolution-method-select.client'
+import { SpellResolutionOutcomesPreview } from '../components/spell-resolution-outcomes-preview.client'
 import { SpellResolutionPreview } from '../components/spell-resolution-preview.client'
+import { buildResolutionEffectArrayAddMenu } from './resolution-effect-add-menu.lib'
+import {
+  formatResolutionEffectRowPrimary,
+  formatResolutionEffectRowSummary,
+} from './resolution-effect-display'
+import { resolutionEffectItemFields } from './resolution-effect-form-fields'
 import {
   RESOLUTION_FIELD_LABELS,
   RESOLUTION_SECTION_LABELS,
@@ -106,31 +112,33 @@ function resolutionDistanceTargetField(): InlineSentenceFieldConfig {
   }
 }
 
-/** Shared damage atoms bound to flattened resolution paths. */
-function resolutionDamageFields(ctx: ContentFormCtx): FormItem[] {
-  return [
-    {
-      kind: 'row',
-      fields: [
-        damageTypeField({
-          name: `${RESOLUTION_PREFIX}.damageType`,
-          ctx,
-          required: true,
-        }),
-        ...rollValueFieldConfigs({
-          namePrefix: `${RESOLUTION_PREFIX}.damageRoll`,
-          label: RESOLUTION_FIELD_LABELS.damageRoll,
-          required: true,
-        }),
-      ],
+function resolutionEffectsArrayField(ctx: ContentFormCtx): FormItem {
+  return {
+    kind: 'array',
+    name: `${RESOLUTION_PREFIX}.effects`,
+    legend: RESOLUTION_SECTION_LABELS.effects,
+    addLabel: 'Add effect',
+    itemCollapsible: true,
+    itemHeader: {
+      fallback: (index) => `Effect ${index + 1}`,
+      primary: (values, index) => formatResolutionEffectRowPrimary(values, index),
+      summary: (values) => formatResolutionEffectRowSummary(values),
     },
-  ]
+    addMenu: buildResolutionEffectArrayAddMenu(),
+    fields: resolutionEffectItemFields(ctx),
+  }
 }
 
 function configuredResolutionFields(ctx: ContentFormCtx): FormItem[] {
   const configured = visibleWhenResolutionConfigured()
 
   return [
+    {
+      kind: 'slot',
+      name: '_resolutionHybridNotice',
+      visibility: configured,
+      render: () => createElement(SpellResolutionHybridNotice),
+    },
     {
       kind: 'slot',
       name: '_resolutionPreview',
@@ -194,11 +202,17 @@ function configuredResolutionFields(ctx: ContentFormCtx): FormItem[] {
       kind: 'group',
       legend: RESOLUTION_SECTION_LABELS.effects,
       visibility: configured,
+      fields: [resolutionEffectsArrayField(ctx)],
+    },
+    {
+      kind: 'group',
+      legend: RESOLUTION_SECTION_LABELS.outcomes,
+      visibility: configured,
       fields: [
         {
-          kind: 'group',
-          legend: RESOLUTION_SECTION_LABELS.damage,
-          fields: resolutionDamageFields(ctx),
+          kind: 'slot',
+          name: '_resolutionOutcomesPreview',
+          render: () => createElement(SpellResolutionOutcomesPreview),
         },
       ],
     },

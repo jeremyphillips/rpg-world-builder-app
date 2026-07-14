@@ -1,13 +1,12 @@
-import { readFileSync } from 'node:fs'
-import { dirname, join } from 'node:path'
-import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vitest'
 
 import {
+  ARCANE_HAND_RESOLUTION,
   CHILL_TOUCH_RESOLUTION,
   CURE_WOUNDS_RESOLUTION,
   ELDRITCH_BLAST_RESOLUTION,
   FALSE_LIFE_RESOLUTION,
+  ICE_KNIFE_RESOLUTION,
   INFlict_WOUNDS_RESOLUTION,
   SPELL_RESOLUTION_FIXTURES,
 } from './resolution-fixtures'
@@ -18,19 +17,18 @@ import {
   spellResolutionFromFormValues,
 } from './resolution-form-values'
 
-const resolutionFormValuesPath = join(
-  dirname(fileURLToPath(import.meta.url)),
-  'resolution-form-values.ts',
-)
-
-const DAMAGE_AUTHORING_FIXTURES = {
+const AUTHORING_FIXTURES = {
   'eldritch-blast': ELDRITCH_BLAST_RESOLUTION,
   'chill-touch': CHILL_TOUCH_RESOLUTION,
   'inflict-wounds': INFlict_WOUNDS_RESOLUTION,
+  'cure-wounds': CURE_WOUNDS_RESOLUTION,
+  'false-life': FALSE_LIFE_RESOLUTION,
+  'ice-knife': ICE_KNIFE_RESOLUTION,
+  'arcane-hand': ARCANE_HAND_RESOLUTION,
 } as const satisfies Partial<typeof SPELL_RESOLUTION_FIXTURES>
 
 describe('spell resolution round trips', () => {
-  for (const [slug, resolution] of Object.entries(DAMAGE_AUTHORING_FIXTURES)) {
+  for (const [slug, resolution] of Object.entries(AUTHORING_FIXTURES)) {
     it(`${slug}: contract resolution → form → stored → contract`, () => {
       const formValues = resolutionToForm(resolution)
       expect(formValues).toBeDefined()
@@ -63,38 +61,40 @@ describe('spell resolution round trips', () => {
     expect(formValues?.hitNote).toBeUndefined()
   })
 
+  it('cure-wounds: maps automatic healing effects array', () => {
+    const formValues = resolutionToForm(CURE_WOUNDS_RESOLUTION)
+    expect(formValues?.methodKind).toBe('automatic')
+    expect(formValues?.effects).toHaveLength(1)
+    expect(formValues?.effects[0]).toMatchObject({ kind: 'healing' })
+  })
+
+  it('ice-knife: preserves multi-effect outcomes from stored envelope', () => {
+    const formValues = resolutionToForm(ICE_KNIFE_RESOLUTION)
+    expect(formValues?.effects).toHaveLength(2)
+    expect(resolutionToStored(formValues)).toEqual(ICE_KNIFE_RESOLUTION)
+  })
+
   it('returns undefined when resolution is absent on the read model', () => {
     expect(resolutionToForm(undefined)).toBeUndefined()
     expect(resolutionToForm(null)).toBeUndefined()
     expect(resolutionToStored(undefined)).toBeUndefined()
   })
 
-  it('returns undefined from stored normalization when damage is incomplete', () => {
+  it('returns undefined from stored normalization when effects are incomplete', () => {
+    const formValues = resolutionToForm(ELDRITCH_BLAST_RESOLUTION)!
     expect(
       resolutionToStored({
-        ...resolutionToForm(ELDRITCH_BLAST_RESOLUTION)!,
-        damageType: undefined,
+        ...formValues,
+        effects: [{ ...formValues.effects[0]!, damageType: undefined } as never],
       }),
     ).toBeUndefined()
   })
 
-  it('returns undefined for automatic non-damage resolutions until authoring expands', () => {
-    expect(resolutionToForm(CURE_WOUNDS_RESOLUTION)).toBeUndefined()
-    expect(resolutionToForm(FALSE_LIFE_RESOLUTION)).toBeUndefined()
-  })
-
-  it('parsed form schema round-trips through stored normalization for damage fixtures', () => {
-    for (const resolution of Object.values(DAMAGE_AUTHORING_FIXTURES)) {
+  it('parsed form schema round-trips through stored normalization for all fixtures', () => {
+    for (const resolution of Object.values(AUTHORING_FIXTURES)) {
       const formValues = resolutionToForm(resolution)
       const parsedForm = resolutionFormSchema.parse(formValues)
       expect(resolutionToStored(parsedForm)).toEqual(resolution)
     }
-  })
-})
-
-describe('resolution form values module', () => {
-  it('documents future persistence seam alongside effects TODO', () => {
-    const source = readFileSync(resolutionFormValuesPath, 'utf8')
-    expect(source.length).toBeGreaterThan(0)
   })
 })

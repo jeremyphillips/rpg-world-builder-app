@@ -981,7 +981,60 @@
         },
         "damageType": "cold"
       }
-    ]
+    ],
+    "resolution": {
+      "target": {
+        "count": 1,
+        "kind": "creature",
+        "proximity": {
+          "kind": "distance",
+          "distance": {
+            "value": 60,
+            "unit": "ft"
+          }
+        }
+      },
+      "method": {
+        "kind": "attack",
+        "attackType": "ranged-spell"
+      },
+      "effects": [
+        {
+          "id": "piercing",
+          "kind": "damage",
+          "roll": {
+            "dice": {
+              "count": 1,
+              "faces": 10
+            }
+          },
+          "damageType": "piercing"
+        },
+        {
+          "id": "cold-burst",
+          "kind": "damage",
+          "roll": {
+            "dice": {
+              "count": 2,
+              "faces": 6
+            }
+          },
+          "damageType": "cold"
+        }
+      ],
+      "outcomes": [
+        {
+          "result": "hit",
+          "applications": [
+            {
+              "effectId": "piercing",
+              "amount": "full"
+            }
+          ],
+          "note": "Hit or miss, the shard explodes: each creature within 5 feet makes a Dexterity saving throw or takes the cold burst damage."
+        }
+      ]
+    }
   },
   {
     "id": "srd-cc-5.2.1:identify",

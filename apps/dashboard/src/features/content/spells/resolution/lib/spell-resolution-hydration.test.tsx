@@ -11,6 +11,7 @@ import { buildSpellTabs, spellFormSchema } from '../../lib/spell-form-fields'
 import { spellFormDef } from '../../lib/spell-form-def'
 import { spellToFormValues } from '../../lib/spell-form-values'
 import { resolutionToStored } from './resolution-form-values'
+import { RESOLUTION_SECTION_LABELS } from './resolution-form-labels'
 import { RESOLUTION_FORM_FIXTURES } from './resolution-fixtures'
 
 const formCtx = makeContentFormCtx({
@@ -248,12 +249,38 @@ describe('spell resolution tab hydration', () => {
 
     await waitFor(() => {
       expect(screen.queryByRole('button', { name: /add resolution/i })).not.toBeInTheDocument()
+      expect(screen.getByText(RESOLUTION_SECTION_LABELS.hybridNoticeTitle)).toBeInTheDocument()
       expect(screen.getByRole('combobox', { name: 'Damage type' })).toHaveTextContent('Force')
       expect(screen.getByRole('spinbutton', { name: 'Damage roll Number of dice' })).toHaveValue(1)
       expect(screen.getByRole('combobox', { name: 'Die size' })).toHaveTextContent('d10')
     })
     expect(isDirty).toBe(false)
     expect(eldritchBlast.effects?.length).toBeGreaterThan(1)
+  })
+
+  it('renders automatic healing for cure-wounds without marking dirty', async () => {
+    const cureWounds = loadSeedSpells('srd-cc-5.2.1').find((spell) => spell.slug === 'cure-wounds')!
+    let isDirty = false
+
+    render(
+      <TabbedForm
+        schema={spellFormSchema}
+        tabs={buildSpellTabs(formCtx).filter((tab) => tab.id === 'resolution')}
+        defaultValues={spellToFormValues(cureWounds)}
+        onSubmit={() => undefined}
+        footer={(form) => {
+          isDirty = form.formState.isDirty
+          return null
+        }}
+      />,
+    )
+
+    await waitFor(() => {
+      expect(screen.getAllByText('Automatic').length).toBeGreaterThan(0)
+      expect(screen.getByRole('spinbutton', { name: 'Roll Number of dice' })).toHaveValue(2)
+      expect(screen.getByRole('combobox', { name: 'Die size' })).toHaveTextContent('d8')
+    })
+    expect(isDirty).toBe(false)
   })
 
   it('keeps manifest-deferred hex in empty resolution state', async () => {

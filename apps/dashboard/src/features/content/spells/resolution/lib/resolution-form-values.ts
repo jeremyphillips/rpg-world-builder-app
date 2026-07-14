@@ -1,8 +1,10 @@
 import {
+  spellResolutionEffectIdSchema,
   spellResolutionSchema,
   SPELL_RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID,
   type SpellResolution,
-  type SpellResolutionDamageEffect,
+  type SpellResolutionEffect,
+  type SpellResolutionEffectId,
   type SpellResolutionMethod,
   type SpellResolutionTargetProximity,
 } from '@rpg/contracts'
@@ -12,11 +14,24 @@ import {
   rollToFormShape,
   type RollFormShape,
 } from '../../../lib/forms/mechanics/roll-form-values'
-import type { ResolutionFormValues, ResolutionMethodKind } from './resolution-form-schema'
+import type {
+  ResolutionEffectFormItem,
+  ResolutionFormValues,
+  ResolutionMethodKind,
+  ResolutionOutcomeFormItem,
+} from './resolution-form-schema'
 
 export const RESOLUTION_FIELD_NAME = 'resolution' as const
 
+const PRIMARY_RESOLUTION_EFFECT_KINDS = ['damage', 'healing', 'temporary-hit-points'] as const
+
+type PrimaryResolutionEffectKind = (typeof PRIMARY_RESOLUTION_EFFECT_KINDS)[number]
+
 function buildResolutionMethod(values: ResolutionFormValues): SpellResolutionMethod | undefined {
+  if (values.methodKind === 'automatic') {
+    return { kind: 'automatic' }
+  }
+
   if (values.methodKind === 'attack') {
     if (!values.attackType) return undefined
     return { kind: 'attack', attackType: values.attackType }
@@ -54,76 +69,166 @@ function buildTargetProximity(
   }
 }
 
-function buildAttackOutcomes(hitNote: string | undefined): SpellResolution['outcomes'] | undefined {
+function findPrimaryEffectId(
+  effects: readonly ResolutionEffectFormItem[],
+): SpellResolutionEffectId | undefined {
+  const primary = effects.find((effect) =>
+    PRIMARY_RESOLUTION_EFFECT_KINDS.includes(effect.kind as PrimaryResolutionEffectKind),
+  )
+  return primary ? parseEffectId(primary.id) : undefined
+}
+
+function parseEffectId(id: string): SpellResolutionEffectId {
+  return spellResolutionEffectIdSchema.parse(id)
+}
+
+function buildAttackOutcomes(
+  effectId: SpellResolutionEffectId,
+  hitNote: string | undefined,
+): SpellResolution['outcomes'] {
   return [
     {
       result: 'hit',
-      applications: [
-        {
-          effectId: SPELL_RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID,
-          amount: 'full',
-        },
-      ],
+      applications: [{ effectId, amount: 'full' }],
       ...(hitNote ? { note: hitNote } : {}),
     },
   ]
 }
 
-function buildSavingThrowDamageOutcomes(): SpellResolution['outcomes'] {
+function buildSavingThrowOutcomes(effectId: SpellResolutionEffectId): SpellResolution['outcomes'] {
   return [
     {
       result: 'failed-save',
-      applications: [
-        {
-          effectId: SPELL_RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID,
-          amount: 'full',
-        },
-      ],
+      applications: [{ effectId, amount: 'full' }],
     },
     {
       result: 'successful-save',
-      applications: [
-        {
-          effectId: SPELL_RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID,
-          amount: 'half',
-        },
-      ],
+      applications: [{ effectId, amount: 'half' }],
     },
   ]
 }
 
-function buildOutcomes(values: ResolutionFormValues): SpellResolution['outcomes'] | undefined {
+function buildAutomaticOutcomes(effectId: SpellResolutionEffectId): SpellResolution['outcomes'] {
+  return [
+    {
+      result: 'applied',
+      applications: [{ effectId, amount: 'full' }],
+    },
+  ]
+}
+
+function synthesizeOutcomes(values: ResolutionFormValues): SpellResolution['outcomes'] | undefined {
+  const primaryEffectId = findPrimaryEffectId(values.effects)
+  if (!primaryEffectId) return undefined
+
   if (values.methodKind === 'attack') {
     const note = values.hitNote?.trim()
-    return buildAttackOutcomes(note || undefined)
+    return buildAttackOutcomes(primaryEffectId, note || undefined)
   }
 
-  return buildSavingThrowDamageOutcomes()
-}
-
-function findPrimaryDamageEffect(
-  resolution: SpellResolution,
-): SpellResolutionDamageEffect | undefined {
-  return resolution.effects.find(
-    (effect): effect is SpellResolutionDamageEffect => effect.kind === 'damage',
-  )
-}
-
-function buildBaseResolutionFormValues(
-  resolution: SpellResolution,
-  damageEffect: SpellResolutionDamageEffect | undefined,
-): ResolutionFormValues {
-  const methodKind: ResolutionMethodKind =
-    resolution.method.kind === 'attack' ? 'attack' : 'saving-throw'
-
-  return {
-    targetCount: resolution.target.count,
-    targetKind: resolution.target.kind,
-    proximityKind: resolution.target.proximity.kind,
-    methodKind,
-    damageRoll: (damageEffect ? rollToFormShape(damageEffect.roll) : undefined) ?? {},
-    ...(damageEffect ? { damageType: damageEffect.damageType } : {}),
+  if (values.methodKind === 'saving-throw') {
+    return buildSavingThrowOutcomes(primaryEffectId)
   }
+
+  return buildAutomaticOutcomes(primaryEffectId)
+}
+
+function storedOutcomesToForm(outcomes: SpellResolution['outcomes']): ResolutionOutcomeFormItem[] {
+  return outcomes.map((outcome) => ({
+    result: outcome.result,
+    ...(outcome.note ? { note: outcome.note } : {}),
+    applications: outcome.applications.map((application) => ({
+      effectId: application.effectId,
+      amount: application.amount,
+    })),
+  }))
+}
+
+function formOutcomesToStored(
+  outcomes: ResolutionOutcomeFormItem[] | undefined,
+): SpellResolution['outcomes'] | undefined {
+  if (!outcomes?.length) return undefined
+
+  return outcomes.map((outcome) => ({
+    result: outcome.result,
+    ...(outcome.note?.trim() ? { note: outcome.note.trim() } : {}),
+    applications: outcome.applications.map((application) => ({
+      effectId: parseEffectId(application.effectId),
+      amount: application.amount,
+    })),
+  }))
+}
+
+function buildOutcomes(values: ResolutionFormValues): SpellResolution['outcomes'] | undefined {
+  return formOutcomesToStored(values.outcomes) ?? synthesizeOutcomes(values)
+}
+
+function effectToForm(effect: SpellResolutionEffect): ResolutionEffectFormItem {
+  const roll = rollToFormShape(effect.roll) ?? {}
+
+  switch (effect.kind) {
+    case 'damage':
+      return {
+        id: effect.id,
+        kind: 'damage',
+        roll,
+        damageType: effect.damageType,
+      }
+    case 'healing':
+      return {
+        id: effect.id,
+        kind: 'healing',
+        roll,
+      }
+    case 'temporary-hit-points':
+      return {
+        id: effect.id,
+        kind: 'temporary-hit-points',
+        roll,
+      }
+    default: {
+      const _exhaustive: never = effect
+      return _exhaustive
+    }
+  }
+}
+
+function effectToStored(effect: ResolutionEffectFormItem): SpellResolutionEffect | undefined {
+  const roll = normalizeRollFormValue(effect.roll as RollFormShape)
+  if (!roll) return undefined
+
+  switch (effect.kind) {
+    case 'damage':
+      if (!effect.damageType) return undefined
+      return {
+        id: parseEffectId(effect.id),
+        kind: 'damage',
+        roll,
+        damageType: effect.damageType,
+      }
+    case 'healing':
+      return {
+        id: parseEffectId(effect.id),
+        kind: 'healing',
+        roll,
+      }
+    case 'temporary-hit-points':
+      return {
+        id: parseEffectId(effect.id),
+        kind: 'temporary-hit-points',
+        roll,
+      }
+    default: {
+      const _exhaustive: never = effect
+      return _exhaustive
+    }
+  }
+}
+
+function buildMethodKind(method: SpellResolutionMethod): ResolutionMethodKind {
+  if (method.kind === 'automatic') return 'automatic'
+  if (method.kind === 'attack') return 'attack'
+  return 'saving-throw'
 }
 
 function applyMethodFields(
@@ -162,12 +267,17 @@ export function resolutionToForm(
   resolution: SpellResolution | undefined | null,
 ): ResolutionFormValues | undefined {
   if (!resolution) return undefined
-  if (resolution.method.kind === 'automatic') return undefined
+  if (!resolution.effects.length) return undefined
 
-  const damageEffect = findPrimaryDamageEffect(resolution)
-  if (!damageEffect) return undefined
+  const form: ResolutionFormValues = {
+    targetCount: resolution.target.count,
+    targetKind: resolution.target.kind,
+    proximityKind: resolution.target.proximity.kind,
+    methodKind: buildMethodKind(resolution.method),
+    effects: resolution.effects.map(effectToForm),
+    outcomes: storedOutcomesToForm(resolution.outcomes),
+  }
 
-  const form = buildBaseResolutionFormValues(resolution, damageEffect)
   applyMethodFields(form, resolution.method, resolution.outcomes)
   applyProximityFields(form, resolution.target.proximity)
   return form
@@ -179,8 +289,10 @@ export function resolutionToStored(
 ): SpellResolution | undefined {
   if (!values) return undefined
 
-  const roll = normalizeRollFormValue(values.damageRoll as RollFormShape)
-  if (!roll || !values.damageType) return undefined
+  const effects = values.effects
+    .map(effectToStored)
+    .filter((effect): effect is SpellResolutionEffect => effect !== undefined)
+  if (!effects.length) return undefined
 
   const method = buildResolutionMethod(values)
   const proximity = buildTargetProximity(values)
@@ -194,14 +306,7 @@ export function resolutionToStored(
       proximity,
     },
     method,
-    effects: [
-      {
-        id: SPELL_RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID,
-        kind: 'damage' as const,
-        roll,
-        damageType: values.damageType,
-      },
-    ],
+    effects,
     outcomes,
   }
 
@@ -216,6 +321,15 @@ export function spellResolutionFromFormValues(
   return resolutionToStored(values)
 }
 
+function defaultDamageEffect(): ResolutionEffectFormItem {
+  return {
+    id: SPELL_RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID,
+    kind: 'damage',
+    roll: { dice: { count: 1, faces: 10 } },
+    damageType: 'force',
+  }
+}
+
 export function createDefaultAttackResolutionFormValues(
   attackType: ResolutionFormValues['attackType'] = 'ranged-spell',
 ): ResolutionFormValues {
@@ -226,8 +340,7 @@ export function createDefaultAttackResolutionFormValues(
     ...(attackType === 'ranged-spell' ? { proximityDistanceFt: 120 } : {}),
     methodKind: 'attack',
     attackType,
-    damageRoll: { dice: { count: 1, faces: 10 } },
-    damageType: 'force',
+    effects: [defaultDamageEffect()],
   }
 }
 
@@ -243,7 +356,29 @@ export function createDefaultSavingThrowResolutionFormValues(): ResolutionFormVa
     proximityKind: 'touch',
     methodKind: 'saving-throw',
     saveAbility: 'con',
-    damageRoll: { dice: { count: 2, faces: 10 } },
-    damageType: 'necrotic',
+    effects: [
+      {
+        id: SPELL_RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID,
+        kind: 'damage',
+        roll: { dice: { count: 2, faces: 10 } },
+        damageType: 'necrotic',
+      },
+    ],
+  }
+}
+
+export function createDefaultAutomaticHealingResolutionFormValues(): ResolutionFormValues {
+  return {
+    targetCount: 1,
+    targetKind: 'creature',
+    proximityKind: 'touch',
+    methodKind: 'automatic',
+    effects: [
+      {
+        id: 'healing',
+        kind: 'healing',
+        roll: { dice: { count: 2, faces: 8 } },
+      },
+    ],
   }
 }

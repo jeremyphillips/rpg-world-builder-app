@@ -24,6 +24,10 @@ export const RESOLUTION_SECTION_LABELS = {
   addResolution: 'Add resolution',
   emptyState: 'No structured resolution configured.',
   notSavedBanner: 'Resolution is not saved yet.',
+  hybridNoticeTitle: 'Hybrid spell',
+  hybridNoticeBody:
+    'Projectile or beam scaling is modeled in legacy root effects, not in the resolution envelope. Edit those counts on the spell read model until projectile-count lands in resolution.',
+  outcomesIncomplete: 'Complete target, method, and effects to preview generated outcomes.',
   hitNote: 'Additional behavior',
 } as const
 
@@ -46,6 +50,7 @@ export const RESOLUTION_FIELD_LABELS = {
 export const RESOLUTION_METHOD_KIND_OPTIONS: FieldOption[] = [
   { value: 'attack', label: 'Spell attack' },
   { value: 'saving-throw', label: 'Saving throw' },
+  { value: 'automatic', label: 'Automatic' },
 ]
 
 export const resolutionTargetKindOptions: FieldOption[] = toOptions(

@@ -1,6 +1,8 @@
 import {
+  ARCANE_HAND_RESOLUTION,
   CHILL_TOUCH_RESOLUTION,
   ELDRITCH_BLAST_RESOLUTION,
+  ICE_KNIFE_RESOLUTION,
   INFlict_WOUNDS_RESOLUTION,
   SPELL_RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID,
 } from '@rpg/contracts'
@@ -118,13 +120,17 @@ describe('resolveSpellSeedResolution manifest parity', () => {
     expect(resolveSpellSeedResolution(spellBySlug('eldritch-blast'))).toEqual(
       ELDRITCH_BLAST_RESOLUTION,
     )
+    expect(resolveSpellSeedResolution(spellBySlug('ice-knife'))).toEqual(ICE_KNIFE_RESOLUTION)
+    expect(resolveSpellSeedResolution(spellBySlug('arcane-hand'))).toEqual(ARCANE_HAND_RESOLUTION)
   })
 
-  it('derives every applicable manifest slug with primary damage parity', () => {
+  it('derives every derived manifest slug with primary effect parity', () => {
     for (const slug of SRD_521_SPELL_SEED_RESOLUTION_SLUGS) {
+      const entry = SRD_521_SPELL_SEED_RESOLUTION[slug]
+      if (entry.kind !== 'derived') continue
+
       const spell = spellBySlug(slug)
       const resolution = resolveSpellSeedResolution(spell)
-      const entry = SRD_521_SPELL_SEED_RESOLUTION[slug]
       const primary = findPrimaryResolutionEffect(spell.effects)
 
       expect(resolution, slug).toBeDefined()

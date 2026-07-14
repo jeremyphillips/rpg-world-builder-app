@@ -15,14 +15,25 @@ const RESOLUTION_METHOD_OPTIONS = [
   { value: 'melee-spell', label: 'Melee spell attack' },
   { value: 'ranged-spell', label: 'Ranged spell attack' },
   { value: 'saving-throw', label: 'Saving throw' },
+  { value: 'automatic', label: 'Automatic' },
 ] as const
 
 type ResolutionMethodOption = (typeof RESOLUTION_METHOD_OPTIONS)[number]['value']
 
 function toMethodOption(resolution: ResolutionFormValues | undefined): ResolutionMethodOption {
   if (!resolution) return 'ranged-spell'
+  if (resolution.methodKind === 'automatic') return 'automatic'
   if (resolution.methodKind === 'saving-throw') return 'saving-throw'
   return resolution.attackType ?? 'ranged-spell'
+}
+
+function applyAutomaticMethod(resolution: ResolutionFormValues): ResolutionFormValues {
+  return {
+    ...resolution,
+    methodKind: 'automatic',
+    attackType: undefined,
+    saveAbility: undefined,
+  }
 }
 
 function applySavingThrowMethod(resolution: ResolutionFormValues): ResolutionFormValues {
@@ -36,7 +47,7 @@ function applySavingThrowMethod(resolution: ResolutionFormValues): ResolutionFor
 
 function applyAttackMethod(
   resolution: ResolutionFormValues,
-  attackType: Exclude<ResolutionMethodOption, 'saving-throw'>,
+  attackType: Exclude<ResolutionMethodOption, 'saving-throw' | 'automatic'>,
 ): ResolutionFormValues {
   return {
     ...resolution,
@@ -50,6 +61,10 @@ function applyMethodOption(
   resolution: ResolutionFormValues,
   option: ResolutionMethodOption,
 ): ResolutionFormValues {
+  if (option === 'automatic') {
+    return applyAutomaticMethod(resolution)
+  }
+
   if (option === 'saving-throw') {
     return applySavingThrowMethod(resolution)
   }

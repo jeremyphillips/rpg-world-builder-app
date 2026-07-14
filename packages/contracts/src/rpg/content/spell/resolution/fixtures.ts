@@ -1,5 +1,6 @@
 import type { SpellResolution } from './schema'
 import {
+  spellResolutionEffectIdSchema,
   SPELL_RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID,
   SPELL_RESOLUTION_PRIMARY_HEALING_EFFECT_ID,
   SPELL_RESOLUTION_PRIMARY_TEMPORARY_HIT_POINTS_EFFECT_ID,
@@ -7,6 +8,13 @@ import {
 
 const CHILL_TOUCH_NO_HEAL_NOTE =
   "The target can't regain Hit Points until the end of your next turn."
+
+const ICE_KNIFE_PIERCING_EFFECT_ID = spellResolutionEffectIdSchema.parse('piercing')
+const ICE_KNIFE_COLD_BURST_EFFECT_ID = spellResolutionEffectIdSchema.parse('cold-burst')
+
+const ARCANE_HAND_CLENCHED_FIST_EFFECT_ID = spellResolutionEffectIdSchema.parse('clenched-fist')
+const ARCANE_HAND_GRASPING_HAND_EFFECT_ID =
+  spellResolutionEffectIdSchema.parse('grasping-hand-crush')
 
 /** Eldritch Blast — ranged attack, 120 ft proximity, 1d10 force on hit. */
 export const ELDRITCH_BLAST_RESOLUTION: SpellResolution = {
@@ -133,10 +141,74 @@ export const FALSE_LIFE_RESOLUTION: SpellResolution = {
   ],
 }
 
+/** Ice Knife — ranged attack piercing on hit; cold burst modeled as a second damage effect. */
+export const ICE_KNIFE_RESOLUTION: SpellResolution = {
+  target: {
+    count: 1,
+    kind: 'creature',
+    proximity: { kind: 'distance', distance: { value: 60, unit: 'ft' } },
+  },
+  method: { kind: 'attack', attackType: 'ranged-spell' },
+  effects: [
+    {
+      id: ICE_KNIFE_PIERCING_EFFECT_ID,
+      kind: 'damage',
+      roll: { dice: { count: 1, faces: 10 } },
+      damageType: 'piercing',
+    },
+    {
+      id: ICE_KNIFE_COLD_BURST_EFFECT_ID,
+      kind: 'damage',
+      roll: { dice: { count: 2, faces: 6 } },
+      damageType: 'cold',
+    },
+  ],
+  outcomes: [
+    {
+      result: 'hit',
+      applications: [{ effectId: ICE_KNIFE_PIERCING_EFFECT_ID, amount: 'full' }],
+      note: 'Hit or miss, the shard explodes: each creature within 5 feet makes a Dexterity saving throw or takes the cold burst damage.',
+    },
+  ],
+}
+
+/** Arcane Hand — melee attack with choice-dependent damage effects. */
+export const ARCANE_HAND_RESOLUTION: SpellResolution = {
+  target: {
+    count: 1,
+    kind: 'creature',
+    proximity: { kind: 'distance', distance: { value: 120, unit: 'ft' } },
+  },
+  method: { kind: 'attack', attackType: 'melee-spell' },
+  effects: [
+    {
+      id: ARCANE_HAND_CLENCHED_FIST_EFFECT_ID,
+      kind: 'damage',
+      roll: { dice: { count: 5, faces: 8 } },
+      damageType: 'force',
+    },
+    {
+      id: ARCANE_HAND_GRASPING_HAND_EFFECT_ID,
+      kind: 'damage',
+      roll: { dice: { count: 4, faces: 6 } },
+      damageType: 'bludgeoning',
+    },
+  ],
+  outcomes: [
+    {
+      result: 'hit',
+      note: 'Choose Clenched Fist or Grasping Hand crush when commanding the hand; apply the matching effect on a hit.',
+      applications: [],
+    },
+  ],
+}
+
 export const SPELL_RESOLUTION_FIXTURES = {
   'eldritch-blast': ELDRITCH_BLAST_RESOLUTION,
   'chill-touch': CHILL_TOUCH_RESOLUTION,
   'inflict-wounds': INFlict_WOUNDS_RESOLUTION,
   'cure-wounds': CURE_WOUNDS_RESOLUTION,
   'false-life': FALSE_LIFE_RESOLUTION,
+  'ice-knife': ICE_KNIFE_RESOLUTION,
+  'arcane-hand': ARCANE_HAND_RESOLUTION,
 } as const satisfies Record<string, SpellResolution>

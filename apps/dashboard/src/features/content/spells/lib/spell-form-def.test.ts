@@ -7,7 +7,7 @@ import {
   type CreateSpellInput,
   type Spell,
 } from '@rpg/contracts'
-import type { FormItem, GroupConfig, RowConfig } from '@rpg/ui/form'
+import type { FormItem, GroupConfig, RowConfig, ArrayConfig } from '@rpg/ui/form'
 
 import { RESOLUTION_FORM_FIXTURES } from '../resolution/lib/resolution-fixtures'
 import { spellFormDef, spellFormSchema, type SpellFormValues } from './spell-form-def'
@@ -220,20 +220,25 @@ describe('spellFormDef resolution tab', () => {
 
     const names = collectFieldNames(resolutionGroup?.fields ?? [])
     expect(names).toContain('_resolutionPersistenceNotice')
+    expect(names).toContain('_resolutionHybridNotice')
     expect(names).toContain('_resolutionPreview')
     expect(names).toContain('_resolutionEmptyState')
     expect(names).toContain('resolution.targetKind')
     expect(names).toContain('resolution.proximityKind')
     expect(names).toContain('resolution.proximityReachDistanceFt')
     expect(names).toContain('_resolutionMethodSelect')
-    expect(names).toContain('resolution.damageType')
-    expect(names).toContain('resolution.damageRoll')
+    expect(names).toContain('resolution.effects')
+    expect(names).toContain('_resolutionOutcomesPreview')
     expect(findGroup(resolutionGroup?.fields ?? [], 'Target')).toBeDefined()
     expect(findGroup(resolutionGroup?.fields ?? [], 'Check')).toBeDefined()
     const effectsGroup = findGroup(resolutionGroup?.fields ?? [], 'Effects')
     expect(effectsGroup).toBeDefined()
-    expect(findGroup(effectsGroup?.fields ?? [], 'Damage')).toBeDefined()
-    expect(findGroup(resolutionGroup?.fields ?? [], 'Outcomes')).toBeUndefined()
+    const effectsArray = effectsGroup?.fields.find(
+      (field): field is ArrayConfig =>
+        'kind' in field && field.kind === 'array' && field.name === 'resolution.effects',
+    )
+    expect(effectsArray).toBeDefined()
+    expect(findGroup(resolutionGroup?.fields ?? [], 'Outcomes')).toBeDefined()
   })
 })
 

@@ -8,19 +8,21 @@ export type DamageEffectFieldsOptions = {
   namePrefix?: string
   modifierField?: FieldConfig[]
   ctx: ContentFormCtx
+  rollLabel?: string
 }
 
 export function damageEffectFieldConfigs({
   namePrefix = '',
   modifierField,
   ctx,
+  rollLabel = 'Damage roll',
 }: DamageEffectFieldsOptions): FieldConfig[] {
   const rollPath = namePrefix ? `${namePrefix}.roll` : 'roll'
   const damageTypePath = namePrefix ? `${namePrefix}.damageType` : 'damageType'
 
   return [
     damageTypeField({ name: damageTypePath, ctx, required: true }),
-    ...rollValueFieldConfigs({ namePrefix: rollPath, label: 'Damage roll', required: true }),
+    ...rollValueFieldConfigs({ namePrefix: rollPath, label: rollLabel, required: true }),
     ...(modifierField ?? []),
   ]
 }

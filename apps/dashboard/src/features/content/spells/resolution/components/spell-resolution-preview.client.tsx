@@ -39,7 +39,7 @@ export function SpellResolutionPreview() {
         aria-live="polite"
       >
         <Text variant="muted" className="text-sm">
-          Complete target, method, range, and damage to preview resolution.
+          Complete target, method, and effects to preview resolution.
         </Text>
       </Alert>
     )
