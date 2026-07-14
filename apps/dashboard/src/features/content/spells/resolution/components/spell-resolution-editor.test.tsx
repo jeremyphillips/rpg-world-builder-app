@@ -75,6 +75,36 @@ describe('SpellResolutionEditor', () => {
     await expectNoAxeViolations(container)
   })
 
+  it('has no axe accessibility violations with eldritch blast fixture', async () => {
+    const { container } = render(
+      <SpellResolutionEditor
+        formCtx={formCtx}
+        defaultResolution={RESOLUTION_FORM_FIXTURES.eldritchBlast}
+      />,
+    )
+
+    await waitFor(() => {
+      expect(screen.getAllByText('Ranged spell attack').length).toBeGreaterThan(0)
+    })
+
+    await expectNoAxeViolations(container)
+  })
+
+  it('has no axe accessibility violations with chill touch fixture', async () => {
+    const { container } = render(
+      <SpellResolutionEditor
+        formCtx={formCtx}
+        defaultResolution={RESOLUTION_FORM_FIXTURES.chillTouch}
+      />,
+    )
+
+    await waitFor(() => {
+      expect(screen.getAllByText(/can't regain Hit Points/i).length).toBeGreaterThan(0)
+    })
+
+    await expectNoAxeViolations(container)
+  })
+
   it('has no axe accessibility violations with inflict wounds fixture', async () => {
     const { container } = render(
       <SpellResolutionEditor

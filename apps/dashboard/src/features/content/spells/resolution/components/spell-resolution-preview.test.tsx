@@ -36,7 +36,47 @@ describe('SpellResolutionPreview', () => {
     expect(screen.getByRole('status')).toHaveAttribute('aria-live', 'polite')
   })
 
-  it('has no axe accessibility violations', async () => {
+  it('renders additional behavior from chill touch note in preview', async () => {
+    render(
+      <Form
+        schema={previewSchema}
+        fields={[
+          {
+            kind: 'slot',
+            name: '_resolutionPreview',
+            render: () => <SpellResolutionPreview />,
+          },
+        ]}
+        defaultValues={{ resolution: RESOLUTION_FORM_FIXTURES.chillTouch }}
+        onSubmit={() => undefined}
+      />,
+    )
+
+    await waitFor(() => {
+      expect(screen.getByText(/can't regain Hit Points/i)).toBeInTheDocument()
+    })
+  })
+
+  it('renders empty preview guidance when resolution is absent', () => {
+    render(
+      <Form
+        schema={previewSchema}
+        fields={[
+          {
+            kind: 'slot',
+            name: '_resolutionPreview',
+            render: () => <SpellResolutionPreview />,
+          },
+        ]}
+        defaultValues={{ resolution: undefined }}
+        onSubmit={() => undefined}
+      />,
+    )
+
+    expect(screen.getByRole('status')).toHaveTextContent(/configure resolution/i)
+  })
+
+  it('has no axe accessibility violations with eldritch blast fixture', async () => {
     const { container } = render(
       <Form
         schema={previewSchema}
@@ -54,6 +94,29 @@ describe('SpellResolutionPreview', () => {
 
     await waitFor(() => {
       expect(screen.getByText('Hit: Full damage')).toBeInTheDocument()
+    })
+
+    await expectNoAxeViolations(container)
+  })
+
+  it('has no axe accessibility violations with chill touch fixture', async () => {
+    const { container } = render(
+      <Form
+        schema={previewSchema}
+        fields={[
+          {
+            kind: 'slot',
+            name: '_resolutionPreview',
+            render: () => <SpellResolutionPreview />,
+          },
+        ]}
+        defaultValues={{ resolution: RESOLUTION_FORM_FIXTURES.chillTouch }}
+        onSubmit={() => undefined}
+      />,
+    )
+
+    await waitFor(() => {
+      expect(screen.getByText(/can't regain Hit Points/i)).toBeInTheDocument()
     })
 
     await expectNoAxeViolations(container)

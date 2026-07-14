@@ -20,16 +20,21 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
+/** No resolution envelope — empty state with Add resolution action. */
 export const Empty: Story = {}
 
+/** Ranged attack preset: 120 ft, 1d10 force, hit applies full damage. */
 export const EldritchBlast: Story = {
   args: { defaultResolution: RESOLUTION_FORM_FIXTURES.eldritchBlast },
 }
 
-export const ChillTouch: Story = {
+/** Melee attack preset with optional additional behavior on the hit outcome. */
+export const ChillTouchWithNote: Story = {
+  name: 'Chill Touch (with note)',
   args: { defaultResolution: RESOLUTION_FORM_FIXTURES.chillTouch },
 }
 
+/** Saving throw preset: CON save, touch range, failed full / successful half damage. */
 export const InflictWounds: Story = {
   args: { defaultResolution: RESOLUTION_FORM_FIXTURES.inflictWounds },
 }
