@@ -132,7 +132,7 @@ function StatefulSpeciesStep({
 
 function speciesCard(speciesId: string): HTMLElement | null {
   const radio = document.getElementById(`character-builder-species-${speciesId}`)
-  return radio?.closest('[class*="rounded-xl"]') ?? null
+  return radio?.closest('[class*="rounded-card"]') ?? null
 }
 
 describe('SpeciesStep', () => {

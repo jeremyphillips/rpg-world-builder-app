@@ -9,7 +9,7 @@ const meta = {
     docs: {
       description: {
         component:
-          'Living reference for `@rpg/ui` CSS color variables. Use the Storybook theme toolbar to switch light/dark. Source of truth: `packages/ui/src/styles/globals.css`.',
+          'Living reference for `@rpg/ui` CSS color variables. Use the Storybook theme toolbar to switch light/dark. Source of truth: `packages/ui/src/styles/tokens/` (imported by `globals.css`).',
       },
     },
   },

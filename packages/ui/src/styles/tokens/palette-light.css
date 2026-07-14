@@ -1,0 +1,61 @@
+/*
+ * Layer 1 — light palette primitives (oklch SSOT).
+ * Inventory: tokens/palette-inventory.md — every name must exist in palette-dark.css.
+ */
+:root {
+  --palette-neutral-hue: 268;
+  --palette-neutral-0: oklch(1 0.002 var(--palette-neutral-hue));
+  --palette-neutral-50: oklch(0.985 0.003 var(--palette-neutral-hue));
+  --palette-neutral-100: oklch(0.967 0.004 var(--palette-neutral-hue));
+  --palette-neutral-150: oklch(0.952 0.005 var(--palette-neutral-hue));
+  --palette-neutral-200: oklch(0.932 0.006 var(--palette-neutral-hue));
+  --palette-neutral-300: oklch(0.87 0.006 var(--palette-neutral-hue));
+  --palette-neutral-500: oklch(0.552 0.014 var(--palette-neutral-hue));
+  --palette-neutral-700: oklch(0.442 0.014 var(--palette-neutral-hue));
+  --palette-neutral-750: oklch(0.39 0.016 var(--palette-neutral-hue));
+  --palette-neutral-800: oklch(0.28 0.014 var(--palette-neutral-hue));
+  --palette-neutral-800-muted: oklch(0.3 0.012 var(--palette-neutral-hue));
+  --palette-neutral-900: oklch(0.21 0.012 var(--palette-neutral-hue));
+  --palette-neutral-950: oklch(0.18 0.012 var(--palette-neutral-hue));
+  --palette-muted-foreground: oklch(0.64 0.01 82);
+
+  /* Layout surfaces — warm off-white canvas + recessed aside. */
+  --palette-page-surface: oklch(0.988 0.005 82);
+  --palette-sidebar-surface: oklch(0.976 0.006 80);
+  --palette-sidebar-shade: oklch(0.94 0.004 var(--palette-neutral-hue));
+  --palette-card-surface: oklch(0.998 0.004 82);
+  --palette-muted-surface: var(--palette-neutral-100);
+  --palette-accent-surface: var(--palette-neutral-200);
+  --palette-secondary-surface: var(--palette-neutral-150);
+
+  --palette-border-default: var(--palette-neutral-300);
+  --palette-border-input: var(--palette-neutral-300);
+  --palette-border-selected: oklch(0.87 0.006 var(--palette-neutral-hue) / 30%);
+  --palette-overlay: oklch(0.21 0.012 var(--palette-neutral-hue) / 0.5);
+
+  /* Deep bronze-gold: AA link text on parchment (5.4:1) and on primary fill. */
+  --palette-primary: oklch(0.52 0.11 70);
+  --palette-primary-foreground: oklch(0.985 0.003 var(--palette-neutral-hue));
+  --palette-on-solid: oklch(0.985 0 0);
+
+  --palette-destructive: oklch(0.577 0.245 27.325);
+  --palette-destructive-muted: oklch(0.577 0.245 27.325 / 70%);
+  --palette-destructive-subtle: oklch(0.577 0.245 27.325 / 50%);
+  --palette-info: oklch(0.52 0.14 250);
+  --palette-info-muted: oklch(0.52 0.14 250 / 70%);
+  --palette-info-subtle: oklch(0.52 0.14 250 / 12%);
+  --palette-success: oklch(0.52 0.14 145);
+  --palette-success-muted: oklch(0.52 0.14 145 / 70%);
+  --palette-success-subtle: oklch(0.52 0.14 145 / 12%);
+  --palette-warning: oklch(0.62 0.14 75);
+  --palette-warning-muted: oklch(0.62 0.14 75 / 70%);
+  --palette-warning-subtle: oklch(0.62 0.14 75 / 14%);
+
+  --palette-semantic-neutral: var(--palette-neutral-500);
+  --palette-semantic-informative: oklch(0.48 0.13 250);
+  --palette-semantic-informative-muted: oklch(0.42 0.07 250);
+  --palette-semantic-positive: oklch(0.48 0.13 145);
+  --palette-semantic-caution: oklch(0.55 0.13 70);
+  --palette-semantic-negative: oklch(0.52 0.2 27);
+  --palette-semantic-negative-on-subtle: oklch(0.42 0.19 27);
+}

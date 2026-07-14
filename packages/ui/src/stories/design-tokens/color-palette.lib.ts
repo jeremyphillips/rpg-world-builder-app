@@ -1,3 +1,5 @@
+import { PALETTE_PRIMITIVE_GROUPS } from '../../styles/tokens/palette-inventory'
+
 /** How the swatch renders the token in Storybook. */
 export type ColorTokenUsage = 'background' | 'text' | 'border'
 
@@ -31,6 +33,7 @@ export interface SurfaceBackground {
 
 export const SURFACE_BACKGROUNDS: SurfaceBackground[] = [
   { id: 'background', label: 'background', cssVar: '--background', tailwind: 'bg-background' },
+  { id: 'sidebar', label: 'sidebar', cssVar: '--sidebar', tailwind: 'bg-sidebar' },
   { id: 'card', label: 'card', cssVar: '--card', tailwind: 'bg-card' },
   { id: 'muted', label: 'muted', cssVar: '--muted', tailwind: 'bg-muted' },
   { id: 'accent', label: 'accent', cssVar: '--accent', tailwind: 'bg-accent' },
@@ -43,6 +46,27 @@ export const SURFACE_BACKGROUNDS: SurfaceBackground[] = [
   },
 ]
 
+function palettePrimitiveUsage(step: string): ColorTokenUsage {
+  if (step.startsWith('border-')) return 'border'
+  if (step.includes('foreground') || step.startsWith('semantic-')) return 'text'
+  return 'background'
+}
+
+/** Layer 1 palette primitives — not Tailwind utilities; tune in `tokens/palette-*.css`. */
+export const PALETTE_PRIMITIVE_TOKEN_GROUPS: ColorTokenGroup[] = PALETTE_PRIMITIVE_GROUPS.map(
+  (group) => ({
+    id: `palette-${group.id}`,
+    label: `Palette · ${group.label}`,
+    description: group.description,
+    tokens: group.steps.map((step) => ({
+      name: step,
+      cssVar: `--palette-${step}`,
+      tailwind: '(palette only)',
+      usage: palettePrimitiveUsage(step),
+    })),
+  }),
+)
+
 export const COLOR_TOKEN_GROUPS: ColorTokenGroup[] = [
   {
     id: 'surfaces',
@@ -53,6 +77,14 @@ export const COLOR_TOKEN_GROUPS: ColorTokenGroup[] = [
         name: 'background',
         cssVar: '--background',
         tailwind: 'bg-background',
+        usage: 'background',
+        foregroundVar: '--foreground',
+        foregroundTailwind: 'text-foreground',
+      },
+      {
+        name: 'sidebar',
+        cssVar: '--sidebar',
+        tailwind: 'bg-sidebar',
         usage: 'background',
         foregroundVar: '--foreground',
         foregroundTailwind: 'text-foreground',

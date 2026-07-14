@@ -65,11 +65,12 @@ import '@rpg/ui/styles.css'
 ```
 
 The stylesheet defines CSS-variable design tokens on `:root` and `.dark`; toggle
-the `dark` class on a root element to switch themes. Color tokens use two layers:
-`--palette-*` primitives (oklch source of truth) and semantic roles
-(`--background`, `--card`, …) mapped via `var()` for components and Tailwind.
-The palette is a warm amber/gold primary over parchment-tinted neutrals (light)
-and warm charcoal (dark); all text/background token pairings meet WCAG 2.2 AA.
+the `dark` class on a root element to switch themes. Color tokens use three
+layers: `--palette-*` primitives in `src/styles/tokens/palette-*.css` (oklch
+SSOT; both themes declare the same inventory — see `palette-inventory.md`),
+semantic roles in `semantic-*.css` (`--background`, `--card`, …), and the
+`@theme inline` bridge in `globals.css` for Tailwind utilities. Components use
+semantic roles only, never `--palette-*` directly.
 
 ### Fonts
 

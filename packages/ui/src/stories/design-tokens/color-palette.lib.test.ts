@@ -17,4 +17,8 @@ describe('color-palette.lib', () => {
   it('keeps on-surface tokens non-empty', () => {
     expect(ON_SURFACE_TOKENS.length).toBeGreaterThan(10)
   })
+
+  it('includes sidebar in surface backgrounds for on-surface matrices', () => {
+    expect(SURFACE_BACKGROUNDS.map((surface) => surface.cssVar)).toContain('--sidebar')
+  })
 })

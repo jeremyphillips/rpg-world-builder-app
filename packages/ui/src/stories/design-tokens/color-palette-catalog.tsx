@@ -9,6 +9,7 @@ import { useTheme } from '../../providers/theme-provider.client'
 import {
   COLOR_TOKEN_GROUPS,
   ON_SURFACE_TOKENS,
+  PALETTE_PRIMITIVE_TOKEN_GROUPS,
   SURFACE_BACKGROUNDS,
   type ColorToken,
   type ColorTokenGroup,
@@ -147,11 +148,15 @@ export function ColorPaletteCatalog() {
           Color palette
         </Heading>
         <Text variant="muted" className="text-base leading-relaxed">
-          Design tokens from <code className="font-mono text-sm">globals.css</code>. Toggle the
+          Layer 2 semantic roles and Layer 1 palette primitives from{' '}
+          <code className="font-mono text-sm">packages/ui/src/styles/tokens/</code>. Toggle the
           Storybook theme toolbar to compare light and dark. Each swatch shows the CSS variable,
           Tailwind utility, and computed value.
         </Text>
       </header>
+      {PALETTE_PRIMITIVE_TOKEN_GROUPS.map((group) => (
+        <TokenGroupSection key={group.id} group={group} />
+      ))}
       {COLOR_TOKEN_GROUPS.map((group) => (
         <TokenGroupSection key={group.id} group={group} />
       ))}

@@ -1,0 +1,63 @@
+/*
+ * Layer 1 — dark palette primitives (oklch SSOT).
+ * Inventory: tokens/palette-inventory.md — mirrors palette-light.css names exactly.
+ */
+.dark {
+  --palette-neutral-hue: 72;
+  --palette-neutral-0: oklch(0.99 0.003 75);
+  --palette-neutral-50: oklch(0.985 0.004 75);
+  --palette-neutral-100: oklch(0.88 0.008 75);
+  --palette-neutral-150: oklch(0.78 0.01 74);
+  --palette-neutral-200: oklch(0.708 0.012 var(--palette-neutral-hue));
+  --palette-neutral-300: oklch(0.55 0.012 var(--palette-neutral-hue));
+  --palette-neutral-500: oklch(0.45 0.012 var(--palette-neutral-hue));
+  --palette-neutral-700: oklch(0.715 0.01 var(--palette-neutral-hue));
+  --palette-neutral-750: oklch(0.32 0.008 var(--palette-neutral-hue));
+  --palette-neutral-800: oklch(0.274 0.007 var(--palette-neutral-hue));
+  --palette-neutral-800-muted: oklch(0.274 0.005 var(--palette-neutral-hue));
+  --palette-neutral-900: oklch(0.21 0.006 var(--palette-neutral-hue));
+  --palette-neutral-950: oklch(0.141 0.005 var(--palette-neutral-hue));
+  --palette-muted-foreground: oklch(0.82 0.01 74);
+
+  --palette-page-surface: var(--palette-neutral-950);
+  --palette-sidebar-shade: oklch(0.11 0.007 var(--palette-neutral-hue));
+  --palette-sidebar-surface: color-mix(
+    in oklch,
+    var(--palette-page-surface) 55%,
+    var(--palette-sidebar-shade)
+  );
+  --palette-card-surface: oklch(0.228 0.01 74);
+  --palette-muted-surface: var(--palette-neutral-800-muted);
+  --palette-accent-surface: var(--palette-neutral-750);
+  --palette-secondary-surface: var(--palette-neutral-800);
+
+  --palette-border-default: oklch(0.985 0.004 75 / 12%);
+  --palette-border-input: oklch(0.985 0.004 75 / 16%);
+  --palette-border-selected: oklch(0.985 0.004 75 / 30%);
+  --palette-overlay: oklch(0.05 0.003 var(--palette-neutral-hue) / 0.7);
+
+  --palette-primary: oklch(0.78 0.13 75);
+  --palette-primary-foreground: oklch(0.141 0.005 var(--palette-neutral-hue));
+  --palette-on-solid: oklch(0.985 0 0);
+
+  --palette-destructive: oklch(0.704 0.191 22.216);
+  --palette-destructive-muted: oklch(0.704 0.191 22.216 / 70%);
+  --palette-destructive-subtle: oklch(0.704 0.191 22.216 / 50%);
+  --palette-info: oklch(0.72 0.12 250);
+  --palette-info-muted: oklch(0.72 0.12 250 / 70%);
+  --palette-info-subtle: oklch(0.72 0.12 250 / 14%);
+  --palette-success: oklch(0.72 0.12 145);
+  --palette-success-muted: oklch(0.72 0.12 145 / 70%);
+  --palette-success-subtle: oklch(0.72 0.12 145 / 14%);
+  --palette-warning: oklch(0.78 0.13 75);
+  --palette-warning-muted: oklch(0.78 0.13 75 / 70%);
+  --palette-warning-subtle: oklch(0.78 0.13 75 / 14%);
+
+  --palette-semantic-neutral: var(--palette-neutral-700);
+  --palette-semantic-informative: oklch(0.62 0.08 250);
+  --palette-semantic-informative-muted: oklch(0.55 0.05 250);
+  --palette-semantic-positive: oklch(0.72 0.11 145);
+  --palette-semantic-caution: oklch(0.78 0.12 75);
+  --palette-semantic-negative: oklch(0.72 0.16 22);
+  --palette-semantic-negative-on-subtle: var(--palette-neutral-50);
+}
