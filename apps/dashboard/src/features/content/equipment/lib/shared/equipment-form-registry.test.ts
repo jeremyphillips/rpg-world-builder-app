@@ -58,7 +58,11 @@ describe('kindFieldGroups', () => {
   it('registers weapon field group', () => {
     const groups = fieldGroupsForEquipmentKind('weapon')
     expect(groups).toHaveLength(1)
-    expect(groups?.[0]).toMatchObject({ kind: 'group', legend: 'Weapon' })
+    expect(groups?.[0]).toMatchObject({
+      kind: 'group',
+      legend: '',
+      fieldsChrome: { variant: 'panel' },
+    })
   })
 
   it('allRegisteredKindFieldGroups includes every registered kind', () => {

@@ -22,7 +22,7 @@ export const dataTableFilterControlVariants = cva('', {
 
 /** Collapsible advanced-filters panel border + padding. */
 export const dataTableAdvancedPanelVariants = cva(
-  'overflow-hidden rounded-md border border-border bg-muted/30',
+  'overflow-hidden rounded-md border border-border bg-muted/35',
 )
 
 /** Inner grid for secondary filter controls. */
@@ -43,8 +43,10 @@ export const dataTablePaginationVariants = cva(
   'flex flex-wrap items-center justify-between gap-2 text-sm text-muted-foreground',
 )
 
-/** Table container with border + rounded corners. */
-export const dataTableTableWrapVariants = cva('rounded-md border border-border')
+/** Table container — elevated card plane on the page canvas. */
+export const dataTableTableWrapVariants = cva(
+  'overflow-hidden rounded-card border border-border bg-card text-card-foreground shadow-surface-raised',
+)
 
 /**
  * Table element — below `lg`, keep natural column widths and scroll horizontally
@@ -53,31 +55,37 @@ export const dataTableTableWrapVariants = cva('rounded-md border border-border')
  */
 export const dataTableTableVariants = cva('min-w-max text-table-body lg:min-w-0')
 
-/** Body row — fixed ~56px height with group context for cell hover. */
-export const dataTableRowVariants = cva('group/row h-14')
+/** Header row — recessed band; hover matches fill so sort controls stay stable. */
+export const dataTableHeaderRowVariants = cva(
+  'border-b border-border bg-muted/45 hover:bg-muted/45 data-[state=selected]:bg-muted/45',
+)
+
+/** Body row — zebra striping and row-level hover wash. */
+export const dataTableRowVariants = cva(
+  'group/row h-14 border-b border-border/60 even:bg-muted/10 hover:bg-muted/15 data-[state=selected]:bg-muted/40',
+)
 
 /** Header cell — group context for sort icon hover/focus affordance. */
-export const dataTableHeaderCellVariants = cva('group/header')
+export const dataTableHeaderCellVariants = cva(
+  'group/header h-10 bg-transparent text-xs font-semibold tracking-wide text-muted-foreground',
+)
 
 /** Tighter body cell padding than the base TableCell default. */
 export const dataTableBodyCellPaddingVariants = cva('px-3 py-2')
 
 /** Body cell background tone — body only; headers stay flat. */
-export const dataTableBodyCellVariants = cva(
-  'transition-[filter,background-color] group-hover/row:brightness-95',
-  {
-    variants: {
-      tone: {
-        identity: 'bg-accent/20',
-        data: 'bg-muted/10 text-muted-foreground',
-        source: 'bg-muted/15 text-muted-foreground',
-        actions: 'bg-muted/15',
-        neutral: 'text-muted-foreground',
-      },
+export const dataTableBodyCellVariants = cva('transition-colors', {
+  variants: {
+    tone: {
+      identity: 'bg-accent/35 group-hover/row:bg-accent/45',
+      data: 'bg-muted/30 text-muted-foreground group-hover/row:bg-muted/40',
+      source: 'bg-muted/35 text-muted-foreground group-hover/row:bg-muted/45',
+      actions: 'bg-muted/35 group-hover/row:bg-muted/45',
+      neutral: 'group-hover/row:bg-muted/15',
     },
-    defaultVariants: { tone: 'neutral' },
   },
-)
+  defaultVariants: { tone: 'neutral' },
+})
 
 /** Sort icon visibility and size inside SortableHeader. */
 export const dataTableSortIconVariants = cva('ml-1 size-3 shrink-0', {

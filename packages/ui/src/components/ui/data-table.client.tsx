@@ -132,8 +132,9 @@ import {
   dataTableResetColumnVariants,
   dataTableRowVariants,
   dataTableSortIconVariants,
-  dataTableLockedColumnVariants,
   dataTableHeaderCellVariants,
+  dataTableHeaderRowVariants,
+  dataTableLockedColumnVariants,
   dataTableNameCellVariants,
   dataTableRootVariants,
   dataTableTableVariants,
@@ -1035,7 +1036,7 @@ export function DataTable<TData>({
           {caption && <TableCaption className={dataTableCaptionVariants()}>{caption}</TableCaption>}
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
+              <TableRow key={headerGroup.id} className={dataTableHeaderRowVariants()}>
                 {headerGroup.headers.map((header) => {
                   const sorted = header.column.getIsSorted()
                   const canSort = header.column.getCanSort()

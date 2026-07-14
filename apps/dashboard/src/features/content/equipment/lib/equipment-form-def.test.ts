@@ -109,11 +109,11 @@ describe('equipmentFormDef kind-scoped fields', () => {
     ])
   })
 
-  it('weapon route shows Identity, Economy, and Weapon only', () => {
+  it('weapon route shows Identity, Economy, and weapon panel group only', () => {
     expect(collectGroupLegends(equipmentFormDef.buildFields({ equipmentKind: 'weapon' }))).toEqual([
       'Identity',
       'Economy',
-      'Weapon',
+      '',
     ])
   })
 })
