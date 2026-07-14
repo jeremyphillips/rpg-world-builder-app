@@ -45,7 +45,6 @@ describe('spell resolution tab hydration', () => {
     await waitFor(() => {
       expect(screen.queryByRole('button', { name: /add resolution/i })).not.toBeInTheDocument()
       expect(screen.getAllByText('Melee spell attack').length).toBeGreaterThan(0)
-      expect(screen.getByRole('button', { name: /remove resolution/i })).toBeInTheDocument()
     })
   })
 
@@ -54,7 +53,6 @@ describe('spell resolution tab hydration', () => {
 
     await waitFor(() => {
       expect(screen.getByRole('button', { name: /add resolution/i })).toBeInTheDocument()
-      expect(screen.queryByRole('button', { name: /remove resolution/i })).not.toBeInTheDocument()
     })
   })
 
@@ -99,22 +97,8 @@ describe('spell resolution tab hydration', () => {
     await user.click(screen.getByRole('button', { name: /add resolution/i }))
 
     await waitFor(() => {
-      expect(screen.getByRole('button', { name: /remove resolution/i })).toBeInTheDocument()
+      expect(screen.getAllByText('Target').length).toBeGreaterThan(0)
       expect(isDirty).toBe(true)
-    })
-  })
-
-  it('removes resolution and returns to the empty state', async () => {
-    const user = userEvent.setup()
-    window.confirm = () => true
-
-    renderSpellTabbedForm(spellToFormValues(modeledSpell))
-
-    await user.click(screen.getByRole('button', { name: /remove resolution/i }))
-
-    await waitFor(() => {
-      expect(screen.getByRole('button', { name: /add resolution/i })).toBeInTheDocument()
-      expect(screen.queryByRole('button', { name: /remove resolution/i })).not.toBeInTheDocument()
     })
   })
 

@@ -61,7 +61,6 @@ describe('SpellResolutionEditor', () => {
 
     await waitFor(() => {
       expect(screen.getAllByText('Target').length).toBeGreaterThan(0)
-      expect(screen.getByRole('button', { name: /remove resolution/i })).toBeInTheDocument()
     })
   })
 

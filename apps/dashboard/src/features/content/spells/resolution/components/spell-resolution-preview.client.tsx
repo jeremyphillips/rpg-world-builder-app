@@ -1,7 +1,7 @@
 'use client'
 
 import { formatResolutionSummarySections } from '@rpg/contracts'
-import { Heading, Text } from '@rpg/ui'
+import { Alert, Heading, Text } from '@rpg/ui'
 import { useWatch } from 'react-hook-form'
 
 import type { ResolutionFormValues } from '../lib/resolution-form-schema'
@@ -16,40 +16,58 @@ export function SpellResolutionPreview() {
 
   if (!resolution) {
     return (
-      <Text variant="muted" className="text-sm" role="status">
-        Configure resolution to preview structured summaries here. Prose in the Basics tab remains
-        the escape hatch.
-      </Text>
+      <Alert
+        variant="info"
+        title={RESOLUTION_SECTION_LABELS.preview}
+        role="status"
+        aria-live="polite"
+      >
+        <Text variant="muted" className="text-sm">
+          Configure resolution to preview structured summaries here. Prose in the Basics tab remains
+          the escape hatch.
+        </Text>
+      </Alert>
     )
   }
 
   if (!stored) {
     return (
-      <Text variant="muted" className="text-sm" role="status">
-        Complete target, method, range, and damage to preview resolution.
-      </Text>
+      <Alert
+        variant="info"
+        title={RESOLUTION_SECTION_LABELS.preview}
+        role="status"
+        aria-live="polite"
+      >
+        <Text variant="muted" className="text-sm">
+          Complete target, method, range, and damage to preview resolution.
+        </Text>
+      </Alert>
     )
   }
 
   const sections = formatResolutionSummarySections(stored)
 
   return (
-    <div className="space-y-4" role="status" aria-live="polite">
-      <Text variant="emphasis" as="span" className="text-sm">
-        {RESOLUTION_SECTION_LABELS.preview}
-      </Text>
-      {sections.map((section) => (
-        <div key={section.heading} className="space-y-1">
-          <Heading as="h4" variant="subsection" className="text-sm font-medium">
-            {section.heading}
-          </Heading>
-          <ul className="list-inside list-disc space-y-1 text-sm">
-            {section.lines.map((line) => (
-              <li key={line}>{line}</li>
-            ))}
-          </ul>
-        </div>
-      ))}
-    </div>
+    <Alert
+      variant="info"
+      title={RESOLUTION_SECTION_LABELS.preview}
+      role="status"
+      aria-live="polite"
+    >
+      <div className="space-y-4">
+        {sections.map((section) => (
+          <div key={section.heading} className="space-y-1">
+            <Heading as="h4" variant="subsection" className="text-sm font-medium">
+              {section.heading}
+            </Heading>
+            <ul className="list-inside list-disc space-y-1 text-sm">
+              {section.lines.map((line) => (
+                <li key={line}>{line}</li>
+              ))}
+            </ul>
+          </div>
+        ))}
+      </div>
+    </Alert>
   )
 }

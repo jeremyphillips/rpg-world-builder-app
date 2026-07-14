@@ -38,7 +38,7 @@ a description such as “Does not have spellcasting”.
 
 The **Resolution** tab authors an optional `resolution` envelope matching
 `spellResolutionSchema` on the read model. Enablement is the presence of the
-`resolution` object — **Add resolution** / **Remove resolution** — with no
+`resolution` object — enable via **Add resolution** when absent — with no
 parallel boolean flag.
 
 | Concern        | Behavior                                                                 |

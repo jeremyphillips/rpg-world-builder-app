@@ -8,7 +8,6 @@ import { SpellResolutionEmptyState } from '../components/spell-resolution-empty-
 import { SpellResolutionMethodSelect } from '../components/spell-resolution-method-select.client'
 import { SpellResolutionOutcomes } from '../components/spell-resolution-outcomes.client'
 import { SpellResolutionPreview } from '../components/spell-resolution-preview.client'
-import { SpellResolutionRemoveButton } from '../components/spell-resolution-remove.client'
 import { SpellResolutionTargetCount } from '../components/spell-resolution-target-count.client'
 import {
   RESOLUTION_FIELD_LABELS,
@@ -18,6 +17,7 @@ import {
   resolutionTargetKindOptions,
 } from './resolution-form-labels'
 import {
+  combineFieldVisibility,
   visibleWhenNoResolution,
   visibleWhenResolutionConfigured,
 } from './resolution-form-visibility'
@@ -50,42 +50,20 @@ function withVisibility(fields: FormItem[], visibility: FieldVisibility): FormIt
   return fields.map((field) => ({ ...field, visibility }))
 }
 
-/** Resolution tab fields for the spell authoring form. */
-export function resolutionFields(ctx: ContentFormCtx): FormItem[] {
+function configuredResolutionFields(ctx: ContentFormCtx): FormItem[] {
+  const configured = visibleWhenResolutionConfigured()
+
   return [
     {
       kind: 'slot',
-      name: '_resolutionPersistenceNotice',
-      render: () =>
-        createElement(
-          'p',
-          { className: 'text-sm text-muted-foreground', role: 'status' },
-          RESOLUTION_SECTION_LABELS.notSavedBanner,
-        ),
-    },
-    {
-      kind: 'slot',
-      name: '_resolutionEmptyState',
-      visibility: visibleWhenNoResolution(),
-      render: () => createElement(SpellResolutionEmptyState),
-    },
-    {
-      kind: 'slot',
       name: '_resolutionPreview',
-      label: RESOLUTION_SECTION_LABELS.preview,
-      visibility: visibleWhenResolutionConfigured(),
+      visibility: configured,
       render: () => createElement(SpellResolutionPreview),
-    },
-    {
-      kind: 'slot',
-      name: '_resolutionRemove',
-      visibility: visibleWhenResolutionConfigured(),
-      render: () => createElement(SpellResolutionRemoveButton),
     },
     {
       kind: 'group',
       legend: RESOLUTION_SECTION_LABELS.target,
-      visibility: visibleWhenResolutionConfigured(),
+      visibility: configured,
       fields: [
         {
           kind: 'slot',
@@ -119,28 +97,26 @@ export function resolutionFields(ctx: ContentFormCtx): FormItem[] {
       ],
     },
     {
-      kind: 'group',
-      legend: RESOLUTION_SECTION_LABELS.resolution,
-      visibility: visibleWhenResolutionConfigured(),
-      fields: [
+      kind: 'slot',
+      name: '_resolutionMethodSelect',
+      visibility: configured,
+      render: () => createElement(SpellResolutionMethodSelect),
+    },
+    ...withVisibility(
+      [
         {
-          kind: 'slot',
-          name: '_resolutionMethodSelect',
-          render: () => createElement(SpellResolutionMethodSelect),
+          type: 'select',
+          name: `${RESOLUTION_PREFIX}.saveAbility`,
+          label: RESOLUTION_FIELD_LABELS.saveAbility,
+          options: resolutionSaveAbilityOptions,
+          width: 'md',
+          required: true,
         },
-        ...withVisibility(
-          [
-            {
-              type: 'select',
-              name: `${RESOLUTION_PREFIX}.saveAbility`,
-              label: RESOLUTION_FIELD_LABELS.saveAbility,
-              options: resolutionSaveAbilityOptions,
-              width: 'md',
-              required: true,
-            },
-          ],
-          visibleWhenResolutionSavingThrow(),
-        ),
+      ],
+      combineFieldVisibility(configured, visibleWhenResolutionSavingThrow()),
+    ),
+    ...withVisibility(
+      [
         {
           type: 'select',
           name: `${RESOLUTION_PREFIX}.rangeKind`,
@@ -149,40 +125,41 @@ export function resolutionFields(ctx: ContentFormCtx): FormItem[] {
           width: 'md',
           required: true,
         },
-        ...withVisibility(
-          [
-            {
-              type: 'number',
-              name: `${RESOLUTION_PREFIX}.rangeDistanceFt`,
-              label: RESOLUTION_FIELD_LABELS.rangeDistanceFt,
-              min: 0,
-              digits: 3,
-              width: 'auto',
-              required: true,
-            },
-          ],
-          visibleWhenResolutionRangeDistance(),
-        ),
-        ...withVisibility(
-          [
-            {
-              type: 'number',
-              name: `${RESOLUTION_PREFIX}.reachDistanceFt`,
-              label: RESOLUTION_FIELD_LABELS.reachDistanceFt,
-              min: 0,
-              digits: 3,
-              width: 'auto',
-              hint: 'Optional explicit reach distance in feet.',
-            },
-          ],
-          visibleWhenResolutionRangeReach(),
-        ),
       ],
-    },
+      configured,
+    ),
+    ...withVisibility(
+      [
+        {
+          type: 'number',
+          name: `${RESOLUTION_PREFIX}.rangeDistanceFt`,
+          label: RESOLUTION_FIELD_LABELS.rangeDistanceFt,
+          min: 0,
+          digits: 3,
+          width: 'auto',
+          required: true,
+        },
+      ],
+      combineFieldVisibility(configured, visibleWhenResolutionRangeDistance()),
+    ),
+    ...withVisibility(
+      [
+        {
+          type: 'number',
+          name: `${RESOLUTION_PREFIX}.reachDistanceFt`,
+          label: RESOLUTION_FIELD_LABELS.reachDistanceFt,
+          min: 0,
+          digits: 3,
+          width: 'auto',
+          hint: 'Optional explicit reach distance in feet.',
+        },
+      ],
+      combineFieldVisibility(configured, visibleWhenResolutionRangeReach()),
+    ),
     {
       kind: 'group',
       legend: RESOLUTION_SECTION_LABELS.damage,
-      visibility: visibleWhenResolutionConfigured(),
+      visibility: configured,
       fields: [
         {
           kind: 'row',
@@ -204,13 +181,42 @@ export function resolutionFields(ctx: ContentFormCtx): FormItem[] {
     {
       kind: 'group',
       legend: RESOLUTION_SECTION_LABELS.outcomes,
-      visibility: visibleWhenResolutionConfigured(),
+      visibility: configured,
       fields: [
         {
           kind: 'slot',
           name: '_resolutionOutcomes',
           render: () => createElement(SpellResolutionOutcomes),
         },
+      ],
+    },
+  ]
+}
+
+/** Resolution tab fields for the spell authoring form. */
+export function resolutionFields(ctx: ContentFormCtx): FormItem[] {
+  return [
+    {
+      kind: 'group',
+      legend: RESOLUTION_SECTION_LABELS.resolution,
+      fields: [
+        {
+          kind: 'slot',
+          name: '_resolutionPersistenceNotice',
+          render: () =>
+            createElement(
+              'p',
+              { className: 'text-sm text-muted-foreground', role: 'status' },
+              RESOLUTION_SECTION_LABELS.notSavedBanner,
+            ),
+        },
+        {
+          kind: 'slot',
+          name: '_resolutionEmptyState',
+          visibility: visibleWhenNoResolution(),
+          render: () => createElement(SpellResolutionEmptyState),
+        },
+        ...configuredResolutionFields(ctx),
       ],
     },
   ]

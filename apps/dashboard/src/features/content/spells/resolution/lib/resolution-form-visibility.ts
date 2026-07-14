@@ -25,3 +25,13 @@ export function visibleWhenNoResolution(): FieldVisibility {
     visibleWhen: (values) => !isResolutionFormConfigured(values),
   }
 }
+
+/** All visibility predicates must pass for the field to render. */
+export function combineFieldVisibility(...visibilities: FieldVisibility[]): FieldVisibility {
+  const dependsOn = Array.from(new Set(visibilities.flatMap((visibility) => visibility.dependsOn)))
+
+  return {
+    dependsOn,
+    visibleWhen: (values) => visibilities.every((visibility) => visibility.visibleWhen(values)),
+  }
+}

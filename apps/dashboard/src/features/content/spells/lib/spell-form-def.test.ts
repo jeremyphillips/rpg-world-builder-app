@@ -210,18 +210,24 @@ describe('spellFormDef duration fields', () => {
 })
 
 describe('spellFormDef resolution tab', () => {
-  it('includes persistence banner, preview slot, empty state, and resolution groups', () => {
+  it('includes persistence banner, preview slot, empty state, and nested resolution groups', () => {
     const resolutionTab = spellFormDef.buildTabs!({}).find((tab) => tab.id === 'resolution')
     expect(resolutionTab).toBeDefined()
     expect(resolutionTab?.label).toBe('Resolution')
 
-    const names = collectFieldNames(resolutionTab?.fields ?? [])
+    const resolutionGroup = findGroup(resolutionTab?.fields ?? [], 'Resolution')
+    expect(resolutionGroup).toBeDefined()
+
+    const names = collectFieldNames(resolutionGroup?.fields ?? [])
     expect(names).toContain('_resolutionPersistenceNotice')
     expect(names).toContain('_resolutionPreview')
     expect(names).toContain('_resolutionEmptyState')
     expect(names).toContain('resolution.targetKind')
     expect(names).toContain('resolution.damageType')
     expect(names).toContain('resolution.damageRoll')
+    expect(findGroup(resolutionGroup?.fields ?? [], 'Target')).toBeDefined()
+    expect(findGroup(resolutionGroup?.fields ?? [], 'Damage')).toBeDefined()
+    expect(findGroup(resolutionGroup?.fields ?? [], 'Outcomes')).toBeDefined()
   })
 })
 

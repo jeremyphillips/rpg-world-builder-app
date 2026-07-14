@@ -20,7 +20,6 @@ export const RESOLUTION_SECTION_LABELS = {
   outcomes: 'Outcomes',
   preview: 'Preview',
   addResolution: 'Add resolution',
-  removeResolution: 'Remove resolution',
   emptyState: 'No structured resolution configured.',
   notSavedBanner: 'Resolution is not saved yet.',
   hitNote: 'Additional behavior',
