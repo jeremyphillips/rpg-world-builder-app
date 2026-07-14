@@ -9,7 +9,7 @@ import { getSpellResolutionApplicationAmountLabel } from '@rpg/contracts'
 
 import type { ResolutionFormValues } from '../lib/resolution-form-schema'
 import { RESOLUTION_FIELD_LABELS, RESOLUTION_SECTION_LABELS } from '../lib/resolution-form-labels'
-import { RESOLUTION_FIELD_NAME } from './spell-resolution-empty-state.client'
+import { RESOLUTION_FIELD_NAME } from '../lib/resolution-form-values'
 
 function OutcomeLine({ label, amountLabel }: { label: string; amountLabel: string }) {
   return (

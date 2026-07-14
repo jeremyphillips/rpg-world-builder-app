@@ -7,7 +7,7 @@ import { useWatch } from 'react-hook-form'
 import type { ResolutionFormValues } from '../lib/resolution-form-schema'
 import { resolutionToStored } from '../lib/resolution-form-values'
 import { RESOLUTION_SECTION_LABELS } from '../lib/resolution-form-labels'
-import { RESOLUTION_FIELD_NAME } from './spell-resolution-empty-state.client'
+import { RESOLUTION_FIELD_NAME } from '../lib/resolution-form-values'
 
 /** Live preview of normalized spell resolution from local form state. */
 export function SpellResolutionPreview() {

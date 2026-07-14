@@ -5,7 +5,7 @@ import { Button } from '@rpg/ui'
 
 import type { ResolutionFormValues } from '../lib/resolution-form-schema'
 import { RESOLUTION_SECTION_LABELS } from '../lib/resolution-form-labels'
-import { RESOLUTION_FIELD_NAME } from './spell-resolution-empty-state.client'
+import { RESOLUTION_FIELD_NAME } from '../lib/resolution-form-values'
 
 function hasResolutionContent(resolution: ResolutionFormValues | undefined): boolean {
   if (!resolution) return false
@@ -38,6 +38,7 @@ export function SpellResolutionRemoveButton() {
 
         setValue(RESOLUTION_FIELD_NAME, undefined, {
           shouldDirty: true,
+          shouldTouch: true,
           shouldValidate: true,
         })
       }}

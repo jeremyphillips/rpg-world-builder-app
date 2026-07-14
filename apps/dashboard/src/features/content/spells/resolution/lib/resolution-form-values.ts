@@ -14,6 +14,8 @@ import {
 } from '../../../lib/forms/mechanics/roll-form-values'
 import type { ResolutionFormValues, ResolutionMethodKind } from './resolution-form-schema'
 
+export const RESOLUTION_FIELD_NAME = 'resolution' as const
+
 function buildResolutionMethod(values: ResolutionFormValues): SpellResolutionMethod | undefined {
   if (values.methodKind === 'attack') {
     if (!values.attackType) return undefined
@@ -220,6 +222,11 @@ export function createDefaultAttackResolutionFormValues(
     damageRoll: { dice: { count: 1, faces: 10 } },
     damageType: 'force',
   }
+}
+
+/** Default attack-preset resolution slice for unmodeled spells (Add resolution). */
+export function createDefaultResolutionFormValues(): ResolutionFormValues {
+  return createDefaultAttackResolutionFormValues()
 }
 
 export function createDefaultSavingThrowResolutionFormValues(): ResolutionFormValues {

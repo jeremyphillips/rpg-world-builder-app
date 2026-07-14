@@ -17,22 +17,13 @@ import {
   resolutionSaveAbilityOptions,
   resolutionTargetKindOptions,
 } from './resolution-form-labels'
+import {
+  visibleWhenNoResolution,
+  visibleWhenResolutionConfigured,
+} from './resolution-form-visibility'
+import { RESOLUTION_FIELD_NAME } from './resolution-form-values'
 
-const RESOLUTION_PREFIX = 'resolution'
-
-function visibleWhenResolutionConfigured(): FieldVisibility {
-  return {
-    dependsOn: [RESOLUTION_PREFIX],
-    visibleWhen: (values) => values[RESOLUTION_PREFIX] != null,
-  }
-}
-
-function visibleWhenNoResolution(): FieldVisibility {
-  return {
-    dependsOn: [RESOLUTION_PREFIX],
-    visibleWhen: (values) => values[RESOLUTION_PREFIX] == null,
-  }
-}
+const RESOLUTION_PREFIX = RESOLUTION_FIELD_NAME
 
 function visibleWhenResolutionSavingThrow(): FieldVisibility {
   return {

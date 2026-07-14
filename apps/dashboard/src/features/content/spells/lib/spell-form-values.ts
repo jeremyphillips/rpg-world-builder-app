@@ -409,7 +409,7 @@ export function spellToFormValues(entity: Spell): SpellFormValues {
     areaOfEffect: spellAreaOfEffectToFormValues(entity.areaOfEffect),
     deliveryMethod: entity.deliveryMethod ?? SPELL_DELIVERY_METHOD_NONE,
     effects: spellEffectsToFormValues(entity.effects),
-    resolution: resolutionToForm(entity.resolution),
+    ...(entity.resolution ? { resolution: resolutionToForm(entity.resolution) } : {}),
   }
 }
 

@@ -4,7 +4,7 @@ import { useWatch } from 'react-hook-form'
 import { Text } from '@rpg/ui'
 
 import { RESOLUTION_FIELD_LABELS } from '../lib/resolution-form-labels'
-import { RESOLUTION_FIELD_NAME } from './spell-resolution-empty-state.client'
+import { RESOLUTION_FIELD_NAME } from '../lib/resolution-form-values'
 
 /** MVP target count display — fixed at one for scoped spells. */
 export function SpellResolutionTargetCount() {

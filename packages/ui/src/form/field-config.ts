@@ -817,6 +817,8 @@ export interface SlotConfig {
   label?: string
   hint?: string
   className?: string
+  /** When hidden, the slot unmounts and any registered values clear with `shouldUnregister`. */
+  visibility?: FieldVisibility
   render: () => ReactNode
   /**
    * Vertical gap between slot content siblings. Defaults to `compact` array rhythm
