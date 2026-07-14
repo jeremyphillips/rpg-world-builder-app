@@ -101,6 +101,8 @@ export {
   fieldDigitTrailingIconClasses,
   fieldDigitTrailingPaddingClasses,
   fieldGroupedControlSizeClasses,
+  buttonSizeToComboboxFieldSize,
+  fieldSizeToArrayAddButtonSize,
   fieldSizeToBadgeSize,
   fieldSizeToChipSize,
   fieldSizeTypographyClasses,
@@ -258,6 +260,7 @@ export {
   previewCardTitleVariants,
   previewCardDescriptionVariants,
   type PreviewCardRootVariantProps,
+  type PreviewCardLayout,
 } from './components/ui/preview-card.variants'
 export {
   RichTextLinkPreviewCard,

@@ -254,6 +254,19 @@ describe('spell resolution tab hydration', () => {
       expect(screen.getByRole('spinbutton', { name: 'Damage roll Number of dice' })).toHaveValue(1)
       expect(screen.getByRole('combobox', { name: 'Die size' })).toHaveTextContent('d10')
     })
+
+    const banner = screen.getByText(RESOLUTION_SECTION_LABELS.notSavedBanner)
+    const hybrid = screen.getByText(RESOLUTION_SECTION_LABELS.hybridNoticeTitle)
+    const emptyStacks = [...document.querySelectorAll('.flex.flex-col.gap-2')].filter(
+      (el) => el.childElementCount === 0,
+    )
+    const betweenBannerAndHybrid = emptyStacks.filter((el) => {
+      const afterBanner = banner.compareDocumentPosition(el) & Node.DOCUMENT_POSITION_FOLLOWING
+      const beforeHybrid = el.compareDocumentPosition(hybrid) & Node.DOCUMENT_POSITION_FOLLOWING
+      return Boolean(afterBanner && beforeHybrid)
+    })
+    expect(betweenBannerAndHybrid).toHaveLength(0)
+
     expect(isDirty).toBe(false)
     expect(eldritchBlast.effects?.length).toBeGreaterThan(1)
   })

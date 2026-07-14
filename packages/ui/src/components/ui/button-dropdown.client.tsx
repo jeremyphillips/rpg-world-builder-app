@@ -4,6 +4,7 @@ import * as React from 'react'
 import * as PopoverPrimitive from '@radix-ui/react-popover'
 import { ChevronDown } from 'lucide-react'
 
+import { buttonSizeToComboboxFieldSize } from '../../components/ui/field-sizing.variants'
 import { cn } from '../../lib/utils'
 import { Button } from './button.client'
 import { ComboboxSearchField } from './combobox-field-parts.client'
@@ -74,15 +75,13 @@ function ButtonDropdownItemRow({
 }) {
   if (item.disabled) {
     return (
-      <div className="px-1 py-0.5" aria-disabled="true">
+      <div aria-disabled="true">
         <PreviewCard
           title={item.label}
           description={item.description}
           tone="transparent"
           density="compact"
-          footerSlot={
-            item.note ? <span className="text-muted-foreground">{item.note}</span> : undefined
-          }
+          footerSlot={item.note}
           className="opacity-50"
         />
       </div>
@@ -90,7 +89,7 @@ function ButtonDropdownItemRow({
   }
 
   return (
-    <div className="px-1 py-0.5" onMouseEnter={onHighlight}>
+    <div onMouseEnter={onHighlight}>
       <PreviewCard
         title={item.label}
         description={item.description}
@@ -99,9 +98,7 @@ function ButtonDropdownItemRow({
         interactive
         optionId={optionId}
         isHighlighted={isHighlighted}
-        footerSlot={
-          item.note ? <span className="text-muted-foreground">{item.note}</span> : undefined
-        }
+        footerSlot={item.note}
         onSelect={onSelect}
       />
     </div>
@@ -141,6 +138,7 @@ export function ButtonDropdown({
     setActiveIndex,
   } = useButtonDropdownControl({ groups, items, enableSearch, onSelectItem })
   const groupedSections = groupHeadingsForItems(displayItems, groups, searchActive)
+  const searchFieldSize = buttonSizeToComboboxFieldSize[size ?? 'default']
 
   const highlightIndexForItem = React.useCallback(
     (item: ButtonDropdownItem) =>
@@ -181,7 +179,7 @@ export function ButtonDropdown({
               label={label}
               listboxId={listboxId}
               searchId={searchId}
-              size="sm"
+              size={searchFieldSize}
               query={query}
               activeOptionId={activeOptionId}
               searchInputRef={searchInputRef}
@@ -218,9 +216,9 @@ export function ButtonDropdown({
               ))
             ) : (
               groupedSections.map(({ group, items: sectionItems }) => (
-                <div key={group?.id ?? '__ungrouped'} className="py-1">
+                <div key={group?.id ?? '__ungrouped'}>
                   {group ? (
-                    <div className="px-3 pb-1">
+                    <div className="px-3 pb-1 pt-1">
                       <Eyebrow size="xs">{group.label}</Eyebrow>
                     </div>
                   ) : null}

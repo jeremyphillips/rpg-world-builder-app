@@ -149,12 +149,12 @@ function resolutionEffectsAndOutcomesGroup(ctx: ContentFormCtx): FormItem {
             name: '_resolutionEffectsApplicationLabel',
             render: () => createElement(SpellResolutionEffectsApplicationLabel),
           },
+          resolutionEffectsArrayField(ctx),
           {
             kind: 'slot',
             name: '_resolutionEffectAddControl',
             render: () => createElement(SpellResolutionEffectAddControl),
           },
-          resolutionEffectsArrayField(ctx),
         ],
       },
       resolutionOutcomeBranchesGroup(),

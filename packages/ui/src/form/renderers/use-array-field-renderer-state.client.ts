@@ -106,7 +106,7 @@ export function useArrayFieldRendererState({
     addValidationSessionExpandKeys,
   })
 
-  const { appendItem, appendFromAddMenu, addMenuItems } = useArrayFieldAppend({
+  const { appendItem, appendFromAddMenu, appendWithDefaults, addMenuItems } = useArrayFieldAppend({
     config,
     fullName,
     fields,
@@ -158,6 +158,7 @@ export function useArrayFieldRendererState({
     addMenuItems,
     appendFromAddMenu,
     appendItem,
+    appendWithDefaults,
     arrayIssueCount,
     canAdd,
     focusFirstArrayIssue,

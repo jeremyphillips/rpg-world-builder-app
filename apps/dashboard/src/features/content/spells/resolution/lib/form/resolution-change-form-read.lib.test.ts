@@ -52,6 +52,7 @@ describe('readResolutionValues', () => {
     const unregister = registerArrayFieldMutators(control, `${RESOLUTION_FIELD_NAME}.effects`, {
       getValues: () => liveEffects,
       remove: () => undefined,
+      append: () => undefined,
     })
 
     const getValues = (name?: string) => {

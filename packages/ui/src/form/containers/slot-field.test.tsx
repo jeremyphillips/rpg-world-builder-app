@@ -20,6 +20,10 @@ function NotesSlot() {
   return <textarea aria-label="Notes" {...register('notes')} />
 }
 
+function NullSlot() {
+  return null
+}
+
 const schema = z.object({
   name: z.string().min(1, 'Name is required'),
   notes: z.string().optional(),
@@ -123,6 +127,56 @@ describe('SlotFieldRenderer', () => {
 
     expect(screen.getByTestId('slot-size')).toHaveTextContent('sm')
     expect(screen.getByRole('textbox', { name: 'Name' })).toHaveClass('h-9')
+  })
+
+  it('omits the rhythm wrapper when an unlabeled slot renders null', () => {
+    const nullSlotFields: FormItem[] = [
+      {
+        kind: 'slot',
+        name: 'empty',
+        render: () => null,
+      },
+      { type: 'text', name: 'name', label: 'Name', required: true },
+    ]
+
+    const { container } = render(
+      <Form<Values>
+        schema={schema}
+        fields={nullSlotFields}
+        defaultValues={{ notes: '' }}
+        onSubmit={vi.fn()}
+        footer={<button type="submit">Save</button>}
+        rhythm="compact"
+      />,
+    )
+
+    expect(container.querySelectorAll('.flex.flex-col.gap-2')).toHaveLength(1)
+    expect(screen.getByLabelText('Name')).toBeInTheDocument()
+  })
+
+  it('omits the rhythm wrapper when an unlabeled slot component renders null', () => {
+    const nullComponentSlotFields: FormItem[] = [
+      {
+        kind: 'slot',
+        name: 'empty',
+        render: () => <NullSlot />,
+      },
+      { type: 'text', name: 'name', label: 'Name', required: true },
+    ]
+
+    const { container } = render(
+      <Form<Values>
+        schema={schema}
+        fields={nullComponentSlotFields}
+        defaultValues={{ notes: '' }}
+        onSubmit={vi.fn()}
+        footer={<button type="submit">Save</button>}
+        rhythm="compact"
+      />,
+    )
+
+    expect(container.querySelectorAll('.flex.flex-col.gap-2')).toHaveLength(1)
+    expect(screen.getByLabelText('Name')).toBeInTheDocument()
   })
 
   it('hides a slot when its visibility predicate is false', () => {

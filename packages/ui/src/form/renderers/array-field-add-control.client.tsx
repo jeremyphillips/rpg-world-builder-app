@@ -12,6 +12,8 @@ import type {
   ButtonDropdownGroup,
   ButtonDropdownItem,
 } from '../../components/ui/button-dropdown.types'
+import { fieldSizeToArrayAddButtonSize } from '../../components/ui/field-sizing.variants'
+import { useFormSectionContext } from '../context/form-section.context'
 import type { ArrayConfig } from '../field-config'
 
 type ArrayFieldAddControlProps = {
@@ -31,6 +33,9 @@ export function ArrayFieldAddControl({
   onAppendItem,
   onAppendFromMenu,
 }: ArrayFieldAddControlProps) {
+  const { size } = useFormSectionContext()
+  const buttonSize = fieldSizeToArrayAddButtonSize[size]
+
   if (!canAdd) return null
 
   if (addMenu) {
@@ -40,13 +45,14 @@ export function ArrayFieldAddControl({
         groups={addMenu.groups as ButtonDropdownGroup[]}
         items={addMenuItems}
         enableSearch={addMenu.enableSearch}
+        size={buttonSize}
         onSelectItem={onAppendFromMenu}
       />
     )
   }
 
   return (
-    <Button variant="outline" size="sm" onClick={onAppendItem} aria-label={addLabel}>
+    <Button variant="outline" size={buttonSize} onClick={onAppendItem} aria-label={addLabel}>
       {addLabel}
     </Button>
   )

@@ -38,13 +38,18 @@ export function SlotFieldRenderer({ config }: SlotFieldRendererProps) {
     )
   }
 
+  if (content == null && !config.hint) return null
+
+  if (!config.hint) {
+    if (!config.className) return content
+    return <div className={config.className}>{content}</div>
+  }
+
   return (
     <FormRhythmStack className={config.className}>
-      {config.hint ? (
-        <Text variant="small" className={fieldGroupDescriptionClasses}>
-          {config.hint}
-        </Text>
-      ) : null}
+      <Text variant="small" className={fieldGroupDescriptionClasses}>
+        {config.hint}
+      </Text>
       {content}
     </FormRhythmStack>
   )

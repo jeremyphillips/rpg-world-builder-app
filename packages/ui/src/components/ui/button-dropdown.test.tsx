@@ -99,6 +99,24 @@ describe('ButtonDropdown', () => {
     expect(onSelectItem).toHaveBeenCalledWith('skill-proficiency')
   })
 
+  it('matches search row size to the trigger button size', async () => {
+    const user = userEvent.setup()
+    render(
+      <ButtonDropdown
+        label="Add grant"
+        size="default"
+        groups={groups}
+        items={items}
+        onSelectItem={vi.fn()}
+      />,
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Add grant' }))
+    expect(screen.getByRole('searchbox', { name: 'Search Add grant' }).parentElement).toHaveClass(
+      'h-9',
+    )
+  })
+
   it('has no axe accessibility violations', async () => {
     const { container } = render(
       <ButtonDropdown label="Add grant" groups={groups} items={items} onSelectItem={vi.fn()} />,

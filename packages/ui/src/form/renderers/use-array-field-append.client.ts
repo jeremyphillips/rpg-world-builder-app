@@ -63,33 +63,31 @@ export function useArrayFieldAppend({
     [append, config, fullName, getValues, staticItemDefaults],
   )
 
-  const appendFromAddMenu = React.useCallback(
-    (itemId: string) => {
-      const menuItem = config.addMenu?.items.find((item) => item.id === itemId)
-      if (!menuItem) return
-
+  const appendWithDefaults = React.useCallback(
+    (defaults: Record<string, unknown>) => {
       const newIndex = fields.length
-      const mergedDefaults = mergeArrayAddMenuDefaults(menuItem, staticItemDefaults)
-      append(mergedDefaults)
+      append(defaults)
 
       if (collapsible) {
         addValidationSessionExpandKeys(
-          buildArrayAddMenuExpandKeys(fullName, newIndex, mergedDefaults, itemCollapseKey),
+          buildArrayAddMenuExpandKeys(fullName, newIndex, defaults, itemCollapseKey),
         )
       }
 
       scheduleArrayItemFocus(fullName, newIndex)
     },
-    [
-      addValidationSessionExpandKeys,
-      append,
-      collapsible,
-      config.addMenu?.items,
-      fields.length,
-      fullName,
-      itemCollapseKey,
-      staticItemDefaults,
-    ],
+    [addValidationSessionExpandKeys, append, collapsible, fields.length, fullName, itemCollapseKey],
+  )
+
+  const appendFromAddMenu = React.useCallback(
+    (itemId: string) => {
+      const menuItem = config.addMenu?.items.find((item) => item.id === itemId)
+      if (!menuItem) return
+
+      const mergedDefaults = mergeArrayAddMenuDefaults(menuItem, staticItemDefaults)
+      appendWithDefaults(mergedDefaults)
+    },
+    [appendWithDefaults, config.addMenu?.items, staticItemDefaults],
   )
 
   const addMenuItems = React.useMemo(() => {
@@ -97,5 +95,5 @@ export function useArrayFieldAppend({
     return buildArrayAddMenuItems(config.addMenu, watchedItems ?? [])
   }, [config.addMenu, watchedItems])
 
-  return { appendItem, appendFromAddMenu, addMenuItems }
+  return { appendItem, appendFromAddMenu, appendWithDefaults, addMenuItems }
 }

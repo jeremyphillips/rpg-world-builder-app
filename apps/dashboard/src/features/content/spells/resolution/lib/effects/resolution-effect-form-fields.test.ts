@@ -10,6 +10,7 @@ import {
 
 import { formatEffectRowPrimary, formatEffectRowSummary } from '../../../lib/effects/effect-display'
 import { resolutionFields } from '../form/resolution-form-fields'
+import { buildResolutionEffectAddMenuItems } from '../selection/resolution-selection-options.lib'
 import { resolutionFormToSelectionContext } from '../selection/resolution-selection-context.lib'
 import { RESOLUTION_FORM_FIXTURES } from '../../fixtures'
 
@@ -62,6 +63,15 @@ describe('resolutionFields effects array', () => {
     const arrayField = findResolutionEffectsArray(resolutionFields({}))
     expect(arrayField?.itemVariant).toBe('detailed')
     expect(arrayField?.itemCollapsible).toBe(true)
+  })
+
+  it('includes template descriptions in the resolution add menu', () => {
+    const context = resolutionFormToSelectionContext(RESOLUTION_FORM_FIXTURES.eldritchBlast)
+    const damageItem = buildResolutionEffectAddMenuItems(context).find(
+      (item) => item.id === 'damage',
+    )
+
+    expect(damageItem?.description).toMatch(/damage type/i)
   })
 
   it('wires grant-style collapsible item headers with parent context summaries', () => {

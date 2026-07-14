@@ -14,6 +14,10 @@ import {
   resolveFormFieldSize,
   resolveInheritedFieldSize,
 } from './field.variants'
+import {
+  fieldSizeToArrayAddButtonSize,
+  buttonSizeToComboboxFieldSize,
+} from './field-sizing.variants'
 import { richTextEditorProseClasses, richTextProseSizeClasses } from './rich-text-content.variants'
 
 describe('fieldStackRhythmVariants', () => {
@@ -97,6 +101,22 @@ describe('resolveFormFieldSize', () => {
 
   it('prefers an explicit form size over rhythm mapping', () => {
     expect(resolveFormFieldSize({ explicit: 'lg', rhythm: 'compact' })).toBe('lg')
+  })
+})
+
+describe('fieldSizeToArrayAddButtonSize', () => {
+  it('bumps sm array sections to default button size', () => {
+    expect(fieldSizeToArrayAddButtonSize.sm).toBe('default')
+    expect(fieldSizeToArrayAddButtonSize.md).toBe('default')
+    expect(fieldSizeToArrayAddButtonSize.lg).toBe('lg')
+  })
+})
+
+describe('buttonSizeToComboboxFieldSize', () => {
+  it('maps outline button sizes to combobox search row sizes', () => {
+    expect(buttonSizeToComboboxFieldSize.sm).toBe('sm')
+    expect(buttonSizeToComboboxFieldSize.default).toBe('md')
+    expect(buttonSizeToComboboxFieldSize.lg).toBe('lg')
   })
 })
 

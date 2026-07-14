@@ -64,6 +64,25 @@ describe('SpellResolutionEditor', () => {
     })
   })
 
+  it('renders the add effect control after authored effect rows', async () => {
+    render(
+      <SpellResolutionEditor
+        formCtx={formCtx}
+        defaultResolution={RESOLUTION_FORM_FIXTURES.eldritchBlast}
+      />,
+    )
+
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: /Collapse Damage/i })).toBeInTheDocument()
+    })
+
+    const collapse = screen.getByRole('button', { name: /Collapse Damage/i })
+    const addEffect = screen.getByRole('button', { name: /^Add effect$/ })
+    expect(
+      collapse.compareDocumentPosition(addEffect) & Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy()
+  })
+
   it('routes header remove through requestResolutionChange', async () => {
     const requestResolutionChange = vi.fn()
     vi.spyOn(resolutionChangeConfirm, 'useResolutionEditorContext').mockReturnValue({

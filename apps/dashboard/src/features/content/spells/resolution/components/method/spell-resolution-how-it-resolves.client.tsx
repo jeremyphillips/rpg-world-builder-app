@@ -65,6 +65,7 @@ export function SpellResolutionHowItResolves() {
         <SelectField
           id={applicationPatternId}
           label={RESOLUTION_FIELD_LABELS.applicationPattern}
+          info={RESOLUTION_FIELD_LABELS.applicationPatternHint}
           value={resolution.applicationPatternKind ?? 'none'}
           onValueChange={(next) => {
             requestResolutionChange({
@@ -74,8 +75,6 @@ export function SpellResolutionHowItResolves() {
           }}
           options={buildResolutionApplicationPatternOptions(context)}
           width="lg"
-          hint={RESOLUTION_FIELD_LABELS.applicationPatternHint}
-          hintPosition="below-control"
         />
       </FieldRow>
       {showSaveAbility ? (

@@ -50,6 +50,7 @@ describe('PreviewCard', () => {
 
     const { container } = render(
       <PreviewCard
+        layout="card"
         eyebrow="Spell"
         title="Fireball"
         description="Homebrew"
@@ -64,6 +65,22 @@ describe('PreviewCard', () => {
     expect(container.firstElementChild?.tagName).toBe('DIV')
     await user.click(screen.getByRole('button', { name: 'Clear selection' }))
     expect(onClear).toHaveBeenCalledTimes(1)
+  })
+
+  it('uses list note styling for availability copy by default', () => {
+    render(
+      <PreviewCard
+        title="Healing"
+        description="Roll-based healing (e.g. 2d8 healing)."
+        footerSlot="Not available with ranged spell resolution"
+      />,
+    )
+
+    const note = screen.getByText('Not available with ranged spell resolution')
+    expect(note).toHaveClass('text-xs')
+    expect(note).toHaveClass('italic')
+    expect(screen.getByText('Healing')).toHaveClass('text-sm')
+    expect(screen.getByText('Healing')).toHaveClass('mb-1')
   })
 
   it('has no axe accessibility violations', async () => {

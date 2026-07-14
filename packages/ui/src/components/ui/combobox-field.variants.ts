@@ -39,16 +39,16 @@ export const comboboxSearchInputVariants = cva(
   'min-w-0 flex-1 border-0 bg-transparent shadow-none rounded-none dark:bg-transparent focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0 placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50',
 )
 
-/** Scrollable listbox region. */
-export const comboboxListVariants = cva('max-h-60 overflow-y-auto p-1')
+/** Scrollable listbox region — flush so option hover states span the panel width. */
+export const comboboxListVariants = cva('max-h-60 overflow-y-auto p-0')
 
 /** Individual selectable option row. */
 export const comboboxOptionVariants = cva(
-  'relative flex w-full cursor-default select-none items-start gap-2 rounded-sm px-2 py-1.5 text-left text-sm outline-none focus-visible:bg-accent focus-visible:text-accent-foreground data-[active=true]:bg-accent data-[active=true]:text-accent-foreground data-[disabled=true]:pointer-events-none data-[disabled=true]:opacity-50',
+  'relative flex w-full cursor-default select-none items-start gap-2 rounded-none px-3 py-1.5 text-left text-sm outline-none hover:bg-accent hover:text-accent-foreground focus-visible:bg-accent focus-visible:text-accent-foreground data-[active=true]:bg-accent data-[active=true]:text-accent-foreground data-[disabled=true]:pointer-events-none data-[disabled=true]:opacity-50',
 )
 
 /** Empty-state message when the filter matches nothing. */
-export const comboboxEmptyVariants = cva('px-2 py-4 text-center text-sm text-muted-foreground')
+export const comboboxEmptyVariants = cva('px-3 py-4 text-center text-sm text-muted-foreground')
 
 /** Dismissible-badge row shown below the trigger in multi-select mode. */
 export const comboboxSelectedItemsRowVariants = cva('flex flex-wrap gap-1.5 pt-2')

@@ -72,6 +72,24 @@ export const fieldSizeToChipSize = {
   lg: 'lg',
 } as const satisfies Record<FieldSizeToken, 'md' | 'lg'>
 
+/**
+ * Maps array section field size to the paired add-button size. Array item fields
+ * default to `sm`, but the add action uses the next visual step (`default` / md).
+ */
+export const fieldSizeToArrayAddButtonSize = {
+  sm: 'default',
+  md: 'default',
+  lg: 'lg',
+} as const satisfies Record<FieldSizeToken, 'default' | 'lg'>
+
+/** Maps outline button size to combobox search row field size. */
+export const buttonSizeToComboboxFieldSize = {
+  sm: 'sm',
+  default: 'md',
+  lg: 'lg',
+  icon: 'md',
+} as const satisfies Record<'sm' | 'default' | 'lg' | 'icon', FieldSizeToken>
+
 /** Icon sizing that pairs with `fieldDigitTrailingColumnClasses`. */
 export const fieldDigitTrailingIconClasses = {
   sm: '[&_svg]:size-2.5',

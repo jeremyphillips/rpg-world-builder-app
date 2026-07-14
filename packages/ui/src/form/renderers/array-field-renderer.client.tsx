@@ -46,13 +46,6 @@ export function ArrayFieldRenderer({ config, idPrefix, fullName }: ArrayFieldRen
   const { getValues } = form
   const watchedItems = useWatch({ name: fullName }) as unknown[] | undefined
 
-  React.useEffect(() => {
-    return registerArrayFieldMutators(form.control, fullName, {
-      getValues: () => fields.map((_, index) => form.getValues(`${fullName}.${index}`)),
-      remove,
-    })
-  }, [form, fullName, fields, remove])
-
   const state = useArrayFieldRendererState({
     config,
     idPrefix,
@@ -63,6 +56,14 @@ export function ArrayFieldRenderer({ config, idPrefix, fullName }: ArrayFieldRen
     getValues,
     watchedItems,
   })
+
+  React.useEffect(() => {
+    return registerArrayFieldMutators(form.control, fullName, {
+      getValues: () => fields.map((_, index) => form.getValues(`${fullName}.${index}`)),
+      remove,
+      append: state.appendWithDefaults,
+    })
+  }, [form, fullName, fields, remove, state.appendWithDefaults])
 
   return (
     <fieldset

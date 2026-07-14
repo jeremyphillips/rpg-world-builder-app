@@ -21,8 +21,27 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
-export const Default: Story = {
+export const ListRow: Story = {
   args: {
+    eyebrow: 'Grant template',
+    title: 'Skill proficiency',
+    description: 'Grant proficiency with specific skills or a player choice from a pool.',
+    tone: 'transparent',
+    interactive: true,
+    onSelect: action('onSelect'),
+  },
+  decorators: [
+    (Story) => (
+      <div className="max-w-sm overflow-hidden rounded-md border border-border">
+        <Story />
+      </div>
+    ),
+  ],
+}
+
+export const Card: Story = {
+  args: {
+    layout: 'card',
     eyebrow: 'Grant template',
     title: 'Skill proficiency',
     description: 'Grant proficiency with specific skills or a player choice from a pool.',
@@ -49,7 +68,7 @@ export const TransparentSelectable: Story = {
   },
   decorators: [
     (Story) => (
-      <div className="max-w-sm rounded-md border border-border p-1">
+      <div className="max-w-sm overflow-hidden rounded-md border border-border">
         <Story />
       </div>
     ),
@@ -78,6 +97,7 @@ export const DescriptionInline: Story = {
 
 export const SelectedTone: Story = {
   args: {
+    layout: 'card',
     tone: 'selected',
     eyebrow: 'Feat',
     title: 'Feat Overview',
@@ -86,6 +106,7 @@ export const SelectedTone: Story = {
 
 export const WithEndSlotControls: Story = {
   args: {
+    layout: 'card',
     tone: 'selected',
     eyebrow: 'Spell',
     title: 'Fireball',

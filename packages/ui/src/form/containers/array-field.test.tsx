@@ -111,6 +111,7 @@ describe('ArrayFieldRenderer', () => {
       'gap-2',
     )
     expect(screen.getByRole('button', { name: 'Add trait' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Add trait' })).toHaveClass('h-9')
     expect(screen.queryByLabelText('Trait name')).not.toBeInTheDocument()
     expect(screen.getByRole('group', { name: /Traits/ })).toHaveClass('mb-8')
   })

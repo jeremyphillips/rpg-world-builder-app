@@ -7,6 +7,7 @@ import { Eyebrow } from './eyebrow'
 import {
   previewCardBodyVariants,
   previewCardDescriptionVariants,
+  previewCardNoteVariants,
   previewCardRootVariants,
   previewCardTitleVariants,
   type PreviewCardRootVariantProps,
@@ -45,6 +46,7 @@ function PreviewCardContent({
   endSlot,
   footerSlot,
   density = 'compact',
+  layout = 'list',
 }: Pick<
   PreviewCardProps,
   | 'title'
@@ -55,14 +57,15 @@ function PreviewCardContent({
   | 'endSlot'
   | 'footerSlot'
   | 'density'
+  | 'layout'
 >) {
   return (
-    <div className={previewCardBodyVariants({ density })}>
+    <div className={previewCardBodyVariants({ density, layout })}>
       {startSlot ? <div className="shrink-0">{startSlot}</div> : null}
       <div className="min-w-0 flex-1">
         {eyebrow ? <Eyebrow size="xs">{eyebrow}</Eyebrow> : null}
         {descriptionInline && description ? (
-          <p className={previewCardTitleVariants({ density })}>
+          <p className={previewCardTitleVariants({ density, layout })}>
             <span>{title}</span>
             <span
               className={cn(previewCardDescriptionVariants({ density, inline: true }), 'font-body')}
@@ -73,13 +76,19 @@ function PreviewCardContent({
           </p>
         ) : (
           <>
-            <p className={previewCardTitleVariants({ density })}>{title}</p>
+            <p className={previewCardTitleVariants({ density, layout })}>{title}</p>
             {description ? (
               <p className={previewCardDescriptionVariants({ density })}>{description}</p>
             ) : null}
           </>
         )}
-        {footerSlot ? <div className="mt-1">{footerSlot}</div> : null}
+        {footerSlot ? (
+          layout === 'list' ? (
+            <p className={previewCardNoteVariants({ density })}>{footerSlot}</p>
+          ) : (
+            <div className="mt-1">{footerSlot}</div>
+          )
+        ) : null}
       </div>
       {endSlot ? <div className="shrink-0">{endSlot}</div> : null}
     </div>
@@ -102,6 +111,7 @@ export function PreviewCard({
   footerSlot,
   tone = 'default',
   density = 'compact',
+  layout = 'list',
   interactive,
   className,
   optionId,
@@ -110,7 +120,7 @@ export function PreviewCard({
 }: PreviewCardProps) {
   const resolvedInteractive = interactive ?? Boolean(onSelect)
   const rootClassName = cn(
-    previewCardRootVariants({ tone, density, interactive: resolvedInteractive }),
+    previewCardRootVariants({ tone, density, layout, interactive: resolvedInteractive }),
     className,
   )
   const content = (
@@ -123,6 +133,7 @@ export function PreviewCard({
       endSlot={endSlot}
       footerSlot={footerSlot}
       density={density}
+      layout={layout}
     />
   )
 

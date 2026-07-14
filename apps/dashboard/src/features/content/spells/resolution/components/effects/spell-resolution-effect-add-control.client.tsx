@@ -1,8 +1,9 @@
 'use client'
 
-import { ButtonDropdown } from '@rpg/ui'
+import { ButtonDropdown, fieldSizeToArrayAddButtonSize } from '@rpg/ui'
 import type { ButtonDropdownItem } from '@rpg/ui'
-import { useFieldArray, useFormContext, useWatch } from 'react-hook-form'
+import { getArrayFieldMutators, useFormSectionContext } from '@rpg/ui/form'
+import { useFormContext, useWatch } from 'react-hook-form'
 
 import {
   createResolutionEffectAppendDefaults,
@@ -18,15 +19,16 @@ const EFFECTS_FIELD = `${RESOLUTION_FIELD_NAME}.effects` as const
 /** Context-aware add control for resolution effects (replaces generic array add menu). */
 export function SpellResolutionEffectAddControl() {
   const { control } = useFormContext()
+  const { size } = useFormSectionContext()
   const resolution = useWatch({ name: RESOLUTION_FIELD_NAME }) as ResolutionFormValues | undefined
-  const { append } = useFieldArray({ control, name: EFFECTS_FIELD })
   const context = resolutionFormToSelectionContext(resolution)
 
   const menuItems: ButtonDropdownItem[] = buildResolutionEffectAddMenuItems(context).map(
     (item) => ({
       id: item.id,
       label: item.label,
-      description: item.reason,
+      description: item.description,
+      note: item.note,
       disabled: item.disabled,
     }),
   )
@@ -36,8 +38,10 @@ export function SpellResolutionEffectAddControl() {
       label="Add effect"
       items={menuItems}
       groups={[{ id: 'effects', label: 'Effects' }]}
+      size={fieldSizeToArrayAddButtonSize[size]}
       onSelectItem={(itemId) => {
-        append(createResolutionEffectAppendDefaults(itemId as ResolutionEffectKind))
+        const mutators = getArrayFieldMutators(control, EFFECTS_FIELD)
+        mutators?.append(createResolutionEffectAppendDefaults(itemId as ResolutionEffectKind))
       }}
     />
   )

@@ -20,6 +20,7 @@ import {
   type RollFormShape,
 } from '../../../../lib/forms/mechanics/roll-form-values'
 import { RESOLUTION_EFFECT_KINDS } from '../effects/resolution-effect-add-menu.lib'
+import { getEffectTemplatesForKinds } from '../../../lib/effects/effect-template-registry'
 import { RESOLUTION_APPLICATION_PATTERN_OPTIONS } from '../form/resolution-form-labels'
 
 function methodOptionLabel(option: ResolutionMethodOption): string {
@@ -75,9 +76,14 @@ export function buildResolutionApplicationPatternOptions(
 export type ResolutionEffectAddMenuItem = {
   id: ResolutionEffectKind
   label: string
+  description?: string
+  note?: string
   disabled: boolean
-  reason?: string
 }
+
+const RESOLUTION_EFFECT_TEMPLATE_BY_KIND = new Map(
+  getEffectTemplatesForKinds(RESOLUTION_EFFECT_KINDS).map((template) => [template.kind, template]),
+)
 
 /** Effect template items for the resolution-specific add control. */
 export function buildResolutionEffectAddMenuItems(
@@ -85,16 +91,21 @@ export function buildResolutionEffectAddMenuItems(
 ): ResolutionEffectAddMenuItem[] {
   return RESOLUTION_EFFECT_KINDS.map((kind) => {
     const label = getSpellAtomicEffectKindLabel(kind)
-    if (!context) return { id: kind, label, disabled: false }
+    const description = RESOLUTION_EFFECT_TEMPLATE_BY_KIND.get(kind)?.description
+
+    if (!context) return { id: kind, label, description, disabled: false }
 
     const availability = getEffectKindAvailability(context, kind)
+    const note = availability.reason
+      ? formatResolutionAvailabilityReason(availability.reason, 'option')
+      : undefined
+
     return {
       id: kind,
       label,
+      description,
+      note: !availability.allowed ? note : undefined,
       disabled: !availability.allowed,
-      reason: availability.reason
-        ? formatResolutionAvailabilityReason(availability.reason, 'option')
-        : undefined,
     }
   })
 }

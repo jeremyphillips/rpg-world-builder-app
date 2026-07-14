@@ -3,6 +3,7 @@ import type { Control } from 'react-hook-form'
 export type ArrayFieldMutators = {
   getValues: () => unknown[]
   remove: (index: number) => void
+  append: (defaults: Record<string, unknown>) => void
 }
 
 const registry = new WeakMap<Control, Map<string, ArrayFieldMutators>>()
