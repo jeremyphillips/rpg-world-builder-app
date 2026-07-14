@@ -25,6 +25,7 @@ import type { ContentFormInputCtx } from '../../lib/forms/content-form-registry'
 import { SPELL_AREA_GEOMETRY_NONE, SPELL_DELIVERY_METHOD_NONE } from './spell-form-labels'
 import type { SpellFormValues } from './spell-form-fields'
 import { spellEffectsToFormValues } from './effect-form-values'
+import { resolutionToForm } from '../resolution/lib/resolution-form-values'
 
 export type SpellFormCastingTime = {
   normal: {
@@ -407,6 +408,7 @@ export function spellToFormValues(entity: Spell): SpellFormValues {
     areaOfEffect: spellAreaOfEffectToFormValues(entity.areaOfEffect),
     deliveryMethod: entity.deliveryMethod ?? SPELL_DELIVERY_METHOD_NONE,
     effects: spellEffectsToFormValues(entity.effects),
+    resolution: resolutionToForm(entity.resolution),
   }
 }
 
@@ -416,7 +418,9 @@ export function buildSpellCreateInput(
 ): CreateSpellInput {
   // TODO(spell.effect.persistence):
   // Include effects after the atomic-effect model and authoring UX are validated.
-  const { effects: _effects, ...persistedValues } = values
+  // TODO(spell.resolution.persistence):
+  // Include resolution after the resolution model and authoring UX are validated.
+  const { effects: _effects, resolution: _resolution, ...persistedValues } = values
 
   const rawDelivery = persistedValues.deliveryMethod?.trim()
   const deliveryMethod =

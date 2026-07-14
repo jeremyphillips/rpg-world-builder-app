@@ -1,5 +1,4 @@
 import { z } from 'zod'
-import { createElement } from 'react'
 import {
   AREA_GEOMETRY_SHAPES,
   castingTimeUnitSchema,
@@ -14,7 +13,6 @@ import {
   spellSchoolIdSchema,
   spellValidationMessages,
 } from '@rpg/contracts'
-import { Text } from '@rpg/ui'
 import { type FieldVisibility, type FormItem, type TabbedFormTab } from '@rpg/ui/form'
 
 import {
@@ -43,11 +41,9 @@ import {
   spellLevelOptions,
 } from './spell-form-labels'
 import { SPELL_SECTION_LABELS } from './spell-display'
-import { SpellEffectsPreview } from '../components/spell-effects-preview.client'
-import { effectArrayFields } from './effect-form-fields'
+import { optionalResolutionFormSchema } from '../resolution/lib/resolution-form-schema'
+import { resolutionFields } from '../resolution/lib/resolution-form-fields'
 import { spellEffectsFormSchema } from './effect-form-schema'
-
-const EFFECTS_NOT_SAVED_BANNER = 'Effects are not saved yet.'
 
 function visibleWhenRangeDistance(): FieldVisibility {
   return {
@@ -202,6 +198,7 @@ export const spellFormSchema = z
     }),
     deliveryMethod: z.string().optional(),
     effects: spellEffectsFormSchema,
+    resolution: optionalResolutionFormSchema,
   })
   .superRefine((values, ctx) => {
     const hasMaterial =
@@ -564,33 +561,15 @@ function tagFields(ctx: ContentFormCtx): FormItem[] {
   ]
 }
 
-function effectsFields(ctx: ContentFormCtx): FormItem[] {
-  return [
-    {
-      kind: 'slot',
-      name: '_effectsPersistenceNotice',
-      render: () =>
-        createElement(
-          Text,
-          { variant: 'muted', className: 'text-sm', role: 'status' },
-          EFFECTS_NOT_SAVED_BANNER,
-        ),
-    },
-    {
-      kind: 'slot',
-      name: '_effectsPreview',
-      label: 'Preview',
-      render: () => createElement(SpellEffectsPreview),
-    },
-    ...effectArrayFields(ctx),
-  ]
+function resolutionTabFields(ctx: ContentFormCtx): FormItem[] {
+  return resolutionFields(ctx)
 }
 
 export function buildSpellTabs(ctx: ContentFormCtx): TabbedFormTab[] {
   return [
     { id: 'basics', label: 'Basics', fields: basicsFields(ctx) },
     { id: 'casting', label: 'Casting', fields: castingFields() },
-    { id: 'effects', label: 'Effects', fields: effectsFields(ctx) },
+    { id: 'resolution', label: 'Resolution', fields: resolutionTabFields(ctx) },
     { id: 'tags', label: 'Tags', fields: tagFields(ctx) },
   ]
 }

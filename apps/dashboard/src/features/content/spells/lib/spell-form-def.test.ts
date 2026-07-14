@@ -202,23 +202,18 @@ describe('spellFormDef duration fields', () => {
   })
 })
 
-describe('spellFormDef effects tab', () => {
-  it('includes persistence banner, preview slot, and effect array', () => {
-    const effectsTab = spellFormDef.buildTabs!({}).find((tab) => tab.id === 'effects')
-    expect(effectsTab).toBeDefined()
+describe('spellFormDef resolution tab', () => {
+  it('includes persistence banner, preview slot, empty state, and resolution groups', () => {
+    const resolutionTab = spellFormDef.buildTabs!({}).find((tab) => tab.id === 'resolution')
+    expect(resolutionTab).toBeDefined()
 
-    const names = collectFieldNames(effectsTab?.fields ?? [])
-    expect(names).toContain('effects')
-    expect(names).toContain('_effectsPersistenceNotice')
-    expect(names).toContain('_effectsPreview')
-
-    const effectsArray = effectsTab?.fields.find(
-      (field) => 'kind' in field && field.kind === 'array' && field.name === 'effects',
-    )
-    expect(effectsArray).toMatchObject({
-      addLabel: 'Add effect',
-      itemCollapsible: true,
-    })
+    const names = collectFieldNames(resolutionTab?.fields ?? [])
+    expect(names).toContain('_resolutionPersistenceNotice')
+    expect(names).toContain('_resolutionPreview')
+    expect(names).toContain('_resolutionEmptyState')
+    expect(names).toContain('resolution.targetKind')
+    expect(names).toContain('resolution.damageType')
+    expect(names).toContain('resolution.damageRoll')
   })
 })
 
