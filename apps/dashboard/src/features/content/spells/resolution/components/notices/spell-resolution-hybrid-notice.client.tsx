@@ -3,7 +3,7 @@
 import { Alert, Text } from '@rpg/ui'
 import { useWatch } from 'react-hook-form'
 
-import type { EffectFormRow } from '../../../lib/effect-form-schema'
+import type { EffectFormRow } from '../../../lib/effects/effect-form-schema'
 import { RESOLUTION_SECTION_LABELS } from '../../lib/form/resolution-form-labels'
 import type { ResolutionFormValues } from '../../lib/form/resolution-form-schema'
 import { RESOLUTION_FIELD_NAME } from '../../lib/form/resolution-form-values'

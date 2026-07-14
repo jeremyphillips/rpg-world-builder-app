@@ -6,7 +6,7 @@
  * and migration dashboards. Catalog maps `modeled` → `migrated` in
  * `spell-resolution-coverage-inventory.ts`.
  *
- * Parallel to `deriveEffectsModelingStatus()` in `content/spell/effects.ts`.
+ * Parallel to `deriveEffectsModelingStatus()` in `content/spell/effects/`.
  */
 import type { SpellResolution } from './schema'
 

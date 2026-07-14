@@ -1,9 +1,9 @@
 import { SPELL_ATOMIC_EFFECT_KINDS, type SpellAtomicEffectKind } from '@rpg/contracts'
 import type { FieldConfig, FieldVisibility, FormItem } from '@rpg/ui/form'
 
-import { damageEffectFieldConfigs } from '../../lib/forms/mechanics/damage-effect-fields'
-import { rollValueFieldConfigs } from '../../lib/forms/mechanics/roll-value-fields'
-import type { ContentFormCtx } from '../../lib/forms/content-form-registry'
+import { damageEffectFieldConfigs } from '../../../lib/forms/mechanics/damage-effect-fields'
+import { rollValueFieldConfigs } from '../../../lib/forms/mechanics/roll-value-fields'
+import type { ContentFormCtx } from '../../../lib/forms/content-form-registry'
 
 const rollOnlyKinds = ['healing', 'temporary-hit-points'] as const
 const effectLabelKinds = ['damage', ...rollOnlyKinds] as const

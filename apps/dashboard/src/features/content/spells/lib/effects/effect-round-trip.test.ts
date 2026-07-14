@@ -4,17 +4,17 @@ import { dirname, join } from 'node:path'
 import { createSpellInputSchema, type Spell, type SpellAtomicEffect } from '@rpg/contracts'
 import { describe, expect, it } from 'vitest'
 
-import { pickSpell } from '../../lib/fixtures/pick'
+import { pickSpell } from '../../../lib/fixtures/pick'
 import { SPELL_EFFECT_DISPLAY_EXPECTATIONS, SPELL_EFFECT_FIXTURES } from './effect-fixtures'
 import {
   normalizeSpellEffects,
   spellEffectsFromFormValues,
   spellEffectsToFormValues,
 } from './effect-form-values'
-import { buildSpellDetailViewModel } from './spell-display'
-import { buildSpellCreateInput, spellToFormValues } from './spell-form-values'
+import { buildSpellDetailViewModel } from '../spell-display'
+import { buildSpellCreateInput, spellToFormValues } from '../spell-form-values'
 
-const spellFormValuesPath = join(dirname(fileURLToPath(import.meta.url)), 'spell-form-values.ts')
+const spellFormValuesPath = join(dirname(fileURLToPath(import.meta.url)), '../spell-form-values.ts')
 
 function spellWithEffects(slug: string, effects: readonly SpellAtomicEffect[]): Spell {
   return { ...pickSpell(slug), effects: [...effects] }

@@ -5,7 +5,7 @@ import { describe, expect, it } from 'vitest'
 import { buildSeedDamageTypeVocabulary } from '@/features/homebrew'
 
 import { makeContentFormCtx } from '../../lib/fixtures/content-form-ctx'
-import { SPELL_EFFECT_FIXTURES } from '../lib/effect-fixtures'
+import { SPELL_EFFECT_FIXTURES } from '../lib/effects/effect-fixtures'
 import { EFFECTS_NOT_SAVED_BANNER, SpellEffectsEditor } from './spell-effects-editor.client'
 
 const formCtx = makeContentFormCtx({

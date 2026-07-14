@@ -1,6 +1,9 @@
 import { spellAtomicEffectSchema, type SpellAtomicEffect } from '@rpg/contracts'
 
-import { normalizeRollFormValue, rollToFormShape } from '../../lib/forms/mechanics/roll-form-values'
+import {
+  normalizeRollFormValue,
+  rollToFormShape,
+} from '../../../lib/forms/mechanics/roll-form-values'
 import type { EffectFormRow } from './effect-form-schema'
 
 function parseSpellEffect(payload: Record<string, unknown>): SpellAtomicEffect | undefined {

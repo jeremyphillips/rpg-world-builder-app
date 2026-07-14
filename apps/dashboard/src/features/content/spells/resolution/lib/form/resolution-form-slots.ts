@@ -12,7 +12,7 @@ import { ResolutionChangeConfirmDialog } from '../../components/notices/resoluti
 import { SpellResolutionOutcomesPreview } from '../../components/preview/spell-resolution-outcomes-preview.client'
 import { SpellResolutionPreview } from '../../components/preview/spell-resolution-preview.client'
 import { SpellResolutionProximitySelect } from '../../components/target/spell-resolution-proximity-select.client'
-import { formatEffectRowPrimary } from '../../../lib/effect-display'
+import { formatEffectRowPrimary } from '../../../lib/effects/effect-display'
 import { resolutionEffectItemFields } from '../effects/resolution-effect-form-fields'
 import { formatResolutionEffectRowSummary } from '../selection/resolution-selection-options.lib'
 import { resolutionSelectionContextFromWatched } from '../selection/resolution-selection-context.lib'

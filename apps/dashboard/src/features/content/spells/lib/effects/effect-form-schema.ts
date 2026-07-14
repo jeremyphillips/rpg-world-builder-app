@@ -6,7 +6,7 @@ import {
   SPELL_ATOMIC_EFFECT_KINDS,
   type SpellAtomicEffectKind,
 } from '@rpg/contracts'
-import { rollFormObjectSchema } from '../../lib/forms/mechanics/roll-form-values'
+import { rollFormObjectSchema } from '../../../lib/forms/mechanics/roll-form-values'
 
 export const SPELL_ATOMIC_EFFECT_KIND_LABELS = Object.fromEntries(
   SPELL_ATOMIC_EFFECT_KINDS.map((kind) => [kind, getSpellAtomicEffectKindLabel(kind)]),

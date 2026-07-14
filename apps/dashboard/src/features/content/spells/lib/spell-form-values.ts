@@ -24,7 +24,7 @@ import { finalizeContentInput, slugForInputParse } from '../../lib/forms/content
 import type { ContentFormInputCtx } from '../../lib/forms/content-form-registry'
 import { SPELL_AREA_GEOMETRY_NONE, SPELL_DELIVERY_METHOD_NONE } from './spell-form-labels'
 import type { SpellFormValues } from './spell-form-fields'
-import { spellEffectsToFormValues } from './effect-form-values'
+import { spellEffectsToFormValues } from './effects/effect-form-values'
 import { resolutionToForm } from '../resolution/lib/form/resolution-form-values'
 
 export type SpellFormCastingTime = {

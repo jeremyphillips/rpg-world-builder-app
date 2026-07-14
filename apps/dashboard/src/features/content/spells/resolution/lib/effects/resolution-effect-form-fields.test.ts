@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import type { ArrayConfig, FormItem, GroupConfig } from '@rpg/ui/form'
 
-import { formatEffectRowPrimary, formatEffectRowSummary } from '../../../lib/effect-display'
+import { formatEffectRowPrimary, formatEffectRowSummary } from '../../../lib/effects/effect-display'
 import { resolutionFields } from '../form/resolution-form-fields'
 
 function findResolutionEffectsArray(fields: FormItem[]): ArrayConfig | undefined {

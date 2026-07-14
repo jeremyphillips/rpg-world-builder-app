@@ -85,10 +85,11 @@ When persistence ships, touch these files:
 ### Atomic effects (catalog read model)
 
 Optional flat `effects[]` on the spell read model (`spellAtomicEffectSchema`) remains
-for catalog seed data and spell detail display. The Resolution tab hydrates from
-`spell.resolution.effects[]` only — it does not read or sync root `effects[]`.
-Authoring UI for flat effects was replaced by the Resolution tab; `effect-*` modules
-are unchanged for detail rendering and future `spell.effect.persistence`.
+for catalog seed data and spell detail display. Shared atomic-effect modules live
+under `lib/effects/` (template registry, form schema/values, display). The Resolution
+tab hydrates from `spell.resolution.effects[]` only — it does not read or sync root
+`effects[]`. Authoring UI for flat effects was replaced by the Resolution tab;
+`lib/effects/*` modules remain for detail rendering and future `spell.effect.persistence`.
 
 **Dual-model spells (Tier A + hybrid):** Migrated catalog spells carry both root
 `effects[]` (legacy flat model) and `resolution` (envelope). The Resolution tab
@@ -126,7 +127,8 @@ rich-text body prose for cantrip upgrades and upcast effects. Section headings
 | Resolution fixtures       | `resolution/fixtures.ts`                                                                                                               |
 | Resolution preview/editor | `resolution/components/preview/spell-resolution-preview.client.tsx`, `resolution/components/editor/spell-resolution-editor.client.tsx` |
 | Resolution stories / a11y | `resolution/components/editor/spell-resolution-editor.stories.tsx`, `resolution/components/**/*.test.tsx`                              |
-| Effect display (detail)   | `lib/effect-display.ts`                                                                                                                |
+| Atomic effects (shared)   | `lib/effects/` — template registry, form schema/values, display, add menu                                                              |
+| Effect display (detail)   | `lib/effects/effect-display.ts`                                                                                                        |
 | Effects editor (stories)  | `components/spell-effects-editor.client.tsx`                                                                                           |
 | Seed effects audit        | `packages/catalog/src/spells/spell-effects-coverage-inventory.ts`                                                                      |
 | Create route              | `routes/spell-create.tsx`                                                                                                              |

@@ -1,8 +1,8 @@
 import { formatRollValue, type RollValue } from '../../../primitives/mechanics/roll'
 import { getDamageTypeLabel } from '../../../vocab/damage/vocabulary'
 import { HIT_POINTS_TERM } from '../../../primitives/mechanics/hit-points-term'
-import type { EffectRecipient } from '../resolution/effect-context'
-import type { SpellAtomicEffect } from '../effects'
+import type { EffectRecipient } from './recipient'
+import type { SpellAtomicEffect } from './schema'
 
 export type { EffectRecipient }
 

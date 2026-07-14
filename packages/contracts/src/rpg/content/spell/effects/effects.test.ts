@@ -12,7 +12,7 @@ import {
   formatEffectRowTitle,
   formatEffectRowTitleFromParts,
   spellAtomicEffectSchema,
-} from './effects'
+} from './index'
 
 describe('spellAtomicEffectSchema', () => {
   it('accepts representative effect kinds', () => {

@@ -6,7 +6,7 @@ import {
 } from '@rpg/contracts'
 import type { ArrayConfig } from '@rpg/ui/form'
 
-import { buildEffectArrayAddMenu } from '../../../lib/effect-add-menu.lib'
+import { buildEffectArrayAddMenu } from '../../../lib/effects/effect-add-menu.lib'
 
 export const RESOLUTION_EFFECT_KINDS = [
   'damage',

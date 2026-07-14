@@ -1,6 +1,7 @@
 import type { ResolutionSelectionState } from './selection-types'
+import type { EffectRecipient } from '../effects/recipient'
 
-export type EffectRecipient = 'generic' | 'self' | 'target'
+export type { EffectRecipient }
 
 /**
  * MVP assumption — not authoritative for future recipient modeling.

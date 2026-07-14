@@ -6,8 +6,8 @@ import { Form } from '@rpg/ui/form'
 import { Text } from '@rpg/ui'
 
 import type { ContentFormCtx } from '../../lib/forms/content-form-registry'
-import { effectArrayFields } from '../lib/effect-form-fields'
-import { spellEffectsFormSchema } from '../lib/effect-form-schema'
+import { effectArrayFields } from '../lib/effects/effect-form-fields'
+import { spellEffectsFormSchema } from '../lib/effects/effect-form-schema'
 import { SpellEffectsPreview } from './spell-effects-preview.client'
 
 export const EFFECTS_NOT_SAVED_BANNER = 'Effects are not saved yet.'

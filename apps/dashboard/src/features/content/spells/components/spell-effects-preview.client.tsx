@@ -4,9 +4,12 @@ import { deriveEffectsModelingStatus, getEffectsModelingStatusLabel } from '@rpg
 import { Text } from '@rpg/ui'
 import { useWatch } from 'react-hook-form'
 
-import { formatSpellEffectsPreviewLines, SPELL_EFFECTS_PREVIEW_LABEL } from '../lib/effect-display'
-import type { EffectFormRow } from '../lib/effect-form-schema'
-import { normalizeSpellEffects } from '../lib/effect-form-values'
+import {
+  formatSpellEffectsPreviewLines,
+  SPELL_EFFECTS_PREVIEW_LABEL,
+} from '../lib/effects/effect-display'
+import type { EffectFormRow } from '../lib/effects/effect-form-schema'
+import { normalizeSpellEffects } from '../lib/effects/effect-form-values'
 import type { SpellFormValues } from '../lib/spell-form-fields'
 
 /** Live preview of normalized spell effects from local form state. */
