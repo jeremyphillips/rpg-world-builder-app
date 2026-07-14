@@ -40,6 +40,7 @@ interface UseArrayFieldItemContentStateArgs {
     listeners: ReturnType<typeof useSortable>['listeners']
     isDragging: boolean
   }
+  onRemoveItem?: () => void
 }
 
 export function useArrayFieldItemContentState({
@@ -54,6 +55,7 @@ export function useArrayFieldItemContentState({
   showDragHandle,
   collapsible,
   dragHandleProps,
+  onRemoveItem,
 }: UseArrayFieldItemContentStateArgs) {
   const itemPrefix = `${fullName}.${index}`
   const headerConfig = resolveArrayItemHeader(config, legend)
@@ -83,12 +85,21 @@ export function useArrayFieldItemContentState({
     () => ({
       items: arrayItems ?? [],
       rowIndex: index,
+      removeItem: onRemoveItem,
       fullArrayName: levelRangeKeys ? fullName : undefined,
       levelRangeKeys,
       filterSelectOptions: config.filterSelectOptions,
       watchedValues,
     }),
-    [arrayItems, index, fullName, levelRangeKeys, config.filterSelectOptions, watchedValues],
+    [
+      arrayItems,
+      index,
+      onRemoveItem,
+      fullName,
+      levelRangeKeys,
+      config.filterSelectOptions,
+      watchedValues,
+    ],
   )
 
   const rowSummaryId = `${idPrefix}-${itemPrefix.replaceAll('.', '-')}-summary`

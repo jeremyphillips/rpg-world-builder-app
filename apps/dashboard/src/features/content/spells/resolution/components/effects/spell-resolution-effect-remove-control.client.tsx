@@ -1,16 +1,22 @@
 'use client'
 
-import { Button } from '@rpg/ui'
-import { useArrayFieldContext } from '@rpg/ui/form'
-import { Trash2 } from 'lucide-react'
+import { outcomeApplicationsReferenceEffect } from '@rpg/contracts'
+import { ArrayItemRemoveButton, useArrayFieldContext } from '@rpg/ui/form'
+import { useWatch } from 'react-hook-form'
 
+import { formatEffectRowPrimary } from '../../../lib/effects/effect-display'
 import { useResolutionEditorContext } from '../../hooks/use-resolution-change-confirm.client'
-import type { ResolutionEffectFormItem } from '../../lib/form/resolution-form-schema'
+import type {
+  ResolutionEffectFormItem,
+  ResolutionFormValues,
+} from '../../lib/form/resolution-form-schema'
+import { RESOLUTION_FIELD_NAME } from '../../lib/form/resolution-form-values'
 
-/** Per-effect remove control that routes through resolution change confirmation. */
+/** Per-effect header remove control that routes through resolution change confirmation. */
 export function SpellResolutionEffectRemoveControl() {
   const arrayContext = useArrayFieldContext()
   const { requestResolutionChange } = useResolutionEditorContext()
+  const resolution = useWatch({ name: RESOLUTION_FIELD_NAME }) as ResolutionFormValues | undefined
 
   if (!arrayContext) return null
 
@@ -18,18 +24,20 @@ export function SpellResolutionEffectRemoveControl() {
   const effectId = effect?.id
   if (!effectId) return null
 
+  const label = formatEffectRowPrimary(effect, arrayContext.rowIndex)
+
   return (
-    <div className="flex justify-end">
-      <Button
-        type="button"
-        variant="ghost"
-        size="sm"
-        className="size-8 shrink-0 p-0"
-        aria-label={`Remove ${effectId} effect`}
-        onClick={() => requestResolutionChange({ field: 'removeEffect', effectId })}
-      >
-        <Trash2 className="size-4" aria-hidden />
-      </Button>
-    </div>
+    <ArrayItemRemoveButton
+      ariaLabel={`Remove ${label}`}
+      canRemove
+      onRemove={() => {
+        if (!outcomeApplicationsReferenceEffect(resolution?.outcomes, effectId)) {
+          arrayContext.removeItem?.()
+          return
+        }
+
+        requestResolutionChange({ field: 'removeEffect', effectId })
+      }}
+    />
   )
 }

@@ -30,6 +30,7 @@ export interface ArrayFieldItemContentProps {
   legend: string
   itemBodyStackClasses: string
   canRemove: boolean
+  showDefaultItemRemove: boolean
   showDragHandle: boolean
   collapsible: boolean
   variant: 'compact' | 'detailed'
@@ -54,6 +55,8 @@ interface ArrayFieldItemChromeProps {
 interface ArrayFieldItemActionsRailProps {
   header: ResolvedArrayItemHeader
   canRemove: boolean
+  showDefaultItemRemove: boolean
+  customRemove?: React.ReactNode
   onRemove: () => void
   showIssueChrome: boolean
   issueCount: number
@@ -67,6 +70,8 @@ interface ArrayFieldItemActionsRailProps {
 function ArrayFieldItemActionsRailSlot({
   header,
   canRemove,
+  showDefaultItemRemove,
+  customRemove,
   onRemove,
   showIssueChrome,
   issueCount,
@@ -80,6 +85,8 @@ function ArrayFieldItemActionsRailSlot({
     <ArrayItemActionsRail
       removeAriaLabel={`Remove ${header.ariaLabel}`}
       canRemove={canRemove}
+      showDefaultRemove={showDefaultItemRemove}
+      customRemove={customRemove}
       onRemove={onRemove}
       issueCount={showIssueChrome ? issueCount : 0}
       issueRowLabel={rowLabel}
@@ -273,6 +280,7 @@ export function ArrayFieldItemContent({
   legend,
   itemBodyStackClasses,
   canRemove,
+  showDefaultItemRemove,
   showDragHandle,
   collapsible,
   variant,
@@ -313,6 +321,7 @@ export function ArrayFieldItemContent({
     showDragHandle,
     collapsible,
     dragHandleProps,
+    onRemoveItem: onRemove,
   })
 
   const fieldsNode = (
@@ -330,10 +339,18 @@ export function ArrayFieldItemContent({
     </ArrayItemPresentationContext.Provider>
   )
 
+  const customRemove = config.itemRemoveSlot ? (
+    <ArrayFieldContext.Provider value={arrayContext}>
+      {config.itemRemoveSlot.render()}
+    </ArrayFieldContext.Provider>
+  ) : undefined
+
   const actionsRail = (
     <ArrayFieldItemActionsRailSlot
       header={header}
       canRemove={canRemove}
+      showDefaultItemRemove={showDefaultItemRemove}
+      customRemove={customRemove}
       onRemove={onRemove}
       showIssueChrome={showIssueChrome}
       issueCount={issueGroup.totalCount}

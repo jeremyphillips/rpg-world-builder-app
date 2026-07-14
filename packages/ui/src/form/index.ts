@@ -169,7 +169,16 @@ export {
   writeArrayItemCollapseOverrides,
   type ArrayItemCollapseStoredValue,
 } from './config/array-item-collapse-storage.lib'
+export {
+  getArrayFieldMutators,
+  registerArrayFieldMutators,
+  type ArrayFieldMutators,
+} from './context/array-field-mutators.registry'
 export { useArrayItemCollapseState } from './hooks/use-array-item-collapse-state.client'
+export {
+  ArrayItemRemoveButton,
+  type ArrayItemRemoveButtonProps,
+} from './renderers/array-item-shell.client'
 export type {
   FieldGroupLegendSize,
   FieldSeparator,

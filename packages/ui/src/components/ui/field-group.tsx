@@ -6,11 +6,13 @@ import {
   DEFAULT_ARRAY_SECTION_SIZE,
   DEFAULT_FORM_RHYTHM,
   fieldGroupBottomMarginClasses,
-  fieldGroupDescriptionClasses,
+  fieldGroupDescriptionTypographyClasses,
+  fieldGroupLegendHeaderMarginVariants,
   fieldGroupLegendVariants,
-  fieldStackRhythmVariants,
   fieldSetResetClasses,
+  fieldStackRhythmVariants,
   resolveArrayLegendScale,
+  resolveFieldGroupLegendHeaderStackClassName,
   type FieldGroupLegendSize,
   type FieldStackRhythm,
 } from './field.variants'
@@ -53,20 +55,26 @@ export function FieldGroup({
 }: FieldGroupProps) {
   const legendScale =
     legendSize === 'array' ? resolveArrayLegendScale(size ?? DEFAULT_ARRAY_SECTION_SIZE) : 'default'
+  const legendTypography = fieldGroupLegendVariants({ size: legendSize, scale: legendScale })
+  const headerMargin = fieldGroupLegendHeaderMarginVariants({ size: legendSize })
 
   return (
     <fieldset
       id={id}
       className={cn(fieldSetResetClasses, fieldGroupBottomMarginClasses, className)}
     >
-      <legend className={fieldGroupLegendVariants({ size: legendSize, scale: legendScale })}>
-        {legend}
+      <legend className={description ? legendTypography : cn(legendTypography, headerMargin)}>
+        {description ? (
+          <span className={resolveFieldGroupLegendHeaderStackClassName(legendSize)}>
+            <span>{legend}</span>
+            <Text as="span" variant="small" className={fieldGroupDescriptionTypographyClasses}>
+              {description}
+            </Text>
+          </span>
+        ) : (
+          legend
+        )}
       </legend>
-      {description ? (
-        <Text variant="small" className={fieldGroupDescriptionClasses}>
-          {description}
-        </Text>
-      ) : null}
       <div className={fieldStackRhythmVariants({ rhythm })}>{children}</div>
     </fieldset>
   )

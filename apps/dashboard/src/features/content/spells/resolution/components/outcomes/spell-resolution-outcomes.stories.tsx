@@ -3,9 +3,9 @@ import { Form } from '@rpg/ui/form'
 import { z } from 'zod'
 
 import { RESOLUTION_FORM_FIXTURES } from '../../fixtures'
-import type { ResolutionFormValues } from '../../lib/form/resolution-form-schema'
 import { optionalResolutionFormSchema } from '../../lib/form/resolution-form-schema'
-import { SpellResolutionOutcomes } from './spell-resolution-outcomes.client'
+import { resolutionOutcomeBranchesFields } from '../../lib/form/resolution-form-slots'
+import type { ResolutionFormValues } from '../../lib/form/resolution-form-schema'
 
 const outcomesSchema = z.object({
   resolution: optionalResolutionFormSchema,
@@ -15,13 +15,7 @@ function OutcomesStory({ defaultResolution }: { defaultResolution?: ResolutionFo
   return (
     <Form
       schema={outcomesSchema}
-      fields={[
-        {
-          kind: 'slot',
-          name: '_resolutionOutcomes',
-          render: () => <SpellResolutionOutcomes />,
-        },
-      ]}
+      fields={resolutionOutcomeBranchesFields()}
       defaultValues={{ resolution: defaultResolution }}
       onSubmit={() => undefined}
       rhythm="compact"

@@ -7,11 +7,12 @@ import { describe, expect, it } from 'vitest'
 
 import { RESOLUTION_FORM_FIXTURES } from '../../fixtures'
 import { RESOLUTION_SECTION_LABELS } from '../../lib/form/resolution-form-labels'
+import { resolutionOutcomeBranchesFields } from '../../lib/form/resolution-form-slots'
+
 import {
   optionalResolutionFormSchema,
   type ResolutionFormValues,
 } from '../../lib/form/resolution-form-schema'
-import { SpellResolutionOutcomes } from './spell-resolution-outcomes.client'
 
 const outcomesSchema = z.object({
   resolution: optionalResolutionFormSchema,
@@ -21,13 +22,7 @@ function renderOutcomes(defaultResolution: ResolutionFormValues) {
   return render(
     <Form
       schema={outcomesSchema}
-      fields={[
-        {
-          kind: 'slot',
-          name: '_resolutionOutcomes',
-          render: () => <SpellResolutionOutcomes />,
-        },
-      ]}
+      fields={resolutionOutcomeBranchesFields()}
       defaultValues={{ resolution: defaultResolution }}
       onSubmit={() => undefined}
       rhythm="compact"
@@ -40,8 +35,9 @@ describe('SpellResolutionOutcomes', () => {
     renderOutcomes(RESOLUTION_FORM_FIXTURES.eldritchBlast)
 
     await waitFor(() => {
-      expect(screen.getByRole('heading', { name: 'On hit' })).toBeInTheDocument()
+      expect(screen.getByRole('group', { name: /Outcome branches/ })).toBeInTheDocument()
       expect(screen.getByText(RESOLUTION_SECTION_LABELS.outcomesHint)).toBeInTheDocument()
+      expect(screen.getByRole('heading', { name: 'On hit' })).toBeInTheDocument()
       expect(screen.getByText(/Damage — 1d10 Force damage/i)).toBeInTheDocument()
     })
   })

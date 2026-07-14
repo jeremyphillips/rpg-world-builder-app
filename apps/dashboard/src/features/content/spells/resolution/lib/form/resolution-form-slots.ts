@@ -2,6 +2,7 @@ import { createElement } from 'react'
 import type { FormItem } from '@rpg/ui/form'
 
 import type { ContentFormCtx } from '../../../../lib/forms/content-form-registry'
+import { SpellResolutionEffectRemoveControl } from '../../components/effects/spell-resolution-effect-remove-control.client'
 import { SpellResolutionEffectAddControl } from '../../components/effects/spell-resolution-effect-add-control.client'
 import { SpellResolutionEffectsApplicationLabel } from '../../components/effects/spell-resolution-effects-application-label.client'
 import { SpellResolutionHowItResolves } from '../../components/method/spell-resolution-how-it-resolves.client'
@@ -41,10 +42,17 @@ function resolutionEffectsArrayField(ctx: ContentFormCtx): FormItem {
   return {
     kind: 'array',
     name: `${RESOLUTION_PREFIX}.effects`,
-    legend: RESOLUTION_SECTION_LABELS.effects,
+    legend: '',
+    // Nested inside Effects & outcomes → Authored effects groups (depth ≥ 2). @rpg/ui
+    // defaults nested arrays to compact unless itemVariant is explicit.
+    itemVariant: 'detailed',
     addLabel: 'Add effect',
     hideAddControl: true,
     hideItemRemove: true,
+    itemRemoveSlot: {
+      name: '_resolutionEffectHeaderRemove',
+      render: () => createElement(SpellResolutionEffectRemoveControl),
+    },
     itemCollapsible: true,
     itemHeader: {
       fallback: (index) => `Effect ${index + 1}`,
@@ -108,6 +116,57 @@ function resolutionProjectilesFields(): FormItem[] {
   ]
 }
 
+function resolutionOutcomeBranchesGroup(): FormItem {
+  return {
+    kind: 'group',
+    legend: RESOLUTION_SECTION_LABELS.outcomeBranches,
+    legendSize: 'subsection',
+    description: RESOLUTION_SECTION_LABELS.outcomesHint,
+    fields: [
+      {
+        kind: 'slot',
+        name: '_resolutionOutcomes',
+        render: () => createElement(SpellResolutionOutcomes),
+      },
+    ],
+  }
+}
+
+function resolutionEffectsAndOutcomesGroup(ctx: ContentFormCtx): FormItem {
+  return {
+    kind: 'group',
+    legend: RESOLUTION_SECTION_LABELS.effectsAndOutcomes,
+    description: RESOLUTION_SECTION_LABELS.effectsAndOutcomesHint,
+    visibility: visibleWhenResolutionConfigured(),
+    fields: [
+      {
+        kind: 'group',
+        legend: RESOLUTION_SECTION_LABELS.authoredEffects,
+        legendSize: 'subsection',
+        fields: [
+          {
+            kind: 'slot',
+            name: '_resolutionEffectsApplicationLabel',
+            render: () => createElement(SpellResolutionEffectsApplicationLabel),
+          },
+          {
+            kind: 'slot',
+            name: '_resolutionEffectAddControl',
+            render: () => createElement(SpellResolutionEffectAddControl),
+          },
+          resolutionEffectsArrayField(ctx),
+        ],
+      },
+      resolutionOutcomeBranchesGroup(),
+    ],
+  }
+}
+
+/** Outcome branches subgroup for isolated stories/tests. */
+export function resolutionOutcomeBranchesFields(): FormItem[] {
+  return [resolutionOutcomeBranchesGroup()]
+}
+
 /** Slot-backed and grouped fields shown when resolution is configured. */
 export function configuredResolutionFields(ctx: ContentFormCtx): FormItem[] {
   const configured = visibleWhenResolutionConfigured()
@@ -157,34 +216,7 @@ export function configuredResolutionFields(ctx: ContentFormCtx): FormItem[] {
       ],
     },
     ...resolutionProjectilesFields(),
-    {
-      kind: 'slot',
-      name: '_resolutionEffectsApplicationLabel',
-      visibility: configured,
-      render: () => createElement(SpellResolutionEffectsApplicationLabel),
-    },
-    {
-      kind: 'slot',
-      name: '_resolutionEffectAddControl',
-      visibility: configured,
-      render: () => createElement(SpellResolutionEffectAddControl),
-    },
-    {
-      ...resolutionEffectsArrayField(ctx),
-      visibility: configured,
-    },
-    {
-      kind: 'group',
-      legend: RESOLUTION_SECTION_LABELS.outcomes,
-      visibility: configured,
-      fields: [
-        {
-          kind: 'slot',
-          name: '_resolutionOutcomes',
-          render: () => createElement(SpellResolutionOutcomes),
-        },
-      ],
-    },
+    resolutionEffectsAndOutcomesGroup(ctx),
     {
       kind: 'slot',
       name: '_resolutionPreview',

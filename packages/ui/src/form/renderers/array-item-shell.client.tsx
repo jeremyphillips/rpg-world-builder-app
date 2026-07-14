@@ -42,6 +42,10 @@ export interface ArrayItemActionsRailProps {
   removeAriaLabel: string
   canRemove: boolean
   onRemove: () => void
+  /** When false, omits the default remove button (e.g. `hideItemRemove` or `itemRemoveSlot`). */
+  showDefaultRemove?: boolean
+  /** Custom remove control rendered before the default button when both are shown. */
+  customRemove?: React.ReactNode
   issueCount?: number
   issueRowLabel?: string
   onIssuePress?: () => void
@@ -59,6 +63,8 @@ export function ArrayItemActionsRail({
   removeAriaLabel,
   canRemove,
   onRemove,
+  showDefaultRemove = true,
+  customRemove,
   issueCount = 0,
   issueRowLabel,
   onIssuePress,
@@ -80,11 +86,14 @@ export function ArrayItemActionsRail({
         compact={compact}
         prominence={badgeProminence}
       />
-      <ArrayItemRemoveButton
-        ariaLabel={removeAriaLabel}
-        canRemove={canRemove}
-        onRemove={onRemove}
-      />
+      {customRemove}
+      {showDefaultRemove ? (
+        <ArrayItemRemoveButton
+          ariaLabel={removeAriaLabel}
+          canRemove={canRemove}
+          onRemove={onRemove}
+        />
+      ) : null}
     </div>
   )
 }

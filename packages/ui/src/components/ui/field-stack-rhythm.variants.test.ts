@@ -2,11 +2,14 @@ import { describe, expect, it } from 'vitest'
 
 import {
   fieldArrayItemListClasses,
+  fieldGroupLegendHeaderMarginVariants,
   fieldGroupLegendVariants,
   fieldLabelVariants,
   fieldStackRhythmVariants,
   resolveArrayLegendScale,
   resolveArraySectionSize,
+  resolveFieldGroupLegendClassName,
+  resolveFieldGroupLegendHeaderStackClassName,
   resolveFieldStackRhythm,
   resolveFormFieldSize,
   resolveInheritedFieldSize,
@@ -151,6 +154,36 @@ describe('fieldGroupLegendVariants', () => {
     expect(fieldGroupLegendVariants({ size: 'array', scale: 'default' })).toContain(
       'text-field-array-legend',
     )
+  })
+})
+
+describe('fieldGroupLegendHeaderMarginVariants', () => {
+  it('uses 20px below section legends and 16px below subgroups and arrays', () => {
+    expect(fieldGroupLegendHeaderMarginVariants({ size: 'section' })).toBe('mb-5')
+    expect(fieldGroupLegendHeaderMarginVariants({ size: 'subsection' })).toBe('mb-4')
+    expect(fieldGroupLegendHeaderMarginVariants({ size: 'array' })).toBe('mb-4')
+  })
+})
+
+describe('resolveFieldGroupLegendClassName', () => {
+  it('combines typography and header margin', () => {
+    expect(resolveFieldGroupLegendClassName({ size: 'section' })).toContain('mb-5')
+    expect(resolveFieldGroupLegendClassName({ size: 'section' })).toContain(
+      'text-field-group-legend',
+    )
+    expect(resolveFieldGroupLegendClassName({ size: 'subsection' })).toContain('mb-4')
+    expect(resolveFieldGroupLegendClassName({ size: 'subsection' })).toContain(
+      'text-field-subgroup-legend',
+    )
+  })
+})
+
+describe('resolveFieldGroupLegendHeaderStackClassName', () => {
+  it('combines legend/hint stack rhythm with header margin', () => {
+    expect(resolveFieldGroupLegendHeaderStackClassName('section')).toContain('gap-2')
+    expect(resolveFieldGroupLegendHeaderStackClassName('section')).toContain('mb-5')
+    expect(resolveFieldGroupLegendHeaderStackClassName('subsection')).toContain('gap-2')
+    expect(resolveFieldGroupLegendHeaderStackClassName('subsection')).toContain('mb-4')
   })
 })
 

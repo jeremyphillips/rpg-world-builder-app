@@ -36,8 +36,12 @@ export function resolveArrayItemVariant(
   config: ArrayConfig,
   options: { nested: boolean },
 ): Exclude<ArrayItemVariant, 'auto'> {
-  if (options.nested) return 'compact'
   const explicit = config.itemVariant ?? 'auto'
+  if (options.nested) {
+    // Nested sections default to compact; opt in to grant-style headers explicitly.
+    if (explicit === 'detailed') return 'detailed'
+    return 'compact'
+  }
   if (explicit !== 'auto') return explicit
   return isCompactEligible(config.fields) ? 'compact' : 'detailed'
 }

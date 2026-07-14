@@ -1,12 +1,13 @@
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { expectNoAxeViolations } from '@rpg/ui/test-utils'
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi, afterEach } from 'vitest'
 
 import { buildSeedDamageTypeVocabulary } from '@/features/homebrew'
 
 import { makeContentFormCtx } from '../../../../lib/fixtures/content-form-ctx'
 import { RESOLUTION_FORM_FIXTURES } from '../../fixtures'
+import * as resolutionChangeConfirm from '../../hooks/use-resolution-change-confirm.client'
 import { RESOLUTION_SECTION_LABELS } from '../../lib/form/resolution-form-labels'
 import {
   RESOLUTION_NOT_SAVED_BANNER,
@@ -18,6 +19,10 @@ const formCtx = makeContentFormCtx({
 })
 
 describe('SpellResolutionEditor', () => {
+  afterEach(() => {
+    vi.restoreAllMocks()
+  })
+
   it('shows persistence banner and add-resolution control when empty', async () => {
     render(<SpellResolutionEditor formCtx={formCtx} />)
 
@@ -50,12 +55,58 @@ describe('SpellResolutionEditor', () => {
     )
 
     await waitFor(() => {
-      expect(screen.getAllByText('Effects').length).toBeGreaterThan(0)
+      expect(screen.getByRole('group', { name: /Effects & outcomes/ })).toBeInTheDocument()
+      expect(screen.getByRole('group', { name: 'Authored effects' })).toBeInTheDocument()
       expect(screen.getByText('Applied once')).toBeInTheDocument()
-      expect(
-        screen.getByRole('button', { name: /(Collapse|Expand) Effects · Damage/ }),
-      ).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: /(Collapse|Expand) Damage/ })).toBeInTheDocument()
       expect(screen.getByText('Inflicts 1d10 Force damage.')).toBeInTheDocument()
+      expect(screen.getAllByRole('button', { name: /^Remove Damage$/ })).toHaveLength(1)
+    })
+  })
+
+  it('routes header remove through requestResolutionChange', async () => {
+    const requestResolutionChange = vi.fn()
+    vi.spyOn(resolutionChangeConfirm, 'useResolutionEditorContext').mockReturnValue({
+      requestResolutionChange,
+      notice: null,
+      clearNotice: vi.fn(),
+    })
+
+    const user = userEvent.setup()
+    render(
+      <SpellResolutionEditor
+        formCtx={formCtx}
+        defaultResolution={RESOLUTION_FORM_FIXTURES.inflictWounds}
+      />,
+    )
+
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: /^Remove Damage$/ })).toBeInTheDocument()
+    })
+
+    await user.click(screen.getByRole('button', { name: /^Remove Damage$/ }))
+
+    expect(requestResolutionChange).toHaveBeenCalledWith({
+      field: 'removeEffect',
+      effectId: 'damage',
+    })
+  })
+
+  it('keeps header remove available when the effect row is collapsed', async () => {
+    const user = userEvent.setup()
+    render(
+      <SpellResolutionEditor
+        formCtx={formCtx}
+        defaultResolution={RESOLUTION_FORM_FIXTURES.eldritchBlast}
+      />,
+    )
+
+    const collapseButton = await screen.findByRole('button', { name: /Collapse Damage/i })
+    await user.click(collapseButton)
+
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: /Expand Damage/i })).toBeInTheDocument()
+      expect(screen.getAllByRole('button', { name: /^Remove Damage$/ })).toHaveLength(1)
     })
   })
 
@@ -81,7 +132,8 @@ describe('SpellResolutionEditor', () => {
     await waitFor(() => {
       expect(screen.getAllByText('Target').length).toBeGreaterThan(0)
       expect(screen.getAllByText('How it resolves').length).toBeGreaterThan(0)
-      expect(screen.getAllByText('Effects').length).toBeGreaterThan(0)
+      expect(screen.getByRole('group', { name: /Effects & outcomes/ })).toBeInTheDocument()
+      expect(screen.getByRole('group', { name: 'Authored effects' })).toBeInTheDocument()
     })
   })
 
@@ -94,7 +146,8 @@ describe('SpellResolutionEditor', () => {
     )
 
     await waitFor(() => {
-      expect(screen.getAllByText(RESOLUTION_SECTION_LABELS.outcomes).length).toBeGreaterThan(0)
+      expect(screen.getByRole('group', { name: /Outcome branches/ })).toBeInTheDocument()
+      expect(screen.getByText(RESOLUTION_SECTION_LABELS.outcomesHint)).toBeInTheDocument()
       expect(screen.getByRole('heading', { name: 'On failed save' })).toBeInTheDocument()
       expect(screen.getByRole('heading', { name: 'On successful save' })).toBeInTheDocument()
     })

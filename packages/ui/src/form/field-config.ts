@@ -777,8 +777,15 @@ export interface ArrayConfig {
   /** When true, hides the default array add control (use an external slot instead). */
   hideAddControl?: boolean
 
-  /** When true, hides per-item remove controls (use a custom slot instead). */
+  /** When true, omits the default per-item remove control (use `itemRemoveSlot` instead). */
   hideItemRemove?: boolean
+
+  /**
+   * Custom per-item remove control rendered in the header actions rail instead of the
+   * default RHF `remove(index)` button. Pair with `hideItemRemove: true` when the slot
+   * fully replaces generic removal.
+   */
+  itemRemoveSlot?: Pick<SlotConfig, 'name' | 'render' | 'visibility'>
 
   /** Searchable template menu for the add control; replaces the plain add button when set. */
   addMenu?: {

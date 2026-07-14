@@ -300,6 +300,59 @@ describe('ArrayFieldRenderer', () => {
     expect(screen.getByRole('button', { name: 'Remove Traits · Trait #1' })).toBeDisabled()
   })
 
+  it('omits the default remove button when hideItemRemove is true', async () => {
+    const user = userEvent.setup()
+    const hiddenRemoveFields: FormItem[] = [
+      {
+        kind: 'array',
+        name: 'traits',
+        legend: 'Traits',
+        fields: traitFields,
+        addLabel: 'Add trait',
+        hideItemRemove: true,
+      },
+    ]
+    render(
+      <Form
+        schema={schema}
+        fields={hiddenRemoveFields}
+        onSubmit={vi.fn()}
+        footer={<button type="submit">Save</button>}
+      />,
+    )
+    await user.click(screen.getByRole('button', { name: 'Add trait' }))
+    expect(screen.queryByRole('button', { name: /Remove Traits/i })).not.toBeInTheDocument()
+  })
+
+  it('renders itemRemoveSlot in the header actions rail instead of the default remove button', async () => {
+    const user = userEvent.setup()
+    const customRemoveFields: FormItem[] = [
+      {
+        kind: 'array',
+        name: 'traits',
+        legend: 'Traits',
+        fields: traitFields,
+        addLabel: 'Add trait',
+        hideItemRemove: true,
+        itemRemoveSlot: {
+          name: '_customTraitRemove',
+          render: () => <button type="button">Custom remove</button>,
+        },
+      },
+    ]
+    render(
+      <Form
+        schema={schema}
+        fields={customRemoveFields}
+        onSubmit={vi.fn()}
+        footer={<button type="submit">Save</button>}
+      />,
+    )
+    await user.click(screen.getByRole('button', { name: 'Add trait' }))
+    expect(screen.queryByRole('button', { name: /Remove Traits/i })).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Custom remove' })).toBeInTheDocument()
+  })
+
   it('hides nested arrays when item-scoped visibility is false', async () => {
     const user = userEvent.setup()
     const grantSchema = z.object({

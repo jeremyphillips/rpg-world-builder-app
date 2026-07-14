@@ -11,7 +11,7 @@ import {
 } from './array-item-config.lib'
 
 describe('array-item-config.lib', () => {
-  it('treats nested array sections as compact', () => {
+  it('treats nested array sections as compact by default', () => {
     expect(isNestedArraySection(2)).toBe(true)
     expect(
       resolveArrayItemVariant(
@@ -24,6 +24,21 @@ describe('array-item-config.lib', () => {
         { nested: true },
       ),
     ).toBe('compact')
+  })
+
+  it('honors itemVariant detailed inside nested array sections', () => {
+    expect(
+      resolveArrayItemVariant(
+        {
+          kind: 'array',
+          name: 'effects',
+          legend: '',
+          itemVariant: 'detailed',
+          fields: [{ type: 'text', name: 'kind', label: 'Kind' }],
+        },
+        { nested: true },
+      ),
+    ).toBe('detailed')
   })
 
   it('auto-selects compact for a single leaf row', () => {

@@ -15,7 +15,7 @@ import {
 } from './dropdown-menu.client'
 import { Field } from './field.client'
 import { FieldLabelContent } from './field-label-content'
-import { fieldGroupLegendVariants } from './field.variants'
+import { resolveFieldGroupLegendClassName } from './field.variants'
 import { NumberInput } from './number-input.client'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './select.client'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './table'
@@ -282,7 +282,7 @@ export function EditableGrid({
     <Field.Root id={id} error={error} width="full" className={className}>
       <fieldset className="min-w-0 border-0 p-0">
         {legend ? (
-          <legend className={cn(fieldGroupLegendVariants(), 'flex items-center gap-1.5')}>
+          <legend className={cn(resolveFieldGroupLegendClassName(), 'flex items-center gap-1.5')}>
             <FieldLabelContent label={legend} info={info} />
           </legend>
         ) : null}

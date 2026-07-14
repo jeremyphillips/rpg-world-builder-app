@@ -31,8 +31,10 @@ Do not sprinkle ad-hoc `space-y-*` on field wrappers in apps — adjust shared t
 | `fieldInlineControlRowClasses`       | `gap-3`                        | Inline label + control rows (e.g. `DiceFormulaField`)                                                       |
 | `fieldSettingsRowClasses`            | —                              | Dense settings — label + hint left, control right                                                           |
 | `fieldChipWrapGapClasses`            | `gap-2 pt-1`                   | Chip pill row inside `ChipsField`                                                                           |
-| `fieldGroupDescriptionClasses`       | `mb-3`                         | Below group / accordion description                                                                         |
-| `fieldGroupLegendSpacingClasses`     | `mb-4`                         | Below group legend                                                                                          |
+| `fieldGroupDescriptionClasses`       | muted hint typography          | Group / accordion description (spacing on legend header)                                                    |
+| `fieldGroupLegendHeaderStackClasses` | `gap-2` (8px)                  | Between group legend and hint inside the legend header                                                      |
+| `fieldGroupLegendSpacingClasses`     | `mb-5` (20px)                  | Below section legend header (legend alone on `<legend>`, or legend + hint stack container)                  |
+| `fieldSubgroupLegendSpacingClasses`  | `mb-4` (16px)                  | Below subgroup legend header (legend alone on `<legend>`, or legend + hint stack container)                 |
 | `fieldArrayItemClasses`              | `p-4 border`                   | Chrome around one array item                                                                                |
 | `fieldArrayItemActionsClasses`       | `mt-3`                         | Above array item move/remove controls                                                                       |
 | `fieldSetResetClasses`               | `m-0 border-0 p-0`             | Strip UA fieldset chrome                                                                                    |

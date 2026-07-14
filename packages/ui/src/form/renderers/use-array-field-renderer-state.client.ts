@@ -70,7 +70,7 @@ export function useArrayFieldRendererState({
   const variant = resolveArrayItemVariant(config, { nested })
   const reorder = resolveArrayItemReorder(config)
   const sortableEnabled = reorder === 'dragHandle' && fields.length > 1
-  const collapsible = itemCollapsible && variant === 'detailed' && !nested
+  const collapsible = itemCollapsible && variant === 'detailed'
 
   const getItemValues = React.useCallback(
     (index: number) => (getValues(`${fullName}.${index}`) ?? {}) as Record<string, unknown>,
@@ -85,7 +85,8 @@ export function useArrayFieldRendererState({
     getItemValues,
   })
 
-  const canRemove = !config.hideItemRemove && fields.length > min
+  const canRemove = fields.length > min
+  const showDefaultItemRemove = !config.hideItemRemove && !config.itemRemoveSlot
   const canAdd = max === undefined || fields.length < max
   const invalidRowCount = validation.hasAttemptedSubmit
     ? countInvalidArrayItems(validation.issues, fullName)
@@ -127,6 +128,7 @@ export function useArrayFieldRendererState({
       legend,
       itemBodyStackClasses,
       canRemove,
+      showDefaultItemRemove,
       showDragHandle: sortableEnabled,
       collapsible,
       variant,
@@ -136,6 +138,7 @@ export function useArrayFieldRendererState({
     }),
     [
       canRemove,
+      showDefaultItemRemove,
       collapsedIds,
       collapsible,
       config,

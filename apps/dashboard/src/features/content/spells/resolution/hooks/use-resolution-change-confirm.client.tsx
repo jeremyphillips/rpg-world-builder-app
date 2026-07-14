@@ -1,12 +1,13 @@
 'use client'
 
 import * as React from 'react'
-import type { Control } from 'react-hook-form'
+import type { Control, UseFormReturn } from 'react-hook-form'
 import { useFormContext } from 'react-hook-form'
+
+import { getArrayFieldMutators } from '@rpg/ui/form'
 
 import {
   buildIncompatibleSelectionClearPatch,
-  outcomeApplicationsReferenceEffect,
   planResolutionChange,
   resolutionChangeRequiresConfirm,
   type ResolutionChangePlan,
@@ -24,6 +25,7 @@ import {
   resolutionMethodFromForm,
 } from '../lib/form/resolution-outcome-slots.lib'
 import { RESOLUTION_FIELD_NAME } from '../lib/form/resolution-form-values'
+import { readResolutionValues } from '../lib/form/resolution-change-form-read.lib'
 import { resolutionFormToSelectionContext } from '../lib/selection/resolution-selection-context.lib'
 
 export type ResolutionChangeNotice = {
@@ -132,14 +134,60 @@ export type ResolutionChangeController = {
 
 const controllers = new WeakMap<Control, ResolutionChangeController>()
 
+type ResolutionFormApi = Pick<UseFormReturn, 'control' | 'getValues' | 'setValue'>
+
+function applyEffectsPatch(
+  getForm: () => ResolutionFormApi,
+  nextEffects: ResolutionFormValues['effects'],
+  patch: Partial<ResolutionFormValues>,
+): boolean {
+  const { control, getValues, setValue } = getForm()
+  const mutators = getArrayFieldMutators(control, `${RESOLUTION_FIELD_NAME}.effects`)
+  if (!mutators) return false
+
+  const currentEffects = mutators.getValues() as ResolutionFormValues['effects']
+  const removedIndexes = currentEffects
+    .map((item, index) => ({ item, index }))
+    .filter(({ item }) => !nextEffects.some((next) => next.id === item.id))
+    .map(({ index }) => index)
+    .sort((a, b) => b - a)
+
+  removedIndexes.forEach((index) => mutators.remove(index))
+
+  const setOptions = { shouldDirty: true, shouldValidate: true } as const
+  const { effects: _effects, ...rest } = patch
+
+  if (patch.outcomes) {
+    setValue(`${RESOLUTION_FIELD_NAME}.outcomes`, patch.outcomes, setOptions)
+  }
+
+  if (Object.keys(rest).length > 0) {
+    const current = readResolutionValues(getValues, control, undefined)
+    if (current) {
+      setValue(RESOLUTION_FIELD_NAME, { ...current, ...rest, effects: nextEffects }, setOptions)
+    }
+  }
+
+  return true
+}
+
 function createController(
-  getValues: (name: typeof RESOLUTION_FIELD_NAME) => ResolutionFormValues | undefined,
-  setValue: (
-    name: typeof RESOLUTION_FIELD_NAME,
-    value: ResolutionFormValues,
-    options: { shouldDirty: boolean; shouldValidate: boolean },
-  ) => void,
+  getForm: () => ResolutionFormApi,
+  defaultResolution?: ResolutionFormValues,
 ): ResolutionChangeController {
+  let initialResolution: ResolutionFormValues | undefined = defaultResolution
+
+  const resolveInitialResolution = (): ResolutionFormValues | undefined => {
+    if (initialResolution) return initialResolution
+
+    const { getValues, control } = getForm()
+    initialResolution =
+      readResolutionValues(getValues, control, defaultResolution) ??
+      (getValues() as { resolution?: ResolutionFormValues }).resolution ??
+      defaultResolution
+
+    return initialResolution
+  }
   let pending: PendingResolutionChange | null = null
   let notice: ResolutionChangeNotice | null = null
   let snapshot: ResolutionChangeSnapshot = { pending: null, notice: null }
@@ -155,16 +203,26 @@ function createController(
   }
 
   const applyPatch = (patch: Partial<ResolutionFormValues>) => {
-    const current = getValues(RESOLUTION_FIELD_NAME)
+    const { getValues, setValue, control } = getForm()
+    const current = readResolutionValues(getValues, control, resolveInitialResolution())
     if (!current) return
-    setValue(
-      RESOLUTION_FIELD_NAME,
-      { ...current, ...patch },
-      {
-        shouldDirty: true,
-        shouldValidate: true,
-      },
-    )
+
+    const next: ResolutionFormValues = { ...current, ...patch }
+    const setOptions = { shouldDirty: true, shouldValidate: true } as const
+
+    if (patch.effects) {
+      if (applyEffectsPatch(getForm, next.effects, patch)) {
+        return
+      }
+
+      setValue(`${RESOLUTION_FIELD_NAME}.effects`, next.effects, setOptions)
+    }
+
+    if (patch.outcomes) {
+      setValue(`${RESOLUTION_FIELD_NAME}.outcomes`, next.outcomes, setOptions)
+    }
+
+    setValue(RESOLUTION_FIELD_NAME, next, setOptions)
   }
 
   return {
@@ -176,19 +234,10 @@ function createController(
       return snapshot
     },
     requestResolutionChange(change) {
-      const resolution = getValues(RESOLUTION_FIELD_NAME)
+      const { getValues, control } = getForm()
+      const resolution = readResolutionValues(getValues, control, resolveInitialResolution())
       const before = resolutionFormToSelectionContext(resolution)
       if (!before || !resolution) return
-
-      if (change.field === 'removeEffect') {
-        const effect = resolution.effects.find((entry) => entry.id === change.effectId)
-        if (!effect) return
-
-        if (!outcomeApplicationsReferenceEffect(resolution.outcomes, change.effectId)) {
-          applyPatch(removeEffectPatch(resolution, change.effectId))
-          return
-        }
-      }
 
       const plan = planResolutionChange(before, change)
       if (!resolutionChangeRequiresConfirm(plan)) {
@@ -218,7 +267,8 @@ function createController(
     confirmPendingChange() {
       if (!pending) return
 
-      const resolution = getValues(RESOLUTION_FIELD_NAME)
+      const { getValues, control } = getForm()
+      const resolution = readResolutionValues(getValues, control, resolveInitialResolution())
       const before = resolutionFormToSelectionContext(resolution)
       if (!before || !resolution) {
         pending = null
@@ -284,9 +334,17 @@ export function useResolutionChangeController(): ResolutionChangeController {
     const existing = controllers.get(form.control)
     if (existing) return existing
 
+    const defaultResolution = (
+      formRef.current.formState.defaultValues as { resolution?: ResolutionFormValues }
+    ).resolution
+
     const controller = createController(
-      (name) => formRef.current.getValues(name) as ResolutionFormValues | undefined,
-      (name, value, options) => formRef.current.setValue(name, value, options),
+      () => ({
+        control: formRef.current.control,
+        getValues: formRef.current.getValues.bind(formRef.current),
+        setValue: formRef.current.setValue.bind(formRef.current),
+      }),
+      defaultResolution,
     )
     controllers.set(form.control, controller)
     return controller

@@ -17,8 +17,10 @@ import { fieldSizeTypographyClasses, type FieldSizeToken } from './field-sizing.
  * - `fieldRowGapClasses` — horizontal + wrap gap between fields in a row
  * - `fieldRowLayoutVariants` — display mode for schema-driven rows
  * - `fieldChipWrapGapClasses` — chip pill row spacing inside `ChipsField`
- * - `fieldGroupDescriptionClasses` — space below a group/section description
- * - `fieldGroupLegendSpacingClasses` — space below a group legend
+ * - `fieldGroupDescriptionClasses` — group/section hint typography (spacing lives on the legend header)
+ * - `fieldGroupLegendHeaderStackClasses` — vertical gap between a group legend and its hint
+ * - `fieldGroupLegendHeaderMarginVariants` — space below a legend header (legend alone or legend + hint)
+ * - `fieldGroupLegendSpacingClasses` — section legend header bottom margin (`mb-5` / 20px)
  * - `fieldArrayItemVariants` — chrome around one repeatable array item
  * - `fieldInlineSentenceClasses` — prose + compact control sentence rows
  * - `fieldInlineControlRowClasses` — inline label + control rows
@@ -41,8 +43,15 @@ export const fieldGroupFlexStackClasses = 'flex flex-col gap-8'
 export const formSectionStackClasses = 'flex flex-col gap-7'
 export const fieldRowGapClasses = 'gap-6'
 export const fieldChipWrapGapClasses = 'gap-2 pt-1'
-export const fieldGroupDescriptionClasses = 'mb-3'
+export const fieldGroupDescriptionTypographyClasses =
+  'font-normal leading-normal text-muted-foreground'
+/** Group/subgroup hint copy — spacing is applied on the legend header wrapper. */
+export const fieldGroupDescriptionClasses = fieldGroupDescriptionTypographyClasses
+/** Vertical gap between a group legend and its optional hint. */
+export const fieldGroupLegendHeaderStackClasses = 'flex flex-col gap-2'
+/** Section-level legend header bottom margin (20px). */
 export const fieldGroupLegendSpacingClasses = 'mb-5'
+/** Subgroup legend header bottom margin (16px). */
 export const fieldSubgroupLegendSpacingClasses = 'mb-4'
 /** Shared legend typography — field groups and array section legends. */
 export const fieldGroupLegendTypographyClasses =
@@ -281,9 +290,9 @@ export function resolveArrayLegendScale(size: FieldSizeToken): FieldGroupLegendS
 export const fieldGroupLegendVariants = cva('', {
   variants: {
     size: {
-      section: cn(fieldGroupLegendSpacingClasses, fieldGroupLegendTypographyClasses),
-      subsection: cn(fieldSubgroupLegendSpacingClasses, fieldSubgroupLegendTypographyClasses),
-      array: fieldArrayLegendSpacingClasses,
+      section: fieldGroupLegendTypographyClasses,
+      subsection: fieldSubgroupLegendTypographyClasses,
+      array: '',
     },
     scale: {
       default: '',
@@ -307,3 +316,34 @@ export const fieldGroupLegendVariants = cva('', {
     scale: 'default',
   },
 })
+
+/** Bottom margin for a field-group legend header — legend alone or legend + hint block. */
+export const fieldGroupLegendHeaderMarginVariants = cva('', {
+  variants: {
+    size: {
+      section: fieldGroupLegendSpacingClasses,
+      subsection: fieldSubgroupLegendSpacingClasses,
+      array: fieldArrayLegendSpacingClasses,
+    },
+  },
+  defaultVariants: {
+    size: 'section',
+  },
+})
+
+export type FieldGroupLegendVariantProps = VariantProps<typeof fieldGroupLegendVariants>
+
+/** Typography + header margin for `<legend>` on groups, subgroups, and array sections. */
+export function resolveFieldGroupLegendClassName(
+  options: FieldGroupLegendVariantProps = {},
+): string {
+  const size = options.size ?? 'section'
+  return cn(fieldGroupLegendVariants(options), fieldGroupLegendHeaderMarginVariants({ size }))
+}
+
+/** Stack + bottom margin for a legend/hint header block nested inside `<legend>`. */
+export function resolveFieldGroupLegendHeaderStackClassName(
+  size: NonNullable<FieldGroupLegendVariantProps['size']> = 'section',
+): string {
+  return cn(fieldGroupLegendHeaderStackClasses, fieldGroupLegendHeaderMarginVariants({ size }))
+}

@@ -5,10 +5,11 @@ import { useFieldArray, useFormContext, useWatch } from 'react-hook-form'
 
 import {
   fieldGroupBottomMarginClasses,
-  fieldGroupLegendVariants,
   fieldSetResetClasses,
+  resolveFieldGroupLegendClassName,
 } from '../../components/ui/field.variants'
 import { cn } from '../../lib/utils'
+import { registerArrayFieldMutators } from '../context/array-field-mutators.registry'
 import {
   FormSectionContext,
   useFormSectionContext,
@@ -40,9 +41,18 @@ export interface ArrayFieldRendererProps {
  * Must be rendered inside a `FormProvider`.
  */
 export function ArrayFieldRenderer({ config, idPrefix, fullName }: ArrayFieldRendererProps) {
+  const form = useFormContext()
   const { fields, append, remove, move } = useFieldArray({ name: fullName })
-  const { getValues } = useFormContext()
+  const { getValues } = form
   const watchedItems = useWatch({ name: fullName }) as unknown[] | undefined
+
+  React.useEffect(() => {
+    return registerArrayFieldMutators(form.control, fullName, {
+      getValues: () => fields.map((_, index) => form.getValues(`${fullName}.${index}`)),
+      remove,
+    })
+  }, [form, fullName, fields, remove])
+
   const state = useArrayFieldRendererState({
     config,
     idPrefix,
@@ -65,7 +75,7 @@ export function ArrayFieldRenderer({ config, idPrefix, fullName }: ArrayFieldRen
     >
       {state.showLegend ? (
         <legend
-          className={fieldGroupLegendVariants({
+          className={resolveFieldGroupLegendClassName({
             size: state.legendSize,
             scale: state.legendScale,
           })}

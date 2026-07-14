@@ -163,7 +163,8 @@ groups, or array items) omit it so parent `fieldStackRhythmVariants` gap control
 
 **Item chrome:** Each row renders a header toolbar (optional drag handle, optional collapse
 caret, title, remove). `itemVariant: 'auto'` picks `compact` when item fields are a single
-leaf `row`; otherwise `detailed`. Nested arrays inside another item are always compact.
+leaf `row`; otherwise `detailed`. Nested arrays inside another item default to compact;
+pass `itemVariant: 'detailed'` to keep grant-style collapsible headers inside nested groups.
 
 ```ts
 {
@@ -224,6 +225,9 @@ Optional hooks:
 | `itemCollapseKey`                 | Stable row field for persisted collapse overrides (default `'id'`; else `index:${index}`).                    |
 | `reorder`                         | `'dragHandle'` (default) or `false` for fixed order.                                                          |
 | `appendDefaults`                  | `(items) => defaults` replaces static defaults on append.                                                     |
+| `hideAddControl`                  | Omits the default add button (use an external slot instead).                                                  |
+| `hideItemRemove`                  | Omits the default per-item remove button (not merely disabled). Use with `itemRemoveSlot`.                    |
+| `itemRemoveSlot`                  | Custom remove control in the header actions rail; receives `ArrayFieldContext`. Pair with `hideItemRemove`.   |
 | `addMenu`                         | Searchable template dropdown for the add control; items carry `appendDefaults` and optional duplicate policy. |
 
 ```ts

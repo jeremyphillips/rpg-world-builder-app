@@ -23,6 +23,42 @@ describe('FieldGroup', () => {
       </FieldGroup>,
     )
     expect(screen.getByText('Shown on your sheet.')).toBeInTheDocument()
+    const legend = screen.getByText('Character basics').closest('legend')
+    expect(legend).not.toHaveClass('mb-5')
+    expect(legend?.firstElementChild).toHaveClass('flex', 'flex-col', 'gap-2', 'mb-5')
+    expect(screen.getByText('Shown on your sheet.')).not.toHaveClass('mb-3')
+  })
+
+  it('applies section header margin to a legend without a description', () => {
+    render(
+      <FieldGroup legend="Character basics">
+        <TextField id="name" label="Name" />
+      </FieldGroup>,
+    )
+
+    expect(screen.getByText('Character basics').closest('legend')).toHaveClass('mb-5')
+  })
+
+  it('applies subgroup header margin to subsection legends', () => {
+    render(
+      <FieldGroup legend="Damage" legendSize="subsection" description="Primary damage dice.">
+        <TextField id="damage-dice" label="Dice" />
+      </FieldGroup>,
+    )
+
+    const legend = screen.getByText('Damage').closest('legend')
+    expect(legend).not.toHaveClass('mb-4')
+    expect(legend?.firstElementChild).toHaveClass('flex', 'flex-col', 'gap-2', 'mb-4')
+  })
+
+  it('applies subgroup header margin to a subsection legend without a description', () => {
+    render(
+      <FieldGroup legend="Damage" legendSize="subsection">
+        <TextField id="damage-dice" label="Dice" />
+      </FieldGroup>,
+    )
+
+    expect(screen.getByText('Damage').closest('legend')).toHaveClass('mb-4')
   })
 
   it('stacks sibling fields with a gap-based column rhythm', () => {

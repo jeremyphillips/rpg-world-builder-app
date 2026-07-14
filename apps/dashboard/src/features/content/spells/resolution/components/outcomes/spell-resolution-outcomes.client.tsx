@@ -50,10 +50,6 @@ export function SpellResolutionOutcomes() {
 
   return (
     <div className="space-y-3">
-      <Text as="p" variant="muted" className="text-sm">
-        {RESOLUTION_SECTION_LABELS.outcomesHint}
-      </Text>
-
       {showPrimaryWarning ? (
         <Alert variant="warning" title="Review outcomes" role="status">
           <Text variant="muted" className="text-sm">

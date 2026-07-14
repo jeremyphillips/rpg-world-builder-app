@@ -1,8 +1,17 @@
 import { describe, expect, it } from 'vitest'
 import type { ArrayConfig, FormItem, GroupConfig } from '@rpg/ui/form'
 
+import {
+  outcomeApplicationsReferenceEffect,
+  planResolutionChange,
+  resolutionChangeRequiresConfirm,
+  SPELL_RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID,
+} from '@rpg/contracts'
+
 import { formatEffectRowPrimary, formatEffectRowSummary } from '../../../lib/effects/effect-display'
 import { resolutionFields } from '../form/resolution-form-fields'
+import { resolutionFormToSelectionContext } from '../selection/resolution-selection-context.lib'
+import { RESOLUTION_FORM_FIXTURES } from '../../fixtures'
 
 function findResolutionEffectsArray(fields: FormItem[]): ArrayConfig | undefined {
   for (const field of fields) {
@@ -27,19 +36,32 @@ describe('resolutionFields effects array', () => {
     expect(arrayField?.addMenu).toBeUndefined()
   })
 
-  it('includes a custom remove slot for each effect row', () => {
+  it('hides the generic remove control in favor of the resolution-specific header remove slot', () => {
+    const arrayField = findResolutionEffectsArray(resolutionFields({}))
+    expect(arrayField?.hideItemRemove).toBe(true)
+    expect(arrayField?.itemRemoveSlot?.name).toBe('_resolutionEffectHeaderRemove')
+    expect(arrayField?.itemRemoveSlot?.render).toBeTypeOf('function')
+  })
+
+  it('does not include a body-level remove slot on effect rows', () => {
     const itemFields = findResolutionEffectsArray(resolutionFields({}))?.fields ?? []
     expect(
       itemFields.find(
         (field) =>
           'kind' in field && field.kind === 'slot' && field.name === '_resolutionEffectRemove',
       ),
-    ).toBeDefined()
+    ).toBeUndefined()
   })
 
   it('does not expose a kind selector; kind is fixed at add time via templates', () => {
     const itemFields = findResolutionEffectsArray(resolutionFields({}))?.fields ?? []
     expect(itemFields.find((field) => !('kind' in field) && field.name === 'kind')).toBeUndefined()
+  })
+
+  it('opts into detailed item chrome when nested inside resolution groups', () => {
+    const arrayField = findResolutionEffectsArray(resolutionFields({}))
+    expect(arrayField?.itemVariant).toBe('detailed')
+    expect(arrayField?.itemCollapsible).toBe(true)
   })
 
   it('wires grant-style collapsible item headers with parent context summaries', () => {
@@ -87,6 +109,22 @@ describe('resolutionFields effects array', () => {
         { 'resolution.proximityKind': 'self' },
       ),
     ).toBe('You heal 3d8 Hit Points.')
+  })
+})
+
+describe('resolution effect removal planning', () => {
+  it('requires confirm when removing an outcome-referenced effect', () => {
+    const form = RESOLUTION_FORM_FIXTURES.inflictWounds
+    const effectId = SPELL_RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID
+
+    expect(outcomeApplicationsReferenceEffect(form.outcomes, effectId)).toBe(true)
+
+    const plan = planResolutionChange(resolutionFormToSelectionContext(form)!, {
+      field: 'removeEffect',
+      effectId,
+    })
+
+    expect(resolutionChangeRequiresConfirm(plan)).toBe(true)
   })
 })
 

@@ -114,7 +114,7 @@ describe('spell resolution tab hydration', () => {
     await waitFor(() => {
       expect(screen.getAllByText('Target').length).toBeGreaterThan(0)
       expect(screen.getAllByText('Check').length).toBeGreaterThan(0)
-      expect(screen.getAllByText('Effects').length).toBeGreaterThan(0)
+      expect(screen.getAllByText('Effects & outcomes').length).toBeGreaterThan(0)
       expect(isDirty).toBe(true)
     })
   })
