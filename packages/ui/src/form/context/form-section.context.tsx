@@ -20,7 +20,7 @@ export interface FormSectionContextValue {
   rhythm: FieldStackRhythm
   /** Control + label scale for leaf fields in this section. */
   size: FieldSize
-  /** Surface tone for array item shells when stack scope is `arrayItems`. */
+  /** Surface tone for array item shells — defaults to `elevated` when unset. */
   arrayItemTone?: FieldStackDependentsTone
   /** True when the current section is nested inside a group fieldset. */
   inGroup?: boolean

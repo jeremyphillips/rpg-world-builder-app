@@ -127,8 +127,6 @@ describe('ArrayFieldRenderer', () => {
       {
         kind: 'stack',
         layout: 'dependent',
-        dependentsChrome: 'subtle',
-        dependentsChromeScope: 'arrayItems',
         fields: [
           {
             type: 'switch',
@@ -167,20 +165,21 @@ describe('ArrayFieldRenderer', () => {
     await waitFor(() => expect(screen.getByRole('textbox', { name: 'Class' })).toBeInTheDocument())
 
     const itemShell = screen.getByRole('group', { name: /Item #1/ })
-    expect(itemShell).toHaveClass('bg-muted/10')
+    expect(itemShell).toHaveClass('bg-card')
+    expect(itemShell).toHaveClass('shadow-surface-raised')
     const dependentsRegion = addButton.closest('[data-field-stack-dependents]')
     expect(dependentsRegion?.querySelector(':scope > .p-3')).toBeNull()
-    expect(dependentsRegion?.querySelector('.bg-muted\\/10')).toBe(itemShell)
+    expect(dependentsRegion?.querySelector('.bg-card')).toBe(itemShell)
   })
 
-  it('applies itemChrome tone on array item shells', async () => {
+  it('applies itemChrome override on array item shells', async () => {
     const user = userEvent.setup()
-    const elevatedFields: FormItem[] = [
+    const subtleFields: FormItem[] = [
       {
         kind: 'array',
         name: 'traits',
         legend: 'Traits',
-        itemChrome: 'elevated',
+        itemChrome: 'subtle',
         fields: traitFields,
         addLabel: 'Add trait',
       },
@@ -189,7 +188,7 @@ describe('ArrayFieldRenderer', () => {
     render(
       <Form<Values>
         schema={schema}
-        fields={elevatedFields}
+        fields={subtleFields}
         onSubmit={vi.fn()}
         footer={<button type="submit">Save</button>}
       />,
@@ -198,8 +197,18 @@ describe('ArrayFieldRenderer', () => {
     await user.click(screen.getByRole('button', { name: 'Add trait' }))
 
     const itemShell = screen.getByRole('group', { name: 'Trait #1' })
-    expect(itemShell).toHaveClass('bg-card')
+    expect(itemShell).toHaveClass('bg-muted/10')
     expect(itemShell).toHaveClass('border-border')
+    expect(itemShell).not.toHaveClass('bg-card')
+  })
+
+  it('defaults array item shells to elevated card chrome', async () => {
+    const user = userEvent.setup()
+    renderForm()
+    await user.click(screen.getByRole('button', { name: 'Add trait' }))
+
+    const itemShell = screen.getByRole('group', { name: 'Trait #1' })
+    expect(itemShell).toHaveClass('bg-card')
     expect(itemShell).toHaveClass('shadow-surface-raised')
   })
 
@@ -246,6 +255,8 @@ describe('ArrayFieldRenderer', () => {
       'rounded-md',
       'border',
       'border-border',
+      'bg-card',
+      'shadow-surface-raised',
       'pl-2',
     )
   })

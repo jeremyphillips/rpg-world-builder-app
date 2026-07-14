@@ -162,7 +162,8 @@ Token: `fieldSeparatorVariants`. Do not use row `className` for recurring divide
 ## Array fields
 
 Repeatable section via `useFieldArray`. Item field names are **relative** (renderer prefixes
-`arrayName.index`).
+`arrayName.index`). Item shells default to the **elevated** surface (`bg-card` + raised shadow);
+use `itemChrome` or stack `dependentsChrome` + `dependentsChromeScope: 'arrayItems'` to override.
 
 ```ts
 {
@@ -248,7 +249,7 @@ Optional hooks:
 | Property                          | Purpose                                                                                                       |
 | --------------------------------- | ------------------------------------------------------------------------------------------------------------- |
 | `itemVariant`                     | `'auto'` \| `'compact'` \| `'detailed'` — row layout (default `auto`).                                        |
-| `itemChrome`                      | Item shell surface tone (`main` \| `elevated` \| `subtle` \| `medium` \| `warning` \| `error`).               |
+| `itemChrome`                      | Item shell surface tone — defaults to `elevated` (`bg-card`); override with `subtle`, `medium`, etc.          |
 | `itemHeader`                      | Primary/fallback labels; optional `summary` on a second row below the title (detailed).                       |
 | `itemHeader.showFallbackInHeader` | When true, appends ` · {fallback}` after the primary title (default `false`).                                 |
 | `itemCollapsible`                 | Detailed items only — collapse body into header row.                                                          |

@@ -758,8 +758,8 @@ export interface ArrayConfig {
   itemVariant?: ArrayItemVariant
   /**
    * Border/background tone on each item shell (`main` | `elevated` | `subtle` | `medium` |
-   * `warning` | `error`). Overrides inherited stack `dependentsChrome` when
-   * `dependentsChromeScope` is `arrayItems`.
+   * `warning` | `error`). Defaults to `elevated` (`bg-card`); overrides inherited stack
+   * `dependentsChrome` when `dependentsChromeScope` is `arrayItems`.
    */
   itemChrome?: FieldStackDependentsTone
   /** Header labels and optional collapsed summary for each item row. */

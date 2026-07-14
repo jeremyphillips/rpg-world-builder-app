@@ -130,7 +130,7 @@ export function ArrayItemShell({
       collapsible={collapsible}
       dragging={dragging}
       layout={layout}
-      tone={arrayItemTone ?? 'default'}
+      tone={arrayItemTone ?? 'elevated'}
       className={className}
       main={main}
       actions={actions}

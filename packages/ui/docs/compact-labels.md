@@ -59,6 +59,7 @@ pill surfaces instead of inline copy.
 Role tokens live in [`globals.css`](../src/styles/globals.css):
 
 - `--semantic-*-border`, `--semantic-*-subtle` — badge soft/outline surfaces
+- `--semantic-negative-on-subtle` — soft negative badge copy (AA on `destructive-subtle` fill)
 - `--selected-control`, `--selected-control-foreground`, `--selected-control-border` — chip selection
 
 Typography aliases: `text-xs-meta`, `text-sm-meta` (see [typography.md](./typography.md)).

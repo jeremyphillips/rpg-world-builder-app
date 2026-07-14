@@ -16,12 +16,12 @@ describe('array-item-issue', () => {
     )
 
     const badge = screen.getByRole('button', { name: '2 issues in Hero' })
-    expect(badge).toHaveClass('text-semantic-negative')
+    expect(badge).toHaveClass('text-semantic-negative-on-subtle')
     expect(badge).toHaveTextContent('2 issues')
 
     rerender(<ArrayItemIssueBadge issueCount={2} rowLabel="Hero" prominence="aggregate" />)
     expect(screen.getByRole('button', { name: '2 issues in Hero' })).toHaveClass(
-      'text-semantic-negative',
+      'text-semantic-negative-on-subtle',
     )
   })
 
