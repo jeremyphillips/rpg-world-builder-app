@@ -70,3 +70,6 @@ export function seedSpellSlugs(rulesetId: SystemRulesetId): ReadonlySet<string> 
 export function getSpellBySlug(rulesetId: SystemRulesetId, slug: string): Spell {
   return getBySlug(loadSeedSpells, rulesetId, slug, 'Spell')
 }
+
+export { SRD_521_SPELL_SEED_RESOLUTION_SLUGS } from './spell-seed-resolution'
+export { buildSpellResolutionCoverageInventory } from './spell-resolution-coverage-inventory'

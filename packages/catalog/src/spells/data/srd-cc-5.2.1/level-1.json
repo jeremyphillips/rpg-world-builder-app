@@ -99,7 +99,53 @@
         },
         "damageType": "fire"
       }
-    ]
+    ],
+    "resolution": {
+      "target": {
+        "count": 1,
+        "kind": "creature-or-object"
+      },
+      "method": {
+        "kind": "saving-throw",
+        "ability": "dex"
+      },
+      "range": {
+        "kind": "reach"
+      },
+      "effects": [
+        {
+          "id": "damage",
+          "kind": "damage",
+          "roll": {
+            "dice": {
+              "count": 3,
+              "faces": 6
+            }
+          },
+          "damageType": "fire"
+        }
+      ],
+      "outcomes": [
+        {
+          "result": "failed-save",
+          "applications": [
+            {
+              "effectId": "damage",
+              "amount": "full"
+            }
+          ]
+        },
+        {
+          "result": "successful-save",
+          "applications": [
+            {
+              "effectId": "damage",
+              "amount": "half"
+            }
+          ]
+        }
+      ]
+    }
   },
   {
     "id": "srd-cc-5.2.1:create-or-destroy-water",
@@ -580,7 +626,57 @@
         },
         "damageType": "fire"
       }
-    ]
+    ],
+    "resolution": {
+      "target": {
+        "count": 1,
+        "kind": "creature"
+      },
+      "method": {
+        "kind": "saving-throw",
+        "ability": "dex"
+      },
+      "range": {
+        "kind": "distance",
+        "value": {
+          "value": 60,
+          "unit": "ft"
+        }
+      },
+      "effects": [
+        {
+          "id": "damage",
+          "kind": "damage",
+          "roll": {
+            "dice": {
+              "count": 2,
+              "faces": 10
+            }
+          },
+          "damageType": "fire"
+        }
+      ],
+      "outcomes": [
+        {
+          "result": "failed-save",
+          "applications": [
+            {
+              "effectId": "damage",
+              "amount": "full"
+            }
+          ]
+        },
+        {
+          "result": "successful-save",
+          "applications": [
+            {
+              "effectId": "damage",
+              "amount": "half"
+            }
+          ]
+        }
+      ]
+    }
   },
   {
     "id": "srd-cc-5.2.1:hex",
@@ -939,7 +1035,53 @@
         },
         "damageType": "necrotic"
       }
-    ]
+    ],
+    "resolution": {
+      "target": {
+        "count": 1,
+        "kind": "creature"
+      },
+      "method": {
+        "kind": "saving-throw",
+        "ability": "con"
+      },
+      "range": {
+        "kind": "touch"
+      },
+      "effects": [
+        {
+          "id": "damage",
+          "kind": "damage",
+          "roll": {
+            "dice": {
+              "count": 2,
+              "faces": 10
+            }
+          },
+          "damageType": "necrotic"
+        }
+      ],
+      "outcomes": [
+        {
+          "result": "failed-save",
+          "applications": [
+            {
+              "effectId": "damage",
+              "amount": "full"
+            }
+          ]
+        },
+        {
+          "result": "successful-save",
+          "applications": [
+            {
+              "effectId": "damage",
+              "amount": "half"
+            }
+          ]
+        }
+      ]
+    }
   },
   {
     "id": "srd-cc-5.2.1:jump",
@@ -1212,7 +1354,48 @@
         },
         "damageType": "poison"
       }
-    ]
+    ],
+    "resolution": {
+      "target": {
+        "count": 1,
+        "kind": "creature-or-object"
+      },
+      "method": {
+        "kind": "attack",
+        "attackType": "ranged-spell"
+      },
+      "range": {
+        "kind": "distance",
+        "value": {
+          "value": 60,
+          "unit": "ft"
+        }
+      },
+      "effects": [
+        {
+          "id": "damage",
+          "kind": "damage",
+          "roll": {
+            "dice": {
+              "count": 2,
+              "faces": 8
+            }
+          },
+          "damageType": "poison"
+        }
+      ],
+      "outcomes": [
+        {
+          "result": "hit",
+          "applications": [
+            {
+              "effectId": "damage",
+              "amount": "full"
+            }
+          ]
+        }
+      ]
+    }
   },
   {
     "id": "srd-cc-5.2.1:sanctuary",
@@ -1513,6 +1696,52 @@
         },
         "damageType": "thunder"
       }
-    ]
+    ],
+    "resolution": {
+      "target": {
+        "count": 1,
+        "kind": "creature-or-object"
+      },
+      "method": {
+        "kind": "saving-throw",
+        "ability": "con"
+      },
+      "range": {
+        "kind": "reach"
+      },
+      "effects": [
+        {
+          "id": "damage",
+          "kind": "damage",
+          "roll": {
+            "dice": {
+              "count": 2,
+              "faces": 8
+            }
+          },
+          "damageType": "thunder"
+        }
+      ],
+      "outcomes": [
+        {
+          "result": "failed-save",
+          "applications": [
+            {
+              "effectId": "damage",
+              "amount": "full"
+            }
+          ]
+        },
+        {
+          "result": "successful-save",
+          "applications": [
+            {
+              "effectId": "damage",
+              "amount": "half"
+            }
+          ]
+        }
+      ]
+    }
   }
 ]

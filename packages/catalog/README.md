@@ -49,3 +49,16 @@ the SRD rules body (`startingWealthRulesSchema`) for ruleset-patch resolution vi
 pnpm --filter @rpg/catalog test
 pnpm --filter @rpg/catalog typecheck
 ```
+
+### Spell structured data scripts
+
+Apply manifest data into `src/spells/data/srd-cc-5.2.1/level-*.json` (requires `tsx`):
+
+```sh
+pnpm exec tsx packages/catalog/scripts/apply-spell-seed-effects.mjs
+pnpm exec tsx packages/catalog/scripts/apply-spell-seed-resolution.mjs
+```
+
+Manifests live in `src/spells/spell-seed-effects.ts` and `spell-seed-resolution.ts`.
+Migrated spells keep both `effects[]` and optional `resolution` until a later
+consolidation phase.

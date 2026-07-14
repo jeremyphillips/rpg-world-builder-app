@@ -1,7 +1,7 @@
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { loadSeedSpells } from '@rpg/catalog/spells'
-import { ELDRITCH_BLAST_RESOLUTION } from '@rpg/contracts'
+import { loadSeedSpells, SRD_521_SPELL_SEED_RESOLUTION_SLUGS } from '@rpg/catalog/spells'
+import { CHILL_TOUCH_RESOLUTION } from '@rpg/contracts'
 import { TabbedForm } from '@rpg/ui/form'
 import { describe, expect, it } from 'vitest'
 
@@ -17,12 +17,11 @@ const formCtx = makeContentFormCtx({
   damageTypeVocabulary: buildSeedDamageTypeVocabulary(),
 })
 
-const modeledSpell = {
-  ...loadSeedSpells('srd-cc-5.2.1')[0]!,
-  resolution: ELDRITCH_BLAST_RESOLUTION,
-}
+const modeledSpell = loadSeedSpells('srd-cc-5.2.1').find((spell) => spell.slug === 'chill-touch')!
 
-const unmodeledSpell = loadSeedSpells('srd-cc-5.2.1')[0]!
+const unmodeledSpell = loadSeedSpells('srd-cc-5.2.1').find(
+  (spell) => spell.slug === 'eldritch-blast',
+)!
 
 function renderSpellTabbedForm(defaultValues: ReturnType<typeof spellToFormValues>) {
   const tabs = buildSpellTabs(formCtx)
@@ -45,7 +44,7 @@ describe('spell resolution tab hydration', () => {
 
     await waitFor(() => {
       expect(screen.queryByRole('button', { name: /add resolution/i })).not.toBeInTheDocument()
-      expect(screen.getAllByText('Ranged spell attack').length).toBeGreaterThan(0)
+      expect(screen.getAllByText('Melee spell attack').length).toBeGreaterThan(0)
       expect(screen.getByRole('button', { name: /remove resolution/i })).toBeInTheDocument()
     })
   })
@@ -75,7 +74,7 @@ describe('spell resolution tab hydration', () => {
     )
 
     await waitFor(() => {
-      expect(screen.getAllByText('Ranged spell attack').length).toBeGreaterThan(0)
+      expect(screen.getAllByText('Melee spell attack').length).toBeGreaterThan(0)
     })
     expect(isDirty).toBe(false)
   })
@@ -135,7 +134,7 @@ describe('spell resolution tab hydration', () => {
     )
 
     await waitFor(() => {
-      expect(screen.getAllByText('Ranged spell attack').length).toBeGreaterThan(0)
+      expect(screen.getAllByText('Melee spell attack').length).toBeGreaterThan(0)
     })
 
     rerender(
@@ -150,7 +149,7 @@ describe('spell resolution tab hydration', () => {
 
     await waitFor(() => {
       expect(screen.getByRole('button', { name: /add resolution/i })).toBeInTheDocument()
-      expect(screen.queryByText('Ranged spell attack')).not.toBeInTheDocument()
+      expect(screen.queryByText('Melee spell attack')).not.toBeInTheDocument()
     })
 
     rerender(
@@ -172,12 +171,24 @@ describe('spell resolution tab hydration', () => {
     })
   })
 
+  it('hydrates Tier A catalog resolution seeds into form values', () => {
+    const spells = loadSeedSpells('srd-cc-5.2.1')
+
+    for (const slug of SRD_521_SPELL_SEED_RESOLUTION_SLUGS) {
+      const spell = spells.find((entry) => entry.slug === slug)!
+      const formValues = spellToFormValues(spell)
+
+      expect(formValues.resolution, slug).toBeDefined()
+      expect(resolutionToStored(formValues.resolution)).toEqual(spell.resolution)
+    }
+  })
+
   it('preserves normalized resolution shape when saving without edits', () => {
     const formValues = spellToFormValues(modeledSpell)
     const input = spellFormDef.toInput(formValues)
 
     expect(input).not.toHaveProperty('resolution')
-    expect(resolutionToStored(formValues.resolution)).toEqual(ELDRITCH_BLAST_RESOLUTION)
-    expect(formValues.resolution).toEqual(RESOLUTION_FORM_FIXTURES.eldritchBlast)
+    expect(resolutionToStored(formValues.resolution)).toEqual(CHILL_TOUCH_RESOLUTION)
+    expect(formValues.resolution).toEqual(RESOLUTION_FORM_FIXTURES.chillTouch)
   })
 })

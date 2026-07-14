@@ -176,6 +176,56 @@
         },
         "damageType": "fire"
       }
-    ]
+    ],
+    "resolution": {
+      "target": {
+        "count": 1,
+        "kind": "creature-or-object"
+      },
+      "method": {
+        "kind": "saving-throw",
+        "ability": "dex"
+      },
+      "range": {
+        "kind": "distance",
+        "value": {
+          "value": 120,
+          "unit": "ft"
+        }
+      },
+      "effects": [
+        {
+          "id": "damage",
+          "kind": "damage",
+          "roll": {
+            "dice": {
+              "count": 5,
+              "faces": 8
+            }
+          },
+          "damageType": "fire"
+        }
+      ],
+      "outcomes": [
+        {
+          "result": "failed-save",
+          "applications": [
+            {
+              "effectId": "damage",
+              "amount": "full"
+            }
+          ]
+        },
+        {
+          "result": "successful-save",
+          "applications": [
+            {
+              "effectId": "damage",
+              "amount": "half"
+            }
+          ]
+        }
+      ]
+    }
   }
 ]

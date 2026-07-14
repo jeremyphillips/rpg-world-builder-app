@@ -54,6 +54,11 @@ parallel boolean flag.
 Modules live under [`resolution/`](resolution/) (`resolution-form-fields.ts`,
 `resolution-form-values.ts`, `components/spell-resolution-*.client.tsx`).
 
+Catalog seeds for Tier A single-damage spells ship optional `resolution` on the
+read model via `packages/catalog/src/spells/spell-seed-resolution.ts` (13 slugs in
+SRD 5.2.1). Apply with `pnpm exec tsx packages/catalog/scripts/apply-spell-seed-resolution.mjs`.
+Flat `effects[]` remain on migrated spells until consolidation.
+
 Shared roll/damage form atoms live under
 [`content/lib/forms/mechanics/`](../../lib/forms/mechanics/) (`roll-value-fields`,
 `damage-type-field`).

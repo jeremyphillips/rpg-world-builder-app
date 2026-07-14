@@ -1,12 +1,13 @@
 /**
- * Applies structured effects from spell-seed-effects.ts into level JSON files.
- * Run from repo root: pnpm exec tsx packages/catalog/scripts/apply-spell-seed-effects.mjs
+ * Applies structured resolution from spell-seed-resolution.ts into level JSON files.
+ * Run from repo root: pnpm exec tsx packages/catalog/scripts/apply-spell-seed-resolution.mjs
  */
 import { readFileSync, writeFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
-import { SRD_521_SPELL_SEED_EFFECTS } from '../src/spells/spell-seed-effects.ts'
+import { deriveResolutionFromSpell } from '../src/spells/lib/derive-resolution-from-spell.ts'
+import { SRD_521_SPELL_SEED_RESOLUTION } from '../src/spells/spell-seed-resolution.ts'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const dataDir = join(__dirname, '../src/spells/data/srd-cc-5.2.1')
@@ -32,15 +33,17 @@ for (const fileName of levelFiles) {
   let changed = false
 
   for (const spell of spells) {
-    const effects = SRD_521_SPELL_SEED_EFFECTS[spell.slug]
-    if (effects) {
-      spell.effects = structuredClone(effects)
-      applied++
-      changed = true
-    } else if ('effects' in spell) {
-      delete spell.effects
-      changed = true
+    const entry = SRD_521_SPELL_SEED_RESOLUTION[spell.slug]
+    if (!entry) {
+      continue
     }
+
+    const resolution =
+      entry.kind === 'full' ? entry.resolution : deriveResolutionFromSpell(spell, entry.overrides)
+
+    spell.resolution = structuredClone(resolution)
+    applied++
+    changed = true
   }
 
   if (changed) {
@@ -48,4 +51,4 @@ for (const fileName of levelFiles) {
   }
 }
 
-console.log(`Applied structured effects to ${applied} spells.`)
+console.log(`Applied structured resolution to ${applied} spells.`)
