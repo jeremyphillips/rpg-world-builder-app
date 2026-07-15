@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest'
 
+import {
+  BURNING_HANDS_RESOLUTION,
+  FALSE_LIFE_RESOLUTION,
+  FIREBALL_RESOLUTION,
+} from '../resolution/fixtures'
+import { deriveEffectRecipientFromResolution } from '../resolution/effect-context'
 import { formatEffectRowSentenceFromParts } from './format'
 
 describe('formatEffectRowSentenceFromParts', () => {
@@ -57,5 +63,43 @@ describe('formatEffectRowSentenceFromParts', () => {
         { recipient: 'self', register: 'resolution-preview' },
       ),
     ).toBe('You gain 2d4+4 temporary hit points.')
+  })
+})
+
+describe('resolution fixture recipient phrasing', () => {
+  it('false life uses caster recipient copy', () => {
+    const effect = FALSE_LIFE_RESOLUTION.effects[0]!
+    const recipient = deriveEffectRecipientFromResolution(FALSE_LIFE_RESOLUTION)
+
+    expect(recipient).toBe('self')
+    expect(
+      formatEffectRowSentenceFromParts(
+        {
+          kind: effect.kind,
+          roll: effect.roll,
+        },
+        { recipient, register: 'resolution-preview' },
+      ),
+    ).toBe('You gain 2d4+4 temporary hit points.')
+  })
+
+  it('burning hands and fireball use area-occupant recipient copy', () => {
+    for (const resolution of [BURNING_HANDS_RESOLUTION, FIREBALL_RESOLUTION]) {
+      const effect = resolution.effects[0]!
+      if (effect.kind !== 'damage') throw new Error('expected damage fixture')
+      const recipient = deriveEffectRecipientFromResolution(resolution)
+
+      expect(recipient).toBe('area')
+      expect(
+        formatEffectRowSentenceFromParts(
+          {
+            kind: effect.kind,
+            roll: effect.roll,
+            damageType: effect.damageType,
+          },
+          { recipient, register: 'resolution-preview' },
+        ),
+      ).toContain('Each creature or object in the area')
+    }
   })
 })

@@ -10,10 +10,12 @@ import {
   formatResolutionTargetProximityPhrase,
 } from './format'
 import {
+  BURNING_HANDS_RESOLUTION,
   CHILL_TOUCH_RESOLUTION,
   CURE_WOUNDS_RESOLUTION,
   ELDRITCH_BLAST_RESOLUTION,
   FALSE_LIFE_RESOLUTION,
+  FIREBALL_RESOLUTION,
   INFlict_WOUNDS_RESOLUTION,
   MAGIC_MISSILE_RESOLUTION,
   SPELL_RESOLUTION_FIXTURES,
@@ -250,6 +252,101 @@ describe('spellResolutionSchema', () => {
         }),
       }),
     )
+  })
+})
+
+describe('spellResolutionSchema selection modes', () => {
+  it('accepts self, targets, point, and none mode fixtures', () => {
+    expect(spellResolutionSchema.parse(FALSE_LIFE_RESOLUTION)).toEqual(FALSE_LIFE_RESOLUTION)
+    expect(spellResolutionSchema.parse(CURE_WOUNDS_RESOLUTION)).toEqual(CURE_WOUNDS_RESOLUTION)
+    expect(spellResolutionSchema.parse(FIREBALL_RESOLUTION)).toEqual(FIREBALL_RESOLUTION)
+    expect(spellResolutionSchema.parse(BURNING_HANDS_RESOLUTION)).toEqual(BURNING_HANDS_RESOLUTION)
+  })
+
+  it('rejects targets mode without target', () => {
+    const result = spellResolutionSchema.safeParse({
+      selectionMode: 'targets',
+      method: { kind: 'automatic' },
+      effects: ELDRITCH_BLAST_RESOLUTION.effects,
+      outcomes: ELDRITCH_BLAST_RESOLUTION.outcomes,
+    })
+
+    expect(result.success).toBe(false)
+  })
+
+  it('rejects point mode without origin', () => {
+    const result = spellResolutionSchema.safeParse({
+      selectionMode: 'point',
+      areaOfEffect: FIREBALL_RESOLUTION.areaOfEffect,
+      method: FIREBALL_RESOLUTION.method,
+      effects: FIREBALL_RESOLUTION.effects,
+      outcomes: FIREBALL_RESOLUTION.outcomes,
+    })
+
+    expect(result.success).toBe(false)
+  })
+
+  it('strips target when selectionMode is self', () => {
+    const parsed = spellResolutionSchema.parse({
+      ...FALSE_LIFE_RESOLUTION,
+      target: CURE_WOUNDS_RESOLUTION.target,
+    })
+
+    expect(parsed.selectionMode).toBe('self')
+    expect(parsed.target).toBeUndefined()
+  })
+
+  it('strips areaOfEffect when selectionMode is none', () => {
+    const parsed = spellResolutionSchema.parse({
+      selectionMode: 'none',
+      areaOfEffect: BURNING_HANDS_RESOLUTION.areaOfEffect,
+      method: { kind: 'automatic' },
+      effects: FALSE_LIFE_RESOLUTION.effects,
+      outcomes: FALSE_LIFE_RESOLUTION.outcomes,
+    })
+
+    expect(parsed.selectionMode).toBe('none')
+    expect(parsed.areaOfEffect).toBeUndefined()
+  })
+
+  it('rejects attack method for self mode without area', () => {
+    const result = spellResolutionSchema.safeParse({
+      selectionMode: 'self',
+      method: { kind: 'attack', attackType: 'ranged-spell' },
+      effects: ELDRITCH_BLAST_RESOLUTION.effects,
+      outcomes: ELDRITCH_BLAST_RESOLUTION.outcomes,
+    })
+
+    expect(result.success).toBe(false)
+  })
+
+  it('rejects deferred attack method for point mode', () => {
+    const result = spellResolutionSchema.safeParse({
+      selectionMode: 'point',
+      origin: FIREBALL_RESOLUTION.origin,
+      areaOfEffect: FIREBALL_RESOLUTION.areaOfEffect,
+      method: { kind: 'attack', attackType: 'ranged-spell' },
+      effects: FIREBALL_RESOLUTION.effects,
+      outcomes: FIREBALL_RESOLUTION.outcomes,
+    })
+
+    expect(result.success).toBe(false)
+  })
+
+  it('normalizes legacy target.self to selectionMode self', () => {
+    const parsed = spellResolutionSchema.parse({
+      target: {
+        count: 1,
+        kind: 'creature',
+        proximity: { kind: 'self' },
+      },
+      method: { kind: 'automatic' },
+      effects: FALSE_LIFE_RESOLUTION.effects,
+      outcomes: FALSE_LIFE_RESOLUTION.outcomes,
+    })
+
+    expect(parsed.selectionMode).toBe('self')
+    expect(parsed.target).toBeUndefined()
   })
 })
 

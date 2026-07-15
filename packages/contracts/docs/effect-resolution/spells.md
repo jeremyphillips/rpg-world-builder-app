@@ -47,3 +47,21 @@ maps that to `selectionMode: 'self'` and removes the target block.
 
 Canonical examples: [`fixtures.ts`](../../src/rpg/content/spell/resolution/fixtures.ts)
 (`FALSE_LIFE_RESOLUTION`, `FIREBALL_RESOLUTION`, `BURNING_HANDS_RESOLUTION`, …).
+
+## Seed migration
+
+- Manifest: [`spell-seed-resolution.ts`](../../../../catalog/src/spells/spell-seed-resolution.ts)
+- Derive script: [`derive-resolution-from-spell.ts`](../../../../catalog/src/spells/lib/derive-resolution-from-spell.ts)
+- Apply script: [`apply-spell-seed-resolution.mjs`](../../../../catalog/src/spells/scripts/apply-spell-seed-resolution.mjs)
+- Audit tests: [`spell-resolution-targeting-audit.test.ts`](../../../../catalog/src/spells/spell-resolution-targeting-audit.test.ts)
+
+## Partial targeting gaps
+
+Resolved spells with incomplete targeting semantics are tagged in
+[`spell-resolution-targeting-gaps.ts`](../../../../catalog/src/spells/spell-resolution-targeting-gaps.ts)
+and surfaced on coverage inventory entries as `targetingGap`.
+
+## Dashboard authoring
+
+Mode visibility matrix, cleanup rules, and form round-trip:
+[authoring.md](../../../../apps/dashboard/src/features/content/spells/resolution/docs/authoring.md).

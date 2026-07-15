@@ -34,6 +34,7 @@ export {
   ICE_KNIFE_RESOLUTION,
   INFlict_WOUNDS_RESOLUTION,
   MAGIC_MISSILE_RESOLUTION,
+  MASS_HEALING_WORD_RESOLUTION,
   SPELL_RESOLUTION_FIXTURES,
 } from './fixtures'
 export {
@@ -180,6 +181,23 @@ export {
   formatResolutionAvailabilityReason,
   type ResolutionAvailabilityTone,
 } from './availability-reasons'
+export {
+  getSelectionMethodCapabilityRequired,
+  getSelectionMethodCompatibility,
+  getSelectionMethodCompatibilityReasonCode,
+  isSelectionMethodAllowed,
+  methodOptionToMethodKind,
+  resolveSelectionMethodContextKey,
+  resolveSelectionModeFromState,
+  SELECTION_METHOD_COMPATIBILITY_MATRIX,
+  SELECTION_METHOD_COMPATIBILITY_REASON_CODES,
+  selectionMethodContextFromState,
+  validateSpellResolutionMethodCompatibility,
+  type ResolutionMethodKind,
+  type SelectionMethodCompatibility,
+  type SelectionMethodCompatibilityReasonCode,
+  type SelectionMethodContextKey,
+} from './selection-method-compatibility'
 export {
   applyMethodOptionPatch,
   applyResolutionStructuralCleanup,

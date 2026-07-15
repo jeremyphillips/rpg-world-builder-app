@@ -5,6 +5,7 @@ import type {
   SpellResolutionTargetKind,
 } from './vocab'
 
+import type { SelectionMethodCompatibilityReasonCode } from './selection-method-compatibility'
 import type { SpellResolutionSelectionMode, SpellResolutionTargetCountKind } from './vocab'
 
 /** Combined method select value used by resolution authoring UI. */
@@ -34,7 +35,7 @@ export type ResolutionSelectionState = {
   originDistanceFt?: number
   hasAreaOfEffect?: boolean
   areaOfEffectShape?: string
-  proximityKind: SpellResolutionProximityKind
+  proximityKind?: SpellResolutionProximityKind
   proximityDistanceFt?: number
   proximityReachDistanceFt?: number
   targetKind?: string
@@ -97,6 +98,14 @@ export type ResolutionAvailabilityReason =
       code: 'effect-kind-incompatible-with-target'
       kind: ResolutionEffectKind
       targetKind: SpellResolutionTargetKind
+    }
+  | {
+      code: 'method-incompatible-with-selection-mode'
+      method: ResolutionMethodOption
+      selectionMode: SpellResolutionSelectionMode
+      hasAreaOfEffect: boolean
+      compatibility: 'deferred' | 'unsupported'
+      reasonCode: SelectionMethodCompatibilityReasonCode
     }
 
 export type OptionAvailability = {

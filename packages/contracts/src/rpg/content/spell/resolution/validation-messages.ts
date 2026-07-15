@@ -62,4 +62,24 @@ export const spellResolutionValidationMessages = {
     'validation.spellResolution.areaForbiddenForMode',
     ({ mode }) => `Area of effect is not allowed when selection mode is "${mode}".`,
   ),
+  methodIncompatibleWithSelectionMode: defineMessage<{
+    compatibility: 'deferred' | 'unsupported'
+    reasonCode: string
+    methodKind: string
+    selectionContext: string
+  }>(
+    'validation.spellResolution.methodIncompatibleWithSelectionMode',
+    ({ compatibility, methodKind, selectionContext }) => {
+      const modeLabel =
+        selectionContext === 'self-with-area'
+          ? 'Self (with area)'
+          : selectionContext === 'self-without-area'
+            ? 'Self'
+            : selectionContext
+      if (compatibility === 'deferred') {
+        return `Resolution method "${methodKind}" is not yet supported for selection mode "${modeLabel}".`
+      }
+      return `Resolution method "${methodKind}" is not compatible with selection mode "${modeLabel}".`
+    },
+  ),
 }

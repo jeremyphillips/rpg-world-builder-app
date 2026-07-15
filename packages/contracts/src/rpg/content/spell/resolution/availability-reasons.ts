@@ -6,7 +6,9 @@ import {
   type SpellResolutionTargetKind,
 } from './vocab'
 import { getSpellAtomicEffectKindLabel } from '../../../vocab/spell/atomic-effect-kind'
+import { getSelectionMethodCapabilityRequired } from './selection-method-compatibility'
 import type { ResolutionAvailabilityReason } from './selection-types'
+import { getSpellResolutionSelectionModeLabel } from './vocab'
 
 export type ResolutionAvailabilityTone = 'option' | 'hint' | 'dialog' | 'compact'
 
@@ -27,10 +29,12 @@ function formatMethodProximityReason(
   tone: ResolutionAvailabilityTone,
 ): string {
   const method = methodLabel(reason.method)
-  const proximity = getSpellResolutionProximityKindLabel(reason.proximity)
-  if (tone === 'compact') return `Not available for ${proximity.toLowerCase()}`
-  if (tone === 'option') return `Not available when target proximity is ${proximity.toLowerCase()}`
-  return `${method} is not available when target proximity is ${proximity.toLowerCase()}.`
+  const proximity =
+    getSpellResolutionProximityKindLabel(reason.proximity) ?? reason.proximity ?? 'unknown'
+  const proximityPhrase = proximity.toLowerCase()
+  if (tone === 'compact') return `Not available for ${proximityPhrase}`
+  if (tone === 'option') return `Not available when target proximity is ${proximityPhrase}`
+  return `${method} is not available when target proximity is ${proximityPhrase}.`
 }
 
 function formatPatternDistanceReason(
@@ -66,12 +70,38 @@ function formatEffectTargetReason(
   return `${kind} is not available when the target is ${target}.`
 }
 
+function formatMethodSelectionModeReason(
+  reason: Extract<
+    ResolutionAvailabilityReason,
+    { code: 'method-incompatible-with-selection-mode' }
+  >,
+  tone: ResolutionAvailabilityTone,
+): string {
+  const method = methodLabel(reason.method)
+  const modeLabel = getSpellResolutionSelectionModeLabel(reason.selectionMode)
+  const areaSuffix = reason.selectionMode === 'self' && reason.hasAreaOfEffect ? ' with area' : ''
+  const modePhrase = `${modeLabel}${areaSuffix}`
+
+  if (reason.compatibility === 'deferred') {
+    const capability = getSelectionMethodCapabilityRequired(reason.reasonCode)
+    if (tone === 'compact') return 'Not yet supported for this selection mode'
+    if (tone === 'option') return `Not yet available for ${modePhrase} selection`
+    return `${method} is not yet supported for ${modePhrase} selection (${capability}).`
+  }
+
+  if (tone === 'compact') return 'Not compatible with this selection mode'
+  if (tone === 'option') return `Not available for ${modePhrase} selection`
+  return `${method} is not compatible with ${modePhrase} selection.`
+}
+
 /** Formats a structured availability reason for UI surfaces. */
 export function formatResolutionAvailabilityReason(
   reason: ResolutionAvailabilityReason,
   tone: ResolutionAvailabilityTone,
 ): string {
   switch (reason.code) {
+    case 'method-incompatible-with-selection-mode':
+      return formatMethodSelectionModeReason(reason, tone)
     case 'method-incompatible-with-proximity':
       return formatMethodProximityReason(reason, tone)
     case 'pattern-requires-distance-proximity':

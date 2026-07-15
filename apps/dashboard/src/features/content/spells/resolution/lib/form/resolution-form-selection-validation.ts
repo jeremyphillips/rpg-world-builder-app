@@ -1,5 +1,13 @@
 import type { z } from 'zod'
 
+import {
+  getSelectionMethodCompatibility,
+  getSelectionMethodCompatibilityReasonCode,
+  resolveSelectionMethodContextKey,
+  spellResolutionValidationMessages,
+} from '@rpg/contracts'
+
+import { SPELL_AREA_GEOMETRY_NONE } from '../../../lib/spell-form-labels'
 import { resolutionFormValidationMessages } from './resolution-form-messages'
 import type { ResolutionFormValues } from './resolution-form-schema'
 import { validateResolutionFormOutcomes } from './resolution-form-outcome-validation'
@@ -67,11 +75,41 @@ function validateResolutionFormProjectileCount(
   })
 }
 
+function validateResolutionFormMethodSelectionCompatibility(
+  values: ResolutionFormValues,
+  ctx: z.RefinementCtx,
+): void {
+  const hasAreaOfEffect = Boolean(
+    values.areaOfEffect?.shape && values.areaOfEffect.shape !== SPELL_AREA_GEOMETRY_NONE,
+  )
+  const context = resolveSelectionMethodContextKey({
+    selectionMode: values.selectionMode,
+    hasAreaOfEffect,
+  })
+  const compatibility = getSelectionMethodCompatibility(context, values.methodKind)
+  if (compatibility === 'supported') return
+
+  const reasonCode = getSelectionMethodCompatibilityReasonCode(context, values.methodKind)
+  if (!reasonCode) return
+
+  ctx.addIssue({
+    code: 'custom',
+    message: spellResolutionValidationMessages.methodIncompatibleWithSelectionMode({
+      compatibility,
+      reasonCode,
+      methodKind: values.methodKind,
+      selectionContext: context,
+    }),
+    path: ['methodKind'],
+  })
+}
+
 export function validateResolutionFormSelection(
   values: ResolutionFormValues,
   ctx: z.RefinementCtx,
 ): void {
   validateResolutionFormMethodFields(values, ctx)
+  validateResolutionFormMethodSelectionCompatibility(values, ctx)
   validateResolutionFormTargetProximity(values, ctx)
   validateResolutionFormPointOrigin(values, ctx)
   validateResolutionFormProjectileCount(values, ctx)

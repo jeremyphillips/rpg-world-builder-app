@@ -5,6 +5,7 @@ import { rollSchema } from '../../../primitives/mechanics/roll'
 import { abilitySchema } from '../../../vocab/ability'
 import { damageTypeIdSchema } from '../../../vocab/damage/vocabulary'
 import { normalizeSpellResolutionInput } from './normalize-resolution'
+import { validateSpellResolutionMethodCompatibility } from './selection-method-compatibility'
 import { validateSpellResolutionModeFields } from './selection-mode-validation'
 import {
   SPELL_RESOLUTION_APPLICATION_AMOUNTS,
@@ -235,6 +236,14 @@ export function validateSpellResolutionReferences(
   ctx: z.RefinementCtx,
 ): void {
   validateSpellResolutionModeFields(resolution, ctx)
+  validateSpellResolutionMethodCompatibility(
+    {
+      selectionMode: resolution.selectionMode,
+      hasAreaOfEffect: Boolean(resolution.areaOfEffect),
+      method: resolution.method,
+    },
+    ctx,
+  )
 
   const effectById = new Map(resolution.effects.map((effect) => [effect.id, effect]))
   const effectIds = resolution.effects.map((effect) => effect.id)

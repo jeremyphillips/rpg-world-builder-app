@@ -435,17 +435,17 @@ Required distinctions and why:
 dimensions only; range stays separate. Formatter and spell detail display use
 `formatAreaGeometry` from `@rpg/contracts`.
 
-| Capability / gap            | Status after area-geometry branch                                                                                                            |
-| --------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
-| `spell.effect.area`         | Foundation in place (display/filter metadata)                                                                                                |
-| `area-model-missing`        | Partially addressed — geometry + dimensions only                                                                                             |
-| `area-origin-model-missing` | Still missing — origin, anchoring, movement                                                                                                  |
-| **Fog Cloud**               | Point-centered sphere structured (20 ft)                                                                                                     |
-| **Fireball**                | Sphere + slot-damage exemplar (20 ft)                                                                                                        |
-| **Burning Hands**           | Cone exemplar (15 ft); replaces Dragon's Breath as direct-cone sample                                                                        |
-| **Darkness**                | Primary point-centered sphere structured (15 ft); object-centered movable emanation prose-only — prime `area-origin-model-missing` candidate |
-| **Pass without Trace**      | Emanation geometry modeled (30 ft); attachment/movement under-modeled                                                                        |
-| **Dragon's Breath**         | Intentionally not structured at spell root (granted-action geometry)                                                                         |
+| Capability / gap            | Status after area-geometry branch                                                                                                                                                  |
+| --------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `spell.effect.area`         | Foundation in place (display/filter metadata)                                                                                                                                      |
+| `area-model-missing`        | Partially addressed — geometry + dimensions only                                                                                                                                   |
+| `area-origin-model-missing` | Partially addressed — resolution `selectionMode` + `areaOfEffect` model caster/point origin and area occupants for migrated spells; movement and object anchoring still prose-only |
+| **Fog Cloud**               | Point-centered sphere structured (20 ft)                                                                                                                                           |
+| **Fireball**                | Sphere + slot-damage exemplar (20 ft)                                                                                                                                              |
+| **Burning Hands**           | Cone exemplar (15 ft); replaces Dragon's Breath as direct-cone sample                                                                                                              |
+| **Darkness**                | Primary point-centered sphere structured (15 ft); object-centered movable emanation prose-only — prime `area-origin-model-missing` candidate                                       |
+| **Pass without Trace**      | Emanation geometry modeled (30 ft); attachment/movement under-modeled                                                                                                              |
+| **Dragon's Breath**         | Intentionally not structured at spell root (granted-action geometry)                                                                                                               |
 
 Authoring candidates surfaced by the outlier batch (geometry fits the shipped
 shapes; not yet structured in seed data):
@@ -681,7 +681,11 @@ represent") is now met for several — prioritization within Stage 4 is a produc
 call, informed by the counts below.
 
 - **Area origin and movement** (`spell.effect.area-origin`) — complements shipped
-  `areaOfEffect` geometry. Evidence: darkness, pass-without-trace, antimagic-field.
+  `areaOfEffect` geometry. Resolution `selectionMode` (`self` / `point`) plus
+  `resolution.areaOfEffect` partially addresses caster-fixed and point-selected
+  origins for migrated spells (Fireball, Burning Hands, Thunderwave). Evidence
+  still prose-only for moving or object-anchored origins: darkness, pass-without-trace,
+  antimagic-field. See `spell-resolution-targeting-gaps.ts` (`moving-aura-origin`).
 - **Summoning / stat-block references** (`spell.effect.summoning`) — evidence: 5
   spells (animate-dead, animate-objects, summon-dragon, simulacrum, planar-binding)
   plus polymorph/true-polymorph transformation. **Hard dependency:** blocked on the

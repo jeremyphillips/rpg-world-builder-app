@@ -45,19 +45,25 @@ export const MagicMissile: Story = {
   args: { defaultResolution: RESOLUTION_FORM_FIXTURES.magicMissile },
 }
 
-/** Self proximity with automatic resolution — recipient-aware healing summaries. */
-export const SelfAutomaticHealing: Story = {
-  name: 'Self automatic healing',
-  args: {
-    defaultResolution: {
-      selectionMode: 'self',
-      targetCount: 1,
-      targetKind: 'creature',
-      proximityKind: 'touch',
-      areaOfEffect: { shape: 'none' },
-      methodKind: 'automatic',
-      applicationPatternKind: 'none',
-      effects: [{ id: 'healing', kind: 'healing', roll: { dice: { count: 2, faces: 8 } } }],
-    },
-  },
+/** Self automatic temporary hit points — recipient-aware preview. */
+export const FalseLife: Story = {
+  name: 'False Life (self)',
+  args: { defaultResolution: RESOLUTION_FORM_FIXTURES.falseLife },
+}
+
+/** Point origin with sphere area and DEX save damage. */
+export const Fireball: Story = {
+  args: { defaultResolution: RESOLUTION_FORM_FIXTURES.fireball },
+}
+
+/** Caster-origin cone with area-occupant damage. */
+export const BurningHands: Story = {
+  name: 'Burning Hands (self + area)',
+  args: { defaultResolution: RESOLUTION_FORM_FIXTURES.burningHands },
+}
+
+/** Up-to six targets at distance with automatic healing. */
+export const MassHealingWord: Story = {
+  name: 'Mass Healing Word (up to 6)',
+  args: { defaultResolution: RESOLUTION_FORM_FIXTURES.massHealingWord },
 }

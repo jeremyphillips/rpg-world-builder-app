@@ -2,13 +2,16 @@ import { describe, expect, it } from 'vitest'
 
 import {
   ARCANE_HAND_RESOLUTION,
+  BURNING_HANDS_RESOLUTION,
   CHILL_TOUCH_RESOLUTION,
   CURE_WOUNDS_RESOLUTION,
   ELDRITCH_BLAST_RESOLUTION,
   FALSE_LIFE_RESOLUTION,
+  FIREBALL_RESOLUTION,
   ICE_KNIFE_RESOLUTION,
   INFlict_WOUNDS_RESOLUTION,
   MAGIC_MISSILE_RESOLUTION,
+  MASS_HEALING_WORD_RESOLUTION,
   SPELL_RESOLUTION_FIXTURES,
 } from '@rpg/contracts'
 import { resolutionFormSchema } from './resolution-form-schema'
@@ -25,6 +28,9 @@ const AUTHORING_FIXTURES = {
   'inflict-wounds': INFlict_WOUNDS_RESOLUTION,
   'cure-wounds': CURE_WOUNDS_RESOLUTION,
   'false-life': FALSE_LIFE_RESOLUTION,
+  fireball: FIREBALL_RESOLUTION,
+  'burning-hands': BURNING_HANDS_RESOLUTION,
+  'mass-healing-word': MASS_HEALING_WORD_RESOLUTION,
   'ice-knife': ICE_KNIFE_RESOLUTION,
   'arcane-hand': ARCANE_HAND_RESOLUTION,
   'magic-missile': MAGIC_MISSILE_RESOLUTION,

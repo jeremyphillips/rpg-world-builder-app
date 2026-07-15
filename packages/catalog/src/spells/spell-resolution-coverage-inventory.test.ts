@@ -83,4 +83,16 @@ describe('spell resolution coverage inventory (srd-cc-5.2.1)', () => {
       }
     }
   })
+
+  it('attaches targeting gap codes to hybrid spells with known partial modeling', () => {
+    const eldritchBlast = inventory.entries.find((entry) => entry.slug === 'eldritch-blast')
+    const iceKnife = inventory.entries.find((entry) => entry.slug === 'ice-knife')
+    const arcaneHand = inventory.entries.find((entry) => entry.slug === 'arcane-hand')
+    const fireball = inventory.entries.find((entry) => entry.slug === 'fireball')
+
+    expect(eldritchBlast?.targetingGap).toBe('dynamic-target-count')
+    expect(iceKnife?.targetingGap).toBe('chained-targets')
+    expect(arcaneHand?.targetingGap).toBe('multi-mode-choice')
+    expect(fireball?.targetingGap).toBeUndefined()
+  })
 })

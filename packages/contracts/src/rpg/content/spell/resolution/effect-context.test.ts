@@ -42,6 +42,29 @@ describe('deriveEffectRecipientFromResolution', () => {
   it('returns target for targets mode', () => {
     expect(deriveEffectRecipientFromResolution(CURE_WOUNDS_RESOLUTION)).toBe('target')
   })
+
+  it('returns generic for none mode', () => {
+    expect(
+      deriveEffectRecipientFromResolution({
+        selectionMode: 'none',
+        method: { kind: 'automatic' },
+        effects: FALSE_LIFE_RESOLUTION.effects,
+        outcomes: FALSE_LIFE_RESOLUTION.outcomes,
+      }),
+    ).toBe('generic')
+  })
+
+  it('returns generic for point mode without area', () => {
+    expect(
+      deriveEffectRecipientFromResolution({
+        selectionMode: 'point',
+        origin: FIREBALL_RESOLUTION.origin,
+        method: FIREBALL_RESOLUTION.method,
+        effects: FIREBALL_RESOLUTION.effects,
+        outcomes: FIREBALL_RESOLUTION.outcomes,
+      }),
+    ).toBe('generic')
+  })
 })
 
 describe('deriveDefaultEffectRecipient', () => {

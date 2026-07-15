@@ -264,6 +264,31 @@ export const ARCANE_HAND_RESOLUTION: SpellResolution = {
   ],
 }
 
+/** Mass Healing Word — up to six creatures at distance with automatic healing. */
+export const MASS_HEALING_WORD_RESOLUTION: SpellResolution = {
+  selectionMode: 'targets',
+  target: {
+    count: 6,
+    countKind: 'up-to',
+    kind: 'creature',
+    proximity: { kind: 'distance', distance: { value: 60, unit: 'ft' } },
+  },
+  method: { kind: 'automatic' },
+  effects: [
+    {
+      id: SPELL_RESOLUTION_PRIMARY_HEALING_EFFECT_ID,
+      kind: 'healing',
+      roll: { dice: { count: 2, faces: 4 } },
+    },
+  ],
+  outcomes: [
+    {
+      result: 'applied',
+      applications: [{ effectId: SPELL_RESOLUTION_PRIMARY_HEALING_EFFECT_ID, amount: 'full' }],
+    },
+  ],
+}
+
 /** Magic Missile — automatic force darts with per-projectile damage. */
 export const MAGIC_MISSILE_RESOLUTION: SpellResolution = {
   selectionMode: 'targets',
@@ -304,6 +329,7 @@ export const SPELL_RESOLUTION_FIXTURES = {
   'false-life': FALSE_LIFE_RESOLUTION,
   fireball: FIREBALL_RESOLUTION,
   'burning-hands': BURNING_HANDS_RESOLUTION,
+  'mass-healing-word': MASS_HEALING_WORD_RESOLUTION,
   'ice-knife': ICE_KNIFE_RESOLUTION,
   'arcane-hand': ARCANE_HAND_RESOLUTION,
   'magic-missile': MAGIC_MISSILE_RESOLUTION,
