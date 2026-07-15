@@ -102,6 +102,7 @@ interface CompactInlineArrayFieldItemProps extends ArrayFieldItemChromeProps {
   idPrefix: string
   itemPrefix: string
   compactInlineRow: RowConfig
+  compactInlineAlign?: ArrayConfig['compactInlineAlign']
   header: ResolvedArrayItemHeader
   suppressFieldErrorText: boolean
   rowSummaryId: string
@@ -120,6 +121,7 @@ function CompactInlineArrayFieldItem({
   idPrefix,
   itemPrefix: namePrefix,
   compactInlineRow,
+  compactInlineAlign,
   header,
   suppressFieldErrorText,
   rowSummaryId,
@@ -144,6 +146,7 @@ function CompactInlineArrayFieldItem({
               ariaLabel={header.ariaLabel}
               fieldCount={compactInlineRow.fields.length}
               showGrip={gripVisible}
+              align={compactInlineAlign}
               grip={
                 gripVisible && dragHandleProps ? (
                   <ArrayItemDragHandle
@@ -369,6 +372,7 @@ export function ArrayFieldItemContent({
         idPrefix={idPrefix}
         itemPrefix={itemPrefix}
         compactInlineRow={compactInlineRow}
+        compactInlineAlign={config.compactInlineAlign}
         header={header}
         suppressFieldErrorText={suppressFieldErrorText}
         rowSummaryId={rowSummaryId}

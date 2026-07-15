@@ -3,6 +3,7 @@
 import * as React from 'react'
 import type { CSSProperties } from 'react'
 
+import type { ArrayCompactInlineAlign } from '../field-config'
 import {
   arrayItemCompactActionsClasses,
   arrayItemCompactFieldCellClasses,
@@ -17,6 +18,7 @@ export interface ArrayItemCompactRowProps {
   ariaLabel: string
   fieldCount: number
   showGrip: boolean
+  align?: ArrayCompactInlineAlign
   grip?: React.ReactNode
   fields: React.ReactNode[]
   actions: React.ReactNode
@@ -32,6 +34,7 @@ export function ArrayItemCompactRow({
   ariaLabel,
   fieldCount,
   showGrip,
+  align = 'start',
   grip,
   fields,
   actions,
@@ -43,14 +46,15 @@ export function ArrayItemCompactRow({
 
   return (
     <div
-      className={arrayItemCompactRowClasses}
+      className={arrayItemCompactRowClasses(align)}
       style={gridStyle}
       data-compact-field-count={fieldCount}
+      data-compact-inline-align={align}
     >
       <span id={titleId} className="sr-only">
         {ariaLabel}
       </span>
-      {showGrip && grip ? <div className={arrayItemCompactGripClasses}>{grip}</div> : null}
+      {showGrip && grip ? <div className={arrayItemCompactGripClasses(align)}>{grip}</div> : null}
       {fields.map((field, index) => (
         <div key={index} className={arrayItemCompactFieldCellClasses}>
           {field}

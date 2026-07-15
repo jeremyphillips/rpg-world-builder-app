@@ -4,6 +4,7 @@ import {
   arrayItemActionsRailClasses,
   arrayItemBodyClasses,
   arrayItemCompactRowClasses,
+  arrayItemCompactGripClasses,
   arrayItemDragHandleClasses,
   arrayItemMainClasses,
   arrayItemRemoveButtonClasses,
@@ -101,7 +102,10 @@ describe('array item shell variants', () => {
     expect(buildArrayItemCompactRowGridTemplate(3, false)).toBe(
       'repeat(3, minmax(0, 1fr)) max-content',
     )
-    expect(arrayItemCompactRowClasses).toContain('grid')
+    expect(arrayItemCompactRowClasses()).toContain('grid')
+    expect(arrayItemCompactRowClasses()).toContain('items-start')
+    expect(arrayItemCompactRowClasses('center')).toContain('items-center')
+    expect(arrayItemCompactGripClasses('center')).toContain('items-center')
     expect(arrayItemActionsRailClasses({ embedded: true })).toContain('justify-self-end')
     expect(arrayItemActionsRailClasses({ embedded: true })).not.toContain('mt-1')
   })

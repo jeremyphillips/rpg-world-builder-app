@@ -859,6 +859,45 @@ describe('ArrayFieldRenderer', () => {
     expect(actionsRail).toHaveClass('justify-self-end')
   })
 
+  it('centers compact inline grip and actions when compactInlineAlign is center', () => {
+    const centeredCompactRowFields: FormItem[] = [
+      {
+        kind: 'array',
+        name: 'examples',
+        legend: 'Examples',
+        itemVariant: 'compact',
+        compactInlineAlign: 'center',
+        reorder: 'dragHandle',
+        fields: [
+          {
+            kind: 'row',
+            fields: [{ type: 'text', name: 'value', label: '', placeholder: 'Example…' }],
+          },
+        ],
+        addLabel: 'Add example',
+        itemHeader: { fallback: (index) => `Example ${index + 1}`, primaryField: 'value' },
+      },
+    ]
+
+    const exampleSchema = z.object({
+      examples: z.array(z.object({ value: z.string() })),
+    })
+
+    render(
+      <Form<z.infer<typeof exampleSchema>>
+        schema={exampleSchema}
+        fields={centeredCompactRowFields}
+        defaultValues={{ examples: [{ value: '' }] }}
+        onSubmit={vi.fn()}
+        footer={<button type="submit">Save</button>}
+      />,
+    )
+
+    const compactRow = document.querySelector('[data-compact-field-count="1"]')
+    expect(compactRow).toHaveAttribute('data-compact-inline-align', 'center')
+    expect(compactRow).toHaveClass('items-center')
+  })
+
   it('shows issue badge, row summary, and legend link after failed submit', async () => {
     const user = userEvent.setup()
 

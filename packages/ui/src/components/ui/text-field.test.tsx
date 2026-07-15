@@ -46,6 +46,14 @@ describe('TextField', () => {
     expect(ref.current).toBe(screen.getByLabelText('Email'))
   })
 
+  it('omits the visible label and required asterisk when label is empty', () => {
+    render(<TextField id="example" label="" placeholder="Example…" required />)
+    const input = screen.getByPlaceholderText('Example…')
+    expect(input).toHaveAttribute('aria-required', 'true')
+    expect(screen.queryByText('*')).not.toBeInTheDocument()
+    expect(screen.queryByRole('label')).not.toBeInTheDocument()
+  })
+
   it('has no axe accessibility violations', async () => {
     const { container } = render(<TextField id="email" label="Email" type="email" />)
     await expectNoAxeViolations(container)

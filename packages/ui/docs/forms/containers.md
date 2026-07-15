@@ -249,6 +249,7 @@ Optional hooks:
 | Property                          | Purpose                                                                                                       |
 | --------------------------------- | ------------------------------------------------------------------------------------------------------------- |
 | `itemVariant`                     | `'auto'` \| `'compact'` \| `'detailed'` — row layout (default `auto`).                                        |
+| `compactInlineAlign`              | `'start'` \| `'center'` — compact inline rows only; center grip/actions with label-less single controls.      |
 | `itemChrome`                      | Item shell surface tone — defaults to `elevated` (`bg-card`); override with `subtle`, `medium`, etc.          |
 | `itemHeader`                      | Primary/fallback labels; optional `summary` on a second row below the title (detailed).                       |
 | `itemHeader.showFallbackInHeader` | When true, appends ` · {fallback}` after the primary title (default `false`).                                 |

@@ -114,6 +114,7 @@ export {
   type ArrayItemHeaderConfig,
   type ArrayItemReorder,
   type ArrayItemVariant,
+  type ArrayCompactInlineAlign,
   type SlotConfig,
   type FormItem,
   type FormIssue,

@@ -98,11 +98,17 @@ export const arrayItemBodyClasses = collapsibleListItemBodyClasses
 /** Inline field region for compact items (same row as toolbar). */
 export const arrayItemCompactFieldsClasses = 'min-w-0 flex-1'
 
+import type { ArrayCompactInlineAlign } from '../field-config'
+
 /** Compact inline row — grip, fields, and actions share one grid row. */
-export const arrayItemCompactRowClasses = 'grid w-full min-w-0 items-start gap-x-2'
+export function arrayItemCompactRowClasses(align: ArrayCompactInlineAlign = 'start'): string {
+  return cn('grid w-full min-w-0 gap-x-2', align === 'center' ? 'items-center' : 'items-start')
+}
 
 /** Grip column in the compact row grid. */
-export const arrayItemCompactGripClasses = 'flex items-start justify-center'
+export function arrayItemCompactGripClasses(align: ArrayCompactInlineAlign = 'start'): string {
+  return cn('flex justify-center', align === 'center' ? 'items-center' : 'items-start')
+}
 
 /** Per-field cell in the compact row grid. */
 export const arrayItemCompactFieldCellClasses = 'min-w-0'

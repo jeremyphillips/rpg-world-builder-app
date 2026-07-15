@@ -29,11 +29,14 @@ export interface FormFieldProps {
   children: ReactElement
 }
 
-const labelNode = (label: string, info?: ReactNode) => (
-  <Field.Label>
-    <FieldLabelContent label={label} info={info} />
-  </Field.Label>
-)
+const labelNode = (label: string, info?: ReactNode) => {
+  if (!label.trim()) return null
+  return (
+    <Field.Label>
+      <FieldLabelContent label={label} info={info} />
+    </Field.Label>
+  )
+}
 
 /**
  * Prop-based shim over the compound `Field`: label (+ optional `[i]` info

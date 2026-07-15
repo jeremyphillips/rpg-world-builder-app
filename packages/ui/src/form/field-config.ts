@@ -671,6 +671,9 @@ export interface GroupConfig {
 /** Layout profile for repeatable array item chrome. */
 export type ArrayItemVariant = 'auto' | 'compact' | 'detailed'
 
+/** Vertical alignment for compact inline rows (grip, fields, embedded actions). */
+export type ArrayCompactInlineAlign = 'start' | 'center'
+
 /** How array items may be reordered. Defaults to `dragHandle`. */
 export type ArrayItemReorder = false | 'dragHandle'
 
@@ -756,6 +759,11 @@ export interface ArrayConfig {
   max?: number
   /** Item row layout — `auto` picks compact when item fields fit a single row. */
   itemVariant?: ArrayItemVariant
+  /**
+   * Compact inline rows only — vertical alignment of grip, fields, and embedded
+   * actions. Use `center` for single control-only cells (no visible field label).
+   */
+  compactInlineAlign?: ArrayCompactInlineAlign
   /**
    * Border/background tone on each item shell (`main` | `elevated` | `subtle` | `medium` |
    * `warning` | `error`). Defaults to `elevated` (`bg-card`); overrides inherited stack
