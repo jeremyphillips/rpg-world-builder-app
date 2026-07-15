@@ -28,10 +28,12 @@ export function resolutionToForm(
   if (!resolution) return undefined
   if (!resolution.effects.length) return undefined
 
+  const target = resolution.target
   const form: ResolutionFormValues = {
-    targetCount: resolution.target.count,
-    targetKind: resolution.target.kind,
-    proximityKind: resolution.target.proximity.kind,
+    targetCount: target?.count ?? 1,
+    targetKind: target?.kind ?? 'creature',
+    proximityKind:
+      resolution.selectionMode === 'self' ? 'self' : (target?.proximity.kind ?? 'touch'),
     methodKind: buildMethodKind(resolution.method),
     effects: resolution.effects.map(effectToForm),
     outcomes: storedOutcomesToForm(resolution.method, resolution.outcomes),
@@ -39,7 +41,9 @@ export function resolutionToForm(
   }
 
   applyMethodFields(form, resolution.method)
-  applyProximityFields(form, resolution.target.proximity)
+  if (target) {
+    applyProximityFields(form, target.proximity)
+  }
   return form
 }
 
@@ -57,18 +61,31 @@ export function resolutionToStored(
   if (!effects.length) return undefined
 
   const method = buildResolutionMethod(values)
-  const proximity = buildTargetProximity(values)
   const outcomes = buildOutcomes(values)
-  if (!method || !proximity || !outcomes?.length) return undefined
+  if (!method || !outcomes?.length) return undefined
 
   const applicationPattern = applicationPatternFromForm(values)
 
+  const selectionEnvelope =
+    values.proximityKind === 'self'
+      ? { selectionMode: 'self' as const }
+      : (() => {
+          const proximity = buildTargetProximity(values)
+          if (!proximity || proximity.kind === 'self') return undefined
+          return {
+            selectionMode: 'targets' as const,
+            target: {
+              count: values.targetCount,
+              kind: values.targetKind,
+              proximity,
+            },
+          }
+        })()
+
+  if (!selectionEnvelope) return undefined
+
   const candidate = {
-    target: {
-      count: values.targetCount,
-      kind: values.targetKind,
-      proximity,
-    },
+    ...selectionEnvelope,
     method,
     ...(applicationPattern ? { applicationPattern } : {}),
     effects,

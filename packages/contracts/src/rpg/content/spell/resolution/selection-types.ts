@@ -5,6 +5,8 @@ import type {
   SpellResolutionTargetKind,
 } from './vocab'
 
+import type { SpellResolutionSelectionMode, SpellResolutionTargetCountKind } from './vocab'
+
 /** Combined method select value used by resolution authoring UI. */
 export type ResolutionMethodOption = SpellResolutionAttackType | 'saving-throw' | 'automatic'
 
@@ -27,6 +29,10 @@ export type ResolutionOutcomeRef = {
 
 /** Flattened resolution slice used by availability predicates and change planning. */
 export type ResolutionSelectionState = {
+  selectionMode?: SpellResolutionSelectionMode
+  countKind?: SpellResolutionTargetCountKind
+  originDistanceFt?: number
+  hasAreaOfEffect?: boolean
   proximityKind: SpellResolutionProximityKind
   proximityDistanceFt?: number
   proximityReachDistanceFt?: number
@@ -43,9 +49,14 @@ export type ResolutionSelectionState = {
   outcomes?: readonly ResolutionOutcomeRef[]
 }
 
-export type ResolutionSelectionField = 'proximityKind' | 'methodOption' | 'applicationPatternKind'
+export type ResolutionSelectionField =
+  | 'selectionMode'
+  | 'proximityKind'
+  | 'methodOption'
+  | 'applicationPatternKind'
 
 export type ResolutionChangeRequest =
+  | { field: 'selectionMode'; value: SpellResolutionSelectionMode }
   | { field: 'proximityKind'; value: SpellResolutionProximityKind }
   | { field: 'methodOption'; value: ResolutionMethodOption }
   | { field: 'applicationPatternKind'; value: ResolutionApplicationPatternFormKind }

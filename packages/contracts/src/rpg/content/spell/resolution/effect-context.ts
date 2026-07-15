@@ -1,22 +1,52 @@
 import type { ResolutionSelectionState } from './selection-types'
 import type { EffectRecipient, EffectRowFormatOptions } from '../effects/format'
 import type { SpellResolution } from './schema'
+import type { SpellResolutionSelectionMode } from './vocab'
 
 export type { EffectRecipient }
 
+function deriveRecipientFromModeAndArea(
+  selectionMode: SpellResolutionSelectionMode,
+  hasAreaOfEffect: boolean,
+): EffectRecipient {
+  switch (selectionMode) {
+    case 'self':
+      return hasAreaOfEffect ? 'area' : 'self'
+    case 'point':
+      return hasAreaOfEffect ? 'area' : 'generic'
+    case 'targets':
+      return 'target'
+    case 'none':
+      return 'generic'
+    default: {
+      const _exhaustive: never = selectionMode
+      return _exhaustive
+    }
+  }
+}
+
+/** Derives effect recipient from a stored resolution envelope. */
+export function deriveEffectRecipientFromResolution(resolution: SpellResolution): EffectRecipient {
+  return deriveRecipientFromModeAndArea(resolution.selectionMode, Boolean(resolution.areaOfEffect))
+}
+
 /**
- * MVP assumption — not authoritative for future recipient modeling.
+ * Derives effect recipient from flattened authoring state or legacy proximity fields.
  *
- * Until explicit effect recipients are modeled, resolution effects are assumed
- * to apply to the resolution target, except self-targeted resolutions, which
- * apply to the caster.
- *
- * Future recipients (caster, another creature, area targets) will extend this
- * module — not rename it to sound authoritative today.
+ * When `selectionMode` is present it is authoritative together with `hasAreaOfEffect`.
  */
 export function deriveDefaultEffectRecipient(
-  context: Pick<ResolutionSelectionState, 'proximityKind' | 'targetKind' | 'targetCount'>,
+  context: Pick<
+    ResolutionSelectionState,
+    'selectionMode' | 'hasAreaOfEffect' | 'targetKind' | 'targetCount'
+  > & {
+    proximityKind?: ResolutionSelectionState['proximityKind']
+  },
 ): EffectRecipient {
+  if (context.selectionMode) {
+    return deriveRecipientFromModeAndArea(context.selectionMode, Boolean(context.hasAreaOfEffect))
+  }
+
   if (context.proximityKind === 'self') return 'self'
   if (isResolutionTargetConfigured(context)) return 'target'
   return 'generic'
@@ -24,7 +54,9 @@ export function deriveDefaultEffectRecipient(
 
 /** True when proximity and target kind/count are present for an external target. */
 export function isResolutionTargetConfigured(
-  context: Pick<ResolutionSelectionState, 'proximityKind' | 'targetKind' | 'targetCount'>,
+  context: Pick<ResolutionSelectionState, 'targetKind' | 'targetCount'> & {
+    proximityKind?: ResolutionSelectionState['proximityKind']
+  },
 ): boolean {
   if (context.proximityKind === 'self') return false
   if (!context.targetKind) return false
@@ -38,12 +70,8 @@ export function resolutionEffectFormatOptions(
   overrides: Partial<EffectRowFormatOptions> = {},
 ): EffectRowFormatOptions {
   return {
-    recipient: deriveDefaultEffectRecipient({
-      proximityKind: resolution.target.proximity.kind,
-      targetKind: resolution.target.kind,
-      targetCount: resolution.target.count,
-    }),
-    targetKind: resolution.target.kind,
+    recipient: deriveEffectRecipientFromResolution(resolution),
+    targetKind: resolution.target?.kind,
     register: 'resolution-preview',
     ...overrides,
   }

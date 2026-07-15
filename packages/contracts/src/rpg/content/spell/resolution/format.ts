@@ -39,7 +39,10 @@ export {
 } from './format-summary'
 export {
   formatResolutionRange,
+  formatResolutionSelectionSections,
   formatResolutionTarget,
   formatResolutionTargetFromParts,
   formatResolutionTargetProximityPhrase,
+  RESOLUTION_AFFECTED_AREA_COPY,
+  type SpellResolutionSelectionSection,
 } from './format-target'

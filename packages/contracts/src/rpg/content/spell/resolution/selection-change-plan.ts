@@ -210,6 +210,8 @@ function buildRequestedPatch(
   change: ResolutionChangeRequest,
 ): ResolutionPatch {
   switch (change.field) {
+    case 'selectionMode':
+      return { selectionMode: change.value }
     case 'proximityKind':
       return { proximityKind: change.value }
     case 'methodOption':

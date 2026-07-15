@@ -18,8 +18,10 @@ const ARCANE_HAND_GRASPING_HAND_EFFECT_ID =
 
 /** Eldritch Blast — ranged attack, 120 ft proximity, 1d10 force on hit. */
 export const ELDRITCH_BLAST_RESOLUTION: SpellResolution = {
+  selectionMode: 'targets',
   target: {
     count: 1,
+    countKind: 'exact',
     kind: 'creature-or-object',
     proximity: { kind: 'distance', distance: { value: 120, unit: 'ft' } },
   },
@@ -42,8 +44,10 @@ export const ELDRITCH_BLAST_RESOLUTION: SpellResolution = {
 
 /** Chill Touch — melee attack, reach proximity, 1d10 necrotic on hit with no-heal rider prose. */
 export const CHILL_TOUCH_RESOLUTION: SpellResolution = {
+  selectionMode: 'targets',
   target: {
     count: 1,
+    countKind: 'exact',
     kind: 'creature-or-object',
     proximity: { kind: 'reach' },
   },
@@ -67,8 +71,10 @@ export const CHILL_TOUCH_RESOLUTION: SpellResolution = {
 
 /** Inflict Wounds — CON save, touch proximity, 2d10 necrotic with half on successful save. */
 export const INFlict_WOUNDS_RESOLUTION: SpellResolution = {
+  selectionMode: 'targets',
   target: {
     count: 1,
+    countKind: 'exact',
     kind: 'creature',
     proximity: { kind: 'touch' },
   },
@@ -95,8 +101,10 @@ export const INFlict_WOUNDS_RESOLUTION: SpellResolution = {
 
 /** Cure Wounds — automatic touch healing for one creature. */
 export const CURE_WOUNDS_RESOLUTION: SpellResolution = {
+  selectionMode: 'targets',
   target: {
     count: 1,
+    countKind: 'exact',
     kind: 'creature',
     proximity: { kind: 'touch' },
   },
@@ -118,11 +126,7 @@ export const CURE_WOUNDS_RESOLUTION: SpellResolution = {
 
 /** False Life — automatic self temporary hit points. */
 export const FALSE_LIFE_RESOLUTION: SpellResolution = {
-  target: {
-    count: 1,
-    kind: 'creature',
-    proximity: { kind: 'self' },
-  },
+  selectionMode: 'self',
   method: { kind: 'automatic' },
   effects: [
     {
@@ -141,10 +145,65 @@ export const FALSE_LIFE_RESOLUTION: SpellResolution = {
   ],
 }
 
+/** Fireball — point origin with sphere area and DEX save damage. */
+export const FIREBALL_RESOLUTION: SpellResolution = {
+  selectionMode: 'point',
+  origin: {
+    proximity: { kind: 'distance', distance: { value: 150, unit: 'ft' } },
+  },
+  areaOfEffect: { shape: 'sphere', radius: { value: 20, unit: 'ft' } },
+  method: { kind: 'saving-throw', ability: 'dex' },
+  effects: [
+    {
+      id: SPELL_RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID,
+      kind: 'damage',
+      roll: { dice: { count: 8, faces: 6 } },
+      damageType: 'fire',
+    },
+  ],
+  outcomes: [
+    {
+      result: 'failed-save',
+      applications: [{ effectId: SPELL_RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID, amount: 'full' }],
+    },
+    {
+      result: 'successful-save',
+      applications: [{ effectId: SPELL_RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID, amount: 'half' }],
+    },
+  ],
+}
+
+/** Burning Hands — caster-origin cone with DEX save damage. */
+export const BURNING_HANDS_RESOLUTION: SpellResolution = {
+  selectionMode: 'self',
+  areaOfEffect: { shape: 'cone', length: { value: 15, unit: 'ft' } },
+  method: { kind: 'saving-throw', ability: 'dex' },
+  effects: [
+    {
+      id: SPELL_RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID,
+      kind: 'damage',
+      roll: { dice: { count: 3, faces: 6 } },
+      damageType: 'fire',
+    },
+  ],
+  outcomes: [
+    {
+      result: 'failed-save',
+      applications: [{ effectId: SPELL_RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID, amount: 'full' }],
+    },
+    {
+      result: 'successful-save',
+      applications: [{ effectId: SPELL_RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID, amount: 'half' }],
+    },
+  ],
+}
+
 /** Ice Knife — ranged attack piercing on hit; cold burst modeled as a second damage effect. */
 export const ICE_KNIFE_RESOLUTION: SpellResolution = {
+  selectionMode: 'targets',
   target: {
     count: 1,
+    countKind: 'exact',
     kind: 'creature',
     proximity: { kind: 'distance', distance: { value: 60, unit: 'ft' } },
   },
@@ -174,8 +233,10 @@ export const ICE_KNIFE_RESOLUTION: SpellResolution = {
 
 /** Arcane Hand — melee attack with choice-dependent damage effects. */
 export const ARCANE_HAND_RESOLUTION: SpellResolution = {
+  selectionMode: 'targets',
   target: {
     count: 1,
+    countKind: 'exact',
     kind: 'creature',
     proximity: { kind: 'distance', distance: { value: 120, unit: 'ft' } },
   },
@@ -205,8 +266,10 @@ export const ARCANE_HAND_RESOLUTION: SpellResolution = {
 
 /** Magic Missile — automatic force darts with per-projectile damage. */
 export const MAGIC_MISSILE_RESOLUTION: SpellResolution = {
+  selectionMode: 'targets',
   target: {
     count: 1,
+    countKind: 'exact',
     kind: 'creature',
     proximity: { kind: 'distance', distance: { value: 120, unit: 'ft' } },
   },
@@ -239,6 +302,8 @@ export const SPELL_RESOLUTION_FIXTURES = {
   'inflict-wounds': INFlict_WOUNDS_RESOLUTION,
   'cure-wounds': CURE_WOUNDS_RESOLUTION,
   'false-life': FALSE_LIFE_RESOLUTION,
+  fireball: FIREBALL_RESOLUTION,
+  'burning-hands': BURNING_HANDS_RESOLUTION,
   'ice-knife': ICE_KNIFE_RESOLUTION,
   'arcane-hand': ARCANE_HAND_RESOLUTION,
   'magic-missile': MAGIC_MISSILE_RESOLUTION,

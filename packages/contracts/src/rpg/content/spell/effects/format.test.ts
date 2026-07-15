@@ -19,6 +19,15 @@ describe('formatEffectRowSentenceFromParts', () => {
     ).toBe('Target creature heals 2d4 Hit Points.')
   })
 
+  it('uses resolution-preview voice for area occupants', () => {
+    expect(
+      formatEffectRowSentenceFromParts(damageParts, {
+        recipient: 'area',
+        register: 'resolution-preview',
+      }),
+    ).toBe('Each creature or object in the area takes 8d6 fire damage.')
+  })
+
   it('uses resolution-preview voice for player-facing sentences', () => {
     expect(
       formatEffectRowSentenceFromParts(damageParts, {

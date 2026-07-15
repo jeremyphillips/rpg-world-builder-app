@@ -170,22 +170,28 @@ function buildMethod(
   return defaultMethodForPrimaryEffect(primary, spell, overrides)
 }
 
-function buildTarget(
+function buildSelectionEnvelope(
   spell: Pick<Spell, 'range'>,
   method: SpellResolutionMethod,
   overrides: ResolutionDerivationOverrides,
-): SpellResolutionTarget {
+): Pick<SpellResolution, 'selectionMode' | 'target'> {
   const proximityOverride = overrides.proximity ?? overrides.range ?? overrides.target?.proximity
-  const proximity =
+  const proximity: SpellResolutionTargetProximity =
     proximityOverride ??
     mapSpellRangeToTargetProximity(spell.range, method) ??
     ({ kind: 'touch' } as const)
 
-  return {
+  if (proximity.kind === 'self') {
+    return { selectionMode: 'self' }
+  }
+
+  const target: SpellResolutionTarget = {
     count: overrides.target?.count ?? 1,
     kind: overrides.target?.kind ?? DEFAULT_TARGET_KIND,
     proximity,
   }
+
+  return { selectionMode: 'targets', target }
 }
 
 function buildOutcomes(
@@ -226,7 +232,7 @@ export function deriveResolutionFromSpell(
   }
 
   const candidate = {
-    target: buildTarget(spell, method, overrides),
+    ...buildSelectionEnvelope(spell, method, overrides),
     method,
     effects: [resolutionEffect],
     outcomes: buildOutcomes(method, resolutionEffect.id, overrides),

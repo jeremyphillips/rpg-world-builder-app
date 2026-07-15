@@ -42,4 +42,24 @@ export const spellResolutionValidationMessages = {
     ({ kind, targetKind }) =>
       `"${kind}" effects cannot target ${targetKind === 'object' ? 'objects' : 'creatures or objects'}.`,
   ),
+  targetRequiredForTargetsMode: defineMessage(
+    'validation.spellResolution.targetRequiredForTargetsMode',
+    () => 'Add a target when selection mode is Targets.',
+  ),
+  originRequiredForPointMode: defineMessage(
+    'validation.spellResolution.originRequiredForPointMode',
+    () => 'Add an origin distance when selection mode is Point.',
+  ),
+  targetForbiddenForMode: defineMessage<{ mode: string }>(
+    'validation.spellResolution.targetForbiddenForMode',
+    ({ mode }) => `Target is not allowed when selection mode is "${mode}".`,
+  ),
+  originForbiddenForMode: defineMessage<{ mode: string }>(
+    'validation.spellResolution.originForbiddenForMode',
+    ({ mode }) => `Origin is not allowed when selection mode is "${mode}".`,
+  ),
+  areaForbiddenForMode: defineMessage<{ mode: string }>(
+    'validation.spellResolution.areaForbiddenForMode',
+    ({ mode }) => `Area of effect is not allowed when selection mode is "${mode}".`,
+  ),
 }

@@ -50,7 +50,7 @@ describe('deriveResolutionFromSpell (Tier A)', () => {
     const resolution = deriveAndValidateSpellResolution(spell)
 
     expect(resolution.method).toEqual({ kind: 'attack', attackType: 'ranged-spell' })
-    expect(resolution.target.proximity).toEqual({
+    expect(resolution.target!.proximity).toEqual({
       kind: 'distance',
       distance: { value: 120, unit: 'ft' },
     })
@@ -80,7 +80,7 @@ describe('deriveResolutionFromSpell (Tier A)', () => {
       proximity: { kind: 'reach' },
     })
 
-    expect(resolution.target.proximity).toEqual({ kind: 'reach' })
+    expect(resolution.target!.proximity).toEqual({ kind: 'reach' })
     expect(resolution.method).toEqual({ kind: 'saving-throw', ability: 'dex' })
   })
 
@@ -106,7 +106,8 @@ describe('deriveResolutionFromSpell (Tier A)', () => {
       target: { kind: 'creature' },
     })
 
-    expect(resolution.target.proximity).toEqual({ kind: 'self' })
+    expect(resolution.selectionMode).toBe('self')
+    expect(resolution.target).toBeUndefined()
     expect(resolution.effects[0]?.kind).toBe('temporary-hit-points')
   })
 })

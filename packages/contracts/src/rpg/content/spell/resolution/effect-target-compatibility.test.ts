@@ -33,6 +33,15 @@ describe('isEffectKindAllowedForTarget', () => {
     ).toBe(true)
   })
 
+  it('allows creature-only effects for area recipients', () => {
+    expect(
+      isEffectKindAllowedForTarget('healing', {
+        selectionMode: 'point',
+        hasAreaOfEffect: true,
+      }),
+    ).toBe(true)
+  })
+
   it('disallows creature-only effects for object and creature-or-object targets', () => {
     expect(
       isEffectKindAllowedForTarget('healing', {

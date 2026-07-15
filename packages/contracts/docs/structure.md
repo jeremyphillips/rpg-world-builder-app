@@ -187,10 +187,13 @@ Class spellcasting (`rpg/content/classes/spellcasting/`) holds the class
 `spellcasting` block schema and SRD slot tables (`slots.ts`).
 
 Spell resolution (`rpg/content/spell/resolution/`) is an optional envelope on
-`spellBodySchema` — target, method, range, base effects, and outcome applications.
-Vocab for resolution-specific closed sets lives alongside the module; formatters
-return semantic preview strings. Like `effects`, `resolution` is on the read model
+`spellBodySchema` — selection mode, target/origin, method, effects, and outcome
+applications. Vocab for resolution-specific closed sets lives alongside the module;
+formatters return semantic preview strings. Like `effects`, `resolution` is on the read model
 but omitted from `spellPersistedBodySchema` until API persistence lands.
+
+Effect resolution documentation (shared framework + spell adapter):
+[docs/effect-resolution/README.md](effect-resolution/README.md).
 
 ## Adding a schema
 

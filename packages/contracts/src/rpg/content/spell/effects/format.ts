@@ -40,6 +40,7 @@ function hitPointsLabel(register: EffectSentenceRegister, plural: boolean): stri
 function previewSubject(recipient: EffectRecipient): string {
   if (recipient === 'self') return 'You'
   if (recipient === 'target') return 'Target'
+  if (recipient === 'area') return 'Each creature or object in the area'
   return 'The target'
 }
 
@@ -54,6 +55,11 @@ function recipientVerb(
   if (recipient === 'target') {
     const subject = targetKind === 'creature' ? ' creature' : ''
     return verb === 'heal' ? `Target${subject} heals` : `Target${subject} gains`
+  }
+  if (recipient === 'area') {
+    return verb === 'heal'
+      ? 'Each creature or object in the area heals'
+      : 'Each creature or object in the area gains'
   }
   return verb === 'heal' ? 'Character heals' : 'Character gains'
 }
@@ -84,8 +90,13 @@ function formatAuthoringHealingSentence(
 }
 
 function formatPreviewHealingSentence(parts: EffectRowParts, recipient: EffectRecipient): string {
-  const verb = recipient === 'self' ? 'You regain' : `${previewSubject(recipient)} regains`
-  return `${verb} ${formatRollValue(parts.roll)} ${hitPointsLabel('resolution-preview', true)}.`
+  if (recipient === 'self') {
+    return `You regain ${formatRollValue(parts.roll)} ${hitPointsLabel('resolution-preview', true)}.`
+  }
+  if (recipient === 'area') {
+    return `Each creature or object in the area regains ${formatRollValue(parts.roll)} ${hitPointsLabel('resolution-preview', true)}.`
+  }
+  return `${previewSubject(recipient)} regains ${formatRollValue(parts.roll)} ${hitPointsLabel('resolution-preview', true)}.`
 }
 
 function formatAuthoringTemporaryHitPointsSentence(
@@ -100,8 +111,13 @@ function formatPreviewTemporaryHitPointsSentence(
   parts: EffectRowParts,
   recipient: EffectRecipient,
 ): string {
-  const verb = recipient === 'self' ? 'You gain' : `${previewSubject(recipient)} gains`
-  return `${verb} ${formatRollValue(parts.roll)} temporary ${hitPointsLabel('resolution-preview', true)}.`
+  if (recipient === 'self') {
+    return `You gain ${formatRollValue(parts.roll)} temporary ${hitPointsLabel('resolution-preview', true)}.`
+  }
+  if (recipient === 'area') {
+    return `Each creature or object in the area gains ${formatRollValue(parts.roll)} temporary ${hitPointsLabel('resolution-preview', true)}.`
+  }
+  return `${previewSubject(recipient)} gains ${formatRollValue(parts.roll)} temporary ${hitPointsLabel('resolution-preview', true)}.`
 }
 
 /** Full sentence from effect parts with optional recipient-aware wording. */

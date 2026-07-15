@@ -6,7 +6,7 @@ import {
 import { formatResolutionMethod } from './format-method'
 import { formatResolutionProjectilesPreview } from './format-application-pattern'
 import { formatResolutionOutcomes } from './format-outcomes'
-import { formatResolutionTarget } from './format-target'
+import { formatResolutionSelectionSections } from './format-target'
 import type { SpellResolution } from './schema'
 
 export type SpellResolutionSummarySection = {
@@ -19,7 +19,7 @@ export function formatResolutionSummarySections(
   resolution: SpellResolution,
 ): SpellResolutionSummarySection[] {
   const sections: SpellResolutionSummarySection[] = [
-    { heading: 'Target', lines: [formatResolutionTarget(resolution)] },
+    ...formatResolutionSelectionSections(resolution),
     {
       heading: 'Check',
       lines: [formatResolutionMethod(resolution, 'resolution-preview')],
