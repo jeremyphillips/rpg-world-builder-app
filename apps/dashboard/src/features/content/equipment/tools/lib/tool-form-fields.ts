@@ -63,6 +63,7 @@ export function toolFormFieldGroup(): FormItem[] {
       itemCollapsible: true,
       itemChrome: 'subtle',
       size: 'md',
+      addActionLayout: 'inline',
       itemHeader: {
         fallback: (index) => `Action ${index + 1}`,
         primaryField: 'description',

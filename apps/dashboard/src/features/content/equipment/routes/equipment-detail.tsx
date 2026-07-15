@@ -1,5 +1,5 @@
 import { useParams } from 'react-router-dom'
-import { Text } from '@rpg/ui'
+import { RichTextContent } from '@rpg/ui'
 import type { Equipment } from '@rpg/contracts'
 
 import { useSetBreadcrumbLabel } from '@/components/layout/use-breadcrumb-label'
@@ -38,7 +38,9 @@ export function EquipmentDetailContent({ item, campaignId, family }: EquipmentDe
         editHref={contentEditHref('equipment', campaignId, item.id, family)}
         statRows={viewModel.statRows}
         descriptionContent={
-          viewModel.description ? <Text variant="muted">{viewModel.description}</Text> : undefined
+          viewModel.description ? (
+            <RichTextContent html={viewModel.description} size="md" tone="muted" />
+          ) : undefined
         }
       />
     </WidePage>

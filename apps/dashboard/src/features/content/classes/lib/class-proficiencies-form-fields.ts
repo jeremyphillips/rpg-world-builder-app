@@ -99,6 +99,7 @@ export function proficienciesFields(ctx: ContentFormCtx): FormItem[] {
     {
       kind: 'group',
       legend: 'Defenses',
+      fieldsChrome: { variant: 'panel' },
       fields: [
         {
           type: 'chips',
@@ -108,6 +109,7 @@ export function proficienciesFields(ctx: ContentFormCtx): FormItem[] {
           max: 2,
           required: true,
           hint: SAVING_THROWS_HINT,
+          separator: 'subtle',
         },
         {
           type: 'chips',
@@ -120,6 +122,7 @@ export function proficienciesFields(ctx: ContentFormCtx): FormItem[] {
     {
       kind: 'group',
       legend: 'Weapons',
+      fieldsChrome: { variant: 'panel' },
       fields: [
         {
           type: 'radio',
@@ -130,6 +133,7 @@ export function proficienciesFields(ctx: ContentFormCtx): FormItem[] {
           orientation: 'horizontal',
           options: WEAPON_PROFICIENCY_MODE_OPTIONS,
           hint: INDIVIDUAL_WEAPONS_TOGGLE_HINT,
+          separator: 'subtle',
         },
         {
           type: 'chips',
@@ -154,27 +158,36 @@ export function proficienciesFields(ctx: ContentFormCtx): FormItem[] {
     {
       kind: 'group',
       legend: 'Granted skills & tools',
+      fieldsChrome: { variant: 'panel' },
       fields: [
         {
           type: 'chips',
           name: 'proficiencies.skills.items',
           label: 'Granted skill proficiencies',
+          chrome: { variant: 'panel' },
           options: skillOptions,
         },
         {
-          type: 'chips',
-          name: 'proficiencies.tools.categories',
-          label: 'Tool categories',
-          options: toolCategoryOptions,
-        },
-        {
-          type: 'combobox',
-          name: 'proficiencies.tools.items',
-          label: 'Specific tools',
-          multiple: true,
-          options: ctx.options?.tools ?? [],
-          placeholder: 'Choose tools…',
-          width: 'xl',
+          kind: 'group',
+          legend: 'Tools',
+          fieldsChrome: { variant: 'panel' },
+          fields: [
+            {
+              type: 'chips',
+              name: 'proficiencies.tools.categories',
+              label: 'Tool categories',
+              options: toolCategoryOptions,
+            },
+            {
+              type: 'combobox',
+              name: 'proficiencies.tools.items',
+              label: 'Specific tools',
+              multiple: true,
+              options: ctx.options?.tools ?? [],
+              placeholder: 'Choose tools…',
+              width: 'xl',
+            },
+          ],
         },
       ],
     },

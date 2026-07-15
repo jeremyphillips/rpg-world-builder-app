@@ -67,7 +67,6 @@ export function buildSkillProficiencyFields(_ctx: ContentFormCtx): FormItem[] {
           itemCollapsible: true,
           itemCollapseKey: 'example',
           itemVariant: 'compact',
-          addActionVariant: 'secondary',
           addActionLayout: 'inline',
           addActionSize: 'sm',
           compactInlineAlign: 'center',

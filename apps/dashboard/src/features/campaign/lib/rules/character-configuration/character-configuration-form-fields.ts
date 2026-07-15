@@ -241,6 +241,7 @@ function startingLevelField(width?: '1/2'): FieldConfig {
     type: 'number',
     name: 'startingLevel',
     label: 'Character starting level',
+    separator: 'subtle',
     min: 1,
     max: ABSOLUTE_MAX_CHARACTER_LEVEL,
     defaultValue: 1,
@@ -260,6 +261,7 @@ function importedCharactersPolicyField(width?: '1/2'): FieldConfig {
     required: true,
     ...(width ? { width } : {}),
     options: toOptions(['approval_required', 'disabled'], IMPORTED_CHARACTERS_POLICY_LABELS),
+    separator: 'subtle',
   }
 }
 
@@ -368,11 +370,13 @@ function multiclassingGroup(): FormItem {
         label: 'Allow characters to multiclass',
         hint: 'Characters can take levels in more than one class when leveling up. Turn this off to require characters to remain within a single class.',
         defaultValue: DEFAULT_MULTICLASSING_ENABLED,
+        separator: 'subtle',
       },
       {
         kind: 'stack',
         layout: 'dependent',
         dependentsChrome: 'subtle',
+        separator: 'subtle',
         visibility: visibleWhenMulticlassingEnabled(),
         fields: [
           {
@@ -404,6 +408,7 @@ function multiclassingGroup(): FormItem {
         hint: 'Let each species define whether and which classes it may multiclass into.',
         defaultValue: DEFAULT_SPECIES_MULTICLASS_POLICY_ENABLED,
         visibility: visibleWhenMulticlassingEnabled(),
+        separator: 'subtle',
       },
       {
         type: 'switch',
@@ -412,6 +417,7 @@ function multiclassingGroup(): FormItem {
         hint: 'Let each species cap total character level and per-class levels.',
         defaultValue: DEFAULT_SPECIES_LEVEL_LIMITS_ENABLED,
         visibility: visibleWhenMulticlassingEnabled(),
+        separator: 'subtle',
       },
     ],
   }
