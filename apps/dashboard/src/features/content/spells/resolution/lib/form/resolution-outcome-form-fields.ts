@@ -29,10 +29,11 @@ export {
   amountOptionsForEffect,
   createOutcomeApplicationAppendValue,
   formatOutcomeApplicationRowLabel,
-  outcomeApplicationsArrayFields,
-  outcomeApplicationsArrayItemFields,
   outcomeApplicationsFieldPath,
   outcomeApplicationsResolverItemFields,
+  outcomeApplicationAmountField,
+  outcomeApplicationEffectIdField,
+  outcomeApplicationAmountOptions,
 } from './resolution-outcome-applications-form-fields'
 
 export function appliedEffectIdsForOutcome(

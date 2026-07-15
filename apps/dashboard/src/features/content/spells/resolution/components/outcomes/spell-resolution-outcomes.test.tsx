@@ -6,10 +6,7 @@ import { expectNoAxeViolations } from '@rpg/ui/test-utils'
 import { describe, expect, it } from 'vitest'
 
 import { RESOLUTION_FORM_FIXTURES } from '../../fixtures'
-import {
-  RESOLUTION_FIELD_LABELS,
-  RESOLUTION_SECTION_LABELS,
-} from '../../lib/form/resolution-form-labels'
+import { RESOLUTION_SECTION_LABELS } from '../../lib/form/resolution-form-labels'
 import { resolutionOutcomeBranchesFields } from '../../lib/form/resolution-form-slots'
 
 import {
@@ -48,7 +45,7 @@ describe('SpellResolutionOutcomes', () => {
       expect(screen.getByRole('group', { name: /Outcome branches/ })).toBeInTheDocument()
       expect(screen.getByText(RESOLUTION_SECTION_LABELS.outcomesHint)).toBeInTheDocument()
       expect(screen.getByRole('heading', { name: 'On hit' })).toBeInTheDocument()
-      expect(screen.getByText(/Damage — 1d10 Force damage/i)).toBeInTheDocument()
+      expect(screen.getByRole('group', { name: /Damage — 1d10 Force damage/i })).toBeInTheDocument()
     })
   })
 
@@ -139,7 +136,7 @@ describe('SpellResolutionOutcomes', () => {
     renderOutcomes(RESOLUTION_FORM_FIXTURES.eldritchBlast)
 
     await waitFor(() => {
-      expect(screen.getByText(/Damage — 1d10 Force damage/i)).toBeInTheDocument()
+      expect(screen.getByRole('group', { name: /Damage — 1d10 Force damage/i })).toBeInTheDocument()
       expect(
         screen.getByText(RESOLUTION_SECTION_LABELS.outcomeAllEffectsApplied),
       ).toBeInTheDocument()
@@ -264,7 +261,7 @@ describe('SpellResolutionOutcomes', () => {
       expect(screen.getByText('Complete the damage roll.')).toBeInTheDocument()
     })
 
-    expect(screen.getByLabelText(RESOLUTION_FIELD_LABELS.outcomeApplicationAmount)).toBeDisabled()
+    expect(screen.getByRole('combobox')).toBeDisabled()
   })
 
   it('renders failed and successful save groups for inflict wounds', async () => {

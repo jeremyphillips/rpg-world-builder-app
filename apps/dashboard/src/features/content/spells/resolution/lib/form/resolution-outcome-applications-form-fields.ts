@@ -1,10 +1,6 @@
 import { supportsPartialApplicationForEffectKind } from '@rpg/contracts'
 import type { SpellResolutionOutcomeResult } from '@rpg/contracts'
-import { createElement } from 'react'
 import type { FieldConfig, FieldOption, FormItem } from '@rpg/ui/form'
-
-import { SpellResolutionOutcomeApplicationEffectIdField } from '../../components/outcomes/spell-resolution-outcome-application-effect-id.client'
-import { SpellResolutionOutcomeApplicationStatus } from '../../components/outcomes/spell-resolution-outcome-application-status.client'
 
 import { defaultApplicationAmountForOutcome } from './resolution-effect-validity.lib'
 import {
@@ -21,7 +17,7 @@ import { RESOLUTION_FIELD_NAME } from './resolution-form-values'
 
 const RESOLUTION_EFFECTS_FIELD = `${RESOLUTION_FIELD_NAME}.effects` as const
 
-/** Leaf fields for resolver field-order and custom outcome rows (step 6). */
+/** Leaf fields for resolver field-order and custom outcome rows. */
 export const outcomeApplicationEffectIdField = {
   type: 'text',
   name: 'effectId',
@@ -77,7 +73,7 @@ export function outcomeApplicationsFieldPath(
   return `${RESOLUTION_FIELD_NAME}.outcomes.${outcomeIndex}.applications`
 }
 
-function outcomeApplicationAmountOptions({
+export function outcomeApplicationAmountOptions({
   arrayItems,
   rowIndex,
   fieldName,
@@ -92,53 +88,10 @@ function outcomeApplicationAmountOptions({
 }): FieldOption[] {
   if (fieldName !== 'amount') return [...options]
 
-  const row = arrayItems[rowIndex] as ResolutionOutcomeApplicationFormItem
+  const row = arrayItems[rowIndex] as ResolutionOutcomeApplicationFormItem | undefined
+  if (!row?.effectId) return [...options]
+
   const effects = (watchedValues[RESOLUTION_EFFECTS_FIELD] as ResolutionEffectFormItem[]) ?? []
   const effect = findResolutionEffectById(effects, row.effectId)
   return amountOptionsForEffect(effect)
-}
-
-/** Visual array item fields until custom outcome rows replace schema rendering. */
-export function outcomeApplicationsArrayItemFields(): FormItem[] {
-  return [
-    {
-      kind: 'slot',
-      name: 'effectId',
-      render: () => createElement(SpellResolutionOutcomeApplicationEffectIdField),
-    },
-    {
-      kind: 'slot',
-      name: 'amount',
-      render: () => createElement(SpellResolutionOutcomeApplicationStatus),
-    },
-  ]
-}
-
-/** Embedded array config for one outcome branch's effect applications. */
-export function outcomeApplicationsArrayFields(): FormItem[] {
-  return [
-    {
-      kind: 'array',
-      name: 'applications',
-      legend: '',
-      size: 'sm',
-      hideAddAction: true,
-      reorder: false,
-      itemChrome: 'subtle',
-      itemVariant: 'detailed',
-      itemHeader: {
-        srOnly: true,
-        fallback: (index) => `Application ${index + 1}`,
-        summaryDependsOn: [RESOLUTION_EFFECTS_FIELD],
-        summary: (values, _index, watched) =>
-          formatOutcomeApplicationRowLabel(
-            (watched?.[RESOLUTION_EFFECTS_FIELD] as ResolutionEffectFormItem[] | undefined) ?? [],
-            values as ResolutionOutcomeApplicationFormItem,
-          ),
-      },
-      filterSelectDependsOn: [RESOLUTION_EFFECTS_FIELD],
-      filterSelectOptions: outcomeApplicationAmountOptions,
-      fields: outcomeApplicationsArrayItemFields(),
-    },
-  ]
 }

@@ -2,12 +2,11 @@
 
 import { useId } from 'react'
 import { Eyebrow, Text } from '@rpg/ui'
-import { FormItems, useFormSectionContext } from '@rpg/ui/form'
+import { useFormSectionContext } from '@rpg/ui/form'
 import { useFormContext, useWatch } from 'react-hook-form'
 
 import { resolveOutcomeApplicationAddState } from '../../lib/form/resolution-outcome-effect-availability.lib'
 import { resolveOutcomeApplicationSectionChrome } from '../../lib/form/resolution-outcome-application-section.lib'
-import { outcomeApplicationsArrayFields } from '../../lib/form/resolution-outcome-applications-form-fields'
 import {
   appendOutcomeApplicationSelection,
   readOutcomeApplications,
@@ -16,6 +15,7 @@ import { RESOLUTION_SECTION_LABELS } from '../../lib/form/resolution-form-labels
 import type { ResolutionFormValues } from '../../lib/form/resolution-form-schema'
 import { RESOLUTION_FIELD_NAME } from '../../lib/form/resolution-form-values'
 import { SpellResolutionOutcomeApplicationAddTrigger } from './spell-resolution-outcome-application-add-trigger.client'
+import { SpellResolutionOutcomeApplicationsList } from './spell-resolution-outcome-applications-list.client'
 import { SpellResolutionOutcomeApplicationSupportingCopy } from './spell-resolution-outcome-application-supporting-copy.client'
 
 export type SpellResolutionOutcomeApplicationSectionProps = {
@@ -57,11 +57,7 @@ export function SpellResolutionOutcomeApplicationSection({
 
       {applications.length > 0 ? (
         <div className="mt-2">
-          <FormItems
-            items={outcomeApplicationsArrayFields()}
-            idPrefix={`resolution-outcome-${outcomeIndex}-applications`}
-            namePrefix={`${RESOLUTION_FIELD_NAME}.outcomes.${outcomeIndex}`}
-          />
+          <SpellResolutionOutcomeApplicationsList outcomeIndex={outcomeIndex} />
         </div>
       ) : null}
 

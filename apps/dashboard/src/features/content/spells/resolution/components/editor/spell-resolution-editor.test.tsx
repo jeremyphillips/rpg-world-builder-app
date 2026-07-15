@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react'
+import { render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { expectNoAxeViolations } from '@rpg/ui/test-utils'
 import { describe, expect, it, vi, afterEach } from 'vitest'
@@ -60,7 +60,7 @@ describe('SpellResolutionEditor', () => {
       expect(screen.getByText('Applied once per resolution')).toBeInTheDocument()
       expect(screen.getByRole('button', { name: /(Collapse|Expand) Damage/ })).toBeInTheDocument()
       expect(screen.getByText('Inflicts 1d10 Force damage.')).toBeInTheDocument()
-      expect(screen.getAllByRole('button', { name: /Remove Damage/i })).toHaveLength(1)
+      expect(screen.getAllByRole('button', { name: /Remove Damage/i })).toHaveLength(2)
     })
   })
 
@@ -100,10 +100,20 @@ describe('SpellResolutionEditor', () => {
     )
 
     await waitFor(() => {
-      expect(screen.getByRole('button', { name: /Remove Damage/i })).toBeInTheDocument()
+      const authoredEffects = screen.getByRole('group', { name: /^Authored effects/ })
+      expect(
+        within(authoredEffects).getByRole('button', {
+          name: /Remove Damage — 2d10 Necrotic damage/i,
+        }),
+      ).toBeInTheDocument()
     })
 
-    await user.click(screen.getByRole('button', { name: /Remove Damage/i }))
+    const authoredEffects = screen.getByRole('group', { name: /^Authored effects/ })
+    await user.click(
+      within(authoredEffects).getByRole('button', {
+        name: /Remove Damage — 2d10 Necrotic damage/i,
+      }),
+    )
 
     expect(requestResolutionChange).toHaveBeenCalledWith({
       field: 'removeEffect',
@@ -125,7 +135,12 @@ describe('SpellResolutionEditor', () => {
 
     await waitFor(() => {
       expect(screen.getByRole('button', { name: /Expand Damage/i })).toBeInTheDocument()
-      expect(screen.getAllByRole('button', { name: /Remove Damage/i })).toHaveLength(1)
+      const authoredEffects = screen.getByRole('group', { name: /^Authored effects/ })
+      expect(
+        within(authoredEffects).getByRole('button', {
+          name: /Remove Damage — 1d10 Force damage/i,
+        }),
+      ).toBeInTheDocument()
     })
   })
 

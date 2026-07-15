@@ -1,14 +1,8 @@
 import { describe, expect, it } from 'vitest'
-import {
-  resolveArrayItemFieldOrder,
-  type ArrayConfig,
-  type FormItem,
-  type GroupConfig,
-} from '@rpg/ui/form'
+import { resolveArrayItemFieldOrder, type FormItem, type GroupConfig } from '@rpg/ui/form'
 
 import {
   amountOptionsForEffect,
-  outcomeApplicationsArrayFields,
   outcomeApplicationsResolverItemFields,
   outcomeBranchBodyFields,
   outcomeNoteFields,
@@ -16,16 +10,6 @@ import {
 } from './resolution-outcome-form-fields'
 import { RESOLUTION_FIELD_LABELS, RESOLUTION_SECTION_LABELS } from './resolution-form-labels'
 import { RESOLUTION_FIELD_NAME } from './resolution-form-values'
-
-function findApplicationsArray(
-  fields: ReturnType<typeof outcomeApplicationsArrayFields>,
-): ArrayConfig {
-  const arrayField = fields.find((field) => 'kind' in field && field.kind === 'array')
-  if (!arrayField || arrayField.kind !== 'array') {
-    throw new Error('Expected applications array field')
-  }
-  return arrayField
-}
 
 function findGroup(fields: FormItem[]): GroupConfig {
   const groupField = fields.find((field) => 'kind' in field && field.kind === 'group')
@@ -70,63 +54,22 @@ describe('outcomeBranchBodyFields', () => {
   })
 })
 
-describe('outcomeApplicationsArrayFields', () => {
-  it('hides the generic add control for an external outcome add slot', () => {
-    const arrayField = findApplicationsArray(outcomeApplicationsArrayFields())
-
-    expect(arrayField.hideAddAction).toBe(true)
-    expect(arrayField.legend).toBe('')
-    expect(arrayField.size).toBe('sm')
-    expect(arrayField.reorder).toBe(false)
-    expect(arrayField.itemHeader?.summaryDependsOn).toContain(`${RESOLUTION_FIELD_NAME}.effects`)
-    expect(arrayField.filterSelectDependsOn).toContain(`${RESOLUTION_FIELD_NAME}.effects`)
-  })
-
-  it('filters amount options to full-only for non-partial effect kinds', () => {
-    const arrayField = findApplicationsArray(outcomeApplicationsArrayFields())
-
-    expect(
-      arrayField.filterSelectOptions?.({
-        arrayItems: [{ effectId: 'healing', amount: 'full' }],
-        rowIndex: 0,
-        fieldName: 'amount',
-        options: [
-          { value: 'full', label: 'Full effect' },
-          { value: 'half', label: 'Half effect' },
-        ],
-        watchedValues: {
-          [`${RESOLUTION_FIELD_NAME}.effects`]: [
-            {
-              id: 'healing',
-              kind: 'healing',
-              roll: { dice: { count: 2, faces: 8 } },
-            },
-          ],
-        },
-      }),
-    ).toEqual([{ value: 'full', label: 'Full effect' }])
-  })
-
-  it('registers leaf field order on resolver item fields', () => {
+describe('outcomeApplicationsResolverItemFields', () => {
+  it('registers leaf field order for invalid-submit navigation', () => {
     expect(resolveArrayItemFieldOrder(outcomeApplicationsResolverItemFields())).toEqual([
       'effectId',
       'amount',
     ])
   })
 
-  it('keeps slot fields on the visual applications array until custom rows land', () => {
-    const arrayField = findApplicationsArray(outcomeApplicationsArrayFields())
-
-    expect(arrayField.fields).toEqual([
-      expect.objectContaining({
-        kind: 'slot',
-        name: 'effectId',
-      }),
-      expect.objectContaining({
-        kind: 'slot',
-        name: 'amount',
-      }),
-    ])
+  it('filters amount options to full-only for non-partial effect kinds', () => {
+    expect(
+      amountOptionsForEffect({
+        id: 'healing',
+        kind: 'healing',
+        roll: { dice: { count: 2, faces: 8 } },
+      }).map((option) => option.value),
+    ).toEqual(['full'])
   })
 })
 

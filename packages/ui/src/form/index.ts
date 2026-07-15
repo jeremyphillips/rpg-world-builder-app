@@ -8,20 +8,27 @@ export {
   SlotFieldRenderer,
   type SlotFieldRendererProps,
 } from './containers/form-items.client'
+export { FieldNode, buildFieldControlId } from './containers/form-conditional.client'
 export {
   FormSectionProvider,
+  FormSectionContext,
+  buildFormSectionChildContext,
   useFormSectionContext,
+  type FormSectionContextOverrides,
+  type FormSectionContextValue,
   type FormSectionProviderProps,
 } from './context/form-section.context'
 export {
   ArrayItemPresentationContext,
   resolveErrorPlacement,
+  useFieldErrorPresentation,
   type ArrayItemPresentationContextValue,
   type ErrorPlacement,
 } from './context/array-item-presentation.context'
 export {
   ArrayFieldContext,
   useArrayFieldContext,
+  applyArrayFilterSelectOptions,
   type ArrayFieldContextValue,
   type FilterSelectOptionsContext,
 } from './context/array-field.context'
@@ -129,6 +136,8 @@ export {
 } from './field-config'
 export { makeFieldErrorMap, type RawZodIssueLike } from './config/field-error-map'
 export { makeResolver } from './config/form-resolver'
+export { navigateInvalidSubmit } from './config/navigate-invalid-submit.client'
+export { performInvalidSubmitFocus } from './config/navigate-invalid-submit-focus.lib'
 export {
   flattenFormIssues,
   classifyFormIssue,
@@ -207,11 +216,17 @@ export {
   useArrayItemRowState,
   type UseArrayItemRowStateArgs,
 } from './renderers/array/use-array-item-row-state.client'
-export type {
-  FieldGroupLegendSize,
-  FieldSeparator,
-  FieldStackLayout,
-  FieldStackRhythm,
+export {
+  ArrayItemIssueSummary,
+  type ArrayItemIssueSummaryProps,
+} from './renderers/array/array-item-issue.client'
+export { buildFieldRendererIds } from './renderers/field-renderer-config.lib'
+export {
+  fieldArrayItemListClasses,
+  type FieldGroupLegendSize,
+  type FieldSeparator,
+  type FieldStackLayout,
+  type FieldStackRhythm,
 } from '../components/ui/field.variants'
 export type {
   FieldStackDependentsChromeScope,
