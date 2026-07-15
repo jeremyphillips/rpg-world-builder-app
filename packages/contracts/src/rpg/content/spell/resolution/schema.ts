@@ -25,6 +25,8 @@ import {
 import { isEffectKindAllowedForTarget } from './effect-target-compatibility'
 import { isResolutionEffectKind } from './selection-availability'
 import { spellResolutionValidationMessages } from './validation-messages'
+import { spellResolutionProgressionSchema } from './progression/schema'
+import { validateSpellResolutionProgression } from './progression/validation'
 
 // ---------------------------------------------------------------------------
 // Spell resolution — contextual envelope for targets (with proximity), method,
@@ -223,12 +225,14 @@ export type SpellResolutionValidationInput = {
   origin?: SpellResolutionOrigin
   areaOfEffect?: z.infer<typeof areaGeometrySchema>
   method: SpellResolutionMethod
+  applicationPattern?: z.infer<typeof spellApplicationPatternSchema>
   effects: readonly SpellResolutionEffect[]
   outcomes: readonly {
     result: SpellResolutionOutcomeResult
     applications: readonly { effectId: SpellResolutionEffectId; amount: string }[]
     note?: string
   }[]
+  progression?: z.infer<typeof spellResolutionProgressionSchema>
 }
 
 export function validateSpellResolutionReferences(
@@ -341,6 +345,10 @@ export function validateSpellResolutionReferences(
       }
     })
   })
+
+  if (resolution.progression) {
+    validateSpellResolutionProgression(resolution, resolution.progression, ctx)
+  }
 }
 
 const spellResolutionObjectSchema = z
@@ -353,6 +361,7 @@ const spellResolutionObjectSchema = z
     applicationPattern: spellApplicationPatternSchema.optional(),
     effects: z.array(spellResolutionEffectSchema).min(1),
     outcomes: z.array(spellResolutionOutcomeSchema).min(1),
+    progression: spellResolutionProgressionSchema.optional(),
   })
   .superRefine(validateSpellResolutionReferences)
 
@@ -366,6 +375,7 @@ const spellResolutionInputSchema = z
     applicationPattern: spellApplicationPatternSchema.optional(),
     effects: z.array(spellResolutionEffectSchema).min(1),
     outcomes: z.array(spellResolutionOutcomeSchema).min(1),
+    progression: spellResolutionProgressionSchema.optional(),
   })
   .transform((value) => normalizeSpellResolutionInput(value))
 

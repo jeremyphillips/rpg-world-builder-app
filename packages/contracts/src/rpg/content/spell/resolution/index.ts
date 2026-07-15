@@ -140,6 +140,73 @@ export {
 } from './vocab'
 export { spellResolutionValidationMessages } from './validation-messages'
 export {
+  BLESS_PROGRESSION_FIXTURE_RESOLUTION,
+  BLESS_TARGET_COUNT_PROGRESSION,
+  ELDRITCH_BLAST_PROGRESSION,
+  ELDRITCH_BLAST_WITH_PROJECTILES_RESOLUTION,
+  FIRE_BOLT_PROGRESSION,
+  FIREBALL_PROGRESSION,
+  MAGIC_MISSILE_PROGRESSION,
+  SPELL_RESOLUTION_PROGRESSION_FIXTURES,
+} from './progression/fixtures'
+export {
+  formatPerProjectileDamageLine,
+  formatProgressionTrackSummary,
+  formatResolutionProgressionSummary,
+  type FormatProgressionTrackOptions,
+} from './progression/format'
+export {
+  findResolutionEffectById,
+  formatProgressionBaseValueLabel,
+  formatProgressionTrackHeading,
+  isRollBearingResolutionEffect,
+  listCompatibleProgressionReferences,
+  readProgressionBaseCount,
+  readProgressionBaseRoll,
+  readProgressionBaseValue,
+  referencesEqual,
+  type ProgressionReferenceContext,
+  type ProgressionResolutionContext,
+} from './progression/references'
+export {
+  resolveLinearValueAtSlot,
+  resolveProgressionValueAtCharacterLevel,
+  resolveProgressionValueAtSlotLevel,
+  resolveThresholdValueAtLevel,
+} from './progression/resolve'
+export {
+  isValidSpellResolutionProgressionReferencePair,
+  SPELL_RESOLUTION_PROGRESSION_BASES,
+  SPELL_RESOLUTION_PROGRESSION_PROPERTIES,
+  SPELL_RESOLUTION_PROGRESSION_SUBJECT_KINDS,
+  spellResolutionProgressionBasisSchema,
+  spellResolutionProgressionCountValueSchema,
+  spellResolutionProgressionLinearTrackSchema,
+  spellResolutionProgressionReferenceSchema,
+  spellResolutionProgressionRollValueSchema,
+  spellResolutionProgressionSchema,
+  spellResolutionProgressionSubjectSchema,
+  spellResolutionProgressionThresholdEntrySchema,
+  spellResolutionProgressionThresholdTrackSchema,
+  spellResolutionProgressionTrackSchema,
+  spellResolutionProgressionValueSchema,
+  VALID_SPELL_RESOLUTION_PROGRESSION_REFERENCE_PAIRS,
+  type SpellResolutionProgression,
+  type SpellResolutionProgressionBasis,
+  type SpellResolutionProgressionProperty,
+  type SpellResolutionProgressionReference,
+  type SpellResolutionProgressionSubject,
+  type SpellResolutionProgressionSubjectKind,
+  type SpellResolutionProgressionThresholdEntry,
+  type SpellResolutionProgressionTrack,
+  type SpellResolutionProgressionValue,
+} from './progression/schema'
+export {
+  validateSpellResolutionProgression,
+  type SpellResolutionProgressionValidationOptions,
+} from './progression/validation'
+export { spellResolutionProgressionValidationMessages } from './progression/validation-messages'
+export {
   getSpellResolutionOutcomeAuthoringLabel,
   SPELL_RESOLUTION_CONVENTIONAL_PRIMARY_OUTCOME,
   SPELL_RESOLUTION_OUTCOME_AUTHORING_LABELS,
