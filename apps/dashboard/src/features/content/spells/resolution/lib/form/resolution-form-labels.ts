@@ -39,6 +39,7 @@ export const RESOLUTION_SECTION_LABELS = {
   outcomeEmptySummary: 'No modeled effect',
   configureMissOutcome: 'Configure miss outcome',
   addOutcomeApplication: 'Add effect application',
+  appliedEffects: 'Applied effects',
   primaryOutcomeEmptyWarning:
     'The primary outcome for this resolution method has no modeled effects or additional behavior.',
   hitNote: 'Additional behavior',
@@ -69,6 +70,7 @@ export const RESOLUTION_FIELD_LABELS = {
   damageRoll: 'Damage roll',
   damageType: 'Damage type',
   hitNote: RESOLUTION_SECTION_LABELS.hitNote,
+  outcomeApplicationAmount: 'Amount',
 } as const
 
 export const RESOLUTION_APPLICATION_PATTERN_NONE_OPTION = {

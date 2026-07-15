@@ -4,7 +4,6 @@ import { createOutcomeApplicationAppendValue } from './resolution-outcome-form-f
 import {
   appendOutcomeApplication,
   readOutcomeApplications,
-  removeOutcomeApplication,
 } from './resolution-outcome-applications.lib'
 import type { ResolutionFormValues } from './resolution-form-schema'
 import { RESOLUTION_FIELD_NAME } from './resolution-form-values'
@@ -40,7 +39,7 @@ const baseResolution: ResolutionFormValues = {
   ],
 }
 
-describe('resolution outcome application mutations', () => {
+describe('resolution outcome application helpers', () => {
   it('reads empty applications as an empty array', () => {
     expect(readOutcomeApplications(undefined)).toEqual([])
   })
@@ -59,22 +58,6 @@ describe('resolution outcome application mutations', () => {
           result: 'miss',
           applications: [createOutcomeApplicationAppendValue('bonus-force')],
         },
-      ],
-      { shouldDirty: true, shouldValidate: false },
-    )
-  })
-
-  it('removes one application from an outcome branch', () => {
-    const setValue = vi.fn()
-    const getValues = vi.fn(() => baseResolution)
-
-    removeOutcomeApplication(getValues, setValue, 0, 0)
-
-    expect(setValue).toHaveBeenCalledWith(
-      `${RESOLUTION_FIELD_NAME}.outcomes`,
-      [
-        { result: 'hit', applications: [] },
-        { result: 'miss', applications: [] },
       ],
       { shouldDirty: true, shouldValidate: false },
     )

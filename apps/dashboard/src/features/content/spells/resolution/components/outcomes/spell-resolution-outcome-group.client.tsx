@@ -22,5 +22,11 @@ export function SpellResolutionOutcomeGroup(props: SpellResolutionOutcomeGroupPr
     )
   }
 
-  return <SpellResolutionOutcomeGroupBody {...state} />
+  return (
+    <SpellResolutionOutcomeGroupBody
+      headingId={state.headingId}
+      result={state.result}
+      outcomeIndex={state.outcomeIndex}
+    />
+  )
 }

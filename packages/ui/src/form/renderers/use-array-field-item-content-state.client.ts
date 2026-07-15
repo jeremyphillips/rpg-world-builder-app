@@ -86,7 +86,7 @@ export function useArrayFieldItemContentState({
       items: arrayItems ?? [],
       rowIndex: index,
       removeItem: onRemoveItem,
-      fullArrayName: levelRangeKeys ? fullName : undefined,
+      fullArrayName: fullName,
       levelRangeKeys,
       filterSelectOptions: config.filterSelectOptions,
       watchedValues,
