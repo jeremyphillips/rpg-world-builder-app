@@ -28,6 +28,16 @@ export {
   formatEffectRowTitleFromParts,
 } from './display'
 export {
+  buildAtomicEffectDisplay,
+  buildAtomicEffectDisplayFromParts,
+  formatAtomicEffectDisplaySummary,
+  formatAtomicEffectDisplayTitle,
+  type AtomicEffectDisplay,
+  type AtomicEffectDisplayInput,
+  type AtomicEffectTitleSegments,
+  type BuildAtomicEffectDisplayOptions,
+} from './atomic-effect-display'
+export {
   deriveEffectsModelingStatus,
   EFFECTS_MODELING_STATUS,
   EFFECTS_MODELING_STATUS_LABELS,

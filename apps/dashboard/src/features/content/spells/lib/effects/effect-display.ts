@@ -1,13 +1,39 @@
 import {
+  buildAtomicEffectDisplayFromParts,
+  formatAtomicEffectDisplayTitle,
   formatEffectRowSentence,
-  formatEffectRowTitleFromParts,
+  type EffectRecipient,
   type SpellAtomicEffectKind,
 } from '@rpg/contracts'
 
+import {
+  normalizeRollFormValue,
+  type RollFormShape,
+} from '../../../lib/forms/mechanics/roll-form-values'
 import { normalizeSpellEffects } from './effect-form-values'
 import type { EffectFormRow } from './effect-form-schema'
 
 export const SPELL_EFFECTS_PREVIEW_LABEL = 'Effect preview' as const
+
+function buildDisplayFromFormRow(
+  values: Record<string, unknown>,
+  options?: { recipient?: EffectRecipient; fallbackIndex?: number },
+) {
+  const kind = typeof values.kind === 'string' ? (values.kind as SpellAtomicEffectKind) : undefined
+  const roll = normalizeRollFormValue(values.roll as RollFormShape) ?? undefined
+
+  return buildAtomicEffectDisplayFromParts(
+    {
+      kind,
+      label: typeof values.label === 'string' ? values.label : undefined,
+      unitLabel: typeof values.unitLabel === 'string' ? values.unitLabel : undefined,
+      roll,
+      damageType: typeof values.damageType === 'string' ? values.damageType : undefined,
+      count: typeof values.count === 'number' ? values.count : undefined,
+    },
+    options,
+  )
+}
 
 /** Formats normalized spell effects for the authoring preview panel (compact lines). */
 export function formatSpellEffectsPreviewLines(
@@ -16,24 +42,22 @@ export function formatSpellEffectsPreviewLines(
   return normalizeSpellEffects(effects).map((effect) => formatEffectRowSentence(effect))
 }
 
-/** Returns a grant-style summary sentence for an effect array item header. */
-export function formatEffectRowSummary(values: Record<string, unknown>): string {
-  const normalized = normalizeSpellEffects([values as EffectFormRow])
-  const effect = normalized[0]
-  if (!effect) return ''
-  return formatEffectRowSentence(effect)
+/** Returns a recipient-aware summary sentence for an effect array item header. */
+export function formatEffectRowSummary(
+  values: Record<string, unknown>,
+  options?: { recipient?: EffectRecipient },
+): string {
+  return buildDisplayFromFormRow(values, options).summary ?? ''
 }
 
-/** Returns a grant-style primary title for an effect array item header. */
+/** Returns a compact mechanical title for an effect array item header. */
 export function formatEffectRowPrimary(
   values: Record<string, unknown>,
   index: number,
-): string | undefined {
-  const kind = values.kind
-  return formatEffectRowTitleFromParts(
-    typeof kind === 'string' ? (kind as SpellAtomicEffectKind) : undefined,
-    { label: values.label, unitLabel: values.unitLabel },
-    index,
+  options?: { recipient?: EffectRecipient },
+): string {
+  return formatAtomicEffectDisplayTitle(
+    buildDisplayFromFormRow(values, { ...options, fallbackIndex: index }),
   )
 }
 

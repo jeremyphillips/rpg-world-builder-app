@@ -1,18 +1,20 @@
 import {
-  getSpellAtomicEffectKindLabel,
   type SpellResolutionApplicationAmount,
   type SpellResolutionOutcomeResult,
 } from '@rpg/contracts'
 import type { ButtonDropdownItem } from '@rpg/ui'
 
 import {
-  formatResolutionEffectCompletenessMessage,
-  getResolutionEffectCompleteness,
+  formatEffectReferenceDescription,
+  formatEffectReferenceTitle,
+  resolveEffectReference,
+} from './resolution-effect-reference.lib'
+import {
   defaultApplicationAmountForOutcome,
+  getResolutionEffectCompleteness,
 } from './resolution-effect-validity.lib'
 import { RESOLUTION_SECTION_LABELS } from './resolution-form-labels'
 import { readOutcomeApplications } from './resolution-outcome-applications.lib'
-import { formatResolutionOutcomeEffectMenuLabel } from './resolution-outcome-display.lib'
 import type { ResolutionEffectFormItem, ResolutionOutcomeFormItem } from './resolution-form-schema'
 
 function appliedEffectIdsForOutcome(
@@ -70,10 +72,16 @@ function toUnavailableMenuItem(
   effect: ResolutionEffectFormItem,
   availability: Extract<OutcomeEffectAvailability, { status: 'incomplete' }>,
 ): ButtonDropdownItem {
+  const reference = {
+    kind: 'incomplete' as const,
+    effect,
+    completeness: availability.reason,
+  }
+
   return {
     id: effect.id,
-    label: getSpellAtomicEffectKindLabel(effect.kind),
-    description: formatResolutionEffectCompletenessMessage(effect, availability.reason),
+    label: formatEffectReferenceTitle(reference),
+    description: formatEffectReferenceDescription(reference),
     groupId: 'unavailable',
     disabled: true,
   }
@@ -82,7 +90,7 @@ function toUnavailableMenuItem(
 function toEligibleMenuItem(effect: ResolutionEffectFormItem): ButtonDropdownItem {
   return {
     id: effect.id,
-    label: formatResolutionOutcomeEffectMenuLabel(effect),
+    label: formatEffectReferenceTitle(resolveEffectReference(effect)),
     groupId: 'available',
   }
 }

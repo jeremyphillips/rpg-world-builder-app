@@ -89,7 +89,7 @@ describe('effect array item headers', () => {
         },
         0,
       ),
-    ).toBe('Damage')
+    ).toBe('Damage — 1d6 Fire damage')
 
     expect(
       formatEffectRowSummary({
@@ -111,7 +111,7 @@ describe('effect array item headers', () => {
         },
         0,
       ),
-    ).toBe('Damage — Clenched Fist')
+    ).toBe('Damage — Clenched Fist · 5d8 Force damage')
 
     expect(
       formatEffectRowSummary({
@@ -132,7 +132,7 @@ describe('effect array item headers', () => {
         },
         0,
       ),
-    ).toBe('Projectile count — darts')
+    ).toBe('Projectile count — darts · 3 darts')
 
     expect(
       formatEffectRowSummary({

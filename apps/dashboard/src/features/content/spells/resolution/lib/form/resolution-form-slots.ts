@@ -13,9 +13,9 @@ import { ResolutionChangeConfirmDialog } from '../../components/notices/resoluti
 import { SpellResolutionOutcomes } from '../../components/outcomes/spell-resolution-outcomes.client'
 import { SpellResolutionPreview } from '../../components/preview/spell-resolution-preview.client'
 import { SpellResolutionProximitySelect } from '../../components/target/spell-resolution-proximity-select.client'
-import { formatEffectRowPrimary } from '../../../lib/effects/effect-display'
+import { deriveDefaultEffectRecipient } from '@rpg/contracts'
+import { formatEffectRowPrimary, formatEffectRowSummary } from '../../../lib/effects/effect-display'
 import { resolutionEffectItemFields } from '../effects/resolution-effect-form-fields'
-import { formatResolutionEffectRowSummary } from '../selection/resolution-selection-options.lib'
 import { resolutionSelectionContextFromWatched } from '../selection/resolution-selection-context.lib'
 import { RESOLUTION_FIELD_LABELS, RESOLUTION_SECTION_LABELS } from './resolution-form-labels'
 import {
@@ -58,11 +58,12 @@ function resolutionEffectsArrayField(ctx: ContentFormCtx): FormItem {
       fallback: (index) => `Effect ${index + 1}`,
       primary: (values, index) => formatEffectRowPrimary(values, index),
       summaryDependsOn: [...RESOLUTION_SUMMARY_DEPENDS_ON],
-      summary: (values, _index, watched) =>
-        formatResolutionEffectRowSummary(
-          values,
-          resolutionSelectionContextFromWatched(watched ?? {}),
-        ),
+      summary: (values, _index, watched) => {
+        const context = resolutionSelectionContextFromWatched(watched ?? {})
+        return formatEffectRowSummary(values, {
+          recipient: deriveDefaultEffectRecipient(context),
+        })
+      },
     },
     fields: resolutionEffectItemFields(ctx),
   }

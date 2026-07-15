@@ -139,6 +139,7 @@ export {
   countInvalidArrayItems,
   indexArrayItemIssues,
   collectArraySections,
+  resolveArrayItemFieldOrder,
   resolveIssueFocusControlId,
   resolveIssueFocusFieldName,
   buildValidationSessionExpandKey,
@@ -183,9 +184,29 @@ export {
 } from './context/array-field-mutators.registry'
 export { useArrayItemCollapseState } from './hooks/use-array-item-collapse-state.client'
 export {
+  ArrayItemActionsRail,
   ArrayItemRemoveButton,
+  ArrayItemShell,
+  type ArrayItemActionsRailProps,
   type ArrayItemRemoveButtonProps,
+  type ArrayItemShellProps,
 } from './renderers/array/array-item-shell.client'
+export {
+  ArrayItemLeadingChromeColumn,
+  type ArrayItemLeadingChromeColumnProps,
+} from './renderers/array/array-item-leading-chrome-column.client'
+export {
+  ArrayItemInlineRow,
+  type ArrayItemInlineRowProps,
+} from './renderers/array/array-item-inline-row.client'
+export {
+  ArrayItemRowShell,
+  type ArrayItemRowShellProps,
+} from './renderers/array/array-item-row-shell.client'
+export {
+  useArrayItemRowState,
+  type UseArrayItemRowStateArgs,
+} from './renderers/array/use-array-item-row-state.client'
 export type {
   FieldGroupLegendSize,
   FieldSeparator,

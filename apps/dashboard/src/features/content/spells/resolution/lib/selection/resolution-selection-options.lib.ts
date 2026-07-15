@@ -1,8 +1,6 @@
 import {
   deriveDefaultEffectRecipient,
-  formatEffectRowSentenceFromParts,
   formatResolutionAvailabilityReason,
-  formatRollValue,
   getApplicationPatternAvailability,
   getEffectKindAvailability,
   getMethodAvailability,
@@ -15,10 +13,8 @@ import {
 } from '@rpg/contracts'
 import type { FieldOption } from '@rpg/ui/form'
 
-import {
-  normalizeRollFormValue,
-  type RollFormShape,
-} from '../../../../lib/forms/mechanics/roll-form-values'
+import { formatEffectRowPrimary, formatEffectRowSummary } from '../../../lib/effects/effect-display'
+
 import { RESOLUTION_EFFECT_KINDS } from '../effects/resolution-effect-add-menu.lib'
 import { getEffectTemplatesForKinds } from '../../../lib/effects/effect-template-registry'
 import { RESOLUTION_APPLICATION_PATTERN_OPTIONS } from '../form/resolution-form-labels'
@@ -114,34 +110,7 @@ export function formatResolutionEffectRowSummary(
   row: Record<string, unknown>,
   context: ResolutionSelectionState,
 ): string {
-  const kind = row.kind
-  if (kind !== 'damage' && kind !== 'healing' && kind !== 'temporary-hit-points') {
-    return ''
-  }
-
-  const roll = normalizeRollFormValue(row.roll as RollFormShape)
-  if (!roll) return ''
-
-  const recipient = deriveDefaultEffectRecipient(context)
-  return formatEffectRowSentenceFromParts(
-    {
-      kind,
-      roll,
-      ...(kind === 'damage' && typeof row.damageType === 'string'
-        ? { damageType: row.damageType }
-        : {}),
-    },
-    { recipient },
-  )
-}
-
-function formatEffectRollDetail(row: Record<string, unknown>): string | undefined {
-  const roll = normalizeRollFormValue(row.roll as RollFormShape)
-  if (!roll) return undefined
-  if (row.kind === 'damage' && typeof row.damageType === 'string') {
-    return `${formatRollValue(roll)} ${row.damageType} damage`
-  }
-  return formatRollValue(roll)
+  return formatEffectRowSummary(row, { recipient: deriveDefaultEffectRecipient(context) })
 }
 
 /** Compact bullet for confirm dialog effect removal lines. */
@@ -150,8 +119,7 @@ export function describeEffectForConfirm(effect: {
   kind: string
   roll?: unknown
   damageType?: string
+  label?: string
 }): string {
-  const kindLabel = getSpellAtomicEffectKindLabel(effect.kind as ResolutionEffectKind)
-  const detail = formatEffectRollDetail(effect as Record<string, unknown>)
-  return detail ? `${kindLabel} — ${detail}` : kindLabel
+  return formatEffectRowPrimary(effect, 0)
 }

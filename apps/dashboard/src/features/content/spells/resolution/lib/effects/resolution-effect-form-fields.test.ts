@@ -91,7 +91,7 @@ describe('resolutionFields effects array', () => {
         },
         0,
       ),
-    ).toBe('Damage')
+    ).toBe('Damage — 1d6 Fire damage')
     expect(
       itemHeader?.summary?.(
         {
@@ -150,7 +150,7 @@ describe('resolution effect array item headers', () => {
         },
         0,
       ),
-    ).toBe('Damage')
+    ).toBe('Damage — 1d6 Fire damage')
 
     expect(
       formatEffectRowSummary({
@@ -170,7 +170,7 @@ describe('resolution effect array item headers', () => {
         },
         0,
       ),
-    ).toBe('Healing')
+    ).toBe('Healing — 3d8 healing')
 
     expect(
       formatEffectRowSummary({
@@ -189,7 +189,7 @@ describe('resolution effect array item headers', () => {
         },
         0,
       ),
-    ).toBe('Temporary hit points')
+    ).toBe('Temporary hit points — 2d4+4 temporary Hit Points')
 
     expect(
       formatEffectRowSummary({

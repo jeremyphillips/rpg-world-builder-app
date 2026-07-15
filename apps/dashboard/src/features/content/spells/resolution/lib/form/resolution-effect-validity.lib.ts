@@ -1,6 +1,4 @@
 import {
-  effectKindPrefix,
-  getSpellAtomicEffectKindLabel,
   supportsPartialApplicationForEffectKind,
   type SpellResolutionApplicationAmount,
   type SpellResolutionOutcomeResult,
@@ -11,7 +9,6 @@ import {
   type RollFormShape,
 } from '../../../../lib/forms/mechanics/roll-form-values'
 import type { ResolutionEffectFormItem } from './resolution-form-schema'
-import { RESOLUTION_SECTION_LABELS } from './resolution-form-labels'
 
 export type ResolutionEffectCompletenessField = 'roll' | 'damageType'
 
@@ -38,15 +35,6 @@ export function getResolutionEffectCompleteness(
   }
 
   return { complete: false, missing }
-}
-
-export function formatResolutionOutcomeEffectMenuLabelIncomplete(
-  effect: ResolutionEffectFormItem,
-): string {
-  return effectKindPrefix(
-    getSpellAtomicEffectKindLabel(effect.kind),
-    RESOLUTION_SECTION_LABELS.outcomeIncompleteEffect,
-  )
 }
 
 export function formatResolutionEffectCompletenessMessage(

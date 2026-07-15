@@ -340,6 +340,23 @@ the first eligible control inside it.
 | `filterSelectOptions` | Cross-row select filtering inside array items. |
 | `arrayPattern` | Domain hooks for array validation severity and focus navigation. |
 
+### Composing custom array rows
+
+When schema `kind: 'array'` layout is insufficient, feature code may compose rows from exported
+primitives (`ArrayItemRowShell`, `ArrayItemInlineRow`, `ArrayItemLeadingChromeColumn`,
+`ArrayItemActionsRail`, `useArrayItemRowState`) while keeping RHF `useFieldArray` and
+`registerArrayFieldMutators`.
+
+Custom rows must preserve navigation parity with schema-rendered arrays:
+
+- Register the same leaf `FieldConfig` entries in resolver/`fields` trees so
+  `collectArraySections` field order matches rendered controls (`effectId` before `amount`, etc.).
+- Render controls with `FieldNode` + `buildFieldRendererIds` (`idPrefix`, `namePrefix`) — do not
+  invent alternate DOM ids.
+- Set `data-array-item-prefix` on the row shell to the item RHF prefix
+  (e.g. `resolution.outcomes.0.applications.1`).
+- Provide `ArrayFieldContext` when array-level `filterSelectOptions` applies.
+
 ### Array validation presentation
 
 Array item validation chrome is generic in `@rpg/ui/form` and is driven by RHF/Zod errors:

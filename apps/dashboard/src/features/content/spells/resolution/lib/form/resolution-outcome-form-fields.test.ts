@@ -1,9 +1,15 @@
 import { describe, expect, it } from 'vitest'
-import type { ArrayConfig, FormItem, GroupConfig } from '@rpg/ui/form'
+import {
+  resolveArrayItemFieldOrder,
+  type ArrayConfig,
+  type FormItem,
+  type GroupConfig,
+} from '@rpg/ui/form'
 
 import {
   amountOptionsForEffect,
   outcomeApplicationsArrayFields,
+  outcomeApplicationsResolverItemFields,
   outcomeBranchBodyFields,
   outcomeNoteFields,
   resolutionOutcomeApplicationsResolverFields,
@@ -101,7 +107,14 @@ describe('outcomeApplicationsArrayFields', () => {
     ).toEqual([{ value: 'full', label: 'Full effect' }])
   })
 
-  it('uses status slot for amount editing', () => {
+  it('registers leaf field order on resolver item fields', () => {
+    expect(resolveArrayItemFieldOrder(outcomeApplicationsResolverItemFields())).toEqual([
+      'effectId',
+      'amount',
+    ])
+  })
+
+  it('keeps slot fields on the visual applications array until custom rows land', () => {
     const arrayField = findApplicationsArray(outcomeApplicationsArrayFields())
 
     expect(arrayField.fields).toEqual([

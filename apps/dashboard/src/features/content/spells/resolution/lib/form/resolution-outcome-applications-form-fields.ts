@@ -1,20 +1,17 @@
 import { supportsPartialApplicationForEffectKind } from '@rpg/contracts'
 import type { SpellResolutionOutcomeResult } from '@rpg/contracts'
 import { createElement } from 'react'
-import type { FieldOption, FormItem } from '@rpg/ui/form'
+import type { FieldConfig, FieldOption, FormItem } from '@rpg/ui/form'
 
 import { SpellResolutionOutcomeApplicationEffectIdField } from '../../components/outcomes/spell-resolution-outcome-application-effect-id.client'
 import { SpellResolutionOutcomeApplicationStatus } from '../../components/outcomes/spell-resolution-outcome-application-status.client'
 
-import {
-  defaultApplicationAmountForOutcome,
-  formatResolutionOutcomeEffectMenuLabelIncomplete,
-  getResolutionEffectCompleteness,
-} from './resolution-effect-validity.lib'
+import { defaultApplicationAmountForOutcome } from './resolution-effect-validity.lib'
 import {
   findResolutionEffectById,
-  formatResolutionOutcomeEffectMenuLabel,
-} from './resolution-outcome-display.lib'
+  formatEffectReferenceTitle,
+  resolveEffectReferenceById,
+} from './resolution-effect-reference.lib'
 import { RESOLUTION_OUTCOME_AMOUNT_OPTIONS } from './resolution-form-labels'
 import type {
   ResolutionEffectFormItem,
@@ -24,19 +21,31 @@ import { RESOLUTION_FIELD_NAME } from './resolution-form-values'
 
 const RESOLUTION_EFFECTS_FIELD = `${RESOLUTION_FIELD_NAME}.effects` as const
 
+/** Leaf fields for resolver field-order and custom outcome rows (step 6). */
+export const outcomeApplicationEffectIdField = {
+  type: 'text',
+  name: 'effectId',
+  label: '',
+  width: 'full',
+} satisfies FieldConfig
+
+export const outcomeApplicationAmountField = {
+  type: 'select',
+  name: 'amount',
+  label: '',
+  options: RESOLUTION_OUTCOME_AMOUNT_OPTIONS,
+  width: 'lg',
+} satisfies FieldConfig
+
+export function outcomeApplicationsResolverItemFields(): FormItem[] {
+  return [outcomeApplicationEffectIdField, outcomeApplicationAmountField]
+}
+
 export function formatOutcomeApplicationRowLabel(
   effects: readonly ResolutionEffectFormItem[],
   application: ResolutionOutcomeApplicationFormItem,
 ): string {
-  const effect = findResolutionEffectById(effects, application.effectId)
-  if (!effect) return application.effectId
-
-  const completeness = getResolutionEffectCompleteness(effect)
-  if (!completeness.complete) {
-    return formatResolutionOutcomeEffectMenuLabelIncomplete(effect)
-  }
-
-  return formatResolutionOutcomeEffectMenuLabel(effect)
+  return formatEffectReferenceTitle(resolveEffectReferenceById(effects, application.effectId))
 }
 
 export function createOutcomeApplicationAppendValue(
@@ -89,7 +98,7 @@ function outcomeApplicationAmountOptions({
   return amountOptionsForEffect(effect)
 }
 
-/** Per-row fields for `resolution.outcomes[n].applications[]`. */
+/** Visual array item fields until custom outcome rows replace schema rendering. */
 export function outcomeApplicationsArrayItemFields(): FormItem[] {
   return [
     {
@@ -100,7 +109,6 @@ export function outcomeApplicationsArrayItemFields(): FormItem[] {
     {
       kind: 'slot',
       name: 'amount',
-      // TODO(outcome_effect_eligibility_ui §9a): read-only display when only one amount option.
       render: () => createElement(SpellResolutionOutcomeApplicationStatus),
     },
   ]

@@ -60,7 +60,7 @@ describe('SpellResolutionEditor', () => {
       expect(screen.getByText('Applied once per resolution')).toBeInTheDocument()
       expect(screen.getByRole('button', { name: /(Collapse|Expand) Damage/ })).toBeInTheDocument()
       expect(screen.getByText('Inflicts 1d10 Force damage.')).toBeInTheDocument()
-      expect(screen.getAllByRole('button', { name: /^Remove Damage$/ })).toHaveLength(1)
+      expect(screen.getAllByRole('button', { name: /Remove Damage/i })).toHaveLength(1)
     })
   })
 
@@ -100,10 +100,10 @@ describe('SpellResolutionEditor', () => {
     )
 
     await waitFor(() => {
-      expect(screen.getByRole('button', { name: /^Remove Damage$/ })).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: /Remove Damage/i })).toBeInTheDocument()
     })
 
-    await user.click(screen.getByRole('button', { name: /^Remove Damage$/ }))
+    await user.click(screen.getByRole('button', { name: /Remove Damage/i }))
 
     expect(requestResolutionChange).toHaveBeenCalledWith({
       field: 'removeEffect',
@@ -125,7 +125,7 @@ describe('SpellResolutionEditor', () => {
 
     await waitFor(() => {
       expect(screen.getByRole('button', { name: /Expand Damage/i })).toBeInTheDocument()
-      expect(screen.getAllByRole('button', { name: /^Remove Damage$/ })).toHaveLength(1)
+      expect(screen.getAllByRole('button', { name: /Remove Damage/i })).toHaveLength(1)
     })
   })
 

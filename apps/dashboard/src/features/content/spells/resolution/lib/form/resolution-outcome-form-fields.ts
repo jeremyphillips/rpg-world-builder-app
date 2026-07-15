@@ -6,10 +6,13 @@ import { SpellResolutionOutcomeApplicationSection } from '../../components/outco
 
 import { embeddedArrayResolverField } from '../../../../lib/forms/tabbed-form-resolver-fields'
 import { readOutcomeApplications } from './resolution-outcome-applications.lib'
-import { formatResolutionOutcomeEffectMenuLabel } from './resolution-outcome-display.lib'
 import {
-  outcomeApplicationsArrayItemFields,
+  formatEffectReferenceTitle,
+  resolveEffectReference,
+} from './resolution-effect-reference.lib'
+import {
   outcomeApplicationsFieldPath,
+  outcomeApplicationsResolverItemFields,
 } from './resolution-outcome-applications-form-fields'
 import { RESOLUTION_FIELD_LABELS, RESOLUTION_SECTION_LABELS } from './resolution-form-labels'
 import type { ResolutionEffectFormItem, ResolutionOutcomeFormItem } from './resolution-form-schema'
@@ -29,6 +32,7 @@ export {
   outcomeApplicationsArrayFields,
   outcomeApplicationsArrayItemFields,
   outcomeApplicationsFieldPath,
+  outcomeApplicationsResolverItemFields,
 } from './resolution-outcome-applications-form-fields'
 
 export function appliedEffectIdsForOutcome(
@@ -55,7 +59,7 @@ export function buildOutcomeEffectApplicationMenuItems(
   return eligibleEffectsForOutcomeApplication(effects, outcome).map((effect) => ({
     id: effect.id,
     effectId: effect.id,
-    label: formatResolutionOutcomeEffectMenuLabel(effect),
+    label: formatEffectReferenceTitle(resolveEffectReference(effect)),
   }))
 }
 
@@ -109,7 +113,7 @@ export function outcomeBranchBodyFields(
 
 /** Resolver-only configs for embedded outcome application arrays on the spell tab. */
 export function resolutionOutcomeApplicationsResolverFields(): FormItem[] {
-  const itemFields = outcomeApplicationsArrayItemFields()
+  const itemFields = outcomeApplicationsResolverItemFields()
 
   return Array.from({ length: MAX_OUTCOME_BRANCHES }, (_, outcomeIndex) =>
     embeddedArrayResolverField(

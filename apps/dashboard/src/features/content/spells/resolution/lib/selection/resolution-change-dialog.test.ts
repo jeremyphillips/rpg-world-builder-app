@@ -44,6 +44,6 @@ describe('describeEffectForConfirm', () => {
         kind: 'healing',
         roll: { dice: { count: 2, faces: 8 } },
       } as ResolutionEffectRef & { roll: { dice: { count: number; faces: number } } }),
-    ).toBe('Healing — 2d8')
+    ).toBe('Healing — 2d8 healing')
   })
 })

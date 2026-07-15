@@ -50,6 +50,7 @@ export const RESOLUTION_SECTION_LABELS = {
   outcomeUnavailableGroup: 'Unavailable',
   outcomeAvailableGroup: 'Available',
   outcomeIncompleteEffect: 'Incomplete effect',
+  outcomeUnknownEffect: 'Unknown effect',
   configureMissOutcome: 'Configure miss outcome',
   addAuthoredEffect: 'Add effect',
   addAppliedEffect: 'Add applied effect',
