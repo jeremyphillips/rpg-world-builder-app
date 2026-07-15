@@ -1,6 +1,6 @@
 import { midSentenceLabel, singularizeLabel } from '@rpg/contracts'
 
-import type { ArrayItemHeaderConfig } from '../field-config'
+import type { ArrayItemHeaderConfig } from '../../field-config'
 
 /** Derives a mid-sentence item label for array min/max copy from `itemHeader` or `legend`. */
 export function arrayItemLabel(header: ArrayItemHeaderConfig, legend: string): string {

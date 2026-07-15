@@ -10,7 +10,7 @@ import { buildItemDefaultValues } from '../../field-config'
 import {
   resolveArrayAddMenuAppendDefaults,
   type ArrayAddMenuItemConfig,
-} from '../../config/array-add-menu.lib'
+} from '../../config/array/array-add-menu.lib'
 import { buildValidationSessionExpandKey, type ValidationSessionExpandKey } from '../../errors'
 import {
   focusFirstEligibleArrayItemControl,

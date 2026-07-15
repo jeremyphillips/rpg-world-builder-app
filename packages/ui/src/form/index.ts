@@ -157,7 +157,7 @@ export {
   ARRAY_ITEM_HEADER_DIVIDER,
   ARRAY_ITEM_TEXT_SEPARATOR,
   joinArrayItemSummaryParts,
-} from './config/array-item-config.lib'
+} from './config/array/array-item-config.lib'
 export {
   buildItemKeysByFieldId,
   collapsedIdsFromSnapshot,
@@ -169,13 +169,13 @@ export {
   toggleArrayItemCollapseOverride,
   type ArrayItemCollapseOverride,
   type ArrayItemCollapseSnapshot,
-} from './config/array-item-collapse.lib'
+} from './config/array/array-item-collapse.lib'
 export {
   buildArrayItemCollapseStorageKey,
   readArrayItemCollapseOverrides,
   writeArrayItemCollapseOverrides,
   type ArrayItemCollapseStoredValue,
-} from './config/array-item-collapse-storage.lib'
+} from './config/array/array-item-collapse-storage.lib'
 export {
   getArrayFieldMutators,
   registerArrayFieldMutators,

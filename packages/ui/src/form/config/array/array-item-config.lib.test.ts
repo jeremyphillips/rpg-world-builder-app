@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import type { FormItem } from '../field-config'
+import type { FormItem } from '../../field-config'
 import {
   defaultArrayItemHeader,
   isNestedArraySection,

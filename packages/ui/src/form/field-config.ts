@@ -33,7 +33,7 @@ import type {
   FieldStackDependentsTone,
 } from '../components/ui/field-stack.variants'
 import type { FieldGroupFieldsChrome } from '../components/ui/field-group-chrome.variants'
-import type { ArrayAddMenuConfig } from './config/array-add-menu.lib'
+import type { ArrayAddMenuConfig } from './config/array/array-add-menu.lib'
 import type {
   FieldHintPosition,
   FieldGroupLegendSize,

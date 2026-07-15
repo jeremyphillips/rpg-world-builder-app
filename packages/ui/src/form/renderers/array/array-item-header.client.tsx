@@ -14,7 +14,7 @@ import {
   resolveArrayItemHeaderLabels,
   ARRAY_ITEM_HEADER_DIVIDER,
   type ResolvedArrayItemHeader,
-} from '../../config/array-item-config.lib'
+} from '../../config/array/array-item-config.lib'
 import {
   arrayItemChromeColumnClasses,
   arrayItemHeaderContentClasses,

@@ -7,7 +7,7 @@ import { z } from 'zod'
 
 import { Form } from '../shells/form.client'
 import type { FormItem } from '../field-config'
-import { readArrayItemCollapseOverrides } from '../config/array-item-collapse-storage.lib'
+import { readArrayItemCollapseOverrides } from '../config/array/array-item-collapse-storage.lib'
 import { submitAndExpectPayload } from '../test-utils'
 
 // ── Schema ──────────────────────────────────────────────────────────────────

@@ -19,7 +19,7 @@ import {
   isNestedArraySection,
   resolveArrayItemReorder,
   resolveArrayItemVariant,
-} from '../../config/array-item-config.lib'
+} from '../../config/array/array-item-config.lib'
 import type { ArrayConfig } from '../../field-config'
 import { useFormSectionContext } from '../../context/form-section.context'
 import { countInvalidArrayItems, countIssuesForArrayPath } from '../../errors'

@@ -10,7 +10,7 @@
 import * as React from 'react'
 import type { UseFieldArrayAppend, UseFieldArrayReturn } from 'react-hook-form'
 
-import { buildArrayAddMenuItems } from '../../config/array-add-menu.lib'
+import { buildArrayAddMenuItems } from '../../config/array/array-add-menu.lib'
 import type { ValidationSessionExpandKey } from '../../errors'
 import type { ArrayConfig } from '../../field-config'
 import {

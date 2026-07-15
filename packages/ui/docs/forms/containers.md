@@ -13,6 +13,26 @@ and size defaults: [forms hub — Form rhythm](../forms.md#form-rhythm).
 | `array` | `useFieldArray` list | `compact`      | `sm`         | yes (`array`)   |
 | `slot`  | Custom `render()` UI | `compact`      | `sm`         | optional label  |
 
+## Component entry files
+
+Every form container or renderer component has **one semantically named entry file** that
+matches the exported component name in kebab-case:
+
+| Component               | Entry file                                                                                             |
+| ----------------------- | ------------------------------------------------------------------------------------------------------ |
+| `ArrayFieldRenderer`    | [`array-field-renderer.client.tsx`](../src/form/renderers/array/array-field-renderer.client.tsx)       |
+| `ArrayFormItemSection`  | [`array-form-item-section.client.tsx`](../src/form/renderers/array/array-form-item-section.client.tsx) |
+| `ConditionalArrayField` | [`conditional-array-field.client.tsx`](../src/form/renderers/array/conditional-array-field.client.tsx) |
+| `SlotFieldRenderer`     | [`slot-field-renderer.client.tsx`](../src/form/renderers/fields/slot-field-renderer.client.tsx)        |
+| `FieldRenderer`         | [`field-renderer.client.tsx`](../src/form/renderers/field-renderer.client.tsx)                         |
+
+Convention: `NewComponent` → `new-component.client.tsx`. Supporting hooks, variants, and
+presentational sub-parts live alongside the entry file in the same folder; they are not
+re-exported from the entry unless they are part of the component's public surface.
+
+`form-item-node.client.tsx` dispatches `kind` values to the matching entry wrapper; the
+wrapper resolves section context and RHF name prefixes, then renders the entry renderer.
+
 ## Groups
 
 Semantic `<fieldset>` + `<legend>`. Top-level: section scale (`text-field-group-legend`).
@@ -166,6 +186,15 @@ Token: `fieldSeparatorVariants`. Do not use row `className` for recurring divide
 Repeatable section via `useFieldArray`. Item field names are **relative** (renderer prefixes
 `arrayName.index`). Item shells default to the **elevated** surface (`bg-card` + raised shadow);
 use `itemChrome` or stack `dependentsChrome` + `dependentsChromeScope: 'arrayItems'` to override.
+
+**Implementation:** `form-item-node` dispatches `kind: 'array'` to
+[`array-form-item-section.client.tsx`](../src/form/renderers/array/array-form-item-section.client.tsx)
+(or [`conditional-array-field.client.tsx`](../src/form/renderers/array/conditional-array-field.client.tsx)
+when `visibility` is set). Both render
+[`array-field-renderer.client.tsx`](../src/form/renderers/array/array-field-renderer.client.tsx)
+— the array entry component. Per-row chrome lives in
+[`array-field-item-content.client.tsx`](../src/form/renderers/array/array-field-item-content.client.tsx).
+See [Component entry files](#component-entry-files).
 
 ```ts
 {

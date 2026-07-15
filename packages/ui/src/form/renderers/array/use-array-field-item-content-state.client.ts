@@ -9,7 +9,7 @@ import {
   resolveArrayItemHeader,
   resolveArrayItemHeaderLabels,
   resolveCompactInlineRow,
-} from '../../config/array-item-config.lib'
+} from '../../config/array/array-item-config.lib'
 import type { ArrayConfig } from '../../field-config'
 import { resolveErrorPlacement } from '../../context/array-item-presentation.context'
 import {

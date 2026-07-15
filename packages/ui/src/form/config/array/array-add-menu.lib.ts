@@ -4,7 +4,7 @@
  * Evaluates duplicate-policy states against current row values and maps
  * configured menu items to `ButtonDropdown` item props at render time.
  */
-import type { WeightedSearchField } from '../../lib/search'
+import type { WeightedSearchField } from '../../../lib/search'
 
 export type ArrayAddMenuDuplicatePolicy = 'allow' | 'warn' | 'block'
 

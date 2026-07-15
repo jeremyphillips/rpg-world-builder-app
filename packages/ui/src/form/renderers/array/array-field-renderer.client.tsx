@@ -1,5 +1,10 @@
 'use client'
 
+/**
+ * Entry component for repeatable array fields (`kind: 'array'`).
+ * Dispatched from `form-item-node.client.tsx` via `ArrayFormItemSection` or
+ * `ConditionalArrayField`.
+ */
 import * as React from 'react'
 import { useFieldArray, useFormContext, useWatch } from 'react-hook-form'
 
@@ -9,13 +14,6 @@ import {
 } from '../../../components/ui/field.variants'
 import { cn } from '../../../lib/utils'
 import { registerArrayFieldMutators } from '../../context/array-field-mutators.registry'
-import {
-  FormSectionContext,
-  useFormSectionContext,
-  type FormSectionContextValue,
-} from '../../context/form-section.context'
-import { buildArraySectionChildContext } from '../../containers/form-section-child-context.lib'
-import { useVisibilityValues } from '../../containers/form-conditional.client'
 import type { ArrayConfig } from '../../field-config'
 import { ArrayFieldAddControl } from './array-field-add-control.client'
 import { ArrayFieldLegend } from './array-field-legend.client'
@@ -112,65 +110,5 @@ export function ArrayFieldRenderer({ config, idPrefix, fullName }: ArrayFieldRen
         {!inlineAddInLegend ? addControl : null}
       </div>
     </fieldset>
-  )
-}
-
-interface ConditionalArrayFieldProps {
-  config: ArrayConfig
-  idPrefix: string
-  namePrefix?: string
-  depth: number
-}
-
-/** Hides a nested array when its `visibility` predicate is false. */
-export function ConditionalArrayField({
-  config,
-  idPrefix,
-  namePrefix,
-  depth,
-}: ConditionalArrayFieldProps) {
-  const values = useVisibilityValues(config.visibility!, namePrefix)
-  const parentContext = useFormSectionContext()
-  const childContext = React.useMemo(
-    () => buildArraySectionChildContext(parentContext, depth, config),
-    [parentContext, depth, config],
-  )
-
-  if (!config.visibility!.visibleWhen(values)) return null
-
-  const fullArrayName = namePrefix ? `${namePrefix}.${config.name}` : config.name
-
-  return (
-    <FormSectionContext.Provider value={childContext}>
-      <ArrayFieldRenderer config={config} idPrefix={idPrefix} fullName={fullArrayName} />
-    </FormSectionContext.Provider>
-  )
-}
-
-interface ArrayFormItemSectionProps {
-  item: ArrayConfig
-  parentContext: FormSectionContextValue
-  idPrefix: string
-  namePrefix?: string
-  depth: number
-}
-
-export function ArrayFormItemSection({
-  item,
-  parentContext,
-  idPrefix,
-  namePrefix,
-  depth,
-}: ArrayFormItemSectionProps) {
-  const arrayChildContext = React.useMemo(
-    () => buildArraySectionChildContext(parentContext, depth, item),
-    [parentContext, depth, item],
-  )
-
-  const fullArrayName = namePrefix ? `${namePrefix}.${item.name}` : item.name
-  return (
-    <FormSectionContext.Provider value={arrayChildContext}>
-      <ArrayFieldRenderer config={item} idPrefix={idPrefix} fullName={fullArrayName} />
-    </FormSectionContext.Provider>
   )
 }

@@ -7,7 +7,7 @@ import type {
   ArrayItemVariant,
   FormItem,
   RowConfig,
-} from '../field-config'
+} from '../../field-config'
 
 const NESTED_ARRAY_SECTION_DEPTH = 2
 

@@ -11,7 +11,7 @@ import {
 import {
   resolveArrayItemHeader,
   type ResolvedArrayItemHeader,
-} from '../../config/array-item-config.lib'
+} from '../../config/array/array-item-config.lib'
 import type { ArrayConfig, RowConfig } from '../../field-config'
 import { NestedFormItems } from '../../containers/form-item-node.client'
 import { FieldNode } from '../../containers/form-conditional.client'
