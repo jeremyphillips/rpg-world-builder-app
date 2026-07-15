@@ -33,6 +33,7 @@ import type {
   FieldStackDependentsTone,
 } from '../components/ui/field-stack.variants'
 import type { FieldGroupFieldsChrome } from '../components/ui/field-group-chrome.variants'
+import type { FieldChrome } from '../components/ui/field-chrome.variants'
 import type {
   FieldHintPosition,
   FieldGroupLegendSize,
@@ -43,6 +44,7 @@ import type {
 } from '../components/ui/field.variants'
 
 export type { FieldGroupFieldsChrome } from '../components/ui/field-group-chrome.variants'
+export type { FieldChrome } from '../components/ui/field-chrome.variants'
 
 /** The set of control types the schema-driven `<Form>` renderer can render. */
 export type FieldType =
@@ -187,6 +189,8 @@ interface BaseFieldConfig {
   dynamicHint?: FieldDynamicHint
   /** Trailing divider after this field within a group/stack rhythm. */
   separator?: FieldSeparator
+  /** Visual shell around the full field anatomy (label + control + messages). */
+  chrome?: FieldChrome
 }
 
 export interface TextFieldConfig extends BaseFieldConfig {

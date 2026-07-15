@@ -5,15 +5,19 @@ import type { IdentityFormValues } from './identity-form-fields'
 type NarrativeFormValues = IdentityFormValues['narrative']
 type NarrativeFormItem = NarrativeFormValues['personalityTraits'][number]
 
-const EMPTY_NARRATIVE_FORM_VALUES: NarrativeFormValues = {
-  personalityTraits: [],
-  ideals: [],
-  bonds: [],
-  flaws: [],
-}
+const BLANK_NARRATIVE_ITEM: NarrativeFormItem = { value: '' }
+
+/** Default narrative form slice — one blank row per array field. */
+export const emptyNarrativeFormValues = (): NarrativeFormValues => ({
+  personalityTraits: [{ ...BLANK_NARRATIVE_ITEM }],
+  ideals: [{ ...BLANK_NARRATIVE_ITEM }],
+  bonds: [{ ...BLANK_NARRATIVE_ITEM }],
+  flaws: [{ ...BLANK_NARRATIVE_ITEM }],
+})
 
 function stringArrayToFormItems(values: string[] | undefined): NarrativeFormItem[] {
-  return (values ?? []).map((value) => ({ value }))
+  if (!values?.length) return [{ ...BLANK_NARRATIVE_ITEM }]
+  return values.map((value) => ({ value }))
 }
 
 function formItemsToStringArray(items: NarrativeFormItem[] | undefined): string[] | undefined {
@@ -24,7 +28,7 @@ function formItemsToStringArray(items: NarrativeFormItem[] | undefined): string[
 function narrativeDraftToFormValues(
   narrative: CharacterNarrative | undefined,
 ): NarrativeFormValues {
-  if (!narrative) return EMPTY_NARRATIVE_FORM_VALUES
+  if (!narrative) return emptyNarrativeFormValues()
 
   return {
     personalityTraits: stringArrayToFormItems(narrative.personalityTraits),

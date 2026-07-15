@@ -303,6 +303,27 @@ describe('ChipsField', () => {
     await expectNoAxeViolations(container)
   })
 
+  it('renders panel chrome around chips only, with legend above the shell', () => {
+    const { container } = render(
+      <ChipsField
+        id="alignment"
+        label="Alignment"
+        options={playStyleOptions}
+        multiple={false}
+        chrome={{ variant: 'panel' }}
+      />,
+    )
+
+    const fieldset = container.querySelector('fieldset')!
+    const legend = fieldset.querySelector('legend')
+    const chromeShell = fieldset.querySelector('.rounded-md.border.bg-muted\\/10')
+
+    expect(legend).toHaveTextContent('Alignment')
+    expect(chromeShell).toBeTruthy()
+    expect(chromeShell?.contains(legend)).toBe(false)
+    expect(chromeShell?.querySelector('button')).toBeTruthy()
+  })
+
   it('has no accessibility violations when required and in error state', async () => {
     const { container } = render(
       <ChipsField

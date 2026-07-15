@@ -5,16 +5,12 @@ import type { CharacterBuilderDraftIdentity } from '@rpg/contracts'
 import type { IdentityFormValues } from './identity-form-fields'
 import {
   areIdentityDraftsEqual,
+  emptyNarrativeFormValues,
   identityDraftToFormValues,
   identityFormValuesToDraft,
 } from './identity-form-values'
 
-const emptyNarrative: IdentityFormValues['narrative'] = {
-  personalityTraits: [],
-  ideals: [],
-  bonds: [],
-  flaws: [],
-}
+const emptyNarrative = emptyNarrativeFormValues()
 
 const fullIdentityDraft: CharacterBuilderDraftIdentity = {
   name: 'Verna',
@@ -42,10 +38,14 @@ describe('identityDraftToFormValues', () => {
       },
     })
   })
+
+  it('seeds blank rows when narrative is unset', () => {
+    expect(identityDraftToFormValues({ name: 'Verna' }).narrative).toEqual(emptyNarrative)
+  })
 })
 
 describe('identityFormValuesToDraft', () => {
-  it('omits blank alignment sentinels from the draft', () => {
+  it('omits blank narrative rows from the draft', () => {
     const values = {
       name: 'Verna',
       narrative: {
@@ -59,6 +59,16 @@ describe('identityFormValuesToDraft', () => {
       name: 'Verna',
       narrative: { personalityTraits: ['Quiet and watchful.'] },
     })
+  })
+
+  it('drops untouched blank narrative rows on save', () => {
+    const values = {
+      name: 'Verna',
+      narrative: emptyNarrative,
+      alignment: '',
+    } as unknown as IdentityFormValues
+
+    expect(identityFormValuesToDraft(values)).toEqual({ name: 'Verna' })
   })
 
   it('round-trips all narrative fields through form values', () => {

@@ -367,6 +367,7 @@ const fieldRenderers: {
       size={config.size}
       chipSize={config.chipSize}
       width={config.width}
+      chrome={config.chrome}
       disabled={config.disabled}
       value={field.value ?? fieldDefaultValue(config)}
       onChange={field.onChange}

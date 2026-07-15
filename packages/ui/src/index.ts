@@ -201,6 +201,7 @@ export {
   type FieldGroupLegendSize,
   type FieldGroupProps,
 } from './components/ui/field-group'
+export type { FieldChrome } from './components/ui/field-chrome.variants'
 export {
   fieldArrayItemClasses,
   fieldArrayItemListClasses,

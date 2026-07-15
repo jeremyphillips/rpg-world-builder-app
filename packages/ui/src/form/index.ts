@@ -109,6 +109,7 @@ export {
   type GroupConfig,
   type GroupFieldItem,
   type FieldGroupFieldsChrome,
+  type FieldChrome,
   type StackConfig,
   type ArrayConfig,
   type ArrayItemHeaderConfig,

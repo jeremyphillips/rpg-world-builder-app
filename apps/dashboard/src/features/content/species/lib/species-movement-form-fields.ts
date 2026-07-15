@@ -47,6 +47,10 @@ export function movementArrayField(): FormItem {
     addLabel: 'Add movement speed',
     min: 1,
     itemVariant: 'compact',
+    compactInlineAlign: 'center',
+    size: 'md',
+    addVariant: 'secondary',
+    itemChrome: 'subtle',
     itemHeader: {
       fallback: (index) => `Movement ${index + 1}`,
       primaryField: 'mode',
@@ -62,6 +66,7 @@ export function movementArrayField(): FormItem {
         type: 'inlineSentence',
         name: 'movementRow',
         label: 'Movement',
+        reorder: 'dragHandle',
         hideLabel: true,
         segments: [
           {

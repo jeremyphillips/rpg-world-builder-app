@@ -84,8 +84,10 @@ describe('IdentityDraftSync', () => {
       />,
     )
 
-    await userEvent.click(screen.getByRole('button', { name: /Add ideal/i }))
-    await userEvent.type(screen.getByLabelText(/^Ideals$/i), 'Protect the weak.')
+    await userEvent.type(
+      screen.getByPlaceholderText(/What principle drives your character/i),
+      'Protect the weak.',
+    )
 
     await waitFor(() => {
       expect(onDraftChange).toHaveBeenCalledWith(

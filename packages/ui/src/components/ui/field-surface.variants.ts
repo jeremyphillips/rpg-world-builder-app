@@ -3,8 +3,17 @@ import { cva, type VariantProps } from 'class-variance-authority'
 import { cn } from '../../lib/utils'
 import { compactLabelAppearanceToneClasses, type CompactLabelTone } from './compact-label.lib'
 
+/** Shared rounded border shell — padding is applied separately per surface kind. */
+export const fieldShellLayoutClasses = 'min-w-0 rounded-md border'
+
+/** Group panel/outline body padding — 16px (`p-4`). */
+export const fieldGroupBodyPaddingClasses = 'p-4'
+
 /** Shared rounded box layout for group panel and outline body chrome. */
-export const fieldGroupBodyShellLayoutClasses = 'min-w-0 rounded-md border p-4'
+export const fieldGroupBodyShellLayoutClasses = cn(
+  fieldShellLayoutClasses,
+  fieldGroupBodyPaddingClasses,
+)
 
 /** Subtle raised emboss for card-plane surfaces — inset highlight + drop shadow. */
 export const fieldSurfaceRaisedShadowClasses = 'shadow-surface-raised'
