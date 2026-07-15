@@ -13,8 +13,8 @@ import {
 import {
   ArrayFormItemSection,
   ConditionalArrayField,
-} from '../renderers/array-field-renderer.client'
-import { SlotFormItemSection } from '../renderers/slot-field-renderer.client'
+} from '../renderers/array/array-field-renderer.client'
+import { SlotFormItemSection } from '../renderers/fields/slot-field-renderer.client'
 
 export interface NestedFormItemsProps {
   items: Array<FormItem | RowConfig>

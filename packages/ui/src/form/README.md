@@ -5,14 +5,16 @@ subpaths under this directory.
 
 ## Subdirectories
 
-| Directory     | Role                                                                    |
-| ------------- | ----------------------------------------------------------------------- |
-| `config/`     | Resolver, `dependsOn` hook, pure helpers                                |
-| `context/`    | Section rhythm/size context (`FormSectionProvider`)                     |
-| `renderers/`  | Leaf field adapters (`FieldRenderer` registry) and array/slot renderers |
-| `containers/` | Structural items: groups, rows, stacks, arrays, conditionals            |
-| `shells/`     | Top-level `<Form>`, `<TabbedForm>`, wizard step wrapper                 |
-| `chrome/`     | Save footer, actions bar, sticky tab chrome                             |
+| Directory           | Role                                                                      |
+| ------------------- | ------------------------------------------------------------------------- |
+| `config/`           | Resolver, `dependsOn` hook, pure helpers                                  |
+| `context/`          | Section rhythm/size context (`FormSectionProvider`)                       |
+| `renderers/`        | Core `FieldRenderer` registry (`field-renderer.client.tsx`, lazy loading) |
+| `renderers/array/`  | Repeatable array field adapters, item chrome, and focus/issue helpers     |
+| `renderers/fields/` | Specialized leaf field adapters (inline sentence, input select, slot, …)  |
+| `containers/`       | Structural items: groups, rows, stacks, arrays, conditionals              |
+| `shells/`           | Top-level `<Form>`, `<TabbedForm>`, wizard step wrapper                   |
+| `chrome/`           | Save footer, actions bar, sticky tab chrome                               |
 
 Root-level [`field-config.ts`](./field-config.ts) is the config type SSOT (heavily linked in docs).
 

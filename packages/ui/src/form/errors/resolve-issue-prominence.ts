@@ -1,4 +1,4 @@
-import type { ArrayItemIssueProminence } from '../renderers/array-item-issue.variants'
+import type { ArrayItemIssueProminence } from '../renderers/array/array-item-issue.variants'
 import type { FormIssueScope } from './form-issue.types'
 
 export type IssueVisibility = 'visible' | 'collapsed' | 'hidden'

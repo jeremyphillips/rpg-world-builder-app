@@ -185,7 +185,7 @@ export { useArrayItemCollapseState } from './hooks/use-array-item-collapse-state
 export {
   ArrayItemRemoveButton,
   type ArrayItemRemoveButtonProps,
-} from './renderers/array-item-shell.client'
+} from './renderers/array/array-item-shell.client'
 export type {
   FieldGroupLegendSize,
   FieldSeparator,

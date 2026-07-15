@@ -22,10 +22,10 @@ import { MarkdownField } from '../../components/ui/markdown-field.client'
 import { useFileFieldRemotePreview } from '../context/file-field-props.context'
 import { useFieldErrorPresentation } from '../context/array-item-presentation.context'
 import { resolveNestedFieldErrorMessage } from '../errors/resolve-field-error-message'
-import { DiceFormulaFieldRenderer } from './dice-formula-field-renderer.client'
+import { DiceFormulaFieldRenderer } from './fields/dice-formula-field-renderer.client'
 import { buildFieldRendererIds, resolveFieldRenderConfig } from './field-renderer-config.lib'
-import { renderSpecializedField } from './field-renderer-specialized.client'
-import { OptionalDisclosureTextareaFieldRenderer } from './optional-disclosure-field-renderer.client'
+import { renderSpecializedField } from './fields/field-renderer-specialized.client'
+import { OptionalDisclosureTextareaFieldRenderer } from './fields/optional-disclosure-field-renderer.client'
 import { LazyFieldSuspense, lazyFieldComponent } from './lazy-field.client'
 import type {
   FieldConfig,
@@ -45,7 +45,7 @@ import { useFormSectionContext } from '../context/form-section.context'
 import type { JsonFieldProps } from '../../components/ui/json-field.client'
 import type { RichTextFieldProps } from '../../components/ui/rich-text-field'
 import type { FileFieldProps } from '../../components/ui/file-field.client'
-import type { EditableGridFieldRendererProps } from './editable-grid-field-renderer.client'
+import type { EditableGridFieldRendererProps } from './fields/editable-grid-field-renderer.client'
 
 const LazyJsonField = lazyFieldComponent<JsonFieldProps>(
   () => import('../../components/ui/json-field.client'),
@@ -60,7 +60,7 @@ const LazyFileField = lazyFieldComponent<FileFieldProps>(
   'FileField',
 )
 const LazyEditableGridFieldRenderer = lazyFieldComponent<EditableGridFieldRendererProps>(
-  () => import('./editable-grid-field-renderer.client'),
+  () => import('./fields/editable-grid-field-renderer.client'),
   'EditableGridFieldRenderer',
 )
 

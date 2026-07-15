@@ -6,8 +6,8 @@ import { FormSectionContext } from '../context/form-section.context'
 import type { FormItem, RowConfig } from '../field-config'
 import { NestedFormItems } from './form-item-node.client'
 
-export type { SlotFieldRendererProps } from '../renderers/slot-field-renderer.client'
-export { SlotFieldRenderer } from '../renderers/slot-field-renderer.client'
+export type { SlotFieldRendererProps } from '../renderers/fields/slot-field-renderer.client'
+export { SlotFieldRenderer } from '../renderers/fields/slot-field-renderer.client'
 
 export interface FormItemsProps {
   items: Array<FormItem | RowConfig>
