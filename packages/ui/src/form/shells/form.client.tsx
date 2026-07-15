@@ -13,10 +13,12 @@ import { resolveSchemaFormFooter, SchemaFormShell } from './schema-form-shell.cl
 import { makeResolver } from '../config/form-resolver'
 import {
   buildDefaultValues,
+  flattenFields,
   type FileFieldPropsMap,
   type FormItem,
   type FormValueSync,
 } from '../field-config'
+import { assertOptionalDisclosureFieldConfigs } from '../config/optional-disclosure-config.lib'
 import { FormActionsBar } from '../chrome/form-actions-bar'
 import { formFooterSpacingClasses } from '../chrome/form-chrome.variants'
 import { FormValueSyncEffects } from '../chrome/form-value-sync-effects.client'
@@ -121,6 +123,10 @@ export function Form<TFieldValues extends FieldValues>({
   const [formDefaults] = React.useState(
     () => ({ ...buildDefaultValues(fields), ...defaultValues }) as DefaultValues<TFieldValues>,
   )
+
+  React.useEffect(() => {
+    assertOptionalDisclosureFieldConfigs(flattenFields(fields))
+  }, [fields])
 
   const form = useForm<TFieldValues>({
     resolver,

@@ -33,7 +33,7 @@ function findArrayField(fields: FormItem[], name: string): ArrayConfig | undefin
       return field
     }
 
-    if ('kind' in field && field.kind === 'group') {
+    if ('kind' in field && (field.kind === 'group' || field.kind === 'stack')) {
       const nested = findArrayField(field.fields, name)
       if (nested) return nested
     }
@@ -53,7 +53,7 @@ function collectFieldNames(fields: FormItem[]): string[] {
       names.push(field.name)
     } else if ('kind' in field && field.kind === 'row') {
       names.push(...collectFieldNames(field.fields))
-    } else if ('kind' in field && field.kind === 'group') {
+    } else if ('kind' in field && (field.kind === 'group' || field.kind === 'stack')) {
       names.push(...collectFieldNames(field.fields))
     }
   }

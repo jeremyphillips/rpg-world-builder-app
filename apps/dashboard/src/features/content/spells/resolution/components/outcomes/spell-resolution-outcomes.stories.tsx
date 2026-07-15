@@ -48,3 +48,44 @@ export const ChillTouch: Story = {
   name: 'Chill Touch',
   args: { defaultResolution: RESOLUTION_FORM_FIXTURES.chillTouch },
 }
+
+export const AllIncompleteEffects: Story = {
+  name: 'All incomplete effects',
+  args: {
+    defaultResolution: {
+      ...RESOLUTION_FORM_FIXTURES.eldritchBlast,
+      effects: [
+        {
+          id: 'incomplete',
+          kind: 'damage',
+          roll: {},
+          damageType: 'force',
+        },
+      ],
+      outcomes: [{ result: 'hit', applications: [] }],
+    },
+  },
+}
+
+export const IncompleteApplicationRow: Story = {
+  name: 'Incomplete application row',
+  args: {
+    defaultResolution: {
+      ...RESOLUTION_FORM_FIXTURES.eldritchBlast,
+      effects: [
+        {
+          id: 'incomplete',
+          kind: 'damage',
+          roll: {},
+          damageType: 'force',
+        },
+      ],
+      outcomes: [
+        {
+          result: 'hit',
+          applications: [{ effectId: 'incomplete', amount: 'full' }],
+        },
+      ],
+    },
+  },
+}

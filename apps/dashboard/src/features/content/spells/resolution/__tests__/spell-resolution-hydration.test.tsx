@@ -287,7 +287,7 @@ describe('spell resolution tab hydration', () => {
 
     await waitFor(() => {
       expect(screen.getAllByText('Projectiles').length).toBeGreaterThan(0)
-      expect(screen.getAllByText('Applied per dart').length).toBeGreaterThan(0)
+      expect(screen.getAllByText('Applied once per dart').length).toBeGreaterThan(0)
     })
     expect(screen.queryByText(RESOLUTION_SECTION_LABELS.hybridNoticeTitle)).not.toBeInTheDocument()
     expect(magicMissile.resolution?.applicationPattern?.kind).toBe('projectiles')

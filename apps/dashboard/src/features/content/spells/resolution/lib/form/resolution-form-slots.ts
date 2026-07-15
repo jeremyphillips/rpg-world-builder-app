@@ -37,6 +37,7 @@ const RESOLUTION_SUMMARY_DEPENDS_ON = [
   `${RESOLUTION_PREFIX}.methodKind`,
   `${RESOLUTION_PREFIX}.attackType`,
 ] as const
+// Effect row summaries (e.g. "1d10 force") react to target/method changes above.
 
 function resolutionEffectsArrayField(ctx: ContentFormCtx): FormItem {
   return {
@@ -47,7 +48,7 @@ function resolutionEffectsArrayField(ctx: ContentFormCtx): FormItem {
     // defaults nested arrays to compact unless itemVariant is explicit.
     itemVariant: 'detailed',
     hideAddAction: true, // Add menu is a sibling slot — options depend on live form state.
-    hideItemRemove: true,
+    hideItemRemove: true, // Remove is in the header slot so it can confirm / read context.
     itemRemoveSlot: {
       name: '_resolutionEffectHeaderRemove',
       render: () => createElement(SpellResolutionEffectRemoveControl),
@@ -82,6 +83,7 @@ function resolutionProjectilesFields(): FormItem[] {
         {
           kind: 'slot',
           name: '_resolutionProjectilesPreview',
+          // Live preview of authored projectile labels/count before save.
           render: () => createElement(SpellResolutionProjectilesPreview),
         },
         {
@@ -124,6 +126,7 @@ function resolutionOutcomeBranchesGroup(): FormItem {
       {
         kind: 'slot',
         name: '_resolutionOutcomes',
+        // Branches are method-derived (hit/miss/save); inner fields live in SpellResolutionOutcomes.
         render: () => createElement(SpellResolutionOutcomes),
       },
     ],
@@ -141,17 +144,25 @@ function resolutionEffectsAndOutcomesGroup(ctx: ContentFormCtx): FormItem {
       {
         kind: 'group',
         legend: RESOLUTION_SECTION_LABELS.authoredEffects,
+        description: RESOLUTION_SECTION_LABELS.authoredEffectsDescription,
         fields: [
           {
-            kind: 'slot',
-            name: '_resolutionEffectsApplicationLabel',
-            render: () => createElement(SpellResolutionEffectsApplicationLabel),
-          },
-          resolutionEffectsArrayField(ctx),
-          {
-            kind: 'slot',
-            name: '_resolutionEffectAddControl',
-            render: () => createElement(SpellResolutionEffectAddControl),
+            kind: 'stack',
+            className: 'gap-3',
+            fields: [
+              {
+                kind: 'slot',
+                name: '_resolutionEffectsApplicationLabel',
+                // Read-only label tying effects to the selected application pattern.
+                render: () => createElement(SpellResolutionEffectsApplicationLabel),
+              },
+              resolutionEffectsArrayField(ctx),
+              {
+                kind: 'slot',
+                name: '_resolutionEffectAddControl',
+                render: () => createElement(SpellResolutionEffectAddControl),
+              },
+            ],
           },
         ],
       },
@@ -170,6 +181,7 @@ export function configuredResolutionFields(ctx: ContentFormCtx): FormItem[] {
   const configured = visibleWhenResolutionConfigured()
 
   return [
+    // Dialogs/notices mount here so they share form context but stay out of the layout flow.
     {
       kind: 'slot',
       name: '_resolutionChangeConfirm',
@@ -197,6 +209,7 @@ export function configuredResolutionFields(ctx: ContentFormCtx): FormItem[] {
         {
           kind: 'slot',
           name: '_resolutionProximitySelect',
+          // Proximity drives which target fields are shown; kept as a slot for that coupling.
           render: () => createElement(SpellResolutionProximitySelect),
         },
         ...resolutionTargetFormFields(),
@@ -211,11 +224,12 @@ export function configuredResolutionFields(ctx: ContentFormCtx): FormItem[] {
         {
           kind: 'slot',
           name: '_resolutionHowItResolves',
+          // Attack vs save vs automatic — method fields are not a flat schema slice.
           render: () => createElement(SpellResolutionHowItResolves),
         },
       ],
     },
-    ...resolutionProjectilesFields(),
+    ...resolutionProjectilesFields(), // Only visible when application pattern is projectiles.
     resolutionEffectsAndOutcomesGroup(ctx),
     {
       kind: 'slot',

@@ -30,44 +30,37 @@ function findGroup(fields: FormItem[]): GroupConfig {
 }
 
 describe('outcomeNoteFields', () => {
-  it('exposes the additional behavior textarea', () => {
+  it('exposes the additional behavior textarea behind optional disclosure', () => {
     expect(outcomeNoteFields()).toEqual([
       {
         type: 'textarea',
         name: 'note',
         label: RESOLUTION_FIELD_LABELS.hitNote,
+        placeholder: RESOLUTION_SECTION_LABELS.outcomeNotePlaceholder,
         rows: 3,
         width: 'full',
         size: 'sm',
+        optionalDisclosure: {
+          addLabel: RESOLUTION_SECTION_LABELS.addOutcomeNote,
+          removeLabel: 'Remove',
+          expandWhenPopulated: true,
+        },
       },
     ])
   })
 })
 
 describe('outcomeBranchBodyFields', () => {
-  it('wraps applications, add slot, and note in a rhythm group', () => {
+  it('wraps application section slot and note in a rhythm group', () => {
     const group = findGroup(outcomeBranchBodyFields(1, true))
 
     expect(group.legend).toBe('')
-    expect(group.fields).toHaveLength(3)
-    expect(group.fields[0]).toMatchObject({ kind: 'array', name: 'applications' })
-    expect(group.fields[1]).toMatchObject({
+    expect(group.fields).toHaveLength(2)
+    expect(group.fields[0]).toMatchObject({
       kind: 'slot',
-      name: '_outcomeApplicationAdd',
+      name: '_outcomeApplicationSection',
     })
-    expect(group.fields[2]).toEqual(outcomeNoteFields()[0])
-  })
-
-  it('omits the applications array when none are configured', () => {
-    const group = findGroup(outcomeBranchBodyFields(0, false))
-
-    expect(group.fields).toEqual([
-      expect.objectContaining({
-        kind: 'slot',
-        name: '_outcomeApplicationAdd',
-      }),
-      ...outcomeNoteFields(),
-    ])
+    expect(group.fields[1]).toEqual(outcomeNoteFields()[0])
   })
 })
 
@@ -76,6 +69,8 @@ describe('outcomeApplicationsArrayFields', () => {
     const arrayField = findApplicationsArray(outcomeApplicationsArrayFields())
 
     expect(arrayField.hideAddAction).toBe(true)
+    expect(arrayField.legend).toBe('')
+    expect(arrayField.size).toBe('sm')
     expect(arrayField.reorder).toBe(false)
     expect(arrayField.itemHeader?.summaryDependsOn).toContain(`${RESOLUTION_FIELD_NAME}.effects`)
     expect(arrayField.filterSelectDependsOn).toContain(`${RESOLUTION_FIELD_NAME}.effects`)
@@ -106,7 +101,7 @@ describe('outcomeApplicationsArrayFields', () => {
     ).toEqual([{ value: 'full', label: 'Full effect' }])
   })
 
-  it('exposes amount field labels for resolver registration', () => {
+  it('uses status slot for amount editing', () => {
     const arrayField = findApplicationsArray(outcomeApplicationsArrayFields())
 
     expect(arrayField.fields).toEqual([
@@ -115,9 +110,8 @@ describe('outcomeApplicationsArrayFields', () => {
         name: 'effectId',
       }),
       expect.objectContaining({
-        type: 'select',
+        kind: 'slot',
         name: 'amount',
-        label: RESOLUTION_FIELD_LABELS.outcomeApplicationAmount,
       }),
     ])
   })

@@ -6,7 +6,10 @@ import { expectNoAxeViolations } from '@rpg/ui/test-utils'
 import { describe, expect, it } from 'vitest'
 
 import { RESOLUTION_FORM_FIXTURES } from '../../fixtures'
-import { RESOLUTION_SECTION_LABELS } from '../../lib/form/resolution-form-labels'
+import {
+  RESOLUTION_FIELD_LABELS,
+  RESOLUTION_SECTION_LABELS,
+} from '../../lib/form/resolution-form-labels'
 import { resolutionOutcomeBranchesFields } from '../../lib/form/resolution-form-slots'
 
 import {
@@ -28,6 +31,13 @@ function renderOutcomes(defaultResolution: ResolutionFormValues) {
       rhythm="compact"
     />,
   )
+}
+
+function hitSection() {
+  const heading = screen.getByRole('heading', { name: 'On hit' })
+  const section = heading.closest('section')
+  expect(section).not.toBeNull()
+  return section!
 }
 
 describe('SpellResolutionOutcomes', () => {
@@ -66,8 +76,29 @@ describe('SpellResolutionOutcomes', () => {
         .closest('section')
       expect(expandedMissSection).not.toBeNull()
       expect(
-        within(expandedMissSection!).getByLabelText(RESOLUTION_SECTION_LABELS.hitNote),
+        within(expandedMissSection!).getByRole('button', {
+          name: RESOLUTION_SECTION_LABELS.addOutcomeNote,
+        }),
       ).toBeInTheDocument()
+      expect(
+        within(expandedMissSection!).queryByLabelText(RESOLUTION_SECTION_LABELS.hitNote),
+      ).not.toBeInTheDocument()
+    })
+  })
+
+  it('shows add additional behavior disclosure on empty hit outcomes', async () => {
+    renderOutcomes(RESOLUTION_FORM_FIXTURES.eldritchBlast)
+
+    await waitFor(() => {
+      const section = hitSection()
+      expect(
+        within(section).getByRole('button', {
+          name: RESOLUTION_SECTION_LABELS.addOutcomeNote,
+        }),
+      ).toBeInTheDocument()
+      expect(
+        within(section).queryByLabelText(RESOLUTION_SECTION_LABELS.hitNote),
+      ).not.toBeInTheDocument()
     })
   })
 
@@ -88,7 +119,7 @@ describe('SpellResolutionOutcomes', () => {
 
     renderOutcomes(resolution)
 
-    const appliedSection = await screen.findByRole('heading', { name: 'Applied automatically' })
+    const appliedSection = await screen.findByText(RESOLUTION_SECTION_LABELS.appliedEffects)
     const section = appliedSection.closest('section')
     expect(section).not.toBeNull()
 
@@ -104,16 +135,136 @@ describe('SpellResolutionOutcomes', () => {
     expect(screen.queryByRole('option', { name: /1d4\+1 Force damage/i })).not.toBeInTheDocument()
   })
 
-  it('hides already-applied effects from the add menu', async () => {
+  it('hides the add trigger when all effects are already applied', async () => {
     renderOutcomes(RESOLUTION_FORM_FIXTURES.eldritchBlast)
 
     await waitFor(() => {
       expect(screen.getByText(/Damage — 1d10 Force damage/i)).toBeInTheDocument()
+      expect(
+        screen.getByText(RESOLUTION_SECTION_LABELS.outcomeAllEffectsApplied),
+      ).toBeInTheDocument()
     })
 
     expect(
       screen.queryByRole('button', { name: RESOLUTION_SECTION_LABELS.addAppliedEffect }),
     ).not.toBeInTheDocument()
+  })
+
+  it('shows no-authored-effects copy without an add trigger', async () => {
+    const resolution: ResolutionFormValues = {
+      ...RESOLUTION_FORM_FIXTURES.eldritchBlast,
+      effects: [],
+      outcomes: RESOLUTION_FORM_FIXTURES.eldritchBlast.outcomes?.map((outcome) => ({
+        ...outcome,
+        applications: [],
+      })),
+    }
+
+    renderOutcomes(resolution)
+
+    await waitFor(() => {
+      expect(
+        screen.getByText(RESOLUTION_SECTION_LABELS.outcomeNoAuthoredEffectsAvailable),
+      ).toBeInTheDocument()
+      expect(
+        screen.getByText(RESOLUTION_SECTION_LABELS.outcomeAuthorEffectsHint),
+      ).toBeInTheDocument()
+    })
+
+    expect(
+      screen.queryByRole('button', { name: RESOLUTION_SECTION_LABELS.addAppliedEffect }),
+    ).not.toBeInTheDocument()
+  })
+
+  it('disables the add trigger with aria-describedby when all effects are incomplete', async () => {
+    const resolution: ResolutionFormValues = {
+      ...RESOLUTION_FORM_FIXTURES.eldritchBlast,
+      effects: [
+        {
+          id: 'incomplete',
+          kind: 'damage',
+          roll: {},
+          damageType: 'force',
+        },
+      ],
+      outcomes: [{ result: 'hit', applications: [] }],
+    }
+
+    renderOutcomes(resolution)
+
+    const addButton = await screen.findByRole('button', {
+      name: RESOLUTION_SECTION_LABELS.addAppliedEffect,
+    })
+    expect(addButton).toBeDisabled()
+    expect(addButton).toHaveAttribute('aria-describedby')
+
+    const hint = document.getElementById(addButton.getAttribute('aria-describedby')!)
+    expect(hint).not.toBeNull()
+    expect(hint).toHaveTextContent(RESOLUTION_SECTION_LABELS.outcomeNoCompleteEffectsAvailable)
+    expect(hint).toHaveTextContent(RESOLUTION_SECTION_LABELS.outcomeCompleteEffectsHint)
+  })
+
+  it('partitions unavailable effects in the add menu', async () => {
+    const user = userEvent.setup()
+    const resolution: ResolutionFormValues = {
+      ...RESOLUTION_FORM_FIXTURES.eldritchBlast,
+      effects: [
+        {
+          id: 'complete',
+          kind: 'damage',
+          roll: { dice: { count: 1, faces: 10 } },
+          damageType: 'force',
+        },
+        {
+          id: 'incomplete',
+          kind: 'damage',
+          roll: {},
+          damageType: 'force',
+        },
+      ],
+      outcomes: [{ result: 'hit', applications: [] }],
+    }
+
+    renderOutcomes(resolution)
+
+    await user.click(
+      screen.getByRole('button', { name: RESOLUTION_SECTION_LABELS.addAppliedEffect }),
+    )
+
+    expect(
+      await screen.findByText(RESOLUTION_SECTION_LABELS.outcomeAvailableGroup),
+    ).toBeInTheDocument()
+    expect(screen.getByText(RESOLUTION_SECTION_LABELS.outcomeUnavailableGroup)).toBeInTheDocument()
+    expect(screen.getByText('Complete the damage roll.')).toBeInTheDocument()
+  })
+
+  it('preserves incomplete application rows with disabled amount select', async () => {
+    const resolution: ResolutionFormValues = {
+      ...RESOLUTION_FORM_FIXTURES.eldritchBlast,
+      effects: [
+        {
+          id: 'incomplete',
+          kind: 'damage',
+          roll: {},
+          damageType: 'force',
+        },
+      ],
+      outcomes: [
+        {
+          result: 'hit',
+          applications: [{ effectId: 'incomplete', amount: 'full' }],
+        },
+      ],
+    }
+
+    renderOutcomes(resolution)
+
+    await waitFor(() => {
+      expect(screen.getByText(/Damage — Incomplete effect/i)).toBeInTheDocument()
+      expect(screen.getByText('Complete the damage roll.')).toBeInTheDocument()
+    })
+
+    expect(screen.getByLabelText(RESOLUTION_FIELD_LABELS.outcomeApplicationAmount)).toBeDisabled()
   })
 
   it('renders failed and successful save groups for inflict wounds', async () => {
@@ -129,9 +280,8 @@ describe('SpellResolutionOutcomes', () => {
     renderOutcomes(RESOLUTION_FORM_FIXTURES.chillTouch)
 
     await waitFor(() => {
-      const hitSection = screen.getByRole('heading', { name: 'On hit' }).closest('section')
-      expect(hitSection).not.toBeNull()
-      expect(within(hitSection!).getByDisplayValue(/can't regain Hit Points/i)).toBeInTheDocument()
+      const section = hitSection()
+      expect(within(section).getByDisplayValue(/can't regain Hit Points/i)).toBeInTheDocument()
     })
   })
 

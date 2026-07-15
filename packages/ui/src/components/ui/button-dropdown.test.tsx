@@ -138,7 +138,8 @@ describe('ButtonDropdown', () => {
     expect(screen.getByTestId('leading-icon')).toBeInTheDocument()
   })
 
-  it('applies fit width classes when width is fit', () => {
+  it('applies fit width classes when width is fit', async () => {
+    const user = userEvent.setup()
     render(
       <ButtonDropdown
         label="Add grant"
@@ -150,6 +151,11 @@ describe('ButtonDropdown', () => {
     )
 
     expect(screen.getByRole('button', { name: 'Add grant' })).toHaveClass('w-fit', 'shrink-0')
+
+    await user.click(screen.getByRole('button', { name: 'Add grant' }))
+    expect(screen.getByRole('listbox', { name: 'Add grant' }).parentElement).toHaveClass(
+      'min-w-[var(--popover-menu-min-width)]',
+    )
   })
 
   it('does not apply fit width classes by default', () => {

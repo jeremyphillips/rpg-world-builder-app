@@ -253,9 +253,11 @@ describe('spell resolution formatters', () => {
 
     expect(formatResolutionProjectilesPreview(pattern)).toBe('Creates 3 darts.')
     expect(formatResolutionEffectsApplicationLabel(MAGIC_MISSILE_RESOLUTION)).toBe(
-      'Applied per dart',
+      'Applied once per dart',
     )
-    expect(formatResolutionEffectsApplicationLabel(ELDRITCH_BLAST_RESOLUTION)).toBe('Applied once')
+    expect(formatResolutionEffectsApplicationLabel(ELDRITCH_BLAST_RESOLUTION)).toBe(
+      'Applied once per resolution',
+    )
     expect(formatResolutionSummary(MAGIC_MISSILE_RESOLUTION)).toContain('Creates 3 darts.')
   })
 
@@ -268,7 +270,7 @@ describe('spell resolution formatters', () => {
 
     expect(formatResolutionProjectilesPreview(pattern)).toBe('Creates 2 projectiles.')
     expect(formatResolutionEffectsApplicationLabel({ applicationPattern: pattern })).toBe(
-      'Applied per projectile',
+      'Applied once per projectile',
     )
   })
 })

@@ -6,19 +6,50 @@ shapes: [`field-config.ts`](../../src/form/field-config.ts). Runnable examples: 
 
 ## Standard leaf types (brief)
 
-| `type`      | Value     | Notes                                            |
-| ----------- | --------- | ------------------------------------------------ |
-| `text`      | `string`  | Optional `inputType`, `autoComplete`             |
-| `number`    | `number`  | `min`/`max` for Zod only; `digits`, `inputWidth` |
-| `textarea`  | `string`  | `rows`                                           |
-| `select`    | `string`  | Flat or grouped options; `optionAvailability`    |
-| `radio`     | `string`  | `orientation`, `labelHidden`                     |
-| `radioCard` | `string`  | Card-style options with `meta` / `badge`         |
-| `checkbox`  | `boolean` |                                                  |
-| `switch`    | `boolean` | `labelPosition`: `inline`, `above`, `settings`   |
-| `file`      | `File[]`  | `accept`, `multiple`, `maxFiles`, `maxSize`      |
+| `type`      | Value     | Notes                                                     |
+| ----------- | --------- | --------------------------------------------------------- |
+| `text`      | `string`  | Optional `inputType`, `autoComplete`                      |
+| `number`    | `number`  | `min`/`max` for Zod only; `digits`, `inputWidth`          |
+| `textarea`  | `string`  | `rows`, optional `optionalDisclosure` (v1: textarea only) |
+| `select`    | `string`  | Flat or grouped options; `optionAvailability`             |
+| `radio`     | `string`  | `orientation`, `labelHidden`                              |
+| `radioCard` | `string`  | Card-style options with `meta` / `badge`                  |
+| `checkbox`  | `boolean` |                                                           |
+| `switch`    | `boolean` | `labelPosition`: `inline`, `above`, `settings`            |
+| `file`      | `File[]`  | `accept`, `multiple`, `maxFiles`, `maxSize`               |
 
 `select` and `combobox` fields default to `Select {label}…` when `placeholder` is omitted.
+
+## Optional disclosure (`optionalDisclosure`)
+
+Collapses empty optional prose fields behind a compact **+ Add …** control. When expanded
+(or when populated and `expandWhenPopulated` is true), the field label and control render
+with a **Remove** action that clears the value and collapses back to the add control.
+
+**v1:** renderer support is **textarea only**. `OPTIONAL_DISCLOSURE_FIELD_KINDS` lists
+`text`, `textarea`, and `richtext` for future enablement; dev guards log when
+`optionalDisclosure` is used on unimplemented kinds.
+
+```ts
+{
+  type: 'textarea',
+  name: 'note',
+  label: 'Additional behavior',
+  placeholder: 'Describe behavior not modeled above...',
+  optionalDisclosure: {
+    addLabel: 'Add additional behavior',
+    removeLabel: 'Remove',
+    expandWhenPopulated: true,
+  },
+}
+```
+
+- **Incompatible with `required: true`** — optional disclosure is for schema-optional
+  fields only; dev builds log when both are set.
+- **Collapsed fields unmount** — empty values take no vertical space; populated values stay
+  expanded by default.
+- Primitive: `OptionalFieldDisclosure` in `@rpg/ui` for bespoke composition outside
+  `<Form>`.
 
 ## Rich text (`richtext`)
 

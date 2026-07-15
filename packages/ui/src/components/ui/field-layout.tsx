@@ -48,10 +48,14 @@ export function FieldLayout({
   if (hintPosition === 'below-label') {
     return (
       <>
-        <div className={fieldLabelHintStackClasses}>
-          {label}
+        {label ? (
+          <div className={fieldLabelHintStackClasses}>
+            {label}
+            <Field.Hint />
+          </div>
+        ) : (
           <Field.Hint />
-        </div>
+        )}
         {chromedControl}
         <Field.Error />
       </>

@@ -1,12 +1,27 @@
 import { describe, expect, it, vi } from 'vitest'
 
-import { createOutcomeApplicationAppendValue } from './resolution-outcome-form-fields'
+import { createOutcomeApplicationAppendValue } from './resolution-outcome-applications-form-fields'
 import {
   appendOutcomeApplication,
   readOutcomeApplications,
 } from './resolution-outcome-applications.lib'
 import type { ResolutionFormValues } from './resolution-form-schema'
 import { RESOLUTION_FIELD_NAME } from './resolution-form-values'
+
+const effects: ResolutionFormValues['effects'] = [
+  {
+    id: 'damage',
+    kind: 'damage',
+    roll: { dice: { count: 1, faces: 10 } },
+    damageType: 'force',
+  },
+  {
+    id: 'bonus-force',
+    kind: 'damage',
+    roll: { dice: { count: 1, faces: 4 } },
+    damageType: 'force',
+  },
+]
 
 const baseResolution: ResolutionFormValues = {
   targetCount: 1,
@@ -16,24 +31,11 @@ const baseResolution: ResolutionFormValues = {
   methodKind: 'attack',
   attackType: 'ranged-spell',
   applicationPatternKind: 'none',
-  effects: [
-    {
-      id: 'damage',
-      kind: 'damage',
-      roll: { dice: { count: 1, faces: 10 } },
-      damageType: 'force',
-    },
-    {
-      id: 'bonus-force',
-      kind: 'damage',
-      roll: { dice: { count: 1, faces: 4 } },
-      damageType: 'force',
-    },
-  ],
+  effects,
   outcomes: [
     {
       result: 'hit',
-      applications: [createOutcomeApplicationAppendValue('damage')],
+      applications: [createOutcomeApplicationAppendValue('damage', 'hit', effects)],
     },
     { result: 'miss', applications: [] },
   ],
@@ -48,7 +50,7 @@ describe('resolution outcome application helpers', () => {
     const setValue = vi.fn()
     const getValues = vi.fn(() => baseResolution)
 
-    appendOutcomeApplication(getValues, setValue, 1, 'bonus-force')
+    appendOutcomeApplication(getValues, setValue, 1, 'bonus-force', 'miss', effects)
 
     expect(setValue).toHaveBeenCalledWith(
       `${RESOLUTION_FIELD_NAME}.outcomes`,
@@ -56,7 +58,7 @@ describe('resolution outcome application helpers', () => {
         baseResolution.outcomes![0],
         {
           result: 'miss',
-          applications: [createOutcomeApplicationAppendValue('bonus-force')],
+          applications: [createOutcomeApplicationAppendValue('bonus-force', 'miss', effects)],
         },
       ],
       { shouldDirty: true, shouldValidate: false },

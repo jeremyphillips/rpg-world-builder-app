@@ -11,7 +11,22 @@ export const COMBOBOX_TRIGGER_OVERLAP_OFFSET = {
 
 /** Popover panel wrapping the search field and scrollable option list. */
 export const comboboxContentVariants = cva(
-  'z-50 w-[var(--radix-popover-trigger-width)] overflow-hidden rounded-md border border-border bg-popover p-0 text-popover-foreground shadow-md outline-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2',
+  'z-50 overflow-hidden rounded-md border border-border bg-popover p-0 text-popover-foreground shadow-md outline-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2',
+  {
+    variants: {
+      /**
+       * `match` — panel width follows the trigger (field comboboxes).
+       * `fit` — panel grows to at least `--popover-menu-min-width` (fit triggers).
+       */
+      triggerWidth: {
+        match: 'w-[var(--radix-popover-trigger-width)] min-w-[var(--radix-popover-trigger-width)]',
+        fit: 'w-max min-w-[var(--popover-menu-min-width)]',
+      },
+    },
+    defaultVariants: {
+      triggerWidth: 'match',
+    },
+  },
 )
 
 /**

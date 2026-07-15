@@ -56,8 +56,8 @@ describe('SpellResolutionEditor', () => {
 
     await waitFor(() => {
       expect(screen.getByRole('group', { name: /Effects & outcomes/ })).toBeInTheDocument()
-      expect(screen.getByRole('group', { name: 'Authored effects' })).toBeInTheDocument()
-      expect(screen.getByText('Applied once')).toBeInTheDocument()
+      expect(screen.getByRole('group', { name: /^Authored effects/ })).toBeInTheDocument()
+      expect(screen.getByText('Applied once per resolution')).toBeInTheDocument()
       expect(screen.getByRole('button', { name: /(Collapse|Expand) Damage/ })).toBeInTheDocument()
       expect(screen.getByText('Inflicts 1d10 Force damage.')).toBeInTheDocument()
       expect(screen.getAllByRole('button', { name: /^Remove Damage$/ })).toHaveLength(1)
@@ -152,7 +152,7 @@ describe('SpellResolutionEditor', () => {
       expect(screen.getAllByText('Target').length).toBeGreaterThan(0)
       expect(screen.getAllByText('How it resolves').length).toBeGreaterThan(0)
       expect(screen.getByRole('group', { name: /Effects & outcomes/ })).toBeInTheDocument()
-      expect(screen.getByRole('group', { name: 'Authored effects' })).toBeInTheDocument()
+      expect(screen.getByRole('group', { name: /^Authored effects/ })).toBeInTheDocument()
     })
   })
 
@@ -165,7 +165,7 @@ describe('SpellResolutionEditor', () => {
     )
 
     await waitFor(() => {
-      expect(screen.getByRole('group', { name: /Outcome branches/ })).toBeInTheDocument()
+      expect(screen.getByRole('group', { name: /^Outcome branches/ })).toBeInTheDocument()
       expect(screen.getByText(RESOLUTION_SECTION_LABELS.outcomesHint)).toBeInTheDocument()
       expect(screen.getByRole('heading', { name: 'On failed save' })).toBeInTheDocument()
       expect(screen.getByRole('heading', { name: 'On successful save' })).toBeInTheDocument()
@@ -224,7 +224,7 @@ describe('SpellResolutionEditor', () => {
       expect(screen.getAllByText('Automatic').length).toBeGreaterThan(0)
       expect(screen.getAllByText('Projectiles').length).toBeGreaterThan(0)
       expect(screen.getAllByText('Creates 3 darts.').length).toBeGreaterThan(0)
-      expect(screen.getByText('Applied per dart')).toBeInTheDocument()
+      expect(screen.getByText('Applied once per dart')).toBeInTheDocument()
       expect(screen.getAllByText('1d4+1 Force damage').length).toBeGreaterThan(0)
     })
   })
@@ -238,7 +238,7 @@ describe('SpellResolutionEditor', () => {
     )
 
     await waitFor(() => {
-      expect(screen.getByText('Applied per dart')).toBeInTheDocument()
+      expect(screen.getByText('Applied once per dart')).toBeInTheDocument()
     })
 
     await expectNoAxeViolations(container)

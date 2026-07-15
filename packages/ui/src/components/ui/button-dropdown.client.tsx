@@ -171,7 +171,9 @@ export function ButtonDropdown({
           side="bottom"
           avoidCollisions
           sideOffset={4}
-          className={cn(comboboxContentVariants(), 'min-w-[var(--radix-popover-trigger-width)]')}
+          className={comboboxContentVariants({
+            triggerWidth: width === 'fit' ? 'fit' : 'match',
+          })}
           onOpenAutoFocus={(event) => {
             event.preventDefault()
             focusPanelOnOpen()

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import type { ArrayConfig, FormItem, GroupConfig } from '@rpg/ui/form'
+import type { ArrayConfig, FormItem } from '@rpg/ui/form'
 
 import {
   outcomeApplicationsReferenceEffect,
@@ -20,8 +20,8 @@ function findResolutionEffectsArray(fields: FormItem[]): ArrayConfig | undefined
       return field
     }
 
-    if ('kind' in field && field.kind === 'group') {
-      const nested = findResolutionEffectsArray((field as GroupConfig).fields)
+    if ('kind' in field && (field.kind === 'group' || field.kind === 'stack')) {
+      const nested = findResolutionEffectsArray(field.fields)
       if (nested) return nested
     }
   }

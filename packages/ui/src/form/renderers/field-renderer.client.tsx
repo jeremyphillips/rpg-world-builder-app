@@ -25,6 +25,7 @@ import { resolveNestedFieldErrorMessage } from '../errors/resolve-field-error-me
 import { DiceFormulaFieldRenderer } from './dice-formula-field-renderer.client'
 import { buildFieldRendererIds, resolveFieldRenderConfig } from './field-renderer-config.lib'
 import { renderSpecializedField } from './field-renderer-specialized.client'
+import { OptionalDisclosureTextareaFieldRenderer } from './optional-disclosure-field-renderer.client'
 import { LazyFieldSuspense, lazyFieldComponent } from './lazy-field.client'
 import type {
   FieldConfig,
@@ -38,6 +39,7 @@ import type {
   RollValueFieldConfig,
 } from '../field-config'
 import { fieldDefaultValue } from '../field-config'
+import { assertOptionalDisclosureFieldConfig } from '../config/optional-disclosure-config.lib'
 import { useDependsOnValues } from '../config/form-depends-on.client'
 import { useFormSectionContext } from '../context/form-section.context'
 import type { JsonFieldProps } from '../../components/ui/json-field.client'
@@ -500,6 +502,20 @@ function StandardFieldRenderer({
       resolveNestedFieldErrorMessage(errors, fullName),
     fullName,
   )
+  assertOptionalDisclosureFieldConfig(config)
+
+  if (renderConfig.type === 'textarea' && renderConfig.optionalDisclosure) {
+    return (
+      <OptionalDisclosureTextareaFieldRenderer
+        config={renderConfig}
+        disclosure={renderConfig.optionalDisclosure}
+        field={field}
+        id={id}
+        {...validation}
+      />
+    )
+  }
+
   // The registry is keyed by the literal type; TS can't prove the union element
   // matches a single entry, so widen the call signature at this one boundary.
   const render = fieldRenderers[renderConfig.type] as (

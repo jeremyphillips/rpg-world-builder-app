@@ -26,17 +26,17 @@ export function formatResolutionProjectilesPreview(
   return `Creates ${count} ${word}.`
 }
 
-/** Supporting label for the Effects section — e.g. "Applied once" / "Applied per dart". */
+/** Supporting label for the Effects section — e.g. "Applied once per resolution" / "Applied once per projectile". */
 export function formatResolutionEffectsApplicationLabel(
   resolution: Pick<SpellResolution, 'applicationPattern'>,
 ): string {
   const pattern = resolution.applicationPattern
   if (!pattern || pattern.kind !== 'projectiles') {
-    return 'Applied once'
+    return 'Applied once per resolution'
   }
 
   const { singular } = resolveProjectilesUnitLabel(pattern)
-  return `Applied per ${singular}`
+  return `Applied once per ${singular}`
 }
 
 /** Formats an application pattern for preview panels. */
