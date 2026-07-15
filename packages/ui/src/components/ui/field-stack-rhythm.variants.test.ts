@@ -16,6 +16,7 @@ import {
 } from './field.variants'
 import {
   fieldSizeToArrayAddButtonSize,
+  resolveArrayAddButtonSize,
   buttonSizeToComboboxFieldSize,
 } from './field-sizing.variants'
 import { richTextEditorProseClasses, richTextProseSizeClasses } from './rich-text-content.variants'
@@ -109,6 +110,13 @@ describe('fieldSizeToArrayAddButtonSize', () => {
     expect(fieldSizeToArrayAddButtonSize.sm).toBe('default')
     expect(fieldSizeToArrayAddButtonSize.md).toBe('default')
     expect(fieldSizeToArrayAddButtonSize.lg).toBe('lg')
+  })
+})
+
+describe('resolveArrayAddButtonSize', () => {
+  it('prefers an explicit override over section rhythm', () => {
+    expect(resolveArrayAddButtonSize('md', 'sm')).toBe('sm')
+    expect(resolveArrayAddButtonSize('sm')).toBe('default')
   })
 })
 

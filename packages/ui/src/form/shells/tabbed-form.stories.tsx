@@ -212,7 +212,7 @@ const arrayValidationTabs: TabbedFormTab[] = [
         kind: 'array',
         name: 'features',
         legend: 'Features',
-        addLabel: 'Add feature',
+        addActionLabel: 'Add feature',
         min: 1,
         itemVariant: 'detailed',
         itemCollapsible: true,

@@ -14,7 +14,7 @@ import {
 const VOCAB_LABEL_WEIGHT = 0.8
 const VOCAB_DESCRIPTION_WEIGHT = 0.8
 
-export type GrantArrayAddMenuConfig = NonNullable<ArrayConfig['addMenu']>
+export type GrantArrayAddMenuConfig = NonNullable<ArrayConfig['addActionMenu']>
 
 function buildTemplateSearchTerms(template: GrantTemplate): WeightedSearchField[] {
   const fields: WeightedSearchField[] = [

@@ -20,7 +20,7 @@ import type {
 import type { ButtonVariantProps } from '../components/ui/button.variants'
 import type { FieldSize } from '../components/ui/field.client'
 import type { ComboboxRenderSelectedItem } from '../components/ui/combobox-field.types'
-import type { WeightedSearchField } from '../lib/search'
+import type { FieldChrome } from '../components/ui/field-chrome.variants'
 import type { FieldWidth } from '../components/ui/field-control.variants'
 import type { FieldDigits } from '../components/ui/field-digit-metrics'
 import { isInlineSentenceBoundSegment } from '../components/ui/inline-sentence-field.lib'
@@ -33,7 +33,7 @@ import type {
   FieldStackDependentsTone,
 } from '../components/ui/field-stack.variants'
 import type { FieldGroupFieldsChrome } from '../components/ui/field-group-chrome.variants'
-import type { FieldChrome } from '../components/ui/field-chrome.variants'
+import type { ArrayAddMenuConfig } from './config/array-add-menu.lib'
 import type {
   FieldHintPosition,
   FieldGroupLegendSize,
@@ -679,6 +679,9 @@ export type ArrayCompactInlineAlign = 'start' | 'center'
 /** How array items may be reordered. Defaults to `dragHandle`. */
 export type ArrayItemReorder = false | 'dragHandle'
 
+/** Placement of the array add control relative to the section legend. */
+export type ArrayAddActionLayout = 'stacked' | 'inline'
+
 export type { FormIssue, FormIssueScope, FormIssueSeverity } from './errors/form-issue.types'
 
 /** Context for mapping a row-level/cross-row issue to a focusable field name. */
@@ -753,13 +756,25 @@ export interface ArrayConfig {
   size?: FieldSize
   /** Field configs for each item; names are relative to the item, not the root. */
   fields: FormItem[]
-  /** Label for the "Add" button. Defaults to `"Add item"`. */
-  addLabel?: string
+  /** Label for the add action button. Defaults to `"Add item"`. */
+  addActionLabel?: string
   /**
-   * Visual style for the add control — mirrors `Button` / `ButtonDropdown` `variant`.
+   * Visual style for the add action — mirrors `Button` / `ButtonDropdown` `variant`.
    * Defaults to `outline`.
    */
-  addVariant?: NonNullable<ButtonVariantProps['variant']>
+  addActionVariant?: NonNullable<ButtonVariantProps['variant']>
+  /**
+   * Add action placement — `stacked` (default) renders below items; `inline` aligns
+   * the control to the right of the section legend.
+   */
+  addActionLayout?: ArrayAddActionLayout
+  /**
+   * Button size for the add action — overrides the size inferred from section
+   * rhythm (`sm`/`md` → `default`, `lg` → `lg`).
+   */
+  addActionSize?: NonNullable<ButtonVariantProps['size']>
+  /** Searchable template menu for the add action; replaces the plain button when set. */
+  addActionMenu?: ArrayAddMenuConfig
   /** Minimum item count; removes the "Remove" button while at the floor. */
   min?: number
   /** Maximum item count; hides the "Add" button once reached. */
@@ -800,8 +815,8 @@ export interface ArrayConfig {
   /** Supplies default values for a newly appended row. */
   appendDefaults?: (items: unknown[]) => Record<string, unknown>
 
-  /** When true, hides the default array add control (use an external slot instead). */
-  hideAddControl?: boolean
+  /** When true, hides the default array add action (use an external slot instead). */
+  hideAddAction?: boolean
 
   /** When true, omits the default per-item remove control (use `itemRemoveSlot` instead). */
   hideItemRemove?: boolean
@@ -812,22 +827,6 @@ export interface ArrayConfig {
    * fully replaces generic removal.
    */
   itemRemoveSlot?: Pick<SlotConfig, 'name' | 'render' | 'visibility'>
-
-  /** Searchable template menu for the add control; replaces the plain add button when set. */
-  addMenu?: {
-    groups: { id: string; label: string }[]
-    items: {
-      id: string
-      label: string
-      description?: string
-      groupId?: string
-      searchTerms?: WeightedSearchField[]
-      appendDefaults: Record<string, unknown> | (() => Record<string, unknown>)
-      isDuplicate?: (items: unknown[]) => boolean
-      duplicatePolicy?: 'allow' | 'warn' | 'block'
-    }[]
-    enableSearch?: boolean
-  }
 
   /** Field names whose values are passed to `filterSelectOptions` as `watchedValues`. */
   filterSelectDependsOn?: string[]

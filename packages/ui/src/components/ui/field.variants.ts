@@ -67,6 +67,9 @@ export const fieldArrayLegendTypographyClasses =
 /** Compact array section legend — follows section `size: 'sm'` (14px). */
 export const fieldArrayLegendSmTypographyClasses =
   'text-sm font-heading leading-none text-foreground'
+/** Legend row when the add action sits inline with the array heading. */
+export const arrayFieldLegendInlineLayoutClasses = 'flex w-full items-center justify-between gap-4'
+export const arrayFieldLegendInlineLabelClasses = 'flex min-w-0 items-center gap-2'
 
 export type FieldArrayItemLayoutVariant = 'compact' | 'detailed'
 

@@ -146,7 +146,7 @@ Dependent stack with an array dependent — use `arrayItems` scope:
       kind: 'array',
       name: 'caps',
       legend: '',
-      addLabel: 'Add class limit',
+      addActionLabel: 'Add class limit',
       fields: [/* … */],
     },
   ],
@@ -176,10 +176,10 @@ use `itemChrome` or stack `dependentsChrome` + `dependentsChromeScope: 'arrayIte
     { type: 'text', name: 'name', label: 'Trait name', required: true },
     { type: 'textarea', name: 'description', label: 'Description' },
   ],
-  addLabel: 'Add trait',
+  addActionLabel: 'Add trait',
   min: 0,
   max: 10,
-  addVariant: 'outline',
+  addActionVariant: 'outline',
   itemHeader: {
     fallback: (i) => `Trait ${i + 1}`,
     primaryField: 'name',
@@ -267,19 +267,21 @@ inside a `FieldRow` within the grip/actions grid — leaf `width` tokens (`full`
 | `itemCollapseKey` | Stable row field for persisted collapse overrides (default `'id'`; else `index:${index}`). |
 | `reorder` | `'dragHandle'` (default) or `false` for fixed order. |
 | `appendDefaults` | `(items) => defaults` replaces static defaults on append. |
-| `addVariant` | Button visual style for the add control — mirrors `Button` `variant`; defaults to `outline`. |
-| `hideAddControl` | Omits the default add button (use an external slot instead). |
+| `addActionVariant` | Button visual style for the add control — mirrors `Button` `variant`; defaults to `outline`. |
+| `addActionLayout` | `stacked` (default) — add control below items; `inline` — add control right-aligned in the legend row with a leading `+` icon. |
+| `addActionSize` | Optional `Button` size override for the add control (`sm`, `default`, `lg`); inherits from section rhythm when omitted. |
+| `hideAddAction` | Omits the default add button (use an external slot instead). |
 | `hideItemRemove` | Omits the default per-item remove button (not merely disabled). Use with `itemRemoveSlot`. |
 | `itemRemoveSlot` | Custom remove control in the header actions rail; receives `ArrayFieldContext`. Pair with `hideItemRemove`. |
-| `addMenu` | Searchable template dropdown for the add control; items carry `appendDefaults` and optional duplicate policy. |
+| `addActionMenu` | Searchable template dropdown for the add control; items carry `appendDefaults` and optional duplicate policy. |
 
 ```ts
 {
   kind: 'array',
   name: 'grants',
   legend: 'Grants',
-  addLabel: 'Add grant',
-  addMenu: {
+  addActionLabel: 'Add grant',
+  addActionMenu: {
     groups: [{ id: 'combat-traits', label: 'Combat & traits' }],
     items: [
       {
@@ -301,7 +303,7 @@ inside a `FieldRow` within the grip/actions grid — leaf `width` tokens (`full`
 }
 ```
 
-When `addMenu` is set, `ArrayFieldRenderer` renders `ButtonDropdown` instead of a plain add
+When `addActionMenu` is set, `ArrayFieldRenderer` renders `ButtonDropdown` instead of a plain add
 button. Selecting an item appends `appendDefaults`, expands the new row, and best-effort focuses
 the first eligible control inside it.
 | `filterSelectDependsOn` | Root field names passed to `filterSelectOptions` as `watchedValues`. |

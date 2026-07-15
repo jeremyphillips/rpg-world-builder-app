@@ -12,7 +12,7 @@ function resourceItemFields(ctx: ContentFormCtx): FormItem[] {
       kind: 'array',
       name: 'entries',
       legend: 'Level values',
-      addLabel: 'Add level value',
+      addActionLabel: 'Add level value',
       min: 1,
       itemCollapsible: true,
       itemHeader: {
@@ -54,7 +54,7 @@ export function resourcesArrayField(ctx: ContentFormCtx): FormItem {
     kind: 'array',
     name: 'resources',
     legend: 'Resources',
-    addLabel: 'Add resource',
+    addActionLabel: 'Add resource',
     itemCollapsible: true,
     itemHeader: {
       fallback: (index) => `Resource ${index + 1}`,

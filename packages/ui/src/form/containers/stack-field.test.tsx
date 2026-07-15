@@ -238,7 +238,7 @@ describe('dependent stack', () => {
             kind: 'array',
             name: 'items',
             legend: '',
-            addLabel: 'Add item',
+            addActionLabel: 'Add item',
             fields: [{ type: 'text', name: 'label', label: 'Label' }],
           },
         ],

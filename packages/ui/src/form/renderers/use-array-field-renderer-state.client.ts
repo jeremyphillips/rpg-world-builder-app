@@ -54,8 +54,10 @@ export function useArrayFieldRendererState({
   const validation = useFormValidationPresentation()
   const { rhythm, size, depth, inRhythmStack } = useFormSectionContext()
   const {
-    addLabel = 'Add item',
-    addVariant = 'outline',
+    addActionLabel = 'Add item',
+    addActionVariant = 'outline',
+    addActionLayout = 'stacked',
+    addActionSize,
     min = 0,
     max,
     legend,
@@ -108,17 +110,18 @@ export function useArrayFieldRendererState({
     addValidationSessionExpandKeys,
   })
 
-  const { appendItem, appendFromAddMenu, appendWithDefaults, addMenuItems } = useArrayFieldAppend({
-    config,
-    fullName,
-    fields,
-    append,
-    getValues,
-    watchedItems,
-    collapsible,
-    itemCollapseKey,
-    addValidationSessionExpandKeys,
-  })
+  const { appendItem, appendFromAddMenu, appendWithDefaults, addActionMenuItems } =
+    useArrayFieldAppend({
+      config,
+      fullName,
+      fields,
+      append,
+      getValues,
+      watchedItems,
+      collapsible,
+      itemCollapseKey,
+      addValidationSessionExpandKeys,
+    })
 
   const itemProps = React.useCallback(
     (rhfField: (typeof fields)[number], index: number) => ({
@@ -156,9 +159,11 @@ export function useArrayFieldRendererState({
   )
 
   return {
-    addLabel,
-    addVariant,
-    addMenuItems,
+    addActionLabel,
+    addActionVariant,
+    addActionLayout,
+    addActionSize,
+    addActionMenuItems,
     appendFromAddMenu,
     appendItem,
     appendWithDefaults,

@@ -117,7 +117,7 @@ describe('speciesLevelLimitsFields', () => {
     expect(stack.fields[1]).toMatchObject({
       kind: 'array',
       name: 'classLevelCaps',
-      addLabel: 'Add class limit',
+      addActionLabel: 'Add class limit',
     })
   })
 })

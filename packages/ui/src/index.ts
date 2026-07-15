@@ -103,6 +103,7 @@ export {
   fieldGroupedControlSizeClasses,
   buttonSizeToComboboxFieldSize,
   fieldSizeToArrayAddButtonSize,
+  resolveArrayAddButtonSize,
   fieldSizeToBadgeSize,
   fieldSizeToChipSize,
   fieldSizeTypographyClasses,

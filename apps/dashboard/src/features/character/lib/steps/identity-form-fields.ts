@@ -30,7 +30,7 @@ function narrativeArrayField(
   name: 'personalityTraits' | 'ideals' | 'bonds' | 'flaws',
   legend: string,
   placeholder: string,
-  addLabel: string,
+  addActionLabel: string,
   hideItemLabel: boolean = true,
 ): FormItem {
   return {
@@ -38,10 +38,12 @@ function narrativeArrayField(
     name: `narrative.${name}`,
     legend,
     itemVariant: 'compact',
+    addActionLayout: 'inline',
+    addActionVariant: 'ghost',
+    addActionSize: 'sm',
     reorder: false,
     min: 1,
     itemChrome: 'subtle',
-    addVariant: 'secondary',
     size: 'md',
     fields: [
       {
@@ -57,7 +59,7 @@ function narrativeArrayField(
         ],
       },
     ],
-    addLabel,
+    addActionLabel,
     itemHeader: {
       fallback: (index) => `${legend} ${index + 1}`,
     },

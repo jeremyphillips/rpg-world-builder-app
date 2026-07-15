@@ -52,7 +52,7 @@ const collapsibleTraitFields: FormItem[] = [
       summary: (values) => (values.description as string) || 'No description',
     },
     fields: traitFields,
-    addLabel: 'Add trait',
+    addActionLabel: 'Add trait',
   },
 ]
 
@@ -68,7 +68,7 @@ const collapsibleTraitFieldsSimpleHeader: FormItem[] = [
       primaryField: 'name',
     },
     fields: traitFields,
-    addLabel: 'Add trait',
+    addActionLabel: 'Add trait',
   },
 ]
 
@@ -79,7 +79,7 @@ const fields: FormItem[] = [
     name: 'traits',
     legend: 'Traits',
     fields: traitFields,
-    addLabel: 'Add trait',
+    addActionLabel: 'Add trait',
   },
 ]
 
@@ -138,7 +138,7 @@ describe('ArrayFieldRenderer', () => {
             kind: 'array',
             name: 'caps',
             legend: '',
-            addLabel: 'Add class limit',
+            addActionLabel: 'Add class limit',
             fields: [{ type: 'text', name: 'classId', label: 'Class' }],
           },
         ],
@@ -181,7 +181,7 @@ describe('ArrayFieldRenderer', () => {
         legend: 'Traits',
         itemChrome: 'subtle',
         fields: traitFields,
-        addLabel: 'Add trait',
+        addActionLabel: 'Add trait',
       },
     ]
 
@@ -211,15 +211,82 @@ describe('ArrayFieldRenderer', () => {
     expect(addButton).not.toHaveClass('bg-secondary')
   })
 
-  it('applies addVariant on the add control', () => {
+  it('renders inline add actions in the legend row with a leading plus icon', () => {
+    const inlineFields: FormItem[] = [
+      {
+        kind: 'array',
+        name: 'traits',
+        legend: 'Movement',
+        fields: traitFields,
+        addActionLabel: 'Add speed',
+        addActionLayout: 'inline',
+      },
+    ]
+
+    const { container } = render(
+      <Form<Values>
+        schema={schema}
+        fields={inlineFields}
+        onSubmit={vi.fn()}
+        footer={<button type="submit">Save</button>}
+      />,
+    )
+
+    const fieldset = container.querySelector('fieldset')!
+    const legend = fieldset.querySelector('legend')
+    const addButton = screen.getByRole('button', { name: 'Add speed' })
+
+    expect(legend).toHaveTextContent('Movement')
+    expect(legend).toContainElement(addButton)
+    expect(addButton.querySelector('svg')).toBeTruthy()
+    expect(screen.getAllByRole('button', { name: 'Add speed' })).toHaveLength(1)
+  })
+
+  it('keeps stacked add actions below the item list', () => {
+    renderForm()
+
+    const fieldset = screen.getByRole('group', { name: /Traits/i })
+    const addButton = screen.getByRole('button', { name: 'Add trait' })
+    const legend = fieldset.querySelector('legend')
+
+    expect(legend).not.toContainElement(addButton)
+  })
+
+  it('applies addActionSize on the add control', () => {
+    const sizedFields: FormItem[] = [
+      {
+        kind: 'array',
+        name: 'traits',
+        legend: 'Traits',
+        fields: traitFields,
+        addActionLabel: 'Add trait',
+        addActionSize: 'sm',
+      },
+    ]
+
+    render(
+      <Form<Values>
+        schema={schema}
+        fields={sizedFields}
+        onSubmit={vi.fn()}
+        footer={<button type="submit">Save</button>}
+      />,
+    )
+
+    const addButton = screen.getByRole('button', { name: 'Add trait' })
+    expect(addButton).toHaveClass('h-8')
+    expect(addButton).toHaveClass('text-xs')
+  })
+
+  it('applies addActionVariant on the add control', () => {
     const secondaryFields: FormItem[] = [
       {
         kind: 'array',
         name: 'traits',
         legend: 'Traits',
         fields: traitFields,
-        addLabel: 'Add trait',
-        addVariant: 'secondary',
+        addActionLabel: 'Add trait',
+        addActionVariant: 'secondary',
       },
     ]
 
@@ -237,21 +304,21 @@ describe('ArrayFieldRenderer', () => {
     expect(addButton).not.toHaveClass('border-input')
   })
 
-  it('applies addVariant on addMenu dropdown triggers', async () => {
+  it('applies addActionVariant on addActionMenu dropdown triggers', async () => {
     const user = userEvent.setup()
     const grantSchema = z.object({
       grants: z.array(z.object({ grantType: z.string().optional() })),
     })
 
-    const addMenuFields: FormItem[] = [
+    const addActionMenuFields: FormItem[] = [
       {
         kind: 'array',
         name: 'grants',
         legend: 'Grants',
-        addLabel: 'Add grant',
-        addVariant: 'default',
+        addActionLabel: 'Add grant',
+        addActionVariant: 'default',
         fields: [{ type: 'text', name: 'grantType', label: 'Grant type' }],
-        addMenu: {
+        addActionMenu: {
           groups: [{ id: 'traits', label: 'Traits' }],
           items: [
             {
@@ -268,7 +335,7 @@ describe('ArrayFieldRenderer', () => {
     render(
       <Form<z.infer<typeof grantSchema>>
         schema={grantSchema}
-        fields={addMenuFields}
+        fields={addActionMenuFields}
         onSubmit={vi.fn()}
         footer={<button type="submit">Save</button>}
       />,
@@ -301,7 +368,7 @@ describe('ArrayFieldRenderer', () => {
         legend: 'Traits',
         rhythm: 'comfortable',
         fields: traitFields,
-        addLabel: 'Add trait',
+        addActionLabel: 'Add trait',
       },
     ]
 
@@ -380,7 +447,7 @@ describe('ArrayFieldRenderer', () => {
         name: 'traits',
         legend: 'Traits',
         fields: traitFields,
-        addLabel: 'Add trait',
+        addActionLabel: 'Add trait',
         max: 1,
       },
     ]
@@ -405,7 +472,7 @@ describe('ArrayFieldRenderer', () => {
         name: 'traits',
         legend: 'Traits',
         fields: traitFields,
-        addLabel: 'Add trait',
+        addActionLabel: 'Add trait',
         min: 1,
       },
     ]
@@ -430,7 +497,7 @@ describe('ArrayFieldRenderer', () => {
         name: 'traits',
         legend: 'Traits',
         fields: traitFields,
-        addLabel: 'Add trait',
+        addActionLabel: 'Add trait',
         hideItemRemove: true,
       },
     ]
@@ -454,7 +521,7 @@ describe('ArrayFieldRenderer', () => {
         name: 'traits',
         legend: 'Traits',
         fields: traitFields,
-        addLabel: 'Add trait',
+        addActionLabel: 'Add trait',
         hideItemRemove: true,
         itemRemoveSlot: {
           name: '_customTraitRemove',
@@ -492,7 +559,7 @@ describe('ArrayFieldRenderer', () => {
         kind: 'array',
         name: 'grants',
         legend: 'Grants',
-        addLabel: 'Add grant',
+        addActionLabel: 'Add grant',
         fields: [
           {
             type: 'text',
@@ -513,7 +580,7 @@ describe('ArrayFieldRenderer', () => {
             kind: 'array',
             name: 'entries',
             legend: 'Innate spell entries',
-            addLabel: 'Add entry',
+            addActionLabel: 'Add entry',
             visibility: {
               dependsOn: ['grantType'],
               visibleWhen: (v) => v.grantType === 'innateSpells',
@@ -567,7 +634,7 @@ describe('ArrayFieldRenderer', () => {
             },
           },
         ],
-        addLabel: 'Add entry',
+        addActionLabel: 'Add entry',
       },
     ]
 
@@ -617,14 +684,14 @@ describe('ArrayFieldRenderer', () => {
         kind: 'array',
         name: 'items',
         legend: 'Items',
-        addLabel: 'Add item',
+        addActionLabel: 'Add item',
         fields: [
           { type: 'text', name: 'name', label: 'Name' },
           {
             kind: 'array',
             name: 'tags',
             legend: 'Tags',
-            addLabel: 'Add tag',
+            addActionLabel: 'Add tag',
             fields: [{ type: 'text', name: 'label', label: 'Label' }],
           },
         ],
@@ -656,7 +723,7 @@ describe('ArrayFieldRenderer', () => {
         legend: 'Traits',
         reorder: false,
         fields: traitFields,
-        addLabel: 'Add trait',
+        addActionLabel: 'Add trait',
       },
     ]
 
@@ -870,7 +937,7 @@ describe('ArrayFieldRenderer', () => {
         legend: 'Traits',
         itemVariant: 'compact',
         fields: traitFields,
-        addLabel: 'Add trait',
+        addActionLabel: 'Add trait',
         itemHeader: { fallback: (index) => `Trait ${index + 1}`, srOnly: true },
       },
     ]
@@ -911,7 +978,7 @@ describe('ArrayFieldRenderer', () => {
             ],
           },
         ],
-        addLabel: 'Add grant',
+        addActionLabel: 'Add grant',
         itemHeader: { fallback: (index) => `Grant ${index + 1}`, srOnly: true },
       },
     ]
@@ -969,7 +1036,7 @@ describe('ArrayFieldRenderer', () => {
             ],
           },
         ],
-        addLabel: 'Add utilize action',
+        addActionLabel: 'Add utilize action',
         itemHeader: { fallback: (index) => `Action ${index + 1}`, primaryField: 'description' },
       },
     ]
@@ -1014,7 +1081,7 @@ describe('ArrayFieldRenderer', () => {
             fields: [{ type: 'text', name: 'value', label: '', placeholder: 'Example…' }],
           },
         ],
-        addLabel: 'Add example',
+        addActionLabel: 'Add example',
         itemHeader: { fallback: (index) => `Example ${index + 1}`, primaryField: 'value' },
       },
     ]
@@ -1158,7 +1225,7 @@ describe('ArrayFieldRenderer', () => {
           { type: 'text', name: 'rarity', label: 'Rarity', required: true },
           { type: 'text', name: 'quantity', label: 'Quantity', required: true },
         ],
-        addLabel: 'Add grant',
+        addActionLabel: 'Add grant',
         min: 1,
         itemHeader: { fallback: (index) => `Grant ${index + 1}`, srOnly: true },
       },
@@ -1186,7 +1253,7 @@ describe('ArrayFieldRenderer', () => {
     expect(screen.getByRole('alert')).toHaveTextContent('Choose a rarity. · Quantity is required.')
   })
 
-  it('appends defaults from addMenu selections', async () => {
+  it('appends defaults from addActionMenu selections', async () => {
     const user = userEvent.setup()
     const grantSchema = z.object({
       grants: z.array(
@@ -1197,18 +1264,18 @@ describe('ArrayFieldRenderer', () => {
       ),
     })
 
-    const addMenuFields: FormItem[] = [
+    const addActionMenuFields: FormItem[] = [
       {
         kind: 'array',
         name: 'grants',
         legend: 'Grants',
-        addLabel: 'Add grant',
+        addActionLabel: 'Add grant',
         itemCollapsible: true,
         itemHeader: {
           fallback: (index) => `Grant ${index + 1}`,
           primary: (values) => (values.grantType as string | undefined) ?? undefined,
         },
-        addMenu: {
+        addActionMenu: {
           groups: [{ id: 'traits', label: 'Traits' }],
           items: [
             {
@@ -1236,7 +1303,7 @@ describe('ArrayFieldRenderer', () => {
     render(
       <Form<z.infer<typeof grantSchema>>
         schema={grantSchema}
-        fields={addMenuFields}
+        fields={addActionMenuFields}
         onSubmit={vi.fn()}
         footer={<button type="submit">Save</button>}
       />,
@@ -1254,7 +1321,7 @@ describe('ArrayFieldRenderer', () => {
     expect(screen.getByRole('textbox', { name: 'Grant type' })).toHaveFocus()
   })
 
-  it('applies duplicate policy states in addMenu', async () => {
+  it('applies duplicate policy states in addActionMenu', async () => {
     const user = userEvent.setup()
     const grantSchema = z.object({
       grants: z.array(z.object({ grantType: z.string().optional() })),
@@ -1265,8 +1332,8 @@ describe('ArrayFieldRenderer', () => {
         kind: 'array',
         name: 'grants',
         legend: 'Grants',
-        addLabel: 'Add grant',
-        addMenu: {
+        addActionLabel: 'Add grant',
+        addActionMenu: {
           groups: [{ id: 'traits', label: 'Traits' }],
           items: [
             {

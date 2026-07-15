@@ -32,9 +32,9 @@ function findResolutionEffectsArray(fields: FormItem[]): ArrayConfig | undefined
 describe('resolutionFields effects array', () => {
   it('hides the generic add control in favor of the resolution-specific add slot', () => {
     const arrayField = findResolutionEffectsArray(resolutionFields({}))
-    expect(arrayField?.hideAddControl).toBe(true)
+    expect(arrayField?.hideAddAction).toBe(true)
     expect(arrayField?.hideItemRemove).toBe(true)
-    expect(arrayField?.addMenu).toBeUndefined()
+    expect(arrayField?.addActionMenu).toBeUndefined()
   })
 
   it('hides the generic remove control in favor of the resolution-specific header remove slot', () => {

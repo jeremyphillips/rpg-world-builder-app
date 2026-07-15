@@ -240,7 +240,7 @@ export const DependentStackArrayItemsScope: Story = {
               kind: 'array',
               name: 'caps',
               legend: '',
-              addLabel: 'Add class limit',
+              addActionLabel: 'Add class limit',
               fields: [
                 { type: 'text', name: 'classId', label: 'Class' },
                 { type: 'text', name: 'maxLevel', label: 'Max level' },

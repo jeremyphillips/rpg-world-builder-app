@@ -61,18 +61,13 @@ export function buildFeatFields(ctx: ContentFormCtx): FormItem[] {
   return [
     nameField(),
     {
-      kind: 'group',
-      legend: '',
-      fields: [
-        {
-          type: 'chips',
-          name: 'category',
-          label: 'Category',
-          options: featCategoryOptions,
-          multiple: false,
-          required: true,
-        },
-      ],
+      type: 'chips',
+      name: 'category',
+      label: 'Category',
+      options: featCategoryOptions,
+      multiple: false,
+      required: true,
+      chrome: { variant: 'outline' },
     },
     descriptionField(ctx),
     {

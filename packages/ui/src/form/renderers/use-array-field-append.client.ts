@@ -4,8 +4,8 @@
  * React hook that wires array "Add" interactions to `useFieldArray`.
  *
  * Exposes `appendItem` for the plain button path, `appendFromAddMenu` for
- * `ArrayConfig.addMenu` template selections (merge defaults, expand, focus),
- * and live `addMenuItems` with duplicate-policy presentation applied.
+ * `ArrayConfig.addActionMenu` template selections (merge defaults, expand, focus),
+ * and live `addActionMenuItems` with duplicate-policy presentation applied.
  */
 import * as React from 'react'
 import type { UseFieldArrayAppend, UseFieldArrayReturn } from 'react-hook-form'
@@ -81,19 +81,19 @@ export function useArrayFieldAppend({
 
   const appendFromAddMenu = React.useCallback(
     (itemId: string) => {
-      const menuItem = config.addMenu?.items.find((item) => item.id === itemId)
+      const menuItem = config.addActionMenu?.items.find((item) => item.id === itemId)
       if (!menuItem) return
 
       const mergedDefaults = mergeArrayAddMenuDefaults(menuItem, staticItemDefaults)
       appendWithDefaults(mergedDefaults)
     },
-    [appendWithDefaults, config.addMenu?.items, staticItemDefaults],
+    [appendWithDefaults, config.addActionMenu?.items, staticItemDefaults],
   )
 
-  const addMenuItems = React.useMemo(() => {
-    if (!config.addMenu) return []
-    return buildArrayAddMenuItems(config.addMenu, watchedItems ?? [])
-  }, [config.addMenu, watchedItems])
+  const addActionMenuItems = React.useMemo(() => {
+    if (!config.addActionMenu) return []
+    return buildArrayAddMenuItems(config.addActionMenu, watchedItems ?? [])
+  }, [config.addActionMenu, watchedItems])
 
-  return { appendItem, appendFromAddMenu, appendWithDefaults, addMenuItems }
+  return { appendItem, appendFromAddMenu, appendWithDefaults, addActionMenuItems }
 }

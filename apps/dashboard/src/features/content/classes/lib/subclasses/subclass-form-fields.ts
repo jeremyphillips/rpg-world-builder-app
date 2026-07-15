@@ -44,7 +44,7 @@ export function buildSubclassFields(
       kind: 'array',
       name: 'features',
       legend: 'Features',
-      addLabel: 'Add feature',
+      addActionLabel: 'Add feature',
       itemCollapsible: true,
       itemHeader: {
         fallback: (index) => `Feature ${index + 1}`,

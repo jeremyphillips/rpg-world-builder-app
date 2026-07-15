@@ -696,14 +696,14 @@ export function grantArrayFields<T extends string>(
       kind: 'array',
       name: 'grants',
       legend: 'Grants',
-      addLabel: 'Add grant',
+      addActionLabel: 'Add grant',
       itemCollapsible: true,
       itemHeader: {
         fallback: (index) => `Grant ${index + 1}`,
         primary: (values, index) => formatGrantRowPrimary(values, index, headerContext),
         summary: (values) => formatGrantRowSummary(values, headerContext),
       },
-      addMenu: buildGrantArrayAddMenu(grantTypes as readonly GrantType[]),
+      addActionMenu: buildGrantArrayAddMenu(grantTypes as readonly GrantType[]),
       fields: grantItemFields(grantTypes, labels, ctx),
     },
   ]

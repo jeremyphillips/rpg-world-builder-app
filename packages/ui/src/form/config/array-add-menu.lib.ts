@@ -1,5 +1,5 @@
 /**
- * Pure helpers for `ArrayConfig.addMenu` presentation and append resolution.
+ * Pure helpers for `ArrayConfig.addActionMenu` presentation and append resolution.
  *
  * Evaluates duplicate-policy states against current row values and maps
  * configured menu items to `ButtonDropdown` item props at render time.
@@ -48,7 +48,7 @@ export function resolveArrayAddMenuItemPresentation(
 }
 
 export function buildArrayAddMenuItems(
-  addMenu: ArrayAddMenuConfig,
+  addActionMenu: ArrayAddMenuConfig,
   currentItems: unknown[],
 ): Array<{
   id: string
@@ -59,7 +59,7 @@ export function buildArrayAddMenuItems(
   disabled?: boolean
   note?: string
 }> {
-  return addMenu.items.map((item) => {
+  return addActionMenu.items.map((item) => {
     const presentation = resolveArrayAddMenuItemPresentation(item, currentItems)
     return {
       id: item.id,

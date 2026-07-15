@@ -6,7 +6,6 @@ import { useFieldArray, useFormContext, useWatch } from 'react-hook-form'
 import {
   fieldGroupBottomMarginClasses,
   fieldSetResetClasses,
-  resolveFieldGroupLegendClassName,
 } from '../../components/ui/field.variants'
 import { cn } from '../../lib/utils'
 import { registerArrayFieldMutators } from '../context/array-field-mutators.registry'
@@ -19,10 +18,10 @@ import { buildArraySectionChildContext } from '../containers/form-section-child-
 import { useVisibilityValues } from '../containers/form-conditional.client'
 import type { ArrayConfig } from '../field-config'
 import { ArrayFieldAddControl } from './array-field-add-control.client'
+import { ArrayFieldLegend } from './array-field-legend.client'
 import { type ArrayFieldItemContentProps } from './array-field-item-content.client'
 import { ArrayFieldItemList } from './array-field-item-list.client'
 import { useArrayFieldRendererState } from './use-array-field-renderer-state.client'
-import { ArrayLegendIssueLink } from './array-item-issue.client'
 
 export type { ArrayFieldItemContentProps }
 
@@ -65,6 +64,22 @@ export function ArrayFieldRenderer({ config, idPrefix, fullName }: ArrayFieldRen
     })
   }, [form, fullName, fields, remove, state.appendWithDefaults])
 
+  const inlineAddInLegend = state.addActionLayout === 'inline' && state.showLegend
+
+  const addControl = (
+    <ArrayFieldAddControl
+      canAdd={state.canAdd && !config.hideAddAction}
+      addActionLabel={state.addActionLabel}
+      addActionVariant={state.addActionVariant}
+      addActionLayout={state.addActionLayout}
+      addActionSize={state.addActionSize}
+      addActionMenu={config.addActionMenu}
+      addActionMenuItems={state.addActionMenuItems}
+      onAppendItem={state.appendItem}
+      onAppendFromMenu={state.appendFromAddMenu}
+    />
+  )
+
   return (
     <fieldset
       id={config.id}
@@ -75,20 +90,16 @@ export function ArrayFieldRenderer({ config, idPrefix, fullName }: ArrayFieldRen
       )}
     >
       {state.showLegend ? (
-        <legend
-          className={resolveFieldGroupLegendClassName({
-            size: state.legendSize,
-            scale: state.legendScale,
-          })}
-        >
-          {state.legend}
-          <ArrayLegendIssueLink
-            issueCount={state.arrayIssueCount}
-            invalidRowCount={state.invalidRowCount}
-            sectionLabel={state.legend}
-            onPress={state.focusFirstArrayIssue}
-          />
-        </legend>
+        <ArrayFieldLegend
+          legend={state.legend}
+          legendSize={state.legendSize}
+          legendScale={state.legendScale}
+          addActionLayout={state.addActionLayout}
+          arrayIssueCount={state.arrayIssueCount}
+          invalidRowCount={state.invalidRowCount}
+          onFocusFirstArrayIssue={state.focusFirstArrayIssue}
+          addControl={inlineAddInLegend ? addControl : undefined}
+        />
       ) : null}
       <div className={state.itemListClasses}>
         <ArrayFieldItemList
@@ -97,15 +108,7 @@ export function ArrayFieldRenderer({ config, idPrefix, fullName }: ArrayFieldRen
           itemProps={state.itemProps}
           onMove={move}
         />
-        <ArrayFieldAddControl
-          canAdd={state.canAdd && !config.hideAddControl}
-          addLabel={state.addLabel}
-          addVariant={state.addVariant}
-          addMenu={config.addMenu}
-          addMenuItems={state.addMenuItems}
-          onAppendItem={state.appendItem}
-          onAppendFromMenu={state.appendFromAddMenu}
-        />
+        {!inlineAddInLegend ? addControl : null}
       </div>
     </fieldset>
   )
