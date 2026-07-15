@@ -84,6 +84,7 @@ export {
   getSpellResolutionProximityKindLabel,
   getSpellResolutionRangeKindLabel,
   getSpellResolutionTargetKindLabel,
+  getSpellResolutionTargetKindNoun,
   SPELL_APPLICATION_PATTERN_APPLICATION_MODES,
   SPELL_APPLICATION_PATTERN_COUNT_TYPES,
   SPELL_APPLICATION_PATTERN_KIND_ENTRIES,
@@ -139,8 +140,16 @@ export {
 export {
   deriveDefaultEffectRecipient,
   isResolutionTargetConfigured,
+  resolutionEffectFormatOptions,
   type EffectRecipient,
 } from './effect-context'
+export {
+  getEffectTargetAvailability,
+  isCreatureOnlyResolutionEffectKind,
+  isEffectKindAllowedForTarget,
+  type CreatureOnlyResolutionEffectKind,
+  type EffectTargetCompatibilityContext,
+} from './effect-target-compatibility'
 export {
   formatResolutionAvailabilityReason,
   type ResolutionAvailabilityTone,
@@ -152,6 +161,8 @@ export {
   getApplicationPatternAvailability,
   getEffectKindAvailability,
   getMethodAvailability,
+  isEffectKindAllowedForState,
+  isResolutionEffectKind,
   planResolutionChange,
   resolutionChangeRequiresConfirm,
   RESOLUTION_METHOD_OPTIONS,

@@ -4,6 +4,7 @@ import {
   formatEffectRowSentence,
   type EffectRecipient,
   type SpellAtomicEffectKind,
+  type SpellResolutionTargetKind,
 } from '@rpg/contracts'
 
 import {
@@ -15,9 +16,15 @@ import type { EffectFormRow } from './effect-form-schema'
 
 export const SPELL_EFFECTS_PREVIEW_LABEL = 'Effect preview' as const
 
+type EffectRowDisplayOptions = {
+  recipient?: EffectRecipient
+  targetKind?: SpellResolutionTargetKind
+  fallbackIndex?: number
+}
+
 function buildDisplayFromFormRow(
   values: Record<string, unknown>,
-  options?: { recipient?: EffectRecipient; fallbackIndex?: number },
+  options?: EffectRowDisplayOptions,
 ) {
   const kind = typeof values.kind === 'string' ? (values.kind as SpellAtomicEffectKind) : undefined
   const roll = normalizeRollFormValue(values.roll as RollFormShape) ?? undefined
@@ -45,7 +52,7 @@ export function formatSpellEffectsPreviewLines(
 /** Returns a recipient-aware summary sentence for an effect array item header. */
 export function formatEffectRowSummary(
   values: Record<string, unknown>,
-  options?: { recipient?: EffectRecipient },
+  options?: Pick<EffectRowDisplayOptions, 'recipient' | 'targetKind'>,
 ): string {
   return buildDisplayFromFormRow(values, options).summary ?? ''
 }
@@ -54,7 +61,7 @@ export function formatEffectRowSummary(
 export function formatEffectRowPrimary(
   values: Record<string, unknown>,
   index: number,
-  options?: { recipient?: EffectRecipient },
+  options?: Pick<EffectRowDisplayOptions, 'recipient' | 'targetKind'>,
 ): string {
   return formatAtomicEffectDisplayTitle(
     buildDisplayFromFormRow(values, { ...options, fallbackIndex: index }),

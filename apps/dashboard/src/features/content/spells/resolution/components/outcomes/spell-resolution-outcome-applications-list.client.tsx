@@ -14,6 +14,7 @@ import {
 import { outcomeApplicationsFieldPath } from '../../lib/form/resolution-outcome-applications-form-fields'
 import type { ResolutionFormValues } from '../../lib/form/resolution-form-schema'
 import { RESOLUTION_FIELD_NAME } from '../../lib/form/resolution-form-values'
+import { resolutionFormToSelectionContext } from '../../lib/selection/resolution-selection-context.lib'
 import { SpellResolutionOutcomeApplicationRow } from './spell-resolution-outcome-application-row.client'
 
 export type SpellResolutionOutcomeApplicationsListProps = {
@@ -35,6 +36,7 @@ export function SpellResolutionOutcomeApplicationsList({
   const { fields, remove } = useFieldArray({ name: fullName })
   const resolution = useWatch({ name: RESOLUTION_FIELD_NAME }) as ResolutionFormValues | undefined
   const effects = resolution?.effects ?? []
+  const selectionContext = resolutionFormToSelectionContext(resolution)
 
   const listContext = React.useMemo(
     () =>
@@ -72,6 +74,7 @@ export function SpellResolutionOutcomeApplicationsList({
             idPrefix={idPrefix}
             fullName={fullName}
             effects={effects}
+            selectionContext={selectionContext}
             onRemove={() => remove(index)}
           />
         ))}

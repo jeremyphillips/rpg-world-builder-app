@@ -37,4 +37,9 @@ export const spellResolutionValidationMessages = {
     'validation.spellResolution.halfNotSupportedForEffectKind',
     ({ kind }) => `Half application is not supported for "${kind}" effects in this version.`,
   ),
+  effectKindIncompatibleWithTarget: defineMessage<{ kind: string; targetKind: string }>(
+    'validation.spellResolution.effectKindIncompatibleWithTarget',
+    ({ kind, targetKind }) =>
+      `"${kind}" effects cannot target ${targetKind === 'object' ? 'objects' : 'creatures or objects'}.`,
+  ),
 }

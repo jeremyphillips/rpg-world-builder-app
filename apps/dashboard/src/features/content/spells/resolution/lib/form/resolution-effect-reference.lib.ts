@@ -1,8 +1,13 @@
 import {
   buildAtomicEffectDisplayFromParts,
   formatAtomicEffectDisplayTitle,
+  formatResolutionAvailabilityReason,
+  isEffectKindAllowedForTarget,
+  isResolutionEffectKind,
   type AtomicEffectDisplay,
   type EffectRecipient,
+  type EffectTargetCompatibilityContext,
+  type SpellResolutionTargetKind,
 } from '@rpg/contracts'
 
 import {
@@ -29,6 +34,7 @@ export type EffectReferenceState =
 
 export type ResolveEffectReferenceOptions = {
   recipient?: EffectRecipient
+  selectionContext?: EffectTargetCompatibilityContext
   index?: number
 }
 
@@ -44,7 +50,28 @@ function buildDisplayFromResolutionEffect(
       roll: roll ?? undefined,
       ...(effect.kind === 'damage' ? { damageType: effect.damageType } : {}),
     },
-    { recipient: options.recipient, fallbackIndex: options.index },
+    {
+      recipient: options.recipient,
+      targetKind: options.selectionContext?.targetKind as SpellResolutionTargetKind | undefined,
+      fallbackIndex: options.index,
+    },
+  )
+}
+
+function unavailableReasonForEffect(
+  effect: ResolutionEffectFormItem,
+  selectionContext: EffectTargetCompatibilityContext,
+): string | undefined {
+  if (!isResolutionEffectKind(effect.kind)) return undefined
+  if (isEffectKindAllowedForTarget(effect.kind, selectionContext)) return undefined
+
+  return formatResolutionAvailabilityReason(
+    {
+      code: 'effect-kind-incompatible-with-target',
+      kind: effect.kind,
+      targetKind: selectionContext.targetKind as SpellResolutionTargetKind,
+    },
+    'hint',
   )
 }
 
@@ -60,6 +87,13 @@ export function resolveEffectReference(
   const completeness = getResolutionEffectCompleteness(effect)
   if (!completeness.complete) {
     return { kind: 'incomplete', effect, completeness }
+  }
+
+  if (options.selectionContext) {
+    const reason = unavailableReasonForEffect(effect, options.selectionContext)
+    if (reason) {
+      return { kind: 'unavailable', effect, reason }
+    }
   }
 
   return {

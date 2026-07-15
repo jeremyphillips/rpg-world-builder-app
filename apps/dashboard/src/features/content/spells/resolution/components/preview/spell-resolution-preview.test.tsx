@@ -30,7 +30,9 @@ describe('SpellResolutionPreview', () => {
     )
 
     await waitFor(() => {
-      expect(screen.getByText('Failed save: Full damage')).toBeInTheDocument()
+      expect(
+        screen.getByText('Failed save: Target takes 2d10 necrotic damage.'),
+      ).toBeInTheDocument()
     })
 
     expect(screen.getByRole('status')).toHaveAttribute('aria-live', 'polite')
@@ -93,7 +95,7 @@ describe('SpellResolutionPreview', () => {
     )
 
     await waitFor(() => {
-      expect(screen.getByText('Hit: Full damage')).toBeInTheDocument()
+      expect(screen.getByText('Hit: Target takes 1d10 force damage.')).toBeInTheDocument()
     })
 
     await expectNoAxeViolations(container)

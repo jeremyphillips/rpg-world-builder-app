@@ -3,6 +3,7 @@ import {
   type SpellAtomicEffectKind,
 } from '../../../vocab/spell/atomic-effect-kind'
 import type { RollValue } from '../../../primitives/mechanics/roll'
+import type { SpellResolutionTargetKind } from '../resolution/vocab'
 
 import type { EffectRecipient } from './recipient'
 import type { SpellAtomicEffect } from './schema'
@@ -37,6 +38,7 @@ export type AtomicEffectDisplayInput = {
 
 export type BuildAtomicEffectDisplayOptions = {
   recipient?: EffectRecipient
+  targetKind?: SpellResolutionTargetKind
   /** Fallback index when `kind` is absent during in-progress authoring. */
   fallbackIndex?: number
 }
@@ -113,7 +115,10 @@ export function buildAtomicEffectDisplayFromParts(
 
   const parts = effectRowPartsFromInput(input)
   const summary = parts
-    ? formatEffectRowSentenceFromParts(parts, { recipient: options.recipient })
+    ? formatEffectRowSentenceFromParts(parts, {
+        recipient: options.recipient,
+        targetKind: options.targetKind,
+      })
     : input.kind === 'projectile-count' &&
         typeof input.count === 'number' &&
         input.unitLabel?.trim()

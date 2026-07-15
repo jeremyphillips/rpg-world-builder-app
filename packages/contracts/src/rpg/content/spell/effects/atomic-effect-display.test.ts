@@ -57,6 +57,18 @@ describe('buildAtomicEffectDisplayFromParts', () => {
     expect(display.summary).toBe('Character gains 2d4+4 temporary Hit Points.')
   })
 
+  it('uses creature-specific target wording for healing summaries', () => {
+    const display = buildAtomicEffectDisplayFromParts(
+      {
+        kind: 'healing',
+        roll: { dice: { count: 2, faces: 4 } },
+      },
+      { recipient: 'target', targetKind: 'creature' },
+    )
+
+    expect(display.summary).toBe('Target creature heals 2d4 Hit Points.')
+  })
+
   it('uses fallback index when kind is missing', () => {
     const display = buildAtomicEffectDisplayFromParts({}, { fallbackIndex: 1 })
 

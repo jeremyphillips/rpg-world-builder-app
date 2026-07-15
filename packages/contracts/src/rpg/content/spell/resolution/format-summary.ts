@@ -22,7 +22,7 @@ export function formatResolutionSummarySections(
     { heading: 'Target', lines: [formatResolutionTarget(resolution)] },
     {
       heading: 'Check',
-      lines: [formatResolutionMethod(resolution)],
+      lines: [formatResolutionMethod(resolution, 'resolution-preview')],
     },
   ]
 
@@ -50,7 +50,10 @@ export function formatResolutionSummarySections(
 
   const outcomeLines = formatResolutionOutcomes(resolution)
   if (outcomeLines.length > 0) {
-    sections.push({ heading: 'Outcomes', lines: outcomeLines })
+    sections.push({
+      heading: outcomeLines.length === 1 ? 'Outcome' : 'Outcomes',
+      lines: outcomeLines,
+    })
   }
 
   return sections

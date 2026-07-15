@@ -22,6 +22,10 @@ import {
   stateAfterPatch,
   toMethodOption,
 } from './selection-availability'
+import {
+  isCreatureOnlyResolutionEffectKind,
+  isEffectKindAllowedForTarget,
+} from './effect-target-compatibility'
 
 function buildProximityCleanupPatch(
   before: ResolutionSelectionState,
@@ -164,12 +168,34 @@ function maybeMultipleEffectsWarning(
   return undefined
 }
 
+function maybeCreatureOnlyEffectWithNonCreatureTargetWarning(
+  state: ResolutionSelectionState,
+): ResolutionWarning | undefined {
+  if (state.proximityKind === 'self') return undefined
+  if (!state.targetKind || state.targetKind === 'creature') return undefined
+
+  const effects = state.effects ?? []
+  if (
+    effects.some(
+      (effect) =>
+        isResolutionEffectKind(effect.kind) &&
+        isCreatureOnlyResolutionEffectKind(effect.kind) &&
+        !isEffectKindAllowedForTarget(effect.kind, state),
+    )
+  ) {
+    return { code: 'creature-only-effect-with-non-creature-target' }
+  }
+
+  return undefined
+}
+
 function collectWarnings(state: ResolutionSelectionState): ResolutionWarning[] {
   const effects = state.effects ?? []
   return [
     maybeSelfWithDamageWarning(state),
     maybeAutomaticDistanceWithoutPatternWarning(state),
     maybeCheckWithoutDamageWarning(state),
+    maybeCreatureOnlyEffectWithNonCreatureTargetWarning(state),
     maybeMultipleEffectsWarning(effects, 'healing', 'multiple-healing-effects'),
     maybeMultipleEffectsWarning(
       effects,

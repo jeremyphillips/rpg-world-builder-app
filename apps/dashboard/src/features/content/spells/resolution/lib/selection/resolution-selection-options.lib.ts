@@ -10,6 +10,7 @@ import {
   type ResolutionEffectKind,
   type ResolutionMethodOption,
   type ResolutionSelectionState,
+  type SpellResolutionTargetKind,
 } from '@rpg/contracts'
 import type { FieldOption } from '@rpg/ui/form'
 
@@ -110,7 +111,10 @@ export function formatResolutionEffectRowSummary(
   row: Record<string, unknown>,
   context: ResolutionSelectionState,
 ): string {
-  return formatEffectRowSummary(row, { recipient: deriveDefaultEffectRecipient(context) })
+  return formatEffectRowSummary(row, {
+    recipient: deriveDefaultEffectRecipient(context),
+    targetKind: context.targetKind as SpellResolutionTargetKind | undefined,
+  })
 }
 
 /** Compact bullet for confirm dialog effect removal lines. */

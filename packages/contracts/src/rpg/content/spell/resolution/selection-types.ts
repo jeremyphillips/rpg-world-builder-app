@@ -2,6 +2,7 @@ import type {
   SpellResolutionAttackType,
   SpellResolutionOutcomeResult,
   SpellResolutionProximityKind,
+  SpellResolutionTargetKind,
 } from './vocab'
 
 /** Combined method select value used by resolution authoring UI. */
@@ -62,6 +63,7 @@ export type ResolutionWarningCode =
   | 'check-without-damage-effect'
   | 'multiple-healing-effects'
   | 'multiple-temporary-hit-points-effects'
+  | 'creature-only-effect-with-non-creature-target'
 
 export type ResolutionWarning = {
   code: ResolutionWarningCode
@@ -78,6 +80,11 @@ export type ResolutionAvailabilityReason =
       code: 'effect-kind-unsupported-for-method'
       kind: ResolutionEffectKind
       method: ResolutionMethodOption
+    }
+  | {
+      code: 'effect-kind-incompatible-with-target'
+      kind: ResolutionEffectKind
+      targetKind: SpellResolutionTargetKind
     }
 
 export type OptionAvailability = {

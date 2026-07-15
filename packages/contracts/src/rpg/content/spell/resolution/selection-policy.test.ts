@@ -55,6 +55,22 @@ describe('getEffectKindAvailability', () => {
     expect(availability.allowed).toBe(false)
     expect(availability.reason?.code).toBe('effect-kind-unsupported-for-method')
   })
+
+  it('disallows healing for object targets', () => {
+    const availability = getEffectKindAvailability(
+      {
+        proximityKind: 'touch',
+        targetKind: 'object',
+        targetCount: 1,
+        methodKind: 'automatic',
+        applicationPatternKind: 'none',
+      },
+      'healing',
+    )
+
+    expect(availability.allowed).toBe(false)
+    expect(availability.reason?.code).toBe('effect-kind-incompatible-with-target')
+  })
 })
 
 describe('planResolutionChange', () => {

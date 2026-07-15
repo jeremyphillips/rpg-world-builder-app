@@ -4,6 +4,7 @@ export {
   formatEffectRowSentenceFromParts,
   type EffectRowFormatOptions,
   type EffectRowParts,
+  type EffectSentenceRegister,
 } from './format'
 export {
   SPELL_ATOMIC_EFFECT_KINDS,

@@ -3,25 +3,15 @@ import type {
   SpellResolutionTarget,
   SpellResolutionTargetProximity,
 } from './schema'
-import { getSpellResolutionTargetKindLabel } from './vocab'
+import { getSpellResolutionTargetKindNoun } from './vocab'
 
 function formatTargetCount(count: number): string {
   if (count === 1) return 'One'
-  return String(count)
+  return `Up to ${count}`
 }
 
 function formatTargetKindPhrase(kind: SpellResolution['target']['kind']): string {
-  switch (kind) {
-    case 'creature':
-      return 'creature'
-    case 'object':
-      return 'object'
-    case 'creature-or-object':
-      return 'creature or object'
-    default: {
-      return getSpellResolutionTargetKindLabel(kind)
-    }
-  }
+  return getSpellResolutionTargetKindNoun(kind)
 }
 
 function formatDistanceFeet(distance: { value: number; unit: 'ft' }): string {
@@ -57,6 +47,10 @@ export function formatResolutionTarget(resolution: SpellResolution): string {
 
 /** Formats count, kind, and proximity without method context. */
 export function formatResolutionTargetFromParts(target: SpellResolutionTarget): string {
+  if (target.proximity.kind === 'self') {
+    return 'You'
+  }
+
   const { count, kind, proximity } = target
   return `${formatTargetCount(count)} ${formatTargetKindPhrase(kind)} ${formatResolutionTargetProximityPhrase(proximity)}`
 }

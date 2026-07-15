@@ -1,6 +1,10 @@
 import {
+  formatResolutionAvailabilityReason,
+  getEffectTargetAvailability,
+  isResolutionEffectKind,
   type SpellResolutionApplicationAmount,
   type SpellResolutionOutcomeResult,
+  type EffectTargetCompatibilityContext,
 } from '@rpg/contracts'
 import type { ButtonDropdownItem } from '@rpg/ui'
 
@@ -51,6 +55,7 @@ export function getOutcomeEffectAvailability(
   context: {
     outcomeResult: SpellResolutionOutcomeResult
     appliedEffectIds: Set<string>
+    selectionContext?: EffectTargetCompatibilityContext
   },
 ): OutcomeEffectAvailability {
   if (context.appliedEffectIds.has(effect.id)) {
@@ -62,6 +67,16 @@ export function getOutcomeEffectAvailability(
     return { status: 'incomplete', reason: completeness }
   }
 
+  if (context.selectionContext && isResolutionEffectKind(effect.kind)) {
+    const targetAvailability = getEffectTargetAvailability(context.selectionContext, effect.kind)
+    if (!targetAvailability.allowed && targetAvailability.reason) {
+      return {
+        status: 'unsupported',
+        reason: formatResolutionAvailabilityReason(targetAvailability.reason, 'hint'),
+      }
+    }
+  }
+
   return {
     status: 'eligible',
     defaultAmount: defaultApplicationAmountForOutcome(effect, context.outcomeResult),
@@ -70,13 +85,22 @@ export function getOutcomeEffectAvailability(
 
 function toUnavailableMenuItem(
   effect: ResolutionEffectFormItem,
-  availability: Extract<OutcomeEffectAvailability, { status: 'incomplete' }>,
+  availability:
+    | Extract<OutcomeEffectAvailability, { status: 'incomplete' }>
+    | Extract<OutcomeEffectAvailability, { status: 'unsupported' }>,
 ): ButtonDropdownItem {
-  const reference = {
-    kind: 'incomplete' as const,
-    effect,
-    completeness: availability.reason,
-  }
+  const reference =
+    availability.status === 'incomplete'
+      ? {
+          kind: 'incomplete' as const,
+          effect,
+          completeness: availability.reason,
+        }
+      : {
+          kind: 'unavailable' as const,
+          effect,
+          reason: availability.reason,
+        }
 
   return {
     id: effect.id,
@@ -87,10 +111,13 @@ function toUnavailableMenuItem(
   }
 }
 
-function toEligibleMenuItem(effect: ResolutionEffectFormItem): ButtonDropdownItem {
+function toEligibleMenuItem(
+  effect: ResolutionEffectFormItem,
+  selectionContext?: EffectTargetCompatibilityContext,
+): ButtonDropdownItem {
   return {
     id: effect.id,
-    label: formatEffectReferenceTitle(resolveEffectReference(effect)),
+    label: formatEffectReferenceTitle(resolveEffectReference(effect, { selectionContext })),
     groupId: 'available',
   }
 }
@@ -99,6 +126,7 @@ export function resolveOutcomeApplicationAddState(
   effects: readonly ResolutionEffectFormItem[],
   outcome: Pick<ResolutionOutcomeFormItem, 'applications'>,
   outcomeResult: SpellResolutionOutcomeResult,
+  selectionContext?: EffectTargetCompatibilityContext,
 ): OutcomeApplicationAddState {
   if (effects.length === 0) {
     return { kind: 'no-authored-effects' }
@@ -109,17 +137,21 @@ export function resolveOutcomeApplicationAddState(
   const unavailable: ButtonDropdownItem[] = []
 
   for (const effect of effects) {
-    const availability = getOutcomeEffectAvailability(effect, { outcomeResult, appliedEffectIds })
+    const availability = getOutcomeEffectAvailability(effect, {
+      outcomeResult,
+      appliedEffectIds,
+      selectionContext,
+    })
 
     switch (availability.status) {
       case 'eligible':
-        eligible.push(toEligibleMenuItem(effect))
+        eligible.push(toEligibleMenuItem(effect, selectionContext))
         break
       case 'incomplete':
+      case 'unsupported':
         unavailable.push(toUnavailableMenuItem(effect, availability))
         break
       case 'already-applied':
-      case 'unsupported':
         break
       default: {
         const _exhaustive: never = availability

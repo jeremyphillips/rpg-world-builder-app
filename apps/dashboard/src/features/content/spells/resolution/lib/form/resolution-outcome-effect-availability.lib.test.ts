@@ -20,6 +20,12 @@ const incompleteDamage: ResolutionEffectFormItem = {
   damageType: 'force',
 }
 
+const completeHealing: ResolutionEffectFormItem = {
+  id: 'healing',
+  kind: 'healing',
+  roll: { dice: { count: 2, faces: 4 } },
+}
+
 describe('getOutcomeEffectAvailability', () => {
   it('marks applied, incomplete, and eligible effects', () => {
     expect(
@@ -42,6 +48,23 @@ describe('getOutcomeEffectAvailability', () => {
         appliedEffectIds: new Set(),
       }),
     ).toEqual({ status: 'eligible', defaultAmount: 'half' })
+  })
+
+  it('marks healing unsupported for object targets', () => {
+    expect(
+      getOutcomeEffectAvailability(completeHealing, {
+        outcomeResult: 'applied',
+        appliedEffectIds: new Set(),
+        selectionContext: {
+          proximityKind: 'touch',
+          targetKind: 'object',
+          targetCount: 1,
+        },
+      }),
+    ).toEqual({
+      status: 'unsupported',
+      reason: 'Healing is not available when the target is an object.',
+    })
   })
 })
 

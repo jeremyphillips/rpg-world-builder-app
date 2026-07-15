@@ -15,6 +15,7 @@ import {
   useArrayItemRowState,
   type ArrayItemIssueSummaryProps,
 } from '@rpg/ui/form'
+import type { EffectTargetCompatibilityContext } from '@rpg/contracts'
 import { useController, useFormContext } from 'react-hook-form'
 
 import {
@@ -139,6 +140,7 @@ export type SpellResolutionOutcomeApplicationRowProps = {
   idPrefix: string
   fullName: string
   effects: readonly ResolutionEffectFormItem[]
+  selectionContext?: EffectTargetCompatibilityContext
   onRemove: () => void
 }
 
@@ -149,6 +151,7 @@ export function SpellResolutionOutcomeApplicationRow({
   idPrefix,
   fullName,
   effects,
+  selectionContext,
   onRemove,
 }: SpellResolutionOutcomeApplicationRowProps) {
   const rowState = useArrayItemRowState({
@@ -163,7 +166,12 @@ export function SpellResolutionOutcomeApplicationRow({
   })
 
   const application = rowState.itemValues as { effectId?: string; amount?: string }
-  const presentation = buildOutcomeApplicationRowPresentation(effects, application, index)
+  const presentation = buildOutcomeApplicationRowPresentation(
+    effects,
+    application,
+    index,
+    selectionContext,
+  )
   const describedByIds = buildOutcomeApplicationDescribedByIds(
     presentation.statusDescription,
     rowState.rowSummaryId,
@@ -186,6 +194,7 @@ export function SpellResolutionOutcomeApplicationRow({
             rowState={rowState}
             presentation={presentation}
             describedByIds={describedByIds}
+            selectionContext={selectionContext}
             onRemove={onRemove}
           />
           <HiddenEffectIdField itemPrefix={rowState.itemPrefix} />
@@ -202,6 +211,7 @@ function OutcomeApplicationRowBody({
   rowState,
   presentation,
   describedByIds,
+  selectionContext,
   onRemove,
 }: {
   idPrefix: string
@@ -210,6 +220,7 @@ function OutcomeApplicationRowBody({
   rowState: ReturnType<typeof useArrayItemRowState>
   presentation: ReturnType<typeof buildOutcomeApplicationRowPresentation>
   describedByIds?: string
+  selectionContext?: EffectTargetCompatibilityContext
   onRemove: () => void
 }) {
   return (
@@ -224,7 +235,7 @@ function OutcomeApplicationRowBody({
         <ResolutionEffectReferenceTitle
           id={rowState.titleId}
           reference={reference}
-          resolveOptions={{ index }}
+          resolveOptions={{ index, selectionContext }}
         />
       }
       controls={

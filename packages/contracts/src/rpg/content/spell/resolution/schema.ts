@@ -15,6 +15,8 @@ import {
   hasMeaningfulOutcomeContent,
   supportsPartialApplicationForEffectKind,
 } from './outcome-slots'
+import { isEffectKindAllowedForTarget } from './effect-target-compatibility'
+import { isResolutionEffectKind } from './selection-availability'
 import { spellResolutionValidationMessages } from './validation-messages'
 
 // ---------------------------------------------------------------------------
@@ -173,6 +175,7 @@ function allowedOutcomeResultsForMethod(
 
 export function validateSpellResolutionReferences(
   resolution: {
+    target: SpellResolutionTarget
     method: SpellResolutionMethod
     effects: readonly SpellResolutionEffect[]
     outcomes: readonly {
@@ -193,6 +196,24 @@ export function validateSpellResolutionReferences(
       path: ['effects'],
     })
   }
+
+  const targetCompatibilityContext = {
+    proximityKind: resolution.target.proximity.kind,
+    targetKind: resolution.target.kind,
+  }
+  resolution.effects.forEach((effect, effectIndex) => {
+    if (!isResolutionEffectKind(effect.kind)) return
+    if (isEffectKindAllowedForTarget(effect.kind, targetCompatibilityContext)) return
+
+    ctx.addIssue({
+      code: 'custom',
+      message: spellResolutionValidationMessages.effectKindIncompatibleWithTarget({
+        kind: effect.kind,
+        targetKind: resolution.target.kind,
+      }),
+      path: ['effects', effectIndex, 'kind'],
+    })
+  })
 
   if (!resolution.outcomes.some(hasMeaningfulOutcomeContent)) {
     ctx.addIssue({

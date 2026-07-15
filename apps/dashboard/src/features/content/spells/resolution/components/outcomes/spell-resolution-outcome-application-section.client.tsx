@@ -14,6 +14,7 @@ import {
 import { RESOLUTION_SECTION_LABELS } from '../../lib/form/resolution-form-labels'
 import type { ResolutionFormValues } from '../../lib/form/resolution-form-schema'
 import { RESOLUTION_FIELD_NAME } from '../../lib/form/resolution-form-values'
+import { resolutionFormToSelectionContext } from '../../lib/selection/resolution-selection-context.lib'
 import { SpellResolutionOutcomeApplicationAddTrigger } from './spell-resolution-outcome-application-add-trigger.client'
 import { SpellResolutionOutcomeApplicationsList } from './spell-resolution-outcome-applications-list.client'
 import { SpellResolutionOutcomeApplicationSupportingCopy } from './spell-resolution-outcome-application-supporting-copy.client'
@@ -34,7 +35,13 @@ export function SpellResolutionOutcomeApplicationSection({
   const effects = resolution?.effects ?? []
   const applications = readOutcomeApplications(outcome?.applications)
   const outcomeResult = outcome?.result ?? 'hit'
-  const addState = resolveOutcomeApplicationAddState(effects, { applications }, outcomeResult)
+  const selectionContext = resolutionFormToSelectionContext(resolution)
+  const addState = resolveOutcomeApplicationAddState(
+    effects,
+    { applications },
+    outcomeResult,
+    selectionContext,
+  )
   const chrome = resolveOutcomeApplicationSectionChrome(applications.length, addState)
 
   const appendApplication = (effectId: string) => {

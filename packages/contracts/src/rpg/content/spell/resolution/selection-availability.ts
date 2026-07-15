@@ -1,4 +1,8 @@
 import type { SpellResolutionProximityKind } from './vocab'
+import {
+  getEffectTargetAvailability,
+  isEffectKindAllowedForTarget,
+} from './effect-target-compatibility'
 import type {
   OptionAvailability,
   ResolutionApplicationPatternFormKind,
@@ -132,24 +136,27 @@ export function getEffectKindAvailability(
   kind: ResolutionEffectKind,
 ): OptionAvailability {
   const method = toMethodOption(context)
-  if (isEffectKindAllowedForMethod(kind, method)) {
-    return { allowed: true }
+  if (!isEffectKindAllowedForMethod(kind, method)) {
+    return {
+      allowed: false,
+      reason: {
+        code: 'effect-kind-unsupported-for-method',
+        kind,
+        method: method ?? 'ranged-spell',
+      },
+      severity: 'unsupported',
+    }
   }
 
-  return {
-    allowed: false,
-    reason: {
-      code: 'effect-kind-unsupported-for-method',
-      kind,
-      method: method ?? 'ranged-spell',
-    },
-    severity: 'unsupported',
-  }
+  return getEffectTargetAvailability(context, kind)
 }
 
 export function isEffectKindAllowedForState(
   state: ResolutionSelectionState,
   kind: ResolutionEffectKind,
 ): boolean {
-  return isEffectKindAllowedForMethod(kind, toMethodOption(state))
+  return (
+    isEffectKindAllowedForMethod(kind, toMethodOption(state)) &&
+    isEffectKindAllowedForTarget(kind, state)
+  )
 }

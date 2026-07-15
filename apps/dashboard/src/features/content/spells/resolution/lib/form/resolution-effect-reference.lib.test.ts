@@ -38,6 +38,29 @@ describe('resolveEffectReference', () => {
       expect(formatEffectReferenceDescription(reference)).toBe('Complete the damage roll.')
     }
   })
+
+  it('returns unavailable reference state for healing on object targets', () => {
+    const reference = resolveEffectReference(
+      {
+        id: 'fx-heal',
+        kind: 'healing',
+        roll: { dice: { count: 2, faces: 4 } },
+      },
+      {
+        selectionContext: {
+          proximityKind: 'touch',
+          targetKind: 'object',
+          targetCount: 1,
+        },
+        recipient: 'target',
+      },
+    )
+
+    expect(reference.kind).toBe('unavailable')
+    if (reference.kind === 'unavailable') {
+      expect(formatEffectReferenceDescription(reference)).toContain('not available')
+    }
+  })
 })
 
 describe('resolveEffectReferenceById', () => {

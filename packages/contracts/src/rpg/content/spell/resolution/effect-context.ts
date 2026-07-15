@@ -1,5 +1,6 @@
 import type { ResolutionSelectionState } from './selection-types'
-import type { EffectRecipient } from '../effects/recipient'
+import type { EffectRecipient, EffectRowFormatOptions } from '../effects/format'
+import type { SpellResolution } from './schema'
 
 export type { EffectRecipient }
 
@@ -29,4 +30,21 @@ export function isResolutionTargetConfigured(
   if (!context.targetKind) return false
   if (context.targetCount === undefined || context.targetCount < 1) return false
   return true
+}
+
+/** Shared recipient/register options for resolution preview and outcome sentences. */
+export function resolutionEffectFormatOptions(
+  resolution: SpellResolution,
+  overrides: Partial<EffectRowFormatOptions> = {},
+): EffectRowFormatOptions {
+  return {
+    recipient: deriveDefaultEffectRecipient({
+      proximityKind: resolution.target.proximity.kind,
+      targetKind: resolution.target.kind,
+      targetCount: resolution.target.count,
+    }),
+    targetKind: resolution.target.kind,
+    register: 'resolution-preview',
+    ...overrides,
+  }
 }

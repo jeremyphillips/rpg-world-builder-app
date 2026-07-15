@@ -13,7 +13,7 @@ import { ResolutionChangeConfirmDialog } from '../../components/notices/resoluti
 import { SpellResolutionOutcomes } from '../../components/outcomes/spell-resolution-outcomes.client'
 import { SpellResolutionPreview } from '../../components/preview/spell-resolution-preview.client'
 import { SpellResolutionProximitySelect } from '../../components/target/spell-resolution-proximity-select.client'
-import { deriveDefaultEffectRecipient } from '@rpg/contracts'
+import { deriveDefaultEffectRecipient, type SpellResolutionTargetKind } from '@rpg/contracts'
 import { formatEffectRowPrimary, formatEffectRowSummary } from '../../../lib/effects/effect-display'
 import { resolutionEffectItemFields } from '../effects/resolution-effect-form-fields'
 import { resolutionSelectionContextFromWatched } from '../selection/resolution-selection-context.lib'
@@ -62,6 +62,7 @@ function resolutionEffectsArrayField(ctx: ContentFormCtx): FormItem {
         const context = resolutionSelectionContextFromWatched(watched ?? {})
         return formatEffectRowSummary(values, {
           recipient: deriveDefaultEffectRecipient(context),
+          targetKind: context.targetKind as SpellResolutionTargetKind | undefined,
         })
       },
     },

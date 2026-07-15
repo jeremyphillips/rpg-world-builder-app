@@ -37,4 +37,17 @@ describe('formatResolutionAvailabilityReason', () => {
       ),
     ).toContain('Healing')
   })
+
+  it('formats effect kind target restriction for option tone', () => {
+    expect(
+      formatResolutionAvailabilityReason(
+        {
+          code: 'effect-kind-incompatible-with-target',
+          kind: 'healing',
+          targetKind: 'object',
+        },
+        'option',
+      ),
+    ).toBe('Not available when the target is an object')
+  })
 })

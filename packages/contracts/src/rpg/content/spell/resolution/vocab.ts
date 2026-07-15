@@ -26,6 +26,22 @@ export const SPELL_RESOLUTION_TARGET_KINDS = Object.keys(SPELL_RESOLUTION_TARGET
   ...SpellResolutionTargetKind[],
 ]
 
+/** Lowercase prose noun for target kind — e.g. "creature", "creature or object". */
+export function getSpellResolutionTargetKindNoun(kind: SpellResolutionTargetKind): string {
+  switch (kind) {
+    case 'creature':
+      return 'creature'
+    case 'object':
+      return 'object'
+    case 'creature-or-object':
+      return 'creature or object'
+    default: {
+      const _exhaustive: never = kind
+      return _exhaustive
+    }
+  }
+}
+
 export const SPELL_RESOLUTION_ATTACK_TYPE_ENTRIES = {
   'melee-spell': {
     label: 'Melee spell attack',

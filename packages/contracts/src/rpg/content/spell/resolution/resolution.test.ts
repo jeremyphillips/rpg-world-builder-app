@@ -21,6 +21,7 @@ import {
   SPELL_RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID,
   spellResolutionEffectIdSchema,
   spellResolutionSchema,
+  SPELL_RESOLUTION_PRIMARY_HEALING_EFFECT_ID,
 } from './schema'
 import { spellResolutionValidationMessages } from './validation-messages'
 
@@ -213,6 +214,39 @@ describe('spellResolutionSchema', () => {
       }),
     )
   })
+
+  it('rejects creature-only effects for object targets', () => {
+    const result = spellResolutionSchema.safeParse({
+      target: { count: 1, kind: 'object', proximity: { kind: 'touch' } },
+      method: { kind: 'automatic' },
+      effects: [
+        {
+          id: SPELL_RESOLUTION_PRIMARY_HEALING_EFFECT_ID,
+          kind: 'healing',
+          roll: { dice: { count: 2, faces: 8 } },
+        },
+      ],
+      outcomes: [
+        {
+          result: 'applied',
+          applications: [{ effectId: SPELL_RESOLUTION_PRIMARY_HEALING_EFFECT_ID, amount: 'full' }],
+        },
+      ],
+    })
+
+    expect(result.success).toBe(false)
+    if (result.success) return
+
+    expect(result.error.issues).toContainEqual(
+      expect.objectContaining({
+        path: ['effects', 0, 'kind'],
+        message: spellResolutionValidationMessages.effectKindIncompatibleWithTarget({
+          kind: 'healing',
+          targetKind: 'object',
+        }),
+      }),
+    )
+  })
 })
 
 describe('spell resolution formatters', () => {
@@ -227,23 +261,30 @@ describe('spell resolution formatters', () => {
       'within your reach',
     )
     expect(formatResolutionOutcomes(INFlict_WOUNDS_RESOLUTION)).toEqual([
-      'Failed save: Full damage',
-      'Successful save: Half damage',
+      'Failed save: Target takes 2d10 necrotic damage.',
+      'Successful save: Target takes half as much damage.',
     ])
 
     const summary = formatResolutionSummary(CHILL_TOUCH_RESOLUTION)
     expect(summary).toContain('Target')
     expect(summary).toContain('within your reach')
     expect(summary).toContain('Melee spell attack')
-    expect(summary).toContain('1d10 Necrotic damage')
+    expect(summary).toContain('Target takes 1d10 necrotic damage')
     expect(summary).toContain("can't regain Hit Points")
   })
 
   it('formats automatic healing and self proximity', () => {
     expect(formatResolutionTarget(CURE_WOUNDS_RESOLUTION)).toBe('One creature you touch')
     expect(formatResolutionMethod(CURE_WOUNDS_RESOLUTION)).toBe('Automatic')
-    expect(formatResolutionSummary(CURE_WOUNDS_RESOLUTION)).toContain('Target heals 2d8 Hit Points')
-    expect(formatResolutionOutcomes(CURE_WOUNDS_RESOLUTION)).toEqual(['Applied: Full healing'])
+    expect(formatResolutionMethod(CURE_WOUNDS_RESOLUTION, 'resolution-preview')).toBe(
+      'No check required',
+    )
+    expect(formatResolutionSummary(CURE_WOUNDS_RESOLUTION)).toContain(
+      'Target regains 2d8 hit points',
+    )
+    expect(formatResolutionOutcomes(CURE_WOUNDS_RESOLUTION)).toEqual([
+      'Applied: Target regains 2d8 hit points.',
+    ])
   })
 
   it('formats projectiles preview and effects application labels', () => {
