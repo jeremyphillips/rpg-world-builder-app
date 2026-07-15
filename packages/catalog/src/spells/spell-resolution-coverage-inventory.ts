@@ -25,6 +25,10 @@ import {
   spellSeedResolutionDeferReason,
   SRD_521_SPELL_SEED_RESOLUTION_SLUGS,
 } from './spell-seed-resolution'
+import {
+  spellResolutionTargetingGap,
+  type SpellResolutionTargetingGapCode,
+} from './spell-resolution-targeting-gaps'
 
 export type SpellResolutionCoverageStatus = 'migrated' | 'deferred' | 'hybrid' | 'prose-only'
 
@@ -35,6 +39,8 @@ export type SpellResolutionCoverageEntry = {
   hasResolution: boolean
   /** Present when manifest explicitly defers resolution for this slug. */
   deferReason?: SpellResolutionDeferReason
+  /** Known partial targeting gap for spells with resolution. */
+  targetingGap?: SpellResolutionTargetingGapCode
 }
 
 export type SpellResolutionCoverageInventory = {
@@ -104,6 +110,7 @@ function toCoverageEntry(spell: Spell): SpellResolutionCoverageEntry {
     effectCount: spell.effects?.length ?? 0,
     hasResolution: Boolean(spell.resolution),
     deferReason,
+    targetingGap: spell.resolution ? spellResolutionTargetingGap(spell.slug) : undefined,
   }
 }
 

@@ -98,6 +98,7 @@ export {
   getSpellResolutionProximityKindLabel,
   getSpellResolutionRangeKindLabel,
   getSpellResolutionSelectionModeLabel,
+  getSpellResolutionTargetCountKindLabel,
   getSpellResolutionTargetKindLabel,
   getSpellResolutionTargetKindNoun,
   inferSpellResolutionTargetCountKind,

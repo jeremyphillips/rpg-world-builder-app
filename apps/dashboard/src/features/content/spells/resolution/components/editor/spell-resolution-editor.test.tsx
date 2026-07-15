@@ -164,7 +164,7 @@ describe('SpellResolutionEditor', () => {
     await user.click(screen.getByRole('button', { name: /add resolution/i }))
 
     await waitFor(() => {
-      expect(screen.getAllByText('Target').length).toBeGreaterThan(0)
+      expect(screen.getAllByText('Selection').length).toBeGreaterThan(0)
       expect(screen.getAllByText('How it resolves').length).toBeGreaterThan(0)
       expect(screen.getByRole('group', { name: /Effects & outcomes/ })).toBeInTheDocument()
       expect(screen.getByRole('group', { name: /^Authored effects/ })).toBeInTheDocument()

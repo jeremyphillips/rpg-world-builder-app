@@ -13,6 +13,8 @@ import { ResolutionChangeConfirmDialog } from '../../components/notices/resoluti
 import { SpellResolutionOutcomes } from '../../components/outcomes/spell-resolution-outcomes.client'
 import { SpellResolutionPreview } from '../../components/preview/spell-resolution-preview.client'
 import { SpellResolutionProximitySelect } from '../../components/target/spell-resolution-proximity-select.client'
+import { SpellResolutionSelectionModeSelect } from '../../components/target/spell-resolution-selection-mode-select.client'
+import { SpellResolutionSelectionHints } from '../../components/target/spell-resolution-selection-hints.client'
 import { deriveDefaultEffectRecipient, type SpellResolutionTargetKind } from '@rpg/contracts'
 import { formatEffectRowPrimary, formatEffectRowSummary } from '../../../lib/effects/effect-display'
 import { resolutionEffectItemFields } from '../effects/resolution-effect-form-fields'
@@ -27,10 +29,15 @@ import {
   resolutionTargetFormFields,
   visibleWhenApplicationPatternKind,
 } from './resolution-target-form-fields'
+import { resolutionAreaFormFields } from './resolution-area-form-fields'
 
 const RESOLUTION_PREFIX = RESOLUTION_FIELD_NAME
 
 const RESOLUTION_SUMMARY_DEPENDS_ON = [
+  `${RESOLUTION_PREFIX}.selectionMode`,
+  `${RESOLUTION_PREFIX}.countKind`,
+  `${RESOLUTION_PREFIX}.areaOfEffect.shape`,
+  `${RESOLUTION_PREFIX}.originDistanceFt`,
   `${RESOLUTION_PREFIX}.proximityKind`,
   `${RESOLUTION_PREFIX}.targetKind`,
   `${RESOLUTION_PREFIX}.targetCount`,
@@ -204,17 +211,27 @@ export function configuredResolutionFields(ctx: ContentFormCtx): FormItem[] {
     },
     {
       kind: 'group',
-      legend: RESOLUTION_SECTION_LABELS.target,
+      legend: RESOLUTION_SECTION_LABELS.selection,
       fieldsChrome: { variant: 'panel' },
       visibility: configured,
       fields: [
         {
           kind: 'slot',
+          name: '_resolutionSelectionModeSelect',
+          render: () => createElement(SpellResolutionSelectionModeSelect),
+        },
+        {
+          kind: 'slot',
+          name: '_resolutionSelectionHints',
+          render: () => createElement(SpellResolutionSelectionHints),
+        },
+        {
+          kind: 'slot',
           name: '_resolutionProximitySelect',
-          // Proximity drives which target fields are shown; kept as a slot for that coupling.
           render: () => createElement(SpellResolutionProximitySelect),
         },
         ...resolutionTargetFormFields(),
+        ...resolutionAreaFormFields(),
       ],
     },
     {

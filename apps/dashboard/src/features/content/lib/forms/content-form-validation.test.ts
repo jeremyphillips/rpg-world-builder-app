@@ -89,6 +89,7 @@ const SPELLS_SCHEMA_EXEMPT = [
   ...COMMON_SCHEMA_EXEMPT,
   /^effects\b/,
   'resolution.methodKind',
+  'resolution.selectionMode',
   'resolution.proximityKind',
   'resolution.applicationPatternKind',
   'resolution.attackType',

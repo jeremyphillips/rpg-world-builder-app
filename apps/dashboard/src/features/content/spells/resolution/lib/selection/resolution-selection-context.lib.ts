@@ -1,5 +1,6 @@
 import type { ResolutionSelectionState } from '@rpg/contracts'
 
+import { SPELL_AREA_GEOMETRY_NONE } from '../../../lib/spell-form-labels'
 import type { ResolutionFormValues } from '../form/resolution-form-schema'
 
 /** Maps flattened resolution form values to contract selection context. */
@@ -8,7 +9,15 @@ export function resolutionFormToSelectionContext(
 ): ResolutionSelectionState | undefined {
   if (!values) return undefined
 
+  const areaShape = values.areaOfEffect?.shape
+  const hasAreaOfEffect = Boolean(areaShape && areaShape !== SPELL_AREA_GEOMETRY_NONE)
+
   return {
+    selectionMode: values.selectionMode,
+    countKind: values.countKind,
+    originDistanceFt: values.originDistanceFt,
+    hasAreaOfEffect,
+    areaOfEffectShape: hasAreaOfEffect ? areaShape : undefined,
     proximityKind: values.proximityKind,
     proximityDistanceFt: values.proximityDistanceFt,
     proximityReachDistanceFt: values.proximityReachDistanceFt,
@@ -31,7 +40,15 @@ export function resolutionSelectionContextFromWatched(
   prefix = 'resolution.',
 ): ResolutionSelectionState {
   const read = (key: string) => watched[`${prefix}${key}`]
+  const areaShape = read('areaOfEffect.shape') as string | undefined
+  const hasAreaOfEffect = Boolean(areaShape && areaShape !== SPELL_AREA_GEOMETRY_NONE)
+
   return {
+    selectionMode: read('selectionMode') as ResolutionSelectionState['selectionMode'],
+    countKind: read('countKind') as ResolutionSelectionState['countKind'],
+    originDistanceFt: read('originDistanceFt') as number | undefined,
+    hasAreaOfEffect,
+    areaOfEffectShape: hasAreaOfEffect ? areaShape : undefined,
     proximityKind: read('proximityKind') as ResolutionSelectionState['proximityKind'],
     proximityDistanceFt: read('proximityDistanceFt') as number | undefined,
     proximityReachDistanceFt: read('proximityReachDistanceFt') as number | undefined,
@@ -45,3 +62,6 @@ export function resolutionSelectionContextFromWatched(
     ) as ResolutionSelectionState['applicationPatternKind'],
   }
 }
+
+/** Converts contract selection cleanup patches to resolution form field updates. */
+export { selectionCleanupPatchToFormPatch } from './selection-cleanup-form-patch.lib'

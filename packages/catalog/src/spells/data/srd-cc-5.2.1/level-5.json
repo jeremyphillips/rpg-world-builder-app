@@ -115,8 +115,10 @@
       }
     ],
     "resolution": {
+      "selectionMode": "targets",
       "target": {
         "count": 1,
+        "countKind": "exact",
         "kind": "creature",
         "proximity": {
           "kind": "distance",
@@ -252,8 +254,10 @@
       }
     ],
     "resolution": {
+      "selectionMode": "targets",
       "target": {
         "count": 6,
+        "countKind": "up-to",
         "kind": "creature",
         "proximity": {
           "kind": "distance",

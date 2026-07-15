@@ -52,15 +52,21 @@
       }
     ],
     "resolution": {
-      "target": {
-        "count": 1,
-        "kind": "creature-or-object",
+      "selectionMode": "point",
+      "origin": {
         "proximity": {
           "kind": "distance",
           "distance": {
             "value": 60,
             "unit": "ft"
           }
+        }
+      },
+      "areaOfEffect": {
+        "shape": "sphere",
+        "radius": {
+          "value": 5,
+          "unit": "ft"
         }
       },
       "method": {
@@ -152,8 +158,10 @@
       }
     ],
     "resolution": {
+      "selectionMode": "targets",
       "target": {
         "count": 1,
+        "countKind": "exact",
         "kind": "creature-or-object",
         "proximity": {
           "kind": "reach"
@@ -334,8 +342,10 @@
       }
     ],
     "resolution": {
+      "selectionMode": "targets",
       "target": {
         "count": 1,
+        "countKind": "exact",
         "kind": "creature-or-object",
         "proximity": {
           "kind": "distance",
@@ -467,8 +477,10 @@
       }
     ],
     "resolution": {
+      "selectionMode": "targets",
       "target": {
         "count": 1,
+        "countKind": "exact",
         "kind": "creature-or-object",
         "proximity": {
           "kind": "distance",
@@ -795,8 +807,10 @@
       }
     ],
     "resolution": {
+      "selectionMode": "targets",
       "target": {
         "count": 1,
+        "countKind": "exact",
         "kind": "creature-or-object",
         "proximity": {
           "kind": "distance",
@@ -965,8 +979,10 @@
       }
     ],
     "resolution": {
+      "selectionMode": "targets",
       "target": {
         "count": 1,
+        "countKind": "exact",
         "kind": "creature-or-object",
         "proximity": {
           "kind": "distance",

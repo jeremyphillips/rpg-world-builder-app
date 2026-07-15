@@ -1,5 +1,8 @@
 import {
   buildDefaultOutcomeSlots,
+  defaultOriginFromSpellRange,
+  inferPointSelectionModeFromSpell,
+  inferSpellResolutionTargetCountKind,
   spellResolutionSchema,
   spellSchema,
   SPELL_RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID,
@@ -7,6 +10,7 @@ import {
   SPELL_RESOLUTION_PRIMARY_TEMPORARY_HIT_POINTS_EFFECT_ID,
   stripEmptyOutcomeSlots,
   type Ability,
+  type AreaGeometry,
   type Spell,
   type SpellAtomicEffect,
   type SpellDamageEffect,
@@ -15,7 +19,10 @@ import {
   type SpellResolutionEffect,
   type SpellResolutionEffectId,
   type SpellResolutionMethod,
+  type SpellResolutionOrigin,
+  type SpellResolutionSelectionMode,
   type SpellResolutionTarget,
+  type SpellResolutionTargetCountKind,
   type SpellResolutionTargetProximity,
   type SpellTemporaryHitPointsEffect,
 } from '@rpg/contracts'
@@ -23,12 +30,16 @@ import {
 export type ResolutionDerivationOverrides = {
   method?: SpellResolutionMethod
   saveAbility?: Ability
+  selectionMode?: SpellResolutionSelectionMode
   proximity?: SpellResolutionTargetProximity
   target?: {
     count?: number
+    countKind?: SpellResolutionTargetCountKind
     kind?: SpellResolutionTarget['kind']
     proximity?: SpellResolutionTargetProximity
   }
+  origin?: SpellResolutionOrigin
+  areaOfEffect?: AreaGeometry
   outcomes?: SpellResolution['outcomes']
   /** @deprecated Use outcomes with a hit-branch note instead */
   hitNote?: string
@@ -170,28 +181,111 @@ function buildMethod(
   return defaultMethodForPrimaryEffect(primary, spell, overrides)
 }
 
-function buildSelectionEnvelope(
+function resolveAreaOfEffect(
+  spell: Pick<Spell, 'areaOfEffect'>,
+  overrides: ResolutionDerivationOverrides,
+): AreaGeometry | undefined {
+  return overrides.areaOfEffect ?? spell.areaOfEffect
+}
+
+function buildSelfSelection(
+  spell: Pick<Spell, 'areaOfEffect'>,
+  overrides: ResolutionDerivationOverrides,
+): Pick<SpellResolution, 'selectionMode' | 'areaOfEffect'> {
+  const areaOfEffect = resolveAreaOfEffect(spell, overrides)
+  return {
+    selectionMode: 'self',
+    ...(areaOfEffect ? { areaOfEffect } : {}),
+  }
+}
+
+function buildPointSelection(
+  spell: Pick<Spell, 'range' | 'areaOfEffect'>,
+  overrides: ResolutionDerivationOverrides,
+): Pick<SpellResolution, 'selectionMode' | 'origin' | 'areaOfEffect'> {
+  const origin = overrides.origin ?? defaultOriginFromSpellRange(spell)
+  const areaOfEffect = resolveAreaOfEffect(spell, overrides)
+
+  return {
+    selectionMode: 'point',
+    ...(origin ? { origin } : {}),
+    ...(areaOfEffect ? { areaOfEffect } : {}),
+  }
+}
+
+function buildTargetsSelection(
   spell: Pick<Spell, 'range'>,
   method: SpellResolutionMethod,
   overrides: ResolutionDerivationOverrides,
+  proximity: SpellResolutionTargetProximity,
 ): Pick<SpellResolution, 'selectionMode' | 'target'> {
+  const count = overrides.target?.count ?? 1
+
+  let externalProximity: SpellResolutionTarget['proximity']
+  if (proximity.kind === 'self') {
+    const mapped = mapSpellRangeToTargetProximity(spell.range, method)
+    externalProximity = mapped && mapped.kind !== 'self' ? mapped : ({ kind: 'touch' } as const)
+  } else {
+    externalProximity = proximity
+  }
+
+  const target: SpellResolutionTarget = {
+    count,
+    countKind: inferSpellResolutionTargetCountKind(count, overrides.target?.countKind),
+    kind: overrides.target?.kind ?? DEFAULT_TARGET_KIND,
+    proximity: externalProximity,
+  }
+
+  return { selectionMode: 'targets', target }
+}
+
+function inferSelectionMode(
+  spell: Pick<Spell, 'range' | 'areaOfEffect'>,
+  method: SpellResolutionMethod,
+  overrides: ResolutionDerivationOverrides,
+  proximity: SpellResolutionTargetProximity,
+): SpellResolutionSelectionMode {
+  if (overrides.selectionMode) return overrides.selectionMode
+
+  if (proximity.kind === 'self') return 'self'
+
+  const pointMode = inferPointSelectionModeFromSpell({ ...spell, method })
+  if (pointMode === 'point') return 'point'
+
+  if (spell.range.kind === 'self' && resolveAreaOfEffect(spell, overrides)) {
+    return 'self'
+  }
+
+  return 'targets'
+}
+
+function buildSelectionEnvelope(
+  spell: Pick<Spell, 'range' | 'areaOfEffect'>,
+  method: SpellResolutionMethod,
+  overrides: ResolutionDerivationOverrides,
+): Pick<SpellResolution, 'selectionMode' | 'target' | 'origin' | 'areaOfEffect'> {
   const proximityOverride = overrides.proximity ?? overrides.range ?? overrides.target?.proximity
   const proximity: SpellResolutionTargetProximity =
     proximityOverride ??
     mapSpellRangeToTargetProximity(spell.range, method) ??
     ({ kind: 'touch' } as const)
 
-  if (proximity.kind === 'self') {
-    return { selectionMode: 'self' }
-  }
+  const mode = inferSelectionMode(spell, method, overrides, proximity)
 
-  const target: SpellResolutionTarget = {
-    count: overrides.target?.count ?? 1,
-    kind: overrides.target?.kind ?? DEFAULT_TARGET_KIND,
-    proximity,
+  switch (mode) {
+    case 'self':
+      return buildSelfSelection(spell, overrides)
+    case 'point':
+      return buildPointSelection(spell, overrides)
+    case 'targets':
+      return buildTargetsSelection(spell, method, overrides, proximity)
+    case 'none':
+      return { selectionMode: 'none' }
+    default: {
+      const _exhaustive: never = mode
+      return _exhaustive
+    }
   }
-
-  return { selectionMode: 'targets', target }
 }
 
 function buildOutcomes(
@@ -217,7 +311,7 @@ function buildOutcomes(
 
 /** Derives a contract resolution envelope from spell metadata and atomic effects. */
 export function deriveResolutionFromSpell(
-  spell: Pick<Spell, 'effects' | 'deliveryMethod' | 'range'>,
+  spell: Pick<Spell, 'effects' | 'deliveryMethod' | 'range' | 'areaOfEffect'>,
   overrides: ResolutionDerivationOverrides = {},
 ): SpellResolution {
   const primaryEffect = findPrimaryResolutionEffect(spell.effects)

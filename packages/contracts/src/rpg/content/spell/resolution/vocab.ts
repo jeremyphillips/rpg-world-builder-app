@@ -202,6 +202,13 @@ export function getSpellResolutionSelectionModeLabel(mode: string): string {
   )
 }
 
+export function getSpellResolutionTargetCountKindLabel(countKind: string): string {
+  return (
+    SPELL_RESOLUTION_TARGET_COUNT_KIND_ENTRIES[countKind as SpellResolutionTargetCountKind]
+      ?.label ?? countKind
+  )
+}
+
 /** @deprecated Use SPELL_RESOLUTION_PROXIMITY_KIND_ENTRIES */
 export const SPELL_RESOLUTION_RANGE_KIND_ENTRIES = SPELL_RESOLUTION_PROXIMITY_KIND_ENTRIES
 

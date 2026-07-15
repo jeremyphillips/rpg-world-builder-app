@@ -101,11 +101,12 @@
       }
     ],
     "resolution": {
-      "target": {
-        "count": 1,
-        "kind": "creature-or-object",
-        "proximity": {
-          "kind": "reach"
+      "selectionMode": "self",
+      "areaOfEffect": {
+        "shape": "cone",
+        "length": {
+          "value": 15,
+          "unit": "ft"
         }
       },
       "method": {
@@ -236,8 +237,10 @@
       }
     ],
     "resolution": {
+      "selectionMode": "targets",
       "target": {
         "count": 1,
+        "countKind": "exact",
         "kind": "creature",
         "proximity": {
           "kind": "touch"
@@ -516,13 +519,7 @@
       }
     ],
     "resolution": {
-      "target": {
-        "count": 1,
-        "kind": "creature",
-        "proximity": {
-          "kind": "self"
-        }
-      },
+      "selectionMode": "self",
       "method": {
         "kind": "automatic"
       },
@@ -699,8 +696,10 @@
       }
     ],
     "resolution": {
+      "selectionMode": "targets",
       "target": {
         "count": 1,
+        "countKind": "exact",
         "kind": "creature",
         "proximity": {
           "kind": "distance",
@@ -983,8 +982,10 @@
       }
     ],
     "resolution": {
+      "selectionMode": "targets",
       "target": {
         "count": 1,
+        "countKind": "exact",
         "kind": "creature",
         "proximity": {
           "kind": "distance",
@@ -1161,8 +1162,10 @@
       }
     ],
     "resolution": {
+      "selectionMode": "targets",
       "target": {
         "count": 1,
+        "countKind": "exact",
         "kind": "creature",
         "proximity": {
           "kind": "touch"
@@ -1381,8 +1384,10 @@
       }
     ],
     "resolution": {
+      "selectionMode": "targets",
       "target": {
         "count": 1,
+        "countKind": "exact",
         "kind": "creature",
         "proximity": {
           "kind": "distance",
@@ -1527,8 +1532,10 @@
       }
     ],
     "resolution": {
+      "selectionMode": "targets",
       "target": {
         "count": 1,
+        "countKind": "exact",
         "kind": "creature-or-object",
         "proximity": {
           "kind": "distance",
@@ -1869,11 +1876,12 @@
       }
     ],
     "resolution": {
-      "target": {
-        "count": 1,
-        "kind": "creature-or-object",
-        "proximity": {
-          "kind": "reach"
+      "selectionMode": "self",
+      "areaOfEffect": {
+        "shape": "cube",
+        "size": {
+          "value": 15,
+          "unit": "ft"
         }
       },
       "method": {

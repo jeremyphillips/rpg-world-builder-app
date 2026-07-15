@@ -33,6 +33,7 @@ export type ResolutionSelectionState = {
   countKind?: SpellResolutionTargetCountKind
   originDistanceFt?: number
   hasAreaOfEffect?: boolean
+  areaOfEffectShape?: string
   proximityKind: SpellResolutionProximityKind
   proximityDistanceFt?: number
   proximityReachDistanceFt?: number

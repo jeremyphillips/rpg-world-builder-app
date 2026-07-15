@@ -24,9 +24,15 @@ import {
   hydrateOutcomeFormSlots,
   resolutionMethodFromForm,
 } from '../lib/form/resolution-outcome-slots.lib'
-import { RESOLUTION_FIELD_NAME } from '../lib/form/resolution-form-values'
+import {
+  initializeOriginFromSpellRange,
+  RESOLUTION_FIELD_NAME,
+} from '../lib/form/resolution-form-values'
 import { readResolutionValues } from '../lib/form/resolution-change-form-read.lib'
-import { resolutionFormToSelectionContext } from '../lib/selection/resolution-selection-context.lib'
+import {
+  resolutionFormToSelectionContext,
+  selectionCleanupPatchToFormPatch,
+} from '../lib/selection/resolution-selection-context.lib'
 
 export type ResolutionChangeNotice = {
   id: string
@@ -41,20 +47,77 @@ function createNoticeId(): string {
   return crypto.randomUUID()
 }
 
-function enrichAppliedPatch(
+function readSpellRangeDistanceFt(getForm: () => ResolutionFormApi): number | undefined {
+  const rootValues = getForm().getValues() as {
+    range?: { kind?: string; value?: { value?: number } }
+  }
+  if (rootValues.range?.kind !== 'distance' || rootValues.range.value?.value === undefined) {
+    return undefined
+  }
+  return initializeOriginFromSpellRange({
+    range: {
+      kind: 'distance',
+      value: { value: rootValues.range.value.value, unit: 'ft' },
+    },
+  })
+}
+
+function enrichPointModeOrigin(
+  getForm: () => ResolutionFormApi,
+  patch: Partial<ResolutionFormValues>,
+): Partial<ResolutionFormValues> {
+  if (patch.originDistanceFt !== undefined) return patch
+  const originDistanceFt = readSpellRangeDistanceFt(getForm)
+  return originDistanceFt === undefined ? patch : { ...patch, originDistanceFt }
+}
+
+function enrichTargetsModeDefaults(
+  resolution: ResolutionFormValues,
+  patch: Partial<ResolutionFormValues>,
+): Partial<ResolutionFormValues> {
+  return {
+    proximityKind: resolution.proximityKind ?? 'touch',
+    targetCount: patch.targetCount ?? 1,
+    countKind: patch.countKind ?? 'exact',
+    targetKind: patch.targetKind ?? resolution.targetKind ?? 'creature-or-object',
+    ...patch,
+  }
+}
+
+function enrichSelectionModePatch(
+  getForm: () => ResolutionFormApi,
   resolution: ResolutionFormValues,
   change: ResolutionChangeRequest,
   patch: Partial<ResolutionFormValues>,
 ): Partial<ResolutionFormValues> {
+  if (change.field !== 'selectionMode') return patch
+
+  if (change.value === 'point') {
+    return enrichPointModeOrigin(getForm, patch)
+  }
+  if (change.value === 'targets') {
+    return enrichTargetsModeDefaults(resolution, patch)
+  }
+  return patch
+}
+
+function enrichAppliedPatch(
+  getForm: () => ResolutionFormApi,
+  resolution: ResolutionFormValues,
+  change: ResolutionChangeRequest,
+  patch: Partial<ResolutionFormValues>,
+): Partial<ResolutionFormValues> {
+  const withSelectionMode = enrichSelectionModePatch(getForm, resolution, change, patch)
+
   if (
     change.field === 'applicationPatternKind' &&
     change.value === 'projectiles' &&
     resolution.applicationPatternKind !== 'projectiles' &&
     resolution.projectileCount === undefined
   ) {
-    return { ...patch, ...createDefaultProjectilesFormFields() }
+    return { ...withSelectionMode, ...createDefaultProjectilesFormFields() }
   }
-  return patch
+  return withSelectionMode
 }
 
 function toResolutionFormPatch(
@@ -64,12 +127,13 @@ function toResolutionFormPatch(
 }
 
 function mergeResolutionPatch(
+  getForm: () => ResolutionFormApi,
   resolution: ResolutionFormValues,
   change: ResolutionChangeRequest,
   ...patches: Record<string, unknown>[]
 ): Partial<ResolutionFormValues> {
   return toResolutionFormPatch(
-    enrichAppliedPatch(resolution, change, Object.assign({}, ...patches)),
+    enrichAppliedPatch(getForm, resolution, change, Object.assign({}, ...patches)),
   )
 }
 
@@ -242,21 +306,24 @@ function createController(
       const plan = planResolutionChange(before, change)
       if (!resolutionChangeRequiresConfirm(plan)) {
         applyPatch(
-          mergeResolutionPatch(resolution, change, {
-            ...plan.requestedPatch,
-            ...plan.cleanupPatch,
-            ...applyOutcomePlanPatch(
+          mergeResolutionPatch(
+            getForm,
+            resolution,
+            change,
+            selectionCleanupPatchToFormPatch(plan.requestedPatch),
+            selectionCleanupPatchToFormPatch(plan.cleanupPatch),
+            applyOutcomePlanPatch(
               {
                 ...resolution,
-                ...plan.requestedPatch,
-                ...plan.cleanupPatch,
+                ...selectionCleanupPatchToFormPatch(plan.requestedPatch),
+                ...selectionCleanupPatchToFormPatch(plan.cleanupPatch),
               } as ResolutionFormValues,
               plan,
             ),
             ...(change.field === 'removeEffect'
-              ? removeEffectPatch(resolution, change.effectId)
-              : {}),
-          }),
+              ? [removeEffectPatch(resolution, change.effectId)]
+              : []),
+          ),
         )
         return
       }
@@ -278,11 +345,13 @@ function createController(
 
       const plan = planResolutionChange(before, pending.change)
       const pendingChange = pending.change
-      const incompatibleClear = buildIncompatibleSelectionClearPatch(plan.incompatibleSelections)
+      const incompatibleClear = selectionCleanupPatchToFormPatch(
+        buildIncompatibleSelectionClearPatch(plan.incompatibleSelections),
+      )
       const mergedResolution = {
         ...resolution,
-        ...plan.requestedPatch,
-        ...plan.cleanupPatch,
+        ...selectionCleanupPatchToFormPatch(plan.requestedPatch),
+        ...selectionCleanupPatchToFormPatch(plan.cleanupPatch),
         ...incompatibleClear,
       } as ResolutionFormValues
       const nextEffects =
@@ -295,9 +364,9 @@ function createController(
           : mergedResolution.effects
 
       applyPatch(
-        mergeResolutionPatch(resolution, pending.change, {
-          ...plan.requestedPatch,
-          ...plan.cleanupPatch,
+        mergeResolutionPatch(getForm, resolution, pending.change, {
+          ...selectionCleanupPatchToFormPatch(plan.requestedPatch),
+          ...selectionCleanupPatchToFormPatch(plan.cleanupPatch),
           ...incompatibleClear,
           ...applyOutcomePlanPatch(mergedResolution, plan),
           effects: nextEffects,

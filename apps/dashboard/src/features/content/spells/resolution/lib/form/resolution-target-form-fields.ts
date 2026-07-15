@@ -1,41 +1,23 @@
-import type { FieldVisibility, FormItem, InlineSentenceFieldConfig } from '@rpg/ui/form'
+import type { FormItem, InlineSentenceFieldConfig } from '@rpg/ui/form'
 
 import {
   feetInputUnitField,
   SPELL_RANGE_DISTANCE_INLINE_COUNT_DIGITS,
 } from '../../../../lib/forms/fields/content-identity-form-fields'
-import { RESOLUTION_FIELD_LABELS, resolutionTargetKindOptions } from './resolution-form-labels'
+import {
+  RESOLUTION_FIELD_LABELS,
+  resolutionCountKindOptions,
+  resolutionTargetKindOptions,
+} from './resolution-form-labels'
 import {
   combineFieldVisibility,
-  visibleWhenResolutionConfigured,
+  visibleWhenCountKindEditable,
+  visibleWhenProximityKind,
+  visibleWhenSelectionMode,
 } from './resolution-form-visibility'
 import { RESOLUTION_FIELD_NAME } from './resolution-form-values'
 
 const RESOLUTION_PREFIX = RESOLUTION_FIELD_NAME
-
-export function visibleWhenProximityKind(kind: 'touch' | 'reach' | 'distance'): FieldVisibility {
-  return {
-    dependsOn: [`${RESOLUTION_PREFIX}.proximityKind`],
-    visibleWhen: (values) => values[`${RESOLUTION_PREFIX}.proximityKind`] === kind,
-  }
-}
-
-export function visibleWhenResolutionTargetCountEditable(): FieldVisibility {
-  return {
-    dependsOn: [`${RESOLUTION_PREFIX}.targetCount`],
-    visibleWhen: (values) => {
-      const count = values[`${RESOLUTION_PREFIX}.targetCount`]
-      return typeof count === 'number' && count !== 1
-    },
-  }
-}
-
-export function visibleWhenApplicationPatternKind(kind: 'projectiles'): FieldVisibility {
-  return {
-    dependsOn: [`${RESOLUTION_PREFIX}.applicationPatternKind`],
-    visibleWhen: (values) => values[`${RESOLUTION_PREFIX}.applicationPatternKind`] === kind,
-  }
-}
 
 function targetKindSegment() {
   return {
@@ -51,7 +33,7 @@ function targetKindSegment() {
 function resolutionTouchTargetField(): InlineSentenceFieldConfig {
   return {
     type: 'inlineSentence',
-    name: `${RESOLUTION_PREFIX}.targetKind`,
+    name: '_resolutionTargetTouchInline',
     label: RESOLUTION_FIELD_LABELS.target,
     visibility: visibleWhenProximityKind('touch'),
     segments: [
@@ -66,7 +48,7 @@ function resolutionTouchTargetField(): InlineSentenceFieldConfig {
 function resolutionReachTargetField(): InlineSentenceFieldConfig {
   return {
     type: 'inlineSentence',
-    name: `${RESOLUTION_PREFIX}.targetKind`,
+    name: '_resolutionTargetReachInline',
     label: RESOLUTION_FIELD_LABELS.target,
     visibility: visibleWhenProximityKind('reach'),
     segments: [
@@ -81,7 +63,7 @@ function resolutionReachTargetField(): InlineSentenceFieldConfig {
 function resolutionDistanceTargetField(): InlineSentenceFieldConfig {
   return {
     type: 'inlineSentence',
-    name: `${RESOLUTION_PREFIX}.targetKind`,
+    name: '_resolutionTargetDistanceInline',
     label: RESOLUTION_FIELD_LABELS.target,
     visibility: visibleWhenProximityKind('distance'),
     segments: [
@@ -102,7 +84,7 @@ function resolutionDistanceTargetField(): InlineSentenceFieldConfig {
 
 /** Target group scalar and inline-sentence fields (proximity select is a separate slot). */
 export function resolutionTargetFormFields(): FormItem[] {
-  const configured = visibleWhenResolutionConfigured()
+  const targetsMode = visibleWhenSelectionMode('targets')
 
   return [
     resolutionTouchTargetField(),
@@ -126,7 +108,29 @@ export function resolutionTargetFormFields(): FormItem[] {
       digits: 2,
       width: 'auto',
       required: true,
-      visibility: combineFieldVisibility(configured, visibleWhenResolutionTargetCountEditable()),
+      visibility: combineFieldVisibility(targetsMode, visibleWhenCountKindEditable()),
     },
+    {
+      type: 'select',
+      name: `${RESOLUTION_PREFIX}.countKind`,
+      label: RESOLUTION_FIELD_LABELS.countKind,
+      options: resolutionCountKindOptions,
+      width: 'md',
+      visibility: combineFieldVisibility(targetsMode, visibleWhenCountKindEditable()),
+    },
+    feetInputUnitField(
+      `${RESOLUTION_PREFIX}.originDistanceFt`,
+      RESOLUTION_FIELD_LABELS.originDistance,
+      {
+        valueDigits: SPELL_RANGE_DISTANCE_INLINE_COUNT_DIGITS,
+        width: 'auto',
+        required: true,
+        visibility: visibleWhenSelectionMode('point'),
+        hint: 'Distance within which the caster selects the origin point.',
+      },
+    ),
   ]
 }
+
+/** Re-export for resolution-form-slots proximity / application pattern visibility. */
+export { visibleWhenApplicationPatternKind } from './resolution-form-visibility'

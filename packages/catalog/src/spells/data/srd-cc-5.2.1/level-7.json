@@ -59,8 +59,10 @@
       }
     ],
     "resolution": {
+      "selectionMode": "targets",
       "target": {
         "count": 1,
+        "countKind": "exact",
         "kind": "creature-or-object",
         "proximity": {
           "kind": "distance",

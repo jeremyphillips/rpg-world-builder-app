@@ -65,11 +65,18 @@ export const SRD_521_SPELL_SEED_RESOLUTION = {
   'fire-bolt': { kind: 'derived', overrides: {} },
   'poison-spray': { kind: 'derived', overrides: {} },
   'ray-of-sickness': { kind: 'derived', overrides: {} },
-  'acid-splash': { kind: 'derived', overrides: { saveAbility: 'dex' } },
+  'acid-splash': {
+    kind: 'derived',
+    overrides: {
+      saveAbility: 'dex',
+      selectionMode: 'point',
+      areaOfEffect: { shape: 'sphere', radius: { value: 5, unit: 'ft' } },
+    },
+  },
   'sacred-flame': { kind: 'derived', overrides: { saveAbility: 'dex' } },
   'burning-hands': {
     kind: 'derived',
-    overrides: { saveAbility: 'dex', proximity: { kind: 'reach' } },
+    overrides: { saveAbility: 'dex', selectionMode: 'self' },
   },
   'hellish-rebuke': {
     kind: 'derived',
@@ -80,7 +87,11 @@ export const SRD_521_SPELL_SEED_RESOLUTION = {
   },
   thunderwave: {
     kind: 'derived',
-    overrides: { saveAbility: 'con', proximity: { kind: 'reach' } },
+    overrides: {
+      saveAbility: 'con',
+      selectionMode: 'self',
+      areaOfEffect: { shape: 'cube', size: { value: 15, unit: 'ft' } },
+    },
   },
   fireball: { kind: 'derived', overrides: { saveAbility: 'dex' } },
   'wall-of-fire': { kind: 'derived', overrides: { saveAbility: 'dex' } },
@@ -107,19 +118,19 @@ export const SRD_521_SPELL_SEED_RESOLUTION = {
     kind: 'derived',
     overrides: {
       method: { kind: 'automatic' },
-      target: { count: 6, kind: 'creature' },
+      target: { count: 6, countKind: 'up-to', kind: 'creature' },
     },
   },
   'mass-cure-wounds': {
     kind: 'derived',
     overrides: {
       method: { kind: 'automatic' },
-      target: { count: 6, kind: 'creature' },
+      target: { count: 6, countKind: 'up-to', kind: 'creature' },
     },
   },
   'false-life': {
     kind: 'derived',
-    overrides: { method: { kind: 'automatic' }, target: { kind: 'creature' } },
+    overrides: { method: { kind: 'automatic' }, selectionMode: 'self' },
   },
 
   // Tier D — explicit deferral

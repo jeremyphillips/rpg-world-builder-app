@@ -17,6 +17,10 @@ export const resolutionFormValidationMessages = {
     'validation.spellResolutionForm.proximityDistanceRequired',
     () => 'Enter a distance in feet.',
   ),
+  originDistanceRequired: defineMessage(
+    'validation.spellResolutionForm.originDistanceRequired',
+    () => 'Enter an origin distance in feet.',
+  ),
   /** @deprecated Use proximityDistanceRequired */
   rangeDistanceRequired: defineMessage(
     'validation.spellResolutionForm.rangeDistanceRequired',

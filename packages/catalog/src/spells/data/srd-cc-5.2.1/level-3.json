@@ -221,15 +221,21 @@
       }
     ],
     "resolution": {
-      "target": {
-        "count": 1,
-        "kind": "creature-or-object",
+      "selectionMode": "point",
+      "origin": {
         "proximity": {
           "kind": "distance",
           "distance": {
             "value": 150,
             "unit": "ft"
           }
+        }
+      },
+      "areaOfEffect": {
+        "shape": "sphere",
+        "radius": {
+          "value": 20,
+          "unit": "ft"
         }
       },
       "method": {
@@ -360,8 +366,10 @@
       }
     ],
     "resolution": {
+      "selectionMode": "targets",
       "target": {
         "count": 6,
+        "countKind": "up-to",
         "kind": "creature",
         "proximity": {
           "kind": "distance",

@@ -50,9 +50,11 @@ export const SelfAutomaticHealing: Story = {
   name: 'Self automatic healing',
   args: {
     defaultResolution: {
+      selectionMode: 'self',
       targetCount: 1,
       targetKind: 'creature',
-      proximityKind: 'self',
+      proximityKind: 'touch',
+      areaOfEffect: { shape: 'none' },
       methodKind: 'automatic',
       applicationPatternKind: 'none',
       effects: [{ id: 'healing', kind: 'healing', roll: { dice: { count: 2, faces: 8 } } }],

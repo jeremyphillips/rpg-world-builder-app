@@ -24,10 +24,12 @@ const effects: ResolutionFormValues['effects'] = [
 ]
 
 const baseResolution: ResolutionFormValues = {
+  selectionMode: 'targets',
   targetCount: 1,
   targetKind: 'creature-or-object',
   proximityKind: 'distance',
   proximityDistanceFt: 120,
+  areaOfEffect: { shape: 'none' },
   methodKind: 'attack',
   attackType: 'ranged-spell',
   applicationPatternKind: 'none',

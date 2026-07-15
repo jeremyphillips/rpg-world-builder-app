@@ -73,14 +73,19 @@ describe('deriveResolutionFromSpell (Tier A)', () => {
     ])
   })
 
-  it('maps self-origin save spells to reach when overridden', () => {
+  it('maps self-origin save spells to self selection with area', () => {
     const spell = spellBySlug('burning-hands')
     const resolution = deriveAndValidateSpellResolution(spell, {
       saveAbility: 'dex',
-      proximity: { kind: 'reach' },
+      selectionMode: 'self',
     })
 
-    expect(resolution.target!.proximity).toEqual({ kind: 'reach' })
+    expect(resolution.selectionMode).toBe('self')
+    expect(resolution.areaOfEffect).toEqual({
+      shape: 'cone',
+      length: { value: 15, unit: 'ft' },
+    })
+    expect(resolution.target).toBeUndefined()
     expect(resolution.method).toEqual({ kind: 'saving-throw', ability: 'dex' })
   })
 
@@ -103,7 +108,7 @@ describe('deriveResolutionFromSpell (Tier A)', () => {
     const spell = spellBySlug('false-life')
     const resolution = deriveAndValidateSpellResolution(spell, {
       method: { kind: 'automatic' },
-      target: { kind: 'creature' },
+      selectionMode: 'self',
     })
 
     expect(resolution.selectionMode).toBe('self')

@@ -534,7 +534,7 @@ function castingFields(): FormItem[] {
       label: 'Delivery method',
       options: deliveryMethodOptions,
       hint: 'Attack-roll delivery for spells that use spell attacks.',
-      width: 'xl',
+      width: 'auto',
     },
   ]
 }

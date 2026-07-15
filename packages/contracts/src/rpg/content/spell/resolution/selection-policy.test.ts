@@ -193,6 +193,50 @@ describe('planResolutionChange', () => {
   })
 })
 
+describe('planResolutionChange selectionMode', () => {
+  it('targets→point clears target fields in cleanupPatch', () => {
+    const before: ResolutionSelectionState = {
+      selectionMode: 'targets',
+      proximityKind: 'distance',
+      proximityDistanceFt: 120,
+      targetKind: 'creature',
+      targetCount: 1,
+      countKind: 'exact',
+      methodKind: 'saving-throw',
+      saveAbility: 'dex',
+      applicationPatternKind: 'none',
+      effects: [{ id: 'damage', kind: 'damage' }],
+    }
+
+    const plan = planResolutionChange(before, { field: 'selectionMode', value: 'point' })
+
+    expect(plan.requestedPatch).toEqual({ selectionMode: 'point' })
+    expect(plan.cleanupPatch.targetCount).toBeUndefined()
+    expect(plan.cleanupPatch.proximityKind).toBeUndefined()
+  })
+
+  it('point→targets clears origin and area in cleanupPatch', () => {
+    const before: ResolutionSelectionState = {
+      selectionMode: 'point',
+      originDistanceFt: 150,
+      hasAreaOfEffect: true,
+      areaOfEffectShape: 'sphere',
+      proximityKind: 'distance',
+      methodKind: 'saving-throw',
+      saveAbility: 'dex',
+      applicationPatternKind: 'none',
+      effects: [{ id: 'damage', kind: 'damage' }],
+    }
+
+    const plan = planResolutionChange(before, { field: 'selectionMode', value: 'targets' })
+
+    expect(plan.cleanupPatch.originDistanceFt).toBeUndefined()
+    expect(plan.cleanupPatch.hasAreaOfEffect).toBe(false)
+    expect(plan.cleanupPatch.targetCount).toBe(1)
+    expect(plan.cleanupPatch.countKind).toBe('exact')
+  })
+})
+
 describe('applyResolutionStructuralCleanup', () => {
   it('clears hidden dependent fields without removing method or effects', () => {
     const state: ResolutionSelectionState = {
