@@ -1,5 +1,6 @@
 'use client'
 
+import { Plus } from 'lucide-react'
 import { ButtonDropdown, fieldSizeToArrayAddButtonSize } from '@rpg/ui'
 import type { ButtonDropdownItem } from '@rpg/ui'
 import { getArrayFieldMutators, useFormSectionContext } from '@rpg/ui/form'
@@ -40,7 +41,9 @@ export function SpellResolutionOutcomeApplicationAddControl({
 
   return (
     <ButtonDropdown
-      label={RESOLUTION_SECTION_LABELS.addOutcomeApplication}
+      label={RESOLUTION_SECTION_LABELS.addAppliedEffect}
+      leadingIcon={<Plus aria-hidden />}
+      width="fit"
       items={menuItems}
       groups={[{ id: 'effects', label: 'Effects' }]}
       size={fieldSizeToArrayAddButtonSize[size]}

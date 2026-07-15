@@ -90,8 +90,8 @@ describe('outcomeApplicationsArrayFields', () => {
         rowIndex: 0,
         fieldName: 'amount',
         options: [
-          { value: 'full', label: 'Full' },
-          { value: 'half', label: 'Half' },
+          { value: 'full', label: 'Full effect' },
+          { value: 'half', label: 'Half effect' },
         ],
         watchedValues: {
           [`${RESOLUTION_FIELD_NAME}.effects`]: [
@@ -103,7 +103,7 @@ describe('outcomeApplicationsArrayFields', () => {
           ],
         },
       }),
-    ).toEqual([{ value: 'full', label: 'Full' }])
+    ).toEqual([{ value: 'full', label: 'Full effect' }])
   })
 
   it('exposes amount field labels for resolver registration', () => {

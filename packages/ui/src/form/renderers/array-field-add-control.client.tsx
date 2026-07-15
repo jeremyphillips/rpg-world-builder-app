@@ -27,6 +27,7 @@ type ArrayFieldAddControlProps = {
   addActionVariant: NonNullable<ButtonVariantProps['variant']>
   addActionLayout?: ArrayAddActionLayout
   addActionSize?: NonNullable<ButtonVariantProps['size']>
+  showAddIcon?: boolean
   addActionMenu?: ArrayConfig['addActionMenu']
   addActionMenuItems: ButtonDropdownItem[]
   onAppendItem: () => void
@@ -35,9 +36,9 @@ type ArrayFieldAddControlProps = {
 
 function ArrayFieldAddTriggerLabel({
   addActionLabel,
-  addActionLayout,
-}: Pick<ArrayFieldAddControlProps, 'addActionLabel' | 'addActionLayout'>) {
-  if (addActionLayout !== 'inline') return addActionLabel
+  showAddIcon = true,
+}: Pick<ArrayFieldAddControlProps, 'addActionLabel' | 'showAddIcon'>) {
+  if (!showAddIcon) return addActionLabel
 
   return (
     <>
@@ -53,6 +54,7 @@ export function ArrayFieldAddControl({
   addActionVariant,
   addActionLayout = 'stacked',
   addActionSize,
+  showAddIcon = true,
   addActionMenu,
   addActionMenuItems,
   onAppendItem,
@@ -61,6 +63,7 @@ export function ArrayFieldAddControl({
   const { size } = useFormSectionContext()
   const buttonSize = resolveArrayAddButtonSize(size, addActionSize)
   const triggerClassName = cn(addActionLayout === 'inline' && 'shrink-0')
+  const leadingIcon = showAddIcon ? <Plus aria-hidden /> : undefined
 
   if (!canAdd) return null
 
@@ -68,11 +71,13 @@ export function ArrayFieldAddControl({
     return (
       <ButtonDropdown
         label={addActionLabel}
+        leadingIcon={leadingIcon}
         groups={addActionMenu.groups as ButtonDropdownGroup[]}
         items={addActionMenuItems}
         enableSearch={addActionMenu.enableSearch}
         variant={addActionVariant}
         size={buttonSize}
+        width={addActionLayout === 'inline' ? 'fit' : 'full'}
         className={triggerClassName}
         onSelectItem={onAppendFromMenu}
       />
@@ -87,10 +92,7 @@ export function ArrayFieldAddControl({
       onClick={onAppendItem}
       aria-label={addActionLabel}
     >
-      <ArrayFieldAddTriggerLabel
-        addActionLabel={addActionLabel}
-        addActionLayout={addActionLayout}
-      />
+      <ArrayFieldAddTriggerLabel addActionLabel={addActionLabel} showAddIcon={showAddIcon} />
     </Button>
   )
 }

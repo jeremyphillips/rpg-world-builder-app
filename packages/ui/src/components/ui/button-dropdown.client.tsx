@@ -115,6 +115,8 @@ export function ButtonDropdown({
   onSelectItem,
   variant = 'outline',
   size = 'sm',
+  leadingIcon,
+  width = 'full',
   className,
 }: ButtonDropdownProps) {
   const {
@@ -153,11 +155,12 @@ export function ButtonDropdown({
           type="button"
           variant={variant}
           size={size}
-          className={className}
+          className={cn(width === 'fit' && 'w-fit shrink-0', className)}
           aria-haspopup="listbox"
           aria-expanded={open}
           aria-controls={listboxId}
         >
+          {leadingIcon}
           {label}
           <ChevronDown className="size-4 opacity-50" aria-hidden />
         </Button>

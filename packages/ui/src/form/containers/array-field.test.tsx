@@ -250,6 +250,32 @@ describe('ArrayFieldRenderer', () => {
     const legend = fieldset.querySelector('legend')
 
     expect(legend).not.toContainElement(addButton)
+    expect(addButton.querySelector('svg')).toBeTruthy()
+  })
+
+  it('omits the add icon when showAddIcon is false', () => {
+    const noIconFields: FormItem[] = [
+      {
+        kind: 'array',
+        name: 'traits',
+        legend: 'Traits',
+        fields: traitFields,
+        addActionLabel: 'Choose preset',
+        showAddIcon: false,
+      },
+    ]
+
+    render(
+      <Form<Values>
+        schema={schema}
+        fields={noIconFields}
+        onSubmit={vi.fn()}
+        footer={<button type="submit">Save</button>}
+      />,
+    )
+
+    const addButton = screen.getByRole('button', { name: 'Choose preset' })
+    expect(addButton.querySelector('svg')).toBeNull()
   })
 
   it('applies addActionSize on the add control', () => {

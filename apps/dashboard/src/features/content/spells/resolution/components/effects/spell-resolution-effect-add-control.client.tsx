@@ -1,5 +1,6 @@
 'use client'
 
+import { Plus } from 'lucide-react'
 import { ButtonDropdown, fieldSizeToArrayAddButtonSize } from '@rpg/ui'
 import type { ButtonDropdownItem } from '@rpg/ui'
 import { getArrayFieldMutators, useFormSectionContext } from '@rpg/ui/form'
@@ -10,6 +11,7 @@ import {
   type ResolutionEffectKind,
 } from '../../lib/effects/resolution-effect-add-menu.lib'
 import type { ResolutionFormValues } from '../../lib/form/resolution-form-schema'
+import { RESOLUTION_SECTION_LABELS } from '../../lib/form/resolution-form-labels'
 import { RESOLUTION_FIELD_NAME } from '../../lib/form/resolution-form-values'
 import { resolutionFormToSelectionContext } from '../../lib/selection/resolution-selection-context.lib'
 import { buildResolutionEffectAddMenuItems } from '../../lib/selection/resolution-selection-options.lib'
@@ -35,7 +37,9 @@ export function SpellResolutionEffectAddControl() {
 
   return (
     <ButtonDropdown
-      label="Add effect"
+      label={RESOLUTION_SECTION_LABELS.addAuthoredEffect}
+      leadingIcon={<Plus aria-hidden />}
+      width="fit"
       items={menuItems}
       groups={[{ id: 'effects', label: 'Effects' }]}
       size={fieldSizeToArrayAddButtonSize[size]}

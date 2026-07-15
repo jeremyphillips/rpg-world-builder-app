@@ -193,8 +193,21 @@ interface BaseFieldConfig {
   chrome?: FieldChrome
 }
 
+/** Field kinds that may use `optionalDisclosure` when renderer support lands. */
+export const OPTIONAL_DISCLOSURE_FIELD_KINDS = ['text', 'textarea', 'richtext'] as const
+export type OptionalDisclosureFieldKind = (typeof OPTIONAL_DISCLOSURE_FIELD_KINDS)[number]
+
+/** Collapse empty optional prose fields behind an add control (v1: textarea only). */
+export type OptionalDisclosureConfig = {
+  addLabel: string
+  removeLabel?: string
+  /** When true (default), populated values keep the field expanded. */
+  expandWhenPopulated?: boolean
+}
+
 export interface TextFieldConfig extends BaseFieldConfig {
   type: 'text'
+  // TODO(text): add optionalDisclosure when OptionalFieldDisclosure supports single-line fields.
   placeholder?: string
   /** Native input type for the text control (e.g. `email`, `password`). */
   inputType?: 'text' | 'email' | 'password' | 'url' | 'tel' | 'search'
@@ -226,6 +239,7 @@ export interface TextareaFieldConfig extends BaseFieldConfig {
   placeholder?: string
   rows?: number
   defaultValue?: string
+  optionalDisclosure?: OptionalDisclosureConfig
 }
 
 export interface SelectFieldConfig extends BaseFieldConfig {
@@ -289,6 +303,7 @@ export interface JsonFieldConfig extends BaseFieldConfig {
 
 export interface RichTextFieldConfig extends BaseFieldConfig {
   type: 'richtext'
+  // TODO(richtext): add optionalDisclosure when empty-HTML detection + header wiring land.
   /** Opt in to the link toolbar button + extension (off by default). */
   linkable?: boolean
   /** Opt in to inline/code-block marks, toolbar buttons, and backtick input rules (off by default). */
@@ -758,6 +773,11 @@ export interface ArrayConfig {
   fields: FormItem[]
   /** Label for the add action button. Defaults to `"Add item"`. */
   addActionLabel?: string
+  /**
+   * When true (default), prefixes the add action with a `+` icon. Set false for
+   * non-add triggers such as "Choose preset" or "Import entries".
+   */
+  showAddIcon?: boolean
   /**
    * Visual style for the add action — mirrors `Button` / `ButtonDropdown` `variant`.
    * Defaults to `outline`.

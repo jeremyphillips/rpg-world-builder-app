@@ -94,7 +94,7 @@ describe('SpellResolutionOutcomes', () => {
 
     await user.click(
       within(section!).getByRole('button', {
-        name: RESOLUTION_SECTION_LABELS.addOutcomeApplication,
+        name: RESOLUTION_SECTION_LABELS.addAppliedEffect,
       }),
     )
 
@@ -112,7 +112,7 @@ describe('SpellResolutionOutcomes', () => {
     })
 
     expect(
-      screen.queryByRole('button', { name: RESOLUTION_SECTION_LABELS.addOutcomeApplication }),
+      screen.queryByRole('button', { name: RESOLUTION_SECTION_LABELS.addAppliedEffect }),
     ).not.toBeInTheDocument()
   })
 

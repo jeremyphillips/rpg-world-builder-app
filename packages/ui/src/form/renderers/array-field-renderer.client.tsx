@@ -73,6 +73,7 @@ export function ArrayFieldRenderer({ config, idPrefix, fullName }: ArrayFieldRen
       addActionVariant={state.addActionVariant}
       addActionLayout={state.addActionLayout}
       addActionSize={state.addActionSize}
+      showAddIcon={state.showAddIcon}
       addActionMenu={config.addActionMenu}
       addActionMenuItems={state.addActionMenuItems}
       onAppendItem={state.appendItem}

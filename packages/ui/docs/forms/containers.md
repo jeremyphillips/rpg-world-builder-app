@@ -268,7 +268,8 @@ inside a `FieldRow` within the grip/actions grid — leaf `width` tokens (`full`
 | `reorder` | `'dragHandle'` (default) or `false` for fixed order. |
 | `appendDefaults` | `(items) => defaults` replaces static defaults on append. |
 | `addActionVariant` | Button visual style for the add control — mirrors `Button` `variant`; defaults to `outline`. |
-| `addActionLayout` | `stacked` (default) — add control below items; `inline` — add control right-aligned in the legend row with a leading `+` icon. |
+| `addActionLayout` | `stacked` (default) — add control below items; `inline` — add control right-aligned in the legend row (`shrink-0`). |
+| `showAddIcon` | When true (default), prefixes the add action with a `+` icon. Set `false` for non-add triggers (e.g. "Choose preset"). |
 | `addActionSize` | Optional `Button` size override for the add control (`sm`, `default`, `lg`); inherits from section rhythm when omitted. |
 | `hideAddAction` | Omits the default add button (use an external slot instead). |
 | `hideItemRemove` | Omits the default per-item remove button (not merely disabled). Use with `itemRemoveSlot`. |

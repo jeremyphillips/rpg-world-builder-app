@@ -46,8 +46,7 @@ function resolutionEffectsArrayField(ctx: ContentFormCtx): FormItem {
     // Nested inside Effects & outcomes → Authored effects groups (depth ≥ 2). @rpg/ui
     // defaults nested arrays to compact unless itemVariant is explicit.
     itemVariant: 'detailed',
-    addActionLabel: 'Add effect',
-    hideAddAction: true,
+    hideAddAction: true, // Add menu is a sibling slot — options depend on live form state.
     hideItemRemove: true,
     itemRemoveSlot: {
       name: '_resolutionEffectHeaderRemove',

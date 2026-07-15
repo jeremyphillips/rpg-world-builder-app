@@ -6,10 +6,13 @@ import {
   getSpellResolutionProximityKindLabel,
   getSpellResolutionTargetKindLabel,
   SPELL_APPLICATION_PATTERN_KINDS,
+  SPELL_RESOLUTION_APPLICATION_AMOUNT_ENTRIES,
+  SPELL_RESOLUTION_APPLICATION_AMOUNTS,
   SPELL_RESOLUTION_ATTACK_TYPES,
   SPELL_RESOLUTION_PROXIMITY_KINDS,
   SPELL_RESOLUTION_TARGET_KINDS,
   type SpellApplicationPatternKind,
+  type SpellResolutionApplicationAmount,
   type SpellResolutionAttackType,
   type SpellResolutionProximityKind,
   type SpellResolutionTargetKind,
@@ -23,6 +26,8 @@ export const RESOLUTION_SECTION_LABELS = {
   effectsAndOutcomes: 'Effects & outcomes',
   effectsAndOutcomesHint: 'Define what the spell does, then choose when each effect applies.',
   authoredEffects: 'Authored effects',
+  authoredEffectsDescription:
+    'Define each effect once. Outcome branches reference these effects below.',
   projectiles: 'Projectiles',
   damage: 'Damage',
   outcomeBranches: 'Outcome branches',
@@ -35,20 +40,28 @@ export const RESOLUTION_SECTION_LABELS = {
     'Projectile or beam scaling is still on legacy root effects. Use Application pattern → Projectiles on this tab when you can, or edit root effects on the read model until catalog consolidation completes.',
   outcomesIncomplete: 'Complete target, method, and effects to preview generated outcomes.',
   outcomesHint:
-    'Choose which authored effects apply to each resolution branch and add optional prose.',
+    'Choose which authored effects apply in each branch and whether each applies fully or partially.',
   outcomeEmptySummary: 'No modeled effect',
   configureMissOutcome: 'Configure miss outcome',
-  addOutcomeApplication: 'Add effect application',
+  addAuthoredEffect: 'Add effect',
+  addAppliedEffect: 'Add applied effect',
   appliedEffects: 'Applied effects',
   primaryOutcomeEmptyWarning:
     'The primary outcome for this resolution method has no modeled effects or additional behavior.',
   hitNote: 'Additional behavior',
+  addOutcomeNote: 'Add additional behavior',
+  outcomeNotePlaceholder: 'Describe behavior not modeled above...',
 } as const
 
-export const RESOLUTION_OUTCOME_AMOUNT_OPTIONS = [
-  { value: 'full', label: 'Full' },
-  { value: 'half', label: 'Half' },
-] as const
+export const RESOLUTION_OUTCOME_AMOUNT_OPTIONS: FieldOption[] = toOptions(
+  SPELL_RESOLUTION_APPLICATION_AMOUNTS,
+  Object.fromEntries(
+    SPELL_RESOLUTION_APPLICATION_AMOUNTS.map((amount) => [
+      amount,
+      SPELL_RESOLUTION_APPLICATION_AMOUNT_ENTRIES[amount].label,
+    ]),
+  ) as Record<SpellResolutionApplicationAmount, string>,
+)
 
 export const RESOLUTION_FIELD_LABELS = {
   target: '',
@@ -70,7 +83,7 @@ export const RESOLUTION_FIELD_LABELS = {
   damageRoll: 'Damage roll',
   damageType: 'Damage type',
   hitNote: RESOLUTION_SECTION_LABELS.hitNote,
-  outcomeApplicationAmount: 'Amount',
+  outcomeApplicationAmount: 'Application',
 } as const
 
 export const RESOLUTION_APPLICATION_PATTERN_NONE_OPTION = {

@@ -123,4 +123,40 @@ describe('ButtonDropdown', () => {
     )
     await expectNoAxeViolations(container)
   })
+
+  it('renders an optional leading icon on the trigger', () => {
+    render(
+      <ButtonDropdown
+        label="Add grant"
+        leadingIcon={<span data-testid="leading-icon" />}
+        groups={groups}
+        items={items}
+        onSelectItem={vi.fn()}
+      />,
+    )
+
+    expect(screen.getByTestId('leading-icon')).toBeInTheDocument()
+  })
+
+  it('applies fit width classes when width is fit', () => {
+    render(
+      <ButtonDropdown
+        label="Add grant"
+        width="fit"
+        groups={groups}
+        items={items}
+        onSelectItem={vi.fn()}
+      />,
+    )
+
+    expect(screen.getByRole('button', { name: 'Add grant' })).toHaveClass('w-fit', 'shrink-0')
+  })
+
+  it('does not apply fit width classes by default', () => {
+    render(
+      <ButtonDropdown label="Add grant" groups={groups} items={items} onSelectItem={vi.fn()} />,
+    )
+
+    expect(screen.getByRole('button', { name: 'Add grant' })).not.toHaveClass('w-fit')
+  })
 })
