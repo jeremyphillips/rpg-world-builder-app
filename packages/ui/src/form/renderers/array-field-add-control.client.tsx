@@ -3,9 +3,11 @@
 /**
  * Renders the array section add control below the item list.
  *
- * Chooses between a plain outline button and `ButtonDropdown` when
+ * Chooses between a plain button and `ButtonDropdown` when
  * `ArrayConfig.addMenu` is configured; hides entirely when `canAdd` is false.
+ * `addVariant` controls the trigger style (defaults to `outline`).
  */
+import type { ButtonVariantProps } from '../../components/ui/button.variants'
 import { Button } from '../../components/ui/button.client'
 import { ButtonDropdown } from '../../components/ui/button-dropdown.client'
 import type {
@@ -19,6 +21,7 @@ import type { ArrayConfig } from '../field-config'
 type ArrayFieldAddControlProps = {
   canAdd: boolean
   addLabel: string
+  addVariant: NonNullable<ButtonVariantProps['variant']>
   addMenu?: ArrayConfig['addMenu']
   addMenuItems: ButtonDropdownItem[]
   onAppendItem: () => void
@@ -28,6 +31,7 @@ type ArrayFieldAddControlProps = {
 export function ArrayFieldAddControl({
   canAdd,
   addLabel,
+  addVariant,
   addMenu,
   addMenuItems,
   onAppendItem,
@@ -45,6 +49,7 @@ export function ArrayFieldAddControl({
         groups={addMenu.groups as ButtonDropdownGroup[]}
         items={addMenuItems}
         enableSearch={addMenu.enableSearch}
+        variant={addVariant}
         size={buttonSize}
         onSelectItem={onAppendFromMenu}
       />
@@ -52,7 +57,7 @@ export function ArrayFieldAddControl({
   }
 
   return (
-    <Button variant="outline" size={buttonSize} onClick={onAppendItem} aria-label={addLabel}>
+    <Button variant={addVariant} size={buttonSize} onClick={onAppendItem} aria-label={addLabel}>
       {addLabel}
     </Button>
   )

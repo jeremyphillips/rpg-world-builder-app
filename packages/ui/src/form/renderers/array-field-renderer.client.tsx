@@ -70,7 +70,7 @@ export function ArrayFieldRenderer({ config, idPrefix, fullName }: ArrayFieldRen
       id={config.id}
       className={cn(
         fieldSetResetClasses,
-        !state.nested && fieldGroupBottomMarginClasses,
+        !state.omitSectionBottomMargin && fieldGroupBottomMarginClasses,
         config.className,
       )}
     >
@@ -100,6 +100,7 @@ export function ArrayFieldRenderer({ config, idPrefix, fullName }: ArrayFieldRen
         <ArrayFieldAddControl
           canAdd={state.canAdd && !config.hideAddControl}
           addLabel={state.addLabel}
+          addVariant={state.addVariant}
           addMenu={config.addMenu}
           addMenuItems={state.addMenuItems}
           onAppendItem={state.appendItem}

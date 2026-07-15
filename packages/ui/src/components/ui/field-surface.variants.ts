@@ -4,7 +4,7 @@ import { cn } from '../../lib/utils'
 import { compactLabelAppearanceToneClasses, type CompactLabelTone } from './compact-label.lib'
 
 /** Shared rounded box layout for group panel and outline body chrome. */
-export const fieldGroupBodyShellLayoutClasses = 'min-w-0 rounded-md border p-3'
+export const fieldGroupBodyShellLayoutClasses = 'min-w-0 rounded-md border p-4'
 
 /** Subtle raised emboss for card-plane surfaces — inset highlight + drop shadow. */
 export const fieldSurfaceRaisedShadowClasses = 'shadow-surface-raised'

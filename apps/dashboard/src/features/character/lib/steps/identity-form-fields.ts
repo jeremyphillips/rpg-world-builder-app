@@ -75,12 +75,19 @@ export const identityFormFields: FormItem[] = [
     ],
   },
   {
-    type: 'chips',
-    name: 'alignment',
-    label: 'Alignment',
-    multiple: false,
-    options: toOptions(ALIGNMENTS, ALIGNMENT_LABELS),
-    width: 'full',
+    kind: 'group',
+    legend: '',
+    fieldsChrome: { variant: 'panel' },
+    fields: [
+      {
+        type: 'chips',
+        name: 'alignment',
+        label: 'Alignment',
+        multiple: false,
+        options: toOptions(ALIGNMENTS, ALIGNMENT_LABELS),
+        width: 'full',
+      },
+    ],
   },
   narrativeArrayField(
     'personalityTraits',

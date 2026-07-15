@@ -17,7 +17,9 @@ and size defaults: [forms hub — Form rhythm](../forms.md#form-rhythm).
 
 Semantic `<fieldset>` + `<legend>`. Top-level: section scale (`text-field-group-legend`).
 Nested groups inside another group default to `legendSize: 'subsection'` (override when
-needed).
+needed). Nested groups omit `mb-8` — parent group rhythm (`gap-6` / `gap-2`) owns sibling
+spacing, matching nested array sections. Top-level groups and arrays inside `<Form>` omit
+`mb-8` as well — the form's `FormRhythmStack` (`gap-6` / `gap-2`) owns sibling spacing.
 
 ```ts
 {
@@ -65,8 +67,8 @@ apply to the `<fieldset>`. Token source: `field-group-chrome.variants.ts`.
 
 ## Rows
 
-Side-by-side leaf fields. `layout`: `flex` (default) or `responsive-2/3/4`. Row-level
-`visibility` and `separator`. Layout detail: [sizing-and-spacing.md](./sizing-and-spacing.md).
+Side-by-side leaf fields in a wrapping flex row. Row-level `visibility`, `separator`,
+and `className`. Layout detail: [sizing-and-spacing.md](./sizing-and-spacing.md).
 
 ## Stacks
 
@@ -153,7 +155,7 @@ Dependent stack with an array dependent — use `arrayItems` scope:
 
 ## Field separators
 
-`separator: 'subtle'` on a leaf or row → trailing `border-b` + `pb-4` before the next sibling.
+`separator: 'subtle'` on a leaf or row → trailing `border-b` + `pb-7` (28px) before the next sibling.
 On a `stack` → trailing divider after the whole stack (controller + dependents region).
 Prefer stack-level `separator` for `layout: 'dependent'` blocks instead of putting it on the
 controller field.
@@ -177,6 +179,7 @@ use `itemChrome` or stack `dependentsChrome` + `dependentsChromeScope: 'arrayIte
   addLabel: 'Add trait',
   min: 0,
   max: 10,
+  addVariant: 'outline',
   itemHeader: {
     fallback: (i) => `Trait ${i + 1}`,
     primaryField: 'name',
@@ -188,8 +191,10 @@ use `itemChrome` or stack `dependentsChrome` + `dependentsChromeScope: 'arrayIte
 **Legend:** Omit or pass `''` when a parent switch/stack already labels the block (e.g.
 `dependent` stack dependents). Empty legends are not rendered — no phantom spacing.
 
-**Section margin:** Top-level array fieldsets use `mb-8`. Nested arrays (inside stacks,
-groups, or array items) omit it so parent `fieldStackRhythmVariants` gap controls spacing.
+**Section margin:** Standalone `FieldGroup` fieldsets use `mb-8`. Arrays and groups inside
+`<Form>` omit it — `FormRhythmStack` gap controls sibling spacing. Nested arrays (inside
+stacks, groups, or array items) also omit it so parent `fieldStackRhythmVariants` gap
+controls spacing.
 
 **Item chrome:** Each row renders a header toolbar (optional drag handle, optional collapse
 caret, title, remove). `itemVariant: 'auto'` picks `compact` when item fields are a single
@@ -246,21 +251,27 @@ traits: z.array(z.object({ name: z.string().min(1), description: z.string() })),
 
 Optional hooks:
 
-| Property                          | Purpose                                                                                                       |
-| --------------------------------- | ------------------------------------------------------------------------------------------------------------- |
-| `itemVariant`                     | `'auto'` \| `'compact'` \| `'detailed'` — row layout (default `auto`).                                        |
-| `compactInlineAlign`              | `'start'` \| `'center'` — compact inline rows only; center grip/actions with label-less single controls.      |
-| `itemChrome`                      | Item shell surface tone — defaults to `elevated` (`bg-card`); override with `subtle`, `medium`, etc.          |
-| `itemHeader`                      | Primary/fallback labels; optional `summary` on a second row below the title (detailed).                       |
-| `itemHeader.showFallbackInHeader` | When true, appends ` · {fallback}` after the primary title (default `false`).                                 |
-| `itemCollapsible`                 | Detailed items only — collapse body into header row.                                                          |
-| `itemCollapseKey`                 | Stable row field for persisted collapse overrides (default `'id'`; else `index:${index}`).                    |
-| `reorder`                         | `'dragHandle'` (default) or `false` for fixed order.                                                          |
-| `appendDefaults`                  | `(items) => defaults` replaces static defaults on append.                                                     |
-| `hideAddControl`                  | Omits the default add button (use an external slot instead).                                                  |
-| `hideItemRemove`                  | Omits the default per-item remove button (not merely disabled). Use with `itemRemoveSlot`.                    |
-| `itemRemoveSlot`                  | Custom remove control in the header actions rail; receives `ArrayFieldContext`. Pair with `hideItemRemove`.   |
-| `addMenu`                         | Searchable template dropdown for the add control; items carry `appendDefaults` and optional duplicate policy. |
+| Property             | Purpose                                                                                                  |
+| -------------------- | -------------------------------------------------------------------------------------------------------- |
+| `itemVariant`        | `'auto'` \| `'compact'` \| `'detailed'` — row layout (default `auto`).                                   |
+| `compactInlineAlign` | `'start'` \| `'center'` — compact inline rows only; center grip/actions with label-less single controls. |
+
+**Compact inline rows** (`itemVariant: 'auto'` \| `'compact'` with a single leaf `row`) render that row
+inside a `FieldRow` within the grip/actions grid — leaf `width` tokens (`full`, `auto`, fractions,
+`digits`, …) compose the same way as schema `kind: 'row'` fields.
+
+| `itemChrome` | Item shell surface tone — defaults to `elevated` (`bg-card`); override with `subtle`, `medium`, etc. |
+| `itemHeader` | Primary/fallback labels; optional `summary` on a second row below the title (detailed). |
+| `itemHeader.showFallbackInHeader` | When true, appends ` · {fallback}` after the primary title (default `false`). |
+| `itemCollapsible` | Detailed items only — collapse body into header row. |
+| `itemCollapseKey` | Stable row field for persisted collapse overrides (default `'id'`; else `index:${index}`). |
+| `reorder` | `'dragHandle'` (default) or `false` for fixed order. |
+| `appendDefaults` | `(items) => defaults` replaces static defaults on append. |
+| `addVariant` | Button visual style for the add control — mirrors `Button` `variant`; defaults to `outline`. |
+| `hideAddControl` | Omits the default add button (use an external slot instead). |
+| `hideItemRemove` | Omits the default per-item remove button (not merely disabled). Use with `itemRemoveSlot`. |
+| `itemRemoveSlot` | Custom remove control in the header actions rail; receives `ArrayFieldContext`. Pair with `hideItemRemove`. |
+| `addMenu` | Searchable template dropdown for the add control; items carry `appendDefaults` and optional duplicate policy. |
 
 ```ts
 {

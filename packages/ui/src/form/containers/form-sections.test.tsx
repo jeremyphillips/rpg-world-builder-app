@@ -42,4 +42,37 @@ describe('Form section rendering', () => {
     expect(screen.getByText('Tags')).toHaveClass('text-sm')
     expect(screen.getByText('Tags')).not.toHaveClass('text-field-array-legend')
   })
+
+  it('omits section bottom margin on nested groups and rhythm-stack siblings', () => {
+    const nestedGroupFields: FormItem[] = [
+      {
+        kind: 'group',
+        legend: 'Weapon',
+        fields: [
+          { type: 'text', name: 'title', label: 'Title' },
+          {
+            kind: 'group',
+            legend: 'Damage',
+            fields: [{ type: 'text', name: 'damageDice', label: 'Dice' }],
+          },
+        ],
+      },
+    ]
+
+    render(<Form schema={schema} fields={nestedGroupFields} onSubmit={vi.fn()} />)
+
+    const weaponGroup = screen.getByRole('group', { name: /Weapon/ })
+    const damageGroup = screen.getByRole('group', { name: /Damage/ })
+
+    expect(weaponGroup).not.toHaveClass('mb-8')
+    expect(weaponGroup).toHaveClass('mb-0')
+    expect(damageGroup).not.toHaveClass('mb-8')
+    expect(damageGroup).toHaveClass('mb-0')
+  })
+
+  it('omits section bottom margin on top-level arrays spaced by form rhythm', () => {
+    render(<Form schema={schema} fields={fields} onSubmit={vi.fn()} />)
+
+    expect(screen.getByRole('group', { name: /Tags/ })).not.toHaveClass('mb-8')
+  })
 })

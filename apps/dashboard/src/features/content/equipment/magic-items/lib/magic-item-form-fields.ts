@@ -61,7 +61,6 @@ export function magicItemFormFieldGroup(ctx: ContentFormCtx = {}): FormItem {
       },
       {
         kind: 'row',
-        layout: 'responsive-2',
         fields: [
           {
             type: 'combobox',

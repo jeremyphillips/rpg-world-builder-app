@@ -17,6 +17,7 @@ import type {
   RichTextLinkPickerContentTypeOption,
   RichTextLinkPickerInternalOption,
 } from '../components/ui/rich-text-link-picker.client'
+import type { ButtonVariantProps } from '../components/ui/button.variants'
 import type { FieldSize } from '../components/ui/field.client'
 import type { ComboboxRenderSelectedItem } from '../components/ui/combobox-field.types'
 import type { WeightedSearchField } from '../lib/search'
@@ -33,7 +34,6 @@ import type {
 } from '../components/ui/field-stack.variants'
 import type { FieldGroupFieldsChrome } from '../components/ui/field-group-chrome.variants'
 import type {
-  FieldRowLayout,
   FieldHintPosition,
   FieldGroupLegendSize,
   FieldLabelPosition,
@@ -593,8 +593,6 @@ export type FieldConfig =
 export interface RowConfig {
   kind: 'row'
   fields: FieldConfig[]
-  /** Preferred display recipe. Use `className` only for one-off escape hatches. */
-  layout?: FieldRowLayout
   className?: string
   /** Trailing divider after this row within a group/stack rhythm. */
   separator?: FieldSeparator
@@ -753,6 +751,11 @@ export interface ArrayConfig {
   fields: FormItem[]
   /** Label for the "Add" button. Defaults to `"Add item"`. */
   addLabel?: string
+  /**
+   * Visual style for the add control — mirrors `Button` / `ButtonDropdown` `variant`.
+   * Defaults to `outline`.
+   */
+  addVariant?: NonNullable<ButtonVariantProps['variant']>
   /** Minimum item count; removes the "Remove" button while at the floor. */
   min?: number
   /** Maximum item count; hides the "Add" button once reached. */

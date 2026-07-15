@@ -16,23 +16,22 @@ import {
 export interface ArrayItemCompactRowProps {
   titleId: string
   ariaLabel: string
-  fieldCount: number
   showGrip: boolean
   align?: ArrayCompactInlineAlign
   grip?: React.ReactNode
-  fields: React.ReactNode[]
+  /** Field row region — typically a `FieldRow` so `width` tokens compose like schema rows. */
+  fields: React.ReactNode
   actions: React.ReactNode
   summary?: React.ReactNode
 }
 
 /**
- * Compact array item layout — `[grip?] [field₁] … [fieldₙ] [actions]` on one grid row,
+ * Compact array item layout — `[grip?] [field row] [actions]` on one grid row,
  * with an optional full-width summary below.
  */
 export function ArrayItemCompactRow({
   titleId,
   ariaLabel,
-  fieldCount,
   showGrip,
   align = 'start',
   grip,
@@ -41,25 +40,21 @@ export function ArrayItemCompactRow({
   summary,
 }: ArrayItemCompactRowProps) {
   const gridStyle = {
-    gridTemplateColumns: buildArrayItemCompactRowGridTemplate(fieldCount, showGrip),
+    gridTemplateColumns: buildArrayItemCompactRowGridTemplate(showGrip),
   } as CSSProperties
 
   return (
     <div
       className={arrayItemCompactRowClasses(align)}
       style={gridStyle}
-      data-compact-field-count={fieldCount}
+      data-compact-inline-row=""
       data-compact-inline-align={align}
     >
       <span id={titleId} className="sr-only">
         {ariaLabel}
       </span>
       {showGrip && grip ? <div className={arrayItemCompactGripClasses(align)}>{grip}</div> : null}
-      {fields.map((field, index) => (
-        <div key={index} className={arrayItemCompactFieldCellClasses}>
-          {field}
-        </div>
-      ))}
+      <div className={arrayItemCompactFieldCellClasses}>{fields}</div>
       <div className={arrayItemCompactActionsClasses}>{actions}</div>
       {summary ? <div className={arrayItemCompactSummaryClasses}>{summary}</div> : null}
     </div>

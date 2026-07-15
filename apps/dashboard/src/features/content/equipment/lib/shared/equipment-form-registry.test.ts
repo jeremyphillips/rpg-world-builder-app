@@ -40,7 +40,11 @@ describe('kindFieldGroups', () => {
   it('registers adventuring gear field group', () => {
     const groups = fieldGroupsForEquipmentKind('adventuring_gear')
     expect(groups).toHaveLength(1)
-    expect(groups?.[0]).toMatchObject({ kind: 'group', legend: 'Adventuring Gear' })
+    expect(groups?.[0]).toMatchObject({
+      kind: 'group',
+      legend: '',
+      fieldsChrome: { variant: 'panel' },
+    })
   })
 
   it('registers vehicle field group', () => {
@@ -52,7 +56,11 @@ describe('kindFieldGroups', () => {
   it('registers armor field group', () => {
     const groups = fieldGroupsForEquipmentKind('armor')
     expect(groups).toHaveLength(1)
-    expect(groups?.[0]).toMatchObject({ kind: 'group', legend: 'Armor' })
+    expect(groups?.[0]).toMatchObject({
+      kind: 'group',
+      legend: '',
+      fieldsChrome: { variant: 'panel' },
+    })
   })
 
   it('registers weapon field group', () => {

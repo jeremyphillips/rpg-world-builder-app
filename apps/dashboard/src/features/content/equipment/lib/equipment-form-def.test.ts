@@ -87,10 +87,10 @@ describe('equipmentFormDef kind-scoped fields', () => {
     ).toEqual(['', 'Economy'])
   })
 
-  it('adventuring gear route shows Adventuring Gear and Economy groups only', () => {
+  it('adventuring gear route shows kind panel and Economy groups only', () => {
     expect(
       collectGroupLegends(equipmentFormDef.buildFields({ equipmentKind: 'adventuring_gear' })),
-    ).toEqual(['Adventuring Gear', 'Economy'])
+    ).toEqual(['', 'Economy'])
   })
 
   it('vehicle route shows kind panel and Economy groups only', () => {
@@ -99,9 +99,9 @@ describe('equipmentFormDef kind-scoped fields', () => {
     )
   })
 
-  it('armor route shows Armor and Economy groups only', () => {
+  it('armor route shows kind panel and Economy groups only', () => {
     expect(collectGroupLegends(equipmentFormDef.buildFields({ equipmentKind: 'armor' }))).toEqual([
-      'Armor',
+      '',
       'Economy',
     ])
   })

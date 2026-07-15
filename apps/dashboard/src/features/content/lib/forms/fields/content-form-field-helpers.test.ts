@@ -142,7 +142,8 @@ describe('wealthGrantFields', () => {
     const [group] = wealthGrantFields('wealth')
     expect(group).toMatchObject({ kind: 'group', legend: 'Wealth' })
     if (group && 'fields' in group && group.fields[0] && 'fields' in group.fields[0]) {
-      expect(group.fields[0]).toMatchObject({ kind: 'row', layout: 'responsive-2' })
+      expect(group.fields[0]).toMatchObject({ kind: 'row' })
+      expect(group.fields[0]).not.toHaveProperty('layout')
       expect(group.fields[0]).not.toHaveProperty('className')
       expect(
         group.fields[0].fields.map((field) => ('name' in field ? field.name : undefined)),
@@ -165,14 +166,12 @@ describe('scalar unit rows', () => {
     }
   })
 
-  it('uses a responsive-4 grid row for cargo, speed, crew, and passengers', () => {
+  it('uses a flex row at intrinsic width for cargo, speed, crew, and passengers', () => {
     const row = vehicleCargoSpeedFields()[0]
-    expect(row).toMatchObject({
-      kind: 'row',
-      layout: 'responsive-4',
-      className: 'w-fit max-w-full md:grid-cols-[auto_auto_auto_auto]',
-    })
+    expect(row).toMatchObject({ kind: 'row', separator: 'subtle' })
     if (row && 'kind' in row && row.kind === 'row') {
+      expect(row).not.toHaveProperty('layout')
+      expect(row).not.toHaveProperty('className')
       expect(row.fields).toEqual([
         expect.objectContaining({ name: 'cargoCapacity', width: 'auto' }),
         expect.objectContaining({ name: 'speed', width: 'auto' }),

@@ -4,7 +4,10 @@ import * as React from 'react'
 import type { useSortable } from '@dnd-kit/sortable'
 
 import { ArrayFieldContext } from '../context/array-field.context'
-import { ArrayItemPresentationContext } from '../context/array-item-presentation.context'
+import {
+  ArrayItemPresentationContext,
+  resolveErrorPlacement,
+} from '../context/array-item-presentation.context'
 import {
   resolveArrayItemHeader,
   type ResolvedArrayItemHeader,
@@ -13,6 +16,7 @@ import type { ArrayConfig, RowConfig } from '../field-config'
 import { NestedFormItems } from '../containers/form-item-node.client'
 import { FieldNode } from '../containers/form-conditional.client'
 import { resolveIssueProminence } from '../errors/resolve-issue-prominence'
+import { FieldRow } from '../../components/ui/field-row'
 import { ArrayItemToolbar, ArrayItemDragHandle } from './array-item-header.client'
 import { ArrayItemCompactRow } from './array-item-compact-row.client'
 import { ArrayItemActionsRail, ArrayItemShell } from './array-item-shell.client'
@@ -130,6 +134,16 @@ function CompactInlineArrayFieldItem({
   actionsRail,
   issueSummary,
 }: CompactInlineArrayFieldItemProps) {
+  const rowPresentation = React.useContext(ArrayItemPresentationContext)
+  const suppressRowFieldErrorText = resolveErrorPlacement(
+    compactInlineRow.errorPlacement,
+    'compact',
+    true,
+  )
+  const rowPresentationValue = suppressRowFieldErrorText
+    ? { ...rowPresentation, suppressFieldErrorText: true }
+    : rowPresentation
+
   return (
     <ArrayItemShell
       titleId={titleId}
@@ -144,7 +158,6 @@ function CompactInlineArrayFieldItem({
             <ArrayItemCompactRow
               titleId={titleId}
               ariaLabel={header.ariaLabel}
-              fieldCount={compactInlineRow.fields.length}
               showGrip={gripVisible}
               align={compactInlineAlign}
               grip={
@@ -157,14 +170,20 @@ function CompactInlineArrayFieldItem({
                   />
                 ) : undefined
               }
-              fields={compactInlineRow.fields.map((field) => (
-                <FieldNode
-                  key={field.name}
-                  config={field}
-                  idPrefix={idPrefix}
-                  namePrefix={namePrefix}
-                />
-              ))}
+              fields={
+                <ArrayItemPresentationContext.Provider value={rowPresentationValue}>
+                  <FieldRow className={compactInlineRow.className}>
+                    {compactInlineRow.fields.map((field) => (
+                      <FieldNode
+                        key={field.name}
+                        config={field}
+                        idPrefix={idPrefix}
+                        namePrefix={namePrefix}
+                      />
+                    ))}
+                  </FieldRow>
+                </ArrayItemPresentationContext.Provider>
+              }
               actions={actionsRail}
               summary={
                 issueSummary?.placement === 'compactSummary' ? (

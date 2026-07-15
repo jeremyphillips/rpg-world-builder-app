@@ -61,6 +61,8 @@ export function toolFormFieldGroup(): FormItem[] {
       addLabel: 'Add utilize action',
       min: 1,
       itemCollapsible: true,
+      itemChrome: 'subtle',
+      size: 'md',
       itemHeader: {
         fallback: (index) => `Action ${index + 1}`,
         primaryField: 'description',
@@ -74,7 +76,7 @@ export function toolFormFieldGroup(): FormItem[] {
               name: 'description',
               label: 'Description',
               required: true,
-              width: 'xl',
+              width: 'full',
             },
             {
               type: 'number',
@@ -83,8 +85,8 @@ export function toolFormFieldGroup(): FormItem[] {
               min: 1,
               max: 30,
               required: true,
-              width: 'auto',
               digits: 2,
+              width: 'auto',
             },
           ],
         },

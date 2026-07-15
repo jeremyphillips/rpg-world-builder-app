@@ -213,7 +213,7 @@ export function wealthGrantFields(namePrefix: string): FormItem[] {
     {
       kind: 'group',
       legend: 'Wealth',
-      fields: [{ kind: 'row', layout: 'responsive-2', fields }],
+      fields: [{ kind: 'row', fields }],
     },
   ]
 }

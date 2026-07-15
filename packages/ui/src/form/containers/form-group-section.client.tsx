@@ -4,6 +4,7 @@ import * as React from 'react'
 
 import { FieldGroup } from '../../components/ui/field-group'
 import { resolveFieldStackRhythm } from '../../components/ui/field.variants'
+import { cn } from '../../lib/utils'
 import {
   FormSectionContext,
   buildFormSectionChildContext,
@@ -54,7 +55,10 @@ export function GroupFieldSection({
       legendSize={legendSize}
       rhythm={groupRhythm}
       description={item.description}
-      className={item.className}
+      className={cn(
+        item.className,
+        (parentContext.inGroup || parentContext.inRhythmStack) && 'mb-0',
+      )}
       fieldsChrome={item.fieldsChrome}
       uiStateKey={uiStateKey}
       collapseKey={item.id}

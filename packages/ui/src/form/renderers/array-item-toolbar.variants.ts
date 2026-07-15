@@ -124,12 +124,9 @@ export const arrayItemCompactActionsClasses =
 export const arrayItemCompactSummaryClasses = 'col-span-full min-w-0'
 
 /** Builds `grid-template-columns` for a compact inline row. */
-export function buildArrayItemCompactRowGridTemplate(
-  fieldCount: number,
-  showGrip: boolean,
-): string {
+export function buildArrayItemCompactRowGridTemplate(showGrip: boolean): string {
   const grip = showGrip ? 'auto ' : ''
-  return `${grip}repeat(${fieldCount}, minmax(0, 1fr)) max-content`
+  return `${grip}minmax(0, 1fr) max-content`
 }
 
 /** Applied to the item wrapper while it is being dragged. */

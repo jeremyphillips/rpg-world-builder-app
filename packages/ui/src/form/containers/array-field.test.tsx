@@ -113,7 +113,7 @@ describe('ArrayFieldRenderer', () => {
     expect(screen.getByRole('button', { name: 'Add trait' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Add trait' })).toHaveClass('h-9')
     expect(screen.queryByLabelText('Trait name')).not.toBeInTheDocument()
-    expect(screen.getByRole('group', { name: /Traits/ })).toHaveClass('mb-8')
+    expect(screen.getByRole('group', { name: /Traits/ })).not.toHaveClass('mb-8')
   })
 
   it('omits section bottom margin and empty legends for nested arrays in dependent stacks', async () => {
@@ -200,6 +200,86 @@ describe('ArrayFieldRenderer', () => {
     expect(itemShell).toHaveClass('bg-muted/10')
     expect(itemShell).toHaveClass('border-border')
     expect(itemShell).not.toHaveClass('bg-card')
+  })
+
+  it('defaults the add control to the outline button variant', () => {
+    renderForm()
+
+    const addButton = screen.getByRole('button', { name: 'Add trait' })
+    expect(addButton).toHaveClass('border-input')
+    expect(addButton).not.toHaveClass('bg-primary')
+    expect(addButton).not.toHaveClass('bg-secondary')
+  })
+
+  it('applies addVariant on the add control', () => {
+    const secondaryFields: FormItem[] = [
+      {
+        kind: 'array',
+        name: 'traits',
+        legend: 'Traits',
+        fields: traitFields,
+        addLabel: 'Add trait',
+        addVariant: 'secondary',
+      },
+    ]
+
+    render(
+      <Form<Values>
+        schema={schema}
+        fields={secondaryFields}
+        onSubmit={vi.fn()}
+        footer={<button type="submit">Save</button>}
+      />,
+    )
+
+    const addButton = screen.getByRole('button', { name: 'Add trait' })
+    expect(addButton).toHaveClass('bg-secondary')
+    expect(addButton).not.toHaveClass('border-input')
+  })
+
+  it('applies addVariant on addMenu dropdown triggers', async () => {
+    const user = userEvent.setup()
+    const grantSchema = z.object({
+      grants: z.array(z.object({ grantType: z.string().optional() })),
+    })
+
+    const addMenuFields: FormItem[] = [
+      {
+        kind: 'array',
+        name: 'grants',
+        legend: 'Grants',
+        addLabel: 'Add grant',
+        addVariant: 'default',
+        fields: [{ type: 'text', name: 'grantType', label: 'Grant type' }],
+        addMenu: {
+          groups: [{ id: 'traits', label: 'Traits' }],
+          items: [
+            {
+              id: 'movement-bonus',
+              label: 'Movement bonus',
+              groupId: 'traits',
+              appendDefaults: { grantType: 'movement-bonus' },
+            },
+          ],
+        },
+      },
+    ]
+
+    render(
+      <Form<z.infer<typeof grantSchema>>
+        schema={grantSchema}
+        fields={addMenuFields}
+        onSubmit={vi.fn()}
+        footer={<button type="submit">Save</button>}
+      />,
+    )
+
+    const addButton = screen.getByRole('button', { name: 'Add grant' })
+    expect(addButton).toHaveClass('bg-primary')
+    expect(addButton).not.toHaveClass('border-input')
+
+    await user.click(addButton)
+    expect(screen.getByRole('option', { name: 'Movement bonus' })).toBeInTheDocument()
   })
 
   it('defaults array item shells to elevated card chrome', async () => {
@@ -850,13 +930,73 @@ describe('ArrayFieldRenderer', () => {
       />,
     )
 
-    const compactRow = document.querySelector('[data-compact-field-count="2"]')
+    const compactRow = document.querySelector('[data-compact-inline-row]')
     expect(compactRow).toBeInTheDocument()
+    expect(compactRow?.querySelector('[data-field-row]')).toBeInTheDocument()
 
     const actionsRail = compactRow!.querySelector('[aria-label="Item actions"]')
     expect(actionsRail).toBeInTheDocument()
     expect(actionsRail).not.toHaveClass('mt-1')
     expect(actionsRail).toHaveClass('justify-self-end')
+  })
+
+  it('honors FieldRow width tokens inside compact inline rows', async () => {
+    const compactWidthFields: FormItem[] = [
+      {
+        kind: 'array',
+        name: 'utilizes',
+        legend: 'Utilize actions',
+        itemVariant: 'compact',
+        fields: [
+          {
+            kind: 'row',
+            fields: [
+              {
+                type: 'text',
+                name: 'description',
+                label: 'Description',
+                required: true,
+                width: 'full',
+              },
+              {
+                type: 'number',
+                name: 'dc',
+                label: 'DC',
+                required: true,
+                digits: 2,
+                width: 'auto',
+              },
+            ],
+          },
+        ],
+        addLabel: 'Add utilize action',
+        itemHeader: { fallback: (index) => `Action ${index + 1}`, primaryField: 'description' },
+      },
+    ]
+
+    const utilizeSchema = z.object({
+      utilizes: z.array(z.object({ description: z.string(), dc: z.number() })),
+    })
+
+    render(
+      <Form<z.infer<typeof utilizeSchema>>
+        schema={utilizeSchema}
+        fields={compactWidthFields}
+        defaultValues={{ utilizes: [{ description: 'Pick a lock', dc: 15 }] }}
+        onSubmit={vi.fn()}
+        footer={<button type="submit">Save</button>}
+      />,
+    )
+
+    const compactRow = document.querySelector('[data-compact-inline-row]')
+    expect(compactRow?.querySelector('[data-field-row]')).toBeInTheDocument()
+
+    expect(screen.getByRole('textbox', { name: 'Description' }).closest('.space-y-2')).toHaveClass(
+      'flex-1',
+    )
+    expect(screen.getByRole('spinbutton', { name: 'DC' }).closest('.space-y-2')).toHaveClass(
+      'flex-none',
+    )
   })
 
   it('centers compact inline grip and actions when compactInlineAlign is center', () => {
@@ -893,7 +1033,7 @@ describe('ArrayFieldRenderer', () => {
       />,
     )
 
-    const compactRow = document.querySelector('[data-compact-field-count="1"]')
+    const compactRow = document.querySelector('[data-compact-inline-row]')
     expect(compactRow).toHaveAttribute('data-compact-inline-align', 'center')
     expect(compactRow).toHaveClass('items-center')
   })

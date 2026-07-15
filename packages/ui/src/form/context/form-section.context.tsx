@@ -24,6 +24,8 @@ export interface FormSectionContextValue {
   arrayItemTone?: FieldStackDependentsTone
   /** True when the current section is nested inside a group fieldset. */
   inGroup?: boolean
+  /** True when a parent rhythm stack (`gap-*`) spaces sibling sections. */
+  inRhythmStack?: boolean
 }
 
 export const FormSectionContext = React.createContext<FormSectionContextValue>({
@@ -41,6 +43,7 @@ export interface FormSectionContextOverrides {
   size?: FieldSize
   arrayItemTone?: FieldStackDependentsTone
   inGroup?: boolean
+  inRhythmStack?: boolean
 }
 
 /** Child section context — inherits rhythm and size unless overridden. */
@@ -55,6 +58,7 @@ export function buildFormSectionChildContext(
     size: overrides?.size ?? parent.size,
     arrayItemTone: overrides?.arrayItemTone ?? parent.arrayItemTone,
     inGroup: overrides?.inGroup ?? parent.inGroup,
+    inRhythmStack: overrides?.inRhythmStack ?? parent.inRhythmStack,
   }
 }
 
@@ -67,10 +71,18 @@ export interface FormRhythmStackProps {
 
 /** Flex column stack whose gap follows form section rhythm. */
 export function FormRhythmStack({ className, rhythm, children }: FormRhythmStackProps) {
-  const { rhythm: inherited } = useFormSectionContext()
-  const resolved = rhythm ?? inherited
+  const parent = useFormSectionContext()
+  const resolved = rhythm ?? parent.rhythm
+  const value = React.useMemo(
+    () => ({ ...parent, rhythm: resolved, inRhythmStack: true }),
+    [parent, resolved],
+  )
   return (
-    <div className={cn(fieldStackRhythmVariants({ rhythm: resolved }), className)}>{children}</div>
+    <FormSectionContext.Provider value={value}>
+      <div className={cn(fieldStackRhythmVariants({ rhythm: resolved }), className)}>
+        {children}
+      </div>
+    </FormSectionContext.Provider>
   )
 }
 

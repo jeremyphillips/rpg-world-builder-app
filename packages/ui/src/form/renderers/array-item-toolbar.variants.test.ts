@@ -96,12 +96,8 @@ describe('array item shell variants', () => {
   })
 
   it('builds compact row grid templates with a reserved actions column', () => {
-    expect(buildArrayItemCompactRowGridTemplate(2, true)).toBe(
-      'auto repeat(2, minmax(0, 1fr)) max-content',
-    )
-    expect(buildArrayItemCompactRowGridTemplate(3, false)).toBe(
-      'repeat(3, minmax(0, 1fr)) max-content',
-    )
+    expect(buildArrayItemCompactRowGridTemplate(true)).toBe('auto minmax(0, 1fr) max-content')
+    expect(buildArrayItemCompactRowGridTemplate(false)).toBe('minmax(0, 1fr) max-content')
     expect(arrayItemCompactRowClasses()).toContain('grid')
     expect(arrayItemCompactRowClasses()).toContain('items-start')
     expect(arrayItemCompactRowClasses('center')).toContain('items-center')

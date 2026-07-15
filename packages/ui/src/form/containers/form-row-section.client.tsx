@@ -27,7 +27,7 @@ export function RowFieldSection({ item, index, idPrefix, namePrefix }: RowFieldS
       {withFieldSeparator(
         item.separator,
         <ArrayItemPresentationContext.Provider value={value}>
-          <FieldRow layout={item.layout} className={item.className}>
+          <FieldRow className={item.className}>
             {item.fields.map((field) => (
               <FieldNode
                 key={namePrefix ? `${namePrefix}.${field.name}` : field.name}

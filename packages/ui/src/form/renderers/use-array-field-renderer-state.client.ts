@@ -52,9 +52,10 @@ export function useArrayFieldRendererState({
 }: UseArrayFieldRendererStateOptions) {
   const { addValidationSessionExpandKeys } = useFormUiContext()
   const validation = useFormValidationPresentation()
-  const { rhythm, size, depth } = useFormSectionContext()
+  const { rhythm, size, depth, inRhythmStack } = useFormSectionContext()
   const {
     addLabel = 'Add item',
+    addVariant = 'outline',
     min = 0,
     max,
     legend,
@@ -67,6 +68,7 @@ export function useArrayFieldRendererState({
   const itemListClasses = fieldArrayItemListClasses({ rhythm, size })
   const itemBodyStackClasses = fieldStackRhythmVariants({ rhythm })
   const nested = isNestedArraySection(depth)
+  const omitSectionBottomMargin = nested || inRhythmStack
   const variant = resolveArrayItemVariant(config, { nested })
   const reorder = resolveArrayItemReorder(config)
   const sortableEnabled = reorder === 'dragHandle' && fields.length > 1
@@ -155,6 +157,7 @@ export function useArrayFieldRendererState({
 
   return {
     addLabel,
+    addVariant,
     addMenuItems,
     appendFromAddMenu,
     appendItem,
@@ -169,6 +172,7 @@ export function useArrayFieldRendererState({
     legendScale,
     legendSize,
     nested,
+    omitSectionBottomMargin,
     showLegend: legend.trim().length > 0,
     sortableEnabled,
   }

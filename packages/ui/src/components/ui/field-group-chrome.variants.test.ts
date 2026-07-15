@@ -31,7 +31,7 @@ describe('resolveFieldGroupChromeClassNames', () => {
     expect(classes.fieldset).toBe('')
     expect(classes.body).toContain('rounded-md')
     expect(classes.body).toContain('border')
-    expect(classes.body).toContain('p-3')
+    expect(classes.body).toContain('p-4')
     expect(classes.body).toContain('bg-muted/10')
   })
 

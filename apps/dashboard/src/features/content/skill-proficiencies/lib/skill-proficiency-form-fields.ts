@@ -53,6 +53,7 @@ export function buildSkillProficiencyFields(_ctx: ContentFormCtx): FormItem[] {
           options: abilityOptions,
           multiple: false,
           required: true,
+          separator: 'subtle',
         },
         {
           kind: 'array',
@@ -66,6 +67,7 @@ export function buildSkillProficiencyFields(_ctx: ContentFormCtx): FormItem[] {
           itemCollapsible: true,
           itemCollapseKey: 'example',
           itemVariant: 'compact',
+          addVariant: 'secondary',
           compactInlineAlign: 'center',
           itemHeader: {
             fallback: (index) => `Example ${index + 1}`,

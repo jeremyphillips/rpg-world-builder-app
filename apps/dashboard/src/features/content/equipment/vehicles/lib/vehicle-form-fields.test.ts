@@ -21,7 +21,7 @@ describe('vehicle kindFieldGroups', () => {
     expect(kindGroup).toEqual(fieldGroupsForEquipmentKind('vehicle')?.[0])
   })
 
-  it('uses one responsive-4 grid row for cargo, speed, crew, and passengers', () => {
+  it('uses a flex row at intrinsic width for cargo, speed, crew, and passengers', () => {
     const group = vehicleFormFieldGroup()
     if (!('kind' in group) || group.kind !== 'group') {
       throw new Error('Expected vehicle group fields')
@@ -42,9 +42,10 @@ describe('vehicle kindFieldGroups', () => {
 
     expect(statsRow).toMatchObject({
       kind: 'row',
-      layout: 'responsive-4',
-      className: 'w-fit max-w-full md:grid-cols-[auto_auto_auto_auto]',
+      separator: 'subtle',
     })
+    expect(statsRow).not.toHaveProperty('layout')
+    expect(statsRow).not.toHaveProperty('className')
     expect(statsRow.fields).toEqual([
       expect.objectContaining({ name: 'cargoCapacity', width: 'auto' }),
       expect.objectContaining({ name: 'speed', width: 'auto' }),

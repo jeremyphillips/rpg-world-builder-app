@@ -388,7 +388,7 @@ describe('dependent stack', () => {
 
     const separator = container.querySelector('[data-field-separator]')
     expect(separator).toBeInTheDocument()
-    expect(separator).toHaveClass('border-b', 'border-border', 'pb-4')
+    expect(separator).toHaveClass('border-b', 'border-border', 'pb-7')
     expect(separator).toContainElement(screen.getByLabelText('Class restrictions'))
     expect(separator).toContainElement(queryDependentsRegion(container) as HTMLElement)
     expect(container.querySelectorAll('[data-field-separator]')).toHaveLength(1)

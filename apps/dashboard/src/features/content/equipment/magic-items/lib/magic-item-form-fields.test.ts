@@ -15,7 +15,7 @@ describe('magic item kindFieldGroups', () => {
     expectComposedKindGroups('magic_item', '')
   })
 
-  it('uses a responsive two-column layout for base equipment', () => {
+  it('renders base equipment in a plain row', () => {
     const group = magicItemFormFieldGroup()
     if (!('fields' in group)) throw new Error('Expected magic item group fields')
 
@@ -26,7 +26,8 @@ describe('magic item kindFieldGroups', () => {
         field.fields.some((rowField) => 'name' in rowField && rowField.name === 'baseEquipmentId'),
     )
 
-    expect(baseEquipmentRow).toMatchObject({ layout: 'responsive-2' })
+    expect(baseEquipmentRow).toMatchObject({ kind: 'row' })
+    expect(baseEquipmentRow).not.toHaveProperty('layout')
     expect(baseEquipmentRow).not.toHaveProperty('className')
   })
 })

@@ -322,7 +322,7 @@ function economyGroup(ctx?: ContentFormCtx): FormItem {
   return {
     kind: 'group',
     legend: 'Economy',
-    fieldsChrome: { variant: 'panel' },
+    fieldsChrome: { variant: 'outline' },
     fields: economyFields({ kind: ctx?.equipmentKind }),
   }
 }

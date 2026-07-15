@@ -6,6 +6,6 @@ describe('fieldSeparatorVariants', () => {
   it('applies a subtle trailing border divider', () => {
     expect(fieldSeparatorVariants({ tone: 'subtle' })).toContain('border-b')
     expect(fieldSeparatorVariants({ tone: 'subtle' })).toContain('border-border')
-    expect(fieldSeparatorVariants({ tone: 'subtle' })).toContain('pb-4')
+    expect(fieldSeparatorVariants({ tone: 'subtle' })).toContain('pb-7')
   })
 })

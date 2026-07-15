@@ -1,6 +1,7 @@
 import { cva, type VariantProps } from 'class-variance-authority'
 
 import { cn } from '../../lib/utils'
+import { fieldGroupDividerBottomPaddingClasses } from './field-group-chrome.variants'
 import { fieldSizeTypographyClasses, type FieldSizeToken } from './field-sizing.variants'
 
 /**
@@ -9,13 +10,13 @@ import { fieldSizeTypographyClasses, type FieldSizeToken } from './field-sizing.
  * - `fieldAnatomyStackClasses` — label / control / hint inside one field
  * - `fieldLabelHintStackClasses` — label + hint cluster when hint sits below the label
  * - `fieldGroupStackClasses` — sibling fields within a group or form column (gap-based; avoids margin collapse with fieldsets)
- * - `fieldGroupBottomMarginClasses` — space below a top-level group or array section fieldset
+ * - `fieldGroupBottomMarginClasses` — space below standalone group/array fieldsets (omitted when a parent rhythm stack owns sibling gap)
  *   (nested array sections omit this; parent stack/group rhythm owns spacing)
  * - `fieldGroupFlexStackClasses` — wider 32px gap stack for collapse-prone fieldset siblings (embedded editors, …)
  * - `fieldSetResetClasses` — strip UA fieldset chrome from leaf field wrappers
  * - `formSectionStackClasses` — vertical gap between top-level form sections
  * - `fieldRowGapClasses` — horizontal + wrap gap between fields in a row
- * - `fieldRowLayoutVariants` — display mode for schema-driven rows
+ * - `fieldRowLayoutClasses` — flex wrap row for schema-driven `FieldRow` / `RowConfig`
  * - `fieldChipWrapGapClasses` — chip pill row spacing inside `ChipsField`
  * - `fieldGroupDescriptionClasses` — group/section hint typography (spacing lives on the legend header)
  * - `fieldGroupLegendHeaderStackClasses` — vertical gap between a group legend and its hint
@@ -201,35 +202,24 @@ export const chooseFromChipsSentenceClasses = fieldInlineSentenceClasses
 /** Trailing divider tone for leaf fields and rows within a group/stack rhythm. */
 export type FieldSeparator = 'subtle'
 
-export const fieldSeparatorVariants = cva('border-b border-border pb-4', {
-  variants: {
-    tone: {
-      subtle: '',
+export const fieldSeparatorVariants = cva(
+  cn('border-b border-border', fieldGroupDividerBottomPaddingClasses),
+  {
+    variants: {
+      tone: {
+        subtle: '',
+      },
+    },
+    defaultVariants: {
+      tone: 'subtle',
     },
   },
-  defaultVariants: {
-    tone: 'subtle',
-  },
-})
+)
 
 export type FieldSeparatorVariantProps = VariantProps<typeof fieldSeparatorVariants>
 
-export const fieldRowLayoutVariants = cva('', {
-  variants: {
-    layout: {
-      flex: cn('flex flex-wrap items-start', fieldRowGapClasses),
-      'responsive-2': cn('grid w-full grid-cols-1 md:grid-cols-2', fieldRowGapClasses),
-      'responsive-3': cn('grid w-full grid-cols-2 md:grid-cols-3', fieldRowGapClasses),
-      'responsive-4': cn('grid w-full grid-cols-2 md:grid-cols-4', fieldRowGapClasses),
-    },
-  },
-  defaultVariants: {
-    layout: 'flex',
-  },
-})
-
-export type FieldRowLayoutVariantProps = VariantProps<typeof fieldRowLayoutVariants>
-export type FieldRowLayout = NonNullable<FieldRowLayoutVariantProps['layout']>
+/** Side-by-side fields in a wrapping flex row — compose widths via leaf `width` tokens. */
+export const fieldRowLayoutClasses = cn('flex flex-wrap items-start', fieldRowGapClasses)
 
 /** Where helper text renders relative to the label and control. */
 export type FieldHintPosition = 'below-label' | 'below-control'

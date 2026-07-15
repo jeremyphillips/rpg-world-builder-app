@@ -298,6 +298,7 @@ function castingFields(): FormItem[] {
     {
       kind: 'group',
       legend: 'Casting time',
+      fieldsChrome: { variant: 'panel' },
       fields: [
         {
           kind: 'row',
@@ -338,6 +339,7 @@ function castingFields(): FormItem[] {
     {
       kind: 'group',
       legend: 'Range',
+      fieldsChrome: { variant: 'panel' },
       fields: [
         {
           kind: 'row',
@@ -370,6 +372,7 @@ function castingFields(): FormItem[] {
     {
       kind: 'group',
       legend: 'Duration',
+      fieldsChrome: { variant: 'outline' },
       fields: [
         {
           kind: 'row',
@@ -425,6 +428,7 @@ function castingFields(): FormItem[] {
     {
       kind: 'group',
       legend: 'Components',
+      fieldsChrome: { variant: 'outline' },
       fields: [
         {
           kind: 'row',
@@ -462,6 +466,7 @@ function castingFields(): FormItem[] {
     {
       kind: 'group',
       legend: 'Area of effect',
+      fieldsChrome: { variant: 'outline' },
       fields: [
         {
           kind: 'row',
