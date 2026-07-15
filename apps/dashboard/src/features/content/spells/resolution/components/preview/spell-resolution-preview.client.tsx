@@ -10,6 +10,7 @@ import { resolutionToStored, RESOLUTION_FIELD_NAME } from '../../lib/form/resolu
 
 /** Live preview of normalized spell resolution from local form state. */
 export function SpellResolutionPreview() {
+  const spellLevel = useWatch({ name: 'level' }) as number | undefined
   const resolution = useWatch({ name: RESOLUTION_FIELD_NAME }) as ResolutionFormValues | undefined
   const stored = resolutionToStored(resolution)
 
@@ -44,7 +45,9 @@ export function SpellResolutionPreview() {
     )
   }
 
-  const sections = formatResolutionSummarySections(stored)
+  const sections = formatResolutionSummarySections(stored, {
+    spellLevel: spellLevel ?? 0,
+  })
 
   return (
     <Alert

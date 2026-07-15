@@ -14,6 +14,10 @@ import { z } from 'zod'
 import { rollFormObjectSchema } from '../../../../lib/forms/mechanics/roll-form-values'
 import { RESOLUTION_APPLICATION_PATTERN_FORM_KINDS } from '../application-pattern/resolution-application-pattern.lib'
 import { validateResolutionFormSelection } from './resolution-form-selection-validation'
+import {
+  PROGRESSION_BASIS_VALUES,
+  progressionTrackFormItemSchema,
+} from './resolution-progression-form-schema'
 
 export const RESOLUTION_METHOD_KINDS = ['attack', 'saving-throw', 'automatic'] as const
 
@@ -93,6 +97,8 @@ export const resolutionFormSchema = z
     projectileUnitLabelPlural: z.string().trim().min(1).optional(),
     effects: z.array(resolutionEffectFormItemSchema).min(1),
     outcomes: z.array(resolutionOutcomeFormItemSchema).optional(),
+    progressionBasis: z.enum(PROGRESSION_BASIS_VALUES).optional(),
+    progressionTracks: z.array(progressionTrackFormItemSchema).optional(),
   })
   .superRefine(validateResolutionFormSelection)
 

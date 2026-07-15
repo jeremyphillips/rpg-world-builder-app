@@ -95,6 +95,8 @@ const SPELLS_SCHEMA_EXEMPT = [
   'resolution.attackType',
   'resolution.saveAbility',
   /^resolution\.outcomes\b/,
+  /^resolution\.progressionBasis\b/,
+  /^resolution\.progressionTracks\b/,
 ] as const
 
 describe.each(registryEntries)('ContentFormDef[%s] validation', (routeKey, def) => {

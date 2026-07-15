@@ -124,15 +124,8 @@ export const BLESS_PROGRESSION_FIXTURE_RESOLUTION: SpellResolution = {
   ],
 }
 
-export const ELDRITCH_BLAST_WITH_PROJECTILES_RESOLUTION: SpellResolution = {
-  ...ELDRITCH_BLAST_RESOLUTION,
-  applicationPattern: {
-    kind: 'projectiles',
-    count: { type: 'fixed', value: 1 },
-    unitLabel: { singular: 'beam', plural: 'beams' },
-    applicationMode: 'per-projectile',
-  },
-}
+/** @deprecated Use {@link ELDRITCH_BLAST_RESOLUTION} — projectiles are on the canonical fixture. */
+export const ELDRITCH_BLAST_WITH_PROJECTILES_RESOLUTION = ELDRITCH_BLAST_RESOLUTION
 
 export const SPELL_RESOLUTION_PROGRESSION_FIXTURES = {
   'fire-bolt': {
@@ -174,7 +167,7 @@ export const SPELL_RESOLUTION_PROGRESSION_FIXTURES = {
     spellLevel: 1,
   },
   'eldritch-blast': {
-    resolution: ELDRITCH_BLAST_WITH_PROJECTILES_RESOLUTION,
+    resolution: ELDRITCH_BLAST_RESOLUTION,
     progression: ELDRITCH_BLAST_PROGRESSION,
     spellLevel: 0,
   },

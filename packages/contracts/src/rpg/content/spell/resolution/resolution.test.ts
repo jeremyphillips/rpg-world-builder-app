@@ -402,7 +402,7 @@ describe('spell resolution formatters', () => {
       'Applied once per dart',
     )
     expect(formatResolutionEffectsApplicationLabel(ELDRITCH_BLAST_RESOLUTION)).toBe(
-      'Applied once per resolution',
+      'Applied once per beam',
     )
     expect(formatResolutionSummary(MAGIC_MISSILE_RESOLUTION)).toContain('Creates 3 darts.')
   })

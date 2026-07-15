@@ -19,18 +19,16 @@ describe('spell resolution coverage inventory (srd-cc-5.2.1)', () => {
     expect(inventory.entries).toHaveLength(92)
   })
 
-  it('reports 18 migrated single-effect resolution spells', () => {
+  it('reports 19 migrated single-effect resolution spells', () => {
     const tierA = SRD_521_SPELL_SEED_RESOLUTION_SLUGS.filter(
-      (slug) => slug !== 'eldritch-blast' && slug !== 'ice-knife' && slug !== 'arcane-hand',
+      (slug) => slug !== 'ice-knife' && slug !== 'arcane-hand',
     )
     expect(inventory.byStatus.migrated.sort()).toEqual([...tierA].sort())
-    expect(inventory.byStatus.migrated).toHaveLength(18)
+    expect(inventory.byStatus.migrated).toHaveLength(19)
   })
 
-  it('reports Eldritch Blast, Ice Knife, and Arcane Hand as hybrid', () => {
-    expect(inventory.byStatus.hybrid.sort()).toEqual(
-      ['arcane-hand', 'eldritch-blast', 'ice-knife'].sort(),
-    )
+  it('reports Ice Knife and Arcane Hand as hybrid', () => {
+    expect(inventory.byStatus.hybrid.sort()).toEqual(['arcane-hand', 'ice-knife'].sort())
   })
 
   it('reports ice-knife and arcane-hand with multi-effect resolution envelopes', () => {
@@ -51,7 +49,7 @@ describe('spell resolution coverage inventory (srd-cc-5.2.1)', () => {
     )
     expect(inventory.byStatus.deferred.sort()).toEqual(deferredFromEffects.sort())
     expect(spellSlugsDeferredResolution(inventory).sort()).toEqual(
-      [...deferredFromEffects, 'eldritch-blast', 'ice-knife', 'arcane-hand'].sort(),
+      [...deferredFromEffects, 'ice-knife', 'arcane-hand'].sort(),
     )
   })
 

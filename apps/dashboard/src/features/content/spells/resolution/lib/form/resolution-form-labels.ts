@@ -74,7 +74,33 @@ export const RESOLUTION_SECTION_LABELS = {
   selectionSelfOriginHint: 'Origin — You (caster is the fixed origin for this area).',
   selectionAffectedAreaHint:
     'Affected — Creatures and objects in the area (not individually selected).',
+  progression: 'Progression',
+  progressionHint:
+    'Define how this spell changes with character level or higher-level spell slots.',
+  progressionEmpty: 'No progression configured',
+  addProgression: 'Add progression',
+  addProgressionTrack: 'Add track',
+  progressionCantripMode: 'Character-level thresholds',
+  progressionLeveledMode: 'Higher-level slot scaling',
+  progressionBaseValue: 'Base value',
+  progressionBaseAtLevel: (level: number) => `Base at ${level}${ordinalSuffix(level)} level`,
+  progressionEachSlotAbove: (level: number) => `Each slot above ${level}${ordinalSuffix(level)}`,
 } as const
+
+function ordinalSuffix(level: number): string {
+  const mod100 = level % 100
+  if (mod100 >= 11 && mod100 <= 13) return 'th'
+  switch (level % 10) {
+    case 1:
+      return 'st'
+    case 2:
+      return 'nd'
+    case 3:
+      return 'rd'
+    default:
+      return 'th'
+  }
+}
 
 export const RESOLUTION_OUTCOME_AMOUNT_OPTIONS: FieldOption[] = toOptions(
   SPELL_RESOLUTION_APPLICATION_AMOUNTS,

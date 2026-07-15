@@ -228,7 +228,7 @@ describe('spell resolution tab hydration', () => {
     })
   })
 
-  it('hydrates Eldritch Blast hybrid resolution with per-beam force damage', async () => {
+  it('hydrates Eldritch Blast resolution with projectiles and per-beam force damage', async () => {
     const eldritchBlast = loadSeedSpells('srd-cc-5.2.1').find(
       (spell) => spell.slug === 'eldritch-blast',
     )!
@@ -249,26 +249,17 @@ describe('spell resolution tab hydration', () => {
 
     await waitFor(() => {
       expect(screen.queryByRole('button', { name: /add resolution/i })).not.toBeInTheDocument()
-      expect(screen.getByText(RESOLUTION_SECTION_LABELS.hybridNoticeTitle)).toBeInTheDocument()
+      expect(
+        screen.queryByText(RESOLUTION_SECTION_LABELS.hybridNoticeTitle),
+      ).not.toBeInTheDocument()
+      expect(screen.getAllByText('Projectiles').length).toBeGreaterThan(0)
       expect(screen.getByRole('combobox', { name: 'Damage type' })).toHaveTextContent('Force')
       expect(screen.getByRole('spinbutton', { name: 'Damage roll Number of dice' })).toHaveValue(1)
       expect(screen.getByRole('combobox', { name: 'Die size' })).toHaveTextContent('d10')
     })
 
-    const banner = screen.getByText(RESOLUTION_SECTION_LABELS.notSavedBanner)
-    const hybrid = screen.getByText(RESOLUTION_SECTION_LABELS.hybridNoticeTitle)
-    const emptyStacks = [...document.querySelectorAll('.flex.flex-col.gap-2')].filter(
-      (el) => el.childElementCount === 0,
-    )
-    const betweenBannerAndHybrid = emptyStacks.filter((el) => {
-      const afterBanner = banner.compareDocumentPosition(el) & Node.DOCUMENT_POSITION_FOLLOWING
-      const beforeHybrid = el.compareDocumentPosition(hybrid) & Node.DOCUMENT_POSITION_FOLLOWING
-      return Boolean(afterBanner && beforeHybrid)
-    })
-    expect(betweenBannerAndHybrid).toHaveLength(0)
-
     expect(isDirty).toBe(false)
-    expect(eldritchBlast.effects?.length).toBeGreaterThan(1)
+    expect(eldritchBlast.resolution?.applicationPattern?.kind).toBe('projectiles')
   })
 
   it('hides hybrid notice for magic-missile when application pattern is projectiles', async () => {

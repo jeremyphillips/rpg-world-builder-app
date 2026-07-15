@@ -11,6 +11,7 @@ import { SpellResolutionChangeNotice } from '../../components/notices/spell-reso
 import { SpellResolutionHybridNotice } from '../../components/notices/spell-resolution-hybrid-notice.client'
 import { ResolutionChangeConfirmDialog } from '../../components/notices/resolution-change-confirm-dialog.client'
 import { SpellResolutionOutcomes } from '../../components/outcomes/spell-resolution-outcomes.client'
+import { SpellResolutionProgression } from '../../components/progression/spell-resolution-progression.client'
 import { SpellResolutionPreview } from '../../components/preview/spell-resolution-preview.client'
 import { SpellResolutionProximitySelect } from '../../components/target/spell-resolution-proximity-select.client'
 import { SpellResolutionSelectionModeSelect } from '../../components/target/spell-resolution-selection-mode-select.client'
@@ -250,6 +251,19 @@ export function configuredResolutionFields(ctx: ContentFormCtx): FormItem[] {
     },
     ...resolutionProjectilesFields(), // Only visible when application pattern is projectiles.
     resolutionEffectsAndOutcomesGroup(ctx),
+    {
+      kind: 'group',
+      legend: RESOLUTION_SECTION_LABELS.progression,
+      fieldsChrome: { variant: 'panel' },
+      visibility: configured,
+      fields: [
+        {
+          kind: 'slot',
+          name: '_resolutionProgression',
+          render: () => createElement(SpellResolutionProgression),
+        },
+      ],
+    },
     {
       kind: 'slot',
       name: '_resolutionPreview',

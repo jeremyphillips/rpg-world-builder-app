@@ -150,7 +150,7 @@ describe('spell resolution round trips', () => {
   })
 
   it('omits applicationPattern when the form pattern kind is none', () => {
-    const formValues = resolutionToForm(ELDRITCH_BLAST_RESOLUTION)!
+    const formValues = resolutionToForm(CHILL_TOUCH_RESOLUTION)!
     expect(formValues.applicationPatternKind).toBe('none')
     expect(resolutionToStored(formValues)?.applicationPattern).toBeUndefined()
   })
@@ -170,7 +170,7 @@ describe('spell resolution round trips', () => {
   })
 
   it('initializes projectiles defaults when adding the pattern in the form', () => {
-    const formValues = resolutionToForm(ELDRITCH_BLAST_RESOLUTION)!
+    const formValues = resolutionToForm(CHILL_TOUCH_RESOLUTION)!
     const withProjectiles = {
       ...formValues,
       applicationPatternKind: 'projectiles' as const,

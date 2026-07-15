@@ -152,6 +152,10 @@ function resolveClassLabels(spell: Spell, vocabulary: SpellDisplayVocabulary): s
 }
 
 function buildProseSections(spell: Spell): SpellDetailProseSections {
+  if (spell.resolution?.progression) {
+    return {}
+  }
+
   return {
     cantripScaling: spell.cantripScaling?.trim() || undefined,
     higherLevelSlotEffect: spell.higherLevelSlotEffect?.trim() || undefined,

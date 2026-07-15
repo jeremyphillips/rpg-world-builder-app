@@ -32,12 +32,6 @@ export const SRD_521_SPELL_SEED_EFFECTS = {
   ],
   'eldritch-blast': [
     {
-      id: effectId('eldritch-blast', 'beams'),
-      kind: 'projectile-count',
-      count: 1,
-      unitLabel: 'beams',
-    },
-    {
       id: effectId('eldritch-blast', 'damage'),
       kind: 'damage',
       roll: { dice: { count: 1, faces: 10 } },

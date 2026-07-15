@@ -15,7 +15,21 @@ contracts — do not redefine them here.
 | `resolution-form-visibility.ts`            | Mode-driven field visibility       |
 | `resolution-form-slots.ts`                 | Slot registry wiring               |
 | `resolution-target-form-fields.ts`         | Selection panel field definitions  |
+| `resolution-progression-*.ts`              | Progression schema slice + presets |
+| `spell-resolution-progression.client.tsx`  | Progression section UI             |
 | `use-resolution-change-confirm.client.tsx` | Confirm-first change planning      |
+
+## Progression section
+
+Placed after **Effects & outcomes**, before preview. Self-contained on the
+Resolution tab — no links to Basics-tab scaling prose.
+
+- Empty state: “No progression configured” + **Add progression** (preset menu).
+- Presets derive `basis` and track shape from spell level + reference type.
+- Cantrip tracks use fixed SRD tiers (5 / 11 / 17); leveled tracks edit increment only.
+- Base values are read-only context from the referenced resolution field.
+
+Tests: `resolution-progression-round-trip.test.ts`.
 
 ## Selection panel visibility
 

@@ -57,7 +57,7 @@ describe('SpellResolutionEditor', () => {
     await waitFor(() => {
       expect(screen.getByRole('group', { name: /Effects & outcomes/ })).toBeInTheDocument()
       expect(screen.getByRole('group', { name: /^Authored effects/ })).toBeInTheDocument()
-      expect(screen.getByText('Applied once per resolution')).toBeInTheDocument()
+      expect(screen.getByText('Applied once per beam')).toBeInTheDocument()
       expect(screen.getByRole('button', { name: /(Collapse|Expand) Damage/ })).toBeInTheDocument()
       expect(screen.getByText('Inflicts 1d10 Force damage.')).toBeInTheDocument()
       expect(screen.getAllByRole('button', { name: /Remove Damage/i })).toHaveLength(2)

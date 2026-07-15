@@ -16,7 +16,7 @@ const ARCANE_HAND_CLENCHED_FIST_EFFECT_ID = spellResolutionEffectIdSchema.parse(
 const ARCANE_HAND_GRASPING_HAND_EFFECT_ID =
   spellResolutionEffectIdSchema.parse('grasping-hand-crush')
 
-/** Eldritch Blast — ranged attack, 120 ft proximity, 1d10 force on hit. */
+/** Eldritch Blast — ranged attack, 120 ft proximity, 1 beam dealing 1d10 force on hit. */
 export const ELDRITCH_BLAST_RESOLUTION: SpellResolution = {
   selectionMode: 'targets',
   target: {
@@ -26,6 +26,12 @@ export const ELDRITCH_BLAST_RESOLUTION: SpellResolution = {
     proximity: { kind: 'distance', distance: { value: 120, unit: 'ft' } },
   },
   method: { kind: 'attack', attackType: 'ranged-spell' },
+  applicationPattern: {
+    kind: 'projectiles',
+    count: { type: 'fixed', value: 1 },
+    unitLabel: { singular: 'beam', plural: 'beams' },
+    applicationMode: 'per-projectile',
+  },
   effects: [
     {
       id: SPELL_RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID,

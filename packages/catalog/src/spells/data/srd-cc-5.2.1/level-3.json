@@ -274,7 +274,31 @@
             }
           ]
         }
-      ]
+      ],
+      "progression": {
+        "basis": "spell-slot-level",
+        "tracks": [
+          {
+            "kind": "linear",
+            "reference": {
+              "subject": {
+                "kind": "effect",
+                "effectId": "damage"
+              },
+              "property": "roll"
+            },
+            "increment": {
+              "kind": "roll",
+              "roll": {
+                "dice": {
+                  "count": 1,
+                  "faces": 6
+                }
+              }
+            }
+          }
+        ]
+      }
     }
   },
   {

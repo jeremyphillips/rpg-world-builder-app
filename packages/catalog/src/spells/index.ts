@@ -79,6 +79,11 @@ export {
   spellSeedResolutionDeferReason,
 } from './spell-seed-resolution'
 export {
+  SRD_521_SPELL_SEED_PROGRESSION,
+  SRD_521_SPELL_SEED_PROGRESSION_SLUGS,
+  resolveSpellSeedProgression,
+} from './spell-seed-progression'
+export {
   SPELL_RESOLUTION_DEFER_REASONS,
   type SpellResolutionDeferReason,
 } from './spell-resolution-defer-reasons'

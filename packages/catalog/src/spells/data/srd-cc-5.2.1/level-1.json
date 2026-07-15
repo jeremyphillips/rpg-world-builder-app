@@ -1436,7 +1436,25 @@
             }
           ]
         }
-      ]
+      ],
+      "progression": {
+        "basis": "spell-slot-level",
+        "tracks": [
+          {
+            "kind": "linear",
+            "reference": {
+              "subject": {
+                "kind": "application-pattern"
+              },
+              "property": "projectile-count"
+            },
+            "increment": {
+              "kind": "count",
+              "count": 1
+            }
+          }
+        ]
+      }
     }
   },
   {

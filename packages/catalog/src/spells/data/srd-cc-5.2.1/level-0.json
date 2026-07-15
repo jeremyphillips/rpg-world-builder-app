@@ -324,12 +324,6 @@
     "cantripScaling": "<p>The spell creates two beams at level 5, three beams at level 11, and four beams at level 17. You can direct the beams at the same target or at different ones. Make a separate attack roll for each beam.</p>",
     "effects": [
       {
-        "id": "srd-cc-5.2.1:eldritch-blast:beams",
-        "kind": "projectile-count",
-        "count": 1,
-        "unitLabel": "beams"
-      },
-      {
         "id": "srd-cc-5.2.1:eldritch-blast:damage",
         "kind": "damage",
         "roll": {
@@ -359,6 +353,18 @@
         "kind": "attack",
         "attackType": "ranged-spell"
       },
+      "applicationPattern": {
+        "kind": "projectiles",
+        "count": {
+          "type": "fixed",
+          "value": 1
+        },
+        "unitLabel": {
+          "singular": "beam",
+          "plural": "beams"
+        },
+        "applicationMode": "per-projectile"
+      },
       "effects": [
         {
           "id": "damage",
@@ -382,7 +388,44 @@
             }
           ]
         }
-      ]
+      ],
+      "progression": {
+        "basis": "character-level",
+        "tracks": [
+          {
+            "kind": "thresholds",
+            "reference": {
+              "subject": {
+                "kind": "application-pattern"
+              },
+              "property": "projectile-count"
+            },
+            "entries": [
+              {
+                "threshold": 5,
+                "value": {
+                  "kind": "count",
+                  "count": 2
+                }
+              },
+              {
+                "threshold": 11,
+                "value": {
+                  "kind": "count",
+                  "count": 3
+                }
+              },
+              {
+                "threshold": 17,
+                "value": {
+                  "kind": "count",
+                  "count": 4
+                }
+              }
+            ]
+          }
+        ]
+      }
     }
   },
   {
@@ -517,7 +560,60 @@
             }
           ]
         }
-      ]
+      ],
+      "progression": {
+        "basis": "character-level",
+        "tracks": [
+          {
+            "kind": "thresholds",
+            "reference": {
+              "subject": {
+                "kind": "effect",
+                "effectId": "damage"
+              },
+              "property": "roll"
+            },
+            "entries": [
+              {
+                "threshold": 5,
+                "value": {
+                  "kind": "roll",
+                  "roll": {
+                    "dice": {
+                      "count": 2,
+                      "faces": 10
+                    }
+                  }
+                }
+              },
+              {
+                "threshold": 11,
+                "value": {
+                  "kind": "roll",
+                  "roll": {
+                    "dice": {
+                      "count": 3,
+                      "faces": 10
+                    }
+                  }
+                }
+              },
+              {
+                "threshold": 17,
+                "value": {
+                  "kind": "roll",
+                  "roll": {
+                    "dice": {
+                      "count": 4,
+                      "faces": 10
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      }
     }
   },
   {

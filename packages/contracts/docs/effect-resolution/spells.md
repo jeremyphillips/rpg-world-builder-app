@@ -7,9 +7,27 @@ Spell-specific adapter for the shared framework in [base.md](./base.md).
 Optional `resolution` on [`spellBodySchema`](../../src/rpg/content/spell/body.ts):
 
 - `selectionMode`, optional `target`, optional `origin`, optional `areaOfEffect`
-- `method`, `effects[]`, `outcomes[]`, optional `applicationPattern`
+- `method`, `effects[]`, `outcomes[]`, optional `applicationPattern`, optional `progression`
 
 Root `effects[]` may coexist during migration (`hybrid` modeling status).
+
+## Progression scope (initial pass)
+
+Optional `resolution.progression` models **resolution-local scaling only** —
+effect roll values, `applicationPattern` projectile count, and `target.count`.
+It is not the permanent home for all spell progression (range, duration, area,
+and spell-body metadata may move to a spell-level container later).
+
+Subject/property references, resolver semantics (threshold totals vs linear
+cumulative increments), and formatters live in
+[`progression/`](../../src/rpg/content/spell/resolution/progression/).
+
+**Display authority:** when `resolution.progression` is present, structured
+progression summaries replace `cantripScaling` / `higherLevelSlotEffect` prose on
+detail surfaces. Prose may remain in storage without automated equivalence checks.
+
+Progression seeds: [`spell-seed-progression.ts`](../../../../catalog/src/spells/spell-seed-progression.ts);
+apply via [`apply-spell-seed-progression.mjs`](../../../../catalog/scripts/apply-spell-seed-progression.mjs).
 
 ## Spell range vs resolution proximity
 

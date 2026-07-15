@@ -17,6 +17,7 @@ import {
 import { buildResolutionMethod } from './resolution-method-values'
 import { buildDefaultOutcomeFormSlots } from './resolution-outcome-slots.lib'
 import { buildOutcomes } from './resolution-outcome-values'
+import { progressionFromForm, progressionToForm } from './resolution-progression-values'
 import { buildTargetProximity } from './resolution-target-values'
 
 export const RESOLUTION_FIELD_NAME = 'resolution' as const
@@ -31,6 +32,7 @@ export function resolutionToForm(
   const form: ResolutionFormValues = {
     ...buildResolutionFormSelectionFields(resolution),
     ...buildResolutionFormMechanicsFields(resolution),
+    ...progressionToForm(resolution.progression),
   }
 
   return applyResolutionFormDerivedFields(form, resolution)
@@ -100,6 +102,7 @@ export function resolutionToStored(
   if (!method || !outcomes?.length) return undefined
 
   const applicationPattern = applicationPatternFromForm(values)
+  const progression = progressionFromForm(values.progressionBasis, values.progressionTracks)
   const selectionEnvelope = buildSelectionEnvelope(values)
   if (!selectionEnvelope) return undefined
 
@@ -107,6 +110,7 @@ export function resolutionToStored(
     ...selectionEnvelope,
     method,
     ...(applicationPattern ? { applicationPattern } : {}),
+    ...(progression ? { progression } : {}),
     effects,
     outcomes,
   }
