@@ -164,19 +164,6 @@
       }
     },
     "higherLevelSlotEffect": "<p>The damage increases by 1d8 for each spell slot level above 4.</p>",
-    "effects": [
-      {
-        "id": "srd-cc-5.2.1:wall-of-fire:damage",
-        "kind": "damage",
-        "roll": {
-          "dice": {
-            "count": 5,
-            "faces": 8
-          }
-        },
-        "damageType": "fire"
-      }
-    ],
     "resolution": {
       "selectionMode": "targets",
       "target": {

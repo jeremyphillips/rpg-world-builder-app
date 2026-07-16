@@ -1,12 +1,18 @@
 import {
   formatAreaGeometry,
-  formatAtomicEffectSummaries,
   formatSlugAsLabel,
   getEffectConditionLabel,
   getSpellDeliveryMethodLabel,
   getSpellFunctionTagLabel,
   getSpellRoleTagLabel,
   getSpellSchoolLabel,
+  effectiveSpellModelingStatus,
+  formatResolutionSummarySections,
+  getModelingStatusLabel,
+  isEditorEligible,
+  meetsConsumerThreshold,
+  MODELING_STATUS_LADDER,
+  type ModelingStatus,
   type Spell,
   type SpellTags,
 } from '@rpg/contracts'
@@ -39,12 +45,13 @@ export const SPELL_SECTION_LABELS = {
   tags: 'Tags',
   cantripScaling: 'Cantrip Upgrade',
   higherLevelSlotEffect: 'Using a Higher-Level Spell Slot',
+  resolution: 'Resolution',
 } as const
 
 export const SPELL_DETAIL_SECTION_LABELS = {
   tags: 'Tags',
   classes: 'Classes',
-  effects: 'Effects',
+  resolution: 'Resolution',
 } as const
 
 const SPELL_STAT_RITUAL_INFO =
@@ -65,6 +72,11 @@ export type SpellDetailProseSections = {
   higherLevelSlotEffect?: string
 }
 
+export type SpellDetailResolutionSubsection = {
+  heading: string
+  lines: string[]
+}
+
 export type SpellDetailViewModel = {
   statRows: ContentStatRowData[]
   descriptionHtml?: string
@@ -79,6 +91,11 @@ export type SpellDetailViewModel = {
     title: string
     labels: string[]
   }
+  resolutionSection?: {
+    title: string
+    subsections: SpellDetailResolutionSubsection[]
+  }
+  /** @deprecated Use resolutionSection — root effects are no longer a display source. */
   effectsSection?: {
     title: string
     lines: string[]
@@ -151,14 +168,29 @@ function resolveClassLabels(spell: Spell, vocabulary: SpellDisplayVocabulary): s
   )
 }
 
-function buildProseSections(spell: Spell): SpellDetailProseSections {
-  if (spell.resolution?.progression) {
+function buildProseSections(
+  spell: Spell,
+  usesStructuredResolutionDisplay: boolean,
+): SpellDetailProseSections {
+  if (spell.resolution?.progression || usesStructuredResolutionDisplay) {
     return {}
   }
 
   return {
     cantripScaling: spell.cantripScaling?.trim() || undefined,
     higherLevelSlotEffect: spell.higherLevelSlotEffect?.trim() || undefined,
+  }
+}
+
+function buildResolutionSection(spell: Spell): SpellDetailViewModel['resolutionSection'] {
+  if (!spell.resolution) return undefined
+
+  const status = effectiveSpellModelingStatus(spell)
+  if (!meetsConsumerThreshold(status, 'sufficient-for-display')) return undefined
+
+  return {
+    title: SPELL_DETAIL_SECTION_LABELS.resolution,
+    subsections: formatResolutionSummarySections(spell.resolution, { spellLevel: spell.level }),
   }
 }
 
@@ -169,7 +201,8 @@ export function buildSpellDetailViewModel(
   const resolveSchoolLabel = vocabulary.resolveSpellSchoolLabel ?? getSpellSchoolLabel
   const tagLabels = spell.tags ? collectTagLabels(spell.tags, vocabulary) : []
   const classLabels = resolveClassLabels(spell, vocabulary)
-  const proseSections = buildProseSections(spell)
+  const resolutionSection = buildResolutionSection(spell)
+  const proseSections = buildProseSections(spell, resolutionSection !== undefined)
 
   return {
     statRows: buildSpellStatRows(spell, {
@@ -197,12 +230,12 @@ export function buildSpellDetailViewModel(
             labels: tagLabels,
           }
         : undefined,
-    effectsSection:
-      spell.effects && spell.effects.length > 0
-        ? {
-            title: SPELL_DETAIL_SECTION_LABELS.effects,
-            lines: formatAtomicEffectSummaries(spell.effects),
-          }
-        : undefined,
+    resolutionSection,
   }
 }
+
+export function isSpellResolutionEditorEligible(spell: Spell): boolean {
+  return isEditorEligible(effectiveSpellModelingStatus(spell))
+}
+
+export { getModelingStatusLabel, MODELING_STATUS_LADDER, type ModelingStatus }

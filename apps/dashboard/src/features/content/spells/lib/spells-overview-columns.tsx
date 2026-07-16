@@ -1,10 +1,10 @@
-import type { EffectsModelingStatus, Spell } from '@rpg/contracts'
+import type { ModelingStatus, Spell } from '@rpg/contracts'
 import {
-  deriveEffectsModelingStatus,
-  EFFECTS_MODELING_STATUS,
-  getEffectsModelingStatusLabel,
+  effectiveSpellModelingStatus,
+  getModelingStatusLabel,
   MAX_SPELL_CONTENT_LEVEL,
   MIN_SPELL_CONTENT_LEVEL,
+  MODELING_STATUS_LADDER,
 } from '@rpg/contracts'
 import { BooleanCell, dataTableWidthMeta, SortableHeader } from '@rpg/ui'
 import type { ColumnDef, FilterDef } from '@rpg/ui'
@@ -22,8 +22,8 @@ const SPELL_LEVEL_FILTER_OPTIONS = Array.from(
   },
 )
 
-const EFFECTS_MODELING_STATUS_FILTER_OPTIONS = EFFECTS_MODELING_STATUS.map((status) => ({
-  label: getEffectsModelingStatusLabel(status),
+const MODELING_STATUS_FILTER_OPTIONS = MODELING_STATUS_LADDER.map((status) => ({
+  label: getModelingStatusLabel(status),
   value: status,
 }))
 
@@ -63,13 +63,12 @@ function buildSpellsMiddleColumns(
       meta: { label: 'Ritual', ...dataTableWidthMeta('compactCenter') },
     },
     {
-      id: 'effectsModelingStatus',
-      accessorFn: (row) => deriveEffectsModelingStatus(row),
-      header: ({ column }) => <SortableHeader column={column}>Effects modeling</SortableHeader>,
-      cell: ({ row }) =>
-        getEffectsModelingStatusLabel(row.getValue<EffectsModelingStatus>('effectsModelingStatus')),
+      id: 'modelingStatus',
+      accessorFn: (row) => effectiveSpellModelingStatus(row),
+      header: ({ column }) => <SortableHeader column={column}>Modeling</SortableHeader>,
+      cell: ({ row }) => getModelingStatusLabel(row.getValue<ModelingStatus>('modelingStatus')),
       filterFn: 'equalsString',
-      meta: { label: 'Effects modeling', ...dataTableWidthMeta('medium') },
+      meta: { label: 'Modeling', ...dataTableWidthMeta('medium') },
     },
   ]
 }
@@ -99,9 +98,9 @@ function buildSpellsSpecificFilters(
     },
     {
       type: 'select',
-      id: 'effectsModelingStatus',
-      label: 'Effects modeling',
-      options: EFFECTS_MODELING_STATUS_FILTER_OPTIONS,
+      id: 'modelingStatus',
+      label: 'Modeling',
+      options: MODELING_STATUS_FILTER_OPTIONS,
       group: 'secondary',
     },
   ]

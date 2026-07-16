@@ -238,7 +238,6 @@ describe('spellFormDef resolution tab', () => {
 
     const names = collectFieldNames(resolutionTab?.fields ?? [])
     expect(names).toContain('_resolutionPersistenceNotice')
-    expect(names).toContain('_resolutionHybridNotice')
     expect(names).toContain('_resolutionPreview')
     expect(names).toContain('_resolutionEmptyState')
     expect(names).toContain('_resolutionSelectionModeSelect')
@@ -269,6 +268,10 @@ describe('spellFormDef resolution integration', () => {
   const spellWithResolution: Spell = {
     ...SRD_SPELLS[0]!,
     resolution: ELDRITCH_BLAST_RESOLUTION,
+    modeling: {
+      reviewedAt: '2026-07-15T00:00:00.000Z',
+      status: 'meaningful-partial',
+    },
   }
 
   it('createDefaultValues omits resolution', () => {

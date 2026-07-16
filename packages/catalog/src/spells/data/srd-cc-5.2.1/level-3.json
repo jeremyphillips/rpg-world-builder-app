@@ -207,19 +207,6 @@
       }
     },
     "higherLevelSlotEffect": "<p>The damage increases by 1d6 for each spell slot level above 3.</p>",
-    "effects": [
-      {
-        "id": "srd-cc-5.2.1:fireball:damage",
-        "kind": "damage",
-        "roll": {
-          "dice": {
-            "count": 8,
-            "faces": 6
-          }
-        },
-        "damageType": "fire"
-      }
-    ],
     "resolution": {
       "selectionMode": "point",
       "origin": {
@@ -377,18 +364,6 @@
       "verbal": true
     },
     "higherLevelSlotEffect": "<p>The healing increases by 1d4 for each spell slot level above 3.</p>",
-    "effects": [
-      {
-        "id": "srd-cc-5.2.1:mass-healing-word:healing",
-        "kind": "healing",
-        "roll": {
-          "dice": {
-            "count": 2,
-            "faces": 4
-          }
-        }
-      }
-    ],
     "resolution": {
       "selectionMode": "targets",
       "target": {

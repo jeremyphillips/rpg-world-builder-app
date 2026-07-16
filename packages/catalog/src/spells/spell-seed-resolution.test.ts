@@ -45,12 +45,12 @@ describe('SRD 5.2.1 spell seed resolution manifest', () => {
     }
   })
 
-  it('keeps effects[] on applicable migrated and hybrid spells', () => {
+  it('does not persist root effects on applicable spells (manifest-only)', () => {
     const spells = loadSeedSpells(RULESET)
 
     for (const slug of SRD_521_SPELL_SEED_RESOLUTION_SLUGS) {
       const spell = spells.find((entry) => entry.slug === slug)
-      expect(spell?.effects?.length, slug).toBeGreaterThan(0)
+      expect(spell).not.toHaveProperty('effects')
     }
   })
 

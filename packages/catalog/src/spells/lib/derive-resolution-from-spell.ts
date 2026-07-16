@@ -27,6 +27,8 @@ import {
   type SpellTemporaryHitPointsEffect,
 } from '@rpg/contracts'
 
+import { SRD_521_SPELL_SEED_EFFECTS } from '../spell-seed-effects'
+
 export type ResolutionDerivationOverrides = {
   method?: SpellResolutionMethod
   saveAbility?: Ability
@@ -60,13 +62,15 @@ type PrimaryResolutionEffectKind = (typeof PRIMARY_RESOLUTION_EFFECT_KINDS)[numb
 type PrimaryResolutionEffect = Extract<SpellAtomicEffect, { kind: PrimaryResolutionEffectKind }>
 
 /** First unlabeled roll-bearing effect — excludes hex-style extra-damage riders. */
-export function findPrimaryDamageEffect(effects: Spell['effects']): SpellDamageEffect | undefined {
+export function findPrimaryDamageEffect(
+  effects: readonly SpellAtomicEffect[] | null | undefined,
+): SpellDamageEffect | undefined {
   const primary = findPrimaryResolutionEffect(effects)
   return primary?.kind === 'damage' ? primary : undefined
 }
 
 export function findPrimaryResolutionEffect(
-  effects: Spell['effects'],
+  effects: readonly SpellAtomicEffect[] | null | undefined,
 ): PrimaryResolutionEffect | undefined {
   if (!effects?.length) return undefined
 
@@ -309,12 +313,17 @@ function buildOutcomes(
   return stripEmptyOutcomeSlots(defaults)
 }
 
-/** Derives a contract resolution envelope from spell metadata and atomic effects. */
+/** Derives a contract resolution envelope from spell metadata and seed effect manifest. */
 export function deriveResolutionFromSpell(
-  spell: Pick<Spell, 'effects' | 'deliveryMethod' | 'range' | 'areaOfEffect'>,
+  spell: Pick<Spell, 'slug' | 'deliveryMethod' | 'range' | 'areaOfEffect'> & {
+    effects?: readonly SpellAtomicEffect[] | null
+  },
   overrides: ResolutionDerivationOverrides = {},
 ): SpellResolution {
-  const primaryEffect = findPrimaryResolutionEffect(spell.effects)
+  const atomicEffects =
+    spell.effects ??
+    SRD_521_SPELL_SEED_EFFECTS[spell.slug as keyof typeof SRD_521_SPELL_SEED_EFFECTS]
+  const primaryEffect = findPrimaryResolutionEffect(atomicEffects)
   if (!primaryEffect) {
     throw new Error('Spell has no primary resolution effect for derivation.')
   }

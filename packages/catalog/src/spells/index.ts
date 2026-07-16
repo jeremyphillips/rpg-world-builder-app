@@ -87,4 +87,9 @@ export {
   SPELL_RESOLUTION_DEFER_REASONS,
   type SpellResolutionDeferReason,
 } from './spell-resolution-defer-reasons'
-export { buildSpellResolutionCoverageInventory } from './spell-resolution-coverage-inventory'
+export {
+  buildSpellModelingAudit,
+  generateSpellModelingReport,
+  spellModelingAuditViolations,
+  validateSpellModelingConsistency,
+} from './spell-modeling-audit'

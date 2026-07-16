@@ -38,19 +38,6 @@
       "somatic": true
     },
     "cantripScaling": "<p>The damage increases by 1d6 when you reach levels 5 (2d6), 11 (3d6), and 17 (4d6).</p>",
-    "effects": [
-      {
-        "id": "srd-cc-5.2.1:acid-splash:damage",
-        "kind": "damage",
-        "roll": {
-          "dice": {
-            "count": 1,
-            "faces": 6
-          }
-        },
-        "damageType": "acid"
-      }
-    ],
     "resolution": {
       "selectionMode": "point",
       "origin": {
@@ -144,19 +131,6 @@
     },
     "deliveryMethod": "melee-spell-attack",
     "cantripScaling": "<p>The damage increases by 1d10 when you reach levels 5 (2d10), 11 (3d10), and 17 (4d10).</p>",
-    "effects": [
-      {
-        "id": "srd-cc-5.2.1:chill-touch:damage",
-        "kind": "damage",
-        "roll": {
-          "dice": {
-            "count": 1,
-            "faces": 10
-          }
-        },
-        "damageType": "necrotic"
-      }
-    ],
     "resolution": {
       "selectionMode": "targets",
       "target": {
@@ -322,19 +296,6 @@
     },
     "deliveryMethod": "ranged-spell-attack",
     "cantripScaling": "<p>The spell creates two beams at level 5, three beams at level 11, and four beams at level 17. You can direct the beams at the same target or at different ones. Make a separate attack roll for each beam.</p>",
-    "effects": [
-      {
-        "id": "srd-cc-5.2.1:eldritch-blast:damage",
-        "kind": "damage",
-        "roll": {
-          "dice": {
-            "count": 1,
-            "faces": 10
-          }
-        },
-        "damageType": "force"
-      }
-    ],
     "resolution": {
       "selectionMode": "targets",
       "target": {
@@ -506,19 +467,6 @@
     },
     "deliveryMethod": "ranged-spell-attack",
     "cantripScaling": "<p>The damage increases by 1d10 when you reach levels 5 (2d10), 11 (3d10), and 17 (4d10).</p>",
-    "effects": [
-      {
-        "id": "srd-cc-5.2.1:fire-bolt:damage",
-        "kind": "damage",
-        "roll": {
-          "dice": {
-            "count": 1,
-            "faces": 10
-          }
-        },
-        "damageType": "fire"
-      }
-    ],
     "resolution": {
       "selectionMode": "targets",
       "target": {
@@ -889,19 +837,6 @@
     },
     "deliveryMethod": "ranged-spell-attack",
     "cantripScaling": "<p>The damage increases by 1d12 when you reach levels 5 (2d12), 11 (3d12), and 17 (4d12).</p>",
-    "effects": [
-      {
-        "id": "srd-cc-5.2.1:poison-spray:damage",
-        "kind": "damage",
-        "roll": {
-          "dice": {
-            "count": 1,
-            "faces": 12
-          }
-        },
-        "damageType": "poison"
-      }
-    ],
     "resolution": {
       "selectionMode": "targets",
       "target": {
@@ -1061,19 +996,6 @@
       "somatic": true
     },
     "cantripScaling": "<p>The damage increases by 1d8 when you reach levels 5 (2d8), 11 (3d8), and 17 (4d8).</p>",
-    "effects": [
-      {
-        "id": "srd-cc-5.2.1:sacred-flame:damage",
-        "kind": "damage",
-        "roll": {
-          "dice": {
-            "count": 1,
-            "faces": 8
-          }
-        },
-        "damageType": "radiant"
-      }
-    ],
     "resolution": {
       "selectionMode": "targets",
       "target": {
@@ -1238,17 +1160,6 @@
         "description": "a weapon with which you have proficiency and that is worth 1+ CP"
       }
     },
-    "cantripScaling": "<p>Whether you deal Radiant damage or the weapon's normal damage type, the attack deals extra Radiant damage when you reach levels 5 (1d6), 11 (2d6), and 17 (3d6).</p>",
-    "effects": [
-      {
-        "id": "srd-cc-5.2.1:true-strike:extra-radiant",
-        "kind": "damage",
-        "label": "Extra radiant",
-        "roll": {
-          "flat": 0
-        },
-        "damageType": "radiant"
-      }
-    ]
+    "cantripScaling": "<p>Whether you deal Radiant damage or the weapon's normal damage type, the attack deals extra Radiant damage when you reach levels 5 (1d6), 11 (2d6), and 17 (3d6).</p>"
   }
 ]

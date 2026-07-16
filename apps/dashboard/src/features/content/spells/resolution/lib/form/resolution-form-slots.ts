@@ -8,7 +8,6 @@ import { SpellResolutionEffectsApplicationLabel } from '../../components/effects
 import { SpellResolutionHowItResolves } from '../../components/method/spell-resolution-how-it-resolves.client'
 import { SpellResolutionProjectilesPreview } from '../../components/method/spell-resolution-how-it-resolves-projectiles.client'
 import { SpellResolutionChangeNotice } from '../../components/notices/spell-resolution-change-notice.client'
-import { SpellResolutionHybridNotice } from '../../components/notices/spell-resolution-hybrid-notice.client'
 import { ResolutionChangeConfirmDialog } from '../../components/notices/resolution-change-confirm-dialog.client'
 import { SpellResolutionOutcomes } from '../../components/outcomes/spell-resolution-outcomes.client'
 import { SpellResolutionProgression } from '../../components/progression/spell-resolution-progression.client'
@@ -203,12 +202,6 @@ export function configuredResolutionFields(ctx: ContentFormCtx): FormItem[] {
       name: '_resolutionChangeNotice',
       visibility: configured,
       render: () => createElement(SpellResolutionChangeNotice),
-    },
-    {
-      kind: 'slot',
-      name: '_resolutionHybridNotice',
-      visibility: configured,
-      render: () => createElement(SpellResolutionHybridNotice),
     },
     {
       kind: 'group',

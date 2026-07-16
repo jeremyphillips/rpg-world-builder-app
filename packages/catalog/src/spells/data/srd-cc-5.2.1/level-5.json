@@ -88,32 +88,6 @@
       }
     },
     "higherLevelSlotEffect": "<p>The damage of the Clenched Fist increases by 2d8 and the damage of the Grasping Hand increases by 2d6 for each spell slot level above 5.</p>",
-    "effects": [
-      {
-        "id": "srd-cc-5.2.1:arcane-hand:clenched-fist",
-        "kind": "damage",
-        "label": "Clenched Fist",
-        "roll": {
-          "dice": {
-            "count": 5,
-            "faces": 8
-          }
-        },
-        "damageType": "force"
-      },
-      {
-        "id": "srd-cc-5.2.1:arcane-hand:grasping-hand-crush",
-        "kind": "damage",
-        "label": "Grasping Hand crush",
-        "roll": {
-          "dice": {
-            "count": 4,
-            "faces": 6
-          }
-        },
-        "damageType": "bludgeoning"
-      }
-    ],
     "resolution": {
       "selectionMode": "targets",
       "target": {
@@ -241,18 +215,6 @@
       "somatic": true
     },
     "higherLevelSlotEffect": "<p>The healing increases by 1d8 for each spell slot level above 5.</p>",
-    "effects": [
-      {
-        "id": "srd-cc-5.2.1:mass-cure-wounds:healing",
-        "kind": "healing",
-        "roll": {
-          "dice": {
-            "count": 5,
-            "faces": 8
-          }
-        }
-      }
-    ],
     "resolution": {
       "selectionMode": "targets",
       "target": {
