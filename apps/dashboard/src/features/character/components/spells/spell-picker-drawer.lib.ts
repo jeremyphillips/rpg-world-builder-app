@@ -1,8 +1,8 @@
 import {
   formatSpellConcentrationMarker,
   formatSpellRitualMarker,
+  formatSpellLevel,
   getSpellSchoolLabel,
-  PICKER_DISABLED_REASON_SELECTION_FULL,
   type ChoiceSet,
   type Spell,
   type SpellPickerCompactSummary,
@@ -11,8 +11,11 @@ import {
 
 import { normalizeSearchQuery, scoreItem } from '@rpg/ui'
 
+import { sanitizeModeBrowseState } from '../picker/catalog-picker-browse-mode.lib'
 import {
-  SPELL_PICKER_LEVEL_ALL,
+  SPELL_PICKER_MECHANICS_LABEL,
+  SPELL_PICKER_MODE_CANTRIPS,
+  SPELL_PICKER_MODE_PREPARED_SPELLS,
   SPELL_PICKER_NO_OPTIONS_MESSAGE,
   SPELL_PICKER_SCHOOL_ALL,
   SPELL_PICKER_SELECTION_FULL_MESSAGE,
@@ -21,48 +24,193 @@ import {
   SPELL_PICKER_SORT_LEVEL_DESC,
   SPELL_PICKER_SORT_NAME_ASC,
   SPELL_PICKER_SORT_NAME_DESC,
+  type SpellPickerBrowseState,
+  type SpellPickerCastingTimeFilter,
   type SpellPickerDrawerProps,
-  type SpellPickerLevelFilter,
+  type SpellPickerMechanicsFilters,
+  type SpellPickerMethodFilter,
+  type SpellPickerMode,
   type SpellPickerSchoolFilter,
   type SpellPickerSortMode,
-  type SpellPickerViewDefaults,
+  type SpellPickerTraitFilter,
+  SPELL_PICKER_LEVELS_ALL,
 } from './spell-picker-drawer.types'
 
-export const SPELL_PICKER_VIEW_DEFAULTS = {
-  selectedLevel: SPELL_PICKER_LEVEL_ALL,
+export const SPELL_PICKER_VIEW_DEFAULTS: SpellPickerBrowseState = {
+  searchQuery: '',
+  activeTabId: 'recommended',
+  selectedLevels: [],
   selectedSchool: SPELL_PICKER_SCHOOL_ALL,
-  sortMode: SPELL_PICKER_SORT_BEST_MATCH,
-} as const satisfies SpellPickerViewDefaults
+  mechanicsFilters: { castingTimes: [], traits: [], methods: [] },
+  sortMode: SPELL_PICKER_SORT_NAME_ASC,
+}
 
 const spellNameCollator = new Intl.Collator(undefined, {
   sensitivity: 'base',
   numeric: true,
 })
 
+const CASTING_TIME_FILTER_LABELS: Record<SpellPickerCastingTimeFilter, string> = {
+  action: 'Action',
+  'bonus-action': 'Bonus action',
+  reaction: 'Reaction',
+  '1-minute': '1 minute',
+  '10-minutes': '10 minutes',
+  '1-hour': '1 hour',
+}
+
+const TRAIT_FILTER_LABELS = {
+  concentration: 'Concentration',
+  ritual: 'Ritual',
+} as const
+
+const METHOD_FILTER_LABELS = {
+  'ranged-spell-attack': 'Ranged spell attack',
+  'melee-spell-attack': 'Melee spell attack',
+} as const
+
 function castingSummaryIncludesConcentration(castingSummary: readonly string[]): boolean {
   return castingSummary.some((entry) => entry.includes('Concentration'))
 }
 
-type SpellPickerScoredItem = {
-  item: SpellPickerItem
-  searchScore: number
+const CASTING_TIME_FILTER_MATCHERS: Record<
+  SpellPickerCastingTimeFilter,
+  (value: number, unit: string) => boolean
+> = {
+  action: (value, unit) => unit === 'action' && value === 1,
+  'bonus-action': (value, unit) => unit === 'bonus-action' && value === 1,
+  reaction: (value, unit) => unit === 'reaction' && value === 1,
+  '1-minute': (value, unit) => unit === 'minute' && value === 1,
+  '10-minutes': (value, unit) => unit === 'minute' && value === 10,
+  '1-hour': (value, unit) => unit === 'hour' && value === 1,
 }
 
-export function formatSpellPickerDrawerTitle(choiceSet: ChoiceSet): string {
-  if (choiceSet.choiceType === 'cantrip') return 'Add cantrip'
-  if (choiceSet.choiceType === 'spell') return 'Add spell'
-  return choiceSet.label
+function resolveCastingTimeFilter(spell: Spell): SpellPickerCastingTimeFilter | undefined {
+  const { value, unit } = spell.castingTime.normal
+  return (
+    Object.entries(CASTING_TIME_FILTER_MATCHERS) as Array<
+      [SpellPickerCastingTimeFilter, (value: number, unit: string) => boolean]
+    >
+  ).find(([, matches]) => matches(value, unit))?.[0]
 }
 
-export function formatSpellPickerDrawerDescription(
-  choiceSet: ChoiceSet,
-  selectedIds: readonly string[],
-): string {
-  const remaining = Math.max(choiceSet.max - selectedIds.length, 0)
-  if (remaining === 0) {
-    return `Selected ${selectedIds.length} of ${choiceSet.max}. Remove a spell to choose another.`
+export function createDefaultSpellPickerBrowseState(
+  mode: SpellPickerMode,
+  recommendationsEnabled: boolean,
+  defaultTabId = 'recommended',
+): SpellPickerBrowseState {
+  return {
+    ...SPELL_PICKER_VIEW_DEFAULTS,
+    activeTabId: defaultTabId,
+    sortMode: recommendationsEnabled ? SPELL_PICKER_SORT_BEST_MATCH : SPELL_PICKER_SORT_NAME_ASC,
+    selectedLevels: mode === SPELL_PICKER_MODE_CANTRIPS ? [] : [],
   }
-  return `Selected ${selectedIds.length} of ${choiceSet.max}. Choose ${remaining} more.`
+}
+
+export function resolveValidSpellPickerSortModes(
+  mode: SpellPickerMode,
+  recommendationsEnabled: boolean,
+): SpellPickerSortMode[] {
+  const modes: SpellPickerSortMode[] = []
+  if (recommendationsEnabled) modes.push(SPELL_PICKER_SORT_BEST_MATCH)
+  modes.push(SPELL_PICKER_SORT_NAME_ASC, SPELL_PICKER_SORT_NAME_DESC)
+  if (mode === SPELL_PICKER_MODE_PREPARED_SPELLS) {
+    modes.push(SPELL_PICKER_SORT_LEVEL_ASC, SPELL_PICKER_SORT_LEVEL_DESC)
+  }
+  return modes
+}
+
+export function resolveValidSpellPickerSort(
+  mode: SpellPickerMode,
+  recommendationsEnabled: boolean,
+  current: SpellPickerSortMode,
+): SpellPickerSortMode {
+  const validModes = resolveValidSpellPickerSortModes(mode, recommendationsEnabled)
+  return validModes.includes(current) ? current : validModes[0]!
+}
+
+export function sanitizeSpellPickerBrowseState(
+  mode: SpellPickerMode,
+  state: SpellPickerBrowseState,
+  recommendationsEnabled: boolean,
+): SpellPickerBrowseState {
+  return sanitizeModeBrowseState(state, (current) => ({
+    ...current,
+    selectedLevels: mode === SPELL_PICKER_MODE_CANTRIPS ? [] : current.selectedLevels,
+    sortMode: resolveValidSpellPickerSort(mode, recommendationsEnabled, current.sortMode),
+  }))
+}
+
+export function formatSpellPickerDrawerTitle(mode: SpellPickerMode): string {
+  return mode === SPELL_PICKER_MODE_CANTRIPS ? 'Add cantrip' : 'Add prepared spell'
+}
+
+export function formatSpellPickerSelectionCountText(selectedCount: number, max: number): string {
+  return `${selectedCount} of ${max} selected`
+}
+
+export function formatSpellPickerSelectionMetadata(
+  mode: SpellPickerMode,
+  className: string,
+  activePreparedLevel?: number,
+): string {
+  if (mode === SPELL_PICKER_MODE_CANTRIPS) {
+    return `${className} cantrips`
+  }
+  const base = `${className} spells`
+  if (activePreparedLevel === undefined) return base
+  return `${base} · ${formatSpellLevel(activePreparedLevel)} level`
+}
+
+export function resolveActivePreparedLevelSuffix(
+  mode: SpellPickerMode,
+  selectedLevels: readonly number[],
+): number | undefined {
+  if (mode !== SPELL_PICKER_MODE_PREPARED_SPELLS) return undefined
+  if (selectedLevels.length !== 1) return undefined
+  return selectedLevels[0]
+}
+
+export function resolveSpellPickerModes(args: {
+  cantripChoiceSet?: ChoiceSet
+  preparedChoiceSet?: ChoiceSet
+}): SpellPickerMode[] {
+  const modes: SpellPickerMode[] = []
+  if (args.cantripChoiceSet) modes.push(SPELL_PICKER_MODE_CANTRIPS)
+  if (args.preparedChoiceSet) modes.push(SPELL_PICKER_MODE_PREPARED_SPELLS)
+  return modes
+}
+
+export function resolveInitialSpellPickerMode(
+  modes: readonly SpellPickerMode[],
+  initialMode?: SpellPickerMode,
+): SpellPickerMode {
+  if (initialMode && modes.includes(initialMode)) return initialMode
+  return modes[0]!
+}
+
+export function choiceSetForSpellPickerMode(
+  mode: SpellPickerMode,
+  cantripChoiceSet?: ChoiceSet,
+  preparedChoiceSet?: ChoiceSet,
+): ChoiceSet | undefined {
+  return mode === SPELL_PICKER_MODE_CANTRIPS ? cantripChoiceSet : preparedChoiceSet
+}
+
+export function selectedIdsForSpellPickerMode(
+  mode: SpellPickerMode,
+  cantripSelectedIds: readonly string[],
+  preparedSelectedIds: readonly string[],
+): string[] {
+  return mode === SPELL_PICKER_MODE_CANTRIPS ? [...cantripSelectedIds] : [...preparedSelectedIds]
+}
+
+export function itemsForSpellPickerMode(
+  mode: SpellPickerMode,
+  cantripItems: readonly SpellPickerItem[],
+  preparedItems: readonly SpellPickerItem[],
+): readonly SpellPickerItem[] {
+  return mode === SPELL_PICKER_MODE_CANTRIPS ? cantripItems : preparedItems
 }
 
 export function collectSpellPickerMarkers(
@@ -92,10 +240,10 @@ export type SpellPickerEmptyStateKind = 'no-options' | 'selection-full'
 
 export function resolveSpellPickerEmptyStateKind(
   itemsLength: number,
-  choiceSet: ChoiceSet,
+  choiceSet: ChoiceSet | undefined,
   selectedIds: readonly string[],
 ): SpellPickerEmptyStateKind | undefined {
-  if (itemsLength > 0) return undefined
+  if (itemsLength > 0 || !choiceSet) return undefined
   if (selectedIds.length >= choiceSet.max) return 'selection-full'
   return 'no-options'
 }
@@ -113,33 +261,19 @@ export function resolveSpellPickerEmptyStateMessage(
   }
 }
 
-export function isSpellSelectionFull(
-  selectedIds: SpellPickerDrawerProps['selectedIds'],
-  choiceSet: ChoiceSet,
-): boolean {
-  return selectedIds.length >= choiceSet.max
+export function countSpellPickerMechanicsFilters(filters: SpellPickerMechanicsFilters): number {
+  return filters.castingTimes.length + filters.traits.length + filters.methods.length
 }
 
-export function formatSpellPickerSelectionFullNotice(
-  choiceSet: ChoiceSet,
-  selectedIds: readonly string[],
-): string | undefined {
-  if (!isSpellSelectionFull([...selectedIds], choiceSet)) return undefined
-  return PICKER_DISABLED_REASON_SELECTION_FULL
-}
-
-export function countSpellPickerStructuredFilters(args: {
-  selectedLevel: SpellPickerLevelFilter
-  selectedSchool: SpellPickerSchoolFilter
-}): number {
-  let count = 0
-  if (args.selectedLevel !== SPELL_PICKER_LEVEL_ALL) count += 1
-  if (args.selectedSchool !== SPELL_PICKER_SCHOOL_ALL) count += 1
+export function countSpellPickerStructuredFilters(state: SpellPickerBrowseState): number {
+  let count = countSpellPickerMechanicsFilters(state.mechanicsFilters)
+  if (state.selectedLevels.length > 0) count += 1
+  if (state.selectedSchool !== SPELL_PICKER_SCHOOL_ALL) count += 1
   return count
 }
 
 export function resolveSpellPickerLevelFilterOptions(items: readonly SpellPickerItem[]): number[] {
-  const levels = new Set(items.map((item) => item.spell.level))
+  const levels = new Set(items.map((item) => item.spell.level).filter((level) => level >= 1))
   return [...levels].sort((left, right) => left - right)
 }
 
@@ -150,8 +284,123 @@ export function resolveSpellPickerSchoolFilterOptions(items: readonly SpellPicke
   )
 }
 
-export function formatSpellPickerLevelFilterLabel(level: number): string {
-  return level === 0 ? 'Cantrip' : `Level ${level}`
+export function formatSpellPickerLevelChipLabel(level: number): string {
+  return formatSpellLevel(level)
+}
+
+export function normalizeSpellPickerLevelSelection(
+  selectedLevels: readonly number[],
+  availableLevels: readonly number[],
+): number[] {
+  if (selectedLevels.length === 0) return []
+  const available = new Set(availableLevels)
+  const normalized = selectedLevels.filter((level) => available.has(level))
+  if (normalized.length === availableLevels.length && availableLevels.length > 0) {
+    return []
+  }
+  return normalized
+}
+
+export function toggleSpellPickerLevelSelection(
+  selectedLevels: readonly number[],
+  level: number | typeof SPELL_PICKER_LEVELS_ALL,
+  availableLevels: readonly number[],
+): number[] {
+  if (level === SPELL_PICKER_LEVELS_ALL) return []
+  const next = selectedLevels.includes(level)
+    ? selectedLevels.filter((entry) => entry !== level)
+    : [...selectedLevels.filter((entry) => entry !== level), level]
+  return normalizeSpellPickerLevelSelection(next, availableLevels)
+}
+
+export function resolveSpellPickerCastingTimeFilterOptions(
+  items: readonly SpellPickerItem[],
+): SpellPickerCastingTimeFilter[] {
+  const filters = new Set<SpellPickerCastingTimeFilter>()
+  for (const item of items) {
+    const filter = resolveCastingTimeFilter(item.spell)
+    if (filter) filters.add(filter)
+  }
+  return [...filters]
+}
+
+export function resolveSpellPickerTraitFilterOptions(
+  items: readonly SpellPickerItem[],
+): SpellPickerTraitFilter[] {
+  const filters = new Set<SpellPickerTraitFilter>()
+  for (const item of items) {
+    if (item.spell.duration.kind === 'timed' && item.spell.duration.concentration) {
+      filters.add('concentration')
+    }
+    if (item.spell.castingTime.canBeCastAsRitual) filters.add('ritual')
+  }
+  return [...filters]
+}
+
+export function resolveSpellPickerMethodFilterOptions(
+  items: readonly SpellPickerItem[],
+): SpellPickerMethodFilter[] {
+  const filters = new Set<SpellPickerMethodFilter>()
+  for (const item of items) {
+    if (item.spell.deliveryMethod === 'ranged-spell-attack') filters.add('ranged-spell-attack')
+    if (item.spell.deliveryMethod === 'melee-spell-attack') filters.add('melee-spell-attack')
+  }
+  return [...filters]
+}
+
+export function formatSpellPickerMechanicsTriggerLabel(activeCount: number): string {
+  if (activeCount === 0) return SPELL_PICKER_MECHANICS_LABEL
+  return `${SPELL_PICKER_MECHANICS_LABEL} · ${activeCount}`
+}
+
+export function getSpellPickerCastingTimeFilterLabel(filter: SpellPickerCastingTimeFilter): string {
+  return CASTING_TIME_FILTER_LABELS[filter]
+}
+
+export function getSpellPickerTraitFilterLabel(filter: SpellPickerTraitFilter): string {
+  return TRAIT_FILTER_LABELS[filter]
+}
+
+export function getSpellPickerMethodFilterLabel(filter: SpellPickerMethodFilter): string {
+  return METHOD_FILTER_LABELS[filter]
+}
+
+function matchesCastingTimeFilters(spell: Spell, filters: SpellPickerCastingTimeFilter[]): boolean {
+  if (filters.length === 0) return true
+  const filter = resolveCastingTimeFilter(spell)
+  return filter ? filters.includes(filter) : false
+}
+
+function matchesTraitFilters(spell: Spell, filters: SpellPickerTraitFilter[]): boolean {
+  if (filters.length === 0) return true
+  const matches = filters.some((filter) => {
+    if (filter === 'concentration') {
+      return spell.duration.kind === 'timed' && spell.duration.concentration
+    }
+    return spell.castingTime.canBeCastAsRitual
+  })
+  return matches
+}
+
+function matchesMethodFilters(spell: Spell, filters: SpellPickerMethodFilter[]): boolean {
+  if (filters.length === 0) return true
+  return filters.some((filter) => spell.deliveryMethod === filter)
+}
+
+export function matchesSpellPickerMechanicsFilters(
+  spell: Spell,
+  filters: SpellPickerMechanicsFilters,
+): boolean {
+  return (
+    matchesCastingTimeFilters(spell, filters.castingTimes) &&
+    matchesTraitFilters(spell, filters.traits) &&
+    matchesMethodFilters(spell, filters.methods)
+  )
+}
+
+type SpellPickerScoredItem = {
+  item: SpellPickerItem
+  searchScore: number
 }
 
 function scoreSpellPickerItem(item: SpellPickerItem, searchQuery: string): number {
@@ -196,14 +445,18 @@ function compareSpellPickerScoredItems(
 export function filterSpellPickerItems(
   items: readonly SpellPickerItem[],
   options: {
-    selectedLevel: SpellPickerLevelFilter
+    mode: SpellPickerMode
+    selectedLevels: readonly number[]
     selectedSchool: SpellPickerSchoolFilter
+    mechanicsFilters: SpellPickerMechanicsFilters
   },
 ): SpellPickerItem[] {
   return items.filter((item) => {
+    if (options.mode === SPELL_PICKER_MODE_CANTRIPS && item.spell.level !== 0) return false
     if (
-      options.selectedLevel !== SPELL_PICKER_LEVEL_ALL &&
-      item.spell.level !== options.selectedLevel
+      options.mode === SPELL_PICKER_MODE_PREPARED_SPELLS &&
+      options.selectedLevels.length > 0 &&
+      !options.selectedLevels.includes(item.spell.level)
     ) {
       return false
     }
@@ -211,6 +464,9 @@ export function filterSpellPickerItems(
       options.selectedSchool !== SPELL_PICKER_SCHOOL_ALL &&
       item.spell.school !== options.selectedSchool
     ) {
+      return false
+    }
+    if (!matchesSpellPickerMechanicsFilters(item.spell, options.mechanicsFilters)) {
       return false
     }
     return true
@@ -234,4 +490,12 @@ export function filterAndSortSpellPickerItems(
   return [...filtered]
     .sort((left, right) => compareSpellPickerScoredItems(left, right, options))
     .map((row) => row.item)
+}
+
+export function isSpellSelectionFull(
+  selectedIds: SpellPickerDrawerProps['cantripSelectedIds'],
+  choiceSet: ChoiceSet | undefined,
+): boolean {
+  if (!choiceSet) return false
+  return selectedIds.length >= choiceSet.max
 }

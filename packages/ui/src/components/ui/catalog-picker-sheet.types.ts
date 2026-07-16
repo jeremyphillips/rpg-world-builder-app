@@ -14,13 +14,14 @@ export type CatalogPickerSheetToolbarContext = {
   setSearchQuery: (query: string) => void
   clearSearchQuery: () => void
   activeTabId: string
+  setActiveTabId: (tabId: string) => void
   resetActiveTab: () => void
 }
 export type CatalogPickerSheetProps<TItem> = {
   open: boolean
   onOpenChange: (open: boolean) => void
   title: string
-  description?: string
+  description?: ReactNode
   /** Merged onto the sheet headline — defaults to card title (19px). */
   headlineClassName?: string
   items: readonly TItem[]
@@ -35,6 +36,14 @@ export type CatalogPickerSheetProps<TItem> = {
   tabs?: readonly CatalogPickerTab[]
   defaultTabId?: string
   getItemTab?: (item: TItem) => string
+  /** When false (default), tabs and recommendation browse UI are not rendered. */
+  recommendationsEnabled?: boolean
+  /** Placement of recommendation tabs relative to search. Defaults to before-search. */
+  recommendationTabsPosition?: 'before-search' | 'after-search'
+  /** Content between header description and toolbar (e.g. segmented mode control). */
+  headerBelowDescription?: ReactNode
+  /** Content after search and optional recommendation tabs (e.g. level chips). */
+  postSearchContent?: ReactNode
   toolbarControls?: ReactNode | ((context: CatalogPickerSheetToolbarContext) => ReactNode)
   /** Trailing actions rendered inline with the tab row (e.g. Reset view). */
   tabToolbarActions?: ReactNode | ((context: CatalogPickerSheetToolbarContext) => ReactNode)

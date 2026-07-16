@@ -6,11 +6,12 @@ import {
   catalogPickerSortFilterClasses,
   catalogPickerSortLabelClasses,
 } from './catalog-picker-filter-toolbar.variants'
+import {
+  resolvePickerSortTriggerLabel,
+  type CatalogPickerSortOption,
+} from './catalog-picker-sort-labels.lib'
 
-export type CatalogPickerSortOption<TMode extends string = string> = {
-  value: TMode
-  label: string
-}
+export type { CatalogPickerSortOption } from './catalog-picker-sort-labels.lib'
 
 export type CatalogPickerSortGroupProps<TMode extends string = string> = {
   label?: string
@@ -29,6 +30,9 @@ export function CatalogPickerSortGroup<TMode extends string = string>({
   options,
   onValueChange,
 }: CatalogPickerSortGroupProps<TMode>) {
+  const selectedOption = options.find((option) => option.value === value)
+  const triggerLabel = selectedOption ? resolvePickerSortTriggerLabel(selectedOption) : undefined
+
   return (
     <div className={catalogPickerSortFilterClasses} role="group" aria-label={ariaLabel}>
       <Text as="span" className={catalogPickerSortLabelClasses}>
@@ -36,7 +40,7 @@ export function CatalogPickerSortGroup<TMode extends string = string>({
       </Text>
       <Select value={value} onValueChange={(next) => onValueChange(next as TMode)}>
         <SelectTrigger size="sm" aria-label={triggerAriaLabel}>
-          <SelectValue />
+          <SelectValue>{triggerLabel}</SelectValue>
         </SelectTrigger>
         <SelectContent>
           {options.map((option) => (
