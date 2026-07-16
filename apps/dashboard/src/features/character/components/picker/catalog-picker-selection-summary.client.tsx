@@ -18,7 +18,7 @@ export function CatalogPickerSelectionSummary({
   metadata,
 }: CatalogPickerSelectionSummaryProps) {
   return (
-    <Text as="div" variant="muted" className={catalogPickerSelectionSummaryClasses}>
+    <Text as="span" variant="muted" className={catalogPickerSelectionSummaryClasses}>
       <span className={complete ? 'inline-flex items-center gap-1 text-success' : undefined}>
         {complete ? <Check aria-hidden className="size-3.5 shrink-0" /> : null}
         <span>{countText}</span>

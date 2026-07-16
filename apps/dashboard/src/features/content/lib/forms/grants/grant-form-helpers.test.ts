@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import type { GrantGroups } from '@rpg/contracts'
+import { isContainer, type FormItem, type RowConfig } from '@rpg/ui/form'
 
 import {
   formatDamageTypeRowSummary,
@@ -10,6 +11,7 @@ import {
   formatResistanceRowSummary,
   formatSenseRowSummary,
   formatSpellRowTitle,
+  grantItemFields,
   GRANT_TYPE_MISSING_PRIMARY,
   type GrantRowHeaderContext,
 } from './grant-form-fields'
@@ -21,6 +23,69 @@ import {
   GRANT_DEFAULT_UNLOCK_LEVEL,
 } from './grant-form-schema'
 import { formRowsToGrantGroups, grantGroupsToFormRows } from './grant-form-values'
+
+function formItemKey(item: FormItem | RowConfig, index: number, namePrefix?: string): string {
+  if ('name' in item && typeof item.name === 'string') {
+    const leafType = 'type' in item && typeof item.type === 'string' ? item.type : undefined
+    const key = leafType ? `${item.name}-${leafType}` : item.name
+    return namePrefix ? `${namePrefix}.${key}` : key
+  }
+
+  if (!('kind' in item)) return String(index)
+
+  switch (item.kind) {
+    case 'group':
+      return namePrefix ? `${namePrefix}.group-${index}` : `group-${index}`
+    case 'stack':
+      return namePrefix ? `${namePrefix}.stack-${index}` : `stack-${index}`
+    case 'row':
+      return namePrefix ? `${namePrefix}.row-${index}` : `row-${index}`
+    case 'slot':
+      return namePrefix ? `${namePrefix}.${item.name}` : item.name
+    default:
+      return String(index)
+  }
+}
+
+function collectDuplicateSiblingKeys(
+  items: Array<FormItem | RowConfig>,
+  namePrefix?: string,
+): string[] {
+  const keys = items.map((item, index) => formItemKey(item, index, namePrefix))
+  const seen = new Set<string>()
+  const duplicates: string[] = []
+
+  for (const key of keys) {
+    if (seen.has(key)) duplicates.push(key)
+    seen.add(key)
+  }
+
+  return duplicates
+}
+
+function walkDuplicateFormItemKeys(
+  items: Array<FormItem | RowConfig>,
+  namePrefix?: string,
+  duplicates: string[] = [],
+): string[] {
+  duplicates.push(...collectDuplicateSiblingKeys(items, namePrefix))
+
+  for (const item of items) {
+    if (!isContainer(item) || item.kind === 'slot' || item.kind === 'array') continue
+    walkDuplicateFormItemKeys(item.fields, namePrefix, duplicates)
+  }
+
+  return duplicates
+}
+
+describe('grantItemFields react keys', () => {
+  it('uses unique sibling keys for co-located proficiency grant field stacks', () => {
+    const fields = grantItemFields(GRANT_TYPES, GRANT_TYPE_LABELS, { options: {} })
+    const prefix = 'features.1.grants.0'
+
+    expect(walkDuplicateFormItemKeys(fields, prefix)).toEqual([])
+  })
+})
 
 describe('grantGroupsToFormRows / formRowsToGrantGroups (atomic model)', () => {
   it('round-trips a spells grant through grantGroups', () => {

@@ -11,6 +11,7 @@ import {
   weaponProficiencyChoiceFormSchema,
   weaponProficiencyGrantItemFields,
   weaponProficiencyItemFormSchema,
+  WEAPON_PROFICIENCY_POOL_SENTENCE_FIELD_NAME,
   type WeaponProficiencyItemForm,
 } from './proficiency-grant-form-fields'
 import {
@@ -313,7 +314,9 @@ describe('weaponProficiencyGrantItemFields', () => {
 
   it('embeds pool kind in the choice inline sentence', () => {
     const fields = weaponProficiencyGrantItemFields({ options: { weapons: [] } })
-    const chooseField = fields.find((field) => 'name' in field && field.name === 'choose')
+    const chooseField = fields.find(
+      (field) => 'name' in field && field.name === WEAPON_PROFICIENCY_POOL_SENTENCE_FIELD_NAME,
+    )
     expect(chooseField).toMatchObject({
       type: 'inlineSentence',
       segments: expect.arrayContaining([
