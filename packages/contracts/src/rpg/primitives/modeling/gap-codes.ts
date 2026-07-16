@@ -8,6 +8,8 @@ export const MODELING_GAP_CODES = {
     'Death-state restoration rules are not modeled (timing, body requirements, return state).',
   'transformation-model-missing':
     'Creature statistic replacement or override for a duration is not modeled.',
+  'duration-model-missing':
+    'Turn- or time-bound effect expiry is not modeled (e.g. until end of your next turn).',
 } as const
 
 export type ModelingGapCode = keyof typeof MODELING_GAP_CODES

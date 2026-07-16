@@ -74,6 +74,7 @@
       "outcomes": [
         {
           "result": "hit",
+          "note": "On a hit, the target has the Poisoned condition until the end of your next turn.",
           "applications": [
             {
               "effectId": "damage",
@@ -84,11 +85,15 @@
       ]
     },
     "modeling": {
-      "status": "meaningful-partial",
+      "status": "sufficient-for-character-sheet",
       "gaps": [
         {
           "code": "conditional-effect-model-missing",
           "note": "Poisoned condition rider stays prose"
+        },
+        {
+          "code": "duration-model-missing",
+          "note": "Until the end of your next turn on Poisoned stays prose"
         }
       ]
     }

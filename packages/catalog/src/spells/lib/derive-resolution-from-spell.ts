@@ -43,8 +43,10 @@ export type ResolutionDerivationOverrides = {
   origin?: SpellResolutionOrigin
   areaOfEffect?: AreaGeometry
   outcomes?: SpellResolution['outcomes']
-  /** @deprecated Use outcomes with a hit-branch note instead */
+  /** Applies to the hit outcome branch when method is attack. */
   hitNote?: string
+  /** Applies to the failed-save outcome branch when method is saving-throw. */
+  failedSaveNote?: string
   /** @deprecated Use proximity */
   range?: SpellResolutionTargetProximity
 }
@@ -301,11 +303,20 @@ function buildOutcomes(
 
   const defaults = buildDefaultOutcomeSlots(method, effectId)
   const hitNote = overrides.hitNote?.trim()
+  const failedSaveNote = overrides.failedSaveNote?.trim()
 
   if (method.kind === 'attack' && hitNote) {
     return stripEmptyOutcomeSlots(
       defaults.map((outcome) =>
         outcome.result === 'hit' ? { ...outcome, note: hitNote } : outcome,
+      ),
+    )
+  }
+
+  if (method.kind === 'saving-throw' && failedSaveNote) {
+    return stripEmptyOutcomeSlots(
+      defaults.map((outcome) =>
+        outcome.result === 'failed-save' ? { ...outcome, note: failedSaveNote } : outcome,
       ),
     )
   }

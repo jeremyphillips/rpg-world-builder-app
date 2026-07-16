@@ -71,9 +71,20 @@ export const SRD_521_SPELL_SEED_RESOLUTION = {
   // Tier A — single primary damage
   'chill-touch': { kind: 'full', resolution: CHILL_TOUCH_RESOLUTION },
   'inflict-wounds': { kind: 'full', resolution: INFlict_WOUNDS_RESOLUTION },
-  'fire-bolt': { kind: 'derived', overrides: {} },
+  'fire-bolt': {
+    kind: 'derived',
+    overrides: {
+      hitNote:
+        "A flammable object hit by this spell starts burning if it isn't being worn or carried.",
+    },
+  },
   'poison-spray': { kind: 'derived', overrides: {} },
-  'ray-of-sickness': { kind: 'derived', overrides: {} },
+  'ray-of-sickness': {
+    kind: 'derived',
+    overrides: {
+      hitNote: 'On a hit, the target has the Poisoned condition until the end of your next turn.',
+    },
+  },
   'acid-splash': {
     kind: 'derived',
     overrides: {
@@ -85,7 +96,12 @@ export const SRD_521_SPELL_SEED_RESOLUTION = {
   'sacred-flame': { kind: 'derived', overrides: { saveAbility: 'dex' } },
   'burning-hands': {
     kind: 'derived',
-    overrides: { saveAbility: 'dex', selectionMode: 'self' },
+    overrides: {
+      saveAbility: 'dex',
+      selectionMode: 'self',
+      failedSaveNote:
+        "Flammable objects in the Cone that aren't being worn or carried start burning.",
+    },
   },
   'hellish-rebuke': {
     kind: 'derived',
@@ -102,7 +118,14 @@ export const SRD_521_SPELL_SEED_RESOLUTION = {
       areaOfEffect: { shape: 'cube', size: { value: 15, unit: 'ft' } },
     },
   },
-  fireball: { kind: 'derived', overrides: { saveAbility: 'dex' } },
+  fireball: {
+    kind: 'derived',
+    overrides: {
+      saveAbility: 'dex',
+      failedSaveNote:
+        "Flammable objects in the area that aren't being worn or carried start burning.",
+    },
+  },
   'wall-of-fire': { kind: 'derived', overrides: { saveAbility: 'dex' } },
   'delayed-blast-fireball': { kind: 'derived', overrides: { saveAbility: 'dex' } },
 

@@ -24,13 +24,20 @@ describe('SRD 5.2.1 spell modeling manifest', () => {
     expect(manifestSlugs).toHaveLength(92)
   })
 
-  it('promotes every resolution seed to meaningful-partial', () => {
+  it('promotes every resolution seed to meaningful-partial or higher', () => {
     expect(SRD_521_SPELL_MODELING_EDITOR_ELIGIBLE_SLUGS).toEqual(
       SRD_521_SPELL_SEED_RESOLUTION_SLUGS,
     )
 
     for (const slug of SRD_521_SPELL_SEED_RESOLUTION_SLUGS) {
-      expect(SRD_521_SPELL_MODELING_MANIFEST[slug]?.status).toBe('meaningful-partial')
+      const status = SRD_521_SPELL_MODELING_MANIFEST[slug]?.status
+      expect(
+        status === 'meaningful-partial' ||
+          status === 'sufficient-for-display' ||
+          status === 'sufficient-for-character-sheet' ||
+          status === 'mechanics-ready',
+        slug,
+      ).toBe(true)
     }
   })
 

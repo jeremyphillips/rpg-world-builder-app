@@ -20,6 +20,7 @@ describe('spell modeling gap codes', () => {
     expect(isSpellModelingGapCode('transformation-model-missing')).toBe(true)
     expect(isSpellModelingGapCode('independent-effect-object-model-missing')).toBe(true)
     expect(isSpellModelingGapCode('concurrent-effect-limit')).toBe(true)
+    expect(isSpellModelingGapCode('duration-model-missing')).toBe(true)
     expect(isSpellModelingGapCode('weapon-attack-modification-model-missing')).toBe(true)
     expect(isSpellModelingGapCode('not-a-code')).toBe(false)
   })

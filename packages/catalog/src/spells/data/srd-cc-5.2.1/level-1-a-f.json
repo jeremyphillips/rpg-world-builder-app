@@ -128,6 +128,7 @@
       "outcomes": [
         {
           "result": "failed-save",
+          "note": "Flammable objects in the Cone that aren't being worn or carried start burning.",
           "applications": [
             {
               "effectId": "damage",
@@ -147,11 +148,19 @@
       ]
     },
     "modeling": {
-      "status": "meaningful-partial",
+      "status": "sufficient-for-character-sheet",
       "gaps": [
         {
+          "code": "unconditional-application",
+          "note": "Object ignition applies regardless of save outcome until resolution-wide notes ship"
+        },
+        {
           "code": "flammability-rules",
-          "note": "Flammable object ignition rider stays prose"
+          "note": "Ignition/burning state not automated; rider documented on outcome"
+        },
+        {
+          "code": "object-state-awareness",
+          "note": "Worn or carried carve-out on object ignition rider"
         }
       ]
     }

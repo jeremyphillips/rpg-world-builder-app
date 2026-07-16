@@ -38,7 +38,28 @@
       }
     },
     "modeling": {
-      "reviewedAt": "2026-07-15T00:00:00.000Z"
+      "blocker": {
+        "code": "effect-schema-missing",
+        "note": "Stored spell with a caster-defined trigger and deferred execution."
+      },
+      "gaps": [
+        {
+          "code": "choice-model-missing",
+          "note": "Contingent spell and trigger choice stay prose"
+        },
+        {
+          "code": "conditional-effect-model-missing",
+          "note": "Trigger fires contingent spell automatically"
+        },
+        {
+          "code": "concurrent-effect-limit",
+          "note": "Only one Contingency spell active on caster at a time"
+        },
+        {
+          "code": "object-state-awareness",
+          "note": "Material component must remain on caster person"
+        }
+      ]
     }
   },
   {
@@ -80,7 +101,24 @@
       }
     },
     "modeling": {
-      "reviewedAt": "2026-07-15T00:00:00.000Z"
+      "blocker": {
+        "code": "effect-schema-missing",
+        "note": "Possession/soul-transfer state machine — future possession-model-missing family"
+      },
+      "gaps": [
+        {
+          "code": "conditional-effect-model-missing",
+          "note": "Possession save, host death, and container destruction branches stay prose"
+        },
+        {
+          "code": "object-state-awareness",
+          "note": "Protection from Evil and Magic Circle ward possession"
+        },
+        {
+          "code": "choice-model-missing",
+          "note": "Return to body vs possess attempt stays prose"
+        }
+      ]
     }
   },
   {
@@ -128,7 +166,20 @@
     },
     "higherLevelSlotEffect": "<p>The duration is longer with a spell slot of level 7 (10 days), 8 (30 days), or 9 (366 days).</p>",
     "modeling": {
-      "reviewedAt": "2026-07-15T00:00:00.000Z"
+      "blocker": {
+        "code": "effect-schema-missing",
+        "capabilityId": "condition"
+      },
+      "gaps": [
+        {
+          "code": "conditional-effect-model-missing",
+          "note": "Suggestion activity, damage ends charm, and early completion stay prose"
+        },
+        {
+          "code": "progression-schema-missing",
+          "note": "Slot duration tiers at levels 7, 8, and 9 stay prose"
+        }
+      ]
     }
   }
 ]

@@ -208,6 +208,8 @@ describe('buildSpellDetailViewModel', () => {
   it('builds cantrip scaling prose section when structured progression is absent', () => {
     const spellWithoutProgression = {
       ...FIRE_BOLT,
+      // Below display threshold so resolution UI does not suppress scaling prose.
+      modeling: undefined,
       resolution: FIRE_BOLT.resolution
         ? (() => {
             const { progression: _progression, ...resolution } = FIRE_BOLT.resolution

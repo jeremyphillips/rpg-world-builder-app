@@ -95,7 +95,7 @@
       ]
     },
     "modeling": {
-      "status": "meaningful-partial"
+      "status": "mechanics-ready"
     }
   },
   {
@@ -180,6 +180,10 @@
         {
           "code": "conditional-effect-model-missing",
           "note": "Target can't regain Hit Points rider stays prose"
+        },
+        {
+          "code": "duration-model-missing",
+          "note": "Until the end of your next turn expiry stays prose"
         }
       ]
     }
@@ -564,6 +568,7 @@
       "outcomes": [
         {
           "result": "hit",
+          "note": "A flammable object hit by this spell starts burning if it isn't being worn or carried.",
           "applications": [
             {
               "effectId": "damage",
@@ -627,11 +632,15 @@
       }
     },
     "modeling": {
-      "status": "meaningful-partial",
+      "status": "mechanics-ready",
       "gaps": [
         {
           "code": "flammability-rules",
-          "note": "Object ignition rider stays prose"
+          "note": "Ignition/burning state not automated; rider documented on hit outcome"
+        },
+        {
+          "code": "object-state-awareness",
+          "note": "Worn or carried carve-out on object ignition rider"
         }
       ]
     }

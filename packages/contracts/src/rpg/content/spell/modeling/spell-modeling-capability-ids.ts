@@ -9,6 +9,7 @@ export const SPELL_MODELING_CAPABILITY_IDS = {
   'spell-negation': 'Counter, dispel, and interrupt ongoing spells',
   'persistent-zone': 'Darkness, fog, glyph traps, and ongoing auras',
   'information-reveal': 'Object and creature information reveal',
+  'hit-point-restoration': 'Hit point restoration including non-roll and full-restore magnitudes',
 } as const
 
 export type SpellModelingCapabilityId = keyof typeof SPELL_MODELING_CAPABILITY_IDS

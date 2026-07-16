@@ -37,11 +37,30 @@ describe('spell modeling audit (srd-cc-5.2.1)', () => {
   })
 
   it('reports prose-only spells missing documented blocker', () => {
-    expect(audit.proseOnlyWithoutDocumentedBlocker.length).toBe(10)
-    for (const slug of audit.proseOnlyWithoutDocumentedBlocker) {
-      const entry = audit.entries.find((item) => item.slug === slug)!
-      expect(entry.effectiveStatus).toBe('prose-only')
-      expect(entry.blocker).toBeUndefined()
+    expect(audit.proseOnlyWithoutDocumentedBlocker.length).toBe(0)
+  })
+
+  it('documents blockers on all level 6-9 prose-only spells', () => {
+    const level6to9ProseOnly = audit.entries.filter(
+      (entry) =>
+        entry.effectiveStatus === 'prose-only' &&
+        [
+          'contingency',
+          'magic-jar',
+          'mass-suggestion',
+          'simulacrum',
+          'symbol',
+          'antimagic-field',
+          'power-word-heal',
+          'prismatic-wall',
+          'true-polymorph',
+          'wish',
+        ].includes(entry.slug),
+    )
+    expect(level6to9ProseOnly).toHaveLength(10)
+    for (const entry of level6to9ProseOnly) {
+      expect(entry.blocker, entry.slug).toBeDefined()
+      expect(entry.blockedFrom).toBe('meaningful-partial')
     }
   })
 
@@ -156,15 +175,48 @@ describe('spell modeling audit (srd-cc-5.2.1)', () => {
     expect(report).toContain('| Blocked from | Blocker | Capability | Residual gaps |')
   })
 
-  it('promotes resolution seeds to meaningful-partial with editor eligibility', () => {
+  it('promotes resolution seeds to meaningful-partial or higher with editor eligibility', () => {
     const withResolution = audit.entries.filter((entry) => entry.hasResolution)
     expect(withResolution).toHaveLength(21)
     for (const entry of withResolution) {
-      expect(entry.effectiveStatus).toBe('meaningful-partial')
-      expect(entry.explicitStatus).toBe('meaningful-partial')
-      expect(entry.editorEligible).toBe(true)
-      expect(entry.displayReady).toBe(false)
+      expect(entry.editorEligible, entry.slug).toBe(true)
+      expect(entry.explicitStatus, entry.slug).toBeDefined()
+      expect(
+        entry.effectiveStatus === 'meaningful-partial' ||
+          entry.effectiveStatus === 'sufficient-for-character-sheet' ||
+          entry.effectiveStatus === 'mechanics-ready',
+        entry.slug,
+      ).toBe(true)
     }
+  })
+
+  it('documents fire-bolt as mechanics-ready with ignition rider on hit outcome', () => {
+    const fireBolt = audit.entries.find((entry) => entry.slug === 'fire-bolt')
+    expect(fireBolt?.explicitStatus).toBe('mechanics-ready')
+    expect(fireBolt?.effectiveStatus).toBe('mechanics-ready')
+    expect(fireBolt?.gaps?.map((gap) => gap.code)).toEqual([
+      'flammability-rules',
+      'object-state-awareness',
+    ])
+    expect(fireBolt?.displayReady).toBe(true)
+  })
+
+  it('documents batch promotions for mechanics-ready and character-sheet spells', () => {
+    for (const slug of ['acid-splash', 'poison-spray', 'inflict-wounds', 'false-life'] as const) {
+      const entry = audit.entries.find((item) => item.slug === slug)
+      expect(entry?.explicitStatus, slug).toBe('mechanics-ready')
+      expect(entry?.gaps ?? []).toHaveLength(0)
+    }
+
+    for (const slug of ['burning-hands', 'fireball', 'ray-of-sickness'] as const) {
+      const entry = audit.entries.find((item) => item.slug === slug)
+      expect(entry?.explicitStatus, slug).toBe('sufficient-for-character-sheet')
+      expect(entry?.displayReady, slug).toBe(true)
+    }
+
+    const chillTouch = audit.entries.find((entry) => entry.slug === 'chill-touch')
+    expect(chillTouch?.explicitStatus).toBe('meaningful-partial')
+    expect(chillTouch?.gaps?.map((gap) => gap.code)).toContain('duration-model-missing')
   })
 
   it('derives prose-only for reviewed spells without resolution', () => {

@@ -6,6 +6,7 @@
  *
  * Promotion rules:
  * - Resolution seeds with editor round-trip support → `meaningful-partial` (+ gaps when prose riders remain)
+ * - Spells with complete declared resolution scope → `mechanics-ready` (+ residual gaps when automation limits remain)
  * - Prose-only spells → `blocker` (+ residual `gaps` when applicable)
  */
 import type { ContentModeling, ModelingBlocker, ModelingGapEntry } from '@rpg/contracts'
@@ -38,31 +39,42 @@ function editorEligible(gaps?: readonly ModelingGapEntry[]): ContentModeling {
   return modeling
 }
 
-/** Legacy reviewed marker — L6–9 terminal spells pending blocker backfill. */
-function reviewedProseOnly(): ContentModeling {
-  return { reviewedAt: SRD_521_SPELL_MODELING_REVIEWED_AT }
+function mechanicsReady(gaps?: readonly ModelingGapEntry[]): ContentModeling {
+  const modeling: ContentModeling = { status: 'mechanics-ready' }
+  if (gaps && gaps.length > 0) {
+    modeling.gaps = [...gaps]
+  }
+  return modeling
+}
+
+function sufficientForCharacterSheet(gaps?: readonly ModelingGapEntry[]): ContentModeling {
+  const modeling: ContentModeling = { status: 'sufficient-for-character-sheet' }
+  if (gaps && gaps.length > 0) {
+    modeling.gaps = [...gaps]
+  }
+  return modeling
 }
 
 /** Editor-eligible resolution spells — form round-trip verified in dashboard tests. */
 const SRD_521_SPELL_MODELING_RESOLUTION_ENTRIES = {
-  'acid-splash': editorEligible(),
+  'acid-splash': mechanicsReady(),
   'arcane-hand': editorEligible([
     gap('multi-mode-choice', 'Forceful Hand and Interposing Hand modes stay prose'),
     gap('modifier-model-missing', 'Grasping Hand crush + spellcasting modifier stays prose'),
     gap('conditional-effect-model-missing', 'Grapple, push, and cover modes stay prose'),
     gap('independent-effect-object-model-missing', 'Hand object AC, HP, and duration stay prose'),
   ]),
-  'burning-hands': editorEligible([
-    {
-      code: 'flammability-rules',
-      note: 'Flammable object ignition rider stays prose',
-    },
+  'burning-hands': sufficientForCharacterSheet([
+    gap(
+      'unconditional-application',
+      'Object ignition applies regardless of save outcome until resolution-wide notes ship',
+    ),
+    gap('flammability-rules', 'Ignition/burning state not automated; rider documented on outcome'),
+    gap('object-state-awareness', 'Worn or carried carve-out on object ignition rider'),
   ]),
   'chill-touch': editorEligible([
-    {
-      code: 'conditional-effect-model-missing',
-      note: "Target can't regain Hit Points rider stays prose",
-    },
+    gap('conditional-effect-model-missing', "Target can't regain Hit Points rider stays prose"),
+    gap('duration-model-missing', 'Until the end of your next turn expiry stays prose'),
   ]),
   'cure-wounds': editorEligible([
     {
@@ -70,22 +82,38 @@ const SRD_521_SPELL_MODELING_RESOLUTION_ENTRIES = {
       note: 'Spellcasting ability modifier on healing stays prose',
     },
   ]),
-  'delayed-blast-fireball': editorEligible(),
+  'delayed-blast-fireball': editorEligible([
+    gap('flammability-rules', 'Flammable object ignition rider stays prose'),
+    gap(
+      'progression-schema-missing',
+      'Time-based accumulation (+1d6 per turn end while concentration holds) — not slot scaling',
+    ),
+    gap(
+      'conditional-effect-model-missing',
+      'Touch, throw, and early detonation branches stay prose',
+    ),
+  ]),
   'eldritch-blast': editorEligible([
     {
       code: 'dynamic-target-count',
       note: 'Beam count scales with character level',
     },
   ]),
-  'false-life': editorEligible(),
-  fireball: editorEligible([
-    gap('flammability-rules', 'Flammable object ignition rider stays prose'),
+  'false-life': mechanicsReady(),
+  fireball: sufficientForCharacterSheet([
+    gap(
+      'unconditional-application',
+      'Object ignition applies regardless of save outcome until resolution-wide notes ship',
+    ),
+    gap('flammability-rules', 'Ignition/burning state not automated; rider documented on outcome'),
+    gap('object-state-awareness', 'Worn or carried carve-out on object ignition rider'),
   ]),
-  'fire-bolt': editorEligible([
-    {
-      code: 'flammability-rules',
-      note: 'Object ignition rider stays prose',
-    },
+  'fire-bolt': mechanicsReady([
+    gap(
+      'flammability-rules',
+      'Ignition/burning state not automated; rider documented on hit outcome',
+    ),
+    gap('object-state-awareness', 'Worn or carried carve-out on object ignition rider'),
   ]),
   'hellish-rebuke': editorEligible([
     {
@@ -103,7 +131,7 @@ const SRD_521_SPELL_MODELING_RESOLUTION_ENTRIES = {
       note: 'Cold burst applies regardless of attack outcome',
     },
   ]),
-  'inflict-wounds': editorEligible(),
+  'inflict-wounds': mechanicsReady(),
   'magic-missile': editorEligible([
     gap('projectile-target-allocation', 'Each dart may select a distinct creature within range'),
     gap(
@@ -122,12 +150,10 @@ const SRD_521_SPELL_MODELING_RESOLUTION_ENTRIES = {
       note: 'Spellcasting ability modifier on healing stays prose',
     },
   ]),
-  'poison-spray': editorEligible(),
-  'ray-of-sickness': editorEligible([
-    {
-      code: 'conditional-effect-model-missing',
-      note: 'Poisoned condition rider stays prose',
-    },
+  'poison-spray': mechanicsReady(),
+  'ray-of-sickness': sufficientForCharacterSheet([
+    gap('conditional-effect-model-missing', 'Poisoned condition rider stays prose'),
+    gap('duration-model-missing', 'Until the end of your next turn on Poisoned stays prose'),
   ]),
   'sacred-flame': editorEligible([
     {
@@ -151,7 +177,7 @@ const SRD_521_SPELL_MODELING_RESOLUTION_ENTRIES = {
   ]),
 } as const satisfies Record<string, ContentModeling>
 
-/** Terminal prose-only spells — reviewed with no explicit status. */
+/** Prose-only spells — blocked from editor promotion until blocker capability ships. */
 const SRD_521_SPELL_MODELING_PROSE_ONLY_ENTRIES = {
   aid: blockedProseOnly({ code: 'effect-schema-missing', capabilityId: 'stat-modifier' }, [
     gap('progression-schema-missing', 'Slot +5 HP scaling stays prose'),
@@ -167,7 +193,20 @@ const SRD_521_SPELL_MODELING_PROSE_ONLY_ENTRIES = {
     gap('dynamic-target-count', 'Spellcasting modifier object cap stays prose'),
     gap('progression-schema-missing', 'Slot slam damage scaling stays prose'),
   ]),
-  'antimagic-field': reviewedProseOnly(),
+  'antimagic-field': blockedProseOnly(
+    {
+      code: 'effect-schema-missing',
+      capabilityId: 'persistent-zone',
+      note: 'Antimagic suppression emanation',
+    },
+    [
+      gap('moving-aura-origin', 'Caster-following 10-foot emanation stays prose'),
+      gap(
+        'conditional-effect-model-missing',
+        'Suppression, artifact/deity exceptions, and portal closure stay prose',
+      ),
+    ],
+  ),
   'aura-of-life': blockedProseOnly(
     { code: 'effect-schema-missing', capabilityId: 'stat-modifier' },
     [
@@ -185,7 +224,18 @@ const SRD_521_SPELL_MODELING_PROSE_ONLY_ENTRIES = {
   bless: blockedProseOnly({ code: 'effect-schema-missing', capabilityId: 'stat-modifier' }, [
     gap('dynamic-target-count', 'Slot +1 target per level above 1'),
   ]),
-  contingency: reviewedProseOnly(),
+  contingency: blockedProseOnly(
+    {
+      code: 'effect-schema-missing',
+      note: 'Stored spell with a caster-defined trigger and deferred execution.',
+    },
+    [
+      gap('choice-model-missing', 'Contingent spell and trigger choice stay prose'),
+      gap('conditional-effect-model-missing', 'Trigger fires contingent spell automatically'),
+      gap('concurrent-effect-limit', 'Only one Contingency spell active on caster at a time'),
+      gap('object-state-awareness', 'Material component must remain on caster person'),
+    ],
+  ),
   counterspell: blockedProseOnly(
     { code: 'targeting-model-missing', capabilityId: 'spell-negation' },
     [
@@ -362,8 +412,30 @@ const SRD_521_SPELL_MODELING_PROSE_ONLY_ENTRIES = {
       'Distance vanish, recast ends, and no attack or magic-item activation stay prose',
     ),
   ]),
-  'magic-jar': reviewedProseOnly(),
-  'mass-suggestion': reviewedProseOnly(),
+  'magic-jar': blockedProseOnly(
+    {
+      code: 'effect-schema-missing',
+      note: 'Possession/soul-transfer state machine — future possession-model-missing family',
+    },
+    [
+      gap(
+        'conditional-effect-model-missing',
+        'Possession save, host death, and container destruction branches stay prose',
+      ),
+      gap('object-state-awareness', 'Protection from Evil and Magic Circle ward possession'),
+      gap('choice-model-missing', 'Return to body vs possess attempt stays prose'),
+    ],
+  ),
+  'mass-suggestion': blockedProseOnly(
+    { code: 'effect-schema-missing', capabilityId: 'condition' },
+    [
+      gap(
+        'conditional-effect-model-missing',
+        'Suggestion activity, damage ends charm, and early completion stay prose',
+      ),
+      gap('progression-schema-missing', 'Slot duration tiers at levels 7, 8, and 9 stay prose'),
+    ],
+  ),
   mending: blockedProseOnly({ code: 'effect-schema-missing' }, [
     gap('object-state-awareness', 'Break size limit and magic-item repair bounds stay prose'),
   ]),
@@ -390,12 +462,40 @@ const SRD_521_SPELL_MODELING_PROSE_ONLY_ENTRIES = {
     gap('choice-model-missing', 'Beast form choice stays prose'),
     gap('conditional-effect-model-missing', 'Save, THP tracking, early end stay prose'),
   ]),
-  'power-word-heal': reviewedProseOnly(),
+  'power-word-heal': blockedProseOnly(
+    {
+      code: 'effect-schema-missing',
+      capabilityId: 'hit-point-restoration',
+      note: 'Non-roll/full HP restoration unsupported; bundled condition removal stays residual',
+    },
+    [
+      gap(
+        'conditional-effect-model-missing',
+        'Prone target may use Reaction to stand on heal stays prose',
+      ),
+    ],
+  ),
   prestidigitation: blockedProseOnly({ code: 'effect-schema-missing' }, [
     gap('multi-mode-choice', 'Sensory, fire, clean, mark, and creation modes stay prose'),
     gap('concurrent-effect-limit', 'Up to three non-instantaneous effects active at once'),
   ]),
-  'prismatic-wall': reviewedProseOnly(),
+  'prismatic-wall': blockedProseOnly(
+    {
+      code: 'effect-schema-missing',
+      capabilityId: 'persistent-zone',
+      note: 'Layered persistent barrier',
+    },
+    [
+      gap('wall-or-path-geometry', 'Wall vs globe placement and dimensions stay prose'),
+      gap('multi-mode-choice', 'Vertical wall vs globe shape stays prose'),
+      gap('choice-model-missing', 'Designated safe passage creatures stay prose'),
+      gap(
+        'conditional-effect-model-missing',
+        'Blind on approach, per-layer saves, and layer destruction stay prose',
+      ),
+      gap('catalog-data-incomplete', 'Prismatic Layers table placeholder in prose'),
+    ],
+  ),
   'purify-food-and-drink': blockedProseOnly({ code: 'effect-schema-missing' }, [
     gap('object-state-awareness', 'Nonmagical food and drink in sphere'),
   ]),
@@ -441,7 +541,20 @@ const SRD_521_SPELL_MODELING_PROSE_ONLY_ENTRIES = {
   'silent-image': blockedProseOnly({ code: 'effect-schema-missing', capabilityId: 'illusion' }, [
     gap('moving-aura-origin', 'Image relocates with Magic action'),
   ]),
-  simulacrum: reviewedProseOnly(),
+  simulacrum: blockedProseOnly(
+    {
+      code: 'summoning-model-missing',
+      note: 'Duplicate/derived creature from an existing stat block — may diverge from ordinary summoning',
+    },
+    [
+      gap(
+        'conditional-effect-model-missing',
+        'Repair during Long Rest and combat obedience stay prose',
+      ),
+      gap('object-state-awareness', 'Target must remain within 10 feet for entire casting'),
+      gap('concurrent-effect-limit', 'Recasting destroys any prior simulacrum from this spell'),
+    ],
+  ),
   sleep: blockedProseOnly({ code: 'effect-schema-missing', capabilityId: 'condition' }, [
     gap('chosen-within-area', 'Caster picks creatures in sphere; each makes an independent save'),
     gap(
@@ -461,7 +574,14 @@ const SRD_521_SPELL_MODELING_PROSE_ONLY_ENTRIES = {
     gap('catalog-data-incomplete', 'Draconic Spirit table placeholder in prose'),
     gap('progression-schema-missing', 'Slot level for stat block stays prose'),
   ]),
-  symbol: reviewedProseOnly(),
+  symbol: blockedProseOnly({ code: 'effect-schema-missing', capabilityId: 'persistent-zone' }, [
+    gap('multi-mode-choice', 'Death, Discord, Fear, Pain, Sleep, and Stunning modes stay prose'),
+    gap('choice-model-missing', 'Trigger and creature-type filter configuration stay prose'),
+    gap(
+      'conditional-effect-model-missing',
+      'Triggered sphere effects and once-per-turn targeting stay prose',
+    ),
+  ]),
   telekinesis: blockedProseOnly({ code: 'effect-schema-missing', capabilityId: 'movement' }, [
     gap('multi-mode-choice', 'Creature vs object branch stays prose'),
     gap('conditional-effect-model-missing', 'Saves, Restrained, suspended fall stay prose'),
@@ -472,7 +592,16 @@ const SRD_521_SPELL_MODELING_PROSE_ONLY_ENTRIES = {
     gap('concurrent-effect-limit', 'Up to three one-minute effects active at once'),
     gap('conditional-effect-model-missing', 'Booming Voice Intimidation advantage stays prose'),
   ]),
-  'true-polymorph': reviewedProseOnly(),
+  'true-polymorph': blockedProseOnly({ code: 'transformation-model-missing' }, [
+    gap('multi-mode-choice', 'Creature→creature, object→creature, and creature→object stay prose'),
+    gap('choice-model-missing', 'New form choice and CR limits stay prose'),
+    gap(
+      'conditional-effect-model-missing',
+      'Unwilling save, gear melding, and concentration→permanent stay prose',
+    ),
+    gap('summoning-model-missing', 'Object→creature branch creates friendly creature'),
+    gap('object-state-awareness', 'Object must be nonmagical and not worn or carried'),
+  ]),
   'true-strike': blockedProseOnly({ code: 'effect-schema-missing' }, [
     gap('choice-model-missing', 'Radiant vs weapon damage type choice stays prose'),
     gap('object-state-awareness', 'Proficient weapon material component stays prose'),
@@ -485,7 +614,24 @@ const SRD_521_SPELL_MODELING_PROSE_ONLY_ENTRIES = {
       'Spellcasting ability drives weapon attack and damage rolls',
     ),
   ]),
-  wish: reviewedProseOnly(),
+  wish: blockedProseOnly(
+    {
+      code: 'manual-review-required',
+      note: 'Open-ended and GM-adjudicated effects block structured partial',
+    },
+    [
+      gap(
+        'multi-mode-choice',
+        'Duplicate spell, object creation, and alternate effects stay prose',
+      ),
+      gap('choice-model-missing', 'Effect selection at cast stays prose'),
+      gap(
+        'conditional-effect-model-missing',
+        'Stress penalties, Strength reduction, and 33% never-cast-again stay prose',
+      ),
+      gap('progression-schema-missing', 'Necrotic damage per spell level after stress stays prose'),
+    ],
+  ),
 } as const satisfies Record<string, ContentModeling>
 
 export const SRD_521_SPELL_MODELING_MANIFEST = {

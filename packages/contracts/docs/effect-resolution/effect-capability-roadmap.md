@@ -69,23 +69,29 @@ Prose-only spells should persist **`blocker`**; residual codes live in **`gaps`*
 
 Add to the gap registry when multiple spells share the pattern:
 
-| Code                                                           | Definition                                                                                               | Shared by              |
-| -------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- | ---------------------- |
-| `resurrection-model-missing`                                   | Death-state restoration (timing, body, eligibility, return state)                                        | revivify, reincarnate  |
-| `transformation-model-missing`                                 | Statistic replacement or override for a duration                                                         | polymorph, reincarnate |
+| Code                                                           | Definition                                                                                               | Shared by                    |
+| -------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- | ---------------------------- |
+| `resurrection-model-missing`                                   | Death-state restoration (timing, body, eligibility, return state)                                        | revivify, reincarnate        |
+| `transformation-model-missing`                                 | Statistic replacement or override for a duration                                                         | polymorph, reincarnate       |
 | `independent-effect-object-model-missing`                      | Spell-created entity with own AC/HP/duration — or controllable construct (e.g. Dancing Lights)           |
 | `concurrent-effect-limit`                                      | Repeated casts leave multiple simultaneous non-instantaneous instances active                            |
 | `weapon-attack-modification-model-missing`                     | Weapon attack overlay — alternate ability, damage replacement, smite-like riders (document until shared) |
 | `ordered-area-allocation` / `resource-distributed-across-area` | Finite resource applied across creatures in an area by HP order — legacy 5e Sleep pattern; not SRD 5.2.1 |
 | `environmental-dispersal`                                      | Zone ends from environmental interaction such as strong wind (e.g. Fog Cloud)                            |
+| `duration-model-missing`                                       | Turn- or time-bound effect expiry (e.g. until end of your next turn)                                     | chill-touch, ray-of-sickness |
+| `possession-model-missing`                                     | Soul leaves body, inhabits container, possesses host — save-gated transfer and container branches        | magic-jar                    |
 
 SRD 5.2.1 **Sleep** uses `chosen-within-area` — caster picks creatures in the sphere; each chosen creature makes an independent save.
 
+**Magic Jar:** family discoverability lives on the spell's `blocker.note` for owner tooling; do not persist `possession-model-missing` as an unregistered seed gap.
+
 ## Future capability IDs (document only)
 
-| Capability ID                  | Primary mechanic                                                                     | Example spells |
-| ------------------------------ | ------------------------------------------------------------------------------------ | -------------- |
-| **controllable-effect-entity** | Persistent caster-controlled construct without conventional AC/HP (move, manipulate) | Mage Hand      |
+| Capability ID                  | Primary mechanic                                                                     | Example spells  |
+| ------------------------------ | ------------------------------------------------------------------------------------ | --------------- |
+| **controllable-effect-entity** | Persistent caster-controlled construct without conventional AC/HP (move, manipulate) | Mage Hand       |
+| **stored-triggered-effect**    | Stored spell payload + caster-defined trigger + deferred execution on self           | Contingency     |
+| **hit-point-restoration**      | Hit point restoration including non-roll and full-restore magnitudes                 | Power Word Heal |
 
 ## Related docs
 
