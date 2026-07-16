@@ -68,7 +68,11 @@ describe('resolution selection migration audit', () => {
         (gap) => gap.code === 'projectile-target-allocation',
       ),
     ).toBe(true)
-    expect(SRD_521_SPELL_MODELING_MANIFEST.fireball?.gaps).toBeUndefined()
+    expect(
+      SRD_521_SPELL_MODELING_MANIFEST.fireball?.gaps?.some(
+        (gap) => gap.code === 'flammability-rules',
+      ),
+    ).toBe(true)
   })
 })
 

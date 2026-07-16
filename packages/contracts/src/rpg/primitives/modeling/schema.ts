@@ -1,20 +1,23 @@
 import { z } from 'zod'
 
-import { modelingGapEntrySchema } from './gap-entry'
+import { modelingBlockerSchema, modelingGapEntrySchema } from './gap-entry'
 import { EXPLICIT_MODELING_STATUSES } from './status'
 
 export const modelingValidationMessages = {
   emptyGapsArray:
     'modeling.gaps must be omitted when there are no known gaps; an empty array implies a reviewed-no-gaps claim',
+  duplicateBlockerInGaps: 'modeling.gaps must not repeat the blocker code',
 } as const
 
 /** Optional root-level modeling metadata on catalog content records. */
 export const contentModelingSchema = z
   .object({
     /** ISO datetime certifying a human reviewed this item's modeling posture. */
-    reviewedAt: z.iso.datetime(),
+    reviewedAt: z.iso.datetime().optional(),
     status: z.enum(EXPLICIT_MODELING_STATUSES).optional(),
-    /** Omit when no known gaps; never persist an empty array. */
+    /** Single limitation preventing promotion to the next status rung. */
+    blocker: modelingBlockerSchema.optional(),
+    /** Residual limitations — omit when none; never persist an empty array. */
     gaps: z.array(modelingGapEntrySchema).optional(),
   })
   .superRefine((data, ctx) => {
@@ -25,10 +28,24 @@ export const contentModelingSchema = z
         path: ['gaps'],
       })
     }
+
+    if (data.blocker && data.gaps?.some((gap) => gap.code === data.blocker?.code)) {
+      ctx.addIssue({
+        code: 'custom',
+        message: modelingValidationMessages.duplicateBlockerInGaps,
+        path: ['gaps'],
+      })
+    }
   })
 
 export type ContentModeling = z.infer<typeof contentModelingSchema>
 
 export function isSpellModelingReviewed(modeling: ContentModeling | undefined | null): boolean {
-  return modeling?.reviewedAt !== undefined
+  if (!modeling) return false
+  return (
+    modeling.reviewedAt !== undefined ||
+    modeling.status !== undefined ||
+    modeling.blocker !== undefined ||
+    modeling.gaps !== undefined
+  )
 }

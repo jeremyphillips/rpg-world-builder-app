@@ -5,6 +5,8 @@ export const SPELL_RESOLUTION_ENVIRONMENT_GAP_CODES = {
   'summoning-model-missing': 'Summoning or stat-block reference not modeled.',
   'targeting-model-missing':
     'Targeting a spell or effect rather than a creature or object not modeled.',
+  'independent-effect-object-model-missing':
+    'Spell-created entity or object with its own AC, HP, duration, or space is not modeled.',
 } as const
 
 export type SpellResolutionEnvironmentGapCode = keyof typeof SPELL_RESOLUTION_ENVIRONMENT_GAP_CODES

@@ -1,7 +1,7 @@
 # Spell modeling workflow (catalog)
 
-Human-reviewed modeling metadata on SRD spell seeds — status ladder, gaps, manifest
-apply, and CI audit.
+Human-reviewed modeling metadata on SRD spell seeds — status ladder, blockers, gaps,
+manifest apply, and CI audit.
 
 ## Status ladder
 
@@ -17,8 +17,8 @@ Ordered rungs (see `packages/contracts/src/rpg/primitives/modeling/status.ts`):
 | `mechanics-ready`                | Explicit   | Active     | Structured / mechanics |
 
 **`meaningful-partial` certifies:** resolution is materially useful **and** the
-dashboard resolution editor round-trips the stored shape without data loss. Gaps are
-expected and allowed below `sufficient-for-display`.
+dashboard resolution editor round-trips the stored shape without data loss. Residual
+gaps are expected and allowed below `sufficient-for-display`.
 
 **`non-meaningful-partial`** is derived when `resolution` exists but no explicit
 status has been reviewed — or when the form cannot safely express the envelope (rare).
@@ -44,19 +44,34 @@ that section was removed in favor of the generated inventory.
 
 ```ts
 {
-  reviewedAt: '2026-07-15T00:00:00.000Z',
-  status: 'meaningful-partial',           // optional — omit for terminal prose-only
-  gaps: [{ code: 'flammability-rules', note: '...' }],  // omit when none; never []
+  reviewedAt?: '2026-07-15T00:00:00.000Z', // optional — manifest-owned review
+  status?: 'meaningful-partial',
+  blocker?: {
+    code: 'effect-schema-missing',
+    capabilityId?: 'stat-modifier', // spell-domain id; omit when no family yet
+    note?: '...',
+  },
+  gaps?: [{ code: 'progression-schema-missing', note: '...' }], // residual only; omit when none; never []
 }
 ```
+
+### Blocker semantics
+
+- **Prose-only:** `blocker` prevents promotion to `meaningful-partial`.
+- **Editor-active (`meaningful-partial`):** `blocker` prevents the next rung, usually `sufficient-for-display`. Omit when only residual gaps remain.
+- Do **not** duplicate `blocker.code` in `gaps`.
+- **`blockedFrom`** is derived in audit reports only — not persisted on seeds.
+
+Spell capability IDs: `packages/contracts/src/rpg/content/spell/modeling/spell-modeling-capability-ids.ts`.
 
 ## Reviewer checklist
 
 1. Confirm resolution envelope parses (`spellResolutionSchema`).
 2. Run dashboard round-trip: `resolutionToForm` → `resolutionToStored` identity.
-3. Set `meaningful-partial` when editor-eligible; add gap codes for prose riders.
-4. Promote to `sufficient-for-display` only when `formatResolutionSummarySections` produces useful output.
-5. Never persist `gaps: []` — omit the key when there are no known gaps.
+3. Set `meaningful-partial` when editor-eligible; add residual `gaps` for prose riders.
+4. Set `blocker` to the single causal limitation preventing the **next** status rung.
+5. Promote to `sufficient-for-display` only when `formatResolutionSummarySections` produces useful output.
+6. Never persist `gaps: []` — omit the key when there are no residual gaps.
 
 ## Gap codes
 
@@ -68,9 +83,18 @@ Targeting, application, and environment families are split by file under
 Effect capability build priority and backlog grouping:
 [`packages/contracts/docs/effect-resolution/effect-capability-roadmap.md`](../../../packages/contracts/docs/effect-resolution/effect-capability-roadmap.md).
 
-Prose-only spells may persist **`gaps`** without `status` — audit documentation only;
-effective status remains derived `prose-only`. Summary and generated inventory report
-**prose-only without documented gaps** (reviewed prose-only spells missing `modeling.gaps`).
+Prose-only spells should persist **`blocker`** documenting the promotion limitation.
+Summary and generated inventory report **prose-only without documented blocker**.
+
+### Audit CLI filters
+
+| Filter                    | Purpose                                      |
+| ------------------------- | -------------------------------------------- |
+| `--blocker <code>`        | Spells with this blocker code                |
+| `--residual-gap <code>`   | Spells with this residual gap                |
+| `--capability <id>`       | Spells whose blocker references a capability |
+| `--blocked-from <status>` | Spells blocked from promotion to this status |
+| `--undocumented-blocker`  | Prose-only spells missing `modeling.blocker` |
 
 ## Level seed shards
 
@@ -84,7 +108,7 @@ Large level files are split alphabetically under `src/spells/data/srd-cc-5.2.1/`
 | Manifest                     | Purpose                                                       |
 | ---------------------------- | ------------------------------------------------------------- |
 | `spell-seed-resolution.ts`   | Which slugs get `resolution` and how (full / derived / defer) |
-| `spell-modeling-manifest.ts` | Reviewed `modeling` metadata (status + gaps)                  |
+| `spell-modeling-manifest.ts` | Reviewed `modeling` metadata (status, blocker, gaps)          |
 | `spell-seed-progression.ts`  | Structured progression tracks (separate concern)              |
 
 ## Tests

@@ -1,4 +1,5 @@
 export * from './derive'
+export * from './spell-modeling-capability-ids'
 export * from './spell-modeling-gap-codes'
 export * from './spell-resolution-application-gap-codes'
 export * from './spell-resolution-environment-gap-codes'

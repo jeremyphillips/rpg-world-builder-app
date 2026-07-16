@@ -37,7 +37,16 @@
       "verbal": true
     },
     "modeling": {
-      "reviewedAt": "2026-07-15T00:00:00.000Z"
+      "blocker": {
+        "code": "effect-schema-missing",
+        "capabilityId": "stat-modifier"
+      },
+      "gaps": [
+        {
+          "code": "conditional-effect-model-missing",
+          "note": "1 HP at turn start when at 0 HP in aura stays prose"
+        }
+      ]
     }
   },
   {
@@ -76,7 +85,15 @@
       "somatic": true
     },
     "modeling": {
-      "reviewedAt": "2026-07-15T00:00:00.000Z"
+      "blocker": {
+        "code": "effect-schema-missing"
+      },
+      "gaps": [
+        {
+          "code": "conditional-effect-model-missing",
+          "note": "0 HP substitution and instant-death negation stay prose"
+        }
+      ]
     }
   },
   {
@@ -124,7 +141,19 @@
       }
     },
     "modeling": {
-      "reviewedAt": "2026-07-15T00:00:00.000Z"
+      "blocker": {
+        "code": "transformation-model-missing"
+      },
+      "gaps": [
+        {
+          "code": "choice-model-missing",
+          "note": "Beast form choice stays prose"
+        },
+        {
+          "code": "conditional-effect-model-missing",
+          "note": "Save, THP tracking, early end stay prose"
+        }
+      ]
     }
   },
   {
@@ -226,12 +255,15 @@
       ]
     },
     "modeling": {
-      "reviewedAt": "2026-07-15T00:00:00.000Z",
       "status": "meaningful-partial",
       "gaps": [
         {
           "code": "wall-or-path-geometry",
           "note": "Wall placement and ongoing side damage stay prose"
+        },
+        {
+          "code": "progression-schema-missing",
+          "note": "Slot +1d8 damage scaling stays prose"
         }
       ]
     }

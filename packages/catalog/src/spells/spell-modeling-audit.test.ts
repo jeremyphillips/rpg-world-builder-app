@@ -34,20 +34,58 @@ describe('spell modeling audit (srd-cc-5.2.1)', () => {
     expect(audit.unreviewed).toEqual([])
   })
 
-  it('reports prose-only spells missing documented gaps', () => {
-    expect(audit.proseOnlyWithoutDocumentedGaps.length).toBeGreaterThan(0)
-    for (const slug of audit.proseOnlyWithoutDocumentedGaps) {
+  it('reports prose-only spells missing documented blocker', () => {
+    expect(audit.proseOnlyWithoutDocumentedBlocker.length).toBe(48)
+    for (const slug of audit.proseOnlyWithoutDocumentedBlocker) {
       const entry = audit.entries.find((item) => item.slug === slug)!
       expect(entry.effectiveStatus).toBe('prose-only')
-      expect(entry.gaps).toEqual([])
+      expect(entry.blocker).toBeUndefined()
     }
   })
 
-  it('includes prose-only gap coverage in generated report', () => {
+  it('documents blockers on all level 2-5 prose-only spells', () => {
+    const level2to5ProseOnly = audit.entries.filter(
+      (entry) =>
+        entry.effectiveStatus === 'prose-only' &&
+        [
+          'aid',
+          'darkness',
+          'dragons-breath',
+          'lesser-restoration',
+          'levitate',
+          'misty-step',
+          'pass-without-trace',
+          'ray-of-enfeeblement',
+          'animate-dead',
+          'bestow-curse',
+          'counterspell',
+          'dispel-magic',
+          'glyph-of-warding',
+          'revivify',
+          'aura-of-life',
+          'death-ward',
+          'polymorph',
+          'animate-objects',
+          'greater-restoration',
+          'planar-binding',
+          'reincarnate',
+          'summon-dragon',
+          'telekinesis',
+        ].includes(entry.slug),
+    )
+    expect(level2to5ProseOnly).toHaveLength(23)
+    for (const entry of level2to5ProseOnly) {
+      expect(entry.blocker, entry.slug).toBeDefined()
+      expect(entry.blockedFrom).toBe('meaningful-partial')
+    }
+  })
+
+  it('includes prose-only blocker coverage in generated report', () => {
     const report = generateSpellModelingReport(audit)
     expect(report).toContain(
-      `Prose-only without documented gaps: ${audit.proseOnlyWithoutDocumentedGaps.length}`,
+      `Prose-only without documented blocker: ${audit.proseOnlyWithoutDocumentedBlocker.length}`,
     )
+    expect(report).toContain('| Blocked from | Blocker | Capability | Residual gaps |')
   })
 
   it('promotes resolution seeds to meaningful-partial with editor eligibility', () => {
@@ -114,8 +152,8 @@ describe('spell seed JSON invariants', () => {
 })
 
 describe('validateSpellModelingConsistency', () => {
-  it('flags invalid gap codes and empty gaps arrays', async () => {
-    const { validateSpellModelingConsistency } = await import('./spell-modeling-audit')
+  it('flags invalid gap codes, duplicate blocker codes, and empty gaps arrays', async () => {
+    const { validateSpellModelingConsistency } = await import('./spell-modeling-audit-validation')
     const spell = {
       slug: 'test-spell',
       modeling: {
@@ -127,5 +165,14 @@ describe('validateSpellModelingConsistency', () => {
 
     const violations = validateSpellModelingConsistency(spell as never)
     expect(violations.some((v) => v.code === 'invalid-modeling-schema')).toBe(true)
+
+    const duplicateBlocker = validateSpellModelingConsistency({
+      slug: 'duplicate-blocker',
+      modeling: {
+        blocker: { code: 'effect-schema-missing' },
+        gaps: [{ code: 'effect-schema-missing' }],
+      },
+    } as never)
+    expect(duplicateBlocker.some((v) => v.code === 'invalid-modeling-schema')).toBe(true)
   })
 })

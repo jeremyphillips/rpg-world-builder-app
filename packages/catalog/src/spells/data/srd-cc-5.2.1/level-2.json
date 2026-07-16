@@ -43,7 +43,16 @@
     },
     "higherLevelSlotEffect": "<p>Each target's Hit Points increase by 5 for each spell slot level above 2.</p>",
     "modeling": {
-      "reviewedAt": "2026-07-15T00:00:00.000Z"
+      "blocker": {
+        "code": "effect-schema-missing",
+        "capabilityId": "stat-modifier"
+      },
+      "gaps": [
+        {
+          "code": "progression-schema-missing",
+          "note": "Slot +5 HP scaling stays prose"
+        }
+      ]
     }
   },
   {
@@ -98,7 +107,24 @@
       }
     },
     "modeling": {
-      "reviewedAt": "2026-07-15T00:00:00.000Z"
+      "blocker": {
+        "code": "effect-schema-missing",
+        "capabilityId": "persistent-zone"
+      },
+      "gaps": [
+        {
+          "code": "multi-mode-choice",
+          "note": "Point sphere vs object emanation stays prose"
+        },
+        {
+          "code": "object-state-awareness",
+          "note": "Object not worn or carried stays prose"
+        },
+        {
+          "code": "conditional-effect-model-missing",
+          "note": "Dispel lower-level light overlap stays prose"
+        }
+      ]
     }
   },
   {
@@ -143,7 +169,24 @@
     },
     "higherLevelSlotEffect": "<p>The damage increases by 1d6 for each spell slot level above 2.</p>",
     "modeling": {
-      "reviewedAt": "2026-07-15T00:00:00.000Z"
+      "blocker": {
+        "code": "effect-schema-missing",
+        "capabilityId": "action-grant"
+      },
+      "gaps": [
+        {
+          "code": "multi-mode-choice",
+          "note": "Damage type choice stays prose"
+        },
+        {
+          "code": "progression-schema-missing",
+          "note": "Slot +1d6 damage scaling stays prose"
+        },
+        {
+          "code": "conditional-effect-model-missing",
+          "note": "Delegated Magic-action breath stays prose"
+        }
+      ]
     }
   },
   {
@@ -181,7 +224,16 @@
       "somatic": true
     },
     "modeling": {
-      "reviewedAt": "2026-07-15T00:00:00.000Z"
+      "blocker": {
+        "code": "effect-schema-missing",
+        "capabilityId": "condition"
+      },
+      "gaps": [
+        {
+          "code": "choice-model-missing",
+          "note": "Pick condition from list stays prose"
+        }
+      ]
     }
   },
   {
@@ -229,7 +281,20 @@
       }
     },
     "modeling": {
-      "reviewedAt": "2026-07-15T00:00:00.000Z"
+      "blocker": {
+        "code": "effect-schema-missing",
+        "capabilityId": "movement"
+      },
+      "gaps": [
+        {
+          "code": "conditional-effect-model-missing",
+          "note": "Unwilling Con save stays prose"
+        },
+        {
+          "code": "object-state-awareness",
+          "note": "Creature vs loose object stays prose"
+        }
+      ]
     }
   },
   {
@@ -266,7 +331,10 @@
       "verbal": true
     },
     "modeling": {
-      "reviewedAt": "2026-07-15T00:00:00.000Z"
+      "blocker": {
+        "code": "effect-schema-missing",
+        "capabilityId": "movement"
+      }
     }
   },
   {
@@ -318,7 +386,16 @@
       }
     },
     "modeling": {
-      "reviewedAt": "2026-07-15T00:00:00.000Z"
+      "blocker": {
+        "code": "effect-schema-missing",
+        "capabilityId": "stat-modifier"
+      },
+      "gaps": [
+        {
+          "code": "chosen-within-area",
+          "note": "Allies chosen within aura stay prose"
+        }
+      ]
     }
   },
   {
@@ -363,7 +440,16 @@
       "somatic": true
     },
     "modeling": {
-      "reviewedAt": "2026-07-15T00:00:00.000Z"
+      "blocker": {
+        "code": "effect-schema-missing",
+        "capabilityId": "condition"
+      },
+      "gaps": [
+        {
+          "code": "conditional-effect-model-missing",
+          "note": "Save branches, repeating saves, and 1d8 penalty stay prose"
+        }
+      ]
     }
   }
 ]

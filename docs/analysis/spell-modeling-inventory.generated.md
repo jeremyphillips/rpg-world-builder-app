@@ -3,6 +3,7 @@
 Ruleset: `srd-cc-5.2.1`
 Total spells: 92
 Unreviewed: 0
+Prose-only without documented blocker: 48
 Violations: 0
 
 ## Status summary
@@ -16,97 +17,97 @@ Violations: 0
 
 ## Per-spell inventory
 
-| Spell                     | Reviewed | Effective status   | Explicit status    | Gaps                             | Resolution | Legacy effects |
-| ------------------------- | -------- | ------------------ | ------------------ | -------------------------------- | ---------- | -------------- |
-| acid-splash               | yes      | meaningful-partial | meaningful-partial | —                                | yes        | no             |
-| chill-touch               | yes      | meaningful-partial | meaningful-partial | conditional-effect-model-missing | yes        | no             |
-| dancing-lights            | yes      | prose-only         | —                  | —                                | no         | no             |
-| druidcraft                | yes      | prose-only         | —                  | —                                | no         | no             |
-| eldritch-blast            | yes      | meaningful-partial | meaningful-partial | dynamic-target-count             | yes        | no             |
-| elementalism              | yes      | prose-only         | —                  | —                                | no         | no             |
-| fire-bolt                 | yes      | meaningful-partial | meaningful-partial | flammability-rules               | yes        | no             |
-| guidance                  | yes      | prose-only         | —                  | —                                | no         | no             |
-| light                     | yes      | prose-only         | —                  | —                                | no         | no             |
-| mage-hand                 | yes      | prose-only         | —                  | —                                | no         | no             |
-| mending                   | yes      | prose-only         | —                  | —                                | no         | no             |
-| message                   | yes      | prose-only         | —                  | —                                | no         | no             |
-| minor-illusion            | yes      | prose-only         | —                  | —                                | no         | no             |
-| poison-spray              | yes      | meaningful-partial | meaningful-partial | —                                | yes        | no             |
-| prestidigitation          | yes      | prose-only         | —                  | —                                | no         | no             |
-| resistance                | yes      | prose-only         | —                  | —                                | no         | no             |
-| sacred-flame              | yes      | meaningful-partial | meaningful-partial | conditional-effect-model-missing | yes        | no             |
-| spare-the-dying           | yes      | prose-only         | —                  | —                                | no         | no             |
-| thaumaturgy               | yes      | prose-only         | —                  | —                                | no         | no             |
-| true-strike               | yes      | prose-only         | —                  | —                                | no         | no             |
-| bless                     | yes      | prose-only         | —                  | —                                | no         | no             |
-| burning-hands             | yes      | meaningful-partial | meaningful-partial | —                                | yes        | no             |
-| create-or-destroy-water   | yes      | prose-only         | —                  | —                                | no         | no             |
-| cure-wounds               | yes      | meaningful-partial | meaningful-partial | modifier-model-missing           | yes        | no             |
-| detect-evil-and-good      | yes      | prose-only         | —                  | —                                | no         | no             |
-| detect-magic              | yes      | prose-only         | —                  | —                                | no         | no             |
-| detect-poison-and-disease | yes      | prose-only         | —                  | —                                | no         | no             |
-| expeditious-retreat       | yes      | prose-only         | —                  | —                                | no         | no             |
-| faerie-fire               | yes      | prose-only         | —                  | —                                | no         | no             |
-| false-life                | yes      | meaningful-partial | meaningful-partial | —                                | yes        | no             |
-| feather-fall              | yes      | prose-only         | —                  | —                                | no         | no             |
-| fog-cloud                 | yes      | prose-only         | —                  | —                                | no         | no             |
-| hellish-rebuke            | yes      | meaningful-partial | meaningful-partial | reaction-trigger                 | yes        | no             |
-| hex                       | yes      | prose-only         | —                  | —                                | no         | no             |
-| hideous-laughter          | yes      | prose-only         | —                  | —                                | no         | no             |
-| hunters-mark              | yes      | prose-only         | —                  | —                                | no         | no             |
-| ice-knife                 | yes      | meaningful-partial | meaningful-partial | chained-targets                  | yes        | no             |
-| identify                  | yes      | prose-only         | —                  | —                                | no         | no             |
-| illusory-script           | yes      | prose-only         | —                  | —                                | no         | no             |
-| inflict-wounds            | yes      | meaningful-partial | meaningful-partial | —                                | yes        | no             |
-| jump                      | yes      | prose-only         | —                  | —                                | no         | no             |
-| longstrider               | yes      | prose-only         | —                  | —                                | no         | no             |
-| mage-armor                | yes      | prose-only         | —                  | —                                | no         | no             |
-| magic-missile             | yes      | meaningful-partial | meaningful-partial | —                                | yes        | no             |
-| purify-food-and-drink     | yes      | prose-only         | —                  | —                                | no         | no             |
-| ray-of-sickness           | yes      | meaningful-partial | meaningful-partial | conditional-effect-model-missing | yes        | no             |
-| sanctuary                 | yes      | prose-only         | —                  | —                                | no         | no             |
-| shield                    | yes      | prose-only         | —                  | —                                | no         | no             |
-| shield-of-faith           | yes      | prose-only         | —                  | —                                | no         | no             |
-| silent-image              | yes      | prose-only         | —                  | —                                | no         | no             |
-| sleep                     | yes      | prose-only         | —                  | —                                | no         | no             |
-| speak-with-animals        | yes      | prose-only         | —                  | —                                | no         | no             |
-| thunderwave               | yes      | meaningful-partial | meaningful-partial | —                                | yes        | no             |
-| aid                       | yes      | prose-only         | —                  | —                                | no         | no             |
-| darkness                  | yes      | prose-only         | —                  | —                                | no         | no             |
-| dragons-breath            | yes      | prose-only         | —                  | —                                | no         | no             |
-| lesser-restoration        | yes      | prose-only         | —                  | —                                | no         | no             |
-| levitate                  | yes      | prose-only         | —                  | —                                | no         | no             |
-| misty-step                | yes      | prose-only         | —                  | —                                | no         | no             |
-| pass-without-trace        | yes      | prose-only         | —                  | —                                | no         | no             |
-| ray-of-enfeeblement       | yes      | prose-only         | —                  | —                                | no         | no             |
-| animate-dead              | yes      | prose-only         | —                  | —                                | no         | no             |
-| bestow-curse              | yes      | prose-only         | —                  | —                                | no         | no             |
-| counterspell              | yes      | prose-only         | —                  | —                                | no         | no             |
-| dispel-magic              | yes      | prose-only         | —                  | —                                | no         | no             |
-| fireball                  | yes      | meaningful-partial | meaningful-partial | —                                | yes        | no             |
-| glyph-of-warding          | yes      | prose-only         | —                  | —                                | no         | no             |
-| mass-healing-word         | yes      | meaningful-partial | meaningful-partial | modifier-model-missing           | yes        | no             |
-| revivify                  | yes      | prose-only         | —                  | —                                | no         | no             |
-| aura-of-life              | yes      | prose-only         | —                  | —                                | no         | no             |
-| death-ward                | yes      | prose-only         | —                  | —                                | no         | no             |
-| polymorph                 | yes      | prose-only         | —                  | —                                | no         | no             |
-| wall-of-fire              | yes      | meaningful-partial | meaningful-partial | wall-or-path-geometry            | yes        | no             |
-| animate-objects           | yes      | prose-only         | —                  | —                                | no         | no             |
-| arcane-hand               | yes      | meaningful-partial | meaningful-partial | multi-mode-choice                | yes        | no             |
-| greater-restoration       | yes      | prose-only         | —                  | —                                | no         | no             |
-| mass-cure-wounds          | yes      | meaningful-partial | meaningful-partial | modifier-model-missing           | yes        | no             |
-| planar-binding            | yes      | prose-only         | —                  | —                                | no         | no             |
-| reincarnate               | yes      | prose-only         | —                  | —                                | no         | no             |
-| summon-dragon             | yes      | prose-only         | —                  | —                                | no         | no             |
-| telekinesis               | yes      | prose-only         | —                  | —                                | no         | no             |
-| contingency               | yes      | prose-only         | —                  | —                                | no         | no             |
-| magic-jar                 | yes      | prose-only         | —                  | —                                | no         | no             |
-| mass-suggestion           | yes      | prose-only         | —                  | —                                | no         | no             |
-| delayed-blast-fireball    | yes      | meaningful-partial | meaningful-partial | —                                | yes        | no             |
-| simulacrum                | yes      | prose-only         | —                  | —                                | no         | no             |
-| symbol                    | yes      | prose-only         | —                  | —                                | no         | no             |
-| antimagic-field           | yes      | prose-only         | —                  | —                                | no         | no             |
-| power-word-heal           | yes      | prose-only         | —                  | —                                | no         | no             |
-| prismatic-wall            | yes      | prose-only         | —                  | —                                | no         | no             |
-| true-polymorph            | yes      | prose-only         | —                  | —                                | no         | no             |
-| wish                      | yes      | prose-only         | —                  | —                                | no         | no             |
+| Spell                     | Reviewed | Effective status   | Blocked from       | Blocker                      | Capability      | Residual gaps                                                                                                        | Resolution |
+| ------------------------- | -------- | ------------------ | ------------------ | ---------------------------- | --------------- | -------------------------------------------------------------------------------------------------------------------- | ---------- |
+| acid-splash               | yes      | meaningful-partial | —                  | —                            | —               | —                                                                                                                    | yes        |
+| chill-touch               | yes      | meaningful-partial | —                  | —                            | —               | conditional-effect-model-missing                                                                                     | yes        |
+| dancing-lights            | yes      | prose-only         | —                  | —                            | —               | —                                                                                                                    | no         |
+| druidcraft                | yes      | prose-only         | —                  | —                            | —               | —                                                                                                                    | no         |
+| eldritch-blast            | yes      | meaningful-partial | —                  | —                            | —               | dynamic-target-count                                                                                                 | yes        |
+| elementalism              | yes      | prose-only         | —                  | —                            | —               | —                                                                                                                    | no         |
+| fire-bolt                 | yes      | meaningful-partial | —                  | —                            | —               | flammability-rules                                                                                                   | yes        |
+| guidance                  | yes      | prose-only         | —                  | —                            | —               | —                                                                                                                    | no         |
+| light                     | yes      | prose-only         | —                  | —                            | —               | —                                                                                                                    | no         |
+| mage-hand                 | yes      | prose-only         | —                  | —                            | —               | —                                                                                                                    | no         |
+| mending                   | yes      | prose-only         | —                  | —                            | —               | —                                                                                                                    | no         |
+| message                   | yes      | prose-only         | —                  | —                            | —               | —                                                                                                                    | no         |
+| minor-illusion            | yes      | prose-only         | —                  | —                            | —               | —                                                                                                                    | no         |
+| poison-spray              | yes      | meaningful-partial | —                  | —                            | —               | —                                                                                                                    | yes        |
+| prestidigitation          | yes      | prose-only         | —                  | —                            | —               | —                                                                                                                    | no         |
+| resistance                | yes      | prose-only         | —                  | —                            | —               | —                                                                                                                    | no         |
+| sacred-flame              | yes      | meaningful-partial | —                  | —                            | —               | conditional-effect-model-missing                                                                                     | yes        |
+| spare-the-dying           | yes      | prose-only         | —                  | —                            | —               | —                                                                                                                    | no         |
+| thaumaturgy               | yes      | prose-only         | —                  | —                            | —               | —                                                                                                                    | no         |
+| true-strike               | yes      | prose-only         | —                  | —                            | —               | —                                                                                                                    | no         |
+| bless                     | yes      | prose-only         | —                  | —                            | —               | effect-schema-missing, dynamic-target-count                                                                          | no         |
+| burning-hands             | yes      | meaningful-partial | —                  | —                            | —               | flammability-rules                                                                                                   | yes        |
+| create-or-destroy-water   | yes      | prose-only         | —                  | —                            | —               | multi-mode-choice, progression-schema-missing, effect-schema-missing                                                 | no         |
+| cure-wounds               | yes      | meaningful-partial | —                  | —                            | —               | modifier-model-missing                                                                                               | yes        |
+| detect-evil-and-good      | yes      | prose-only         | —                  | —                            | —               | effect-schema-missing                                                                                                | no         |
+| detect-magic              | yes      | prose-only         | —                  | —                            | —               | effect-schema-missing                                                                                                | no         |
+| detect-poison-and-disease | yes      | prose-only         | —                  | —                            | —               | effect-schema-missing                                                                                                | no         |
+| expeditious-retreat       | yes      | prose-only         | —                  | —                            | —               | effect-schema-missing                                                                                                | no         |
+| faerie-fire               | yes      | prose-only         | —                  | —                            | —               | conditional-effect-model-missing, effect-schema-missing                                                              | no         |
+| false-life                | yes      | meaningful-partial | —                  | —                            | —               | —                                                                                                                    | yes        |
+| feather-fall              | yes      | prose-only         | —                  | —                            | —               | reaction-trigger, effect-schema-missing                                                                              | no         |
+| fog-cloud                 | yes      | prose-only         | —                  | —                            | —               | effect-schema-missing                                                                                                | no         |
+| hellish-rebuke            | yes      | meaningful-partial | —                  | —                            | —               | reaction-trigger                                                                                                     | yes        |
+| hex                       | yes      | prose-only         | —                  | —                            | —               | effect-schema-missing, choice-model-missing, retargetable-mark, conditional-effect-model-missing                     | no         |
+| hideous-laughter          | yes      | prose-only         | —                  | —                            | —               | conditional-effect-model-missing, effect-schema-missing                                                              | no         |
+| hunters-mark              | yes      | prose-only         | —                  | —                            | —               | effect-schema-missing, retargetable-mark, conditional-effect-model-missing                                           | no         |
+| ice-knife                 | yes      | meaningful-partial | —                  | —                            | —               | chained-targets, unconditional-application                                                                           | yes        |
+| identify                  | yes      | prose-only         | —                  | —                            | —               | effect-schema-missing                                                                                                | no         |
+| illusory-script           | yes      | prose-only         | —                  | —                            | —               | choice-model-missing, effect-schema-missing                                                                          | no         |
+| inflict-wounds            | yes      | meaningful-partial | —                  | —                            | —               | —                                                                                                                    | yes        |
+| jump                      | yes      | prose-only         | —                  | —                            | —               | dynamic-target-count, effect-schema-missing                                                                          | no         |
+| longstrider               | yes      | prose-only         | —                  | —                            | —               | dynamic-target-count, effect-schema-missing                                                                          | no         |
+| mage-armor                | yes      | prose-only         | —                  | —                            | —               | object-state-awareness, conditional-effect-model-missing, effect-schema-missing                                      | no         |
+| magic-missile             | yes      | meaningful-partial | —                  | —                            | —               | projectile-target-allocation, dynamic-target-count                                                                   | yes        |
+| purify-food-and-drink     | yes      | prose-only         | —                  | —                            | —               | object-state-awareness, effect-schema-missing                                                                        | no         |
+| ray-of-sickness           | yes      | meaningful-partial | —                  | —                            | —               | conditional-effect-model-missing                                                                                     | yes        |
+| sanctuary                 | yes      | prose-only         | —                  | —                            | —               | targeting-model-missing, conditional-effect-model-missing, effect-schema-missing                                     | no         |
+| shield                    | yes      | prose-only         | —                  | —                            | —               | reaction-trigger, conditional-effect-model-missing, effect-schema-missing                                            | no         |
+| shield-of-faith           | yes      | prose-only         | —                  | —                            | —               | effect-schema-missing                                                                                                | no         |
+| silent-image              | yes      | prose-only         | —                  | —                            | —               | moving-aura-origin, effect-schema-missing                                                                            | no         |
+| sleep                     | yes      | prose-only         | —                  | —                            | —               | conditional-effect-model-missing, effect-schema-missing                                                              | no         |
+| speak-with-animals        | yes      | prose-only         | —                  | —                            | —               | effect-schema-missing                                                                                                | no         |
+| thunderwave               | yes      | meaningful-partial | —                  | —                            | —               | conditional-effect-model-missing, object-state-awareness                                                             | yes        |
+| aid                       | yes      | prose-only         | meaningful-partial | effect-schema-missing        | stat-modifier   | progression-schema-missing                                                                                           | no         |
+| darkness                  | yes      | prose-only         | meaningful-partial | effect-schema-missing        | persistent-zone | multi-mode-choice, object-state-awareness, conditional-effect-model-missing                                          | no         |
+| dragons-breath            | yes      | prose-only         | meaningful-partial | effect-schema-missing        | action-grant    | multi-mode-choice, progression-schema-missing, conditional-effect-model-missing                                      | no         |
+| lesser-restoration        | yes      | prose-only         | meaningful-partial | effect-schema-missing        | condition       | choice-model-missing                                                                                                 | no         |
+| levitate                  | yes      | prose-only         | meaningful-partial | effect-schema-missing        | movement        | conditional-effect-model-missing, object-state-awareness                                                             | no         |
+| misty-step                | yes      | prose-only         | meaningful-partial | effect-schema-missing        | movement        | —                                                                                                                    | no         |
+| pass-without-trace        | yes      | prose-only         | meaningful-partial | effect-schema-missing        | stat-modifier   | chosen-within-area                                                                                                   | no         |
+| ray-of-enfeeblement       | yes      | prose-only         | meaningful-partial | effect-schema-missing        | condition       | conditional-effect-model-missing                                                                                     | no         |
+| animate-dead              | yes      | prose-only         | meaningful-partial | summoning-model-missing      | —               | choice-model-missing, dynamic-target-count, conditional-effect-model-missing                                         | no         |
+| bestow-curse              | yes      | prose-only         | meaningful-partial | effect-schema-missing        | condition       | choice-model-missing, conditional-effect-model-missing, progression-schema-missing                                   | no         |
+| counterspell              | yes      | prose-only         | meaningful-partial | targeting-model-missing      | spell-negation  | reaction-trigger, effect-schema-missing                                                                              | no         |
+| dispel-magic              | yes      | prose-only         | meaningful-partial | targeting-model-missing      | spell-negation  | effect-schema-missing, progression-schema-missing                                                                    | no         |
+| fireball                  | yes      | meaningful-partial | —                  | —                            | —               | flammability-rules                                                                                                   | yes        |
+| glyph-of-warding          | yes      | prose-only         | meaningful-partial | effect-schema-missing        | persistent-zone | multi-mode-choice, choice-model-missing, conditional-effect-model-missing, progression-schema-missing                | no         |
+| mass-healing-word         | yes      | meaningful-partial | —                  | —                            | —               | modifier-model-missing                                                                                               | yes        |
+| revivify                  | yes      | prose-only         | meaningful-partial | resurrection-model-missing   | —               | —                                                                                                                    | no         |
+| aura-of-life              | yes      | prose-only         | meaningful-partial | effect-schema-missing        | stat-modifier   | conditional-effect-model-missing                                                                                     | no         |
+| death-ward                | yes      | prose-only         | meaningful-partial | effect-schema-missing        | —               | conditional-effect-model-missing                                                                                     | no         |
+| polymorph                 | yes      | prose-only         | meaningful-partial | transformation-model-missing | —               | choice-model-missing, conditional-effect-model-missing                                                               | no         |
+| wall-of-fire              | yes      | meaningful-partial | —                  | —                            | —               | wall-or-path-geometry, progression-schema-missing                                                                    | yes        |
+| animate-objects           | yes      | prose-only         | meaningful-partial | summoning-model-missing      | —               | object-state-awareness, choice-model-missing, dynamic-target-count, progression-schema-missing                       | no         |
+| arcane-hand               | yes      | meaningful-partial | —                  | —                            | —               | multi-mode-choice, modifier-model-missing, conditional-effect-model-missing, independent-effect-object-model-missing | yes        |
+| greater-restoration       | yes      | prose-only         | meaningful-partial | effect-schema-missing        | condition       | choice-model-missing                                                                                                 | no         |
+| mass-cure-wounds          | yes      | meaningful-partial | —                  | —                            | —               | modifier-model-missing, chosen-within-area, progression-schema-missing                                               | yes        |
+| planar-binding            | yes      | prose-only         | meaningful-partial | summoning-model-missing      | —               | effect-schema-missing, conditional-effect-model-missing, progression-schema-missing                                  | no         |
+| reincarnate               | yes      | prose-only         | meaningful-partial | resurrection-model-missing   | —               | transformation-model-missing, catalog-data-incomplete, choice-model-missing                                          | no         |
+| summon-dragon             | yes      | prose-only         | meaningful-partial | summoning-model-missing      | —               | catalog-data-incomplete, progression-schema-missing                                                                  | no         |
+| telekinesis               | yes      | prose-only         | meaningful-partial | effect-schema-missing        | movement        | multi-mode-choice, conditional-effect-model-missing, object-state-awareness                                          | no         |
+| contingency               | yes      | prose-only         | —                  | —                            | —               | —                                                                                                                    | no         |
+| magic-jar                 | yes      | prose-only         | —                  | —                            | —               | —                                                                                                                    | no         |
+| mass-suggestion           | yes      | prose-only         | —                  | —                            | —               | —                                                                                                                    | no         |
+| delayed-blast-fireball    | yes      | meaningful-partial | —                  | —                            | —               | —                                                                                                                    | yes        |
+| simulacrum                | yes      | prose-only         | —                  | —                            | —               | —                                                                                                                    | no         |
+| symbol                    | yes      | prose-only         | —                  | —                            | —               | —                                                                                                                    | no         |
+| antimagic-field           | yes      | prose-only         | —                  | —                            | —               | —                                                                                                                    | no         |
+| power-word-heal           | yes      | prose-only         | —                  | —                            | —               | —                                                                                                                    | no         |
+| prismatic-wall            | yes      | prose-only         | —                  | —                            | —               | —                                                                                                                    | no         |
+| true-polymorph            | yes      | prose-only         | —                  | —                            | —               | —                                                                                                                    | no         |
+| wish                      | yes      | prose-only         | —                  | —                            | —               | —                                                                                                                    | no         |

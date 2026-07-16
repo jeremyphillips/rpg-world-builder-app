@@ -41,7 +41,23 @@
     },
     "higherLevelSlotEffect": "<p>You animate or reassert control over two additional Undead creatures for each spell slot level above 3. Each of the creatures must come from a different corpse or pile of bones.</p>",
     "modeling": {
-      "reviewedAt": "2026-07-15T00:00:00.000Z"
+      "blocker": {
+        "code": "summoning-model-missing"
+      },
+      "gaps": [
+        {
+          "code": "choice-model-missing",
+          "note": "Bones vs corpse choice stays prose"
+        },
+        {
+          "code": "dynamic-target-count",
+          "note": "Slot +2 undead scaling stays prose"
+        },
+        {
+          "code": "conditional-effect-model-missing",
+          "note": "Reassert control vs animate stays prose"
+        }
+      ]
     }
   },
   {
@@ -84,7 +100,24 @@
     },
     "higherLevelSlotEffect": "<p>If you cast this spell using a level 4 spell slot, you can maintain Concentration on it for up to 10 minutes. If you use a level 5+ spell slot, the spell doesn't require Concentration, and the duration becomes 8 hours (level 5–6 slot) or 24 hours (level 7–8 slot). If you use a level 9 spell slot, the spell lasts until dispelled.</p>",
     "modeling": {
-      "reviewedAt": "2026-07-15T00:00:00.000Z"
+      "blocker": {
+        "code": "effect-schema-missing",
+        "capabilityId": "condition"
+      },
+      "gaps": [
+        {
+          "code": "choice-model-missing",
+          "note": "Curse mode choice stays prose"
+        },
+        {
+          "code": "conditional-effect-model-missing",
+          "note": "Repeating saves and extra 1d8 rider stay prose"
+        },
+        {
+          "code": "progression-schema-missing",
+          "note": "Slot duration and concentration rules stay prose"
+        }
+      ]
     }
   },
   {
@@ -125,7 +158,20 @@
       "somatic": true
     },
     "modeling": {
-      "reviewedAt": "2026-07-15T00:00:00.000Z"
+      "blocker": {
+        "code": "targeting-model-missing",
+        "capabilityId": "spell-negation"
+      },
+      "gaps": [
+        {
+          "code": "reaction-trigger",
+          "note": "Interrupt when creature casts stays prose"
+        },
+        {
+          "code": "effect-schema-missing",
+          "note": "Cast dissipate mechanics stay prose"
+        }
+      ]
     }
   },
   {
@@ -167,7 +213,20 @@
     },
     "higherLevelSlotEffect": "<p>You automatically end a spell on the target if the spell's level is equal to or less than the level of the spell slot you use.</p>",
     "modeling": {
-      "reviewedAt": "2026-07-15T00:00:00.000Z"
+      "blocker": {
+        "code": "targeting-model-missing",
+        "capabilityId": "spell-negation"
+      },
+      "gaps": [
+        {
+          "code": "effect-schema-missing",
+          "note": "End ongoing spell mechanics stay prose"
+        },
+        {
+          "code": "progression-schema-missing",
+          "note": "Auto-end threshold by slot stays prose"
+        }
+      ]
     }
   },
   {
@@ -300,8 +359,13 @@
       }
     },
     "modeling": {
-      "reviewedAt": "2026-07-15T00:00:00.000Z",
-      "status": "meaningful-partial"
+      "status": "meaningful-partial",
+      "gaps": [
+        {
+          "code": "flammability-rules",
+          "note": "Flammable object ignition rider stays prose"
+        }
+      ]
     }
   },
   {
@@ -343,7 +407,28 @@
     },
     "higherLevelSlotEffect": "<p>The damage of an explosive rune increases by 1d8 for each spell slot level above 3. If you create a spell glyph, you can store any spell of up to the same level as the spell slot you use for the Glyph of Warding.</p>",
     "modeling": {
-      "reviewedAt": "2026-07-15T00:00:00.000Z"
+      "blocker": {
+        "code": "effect-schema-missing",
+        "capabilityId": "persistent-zone"
+      },
+      "gaps": [
+        {
+          "code": "multi-mode-choice",
+          "note": "Explosive rune vs spell glyph stays prose"
+        },
+        {
+          "code": "choice-model-missing",
+          "note": "Trigger and filter configuration stay prose"
+        },
+        {
+          "code": "conditional-effect-model-missing",
+          "note": "Triggered burst and stored spell stay prose"
+        },
+        {
+          "code": "progression-schema-missing",
+          "note": "Slot damage and stored spell level stay prose"
+        }
+      ]
     }
   },
   {
@@ -425,7 +510,6 @@
       ]
     },
     "modeling": {
-      "reviewedAt": "2026-07-15T00:00:00.000Z",
       "status": "meaningful-partial",
       "gaps": [
         {
@@ -472,7 +556,9 @@
       }
     },
     "modeling": {
-      "reviewedAt": "2026-07-15T00:00:00.000Z"
+      "blocker": {
+        "code": "resurrection-model-missing"
+      }
     }
   }
 ]

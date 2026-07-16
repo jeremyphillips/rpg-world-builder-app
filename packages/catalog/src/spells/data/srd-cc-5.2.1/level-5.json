@@ -42,7 +42,27 @@
     },
     "higherLevelSlotEffect": "<p>The creature's Slam damage increases by 1d4 (Medium or smaller), 1d6 (Large), or 1d12 (Huge) for each spell slot level above 5.</p>",
     "modeling": {
-      "reviewedAt": "2026-07-15T00:00:00.000Z"
+      "blocker": {
+        "code": "summoning-model-missing"
+      },
+      "gaps": [
+        {
+          "code": "object-state-awareness",
+          "note": "Worn, carried, fixed, and size eligibility stays prose"
+        },
+        {
+          "code": "choice-model-missing",
+          "note": "Object selection and size weighting stay prose"
+        },
+        {
+          "code": "dynamic-target-count",
+          "note": "Spellcasting modifier object cap stays prose"
+        },
+        {
+          "code": "progression-schema-missing",
+          "note": "Slot slam damage scaling stays prose"
+        }
+      ]
     }
   },
   {
@@ -142,12 +162,23 @@
       ]
     },
     "modeling": {
-      "reviewedAt": "2026-07-15T00:00:00.000Z",
       "status": "meaningful-partial",
       "gaps": [
         {
           "code": "multi-mode-choice",
           "note": "Forceful Hand and Interposing Hand modes stay prose"
+        },
+        {
+          "code": "modifier-model-missing",
+          "note": "Grasping Hand crush + spellcasting modifier stays prose"
+        },
+        {
+          "code": "conditional-effect-model-missing",
+          "note": "Grapple, push, and cover modes stay prose"
+        },
+        {
+          "code": "independent-effect-object-model-missing",
+          "note": "Hand object AC, HP, and duration stay prose"
         }
       ]
     }
@@ -190,7 +221,16 @@
       }
     },
     "modeling": {
-      "reviewedAt": "2026-07-15T00:00:00.000Z"
+      "blocker": {
+        "code": "effect-schema-missing",
+        "capabilityId": "condition"
+      },
+      "gaps": [
+        {
+          "code": "choice-model-missing",
+          "note": "Pick effect from list stays prose"
+        }
+      ]
     }
   },
   {
@@ -273,12 +313,19 @@
       ]
     },
     "modeling": {
-      "reviewedAt": "2026-07-15T00:00:00.000Z",
       "status": "meaningful-partial",
       "gaps": [
         {
           "code": "modifier-model-missing",
           "note": "Spellcasting ability modifier on healing stays prose"
+        },
+        {
+          "code": "chosen-within-area",
+          "note": "Recipient selection within 30-ft sphere stays prose"
+        },
+        {
+          "code": "progression-schema-missing",
+          "note": "Slot +1d8 healing scaling stays prose"
         }
       ]
     }
@@ -327,7 +374,23 @@
     },
     "higherLevelSlotEffect": "<p>The duration increases with a spell slot of level 6 (10 days), 7 (30 days), 8 (180 days), and 9 (366 days).</p>",
     "modeling": {
-      "reviewedAt": "2026-07-15T00:00:00.000Z"
+      "blocker": {
+        "code": "summoning-model-missing"
+      },
+      "gaps": [
+        {
+          "code": "effect-schema-missing",
+          "note": "Service binding mechanics stay prose"
+        },
+        {
+          "code": "conditional-effect-model-missing",
+          "note": "Save, hostile twist, extend summon stay prose"
+        },
+        {
+          "code": "progression-schema-missing",
+          "note": "Slot duration scaling stays prose"
+        }
+      ]
     }
   },
   {
@@ -367,7 +430,24 @@
       }
     },
     "modeling": {
-      "reviewedAt": "2026-07-15T00:00:00.000Z"
+      "blocker": {
+        "code": "resurrection-model-missing",
+        "note": "Remediation order — transformation follows"
+      },
+      "gaps": [
+        {
+          "code": "transformation-model-missing",
+          "note": "Species and form change stay prose"
+        },
+        {
+          "code": "catalog-data-incomplete",
+          "note": "Species roll table placeholder in prose"
+        },
+        {
+          "code": "choice-model-missing",
+          "note": "Species outcome choice stays prose"
+        }
+      ]
     }
   },
   {
@@ -416,7 +496,19 @@
     },
     "higherLevelSlotEffect": "<p>Use the spell slot's level for the spell's level in the stat block.</p>",
     "modeling": {
-      "reviewedAt": "2026-07-15T00:00:00.000Z"
+      "blocker": {
+        "code": "summoning-model-missing"
+      },
+      "gaps": [
+        {
+          "code": "catalog-data-incomplete",
+          "note": "Draconic Spirit table placeholder in prose"
+        },
+        {
+          "code": "progression-schema-missing",
+          "note": "Slot level for stat block stays prose"
+        }
+      ]
     }
   },
   {
@@ -462,7 +554,24 @@
       "somatic": true
     },
     "modeling": {
-      "reviewedAt": "2026-07-15T00:00:00.000Z"
+      "blocker": {
+        "code": "effect-schema-missing",
+        "capabilityId": "movement"
+      },
+      "gaps": [
+        {
+          "code": "multi-mode-choice",
+          "note": "Creature vs object branch stays prose"
+        },
+        {
+          "code": "conditional-effect-model-missing",
+          "note": "Saves, Restrained, suspended fall stay prose"
+        },
+        {
+          "code": "object-state-awareness",
+          "note": "Worn or carried object stays prose"
+        }
+      ]
     }
   }
 ]

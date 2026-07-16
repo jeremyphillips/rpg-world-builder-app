@@ -19,18 +19,23 @@ mechanic falls outside this set remain `prose-only` until the relevant capabilit
 
 ## Capability links
 
-When a spell is blocked on **`effect-schema-missing`**, catalog manifest notes include a
-**capability link** — a roadmap grouping, not a persisted gap code:
+When a spell is blocked on **`effect-schema-missing`**, persist the roadmap grouping on
+`modeling.blocker.capabilityId` (spell-domain registry) — not as a separate gap code:
 
-| Capability link   | Primary mechanic                                 | Example spells (level 1)                                                      |
-| ----------------- | ------------------------------------------------ | ----------------------------------------------------------------------------- |
-| **stat-modifier** | AC, speed, roll bonuses                          | Bless, Shield of Faith, Mage Armor, Shield, Longstrider                       |
-| **condition**     | Apply/remove conditions, save-or-suffer control  | Hideous Laughter, Sleep, Faerie Fire, Sanctuary                               |
-| **movement**      | Jump distance, forced push/pull, fall mitigation | Jump, Thunderwave (push), Feather Fall                                        |
-| **action-grant**  | Bonus or special action economy                  | Expeditious Retreat                                                           |
-| **detection**     | Sensing, identification, information reveal      | Detect Magic, Identify                                                        |
-| **illusion**      | Visual/textual illusion authoring                | Silent Image, Illusory Script                                                 |
-| **utility**       | Zones, obscurement, creation, object interaction | Fog Cloud, Purify Food and Drink, Create or Destroy Water, Speak with Animals |
+| Capability ID          | Primary mechanic                                | Example spells                              |
+| ---------------------- | ----------------------------------------------- | ------------------------------------------- |
+| **stat-modifier**      | AC, speed, roll bonuses, HP max                 | Bless, Shield of Faith, Mage Armor, Aid     |
+| **condition**          | Apply/remove conditions, save-or-suffer control | Hideous Laughter, Sleep, Lesser Restoration |
+| **movement**           | Jump distance, forced push/pull, teleport       | Jump, Thunderwave, Misty Step               |
+| **action-grant**       | Bonus or delegated action economy               | Expeditious Retreat, Dragon's Breath        |
+| **detection**          | Sensing, identification                         | Detect Magic, Identify                      |
+| **illusion**           | Visual/textual illusion authoring               | Silent Image, Illusory Script               |
+| **spell-negation**     | Counter, dispel, interrupt ongoing spells       | Counterspell, Dispel Magic                  |
+| **persistent-zone**    | Darkness, fog, glyph traps, ongoing auras       | Darkness, Glyph of Warding                  |
+| **information-reveal** | Object or creature facts on touch               | Identify                                    |
+
+Prefer specific capability IDs over generic catch-alls. Omit `capabilityId` when no
+family is defined yet.
 
 These families unlock content **across** spells, class features, feats, species traits,
 and monster actions — not only one spell level.
@@ -50,24 +55,27 @@ Within spells, **explicit deferrals** (e.g. Hex, Hunter's Mark — `extra-damage
 [`spell-seed-resolution.ts`](../../../../catalog/src/spells/spell-seed-resolution.ts))
 resolve on a parallel track once condition and mark semantics exist.
 
-## Promotion vs residual gaps
+## Promotion blocker vs residual gaps
 
-| Field                 | Meaning                                                                                       |
-| --------------------- | --------------------------------------------------------------------------------------------- |
-| **Promotion blocker** | Missing capability or seed row — prevents `meaningful-partial`                                |
-| **Residual gaps**     | Known gap codes on editor-active spells for prose riders (e.g. flammability on Burning Hands) |
+| Field                 | Persisted as       | Meaning                                                                                 |
+| --------------------- | ------------------ | --------------------------------------------------------------------------------------- |
+| **Promotion blocker** | `modeling.blocker` | Single limitation preventing the next status rung (`meaningful-partial` for prose-only) |
+| **Residual gaps**     | `modeling.gaps`    | Secondary limitations and prose riders on promoted content                              |
+| **Blocked from**      | _(derived)_        | Next status rung — audit/report field only                                              |
 
-Prose-only spells may carry **`gaps`** on `modeling` without `status` — documentation for
-audit inventory only; effective status stays derived `prose-only`.
+Prose-only spells should persist **`blocker`**; residual codes live in **`gaps`** only.
 
 ## Future gap codes (document only)
 
 Add to the gap registry when multiple spells share the pattern:
 
-| Proposed code                                                  | Use when                                                                                                           |
-| -------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
-| `ordered-area-allocation` / `resource-distributed-across-area` | Finite resource applied across creatures in an area by HP order or similar — not caster-chosen subset (e.g. Sleep) |
-| `environmental-dispersal`                                      | Zone ends from environmental interaction such as strong wind (e.g. Fog Cloud)                                      |
+| Code                                                           | Definition                                                                                              | Shared by              |
+| -------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- | ---------------------- |
+| `resurrection-model-missing`                                   | Death-state restoration (timing, body, eligibility, return state)                                       | revivify, reincarnate  |
+| `transformation-model-missing`                                 | Statistic replacement or override for a duration                                                        | polymorph, reincarnate |
+| `independent-effect-object-model-missing`                      | Spell-created entity with own AC/HP/duration                                                            | arcane-hand            |
+| `ordered-area-allocation` / `resource-distributed-across-area` | Finite resource applied across creatures in an area by HP order — not caster-chosen subset (e.g. Sleep) |
+| `environmental-dispersal`                                      | Zone ends from environmental interaction such as strong wind (e.g. Fog Cloud)                           |
 
 **Not** `chosen-within-area` for Sleep — allocation follows spell rules, not subset choice.
 
