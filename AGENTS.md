@@ -24,7 +24,11 @@ pnpm lint-staged → pnpm typecheck:affected → pnpm test:affected → pnpm gat
 pnpm gate:pre-push  →  pnpm coverage → pnpm gate:fallow-health:coverage → pnpm build
 ```
 
-**CI** mirrors pre-push coverage and fallow checks on every PR. Skip hooks
+`pnpm build` excludes `@rpg/bench` (internal dev tooling). Use `pnpm build:bench`
+when you need a production bundle of the bench app.
+
+**CI** mirrors pre-push coverage and fallow checks on every PR, with affected
+Turbo scope for typecheck, lint, and build (`gate:ci:quality`, `build:ci`). Skip hooks
 locally only when necessary: `HUSKY=0 git commit` / `HUSKY=0 git push`.
 
 ## fallow (code health)

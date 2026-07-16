@@ -152,19 +152,20 @@ Then open the proxy URL (default `http://localhost:8080`).
 
 ## Scripts
 
-| Script              | Description                                               |
-| ------------------- | --------------------------------------------------------- |
-| `pnpm dev`          | Dev proxy + all workspace dev servers                     |
-| `pnpm dev:proxy`    | Just the single-origin dev reverse proxy                  |
-| `pnpm build`        | Build all workspaces (turbo)                              |
-| `pnpm lint`         | Lint all workspaces (turbo)                               |
-| `pnpm typecheck`    | Typecheck all workspaces (turbo)                          |
-| `pnpm test`         | Test all workspaces (turbo)                               |
-| `pnpm format`       | Format the repo with Prettier                             |
-| `pnpm format:check` | Check formatting without writing                          |
-| `pnpm analyze`      | `fallow` code-health report                               |
-| `pnpm storybook`    | UI + dashboard Storybooks concurrently (`:6006`, `:6007`) |
-| `pnpm bench`        | Dev Bench agent CLI (calls API on `:5001` directly)       |
+| Script              | Description                                                |
+| ------------------- | ---------------------------------------------------------- |
+| `pnpm dev`          | Dev proxy + all workspace dev servers                      |
+| `pnpm dev:proxy`    | Just the single-origin dev reverse proxy                   |
+| `pnpm build`        | Build production workspaces (turbo; excludes `@rpg/bench`) |
+| `pnpm build:bench`  | Build `@rpg/bench` only                                    |
+| `pnpm lint`         | Lint all workspaces (turbo)                                |
+| `pnpm typecheck`    | Typecheck all workspaces (turbo)                           |
+| `pnpm test`         | Test all workspaces (turbo)                                |
+| `pnpm format`       | Format the repo with Prettier                              |
+| `pnpm format:check` | Check formatting without writing                           |
+| `pnpm analyze`      | `fallow` code-health report                                |
+| `pnpm storybook`    | UI + dashboard Storybooks concurrently (`:6006`, `:6007`)  |
+| `pnpm bench`        | Dev Bench agent CLI (calls API on `:5001` directly)        |
 
 Target one workspace with a filter, e.g. `pnpm --filter @rpg/api dev`. See
 [docs/running.md](docs/running.md) for Storybook ports, Dev Bench CLI usage, and

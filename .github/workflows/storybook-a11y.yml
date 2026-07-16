@@ -8,6 +8,11 @@ on:
       - opened
       - synchronize
       - reopened
+    paths:
+      - 'packages/ui/**'
+      - 'apps/dashboard/**'
+      - 'packages/config/src/storybook/**'
+      - 'pnpm-lock.yaml'
 
 concurrency:
   group: storybook-a11y-${{ github.workflow }}-${{ github.ref }}
