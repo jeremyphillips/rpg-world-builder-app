@@ -57,7 +57,8 @@ Apply manifest data into `src/spells/data/srd-cc-5.2.1/level-*.json` (requires `
 ```sh
 pnpm exec tsx packages/catalog/scripts/apply-spell-seed-resolution.mjs
 pnpm exec tsx packages/catalog/scripts/apply-spell-modeling-metadata.mjs
-pnpm exec tsx packages/catalog/scripts/generate-spell-modeling-report.mjs
+pnpm catalog:spell-modeling-audit
+pnpm catalog:spell-modeling-report
 ```
 
 Manifests live in `src/spells/spell-seed-resolution.ts` and `spell-modeling-manifest.ts`.

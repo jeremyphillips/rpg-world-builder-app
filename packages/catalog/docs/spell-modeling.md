@@ -33,7 +33,8 @@ spell-modeling-manifest.ts  →  apply script  →  level-*.json (modeling field
 
 - **Manifest:** [`src/spells/spell-modeling-manifest.ts`](../src/spells/spell-modeling-manifest.ts)
 - **Apply:** `pnpm exec tsx packages/catalog/scripts/apply-spell-modeling-metadata.mjs`
-- **Audit report:** `pnpm exec tsx packages/catalog/scripts/generate-spell-modeling-report.mjs`
+- **Audit CLI:** `pnpm catalog:spell-modeling-audit` (from repo root)
+- **Audit report:** `pnpm catalog:spell-modeling-report` or `pnpm exec tsx packages/catalog/scripts/generate-spell-modeling-report.mjs`
 - **Generated inventory:** [`docs/analysis/spell-modeling-inventory.generated.md`](../../../docs/analysis/spell-modeling-inventory.generated.md)
 
 Do not hand-edit per-spell tables in `docs/analysis/spell-progression-modeling.md` §2 —
@@ -63,6 +64,20 @@ Union registry: `packages/contracts/src/rpg/content/spell/modeling/spell-modelin
 
 Targeting, application, and environment families are split by file under
 `packages/contracts/src/rpg/content/spell/modeling/`.
+
+Effect capability build priority and backlog grouping:
+[`packages/contracts/docs/effect-resolution/effect-capability-roadmap.md`](../../../packages/contracts/docs/effect-resolution/effect-capability-roadmap.md).
+
+Prose-only spells may persist **`gaps`** without `status` — audit documentation only;
+effective status remains derived `prose-only`. Summary and generated inventory report
+**prose-only without documented gaps** (reviewed prose-only spells missing `modeling.gaps`).
+
+## Level seed shards
+
+Large level files are split alphabetically under `src/spells/data/srd-cc-5.2.1/` using
+`level-{n}-{firstInitial}-{lastInitial}.json` (e.g. `level-1-a-f.json`). The loader in
+`index.ts` concatenates shards; scripts iterate `SRD_521_SPELL_LEVEL_SEED_FILES` from
+`spell-level-seed-files.ts`.
 
 ## Related manifests
 

@@ -1,7 +1,10 @@
 import { describe, expect, it } from 'vitest'
 
 import level0Raw from './data/srd-cc-5.2.1/level-0.json'
-import level1Raw from './data/srd-cc-5.2.1/level-1.json'
+import level1AFRaw from './data/srd-cc-5.2.1/level-1-a-f.json'
+import level1FIRaw from './data/srd-cc-5.2.1/level-1-f-i.json'
+import level1IPRaw from './data/srd-cc-5.2.1/level-1-i-p.json'
+import level1RTRaw from './data/srd-cc-5.2.1/level-1-r-t.json'
 import level2Raw from './data/srd-cc-5.2.1/level-2.json'
 import level3Raw from './data/srd-cc-5.2.1/level-3.json'
 import level4Raw from './data/srd-cc-5.2.1/level-4.json'
@@ -29,6 +32,22 @@ describe('spell modeling audit (srd-cc-5.2.1)', () => {
 
   it('reports all spells as reviewed after manifest apply', () => {
     expect(audit.unreviewed).toEqual([])
+  })
+
+  it('reports prose-only spells missing documented gaps', () => {
+    expect(audit.proseOnlyWithoutDocumentedGaps.length).toBeGreaterThan(0)
+    for (const slug of audit.proseOnlyWithoutDocumentedGaps) {
+      const entry = audit.entries.find((item) => item.slug === slug)!
+      expect(entry.effectiveStatus).toBe('prose-only')
+      expect(entry.gaps).toEqual([])
+    }
+  })
+
+  it('includes prose-only gap coverage in generated report', () => {
+    const report = generateSpellModelingReport(audit)
+    expect(report).toContain(
+      `Prose-only without documented gaps: ${audit.proseOnlyWithoutDocumentedGaps.length}`,
+    )
   })
 
   it('promotes resolution seeds to meaningful-partial with editor eligibility', () => {
@@ -71,7 +90,10 @@ describe('spell modeling audit (srd-cc-5.2.1)', () => {
 describe('spell seed JSON invariants', () => {
   const levelRaws = [
     level0Raw,
-    level1Raw,
+    level1AFRaw,
+    level1FIRaw,
+    level1IPRaw,
+    level1RTRaw,
     level2Raw,
     level3Raw,
     level4Raw,

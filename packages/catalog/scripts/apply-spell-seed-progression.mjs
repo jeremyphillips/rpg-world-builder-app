@@ -7,22 +7,12 @@ import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 import { SRD_521_SPELL_SEED_PROGRESSION } from '../src/spells/spell-seed-progression.ts'
+import { SRD_521_SPELL_LEVEL_SEED_FILES } from '../src/spells/spell-level-seed-files.ts'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const dataDir = join(__dirname, '../src/spells/data/srd-cc-5.2.1')
 
-const levelFiles = [
-  'level-0.json',
-  'level-1.json',
-  'level-2.json',
-  'level-3.json',
-  'level-4.json',
-  'level-5.json',
-  'level-6.json',
-  'level-7.json',
-  'level-8.json',
-  'level-9.json',
-]
+const levelFiles = SRD_521_SPELL_LEVEL_SEED_FILES
 
 let applied = 0
 let stripped = 0

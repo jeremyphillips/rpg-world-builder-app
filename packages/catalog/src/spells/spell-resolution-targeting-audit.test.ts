@@ -63,6 +63,11 @@ describe('resolution selection migration audit', () => {
         (gap) => gap.code === 'chained-targets',
       ),
     ).toBe(true)
+    expect(
+      SRD_521_SPELL_MODELING_MANIFEST['magic-missile']?.gaps?.some(
+        (gap) => gap.code === 'projectile-target-allocation',
+      ),
+    ).toBe(true)
     expect(SRD_521_SPELL_MODELING_MANIFEST.fireball?.gaps).toBeUndefined()
   })
 })

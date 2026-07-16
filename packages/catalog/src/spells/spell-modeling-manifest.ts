@@ -19,6 +19,14 @@ function reviewedProseOnly(): ContentModeling {
   return { reviewedAt: SRD_521_SPELL_MODELING_REVIEWED_AT }
 }
 
+/** Reviewed prose-only with documented promotion blockers — no explicit status. */
+function reviewedProseOnlyWithGaps(gaps: readonly ModelingGapEntry[]): ContentModeling {
+  return {
+    reviewedAt: SRD_521_SPELL_MODELING_REVIEWED_AT,
+    gaps: [...gaps],
+  }
+}
+
 function editorEligible(gaps?: readonly ModelingGapEntry[]): ContentModeling {
   if (gaps && gaps.length > 0) {
     return {
@@ -42,7 +50,12 @@ const SRD_521_SPELL_MODELING_RESOLUTION_ENTRIES = {
       note: 'Forceful Hand and Interposing Hand modes stay prose',
     },
   ]),
-  'burning-hands': editorEligible(),
+  'burning-hands': editorEligible([
+    {
+      code: 'flammability-rules',
+      note: 'Flammable object ignition rider stays prose',
+    },
+  ]),
   'chill-touch': editorEligible([
     {
       code: 'conditional-effect-model-missing',
@@ -81,9 +94,22 @@ const SRD_521_SPELL_MODELING_RESOLUTION_ENTRIES = {
       code: 'chained-targets',
       note: 'Cold burst targets derived from primary hit or miss',
     },
+    {
+      code: 'unconditional-application',
+      note: 'Cold burst applies regardless of attack outcome',
+    },
   ]),
   'inflict-wounds': editorEligible(),
-  'magic-missile': editorEligible(),
+  'magic-missile': editorEligible([
+    {
+      code: 'projectile-target-allocation',
+      note: 'Each dart may select a distinct creature within range',
+    },
+    {
+      code: 'dynamic-target-count',
+      note: 'Dart count scales with spell slot level',
+    },
+  ]),
   'mass-cure-wounds': editorEligible([
     {
       code: 'modifier-model-missing',
@@ -109,7 +135,16 @@ const SRD_521_SPELL_MODELING_RESOLUTION_ENTRIES = {
       note: 'Cover negation rider stays prose',
     },
   ]),
-  thunderwave: editorEligible(),
+  thunderwave: editorEligible([
+    {
+      code: 'conditional-effect-model-missing',
+      note: 'Push on failed save stays prose',
+    },
+    {
+      code: 'object-state-awareness',
+      note: 'Unsecured object push rider stays prose',
+    },
+  ]),
   'wall-of-fire': editorEligible([
     {
       code: 'wall-or-path-geometry',
@@ -126,38 +161,187 @@ const SRD_521_SPELL_MODELING_PROSE_ONLY_ENTRIES = {
   'antimagic-field': reviewedProseOnly(),
   'aura-of-life': reviewedProseOnly(),
   'bestow-curse': reviewedProseOnly(),
-  bless: reviewedProseOnly(),
+  bless: reviewedProseOnlyWithGaps([
+    {
+      code: 'effect-schema-missing',
+      note: 'Capability: stat-modifier — +1d4 attack and save bonus',
+    },
+    {
+      code: 'dynamic-target-count',
+      note: 'Slot +1 target per level above 1',
+    },
+  ]),
   contingency: reviewedProseOnly(),
   counterspell: reviewedProseOnly(),
-  'create-or-destroy-water': reviewedProseOnly(),
+  'create-or-destroy-water': reviewedProseOnlyWithGaps([
+    {
+      code: 'multi-mode-choice',
+      note: 'Create Water vs Destroy Water modes stay prose',
+    },
+    {
+      code: 'progression-schema-missing',
+      note: 'Cube size and gallon volume slot scaling stay prose',
+    },
+    {
+      code: 'effect-schema-missing',
+      note: 'Capability: utility — creation and destruction of water',
+    },
+  ]),
   'dancing-lights': reviewedProseOnly(),
   darkness: reviewedProseOnly(),
   'death-ward': reviewedProseOnly(),
-  'detect-evil-and-good': reviewedProseOnly(),
-  'detect-magic': reviewedProseOnly(),
-  'detect-poison-and-disease': reviewedProseOnly(),
+  'detect-evil-and-good': reviewedProseOnlyWithGaps([
+    {
+      code: 'effect-schema-missing',
+      note: 'Capability: detection — creature-type and Hallow sensing',
+    },
+  ]),
+  'detect-magic': reviewedProseOnlyWithGaps([
+    {
+      code: 'effect-schema-missing',
+      note: 'Capability: detection — magic aura sensing within emanation',
+    },
+  ]),
+  'detect-poison-and-disease': reviewedProseOnlyWithGaps([
+    {
+      code: 'effect-schema-missing',
+      note: 'Capability: detection — poison and contagion sensing',
+    },
+  ]),
   'dispel-magic': reviewedProseOnly(),
   'dragons-breath': reviewedProseOnly(),
   druidcraft: reviewedProseOnly(),
   elementalism: reviewedProseOnly(),
-  'expeditious-retreat': reviewedProseOnly(),
-  'faerie-fire': reviewedProseOnly(),
-  'feather-fall': reviewedProseOnly(),
-  'fog-cloud': reviewedProseOnly(),
+  'expeditious-retreat': reviewedProseOnlyWithGaps([
+    {
+      code: 'effect-schema-missing',
+      note: 'Capability: action-grant — bonus Dash action',
+    },
+  ]),
+  'faerie-fire': reviewedProseOnlyWithGaps([
+    {
+      code: 'conditional-effect-model-missing',
+      note: 'Objects outlined automatically; creatures save for same effect',
+    },
+    {
+      code: 'effect-schema-missing',
+      note: 'Capability: condition — outline, advantage, and Invisible negation',
+    },
+  ]),
+  'feather-fall': reviewedProseOnlyWithGaps([
+    {
+      code: 'reaction-trigger',
+      note: 'Cast when a falling creature is seen within range',
+    },
+    {
+      code: 'effect-schema-missing',
+      note: 'Capability: movement — fall speed mitigation',
+    },
+  ]),
+  'fog-cloud': reviewedProseOnlyWithGaps([
+    {
+      code: 'effect-schema-missing',
+      note: 'Capability: utility — heavily obscured zone; future environmental-dispersal for wind',
+    },
+  ]),
   'glyph-of-warding': reviewedProseOnly(),
   'greater-restoration': reviewedProseOnly(),
   guidance: reviewedProseOnly(),
-  hex: reviewedProseOnly(),
-  'hideous-laughter': reviewedProseOnly(),
-  'hunters-mark': reviewedProseOnly(),
-  identify: reviewedProseOnly(),
-  'illusory-script': reviewedProseOnly(),
-  jump: reviewedProseOnly(),
+  hex: reviewedProseOnlyWithGaps([
+    {
+      code: 'effect-schema-missing',
+      note: 'Capability: condition — curse, ability disadvantage, extra-damage defer',
+    },
+    {
+      code: 'choice-model-missing',
+      note: 'Chosen ability for disadvantage stays prose',
+    },
+    {
+      code: 'retargetable-mark',
+      note: 'Mark moves to a new creature when target drops to 0 HP',
+    },
+    {
+      code: 'conditional-effect-model-missing',
+      note: 'Extra necrotic damage on hit stays prose',
+    },
+  ]),
+  'hideous-laughter': reviewedProseOnlyWithGaps([
+    {
+      code: 'conditional-effect-model-missing',
+      note: 'Repeating saves and damage-triggered save advantage stay prose',
+    },
+    {
+      code: 'effect-schema-missing',
+      note: 'Capability: condition — Prone and Incapacitated on failed save',
+    },
+  ]),
+  'hunters-mark': reviewedProseOnlyWithGaps([
+    {
+      code: 'effect-schema-missing',
+      note: 'Capability: condition — mark, Perception advantage, extra-damage defer',
+    },
+    {
+      code: 'retargetable-mark',
+      note: 'Mark moves to a new creature when quarry drops to 0 HP',
+    },
+    {
+      code: 'conditional-effect-model-missing',
+      note: 'Extra force damage on hit stays prose',
+    },
+  ]),
+  identify: reviewedProseOnlyWithGaps([
+    {
+      code: 'effect-schema-missing',
+      note: 'Capability: detection — object or creature information reveal on touch',
+    },
+  ]),
+  'illusory-script': reviewedProseOnlyWithGaps([
+    {
+      code: 'choice-model-missing',
+      note: 'Designated viewers at cast time stay prose',
+    },
+    {
+      code: 'effect-schema-missing',
+      note: 'Capability: illusion — hidden script and viewer-specific text',
+    },
+  ]),
+  jump: reviewedProseOnlyWithGaps([
+    {
+      code: 'dynamic-target-count',
+      note: 'Slot +1 target per level above 1',
+    },
+    {
+      code: 'effect-schema-missing',
+      note: 'Capability: movement — enhanced jump distance',
+    },
+  ]),
   'lesser-restoration': reviewedProseOnly(),
   levitate: reviewedProseOnly(),
   light: reviewedProseOnly(),
-  longstrider: reviewedProseOnly(),
-  'mage-armor': reviewedProseOnly(),
+  longstrider: reviewedProseOnlyWithGaps([
+    {
+      code: 'dynamic-target-count',
+      note: 'Slot +1 target per level above 1',
+    },
+    {
+      code: 'effect-schema-missing',
+      note: 'Capability: stat-modifier — +10 ft Speed',
+    },
+  ]),
+  'mage-armor': reviewedProseOnlyWithGaps([
+    {
+      code: 'object-state-awareness',
+      note: 'Target must not be wearing armor',
+    },
+    {
+      code: 'conditional-effect-model-missing',
+      note: 'Spell ends early if target dons armor',
+    },
+    {
+      code: 'effect-schema-missing',
+      note: 'Capability: stat-modifier — base AC formula',
+    },
+  ]),
   'mage-hand': reviewedProseOnly(),
   'magic-jar': reviewedProseOnly(),
   'mass-suggestion': reviewedProseOnly(),
@@ -171,19 +355,82 @@ const SRD_521_SPELL_MODELING_PROSE_ONLY_ENTRIES = {
   'power-word-heal': reviewedProseOnly(),
   prestidigitation: reviewedProseOnly(),
   'prismatic-wall': reviewedProseOnly(),
-  'purify-food-and-drink': reviewedProseOnly(),
+  'purify-food-and-drink': reviewedProseOnlyWithGaps([
+    {
+      code: 'object-state-awareness',
+      note: 'Nonmagical food and drink in sphere',
+    },
+    {
+      code: 'effect-schema-missing',
+      note: 'Capability: utility — purify poison and rot',
+    },
+  ]),
   'ray-of-enfeeblement': reviewedProseOnly(),
   reincarnate: reviewedProseOnly(),
   resistance: reviewedProseOnly(),
   revivify: reviewedProseOnly(),
-  sanctuary: reviewedProseOnly(),
-  shield: reviewedProseOnly(),
-  'shield-of-faith': reviewedProseOnly(),
-  'silent-image': reviewedProseOnly(),
+  sanctuary: reviewedProseOnlyWithGaps([
+    {
+      code: 'targeting-model-missing',
+      note: 'Attackers must save before targeting warded creature',
+    },
+    {
+      code: 'conditional-effect-model-missing',
+      note: 'Ward ends when warded creature attacks or deals damage',
+    },
+    {
+      code: 'effect-schema-missing',
+      note: 'Capability: condition — ward against targeted attacks',
+    },
+  ]),
+  shield: reviewedProseOnlyWithGaps([
+    {
+      code: 'reaction-trigger',
+      note: 'Cast when hit by attack or targeted by Magic Missile',
+    },
+    {
+      code: 'conditional-effect-model-missing',
+      note: 'Magic Missile immunity rider stays prose',
+    },
+    {
+      code: 'effect-schema-missing',
+      note: 'Capability: stat-modifier — +5 AC reaction ward',
+    },
+  ]),
+  'shield-of-faith': reviewedProseOnlyWithGaps([
+    {
+      code: 'effect-schema-missing',
+      note: 'Capability: stat-modifier — +2 AC buff',
+    },
+  ]),
+  'silent-image': reviewedProseOnlyWithGaps([
+    {
+      code: 'moving-aura-origin',
+      note: 'Image relocates with Magic action',
+    },
+    {
+      code: 'effect-schema-missing',
+      note: 'Capability: illusion — visual-only phenomenon',
+    },
+  ]),
   simulacrum: reviewedProseOnly(),
-  sleep: reviewedProseOnly(),
+  sleep: reviewedProseOnlyWithGaps([
+    {
+      code: 'conditional-effect-model-missing',
+      note: 'Multi-stage save, damage wake, and shake action stay prose',
+    },
+    {
+      code: 'effect-schema-missing',
+      note: 'Capability: condition — HP-ordered area allocation; future ordered-area-allocation',
+    },
+  ]),
   'spare-the-dying': reviewedProseOnly(),
-  'speak-with-animals': reviewedProseOnly(),
+  'speak-with-animals': reviewedProseOnlyWithGaps([
+    {
+      code: 'effect-schema-missing',
+      note: 'Capability: utility — Beast communication and Influence',
+    },
+  ]),
   'summon-dragon': reviewedProseOnly(),
   symbol: reviewedProseOnly(),
   telekinesis: reviewedProseOnly(),

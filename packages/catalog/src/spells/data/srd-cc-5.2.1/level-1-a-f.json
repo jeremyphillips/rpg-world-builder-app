@@ -1,0 +1,545 @@
+[
+  {
+    "id": "srd-cc-5.2.1:bless",
+    "slug": "bless",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Bless",
+    "description": "<p>You bless up to three creatures within range. Whenever a target makes an attack roll or a saving throw before the spell ends, the target adds 1d4 to the attack roll or save.</p>",
+    "school": "enchantment",
+    "level": 1,
+    "classIds": ["cleric", "paladin"],
+    "tags": {
+      "roles": ["buff"]
+    },
+    "castingTime": {
+      "normal": {
+        "value": 1,
+        "unit": "action"
+      },
+      "canBeCastAsRitual": false
+    },
+    "range": {
+      "kind": "distance",
+      "value": {
+        "value": 30,
+        "unit": "ft"
+      }
+    },
+    "duration": {
+      "kind": "timed",
+      "value": 1,
+      "unit": "minute",
+      "concentration": true,
+      "upTo": true
+    },
+    "components": {
+      "verbal": true,
+      "somatic": true,
+      "material": {
+        "description": "a Holy Symbol worth 5+ GP"
+      }
+    },
+    "higherLevelSlotEffect": "<p>You can target one additional creature for each spell slot level above 1.</p>",
+    "modeling": {
+      "reviewedAt": "2026-07-15T00:00:00.000Z",
+      "gaps": [
+        {
+          "code": "effect-schema-missing",
+          "note": "Capability: stat-modifier — +1d4 attack and save bonus"
+        },
+        {
+          "code": "dynamic-target-count",
+          "note": "Slot +1 target per level above 1"
+        }
+      ]
+    }
+  },
+  {
+    "id": "srd-cc-5.2.1:burning-hands",
+    "slug": "burning-hands",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Burning Hands",
+    "level": 1,
+    "description": "<p>A thin sheet of flames shoots forth from you. Each creature in a 15-foot Cone makes a Dexterity saving throw, taking 3d6 Fire damage on a failed save or half as much damage on a successful one.</p><p>Flammable objects in the Cone that aren't being worn or carried start burning.</p>",
+    "school": "evocation",
+    "classIds": ["sorcerer", "wizard"],
+    "tags": {
+      "damageTypes": ["fire"],
+      "roles": ["damage"]
+    },
+    "castingTime": {
+      "normal": {
+        "value": 1,
+        "unit": "action"
+      },
+      "canBeCastAsRitual": false
+    },
+    "range": {
+      "kind": "self"
+    },
+    "areaOfEffect": {
+      "shape": "cone",
+      "length": {
+        "value": 15,
+        "unit": "ft"
+      }
+    },
+    "duration": {
+      "kind": "instantaneous"
+    },
+    "components": {
+      "verbal": true,
+      "somatic": true
+    },
+    "higherLevelSlotEffect": "<p>The damage increases by 1d6 for each spell slot level above 1.</p>",
+    "resolution": {
+      "selectionMode": "self",
+      "areaOfEffect": {
+        "shape": "cone",
+        "length": {
+          "value": 15,
+          "unit": "ft"
+        }
+      },
+      "method": {
+        "kind": "saving-throw",
+        "ability": "dex"
+      },
+      "effects": [
+        {
+          "id": "damage",
+          "kind": "damage",
+          "roll": {
+            "dice": {
+              "count": 3,
+              "faces": 6
+            }
+          },
+          "damageType": "fire"
+        }
+      ],
+      "outcomes": [
+        {
+          "result": "failed-save",
+          "applications": [
+            {
+              "effectId": "damage",
+              "amount": "full"
+            }
+          ]
+        },
+        {
+          "result": "successful-save",
+          "applications": [
+            {
+              "effectId": "damage",
+              "amount": "half"
+            }
+          ]
+        }
+      ]
+    },
+    "modeling": {
+      "reviewedAt": "2026-07-15T00:00:00.000Z",
+      "status": "meaningful-partial",
+      "gaps": [
+        {
+          "code": "flammability-rules",
+          "note": "Flammable object ignition rider stays prose"
+        }
+      ]
+    }
+  },
+  {
+    "id": "srd-cc-5.2.1:create-or-destroy-water",
+    "slug": "create-or-destroy-water",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Create or Destroy Water",
+    "level": 1,
+    "description": "<p>You do one of the following:</p><p><strong>Create Water.</strong> You create up to 10 gallons of clean water within range in an open container. Alternatively, the water falls as rain in a 30-foot Cube within range, extinguishing exposed flames there.</p><p><strong>Destroy Water.</strong> You destroy up to 10 gallons of water in an open container within range. Alternatively, you destroy fog in a 30-foot Cube within range.</p>",
+    "school": "transmutation",
+    "classIds": ["cleric", "druid"],
+    "tags": {
+      "functions": ["creation", "utility"]
+    },
+    "castingTime": {
+      "normal": {
+        "value": 1,
+        "unit": "action"
+      },
+      "canBeCastAsRitual": false
+    },
+    "range": {
+      "kind": "distance",
+      "value": {
+        "value": 30,
+        "unit": "ft"
+      }
+    },
+    "duration": {
+      "kind": "instantaneous"
+    },
+    "components": {
+      "verbal": true,
+      "somatic": true,
+      "material": {
+        "description": "a mix of water and sand"
+      }
+    },
+    "higherLevelSlotEffect": "<p>You create or destroy 10 additional gallons of water, or the size of the Cube increases by 5 feet, for each spell slot level above 1.</p>",
+    "modeling": {
+      "reviewedAt": "2026-07-15T00:00:00.000Z",
+      "gaps": [
+        {
+          "code": "multi-mode-choice",
+          "note": "Create Water vs Destroy Water modes stay prose"
+        },
+        {
+          "code": "progression-schema-missing",
+          "note": "Cube size and gallon volume slot scaling stay prose"
+        },
+        {
+          "code": "effect-schema-missing",
+          "note": "Capability: utility — creation and destruction of water"
+        }
+      ]
+    }
+  },
+  {
+    "id": "srd-cc-5.2.1:cure-wounds",
+    "slug": "cure-wounds",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Cure Wounds",
+    "description": "<p>A creature you touch regains a number of Hit Points equal to 2d8 plus your spellcasting ability modifier.</p>",
+    "school": "abjuration",
+    "level": 1,
+    "classIds": ["bard", "cleric", "druid", "paladin", "ranger"],
+    "tags": {
+      "roles": ["healing"]
+    },
+    "castingTime": {
+      "normal": {
+        "value": 1,
+        "unit": "action"
+      },
+      "canBeCastAsRitual": false
+    },
+    "range": {
+      "kind": "touch"
+    },
+    "duration": {
+      "kind": "instantaneous"
+    },
+    "components": {
+      "verbal": true,
+      "somatic": true
+    },
+    "higherLevelSlotEffect": "<p>The healing increases by 2d8 for each spell slot level above 1.</p>",
+    "resolution": {
+      "selectionMode": "targets",
+      "target": {
+        "count": 1,
+        "countKind": "exact",
+        "kind": "creature",
+        "proximity": {
+          "kind": "touch"
+        }
+      },
+      "method": {
+        "kind": "automatic"
+      },
+      "effects": [
+        {
+          "id": "healing",
+          "kind": "healing",
+          "roll": {
+            "dice": {
+              "count": 2,
+              "faces": 8
+            }
+          }
+        }
+      ],
+      "outcomes": [
+        {
+          "result": "applied",
+          "applications": [
+            {
+              "effectId": "healing",
+              "amount": "full"
+            }
+          ]
+        }
+      ]
+    },
+    "modeling": {
+      "reviewedAt": "2026-07-15T00:00:00.000Z",
+      "status": "meaningful-partial",
+      "gaps": [
+        {
+          "code": "modifier-model-missing",
+          "note": "Spellcasting ability modifier on healing stays prose"
+        }
+      ]
+    }
+  },
+  {
+    "id": "srd-cc-5.2.1:detect-evil-and-good",
+    "slug": "detect-evil-and-good",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Detect Evil and Good",
+    "level": 1,
+    "description": "<p>For the duration, you sense the location of any Aberration, Celestial, Elemental, Fey, Fiend, or Undead within 30 feet of yourself. You also sense whether the <em>Hallow</em> spell is active there and, if so, where.</p><p>The spell is blocked by 1 foot of stone, dirt, or wood; 1 inch of metal; or a thin sheet of lead.</p>",
+    "school": "divination",
+    "classIds": ["cleric", "paladin"],
+    "tags": {
+      "roles": ["detection"]
+    },
+    "castingTime": {
+      "normal": {
+        "value": 1,
+        "unit": "action"
+      },
+      "canBeCastAsRitual": false
+    },
+    "range": {
+      "kind": "self"
+    },
+    "duration": {
+      "kind": "timed",
+      "value": 10,
+      "unit": "minute",
+      "concentration": true,
+      "upTo": true
+    },
+    "components": {
+      "verbal": true,
+      "somatic": true
+    },
+    "modeling": {
+      "reviewedAt": "2026-07-15T00:00:00.000Z",
+      "gaps": [
+        {
+          "code": "effect-schema-missing",
+          "note": "Capability: detection — creature-type and Hallow sensing"
+        }
+      ]
+    }
+  },
+  {
+    "id": "srd-cc-5.2.1:detect-magic",
+    "slug": "detect-magic",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Detect Magic",
+    "description": "<p>For the duration, you sense the presence of magical effects within 30 feet of yourself. If you sense such effects, you can take the Magic action to see a faint aura around any visible creature or object in the area that bears the magic, and if an effect was created by a spell, you learn the spell's school of magic. The spell is blocked by 1 foot of stone, dirt, or wood; 1 inch of metal; or a thin sheet of lead.</p>",
+    "school": "divination",
+    "level": 1,
+    "classIds": ["bard", "cleric", "druid", "paladin", "ranger", "sorcerer", "warlock", "wizard"],
+    "castingTime": {
+      "normal": {
+        "value": 1,
+        "unit": "action"
+      },
+      "canBeCastAsRitual": true
+    },
+    "range": {
+      "kind": "self"
+    },
+    "duration": {
+      "kind": "timed",
+      "value": 10,
+      "unit": "minute",
+      "concentration": true,
+      "upTo": true
+    },
+    "components": {
+      "verbal": true,
+      "somatic": true
+    },
+    "modeling": {
+      "reviewedAt": "2026-07-15T00:00:00.000Z",
+      "gaps": [
+        {
+          "code": "effect-schema-missing",
+          "note": "Capability: detection — magic aura sensing within emanation"
+        }
+      ]
+    }
+  },
+  {
+    "id": "srd-cc-5.2.1:detect-poison-and-disease",
+    "slug": "detect-poison-and-disease",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Detect Poison and Disease",
+    "level": 1,
+    "description": "<p>For the duration, you sense the location of poisons, poisonous or venomous creatures, and magical contagions within 30 feet of yourself. You sense the kind of poison, creature, or contagion in each case.</p><p>The spell is blocked by 1 foot of stone, dirt, or wood; 1 inch of metal; or a thin sheet of lead.</p>",
+    "school": "divination",
+    "classIds": ["cleric", "druid", "paladin", "ranger"],
+    "tags": {
+      "roles": ["detection"]
+    },
+    "castingTime": {
+      "normal": {
+        "value": 1,
+        "unit": "action"
+      },
+      "canBeCastAsRitual": true
+    },
+    "range": {
+      "kind": "self"
+    },
+    "duration": {
+      "kind": "timed",
+      "value": 10,
+      "unit": "minute",
+      "concentration": true,
+      "upTo": true
+    },
+    "components": {
+      "verbal": true,
+      "somatic": true,
+      "material": {
+        "description": "a yew leaf"
+      }
+    },
+    "modeling": {
+      "reviewedAt": "2026-07-15T00:00:00.000Z",
+      "gaps": [
+        {
+          "code": "effect-schema-missing",
+          "note": "Capability: detection — poison and contagion sensing"
+        }
+      ]
+    }
+  },
+  {
+    "id": "srd-cc-5.2.1:expeditious-retreat",
+    "slug": "expeditious-retreat",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Expeditious Retreat",
+    "level": 1,
+    "description": "<p>You take the Dash action, and until the spell ends, you can take that action again as a Bonus Action.</p>",
+    "school": "transmutation",
+    "classIds": ["sorcerer", "warlock", "wizard"],
+    "tags": {
+      "roles": ["buff", "movement"]
+    },
+    "castingTime": {
+      "normal": {
+        "value": 1,
+        "unit": "bonus-action"
+      },
+      "canBeCastAsRitual": false
+    },
+    "range": {
+      "kind": "self"
+    },
+    "duration": {
+      "kind": "timed",
+      "value": 10,
+      "unit": "minute",
+      "concentration": true,
+      "upTo": true
+    },
+    "components": {
+      "verbal": true,
+      "somatic": true
+    },
+    "modeling": {
+      "reviewedAt": "2026-07-15T00:00:00.000Z",
+      "gaps": [
+        {
+          "code": "effect-schema-missing",
+          "note": "Capability: action-grant — bonus Dash action"
+        }
+      ]
+    }
+  },
+  {
+    "id": "srd-cc-5.2.1:faerie-fire",
+    "slug": "faerie-fire",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Faerie Fire",
+    "description": "<p>Objects in a 20-foot Cube within range are outlined in blue, green, or violet light (your choice). Each creature in the Cube is also outlined if it fails a Dexterity saving throw. For the duration, objects and affected creatures shed Dim Light in a 10-foot radius and can't benefit from the Invisible condition. Attack rolls against an affected creature or object have Advantage if the attacker can see it.</p>",
+    "school": "evocation",
+    "level": 1,
+    "classIds": ["bard", "druid"],
+    "tags": {
+      "conditions": ["invisible"],
+      "roles": ["debuff", "control"]
+    },
+    "castingTime": {
+      "normal": {
+        "value": 1,
+        "unit": "action"
+      },
+      "canBeCastAsRitual": false
+    },
+    "range": {
+      "kind": "distance",
+      "value": {
+        "value": 60,
+        "unit": "ft"
+      }
+    },
+    "duration": {
+      "kind": "timed",
+      "value": 1,
+      "unit": "minute",
+      "concentration": true,
+      "upTo": true
+    },
+    "components": {
+      "verbal": true
+    },
+    "modeling": {
+      "reviewedAt": "2026-07-15T00:00:00.000Z",
+      "gaps": [
+        {
+          "code": "conditional-effect-model-missing",
+          "note": "Objects outlined automatically; creatures save for same effect"
+        },
+        {
+          "code": "effect-schema-missing",
+          "note": "Capability: condition — outline, advantage, and Invisible negation"
+        }
+      ]
+    }
+  }
+]

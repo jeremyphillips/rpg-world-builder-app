@@ -48,7 +48,9 @@
   "scripts": {
     "typecheck": "tsc -p tsconfig.json",
     "lint": "eslint .",
-    "test": "vitest run"
+    "test": "vitest run",
+    "spell-modeling-audit": "tsx scripts/spell-modeling-audit.mjs",
+    "spell-modeling-report": "tsx scripts/generate-spell-modeling-report.mjs"
   },
   "dependencies": {
     "@rpg/contracts": "workspace:*",

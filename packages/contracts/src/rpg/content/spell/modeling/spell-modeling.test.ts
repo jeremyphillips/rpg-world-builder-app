@@ -14,6 +14,8 @@ describe('spell modeling gap codes', () => {
     expect(SPELL_MODELING_GAP_CODES['flammability-rules']).toBeDefined()
     expect(SPELL_MODELING_GAP_CODES['unconditional-application']).toBeDefined()
     expect(isSpellModelingGapCode('dynamic-target-count')).toBe(true)
+    expect(isSpellModelingGapCode('projectile-target-allocation')).toBe(true)
+    expect(isSpellModelingGapCode('retargetable-mark')).toBe(true)
     expect(isSpellModelingGapCode('not-a-code')).toBe(false)
   })
 })

@@ -73,6 +73,13 @@ Canonical examples: [`fixtures.ts`](../../src/rpg/content/spell/resolution/fixtu
 - Apply script: [`apply-spell-seed-resolution.mjs`](../../../../catalog/src/spells/scripts/apply-spell-seed-resolution.mjs)
 - Audit tests: [`spell-resolution-targeting-audit.test.ts`](../../../../catalog/src/spells/spell-resolution-targeting-audit.test.ts)
 
+## Effect capability roadmap
+
+Spells blocked on primary mechanics outside damage/healing/THP declare
+`effect-schema-missing` with capability-linked manifest notes. Staged build priority
+(stat modifiers → conditions → movement → action grants → detection/utility):
+[effect-capability-roadmap.md](./effect-capability-roadmap.md).
+
 ## Partial targeting gaps
 
 Resolved spells with incomplete targeting semantics declare gap codes on

@@ -50,6 +50,8 @@ export type SpellModelingAudit = {
   entries: SpellModelingAuditEntry[]
   byEffectiveStatus: Record<ModelingStatus, string[]>
   unreviewed: string[]
+  /** Prose-only spells with no `modeling.gaps` entries (promotion blockers undocumented). */
+  proseOnlyWithoutDocumentedGaps: string[]
   violationCount: number
 }
 
@@ -139,6 +141,16 @@ function groupByEffectiveStatus(
   return groups
 }
 
+/** Prose-only audit entries with no documented `modeling.gaps`. */
+export function proseOnlyWithoutDocumentedGaps(
+  entries: readonly SpellModelingAuditEntry[],
+): string[] {
+  return entries
+    .filter((entry) => entry.effectiveStatus === 'prose-only' && entry.gaps.length === 0)
+    .map((entry) => entry.slug)
+    .sort()
+}
+
 /** Audits spell modeling metadata for a ruleset seed catalog. */
 export function buildSpellModelingAudit(rulesetId: SystemRulesetId): SpellModelingAudit {
   const entries = loadSeedSpells(rulesetId).map(toAuditEntry)
@@ -153,6 +165,7 @@ export function buildSpellModelingAudit(rulesetId: SystemRulesetId): SpellModeli
       .filter((entry) => !entry.reviewed)
       .map((entry) => entry.slug)
       .sort(),
+    proseOnlyWithoutDocumentedGaps: proseOnlyWithoutDocumentedGaps(entries),
     violationCount,
   }
 }
@@ -169,6 +182,7 @@ export function generateSpellModelingReport(audit: SpellModelingAudit): string {
     `Ruleset: \`${audit.rulesetId}\``,
     `Total spells: ${audit.totalSpells}`,
     `Unreviewed: ${audit.unreviewed.length}`,
+    `Prose-only without documented gaps: ${audit.proseOnlyWithoutDocumentedGaps.length}`,
     `Violations: ${audit.violationCount}`,
     '',
     '## Status summary',
