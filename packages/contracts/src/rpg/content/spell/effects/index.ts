@@ -4,6 +4,7 @@ export {
   formatEffectRowSentenceFromParts,
   type EffectRowFormatOptions,
   type EffectRowParts,
+  type EffectSentenceRegister,
 } from './format'
 export {
   SPELL_ATOMIC_EFFECT_KINDS,
@@ -28,9 +29,12 @@ export {
   formatEffectRowTitleFromParts,
 } from './display'
 export {
-  deriveEffectsModelingStatus,
-  EFFECTS_MODELING_STATUS,
-  EFFECTS_MODELING_STATUS_LABELS,
-  getEffectsModelingStatusLabel,
-  type EffectsModelingStatus,
-} from './modeling-status'
+  buildAtomicEffectDisplay,
+  buildAtomicEffectDisplayFromParts,
+  formatAtomicEffectDisplaySummary,
+  formatAtomicEffectDisplayTitle,
+  type AtomicEffectDisplay,
+  type AtomicEffectDisplayInput,
+  type AtomicEffectTitleSegments,
+  type BuildAtomicEffectDisplayOptions,
+} from './atomic-effect-display'

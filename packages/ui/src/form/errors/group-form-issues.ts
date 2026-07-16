@@ -1,6 +1,6 @@
 import type { ArraySectionMeta } from './resolve-field-order'
 import { resolveFieldOrderIndex } from './resolve-field-order'
-import { joinArrayItemSummaryParts } from '../config/array-item-config.lib'
+import { joinArrayItemSummaryParts } from '../config/array/array-item-config.lib'
 import type { ArrayItemIssueGroup, FormIssue } from './form-issue.types'
 import { FORM_ISSUE_SEVERITY_ORDER } from './form-issue.types'
 

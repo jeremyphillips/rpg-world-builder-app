@@ -76,7 +76,7 @@ describe('field separator', () => {
     await waitFor(() => {
       const separator = container.querySelector('[data-field-separator]')
       expect(separator).toBeInTheDocument()
-      expect(separator).toHaveClass('border-b', 'border-border', 'pb-4')
+      expect(separator).toHaveClass('border-b', 'border-border', 'pb-7')
       expect(separator).toContainElement(screen.getByLabelText('Feature level'))
       expect(separator).not.toContainElement(screen.getByLabelText('Feature note'))
       expect(screen.getByLabelText('Feature note')).toBeInTheDocument()

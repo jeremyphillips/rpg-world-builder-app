@@ -12,7 +12,7 @@ const ARMOR_SEEDS = seedEquipmentOfKind('armor')
 
 describe('armor kindFieldGroups', () => {
   it('buildFields composes identity, economy, and registered armor group', () => {
-    expectComposedKindGroups('armor', 'Armor')
+    expectComposedKindGroups('armor', '')
   })
 
   it('shows strength requirement only for heavy armor', () => {

@@ -41,15 +41,14 @@ The **Resolution** tab authors an optional `resolution` envelope matching
 `resolution` object — enable via **Add resolution** when absent — with no
 parallel boolean flag.
 
-| Concern          | Behavior                                                                                                        |
-| ---------------- | --------------------------------------------------------------------------------------------------------------- |
-| Form shape       | `ResolutionFormValues` with `effects[]` array + optional stored `outcomes[]` via `resolution-form-schema.ts`    |
-| Effects editor   | Searchable 3-template add menu (`damage`, `healing`, `temporary-hit-points`) mirroring root `effectArrayFields` |
-| Automatic method | Tier D healing/temp-HP seeds use `method: automatic` with `applied` outcomes                                    |
-| Outcomes         | Read-only preview of stored or synthesized outcomes (`SpellResolutionOutcomesPreview`)                          |
-| Save             | **Disabled** — banner: "Resolution is not saved yet."                                                           |
-| Legacy effects   | Flat `effects[]` on the read model for catalog detail; Resolution tab reads `resolution.effects[]` only         |
-| Target proximity | `resolution.target.proximity` (touch / reach / distance) — separate from Check method                           |
+| Concern          | Behavior                                                                                                          |
+| ---------------- | ----------------------------------------------------------------------------------------------------------------- |
+| Form shape       | `ResolutionFormValues` with `resolution.effects[]` + optional stored `outcomes[]` via `resolution-form-schema.ts` |
+| Effects editor   | Searchable 3-template add menu (`damage`, `healing`, `temporary-hit-points`) in the Resolution tab                |
+| Automatic method | Tier D healing/temp-HP seeds use `method: automatic` with `applied` outcomes                                      |
+| Outcomes         | Interactive method-derived outcome groups (`SpellResolutionOutcomes`)                                             |
+| Save             | **Disabled** — banner: "Resolution is not saved yet."                                                             |
+| Target proximity | `resolution.target.proximity` (touch / reach / distance) — separate from Check method                             |
 
 Modules live under [`resolution/`](resolution/) (`lib/form/resolution-form-*.ts`,
 `fixtures.ts`, `components/spell-resolution-*.client.tsx`).
@@ -60,7 +59,6 @@ Catalog seeds ship optional `resolution` on the read model via
 hybrid, 4 Tier D healing/temporary-HP spells, Ice Knife and Arcane Hand multi-effect). Three
 effect spells remain explicitly deferred in the manifest with documented reason codes.
 Apply with `pnpm exec tsx packages/catalog/scripts/apply-spell-seed-resolution.mjs`.
-Flat `effects[]` remain on migrated spells until consolidation.
 
 Shared roll/damage form atoms live under
 [`content/lib/forms/mechanics/`](../../lib/forms/mechanics/) (`roll-value-fields`,
@@ -69,8 +67,7 @@ Shared roll/damage form atoms live under
 #### Persistence boundary (`spell.resolution.persistence`)
 
 Create/update API input **omits** `resolution` today. `buildSpellCreateInput` strips
-the field with a `TODO(spell.resolution.persistence)` comment alongside the existing
-`effects` omission.
+the field with a `TODO(spell.resolution.persistence)` comment.
 
 When persistence ships, touch these files:
 
@@ -82,23 +79,12 @@ When persistence ships, touch these files:
 | API mapper  | `apps/api/.../spells.config.ts` — `toHomebrewSpell`                                         |
 | Patch merge | `apps/api/.../lib/deep-merge.ts` — object replace for `resolution`                          |
 
-### Atomic effects (catalog read model)
+### Resolution authoring
 
-Optional flat `effects[]` on the spell read model (`spellAtomicEffectSchema`) remains
-for catalog seed data and spell detail display. Shared atomic-effect modules live
-under `lib/effects/` (template registry, form schema/values, display). The Resolution
-tab hydrates from `spell.resolution.effects[]` only — it does not read or sync root
-`effects[]`. Authoring UI for flat effects was replaced by the Resolution tab;
-`lib/effects/*` modules remain for detail rendering and future `spell.effect.persistence`.
-
-**Dual-model spells (Tier A + hybrid):** Migrated catalog spells carry both root
-`effects[]` (legacy flat model) and `resolution` (envelope). The Resolution tab
-authors `resolution.effects[]` via the add menu. Projectile or beam scaling uses
-optional `resolution.applicationPattern` (Projectiles MVP) — not a fourth effect kind
-in the resolution add menu. Magic Missile consolidates dart count on
-`applicationPattern`; Eldritch Blast remains hybrid until beam scaling migrates from
-root `projectile-count` (hybrid notice when root still owns scaling). Manifest-deferred
-spells (e.g. Hex) render the empty state until resolution modeling lands.
+The Resolution tab hydrates from `spell.resolution` when `modeling.status` is at
+least `meaningful-partial`. Projectile scaling uses `resolution.applicationPattern`
+(Projectiles MVP). Manifest-deferred spells (e.g. Hex) render the empty state until
+resolution modeling lands. See [`packages/catalog/docs/spell-modeling.md`](../../../../packages/catalog/docs/spell-modeling.md).
 
 ### Scaling prose fields
 
@@ -130,7 +116,7 @@ rich-text body prose for cantrip upgrades and upcast effects. Section headings
 | Atomic effects (shared)   | `lib/effects/` — template registry, form schema/values, display, add menu                                                              |
 | Effect display (detail)   | `lib/effects/effect-display.ts`                                                                                                        |
 | Effects editor (stories)  | `components/spell-effects-editor.client.tsx`                                                                                           |
-| Seed effects audit        | `packages/catalog/src/spells/spell-effects-coverage-inventory.ts`                                                                      |
+| Modeling audit            | `packages/catalog/src/spells/spell-modeling-audit.ts`                                                                                  |
 | Create route              | `routes/spell-create.tsx`                                                                                                              |
 | Edit route                | `routes/spell-edit.tsx`                                                                                                                |
 

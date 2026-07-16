@@ -1,4 +1,15 @@
 import type { SpellResolutionProximityKind } from './vocab'
+import {
+  getEffectTargetAvailability,
+  isEffectKindAllowedForTarget,
+} from './effect-target-compatibility'
+import {
+  getSelectionMethodCompatibility,
+  getSelectionMethodCompatibilityReasonCode,
+  methodOptionToMethodKind,
+  resolveSelectionModeFromState,
+  selectionMethodContextFromState,
+} from './selection-method-compatibility'
 import type {
   OptionAvailability,
   ResolutionApplicationPatternFormKind,
@@ -81,6 +92,12 @@ function isPatternAllowedForProximity(
   return proximity === 'distance'
 }
 
+/** Target proximity gates method/pattern only for external target selection. */
+function isProximityRelevantForAvailability(context: ResolutionSelectionState): boolean {
+  if (context.selectionMode) return context.selectionMode === 'targets'
+  return context.proximityKind !== undefined && context.proximityKind !== 'self'
+}
+
 export function isResolutionEffectKind(kind: string): kind is ResolutionEffectKind {
   return kind === 'damage' || kind === 'healing' || kind === 'temporary-hit-points'
 }
@@ -97,7 +114,36 @@ export function getMethodAvailability(
   context: ResolutionSelectionState,
   method: ResolutionMethodOption,
 ): OptionAvailability {
-  if (isMethodAllowedForProximity(method, context.proximityKind)) {
+  const selectionContext = selectionMethodContextFromState(context)
+  if (selectionContext) {
+    const methodKind = methodOptionToMethodKind(method)
+    const compatibility = getSelectionMethodCompatibility(selectionContext, methodKind)
+    if (compatibility !== 'supported') {
+      const reasonCode = getSelectionMethodCompatibilityReasonCode(selectionContext, methodKind)
+      const selectionMode = resolveSelectionModeFromState(context)
+      if (reasonCode && selectionMode) {
+        return {
+          allowed: false,
+          reason: {
+            code: 'method-incompatible-with-selection-mode',
+            method,
+            selectionMode,
+            hasAreaOfEffect: Boolean(context.hasAreaOfEffect),
+            compatibility,
+            reasonCode,
+          },
+          severity: 'unsupported',
+        }
+      }
+    }
+  }
+
+  if (!isProximityRelevantForAvailability(context)) {
+    return { allowed: true }
+  }
+
+  const proximity = context.proximityKind
+  if (!proximity || isMethodAllowedForProximity(method, proximity)) {
     return { allowed: true }
   }
 
@@ -106,7 +152,7 @@ export function getMethodAvailability(
     reason: {
       code: 'method-incompatible-with-proximity',
       method,
-      proximity: context.proximityKind,
+      proximity,
     },
     severity: 'unsupported',
   }
@@ -116,7 +162,12 @@ export function getApplicationPatternAvailability(
   context: ResolutionSelectionState,
   pattern: ResolutionApplicationPatternFormKind,
 ): OptionAvailability {
-  if (isPatternAllowedForProximity(pattern, context.proximityKind)) {
+  if (!isProximityRelevantForAvailability(context)) {
+    return { allowed: true }
+  }
+
+  const proximity = context.proximityKind
+  if (!proximity || isPatternAllowedForProximity(pattern, proximity)) {
     return { allowed: true }
   }
 
@@ -132,24 +183,27 @@ export function getEffectKindAvailability(
   kind: ResolutionEffectKind,
 ): OptionAvailability {
   const method = toMethodOption(context)
-  if (isEffectKindAllowedForMethod(kind, method)) {
-    return { allowed: true }
+  if (!isEffectKindAllowedForMethod(kind, method)) {
+    return {
+      allowed: false,
+      reason: {
+        code: 'effect-kind-unsupported-for-method',
+        kind,
+        method: method ?? 'ranged-spell',
+      },
+      severity: 'unsupported',
+    }
   }
 
-  return {
-    allowed: false,
-    reason: {
-      code: 'effect-kind-unsupported-for-method',
-      kind,
-      method: method ?? 'ranged-spell',
-    },
-    severity: 'unsupported',
-  }
+  return getEffectTargetAvailability(context, kind)
 }
 
 export function isEffectKindAllowedForState(
   state: ResolutionSelectionState,
   kind: ResolutionEffectKind,
 ): boolean {
-  return isEffectKindAllowedForMethod(kind, toMethodOption(state))
+  return (
+    isEffectKindAllowedForMethod(kind, toMethodOption(state)) &&
+    isEffectKindAllowedForTarget(kind, state)
+  )
 }

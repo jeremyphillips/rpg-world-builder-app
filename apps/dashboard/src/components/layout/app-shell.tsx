@@ -14,9 +14,9 @@ export function AppShell() {
 
   return (
     <BreadcrumbLabelProvider>
-      <div className="flex min-h-dvh">
+      <div className="flex min-h-dvh bg-background">
         <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
-        <div className="flex min-w-0 flex-1 flex-col">
+        <div className="flex min-w-0 flex-1 flex-col bg-background">
           <Topbar sidebarOpen={sidebarOpen} onToggleSidebar={() => setSidebarOpen((o) => !o)} />
           <div className="border-b border-border px-6 py-3">
             <AppBreadcrumb />

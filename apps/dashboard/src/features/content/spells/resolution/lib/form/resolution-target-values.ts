@@ -1,10 +1,12 @@
-import type { SpellResolutionTargetProximity } from '@rpg/contracts'
+import type { SpellResolutionTarget } from '@rpg/contracts'
 
 import type { ResolutionFormValues } from './resolution-form-schema'
 
+type ExternalTargetProximity = SpellResolutionTarget['proximity']
+
 export function buildTargetProximity(
   values: ResolutionFormValues,
-): SpellResolutionTargetProximity | undefined {
+): ExternalTargetProximity | undefined {
   switch (values.proximityKind) {
     case 'touch':
       return { kind: 'touch' }
@@ -21,8 +23,6 @@ export function buildTargetProximity(
         kind: 'distance',
         distance: { value: values.proximityDistanceFt, unit: 'ft' },
       }
-    case 'self':
-      return { kind: 'self' }
     default: {
       const _exhaustive: never = values.proximityKind
       return _exhaustive
@@ -32,7 +32,7 @@ export function buildTargetProximity(
 
 export function applyProximityFields(
   form: ResolutionFormValues,
-  proximity: SpellResolutionTargetProximity,
+  proximity: ExternalTargetProximity,
 ): void {
   if (proximity.kind === 'distance') {
     form.proximityDistanceFt = proximity.distance.value

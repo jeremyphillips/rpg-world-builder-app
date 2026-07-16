@@ -44,6 +44,7 @@ export function buildSkillProficiencyFields(_ctx: ContentFormCtx): FormItem[] {
     {
       kind: 'group',
       legend: 'Mechanics',
+      fieldsChrome: { variant: 'panel' },
       fields: [
         {
           type: 'chips',
@@ -52,15 +53,23 @@ export function buildSkillProficiencyFields(_ctx: ContentFormCtx): FormItem[] {
           options: abilityOptions,
           multiple: false,
           required: true,
+          separator: 'subtle',
         },
         {
           kind: 'array',
           name: 'examples',
           legend: 'Examples',
-          addLabel: 'Add example',
+          addActionLabel: 'Add example',
           min: 1,
+          reorder: 'dragHandle',
+          itemChrome: 'subtle',
+          size: 'md',
+          itemCollapsible: true,
+          itemCollapseKey: 'example',
           itemVariant: 'compact',
-          reorder: false,
+          addActionLayout: 'inline',
+          addActionSize: 'sm',
+          compactInlineAlign: 'center',
           itemHeader: {
             fallback: (index) => `Example ${index + 1}`,
             primaryField: 'value',
@@ -72,7 +81,8 @@ export function buildSkillProficiencyFields(_ctx: ContentFormCtx): FormItem[] {
                 {
                   type: 'text',
                   name: 'value',
-                  label: 'Example',
+                  label: '',
+                  placeholder: 'Example…',
                   required: true,
                   width: 'full',
                 },

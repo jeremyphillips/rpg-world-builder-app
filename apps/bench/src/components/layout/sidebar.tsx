@@ -6,7 +6,7 @@ import { BENCH_NAV_ITEMS } from '@/app/routes'
 
 export function Sidebar() {
   return (
-    <aside className="flex w-50 shrink-0 flex-col border-r border-border bg-card">
+    <aside className="flex w-[240px] shrink-0 flex-col border-r border-border bg-sidebar">
       <div className="flex h-16 items-center px-6">
         <Heading variant="brand" as="span">
           Dev Bench

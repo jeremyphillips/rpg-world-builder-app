@@ -2,7 +2,6 @@ import { describe, expect, it } from 'vitest'
 
 import {
   applyResolutionStructuralCleanup,
-  buildIncompatibleSelectionClearPatch,
   getEffectKindAvailability,
   getMethodAvailability,
   planResolutionChange,
@@ -30,22 +29,61 @@ function distanceRangedState(
 }
 
 describe('getMethodAvailability', () => {
-  it('disallows ranged spell attack for self proximity', () => {
+  it('disallows ranged spell attack for touch proximity in targets mode', () => {
     const availability = getMethodAvailability(
-      { proximityKind: 'self', targetKind: 'creature', targetCount: 1 },
+      {
+        selectionMode: 'targets',
+        proximityKind: 'touch',
+        targetKind: 'creature',
+        targetCount: 1,
+      },
       'ranged-spell',
     )
     expect(availability.allowed).toBe(false)
     expect(availability.reason?.code).toBe('method-incompatible-with-proximity')
   })
 
-  it('allows automatic for self proximity', () => {
+  it('blocks attack methods for self mode without area', () => {
+    const availability = getMethodAvailability(
+      { selectionMode: 'self', hasAreaOfEffect: false },
+      'ranged-spell',
+    )
+    expect(availability.allowed).toBe(false)
+    expect(availability.reason?.code).toBe('method-incompatible-with-selection-mode')
+    expect(availability.reason).toMatchObject({
+      compatibility: 'unsupported',
+      reasonCode: 'attack-unsupported-for-self-without-area',
+    })
+  })
+
+  it('blocks deferred saving throw for self mode without area', () => {
+    const availability = getMethodAvailability(
+      { selectionMode: 'self', hasAreaOfEffect: false },
+      'saving-throw',
+    )
+    expect(availability.allowed).toBe(false)
+    expect(availability.reason).toMatchObject({
+      compatibility: 'deferred',
+      reasonCode: 'saving-throw-deferred-for-self-without-area',
+    })
+  })
+
+  it('allows automatic for self mode without area', () => {
     expect(
-      getMethodAvailability(
-        { proximityKind: 'self', targetKind: 'creature', targetCount: 1 },
-        'automatic',
-      ).allowed,
+      getMethodAvailability({ selectionMode: 'self', hasAreaOfEffect: false }, 'automatic').allowed,
     ).toBe(true)
+  })
+
+  it('defers attack for point mode', () => {
+    const availability = getMethodAvailability(
+      { selectionMode: 'point', hasAreaOfEffect: true, originDistanceFt: 150 },
+      'melee-spell',
+    )
+    expect(availability.allowed).toBe(false)
+    expect(availability.reason).toMatchObject({
+      compatibility: 'deferred',
+      reasonCode: 'attack-deferred-for-point-selection',
+    })
   })
 })
 
@@ -55,26 +93,36 @@ describe('getEffectKindAvailability', () => {
     expect(availability.allowed).toBe(false)
     expect(availability.reason?.code).toBe('effect-kind-unsupported-for-method')
   })
+
+  it('disallows healing for object targets', () => {
+    const availability = getEffectKindAvailability(
+      {
+        proximityKind: 'touch',
+        targetKind: 'object',
+        targetCount: 1,
+        methodKind: 'automatic',
+        applicationPatternKind: 'none',
+      },
+      'healing',
+    )
+
+    expect(availability.allowed).toBe(false)
+    expect(availability.reason?.code).toBe('effect-kind-incompatible-with-target')
+  })
 })
 
 describe('planResolutionChange', () => {
-  it('distance→self reports incompatible method and pattern without auto-setting automatic', () => {
-    const before = distanceRangedState()
-    const plan = planResolutionChange(before, { field: 'proximityKind', value: 'self' })
+  it('targets→self flags incompatible attack method without coercing method', () => {
+    const before = { ...distanceRangedState(), selectionMode: 'targets' as const }
+    const plan = planResolutionChange(before, { field: 'selectionMode', value: 'self' })
 
-    expect(plan.requestedPatch).toEqual({ proximityKind: 'self' })
+    expect(plan.requestedPatch).toEqual({ selectionMode: 'self' })
     expect(plan.incompatibleSelections).toEqual([
       { field: 'method', currentOption: 'ranged-spell' },
-      { field: 'applicationPattern', currentKind: 'projectiles' },
     ])
+    expect(plan.cleanupPatch.methodKind).toBeUndefined()
     expect(plan.effectsToRemove).toEqual([])
     expect(resolutionChangeRequiresConfirm(plan)).toBe(true)
-
-    const cleared = buildIncompatibleSelectionClearPatch(plan.incompatibleSelections)
-    expect(cleared.methodKind).toBeUndefined()
-    expect(cleared.attackType).toBeUndefined()
-    expect(cleared.applicationPatternKind).toBe('none')
-    expect(cleared.methodKind).not.toBe('automatic')
   })
 
   it('saving-throw→attack clears saveAbility without confirm', () => {
@@ -174,6 +222,118 @@ describe('planResolutionChange', () => {
     )
 
     expect(plan.warnings).toContainEqual({ code: 'automatic-distance-without-pattern' })
+  })
+})
+
+describe('planResolutionChange selectionMode', () => {
+  it('targets→point clears target fields in cleanupPatch', () => {
+    const before: ResolutionSelectionState = {
+      selectionMode: 'targets',
+      proximityKind: 'distance',
+      proximityDistanceFt: 120,
+      targetKind: 'creature',
+      targetCount: 1,
+      countKind: 'exact',
+      methodKind: 'saving-throw',
+      saveAbility: 'dex',
+      applicationPatternKind: 'none',
+      effects: [{ id: 'damage', kind: 'damage' }],
+    }
+
+    const plan = planResolutionChange(before, { field: 'selectionMode', value: 'point' })
+
+    expect(plan.requestedPatch).toEqual({ selectionMode: 'point' })
+    expect(plan.cleanupPatch.targetCount).toBeUndefined()
+    expect(plan.cleanupPatch.proximityKind).toBeUndefined()
+  })
+
+  it('point→targets clears origin and area in cleanupPatch', () => {
+    const before: ResolutionSelectionState = {
+      selectionMode: 'point',
+      originDistanceFt: 150,
+      hasAreaOfEffect: true,
+      areaOfEffectShape: 'sphere',
+      proximityKind: 'distance',
+      methodKind: 'saving-throw',
+      saveAbility: 'dex',
+      applicationPatternKind: 'none',
+      effects: [{ id: 'damage', kind: 'damage' }],
+    }
+
+    const plan = planResolutionChange(before, { field: 'selectionMode', value: 'targets' })
+
+    expect(plan.cleanupPatch.originDistanceFt).toBeUndefined()
+    expect(plan.cleanupPatch.hasAreaOfEffect).toBe(false)
+    expect(plan.cleanupPatch.targetCount).toBe(1)
+    expect(plan.cleanupPatch.countKind).toBe('exact')
+  })
+
+  it.each([
+    {
+      label: 'self→none',
+      before: {
+        selectionMode: 'self' as const,
+        hasAreaOfEffect: true,
+        areaOfEffectShape: 'cone',
+        methodKind: 'saving-throw' as const,
+        saveAbility: 'dex',
+        applicationPatternKind: 'none' as const,
+        effects: [{ id: 'damage', kind: 'damage' }],
+      },
+      next: 'none' as const,
+      expectCleanup: { hasAreaOfEffect: false, areaOfEffectShape: undefined },
+    },
+    {
+      label: 'point→self',
+      before: {
+        selectionMode: 'point' as const,
+        originDistanceFt: 150,
+        hasAreaOfEffect: true,
+        areaOfEffectShape: 'sphere',
+        methodKind: 'saving-throw' as const,
+        saveAbility: 'dex',
+        applicationPatternKind: 'none' as const,
+        effects: [{ id: 'damage', kind: 'damage' }],
+      },
+      next: 'self' as const,
+      expectCleanup: { originDistanceFt: undefined },
+    },
+    {
+      label: 'targets→none',
+      before: {
+        selectionMode: 'targets' as const,
+        proximityKind: 'touch' as const,
+        targetKind: 'creature',
+        targetCount: 1,
+        methodKind: 'automatic' as const,
+        applicationPatternKind: 'none' as const,
+        effects: [{ id: 'healing', kind: 'healing' }],
+      },
+      next: 'none' as const,
+      expectCleanup: { targetCount: undefined, proximityKind: undefined },
+    },
+    {
+      label: 'point→none',
+      before: {
+        selectionMode: 'point' as const,
+        originDistanceFt: 120,
+        hasAreaOfEffect: true,
+        areaOfEffectShape: 'sphere',
+        methodKind: 'saving-throw' as const,
+        saveAbility: 'dex',
+        applicationPatternKind: 'none' as const,
+        effects: [{ id: 'damage', kind: 'damage' }],
+      },
+      next: 'none' as const,
+      expectCleanup: {
+        originDistanceFt: undefined,
+        hasAreaOfEffect: false,
+        areaOfEffectShape: undefined,
+      },
+    },
+  ])('$label applies expected cleanupPatch fields', ({ before, next, expectCleanup }) => {
+    const plan = planResolutionChange(before, { field: 'selectionMode', value: next })
+    expect(plan.cleanupPatch).toMatchObject(expectCleanup)
   })
 })
 

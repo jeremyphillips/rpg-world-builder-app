@@ -1,3 +1,4 @@
 export * from './attack-resolution-mode'
+export * from './cantrip-scaling-thresholds'
 export * from './edition-preset'
 export * from './edition-preset-mechanics'

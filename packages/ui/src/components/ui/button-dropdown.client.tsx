@@ -4,6 +4,7 @@ import * as React from 'react'
 import * as PopoverPrimitive from '@radix-ui/react-popover'
 import { ChevronDown } from 'lucide-react'
 
+import { buttonSizeToComboboxFieldSize } from '../../components/ui/field-sizing.variants'
 import { cn } from '../../lib/utils'
 import { Button } from './button.client'
 import { ComboboxSearchField } from './combobox-field-parts.client'
@@ -74,15 +75,13 @@ function ButtonDropdownItemRow({
 }) {
   if (item.disabled) {
     return (
-      <div className="px-1 py-0.5" aria-disabled="true">
+      <div aria-disabled="true">
         <PreviewCard
           title={item.label}
           description={item.description}
           tone="transparent"
           density="compact"
-          footerSlot={
-            item.note ? <span className="text-muted-foreground">{item.note}</span> : undefined
-          }
+          footerSlot={item.note}
           className="opacity-50"
         />
       </div>
@@ -90,7 +89,7 @@ function ButtonDropdownItemRow({
   }
 
   return (
-    <div className="px-1 py-0.5" onMouseEnter={onHighlight}>
+    <div onMouseEnter={onHighlight}>
       <PreviewCard
         title={item.label}
         description={item.description}
@@ -99,9 +98,7 @@ function ButtonDropdownItemRow({
         interactive
         optionId={optionId}
         isHighlighted={isHighlighted}
-        footerSlot={
-          item.note ? <span className="text-muted-foreground">{item.note}</span> : undefined
-        }
+        footerSlot={item.note}
         onSelect={onSelect}
       />
     </div>
@@ -118,6 +115,8 @@ export function ButtonDropdown({
   onSelectItem,
   variant = 'outline',
   size = 'sm',
+  leadingIcon,
+  width = 'full',
   className,
 }: ButtonDropdownProps) {
   const {
@@ -141,6 +140,7 @@ export function ButtonDropdown({
     setActiveIndex,
   } = useButtonDropdownControl({ groups, items, enableSearch, onSelectItem })
   const groupedSections = groupHeadingsForItems(displayItems, groups, searchActive)
+  const searchFieldSize = buttonSizeToComboboxFieldSize[size ?? 'default']
 
   const highlightIndexForItem = React.useCallback(
     (item: ButtonDropdownItem) =>
@@ -155,11 +155,12 @@ export function ButtonDropdown({
           type="button"
           variant={variant}
           size={size}
-          className={className}
+          className={cn(width === 'fit' && 'w-fit shrink-0', className)}
           aria-haspopup="listbox"
           aria-expanded={open}
           aria-controls={listboxId}
         >
+          {leadingIcon}
           {label}
           <ChevronDown className="size-4 opacity-50" aria-hidden />
         </Button>
@@ -170,7 +171,9 @@ export function ButtonDropdown({
           side="bottom"
           avoidCollisions
           sideOffset={4}
-          className={cn(comboboxContentVariants(), 'min-w-[var(--radix-popover-trigger-width)]')}
+          className={comboboxContentVariants({
+            triggerWidth: width === 'fit' ? 'fit' : 'match',
+          })}
           onOpenAutoFocus={(event) => {
             event.preventDefault()
             focusPanelOnOpen()
@@ -181,7 +184,7 @@ export function ButtonDropdown({
               label={label}
               listboxId={listboxId}
               searchId={searchId}
-              size="sm"
+              size={searchFieldSize}
               query={query}
               activeOptionId={activeOptionId}
               searchInputRef={searchInputRef}
@@ -218,9 +221,9 @@ export function ButtonDropdown({
               ))
             ) : (
               groupedSections.map(({ group, items: sectionItems }) => (
-                <div key={group?.id ?? '__ungrouped'} className="py-1">
+                <div key={group?.id ?? '__ungrouped'}>
                   {group ? (
-                    <div className="px-3 pb-1">
+                    <div className="px-3 pb-1 pt-1">
                       <Eyebrow size="xs">{group.label}</Eyebrow>
                     </div>
                   ) : null}

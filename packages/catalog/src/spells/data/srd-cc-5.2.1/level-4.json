@@ -35,6 +35,18 @@
     },
     "components": {
       "verbal": true
+    },
+    "modeling": {
+      "blocker": {
+        "code": "effect-schema-missing",
+        "capabilityId": "stat-modifier"
+      },
+      "gaps": [
+        {
+          "code": "conditional-effect-model-missing",
+          "note": "1 HP at turn start when at 0 HP in aura stays prose"
+        }
+      ]
     }
   },
   {
@@ -71,6 +83,17 @@
     "components": {
       "verbal": true,
       "somatic": true
+    },
+    "modeling": {
+      "blocker": {
+        "code": "effect-schema-missing"
+      },
+      "gaps": [
+        {
+          "code": "conditional-effect-model-missing",
+          "note": "0 HP substitution and instant-death negation stay prose"
+        }
+      ]
     }
   },
   {
@@ -116,6 +139,21 @@
       "material": {
         "description": "a caterpillar cocoon"
       }
+    },
+    "modeling": {
+      "blocker": {
+        "code": "transformation-model-missing"
+      },
+      "gaps": [
+        {
+          "code": "choice-model-missing",
+          "note": "Beast form choice stays prose"
+        },
+        {
+          "code": "conditional-effect-model-missing",
+          "note": "Save, THP tracking, early end stay prose"
+        }
+      ]
     }
   },
   {
@@ -164,22 +202,11 @@
       }
     },
     "higherLevelSlotEffect": "<p>The damage increases by 1d8 for each spell slot level above 4.</p>",
-    "effects": [
-      {
-        "id": "srd-cc-5.2.1:wall-of-fire:damage",
-        "kind": "damage",
-        "roll": {
-          "dice": {
-            "count": 5,
-            "faces": 8
-          }
-        },
-        "damageType": "fire"
-      }
-    ],
     "resolution": {
+      "selectionMode": "targets",
       "target": {
         "count": 1,
+        "countKind": "exact",
         "kind": "creature-or-object",
         "proximity": {
           "kind": "distance",
@@ -224,6 +251,19 @@
               "amount": "half"
             }
           ]
+        }
+      ]
+    },
+    "modeling": {
+      "status": "meaningful-partial",
+      "gaps": [
+        {
+          "code": "wall-or-path-geometry",
+          "note": "Wall placement and ongoing side damage stay prose"
+        },
+        {
+          "code": "progression-schema-missing",
+          "note": "Slot +1d8 damage scaling stays prose"
         }
       ]
     }

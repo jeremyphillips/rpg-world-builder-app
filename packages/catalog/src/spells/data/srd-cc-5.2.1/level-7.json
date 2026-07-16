@@ -45,22 +45,11 @@
       }
     },
     "higherLevelSlotEffect": "<p>The base damage increases by 1d6 for each spell slot level above 7.</p>",
-    "effects": [
-      {
-        "id": "srd-cc-5.2.1:delayed-blast-fireball:damage",
-        "kind": "damage",
-        "roll": {
-          "dice": {
-            "count": 12,
-            "faces": 6
-          }
-        },
-        "damageType": "fire"
-      }
-    ],
     "resolution": {
+      "selectionMode": "targets",
       "target": {
         "count": 1,
+        "countKind": "exact",
         "kind": "creature-or-object",
         "proximity": {
           "kind": "distance",
@@ -107,6 +96,23 @@
           ]
         }
       ]
+    },
+    "modeling": {
+      "status": "meaningful-partial",
+      "gaps": [
+        {
+          "code": "flammability-rules",
+          "note": "Flammable object ignition rider stays prose"
+        },
+        {
+          "code": "progression-schema-missing",
+          "note": "Time-based accumulation (+1d6 per turn end while concentration holds) — not slot scaling"
+        },
+        {
+          "code": "conditional-effect-model-missing",
+          "note": "Touch, throw, and early detonation branches stay prose"
+        }
+      ]
     }
   },
   {
@@ -145,6 +151,26 @@
       "material": {
         "description": "powdered ruby worth 1,500+ GP, which the spell consumes"
       }
+    },
+    "modeling": {
+      "blocker": {
+        "code": "summoning-model-missing",
+        "note": "Duplicate/derived creature from an existing stat block — may diverge from ordinary summoning"
+      },
+      "gaps": [
+        {
+          "code": "conditional-effect-model-missing",
+          "note": "Repair during Long Rest and combat obedience stay prose"
+        },
+        {
+          "code": "object-state-awareness",
+          "note": "Target must remain within 10 feet for entire casting"
+        },
+        {
+          "code": "concurrent-effect-limit",
+          "note": "Recasting destroys any prior simulacrum from this spell"
+        }
+      ]
     }
   },
   {
@@ -185,6 +211,26 @@
       "material": {
         "description": "powdered diamond worth 1,000+ GP, which the spell consumes"
       }
+    },
+    "modeling": {
+      "blocker": {
+        "code": "effect-schema-missing",
+        "capabilityId": "persistent-zone"
+      },
+      "gaps": [
+        {
+          "code": "multi-mode-choice",
+          "note": "Death, Discord, Fear, Pain, Sleep, and Stunning modes stay prose"
+        },
+        {
+          "code": "choice-model-missing",
+          "note": "Trigger and creature-type filter configuration stay prose"
+        },
+        {
+          "code": "conditional-effect-model-missing",
+          "note": "Triggered sphere effects and once-per-turn targeting stay prose"
+        }
+      ]
     }
   }
 ]

@@ -8,17 +8,30 @@ export {
   SlotFieldRenderer,
   type SlotFieldRendererProps,
 } from './containers/form-items.client'
+export { FieldNode, buildFieldControlId } from './containers/form-conditional.client'
 export {
   FormSectionProvider,
+  FormSectionContext,
+  buildFormSectionChildContext,
   useFormSectionContext,
+  type FormSectionContextOverrides,
+  type FormSectionContextValue,
   type FormSectionProviderProps,
 } from './context/form-section.context'
 export {
   ArrayItemPresentationContext,
   resolveErrorPlacement,
+  useFieldErrorPresentation,
   type ArrayItemPresentationContextValue,
   type ErrorPlacement,
 } from './context/array-item-presentation.context'
+export {
+  ArrayFieldContext,
+  useArrayFieldContext,
+  applyArrayFilterSelectOptions,
+  type ArrayFieldContextValue,
+  type FilterSelectOptionsContext,
+} from './context/array-field.context'
 export {
   FormUiContext,
   FormUiProvider,
@@ -64,6 +77,12 @@ export {
   resolveFieldHint,
   applyOptionAvailabilityToFieldOptions,
   applyOptionAvailabilityToSelectOptions,
+  flattenSelectFieldOptions,
+  resolveSelectFieldFlatOptions,
+  resolveSelectFieldDisplayLabel,
+  isSelectFieldReadOnly,
+  type FieldReadOnlyContext,
+  type FieldPresentationConfig,
   type FieldType,
   type FieldOption,
   type FieldOptionGroup,
@@ -76,6 +95,9 @@ export {
   type TextFieldConfig,
   type NumberFieldConfig,
   type TextareaFieldConfig,
+  type OptionalDisclosureConfig,
+  type OptionalDisclosureFieldKind,
+  OPTIONAL_DISCLOSURE_FIELD_KINDS,
   type SelectFieldConfig,
   type RadioFieldConfig,
   type CheckboxFieldConfig,
@@ -102,11 +124,15 @@ export {
   type RowConfig,
   type GroupConfig,
   type GroupFieldItem,
+  type FieldGroupFieldsChrome,
+  type FieldChrome,
   type StackConfig,
   type ArrayConfig,
   type ArrayItemHeaderConfig,
   type ArrayItemReorder,
+  type ArrayAddActionLayout,
   type ArrayItemVariant,
+  type ArrayCompactInlineAlign,
   type SlotConfig,
   type FormItem,
   type FormIssue,
@@ -116,6 +142,8 @@ export {
 } from './field-config'
 export { makeFieldErrorMap, type RawZodIssueLike } from './config/field-error-map'
 export { makeResolver } from './config/form-resolver'
+export { navigateInvalidSubmit } from './config/navigate-invalid-submit.client'
+export { performInvalidSubmitFocus } from './config/navigate-invalid-submit-focus.lib'
 export {
   flattenFormIssues,
   classifyFormIssue,
@@ -126,6 +154,7 @@ export {
   countInvalidArrayItems,
   indexArrayItemIssues,
   collectArraySections,
+  resolveArrayItemFieldOrder,
   resolveIssueFocusControlId,
   resolveIssueFocusFieldName,
   buildValidationSessionExpandKey,
@@ -144,7 +173,7 @@ export {
   ARRAY_ITEM_HEADER_DIVIDER,
   ARRAY_ITEM_TEXT_SEPARATOR,
   joinArrayItemSummaryParts,
-} from './config/array-item-config.lib'
+} from './config/array/array-item-config.lib'
 export {
   buildItemKeysByFieldId,
   collapsedIdsFromSnapshot,
@@ -156,19 +185,54 @@ export {
   toggleArrayItemCollapseOverride,
   type ArrayItemCollapseOverride,
   type ArrayItemCollapseSnapshot,
-} from './config/array-item-collapse.lib'
+} from './config/array/array-item-collapse.lib'
 export {
   buildArrayItemCollapseStorageKey,
   readArrayItemCollapseOverrides,
   writeArrayItemCollapseOverrides,
   type ArrayItemCollapseStoredValue,
-} from './config/array-item-collapse-storage.lib'
+} from './config/array/array-item-collapse-storage.lib'
+export {
+  getArrayFieldMutators,
+  registerArrayFieldMutators,
+  type ArrayFieldMutators,
+} from './context/array-field-mutators.registry'
 export { useArrayItemCollapseState } from './hooks/use-array-item-collapse-state.client'
-export type {
-  FieldGroupLegendSize,
-  FieldSeparator,
-  FieldStackLayout,
-  FieldStackRhythm,
+export {
+  ArrayItemActionsRail,
+  ArrayItemRemoveButton,
+  ArrayItemShell,
+  type ArrayItemActionsRailProps,
+  type ArrayItemRemoveButtonProps,
+  type ArrayItemShellProps,
+} from './renderers/array/array-item-shell.client'
+export {
+  ArrayItemLeadingChromeColumn,
+  type ArrayItemLeadingChromeColumnProps,
+} from './renderers/array/array-item-leading-chrome-column.client'
+export {
+  ArrayItemInlineRow,
+  type ArrayItemInlineRowProps,
+} from './renderers/array/array-item-inline-row.client'
+export {
+  ArrayItemRowShell,
+  type ArrayItemRowShellProps,
+} from './renderers/array/array-item-row-shell.client'
+export {
+  useArrayItemRowState,
+  type UseArrayItemRowStateArgs,
+} from './renderers/array/use-array-item-row-state.client'
+export {
+  ArrayItemIssueSummary,
+  type ArrayItemIssueSummaryProps,
+} from './renderers/array/array-item-issue.client'
+export { buildFieldRendererIds } from './renderers/field-renderer-config.lib'
+export {
+  fieldArrayItemListClasses,
+  type FieldGroupLegendSize,
+  type FieldSeparator,
+  type FieldStackLayout,
+  type FieldStackRhythm,
 } from '../components/ui/field.variants'
 export type {
   FieldStackDependentsChromeScope,

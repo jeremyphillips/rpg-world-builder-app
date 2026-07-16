@@ -1,0 +1,519 @@
+[
+  {
+    "id": "srd-cc-5.2.1:identify",
+    "slug": "identify",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Identify",
+    "level": 1,
+    "description": "<p>You touch an object throughout the spell's casting. If the object is a magic item or some other magical object, you learn its properties and how to use them, whether it requires Attunement, and how many charges it has, if any. You learn whether any ongoing spells are affecting the item and what they are. If the item was created by a spell, you learn that spell's name.</p><p>If you instead touch a creature throughout the casting, you learn which ongoing spells, if any, are currently affecting it.</p>",
+    "school": "divination",
+    "classIds": ["bard", "wizard"],
+    "tags": {
+      "roles": ["detection"],
+      "functions": ["utility"]
+    },
+    "castingTime": {
+      "normal": {
+        "value": 1,
+        "unit": "minute"
+      },
+      "canBeCastAsRitual": true
+    },
+    "range": {
+      "kind": "touch"
+    },
+    "duration": {
+      "kind": "instantaneous"
+    },
+    "components": {
+      "verbal": true,
+      "somatic": true,
+      "material": {
+        "description": "a pearl worth 100+ GP"
+      }
+    },
+    "modeling": {
+      "blocker": {
+        "code": "effect-schema-missing",
+        "capabilityId": "information-reveal"
+      }
+    }
+  },
+  {
+    "id": "srd-cc-5.2.1:illusory-script",
+    "slug": "illusory-script",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Illusory Script",
+    "level": 1,
+    "description": "<p>You write on parchment, paper, or another suitable material and imbue it with an illusion that lasts for the duration. To you and any creatures you designate when you cast the spell, the writing appears normal, seems to be written in your hand, and conveys whatever meaning you intended when you wrote the text. To all others, the writing appears as if it were written in an unknown or magical script that is unintelligible. Alternatively, the illusion can alter the meaning, handwriting, and language of the text, though the language must be one you know.</p><p>If the spell is dispelled, the original script and the illusion both disappear.</p><p>A creature that has Truesight can read the hidden message.</p>",
+    "school": "illusion",
+    "classIds": ["bard", "warlock", "wizard"],
+    "tags": {
+      "functions": ["deception", "utility"]
+    },
+    "castingTime": {
+      "normal": {
+        "value": 1,
+        "unit": "minute"
+      },
+      "canBeCastAsRitual": true
+    },
+    "range": {
+      "kind": "touch"
+    },
+    "duration": {
+      "kind": "timed",
+      "value": 10,
+      "unit": "day"
+    },
+    "components": {
+      "somatic": true,
+      "material": {
+        "description": "ink worth 10+ GP, which the spell consumes"
+      }
+    },
+    "modeling": {
+      "blocker": {
+        "code": "effect-schema-missing",
+        "capabilityId": "illusion"
+      },
+      "gaps": [
+        {
+          "code": "choice-model-missing",
+          "note": "Designated viewers at cast time stay prose"
+        }
+      ]
+    }
+  },
+  {
+    "id": "srd-cc-5.2.1:inflict-wounds",
+    "slug": "inflict-wounds",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Inflict Wounds",
+    "level": 1,
+    "description": "<p>A creature you touch makes a Constitution saving throw, taking 2d10 Necrotic damage on a failed save or half as much damage on a successful one.</p>",
+    "school": "necromancy",
+    "classIds": ["cleric"],
+    "tags": {
+      "damageTypes": ["necrotic"],
+      "roles": ["damage"]
+    },
+    "castingTime": {
+      "normal": {
+        "value": 1,
+        "unit": "action"
+      },
+      "canBeCastAsRitual": false
+    },
+    "range": {
+      "kind": "touch"
+    },
+    "duration": {
+      "kind": "instantaneous"
+    },
+    "components": {
+      "verbal": true,
+      "somatic": true
+    },
+    "higherLevelSlotEffect": "<p>The damage increases by 1d10 for each spell slot level above 1.</p>",
+    "resolution": {
+      "selectionMode": "targets",
+      "target": {
+        "count": 1,
+        "countKind": "exact",
+        "kind": "creature",
+        "proximity": {
+          "kind": "touch"
+        }
+      },
+      "method": {
+        "kind": "saving-throw",
+        "ability": "con"
+      },
+      "effects": [
+        {
+          "id": "damage",
+          "kind": "damage",
+          "roll": {
+            "dice": {
+              "count": 2,
+              "faces": 10
+            }
+          },
+          "damageType": "necrotic"
+        }
+      ],
+      "outcomes": [
+        {
+          "result": "failed-save",
+          "applications": [
+            {
+              "effectId": "damage",
+              "amount": "full"
+            }
+          ]
+        },
+        {
+          "result": "successful-save",
+          "applications": [
+            {
+              "effectId": "damage",
+              "amount": "half"
+            }
+          ]
+        }
+      ]
+    },
+    "modeling": {
+      "status": "mechanics-ready"
+    }
+  },
+  {
+    "id": "srd-cc-5.2.1:jump",
+    "slug": "jump",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Jump",
+    "level": 1,
+    "description": "<p>You touch a willing creature. Once on each of its turns until the spell ends, that creature can jump up to 30 feet by spending 10 feet of movement.</p>",
+    "school": "transmutation",
+    "classIds": ["druid", "ranger", "sorcerer", "wizard"],
+    "tags": {
+      "roles": ["buff", "movement"]
+    },
+    "castingTime": {
+      "normal": {
+        "value": 1,
+        "unit": "bonus-action"
+      },
+      "canBeCastAsRitual": false
+    },
+    "range": {
+      "kind": "touch"
+    },
+    "duration": {
+      "kind": "timed",
+      "value": 1,
+      "unit": "minute"
+    },
+    "components": {
+      "verbal": true,
+      "somatic": true,
+      "material": {
+        "description": "a grasshopper's hind leg"
+      }
+    },
+    "higherLevelSlotEffect": "<p>You can target one additional creature for each spell slot level above 1.</p>",
+    "modeling": {
+      "blocker": {
+        "code": "effect-schema-missing",
+        "capabilityId": "movement"
+      },
+      "gaps": [
+        {
+          "code": "dynamic-target-count",
+          "note": "Slot +1 target per level above 1"
+        }
+      ]
+    }
+  },
+  {
+    "id": "srd-cc-5.2.1:longstrider",
+    "slug": "longstrider",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Longstrider",
+    "description": "<p>You touch a creature. The target's Speed increases by 10 feet until the spell ends.</p>",
+    "school": "transmutation",
+    "level": 1,
+    "classIds": ["bard", "druid", "ranger", "wizard"],
+    "tags": {
+      "roles": ["buff", "movement"],
+      "functions": ["utility"]
+    },
+    "castingTime": {
+      "normal": {
+        "value": 1,
+        "unit": "action"
+      },
+      "canBeCastAsRitual": false
+    },
+    "range": {
+      "kind": "touch"
+    },
+    "duration": {
+      "kind": "timed",
+      "value": 1,
+      "unit": "hour"
+    },
+    "components": {
+      "verbal": true,
+      "somatic": true,
+      "material": {
+        "description": "a pinch of dirt"
+      }
+    },
+    "higherLevelSlotEffect": "<p>You can target one additional creature for each spell slot level above 1.</p>",
+    "modeling": {
+      "blocker": {
+        "code": "effect-schema-missing",
+        "capabilityId": "stat-modifier",
+        "note": "Future movement-modifier may group speed changes more usefully"
+      },
+      "gaps": [
+        {
+          "code": "dynamic-target-count",
+          "note": "Slot +1 target per level above 1"
+        }
+      ]
+    }
+  },
+  {
+    "id": "srd-cc-5.2.1:mage-armor",
+    "slug": "mage-armor",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Mage Armor",
+    "level": 1,
+    "description": "<p>You touch a willing creature who isn't wearing armor. Until the spell ends, the target's base AC becomes 13 plus its Dexterity modifier. The spell ends early if the target dons armor.</p>",
+    "school": "abjuration",
+    "classIds": ["sorcerer", "wizard"],
+    "tags": {
+      "roles": ["buff", "warding"]
+    },
+    "castingTime": {
+      "normal": {
+        "value": 1,
+        "unit": "action"
+      },
+      "canBeCastAsRitual": false
+    },
+    "range": {
+      "kind": "touch"
+    },
+    "duration": {
+      "kind": "timed",
+      "value": 8,
+      "unit": "hour"
+    },
+    "components": {
+      "verbal": true,
+      "somatic": true,
+      "material": {
+        "description": "a piece of cured leather"
+      }
+    },
+    "modeling": {
+      "blocker": {
+        "code": "effect-schema-missing",
+        "capabilityId": "stat-modifier"
+      },
+      "gaps": [
+        {
+          "code": "object-state-awareness",
+          "note": "Target must not be wearing armor"
+        },
+        {
+          "code": "conditional-effect-model-missing",
+          "note": "Spell ends early if target dons armor"
+        }
+      ]
+    }
+  },
+  {
+    "id": "srd-cc-5.2.1:magic-missile",
+    "slug": "magic-missile",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Magic Missile",
+    "level": 1,
+    "description": "<p>You create three glowing darts of magical force. Each dart strikes a creature of your choice that you can see within range. A dart deals 1d4 + 1 Force damage to its target. The darts all strike simultaneously, and you can direct them to hit one creature or several.</p>",
+    "school": "evocation",
+    "classIds": ["sorcerer", "wizard"],
+    "tags": {
+      "damageTypes": ["force"],
+      "roles": ["damage"]
+    },
+    "castingTime": {
+      "normal": {
+        "value": 1,
+        "unit": "action"
+      },
+      "canBeCastAsRitual": false
+    },
+    "range": {
+      "kind": "distance",
+      "value": {
+        "value": 120,
+        "unit": "ft"
+      }
+    },
+    "duration": {
+      "kind": "instantaneous"
+    },
+    "components": {
+      "verbal": true,
+      "somatic": true
+    },
+    "higherLevelSlotEffect": "<p>The spell creates one more dart for each spell slot level above 1.</p>",
+    "resolution": {
+      "selectionMode": "targets",
+      "target": {
+        "count": 1,
+        "countKind": "exact",
+        "kind": "creature",
+        "proximity": {
+          "kind": "distance",
+          "distance": {
+            "value": 120,
+            "unit": "ft"
+          }
+        }
+      },
+      "method": {
+        "kind": "automatic"
+      },
+      "applicationPattern": {
+        "kind": "projectiles",
+        "count": {
+          "type": "fixed",
+          "value": 3
+        },
+        "unitLabel": {
+          "singular": "dart",
+          "plural": "darts"
+        },
+        "applicationMode": "per-projectile"
+      },
+      "effects": [
+        {
+          "id": "damage",
+          "kind": "damage",
+          "roll": {
+            "dice": {
+              "count": 1,
+              "faces": 4
+            },
+            "flat": 1
+          },
+          "damageType": "force"
+        }
+      ],
+      "outcomes": [
+        {
+          "result": "applied",
+          "applications": [
+            {
+              "effectId": "damage",
+              "amount": "full"
+            }
+          ]
+        }
+      ],
+      "progression": {
+        "basis": "spell-slot-level",
+        "tracks": [
+          {
+            "kind": "linear",
+            "reference": {
+              "subject": {
+                "kind": "application-pattern"
+              },
+              "property": "projectile-count"
+            },
+            "increment": {
+              "kind": "count",
+              "count": 1
+            }
+          }
+        ]
+      }
+    },
+    "modeling": {
+      "status": "meaningful-partial",
+      "gaps": [
+        {
+          "code": "projectile-target-allocation",
+          "note": "Each dart may select a distinct creature within range"
+        },
+        {
+          "code": "dynamic-target-count",
+          "note": "Slot level above 1 adds one projectile (dart), not additional target capacity"
+        }
+      ]
+    }
+  },
+  {
+    "id": "srd-cc-5.2.1:purify-food-and-drink",
+    "slug": "purify-food-and-drink",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Purify Food and Drink",
+    "level": 1,
+    "description": "<p>You remove poison and rot from nonmagical food and drink in a 5-foot-radius Sphere centered on a point within range.</p>",
+    "school": "transmutation",
+    "classIds": ["cleric", "druid", "paladin"],
+    "tags": {
+      "functions": ["utility"]
+    },
+    "castingTime": {
+      "normal": {
+        "value": 1,
+        "unit": "action"
+      },
+      "canBeCastAsRitual": true
+    },
+    "range": {
+      "kind": "distance",
+      "value": {
+        "value": 10,
+        "unit": "ft"
+      }
+    },
+    "duration": {
+      "kind": "instantaneous"
+    },
+    "components": {
+      "verbal": true,
+      "somatic": true
+    },
+    "modeling": {
+      "blocker": {
+        "code": "effect-schema-missing"
+      },
+      "gaps": [
+        {
+          "code": "object-state-awareness",
+          "note": "Nonmagical food and drink in sphere"
+        }
+      ]
+    }
+  }
+]

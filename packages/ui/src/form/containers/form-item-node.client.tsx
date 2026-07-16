@@ -10,11 +10,9 @@ import {
   StackSection,
   type RenderNestedFormItemsProps,
 } from './form-stack-section.client'
-import {
-  ArrayFormItemSection,
-  ConditionalArrayField,
-} from '../renderers/array-field-renderer.client'
-import { SlotFormItemSection } from '../renderers/slot-field-renderer.client'
+import { ArrayFormItemSection } from '../renderers/array/array-form-item-section.client'
+import { ConditionalArrayField } from '../renderers/array/conditional-array-field.client'
+import { SlotFormItemSection } from '../renderers/fields/slot-field-renderer.client'
 
 export interface NestedFormItemsProps {
   items: Array<FormItem | RowConfig>

@@ -38,6 +38,23 @@
       "material": {
         "description": "iron filings"
       }
+    },
+    "modeling": {
+      "blocker": {
+        "code": "effect-schema-missing",
+        "capabilityId": "persistent-zone",
+        "note": "Antimagic suppression emanation"
+      },
+      "gaps": [
+        {
+          "code": "moving-aura-origin",
+          "note": "Caster-following 10-foot emanation stays prose"
+        },
+        {
+          "code": "conditional-effect-model-missing",
+          "note": "Suppression, artifact/deity exceptions, and portal closure stay prose"
+        }
+      ]
     }
   }
 ]

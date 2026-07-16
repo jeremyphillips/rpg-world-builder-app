@@ -18,7 +18,9 @@ import {
 export type CollapsibleListItemShellTone =
   | 'default'
   | 'main'
+  | 'elevated'
   | 'subtle'
+  | 'medium'
   | 'warning'
   | 'error'
   | 'catalog'

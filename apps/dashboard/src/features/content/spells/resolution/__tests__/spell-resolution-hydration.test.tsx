@@ -1,7 +1,7 @@
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { loadSeedSpells, SRD_521_SPELL_SEED_RESOLUTION_TIER_A_SLUGS } from '@rpg/catalog/spells'
-import { CHILL_TOUCH_RESOLUTION } from '@rpg/contracts'
+import { type Spell } from '@rpg/contracts'
 import { TabbedForm } from '@rpg/ui/form'
 import { beforeAll, describe, expect, it } from 'vitest'
 
@@ -10,8 +10,7 @@ import { makeContentFormCtx } from '../../../lib/fixtures/content-form-ctx'
 import { buildSpellTabs, spellFormSchema } from '../../lib/spell-form-fields'
 import { spellFormDef } from '../../lib/spell-form-def'
 import { spellToFormValues } from '../../lib/spell-form-values'
-import { resolutionToStored } from '../lib/form/resolution-form-values'
-import { RESOLUTION_SECTION_LABELS } from '../lib/form/resolution-form-labels'
+import { resolutionToForm, resolutionToStored } from '../lib/form/resolution-form-values'
 import { RESOLUTION_FORM_FIXTURES } from '../fixtures'
 
 const formCtx = makeContentFormCtx({
@@ -34,9 +33,32 @@ const formHydratableResolutionSlugs = [
   'eldritch-blast',
 ] as const
 
-const modeledSpell = loadSeedSpells('srd-cc-5.2.1').find((spell) => spell.slug === 'chill-touch')!
+const editorEligibleSpell = {
+  ...loadSeedSpells('srd-cc-5.2.1').find((spell) => spell.slug === 'chill-touch')!,
+  modeling: {
+    reviewedAt: '2026-07-15T00:00:00.000Z',
+    status: 'meaningful-partial' as const,
+  },
+}
+
+const belowEditorThresholdSpell = (() => {
+  const { modeling: _modeling, ...spell } = loadSeedSpells('srd-cc-5.2.1').find(
+    (entry) => entry.slug === 'chill-touch',
+  )!
+  return spell
+})()
 
 const unmodeledSpell = loadSeedSpells('srd-cc-5.2.1').find((spell) => spell.slug === 'hex')!
+
+function withEditorEligibility(spell: Spell): Spell {
+  return {
+    ...spell,
+    modeling: {
+      reviewedAt: '2026-07-15T00:00:00.000Z',
+      status: 'meaningful-partial',
+    },
+  }
+}
 
 function renderSpellTabbedForm(defaultValues: ReturnType<typeof spellToFormValues>) {
   const tabs = buildSpellTabs(formCtx)
@@ -54,12 +76,21 @@ function renderSpellTabbedForm(defaultValues: ReturnType<typeof spellToFormValue
 }
 
 describe('spell resolution tab hydration', () => {
-  it('renders the editor immediately for a modeled spell', async () => {
-    renderSpellTabbedForm(spellToFormValues(modeledSpell))
+  it('renders the editor for editor-eligible spells', async () => {
+    renderSpellTabbedForm(spellToFormValues(editorEligibleSpell))
 
     await waitFor(() => {
       expect(screen.queryByRole('button', { name: /add resolution/i })).not.toBeInTheDocument()
       expect(screen.getAllByText('Melee spell attack').length).toBeGreaterThan(0)
+    })
+  })
+
+  it('renders the empty state when resolution exists but status is below meaningful-partial', async () => {
+    renderSpellTabbedForm(spellToFormValues(belowEditorThresholdSpell))
+
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: /add resolution/i })).toBeInTheDocument()
+      expect(screen.queryByText('Melee spell attack')).not.toBeInTheDocument()
     })
   })
 
@@ -77,7 +108,7 @@ describe('spell resolution tab hydration', () => {
       <TabbedForm
         schema={spellFormSchema}
         tabs={buildSpellTabs(formCtx).filter((tab) => tab.id === 'resolution')}
-        defaultValues={spellToFormValues(modeledSpell)}
+        defaultValues={spellToFormValues(editorEligibleSpell)}
         onSubmit={() => undefined}
         footer={(form) => {
           isDirty = form.formState.isDirty
@@ -112,15 +143,15 @@ describe('spell resolution tab hydration', () => {
     await user.click(screen.getByRole('button', { name: /add resolution/i }))
 
     await waitFor(() => {
-      expect(screen.getAllByText('Target').length).toBeGreaterThan(0)
+      expect(screen.getAllByText('Selection').length).toBeGreaterThan(0)
       expect(screen.getAllByText('Check').length).toBeGreaterThan(0)
-      expect(screen.getAllByText('Effects').length).toBeGreaterThan(0)
+      expect(screen.getAllByText('Effects & outcomes').length).toBeGreaterThan(0)
       expect(isDirty).toBe(true)
     })
   })
 
   it('remounts cleanly when switching between modeled and unmodeled spells', async () => {
-    const modeledDefaults = spellToFormValues(modeledSpell)
+    const modeledDefaults = spellToFormValues(editorEligibleSpell)
     const unmodeledDefaults = spellToFormValues(unmodeledSpell)
     const resolutionTab = buildSpellTabs(formCtx).filter((tab) => tab.id === 'resolution')
 
@@ -176,7 +207,7 @@ describe('spell resolution tab hydration', () => {
     const spells = loadSeedSpells('srd-cc-5.2.1')
 
     for (const slug of formHydratableResolutionSlugs) {
-      const spell = spells.find((entry) => entry.slug === slug)!
+      const spell = withEditorEligibility(spells.find((entry) => entry.slug === slug)!)
       const formValues = spellToFormValues(spell)
 
       expect(formValues.resolution, slug).toBeDefined()
@@ -185,16 +216,18 @@ describe('spell resolution tab hydration', () => {
   })
 
   it('preserves normalized resolution shape when saving without edits', () => {
-    const formValues = spellToFormValues(modeledSpell)
+    const formValues = spellToFormValues(editorEligibleSpell)
     const input = spellFormDef.toInput(formValues)
 
     expect(input).not.toHaveProperty('resolution')
-    expect(resolutionToStored(formValues.resolution)).toEqual(CHILL_TOUCH_RESOLUTION)
-    expect(formValues.resolution).toEqual(RESOLUTION_FORM_FIXTURES.chillTouch)
+    expect(resolutionToStored(formValues.resolution)).toEqual(editorEligibleSpell.resolution)
+    expect(formValues.resolution).toEqual(resolutionToForm(editorEligibleSpell.resolution!))
   })
 
   it('renders seeded damage type and roll for Tier A acid-splash without marking dirty', async () => {
-    const acidSplash = loadSeedSpells('srd-cc-5.2.1').find((spell) => spell.slug === 'acid-splash')!
+    const acidSplash = withEditorEligibility(
+      loadSeedSpells('srd-cc-5.2.1').find((spell) => spell.slug === 'acid-splash')!,
+    )
     let isDirty = false
 
     render(
@@ -219,7 +252,7 @@ describe('spell resolution tab hydration', () => {
   })
 
   it('renders seeded necrotic damage for Tier A chill-touch', async () => {
-    renderSpellTabbedForm(spellToFormValues(modeledSpell))
+    renderSpellTabbedForm(spellToFormValues(editorEligibleSpell))
 
     await waitFor(() => {
       expect(screen.getByRole('combobox', { name: 'Damage type' })).toHaveTextContent('Necrotic')
@@ -228,10 +261,10 @@ describe('spell resolution tab hydration', () => {
     })
   })
 
-  it('hydrates Eldritch Blast hybrid resolution with per-beam force damage', async () => {
-    const eldritchBlast = loadSeedSpells('srd-cc-5.2.1').find(
-      (spell) => spell.slug === 'eldritch-blast',
-    )!
+  it('hydrates Eldritch Blast resolution with projectiles and per-beam force damage', async () => {
+    const eldritchBlast = withEditorEligibility(
+      loadSeedSpells('srd-cc-5.2.1').find((spell) => spell.slug === 'eldritch-blast')!,
+    )
     let isDirty = false
 
     render(
@@ -249,19 +282,20 @@ describe('spell resolution tab hydration', () => {
 
     await waitFor(() => {
       expect(screen.queryByRole('button', { name: /add resolution/i })).not.toBeInTheDocument()
-      expect(screen.getByText(RESOLUTION_SECTION_LABELS.hybridNoticeTitle)).toBeInTheDocument()
+      expect(screen.getAllByText('Projectiles').length).toBeGreaterThan(0)
       expect(screen.getByRole('combobox', { name: 'Damage type' })).toHaveTextContent('Force')
       expect(screen.getByRole('spinbutton', { name: 'Damage roll Number of dice' })).toHaveValue(1)
       expect(screen.getByRole('combobox', { name: 'Die size' })).toHaveTextContent('d10')
     })
+
     expect(isDirty).toBe(false)
-    expect(eldritchBlast.effects?.length).toBeGreaterThan(1)
+    expect(eldritchBlast.resolution?.applicationPattern?.kind).toBe('projectiles')
   })
 
   it('hides hybrid notice for magic-missile when application pattern is projectiles', async () => {
-    const magicMissile = loadSeedSpells('srd-cc-5.2.1').find(
-      (spell) => spell.slug === 'magic-missile',
-    )!
+    const magicMissile = withEditorEligibility(
+      loadSeedSpells('srd-cc-5.2.1').find((spell) => spell.slug === 'magic-missile')!,
+    )
 
     render(
       <TabbedForm
@@ -274,14 +308,15 @@ describe('spell resolution tab hydration', () => {
 
     await waitFor(() => {
       expect(screen.getAllByText('Projectiles').length).toBeGreaterThan(0)
-      expect(screen.getAllByText('Applied per dart').length).toBeGreaterThan(0)
+      expect(screen.getAllByText('Applied once per dart').length).toBeGreaterThan(0)
     })
-    expect(screen.queryByText(RESOLUTION_SECTION_LABELS.hybridNoticeTitle)).not.toBeInTheDocument()
     expect(magicMissile.resolution?.applicationPattern?.kind).toBe('projectiles')
   })
 
   it('renders automatic healing for cure-wounds without marking dirty', async () => {
-    const cureWounds = loadSeedSpells('srd-cc-5.2.1').find((spell) => spell.slug === 'cure-wounds')!
+    const cureWounds = withEditorEligibility(
+      loadSeedSpells('srd-cc-5.2.1').find((spell) => spell.slug === 'cure-wounds')!,
+    )
     let isDirty = false
 
     render(
@@ -314,15 +349,14 @@ describe('spell resolution tab hydration', () => {
       expect(screen.getByRole('button', { name: /add resolution/i })).toBeInTheDocument()
       expect(screen.queryByRole('combobox', { name: 'Damage type' })).not.toBeInTheDocument()
     })
-    expect(formValues.effects?.length).toBeGreaterThan(0)
     expect(formValues.resolution).toBeUndefined()
   })
 
   it('hides saving throw ability when switching from saving throw to attack', async () => {
     const user = userEvent.setup()
-    const inflictWounds = loadSeedSpells('srd-cc-5.2.1').find(
-      (spell) => spell.slug === 'inflict-wounds',
-    )!
+    const inflictWounds = withEditorEligibility(
+      loadSeedSpells('srd-cc-5.2.1').find((spell) => spell.slug === 'inflict-wounds')!,
+    )
 
     renderSpellTabbedForm(spellToFormValues(inflictWounds))
 

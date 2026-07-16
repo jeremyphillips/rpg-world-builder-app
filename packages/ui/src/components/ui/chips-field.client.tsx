@@ -3,6 +3,9 @@
 import * as React from 'react'
 
 import { cn } from '../../lib/utils'
+import type { FieldChrome } from './field-chrome.variants'
+import { FieldChromeShell } from './field-chrome-shell'
+import { hasActiveFieldChrome } from './field-chrome.variants'
 import {
   Field,
   FieldErrorText,
@@ -122,6 +125,7 @@ export interface ChipsFieldProps extends SelectFieldValueProps {
   chipSize?: ChipSize
   width?: FieldWidth
   hintPosition?: FieldHintPosition
+  chrome?: FieldChrome
   showSelectedCheckmark?: boolean
 }
 
@@ -149,6 +153,7 @@ export function ChipsField({
   size = 'md',
   chipSize,
   width,
+  chrome,
   showSelectedCheckmark,
 }: ChipsFieldProps) {
   const resolvedChipSize = chipSize ?? size
@@ -165,60 +170,68 @@ export function ChipsField({
     hintId,
   )
 
-  return (
-    <fieldset
+  const chipsOptions = (
+    <ChipsFieldOptions
       id={id}
-      aria-describedby={resolvedDescribedBy}
-      aria-invalid={hasError || undefined}
+      options={options}
+      labelledBy={legendId}
+      multiple={multiple}
+      max={max}
+      value={value}
+      onChange={onChange}
       disabled={disabled}
-      className={cn(
-        fieldSetResetClasses,
-        fieldAnatomyStackClasses,
-        width === 'auto' ? 'w-auto' : 'w-full',
-      )}
-      onBlur={onBlur}
-    >
-      <legend
-        id={legendId}
-        data-required={required || undefined}
-        className={fieldLabelVariants({ size })}
-      >
-        <FieldLabelContent label={label} info={info} />
-      </legend>
+      chipSize={resolvedChipSize}
+      showSelectedCheckmark={showSelectedCheckmark}
+    />
+  )
 
-      {hintPosition === 'below-label' ? (
-        <FieldHintBelowLabel hint={hint} error={error} hintId={hintId} />
-      ) : null}
-
-      <ChipsFieldOptions
+  return (
+    <div className={width === 'auto' ? 'w-auto' : 'w-full'}>
+      <fieldset
         id={id}
-        options={options}
-        labelledBy={legendId}
-        multiple={multiple}
-        max={max}
-        value={value}
-        onChange={onChange}
+        aria-describedby={resolvedDescribedBy}
+        aria-invalid={hasError || undefined}
         disabled={disabled}
-        chipSize={resolvedChipSize}
-        showSelectedCheckmark={showSelectedCheckmark}
-      />
+        className={cn(fieldSetResetClasses, fieldAnatomyStackClasses)}
+        onBlur={onBlur}
+      >
+        <legend
+          id={legendId}
+          data-required={required || undefined}
+          className={fieldLabelVariants({ size })}
+        >
+          <FieldLabelContent label={label} info={info} />
+        </legend>
 
-      {hintPosition === 'below-label' ? (
-        error ? (
-          <FieldErrorText id={errorId} size={size}>
-            {error}
-          </FieldErrorText>
-        ) : null
-      ) : (
-        <FieldHintErrorBelowControl
-          hint={hint}
-          error={error}
-          hintId={hintId}
-          errorId={errorId}
-          size={size}
-        />
-      )}
-    </fieldset>
+        {hintPosition === 'below-label' ? (
+          <FieldHintBelowLabel hint={hint} error={error} hintId={hintId} />
+        ) : null}
+
+        {hasActiveFieldChrome(chrome) ? (
+          <FieldChromeShell chrome={chrome} size={size}>
+            {chipsOptions}
+          </FieldChromeShell>
+        ) : (
+          chipsOptions
+        )}
+
+        {hintPosition === 'below-label' ? (
+          error ? (
+            <FieldErrorText id={errorId} size={size}>
+              {error}
+            </FieldErrorText>
+          ) : null
+        ) : (
+          <FieldHintErrorBelowControl
+            hint={hint}
+            error={error}
+            hintId={hintId}
+            errorId={errorId}
+            size={size}
+          />
+        )}
+      </fieldset>
+    </div>
   )
 }
 

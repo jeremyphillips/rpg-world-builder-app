@@ -41,7 +41,19 @@
         "description": "a strip of white cloth"
       }
     },
-    "higherLevelSlotEffect": "<p>Each target's Hit Points increase by 5 for each spell slot level above 2.</p>"
+    "higherLevelSlotEffect": "<p>Each target's Hit Points increase by 5 for each spell slot level above 2.</p>",
+    "modeling": {
+      "blocker": {
+        "code": "effect-schema-missing",
+        "capabilityId": "stat-modifier"
+      },
+      "gaps": [
+        {
+          "code": "progression-schema-missing",
+          "note": "Slot +5 HP scaling stays prose"
+        }
+      ]
+    }
   },
   {
     "id": "srd-cc-5.2.1:darkness",
@@ -93,6 +105,26 @@
       "material": {
         "description": "bat fur and a piece of coal"
       }
+    },
+    "modeling": {
+      "blocker": {
+        "code": "effect-schema-missing",
+        "capabilityId": "persistent-zone"
+      },
+      "gaps": [
+        {
+          "code": "multi-mode-choice",
+          "note": "Point sphere vs object emanation stays prose"
+        },
+        {
+          "code": "object-state-awareness",
+          "note": "Object not worn or carried stays prose"
+        },
+        {
+          "code": "conditional-effect-model-missing",
+          "note": "Dispel lower-level light overlap stays prose"
+        }
+      ]
     }
   },
   {
@@ -135,7 +167,27 @@
         "description": "a hot pepper"
       }
     },
-    "higherLevelSlotEffect": "<p>The damage increases by 1d6 for each spell slot level above 2.</p>"
+    "higherLevelSlotEffect": "<p>The damage increases by 1d6 for each spell slot level above 2.</p>",
+    "modeling": {
+      "blocker": {
+        "code": "effect-schema-missing",
+        "capabilityId": "action-grant"
+      },
+      "gaps": [
+        {
+          "code": "multi-mode-choice",
+          "note": "Damage type choice stays prose"
+        },
+        {
+          "code": "progression-schema-missing",
+          "note": "Slot +1d6 damage scaling stays prose"
+        },
+        {
+          "code": "conditional-effect-model-missing",
+          "note": "Delegated Magic-action breath stays prose"
+        }
+      ]
+    }
   },
   {
     "id": "srd-cc-5.2.1:lesser-restoration",
@@ -170,6 +222,18 @@
     "components": {
       "verbal": true,
       "somatic": true
+    },
+    "modeling": {
+      "blocker": {
+        "code": "effect-schema-missing",
+        "capabilityId": "condition"
+      },
+      "gaps": [
+        {
+          "code": "choice-model-missing",
+          "note": "Pick condition from list stays prose"
+        }
+      ]
     }
   },
   {
@@ -215,6 +279,22 @@
       "material": {
         "description": "a metal spring"
       }
+    },
+    "modeling": {
+      "blocker": {
+        "code": "effect-schema-missing",
+        "capabilityId": "movement"
+      },
+      "gaps": [
+        {
+          "code": "conditional-effect-model-missing",
+          "note": "Unwilling Con save stays prose"
+        },
+        {
+          "code": "object-state-awareness",
+          "note": "Creature vs loose object stays prose"
+        }
+      ]
     }
   },
   {
@@ -249,6 +329,12 @@
     },
     "components": {
       "verbal": true
+    },
+    "modeling": {
+      "blocker": {
+        "code": "effect-schema-missing",
+        "capabilityId": "movement"
+      }
     }
   },
   {
@@ -298,6 +384,18 @@
       "material": {
         "description": "ashes from burned mistletoe"
       }
+    },
+    "modeling": {
+      "blocker": {
+        "code": "effect-schema-missing",
+        "capabilityId": "stat-modifier"
+      },
+      "gaps": [
+        {
+          "code": "chosen-within-area",
+          "note": "Allies chosen within aura stay prose"
+        }
+      ]
     }
   },
   {
@@ -340,6 +438,18 @@
     "components": {
       "verbal": true,
       "somatic": true
+    },
+    "modeling": {
+      "blocker": {
+        "code": "effect-schema-missing",
+        "capabilityId": "condition"
+      },
+      "gaps": [
+        {
+          "code": "conditional-effect-model-missing",
+          "note": "Save branches, repeating saves, and 1d8 penalty stay prose"
+        }
+      ]
     }
   }
 ]

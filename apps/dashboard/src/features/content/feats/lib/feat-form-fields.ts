@@ -11,7 +11,7 @@ import {
 import { toOptions, type FieldVisibility, type FormItem } from '@rpg/ui/form'
 
 import { RequirementEditor } from '../components/requirement-editor.client'
-import { identityFields } from '../../lib/forms/fields/content-identity-form-fields'
+import { descriptionField, nameField } from '../../lib/forms/fields/content-identity-form-fields'
 import type { ContentFormCtx } from '../../lib/forms/content-form-registry'
 import { refineRequirementEditor } from './requirement-editor-form'
 import { prerequisiteEditorSchema } from './requirement-editor-form-schema'
@@ -59,30 +59,32 @@ function visibleWhenRepeatableNotes(): FieldVisibility {
 
 export function buildFeatFields(ctx: ContentFormCtx): FormItem[] {
   return [
-    { kind: 'group', legend: 'Identity', fields: identityFields(ctx) },
+    nameField(),
+    {
+      type: 'chips',
+      name: 'category',
+      label: 'Category',
+      options: featCategoryOptions,
+      multiple: false,
+      required: true,
+      chrome: { variant: 'outline' },
+    },
+    descriptionField(ctx),
     {
       kind: 'group',
-      legend: 'Classification',
+      legend: 'Prerequisites',
+      fieldsChrome: { variant: 'panel' },
       fields: [
         {
-          type: 'chips',
-          name: 'category',
-          label: 'Category',
-          options: featCategoryOptions,
-          multiple: false,
-          required: true,
+          kind: 'slot',
+          name: 'prerequisiteEditor',
+          render: () =>
+            createElement(RequirementEditor, {
+              name: 'prerequisiteEditor',
+              maxCharacterLevel: ctx.campaignRules?.maxCharacterLevel ?? MAX_CHARACTER_LEVEL,
+            }),
         },
       ],
-    },
-    {
-      kind: 'slot',
-      name: 'prerequisiteEditor',
-      label: 'Prerequisites',
-      render: () =>
-        createElement(RequirementEditor, {
-          name: 'prerequisiteEditor',
-          maxCharacterLevel: ctx.campaignRules?.maxCharacterLevel ?? MAX_CHARACTER_LEVEL,
-        }),
     },
     {
       kind: 'group',

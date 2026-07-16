@@ -25,6 +25,7 @@ export function coreAttributesFields(): FormItem[] {
           type: 'chips',
           name: 'primaryAbilities',
           label: 'Primary abilities',
+          chrome: { variant: 'outline' },
           options: abilityOptions,
           max: 2,
           required: true,

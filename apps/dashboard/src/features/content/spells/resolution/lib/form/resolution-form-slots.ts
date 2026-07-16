@@ -2,19 +2,22 @@ import { createElement } from 'react'
 import type { FormItem } from '@rpg/ui/form'
 
 import type { ContentFormCtx } from '../../../../lib/forms/content-form-registry'
+import { SpellResolutionEffectRemoveControl } from '../../components/effects/spell-resolution-effect-remove-control.client'
 import { SpellResolutionEffectAddControl } from '../../components/effects/spell-resolution-effect-add-control.client'
 import { SpellResolutionEffectsApplicationLabel } from '../../components/effects/spell-resolution-effects-application-label.client'
 import { SpellResolutionHowItResolves } from '../../components/method/spell-resolution-how-it-resolves.client'
 import { SpellResolutionProjectilesPreview } from '../../components/method/spell-resolution-how-it-resolves-projectiles.client'
 import { SpellResolutionChangeNotice } from '../../components/notices/spell-resolution-change-notice.client'
-import { SpellResolutionHybridNotice } from '../../components/notices/spell-resolution-hybrid-notice.client'
 import { ResolutionChangeConfirmDialog } from '../../components/notices/resolution-change-confirm-dialog.client'
-import { SpellResolutionOutcomesPreview } from '../../components/preview/spell-resolution-outcomes-preview.client'
+import { SpellResolutionOutcomes } from '../../components/outcomes/spell-resolution-outcomes.client'
+import { SpellResolutionProgression } from '../../components/progression/spell-resolution-progression.client'
 import { SpellResolutionPreview } from '../../components/preview/spell-resolution-preview.client'
 import { SpellResolutionProximitySelect } from '../../components/target/spell-resolution-proximity-select.client'
-import { formatEffectRowPrimary } from '../../../lib/effects/effect-display'
+import { SpellResolutionSelectionModeSelect } from '../../components/target/spell-resolution-selection-mode-select.client'
+import { SpellResolutionSelectionHints } from '../../components/target/spell-resolution-selection-hints.client'
+import { deriveDefaultEffectRecipient, type SpellResolutionTargetKind } from '@rpg/contracts'
+import { formatEffectRowPrimary, formatEffectRowSummary } from '../../../lib/effects/effect-display'
 import { resolutionEffectItemFields } from '../effects/resolution-effect-form-fields'
-import { formatResolutionEffectRowSummary } from '../selection/resolution-selection-options.lib'
 import { resolutionSelectionContextFromWatched } from '../selection/resolution-selection-context.lib'
 import { RESOLUTION_FIELD_LABELS, RESOLUTION_SECTION_LABELS } from './resolution-form-labels'
 import {
@@ -26,34 +29,49 @@ import {
   resolutionTargetFormFields,
   visibleWhenApplicationPatternKind,
 } from './resolution-target-form-fields'
+import { resolutionAreaFormFields } from './resolution-area-form-fields'
 
 const RESOLUTION_PREFIX = RESOLUTION_FIELD_NAME
 
 const RESOLUTION_SUMMARY_DEPENDS_ON = [
+  `${RESOLUTION_PREFIX}.selectionMode`,
+  `${RESOLUTION_PREFIX}.countKind`,
+  `${RESOLUTION_PREFIX}.areaOfEffect.shape`,
+  `${RESOLUTION_PREFIX}.originDistanceFt`,
   `${RESOLUTION_PREFIX}.proximityKind`,
   `${RESOLUTION_PREFIX}.targetKind`,
   `${RESOLUTION_PREFIX}.targetCount`,
   `${RESOLUTION_PREFIX}.methodKind`,
   `${RESOLUTION_PREFIX}.attackType`,
 ] as const
+// Effect row summaries (e.g. "1d10 force") react to target/method changes above.
 
 function resolutionEffectsArrayField(ctx: ContentFormCtx): FormItem {
   return {
     kind: 'array',
     name: `${RESOLUTION_PREFIX}.effects`,
-    legend: RESOLUTION_SECTION_LABELS.effects,
-    addLabel: 'Add effect',
-    hideAddControl: true,
+    legend: '',
+    // Nested inside Effects & outcomes → Authored effects groups (depth ≥ 2). @rpg/ui
+    // defaults nested arrays to compact unless itemVariant is explicit.
+    itemVariant: 'detailed',
+    hideAddAction: true, // Add menu is a sibling slot — options depend on live form state.
+    hideItemRemove: true, // Remove is in the header slot so it can confirm / read context.
+    itemRemoveSlot: {
+      name: '_resolutionEffectHeaderRemove',
+      render: () => createElement(SpellResolutionEffectRemoveControl),
+    },
     itemCollapsible: true,
     itemHeader: {
       fallback: (index) => `Effect ${index + 1}`,
       primary: (values, index) => formatEffectRowPrimary(values, index),
       summaryDependsOn: [...RESOLUTION_SUMMARY_DEPENDS_ON],
-      summary: (values, _index, watched) =>
-        formatResolutionEffectRowSummary(
-          values,
-          resolutionSelectionContextFromWatched(watched ?? {}),
-        ),
+      summary: (values, _index, watched) => {
+        const context = resolutionSelectionContextFromWatched(watched ?? {})
+        return formatEffectRowSummary(values, {
+          recipient: deriveDefaultEffectRecipient(context),
+          targetKind: context.targetKind as SpellResolutionTargetKind | undefined,
+        })
+      },
     },
     fields: resolutionEffectItemFields(ctx),
   }
@@ -74,6 +92,7 @@ function resolutionProjectilesFields(): FormItem[] {
         {
           kind: 'slot',
           name: '_resolutionProjectilesPreview',
+          // Live preview of authored projectile labels/count before save.
           render: () => createElement(SpellResolutionProjectilesPreview),
         },
         {
@@ -107,11 +126,71 @@ function resolutionProjectilesFields(): FormItem[] {
   ]
 }
 
+function resolutionOutcomeBranchesGroup(): FormItem {
+  return {
+    kind: 'group',
+    legend: RESOLUTION_SECTION_LABELS.outcomeBranches,
+    description: RESOLUTION_SECTION_LABELS.outcomesHint,
+    fields: [
+      {
+        kind: 'slot',
+        name: '_resolutionOutcomes',
+        // Branches are method-derived (hit/miss/save); inner fields live in SpellResolutionOutcomes.
+        render: () => createElement(SpellResolutionOutcomes),
+      },
+    ],
+  }
+}
+
+function resolutionEffectsAndOutcomesGroup(ctx: ContentFormCtx): FormItem {
+  return {
+    kind: 'group',
+    legend: RESOLUTION_SECTION_LABELS.effectsAndOutcomes,
+    description: RESOLUTION_SECTION_LABELS.effectsAndOutcomesHint,
+    fieldsChrome: { variant: 'inset' },
+    visibility: visibleWhenResolutionConfigured(),
+    fields: [
+      {
+        kind: 'group',
+        legend: RESOLUTION_SECTION_LABELS.authoredEffects,
+        description: RESOLUTION_SECTION_LABELS.authoredEffectsDescription,
+        fields: [
+          {
+            kind: 'stack',
+            className: 'gap-3',
+            fields: [
+              {
+                kind: 'slot',
+                name: '_resolutionEffectsApplicationLabel',
+                // Read-only label tying effects to the selected application pattern.
+                render: () => createElement(SpellResolutionEffectsApplicationLabel),
+              },
+              resolutionEffectsArrayField(ctx),
+              {
+                kind: 'slot',
+                name: '_resolutionEffectAddControl',
+                render: () => createElement(SpellResolutionEffectAddControl),
+              },
+            ],
+          },
+        ],
+      },
+      resolutionOutcomeBranchesGroup(),
+    ],
+  }
+}
+
+/** Outcome branches subgroup for isolated stories/tests. */
+export function resolutionOutcomeBranchesFields(): FormItem[] {
+  return [resolutionOutcomeBranchesGroup()]
+}
+
 /** Slot-backed and grouped fields shown when resolution is configured. */
 export function configuredResolutionFields(ctx: ContentFormCtx): FormItem[] {
   const configured = visibleWhenResolutionConfigured()
 
   return [
+    // Dialogs/notices mount here so they share form context but stay out of the layout flow.
     {
       kind: 'slot',
       name: '_resolutionChangeConfirm',
@@ -125,70 +204,64 @@ export function configuredResolutionFields(ctx: ContentFormCtx): FormItem[] {
       render: () => createElement(SpellResolutionChangeNotice),
     },
     {
-      kind: 'slot',
-      name: '_resolutionHybridNotice',
-      visibility: configured,
-      render: () => createElement(SpellResolutionHybridNotice),
-    },
-    {
-      kind: 'slot',
-      name: '_resolutionPreview',
-      visibility: configured,
-      render: () => createElement(SpellResolutionPreview),
-    },
-    {
       kind: 'group',
-      legend: RESOLUTION_SECTION_LABELS.target,
+      legend: RESOLUTION_SECTION_LABELS.selection,
+      fieldsChrome: { variant: 'panel' },
       visibility: configured,
       fields: [
+        {
+          kind: 'slot',
+          name: '_resolutionSelectionModeSelect',
+          render: () => createElement(SpellResolutionSelectionModeSelect),
+        },
+        {
+          kind: 'slot',
+          name: '_resolutionSelectionHints',
+          render: () => createElement(SpellResolutionSelectionHints),
+        },
         {
           kind: 'slot',
           name: '_resolutionProximitySelect',
           render: () => createElement(SpellResolutionProximitySelect),
         },
         ...resolutionTargetFormFields(),
+        ...resolutionAreaFormFields(),
       ],
     },
     {
       kind: 'group',
       legend: RESOLUTION_SECTION_LABELS.check,
+      fieldsChrome: { variant: 'panel' },
       visibility: configured,
       fields: [
         {
           kind: 'slot',
           name: '_resolutionHowItResolves',
+          // Attack vs save vs automatic — method fields are not a flat schema slice.
           render: () => createElement(SpellResolutionHowItResolves),
         },
       ],
     },
-    ...resolutionProjectilesFields(),
-    {
-      kind: 'slot',
-      name: '_resolutionEffectsApplicationLabel',
-      visibility: configured,
-      render: () => createElement(SpellResolutionEffectsApplicationLabel),
-    },
-    {
-      kind: 'slot',
-      name: '_resolutionEffectAddControl',
-      visibility: configured,
-      render: () => createElement(SpellResolutionEffectAddControl),
-    },
-    {
-      ...resolutionEffectsArrayField(ctx),
-      visibility: configured,
-    },
+    ...resolutionProjectilesFields(), // Only visible when application pattern is projectiles.
+    resolutionEffectsAndOutcomesGroup(ctx),
     {
       kind: 'group',
-      legend: RESOLUTION_SECTION_LABELS.outcomes,
+      legend: RESOLUTION_SECTION_LABELS.progression,
+      fieldsChrome: { variant: 'panel' },
       visibility: configured,
       fields: [
         {
           kind: 'slot',
-          name: '_resolutionOutcomesPreview',
-          render: () => createElement(SpellResolutionOutcomesPreview),
+          name: '_resolutionProgression',
+          render: () => createElement(SpellResolutionProgression),
         },
       ],
+    },
+    {
+      kind: 'slot',
+      name: '_resolutionPreview',
+      visibility: configured,
+      render: () => createElement(SpellResolutionPreview),
     },
   ]
 }

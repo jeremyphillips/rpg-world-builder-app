@@ -1,11 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import {
-  deriveEffectsModelingStatus,
-  EFFECTS_MODELING_STATUS,
-  EFFECTS_MODELING_STATUS_LABELS,
   formatAtomicEffectSummary,
-  getEffectsModelingStatusLabel,
   formatAtomicEffectSummaries,
   formatDamageValue,
   formatEffectRowSentence,
@@ -216,36 +212,5 @@ describe('formatAtomicEffectSummary', () => {
 describe('formatDamageValue', () => {
   it('formats typed damage rolls', () => {
     expect(formatDamageValue({ dice: { count: 8, faces: 6 } }, 'fire')).toBe('8d6 Fire damage')
-  })
-})
-
-describe('EFFECTS_MODELING_STATUS_LABELS', () => {
-  it('covers every modeling status', () => {
-    expect([...EFFECTS_MODELING_STATUS].sort()).toEqual(
-      Object.keys(EFFECTS_MODELING_STATUS_LABELS).sort(),
-    )
-  })
-
-  it('returns display labels for each status', () => {
-    expect(getEffectsModelingStatusLabel('partially-modeled')).toBe('Partially modeled')
-  })
-})
-
-describe('deriveEffectsModelingStatus', () => {
-  it('derives coarse status from effects presence', () => {
-    expect(deriveEffectsModelingStatus({ effects: undefined })).toBe('prose-only')
-    expect(deriveEffectsModelingStatus({ effects: [] })).toBe('prose-only')
-    expect(
-      deriveEffectsModelingStatus({
-        effects: [
-          {
-            id: 'fx-1',
-            kind: 'damage',
-            roll: { dice: { count: 8, faces: 6 } },
-            damageType: 'fire',
-          },
-        ],
-      }),
-    ).toBe('partially-modeled')
   })
 })

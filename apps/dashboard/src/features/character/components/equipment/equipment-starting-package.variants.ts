@@ -1,5 +1,5 @@
 export const equipmentStartingPackageCardClasses =
-  'overflow-hidden rounded-xl border border-border bg-card shadow-sm'
+  'overflow-hidden rounded-card border border-border bg-card shadow-sm'
 
 export const equipmentStartingPackageCardBodyClasses = 'divide-y divide-border'
 
@@ -11,7 +11,7 @@ export const equipmentStartingPackageFooterClasses =
 export const equipmentStartingPackageCustomizeReasonClasses = 'text-sm text-muted-foreground'
 
 export const equipmentPackageConversionEditorClasses =
-  'mt-4 overflow-hidden rounded-xl border border-border bg-card shadow-sm'
+  'mt-4 overflow-hidden rounded-card border border-border bg-card shadow-sm'
 
 export const equipmentPackageConversionEditorEmbeddedClasses = 'flex flex-col'
 

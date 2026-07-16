@@ -11,9 +11,12 @@ import { fieldGroupsForEquipmentKind } from '../../lib/shared/equipment-form-reg
 const ADVENTURING_GEAR_SEEDS = seedEquipmentOfKind('adventuring_gear')
 
 describe('adventuring gear kindFieldGroups', () => {
-  it('buildFields composes identity, economy, and registered adventuring gear group', () => {
-    const fields = expectComposedKindGroups('adventuring_gear', 'Adventuring Gear')
-    expect(fields.at(-1)).toEqual(fieldGroupsForEquipmentKind('adventuring_gear')?.[0])
+  it('buildFields composes name, kind group, economy, and description', () => {
+    const fields = expectComposedKindGroups('adventuring_gear', '')
+    const kindGroup = fields.find(
+      (field) => 'kind' in field && field.kind === 'group' && field.legend === '',
+    )
+    expect(kindGroup).toEqual(fieldGroupsForEquipmentKind('adventuring_gear')?.[0])
   })
 })
 

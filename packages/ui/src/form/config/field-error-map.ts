@@ -1,10 +1,10 @@
 import { fieldValidationMessages, midSentenceLabel, singularizeLabel } from '@rpg/contracts'
 
 import type { FieldConfig, FormItem } from '../field-config'
-import { arrayItemLabel } from './array-item-label.lib'
+import { arrayItemLabel } from './array/array-item-label.lib'
 import { fieldCategory } from './field-error-map-category.lib'
 import { registerFieldPaths, type RegistryEntry } from './field-error-map-register.lib'
-import { resolveArrayItemHeader } from './array-item-config.lib'
+import { resolveArrayItemHeader } from './array/array-item-config.lib'
 
 // ---------------------------------------------------------------------------
 // Field-aware Zod error map (tier 1 of the validation-message architecture).

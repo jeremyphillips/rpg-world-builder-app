@@ -1,10 +1,16 @@
 import {
+  buildDefaultOutcomeSlots,
+  defaultOriginFromSpellRange,
+  inferPointSelectionModeFromSpell,
+  inferSpellResolutionTargetCountKind,
   spellResolutionSchema,
   spellSchema,
   SPELL_RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID,
   SPELL_RESOLUTION_PRIMARY_HEALING_EFFECT_ID,
   SPELL_RESOLUTION_PRIMARY_TEMPORARY_HIT_POINTS_EFFECT_ID,
+  stripEmptyOutcomeSlots,
   type Ability,
+  type AreaGeometry,
   type Spell,
   type SpellAtomicEffect,
   type SpellDamageEffect,
@@ -13,22 +19,34 @@ import {
   type SpellResolutionEffect,
   type SpellResolutionEffectId,
   type SpellResolutionMethod,
+  type SpellResolutionOrigin,
+  type SpellResolutionSelectionMode,
   type SpellResolutionTarget,
+  type SpellResolutionTargetCountKind,
   type SpellResolutionTargetProximity,
   type SpellTemporaryHitPointsEffect,
 } from '@rpg/contracts'
 
+import { SRD_521_SPELL_RESOLUTION_DERIVATION_EFFECTS } from './spell-resolution-derivation-effects'
+
 export type ResolutionDerivationOverrides = {
   method?: SpellResolutionMethod
   saveAbility?: Ability
+  selectionMode?: SpellResolutionSelectionMode
   proximity?: SpellResolutionTargetProximity
   target?: {
     count?: number
+    countKind?: SpellResolutionTargetCountKind
     kind?: SpellResolutionTarget['kind']
     proximity?: SpellResolutionTargetProximity
   }
-  hitNote?: string
+  origin?: SpellResolutionOrigin
+  areaOfEffect?: AreaGeometry
   outcomes?: SpellResolution['outcomes']
+  /** Applies to the hit outcome branch when method is attack. */
+  hitNote?: string
+  /** Applies to the failed-save outcome branch when method is saving-throw. */
+  failedSaveNote?: string
   /** @deprecated Use proximity */
   range?: SpellResolutionTargetProximity
 }
@@ -46,13 +64,15 @@ type PrimaryResolutionEffectKind = (typeof PRIMARY_RESOLUTION_EFFECT_KINDS)[numb
 type PrimaryResolutionEffect = Extract<SpellAtomicEffect, { kind: PrimaryResolutionEffectKind }>
 
 /** First unlabeled roll-bearing effect — excludes hex-style extra-damage riders. */
-export function findPrimaryDamageEffect(effects: Spell['effects']): SpellDamageEffect | undefined {
+export function findPrimaryDamageEffect(
+  effects: readonly SpellAtomicEffect[] | null | undefined,
+): SpellDamageEffect | undefined {
   const primary = findPrimaryResolutionEffect(effects)
   return primary?.kind === 'damage' ? primary : undefined
 }
 
 export function findPrimaryResolutionEffect(
-  effects: Spell['effects'],
+  effects: readonly SpellAtomicEffect[] | null | undefined,
 ): PrimaryResolutionEffect | undefined {
   if (!effects?.length) return undefined
 
@@ -167,77 +187,111 @@ function buildMethod(
   return defaultMethodForPrimaryEffect(primary, spell, overrides)
 }
 
-function buildTarget(
+function resolveAreaOfEffect(
+  spell: Pick<Spell, 'areaOfEffect'>,
+  overrides: ResolutionDerivationOverrides,
+): AreaGeometry | undefined {
+  return overrides.areaOfEffect ?? spell.areaOfEffect
+}
+
+function buildSelfSelection(
+  spell: Pick<Spell, 'areaOfEffect'>,
+  overrides: ResolutionDerivationOverrides,
+): Pick<SpellResolution, 'selectionMode' | 'areaOfEffect'> {
+  const areaOfEffect = resolveAreaOfEffect(spell, overrides)
+  return {
+    selectionMode: 'self',
+    ...(areaOfEffect ? { areaOfEffect } : {}),
+  }
+}
+
+function buildPointSelection(
+  spell: Pick<Spell, 'range' | 'areaOfEffect'>,
+  overrides: ResolutionDerivationOverrides,
+): Pick<SpellResolution, 'selectionMode' | 'origin' | 'areaOfEffect'> {
+  const origin = overrides.origin ?? defaultOriginFromSpellRange(spell)
+  const areaOfEffect = resolveAreaOfEffect(spell, overrides)
+
+  return {
+    selectionMode: 'point',
+    ...(origin ? { origin } : {}),
+    ...(areaOfEffect ? { areaOfEffect } : {}),
+  }
+}
+
+function buildTargetsSelection(
   spell: Pick<Spell, 'range'>,
   method: SpellResolutionMethod,
   overrides: ResolutionDerivationOverrides,
-): SpellResolutionTarget {
+  proximity: SpellResolutionTargetProximity,
+): Pick<SpellResolution, 'selectionMode' | 'target'> {
+  const count = overrides.target?.count ?? 1
+
+  let externalProximity: SpellResolutionTarget['proximity']
+  if (proximity.kind === 'self') {
+    const mapped = mapSpellRangeToTargetProximity(spell.range, method)
+    externalProximity = mapped && mapped.kind !== 'self' ? mapped : ({ kind: 'touch' } as const)
+  } else {
+    externalProximity = proximity
+  }
+
+  const target: SpellResolutionTarget = {
+    count,
+    countKind: inferSpellResolutionTargetCountKind(count, overrides.target?.countKind),
+    kind: overrides.target?.kind ?? DEFAULT_TARGET_KIND,
+    proximity: externalProximity,
+  }
+
+  return { selectionMode: 'targets', target }
+}
+
+function inferSelectionMode(
+  spell: Pick<Spell, 'range' | 'areaOfEffect'>,
+  method: SpellResolutionMethod,
+  overrides: ResolutionDerivationOverrides,
+  proximity: SpellResolutionTargetProximity,
+): SpellResolutionSelectionMode {
+  if (overrides.selectionMode) return overrides.selectionMode
+
+  if (proximity.kind === 'self') return 'self'
+
+  const pointMode = inferPointSelectionModeFromSpell({ ...spell, method })
+  if (pointMode === 'point') return 'point'
+
+  if (spell.range.kind === 'self' && resolveAreaOfEffect(spell, overrides)) {
+    return 'self'
+  }
+
+  return 'targets'
+}
+
+function buildSelectionEnvelope(
+  spell: Pick<Spell, 'range' | 'areaOfEffect'>,
+  method: SpellResolutionMethod,
+  overrides: ResolutionDerivationOverrides,
+): Pick<SpellResolution, 'selectionMode' | 'target' | 'origin' | 'areaOfEffect'> {
   const proximityOverride = overrides.proximity ?? overrides.range ?? overrides.target?.proximity
-  const proximity =
+  const proximity: SpellResolutionTargetProximity =
     proximityOverride ??
     mapSpellRangeToTargetProximity(spell.range, method) ??
     ({ kind: 'touch' } as const)
 
-  return {
-    count: overrides.target?.count ?? 1,
-    kind: overrides.target?.kind ?? DEFAULT_TARGET_KIND,
-    proximity,
+  const mode = inferSelectionMode(spell, method, overrides, proximity)
+
+  switch (mode) {
+    case 'self':
+      return buildSelfSelection(spell, overrides)
+    case 'point':
+      return buildPointSelection(spell, overrides)
+    case 'targets':
+      return buildTargetsSelection(spell, method, overrides, proximity)
+    case 'none':
+      return { selectionMode: 'none' }
+    default: {
+      const _exhaustive: never = mode
+      return _exhaustive
+    }
   }
-}
-
-function buildAttackOutcomes(
-  effectId: SpellResolutionEffectId,
-  hitNote: string | undefined,
-): SpellResolution['outcomes'] {
-  return [
-    {
-      result: 'hit',
-      applications: [
-        {
-          effectId,
-          amount: 'full',
-        },
-      ],
-      ...(hitNote ? { note: hitNote } : {}),
-    },
-  ]
-}
-
-function buildSavingThrowOutcomes(effectId: SpellResolutionEffectId): SpellResolution['outcomes'] {
-  return [
-    {
-      result: 'failed-save',
-      applications: [
-        {
-          effectId,
-          amount: 'full',
-        },
-      ],
-    },
-    {
-      result: 'successful-save',
-      applications: [
-        {
-          effectId,
-          amount: 'half',
-        },
-      ],
-    },
-  ]
-}
-
-function buildAutomaticOutcomes(effectId: SpellResolutionEffectId): SpellResolution['outcomes'] {
-  return [
-    {
-      result: 'applied',
-      applications: [
-        {
-          effectId,
-          amount: 'full',
-        },
-      ],
-    },
-  ]
 }
 
 function buildOutcomes(
@@ -247,24 +301,39 @@ function buildOutcomes(
 ): SpellResolution['outcomes'] {
   if (overrides.outcomes) return overrides.outcomes
 
-  if (method.kind === 'attack') {
-    const note = overrides.hitNote?.trim()
-    return buildAttackOutcomes(effectId, note || undefined)
+  const defaults = buildDefaultOutcomeSlots(method, effectId)
+  const hitNote = overrides.hitNote?.trim()
+  const failedSaveNote = overrides.failedSaveNote?.trim()
+
+  if (method.kind === 'attack' && hitNote) {
+    return stripEmptyOutcomeSlots(
+      defaults.map((outcome) =>
+        outcome.result === 'hit' ? { ...outcome, note: hitNote } : outcome,
+      ),
+    )
   }
 
-  if (method.kind === 'saving-throw') {
-    return buildSavingThrowOutcomes(effectId)
+  if (method.kind === 'saving-throw' && failedSaveNote) {
+    return stripEmptyOutcomeSlots(
+      defaults.map((outcome) =>
+        outcome.result === 'failed-save' ? { ...outcome, note: failedSaveNote } : outcome,
+      ),
+    )
   }
 
-  return buildAutomaticOutcomes(effectId)
+  return stripEmptyOutcomeSlots(defaults)
 }
 
-/** Derives a contract resolution envelope from spell metadata and atomic effects. */
+/** Derives a contract resolution envelope from spell metadata and derivation effect snapshots. */
 export function deriveResolutionFromSpell(
-  spell: Pick<Spell, 'effects' | 'deliveryMethod' | 'range'>,
+  spell: Pick<Spell, 'slug' | 'deliveryMethod' | 'range' | 'areaOfEffect'>,
   overrides: ResolutionDerivationOverrides = {},
 ): SpellResolution {
-  const primaryEffect = findPrimaryResolutionEffect(spell.effects)
+  const atomicEffects =
+    SRD_521_SPELL_RESOLUTION_DERIVATION_EFFECTS[
+      spell.slug as keyof typeof SRD_521_SPELL_RESOLUTION_DERIVATION_EFFECTS
+    ]
+  const primaryEffect = findPrimaryResolutionEffect(atomicEffects)
   if (!primaryEffect) {
     throw new Error('Spell has no primary resolution effect for derivation.')
   }
@@ -276,7 +345,7 @@ export function deriveResolutionFromSpell(
   }
 
   const candidate = {
-    target: buildTarget(spell, method, overrides),
+    ...buildSelectionEnvelope(spell, method, overrides),
     method,
     effects: [resolutionEffect],
     outcomes: buildOutcomes(method, resolutionEffect.id, overrides),

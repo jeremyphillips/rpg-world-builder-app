@@ -90,23 +90,32 @@ function SpellTagsSection({
   )
 }
 
-function SpellEffectsSection({
+function SpellResolutionSection({
   section,
 }: {
-  section: NonNullable<SpellDetailViewModel['effectsSection']>
+  section: NonNullable<SpellDetailViewModel['resolutionSection']>
 }) {
   return (
-    <section aria-labelledby="spell-effects-heading">
-      <Heading variant="section" as="h2" id="spell-effects-heading" className="mb-3">
+    <section aria-labelledby="spell-resolution-heading">
+      <Heading variant="section" as="h2" id="spell-resolution-heading" className="mb-3">
         {section.title}
       </Heading>
-      <ul className="list-inside list-disc space-y-1" role="list">
-        {section.lines.map((line) => (
-          <li key={line}>
-            <Text as="span">{line}</Text>
-          </li>
+      <div className="space-y-4">
+        {section.subsections.map((subsection) => (
+          <div key={subsection.heading}>
+            <Heading variant="subsection" as="h3" className="mb-2">
+              {subsection.heading}
+            </Heading>
+            <ul className="list-inside list-disc space-y-1" role="list">
+              {subsection.lines.map((line) => (
+                <li key={`${subsection.heading}-${line}`}>
+                  <Text as="span">{line}</Text>
+                </li>
+              ))}
+            </ul>
+          </div>
         ))}
-      </ul>
+      </div>
     </section>
   )
 }
@@ -199,8 +208,8 @@ export function SpellDetailContent({ spell, campaignId }: SpellDetailContentProp
           <SpellClassesList campaignId={campaignId} section={viewModel.classesSection} />
         ) : null}
         {viewModel.tagsSection ? <SpellTagsSection section={viewModel.tagsSection} /> : null}
-        {viewModel.effectsSection ? (
-          <SpellEffectsSection section={viewModel.effectsSection} />
+        {viewModel.resolutionSection ? (
+          <SpellResolutionSection section={viewModel.resolutionSection} />
         ) : null}
       </ContentDetailLayout>
     </WidePage>

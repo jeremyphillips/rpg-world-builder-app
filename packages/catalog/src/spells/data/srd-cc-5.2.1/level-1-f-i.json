@@ -1,0 +1,584 @@
+[
+  {
+    "id": "srd-cc-5.2.1:false-life",
+    "slug": "false-life",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "False Life",
+    "description": "<p>You gain 2d4 + 4 Temporary Hit Points.</p>",
+    "school": "necromancy",
+    "level": 1,
+    "classIds": ["sorcerer", "wizard"],
+    "tags": {
+      "roles": ["buff", "warding"]
+    },
+    "castingTime": {
+      "normal": {
+        "value": 1,
+        "unit": "action"
+      },
+      "canBeCastAsRitual": false
+    },
+    "range": {
+      "kind": "self"
+    },
+    "duration": {
+      "kind": "instantaneous"
+    },
+    "components": {
+      "verbal": true,
+      "somatic": true,
+      "material": {
+        "description": "a drop of alcohol"
+      }
+    },
+    "higherLevelSlotEffect": "<p>You gain 5 additional Temporary Hit Points for each spell slot level above 1.</p>",
+    "resolution": {
+      "selectionMode": "self",
+      "method": {
+        "kind": "automatic"
+      },
+      "effects": [
+        {
+          "id": "temporary-hit-points",
+          "kind": "temporary-hit-points",
+          "roll": {
+            "dice": {
+              "count": 2,
+              "faces": 4
+            },
+            "flat": 4
+          }
+        }
+      ],
+      "outcomes": [
+        {
+          "result": "applied",
+          "applications": [
+            {
+              "effectId": "temporary-hit-points",
+              "amount": "full"
+            }
+          ]
+        }
+      ]
+    },
+    "modeling": {
+      "status": "mechanics-ready"
+    }
+  },
+  {
+    "id": "srd-cc-5.2.1:feather-fall",
+    "slug": "feather-fall",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Feather Fall",
+    "level": 1,
+    "description": "<p>Choose up to five falling creatures within range. A falling creature's rate of descent slows to 60 feet per round until the spell ends. If a creature lands before the spell ends, the creature takes no damage from the fall, and the spell ends for that creature.</p>",
+    "school": "transmutation",
+    "classIds": ["bard", "sorcerer", "wizard"],
+    "tags": {
+      "roles": ["buff", "warding"]
+    },
+    "castingTime": {
+      "normal": {
+        "value": 1,
+        "unit": "reaction",
+        "trigger": "when you or a creature you can see within 60 feet of you falls"
+      },
+      "canBeCastAsRitual": false
+    },
+    "range": {
+      "kind": "distance",
+      "value": {
+        "value": 60,
+        "unit": "ft"
+      }
+    },
+    "duration": {
+      "kind": "timed",
+      "value": 1,
+      "unit": "minute"
+    },
+    "components": {
+      "verbal": true,
+      "material": {
+        "description": "a small feather or piece of down"
+      }
+    },
+    "modeling": {
+      "blocker": {
+        "code": "effect-schema-missing",
+        "capabilityId": "movement"
+      },
+      "gaps": [
+        {
+          "code": "reaction-trigger",
+          "note": "Cast when a falling creature is seen within range"
+        }
+      ]
+    }
+  },
+  {
+    "id": "srd-cc-5.2.1:fog-cloud",
+    "slug": "fog-cloud",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Fog Cloud",
+    "level": 1,
+    "description": "<p>You create a 20-foot-radius Sphere of fog centered on a point within range. The Sphere is Heavily Obscured. It lasts for the duration or until a strong wind (such as one created by Gust of Wind) disperses it.</p>",
+    "school": "conjuration",
+    "classIds": ["druid", "ranger", "sorcerer", "wizard"],
+    "tags": {
+      "roles": ["control"]
+    },
+    "castingTime": {
+      "normal": {
+        "value": 1,
+        "unit": "action"
+      },
+      "canBeCastAsRitual": false
+    },
+    "range": {
+      "kind": "distance",
+      "value": {
+        "value": 120,
+        "unit": "ft"
+      }
+    },
+    "areaOfEffect": {
+      "shape": "sphere",
+      "radius": {
+        "value": 20,
+        "unit": "ft"
+      }
+    },
+    "duration": {
+      "kind": "timed",
+      "value": 1,
+      "unit": "hour",
+      "concentration": true,
+      "upTo": true
+    },
+    "components": {
+      "verbal": true,
+      "somatic": true
+    },
+    "higherLevelSlotEffect": "<p>The fog's radius increases by 20 feet for each spell slot level above 1.</p>",
+    "modeling": {
+      "blocker": {
+        "code": "effect-schema-missing",
+        "capabilityId": "persistent-zone"
+      }
+    }
+  },
+  {
+    "id": "srd-cc-5.2.1:hellish-rebuke",
+    "slug": "hellish-rebuke",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Hellish Rebuke",
+    "description": "<p>The creature that damaged you is momentarily surrounded by green flames. It makes a Dexterity saving throw, taking 2d10 Fire damage on a failed save or half as much damage on a successful one.</p>",
+    "school": "evocation",
+    "level": 1,
+    "classIds": ["warlock"],
+    "tags": {
+      "damageTypes": ["fire"],
+      "roles": ["damage"]
+    },
+    "castingTime": {
+      "normal": {
+        "value": 1,
+        "unit": "reaction",
+        "trigger": "in response to taking damage from a creature that you can see within 60 feet of yourself"
+      },
+      "canBeCastAsRitual": false
+    },
+    "range": {
+      "kind": "distance",
+      "value": {
+        "value": 60,
+        "unit": "ft"
+      }
+    },
+    "duration": {
+      "kind": "instantaneous"
+    },
+    "components": {
+      "verbal": true,
+      "somatic": true
+    },
+    "higherLevelSlotEffect": "<p>The damage increases by 1d10 for each spell slot level above 1.</p>",
+    "resolution": {
+      "selectionMode": "targets",
+      "target": {
+        "count": 1,
+        "countKind": "exact",
+        "kind": "creature",
+        "proximity": {
+          "kind": "distance",
+          "distance": {
+            "value": 60,
+            "unit": "ft"
+          }
+        }
+      },
+      "method": {
+        "kind": "saving-throw",
+        "ability": "dex"
+      },
+      "effects": [
+        {
+          "id": "damage",
+          "kind": "damage",
+          "roll": {
+            "dice": {
+              "count": 2,
+              "faces": 10
+            }
+          },
+          "damageType": "fire"
+        }
+      ],
+      "outcomes": [
+        {
+          "result": "failed-save",
+          "applications": [
+            {
+              "effectId": "damage",
+              "amount": "full"
+            }
+          ]
+        },
+        {
+          "result": "successful-save",
+          "applications": [
+            {
+              "effectId": "damage",
+              "amount": "half"
+            }
+          ]
+        }
+      ]
+    },
+    "modeling": {
+      "status": "meaningful-partial",
+      "gaps": [
+        {
+          "code": "reaction-trigger",
+          "note": "Damaging creature target implied by reaction trigger"
+        }
+      ]
+    }
+  },
+  {
+    "id": "srd-cc-5.2.1:hex",
+    "slug": "hex",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Hex",
+    "level": 1,
+    "description": "<p>You place a curse on a creature that you can see within range. Until the spell ends, you deal an extra 1d6 Necrotic damage to the target whenever you hit it with an attack roll. Also, choose one ability when you cast the spell. The target has Disadvantage on ability checks made with the chosen ability.</p><p>If the target drops to 0 Hit Points before this spell ends, you can take a Bonus Action on a later turn to curse a new creature.</p>",
+    "school": "enchantment",
+    "classIds": ["warlock"],
+    "tags": {
+      "damageTypes": ["necrotic"],
+      "roles": ["debuff", "damage"]
+    },
+    "castingTime": {
+      "normal": {
+        "value": 1,
+        "unit": "bonus-action"
+      },
+      "canBeCastAsRitual": false
+    },
+    "range": {
+      "kind": "distance",
+      "value": {
+        "value": 90,
+        "unit": "ft"
+      }
+    },
+    "duration": {
+      "kind": "timed",
+      "value": 1,
+      "unit": "hour",
+      "concentration": true,
+      "upTo": true
+    },
+    "components": {
+      "verbal": true,
+      "somatic": true,
+      "material": {
+        "description": "the petrified eye of a newt"
+      }
+    },
+    "higherLevelSlotEffect": "<p>Your Concentration can last longer with a spell slot of level 2 (up to 4 hours), 3–4 (up to 8 hours), or 5+ (24 hours).</p>",
+    "modeling": {
+      "blocker": {
+        "code": "effect-schema-missing",
+        "capabilityId": "condition",
+        "note": "May later split into condition + mark when mark family ships"
+      },
+      "gaps": [
+        {
+          "code": "choice-model-missing",
+          "note": "Chosen ability for disadvantage stays prose"
+        },
+        {
+          "code": "retargetable-mark",
+          "note": "Mark moves to a new creature when target drops to 0 HP"
+        },
+        {
+          "code": "conditional-effect-model-missing",
+          "note": "Extra necrotic damage on hit stays prose"
+        }
+      ]
+    }
+  },
+  {
+    "id": "srd-cc-5.2.1:hideous-laughter",
+    "slug": "hideous-laughter",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Hideous Laughter",
+    "level": 1,
+    "description": "<p>One creature of your choice that you can see within range makes a Wisdom saving throw. On a failed save, it has the Prone and Incapacitated conditions for the duration. During that time, it laughs uncontrollably if it's capable of laughter, and it can't end the Prone condition on itself.</p><p>At the end of each of its turns and each time it takes damage, it makes another Wisdom saving throw. The target has Advantage on the save if the save is triggered by damage. On a successful save, the spell ends.</p>",
+    "school": "enchantment",
+    "classIds": ["bard", "warlock", "wizard"],
+    "tags": {
+      "conditions": ["incapacitated", "prone"],
+      "roles": ["control", "debuff"]
+    },
+    "castingTime": {
+      "normal": {
+        "value": 1,
+        "unit": "action"
+      },
+      "canBeCastAsRitual": false
+    },
+    "range": {
+      "kind": "distance",
+      "value": {
+        "value": 30,
+        "unit": "ft"
+      }
+    },
+    "duration": {
+      "kind": "timed",
+      "value": 1,
+      "unit": "minute",
+      "concentration": true,
+      "upTo": true
+    },
+    "components": {
+      "verbal": true,
+      "somatic": true,
+      "material": {
+        "description": "a tart and a feather"
+      }
+    },
+    "higherLevelSlotEffect": "<p>You can target one additional creature for each spell slot level above 1.</p>",
+    "modeling": {
+      "blocker": {
+        "code": "effect-schema-missing",
+        "capabilityId": "condition"
+      },
+      "gaps": [
+        {
+          "code": "conditional-effect-model-missing",
+          "note": "Repeating saves and damage-triggered save advantage stay prose"
+        }
+      ]
+    }
+  },
+  {
+    "id": "srd-cc-5.2.1:hunters-mark",
+    "slug": "hunters-mark",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Hunter's Mark",
+    "level": 1,
+    "description": "<p>You magically mark one creature you can see within range as your quarry. Until the spell ends, you deal an extra 1d6 Force damage to the target whenever you hit it with an attack roll. You also have Advantage on any Wisdom (Perception or Survival) check you make to find it.</p><p>If the target drops to 0 Hit Points before this spell ends, you can take a Bonus Action to move the mark to a new creature you can see within range.</p>",
+    "school": "divination",
+    "classIds": ["ranger"],
+    "tags": {
+      "damageTypes": ["force"],
+      "roles": ["buff", "damage"]
+    },
+    "castingTime": {
+      "normal": {
+        "value": 1,
+        "unit": "bonus-action"
+      },
+      "canBeCastAsRitual": false
+    },
+    "range": {
+      "kind": "distance",
+      "value": {
+        "value": 90,
+        "unit": "ft"
+      }
+    },
+    "duration": {
+      "kind": "timed",
+      "value": 1,
+      "unit": "hour",
+      "concentration": true,
+      "upTo": true
+    },
+    "components": {
+      "verbal": true
+    },
+    "higherLevelSlotEffect": "<p>Your Concentration can last longer with a spell slot of level 3–4 (up to 8 hours) or 5+ (up to 24 hours).</p>",
+    "modeling": {
+      "blocker": {
+        "code": "effect-schema-missing",
+        "capabilityId": "condition",
+        "note": "May later split into condition + mark when mark family ships"
+      },
+      "gaps": [
+        {
+          "code": "retargetable-mark",
+          "note": "Mark moves to a new creature when quarry drops to 0 HP"
+        },
+        {
+          "code": "conditional-effect-model-missing",
+          "note": "Extra force damage on hit stays prose"
+        }
+      ]
+    }
+  },
+  {
+    "id": "srd-cc-5.2.1:ice-knife",
+    "slug": "ice-knife",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Ice Knife",
+    "level": 1,
+    "description": "<p>You create a shard of ice and fling it at one creature within range. Make a ranged spell attack against the target. On a hit, the target takes 1d10 Piercing damage. Hit or miss, the shard then explodes. The target and each creature within 5 feet of it must succeed on a Dexterity saving throw or take 2d6 Cold damage.</p>",
+    "school": "conjuration",
+    "classIds": ["druid", "sorcerer", "wizard"],
+    "tags": {
+      "damageTypes": ["cold", "piercing"],
+      "roles": ["damage"]
+    },
+    "castingTime": {
+      "normal": {
+        "value": 1,
+        "unit": "action"
+      },
+      "canBeCastAsRitual": false
+    },
+    "range": {
+      "kind": "distance",
+      "value": {
+        "value": 60,
+        "unit": "ft"
+      }
+    },
+    "duration": {
+      "kind": "instantaneous"
+    },
+    "components": {
+      "somatic": true,
+      "material": {
+        "description": "a drop of water or a piece of ice"
+      }
+    },
+    "deliveryMethod": "ranged-spell-attack",
+    "higherLevelSlotEffect": "<p>The Cold damage increases by 1d6 for each spell slot level above 1.</p>",
+    "resolution": {
+      "selectionMode": "targets",
+      "target": {
+        "count": 1,
+        "countKind": "exact",
+        "kind": "creature",
+        "proximity": {
+          "kind": "distance",
+          "distance": {
+            "value": 60,
+            "unit": "ft"
+          }
+        }
+      },
+      "method": {
+        "kind": "attack",
+        "attackType": "ranged-spell"
+      },
+      "effects": [
+        {
+          "id": "piercing",
+          "kind": "damage",
+          "roll": {
+            "dice": {
+              "count": 1,
+              "faces": 10
+            }
+          },
+          "damageType": "piercing"
+        },
+        {
+          "id": "cold-burst",
+          "kind": "damage",
+          "roll": {
+            "dice": {
+              "count": 2,
+              "faces": 6
+            }
+          },
+          "damageType": "cold"
+        }
+      ],
+      "outcomes": [
+        {
+          "result": "hit",
+          "applications": [
+            {
+              "effectId": "piercing",
+              "amount": "full"
+            }
+          ],
+          "note": "Hit or miss, the shard explodes: each creature within 5 feet makes a Dexterity saving throw or takes the cold burst damage."
+        }
+      ]
+    },
+    "modeling": {
+      "status": "meaningful-partial",
+      "gaps": [
+        {
+          "code": "chained-targets",
+          "note": "Cold burst targets derived from primary hit or miss"
+        },
+        {
+          "code": "unconditional-application",
+          "note": "Cold burst applies regardless of attack outcome"
+        }
+      ]
+    }
+  }
+]

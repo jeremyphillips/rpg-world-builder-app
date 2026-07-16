@@ -132,7 +132,7 @@ describe('RadioCard', () => {
       />,
     )
 
-    const elfCard = screen.getByRole('radio', { name: /Elf/i }).closest('[class*="rounded-xl"]')
+    const elfCard = screen.getByRole('radio', { name: /Elf/i }).closest('[class*="rounded-card"]')
     expect(elfCard).toHaveTextContent('Gnomish Lineage picker')
   })
 
@@ -209,7 +209,7 @@ describe('RadioCard', () => {
     const panel = container.querySelector('[class*="bg-muted"]')
     expect(panel).toHaveTextContent('Configuration panel')
     expect(panel?.className).toContain('-mx-3')
-    expect(panel?.className).toContain('rounded-b-xl')
+    expect(panel?.className).toContain('rounded-b-card')
   })
 
   it('has no axe accessibility violations', async () => {

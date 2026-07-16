@@ -1,3 +1,4 @@
+import { loadSeedSpells } from '@rpg/catalog/spells'
 import { formatSlugAsLabel } from '@rpg/contracts'
 import { describe, expect, it } from 'vitest'
 
@@ -204,10 +205,31 @@ describe('buildSpellDetailViewModel', () => {
     ).toBeUndefined()
   })
 
-  it('builds cantrip scaling prose section from dedicated fields', () => {
-    const viewModel = buildSpellDetailViewModel(FIRE_BOLT, vocabulary)
+  it('builds cantrip scaling prose section when structured progression is absent', () => {
+    const spellWithoutProgression = {
+      ...FIRE_BOLT,
+      // Below display threshold so resolution UI does not suppress scaling prose.
+      modeling: undefined,
+      resolution: FIRE_BOLT.resolution
+        ? (() => {
+            const { progression: _progression, ...resolution } = FIRE_BOLT.resolution
+            return resolution
+          })()
+        : undefined,
+    }
+    const viewModel = buildSpellDetailViewModel(spellWithoutProgression, vocabulary)
 
     expect(viewModel.proseSections.cantripScaling).toBe(FIRE_BOLT.cantripScaling)
+    expect(viewModel.proseSections.higherLevelSlotEffect).toBeUndefined()
+  })
+
+  it('suppresses scaling prose when structured resolution progression is present', () => {
+    const fireBolt = loadSeedSpells('srd-cc-5.2.1').find((spell) => spell.slug === 'fire-bolt')!
+    const viewModel = buildSpellDetailViewModel(fireBolt, vocabulary)
+
+    expect(fireBolt.resolution?.progression).toBeDefined()
+    expect(fireBolt.cantripScaling).toBeTruthy()
+    expect(viewModel.proseSections.cantripScaling).toBeUndefined()
     expect(viewModel.proseSections.higherLevelSlotEffect).toBeUndefined()
   })
 

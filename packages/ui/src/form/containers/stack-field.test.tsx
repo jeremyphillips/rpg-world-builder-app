@@ -123,7 +123,7 @@ describe('dependent stack', () => {
 
     await waitFor(() => {
       const shell = queryChromeShell(container)
-      expect(shell).toHaveClass('bg-muted/30')
+      expect(shell).toHaveClass('bg-muted/10')
       expect(queryDependentsRegion(container)).toHaveClass(fieldToggleDependentIndentClasses)
     })
   })
@@ -238,7 +238,7 @@ describe('dependent stack', () => {
             kind: 'array',
             name: 'items',
             legend: '',
-            addLabel: 'Add item',
+            addActionLabel: 'Add item',
             fields: [{ type: 'text', name: 'label', label: 'Label' }],
           },
         ],
@@ -262,7 +262,7 @@ describe('dependent stack', () => {
       expect(queryChromeShell(container)).toBeNull()
 
       const itemShell = screen.getByRole('group', { name: /Item #1/ })
-      expect(itemShell).toHaveClass('bg-muted/30')
+      expect(itemShell).toHaveClass('bg-muted/10')
       expect(itemShell).toHaveClass('border-border')
     })
   })
@@ -388,7 +388,7 @@ describe('dependent stack', () => {
 
     const separator = container.querySelector('[data-field-separator]')
     expect(separator).toBeInTheDocument()
-    expect(separator).toHaveClass('border-b', 'border-border', 'pb-4')
+    expect(separator).toHaveClass('border-b', 'border-border', 'pb-7')
     expect(separator).toContainElement(screen.getByLabelText('Class restrictions'))
     expect(separator).toContainElement(queryDependentsRegion(container) as HTMLElement)
     expect(container.querySelectorAll('[data-field-separator]')).toHaveLength(1)

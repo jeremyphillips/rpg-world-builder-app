@@ -2,15 +2,23 @@ import { describe, expect, it } from 'vitest'
 
 import {
   fieldArrayItemListClasses,
+  fieldGroupLegendHeaderMarginVariants,
   fieldGroupLegendVariants,
   fieldLabelVariants,
   fieldStackRhythmVariants,
   resolveArrayLegendScale,
   resolveArraySectionSize,
+  resolveFieldGroupLegendClassName,
+  resolveFieldGroupLegendHeaderStackClassName,
   resolveFieldStackRhythm,
   resolveFormFieldSize,
   resolveInheritedFieldSize,
 } from './field.variants'
+import {
+  fieldSizeToArrayAddButtonSize,
+  resolveArrayAddButtonSize,
+  buttonSizeToComboboxFieldSize,
+} from './field-sizing.variants'
 import { richTextEditorProseClasses, richTextProseSizeClasses } from './rich-text-content.variants'
 
 describe('fieldStackRhythmVariants', () => {
@@ -97,6 +105,29 @@ describe('resolveFormFieldSize', () => {
   })
 })
 
+describe('fieldSizeToArrayAddButtonSize', () => {
+  it('bumps sm array sections to default button size', () => {
+    expect(fieldSizeToArrayAddButtonSize.sm).toBe('default')
+    expect(fieldSizeToArrayAddButtonSize.md).toBe('default')
+    expect(fieldSizeToArrayAddButtonSize.lg).toBe('lg')
+  })
+})
+
+describe('resolveArrayAddButtonSize', () => {
+  it('prefers an explicit override over section rhythm', () => {
+    expect(resolveArrayAddButtonSize('md', 'sm')).toBe('sm')
+    expect(resolveArrayAddButtonSize('sm')).toBe('default')
+  })
+})
+
+describe('buttonSizeToComboboxFieldSize', () => {
+  it('maps outline button sizes to combobox search row sizes', () => {
+    expect(buttonSizeToComboboxFieldSize.sm).toBe('sm')
+    expect(buttonSizeToComboboxFieldSize.default).toBe('md')
+    expect(buttonSizeToComboboxFieldSize.lg).toBe('lg')
+  })
+})
+
 describe('resolveArraySectionSize', () => {
   it('defaults array item fields to sm', () => {
     expect(
@@ -151,6 +182,36 @@ describe('fieldGroupLegendVariants', () => {
     expect(fieldGroupLegendVariants({ size: 'array', scale: 'default' })).toContain(
       'text-field-array-legend',
     )
+  })
+})
+
+describe('fieldGroupLegendHeaderMarginVariants', () => {
+  it('uses 20px below section legends and 16px below subgroups and arrays', () => {
+    expect(fieldGroupLegendHeaderMarginVariants({ size: 'section' })).toBe('mb-5')
+    expect(fieldGroupLegendHeaderMarginVariants({ size: 'subsection' })).toBe('mb-4')
+    expect(fieldGroupLegendHeaderMarginVariants({ size: 'array' })).toBe('mb-4')
+  })
+})
+
+describe('resolveFieldGroupLegendClassName', () => {
+  it('combines typography and header margin', () => {
+    expect(resolveFieldGroupLegendClassName({ size: 'section' })).toContain('mb-5')
+    expect(resolveFieldGroupLegendClassName({ size: 'section' })).toContain(
+      'text-field-group-legend',
+    )
+    expect(resolveFieldGroupLegendClassName({ size: 'subsection' })).toContain('mb-4')
+    expect(resolveFieldGroupLegendClassName({ size: 'subsection' })).toContain(
+      'text-field-subgroup-legend',
+    )
+  })
+})
+
+describe('resolveFieldGroupLegendHeaderStackClassName', () => {
+  it('combines legend/hint stack rhythm with header margin', () => {
+    expect(resolveFieldGroupLegendHeaderStackClassName('section')).toContain('gap-2')
+    expect(resolveFieldGroupLegendHeaderStackClassName('section')).toContain('mb-5')
+    expect(resolveFieldGroupLegendHeaderStackClassName('subsection')).toContain('gap-2')
+    expect(resolveFieldGroupLegendHeaderStackClassName('subsection')).toContain('mb-4')
   })
 })
 

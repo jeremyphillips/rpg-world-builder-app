@@ -1,5 +1,9 @@
 @import 'tailwindcss';
 @import 'tw-animate-css';
+@import './tokens/palette-light.css';
+@import './tokens/semantic-light.css';
+@import './tokens/palette-dark.css';
+@import './tokens/semantic-dark.css';
 
 @plugin '@tailwindcss/typography';
 
@@ -22,9 +26,17 @@
  * (`--font-weight-heading`, …) mirror the same pattern. Meta/semantic aliases
  * (`--text-xs-meta`, `--text-eyebrow-sm`, …) sit below the type scale.
  *
- * Palette: warm amber/gold primary over parchment-tinted neutrals (light) and
- * warm charcoal (dark). All neutrals carry a whisper of chroma at hue ~60–85
- * so the theme reads warm rather than sterile gray.
+ * Palette: warm amber/gold primary over zinc-leaning neutrals with adjustable
+ * warmth (`--palette-neutral-hue`). Default is near-zinc (~268); nudge hue in
+ * Layer 1 for incremental warmth — a few degrees reads subtle, 80+ reads parchment.
+ *
+ * Color tokens use three layers:
+ * 1. `--palette-*` primitives — oklch SSOT in `tokens/palette-light.css` and
+ *    `tokens/palette-dark.css`. Both themes declare the same inventory
+ *    (`tokens/palette-inventory.md`).
+ * 2. Semantic roles (`--background`, `--card`, …) in `tokens/semantic-*.css` —
+ *    stable API for components; map to theme-local palette via `var()` only.
+ * 3. `@theme inline` below — Tailwind bridge (`bg-*`, `text-*`, …).
  *
  * Fonts: apps provide the actual font faces. The public app (Next.js) sets
  * `--font-body` via `next/font`; the dashboard (Vite) loads `@fontsource-variable/inter`.
@@ -73,6 +85,7 @@
   --color-semantic-positive: var(--semantic-positive);
   --color-semantic-caution: var(--semantic-caution);
   --color-semantic-negative: var(--semantic-negative);
+  --color-semantic-negative-on-subtle: var(--semantic-negative-on-subtle);
   --color-semantic-neutral-border: var(--semantic-neutral-border);
   --color-semantic-neutral-subtle: var(--semantic-neutral-subtle);
   --color-semantic-informative-border: var(--semantic-informative-border);
@@ -87,6 +100,9 @@
   --color-selected-control-foreground: var(--selected-control-foreground);
   --color-selected-control-border: var(--selected-control-border);
   --color-catalog-picker-row-surface: var(--catalog-picker-row-surface);
+  --color-sidebar: var(--sidebar);
+
+  --shadow-surface-raised: var(--surface-raised-shadow);
 
   --font-sans: var(--font-body, 'Inter Variable'), 'Inter', ui-sans-serif, system-ui, sans-serif;
   --font-display:
@@ -97,6 +113,7 @@
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
+  --radius-card: var(--radius-card);
 
   /* Layout — readable body column nested inside full-width page shells. */
   --max-width-narrow-content: 41.25rem; /* ~660px */
@@ -236,133 +253,12 @@
   --tracking-eyebrow-xs: 0.075rem; /* 1.2px @ 16px root */
   --tracking-eyebrow: 0.1rem; /* 1.6px @ 16px root */
 
+  /* Popover menus — minimum readable width when the trigger is fit-sized. */
+  --popover-menu-min-width: 15.625rem; /* 250px */
+
   --animate-accordion-down: accordion-down 0.2s ease-out;
   --animate-accordion-up: accordion-up 0.2s ease-out;
   --animate-attention-ring: attention-ring 1.5s ease-out;
-}
-
-:root {
-  --radius: 0.625rem;
-
-  --background: oklch(0.985 0.008 85);
-  --foreground: oklch(0.21 0.012 60);
-  --card: oklch(0.995 0.005 90);
-  --card-foreground: oklch(0.21 0.012 60);
-  --popover: oklch(0.995 0.005 90);
-  --popover-foreground: oklch(0.21 0.012 60);
-  /* Deep bronze-gold: dark enough to double as AA link text on the parchment
-     background (5.4:1) while warm white stays readable on top of it (5.4:1). */
-  --primary: oklch(0.52 0.11 70);
-  --primary-foreground: oklch(0.985 0.005 85);
-  --secondary: oklch(0.945 0.018 85);
-  --secondary-foreground: oklch(0.28 0.02 60);
-  --muted: oklch(0.95 0.014 85);
-  --muted-foreground: oklch(0.5 0.025 70);
-  --accent: oklch(0.93 0.03 80);
-  --accent-foreground: oklch(0.28 0.025 60);
-  --destructive: oklch(0.577 0.245 27.325);
-  --destructive-foreground: oklch(0.985 0 0);
-  /* Error prominence tiers — nav (hidden descendants) and aggregate (parent count). */
-  --destructive-muted: oklch(0.577 0.245 27.325 / 70%);
-  --destructive-subtle: oklch(0.577 0.245 27.325 / 50%);
-  --info: oklch(0.52 0.14 250);
-  --info-foreground: oklch(0.985 0 0);
-  --info-muted: oklch(0.52 0.14 250 / 70%);
-  --info-subtle: oklch(0.52 0.14 250 / 12%);
-  --success: oklch(0.52 0.14 145);
-  --success-foreground: oklch(0.985 0 0);
-  --success-muted: oklch(0.52 0.14 145 / 70%);
-  --success-subtle: oklch(0.52 0.14 145 / 12%);
-  --warning: oklch(0.62 0.14 75);
-  --warning-foreground: oklch(0.21 0.012 60);
-  --warning-muted: oklch(0.62 0.14 75 / 70%);
-  --warning-subtle: oklch(0.62 0.14 75 / 14%);
-  --border: oklch(0.9 0.02 80);
-  --card-selected-border: oklch(0.95 0.02 80 / 30%);
-  --input: oklch(0.9 0.02 80);
-  --ring: oklch(0.52 0.11 70);
-  --overlay: oklch(0.2 0.015 60 / 0.5);
-  /* Inline semantic text — tuned for base and muted/subtle surfaces (AA on parchment). */
-  --semantic-neutral: oklch(0.5 0.025 70);
-  --semantic-informative: oklch(0.48 0.13 250);
-  --semantic-informative-muted: oklch(0.42 0.07 250);
-  --semantic-positive: oklch(0.48 0.13 145);
-  --semantic-caution: oklch(0.55 0.13 70);
-  --semantic-negative: oklch(0.52 0.2 27);
-  /* Compact-label semantic surfaces — colored roles derive from alert tokens. */
-  --semantic-neutral-border: var(--border);
-  --semantic-neutral-subtle: var(--muted);
-  --semantic-informative-border: var(--info-muted);
-  --semantic-informative-subtle: var(--info-subtle);
-  --semantic-positive-border: var(--success-muted);
-  --semantic-positive-subtle: var(--success-subtle);
-  --semantic-caution-border: var(--warning-muted);
-  --semantic-caution-subtle: var(--warning-subtle);
-  --semantic-negative-border: var(--destructive-muted);
-  --semantic-negative-subtle: var(--destructive-subtle);
-  /* Chip selectable/selected — control state, not semantic hue. */
-  --selected-control: var(--foreground);
-  --selected-control-foreground: var(--background);
-  --selected-control-border: var(--foreground);
-  --catalog-picker-row-surface: color-mix(in oklab, var(--muted) 20%, transparent);
-}
-
-.dark {
-  --background: oklch(0.165 0.01 60);
-  --foreground: oklch(0.96 0.01 85);
-  --card: oklch(0.215 0.012 60);
-  --card-foreground: oklch(0.96 0.01 85);
-  --popover: oklch(0.215 0.012 60);
-  --popover-foreground: oklch(0.96 0.01 85);
-  --primary: oklch(0.78 0.13 75);
-  --primary-foreground: oklch(0.2 0.035 70);
-  --secondary: oklch(0.27 0.015 60);
-  --secondary-foreground: oklch(0.96 0.01 85);
-  --muted: oklch(0.27 0.013 60);
-  --muted-foreground: oklch(0.85 0.025 80);
-  --accent: oklch(0.3 0.025 70);
-  --accent-foreground: oklch(0.96 0.01 85);
-  --destructive: oklch(0.704 0.191 22.216);
-  --destructive-foreground: oklch(0.985 0 0);
-  --destructive-muted: oklch(0.704 0.191 22.216 / 70%);
-  --destructive-subtle: oklch(0.704 0.191 22.216 / 50%);
-  --info: oklch(0.72 0.12 250);
-  --info-foreground: oklch(0.165 0.01 60);
-  --info-muted: oklch(0.72 0.12 250 / 70%);
-  --info-subtle: oklch(0.72 0.12 250 / 14%);
-  --success: oklch(0.72 0.12 145);
-  --success-foreground: oklch(0.165 0.01 60);
-  --success-muted: oklch(0.72 0.12 145 / 70%);
-  --success-subtle: oklch(0.72 0.12 145 / 14%);
-  --warning: oklch(0.78 0.13 75);
-  --warning-foreground: oklch(0.165 0.01 60);
-  --warning-muted: oklch(0.78 0.13 75 / 70%);
-  --warning-subtle: oklch(0.78 0.13 75 / 14%);
-  --border: oklch(0.95 0.02 80 / 12%);
-  --card-selected-border: oklch(0.95 0.02 80 / 30%);
-  --input: oklch(0.95 0.02 80 / 16%);
-  --ring: oklch(0.78 0.13 75);
-  --overlay: oklch(0.05 0.005 60 / 0.7);
-  --semantic-neutral: oklch(0.72 0.02 80);
-  --semantic-informative: oklch(0.62 0.08 250);
-  --semantic-informative-muted: oklch(0.55 0.05 250);
-  --semantic-positive: oklch(0.72 0.11 145);
-  --semantic-caution: oklch(0.78 0.12 75);
-  --semantic-negative: oklch(0.72 0.16 22);
-  --semantic-neutral-border: var(--border);
-  --semantic-neutral-subtle: var(--muted);
-  --semantic-informative-border: var(--info-muted);
-  --semantic-informative-subtle: var(--info-subtle);
-  --semantic-positive-border: var(--success-muted);
-  --semantic-positive-subtle: var(--success-subtle);
-  --semantic-caution-border: var(--warning-muted);
-  --semantic-caution-subtle: var(--warning-subtle);
-  --semantic-negative-border: var(--destructive-muted);
-  --semantic-negative-subtle: var(--destructive-subtle);
-  --selected-control: var(--foreground);
-  --selected-control-foreground: var(--background);
-  --selected-control-border: var(--foreground);
-  --catalog-picker-row-surface: oklab(0.27 0.0065 0.0112583 / 0.2);
 }
 
 /*

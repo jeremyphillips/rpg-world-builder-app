@@ -17,9 +17,10 @@ import type {
   RichTextLinkPickerContentTypeOption,
   RichTextLinkPickerInternalOption,
 } from '../components/ui/rich-text-link-picker.client'
+import type { ButtonVariantProps } from '../components/ui/button.variants'
 import type { FieldSize } from '../components/ui/field.client'
 import type { ComboboxRenderSelectedItem } from '../components/ui/combobox-field.types'
-import type { WeightedSearchField } from '../lib/search'
+import type { FieldChrome } from '../components/ui/field-chrome.variants'
 import type { FieldWidth } from '../components/ui/field-control.variants'
 import type { FieldDigits } from '../components/ui/field-digit-metrics'
 import { isInlineSentenceBoundSegment } from '../components/ui/inline-sentence-field.lib'
@@ -31,8 +32,9 @@ import type {
   FieldStackDependentsChromeScope,
   FieldStackDependentsTone,
 } from '../components/ui/field-stack.variants'
+import type { FieldGroupFieldsChrome } from '../components/ui/field-group-chrome.variants'
+import type { ArrayAddMenuConfig } from './config/array/array-add-menu.lib'
 import type {
-  FieldRowLayout,
   FieldHintPosition,
   FieldGroupLegendSize,
   FieldLabelPosition,
@@ -40,6 +42,9 @@ import type {
   FieldStackLayout,
   FieldStackRhythm,
 } from '../components/ui/field.variants'
+
+export type { FieldGroupFieldsChrome } from '../components/ui/field-group-chrome.variants'
+export type { FieldChrome } from '../components/ui/field-chrome.variants'
 
 /** The set of control types the schema-driven `<Form>` renderer can render. */
 export type FieldType =
@@ -91,6 +96,23 @@ export type SelectFieldOptionListItem = FieldOption | FieldOptionGroup
 
 export function isFieldOptionGroup(item: SelectFieldOptionListItem): item is FieldOptionGroup {
   return 'kind' in item && item.kind === 'group'
+}
+
+/** Flattens grouped select config items to a plain option list. */
+export function flattenSelectFieldOptions(
+  options: readonly SelectFieldOptionListItem[],
+): FieldOption[] {
+  return options.flatMap((item) => (isFieldOptionGroup(item) ? item.options : [item]))
+}
+
+/** Context passed to `presentation.readOnlyWhen` for option-backed fields. */
+export type FieldReadOnlyContext = {
+  options: FieldOption[]
+}
+
+/** Presentation overrides that swap an editable control for read-only chrome. */
+export type FieldPresentationConfig = {
+  readOnlyWhen?: (context: FieldReadOnlyContext) => boolean
 }
 
 /**
@@ -184,10 +206,27 @@ interface BaseFieldConfig {
   dynamicHint?: FieldDynamicHint
   /** Trailing divider after this field within a group/stack rhythm. */
   separator?: FieldSeparator
+  /** Visual shell around the full field anatomy (label + control + messages). */
+  chrome?: FieldChrome
+  /** Optional presentation overrides (e.g. read-only when only one option remains). */
+  presentation?: FieldPresentationConfig
+}
+
+/** Field kinds that may use `optionalDisclosure` when renderer support lands. */
+export const OPTIONAL_DISCLOSURE_FIELD_KINDS = ['text', 'textarea', 'richtext'] as const
+export type OptionalDisclosureFieldKind = (typeof OPTIONAL_DISCLOSURE_FIELD_KINDS)[number]
+
+/** Collapse empty optional prose fields behind an add control (v1: textarea only). */
+export type OptionalDisclosureConfig = {
+  addLabel: string
+  removeLabel?: string
+  /** When true (default), populated values keep the field expanded. */
+  expandWhenPopulated?: boolean
 }
 
 export interface TextFieldConfig extends BaseFieldConfig {
   type: 'text'
+  // TODO(text): add optionalDisclosure when OptionalFieldDisclosure supports single-line fields.
   placeholder?: string
   /** Native input type for the text control (e.g. `email`, `password`). */
   inputType?: 'text' | 'email' | 'password' | 'url' | 'tel' | 'search'
@@ -219,6 +258,7 @@ export interface TextareaFieldConfig extends BaseFieldConfig {
   placeholder?: string
   rows?: number
   defaultValue?: string
+  optionalDisclosure?: OptionalDisclosureConfig
 }
 
 export interface SelectFieldConfig extends BaseFieldConfig {
@@ -282,6 +322,7 @@ export interface JsonFieldConfig extends BaseFieldConfig {
 
 export interface RichTextFieldConfig extends BaseFieldConfig {
   type: 'richtext'
+  // TODO(richtext): add optionalDisclosure when empty-HTML detection + header wiring land.
   /** Opt in to the link toolbar button + extension (off by default). */
   linkable?: boolean
   /** Opt in to inline/code-block marks, toolbar buttons, and backtick input rules (off by default). */
@@ -590,8 +631,6 @@ export type FieldConfig =
 export interface RowConfig {
   kind: 'row'
   fields: FieldConfig[]
-  /** Preferred display recipe. Use `className` only for one-off escape hatches. */
-  layout?: FieldRowLayout
   className?: string
   /** Trailing divider after this row within a group/stack rhythm. */
   separator?: FieldSeparator
@@ -661,13 +700,21 @@ export interface GroupConfig {
   rhythm?: FieldStackRhythm
   /** When hidden, the whole group unmounts and nested field values clear. */
   visibility?: FieldVisibility
+  /** Visual treatment for legend + field stack — variants are mutually exclusive. */
+  fieldsChrome?: FieldGroupFieldsChrome
 }
 
 /** Layout profile for repeatable array item chrome. */
 export type ArrayItemVariant = 'auto' | 'compact' | 'detailed'
 
+/** Vertical alignment for compact inline rows (grip, fields, embedded actions). */
+export type ArrayCompactInlineAlign = 'start' | 'center'
+
 /** How array items may be reordered. Defaults to `dragHandle`. */
 export type ArrayItemReorder = false | 'dragHandle'
+
+/** Placement of the array add control relative to the section legend. */
+export type ArrayAddActionLayout = 'stacked' | 'inline'
 
 export type { FormIssue, FormIssueScope, FormIssueSeverity } from './errors/form-issue.types'
 
@@ -743,14 +790,47 @@ export interface ArrayConfig {
   size?: FieldSize
   /** Field configs for each item; names are relative to the item, not the root. */
   fields: FormItem[]
-  /** Label for the "Add" button. Defaults to `"Add item"`. */
-  addLabel?: string
+  /** Label for the add action button. Defaults to `"Add item"`. */
+  addActionLabel?: string
+  /**
+   * When true (default), prefixes the add action with a `+` icon. Set false for
+   * non-add triggers such as "Choose preset" or "Import entries".
+   */
+  showAddIcon?: boolean
+  /**
+   * Visual style for the add action — mirrors `Button` / `ButtonDropdown` `variant`.
+   * Defaults to `outline`.
+   */
+  addActionVariant?: NonNullable<ButtonVariantProps['variant']>
+  /**
+   * Add action placement — `stacked` (default) renders below items; `inline` aligns
+   * the control to the right of the section legend.
+   */
+  addActionLayout?: ArrayAddActionLayout
+  /**
+   * Button size for the add action — overrides the size inferred from section
+   * rhythm (`sm`/`md` → `default`, `lg` → `lg`).
+   */
+  addActionSize?: NonNullable<ButtonVariantProps['size']>
+  /** Searchable template menu for the add action; replaces the plain button when set. */
+  addActionMenu?: ArrayAddMenuConfig
   /** Minimum item count; removes the "Remove" button while at the floor. */
   min?: number
   /** Maximum item count; hides the "Add" button once reached. */
   max?: number
   /** Item row layout — `auto` picks compact when item fields fit a single row. */
   itemVariant?: ArrayItemVariant
+  /**
+   * Compact inline rows only — vertical alignment of grip, fields, and embedded
+   * actions. Use `center` for single control-only cells (no visible field label).
+   */
+  compactInlineAlign?: ArrayCompactInlineAlign
+  /**
+   * Border/background tone on each item shell (`main` | `elevated` | `subtle` | `medium` |
+   * `warning` | `error`). Defaults to `elevated` (`bg-card`); overrides inherited stack
+   * `dependentsChrome` when `dependentsChromeScope` is `arrayItems`.
+   */
+  itemChrome?: FieldStackDependentsTone
   /** Header labels and optional collapsed summary for each item row. */
   itemHeader?: ArrayItemHeaderConfig
   /** When true, detailed items collapse to their header row. Ignored for compact/nested. */
@@ -774,24 +854,18 @@ export interface ArrayConfig {
   /** Supplies default values for a newly appended row. */
   appendDefaults?: (items: unknown[]) => Record<string, unknown>
 
-  /** When true, hides the default array add control (use an external slot instead). */
-  hideAddControl?: boolean
+  /** When true, hides the default array add action (use an external slot instead). */
+  hideAddAction?: boolean
 
-  /** Searchable template menu for the add control; replaces the plain add button when set. */
-  addMenu?: {
-    groups: { id: string; label: string }[]
-    items: {
-      id: string
-      label: string
-      description?: string
-      groupId?: string
-      searchTerms?: WeightedSearchField[]
-      appendDefaults: Record<string, unknown> | (() => Record<string, unknown>)
-      isDuplicate?: (items: unknown[]) => boolean
-      duplicatePolicy?: 'allow' | 'warn' | 'block'
-    }[]
-    enableSearch?: boolean
-  }
+  /** When true, omits the default per-item remove control (use `itemRemoveSlot` instead). */
+  hideItemRemove?: boolean
+
+  /**
+   * Custom per-item remove control rendered in the header actions rail instead of the
+   * default RHF `remove(index)` button. Pair with `hideItemRemove: true` when the slot
+   * fully replaces generic removal.
+   */
+  itemRemoveSlot?: Pick<SlotConfig, 'name' | 'render' | 'visibility'>
 
   /** Field names whose values are passed to `filterSelectOptions` as `watchedValues`. */
   filterSelectDependsOn?: string[]
@@ -1133,4 +1207,45 @@ export function applyOptionAvailabilityToSelectOptions(
         }
       : applyOptionAvailabilityToFieldOptions([item], availability, values)[0]!,
   )
+}
+
+/** Resolves a select field's flat option list after availability and array filters. */
+export function resolveSelectFieldFlatOptions(
+  config: SelectFieldConfig,
+  optionValues: Record<string, unknown>,
+  arrayFilter?: (options: FieldOption[], fieldName: string) => FieldOption[],
+): FieldOption[] {
+  let options = flattenSelectFieldOptions(config.options)
+  if (config.optionAvailability) {
+    options = applyOptionAvailabilityToFieldOptions(
+      options,
+      config.optionAvailability,
+      optionValues,
+    )
+  }
+  if (arrayFilter) {
+    options = arrayFilter(options, config.name)
+  }
+  return options
+}
+
+export function isSelectFieldReadOnly(
+  config: SelectFieldConfig,
+  resolvedOptions: FieldOption[],
+): boolean {
+  return config.presentation?.readOnlyWhen?.({ options: resolvedOptions }) ?? false
+}
+
+/** Label for the current select value; falls back to the sole option when read-only. */
+export function resolveSelectFieldDisplayLabel(
+  value: unknown,
+  options: FieldOption[],
+): string | undefined {
+  const normalized = value != null && value !== '' ? String(value) : undefined
+  if (normalized) {
+    const match = options.find((option) => option.value === normalized)
+    if (match) return match.label
+  }
+  if (options.length === 1) return options[0]?.label
+  return normalized
 }

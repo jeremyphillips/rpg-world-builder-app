@@ -99,10 +99,70 @@ describe('ButtonDropdown', () => {
     expect(onSelectItem).toHaveBeenCalledWith('skill-proficiency')
   })
 
+  it('matches search row size to the trigger button size', async () => {
+    const user = userEvent.setup()
+    render(
+      <ButtonDropdown
+        label="Add grant"
+        size="default"
+        groups={groups}
+        items={items}
+        onSelectItem={vi.fn()}
+      />,
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Add grant' }))
+    expect(screen.getByRole('searchbox', { name: 'Search Add grant' }).parentElement).toHaveClass(
+      'h-9',
+    )
+  })
+
   it('has no axe accessibility violations', async () => {
     const { container } = render(
       <ButtonDropdown label="Add grant" groups={groups} items={items} onSelectItem={vi.fn()} />,
     )
     await expectNoAxeViolations(container)
+  })
+
+  it('renders an optional leading icon on the trigger', () => {
+    render(
+      <ButtonDropdown
+        label="Add grant"
+        leadingIcon={<span data-testid="leading-icon" />}
+        groups={groups}
+        items={items}
+        onSelectItem={vi.fn()}
+      />,
+    )
+
+    expect(screen.getByTestId('leading-icon')).toBeInTheDocument()
+  })
+
+  it('applies fit width classes when width is fit', async () => {
+    const user = userEvent.setup()
+    render(
+      <ButtonDropdown
+        label="Add grant"
+        width="fit"
+        groups={groups}
+        items={items}
+        onSelectItem={vi.fn()}
+      />,
+    )
+
+    expect(screen.getByRole('button', { name: 'Add grant' })).toHaveClass('w-fit', 'shrink-0')
+
+    await user.click(screen.getByRole('button', { name: 'Add grant' }))
+    expect(screen.getByRole('listbox', { name: 'Add grant' }).parentElement).toHaveClass(
+      'min-w-[var(--popover-menu-min-width)]',
+    )
+  })
+
+  it('does not apply fit width classes by default', () => {
+    render(
+      <ButtonDropdown label="Add grant" groups={groups} items={items} onSelectItem={vi.fn()} />,
+    )
+
+    expect(screen.getByRole('button', { name: 'Add grant' })).not.toHaveClass('w-fit')
   })
 })

@@ -23,7 +23,7 @@ export function toolFormFieldGroup(): FormItem[] {
   return [
     {
       kind: 'group',
-      legend: 'Tool',
+      legend: '',
       fields: [
         {
           kind: 'row',
@@ -58,9 +58,12 @@ export function toolFormFieldGroup(): FormItem[] {
       kind: 'array',
       name: 'utilizes',
       legend: 'Utilize actions',
-      addLabel: 'Add utilize action',
+      addActionLabel: 'Add utilize action',
       min: 1,
       itemCollapsible: true,
+      itemChrome: 'subtle',
+      size: 'md',
+      addActionLayout: 'inline',
       itemHeader: {
         fallback: (index) => `Action ${index + 1}`,
         primaryField: 'description',
@@ -74,7 +77,7 @@ export function toolFormFieldGroup(): FormItem[] {
               name: 'description',
               label: 'Description',
               required: true,
-              width: 'xl',
+              width: 'full',
             },
             {
               type: 'number',
@@ -83,8 +86,8 @@ export function toolFormFieldGroup(): FormItem[] {
               min: 1,
               max: 30,
               required: true,
-              width: 'auto',
               digits: 2,
+              width: 'auto',
             },
           ],
         },

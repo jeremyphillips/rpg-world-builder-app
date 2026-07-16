@@ -10,9 +10,12 @@ import {
   formatResolutionTargetProximityPhrase,
 } from './format'
 import {
+  BURNING_HANDS_RESOLUTION,
   CHILL_TOUCH_RESOLUTION,
   CURE_WOUNDS_RESOLUTION,
   ELDRITCH_BLAST_RESOLUTION,
+  FALSE_LIFE_RESOLUTION,
+  FIREBALL_RESOLUTION,
   INFlict_WOUNDS_RESOLUTION,
   MAGIC_MISSILE_RESOLUTION,
   SPELL_RESOLUTION_FIXTURES,
@@ -21,6 +24,7 @@ import {
   SPELL_RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID,
   spellResolutionEffectIdSchema,
   spellResolutionSchema,
+  SPELL_RESOLUTION_PRIMARY_HEALING_EFFECT_ID,
 } from './schema'
 import { spellResolutionValidationMessages } from './validation-messages'
 
@@ -33,6 +37,7 @@ describe('spellResolutionSchema', () => {
 
   it('defaults outcome applications to an empty array', () => {
     const parsed = spellResolutionSchema.parse({
+      selectionMode: 'targets',
       target: { count: 1, kind: 'creature', proximity: { kind: 'touch' } },
       method: { kind: 'attack', attackType: 'melee-spell' },
       effects: [
@@ -58,6 +63,7 @@ describe('spellResolutionSchema', () => {
   it('accepts a saving-throw resolution with only a failed-save outcome', () => {
     expect(
       spellResolutionSchema.parse({
+        selectionMode: 'targets',
         target: { count: 1, kind: 'creature', proximity: { kind: 'touch' } },
         method: { kind: 'saving-throw', ability: 'wis' },
         effects: [
@@ -88,7 +94,7 @@ describe('spellResolutionSchema', () => {
           ...CHILL_TOUCH_RESOLUTION.target,
           proximity: { kind: 'reach', distance: { value: 10, unit: 'ft' } },
         },
-      }).target.proximity,
+      }).target!.proximity,
     ).toEqual({ kind: 'reach', distance: { value: 10, unit: 'ft' } })
   })
 
@@ -213,6 +219,135 @@ describe('spellResolutionSchema', () => {
       }),
     )
   })
+
+  it('rejects creature-only effects for object targets', () => {
+    const result = spellResolutionSchema.safeParse({
+      selectionMode: 'targets',
+      target: { count: 1, kind: 'object', proximity: { kind: 'touch' } },
+      method: { kind: 'automatic' },
+      effects: [
+        {
+          id: SPELL_RESOLUTION_PRIMARY_HEALING_EFFECT_ID,
+          kind: 'healing',
+          roll: { dice: { count: 2, faces: 8 } },
+        },
+      ],
+      outcomes: [
+        {
+          result: 'applied',
+          applications: [{ effectId: SPELL_RESOLUTION_PRIMARY_HEALING_EFFECT_ID, amount: 'full' }],
+        },
+      ],
+    })
+
+    expect(result.success).toBe(false)
+    if (result.success) return
+
+    expect(result.error.issues).toContainEqual(
+      expect.objectContaining({
+        path: ['effects', 0, 'kind'],
+        message: spellResolutionValidationMessages.effectKindIncompatibleWithTarget({
+          kind: 'healing',
+          targetKind: 'object',
+        }),
+      }),
+    )
+  })
+})
+
+describe('spellResolutionSchema selection modes', () => {
+  it('accepts self, targets, point, and none mode fixtures', () => {
+    expect(spellResolutionSchema.parse(FALSE_LIFE_RESOLUTION)).toEqual(FALSE_LIFE_RESOLUTION)
+    expect(spellResolutionSchema.parse(CURE_WOUNDS_RESOLUTION)).toEqual(CURE_WOUNDS_RESOLUTION)
+    expect(spellResolutionSchema.parse(FIREBALL_RESOLUTION)).toEqual(FIREBALL_RESOLUTION)
+    expect(spellResolutionSchema.parse(BURNING_HANDS_RESOLUTION)).toEqual(BURNING_HANDS_RESOLUTION)
+  })
+
+  it('rejects targets mode without target', () => {
+    const result = spellResolutionSchema.safeParse({
+      selectionMode: 'targets',
+      method: { kind: 'automatic' },
+      effects: ELDRITCH_BLAST_RESOLUTION.effects,
+      outcomes: ELDRITCH_BLAST_RESOLUTION.outcomes,
+    })
+
+    expect(result.success).toBe(false)
+  })
+
+  it('rejects point mode without origin', () => {
+    const result = spellResolutionSchema.safeParse({
+      selectionMode: 'point',
+      areaOfEffect: FIREBALL_RESOLUTION.areaOfEffect,
+      method: FIREBALL_RESOLUTION.method,
+      effects: FIREBALL_RESOLUTION.effects,
+      outcomes: FIREBALL_RESOLUTION.outcomes,
+    })
+
+    expect(result.success).toBe(false)
+  })
+
+  it('strips target when selectionMode is self', () => {
+    const parsed = spellResolutionSchema.parse({
+      ...FALSE_LIFE_RESOLUTION,
+      target: CURE_WOUNDS_RESOLUTION.target,
+    })
+
+    expect(parsed.selectionMode).toBe('self')
+    expect(parsed.target).toBeUndefined()
+  })
+
+  it('strips areaOfEffect when selectionMode is none', () => {
+    const parsed = spellResolutionSchema.parse({
+      selectionMode: 'none',
+      areaOfEffect: BURNING_HANDS_RESOLUTION.areaOfEffect,
+      method: { kind: 'automatic' },
+      effects: FALSE_LIFE_RESOLUTION.effects,
+      outcomes: FALSE_LIFE_RESOLUTION.outcomes,
+    })
+
+    expect(parsed.selectionMode).toBe('none')
+    expect(parsed.areaOfEffect).toBeUndefined()
+  })
+
+  it('rejects attack method for self mode without area', () => {
+    const result = spellResolutionSchema.safeParse({
+      selectionMode: 'self',
+      method: { kind: 'attack', attackType: 'ranged-spell' },
+      effects: ELDRITCH_BLAST_RESOLUTION.effects,
+      outcomes: ELDRITCH_BLAST_RESOLUTION.outcomes,
+    })
+
+    expect(result.success).toBe(false)
+  })
+
+  it('rejects deferred attack method for point mode', () => {
+    const result = spellResolutionSchema.safeParse({
+      selectionMode: 'point',
+      origin: FIREBALL_RESOLUTION.origin,
+      areaOfEffect: FIREBALL_RESOLUTION.areaOfEffect,
+      method: { kind: 'attack', attackType: 'ranged-spell' },
+      effects: FIREBALL_RESOLUTION.effects,
+      outcomes: FIREBALL_RESOLUTION.outcomes,
+    })
+
+    expect(result.success).toBe(false)
+  })
+
+  it('normalizes legacy target.self to selectionMode self', () => {
+    const parsed = spellResolutionSchema.parse({
+      target: {
+        count: 1,
+        kind: 'creature',
+        proximity: { kind: 'self' },
+      },
+      method: { kind: 'automatic' },
+      effects: FALSE_LIFE_RESOLUTION.effects,
+      outcomes: FALSE_LIFE_RESOLUTION.outcomes,
+    })
+
+    expect(parsed.selectionMode).toBe('self')
+    expect(parsed.target).toBeUndefined()
+  })
 })
 
 describe('spell resolution formatters', () => {
@@ -220,30 +355,41 @@ describe('spell resolution formatters', () => {
     expect(formatResolutionTarget(ELDRITCH_BLAST_RESOLUTION)).toBe(
       'One creature or object within 120 feet',
     )
-    expect(formatResolutionTargetProximityPhrase(INFlict_WOUNDS_RESOLUTION.target.proximity)).toBe(
+    expect(formatResolutionTargetProximityPhrase(INFlict_WOUNDS_RESOLUTION.target!.proximity)).toBe(
       'you touch',
     )
-    expect(formatResolutionTargetProximityPhrase(CHILL_TOUCH_RESOLUTION.target.proximity)).toBe(
+    expect(formatResolutionTargetProximityPhrase(CHILL_TOUCH_RESOLUTION.target!.proximity)).toBe(
       'within your reach',
     )
     expect(formatResolutionOutcomes(INFlict_WOUNDS_RESOLUTION)).toEqual([
-      'Failed save: Full damage',
-      'Successful save: Half damage',
+      'Failed save: Target takes 2d10 necrotic damage.',
+      'Successful save: Target takes half as much damage.',
     ])
 
     const summary = formatResolutionSummary(CHILL_TOUCH_RESOLUTION)
     expect(summary).toContain('Target')
     expect(summary).toContain('within your reach')
     expect(summary).toContain('Melee spell attack')
-    expect(summary).toContain('1d10 Necrotic damage')
+    expect(summary).toContain('Target takes 1d10 necrotic damage')
     expect(summary).toContain("can't regain Hit Points")
   })
 
-  it('formats automatic healing and self proximity', () => {
+  it('formats automatic healing and self recipient preview', () => {
     expect(formatResolutionTarget(CURE_WOUNDS_RESOLUTION)).toBe('One creature you touch')
     expect(formatResolutionMethod(CURE_WOUNDS_RESOLUTION)).toBe('Automatic')
-    expect(formatResolutionSummary(CURE_WOUNDS_RESOLUTION)).toContain('Target heals 2d8 Hit Points')
-    expect(formatResolutionOutcomes(CURE_WOUNDS_RESOLUTION)).toEqual(['Applied: Full healing'])
+    expect(formatResolutionMethod(CURE_WOUNDS_RESOLUTION, 'resolution-preview')).toBe(
+      'No check required',
+    )
+    expect(formatResolutionSummary(CURE_WOUNDS_RESOLUTION)).toContain(
+      'Target regains 2d8 hit points',
+    )
+    expect(formatResolutionOutcomes(CURE_WOUNDS_RESOLUTION)).toEqual([
+      'Applied: Target regains 2d8 hit points.',
+    ])
+    expect(formatResolutionSummary(FALSE_LIFE_RESOLUTION)).toContain('Recipient')
+    expect(formatResolutionSummary(FALSE_LIFE_RESOLUTION)).toContain(
+      'You gain 2d4+4 temporary hit points',
+    )
   })
 
   it('formats projectiles preview and effects application labels', () => {
@@ -253,9 +399,11 @@ describe('spell resolution formatters', () => {
 
     expect(formatResolutionProjectilesPreview(pattern)).toBe('Creates 3 darts.')
     expect(formatResolutionEffectsApplicationLabel(MAGIC_MISSILE_RESOLUTION)).toBe(
-      'Applied per dart',
+      'Applied once per dart',
     )
-    expect(formatResolutionEffectsApplicationLabel(ELDRITCH_BLAST_RESOLUTION)).toBe('Applied once')
+    expect(formatResolutionEffectsApplicationLabel(ELDRITCH_BLAST_RESOLUTION)).toBe(
+      'Applied once per beam',
+    )
     expect(formatResolutionSummary(MAGIC_MISSILE_RESOLUTION)).toContain('Creates 3 darts.')
   })
 
@@ -268,7 +416,7 @@ describe('spell resolution formatters', () => {
 
     expect(formatResolutionProjectilesPreview(pattern)).toBe('Creates 2 projectiles.')
     expect(formatResolutionEffectsApplicationLabel({ applicationPattern: pattern })).toBe(
-      'Applied per projectile',
+      'Applied once per projectile',
     )
   })
 })

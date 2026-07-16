@@ -1,12 +1,13 @@
-import { render, screen, waitFor } from '@testing-library/react'
+import { render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { expectNoAxeViolations } from '@rpg/ui/test-utils'
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi, afterEach } from 'vitest'
 
 import { buildSeedDamageTypeVocabulary } from '@/features/homebrew'
 
 import { makeContentFormCtx } from '../../../../lib/fixtures/content-form-ctx'
 import { RESOLUTION_FORM_FIXTURES } from '../../fixtures'
+import * as resolutionChangeConfirm from '../../hooks/use-resolution-change-confirm.client'
 import { RESOLUTION_SECTION_LABELS } from '../../lib/form/resolution-form-labels'
 import {
   RESOLUTION_NOT_SAVED_BANNER,
@@ -18,6 +19,10 @@ const formCtx = makeContentFormCtx({
 })
 
 describe('SpellResolutionEditor', () => {
+  afterEach(() => {
+    vi.restoreAllMocks()
+  })
+
   it('shows persistence banner and add-resolution control when empty', async () => {
     render(<SpellResolutionEditor formCtx={formCtx} />)
 
@@ -50,16 +55,96 @@ describe('SpellResolutionEditor', () => {
     )
 
     await waitFor(() => {
-      expect(screen.getAllByText('Effects').length).toBeGreaterThan(0)
-      expect(screen.getByText('Applied once')).toBeInTheDocument()
-      expect(
-        screen.getByRole('button', { name: /(Collapse|Expand) Effects · Damage/ }),
-      ).toBeInTheDocument()
+      expect(screen.getByRole('group', { name: /Effects & outcomes/ })).toBeInTheDocument()
+      expect(screen.getByRole('group', { name: /^Authored effects/ })).toBeInTheDocument()
+      expect(screen.getByText('Applied once per beam')).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: /(Collapse|Expand) Damage/ })).toBeInTheDocument()
       expect(screen.getByText('Inflicts 1d10 Force damage.')).toBeInTheDocument()
+      expect(screen.getAllByRole('button', { name: /Remove Damage/i })).toHaveLength(2)
     })
   })
 
-  it('shows chill touch additional behavior in preview', async () => {
+  it('renders the add effect control after authored effect rows', async () => {
+    render(
+      <SpellResolutionEditor
+        formCtx={formCtx}
+        defaultResolution={RESOLUTION_FORM_FIXTURES.eldritchBlast}
+      />,
+    )
+
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: /Collapse Damage/i })).toBeInTheDocument()
+    })
+
+    const collapse = screen.getByRole('button', { name: /Collapse Damage/i })
+    const addEffect = screen.getByRole('button', { name: /^Add effect$/ })
+    expect(
+      collapse.compareDocumentPosition(addEffect) & Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy()
+  })
+
+  it('routes header remove through requestResolutionChange', async () => {
+    const requestResolutionChange = vi.fn()
+    vi.spyOn(resolutionChangeConfirm, 'useResolutionEditorContext').mockReturnValue({
+      requestResolutionChange,
+      notice: null,
+      clearNotice: vi.fn(),
+    })
+
+    const user = userEvent.setup()
+    render(
+      <SpellResolutionEditor
+        formCtx={formCtx}
+        defaultResolution={RESOLUTION_FORM_FIXTURES.inflictWounds}
+      />,
+    )
+
+    await waitFor(() => {
+      const authoredEffects = screen.getByRole('group', { name: /^Authored effects/ })
+      expect(
+        within(authoredEffects).getByRole('button', {
+          name: /Remove Damage — 2d10 Necrotic damage/i,
+        }),
+      ).toBeInTheDocument()
+    })
+
+    const authoredEffects = screen.getByRole('group', { name: /^Authored effects/ })
+    await user.click(
+      within(authoredEffects).getByRole('button', {
+        name: /Remove Damage — 2d10 Necrotic damage/i,
+      }),
+    )
+
+    expect(requestResolutionChange).toHaveBeenCalledWith({
+      field: 'removeEffect',
+      effectId: 'damage',
+    })
+  })
+
+  it('keeps header remove available when the effect row is collapsed', async () => {
+    const user = userEvent.setup()
+    render(
+      <SpellResolutionEditor
+        formCtx={formCtx}
+        defaultResolution={RESOLUTION_FORM_FIXTURES.eldritchBlast}
+      />,
+    )
+
+    const collapseButton = await screen.findByRole('button', { name: /Collapse Damage/i })
+    await user.click(collapseButton)
+
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: /Expand Damage/i })).toBeInTheDocument()
+      const authoredEffects = screen.getByRole('group', { name: /^Authored effects/ })
+      expect(
+        within(authoredEffects).getByRole('button', {
+          name: /Remove Damage — 1d10 Force damage/i,
+        }),
+      ).toBeInTheDocument()
+    })
+  })
+
+  it('shows chill touch additional behavior in outcomes editor', async () => {
     render(
       <SpellResolutionEditor
         formCtx={formCtx}
@@ -68,7 +153,7 @@ describe('SpellResolutionEditor', () => {
     )
 
     await waitFor(() => {
-      expect(screen.getAllByText(/can't regain Hit Points/i).length).toBeGreaterThan(0)
+      expect(screen.getByDisplayValue(/can't regain Hit Points/i)).toBeInTheDocument()
     })
   })
 
@@ -79,13 +164,14 @@ describe('SpellResolutionEditor', () => {
     await user.click(screen.getByRole('button', { name: /add resolution/i }))
 
     await waitFor(() => {
-      expect(screen.getAllByText('Target').length).toBeGreaterThan(0)
+      expect(screen.getAllByText('Selection').length).toBeGreaterThan(0)
       expect(screen.getAllByText('How it resolves').length).toBeGreaterThan(0)
-      expect(screen.getAllByText('Effects').length).toBeGreaterThan(0)
+      expect(screen.getByRole('group', { name: /Effects & outcomes/ })).toBeInTheDocument()
+      expect(screen.getByRole('group', { name: /^Authored effects/ })).toBeInTheDocument()
     })
   })
 
-  it('renders read-only outcomes preview for inflict wounds fixture', async () => {
+  it('renders interactive outcomes for inflict wounds fixture', async () => {
     render(
       <SpellResolutionEditor
         formCtx={formCtx}
@@ -94,8 +180,10 @@ describe('SpellResolutionEditor', () => {
     )
 
     await waitFor(() => {
-      expect(screen.getAllByText(RESOLUTION_SECTION_LABELS.outcomes).length).toBeGreaterThan(0)
-      expect(screen.getAllByText(/Failed save/i).length).toBeGreaterThan(0)
+      expect(screen.getByRole('group', { name: /^Outcome branches/ })).toBeInTheDocument()
+      expect(screen.getByText(RESOLUTION_SECTION_LABELS.outcomesHint)).toBeInTheDocument()
+      expect(screen.getByRole('heading', { name: 'On failed save' })).toBeInTheDocument()
+      expect(screen.getByRole('heading', { name: 'On successful save' })).toBeInTheDocument()
     })
   })
 
@@ -151,7 +239,7 @@ describe('SpellResolutionEditor', () => {
       expect(screen.getAllByText('Automatic').length).toBeGreaterThan(0)
       expect(screen.getAllByText('Projectiles').length).toBeGreaterThan(0)
       expect(screen.getAllByText('Creates 3 darts.').length).toBeGreaterThan(0)
-      expect(screen.getByText('Applied per dart')).toBeInTheDocument()
+      expect(screen.getByText('Applied once per dart')).toBeInTheDocument()
       expect(screen.getAllByText('1d4+1 Force damage').length).toBeGreaterThan(0)
     })
   })
@@ -165,7 +253,7 @@ describe('SpellResolutionEditor', () => {
     )
 
     await waitFor(() => {
-      expect(screen.getByText('Applied per dart')).toBeInTheDocument()
+      expect(screen.getByText('Applied once per dart')).toBeInTheDocument()
     })
 
     await expectNoAxeViolations(container)

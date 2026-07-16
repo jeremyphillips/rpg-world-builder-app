@@ -10,8 +10,8 @@ import { Field } from './field.client'
 import { FieldLayout } from './field-layout'
 import { FieldLabelContent } from './field-label-content'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './select.client'
-import type { FieldOption, SelectFieldOptionListItem } from '../../form/field-config'
-import { isFieldOptionGroup } from '../../form/field-config'
+import type { FieldOption } from '../../form/field-config'
+import { flattenSelectFieldOptions } from '../../form/field-config'
 import { InlineSentenceConnector, InlineSentenceRow } from './inline-sentence-row'
 
 export interface LevelRangeFieldProps {
@@ -141,7 +141,4 @@ export function LevelRangeField({
   )
 }
 
-/** Flattens grouped select config items to a plain option list. */
-export function flattenSelectFieldOptions(options: SelectFieldOptionListItem[]): FieldOption[] {
-  return options.flatMap((item) => (isFieldOptionGroup(item) ? item.options : [item]))
-}
+export { flattenSelectFieldOptions }

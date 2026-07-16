@@ -42,7 +42,7 @@ export type BuildLevelRangeTiersArrayFieldOptions = {
   itemHeader?: ArrayItemHeaderConfig
   itemVariant?: LevelRangeArrayConfig['itemVariant']
   itemCollapsible?: LevelRangeArrayConfig['itemCollapsible']
-  addLabel?: string
+  addActionLabel?: string
   /** Row fields after the level range control. */
   fields: FormItem[]
   levelRangeLabel?: string
@@ -68,7 +68,7 @@ export function buildLevelRangeTiersArrayField(
     itemHeader: options.itemHeader,
     itemVariant: options.itemVariant,
     itemCollapsible: options.itemCollapsible ?? true,
-    addLabel: options.addLabel,
+    addActionLabel: options.addActionLabel,
     reorder: false,
     arrayPattern: levelRangeArrayPattern({ min: 'minLevel', max: 'maxLevel' }),
     filterSelectDependsOn: [...LEVEL_RANGE_FILTER_DEPENDS_ON],

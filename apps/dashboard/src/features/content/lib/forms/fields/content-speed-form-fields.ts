@@ -214,13 +214,12 @@ export function mountCapacitySpeedFields(): GroupField[] {
   ]
 }
 
-/** Cargo, speed, crew, and passengers in one compact grid row for the Vehicle group. */
+/** Cargo, speed, crew, and passengers in one intrinsic-width flex row for the Vehicle group. */
 export function vehicleCargoSpeedFields(): GroupField[] {
   return [
     {
       kind: 'row',
-      layout: 'responsive-4',
-      className: 'w-fit max-w-full md:grid-cols-[auto_auto_auto_auto]',
+      separator: 'subtle',
       fields: [
         massInputSelectField({
           name: 'cargoCapacity',

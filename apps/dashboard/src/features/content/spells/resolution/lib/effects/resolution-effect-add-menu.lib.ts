@@ -58,7 +58,7 @@ export function createResolutionEffectAppendDefaults(
   }
 }
 
-export type ResolutionEffectArrayAddMenuConfig = NonNullable<ArrayConfig['addMenu']>
+export type ResolutionEffectArrayAddMenuConfig = NonNullable<ArrayConfig['addActionMenu']>
 
 /** Builds the searchable resolution effect template add menu (3 kinds). */
 export function buildResolutionEffectArrayAddMenu(): ResolutionEffectArrayAddMenuConfig {

@@ -1,5 +1,8 @@
 import type { ReactElement, ReactNode } from 'react'
 
+import type { FieldChrome } from './field-chrome.variants'
+import { FieldChromeShell } from './field-chrome-shell'
+import { hasActiveFieldChrome } from './field-chrome.variants'
 import { Field, type FieldSize } from './field.client'
 import { FieldLayout } from './field-layout'
 import { FieldLabelContent } from './field-label-content'
@@ -26,14 +29,18 @@ export interface FormFieldProps {
   width?: FieldWidth
   /** `above` (default) — label over control. `settings` — label + hint left, control right. */
   labelPosition?: FieldLabelPosition
+  chrome?: FieldChrome
   children: ReactElement
 }
 
-const labelNode = (label: string, info?: ReactNode) => (
-  <Field.Label>
-    <FieldLabelContent label={label} info={info} />
-  </Field.Label>
-)
+const labelNode = (label: string, info?: ReactNode) => {
+  if (!label.trim()) return null
+  return (
+    <Field.Label>
+      <FieldLabelContent label={label} info={info} />
+    </Field.Label>
+  )
+}
 
 /**
  * Prop-based shim over the compound `Field`: label (+ optional `[i]` info
@@ -54,9 +61,19 @@ export function FormField({
   size,
   width,
   labelPosition = 'above',
+  chrome,
   children,
 }: FormFieldProps) {
   if (labelPosition === 'settings') {
+    const controlNode = <Field.Control>{children}</Field.Control>
+    const chromedControl = hasActiveFieldChrome(chrome) ? (
+      <FieldChromeShell chrome={chrome} size={size}>
+        {controlNode}
+      </FieldChromeShell>
+    ) : (
+      controlNode
+    )
+
     return (
       <Field.Root
         id={id}
@@ -73,7 +90,7 @@ export function FormField({
             {labelNode(label, info)}
             <Field.Hint />
           </div>
-          <Field.Control>{children}</Field.Control>
+          {chromedControl}
         </div>
         <Field.Error />
       </Field.Root>
@@ -91,7 +108,13 @@ export function FormField({
       size={size}
       width={width}
     >
-      <FieldLayout hintPosition={hintPosition} label={labelNode(label, info)} control={children} />
+      <FieldLayout
+        hintPosition={hintPosition}
+        label={labelNode(label, info)}
+        control={children}
+        chrome={chrome}
+        size={size}
+      />
     </Field.Root>
   )
 }

@@ -1,8 +1,18 @@
 import { describe, expect, it } from 'vitest'
-import type { ArrayConfig, FormItem, GroupConfig } from '@rpg/ui/form'
+import type { ArrayConfig, FormItem } from '@rpg/ui/form'
+
+import {
+  outcomeApplicationsReferenceEffect,
+  planResolutionChange,
+  resolutionChangeRequiresConfirm,
+  SPELL_RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID,
+} from '@rpg/contracts'
 
 import { formatEffectRowPrimary, formatEffectRowSummary } from '../../../lib/effects/effect-display'
 import { resolutionFields } from '../form/resolution-form-fields'
+import { buildResolutionEffectAddMenuItems } from '../selection/resolution-selection-options.lib'
+import { resolutionFormToSelectionContext } from '../selection/resolution-selection-context.lib'
+import { RESOLUTION_FORM_FIXTURES } from '../../fixtures'
 
 function findResolutionEffectsArray(fields: FormItem[]): ArrayConfig | undefined {
   for (const field of fields) {
@@ -10,8 +20,8 @@ function findResolutionEffectsArray(fields: FormItem[]): ArrayConfig | undefined
       return field
     }
 
-    if ('kind' in field && field.kind === 'group') {
-      const nested = findResolutionEffectsArray((field as GroupConfig).fields)
+    if ('kind' in field && (field.kind === 'group' || field.kind === 'stack')) {
+      const nested = findResolutionEffectsArray(field.fields)
       if (nested) return nested
     }
   }
@@ -22,13 +32,46 @@ function findResolutionEffectsArray(fields: FormItem[]): ArrayConfig | undefined
 describe('resolutionFields effects array', () => {
   it('hides the generic add control in favor of the resolution-specific add slot', () => {
     const arrayField = findResolutionEffectsArray(resolutionFields({}))
-    expect(arrayField?.hideAddControl).toBe(true)
-    expect(arrayField?.addMenu).toBeUndefined()
+    expect(arrayField?.hideAddAction).toBe(true)
+    expect(arrayField?.hideItemRemove).toBe(true)
+    expect(arrayField?.addActionMenu).toBeUndefined()
+  })
+
+  it('hides the generic remove control in favor of the resolution-specific header remove slot', () => {
+    const arrayField = findResolutionEffectsArray(resolutionFields({}))
+    expect(arrayField?.hideItemRemove).toBe(true)
+    expect(arrayField?.itemRemoveSlot?.name).toBe('_resolutionEffectHeaderRemove')
+    expect(arrayField?.itemRemoveSlot?.render).toBeTypeOf('function')
+  })
+
+  it('does not include a body-level remove slot on effect rows', () => {
+    const itemFields = findResolutionEffectsArray(resolutionFields({}))?.fields ?? []
+    expect(
+      itemFields.find(
+        (field) =>
+          'kind' in field && field.kind === 'slot' && field.name === '_resolutionEffectRemove',
+      ),
+    ).toBeUndefined()
   })
 
   it('does not expose a kind selector; kind is fixed at add time via templates', () => {
     const itemFields = findResolutionEffectsArray(resolutionFields({}))?.fields ?? []
     expect(itemFields.find((field) => !('kind' in field) && field.name === 'kind')).toBeUndefined()
+  })
+
+  it('opts into detailed item chrome when nested inside resolution groups', () => {
+    const arrayField = findResolutionEffectsArray(resolutionFields({}))
+    expect(arrayField?.itemVariant).toBe('detailed')
+    expect(arrayField?.itemCollapsible).toBe(true)
+  })
+
+  it('includes template descriptions in the resolution add menu', () => {
+    const context = resolutionFormToSelectionContext(RESOLUTION_FORM_FIXTURES.eldritchBlast)
+    const damageItem = buildResolutionEffectAddMenuItems(context).find(
+      (item) => item.id === 'damage',
+    )
+
+    expect(damageItem?.description).toMatch(/damage type/i)
   })
 
   it('wires grant-style collapsible item headers with parent context summaries', () => {
@@ -48,7 +91,7 @@ describe('resolutionFields effects array', () => {
         },
         0,
       ),
-    ).toBe('Damage')
+    ).toBe('Damage — 1d6 Fire damage')
     expect(
       itemHeader?.summary?.(
         {
@@ -79,6 +122,22 @@ describe('resolutionFields effects array', () => {
   })
 })
 
+describe('resolution effect removal planning', () => {
+  it('requires confirm when removing an outcome-referenced effect', () => {
+    const form = RESOLUTION_FORM_FIXTURES.inflictWounds
+    const effectId = SPELL_RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID
+
+    expect(outcomeApplicationsReferenceEffect(form.outcomes, effectId)).toBe(true)
+
+    const plan = planResolutionChange(resolutionFormToSelectionContext(form)!, {
+      field: 'removeEffect',
+      effectId,
+    })
+
+    expect(resolutionChangeRequiresConfirm(plan)).toBe(true)
+  })
+})
+
 describe('resolution effect array item headers', () => {
   it('formats grant-style titles and summaries for resolution effect kinds', () => {
     expect(
@@ -91,7 +150,7 @@ describe('resolution effect array item headers', () => {
         },
         0,
       ),
-    ).toBe('Damage')
+    ).toBe('Damage — 1d6 Fire damage')
 
     expect(
       formatEffectRowSummary({
@@ -111,7 +170,7 @@ describe('resolution effect array item headers', () => {
         },
         0,
       ),
-    ).toBe('Healing')
+    ).toBe('Healing — 3d8 healing')
 
     expect(
       formatEffectRowSummary({
@@ -130,7 +189,7 @@ describe('resolution effect array item headers', () => {
         },
         0,
       ),
-    ).toBe('Temporary hit points')
+    ).toBe('Temporary hit points — 2d4+4 temporary Hit Points')
 
     expect(
       formatEffectRowSummary({

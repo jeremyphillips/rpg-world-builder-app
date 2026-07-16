@@ -34,6 +34,14 @@ const toneBorderClass: Record<CompactLabelTone, string> = {
   negative: 'border-semantic-negative-border',
 }
 
+const toneSoftTextClass: Record<CompactLabelTone, string> = {
+  neutral: toneTextClass.neutral,
+  informative: toneTextClass.informative,
+  positive: toneTextClass.positive,
+  caution: toneTextClass.caution,
+  negative: 'text-semantic-negative-on-subtle',
+}
+
 const toneSubtleBgClass: Record<CompactLabelTone, string> = {
   neutral: 'bg-semantic-neutral-subtle',
   informative: 'bg-semantic-informative-subtle',
@@ -59,5 +67,5 @@ export function compactLabelAppearanceToneClasses(
     return `border ${toneBorderClass[tone]} bg-transparent ${toneTextClass[tone]}`
   }
 
-  return `border ${toneBorderClass[tone]} ${toneSubtleBgClass[tone]} ${toneTextClass[tone]}`
+  return `border ${toneBorderClass[tone]} ${toneSubtleBgClass[tone]} ${toneSoftTextClass[tone]}`
 }

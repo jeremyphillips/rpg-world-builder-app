@@ -1,29 +1,31 @@
 import { cva, type VariantProps } from 'class-variance-authority'
 
+import { fieldSurfaceToneVariants } from './field-surface.variants'
+
+export type {
+  FieldSurfaceTone,
+  FieldGroupPanelTone,
+  FieldGroupOutlineTone,
+} from './field-surface.variants'
+export {
+  fieldSurfaceToneVariants,
+  fieldGroupBodyShellLayoutClasses,
+  isCompactLabelTone,
+  resolveFieldGroupOutlineToneClasses,
+  resolveFieldGroupPanelToneClasses,
+} from './field-surface.variants'
+
 /** Surface tone for dependents-only chrome on toggle-dependent stacks. */
-export type FieldStackDependentsTone = 'main' | 'subtle' | 'warning' | 'error'
+export type FieldStackDependentsTone =
+  | 'main'
+  | 'elevated'
+  | 'subtle'
+  | 'medium'
+  | 'warning'
+  | 'error'
 
 /** Where `dependentsChrome` tone applies on toggle-dependent stacks. */
 export type FieldStackDependentsChromeScope = 'wrapper' | 'arrayItems'
-
-/**
- * Border/bg tone only — no layout padding. Shared by stack dependents wrapper
- * chrome and array item shells when `dependentsChromeScope: 'arrayItems'`.
- */
-export const fieldSurfaceToneVariants = cva('', {
-  variants: {
-    tone: {
-      main: 'border-border bg-background',
-      subtle: 'border-border bg-muted/30',
-      /** Stub until warning design tokens exist — distinct from subtle via accent wash. */
-      warning: 'border-border bg-accent/30',
-      error: 'border-destructive/50 bg-destructive/10',
-    },
-  },
-  defaultVariants: {
-    tone: 'subtle',
-  },
-})
 
 export type FieldSurfaceToneVariantProps = VariantProps<typeof fieldSurfaceToneVariants>
 
@@ -39,14 +41,18 @@ export const fieldStackDependentsChromeVariants = cva('rounded-md border p-3', {
   variants: {
     tone: {
       main: '',
+      elevated: '',
       subtle: '',
+      medium: '',
       warning: '',
       error: '',
     },
   },
   compoundVariants: [
     { tone: 'main', class: fieldSurfaceToneVariants({ tone: 'main' }) },
+    { tone: 'elevated', class: fieldSurfaceToneVariants({ tone: 'elevated' }) },
     { tone: 'subtle', class: fieldSurfaceToneVariants({ tone: 'subtle' }) },
+    { tone: 'medium', class: fieldSurfaceToneVariants({ tone: 'medium' }) },
     { tone: 'warning', class: fieldSurfaceToneVariants({ tone: 'warning' }) },
     { tone: 'error', class: fieldSurfaceToneVariants({ tone: 'error' }) },
   ],

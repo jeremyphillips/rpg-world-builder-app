@@ -9,6 +9,11 @@ import type {
   ResolutionWarning,
 } from './selection-types'
 import {
+  outcomeApplicationsReferenceEffect,
+  planOutcomeMethodChange,
+  stripEffectFromOutcomes,
+} from './outcome-change-plan'
+import {
   applyMethodOptionPatch,
   getApplicationPatternAvailability,
   getMethodAvailability,
@@ -17,6 +22,11 @@ import {
   stateAfterPatch,
   toMethodOption,
 } from './selection-availability'
+import {
+  isCreatureOnlyResolutionEffectKind,
+  isEffectKindAllowedForTarget,
+} from './effect-target-compatibility'
+import { buildSelectionModeCleanupPatch } from './selection-mode-cleanup'
 
 function buildProximityCleanupPatch(
   before: ResolutionSelectionState,
@@ -114,7 +124,10 @@ function maybeSelfWithDamageWarning(
   state: ResolutionSelectionState,
 ): ResolutionWarning | undefined {
   const effects = state.effects ?? []
-  if (state.proximityKind === 'self' && effects.some((effect) => effect.kind === 'damage')) {
+  const isSelfRecipient =
+    state.selectionMode === 'self' ||
+    (!state.selectionMode && state.proximityKind === 'self' && !state.hasAreaOfEffect)
+  if (isSelfRecipient && effects.some((effect) => effect.kind === 'damage')) {
     return { code: 'self-with-damage' }
   }
   return undefined
@@ -159,12 +172,41 @@ function maybeMultipleEffectsWarning(
   return undefined
 }
 
+function maybeCreatureOnlyEffectWithNonCreatureTargetWarning(
+  state: ResolutionSelectionState,
+): ResolutionWarning | undefined {
+  if (
+    state.selectionMode === 'self' ||
+    state.selectionMode === 'point' ||
+    state.selectionMode === 'none'
+  ) {
+    return undefined
+  }
+  if (state.proximityKind === 'self') return undefined
+  if (!state.targetKind || state.targetKind === 'creature') return undefined
+
+  const effects = state.effects ?? []
+  if (
+    effects.some(
+      (effect) =>
+        isResolutionEffectKind(effect.kind) &&
+        isCreatureOnlyResolutionEffectKind(effect.kind) &&
+        !isEffectKindAllowedForTarget(effect.kind, state),
+    )
+  ) {
+    return { code: 'creature-only-effect-with-non-creature-target' }
+  }
+
+  return undefined
+}
+
 function collectWarnings(state: ResolutionSelectionState): ResolutionWarning[] {
   const effects = state.effects ?? []
   return [
     maybeSelfWithDamageWarning(state),
     maybeAutomaticDistanceWithoutPatternWarning(state),
     maybeCheckWithoutDamageWarning(state),
+    maybeCreatureOnlyEffectWithNonCreatureTargetWarning(state),
     maybeMultipleEffectsWarning(effects, 'healing', 'multiple-healing-effects'),
     maybeMultipleEffectsWarning(
       effects,
@@ -179,12 +221,16 @@ function buildRequestedPatch(
   change: ResolutionChangeRequest,
 ): ResolutionPatch {
   switch (change.field) {
+    case 'selectionMode':
+      return { selectionMode: change.value }
     case 'proximityKind':
       return { proximityKind: change.value }
     case 'methodOption':
       return applyMethodOptionPatch(before, change.value)
     case 'applicationPatternKind':
       return { applicationPatternKind: change.value }
+    case 'removeEffect':
+      return {}
     default: {
       const _exhaustive: never = change
       return _exhaustive
@@ -192,9 +238,50 @@ function buildRequestedPatch(
   }
 }
 
+function findEffectRemovalTargets(
+  state: ResolutionSelectionState,
+  effectId: string,
+): ResolutionEffectRef[] {
+  const effect = state.effects?.find((entry) => entry.id === effectId)
+  if (!effect) return []
+  if (!outcomeApplicationsReferenceEffect(state.outcomes, effectId)) return []
+  return [effect]
+}
+
+function buildFieldCleanupPatches(
+  before: ResolutionSelectionState,
+  change: ResolutionChangeRequest,
+  after: ResolutionSelectionState,
+): ResolutionPatch {
+  const selectionModeCleanup =
+    change.field === 'selectionMode' ? buildSelectionModeCleanupPatch(before, change.value) : {}
+
+  const proximityCleanup =
+    change.field === 'proximityKind' ? buildProximityCleanupPatch(before, change.value) : {}
+
+  const methodCleanup =
+    change.field === 'methodOption' ? buildMethodCleanupPatch(before, after) : {}
+
+  const patternCleanup =
+    change.field === 'applicationPatternKind' && change.value === 'none'
+      ? buildPatternCleanupPatch(before, after)
+      : {}
+
+  return {
+    ...selectionModeCleanup,
+    ...proximityCleanup,
+    ...methodCleanup,
+    ...patternCleanup,
+  }
+}
+
 /** Returns true when author confirmation is required before applying the plan. */
 export function resolutionChangeRequiresConfirm(plan: ResolutionChangePlan): boolean {
-  return plan.incompatibleSelections.length > 0 || plan.effectsToRemove.length > 0
+  return (
+    plan.incompatibleSelections.length > 0 ||
+    plan.effectsToRemove.length > 0 ||
+    plan.discardedOutcomeBranches.length > 0
+  )
 }
 
 /**
@@ -205,40 +292,44 @@ export function planResolutionChange(
   before: ResolutionSelectionState,
   change: ResolutionChangeRequest,
 ): ResolutionChangePlan {
+  if (change.field === 'removeEffect') {
+    const effectsToRemove = findEffectRemovalTargets(before, change.effectId)
+    return {
+      requestedPatch: {},
+      cleanupPatch: {},
+      incompatibleSelections: [],
+      effectsToRemove,
+      discardedOutcomeBranches: [],
+      outcomePatch: effectsToRemove.length
+        ? { outcomes: stripEffectFromOutcomes(before.outcomes ?? [], change.effectId) }
+        : undefined,
+      warnings: collectWarnings(before),
+    }
+  }
+
   const requestedPatch = buildRequestedPatch(before, change)
   let after = stateAfterPatch(before, requestedPatch)
 
-  const proximityCleanup =
-    change.field === 'proximityKind' ? buildProximityCleanupPatch(before, change.value) : {}
-
-  after = stateAfterPatch(after, proximityCleanup)
-
-  const methodCleanup =
-    change.field === 'methodOption' ? buildMethodCleanupPatch(before, after) : {}
-  after = stateAfterPatch(after, methodCleanup)
-
-  const patternCleanup =
-    change.field === 'applicationPatternKind' && change.value === 'none'
-      ? buildPatternCleanupPatch(before, after)
-      : {}
-
-  after = stateAfterPatch(after, patternCleanup)
-
-  const cleanupPatch: ResolutionPatch = {
-    ...proximityCleanup,
-    ...methodCleanup,
-    ...patternCleanup,
-  }
+  const cleanupPatch = buildFieldCleanupPatches(before, change, after)
+  after = stateAfterPatch(after, cleanupPatch)
 
   const incompatibleSelections = collectIncompatibleSelections(after)
   const effectsToRemove = findEffectsToRemove(after)
   const warnings = collectWarnings(after)
+
+  const outcomePlan =
+    change.field === 'methodOption'
+      ? planOutcomeMethodChange(before, change.value)
+      : { discardedBranches: [], mappedOutcomes: before.outcomes ?? [] }
 
   return {
     requestedPatch,
     cleanupPatch,
     incompatibleSelections,
     effectsToRemove,
+    discardedOutcomeBranches: outcomePlan.discardedBranches,
+    outcomePatch:
+      change.field === 'methodOption' ? { outcomes: outcomePlan.mappedOutcomes } : undefined,
     warnings,
   }
 }

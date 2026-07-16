@@ -20,6 +20,7 @@ export interface RichTextLinkPreviewCardProps extends PreviewCardRootVariantProp
   onSelect?: () => void
   onClear?: () => void
   clearLabel?: string
+  layout?: PreviewCardRootVariantProps['layout']
 }
 
 export function RichTextLinkPreviewCard({
@@ -32,6 +33,7 @@ export function RichTextLinkPreviewCard({
   onSelect,
   onClear,
   clearLabel = 'Clear selected internal link',
+  layout = 'list',
 }: RichTextLinkPreviewCardProps) {
   const resolvedInteractive = onClear ? false : interactive || Boolean(onSelect)
 
@@ -41,6 +43,7 @@ export function RichTextLinkPreviewCard({
       eyebrow={toEyebrow(contentType)}
       description={sourceLabel}
       tone={tone}
+      layout={layout}
       interactive={resolvedInteractive}
       className={className}
       onSelect={onClear ? undefined : onSelect}

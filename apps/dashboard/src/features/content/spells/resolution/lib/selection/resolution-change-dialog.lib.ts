@@ -1,7 +1,9 @@
 import {
   getSpellApplicationPatternKindLabel,
   getSpellResolutionAttackTypeLabel,
+  getSpellResolutionOutcomeAuthoringLabel,
   getSpellResolutionProximityKindLabel,
+  getSpellResolutionSelectionModeLabel,
   type ResolutionChangePlan,
   type ResolutionChangeRequest,
   type ResolutionMethodOption,
@@ -25,9 +27,11 @@ function formatIncompatibleSelectionLine(
 }
 
 const CHANGE_FIELD_HEADLINES: Record<ResolutionChangeRequest['field'], string> = {
+  selectionMode: 'Change selection mode?',
   proximityKind: 'Change target proximity?',
   methodOption: 'Change resolution method?',
   applicationPatternKind: 'Change application pattern?',
+  removeEffect: 'Remove effect?',
 }
 
 export type ResolutionChangeDialogCopy = {
@@ -47,10 +51,15 @@ export function formatChangePlanForDialog(
   const consequences = [
     ...plan.incompatibleSelections.map((selection) => formatIncompatibleSelectionLine(selection)),
     ...plan.effectsToRemove.map((effect) => `remove ${describeEffectForConfirm(effect)}`),
+    ...plan.discardedOutcomeBranches.map(
+      (result) => `discard authored content for ${getSpellResolutionOutcomeAuthoringLabel(result)}`,
+    ),
   ]
 
   let intro = 'Applying this change will:'
-  if (change.field === 'proximityKind') {
+  if (change.field === 'selectionMode') {
+    intro = `Changing selection mode to ${getSpellResolutionSelectionModeLabel(change.value)} will:`
+  } else if (change.field === 'proximityKind') {
     intro = `Changing the target to ${getSpellResolutionProximityKindLabel(change.value)} will:`
   }
 

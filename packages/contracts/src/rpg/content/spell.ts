@@ -1,6 +1,7 @@
 export * from './spell/body'
 export * from './spell/levels'
 export * from './spell/effects'
+export * from './spell/modeling'
 export * from './spell/resolution'
 export {
   getSpellAtomicEffectKindLabel,

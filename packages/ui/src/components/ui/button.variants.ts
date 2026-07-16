@@ -16,11 +16,12 @@ export const buttonVariants = cva(
         destructive:
           'bg-destructive text-destructive-foreground shadow-sm hover:bg-destructive/90 active:bg-destructive/80',
         outline:
-          'border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground active:bg-accent/80',
+          'border border-input bg-transparent shadow-sm hover:bg-accent hover:text-accent-foreground active:bg-accent/80',
         secondary:
           'bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/80 active:bg-secondary/60',
         ghost: 'hover:bg-accent hover:text-accent-foreground active:bg-accent/80',
         link: 'text-primary underline-offset-4 hover:underline',
+        text: 'bg-transparent text-primary hover:bg-transparent hover:text-primary/90 active:bg-transparent active:text-primary/80',
       },
       size: {
         default: 'h-9 px-4 py-2',

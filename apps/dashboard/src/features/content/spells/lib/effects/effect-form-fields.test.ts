@@ -14,8 +14,8 @@ function findEffectsArray(fields: FormItem[]): ArrayConfig | undefined {
 describe('effectArrayFields', () => {
   it('registers a searchable add menu with four templates', () => {
     const arrayField = findEffectsArray(effectArrayFields({}))
-    expect(arrayField?.addMenu?.items).toHaveLength(4)
-    expect(arrayField?.addMenu?.items.map((item) => item.id)).toEqual([
+    expect(arrayField?.addActionMenu?.items).toHaveLength(4)
+    expect(arrayField?.addActionMenu?.items.map((item) => item.id)).toEqual([
       'damage',
       'healing',
       'temporary-hit-points',
@@ -89,7 +89,7 @@ describe('effect array item headers', () => {
         },
         0,
       ),
-    ).toBe('Damage')
+    ).toBe('Damage — 1d6 Fire damage')
 
     expect(
       formatEffectRowSummary({
@@ -111,7 +111,7 @@ describe('effect array item headers', () => {
         },
         0,
       ),
-    ).toBe('Damage — Clenched Fist')
+    ).toBe('Damage — Clenched Fist · 5d8 Force damage')
 
     expect(
       formatEffectRowSummary({
@@ -132,7 +132,7 @@ describe('effect array item headers', () => {
         },
         0,
       ),
-    ).toBe('Projectile count — darts')
+    ).toBe('Projectile count — darts · 3 darts')
 
     expect(
       formatEffectRowSummary({

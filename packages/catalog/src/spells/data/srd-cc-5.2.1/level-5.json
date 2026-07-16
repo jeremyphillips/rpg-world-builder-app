@@ -40,7 +40,30 @@
       "verbal": true,
       "somatic": true
     },
-    "higherLevelSlotEffect": "<p>The creature's Slam damage increases by 1d4 (Medium or smaller), 1d6 (Large), or 1d12 (Huge) for each spell slot level above 5.</p>"
+    "higherLevelSlotEffect": "<p>The creature's Slam damage increases by 1d4 (Medium or smaller), 1d6 (Large), or 1d12 (Huge) for each spell slot level above 5.</p>",
+    "modeling": {
+      "blocker": {
+        "code": "summoning-model-missing"
+      },
+      "gaps": [
+        {
+          "code": "object-state-awareness",
+          "note": "Worn, carried, fixed, and size eligibility stays prose"
+        },
+        {
+          "code": "choice-model-missing",
+          "note": "Object selection and size weighting stay prose"
+        },
+        {
+          "code": "dynamic-target-count",
+          "note": "Spellcasting modifier object cap stays prose"
+        },
+        {
+          "code": "progression-schema-missing",
+          "note": "Slot slam damage scaling stays prose"
+        }
+      ]
+    }
   },
   {
     "id": "srd-cc-5.2.1:arcane-hand",
@@ -88,35 +111,11 @@
       }
     },
     "higherLevelSlotEffect": "<p>The damage of the Clenched Fist increases by 2d8 and the damage of the Grasping Hand increases by 2d6 for each spell slot level above 5.</p>",
-    "effects": [
-      {
-        "id": "srd-cc-5.2.1:arcane-hand:clenched-fist",
-        "kind": "damage",
-        "label": "Clenched Fist",
-        "roll": {
-          "dice": {
-            "count": 5,
-            "faces": 8
-          }
-        },
-        "damageType": "force"
-      },
-      {
-        "id": "srd-cc-5.2.1:arcane-hand:grasping-hand-crush",
-        "kind": "damage",
-        "label": "Grasping Hand crush",
-        "roll": {
-          "dice": {
-            "count": 4,
-            "faces": 6
-          }
-        },
-        "damageType": "bludgeoning"
-      }
-    ],
     "resolution": {
+      "selectionMode": "targets",
       "target": {
         "count": 1,
+        "countKind": "exact",
         "kind": "creature",
         "proximity": {
           "kind": "distance",
@@ -161,6 +160,27 @@
           "applications": []
         }
       ]
+    },
+    "modeling": {
+      "status": "meaningful-partial",
+      "gaps": [
+        {
+          "code": "multi-mode-choice",
+          "note": "Forceful Hand and Interposing Hand modes stay prose"
+        },
+        {
+          "code": "modifier-model-missing",
+          "note": "Grasping Hand crush + spellcasting modifier stays prose"
+        },
+        {
+          "code": "conditional-effect-model-missing",
+          "note": "Grapple, push, and cover modes stay prose"
+        },
+        {
+          "code": "independent-effect-object-model-missing",
+          "note": "Hand object AC, HP, and duration stay prose"
+        }
+      ]
     }
   },
   {
@@ -199,6 +219,18 @@
       "material": {
         "description": "diamond dust worth 100+ GP, which the spell consumes"
       }
+    },
+    "modeling": {
+      "blocker": {
+        "code": "effect-schema-missing",
+        "capabilityId": "condition"
+      },
+      "gaps": [
+        {
+          "code": "choice-model-missing",
+          "note": "Pick effect from list stays prose"
+        }
+      ]
     }
   },
   {
@@ -239,21 +271,11 @@
       "somatic": true
     },
     "higherLevelSlotEffect": "<p>The healing increases by 1d8 for each spell slot level above 5.</p>",
-    "effects": [
-      {
-        "id": "srd-cc-5.2.1:mass-cure-wounds:healing",
-        "kind": "healing",
-        "roll": {
-          "dice": {
-            "count": 5,
-            "faces": 8
-          }
-        }
-      }
-    ],
     "resolution": {
+      "selectionMode": "targets",
       "target": {
         "count": 6,
+        "countKind": "up-to",
         "kind": "creature",
         "proximity": {
           "kind": "distance",
@@ -287,6 +309,23 @@
               "amount": "full"
             }
           ]
+        }
+      ]
+    },
+    "modeling": {
+      "status": "meaningful-partial",
+      "gaps": [
+        {
+          "code": "modifier-model-missing",
+          "note": "Spellcasting ability modifier on healing stays prose"
+        },
+        {
+          "code": "chosen-within-area",
+          "note": "Recipient selection within 30-ft sphere stays prose"
+        },
+        {
+          "code": "progression-schema-missing",
+          "note": "Slot +1d8 healing scaling stays prose"
         }
       ]
     }
@@ -333,7 +372,26 @@
         "description": "a jewel worth 1,000+ GP, which the spell consumes"
       }
     },
-    "higherLevelSlotEffect": "<p>The duration increases with a spell slot of level 6 (10 days), 7 (30 days), 8 (180 days), and 9 (366 days).</p>"
+    "higherLevelSlotEffect": "<p>The duration increases with a spell slot of level 6 (10 days), 7 (30 days), 8 (180 days), and 9 (366 days).</p>",
+    "modeling": {
+      "blocker": {
+        "code": "summoning-model-missing"
+      },
+      "gaps": [
+        {
+          "code": "effect-schema-missing",
+          "note": "Service binding mechanics stay prose"
+        },
+        {
+          "code": "conditional-effect-model-missing",
+          "note": "Save, hostile twist, extend summon stay prose"
+        },
+        {
+          "code": "progression-schema-missing",
+          "note": "Slot duration scaling stays prose"
+        }
+      ]
+    }
   },
   {
     "id": "srd-cc-5.2.1:reincarnate",
@@ -370,6 +428,26 @@
       "material": {
         "description": "rare oils worth 1,000+ GP, which the spell consumes"
       }
+    },
+    "modeling": {
+      "blocker": {
+        "code": "resurrection-model-missing",
+        "note": "Remediation order — transformation follows"
+      },
+      "gaps": [
+        {
+          "code": "transformation-model-missing",
+          "note": "Species and form change stay prose"
+        },
+        {
+          "code": "catalog-data-incomplete",
+          "note": "Species roll table placeholder in prose"
+        },
+        {
+          "code": "choice-model-missing",
+          "note": "Species outcome choice stays prose"
+        }
+      ]
     }
   },
   {
@@ -416,7 +494,22 @@
         "description": "an object with the image of a dragon engraved on it worth 500+ GP"
       }
     },
-    "higherLevelSlotEffect": "<p>Use the spell slot's level for the spell's level in the stat block.</p>"
+    "higherLevelSlotEffect": "<p>Use the spell slot's level for the spell's level in the stat block.</p>",
+    "modeling": {
+      "blocker": {
+        "code": "summoning-model-missing"
+      },
+      "gaps": [
+        {
+          "code": "catalog-data-incomplete",
+          "note": "Draconic Spirit table placeholder in prose"
+        },
+        {
+          "code": "progression-schema-missing",
+          "note": "Slot level for stat block stays prose"
+        }
+      ]
+    }
   },
   {
     "id": "srd-cc-5.2.1:telekinesis",
@@ -459,6 +552,30 @@
     "components": {
       "verbal": true,
       "somatic": true
+    },
+    "modeling": {
+      "blocker": {
+        "code": "effect-schema-missing",
+        "capabilityId": "movement"
+      },
+      "gaps": [
+        {
+          "code": "multi-mode-choice",
+          "note": "Creature vs object branch stays prose"
+        },
+        {
+          "code": "conditional-effect-model-missing",
+          "note": "Saves, Restrained, suspended fall stay prose"
+        },
+        {
+          "code": "object-state-awareness",
+          "note": "Worn or carried object stays prose"
+        },
+        {
+          "code": "duration-model-missing",
+          "note": "Until the end of your next turn on Restrained stays prose"
+        }
+      ]
     }
   }
 ]

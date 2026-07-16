@@ -46,7 +46,8 @@ function visibleWhenArmorHeavy(): FieldVisibility {
 export function armorFormFieldGroup(): FormItem {
   return {
     kind: 'group',
-    legend: 'Armor',
+    legend: '',
+    fieldsChrome: { variant: 'panel' },
     fields: [
       {
         kind: 'row',

@@ -8,6 +8,7 @@ import type { CharacterBuilderDraft, CharacterBuilderDraftIdentity } from '@rpg/
 import type { IdentityFormValues } from '../../lib/steps/identity-form-fields'
 import {
   areIdentityDraftsEqual,
+  emptyNarrativeFormValues,
   identityDraftToFormValues,
   identityFormValuesToDraft,
 } from '../../lib/steps/identity-form-values'
@@ -33,12 +34,7 @@ export function IdentityDraftSync({ draftIdentity, onDraftChange }: IdentityDraf
     const draftChanged = !areIdentityDraftsEqual(previousDraft, draftIdentity)
     const formIdentity = identityFormValuesToDraft({
       name: name ?? '',
-      narrative: narrative ?? {
-        personalityTraits: [],
-        ideals: [],
-        bonds: [],
-        flaws: [],
-      },
+      narrative: narrative ?? emptyNarrativeFormValues(),
       alignment,
     })
 

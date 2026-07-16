@@ -1,8 +1,6 @@
 import {
   deriveDefaultEffectRecipient,
-  formatEffectRowSentenceFromParts,
   formatResolutionAvailabilityReason,
-  formatRollValue,
   getApplicationPatternAvailability,
   getEffectKindAvailability,
   getMethodAvailability,
@@ -12,14 +10,14 @@ import {
   type ResolutionEffectKind,
   type ResolutionMethodOption,
   type ResolutionSelectionState,
+  type SpellResolutionTargetKind,
 } from '@rpg/contracts'
 import type { FieldOption } from '@rpg/ui/form'
 
-import {
-  normalizeRollFormValue,
-  type RollFormShape,
-} from '../../../../lib/forms/mechanics/roll-form-values'
+import { formatEffectRowPrimary, formatEffectRowSummary } from '../../../lib/effects/effect-display'
+
 import { RESOLUTION_EFFECT_KINDS } from '../effects/resolution-effect-add-menu.lib'
+import { getEffectTemplatesForKinds } from '../../../lib/effects/effect-template-registry'
 import { RESOLUTION_APPLICATION_PATTERN_OPTIONS } from '../form/resolution-form-labels'
 
 function methodOptionLabel(option: ResolutionMethodOption): string {
@@ -75,9 +73,14 @@ export function buildResolutionApplicationPatternOptions(
 export type ResolutionEffectAddMenuItem = {
   id: ResolutionEffectKind
   label: string
+  description?: string
+  note?: string
   disabled: boolean
-  reason?: string
 }
+
+const RESOLUTION_EFFECT_TEMPLATE_BY_KIND = new Map(
+  getEffectTemplatesForKinds(RESOLUTION_EFFECT_KINDS).map((template) => [template.kind, template]),
+)
 
 /** Effect template items for the resolution-specific add control. */
 export function buildResolutionEffectAddMenuItems(
@@ -85,16 +88,21 @@ export function buildResolutionEffectAddMenuItems(
 ): ResolutionEffectAddMenuItem[] {
   return RESOLUTION_EFFECT_KINDS.map((kind) => {
     const label = getSpellAtomicEffectKindLabel(kind)
-    if (!context) return { id: kind, label, disabled: false }
+    const description = RESOLUTION_EFFECT_TEMPLATE_BY_KIND.get(kind)?.description
+
+    if (!context) return { id: kind, label, description, disabled: false }
 
     const availability = getEffectKindAvailability(context, kind)
+    const note = availability.reason
+      ? formatResolutionAvailabilityReason(availability.reason, 'option')
+      : undefined
+
     return {
       id: kind,
       label,
+      description,
+      note: !availability.allowed ? note : undefined,
       disabled: !availability.allowed,
-      reason: availability.reason
-        ? formatResolutionAvailabilityReason(availability.reason, 'option')
-        : undefined,
     }
   })
 }
@@ -103,34 +111,10 @@ export function formatResolutionEffectRowSummary(
   row: Record<string, unknown>,
   context: ResolutionSelectionState,
 ): string {
-  const kind = row.kind
-  if (kind !== 'damage' && kind !== 'healing' && kind !== 'temporary-hit-points') {
-    return ''
-  }
-
-  const roll = normalizeRollFormValue(row.roll as RollFormShape)
-  if (!roll) return ''
-
-  const recipient = deriveDefaultEffectRecipient(context)
-  return formatEffectRowSentenceFromParts(
-    {
-      kind,
-      roll,
-      ...(kind === 'damage' && typeof row.damageType === 'string'
-        ? { damageType: row.damageType }
-        : {}),
-    },
-    { recipient },
-  )
-}
-
-function formatEffectRollDetail(row: Record<string, unknown>): string | undefined {
-  const roll = normalizeRollFormValue(row.roll as RollFormShape)
-  if (!roll) return undefined
-  if (row.kind === 'damage' && typeof row.damageType === 'string') {
-    return `${formatRollValue(roll)} ${row.damageType} damage`
-  }
-  return formatRollValue(roll)
+  return formatEffectRowSummary(row, {
+    recipient: deriveDefaultEffectRecipient(context),
+    targetKind: context.targetKind as SpellResolutionTargetKind | undefined,
+  })
 }
 
 /** Compact bullet for confirm dialog effect removal lines. */
@@ -139,8 +123,7 @@ export function describeEffectForConfirm(effect: {
   kind: string
   roll?: unknown
   damageType?: string
+  label?: string
 }): string {
-  const kindLabel = getSpellAtomicEffectKindLabel(effect.kind as ResolutionEffectKind)
-  const detail = formatEffectRollDetail(effect as Record<string, unknown>)
-  return detail ? `${kindLabel} — ${detail}` : kindLabel
+  return formatEffectRowPrimary(effect, 0)
 }

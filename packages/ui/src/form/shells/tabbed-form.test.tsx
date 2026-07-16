@@ -398,7 +398,7 @@ describe('TabbedForm', () => {
             kind: 'array',
             name: 'grants',
             legend: 'Grants',
-            addLabel: 'Add grant',
+            addActionLabel: 'Add grant',
             min: 1,
             itemVariant: 'detailed',
             itemCollapsible: true,

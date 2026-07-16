@@ -16,10 +16,39 @@
       "conditions": ["charmed", "frightened", "paralyzed", "poisoned", "stunned", "prone"],
       "roles": ["healing", "buff"]
     },
-    "castingTime": { "normal": { "value": 1, "unit": "action" }, "canBeCastAsRitual": false },
-    "range": { "kind": "distance", "value": { "value": 60, "unit": "ft" } },
-    "duration": { "kind": "instantaneous" },
-    "components": { "verbal": true }
+    "castingTime": {
+      "normal": {
+        "value": 1,
+        "unit": "action"
+      },
+      "canBeCastAsRitual": false
+    },
+    "range": {
+      "kind": "distance",
+      "value": {
+        "value": 60,
+        "unit": "ft"
+      }
+    },
+    "duration": {
+      "kind": "instantaneous"
+    },
+    "components": {
+      "verbal": true
+    },
+    "modeling": {
+      "blocker": {
+        "code": "effect-schema-missing",
+        "capabilityId": "hit-point-restoration",
+        "note": "Non-roll/full HP restoration unsupported; bundled condition removal stays residual"
+      },
+      "gaps": [
+        {
+          "code": "conditional-effect-model-missing",
+          "note": "Prone target may use Reaction to stand on heal stays prose"
+        }
+      ]
+    }
   },
   {
     "id": "srd-cc-5.2.1:prismatic-wall",
@@ -60,6 +89,35 @@
     "components": {
       "verbal": true,
       "somatic": true
+    },
+    "modeling": {
+      "blocker": {
+        "code": "effect-schema-missing",
+        "capabilityId": "persistent-zone",
+        "note": "Layered persistent barrier"
+      },
+      "gaps": [
+        {
+          "code": "wall-or-path-geometry",
+          "note": "Wall vs globe placement and dimensions stay prose"
+        },
+        {
+          "code": "multi-mode-choice",
+          "note": "Vertical wall vs globe shape stays prose"
+        },
+        {
+          "code": "choice-model-missing",
+          "note": "Designated safe passage creatures stay prose"
+        },
+        {
+          "code": "conditional-effect-model-missing",
+          "note": "Blind on approach, per-layer saves, and layer destruction stay prose"
+        },
+        {
+          "code": "catalog-data-incomplete",
+          "note": "Prismatic Layers table placeholder in prose"
+        }
+      ]
     }
   },
   {
@@ -105,6 +163,33 @@
       "material": {
         "description": "a drop of mercury, a dollop of gum arabic, and a wisp of smoke"
       }
+    },
+    "modeling": {
+      "blocker": {
+        "code": "transformation-model-missing"
+      },
+      "gaps": [
+        {
+          "code": "multi-mode-choice",
+          "note": "Creature→creature, object→creature, and creature→object stay prose"
+        },
+        {
+          "code": "choice-model-missing",
+          "note": "New form choice and CR limits stay prose"
+        },
+        {
+          "code": "conditional-effect-model-missing",
+          "note": "Unwilling save, gear melding, and concentration→permanent stay prose"
+        },
+        {
+          "code": "summoning-model-missing",
+          "note": "Object→creature branch creates friendly creature"
+        },
+        {
+          "code": "object-state-awareness",
+          "note": "Object must be nonmagical and not worn or carried"
+        }
+      ]
     }
   },
   {
@@ -139,6 +224,30 @@
     },
     "components": {
       "verbal": true
+    },
+    "modeling": {
+      "blocker": {
+        "code": "manual-review-required",
+        "note": "Open-ended and GM-adjudicated effects block structured partial"
+      },
+      "gaps": [
+        {
+          "code": "multi-mode-choice",
+          "note": "Duplicate spell, object creation, and alternate effects stay prose"
+        },
+        {
+          "code": "choice-model-missing",
+          "note": "Effect selection at cast stays prose"
+        },
+        {
+          "code": "conditional-effect-model-missing",
+          "note": "Stress penalties, Strength reduction, and 33% never-cast-again stay prose"
+        },
+        {
+          "code": "progression-schema-missing",
+          "note": "Necrotic damage per spell level after stress stays prose"
+        }
+      ]
     }
   }
 ]

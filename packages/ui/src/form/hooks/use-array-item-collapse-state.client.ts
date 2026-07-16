@@ -11,11 +11,11 @@ import {
   pruneArrayItemCollapseOverrides,
   serializeArrayItemCollapseOverrides,
   toggleArrayItemCollapseOverride,
-} from '../config/array-item-collapse.lib'
+} from '../config/array/array-item-collapse.lib'
 import {
   readArrayItemCollapseOverrides,
   writeArrayItemCollapseOverrides,
-} from '../config/array-item-collapse-storage.lib'
+} from '../config/array/array-item-collapse-storage.lib'
 import { useFormUiContext, type ValidationSessionExpandKey } from '../context/form-ui.context'
 
 export interface UseArrayItemCollapseStateOptions {

@@ -101,6 +101,9 @@ export {
   fieldDigitTrailingIconClasses,
   fieldDigitTrailingPaddingClasses,
   fieldGroupedControlSizeClasses,
+  buttonSizeToComboboxFieldSize,
+  fieldSizeToArrayAddButtonSize,
+  resolveArrayAddButtonSize,
   fieldSizeToBadgeSize,
   fieldSizeToChipSize,
   fieldSizeTypographyClasses,
@@ -127,6 +130,10 @@ export { FormField } from './components/ui/form-field'
 export { FieldLayout, type FieldLayoutProps } from './components/ui/field-layout'
 export { TextField, type TextFieldProps } from './components/ui/text-field'
 export { TextareaField, type TextareaFieldProps } from './components/ui/textarea-field'
+export {
+  OptionalFieldDisclosure,
+  type OptionalFieldDisclosureProps,
+} from './components/ui/optional-field-disclosure.client'
 export { NumberField, type NumberFieldProps } from './components/ui/number-field'
 export {
   DiceFormulaField,
@@ -149,12 +156,18 @@ export {
   ARRAY_ITEM_HEADER_DIVIDER,
   ARRAY_ITEM_TEXT_SEPARATOR,
   joinArrayItemSummaryParts,
-} from './form/config/array-item-config.lib'
+} from './form/config/array/array-item-config.lib'
 export {
   SelectField,
   type SelectFieldProps,
   type SelectFieldOption,
 } from './components/ui/select-field'
+export {
+  FieldReadOnlyValue,
+  FieldReadOnlyValueField,
+  type FieldReadOnlyValueProps,
+  type FieldReadOnlyValueFieldProps,
+} from './components/ui/field-read-only-value.client'
 export { CheckboxField, type CheckboxFieldProps } from './components/ui/checkbox-field'
 export { SwitchField, type SwitchFieldProps } from './components/ui/switch-field'
 export {
@@ -195,9 +208,11 @@ export { MarkdownField, type MarkdownFieldProps } from './components/ui/markdown
 
 export {
   FieldGroup,
+  type FieldGroupFieldsChrome,
   type FieldGroupLegendSize,
   type FieldGroupProps,
 } from './components/ui/field-group'
+export type { FieldChrome } from './components/ui/field-chrome.variants'
 export {
   fieldArrayItemClasses,
   fieldArrayItemListClasses,
@@ -212,7 +227,7 @@ export {
   fieldInlineToggleRowClasses,
   fieldLabelHintStackClasses,
   fieldLabelVariants,
-  fieldRowLayoutVariants,
+  fieldRowLayoutClasses,
   fieldSeparatorVariants,
   fieldStackRhythmVariants,
   fieldSettingsRowClasses,
@@ -221,7 +236,6 @@ export {
   type FieldHintPosition,
   type FieldLabelPlacement,
   type FieldLabelPosition,
-  type FieldRowLayout,
   type FieldSeparator,
   type FieldStackLayout,
   type FieldStackRhythm,
@@ -258,6 +272,7 @@ export {
   previewCardTitleVariants,
   previewCardDescriptionVariants,
   type PreviewCardRootVariantProps,
+  type PreviewCardLayout,
 } from './components/ui/preview-card.variants'
 export {
   RichTextLinkPreviewCard,

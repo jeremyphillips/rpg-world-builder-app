@@ -3,14 +3,14 @@ import { ALIGNMENTS, getAlignmentLabel, optionalAlignmentSchema } from '@rpg/con
 import { toOptions, type FormItem } from '@rpg/ui/form'
 
 const narrativeFormItemSchema = z.object({
-  value: z.string().min(1),
+  value: z.string(),
 })
 
 const narrativeFormSchema = z.object({
-  personalityTraits: z.array(narrativeFormItemSchema).default([]),
-  ideals: z.array(narrativeFormItemSchema).default([]),
-  bonds: z.array(narrativeFormItemSchema).default([]),
-  flaws: z.array(narrativeFormItemSchema).default([]),
+  personalityTraits: z.array(narrativeFormItemSchema).default([{ value: '' }]),
+  ideals: z.array(narrativeFormItemSchema).default([{ value: '' }]),
+  bonds: z.array(narrativeFormItemSchema).default([{ value: '' }]),
+  flaws: z.array(narrativeFormItemSchema).default([{ value: '' }]),
   backstory: z.string().optional(),
 })
 
@@ -30,14 +30,21 @@ function narrativeArrayField(
   name: 'personalityTraits' | 'ideals' | 'bonds' | 'flaws',
   legend: string,
   placeholder: string,
-  addLabel: string,
+  addActionLabel: string,
+  hideItemLabel: boolean = true,
 ): FormItem {
   return {
     kind: 'array',
     name: `narrative.${name}`,
     legend,
     itemVariant: 'compact',
+    addActionLayout: 'inline',
+    addActionVariant: 'ghost',
+    addActionSize: 'sm',
     reorder: false,
+    min: 1,
+    itemChrome: 'subtle',
+    size: 'md',
     fields: [
       {
         kind: 'row',
@@ -45,15 +52,14 @@ function narrativeArrayField(
           {
             type: 'text',
             name: 'value',
-            label: legend,
+            label: hideItemLabel ? '' : legend,
             placeholder,
-            required: true,
             width: 'full',
           },
         ],
       },
     ],
-    addLabel,
+    addActionLabel,
     itemHeader: {
       fallback: (index) => `${legend} ${index + 1}`,
     },
@@ -81,19 +87,32 @@ export const identityFormFields: FormItem[] = [
     multiple: false,
     options: toOptions(ALIGNMENTS, ALIGNMENT_LABELS),
     width: 'full',
+    chrome: { variant: 'panel' },
   },
-  narrativeArrayField(
-    'personalityTraits',
-    'Personality traits',
-    'Describe a distinctive habit or mannerism.',
-    'Add trait',
-  ),
-  narrativeArrayField('ideals', 'Ideals', 'What principle drives your character?', 'Add ideal'),
-  narrativeArrayField('bonds', 'Bonds', 'Who or what does your character care about?', 'Add bond'),
-  narrativeArrayField('flaws', 'Flaws', 'What weakness complicates their life?', 'Add flaw'),
   {
-    type: 'richtext',
-    name: 'narrative.backstory',
-    label: 'Backstory',
+    kind: 'group',
+    legend: 'Narrative',
+    fieldsChrome: { variant: 'inset' },
+    fields: [
+      narrativeArrayField(
+        'personalityTraits',
+        'Personality traits',
+        'Describe a distinctive habit or mannerism.',
+        'Add trait',
+      ),
+      narrativeArrayField('ideals', 'Ideals', 'What principle drives your character?', 'Add ideal'),
+      narrativeArrayField(
+        'bonds',
+        'Bonds',
+        'Who or what does your character care about?',
+        'Add bond',
+      ),
+      narrativeArrayField('flaws', 'Flaws', 'What weakness complicates their life?', 'Add flaw'),
+      {
+        type: 'richtext',
+        name: 'narrative.backstory',
+        label: 'Backstory',
+      },
+    ],
   },
 ]

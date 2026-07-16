@@ -5,6 +5,8 @@
  * Component-specific variants should compose these maps instead of repeating
  * the sm/md/lg height, padding, and type-scale tuples.
  */
+import type { ButtonVariantProps } from './button.variants'
+
 export type FieldSizeToken = 'sm' | 'md' | 'lg'
 
 /** Shared type scale for labels and controls at each field size. */
@@ -71,6 +73,34 @@ export const fieldSizeToChipSize = {
   md: 'md',
   lg: 'lg',
 } as const satisfies Record<FieldSizeToken, 'md' | 'lg'>
+
+/**
+ * Maps array section field size to the paired add-button size. Array item fields
+ * default to `sm`, but the add action uses the next visual step (`default` / md).
+ */
+export const fieldSizeToArrayAddButtonSize = {
+  sm: 'default',
+  md: 'default',
+  lg: 'lg',
+} as const satisfies Record<FieldSizeToken, 'default' | 'lg'>
+
+type ArrayAddButtonSize = NonNullable<ButtonVariantProps['size']>
+
+/** Resolves array add-control button size — explicit override wins over section rhythm. */
+export function resolveArrayAddButtonSize(
+  sectionSize: FieldSizeToken,
+  override?: ArrayAddButtonSize,
+): ArrayAddButtonSize {
+  return override ?? fieldSizeToArrayAddButtonSize[sectionSize]
+}
+
+/** Maps outline button size to combobox search row field size. */
+export const buttonSizeToComboboxFieldSize = {
+  sm: 'sm',
+  default: 'md',
+  lg: 'lg',
+  icon: 'md',
+} as const satisfies Record<'sm' | 'default' | 'lg' | 'icon', FieldSizeToken>
 
 /** Icon sizing that pairs with `fieldDigitTrailingColumnClasses`. */
 export const fieldDigitTrailingIconClasses = {

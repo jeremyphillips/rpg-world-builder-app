@@ -10,17 +10,27 @@ import { readFileSync, writeFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
+import {
+  SRD_521_SPELL_LEVEL_0_SHARD_FILES,
+  SRD_521_SPELL_LEVEL_SEED_FILES,
+} from '../src/spells/spell-level-seed-files.ts'
+
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const DATA_DIR = join(__dirname, '../src/spells/data/srd-cc-5.2.1')
 
-const LEVEL_FILES = [
-  'level-0.json',
-  'level-1.json',
-  'level-2.json',
-  'level-3.json',
-  'level-5.json',
-  'level-6.json',
-]
+const LEVEL_FILES = SRD_521_SPELL_LEVEL_SEED_FILES.filter((file) =>
+  [
+    ...SRD_521_SPELL_LEVEL_0_SHARD_FILES,
+    'level-1-a-f.json',
+    'level-1-f-i.json',
+    'level-1-i-p.json',
+    'level-1-r-t.json',
+    'level-2.json',
+    'level-3.json',
+    'level-5.json',
+    'level-6.json',
+  ].includes(file),
+)
 
 const CANTrip_PATTERN = /<p><strong>Cantrip Upgrade\.<\/strong>\s*([\s\S]*?)<\/p>\s*$/i
 const HIGHER_LEVEL_PATTERN =

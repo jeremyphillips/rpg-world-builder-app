@@ -1,4 +1,4 @@
-import type { SpellResolution, SpellResolutionMethod } from '@rpg/contracts'
+import type { SpellResolutionMethod } from '@rpg/contracts'
 
 import type { ResolutionFormValues, ResolutionMethodKind } from './resolution-form-schema'
 
@@ -24,15 +24,9 @@ export function buildMethodKind(method: SpellResolutionMethod): ResolutionMethod
   return 'saving-throw'
 }
 
-export function applyMethodFields(
-  form: ResolutionFormValues,
-  method: SpellResolutionMethod,
-  outcomes: SpellResolution['outcomes'],
-): void {
+export function applyMethodFields(form: ResolutionFormValues, method: SpellResolutionMethod): void {
   if (method.kind === 'attack') {
     form.attackType = method.attackType
-    const hitNote = outcomes.find((outcome) => outcome.result === 'hit')?.note
-    if (hitNote) form.hitNote = hitNote
     return
   }
 

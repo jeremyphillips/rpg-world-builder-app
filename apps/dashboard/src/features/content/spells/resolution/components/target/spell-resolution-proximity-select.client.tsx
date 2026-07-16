@@ -12,13 +12,13 @@ import {
 import type { ResolutionFormValues } from '../../lib/form/resolution-form-schema'
 import { RESOLUTION_FIELD_NAME } from '../../lib/form/resolution-form-values'
 
-/** Proximity select routed through confirm-first change planning. */
+/** Proximity select routed through confirm-first change planning (targets mode only). */
 export function SpellResolutionProximitySelect() {
   const id = useId()
   const resolution = useWatch({ name: RESOLUTION_FIELD_NAME }) as ResolutionFormValues | undefined
   const { requestResolutionChange } = useResolutionEditorContext()
 
-  if (!resolution) return null
+  if (!resolution || resolution.selectionMode !== 'targets') return null
 
   return (
     <SelectField

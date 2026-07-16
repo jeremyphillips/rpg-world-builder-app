@@ -6,8 +6,15 @@ import {
 import { formatResolutionMethod } from './format-method'
 import { formatResolutionProjectilesPreview } from './format-application-pattern'
 import { formatResolutionOutcomes } from './format-outcomes'
-import { formatResolutionTarget } from './format-target'
+import { formatResolutionSelectionSections } from './format-target'
+import { formatResolutionProgressionSummary } from './progression/format'
 import type { SpellResolution } from './schema'
+
+export type FormatResolutionSummaryOptions = {
+  spellLevel?: number
+  characterLevel?: number
+  castSlotLevel?: number
+}
 
 export type SpellResolutionSummarySection = {
   heading: string
@@ -17,12 +24,13 @@ export type SpellResolutionSummarySection = {
 /** Structured summary sections for preview panels. */
 export function formatResolutionSummarySections(
   resolution: SpellResolution,
+  options: FormatResolutionSummaryOptions = {},
 ): SpellResolutionSummarySection[] {
   const sections: SpellResolutionSummarySection[] = [
-    { heading: 'Target', lines: [formatResolutionTarget(resolution)] },
+    ...formatResolutionSelectionSections(resolution),
     {
       heading: 'Check',
-      lines: [formatResolutionMethod(resolution)],
+      lines: [formatResolutionMethod(resolution, 'resolution-preview')],
     },
   ]
 
@@ -50,7 +58,21 @@ export function formatResolutionSummarySections(
 
   const outcomeLines = formatResolutionOutcomes(resolution)
   if (outcomeLines.length > 0) {
-    sections.push({ heading: 'Outcomes', lines: outcomeLines })
+    sections.push({
+      heading: outcomeLines.length === 1 ? 'Outcome' : 'Outcomes',
+      lines: outcomeLines,
+    })
+  }
+
+  if (resolution.progression && options.spellLevel !== undefined) {
+    sections.push({
+      heading: 'Progression',
+      lines: formatResolutionProgressionSummary(resolution, resolution.progression, {
+        spellLevel: options.spellLevel,
+        characterLevel: options.characterLevel,
+        castSlotLevel: options.castSlotLevel,
+      }),
+    })
   }
 
   return sections

@@ -8,7 +8,7 @@ import { applicationPatternFromForm } from '../../lib/application-pattern/resolu
 import type { ResolutionFormValues } from '../../lib/form/resolution-form-schema'
 import { RESOLUTION_FIELD_NAME } from '../../lib/form/resolution-form-values'
 
-/** Supporting label beneath the Effects section legend. */
+/** Supporting label beneath the Authored effects section legend. */
 export function SpellResolutionEffectsApplicationLabel() {
   const resolution = useWatch({ name: RESOLUTION_FIELD_NAME }) as ResolutionFormValues | undefined
 

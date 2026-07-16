@@ -1,0 +1,519 @@
+[
+  {
+    "id": "srd-cc-5.2.1:ray-of-sickness",
+    "slug": "ray-of-sickness",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Ray of Sickness",
+    "level": 1,
+    "description": "<p>You shoot a greenish ray at a creature within range. Make a ranged spell attack against the target. On a hit, the target takes 2d8 Poison damage and has the Poisoned condition until the end of your next turn.</p>",
+    "school": "necromancy",
+    "classIds": ["sorcerer", "wizard"],
+    "tags": {
+      "damageTypes": ["poison"],
+      "conditions": ["poisoned"],
+      "roles": ["damage", "debuff"]
+    },
+    "castingTime": {
+      "normal": {
+        "value": 1,
+        "unit": "action"
+      },
+      "canBeCastAsRitual": false
+    },
+    "range": {
+      "kind": "distance",
+      "value": {
+        "value": 60,
+        "unit": "ft"
+      }
+    },
+    "duration": {
+      "kind": "instantaneous"
+    },
+    "components": {
+      "verbal": true,
+      "somatic": true
+    },
+    "deliveryMethod": "ranged-spell-attack",
+    "higherLevelSlotEffect": "<p>The damage increases by 1d8 for each spell slot level above 1.</p>",
+    "resolution": {
+      "selectionMode": "targets",
+      "target": {
+        "count": 1,
+        "countKind": "exact",
+        "kind": "creature-or-object",
+        "proximity": {
+          "kind": "distance",
+          "distance": {
+            "value": 60,
+            "unit": "ft"
+          }
+        }
+      },
+      "method": {
+        "kind": "attack",
+        "attackType": "ranged-spell"
+      },
+      "effects": [
+        {
+          "id": "damage",
+          "kind": "damage",
+          "roll": {
+            "dice": {
+              "count": 2,
+              "faces": 8
+            }
+          },
+          "damageType": "poison"
+        }
+      ],
+      "outcomes": [
+        {
+          "result": "hit",
+          "note": "On a hit, the target has the Poisoned condition until the end of your next turn.",
+          "applications": [
+            {
+              "effectId": "damage",
+              "amount": "full"
+            }
+          ]
+        }
+      ]
+    },
+    "modeling": {
+      "status": "sufficient-for-character-sheet",
+      "gaps": [
+        {
+          "code": "conditional-effect-model-missing",
+          "note": "Poisoned condition rider stays prose"
+        },
+        {
+          "code": "duration-model-missing",
+          "note": "Until the end of your next turn on Poisoned stays prose"
+        }
+      ]
+    }
+  },
+  {
+    "id": "srd-cc-5.2.1:sanctuary",
+    "slug": "sanctuary",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Sanctuary",
+    "level": 1,
+    "description": "<p>You ward a creature within range. Until the spell ends, any creature who targets the warded creature with an attack roll or a damaging spell must succeed on a Wisdom saving throw or either choose a new target or lose the attack or spell. This spell doesn't protect the warded creature from areas of effect. The spell ends if the warded creature makes an attack roll, casts a spell, or deals damage.</p>",
+    "school": "abjuration",
+    "classIds": ["cleric"],
+    "tags": {
+      "roles": ["buff", "warding"]
+    },
+    "castingTime": {
+      "normal": {
+        "value": 1,
+        "unit": "bonus-action"
+      },
+      "canBeCastAsRitual": false
+    },
+    "range": {
+      "kind": "distance",
+      "value": {
+        "value": 30,
+        "unit": "ft"
+      }
+    },
+    "duration": {
+      "kind": "timed",
+      "value": 1,
+      "unit": "minute"
+    },
+    "components": {
+      "verbal": true,
+      "somatic": true,
+      "material": {
+        "description": "a shard of glass from a mirror"
+      }
+    },
+    "modeling": {
+      "blocker": {
+        "code": "targeting-model-missing"
+      },
+      "gaps": [
+        {
+          "code": "conditional-effect-model-missing",
+          "note": "Ward ends when warded creature attacks or deals damage"
+        }
+      ]
+    }
+  },
+  {
+    "id": "srd-cc-5.2.1:shield",
+    "slug": "shield",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Shield",
+    "level": 1,
+    "description": "<p>An imperceptible barrier of magical force protects you. Until the start of your next turn, you have a +5 bonus to AC, including against the triggering attack, and you take no damage from Magic Missile.</p>",
+    "school": "abjuration",
+    "classIds": ["sorcerer", "wizard"],
+    "tags": {
+      "roles": ["buff", "warding"]
+    },
+    "castingTime": {
+      "normal": {
+        "value": 1,
+        "unit": "reaction",
+        "trigger": "when you are hit by an attack roll or targeted by the Magic Missile spell"
+      },
+      "canBeCastAsRitual": false
+    },
+    "range": {
+      "kind": "self"
+    },
+    "duration": {
+      "kind": "timed",
+      "value": 1,
+      "unit": "round"
+    },
+    "components": {
+      "verbal": true,
+      "somatic": true
+    },
+    "modeling": {
+      "blocker": {
+        "code": "effect-schema-missing",
+        "capabilityId": "stat-modifier"
+      },
+      "gaps": [
+        {
+          "code": "reaction-trigger",
+          "note": "Cast when hit by attack or targeted by Magic Missile"
+        },
+        {
+          "code": "conditional-effect-model-missing",
+          "note": "Magic Missile immunity rider stays prose"
+        }
+      ]
+    }
+  },
+  {
+    "id": "srd-cc-5.2.1:shield-of-faith",
+    "slug": "shield-of-faith",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Shield of Faith",
+    "level": 1,
+    "description": "<p>A shimmering field surrounds a creature of your choice within range, granting it a +2 bonus to AC for the duration.</p>",
+    "school": "abjuration",
+    "classIds": ["cleric", "paladin"],
+    "tags": {
+      "roles": ["buff", "warding"]
+    },
+    "castingTime": {
+      "normal": {
+        "value": 1,
+        "unit": "bonus-action"
+      },
+      "canBeCastAsRitual": false
+    },
+    "range": {
+      "kind": "distance",
+      "value": {
+        "value": 60,
+        "unit": "ft"
+      }
+    },
+    "duration": {
+      "kind": "timed",
+      "value": 10,
+      "unit": "minute",
+      "concentration": true,
+      "upTo": true
+    },
+    "components": {
+      "verbal": true,
+      "somatic": true,
+      "material": {
+        "description": "a prayer scroll"
+      }
+    },
+    "modeling": {
+      "blocker": {
+        "code": "effect-schema-missing",
+        "capabilityId": "stat-modifier"
+      }
+    }
+  },
+  {
+    "id": "srd-cc-5.2.1:silent-image",
+    "slug": "silent-image",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Silent Image",
+    "level": 1,
+    "description": "<p>You create the image of an object, a creature, or some other visible phenomenon that is no larger than a 15-foot Cube. The image appears at a spot within range and lasts for the duration. The image is purely visual; it isn't accompanied by sound, smell, or other sensory effects.</p><p>As a Magic action, you can cause the image to move to any spot within range. As the image changes location, you can alter its appearance so that its movements appear natural for the image. For example, if you create an image of a creature and move it, you can alter the image so that it appears to be walking.</p><p>Physical interaction with the image reveals it to be an illusion, since things can pass through it. A creature that takes a Study action to examine the image can determine that it is an illusion with a successful Intelligence (Investigation) check against your spell save DC. If a creature discerns the illusion for what it is, the creature can see through the image.</p>",
+    "school": "illusion",
+    "classIds": ["bard", "sorcerer", "wizard"],
+    "tags": {
+      "functions": ["deception", "utility"]
+    },
+    "castingTime": {
+      "normal": {
+        "value": 1,
+        "unit": "action"
+      },
+      "canBeCastAsRitual": false
+    },
+    "range": {
+      "kind": "distance",
+      "value": {
+        "value": 60,
+        "unit": "ft"
+      }
+    },
+    "duration": {
+      "kind": "timed",
+      "value": 10,
+      "unit": "minute",
+      "concentration": true,
+      "upTo": true
+    },
+    "components": {
+      "verbal": true,
+      "somatic": true,
+      "material": {
+        "description": "a bit of fleece"
+      }
+    },
+    "modeling": {
+      "blocker": {
+        "code": "effect-schema-missing",
+        "capabilityId": "illusion"
+      },
+      "gaps": [
+        {
+          "code": "moving-aura-origin",
+          "note": "Image relocates with Magic action"
+        }
+      ]
+    }
+  },
+  {
+    "id": "srd-cc-5.2.1:sleep",
+    "slug": "sleep",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Sleep",
+    "level": 1,
+    "description": "<p>Each creature of your choice in a 5-foot-radius Sphere centered on a point within range must succeed on a Wisdom saving throw or have the Incapacitated condition until the end of its next turn, at which point it must repeat the save. If the target fails the second save, the target has the Unconscious condition for the duration. The spell ends on a target if it takes damage or someone within 5 feet of it takes an action to shake it out of the spell's effect.</p><p>Creatures that don't sleep, such as elves, or that have Immunity to the Exhaustion condition automatically succeed on saves against this spell.</p>",
+    "school": "enchantment",
+    "classIds": ["bard", "sorcerer", "wizard"],
+    "tags": {
+      "conditions": ["incapacitated", "unconscious"],
+      "roles": ["control"]
+    },
+    "castingTime": {
+      "normal": {
+        "value": 1,
+        "unit": "action"
+      },
+      "canBeCastAsRitual": false
+    },
+    "range": {
+      "kind": "distance",
+      "value": {
+        "value": 60,
+        "unit": "ft"
+      }
+    },
+    "duration": {
+      "kind": "timed",
+      "value": 1,
+      "unit": "minute",
+      "concentration": true,
+      "upTo": true
+    },
+    "components": {
+      "verbal": true,
+      "somatic": true,
+      "material": {
+        "description": "a pinch of sand or rose petals"
+      }
+    },
+    "modeling": {
+      "blocker": {
+        "code": "effect-schema-missing",
+        "capabilityId": "condition"
+      },
+      "gaps": [
+        {
+          "code": "chosen-within-area",
+          "note": "Caster picks creatures in sphere; each makes an independent save"
+        },
+        {
+          "code": "conditional-effect-model-missing",
+          "note": "Multi-stage save, damage wake, and shake action stay prose"
+        },
+        {
+          "code": "duration-model-missing",
+          "note": "Until the end of its next turn on Incapacitated stays prose"
+        }
+      ]
+    }
+  },
+  {
+    "id": "srd-cc-5.2.1:speak-with-animals",
+    "slug": "speak-with-animals",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Speak with Animals",
+    "description": "<p>For the duration, you can comprehend and verbally communicate with Beasts, and you can use any of the Influence action's skill options with them. Most Beasts have little to say about topics that don't pertain to survival or companionship, but at minimum, a Beast can give you information about nearby locations and monsters, including whatever it has perceived within the past day.</p>",
+    "school": "divination",
+    "level": 1,
+    "classIds": ["bard", "druid", "ranger", "warlock"],
+    "tags": {
+      "functions": ["communication", "social"]
+    },
+    "castingTime": {
+      "normal": {
+        "value": 1,
+        "unit": "action"
+      },
+      "canBeCastAsRitual": true
+    },
+    "range": {
+      "kind": "self"
+    },
+    "duration": {
+      "kind": "timed",
+      "value": 10,
+      "unit": "minute"
+    },
+    "components": {
+      "verbal": true,
+      "somatic": true
+    },
+    "modeling": {
+      "blocker": {
+        "code": "effect-schema-missing"
+      }
+    }
+  },
+  {
+    "id": "srd-cc-5.2.1:thunderwave",
+    "slug": "thunderwave",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Thunderwave",
+    "level": 1,
+    "description": "<p>You unleash a wave of thunderous energy. Each creature in a 15-foot Cube originating from you makes a Constitution saving throw. On a failed save, a creature takes 2d8 Thunder damage and is pushed 10 feet away from you. On a successful save, a creature takes half as much damage only.</p><p>In addition, unsecured objects that are entirely within the Cube are pushed 10 feet away from you, and a thunderous boom is audible within 300 feet.</p>",
+    "school": "evocation",
+    "classIds": ["bard", "druid", "sorcerer", "wizard"],
+    "tags": {
+      "damageTypes": ["thunder"],
+      "roles": ["damage", "control"]
+    },
+    "castingTime": {
+      "normal": {
+        "value": 1,
+        "unit": "action"
+      },
+      "canBeCastAsRitual": false
+    },
+    "range": {
+      "kind": "self"
+    },
+    "duration": {
+      "kind": "instantaneous"
+    },
+    "components": {
+      "verbal": true,
+      "somatic": true
+    },
+    "higherLevelSlotEffect": "<p>The damage increases by 1d8 for each spell slot level above 1.</p>",
+    "resolution": {
+      "selectionMode": "self",
+      "areaOfEffect": {
+        "shape": "cube",
+        "size": {
+          "value": 15,
+          "unit": "ft"
+        }
+      },
+      "method": {
+        "kind": "saving-throw",
+        "ability": "con"
+      },
+      "effects": [
+        {
+          "id": "damage",
+          "kind": "damage",
+          "roll": {
+            "dice": {
+              "count": 2,
+              "faces": 8
+            }
+          },
+          "damageType": "thunder"
+        }
+      ],
+      "outcomes": [
+        {
+          "result": "failed-save",
+          "applications": [
+            {
+              "effectId": "damage",
+              "amount": "full"
+            }
+          ]
+        },
+        {
+          "result": "successful-save",
+          "applications": [
+            {
+              "effectId": "damage",
+              "amount": "half"
+            }
+          ]
+        }
+      ]
+    },
+    "modeling": {
+      "status": "meaningful-partial",
+      "gaps": [
+        {
+          "code": "conditional-effect-model-missing",
+          "note": "Push on failed save stays prose"
+        },
+        {
+          "code": "object-state-awareness",
+          "note": "Unsecured object push rider stays prose"
+        }
+      ]
+    }
+  }
+]

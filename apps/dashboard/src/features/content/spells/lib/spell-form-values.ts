@@ -24,8 +24,8 @@ import { finalizeContentInput, slugForInputParse } from '../../lib/forms/content
 import type { ContentFormInputCtx } from '../../lib/forms/content-form-registry'
 import { SPELL_AREA_GEOMETRY_NONE, SPELL_DELIVERY_METHOD_NONE } from './spell-form-labels'
 import type { SpellFormValues } from './spell-form-fields'
-import { spellEffectsToFormValues } from './effects/effect-form-values'
 import { resolutionToForm } from '../resolution/lib/form/resolution-form-values'
+import { isSpellResolutionEditorEligible } from './spell-display'
 
 export type SpellFormCastingTime = {
   normal: {
@@ -103,7 +103,6 @@ export const spellCreateDefaultValues: Partial<SpellFormValues> = {
   components: { verbal: true, somatic: true, material: { enabled: false } },
   areaOfEffect: { ...EMPTY_SPELL_AREA_OF_EFFECT },
   deliveryMethod: SPELL_DELIVERY_METHOD_NONE,
-  effects: [],
 }
 
 export function spellCastingTimeToFormValues(castingTime: SpellCastingTime): SpellFormCastingTime {
@@ -408,8 +407,7 @@ export function spellToFormValues(entity: Spell): SpellFormValues {
     tags: spellTagsToFormValues(entity.tags),
     areaOfEffect: spellAreaOfEffectToFormValues(entity.areaOfEffect),
     deliveryMethod: entity.deliveryMethod ?? SPELL_DELIVERY_METHOD_NONE,
-    effects: spellEffectsToFormValues(entity.effects),
-    ...(entity.resolution
+    ...(entity.resolution && isSpellResolutionEditorEligible(entity)
       ? (() => {
           const resolution = resolutionToForm(entity.resolution)
           return resolution ? { resolution } : {}
@@ -422,10 +420,6 @@ export function buildSpellCreateInput(
   values: SpellFormValues,
   ctx?: ContentFormInputCtx<Spell>,
 ): CreateSpellInput {
-  // TODO(spell.effect.persistence):
-  // Include effects after the atomic-effect model and authoring UX are validated.
-  // TODO(spell.resolution.persistence):
-  // Include resolution after the resolution model and authoring UX are validated.
   const { effects: _effects, resolution: _resolution, ...persistedValues } = values
 
   const rawDelivery = persistedValues.deliveryMethod?.trim()

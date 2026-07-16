@@ -20,6 +20,7 @@ import {
   SRD_521_SPELL_SEED_RESOLUTION,
   SRD_521_SPELL_SEED_RESOLUTION_SLUGS,
 } from '../spell-seed-resolution'
+import { SRD_521_SPELL_RESOLUTION_DERIVATION_EFFECTS } from './spell-resolution-derivation-effects'
 
 const RULESET = 'srd-cc-5.2.1' as const
 
@@ -31,14 +32,22 @@ function spellBySlug(slug: string) {
 
 describe('findPrimaryDamageEffect', () => {
   it('skips labeled extra-damage riders', () => {
-    const hex = spellBySlug('hex')
-    const primary = findPrimaryDamageEffect(hex.effects)
+    const primary = findPrimaryDamageEffect([
+      {
+        id: 'test:extra',
+        kind: 'damage',
+        label: 'Extra',
+        roll: { dice: { count: 1, faces: 6 } },
+        damageType: 'necrotic',
+      },
+    ])
     expect(primary).toBeUndefined()
   })
 
   it('returns the first unlabeled damage effect', () => {
-    const fireBolt = spellBySlug('fire-bolt')
-    const primary = findPrimaryDamageEffect(fireBolt.effects)
+    const primary = findPrimaryDamageEffect(
+      SRD_521_SPELL_RESOLUTION_DERIVATION_EFFECTS['fire-bolt'],
+    )
     expect(primary?.damageType).toBe('fire')
     expect(primary?.roll).toEqual({ dice: { count: 1, faces: 10 } })
   })
@@ -50,7 +59,7 @@ describe('deriveResolutionFromSpell (Tier A)', () => {
     const resolution = deriveAndValidateSpellResolution(spell)
 
     expect(resolution.method).toEqual({ kind: 'attack', attackType: 'ranged-spell' })
-    expect(resolution.target.proximity).toEqual({
+    expect(resolution.target!.proximity).toEqual({
       kind: 'distance',
       distance: { value: 120, unit: 'ft' },
     })
@@ -73,14 +82,19 @@ describe('deriveResolutionFromSpell (Tier A)', () => {
     ])
   })
 
-  it('maps self-origin save spells to reach when overridden', () => {
+  it('maps self-origin save spells to self selection with area', () => {
     const spell = spellBySlug('burning-hands')
     const resolution = deriveAndValidateSpellResolution(spell, {
       saveAbility: 'dex',
-      proximity: { kind: 'reach' },
+      selectionMode: 'self',
     })
 
-    expect(resolution.target.proximity).toEqual({ kind: 'reach' })
+    expect(resolution.selectionMode).toBe('self')
+    expect(resolution.areaOfEffect).toEqual({
+      shape: 'cone',
+      length: { value: 15, unit: 'ft' },
+    })
+    expect(resolution.target).toBeUndefined()
     expect(resolution.method).toEqual({ kind: 'saving-throw', ability: 'dex' })
   })
 
@@ -103,10 +117,11 @@ describe('deriveResolutionFromSpell (Tier A)', () => {
     const spell = spellBySlug('false-life')
     const resolution = deriveAndValidateSpellResolution(spell, {
       method: { kind: 'automatic' },
-      target: { kind: 'creature' },
+      selectionMode: 'self',
     })
 
-    expect(resolution.target.proximity).toEqual({ kind: 'self' })
+    expect(resolution.selectionMode).toBe('self')
+    expect(resolution.target).toBeUndefined()
     expect(resolution.effects[0]?.kind).toBe('temporary-hit-points')
   })
 })
@@ -131,7 +146,11 @@ describe('resolveSpellSeedResolution manifest parity', () => {
 
       const spell = spellBySlug(slug)
       const resolution = resolveSpellSeedResolution(spell)
-      const primary = findPrimaryResolutionEffect(spell.effects)
+      const primary = findPrimaryResolutionEffect(
+        SRD_521_SPELL_RESOLUTION_DERIVATION_EFFECTS[
+          slug as keyof typeof SRD_521_SPELL_RESOLUTION_DERIVATION_EFFECTS
+        ],
+      )
 
       expect(resolution, slug).toBeDefined()
       expect(primary, slug).toBeDefined()

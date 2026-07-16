@@ -11,9 +11,11 @@ import {
 const TOOL_SEEDS = seedEquipmentOfKind('tool')
 
 describe('tool kindFieldGroups', () => {
-  it('buildFields composes identity, economy, and registered tool group', () => {
+  it('buildFields composes name, economy, kind group, and description', () => {
     const fields = equipmentFormDef.buildFields({ equipmentKind: 'tool' })
-    expect(collectGroupLegends(fields)).toEqual(['Identity', 'Economy', 'Tool'])
+    expect(collectGroupLegends(fields)).toEqual(['', 'Economy'])
+    expect(fields[0]).toMatchObject({ name: 'name' })
+    expect(fields.at(-1)).toMatchObject({ name: 'description' })
     expect(fields.some((field) => 'name' in field && field.name === 'utilizes')).toBe(true)
   })
 })

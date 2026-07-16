@@ -208,15 +208,16 @@ function RichTextLinkPickerForm({
           {selectedInternalOption ? (
             <RichTextLinkPreviewCard
               tone="selected"
+              layout="card"
               title={selectedInternalOption.title}
               contentType={selectedInternalOption.contentType}
               sourceLabel={selectedInternalOption.sourceLabel}
               onClear={() => setSelectedOptionId(null)}
             />
           ) : (
-            <div className="max-h-40 space-y-1 overflow-auto rounded-md border border-border p-1">
+            <div className="max-h-40 overflow-auto">
               {filteredInternalOptions.length === 0 ? (
-                <p className="px-2 py-1.5 text-xs text-muted-foreground">{EMPTY_SEARCH_MESSAGE}</p>
+                <p className="px-3 py-1.5 text-xs text-muted-foreground">{EMPTY_SEARCH_MESSAGE}</p>
               ) : (
                 filteredInternalOptions.map((option) => (
                   <RichTextLinkPreviewCard

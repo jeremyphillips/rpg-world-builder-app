@@ -1,38 +1,15 @@
+import { formatResolutionApplicationSentence } from './format-effect-lines'
 import type { SpellResolution, SpellResolutionOutcome } from './schema'
-import {
-  getSpellResolutionApplicationAmountLabel,
-  getSpellResolutionOutcomeResultLabel,
-} from './vocab'
+import { getSpellResolutionOutcomeResultLabel } from './vocab'
 
 function formatOutcomeApplicationSummary(
   application: SpellResolutionOutcome['applications'][number],
   resolution: SpellResolution,
 ): string {
-  const effect = resolution.effects.find((entry) => entry.id === application.effectId)
-  const amountLabel = getSpellResolutionApplicationAmountLabel(application.amount)
-
-  if (effect?.kind === 'healing') {
-    return amountLabel
-      .replace(/^Full effect$/i, 'Full healing')
-      .replace(/^Half effect$/i, 'Half healing')
-  }
-
-  if (effect?.kind === 'temporary-hit-points') {
-    return amountLabel
-      .replace(/^Full effect$/i, 'Full temporary hit points')
-      .replace(/^Half effect$/i, 'Half temporary hit points')
-  }
-
-  if (effect?.kind === 'damage') {
-    return amountLabel
-      .replace(/^Full effect$/i, 'Full damage')
-      .replace(/^Half effect$/i, 'Half damage')
-  }
-
-  return amountLabel
+  return formatResolutionApplicationSentence(resolution, application.effectId, application.amount)
 }
 
-/** e.g. "Hit: Full damage" */
+/** e.g. "Failed save: Target takes 2d10 necrotic damage." */
 export function formatResolutionOutcomeLine(
   outcome: SpellResolutionOutcome,
   resolution: SpellResolution,
@@ -47,8 +24,8 @@ export function formatResolutionOutcomeLine(
     .map((application) => formatOutcomeApplicationSummary(application, resolution))
     .join(', ')
 
-  const line = `${resultLabel}: ${applicationSummary}`
-  return outcome.note ? `${line}. ${outcome.note}` : line
+  const line = `${resultLabel}: ${applicationSummary}.`
+  return outcome.note ? `${line} ${outcome.note}` : line
 }
 
 /** Bullet-ready outcome lines in document order. */

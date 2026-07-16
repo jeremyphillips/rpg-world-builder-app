@@ -127,7 +127,7 @@ describe('Form', () => {
     expect(screen.getByRole('textbox', { name: 'Name' })).toHaveClass('h-9')
   })
 
-  it('renders schema rows with responsive grid layout without flex classes', () => {
+  it('renders schema rows as flex rows', () => {
     const rowSchema = z.object({
       first: z.string(),
       second: z.string(),
@@ -135,7 +135,6 @@ describe('Form', () => {
     const rowFields: FormItem[] = [
       {
         kind: 'row',
-        layout: 'responsive-2',
         fields: [
           { type: 'text', name: 'first', label: 'First name' },
           { type: 'text', name: 'second', label: 'Last name' },
@@ -144,12 +143,11 @@ describe('Form', () => {
     ]
     const { container } = render(<Form schema={rowSchema} fields={rowFields} onSubmit={vi.fn()} />)
 
-    const row = container.querySelector('.grid')
+    const row = container.querySelector('[data-field-row]')
     expect(row).toBeTruthy()
-    expect(row).toHaveClass('grid-cols-1')
-    expect(row).toHaveClass('md:grid-cols-2')
-    expect(row).not.toHaveClass('flex')
-    expect(row).not.toHaveClass('flex-wrap')
+    expect(row).toHaveClass('flex')
+    expect(row).toHaveClass('flex-wrap')
+    expect(row).not.toHaveClass('grid')
   })
 
   it('submits when hidden fields use a refined object schema', async () => {

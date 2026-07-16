@@ -13,10 +13,33 @@ and size defaults: [forms hub — Form rhythm](../forms.md#form-rhythm).
 | `array` | `useFieldArray` list | `compact`      | `sm`         | yes (`array`)   |
 | `slot`  | Custom `render()` UI | `compact`      | `sm`         | optional label  |
 
+## Component entry files
+
+Every form container or renderer component has **one semantically named entry file** that
+matches the exported component name in kebab-case:
+
+| Component               | Entry file                                                                                             |
+| ----------------------- | ------------------------------------------------------------------------------------------------------ |
+| `ArrayFieldRenderer`    | [`array-field-renderer.client.tsx`](../src/form/renderers/array/array-field-renderer.client.tsx)       |
+| `ArrayFormItemSection`  | [`array-form-item-section.client.tsx`](../src/form/renderers/array/array-form-item-section.client.tsx) |
+| `ConditionalArrayField` | [`conditional-array-field.client.tsx`](../src/form/renderers/array/conditional-array-field.client.tsx) |
+| `SlotFieldRenderer`     | [`slot-field-renderer.client.tsx`](../src/form/renderers/fields/slot-field-renderer.client.tsx)        |
+| `FieldRenderer`         | [`field-renderer.client.tsx`](../src/form/renderers/field-renderer.client.tsx)                         |
+
+Convention: `NewComponent` → `new-component.client.tsx`. Supporting hooks, variants, and
+presentational sub-parts live alongside the entry file in the same folder; they are not
+re-exported from the entry unless they are part of the component's public surface.
+
+`form-item-node.client.tsx` dispatches `kind` values to the matching entry wrapper; the
+wrapper resolves section context and RHF name prefixes, then renders the entry renderer.
+
 ## Groups
 
 Semantic `<fieldset>` + `<legend>`. Top-level: section scale (`text-field-group-legend`).
-Nested: `legendSize: 'subsection'`.
+Nested groups inside another group default to `legendSize: 'subsection'` (override when
+needed). Nested groups omit `mb-8` — parent group rhythm (`gap-6` / `gap-2`) owns sibling
+spacing, matching nested array sections. Top-level groups and arrays inside `<Form>` omit
+`mb-8` as well — the form's `FormRhythmStack` (`gap-6` / `gap-2`) owns sibling spacing.
 
 ```ts
 {
@@ -24,20 +47,48 @@ Nested: `legendSize: 'subsection'`.
   legend: 'Weapon',
   fields: [
     { /* … */ },
-    { kind: 'group', legend: 'Damage', legendSize: 'subsection', fields: [/* … */] },
+    { kind: 'group', legend: 'Damage', fields: [/* … */] },
   ],
 }
 ```
 
-`FieldGroup` (standalone) accepts the same `legendSize` and `size`. Groups may declare
-`visibility` — hidden groups unmount and clear nested values.
+`FieldGroup` (standalone) accepts the same `legendSize`, `size`, and `fieldsChrome`.
+Groups may declare `visibility` — hidden groups unmount and clear nested values.
 
 `rhythm` overrides inherited form rhythm.
 
+### Group `fieldsChrome`
+
+Optional visual treatment for the legend + field stack. Variants are **mutually
+exclusive** — omit for plain fieldset behavior.
+
+| `variant`     | Use                                                                                                                                                                                     |
+| ------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `inset`       | Left rail + indent on the **field stack** only — legend stays outside. Tones: `border` (default), `primary`.                                                                            |
+| `panel`       | Rounded border box around the **field stack** only. Tones: `subtle` (default, `bg-muted/10`), `medium` (`/30`), `emphasis`, `main`, `warning`, `error`, or semantic (`informative`, …). |
+| `outline`     | Border-only box around the **field stack** — no background wash. Tones: `border` (default), `primary`, `destructive`, `warning`.                                                        |
+| `divider`     | Section separator on the fieldset. `edge`: `top` (default) or `bottom`; adds `pt-7` / `pb-7` (28px) with `border-t` / `border-b`.                                                       |
+| `callout`     | Alert-shaped surface on the **field stack** only. Tones: `info` (default), `warning`, `destructive`, … or semantic compact-label tones.                                                 |
+| `accent`      | Light emphasis — `edge: 'top'` (`border-t-2 pt-4`) or `edge: 'legendRail'` (primary/semantic rail on legend only).                                                                      |
+| `collapsible` | Legend becomes a disclosure trigger; fields stay registered when collapsed. `defaultOpen`; optional `collapseKey` for `uiStateKey` persistence.                                         |
+
+```ts
+{
+  kind: 'group',
+  legend: 'Target',
+  fieldsChrome: { variant: 'panel' },
+  fields: [/* … */],
+}
+```
+
+Legend header margin (`mb-5` / `mb-4`) lives on the legend header block; `<legend>` is `w-full`
+and sits **outside** panel, outline, inset, and callout boxes. Divider and accent-top chrome
+apply to the `<fieldset>`. Token source: `field-group-chrome.variants.ts`.
+
 ## Rows
 
-Side-by-side leaf fields. `layout`: `flex` (default) or `responsive-2/3/4`. Row-level
-`visibility` and `separator`. Layout detail: [sizing-and-spacing.md](./sizing-and-spacing.md).
+Side-by-side leaf fields in a wrapping flex row. Row-level `visibility`, `separator`,
+and `className`. Layout detail: [sizing-and-spacing.md](./sizing-and-spacing.md).
 
 ## Stacks
 
@@ -50,7 +101,7 @@ controller field gates indented dependents:
 - `dependentsVisibility` gates fields `[1..]`. When omitted and `[0]` is a switch, defaults
   to "switch is true". For select/other controllers, pass an explicit predicate for hide
   behavior; omit for indent/chrome only (dependents always shown).
-- Optional `dependentsChrome`: `main` | `subtle` | `warning` | `error`.
+- Optional `dependentsChrome`: `main` | `elevated` | `subtle` | `medium` | `warning` | `error`.
 - Optional `dependentsChromeScope`: `wrapper` (default) | `arrayItems`.
   - `wrapper` — tone on the dependents container; use for scalar dependents (selects, numbers).
   - `arrayItems` — tone on array item shells only; avoids double borders when dependents include arrays.
@@ -115,7 +166,7 @@ Dependent stack with an array dependent — use `arrayItems` scope:
       kind: 'array',
       name: 'caps',
       legend: '',
-      addLabel: 'Add class limit',
+      addActionLabel: 'Add class limit',
       fields: [/* … */],
     },
   ],
@@ -124,7 +175,7 @@ Dependent stack with an array dependent — use `arrayItems` scope:
 
 ## Field separators
 
-`separator: 'subtle'` on a leaf or row → trailing `border-b` + `pb-4` before the next sibling.
+`separator: 'subtle'` on a leaf or row → trailing `border-b` + `pb-7` (28px) before the next sibling.
 On a `stack` → trailing divider after the whole stack (controller + dependents region).
 Prefer stack-level `separator` for `layout: 'dependent'` blocks instead of putting it on the
 controller field.
@@ -133,7 +184,17 @@ Token: `fieldSeparatorVariants`. Do not use row `className` for recurring divide
 ## Array fields
 
 Repeatable section via `useFieldArray`. Item field names are **relative** (renderer prefixes
-`arrayName.index`).
+`arrayName.index`). Item shells default to the **elevated** surface (`bg-card` + raised shadow);
+use `itemChrome` or stack `dependentsChrome` + `dependentsChromeScope: 'arrayItems'` to override.
+
+**Implementation:** `form-item-node` dispatches `kind: 'array'` to
+[`array-form-item-section.client.tsx`](../src/form/renderers/array/array-form-item-section.client.tsx)
+(or [`conditional-array-field.client.tsx`](../src/form/renderers/array/conditional-array-field.client.tsx)
+when `visibility` is set). Both render
+[`array-field-renderer.client.tsx`](../src/form/renderers/array/array-field-renderer.client.tsx)
+— the array entry component. Per-row chrome lives in
+[`array-field-item-content.client.tsx`](../src/form/renderers/array/array-field-item-content.client.tsx).
+See [Component entry files](#component-entry-files).
 
 ```ts
 {
@@ -144,9 +205,10 @@ Repeatable section via `useFieldArray`. Item field names are **relative** (rende
     { type: 'text', name: 'name', label: 'Trait name', required: true },
     { type: 'textarea', name: 'description', label: 'Description' },
   ],
-  addLabel: 'Add trait',
+  addActionLabel: 'Add trait',
   min: 0,
   max: 10,
+  addActionVariant: 'outline',
   itemHeader: {
     fallback: (i) => `Trait ${i + 1}`,
     primaryField: 'name',
@@ -158,12 +220,15 @@ Repeatable section via `useFieldArray`. Item field names are **relative** (rende
 **Legend:** Omit or pass `''` when a parent switch/stack already labels the block (e.g.
 `dependent` stack dependents). Empty legends are not rendered — no phantom spacing.
 
-**Section margin:** Top-level array fieldsets use `mb-8`. Nested arrays (inside stacks,
-groups, or array items) omit it so parent `fieldStackRhythmVariants` gap controls spacing.
+**Section margin:** Standalone `FieldGroup` fieldsets use `mb-8`. Arrays and groups inside
+`<Form>` omit it — `FormRhythmStack` gap controls sibling spacing. Nested arrays (inside
+stacks, groups, or array items) also omit it so parent `fieldStackRhythmVariants` gap
+controls spacing.
 
 **Item chrome:** Each row renders a header toolbar (optional drag handle, optional collapse
 caret, title, remove). `itemVariant: 'auto'` picks `compact` when item fields are a single
-leaf `row`; otherwise `detailed`. Nested arrays inside another item are always compact.
+leaf `row`; otherwise `detailed`. Nested arrays inside another item default to compact;
+pass `itemVariant: 'detailed'` to keep grant-style collapsible headers inside nested groups.
 
 ```ts
 {
@@ -215,24 +280,38 @@ traits: z.array(z.object({ name: z.string().min(1), description: z.string() })),
 
 Optional hooks:
 
-| Property                          | Purpose                                                                                                       |
-| --------------------------------- | ------------------------------------------------------------------------------------------------------------- |
-| `itemVariant`                     | `'auto'` \| `'compact'` \| `'detailed'` — row layout (default `auto`).                                        |
-| `itemHeader`                      | Primary/fallback labels; optional `summary` on a second row below the title (detailed).                       |
-| `itemHeader.showFallbackInHeader` | When true, appends ` · {fallback}` after the primary title (default `false`).                                 |
-| `itemCollapsible`                 | Detailed items only — collapse body into header row.                                                          |
-| `itemCollapseKey`                 | Stable row field for persisted collapse overrides (default `'id'`; else `index:${index}`).                    |
-| `reorder`                         | `'dragHandle'` (default) or `false` for fixed order.                                                          |
-| `appendDefaults`                  | `(items) => defaults` replaces static defaults on append.                                                     |
-| `addMenu`                         | Searchable template dropdown for the add control; items carry `appendDefaults` and optional duplicate policy. |
+| Property             | Purpose                                                                                                  |
+| -------------------- | -------------------------------------------------------------------------------------------------------- |
+| `itemVariant`        | `'auto'` \| `'compact'` \| `'detailed'` — row layout (default `auto`).                                   |
+| `compactInlineAlign` | `'start'` \| `'center'` — compact inline rows only; center grip/actions with label-less single controls. |
+
+**Compact inline rows** (`itemVariant: 'auto'` \| `'compact'` with a single leaf `row`) render that row
+inside a `FieldRow` within the grip/actions grid — leaf `width` tokens (`full`, `auto`, fractions,
+`digits`, …) compose the same way as schema `kind: 'row'` fields.
+
+| `itemChrome` | Item shell surface tone — defaults to `elevated` (`bg-card`); override with `subtle`, `medium`, etc. |
+| `itemHeader` | Primary/fallback labels; optional `summary` on a second row below the title (detailed). |
+| `itemHeader.showFallbackInHeader` | When true, appends ` · {fallback}` after the primary title (default `false`). |
+| `itemCollapsible` | Detailed items only — collapse body into header row. |
+| `itemCollapseKey` | Stable row field for persisted collapse overrides (default `'id'`; else `index:${index}`). |
+| `reorder` | `'dragHandle'` (default) or `false` for fixed order. |
+| `appendDefaults` | `(items) => defaults` replaces static defaults on append. |
+| `addActionVariant` | Button visual style for the add control — mirrors `Button` `variant`; defaults to `outline`. |
+| `addActionLayout` | `stacked` (default) — add control below items; `inline` — add control right-aligned in the legend row (`shrink-0`). |
+| `showAddIcon` | When true (default), prefixes the add action with a `+` icon. Set `false` for non-add triggers (e.g. "Choose preset"). |
+| `addActionSize` | Optional `Button` size override for the add control (`sm`, `default`, `lg`); inherits from section rhythm when omitted. |
+| `hideAddAction` | Omits the default add button (use an external slot instead). |
+| `hideItemRemove` | Omits the default per-item remove button (not merely disabled). Use with `itemRemoveSlot`. |
+| `itemRemoveSlot` | Custom remove control in the header actions rail; receives `ArrayFieldContext`. Pair with `hideItemRemove`. |
+| `addActionMenu` | Searchable template dropdown for the add control; items carry `appendDefaults` and optional duplicate policy. |
 
 ```ts
 {
   kind: 'array',
   name: 'grants',
   legend: 'Grants',
-  addLabel: 'Add grant',
-  addMenu: {
+  addActionLabel: 'Add grant',
+  addActionMenu: {
     groups: [{ id: 'combat-traits', label: 'Combat & traits' }],
     items: [
       {
@@ -254,12 +333,29 @@ Optional hooks:
 }
 ```
 
-When `addMenu` is set, `ArrayFieldRenderer` renders `ButtonDropdown` instead of a plain add
+When `addActionMenu` is set, `ArrayFieldRenderer` renders `ButtonDropdown` instead of a plain add
 button. Selecting an item appends `appendDefaults`, expands the new row, and best-effort focuses
 the first eligible control inside it.
 | `filterSelectDependsOn` | Root field names passed to `filterSelectOptions` as `watchedValues`. |
 | `filterSelectOptions` | Cross-row select filtering inside array items. |
 | `arrayPattern` | Domain hooks for array validation severity and focus navigation. |
+
+### Composing custom array rows
+
+When schema `kind: 'array'` layout is insufficient, feature code may compose rows from exported
+primitives (`ArrayItemRowShell`, `ArrayItemInlineRow`, `ArrayItemLeadingChromeColumn`,
+`ArrayItemActionsRail`, `useArrayItemRowState`) while keeping RHF `useFieldArray` and
+`registerArrayFieldMutators`.
+
+Custom rows must preserve navigation parity with schema-rendered arrays:
+
+- Register the same leaf `FieldConfig` entries in resolver/`fields` trees so
+  `collectArraySections` field order matches rendered controls (`effectId` before `amount`, etc.).
+- Render controls with `FieldNode` + `buildFieldRendererIds` (`idPrefix`, `namePrefix`) — do not
+  invent alternate DOM ids.
+- Set `data-array-item-prefix` on the row shell to the item RHF prefix
+  (e.g. `resolution.outcomes.0.applications.1`).
+- Provide `ArrayFieldContext` when array-level `filterSelectOptions` applies.
 
 ### Array validation presentation
 

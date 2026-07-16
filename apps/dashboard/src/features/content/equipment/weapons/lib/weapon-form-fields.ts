@@ -96,7 +96,8 @@ const weaponMasteryDynamicHint: FieldDynamicHint = {
 export function weaponFormFieldGroup(ctx: ContentFormCtx): FormItem {
   return {
     kind: 'group',
-    legend: 'Weapon',
+    legend: '',
+    fieldsChrome: { variant: 'panel' },
     fields: [
       {
         kind: 'row',
@@ -141,6 +142,7 @@ export function weaponFormFieldGroup(ctx: ContentFormCtx): FormItem {
       {
         kind: 'group',
         legend: 'Damage',
+        fieldsChrome: { variant: 'panel', tone: 'subtle' },
         legendSize: 'subsection',
         fields: [
           ...weaponDamageFields({ ctx }),

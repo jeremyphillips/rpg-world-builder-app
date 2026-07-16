@@ -107,8 +107,6 @@ describe('speciesLevelLimitsFields', () => {
     expect(stack).toMatchObject({
       kind: 'stack',
       layout: 'dependent',
-      dependentsChrome: 'subtle',
-      dependentsChromeScope: 'arrayItems',
     })
     expect(stack.fields[0]).toMatchObject({
       type: 'switch',
@@ -119,7 +117,7 @@ describe('speciesLevelLimitsFields', () => {
     expect(stack.fields[1]).toMatchObject({
       kind: 'array',
       name: 'classLevelCaps',
-      addLabel: 'Add class limit',
+      addActionLabel: 'Add class limit',
     })
   })
 })

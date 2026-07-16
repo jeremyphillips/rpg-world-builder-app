@@ -1,0 +1,66 @@
+/*
+ * Layer 2 — dark semantic roles (component / Tailwind API).
+ * Structure mirrors semantic-light.css; palette refs target palette-dark.css.
+ */
+.dark {
+  --background: var(--palette-page-surface);
+  --foreground: var(--palette-neutral-50);
+  --card: var(--palette-card-surface);
+  --card-foreground: var(--palette-neutral-50);
+  --popover: var(--palette-card-surface);
+  --popover-foreground: var(--palette-neutral-50);
+  --primary: var(--palette-primary);
+  --primary-foreground: var(--palette-primary-foreground);
+  --secondary: var(--palette-secondary-surface);
+  --secondary-foreground: var(--palette-neutral-50);
+  --muted: var(--palette-muted-surface);
+  --muted-foreground: var(--palette-muted-foreground);
+  --accent: var(--palette-accent-surface);
+  --accent-foreground: var(--palette-neutral-50);
+  --destructive: var(--palette-destructive);
+  --destructive-foreground: var(--palette-on-solid);
+  --destructive-muted: var(--palette-destructive-muted);
+  --destructive-subtle: var(--palette-destructive-subtle);
+  --info: var(--palette-info);
+  --info-foreground: var(--palette-neutral-950);
+  --info-muted: var(--palette-info-muted);
+  --info-subtle: var(--palette-info-subtle);
+  --success: var(--palette-success);
+  --success-foreground: var(--palette-neutral-950);
+  --success-muted: var(--palette-success-muted);
+  --success-subtle: var(--palette-success-subtle);
+  --warning: var(--palette-warning);
+  --warning-foreground: var(--palette-neutral-950);
+  --warning-muted: var(--palette-warning-muted);
+  --warning-subtle: var(--palette-warning-subtle);
+  --border: var(--palette-border-default);
+  --card-selected-border: var(--palette-border-selected);
+  --input: var(--palette-border-input);
+  --ring: var(--palette-primary);
+  --overlay: var(--palette-overlay);
+  --sidebar: var(--palette-sidebar-surface);
+  --semantic-neutral: var(--palette-semantic-neutral);
+  --semantic-informative: var(--palette-semantic-informative);
+  --semantic-informative-muted: var(--palette-semantic-informative-muted);
+  --semantic-positive: var(--palette-semantic-positive);
+  --semantic-caution: var(--palette-semantic-caution);
+  --semantic-negative: var(--palette-semantic-negative);
+  --semantic-negative-on-subtle: var(--palette-semantic-negative-on-subtle);
+  --semantic-neutral-border: var(--border);
+  --semantic-neutral-subtle: var(--muted);
+  --semantic-informative-border: var(--info-muted);
+  --semantic-informative-subtle: var(--info-subtle);
+  --semantic-positive-border: var(--success-muted);
+  --semantic-positive-subtle: var(--success-subtle);
+  --semantic-caution-border: var(--warning-muted);
+  --semantic-caution-subtle: var(--warning-subtle);
+  --semantic-negative-border: var(--destructive-muted);
+  --semantic-negative-subtle: var(--destructive-subtle);
+  --selected-control: var(--foreground);
+  --selected-control-foreground: var(--background);
+  --selected-control-border: var(--foreground);
+  --catalog-picker-row-surface: color-mix(in oklab, var(--muted) 20%, transparent);
+  --surface-raised-shadow:
+    inset 0 1px 0 0 color-mix(in oklab, var(--foreground) 6%, transparent),
+    0 1px 3px 0 color-mix(in oklab, var(--background) 55%, black);
+}

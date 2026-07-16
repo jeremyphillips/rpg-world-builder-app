@@ -26,6 +26,22 @@ export const SPELL_RESOLUTION_TARGET_KINDS = Object.keys(SPELL_RESOLUTION_TARGET
   ...SpellResolutionTargetKind[],
 ]
 
+/** Lowercase prose noun for target kind — e.g. "creature", "creature or object". */
+export function getSpellResolutionTargetKindNoun(kind: SpellResolutionTargetKind): string {
+  switch (kind) {
+    case 'creature':
+      return 'creature'
+    case 'object':
+      return 'object'
+    case 'creature-or-object':
+      return 'creature or object'
+    default: {
+      const _exhaustive: never = kind
+      return _exhaustive
+    }
+  }
+}
+
 export const SPELL_RESOLUTION_ATTACK_TYPE_ENTRIES = {
   'melee-spell': {
     label: 'Melee spell attack',
@@ -50,6 +66,10 @@ export const SPELL_RESOLUTION_OUTCOME_RESULT_ENTRIES = {
   hit: {
     label: 'Hit',
     description: 'The attack roll succeeded against the target.',
+  },
+  miss: {
+    label: 'Miss',
+    description: 'The attack roll failed against the target.',
   },
   'failed-save': {
     label: 'Failed save',
@@ -115,6 +135,80 @@ export const SPELL_RESOLUTION_PROXIMITY_KINDS = Object.keys(
   SPELL_RESOLUTION_PROXIMITY_KIND_ENTRIES,
 ) as [SpellResolutionProximityKind, ...SpellResolutionProximityKind[]]
 
+export const SPELL_RESOLUTION_SELECTION_MODE_ENTRIES = {
+  self: {
+    label: 'Self',
+    description: 'The caster is the fixed selection or origin.',
+  },
+  targets: {
+    label: 'Targets',
+    description: 'The caster selects one or more eligible creatures or objects.',
+  },
+  point: {
+    label: 'Point',
+    description: 'The caster selects an origin point within range.',
+  },
+  none: {
+    label: 'None',
+    description: 'No target, origin, or location is selected by this resolution.',
+  },
+} as const satisfies Record<string, GameTermEntry>
+
+export type SpellResolutionSelectionMode = keyof typeof SPELL_RESOLUTION_SELECTION_MODE_ENTRIES
+
+export const SPELL_RESOLUTION_SELECTION_MODES = Object.keys(
+  SPELL_RESOLUTION_SELECTION_MODE_ENTRIES,
+) as [SpellResolutionSelectionMode, ...SpellResolutionSelectionMode[]]
+
+export const SPELL_RESOLUTION_TARGET_COUNT_KIND_ENTRIES = {
+  exact: {
+    label: 'Exactly',
+    description: 'The caster must select exactly this many targets.',
+  },
+  'up-to': {
+    label: 'Up to',
+    description: 'The caster may select up to this many targets.',
+  },
+} as const satisfies Record<string, GameTermEntry>
+
+export type SpellResolutionTargetCountKind = keyof typeof SPELL_RESOLUTION_TARGET_COUNT_KIND_ENTRIES
+
+export const SPELL_RESOLUTION_TARGET_COUNT_KINDS = Object.keys(
+  SPELL_RESOLUTION_TARGET_COUNT_KIND_ENTRIES,
+) as [SpellResolutionTargetCountKind, ...SpellResolutionTargetCountKind[]]
+
+/** Proximity kinds used on external target selection — excludes legacy `self`. */
+export const SPELL_RESOLUTION_EXTERNAL_PROXIMITY_KINDS = [
+  'touch',
+  'reach',
+  'distance',
+] as const satisfies readonly SpellResolutionProximityKind[]
+
+export type SpellResolutionExternalProximityKind =
+  (typeof SPELL_RESOLUTION_EXTERNAL_PROXIMITY_KINDS)[number]
+
+/** Infers count kind when omitted — `1` is exact; greater counts default to up-to. */
+export function inferSpellResolutionTargetCountKind(
+  count: number,
+  countKind?: SpellResolutionTargetCountKind,
+): SpellResolutionTargetCountKind {
+  if (countKind) return countKind
+  return count === 1 ? 'exact' : 'up-to'
+}
+
+export function getSpellResolutionSelectionModeLabel(mode: string): string {
+  return (
+    SPELL_RESOLUTION_SELECTION_MODE_ENTRIES[mode as SpellResolutionSelectionMode]?.label ?? mode
+  )
+}
+
+export function getSpellResolutionTargetCountKindLabel(countKind: string): string {
+  return (
+    SPELL_RESOLUTION_TARGET_COUNT_KIND_ENTRIES[countKind as SpellResolutionTargetCountKind]
+      ?.label ?? countKind
+  )
+}
+
 /** @deprecated Use SPELL_RESOLUTION_PROXIMITY_KIND_ENTRIES */
 export const SPELL_RESOLUTION_RANGE_KIND_ENTRIES = SPELL_RESOLUTION_PROXIMITY_KIND_ENTRIES
 
@@ -161,7 +255,7 @@ export function getSpellResolutionRangeKindLabel(kind: string): string {
 
 /** Outcome results permitted for each resolution method kind (structural allowlist). */
 export const SPELL_RESOLUTION_OUTCOME_RESULTS_BY_METHOD = {
-  attack: ['hit'],
+  attack: ['hit', 'miss'],
   'saving-throw': ['failed-save', 'successful-save'],
   automatic: ['applied'],
 } as const satisfies Record<string, readonly SpellResolutionOutcomeResult[]>

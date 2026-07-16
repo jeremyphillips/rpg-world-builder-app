@@ -35,7 +35,18 @@ function damageGroupFromWeaponGroup(weaponGroup: GroupConfig) {
 
 describe('weapon kindFieldGroups', () => {
   it('buildFields composes identity, economy, and registered weapon group', () => {
-    expectComposedKindGroups('weapon', 'Weapon')
+    expectComposedKindGroups('weapon', '')
+  })
+
+  it('uses panel chrome on the weapon group and subtle panel on Damage', () => {
+    const weaponGroup = assertWeaponGroup(weaponFormFieldGroup(FORM_CTX))
+    expect(weaponGroup).toMatchObject({
+      fieldsChrome: { variant: 'panel' },
+    })
+    const damageGroup = damageGroupFromWeaponGroup(weaponGroup)
+    expect(damageGroup).toMatchObject({
+      fieldsChrome: { variant: 'panel', tone: 'subtle' },
+    })
   })
 
   it('uses subsection legend size on the nested Damage group', () => {

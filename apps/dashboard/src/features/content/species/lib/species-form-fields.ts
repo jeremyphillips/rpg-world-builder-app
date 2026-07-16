@@ -14,7 +14,7 @@ import { toOptions, type FormItem, type TabbedFormTab } from '@rpg/ui/form'
 import { buildActiveLanguageFieldOptions, vocabularySelectField } from '@/features/homebrew'
 
 import { getCharacterCreatureTypeFieldOptions } from './creature-type-field-options'
-import { identityFields } from '../../lib/forms/fields/content-identity-form-fields'
+import { descriptionField, nameField } from '../../lib/forms/fields/content-identity-form-fields'
 import type { ContentFormCtx } from '../../lib/forms/content-form-registry'
 import {
   embeddedArrayResolverField,
@@ -125,6 +125,7 @@ function attributesFields(ctx: ContentFormCtx): FormItem[] {
       label: 'Language affinities',
       hint: 'Recommended languages for origin picks. Does not grant languages or expand selectable pools.',
       options: buildActiveLanguageFieldOptions(ctx.languageVocabulary),
+      chrome: { variant: 'panel' },
     },
     {
       type: 'chips',
@@ -132,6 +133,7 @@ function attributesFields(ctx: ContentFormCtx): FormItem[] {
       label: 'Size',
       options: creatureSizeOptions,
       required: true,
+      chrome: { variant: 'panel' },
     },
   ]
 }
@@ -141,7 +143,7 @@ export function buildSpeciesTabs(ctx: ContentFormCtx): TabbedFormTab[] {
     {
       id: 'basics',
       label: 'Basics',
-      fields: [...identityFields(ctx), ...attributesFields(ctx)],
+      fields: [nameField(), ...attributesFields(ctx), descriptionField(ctx)],
     },
     {
       id: 'traits',

@@ -7,7 +7,7 @@ import { z } from 'zod'
 
 import { Form } from '../shells/form.client'
 import type { FormItem } from '../field-config'
-import { readArrayItemCollapseOverrides } from '../config/array-item-collapse-storage.lib'
+import { readArrayItemCollapseOverrides } from '../config/array/array-item-collapse-storage.lib'
 import { submitAndExpectPayload } from '../test-utils'
 
 // ── Schema ──────────────────────────────────────────────────────────────────
@@ -52,7 +52,7 @@ const collapsibleTraitFields: FormItem[] = [
       summary: (values) => (values.description as string) || 'No description',
     },
     fields: traitFields,
-    addLabel: 'Add trait',
+    addActionLabel: 'Add trait',
   },
 ]
 
@@ -68,7 +68,7 @@ const collapsibleTraitFieldsSimpleHeader: FormItem[] = [
       primaryField: 'name',
     },
     fields: traitFields,
-    addLabel: 'Add trait',
+    addActionLabel: 'Add trait',
   },
 ]
 
@@ -79,7 +79,7 @@ const fields: FormItem[] = [
     name: 'traits',
     legend: 'Traits',
     fields: traitFields,
-    addLabel: 'Add trait',
+    addActionLabel: 'Add trait',
   },
 ]
 
@@ -111,8 +111,9 @@ describe('ArrayFieldRenderer', () => {
       'gap-2',
     )
     expect(screen.getByRole('button', { name: 'Add trait' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Add trait' })).toHaveClass('h-9')
     expect(screen.queryByLabelText('Trait name')).not.toBeInTheDocument()
-    expect(screen.getByRole('group', { name: /Traits/ })).toHaveClass('mb-8')
+    expect(screen.getByRole('group', { name: /Traits/ })).not.toHaveClass('mb-8')
   })
 
   it('omits section bottom margin and empty legends for nested arrays in dependent stacks', async () => {
@@ -126,8 +127,6 @@ describe('ArrayFieldRenderer', () => {
       {
         kind: 'stack',
         layout: 'dependent',
-        dependentsChrome: 'subtle',
-        dependentsChromeScope: 'arrayItems',
         fields: [
           {
             type: 'switch',
@@ -139,7 +138,7 @@ describe('ArrayFieldRenderer', () => {
             kind: 'array',
             name: 'caps',
             legend: '',
-            addLabel: 'Add class limit',
+            addActionLabel: 'Add class limit',
             fields: [{ type: 'text', name: 'classId', label: 'Class' }],
           },
         ],
@@ -166,10 +165,224 @@ describe('ArrayFieldRenderer', () => {
     await waitFor(() => expect(screen.getByRole('textbox', { name: 'Class' })).toBeInTheDocument())
 
     const itemShell = screen.getByRole('group', { name: /Item #1/ })
-    expect(itemShell).toHaveClass('bg-muted/30')
+    expect(itemShell).toHaveClass('bg-card')
+    expect(itemShell).toHaveClass('shadow-surface-raised')
     const dependentsRegion = addButton.closest('[data-field-stack-dependents]')
     expect(dependentsRegion?.querySelector(':scope > .p-3')).toBeNull()
-    expect(dependentsRegion?.querySelector('.bg-muted\\/30')).toBe(itemShell)
+    expect(dependentsRegion?.querySelector('.bg-card')).toBe(itemShell)
+  })
+
+  it('applies itemChrome override on array item shells', async () => {
+    const user = userEvent.setup()
+    const subtleFields: FormItem[] = [
+      {
+        kind: 'array',
+        name: 'traits',
+        legend: 'Traits',
+        itemChrome: 'subtle',
+        fields: traitFields,
+        addActionLabel: 'Add trait',
+      },
+    ]
+
+    render(
+      <Form<Values>
+        schema={schema}
+        fields={subtleFields}
+        onSubmit={vi.fn()}
+        footer={<button type="submit">Save</button>}
+      />,
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Add trait' }))
+
+    const itemShell = screen.getByRole('group', { name: 'Trait #1' })
+    expect(itemShell).toHaveClass('bg-muted/10')
+    expect(itemShell).toHaveClass('border-border')
+    expect(itemShell).not.toHaveClass('bg-card')
+  })
+
+  it('defaults the add control to the outline button variant', () => {
+    renderForm()
+
+    const addButton = screen.getByRole('button', { name: 'Add trait' })
+    expect(addButton).toHaveClass('border-input')
+    expect(addButton).not.toHaveClass('bg-primary')
+    expect(addButton).not.toHaveClass('bg-secondary')
+  })
+
+  it('renders inline add actions in the legend row with a leading plus icon', () => {
+    const inlineFields: FormItem[] = [
+      {
+        kind: 'array',
+        name: 'traits',
+        legend: 'Movement',
+        fields: traitFields,
+        addActionLabel: 'Add speed',
+        addActionLayout: 'inline',
+      },
+    ]
+
+    const { container } = render(
+      <Form<Values>
+        schema={schema}
+        fields={inlineFields}
+        onSubmit={vi.fn()}
+        footer={<button type="submit">Save</button>}
+      />,
+    )
+
+    const fieldset = container.querySelector('fieldset')!
+    const legend = fieldset.querySelector('legend')
+    const addButton = screen.getByRole('button', { name: 'Add speed' })
+
+    expect(legend).toHaveTextContent('Movement')
+    expect(legend).toContainElement(addButton)
+    expect(addButton.querySelector('svg')).toBeTruthy()
+    expect(screen.getAllByRole('button', { name: 'Add speed' })).toHaveLength(1)
+  })
+
+  it('keeps stacked add actions below the item list', () => {
+    renderForm()
+
+    const fieldset = screen.getByRole('group', { name: /Traits/i })
+    const addButton = screen.getByRole('button', { name: 'Add trait' })
+    const legend = fieldset.querySelector('legend')
+
+    expect(legend).not.toContainElement(addButton)
+    expect(addButton.querySelector('svg')).toBeTruthy()
+  })
+
+  it('omits the add icon when showAddIcon is false', () => {
+    const noIconFields: FormItem[] = [
+      {
+        kind: 'array',
+        name: 'traits',
+        legend: 'Traits',
+        fields: traitFields,
+        addActionLabel: 'Choose preset',
+        showAddIcon: false,
+      },
+    ]
+
+    render(
+      <Form<Values>
+        schema={schema}
+        fields={noIconFields}
+        onSubmit={vi.fn()}
+        footer={<button type="submit">Save</button>}
+      />,
+    )
+
+    const addButton = screen.getByRole('button', { name: 'Choose preset' })
+    expect(addButton.querySelector('svg')).toBeNull()
+  })
+
+  it('applies addActionSize on the add control', () => {
+    const sizedFields: FormItem[] = [
+      {
+        kind: 'array',
+        name: 'traits',
+        legend: 'Traits',
+        fields: traitFields,
+        addActionLabel: 'Add trait',
+        addActionSize: 'sm',
+      },
+    ]
+
+    render(
+      <Form<Values>
+        schema={schema}
+        fields={sizedFields}
+        onSubmit={vi.fn()}
+        footer={<button type="submit">Save</button>}
+      />,
+    )
+
+    const addButton = screen.getByRole('button', { name: 'Add trait' })
+    expect(addButton).toHaveClass('h-8')
+    expect(addButton).toHaveClass('text-xs')
+  })
+
+  it('applies addActionVariant on the add control', () => {
+    const secondaryFields: FormItem[] = [
+      {
+        kind: 'array',
+        name: 'traits',
+        legend: 'Traits',
+        fields: traitFields,
+        addActionLabel: 'Add trait',
+        addActionVariant: 'secondary',
+      },
+    ]
+
+    render(
+      <Form<Values>
+        schema={schema}
+        fields={secondaryFields}
+        onSubmit={vi.fn()}
+        footer={<button type="submit">Save</button>}
+      />,
+    )
+
+    const addButton = screen.getByRole('button', { name: 'Add trait' })
+    expect(addButton).toHaveClass('bg-secondary')
+    expect(addButton).not.toHaveClass('border-input')
+  })
+
+  it('applies addActionVariant on addActionMenu dropdown triggers', async () => {
+    const user = userEvent.setup()
+    const grantSchema = z.object({
+      grants: z.array(z.object({ grantType: z.string().optional() })),
+    })
+
+    const addActionMenuFields: FormItem[] = [
+      {
+        kind: 'array',
+        name: 'grants',
+        legend: 'Grants',
+        addActionLabel: 'Add grant',
+        addActionVariant: 'default',
+        fields: [{ type: 'text', name: 'grantType', label: 'Grant type' }],
+        addActionMenu: {
+          groups: [{ id: 'traits', label: 'Traits' }],
+          items: [
+            {
+              id: 'movement-bonus',
+              label: 'Movement bonus',
+              groupId: 'traits',
+              appendDefaults: { grantType: 'movement-bonus' },
+            },
+          ],
+        },
+      },
+    ]
+
+    render(
+      <Form<z.infer<typeof grantSchema>>
+        schema={grantSchema}
+        fields={addActionMenuFields}
+        onSubmit={vi.fn()}
+        footer={<button type="submit">Save</button>}
+      />,
+    )
+
+    const addButton = screen.getByRole('button', { name: 'Add grant' })
+    expect(addButton).toHaveClass('bg-primary')
+    expect(addButton).not.toHaveClass('border-input')
+
+    await user.click(addButton)
+    expect(screen.getByRole('option', { name: 'Movement bonus' })).toBeInTheDocument()
+  })
+
+  it('defaults array item shells to elevated card chrome', async () => {
+    const user = userEvent.setup()
+    renderForm()
+    await user.click(screen.getByRole('button', { name: 'Add trait' }))
+
+    const itemShell = screen.getByRole('group', { name: 'Trait #1' })
+    expect(itemShell).toHaveClass('bg-card')
+    expect(itemShell).toHaveClass('shadow-surface-raised')
   })
 
   it('uses gap-3 between sm comfortable array items while keeping gap-6 inside item bodies', async () => {
@@ -181,7 +394,7 @@ describe('ArrayFieldRenderer', () => {
         legend: 'Traits',
         rhythm: 'comfortable',
         fields: traitFields,
-        addLabel: 'Add trait',
+        addActionLabel: 'Add trait',
       },
     ]
 
@@ -215,6 +428,8 @@ describe('ArrayFieldRenderer', () => {
       'rounded-md',
       'border',
       'border-border',
+      'bg-card',
+      'shadow-surface-raised',
       'pl-2',
     )
   })
@@ -258,7 +473,7 @@ describe('ArrayFieldRenderer', () => {
         name: 'traits',
         legend: 'Traits',
         fields: traitFields,
-        addLabel: 'Add trait',
+        addActionLabel: 'Add trait',
         max: 1,
       },
     ]
@@ -283,7 +498,7 @@ describe('ArrayFieldRenderer', () => {
         name: 'traits',
         legend: 'Traits',
         fields: traitFields,
-        addLabel: 'Add trait',
+        addActionLabel: 'Add trait',
         min: 1,
       },
     ]
@@ -298,6 +513,59 @@ describe('ArrayFieldRenderer', () => {
     )
     await user.click(screen.getByRole('button', { name: 'Add trait' }))
     expect(screen.getByRole('button', { name: 'Remove Traits · Trait #1' })).toBeDisabled()
+  })
+
+  it('omits the default remove button when hideItemRemove is true', async () => {
+    const user = userEvent.setup()
+    const hiddenRemoveFields: FormItem[] = [
+      {
+        kind: 'array',
+        name: 'traits',
+        legend: 'Traits',
+        fields: traitFields,
+        addActionLabel: 'Add trait',
+        hideItemRemove: true,
+      },
+    ]
+    render(
+      <Form
+        schema={schema}
+        fields={hiddenRemoveFields}
+        onSubmit={vi.fn()}
+        footer={<button type="submit">Save</button>}
+      />,
+    )
+    await user.click(screen.getByRole('button', { name: 'Add trait' }))
+    expect(screen.queryByRole('button', { name: /Remove Traits/i })).not.toBeInTheDocument()
+  })
+
+  it('renders itemRemoveSlot in the header actions rail instead of the default remove button', async () => {
+    const user = userEvent.setup()
+    const customRemoveFields: FormItem[] = [
+      {
+        kind: 'array',
+        name: 'traits',
+        legend: 'Traits',
+        fields: traitFields,
+        addActionLabel: 'Add trait',
+        hideItemRemove: true,
+        itemRemoveSlot: {
+          name: '_customTraitRemove',
+          render: () => <button type="button">Custom remove</button>,
+        },
+      },
+    ]
+    render(
+      <Form
+        schema={schema}
+        fields={customRemoveFields}
+        onSubmit={vi.fn()}
+        footer={<button type="submit">Save</button>}
+      />,
+    )
+    await user.click(screen.getByRole('button', { name: 'Add trait' }))
+    expect(screen.queryByRole('button', { name: /Remove Traits/i })).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Custom remove' })).toBeInTheDocument()
   })
 
   it('hides nested arrays when item-scoped visibility is false', async () => {
@@ -317,7 +585,7 @@ describe('ArrayFieldRenderer', () => {
         kind: 'array',
         name: 'grants',
         legend: 'Grants',
-        addLabel: 'Add grant',
+        addActionLabel: 'Add grant',
         fields: [
           {
             type: 'text',
@@ -338,7 +606,7 @@ describe('ArrayFieldRenderer', () => {
             kind: 'array',
             name: 'entries',
             legend: 'Innate spell entries',
-            addLabel: 'Add entry',
+            addActionLabel: 'Add entry',
             visibility: {
               dependsOn: ['grantType'],
               visibleWhen: (v) => v.grantType === 'innateSpells',
@@ -392,7 +660,7 @@ describe('ArrayFieldRenderer', () => {
             },
           },
         ],
-        addLabel: 'Add entry',
+        addActionLabel: 'Add entry',
       },
     ]
 
@@ -442,14 +710,14 @@ describe('ArrayFieldRenderer', () => {
         kind: 'array',
         name: 'items',
         legend: 'Items',
-        addLabel: 'Add item',
+        addActionLabel: 'Add item',
         fields: [
           { type: 'text', name: 'name', label: 'Name' },
           {
             kind: 'array',
             name: 'tags',
             legend: 'Tags',
-            addLabel: 'Add tag',
+            addActionLabel: 'Add tag',
             fields: [{ type: 'text', name: 'label', label: 'Label' }],
           },
         ],
@@ -481,7 +749,7 @@ describe('ArrayFieldRenderer', () => {
         legend: 'Traits',
         reorder: false,
         fields: traitFields,
-        addLabel: 'Add trait',
+        addActionLabel: 'Add trait',
       },
     ]
 
@@ -695,7 +963,7 @@ describe('ArrayFieldRenderer', () => {
         legend: 'Traits',
         itemVariant: 'compact',
         fields: traitFields,
-        addLabel: 'Add trait',
+        addActionLabel: 'Add trait',
         itemHeader: { fallback: (index) => `Trait ${index + 1}`, srOnly: true },
       },
     ]
@@ -736,7 +1004,7 @@ describe('ArrayFieldRenderer', () => {
             ],
           },
         ],
-        addLabel: 'Add grant',
+        addActionLabel: 'Add grant',
         itemHeader: { fallback: (index) => `Grant ${index + 1}`, srOnly: true },
       },
     ]
@@ -755,13 +1023,112 @@ describe('ArrayFieldRenderer', () => {
       />,
     )
 
-    const compactRow = document.querySelector('[data-compact-field-count="2"]')
+    const compactRow = document.querySelector('[data-compact-inline-row]')
     expect(compactRow).toBeInTheDocument()
+    expect(compactRow?.querySelector('[data-field-row]')).toBeInTheDocument()
 
     const actionsRail = compactRow!.querySelector('[aria-label="Item actions"]')
     expect(actionsRail).toBeInTheDocument()
     expect(actionsRail).not.toHaveClass('mt-1')
     expect(actionsRail).toHaveClass('justify-self-end')
+  })
+
+  it('honors FieldRow width tokens inside compact inline rows', async () => {
+    const compactWidthFields: FormItem[] = [
+      {
+        kind: 'array',
+        name: 'utilizes',
+        legend: 'Utilize actions',
+        itemVariant: 'compact',
+        fields: [
+          {
+            kind: 'row',
+            fields: [
+              {
+                type: 'text',
+                name: 'description',
+                label: 'Description',
+                required: true,
+                width: 'full',
+              },
+              {
+                type: 'number',
+                name: 'dc',
+                label: 'DC',
+                required: true,
+                digits: 2,
+                width: 'auto',
+              },
+            ],
+          },
+        ],
+        addActionLabel: 'Add utilize action',
+        itemHeader: { fallback: (index) => `Action ${index + 1}`, primaryField: 'description' },
+      },
+    ]
+
+    const utilizeSchema = z.object({
+      utilizes: z.array(z.object({ description: z.string(), dc: z.number() })),
+    })
+
+    render(
+      <Form<z.infer<typeof utilizeSchema>>
+        schema={utilizeSchema}
+        fields={compactWidthFields}
+        defaultValues={{ utilizes: [{ description: 'Pick a lock', dc: 15 }] }}
+        onSubmit={vi.fn()}
+        footer={<button type="submit">Save</button>}
+      />,
+    )
+
+    const compactRow = document.querySelector('[data-compact-inline-row]')
+    expect(compactRow?.querySelector('[data-field-row]')).toBeInTheDocument()
+
+    expect(screen.getByRole('textbox', { name: 'Description' }).closest('.space-y-2')).toHaveClass(
+      'flex-1',
+    )
+    expect(screen.getByRole('spinbutton', { name: 'DC' }).closest('.space-y-2')).toHaveClass(
+      'flex-none',
+    )
+  })
+
+  it('centers compact inline grip and actions when compactInlineAlign is center', () => {
+    const centeredCompactRowFields: FormItem[] = [
+      {
+        kind: 'array',
+        name: 'examples',
+        legend: 'Examples',
+        itemVariant: 'compact',
+        compactInlineAlign: 'center',
+        reorder: 'dragHandle',
+        fields: [
+          {
+            kind: 'row',
+            fields: [{ type: 'text', name: 'value', label: '', placeholder: 'Example…' }],
+          },
+        ],
+        addActionLabel: 'Add example',
+        itemHeader: { fallback: (index) => `Example ${index + 1}`, primaryField: 'value' },
+      },
+    ]
+
+    const exampleSchema = z.object({
+      examples: z.array(z.object({ value: z.string() })),
+    })
+
+    render(
+      <Form<z.infer<typeof exampleSchema>>
+        schema={exampleSchema}
+        fields={centeredCompactRowFields}
+        defaultValues={{ examples: [{ value: '' }] }}
+        onSubmit={vi.fn()}
+        footer={<button type="submit">Save</button>}
+      />,
+    )
+
+    const compactRow = document.querySelector('[data-compact-inline-row]')
+    expect(compactRow).toHaveAttribute('data-compact-inline-align', 'center')
+    expect(compactRow).toHaveClass('items-center')
   })
 
   it('shows issue badge, row summary, and legend link after failed submit', async () => {
@@ -884,7 +1251,7 @@ describe('ArrayFieldRenderer', () => {
           { type: 'text', name: 'rarity', label: 'Rarity', required: true },
           { type: 'text', name: 'quantity', label: 'Quantity', required: true },
         ],
-        addLabel: 'Add grant',
+        addActionLabel: 'Add grant',
         min: 1,
         itemHeader: { fallback: (index) => `Grant ${index + 1}`, srOnly: true },
       },
@@ -912,7 +1279,7 @@ describe('ArrayFieldRenderer', () => {
     expect(screen.getByRole('alert')).toHaveTextContent('Choose a rarity. · Quantity is required.')
   })
 
-  it('appends defaults from addMenu selections', async () => {
+  it('appends defaults from addActionMenu selections', async () => {
     const user = userEvent.setup()
     const grantSchema = z.object({
       grants: z.array(
@@ -923,18 +1290,18 @@ describe('ArrayFieldRenderer', () => {
       ),
     })
 
-    const addMenuFields: FormItem[] = [
+    const addActionMenuFields: FormItem[] = [
       {
         kind: 'array',
         name: 'grants',
         legend: 'Grants',
-        addLabel: 'Add grant',
+        addActionLabel: 'Add grant',
         itemCollapsible: true,
         itemHeader: {
           fallback: (index) => `Grant ${index + 1}`,
           primary: (values) => (values.grantType as string | undefined) ?? undefined,
         },
-        addMenu: {
+        addActionMenu: {
           groups: [{ id: 'traits', label: 'Traits' }],
           items: [
             {
@@ -962,7 +1329,7 @@ describe('ArrayFieldRenderer', () => {
     render(
       <Form<z.infer<typeof grantSchema>>
         schema={grantSchema}
-        fields={addMenuFields}
+        fields={addActionMenuFields}
         onSubmit={vi.fn()}
         footer={<button type="submit">Save</button>}
       />,
@@ -980,7 +1347,7 @@ describe('ArrayFieldRenderer', () => {
     expect(screen.getByRole('textbox', { name: 'Grant type' })).toHaveFocus()
   })
 
-  it('applies duplicate policy states in addMenu', async () => {
+  it('applies duplicate policy states in addActionMenu', async () => {
     const user = userEvent.setup()
     const grantSchema = z.object({
       grants: z.array(z.object({ grantType: z.string().optional() })),
@@ -991,8 +1358,8 @@ describe('ArrayFieldRenderer', () => {
         kind: 'array',
         name: 'grants',
         legend: 'Grants',
-        addLabel: 'Add grant',
-        addMenu: {
+        addActionLabel: 'Add grant',
+        addActionMenu: {
           groups: [{ id: 'traits', label: 'Traits' }],
           items: [
             {

@@ -1,6 +1,9 @@
 import { cva, type VariantProps } from 'class-variance-authority'
 
-export const previewCardRootVariants = cva('w-full rounded-md text-left transition-colors', {
+const previewCardListInteractiveClasses =
+  'hover:bg-accent hover:text-accent-foreground data-[active=true]:bg-accent data-[active=true]:text-accent-foreground'
+
+export const previewCardRootVariants = cva('w-full text-left transition-colors', {
   variants: {
     tone: {
       default: 'border border-border bg-background',
@@ -11,6 +14,12 @@ export const previewCardRootVariants = cva('w-full rounded-md text-left transiti
       compact: '',
       comfortable: '',
     },
+    layout: {
+      /** Flush list row for dropdown/combobox menus — default site-wide. */
+      list: 'rounded-none',
+      /** Bordered, rounded card for standalone summaries. */
+      card: 'rounded-md',
+    },
     interactive: {
       true: 'cursor-pointer',
       false: 'cursor-default',
@@ -20,12 +29,26 @@ export const previewCardRootVariants = cva('w-full rounded-md text-left transiti
     {
       tone: 'default',
       interactive: true,
+      layout: 'card',
       className: 'hover:bg-accent hover:text-accent-foreground',
     },
     {
       tone: 'transparent',
       interactive: true,
+      layout: 'card',
       className: 'hover:bg-accent hover:text-accent-foreground',
+    },
+    {
+      tone: 'transparent',
+      interactive: true,
+      layout: 'list',
+      className: previewCardListInteractiveClasses,
+    },
+    {
+      tone: 'default',
+      interactive: true,
+      layout: 'list',
+      className: previewCardListInteractiveClasses,
     },
     {
       tone: 'selected',
@@ -36,6 +59,7 @@ export const previewCardRootVariants = cva('w-full rounded-md text-left transiti
   defaultVariants: {
     tone: 'default',
     density: 'compact',
+    layout: 'list',
     interactive: false,
   },
 })
@@ -43,24 +67,58 @@ export const previewCardRootVariants = cva('w-full rounded-md text-left transiti
 export const previewCardBodyVariants = cva('flex items-start gap-2', {
   variants: {
     density: {
-      compact: 'px-2 py-1.5',
-      comfortable: 'px-3 py-2.5',
+      compact: '',
+      comfortable: '',
+    },
+    layout: {
+      list: 'px-3 py-1.5',
+      card: '',
     },
   },
+  compoundVariants: [
+    {
+      layout: 'card',
+      density: 'compact',
+      className: 'px-2 py-1.5',
+    },
+    {
+      layout: 'card',
+      density: 'comfortable',
+      className: 'px-3 py-2.5',
+    },
+  ],
   defaultVariants: {
     density: 'compact',
+    layout: 'list',
   },
 })
 
 export const previewCardTitleVariants = cva('truncate font-body-emphasis', {
   variants: {
     density: {
-      compact: 'text-xs',
+      compact: '',
       comfortable: 'text-sm',
     },
+    layout: {
+      list: 'mb-1 text-sm',
+      card: '',
+    },
   },
+  compoundVariants: [
+    {
+      layout: 'card',
+      density: 'compact',
+      className: 'text-xs',
+    },
+    {
+      layout: 'card',
+      density: 'comfortable',
+      className: 'text-sm',
+    },
+  ],
   defaultVariants: {
     density: 'compact',
+    layout: 'list',
   },
 })
 
@@ -81,4 +139,18 @@ export const previewCardDescriptionVariants = cva('text-muted-foreground', {
   },
 })
 
+/** Secondary line for list rows (e.g. availability notes) — matches description scale. */
+export const previewCardNoteVariants = cva('truncate text-muted-foreground italic', {
+  variants: {
+    density: {
+      compact: 'text-xs',
+      comfortable: 'text-sm',
+    },
+  },
+  defaultVariants: {
+    density: 'compact',
+  },
+})
+
 export type PreviewCardRootVariantProps = VariantProps<typeof previewCardRootVariants>
+export type PreviewCardLayout = NonNullable<PreviewCardRootVariantProps['layout']>

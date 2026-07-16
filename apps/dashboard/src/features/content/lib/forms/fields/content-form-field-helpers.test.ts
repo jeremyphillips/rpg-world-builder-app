@@ -10,7 +10,12 @@ import {
   weightFromForm,
   weightToForm,
 } from './content-economy-form-fields'
-import { feetInputUnitField } from './content-identity-form-fields'
+import {
+  descriptionField,
+  feetInputUnitField,
+  identityFields,
+  nameField,
+} from './content-identity-form-fields'
 import { mountCapacitySpeedFields, vehicleCargoSpeedFields } from './content-speed-form-fields'
 import { EQUIPMENT_COST_VALUE_DIGITS } from '../../../equipment/lib/equipment-cost-config'
 import { EQUIPMENT_WEIGHT_VALUE_DIGITS } from '../../../equipment/lib/equipment-weight-config'
@@ -137,7 +142,8 @@ describe('wealthGrantFields', () => {
     const [group] = wealthGrantFields('wealth')
     expect(group).toMatchObject({ kind: 'group', legend: 'Wealth' })
     if (group && 'fields' in group && group.fields[0] && 'fields' in group.fields[0]) {
-      expect(group.fields[0]).toMatchObject({ kind: 'row', layout: 'responsive-2' })
+      expect(group.fields[0]).toMatchObject({ kind: 'row' })
+      expect(group.fields[0]).not.toHaveProperty('layout')
       expect(group.fields[0]).not.toHaveProperty('className')
       expect(
         group.fields[0].fields.map((field) => ('name' in field ? field.name : undefined)),
@@ -160,14 +166,12 @@ describe('scalar unit rows', () => {
     }
   })
 
-  it('uses a responsive-4 grid row for cargo, speed, crew, and passengers', () => {
+  it('uses a flex row at intrinsic width for cargo, speed, crew, and passengers', () => {
     const row = vehicleCargoSpeedFields()[0]
-    expect(row).toMatchObject({
-      kind: 'row',
-      layout: 'responsive-4',
-      className: 'w-fit max-w-full md:grid-cols-[auto_auto_auto_auto]',
-    })
+    expect(row).toMatchObject({ kind: 'row', separator: 'subtle' })
     if (row && 'kind' in row && row.kind === 'row') {
+      expect(row).not.toHaveProperty('layout')
+      expect(row).not.toHaveProperty('className')
       expect(row.fields).toEqual([
         expect.objectContaining({ name: 'cargoCapacity', width: 'auto' }),
         expect.objectContaining({ name: 'speed', width: 'auto' }),
@@ -199,7 +203,13 @@ describe('feetInputUnitField', () => {
       name: 'range.value.value',
       label: 'Distance',
       segments: [
-        { kind: 'number', name: 'range.value.value', min: 0, digits: 2, ariaLabel: 'Distance value' },
+        {
+          kind: 'number',
+          name: 'range.value.value',
+          min: 0,
+          digits: 2,
+          ariaLabel: 'Distance value',
+        },
         { kind: 'text', value: 'ft.', tone: 'label' },
       ],
     })
@@ -215,5 +225,11 @@ describe('feetInputUnitField', () => {
         { kind: 'text', value: 'ft.', tone: 'label' },
       ],
     })
+  })
+})
+
+describe('catalog identity fields', () => {
+  it('identityFields returns name then description without a group wrapper', () => {
+    expect(identityFields()).toEqual([nameField(), descriptionField()])
   })
 })

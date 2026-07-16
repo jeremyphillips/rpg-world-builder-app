@@ -9,7 +9,7 @@ import {
   type EffectTemplate,
 } from './effect-template-registry'
 
-export type EffectArrayAddMenuConfig = NonNullable<ArrayConfig['addMenu']>
+export type EffectArrayAddMenuConfig = NonNullable<ArrayConfig['addActionMenu']>
 
 function buildTemplateSearchTerms(template: EffectTemplate): WeightedSearchField[] {
   const fields: WeightedSearchField[] = [

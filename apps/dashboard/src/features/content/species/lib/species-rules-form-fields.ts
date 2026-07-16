@@ -205,8 +205,6 @@ export function speciesLevelLimitsFields(ctx: ContentFormCtx): FormItem[] {
     {
       kind: 'stack',
       layout: 'dependent',
-      dependentsChrome: 'subtle',
-      dependentsChromeScope: 'arrayItems',
       fields: [
         {
           type: 'switch',
@@ -220,7 +218,7 @@ export function speciesLevelLimitsFields(ctx: ContentFormCtx): FormItem[] {
           kind: 'array',
           name: 'classLevelCaps',
           legend: '',
-          addLabel: 'Add class limit',
+          addActionLabel: 'Add class limit',
           itemCollapsible: true,
           itemHeader: {
             fallback: (index: number) => `Class limit ${index + 1}`,

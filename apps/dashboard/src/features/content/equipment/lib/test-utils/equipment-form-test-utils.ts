@@ -20,18 +20,24 @@ export function collectGroupLegends(fields: readonly FormItem[]): string[] {
 }
 
 /**
- * Asserts `buildFields` for a kind composes the shared Identity/Economy groups
- * plus the registered kind group as the last item. Returns the built fields so
- * callers can layer per-family assertions on top.
+ * Asserts `buildFields` for a kind places name first, the registered kind group,
+ * Economy, then description last. Returns the built fields so callers can layer
+ * per-family assertions on top.
  */
 export function expectComposedKindGroups(
   equipmentKind: EquipmentKind,
-  lastLegend: string,
-  expectedLegends: readonly string[] = ['Identity', 'Economy', lastLegend],
+  kindLegend: string,
+  expectedLegends: readonly string[] = [kindLegend, 'Economy'],
 ): FormItem[] {
   const fields = equipmentFormDef.buildFields({ equipmentKind })
   expect(collectGroupLegends(fields)).toEqual(expectedLegends)
-  expect(fields.at(-1)).toMatchObject({ kind: 'group', legend: lastLegend })
+  expect(fields[0]).toMatchObject({ name: 'name' })
+  expect(fields.at(-1)).toMatchObject({ name: 'description' })
+  const kindGroup = fields.find(
+    (field): field is GroupConfig =>
+      'kind' in field && field.kind === 'group' && field.legend === kindLegend,
+  )
+  expect(kindGroup).toBeDefined()
   return fields
 }
 

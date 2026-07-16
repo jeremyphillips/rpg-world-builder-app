@@ -1,20 +1,14 @@
 /**
  * Resolution seed manifest for SRD 5.2.1 catalog spells.
  *
- * Declares which structured-effect slugs receive a `spell.resolution` envelope on
- * the read model and how that envelope is produced. Mirrors the pattern in
- * `spell-seed-effects.ts`: manifest here, materialize into `level-*.json` via
+ * Declares which slugs receive a `spell.resolution` envelope on the read model and
+ * how that envelope is produced. Materialize into `level-*.json` via
  * `packages/catalog/scripts/apply-spell-seed-resolution.mjs`.
  *
  * Each manifest row is one of:
  * - `full` — hand-authored `SpellResolution` (contract fixtures)
- * - `derived` — built by `deriveResolutionFromSpell()` from root `effects[]` plus overrides
- * - `defer` — intentionally no resolution yet; reason codes live in
- *   `spell-resolution-defer-reasons.ts`
- *
- * Migrated spells keep both root `effects[]` and optional `resolution` until a later
- * consolidation phase. Temporary seed manifest — use `resolveSpellSeedResolution()`
- * in tests and `SRD_521_SPELL_SEED_RESOLUTION_SLUGS` for slugs the apply script writes.
+ * - `derived` — built by `deriveResolutionFromSpell()` from derivation snapshots plus overrides
+ * - `defer` — intentionally no resolution yet; documented defer reason codes below
  */
 import {
   ARCANE_HAND_RESOLUTION,
@@ -32,7 +26,22 @@ import {
   deriveResolutionFromSpell,
   type ResolutionDerivationOverrides,
 } from './lib/derive-resolution-from-spell'
-import type { SpellResolutionDeferReason } from './spell-resolution-defer-reasons'
+
+/** Documented deferral reason codes for `kind: 'defer'` manifest rows. */
+export const SPELL_RESOLUTION_DEFER_REASONS = {
+  'automatic-method':
+    'Requires resolution method automatic (e.g. Magic Missile) before envelope modeling.',
+  'extra-damage-rider':
+    'Primary mechanics are non-damage; extra damage is a rider (e.g. Hex, Hunter’s Mark).',
+  'multi-effect': 'Multiple damage effects need per-outcome effect linking (e.g. Ice Knife).',
+  'choice-model': 'Choice-dependent modes and multiple labeled damage effects (e.g. Arcane Hand).',
+  'unsupported-effect-kind':
+    'Legacy defer code — healing and temporary hit points are supported as of Tier D.',
+  'placeholder-damage':
+    'Placeholder flat-zero damage rider is not a real resolution envelope (e.g. True Strike).',
+} as const
+
+export type SpellResolutionDeferReason = keyof typeof SPELL_RESOLUTION_DEFER_REASONS
 
 export type SpellSeedResolutionFullEntry = {
   kind: 'full'
@@ -62,14 +71,37 @@ export const SRD_521_SPELL_SEED_RESOLUTION = {
   // Tier A — single primary damage
   'chill-touch': { kind: 'full', resolution: CHILL_TOUCH_RESOLUTION },
   'inflict-wounds': { kind: 'full', resolution: INFlict_WOUNDS_RESOLUTION },
-  'fire-bolt': { kind: 'derived', overrides: {} },
+  'fire-bolt': {
+    kind: 'derived',
+    overrides: {
+      hitNote:
+        "A flammable object hit by this spell starts burning if it isn't being worn or carried.",
+    },
+  },
   'poison-spray': { kind: 'derived', overrides: {} },
-  'ray-of-sickness': { kind: 'derived', overrides: {} },
-  'acid-splash': { kind: 'derived', overrides: { saveAbility: 'dex' } },
+  'ray-of-sickness': {
+    kind: 'derived',
+    overrides: {
+      hitNote: 'On a hit, the target has the Poisoned condition until the end of your next turn.',
+    },
+  },
+  'acid-splash': {
+    kind: 'derived',
+    overrides: {
+      saveAbility: 'dex',
+      selectionMode: 'point',
+      areaOfEffect: { shape: 'sphere', radius: { value: 5, unit: 'ft' } },
+    },
+  },
   'sacred-flame': { kind: 'derived', overrides: { saveAbility: 'dex' } },
   'burning-hands': {
     kind: 'derived',
-    overrides: { saveAbility: 'dex', proximity: { kind: 'reach' } },
+    overrides: {
+      saveAbility: 'dex',
+      selectionMode: 'self',
+      failedSaveNote:
+        "Flammable objects in the Cone that aren't being worn or carried start burning.",
+    },
   },
   'hellish-rebuke': {
     kind: 'derived',
@@ -80,13 +112,24 @@ export const SRD_521_SPELL_SEED_RESOLUTION = {
   },
   thunderwave: {
     kind: 'derived',
-    overrides: { saveAbility: 'con', proximity: { kind: 'reach' } },
+    overrides: {
+      saveAbility: 'con',
+      selectionMode: 'self',
+      areaOfEffect: { shape: 'cube', size: { value: 15, unit: 'ft' } },
+    },
   },
-  fireball: { kind: 'derived', overrides: { saveAbility: 'dex' } },
+  fireball: {
+    kind: 'derived',
+    overrides: {
+      saveAbility: 'dex',
+      failedSaveNote:
+        "Flammable objects in the area that aren't being worn or carried start burning.",
+    },
+  },
   'wall-of-fire': { kind: 'derived', overrides: { saveAbility: 'dex' } },
   'delayed-blast-fireball': { kind: 'derived', overrides: { saveAbility: 'dex' } },
 
-  // Tier B — hybrid resolution + legacy effects[]
+  // Tier B — application pattern / automatic method
   'eldritch-blast': { kind: 'full', resolution: ELDRITCH_BLAST_RESOLUTION },
   'magic-missile': { kind: 'full', resolution: MAGIC_MISSILE_RESOLUTION },
 
@@ -107,19 +150,19 @@ export const SRD_521_SPELL_SEED_RESOLUTION = {
     kind: 'derived',
     overrides: {
       method: { kind: 'automatic' },
-      target: { count: 6, kind: 'creature' },
+      target: { count: 6, countKind: 'up-to', kind: 'creature' },
     },
   },
   'mass-cure-wounds': {
     kind: 'derived',
     overrides: {
       method: { kind: 'automatic' },
-      target: { count: 6, kind: 'creature' },
+      target: { count: 6, countKind: 'up-to', kind: 'creature' },
     },
   },
   'false-life': {
     kind: 'derived',
-    overrides: { method: { kind: 'automatic' }, target: { kind: 'creature' } },
+    overrides: { method: { kind: 'automatic' }, selectionMode: 'self' },
   },
 
   // Tier D — explicit deferral

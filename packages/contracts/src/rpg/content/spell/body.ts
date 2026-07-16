@@ -17,7 +17,7 @@ import {
   slugSchema,
 } from '../lib/envelope'
 import { classSlugSchema } from '../classes/class'
-import { spellAtomicEffectSchema } from './effects'
+import { contentModelingSchema } from '../../primitives/modeling/schema'
 import { spellResolutionSchema } from './resolution'
 
 // ---------------------------------------------------------------------------
@@ -59,10 +59,10 @@ export const spellBodySchema = contentBodyBaseSchema.extend({
   cantripScaling: z.string().optional(),
   /** Rich-text HTML (TipTap). Upcast body prose — no "Using a Higher-Level Spell Slot" heading. */
   higherLevelSlotEffect: z.string().optional(),
-  /** Structured atomic effects; optional until catalog/homebrew authoring lands. */
-  effects: z.array(spellAtomicEffectSchema).optional(),
   /** Structured resolution envelope; optional until resolution authoring persistence lands. */
   resolution: spellResolutionSchema.optional(),
+  /** Human-reviewed modeling posture; absent until audited. */
+  modeling: contentModelingSchema.optional(),
 })
 
 export type SpellBody = z.infer<typeof spellBodySchema>
@@ -71,7 +71,7 @@ export type SpellBody = z.infer<typeof spellBodySchema>
  * Spell body fields included in create/update API input today.
  * Effects and resolution are intentionally omitted until persistence lands.
  */
-export const spellPersistedBodySchema = spellBodySchema.omit({ effects: true, resolution: true })
+export const spellPersistedBodySchema = spellBodySchema.omit({ resolution: true })
 
 export type SpellPersistedBody = z.infer<typeof spellPersistedBodySchema>
 

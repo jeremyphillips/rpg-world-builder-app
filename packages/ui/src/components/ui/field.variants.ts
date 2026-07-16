@@ -1,6 +1,7 @@
 import { cva, type VariantProps } from 'class-variance-authority'
 
 import { cn } from '../../lib/utils'
+import { fieldGroupDividerBottomPaddingClasses } from './field-group-chrome.variants'
 import { fieldSizeTypographyClasses, type FieldSizeToken } from './field-sizing.variants'
 
 /**
@@ -9,16 +10,18 @@ import { fieldSizeTypographyClasses, type FieldSizeToken } from './field-sizing.
  * - `fieldAnatomyStackClasses` — label / control / hint inside one field
  * - `fieldLabelHintStackClasses` — label + hint cluster when hint sits below the label
  * - `fieldGroupStackClasses` — sibling fields within a group or form column (gap-based; avoids margin collapse with fieldsets)
- * - `fieldGroupBottomMarginClasses` — space below a top-level group or array section fieldset
+ * - `fieldGroupBottomMarginClasses` — space below standalone group/array fieldsets (omitted when a parent rhythm stack owns sibling gap)
  *   (nested array sections omit this; parent stack/group rhythm owns spacing)
  * - `fieldGroupFlexStackClasses` — wider 32px gap stack for collapse-prone fieldset siblings (embedded editors, …)
  * - `fieldSetResetClasses` — strip UA fieldset chrome from leaf field wrappers
  * - `formSectionStackClasses` — vertical gap between top-level form sections
  * - `fieldRowGapClasses` — horizontal + wrap gap between fields in a row
- * - `fieldRowLayoutVariants` — display mode for schema-driven rows
+ * - `fieldRowLayoutClasses` — flex wrap row for schema-driven `FieldRow` / `RowConfig`
  * - `fieldChipWrapGapClasses` — chip pill row spacing inside `ChipsField`
- * - `fieldGroupDescriptionClasses` — space below a group/section description
- * - `fieldGroupLegendSpacingClasses` — space below a group legend
+ * - `fieldGroupDescriptionClasses` — group/section hint typography (spacing lives on the legend header)
+ * - `fieldGroupLegendHeaderStackClasses` — vertical gap between a group legend and its hint
+ * - `fieldGroupLegendHeaderMarginVariants` — space below a legend header (legend alone or legend + hint)
+ * - `fieldGroupLegendSpacingClasses` — section legend header bottom margin (`mb-5` / 20px)
  * - `fieldArrayItemVariants` — chrome around one repeatable array item
  * - `fieldInlineSentenceClasses` — prose + compact control sentence rows
  * - `fieldInlineControlRowClasses` — inline label + control rows
@@ -41,8 +44,15 @@ export const fieldGroupFlexStackClasses = 'flex flex-col gap-8'
 export const formSectionStackClasses = 'flex flex-col gap-7'
 export const fieldRowGapClasses = 'gap-6'
 export const fieldChipWrapGapClasses = 'gap-2 pt-1'
-export const fieldGroupDescriptionClasses = 'mb-3'
+export const fieldGroupDescriptionTypographyClasses =
+  'font-normal leading-normal text-muted-foreground'
+/** Group/subgroup hint copy — spacing is applied on the legend header wrapper. */
+export const fieldGroupDescriptionClasses = fieldGroupDescriptionTypographyClasses
+/** Vertical gap between a group legend and its optional hint. */
+export const fieldGroupLegendHeaderStackClasses = 'flex flex-col gap-2'
+/** Section-level legend header bottom margin (20px). */
 export const fieldGroupLegendSpacingClasses = 'mb-5'
+/** Subgroup legend header bottom margin (16px). */
 export const fieldSubgroupLegendSpacingClasses = 'mb-4'
 /** Shared legend typography — field groups and array section legends. */
 export const fieldGroupLegendTypographyClasses =
@@ -57,6 +67,9 @@ export const fieldArrayLegendTypographyClasses =
 /** Compact array section legend — follows section `size: 'sm'` (14px). */
 export const fieldArrayLegendSmTypographyClasses =
   'text-sm font-heading leading-none text-foreground'
+/** Legend row when the add action sits inline with the array heading. */
+export const arrayFieldLegendInlineLayoutClasses = 'flex w-full items-center justify-between gap-4'
+export const arrayFieldLegendInlineLabelClasses = 'flex min-w-0 items-center gap-2'
 
 export type FieldArrayItemLayoutVariant = 'compact' | 'detailed'
 
@@ -192,35 +205,24 @@ export const chooseFromChipsSentenceClasses = fieldInlineSentenceClasses
 /** Trailing divider tone for leaf fields and rows within a group/stack rhythm. */
 export type FieldSeparator = 'subtle'
 
-export const fieldSeparatorVariants = cva('border-b border-border pb-4', {
-  variants: {
-    tone: {
-      subtle: '',
+export const fieldSeparatorVariants = cva(
+  cn('border-b border-border', fieldGroupDividerBottomPaddingClasses),
+  {
+    variants: {
+      tone: {
+        subtle: '',
+      },
+    },
+    defaultVariants: {
+      tone: 'subtle',
     },
   },
-  defaultVariants: {
-    tone: 'subtle',
-  },
-})
+)
 
 export type FieldSeparatorVariantProps = VariantProps<typeof fieldSeparatorVariants>
 
-export const fieldRowLayoutVariants = cva('', {
-  variants: {
-    layout: {
-      flex: cn('flex flex-wrap items-start', fieldRowGapClasses),
-      'responsive-2': cn('grid w-full grid-cols-1 md:grid-cols-2', fieldRowGapClasses),
-      'responsive-3': cn('grid w-full grid-cols-2 md:grid-cols-3', fieldRowGapClasses),
-      'responsive-4': cn('grid w-full grid-cols-2 md:grid-cols-4', fieldRowGapClasses),
-    },
-  },
-  defaultVariants: {
-    layout: 'flex',
-  },
-})
-
-export type FieldRowLayoutVariantProps = VariantProps<typeof fieldRowLayoutVariants>
-export type FieldRowLayout = NonNullable<FieldRowLayoutVariantProps['layout']>
+/** Side-by-side fields in a wrapping flex row — compose widths via leaf `width` tokens. */
+export const fieldRowLayoutClasses = cn('flex flex-wrap items-start', fieldRowGapClasses)
 
 /** Where helper text renders relative to the label and control. */
 export type FieldHintPosition = 'below-label' | 'below-control'
@@ -281,9 +283,9 @@ export function resolveArrayLegendScale(size: FieldSizeToken): FieldGroupLegendS
 export const fieldGroupLegendVariants = cva('', {
   variants: {
     size: {
-      section: cn(fieldGroupLegendSpacingClasses, fieldGroupLegendTypographyClasses),
-      subsection: cn(fieldSubgroupLegendSpacingClasses, fieldSubgroupLegendTypographyClasses),
-      array: fieldArrayLegendSpacingClasses,
+      section: fieldGroupLegendTypographyClasses,
+      subsection: fieldSubgroupLegendTypographyClasses,
+      array: '',
     },
     scale: {
       default: '',
@@ -307,3 +309,34 @@ export const fieldGroupLegendVariants = cva('', {
     scale: 'default',
   },
 })
+
+/** Bottom margin for a field-group legend header — legend alone or legend + hint block. */
+export const fieldGroupLegendHeaderMarginVariants = cva('', {
+  variants: {
+    size: {
+      section: fieldGroupLegendSpacingClasses,
+      subsection: fieldSubgroupLegendSpacingClasses,
+      array: fieldArrayLegendSpacingClasses,
+    },
+  },
+  defaultVariants: {
+    size: 'section',
+  },
+})
+
+export type FieldGroupLegendVariantProps = VariantProps<typeof fieldGroupLegendVariants>
+
+/** Typography + header margin for `<legend>` on groups, subgroups, and array sections. */
+export function resolveFieldGroupLegendClassName(
+  options: FieldGroupLegendVariantProps = {},
+): string {
+  const size = options.size ?? 'section'
+  return cn(fieldGroupLegendVariants(options), fieldGroupLegendHeaderMarginVariants({ size }))
+}
+
+/** Stack + bottom margin for a legend/hint header block nested inside `<legend>`. */
+export function resolveFieldGroupLegendHeaderStackClassName(
+  size: NonNullable<FieldGroupLegendVariantProps['size']> = 'section',
+): string {
+  return cn(fieldGroupLegendHeaderStackClasses, fieldGroupLegendHeaderMarginVariants({ size }))
+}

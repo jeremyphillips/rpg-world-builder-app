@@ -11,14 +11,35 @@ import type { FormItem, GroupConfig, RowConfig, ArrayConfig } from '@rpg/ui/form
 
 import { RESOLUTION_FORM_FIXTURES } from '../resolution/fixtures'
 import { spellFormDef, spellFormSchema, type SpellFormValues } from './spell-form-def'
+import { RESOLUTION_SECTION_LABELS } from '../resolution/lib/form/resolution-form-labels'
 
 const SRD_SPELLS = loadSeedSpells('srd-cc-5.2.1')
 
 function findGroup(fields: FormItem[], legend: string): GroupConfig | undefined {
-  return fields.find(
-    (field): field is GroupConfig =>
-      'kind' in field && field.kind === 'group' && field.legend === legend,
-  )
+  for (const field of fields) {
+    if ('kind' in field && field.kind === 'group') {
+      if (field.legend === legend) return field
+      const nested = findGroup(field.fields, legend)
+      if (nested) return nested
+    }
+  }
+
+  return undefined
+}
+
+function findArrayField(fields: FormItem[], name: string): ArrayConfig | undefined {
+  for (const field of fields) {
+    if ('kind' in field && field.kind === 'array' && field.name === name) {
+      return field
+    }
+
+    if ('kind' in field && (field.kind === 'group' || field.kind === 'stack')) {
+      const nested = findArrayField(field.fields, name)
+      if (nested) return nested
+    }
+  }
+
+  return undefined
 }
 
 function findRow(fields: GroupConfig['fields']): RowConfig | undefined {
@@ -32,7 +53,7 @@ function collectFieldNames(fields: FormItem[]): string[] {
       names.push(field.name)
     } else if ('kind' in field && field.kind === 'row') {
       names.push(...collectFieldNames(field.fields))
-    } else if ('kind' in field && field.kind === 'group') {
+    } else if ('kind' in field && (field.kind === 'group' || field.kind === 'stack')) {
       names.push(...collectFieldNames(field.fields))
     }
   }
@@ -217,28 +238,29 @@ describe('spellFormDef resolution tab', () => {
 
     const names = collectFieldNames(resolutionTab?.fields ?? [])
     expect(names).toContain('_resolutionPersistenceNotice')
-    expect(names).toContain('_resolutionHybridNotice')
     expect(names).toContain('_resolutionPreview')
     expect(names).toContain('_resolutionEmptyState')
-    expect(names).toContain('resolution.targetKind')
+    expect(names).toContain('_resolutionSelectionModeSelect')
     expect(names).toContain('_resolutionProximitySelect')
     expect(names).toContain('resolution.proximityReachDistanceFt')
     expect(names).toContain('_resolutionHowItResolves')
     expect(names).toContain('resolution.effects')
     expect(names).toContain('_resolutionEffectsApplicationLabel')
-    expect(names).toContain('_resolutionOutcomesPreview')
-    expect(findGroup(resolutionTab?.fields ?? [], 'Target')).toBeDefined()
+    expect(names).toContain('_resolutionOutcomes')
+    expect(findGroup(resolutionTab?.fields ?? [], 'Selection')).toBeDefined()
     expect(findGroup(resolutionTab?.fields ?? [], 'How it resolves')).toBeDefined()
-    const effectsArray = resolutionTab?.fields.find(
-      (field): field is ArrayConfig =>
-        'kind' in field && field.kind === 'array' && field.name === 'resolution.effects',
-    )
+    expect(findGroup(resolutionTab?.fields ?? [], 'Effects & outcomes')).toBeDefined()
+    expect(findGroup(resolutionTab?.fields ?? [], 'Authored effects')).toBeDefined()
+    const effectsArray = findArrayField(resolutionTab?.fields ?? [], 'resolution.effects')
     expect(effectsArray).toBeDefined()
-    expect(effectsArray?.legend).toBe('Effects')
+    expect(effectsArray?.legend).toBe('')
+    expect(effectsArray?.itemVariant).toBe('detailed')
     expect(effectsArray?.itemCollapsible).toBe(true)
     expect(effectsArray?.itemHeader?.primary).toBeTypeOf('function')
     expect(effectsArray?.itemHeader?.summary).toBeTypeOf('function')
-    expect(findGroup(resolutionTab?.fields ?? [], 'Outcomes')).toBeDefined()
+    expect(findGroup(resolutionTab?.fields ?? [], 'Outcome branches')).toMatchObject({
+      description: RESOLUTION_SECTION_LABELS.outcomesHint,
+    })
   })
 })
 
@@ -246,6 +268,10 @@ describe('spellFormDef resolution integration', () => {
   const spellWithResolution: Spell = {
     ...SRD_SPELLS[0]!,
     resolution: ELDRITCH_BLAST_RESOLUTION,
+    modeling: {
+      reviewedAt: '2026-07-15T00:00:00.000Z',
+      status: 'meaningful-partial',
+    },
   }
 
   it('createDefaultValues omits resolution', () => {

@@ -31,7 +31,11 @@ describe('Badge', () => {
         Error
       </Badge>,
     )
-    expect(screen.getByText('Error')).toHaveClass('font-medium', 'bg-semantic-negative-subtle')
+    expect(screen.getByText('Error')).toHaveClass(
+      'font-medium',
+      'bg-semantic-negative-subtle',
+      'text-semantic-negative-on-subtle',
+    )
   })
 
   it('has no accessibility violations', async () => {
@@ -39,6 +43,17 @@ describe('Badge', () => {
       <Badge appearance="neutral" tone="neutral">
         Homebrew
       </Badge>,
+    )
+    await expectNoAxeViolations(container)
+  })
+
+  it('has no accessibility violations for soft negative on card surface', async () => {
+    const { container } = render(
+      <div className="rounded-lg bg-card p-4">
+        <Badge appearance="soft" tone="negative">
+          Error
+        </Badge>
+      </div>,
     )
     await expectNoAxeViolations(container)
   })

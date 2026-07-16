@@ -6,8 +6,9 @@ import { formatChangePlanForDialog } from './resolution-change-dialog.lib'
 import { describeEffectForConfirm } from './resolution-selection-options.lib'
 
 describe('formatChangePlanForDialog', () => {
-  it('aggregates method, pattern, and effect consequences', () => {
+  it('selection mode change reports method incompatibility without silent coercion', () => {
     const before = {
+      selectionMode: 'targets' as const,
       proximityKind: 'distance' as const,
       proximityDistanceFt: 120,
       targetKind: 'creature-or-object',
@@ -25,13 +26,13 @@ describe('formatChangePlanForDialog', () => {
       ],
     }
 
-    const change = { field: 'proximityKind' as const, value: 'self' as const }
+    const change = { field: 'selectionMode' as const, value: 'self' as const }
     const plan = planResolutionChange(before, change)
     const copy = formatChangePlanForDialog(plan, change)
 
-    expect(copy.headline).toBe('Change target proximity?')
+    expect(copy.headline).toBe('Change selection mode?')
     expect(copy.consequences).toContain('invalidate the current Ranged spell attack selection')
-    expect(copy.consequences).toContain('remove the Projectiles application pattern')
+    expect(plan.incompatibleSelections).toHaveLength(1)
     expect(plan.effectsToRemove).toEqual([])
   })
 })
@@ -44,6 +45,6 @@ describe('describeEffectForConfirm', () => {
         kind: 'healing',
         roll: { dice: { count: 2, faces: 8 } },
       } as ResolutionEffectRef & { roll: { dice: { count: number; faces: number } } }),
-    ).toBe('Healing — 2d8')
+    ).toBe('Healing — 2d8 healing')
   })
 })

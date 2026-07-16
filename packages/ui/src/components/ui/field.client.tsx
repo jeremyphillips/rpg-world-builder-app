@@ -155,12 +155,13 @@ export interface FieldControlProps {
  * control gets consistent labelling and error semantics without per-field props.
  */
 function FieldControl({ children }: FieldControlProps) {
-  const { controlId, describedBy, hasError } = useFieldContext('Field.Control')
+  const { controlId, describedBy, hasError, required } = useFieldContext('Field.Control')
   const child = React.Children.only(children) as React.ReactElement<Record<string, unknown>>
   return React.cloneElement(child, {
     id: child.props.id ?? controlId,
     'aria-describedby': child.props['aria-describedby'] ?? describedBy,
     'aria-invalid': child.props['aria-invalid'] ?? (hasError || undefined),
+    'aria-required': child.props['aria-required'] ?? (required || undefined),
   })
 }
 FieldControl.displayName = 'Field.Control'

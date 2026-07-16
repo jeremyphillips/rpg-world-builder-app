@@ -212,7 +212,7 @@ const arrayItemsScopeSchema = z.object({
   caps: z.array(z.object({ classId: z.string(), maxLevel: z.string() })),
 })
 
-/** Dependent stack with array dependents — tone on item shells, not wrapper. */
+/** Dependent stack with array dependents — item shells use elevated card chrome by default. */
 export const DependentStackArrayItemsScope: Story = {
   args: {
     schema: stackSchema,
@@ -228,8 +228,6 @@ export const DependentStackArrayItemsScope: Story = {
         {
           kind: 'stack',
           layout: 'dependent',
-          dependentsChrome: 'subtle',
-          dependentsChromeScope: 'arrayItems',
           fields: [
             {
               type: 'switch',
@@ -242,7 +240,7 @@ export const DependentStackArrayItemsScope: Story = {
               kind: 'array',
               name: 'caps',
               legend: '',
-              addLabel: 'Add class limit',
+              addActionLabel: 'Add class limit',
               fields: [
                 { type: 'text', name: 'classId', label: 'Class' },
                 { type: 'text', name: 'maxLevel', label: 'Max level' },

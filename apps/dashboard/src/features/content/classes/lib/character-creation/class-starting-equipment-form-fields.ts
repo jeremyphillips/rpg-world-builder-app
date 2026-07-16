@@ -183,7 +183,7 @@ export function startingEquipmentModifierFields(): FormItem[] {
       kind: 'array',
       name: 'modifiers',
       legend: 'Modifiers',
-      addLabel: 'Add modifier',
+      addActionLabel: 'Add modifier',
       itemCollapsible: true,
       visibility: visibleForEquipmentGrantTarget(),
       itemHeader: {
@@ -283,7 +283,7 @@ export function startingEquipmentOptionItemFields(ctx: ContentFormCtx): FormItem
       kind: 'array',
       name: 'items',
       legend: 'Items',
-      addLabel: 'Add item',
+      addActionLabel: 'Add item',
       itemVariant: 'detailed',
       itemCollapsible: true,
       itemHeader: {

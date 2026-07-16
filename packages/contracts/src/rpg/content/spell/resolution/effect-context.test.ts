@@ -1,9 +1,20 @@
 import { describe, expect, it } from 'vitest'
 
-import { deriveDefaultEffectRecipient, isResolutionTargetConfigured } from './effect-context'
+import {
+  BURNING_HANDS_RESOLUTION,
+  CURE_WOUNDS_RESOLUTION,
+  FALSE_LIFE_RESOLUTION,
+  FIREBALL_RESOLUTION,
+} from './fixtures'
+import {
+  deriveDefaultEffectRecipient,
+  deriveEffectRecipientFromResolution,
+  isResolutionTargetConfigured,
+} from './effect-context'
 import type { ResolutionSelectionState } from './selection-types'
 
 const distanceAttackState: ResolutionSelectionState = {
+  selectionMode: 'targets',
   proximityKind: 'distance',
   proximityDistanceFt: 120,
   targetKind: 'creature-or-object',
@@ -15,18 +26,65 @@ const distanceAttackState: ResolutionSelectionState = {
   effects: [{ id: 'damage', kind: 'damage' }],
 }
 
+describe('deriveEffectRecipientFromResolution', () => {
+  it('returns self for self mode without area', () => {
+    expect(deriveEffectRecipientFromResolution(FALSE_LIFE_RESOLUTION)).toBe('self')
+  })
+
+  it('returns area for self mode with area', () => {
+    expect(deriveEffectRecipientFromResolution(BURNING_HANDS_RESOLUTION)).toBe('area')
+  })
+
+  it('returns area for point mode with area', () => {
+    expect(deriveEffectRecipientFromResolution(FIREBALL_RESOLUTION)).toBe('area')
+  })
+
+  it('returns target for targets mode', () => {
+    expect(deriveEffectRecipientFromResolution(CURE_WOUNDS_RESOLUTION)).toBe('target')
+  })
+
+  it('returns generic for none mode', () => {
+    expect(
+      deriveEffectRecipientFromResolution({
+        selectionMode: 'none',
+        method: { kind: 'automatic' },
+        effects: FALSE_LIFE_RESOLUTION.effects,
+        outcomes: FALSE_LIFE_RESOLUTION.outcomes,
+      }),
+    ).toBe('generic')
+  })
+
+  it('returns generic for point mode without area', () => {
+    expect(
+      deriveEffectRecipientFromResolution({
+        selectionMode: 'point',
+        origin: FIREBALL_RESOLUTION.origin,
+        method: FIREBALL_RESOLUTION.method,
+        effects: FIREBALL_RESOLUTION.effects,
+        outcomes: FIREBALL_RESOLUTION.outcomes,
+      }),
+    ).toBe('generic')
+  })
+})
+
 describe('deriveDefaultEffectRecipient', () => {
-  it('returns self for self proximity', () => {
+  it('uses selectionMode and area when present', () => {
     expect(
       deriveDefaultEffectRecipient({
-        proximityKind: 'self',
-        targetKind: 'creature',
-        targetCount: 1,
+        selectionMode: 'self',
+        hasAreaOfEffect: true,
+      }),
+    ).toBe('area')
+
+    expect(
+      deriveDefaultEffectRecipient({
+        selectionMode: 'self',
+        hasAreaOfEffect: false,
       }),
     ).toBe('self')
   })
 
-  it('returns target when external target is configured', () => {
+  it('returns target for legacy external target state', () => {
     expect(
       deriveDefaultEffectRecipient({
         proximityKind: 'touch',

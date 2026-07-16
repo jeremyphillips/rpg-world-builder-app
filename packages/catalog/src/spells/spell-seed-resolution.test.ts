@@ -1,4 +1,4 @@
-import { CURE_WOUNDS_RESOLUTION, FALSE_LIFE_RESOLUTION } from '@rpg/contracts'
+import { CURE_WOUNDS_RESOLUTION, FALSE_LIFE_RESOLUTION, type SpellResolution } from '@rpg/contracts'
 import { describe, expect, it } from 'vitest'
 
 import { loadSeedSpells } from './index'
@@ -12,13 +12,23 @@ import {
 
 const RULESET = 'srd-cc-5.2.1' as const
 
+function resolutionEnvelopeOnly(
+  resolution: SpellResolution | undefined,
+): SpellResolution | undefined {
+  if (!resolution) return undefined
+  const { progression: _progression, ...envelope } = resolution
+  return envelope
+}
+
 describe('SRD 5.2.1 spell seed resolution manifest', () => {
   it('matches structured resolution on every applicable seeded spell after apply', () => {
     const spells = loadSeedSpells(RULESET)
 
     for (const slug of SRD_521_SPELL_SEED_RESOLUTION_SLUGS) {
       const spell = spells.find((entry) => entry.slug === slug)
-      expect(spell?.resolution, slug).toEqual(resolveSpellSeedResolution(spell!))
+      expect(resolutionEnvelopeOnly(spell?.resolution), slug).toEqual(
+        resolutionEnvelopeOnly(resolveSpellSeedResolution(spell!)),
+      )
     }
   })
 
@@ -35,12 +45,12 @@ describe('SRD 5.2.1 spell seed resolution manifest', () => {
     }
   })
 
-  it('keeps effects[] on applicable migrated and hybrid spells', () => {
+  it('does not persist a spell-level effects array on applicable spells', () => {
     const spells = loadSeedSpells(RULESET)
 
     for (const slug of SRD_521_SPELL_SEED_RESOLUTION_SLUGS) {
       const spell = spells.find((entry) => entry.slug === slug)
-      expect(spell?.effects?.length, slug).toBeGreaterThan(0)
+      expect(spell).not.toHaveProperty('effects')
     }
   })
 

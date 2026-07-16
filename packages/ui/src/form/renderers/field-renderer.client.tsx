@@ -14,7 +14,6 @@ import { ComboboxField } from '../../components/ui/combobox-field.client'
 import { NumberField } from '../../components/ui/number-field'
 import { RadioCardField } from '../../components/ui/radio-card-field'
 import { RadioGroupField } from '../../components/ui/radio-group-field'
-import { SelectField } from '../../components/ui/select-field'
 import { SwitchField } from '../../components/ui/switch-field'
 import { TextareaField } from '../../components/ui/textarea-field'
 import { TextField } from '../../components/ui/text-field'
@@ -22,14 +21,17 @@ import { MarkdownField } from '../../components/ui/markdown-field.client'
 import { useFileFieldRemotePreview } from '../context/file-field-props.context'
 import { useFieldErrorPresentation } from '../context/array-item-presentation.context'
 import { resolveNestedFieldErrorMessage } from '../errors/resolve-field-error-message'
-import { DiceFormulaFieldRenderer } from './dice-formula-field-renderer.client'
+import { DiceFormulaFieldRenderer } from './fields/dice-formula-field-renderer.client'
 import { buildFieldRendererIds, resolveFieldRenderConfig } from './field-renderer-config.lib'
-import { renderSpecializedField } from './field-renderer-specialized.client'
+import { renderSpecializedField } from './fields/field-renderer-specialized.client'
+import { OptionalDisclosureTextareaFieldRenderer } from './fields/optional-disclosure-field-renderer.client'
+import { SelectFieldRenderer } from './fields/select-field-renderer.client'
 import { LazyFieldSuspense, lazyFieldComponent } from './lazy-field.client'
 import type {
   FieldConfig,
   FieldType,
   InputSelectFieldConfig,
+  SelectFieldConfig,
   InlineSentenceFieldConfig,
   InlineChooseCountFieldConfig,
   ChooseFromChipsFieldConfig,
@@ -38,12 +40,13 @@ import type {
   RollValueFieldConfig,
 } from '../field-config'
 import { fieldDefaultValue } from '../field-config'
+import { assertOptionalDisclosureFieldConfig } from '../config/optional-disclosure-config.lib'
 import { useDependsOnValues } from '../config/form-depends-on.client'
 import { useFormSectionContext } from '../context/form-section.context'
 import type { JsonFieldProps } from '../../components/ui/json-field.client'
 import type { RichTextFieldProps } from '../../components/ui/rich-text-field'
 import type { FileFieldProps } from '../../components/ui/file-field.client'
-import type { EditableGridFieldRendererProps } from './editable-grid-field-renderer.client'
+import type { EditableGridFieldRendererProps } from './fields/editable-grid-field-renderer.client'
 
 const LazyJsonField = lazyFieldComponent<JsonFieldProps>(
   () => import('../../components/ui/json-field.client'),
@@ -58,7 +61,7 @@ const LazyFileField = lazyFieldComponent<FileFieldProps>(
   'FileField',
 )
 const LazyEditableGridFieldRenderer = lazyFieldComponent<EditableGridFieldRendererProps>(
-  () => import('./editable-grid-field-renderer.client'),
+  () => import('./fields/editable-grid-field-renderer.client'),
   'EditableGridFieldRenderer',
 )
 
@@ -99,6 +102,7 @@ const fieldRenderers: {
   [K in Exclude<
     FieldType,
     | 'inputSelect'
+    | 'select'
     | 'levelRange'
     | 'inlineSentence'
     | 'inlineChooseCount'
@@ -170,27 +174,6 @@ const fieldRenderers: {
       ref={field.ref}
       value={field.value ?? ''}
       onChange={field.onChange}
-      onBlur={field.onBlur}
-    />
-  ),
-  select: ({ config, field, id, ...validation }) => (
-    <SelectField
-      id={id}
-      label={config.label}
-      options={config.options}
-      {...fieldValidationProps(validation)}
-      hint={config.hint}
-      hintPosition={config.hintPosition}
-      info={config.info}
-      required={config.required}
-      width={config.width}
-      size={config.size}
-      digits={config.digits}
-      labelPosition={config.labelPosition}
-      placeholder={config.placeholder}
-      disabled={config.disabled}
-      value={field.value != null && field.value !== '' ? String(field.value) : ''}
-      onValueChange={field.onChange}
       onBlur={field.onBlur}
     />
   ),
@@ -367,6 +350,7 @@ const fieldRenderers: {
       size={config.size}
       chipSize={config.chipSize}
       width={config.width}
+      chrome={config.chrome}
       disabled={config.disabled}
       value={field.value ?? fieldDefaultValue(config)}
       onChange={field.onChange}
@@ -447,6 +431,12 @@ export function FieldRenderer({ config, idPrefix, namePrefix }: FieldRendererPro
   const specialized = renderSpecializedField({ renderConfig, fullName, id, namePrefix })
   if (specialized) return specialized
 
+  if (config.type === 'select') {
+    return (
+      <SelectFieldRenderer config={config} fullName={fullName} id={id} namePrefix={namePrefix} />
+    )
+  }
+
   return (
     <StandardFieldRenderer
       config={config}
@@ -461,6 +451,7 @@ export function FieldRenderer({ config, idPrefix, namePrefix }: FieldRendererPro
 type StandardFieldConfig = Exclude<
   FieldConfig,
   | InputSelectFieldConfig
+  | SelectFieldConfig
   | LevelRangeFieldConfig
   | InlineSentenceFieldConfig
   | InlineChooseCountFieldConfig
@@ -499,6 +490,20 @@ function StandardFieldRenderer({
       resolveNestedFieldErrorMessage(errors, fullName),
     fullName,
   )
+  assertOptionalDisclosureFieldConfig(config)
+
+  if (renderConfig.type === 'textarea' && renderConfig.optionalDisclosure) {
+    return (
+      <OptionalDisclosureTextareaFieldRenderer
+        config={renderConfig}
+        disclosure={renderConfig.optionalDisclosure}
+        field={field}
+        id={id}
+        {...validation}
+      />
+    )
+  }
+
   // The registry is keyed by the literal type; TS can't prove the union element
   // matches a single entry, so widen the call signature at this one boundary.
   const render = fieldRenderers[renderConfig.type] as (

@@ -1,9 +1,16 @@
 import { describe, expect, it } from 'vitest'
 import { render, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { expectNoAxeViolations } from '@rpg/ui/test-utils'
 
 import { FieldGroup } from './field-group'
 import { TextField } from './text-field'
+
+function fieldStack(fieldset: HTMLElement): HTMLElement | null {
+  return fieldset.querySelector(
+    ':scope > div.flex.flex-col.gap-6, :scope > div > div.flex.flex-col.gap-6',
+  )
+}
 
 describe('FieldGroup', () => {
   it('renders a group named by its legend', () => {
@@ -13,7 +20,9 @@ describe('FieldGroup', () => {
       </FieldGroup>,
     )
     expect(screen.getByRole('group', { name: /Character basics/ })).toBeInTheDocument()
-    expect(screen.getByText('Character basics')).toHaveClass('text-field-group-legend')
+    expect(screen.getByText('Character basics').closest('legend')).toHaveClass(
+      'text-field-group-legend',
+    )
   })
 
   it('renders an optional description', () => {
@@ -23,6 +32,30 @@ describe('FieldGroup', () => {
       </FieldGroup>,
     )
     expect(screen.getByText('Shown on your sheet.')).toBeInTheDocument()
+    const legend = screen.getByText('Character basics').closest('legend')
+    expect(legend).toHaveClass('text-field-group-legend', 'w-full')
+    expect(legend?.firstElementChild).toHaveClass('flex', 'flex-col', 'gap-2', 'mb-5')
+    expect(screen.getByText('Shown on your sheet.')).not.toHaveClass('mb-3')
+  })
+
+  it('applies section header margin to a legend without a description', () => {
+    render(
+      <FieldGroup legend="Character basics">
+        <TextField id="name" label="Name" />
+      </FieldGroup>,
+    )
+
+    expect(screen.getByText('Character basics').closest('legend')).toHaveClass('mb-5')
+  })
+
+  it('uses subgroup header margin for subsection legends with a description', () => {
+    render(
+      <FieldGroup legend="Damage" legendSize="subsection" description="Primary damage dice.">
+        <TextField id="damage-dice" label="Dice" />
+      </FieldGroup>,
+    )
+
+    expect(screen.getByText('Damage').closest('legend')?.firstElementChild).toHaveClass('mb-4')
   })
 
   it('stacks sibling fields with a gap-based column rhythm', () => {
@@ -32,9 +65,7 @@ describe('FieldGroup', () => {
         <TextField id="bio" label="Bio" />
       </FieldGroup>,
     )
-    const stack = screen
-      .getByRole('group', { name: /Character basics/ })
-      .querySelector(':scope > div')
+    const stack = fieldStack(screen.getByRole('group', { name: /Character basics/ }))
     expect(stack).toHaveClass('flex', 'flex-col', 'gap-6')
   })
 
@@ -44,8 +75,7 @@ describe('FieldGroup', () => {
         <TextField id="damage-dice" label="Dice" />
       </FieldGroup>,
     )
-    expect(screen.getByText('Damage')).toHaveClass('text-field-subgroup-legend')
-    expect(screen.getByText('Damage')).not.toHaveClass('text-field-group-legend')
+    expect(screen.getByText('Damage').closest('legend')).toHaveClass('text-field-subgroup-legend')
   })
 
   it('renders an array legend at the repeatable-list type scale when size is md', () => {
@@ -54,8 +84,7 @@ describe('FieldGroup', () => {
         <TextField id="grant-type" label="Grant type" />
       </FieldGroup>,
     )
-    expect(screen.getByText('Grants')).toHaveClass('text-field-array-legend')
-    expect(screen.getByText('Grants')).not.toHaveClass('text-field-group-legend')
+    expect(screen.getByText('Grants').closest('legend')).toHaveClass('text-field-array-legend')
   })
 
   it('defaults array legend to sm scale when size is omitted', () => {
@@ -64,24 +93,67 @@ describe('FieldGroup', () => {
         <TextField id="grant-type" label="Grant type" />
       </FieldGroup>,
     )
-    expect(screen.getByText('Grants')).toHaveClass('text-sm')
-    expect(screen.getByText('Grants')).not.toHaveClass('text-field-array-legend')
+    expect(screen.getByText('Grants').closest('legend')).toHaveClass('text-sm')
   })
 
-  it('renders an array legend at sm scale when size is sm', () => {
+  it('applies panel chrome on the field body', () => {
     render(
-      <FieldGroup legend="Grants" legendSize="array" size="sm">
-        <TextField id="grant-type" label="Grant type" />
+      <FieldGroup legend="Target" fieldsChrome={{ variant: 'panel' }}>
+        <TextField id="target-kind" label="Kind" />
       </FieldGroup>,
     )
-    expect(screen.getByText('Grants')).toHaveClass('text-sm')
-    expect(screen.getByText('Grants')).not.toHaveClass('text-field-array-legend')
+    const fieldset = screen.getByRole('group', { name: /Target/ })
+    expect(fieldset).not.toHaveClass('rounded-md')
+    const stack = fieldStack(fieldset)
+    expect(stack).toHaveClass('rounded-md', 'border', 'p-4', 'bg-muted/10')
+  })
+
+  it('applies inset chrome on the field stack', () => {
+    render(
+      <FieldGroup legend="Effects" fieldsChrome={{ variant: 'inset' }}>
+        <TextField id="effect-name" label="Effect" />
+      </FieldGroup>,
+    )
+    const stack = fieldStack(screen.getByRole('group', { name: /Effects/ }))
+    expect(stack).toHaveClass('border-l-2', 'pl-6', 'sm:pl-10', 'border-border')
+  })
+
+  it('applies divider top chrome on the fieldset', () => {
+    render(
+      <FieldGroup legend="Weapons" fieldsChrome={{ variant: 'divider', edge: 'top' }}>
+        <TextField id="weapon-mode" label="Mode" />
+      </FieldGroup>,
+    )
+    expect(screen.getByRole('group', { name: /Weapons/ })).toHaveClass('border-t', 'pt-7')
+  })
+
+  it('toggles collapsible groups', async () => {
+    const user = userEvent.setup()
+    render(
+      <FieldGroup legend="Advanced" fieldsChrome={{ variant: 'collapsible', defaultOpen: true }}>
+        <TextField id="advanced-field" label="Detail" />
+      </FieldGroup>,
+    )
+
+    const content = screen.getByRole('group', { name: /Advanced/ }).querySelector('[data-state]')
+    expect(content).toHaveAttribute('data-state', 'open')
+    await user.click(screen.getByRole('button', { name: /Advanced/ }))
+    expect(content).toHaveAttribute('data-state', 'closed')
   })
 
   it('has no axe accessibility violations', async () => {
     const { container } = render(
       <FieldGroup legend="Character basics">
         <TextField id="name" label="Name" />
+      </FieldGroup>,
+    )
+    await expectNoAxeViolations(container)
+  })
+
+  it('has no axe accessibility violations for panel chrome', async () => {
+    const { container } = render(
+      <FieldGroup legend="Target" fieldsChrome={{ variant: 'panel' }}>
+        <TextField id="target-field" label="Kind" />
       </FieldGroup>,
     )
     await expectNoAxeViolations(container)

@@ -9,6 +9,8 @@ export interface ArrayFieldContextValue {
   items: unknown[]
   /** 0-based index of the item being rendered. */
   rowIndex: number
+  /** Removes the current row via the parent field array. */
+  removeItem?: () => void
   /** Resolved RHF path for the parent array when cascade editing is enabled. */
   fullArrayName?: string
   /** Level-range key names for cascade edits inside level-range tier arrays. */

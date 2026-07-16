@@ -21,8 +21,9 @@ import {
 } from '@/features/homebrew'
 
 import {
+  descriptionField,
   feetInputUnitField,
-  identityFields,
+  nameField,
   SPELL_RANGE_DISTANCE_INLINE_COUNT_DIGITS,
 } from '../../lib/forms/fields/content-identity-form-fields'
 import { distanceInputSelectField } from '../../lib/forms/fields/content-speed-form-fields'
@@ -43,6 +44,8 @@ import {
 import { SPELL_SECTION_LABELS } from './spell-display'
 import { optionalResolutionFormSchema } from '../resolution/lib/form/resolution-form-schema'
 import { resolutionFields } from '../resolution/lib/form/resolution-form-fields'
+import { resolutionOutcomeApplicationsResolverFields } from '../resolution/lib/form/resolution-outcome-form-fields'
+import { RESOLUTION_FIELD_NAME } from '../resolution/lib/form/resolution-form-values'
 import { spellEffectsFormSchema } from './effects/effect-form-schema'
 
 function visibleWhenRangeDistance(): FieldVisibility {
@@ -234,25 +237,7 @@ function basicsFields(ctx: ContentFormCtx): FormItem[] {
   const schoolOptions = buildActiveSpellSchoolFieldOptions(ctx.spellSchoolVocabulary)
 
   return [
-    ...identityFields(ctx),
-    {
-      type: 'richtext',
-      name: 'cantripScaling',
-      label: SPELL_SECTION_LABELS.cantripScaling,
-      linkable: true,
-      internalLinkOptions: ctx.options?.richTextInternalLinkOptions,
-      contentTypeOptions: ctx.options?.richTextContentTypeOptions,
-      visibility: visibleWhenCantripLevel(),
-    },
-    {
-      type: 'richtext',
-      name: 'higherLevelSlotEffect',
-      label: SPELL_SECTION_LABELS.higherLevelSlotEffect,
-      linkable: true,
-      internalLinkOptions: ctx.options?.richTextInternalLinkOptions,
-      contentTypeOptions: ctx.options?.richTextContentTypeOptions,
-      visibility: visibleWhenLeveledSpell(),
-    },
+    nameField(),
     {
       kind: 'row',
       fields: [
@@ -288,6 +273,25 @@ function basicsFields(ctx: ContentFormCtx): FormItem[] {
         },
       ],
     },
+    descriptionField(ctx),
+    {
+      type: 'richtext',
+      name: 'cantripScaling',
+      label: SPELL_SECTION_LABELS.cantripScaling,
+      linkable: true,
+      internalLinkOptions: ctx.options?.richTextInternalLinkOptions,
+      contentTypeOptions: ctx.options?.richTextContentTypeOptions,
+      visibility: visibleWhenCantripLevel(),
+    },
+    {
+      type: 'richtext',
+      name: 'higherLevelSlotEffect',
+      label: SPELL_SECTION_LABELS.higherLevelSlotEffect,
+      linkable: true,
+      internalLinkOptions: ctx.options?.richTextInternalLinkOptions,
+      contentTypeOptions: ctx.options?.richTextContentTypeOptions,
+      visibility: visibleWhenLeveledSpell(),
+    },
   ]
 }
 
@@ -296,6 +300,7 @@ function castingFields(): FormItem[] {
     {
       kind: 'group',
       legend: 'Casting time',
+      fieldsChrome: { variant: 'panel' },
       fields: [
         {
           kind: 'row',
@@ -336,6 +341,7 @@ function castingFields(): FormItem[] {
     {
       kind: 'group',
       legend: 'Range',
+      fieldsChrome: { variant: 'panel' },
       fields: [
         {
           kind: 'row',
@@ -368,6 +374,7 @@ function castingFields(): FormItem[] {
     {
       kind: 'group',
       legend: 'Duration',
+      fieldsChrome: { variant: 'outline' },
       fields: [
         {
           kind: 'row',
@@ -423,6 +430,7 @@ function castingFields(): FormItem[] {
     {
       kind: 'group',
       legend: 'Components',
+      fieldsChrome: { variant: 'outline' },
       fields: [
         {
           kind: 'row',
@@ -460,6 +468,7 @@ function castingFields(): FormItem[] {
     {
       kind: 'group',
       legend: 'Area of effect',
+      fieldsChrome: { variant: 'outline' },
       fields: [
         {
           kind: 'row',
@@ -525,7 +534,7 @@ function castingFields(): FormItem[] {
       label: 'Delivery method',
       options: deliveryMethodOptions,
       hint: 'Attack-roll delivery for spells that use spell attacks.',
-      width: 'xl',
+      width: 'auto',
     },
   ]
 }
@@ -569,7 +578,13 @@ export function buildSpellTabs(ctx: ContentFormCtx): TabbedFormTab[] {
   return [
     { id: 'basics', label: 'Basics', fields: basicsFields(ctx) },
     { id: 'casting', label: 'Casting', fields: castingFields() },
-    { id: 'resolution', label: 'Resolution', fields: resolutionTabFields(ctx) },
+    {
+      id: 'resolution',
+      label: 'Resolution',
+      fields: resolutionTabFields(ctx),
+      errorPaths: [`${RESOLUTION_FIELD_NAME}.outcomes`],
+      resolverFields: resolutionOutcomeApplicationsResolverFields(),
+    },
     { id: 'tags', label: 'Tags', fields: tagFields(ctx) },
   ]
 }

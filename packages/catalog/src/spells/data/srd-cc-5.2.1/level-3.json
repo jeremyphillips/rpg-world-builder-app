@@ -39,7 +39,26 @@
         "description": "a drop of blood, a piece of flesh, and a pinch of bone dust"
       }
     },
-    "higherLevelSlotEffect": "<p>You animate or reassert control over two additional Undead creatures for each spell slot level above 3. Each of the creatures must come from a different corpse or pile of bones.</p>"
+    "higherLevelSlotEffect": "<p>You animate or reassert control over two additional Undead creatures for each spell slot level above 3. Each of the creatures must come from a different corpse or pile of bones.</p>",
+    "modeling": {
+      "blocker": {
+        "code": "summoning-model-missing"
+      },
+      "gaps": [
+        {
+          "code": "choice-model-missing",
+          "note": "Bones vs corpse choice stays prose"
+        },
+        {
+          "code": "dynamic-target-count",
+          "note": "Slot +2 undead scaling stays prose"
+        },
+        {
+          "code": "conditional-effect-model-missing",
+          "note": "Reassert control vs animate stays prose"
+        }
+      ]
+    }
   },
   {
     "id": "srd-cc-5.2.1:bestow-curse",
@@ -79,7 +98,27 @@
       "verbal": true,
       "somatic": true
     },
-    "higherLevelSlotEffect": "<p>If you cast this spell using a level 4 spell slot, you can maintain Concentration on it for up to 10 minutes. If you use a level 5+ spell slot, the spell doesn't require Concentration, and the duration becomes 8 hours (level 5–6 slot) or 24 hours (level 7–8 slot). If you use a level 9 spell slot, the spell lasts until dispelled.</p>"
+    "higherLevelSlotEffect": "<p>If you cast this spell using a level 4 spell slot, you can maintain Concentration on it for up to 10 minutes. If you use a level 5+ spell slot, the spell doesn't require Concentration, and the duration becomes 8 hours (level 5–6 slot) or 24 hours (level 7–8 slot). If you use a level 9 spell slot, the spell lasts until dispelled.</p>",
+    "modeling": {
+      "blocker": {
+        "code": "effect-schema-missing",
+        "capabilityId": "condition"
+      },
+      "gaps": [
+        {
+          "code": "choice-model-missing",
+          "note": "Curse mode choice stays prose"
+        },
+        {
+          "code": "conditional-effect-model-missing",
+          "note": "Repeating saves and extra 1d8 rider stay prose"
+        },
+        {
+          "code": "progression-schema-missing",
+          "note": "Slot duration and concentration rules stay prose"
+        }
+      ]
+    }
   },
   {
     "id": "srd-cc-5.2.1:counterspell",
@@ -117,6 +156,22 @@
     },
     "components": {
       "somatic": true
+    },
+    "modeling": {
+      "blocker": {
+        "code": "targeting-model-missing",
+        "capabilityId": "spell-negation"
+      },
+      "gaps": [
+        {
+          "code": "reaction-trigger",
+          "note": "Interrupt when creature casts stays prose"
+        },
+        {
+          "code": "effect-schema-missing",
+          "note": "Cast dissipate mechanics stay prose"
+        }
+      ]
     }
   },
   {
@@ -156,7 +211,23 @@
       "verbal": true,
       "somatic": true
     },
-    "higherLevelSlotEffect": "<p>You automatically end a spell on the target if the spell's level is equal to or less than the level of the spell slot you use.</p>"
+    "higherLevelSlotEffect": "<p>You automatically end a spell on the target if the spell's level is equal to or less than the level of the spell slot you use.</p>",
+    "modeling": {
+      "blocker": {
+        "code": "targeting-model-missing",
+        "capabilityId": "spell-negation"
+      },
+      "gaps": [
+        {
+          "code": "effect-schema-missing",
+          "note": "End ongoing spell mechanics stay prose"
+        },
+        {
+          "code": "progression-schema-missing",
+          "note": "Auto-end threshold by slot stays prose"
+        }
+      ]
+    }
   },
   {
     "id": "srd-cc-5.2.1:fireball",
@@ -207,29 +278,22 @@
       }
     },
     "higherLevelSlotEffect": "<p>The damage increases by 1d6 for each spell slot level above 3.</p>",
-    "effects": [
-      {
-        "id": "srd-cc-5.2.1:fireball:damage",
-        "kind": "damage",
-        "roll": {
-          "dice": {
-            "count": 8,
-            "faces": 6
-          }
-        },
-        "damageType": "fire"
-      }
-    ],
     "resolution": {
-      "target": {
-        "count": 1,
-        "kind": "creature-or-object",
+      "selectionMode": "point",
+      "origin": {
         "proximity": {
           "kind": "distance",
           "distance": {
             "value": 150,
             "unit": "ft"
           }
+        }
+      },
+      "areaOfEffect": {
+        "shape": "sphere",
+        "radius": {
+          "value": 20,
+          "unit": "ft"
         }
       },
       "method": {
@@ -252,6 +316,7 @@
       "outcomes": [
         {
           "result": "failed-save",
+          "note": "Flammable objects in the area that aren't being worn or carried start burning.",
           "applications": [
             {
               "effectId": "damage",
@@ -267,6 +332,47 @@
               "amount": "half"
             }
           ]
+        }
+      ],
+      "progression": {
+        "basis": "spell-slot-level",
+        "tracks": [
+          {
+            "kind": "linear",
+            "reference": {
+              "subject": {
+                "kind": "effect",
+                "effectId": "damage"
+              },
+              "property": "roll"
+            },
+            "increment": {
+              "kind": "roll",
+              "roll": {
+                "dice": {
+                  "count": 1,
+                  "faces": 6
+                }
+              }
+            }
+          }
+        ]
+      }
+    },
+    "modeling": {
+      "status": "sufficient-for-character-sheet",
+      "gaps": [
+        {
+          "code": "unconditional-application",
+          "note": "Object ignition applies regardless of save outcome until resolution-wide notes ship"
+        },
+        {
+          "code": "flammability-rules",
+          "note": "Ignition/burning state not automated; rider documented on outcome"
+        },
+        {
+          "code": "object-state-awareness",
+          "note": "Worn or carried carve-out on object ignition rider"
         }
       ]
     }
@@ -308,7 +414,31 @@
         "description": "powdered diamond worth 200+ GP, which the spell consumes"
       }
     },
-    "higherLevelSlotEffect": "<p>The damage of an explosive rune increases by 1d8 for each spell slot level above 3. If you create a spell glyph, you can store any spell of up to the same level as the spell slot you use for the Glyph of Warding.</p>"
+    "higherLevelSlotEffect": "<p>The damage of an explosive rune increases by 1d8 for each spell slot level above 3. If you create a spell glyph, you can store any spell of up to the same level as the spell slot you use for the Glyph of Warding.</p>",
+    "modeling": {
+      "blocker": {
+        "code": "effect-schema-missing",
+        "capabilityId": "persistent-zone"
+      },
+      "gaps": [
+        {
+          "code": "multi-mode-choice",
+          "note": "Explosive rune vs spell glyph stays prose"
+        },
+        {
+          "code": "choice-model-missing",
+          "note": "Trigger and filter configuration stay prose"
+        },
+        {
+          "code": "conditional-effect-model-missing",
+          "note": "Triggered burst and stored spell stay prose"
+        },
+        {
+          "code": "progression-schema-missing",
+          "note": "Slot damage and stored spell level stay prose"
+        }
+      ]
+    }
   },
   {
     "id": "srd-cc-5.2.1:mass-healing-word",
@@ -347,21 +477,11 @@
       "verbal": true
     },
     "higherLevelSlotEffect": "<p>The healing increases by 1d4 for each spell slot level above 3.</p>",
-    "effects": [
-      {
-        "id": "srd-cc-5.2.1:mass-healing-word:healing",
-        "kind": "healing",
-        "roll": {
-          "dice": {
-            "count": 2,
-            "faces": 4
-          }
-        }
-      }
-    ],
     "resolution": {
+      "selectionMode": "targets",
       "target": {
         "count": 6,
+        "countKind": "up-to",
         "kind": "creature",
         "proximity": {
           "kind": "distance",
@@ -395,6 +515,15 @@
               "amount": "full"
             }
           ]
+        }
+      ]
+    },
+    "modeling": {
+      "status": "meaningful-partial",
+      "gaps": [
+        {
+          "code": "modifier-model-missing",
+          "note": "Spellcasting ability modifier on healing stays prose"
         }
       ]
     }
@@ -433,6 +562,11 @@
       "somatic": true,
       "material": {
         "description": "a diamond worth 300+ GP, which the spell consumes"
+      }
+    },
+    "modeling": {
+      "blocker": {
+        "code": "resurrection-model-missing"
       }
     }
   }

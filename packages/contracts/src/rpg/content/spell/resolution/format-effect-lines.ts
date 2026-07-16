@@ -1,7 +1,7 @@
 import { formatRollValue } from '../../../primitives/mechanics/roll'
 import { formatDamageValue } from '../effects/display'
-import { formatEffectRowSentenceFromParts } from '../effects/format'
-import { deriveDefaultEffectRecipient } from './effect-context'
+import { formatEffectRowSentenceFromParts, type EffectRowParts } from '../effects/format'
+import { resolutionEffectFormatOptions } from './effect-context'
 import type {
   SpellResolution,
   SpellResolutionDamageEffect,
@@ -34,38 +34,43 @@ export function findResolutionTemporaryHitPointsEffects(
   )
 }
 
-/** e.g. "2d8 healing" or recipient-aware sentence in summary sections. */
+function formatResolutionEffectLine(resolution: SpellResolution, parts: EffectRowParts): string {
+  return formatEffectRowSentenceFromParts(parts, resolutionEffectFormatOptions(resolution)).replace(
+    /\.$/,
+    '',
+  )
+}
+
+/** Recipient-aware preview sentence for the primary healing effect. */
 export function formatResolutionHealing(resolution: SpellResolution): string {
   const healing = findResolutionHealingEffects(resolution)[0]
   if (!healing) return ''
-  const recipient = deriveDefaultEffectRecipient({
-    proximityKind: resolution.target.proximity.kind,
-    targetKind: resolution.target.kind,
-    targetCount: resolution.target.count,
-  })
-  return formatEffectRowSentenceFromParts(
-    { kind: 'healing', roll: healing.roll },
-    { recipient },
-  ).replace(/\.$/, '')
+  return formatResolutionEffectLine(resolution, { kind: 'healing', roll: healing.roll })
 }
 
-/** e.g. "2d4+4 temporary hit points" or recipient-aware sentence. */
+/** Recipient-aware preview sentence for the primary temporary hit points effect. */
 export function formatResolutionTemporaryHitPoints(resolution: SpellResolution): string {
   const temporaryHitPoints = findResolutionTemporaryHitPointsEffects(resolution)[0]
   if (!temporaryHitPoints) return ''
-  const recipient = deriveDefaultEffectRecipient({
-    proximityKind: resolution.target.proximity.kind,
-    targetKind: resolution.target.kind,
-    targetCount: resolution.target.count,
+  return formatResolutionEffectLine(resolution, {
+    kind: 'temporary-hit-points',
+    roll: temporaryHitPoints.roll,
   })
-  return formatEffectRowSentenceFromParts(
-    { kind: 'temporary-hit-points', roll: temporaryHitPoints.roll },
-    { recipient },
-  ).replace(/\.$/, '')
 }
 
-/** e.g. "2d10 Necrotic" — uses the first damage effect when several exist. */
+/** Recipient-aware preview sentence for the primary damage effect. */
 export function formatResolutionDamage(resolution: SpellResolution): string {
+  const damage = findResolutionDamageEffects(resolution)[0]
+  if (!damage) return ''
+  return formatResolutionEffectLine(resolution, {
+    kind: 'damage',
+    roll: damage.roll,
+    damageType: damage.damageType,
+  })
+}
+
+/** Compact mechanical damage fragment (e.g. "8d6 Fire damage") — not a preview sentence. */
+export function formatResolutionDamageValue(resolution: SpellResolution): string {
   const damage = findResolutionDamageEffects(resolution)[0]
   if (!damage) return ''
   return formatDamageValue(damage.roll, damage.damageType)
@@ -76,4 +81,37 @@ export function formatResolutionDamageRoll(resolution: SpellResolution): string 
   const damage = findResolutionDamageEffects(resolution)[0]
   if (!damage) return ''
   return formatRollValue(damage.roll)
+}
+
+/** Preview sentence for one outcome application. */
+export function formatResolutionApplicationSentence(
+  resolution: SpellResolution,
+  effectId: string,
+  amount: 'full' | 'half',
+): string {
+  const effect = resolution.effects.find((entry) => entry.id === effectId)
+  if (!effect) return ''
+
+  if (effect.kind === 'damage') {
+    return formatEffectRowSentenceFromParts(
+      { kind: 'damage', roll: effect.roll, damageType: effect.damageType },
+      resolutionEffectFormatOptions(resolution, { applicationAmount: amount }),
+    ).replace(/\.$/, '')
+  }
+
+  if (effect.kind === 'healing') {
+    return formatEffectRowSentenceFromParts(
+      { kind: 'healing', roll: effect.roll },
+      resolutionEffectFormatOptions(resolution, { applicationAmount: amount }),
+    ).replace(/\.$/, '')
+  }
+
+  if (effect.kind === 'temporary-hit-points') {
+    return formatEffectRowSentenceFromParts(
+      { kind: 'temporary-hit-points', roll: effect.roll },
+      resolutionEffectFormatOptions(resolution, { applicationAmount: amount }),
+    ).replace(/\.$/, '')
+  }
+
+  return ''
 }
