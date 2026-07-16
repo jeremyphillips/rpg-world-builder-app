@@ -4,6 +4,8 @@ import type { ReactNode } from 'react'
 
 import {
   BUILDER_STEPS,
+  characterBuilderValidationMessages,
+  formatFieldMessage,
   type CharacterBuilderStepId,
   type CharacterBuildValidationIssue,
 } from '@rpg/contracts'
@@ -12,15 +14,21 @@ import { Heading, Text } from '@rpg/ui'
 import { CharacterBuilderValidationAlert } from '../character-builder-validation-alert.client'
 import { characterBuilderStepPanelClasses } from '../character-builder-shell.variants'
 
+const STEP_VALIDATION_HEADING = formatFieldMessage(
+  characterBuilderValidationMessages.stepIncomplete(),
+)
+
 export type BuilderStepFrameProps = {
   stepId: CharacterBuilderStepId
   validationIssues?: CharacterBuildValidationIssue[]
+  validationHeading?: string
   children: ReactNode
 }
 
 export function BuilderStepFrame({
   stepId,
   validationIssues = [],
+  validationHeading,
   children,
 }: BuilderStepFrameProps) {
   const step = BUILDER_STEPS.find((entry) => entry.id === stepId)
@@ -38,7 +46,10 @@ export function BuilderStepFrame({
         <Text variant="muted">{step.description}</Text>
       </div>
 
-      <CharacterBuilderValidationAlert issues={validationIssues} />
+      <CharacterBuilderValidationAlert
+        issues={validationIssues}
+        heading={validationHeading ?? STEP_VALIDATION_HEADING}
+      />
       {children}
     </section>
   )

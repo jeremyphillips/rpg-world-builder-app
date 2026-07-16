@@ -10,6 +10,7 @@ import {
   currencySchema,
   gearKindSchema,
   holySymbolUsageSchema,
+  spellcastingGearKindSchema,
   magicItemCategorySchema,
   magicItemRaritySchema,
   massUnitSchema,
@@ -33,6 +34,7 @@ import { toOptions, type FormItem } from '@rpg/ui/form'
 import { economyFields } from '../../lib/forms/fields/content-economy-form-fields'
 import { identityFields } from '../../lib/forms/fields/content-identity-form-fields'
 import type { ContentFormCtx } from '../../lib/forms/content-form-registry'
+import { rollFormObjectSchema } from '../../lib/forms/mechanics/roll-form-values'
 import {
   allRegisteredKindFieldGroups,
   fieldGroupsForEquipmentKind,
@@ -82,9 +84,8 @@ export const weaponEquipmentFormSchema = physicalEquipmentBaseFormSchema.extend(
   mode: weaponModeSchema,
   mastery: weaponMasterySchema,
   properties: z.array(weaponPropertySchema).optional(),
-  damageKind: z.enum(['dice', 'flat', 'none']).optional(),
-  damageDice: diceSchema.optional(),
-  damageAmount: z.coerce.number().int().min(1).optional(),
+  hasDamage: z.boolean().optional(),
+  damage: rollFormObjectSchema.optional(),
   damageType: weaponDamageTypeSchema.optional(),
   versatileDamage: diceSchema.optional(),
   rangeNormal: z.coerce.number().int().min(0).optional(),
@@ -114,6 +115,7 @@ export const armorEquipmentFormSchema = physicalEquipmentBaseFormSchema.extend({
 export const adventuringGearEquipmentFormSchema = physicalEquipmentBaseFormSchema.extend({
   kind: z.literal('adventuring_gear'),
   gearKind: gearKindSchema,
+  spellcastingGearKind: spellcastingGearKindSchema.optional(),
   bundleSize: z.coerce.number().int().min(1).optional(),
   storage: z.string().optional(),
   propertiesText: z.string().optional(),
@@ -238,6 +240,7 @@ export const equipmentFormSchema = z.object({
 
   // adventuring gear
   gearKind: gearKindSchema.optional(),
+  spellcastingGearKind: spellcastingGearKindSchema.optional(),
   bundleSize: z.coerce.number().int().min(1).optional(),
   storage: z.string().optional(),
   propertiesText: z.string().optional(),
@@ -289,9 +292,8 @@ export const equipmentFormSchema = z.object({
   // weapon variant fields
   category: weaponCategorySchema.optional(),
   mode: weaponModeSchema.optional(),
-  damageKind: z.enum(['dice', 'flat', 'none']).optional(),
-  damageDice: diceSchema.optional(),
-  damageAmount: z.coerce.number().int().min(1).optional(),
+  hasDamage: z.boolean().optional(),
+  damage: rollFormObjectSchema.optional(),
   damageType: weaponDamageTypeSchema.optional(),
   versatileDamage: diceSchema.optional(),
   properties: z.array(weaponPropertySchema).optional(),

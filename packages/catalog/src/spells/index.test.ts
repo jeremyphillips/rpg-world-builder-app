@@ -12,8 +12,8 @@ const SPELL_OPTION_HEADROOM = 2
 describe('SRD 5.2.1 spell seed', () => {
   const spells = loadSeedSpells(RULESET)
 
-  it('ships 67 curated spells (validated against the schema at load)', () => {
-    expect(spells).toHaveLength(67)
+  it('ships 92 curated spells (validated against the schema at load)', () => {
+    expect(spells).toHaveLength(92)
   })
 
   it('uses deterministic system ids and null campaignId', () => {
@@ -28,7 +28,7 @@ describe('SRD 5.2.1 spell seed', () => {
   it('has globally unique slugs', () => {
     const slugs = spells.map((s) => s.slug)
     expect(new Set(slugs).size).toBe(slugs.length)
-    expect(seedSpellSlugs(RULESET).size).toBe(67)
+    expect(seedSpellSlugs(RULESET).size).toBe(92)
   })
 
   it('stores each spell in the level file matching its level field', () => {
@@ -61,6 +61,34 @@ describe('SRD 5.2.1 spell seed', () => {
     for (const spell of spells) {
       expectRichTextHtml(spell.description)
     }
+  })
+
+  it('keeps scaling prose out of descriptions', () => {
+    for (const spell of spells) {
+      expect(spell.description).not.toMatch(/Cantrip Upgrade/i)
+      expect(spell.description).not.toMatch(/Using a Higher-Level Spell Slot/i)
+    }
+  })
+
+  it('stores scaling prose in dedicated fields without headings', () => {
+    for (const spell of spells) {
+      if (spell.cantripScaling) {
+        expect(spell.level).toBe(0)
+        expectRichTextHtml(spell.cantripScaling)
+        expect(spell.cantripScaling).not.toMatch(/Cantrip Upgrade/i)
+      }
+      if (spell.higherLevelSlotEffect) {
+        expect(spell.level).toBeGreaterThan(0)
+        expectRichTextHtml(spell.higherLevelSlotEffect)
+        expect(spell.higherLevelSlotEffect).not.toMatch(/Using a Higher-Level Spell Slot/i)
+      }
+    }
+  })
+
+  it('spot-checks fire-bolt cantrip scaling migration', () => {
+    const fireBolt = spells.find((s) => s.slug === 'fire-bolt')
+    expect(fireBolt?.cantripScaling).toContain('The damage increases by 1d10')
+    expect(fireBolt?.description).not.toContain('Cantrip Upgrade')
   })
 
   it('spot-checks deliveryMethod and ritual casting', () => {

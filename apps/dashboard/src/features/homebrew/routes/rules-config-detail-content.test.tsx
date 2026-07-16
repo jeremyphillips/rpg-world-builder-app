@@ -4,9 +4,11 @@ import { QueryClientProvider } from '@tanstack/react-query'
 import { getStandardStartingWealthRules } from '@rpg/catalog/starting-wealth'
 import {
   CREATURE_TYPE_SET_ID,
+  LANGUAGE_SET_ID,
   defaultMulticlassingRules,
   defaultSubclassingRules,
   defaultCampaignMechanicsPatch,
+  resolveCharacterCreationPatch,
   type RulesetPatchRead,
 } from '@rpg/contracts'
 
@@ -16,9 +18,11 @@ import { makeTestQueryClient } from '@/test/render'
 import { buildAttackResolutionModeVocabulary } from '../lib/vocabulary/sets/attack-resolution-modes'
 import { buildCreatureTypeVocabulary } from '../lib/vocabulary/sets/creature-types'
 import { buildEditionPresetVocabulary } from '../lib/vocabulary/sets/edition-presets'
+import { buildLanguageVocabulary } from '../lib/vocabulary/sets/languages'
 import { useAttackResolutionModeVocabulary } from '../hooks/use-attack-resolution-mode-vocabulary'
 import { useCreatureTypeVocabulary } from '../hooks/use-creature-type-vocabulary'
 import { useEditionPresetVocabulary } from '../hooks/use-edition-preset-vocabulary'
+import { useLanguageVocabulary } from '../hooks/use-language-vocabulary'
 import { useRulesetPatch } from '../hooks/use-ruleset-patch'
 
 vi.mock('@/features/campaign', async (importOriginal) => {
@@ -53,6 +57,10 @@ vi.mock('../hooks/use-creature-type-vocabulary', () => ({
   useCreatureTypeVocabulary: vi.fn(),
 }))
 
+vi.mock('../hooks/use-language-vocabulary', () => ({
+  useLanguageVocabulary: vi.fn(),
+}))
+
 vi.mock('../hooks/use-edition-preset-vocabulary', () => ({
   useEditionPresetVocabulary: vi.fn(),
 }))
@@ -84,19 +92,22 @@ import { RulesConfigDetailContent } from './rules-config-detail-content'
 const useCanManageCampaignMock = vi.mocked(useCanManageCampaign)
 const useRulesetPatchMock = vi.mocked(useRulesetPatch)
 const useCreatureTypeVocabularyMock = vi.mocked(useCreatureTypeVocabulary)
+const useLanguageVocabularyMock = vi.mocked(useLanguageVocabulary)
 const useEditionPresetVocabularyMock = vi.mocked(useEditionPresetVocabulary)
 const useAttackResolutionModeVocabularyMock = vi.mocked(useAttackResolutionModeVocabulary)
 
 const mockPatch: RulesetPatchRead = {
-  characterCreation: {
-    startingLevel: 3,
-    importedCharacters: { policy: 'approval_required' },
-    progression: { maxCharacterLevel: 20 },
-    species: { creatureTypePolicy: { mode: 'only', ids: ['humanoid'] } },
-    multiclassing: defaultMulticlassingRules(),
-    subclasses: defaultSubclassingRules(),
-    startingWealth: getStandardStartingWealthRules('srd-cc-5.2.1'),
-  },
+  characterCreation: resolveCharacterCreationPatch(
+    {
+      startingLevel: 3,
+      importedCharacters: { policy: 'approval_required' },
+      progression: { maxCharacterLevel: 20 },
+      species: { creatureTypePolicy: { mode: 'only', ids: ['humanoid'] } },
+      multiclassing: defaultMulticlassingRules(),
+      subclasses: defaultSubclassingRules(),
+    },
+    getStandardStartingWealthRules('srd-cc-5.2.1'),
+  ),
   mechanics: defaultCampaignMechanicsPatch(),
 }
 
@@ -135,6 +146,19 @@ const attackResolutionOptions = [
   },
 ] as const
 
+const languageSet = {
+  id: LANGUAGE_SET_ID,
+  options: [
+    {
+      id: 'common',
+      label: 'Common',
+      source: 'system' as const,
+      status: 'active' as const,
+      usedBy: 0,
+    },
+  ],
+}
+
 function mockResolvedRulesData() {
   useRulesetPatchMock.mockReturnValue({
     data: mockPatch,
@@ -147,6 +171,12 @@ function mockResolvedRulesData() {
     isPending: false,
     isError: false,
   } as ReturnType<typeof useCreatureTypeVocabulary>)
+
+  useLanguageVocabularyMock.mockReturnValue({
+    vocabulary: buildLanguageVocabulary(languageSet),
+    isPending: false,
+    isError: false,
+  } as ReturnType<typeof useLanguageVocabulary>)
 
   useEditionPresetVocabularyMock.mockReturnValue({
     vocabulary: buildEditionPresetVocabulary({ options: [...editionPresetOptions] }),

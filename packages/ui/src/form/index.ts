@@ -95,6 +95,7 @@ export {
   type EditableGridColumnConfig,
   type EditableGridFieldConfig,
   type DiceFormulaFieldConfig,
+  type RollValueFieldConfig,
   type InputSelectFieldConfig,
   type InputUnitFieldConfig,
   type FieldConfig,

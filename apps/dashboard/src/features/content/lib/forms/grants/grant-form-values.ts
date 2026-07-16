@@ -6,6 +6,8 @@ import type {
   GrantGroup,
   GrantGroups,
   GrantUnlock,
+  MovementBonusFeet,
+  MovementSpeedFeet,
   SenseId,
 } from '@rpg/contracts'
 import { flattenGrantGroups, normalizeGrantGroups } from '@rpg/contracts'
@@ -48,8 +50,8 @@ function emptyGrantRow(grantType: GrantRowType): GrantRowForm {
     senseRange: undefined,
     movementMode: undefined,
     movementOperation: undefined,
-    movementValue: undefined,
-    movementUnit: undefined,
+    movementFeet: undefined,
+    movementMatchMode: undefined,
     language: undefined,
     spellAbility: undefined,
     spellMode: undefined,
@@ -98,13 +100,22 @@ const CONTENT_GRANT_TO_FORM_ROWS = {
     grantRows('resistances', unlockLevel, { resistances: grant.damageTypes }),
   damageType: (grant, unlockLevel) =>
     grantRows('damageType', unlockLevel, { damageType: grant.damageTypes }),
-  movement: (grant, unlockLevel) =>
-    grantRows('movement', unlockLevel, {
+  movement: (grant, unlockLevel) => {
+    const base = {
       movementMode: grant.mode,
       movementOperation: grant.operation,
-      movementValue: grant.value,
-      movementUnit: grant.unit,
-    }),
+    }
+    if (grant.operation === 'match') {
+      return grantRows('movement', unlockLevel, {
+        ...base,
+        movementMatchMode: grant.matchMode,
+      })
+    }
+    return grantRows('movement', unlockLevel, {
+      ...base,
+      movementFeet: grant.feet,
+    })
+  },
   weaponProficiency: (grant, unlockLevel) => [
     {
       grantType: 'weaponProficiency',
@@ -231,14 +242,36 @@ function damageTypeToGrant(row: GrantRowForm): ContentGrant | undefined {
 }
 
 function movementToGrant(row: GrantRowForm): ContentGrant | undefined {
-  if (!row.movementMode || !row.movementOperation || row.movementValue === undefined)
-    return undefined
+  if (!row.movementMode || !row.movementOperation) return undefined
+
+  if (row.movementOperation === 'match') {
+    if (!row.movementMatchMode || row.movementMatchMode === row.movementMode) return undefined
+    return {
+      kind: 'movement',
+      mode: row.movementMode,
+      operation: 'match',
+      matchMode: row.movementMatchMode,
+    }
+  }
+
+  if (row.movementFeet === undefined) return undefined
+  const feet = typeof row.movementFeet === 'number' ? row.movementFeet : Number(row.movementFeet)
+  if (!Number.isFinite(feet)) return undefined
+
+  if (row.movementOperation === 'increase') {
+    return {
+      kind: 'movement',
+      mode: row.movementMode,
+      operation: 'increase',
+      feet: feet as MovementBonusFeet,
+    }
+  }
+
   return {
     kind: 'movement',
     mode: row.movementMode,
-    operation: row.movementOperation,
-    value: row.movementValue,
-    unit: row.movementUnit ?? 'ft',
+    operation: 'set',
+    feet: feet as MovementSpeedFeet,
   }
 }
 

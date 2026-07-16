@@ -19,7 +19,6 @@ const characterSchema = new Schema(
     abilityScores: { type: Schema.Types.Mixed, required: true },
     hitPoints: { type: Schema.Types.Mixed, required: true },
     proficiencies: { type: Schema.Types.Mixed, required: true },
-    languages: { type: [Schema.Types.Mixed], default: [] },
     spells: { type: [Schema.Types.Mixed], default: [] },
     equipment: { type: Schema.Types.Mixed, required: true },
     wealth: { type: Schema.Types.Mixed, required: true },

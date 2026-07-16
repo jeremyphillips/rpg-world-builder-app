@@ -1,7 +1,7 @@
 'use client'
 
 import type { CharacterBuilderStepId } from '@rpg/contracts'
-import { Button } from '@rpg/ui'
+import { Button, Text } from '@rpg/ui'
 
 import {
   getAdjacentBuilderStepId,
@@ -12,7 +12,7 @@ import { characterBuilderShellFooterClasses } from './character-builder-shell.va
 
 export type CharacterBuilderFooterProps = {
   currentStepId: CharacterBuilderStepId
-  continueFormId?: string
+  canCreateCharacter?: boolean
   onBack: () => void
   onContinue: () => void
   onCreateCharacter: () => void
@@ -21,7 +21,7 @@ export type CharacterBuilderFooterProps = {
 
 export function CharacterBuilderFooter({
   currentStepId,
-  continueFormId,
+  canCreateCharacter = true,
   onBack,
   onContinue,
   onCreateCharacter,
@@ -30,29 +30,34 @@ export function CharacterBuilderFooter({
   const showBack = !isFirstBuilderStep(currentStepId)
   const onReview = isReviewBuilderStep(currentStepId)
   const canContinue = getAdjacentBuilderStepId(currentStepId, 'forward') !== null
+  const createDisabled = isCreating || !canCreateCharacter
 
   return (
     <footer className={characterBuilderShellFooterClasses}>
-      <div className="flex flex-wrap items-center gap-2">
-        {showBack ? (
-          <Button type="button" variant="outline" onClick={onBack}>
-            Back
-          </Button>
+      <div className="flex flex-col gap-2">
+        {onReview && !canCreateCharacter ? (
+          <Text variant="muted" className="text-sm">
+            Resolve the issues above before creating your character.
+          </Text>
         ) : null}
 
-        {onReview ? (
-          <Button type="button" disabled={isCreating} onClick={onCreateCharacter}>
-            {isCreating ? 'Creating…' : 'Create character'}
-          </Button>
-        ) : canContinue && continueFormId ? (
-          <Button type="submit" form={continueFormId}>
-            Continue
-          </Button>
-        ) : canContinue ? (
-          <Button type="button" onClick={onContinue}>
-            Continue
-          </Button>
-        ) : null}
+        <div className="flex flex-wrap items-center gap-2">
+          {showBack ? (
+            <Button type="button" variant="outline" onClick={onBack}>
+              Back
+            </Button>
+          ) : null}
+
+          {onReview ? (
+            <Button type="button" disabled={createDisabled} onClick={onCreateCharacter}>
+              {isCreating ? 'Creating…' : 'Create character'}
+            </Button>
+          ) : canContinue ? (
+            <Button type="button" onClick={onContinue}>
+              Continue
+            </Button>
+          ) : null}
+        </div>
       </div>
     </footer>
   )

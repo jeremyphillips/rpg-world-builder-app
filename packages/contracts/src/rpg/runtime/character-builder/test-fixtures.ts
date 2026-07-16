@@ -5,7 +5,44 @@ import { resolveCharacterCreationPatch } from '../../campaign/patches/campaign-c
 import { defaultCampaignMechanicsPatch } from '../../campaign/patches/campaign-mechanics-patch'
 import type { StartingWealthRules } from '../../campaign/rules/starting-wealth'
 import { DEFAULT_ABILITY_GENERATION_RULES } from './ability-generation'
-import type { CharacterBuildCatalog, CharacterBuildContext } from './context'
+import type {
+  CharacterBuildCatalog,
+  CharacterBuildContext,
+  CharacterBuildLanguageOption,
+} from './context'
+
+export const builderTestLanguages = [
+  {
+    id: 'common',
+    label: 'Common',
+    description: 'Trade language.',
+    category: 'standard',
+  },
+  {
+    id: 'elvish',
+    label: 'Elvish',
+    description: 'Elven language.',
+    category: 'standard',
+  },
+  {
+    id: 'dwarvish',
+    label: 'Dwarvish',
+    description: 'Dwarven language.',
+    category: 'standard',
+  },
+  {
+    id: 'draconic',
+    label: 'Draconic',
+    description: 'Draconic language.',
+    category: 'standard',
+  },
+  {
+    id: 'abyssal',
+    label: 'Abyssal',
+    description: 'Infernal language.',
+    category: 'rare',
+  },
+] as const satisfies readonly CharacterBuildLanguageOption[]
 
 export const startingWealthSeed: StartingWealthRules = {
   name: 'Standard starting wealth',
@@ -61,6 +98,7 @@ export const athleticsSkill = {
   updatedAt: '2026-01-01T00:00:00.000Z',
   name: 'Athletics',
   ability: 'str',
+  examples: ['Jump farther than normal', 'Stay afloat in rough water', 'Break something'],
 } as const satisfies SkillProficiency
 
 export const dwarfSpecies = {
@@ -75,7 +113,8 @@ export const dwarfSpecies = {
   description: '<p>Stout and hardy folk.</p>',
   creatureType: 'humanoid',
   sizes: ['medium'],
-  speed: { walk: 30 },
+  movement: { walk: 30 },
+  languageAffinities: ['dwarvish'],
   traits: [],
 } as const satisfies Species
 
@@ -85,6 +124,7 @@ export const builderTestCatalog: CharacterBuildCatalog = {
   spells: [],
   equipment: [],
   skillProficiencies: [athleticsSkill],
+  languages: [...builderTestLanguages],
 }
 
 export const builderTestRules = {

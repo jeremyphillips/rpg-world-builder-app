@@ -1,7 +1,6 @@
 import { useParams } from 'react-router-dom'
 import { Text } from '@rpg/ui'
 import type { Equipment } from '@rpg/contracts'
-import { formatMoney, getEquipmentKindLabel } from '@rpg/contracts'
 
 import { useSetBreadcrumbLabel } from '@/components/layout/use-breadcrumb-label'
 import { WidePage } from '@/components/layout/wide-page'
@@ -9,17 +8,14 @@ import { useEquipment } from '../hooks/use-equipment'
 import { ContentDetailLayout } from '../../lib/detail/content-detail-layout'
 import { ContentDetailResolver } from '../../lib/detail/content-detail-resolver'
 import { contentEditHref } from '../../lib/detail/content-edit-href'
-import type { ContentStatRowData } from '../../lib/detail/content-stat-rows'
 import { getContentImageUrl } from '../../lib/detail/content-image-url'
-import { getEquipmentKindStatRows } from '../lib/shared/equipment-detail-stat-rows'
+import { buildEquipmentDetailViewModel } from '../lib/equipment-display'
 import { EquipmentFamilyMismatchAlert } from '../lib/shared/equipment-family-mismatch-alert'
 import { shouldShowEquipmentFamilyMismatch } from '../lib/shared/equipment-family-route-guard'
 import {
   familyPathToEquipmentKind,
   type EquipmentFamilyPath,
 } from '../lib/shared/equipment-family-paths'
-
-type StatRow = ContentStatRowData
 
 type EquipmentDetailContentProps = {
   item: Equipment
@@ -30,11 +26,7 @@ type EquipmentDetailContentProps = {
 export function EquipmentDetailContent({ item, campaignId, family }: EquipmentDetailContentProps) {
   useSetBreadcrumbLabel(item.name)
 
-  const statRows: StatRow[] = [
-    { label: 'Kind', value: getEquipmentKindLabel(item.kind) },
-    { label: 'Cost', value: formatMoney(item.cost) },
-    ...getEquipmentKindStatRows(item),
-  ]
+  const viewModel = buildEquipmentDetailViewModel(item)
 
   return (
     <WidePage>
@@ -44,9 +36,9 @@ export function EquipmentDetailContent({ item, campaignId, family }: EquipmentDe
         imageName={item.name}
         campaignId={campaignId}
         editHref={contentEditHref('equipment', campaignId, item.id, family)}
-        statRows={statRows}
+        statRows={viewModel.statRows}
         descriptionContent={
-          item.description ? <Text variant="muted">{item.description}</Text> : undefined
+          viewModel.description ? <Text variant="muted">{viewModel.description}</Text> : undefined
         }
       />
     </WidePage>

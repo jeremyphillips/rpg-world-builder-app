@@ -12,8 +12,16 @@ import {
   normalizeGrantGroups,
   subclassChoiceFeatureId,
   skillSlugsFromClassChoices,
+  listToolsMatchingPool,
+  assembleStartingEquipment,
+  buildChoiceSetId,
+  createEmptyCharacterBuilderDraft,
+  indexCharacterBuildCatalog,
+  startingEquipmentChoiceSetId,
+  startingEquipmentGrantProficiencyChoiceId,
   type CharacterClass,
 } from '@rpg/contracts'
+import { loadSeedEquipment } from '../equipment'
 
 const RULESET = 'srd-cc-5.2.1'
 
@@ -302,12 +310,15 @@ describe('SRD 5.2.1 class seed', () => {
     expect(druid.spellcasting?.spellsAvailable?.find((e) => e.level === 1)?.count).toBe(4)
     expect(druid.spellcasting?.spellsAvailable?.find((e) => e.level === 20)?.count).toBe(22)
     const druidic = druid.features.find((f) => f.id === 'druidic')
-    const druidicSpell = druidic?.grantGroups?.[0]?.grants?.find((g) => g.kind === 'spells')
+    const druidicGrants = druidic?.grantGroups?.[0]?.grants ?? []
+    const druidicSpell = druidicGrants.find((g) => g.kind === 'spells')
     expect(druidicSpell).toMatchObject({
       kind: 'spells',
       mode: 'always_prepared',
       spellIds: ['speak-with-animals'],
     })
+    const druidicLanguage = druidicGrants.find((g) => g.kind === 'languages')
+    expect(druidicLanguage).toEqual({ kind: 'languages', languageIds: ['druidic'] })
     const wildShape = druid.features.find((f) => f.id === 'wild-shape')
     expect(wildShape?.description).toContain('<strong>Beast Shapes.</strong>')
     expect(wildShape?.description).toContain('<strong>Game Statistics.</strong>')
@@ -713,6 +724,80 @@ describe('SRD 5.2.1 class seed', () => {
     }
   })
 
+  it('Bard stores three musical-instrument tool proficiency choices', () => {
+    const bard = getClassBySlug(RULESET, 'bard')
+    expect(bard.characterCreation?.proficiencies?.tools?.choices?.[0]).toMatchObject({
+      id: 'class-tools',
+      label: 'Musical Instruments',
+      choose: 3,
+      pool: {
+        source: 'filtered',
+        toolCategories: ['musical_instrument'],
+      },
+    })
+  })
+
+  it('Monk stores one artisan-or-instrument tool proficiency choice', () => {
+    const monk = getClassBySlug(RULESET, 'monk')
+    expect(monk.characterCreation?.proficiencies?.tools?.choices?.[0]).toMatchObject({
+      id: 'class-tools',
+      label: "Artisan's Tools or Musical Instrument",
+      choose: 1,
+      pool: {
+        source: 'filtered',
+        toolCategories: ['artisan', 'musical_instrument'],
+      },
+    })
+  })
+
+  it('Monk tool pool resolves to artisan and musical-instrument seed tools', () => {
+    const monk = getClassBySlug(RULESET, 'monk')
+    const choice = monk.characterCreation?.proficiencies?.tools?.choices?.[0]
+    expect(choice?.pool).toMatchObject({
+      source: 'filtered',
+      toolCategories: ['artisan', 'musical_instrument'],
+    })
+
+    const equipment = new Map(loadSeedEquipment(RULESET).map((row) => [row.id, row]))
+    const resolved = listToolsMatchingPool({
+      pool: choice!.pool!,
+      equipment,
+      rulesetId: RULESET,
+    })
+
+    expect(resolved).toHaveLength(27)
+    expect(
+      resolved.every(
+        (row) =>
+          row.kind === 'tool' &&
+          (row.toolCategory === 'artisan' || row.toolCategory === 'musical_instrument'),
+      ),
+    ).toBe(true)
+    expect(choice!.choose).toBeLessThanOrEqual(resolved.length)
+  })
+
+  it('Bard tool pool resolves to all musical-instrument seed tools', () => {
+    const bard = getClassBySlug(RULESET, 'bard')
+    const choice = bard.characterCreation?.proficiencies?.tools?.choices?.[0]
+    expect(choice?.pool).toMatchObject({
+      source: 'filtered',
+      toolCategories: ['musical_instrument'],
+    })
+
+    const equipment = new Map(loadSeedEquipment(RULESET).map((row) => [row.id, row]))
+    const resolved = listToolsMatchingPool({
+      pool: choice!.pool!,
+      equipment,
+      rulesetId: RULESET,
+    })
+
+    expect(resolved).toHaveLength(10)
+    expect(
+      resolved.every((row) => row.kind === 'tool' && row.toolCategory === 'musical_instrument'),
+    ).toBe(true)
+    expect(choice!.choose).toBeLessThanOrEqual(resolved.length)
+  })
+
   it('ships starting equipment for every class with at least two options', () => {
     for (const cls of classes) {
       const startingEquipment = cls.characterCreation?.startingEquipment
@@ -763,14 +848,54 @@ describe('SRD 5.2.1 class seed', () => {
     }
   })
 
-  it('Monk documents tool/instrument cross-reference in prose (FOLLOWUP: proficiencyLinkedChoice)', () => {
+  it('Monk standard package includes a proficiency-linked tool grant', () => {
     const monk = getClassBySlug(RULESET, 'monk')
     const startingEquipment = monk.characterCreation?.startingEquipment
     expect(startingEquipment).toBeDefined()
+
     const standard = startingEquipment!.options.find((option) => option.id === 'standard')
     expect(standard?.description).toContain('Artisan')
-    expect(standard?.description).toContain('FOLLOWUP: proficiencyLinkedChoice')
+    expect(standard?.description).not.toContain('FOLLOWUP')
+
+    const linkedGrant = standard?.items.find(
+      (item) =>
+        item.kind === 'grant' && startingEquipmentGrantProficiencyChoiceId(item) === 'class-tools',
+    )
+    expect(linkedGrant).toMatchObject({
+      kind: 'grant',
+      target: { source: 'proficiency_choice', choiceId: 'class-tools' },
+      quantity: 1,
+    })
     expect(standard?.items.some((item) => item.kind === 'choice')).toBe(false)
+  })
+
+  it('Monk linked starting equipment resolves from the tool proficiency answer', () => {
+    const monk = getClassBySlug(RULESET, 'monk')
+    const equipment = loadSeedEquipment(RULESET)
+    const lute = equipment.find((row) => row.slug === 'lute')
+    expect(lute).toBeDefined()
+
+    const catalogIndex = indexCharacterBuildCatalog({
+      species: [],
+      classes: [monk],
+      spells: [],
+      equipment,
+      skillProficiencies: [],
+      languages: [],
+    })
+
+    const monkToolChoiceSetId = buildChoiceSetId('class', monk.id, 'class-tools')
+    const draft = {
+      ...createEmptyCharacterBuilderDraft(),
+      class: { classId: monk.id, level: 1 as const },
+      choiceSelections: {
+        [startingEquipmentChoiceSetId(monk.id)]: ['standard'],
+        [monkToolChoiceSetId]: [lute!.id],
+      },
+    }
+
+    const { equipment: inventory } = assembleStartingEquipment(draft, catalogIndex)
+    expect(inventory.tools.some((row) => row.equipmentId === lute!.id)).toBe(true)
   })
 
   it('all seed grantGroups are already in canonical form (normalizeGrantGroups round-trip is identity)', () => {

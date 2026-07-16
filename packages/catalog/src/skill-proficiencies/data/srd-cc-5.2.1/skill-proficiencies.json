@@ -8,7 +8,8 @@
     "createdAt": "2024-05-21T00:00:00.000Z",
     "updatedAt": "2024-05-21T00:00:00.000Z",
     "name": "Athletics",
-    "description": "Jump farther than normal, stay afloat in rough water, or break something.",
+    "description": "Physical challenges involving strength, movement, and force.",
+    "examples": ["Jump farther than normal", "Stay afloat in rough water", "Break something"],
     "ability": "str"
   },
   {
@@ -20,7 +21,8 @@
     "createdAt": "2024-05-21T00:00:00.000Z",
     "updatedAt": "2024-05-21T00:00:00.000Z",
     "name": "Acrobatics",
-    "description": "Stay on your feet in a tricky situation, or perform an acrobatic stunt.",
+    "description": "TODO: Balance, agility, and acrobatic feats in difficult situations.",
+    "examples": ["Stay on your feet in a tricky situation", "Perform an acrobatic stunt"],
     "ability": "dex"
   },
   {
@@ -32,7 +34,8 @@
     "createdAt": "2024-05-21T00:00:00.000Z",
     "updatedAt": "2024-05-21T00:00:00.000Z",
     "name": "Sleight of Hand",
-    "description": "Pick a pocket, conceal a handheld object, or perform legerdemain.",
+    "description": "TODO: Manual dexterity for concealment, theft, and tricks.",
+    "examples": ["Pick a pocket", "Conceal a handheld object", "Perform legerdemain"],
     "ability": "dex"
   },
   {
@@ -44,7 +47,8 @@
     "createdAt": "2024-05-21T00:00:00.000Z",
     "updatedAt": "2024-05-21T00:00:00.000Z",
     "name": "Stealth",
-    "description": "Escape notice by moving quietly and hiding behind things.",
+    "description": "TODO: Moving unseen and unheard.",
+    "examples": ["Escape notice by moving quietly and hiding behind things"],
     "ability": "dex"
   },
   {
@@ -56,7 +60,8 @@
     "createdAt": "2024-05-21T00:00:00.000Z",
     "updatedAt": "2024-05-21T00:00:00.000Z",
     "name": "Arcana",
-    "description": "Recall lore about spells, magic items, and the planes of existence.",
+    "description": "TODO: Lore about magic, spells, and the planes.",
+    "examples": ["Recall lore about spells, magic items, and the planes of existence"],
     "ability": "int"
   },
   {
@@ -68,7 +73,8 @@
     "createdAt": "2024-05-21T00:00:00.000Z",
     "updatedAt": "2024-05-21T00:00:00.000Z",
     "name": "History",
-    "description": "Recall lore about historical events, people, nations, and cultures.",
+    "description": "TODO: Lore about the past, civilizations, and events.",
+    "examples": ["Recall lore about historical events, people, nations, and cultures"],
     "ability": "int"
   },
   {
@@ -80,7 +86,8 @@
     "createdAt": "2024-05-21T00:00:00.000Z",
     "updatedAt": "2024-05-21T00:00:00.000Z",
     "name": "Investigation",
-    "description": "Find obscure information in books, or deduce how something works.",
+    "description": "TODO: Finding clues and deducing how things work.",
+    "examples": ["Find obscure information in books", "Deduce how something works"],
     "ability": "int"
   },
   {
@@ -92,7 +99,8 @@
     "createdAt": "2024-05-21T00:00:00.000Z",
     "updatedAt": "2024-05-21T00:00:00.000Z",
     "name": "Nature",
-    "description": "Recall lore about terrain, plants, animals, and weather.",
+    "description": "TODO: Lore about the natural world.",
+    "examples": ["Recall lore about terrain, plants, animals, and weather"],
     "ability": "int"
   },
   {
@@ -104,7 +112,8 @@
     "createdAt": "2024-05-21T00:00:00.000Z",
     "updatedAt": "2024-05-21T00:00:00.000Z",
     "name": "Religion",
-    "description": "Recall lore about gods, religious rituals, and holy symbols.",
+    "description": "TODO: Lore about deities, rituals, and holy symbols.",
+    "examples": ["Recall lore about gods, religious rituals, and holy symbols"],
     "ability": "int"
   },
   {
@@ -116,7 +125,8 @@
     "createdAt": "2024-05-21T00:00:00.000Z",
     "updatedAt": "2024-05-21T00:00:00.000Z",
     "name": "Animal Handling",
-    "description": "Calm or train an animal, or get an animal to behave in a certain way.",
+    "description": "TODO: Calming, training, and directing animals.",
+    "examples": ["Calm or train an animal", "Get an animal to behave in a certain way"],
     "ability": "wis"
   },
   {
@@ -128,7 +138,8 @@
     "createdAt": "2024-05-21T00:00:00.000Z",
     "updatedAt": "2024-05-21T00:00:00.000Z",
     "name": "Insight",
-    "description": "Discern a person's mood and intentions.",
+    "description": "TODO: Reading motives and emotional states.",
+    "examples": ["Discern a person's mood and intentions"],
     "ability": "wis"
   },
   {
@@ -140,7 +151,8 @@
     "createdAt": "2024-05-21T00:00:00.000Z",
     "updatedAt": "2024-05-21T00:00:00.000Z",
     "name": "Medicine",
-    "description": "Diagnose an illness, or determine what killed the recently slain.",
+    "description": "TODO: Diagnosing illness and cause of death.",
+    "examples": ["Diagnose an illness", "Determine what killed the recently slain"],
     "ability": "wis"
   },
   {
@@ -152,7 +164,8 @@
     "createdAt": "2024-05-21T00:00:00.000Z",
     "updatedAt": "2024-05-21T00:00:00.000Z",
     "name": "Perception",
-    "description": "Using a combination of senses, notice something that's easy to miss.",
+    "description": "TODO: Noticing details using your senses.",
+    "examples": ["Using a combination of senses, notice something that's easy to miss"],
     "ability": "wis"
   },
   {
@@ -164,7 +177,8 @@
     "createdAt": "2024-05-21T00:00:00.000Z",
     "updatedAt": "2024-05-21T00:00:00.000Z",
     "name": "Survival",
-    "description": "Follow tracks, forage, find a trail, or avoid natural hazards.",
+    "description": "TODO: Tracking, foraging, and navigating the wilderness.",
+    "examples": ["Follow tracks", "Forage", "Find a trail", "Avoid natural hazards"],
     "ability": "wis"
   },
   {
@@ -176,7 +190,8 @@
     "createdAt": "2024-05-21T00:00:00.000Z",
     "updatedAt": "2024-05-21T00:00:00.000Z",
     "name": "Deception",
-    "description": "Tell a convincing lie, or wear a disguise convincingly.",
+    "description": "TODO: Lies, disguises, and misdirection.",
+    "examples": ["Tell a convincing lie", "Wear a disguise convincingly"],
     "ability": "cha"
   },
   {
@@ -188,7 +203,8 @@
     "createdAt": "2024-05-21T00:00:00.000Z",
     "updatedAt": "2024-05-21T00:00:00.000Z",
     "name": "Intimidation",
-    "description": "Awe or threaten someone into doing what you want.",
+    "description": "TODO: Coercion through fear or awe.",
+    "examples": ["Awe or threaten someone into doing what you want"],
     "ability": "cha"
   },
   {
@@ -200,7 +216,8 @@
     "createdAt": "2024-05-21T00:00:00.000Z",
     "updatedAt": "2024-05-21T00:00:00.000Z",
     "name": "Performance",
-    "description": "Act, tell a story, perform music, or dance.",
+    "description": "TODO: Entertaining an audience through art.",
+    "examples": ["Act", "Tell a story", "Perform music", "Dance"],
     "ability": "cha"
   },
   {
@@ -212,7 +229,8 @@
     "createdAt": "2024-05-21T00:00:00.000Z",
     "updatedAt": "2024-05-21T00:00:00.000Z",
     "name": "Persuasion",
-    "description": "Honestly and graciously convince someone of something.",
+    "description": "TODO: Honest influence and negotiation.",
+    "examples": ["Honestly and graciously convince someone of something"],
     "ability": "cha"
   }
 ]

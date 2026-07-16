@@ -276,6 +276,37 @@ When adding a referencing feature, increment the stub for matching
 
 ---
 
+## Consuming reference vocabulary in UI
+
+Display code should never render raw vocabulary slugs. Use label helpers from
+`@rpg/contracts` (`get*Label()`, `format*()`, `*_ENTRIES` maps) so copy stays
+consistent with catalog seed and campaign patches.
+
+### Campaign vocab vs closed reference sets
+
+| Source                                                    | Examples                                               | Consumption                                                                                                                                             |
+| --------------------------------------------------------- | ------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Campaign vocab** (`VOCABULARY_OPTION_SET_IDS`)          | Creature types, damage types, languages                | Resolve per campaign via vocabulary API; build label maps from the resolved set (see [Adding the next vocabulary set](#adding-the-next-vocabulary-set)) |
+| **Closed reference vocab** (`*_ENTRIES`, `GameTermEntry`) | Weapon properties, armor categories, magic item rarity | Import label helpers from `rpg/vocab/*`; no campaign patch merge                                                                                        |
+
+Catalog **content types** (classes, species, equipment, …) are separate — see
+[content-types.md](./content-types.md).
+
+### Compact display pattern
+
+Equipment picker rows use a contracts-side segment assembler in
+[`equipment-compact-display.ts`](../packages/contracts/src/rpg/content/lib/equipment-compact-display.ts):
+
+1. **Field formatters** — each `CompactFieldId` maps catalog data to one display segment via vocab label helpers.
+2. **Layout registry** — per `EquipmentKind`, a priority-ordered `fields` list with optional `{ firstAvailable: [...] }` fallback slots.
+3. **Assembler** — walks slots in order, skips redundant segments, caps intrinsic `metadata` at three segments; `kindLabel` and contextual callouts sit outside the cap.
+
+Dashboard surfaces call `buildEquipmentCompactSummary()` through
+[`buildEquipmentPickerRowViewModel`](../apps/dashboard/src/features/content/equipment/lib/equipment-display.ts);
+the picker UI joins segments with `EQUIPMENT_COMPACT_SEPARATOR`.
+
+---
+
 ## Related docs
 
 - [architecture.md](./architecture.md) — monorepo topology and feature boundaries

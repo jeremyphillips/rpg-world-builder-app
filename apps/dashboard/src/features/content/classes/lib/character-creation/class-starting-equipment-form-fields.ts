@@ -2,8 +2,8 @@ import { z } from 'zod'
 import {
   choiceOptionTitle,
   defineMessage,
-  GEAR_KIND_ENTRIES,
   SPELLCASTING_FOCUS_GEAR_KINDS,
+  SPELLCASTING_GEAR_KIND_ENTRIES,
   spellcastingFocusGearKindSchema,
 } from '@rpg/contracts'
 import { toOptions, type FieldVisibility, type FormItem } from '@rpg/ui/form'
@@ -15,10 +15,19 @@ import {
 import type { ContentFormCtx } from '../../../lib/forms/content-form-registry'
 import {
   equipmentGrantChoiceItemFormSchema,
-  grantedEquipmentItemFormSchema,
   equipmentGrantItemFields,
+  equipmentGrantValidationMessages,
+  grantedEquipmentItemFormSchema,
   EQUIPMENT_GRANT_ITEM_KINDS,
 } from '../../../lib/forms/grants/equipment-grant-form-fields'
+import {
+  STARTING_EQUIPMENT_GRANT_ITEM_KIND_LABELS,
+  STARTING_EQUIPMENT_GRANT_TARGET_SOURCE_LABELS,
+} from '../../../lib/forms/grants/equipment-grant-form-labels'
+import {
+  INELIGIBLE_PROFICIENCY_CHOICE_ERROR,
+  STARTING_EQUIPMENT_ITEM_TYPE_LABEL,
+} from './class-character-creation-link-labels'
 import {
   equipmentGrantTitle,
   equipmentGrantSummary,
@@ -44,7 +53,7 @@ export const STARTING_EQUIPMENT_FIELD_NAME = 'characterCreation.startingEquipmen
 const focusKindOptions = toOptions(
   SPELLCASTING_FOCUS_GEAR_KINDS,
   Object.fromEntries(
-    SPELLCASTING_FOCUS_GEAR_KINDS.map((kind) => [kind, GEAR_KIND_ENTRIES[kind].label]),
+    SPELLCASTING_FOCUS_GEAR_KINDS.map((kind) => [kind, SPELLCASTING_GEAR_KIND_ENTRIES[kind].label]),
   ) as Record<(typeof SPELLCASTING_FOCUS_GEAR_KINDS)[number], string>,
 )
 
@@ -55,14 +64,57 @@ const wealthGrantMoneyFormSchema = z.object({
 
 export const startingEquipmentModifierFormSchema = z.object({
   kind: z.literal('spellcasting_focus'),
-  focusKind: spellcastingFocusGearKindSchema,
+  spellcastingGearKind: spellcastingFocusGearKindSchema,
 })
 
 export type StartingEquipmentModifierForm = z.infer<typeof startingEquipmentModifierFormSchema>
 
-export const startingEquipmentGrantedItemFormSchema = grantedEquipmentItemFormSchema.extend({
-  modifiers: z.array(startingEquipmentModifierFormSchema).optional(),
-})
+export const startingEquipmentGrantedItemFormSchema = grantedEquipmentItemFormSchema
+  .extend({
+    modifiers: z.array(startingEquipmentModifierFormSchema).optional(),
+  })
+  .superRefine((row, ctx) => {
+    if (row.grantTargetSource === 'proficiency_choice' && (row.modifiers?.length ?? 0) > 0) {
+      ctx.addIssue({
+        code: 'custom',
+        message: 'Proficiency-linked starting equipment grants cannot carry modifiers.',
+        path: ['modifiers'],
+      })
+    }
+  })
+
+export type StartingEquipmentProficiencyLinkValidationContext = {
+  definedToolChoiceIds: ReadonlySet<string>
+  eligibleProficiencyChoiceIds: ReadonlySet<string>
+}
+
+export function refineStartingEquipmentProficiencyLinkRow(
+  row: z.infer<typeof grantedEquipmentItemFormSchema>,
+  ctx: Pick<z.RefinementCtx, 'addIssue'>,
+  validation?: StartingEquipmentProficiencyLinkValidationContext,
+): void {
+  if (row.grantTargetSource !== 'proficiency_choice' || !row.proficiencyChoiceId?.trim()) return
+  if (!validation) return
+
+  const choiceId = row.proficiencyChoiceId.trim()
+
+  if (!validation.definedToolChoiceIds.has(choiceId)) {
+    ctx.addIssue({
+      code: 'custom',
+      message: equipmentGrantValidationMessages.missingProficiencyChoice({ choiceId }),
+      path: ['proficiencyChoiceId'],
+    })
+    return
+  }
+
+  if (!validation.eligibleProficiencyChoiceIds.has(choiceId)) {
+    ctx.addIssue({
+      code: 'custom',
+      message: INELIGIBLE_PROFICIENCY_CHOICE_ERROR,
+      path: ['proficiencyChoiceId'],
+    })
+  }
+}
 
 export const startingEquipmentChoiceItemFormSchema = equipmentGrantChoiceItemFormSchema
 
@@ -100,15 +152,6 @@ export const startingEquipmentFormSchema = z.object({
 
 export type StartingEquipmentForm = z.infer<typeof startingEquipmentFormSchema>
 
-function visibleForItemKind(
-  itemKind: (typeof STARTING_EQUIPMENT_ITEM_KINDS)[number],
-): FieldVisibility {
-  return {
-    dependsOn: ['itemKind'],
-    visibleWhen: (watched) => watched['itemKind'] === itemKind,
-  }
-}
-
 export function startingEquipmentOptionTitle(
   row: Pick<StartingEquipmentOptionForm, 'id' | 'label'> | undefined,
 ): string {
@@ -120,8 +163,18 @@ export function startingEquipmentItemTitle(
   row: StartingEquipmentItemForm | undefined,
   index: number,
   equipmentOptions: Parameters<typeof equipmentGrantTitle>[2] = [],
+  proficiencyChoiceOptions: Parameters<typeof equipmentGrantTitle>[3] = [],
 ): string {
-  return equipmentGrantTitle(row, index, equipmentOptions)
+  return equipmentGrantTitle(row, index, equipmentOptions, proficiencyChoiceOptions)
+}
+
+function visibleForEquipmentGrantTarget(): FieldVisibility {
+  return {
+    dependsOn: ['itemKind', 'grantTargetSource'],
+    visibleWhen: (watched) =>
+      watched['itemKind'] === 'grant' &&
+      (watched['grantTargetSource'] === 'equipment' || watched['grantTargetSource'] === undefined),
+  }
 }
 
 export function startingEquipmentModifierFields(): FormItem[] {
@@ -132,13 +185,13 @@ export function startingEquipmentModifierFields(): FormItem[] {
       legend: 'Modifiers',
       addLabel: 'Add modifier',
       itemCollapsible: true,
-      visibility: visibleForItemKind('grant'),
+      visibility: visibleForEquipmentGrantTarget(),
       itemHeader: {
         fallback: () => 'Modifier',
         primary: (values) => {
           const row = values as StartingEquipmentModifierForm | undefined
-          if (row?.focusKind) {
-            return GEAR_KIND_ENTRIES[row.focusKind].label
+          if (row?.spellcastingGearKind) {
+            return SPELLCASTING_GEAR_KIND_ENTRIES[row.spellcastingGearKind].label
           }
           return undefined
         },
@@ -154,7 +207,7 @@ export function startingEquipmentModifierFields(): FormItem[] {
         },
         {
           type: 'select',
-          name: 'focusKind',
+          name: 'spellcastingGearKind',
           label: 'Focus kind',
           options: focusKindOptions,
           required: true,
@@ -185,12 +238,29 @@ export function startingEquipmentChooseFields(): FormItem[] {
   ]
 }
 
+const startingEquipmentItemKindOptions = toOptions(
+  EQUIPMENT_GRANT_ITEM_KINDS,
+  STARTING_EQUIPMENT_GRANT_ITEM_KIND_LABELS,
+)
+
+const startingEquipmentGrantTargetSourceOptions = toOptions(
+  ['equipment', 'proficiency_choice'] as const,
+  STARTING_EQUIPMENT_GRANT_TARGET_SOURCE_LABELS,
+)
+
 export function startingEquipmentItemFields(ctx: ContentFormCtx): FormItem[] {
-  return equipmentGrantItemFields(ctx, { extraFields: startingEquipmentModifierFields() })
+  return equipmentGrantItemFields(ctx, {
+    allowProficiencyChoiceTarget: true,
+    kindSelectLabel: STARTING_EQUIPMENT_ITEM_TYPE_LABEL,
+    itemKindOptions: startingEquipmentItemKindOptions,
+    grantTargetSourceOptions: startingEquipmentGrantTargetSourceOptions,
+    extraFields: startingEquipmentModifierFields(),
+  })
 }
 
 export function startingEquipmentOptionItemFields(ctx: ContentFormCtx): FormItem[] {
   const equipmentOptions = ctx.options?.equipment ?? []
+  const proficiencyChoiceOptions = ctx.options?.proficiencyChoiceTargets ?? []
 
   return [
     {
@@ -223,6 +293,7 @@ export function startingEquipmentOptionItemFields(ctx: ContentFormCtx): FormItem
             values as StartingEquipmentItemForm | undefined,
             index,
             equipmentOptions,
+            proficiencyChoiceOptions,
           ),
         summary: (values) =>
           equipmentGrantSummary(values as StartingEquipmentItemForm | undefined, equipmentOptions),

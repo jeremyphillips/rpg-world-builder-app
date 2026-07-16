@@ -1,6 +1,6 @@
-import { Link, useParams } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import { Heading, Text } from '@rpg/ui'
-import { classesOfferingSkillChoice, getAbilityLabel } from '@rpg/contracts'
+import { classesOfferingSkillChoice } from '@rpg/contracts'
 import type { SkillProficiency } from '@rpg/contracts'
 
 import { ROUTES } from '@/app/routes'
@@ -13,9 +13,31 @@ import { ContentDetailResolver } from '../../lib/detail/content-detail-resolver'
 import { contentEditHref } from '../../lib/detail/content-edit-href'
 import { ContentStatRow } from '../../lib/detail/content-stat-row.client'
 import { getContentImageUrl } from '../../lib/detail/content-image-url'
+import { ContentLinkBadge } from '../../lib/detail/content-link-badge'
+import { buildSkillProficiencyDetailViewModel } from '../lib/skill-proficiency-display'
 
-const CLASS_SKILL_CHOICE_CHIP_CLASS =
-  'rounded-md border px-2 py-1 text-sm hover:underline focus-visible:underline'
+function SkillExamplesList({
+  examples,
+  sectionTitle,
+}: {
+  examples: string[]
+  sectionTitle: string
+}) {
+  return (
+    <section aria-labelledby="skill-examples-heading">
+      <Heading variant="label" as="h2" id="skill-examples-heading" className="mb-3">
+        {sectionTitle}
+      </Heading>
+      <ul className="list-disc space-y-1 pl-5" role="list">
+        {examples.map((example) => (
+          <li key={example}>
+            <Text variant="muted">{example}</Text>
+          </li>
+        ))}
+      </ul>
+    </section>
+  )
+}
 
 function ClassSkillChoicesList({
   campaignId,
@@ -40,12 +62,9 @@ function ClassSkillChoicesList({
         <ul className="flex flex-wrap gap-2" role="list">
           {offeringClasses.map((cls) => (
             <li key={cls.slug}>
-              <Link
-                to={ROUTES.content.classes.detail(campaignId, cls.id)}
-                className={CLASS_SKILL_CHOICE_CHIP_CLASS}
-              >
+              <ContentLinkBadge to={ROUTES.content.classes.detail(campaignId, cls.id)}>
                 {cls.name}
-              </Link>
+              </ContentLinkBadge>
             </li>
           ))}
         </ul>
@@ -62,6 +81,7 @@ type SkillDetailContentProps = {
 
 export function SkillDetailContent({ skill, campaignId, skillId }: SkillDetailContentProps) {
   useSetBreadcrumbLabel(skill.name)
+  const viewModel = buildSkillProficiencyDetailViewModel(skill)
 
   return (
     <WidePage>
@@ -73,8 +93,14 @@ export function SkillDetailContent({ skill, campaignId, skillId }: SkillDetailCo
         editHref={contentEditHref('skillProficiencies', campaignId, skillId)}
         metadata={
           <div className="space-y-8">
-            <ContentStatRow label="Governing Ability" value={getAbilityLabel(skill.ability)} />
-            {skill.description ? <Text variant="muted">{skill.description}</Text> : null}
+            <ContentStatRow label="Governing Ability" value={viewModel.governingAbilityLabel} />
+            {viewModel.summarySentence ? (
+              <Text variant="muted">{viewModel.summarySentence}</Text>
+            ) : null}
+            <SkillExamplesList
+              examples={viewModel.examples}
+              sectionTitle={viewModel.examplesSectionTitle}
+            />
             <ClassSkillChoicesList campaignId={campaignId} skillSlug={skill.slug} />
           </div>
         }

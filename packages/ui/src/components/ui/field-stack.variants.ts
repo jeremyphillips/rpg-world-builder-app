@@ -1,7 +1,7 @@
 import { cva, type VariantProps } from 'class-variance-authority'
 
 /** Surface tone for dependents-only chrome on toggle-dependent stacks. */
-export type FieldStackDependentsTone = 'subtle' | 'warning' | 'error'
+export type FieldStackDependentsTone = 'main' | 'subtle' | 'warning' | 'error'
 
 /** Where `dependentsChrome` tone applies on toggle-dependent stacks. */
 export type FieldStackDependentsChromeScope = 'wrapper' | 'arrayItems'
@@ -13,6 +13,7 @@ export type FieldStackDependentsChromeScope = 'wrapper' | 'arrayItems'
 export const fieldSurfaceToneVariants = cva('', {
   variants: {
     tone: {
+      main: 'border-border bg-background',
       subtle: 'border-border bg-muted/30',
       /** Stub until warning design tokens exist — distinct from subtle via accent wash. */
       warning: 'border-border bg-accent/30',
@@ -37,12 +38,14 @@ export type FieldStackDependentsChromeVariantProps = VariantProps<
 export const fieldStackDependentsChromeVariants = cva('rounded-md border p-3', {
   variants: {
     tone: {
+      main: '',
       subtle: '',
       warning: '',
       error: '',
     },
   },
   compoundVariants: [
+    { tone: 'main', class: fieldSurfaceToneVariants({ tone: 'main' }) },
     { tone: 'subtle', class: fieldSurfaceToneVariants({ tone: 'subtle' }) },
     { tone: 'warning', class: fieldSurfaceToneVariants({ tone: 'warning' }) },
     { tone: 'error', class: fieldSurfaceToneVariants({ tone: 'error' }) },

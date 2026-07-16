@@ -32,7 +32,12 @@ export const EmptyDraft: Story = {
         draft={draft}
         context={context}
         catalogIndex={catalogIndex}
-        preview={buildCharacterPreview(draft, catalogIndex, context.characterCreationRules)}
+        preview={buildCharacterPreview(
+          draft,
+          catalogIndex,
+          context.characterCreationRules,
+          context.rulesetId,
+        )}
       />
     )
   },
@@ -70,6 +75,7 @@ export const PartialDraft: Story = {
             draft,
             populatedCatalogIndex,
             populatedContext.characterCreationRules,
+            populatedContext.rulesetId,
           )}
         />
       </div>

@@ -8,6 +8,13 @@ import { weaponCategorySchema } from '../../vocab/weapon/category'
 import { skillSchema } from '../../content/skill-proficiency'
 import { characterSelectionSourcesSchema } from './selection-sources'
 
+/**
+ * Stored character proficiency row shapes (`character.proficiencies`).
+ *
+ * Schemas and types only — merge/dedupe assembly for languages lives in
+ * {@link ./languages.ts}; builder finalize orchestration lives under
+ * `character-builder/assembly/` (see `runtime-resolution-boundaries.md`).
+ */
 // ---------------------------------------------------------------------------
 // Proficiencies
 // ---------------------------------------------------------------------------
@@ -81,19 +88,22 @@ export const characterArmorProficiencyEntrySchema = z.object({
 
 export type CharacterArmorProficiencyEntry = z.infer<typeof characterArmorProficiencyEntrySchema>
 
-export const characterProficienciesSchema = z.object({
-  skills: z.array(characterSkillProficiencyEntrySchema).default([]),
-  weapons: z.array(characterWeaponProficiencyEntrySchema).default([]),
-  armor: z.array(characterArmorProficiencyEntrySchema).default([]),
-  tools: z.array(characterToolProficiencyEntrySchema).default([]),
-})
-
-export type CharacterProficiencies = z.infer<typeof characterProficienciesSchema>
-
-export const characterLanguageEntrySchema = z.object({
+export const characterLanguageProficiencyEntrySchema = z.object({
   language: languageIdSchema,
   sources: characterSelectionSourcesSchema,
   notes: z.string().optional(),
 })
 
-export type CharacterLanguageEntry = z.infer<typeof characterLanguageEntrySchema>
+export type CharacterLanguageProficiencyEntry = z.infer<
+  typeof characterLanguageProficiencyEntrySchema
+>
+
+export const characterProficienciesSchema = z.object({
+  skills: z.array(characterSkillProficiencyEntrySchema).default([]),
+  weapons: z.array(characterWeaponProficiencyEntrySchema).default([]),
+  armor: z.array(characterArmorProficiencyEntrySchema).default([]),
+  tools: z.array(characterToolProficiencyEntrySchema).default([]),
+  languages: z.array(characterLanguageProficiencyEntrySchema).default([]),
+})
+
+export type CharacterProficiencies = z.infer<typeof characterProficienciesSchema>

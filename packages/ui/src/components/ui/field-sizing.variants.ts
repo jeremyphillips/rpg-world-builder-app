@@ -58,12 +58,19 @@ export const fieldDigitTrailingColumnClasses = {
   lg: 'w-7',
 } as const satisfies Record<FieldSizeToken, string>
 
-/** Maps field control size to badge size (`Badge` / `DismissibleBadge` only define `sm` | `md`). */
+/** Maps field control size to badge size (`Badge` defines `sm` | `md` | `lg`). */
 export const fieldSizeToBadgeSize = {
   sm: 'sm',
   md: 'md',
-  lg: 'md',
-} as const satisfies Record<FieldSizeToken, 'sm' | 'md'>
+  lg: 'lg',
+} as const satisfies Record<FieldSizeToken, 'sm' | 'md' | 'lg'>
+
+/** Maps field control size to removable chip size (`sm` fields use `md` — removable chips have no `sm`). */
+export const fieldSizeToChipSize = {
+  sm: 'md',
+  md: 'md',
+  lg: 'lg',
+} as const satisfies Record<FieldSizeToken, 'md' | 'lg'>
 
 /** Icon sizing that pairs with `fieldDigitTrailingColumnClasses`. */
 export const fieldDigitTrailingIconClasses = {

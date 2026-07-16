@@ -14,7 +14,7 @@ export function AvailabilityBadge({ availability }: AvailabilityBadgeProps) {
   if (!badge) return null
 
   return (
-    <Badge variant={badge.variant ?? 'outline'} size="sm">
+    <Badge appearance={badge.appearance} tone={badge.tone} size="sm">
       {badge.label}
     </Badge>
   )

@@ -2,6 +2,7 @@ import {
   characterBuilderDraftSchema,
   createEmptyCharacterBuilderDraft,
   createPersistedCharacterBuilderState,
+  normalizeCharacterBuilderDraft,
   type CharacterBuilderDraft,
   type PersistedCharacterBuilderState,
 } from '@rpg/contracts'
@@ -68,7 +69,7 @@ function finishCharacterBuilderHydration(
       return
     }
 
-    const mergedDraft = parsed.data
+    const mergedDraft = normalizeCharacterBuilderDraft(parsed.data)
     if (isNonEmptyCharacterBuilderDraft(mergedDraft)) {
       store.setState({
         draft: createEmptyCharacterBuilderDraft(),
@@ -76,6 +77,11 @@ function finishCharacterBuilderHydration(
         hasPendingRestore: true,
         _hasHydrated: true,
       })
+      return
+    }
+
+    if (mergedDraft !== parsed.data) {
+      store.setState({ draft: mergedDraft, _hasHydrated: true })
       return
     }
 

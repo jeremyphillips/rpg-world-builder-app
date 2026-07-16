@@ -3,6 +3,7 @@ import { type CreateSpeciesInput, type Species } from '@rpg/contracts'
 import { envelopeSlugFields, finalizeContentInput } from '../../lib/forms/content-form-key-helpers'
 import type { ContentFormInputCtx } from '../../lib/forms/content-form-registry'
 import { heritageFromFormValues, heritageToFormRow } from './species-heritage-form-values'
+import { movementRecordToRows, movementRowsToRecord } from './species-movement-form-fields'
 import {
   characterCreationFromFormValues,
   characterCreationToFormValues,
@@ -13,7 +14,8 @@ import { traitToFormRow, traitsFromFormValues } from './species-trait-form-value
 export const speciesCreateDefaultValues: Partial<SpeciesFormValues> = {
   creatureType: 'humanoid',
   sizes: ['medium'],
-  speed: { walk: 30 },
+  movement: [{ mode: 'walk', feet: 30 }],
+  languageAffinities: [],
   traits: [],
 }
 
@@ -24,7 +26,8 @@ export function speciesToFormValues(entity: Species): SpeciesFormValues {
     description: entity.description,
     creatureType: entity.creatureType,
     sizes: entity.sizes,
-    speed: { walk: entity.speed.walk },
+    movement: movementRecordToRows(entity.movement),
+    languageAffinities: entity.languageAffinities ?? [],
     traits: entity.traits.map(traitToFormRow),
     heritage: entity.heritage ? heritageToFormRow(entity.heritage) : undefined,
     characterCreation: characterCreationToFormValues(entity.characterCreation),
@@ -44,7 +47,10 @@ export function buildSpeciesCreateInput(
       description: values.description || undefined,
       creatureType: values.creatureType,
       sizes: values.sizes,
-      speed: { walk: values.speed.walk },
+      movement: movementRowsToRecord(values.movement),
+      ...(values.languageAffinities && values.languageAffinities.length > 0
+        ? { languageAffinities: values.languageAffinities }
+        : {}),
       traits: traitsFromFormValues(values.traits, ctx?.entity?.traits),
       heritage: heritageFromFormValues(values.heritage, ctx?.entity?.heritage),
       ...(characterCreation ? { characterCreation } : {}),

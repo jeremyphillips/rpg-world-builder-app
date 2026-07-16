@@ -20,20 +20,26 @@ describe('useCharacterPreview', () => {
     }
 
     const { result } = renderHook(() =>
-      useCharacterPreview(draft, catalogIndex, context.characterCreationRules),
+      useCharacterPreview(draft, catalogIndex, context.characterCreationRules, context.rulesetId),
     )
 
     expect(result.current).toEqual(
-      buildCharacterPreview(draft, catalogIndex, context.characterCreationRules, {
-        resolvedChoiceSets: [],
-      }),
+      buildCharacterPreview(
+        draft,
+        catalogIndex,
+        context.characterCreationRules,
+        context.rulesetId,
+        {
+          resolvedChoiceSets: [],
+        },
+      ),
     )
   })
 
   it('returns null when catalog index or rules are missing', () => {
     const draft = createEmptyCharacterBuilderDraft()
 
-    const { result } = renderHook(() => useCharacterPreview(draft, null, null))
+    const { result } = renderHook(() => useCharacterPreview(draft, null, null, null))
 
     expect(result.current).toBeNull()
   })

@@ -2,9 +2,13 @@ import { describe, expect, it } from 'vitest'
 
 import {
   armorTrainingGrantSchema,
+  formatArmorTrainingGrantCompact,
   formatArmorTrainingGrantSentence,
+  formatSkillProficiencyGrantCompact,
   formatSkillProficiencyGrantSentence,
+  formatToolProficiencyGrantCompact,
   formatToolProficiencyGrantSentence,
+  formatWeaponProficiencyGrantCompact,
   formatWeaponProficiencyGrantSentence,
   skillProficiencyGrantSchema,
   toolProficiencyGrantSchema,
@@ -58,6 +62,50 @@ describe('toolProficiencyGrantSchema', () => {
         pool: { source: 'any' },
       }),
     ).toEqual({ kind: 'choice', choose: 3, pool: { source: 'any' } })
+  })
+
+  it('parses a filtered tool pool with multiple categories', () => {
+    expect(
+      toolProficiencyGrantSchema.parse({
+        kind: 'choice',
+        choose: 1,
+        pool: {
+          source: 'filtered',
+          toolCategories: ['artisan', 'musical_instrument'],
+        },
+      }),
+    ).toEqual({
+      kind: 'choice',
+      choose: 1,
+      pool: {
+        source: 'filtered',
+        toolCategories: ['artisan', 'musical_instrument'],
+      },
+    })
+  })
+
+  it('coerces legacy single toolCategory to toolCategories', () => {
+    expect(
+      toolProficiencyGrantSchema.parse({
+        kind: 'choice',
+        choose: 3,
+        pool: { source: 'filtered', toolCategory: 'musical_instrument' },
+      }),
+    ).toEqual({
+      kind: 'choice',
+      choose: 3,
+      pool: { source: 'filtered', toolCategories: ['musical_instrument'] },
+    })
+  })
+
+  it('rejects filtered pools with no categories or slugs', () => {
+    expect(
+      toolProficiencyGrantSchema.safeParse({
+        kind: 'choice',
+        choose: 1,
+        pool: { source: 'filtered' },
+      }).success,
+    ).toBe(false)
   })
 })
 
@@ -159,7 +207,7 @@ describe('format proficiency grant sentences', () => {
       formatToolProficiencyGrantSentence({
         kind: 'choice',
         choose: 2,
-        pool: { source: 'filtered', toolCategory: 'thieves' },
+        pool: { source: 'filtered', toolCategories: ['thieves'] },
       }),
     ).toBe("Character chooses 2 tool proficiencies from sets of thieves' tools.")
   })
@@ -172,5 +220,69 @@ describe('format proficiency grant sentences', () => {
         pool: { source: 'filtered', armorCategory: 'heavy' },
       }),
     ).toBe('Character chooses 1 armor training from heavy armor.')
+  })
+})
+
+describe('format proficiency grant compact labels', () => {
+  it('formats fixed proficiency grants with singular and plural suffixes', () => {
+    expect(
+      formatSkillProficiencyGrantCompact({
+        kind: 'fixed',
+        skillIds: ['athletics'],
+      }),
+    ).toBe('Athletics proficiency')
+    expect(
+      formatSkillProficiencyGrantCompact({
+        kind: 'fixed',
+        skillIds: ['athletics', 'stealth'],
+      }),
+    ).toBe('Athletics, Stealth proficiencies')
+
+    expect(
+      formatToolProficiencyGrantCompact({ kind: 'fixed', toolSlugs: ['thieves-tools'] }, (slug) =>
+        slug === 'thieves-tools' ? "Thieves' Tools" : undefined,
+      ),
+    ).toBe("Thieves' Tools proficiency")
+    expect(
+      formatToolProficiencyGrantCompact({ kind: 'fixed', toolSlugs: ['lute', 'flute'] }, (slug) =>
+        slug === 'lute' ? 'Lute' : slug === 'flute' ? 'Flute' : undefined,
+      ),
+    ).toBe('Lute, Flute proficiencies')
+
+    expect(
+      formatWeaponProficiencyGrantCompact({
+        kind: 'fixed',
+        weaponCategories: ['simple'],
+      }),
+    ).toBe('Simple weapons proficiency')
+    expect(
+      formatWeaponProficiencyGrantCompact({
+        kind: 'fixed',
+        weaponCategories: ['simple', 'martial'],
+      }),
+    ).toBe('Simple weapons, Martial weapons proficiencies')
+
+    expect(
+      formatArmorTrainingGrantCompact({
+        kind: 'fixed',
+        armorCategories: ['light'],
+      }),
+    ).toBe('Light armor training')
+    expect(
+      formatArmorTrainingGrantCompact({
+        kind: 'fixed',
+        armorCategories: ['light', 'medium'],
+      }),
+    ).toBe('Light armor, Medium armor training')
+  })
+
+  it('returns undefined for choice proficiency grants', () => {
+    expect(
+      formatSkillProficiencyGrantCompact({
+        kind: 'choice',
+        choose: 2,
+        pool: { source: 'any' },
+      }),
+    ).toBeUndefined()
   })
 })

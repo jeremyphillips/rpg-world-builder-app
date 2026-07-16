@@ -5,10 +5,13 @@ import {
   equipmentGrantSchema,
   equipmentPoolSchema,
   grantedEquipmentItemSchema,
+  formatEquipmentGrantCompact,
   formatEquipmentGrantSentence,
   formatEquipmentPoolLabel,
+  type EquipmentGrantCompactResolver,
 } from './equipment-grant'
 import { grantValidationMessages } from './grant-messages'
+import type { EquipmentKind } from '../equipment'
 
 describe('equipmentPoolSchema', () => {
   it('accepts an explicit slug list', () => {
@@ -156,11 +159,11 @@ describe('grantedEquipmentItemSchema', () => {
         equipmentSlug: 'quarterstaff',
         quantity: 1,
         equipped: false,
-        modifiers: [{ kind: 'spellcasting_focus', focusKind: 'druidic_focus' }],
+        modifiers: [{ kind: 'spellcasting_focus', spellcastingGearKind: 'druidic_focus' }],
       }),
     ).toMatchObject({
       kind: 'grant',
-      modifiers: [{ kind: 'spellcasting_focus', focusKind: 'druidic_focus' }],
+      modifiers: [{ kind: 'spellcasting_focus', spellcastingGearKind: 'druidic_focus' }],
     })
   })
 })
@@ -506,5 +509,105 @@ describe('formatEquipmentGrantSentence', () => {
 
   it('returns an empty string for incomplete granted items', () => {
     expect(formatEquipmentGrantSentence({ kind: 'grant', equipmentSlug: '', quantity: 1 })).toBe('')
+  })
+
+  it('returns an empty string for filtered pool choices missing equipment kind', () => {
+    expect(
+      formatEquipmentGrantSentence({
+        kind: 'choice',
+        choose: 1,
+        pool: { source: 'filtered', equipmentKind: undefined as unknown as 'tool' },
+      }),
+    ).toBe('')
+  })
+})
+
+describe('formatEquipmentGrantCompact', () => {
+  const resolveCatalogEquipment = (slug: string) =>
+    ({
+      rope: { name: 'Rope', kind: 'adventuring_gear' },
+      camel: { name: 'Camel', kind: 'mount' },
+      wagon: { name: 'Wagon', kind: 'vehicle' },
+      'potion-of-healing': { name: 'Potion of Healing', kind: 'magic_item' },
+      messenger: { name: 'Messenger', kind: 'service' },
+      'skilled-hireling': { name: 'Skilled Hireling', kind: 'service' },
+    })[slug]
+
+  const resolver: EquipmentGrantCompactResolver = {
+    resolveEquipmentName: (slug) => resolveCatalogEquipment(slug)?.name,
+    resolveEquipmentKind: (slug) =>
+      resolveCatalogEquipment(slug)?.kind as EquipmentKind | undefined,
+  }
+
+  it('uses resolved names for gear, mounts, vehicles, and magic items', () => {
+    expect(
+      formatEquipmentGrantCompact({ kind: 'grant', equipmentSlug: 'rope', quantity: 1 }, resolver),
+    ).toBe('Rope')
+    expect(
+      formatEquipmentGrantCompact({ kind: 'grant', equipmentSlug: 'camel', quantity: 1 }, resolver),
+    ).toBe('Camel')
+    expect(
+      formatEquipmentGrantCompact({ kind: 'grant', equipmentSlug: 'wagon', quantity: 1 }, resolver),
+    ).toBe('Wagon')
+    expect(
+      formatEquipmentGrantCompact(
+        { kind: 'grant', equipmentSlug: 'potion-of-healing', quantity: 1 },
+        resolver,
+      ),
+    ).toBe('Potion of Healing')
+  })
+
+  it('appends service suffixes for service equipment', () => {
+    expect(
+      formatEquipmentGrantCompact(
+        { kind: 'grant', equipmentSlug: 'messenger', quantity: 1 },
+        resolver,
+      ),
+    ).toBe('Messenger service')
+    expect(
+      formatEquipmentGrantCompact(
+        {
+          kind: 'choice',
+          choose: 1,
+          pool: {
+            source: 'explicit',
+            equipmentSlugs: ['messenger', 'skilled-hireling'],
+          },
+        },
+        resolver,
+      ),
+    ).toBe('Messenger, Skilled Hireling services')
+  })
+
+  it('uses pool labels for filtered equipment choices', () => {
+    expect(
+      formatEquipmentGrantCompact({
+        kind: 'choice',
+        choose: 1,
+        pool: { source: 'filtered', equipmentKind: 'mount' },
+      }),
+    ).toBe('Mount')
+    expect(
+      formatEquipmentGrantCompact({
+        kind: 'choice',
+        choose: 2,
+        pool: {
+          source: 'filtered',
+          equipmentKind: 'magic_item',
+          magicItemCategory: 'wondrous_item',
+        },
+      }),
+    ).toBe('Wondrous Item')
+    expect(
+      formatEquipmentGrantCompact({
+        kind: 'choice',
+        choose: 1,
+        pool: {
+          source: 'filtered',
+          equipmentKind: 'service',
+          serviceCategory: 'lodging',
+        },
+      }),
+    ).toBe('Lodging service')
   })
 })

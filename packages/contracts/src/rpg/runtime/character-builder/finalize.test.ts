@@ -11,7 +11,9 @@ import {
   wizardClass,
   wizardLevelOneSpells,
 } from './spellcasting-test-fixtures'
-import { resolveAvailableChoices } from './resolvers/resolve-choices'
+import { resolveAvailableChoices } from './resolvers/registry/resolve-choices'
+import { resolveLanguageChoiceSets } from './resolvers/ruleset/resolve-language-choice-sets'
+import { ORIGIN_LANGUAGES_CHOICE_ID } from '../../content/character-creation-proficiencies'
 
 function makeCompleteDraft(overrides: Partial<CharacterBuilderDraft> = {}): CharacterBuilderDraft {
   return {
@@ -107,6 +109,54 @@ describe('finalizeCharacterBuild', () => {
     ])
   })
 
+  it('assembles language proficiencies under proficiencies.languages', () => {
+    const originChoiceSetId = `ruleset:srd-cc-5.2.1:${ORIGIN_LANGUAGES_CHOICE_ID}`
+    const draft = makeCompleteDraft({
+      choiceSelections: {
+        [originChoiceSetId]: ['elvish', 'dwarvish'],
+      },
+    })
+    const choiceSets = resolveLanguageChoiceSets(makeCompleteDraft(), builderTestContext)
+
+    const input = finalizeCharacterBuild(draft, builderTestContext, {
+      resolvedChoiceSets: choiceSets,
+    })
+
+    expect(input.proficiencies.languages).toEqual([
+      {
+        language: 'common',
+        sources: [
+          {
+            kind: 'characterCreation',
+            sourceId: 'srd-cc-5.2.1',
+            grantId: 'language-grants',
+          },
+        ],
+      },
+      {
+        language: 'elvish',
+        sources: [
+          {
+            kind: 'characterCreation',
+            sourceId: 'srd-cc-5.2.1',
+            grantId: originChoiceSetId,
+          },
+        ],
+      },
+      {
+        language: 'dwarvish',
+        sources: [
+          {
+            kind: 'characterCreation',
+            sourceId: 'srd-cc-5.2.1',
+            grantId: originChoiceSetId,
+          },
+        ],
+      },
+    ])
+    expect((input as Record<string, unknown>)['languages']).toBeUndefined()
+  })
+
   it('throws CharacterBuildFinalizationError when validation fails', () => {
     expect(() =>
       finalizeCharacterBuild(createEmptyCharacterBuilderDraft(), builderTestContext),
@@ -179,6 +229,99 @@ describe('finalizeCharacterBuild', () => {
       vehicles: [],
       mounts: [],
     })
+  })
+
+  it('assembles equipment entries and remaining wealth from the draft equipment section', () => {
+    const rope = {
+      id: 'srd-cc-5.2.1:rope',
+      slug: 'rope',
+      rulesetId: 'srd-cc-5.2.1' as const,
+      source: 'system' as const,
+      campaignId: null,
+      createdAt: '2026-01-01T00:00:00.000Z',
+      updatedAt: '2026-01-01T00:00:00.000Z',
+      name: 'Rope',
+      description: '',
+      cost: { amount: 2, currency: 'gp' as const },
+      weight: { value: 5, unit: 'lb' as const },
+      kind: 'adventuring_gear' as const,
+      gearKind: 'general' as const,
+    }
+
+    const storedFighterWithEquipment = {
+      ...builderTestContext.catalog.classes[0]!,
+      characterCreation: {
+        proficiencies: {
+          skills: {
+            choices: [{ id: 'class-skills', choose: 1, from: ['athletics'] }],
+          },
+        },
+        startingEquipment: {
+          choose: 1,
+          options: [
+            {
+              id: 'pack-a',
+              label: 'Pack A',
+              items: [],
+              wealth: { gp: 10 },
+            },
+          ],
+        },
+      },
+    }
+
+    const context = {
+      ...builderTestContext,
+      catalog: {
+        ...builderTestContext.catalog,
+        classes: [storedFighterWithEquipment],
+        equipment: [...builderTestContext.catalog.equipment, rope],
+      },
+    }
+
+    const input = finalizeCharacterBuild(
+      makeCompleteDraft({
+        class: { classId: storedFighterWithEquipment.id, level: 1 },
+        choiceSelections: {
+          'class:srd-cc-5.2.1:fighter:starting-equipment': ['pack-a'],
+        },
+        equipment: {
+          mode: 'package',
+          purchases: [
+            { equipmentId: rope.id, quantity: 1, sourceMode: 'startingGold', origin: 'picker' },
+          ],
+          removedPackageItemKeys: [],
+          customized: true,
+        },
+      }),
+      context,
+      {
+        resolvedChoiceSets: [
+          {
+            id: 'class:srd-cc-5.2.1:fighter:starting-equipment',
+            sourceType: 'class',
+            sourceId: 'srd-cc-5.2.1:fighter',
+            choiceType: 'equipment',
+            label: 'Choose Starting Equipment',
+            min: 1,
+            max: 1,
+            options: [{ id: 'pack-a', label: 'Pack A' }],
+            required: true,
+          },
+        ],
+      },
+    )
+
+    expect(input.wealth).toEqual({ cp: 0, sp: 0, gp: 8, pp: 0 })
+    expect(input.equipment.gear).toEqual([
+      {
+        equipmentId: rope.id,
+        quantity: 1,
+        sources: [
+          { kind: 'startingGold', sourceId: storedFighterWithEquipment.id, grantId: 'pack-a' },
+        ],
+      },
+    ])
   })
 
   it('assembles class spellcasting with classSpellcasting provenance', () => {

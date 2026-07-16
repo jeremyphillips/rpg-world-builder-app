@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 import { expectRichTextHtml } from '../lib/expect-rich-text-html'
 import type { ContentTrait } from '@rpg/contracts'
 import { normalizeGrantGroups, resolveTraitDisplay } from '@rpg/contracts'
+import { listLanguageSeedOptions } from '../vocabulary'
 import { loadSeedSpecies, seedSpeciesSlugs } from './index'
 
 const RULESET = 'srd-cc-5.2.1' as const
@@ -115,9 +116,8 @@ describe('SRD 5.2.1 species seed', () => {
     expect(speedGrant).toEqual({
       kind: 'movement',
       mode: 'walk',
-      operation: 'bonus',
-      value: 5,
-      unit: 'ft',
+      operation: 'increase',
+      feet: 5,
     })
   })
 
@@ -159,7 +159,7 @@ describe('SRD 5.2.1 species seed', () => {
 
   it('Goliath has speed 35', () => {
     const goliath = species.find((s) => s.slug === 'goliath')!
-    expect(goliath.speed.walk).toBe(35)
+    expect(goliath.movement.walk).toBe(35)
   })
 
   it('Dwarf grants poison resistance', () => {
@@ -168,6 +168,38 @@ describe('SRD 5.2.1 species seed', () => {
     const defaultGrants = resilience.grantGroups?.[0]?.grants ?? []
     const resistGrant = defaultGrants.find((g) => g.kind === 'resistances')
     expect(resistGrant?.kind === 'resistances' && resistGrant.damageTypes).toContain('poison')
+  })
+
+  it('languageAffinities reference valid seed language ids', () => {
+    const languageIds = new Set(listLanguageSeedOptions(RULESET).map((language) => language.id))
+
+    for (const entry of species) {
+      if (!entry.languageAffinities) continue
+      expect(entry.languageAffinities.length).toBeGreaterThan(0)
+      for (const id of entry.languageAffinities) {
+        expect(languageIds.has(id)).toBe(true)
+      }
+    }
+  })
+
+  it('seeds languageAffinities on ancestral species and omits them elsewhere', () => {
+    const withAffinities = new Map(
+      species
+        .filter((entry) => entry.languageAffinities)
+        .map((entry) => [entry.slug, entry.languageAffinities!]),
+    )
+
+    expect(withAffinities.get('dragonborn')).toEqual(['draconic'])
+    expect(withAffinities.get('dwarf')).toEqual(['dwarvish'])
+    expect(withAffinities.get('elf')).toEqual(['elvish'])
+    expect(withAffinities.get('gnome')).toEqual(['gnomish'])
+    expect(withAffinities.get('goliath')).toEqual(['giant'])
+    expect(withAffinities.get('halfling')).toEqual(['halfling'])
+    expect(withAffinities.size).toBe(6)
+
+    for (const slug of ['human', 'orc', 'tiefling'] as const) {
+      expect(species.find((entry) => entry.slug === slug)?.languageAffinities).toBeUndefined()
+    }
   })
 
   it('stores non-empty descriptions as rich-text HTML', () => {

@@ -39,7 +39,7 @@ describe('createHomebrewContent (equipment)', () => {
     category: 'martial' as const,
     mode: 'melee' as const,
     cost: { amount: 25, currency: 'gp' as const },
-    damage: { kind: 'dice' as const, count: 1, faces: 8 },
+    damage: { dice: { count: 1, faces: 8 } },
     damageType: 'slashing' as const,
     properties: [] as const,
     mastery: 'sap' as const,
@@ -101,7 +101,7 @@ describe('createHomebrewContent (equipment)', () => {
     expect(created.kind).toBe('weapon')
     expect(created.slug).toBe('custom-blade')
     if (!isWeaponEquipment(created)) throw new Error('expected weapon')
-    expect(created.damage).toEqual({ kind: 'dice', count: 1, faces: 8 })
+    expect(created.damage).toEqual({ dice: { count: 1, faces: 8 } })
   })
 
   it('creates homebrew tool with utilizes and crafts', async () => {
@@ -326,7 +326,9 @@ describe('createHomebrewContent (classes)', () => {
     const rogue = (await resolveClassesForCampaign(campaign.id)).find(
       (cls) => cls.slug === 'rogue',
     )!
-    const rogueChoice = rogue.characterCreation?.proficiencies?.skills?.choices?.[0]!
+    const rogueChoice = rogue.characterCreation?.proficiencies?.skills?.choices?.[0]
+    expect(rogueChoice).toBeDefined()
+    if (!rogueChoice) throw new Error('expected rogue skill choice')
 
     await updateContentEntity(classWriteConfig, campaign.id, rogue.id, {
       characterCreation: {
@@ -482,7 +484,7 @@ describe('createHomebrewContent (species)', () => {
     name: 'Custom Folk',
     creatureType: 'humanoid',
     sizes: ['medium'],
-    speed: { walk: 30 },
+    movement: { walk: 30 },
     traits: [],
   }
 

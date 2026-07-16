@@ -3,7 +3,7 @@ import { isStandardArrayAssignment, STANDARD_ARRAY } from './ability-generation'
 import { areRequiredChoiceSetsSatisfied } from './choice-set'
 import type { ChoiceSet, ChoiceType } from './choice-set'
 import type { CharacterBuilderDraft } from './draft'
-import type { CharacterBuilderStepId } from './step-ids'
+import { CHARACTER_BUILDER_STEP_IDS, type CharacterBuilderStepId } from './step-ids'
 
 // ---------------------------------------------------------------------------
 // BuilderStepStatus — the computed display state of a wizard step.
@@ -36,48 +36,60 @@ export type BuilderStep = {
   description: string
 }
 
-export const BUILDER_STEPS: readonly BuilderStep[] = [
-  {
-    id: 'identity',
+type BuilderStepMeta = {
+  readonly label: string
+  readonly description: string
+  /**
+   * When true, the step stays `deferred` until resolvers supply ChoiceSets.
+   * Species is excluded — primary species selection is always available in the shell.
+   */
+  readonly deferredUntilChoiceSetsResolved?: true
+}
+
+const BUILDER_STEP_METADATA = {
+  identity: {
     label: 'Identity',
     description: 'Name, appearance, and alignment',
   },
-  {
-    id: 'species',
+  species: {
     label: 'Species',
     description: "Choose your character's species and heritage",
   },
-  {
-    id: 'class',
+  class: {
     label: 'Class',
     description: "Choose your character's class",
   },
-  {
-    id: 'abilities',
+  abilities: {
     label: 'Abilities',
     description: 'Assign your six ability scores',
   },
-  {
-    id: 'proficiencies',
+  proficiencies: {
     label: 'Proficiencies',
     description: 'Choose skill and other proficiencies',
+    deferredUntilChoiceSetsResolved: true,
   },
-  {
-    id: 'equipment',
+  equipment: {
     label: 'Equipment',
     description: 'Choose your starting equipment',
+    deferredUntilChoiceSetsResolved: true,
   },
-  {
-    id: 'spells',
+  spells: {
     label: 'Spells',
     description: 'Choose your starting spells',
+    deferredUntilChoiceSetsResolved: true,
   },
-  {
-    id: 'review',
+  review: {
     label: 'Review',
     description: 'Review and finalize your character',
   },
-]
+} as const satisfies Record<CharacterBuilderStepId, BuilderStepMeta>
+
+/** Ordered wizard steps — ids and order come from {@link CHARACTER_BUILDER_STEP_IDS}. */
+export const BUILDER_STEPS: readonly BuilderStep[] = CHARACTER_BUILDER_STEP_IDS.map((id) => ({
+  id,
+  label: BUILDER_STEP_METADATA[id].label,
+  description: BUILDER_STEP_METADATA[id].description,
+}))
 
 // ---------------------------------------------------------------------------
 // Step → ChoiceType mapping
@@ -118,15 +130,11 @@ function invertChoiceTypeStep(
 
 const STEP_CHOICE_TYPES = invertChoiceTypeStep(CHOICE_TYPE_STEP)
 
-/**
- * Choice steps that stay `deferred` until resolvers supply ChoiceSets.
- * Species is excluded — primary species selection is always available in the shell.
- */
-const DEFERRED_UNTIL_CHOICE_SETS_RESOLVED = new Set<CharacterBuilderStepId>([
-  'proficiencies',
-  'equipment',
-  'spells',
-])
+const DEFERRED_UNTIL_CHOICE_SETS_RESOLVED = new Set(
+  CHARACTER_BUILDER_STEP_IDS.filter(
+    (id) => 'deferredUntilChoiceSetsResolved' in BUILDER_STEP_METADATA[id],
+  ),
+)
 
 /** Inverted index of {@link CHOICE_TYPE_STEP} — choice types grouped by step id. */
 export const STEP_CHOICE_TYPES_BY_STEP = STEP_CHOICE_TYPES
@@ -232,7 +240,8 @@ const STEP_COMPLETION_CHECKS: Record<
   abilities: (draft, _stepChoiceSets, _resolvedChoiceSets, standardArray) =>
     isAbilitiesComplete(draft, standardArray),
   proficiencies: (draft, stepChoiceSets) => isChoiceStepComplete(draft, stepChoiceSets),
-  equipment: (draft, stepChoiceSets) => isChoiceStepComplete(draft, stepChoiceSets),
+  equipment: (draft, stepChoiceSets) =>
+    draft.equipment?.skipped === true || isChoiceStepComplete(draft, stepChoiceSets),
   spells: (draft, stepChoiceSets) => isChoiceStepComplete(draft, stepChoiceSets),
   review: (draft, _stepChoiceSets, resolvedChoiceSets) =>
     isReviewComplete(draft, resolvedChoiceSets),

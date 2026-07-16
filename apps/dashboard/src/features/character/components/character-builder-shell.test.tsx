@@ -4,8 +4,10 @@ import userEvent from '@testing-library/user-event'
 import { expectNoAxeViolations } from '@rpg/ui/test-utils'
 
 import {
+  characterBuilderValidationMessages,
   createEmptyCharacterBuilderDraft,
   createPersistedCharacterBuilderState,
+  formatFieldMessage,
   getCharacterBuilderStorageKey,
 } from '@rpg/contracts'
 
@@ -15,8 +17,18 @@ import {
   createStandaloneBuilderCatalogIndexFixture,
   createStandaloneBuilderContextFixture,
 } from '../lib/character-builder-fixtures'
+import { abilitiesFormCopy } from '../lib/steps/abilities-form-labels'
 import { resetCharacterBuilderStoreCache } from '../store/character-builder-store'
 import { CharacterBuilderShell } from './character-builder-shell.client'
+
+async function assignStrengthScore(score: number) {
+  await userEvent.click(
+    screen.getByRole('button', {
+      name: new RegExp(`${abilitiesFormCopy.chooseScore} for Strength`, 'i'),
+    }),
+  )
+  await userEvent.click(screen.getByRole('menuitem', { name: String(score) }))
+}
 
 function installSessionStorageMock(): void {
   const storage = new Map<string, string>()
@@ -105,6 +117,29 @@ describe('CharacterBuilderShell', () => {
     expect(screen.getByDisplayValue('Steady')).toBeInTheDocument()
   })
 
+  it('shows validation alert and rail error when Continue fails on abilities', async () => {
+    const context = createStandaloneBuilderContextFixture()
+    const catalogIndex = createStandaloneBuilderCatalogIndexFixture(context)
+
+    renderWithProviders(<CharacterBuilderShell context={context} catalogIndex={catalogIndex} />)
+
+    await screen.findByRole('heading', { name: 'Identity' })
+    const stepRail = screen.getByRole('navigation', { name: 'Character builder steps' })
+    await userEvent.click(within(stepRail).getByRole('button', { name: /Abilities/i }))
+
+    await screen.findByRole('heading', { name: 'Abilities', level: 2 })
+    await userEvent.click(screen.getByRole('button', { name: 'Continue' }))
+
+    expect(screen.getByRole('alert')).toHaveTextContent('Assign a score to every ability.')
+    expect(screen.getByRole('alert')).toHaveTextContent(
+      formatFieldMessage(characterBuilderValidationMessages.stepIncomplete()),
+    )
+    expect(screen.getByRole('heading', { name: 'Abilities', level: 2 })).toBeInTheDocument()
+    expect(
+      within(stepRail).getByRole('button', { name: /Abilities, has blocking validation issues/i }),
+    ).toBeInTheDocument()
+  })
+
   it('keeps ability scores when navigating away via the step rail without submitting', async () => {
     const context = createStandaloneBuilderContextFixture()
     const catalogIndex = createStandaloneBuilderCatalogIndexFixture(context)
@@ -115,9 +150,7 @@ describe('CharacterBuilderShell', () => {
     const stepRail = screen.getByRole('navigation', { name: 'Character builder steps' })
     await userEvent.click(within(stepRail).getByRole('button', { name: /Abilities/i }))
 
-    const strengthSelect = await screen.findByRole('combobox', { name: /Strength score/i })
-    await userEvent.click(strengthSelect)
-    await userEvent.click(screen.getByRole('option', { name: '15' }))
+    await assignStrengthScore(15)
 
     await userEvent.click(within(stepRail).getByRole('button', { name: /Review/i }))
 
@@ -128,7 +161,35 @@ describe('CharacterBuilderShell', () => {
     await userEvent.click(within(stepRail).getByRole('button', { name: /Abilities/i }))
 
     await waitFor(() => {
-      expect(screen.getByRole('combobox', { name: /Strength score/i })).toHaveTextContent('15')
+      expect(screen.getByLabelText('Strength score 15')).toBeInTheDocument()
     })
+  })
+
+  it('clears the step alert and rail error when a failed step becomes valid', async () => {
+    const context = createStandaloneBuilderContextFixture()
+    const catalogIndex = createStandaloneBuilderCatalogIndexFixture(context)
+
+    renderWithProviders(<CharacterBuilderShell context={context} catalogIndex={catalogIndex} />)
+
+    await screen.findByRole('heading', { name: 'Identity' })
+    const stepRail = screen.getByRole('navigation', { name: 'Character builder steps' })
+
+    await userEvent.click(screen.getByRole('button', { name: 'Continue' }))
+
+    expect(screen.getByRole('alert')).toHaveTextContent(
+      formatFieldMessage(characterBuilderValidationMessages.nameRequired()),
+    )
+    expect(
+      within(stepRail).getByRole('button', { name: /Identity, has blocking validation issues/i }),
+    ).toBeInTheDocument()
+
+    await userEvent.type(screen.getByLabelText(/Character name/i), 'Verna')
+
+    await waitFor(() => {
+      expect(screen.queryByRole('alert')).not.toBeInTheDocument()
+    })
+    expect(
+      within(stepRail).queryByRole('button', { name: /Identity, has blocking validation issues/i }),
+    ).not.toBeInTheDocument()
   })
 })

@@ -7,7 +7,7 @@ import {
   creatureSavingThrowModifierEntrySchema,
   creatureSensesSchema,
   creatureSkillModifierEntrySchema,
-  creatureSpeedSchema,
+  creatureMovementSchema,
   creatureStatBlockHitPointsSchema,
 } from './creature'
 
@@ -63,15 +63,15 @@ describe('creature hit point schemas', () => {
 })
 
 describe('creature movement and senses', () => {
-  it('uses existing creature speed and sense vocabulary', () => {
+  it('uses existing creature movement and sense vocabulary', () => {
     expect(
-      creatureSpeedSchema.parse({
+      creatureMovementSchema.parse({
         walk: 30,
-        modes: [{ mode: 'fly', feet: 60 }],
+        fly: 60,
       }),
     ).toEqual({
       walk: 30,
-      modes: [{ mode: 'fly', feet: 60 }],
+      fly: 60,
     })
 
     expect(creatureSensesSchema.parse([{ type: 'darkvision', range: 60 }])).toEqual([

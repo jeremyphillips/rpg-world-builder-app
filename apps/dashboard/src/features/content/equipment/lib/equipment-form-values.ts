@@ -87,14 +87,16 @@ function legacyKindFormValues(entity: Equipment): Partial<EquipmentFormValues> {
   }
   if (legacyKind === 'focus') {
     const focusType = (legacy as { focusType?: string }).focusType
+    const spellcastingGearKind =
+      focusType === 'holy'
+        ? 'holy_symbol'
+        : focusType === 'druidic'
+          ? 'druidic_focus'
+          : 'arcane_focus'
     return {
       kind: 'adventuring_gear',
-      gearKind:
-        focusType === 'holy'
-          ? 'holy_symbol'
-          : focusType === 'druidic'
-            ? 'druidic_focus'
-            : 'arcane_focus',
+      gearKind: 'spellcasting',
+      spellcastingGearKind,
     }
   }
   if (legacyKind === 'ship') {

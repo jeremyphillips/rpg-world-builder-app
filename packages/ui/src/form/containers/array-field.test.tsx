@@ -717,7 +717,7 @@ describe('ArrayFieldRenderer', () => {
 
     expect(item).toContainElement(actionsRail)
     expect(actionsRail).toContainElement(removeButton)
-    expect(actionsRail).toHaveClass('self-start', 'mt-1', 'mr-1')
+    expect(actionsRail).toHaveClass('self-start', 'mt-1')
   })
 
   it('lays out compact inline rows on a dedicated grid with embedded actions', async () => {

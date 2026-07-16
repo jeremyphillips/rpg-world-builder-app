@@ -4,13 +4,10 @@ import {
   type SystemRulesetId,
 } from '@rpg/contracts'
 import { getStandardStartingWealthRules } from '@rpg/catalog/starting-wealth'
+import { listLanguageSeedOptions } from '@rpg/catalog/vocabulary'
 
 import { HttpError } from '../../lib/http-error'
-import {
-  getContentTypeConfig,
-  isContentTypeName,
-  type ContentTypeName,
-} from '../content/content-types'
+import { getContentTypeConfig, isContentTypeName, type ContentTypeName } from '../content'
 import { resolveStoredMechanicsPatch } from '../vocabulary/ruleset-patch/mechanics-patch.service'
 
 export function assertSupportedRulesetId(rulesetId: string): asserts rulesetId is SystemRulesetId {
@@ -27,6 +24,10 @@ export function listSystemContentForRuleset(type: ContentTypeName, rulesetId: Sy
 
 export function isRulesetContentType(type: string): type is ContentTypeName {
   return isContentTypeName(type)
+}
+
+export function listRulesetLanguageOptions(rulesetId: SystemRulesetId) {
+  return [...listLanguageSeedOptions(rulesetId)]
 }
 
 /** Resolved rules for an unpatched campaign — standalone builder bootstrap. */

@@ -19,13 +19,21 @@ type Story = StoryObj<typeof CharacterBuilderFooter>
 export const IdentityStep: Story = {
   args: {
     currentStepId: 'identity',
-    continueFormId: 'identity-form',
   },
 }
 
 export const ReviewStep: Story = {
   args: {
     currentStepId: 'review',
+    canCreateCharacter: true,
+    isCreating: false,
+  },
+}
+
+export const ReviewStepBlocked: Story = {
+  args: {
+    currentStepId: 'review',
+    canCreateCharacter: false,
     isCreating: false,
   },
 }
@@ -33,6 +41,7 @@ export const ReviewStep: Story = {
 export const Creating: Story = {
   args: {
     currentStepId: 'review',
+    canCreateCharacter: true,
     isCreating: true,
   },
 }

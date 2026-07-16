@@ -1,6 +1,11 @@
 import { z } from 'zod'
 
+import { coinWealthSchema, type CoinWealth } from '../../primitives/wealth'
+import type { ArmorEquipment, Equipment } from '../../content/equipment'
+import { isArmorEquipment } from '../../content/equipment'
+import type { CharacterWealthGrant } from '../../content/lib/wealth-grant'
 import { equipmentModifierSchema } from '../../content/equipment/modifier'
+import type { CreatureEquipmentCatalog } from '../creature/equipment'
 import { characterSelectionSourcesSchema } from './selection-sources'
 
 // ---------------------------------------------------------------------------
@@ -34,14 +39,67 @@ export const characterEquipmentSchema = z.object({
 
 export type CharacterEquipment = z.infer<typeof characterEquipmentSchema>
 
-export const characterWealthSchema = z.object({
-  cp: z.number().int().min(0).default(0),
-  sp: z.number().int().min(0).default(0),
-  gp: z.number().int().min(0).default(0),
-  pp: z.number().int().min(0).default(0),
-})
+export const EMPTY_CHARACTER_EQUIPMENT: CharacterEquipment = {
+  weapons: [],
+  armor: [],
+  tools: [],
+  gear: [],
+  magicItems: [],
+  vehicles: [],
+  mounts: [],
+}
 
-export type CharacterWealth = z.infer<typeof characterWealthSchema>
+type EquipmentInventoryBucket = keyof CharacterEquipment
+
+const EQUIPMENT_KIND_TO_BUCKET = {
+  weapon: 'weapons',
+  armor: 'armor',
+  tool: 'tools',
+  adventuring_gear: 'gear',
+  magic_item: 'magicItems',
+  vehicle: 'vehicles',
+  mount: 'mounts',
+  service: 'gear',
+} as const satisfies Record<Equipment['kind'], EquipmentInventoryBucket>
+
+/** Appends an equipment entry to the inventory bucket matching the catalog row kind. */
+export function appendEquipmentEntry(
+  inventory: CharacterEquipment,
+  equipment: Equipment,
+  entry: CharacterEquipmentEntry,
+): CharacterEquipment {
+  const bucket = EQUIPMENT_KIND_TO_BUCKET[equipment.kind]
+  return {
+    ...inventory,
+    [bucket]: [...inventory[bucket], entry],
+  }
+}
+
+/** Maps a wealth grant to the stored character wealth shape. */
+export function characterWealthFromGrant(grant: CharacterWealthGrant | undefined): CharacterWealth {
+  return {
+    cp: grant?.cp ?? 0,
+    sp: grant?.sp ?? 0,
+    gp: grant?.gp ?? 0,
+    pp: grant?.pp ?? 0,
+  }
+}
+
+/** Returns equipped armor catalog rows referenced by the character inventory. */
+export function resolveEquippedArmorFromInventory(args: {
+  equipment: CharacterEquipment
+  catalog: CreatureEquipmentCatalog
+}): ArmorEquipment[] {
+  return args.equipment.armor.flatMap((entry) => {
+    if (!entry.equipped) return []
+    const item = args.catalog.get(entry.equipmentId)
+    return item && isArmorEquipment(item) ? [item] : []
+  })
+}
+
+export const characterWealthSchema = coinWealthSchema
+
+export type CharacterWealth = CoinWealth
 
 export const characterFeatEntrySchema = z.object({
   featId: z.string().min(1),

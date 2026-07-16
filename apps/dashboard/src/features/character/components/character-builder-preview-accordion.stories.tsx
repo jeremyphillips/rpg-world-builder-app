@@ -4,6 +4,7 @@ import {
   buildCharacterPreview,
   createEmptyCharacterBuilderDraft,
   indexCharacterBuildCatalog,
+  resolveAvailableChoices,
 } from '@rpg/contracts'
 
 import { createPopulatedStandaloneBuilderContextFixture } from '../lib/character-builder-fixtures'
@@ -23,7 +24,14 @@ export default meta
 type Story = StoryObj<typeof CharacterBuilderPreviewAccordion>
 
 function renderAccordionStory(draft = createEmptyCharacterBuilderDraft()) {
-  const preview = buildCharacterPreview(draft, catalogIndex, context.characterCreationRules)
+  const resolvedChoiceSets = resolveAvailableChoices(draft, context)
+  const preview = buildCharacterPreview(
+    draft,
+    catalogIndex,
+    context.characterCreationRules,
+    context.rulesetId,
+    { resolvedChoiceSets },
+  )
   const narrative = draft.identity.narrative
   const characterClass = draft.class.classId
     ? catalogIndex.classes.get(draft.class.classId)
@@ -33,11 +41,11 @@ function renderAccordionStory(draft = createEmptyCharacterBuilderDraft()) {
     <div className="max-w-xs rounded-lg border border-border bg-muted/20 p-2">
       <CharacterBuilderPreviewAccordion
         preview={preview}
+        catalogIndex={catalogIndex}
+        draft={draft}
+        resolvedChoiceSets={resolvedChoiceSets}
         narrative={narrative}
         narrativeCount={narrativeFieldCount(narrative)}
-        skillChoiceCount={
-          characterClass?.characterCreation?.proficiencies?.skills?.choices?.[0]?.choose
-        }
         hasCharacterClass={characterClass !== undefined}
         spellcastingActive={false}
       />

@@ -38,4 +38,12 @@ export const equipmentVariantValidationMessages = {
     'validation.equipmentVariant.alsoWeaponSlugForbidden',
     () => 'Linked weapon slugs only apply to arcane or druidic foci.',
   ),
+  spellcastingGearKindRequired: defineMessage(
+    'validation.equipmentVariant.spellcastingGearKindRequired',
+    () => 'Spellcasting gear needs a spellcasting kind.',
+  ),
+  spellcastingGearKindForbidden: defineMessage(
+    'validation.equipmentVariant.spellcastingGearKindForbidden',
+    () => 'Spellcasting kind only applies when gear kind is Spellcasting.',
+  ),
 }

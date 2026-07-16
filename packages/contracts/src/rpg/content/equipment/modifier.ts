@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-import { type GearKind } from '../../vocab/equipment/gear-kind'
+import { spellcastingFocusGearKindSchema } from '../../vocab/equipment/spellcasting-gear-kind'
 
 // ---------------------------------------------------------------------------
 // Equipment modifiers — per-copy overlays on catalog items (spellcasting focus,
@@ -14,20 +14,16 @@ export const equipmentModifierKindSchema = z.enum(EQUIPMENT_MODIFIER_KINDS)
 
 export type EquipmentModifierKind = z.infer<typeof equipmentModifierKindSchema>
 
-export const SPELLCASTING_FOCUS_GEAR_KINDS = [
-  'arcane_focus',
-  'druidic_focus',
-  'holy_symbol',
-] as const satisfies readonly GearKind[]
-
-export type SpellcastingFocusGearKind = (typeof SPELLCASTING_FOCUS_GEAR_KINDS)[number]
-
-export const spellcastingFocusGearKindSchema = z.enum(SPELLCASTING_FOCUS_GEAR_KINDS)
+export {
+  SPELLCASTING_FOCUS_GEAR_KINDS,
+  spellcastingFocusGearKindSchema,
+  type SpellcastingFocusGearKind,
+} from '../../vocab/equipment/spellcasting-gear-kind'
 
 export const spellcastingFocusModifierSchema = z
   .object({
     kind: z.literal('spellcasting_focus'),
-    focusKind: spellcastingFocusGearKindSchema,
+    spellcastingGearKind: spellcastingFocusGearKindSchema,
   })
   .strict()
 
@@ -38,8 +34,3 @@ export const equipmentModifierSchema = z.discriminatedUnion('kind', [
 ])
 
 export type EquipmentModifier = z.infer<typeof equipmentModifierSchema>
-
-/** Validates that a gear kind is a valid spellcasting focus modifier target. */
-export function isSpellcastingFocusGearKind(kind: GearKind): kind is SpellcastingFocusGearKind {
-  return (SPELLCASTING_FOCUS_GEAR_KINDS as readonly string[]).includes(kind)
-}

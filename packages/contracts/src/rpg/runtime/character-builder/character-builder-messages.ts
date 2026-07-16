@@ -81,8 +81,108 @@ export const characterBuilderValidationMessages = {
         ? `${spellLabel} is not a level 1 spell.`
         : `${spellLabel} is above the highest spell level you can select.`,
   ),
+  proficiencyNoLongerAvailable: defineMessage<{ proficiencyLabel: string }>(
+    'validation.characterBuilder.proficiencyNoLongerAvailable',
+    ({ proficiencyLabel }) => `${proficiencyLabel} is no longer available.`,
+  ),
+  speciesRequiredForLanguageRecommendations: defineMessage(
+    'validation.characterBuilder.speciesRequiredForLanguageRecommendations',
+    () => 'Choose a species to see recommended languages for your ancestry.',
+  ),
   finalizationFailed: defineMessage(
     'validation.characterBuilder.finalizationFailed',
     () => 'Fix the highlighted issues before creating your character.',
+  ),
+}
+
+// ---------------------------------------------------------------------------
+// Builder step readiness messages — empty/default/blocked copy for advanced
+// steps (Equipment, Spells, Proficiencies). Distinct from validation messages.
+// ---------------------------------------------------------------------------
+
+export const characterBuilderStepReadinessMessages = {
+  equipmentBlockedNoClass: defineMessage(
+    'validation.characterBuilder.readiness.equipmentBlockedNoClass',
+    () => 'Choose a class to see equipment options.',
+  ),
+  equipmentNoOptions: defineMessage(
+    'validation.characterBuilder.readiness.equipmentNoOptions',
+    () => 'No starting equipment options are available for this class.',
+  ),
+  equipmentReviewComplete: defineMessage(
+    'validation.characterBuilder.readiness.equipmentReviewComplete',
+    () => 'Review your starting equipment.',
+  ),
+  equipmentContinuingWithout: defineMessage(
+    'validation.characterBuilder.readiness.equipmentContinuingWithout',
+    () => 'Continuing without starting equipment.',
+  ),
+  equipmentPendingProficiencyLinked: defineMessage(
+    'validation.characterBuilder.readiness.equipmentPendingProficiencyLinked',
+    () => 'Complete Tool Proficiencies to resolve your included tool.',
+  ),
+  equipmentPendingIncludedTool: defineMessage(
+    'validation.characterBuilder.readiness.equipmentPendingIncludedTool',
+    () =>
+      'Choose the tool included with this equipment package. This selection also completes your Tool Proficiency choice.',
+  ),
+  spellsBlockedNoClass: defineMessage(
+    'validation.characterBuilder.readiness.spellsBlockedNoClass',
+    () => 'Choose a class to see spell options.',
+  ),
+  spellsNotApplicableNoSpellcasting: defineMessage<{ className: string }>(
+    'validation.characterBuilder.readiness.spellsNotApplicableNoSpellcasting',
+    ({ className }) => `${className} does not have spellcasting.`,
+  ),
+  spellsNotApplicableInactiveAtLevel: defineMessage<{ className: string; level: number }>(
+    'validation.characterBuilder.readiness.spellsNotApplicableInactiveAtLevel',
+    ({ className, level }) => `${className} does not have spellcasting at level ${level}.`,
+  ),
+  spellsReviewComplete: defineMessage(
+    'validation.characterBuilder.readiness.spellsReviewComplete',
+    () => 'Review your starting spells.',
+  ),
+  proficienciesBlockedNoClass: defineMessage(
+    'validation.characterBuilder.readiness.proficienciesBlockedNoClass',
+    () => 'Choose a class to see class proficiencies.',
+  ),
+  proficienciesBlockedNoClassHelper: defineMessage(
+    'validation.characterBuilder.readiness.proficienciesBlockedNoClassHelper',
+    () => 'Class selection determines saving throws, skill choices, armor, weapons, and tools.',
+  ),
+  proficienciesNoChoicesRequired: defineMessage(
+    'validation.characterBuilder.readiness.proficienciesNoChoicesRequired',
+    () => 'No proficiency choices are required for this character.',
+  ),
+  proficienciesReviewComplete: defineMessage(
+    'validation.characterBuilder.readiness.proficienciesReviewComplete',
+    () => 'Review your starting proficiencies.',
+  ),
+}
+
+export const characterBuilderProficiencyChoiceEmptyMessages = {
+  language: defineMessage(
+    'validation.characterBuilder.proficiencyChoiceEmpty.language',
+    () => 'No languages chosen yet.',
+  ),
+  skillProficiency: defineMessage(
+    'validation.characterBuilder.proficiencyChoiceEmpty.skillProficiency',
+    () => 'No skills chosen yet.',
+  ),
+  toolProficiency: defineMessage(
+    'validation.characterBuilder.proficiencyChoiceEmpty.toolProficiency',
+    () => 'No tools chosen yet.',
+  ),
+  weaponProficiency: defineMessage(
+    'validation.characterBuilder.proficiencyChoiceEmpty.weaponProficiency',
+    () => 'No weapons chosen yet.',
+  ),
+  armorTraining: defineMessage(
+    'validation.characterBuilder.proficiencyChoiceEmpty.armorTraining',
+    () => 'No armor chosen yet.',
+  ),
+  fallback: defineMessage(
+    'validation.characterBuilder.proficiencyChoiceEmpty.fallback',
+    () => 'No choices chosen yet.',
   ),
 }

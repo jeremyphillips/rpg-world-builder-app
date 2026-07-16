@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
+import { action } from 'storybook/actions'
 
 import { RadioCard } from './radio-card.client'
 
@@ -94,5 +95,150 @@ export const RadioOnRightTwoColumnGrid: Story = {
     className: 'grid-cols-1 sm:grid-cols-2',
     options: gridOptions,
     defaultValue: '5e',
+  },
+}
+
+const compactBuilderOptions = [
+  {
+    label: 'Dwarf',
+    value: 'dwarf',
+    description: 'Humanoid',
+    summaryItems: ['Darkvision', 'Dwarven Resilience', 'Forge Wise'],
+    onDetails: action('onDetails'),
+  },
+  {
+    label: 'Dragonborn',
+    value: 'dragonborn',
+    description: 'Humanoid',
+    onDetails: action('onDetails'),
+  },
+  {
+    label: 'Fighter',
+    value: 'fighter',
+    description: 'Strength · d10 Hit Die',
+  },
+]
+
+/** Builder species/class cards: compact density, inline summary, optional Details. */
+export const Compact: Story = {
+  args: {
+    'aria-label': 'Character builder option',
+    density: 'compact',
+    options: compactBuilderOptions,
+    defaultValue: 'dwarf',
+  },
+}
+
+/** Builder dependent-choice cards: stacked grant summaries. */
+export const DependentChoice: Story = {
+  args: {
+    'aria-label': 'Elven Lineage',
+    density: 'compact',
+    defaultValue: 'drow',
+    options: [
+      {
+        label: 'Drow',
+        value: 'drow',
+        summaryLines: [
+          'L1: Darkvision 120 ft · Dancing Lights cantrip',
+          'L3: Faerie Fire spell',
+          'L5: Darkness spell',
+        ],
+      },
+      {
+        label: 'High Elf',
+        value: 'high-elf',
+        summaryLines: [
+          'L1: Prestidigitation cantrip',
+          'L3: Detect Magic spell',
+          'L5: Misty Step spell',
+        ],
+      },
+    ],
+  },
+}
+
+/** Configuration-panel radio rows: lighter chrome than parent species cards. */
+export const RowVariant: Story = {
+  args: {
+    'aria-label': 'Elven Lineage',
+    variant: 'row',
+    density: 'compact',
+    defaultValue: 'drow',
+    options: [
+      {
+        label: 'Drow',
+        value: 'drow',
+        summaryLines: [
+          'L1: Darkvision 120 ft · Dancing Lights cantrip',
+          'L3: Faerie Fire spell',
+          'L5: Darkness spell',
+        ],
+      },
+      {
+        label: 'High Elf',
+        value: 'high-elf',
+        summaryLines: [
+          'L1: Prestidigitation cantrip',
+          'L3: Detect Magic spell',
+          'L5: Misty Step spell',
+        ],
+      },
+    ],
+  },
+}
+
+/** Parent species card with inline titleMeta. */
+export const ParentChoiceTitleMeta: Story = {
+  args: {
+    'aria-label': 'Species',
+    density: 'compact',
+    defaultValue: 'elf',
+    options: [
+      {
+        label: 'Elf',
+        value: 'elf',
+        description: 'Humanoid',
+        titleMeta: 'Heritage required',
+        summaryItems: ['Darkvision', 'Fey Ancestry', 'Keen Senses', 'Trance'],
+        onDetails: action('onDetails'),
+      },
+    ],
+  },
+}
+
+/** Selected parent card revealing a dependent-choice region inside the shell. */
+export const EmbeddedDependentChoice: Story = {
+  args: {
+    'aria-label': 'Species',
+    density: 'compact',
+    defaultValue: 'gnome',
+    options: [
+      {
+        label: 'Gnome',
+        value: 'gnome',
+        description: 'Humanoid',
+        titleMeta: 'Heritage required',
+        summaryItems: ['Darkvision', 'Gnomish Cunning'],
+        onDetails: action('onDetails'),
+        embeddedSlotTone: 'panel',
+        embeddedContent: (
+          <div className="space-y-2">
+            <div className="flex items-start justify-between gap-3">
+              <p className="text-sm font-semibold">Gnomish Lineage</p>
+              <p className="text-sm text-muted-foreground">Required</p>
+            </div>
+            <p className="text-sm text-muted-foreground">Choose one option.</p>
+          </div>
+        ),
+      },
+      {
+        label: 'Dwarf',
+        value: 'dwarf',
+        description: 'Humanoid',
+        summaryItems: ['Darkvision', 'Dwarven Resilience'],
+        onDetails: action('onDetails'),
+      },
+    ],
   },
 }

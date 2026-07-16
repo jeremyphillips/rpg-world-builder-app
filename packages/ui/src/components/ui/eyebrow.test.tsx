@@ -8,17 +8,35 @@ describe('Eyebrow', () => {
   it('defaults to sm size composite', () => {
     render(<Eyebrow>Campaign</Eyebrow>)
     const eyebrow = screen.getByText('Campaign')
-    expect(eyebrow).toHaveClass('eyebrow-style-sm')
+    expect(eyebrow).toHaveClass('eyebrow-style-sm', 'text-muted-foreground')
   })
 
   it('applies md size composite', () => {
     render(<Eyebrow size="md">Overview</Eyebrow>)
-    expect(screen.getByText('Overview')).toHaveClass('eyebrow-style-md')
+    expect(screen.getByText('Overview')).toHaveClass('eyebrow-style-md', 'text-muted-foreground')
   })
 
   it('applies xs size composite', () => {
     render(<Eyebrow size="xs">Spell</Eyebrow>)
-    expect(screen.getByText('Spell')).toHaveClass('eyebrow-style-xs')
+    expect(screen.getByText('Spell')).toHaveClass('eyebrow-style-xs', 'text-muted-foreground')
+  })
+
+  it('applies foreground tone', () => {
+    render(
+      <Eyebrow size="xs" tone="foreground">
+        Recommended
+      </Eyebrow>,
+    )
+    expect(screen.getByText('Recommended')).toHaveClass('eyebrow-style-xs', 'text-foreground')
+  })
+
+  it('applies primary tone', () => {
+    render(
+      <Eyebrow size="sm" tone="primary">
+        Featured
+      </Eyebrow>,
+    )
+    expect(screen.getByText('Featured')).toHaveClass('eyebrow-style-sm', 'text-primary')
   })
 
   it('merges custom className', () => {

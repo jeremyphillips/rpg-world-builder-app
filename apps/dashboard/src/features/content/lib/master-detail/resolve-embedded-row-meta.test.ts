@@ -20,8 +20,8 @@ describe('resolveEmbeddedRowMeta', () => {
       { code: 'subclasses-disabled', settingId: 'characterCreation.subclasses.enabled' },
     ])
     expect(meta.badges).toEqual([
-      { label: 'System', variant: 'secondary' },
-      { label: 'Inactive', variant: 'outline' },
+      { label: 'System', appearance: 'neutral', tone: 'neutral' },
+      { label: 'Inactive', appearance: 'outline', tone: 'caution' },
     ])
   })
 
@@ -37,6 +37,10 @@ describe('resolveEmbeddedRowMeta', () => {
       status: 'inactive',
       reasons: [{ code: 'not-available-in-campaign' }],
     })
-    expect(meta.badges.at(-1)).toEqual({ label: 'Inactive', variant: 'outline' })
+    expect(meta.badges.at(-1)).toEqual({
+      label: 'Inactive',
+      appearance: 'outline',
+      tone: 'caution',
+    })
   })
 })

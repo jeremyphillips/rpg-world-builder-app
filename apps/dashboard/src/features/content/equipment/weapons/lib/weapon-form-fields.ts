@@ -3,7 +3,6 @@ import {
   formatWeaponPropertyModeHint,
   isWeaponMasteryCompatibleWithMode,
   isWeaponPropertyCompatibleWithMode,
-  PHYSICAL_DAMAGE_TYPE_IDS,
   WEAPON_CATEGORIES,
   WEAPON_CATEGORY_ENTRIES,
   WEAPON_MASTERIES,
@@ -30,6 +29,8 @@ import {
   feetInputUnitField,
   SPELL_RANGE_DISTANCE_INLINE_COUNT_DIGITS,
 } from '../../../lib/forms/fields/content-identity-form-fields'
+import { weaponDamageFields } from '../../../lib/forms/mechanics/weapon-damage-fields'
+import type { ContentFormCtx } from '../../../lib/forms/content-form-registry'
 
 const weaponCategoryOptions = toOptions(
   WEAPON_CATEGORIES,
@@ -41,47 +42,14 @@ const weaponPropertyOptions = toOptions(
   WEAPON_PROPERTIES,
   labelsFromEntries(WEAPON_PROPERTY_ENTRIES),
 )
-const damageTypeOptions = toOptions(
-  PHYSICAL_DAMAGE_TYPE_IDS,
-  Object.fromEntries(PHYSICAL_DAMAGE_TYPE_IDS.map((id) => [id, id])) as Record<
-    (typeof PHYSICAL_DAMAGE_TYPE_IDS)[number],
-    string
-  >,
-)
-const damageKindOptions = [
-  { value: 'dice', label: 'Dice' },
-  { value: 'flat', label: 'Flat amount' },
-  { value: 'none', label: 'None' },
-]
 
 const WEAPON_SELECT_PLACEHOLDER = 'Choose...'
 
-function visibleWhenDealsDamage(): FieldVisibility {
-  return {
-    dependsOn: ['damageKind'],
-    visibleWhen: (v) => v.damageKind !== 'none',
-  }
-}
-
-function visibleWhenDiceDamage(): FieldVisibility {
-  return {
-    dependsOn: ['damageKind'],
-    visibleWhen: (v) => v.damageKind === 'dice',
-  }
-}
-
-function visibleWhenFlatDamage(): FieldVisibility {
-  return {
-    dependsOn: ['damageKind'],
-    visibleWhen: (v) => v.damageKind === 'flat',
-  }
-}
-
 function visibleWhenVersatile(): FieldVisibility {
   return {
-    dependsOn: ['properties', 'damageKind'],
+    dependsOn: ['properties', 'hasDamage'],
     visibleWhen: (v) =>
-      v.damageKind !== 'none' && Array.isArray(v.properties) && v.properties.includes('versatile'),
+      v.hasDamage === true && Array.isArray(v.properties) && v.properties.includes('versatile'),
   }
 }
 
@@ -125,7 +93,7 @@ const weaponMasteryDynamicHint: FieldDynamicHint = {
 }
 
 /** Weapon-specific form field group for the unified equipment form. */
-export function weaponFormFieldGroup(): FormItem {
+export function weaponFormFieldGroup(ctx: ContentFormCtx): FormItem {
   return {
     kind: 'group',
     legend: 'Weapon',
@@ -175,38 +143,10 @@ export function weaponFormFieldGroup(): FormItem {
         legend: 'Damage',
         legendSize: 'subsection',
         fields: [
+          ...weaponDamageFields({ ctx }),
           {
             kind: 'row',
             fields: [
-              {
-                type: 'select',
-                name: 'damageKind',
-                label: 'Mode',
-                options: damageKindOptions,
-                defaultValue: 'dice',
-                width: 'md',
-              },
-              {
-                type: 'diceFormula',
-                name: 'damageDice',
-                label: 'Dice',
-                modifierMode: 'none',
-                size: 'md',
-                width: 'auto',
-                countMin: 1,
-                visibility: visibleWhenDiceDamage(),
-                required: true,
-              },
-              {
-                type: 'number',
-                name: 'damageAmount',
-                label: 'Flat amount',
-                min: 1,
-                visibility: visibleWhenFlatDamage(),
-                required: true,
-                digits: 3,
-                width: 'md',
-              },
               {
                 type: 'diceFormula',
                 name: 'versatileDamage',
@@ -216,16 +156,6 @@ export function weaponFormFieldGroup(): FormItem {
                 width: 'auto',
                 countMin: 1,
                 visibility: visibleWhenVersatile(),
-                required: true,
-              },
-              {
-                type: 'select',
-                name: 'damageType',
-                label: 'Type',
-                options: damageTypeOptions,
-                placeholder: WEAPON_SELECT_PLACEHOLDER,
-                width: 'md',
-                visibility: visibleWhenDealsDamage(),
                 required: true,
               },
             ],

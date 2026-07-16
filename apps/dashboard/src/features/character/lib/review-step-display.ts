@@ -1,34 +1,23 @@
 import {
+  getAbilityGenerationMethodDisplayName,
   getAlignmentLabel,
   validateCharacterBuild,
   type CharacterBuildContext,
   type CharacterBuilderDraft,
   type CharacterBuildValidationIssue,
+  type ChoiceSet,
 } from '@rpg/contracts'
-
-export function resolveReviewDisplayIssues(
-  draft: CharacterBuilderDraft,
-  context: CharacterBuildContext,
-  validationIssues: CharacterBuildValidationIssue[],
-): CharacterBuildValidationIssue[] {
-  if (validationIssues.length > 0) return validationIssues
-
-  const validation = validateCharacterBuild(draft, context, 'finalSubmit', {
-    resolvedChoiceSets: [],
-  })
-
-  return validation.ok ? [] : validation.issues
-}
 
 export function resolveReviewReadyMessage(
   draft: CharacterBuilderDraft,
   context: CharacterBuildContext,
   displayIssues: CharacterBuildValidationIssue[],
+  resolvedChoiceSets: readonly ChoiceSet[],
 ): string | null {
   if (displayIssues.length > 0) return null
 
   const validation = validateCharacterBuild(draft, context, 'finalSubmit', {
-    resolvedChoiceSets: [],
+    resolvedChoiceSets,
   })
 
   return validation.ok
@@ -39,9 +28,7 @@ export function resolveReviewReadyMessage(
 export function formatAbilityMethodLabel(
   method: CharacterBuilderDraft['abilities']['method'],
 ): string {
-  if (method === 'manual') return 'Manual entry'
-  if (method === 'standard-array') return 'Standard array'
-  return 'Not set'
+  return getAbilityGenerationMethodDisplayName(method)
 }
 
 export function resolveCatalogEntryName(

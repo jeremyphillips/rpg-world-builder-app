@@ -9,7 +9,7 @@
     "updatedAt": "2024-05-21T00:00:00.000Z",
     "name": "Acid Splash",
     "level": 0,
-    "description": "<p>You create an acidic bubble at a point within range, where it explodes in a 5-foot-radius Sphere. Each creature in that Sphere must succeed on a Dexterity saving throw or take 1d6 Acid damage.</p><p><strong>Cantrip Upgrade.</strong> The damage increases by 1d6 when you reach levels 5 (2d6), 11 (3d6), and 17 (4d6).</p>",
+    "description": "<p>You create an acidic bubble at a point within range, where it explodes in a 5-foot-radius Sphere. Each creature in that Sphere must succeed on a Dexterity saving throw or take 1d6 Acid damage.</p>",
     "school": "evocation",
     "classIds": ["sorcerer", "wizard"],
     "tags": {
@@ -36,6 +36,70 @@
     "components": {
       "verbal": true,
       "somatic": true
+    },
+    "cantripScaling": "<p>The damage increases by 1d6 when you reach levels 5 (2d6), 11 (3d6), and 17 (4d6).</p>",
+    "effects": [
+      {
+        "id": "srd-cc-5.2.1:acid-splash:damage",
+        "kind": "damage",
+        "roll": {
+          "dice": {
+            "count": 1,
+            "faces": 6
+          }
+        },
+        "damageType": "acid"
+      }
+    ],
+    "resolution": {
+      "target": {
+        "count": 1,
+        "kind": "creature-or-object",
+        "proximity": {
+          "kind": "distance",
+          "distance": {
+            "value": 60,
+            "unit": "ft"
+          }
+        }
+      },
+      "method": {
+        "kind": "saving-throw",
+        "ability": "dex"
+      },
+      "effects": [
+        {
+          "id": "damage",
+          "kind": "damage",
+          "roll": {
+            "dice": {
+              "count": 1,
+              "faces": 6
+            }
+          },
+          "damageType": "acid"
+        }
+      ],
+      "outcomes": [
+        {
+          "result": "failed-save",
+          "applications": [
+            {
+              "effectId": "damage",
+              "amount": "full"
+            }
+          ]
+        },
+        {
+          "result": "successful-save",
+          "applications": [
+            {
+              "effectId": "damage",
+              "amount": "half"
+            }
+          ]
+        }
+      ]
     }
   },
   {
@@ -47,7 +111,7 @@
     "createdAt": "2024-05-21T00:00:00.000Z",
     "updatedAt": "2024-05-21T00:00:00.000Z",
     "name": "Chill Touch",
-    "description": "<p>Channeling the chill of the grave, make a melee spell attack against a target within reach. On a hit, the target takes 1d10 Necrotic damage, and it can't regain Hit Points until the end of your next turn.</p><p><strong>Cantrip Upgrade.</strong> The damage increases by 1d10 when you reach levels 5 (2d10), 11 (3d10), and 17 (4d10).</p>",
+    "description": "<p>Channeling the chill of the grave, make a melee spell attack against a target within reach. On a hit, the target takes 1d10 Necrotic damage, and it can't regain Hit Points until the end of your next turn.</p>",
     "school": "necromancy",
     "level": 0,
     "classIds": ["sorcerer", "warlock", "wizard"],
@@ -72,7 +136,59 @@
       "verbal": true,
       "somatic": true
     },
-    "deliveryMethod": "melee-spell-attack"
+    "deliveryMethod": "melee-spell-attack",
+    "cantripScaling": "<p>The damage increases by 1d10 when you reach levels 5 (2d10), 11 (3d10), and 17 (4d10).</p>",
+    "effects": [
+      {
+        "id": "srd-cc-5.2.1:chill-touch:damage",
+        "kind": "damage",
+        "roll": {
+          "dice": {
+            "count": 1,
+            "faces": 10
+          }
+        },
+        "damageType": "necrotic"
+      }
+    ],
+    "resolution": {
+      "target": {
+        "count": 1,
+        "kind": "creature-or-object",
+        "proximity": {
+          "kind": "reach"
+        }
+      },
+      "method": {
+        "kind": "attack",
+        "attackType": "melee-spell"
+      },
+      "effects": [
+        {
+          "id": "damage",
+          "kind": "damage",
+          "roll": {
+            "dice": {
+              "count": 1,
+              "faces": 10
+            }
+          },
+          "damageType": "necrotic"
+        }
+      ],
+      "outcomes": [
+        {
+          "result": "hit",
+          "applications": [
+            {
+              "effectId": "damage",
+              "amount": "full"
+            }
+          ],
+          "note": "The target can't regain Hit Points until the end of your next turn."
+        }
+      ]
+    }
   },
   {
     "id": "srd-cc-5.2.1:dancing-lights",
@@ -168,7 +284,7 @@
     "updatedAt": "2024-05-21T00:00:00.000Z",
     "name": "Eldritch Blast",
     "level": 0,
-    "description": "<p>You hurl a beam of crackling energy. Make a ranged spell attack against one creature or object in range. On a hit, the target takes 1d10 Force damage.</p><p><strong>Cantrip Upgrade.</strong> The spell creates two beams at level 5, three beams at level 11, and four beams at level 17. You can direct the beams at the same target or at different ones. Make a separate attack roll for each beam.</p>",
+    "description": "<p>You hurl a beam of crackling energy. Make a ranged spell attack against one creature or object in range. On a hit, the target takes 1d10 Force damage.</p>",
     "school": "evocation",
     "classIds": ["warlock"],
     "tags": {
@@ -196,7 +312,68 @@
       "verbal": true,
       "somatic": true
     },
-    "deliveryMethod": "ranged-spell-attack"
+    "deliveryMethod": "ranged-spell-attack",
+    "cantripScaling": "<p>The spell creates two beams at level 5, three beams at level 11, and four beams at level 17. You can direct the beams at the same target or at different ones. Make a separate attack roll for each beam.</p>",
+    "effects": [
+      {
+        "id": "srd-cc-5.2.1:eldritch-blast:beams",
+        "kind": "projectile-count",
+        "count": 1,
+        "unitLabel": "beams"
+      },
+      {
+        "id": "srd-cc-5.2.1:eldritch-blast:damage",
+        "kind": "damage",
+        "roll": {
+          "dice": {
+            "count": 1,
+            "faces": 10
+          }
+        },
+        "damageType": "force"
+      }
+    ],
+    "resolution": {
+      "target": {
+        "count": 1,
+        "kind": "creature-or-object",
+        "proximity": {
+          "kind": "distance",
+          "distance": {
+            "value": 120,
+            "unit": "ft"
+          }
+        }
+      },
+      "method": {
+        "kind": "attack",
+        "attackType": "ranged-spell"
+      },
+      "effects": [
+        {
+          "id": "damage",
+          "kind": "damage",
+          "roll": {
+            "dice": {
+              "count": 1,
+              "faces": 10
+            }
+          },
+          "damageType": "force"
+        }
+      ],
+      "outcomes": [
+        {
+          "result": "hit",
+          "applications": [
+            {
+              "effectId": "damage",
+              "amount": "full"
+            }
+          ]
+        }
+      ]
+    }
   },
   {
     "id": "srd-cc-5.2.1:elementalism",
@@ -245,7 +422,7 @@
     "createdAt": "2024-05-21T00:00:00.000Z",
     "updatedAt": "2024-05-21T00:00:00.000Z",
     "name": "Fire Bolt",
-    "description": "<p>You hurl a mote of fire at a creature or an object within range. Make a ranged spell attack against the target. On a hit, the target takes 1d10 Fire damage. A flammable object hit by this spell starts burning if it isn't being worn or carried.</p><p><strong>Cantrip Upgrade.</strong> The damage increases by 1d10 when you reach levels 5 (2d10), 11 (3d10), and 17 (4d10).</p>",
+    "description": "<p>You hurl a mote of fire at a creature or an object within range. Make a ranged spell attack against the target. On a hit, the target takes 1d10 Fire damage. A flammable object hit by this spell starts burning if it isn't being worn or carried.</p>",
     "school": "evocation",
     "level": 0,
     "classIds": ["sorcerer", "wizard"],
@@ -274,7 +451,62 @@
       "verbal": true,
       "somatic": true
     },
-    "deliveryMethod": "ranged-spell-attack"
+    "deliveryMethod": "ranged-spell-attack",
+    "cantripScaling": "<p>The damage increases by 1d10 when you reach levels 5 (2d10), 11 (3d10), and 17 (4d10).</p>",
+    "effects": [
+      {
+        "id": "srd-cc-5.2.1:fire-bolt:damage",
+        "kind": "damage",
+        "roll": {
+          "dice": {
+            "count": 1,
+            "faces": 10
+          }
+        },
+        "damageType": "fire"
+      }
+    ],
+    "resolution": {
+      "target": {
+        "count": 1,
+        "kind": "creature-or-object",
+        "proximity": {
+          "kind": "distance",
+          "distance": {
+            "value": 120,
+            "unit": "ft"
+          }
+        }
+      },
+      "method": {
+        "kind": "attack",
+        "attackType": "ranged-spell"
+      },
+      "effects": [
+        {
+          "id": "damage",
+          "kind": "damage",
+          "roll": {
+            "dice": {
+              "count": 1,
+              "faces": 10
+            }
+          },
+          "damageType": "fire"
+        }
+      ],
+      "outcomes": [
+        {
+          "result": "hit",
+          "applications": [
+            {
+              "effectId": "damage",
+              "amount": "full"
+            }
+          ]
+        }
+      ]
+    }
   },
   {
     "id": "srd-cc-5.2.1:guidance",
@@ -522,7 +754,7 @@
     "createdAt": "2024-05-21T00:00:00.000Z",
     "updatedAt": "2024-05-21T00:00:00.000Z",
     "name": "Poison Spray",
-    "description": "<p>You spray toxic mist at a creature within range. Make a ranged spell attack against the target. On a hit, the target takes 1d12 Poison damage.</p><p><strong>Cantrip Upgrade.</strong> The damage increases by 1d12 when you reach levels 5 (2d12), 11 (3d12), and 17 (4d12).</p>",
+    "description": "<p>You spray toxic mist at a creature within range. Make a ranged spell attack against the target. On a hit, the target takes 1d12 Poison damage.</p>",
     "school": "necromancy",
     "level": 0,
     "classIds": ["druid", "sorcerer", "warlock", "wizard"],
@@ -547,7 +779,62 @@
       "verbal": true,
       "somatic": true
     },
-    "deliveryMethod": "ranged-spell-attack"
+    "deliveryMethod": "ranged-spell-attack",
+    "cantripScaling": "<p>The damage increases by 1d12 when you reach levels 5 (2d12), 11 (3d12), and 17 (4d12).</p>",
+    "effects": [
+      {
+        "id": "srd-cc-5.2.1:poison-spray:damage",
+        "kind": "damage",
+        "roll": {
+          "dice": {
+            "count": 1,
+            "faces": 12
+          }
+        },
+        "damageType": "poison"
+      }
+    ],
+    "resolution": {
+      "target": {
+        "count": 1,
+        "kind": "creature-or-object",
+        "proximity": {
+          "kind": "distance",
+          "distance": {
+            "value": 30,
+            "unit": "ft"
+          }
+        }
+      },
+      "method": {
+        "kind": "attack",
+        "attackType": "ranged-spell"
+      },
+      "effects": [
+        {
+          "id": "damage",
+          "kind": "damage",
+          "roll": {
+            "dice": {
+              "count": 1,
+              "faces": 12
+            }
+          },
+          "damageType": "poison"
+        }
+      ],
+      "outcomes": [
+        {
+          "result": "hit",
+          "applications": [
+            {
+              "effectId": "damage",
+              "amount": "full"
+            }
+          ]
+        }
+      ]
+    }
   },
   {
     "id": "srd-cc-5.2.1:prestidigitation",
@@ -635,7 +922,7 @@
     "updatedAt": "2024-05-21T00:00:00.000Z",
     "name": "Sacred Flame",
     "level": 0,
-    "description": "<p>Flame-like radiance descends on a creature that you can see within range. The target must succeed on a Dexterity saving throw or take 1d8 Radiant damage. The target gains no benefit from Half Cover or Three-Quarters Cover for this save.</p><p><strong>Cantrip Upgrade.</strong> The damage increases by 1d8 when you reach levels 5 (2d8), 11 (3d8), and 17 (4d8).</p>",
+    "description": "<p>Flame-like radiance descends on a creature that you can see within range. The target must succeed on a Dexterity saving throw or take 1d8 Radiant damage. The target gains no benefit from Half Cover or Three-Quarters Cover for this save.</p>",
     "school": "evocation",
     "classIds": ["cleric"],
     "tags": {
@@ -662,6 +949,70 @@
     "components": {
       "verbal": true,
       "somatic": true
+    },
+    "cantripScaling": "<p>The damage increases by 1d8 when you reach levels 5 (2d8), 11 (3d8), and 17 (4d8).</p>",
+    "effects": [
+      {
+        "id": "srd-cc-5.2.1:sacred-flame:damage",
+        "kind": "damage",
+        "roll": {
+          "dice": {
+            "count": 1,
+            "faces": 8
+          }
+        },
+        "damageType": "radiant"
+      }
+    ],
+    "resolution": {
+      "target": {
+        "count": 1,
+        "kind": "creature-or-object",
+        "proximity": {
+          "kind": "distance",
+          "distance": {
+            "value": 60,
+            "unit": "ft"
+          }
+        }
+      },
+      "method": {
+        "kind": "saving-throw",
+        "ability": "dex"
+      },
+      "effects": [
+        {
+          "id": "damage",
+          "kind": "damage",
+          "roll": {
+            "dice": {
+              "count": 1,
+              "faces": 8
+            }
+          },
+          "damageType": "radiant"
+        }
+      ],
+      "outcomes": [
+        {
+          "result": "failed-save",
+          "applications": [
+            {
+              "effectId": "damage",
+              "amount": "full"
+            }
+          ]
+        },
+        {
+          "result": "successful-save",
+          "applications": [
+            {
+              "effectId": "damage",
+              "amount": "half"
+            }
+          ]
+        }
+      ]
     }
   },
   {
@@ -674,7 +1025,7 @@
     "updatedAt": "2024-05-21T00:00:00.000Z",
     "name": "Spare the Dying",
     "level": 0,
-    "description": "<p>Choose a creature within range that has 0 Hit Points and isn't dead. The creature becomes Stable.</p><p><strong>Cantrip Upgrade.</strong> The range doubles when you reach levels 5 (30 feet), 11 (60 feet), and 17 (120 feet).</p>",
+    "description": "<p>Choose a creature within range that has 0 Hit Points and isn't dead. The creature becomes Stable.</p>",
     "school": "necromancy",
     "classIds": ["cleric", "druid"],
     "tags": {
@@ -700,7 +1051,8 @@
     "components": {
       "verbal": true,
       "somatic": true
-    }
+    },
+    "cantripScaling": "<p>The range doubles when you reach levels 5 (30 feet), 11 (60 feet), and 17 (120 feet).</p>"
   },
   {
     "id": "srd-cc-5.2.1:thaumaturgy",
@@ -749,7 +1101,7 @@
     "updatedAt": "2024-05-21T00:00:00.000Z",
     "name": "True Strike",
     "level": 0,
-    "description": "<p>Guided by a flash of magical insight, you make one attack with the weapon used in the spell's casting. The attack uses your spellcasting ability for the attack and damage rolls instead of using Strength or Dexterity. If the attack deals damage, it can be Radiant damage or the weapon's normal damage type (your choice).</p><p><strong>Cantrip Upgrade.</strong> Whether you deal Radiant damage or the weapon's normal damage type, the attack deals extra Radiant damage when you reach levels 5 (1d6), 11 (2d6), and 17 (3d6).</p>",
+    "description": "<p>Guided by a flash of magical insight, you make one attack with the weapon used in the spell's casting. The attack uses your spellcasting ability for the attack and damage rolls instead of using Strength or Dexterity. If the attack deals damage, it can be Radiant damage or the weapon's normal damage type (your choice).</p>",
     "school": "divination",
     "classIds": ["bard", "sorcerer", "warlock", "wizard"],
     "tags": {
@@ -773,6 +1125,18 @@
       "material": {
         "description": "a weapon with which you have proficiency and that is worth 1+ CP"
       }
-    }
+    },
+    "cantripScaling": "<p>Whether you deal Radiant damage or the weapon's normal damage type, the attack deals extra Radiant damage when you reach levels 5 (1d6), 11 (2d6), and 17 (3d6).</p>",
+    "effects": [
+      {
+        "id": "srd-cc-5.2.1:true-strike:extra-radiant",
+        "kind": "damage",
+        "label": "Extra radiant",
+        "roll": {
+          "flat": 0
+        },
+        "damageType": "radiant"
+      }
+    ]
   }
 ]

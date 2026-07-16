@@ -1,0 +1,396 @@
+{
+  "id": "srd-cc-5.2.1:paladin",
+  "slug": "paladin",
+  "rulesetId": "srd-cc-5.2.1",
+  "source": "system",
+  "campaignId": null,
+  "createdAt": "2024-05-21T00:00:00.000Z",
+  "updatedAt": "2024-05-21T00:00:00.000Z",
+  "name": "Paladin",
+  "description": "<p>A holy warrior bound to a sacred oath.</p>",
+  "primaryAbilities": ["str", "cha"],
+  "hitDie": 10,
+  "spellcasting": {
+    "progression": "half",
+    "ability": "cha",
+    "preparation": "prepared",
+    "spellsAvailable": [
+      {
+        "level": 1,
+        "count": 2
+      },
+      {
+        "level": 2,
+        "count": 3
+      },
+      {
+        "level": 3,
+        "count": 4
+      },
+      {
+        "level": 4,
+        "count": 5
+      },
+      {
+        "level": 5,
+        "count": 6
+      },
+      {
+        "level": 7,
+        "count": 7
+      },
+      {
+        "level": 9,
+        "count": 9
+      },
+      {
+        "level": 11,
+        "count": 10
+      },
+      {
+        "level": 13,
+        "count": 11
+      },
+      {
+        "level": 15,
+        "count": 12
+      },
+      {
+        "level": 17,
+        "count": 14
+      },
+      {
+        "level": 19,
+        "count": 15
+      }
+    ],
+    "description": "<p>You have learned to cast spells through prayer and meditation. See \"Spells\" for the rules on spellcasting. The information below details how you use those rules with Paladin spells, which appear in the Paladin spell list later in the class's description.</p><p><strong>Spell Slots.</strong> The Paladin Features table shows how many spell slots you have to cast your level 1+ spells. You regain all expended slots when you finish a Long Rest.</p><p><strong>Prepared Spells of Level 1+.</strong> You prepare the list of level 1+ spells that are available for you to cast with this feature. To start, choose two level 1 Paladin spells. Heroism and Searing Smite are recommended.</p><p>The number of spells on your list increases as you gain Paladin levels, as shown in the Prepared Spells column of the Paladin Features table. Whenever that number increases, choose additional Paladin spells until the number of spells on your list matches the number in the Paladin Features table. The chosen spells must be of a level for which you have spell slots. For example, if you're a level 5 Paladin, your list of prepared spells can include six Paladin spells of level 1 or 2 in any combination.</p><p>If another Paladin feature gives you spells that you always have prepared, those spells don't count against the number of spells you can prepare with this feature, but those spells otherwise count as Paladin spells for you.</p><p><strong>Changing Your Prepared Spells.</strong> Whenever you finish a Long Rest, you can replace one spell on your list with another Paladin spell for which you have spell slots.</p><p><strong>Spellcasting Ability.</strong> Charisma is your spellcasting ability for your Paladin spells.</p><p><strong>Spellcasting Focus.</strong> You can use a Holy Symbol as a Spellcasting Focus for your Paladin spells.</p>"
+  },
+  "proficiencies": {
+    "savingThrows": ["wis", "cha"],
+    "armor": {
+      "categories": ["light", "medium", "heavy", "shields"],
+      "items": []
+    },
+    "weapons": {
+      "categories": ["simple", "martial"],
+      "items": []
+    },
+    "skills": {
+      "categories": [],
+      "items": []
+    }
+  },
+  "characterCreation": {
+    "startingEquipment": {
+      "choose": 1,
+      "options": [
+        {
+          "id": "standard",
+          "label": "Standard Equipment",
+          "description": "Chain Mail, Shield, Longsword, 6 Javelins, Holy Symbol, Priest's Pack, and 9 GP.",
+          "items": [
+            {
+              "kind": "grant",
+              "equipmentSlug": "chain-mail",
+              "quantity": 1,
+              "equipped": true
+            },
+            {
+              "kind": "grant",
+              "equipmentSlug": "shield",
+              "quantity": 1,
+              "equipped": true
+            },
+            {
+              "kind": "grant",
+              "equipmentSlug": "longsword",
+              "quantity": 1,
+              "equipped": true
+            },
+            {
+              "kind": "grant",
+              "equipmentSlug": "javelin",
+              "quantity": 6
+            },
+            {
+              "kind": "grant",
+              "equipmentSlug": "holy-symbol-amulet",
+              "quantity": 1
+            },
+            {
+              "kind": "grant",
+              "equipmentSlug": "priests-pack",
+              "quantity": 1
+            }
+          ],
+          "wealth": {
+            "gp": 9
+          }
+        },
+        {
+          "id": "gold",
+          "label": "Starting Gold",
+          "description": "Take 150 GP instead of standard equipment.",
+          "items": [],
+          "wealth": {
+            "gp": 150
+          }
+        }
+      ]
+    },
+    "proficiencies": {
+      "skills": {
+        "choices": [
+          {
+            "id": "class-skills",
+            "label": "Paladin Skills",
+            "choose": 2,
+            "from": [
+              "athletics",
+              "history",
+              "insight",
+              "intimidation",
+              "medicine",
+              "persuasion",
+              "religion"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "features": [
+    {
+      "id": "lay-on-hands",
+      "name": "Lay On Hands",
+      "level": 1,
+      "description": "<p>Your blessed touch can heal wounds. You have a pool of healing power that replenishes when you finish a Long Rest. With that pool, you can restore a total number of Hit Points equal to five times your Paladin level.</p><p>As a Bonus Action, you can touch a creature (which could be yourself) and draw power from the pool of healing to restore a number of Hit Points to that creature, up to the maximum amount remaining in the pool.</p><p>You can also expend 5 Hit Points from the pool of healing power to remove the Poisoned condition from the creature; those points don't also restore Hit Points to the creature.</p>"
+    },
+    {
+      "id": "weapon-mastery",
+      "name": "Weapon Mastery",
+      "level": 1,
+      "description": "<p>Your training with weapons allows you to use the mastery properties of two kinds of weapons of your choice with which you have proficiency, such as Longswords and Javelins.</p><p>Whenever you finish a Long Rest, you can change the kinds of weapons you chose. For example, you could switch to using the mastery properties of Halberds and Flails.</p>"
+    },
+    {
+      "id": "fighting-style",
+      "name": "Fighting Style",
+      "level": 2,
+      "description": "<p>You gain a Fighting Style feat of your choice (see \"Feats\"). Instead of choosing one of those feats, you can choose the option below.</p><p><strong>Blessed Warrior.</strong> You learn two Cleric cantrips of your choice (see the Cleric class's section for a list of Cleric spells). Guidance and Sacred Flame are recommended. The chosen cantrips count as Paladin spells for you, and Charisma is your spellcasting ability for them. Whenever you gain a Paladin level, you can replace one of these cantrips with another Cleric cantrip.</p>",
+      "grantGroups": [
+        {
+          "grants": [
+            {
+              "kind": "featChoice",
+              "category": "fighting-style",
+              "choose": 1,
+              "recommendedFeatIds": ["defense"]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "paladins-smite",
+      "name": "Paladin's Smite",
+      "level": 2,
+      "description": "<p>You always have the <em>Divine Smite</em> spell prepared. In addition, you can cast it without expending a spell slot, but you must finish a Long Rest before you can cast it in this way again.</p>",
+      "grantGroups": [
+        {
+          "grants": [
+            {
+              "kind": "spells",
+              "ability": "cha",
+              "mode": "always_prepared",
+              "spellIds": ["divine-smite"]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "channel-divinity",
+      "name": "Channel Divinity",
+      "level": 3,
+      "description": "<p>You can channel divine energy directly from the Outer Planes, using it to fuel magical effects. You start with one such effect: Divine Sense, which is described below. Other Paladin features give additional Channel Divinity effect options. Each time you use this class's Channel Divinity, you choose which effect from this class to create.</p><p>You can use this class's Channel Divinity twice. You regain one of its expended uses when you finish a Short Rest, and you regain all expended uses when you finish a Long Rest. You gain an additional use when you reach Paladin level 11.</p><p>If a Channel Divinity effect requires a saving throw, the DC equals the spell save DC from this class's Spellcasting feature.</p><p><strong>Divine Sense.</strong> As a Bonus Action, you can open your awareness to detect Celestials, Fiends, and Undead. For the next 10 minutes or until you have the Incapacitated condition, you know the location of any creature of those types within 60 feet of yourself, and you know its creature type. Within the same radius, you also detect the presence of any place or object that has been consecrated or desecrated, as with the <em>Hallow</em> spell.</p>"
+    },
+    {
+      "kind": "subclass-choice",
+      "id": "paladin-subclass",
+      "name": "Paladin Subclass",
+      "level": 3,
+      "description": ""
+    },
+    {
+      "id": "ability-score-improvement-4",
+      "name": "Ability Score Improvement",
+      "level": 4,
+      "description": "<p>You gain the Ability Score Improvement feat or another feat of your choice for which you qualify.</p>",
+      "grantGroups": [
+        {
+          "grants": [
+            {
+              "kind": "featChoice",
+              "category": "general",
+              "choose": 1,
+              "allowAnyQualifying": true,
+              "recommendedFeatIds": ["ability-score-improvement"]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "extra-attack",
+      "name": "Extra Attack",
+      "level": 5,
+      "description": "<p>You can attack twice instead of once whenever you take the Attack action on your turn.</p>"
+    },
+    {
+      "id": "faithful-steed",
+      "name": "Faithful Steed",
+      "level": 5,
+      "description": "<p>You can call on the aid of an otherworldly steed. You always have the <em>Find Steed</em> spell prepared.</p><p>You can also cast the spell once without expending a spell slot, and you regain the ability to do so when you finish a Long Rest.</p>",
+      "grantGroups": [
+        {
+          "grants": [
+            {
+              "kind": "spells",
+              "ability": "cha",
+              "mode": "always_prepared",
+              "spellIds": ["find-steed"]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "aura-of-protection",
+      "name": "Aura of Protection",
+      "level": 6,
+      "description": "<p>You radiate a protective, unseeable aura in a 10-foot Emanation that originates from you. The aura is inactive while you have the Incapacitated condition.</p><p>You and your allies in the aura gain a bonus to saving throws equal to your Charisma modifier (minimum bonus of +1).</p><p>If another Paladin is present, a creature can benefit from only one Aura of Protection at a time; the creature chooses which aura while in them.</p>"
+    },
+    {
+      "id": "ability-score-improvement-8",
+      "name": "Ability Score Improvement",
+      "level": 8,
+      "description": "<p>You gain the Ability Score Improvement feat or another feat of your choice for which you qualify.</p>",
+      "grantGroups": [
+        {
+          "grants": [
+            {
+              "kind": "featChoice",
+              "category": "general",
+              "choose": 1,
+              "allowAnyQualifying": true,
+              "recommendedFeatIds": ["ability-score-improvement"]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "abjure-foes",
+      "name": "Abjure Foes",
+      "level": 9,
+      "description": "<p>As a Magic action, you can expend one use of this class's Channel Divinity to overwhelm foes with awe. As you present your Holy Symbol or weapon, you can target a number of creatures equal to your Charisma modifier (minimum of one creature) that you can see within 60 feet of yourself. Each target must succeed on a Wisdom saving throw or have the Frightened condition for 1 minute or until it takes any damage. While Frightened in this way, a target can do only one of the following on its turns: move, take an action, or take a Bonus Action.</p>"
+    },
+    {
+      "id": "aura-of-courage",
+      "name": "Aura of Courage",
+      "level": 10,
+      "description": "<p>You and your allies have Immunity to the Frightened condition while in your Aura of Protection. If a Frightened ally enters the aura, that condition has no effect on that ally while there.</p>"
+    },
+    {
+      "id": "radiant-strikes",
+      "name": "Radiant Strikes",
+      "level": 11,
+      "description": "<p>Your strikes now carry supernatural power. When you hit a target with an attack roll using a Melee weapon or an Unarmed Strike, the target takes an extra 1d8 Radiant damage.</p>"
+    },
+    {
+      "id": "ability-score-improvement-12",
+      "name": "Ability Score Improvement",
+      "level": 12,
+      "description": "<p>You gain the Ability Score Improvement feat or another feat of your choice for which you qualify.</p>",
+      "grantGroups": [
+        {
+          "grants": [
+            {
+              "kind": "featChoice",
+              "category": "general",
+              "choose": 1,
+              "allowAnyQualifying": true,
+              "recommendedFeatIds": ["ability-score-improvement"]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "restoring-touch",
+      "name": "Restoring Touch",
+      "level": 14,
+      "description": "<p>When you use Lay On Hands on a creature, you can also remove one or more of the following conditions from the creature: Blinded, Charmed, Deafened, Frightened, Paralyzed, or Stunned. You must expend 5 Hit Points from the healing pool of Lay On Hands for each of these conditions you remove; those points don't also restore Hit Points to the creature.</p>"
+    },
+    {
+      "id": "ability-score-improvement-16",
+      "name": "Ability Score Improvement",
+      "level": 16,
+      "description": "<p>You gain the Ability Score Improvement feat or another feat of your choice for which you qualify.</p>",
+      "grantGroups": [
+        {
+          "grants": [
+            {
+              "kind": "featChoice",
+              "category": "general",
+              "choose": 1,
+              "allowAnyQualifying": true,
+              "recommendedFeatIds": ["ability-score-improvement"]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "aura-expansion",
+      "name": "Aura Expansion",
+      "level": 18,
+      "description": "<p>Your Aura of Protection is now a 30-foot Emanation.</p>"
+    },
+    {
+      "id": "epic-boon",
+      "name": "Epic Boon",
+      "level": 19,
+      "description": "<p>You gain an Epic Boon feat (see \"Feats\") or another feat of your choice for which you qualify.</p>",
+      "grantGroups": [
+        {
+          "grants": [
+            {
+              "kind": "featChoice",
+              "category": "epic-boon",
+              "choose": 1,
+              "allowAnyQualifying": true,
+              "recommendedFeatIds": ["boon-of-truesight"]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "resources": [
+    {
+      "name": "Channel Divinity",
+      "entries": [
+        {
+          "level": 3,
+          "value": 2
+        },
+        {
+          "level": 11,
+          "value": 3
+        }
+      ]
+    }
+  ]
+}

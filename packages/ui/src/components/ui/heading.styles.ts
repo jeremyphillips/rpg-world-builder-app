@@ -60,6 +60,22 @@ export const HEADING_STYLE_SPECS: HeadingStyleSpec[] = [
     useCase: 'Card and modal titles (chrome)',
   },
   {
+    variant: 'sheetTitle',
+    utility: 'heading-style-sheet-title',
+    level: 'h2',
+    px: 24,
+    weight: 600,
+    useCase: 'Builder option detail sheet entity title',
+  },
+  {
+    variant: 'sheetSection',
+    utility: 'heading-style-sheet-section',
+    level: 'h2',
+    px: 24,
+    weight: 300,
+    useCase: 'Builder option detail sheet section headings',
+  },
+  {
     variant: 'alert',
     utility: 'heading-style-alert',
     level: '—',

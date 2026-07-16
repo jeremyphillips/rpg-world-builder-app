@@ -1,11 +1,14 @@
 'use client'
 
 import * as React from 'react'
-import { ChevronDown, GripVertical } from 'lucide-react'
 import type { DraggableAttributes } from '@dnd-kit/core'
 import type { SyntheticListenerMap } from '@dnd-kit/core/dist/hooks/utilities'
 
 import { cn } from '../../lib/utils'
+import {
+  CollapsibleListItemCollapseButton,
+  CollapsibleListItemDragHandle,
+} from '../../components/ui/collapsible-list-item/collapsible-list-item-toolbar.client'
 import type { ArrayItemHeaderConfig } from '../field-config'
 import {
   resolveArrayItemHeaderLabels,
@@ -14,8 +17,6 @@ import {
 } from '../config/array-item-config.lib'
 import {
   arrayItemChromeColumnClasses,
-  arrayItemCollapseButtonClasses,
-  arrayItemDragHandleClasses,
   arrayItemHeaderContentClasses,
   arrayItemHeaderDividerClasses,
   arrayItemHeaderFallbackClasses,
@@ -37,24 +38,8 @@ export interface ArrayItemDragHandleProps {
   compact?: boolean
 }
 
-export function ArrayItemDragHandle({
-  ariaLabel,
-  attributes,
-  listeners,
-  compact = false,
-}: ArrayItemDragHandleProps) {
-  return (
-    <button
-      type="button"
-      className={arrayItemDragHandleClasses({ compact })}
-      aria-label={ariaLabel}
-      onClick={(event) => event.stopPropagation()}
-      {...attributes}
-      {...listeners}
-    >
-      <GripVertical className="size-3.5" aria-hidden />
-    </button>
-  )
+export function ArrayItemDragHandle(props: ArrayItemDragHandleProps) {
+  return <CollapsibleListItemDragHandle {...props} />
 }
 
 function renderArrayItemTitleLine(header: ResolvedArrayItemHeader): React.ReactNode {
@@ -93,19 +78,12 @@ function ArrayItemCollapseButton({
   onToggleCollapse,
 }: ArrayItemCollapseButtonProps) {
   return (
-    <button
-      type="button"
-      className={arrayItemCollapseButtonClasses}
-      aria-expanded={!collapsed}
-      aria-controls={bodyId}
-      aria-label={`${collapsed ? 'Expand' : 'Collapse'} ${ariaLabel}`}
-      onClick={onToggleCollapse}
-    >
-      <ChevronDown
-        className={cn('size-4 transition-transform', collapsed && '-rotate-90')}
-        aria-hidden
-      />
-    </button>
+    <CollapsibleListItemCollapseButton
+      collapsed={collapsed}
+      bodyId={bodyId}
+      ariaLabel={ariaLabel}
+      onToggleCollapse={onToggleCollapse}
+    />
   )
 }
 
@@ -244,6 +222,7 @@ export interface ArrayItemToolbarProps {
   headerConfig: ArrayItemHeaderConfig
   itemValues: Record<string, unknown>
   watchedPrimary: unknown
+  watchedSummaryContext?: Record<string, unknown>
   showDragHandle: boolean
   dragHandleProps?: ArrayItemDragHandleProps
   collapsible: boolean
@@ -264,6 +243,7 @@ export function ArrayItemToolbar({
   headerConfig,
   itemValues,
   watchedPrimary,
+  watchedSummaryContext,
   showDragHandle,
   dragHandleProps,
   collapsible,
@@ -283,7 +263,9 @@ export function ArrayItemToolbar({
     legend,
   )
   const summary =
-    !compact && headerConfig.summary ? headerConfig.summary(itemValues, index) : undefined
+    !compact && headerConfig.summary
+      ? headerConfig.summary(itemValues, index, watchedSummaryContext)
+      : undefined
 
   const gripVisible = showDragHandle && Boolean(dragHandleProps)
   const leadingChrome: ArrayItemLeadingChromeOptions = { showDragHandle: gripVisible, collapsible }

@@ -1,4 +1,5 @@
-import type { CharacterBuilderDraft, CharacterNarrative } from '@rpg/contracts'
+import type { CharacterBuilderDraft, CharacterNarrative, ChoiceSet } from '@rpg/contracts'
+import { characterBuilderStepReadinessMessages, formatStepReadinessMessage } from '@rpg/contracts'
 
 export const CHARACTER_BUILDER_PREVIEW_SECTIONS = [
   'narrative',
@@ -37,10 +38,82 @@ export function formatPreviewAbilityCell(
   return `${score} (${modLabel})`
 }
 
-export function resolveProficienciesSectionHint(skillChoiceCount: number | undefined): string {
-  if (skillChoiceCount) {
-    return `${skillChoiceCount} skill choice${skillChoiceCount === 1 ? '' : 's'} remaining`
+export type ResolveProficienciesSectionHintArgs = {
+  hasCharacterClass: boolean
+}
+
+export function resolveProficienciesSectionHint({
+  hasCharacterClass,
+}: ResolveProficienciesSectionHintArgs): string {
+  if (!hasCharacterClass) {
+    return formatStepReadinessMessage(
+      characterBuilderStepReadinessMessages.proficienciesBlockedNoClass,
+    )
   }
 
-  return 'Choose a class to see options'
+  return ''
+}
+
+export function resolveEquipmentPreviewEmptyHint(hasCharacterClass: boolean): string {
+  if (!hasCharacterClass) {
+    return formatStepReadinessMessage(characterBuilderStepReadinessMessages.equipmentBlockedNoClass)
+  }
+
+  return 'Nothing selected yet.'
+}
+
+export function resolveSpellsPreviewEmptyHint(
+  hasCharacterClass: boolean,
+  spellcastingActive: boolean,
+): string {
+  if (!hasCharacterClass) {
+    return formatStepReadinessMessage(characterBuilderStepReadinessMessages.spellsBlockedNoClass)
+  }
+
+  return spellcastingActive ? 'Choose starting spells.' : 'Not applicable for this class.'
+}
+
+export type PreviewSpellsSubsection = {
+  resolvedText: string | null
+  emptyHint: string | null
+}
+
+export function collectPreviewSpellLabels(
+  draft: CharacterBuilderDraft,
+  resolvedChoiceSets: readonly ChoiceSet[],
+): string[] {
+  const labels: string[] = []
+
+  for (const choiceSet of resolvedChoiceSets) {
+    if (choiceSet.choiceType !== 'cantrip' && choiceSet.choiceType !== 'spell') continue
+
+    const selections = draft.choiceSelections[choiceSet.id] ?? []
+    for (const selectedId of selections) {
+      const option = choiceSet.options.find((entry) => entry.id === selectedId)
+      labels.push(option?.label ?? selectedId)
+    }
+  }
+
+  return labels
+}
+
+export function formatPreviewSpellsSubsection(
+  draft: CharacterBuilderDraft,
+  resolvedChoiceSets: readonly ChoiceSet[],
+  hasCharacterClass: boolean,
+  spellcastingActive: boolean,
+): PreviewSpellsSubsection {
+  const labels = collectPreviewSpellLabels(draft, resolvedChoiceSets)
+
+  if (labels.length > 0) {
+    return {
+      resolvedText: labels.join(', '),
+      emptyHint: null,
+    }
+  }
+
+  return {
+    resolvedText: null,
+    emptyHint: resolveSpellsPreviewEmptyHint(hasCharacterClass, spellcastingActive),
+  }
 }

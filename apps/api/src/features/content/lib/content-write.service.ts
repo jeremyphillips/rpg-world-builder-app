@@ -62,27 +62,20 @@ function normalizeWriteInput(
   }
 }
 
-function stripPersistedClassPatch<T extends StoredEntity>(
-  _config: ContentWriteConfig<T>,
-  input: Record<string, unknown>,
-): Record<string, unknown> {
-  return input
-}
-
 function prepareSystemPatchMerge<T extends StoredEntity>(
-  config: ContentWriteConfig<T>,
+  _config: ContentWriteConfig<T>,
   existing: T,
   existingPatch: Record<string, unknown> | undefined,
   update: Record<string, unknown>,
 ): { mergedBody: Record<string, unknown>; cumulativePatch: Record<string, unknown> } {
-  const patchBody = stripUndefined(stripPersistedClassPatch(config, stripUndefined(update)))
-  const existingPatchStripped = stripPersistedClassPatch(config, existingPatch ?? {})
+  const patchBody = stripUndefined(update)
+  const existingPatchStripped = existingPatch ?? {}
   const mergedBodyRaw = deepMerge(
     deepMerge(entityBody(existing as unknown as Record<string, unknown>), existingPatchStripped),
     patchBody,
   )
   return {
-    mergedBody: stripPersistedClassPatch(config, mergedBodyRaw),
+    mergedBody: mergedBodyRaw,
     cumulativePatch: deepMerge(existingPatchStripped, patchBody),
   }
 }
@@ -92,9 +85,8 @@ function parsePersistedWriteInput<T extends StoredEntity>(
   normalized: Record<string, unknown>,
   mode: 'create' | 'update',
 ): Record<string, unknown> {
-  const forParse = stripPersistedClassPatch(config, normalized)
   const schema = mode === 'create' ? config.createInputSchema : config.updateInputSchema
-  return schema.parse(forParse) as Record<string, unknown>
+  return schema.parse(normalized) as Record<string, unknown>
 }
 
 function buildWriteContext(
@@ -252,16 +244,6 @@ export async function updateContentEntity<T extends StoredEntity>(
 
   const existingBody = entityBody(existing as unknown as Record<string, unknown>)
   const normalized = normalizeWriteInput(rawInput, existingBody, 'update')
-  const preParseCtx = buildWriteContext(
-    campaignId,
-    campaign.rulesetId,
-    'update',
-    {},
-    normalized,
-    existing,
-  )
-  await config.beforeUpdateParse?.(preParseCtx)
-
   const update = parsePersistedWriteInput(config, normalized, 'update')
   const writeCtx = buildWriteContext(
     campaignId,

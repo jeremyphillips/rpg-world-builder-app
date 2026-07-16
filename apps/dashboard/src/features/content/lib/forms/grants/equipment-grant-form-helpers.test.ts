@@ -119,11 +119,26 @@ describe('equipmentGrantTitle', () => {
   it('includes quantity when granted equipment count is greater than one', () => {
     expect(
       equipmentGrantTitle(
-        { itemKind: 'grant', equipmentSlug: 'javelin', quantity: 4 },
+        {
+          itemKind: 'grant',
+          grantTargetSource: 'equipment',
+          equipmentSlug: 'javelin',
+          quantity: 4,
+        },
         0,
         equipmentOptions,
       ),
-    ).toBe('Javelin x4')
+    ).toBe('4 × Javelin')
+  })
+
+  it('returns empty summary for incomplete choice rows', () => {
+    expect(
+      equipmentGrantSummary({
+        itemKind: 'choice',
+        choose: 1,
+        poolSource: 'filtered',
+      } as EquipmentGrantItemForm),
+    ).toBe('')
   })
 
   it('formats choice titles with pool label and choose count', () => {

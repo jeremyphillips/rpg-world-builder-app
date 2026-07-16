@@ -16,14 +16,15 @@ import {
 import { fieldSurfaceToneVariants } from '../../components/ui/field-stack.variants'
 
 describe('array item shell variants', () => {
-  it('uses a two-column grid with top-aligned actions and no right inset', () => {
+  it('uses a two-column grid with top-aligned actions and shell padding', () => {
     expect(arrayItemShellClasses).toContain('grid-cols-[minmax(0,1fr)_auto]')
     expect(arrayItemShellClasses).toContain('items-start')
-    expect(arrayItemShellClasses).toContain('pr-0')
+    expect(arrayItemShellClasses).toContain('pr-3')
+    expect(arrayItemShellClasses).toContain('pb-3')
     expect(arrayItemMainClasses).toContain('pt-[calc(var(--spacing)*2)]')
     expect(arrayItemActionsRailClasses()).toContain('self-start')
     expect(arrayItemActionsRailClasses()).toContain('mt-2')
-    expect(arrayItemActionsRailClasses()).toContain('mr-1')
+    expect(arrayItemActionsRailClasses()).not.toContain('mr-1')
     expect(arrayItemActionsRailClasses({ compact: true })).toContain('mt-1')
     expect(arrayItemDragHandleClasses({ compact: true })).toContain('-mt-1')
   })
@@ -85,7 +86,8 @@ describe('array item shell variants', () => {
   })
 
   it('uses a single-column shell for compact inline rows', () => {
-    expect(arrayItemShellVariants({ layout: 'compactRow' })).toContain('p-2')
+    expect(arrayItemShellVariants({ layout: 'compactRow' })).toContain('pr-3')
+    expect(arrayItemShellVariants({ layout: 'compactRow' })).toContain('pb-3')
     expect(arrayItemShellVariants({ layout: 'compactRow' })).not.toContain('grid-cols-')
   })
 

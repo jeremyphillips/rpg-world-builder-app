@@ -8,9 +8,9 @@ export interface EyebrowProps
   children: React.ReactNode
 }
 
-export function Eyebrow({ children, className, size, ...props }: EyebrowProps) {
+export function Eyebrow({ children, className, size, tone, ...props }: EyebrowProps) {
   return (
-    <p className={cn(className, eyebrowVariants({ size }))} {...props}>
+    <p className={cn(eyebrowVariants({ size, tone }), className)} {...props}>
       {children}
     </p>
   )

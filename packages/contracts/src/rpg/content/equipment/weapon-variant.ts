@@ -1,6 +1,12 @@
 import { z } from 'zod'
 
-import { averageDiceRoll, dieFaceSchema } from '../../primitives/dice'
+import { diceSchema } from '../../primitives/dice'
+import {
+  averageRollValue,
+  formatRollValue,
+  rollSchema,
+  type RollValue,
+} from '../../primitives/mechanics/roll'
 import { PHYSICAL_DAMAGE_TYPE_IDS } from '../../vocab/damage/physical'
 import {
   getWeaponPropertyLabel,
@@ -47,37 +53,27 @@ export function formatWeaponRange(range: WeaponRange): string {
 }
 
 // ---------------------------------------------------------------------------
-// Damage — dice rolls and the blowgun's flat-1 case.
+// Damage — shared RollValue primitive (dice, flat, or both).
 // ---------------------------------------------------------------------------
 
-export const diceDamageSchema = z.object({
-  kind: z.literal('dice'),
-  count: z.number().int().min(1),
-  faces: dieFaceSchema,
-})
+/** Weapon damage uses the shared roll primitive. */
+export const weaponDamageSchema = rollSchema
 
-export const flatDamageSchema = z.object({
-  kind: z.literal('flat'),
-  amount: z.number().int().min(1),
-})
+export type WeaponDamage = RollValue
 
-export const weaponDamageSchema = z.discriminatedUnion('kind', [diceDamageSchema, flatDamageSchema])
-
-export type WeaponDamage = z.infer<typeof weaponDamageSchema>
-
-/** Formats a weapon damage value for display (e.g. "1d6" or "1"). */
+/** Formats weapon damage for display (e.g. "1d6", "1", "1d8+2"). */
 export function formatWeaponDamage(d: WeaponDamage): string {
-  return d.kind === 'dice' ? `${d.count}d${d.faces}` : String(d.amount)
+  return formatRollValue(d)
 }
 
 /**
  * Returns the average damage for a weapon damage value.
  *
- * @example averageWeaponDamage({ kind: 'dice', count: 1, faces: 8 }) // 4.5
- * @example averageWeaponDamage({ kind: 'flat', amount: 1 })          // 1
+ * @example averageWeaponDamage({ dice: { count: 1, faces: 8 } }) // 4.5
+ * @example averageWeaponDamage({ flat: 1 })                    // 1
  */
 export function averageWeaponDamage(d: WeaponDamage): number {
-  return d.kind === 'dice' ? averageDiceRoll(d) : d.amount
+  return averageRollValue(d)
 }
 
 // ---------------------------------------------------------------------------
@@ -94,7 +90,7 @@ export const weaponEquipmentKindFields = {
   /** Must be present whenever `damage` is present, and absent otherwise. */
   damageType: weaponDamageTypeSchema.optional(),
   /** Dice rolled when wielded two-handed; present only when 'versatile' in properties. */
-  versatileDamage: diceDamageSchema.optional(),
+  versatileDamage: diceSchema.optional(),
   properties: z.array(weaponPropertySchema),
   mastery: weaponMasterySchema,
   /** Normal/long throw or fire range in feet. Present for thrown/ranged weapons. */

@@ -6,6 +6,7 @@ import type { Equipment } from '../../content/equipment'
 import type { SkillProficiency } from '../../content/skill-proficiency'
 import type { Species } from '../../content/species'
 import type { Spell } from '../../content/spell'
+import type { LanguageSeedOption } from '../../vocab/language'
 import { resolvedCampaignCharacterCreationPatchSchema } from '../../campaign/patches/campaign-character-creation-patch'
 import { resolvedArmorClassSchema } from '../../campaign/patches/campaign-mechanics-patch'
 import { abilityGenerationRulesSchema } from './ability-generation'
@@ -23,6 +24,8 @@ import type {
 // and filters the catalog without touching this shape.
 // ---------------------------------------------------------------------------
 
+export type CharacterBuildLanguageOption = LanguageSeedOption
+
 /**
  * Catalog lists as delivered by the API — arrays only at this boundary.
  * Resolvers and derive code look items up through
@@ -34,6 +37,8 @@ export type CharacterBuildCatalog = {
   spells: Spell[]
   equipment: Equipment[]
   skillProficiencies: SkillProficiency[]
+  /** Active language vocabulary rows for the ruleset (category included). */
+  languages: CharacterBuildLanguageOption[]
 }
 
 export type CharacterBuildCatalogIndex = {
@@ -42,6 +47,7 @@ export type CharacterBuildCatalogIndex = {
   spells: ReadonlyMap<string, Spell>
   equipment: ReadonlyMap<string, Equipment>
   skillProficiencies: ReadonlyMap<string, SkillProficiency>
+  languages: readonly CharacterBuildLanguageOption[]
 }
 
 function byId<T extends { id: string }>(items: readonly T[]): ReadonlyMap<string, T> {
@@ -58,6 +64,7 @@ export function indexCharacterBuildCatalog(
     spells: byId(catalog.spells),
     equipment: byId(catalog.equipment),
     skillProficiencies: byId(catalog.skillProficiencies),
+    languages: catalog.languages,
   }
 }
 

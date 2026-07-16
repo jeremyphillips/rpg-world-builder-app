@@ -1,6 +1,6 @@
 import { getDamageTypeSentenceForm } from '../../vocab/damage/vocabulary'
 import { getLanguageSentenceForm } from '../../vocab/language'
-import { formatMovementBonusDescription } from '../../vocab/movement-mode'
+import { formatMovementGrantSentence } from '../../vocab/movement-mode'
 import { getSenseLabel, getSenseSentenceForm } from '../../vocab/sense'
 import type { ContentTrait, CustomContentTrait, GrantContentTrait, GrantGroups } from './grants'
 
@@ -29,7 +29,7 @@ function deriveGrantGroupDisplay(groups: GrantGroups): TraitDisplay {
     case 'movement':
       return {
         name: 'Movement',
-        descriptionHtml: `<p>${formatMovementBonusDescription(grant)}</p>`,
+        descriptionHtml: `<p>${formatMovementGrantSentence(grant)}</p>`,
       }
     case 'languages':
       return {

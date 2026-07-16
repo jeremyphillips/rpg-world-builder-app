@@ -10,4 +10,5 @@ rulesetRouter.get(
   requireAuth,
   controller.getCharacterCreationRules,
 )
+rulesetRouter.get('/:rulesetId/languages', requireAuth, controller.listLanguages)
 rulesetRouter.get('/:rulesetId/content/:contentType', requireAuth, controller.listContent)

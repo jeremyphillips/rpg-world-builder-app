@@ -20,7 +20,7 @@ const ELF_SYSTEM = {
   name: 'Elf',
   creatureType: 'humanoid',
   sizes: ['medium'],
-  speed: { walk: 30 },
+  movement: { walk: 30 },
   traits: [],
 }
 

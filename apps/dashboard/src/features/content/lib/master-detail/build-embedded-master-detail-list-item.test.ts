@@ -26,7 +26,7 @@ describe('buildEmbeddedMasterDetailListItem', () => {
       deletable: false,
       hasError: false,
       active: true,
-      badges: [{ label: 'System', variant: 'secondary' }],
+      badges: [{ label: 'System', appearance: 'neutral', tone: 'neutral' }],
     })
   })
 
@@ -47,7 +47,7 @@ describe('buildEmbeddedMasterDetailListItem', () => {
       title: 'Custom Feature',
       deletable: true,
       hasError: false,
-      badges: [{ label: 'Homebrew', variant: 'outline' }],
+      badges: [{ label: 'Homebrew', appearance: 'outline', tone: 'neutral' }],
     })
   })
 
@@ -67,8 +67,8 @@ describe('buildEmbeddedMasterDetailListItem', () => {
     expect(item.hasError).toBe(true)
     expect(item.active).toBe(false)
     expect(item.badges).toEqual([
-      { label: 'Homebrew', variant: 'outline' },
-      { label: 'Inactive', variant: 'outline' },
+      { label: 'Homebrew', appearance: 'outline', tone: 'neutral' },
+      { label: 'Inactive', appearance: 'outline', tone: 'caution' },
     ])
     expect(hasRowError).toHaveBeenCalledWith(0)
   })

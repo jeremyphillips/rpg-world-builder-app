@@ -4,7 +4,7 @@ import { indexCharacterBuildCatalog } from './context'
 import { createEmptyCharacterBuilderDraft } from './draft'
 import type { CharacterBuilderDraft } from './draft'
 import { buildCharacterPreview } from './preview'
-import { builderTestCatalog, builderTestRules } from './test-fixtures'
+import { builderTestCatalog, builderTestRules, storedFighter } from './test-fixtures'
 
 function makeCompleteDraft(overrides: Partial<CharacterBuilderDraft> = {}): CharacterBuilderDraft {
   return {
@@ -20,6 +20,8 @@ function makeCompleteDraft(overrides: Partial<CharacterBuilderDraft> = {}): Char
   }
 }
 
+const RULESET_ID = 'srd-cc-5.2.1' as const
+
 describe('buildCharacterPreview', () => {
   it('does not throw on an empty draft', () => {
     expect(() =>
@@ -27,6 +29,7 @@ describe('buildCharacterPreview', () => {
         createEmptyCharacterBuilderDraft(),
         indexCharacterBuildCatalog(builderTestCatalog),
         builderTestRules,
+        RULESET_ID,
       ),
     ).not.toThrow()
   })
@@ -36,6 +39,7 @@ describe('buildCharacterPreview', () => {
       createEmptyCharacterBuilderDraft(),
       indexCharacterBuildCatalog(builderTestCatalog),
       builderTestRules,
+      RULESET_ID,
     )
 
     expect(preview.maxHp).toBeUndefined()
@@ -51,6 +55,7 @@ describe('buildCharacterPreview', () => {
       },
       indexCharacterBuildCatalog(builderTestCatalog),
       builderTestRules,
+      RULESET_ID,
     )
 
     expect(preview.maxHp).toBeUndefined()
@@ -66,6 +71,7 @@ describe('buildCharacterPreview', () => {
       },
       indexCharacterBuildCatalog(builderTestCatalog),
       builderTestRules,
+      RULESET_ID,
     )
 
     expect(preview.maxHp).toBe(10)
@@ -77,6 +83,7 @@ describe('buildCharacterPreview', () => {
       makeCompleteDraft(),
       indexCharacterBuildCatalog(builderTestCatalog),
       builderTestRules,
+      RULESET_ID,
     )
 
     expect(preview.proficiencyBonus).toBe(2)
@@ -97,6 +104,7 @@ describe('buildCharacterPreview', () => {
       makeCompleteDraft(),
       indexCharacterBuildCatalog(builderTestCatalog),
       builderTestRules,
+      RULESET_ID,
       {
         resolvedChoiceSets: [
           {
@@ -117,15 +125,46 @@ describe('buildCharacterPreview', () => {
     expect(preview.unresolvedChoiceSetIds).toEqual(['class:srd-cc-5.2.1:fighter:class-skills'])
   })
 
-  it('surfaces advisory warnings for incomplete drafts', () => {
+  it('returns advisory warnings only for non-blocking recommendations', () => {
     const preview = buildCharacterPreview(
       createEmptyCharacterBuilderDraft(),
       indexCharacterBuildCatalog(builderTestCatalog),
       builderTestRules,
+      RULESET_ID,
     )
 
-    expect(preview.warnings).toContain('Name is not set.')
-    expect(preview.warnings).toContain('Species is not selected.')
-    expect(preview.warnings).toContain('Class is not selected.')
+    expect(preview.warnings).toEqual([])
+  })
+
+  it('surfaces unarmored defense when no body armor is equipped', () => {
+    const catalogWithUnarmoredDefense = {
+      ...builderTestCatalog,
+      classes: [
+        {
+          ...storedFighter,
+          features: [
+            {
+              kind: 'custom' as const,
+              id: 'unarmored-defense',
+              name: 'Unarmored Defense',
+              level: 1,
+              description: 'AC without armor.',
+            },
+          ],
+        },
+      ],
+    }
+
+    const preview = buildCharacterPreview(
+      {
+        ...createEmptyCharacterBuilderDraft(),
+        class: { classId: 'srd-cc-5.2.1:fighter', level: 1 },
+      },
+      indexCharacterBuildCatalog(catalogWithUnarmoredDefense),
+      builderTestRules,
+      RULESET_ID,
+    )
+
+    expect(preview.warnings.some((warning) => warning.includes('Unarmored Defense'))).toBe(true)
   })
 })

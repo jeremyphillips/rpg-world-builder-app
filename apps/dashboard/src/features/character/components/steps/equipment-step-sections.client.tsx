@@ -1,0 +1,48 @@
+'use client'
+
+import type { ComponentProps } from 'react'
+
+import type { EquipmentBudgetSummary } from '@rpg/contracts'
+import { Button, Heading, Text } from '@rpg/ui'
+
+import {
+  EQUIPMENT_STEP_CONTINUE_WITHOUT_LABEL,
+  EQUIPMENT_STEP_NO_VALID_OPTIONS_MESSAGE,
+} from '../../lib/equipment-step.lib'
+import { EquipmentBudgetHeader } from '../equipment/equipment-budget-header.client'
+import { EquipmentInventorySummary } from '../equipment/equipment-inventory-summary.client'
+
+export function EquipmentStepFallback({ onContinueWithout }: { onContinueWithout: () => void }) {
+  return (
+    <div className="space-y-4">
+      <Text>{EQUIPMENT_STEP_NO_VALID_OPTIONS_MESSAGE}</Text>
+      <Button type="button" variant="secondary" onClick={onContinueWithout}>
+        {EQUIPMENT_STEP_CONTINUE_WITHOUT_LABEL}
+      </Button>
+    </div>
+  )
+}
+
+export function EquipmentStepShoppingSection({ budget }: { budget: EquipmentBudgetSummary }) {
+  return (
+    <section className="space-y-4">
+      <Heading variant="subsection" as="h3">
+        Budget
+      </Heading>
+      <EquipmentBudgetHeader budget={budget} />
+    </section>
+  )
+}
+
+export type EquipmentStepInventorySectionProps = ComponentProps<typeof EquipmentInventorySummary>
+
+export function EquipmentStepInventorySection(props: EquipmentStepInventorySectionProps) {
+  return (
+    <section className="space-y-3">
+      <Heading variant="sheetSection" as="h3">
+        Inventory
+      </Heading>
+      <EquipmentInventorySummary {...props} />
+    </section>
+  )
+}

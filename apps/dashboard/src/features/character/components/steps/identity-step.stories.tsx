@@ -20,6 +20,7 @@ export const Empty: Story = {
       validationIssues={[]}
       onDraftChange={() => undefined}
       onStepComplete={() => undefined}
+      onFormContinueValidationFailed={() => undefined}
     />
   ),
 }
@@ -42,6 +43,7 @@ export const WithNarrative: Story = {
       validationIssues={[]}
       onDraftChange={() => undefined}
       onStepComplete={() => undefined}
+      onFormContinueValidationFailed={() => undefined}
     />
   ),
 }
@@ -59,6 +61,7 @@ export const WithValidationIssues: Story = {
       ]}
       onDraftChange={() => undefined}
       onStepComplete={() => undefined}
+      onFormContinueValidationFailed={() => undefined}
     />
   ),
 }

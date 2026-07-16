@@ -152,7 +152,7 @@ export function proficienciesFields(ctx: ContentFormCtx): FormItem[] {
     },
     {
       kind: 'group',
-      legend: 'Skills & Tools',
+      legend: 'Granted skills & tools',
       fields: [
         {
           type: 'chips',

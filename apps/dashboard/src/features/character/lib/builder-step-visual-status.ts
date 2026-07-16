@@ -1,82 +1,168 @@
 import {
+  BUILDER_STEP_READINESS_STEP_IDS,
   isBuilderStepComplete,
-  isSpellcastingActiveAtLevel,
+  resolveBuilderStepReadiness,
+  type BuilderStepReadiness,
+  type BuilderStepReadinessState,
+  type BuilderStepReadinessStepId,
   type CharacterBuildCatalogIndex,
+  type CharacterBuildContext,
   type CharacterBuilderDraft,
   type CharacterBuilderStepId,
   type CharacterBuildValidationIssue,
+  type ChoiceSet,
 } from '@rpg/contracts'
 
-import { issuesForStep } from './validate-builder-step'
-
-export type StepStatus = 'notStarted' | 'current' | 'complete' | 'warning' | 'locked'
+export type StepStatus = 'idle' | 'active' | 'complete' | 'error' | 'locked'
 
 export type ResolveStepVisualStatusInput = {
   stepId: CharacterBuilderStepId
   draft: CharacterBuilderDraft
   currentStepId: CharacterBuilderStepId
-  resolvedChoiceSets: null
-  validationIssues: CharacterBuildValidationIssue[]
-  attemptedStepIds: readonly CharacterBuilderStepId[]
+  context: CharacterBuildContext
+  resolvedChoiceSets: readonly ChoiceSet[] | null
+  draftValidationIssues: CharacterBuildValidationIssue[]
+  validationVisibleStepIds: readonly CharacterBuilderStepId[]
   catalogIndex: CharacterBuildCatalogIndex
   standardArray: readonly number[]
 }
 
-function isSpellsStepLocked(
-  draft: CharacterBuilderDraft,
-  catalogIndex: CharacterBuildCatalogIndex,
+const READINESS_STEP_IDS = new Set<CharacterBuilderStepId>(BUILDER_STEP_READINESS_STEP_IDS)
+
+function isReadinessStep(stepId: CharacterBuilderStepId): stepId is BuilderStepReadinessStepId {
+  return READINESS_STEP_IDS.has(stepId)
+}
+
+function stepStatusFromReadiness(
+  readiness: BuilderStepReadiness,
+  stepId: CharacterBuilderStepId,
+  currentStepId: CharacterBuilderStepId,
+): StepStatus | null {
+  switch (readiness) {
+    case 'notApplicable':
+      return 'locked'
+    case 'readyEmpty':
+    case 'complete':
+      return 'complete'
+    case 'blocked':
+      return currentStepId === stepId ? 'active' : 'idle'
+    case 'readyWithChoices':
+      return null
+  }
+}
+
+function hasValidationVisibleError(
+  stepId: CharacterBuilderStepId,
+  validationVisibleStepIds: readonly CharacterBuilderStepId[],
 ): boolean {
-  const classId = draft.class.classId
-  if (!classId) return false
+  return validationVisibleStepIds.includes(stepId)
+}
 
-  const characterClass = catalogIndex.classes.get(classId)
-  if (!characterClass) return false
+function hasDraftValidationIssues(
+  stepId: CharacterBuilderStepId,
+  draftValidationIssues: CharacterBuildValidationIssue[],
+): boolean {
+  return draftValidationIssues.some((issue) => issue.stepId === stepId)
+}
 
-  return !isSpellcastingActiveAtLevel(characterClass.spellcasting, draft.class.level)
+function resolveReadinessState(
+  stepId: CharacterBuilderStepId,
+  draft: CharacterBuilderDraft,
+  context: CharacterBuildContext,
+  resolvedChoiceSets: readonly ChoiceSet[] | null,
+): BuilderStepReadinessState | null {
+  if (!isReadinessStep(stepId) || resolvedChoiceSets === null) {
+    return null
+  }
+
+  return resolveBuilderStepReadiness(stepId, draft, context, resolvedChoiceSets)
+}
+
+function resolveReadinessVisualStatus(
+  readiness: BuilderStepReadiness,
+  stepId: CharacterBuilderStepId,
+  currentStepId: CharacterBuilderStepId,
+  draftValidationIssues: CharacterBuildValidationIssue[],
+): StepStatus | null {
+  const readinessStatus = stepStatusFromReadiness(readiness, stepId, currentStepId)
+  if (readinessStatus === null) {
+    return null
+  }
+
+  if (readinessStatus === 'complete' && hasDraftValidationIssues(stepId, draftValidationIssues)) {
+    return currentStepId === stepId ? 'active' : 'idle'
+  }
+
+  return readinessStatus
+}
+
+function resolveIncompleteVisualStatus(
+  stepId: CharacterBuilderStepId,
+  draft: CharacterBuilderDraft,
+  currentStepId: CharacterBuilderStepId,
+  resolvedChoiceSets: readonly ChoiceSet[] | null,
+  draftValidationIssues: CharacterBuildValidationIssue[],
+  standardArray: readonly number[],
+): StepStatus {
+  const isComplete = isBuilderStepComplete(stepId, draft, resolvedChoiceSets, { standardArray })
+  if (isComplete && !hasDraftValidationIssues(stepId, draftValidationIssues)) {
+    return 'complete'
+  }
+
+  return currentStepId === stepId ? 'active' : 'idle'
 }
 
 export function resolveStepVisualStatus({
   stepId,
   draft,
   currentStepId,
+  context,
   resolvedChoiceSets,
-  validationIssues,
-  attemptedStepIds,
-  catalogIndex,
+  draftValidationIssues,
+  validationVisibleStepIds,
+  catalogIndex: _catalogIndex,
   standardArray,
 }: ResolveStepVisualStatusInput): StepStatus {
-  const isLocked = stepId === 'spells' && isSpellsStepLocked(draft, catalogIndex)
-  if (isLocked) {
+  const readinessState = resolveReadinessState(stepId, draft, context, resolvedChoiceSets)
+
+  if (readinessState?.readiness === 'notApplicable') {
     return 'locked'
   }
 
-  const hasBlockingIssues = issuesForStep(validationIssues, stepId).length > 0
-  const hasAttemptedStep = attemptedStepIds.includes(stepId)
-  if (hasAttemptedStep && hasBlockingIssues) {
-    return 'warning'
+  if (hasValidationVisibleError(stepId, validationVisibleStepIds)) {
+    return 'error'
   }
 
-  const isComplete = isBuilderStepComplete(stepId, draft, resolvedChoiceSets, { standardArray })
-  if (isComplete) {
-    return 'complete'
+  if (readinessState) {
+    const readinessStatus = resolveReadinessVisualStatus(
+      readinessState.readiness,
+      stepId,
+      currentStepId,
+      draftValidationIssues,
+    )
+    if (readinessStatus !== null) {
+      return readinessStatus
+    }
   }
 
-  const isActive = currentStepId === stepId
-  if (isActive) {
-    return 'current'
-  }
+  return resolveIncompleteVisualStatus(
+    stepId,
+    draft,
+    currentStepId,
+    resolvedChoiceSets,
+    draftValidationIssues,
+    standardArray,
+  )
+}
 
-  return 'notStarted'
+export const STEP_STATUS_ARIA_LABELS: Record<StepStatus, string> = {
+  idle: 'not started',
+  active: 'current step',
+  complete: 'complete',
+  error: 'has blocking validation issues',
+  locked: 'not applicable',
 }
 
 export function stepStatusAriaLabel(stepLabel: string, status: StepStatus): string {
-  const statusLabels: Record<StepStatus, string> = {
-    notStarted: 'not started',
-    current: 'current step',
-    complete: 'complete',
-    warning: 'has validation issues',
-    locked: 'locked',
-  }
-
-  return `${stepLabel}, ${statusLabels[status]}`
+  return `${stepLabel}, ${STEP_STATUS_ARIA_LABELS[status]}`
 }

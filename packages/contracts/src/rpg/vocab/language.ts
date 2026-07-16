@@ -94,3 +94,8 @@ export function getLanguageCategorySentenceForm(category: string, count = 1): st
   if (entry) return getTermSentenceForm(entry, count)
   return getTermSentenceForm({ label: category, description: '' }, count)
 }
+
+/** Counted noun phrase for language proficiency grants (e.g. "language" / "languages"). */
+export function getLanguageProficiencySentenceForm(count = 1): string {
+  return count === 1 ? 'language' : 'languages'
+}

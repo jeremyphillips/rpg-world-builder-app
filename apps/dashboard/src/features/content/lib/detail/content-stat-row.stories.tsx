@@ -19,6 +19,14 @@ export const Default: Story = {
   },
 }
 
+export const Compact: Story = {
+  args: {
+    label: 'Category',
+    value: 'Martial',
+    size: 'sm',
+  },
+}
+
 export const WithInfo: Story = {
   args: {
     label: 'Mastery',

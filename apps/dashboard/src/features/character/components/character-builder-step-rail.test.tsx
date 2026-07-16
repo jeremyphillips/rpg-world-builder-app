@@ -7,15 +7,28 @@ import {
   createEmptyCharacterBuilderDraft,
   DEFAULT_ABILITY_GENERATION_RULES,
   indexCharacterBuildCatalog,
+  resolveAvailableChoices,
+  type CharacterBuilderStepId,
+  type CharacterBuildValidationIssue,
 } from '@rpg/contracts'
 
 import { createPopulatedStandaloneBuilderContextFixture } from '../lib/character-builder-fixtures'
+import { createSpellsStepContextFixture } from '../lib/spells-step.fixtures'
 import { CharacterBuilderStepRail } from './character-builder-step-rail.client'
 
-const catalogIndex = indexCharacterBuildCatalog(
-  createPopulatedStandaloneBuilderContextFixture().catalog,
-)
+const context = createPopulatedStandaloneBuilderContextFixture()
+const catalogIndex = indexCharacterBuildCatalog(context.catalog)
 const standardArray = DEFAULT_ABILITY_GENERATION_RULES.standardArray
+
+const railProps = {
+  context,
+  catalogIndex,
+  resolvedChoiceSets: null,
+  draftValidationIssues: [] as CharacterBuildValidationIssue[],
+  validationVisibleStepIds: [] as CharacterBuilderStepId[],
+  standardArray,
+  onStepSelect: () => undefined,
+}
 
 describe('CharacterBuilderStepRail', () => {
   it('renders all builder steps and marks the active step', () => {
@@ -23,12 +36,7 @@ describe('CharacterBuilderStepRail', () => {
       <CharacterBuilderStepRail
         draft={createEmptyCharacterBuilderDraft()}
         currentStepId="species"
-        catalogIndex={catalogIndex}
-        resolvedChoiceSets={null}
-        validationIssues={[]}
-        attemptedStepIds={[]}
-        standardArray={standardArray}
-        onStepSelect={() => undefined}
+        {...railProps}
       />,
     )
 
@@ -48,12 +56,7 @@ describe('CharacterBuilderStepRail', () => {
           currentStepId: 'identity',
         }}
         currentStepId="identity"
-        catalogIndex={catalogIndex}
-        resolvedChoiceSets={null}
-        validationIssues={[]}
-        attemptedStepIds={[]}
-        standardArray={standardArray}
-        onStepSelect={() => undefined}
+        {...railProps}
       />,
     )
 
@@ -63,46 +66,58 @@ describe('CharacterBuilderStepRail', () => {
     )
   })
 
-  it('shows a warning icon only after an attempted submit with blocking issues', () => {
+  it('shows an error icon only for validation-visible steps', () => {
     render(
       <CharacterBuilderStepRail
         draft={createEmptyCharacterBuilderDraft()}
-        currentStepId="identity"
-        catalogIndex={catalogIndex}
-        resolvedChoiceSets={null}
-        validationIssues={[
-          { code: 'identity.name.required', message: 'Name is required.', stepId: 'identity' },
-        ]}
-        attemptedStepIds={['identity']}
-        standardArray={standardArray}
-        onStepSelect={() => undefined}
+        currentStepId="species"
+        {...railProps}
+        validationVisibleStepIds={['identity']}
       />,
     )
 
     expect(
-      screen.getByRole('button', { name: /Identity, has validation issues/i }),
+      screen.getByRole('button', { name: /Identity, has blocking validation issues/i }),
     ).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /Species, current step/i })).toBeInTheDocument()
   })
 
-  it('does not show a warning icon before Continue is attempted', () => {
+  it('does not show an error icon before Continue marks a step validation-visible', () => {
     render(
       <CharacterBuilderStepRail
         draft={createEmptyCharacterBuilderDraft()}
         currentStepId="identity"
-        catalogIndex={catalogIndex}
-        resolvedChoiceSets={null}
-        validationIssues={[
-          { code: 'identity.name.required', message: 'Name is required.', stepId: 'identity' },
+        {...railProps}
+        draftValidationIssues={[
+          { code: 'name_required', message: 'Enter a character name.', stepId: 'identity' },
         ]}
-        attemptedStepIds={[]}
-        standardArray={standardArray}
-        onStepSelect={() => undefined}
       />,
     )
 
     expect(screen.getByRole('button', { name: /Identity, current step/i })).toBeInTheDocument()
     expect(
-      screen.queryByRole('button', { name: /Identity, has validation issues/i }),
+      screen.queryByRole('button', { name: /Identity, has blocking validation issues/i }),
+    ).not.toBeInTheDocument()
+  })
+
+  it('does not show an error icon for field edits alone', () => {
+    render(
+      <CharacterBuilderStepRail
+        draft={{
+          ...createEmptyCharacterBuilderDraft(),
+          touchedStepIds: ['identity'],
+        }}
+        currentStepId="species"
+        {...railProps}
+        draftValidationIssues={[
+          { code: 'name_required', message: 'Enter a character name.', stepId: 'identity' },
+        ]}
+      />,
+    )
+
+    expect(screen.getByRole('button', { name: /Identity, not started/i })).toBeInTheDocument()
+    expect(
+      screen.queryByRole('button', { name: /Identity, has blocking validation issues/i }),
     ).not.toBeInTheDocument()
   })
 
@@ -113,11 +128,7 @@ describe('CharacterBuilderStepRail', () => {
       <CharacterBuilderStepRail
         draft={createEmptyCharacterBuilderDraft()}
         currentStepId="identity"
-        catalogIndex={catalogIndex}
-        resolvedChoiceSets={null}
-        validationIssues={[]}
-        attemptedStepIds={[]}
-        standardArray={standardArray}
+        {...railProps}
         onStepSelect={onStepSelect}
       />,
     )
@@ -126,17 +137,58 @@ describe('CharacterBuilderStepRail', () => {
     expect(onStepSelect).toHaveBeenCalledWith('class')
   })
 
+  it('moves focus and selection with arrow keys', async () => {
+    const user = userEvent.setup()
+    const onStepSelect = vi.fn()
+
+    render(
+      <CharacterBuilderStepRail
+        draft={createEmptyCharacterBuilderDraft()}
+        currentStepId="identity"
+        {...railProps}
+        onStepSelect={onStepSelect}
+      />,
+    )
+
+    const identityButton = screen.getByRole('button', { name: /Identity, current step/i })
+    identityButton.focus()
+
+    await user.keyboard('{ArrowDown}')
+
+    expect(onStepSelect).toHaveBeenCalledWith('species')
+    expect(screen.getByRole('button', { name: /Species, not started/i })).toHaveFocus()
+  })
+
+  it('marks non-caster spells as not applicable once choice sets are resolved', () => {
+    const spellsContext = createSpellsStepContextFixture()
+    const draft = {
+      ...createEmptyCharacterBuilderDraft(),
+      class: { classId: 'srd-cc-5.2.1:fighter', level: 1 as const },
+    }
+
+    render(
+      <CharacterBuilderStepRail
+        draft={draft}
+        currentStepId="identity"
+        context={spellsContext}
+        catalogIndex={indexCharacterBuildCatalog(spellsContext.catalog)}
+        resolvedChoiceSets={resolveAvailableChoices(draft, spellsContext)}
+        draftValidationIssues={[]}
+        validationVisibleStepIds={[]}
+        standardArray={standardArray}
+        onStepSelect={() => undefined}
+      />,
+    )
+
+    expect(screen.getByRole('button', { name: /Spells, not applicable/i })).toBeInTheDocument()
+  })
+
   it('has no axe accessibility violations', async () => {
     const { container } = render(
       <CharacterBuilderStepRail
         draft={createEmptyCharacterBuilderDraft()}
         currentStepId="identity"
-        catalogIndex={catalogIndex}
-        resolvedChoiceSets={null}
-        validationIssues={[]}
-        attemptedStepIds={[]}
-        standardArray={standardArray}
-        onStepSelect={() => undefined}
+        {...railProps}
       />,
     )
 

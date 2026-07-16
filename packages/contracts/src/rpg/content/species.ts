@@ -8,7 +8,7 @@ import {
 } from './lib/envelope'
 import { creatureSizeSchema } from '../vocab/creature-size'
 import { creatureTypeSchema } from '../vocab/creature-type'
-import { speedSchema } from '../vocab/movement-mode'
+import { movementSpeedsSchema } from '../vocab/movement-mode'
 import { contentNamedChoiceSchema } from './lib/choice'
 import {
   contentGrantsSchema,
@@ -20,6 +20,7 @@ import {
   innateSpellEntrySchema,
   innateSpellsSchema,
 } from './lib/grants'
+import { languageIdSchema } from '../vocab/language'
 import { speciesCharacterCreationSchema } from './species-character-creation'
 
 // ---------------------------------------------------------------------------
@@ -72,7 +73,12 @@ export const speciesBodySchema = contentBodyBaseSchema.extend({
   creatureType: creatureTypeSchema,
   /** Allowed sizes; a single-element array is a fixed size, multiple is a choice. */
   sizes: z.array(creatureSizeSchema).min(1),
-  speed: speedSchema,
+  movement: movementSpeedsSchema,
+  /**
+   * Recommended language ids for origin picks. Marks selectable ChoiceSet options
+   * as recommended in the UI; does not grant languages or expand selectable pools.
+   */
+  languageAffinities: z.array(languageIdSchema).optional(),
   traits: z.array(contentTraitSchema),
   heritage: speciesHeritageSchema.optional(),
   /** Species-authored data consumed only when the campaign enables the matching rule. */

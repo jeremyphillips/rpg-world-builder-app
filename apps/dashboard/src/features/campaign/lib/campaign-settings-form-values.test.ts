@@ -9,6 +9,7 @@ import {
   DEFAULT_SPECIES_LEVEL_LIMITS_ENABLED,
   DEFAULT_SPECIES_MULTICLASS_POLICY_ENABLED,
   DEFAULT_SUBCLASS_CHOICES_ENABLED,
+  resolveCharacterCreationPatch,
   type Campaign,
   type CreatureTypeId,
 } from '@rpg/contracts'
@@ -26,6 +27,7 @@ import {
   buildCharacterCreationPatchInputFromCreateWizard,
   mapRulesetPatchToRulesValues,
 } from './rules/character-configuration/character-configuration-form-values'
+import { languageProficiencyRulesDefaultValues } from './rules/character-configuration/language-proficiency-form-values'
 import { mapStartingWealthToFormValues } from './rules/character-configuration/starting-wealth-form-values'
 
 const defaultStartingWealth = mapStartingWealthToFormValues(
@@ -75,6 +77,7 @@ const defaultMulticlassingFields = {
   speciesLevelLimitsEnabled: DEFAULT_SPECIES_LEVEL_LIMITS_ENABLED,
   subclassChoicesEnabled: DEFAULT_SUBCLASS_CHOICES_ENABLED,
   startingWealth: defaultStartingWealth,
+  ...languageProficiencyRulesDefaultValues(),
 } as const
 
 describe('mapCampaignToSettingsValues', () => {
@@ -189,6 +192,7 @@ describe('buildCharacterCreationPatchInput', () => {
         speciesLevelLimitsEnabled: false,
         subclassChoicesEnabled: true,
         startingWealth: defaultStartingWealth,
+        ...languageProficiencyRulesDefaultValues(),
       }),
     ).toEqual({
       startingLevel: 1,
@@ -232,6 +236,7 @@ describe('buildCharacterCreationPatchInput', () => {
           speciesLevelLimitsEnabled: true,
           subclassChoicesEnabled: true,
           startingWealth: defaultStartingWealth,
+          ...languageProficiencyRulesDefaultValues(),
         },
         { includeDefaultMulticlassing: true },
       ),
@@ -330,16 +335,20 @@ describe('mapRulesetPatchToRulesValues', () => {
   it('maps resolved patch data to flat rules form values', () => {
     expect(
       mapRulesetPatchToRulesValues({
-        startingLevel: 3,
-        importedCharacters: { policy: 'approval_required' },
-        progression: {
-          maxCharacterLevel: 25,
-          extendedProgression: { tierName: 'Epic Destiny', maxLevel: 30 },
-        },
-        species: { creatureTypePolicy: { mode: 'only', ids: ['humanoid', 'fey'] } },
+        ...resolveCharacterCreationPatch(
+          {
+            startingLevel: 3,
+            importedCharacters: { policy: 'approval_required' },
+            progression: {
+              maxCharacterLevel: 25,
+              extendedProgression: { tierName: 'Epic Destiny', maxLevel: 30 },
+            },
+            species: { creatureTypePolicy: { mode: 'only', ids: ['humanoid', 'fey'] } },
+          },
+          getStandardStartingWealthRules('srd-cc-5.2.1'),
+        ),
         multiclassing: defaultMulticlassingRules(),
         subclasses: defaultSubclassingRules(),
-        startingWealth: getStandardStartingWealthRules('srd-cc-5.2.1'),
       }),
     ).toEqual({
       startingLevel: 3,
@@ -356,6 +365,7 @@ describe('mapRulesetPatchToRulesValues', () => {
       speciesLevelLimitsEnabled: false,
       subclassChoicesEnabled: true,
       startingWealth: defaultStartingWealth,
+      ...languageProficiencyRulesDefaultValues(),
     })
   })
 })

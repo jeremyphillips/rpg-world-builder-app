@@ -16,20 +16,23 @@ The **Subclasses** tab uses a list + editor layout: seed subclasses load from th
 
 ## Key files
 
-| Area                                 | Path                                                                                                                                           |
-| ------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------- |
-| Class form def                       | `lib/class-form-def.ts`                                                                                                                        |
-| Class form hub / values / labels     | `lib/class-form-fields.ts`, `class-form-values.ts`, `class-form-labels.ts`                                                                     |
-| Class form tab field modules         | `lib/class-basics-form-fields.ts`, `class-proficiencies-form-fields.ts`, `class-spellcasting-form-fields.ts`, `class-resources-form-fields.ts` |
-| Subclass form fields / values        | `lib/subclasses/subclass-form-fields.ts`, `subclass-form-values.ts`                                                                            |
-| Shared feature row fields            | `lib/class-feature-form-fields.ts`, `lib/class-subclass-choice-features.ts`                                                                    |
-| Features tab (master-detail)         | `components/class-features-tab.client.tsx`                                                                                                     |
-| Character creation tab               | `components/class-character-creation-tab.client.tsx`                                                                                           |
-| Starting equipment form              | `lib/character-creation/class-starting-equipment-form-*.ts`                                                                                    |
-| Subclasses tab                       | `components/class-subclasses-tab.client.tsx`                                                                                                   |
-| Spell progression grid helpers       | `lib/progression-table-helpers.ts`                                                                                                             |
-| Cantrip template presets (seed-only) | `lib/cantrips-profiles.ts`                                                                                                                     |
-| Read-only progression table          | `components/class-progression-table.tsx`                                                                                                       |
-| Detail feature list item             | `lib/feature-item.tsx`                                                                                                                         |
+| Area                                 | Path                                                                                                                                                             |
+| ------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Class form def                       | `lib/class-form-def.ts`                                                                                                                                          |
+| Class form hub / values / labels     | `lib/class-form-fields.ts`, `class-form-values.ts`, `class-form-labels.ts`                                                                                       |
+| Class form tab field modules         | `lib/class-basics-form-fields.ts`, `class-proficiencies-form-fields.ts`, `class-spellcasting-form-fields.ts`, `class-resources-form-fields.ts`                   |
+| Subclass form fields / values        | `lib/subclasses/subclass-form-fields.ts`, `subclass-form-values.ts`                                                                                              |
+| Shared feature row fields            | `lib/class-feature-form-fields.ts`, `lib/class-subclass-choice-features.ts`                                                                                      |
+| Features tab (master-detail)         | `components/class-features-tab.client.tsx`                                                                                                                       |
+| Character creation tab               | `components/class-character-creation-tab.client.tsx`                                                                                                             |
+| Starting equipment form              | `lib/character-creation/class-starting-equipment-form-*.ts`                                                                                                      |
+| Subclasses tab                       | `components/class-subclasses-tab.client.tsx`                                                                                                                     |
+| Spell progression grid helpers       | `lib/progression-table-helpers.ts`                                                                                                                               |
+| Cantrip template presets (seed-only) | `lib/cantrips-profiles.ts`                                                                                                                                       |
+| Read-only progression table          | `components/class-progression-table.tsx`                                                                                                                         |
+| Detail feature list item             | `lib/feature-item.tsx`                                                                                                                                           |
+| Display registry (detail + builder)  | `lib/class-display.ts` — labels and view models for detail route and builder sheet; join-dependent rendering (skill links, subclasses) stays in route components |
+
+`class-display.ts` owns intrinsic class data: stat rows, granted proficiencies, choice pool slugs, and features. The detail route joins skill proficiency records for linked choice labels and keeps subclasses and the progression table outside the view model. The builder sheet adapter (`buildClassDetailsSheetContent` in `apps/dashboard/src/features/character/lib/builder-class-option-display.lib.ts`) maps the same registry with `surface: 'builder-sheet'` — compact proficiency choice summaries with option-pool disclosure, level-1 features only.
 
 Spellcasting contract shape, preparation modes, and the sparse/dense progression model are documented in [content-types.md](../../../../../docs/content-types.md#class-spellcasting-reference).

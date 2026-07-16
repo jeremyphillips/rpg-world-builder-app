@@ -23,6 +23,7 @@ packages/contracts/src/
     content/            # catalog content types (species, weapons, classes, …)
       lib/              # envelope, grants, content-key, content-type-keys, …
       classes/          # class body, spellcasting, subclasses
+        spellcasting/   # spellcasting schema + slot progression tables
     runtime/            # stored character sheets + builder runtime (not catalog content)
       character/        # sheet schema, provenance, proficiencies, inventory
       character-builder/ # builder draft, context, choice/step vocabulary
@@ -67,19 +68,20 @@ flowchart BT
 
 ## Where to put new modules
 
-| You are adding…                                       | Layer                 | Example path                                                                    |
-| ----------------------------------------------------- | --------------------- | ------------------------------------------------------------------------------- |
-| A shared validation message or message primitive      | `validation/`         | `validation/messages.ts` (see [validation-messages.md](validation-messages.md)) |
-| A closed id set with labels (and optional SRD text)   | `rpg/vocab/`          | `rpg/vocab/sense.ts`, `rpg/vocab/weapon/property.ts`                            |
-| A reusable value type used across content types       | `rpg/primitives/`     | `rpg/primitives/dice.ts`, `rpg/primitives/level.ts`                             |
-| A catalog content type or its DTOs/patches            | `rpg/content/`        | `rpg/content/species.ts`, `rpg/content/classes/class.ts`                        |
-| Shared content helpers (grants, envelope, keys)       | `rpg/content/lib/`    | `rpg/content/lib/grants.ts`                                                     |
-| A stored character sheet or builder runtime contract  | `rpg/runtime/`        | `rpg/runtime/character/sheet.ts`                                                |
-| Campaign identity, rules, membership, ruleset patches | `rpg/campaign/`       | `rpg/campaign/campaign.ts`, `rpg/campaign/patches/`                             |
-| Campaign rule bodies (not catalog content types)      | `rpg/campaign/rules/` | `rpg/campaign/rules/starting-wealth.ts`                                         |
-| Auth, session, upload, or API error shapes            | `shared/`             | `shared/auth.ts`, `shared/errors.ts`                                            |
-| Dev Bench ticket/epic schemas and input DTOs          | `dev-bench/`          | `dev-bench/ticket.ts`                                                           |
-| Public marketing or CMS schemas                       | `public/`             | (scaffold — add when needed)                                                    |
+| You are adding…                                       | Layer                   | Example path                                                                                                                 |
+| ----------------------------------------------------- | ----------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| A shared validation message or message primitive      | `validation/`           | `validation/messages.ts` (see [validation-messages.md](validation-messages.md))                                              |
+| A closed id set with labels (and optional SRD text)   | `rpg/vocab/`            | `rpg/vocab/sense.ts`, `rpg/vocab/weapon/property.ts`                                                                         |
+| A reusable value type used across content types       | `rpg/primitives/`       | `rpg/primitives/dice.ts`, `rpg/primitives/units.ts`, `rpg/primitives/wealth.ts`                                              |
+| A catalog content type or its DTOs/patches            | `rpg/content/`          | `rpg/content/species.ts`, `rpg/content/classes/class.ts`                                                                     |
+| Shared content helpers (grants, envelope, keys)       | `rpg/content/lib/`      | `rpg/content/lib/grants.ts`                                                                                                  |
+| Creature-like runtime primitives (PC, NPC, monster)   | `rpg/runtime/creature/` | `languages.ts`, `equipment.ts`, `spellcasting.ts` — see [runtime-resolution-boundaries.md](runtime-resolution-boundaries.md) |
+| A stored character sheet or builder runtime contract  | `rpg/runtime/`          | `rpg/runtime/character/sheet.ts` — see [runtime-resolution-boundaries.md](runtime-resolution-boundaries.md)                  |
+| Campaign identity, rules, membership, ruleset patches | `rpg/campaign/`         | `rpg/campaign/campaign.ts`, `rpg/campaign/patches/`                                                                          |
+| Campaign rule bodies (not catalog content types)      | `rpg/campaign/rules/`   | `rpg/campaign/rules/starting-wealth.ts`                                                                                      |
+| Auth, session, upload, or API error shapes            | `shared/`               | `shared/auth.ts`, `shared/errors.ts`                                                                                         |
+| Dev Bench ticket/epic schemas and input DTOs          | `dev-bench/`            | `dev-bench/ticket.ts`                                                                                                        |
+| Public marketing or CMS schemas                       | `public/`               | (scaffold — add when needed)                                                                                                 |
 
 Nested folders are fine when a domain splits cleanly (e.g. `rpg/content/classes/`
 for spellcasting + class body, `rpg/vocab/weapon/` for weapon term maps).
@@ -178,6 +180,17 @@ Pattern: `*_ENTRIES` map → derived id tuple → `z.enum` schema →
 `vocabularyOptionIdSchema`; see [docs/vocabulary.md](../../../docs/vocabulary.md).
 
 Entity-specific fields stay on the content schema in `rpg/content/`, not in vocab maps.
+
+Spell catalog content lives under `rpg/content/spell/` (`body.ts`, `levels.ts`,
+`effects/`, `resolution/`); `rpg/content/spell.ts` is the facade re-export.
+Class spellcasting (`rpg/content/classes/spellcasting/`) holds the class
+`spellcasting` block schema and SRD slot tables (`slots.ts`).
+
+Spell resolution (`rpg/content/spell/resolution/`) is an optional envelope on
+`spellBodySchema` — target, method, range, base effects, and outcome applications.
+Vocab for resolution-specific closed sets lives alongside the module; formatters
+return semantic preview strings. Like `effects`, `resolution` is on the read model
+but omitted from `spellPersistedBodySchema` until API persistence lands.
 
 ## Adding a schema
 

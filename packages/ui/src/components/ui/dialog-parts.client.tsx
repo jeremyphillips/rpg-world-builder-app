@@ -44,17 +44,40 @@ export interface DialogPanelHeaderProps extends React.HTMLAttributes<HTMLDivElem
   description?: React.ReactNode
   /** Merged onto the dialog title element (overrides default heading styles). */
   headlineClassName?: string
+  /** Right-aligned slot on the title row (e.g. primary action). */
+  endSlot?: React.ReactNode
+}
+
+function renderKicker(kicker: React.ReactNode) {
+  if (typeof kicker === 'string') {
+    return <div className="text-sm">{kicker}</div>
+  }
+
+  return kicker
 }
 
 export const DialogPanelHeader = React.forwardRef<HTMLDivElement, DialogPanelHeaderProps>(
-  ({ className, kicker, headline, description, headlineClassName, children, ...props }, ref) => (
-    <div ref={ref} className={cn('flex flex-col space-y-1.5 p-6', className)} {...props}>
-      {kicker ? <div className="text-sm">{kicker}</div> : null}
-      <DialogPrimitive.Title
-        className={cn(headingVariants({ variant: 'card' }), headlineClassName)}
-      >
-        {headline}
-      </DialogPrimitive.Title>
+  (
+    { className, kicker, headline, description, headlineClassName, endSlot, children, ...props },
+    ref,
+  ) => (
+    <div
+      ref={ref}
+      className={cn('flex flex-col space-y-1.5 p-6', endSlot && 'pr-12', className)}
+      {...props}
+    >
+      {kicker ? renderKicker(kicker) : null}
+      <div className="flex items-start justify-between gap-4">
+        <DialogPrimitive.Title
+          className={cn(
+            headlineClassName ?? headingVariants({ variant: 'card' }),
+            'min-w-0 flex-1',
+          )}
+        >
+          {headline}
+        </DialogPrimitive.Title>
+        {endSlot ? <div className="shrink-0">{endSlot}</div> : null}
+      </div>
       {description ? (
         <DialogPrimitive.Description className={textVariants({ variant: 'small' })}>
           {description}

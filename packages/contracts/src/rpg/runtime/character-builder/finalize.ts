@@ -3,14 +3,15 @@ import type { CreateCharacterInput } from '../character/create-input'
 import { levelOneMaxHp } from '../character/derive/index'
 import { formatFieldMessage } from '../../../validation/define-message'
 import { ABILITY_IDS, type Ability } from '../../vocab/ability'
-import { assembleCharacterProficiencies } from './assemble-proficiencies'
+import { assembleCharacterProficiencies } from './assembly/assemble-proficiencies'
 import { characterBuilderValidationMessages } from './character-builder-messages'
 import { indexCharacterBuildCatalog, type CharacterBuildContext } from './context'
 import type { CharacterBuilderDraft } from './draft'
 import type { CharacterBuildEngineOptions } from './engine-options'
-import { assembleClassSpellcasting } from './resolvers/spellcasting-resolution'
-import { assembleStartingEquipment } from './resolvers/starting-equipment-resolution'
-import { validateCharacterBuild, type CharacterBuildValidationResult } from './validate'
+import { assembleClassSpellcasting } from './assembly/assemble-spellcasting'
+import { assembleStartingEquipment } from './assembly/assemble-starting-equipment'
+import { validateCharacterBuild } from './validate/validate-character-build'
+import type { CharacterBuildValidationResult } from './validate/types'
 
 // ---------------------------------------------------------------------------
 // Finalization — assembles CreateCharacterInput after finalSubmit validation.
@@ -85,6 +86,7 @@ export function finalizeCharacterBuild(
     catalogIndex,
     choiceSets,
     characterClass,
+    context,
   )
   const { equipment, wealth } = assembleStartingEquipment(draft, catalogIndex)
 
@@ -107,7 +109,6 @@ export function finalizeCharacterBuild(
       temporary: 0,
     },
     proficiencies,
-    languages: [],
     spells: assembleClassSpellcasting(draft, context, choiceSets),
     equipment,
     wealth,

@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import type { BadgeProps, ColumnDef, DataTableColumnWidth } from '@rpg/ui'
+import type { BadgeAppearance, BadgeTone, ColumnDef, DataTableColumnWidth } from '@rpg/ui'
 import {
   dataTableColumnMeta,
   dataTableNameLinkCellVariants,
@@ -9,10 +9,10 @@ import {
   TableBadgeCell,
 } from '@rpg/ui'
 
-/** Domain badge map for `buildSourceColumn` — variant + label per enum value. */
+/** Domain badge map for `buildSourceColumn` — appearance, tone, and label per enum value. */
 export type SourceBadgeMap<T extends string> = Record<
   T,
-  { variant: NonNullable<BadgeProps['variant']>; label: string }
+  { appearance: BadgeAppearance; tone: BadgeTone; label: string }
 >
 
 /** Applies the data column tone to each column unless overridden in `meta`. */
@@ -86,8 +86,12 @@ export function buildSourceColumn<T, S extends string>({
     header: label,
     cell: ({ row }) => {
       const source = row.getValue<S>(accessorKey)
-      const { variant, label: badgeLabel } = badgeMap[source]
-      return <TableBadgeCell variant={variant}>{badgeLabel}</TableBadgeCell>
+      const { appearance, tone, label: badgeLabel } = badgeMap[source]
+      return (
+        <TableBadgeCell appearance={appearance} tone={tone}>
+          {badgeLabel}
+        </TableBadgeCell>
+      )
     },
     enableSorting: false,
     meta: { ...dataTableColumnMeta.source, ...dataTableWidthMeta(width), label },

@@ -99,7 +99,11 @@ export function SubclassEditorPanel({
               aria-label={ACTIVE_IN_CAMPAIGN_LABEL}
             />
           </div>
-          {entity?.source === 'system' ? <Badge variant="secondary">System</Badge> : null}
+          {entity?.source === 'system' ? (
+            <Badge appearance="neutral" tone="neutral">
+              System
+            </Badge>
+          ) : null}
         </div>
 
         <FormItems items={fields} idPrefix={`subclass-editor-${subclassId}`} />

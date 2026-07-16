@@ -11,6 +11,7 @@ import {
   type Species,
   type StandaloneBuildContext,
 } from '@rpg/contracts'
+import { listLanguageSeedOptions } from '@rpg/catalog/vocabulary'
 import { getStandardStartingWealthRules } from '@rpg/catalog/starting-wealth'
 
 const emptyCatalog: StandaloneBuildContext['catalog'] = {
@@ -19,6 +20,7 @@ const emptyCatalog: StandaloneBuildContext['catalog'] = {
   spells: [],
   equipment: [],
   skillProficiencies: [],
+  languages: [],
 }
 
 const storedFighter = {
@@ -62,7 +64,7 @@ const dwarfSpecies = {
   description: '<p>Stout and hardy folk.</p>',
   creatureType: 'humanoid',
   sizes: ['medium'],
-  speed: { walk: 30 },
+  movement: { walk: 30 },
   traits: [],
 } as const satisfies Species
 
@@ -76,6 +78,7 @@ const athleticsSkill = {
   updatedAt: '2026-01-01T00:00:00.000Z',
   name: 'Athletics',
   ability: 'str',
+  examples: ['Jump farther than normal', 'Stay afloat in rough water', 'Break something'],
 } as const satisfies SkillProficiency
 
 export const populatedBuilderCatalog = {
@@ -84,6 +87,7 @@ export const populatedBuilderCatalog = {
   spells: [],
   equipment: [],
   skillProficiencies: [athleticsSkill],
+  languages: [...listLanguageSeedOptions(DEFAULT_SYSTEM_RULESET_ID)],
 } satisfies CharacterBuildCatalog
 
 export function createStandaloneBuilderContextFixture(

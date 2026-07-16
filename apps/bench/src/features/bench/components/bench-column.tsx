@@ -45,7 +45,9 @@ export function BenchColumn({
     >
       <header className="flex items-center gap-2 px-1">
         <Text className="font-medium">{getTicketStatusLabel(column)}</Text>
-        <Badge variant="secondary">{tickets.length}</Badge>
+        <Badge appearance="neutral" tone="neutral">
+          {tickets.length}
+        </Badge>
       </header>
       {tickets.length === 0 ? (
         <Text variant="muted" className="px-1">

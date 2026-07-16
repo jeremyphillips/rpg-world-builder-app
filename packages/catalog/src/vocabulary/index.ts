@@ -281,6 +281,11 @@ export function loadSeedLanguages(rulesetId: SystemRulesetId): VocabularyOptionS
   return loadSeedVocabularyOptionSet(rulesetId, LANGUAGE_SET_ID)
 }
 
+/** Language seed rows with category — for character builder vocabulary resolution. */
+export function listLanguageSeedOptions(rulesetId: SystemRulesetId): readonly LanguageSeedOption[] {
+  return loadLanguageSeedOptions(rulesetId)
+}
+
 export function seedLanguageIds(rulesetId: SystemRulesetId): ReadonlySet<string> {
   return seedVocabularyOptionIds(rulesetId, LANGUAGE_SET_ID)
 }

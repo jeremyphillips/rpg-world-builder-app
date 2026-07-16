@@ -61,15 +61,16 @@ expect(result.error.issues[0]?.message).toBe(levelValidationMessages.rangeGap({ 
 | File           | `<domain>-messages.ts` next to the domain module; small domains may keep an in-file section instead | `rpg/primitives/level-messages.ts` |
 | Global catalog | `fieldValidationMessages` in `src/validation/messages.ts`                                           | —                                  |
 
-| Catalog const                                    | Scope prefix                                | Owns                                                                 |
-| ------------------------------------------------ | ------------------------------------------- | -------------------------------------------------------------------- |
-| `levelValidationMessages`                        | `validation.level.*`                        | Level bounds, tables, campaign max (`overCampaignMax`)               |
-| `characterValidationMessages`                    | `validation.character.*`                    | Valid character data (duplicate class, proficiency targets, sources) |
-| `characterBuilderValidationMessages`             | `validation.characterBuilder.*`             | Builder workflow copy (incomplete steps, pending draft choices)      |
-| `featValidationMessages`                         | `validation.feat.*`                         | Feat persisted business rules                                        |
-| `requirementEditorValidationMessages`            | `validation.requirementEditor.*`            | Prerequisite builder UI state (dashboard)                            |
-| `speciesCharacterCreationValidationMessages`     | `validation.speciesCharacterCreation.*`     | Persisted species creation domain                                    |
-| `speciesCharacterCreationFormValidationMessages` | `validation.speciesCharacterCreationForm.*` | Species creation form-only rules (dashboard)                         |
+| Catalog const                                    | Scope prefix                                    | Owns                                                                 |
+| ------------------------------------------------ | ----------------------------------------------- | -------------------------------------------------------------------- |
+| `levelValidationMessages`                        | `validation.level.*`                            | Level bounds, tables, campaign max (`overCampaignMax`)               |
+| `characterValidationMessages`                    | `validation.character.*`                        | Valid character data (duplicate class, proficiency targets, sources) |
+| `characterBuilderValidationMessages`             | `validation.characterBuilder.*`                 | Builder workflow copy (incomplete steps, pending draft choices)      |
+| `characterBuilderDependentChoiceMessages`        | `validation.characterBuilder.dependentChoice.*` | Inline dependent-choice workflow copy (heritage, subclass)           |
+| `featValidationMessages`                         | `validation.feat.*`                             | Feat persisted business rules                                        |
+| `requirementEditorValidationMessages`            | `validation.requirementEditor.*`                | Prerequisite builder UI state (dashboard)                            |
+| `speciesCharacterCreationValidationMessages`     | `validation.speciesCharacterCreation.*`         | Persisted species creation domain                                    |
+| `speciesCharacterCreationFormValidationMessages` | `validation.speciesCharacterCreationForm.*`     | Species creation form-only rules (dashboard)                         |
 
 Future `validation.requirement.*` holds persisted requirement-expression rules when
 `requirement-expression.ts` gains `superRefine` validation; editor-only rules stay in
@@ -94,14 +95,38 @@ the base catalog must not depend on it.
 Spell ChoiceSet validation (BENCH-089) adds spell-specific ids alongside the generic
 `choiceSetUnsatisfied` / `choiceSetTooMany` pair:
 
-| Id                                                      | When                                                        |
-| ------------------------------------------------------- | ----------------------------------------------------------- |
-| `validation.characterBuilder.chooseCantrips`            | Required cantrip ChoiceSet below `min`                      |
-| `validation.characterBuilder.chooseSpells`              | Required spell ChoiceSet below `min`                        |
-| `validation.characterBuilder.removeCantrips`            | Cantrip ChoiceSet above `max`                               |
-| `validation.characterBuilder.removeSpells`              | Spell ChoiceSet above `max`                                 |
-| `validation.characterBuilder.spellNoLongerAvailable`    | Selected spell id not in re-derived options                 |
-| `validation.characterBuilder.spellNotSelectableAtLevel` | Selected spell exists but exceeds `maxSelectableSpellLevel` |
+| Id                                                                      | When                                                               |
+| ----------------------------------------------------------------------- | ------------------------------------------------------------------ |
+| `validation.characterBuilder.chooseCantrips`                            | Required cantrip ChoiceSet below `min`                             |
+| `validation.characterBuilder.chooseSpells`                              | Required spell ChoiceSet below `min`                               |
+| `validation.characterBuilder.removeCantrips`                            | Cantrip ChoiceSet above `max`                                      |
+| `validation.characterBuilder.removeSpells`                              | Spell ChoiceSet above `max`                                        |
+| `validation.characterBuilder.spellNoLongerAvailable`                    | Selected spell id not in re-derived options                        |
+| `validation.characterBuilder.spellNotSelectableAtLevel`                 | Selected spell exists but exceeds `maxSelectableSpellLevel`        |
+| `validation.characterBuilder.speciesRequiredForLanguageRecommendations` | Language ChoiceSet visible but no species selected (affinity hint) |
+
+**Builder step readiness** (`characterBuilderStepReadinessMessages` in
+`character-builder-messages.ts`) — empty/default/blocked copy for Equipment,
+Spells, and Proficiencies. Ids use `validation.characterBuilder.readiness.*`
+(e.g. `equipmentBlockedNoClass`, `spellsNotApplicableNoSpellcasting`,
+`proficienciesBlockedNoClassHelper`). Parameterized messages accept `className`
+and/or `level`. Blocked copy uses the grammar `Choose a class to see …`.
+
+**Proficiency choice empty** (`characterBuilderProficiencyChoiceEmptyMessages`) —
+section-level empty copy keyed by `choiceType` (e.g. `No languages chosen yet.`).
+Formatted via `formatProficiencyChoiceEmptyMessage`. Readiness copy is distinct
+from validation issues; see
+[character-builder-resolvers.md](character-builder-resolvers.md#builder-step-readiness-bench-120).
+
+**Dependent choice** (`characterBuilderDependentChoiceMessages` in
+`character-builder-dependent-choice-messages.ts`) — inline parent→dependent workflow
+copy for species heritage and future subclass steps. Ids use
+`validation.characterBuilder.dependentChoice.*` (e.g. `requiredStatus`, `helperText`,
+`changeHeritage`, `parentChoiceRequired`, `optionSelected`). Domain kinds live in
+`DEPENDENT_CHOICE_KINDS` (`heritage`, `subclass`). Dashboard formatters in
+`builder-parent-choice-status.lib.ts` and `builder-dependent-choice.lib.ts` call
+`formatFieldMessage(...)` — see
+[character-builder-copy.md](../../../apps/dashboard/docs/character-builder-copy.md).
 
 **Future surface catalogs** (add only when those UI flows ship):
 

@@ -3,11 +3,20 @@
 import { InfoTooltip, Text } from '@rpg/ui'
 
 import type { ContentStatRowData } from './content-stat-rows'
+import {
+  contentStatRowLabelVariants,
+  contentStatRowValueVariants,
+  contentStatRowVariants,
+  type ContentStatRowSize,
+} from './content-stat-row.variants'
 
+export type { ContentStatRowSize } from './content-stat-row.variants'
 export type ContentStatRowProps = Pick<
   ContentStatRowData,
   'label' | 'value' | 'info' | 'infoPlacement' | 'infoAriaLabel'
->
+> & {
+  size?: ContentStatRowSize
+}
 
 function StatRowInfo({
   label,
@@ -32,19 +41,20 @@ export function ContentStatRow({
   info,
   infoPlacement = 'value',
   infoAriaLabel,
+  size = 'default',
 }: ContentStatRowProps) {
   const infoOnLabel = infoPlacement === 'label'
 
   return (
-    <Text variant="emphasis" as="p">
-      <Text variant="emphasis" as="span" className="inline-flex items-center gap-1">
+    <Text as="p" className={contentStatRowVariants({ size })}>
+      <Text as="span" className={contentStatRowLabelVariants({ size })}>
         {label}
         {infoOnLabel ? (
           <StatRowInfo label={label} info={info} infoAriaLabel={infoAriaLabel} />
         ) : null}
       </Text>
       :{' '}
-      <Text variant="muted" as="span" className="inline-flex items-center gap-1">
+      <Text as="span" className={contentStatRowValueVariants({ size })}>
         {value}
         {!infoOnLabel ? (
           <StatRowInfo label={label} info={info} infoAriaLabel={infoAriaLabel} />

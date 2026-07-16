@@ -7,6 +7,11 @@ import {
 } from '../../vocab/armor/category'
 import { gearKindSchema, getGearKindEntry, getGearKindLabel } from '../../vocab/equipment/gear-kind'
 import {
+  getSpellcastingGearKindEntry,
+  getSpellcastingGearKindLabel,
+  spellcastingGearKindSchema,
+} from '../../vocab/equipment/spellcasting-gear-kind'
+import {
   getServiceCategoryEntry,
   getServiceCategoryLabel,
   serviceCategorySchema,
@@ -37,7 +42,13 @@ import {
   weaponCategorySchema,
 } from '../../vocab/weapon/category'
 import { getTermSentenceForm, pluralizeTermLabel } from '../../vocab/types'
-import { equipmentKindSchema, getEquipmentKindEntry, getEquipmentKindLabel } from '../equipment'
+import { formatVocabularySlugLabel } from '../../vocab/format-slug-label'
+import {
+  equipmentKindSchema,
+  getEquipmentKindEntry,
+  getEquipmentKindLabel,
+  type EquipmentKind,
+} from '../equipment'
 import { equipmentModifierSchema } from '../equipment/modifier'
 import { contentPoolChoiceSchema } from './choice'
 import { grantValidationMessages } from './grant-messages'
@@ -55,7 +66,7 @@ const EQUIPMENT_KIND_CATEGORY_FIELDS = {
   tool: ['toolCategory'],
   weapon: ['weaponCategory'],
   armor: ['armorCategory'],
-  adventuring_gear: ['gearKind'],
+  adventuring_gear: ['gearKind', 'spellcastingGearKind'],
   magic_item: ['magicItemCategory', 'magicItemRarity'],
   vehicle: ['vehicleCategory'],
   service: ['serviceCategory'],
@@ -70,6 +81,7 @@ const FILTERED_POOL_CATEGORY_FIELDS = [
   'weaponCategory',
   'armorCategory',
   'gearKind',
+  'spellcastingGearKind',
   'magicItemCategory',
   'magicItemRarity',
   'vehicleCategory',
@@ -81,6 +93,7 @@ const FILTERED_POOL_CATEGORY_LABELS = {
   weaponCategory: 'Weapon category',
   armorCategory: 'Armor category',
   gearKind: 'Gear kind',
+  spellcastingGearKind: 'Spellcasting kind',
   magicItemCategory: 'Magic item category',
   magicItemRarity: 'Magic item rarity',
   vehicleCategory: 'Vehicle category',
@@ -94,6 +107,7 @@ function refineFilteredEquipmentPool(
     weaponCategory?: z.infer<typeof weaponCategorySchema>
     armorCategory?: z.infer<typeof armorCategorySchema>
     gearKind?: z.infer<typeof gearKindSchema>
+    spellcastingGearKind?: z.infer<typeof spellcastingGearKindSchema>
     magicItemCategory?: z.infer<typeof magicItemCategorySchema>
     magicItemRarity?: z.infer<typeof magicItemRaritySchema>
     vehicleCategory?: z.infer<typeof vehicleCategorySchema>
@@ -136,6 +150,21 @@ function refineFilteredEquipmentPool(
       })
     }
   }
+
+  if (
+    val.spellcastingGearKind !== undefined &&
+    val.gearKind !== undefined &&
+    val.gearKind !== 'spellcasting'
+  ) {
+    ctx.addIssue({
+      code: 'custom',
+      message: grantValidationMessages.categoryFilterWrongKind({
+        filterLabel: FILTERED_POOL_CATEGORY_LABELS.spellcastingGearKind,
+        equipmentKindLabel: getGearKindLabel('spellcasting'),
+      }),
+      path: ['spellcastingGearKind'],
+    })
+  }
 }
 
 const explicitEquipmentPoolSchema = z.object({
@@ -153,6 +182,7 @@ const filteredEquipmentPoolSchema = z
     weaponCategory: weaponCategorySchema.optional(),
     armorCategory: armorCategorySchema.optional(),
     gearKind: gearKindSchema.optional(),
+    spellcastingGearKind: spellcastingGearKindSchema.optional(),
     magicItemCategory: magicItemCategorySchema.optional(),
     magicItemRarity: magicItemRaritySchema.optional(),
     vehicleCategory: vehicleCategorySchema.optional(),
@@ -294,49 +324,68 @@ export const equipmentGrantSchema = z.preprocess(
 
 export type EquipmentGrant = z.infer<typeof equipmentGrantSchema>
 
+const FILTERED_POOL_CATEGORY_LABEL_RESOLVERS = [
+  (pool: FilteredEquipmentPool) =>
+    pool.toolCategory ? getToolCategoryLabel(pool.toolCategory) : undefined,
+  (pool: FilteredEquipmentPool) =>
+    pool.weaponCategory ? getWeaponCategoryLabel(pool.weaponCategory) : undefined,
+  (pool: FilteredEquipmentPool) =>
+    pool.armorCategory ? getArmorCategoryLabel(pool.armorCategory) : undefined,
+  (pool: FilteredEquipmentPool) =>
+    pool.spellcastingGearKind ? getSpellcastingGearKindLabel(pool.spellcastingGearKind) : undefined,
+  (pool: FilteredEquipmentPool) => (pool.gearKind ? getGearKindLabel(pool.gearKind) : undefined),
+  (pool: FilteredEquipmentPool) =>
+    pool.magicItemCategory ? getMagicItemCategoryLabel(pool.magicItemCategory) : undefined,
+  (pool: FilteredEquipmentPool) =>
+    pool.magicItemRarity ? getMagicItemRarityLabel(pool.magicItemRarity) : undefined,
+  (pool: FilteredEquipmentPool) =>
+    pool.vehicleCategory ? getVehicleCategoryLabel(pool.vehicleCategory) : undefined,
+  (pool: FilteredEquipmentPool) =>
+    pool.serviceCategory ? getServiceCategoryLabel(pool.serviceCategory) : undefined,
+] as const
+
+const FILTERED_POOL_CATEGORY_ENTRY_RESOLVERS = [
+  (pool: FilteredEquipmentPool) =>
+    pool.toolCategory ? getToolCategoryEntry(pool.toolCategory) : undefined,
+  (pool: FilteredEquipmentPool) =>
+    pool.weaponCategory ? getWeaponCategoryEntry(pool.weaponCategory) : undefined,
+  (pool: FilteredEquipmentPool) =>
+    pool.armorCategory ? getArmorCategoryEntry(pool.armorCategory) : undefined,
+  (pool: FilteredEquipmentPool) =>
+    pool.spellcastingGearKind ? getSpellcastingGearKindEntry(pool.spellcastingGearKind) : undefined,
+  (pool: FilteredEquipmentPool) => (pool.gearKind ? getGearKindEntry(pool.gearKind) : undefined),
+  (pool: FilteredEquipmentPool) =>
+    pool.magicItemCategory ? getMagicItemCategoryEntry(pool.magicItemCategory) : undefined,
+  (pool: FilteredEquipmentPool) =>
+    pool.magicItemRarity ? getMagicItemRarityEntry(pool.magicItemRarity) : undefined,
+  (pool: FilteredEquipmentPool) =>
+    pool.vehicleCategory ? getVehicleCategoryEntry(pool.vehicleCategory) : undefined,
+  (pool: FilteredEquipmentPool) =>
+    pool.serviceCategory ? getServiceCategoryEntry(pool.serviceCategory) : undefined,
+] as const
+
+function resolveFilteredPoolCategoryLabel(pool: FilteredEquipmentPool): string | undefined {
+  for (const resolveLabel of FILTERED_POOL_CATEGORY_LABEL_RESOLVERS) {
+    const label = resolveLabel(pool)
+    if (label) return label
+  }
+  return undefined
+}
+
 /** Display label for a pool-backed equipment choice (titles, character builder). */
 export function formatEquipmentPoolLabel(pool: EquipmentPool): string {
   if (pool.source === 'explicit') {
     return pool.equipmentSlugs.join(', ')
   }
 
-  if (pool.toolCategory) {
-    return getToolCategoryLabel(pool.toolCategory)
-  }
-  if (pool.weaponCategory) {
-    return getWeaponCategoryLabel(pool.weaponCategory)
-  }
-  if (pool.armorCategory) {
-    return getArmorCategoryLabel(pool.armorCategory)
-  }
-  if (pool.gearKind) {
-    return getGearKindLabel(pool.gearKind)
-  }
-  if (pool.magicItemCategory) {
-    return getMagicItemCategoryLabel(pool.magicItemCategory)
-  }
-  if (pool.magicItemRarity) {
-    return getMagicItemRarityLabel(pool.magicItemRarity)
-  }
-  if (pool.vehicleCategory) {
-    return getVehicleCategoryLabel(pool.vehicleCategory)
-  }
-  if (pool.serviceCategory) {
-    return getServiceCategoryLabel(pool.serviceCategory)
-  }
-
-  return getEquipmentKindLabel(pool.equipmentKind)
+  return resolveFilteredPoolCategoryLabel(pool) ?? (getEquipmentKindLabel(pool.equipmentKind) || '')
 }
 
-function getEquipmentPoolSentenceEntry(pool: Extract<EquipmentPool, { source: 'filtered' }>) {
-  if (pool.toolCategory) return getToolCategoryEntry(pool.toolCategory)
-  if (pool.weaponCategory) return getWeaponCategoryEntry(pool.weaponCategory)
-  if (pool.armorCategory) return getArmorCategoryEntry(pool.armorCategory)
-  if (pool.gearKind) return getGearKindEntry(pool.gearKind)
-  if (pool.magicItemCategory) return getMagicItemCategoryEntry(pool.magicItemCategory)
-  if (pool.magicItemRarity) return getMagicItemRarityEntry(pool.magicItemRarity)
-  if (pool.vehicleCategory) return getVehicleCategoryEntry(pool.vehicleCategory)
-  if (pool.serviceCategory) return getServiceCategoryEntry(pool.serviceCategory)
+function getEquipmentPoolSentenceEntry(pool: FilteredEquipmentPool) {
+  for (const resolveEntry of FILTERED_POOL_CATEGORY_ENTRY_RESOLVERS) {
+    const entry = resolveEntry(pool)
+    if (entry) return entry
+  }
   return getEquipmentKindEntry(pool.equipmentKind)
 }
 
@@ -348,6 +397,7 @@ function formatEquipmentPoolSentenceForm(
   if (entry) return getTermSentenceForm(entry, count)
 
   const fallbackLabel = formatEquipmentPoolLabel(pool)
+  if (!fallbackLabel) return ''
   if (count === 1) return fallbackLabel.toLowerCase()
   return pluralizeTermLabel(fallbackLabel)
 }
@@ -379,4 +429,92 @@ export function formatEquipmentGrantSentence(
   const poolForm = formatEquipmentPoolSentenceForm(pool, choose)
   if (!poolForm) return ''
   return `Character chooses ${choose} ${poolForm}.`
+}
+
+export type EquipmentGrantCompactResolver = {
+  resolveEquipmentName?: (slug: string) => string | undefined
+  resolveEquipmentKind?: (slug: string) => EquipmentKind | undefined
+}
+
+function formatCompactListSuffix(
+  labels: string[],
+  suffixSingular: string,
+  suffixPlural: string,
+): string | undefined {
+  if (labels.length === 0) return undefined
+  if (labels.length === 1) return `${labels[0]} ${suffixSingular}`
+  return `${labels.join(', ')} ${suffixPlural}`
+}
+
+function resolveEquipmentSlugLabel(slug: string, resolver?: EquipmentGrantCompactResolver): string {
+  return resolver?.resolveEquipmentName?.(slug) ?? formatVocabularySlugLabel(slug)
+}
+
+function resolveEquipmentSlugKind(
+  slug: string,
+  resolver?: EquipmentGrantCompactResolver,
+): EquipmentKind | undefined {
+  return resolver?.resolveEquipmentKind?.(slug)
+}
+
+function formatEquipmentItemLabelsCompact(
+  labels: string[],
+  kinds: (EquipmentKind | undefined)[],
+): string | undefined {
+  if (labels.length === 0) return undefined
+
+  if (labels.every((_, index) => kinds[index] === 'service')) {
+    return formatCompactListSuffix(labels, 'service', 'services')
+  }
+
+  const parts = labels.map((label, index) =>
+    kinds[index] === 'service' ? `${label} service` : label,
+  )
+  return parts.join(', ')
+}
+
+function collectGrantedEquipmentLabels(
+  grant: GrantedEquipmentItem,
+  resolver?: EquipmentGrantCompactResolver,
+): { labels: string[]; kinds: (EquipmentKind | undefined)[] } {
+  const name = resolveEquipmentSlugLabel(grant.equipmentSlug, resolver)
+  const kind = resolveEquipmentSlugKind(grant.equipmentSlug, resolver)
+  const quantity = grant.quantity ?? 1
+
+  return {
+    labels: Array.from({ length: quantity }, () => name),
+    kinds: Array.from({ length: quantity }, () => kind),
+  }
+}
+
+/**
+ * Compact summary label for equipment grants.
+ * Adventuring gear, mounts, vehicles, and magic items use the resolved name only;
+ * services append `service` / `services`.
+ */
+export function formatEquipmentGrantCompact(
+  grant: EquipmentGrant,
+  resolver?: EquipmentGrantCompactResolver,
+): string | undefined {
+  if (grant.kind === 'grant') {
+    if (!grant.equipmentSlug) return undefined
+    const { labels, kinds } = collectGrantedEquipmentLabels(grant, resolver)
+    return formatEquipmentItemLabelsCompact(labels, kinds)
+  }
+
+  const pool = grant.pool
+  if (pool.source === 'explicit') {
+    const labels = pool.equipmentSlugs.map((slug) => resolveEquipmentSlugLabel(slug, resolver))
+    const kinds = pool.equipmentSlugs.map((slug) => resolveEquipmentSlugKind(slug, resolver))
+    return formatEquipmentItemLabelsCompact(labels, kinds)
+  }
+
+  const poolLabel = formatEquipmentPoolLabel(pool)
+  if (!poolLabel) return undefined
+
+  if (pool.equipmentKind === 'service') {
+    return formatCompactListSuffix([poolLabel], 'service', 'services')
+  }
+
+  return poolLabel
 }

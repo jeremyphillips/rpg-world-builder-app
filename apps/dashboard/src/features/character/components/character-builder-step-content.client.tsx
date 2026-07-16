@@ -6,23 +6,28 @@ import type {
   CharacterBuilderStepId,
   CharacterBuildPreview,
   CharacterBuildValidationIssue,
+  ChoiceSet,
 } from '@rpg/contracts'
-
-import { CharacterBuilderStepPanel } from './character-builder-step-panel.client'
 import { AbilitiesStep } from './steps/abilities-step.client'
 import { ClassStep } from './steps/class-step.client'
 import { IdentityStep } from './steps/identity-step.client'
+import { ProficienciesStep } from './steps/proficiencies-step.client'
+import { EquipmentStep } from './steps/equipment-step.client'
 import { ReviewStep } from './steps/review-step.client'
 import { SpeciesStep } from './steps/species-step.client'
+import { SpellsStep } from './steps/spells-step.client'
 
 export type CharacterBuilderStepContentProps = {
   stepId: CharacterBuilderStepId
   context: CharacterBuildContext
   draft: CharacterBuilderDraft
   preview: CharacterBuildPreview | null
+  resolvedChoiceSets: readonly ChoiceSet[]
   validationIssues: CharacterBuildValidationIssue[]
   onDraftChange: (patch: Partial<CharacterBuilderDraft>) => void
   onStepComplete: (patch?: Partial<CharacterBuilderDraft>) => void
+  onFormContinueValidationFailed: (patch: Partial<CharacterBuilderDraft>) => void
+  onNavigateToStep: (stepId: CharacterBuilderStepId) => void
 }
 
 export function CharacterBuilderStepContent({
@@ -30,9 +35,12 @@ export function CharacterBuilderStepContent({
   context,
   draft,
   preview,
+  resolvedChoiceSets,
   validationIssues,
   onDraftChange,
   onStepComplete,
+  onFormContinueValidationFailed,
+  onNavigateToStep,
 }: CharacterBuilderStepContentProps) {
   switch (stepId) {
     case 'identity':
@@ -42,6 +50,7 @@ export function CharacterBuilderStepContent({
           validationIssues={validationIssues}
           onDraftChange={onDraftChange}
           onStepComplete={onStepComplete}
+          onFormContinueValidationFailed={onFormContinueValidationFailed}
         />
       )
     case 'species':
@@ -49,6 +58,7 @@ export function CharacterBuilderStepContent({
         <SpeciesStep
           context={context}
           draft={draft}
+          resolvedChoiceSets={resolvedChoiceSets}
           validationIssues={validationIssues}
           onDraftChange={onDraftChange}
         />
@@ -70,6 +80,7 @@ export function CharacterBuilderStepContent({
           validationIssues={validationIssues}
           onDraftChange={onDraftChange}
           onStepComplete={onStepComplete}
+          onFormContinueValidationFailed={onFormContinueValidationFailed}
         />
       )
     case 'review':
@@ -78,13 +89,43 @@ export function CharacterBuilderStepContent({
           context={context}
           draft={draft}
           preview={preview}
+          resolvedChoiceSets={resolvedChoiceSets}
           validationIssues={validationIssues}
+          onNavigateToStep={onNavigateToStep}
         />
       )
     case 'proficiencies':
+      return (
+        <ProficienciesStep
+          context={context}
+          draft={draft}
+          preview={preview}
+          resolvedChoiceSets={resolvedChoiceSets}
+          validationIssues={validationIssues}
+          onDraftChange={onDraftChange}
+        />
+      )
     case 'equipment':
+      return (
+        <EquipmentStep
+          context={context}
+          draft={draft}
+          resolvedChoiceSets={resolvedChoiceSets}
+          validationIssues={validationIssues}
+          onDraftChange={onDraftChange}
+        />
+      )
     case 'spells':
-      return <CharacterBuilderStepPanel stepId={stepId} status="deferred" />
+      return (
+        <SpellsStep
+          context={context}
+          draft={draft}
+          preview={preview}
+          resolvedChoiceSets={resolvedChoiceSets}
+          validationIssues={validationIssues}
+          onDraftChange={onDraftChange}
+        />
+      )
     default:
       return null
   }

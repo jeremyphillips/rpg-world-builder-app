@@ -147,14 +147,20 @@ describe('weaponProficiencyPoolToFormRow / weaponProficiencyPoolFromFormRow', ()
 })
 
 describe('toolProficiencyPoolToFormRow / toolProficiencyPoolFromFormRow', () => {
-  it('maps filtered tool pools without a category', () => {
-    const pool = toolProficiencyPoolFromFormRow({
-      proficiencySource: 'pool',
-      choose: 1,
+  it('maps filtered tool pools with categories', () => {
+    const pool = {
+      source: 'filtered' as const,
+      toolCategories: ['musical_instrument' as const],
+    }
+    const formFields = toolProficiencyPoolToFormRow(pool)
+    expect(formFields).toEqual({
       poolSource: 'filtered',
-      toolProficiencyPoolCategory: PROFICIENCY_POOL_CATEGORY_ANY,
+      toolProficiencyPoolCategories: ['musical_instrument'],
+      toolProficiencyPoolFilteredToolSlugs: undefined,
     })
-    expect(pool).toEqual({ source: 'filtered' })
+    expect(
+      toolProficiencyPoolFromFormRow({ proficiencySource: 'pool', choose: 1, ...formFields }),
+    ).toEqual(pool)
   })
 
   it('round-trips explicit tool pools', () => {

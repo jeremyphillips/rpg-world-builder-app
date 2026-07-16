@@ -3,33 +3,14 @@ import { describe, expect, it } from 'vitest'
 import { createEmptyCharacterBuilderDraft } from '@rpg/contracts'
 
 import { createStandaloneBuilderContextFixture } from './character-builder-fixtures'
-import {
-  formatAbilityMethodLabel,
-  resolveReviewDisplayIssues,
-  resolveReviewReadyMessage,
-} from './review-step-display'
+import { formatAbilityMethodLabel, resolveReviewReadyMessage } from './review-step-display'
 
 describe('review-step-display', () => {
   const context = createStandaloneBuilderContextFixture()
 
-  it('returns submit issues when provided', () => {
-    const issues = [
-      {
-        code: 'name_required',
-        message: 'Name is required.',
-        path: 'identity.name',
-        stepId: 'identity' as const,
-      },
-    ]
-
-    expect(resolveReviewDisplayIssues(createEmptyCharacterBuilderDraft(), context, issues)).toBe(
-      issues,
-    )
-  })
-
   it('formats ability method labels', () => {
-    expect(formatAbilityMethodLabel('manual')).toBe('Manual entry')
-    expect(formatAbilityMethodLabel('standard-array')).toBe('Standard array')
+    expect(formatAbilityMethodLabel('manual')).toBe('Custom scores')
+    expect(formatAbilityMethodLabel('standard-array')).toBe('Fixed scores')
     expect(formatAbilityMethodLabel(undefined)).toBe('Not set')
   })
 
@@ -45,6 +26,8 @@ describe('review-step-display', () => {
       },
     }
 
-    expect(resolveReviewReadyMessage(draft, context, [])).toBe('Your character is ready to create.')
+    expect(resolveReviewReadyMessage(draft, context, [], [])).toBe(
+      'Your character is ready to create.',
+    )
   })
 })

@@ -4,15 +4,26 @@ import {
   createEmptyCharacterBuilderDraft,
   DEFAULT_ABILITY_GENERATION_RULES,
   indexCharacterBuildCatalog,
+  type CharacterBuilderStepId,
+  type CharacterBuildValidationIssue,
 } from '@rpg/contracts'
 
 import { createPopulatedStandaloneBuilderContextFixture } from '../lib/character-builder-fixtures'
 import { CharacterBuilderStepRail } from './character-builder-step-rail.client'
 
-const catalogIndex = indexCharacterBuildCatalog(
-  createPopulatedStandaloneBuilderContextFixture().catalog,
-)
+const context = createPopulatedStandaloneBuilderContextFixture()
+const catalogIndex = indexCharacterBuildCatalog(context.catalog)
 const standardArray = DEFAULT_ABILITY_GENERATION_RULES.standardArray
+
+const railProps = {
+  context,
+  catalogIndex,
+  resolvedChoiceSets: null,
+  draftValidationIssues: [] as CharacterBuildValidationIssue[],
+  validationVisibleStepIds: [] as CharacterBuilderStepId[],
+  standardArray,
+  onStepSelect: () => undefined,
+}
 
 const meta = {
   title: 'Character Builder/CharacterBuilderStepRail',
@@ -28,12 +39,7 @@ export const IdentityActive: Story = {
     <CharacterBuilderStepRail
       draft={createEmptyCharacterBuilderDraft()}
       currentStepId="identity"
-      catalogIndex={catalogIndex}
-      resolvedChoiceSets={null}
-      validationIssues={[]}
-      attemptedStepIds={[]}
-      standardArray={standardArray}
-      onStepSelect={() => undefined}
+      {...railProps}
     />
   ),
 }
@@ -49,46 +55,34 @@ export const AbilitiesActive: Story = {
         touchedStepIds: ['identity', 'species', 'class'],
       }}
       currentStepId="abilities"
-      catalogIndex={catalogIndex}
-      resolvedChoiceSets={null}
-      validationIssues={[]}
-      attemptedStepIds={[]}
-      standardArray={standardArray}
-      onStepSelect={() => undefined}
+      {...railProps}
     />
   ),
 }
 
-export const IdentityWarning: Story = {
+export const IdentityValidationVisible: Story = {
   render: () => (
     <CharacterBuilderStepRail
       draft={createEmptyCharacterBuilderDraft()}
-      currentStepId="identity"
-      catalogIndex={catalogIndex}
-      resolvedChoiceSets={null}
-      validationIssues={[
-        { code: 'identity.name.required', message: 'Name is required.', stepId: 'identity' },
-      ]}
-      attemptedStepIds={['identity']}
-      standardArray={standardArray}
-      onStepSelect={() => undefined}
+      currentStepId="species"
+      {...railProps}
+      validationVisibleStepIds={['identity']}
     />
   ),
 }
 
-export const IssuesBeforeAttempt: Story = {
+export const DraftIssuesBeforeValidationVisible: Story = {
   render: () => (
     <CharacterBuilderStepRail
-      draft={createEmptyCharacterBuilderDraft()}
-      currentStepId="identity"
-      catalogIndex={catalogIndex}
-      resolvedChoiceSets={null}
-      validationIssues={[
-        { code: 'identity.name.required', message: 'Name is required.', stepId: 'identity' },
+      draft={{
+        ...createEmptyCharacterBuilderDraft(),
+        touchedStepIds: ['identity'],
+      }}
+      currentStepId="species"
+      {...railProps}
+      draftValidationIssues={[
+        { code: 'name_required', message: 'Enter a character name.', stepId: 'identity' },
       ]}
-      attemptedStepIds={[]}
-      standardArray={standardArray}
-      onStepSelect={() => undefined}
     />
   ),
 }

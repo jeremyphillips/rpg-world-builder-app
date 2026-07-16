@@ -47,8 +47,9 @@ describe('skill sentence forms', () => {
 
 const athleticsBody = {
   name: 'Athletics',
-  description: 'Difficult situations you face while climbing, jumping, or swimming.',
+  description: 'Physical challenges involving strength, movement, and force.',
   ability: 'str',
+  examples: ['Jump farther than normal', 'Stay afloat in rough water', 'Break something'],
 } as const
 
 const timestamps = {
@@ -82,6 +83,12 @@ describe('skillProficiencySchema', () => {
       description: undefined,
     }
     expect(skillProficiencySchema.safeParse(minimal).success).toBe(true)
+  })
+
+  it('requires at least one example', () => {
+    const { examples: _examples, ...withoutExamples } = athletics
+    expect(skillProficiencySchema.safeParse(withoutExamples).success).toBe(false)
+    expect(skillProficiencySchema.safeParse({ ...athletics, examples: [] }).success).toBe(false)
   })
 
   it('rejects an invalid governing ability', () => {

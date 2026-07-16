@@ -1,10 +1,16 @@
 import { describe, expect, it } from 'vitest'
 
-import { createEmptyCharacterBuilderDraft, indexCharacterBuildCatalog } from '@rpg/contracts'
+import {
+  createEmptyCharacterBuilderDraft,
+  indexCharacterBuildCatalog,
+  resolveAvailableChoices,
+} from '@rpg/contracts'
 
 import { createPopulatedStandaloneBuilderContextFixture } from './character-builder-fixtures'
+import { createSpellsStepContextFixture } from './spells-step.fixtures'
 import {
   resolveStepVisualStatus,
+  stepStatusAriaLabel,
   type ResolveStepVisualStatusInput,
 } from './builder-step-visual-status'
 
@@ -17,9 +23,10 @@ function resolveStatus(
     Partial<ResolveStepVisualStatusInput>,
 ): ReturnType<typeof resolveStepVisualStatus> {
   return resolveStepVisualStatus({
+    context,
     resolvedChoiceSets: null,
-    validationIssues: [],
-    attemptedStepIds: [],
+    draftValidationIssues: [],
+    validationVisibleStepIds: [],
     catalogIndex,
     standardArray,
     ...input,
@@ -27,11 +34,8 @@ function resolveStatus(
 }
 
 describe('resolveStepVisualStatus', () => {
-  it('returns notStarted for incomplete steps that were only visited', () => {
-    const draft = {
-      ...createEmptyCharacterBuilderDraft(),
-      touchedStepIds: ['species' as const],
-    }
+  it('returns idle for incomplete steps without field edits', () => {
+    const draft = createEmptyCharacterBuilderDraft()
 
     expect(
       resolveStatus({
@@ -39,10 +43,10 @@ describe('resolveStepVisualStatus', () => {
         draft,
         currentStepId: 'identity',
       }),
-    ).toBe('notStarted')
+    ).toBe('idle')
   })
 
-  it('returns current for the active step only', () => {
+  it('returns active for the current step only', () => {
     const draft = createEmptyCharacterBuilderDraft()
 
     expect(
@@ -51,7 +55,7 @@ describe('resolveStepVisualStatus', () => {
         draft,
         currentStepId: 'identity',
       }),
-    ).toBe('current')
+    ).toBe('active')
   })
 
   it('returns complete when the builder step is complete', () => {
@@ -102,7 +106,20 @@ describe('resolveStepVisualStatus', () => {
     ).toBe('complete')
   })
 
-  it('returns warning only after an attempted submit with blocking issues', () => {
+  it('returns error only for validation-visible steps', () => {
+    const draft = createEmptyCharacterBuilderDraft()
+
+    expect(
+      resolveStatus({
+        stepId: 'identity',
+        draft,
+        currentStepId: 'species',
+        validationVisibleStepIds: ['identity'],
+      }),
+    ).toBe('error')
+  })
+
+  it('does not return error before a step is validation-visible', () => {
     const draft = createEmptyCharacterBuilderDraft()
 
     expect(
@@ -110,30 +127,29 @@ describe('resolveStepVisualStatus', () => {
         stepId: 'identity',
         draft,
         currentStepId: 'identity',
-        validationIssues: [
-          { code: 'identity.name.required', message: 'Name is required.', stepId: 'identity' },
-        ],
-        attemptedStepIds: ['identity'],
       }),
-    ).toBe('warning')
+    ).toBe('active')
   })
 
-  it('does not return warning without an attempted submit', () => {
-    const draft = createEmptyCharacterBuilderDraft()
+  it('does not promote field edits to rail error state', () => {
+    const draft = {
+      ...createEmptyCharacterBuilderDraft(),
+      touchedStepIds: ['identity' as const],
+    }
 
     expect(
       resolveStatus({
         stepId: 'identity',
         draft,
-        currentStepId: 'identity',
-        validationIssues: [
-          { code: 'identity.name.required', message: 'Name is required.', stepId: 'identity' },
+        currentStepId: 'species',
+        draftValidationIssues: [
+          { code: 'name_required', message: 'Enter a character name.', stepId: 'identity' },
         ],
       }),
-    ).toBe('current')
+    ).toBe('idle')
   })
 
-  it('does not return warning for other steps with unresolved issues', () => {
+  it('does not return error for untouched validation-visible candidates with draft issues only', () => {
     const draft = createEmptyCharacterBuilderDraft()
 
     expect(
@@ -141,27 +157,141 @@ describe('resolveStepVisualStatus', () => {
         stepId: 'species',
         draft,
         currentStepId: 'identity',
-        validationIssues: [
-          { code: 'species.required', message: 'Species is required.', stepId: 'species' },
+        draftValidationIssues: [
+          { code: 'species_required', message: 'Choose a species.', stepId: 'species' },
         ],
-        attemptedStepIds: ['identity'],
       }),
-    ).toBe('notStarted')
+    ).toBe('idle')
   })
 
-  it('returns locked for spells when the class has no level-1 spellcasting', () => {
+  it('does not mark a step complete when draft validation still has issues', () => {
+    const draft = {
+      ...createEmptyCharacterBuilderDraft(),
+      species: { speciesId: 'srd-cc-5.2.1:dwarf' },
+    }
+
+    expect(
+      resolveStatus({
+        stepId: 'species',
+        draft,
+        currentStepId: 'class',
+        resolvedChoiceSets: [],
+        draftValidationIssues: [
+          {
+            code: 'choice_set_unsatisfied',
+            message: 'Choose an option for Heritage.',
+            stepId: 'species',
+          },
+        ],
+      }),
+    ).toBe('idle')
+  })
+
+  it('keeps non-caster spells locked even when draft validation has spell issues', () => {
+    const spellsContext = createSpellsStepContextFixture()
     const draft = {
       ...createEmptyCharacterBuilderDraft(),
       class: { classId: 'srd-cc-5.2.1:fighter', level: 1 as const },
+      touchedStepIds: ['spells' as const],
     }
+    const resolvedChoiceSets = resolveAvailableChoices(draft, spellsContext)
 
     expect(
       resolveStatus({
         stepId: 'spells',
         draft,
         currentStepId: 'identity',
+        context: spellsContext,
+        resolvedChoiceSets,
+        draftValidationIssues: [
+          {
+            code: 'choice_set_unsatisfied',
+            message: 'Choose 1 more cantrip.',
+            stepId: 'spells',
+          },
+        ],
       }),
     ).toBe('locked')
+  })
+
+  it('returns locked for spells when the class has no level-1 spellcasting', () => {
+    const context = createSpellsStepContextFixture()
+    const draft = {
+      ...createEmptyCharacterBuilderDraft(),
+      class: { classId: 'srd-cc-5.2.1:fighter', level: 1 as const },
+    }
+    const resolvedChoiceSets = resolveAvailableChoices(draft, context)
+
+    expect(
+      resolveStatus({
+        stepId: 'spells',
+        draft,
+        currentStepId: 'identity',
+        context,
+        resolvedChoiceSets,
+      }),
+    ).toBe('locked')
+    expect(stepStatusAriaLabel('Spells', 'locked')).toBe('Spells, not applicable')
+  })
+
+  it('does not return error for other steps with validation visible elsewhere', () => {
+    const draft = createEmptyCharacterBuilderDraft()
+
+    expect(
+      resolveStatus({
+        stepId: 'species',
+        draft,
+        currentStepId: 'identity',
+        validationVisibleStepIds: ['identity'],
+      }),
+    ).toBe('idle')
+  })
+
+  it('returns idle for spells before a class is selected', () => {
+    const context = createSpellsStepContextFixture()
+    const draft = createEmptyCharacterBuilderDraft()
+    const resolvedChoiceSets = resolveAvailableChoices(draft, context)
+
+    expect(
+      resolveStatus({
+        stepId: 'spells',
+        draft,
+        currentStepId: 'identity',
+        context,
+        resolvedChoiceSets,
+      }),
+    ).toBe('idle')
+  })
+
+  it('returns active for a blocked proficiencies step while origin languages are editable', () => {
+    const draft = createEmptyCharacterBuilderDraft()
+    const resolvedChoiceSets = resolveAvailableChoices(draft, context)
+
+    expect(
+      resolveStatus({
+        stepId: 'proficiencies',
+        draft,
+        currentStepId: 'proficiencies',
+        resolvedChoiceSets,
+      }),
+    ).toBe('active')
+  })
+
+  it('returns complete for equipment when the class has no starting equipment choices', () => {
+    const draft = {
+      ...createEmptyCharacterBuilderDraft(),
+      class: { classId: 'srd-cc-5.2.1:fighter', level: 1 as const },
+    }
+    const resolvedChoiceSets = resolveAvailableChoices(draft, context)
+
+    expect(
+      resolveStatus({
+        stepId: 'equipment',
+        draft,
+        currentStepId: 'identity',
+        resolvedChoiceSets,
+      }),
+    ).toBe('complete')
   })
 
   it('does not mark abilities complete when standard-array scores duplicate a value', () => {
@@ -179,6 +309,6 @@ describe('resolveStepVisualStatus', () => {
         draft,
         currentStepId: 'identity',
       }),
-    ).toBe('notStarted')
+    ).toBe('idle')
   })
 })

@@ -15,6 +15,7 @@ import {
 import { NarrowPage } from '@/components/layout/narrow-page'
 import { FormUnsavedChangesGuard } from '@/lib/form-unsaved-changes-guard'
 import { weaponAdvisorySubmitOptions, weaponFormValueSyncs } from '../../../equipment/weapons'
+import { resolutionFormValueSyncs } from '../../../spells/resolution/lib/form/resolution-form-sync'
 import { useContentFormOptions } from '../../form-options/content-form-options'
 import type { AnyContentFormDef, ContentFormCtx } from '../content-form-registry'
 import { contentFormFields } from '../content-form-registry'
@@ -229,6 +230,7 @@ export function ContentFormLayout<TFormValues extends FieldValues>({
   onSubmit,
 }: ContentFormLayoutProps<TFormValues>) {
   const isWeaponEquipmentForm = def.routeKey === 'equipment' && ctx.equipmentKind === 'weapon'
+  const isSpellForm = def.routeKey === 'spells'
   const weaponAdvisoryOptions = React.useMemo((): AdvisoryFormSubmitOptions<TFormValues> => {
     if (!isWeaponEquipmentForm) return { enabled: false }
     // Weapon advisories are authored for EquipmentFormValues; this layout only
@@ -240,7 +242,11 @@ export function ContentFormLayout<TFormValues extends FieldValues>({
     weaponAdvisoryOptions,
   )
   const resolvedOnSubmit = isWeaponEquipmentForm ? advisoryOnSubmit : onSubmit
-  const valueSyncs = isWeaponEquipmentForm ? weaponFormValueSyncs : undefined
+  const valueSyncs = isWeaponEquipmentForm
+    ? weaponFormValueSyncs
+    : isSpellForm
+      ? resolutionFormValueSyncs
+      : undefined
 
   const sharedProps = {
     schema,

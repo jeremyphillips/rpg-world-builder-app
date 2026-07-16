@@ -7,6 +7,7 @@ import {
   buildCharacterPreview,
   createEmptyCharacterBuilderDraft,
   indexCharacterBuildCatalog,
+  resolveAvailableChoices,
 } from '@rpg/contracts'
 
 import {
@@ -25,7 +26,14 @@ describe('CharacterBuilderPreviewPanel', () => {
     const context = createStandaloneBuilderContextFixture()
     const catalogIndex = indexCharacterBuildCatalog(context.catalog)
     const draft = createEmptyCharacterBuilderDraft()
-    const preview = buildCharacterPreview(draft, catalogIndex, context.characterCreationRules)
+    const resolvedChoiceSets = resolveAvailableChoices(draft, context)
+    const preview = buildCharacterPreview(
+      draft,
+      catalogIndex,
+      context.characterCreationRules,
+      context.rulesetId,
+      { resolvedChoiceSets },
+    )
 
     render(
       <CharacterBuilderPreviewPanel
@@ -48,11 +56,11 @@ describe('CharacterBuilderPreviewPanel', () => {
     expect(screen.getByText('HP')).toBeInTheDocument()
     expect(screen.queryByText('Max HP')).not.toBeInTheDocument()
     expect(screen.getByText('STR')).toBeInTheDocument()
-    expect(screen.getByText('Choose a class to see options')).toBeInTheDocument()
+    expect(screen.getByText('Choose a class to see class proficiencies.')).toBeInTheDocument()
     expect(
       screen.getByText('Class saving throws appear after you choose a class.'),
     ).toBeInTheDocument()
-    expect(screen.getByText('Not applicable for this class.')).toBeInTheDocument()
+    expect(screen.getByText('Choose a class to see spell options.')).toBeInTheDocument()
   })
 
   it('renders populated identity and class proficiencies when available', () => {
@@ -75,7 +83,14 @@ describe('CharacterBuilderPreviewPanel', () => {
         scores: { str: 15, dex: 14, con: 13, int: 12, wis: 10, cha: 8 },
       },
     }
-    const preview = buildCharacterPreview(draft, catalogIndex, context.characterCreationRules)
+    const resolvedChoiceSets = resolveAvailableChoices(draft, context)
+    const preview = buildCharacterPreview(
+      draft,
+      catalogIndex,
+      context.characterCreationRules,
+      context.rulesetId,
+      { resolvedChoiceSets },
+    )
 
     render(
       <CharacterBuilderPreviewPanel
@@ -87,7 +102,7 @@ describe('CharacterBuilderPreviewPanel', () => {
     )
 
     expect(screen.getByText('Verna')).toBeInTheDocument()
-    expect(screen.getByText('Level 1 Fighter')).toBeInTheDocument()
+    expect(screen.getByText('Level 1 · Fighter')).toBeInTheDocument()
     expect(screen.getByText('Dwarf')).toBeInTheDocument()
     expect(screen.getByText('Neutral Good')).toBeInTheDocument()
     expect(screen.getByText('2 fields added.')).toBeInTheDocument()
@@ -99,7 +114,14 @@ describe('CharacterBuilderPreviewPanel', () => {
     const context = createStandaloneBuilderContextFixture()
     const catalogIndex = indexCharacterBuildCatalog(context.catalog)
     const draft = createEmptyCharacterBuilderDraft()
-    const preview = buildCharacterPreview(draft, catalogIndex, context.characterCreationRules)
+    const resolvedChoiceSets = resolveAvailableChoices(draft, context)
+    const preview = buildCharacterPreview(
+      draft,
+      catalogIndex,
+      context.characterCreationRules,
+      context.rulesetId,
+      { resolvedChoiceSets },
+    )
     const user = userEvent.setup()
 
     render(
@@ -130,7 +152,14 @@ describe('CharacterBuilderPreviewPanel', () => {
         scores: { str: 15, dex: 14, con: 13, int: 12, wis: 10, cha: 8 },
       },
     }
-    const preview = buildCharacterPreview(draft, catalogIndex, context.characterCreationRules)
+    const resolvedChoiceSets = resolveAvailableChoices(draft, context)
+    const preview = buildCharacterPreview(
+      draft,
+      catalogIndex,
+      context.characterCreationRules,
+      context.rulesetId,
+      { resolvedChoiceSets },
+    )
 
     const { container } = render(
       <CharacterBuilderPreviewPanel

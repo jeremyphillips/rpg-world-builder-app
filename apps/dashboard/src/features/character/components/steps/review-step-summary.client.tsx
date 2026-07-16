@@ -37,19 +37,6 @@ export function ReviewStepSummary({ context, draft, preview }: ReviewStepSummary
         />
       </dl>
 
-      {preview && preview.unresolvedChoiceSetIds.length > 0 ? (
-        <div className="space-y-1">
-          <Text as="p" variant="body" className="font-medium">
-            Unresolved choices
-          </Text>
-          <ul className="list-disc space-y-1 pl-5 text-sm text-muted-foreground">
-            {preview.unresolvedChoiceSetIds.map((choiceSetId) => (
-              <li key={choiceSetId}>{choiceSetId}</li>
-            ))}
-          </ul>
-        </div>
-      ) : null}
-
       {preview ? (
         <div className="space-y-2">
           <Text as="p" variant="body" className="font-medium">

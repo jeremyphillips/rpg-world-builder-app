@@ -1,5 +1,5 @@
 import type { Species } from '@rpg/contracts'
-import { getCreatureSizeLabel } from '@rpg/contracts'
+import { formatMovementDisplay, getCreatureSizeLabel } from '@rpg/contracts'
 import { dataTableWidthMeta, SortableHeader } from '@rpg/ui'
 import type { ColumnDef, FilterDef } from '@rpg/ui'
 
@@ -12,6 +12,7 @@ import {
 
 import { buildContentColumns, buildContentFilters } from '../../lib/overview/content-table-config'
 import { getCreatureTypeLabel } from './creature-type-field-options'
+import { SPECIES_STAT_LABELS } from './species-display'
 
 function speciesMiddleColumns(vocabulary?: CreatureTypeVocabulary): ColumnDef<Species>[] {
   return [
@@ -33,11 +34,11 @@ function speciesMiddleColumns(vocabulary?: CreatureTypeVocabulary): ColumnDef<Sp
       meta: { label: 'Size', ...dataTableWidthMeta('medium') },
     },
     {
-      id: 'speed',
-      accessorFn: (row) => row.speed.walk,
-      header: ({ column }) => <SortableHeader column={column}>Speed</SortableHeader>,
-      cell: ({ row }) => `${row.original.speed.walk} ft.`,
-      meta: { label: 'Speed', ...dataTableWidthMeta('tiny') },
+      id: 'movement',
+      accessorFn: (row) => formatMovementDisplay(row.movement),
+      header: ({ column }) => <SortableHeader column={column}>Movement</SortableHeader>,
+      cell: ({ row }) => row.getValue<string>('movement'),
+      meta: { label: 'Movement', ...dataTableWidthMeta('medium') },
     },
   ]
 }
@@ -51,7 +52,7 @@ function speciesSpecificFilters(vocabulary?: CreatureTypeVocabulary): FilterDef[
     {
       type: 'select',
       id: 'creatureType',
-      label: 'Creature Type',
+      label: SPECIES_STAT_LABELS.creatureType,
       options,
     },
   ]

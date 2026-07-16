@@ -24,6 +24,18 @@ export { Heading, type HeadingProps } from './components/ui/heading'
 export { headingVariants, type HeadingVariantProps } from './components/ui/heading.variants'
 export { Text, type TextProps } from './components/ui/text'
 export { textVariants, type TextVariantProps } from './components/ui/text.variants'
+export {
+  SemanticText,
+  semanticTextVariants,
+  type SemanticTextEmphasis,
+  type SemanticTextProps,
+  type SemanticTextTone,
+} from './components/ui/semantic-text/semantic-text'
+export {
+  EmphasisDetailLine,
+  type EmphasisDetailLineProps,
+  type EmphasisDetailLineSecondaryTone,
+} from './components/ui/emphasis-detail-line'
 export { Alert, type AlertProps, type AlertVariant } from './components/ui/alert'
 export {
   alertVariants,
@@ -58,6 +70,11 @@ export {
   type NumberInputDigits,
   type NumberInputProps,
 } from './components/ui/number-input.client'
+export {
+  NumberStepper,
+  type NumberStepperDigits,
+  type NumberStepperProps,
+} from './components/ui/number-stepper.client'
 export { Textarea, type TextareaProps } from './components/ui/textarea.client'
 export {
   Card,
@@ -85,6 +102,7 @@ export {
   fieldDigitTrailingPaddingClasses,
   fieldGroupedControlSizeClasses,
   fieldSizeToBadgeSize,
+  fieldSizeToChipSize,
   fieldSizeTypographyClasses,
   fieldTextareaSizeClasses,
   type FieldSizeToken,
@@ -145,13 +163,31 @@ export {
   type RadioGroupFieldOption,
 } from './components/ui/radio-group-field'
 export {
+  radioCardCompactBodyInsetClasses,
+  radioCardCompactPanelPaddingClasses,
+  radioCardCompactPaddingRightClasses,
+  radioCardCompactPaddingXClasses,
+} from './components/ui/radio-card.variants'
+export {
   RadioCard,
   RadioCardItem,
   radioCardVariants,
+  RADIO_CARD_DEFAULT_DETAILS_LABEL,
+  RADIO_CARD_SUMMARY_SEPARATOR,
+  type RadioCardDensity,
+  type RadioCardVariant,
+  type RadioCardEmbeddedSlotTone,
   type RadioCardOption,
   type RadioCardProps,
   type RadioCardItemProps,
 } from './components/ui/radio-card.client'
+export {
+  AttentionFrame,
+  ATTENTION_FRAME_DURATION_MS,
+  ATTENTION_FRAME_REDUCED_MOTION_HOLD_MS,
+  type AttentionFrameProps,
+} from './components/ui/attention-frame.client'
+export { attentionFrameVariants } from './components/ui/attention-frame.variants'
 export { RadioCardField, type RadioCardFieldProps } from './components/ui/radio-card-field'
 export { JsonField, type JsonFieldProps } from './components/ui/json-field.client'
 export { RichTextField, type RichTextFieldProps } from './components/ui/rich-text-field'
@@ -296,6 +332,40 @@ export {
 export { ConfirmDialog, type ConfirmDialogProps } from './components/ui/confirm-dialog.client'
 export { Sheet, type SheetContentProps, type SheetHeaderProps } from './components/ui/sheet.client'
 export {
+  BuilderOptionDetailsSheet,
+  type BuilderOptionDetailsSheetProps,
+  type BuilderOptionDetailsMetadata,
+  type BuilderOptionDetailsSection,
+  type BuilderOptionDetailsSectionItem,
+} from './components/ui/builder-option-details-sheet.client'
+export type { BuilderOptionPrimaryActionPlacement } from './components/ui/builder-option-details-sheet.variants'
+export {
+  CollapsibleListItem,
+  CollapsibleListItemActions,
+  CollapsibleListItemBody,
+  CollapsibleListItemCollapseButton,
+  CollapsibleListItemDragHandle,
+  CollapsibleListItemShell,
+  CollapsibleListItemToolbar,
+  collapsibleListItemBodyClasses,
+  type CollapsibleListItemActionsProps,
+  type CollapsibleListItemBodyProps,
+  type CollapsibleListItemCollapseButtonProps,
+  type CollapsibleListItemDragHandleConfig,
+  type CollapsibleListItemDragHandleProps,
+  type CollapsibleListItemProps,
+  type CollapsibleListItemActionsAlign,
+  type CollapsibleListItemShellProps,
+  type CollapsibleListItemShellTone,
+  type CollapsibleListItemToolbarProps,
+} from './components/ui/collapsible-list-item'
+export {
+  CatalogPickerSheet,
+  type CatalogPickerSheetProps,
+  type CatalogPickerSheetToolbarContext,
+  type CatalogPickerTab,
+} from './components/ui/catalog-picker-sheet.client'
+export {
   sheetBodyVariants,
   sheetContentVariants,
   type SheetContentVariantProps,
@@ -333,7 +403,7 @@ export {
   ChooseFromChipsField,
   type ChooseFromChipsFieldProps,
 } from './components/ui/choose-from-chips-field.client'
-export { type ChipSize } from './components/ui/chips-field.variants'
+export type { CompactLabelSize as ChipSize } from './components/ui/compact-label.lib'
 export {
   ComboboxField,
   type ComboboxFieldProps,
@@ -365,15 +435,18 @@ export {
 export {
   Badge,
   badgeVariants,
-  dismissibleBadgeVariants,
-  badgeDismissButtonVariants,
+  type BadgeAppearance,
   type BadgeProps,
   type BadgeSize,
+  type BadgeTone,
 } from './components/ui/badge'
 export {
-  DismissibleBadge,
-  type DismissibleBadgeProps,
-} from './components/ui/dismissible-badge.client'
+  Chip,
+  type ChipProps,
+  type ChipSelectableProps,
+  type ChipRemovableProps,
+} from './components/ui/chip.client'
+export { ChipGroup, type ChipGroupProps } from './components/ui/chip-group.client'
 export { Spinner, type SpinnerProps } from './components/ui/spinner'
 export { spinnerVariants, type SpinnerVariantProps } from './components/ui/spinner.variants'
 export {
@@ -416,6 +489,7 @@ export {
 export type {
   BooleanCellProps,
   NameCellProps,
+  RowActionsMenuLinkProps,
   RowActionsMenuProps,
   TableBadgeCellProps,
 } from './components/ui/data-table.client'

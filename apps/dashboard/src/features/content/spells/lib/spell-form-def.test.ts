@@ -1,9 +1,16 @@
 import { describe, expect, expectTypeOf, it } from 'vitest'
 import { loadSeedSpells } from '@rpg/catalog/spells'
-import { createSpellInputSchema, deriveContentKey, type CreateSpellInput } from '@rpg/contracts'
-import type { FormItem, GroupConfig, RowConfig } from '@rpg/ui/form'
+import {
+  createSpellInputSchema,
+  deriveContentKey,
+  ELDRITCH_BLAST_RESOLUTION,
+  type CreateSpellInput,
+  type Spell,
+} from '@rpg/contracts'
+import type { FormItem, GroupConfig, RowConfig, ArrayConfig } from '@rpg/ui/form'
 
-import { spellFormDef, type SpellFormValues } from './spell-form-def'
+import { RESOLUTION_FORM_FIXTURES } from '../resolution/fixtures'
+import { spellFormDef, spellFormSchema, type SpellFormValues } from './spell-form-def'
 
 const SRD_SPELLS = loadSeedSpells('srd-cc-5.2.1')
 
@@ -16,6 +23,20 @@ function findGroup(fields: FormItem[], legend: string): GroupConfig | undefined 
 
 function findRow(fields: GroupConfig['fields']): RowConfig | undefined {
   return fields.find((field): field is RowConfig => 'kind' in field && field.kind === 'row')
+}
+
+function collectFieldNames(fields: FormItem[]): string[] {
+  const names: string[] = []
+  for (const field of fields) {
+    if ('name' in field) {
+      names.push(field.name)
+    } else if ('kind' in field && field.kind === 'row') {
+      names.push(...collectFieldNames(field.fields))
+    } else if ('kind' in field && field.kind === 'group') {
+      names.push(...collectFieldNames(field.fields))
+    }
+  }
+  return names
 }
 
 it('type: toInput return type matches CreateSpellInput', () => {
@@ -37,6 +58,69 @@ describe('spellFormDef round-trips', () => {
       expect(input.school).toBe(spell.school)
     })
   }
+
+  const fireballWithArea = {
+    ...SRD_SPELLS[0]!,
+    slug: 'fireball',
+    name: 'Fireball',
+    level: 3,
+    range: { kind: 'distance' as const, value: { value: 150, unit: 'ft' as const } },
+    areaOfEffect: { shape: 'sphere' as const, radius: { value: 20, unit: 'ft' as const } },
+  }
+
+  it('preserves areaOfEffect through form round-trip', () => {
+    const formValues = spellFormDef.toFormValues(fireballWithArea) as SpellFormValues
+    const input = spellFormDef.toInput(formValues)
+    expect(input.areaOfEffect).toEqual(fireballWithArea.areaOfEffect)
+  })
+
+  it('omits areaOfEffect when shape is none', () => {
+    const formValues = spellFormDef.toFormValues(fireballWithArea) as SpellFormValues
+    formValues.areaOfEffect = { shape: 'none' }
+    const input = spellFormDef.toInput(formValues)
+    expect(input.areaOfEffect).toBeUndefined()
+  })
+})
+
+describe('spellFormDef area of effect fields', () => {
+  it('includes shape select and conditional distance fields in the casting tab', () => {
+    const castingTab = spellFormDef.buildTabs!({}).find((tab) => tab.id === 'casting')
+    const areaGroup = findGroup(castingTab?.fields ?? [], 'Area of effect')
+    expect(areaGroup?.kind).toBe('group')
+
+    expect(collectFieldNames(areaGroup?.fields ?? [])).toEqual(
+      expect.arrayContaining([
+        'areaOfEffect.shape',
+        'areaOfEffect.radius',
+        'areaOfEffect.length',
+        'areaOfEffect.width',
+        'areaOfEffect.size',
+        'areaOfEffect.height',
+        'areaOfEffect.description',
+      ]),
+    )
+  })
+
+  it('lays out shape and radius in an auto-width row with the shape hint below the control', () => {
+    const castingTab = spellFormDef.buildTabs!({}).find((tab) => tab.id === 'casting')
+    const areaGroup = findGroup(castingTab?.fields ?? [], 'Area of effect')
+    const row = findRow(areaGroup?.fields ?? [])
+
+    expect(row?.kind).toBe('row')
+    expect(row?.fields).toEqual([
+      expect.objectContaining({
+        type: 'select',
+        name: 'areaOfEffect.shape',
+        width: 'auto',
+        hintPosition: 'below-control',
+      }),
+      expect.objectContaining({
+        type: 'inputSelect',
+        name: 'areaOfEffect.radius',
+        width: 'auto',
+      }),
+    ])
+  })
 })
 
 describe('spellFormDef casting fields', () => {
@@ -122,6 +206,76 @@ describe('spellFormDef duration fields', () => {
       }),
       expect.objectContaining({ name: 'duration.upTo', width: 'auto' }),
     ])
+  })
+})
+
+describe('spellFormDef resolution tab', () => {
+  it('includes persistence banner, preview slot, empty state, and resolution sections', () => {
+    const resolutionTab = spellFormDef.buildTabs!({}).find((tab) => tab.id === 'resolution')
+    expect(resolutionTab).toBeDefined()
+    expect(resolutionTab?.label).toBe('Resolution')
+
+    const names = collectFieldNames(resolutionTab?.fields ?? [])
+    expect(names).toContain('_resolutionPersistenceNotice')
+    expect(names).toContain('_resolutionHybridNotice')
+    expect(names).toContain('_resolutionPreview')
+    expect(names).toContain('_resolutionEmptyState')
+    expect(names).toContain('resolution.targetKind')
+    expect(names).toContain('_resolutionProximitySelect')
+    expect(names).toContain('resolution.proximityReachDistanceFt')
+    expect(names).toContain('_resolutionHowItResolves')
+    expect(names).toContain('resolution.effects')
+    expect(names).toContain('_resolutionEffectsApplicationLabel')
+    expect(names).toContain('_resolutionOutcomesPreview')
+    expect(findGroup(resolutionTab?.fields ?? [], 'Target')).toBeDefined()
+    expect(findGroup(resolutionTab?.fields ?? [], 'How it resolves')).toBeDefined()
+    const effectsArray = resolutionTab?.fields.find(
+      (field): field is ArrayConfig =>
+        'kind' in field && field.kind === 'array' && field.name === 'resolution.effects',
+    )
+    expect(effectsArray).toBeDefined()
+    expect(effectsArray?.legend).toBe('Effects')
+    expect(effectsArray?.itemCollapsible).toBe(true)
+    expect(effectsArray?.itemHeader?.primary).toBeTypeOf('function')
+    expect(effectsArray?.itemHeader?.summary).toBeTypeOf('function')
+    expect(findGroup(resolutionTab?.fields ?? [], 'Outcomes')).toBeDefined()
+  })
+})
+
+describe('spellFormDef resolution integration', () => {
+  const spellWithResolution: Spell = {
+    ...SRD_SPELLS[0]!,
+    resolution: ELDRITCH_BLAST_RESOLUTION,
+  }
+
+  it('createDefaultValues omits resolution', () => {
+    expect(spellFormDef.createDefaultValues).not.toHaveProperty('resolution')
+  })
+
+  it('spellFormSchema accepts optional resolution', () => {
+    const parsed = spellFormSchema.parse({
+      ...spellFormDef.createDefaultValues,
+      name: 'Test',
+      school: 'evocation',
+      level: 0,
+      classIds: ['wizard'],
+      resolution: RESOLUTION_FORM_FIXTURES.eldritchBlast,
+    })
+    expect(parsed.resolution).toEqual(RESOLUTION_FORM_FIXTURES.eldritchBlast)
+  })
+
+  it('toFormValues hydrates resolution from the read model', () => {
+    const formValues = spellFormDef.toFormValues(spellWithResolution) as SpellFormValues
+    expect(formValues.resolution).toEqual(RESOLUTION_FORM_FIXTURES.eldritchBlast)
+  })
+
+  it('toInput omits resolution until persistence ships', () => {
+    const formValues = spellFormDef.toFormValues(spellWithResolution) as SpellFormValues
+    expect(formValues.resolution).toBeDefined()
+
+    const input = spellFormDef.toInput(formValues)
+    expect(input).not.toHaveProperty('resolution')
+    expect(() => createSpellInputSchema.parse(input)).not.toThrow()
   })
 })
 

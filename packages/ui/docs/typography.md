@@ -16,26 +16,26 @@ styles, and list behavior on all descendants and fights layout utilities
 Document outline presets — pair each `variant` with the matching `as` level. Use **one
 h1 per page** (route title via `page`, or entity title via `display` on detail routes).
 
-| Variant / component           | `as`   | px   | Weight | Use case                                 |
-| ----------------------------- | ------ | ---- | ------ | ---------------------------------------- |
-| `Heading` `display`           | `h1`   | 42   | 700    | Hero, content detail entity titles       |
-| `Heading` `page`              | `h1`   | 34   | 600    | Route titles (`PageHeader`)              |
-| `Heading` `section`           | `h2`   | 28   | 300    | Top-level in-page sections               |
-| `Heading` `subsection`        | `h3`   | 19   | 600    | Nested blocks within a section           |
-| `Heading` `group`             | `h4`   | 16   | 500    | Headings inside subsections              |
-| `Heading` `card`              | Radix  | 19   | 600    | `CardTitle`, `Modal.Header` (chrome)     |
-| `Heading` `nav` / `brand`     | `span` | 16   | 600    | Topbar title, sidebar product name       |
-| `Heading` `alert`             | Radix  | 16   | 600    | Confirm dialog title                     |
-| `Heading` `label`             | `p`    | 16   | 500    | Inline non-outline titles (trait names)  |
-| `Text` `body`                 | `p`    | 16   | 400    | Default foreground copy                  |
-| `Text` `muted`                | `p`    | 16   | 400    | Non-catalog plain copy (hints, errors)   |
-| `Text` `small`                | `p`    | 15   | 400    | Helper text, secondary metadata          |
-| `Text` `caption`              | `p`    | 12   | 400    | Form field hints                         |
-| `Text` `lead`                 | `p`    | 18   | 400    | Marketing subheads                       |
-| `Text` `destructive`          | `p`    | 15   | 400    | Inline errors — pair with `role="alert"` |
-| `Eyebrow` `xs` / `sm` / `md`  | `p`    | 9–13 | 300    | Uppercase section labels                 |
-| `RichTextContent` `size="md"` | `div`  | 15   | 400    | Catalog descriptions (TipTap / CMS HTML) |
-| `CardDescription`             | `div`  | 15   | 400    | Card header secondary line               |
+| Variant / component           | `as`   | px   | Weight | Use case                                                      |
+| ----------------------------- | ------ | ---- | ------ | ------------------------------------------------------------- |
+| `Heading` `display`           | `h1`   | 42   | 700    | Hero, content detail entity titles                            |
+| `Heading` `page`              | `h1`   | 34   | 600    | Route titles (`PageHeader`)                                   |
+| `Heading` `section`           | `h2`   | 28   | 300    | Top-level in-page sections                                    |
+| `Heading` `subsection`        | `h3`   | 19   | 600    | Nested blocks within a section                                |
+| `Heading` `group`             | `h4`   | 16   | 500    | Headings inside subsections                                   |
+| `Heading` `card`              | Radix  | 19   | 600    | `CardTitle`, `Modal.Header` (chrome)                          |
+| `Heading` `nav` / `brand`     | `span` | 16   | 600    | Topbar title, sidebar product name                            |
+| `Heading` `alert`             | Radix  | 16   | 600    | Confirm dialog title                                          |
+| `Heading` `label`             | `p`    | 16   | 500    | Inline non-outline titles (trait names)                       |
+| `Text` `body`                 | `p`    | 16   | 400    | Default foreground copy                                       |
+| `Text` `muted`                | `p`    | 16   | 400    | Non-catalog plain copy (hints, errors)                        |
+| `Text` `small`                | `p`    | 15   | 400    | Helper text, secondary metadata                               |
+| `Text` `caption`              | `p`    | 12   | 400    | Form field hints                                              |
+| `Text` `lead`                 | `p`    | 18   | 400    | Marketing subheads                                            |
+| `Text` `destructive`          | `p`    | 15   | 400    | Inline errors — pair with `role="alert"`                      |
+| `Eyebrow` `xs` / `sm` / `md`  | `p`    | 9–13 | 300    | Uppercase section labels (`tone`: muted, foreground, primary) |
+| `RichTextContent` `size="md"` | `div`  | 15   | 400    | Catalog descriptions (TipTap / CMS HTML)                      |
+| `CardDescription`             | `div`  | 15   | 400    | Card header secondary line                                    |
 
 Preserve semantic headings and existing `id`s — content detail routes use
 `aria-labelledby` on sections.
@@ -178,7 +178,8 @@ table above in app code.
 
 Each `Heading` / `Eyebrow` variant maps to one `@utility` composite (e.g.
 `heading-style-page`) that bundles size, line-height, weight, tracking, and (for
-eyebrow) case/color. Composites reference `@theme` variables only.
+eyebrow) case. Color is set via `Eyebrow` `tone` (`text-muted-foreground`,
+`text-foreground`, `text-primary`). Composites reference `@theme` variables only.
 
 Visual reference: Storybook **`Typography/Composites`**.
 
@@ -212,12 +213,14 @@ Secondary copy sizes sit one step below the Tailwind text scale (at 16px root):
 | `text-2xs-meta`       | 9              | Ultra-compact meta; aliased by `text-eyebrow-xs`                  |
 | `text-xs-meta`        | 11             | Shared meta base; aliased by `text-eyebrow-sm`                    |
 | `text-sm-meta`        | 13             | Shared meta base; aliased by `text-eyebrow-md`, `text-table-body` |
-| `text-badge-sm`       | 12             | Badge / dismissible-badge `size="sm"` — aliases `--text-xs`       |
-| `text-badge-md`       | 15             | Badge / dismissible-badge `size="md"` — aliases `--text-md`       |
+| `text-md`             | 15             | Compact label `lg` (`Badge` / `Chip`); aliases `--text-md`        |
 | `tracking-eyebrow-xs` | 1.2px          | Letter-spacing for `Eyebrow` `size="xs"`                          |
 | `tracking-eyebrow`    | 1.6px          | Letter-spacing for `Eyebrow` `size="sm"` / `size="md"`            |
 
-Prefer semantic aliases (`text-eyebrow-sm`, `text-badge-sm`) in component variants; use
+Compact-label vocabulary (`appearance`, `tone`, selected-control vs semantic soft) →
+[compact-labels.md](./compact-labels.md).
+
+Prefer semantic aliases (`text-eyebrow-sm`) in component variants; use
 `text-xs-meta` / `text-sm-meta` directly for role-based typography (e.g. data-table meta).
 
 ## Internal primitives

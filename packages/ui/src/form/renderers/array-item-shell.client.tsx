@@ -1,18 +1,14 @@
 'use client'
 
 import * as React from 'react'
-import type { CSSProperties } from 'react'
 import { Trash2 } from 'lucide-react'
 
 import { cn } from '../../lib/utils'
-import { resolveArrayItemLeadingChrome } from '../config/array-item-leading-chrome.lib'
+import { CollapsibleListItemShell } from '../../components/ui/collapsible-list-item/collapsible-list-item-shell.client'
 import { useFormSectionContext } from '../context/form-section.context'
 import {
   arrayItemActionsRailClasses,
-  arrayItemMainClasses,
   arrayItemRemoveButtonClasses,
-  arrayItemShellVariants,
-  arrayItemDraggingClasses,
   type ArrayItemLeadingChromeOptions,
 } from './array-item-toolbar.variants'
 import { ArrayItemIssueBadge } from './array-item-issue.client'
@@ -116,33 +112,19 @@ export function ArrayItemShell({
   actions,
 }: ArrayItemShellProps) {
   const { arrayItemTone } = useFormSectionContext()
-  const leadingChromeStyle = {
-    '--array-item-chrome-count': resolveArrayItemLeadingChrome({
-      showDragHandle,
-      collapsible,
-    }).chromeCount,
-  } as CSSProperties
 
   return (
-    <div
-      role="group"
-      aria-labelledby={titleId}
-      data-array-item-prefix={itemPrefix}
-      className={cn(
-        arrayItemShellVariants({ tone: arrayItemTone ?? 'default', layout }),
-        dragging && arrayItemDraggingClasses,
-        className,
-      )}
-      style={leadingChromeStyle}
-    >
-      {layout === 'compactRow' ? (
-        main
-      ) : (
-        <>
-          <div className={arrayItemMainClasses}>{main}</div>
-          {actions}
-        </>
-      )}
-    </div>
+    <CollapsibleListItemShell
+      titleId={titleId}
+      itemPrefix={itemPrefix}
+      showDragHandle={showDragHandle}
+      collapsible={collapsible}
+      dragging={dragging}
+      layout={layout}
+      tone={arrayItemTone ?? 'default'}
+      className={className}
+      main={main}
+      actions={actions}
+    />
   )
 }

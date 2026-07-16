@@ -7,17 +7,19 @@ import {
   type AvailabilityReason,
 } from '@/lib/availability'
 import type { ContentFormCtx } from '../forms/content-form-registry'
+import type { BadgeAppearance, BadgeTone } from '@rpg/ui'
+
 import type { MasterDetailListBadge } from '../../components/master-detail/master-detail-list-panel.client'
 import { isContentRowActive } from './content-campaign-availability'
 
 export type EmbeddedRowSource = 'system' | 'homebrew'
 
 const SOURCE_BADGE = {
-  system: { variant: 'secondary', label: 'System' },
-  homebrew: { variant: 'outline', label: 'Homebrew' },
+  system: { appearance: 'neutral', tone: 'neutral', label: 'System' },
+  homebrew: { appearance: 'outline', tone: 'neutral', label: 'Homebrew' },
 } as const satisfies Record<
   EmbeddedRowSource,
-  { variant: MasterDetailListBadge['variant']; label: string }
+  { appearance: BadgeAppearance; tone: BadgeTone; label: string }
 >
 
 export interface ResolveEmbeddedRowMetaParams {

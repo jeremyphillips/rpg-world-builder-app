@@ -2,6 +2,7 @@
 
 import {
   isSpellcastingActiveAtLevel,
+  resolveAvailableChoices,
   type CharacterBuildCatalogIndex,
   type CharacterBuilderDraft,
   type CharacterBuildPreview,
@@ -41,6 +42,7 @@ export type CharacterBuilderPreviewPanelProps = {
 
 export function CharacterBuilderPreviewPanel({
   draft,
+  context,
   catalogIndex,
   preview,
 }: CharacterBuilderPreviewPanelProps) {
@@ -52,6 +54,7 @@ export function CharacterBuilderPreviewPanel({
   const spellcastingActive =
     characterClass !== undefined &&
     isSpellcastingActiveAtLevel(characterClass.spellcasting, draft.class.level)
+  const resolvedChoiceSets = preview ? resolveAvailableChoices(draft, context) : []
 
   return (
     <aside
@@ -84,11 +87,11 @@ export function CharacterBuilderPreviewPanel({
           ) : (
             <CharacterBuilderPreviewAccordion
               preview={preview}
+              catalogIndex={catalogIndex}
+              draft={draft}
+              resolvedChoiceSets={resolvedChoiceSets}
               narrative={narrative}
               narrativeCount={narrativeCount}
-              skillChoiceCount={
-                characterClass?.characterCreation?.proficiencies?.skills?.choices?.[0]?.choose
-              }
               hasCharacterClass={characterClass !== undefined}
               spellcastingActive={spellcastingActive}
             />

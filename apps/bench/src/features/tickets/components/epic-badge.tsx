@@ -5,8 +5,7 @@ import { DEFAULT_EPIC_BADGE_COLOR } from '@rpg/contracts/dev-bench'
 import { Badge, cn } from '@rpg/ui'
 import { Link } from 'react-router-dom'
 
-import { badgeTextColorForBackground, epicBadgeBackgroundColor } from '../lib/epic-badge.lib'
-import { epicBadgeLinkClasses, epicBadgeNoEpicClasses } from './epic-badge.variants'
+import { epicBadgeLinkClasses } from './epic-badge.variants'
 
 const NO_EPIC_BADGE_LABEL = 'No epic'
 
@@ -24,14 +23,16 @@ function stopCardActivation(event: { stopPropagation: () => void }) {
 export function EpicBadge({ epic, className, stopActivation = false }: EpicBadgeProps) {
   if (!epic) {
     return (
-      <Badge size="sm" className={cn(epicBadgeNoEpicClasses, 'max-w-full truncate', className)}>
+      <Badge
+        appearance="neutral"
+        tone="neutral"
+        size="sm"
+        className={cn('max-w-full truncate', className)}
+      >
         {NO_EPIC_BADGE_LABEL}
       </Badge>
     )
   }
-
-  const backgroundColor = epicBadgeBackgroundColor(epic.badgeColor)
-  const color = badgeTextColorForBackground(backgroundColor)
 
   return (
     <Link
@@ -42,9 +43,10 @@ export function EpicBadge({ epic, className, stopActivation = false }: EpicBadge
       onKeyDown={stopActivation ? stopCardActivation : undefined}
     >
       <Badge
+        appearance="accent-outline"
+        tone="informative"
         size="sm"
-        className="max-w-full truncate border-transparent"
-        style={{ backgroundColor, color }}
+        className="max-w-full truncate"
       >
         {epic.title}
       </Badge>

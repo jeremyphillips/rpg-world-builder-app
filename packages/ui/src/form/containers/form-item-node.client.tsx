@@ -116,7 +116,14 @@ export function FormItemNode({ item, index, idPrefix, namePrefix, depth }: FormI
   }
 
   if (item.kind === 'slot') {
-    return <SlotFormItemSection item={item} parentContext={parentContext} depth={depth} />
+    return (
+      <SlotFormItemSection
+        item={item}
+        parentContext={parentContext}
+        depth={depth}
+        namePrefix={namePrefix}
+      />
+    )
   }
 
   if (item.visibility) {

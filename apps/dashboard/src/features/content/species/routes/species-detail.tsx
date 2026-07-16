@@ -1,131 +1,100 @@
 import { useParams } from 'react-router-dom'
 import { Heading, RichTextContent } from '@rpg/ui'
-import {
-  flattenGrantGroups,
-  formatSpeed,
-  getCreatureSizeLabel,
-  resolveGrantGroupsFromContent,
-  resolveTraitDisplay,
-} from '@rpg/contracts'
-import type { Species, SpeciesTrait, SpeciesHeritage } from '@rpg/contracts'
+import type { Species } from '@rpg/contracts'
 
 import { useSetBreadcrumbLabel } from '@/components/layout/use-breadcrumb-label'
 import { WidePage } from '@/components/layout/wide-page'
 import {
   useCreatureTypeVocabulary,
+  useLanguageVocabulary,
   useSenseVocabulary,
+  getLanguageLabelFromVocabulary,
   getSenseLabelFromVocabulary,
 } from '@/features/homebrew'
 import { getCreatureTypeLabel } from '../lib/creature-type-field-options'
+import {
+  buildSpeciesDetailViewModel,
+  type SpeciesDetailItem,
+  type SpeciesDetailViewModel,
+} from '../lib/species-display'
 import { useSpecies } from '../hooks/use-species'
 import { ContentDetailLayout } from '../../lib/detail/content-detail-layout'
 import { ContentDetailResolver } from '../../lib/detail/content-detail-resolver'
 import { contentEditHref } from '../../lib/detail/content-edit-href'
-import { ContentStatRow } from '../../lib/detail/content-stat-row.client'
 import { getContentImageUrl } from '../../lib/detail/content-image-url'
 
 // ---------------------------------------------------------------------------
-// Helpers
+// Sub-components (markup only — labels and formatting live in species-display)
 // ---------------------------------------------------------------------------
 
-function collectSenses(
-  traits: SpeciesTrait[],
-  senseVocabulary: ReturnType<typeof useSenseVocabulary>['vocabulary'],
-): string {
-  const senses = traits.flatMap((trait) =>
-    flattenGrantGroups(resolveGrantGroupsFromContent(trait))
-      .map(({ grant }) => grant)
-      .filter((grant): grant is Extract<typeof grant, { kind: 'sense' }> => grant.kind === 'sense'),
-  )
-  if (senses.length === 0) return 'None'
-  return senses
-    .map((s) => `${getSenseLabelFromVocabulary(senseVocabulary, s.type)} ${s.range} ft.`)
-    .join(', ')
-}
-
-// ---------------------------------------------------------------------------
-// Sub-components
-// ---------------------------------------------------------------------------
-
-function TraitItem({ trait }: { trait: SpeciesTrait }) {
-  const display = resolveTraitDisplay(trait)
+function TraitItem({ item }: { item: SpeciesDetailItem }) {
   return (
     <li className="space-y-1">
       <Heading variant="subsection" as="h3">
-        {display.name}
+        {item.title}
       </Heading>
-      {display.descriptionHtml && (
-        <RichTextContent html={display.descriptionHtml} size="md" tone="muted" />
-      )}
+      {item.bodyHtml && <RichTextContent html={item.bodyHtml} size="md" tone="muted" />}
     </li>
   )
 }
 
-function TraitsList({ traits }: { traits: SpeciesTrait[] }) {
-  if (traits.length === 0) return null
+function TraitsSection({
+  section,
+}: {
+  section: Extract<SpeciesDetailViewModel['sections'][number], { id: 'traits' }>
+}) {
   return (
     <section aria-labelledby="traits-heading">
       <Heading variant="section" as="h2" id="traits-heading" className="mb-4">
-        Traits
+        {section.title}
       </Heading>
       <ul className="space-y-4" role="list">
-        {traits.map((trait) => (
-          <TraitItem key={trait.id} trait={trait} />
+        {section.items.map((item) => (
+          <TraitItem key={item.id} item={item} />
         ))}
       </ul>
     </section>
   )
 }
 
-function HeritageSection({ heritage }: { heritage: SpeciesHeritage }) {
+function HeritageSection({
+  section,
+}: {
+  section: Extract<SpeciesDetailViewModel['sections'][number], { id: 'heritage' }>
+}) {
   return (
-    <section aria-labelledby={`heritage-${heritage.id}-heading`}>
+    <section aria-labelledby={`heritage-${section.heritageId}-heading`}>
       <Heading
         variant="section"
         as="h2"
-        id={`heritage-${heritage.id}-heading`}
+        id={`heritage-${section.heritageId}-heading`}
         className="mb-2 capitalize"
       >
-        {heritage.name}
+        {section.title}
       </Heading>
-      {heritage.description && (
-        <RichTextContent html={heritage.description} size="md" tone="muted" className="mb-4" />
+      {section.descriptionHtml && (
+        <RichTextContent html={section.descriptionHtml} size="md" tone="muted" className="mb-4" />
       )}
       <ul className="space-y-4" role="list">
-        {heritage.options.map((option) => {
-          const display = resolveTraitDisplay(option)
-          return (
-            <li key={option.id} className="space-y-1">
-              <Heading variant="subsection" as="h3">
-                {display.name}
-              </Heading>
-              {display.descriptionHtml && (
-                <RichTextContent html={display.descriptionHtml} size="md" tone="muted" />
-              )}
-            </li>
-          )
-        })}
+        {section.items.map((item) => (
+          <TraitItem key={item.id} item={item} />
+        ))}
       </ul>
     </section>
   )
 }
 
-function SpeciesStatsSection({ species, campaignId }: { species: Species; campaignId: string }) {
-  const { vocabulary } = useCreatureTypeVocabulary(campaignId)
-  const { vocabulary: senseVocabulary } = useSenseVocabulary(campaignId)
-  const sizeLabel = species.sizes.map(getCreatureSizeLabel).join(' or ')
-  const sensesLabel = collectSenses(species.traits, senseVocabulary)
-
+function SpeciesDetailSections({ sections }: { sections: SpeciesDetailViewModel['sections'] }) {
   return (
-    <div className="space-y-3">
-      <ContentStatRow
-        label="Creature Type"
-        value={getCreatureTypeLabel(species.creatureType, { creatureTypeVocabulary: vocabulary })}
-      />
-      <ContentStatRow label="Size" value={sizeLabel} />
-      <ContentStatRow label="Speed" value={formatSpeed(species.speed)} />
-      <ContentStatRow label="Senses" value={sensesLabel} />
-    </div>
+    <>
+      {sections.map((section) =>
+        section.id === 'traits' ? (
+          <TraitsSection key={section.id} section={section} />
+        ) : (
+          <HeritageSection key={section.id} section={section} />
+        ),
+      )}
+    </>
   )
 }
 
@@ -138,6 +107,17 @@ type SpeciesDetailContentProps = { species: Species; campaignId: string }
 export function SpeciesDetailContent({ species, campaignId }: SpeciesDetailContentProps) {
   useSetBreadcrumbLabel(species.name)
 
+  const { vocabulary: creatureTypeVocabulary } = useCreatureTypeVocabulary(campaignId)
+  const { vocabulary: senseVocabulary } = useSenseVocabulary(campaignId)
+  const { vocabulary: languageVocabulary } = useLanguageVocabulary(campaignId)
+
+  const viewModel = buildSpeciesDetailViewModel(species, {
+    resolveCreatureTypeLabel: (id) => getCreatureTypeLabel(id, { creatureTypeVocabulary }),
+    resolveLanguageLabel: (id) => getLanguageLabelFromVocabulary(languageVocabulary, id),
+    resolveSenseLabel: (type) => getSenseLabelFromVocabulary(senseVocabulary, type),
+    resolveSpell: () => undefined,
+  })
+
   return (
     <WidePage>
       <ContentDetailLayout
@@ -146,15 +126,14 @@ export function SpeciesDetailContent({ species, campaignId }: SpeciesDetailConte
         imageName={species.name}
         campaignId={campaignId}
         editHref={contentEditHref('species', campaignId, species.id)}
-        metadata={<SpeciesStatsSection species={species} campaignId={campaignId} />}
+        statRows={viewModel.statRows}
         descriptionContent={
-          species.description ? (
-            <RichTextContent html={species.description} size="md" tone="muted" />
+          viewModel.descriptionHtml ? (
+            <RichTextContent html={viewModel.descriptionHtml} size="md" tone="muted" />
           ) : undefined
         }
       >
-        <TraitsList traits={species.traits} />
-        {species.heritage ? <HeritageSection heritage={species.heritage} /> : null}
+        <SpeciesDetailSections sections={viewModel.sections} />
       </ContentDetailLayout>
     </WidePage>
   )

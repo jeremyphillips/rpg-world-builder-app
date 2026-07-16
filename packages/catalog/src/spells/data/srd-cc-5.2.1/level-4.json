@@ -16,8 +16,16 @@
       "damageTypes": ["necrotic"],
       "roles": ["buff", "healing", "warding"]
     },
-    "castingTime": { "normal": { "value": 1, "unit": "action" }, "canBeCastAsRitual": false },
-    "range": { "kind": "self" },
+    "castingTime": {
+      "normal": {
+        "value": 1,
+        "unit": "action"
+      },
+      "canBeCastAsRitual": false
+    },
+    "range": {
+      "kind": "self"
+    },
     "duration": {
       "kind": "timed",
       "value": 10,
@@ -25,7 +33,9 @@
       "concentration": true,
       "upTo": true
     },
-    "components": { "verbal": true }
+    "components": {
+      "verbal": true
+    }
   },
   {
     "id": "srd-cc-5.2.1:death-ward",
@@ -43,9 +53,179 @@
     "tags": {
       "roles": ["warding"]
     },
-    "castingTime": { "normal": { "value": 1, "unit": "action" }, "canBeCastAsRitual": false },
-    "range": { "kind": "touch" },
-    "duration": { "kind": "timed", "value": 8, "unit": "hour" },
-    "components": { "verbal": true, "somatic": true }
+    "castingTime": {
+      "normal": {
+        "value": 1,
+        "unit": "action"
+      },
+      "canBeCastAsRitual": false
+    },
+    "range": {
+      "kind": "touch"
+    },
+    "duration": {
+      "kind": "timed",
+      "value": 8,
+      "unit": "hour"
+    },
+    "components": {
+      "verbal": true,
+      "somatic": true
+    }
+  },
+  {
+    "id": "srd-cc-5.2.1:polymorph",
+    "slug": "polymorph",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Polymorph",
+    "description": "<p>You attempt to transform a creature that you can see within range into a Beast. The target must succeed on a Wisdom saving throw or shape-shift into a Beast form for the duration. That form can be any Beast you choose that has a Challenge Rating equal to or less than the target's (or the target's level if it doesn't have a Challenge Rating). The target's game statistics are replaced by the stat block of the chosen Beast, but the target retains its alignment, personality, creature type, Hit Points, and Hit Point Dice. See the \"Animals\" section of \"Monsters\" for a sample of Beast stat blocks.</p><p>The target gains a number of Temporary Hit Points equal to the Hit Points of the Beast form. These Temporary Hit Points vanish if any remain when the spell ends. The spell ends early on the target if it has no Temporary Hit Points left.</p><p>The target is limited in the actions it can perform by the anatomy of its new form, and it can't speak or cast spells.</p><p>The target's gear melds into the new form. The creature can't use or otherwise benefit from any of that equipment.</p>",
+    "school": "transmutation",
+    "level": 4,
+    "classIds": ["bard", "druid", "sorcerer", "wizard"],
+    "tags": {
+      "roles": ["control", "debuff"]
+    },
+    "castingTime": {
+      "normal": {
+        "value": 1,
+        "unit": "action"
+      },
+      "canBeCastAsRitual": false
+    },
+    "range": {
+      "kind": "distance",
+      "value": {
+        "value": 60,
+        "unit": "ft"
+      }
+    },
+    "duration": {
+      "kind": "timed",
+      "value": 1,
+      "unit": "hour",
+      "concentration": true,
+      "upTo": true
+    },
+    "components": {
+      "verbal": true,
+      "somatic": true,
+      "material": {
+        "description": "a caterpillar cocoon"
+      }
+    }
+  },
+  {
+    "id": "srd-cc-5.2.1:wall-of-fire",
+    "slug": "wall-of-fire",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Wall of Fire",
+    "description": "<p>You create a wall of fire on a solid surface within range. You can make the wall up to 60 feet long, 20 feet high, and 1 foot thick, or a ringed wall up to 20 feet in diameter, 20 feet high, and 1 foot thick. The wall is opaque and lasts for the duration.</p><p>When the wall appears, each creature in its area makes a Dexterity saving throw, taking 5d8 Fire damage on a failed save or half as much damage on a successful one.</p><p>One side of the wall, selected by you when you cast this spell, deals 5d8 Fire damage to each creature that ends its turn within 10 feet of that side or inside the wall. A creature takes the same damage when it enters the wall for the first time on a turn or ends its turn there. The other side of the wall deals no damage.</p>",
+    "school": "evocation",
+    "level": 4,
+    "classIds": ["druid", "sorcerer", "wizard"],
+    "tags": {
+      "damageTypes": ["fire"],
+      "roles": ["control", "damage"]
+    },
+    "castingTime": {
+      "normal": {
+        "value": 1,
+        "unit": "action"
+      },
+      "canBeCastAsRitual": false
+    },
+    "range": {
+      "kind": "distance",
+      "value": {
+        "value": 120,
+        "unit": "ft"
+      }
+    },
+    "duration": {
+      "kind": "timed",
+      "value": 1,
+      "unit": "minute",
+      "concentration": true,
+      "upTo": true
+    },
+    "components": {
+      "verbal": true,
+      "somatic": true,
+      "material": {
+        "description": "a piece of charcoal"
+      }
+    },
+    "higherLevelSlotEffect": "<p>The damage increases by 1d8 for each spell slot level above 4.</p>",
+    "effects": [
+      {
+        "id": "srd-cc-5.2.1:wall-of-fire:damage",
+        "kind": "damage",
+        "roll": {
+          "dice": {
+            "count": 5,
+            "faces": 8
+          }
+        },
+        "damageType": "fire"
+      }
+    ],
+    "resolution": {
+      "target": {
+        "count": 1,
+        "kind": "creature-or-object",
+        "proximity": {
+          "kind": "distance",
+          "distance": {
+            "value": 120,
+            "unit": "ft"
+          }
+        }
+      },
+      "method": {
+        "kind": "saving-throw",
+        "ability": "dex"
+      },
+      "effects": [
+        {
+          "id": "damage",
+          "kind": "damage",
+          "roll": {
+            "dice": {
+              "count": 5,
+              "faces": 8
+            }
+          },
+          "damageType": "fire"
+        }
+      ],
+      "outcomes": [
+        {
+          "result": "failed-save",
+          "applications": [
+            {
+              "effectId": "damage",
+              "amount": "full"
+            }
+          ]
+        },
+        {
+          "result": "successful-save",
+          "applications": [
+            {
+              "effectId": "damage",
+              "amount": "half"
+            }
+          ]
+        }
+      ]
+    }
   }
 ]

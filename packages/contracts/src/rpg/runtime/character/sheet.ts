@@ -14,7 +14,7 @@ import {
 } from './equipment-inventory'
 import { characterNarrativeSchema } from './narrative'
 import { characterSpellEntrySchema } from './spells'
-import { characterLanguageEntrySchema, characterProficienciesSchema } from './proficiencies'
+import { characterProficienciesSchema } from './proficiencies'
 
 // ---------------------------------------------------------------------------
 // Character — player characters and campaign-owned NPCs. This is a stored sheet
@@ -34,7 +34,6 @@ const characterBaseSchema = z.object({
   abilityScores: characterAbilityScoresSchema,
   hitPoints: characterHitPointsSchema,
   proficiencies: characterProficienciesSchema,
-  languages: z.array(characterLanguageEntrySchema).default([]),
   spells: z.array(characterSpellEntrySchema).default([]),
   equipment: characterEquipmentSchema,
   wealth: characterWealthSchema,

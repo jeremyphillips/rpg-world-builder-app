@@ -37,13 +37,13 @@ describe('resolveTraitDisplay', () => {
         id: 'speed',
         grantGroups: [
           {
-            grants: [{ kind: 'movement', mode: 'walk', operation: 'bonus', value: 5, unit: 'ft' }],
+            grants: [{ kind: 'movement', mode: 'walk', operation: 'increase', feet: 5 }],
           },
         ],
       }),
     )
     expect(display.name).toBe('Movement')
-    expect(display.descriptionHtml).toBe('<p>Your walking speed increases by 5 feet.</p>')
+    expect(display.descriptionHtml).toBe('<p>Your walking speed increases by 5 ft.</p>')
   })
 
   it('derives language display from grantGroups', () => {

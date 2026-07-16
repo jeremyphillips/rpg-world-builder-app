@@ -42,8 +42,8 @@ const baseInput: CreateCharacterInput = {
     ],
     armor: [{ armorCategory: 'light' }],
     tools: [],
+    languages: [],
   },
-  languages: [],
   spells: [],
   equipment: {
     weapons: [],
@@ -127,11 +127,11 @@ describe('createCharacterInputSchema', () => {
   })
 
   it('defaults omitted array fields to empty', () => {
-    const { languages: _l, spells: _s, feats: _f, ...withoutLists } = baseInput
+    const { spells: _s, feats: _f, ...withoutLists } = baseInput
     const result = createCharacterInputSchema.safeParse(withoutLists)
     expect(result.success).toBe(true)
     if (result.success) {
-      expect(result.data.languages).toEqual([])
+      expect(result.data.proficiencies.languages).toEqual([])
       expect(result.data.spells).toEqual([])
       expect(result.data.feats).toEqual([])
     }
