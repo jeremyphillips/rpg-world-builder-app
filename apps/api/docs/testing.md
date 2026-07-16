@@ -17,18 +17,21 @@ Do **not** duplicate combinatorial validation matrices here — those live in
 
 ## Shared scaffold (`src/test/`)
 
-| Path                             | Purpose                                                                |
-| -------------------------------- | ---------------------------------------------------------------------- |
-| `setup/integration-db.ts`        | `useIntegrationDb()` — `beforeAll`/`beforeEach`/`afterAll` for Mongo   |
-| `setup/integration-app.ts`       | `useIntegrationApp()` — DB + `createApp()` for route tests             |
-| `fixtures/users.ts`              | `makeTestUser()`                                                       |
-| `fixtures/campaigns.ts`          | `makeTestCampaign()`                                                   |
-| `fixtures/starting-wealth.ts`    | Re-exports catalog-aligned wealth helpers (see below)                  |
-| `fixtures/character-creation.ts` | `characterCreationScenarios`, `enableExtendedProgressionAt30()`        |
-| `helpers/ruleset-patch.ts`       | `readRulesetPatch`, `storedRulesetPatchDoc`, `expectStoredSparseUnset` |
-| `helpers/http.ts`                | `authedCampaignContext`, `patchCharacterCreationRoute`, …              |
-| `expect-http-error.ts`           | `expectHttpError`, `expectHttpErrorAsync`                              |
-| `auth-agent.ts`                  | Register/login helpers for supertest agents                            |
+| Path                              | Purpose                                                                 |
+| --------------------------------- | ----------------------------------------------------------------------- |
+| `setup/global-setup.ts`           | One shared `MongoMemoryServer` per integration run (Vitest globalSetup) |
+| `setup/connect-integration-db.ts` | Connects Mongoose to the shared server (`api:integration` setupFiles)   |
+| `setup/integration-db.ts`         | `useIntegrationDb()` — `beforeEach(clearTestDb)` for integration tests  |
+| `setup/integration-app.ts`        | `useIntegrationApp()` — DB + `createApp()` for route tests              |
+| `setup/unit-test-files.ts`        | Pure lib test paths (parallel `api:unit` project, no Mongo)             |
+| `fixtures/users.ts`               | `makeTestUser()`                                                        |
+| `fixtures/campaigns.ts`           | `makeTestCampaign()`                                                    |
+| `fixtures/starting-wealth.ts`     | Re-exports catalog-aligned wealth helpers (see below)                   |
+| `fixtures/character-creation.ts`  | `characterCreationScenarios`, `enableExtendedProgressionAt30()`         |
+| `helpers/ruleset-patch.ts`        | `readRulesetPatch`, `storedRulesetPatchDoc`, `expectStoredSparseUnset`  |
+| `helpers/http.ts`                 | `authedCampaignContext`, `patchCharacterCreationRoute`, …               |
+| `expect-http-error.ts`            | `expectHttpError`, `expectHttpErrorAsync`                               |
+| `auth-agent.ts`                   | Register/login helpers for supertest agents                             |
 
 Register hooks at module scope:
 
@@ -41,6 +44,10 @@ useIntegrationDb()
 Route tests use `useIntegrationApp()` and call `getApp()` inside each test.
 
 DB clearing uses **`beforeEach(clearTestDb)`** via `useIntegrationDb()` — not `afterEach`.
+
+Integration tests run in the **`api:integration`** Vitest project (serial files, shared
+in-memory Mongo). Pure lib tests run in **`api:unit`** (parallel, no DB). Auth hashing uses
+fewer bcrypt rounds in test (`src/lib/bcrypt-rounds.ts`) for speed; production stays at 12.
 
 ## Catalog-aligned starting wealth
 
@@ -72,7 +79,9 @@ See also [`src/features/vocabulary/README.md`](../src/features/vocabulary/README
 
 ```sh
 pnpm --filter @rpg/api test
+pnpm --filter @rpg/api exec vitest run --project api:integration
+pnpm --filter @rpg/api exec vitest run --project api:unit
 pnpm --filter @rpg/api typecheck
 ```
 
-First run downloads a `mongod` binary via `mongodb-memory-server`; no external services required.
+First integration run downloads a `mongod` binary via `mongodb-memory-server`; no external services required.

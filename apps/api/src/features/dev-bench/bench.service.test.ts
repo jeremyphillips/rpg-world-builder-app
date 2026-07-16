@@ -1,4 +1,4 @@
-import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest'
+import { describe, expect, it } from 'vitest'
 
 import {
   ticketSchema,
@@ -6,7 +6,7 @@ import {
   createTicketInputSchema,
 } from '@rpg/contracts/dev-bench'
 
-import { clearTestDb, startTestDb, stopTestDb } from '../../test/db'
+import { useIntegrationDb } from '../../test/setup/integration-db'
 import {
   createEpic,
   createTicket,
@@ -19,17 +19,7 @@ import {
   updateTicket,
 } from './bench.service'
 
-beforeAll(async () => {
-  await startTestDb()
-})
-
-afterAll(async () => {
-  await stopTestDb()
-})
-
-beforeEach(async () => {
-  await clearTestDb()
-})
+useIntegrationDb()
 
 const baseTicketInput = createTicketInputSchema.parse({
   title: 'Capture gap',
