@@ -27,7 +27,7 @@ import {
   type SpellTemporaryHitPointsEffect,
 } from '@rpg/contracts'
 
-import { SRD_521_SPELL_SEED_EFFECTS } from '../spell-seed-effects'
+import { SRD_521_SPELL_RESOLUTION_DERIVATION_EFFECTS } from './spell-resolution-derivation-effects'
 
 export type ResolutionDerivationOverrides = {
   method?: SpellResolutionMethod
@@ -313,16 +313,15 @@ function buildOutcomes(
   return stripEmptyOutcomeSlots(defaults)
 }
 
-/** Derives a contract resolution envelope from spell metadata and seed effect manifest. */
+/** Derives a contract resolution envelope from spell metadata and derivation effect snapshots. */
 export function deriveResolutionFromSpell(
-  spell: Pick<Spell, 'slug' | 'deliveryMethod' | 'range' | 'areaOfEffect'> & {
-    effects?: readonly SpellAtomicEffect[] | null
-  },
+  spell: Pick<Spell, 'slug' | 'deliveryMethod' | 'range' | 'areaOfEffect'>,
   overrides: ResolutionDerivationOverrides = {},
 ): SpellResolution {
   const atomicEffects =
-    spell.effects ??
-    SRD_521_SPELL_SEED_EFFECTS[spell.slug as keyof typeof SRD_521_SPELL_SEED_EFFECTS]
+    SRD_521_SPELL_RESOLUTION_DERIVATION_EFFECTS[
+      spell.slug as keyof typeof SRD_521_SPELL_RESOLUTION_DERIVATION_EFFECTS
+    ]
   const primaryEffect = findPrimaryResolutionEffect(atomicEffects)
   if (!primaryEffect) {
     throw new Error('Spell has no primary resolution effect for derivation.')

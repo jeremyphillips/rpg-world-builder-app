@@ -38,13 +38,6 @@ export {
   SPELL_RESOLUTION_FIXTURES,
 } from './fixtures'
 export {
-  deriveResolutionModelingStatus,
-  getResolutionModelingStatusLabel,
-  RESOLUTION_MODELING_STATUS,
-  RESOLUTION_MODELING_STATUS_LABELS,
-  type ResolutionModelingStatus,
-} from './modeling-status'
-export {
   SPELL_RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID,
   SPELL_RESOLUTION_PRIMARY_HEALING_EFFECT_ID,
   SPELL_RESOLUTION_PRIMARY_TEMPORARY_HIT_POINTS_EFFECT_ID,

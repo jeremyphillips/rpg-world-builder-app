@@ -82,23 +82,12 @@ When persistence ships, touch these files:
 | API mapper  | `apps/api/.../spells.config.ts` — `toHomebrewSpell`                                         |
 | Patch merge | `apps/api/.../lib/deep-merge.ts` — object replace for `resolution`                          |
 
-### Atomic effects (catalog read model)
+### Resolution authoring
 
-Optional flat `effects[]` on the spell read model (`spellAtomicEffectSchema`) remains
-for catalog seed data and spell detail display. Shared atomic-effect modules live
-under `lib/effects/` (template registry, form schema/values, display). The Resolution
-tab hydrates from `spell.resolution.effects[]` only — it does not read or sync root
-`effects[]`. Authoring UI for flat effects was replaced by the Resolution tab;
-`lib/effects/*` modules remain for detail rendering and future `spell.effect.persistence`.
-
-**Dual-model spells (Tier A + hybrid):** Migrated catalog spells carry both root
-`effects[]` (legacy flat model) and `resolution` (envelope). The Resolution tab
-authors `resolution.effects[]` via the add menu. Projectile or beam scaling uses
-optional `resolution.applicationPattern` (Projectiles MVP) — not a fourth effect kind
-in the resolution add menu. Magic Missile consolidates dart count on
-`applicationPattern`; Eldritch Blast remains hybrid until beam scaling migrates from
-root `projectile-count` (hybrid notice when root still owns scaling). Manifest-deferred
-spells (e.g. Hex) render the empty state until resolution modeling lands.
+The Resolution tab hydrates from `spell.resolution` when `modeling.status` is at
+least `meaningful-partial`. Projectile scaling uses `resolution.applicationPattern`
+(Projectiles MVP). Manifest-deferred spells (e.g. Hex) render the empty state until
+resolution modeling lands. See [`packages/catalog/docs/spell-modeling.md`](../../../../packages/catalog/docs/spell-modeling.md).
 
 ### Scaling prose fields
 
@@ -130,7 +119,7 @@ rich-text body prose for cantrip upgrades and upcast effects. Section headings
 | Atomic effects (shared)   | `lib/effects/` — template registry, form schema/values, display, add menu                                                              |
 | Effect display (detail)   | `lib/effects/effect-display.ts`                                                                                                        |
 | Effects editor (stories)  | `components/spell-effects-editor.client.tsx`                                                                                           |
-| Seed effects audit        | `packages/catalog/src/spells/spell-effects-coverage-inventory.ts`                                                                      |
+| Modeling audit            | `packages/catalog/src/spells/spell-modeling-audit.ts`                                                                                  |
 | Create route              | `routes/spell-create.tsx`                                                                                                              |
 | Edit route                | `routes/spell-edit.tsx`                                                                                                                |
 

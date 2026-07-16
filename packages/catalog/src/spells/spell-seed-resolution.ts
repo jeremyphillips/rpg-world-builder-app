@@ -1,20 +1,14 @@
 /**
  * Resolution seed manifest for SRD 5.2.1 catalog spells.
  *
- * Declares which structured-effect slugs receive a `spell.resolution` envelope on
- * the read model and how that envelope is produced. Mirrors the pattern in
- * `spell-seed-effects.ts`: manifest here, materialize into `level-*.json` via
+ * Declares which slugs receive a `spell.resolution` envelope on the read model and
+ * how that envelope is produced. Materialize into `level-*.json` via
  * `packages/catalog/scripts/apply-spell-seed-resolution.mjs`.
  *
  * Each manifest row is one of:
  * - `full` — hand-authored `SpellResolution` (contract fixtures)
- * - `derived` — built by `deriveResolutionFromSpell()` from root `effects[]` plus overrides
- * - `defer` — intentionally no resolution yet; reason codes live in
- *   `spell-resolution-defer-reasons.ts`
- *
- * Migrated spells keep both root `effects[]` and optional `resolution` until a later
- * consolidation phase. Temporary seed manifest — use `resolveSpellSeedResolution()`
- * in tests and `SRD_521_SPELL_SEED_RESOLUTION_SLUGS` for slugs the apply script writes.
+ * - `derived` — built by `deriveResolutionFromSpell()` from derivation snapshots plus overrides
+ * - `defer` — intentionally no resolution yet; documented defer reason codes below
  */
 import {
   ARCANE_HAND_RESOLUTION,
@@ -32,7 +26,22 @@ import {
   deriveResolutionFromSpell,
   type ResolutionDerivationOverrides,
 } from './lib/derive-resolution-from-spell'
-import type { SpellResolutionDeferReason } from './spell-resolution-defer-reasons'
+
+/** Documented deferral reason codes for `kind: 'defer'` manifest rows. */
+export const SPELL_RESOLUTION_DEFER_REASONS = {
+  'automatic-method':
+    'Requires resolution method automatic (e.g. Magic Missile) before envelope modeling.',
+  'extra-damage-rider':
+    'Primary mechanics are non-damage; extra damage is a rider (e.g. Hex, Hunter’s Mark).',
+  'multi-effect': 'Multiple damage effects need per-outcome effect linking (e.g. Ice Knife).',
+  'choice-model': 'Choice-dependent modes and multiple labeled damage effects (e.g. Arcane Hand).',
+  'unsupported-effect-kind':
+    'Legacy defer code — healing and temporary hit points are supported as of Tier D.',
+  'placeholder-damage':
+    'Placeholder flat-zero damage rider is not a real resolution envelope (e.g. True Strike).',
+} as const
+
+export type SpellResolutionDeferReason = keyof typeof SPELL_RESOLUTION_DEFER_REASONS
 
 export type SpellSeedResolutionFullEntry = {
   kind: 'full'

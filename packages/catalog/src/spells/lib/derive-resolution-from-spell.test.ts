@@ -20,7 +20,7 @@ import {
   SRD_521_SPELL_SEED_RESOLUTION,
   SRD_521_SPELL_SEED_RESOLUTION_SLUGS,
 } from '../spell-seed-resolution'
-import { SRD_521_SPELL_SEED_EFFECTS } from '../spell-seed-effects'
+import { SRD_521_SPELL_RESOLUTION_DERIVATION_EFFECTS } from './spell-resolution-derivation-effects'
 
 const RULESET = 'srd-cc-5.2.1' as const
 
@@ -32,12 +32,22 @@ function spellBySlug(slug: string) {
 
 describe('findPrimaryDamageEffect', () => {
   it('skips labeled extra-damage riders', () => {
-    const primary = findPrimaryDamageEffect(SRD_521_SPELL_SEED_EFFECTS.hex)
+    const primary = findPrimaryDamageEffect([
+      {
+        id: 'test:extra',
+        kind: 'damage',
+        label: 'Extra',
+        roll: { dice: { count: 1, faces: 6 } },
+        damageType: 'necrotic',
+      },
+    ])
     expect(primary).toBeUndefined()
   })
 
   it('returns the first unlabeled damage effect', () => {
-    const primary = findPrimaryDamageEffect(SRD_521_SPELL_SEED_EFFECTS['fire-bolt'])
+    const primary = findPrimaryDamageEffect(
+      SRD_521_SPELL_RESOLUTION_DERIVATION_EFFECTS['fire-bolt'],
+    )
     expect(primary?.damageType).toBe('fire')
     expect(primary?.roll).toEqual({ dice: { count: 1, faces: 10 } })
   })
@@ -137,7 +147,9 @@ describe('resolveSpellSeedResolution manifest parity', () => {
       const spell = spellBySlug(slug)
       const resolution = resolveSpellSeedResolution(spell)
       const primary = findPrimaryResolutionEffect(
-        SRD_521_SPELL_SEED_EFFECTS[slug as keyof typeof SRD_521_SPELL_SEED_EFFECTS],
+        SRD_521_SPELL_RESOLUTION_DERIVATION_EFFECTS[
+          slug as keyof typeof SRD_521_SPELL_RESOLUTION_DERIVATION_EFFECTS
+        ],
       )
 
       expect(resolution, slug).toBeDefined()

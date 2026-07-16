@@ -6,7 +6,7 @@ import {
   resolveSpellSeedResolution,
   SRD_521_SPELL_SEED_RESOLUTION_SLUGS,
 } from './spell-seed-resolution'
-import { spellResolutionTargetingGap } from './spell-resolution-targeting-gaps'
+import { SRD_521_SPELL_MODELING_MANIFEST } from './spell-modeling-manifest'
 
 const RULESET = 'srd-cc-5.2.1' as const
 
@@ -52,10 +52,18 @@ describe('resolution selection migration audit', () => {
     expect(resolution?.target).toMatchObject({ count: 6, countKind: 'up-to' })
   })
 
-  it('documents known targeting gaps on hybrid spells', () => {
-    expect(spellResolutionTargetingGap('eldritch-blast')).toBe('dynamic-target-count')
-    expect(spellResolutionTargetingGap('ice-knife')).toBe('chained-targets')
-    expect(spellResolutionTargetingGap('fireball')).toBeUndefined()
+  it('documents known targeting gaps on hybrid spells via modeling manifest', () => {
+    expect(
+      SRD_521_SPELL_MODELING_MANIFEST['eldritch-blast']?.gaps?.some(
+        (gap) => gap.code === 'dynamic-target-count',
+      ),
+    ).toBe(true)
+    expect(
+      SRD_521_SPELL_MODELING_MANIFEST['ice-knife']?.gaps?.some(
+        (gap) => gap.code === 'chained-targets',
+      ),
+    ).toBe(true)
+    expect(SRD_521_SPELL_MODELING_MANIFEST.fireball?.gaps).toBeUndefined()
   })
 })
 

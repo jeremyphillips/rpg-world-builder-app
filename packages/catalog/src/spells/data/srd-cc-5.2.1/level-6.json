@@ -36,6 +36,9 @@
       "material": {
         "description": "a gem-encrusted statuette of yourself worth 1,500+ GP"
       }
+    },
+    "modeling": {
+      "reviewedAt": "2026-07-15T00:00:00.000Z"
     }
   },
   {
@@ -75,6 +78,9 @@
       "material": {
         "description": "a gem, crystal, or reliquary worth 500+ GP"
       }
+    },
+    "modeling": {
+      "reviewedAt": "2026-07-15T00:00:00.000Z"
     }
   },
   {
@@ -120,6 +126,9 @@
         "description": "a snake's tongue"
       }
     },
-    "higherLevelSlotEffect": "<p>The duration is longer with a spell slot of level 7 (10 days), 8 (30 days), or 9 (366 days).</p>"
+    "higherLevelSlotEffect": "<p>The duration is longer with a spell slot of level 7 (10 days), 8 (30 days), or 9 (366 days).</p>",
+    "modeling": {
+      "reviewedAt": "2026-07-15T00:00:00.000Z"
+    }
   }
 ]

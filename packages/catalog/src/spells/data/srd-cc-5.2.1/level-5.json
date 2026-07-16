@@ -40,7 +40,10 @@
       "verbal": true,
       "somatic": true
     },
-    "higherLevelSlotEffect": "<p>The creature's Slam damage increases by 1d4 (Medium or smaller), 1d6 (Large), or 1d12 (Huge) for each spell slot level above 5.</p>"
+    "higherLevelSlotEffect": "<p>The creature's Slam damage increases by 1d4 (Medium or smaller), 1d6 (Large), or 1d12 (Huge) for each spell slot level above 5.</p>",
+    "modeling": {
+      "reviewedAt": "2026-07-15T00:00:00.000Z"
+    }
   },
   {
     "id": "srd-cc-5.2.1:arcane-hand",
@@ -137,6 +140,16 @@
           "applications": []
         }
       ]
+    },
+    "modeling": {
+      "reviewedAt": "2026-07-15T00:00:00.000Z",
+      "status": "meaningful-partial",
+      "gaps": [
+        {
+          "code": "multi-mode-choice",
+          "note": "Forceful Hand and Interposing Hand modes stay prose"
+        }
+      ]
     }
   },
   {
@@ -175,6 +188,9 @@
       "material": {
         "description": "diamond dust worth 100+ GP, which the spell consumes"
       }
+    },
+    "modeling": {
+      "reviewedAt": "2026-07-15T00:00:00.000Z"
     }
   },
   {
@@ -255,6 +271,16 @@
           ]
         }
       ]
+    },
+    "modeling": {
+      "reviewedAt": "2026-07-15T00:00:00.000Z",
+      "status": "meaningful-partial",
+      "gaps": [
+        {
+          "code": "modifier-model-missing",
+          "note": "Spellcasting ability modifier on healing stays prose"
+        }
+      ]
     }
   },
   {
@@ -299,7 +325,10 @@
         "description": "a jewel worth 1,000+ GP, which the spell consumes"
       }
     },
-    "higherLevelSlotEffect": "<p>The duration increases with a spell slot of level 6 (10 days), 7 (30 days), 8 (180 days), and 9 (366 days).</p>"
+    "higherLevelSlotEffect": "<p>The duration increases with a spell slot of level 6 (10 days), 7 (30 days), 8 (180 days), and 9 (366 days).</p>",
+    "modeling": {
+      "reviewedAt": "2026-07-15T00:00:00.000Z"
+    }
   },
   {
     "id": "srd-cc-5.2.1:reincarnate",
@@ -336,6 +365,9 @@
       "material": {
         "description": "rare oils worth 1,000+ GP, which the spell consumes"
       }
+    },
+    "modeling": {
+      "reviewedAt": "2026-07-15T00:00:00.000Z"
     }
   },
   {
@@ -382,7 +414,10 @@
         "description": "an object with the image of a dragon engraved on it worth 500+ GP"
       }
     },
-    "higherLevelSlotEffect": "<p>Use the spell slot's level for the spell's level in the stat block.</p>"
+    "higherLevelSlotEffect": "<p>Use the spell slot's level for the spell's level in the stat block.</p>",
+    "modeling": {
+      "reviewedAt": "2026-07-15T00:00:00.000Z"
+    }
   },
   {
     "id": "srd-cc-5.2.1:telekinesis",
@@ -425,6 +460,9 @@
     "components": {
       "verbal": true,
       "somatic": true
+    },
+    "modeling": {
+      "reviewedAt": "2026-07-15T00:00:00.000Z"
     }
   }
 ]

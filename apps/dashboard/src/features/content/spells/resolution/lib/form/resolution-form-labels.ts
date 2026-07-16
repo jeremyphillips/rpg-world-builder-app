@@ -44,9 +44,6 @@ export const RESOLUTION_SECTION_LABELS = {
   addResolution: 'Add resolution',
   emptyState: 'No structured resolution configured.',
   notSavedBanner: 'Resolution is not saved yet.',
-  hybridNoticeTitle: 'Hybrid spell',
-  hybridNoticeBody:
-    'Projectile or beam scaling is still on legacy root effects. Use Application pattern → Projectiles on this tab when you can, or edit root effects on the read model until catalog consolidation completes.',
   outcomesIncomplete: 'Complete target, method, and effects to preview generated outcomes.',
   outcomesHint:
     'Choose which authored effects apply in each branch and whether each applies fully or partially.',

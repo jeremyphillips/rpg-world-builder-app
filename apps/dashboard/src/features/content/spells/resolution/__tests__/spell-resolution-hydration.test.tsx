@@ -11,7 +11,6 @@ import { buildSpellTabs, spellFormSchema } from '../../lib/spell-form-fields'
 import { spellFormDef } from '../../lib/spell-form-def'
 import { spellToFormValues } from '../../lib/spell-form-values'
 import { resolutionToStored } from '../lib/form/resolution-form-values'
-import { RESOLUTION_SECTION_LABELS } from '../lib/form/resolution-form-labels'
 import { RESOLUTION_FORM_FIXTURES } from '../fixtures'
 
 const formCtx = makeContentFormCtx({
@@ -42,9 +41,12 @@ const editorEligibleSpell = {
   },
 }
 
-const unreviewedResolutionSpell = loadSeedSpells('srd-cc-5.2.1').find(
-  (spell) => spell.slug === 'chill-touch',
-)!
+const belowEditorThresholdSpell = (() => {
+  const { modeling: _modeling, ...spell } = loadSeedSpells('srd-cc-5.2.1').find(
+    (entry) => entry.slug === 'chill-touch',
+  )!
+  return spell
+})()
 
 const unmodeledSpell = loadSeedSpells('srd-cc-5.2.1').find((spell) => spell.slug === 'hex')!
 
@@ -84,7 +86,7 @@ describe('spell resolution tab hydration', () => {
   })
 
   it('renders the empty state when resolution exists but status is below meaningful-partial', async () => {
-    renderSpellTabbedForm(spellToFormValues(unreviewedResolutionSpell))
+    renderSpellTabbedForm(spellToFormValues(belowEditorThresholdSpell))
 
     await waitFor(() => {
       expect(screen.getByRole('button', { name: /add resolution/i })).toBeInTheDocument()
@@ -280,9 +282,6 @@ describe('spell resolution tab hydration', () => {
 
     await waitFor(() => {
       expect(screen.queryByRole('button', { name: /add resolution/i })).not.toBeInTheDocument()
-      expect(
-        screen.queryByText(RESOLUTION_SECTION_LABELS.hybridNoticeTitle),
-      ).not.toBeInTheDocument()
       expect(screen.getAllByText('Projectiles').length).toBeGreaterThan(0)
       expect(screen.getByRole('combobox', { name: 'Damage type' })).toHaveTextContent('Force')
       expect(screen.getByRole('spinbutton', { name: 'Damage roll Number of dice' })).toHaveValue(1)
@@ -311,7 +310,6 @@ describe('spell resolution tab hydration', () => {
       expect(screen.getAllByText('Projectiles').length).toBeGreaterThan(0)
       expect(screen.getAllByText('Applied once per dart').length).toBeGreaterThan(0)
     })
-    expect(screen.queryByText(RESOLUTION_SECTION_LABELS.hybridNoticeTitle)).not.toBeInTheDocument()
     expect(magicMissile.resolution?.applicationPattern?.kind).toBe('projectiles')
   })
 

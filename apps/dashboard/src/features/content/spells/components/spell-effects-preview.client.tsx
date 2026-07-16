@@ -1,6 +1,5 @@
 'use client'
 
-import { deriveEffectsModelingStatus, getEffectsModelingStatusLabel } from '@rpg/contracts'
 import { Text } from '@rpg/ui'
 import { useWatch } from 'react-hook-form'
 
@@ -12,13 +11,21 @@ import type { EffectFormRow } from '../lib/effects/effect-form-schema'
 import { normalizeSpellEffects } from '../lib/effects/effect-form-values'
 import type { SpellFormValues } from '../lib/spell-form-fields'
 
+const EFFECTS_PREVIEW_STATUS_LABEL = {
+  empty: 'Prose only',
+  partial: 'Partially modeled',
+} as const
+
 /** Live preview of normalized spell effects from local form state. */
 export function SpellEffectsPreview() {
   const effects = useWatch<SpellFormValues, 'effects'>({ name: 'effects' })
   const effectRows = (effects ?? []) as EffectFormRow[]
   const normalized = normalizeSpellEffects(effectRows)
   const lines = formatSpellEffectsPreviewLines(effectRows)
-  const modelingStatus = deriveEffectsModelingStatus({ effects: normalized })
+  const modelingLabel =
+    normalized.length === 0
+      ? EFFECTS_PREVIEW_STATUS_LABEL.empty
+      : EFFECTS_PREVIEW_STATUS_LABEL.partial
 
   if (lines.length === 0) {
     return (
@@ -36,7 +43,7 @@ export function SpellEffectsPreview() {
           {SPELL_EFFECTS_PREVIEW_LABEL}
         </Text>
         <Text variant="muted" className="text-xs" as="span">
-          {getEffectsModelingStatusLabel(modelingStatus)}
+          {modelingLabel}
         </Text>
       </div>
       <ul className="list-inside list-disc space-y-1 text-sm">

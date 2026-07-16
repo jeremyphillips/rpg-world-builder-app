@@ -41,7 +41,10 @@
         "description": "a strip of white cloth"
       }
     },
-    "higherLevelSlotEffect": "<p>Each target's Hit Points increase by 5 for each spell slot level above 2.</p>"
+    "higherLevelSlotEffect": "<p>Each target's Hit Points increase by 5 for each spell slot level above 2.</p>",
+    "modeling": {
+      "reviewedAt": "2026-07-15T00:00:00.000Z"
+    }
   },
   {
     "id": "srd-cc-5.2.1:darkness",
@@ -93,6 +96,9 @@
       "material": {
         "description": "bat fur and a piece of coal"
       }
+    },
+    "modeling": {
+      "reviewedAt": "2026-07-15T00:00:00.000Z"
     }
   },
   {
@@ -135,7 +141,10 @@
         "description": "a hot pepper"
       }
     },
-    "higherLevelSlotEffect": "<p>The damage increases by 1d6 for each spell slot level above 2.</p>"
+    "higherLevelSlotEffect": "<p>The damage increases by 1d6 for each spell slot level above 2.</p>",
+    "modeling": {
+      "reviewedAt": "2026-07-15T00:00:00.000Z"
+    }
   },
   {
     "id": "srd-cc-5.2.1:lesser-restoration",
@@ -170,6 +179,9 @@
     "components": {
       "verbal": true,
       "somatic": true
+    },
+    "modeling": {
+      "reviewedAt": "2026-07-15T00:00:00.000Z"
     }
   },
   {
@@ -215,6 +227,9 @@
       "material": {
         "description": "a metal spring"
       }
+    },
+    "modeling": {
+      "reviewedAt": "2026-07-15T00:00:00.000Z"
     }
   },
   {
@@ -249,6 +264,9 @@
     },
     "components": {
       "verbal": true
+    },
+    "modeling": {
+      "reviewedAt": "2026-07-15T00:00:00.000Z"
     }
   },
   {
@@ -298,6 +316,9 @@
       "material": {
         "description": "ashes from burned mistletoe"
       }
+    },
+    "modeling": {
+      "reviewedAt": "2026-07-15T00:00:00.000Z"
     }
   },
   {
@@ -340,6 +361,9 @@
     "components": {
       "verbal": true,
       "somatic": true
+    },
+    "modeling": {
+      "reviewedAt": "2026-07-15T00:00:00.000Z"
     }
   }
 ]

@@ -16,10 +16,29 @@
       "conditions": ["charmed", "frightened", "paralyzed", "poisoned", "stunned", "prone"],
       "roles": ["healing", "buff"]
     },
-    "castingTime": { "normal": { "value": 1, "unit": "action" }, "canBeCastAsRitual": false },
-    "range": { "kind": "distance", "value": { "value": 60, "unit": "ft" } },
-    "duration": { "kind": "instantaneous" },
-    "components": { "verbal": true }
+    "castingTime": {
+      "normal": {
+        "value": 1,
+        "unit": "action"
+      },
+      "canBeCastAsRitual": false
+    },
+    "range": {
+      "kind": "distance",
+      "value": {
+        "value": 60,
+        "unit": "ft"
+      }
+    },
+    "duration": {
+      "kind": "instantaneous"
+    },
+    "components": {
+      "verbal": true
+    },
+    "modeling": {
+      "reviewedAt": "2026-07-15T00:00:00.000Z"
+    }
   },
   {
     "id": "srd-cc-5.2.1:prismatic-wall",
@@ -60,6 +79,9 @@
     "components": {
       "verbal": true,
       "somatic": true
+    },
+    "modeling": {
+      "reviewedAt": "2026-07-15T00:00:00.000Z"
     }
   },
   {
@@ -105,6 +127,9 @@
       "material": {
         "description": "a drop of mercury, a dollop of gum arabic, and a wisp of smoke"
       }
+    },
+    "modeling": {
+      "reviewedAt": "2026-07-15T00:00:00.000Z"
     }
   },
   {
@@ -139,6 +164,9 @@
     },
     "components": {
       "verbal": true
+    },
+    "modeling": {
+      "reviewedAt": "2026-07-15T00:00:00.000Z"
     }
   }
 ]

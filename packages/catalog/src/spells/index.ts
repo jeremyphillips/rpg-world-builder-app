@@ -76,7 +76,9 @@ export {
   SRD_521_SPELL_SEED_RESOLUTION_MANIFEST_SLUGS,
   SRD_521_SPELL_SEED_RESOLUTION_SLUGS,
   SRD_521_SPELL_SEED_RESOLUTION_TIER_A_SLUGS,
+  SPELL_RESOLUTION_DEFER_REASONS,
   spellSeedResolutionDeferReason,
+  type SpellResolutionDeferReason,
 } from './spell-seed-resolution'
 export {
   SRD_521_SPELL_SEED_PROGRESSION,
@@ -84,12 +86,14 @@ export {
   resolveSpellSeedProgression,
 } from './spell-seed-progression'
 export {
-  SPELL_RESOLUTION_DEFER_REASONS,
-  type SpellResolutionDeferReason,
-} from './spell-resolution-defer-reasons'
-export {
   buildSpellModelingAudit,
   generateSpellModelingReport,
   spellModelingAuditViolations,
   validateSpellModelingConsistency,
 } from './spell-modeling-audit'
+export {
+  SRD_521_SPELL_MODELING_EDITOR_ELIGIBLE_SLUGS,
+  SRD_521_SPELL_MODELING_MANIFEST,
+  SRD_521_SPELL_MODELING_MANIFEST_SLUGS,
+  SRD_521_SPELL_MODELING_REVIEWED_AT,
+} from './spell-modeling-manifest'

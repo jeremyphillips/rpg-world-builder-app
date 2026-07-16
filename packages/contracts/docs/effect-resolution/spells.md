@@ -75,9 +75,10 @@ Canonical examples: [`fixtures.ts`](../../src/rpg/content/spell/resolution/fixtu
 
 ## Partial targeting gaps
 
-Resolved spells with incomplete targeting semantics are tagged in
-[`spell-resolution-targeting-gaps.ts`](../../../../catalog/src/spells/spell-resolution-targeting-gaps.ts)
-and surfaced on coverage inventory entries as `targetingGap`.
+Resolved spells with incomplete targeting semantics declare gap codes on
+`spell.modeling.gaps` in the catalog manifest (see
+[`spell-modeling-manifest.ts`](../../../../catalog/src/spells/spell-modeling-manifest.ts)
+and [`spell-modeling.md`](../../../../catalog/docs/spell-modeling.md)).
 
 ## Dashboard authoring
 

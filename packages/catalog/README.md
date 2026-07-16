@@ -55,13 +55,15 @@ pnpm --filter @rpg/catalog typecheck
 Apply manifest data into `src/spells/data/srd-cc-5.2.1/level-*.json` (requires `tsx`):
 
 ```sh
-pnpm exec tsx packages/catalog/scripts/apply-spell-seed-effects.mjs
 pnpm exec tsx packages/catalog/scripts/apply-spell-seed-resolution.mjs
+pnpm exec tsx packages/catalog/scripts/apply-spell-modeling-metadata.mjs
+pnpm exec tsx packages/catalog/scripts/generate-spell-modeling-report.mjs
 ```
 
-Manifests live in `src/spells/spell-seed-effects.ts` and `spell-seed-resolution.ts`.
+Manifests live in `src/spells/spell-seed-resolution.ts` and `spell-modeling-manifest.ts`.
 The resolution manifest covers all 24 structured-effect slugs: Tier A applicable entries,
 Tier B hybrid (Eldritch Blast), Tier D healing/temporary-HP entries, and explicit
-`kind: 'defer'` rows with documented reason codes in `spell-resolution-defer-reasons.ts`.
-Primary-effect parity is audited by `spell-resolution-parity.lib.ts`. Migrated spells keep
-both `effects[]` and optional `resolution` until a later consolidation phase.
+`kind: 'defer'` rows with documented reason codes in `spell-seed-resolution.ts`.
+The modeling manifest promotes editor-eligible resolution seeds to `meaningful-partial`
+(with gap codes where prose riders remain) and marks terminal prose-only spells as
+reviewed. Operational inventory: `docs/analysis/spell-modeling-inventory.generated.md`.

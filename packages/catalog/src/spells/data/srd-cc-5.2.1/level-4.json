@@ -35,6 +35,9 @@
     },
     "components": {
       "verbal": true
+    },
+    "modeling": {
+      "reviewedAt": "2026-07-15T00:00:00.000Z"
     }
   },
   {
@@ -71,6 +74,9 @@
     "components": {
       "verbal": true,
       "somatic": true
+    },
+    "modeling": {
+      "reviewedAt": "2026-07-15T00:00:00.000Z"
     }
   },
   {
@@ -116,6 +122,9 @@
       "material": {
         "description": "a caterpillar cocoon"
       }
+    },
+    "modeling": {
+      "reviewedAt": "2026-07-15T00:00:00.000Z"
     }
   },
   {
@@ -213,6 +222,16 @@
               "amount": "half"
             }
           ]
+        }
+      ]
+    },
+    "modeling": {
+      "reviewedAt": "2026-07-15T00:00:00.000Z",
+      "status": "meaningful-partial",
+      "gaps": [
+        {
+          "code": "wall-or-path-geometry",
+          "note": "Wall placement and ongoing side damage stay prose"
         }
       ]
     }

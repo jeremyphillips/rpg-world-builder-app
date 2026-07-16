@@ -27,17 +27,28 @@ describe('spell modeling audit (srd-cc-5.2.1)', () => {
     expect(audit.entries).toHaveLength(92)
   })
 
-  it('reports unreviewed spells when modeling metadata is absent', () => {
-    expect(audit.unreviewed.length).toBe(92)
+  it('reports all spells as reviewed after manifest apply', () => {
+    expect(audit.unreviewed).toEqual([])
   })
 
-  it('derives non-meaningful-partial for spells with resolution but no explicit status', () => {
+  it('promotes resolution seeds to meaningful-partial with editor eligibility', () => {
     const withResolution = audit.entries.filter((entry) => entry.hasResolution)
-    expect(withResolution.length).toBeGreaterThan(0)
+    expect(withResolution).toHaveLength(21)
     for (const entry of withResolution) {
-      expect(entry.effectiveStatus).toBe('non-meaningful-partial')
-      expect(entry.editorEligible).toBe(false)
+      expect(entry.effectiveStatus).toBe('meaningful-partial')
+      expect(entry.explicitStatus).toBe('meaningful-partial')
+      expect(entry.editorEligible).toBe(true)
       expect(entry.displayReady).toBe(false)
+    }
+  })
+
+  it('derives prose-only for reviewed spells without resolution', () => {
+    const proseOnly = audit.entries.filter((entry) => !entry.hasResolution)
+    expect(proseOnly).toHaveLength(71)
+    for (const entry of proseOnly) {
+      expect(entry.effectiveStatus).toBe('prose-only')
+      expect(entry.explicitStatus).toBeUndefined()
+      expect(entry.editorEligible).toBe(false)
     }
   })
 

@@ -93,6 +93,10 @@
           ]
         }
       ]
+    },
+    "modeling": {
+      "reviewedAt": "2026-07-15T00:00:00.000Z",
+      "status": "meaningful-partial"
     }
   },
   {
@@ -170,6 +174,16 @@
           "note": "The target can't regain Hit Points until the end of your next turn."
         }
       ]
+    },
+    "modeling": {
+      "reviewedAt": "2026-07-15T00:00:00.000Z",
+      "status": "meaningful-partial",
+      "gaps": [
+        {
+          "code": "conditional-effect-model-missing",
+          "note": "Target can't regain Hit Points rider stays prose"
+        }
+      ]
     }
   },
   {
@@ -215,6 +229,9 @@
       "material": {
         "description": "a bit of phosphorus"
       }
+    },
+    "modeling": {
+      "reviewedAt": "2026-07-15T00:00:00.000Z"
     }
   },
   {
@@ -254,6 +271,9 @@
     "components": {
       "verbal": true,
       "somatic": true
+    },
+    "modeling": {
+      "reviewedAt": "2026-07-15T00:00:00.000Z"
     }
   },
   {
@@ -387,6 +407,16 @@
           }
         ]
       }
+    },
+    "modeling": {
+      "reviewedAt": "2026-07-15T00:00:00.000Z",
+      "status": "meaningful-partial",
+      "gaps": [
+        {
+          "code": "dynamic-target-count",
+          "note": "Beam count scales with character level"
+        }
+      ]
     }
   },
   {
@@ -425,6 +455,9 @@
     "components": {
       "verbal": true,
       "somatic": true
+    },
+    "modeling": {
+      "reviewedAt": "2026-07-15T00:00:00.000Z"
     }
   },
   {
@@ -562,6 +595,16 @@
           }
         ]
       }
+    },
+    "modeling": {
+      "reviewedAt": "2026-07-15T00:00:00.000Z",
+      "status": "meaningful-partial",
+      "gaps": [
+        {
+          "code": "flammability-rules",
+          "note": "Object ignition rider stays prose"
+        }
+      ]
     }
   },
   {
@@ -600,6 +643,9 @@
     "components": {
       "verbal": true,
       "somatic": true
+    },
+    "modeling": {
+      "reviewedAt": "2026-07-15T00:00:00.000Z"
     }
   },
   {
@@ -638,6 +684,9 @@
       "material": {
         "description": "a firefly or phosphorescent moss"
       }
+    },
+    "modeling": {
+      "reviewedAt": "2026-07-15T00:00:00.000Z"
     }
   },
   {
@@ -678,6 +727,9 @@
     "components": {
       "verbal": true,
       "somatic": true
+    },
+    "modeling": {
+      "reviewedAt": "2026-07-15T00:00:00.000Z"
     }
   },
   {
@@ -715,6 +767,9 @@
       "material": {
         "description": "two lodestones"
       }
+    },
+    "modeling": {
+      "reviewedAt": "2026-07-15T00:00:00.000Z"
     }
   },
   {
@@ -757,6 +812,9 @@
       "material": {
         "description": "a copper wire"
       }
+    },
+    "modeling": {
+      "reviewedAt": "2026-07-15T00:00:00.000Z"
     }
   },
   {
@@ -799,6 +857,9 @@
       "material": {
         "description": "a bit of fleece"
       }
+    },
+    "modeling": {
+      "reviewedAt": "2026-07-15T00:00:00.000Z"
     }
   },
   {
@@ -879,6 +940,10 @@
           ]
         }
       ]
+    },
+    "modeling": {
+      "reviewedAt": "2026-07-15T00:00:00.000Z",
+      "status": "meaningful-partial"
     }
   },
   {
@@ -917,6 +982,9 @@
     "components": {
       "verbal": true,
       "somatic": true
+    },
+    "modeling": {
+      "reviewedAt": "2026-07-15T00:00:00.000Z"
     }
   },
   {
@@ -955,6 +1023,9 @@
     "components": {
       "verbal": true,
       "somatic": true
+    },
+    "modeling": {
+      "reviewedAt": "2026-07-15T00:00:00.000Z"
     }
   },
   {
@@ -1047,6 +1118,16 @@
           ]
         }
       ]
+    },
+    "modeling": {
+      "reviewedAt": "2026-07-15T00:00:00.000Z",
+      "status": "meaningful-partial",
+      "gaps": [
+        {
+          "code": "conditional-effect-model-missing",
+          "note": "Cover negation rider stays prose"
+        }
+      ]
     }
   },
   {
@@ -1086,7 +1167,10 @@
       "verbal": true,
       "somatic": true
     },
-    "cantripScaling": "<p>The range doubles when you reach levels 5 (30 feet), 11 (60 feet), and 17 (120 feet).</p>"
+    "cantripScaling": "<p>The range doubles when you reach levels 5 (30 feet), 11 (60 feet), and 17 (120 feet).</p>",
+    "modeling": {
+      "reviewedAt": "2026-07-15T00:00:00.000Z"
+    }
   },
   {
     "id": "srd-cc-5.2.1:thaumaturgy",
@@ -1123,6 +1207,9 @@
     },
     "components": {
       "verbal": true
+    },
+    "modeling": {
+      "reviewedAt": "2026-07-15T00:00:00.000Z"
     }
   },
   {
@@ -1160,6 +1247,9 @@
         "description": "a weapon with which you have proficiency and that is worth 1+ CP"
       }
     },
-    "cantripScaling": "<p>Whether you deal Radiant damage or the weapon's normal damage type, the attack deals extra Radiant damage when you reach levels 5 (1d6), 11 (2d6), and 17 (3d6).</p>"
+    "cantripScaling": "<p>Whether you deal Radiant damage or the weapon's normal damage type, the attack deals extra Radiant damage when you reach levels 5 (1d6), 11 (2d6), and 17 (3d6).</p>",
+    "modeling": {
+      "reviewedAt": "2026-07-15T00:00:00.000Z"
+    }
   }
 ]

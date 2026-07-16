@@ -39,7 +39,10 @@
         "description": "a drop of blood, a piece of flesh, and a pinch of bone dust"
       }
     },
-    "higherLevelSlotEffect": "<p>You animate or reassert control over two additional Undead creatures for each spell slot level above 3. Each of the creatures must come from a different corpse or pile of bones.</p>"
+    "higherLevelSlotEffect": "<p>You animate or reassert control over two additional Undead creatures for each spell slot level above 3. Each of the creatures must come from a different corpse or pile of bones.</p>",
+    "modeling": {
+      "reviewedAt": "2026-07-15T00:00:00.000Z"
+    }
   },
   {
     "id": "srd-cc-5.2.1:bestow-curse",
@@ -79,7 +82,10 @@
       "verbal": true,
       "somatic": true
     },
-    "higherLevelSlotEffect": "<p>If you cast this spell using a level 4 spell slot, you can maintain Concentration on it for up to 10 minutes. If you use a level 5+ spell slot, the spell doesn't require Concentration, and the duration becomes 8 hours (level 5–6 slot) or 24 hours (level 7–8 slot). If you use a level 9 spell slot, the spell lasts until dispelled.</p>"
+    "higherLevelSlotEffect": "<p>If you cast this spell using a level 4 spell slot, you can maintain Concentration on it for up to 10 minutes. If you use a level 5+ spell slot, the spell doesn't require Concentration, and the duration becomes 8 hours (level 5–6 slot) or 24 hours (level 7–8 slot). If you use a level 9 spell slot, the spell lasts until dispelled.</p>",
+    "modeling": {
+      "reviewedAt": "2026-07-15T00:00:00.000Z"
+    }
   },
   {
     "id": "srd-cc-5.2.1:counterspell",
@@ -117,6 +123,9 @@
     },
     "components": {
       "somatic": true
+    },
+    "modeling": {
+      "reviewedAt": "2026-07-15T00:00:00.000Z"
     }
   },
   {
@@ -156,7 +165,10 @@
       "verbal": true,
       "somatic": true
     },
-    "higherLevelSlotEffect": "<p>You automatically end a spell on the target if the spell's level is equal to or less than the level of the spell slot you use.</p>"
+    "higherLevelSlotEffect": "<p>You automatically end a spell on the target if the spell's level is equal to or less than the level of the spell slot you use.</p>",
+    "modeling": {
+      "reviewedAt": "2026-07-15T00:00:00.000Z"
+    }
   },
   {
     "id": "srd-cc-5.2.1:fireball",
@@ -286,6 +298,10 @@
           }
         ]
       }
+    },
+    "modeling": {
+      "reviewedAt": "2026-07-15T00:00:00.000Z",
+      "status": "meaningful-partial"
     }
   },
   {
@@ -325,7 +341,10 @@
         "description": "powdered diamond worth 200+ GP, which the spell consumes"
       }
     },
-    "higherLevelSlotEffect": "<p>The damage of an explosive rune increases by 1d8 for each spell slot level above 3. If you create a spell glyph, you can store any spell of up to the same level as the spell slot you use for the Glyph of Warding.</p>"
+    "higherLevelSlotEffect": "<p>The damage of an explosive rune increases by 1d8 for each spell slot level above 3. If you create a spell glyph, you can store any spell of up to the same level as the spell slot you use for the Glyph of Warding.</p>",
+    "modeling": {
+      "reviewedAt": "2026-07-15T00:00:00.000Z"
+    }
   },
   {
     "id": "srd-cc-5.2.1:mass-healing-word",
@@ -404,6 +423,16 @@
           ]
         }
       ]
+    },
+    "modeling": {
+      "reviewedAt": "2026-07-15T00:00:00.000Z",
+      "status": "meaningful-partial",
+      "gaps": [
+        {
+          "code": "modifier-model-missing",
+          "note": "Spellcasting ability modifier on healing stays prose"
+        }
+      ]
     }
   },
   {
@@ -441,6 +470,9 @@
       "material": {
         "description": "a diamond worth 300+ GP, which the spell consumes"
       }
+    },
+    "modeling": {
+      "reviewedAt": "2026-07-15T00:00:00.000Z"
     }
   }
 ]

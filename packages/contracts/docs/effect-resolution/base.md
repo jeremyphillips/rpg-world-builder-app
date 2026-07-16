@@ -142,7 +142,8 @@ dashboard hook. See [dashboard authoring doc](../../../../apps/dashboard/src/fea
 
 ## Explicit gaps (out of MVP)
 
-Documented in catalog [`spell-resolution-targeting-gaps.ts`](../../../../catalog/src/spells/spell-resolution-targeting-gaps.ts):
+Documented as `modeling.gaps` on catalog seeds and in
+[`spell-modeling-gap-codes.ts`](../../src/rpg/content/spell/modeling/spell-modeling-gap-codes.ts):
 
 - Dynamic target counts (Eldritch Blast beams)
 - Chosen-within-area subsets

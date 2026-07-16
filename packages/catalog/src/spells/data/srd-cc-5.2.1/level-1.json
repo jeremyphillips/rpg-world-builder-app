@@ -43,7 +43,10 @@
         "description": "a Holy Symbol worth 5+ GP"
       }
     },
-    "higherLevelSlotEffect": "<p>You can target one additional creature for each spell slot level above 1.</p>"
+    "higherLevelSlotEffect": "<p>You can target one additional creature for each spell slot level above 1.</p>",
+    "modeling": {
+      "reviewedAt": "2026-07-15T00:00:00.000Z"
+    }
   },
   {
     "id": "srd-cc-5.2.1:burning-hands",
@@ -133,6 +136,10 @@
           ]
         }
       ]
+    },
+    "modeling": {
+      "reviewedAt": "2026-07-15T00:00:00.000Z",
+      "status": "meaningful-partial"
     }
   },
   {
@@ -175,7 +182,10 @@
         "description": "a mix of water and sand"
       }
     },
-    "higherLevelSlotEffect": "<p>You create or destroy 10 additional gallons of water, or the size of the Cube increases by 5 feet, for each spell slot level above 1.</p>"
+    "higherLevelSlotEffect": "<p>You create or destroy 10 additional gallons of water, or the size of the Cube increases by 5 feet, for each spell slot level above 1.</p>",
+    "modeling": {
+      "reviewedAt": "2026-07-15T00:00:00.000Z"
+    }
   },
   {
     "id": "srd-cc-5.2.1:cure-wounds",
@@ -247,6 +257,16 @@
           ]
         }
       ]
+    },
+    "modeling": {
+      "reviewedAt": "2026-07-15T00:00:00.000Z",
+      "status": "meaningful-partial",
+      "gaps": [
+        {
+          "code": "modifier-model-missing",
+          "note": "Spellcasting ability modifier on healing stays prose"
+        }
+      ]
     }
   },
   {
@@ -285,6 +305,9 @@
     "components": {
       "verbal": true,
       "somatic": true
+    },
+    "modeling": {
+      "reviewedAt": "2026-07-15T00:00:00.000Z"
     }
   },
   {
@@ -320,6 +343,9 @@
     "components": {
       "verbal": true,
       "somatic": true
+    },
+    "modeling": {
+      "reviewedAt": "2026-07-15T00:00:00.000Z"
     }
   },
   {
@@ -361,6 +387,9 @@
       "material": {
         "description": "a yew leaf"
       }
+    },
+    "modeling": {
+      "reviewedAt": "2026-07-15T00:00:00.000Z"
     }
   },
   {
@@ -399,6 +428,9 @@
     "components": {
       "verbal": true,
       "somatic": true
+    },
+    "modeling": {
+      "reviewedAt": "2026-07-15T00:00:00.000Z"
     }
   },
   {
@@ -441,6 +473,9 @@
     },
     "components": {
       "verbal": true
+    },
+    "modeling": {
+      "reviewedAt": "2026-07-15T00:00:00.000Z"
     }
   },
   {
@@ -509,6 +544,10 @@
           ]
         }
       ]
+    },
+    "modeling": {
+      "reviewedAt": "2026-07-15T00:00:00.000Z",
+      "status": "meaningful-partial"
     }
   },
   {
@@ -552,6 +591,9 @@
       "material": {
         "description": "a small feather or piece of down"
       }
+    },
+    "modeling": {
+      "reviewedAt": "2026-07-15T00:00:00.000Z"
     }
   },
   {
@@ -602,7 +644,10 @@
       "verbal": true,
       "somatic": true
     },
-    "higherLevelSlotEffect": "<p>The fog's radius increases by 20 feet for each spell slot level above 1.</p>"
+    "higherLevelSlotEffect": "<p>The fog's radius increases by 20 feet for each spell slot level above 1.</p>",
+    "modeling": {
+      "reviewedAt": "2026-07-15T00:00:00.000Z"
+    }
   },
   {
     "id": "srd-cc-5.2.1:hellish-rebuke",
@@ -695,6 +740,16 @@
           ]
         }
       ]
+    },
+    "modeling": {
+      "reviewedAt": "2026-07-15T00:00:00.000Z",
+      "status": "meaningful-partial",
+      "gaps": [
+        {
+          "code": "reaction-trigger",
+          "note": "Damaging creature target implied by reaction trigger"
+        }
+      ]
     }
   },
   {
@@ -742,7 +797,10 @@
         "description": "the petrified eye of a newt"
       }
     },
-    "higherLevelSlotEffect": "<p>Your Concentration can last longer with a spell slot of level 2 (up to 4 hours), 3–4 (up to 8 hours), or 5+ (24 hours).</p>"
+    "higherLevelSlotEffect": "<p>Your Concentration can last longer with a spell slot of level 2 (up to 4 hours), 3–4 (up to 8 hours), or 5+ (24 hours).</p>",
+    "modeling": {
+      "reviewedAt": "2026-07-15T00:00:00.000Z"
+    }
   },
   {
     "id": "srd-cc-5.2.1:hideous-laughter",
@@ -789,7 +847,10 @@
         "description": "a tart and a feather"
       }
     },
-    "higherLevelSlotEffect": "<p>You can target one additional creature for each spell slot level above 1.</p>"
+    "higherLevelSlotEffect": "<p>You can target one additional creature for each spell slot level above 1.</p>",
+    "modeling": {
+      "reviewedAt": "2026-07-15T00:00:00.000Z"
+    }
   },
   {
     "id": "srd-cc-5.2.1:hunters-mark",
@@ -832,7 +893,10 @@
     "components": {
       "verbal": true
     },
-    "higherLevelSlotEffect": "<p>Your Concentration can last longer with a spell slot of level 3–4 (up to 8 hours) or 5+ (up to 24 hours).</p>"
+    "higherLevelSlotEffect": "<p>Your Concentration can last longer with a spell slot of level 3–4 (up to 8 hours) or 5+ (up to 24 hours).</p>",
+    "modeling": {
+      "reviewedAt": "2026-07-15T00:00:00.000Z"
+    }
   },
   {
     "id": "srd-cc-5.2.1:ice-knife",
@@ -930,6 +994,16 @@
           "note": "Hit or miss, the shard explodes: each creature within 5 feet makes a Dexterity saving throw or takes the cold burst damage."
         }
       ]
+    },
+    "modeling": {
+      "reviewedAt": "2026-07-15T00:00:00.000Z",
+      "status": "meaningful-partial",
+      "gaps": [
+        {
+          "code": "chained-targets",
+          "note": "Cold burst targets derived from primary hit or miss"
+        }
+      ]
     }
   },
   {
@@ -968,6 +1042,9 @@
       "material": {
         "description": "a pearl worth 100+ GP"
       }
+    },
+    "modeling": {
+      "reviewedAt": "2026-07-15T00:00:00.000Z"
     }
   },
   {
@@ -1006,6 +1083,9 @@
       "material": {
         "description": "ink worth 10+ GP, which the spell consumes"
       }
+    },
+    "modeling": {
+      "reviewedAt": "2026-07-15T00:00:00.000Z"
     }
   },
   {
@@ -1090,6 +1170,10 @@
           ]
         }
       ]
+    },
+    "modeling": {
+      "reviewedAt": "2026-07-15T00:00:00.000Z",
+      "status": "meaningful-partial"
     }
   },
   {
@@ -1130,7 +1214,10 @@
         "description": "a grasshopper's hind leg"
       }
     },
-    "higherLevelSlotEffect": "<p>You can target one additional creature for each spell slot level above 1.</p>"
+    "higherLevelSlotEffect": "<p>You can target one additional creature for each spell slot level above 1.</p>",
+    "modeling": {
+      "reviewedAt": "2026-07-15T00:00:00.000Z"
+    }
   },
   {
     "id": "srd-cc-5.2.1:longstrider",
@@ -1171,7 +1258,10 @@
         "description": "a pinch of dirt"
       }
     },
-    "higherLevelSlotEffect": "<p>You can target one additional creature for each spell slot level above 1.</p>"
+    "higherLevelSlotEffect": "<p>You can target one additional creature for each spell slot level above 1.</p>",
+    "modeling": {
+      "reviewedAt": "2026-07-15T00:00:00.000Z"
+    }
   },
   {
     "id": "srd-cc-5.2.1:mage-armor",
@@ -1210,6 +1300,9 @@
       "material": {
         "description": "a piece of cured leather"
       }
+    },
+    "modeling": {
+      "reviewedAt": "2026-07-15T00:00:00.000Z"
     }
   },
   {
@@ -1323,6 +1416,10 @@
           }
         ]
       }
+    },
+    "modeling": {
+      "reviewedAt": "2026-07-15T00:00:00.000Z",
+      "status": "meaningful-partial"
     }
   },
   {
@@ -1361,6 +1458,9 @@
     "components": {
       "verbal": true,
       "somatic": true
+    },
+    "modeling": {
+      "reviewedAt": "2026-07-15T00:00:00.000Z"
     }
   },
   {
@@ -1446,6 +1546,16 @@
           ]
         }
       ]
+    },
+    "modeling": {
+      "reviewedAt": "2026-07-15T00:00:00.000Z",
+      "status": "meaningful-partial",
+      "gaps": [
+        {
+          "code": "conditional-effect-model-missing",
+          "note": "Poisoned condition rider stays prose"
+        }
+      ]
     }
   },
   {
@@ -1489,6 +1599,9 @@
       "material": {
         "description": "a shard of glass from a mirror"
       }
+    },
+    "modeling": {
+      "reviewedAt": "2026-07-15T00:00:00.000Z"
     }
   },
   {
@@ -1526,6 +1639,9 @@
     "components": {
       "verbal": true,
       "somatic": true
+    },
+    "modeling": {
+      "reviewedAt": "2026-07-15T00:00:00.000Z"
     }
   },
   {
@@ -1571,6 +1687,9 @@
       "material": {
         "description": "a prayer scroll"
       }
+    },
+    "modeling": {
+      "reviewedAt": "2026-07-15T00:00:00.000Z"
     }
   },
   {
@@ -1616,6 +1735,9 @@
       "material": {
         "description": "a bit of fleece"
       }
+    },
+    "modeling": {
+      "reviewedAt": "2026-07-15T00:00:00.000Z"
     }
   },
   {
@@ -1662,6 +1784,9 @@
       "material": {
         "description": "a pinch of sand or rose petals"
       }
+    },
+    "modeling": {
+      "reviewedAt": "2026-07-15T00:00:00.000Z"
     }
   },
   {
@@ -1698,6 +1823,9 @@
     "components": {
       "verbal": true,
       "somatic": true
+    },
+    "modeling": {
+      "reviewedAt": "2026-07-15T00:00:00.000Z"
     }
   },
   {
@@ -1781,6 +1909,10 @@
           ]
         }
       ]
+    },
+    "modeling": {
+      "reviewedAt": "2026-07-15T00:00:00.000Z",
+      "status": "meaningful-partial"
     }
   }
 ]
