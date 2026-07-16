@@ -90,4 +90,32 @@ describe('FilterToolbar', () => {
 
     await expectNoAxeViolations(container)
   })
+
+  it('renders inline fields with group and trigger aria labels', () => {
+    render(
+      <FilterToolbar
+        idPrefix="inline"
+        fields={[
+          {
+            key: 'category',
+            type: 'select',
+            label: 'Category',
+            ariaLabel: 'Filter by category',
+            triggerAriaLabel: 'Equipment category',
+            labelLayout: 'inline',
+            options: [
+              { value: 'all', label: 'All' },
+              { value: 'weapon', label: 'Weapon' },
+            ],
+            required: true,
+          },
+        ]}
+        values={{ category: 'all' }}
+        onValueChange={() => undefined}
+      />,
+    )
+
+    expect(screen.getByRole('group', { name: 'Filter by category' })).toBeInTheDocument()
+    expect(screen.getByLabelText('Equipment category')).toBeInTheDocument()
+  })
 })

@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 import { FILTER_TOOLBAR_ANY_VALUE } from './filter-toolbar.variants'
 import {
   normalizeFilterToolbarSelectChange,
+  resolveFilterToolbarPlaceholder,
   resolveFilterToolbarSelectValue,
 } from './filter-toolbar.lib'
 import type { SelectFilterFieldConfig } from './filter-toolbar.types'
@@ -49,5 +50,13 @@ describe('filter-toolbar.lib', () => {
     expect(
       normalizeFilterToolbarSelectChange(OPTIONAL_FIELD, FILTER_TOOLBAR_ANY_VALUE),
     ).toBeUndefined()
+  })
+
+  it('resolves placeholder for optional fields', () => {
+    expect(resolveFilterToolbarPlaceholder({ allowAny: true, anyLabel: 'Any species' })).toBe(
+      'Any species',
+    )
+    expect(resolveFilterToolbarPlaceholder({ allowAny: true })).toBe('Any')
+    expect(resolveFilterToolbarPlaceholder({ placeholder: 'Choose…' })).toBe('Choose…')
   })
 })

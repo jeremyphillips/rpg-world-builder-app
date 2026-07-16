@@ -5,6 +5,7 @@ import * as React from 'react'
 import { getSpellSchoolLabel } from '@rpg/contracts'
 import {
   CatalogPickerSheet,
+  FilterToolbar,
   SegmentedControl,
   Text,
   type CatalogPickerSheetToolbarContext,
@@ -12,14 +13,11 @@ import {
 
 import { hasCatalogPickerResetViewCriteria } from '../picker/catalog-picker-filter-state.lib'
 import {
-  CatalogPickerFilterGroup,
-  CatalogPickerFilterSelectItem,
-} from '../picker/catalog-picker-filter-group.client'
-import {
   catalogPickerFiltersMainClasses,
   catalogPickerFiltersRowClasses,
   catalogPickerSortActionsGroupClasses,
 } from '../picker/catalog-picker-filter-toolbar.variants'
+import { catalogPickerInlineSelectFilter } from '../picker/catalog-picker-select-filter.lib'
 import {
   createBrowseStateByMode,
   resolveModeBrowseState,
@@ -221,6 +219,29 @@ export function SpellPickerDrawer({
   const showSchoolFilter = schoolOptions.length > 1
   const showSegmentedControl = modes.length > 1
 
+  const schoolFilterFields = React.useMemo(
+    () => [
+      catalogPickerInlineSelectFilter<
+        { selectedSchool: SpellPickerBrowseState['selectedSchool'] },
+        'selectedSchool'
+      >({
+        key: 'selectedSchool',
+        label: SPELL_PICKER_SCHOOL_LABEL,
+        ariaLabel: 'Filter by school',
+        triggerAriaLabel: 'Spell school',
+        options: [
+          { value: SPELL_PICKER_SCHOOL_ALL, label: 'All' },
+          ...schoolOptions.map((school) => ({
+            value: school,
+            label:
+              displayVocabulary?.resolveSpellSchoolLabel?.(school) ?? getSpellSchoolLabel(school),
+          })),
+        ],
+      }),
+    ],
+    [displayVocabulary, schoolOptions],
+  )
+
   const selectionLimit = activeChoiceSet?.max ?? 0
   const selectionComplete = activeSelectedIds.length >= selectionLimit && selectionLimit > 0
   const activePreparedLevel = resolveActivePreparedLevelSuffix(mode, browseState.selectedLevels)
@@ -386,28 +407,20 @@ export function SpellPickerDrawer({
         <div className={catalogPickerFiltersRowClasses}>
           <div className={catalogPickerFiltersMainClasses}>
             {showSchoolFilter ? (
-              <CatalogPickerFilterGroup
-                label={SPELL_PICKER_SCHOOL_LABEL}
-                ariaLabel="Filter by school"
-                value={browseState.selectedSchool}
-                onValueChange={(value) =>
-                  persistBrowseState({
-                    ...browseState,
-                    selectedSchool: value as typeof browseState.selectedSchool,
-                  })
-                }
-                triggerAriaLabel="Spell school"
-              >
-                <CatalogPickerFilterSelectItem value={SPELL_PICKER_SCHOOL_ALL}>
-                  All
-                </CatalogPickerFilterSelectItem>
-                {schoolOptions.map((school) => (
-                  <CatalogPickerFilterSelectItem key={school} value={school}>
-                    {displayVocabulary?.resolveSpellSchoolLabel?.(school) ??
-                      getSpellSchoolLabel(school)}
-                  </CatalogPickerFilterSelectItem>
-                ))}
-              </CatalogPickerFilterGroup>
+              <FilterToolbar
+                idPrefix="spell-picker-school"
+                fields={schoolFilterFields}
+                values={{ selectedSchool: browseState.selectedSchool }}
+                className="flex-row flex-nowrap items-center gap-0"
+                onValueChange={(_key, value) => {
+                  if (value !== undefined) {
+                    persistBrowseState({
+                      ...browseState,
+                      selectedSchool: value as typeof browseState.selectedSchool,
+                    })
+                  }
+                }}
+              />
             ) : null}
 
             {castingTimeOptions.length > 0 ||

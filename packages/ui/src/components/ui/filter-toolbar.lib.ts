@@ -26,3 +26,9 @@ export function normalizeFilterToolbarSelectChange<TFilters extends Record<strin
 
   return nextValue as TFilters[SelectFilterFieldConfig<TFilters>['key']]
 }
+
+export function resolveFilterToolbarPlaceholder<TFilters extends Record<string, unknown>>(
+  field: Pick<SelectFilterFieldConfig<TFilters>, 'placeholder' | 'allowAny' | 'anyLabel'>,
+): string | undefined {
+  return field.placeholder ?? (field.allowAny ? (field.anyLabel ?? 'Any') : undefined)
+}

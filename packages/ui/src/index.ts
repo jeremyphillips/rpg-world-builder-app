@@ -388,6 +388,7 @@ export {
 export {
   FilterToolbar,
   type FilterFieldConfig,
+  type FilterToolbarLabelLayout,
   type FilterToolbarOption,
   type FilterToolbarProps,
   type SelectFilterFieldConfig,

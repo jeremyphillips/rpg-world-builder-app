@@ -114,3 +114,45 @@ export const Narrow: Story = {
     ),
   ],
 }
+
+const INLINE_FIELDS: FilterFieldConfig<{ category: string }>[] = [
+  {
+    key: 'category',
+    type: 'select',
+    label: 'Category',
+    ariaLabel: 'Filter by category',
+    triggerAriaLabel: 'Equipment category',
+    labelLayout: 'inline',
+    options: [
+      { value: '__all__', label: 'All' },
+      { value: 'weapon', label: 'Weapon' },
+      { value: 'armor', label: 'Armor' },
+    ],
+    required: true,
+  },
+]
+
+function InlineFilterToolbarDemo() {
+  const [values, setValues] = useState({ category: '__all__' })
+
+  return (
+    <FilterToolbar
+      idPrefix="inline-demo"
+      fields={INLINE_FIELDS}
+      values={values}
+      className="flex-row flex-nowrap items-center gap-0"
+      onValueChange={(_key, value) => {
+        if (value !== undefined) {
+          setValues({ category: value })
+        }
+      }}
+    />
+  )
+}
+
+export const InlineCatalogPicker: Story = {
+  args: {
+    initialValues: { subject: 'person' },
+  },
+  render: () => <InlineFilterToolbarDemo />,
+}

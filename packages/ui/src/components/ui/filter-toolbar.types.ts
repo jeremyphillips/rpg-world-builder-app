@@ -4,6 +4,8 @@ export type FilterToolbarOption = {
   label: string
 }
 
+export type FilterToolbarLabelLayout = 'stacked' | 'inline'
+
 export type SelectFilterFieldConfig<TFilters extends Record<string, unknown>> = {
   key: keyof TFilters
   type: 'select'
@@ -12,6 +14,12 @@ export type SelectFilterFieldConfig<TFilters extends Record<string, unknown>> = 
   allowAny?: boolean
   anyLabel?: string
   placeholder?: string
+  /** `stacked` (default) — label above control. `inline` — label beside control from `sm` up. */
+  labelLayout?: FilterToolbarLabelLayout
+  /** Group label for inline layout; defaults to `label`. */
+  ariaLabel?: string
+  /** Select trigger label; defaults to `label`. */
+  triggerAriaLabel?: string
   visible?: boolean
   disabled?: boolean
   required?: boolean
