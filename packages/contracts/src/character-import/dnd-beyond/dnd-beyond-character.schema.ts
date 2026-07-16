@@ -103,6 +103,8 @@ export const dndBeyondClassSchema = z
   })
   .passthrough()
 
+export type DndBeyondClass = z.infer<typeof dndBeyondClassSchema>
+
 export const dndBeyondRaceSchema = z
   .object({
     fullName: nullableString,
@@ -167,6 +169,37 @@ export const dndBeyondCurrenciesSchema = z
   })
   .passthrough()
 
+export type DndBeyondCurrencies = z.infer<typeof dndBeyondCurrenciesSchema>
+
+export const dndBeyondClassSpellEntrySchema = z
+  .object({
+    id: z.number().optional(),
+    definitionId: z.number().optional(),
+    definition: z
+      .object({
+        id: z.number().optional(),
+        name: z.string().optional(),
+        slug: z.string().optional(),
+        level: z.number().optional(),
+      })
+      .passthrough()
+      .optional(),
+    prepared: z.boolean().optional(),
+    alwaysPrepared: z.boolean().optional(),
+  })
+  .passthrough()
+
+export type DndBeyondClassSpellEntry = z.infer<typeof dndBeyondClassSpellEntrySchema>
+
+export const dndBeyondClassSpellsGroupSchema = z
+  .object({
+    characterClassId: z.number().optional(),
+    spells: z.array(dndBeyondClassSpellEntrySchema).optional(),
+  })
+  .passthrough()
+
+export type DndBeyondClassSpellsGroup = z.infer<typeof dndBeyondClassSpellsGroupSchema>
+
 /** Character `data` node — validated payload consumed by the adapter. */
 export const dndBeyondCharacterDataSchema = z
   .object({
@@ -194,7 +227,7 @@ export const dndBeyondCharacterDataSchema = z
     inventory: z.array(dndBeyondInventoryItemSchema).optional(),
     currencies: dndBeyondCurrenciesSchema.optional(),
     feats: z.array(dndBeyondFeatSchema).optional(),
-    classSpells: z.array(dndBeyondSpellSchema).optional(),
+    classSpells: z.array(dndBeyondClassSpellsGroupSchema).optional(),
     raceSpells: z.array(dndBeyondSpellSchema).optional(),
   })
   .passthrough()

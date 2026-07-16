@@ -111,13 +111,17 @@ evidence for preview/debug only and must never flow into character persistence.
 
 ### Ambiguous props (follow-up)
 
-| Source field                | Notes                                                                                       |
-| --------------------------- | ------------------------------------------------------------------------------------------- |
-| `adjustmentXp`              | Recorded in `availableSourceData`; not summed into mapped XP                                |
-| `removedHitPoints`          | Runtime state; not mapped to local HP contract                                              |
-| Saving-throw proficiencies  | Ignored in preview (`resolved-from-local-content`); resolved from local class               |
-| `data.race`                 | D&D Beyond species — mapped to local `species` preview (`fullName`, `baseRaceName`, `slug`) |
-| Background definition prose | Excluded from personal `narrative.backstory`                                                |
+| Source field                | Notes                                                                                                                     |
+| --------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| `adjustmentXp`              | Recorded in `availableSourceData`; not summed into mapped XP                                                              |
+| `removedHitPoints`          | Runtime state; not mapped to local HP contract                                                                            |
+| Saving-throw proficiencies  | Ignored in preview (`resolved-from-local-content`); resolved from local class                                             |
+| `data.race`                 | D&D Beyond species — mapped to local `species` preview (`fullName`, `baseRaceName`, `slug`)                               |
+| `data.classes`              | D&D Beyond classes — mapped to local `classes` preview (`definition.name`, `definition.slug`, `level`, optional subclass) |
+| `data.inventory`            | Inventory items — matched against local equipment catalog names for preview (`mapped` vs `unresolved-reference`)          |
+| `data.currencies`           | Currency totals — mapped to local `wealth` (`cp`, `sp`, `gp`, `pp`; electrum folded into copper)                          |
+| `data.classSpells`          | Class spells — matched against local spell catalog names for preview (`mapped` vs `unresolved-reference`)                 |
+| Background definition prose | Excluded from personal `narrative.backstory`                                                                              |
 
 ## Fixtures
 

@@ -1434,8 +1434,8 @@
     "spellcastingGearKind": "arcane_focus"
   },
   {
-    "id": "srd-cc-5.2.1:rope-hempen",
-    "slug": "rope-hempen",
+    "id": "srd-cc-5.2.1:rope",
+    "slug": "rope",
     "rulesetId": "srd-cc-5.2.1",
     "source": "system",
     "campaignId": null,

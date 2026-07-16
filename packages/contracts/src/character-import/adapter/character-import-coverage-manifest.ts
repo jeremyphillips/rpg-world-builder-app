@@ -34,6 +34,67 @@ const coverageForExtractionField = (
   sourcePaths,
 })
 
+type CatalogMatchablePreview = { status: string }
+
+type CatalogMatchedListCoverageOptions = {
+  mappedReason: string
+  partialReason: string
+  noneMatchedReason: string
+  hasSourceData: boolean
+  deferredReason: string
+  unresolvedWhenPresentReason: string
+  sourcePathsWhenPresent?: string[]
+}
+
+const buildCatalogMatchedListCoverage = (
+  targetPath: string,
+  extractionStatus: CharacterImportExtraction[keyof CharacterImportExtraction]['status'],
+  sourcePaths: string[] | undefined,
+  items: CatalogMatchablePreview[],
+  options: CatalogMatchedListCoverageOptions,
+): CharacterImportCoverageEntry => {
+  const allResolved =
+    extractionStatus === 'mapped' && items.every((entry) => entry.status === 'mapped')
+  const someResolved =
+    extractionStatus === 'mapped' &&
+    items.some((entry) => entry.status === 'mapped') &&
+    items.some((entry) => entry.status !== 'mapped')
+
+  if (allResolved) {
+    return {
+      targetPath,
+      state: 'mapped',
+      reason: options.mappedReason,
+      sourcePaths,
+    }
+  }
+
+  if (someResolved) {
+    return {
+      targetPath,
+      state: 'unresolved-reference',
+      reason: options.partialReason,
+      sourcePaths,
+    }
+  }
+
+  if (extractionStatus === 'mapped') {
+    return {
+      targetPath,
+      state: 'unresolved-reference',
+      reason: options.noneMatchedReason,
+      sourcePaths,
+    }
+  }
+
+  return {
+    targetPath,
+    state: options.hasSourceData ? 'unresolved-reference' : 'deferred',
+    reason: options.hasSourceData ? options.unresolvedWhenPresentReason : options.deferredReason,
+    sourcePaths: options.hasSourceData ? options.sourcePathsWhenPresent : undefined,
+  }
+}
+
 const buildNameCoverage: CoverageBuilder = (extraction) =>
   coverageForExtractionField(
     'name',
@@ -52,14 +113,23 @@ const buildAbilityScoresCoverage: CoverageBuilder = (extraction) =>
     'Ability scores could not be derived from the source character.',
   )
 
-const buildAlignmentCoverage: CoverageBuilder = (extraction) =>
-  coverageForExtractionField(
-    'alignment',
-    extraction.alignment.status,
-    extraction.alignment.sourcePaths,
-    'Alignment mapped from source alignment id.',
-    'Alignment is missing or unrecognized in the source character.',
-  )
+const buildAlignmentCoverage: CoverageBuilder = (extraction) => {
+  if (extraction.alignment.status === 'mapped') {
+    return {
+      targetPath: 'alignment',
+      state: 'mapped',
+      reason: 'Alignment mapped from source alignment data.',
+      sourcePaths: extraction.alignment.sourcePaths,
+    }
+  }
+
+  return {
+    targetPath: 'alignment',
+    state: 'not-applicable',
+    reason: 'Alignment was not set on the source character.',
+    sourcePaths: extraction.alignment.sourcePaths,
+  }
+}
 
 const buildXpCoverage: CoverageBuilder = (extraction) =>
   coverageForExtractionField(
@@ -103,25 +173,57 @@ const buildRulesetIdCoverage: CoverageBuilder = (_extraction, _payload) => ({
   reason: 'Ruleset selection requires campaign or application context, not provider payload.',
 })
 
-const buildClassesCoverage: CoverageBuilder = (_extraction, payload) => {
-  const hasClasses = (payload.classes?.length ?? 0) > 0
+const buildClassesCoverage: CoverageBuilder = (extraction) => {
+  const classes = extraction.classes.value ?? []
+  const allResolved =
+    extraction.classes.status === 'mapped' && classes.every((entry) => entry.status === 'mapped')
+
+  if (allResolved) {
+    return {
+      targetPath: 'classes',
+      state: 'mapped',
+      reason: 'Classes were extracted and matched to the local catalog.',
+      sourcePaths: extraction.classes.sourcePaths,
+    }
+  }
+
+  if (extraction.classes.status === 'mapped') {
+    return {
+      targetPath: 'classes',
+      state: 'unresolved-reference',
+      reason: 'One or more source classes require local catalog matching.',
+      sourcePaths: extraction.classes.sourcePaths,
+    }
+  }
+
   return {
     targetPath: 'classes',
-    state: hasClasses ? 'unresolved-reference' : 'deferred',
-    reason: hasClasses
-      ? 'Class levels are present in the source but require local catalog matching.'
-      : 'No class data was found in the source character.',
-    sourcePaths: hasClasses ? ['data.classes'] : undefined,
+    state: extraction.classes.status === 'missing-source' ? 'deferred' : 'unresolved-reference',
+    reason:
+      extraction.classes.status === 'missing-source'
+        ? 'No class data was found in the source character.'
+        : 'Class data is present in the source but requires local catalog matching.',
+    sourcePaths: extraction.classes.sourcePaths,
   }
 }
 
 const buildSpeciesCoverage: CoverageBuilder = (extraction) => {
+  const species = extraction.species.value
+
+  if (extraction.species.status === 'mapped' && species?.status === 'mapped') {
+    return {
+      targetPath: 'species',
+      state: 'mapped',
+      reason: 'Species was extracted from data.race and matched to the local catalog.',
+      sourcePaths: extraction.species.sourcePaths,
+    }
+  }
+
   if (extraction.species.status === 'mapped') {
     return {
       targetPath: 'species',
       state: 'unresolved-reference',
-      reason:
-        'Species was extracted from data.race for preview; local catalog matching is still required before save.',
+      reason: 'Species was extracted from data.race but requires local catalog matching.',
       sourcePaths: extraction.species.sourcePaths,
     }
   }
@@ -139,35 +241,41 @@ const buildSpeciesCoverage: CoverageBuilder = (extraction) => {
 
 const buildEquipmentCoverage: CoverageBuilder = (extraction, payload) => {
   const hasInventory = (payload.inventory?.length ?? 0) > 0
-  if (extraction.equipment.status === 'mapped') {
+
+  return buildCatalogMatchedListCoverage(
+    'equipment',
+    extraction.equipment.status,
+    extraction.equipment.sourcePaths,
+    extraction.equipment.value ?? [],
+    {
+      mappedReason: 'Inventory items were extracted and matched to the local catalog.',
+      partialReason:
+        'Some inventory items matched the local catalog; others require manual review.',
+      noneMatchedReason: 'Inventory items were extracted but none matched the local catalog.',
+      hasSourceData: hasInventory,
+      deferredReason: 'No inventory was found in the source character.',
+      unresolvedWhenPresentReason:
+        'Inventory items are present in the source but require local catalog matching.',
+      sourcePathsWhenPresent: ['data.inventory'],
+    },
+  )
+}
+
+const buildWealthCoverage: CoverageBuilder = (extraction) => {
+  if (extraction.wealth.status === 'mapped') {
     return {
-      targetPath: 'equipment',
-      state: 'unresolved-reference',
-      reason:
-        'Inventory items were extracted for preview; canonical equipment rows require local catalog matching.',
-      sourcePaths: extraction.equipment.sourcePaths,
+      targetPath: 'wealth',
+      state: 'mapped',
+      reason: 'Currency totals were mapped to the local wealth shape.',
+      sourcePaths: extraction.wealth.sourcePaths,
     }
   }
 
   return {
-    targetPath: 'equipment',
-    state: hasInventory ? 'unresolved-reference' : 'deferred',
-    reason: hasInventory
-      ? 'Inventory items are present in the source but require local catalog matching.'
-      : 'No inventory was found in the source character.',
-    sourcePaths: hasInventory ? ['data.inventory'] : undefined,
-  }
-}
-
-const buildWealthCoverage: CoverageBuilder = (_extraction, payload) => {
-  const hasCurrency = payload.currencies != null
-  return {
     targetPath: 'wealth',
-    state: hasCurrency ? 'unresolved-reference' : 'deferred',
-    reason: hasCurrency
-      ? 'Currency totals are present in the source but require local wealth mapping.'
-      : 'No currency data was found in the source character.',
-    sourcePaths: hasCurrency ? ['data.currencies'] : undefined,
+    state: 'deferred',
+    reason: 'No currency data was found in the source character.',
+    sourcePaths: extraction.wealth.sourcePaths,
   }
 }
 
@@ -187,17 +295,30 @@ const buildProficienciesCoverage: CoverageBuilder = (extraction) => {
   }
 }
 
-const buildSpellsCoverage: CoverageBuilder = (_extraction, payload) => {
-  const spellCount = (payload.classSpells?.length ?? 0) + (payload.raceSpells?.length ?? 0)
-  return {
-    targetPath: 'spells',
-    state: spellCount > 0 ? 'unresolved-reference' : 'deferred',
-    reason:
-      spellCount > 0
-        ? 'Spells are present in the source but require local catalog matching.'
-        : 'Spell import is deferred in the experimental preview.',
-    sourcePaths: spellCount > 0 ? ['data.classSpells', 'data.raceSpells'] : undefined,
-  }
+const buildSpellsCoverage: CoverageBuilder = (extraction, payload) => {
+  const classSpellCount = (payload.classSpells ?? []).reduce(
+    (count, group) => count + (group.spells?.length ?? 0),
+    0,
+  )
+  const raceSpellCount = payload.raceSpells?.length ?? 0
+  const spellCount = classSpellCount + raceSpellCount
+
+  return buildCatalogMatchedListCoverage(
+    'spells',
+    extraction.spells.status,
+    extraction.spells.sourcePaths,
+    extraction.spells.value ?? [],
+    {
+      mappedReason: 'Class spells were extracted and matched to the local catalog.',
+      partialReason: 'Some class spells matched the local catalog; others require manual review.',
+      noneMatchedReason: 'Class spells were extracted but none matched the local catalog.',
+      hasSourceData: spellCount > 0,
+      deferredReason: 'Spell import is deferred in the experimental preview.',
+      unresolvedWhenPresentReason:
+        'Spells are present in the source but require local catalog matching.',
+      sourcePathsWhenPresent: ['data.classSpells', 'data.raceSpells'],
+    },
+  )
 }
 
 const buildFeatsCoverage: CoverageBuilder = (_extraction, payload) => {

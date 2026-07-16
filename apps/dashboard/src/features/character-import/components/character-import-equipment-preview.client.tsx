@@ -3,7 +3,7 @@
 import { SemanticText, Text } from '@rpg/ui'
 import type {
   CharacterImportFieldResult,
-  CharacterImportProficienciesPreview,
+  RecognizedEquipmentItem,
 } from '@rpg/contracts/character-import'
 
 import {
@@ -12,42 +12,28 @@ import {
   extractionIssueTone,
   extractionValueEmphasis,
   extractionValueTone,
-  formatProficienciesPreviewValue,
+  formatEquipmentItemLabel,
+  formatSupportedEquipmentValue,
   isExtractionValueUnset,
+  partitionEquipmentItems,
   shouldShowExtractionIssue,
 } from '../model/character-import-preview.lib'
 
-export type CharacterImportProficienciesPreviewProps = {
-  result: CharacterImportFieldResult<CharacterImportProficienciesPreview>
+export type CharacterImportEquipmentPreviewSectionProps = {
+  result: CharacterImportFieldResult<RecognizedEquipmentItem[]>
 }
 
-function ProficiencyGroup({ label, values }: { label: string; values: string[] }) {
-  const isUnset = values.length === 0
-
-  return (
-    <div className="grid gap-1">
-      <Text variant="emphasis">{label}</Text>
-      <SemanticText
-        tone={isUnset ? 'informative' : 'neutral'}
-        emphasis={isUnset ? 'low' : 'medium'}
-        className={PREVIEW_VALUE_TEXT_CLASS}
-      >
-        {isUnset ? EXTRACTION_UNSET_DISPLAY_VALUE : values.join(', ')}
-      </SemanticText>
-    </div>
-  )
-}
-
-export function CharacterImportProficienciesPreviewSection({
+export function CharacterImportEquipmentPreviewSection({
   result,
-}: CharacterImportProficienciesPreviewProps) {
+}: CharacterImportEquipmentPreviewSectionProps) {
   const isUnset = isExtractionValueUnset(result)
-  const preview = result.value
+  const equipment = result.value
+  const { supported, unsupported } = partitionEquipmentItems(equipment ?? [])
 
   return (
     <div className="grid gap-3 border-b border-border-subtle py-3 last:border-b-0">
-      <Text variant="emphasis">Proficiencies</Text>
-      {isUnset || !preview ? (
+      <Text variant="emphasis">Equipment</Text>
+      {isUnset || !equipment ? (
         <>
           <SemanticText
             tone={extractionValueTone(result)}
@@ -68,11 +54,19 @@ export function CharacterImportProficienciesPreviewSection({
         </>
       ) : (
         <>
-          <ProficiencyGroup
-            label="Skills"
-            values={formatProficienciesPreviewValue(preview.skills)}
-          />
-          <ProficiencyGroup label="Tools" values={formatProficienciesPreviewValue(preview.tools)} />
+          <SemanticText tone="neutral" emphasis="medium" className={PREVIEW_VALUE_TEXT_CLASS}>
+            {supported.length > 0
+              ? formatSupportedEquipmentValue(supported)
+              : EXTRACTION_UNSET_DISPLAY_VALUE}
+          </SemanticText>
+          {unsupported.length > 0 ? (
+            <div className="grid gap-1">
+              <Text variant="emphasis">Unsupported:</Text>
+              <SemanticText tone="caution" emphasis="medium" className={PREVIEW_VALUE_TEXT_CLASS}>
+                {unsupported.map((entry) => formatEquipmentItemLabel(entry)).join(', ')}
+              </SemanticText>
+            </div>
+          ) : null}
           {shouldShowExtractionIssue(result) ? (
             <SemanticText
               tone={extractionIssueTone(result)}

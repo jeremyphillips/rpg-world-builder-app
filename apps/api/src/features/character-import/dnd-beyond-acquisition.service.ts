@@ -3,6 +3,9 @@ import {
   buildDndBeyondCharacterUrl,
   buildDndBeyondReadonlyUrl,
   CHARACTER_IMPORT_ERROR_MESSAGES,
+  createDndBeyondEquipmentNameIndex,
+  createDndBeyondSpellNameIndex,
+  DND_BEYOND_SRD_TOOL_RULESET_ID,
   dndBeyondCharacterPayloadSchema,
   dndBeyondCharacterResponseSchema,
   dndBeyondErrorEnvelopeSchema,
@@ -11,6 +14,8 @@ import {
   normalizeDndBeyondCharacterInput,
   type CharacterImportResult,
 } from '@rpg/contracts/character-import'
+import { loadSeedEquipment } from '@rpg/catalog/equipment'
+import { loadSeedSpells } from '@rpg/catalog/spells'
 
 import { loadEnv } from '../../env'
 import { HttpError } from '../../lib/http-error'
@@ -154,13 +159,30 @@ export async function previewDndBeyondCharacter(
     })
   }
 
-  return adaptDndBeyondCharacter(payload.data, {
-    provider: 'dnd-beyond',
-    payloadVersion: DND_BEYOND_PAYLOAD_VERSION,
-    requestedPayloadVersion: DND_BEYOND_PAYLOAD_VERSION,
-    supportedPayloadVersion: DND_BEYOND_PAYLOAD_VERSION,
-    characterId,
-    acquisition: 'public-id-fetch',
-    readonlyUrl: buildDndBeyondReadonlyUrl(characterId),
-  })
+  return adaptDndBeyondCharacter(
+    payload.data,
+    {
+      provider: 'dnd-beyond',
+      payloadVersion: DND_BEYOND_PAYLOAD_VERSION,
+      requestedPayloadVersion: DND_BEYOND_PAYLOAD_VERSION,
+      supportedPayloadVersion: DND_BEYOND_PAYLOAD_VERSION,
+      characterId,
+      acquisition: 'public-id-fetch',
+      readonlyUrl: buildDndBeyondReadonlyUrl(characterId),
+    },
+    {
+      equipmentNameIndex: createDndBeyondEquipmentNameIndex(
+        loadSeedEquipment(DND_BEYOND_SRD_TOOL_RULESET_ID).map((item) => ({
+          name: item.name,
+          slug: item.slug,
+        })),
+      ),
+      spellNameIndex: createDndBeyondSpellNameIndex(
+        loadSeedSpells(DND_BEYOND_SRD_TOOL_RULESET_ID).map((spell) => ({
+          name: spell.name,
+          slug: spell.slug,
+        })),
+      ),
+    },
+  )
 }

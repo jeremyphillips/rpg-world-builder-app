@@ -80,6 +80,17 @@ export const recognizedEquipmentItemSchema = z.object({
 
 export type RecognizedEquipmentItem = z.infer<typeof recognizedEquipmentItemSchema>
 
+export const recognizedSpellPreviewSchema = z.object({
+  sourceValue: z.string(),
+  sourceLevel: z.number().int().min(0).optional(),
+  prepared: z.boolean().optional(),
+  localSlug: z.string().optional(),
+  localValue: z.string().optional(),
+  status: recognizedEntryStatusSchema,
+})
+
+export type RecognizedSpellPreview = z.infer<typeof recognizedSpellPreviewSchema>
+
 export const recognizedSpeciesPreviewSchema = z.object({
   sourceValue: z.string(),
   sourceSlug: z.string().optional(),
@@ -92,6 +103,22 @@ export const recognizedSpeciesPreviewSchema = z.object({
 })
 
 export type RecognizedSpeciesPreview = z.infer<typeof recognizedSpeciesPreviewSchema>
+
+export const recognizedClassPreviewSchema = z.object({
+  sourceValue: z.string(),
+  sourceSlug: z.string().optional(),
+  sourceClassId: z.number().optional(),
+  level: z.number().int().positive(),
+  subclassSourceValue: z.string().optional(),
+  subclassSourceSlug: z.string().optional(),
+  subclassLocalSlug: z.string().optional(),
+  subclassLocalValue: z.string().optional(),
+  localSlug: z.string().optional(),
+  localValue: z.string().optional(),
+  status: recognizedEntryStatusSchema,
+})
+
+export type RecognizedClassPreview = z.infer<typeof recognizedClassPreviewSchema>
 
 /** Narrative preview reuses the stored narrative shape (all fields optional). */
 export const characterNarrativePreviewSchema = characterNarrativeSchema

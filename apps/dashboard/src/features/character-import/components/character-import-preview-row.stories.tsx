@@ -29,7 +29,7 @@ export const Missing: Story = {
   args: {
     field: 'alignment',
     label: 'Alignment',
-    displayValue: 'Undefined',
+    displayValue: 'Not set',
     result: {
       status: 'missing-source',
       sourcePaths: ['data.alignmentId'],

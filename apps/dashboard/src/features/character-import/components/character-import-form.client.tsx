@@ -9,6 +9,7 @@ import { getCharacterImportErrorAlert } from '@rpg/contracts/character-import'
 import { Alert, Button, Input, Text } from '@rpg/ui'
 
 import { useCharacterImportPreview } from '../hooks/use-character-import-preview'
+import { CHARACTER_IMPORT_DEFAULT_CHARACTER_ID } from '../model/character-import-defaults'
 import {
   characterImportFormSchema,
   type CharacterImportFormValues,
@@ -21,7 +22,10 @@ export type CharacterImportFormProps = {
 }
 
 // fallow-ignore-next-line complexity
-export function CharacterImportForm({ initialInput = '', campaignId }: CharacterImportFormProps) {
+export function CharacterImportForm({
+  initialInput = CHARACTER_IMPORT_DEFAULT_CHARACTER_ID,
+  campaignId,
+}: CharacterImportFormProps) {
   const inputId = useId()
   const {
     register,
@@ -64,7 +68,7 @@ export function CharacterImportForm({ initialInput = '', campaignId }: Character
           <Input
             id={inputId}
             {...register('input')}
-            placeholder="133058471 or https://www.dndbeyond.com/characters/…"
+            placeholder={`${CHARACTER_IMPORT_DEFAULT_CHARACTER_ID} or https://www.dndbeyond.com/characters/…`}
             disabled={isPending}
             aria-invalid={errors.input ? true : undefined}
           />

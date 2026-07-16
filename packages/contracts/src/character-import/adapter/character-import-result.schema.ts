@@ -1,6 +1,7 @@
 import { z } from 'zod'
 
 import { characterAbilityScoresSchema } from '../../rpg/runtime/character/core'
+import { coinWealthSchema } from '../../rpg/primitives/wealth'
 import { alignmentSchema } from '../../rpg/vocab/alignment'
 import { DND_BEYOND_PAYLOAD_VERSION } from '../dnd-beyond/dnd-beyond-version'
 import {
@@ -13,8 +14,10 @@ import {
   characterImportFieldResultSchema,
   characterImportProficienciesPreviewSchema,
   characterNarrativePreviewSchema,
+  recognizedClassPreviewSchema,
   recognizedEquipmentItemSchema,
   recognizedLanguageSchema,
+  recognizedSpellPreviewSchema,
   recognizedSpeciesPreviewSchema,
 } from './character-import-preview-types'
 import { characterImportDispositionEntrySchema } from './character-import-disposition'
@@ -44,6 +47,7 @@ export type CharacterImportSource = z.infer<typeof characterImportSourceSchema>
 export const characterImportExtractionSchema = z.object({
   name: characterImportFieldResultSchema(z.string()),
   species: characterImportFieldResultSchema(recognizedSpeciesPreviewSchema),
+  classes: characterImportFieldResultSchema(z.array(recognizedClassPreviewSchema)),
   abilityScores: characterImportFieldResultSchema(characterAbilityScoresSchema),
   alignment: characterImportFieldResultSchema(alignmentSchema),
   xp: characterImportFieldResultSchema(z.number().int().min(0)),
@@ -52,6 +56,8 @@ export const characterImportExtractionSchema = z.object({
   languages: characterImportFieldResultSchema(z.array(recognizedLanguageSchema)),
   proficiencies: characterImportFieldResultSchema(characterImportProficienciesPreviewSchema),
   equipment: characterImportFieldResultSchema(z.array(recognizedEquipmentItemSchema)),
+  wealth: characterImportFieldResultSchema(coinWealthSchema),
+  spells: characterImportFieldResultSchema(z.array(recognizedSpellPreviewSchema)),
 })
 
 export type CharacterImportExtraction = z.infer<typeof characterImportExtractionSchema>

@@ -10,7 +10,35 @@ import {
   dndBeyondCharacter133058471Payload,
   DND_BEYOND_FIXTURE_CHARACTER_ID,
 } from './dnd-beyond-character-fixtures'
+import { createDndBeyondEquipmentNameIndex } from './dnd-beyond-equipment-mapping'
+import { createDndBeyondSpellNameIndex } from './dnd-beyond-spell-mapping'
 import { DND_BEYOND_PAYLOAD_VERSION } from './dnd-beyond-version'
+
+const fixtureAdaptOptions = {
+  equipmentNameIndex: createDndBeyondEquipmentNameIndex([
+    { name: 'Backpack', slug: 'backpack' },
+    { name: "Calligrapher's Supplies", slug: 'calligraphers-supplies' },
+    { name: 'Dagger', slug: 'dagger' },
+    { name: 'Quarterstaff', slug: 'quarterstaff' },
+    { name: 'Spellbook', slug: 'spellbook' },
+    { name: 'Oil', slug: 'oil' },
+    { name: 'Parchment', slug: 'parchment' },
+    { name: 'Robe', slug: 'robe' },
+    { name: 'Lamp', slug: 'lamp' },
+    { name: 'Fine Clothes', slug: 'fine-clothes' },
+  ]),
+  spellNameIndex: createDndBeyondSpellNameIndex([
+    { name: 'Light', slug: 'light' },
+    { name: 'Mage Hand', slug: 'mage-hand' },
+    { name: 'Ray of Frost', slug: 'ray-of-frost' },
+    { name: 'Detect Magic', slug: 'detect-magic' },
+    { name: 'Feather Fall', slug: 'feather-fall' },
+    { name: 'Mage Armor', slug: 'mage-armor' },
+    { name: 'Magic Missile', slug: 'magic-missile' },
+    { name: 'Sleep', slug: 'sleep' },
+    { name: 'Thunderwave', slug: 'thunderwave' },
+  ]),
+}
 
 const fixtureSource = {
   provider: 'dnd-beyond' as const,
@@ -22,7 +50,11 @@ const fixtureSource = {
 }
 
 describe('adaptDndBeyondCharacter', () => {
-  const result = adaptDndBeyondCharacter(dndBeyondCharacter133058471Payload, fixtureSource)
+  const result = adaptDndBeyondCharacter(
+    dndBeyondCharacter133058471Payload,
+    fixtureSource,
+    fixtureAdaptOptions,
+  )
 
   it('parses through the result schema', () => {
     expect(() => characterImportResultSchema.parse(result)).not.toThrow()
@@ -42,6 +74,16 @@ describe('adaptDndBeyondCharacter', () => {
       localValue: 'srd-cc-5.2.1:human',
       status: 'mapped',
     })
+    expect(result.extraction.classes.value).toEqual([
+      expect.objectContaining({
+        sourceValue: 'Wizard',
+        sourceSlug: '2190886-wizard',
+        level: 1,
+        localSlug: 'wizard',
+        localValue: 'srd-cc-5.2.1:wizard',
+        status: 'mapped',
+      }),
+    ])
     expect(result.extraction.abilityScores.value).toEqual({
       str: 8,
       dex: 14,
@@ -117,10 +159,46 @@ describe('adaptDndBeyondCharacter', () => {
     )
   })
 
-  it('extracts inventory for equipment preview', () => {
+  it('maps currencies to local wealth', () => {
+    expect(result.extraction.wealth).toEqual({
+      status: 'mapped',
+      value: { cp: 0, sp: 0, gp: 38, pp: 0 },
+      sourcePaths: ['data.currencies'],
+      issues: [],
+    })
+  })
+
+  it('extracts class spells with catalog validation', () => {
+    expect(result.extraction.spells.status).toBe('mapped')
+    const spells = result.extraction.spells.value ?? []
+    expect(spells).toHaveLength(9)
+    expect(spells.find((entry) => entry.sourceValue === 'Light')).toMatchObject({
+      status: 'mapped',
+      localValue: 'srd-cc-5.2.1:light',
+      sourceLevel: 0,
+    })
+    expect(spells.every((entry) => entry.status === 'mapped')).toBe(true)
+  })
+
+  it('extracts inventory for equipment preview with catalog validation', () => {
     expect(result.extraction.equipment.status).toBe('mapped')
-    const names = result.extraction.equipment.value?.map((entry) => entry.sourceLabel) ?? []
-    expect(names).toEqual(expect.arrayContaining(["Calligrapher's Supplies", 'Dagger']))
+    const equipment = result.extraction.equipment.value ?? []
+    const dagger = equipment.find((entry) => entry.sourceLabel === 'Dagger')
+    const assassinsBlood = equipment.find(
+      (entry) => entry.sourceLabel === "Assassin's Blood (Ingested)",
+    )
+
+    expect(dagger).toMatchObject({
+      status: 'mapped',
+      localValue: 'srd-cc-5.2.1:dagger',
+      quantity: 4,
+    })
+    expect(assassinsBlood).toMatchObject({
+      status: 'unresolved-reference',
+    })
+    expect(
+      equipment.some((entry) => entry.sourceLabel === 'Backpack' && entry.status === 'mapped'),
+    ).toBe(true)
   })
 
   it('does not emit derived values in mapped extraction fields', () => {
@@ -134,9 +212,19 @@ describe('adaptDndBeyondCharacter', () => {
       dndBeyondCharacter133058471Payload,
     )
     const classes = createInputCoverage.find((entry) => entry.targetPath === 'classes')
+    const species = createInputCoverage.find((entry) => entry.targetPath === 'species')
+    const alignment = createInputCoverage.find((entry) => entry.targetPath === 'alignment')
+    const equipment = createInputCoverage.find((entry) => entry.targetPath === 'equipment')
+    const wealth = createInputCoverage.find((entry) => entry.targetPath === 'wealth')
+    const spells = createInputCoverage.find((entry) => entry.targetPath === 'spells')
     const proficiencies = createInputCoverage.find((entry) => entry.targetPath === 'proficiencies')
 
-    expect(classes?.state).toBe('unresolved-reference')
+    expect(classes?.state).toBe('mapped')
+    expect(species?.state).toBe('mapped')
+    expect(alignment?.state).toBe('not-applicable')
+    expect(equipment?.state).toBe('unresolved-reference')
+    expect(wealth?.state).toBe('mapped')
+    expect(spells?.state).toBe('mapped')
     expect(proficiencies?.state).toBe('deferred')
     expect(result.extraction.proficiencies.status).toBe('mapped')
   })
@@ -157,6 +245,7 @@ describe('adaptDndBeyondCharacter edge cases', () => {
         alignmentId: 2,
       },
       fixtureSource,
+      fixtureAdaptOptions,
     )
     expect(adapted.extraction.alignment.value).toBe('ng')
   })
@@ -169,6 +258,7 @@ describe('adaptDndBeyondCharacter edge cases', () => {
         alignment: 'Neutral Good',
       },
       fixtureSource,
+      fixtureAdaptOptions,
     )
     expect(adapted.extraction.alignment.value).toBe('ng')
   })
@@ -180,6 +270,7 @@ describe('adaptDndBeyondCharacter edge cases', () => {
         alignmentId: 0,
       },
       fixtureSource,
+      fixtureAdaptOptions,
     )
     expect(adapted.extraction.alignment.status).toBe('missing-source')
   })
@@ -191,6 +282,7 @@ describe('adaptDndBeyondCharacter edge cases', () => {
         overrideStats: [{ id: 4, name: null, value: 20 }],
       },
       fixtureSource,
+      fixtureAdaptOptions,
     )
     expect(adapted.extraction.abilityScores.value?.int).toBe(20)
   })
@@ -213,6 +305,7 @@ describe('adaptDndBeyondCharacter edge cases', () => {
         },
       },
       fixtureSource,
+      fixtureAdaptOptions,
     )
     const commonEntries = (adapted.extraction.languages.value ?? []).filter(
       (entry) => entry.localValue === 'common',

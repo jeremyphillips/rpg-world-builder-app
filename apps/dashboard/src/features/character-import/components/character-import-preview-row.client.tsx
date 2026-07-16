@@ -4,8 +4,11 @@ import { SemanticText, Text } from '@rpg/ui'
 import type { CharacterImportFieldResult } from '@rpg/contracts/character-import'
 
 import {
-  extractionFieldTone,
-  extractionIssueReason,
+  PREVIEW_VALUE_TEXT_CLASS,
+  extractionIssueTone,
+  extractionValueEmphasis,
+  extractionValueTone,
+  shouldShowExtractionIssue,
   type ExtractionFieldKey,
 } from '../model/character-import-preview.lib'
 
@@ -21,21 +24,22 @@ export function CharacterImportPreviewRow({
   result,
   displayValue,
 }: CharacterImportPreviewRowProps) {
-  const tone = extractionFieldTone(result)
-  const isUndefined = result.status !== 'mapped' || result.value == null
-
   return (
     <div className="grid gap-1 border-b border-border-subtle py-3 last:border-b-0">
       <Text variant="emphasis">{label}</Text>
-      <SemanticText tone={isUndefined ? 'negative' : tone} emphasis="medium">
+      <SemanticText
+        tone={extractionValueTone(result)}
+        emphasis={extractionValueEmphasis(result)}
+        className={PREVIEW_VALUE_TEXT_CLASS}
+      >
         {displayValue}
       </SemanticText>
-      {isUndefined ? (
-        <SemanticText tone="negative" emphasis="low">
-          {result.issues[0] ?? extractionIssueReason(result.status)}
-        </SemanticText>
-      ) : result.issues.length > 0 ? (
-        <SemanticText tone="caution" emphasis="low">
+      {shouldShowExtractionIssue(result) ? (
+        <SemanticText
+          tone={extractionIssueTone(result)}
+          emphasis="low"
+          className={PREVIEW_VALUE_TEXT_CLASS}
+        >
           {result.issues.join(' ')}
         </SemanticText>
       ) : null}

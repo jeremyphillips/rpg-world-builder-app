@@ -4,12 +4,12 @@ import { render, screen } from '@testing-library/react'
 import { CharacterImportPreviewRow } from './character-import-preview-row.client'
 
 describe('CharacterImportPreviewRow', () => {
-  it('renders undefined values in an error tone with a reason', () => {
+  it('renders missing-source values as muted not-set copy without an issue line', () => {
     render(
       <CharacterImportPreviewRow
         field="alignment"
         label="Alignment"
-        displayValue="Undefined"
+        displayValue="Not set"
         result={{
           status: 'missing-source',
           sourcePaths: ['data.alignmentId'],
@@ -18,7 +18,26 @@ describe('CharacterImportPreviewRow', () => {
       />,
     )
 
-    expect(screen.getByText('Undefined')).toBeInTheDocument()
-    expect(screen.getByText('Alignment is not set on the source character.')).toBeInTheDocument()
+    expect(screen.getByText('Not set')).toBeInTheDocument()
+    expect(
+      screen.queryByText('Alignment is not set on the source character.'),
+    ).not.toBeInTheDocument()
+  })
+
+  it('renders invalid-source issues in an error tone', () => {
+    render(
+      <CharacterImportPreviewRow
+        field="alignment"
+        label="Alignment"
+        displayValue="Not set"
+        result={{
+          status: 'invalid-value',
+          sourcePaths: ['data.alignmentId'],
+          issues: ['Source alignment id 99 is not recognized.'],
+        }}
+      />,
+    )
+
+    expect(screen.getByText('Source alignment id 99 is not recognized.')).toBeInTheDocument()
   })
 })

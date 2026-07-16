@@ -1,4 +1,5 @@
 // fallow-ignore-file complexity
+import type { CoinWealth } from '../../rpg/primitives/wealth'
 import type { Alignment } from '../../rpg/vocab/alignment'
 import type { CharacterAbilityScores } from '../../rpg/runtime/character/core'
 import type { DndBeyondCharacterPayload, DndBeyondModifier } from './dnd-beyond-character.schema'
@@ -16,13 +17,28 @@ import type {
   CharacterImportFieldResult,
   CharacterImportProficienciesPreview,
   CharacterNarrativePreview,
+  RecognizedClassPreview,
   RecognizedEquipmentItem,
   RecognizedLanguage,
   RecognizedProficiency,
   RecognizedSpeciesPreview,
+  RecognizedSpellPreview,
 } from '../adapter/character-import-preview-types'
 import { fieldResult, mappedFieldResult } from '../adapter/character-import-preview-types'
 import type { CharacterImportDispositionEntry } from '../adapter/character-import-disposition'
+import {
+  inferLocalClassId,
+  inferLocalClassSlug,
+  inferLocalSubclassId,
+  inferLocalSubclassSlug,
+  readDndBeyondClassLabel,
+  readDndBeyondSubclassLabel,
+} from './dnd-beyond-class-mapping'
+import type { DndBeyondEquipmentNameIndex } from './dnd-beyond-equipment-mapping'
+import { resolveLocalEquipmentFromName } from './dnd-beyond-equipment-mapping'
+import type { DndBeyondSpellNameIndex } from './dnd-beyond-spell-mapping'
+import { resolveLocalSpellFromName } from './dnd-beyond-spell-mapping'
+import { mapDndBeyondCurrenciesToWealth } from './dnd-beyond-wealth-mapping'
 import { mapDndBeyondToolSubtype } from './dnd-beyond-tool-mapping'
 import {
   inferLocalSpeciesId,
@@ -194,6 +210,65 @@ function extractSpecies(
   }
 
   return mappedFieldResult(species, sourcePaths)
+}
+
+function extractClasses(
+  payload: DndBeyondCharacterPayload,
+): CharacterImportFieldResult<RecognizedClassPreview[]> {
+  const sourcePaths = ['data.classes']
+  const classes = payload.classes ?? []
+
+  if (classes.length === 0) {
+    return fieldResult('missing-source', sourcePaths, [
+      'No classes were found on the source character.',
+    ])
+  }
+
+  const previews: RecognizedClassPreview[] = []
+  const issues: string[] = []
+
+  for (const [index, dndClass] of classes.entries()) {
+    const path = `data.classes[${index}]`
+    const sourceLabel = readDndBeyondClassLabel(dndClass)
+
+    if (!sourceLabel) {
+      issues.push(`Class at ${path} is missing a recognizable name.`)
+      continue
+    }
+
+    sourcePaths.push(path)
+
+    const localSlug = inferLocalClassSlug(dndClass)
+    const localValue = inferLocalClassId(dndClass)
+    const subclassLabel = readDndBeyondSubclassLabel(dndClass)
+    const subclassLocalSlug = inferLocalSubclassSlug(dndClass)
+    const subclassLocalValue = inferLocalSubclassId(dndClass)
+
+    previews.push({
+      sourceValue: sourceLabel,
+      sourceSlug: dndClass.definition?.slug ?? undefined,
+      sourceClassId: dndClass.definition?.id ?? dndClass.definitionId ?? undefined,
+      level: dndClass.level,
+      subclassSourceValue: subclassLabel,
+      subclassSourceSlug: dndClass.subclassDefinition?.slug ?? undefined,
+      subclassLocalSlug,
+      subclassLocalValue,
+      localSlug,
+      localValue,
+      status: localSlug ? 'mapped' : 'unresolved-reference',
+    })
+  }
+
+  if (previews.length === 0) {
+    return fieldResult('invalid-value', sourcePaths, issues)
+  }
+
+  return {
+    status: 'mapped',
+    value: previews,
+    sourcePaths,
+    issues,
+  }
 }
 
 function extractAbilityScores(
@@ -668,6 +743,7 @@ function extractProficiencies(
 
 function extractEquipment(
   payload: DndBeyondCharacterPayload,
+  equipmentNameIndex?: DndBeyondEquipmentNameIndex,
 ): CharacterImportFieldResult<RecognizedEquipmentItem[]> {
   const sourcePaths: string[] = []
   const aggregated = new Map<string, RecognizedEquipmentItem>()
@@ -681,6 +757,9 @@ function extractEquipment(
     const key = name.toLowerCase()
     const quantity = item.quantity ?? 1
     const existing = aggregated.get(key)
+    const catalogMatch = equipmentNameIndex
+      ? resolveLocalEquipmentFromName(name, equipmentNameIndex)
+      : undefined
 
     if (existing) {
       existing.quantity += quantity
@@ -693,7 +772,8 @@ function extractEquipment(
       sourceLabel: name,
       quantity,
       equipped: item.equipped ?? undefined,
-      status: 'mapped',
+      localValue: catalogMatch?.localValue,
+      status: equipmentNameIndex ? (catalogMatch ? 'mapped' : 'unresolved-reference') : 'mapped',
     })
   }
 
@@ -710,6 +790,67 @@ function extractEquipment(
   }
 
   return mappedFieldResult(equipment, sourcePaths)
+}
+
+function extractWealth(payload: DndBeyondCharacterPayload): CharacterImportFieldResult<CoinWealth> {
+  const sourcePaths = ['data.currencies']
+
+  if (!payload.currencies) {
+    return fieldResult('missing-source', sourcePaths, [
+      'No currency data was found on the source character.',
+    ])
+  }
+
+  return mappedFieldResult(mapDndBeyondCurrenciesToWealth(payload.currencies), sourcePaths)
+}
+
+function extractSpells(
+  payload: DndBeyondCharacterPayload,
+  spellNameIndex?: DndBeyondSpellNameIndex,
+): CharacterImportFieldResult<RecognizedSpellPreview[]> {
+  const sourcePaths: string[] = []
+  const spells: RecognizedSpellPreview[] = []
+  const seen = new Set<string>()
+
+  for (const [groupIndex, group] of (payload.classSpells ?? []).entries()) {
+    for (const [spellIndex, spell] of (group.spells ?? []).entries()) {
+      const path = `data.classSpells[${groupIndex}].spells[${spellIndex}]`
+      const name = spell.definition?.name?.trim()
+
+      if (!name) continue
+
+      sourcePaths.push(path)
+
+      const key = name.toLowerCase()
+      if (seen.has(key)) continue
+      seen.add(key)
+
+      const catalogMatch = spellNameIndex
+        ? resolveLocalSpellFromName(name, spellNameIndex)
+        : undefined
+
+      spells.push({
+        sourceValue: name,
+        sourceLevel: spell.definition?.level ?? undefined,
+        prepared: spell.prepared ?? spell.alwaysPrepared ?? undefined,
+        localSlug: catalogMatch?.localSlug,
+        localValue: catalogMatch?.localValue,
+        status: spellNameIndex ? (catalogMatch ? 'mapped' : 'unresolved-reference') : 'mapped',
+      })
+    }
+  }
+
+  spells.sort((left, right) => left.sourceValue.localeCompare(right.sourceValue))
+
+  if (spells.length === 0) {
+    return fieldResult(
+      'missing-source',
+      ['data.classSpells'],
+      ['No class spells were found on the source character.'],
+    )
+  }
+
+  return mappedFieldResult(spells, sourcePaths)
 }
 
 function collectAvailableSourceData(
@@ -775,15 +916,22 @@ function collectAvailableSourceData(
   return capabilities
 }
 
+export type AdaptDndBeyondCharacterOptions = {
+  equipmentNameIndex?: DndBeyondEquipmentNameIndex
+  spellNameIndex?: DndBeyondSpellNameIndex
+}
+
 export function adaptDndBeyondCharacter(
   payload: DndBeyondCharacterPayload,
   source: DndBeyondCharacterImportSource,
+  options: AdaptDndBeyondCharacterOptions = {},
 ): CharacterImportResult {
   const dispositions: CharacterImportDispositionEntry[] = []
 
   const extraction = {
     name: extractName(payload),
     species: extractSpecies(payload),
+    classes: extractClasses(payload),
     abilityScores: extractAbilityScores(payload),
     alignment: extractAlignment(payload),
     xp: extractXp(payload),
@@ -791,7 +939,9 @@ export function adaptDndBeyondCharacter(
     hitPoints: extractHitPoints(payload),
     languages: extractLanguages(payload),
     proficiencies: extractProficiencies(payload, dispositions),
-    equipment: extractEquipment(payload),
+    equipment: extractEquipment(payload, options.equipmentNameIndex),
+    wealth: extractWealth(payload),
+    spells: extractSpells(payload, options.spellNameIndex),
   }
 
   const coverage = [
