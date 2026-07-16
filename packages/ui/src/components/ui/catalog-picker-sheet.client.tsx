@@ -81,6 +81,10 @@ export function CatalogPickerSheet<TItem>({
   tabs,
   defaultTabId,
   getItemTab,
+  recommendationsEnabled = false,
+  recommendationTabsPosition = 'before-search',
+  headerBelowDescription,
+  postSearchContent,
   toolbarControls,
   tabToolbarActions,
   transformVisibleItems,
@@ -113,8 +117,8 @@ export function CatalogPickerSheet<TItem>({
   } = useCatalogPickerSheetState({
     items,
     getSearchText,
-    getItemTab,
-    tabs,
+    getItemTab: recommendationsEnabled ? getItemTab : undefined,
+    tabs: recommendationsEnabled ? tabs : undefined,
     defaultTabId,
     hasStructuredFilters,
     transformVisibleItems,
@@ -163,16 +167,21 @@ export function CatalogPickerSheet<TItem>({
           {headerExtra ? <div className="mt-4">{headerExtra}</div> : null}
         </Sheet.Header>
 
+        {headerBelowDescription ? <div className="px-6 pb-4">{headerBelowDescription}</div> : null}
+
         <CatalogPickerSheetToolbar
           title={title}
           searchQuery={searchQuery}
           onSearchQueryChange={setSearchQuery}
           searchPlaceholder={searchPlaceholder}
           tabs={tabs}
+          recommendationsEnabled={recommendationsEnabled}
+          recommendationTabsPosition={recommendationTabsPosition}
           activeTabId={activeTabId}
           onActiveTabIdChange={setActiveTabId}
           onResetActiveTab={resetActiveTab}
           tabCounts={tabCounts}
+          postSearchContent={postSearchContent}
           tabToolbarActions={tabToolbarActions}
           toolbarControls={toolbarControls}
         />

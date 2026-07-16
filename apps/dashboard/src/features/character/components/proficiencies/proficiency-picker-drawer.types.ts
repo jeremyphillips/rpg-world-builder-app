@@ -27,8 +27,8 @@ export const PROFICIENCY_PICKER_SORT_MODES = [
 
 export const PROFICIENCY_PICKER_SORT_LABELS: Record<ProficiencyPickerSortMode, string> = {
   [PROFICIENCY_PICKER_SORT_BEST_MATCH]: 'Best match',
-  [PROFICIENCY_PICKER_SORT_NAME_ASC]: 'Name (A–Z)',
-  [PROFICIENCY_PICKER_SORT_NAME_DESC]: 'Name (Z–A)',
+  [PROFICIENCY_PICKER_SORT_NAME_ASC]: 'Name: A–Z',
+  [PROFICIENCY_PICKER_SORT_NAME_DESC]: 'Name: Z–A',
 }
 
 export type ProficiencyPickerViewDefaults = {

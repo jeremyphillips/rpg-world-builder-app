@@ -9,11 +9,13 @@ import { catalogPickerToolbarResetButtonClasses } from './catalog-picker-filter-
 export type CatalogPickerToolbarResetButtonProps = {
   label: string
   onClick: () => void
+  tabIndex?: number
 }
 
 export function CatalogPickerToolbarResetButton({
   label,
   onClick,
+  tabIndex,
 }: CatalogPickerToolbarResetButtonProps) {
   return (
     <Button
@@ -22,9 +24,33 @@ export function CatalogPickerToolbarResetButton({
       size="sm"
       className={catalogPickerToolbarResetButtonClasses}
       onClick={onClick}
+      tabIndex={tabIndex}
     >
       <RotateCcw aria-hidden className="size-3" />
       {label}
     </Button>
+  )
+}
+
+export type CatalogPickerToolbarResetSlotProps = {
+  visible: boolean
+  label: string
+  onClick: () => void
+}
+
+/** Reserves toolbar space so the reset action does not shift sibling controls. */
+export function CatalogPickerToolbarResetSlot({
+  visible,
+  label,
+  onClick,
+}: CatalogPickerToolbarResetSlotProps) {
+  return (
+    <div className={visible ? undefined : 'invisible'} aria-hidden={visible ? undefined : true}>
+      <CatalogPickerToolbarResetButton
+        label={label}
+        onClick={onClick}
+        tabIndex={visible ? undefined : -1}
+      />
+    </div>
   )
 }

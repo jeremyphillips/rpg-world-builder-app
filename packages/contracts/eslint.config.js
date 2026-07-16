@@ -16,6 +16,11 @@ export default [
         { type: 'campaign', pattern: 'src/rpg/campaign/**', mode: 'full' },
         { type: 'public', pattern: 'src/public/**', mode: 'full' },
         { type: 'dev-bench', pattern: 'src/dev-bench/**', mode: 'full' },
+        {
+          type: 'character-import',
+          pattern: 'src/character-import/**',
+          mode: 'full',
+        },
         { type: 'barrel', pattern: 'src/index.ts', mode: 'file' },
       ],
     },
@@ -42,6 +47,10 @@ export default [
             },
             { from: ['public'], allow: ['public'] },
             { from: ['dev-bench'], allow: ['dev-bench'] },
+            {
+              from: ['character-import'],
+              allow: ['validation', 'vocab', 'primitives', 'runtime', 'character-import'],
+            },
             {
               from: ['barrel'],
               allow: [

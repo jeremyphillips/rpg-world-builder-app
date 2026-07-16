@@ -41,7 +41,7 @@ export const spellPickerDetectMagicFixture = {
   name: 'Detect Magic',
   description: '<p>For the duration, you sense the presence of magic within 30 feet of you.</p>',
   school: 'divination',
-  level: 1,
+  level: 0,
   tags: { roles: ['detection'] },
   castingTime: { normal: { value: 1, unit: 'action' }, canBeCastAsRitual: true },
   range: { kind: 'self' },

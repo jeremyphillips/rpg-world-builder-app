@@ -366,6 +366,16 @@ export {
   type CatalogPickerTab,
 } from './components/ui/catalog-picker-sheet.client'
 export {
+  FilterPopover,
+  type FilterPopoverGroup,
+  type FilterPopoverProps,
+} from './components/ui/filter-popover.client'
+export {
+  SegmentedControl,
+  type SegmentedControlOption,
+  type SegmentedControlProps,
+} from './components/ui/segmented-control.client'
+export {
   sheetBodyVariants,
   sheetContentVariants,
   type SheetContentVariantProps,
@@ -398,7 +408,12 @@ export {
   type TabsVariant,
 } from './components/ui/tabs.variants'
 
-export { ChipsField, type ChipsFieldProps } from './components/ui/chips-field.client'
+export {
+  ChipsField,
+  ChipsFieldOptions,
+  type ChipsFieldProps,
+  type ChipsFieldOptionsProps,
+} from './components/ui/chips-field.client'
 export {
   ChooseFromChipsField,
   type ChooseFromChipsFieldProps,

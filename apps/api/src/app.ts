@@ -12,6 +12,7 @@ import { benchRouter } from './features/dev-bench'
 import { rulesetPatchRouter, vocabularyRouter } from './features/vocabulary'
 import { rulesetRouter } from './features/ruleset'
 import { uploadsRouter, ensureUploadDir } from './features/uploads'
+import { characterImportRouter } from './features/character-import'
 import { userRouter } from './features/user'
 
 /**
@@ -20,7 +21,7 @@ import { userRouter } from './features/user'
  * No CORS is configured — the browser only ever talks to one origin.
  */
 export function createApp(): Express {
-  const { devBenchEnabled } = loadEnv()
+  const { devBenchEnabled, characterImportEnabled } = loadEnv()
   const app = express()
 
   // Ensure the upload directory exists before any requests are handled.
@@ -50,6 +51,9 @@ export function createApp(): Express {
   api.use('/users', userRouter)
   if (devBenchEnabled) {
     api.use('/bench', benchRouter)
+  }
+  if (characterImportEnabled) {
+    api.use('/character-import', characterImportRouter)
   }
 
   app.use('/api', api)

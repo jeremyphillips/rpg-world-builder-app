@@ -22,12 +22,57 @@ type CatalogPickerSheetToolbarProps = {
   onSearchQueryChange: (value: string) => void
   searchPlaceholder: string
   tabs?: readonly CatalogPickerTab[]
+  recommendationsEnabled?: boolean
+  recommendationTabsPosition?: 'before-search' | 'after-search'
   activeTabId: string
   onActiveTabIdChange: (tabId: string) => void
   onResetActiveTab: () => void
   tabCounts: Record<string, number>
+  postSearchContent?: ReactNode
   tabToolbarActions?: ReactNode | ((context: CatalogPickerSheetToolbarContext) => ReactNode)
   toolbarControls?: ReactNode | ((context: CatalogPickerSheetToolbarContext) => ReactNode)
+}
+
+function CatalogPickerRecommendationTabs({
+  title,
+  tabs,
+  activeTabId,
+  onActiveTabIdChange,
+  tabCounts,
+  tabToolbarActions,
+  toolbarContext,
+}: {
+  title: string
+  tabs: readonly CatalogPickerTab[]
+  activeTabId: string
+  onActiveTabIdChange: (tabId: string) => void
+  tabCounts: Record<string, number>
+  tabToolbarActions?: ReactNode | ((context: CatalogPickerSheetToolbarContext) => ReactNode)
+  toolbarContext: CatalogPickerSheetToolbarContext
+}) {
+  const renderedTabActions =
+    typeof tabToolbarActions === 'function' ? tabToolbarActions(toolbarContext) : tabToolbarActions
+
+  return (
+    <div className={catalogPickerSheetTabRowVariants()}>
+      <Tabs value={activeTabId} onValueChange={onActiveTabIdChange} className="min-w-0 flex-1">
+        <TabsList aria-label={`${title} views`} className="w-full border-b-0">
+          {tabs.map((tab) => {
+            const count = tab.count ?? tabCounts[tab.id] ?? 0
+            return (
+              <TabsTrigger key={tab.id} value={tab.id}>
+                {tab.label}
+                <Text as="span" variant="muted" className="ml-1 tabular-nums">
+                  ({count})
+                </Text>
+              </TabsTrigger>
+            )
+          })}
+        </TabsList>
+      </Tabs>
+      {renderedTabActions ? <div className="shrink-0">{renderedTabActions}</div> : null}
+    </div>
+  )
 }
 
 export function CatalogPickerSheetToolbar({
@@ -36,10 +81,13 @@ export function CatalogPickerSheetToolbar({
   onSearchQueryChange,
   searchPlaceholder,
   tabs,
+  recommendationsEnabled = false,
+  recommendationTabsPosition = 'before-search',
   activeTabId,
   onActiveTabIdChange,
   onResetActiveTab,
   tabCounts,
+  postSearchContent,
   tabToolbarActions,
   toolbarControls,
 }: CatalogPickerSheetToolbarProps) {
@@ -48,36 +96,29 @@ export function CatalogPickerSheetToolbar({
     setSearchQuery: onSearchQueryChange,
     clearSearchQuery: () => onSearchQueryChange(''),
     activeTabId,
+    setActiveTabId: onActiveTabIdChange,
     resetActiveTab: onResetActiveTab,
   }
 
   const renderedControls =
     typeof toolbarControls === 'function' ? toolbarControls(toolbarContext) : toolbarControls
-  const renderedTabActions =
-    typeof tabToolbarActions === 'function' ? tabToolbarActions(toolbarContext) : tabToolbarActions
+
+  const recommendationTabs =
+    recommendationsEnabled && tabs && tabs.length > 0 ? (
+      <CatalogPickerRecommendationTabs
+        title={title}
+        tabs={tabs}
+        activeTabId={activeTabId}
+        onActiveTabIdChange={onActiveTabIdChange}
+        tabCounts={tabCounts}
+        tabToolbarActions={tabToolbarActions}
+        toolbarContext={toolbarContext}
+      />
+    ) : null
 
   return (
     <div className={catalogPickerSheetToolbarVariants()}>
-      {tabs && tabs.length > 0 ? (
-        <div className={catalogPickerSheetTabRowVariants()}>
-          <Tabs value={activeTabId} onValueChange={onActiveTabIdChange} className="min-w-0 flex-1">
-            <TabsList aria-label={`${title} views`} className="w-full border-b-0">
-              {tabs.map((tab) => {
-                const count = tab.count ?? tabCounts[tab.id] ?? 0
-                return (
-                  <TabsTrigger key={tab.id} value={tab.id}>
-                    {tab.label}
-                    <Text as="span" variant="muted" className="ml-1 tabular-nums">
-                      ({count})
-                    </Text>
-                  </TabsTrigger>
-                )
-              })}
-            </TabsList>
-          </Tabs>
-          {renderedTabActions ? <div className="shrink-0">{renderedTabActions}</div> : null}
-        </div>
-      ) : null}
+      {recommendationTabsPosition === 'before-search' ? recommendationTabs : null}
 
       <div className={catalogPickerSheetSearchRowVariants()}>
         <Search
@@ -92,6 +133,10 @@ export function CatalogPickerSheetToolbar({
           className="pl-9"
         />
       </div>
+
+      {recommendationTabsPosition === 'after-search' ? recommendationTabs : null}
+
+      {postSearchContent ? <div>{postSearchContent}</div> : null}
 
       {renderedControls ? <div>{renderedControls}</div> : null}
     </div>

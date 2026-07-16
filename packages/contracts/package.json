@@ -61,6 +61,10 @@
     "./dev-bench": {
       "types": "./src/dev-bench/index.ts",
       "default": "./src/dev-bench/index.ts"
+    },
+    "./character-import": {
+      "types": "./src/character-import/index.ts",
+      "default": "./src/character-import/index.ts"
     }
   },
   "scripts": {

@@ -351,9 +351,7 @@ describe('EquipmentPickerDrawer', () => {
     await user.click(screen.getByRole('option', { name: 'Name: Z–A' }))
     await user.click(screen.getByRole('tab', { name: /All/i }))
 
-    expect(screen.getByRole('combobox', { name: 'Equipment sort order' })).toHaveTextContent(
-      'Name: Z–A',
-    )
+    expect(screen.getByRole('combobox', { name: 'Equipment sort order' })).toHaveTextContent('Z–A')
   })
 
   it('renders reset view inline with the tab row', async () => {
@@ -437,9 +435,7 @@ describe('EquipmentPickerDrawer', () => {
       />,
     )
 
-    expect(screen.getByRole('combobox', { name: 'Equipment sort order' })).toHaveTextContent(
-      'Name: Z–A',
-    )
+    expect(screen.getByRole('combobox', { name: 'Equipment sort order' })).toHaveTextContent('Z–A')
   })
 
   it('keeps added rows visible after quick-add', async () => {

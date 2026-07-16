@@ -18,6 +18,7 @@ import {
   CampaignSettingsRoute,
   CharacterCreateRoute,
   CharacterDetailRoute,
+  CharacterImportRoute,
   CharactersOverviewRoute,
   ClassCreateRoute,
   ClassDetailRoute,
@@ -73,6 +74,11 @@ const router = createBrowserRouter(
               } satisfies CrumbHandle,
               children: [
                 { index: true, element: <CharactersOverviewRoute /> },
+                {
+                  path: 'import',
+                  element: <CharacterImportRoute />,
+                  handle: { crumb: () => ({ label: 'Import' }) } satisfies CrumbHandle,
+                },
                 {
                   path: ':characterId',
                   element: <CharacterDetailRoute />,
