@@ -1,0 +1,96 @@
+import type { NameCollectionManifestEntry } from '@rpg/contracts/name-generator'
+
+export const COLLECTION_MANIFEST_ENTRIES = [
+  {
+    id: 'elvish-given-pool',
+    label: 'Elvish given names',
+    subjectKinds: ['person'],
+    generatorKinds: ['sample'],
+    assetPath: 'collections/elvish-given-pool.ts',
+    approximateResultCount: 19,
+  },
+  {
+    id: 'elvish-family-pool',
+    label: 'Elvish family names',
+    subjectKinds: ['person'],
+    generatorKinds: ['sample'],
+    assetPath: 'collections/elvish-family-pool.ts',
+    approximateResultCount: 7,
+  },
+  {
+    id: 'elvish-place-root-pool',
+    label: 'Elvish settlement roots',
+    subjectKinds: ['settlement', 'landmark'],
+    generatorKinds: ['sample'],
+    assetPath: 'collections/elvish-place-root-pool.ts',
+    approximateResultCount: 7,
+  },
+  {
+    id: 'elvish-place-suffix-pool',
+    label: 'Elvish settlement suffixes',
+    subjectKinds: ['settlement', 'landmark'],
+    generatorKinds: ['sample'],
+    assetPath: 'collections/elvish-place-suffix-pool.ts',
+    approximateResultCount: 7,
+  },
+  {
+    id: 'draconic-personal-pool',
+    label: 'Draconic personal names',
+    subjectKinds: ['person', 'creature'],
+    generatorKinds: ['sample'],
+    assetPath: 'collections/draconic-personal-pool.ts',
+    approximateResultCount: 8,
+  },
+  {
+    id: 'draconic-clan-pool',
+    label: 'Draconic clan names',
+    subjectKinds: ['clan', 'family'],
+    generatorKinds: ['sample'],
+    assetPath: 'collections/draconic-clan-pool.ts',
+    approximateResultCount: 6,
+  },
+  {
+    id: 'dwarven-settlement-pool',
+    label: 'Dwarven settlement compounds',
+    subjectKinds: ['settlement'],
+    generatorKinds: ['compound'],
+    assetPath: 'collections/dwarven-settlement-pool.ts',
+    approximateResultCount: 36,
+  },
+  {
+    id: 'faction-descriptor-pool',
+    label: 'Faction descriptors',
+    subjectKinds: ['faction', 'organization'],
+    generatorKinds: ['sample'],
+    assetPath: 'collections/faction-descriptor-pool.ts',
+    approximateResultCount: 7,
+  },
+  {
+    id: 'faction-org-type-pool',
+    label: 'Organization types',
+    subjectKinds: ['faction', 'organization'],
+    generatorKinds: ['sample'],
+    assetPath: 'collections/faction-org-type-pool.ts',
+    approximateResultCount: 6,
+  },
+  {
+    id: 'akan-given-pool',
+    label: 'Akan given names',
+    subjectKinds: ['person'],
+    generatorKinds: ['sample'],
+    assetPath: 'collections/akan-given-pool.ts',
+    approximateResultCount: 12,
+  },
+  {
+    id: 'akan-family-pool',
+    label: 'Akan family names',
+    subjectKinds: ['person', 'family'],
+    generatorKinds: ['sample'],
+    assetPath: 'collections/akan-family-pool.ts',
+    approximateResultCount: 6,
+  },
+] as const satisfies readonly NameCollectionManifestEntry[]
+
+export const COLLECTION_MANIFEST_IDS = new Set<string>(
+  COLLECTION_MANIFEST_ENTRIES.map((entry) => entry.id),
+)
