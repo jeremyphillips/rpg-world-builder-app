@@ -6,19 +6,39 @@ shapes: [`field-config.ts`](../../src/form/field-config.ts). Runnable examples: 
 
 ## Standard leaf types (brief)
 
-| `type`      | Value     | Notes                                                     |
-| ----------- | --------- | --------------------------------------------------------- |
-| `text`      | `string`  | Optional `inputType`, `autoComplete`                      |
-| `number`    | `number`  | `min`/`max` for Zod only; `digits`, `inputWidth`          |
-| `textarea`  | `string`  | `rows`, optional `optionalDisclosure` (v1: textarea only) |
-| `select`    | `string`  | Flat or grouped options; `optionAvailability`             |
-| `radio`     | `string`  | `orientation`, `labelHidden`                              |
-| `radioCard` | `string`  | Card-style options with `meta` / `badge`                  |
-| `checkbox`  | `boolean` |                                                           |
-| `switch`    | `boolean` | `labelPosition`: `inline`, `above`, `settings`            |
-| `file`      | `File[]`  | `accept`, `multiple`, `maxFiles`, `maxSize`               |
+| `type`      | Value     | Notes                                                                      |
+| ----------- | --------- | -------------------------------------------------------------------------- |
+| `text`      | `string`  | Optional `inputType`, `autoComplete`                                       |
+| `number`    | `number`  | `min`/`max` for Zod only; `digits`, `inputWidth`                           |
+| `textarea`  | `string`  | `rows`, optional `optionalDisclosure` (v1: textarea only)                  |
+| `select`    | `string`  | Flat or grouped options; `optionAvailability`; `presentation.readOnlyWhen` |
+| `radio`     | `string`  | `orientation`, `labelHidden`                                               |
+| `radioCard` | `string`  | Card-style options with `meta` / `badge`                                   |
+| `checkbox`  | `boolean` |                                                                            |
+| `switch`    | `boolean` | `labelPosition`: `inline`, `above`, `settings`                             |
+| `file`      | `File[]`  | `accept`, `multiple`, `maxFiles`, `maxSize`                                |
 
 `select` and `combobox` fields default to `Select {label}…` when `placeholder` is omitted.
+
+### Select read-only presentation
+
+When filtered options collapse to a single choice, swap the trigger for `FieldReadOnlyValue`
+instead of a one-option dropdown. Value stays registered in RHF and still validates.
+
+```ts
+{
+  type: 'select',
+  name: 'amount',
+  label: 'Amount',
+  options: amountOptions,
+  presentation: {
+    readOnlyWhen: ({ options }) => options.length === 1,
+  },
+}
+```
+
+Works with `filterSelectOptions` on parent `array` configs — `readOnlyWhen` receives the
+resolved flat option list after array filtering and `optionAvailability`.
 
 ## Optional disclosure (`optionalDisclosure`)
 

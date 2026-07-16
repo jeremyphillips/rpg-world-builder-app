@@ -162,6 +162,12 @@ export {
   type SelectFieldProps,
   type SelectFieldOption,
 } from './components/ui/select-field'
+export {
+  FieldReadOnlyValue,
+  FieldReadOnlyValueField,
+  type FieldReadOnlyValueProps,
+  type FieldReadOnlyValueFieldProps,
+} from './components/ui/field-read-only-value.client'
 export { CheckboxField, type CheckboxFieldProps } from './components/ui/checkbox-field'
 export { SwitchField, type SwitchFieldProps } from './components/ui/switch-field'
 export {

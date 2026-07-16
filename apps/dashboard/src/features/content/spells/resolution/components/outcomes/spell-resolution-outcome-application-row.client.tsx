@@ -1,6 +1,13 @@
 'use client'
 
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Text } from '@rpg/ui'
+import {
+  FieldReadOnlyValue,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@rpg/ui'
 import {
   ArrayFieldContext,
   ArrayItemActionsRail,
@@ -45,13 +52,27 @@ function HiddenEffectIdField({ itemPrefix }: { itemPrefix: string }) {
   return <input type="hidden" {...field} value={field.value ?? ''} />
 }
 
-function ReadOnlyAmountLabel({ label }: { label: string }) {
-  const { size } = useFormSectionContext()
-
+function ReadOnlyAmountValue({
+  id,
+  label,
+  titleId,
+  describedBy,
+  size,
+}: {
+  id: string
+  label: string
+  titleId: string
+  describedBy?: string
+  size: 'sm' | 'md' | 'lg'
+}) {
   return (
-    <Text variant="muted" className={size === 'sm' ? 'text-sm' : undefined}>
-      {label}
-    </Text>
+    <FieldReadOnlyValue
+      id={id}
+      displayValue={label}
+      size={size}
+      ariaLabelledBy={titleId}
+      ariaDescribedBy={describedBy}
+    />
   )
 }
 
@@ -284,9 +305,22 @@ function OutcomeApplicationRowAmountControl({
   describedByIds?: string
   presentation: ReturnType<typeof buildOutcomeApplicationRowPresentation>
 }) {
+  const { size } = useFormSectionContext()
+
   if (!presentation.showAmountControl) return null
+
+  const { id } = buildFieldRendererIds(outcomeApplicationAmountField, idPrefix, itemPrefix)
+
   if (presentation.singleAmountOption) {
-    return <ReadOnlyAmountLabel label={presentation.singleAmountOption.label} />
+    return (
+      <ReadOnlyAmountValue
+        id={id}
+        label={presentation.singleAmountOption.label}
+        titleId={titleId}
+        describedBy={describedByIds}
+        size={size}
+      />
+    )
   }
 
   return (

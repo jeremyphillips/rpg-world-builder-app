@@ -4,6 +4,14 @@ Guidance for AI agents working in this repo. Concise by design — follow the
 links for depth. See [docs/architecture.md](docs/architecture.md) for the
 system overview.
 
+## Project stage
+
+This is a **dev-only** project — no production users or live data. When
+changing schemas (MongoDB, Zod contracts in `@rpg/contracts`, catalog JSON,
+etc.), prefer the direct, clean shape over backward-compatible migrations. Do
+not add migration scripts, versioned transforms, or dual-read paths unless the
+user explicitly asks.
+
 ## Quality gate
 
 Work is **not done** until the tiered gates pass. Hook scripts are the source of

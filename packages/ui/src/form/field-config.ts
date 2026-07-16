@@ -98,6 +98,23 @@ export function isFieldOptionGroup(item: SelectFieldOptionListItem): item is Fie
   return 'kind' in item && item.kind === 'group'
 }
 
+/** Flattens grouped select config items to a plain option list. */
+export function flattenSelectFieldOptions(
+  options: readonly SelectFieldOptionListItem[],
+): FieldOption[] {
+  return options.flatMap((item) => (isFieldOptionGroup(item) ? item.options : [item]))
+}
+
+/** Context passed to `presentation.readOnlyWhen` for option-backed fields. */
+export type FieldReadOnlyContext = {
+  options: FieldOption[]
+}
+
+/** Presentation overrides that swap an editable control for read-only chrome. */
+export type FieldPresentationConfig = {
+  readOnlyWhen?: (context: FieldReadOnlyContext) => boolean
+}
+
 /**
  * Builds `FieldOption[]` from a value list (typically a contract enum constant)
  * and a label map. Keying the labels by the value union makes a missing or
@@ -191,6 +208,8 @@ interface BaseFieldConfig {
   separator?: FieldSeparator
   /** Visual shell around the full field anatomy (label + control + messages). */
   chrome?: FieldChrome
+  /** Optional presentation overrides (e.g. read-only when only one option remains). */
+  presentation?: FieldPresentationConfig
 }
 
 /** Field kinds that may use `optionalDisclosure` when renderer support lands. */
@@ -1188,4 +1207,45 @@ export function applyOptionAvailabilityToSelectOptions(
         }
       : applyOptionAvailabilityToFieldOptions([item], availability, values)[0]!,
   )
+}
+
+/** Resolves a select field's flat option list after availability and array filters. */
+export function resolveSelectFieldFlatOptions(
+  config: SelectFieldConfig,
+  optionValues: Record<string, unknown>,
+  arrayFilter?: (options: FieldOption[], fieldName: string) => FieldOption[],
+): FieldOption[] {
+  let options = flattenSelectFieldOptions(config.options)
+  if (config.optionAvailability) {
+    options = applyOptionAvailabilityToFieldOptions(
+      options,
+      config.optionAvailability,
+      optionValues,
+    )
+  }
+  if (arrayFilter) {
+    options = arrayFilter(options, config.name)
+  }
+  return options
+}
+
+export function isSelectFieldReadOnly(
+  config: SelectFieldConfig,
+  resolvedOptions: FieldOption[],
+): boolean {
+  return config.presentation?.readOnlyWhen?.({ options: resolvedOptions }) ?? false
+}
+
+/** Label for the current select value; falls back to the sole option when read-only. */
+export function resolveSelectFieldDisplayLabel(
+  value: unknown,
+  options: FieldOption[],
+): string | undefined {
+  const normalized = value != null && value !== '' ? String(value) : undefined
+  if (normalized) {
+    const match = options.find((option) => option.value === normalized)
+    if (match) return match.label
+  }
+  if (options.length === 1) return options[0]?.label
+  return normalized
 }

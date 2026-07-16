@@ -140,6 +140,19 @@ its body if the body is alive and ...
 
 Read merged text aloud — no missing words across former page breaks.
 
+### Spell name references
+
+When prose cites another spell by name, wrap it in `<em>` (italics):
+
+```html
+<p>...until a strong wind (such as one created by <em>Gust of Wind</em>) disperses it.</p>
+<p>...whether the <em>Hallow</em> spell is active there...</p>
+```
+
+Apply in `description`, `cantripScaling`, `higherLevelSlotEffect`, and outcome `note` riders.
+Use the published spell name (title case). Do not italicize conditions, damage types, or
+generic game terms — only named spells (and similar named spell-like effects when cited as spells).
+
 ---
 
 ## Resolution track boundaries
@@ -187,6 +200,39 @@ modeling: {
 - Known limitations after the blocker is solved. Higher status may still carry gaps.
 - Peripheral/environmental gaps do not automatically prevent promotion.
 - Do not invent gap codes for isolated wording — check `spell-modeling-gap-codes.ts` first.
+
+### Authoring requirements
+
+Every new or materially changed spell **must** include a reviewed `modeling` manifest entry
+(applied to the seed via `apply-spell-modeling-metadata.mjs`). Do not ship seed/resolution
+work without it.
+
+| Field     | Required when                                                                                  |
+| --------- | ---------------------------------------------------------------------------------------------- |
+| `status`  | Always — honest rung for current structure (default `prose-only` when no `resolution`)         |
+| `blocker` | **Always for `prose-only`**; for editor-active spells, when the next promotion rung is blocked |
+| `gaps`    | Only when residual limitations remain after the blocker; **omit** when none — never `[]`       |
+
+`blocker` documents the single causal limitation preventing the **next** meaningful
+promotion. `gaps` document known residuals that remain after that blocker is solved — not
+a substitute for `blocker`, and never duplicate `blocker.code`.
+
+### New gap codes
+
+Prefer an existing code from `spell-modeling-gap-codes.ts` (and split registries it
+composes). Do not mint a code for isolated wording or a single spell without checking
+the registry first.
+
+When no existing code fits, **stop and return explicitly** with:
+
+1. **Proposed code(s)** — kebab-case slug(s) to add to the appropriate registry file
+2. **Justification** — why existing codes are insufficient; which mechanic family the code
+   represents; whether it is expected to recur across spells (not spell-specific prose)
+3. **Registry patch** — which file(s) under `packages/contracts/src/rpg/content/spell/modeling/`
+   need updating
+
+Do not use an unregistered code in a manifest/seed patch without including this proposal.
+Do not add registry entries silently — the user must see the code and rationale first.
 
 ---
 
@@ -278,18 +324,19 @@ Structured `resolution.progression` supersedes scaling prose on detail surfaces 
 When given spell text:
 
 1. Tier 0/1 context if slug exists.
-2. Normalize PDF → `description` (+ scaling prose if needed) per [SRD paste rules](#srd-pdf-paste-rules).
+2. Normalize PDF → `description` (+ scaling prose if needed) per [SRD paste rules](#srd-pdf-paste-rules); italicize cited spell names with `<em>`.
 3. Identify selection (`self` | `targets` | `point` | `none`) and method (`attack` | `saving-throw` | `automatic`).
 4. Validate selection × method compatibility.
 5. Target count/kind, range, origin, area.
 6. Reusable effects, outcome branches, application amounts.
 7. Progression (character-level / slot-level).
 8. Separate core mechanics from Additional behavior prose.
-9. Proposed `modeling`: status, blocker, capability, residual gaps.
-10. Output: analysis, plan, seed/manifest patch, or schema/UI plan as requested.
+9. **Required** `modeling` manifest entry: `status`, `blocker` (per [Authoring requirements](#authoring-requirements)), and residual `gaps` when applicable.
+10. If a new gap code is needed, return proposed code(s), justification, and registry patch plan per [New gap codes](#new-gap-codes) — do not proceed with an unregistered code.
+11. Output: analysis, plan, seed/manifest patch, or schema/UI plan as requested — manifest patch is part of every spell authoring deliverable.
 
 Never infer unsupported mechanics from prose at runtime. Flag ambiguities explicitly.
-Do not inject description into resolution.
+Do not inject description into resolution. Never omit `modeling` on a new spell seed.
 
 ---
 
@@ -341,6 +388,14 @@ When adding form capability:
 
 **Section order:** Selection → How it resolves → Effects & outcomes → Progression.
 
+**Author-facing copy:** labels, hints, banners, and `inlineSentence` text are for spell authors —
+not engineers. Do **not** surface internal schema or code terms (`selectionMode`, `effectId`,
+`application-pattern`, `per-projectile`, `thresholds` track kind, gap codes, etc.) unless the
+SRD itself uses that exact phrase. Prefer clear natural language; follow existing tone in
+[`resolution-form-labels.ts`](../../../apps/dashboard/src/features/content/spells/resolution/lib/form/resolution-form-labels.ts)
+(`How it resolves`, `Authored effects`, `Additional behavior`). Use judgement: SRD terms authors
+already know (`Dexterity saving throw`, `Heavily Obscured`) are fine; implementation vocabulary is not.
+
 **inlineSentence:** short grammatical target sentences (`resolution-target-form-fields.ts`,
 [`field-types.md`](../../../packages/ui/docs/forms/field-types.md)). Not for many optional branches.
 
@@ -363,12 +418,14 @@ Do not:
 - confuse residual gaps with primary blockers
 - use vague `capabilityId` values
 - duplicate blocker codes in `gaps`
-- invent gap codes without checking registry
+- invent gap codes without checking registry — when a new code is justified, return the proposed code(s), rationale, and registry file(s) per [New gap codes](#new-gap-codes)
 - force intentionally prose-only behavior into schema
 - expose structured data below its consumer threshold
 - recommend UI controls for invalid combinations
 - inject description prose into resolution
 - over-generalize shared form APIs before a repeated pattern exists
+- expose internal resolution/schema jargon in author-visible UI copy
+- ship a new or updated spell seed without a reviewed `modeling` manifest entry (`status` + `blocker`/`gaps` per [Authoring requirements](#authoring-requirements))
 
 Every recommendation states: what becomes possible · what stays prose · what stays blocked ·
 why the status is honest · which consumer is unlocked · which sources support the conclusion.

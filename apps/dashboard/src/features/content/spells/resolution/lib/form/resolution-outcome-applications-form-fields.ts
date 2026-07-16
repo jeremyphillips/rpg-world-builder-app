@@ -31,6 +31,9 @@ export const outcomeApplicationAmountField = {
   label: '',
   options: RESOLUTION_OUTCOME_AMOUNT_OPTIONS,
   width: 'lg',
+  presentation: {
+    readOnlyWhen: ({ options }) => options.length === 1,
+  },
 } satisfies FieldConfig
 
 export function outcomeApplicationsResolverItemFields(): FormItem[] {

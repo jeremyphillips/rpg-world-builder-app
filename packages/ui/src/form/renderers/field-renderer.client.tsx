@@ -14,7 +14,6 @@ import { ComboboxField } from '../../components/ui/combobox-field.client'
 import { NumberField } from '../../components/ui/number-field'
 import { RadioCardField } from '../../components/ui/radio-card-field'
 import { RadioGroupField } from '../../components/ui/radio-group-field'
-import { SelectField } from '../../components/ui/select-field'
 import { SwitchField } from '../../components/ui/switch-field'
 import { TextareaField } from '../../components/ui/textarea-field'
 import { TextField } from '../../components/ui/text-field'
@@ -26,11 +25,13 @@ import { DiceFormulaFieldRenderer } from './fields/dice-formula-field-renderer.c
 import { buildFieldRendererIds, resolveFieldRenderConfig } from './field-renderer-config.lib'
 import { renderSpecializedField } from './fields/field-renderer-specialized.client'
 import { OptionalDisclosureTextareaFieldRenderer } from './fields/optional-disclosure-field-renderer.client'
+import { SelectFieldRenderer } from './fields/select-field-renderer.client'
 import { LazyFieldSuspense, lazyFieldComponent } from './lazy-field.client'
 import type {
   FieldConfig,
   FieldType,
   InputSelectFieldConfig,
+  SelectFieldConfig,
   InlineSentenceFieldConfig,
   InlineChooseCountFieldConfig,
   ChooseFromChipsFieldConfig,
@@ -101,6 +102,7 @@ const fieldRenderers: {
   [K in Exclude<
     FieldType,
     | 'inputSelect'
+    | 'select'
     | 'levelRange'
     | 'inlineSentence'
     | 'inlineChooseCount'
@@ -172,27 +174,6 @@ const fieldRenderers: {
       ref={field.ref}
       value={field.value ?? ''}
       onChange={field.onChange}
-      onBlur={field.onBlur}
-    />
-  ),
-  select: ({ config, field, id, ...validation }) => (
-    <SelectField
-      id={id}
-      label={config.label}
-      options={config.options}
-      {...fieldValidationProps(validation)}
-      hint={config.hint}
-      hintPosition={config.hintPosition}
-      info={config.info}
-      required={config.required}
-      width={config.width}
-      size={config.size}
-      digits={config.digits}
-      labelPosition={config.labelPosition}
-      placeholder={config.placeholder}
-      disabled={config.disabled}
-      value={field.value != null && field.value !== '' ? String(field.value) : ''}
-      onValueChange={field.onChange}
       onBlur={field.onBlur}
     />
   ),
@@ -450,6 +431,12 @@ export function FieldRenderer({ config, idPrefix, namePrefix }: FieldRendererPro
   const specialized = renderSpecializedField({ renderConfig, fullName, id, namePrefix })
   if (specialized) return specialized
 
+  if (config.type === 'select') {
+    return (
+      <SelectFieldRenderer config={config} fullName={fullName} id={id} namePrefix={namePrefix} />
+    )
+  }
+
   return (
     <StandardFieldRenderer
       config={config}
@@ -464,6 +451,7 @@ export function FieldRenderer({ config, idPrefix, namePrefix }: FieldRendererPro
 type StandardFieldConfig = Exclude<
   FieldConfig,
   | InputSelectFieldConfig
+  | SelectFieldConfig
   | LevelRangeFieldConfig
   | InlineSentenceFieldConfig
   | InlineChooseCountFieldConfig
