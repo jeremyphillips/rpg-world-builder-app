@@ -16,16 +16,31 @@ const envSchema = z.object({
   MAX_UPLOAD_BYTES: z.coerce.number().int().positive().default(5_242_880),
   /** Mount unauthenticated `/api/bench` routes. Defaults off in production. */
   DEV_BENCH_ENABLED: z.enum(['true', 'false']).optional(),
+  /** Mount `/api/character-import` routes. Defaults off in production. */
+  CHARACTER_IMPORT_ENABLED: z.enum(['true', 'false']).optional(),
+  /** Outbound D&D Beyond character fetch timeout in milliseconds. */
+  DND_BEYOND_FETCH_TIMEOUT_MS: z.coerce.number().int().positive().default(10_000),
 })
 
 export type Env = z.infer<typeof envSchema> & {
   isProduction: boolean
   devBenchEnabled: boolean
+  characterImportEnabled: boolean
+  dndBeyondFetchTimeoutMs: number
 }
 
 function resolveDevBenchEnabled(
   nodeEnv: z.infer<typeof envSchema>['NODE_ENV'],
   raw: z.infer<typeof envSchema>['DEV_BENCH_ENABLED'],
+): boolean {
+  if (raw === 'true') return true
+  if (raw === 'false') return false
+  return nodeEnv !== 'production'
+}
+
+function resolveCharacterImportEnabled(
+  nodeEnv: z.infer<typeof envSchema>['NODE_ENV'],
+  raw: z.infer<typeof envSchema>['CHARACTER_IMPORT_ENABLED'],
 ): boolean {
   if (raw === 'true') return true
   if (raw === 'false') return false
@@ -49,6 +64,8 @@ export function loadEnv(source: NodeJS.ProcessEnv = process.env): Env {
     UPLOAD_DIR: source.UPLOAD_DIR,
     MAX_UPLOAD_BYTES: source.MAX_UPLOAD_BYTES,
     DEV_BENCH_ENABLED: source.DEV_BENCH_ENABLED,
+    CHARACTER_IMPORT_ENABLED: source.CHARACTER_IMPORT_ENABLED,
+    DND_BEYOND_FETCH_TIMEOUT_MS: source.DND_BEYOND_FETCH_TIMEOUT_MS,
   })
 
   if (!parsed.success) {
@@ -62,6 +79,11 @@ export function loadEnv(source: NodeJS.ProcessEnv = process.env): Env {
     ...parsed.data,
     isProduction: parsed.data.NODE_ENV === 'production',
     devBenchEnabled: resolveDevBenchEnabled(parsed.data.NODE_ENV, parsed.data.DEV_BENCH_ENABLED),
+    characterImportEnabled: resolveCharacterImportEnabled(
+      parsed.data.NODE_ENV,
+      parsed.data.CHARACTER_IMPORT_ENABLED,
+    ),
+    dndBeyondFetchTimeoutMs: parsed.data.DND_BEYOND_FETCH_TIMEOUT_MS,
   }
   return cached
 }

@@ -7,6 +7,10 @@ export const ROUTES = {
   characters: {
     list: '/characters',
     new: '/characters/new',
+    import: (campaignId?: string) =>
+      campaignId
+        ? `/characters/import?campaignId=${encodeURIComponent(campaignId)}`
+        : '/characters/import',
     detail: (characterId: string) => `/characters/${characterId}`,
   },
   account: '/account',
