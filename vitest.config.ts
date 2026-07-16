@@ -10,6 +10,8 @@ export default defineConfig({
       '!packages/ui/vitest.config.ts',
       'packages/ui/vitest.*.config.ts',
       'apps/*/vitest.config.ts',
+      '!apps/api/vitest.config.ts',
+      'apps/api/vitest.*.config.ts',
       '!apps/dashboard/vitest.config.ts',
       'apps/dashboard/vitest.*.config.ts',
       '!apps/bench/vitest.config.ts',

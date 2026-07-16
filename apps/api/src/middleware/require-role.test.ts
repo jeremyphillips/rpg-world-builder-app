@@ -1,4 +1,4 @@
-import { afterAll, beforeAll, describe, expect, it } from 'vitest'
+import { beforeAll, describe, expect, it } from 'vitest'
 import express, { type Express } from 'express'
 import cookieParser from 'cookie-parser'
 import request from 'supertest'
@@ -9,12 +9,14 @@ import { errorHandler } from './error-handler'
 import { requireAuth } from './require-auth'
 import { requirePlatformRole } from './require-role'
 import { createUser } from '../features/user'
-import { clearTestDb, startTestDb, stopTestDb } from '../test/db'
+import { clearTestDb } from '../test/db'
+import { useIntegrationDb } from '../test/setup/integration-db'
+
+useIntegrationDb()
 
 let app: Express
 
 beforeAll(async () => {
-  await startTestDb()
   await clearTestDb()
 
   app = express()
@@ -23,10 +25,6 @@ beforeAll(async () => {
     res.status(200).json({ ok: true })
   })
   app.use(errorHandler)
-})
-
-afterAll(async () => {
-  await stopTestDb()
 })
 
 function sessionCookie(

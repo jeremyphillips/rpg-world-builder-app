@@ -1,10 +1,9 @@
 import bcrypt from 'bcryptjs'
 import type { LoginInput, RegisterInput, User } from '@rpg/contracts'
 
+import { BCRYPT_ROUNDS } from '../../lib/bcrypt-rounds'
 import { HttpError } from '../../lib/http-error'
 import { createUser, findUserByEmailWithSecret } from '../user'
-
-const BCRYPT_ROUNDS = 12
 
 export async function registerUser(input: RegisterInput): Promise<User> {
   const existing = await findUserByEmailWithSecret(input.email)

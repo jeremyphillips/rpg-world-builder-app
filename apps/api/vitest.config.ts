@@ -1,15 +1,9 @@
-import { defineConfig, mergeConfig } from 'vitest/config'
-import base from '@rpg/config/vitest/base'
+import { defineConfig } from 'vitest/config'
 
-export default mergeConfig(
-  base,
-  defineConfig({
-    test: {
-      environment: 'node',
-      // Auth/db integration suites share a single in-memory Mongo; keep them serial.
-      fileParallelism: false,
-      hookTimeout: 30_000,
-      testTimeout: 30_000,
-    },
-  }),
-)
+// Split integration (Mongo + serial) from pure lib tests (parallel, no DB).
+// Leaf configs are referenced from the repo-root vitest runner (see vitest.config.ts).
+export default defineConfig({
+  test: {
+    projects: ['./vitest.integration.config.ts', './vitest.unit.config.ts'],
+  },
+})

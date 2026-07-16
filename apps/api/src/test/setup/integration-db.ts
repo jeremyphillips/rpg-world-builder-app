@@ -1,18 +1,10 @@
-import { afterAll, beforeAll, beforeEach } from 'vitest'
+import { beforeEach } from 'vitest'
 
-import { clearTestDb, startTestDb, stopTestDb } from '../db'
+import { clearTestDb } from '../db'
 
-/** Registers in-memory Mongo lifecycle hooks for integration tests. */
+/** Registers per-test DB clearing for integration suites (Mongo is started in globalSetup). */
 export function useIntegrationDb(): void {
-  beforeAll(async () => {
-    await startTestDb()
-  })
-
   beforeEach(async () => {
     await clearTestDb()
-  })
-
-  afterAll(async () => {
-    await stopTestDb()
   })
 }

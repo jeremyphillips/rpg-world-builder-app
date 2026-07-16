@@ -1,23 +1,13 @@
-import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest'
+import { describe, expect, it } from 'vitest'
 import mongoose from 'mongoose'
 
-import { clearTestDb, startTestDb, stopTestDb } from '../../test/db'
 import { createCampaign } from '../campaign'
 import { createUser } from './user.service'
 import { resolveActiveCampaignForUser } from './active-campaign'
 import { updateLastSelectedCampaign } from './user.service'
+import { useIntegrationDb } from '../../test/setup/integration-db'
 
-beforeAll(async () => {
-  await startTestDb()
-})
-
-afterAll(async () => {
-  await stopTestDb()
-})
-
-beforeEach(async () => {
-  await clearTestDb()
-})
+useIntegrationDb()
 
 async function makeUser(email: string) {
   return createUser({ email, passwordHash: 'x', displayName: email })

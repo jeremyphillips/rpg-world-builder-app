@@ -2,10 +2,9 @@ import bcrypt from 'bcryptjs'
 import { isValidObjectId } from 'mongoose'
 import type { PlatformRole, SessionUser, UpdateProfileInput, User } from '@rpg/contracts'
 
+import { BCRYPT_ROUNDS } from '../../lib/bcrypt-rounds'
 import { HttpError } from '../../lib/http-error'
 import { UserModel, type UserSchemaType } from './user.model'
-
-const BCRYPT_ROUNDS = 12
 
 type UserRecord = UserSchemaType & {
   _id: unknown
