@@ -919,6 +919,13 @@ BENCH tickets, giving one level of indirection.
    full resolution union (adding `saving-throw { ability }`, `automatic`,
    `weapon-attack`) vs adding a new `resolution` field and deprecating
    `deliveryMethod`. Affects existing form, picker labels, and stored patches.
+   **First-pass resolution MVP (2026-07):** chose the new `resolution` field on
+   `spellBodySchema` (`packages/contracts/src/rpg/content/spell/resolution/`) with
+   dashboard authoring under `apps/dashboard/src/features/content/spells/resolution/`
+   — attack and save presets, flattened form view model, live preview; persistence
+   and catalog migration deferred. See
+   [`spells/README.md`](../../apps/dashboard/src/features/content/spells/README.md)
+   (Resolution section).
 2. **Where primitives live.** `packages/contracts/src/rpg/primitives/mechanics/`
    (recommended) vs keeping everything under `content/spell` and extracting later.
    Later extraction is a type-name migration with catalog data untouched, but the

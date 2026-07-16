@@ -87,7 +87,81 @@
         "description": "an eggshell and a glove"
       }
     },
-    "higherLevelSlotEffect": "<p>The damage of the Clenched Fist increases by 2d8 and the damage of the Grasping Hand increases by 2d6 for each spell slot level above 5.</p>"
+    "higherLevelSlotEffect": "<p>The damage of the Clenched Fist increases by 2d8 and the damage of the Grasping Hand increases by 2d6 for each spell slot level above 5.</p>",
+    "effects": [
+      {
+        "id": "srd-cc-5.2.1:arcane-hand:clenched-fist",
+        "kind": "damage",
+        "label": "Clenched Fist",
+        "roll": {
+          "dice": {
+            "count": 5,
+            "faces": 8
+          }
+        },
+        "damageType": "force"
+      },
+      {
+        "id": "srd-cc-5.2.1:arcane-hand:grasping-hand-crush",
+        "kind": "damage",
+        "label": "Grasping Hand crush",
+        "roll": {
+          "dice": {
+            "count": 4,
+            "faces": 6
+          }
+        },
+        "damageType": "bludgeoning"
+      }
+    ],
+    "resolution": {
+      "target": {
+        "count": 1,
+        "kind": "creature",
+        "proximity": {
+          "kind": "distance",
+          "distance": {
+            "value": 120,
+            "unit": "ft"
+          }
+        }
+      },
+      "method": {
+        "kind": "attack",
+        "attackType": "melee-spell"
+      },
+      "effects": [
+        {
+          "id": "clenched-fist",
+          "kind": "damage",
+          "roll": {
+            "dice": {
+              "count": 5,
+              "faces": 8
+            }
+          },
+          "damageType": "force"
+        },
+        {
+          "id": "grasping-hand-crush",
+          "kind": "damage",
+          "roll": {
+            "dice": {
+              "count": 4,
+              "faces": 6
+            }
+          },
+          "damageType": "bludgeoning"
+        }
+      ],
+      "outcomes": [
+        {
+          "result": "hit",
+          "note": "Choose Clenched Fist or Grasping Hand crush when commanding the hand; apply the matching effect on a hit.",
+          "applications": []
+        }
+      ]
+    }
   },
   {
     "id": "srd-cc-5.2.1:greater-restoration",
@@ -164,7 +238,58 @@
       "verbal": true,
       "somatic": true
     },
-    "higherLevelSlotEffect": "<p>The healing increases by 1d8 for each spell slot level above 5.</p>"
+    "higherLevelSlotEffect": "<p>The healing increases by 1d8 for each spell slot level above 5.</p>",
+    "effects": [
+      {
+        "id": "srd-cc-5.2.1:mass-cure-wounds:healing",
+        "kind": "healing",
+        "roll": {
+          "dice": {
+            "count": 5,
+            "faces": 8
+          }
+        }
+      }
+    ],
+    "resolution": {
+      "target": {
+        "count": 6,
+        "kind": "creature",
+        "proximity": {
+          "kind": "distance",
+          "distance": {
+            "value": 60,
+            "unit": "ft"
+          }
+        }
+      },
+      "method": {
+        "kind": "automatic"
+      },
+      "effects": [
+        {
+          "id": "healing",
+          "kind": "healing",
+          "roll": {
+            "dice": {
+              "count": 5,
+              "faces": 8
+            }
+          }
+        }
+      ],
+      "outcomes": [
+        {
+          "result": "applied",
+          "applications": [
+            {
+              "effectId": "healing",
+              "amount": "full"
+            }
+          ]
+        }
+      ]
+    }
   },
   {
     "id": "srd-cc-5.2.1:planar-binding",

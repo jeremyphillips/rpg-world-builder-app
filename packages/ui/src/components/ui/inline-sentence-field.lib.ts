@@ -84,6 +84,28 @@ export function flattenInlineSentenceSelectOptions(
   return options.flatMap((item) => (isFieldOptionGroup(item) ? item.options : [item]))
 }
 
+/** Coerces stored select values (e.g. numeric die faces) to string for Radix Select. */
+export function coerceInlineSentenceSelectValue(raw: unknown): string | undefined {
+  if (raw === undefined || raw === null || raw === '') return undefined
+  return String(raw)
+}
+
+/** True when every option value is a base-10 integer string (die faces, levels, etc.). */
+export function inlineSentenceSelectOptionsAreNumeric(
+  options: SelectFieldOptionListItem[],
+): boolean {
+  const flat = flattenInlineSentenceSelectOptions(options)
+  return flat.length > 0 && flat.every((option) => /^\d+$/.test(option.value))
+}
+
+export function resolveInlineSentenceSelectChange(
+  next: string,
+  options: SelectFieldOptionListItem[],
+): string | number {
+  if (!inlineSentenceSelectOptionsAreNumeric(options)) return next
+  return Number(next)
+}
+
 export function indexInlineSentenceControls(
   controls: readonly InlineSentenceBoundControl[],
 ): Map<string, InlineSentenceBoundControl> {

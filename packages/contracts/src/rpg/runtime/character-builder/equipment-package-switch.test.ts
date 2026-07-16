@@ -48,7 +48,7 @@ const dagger = equipmentSchema.parse({
   kind: 'weapon',
   category: 'simple',
   mode: 'melee',
-  damage: { kind: 'dice', count: 1, faces: 4 },
+  damage: { dice: { count: 1, faces: 4 } },
   damageType: 'piercing',
   properties: [],
   mastery: 'nick',

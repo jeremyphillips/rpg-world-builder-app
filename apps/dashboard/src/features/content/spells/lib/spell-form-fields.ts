@@ -41,6 +41,9 @@ import {
   spellLevelOptions,
 } from './spell-form-labels'
 import { SPELL_SECTION_LABELS } from './spell-display'
+import { optionalResolutionFormSchema } from '../resolution/lib/form/resolution-form-schema'
+import { resolutionFields } from '../resolution/lib/form/resolution-form-fields'
+import { spellEffectsFormSchema } from './effects/effect-form-schema'
 
 function visibleWhenRangeDistance(): FieldVisibility {
   return {
@@ -194,6 +197,8 @@ export const spellFormSchema = z
       description: z.string().optional(),
     }),
     deliveryMethod: z.string().optional(),
+    effects: spellEffectsFormSchema,
+    resolution: optionalResolutionFormSchema,
   })
   .superRefine((values, ctx) => {
     const hasMaterial =
@@ -556,10 +561,15 @@ function tagFields(ctx: ContentFormCtx): FormItem[] {
   ]
 }
 
+function resolutionTabFields(ctx: ContentFormCtx): FormItem[] {
+  return resolutionFields(ctx)
+}
+
 export function buildSpellTabs(ctx: ContentFormCtx): TabbedFormTab[] {
   return [
     { id: 'basics', label: 'Basics', fields: basicsFields(ctx) },
     { id: 'casting', label: 'Casting', fields: castingFields() },
+    { id: 'resolution', label: 'Resolution', fields: resolutionTabFields(ctx) },
     { id: 'tags', label: 'Tags', fields: tagFields(ctx) },
   ]
 }

@@ -26,7 +26,7 @@ describe('isEquipmentStackable', () => {
       kind: 'weapon',
       category: 'martial',
       mode: 'melee',
-      damage: { kind: 'dice', count: 1, faces: 8 },
+      damage: { dice: { count: 1, faces: 8 } },
       damageType: 'slashing',
       properties: [],
       mastery: 'sap',

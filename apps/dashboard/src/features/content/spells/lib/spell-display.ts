@@ -1,5 +1,6 @@
 import {
   formatAreaGeometry,
+  formatAtomicEffectSummaries,
   formatSlugAsLabel,
   getEffectConditionLabel,
   getSpellDeliveryMethodLabel,
@@ -43,6 +44,7 @@ export const SPELL_SECTION_LABELS = {
 export const SPELL_DETAIL_SECTION_LABELS = {
   tags: 'Tags',
   classes: 'Classes',
+  effects: 'Effects',
 } as const
 
 const SPELL_STAT_RITUAL_INFO =
@@ -76,6 +78,10 @@ export type SpellDetailViewModel = {
   tagsSection?: {
     title: string
     labels: string[]
+  }
+  effectsSection?: {
+    title: string
+    lines: string[]
   }
 }
 
@@ -185,6 +191,13 @@ export function buildSpellDetailViewModel(
         ? {
             title: SPELL_SECTION_LABELS.tags,
             labels: tagLabels,
+          }
+        : undefined,
+    effectsSection:
+      spell.effects && spell.effects.length > 0
+        ? {
+            title: SPELL_DETAIL_SECTION_LABELS.effects,
+            lines: formatAtomicEffectSummaries(spell.effects),
           }
         : undefined,
   }

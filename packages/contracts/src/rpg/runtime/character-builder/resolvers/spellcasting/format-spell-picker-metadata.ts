@@ -1,5 +1,5 @@
 import type { Spell } from '../../../../content/spell'
-import { formatSpellLevel } from '../../../../content/spell-levels'
+import { formatSpellLevel } from '../../../../content/spell/levels'
 import type { SpellTags } from '../../../../vocab/spell/tags'
 import { getCastingTimeUnitLabel } from '../../../../vocab/spell/casting-time'
 import type {

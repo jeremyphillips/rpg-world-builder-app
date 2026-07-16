@@ -6,7 +6,8 @@ import {
   spellPatchSchema,
   spellSchema,
   updateSpellInputSchema,
-} from './spell'
+} from './body'
+import { CHILL_TOUCH_RESOLUTION, ELDRITCH_BLAST_RESOLUTION } from './resolution/fixtures'
 
 const timestamps = {
   createdAt: '2026-01-01T00:00:00.000Z',
@@ -268,5 +269,79 @@ describe('spellContentLevelSchema', () => {
   it('rejects levels outside 0–9', () => {
     expect(spellSchema.safeParse({ ...fireBolt, level: 10 }).success).toBe(false)
     expect(spellSchema.safeParse({ ...fireBolt, level: -1 }).success).toBe(false)
+  })
+})
+
+describe('spell effects schema', () => {
+  const sampleEffect = {
+    id: 'fx-1',
+    kind: 'damage' as const,
+    roll: { dice: { count: 1, faces: 10 } },
+    damageType: 'fire',
+  }
+
+  it('accepts optional effects on the stored spell shape', () => {
+    expect(spellSchema.parse({ ...fireBolt, effects: [sampleEffect] }).effects).toEqual([
+      sampleEffect,
+    ])
+  })
+
+  it('omits effects from create/update input schemas until persistence lands', () => {
+    expect('effects' in createSpellInputSchema.shape).toBe(false)
+    expect('effects' in updateSpellInputSchema.shape).toBe(false)
+    const parsed = createSpellInputSchema.parse({
+      slug: 'fire-bolt',
+      ...fireBoltBody,
+      effects: [sampleEffect],
+    } as Parameters<typeof createSpellInputSchema.parse>[0] & {
+      effects: (typeof sampleEffect)[]
+    })
+    expect('effects' in parsed).toBe(false)
+  })
+
+  it('allows effects in patch bodies for future overlay authoring', () => {
+    expect(
+      spellPatchSchema.parse({
+        id: 'patch_1',
+        campaignId: 'camp_1',
+        targetId: 'srd-cc-5.2.1:fire-bolt',
+        patch: { effects: [sampleEffect] },
+        ...timestamps,
+      }).patch.effects,
+    ).toEqual([sampleEffect])
+  })
+})
+
+describe('spell resolution schema', () => {
+  it('accepts optional resolution on the stored spell shape', () => {
+    expect(
+      spellSchema.parse({ ...fireBolt, resolution: ELDRITCH_BLAST_RESOLUTION }).resolution,
+    ).toEqual(ELDRITCH_BLAST_RESOLUTION)
+  })
+
+  it('omits resolution from create/update input schemas until persistence lands', () => {
+    expect('resolution' in createSpellInputSchema.shape).toBe(false)
+    expect('resolution' in updateSpellInputSchema.shape).toBe(false)
+
+    const parsed = createSpellInputSchema.parse({
+      slug: 'fire-bolt',
+      ...fireBoltBody,
+      resolution: ELDRITCH_BLAST_RESOLUTION,
+    } as Parameters<typeof createSpellInputSchema.parse>[0] & {
+      resolution: typeof ELDRITCH_BLAST_RESOLUTION
+    })
+    expect('resolution' in parsed).toBe(false)
+  })
+
+  it('allows resolution in patch bodies for future overlay authoring', () => {
+    expect(
+      spellPatchSchema.parse({
+        id: 'patch_2',
+        campaignId: 'camp_1',
+        targetId: 'srd-cc-5.2.1:chill-touch',
+        patch: { resolution: CHILL_TOUCH_RESOLUTION },
+        ...timestamps,
+      }).patch.resolution,
+    ).toEqual(CHILL_TOUCH_RESOLUTION)
   })
 })

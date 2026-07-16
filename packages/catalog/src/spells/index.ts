@@ -70,3 +70,16 @@ export function seedSpellSlugs(rulesetId: SystemRulesetId): ReadonlySet<string> 
 export function getSpellBySlug(rulesetId: SystemRulesetId, slug: string): Spell {
   return getBySlug(loadSeedSpells, rulesetId, slug, 'Spell')
 }
+
+export {
+  SRD_521_SPELL_SEED_RESOLUTION_DEFERRED_SLUGS,
+  SRD_521_SPELL_SEED_RESOLUTION_MANIFEST_SLUGS,
+  SRD_521_SPELL_SEED_RESOLUTION_SLUGS,
+  SRD_521_SPELL_SEED_RESOLUTION_TIER_A_SLUGS,
+  spellSeedResolutionDeferReason,
+} from './spell-seed-resolution'
+export {
+  SPELL_RESOLUTION_DEFER_REASONS,
+  type SpellResolutionDeferReason,
+} from './spell-resolution-defer-reasons'
+export { buildSpellResolutionCoverageInventory } from './spell-resolution-coverage-inventory'

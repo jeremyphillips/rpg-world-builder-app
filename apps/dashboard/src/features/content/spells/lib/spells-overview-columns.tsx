@@ -1,5 +1,11 @@
-import type { Spell } from '@rpg/contracts'
-import { MAX_SPELL_CONTENT_LEVEL, MIN_SPELL_CONTENT_LEVEL } from '@rpg/contracts'
+import type { EffectsModelingStatus, Spell } from '@rpg/contracts'
+import {
+  deriveEffectsModelingStatus,
+  EFFECTS_MODELING_STATUS,
+  getEffectsModelingStatusLabel,
+  MAX_SPELL_CONTENT_LEVEL,
+  MIN_SPELL_CONTENT_LEVEL,
+} from '@rpg/contracts'
 import { BooleanCell, dataTableWidthMeta, SortableHeader } from '@rpg/ui'
 import type { ColumnDef, FilterDef } from '@rpg/ui'
 
@@ -15,6 +21,11 @@ const SPELL_LEVEL_FILTER_OPTIONS = Array.from(
     return { label: formatSpellLevelLabel(level), value: String(level) }
   },
 )
+
+const EFFECTS_MODELING_STATUS_FILTER_OPTIONS = EFFECTS_MODELING_STATUS.map((status) => ({
+  label: getEffectsModelingStatusLabel(status),
+  value: status,
+}))
 
 function buildSpellsMiddleColumns(
   spellSchoolVocabulary: SpellSchoolVocabulary | undefined,
@@ -51,6 +62,15 @@ function buildSpellsMiddleColumns(
       enableSorting: false,
       meta: { label: 'Ritual', ...dataTableWidthMeta('compactCenter') },
     },
+    {
+      id: 'effectsModelingStatus',
+      accessorFn: (row) => deriveEffectsModelingStatus(row),
+      header: ({ column }) => <SortableHeader column={column}>Effects modeling</SortableHeader>,
+      cell: ({ row }) =>
+        getEffectsModelingStatusLabel(row.getValue<EffectsModelingStatus>('effectsModelingStatus')),
+      filterFn: 'equalsString',
+      meta: { label: 'Effects modeling', ...dataTableWidthMeta('medium') },
+    },
   ]
 }
 
@@ -76,6 +96,13 @@ function buildSpellsSpecificFilters(
       id: 'school',
       label: 'School',
       options: schoolOptions,
+    },
+    {
+      type: 'select',
+      id: 'effectsModelingStatus',
+      label: 'Effects modeling',
+      options: EFFECTS_MODELING_STATUS_FILTER_OPTIONS,
+      group: 'secondary',
     },
   ]
 }

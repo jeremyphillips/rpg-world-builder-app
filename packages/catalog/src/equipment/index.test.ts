@@ -125,12 +125,11 @@ describe('weapon records in unified seed', () => {
   })
 
   it('blowgun has flat damage of 1', () => {
-    expect(getWeaponBySlug(RULESET, 'blowgun').damage).toEqual({ kind: 'flat', amount: 1 })
+    expect(getWeaponBySlug(RULESET, 'blowgun').damage).toEqual({ flat: 1 })
   })
 
   it('quarterstaff has versatileDamage 1d8', () => {
     expect(getWeaponBySlug(RULESET, 'quarterstaff').versatileDamage).toEqual({
-      kind: 'dice',
       count: 1,
       faces: 8,
     })
@@ -138,9 +137,7 @@ describe('weapon records in unified seed', () => {
 
   it('greatsword has 2d6 dice damage', () => {
     expect(getWeaponBySlug(RULESET, 'greatsword').damage).toEqual({
-      kind: 'dice',
-      count: 2,
-      faces: 6,
+      dice: { count: 2, faces: 6 },
     })
   })
 

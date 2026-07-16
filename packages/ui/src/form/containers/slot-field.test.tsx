@@ -124,4 +124,36 @@ describe('SlotFieldRenderer', () => {
     expect(screen.getByTestId('slot-size')).toHaveTextContent('sm')
     expect(screen.getByRole('textbox', { name: 'Name' })).toHaveClass('h-9')
   })
+
+  it('hides a slot when its visibility predicate is false', () => {
+    const conditionalFields: FormItem[] = [
+      {
+        type: 'switch',
+        name: 'showNotes',
+        label: 'Show notes',
+      },
+      {
+        kind: 'slot',
+        name: 'notes',
+        label: 'Notes',
+        visibility: {
+          dependsOn: ['showNotes'],
+          visibleWhen: (values) => values.showNotes === true,
+        },
+        render: () => <NotesSlot />,
+      },
+    ]
+
+    render(
+      <Form<Values & { showNotes?: boolean }>
+        schema={schema.extend({ showNotes: z.boolean().optional() })}
+        fields={conditionalFields}
+        defaultValues={{ notes: '', showNotes: false }}
+        onSubmit={vi.fn()}
+        footer={<button type="submit">Save</button>}
+      />,
+    )
+
+    expect(screen.queryByRole('textbox', { name: 'Notes' })).not.toBeInTheDocument()
+  })
 })

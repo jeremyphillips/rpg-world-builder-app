@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { formatSpellLevel, spellLevelSchema, SPELL_LEVELS } from './spell-levels'
+import { formatSpellLevel, spellLevelSchema, SPELL_LEVELS } from './levels'
 
 describe('SPELL_LEVELS', () => {
   it('covers spell levels 1 through 9', () => {

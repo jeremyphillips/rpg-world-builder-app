@@ -11,23 +11,19 @@ import {
   type EquipmentInputBuildCtx,
 } from '../../lib/equipment-form-values-base'
 import type { WeaponEquipmentFormValues } from '../../lib/equipment-form-fields'
+import {
+  normalizeRollFormValue,
+  rollToFormShape,
+  type RollFormShape,
+} from '../../../lib/forms/mechanics/roll-form-values'
 
 type WeaponInput = Extract<CreateEquipmentInput, { kind: 'weapon' }>
 
 export function damageToForm(
   damage: WeaponDamage | undefined,
-): Pick<WeaponEquipmentFormValues, 'damageKind' | 'damageDice' | 'damageAmount'> {
-  if (!damage) return { damageKind: 'none' }
-  if (damage.kind === 'dice') {
-    return {
-      damageKind: 'dice',
-      damageDice: { count: damage.count, faces: damage.faces },
-    }
-  }
-  return {
-    damageKind: 'flat',
-    damageAmount: damage.amount,
-  }
+): Pick<WeaponEquipmentFormValues, 'hasDamage' | 'damage'> {
+  if (!damage) return { hasDamage: false }
+  return { hasDamage: true, damage: rollToFormShape(damage) }
 }
 
 export function weaponFormValuesFromEntity(
@@ -36,9 +32,8 @@ export function weaponFormValuesFromEntity(
   WeaponEquipmentFormValues,
   | 'category'
   | 'mode'
-  | 'damageKind'
-  | 'damageDice'
-  | 'damageAmount'
+  | 'hasDamage'
+  | 'damage'
   | 'damageType'
   | 'versatileDamage'
   | 'properties'
@@ -64,20 +59,8 @@ export function weaponFormValuesFromEntity(
 }
 
 function damageFromForm(values: EquipmentInputBuildCtx<'weapon'>['values']): WeaponInput['damage'] {
-  if (values.damageKind === 'none' || values.damageKind === undefined) return undefined
-  if (values.damageKind === 'flat') {
-    return values.damageAmount !== undefined
-      ? { kind: 'flat', amount: values.damageAmount }
-      : undefined
-  }
-  if (values.damageDice?.count !== undefined && values.damageDice?.faces !== undefined) {
-    return {
-      kind: 'dice',
-      count: values.damageDice.count,
-      faces: dieFaceSchema.parse(values.damageDice.faces),
-    }
-  }
-  return undefined
+  if (!values.hasDamage) return undefined
+  return normalizeRollFormValue(values.damage as RollFormShape | undefined)
 }
 
 function optionalWeaponDamage(
@@ -100,7 +83,6 @@ function optionalVersatileDamage(
   }
   return {
     versatileDamage: {
-      kind: 'dice',
       count: values.versatileDamage.count,
       faces: dieFaceSchema.parse(values.versatileDamage.faces),
     },

@@ -90,6 +90,27 @@ function SpellTagsSection({
   )
 }
 
+function SpellEffectsSection({
+  section,
+}: {
+  section: NonNullable<SpellDetailViewModel['effectsSection']>
+}) {
+  return (
+    <section aria-labelledby="spell-effects-heading">
+      <Heading variant="section" as="h2" id="spell-effects-heading" className="mb-3">
+        {section.title}
+      </Heading>
+      <ul className="list-inside list-disc space-y-1" role="list">
+        {section.lines.map((line) => (
+          <li key={line}>
+            <Text as="span">{line}</Text>
+          </li>
+        ))}
+      </ul>
+    </section>
+  )
+}
+
 function SpellProseSection({
   id,
   title,
@@ -178,6 +199,9 @@ export function SpellDetailContent({ spell, campaignId }: SpellDetailContentProp
           <SpellClassesList campaignId={campaignId} section={viewModel.classesSection} />
         ) : null}
         {viewModel.tagsSection ? <SpellTagsSection section={viewModel.tagsSection} /> : null}
+        {viewModel.effectsSection ? (
+          <SpellEffectsSection section={viewModel.effectsSection} />
+        ) : null}
       </ContentDetailLayout>
     </WidePage>
   )

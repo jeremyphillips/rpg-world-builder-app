@@ -206,7 +206,70 @@
         "description": "a ball of bat guano and sulfur"
       }
     },
-    "higherLevelSlotEffect": "<p>The damage increases by 1d6 for each spell slot level above 3.</p>"
+    "higherLevelSlotEffect": "<p>The damage increases by 1d6 for each spell slot level above 3.</p>",
+    "effects": [
+      {
+        "id": "srd-cc-5.2.1:fireball:damage",
+        "kind": "damage",
+        "roll": {
+          "dice": {
+            "count": 8,
+            "faces": 6
+          }
+        },
+        "damageType": "fire"
+      }
+    ],
+    "resolution": {
+      "target": {
+        "count": 1,
+        "kind": "creature-or-object",
+        "proximity": {
+          "kind": "distance",
+          "distance": {
+            "value": 150,
+            "unit": "ft"
+          }
+        }
+      },
+      "method": {
+        "kind": "saving-throw",
+        "ability": "dex"
+      },
+      "effects": [
+        {
+          "id": "damage",
+          "kind": "damage",
+          "roll": {
+            "dice": {
+              "count": 8,
+              "faces": 6
+            }
+          },
+          "damageType": "fire"
+        }
+      ],
+      "outcomes": [
+        {
+          "result": "failed-save",
+          "applications": [
+            {
+              "effectId": "damage",
+              "amount": "full"
+            }
+          ]
+        },
+        {
+          "result": "successful-save",
+          "applications": [
+            {
+              "effectId": "damage",
+              "amount": "half"
+            }
+          ]
+        }
+      ]
+    }
   },
   {
     "id": "srd-cc-5.2.1:glyph-of-warding",
@@ -283,7 +346,58 @@
     "components": {
       "verbal": true
     },
-    "higherLevelSlotEffect": "<p>The healing increases by 1d4 for each spell slot level above 3.</p>"
+    "higherLevelSlotEffect": "<p>The healing increases by 1d4 for each spell slot level above 3.</p>",
+    "effects": [
+      {
+        "id": "srd-cc-5.2.1:mass-healing-word:healing",
+        "kind": "healing",
+        "roll": {
+          "dice": {
+            "count": 2,
+            "faces": 4
+          }
+        }
+      }
+    ],
+    "resolution": {
+      "target": {
+        "count": 6,
+        "kind": "creature",
+        "proximity": {
+          "kind": "distance",
+          "distance": {
+            "value": 60,
+            "unit": "ft"
+          }
+        }
+      },
+      "method": {
+        "kind": "automatic"
+      },
+      "effects": [
+        {
+          "id": "healing",
+          "kind": "healing",
+          "roll": {
+            "dice": {
+              "count": 2,
+              "faces": 4
+            }
+          }
+        }
+      ],
+      "outcomes": [
+        {
+          "result": "applied",
+          "applications": [
+            {
+              "effectId": "healing",
+              "amount": "full"
+            }
+          ]
+        }
+      ]
+    }
   },
   {
     "id": "srd-cc-5.2.1:revivify",
