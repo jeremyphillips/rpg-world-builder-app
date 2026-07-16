@@ -107,10 +107,21 @@ export const dndBeyondRaceSchema = z
   .object({
     fullName: nullableString,
     baseName: nullableString,
+    baseRaceName: nullableString,
+    entityRaceId: z.number().optional(),
+    entityRaceTypeId: z.number().optional(),
+    baseRaceId: z.number().optional(),
+    baseRaceTypeId: z.number().optional(),
+    definitionKey: z.string().optional(),
+    slug: z.string().optional(),
+    isSubRace: z.boolean().optional(),
+    subRaceShortName: nullableString.optional(),
     definitionId: z.number().optional(),
     definition: shallowDefinitionSchema.optional(),
   })
   .passthrough()
+
+export type DndBeyondRace = z.infer<typeof dndBeyondRaceSchema>
 
 export const dndBeyondBackgroundSchema = z
   .object({
@@ -162,6 +173,7 @@ export const dndBeyondCharacterDataSchema = z
     id: z.number(),
     name: nullableString,
     alignmentId: nullableNumber,
+    alignment: nullableString.optional(),
     currentXp: z.number().optional(),
     adjustmentXp: z.number().optional(),
     stats: z.array(dndBeyondStatRowSchema).optional(),

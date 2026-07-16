@@ -1,31 +1,74 @@
-import { formatAlignmentLabel, type Alignment } from '@rpg/contracts'
+import {
+  formatAlignmentLabel,
+  getSkillName,
+  getToolCategoryLabel,
+  type Alignment,
+} from '@rpg/contracts'
 import {
   CHARACTER_IMPORT_SERVER_OWNED_FIELDS,
+  partitionDispositionEntries,
   type CharacterImportCoverageEntry,
   type CharacterImportCoverageState,
+  type CharacterImportDispositionEntry,
+  type CharacterImportDispositionReason,
   type CharacterImportExtraction,
   type CharacterImportFieldResult,
   type CharacterImportFieldStatus,
   type CharacterNarrativePreview,
+  type RecognizedEquipmentItem,
   type RecognizedLanguage,
   type RecognizedProficiency,
+  type RecognizedSpeciesPreview,
 } from '@rpg/contracts/character-import'
 import type { SemanticTextTone } from '@rpg/ui'
 
 export const EXTRACTION_FIELD_LABELS = {
   name: 'Name',
+  species: 'Species',
   abilityScores: 'Abilities',
   alignment: 'Alignment',
   xp: 'XP',
   narrative: 'Narrative',
   hitPoints: 'Hit points',
   languages: 'Languages',
-  proficiencies: 'Proficiencies',
-} as const satisfies Record<keyof CharacterImportExtraction, string>
+  equipment: 'Equipment',
+} as const satisfies Record<Exclude<keyof CharacterImportExtraction, 'proficiencies'>, string>
 
 export type ExtractionFieldKey = keyof typeof EXTRACTION_FIELD_LABELS
 
 export const EXTRACTION_FIELD_KEYS = Object.keys(EXTRACTION_FIELD_LABELS) as ExtractionFieldKey[]
+
+export const COVERAGE_READINESS_GROUPS = [
+  {
+    id: 'core',
+    label: 'Core character',
+    targetPaths: ['name', 'abilityScores', 'alignment', 'xp', 'hitPoints'],
+  },
+  {
+    id: 'narrative',
+    label: 'Narrative',
+    targetPaths: ['narrative'],
+  },
+  {
+    id: 'catalog',
+    label: 'Catalog content',
+    targetPaths: [
+      'rulesetId',
+      'classes',
+      'species',
+      'proficiencies',
+      'equipment',
+      'wealth',
+      'spells',
+      'feats',
+    ],
+  },
+  {
+    id: 'context',
+    label: 'Save context',
+    targetPaths: ['imageKey', 'campaignId'],
+  },
+] as const
 
 export function extractionFieldTone(result: CharacterImportFieldResult<unknown>): SemanticTextTone {
   if (result.status === 'mapped' && result.issues.length > 0) {
@@ -71,6 +114,17 @@ export function formatAlignmentValue(alignment: Alignment): string {
   return formatAlignmentLabel(alignment)
 }
 
+export function formatSpeciesValue(species: RecognizedSpeciesPreview): string {
+  const parts = [species.sourceValue]
+  if (species.isSubRace && species.baseSpeciesName) {
+    parts.push(`(base species: ${species.baseSpeciesName})`)
+  }
+  if (species.localValue) {
+    parts.push(`→ ${species.localValue}`)
+  }
+  return parts.join(' ')
+}
+
 export function formatNarrativeValue(narrative: CharacterNarrativePreview): string {
   const parts: string[] = []
   if (narrative.personalityTraits?.length) {
@@ -104,15 +158,28 @@ export function formatLanguagesValue(languages: RecognizedLanguage[]): string {
     .join(', ')
 }
 
-export function formatProficienciesValue(proficiencies: RecognizedProficiency[]): string {
-  return proficiencies
-    .map((entry) => {
-      const label = entry.localValue ?? entry.sourceValue
-      if (entry.status === 'unsupported') {
-        return `${label} (unsupported)`
-      }
-      return label
-    })
+export function formatProficiencyLabel(entry: RecognizedProficiency): string {
+  if (entry.kind === 'tool' && entry.toolCategory) {
+    return getToolCategoryLabel(entry.toolCategory)
+  }
+
+  if (entry.kind === 'skill') {
+    const skillId = entry.skillId ?? entry.localValue ?? entry.sourceValue
+    return getSkillName(skillId)
+  }
+
+  return entry.sourceLabel ?? entry.localValue ?? entry.sourceValue
+}
+
+export function formatProficienciesPreviewValue(proficiencies: RecognizedProficiency[]): string[] {
+  return proficiencies.map((entry) => formatProficiencyLabel(entry)).filter(Boolean)
+}
+
+export function formatEquipmentValue(equipment: RecognizedEquipmentItem[]): string {
+  return equipment
+    .map((entry) =>
+      entry.quantity > 1 ? `${entry.quantity}x ${entry.sourceLabel}` : entry.sourceLabel,
+    )
     .join(', ')
 }
 
@@ -120,13 +187,14 @@ const EXTRACTION_DISPLAY_FORMATTERS: {
   [K in ExtractionFieldKey]: (result: CharacterImportExtraction[K]) => string
 } = {
   name: (result) => result.value ?? 'Undefined',
+  species: (result) => (result.value ? formatSpeciesValue(result.value) : 'Undefined'),
   abilityScores: (result) => (result.value ? formatAbilityScores(result.value) : 'Undefined'),
   alignment: (result) => (result.value ? formatAlignmentValue(result.value) : 'Undefined'),
   xp: (result) => (result.value != null ? String(result.value) : 'Undefined'),
   narrative: (result) => (result.value ? formatNarrativeValue(result.value) : 'Undefined'),
   hitPoints: (result) => (result.value ? formatHitPointsValue(result.value) : 'Undefined'),
   languages: (result) => (result.value ? formatLanguagesValue(result.value) : 'Undefined'),
-  proficiencies: (result) => (result.value ? formatProficienciesValue(result.value) : 'Undefined'),
+  equipment: (result) => (result.value ? formatEquipmentValue(result.value) : 'Undefined'),
 }
 
 export function formatExtractionDisplayValue<K extends ExtractionFieldKey>(
@@ -154,6 +222,34 @@ export function coverageStateTone(state: CharacterImportCoverageState): Semantic
     default:
       return 'neutral'
   }
+}
+
+export function groupCoverageEntries(entries: CharacterImportCoverageEntry[]): Array<{
+  id: (typeof COVERAGE_READINESS_GROUPS)[number]['id']
+  label: string
+  entries: CharacterImportCoverageEntry[]
+}> {
+  const grouped = new Map<string, CharacterImportCoverageEntry[]>()
+
+  for (const group of COVERAGE_READINESS_GROUPS) {
+    grouped.set(group.id, [])
+  }
+
+  const fallback = grouped.get('catalog') ?? []
+
+  for (const entry of entries) {
+    const group = COVERAGE_READINESS_GROUPS.find((candidate) =>
+      candidate.targetPaths.includes(entry.targetPath as never),
+    )
+    const bucket = group ? (grouped.get(group.id) ?? fallback) : fallback
+    bucket.push(entry)
+  }
+
+  return COVERAGE_READINESS_GROUPS.map((group) => ({
+    id: group.id,
+    label: group.label,
+    entries: grouped.get(group.id) ?? [],
+  })).filter((group) => group.entries.length > 0)
 }
 
 export function partitionCoverageEntries(coverage: CharacterImportCoverageEntry[]): {
@@ -184,3 +280,32 @@ export function formatCoverageStateLabel(state: CharacterImportCoverageState): s
       return state
   }
 }
+
+export function formatDispositionReasonLabel(reason: CharacterImportDispositionReason): string {
+  switch (reason) {
+    case 'derived-from-class':
+      return 'derived from local class'
+    case 'resolved-from-local-content':
+      return 'resolved from local content'
+    case 'derived-value':
+      return 'derived value'
+    case 'duplicate-source':
+      return 'duplicate source'
+    case 'provider-metadata':
+      return 'provider metadata'
+    case 'runtime-state':
+      return 'runtime state'
+    case 'not-in-local-contract':
+      return 'not in local contract'
+    case 'requires-catalog-resolution':
+      return 'requires catalog resolution'
+    default:
+      return reason
+  }
+}
+
+export function formatDispositionSummary(entry: CharacterImportDispositionEntry): string {
+  return `${entry.sourceValue} — ${formatDispositionReasonLabel(entry.reason)}`
+}
+
+export { partitionDispositionEntries }

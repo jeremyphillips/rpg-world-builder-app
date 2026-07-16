@@ -115,20 +115,40 @@ const buildClassesCoverage: CoverageBuilder = (_extraction, payload) => {
   }
 }
 
-const buildSpeciesCoverage: CoverageBuilder = (_extraction, payload) => {
-  const hasSpecies = payload.race != null
+const buildSpeciesCoverage: CoverageBuilder = (extraction) => {
+  if (extraction.species.status === 'mapped') {
+    return {
+      targetPath: 'species',
+      state: 'unresolved-reference',
+      reason:
+        'Species was extracted from data.race for preview; local catalog matching is still required before save.',
+      sourcePaths: extraction.species.sourcePaths,
+    }
+  }
+
   return {
     targetPath: 'species',
-    state: hasSpecies ? 'unresolved-reference' : 'deferred',
-    reason: hasSpecies
-      ? 'Species/race data is present in the source but requires local catalog matching.'
-      : 'No species/race data was found in the source character.',
-    sourcePaths: hasSpecies ? ['data.race'] : undefined,
+    state: extraction.species.status === 'missing-source' ? 'deferred' : 'unresolved-reference',
+    reason:
+      extraction.species.status === 'missing-source'
+        ? 'No species/race data was found in the source character.'
+        : 'Species/race data is present in the source but requires local catalog matching.',
+    sourcePaths: extraction.species.sourcePaths,
   }
 }
 
-const buildEquipmentCoverage: CoverageBuilder = (_extraction, payload) => {
+const buildEquipmentCoverage: CoverageBuilder = (extraction, payload) => {
   const hasInventory = (payload.inventory?.length ?? 0) > 0
+  if (extraction.equipment.status === 'mapped') {
+    return {
+      targetPath: 'equipment',
+      state: 'unresolved-reference',
+      reason:
+        'Inventory items were extracted for preview; canonical equipment rows require local catalog matching.',
+      sourcePaths: extraction.equipment.sourcePaths,
+    }
+  }
+
   return {
     targetPath: 'equipment',
     state: hasInventory ? 'unresolved-reference' : 'deferred',
@@ -151,15 +171,21 @@ const buildWealthCoverage: CoverageBuilder = (_extraction, payload) => {
   }
 }
 
-const buildProficienciesCoverage: CoverageBuilder = (extraction) => ({
-  targetPath: 'proficiencies',
-  state: 'deferred',
-  reason:
-    extraction.proficiencies.status === 'mapped'
-      ? 'Recognized proficiencies were extracted for preview; canonical stored rows require catalog and provenance resolution.'
+const buildProficienciesCoverage: CoverageBuilder = (extraction) => {
+  const hasPreview =
+    extraction.proficiencies.status === 'mapped' &&
+    ((extraction.proficiencies.value?.skills.length ?? 0) > 0 ||
+      (extraction.proficiencies.value?.tools.length ?? 0) > 0)
+
+  return {
+    targetPath: 'proficiencies',
+    state: 'deferred',
+    reason: hasPreview
+      ? 'Recognized skill and tool proficiencies were extracted for preview; canonical stored rows require catalog and provenance resolution.'
       : 'Canonical proficiency rows are not produced during the experimental import preview.',
-  sourcePaths: extraction.proficiencies.sourcePaths,
-})
+    sourcePaths: extraction.proficiencies.sourcePaths,
+  }
+}
 
 const buildSpellsCoverage: CoverageBuilder = (_extraction, payload) => {
   const spellCount = (payload.classSpells?.length ?? 0) + (payload.raceSpells?.length ?? 0)

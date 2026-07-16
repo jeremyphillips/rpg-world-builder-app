@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { adaptDndBeyondCharacter } from '../adapter/adapt-dnd-beyond-character'
+import { adaptDndBeyondCharacter } from './adapt-dnd-beyond-character'
 import { characterImportResultSchema } from '../adapter/character-import-result.schema'
 import {
   CHARACTER_IMPORT_SERVER_OWNED_FIELDS,
@@ -9,13 +9,14 @@ import {
 import {
   dndBeyondCharacter133058471Payload,
   DND_BEYOND_FIXTURE_CHARACTER_ID,
-} from '../dnd-beyond/dnd-beyond-character-fixtures'
+} from './dnd-beyond-character-fixtures'
+import { DND_BEYOND_PAYLOAD_VERSION } from './dnd-beyond-version'
 
 const fixtureSource = {
   provider: 'dnd-beyond' as const,
-  payloadVersion: 'character-v5' as const,
-  requestedPayloadVersion: 'character-v5' as const,
-  supportedPayloadVersion: 'character-v5' as const,
+  payloadVersion: DND_BEYOND_PAYLOAD_VERSION,
+  requestedPayloadVersion: DND_BEYOND_PAYLOAD_VERSION,
+  supportedPayloadVersion: DND_BEYOND_PAYLOAD_VERSION,
   characterId: DND_BEYOND_FIXTURE_CHARACTER_ID,
   acquisition: 'public-id-fetch' as const,
 }
@@ -33,6 +34,13 @@ describe('adaptDndBeyondCharacter', () => {
       value: 'Presto',
       sourcePaths: ['data.name'],
       issues: [],
+    })
+    expect(result.extraction.species.value).toMatchObject({
+      sourceValue: 'Human',
+      sourceSlug: '1751441-human',
+      localSlug: 'human',
+      localValue: 'srd-cc-5.2.1:human',
+      status: 'mapped',
     })
     expect(result.extraction.abilityScores.value).toEqual({
       str: 8,
@@ -67,17 +75,52 @@ describe('adaptDndBeyondCharacter', () => {
   })
 
   it('classifies proficiencies across race, class, background, and feat sources', () => {
-    const proficiencies = result.extraction.proficiencies.value ?? []
-    const groups = [...new Set(proficiencies.map((entry) => entry.sourceGroup))]
+    const proficiencies = result.extraction.proficiencies.value
+    expect(proficiencies).toBeDefined()
+
+    const groups = [
+      ...new Set([
+        ...proficiencies!.skills.map((entry) => entry.sourceGroup),
+        ...proficiencies!.tools.map((entry) => entry.sourceGroup),
+      ]),
+    ]
     expect(groups).toEqual(expect.arrayContaining(['race', 'class', 'background', 'feat']))
 
-    const savingThrows = proficiencies.filter((entry) => entry.kind === 'savingThrow')
-    expect(savingThrows.every((entry) => entry.status === 'unsupported')).toBe(true)
+    expect(proficiencies!.skills.length).toBeGreaterThan(0)
+    expect(proficiencies!.tools.length).toBeGreaterThan(0)
+    expect(proficiencies!.skills.every((entry) => entry.kind === 'skill')).toBe(true)
+    expect(proficiencies!.tools.every((entry) => entry.kind === 'tool')).toBe(true)
+  })
 
-    const mappedSkills = proficiencies.filter(
-      (entry) => entry.kind === 'skill' && entry.status === 'mapped',
+  it('maps tool proficiencies to local tool categories instead of raw slugs', () => {
+    const tools = result.extraction.proficiencies.value?.tools ?? []
+    const calligraphy = tools.find((entry) => entry.sourceValue === 'calligraphers-supplies')
+
+    expect(calligraphy).toMatchObject({
+      toolId: 'srd-cc-5.2.1:calligraphers-supplies',
+      toolCategory: 'artisan',
+      localValue: 'artisan',
+    })
+  })
+
+  it('records ignored saving throw and weapon category proficiencies in dispositions', () => {
+    const ignored = result.dispositions.filter((entry) => entry.disposition === 'ignored')
+    expect(ignored.map((entry) => entry.sourceValue)).toEqual(
+      expect.arrayContaining([
+        'intelligence-saving-throws',
+        'wisdom-saving-throws',
+        'simple-weapons',
+      ]),
     )
-    expect(mappedSkills.length).toBeGreaterThan(0)
+    expect(result.dispositions.filter((entry) => entry.disposition === 'unsupported')).toHaveLength(
+      0,
+    )
+  })
+
+  it('extracts inventory for equipment preview', () => {
+    expect(result.extraction.equipment.status).toBe('mapped')
+    const names = result.extraction.equipment.value?.map((entry) => entry.sourceLabel) ?? []
+    expect(names).toEqual(expect.arrayContaining(["Calligrapher's Supplies", 'Dagger']))
   })
 
   it('does not emit derived values in mapped extraction fields', () => {
@@ -116,6 +159,29 @@ describe('adaptDndBeyondCharacter edge cases', () => {
       fixtureSource,
     )
     expect(adapted.extraction.alignment.value).toBe('ng')
+  })
+
+  it('maps alignment from source string when alignment id is unset', () => {
+    const adapted = adaptDndBeyondCharacter(
+      {
+        ...dndBeyondCharacter133058471Payload,
+        alignmentId: null,
+        alignment: 'Neutral Good',
+      },
+      fixtureSource,
+    )
+    expect(adapted.extraction.alignment.value).toBe('ng')
+  })
+
+  it('treats alignment id 0 as missing', () => {
+    const adapted = adaptDndBeyondCharacter(
+      {
+        ...dndBeyondCharacter133058471Payload,
+        alignmentId: 0,
+      },
+      fixtureSource,
+    )
+    expect(adapted.extraction.alignment.status).toBe('missing-source')
   })
 
   it('prefers override stats over computed totals', () => {

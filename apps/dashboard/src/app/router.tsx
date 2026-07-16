@@ -75,6 +75,11 @@ const router = createBrowserRouter(
               children: [
                 { index: true, element: <CharactersOverviewRoute /> },
                 {
+                  path: 'import',
+                  element: <CharacterImportRoute />,
+                  handle: { crumb: () => ({ label: 'Import' }) } satisfies CrumbHandle,
+                },
+                {
                   path: ':characterId',
                   element: <CharacterDetailRoute />,
                   handle: {
@@ -402,7 +407,6 @@ const router = createBrowserRouter(
           children: [{ path: 'campaigns/new', element: <CampaignCreateRoute /> }],
         },
         { path: 'characters/new', element: <CharacterCreateRoute /> },
-        { path: 'characters/import', element: <CharacterImportRoute /> },
       ],
     },
     { path: '*', element: <Navigate to={ROUTES.home} replace /> },

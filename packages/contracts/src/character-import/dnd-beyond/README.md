@@ -97,7 +97,7 @@ fields do not break the experiment; incompatible changes surface as
 ## Schema policy (narrow comprehensive)
 
 - **Adapter-critical** — explicit schemas for nodes the mapper reads (stats,
-  modifiers, traits, HP inputs, `alignmentId`).
+  modifiers, traits, HP inputs, `alignmentId`, `data.race` species node).
 - **Roadmap-useful** — shallow named schemas for classes, inventory, spells,
   feats (ids/labels).
 - **Volatile** — `.passthrough()`; documented in this README as unsupported
@@ -111,12 +111,13 @@ evidence for preview/debug only and must never flow into character persistence.
 
 ### Ambiguous props (follow-up)
 
-| Source field                | Notes                                                        |
-| --------------------------- | ------------------------------------------------------------ |
-| `adjustmentXp`              | Recorded in `availableSourceData`; not summed into mapped XP |
-| `removedHitPoints`          | Runtime state; not mapped to local HP contract               |
-| Saving-throw proficiencies  | Recognized in preview; unsupported in stored `proficiencies` |
-| Background definition prose | Excluded from personal `narrative.backstory`                 |
+| Source field                | Notes                                                                                       |
+| --------------------------- | ------------------------------------------------------------------------------------------- |
+| `adjustmentXp`              | Recorded in `availableSourceData`; not summed into mapped XP                                |
+| `removedHitPoints`          | Runtime state; not mapped to local HP contract                                              |
+| Saving-throw proficiencies  | Ignored in preview (`resolved-from-local-content`); resolved from local class               |
+| `data.race`                 | D&D Beyond species — mapped to local `species` preview (`fullName`, `baseRaceName`, `slug`) |
+| Background definition prose | Excluded from personal `narrative.backstory`                                                |
 
 ## Fixtures
 

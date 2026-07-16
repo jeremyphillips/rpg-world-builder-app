@@ -2,27 +2,29 @@ import { z } from 'zod'
 
 import { characterAbilityScoresSchema } from '../../rpg/runtime/character/core'
 import { alignmentSchema } from '../../rpg/vocab/alignment'
+import { DND_BEYOND_PAYLOAD_VERSION } from '../dnd-beyond/dnd-beyond-version'
 import {
   CHARACTER_IMPORT_ACQUISITION_METHODS,
   CHARACTER_IMPORT_COVERAGE_STATES,
-  CHARACTER_IMPORT_PROVIDERS,
   CHARACTER_IMPORT_SOURCE_CAPABILITY_CATEGORIES,
-  DND_BEYOND_PAYLOAD_VERSION,
 } from './character-import-field-status'
 import {
   characterHitPointsPreviewSchema,
   characterImportFieldResultSchema,
+  characterImportProficienciesPreviewSchema,
   characterNarrativePreviewSchema,
+  recognizedEquipmentItemSchema,
   recognizedLanguageSchema,
-  recognizedProficiencySchema,
+  recognizedSpeciesPreviewSchema,
 } from './character-import-preview-types'
+import { characterImportDispositionEntrySchema } from './character-import-disposition'
 
 // ---------------------------------------------------------------------------
 // Character import result — extraction preview + coverage + source evidence.
 // ---------------------------------------------------------------------------
 
-export const characterImportSourceSchema = z.object({
-  provider: z.enum(CHARACTER_IMPORT_PROVIDERS),
+export const dndBeyondCharacterImportSourceSchema = z.object({
+  provider: z.literal('dnd-beyond'),
   payloadVersion: z.literal(DND_BEYOND_PAYLOAD_VERSION),
   requestedPayloadVersion: z.literal(DND_BEYOND_PAYLOAD_VERSION),
   supportedPayloadVersion: z.literal(DND_BEYOND_PAYLOAD_VERSION),
@@ -31,17 +33,25 @@ export const characterImportSourceSchema = z.object({
   readonlyUrl: z.string().optional(),
 })
 
+export type DndBeyondCharacterImportSource = z.infer<typeof dndBeyondCharacterImportSourceSchema>
+
+export const characterImportSourceSchema = z.discriminatedUnion('provider', [
+  dndBeyondCharacterImportSourceSchema,
+])
+
 export type CharacterImportSource = z.infer<typeof characterImportSourceSchema>
 
 export const characterImportExtractionSchema = z.object({
   name: characterImportFieldResultSchema(z.string()),
+  species: characterImportFieldResultSchema(recognizedSpeciesPreviewSchema),
   abilityScores: characterImportFieldResultSchema(characterAbilityScoresSchema),
   alignment: characterImportFieldResultSchema(alignmentSchema),
   xp: characterImportFieldResultSchema(z.number().int().min(0)),
   narrative: characterImportFieldResultSchema(characterNarrativePreviewSchema),
   hitPoints: characterImportFieldResultSchema(characterHitPointsPreviewSchema),
   languages: characterImportFieldResultSchema(z.array(recognizedLanguageSchema)),
-  proficiencies: characterImportFieldResultSchema(z.array(recognizedProficiencySchema)),
+  proficiencies: characterImportFieldResultSchema(characterImportProficienciesPreviewSchema),
+  equipment: characterImportFieldResultSchema(z.array(recognizedEquipmentItemSchema)),
 })
 
 export type CharacterImportExtraction = z.infer<typeof characterImportExtractionSchema>
@@ -67,6 +77,7 @@ export const characterImportResultSchema = z.object({
   source: characterImportSourceSchema,
   extraction: characterImportExtractionSchema,
   coverage: z.array(characterImportCoverageEntrySchema),
+  dispositions: z.array(characterImportDispositionEntrySchema),
   availableSourceData: z.array(characterImportSourceCapabilitySchema),
 })
 

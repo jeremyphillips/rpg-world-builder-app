@@ -9,6 +9,8 @@ import {
   formatExtractionDisplayValue,
 } from '../model/character-import-preview.lib'
 import { CharacterImportPreviewRow } from './character-import-preview-row.client'
+import { CharacterImportProficienciesPreviewSection } from './character-import-proficiencies-preview.client'
+import { CharacterImportDispositionReport } from './character-import-disposition-report.client'
 import { CharacterImportUnmappedAlert } from './character-import-unmapped-alert.client'
 
 export type CharacterImportPreviewProps = {
@@ -32,8 +34,11 @@ export function CharacterImportPreview({ result }: CharacterImportPreviewProps) 
               displayValue={formatExtractionDisplayValue(field, result.extraction[field])}
             />
           ))}
+          <CharacterImportProficienciesPreviewSection result={result.extraction.proficiencies} />
         </div>
       </section>
+
+      <CharacterImportDispositionReport dispositions={result.dispositions} />
 
       <CharacterImportUnmappedAlert coverage={result.coverage} />
     </div>

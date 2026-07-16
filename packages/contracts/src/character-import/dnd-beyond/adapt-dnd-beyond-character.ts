@@ -1,27 +1,35 @@
 // fallow-ignore-file complexity
 import type { Alignment } from '../../rpg/vocab/alignment'
 import type { CharacterAbilityScores } from '../../rpg/runtime/character/core'
-import type {
-  DndBeyondCharacterPayload,
-  DndBeyondModifier,
-} from '../dnd-beyond/dnd-beyond-character.schema'
+import type { DndBeyondCharacterPayload, DndBeyondModifier } from './dnd-beyond-character.schema'
 import {
   buildCharacterImportCoverage,
   buildServerOwnedCoverageEntries,
-} from './character-import-coverage-manifest'
-import type { CharacterImportSource } from './character-import-result.schema'
+} from '../adapter/character-import-coverage-manifest'
 import type {
   CharacterImportResult,
   CharacterImportSourceCapability,
-} from './character-import-result.schema'
+  DndBeyondCharacterImportSource,
+} from '../adapter/character-import-result.schema'
 import type {
   CharacterHitPointsPreview,
   CharacterImportFieldResult,
+  CharacterImportProficienciesPreview,
   CharacterNarrativePreview,
+  RecognizedEquipmentItem,
   RecognizedLanguage,
   RecognizedProficiency,
-} from './character-import-preview-types'
-import { fieldResult, mappedFieldResult } from './character-import-preview-types'
+  RecognizedSpeciesPreview,
+} from '../adapter/character-import-preview-types'
+import { fieldResult, mappedFieldResult } from '../adapter/character-import-preview-types'
+import type { CharacterImportDispositionEntry } from '../adapter/character-import-disposition'
+import { mapDndBeyondToolSubtype } from './dnd-beyond-tool-mapping'
+import {
+  inferLocalSpeciesId,
+  inferLocalSpeciesSlug,
+  readDndBeyondSpeciesLabel,
+} from './dnd-beyond-species-mapping'
+import { resolveDndBeyondProficiencyDisposition } from './proficiency-dispositions'
 
 // ---------------------------------------------------------------------------
 // D&D Beyond → provider-neutral import adapter (pure; no HTTP).
@@ -46,6 +54,19 @@ const DND_BEYOND_ALIGNMENT_ID_TO_LOCAL: Record<number, Alignment> = {
   7: 'le',
   8: 'ne',
   9: 'ce',
+}
+
+const DND_BEYOND_ALIGNMENT_NAME_TO_LOCAL: Record<string, Alignment> = {
+  'lawful good': 'lg',
+  'neutral good': 'ng',
+  'chaotic good': 'cg',
+  'lawful neutral': 'ln',
+  'true neutral': 'n',
+  neutral: 'n',
+  'chaotic neutral': 'cn',
+  'lawful evil': 'le',
+  'neutral evil': 'ne',
+  'chaotic evil': 'ce',
 }
 
 const ABILITY_SCORE_BONUS_SUBTYPE_TO_ABILITY: Record<string, keyof CharacterAbilityScores> = {
@@ -87,20 +108,12 @@ const SKILL_SUBTYPES = new Set([
   'survival',
 ])
 
-const WEAPON_CATEGORY_SUBTYPES: Record<string, string> = {
-  'simple-weapons': 'simple',
-  'martial-weapons': 'martial',
-}
-
-const ARMOR_CATEGORY_SUBTYPES: Record<string, string> = {
-  'light-armor': 'light',
-  'medium-armor': 'medium',
-  'heavy-armor': 'heavy',
-  shields: 'shields',
-  shield: 'shields',
-}
-
 const TOOL_SUBTYPE_SUFFIXES = ['-supplies', '-tools', '-kit', '-instruments'] as const
+
+type ClassifiedProficiency = Pick<
+  RecognizedProficiency,
+  'kind' | 'localValue' | 'skillId' | 'toolId' | 'toolCategory' | 'status'
+>
 
 type ModifierRef = {
   group: string
@@ -145,6 +158,42 @@ function extractName(payload: DndBeyondCharacterPayload): CharacterImportFieldRe
     ])
   }
   return mappedFieldResult(name, sourcePaths)
+}
+
+function extractSpecies(
+  payload: DndBeyondCharacterPayload,
+): CharacterImportFieldResult<RecognizedSpeciesPreview> {
+  const sourcePaths = ['data.race']
+  const race = payload.race
+
+  if (!race) {
+    return fieldResult('missing-source', sourcePaths, [
+      'Species is not set on the source character. D&D Beyond stores species on data.race.',
+    ])
+  }
+
+  const sourceLabel = readDndBeyondSpeciesLabel(race)
+  if (!sourceLabel) {
+    return fieldResult('invalid-value', sourcePaths, [
+      'Race data is present but missing a recognizable species name.',
+    ])
+  }
+
+  const localSlug = inferLocalSpeciesSlug(race)
+  const localValue = inferLocalSpeciesId(race)
+
+  const species: RecognizedSpeciesPreview = {
+    sourceValue: sourceLabel,
+    sourceSlug: race.slug ?? undefined,
+    sourceRaceId: race.entityRaceId ?? race.baseRaceId ?? undefined,
+    baseSpeciesName: race.baseRaceName?.trim() || race.baseName?.trim() || undefined,
+    isSubRace: race.isSubRace ?? undefined,
+    localSlug,
+    localValue,
+    status: localSlug ? 'mapped' : 'unresolved-reference',
+  }
+
+  return mappedFieldResult(species, sourcePaths)
 }
 
 function extractAbilityScores(
@@ -198,26 +247,42 @@ function extractAbilityScores(
   return mappedFieldResult(scores, sourcePaths)
 }
 
+function mapAlignmentName(value: string): Alignment | undefined {
+  return DND_BEYOND_ALIGNMENT_NAME_TO_LOCAL[value.trim().toLowerCase()]
+}
+
 function extractAlignment(
   payload: DndBeyondCharacterPayload,
 ): CharacterImportFieldResult<Alignment> {
-  const sourcePaths = ['data.alignmentId']
+  const sourcePaths = ['data.alignmentId', 'data.alignment']
   const alignmentId = payload.alignmentId
 
-  if (alignmentId == null) {
-    return fieldResult('missing-source', sourcePaths, [
-      'Alignment is not set on the source character.',
-    ])
+  if (alignmentId != null && alignmentId !== 0) {
+    const alignment = DND_BEYOND_ALIGNMENT_ID_TO_LOCAL[alignmentId]
+    if (!alignment) {
+      return fieldResult('invalid-value', sourcePaths, [
+        `Source alignment id ${alignmentId} is not recognized.`,
+      ])
+    }
+
+    return mappedFieldResult(alignment, ['data.alignmentId'])
   }
 
-  const alignment = DND_BEYOND_ALIGNMENT_ID_TO_LOCAL[alignmentId]
-  if (!alignment) {
-    return fieldResult('invalid-value', sourcePaths, [
-      `Source alignment id ${alignmentId} is not recognized.`,
-    ])
+  const alignmentName = payload.alignment?.trim()
+  if (alignmentName) {
+    const alignment = mapAlignmentName(alignmentName)
+    if (!alignment) {
+      return fieldResult('invalid-value', sourcePaths, [
+        `Source alignment "${alignmentName}" is not recognized.`,
+      ])
+    }
+
+    return mappedFieldResult(alignment, ['data.alignment'])
   }
 
-  return mappedFieldResult(alignment, sourcePaths)
+  return fieldResult('missing-source', sourcePaths, [
+    'Alignment is not set on the source character.',
+  ])
 }
 
 function extractXp(payload: DndBeyondCharacterPayload): CharacterImportFieldResult<number> {
@@ -403,45 +468,93 @@ function isToolSubtype(subType: string): boolean {
   return TOOL_SUBTYPE_SUFFIXES.some((suffix) => subType.endsWith(suffix))
 }
 
-function classifyProficiency(
-  subType: string,
-): Pick<RecognizedProficiency, 'kind' | 'localValue' | 'status'> {
-  if (subType.endsWith('-saving-throws')) {
-    return { kind: 'savingThrow', status: 'unsupported' }
-  }
-
-  const weaponCategory = WEAPON_CATEGORY_SUBTYPES[subType]
-  if (weaponCategory) {
-    return { kind: 'weapon', localValue: weaponCategory, status: 'mapped' }
-  }
-
-  const armorCategory = ARMOR_CATEGORY_SUBTYPES[subType]
-  if (armorCategory) {
-    return { kind: 'armor', localValue: armorCategory, status: 'mapped' }
-  }
-
+function classifyProficiency(subType: string): ClassifiedProficiency {
   if (SKILL_SUBTYPES.has(subType)) {
-    return { kind: 'skill', localValue: subType, status: 'mapped' }
+    return {
+      kind: 'skill',
+      skillId: subType,
+      localValue: subType,
+      status: 'mapped',
+    }
+  }
+
+  const toolMapping = mapDndBeyondToolSubtype(subType)
+  if (toolMapping) {
+    return {
+      kind: 'tool',
+      toolId: toolMapping.toolId,
+      toolCategory: toolMapping.toolCategory,
+      localValue: toolMapping.toolCategory,
+      status: 'mapped',
+    }
   }
 
   if (isToolSubtype(subType)) {
-    return { kind: 'tool', localValue: subType, status: 'mapped' }
+    return { kind: 'tool', status: 'unresolved-reference' }
   }
 
   return { kind: 'skill', status: 'unresolved-reference' }
 }
 
-function proficiencyDedupeKey(entry: RecognizedProficiency): string {
-  return `${entry.kind}:${entry.localValue ?? ''}:${entry.sourceValue}`
+function proficiencyPreviewKey(entry: RecognizedProficiency): string {
+  if (entry.kind === 'tool') {
+    return `tool:${entry.toolCategory ?? entry.sourceValue}`
+  }
+
+  return `skill:${entry.skillId ?? entry.localValue ?? entry.sourceValue}`
 }
 
 function extractProficiencies(
   payload: DndBeyondCharacterPayload,
-): CharacterImportFieldResult<RecognizedProficiency[]> {
+  dispositions: CharacterImportDispositionEntry[],
+): CharacterImportFieldResult<CharacterImportProficienciesPreview> {
   const sourcePaths: string[] = []
-  const proficiencies: RecognizedProficiency[] = []
-  const seen = new Set<string>()
+  const skills: RecognizedProficiency[] = []
+  const tools: RecognizedProficiency[] = []
+  const seenSkills = new Set<string>()
+  const seenTools = new Set<string>()
   const issues: string[] = []
+
+  const recordDisposition = (
+    path: string,
+    sourceValue: string,
+    classified: ClassifiedProficiency,
+  ) => {
+    if (classified.status === 'unresolved-reference') {
+      dispositions.push({
+        sourcePath: path,
+        sourceValue,
+        targetPath: 'proficiencies',
+        disposition: 'unresolved-reference',
+        reason: 'requires-catalog-resolution',
+        message: `Proficiency subtype "${sourceValue}" requires local catalog resolution.`,
+      })
+      return
+    }
+
+    dispositions.push({
+      sourcePath: path,
+      sourceValue,
+      targetPath: 'proficiencies',
+      disposition: 'unsupported',
+      reason: 'not-in-local-contract',
+      message: `Proficiency subtype "${sourceValue}" is not supported by the local character contract.`,
+    })
+  }
+
+  const addProficiency = (entry: RecognizedProficiency) => {
+    const key = proficiencyPreviewKey(entry)
+    if (entry.kind === 'tool') {
+      if (seenTools.has(key)) return
+      seenTools.add(key)
+      tools.push(entry)
+      return
+    }
+
+    if (seenSkills.has(key)) return
+    seenSkills.add(key)
+    skills.push(entry)
+  }
 
   for (const { group, modifier, path } of collectModifiers(payload)) {
     if (modifier.type !== 'proficiency') continue
@@ -453,28 +566,39 @@ function extractProficiencies(
       continue
     }
 
-    const classified = classifyProficiency(sourceValue)
-    const entry: RecognizedProficiency = {
+    const normalizedSubType = sourceValue.toLowerCase()
+    const ignoredRule = resolveDndBeyondProficiencyDisposition(normalizedSubType)
+    if (ignoredRule) {
+      dispositions.push({
+        sourcePath: path,
+        sourceValue,
+        targetPath: ignoredRule.targetPath,
+        disposition: ignoredRule.disposition,
+        reason: ignoredRule.reason,
+        message: ignoredRule.message,
+      })
+      continue
+    }
+
+    const classified = classifyProficiency(normalizedSubType)
+    if (classified.status !== 'mapped') {
+      recordDisposition(path, sourceValue, classified)
+      issues.push(`Proficiency subtype "${sourceValue}" could not be mapped for preview.`)
+      continue
+    }
+
+    addProficiency({
       kind: classified.kind,
       sourceValue,
+      sourceLabel: modifier.friendlySubtypeName?.trim() || undefined,
       localValue: classified.localValue,
+      skillId: classified.skillId,
+      toolId: classified.toolId,
+      toolCategory: classified.toolCategory,
       sourceGroup: group,
       status: classified.status,
       rank: 'proficient',
-    }
-
-    const key = proficiencyDedupeKey(entry)
-    if (seen.has(key)) continue
-    seen.add(key)
-    proficiencies.push(entry)
-
-    if (classified.status === 'unsupported') {
-      issues.push(
-        `Saving throw proficiency "${sourceValue}" is not supported by the local character contract.`,
-      )
-    } else if (classified.status === 'unresolved-reference') {
-      issues.push(`Proficiency subtype "${sourceValue}" could not be classified.`)
-    }
+    })
   }
 
   for (const [index, custom] of (payload.customProficiencies ?? []).entries()) {
@@ -486,22 +610,43 @@ function extractProficiencies(
       continue
     }
 
-    const classified = classifyProficiency(sourceValue.toLowerCase())
-    const entry: RecognizedProficiency = {
+    const normalizedSubType = sourceValue.toLowerCase()
+    const ignoredRule = resolveDndBeyondProficiencyDisposition(normalizedSubType)
+    if (ignoredRule) {
+      dispositions.push({
+        sourcePath: path,
+        sourceValue,
+        targetPath: ignoredRule.targetPath,
+        disposition: ignoredRule.disposition,
+        reason: ignoredRule.reason,
+        message: ignoredRule.message,
+      })
+      continue
+    }
+
+    const classified = classifyProficiency(normalizedSubType)
+    if (classified.status !== 'mapped') {
+      recordDisposition(path, sourceValue, classified)
+      continue
+    }
+
+    addProficiency({
       kind: classified.kind,
       sourceValue,
+      sourceLabel: custom.name?.trim() || undefined,
       localValue: classified.localValue,
+      skillId: classified.skillId,
+      toolId: classified.toolId,
+      toolCategory: classified.toolCategory,
       sourceGroup: 'custom',
       status: classified.status,
       rank: 'proficient',
-    }
-    const key = proficiencyDedupeKey(entry)
-    if (seen.has(key)) continue
-    seen.add(key)
-    proficiencies.push(entry)
+    })
   }
 
-  if (proficiencies.length === 0) {
+  const preview = { skills, tools }
+
+  if (skills.length === 0 && tools.length === 0 && dispositions.length === 0) {
     return fieldResult(
       'missing-source',
       ['data.modifiers', 'data.customProficiencies'],
@@ -509,17 +654,62 @@ function extractProficiencies(
     )
   }
 
-  const hasMapped = proficiencies.some((entry) => entry.status === 'mapped')
-  if (!hasMapped) {
+  if (skills.length === 0 && tools.length === 0) {
     return fieldResult('unsupported', sourcePaths, issues)
   }
 
   return {
     status: 'mapped',
-    value: proficiencies,
+    value: preview,
     sourcePaths,
     issues,
   }
+}
+
+function extractEquipment(
+  payload: DndBeyondCharacterPayload,
+): CharacterImportFieldResult<RecognizedEquipmentItem[]> {
+  const sourcePaths: string[] = []
+  const aggregated = new Map<string, RecognizedEquipmentItem>()
+
+  for (const [index, item] of (payload.inventory ?? []).entries()) {
+    const path = `data.inventory[${index}]`
+    const name = item.definition?.name?.trim()
+    if (!name) continue
+
+    sourcePaths.push(path)
+    const key = name.toLowerCase()
+    const quantity = item.quantity ?? 1
+    const existing = aggregated.get(key)
+
+    if (existing) {
+      existing.quantity += quantity
+      if (item.equipped) existing.equipped = true
+      continue
+    }
+
+    aggregated.set(key, {
+      sourceValue: name,
+      sourceLabel: name,
+      quantity,
+      equipped: item.equipped ?? undefined,
+      status: 'mapped',
+    })
+  }
+
+  const equipment = [...aggregated.values()].sort((left, right) =>
+    left.sourceLabel.localeCompare(right.sourceLabel),
+  )
+
+  if (equipment.length === 0) {
+    return fieldResult(
+      'missing-source',
+      ['data.inventory'],
+      ['No inventory items were found in the source character.'],
+    )
+  }
+
+  return mappedFieldResult(equipment, sourcePaths)
 }
 
 function collectAvailableSourceData(
@@ -587,17 +777,21 @@ function collectAvailableSourceData(
 
 export function adaptDndBeyondCharacter(
   payload: DndBeyondCharacterPayload,
-  source: CharacterImportSource,
+  source: DndBeyondCharacterImportSource,
 ): CharacterImportResult {
+  const dispositions: CharacterImportDispositionEntry[] = []
+
   const extraction = {
     name: extractName(payload),
+    species: extractSpecies(payload),
     abilityScores: extractAbilityScores(payload),
     alignment: extractAlignment(payload),
     xp: extractXp(payload),
     narrative: extractNarrative(payload),
     hitPoints: extractHitPoints(payload),
     languages: extractLanguages(payload),
-    proficiencies: extractProficiencies(payload),
+    proficiencies: extractProficiencies(payload, dispositions),
+    equipment: extractEquipment(payload),
   }
 
   const coverage = [
@@ -609,6 +803,7 @@ export function adaptDndBeyondCharacter(
     source,
     extraction,
     coverage,
+    dispositions,
     availableSourceData: collectAvailableSourceData(payload),
   }
 }

@@ -2,6 +2,8 @@ import { z } from 'zod'
 
 import { characterNarrativeSchema } from '../../rpg/runtime/character/narrative'
 import { characterHitPointsSchema } from '../../rpg/runtime/character/core'
+import { toolCategorySchema } from '../../rpg/vocab/equipment/tool-category'
+import { skillSchema } from '../../rpg/content/skill-proficiency'
 import {
   CHARACTER_IMPORT_FIELD_STATUSES,
   type CharacterImportFieldStatus,
@@ -46,13 +48,50 @@ export type RecognizedProficiencyRank = z.infer<typeof recognizedProficiencyRank
 export const recognizedProficiencySchema = z.object({
   kind: recognizedProficiencyKindSchema,
   sourceValue: z.string(),
+  sourceLabel: z.string().optional(),
   localValue: z.string().optional(),
+  skillId: skillSchema.optional(),
+  toolId: z.string().optional(),
+  toolCategory: toolCategorySchema.optional(),
   sourceGroup: z.string(),
   rank: recognizedProficiencyRankSchema.optional(),
   status: recognizedEntryStatusSchema,
 })
 
 export type RecognizedProficiency = z.infer<typeof recognizedProficiencySchema>
+
+export const characterImportProficienciesPreviewSchema = z.object({
+  skills: z.array(recognizedProficiencySchema),
+  tools: z.array(recognizedProficiencySchema),
+})
+
+export type CharacterImportProficienciesPreview = z.infer<
+  typeof characterImportProficienciesPreviewSchema
+>
+
+export const recognizedEquipmentItemSchema = z.object({
+  sourceValue: z.string(),
+  sourceLabel: z.string(),
+  quantity: z.number().int().positive(),
+  equipped: z.boolean().optional(),
+  status: recognizedEntryStatusSchema,
+  localValue: z.string().optional(),
+})
+
+export type RecognizedEquipmentItem = z.infer<typeof recognizedEquipmentItemSchema>
+
+export const recognizedSpeciesPreviewSchema = z.object({
+  sourceValue: z.string(),
+  sourceSlug: z.string().optional(),
+  sourceRaceId: z.number().optional(),
+  baseSpeciesName: z.string().optional(),
+  isSubRace: z.boolean().optional(),
+  localSlug: z.string().optional(),
+  localValue: z.string().optional(),
+  status: recognizedEntryStatusSchema,
+})
+
+export type RecognizedSpeciesPreview = z.infer<typeof recognizedSpeciesPreviewSchema>
 
 /** Narrative preview reuses the stored narrative shape (all fields optional). */
 export const characterNarrativePreviewSchema = characterNarrativeSchema

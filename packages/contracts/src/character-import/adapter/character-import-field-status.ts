@@ -43,7 +43,3 @@ export type CharacterImportAcquisitionMethod = (typeof CHARACTER_IMPORT_ACQUISIT
 export const CHARACTER_IMPORT_PROVIDERS = ['dnd-beyond'] as const
 
 export type CharacterImportProvider = (typeof CHARACTER_IMPORT_PROVIDERS)[number]
-
-export const DND_BEYOND_PAYLOAD_VERSION = 'character-v5' as const
-
-export type DndBeyondPayloadVersion = typeof DND_BEYOND_PAYLOAD_VERSION
