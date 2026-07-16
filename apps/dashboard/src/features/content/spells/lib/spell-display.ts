@@ -1,8 +1,12 @@
 import {
+  formatAreaGeometry,
+  formatAtomicEffectSummaries,
+  formatSlugAsLabel,
   getEffectConditionLabel,
   getSpellDeliveryMethodLabel,
   getSpellFunctionTagLabel,
   getSpellRoleTagLabel,
+  getSpellSchoolLabel,
   type Spell,
   type SpellTags,
 } from '@rpg/contracts'
@@ -22,6 +26,7 @@ export const SPELL_STAT_LABELS = {
   school: 'School',
   castingTime: 'Casting Time',
   range: 'Range',
+  area: 'Area',
   duration: 'Duration',
   components: 'Components',
   ritual: 'Ritual',
@@ -36,6 +41,12 @@ export const SPELL_SECTION_LABELS = {
   higherLevelSlotEffect: 'Using a Higher-Level Spell Slot',
 } as const
 
+export const SPELL_DETAIL_SECTION_LABELS = {
+  tags: 'Tags',
+  classes: 'Classes',
+  effects: 'Effects',
+} as const
+
 const SPELL_STAT_RITUAL_INFO =
   'When a spell can be cast as a ritual, you may extend its casting time by 10 minutes to cast it without expending a spell slot, if you have the spell prepared or it appears in your spellbook (for classes that use one).'
 
@@ -43,20 +54,23 @@ const SPELL_STAT_CONCENTRATION_INFO =
   'Some spells require Concentration to maintain. Your Concentration on a spell ends if you cast another Concentration spell, fail a Constitution saving throw after taking damage, or become Incapacitated or die.'
 
 export type SpellDisplayVocabulary = {
-  resolveSpellSchoolLabel: (schoolId: string) => string
-  resolveSpellSchoolDescription: (schoolId: string) => string | undefined
-  resolveDamageTypeLabel: (typeId: string) => string
-  resolveClassLabel: (classSlug: string) => string
+  resolveSpellSchoolLabel?: (schoolId: string) => string
+  resolveSpellSchoolDescription?: (schoolId: string) => string | undefined
+  resolveDamageTypeLabel?: (typeId: string) => string
+  resolveClassLabel?: (slug: string) => string
+}
+
+export type SpellDetailProseSections = {
+  cantripScaling?: string
+  higherLevelSlotEffect?: string
 }
 
 export type SpellDetailViewModel = {
   statRows: ContentStatRowData[]
   descriptionHtml?: string
-  proseSections?: Array<{
-    id: 'cantripScaling' | 'higherLevelSlotEffect'
-    title: string
-    bodyHtml: string
-  }>
+  proseSections: SpellDetailProseSections
+  tagLabels: string[]
+  classLabels: string[]
   classesSection?: {
     title: string
     items: Array<{ slug: string; label: string }>
@@ -65,23 +79,32 @@ export type SpellDetailViewModel = {
     title: string
     labels: string[]
   }
+  effectsSection?: {
+    title: string
+    lines: string[]
+  }
 }
 
 function collectTagLabels(tags: SpellTags, vocabulary: SpellDisplayVocabulary): string[] {
   const labels: string[] = []
   tags.roles?.forEach((role) => labels.push(getSpellRoleTagLabel(role)))
   tags.functions?.forEach((fn) => labels.push(getSpellFunctionTagLabel(fn)))
-  tags.damageTypes?.forEach((type) => labels.push(vocabulary.resolveDamageTypeLabel(type)))
+  tags.damageTypes?.forEach((type) =>
+    labels.push(vocabulary.resolveDamageTypeLabel?.(type) ?? formatSlugAsLabel(type)),
+  )
   tags.conditions?.forEach((condition) => labels.push(getEffectConditionLabel(condition)))
   return labels
 }
 
 function buildSpellStatRows(
   spell: Spell,
-  vocabulary: SpellDisplayVocabulary,
+  vocabulary: {
+    resolveSpellSchoolLabel: (schoolId: string) => string
+    resolveSpellSchoolDescription?: (schoolId: string) => string | undefined
+  },
 ): ContentStatRowData[] {
   const schoolLabel = vocabulary.resolveSpellSchoolLabel(spell.school)
-  const schoolDescription = vocabulary.resolveSpellSchoolDescription(spell.school)
+  const schoolDescription = vocabulary.resolveSpellSchoolDescription?.(spell.school)
 
   const rows: ContentStatRowData[] = [
     { label: SPELL_STAT_LABELS.level, value: formatSpellLevelLabel(spell.level) },
@@ -89,10 +112,13 @@ function buildSpellStatRows(
       label: SPELL_STAT_LABELS.school,
       value: schoolLabel,
       info: schoolDescription,
-      infoAriaLabel: `About ${schoolLabel}`,
+      infoAriaLabel: schoolDescription ? `About ${schoolLabel}` : undefined,
     },
     { label: SPELL_STAT_LABELS.castingTime, value: formatCastingTime(spell.castingTime) },
     { label: SPELL_STAT_LABELS.range, value: formatSpellRange(spell.range) },
+    ...(spell.areaOfEffect
+      ? [{ label: SPELL_STAT_LABELS.area, value: formatAreaGeometry(spell.areaOfEffect) }]
+      : []),
     { label: SPELL_STAT_LABELS.duration, value: formatSpellDuration(spell.duration) },
     { label: SPELL_STAT_LABELS.components, value: formatSpellComponents(spell.components) },
     {
@@ -119,45 +145,44 @@ function buildSpellStatRows(
   return rows
 }
 
-function buildProseSections(spell: Spell): SpellDetailViewModel['proseSections'] {
-  const sections: NonNullable<SpellDetailViewModel['proseSections']> = []
+function resolveClassLabels(spell: Spell, vocabulary: SpellDisplayVocabulary): string[] {
+  return spell.classIds.map(
+    (slug) => vocabulary.resolveClassLabel?.(slug) ?? formatSlugAsLabel(slug),
+  )
+}
 
-  if (spell.cantripScaling?.trim()) {
-    sections.push({
-      id: 'cantripScaling',
-      title: SPELL_SECTION_LABELS.cantripScaling,
-      bodyHtml: spell.cantripScaling,
-    })
+function buildProseSections(spell: Spell): SpellDetailProseSections {
+  return {
+    cantripScaling: spell.cantripScaling?.trim() || undefined,
+    higherLevelSlotEffect: spell.higherLevelSlotEffect?.trim() || undefined,
   }
-
-  if (spell.higherLevelSlotEffect?.trim()) {
-    sections.push({
-      id: 'higherLevelSlotEffect',
-      title: SPELL_SECTION_LABELS.higherLevelSlotEffect,
-      bodyHtml: spell.higherLevelSlotEffect,
-    })
-  }
-
-  return sections.length > 0 ? sections : undefined
 }
 
 export function buildSpellDetailViewModel(
   spell: Spell,
-  vocabulary: SpellDisplayVocabulary,
+  vocabulary: SpellDisplayVocabulary = {},
 ): SpellDetailViewModel {
+  const resolveSchoolLabel = vocabulary.resolveSpellSchoolLabel ?? getSpellSchoolLabel
   const tagLabels = spell.tags ? collectTagLabels(spell.tags, vocabulary) : []
+  const classLabels = resolveClassLabels(spell, vocabulary)
+  const proseSections = buildProseSections(spell)
 
   return {
-    statRows: buildSpellStatRows(spell, vocabulary),
+    statRows: buildSpellStatRows(spell, {
+      resolveSpellSchoolLabel: resolveSchoolLabel,
+      resolveSpellSchoolDescription: vocabulary.resolveSpellSchoolDescription,
+    }),
     descriptionHtml: spell.description || undefined,
-    proseSections: buildProseSections(spell),
+    proseSections,
+    tagLabels,
+    classLabels,
     classesSection:
       spell.classIds.length > 0
         ? {
             title: SPELL_SECTION_LABELS.classes,
             items: spell.classIds.map((slug) => ({
               slug,
-              label: vocabulary.resolveClassLabel(slug),
+              label: vocabulary.resolveClassLabel?.(slug) ?? formatSlugAsLabel(slug),
             })),
           }
         : undefined,
@@ -166,6 +191,13 @@ export function buildSpellDetailViewModel(
         ? {
             title: SPELL_SECTION_LABELS.tags,
             labels: tagLabels,
+          }
+        : undefined,
+    effectsSection:
+      spell.effects && spell.effects.length > 0
+        ? {
+            title: SPELL_DETAIL_SECTION_LABELS.effects,
+            lines: formatAtomicEffectSummaries(spell.effects),
           }
         : undefined,
   }

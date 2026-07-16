@@ -6,7 +6,9 @@ import { describe, expect, it, vi } from 'vitest'
 import { ProficiencyPickerDrawer } from './proficiency-picker-drawer.client'
 import {
   proficiencyPickerAcrobaticsOptionId,
+  proficiencyPickerCatalogIndexFixture,
   proficiencyPickerItemsFixture,
+  proficiencyPickerLanguageCatalogIndexFixture,
   proficiencyPickerLanguageChoiceSetFixture,
   proficiencyPickerLanguageItemsFixture,
   proficiencyPickerOpenItemsFixture,
@@ -20,7 +22,7 @@ import {
 } from './proficiency-picker-drawer.types'
 
 describe('ProficiencyPickerDrawer', () => {
-  it('renders search and filters rows by label', async () => {
+  it('renders search, sort toolbar, and filters rows by label', async () => {
     const user = userEvent.setup()
 
     render(
@@ -30,12 +32,15 @@ describe('ProficiencyPickerDrawer', () => {
         choiceSet={proficiencyPickerSkillChoiceSetFixture}
         selectedIds={[]}
         items={proficiencyPickerOpenItemsFixture}
+        catalogIndex={proficiencyPickerCatalogIndexFixture}
         onSelectOption={vi.fn()}
         onRemoveOption={vi.fn()}
       />,
     )
 
+    expect(screen.getByRole('group', { name: 'Sort proficiencies' })).toBeInTheDocument()
     expect(screen.getByText('Stealth')).toBeInTheDocument()
+    expect(screen.getAllByText('Dexterity').length).toBeGreaterThan(0)
     expect(screen.getByText('Acrobatics')).toBeInTheDocument()
     expect(screen.getByText('Perception')).toBeInTheDocument()
 
@@ -54,6 +59,7 @@ describe('ProficiencyPickerDrawer', () => {
         choiceSet={proficiencyPickerSkillChoiceSetFixture}
         selectedIds={[proficiencyPickerStealthOptionId, proficiencyPickerAcrobaticsOptionId]}
         items={proficiencyPickerItemsFixture}
+        catalogIndex={proficiencyPickerCatalogIndexFixture}
         onSelectOption={vi.fn()}
         onRemoveOption={vi.fn()}
       />,
@@ -77,6 +83,7 @@ describe('ProficiencyPickerDrawer', () => {
         choiceSet={proficiencyPickerSkillChoiceSetFixture}
         selectedIds={[]}
         items={proficiencyPickerOpenItemsFixture}
+        catalogIndex={proficiencyPickerCatalogIndexFixture}
         onSelectOption={onSelectOption}
         onRemoveOption={onRemoveOption}
       />,
@@ -98,6 +105,7 @@ describe('ProficiencyPickerDrawer', () => {
         choiceSet={proficiencyPickerSkillChoiceSetFixture}
         selectedIds={[proficiencyPickerStealthOptionId, proficiencyPickerAcrobaticsOptionId]}
         items={proficiencyPickerItemsFixture}
+        catalogIndex={proficiencyPickerCatalogIndexFixture}
         onSelectOption={onSelectOption}
         onRemoveOption={onRemoveOption}
       />,
@@ -106,6 +114,46 @@ describe('ProficiencyPickerDrawer', () => {
     const stealthRow = screen.getByText('Stealth').closest('[data-picker-item-key]') as HTMLElement
     await user.click(within(stealthRow).getByRole('button', { name: 'Remove' }))
     expect(onRemoveOption).toHaveBeenCalledWith(proficiencyPickerStealthOptionId)
+  })
+
+  it('expands skill rows with governing ability and examples', async () => {
+    const user = userEvent.setup()
+
+    render(
+      <ProficiencyPickerDrawer
+        open
+        onOpenChange={vi.fn()}
+        choiceSet={proficiencyPickerSkillChoiceSetFixture}
+        selectedIds={[]}
+        items={proficiencyPickerOpenItemsFixture}
+        catalogIndex={proficiencyPickerCatalogIndexFixture}
+        onSelectOption={vi.fn()}
+        onRemoveOption={vi.fn()}
+      />,
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Expand Stealth' }))
+
+    const stealthRow = screen.getByText('Stealth').closest('[data-picker-item-key]') as HTMLElement
+    expect(within(stealthRow).getByText(/^Governing Ability$/)).toBeInTheDocument()
+    expect(within(stealthRow).getAllByText('Dexterity').length).toBeGreaterThanOrEqual(2)
+  })
+
+  it('does not render expand controls for language rows', () => {
+    render(
+      <ProficiencyPickerDrawer
+        open
+        onOpenChange={vi.fn()}
+        choiceSet={proficiencyPickerLanguageChoiceSetFixture}
+        selectedIds={[]}
+        items={proficiencyPickerLanguageItemsFixture}
+        catalogIndex={proficiencyPickerLanguageCatalogIndexFixture}
+        onSelectOption={vi.fn()}
+        onRemoveOption={vi.fn()}
+      />,
+    )
+
+    expect(screen.queryByRole('button', { name: /^Expand / })).not.toBeInTheDocument()
   })
 
   it('shows distinct empty states for no options, no search results, and selection full', async () => {
@@ -118,6 +166,7 @@ describe('ProficiencyPickerDrawer', () => {
         choiceSet={proficiencyPickerSkillChoiceSetFixture}
         selectedIds={[]}
         items={[]}
+        catalogIndex={proficiencyPickerCatalogIndexFixture}
         onSelectOption={vi.fn()}
         onRemoveOption={vi.fn()}
       />,
@@ -132,6 +181,7 @@ describe('ProficiencyPickerDrawer', () => {
         choiceSet={proficiencyPickerSkillChoiceSetFixture}
         selectedIds={[proficiencyPickerStealthOptionId, proficiencyPickerAcrobaticsOptionId]}
         items={[]}
+        catalogIndex={proficiencyPickerCatalogIndexFixture}
         onSelectOption={vi.fn()}
         onRemoveOption={vi.fn()}
       />,
@@ -146,6 +196,7 @@ describe('ProficiencyPickerDrawer', () => {
         choiceSet={proficiencyPickerSkillChoiceSetFixture}
         selectedIds={[]}
         items={proficiencyPickerOpenItemsFixture}
+        catalogIndex={proficiencyPickerCatalogIndexFixture}
         onSelectOption={vi.fn()}
         onRemoveOption={vi.fn()}
       />,
@@ -165,6 +216,7 @@ describe('ProficiencyPickerDrawer', () => {
         choiceSet={proficiencyPickerLanguageChoiceSetFixture}
         selectedIds={[]}
         items={proficiencyPickerLanguageItemsFixture}
+        catalogIndex={proficiencyPickerLanguageCatalogIndexFixture}
         onSelectOption={vi.fn()}
         onRemoveOption={vi.fn()}
       />,
@@ -186,6 +238,7 @@ describe('ProficiencyPickerDrawer', () => {
         choiceSet={proficiencyPickerSkillChoiceSetFixture}
         selectedIds={[proficiencyPickerStealthOptionId]}
         items={proficiencyPickerItemsFixture}
+        catalogIndex={proficiencyPickerCatalogIndexFixture}
         onSelectOption={vi.fn()}
         onRemoveOption={vi.fn()}
       />,

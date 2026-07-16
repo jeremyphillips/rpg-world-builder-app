@@ -2,6 +2,8 @@
 export type GameTermEntry = {
   readonly label: string
   readonly description: string
+  /** Compact-surface display label; falls back to `label` when absent. */
+  readonly compactLabel?: string
   /** Counted noun phrase forms for generated sentences, not replacement labels. */
   readonly sentence?: {
     readonly singular?: string
@@ -25,4 +27,9 @@ export function getTermSentenceForm(entry: GameTermEntry, count: number): string
   const singular = entry.sentence?.singular ?? getTermLabelSingular(entry.label)
   if (count === 1) return singular
   return entry.sentence?.plural ?? (singular.endsWith('s') ? singular : `${singular}s`)
+}
+
+/** Compact-surface display label; falls back to `label` when `compactLabel` is absent. */
+export function getTermCompactLabel(entry: GameTermEntry): string {
+  return entry.compactLabel ?? entry.label
 }

@@ -17,8 +17,8 @@ const gp = (amount) => ({ amount, currency: 'gp' })
 const sp = (amount) => ({ amount, currency: 'sp' })
 const cp = (amount) => ({ amount, currency: 'cp' })
 
-const d = (count, faces) => ({ kind: 'dice', count, faces })
-const flat = (amount) => ({ kind: 'flat', amount })
+const d = (count, faces) => ({ dice: { count, faces } })
+const flat = (amount) => ({ flat: amount })
 const range = (normal, long) => ({ normal, long })
 
 function weapon(slug, name, category, mode, damage, damageType, mastery, cost, weight, extra = {}) {

@@ -11,11 +11,9 @@ export {
   EQUIPMENT_FAMILY_PATHS,
   getEquipmentFamilyLabel,
   buildEquipmentDetailViewModel,
-  buildEquipmentPickerHeaderViewModel,
   buildEquipmentPickerRowViewModel,
   EQUIPMENT_DETAILS_SECTION_TITLES,
   EQUIPMENT_STAT_LABELS,
-  type EquipmentCardViewModel,
   type EquipmentDetailViewModel,
   type EquipmentPickerRowViewModel,
   EquipmentDetailMetadata,
@@ -27,6 +25,11 @@ export {
   useSkillProficiencies,
   skillProficienciesQueryKey,
 } from './skill-proficiencies'
+export {
+  buildSkillProficiencyDetailViewModel,
+  type SkillProficiencyDetailViewModel,
+} from './skill-proficiencies/lib/skill-proficiency-display'
+export { SkillProficiencyDetailMetadata } from './skill-proficiencies/components/skill-proficiency-detail-metadata.client'
 export { SkillProficiencyCreate } from './skill-proficiencies/routes/skill-proficiency-create'
 export { SkillProficiencyEdit } from './skill-proficiencies/routes/skill-proficiency-edit'
 export { SpeciesOverview, SpeciesDetail, useSpecies, speciesQueryKey } from './species'
@@ -64,6 +67,13 @@ export { FeatsOverview, FeatDetail, FeatCreate, FeatEdit, useFeats, featsQueryKe
 export { SpellsOverview, SpellDetail, useSpells, spellsQueryKey } from './spells'
 export { SpellCreate } from './spells/routes/spell-create'
 export { SpellEdit } from './spells/routes/spell-edit'
+export {
+  buildSpellDetailViewModel,
+  SPELL_DETAIL_SECTION_LABELS,
+  type SpellDetailViewModel,
+  type SpellDisplayVocabulary,
+} from './spells/lib/spell-display'
+export { SpellDetailMetadata } from './spells/components/spell-detail-metadata.client'
 export {
   ContentCreateShell,
   ContentFormShellResolver,

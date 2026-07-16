@@ -294,4 +294,42 @@ describe('InlineSentenceField form integration', () => {
 
     expect(screen.getAllByRole('combobox')).toHaveLength(2)
   })
+
+  it('renders numeric select values stored as numbers', () => {
+    const fields: FormItem[] = [
+      {
+        type: 'inlineSentence',
+        name: 'roll',
+        label: 'Roll',
+        segments: [
+          {
+            kind: 'select',
+            name: 'roll.dice.faces',
+            options: [
+              { value: '6', label: '6' },
+              { value: '10', label: '10' },
+            ],
+            digits: 3,
+            ariaLabel: 'Die faces',
+          },
+        ],
+      },
+    ]
+
+    render(
+      <Form
+        schema={z.object({
+          roll: z.object({
+            dice: z.object({ faces: z.number() }),
+          }),
+        })}
+        fields={fields}
+        defaultValues={{ roll: { dice: { faces: 10 } } }}
+        onSubmit={vi.fn()}
+        footer={null}
+      />,
+    )
+
+    expect(screen.getByRole('combobox', { name: 'Die faces' })).toHaveTextContent('10')
+  })
 })

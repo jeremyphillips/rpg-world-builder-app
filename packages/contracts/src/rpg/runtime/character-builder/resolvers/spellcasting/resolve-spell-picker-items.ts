@@ -7,9 +7,8 @@ import {
 } from '../picker/picker-item-state'
 import { resolveAvailableChoices } from '../registry/resolve-choices'
 import {
+  buildSpellPickerCompactSummary,
   buildSpellPickerSearchText,
-  formatSpellPickerLevelLabel,
-  formatSpellPickerSummaryLine,
 } from './format-spell-picker-metadata'
 
 export type SpellPickerItemState = PickerItemStateBase & {
@@ -22,8 +21,7 @@ export type SpellPickerItem = {
   spell: Spell
   state: SpellPickerItemState
   searchText: string
-  levelLabel: string
-  summaryLine: string
+  compactSummary: ReturnType<typeof buildSpellPickerCompactSummary>
 }
 
 export type ResolveSpellPickerItemsArgs = {
@@ -81,8 +79,7 @@ export function resolveSpellPickerItems({
         spell,
         state: resolveSpellPickerItemState(spell.id, selectedIds, choiceSet.max),
         searchText: buildSpellPickerSearchText(spell),
-        levelLabel: formatSpellPickerLevelLabel(spell.level),
-        summaryLine: formatSpellPickerSummaryLine(spell),
+        compactSummary: buildSpellPickerCompactSummary(spell),
       },
     ]
   })

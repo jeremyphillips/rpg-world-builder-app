@@ -65,6 +65,7 @@ export type FieldType =
   | 'inlineChooseCount'
   | 'inlineSentence'
   | 'levelRange'
+  | 'rollValue'
 
 /** Option for the `select`, `radio`, `radioCard`, `chips`, and `combobox` field types. */
 export interface FieldOption {
@@ -498,6 +499,17 @@ export interface DiceFormulaFieldConfig extends BaseFieldConfig {
   defaultValue?: DiceFormulaValue
 }
 
+export interface RollValueFieldConfig extends BaseFieldConfig {
+  type: 'rollValue'
+  faces?: readonly number[]
+  countMin?: number
+  countMax?: number
+  modifierMin?: number
+  modifierMax?: number
+  defaultCount?: number
+  defaultFaces?: number
+}
+
 /**
  * Value + unit composite bound to a nested object field (e.g. `{ amount, currency }`).
  * `valueKey` / `unitKey` name the object properties the control reads and writes.
@@ -572,6 +584,7 @@ export type FieldConfig =
   | ComboboxFieldConfig
   | EditableGridFieldConfig
   | DiceFormulaFieldConfig
+  | RollValueFieldConfig
   | InputSelectFieldConfig
   | InputUnitFieldConfig
 export interface RowConfig {
@@ -684,7 +697,13 @@ export interface ArrayItemHeaderConfig {
   primary?: (values: Record<string, unknown>, index: number) => string | undefined
   fallback: (index: number) => string
   /** Shown on its own row below the header title on detailed items. */
-  summary?: (values: Record<string, unknown>, index: number) => string
+  summary?: (
+    values: Record<string, unknown>,
+    index: number,
+    watchedContext?: Record<string, unknown>,
+  ) => string
+  /** Root-relative field paths whose values are passed as `watchedContext` to `summary`. */
+  summaryDependsOn?: string[]
   /**
    * When true, appends ` · {fallback}` after the primary label in the header title.
    * Defaults to false — fallback still drives aria labels and empty-primary titles.
@@ -755,6 +774,9 @@ export interface ArrayConfig {
   /** Supplies default values for a newly appended row. */
   appendDefaults?: (items: unknown[]) => Record<string, unknown>
 
+  /** When true, hides the default array add control (use an external slot instead). */
+  hideAddControl?: boolean
+
   /** Searchable template menu for the add control; replaces the plain add button when set. */
   addMenu?: {
     groups: { id: string; label: string }[]
@@ -804,6 +826,8 @@ export interface SlotConfig {
   label?: string
   hint?: string
   className?: string
+  /** When hidden, the slot unmounts and any registered values clear with `shouldUnregister`. */
+  visibility?: FieldVisibility
   render: () => ReactNode
   /**
    * Vertical gap between slot content siblings. Defaults to `compact` array rhythm
@@ -895,6 +919,7 @@ const TYPE_DEFAULTS: Record<FieldType, unknown> = {
   inlineChooseCount: undefined,
   inlineSentence: undefined,
   levelRange: undefined,
+  rollValue: undefined,
 }
 
 function assignInlineSentenceDefaults(
@@ -992,6 +1017,15 @@ function assignDependentFieldDefaults(field: FieldConfig, values: Record<string,
     inlineField.selectDefaultValue ?? (inlineField.selectRequired ? '' : undefined)
 }
 
+function assignRollValueDefaults(
+  field: RollValueFieldConfig,
+  values: Record<string, unknown>,
+): void {
+  const base = field.name
+  values[`${base}.dice.count`] = field.defaultCount ?? 1
+  values[`${base}.dice.faces`] = field.defaultFaces ?? 6
+}
+
 function assignFieldDefaultValues(field: FieldConfig, values: Record<string, unknown>): void {
   if (field.type === 'inlineSentence') {
     assignInlineSentenceDefaults(field, values)
@@ -1000,6 +1034,11 @@ function assignFieldDefaultValues(field: FieldConfig, values: Record<string, unk
 
   if (field.type === 'levelRange') {
     assignLevelRangeDefaults(field as LevelRangeFieldConfig, values)
+    return
+  }
+
+  if (field.type === 'rollValue') {
+    assignRollValueDefaults(field as RollValueFieldConfig, values)
     return
   }
 

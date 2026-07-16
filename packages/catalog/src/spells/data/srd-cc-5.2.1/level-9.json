@@ -20,5 +20,125 @@
     "range": { "kind": "distance", "value": { "value": 60, "unit": "ft" } },
     "duration": { "kind": "instantaneous" },
     "components": { "verbal": true }
+  },
+  {
+    "id": "srd-cc-5.2.1:prismatic-wall",
+    "slug": "prismatic-wall",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Prismatic Wall",
+    "description": "<p>A shimmering, multicolored plane of light forms a vertical opaque wall—up to 90 feet long, 30 feet high, and 1 inch thick—centered on a point within range. Alternatively, you shape the wall into a globe up to 30 feet in diameter centered on a point within range. The wall lasts for the duration. If you position the wall in a space occupied by a creature, the spell ends instantly without effect.</p><p>The wall sheds Bright Light within 100 feet and Dim Light for an additional 100 feet. You and creatures you designate when you cast the spell can pass through and be near the wall without harm. If another creature that can see the wall moves within 20 feet of it or starts its turn there, the creature must succeed on a Constitution saving throw or have the Blinded condition for 1 minute.</p><p>The wall consists of seven layers, each with a different color. When a creature reaches into or passes through the wall, it does so one layer at a time through all the layers. Each layer forces the creature to make a Dexterity saving throw or be affected by that layer's properties as described in the Prismatic Layers table.</p><p>[Prismatic Layers Table]</p><p>The wall, which has AC 10, can be destroyed one layer at a time, in order from red to violet, by means specific to each layer. If a layer is destroyed, it is gone for the duration. Antimagic Field has no effect on the wall, and Dispel Magic can affect only the violet layer.</p>",
+    "school": "abjuration",
+    "level": 9,
+    "classIds": ["bard", "wizard"],
+    "tags": {
+      "conditions": ["blinded"],
+      "roles": ["control", "warding"]
+    },
+    "castingTime": {
+      "normal": {
+        "value": 1,
+        "unit": "action"
+      },
+      "canBeCastAsRitual": false
+    },
+    "range": {
+      "kind": "distance",
+      "value": {
+        "value": 60,
+        "unit": "ft"
+      }
+    },
+    "duration": {
+      "kind": "timed",
+      "value": 10,
+      "unit": "minute"
+    },
+    "components": {
+      "verbal": true,
+      "somatic": true
+    }
+  },
+  {
+    "id": "srd-cc-5.2.1:true-polymorph",
+    "slug": "true-polymorph",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "True Polymorph",
+    "description": "<p>Choose one creature or nonmagical object that you can see within range. The creature shape-shifts into a different creature or a nonmagical object, or the object shape-shifts into a creature (the object must be neither worn nor carried). The transformation lasts for the duration or until the target dies or is destroyed, but if you maintain Concentration on this spell for the full duration, the spell lasts until dispelled.</p><p>An unwilling creature can make a Wisdom saving throw, and if it succeeds, it isn't affected by this spell.</p><p><strong>Creature into Creature.</strong> If you turn a creature into another kind of creature, the new form can be any kind you choose that has a Challenge Rating equal to or less than the target's Challenge Rating or level. The target's game statistics are replaced by the stat block of the new form, but it retains its Hit Points, Hit Point Dice, alignment, and personality.</p><p>The target gains a number of Temporary Hit Points equal to the Hit Points of the new form. These Temporary Hit Points vanish if any remain when the spell ends.</p><p>The target is limited in the actions it can perform by the anatomy of its new form, and it can't speak or cast spells.</p><p>The target's gear melds into the new form. The creature can't use or otherwise benefit from any of that equipment.</p><p><strong>Object into Creature.</strong> You can turn an object into any kind of creature, as long as the creature's size is no larger than the object's size and the creature has a Challenge Rating of 9 or lower. The creature is Friendly to you and your allies. In combat, it takes its turns immediately after yours, and it obeys your commands.</p><p>If the spell lasts more than an hour, you no longer control the creature. It might remain Friendly to you, depending on how you have treated it.</p><p><strong>Creature into Object.</strong> If you turn a creature into an object, it transforms along with whatever it is wearing and carrying into that form, as long as the object's size is no larger than the creature's size. The creature's statistics become those of the object, and the creature has no memory of time spent in this form after the spell ends and it returns to normal.</p>",
+    "school": "transmutation",
+    "level": 9,
+    "classIds": ["bard", "warlock", "wizard"],
+    "tags": {
+      "roles": ["control"]
+    },
+    "castingTime": {
+      "normal": {
+        "value": 1,
+        "unit": "action"
+      },
+      "canBeCastAsRitual": false
+    },
+    "range": {
+      "kind": "distance",
+      "value": {
+        "value": 30,
+        "unit": "ft"
+      }
+    },
+    "duration": {
+      "kind": "timed",
+      "value": 1,
+      "unit": "hour",
+      "concentration": true,
+      "upTo": true
+    },
+    "components": {
+      "verbal": true,
+      "somatic": true,
+      "material": {
+        "description": "a drop of mercury, a dollop of gum arabic, and a wisp of smoke"
+      }
+    }
+  },
+  {
+    "id": "srd-cc-5.2.1:wish",
+    "slug": "wish",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Wish",
+    "description": "<p>Wish is the mightiest spell a mortal can cast. By simply speaking aloud, you can alter reality itself.</p><p>The basic use of this spell is to duplicate any other spell of level 8 or lower. If you use it this way, you don't need to meet any requirements to cast that spell, including costly components. The spell simply takes effect.</p><p>Alternatively, you can create one of the following effects of your choice:</p><p><strong>Object Creation.</strong> You create one object of up to 25,000 GP in value that isn't a magic item. The object can be no more than 300 feet in any dimension, and it appears in an unoccupied space that you can see on the ground.</p><p><strong>Instant Health.</strong> You allow yourself and up to twenty creatures that you can see to regain all Hit Points, and you end all effects on them listed in the Greater Restoration spell.</p><p><strong>Resistance.</strong> You grant up to ten creatures that you can see Resistance to one damage type that you choose. This Resistance is permanent.</p><p><strong>Spell Immunity.</strong> You grant up to ten creatures you can see immunity to a single spell or other magical effect for 8 hours.</p><p><strong>Sudden Learning.</strong> You replace one of your feats with another feat for which you are eligible. You lose all the benefits of the old feat and gain the benefits of the new one. You can't replace a feat that is a prerequisite for any of your other feats or features.</p><p><strong>Roll Redo.</strong> You undo a single recent event by forcing a reroll of any die roll made within the last round (including your last turn). Reality reshapes itself to accommodate the new result. For example, a Wish spell could undo an ally's failed saving throw or a foe's Critical Hit. You can force the reroll to be made with Advantage or Disadvantage, and you choose whether to use the reroll or the original roll.</p><p><strong>Reshape Reality.</strong> You may wish for something not included in any of the other effects. To do so, state your wish to the GM as precisely as possible. The GM has great latitude in ruling what occurs in such an instance; the greater the wish, the greater the likelihood that something goes wrong. This spell might simply fail, the effect you desire might be achieved only in part, or you might suffer an unforeseen consequence as a result of how you worded the wish. For example, wishing that a villain were dead might propel you forward in time to a period when that villain is no longer alive, effectively removing you from the game. Similarly, wishing for a Legendary magic item or an Artifact might instantly transport you to the presence of the item's current owner. If your wish is granted and its effects have consequences for a whole community, region, or world, you are likely to attract powerful foes. If your wish would affect a god, the god's divine servants might instantly intervene to prevent it or to encourage you to craft the wish in a particular way. If your wish would undo the multiverse itself, your wish fails.</p><p>The stress of casting Wish to produce any effect other than duplicating another spell weakens you. After enduring that stress, each time you cast a spell until you finish a Long Rest, you take 1d10 Necrotic damage per level of that spell. This damage can't be reduced or prevented in any way. In addition, your Strength score becomes 3 for 2d4 days. For each of those days that you spend resting and doing nothing more than light activity, your remaining recovery time decreases by 2 days. Finally, there is a 33 percent chance that you are unable to cast Wish ever again if you suffer this stress.</p>",
+    "school": "conjuration",
+    "level": 9,
+    "classIds": ["sorcerer", "wizard"],
+    "tags": {
+      "damageTypes": ["necrotic"],
+      "roles": ["buff", "healing"]
+    },
+    "castingTime": {
+      "normal": {
+        "value": 1,
+        "unit": "action"
+      },
+      "canBeCastAsRitual": false
+    },
+    "range": {
+      "kind": "self"
+    },
+    "duration": {
+      "kind": "instantaneous"
+    },
+    "components": {
+      "verbal": true
+    }
   }
 ]

@@ -32,7 +32,7 @@ export type EquipmentPickerRowViewModel = {
   name: string
   priceLabel: string
   kindLabel: string
-  metadata: string[]
+  comparisonGroups: readonly string[]
 }
 
 export type EquipmentDetailViewModel = {
@@ -53,35 +53,15 @@ function buildEquipmentStatRows(equipment: Equipment): ContentStatRowData[] {
 export function buildEquipmentPickerRowViewModel(
   equipment: Equipment,
 ): EquipmentPickerRowViewModel {
-  const { kindLabel, metadata } = buildEquipmentCompactSummary(equipment)
+  const { kindLabel, comparisonGroups } = buildEquipmentCompactSummary(equipment)
 
   return {
     name: equipment.name,
     priceLabel: formatMoney(equipment.cost),
     kindLabel,
-    metadata,
+    comparisonGroups,
   }
 }
-
-/** @deprecated Use {@link buildEquipmentPickerRowViewModel}. */
-export function buildEquipmentPickerHeaderViewModel(equipment: Equipment): {
-  name: string
-  kindLabel: string
-  priceLabel: string
-} {
-  const viewModel = buildEquipmentPickerRowViewModel(equipment)
-  return {
-    name: viewModel.name,
-    kindLabel: viewModel.kindLabel,
-    priceLabel: viewModel.priceLabel,
-  }
-}
-
-/** @deprecated Use {@link EquipmentPickerRowViewModel}. */
-export type EquipmentCardViewModel = Pick<
-  EquipmentPickerRowViewModel,
-  'name' | 'kindLabel' | 'priceLabel'
->
 
 export function buildEquipmentDetailViewModel(equipment: Equipment): EquipmentDetailViewModel {
   return {

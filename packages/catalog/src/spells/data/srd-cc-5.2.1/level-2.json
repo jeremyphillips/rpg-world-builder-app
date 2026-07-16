@@ -52,7 +52,7 @@
     "createdAt": "2024-05-21T00:00:00.000Z",
     "updatedAt": "2024-05-21T00:00:00.000Z",
     "name": "Darkness",
-    "description": "<p>For the duration, magical Darkness spreads from a point within range and fills a 15-foot-radius Sphere. Darkvision can't see through it, and nonmagical light can't illuminate it. Alternatively, cast on object for 15-foot Emanation. If area overlaps Bright/Dim Light from spell level 2 or lower, that spell is dispelled.</p>",
+    "description": "<p>For the duration, magical Darkness spreads from a point within range and fills a 15-foot-radius Sphere. Darkvision can't see through it, and nonmagical light can't illuminate it.</p><p>Alternatively, you cast the spell on an object that isn't being worn or carried, causing the Darkness to fill a 15-foot Emanation originating from that object. Covering that object with something opaque, such as a bowl or helm, blocks the Darkness.</p><p>If any of this spell's area overlaps with an area of Bright Light or Dim Light created by a spell of level 2 or lower, that other spell is dispelled.</p>",
     "school": "evocation",
     "level": 2,
     "classIds": ["sorcerer", "warlock", "wizard"],
@@ -74,6 +74,13 @@
         "unit": "ft"
       }
     },
+    "areaOfEffect": {
+      "shape": "sphere",
+      "radius": {
+        "value": 15,
+        "unit": "ft"
+      }
+    },
     "duration": {
       "kind": "timed",
       "value": 10,
@@ -87,6 +94,48 @@
         "description": "bat fur and a piece of coal"
       }
     }
+  },
+  {
+    "id": "srd-cc-5.2.1:dragons-breath",
+    "slug": "dragons-breath",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Dragon's Breath",
+    "description": "<p>You touch one willing creature, and choose Acid, Cold, Fire, Lightning, or Poison. Until the spell ends, the target can take a Magic action to exhale a 15-foot Cone. Each creature in that area makes a Dexterity saving throw, taking 3d6 damage of the chosen type on a failed save or half as much damage on a successful one.</p>",
+    "school": "transmutation",
+    "level": 2,
+    "classIds": ["sorcerer", "wizard"],
+    "tags": {
+      "roles": ["buff", "damage"]
+    },
+    "castingTime": {
+      "normal": {
+        "value": 1,
+        "unit": "bonus-action"
+      },
+      "canBeCastAsRitual": false
+    },
+    "range": {
+      "kind": "touch"
+    },
+    "duration": {
+      "kind": "timed",
+      "value": 1,
+      "unit": "minute",
+      "concentration": true,
+      "upTo": true
+    },
+    "components": {
+      "verbal": true,
+      "somatic": true,
+      "material": {
+        "description": "a hot pepper"
+      }
+    },
+    "higherLevelSlotEffect": "<p>The damage increases by 1d6 for each spell slot level above 2.</p>"
   },
   {
     "id": "srd-cc-5.2.1:lesser-restoration",
@@ -228,6 +277,13 @@
     },
     "range": {
       "kind": "self"
+    },
+    "areaOfEffect": {
+      "shape": "emanation",
+      "radius": {
+        "value": 30,
+        "unit": "ft"
+      }
     },
     "duration": {
       "kind": "timed",

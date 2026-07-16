@@ -1,4 +1,5 @@
 export * from './spell-messages'
+export * from './atomic-effect-kind'
 export * from './school'
 export * from './role-tag'
 export * from './function-tag'

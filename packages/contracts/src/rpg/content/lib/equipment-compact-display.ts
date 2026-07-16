@@ -59,8 +59,11 @@ export type EquipmentCompactLayout = {
 
 export type EquipmentCompactSummary = {
   kindLabel: string
-  /** Up to three intrinsic comparison facts for line 2. kindLabel and callouts are excluded. */
-  metadata: string[]
+  /**
+   * Curated comparison groups for collapsed picker metadata.
+   * Each group is one top-level fact; a group may contain internal · joins.
+   */
+  comparisonGroups: readonly string[]
 }
 
 export function joinCompactSegments(...segments: Array<string | undefined>): string | undefined {
@@ -79,12 +82,12 @@ function normalizeCompactSegment(value: string): string {
 
 function isRedundantCompactSegment(
   segment: string,
-  metadata: readonly string[],
+  comparisonGroups: readonly string[],
   kindLabel: string,
 ): boolean {
   const normalized = normalizeCompactSegment(segment)
   if (normalized === normalizeCompactSegment(kindLabel)) return true
-  return metadata.some((existing) => normalizeCompactSegment(existing) === normalized)
+  return comparisonGroups.some((existing) => normalizeCompactSegment(existing) === normalized)
 }
 
 function formatCompactWeaponProperties(equipment: Equipment): string | undefined {
@@ -312,31 +315,39 @@ function formatCompactField(equipment: Equipment, fieldId: CompactFieldId): stri
 }
 
 function pushCompactSegment(
-  metadata: string[],
+  comparisonGroups: string[],
   segment: string | undefined,
   kindLabel: string,
   maxSegments: number,
 ): boolean {
-  if (!segment || metadata.length >= maxSegments) return metadata.length >= maxSegments
-  if (isRedundantCompactSegment(segment, metadata, kindLabel)) return metadata.length >= maxSegments
-  metadata.push(segment)
-  return metadata.length >= maxSegments
+  if (!segment || comparisonGroups.length >= maxSegments)
+    return comparisonGroups.length >= maxSegments
+  if (isRedundantCompactSegment(segment, comparisonGroups, kindLabel)) {
+    return comparisonGroups.length >= maxSegments
+  }
+  comparisonGroups.push(segment)
+  return comparisonGroups.length >= maxSegments
 }
 
-function assembleCompactMetadata(
+function assembleComparisonGroups(
   equipment: Equipment,
   layout: EquipmentCompactLayout,
   kindLabel: string,
 ): string[] {
   const maxSegments = layout.maxSegments ?? EQUIPMENT_COMPACT_DEFAULT_MAX_SEGMENTS
-  const metadata: string[] = []
+  const comparisonGroups: string[] = []
 
   for (const slot of layout.fields) {
-    if (metadata.length >= maxSegments) break
+    if (comparisonGroups.length >= maxSegments) break
 
     if (typeof slot === 'string') {
       if (
-        pushCompactSegment(metadata, formatCompactField(equipment, slot), kindLabel, maxSegments)
+        pushCompactSegment(
+          comparisonGroups,
+          formatCompactField(equipment, slot),
+          kindLabel,
+          maxSegments,
+        )
       ) {
         break
       }
@@ -345,13 +356,13 @@ function assembleCompactMetadata(
 
     for (const fieldId of slot.firstAvailable) {
       const segment = formatCompactField(equipment, fieldId)
-      if (!segment || isRedundantCompactSegment(segment, metadata, kindLabel)) continue
-      metadata.push(segment)
+      if (!segment || isRedundantCompactSegment(segment, comparisonGroups, kindLabel)) continue
+      comparisonGroups.push(segment)
       break
     }
   }
 
-  return metadata
+  return comparisonGroups
 }
 
 export function buildEquipmentCompactSummary(equipment: Equipment): EquipmentCompactSummary {
@@ -360,6 +371,6 @@ export function buildEquipmentCompactSummary(equipment: Equipment): EquipmentCom
 
   return {
     kindLabel,
-    metadata: assembleCompactMetadata(equipment, layout, kindLabel),
+    comparisonGroups: assembleComparisonGroups(equipment, layout, kindLabel),
   }
 }

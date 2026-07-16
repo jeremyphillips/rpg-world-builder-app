@@ -361,7 +361,6 @@ export {
 } from './components/ui/collapsible-list-item'
 export {
   CatalogPickerSheet,
-  type CatalogPickerSheetFilterContext,
   type CatalogPickerSheetProps,
   type CatalogPickerSheetToolbarContext,
   type CatalogPickerTab,
@@ -490,6 +489,7 @@ export {
 export type {
   BooleanCellProps,
   NameCellProps,
+  RowActionsMenuLinkProps,
   RowActionsMenuProps,
   TableBadgeCellProps,
 } from './components/ui/data-table.client'

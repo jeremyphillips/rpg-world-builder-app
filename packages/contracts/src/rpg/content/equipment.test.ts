@@ -39,9 +39,9 @@ const LONGSWORD_BODY = {
   weight: { value: 3, unit: 'lb' },
   category: 'martial',
   mode: 'melee',
-  damage: { kind: 'dice', count: 1, faces: 8 },
+  damage: { dice: { count: 1, faces: 8 } },
   damageType: 'slashing',
-  versatileDamage: { kind: 'dice', count: 1, faces: 10 },
+  versatileDamage: { count: 1, faces: 10 },
   properties: ['versatile'],
   mastery: 'sap',
 }
@@ -55,7 +55,7 @@ const SHORTBOW_STORED = systemRecord('shortbow', {
   weight: { value: 2, unit: 'lb' },
   category: 'simple',
   mode: 'ranged',
-  damage: { kind: 'dice', count: 1, faces: 6 },
+  damage: { dice: { count: 1, faces: 6 } },
   damageType: 'piercing',
   properties: ['ammunition', 'two-handed'],
   mastery: 'vex',
@@ -82,7 +82,7 @@ const BLOWGUN_STORED = systemRecord('blowgun', {
   weight: { value: 1, unit: 'lb' },
   category: 'martial',
   mode: 'ranged',
-  damage: { kind: 'flat', amount: 1 },
+  damage: { flat: 1 },
   damageType: 'piercing',
   properties: ['ammunition', 'loading'],
   mastery: 'vex',
@@ -277,7 +277,7 @@ describe('weapon equipment variant', () => {
     }
     const blowgun = equipmentSchema.parse(BLOWGUN_STORED)
     if (blowgun.kind === 'weapon') {
-      expect(blowgun.damage).toEqual({ kind: 'flat', amount: 1 })
+      expect(blowgun.damage).toEqual({ flat: 1 })
     }
   })
 
@@ -292,7 +292,7 @@ describe('weapon equipment variant', () => {
     expect(
       equipmentSchema.safeParse({
         ...SHORTBOW_STORED,
-        versatileDamage: { kind: 'dice', count: 1, faces: 8 },
+        versatileDamage: { count: 1, faces: 8 },
       }).success,
     ).toBe(false)
   })
@@ -370,13 +370,13 @@ describe('weapon display helpers', () => {
     expect(formatWeaponProperties([])).toBe('—')
     expect(formatWeaponRange({ normal: 80, long: 320 })).toBe('80/320 ft.')
     expect(formatWeaponRange({ normal: 5 })).toBe('5 ft.')
-    expect(formatWeaponDamage({ kind: 'dice', count: 2, faces: 6 })).toBe('2d6')
-    expect(formatWeaponDamage({ kind: 'flat', amount: 1 })).toBe('1')
+    expect(formatWeaponDamage({ dice: { count: 2, faces: 6 } })).toBe('2d6')
+    expect(formatWeaponDamage({ flat: 1 })).toBe('1')
   })
 
   it('computes average weapon damage', () => {
-    expect(averageWeaponDamage({ kind: 'dice', count: 1, faces: 8 })).toBe(4.5)
-    expect(averageWeaponDamage({ kind: 'flat', amount: 1 })).toBe(1)
+    expect(averageWeaponDamage({ dice: { count: 1, faces: 8 } })).toBe(4.5)
+    expect(averageWeaponDamage({ flat: 1 })).toBe(1)
   })
 })
 

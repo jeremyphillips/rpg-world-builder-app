@@ -1,4 +1,6 @@
 import {
+  AREA_GEOMETRY_SHAPES,
+  AREA_GEOMETRY_SHAPE_ENTRIES,
   CASTING_TIME_UNITS,
   CASTING_TIME_UNIT_ENTRIES,
   DURATION_UNITS,
@@ -30,6 +32,18 @@ export const SPELL_DURATION_KIND_LABELS: Record<(typeof SPELL_DURATION_KINDS)[nu
 }
 
 export const SPELL_DELIVERY_METHOD_NONE = 'none'
+
+export const SPELL_AREA_GEOMETRY_NONE = 'none'
+
+export const areaGeometryShapeOptions: FieldOption[] = [
+  { value: SPELL_AREA_GEOMETRY_NONE, label: 'None' },
+  ...toOptions(
+    AREA_GEOMETRY_SHAPES,
+    Object.fromEntries(
+      AREA_GEOMETRY_SHAPES.map((shape) => [shape, AREA_GEOMETRY_SHAPE_ENTRIES[shape].label]),
+    ) as Record<(typeof AREA_GEOMETRY_SHAPES)[number], string>,
+  ),
+]
 
 export const spellLevelOptions: FieldOption[] = Array.from(
   { length: MAX_SPELL_CONTENT_LEVEL - MIN_SPELL_CONTENT_LEVEL + 1 },

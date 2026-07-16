@@ -5,11 +5,13 @@ import { useController } from 'react-hook-form'
 
 import { InlineSentenceField } from '../../components/ui/inline-sentence-field.client'
 import {
+  coerceInlineSentenceSelectValue,
   filterVisibleInlineSentenceSegments,
   inlineSentenceSegmentVisibilityDeps,
   inlineSentenceUniqueBoundNames,
   isInlineSentenceBoundSegment,
   MAX_INLINE_SENTENCE_BOUND_CONTROLLERS,
+  resolveInlineSentenceSelectChange,
 } from '../../components/ui/inline-sentence-field.lib'
 import type {
   InlineSentenceBoundChips,
@@ -164,13 +166,14 @@ export function InlineSentenceFieldRenderer({
         kind: 'select',
         id: controlId,
         name: segment.name,
-        value: typeof field.value === 'string' ? field.value : undefined,
+        value: coerceInlineSentenceSelectValue(field.value),
         options: segment.options,
         digits: segment.digits,
         width: segment.width,
         placeholder: resolveSelectPlaceholder(selectLabel, segment.placeholder),
         ariaLabel: selectLabel,
-        onChange: field.onChange,
+        onChange: (next) =>
+          field.onChange(resolveInlineSentenceSelectChange(next, segment.options)),
         onBlur: field.onBlur,
       }
       result.push(selectControl)

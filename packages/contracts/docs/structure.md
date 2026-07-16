@@ -23,6 +23,7 @@ packages/contracts/src/
     content/            # catalog content types (species, weapons, classes, …)
       lib/              # envelope, grants, content-key, content-type-keys, …
       classes/          # class body, spellcasting, subclasses
+        spellcasting/   # spellcasting schema + slot progression tables
     runtime/            # stored character sheets + builder runtime (not catalog content)
       character/        # sheet schema, provenance, proficiencies, inventory
       character-builder/ # builder draft, context, choice/step vocabulary
@@ -179,6 +180,17 @@ Pattern: `*_ENTRIES` map → derived id tuple → `z.enum` schema →
 `vocabularyOptionIdSchema`; see [docs/vocabulary.md](../../../docs/vocabulary.md).
 
 Entity-specific fields stay on the content schema in `rpg/content/`, not in vocab maps.
+
+Spell catalog content lives under `rpg/content/spell/` (`body.ts`, `levels.ts`,
+`effects/`, `resolution/`); `rpg/content/spell.ts` is the facade re-export.
+Class spellcasting (`rpg/content/classes/spellcasting/`) holds the class
+`spellcasting` block schema and SRD slot tables (`slots.ts`).
+
+Spell resolution (`rpg/content/spell/resolution/`) is an optional envelope on
+`spellBodySchema` — target, method, range, base effects, and outcome applications.
+Vocab for resolution-specific closed sets lives alongside the module; formatters
+return semantic preview strings. Like `effects`, `resolution` is on the read model
+but omitted from `spellPersistedBodySchema` until API persistence lands.
 
 ## Adding a schema
 

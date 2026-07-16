@@ -43,7 +43,7 @@ describe('weaponAttackBonus', () => {
 
 describe('formatWeaponDamageWithModifier', () => {
   it('formats dice damage with a signed modifier', () => {
-    expect(formatWeaponDamageWithModifier({ kind: 'dice', count: 1, faces: 8 }, 3)).toBe('1d8 +3')
+    expect(formatWeaponDamageWithModifier({ dice: { count: 1, faces: 8 } }, 3)).toBe('1d8 +3')
   })
 })
 

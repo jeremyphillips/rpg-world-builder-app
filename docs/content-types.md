@@ -807,7 +807,7 @@ Subclasses are **not** registered in `content-types.ts`. They use a nested read 
 
 ## Class spellcasting (reference)
 
-The `classes` type embeds an optional `spellcasting` block (`content/class/spellcasting.ts`). Spell slot columns on the read-only progression table are derived from `SLOT_TABLES` by progression (`full` / `half` / `pact`); they are not stored on the class record.
+The `classes` type embeds an optional `spellcasting` block (`content/classes/spellcasting/spellcasting.ts`). Spell slot columns on the read-only progression table are derived from `SLOT_TABLES` in `content/classes/spellcasting/slots.ts` by progression (`full` / `half` / `pact`); they are not stored on the class record.
 
 ### Unlock level and feature label
 

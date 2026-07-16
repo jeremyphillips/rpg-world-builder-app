@@ -600,6 +600,28 @@ describe('RowActionsMenu', () => {
 
     expect(screen.getByRole('switch', { name: /active in campaign/i })).toBeInTheDocument()
   })
+
+  it('renders a custom EditLink component when provided', async () => {
+    const user = userEvent.setup()
+    render(
+      <RowActionsMenu
+        editHref="/campaigns/c1/spells/fire-bolt/edit"
+        enabled={true}
+        onToggleEnabled={vi.fn()}
+        EditLink={({ href, children }) => (
+          <a href={href} data-testid="router-edit-link">
+            {children}
+          </a>
+        )}
+      />,
+    )
+
+    await user.click(screen.getByRole('button', { name: /open actions/i }))
+
+    const editLink = screen.getByTestId('router-edit-link')
+    expect(editLink).toHaveAttribute('href', '/campaigns/c1/spells/fire-bolt/edit')
+    expect(editLink).toHaveTextContent('Edit')
+  })
 })
 
 // ---------------------------------------------------------------------------

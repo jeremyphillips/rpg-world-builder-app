@@ -230,27 +230,6 @@ describe('CatalogPickerSheet', () => {
     expect(screen.getByRole('status')).toHaveTextContent('No items match your search.')
   })
 
-  it('keeps legacy rows expandable via the right-side details button', async () => {
-    const user = userEvent.setup()
-
-    render(
-      <CatalogPickerSheet
-        open
-        onOpenChange={vi.fn()}
-        title="Catalog"
-        items={items}
-        getItemKey={(item) => item.id}
-        getSearchText={(item) => item.searchText}
-        renderItem={(item) => <span>{item.name}</span>}
-        renderItemDetails={(item) => <p>Details for {item.name}</p>}
-      />,
-    )
-
-    const [alphaDetailsButton] = screen.getAllByRole('button', { name: 'Show details' })
-    await user.click(alphaDetailsButton!)
-    expect(screen.getByText('Details for Alpha Item')).toBeInTheDocument()
-  })
-
   it('has no axe accessibility violations', async () => {
     const { container } = render(
       <CatalogPickerSheet

@@ -8,11 +8,9 @@ export { EquipmentDetail, EquipmentDetailContent } from './routes/equipment-deta
 export { EquipmentDetailMetadata } from './components/equipment-detail-metadata.client'
 export {
   buildEquipmentDetailViewModel,
-  buildEquipmentPickerHeaderViewModel,
   buildEquipmentPickerRowViewModel,
   EQUIPMENT_DETAILS_SECTION_TITLES,
   EQUIPMENT_STAT_LABELS,
-  type EquipmentCardViewModel,
   type EquipmentDetailViewModel,
   type EquipmentPickerRowViewModel,
 } from './lib/equipment-display'

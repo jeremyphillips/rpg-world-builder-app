@@ -19,7 +19,11 @@ import { ContentDetailLayout } from '../../lib/detail/content-detail-layout'
 import { ContentDetailResolver } from '../../lib/detail/content-detail-resolver'
 import { contentEditHref } from '../../lib/detail/content-edit-href'
 import { getContentImageUrl } from '../../lib/detail/content-image-url'
-import { buildSpellDetailViewModel, type SpellDetailViewModel } from '../lib/spell-display'
+import {
+  buildSpellDetailViewModel,
+  SPELL_SECTION_LABELS,
+  type SpellDetailViewModel,
+} from '../lib/spell-display'
 import { ContentLinkBadge, ContentStaticBadge } from '../../lib/detail/content-link-badge'
 
 // ---------------------------------------------------------------------------
@@ -86,31 +90,63 @@ function SpellTagsSection({
   )
 }
 
-function SpellProseSection({
+function SpellEffectsSection({
   section,
 }: {
-  section: NonNullable<SpellDetailViewModel['proseSections']>[number]
+  section: NonNullable<SpellDetailViewModel['effectsSection']>
 }) {
   return (
-    <section aria-labelledby={`spell-${section.id}-heading`}>
-      <Heading variant="section" as="h2" id={`spell-${section.id}-heading`} className="mb-3">
+    <section aria-labelledby="spell-effects-heading">
+      <Heading variant="section" as="h2" id="spell-effects-heading" className="mb-3">
         {section.title}
       </Heading>
-      <RichTextContent html={section.bodyHtml} size="md" tone="muted" />
+      <ul className="list-inside list-disc space-y-1" role="list">
+        {section.lines.map((line) => (
+          <li key={line}>
+            <Text as="span">{line}</Text>
+          </li>
+        ))}
+      </ul>
     </section>
   )
 }
 
-function SpellProseSections({
-  sections,
+function SpellProseSection({
+  id,
+  title,
+  bodyHtml,
 }: {
-  sections: NonNullable<SpellDetailViewModel['proseSections']>
+  id: 'cantripScaling' | 'higherLevelSlotEffect'
+  title: string
+  bodyHtml: string
 }) {
   return (
+    <section aria-labelledby={`spell-${id}-heading`}>
+      <Heading variant="section" as="h2" id={`spell-${id}-heading`} className="mb-3">
+        {title}
+      </Heading>
+      <RichTextContent html={bodyHtml} size="md" tone="muted" />
+    </section>
+  )
+}
+
+function SpellProseSections({ sections }: { sections: SpellDetailViewModel['proseSections'] }) {
+  return (
     <>
-      {sections.map((section) => (
-        <SpellProseSection key={section.id} section={section} />
-      ))}
+      {sections.cantripScaling ? (
+        <SpellProseSection
+          id="cantripScaling"
+          title={SPELL_SECTION_LABELS.cantripScaling}
+          bodyHtml={sections.cantripScaling}
+        />
+      ) : null}
+      {sections.higherLevelSlotEffect ? (
+        <SpellProseSection
+          id="higherLevelSlotEffect"
+          title={SPELL_SECTION_LABELS.higherLevelSlotEffect}
+          bodyHtml={sections.higherLevelSlotEffect}
+        />
+      ) : null}
     </>
   )
 }
@@ -156,11 +192,16 @@ export function SpellDetailContent({ spell, campaignId }: SpellDetailContentProp
           ) : undefined
         }
       >
-        {viewModel.proseSections ? <SpellProseSections sections={viewModel.proseSections} /> : null}
+        {viewModel.proseSections.cantripScaling || viewModel.proseSections.higherLevelSlotEffect ? (
+          <SpellProseSections sections={viewModel.proseSections} />
+        ) : null}
         {viewModel.classesSection ? (
           <SpellClassesList campaignId={campaignId} section={viewModel.classesSection} />
         ) : null}
         {viewModel.tagsSection ? <SpellTagsSection section={viewModel.tagsSection} /> : null}
+        {viewModel.effectsSection ? (
+          <SpellEffectsSection section={viewModel.effectsSection} />
+        ) : null}
       </ContentDetailLayout>
     </WidePage>
   )

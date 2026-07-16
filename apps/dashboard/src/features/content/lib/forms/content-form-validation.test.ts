@@ -84,6 +84,19 @@ const COMMON_SCHEMA_EXEMPT = [
 
 const EQUIPMENT_SCHEMA_EXEMPT = [...COMMON_SCHEMA_EXEMPT, ...EQUIPMENT_KIND_EXEMPT] as const
 
+/** Legacy flat effects tab removed; resolution method/note/outcomes wired via slots. */
+const SPELLS_SCHEMA_EXEMPT = [
+  ...COMMON_SCHEMA_EXEMPT,
+  /^effects\b/,
+  'resolution.methodKind',
+  'resolution.proximityKind',
+  'resolution.applicationPatternKind',
+  'resolution.attackType',
+  'resolution.saveAbility',
+  'resolution.hitNote',
+  /^resolution\.outcomes\b/,
+] as const
+
 describe.each(registryEntries)('ContentFormDef[%s] validation', (routeKey, def) => {
   const ctx = routeKey === 'equipment' ? { equipmentKind: 'weapon' as const } : {}
 
@@ -94,7 +107,12 @@ describe.each(registryEntries)('ContentFormDef[%s] validation', (routeKey, def) 
   it('registers schema leaf paths in the field error map', () => {
     const fields = contentFormFields(def, ctx)
     const schema = def.resolveSchema?.(ctx) ?? def.schema
-    const exempt = routeKey === 'equipment' ? EQUIPMENT_SCHEMA_EXEMPT : COMMON_SCHEMA_EXEMPT
+    const exempt =
+      routeKey === 'equipment'
+        ? EQUIPMENT_SCHEMA_EXEMPT
+        : routeKey === 'spells'
+          ? SPELLS_SCHEMA_EXEMPT
+          : COMMON_SCHEMA_EXEMPT
 
     assertRegistryCoverage(schema, fields, { exemptPaths: exempt })
   })
@@ -248,6 +266,7 @@ function invalidValueFor(routeKey: string): unknown {
         range: { kind: 'self' },
         duration: { kind: 'instant' },
         components: {},
+        areaOfEffect: { shape: 'none' },
       }
     case 'feats':
       return {

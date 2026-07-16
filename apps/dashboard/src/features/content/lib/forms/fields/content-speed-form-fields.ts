@@ -117,6 +117,48 @@ export function massInputSelectField(options: {
   })
 }
 
+const DISTANCE_FT_UNIT = 'ft' as const
+
+const distanceFtUnitOptions: FieldOption[] = [{ value: DISTANCE_FT_UNIT, label: 'ft' }]
+
+/** Positive distance amount in feet for area geometry and similar mechanics fields. */
+export function distanceInputSelectField(options: {
+  name: string
+  label: string
+  required?: boolean
+  min?: number
+  step?: number
+  valueDigits?: NumberInputDigits
+  width?: FieldConfig['width']
+  visibility?: FieldConfig['visibility']
+}): FieldConfig {
+  const {
+    name,
+    label,
+    required,
+    min = 0.5,
+    step = 0.5,
+    valueDigits,
+    width = 'auto',
+    visibility,
+  } = options
+
+  return {
+    ...scalarUnitInputSelectField({
+      name,
+      label,
+      required,
+      defaultUnit: DISTANCE_FT_UNIT,
+      unitOptions: distanceFtUnitOptions,
+      min,
+      step,
+      valueDigits,
+      width,
+    }),
+    ...(visibility !== undefined ? { visibility } : {}),
+  }
+}
+
 /** Speed rate amount + unit composite for mounts and vehicles. */
 export function speedInputSelectField(options: {
   name?: string

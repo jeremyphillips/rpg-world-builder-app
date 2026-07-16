@@ -35,6 +35,7 @@ import type {
   ChooseFromChipsFieldConfig,
   InputUnitFieldConfig,
   LevelRangeFieldConfig,
+  RollValueFieldConfig,
 } from '../field-config'
 import { fieldDefaultValue } from '../field-config'
 import { useDependsOnValues } from '../config/form-depends-on.client'
@@ -103,6 +104,7 @@ const fieldRenderers: {
     | 'inlineChooseCount'
     | 'chooseFromChips'
     | 'inputUnit'
+    | 'rollValue'
   >]: (args: RenderArgs<K>) => React.ReactElement
 } = {
   text: ({ config, field, id, ...validation }) => (
@@ -464,6 +466,7 @@ type StandardFieldConfig = Exclude<
   | InlineChooseCountFieldConfig
   | ChooseFromChipsFieldConfig
   | InputUnitFieldConfig
+  | RollValueFieldConfig
 >
 
 interface StandardFieldRendererProps {

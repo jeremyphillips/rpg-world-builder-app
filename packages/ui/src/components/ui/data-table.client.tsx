@@ -761,9 +761,20 @@ export function TableBadgeCell({
 // RowActionsMenu — standard ellipsis actions menu for table rows
 // ---------------------------------------------------------------------------
 
+export interface RowActionsMenuLinkProps {
+  href: string
+  className?: string
+  children: React.ReactNode
+}
+
 export interface RowActionsMenuProps {
-  /** Href for the edit route — rendered as an `<a>` tag so Next.js Link can wrap it. */
+  /** Target path for the edit route. */
   editHref: string
+  /**
+   * Router-aware link component for in-app navigation (e.g. React Router `Link`).
+   * Receives `href` as the navigation target. Defaults to a plain `<a>`.
+   */
+  EditLink?: React.ComponentType<RowActionsMenuLinkProps>
   /** Whether this item is currently active in the campaign. */
   enabled: boolean
   /** Called with the new boolean when the active-in-campaign toggle changes. */
@@ -800,12 +811,20 @@ export interface RowActionsMenuProps {
  */
 export function RowActionsMenu({
   editHref,
+  EditLink: EditLinkComponent,
   enabled,
   onToggleEnabled,
   enabledLabel = 'Active in campaign',
   enabledTooltip = 'Hides this item from players in the current campaign. The item remains available globally.',
   itemLabel = 'item',
 }: RowActionsMenuProps) {
+  const editAction = (
+    <>
+      <Pencil />
+      Edit
+    </>
+  )
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -820,10 +839,11 @@ export function RowActionsMenu({
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-44">
         <DropdownMenuItem asChild className="text-xs [&_svg]:size-3">
-          <a href={editHref}>
-            <Pencil />
-            Edit
-          </a>
+          {EditLinkComponent ? (
+            <EditLinkComponent href={editHref}>{editAction}</EditLinkComponent>
+          ) : (
+            <a href={editHref}>{editAction}</a>
+          )}
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         {/* onSelect preventDefault keeps the menu open after the switch is toggled */}

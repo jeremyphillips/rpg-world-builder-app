@@ -106,29 +106,6 @@ export const Default: Story = {
   },
 }
 
-export const LegacyRows: Story = {
-  args: {
-    open: true,
-    onOpenChange: () => undefined,
-    title: 'Legacy catalog rows',
-    description: 'Right-side chevron rows until callers migrate.',
-    items: demoItems,
-    getItemKey: (item) => item.id,
-    getSearchText: (item) => `${item.name} ${item.summary}`,
-    renderItem: (item) => (
-      <div className="space-y-1">
-        <Text as="p" variant="emphasis">
-          {item.name}
-        </Text>
-        <Text as="p" variant="muted">
-          {item.summary}
-        </Text>
-      </div>
-    ),
-    renderItemDetails: (item) => <p>{item.details}</p>,
-  },
-}
-
 export const Loading: Story = {
   args: {
     open: true,

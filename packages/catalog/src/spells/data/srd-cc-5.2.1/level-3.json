@@ -1,5 +1,316 @@
 [
   {
+    "id": "srd-cc-5.2.1:animate-dead",
+    "slug": "animate-dead",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Animate Dead",
+    "description": "<p>Choose a pile of bones or a corpse of a Medium or Small Humanoid within range. The target becomes an Undead creature: a Skeleton if you chose bones or a Zombie if you chose a corpse (see \"Monsters\" for the stat blocks).</p><p>On each of your turns, you can take a Bonus Action to mentally command any creature you made with this spell if the creature is within 60 feet of you (if you control multiple creatures, you can command any of them at the same time, issuing the same command to each one). You decide what action the creature will take and where it will move on its next turn, or you can issue a general command, such as to guard a chamber or corridor. If you issue no commands, the creature takes the Dodge action and moves only to avoid harm. Once given an order, the creature continues to follow it until its task is complete.</p><p>The creature is under your control for 24 hours, after which it stops obeying any command you've given it. To maintain control of the creature for another 24 hours, you must cast this spell on the creature again before the current 24-hour period ends. This use of the spell reasserts your control over up to four creatures you have animated with this spell rather than animating a new creature.</p>",
+    "school": "necromancy",
+    "level": 3,
+    "classIds": ["cleric", "wizard"],
+    "tags": {
+      "roles": ["control", "summoning"]
+    },
+    "castingTime": {
+      "normal": {
+        "value": 1,
+        "unit": "minute"
+      },
+      "canBeCastAsRitual": false
+    },
+    "range": {
+      "kind": "distance",
+      "value": {
+        "value": 10,
+        "unit": "ft"
+      }
+    },
+    "duration": {
+      "kind": "instantaneous"
+    },
+    "components": {
+      "verbal": true,
+      "somatic": true,
+      "material": {
+        "description": "a drop of blood, a piece of flesh, and a pinch of bone dust"
+      }
+    },
+    "higherLevelSlotEffect": "<p>You animate or reassert control over two additional Undead creatures for each spell slot level above 3. Each of the creatures must come from a different corpse or pile of bones.</p>"
+  },
+  {
+    "id": "srd-cc-5.2.1:bestow-curse",
+    "slug": "bestow-curse",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Bestow Curse",
+    "description": "<p>You touch a creature, which must succeed on a Wisdom saving throw or become cursed for the duration. Until the curse ends, the target suffers one of the following effects of your choice:</p><ul><li>Choose one ability. The target has Disadvantage on ability checks and saving throws made with that ability.</li><li>The target has Disadvantage on attack rolls against you.</li><li>In combat, the target must succeed on a Wisdom saving throw at the start of each of its turns or be forced to take the Dodge action on that turn.</li><li>If you deal damage to the target with an attack roll or a spell, the target takes an extra 1d8 Necrotic damage.</li></ul>",
+    "school": "necromancy",
+    "level": 3,
+    "classIds": ["bard", "cleric", "wizard"],
+    "tags": {
+      "damageTypes": ["necrotic"],
+      "roles": ["debuff"]
+    },
+    "castingTime": {
+      "normal": {
+        "value": 1,
+        "unit": "action"
+      },
+      "canBeCastAsRitual": false
+    },
+    "range": {
+      "kind": "touch"
+    },
+    "duration": {
+      "kind": "timed",
+      "value": 1,
+      "unit": "minute",
+      "concentration": true,
+      "upTo": true
+    },
+    "components": {
+      "verbal": true,
+      "somatic": true
+    },
+    "higherLevelSlotEffect": "<p>If you cast this spell using a level 4 spell slot, you can maintain Concentration on it for up to 10 minutes. If you use a level 5+ spell slot, the spell doesn't require Concentration, and the duration becomes 8 hours (level 5–6 slot) or 24 hours (level 7–8 slot). If you use a level 9 spell slot, the spell lasts until dispelled.</p>"
+  },
+  {
+    "id": "srd-cc-5.2.1:counterspell",
+    "slug": "counterspell",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Counterspell",
+    "description": "<p>You attempt to interrupt a creature in the process of casting a spell. The creature makes a Constitution saving throw. On a failed save, the spell dissipates with no effect, and the action, Bonus Action, or Reaction used to cast it is wasted. If that spell was cast with a spell slot, the slot isn't expended.</p>",
+    "school": "abjuration",
+    "level": 3,
+    "classIds": ["sorcerer", "warlock", "wizard"],
+    "tags": {
+      "roles": ["control", "warding"]
+    },
+    "castingTime": {
+      "normal": {
+        "value": 1,
+        "unit": "reaction",
+        "trigger": "when you see a creature within 60 feet of yourself casting a spell with Verbal, Somatic, or Material components"
+      },
+      "canBeCastAsRitual": false
+    },
+    "range": {
+      "kind": "distance",
+      "value": {
+        "value": 60,
+        "unit": "ft"
+      }
+    },
+    "duration": {
+      "kind": "instantaneous"
+    },
+    "components": {
+      "somatic": true
+    }
+  },
+  {
+    "id": "srd-cc-5.2.1:dispel-magic",
+    "slug": "dispel-magic",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Dispel Magic",
+    "description": "<p>Choose one creature, object, or magical effect within range. Any ongoing spell of level 3 or lower on the target ends. For each ongoing spell of level 4 or higher on the target, make an ability check using your spellcasting ability (DC 10 plus that spell's level). On a successful check, the spell ends.</p>",
+    "school": "abjuration",
+    "level": 3,
+    "classIds": ["bard", "cleric", "druid", "paladin", "ranger", "sorcerer", "warlock", "wizard"],
+    "tags": {
+      "roles": ["warding"]
+    },
+    "castingTime": {
+      "normal": {
+        "value": 1,
+        "unit": "action"
+      },
+      "canBeCastAsRitual": false
+    },
+    "range": {
+      "kind": "distance",
+      "value": {
+        "value": 120,
+        "unit": "ft"
+      }
+    },
+    "duration": {
+      "kind": "instantaneous"
+    },
+    "components": {
+      "verbal": true,
+      "somatic": true
+    },
+    "higherLevelSlotEffect": "<p>You automatically end a spell on the target if the spell's level is equal to or less than the level of the spell slot you use.</p>"
+  },
+  {
+    "id": "srd-cc-5.2.1:fireball",
+    "slug": "fireball",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Fireball",
+    "level": 3,
+    "description": "<p>A bright streak flashes from you to a point you choose within range and then blossoms with a low roar into a fiery explosion. Each creature in a 20-foot-radius Sphere centered on that point makes a Dexterity saving throw, taking 8d6 Fire damage on a failed save or half as much damage on a successful one.</p><p>Flammable objects in the area that aren't being worn or carried start burning.</p>",
+    "school": "evocation",
+    "classIds": ["sorcerer", "wizard"],
+    "tags": {
+      "damageTypes": ["fire"],
+      "roles": ["damage"]
+    },
+    "castingTime": {
+      "normal": {
+        "value": 1,
+        "unit": "action"
+      },
+      "canBeCastAsRitual": false
+    },
+    "range": {
+      "kind": "distance",
+      "value": {
+        "value": 150,
+        "unit": "ft"
+      }
+    },
+    "areaOfEffect": {
+      "shape": "sphere",
+      "radius": {
+        "value": 20,
+        "unit": "ft"
+      }
+    },
+    "duration": {
+      "kind": "instantaneous"
+    },
+    "components": {
+      "verbal": true,
+      "somatic": true,
+      "material": {
+        "description": "a ball of bat guano and sulfur"
+      }
+    },
+    "higherLevelSlotEffect": "<p>The damage increases by 1d6 for each spell slot level above 3.</p>",
+    "effects": [
+      {
+        "id": "srd-cc-5.2.1:fireball:damage",
+        "kind": "damage",
+        "roll": {
+          "dice": {
+            "count": 8,
+            "faces": 6
+          }
+        },
+        "damageType": "fire"
+      }
+    ],
+    "resolution": {
+      "target": {
+        "count": 1,
+        "kind": "creature-or-object",
+        "proximity": {
+          "kind": "distance",
+          "distance": {
+            "value": 150,
+            "unit": "ft"
+          }
+        }
+      },
+      "method": {
+        "kind": "saving-throw",
+        "ability": "dex"
+      },
+      "effects": [
+        {
+          "id": "damage",
+          "kind": "damage",
+          "roll": {
+            "dice": {
+              "count": 8,
+              "faces": 6
+            }
+          },
+          "damageType": "fire"
+        }
+      ],
+      "outcomes": [
+        {
+          "result": "failed-save",
+          "applications": [
+            {
+              "effectId": "damage",
+              "amount": "full"
+            }
+          ]
+        },
+        {
+          "result": "successful-save",
+          "applications": [
+            {
+              "effectId": "damage",
+              "amount": "half"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "srd-cc-5.2.1:glyph-of-warding",
+    "slug": "glyph-of-warding",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Glyph of Warding",
+    "description": "<p>You inscribe a glyph that later unleashes a magical effect. You inscribe it either on a surface (such as a table or a section of floor) or within an object that can be closed (such as a book or chest) to conceal the glyph. The glyph can cover an area no larger than 10 feet in diameter. If the surface or object is moved more than 10 feet from where you cast this spell, the glyph is broken, and the spell ends without being triggered.</p><p>The glyph is nearly imperceptible and requires a successful Wisdom (Perception) check against your spell save DC to notice.</p><p>When you inscribe the glyph, you set its trigger and choose whether it's an explosive rune or a spell glyph, as explained below.</p><p><strong>Set the Trigger.</strong> You decide what triggers the glyph when you cast the spell. For glyphs inscribed on a surface, common triggers include touching or stepping on the glyph, removing another object covering it, or approaching within a certain distance of it. For glyphs inscribed within an object, common triggers include opening that object or seeing the glyph. Once a glyph is triggered, this spell ends.</p><p>You can refine the trigger so that only creatures of certain types activate it (for example, the glyph could be set to affect Aberrations). You can also set conditions for creatures that don't trigger the glyph, such as those who say a certain password.</p><p><strong>Explosive Rune.</strong> When triggered, the glyph erupts with magical energy in a 20-foot-radius Sphere centered on the glyph. Each creature in the area makes a Dexterity saving throw. A creature takes 5d8 Acid, Cold, Fire, Lightning, or Thunder damage (your choice when you create the glyph) on a failed save or half as much damage on a successful one.</p><p><strong>Spell Glyph.</strong> You can store a prepared spell of level 3 or lower in the glyph by casting it as part of creating the glyph. The spell must target a single creature or an area. The spell being stored has no immediate effect when cast in this way.</p><p>When the glyph is triggered, the stored spell takes effect. If the spell has a target, it targets the creature that triggered the glyph. If the spell affects an area, the area is centered on that creature. If the spell summons Hostile creatures or creates harmful objects or traps, they appear as close as possible to the intruder and attack it. If the spell requires Concentration, it lasts until the end of its full duration.</p>",
+    "school": "abjuration",
+    "level": 3,
+    "classIds": ["bard", "cleric", "wizard"],
+    "tags": {
+      "roles": ["damage", "warding"]
+    },
+    "castingTime": {
+      "normal": {
+        "value": 1,
+        "unit": "hour"
+      },
+      "canBeCastAsRitual": false
+    },
+    "range": {
+      "kind": "touch"
+    },
+    "duration": {
+      "kind": "special",
+      "description": "Until dispelled or triggered"
+    },
+    "components": {
+      "verbal": true,
+      "somatic": true,
+      "material": {
+        "description": "powdered diamond worth 200+ GP, which the spell consumes"
+      }
+    },
+    "higherLevelSlotEffect": "<p>The damage of an explosive rune increases by 1d8 for each spell slot level above 3. If you create a spell glyph, you can store any spell of up to the same level as the spell slot you use for the Glyph of Warding.</p>"
+  },
+  {
     "id": "srd-cc-5.2.1:mass-healing-word",
     "slug": "mass-healing-word",
     "rulesetId": "srd-cc-5.2.1",
@@ -35,7 +346,58 @@
     "components": {
       "verbal": true
     },
-    "higherLevelSlotEffect": "<p>The healing increases by 1d4 for each spell slot level above 3.</p>"
+    "higherLevelSlotEffect": "<p>The healing increases by 1d4 for each spell slot level above 3.</p>",
+    "effects": [
+      {
+        "id": "srd-cc-5.2.1:mass-healing-word:healing",
+        "kind": "healing",
+        "roll": {
+          "dice": {
+            "count": 2,
+            "faces": 4
+          }
+        }
+      }
+    ],
+    "resolution": {
+      "target": {
+        "count": 6,
+        "kind": "creature",
+        "proximity": {
+          "kind": "distance",
+          "distance": {
+            "value": 60,
+            "unit": "ft"
+          }
+        }
+      },
+      "method": {
+        "kind": "automatic"
+      },
+      "effects": [
+        {
+          "id": "healing",
+          "kind": "healing",
+          "roll": {
+            "dice": {
+              "count": 2,
+              "faces": 4
+            }
+          }
+        }
+      ],
+      "outcomes": [
+        {
+          "result": "applied",
+          "applications": [
+            {
+              "effectId": "healing",
+              "amount": "full"
+            }
+          ]
+        }
+      ]
+    }
   },
   {
     "id": "srd-cc-5.2.1:revivify",

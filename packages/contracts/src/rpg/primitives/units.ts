@@ -160,6 +160,16 @@ export const distanceSchema = z.object({
 export type Distance = z.infer<typeof distanceSchema>
 
 /**
+ * A strictly positive distance. Use when zero or negative dimensions are invalid
+ * (e.g. area geometry radii, cone length).
+ */
+export const positiveDistanceSchema = distanceSchema.extend({
+  value: distanceSchema.shape.value.positive(),
+})
+
+export type PositiveDistance = z.infer<typeof positiveDistanceSchema>
+
+/**
  * Speed units for mount/vehicle travel rates. Mounts typically use feet per round;
  * vehicles use miles per hour.
  */

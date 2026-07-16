@@ -23,13 +23,13 @@
     "properties": ["versatile"],
     "mastery": "topple",
     "damage": {
-      "kind": "dice",
-      "count": 1,
-      "faces": 8
+      "dice": {
+        "count": 1,
+        "faces": 8
+      }
     },
     "damageType": "slashing",
     "versatileDamage": {
-      "kind": "dice",
       "count": 1,
       "faces": 10
     }
@@ -58,8 +58,7 @@
     "properties": ["ammunition", "loading"],
     "mastery": "vex",
     "damage": {
-      "kind": "flat",
-      "amount": 1
+      "flat": 1
     },
     "damageType": "piercing",
     "range": {
@@ -91,9 +90,10 @@
     "properties": ["light"],
     "mastery": "slow",
     "damage": {
-      "kind": "dice",
-      "count": 1,
-      "faces": 4
+      "dice": {
+        "count": 1,
+        "faces": 4
+      }
     },
     "damageType": "bludgeoning"
   },
@@ -121,9 +121,10 @@
     "properties": ["finesse", "light", "thrown"],
     "mastery": "nick",
     "damage": {
-      "kind": "dice",
-      "count": 1,
-      "faces": 4
+      "dice": {
+        "count": 1,
+        "faces": 4
+      }
     },
     "damageType": "piercing",
     "range": {
@@ -155,9 +156,10 @@
     "properties": ["finesse", "thrown"],
     "mastery": "vex",
     "damage": {
-      "kind": "dice",
-      "count": 1,
-      "faces": 4
+      "dice": {
+        "count": 1,
+        "faces": 4
+      }
     },
     "damageType": "piercing",
     "range": {
@@ -189,9 +191,10 @@
     "properties": [],
     "mastery": "sap",
     "damage": {
-      "kind": "dice",
-      "count": 1,
-      "faces": 8
+      "dice": {
+        "count": 1,
+        "faces": 8
+      }
     },
     "damageType": "bludgeoning"
   },
@@ -219,9 +222,10 @@
     "properties": ["heavy", "reach", "two-handed"],
     "mastery": "graze",
     "damage": {
-      "kind": "dice",
-      "count": 1,
-      "faces": 10
+      "dice": {
+        "count": 1,
+        "faces": 10
+      }
     },
     "damageType": "slashing"
   },
@@ -249,9 +253,10 @@
     "properties": ["heavy", "two-handed"],
     "mastery": "cleave",
     "damage": {
-      "kind": "dice",
-      "count": 1,
-      "faces": 12
+      "dice": {
+        "count": 1,
+        "faces": 12
+      }
     },
     "damageType": "slashing"
   },
@@ -279,9 +284,10 @@
     "properties": ["two-handed"],
     "mastery": "push",
     "damage": {
-      "kind": "dice",
-      "count": 1,
-      "faces": 8
+      "dice": {
+        "count": 1,
+        "faces": 8
+      }
     },
     "damageType": "bludgeoning"
   },
@@ -309,9 +315,10 @@
     "properties": ["heavy", "two-handed"],
     "mastery": "graze",
     "damage": {
-      "kind": "dice",
-      "count": 2,
-      "faces": 6
+      "dice": {
+        "count": 2,
+        "faces": 6
+      }
     },
     "damageType": "slashing"
   },
@@ -339,9 +346,10 @@
     "properties": ["heavy", "reach", "two-handed"],
     "mastery": "cleave",
     "damage": {
-      "kind": "dice",
-      "count": 1,
-      "faces": 10
+      "dice": {
+        "count": 1,
+        "faces": 10
+      }
     },
     "damageType": "slashing"
   },
@@ -369,9 +377,10 @@
     "properties": ["ammunition", "light", "loading"],
     "mastery": "vex",
     "damage": {
-      "kind": "dice",
-      "count": 1,
-      "faces": 6
+      "dice": {
+        "count": 1,
+        "faces": 6
+      }
     },
     "damageType": "piercing",
     "range": {
@@ -403,9 +412,10 @@
     "properties": ["light", "thrown"],
     "mastery": "vex",
     "damage": {
-      "kind": "dice",
-      "count": 1,
-      "faces": 6
+      "dice": {
+        "count": 1,
+        "faces": 6
+      }
     },
     "damageType": "slashing",
     "range": {
@@ -437,9 +447,10 @@
     "properties": ["ammunition", "heavy", "loading", "two-handed"],
     "mastery": "push",
     "damage": {
-      "kind": "dice",
-      "count": 1,
-      "faces": 10
+      "dice": {
+        "count": 1,
+        "faces": 10
+      }
     },
     "damageType": "piercing",
     "range": {
@@ -471,9 +482,10 @@
     "properties": ["thrown"],
     "mastery": "slow",
     "damage": {
-      "kind": "dice",
-      "count": 1,
-      "faces": 6
+      "dice": {
+        "count": 1,
+        "faces": 6
+      }
     },
     "damageType": "piercing",
     "range": {
@@ -505,9 +517,10 @@
     "properties": ["heavy", "reach", "special", "two-handed"],
     "mastery": "topple",
     "damage": {
-      "kind": "dice",
-      "count": 1,
-      "faces": 10
+      "dice": {
+        "count": 1,
+        "faces": 10
+      }
     },
     "damageType": "piercing",
     "specialRules": "You have Disadvantage when you use a Lance to attack a target within 5 feet of you. Also, a Lance requires two hands to wield when you aren't mounted."
@@ -536,9 +549,10 @@
     "properties": ["ammunition", "loading", "two-handed"],
     "mastery": "slow",
     "damage": {
-      "kind": "dice",
-      "count": 1,
-      "faces": 8
+      "dice": {
+        "count": 1,
+        "faces": 8
+      }
     },
     "damageType": "piercing",
     "range": {
@@ -570,9 +584,10 @@
     "properties": ["light", "thrown"],
     "mastery": "nick",
     "damage": {
-      "kind": "dice",
-      "count": 1,
-      "faces": 4
+      "dice": {
+        "count": 1,
+        "faces": 4
+      }
     },
     "damageType": "bludgeoning",
     "range": {
@@ -604,9 +619,10 @@
     "properties": ["ammunition", "heavy", "two-handed"],
     "mastery": "slow",
     "damage": {
-      "kind": "dice",
-      "count": 1,
-      "faces": 8
+      "dice": {
+        "count": 1,
+        "faces": 8
+      }
     },
     "damageType": "piercing",
     "range": {
@@ -638,13 +654,13 @@
     "properties": ["versatile"],
     "mastery": "sap",
     "damage": {
-      "kind": "dice",
-      "count": 1,
-      "faces": 8
+      "dice": {
+        "count": 1,
+        "faces": 8
+      }
     },
     "damageType": "slashing",
     "versatileDamage": {
-      "kind": "dice",
       "count": 1,
       "faces": 10
     }
@@ -673,9 +689,10 @@
     "properties": [],
     "mastery": "sap",
     "damage": {
-      "kind": "dice",
-      "count": 1,
-      "faces": 6
+      "dice": {
+        "count": 1,
+        "faces": 6
+      }
     },
     "damageType": "bludgeoning"
   },
@@ -703,9 +720,10 @@
     "properties": ["heavy", "two-handed"],
     "mastery": "topple",
     "damage": {
-      "kind": "dice",
-      "count": 2,
-      "faces": 6
+      "dice": {
+        "count": 2,
+        "faces": 6
+      }
     },
     "damageType": "bludgeoning"
   },
@@ -733,9 +751,10 @@
     "properties": [],
     "mastery": "sap",
     "damage": {
-      "kind": "dice",
-      "count": 1,
-      "faces": 8
+      "dice": {
+        "count": 1,
+        "faces": 8
+      }
     },
     "damageType": "piercing"
   },
@@ -763,9 +782,10 @@
     "properties": ["ammunition", "loading", "two-handed"],
     "mastery": "slow",
     "damage": {
-      "kind": "dice",
-      "count": 1,
-      "faces": 12
+      "dice": {
+        "count": 1,
+        "faces": 12
+      }
     },
     "damageType": "piercing",
     "range": {
@@ -826,9 +846,10 @@
     "properties": ["heavy", "reach", "two-handed"],
     "mastery": "push",
     "damage": {
-      "kind": "dice",
-      "count": 1,
-      "faces": 10
+      "dice": {
+        "count": 1,
+        "faces": 10
+      }
     },
     "damageType": "piercing"
   },
@@ -856,9 +877,10 @@
     "properties": ["ammunition", "loading"],
     "mastery": "vex",
     "damage": {
-      "kind": "dice",
-      "count": 1,
-      "faces": 10
+      "dice": {
+        "count": 1,
+        "faces": 10
+      }
     },
     "damageType": "piercing",
     "range": {
@@ -890,13 +912,13 @@
     "properties": ["versatile"],
     "mastery": "topple",
     "damage": {
-      "kind": "dice",
-      "count": 1,
-      "faces": 6
+      "dice": {
+        "count": 1,
+        "faces": 6
+      }
     },
     "damageType": "bludgeoning",
     "versatileDamage": {
-      "kind": "dice",
       "count": 1,
       "faces": 8
     }
@@ -925,9 +947,10 @@
     "properties": ["finesse"],
     "mastery": "vex",
     "damage": {
-      "kind": "dice",
-      "count": 1,
-      "faces": 8
+      "dice": {
+        "count": 1,
+        "faces": 8
+      }
     },
     "damageType": "piercing"
   },
@@ -955,9 +978,10 @@
     "properties": ["finesse", "light"],
     "mastery": "nick",
     "damage": {
-      "kind": "dice",
-      "count": 1,
-      "faces": 6
+      "dice": {
+        "count": 1,
+        "faces": 6
+      }
     },
     "damageType": "slashing"
   },
@@ -985,9 +1009,10 @@
     "properties": ["ammunition", "two-handed"],
     "mastery": "vex",
     "damage": {
-      "kind": "dice",
-      "count": 1,
-      "faces": 6
+      "dice": {
+        "count": 1,
+        "faces": 6
+      }
     },
     "damageType": "piercing",
     "range": {
@@ -1019,9 +1044,10 @@
     "properties": ["finesse", "light"],
     "mastery": "vex",
     "damage": {
-      "kind": "dice",
-      "count": 1,
-      "faces": 6
+      "dice": {
+        "count": 1,
+        "faces": 6
+      }
     },
     "damageType": "piercing"
   },
@@ -1049,9 +1075,10 @@
     "properties": ["light"],
     "mastery": "nick",
     "damage": {
-      "kind": "dice",
-      "count": 1,
-      "faces": 4
+      "dice": {
+        "count": 1,
+        "faces": 4
+      }
     },
     "damageType": "slashing"
   },
@@ -1079,9 +1106,10 @@
     "properties": ["ammunition"],
     "mastery": "slow",
     "damage": {
-      "kind": "dice",
-      "count": 1,
-      "faces": 4
+      "dice": {
+        "count": 1,
+        "faces": 4
+      }
     },
     "damageType": "bludgeoning",
     "range": {
@@ -1113,13 +1141,13 @@
     "properties": ["thrown", "versatile"],
     "mastery": "sap",
     "damage": {
-      "kind": "dice",
-      "count": 1,
-      "faces": 6
+      "dice": {
+        "count": 1,
+        "faces": 6
+      }
     },
     "damageType": "piercing",
     "versatileDamage": {
-      "kind": "dice",
       "count": 1,
       "faces": 8
     },
@@ -1152,13 +1180,13 @@
     "properties": ["thrown", "versatile"],
     "mastery": "topple",
     "damage": {
-      "kind": "dice",
-      "count": 1,
-      "faces": 8
+      "dice": {
+        "count": 1,
+        "faces": 8
+      }
     },
     "damageType": "piercing",
     "versatileDamage": {
-      "kind": "dice",
       "count": 1,
       "faces": 10
     },
@@ -1191,13 +1219,13 @@
     "properties": ["versatile"],
     "mastery": "sap",
     "damage": {
-      "kind": "dice",
-      "count": 1,
-      "faces": 8
+      "dice": {
+        "count": 1,
+        "faces": 8
+      }
     },
     "damageType": "piercing",
     "versatileDamage": {
-      "kind": "dice",
       "count": 1,
       "faces": 10
     }
@@ -1226,13 +1254,13 @@
     "properties": ["versatile"],
     "mastery": "push",
     "damage": {
-      "kind": "dice",
-      "count": 1,
-      "faces": 8
+      "dice": {
+        "count": 1,
+        "faces": 8
+      }
     },
     "damageType": "bludgeoning",
     "versatileDamage": {
-      "kind": "dice",
       "count": 1,
       "faces": 10
     }
@@ -1261,9 +1289,10 @@
     "properties": ["finesse", "reach"],
     "mastery": "slow",
     "damage": {
-      "kind": "dice",
-      "count": 1,
-      "faces": 4
+      "dice": {
+        "count": 1,
+        "faces": 4
+      }
     },
     "damageType": "slashing"
   }

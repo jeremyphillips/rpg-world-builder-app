@@ -1,5 +1,6 @@
 import {
   DEFAULT_SYSTEM_RULESET_ID,
+  buildSpellPickerCompactSummary,
   type ChoiceSet,
   type Spell,
   type SpellPickerItem,
@@ -94,8 +95,7 @@ export const spellPickerItemsFixture: SpellPickerItem[] = [
   {
     spell: spellPickerMageHandFixture,
     searchText: 'Mage Hand conjuration cantrip spectral floating hand',
-    levelLabel: 'Cantrip',
-    summaryLine: 'Cantrip · Conjuration · Action · 30 ft. · 1 minute',
+    compactSummary: buildSpellPickerCompactSummary(spellPickerMageHandFixture),
     state: {
       isAvailable: true,
       isRecommended: false,
@@ -108,9 +108,7 @@ export const spellPickerItemsFixture: SpellPickerItem[] = [
   {
     spell: spellPickerDetectMagicFixture,
     searchText: 'Detect Magic divination ritual concentration detection',
-    levelLabel: 'Level 1',
-    summaryLine:
-      'Level 1 · Divination · Action · Self · Concentration, up to 10 minutes · Concentration · Ritual · detection',
+    compactSummary: buildSpellPickerCompactSummary(spellPickerDetectMagicFixture),
     state: {
       isAvailable: true,
       isRecommended: false,
@@ -123,8 +121,7 @@ export const spellPickerItemsFixture: SpellPickerItem[] = [
   {
     spell: spellPickerCureWoundsFixture,
     searchText: 'Cure Wounds evocation healing touch',
-    levelLabel: 'Level 1',
-    summaryLine: 'Level 1 · Evocation · Action · Touch · Instantaneous · healing',
+    compactSummary: buildSpellPickerCompactSummary(spellPickerCureWoundsFixture),
     state: {
       isAvailable: true,
       isRecommended: false,

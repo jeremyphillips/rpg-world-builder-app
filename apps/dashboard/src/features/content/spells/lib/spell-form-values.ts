@@ -1,4 +1,8 @@
 import {
+  areaGeometrySchema,
+  areaGeometryShapeSchema,
+  type AreaGeometry,
+  type AreaGeometryShape,
   spellCastingTimeSchema,
   spellComponentsSchema,
   spellDurationSchema,
@@ -7,6 +11,7 @@ import {
   createSpellInputSchema,
   spellDeliveryMethodSchema,
   type CreateSpellInput,
+  type Distance,
   type Spell,
   type SpellCastingTime,
   type SpellComponents,
@@ -17,8 +22,10 @@ import {
 
 import { finalizeContentInput, slugForInputParse } from '../../lib/forms/content-form-key-helpers'
 import type { ContentFormInputCtx } from '../../lib/forms/content-form-registry'
-import { SPELL_DELIVERY_METHOD_NONE } from './spell-form-labels'
+import { SPELL_AREA_GEOMETRY_NONE, SPELL_DELIVERY_METHOD_NONE } from './spell-form-labels'
 import type { SpellFormValues } from './spell-form-fields'
+import { spellEffectsToFormValues } from './effects/effect-form-values'
+import { resolutionToForm } from '../resolution/lib/form/resolution-form-values'
 
 export type SpellFormCastingTime = {
   normal: {
@@ -57,6 +64,25 @@ export type SpellFormTags = {
   conditions?: NonNullable<SpellTags['conditions']>
 }
 
+export type SpellFormDistance = {
+  value: number
+  unit?: Distance['unit']
+}
+
+export type SpellFormAreaOfEffect = {
+  shape: string
+  radius?: SpellFormDistance
+  length?: SpellFormDistance
+  width?: SpellFormDistance
+  size?: SpellFormDistance
+  height?: SpellFormDistance
+  description?: string
+}
+
+export const EMPTY_SPELL_AREA_OF_EFFECT: SpellFormAreaOfEffect = {
+  shape: SPELL_AREA_GEOMETRY_NONE,
+}
+
 export const EMPTY_SPELL_TAGS: SpellFormTags = {
   roles: [],
   functions: [],
@@ -64,6 +90,7 @@ export const EMPTY_SPELL_TAGS: SpellFormTags = {
   conditions: [],
 }
 
+/** Create defaults intentionally omit `resolution` — authors enable via Add resolution. */
 export const spellCreateDefaultValues: Partial<SpellFormValues> = {
   classIds: [],
   tags: { ...EMPTY_SPELL_TAGS },
@@ -74,7 +101,9 @@ export const spellCreateDefaultValues: Partial<SpellFormValues> = {
   range: { kind: 'self' },
   duration: { kind: 'instantaneous', value: 1, unit: 'round' },
   components: { verbal: true, somatic: true, material: { enabled: false } },
+  areaOfEffect: { ...EMPTY_SPELL_AREA_OF_EFFECT },
   deliveryMethod: SPELL_DELIVERY_METHOD_NONE,
+  effects: [],
 }
 
 export function spellCastingTimeToFormValues(castingTime: SpellCastingTime): SpellFormCastingTime {
@@ -226,6 +255,142 @@ export function spellTagsFromFormValues(tags: SpellFormTags | undefined): SpellT
   return spellTagsSchema.parse(result)
 }
 
+function toPositiveDistance(distance: SpellFormDistance | undefined): Distance {
+  return { value: distance?.value ?? 0, unit: 'ft' }
+}
+
+function sphereAreaToFormValues(
+  area: Extract<AreaGeometry, { shape: 'sphere' | 'emanation' }>,
+): SpellFormAreaOfEffect {
+  return {
+    shape: area.shape,
+    radius: { value: area.radius.value, unit: area.radius.unit },
+  }
+}
+
+function coneAreaToFormValues(
+  area: Extract<AreaGeometry, { shape: 'cone' }>,
+): SpellFormAreaOfEffect {
+  return {
+    shape: area.shape,
+    length: { value: area.length.value, unit: area.length.unit },
+  }
+}
+
+function cubeAreaToFormValues(
+  area: Extract<AreaGeometry, { shape: 'cube' }>,
+): SpellFormAreaOfEffect {
+  return {
+    shape: area.shape,
+    size: { value: area.size.value, unit: area.size.unit },
+  }
+}
+
+function lineAreaToFormValues(
+  area: Extract<AreaGeometry, { shape: 'line' }>,
+): SpellFormAreaOfEffect {
+  return {
+    shape: area.shape,
+    length: { value: area.length.value, unit: area.length.unit },
+    width: { value: area.width.value, unit: area.width.unit },
+  }
+}
+
+function cylinderAreaToFormValues(
+  area: Extract<AreaGeometry, { shape: 'cylinder' }>,
+): SpellFormAreaOfEffect {
+  return {
+    shape: area.shape,
+    radius: { value: area.radius.value, unit: area.radius.unit },
+    height: { value: area.height.value, unit: area.height.unit },
+  }
+}
+
+function specialAreaToFormValues(
+  area: Extract<AreaGeometry, { shape: 'special' }>,
+): SpellFormAreaOfEffect {
+  return {
+    shape: area.shape,
+    description: area.description,
+  }
+}
+
+const AREA_GEOMETRY_TO_FORM_VALUES: Record<
+  AreaGeometryShape,
+  (area: AreaGeometry) => SpellFormAreaOfEffect
+> = {
+  sphere: (area) => sphereAreaToFormValues(area as Extract<AreaGeometry, { shape: 'sphere' }>),
+  emanation: (area) =>
+    sphereAreaToFormValues(area as Extract<AreaGeometry, { shape: 'emanation' }>),
+  cone: (area) => coneAreaToFormValues(area as Extract<AreaGeometry, { shape: 'cone' }>),
+  cube: (area) => cubeAreaToFormValues(area as Extract<AreaGeometry, { shape: 'cube' }>),
+  line: (area) => lineAreaToFormValues(area as Extract<AreaGeometry, { shape: 'line' }>),
+  cylinder: (area) =>
+    cylinderAreaToFormValues(area as Extract<AreaGeometry, { shape: 'cylinder' }>),
+  special: (area) => specialAreaToFormValues(area as Extract<AreaGeometry, { shape: 'special' }>),
+}
+
+const AREA_GEOMETRY_FROM_FORM_VALUES: Record<
+  AreaGeometryShape,
+  (area: SpellFormAreaOfEffect) => AreaGeometry
+> = {
+  sphere: (area) =>
+    areaGeometrySchema.parse({
+      shape: 'sphere',
+      radius: toPositiveDistance(area.radius),
+    }),
+  emanation: (area) =>
+    areaGeometrySchema.parse({
+      shape: 'emanation',
+      radius: toPositiveDistance(area.radius),
+    }),
+  cone: (area) =>
+    areaGeometrySchema.parse({
+      shape: 'cone',
+      length: toPositiveDistance(area.length),
+    }),
+  cube: (area) =>
+    areaGeometrySchema.parse({
+      shape: 'cube',
+      size: toPositiveDistance(area.size),
+    }),
+  line: (area) =>
+    areaGeometrySchema.parse({
+      shape: 'line',
+      length: toPositiveDistance(area.length),
+      width: toPositiveDistance(area.width),
+    }),
+  cylinder: (area) =>
+    areaGeometrySchema.parse({
+      shape: 'cylinder',
+      radius: toPositiveDistance(area.radius),
+      height: toPositiveDistance(area.height),
+    }),
+  special: (area) =>
+    areaGeometrySchema.parse({
+      shape: 'special',
+      description: area.description?.trim() ?? '',
+    }),
+}
+
+export function spellAreaOfEffectToFormValues(
+  areaOfEffect: Spell['areaOfEffect'],
+): SpellFormAreaOfEffect {
+  if (!areaOfEffect) return { ...EMPTY_SPELL_AREA_OF_EFFECT }
+  return AREA_GEOMETRY_TO_FORM_VALUES[areaOfEffect.shape](areaOfEffect)
+}
+
+export function spellAreaOfEffectFromFormValues(
+  areaOfEffect: SpellFormAreaOfEffect | undefined,
+): AreaGeometry | undefined {
+  if (!areaOfEffect?.shape || areaOfEffect.shape === SPELL_AREA_GEOMETRY_NONE) {
+    return undefined
+  }
+
+  const shape = areaGeometryShapeSchema.parse(areaOfEffect.shape)
+  return AREA_GEOMETRY_FROM_FORM_VALUES[shape](areaOfEffect)
+}
+
 export function spellToFormValues(entity: Spell): SpellFormValues {
   return {
     name: entity.name,
@@ -241,7 +406,15 @@ export function spellToFormValues(entity: Spell): SpellFormValues {
     duration: spellDurationToFormValues(entity.duration),
     components: spellComponentsToFormValues(entity.components),
     tags: spellTagsToFormValues(entity.tags),
+    areaOfEffect: spellAreaOfEffectToFormValues(entity.areaOfEffect),
     deliveryMethod: entity.deliveryMethod ?? SPELL_DELIVERY_METHOD_NONE,
+    effects: spellEffectsToFormValues(entity.effects),
+    ...(entity.resolution
+      ? (() => {
+          const resolution = resolutionToForm(entity.resolution)
+          return resolution ? { resolution } : {}
+        })()
+      : {}),
   }
 }
 
@@ -249,26 +422,39 @@ export function buildSpellCreateInput(
   values: SpellFormValues,
   ctx?: ContentFormInputCtx<Spell>,
 ): CreateSpellInput {
-  const rawDelivery = values.deliveryMethod?.trim()
+  // TODO(spell.effect.persistence):
+  // Include effects after the atomic-effect model and authoring UX are validated.
+  // TODO(spell.resolution.persistence):
+  // Include resolution after the resolution model and authoring UX are validated.
+  const { effects: _effects, resolution: _resolution, ...persistedValues } = values
+
+  const rawDelivery = persistedValues.deliveryMethod?.trim()
   const deliveryMethod =
     rawDelivery && rawDelivery !== SPELL_DELIVERY_METHOD_NONE
       ? spellDeliveryMethodSchema.parse(rawDelivery)
       : undefined
 
+  const areaOfEffect = spellAreaOfEffectFromFormValues(
+    persistedValues.areaOfEffect as SpellFormAreaOfEffect | undefined,
+  )
+
   const input = createSpellInputSchema.parse({
-    slug: slugForInputParse(values.name, ctx),
-    name: values.name,
-    description: values.description || undefined,
-    cantripScaling: values.cantripScaling || undefined,
-    higherLevelSlotEffect: values.higherLevelSlotEffect || undefined,
-    school: values.school,
-    level: values.level,
-    classIds: values.classIds,
-    castingTime: spellCastingTimeFromFormValues(values.castingTime as SpellFormCastingTime),
-    range: spellRangeFromFormValues(values.range as SpellFormRange),
-    duration: spellDurationFromFormValues(values.duration as SpellFormDuration),
-    components: spellComponentsFromFormValues(values.components as SpellFormComponents),
-    tags: spellTagsFromFormValues(values.tags),
+    slug: slugForInputParse(persistedValues.name, ctx),
+    name: persistedValues.name,
+    description: persistedValues.description || undefined,
+    cantripScaling: persistedValues.cantripScaling || undefined,
+    higherLevelSlotEffect: persistedValues.higherLevelSlotEffect || undefined,
+    school: persistedValues.school,
+    level: persistedValues.level,
+    classIds: persistedValues.classIds,
+    castingTime: spellCastingTimeFromFormValues(
+      persistedValues.castingTime as SpellFormCastingTime,
+    ),
+    range: spellRangeFromFormValues(persistedValues.range as SpellFormRange),
+    duration: spellDurationFromFormValues(persistedValues.duration as SpellFormDuration),
+    components: spellComponentsFromFormValues(persistedValues.components as SpellFormComponents),
+    tags: spellTagsFromFormValues(persistedValues.tags),
+    ...(areaOfEffect !== undefined && { areaOfEffect }),
     ...(deliveryMethod !== undefined && { deliveryMethod }),
   })
 

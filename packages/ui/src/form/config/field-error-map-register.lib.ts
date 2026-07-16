@@ -7,6 +7,7 @@
 import type {
   ChooseFromChipsFieldConfig,
   DiceFormulaFieldConfig,
+  RollValueFieldConfig,
   EditableGridFieldConfig,
   FieldConfig,
   InlineChooseCountFieldConfig,
@@ -90,6 +91,20 @@ function registerEditableGridField(
   }
 }
 
+function registerRollValueField(
+  registry: Map<string, RegistryEntry>,
+  key: RegistryKey,
+  field: RollValueFieldConfig,
+): void {
+  const entry: RegistryEntry = { label: field.label, category: 'number' }
+  const base = field.name
+
+  registry.set(key(`${base}.dice.count`), entry)
+  registry.set(key(`${base}.dice.faces`), entry)
+  registry.set(key(`${base}.flatAmount`), entry)
+  registry.set(key(`${base}.flatOperator`), { label: field.label, category: 'choice' })
+}
+
 function registerDiceFormulaField(
   registry: Map<string, RegistryEntry>,
   key: RegistryKey,
@@ -150,5 +165,9 @@ export function registerFieldPaths(
 
   if (field.type === 'diceFormula') {
     registerDiceFormulaField(registry, key, field as DiceFormulaFieldConfig)
+  }
+
+  if (field.type === 'rollValue') {
+    registerRollValueField(registry, key, field as RollValueFieldConfig)
   }
 }
