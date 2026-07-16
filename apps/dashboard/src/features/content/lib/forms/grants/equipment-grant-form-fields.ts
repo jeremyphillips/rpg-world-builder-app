@@ -43,6 +43,9 @@ import {
 /** Sentinel for “any category” in single-select pool category fields (Radix Select rejects `''`). */
 export const EQUIPMENT_POOL_CATEGORY_ANY = '__any__' as const
 
+/** React key for the equipment choice pool inline sentence (segments still bind `choose`). */
+export const EQUIPMENT_CHOICE_POOL_SENTENCE_FIELD_NAME = 'equipmentChoicePoolSentence' as const
+
 /** Equipment grant validation messages (tier 3 form overrides). */
 export const equipmentGrantValidationMessages = {
   explicitPoolSlugsRequired: defineMessage(
@@ -412,7 +415,7 @@ export function equipmentChoiceGrantFields(
   return [
     {
       type: 'inlineSentence',
-      name: 'choose',
+      name: EQUIPMENT_CHOICE_POOL_SENTENCE_FIELD_NAME,
       label: '',
       hideLabel: true,
       visibility: visibleForItemKind('choice', guard),

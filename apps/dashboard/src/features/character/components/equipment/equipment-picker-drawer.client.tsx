@@ -32,7 +32,8 @@ import {
 } from '../picker/catalog-picker-filter-toolbar.variants'
 import { catalogPickerShellProps } from '../picker/catalog-picker-shell.lib'
 import { CatalogPickerSortGroup } from '../picker/catalog-picker-sort-group.client'
-import { CatalogPickerToolbarResetButton } from '../picker/catalog-picker-toolbar-reset-button.client'
+import { pickerSortOption } from '../picker/catalog-picker-sort-labels.lib'
+import { CatalogPickerToolbarResetSlot } from '../picker/catalog-picker-toolbar-reset-button.client'
 import {
   countEquipmentPickerAffordableHiddenImpact,
   countEquipmentPickerClearableCriteria,
@@ -121,12 +122,19 @@ function EquipmentPickerTabToolbarActions({
   }
 
   if (!showClearFilters && !showResetView) {
-    return null
+    return (
+      <CatalogPickerToolbarResetSlot
+        visible={false}
+        label={EQUIPMENT_PICKER_RESET_VIEW_LABEL}
+        onClick={() => undefined}
+      />
+    )
   }
 
   if (showClearFilters) {
     return (
-      <CatalogPickerToolbarResetButton
+      <CatalogPickerToolbarResetSlot
+        visible
         label={EQUIPMENT_PICKER_CLEAR_FILTERS_LABEL}
         onClick={handleClearFilters}
       />
@@ -134,7 +142,8 @@ function EquipmentPickerTabToolbarActions({
   }
 
   return (
-    <CatalogPickerToolbarResetButton
+    <CatalogPickerToolbarResetSlot
+      visible
       label={EQUIPMENT_PICKER_RESET_VIEW_LABEL}
       onClick={onResetView}
     />
@@ -203,10 +212,9 @@ function EquipmentPickerFilterToolbarControls({
           label={EQUIPMENT_PICKER_SORT_LABEL}
           ariaLabel="Sort equipment"
           triggerAriaLabel="Equipment sort order"
-          options={EQUIPMENT_PICKER_SORT_MODES.map((mode) => ({
-            value: mode,
-            label: EQUIPMENT_PICKER_SORT_LABELS[mode],
-          }))}
+          options={EQUIPMENT_PICKER_SORT_MODES.map((mode) =>
+            pickerSortOption(mode, EQUIPMENT_PICKER_SORT_LABELS[mode]),
+          )}
           onValueChange={(value) => onSortModeChange(value as EquipmentPickerSortMode)}
         />
       </div>
@@ -374,6 +382,7 @@ export function EquipmentPickerDrawer({
       title="Add equipment"
       description="Search the catalog and add items to your loadout."
       {...catalogPickerShellProps()}
+      recommendationsEnabled
       items={filteredItems}
       getItemKey={(item) => item.equipment.id}
       getItemToolbarLabel={(item) => item.equipment.name}

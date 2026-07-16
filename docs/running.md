@@ -111,7 +111,8 @@ See [`tools/bench/README.md`](../tools/bench/README.md) for command reference an
 ## Quality gates (Turbo, all workspaces)
 
 ```bash
-pnpm build       # turbo run build
+pnpm build       # turbo run build (excludes @rpg/bench)
+pnpm build:bench # turbo run build --filter @rpg/bench
 pnpm lint        # turbo run lint
 pnpm typecheck   # turbo run typecheck
 pnpm test        # turbo run test

@@ -5,6 +5,7 @@ import {
   equipmentGrantChoiceItemFormSchema,
   equipmentGrantItemFields,
   equipmentGrantItemFormSchema,
+  EQUIPMENT_CHOICE_POOL_SENTENCE_FIELD_NAME,
   EQUIPMENT_POOL_CATEGORY_ANY,
   type EquipmentGrantItemForm,
 } from './equipment-grant-form-fields'
@@ -227,7 +228,9 @@ describe('equipmentGrantItemFields', () => {
 
   it('embeds pool source in the choice inline sentence', () => {
     const fields = equipmentGrantItemFields({ options: { equipment: [] } })
-    const chooseField = fields.find((field) => 'name' in field && field.name === 'choose')
+    const chooseField = fields.find(
+      (field) => 'name' in field && field.name === EQUIPMENT_CHOICE_POOL_SENTENCE_FIELD_NAME,
+    )
     expect(chooseField).toMatchObject({
       type: 'inlineSentence',
       segments: expect.arrayContaining([

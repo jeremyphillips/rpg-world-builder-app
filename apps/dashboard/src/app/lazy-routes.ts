@@ -24,6 +24,12 @@ export const CharacterDetailRoute = withRouteSuspense(
 export const CharacterCreateRoute = withRouteSuspense(
   lazyNamed(() => import('@/features/character/routes/character-create'), 'CharacterCreate'),
 )
+export const CharacterImportRoute = withRouteSuspense(
+  lazyNamed(
+    () => import('@/features/character-import/routes/character-import-route'),
+    'CharacterImportRoute',
+  ),
+)
 export const AccountSettingsRoute = withRouteSuspense(
   lazyNamed(() => import('@/features/user/routes/account-settings'), 'AccountSettings'),
 )

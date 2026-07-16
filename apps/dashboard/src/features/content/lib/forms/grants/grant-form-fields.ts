@@ -406,9 +406,13 @@ function proficiencyGrantFieldsForTypes(
 ): FormItem[] {
   return PROFICIENCY_GRANT_TYPES.flatMap((grantType) =>
     includesGrantType(grantTypes, grantType)
-      ? proficiencyGrantItemFields(grantType, ctx, {
-          guardVisibility: visibleFor(grantType),
-        })
+      ? [
+          {
+            kind: 'stack' as const,
+            visibility: visibleFor(grantType),
+            fields: proficiencyGrantItemFields(grantType, ctx),
+          },
+        ]
       : [],
   )
 }

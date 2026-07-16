@@ -50,6 +50,8 @@ export interface ChipsFieldOptionsProps {
   onBlur?: () => void
   disabled?: boolean
   chipSize: ChipSize
+  /** When false, selected chips omit the leading check icon. Defaults to true. */
+  showSelectedCheckmark?: boolean
 }
 
 /** Chip pill row only — for embedding inside a parent fieldset (e.g. `ChooseFromChipsField`). */
@@ -63,6 +65,7 @@ export function ChipsFieldOptions({
   onBlur,
   disabled,
   chipSize,
+  showSelectedCheckmark = true,
 }: ChipsFieldOptionsProps) {
   const selected: string[] = React.useMemo(() => {
     if (multiple) {
@@ -102,6 +105,7 @@ export function ChipsFieldOptions({
             onSelectedChange={(next) => handleSelectedChange(option.value, next)}
             selectionRole={selectionRole}
             disabled={isDisabled}
+            leadingIcon={showSelectedCheckmark ? undefined : null}
           >
             {option.label}
           </Chip>
@@ -122,6 +126,7 @@ export interface ChipsFieldProps extends SelectFieldValueProps {
   width?: FieldWidth
   hintPosition?: FieldHintPosition
   chrome?: FieldChrome
+  showSelectedCheckmark?: boolean
 }
 
 /**
@@ -149,6 +154,7 @@ export function ChipsField({
   chipSize,
   width,
   chrome,
+  showSelectedCheckmark,
 }: ChipsFieldProps) {
   const resolvedChipSize = chipSize ?? size
   const legendId = `${id}-legend`
@@ -175,6 +181,7 @@ export function ChipsField({
       onChange={onChange}
       disabled={disabled}
       chipSize={resolvedChipSize}
+      showSelectedCheckmark={showSelectedCheckmark}
     />
   )
 

@@ -1,8 +1,6 @@
-import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest'
+import { describe, expect, it } from 'vitest'
 import request, { type Agent } from 'supertest'
-import type { Express } from 'express'
 
-import { createApp } from '../../app'
 import { CSRF_HEADER } from '../../lib/cookies'
 import {
   defaultTestCredentials,
@@ -10,41 +8,28 @@ import {
   registerAndLoginTestUser,
   registerTestUser,
 } from '../../test/auth-agent'
-import { clearTestDb, startTestDb, stopTestDb } from '../../test/db'
+import { useIntegrationApp } from '../../test/setup/integration-app'
 import { updateLastSelectedCampaign } from '../user'
 
-let app: Express
+const getApp = useIntegrationApp()
 
 const credentials = defaultTestCredentials
 
 async function newAgent(): Promise<{ agent: Agent; csrfToken: string }> {
-  return newAuthAgent(app)
+  return newAuthAgent(getApp())
 }
 
 async function registerUser(): Promise<{ agent: Agent; csrfToken: string }> {
-  return registerTestUser(app, credentials)
+  return registerTestUser(getApp(), credentials)
 }
 
 async function registerAndLogin(): Promise<{ agent: Agent; csrfToken: string }> {
-  return registerAndLoginTestUser(app, credentials)
+  return registerAndLoginTestUser(getApp(), credentials)
 }
-
-beforeAll(async () => {
-  await startTestDb()
-  app = createApp()
-})
-
-afterEach(async () => {
-  await clearTestDb()
-})
-
-afterAll(async () => {
-  await stopTestDb()
-})
 
 describe('GET /api/health', () => {
   it('returns ok', async () => {
-    const res = await request(app).get('/api/health').expect(200)
+    const res = await request(getApp()).get('/api/health').expect(200)
     expect(res.body.status).toBe('ok')
   })
 })
@@ -98,7 +83,7 @@ describe('auth flow', () => {
   })
 
   it('rejects /me without a session cookie', async () => {
-    await request(app).get('/api/auth/me').expect(401)
+    await request(getApp()).get('/api/auth/me').expect(401)
   })
 
   it('rejects duplicate registration with 409', async () => {
@@ -140,7 +125,7 @@ describe('CSRF double-submit guard', () => {
   })
 
   it('does not require a token for safe (GET) requests', async () => {
-    await request(app).get('/api/health').expect(200)
+    await request(getApp()).get('/api/health').expect(200)
   })
 })
 

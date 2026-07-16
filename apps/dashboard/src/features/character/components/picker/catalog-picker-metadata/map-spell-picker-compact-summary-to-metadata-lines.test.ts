@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest'
 import { mapSpellPickerCompactSummaryToMetadataLines } from './map-spell-picker-compact-summary-to-metadata-lines'
 
 describe('mapSpellPickerCompactSummaryToMetadataLines', () => {
-  it('maps casting summary and classification with an explicit neutral level badge', () => {
+  it('maps casting summary and classification as muted text metadata', () => {
     expect(
       mapSpellPickerCompactSummaryToMetadataLines({
         castingSummary: ['Action', 'Self', 'Concentration, up to 10 minutes'],
@@ -22,12 +22,7 @@ describe('mapSpellPickerCompactSummaryToMetadataLines', () => {
       },
       {
         segments: [
-          {
-            type: 'badge',
-            text: '1st level',
-            tone: 'neutral',
-            appearance: 'neutral',
-          },
+          { type: 'text', text: '1st level' },
           { type: 'text', text: 'Divination' },
         ],
       },

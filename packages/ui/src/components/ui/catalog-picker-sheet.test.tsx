@@ -42,7 +42,7 @@ describe('CatalogPickerSheet', () => {
     expect(screen.getByText('Beta Item')).toBeInTheDocument()
   })
 
-  it('renders tabs before the search input', () => {
+  it('renders tabs before the search input by default', () => {
     render(
       <CatalogPickerSheet
         open
@@ -52,6 +52,7 @@ describe('CatalogPickerSheet', () => {
         getItemKey={(item) => item.id}
         getSearchText={(item) => item.searchText}
         getItemTab={(item) => item.tab}
+        recommendationsEnabled
         defaultTabId="featured"
         tabs={[
           { id: 'featured', label: 'Featured' },
@@ -66,6 +67,55 @@ describe('CatalogPickerSheet', () => {
     expect(tablist.compareDocumentPosition(search) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
   })
 
+  it('hides recommendation tabs when recommendationsEnabled is false', () => {
+    render(
+      <CatalogPickerSheet
+        open
+        onOpenChange={vi.fn()}
+        title="Catalog"
+        items={items}
+        getItemKey={(item) => item.id}
+        getSearchText={(item) => item.searchText}
+        getItemTab={(item) => item.tab}
+        recommendationsEnabled={false}
+        defaultTabId="featured"
+        tabs={[
+          { id: 'featured', label: 'Featured' },
+          { id: 'all', label: 'All' },
+        ]}
+        renderItemHeader={(item) => <span>{item.name}</span>}
+      />,
+    )
+
+    expect(screen.queryByRole('tablist')).not.toBeInTheDocument()
+  })
+
+  it('renders tabs after search when recommendationTabsPosition is after-search', () => {
+    render(
+      <CatalogPickerSheet
+        open
+        onOpenChange={vi.fn()}
+        title="Catalog"
+        items={items}
+        getItemKey={(item) => item.id}
+        getSearchText={(item) => item.searchText}
+        getItemTab={(item) => item.tab}
+        recommendationsEnabled
+        recommendationTabsPosition="after-search"
+        defaultTabId="featured"
+        tabs={[
+          { id: 'featured', label: 'Featured' },
+          { id: 'all', label: 'All' },
+        ]}
+        renderItemHeader={(item) => <span>{item.name}</span>}
+      />,
+    )
+
+    const tablist = screen.getByRole('tablist')
+    const search = screen.getByRole('textbox', { name: 'Search catalog' })
+    expect(search.compareDocumentPosition(tablist) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+  })
+
   it('resolves toolbar control render props with tab reset helpers', async () => {
     const user = userEvent.setup()
 
@@ -78,6 +128,7 @@ describe('CatalogPickerSheet', () => {
         getItemKey={(item) => item.id}
         getSearchText={(item) => item.searchText}
         getItemTab={(item) => item.tab}
+        recommendationsEnabled
         defaultTabId="featured"
         tabs={[
           { id: 'featured', label: 'Featured' },
@@ -122,6 +173,7 @@ describe('CatalogPickerSheet', () => {
         getItemKey={(item) => item.id}
         getSearchText={(item) => item.searchText}
         getItemTab={(item) => item.tab}
+        recommendationsEnabled
         defaultTabId="featured"
         tabs={[
           { id: 'featured', label: 'Featured' },
@@ -168,6 +220,7 @@ describe('CatalogPickerSheet', () => {
         getSearchText={(item) => item.searchText}
         getItemToolbarLabel={(item) => item.name}
         getItemTab={(item) => item.tab}
+        recommendationsEnabled
         defaultTabId="featured"
         tabs={[
           { id: 'featured', label: 'Featured' },
@@ -198,6 +251,7 @@ describe('CatalogPickerSheet', () => {
         getItemKey={(item) => item.id}
         getSearchText={(item) => item.searchText}
         getItemTab={(item) => item.tab}
+        recommendationsEnabled
         defaultTabId="featured"
         tabs={[
           { id: 'featured', label: 'Featured' },

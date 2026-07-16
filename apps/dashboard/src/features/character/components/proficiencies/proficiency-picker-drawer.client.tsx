@@ -15,6 +15,7 @@ import { CatalogPickerSelectionActions } from '../picker/catalog-picker-selectio
 import { catalogPickerShellProps } from '../picker/catalog-picker-shell.lib'
 import { catalogPickerEmptyStateClasses } from '../picker/catalog-picker-shell.variants'
 import { CatalogPickerSortGroup } from '../picker/catalog-picker-sort-group.client'
+import { pickerSortOption } from '../picker/catalog-picker-sort-labels.lib'
 import { CatalogPickerToolbarResetButton } from '../picker/catalog-picker-toolbar-reset-button.client'
 import {
   filterAndSortProficiencyPickerItems,
@@ -139,10 +140,9 @@ export function ProficiencyPickerDrawer({
           <div className={catalogPickerSortActionsGroupClasses}>
             <CatalogPickerSortGroup
               value={sortMode}
-              options={PROFICIENCY_PICKER_SORT_MODES.map((mode) => ({
-                value: mode,
-                label: PROFICIENCY_PICKER_SORT_LABELS[mode],
-              }))}
+              options={PROFICIENCY_PICKER_SORT_MODES.map((mode) =>
+                pickerSortOption(mode, PROFICIENCY_PICKER_SORT_LABELS[mode]),
+              )}
               onValueChange={setSortMode}
               triggerAriaLabel="Proficiency sort order"
               ariaLabel="Sort proficiencies"

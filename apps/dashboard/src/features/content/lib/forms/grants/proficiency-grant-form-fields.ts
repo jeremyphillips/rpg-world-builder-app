@@ -38,6 +38,12 @@ import {
 /** Sentinel for “any category” in filtered pool fields (Radix Select rejects `''`). */
 export const PROFICIENCY_POOL_CATEGORY_ANY = '__any__' as const
 
+/** React keys for co-located pool inline sentences (outer `name`; segments still bind `choose`). */
+export const WEAPON_PROFICIENCY_POOL_SENTENCE_FIELD_NAME = 'weaponProficiencyPoolSentence' as const
+export const TOOL_PROFICIENCY_POOL_SENTENCE_FIELD_NAME = 'toolProficiencyPoolSentence' as const
+export const SKILL_PROFICIENCY_POOL_SENTENCE_FIELD_NAME = 'skillProficiencyPoolSentence' as const
+export const ARMOR_TRAINING_POOL_SENTENCE_FIELD_NAME = 'armorTrainingPoolSentence' as const
+
 export const WEAPON_PROFICIENCY_SOURCES = ['specific', 'category', 'pool'] as const
 export const TOOL_PROFICIENCY_SOURCES = ['specific', 'category', 'pool'] as const
 export const SKILL_PROFICIENCY_SOURCES = ['specific', 'pool'] as const
@@ -199,7 +205,7 @@ function weaponProficiencyPoolFields(ctx: ContentFormCtx, guard?: FieldVisibilit
   return [
     {
       type: 'inlineSentence',
-      name: 'choose',
+      name: WEAPON_PROFICIENCY_POOL_SENTENCE_FIELD_NAME,
       label: '',
       hideLabel: true,
       visibility: visibleForProficiencySource('pool', guard),
@@ -319,6 +325,7 @@ function toolProficiencyPoolFields(ctx: ContentFormCtx, guard?: FieldVisibility)
     names: GRANT_TOOL_PROFICIENCY_POOL_FIELD_NAMES,
     guard,
     proficiencySourceGuard: visibleForProficiencySource('pool', guard),
+    sentenceName: TOOL_PROFICIENCY_POOL_SENTENCE_FIELD_NAME,
   })
 }
 
@@ -391,7 +398,7 @@ function skillProficiencyPoolFields(ctx: ContentFormCtx, guard?: FieldVisibility
   return [
     {
       type: 'inlineSentence',
-      name: 'choose',
+      name: SKILL_PROFICIENCY_POOL_SENTENCE_FIELD_NAME,
       label: '',
       hideLabel: true,
       visibility: visibleForProficiencySource('pool', guard),
@@ -493,7 +500,7 @@ function armorTrainingPoolFields(ctx: ContentFormCtx, guard?: FieldVisibility): 
   return [
     {
       type: 'inlineSentence',
-      name: 'choose',
+      name: ARMOR_TRAINING_POOL_SENTENCE_FIELD_NAME,
       label: '',
       hideLabel: true,
       visibility: visibleForProficiencySource('pool', guard),

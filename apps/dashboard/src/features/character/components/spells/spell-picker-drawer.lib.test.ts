@@ -7,16 +7,25 @@ import {
 } from './spell-picker-drawer.fixtures'
 import {
   collectSpellPickerMarkers,
-  formatSpellPickerDrawerDescription,
   formatSpellPickerDrawerTitle,
-  getSpellPickerDisabledNote,
-  isSpellPickerRowDimmed,
+  formatSpellPickerSelectionCountText,
+  formatSpellPickerSelectionMetadata,
+  matchesSpellPickerMechanicsFilters,
+  normalizeSpellPickerLevelSelection,
+  resolveActivePreparedLevelSuffix,
   resolveSpellPickerEmptyStateKind,
   resolveSpellPickerEmptyStateMessage,
+  resolveValidSpellPickerSort,
+  toggleSpellPickerLevelSelection,
 } from './spell-picker-drawer.lib'
 import {
+  SPELL_PICKER_LEVELS_ALL,
+  SPELL_PICKER_MODE_CANTRIPS,
+  SPELL_PICKER_MODE_PREPARED_SPELLS,
   SPELL_PICKER_NO_OPTIONS_MESSAGE,
   SPELL_PICKER_SELECTION_FULL_MESSAGE,
+  SPELL_PICKER_SORT_LEVEL_ASC,
+  SPELL_PICKER_SORT_NAME_ASC,
 } from './spell-picker-drawer.types'
 
 describe('spell-picker-drawer.lib', () => {
@@ -29,13 +38,17 @@ describe('spell-picker-drawer.lib', () => {
     ])
   })
 
-  it('formats drawer title and description from the ChoiceSet', () => {
-    expect(formatSpellPickerDrawerTitle(spellPickerCantripChoiceSetFixture)).toBe('Add cantrip')
-    expect(formatSpellPickerDrawerDescription(spellPickerCantripChoiceSetFixture, ['a', 'b'])).toBe(
-      'Selected 2 of 2. Remove a spell to choose another.',
+  it('formats drawer title and selection summary metadata', () => {
+    expect(formatSpellPickerDrawerTitle(SPELL_PICKER_MODE_CANTRIPS)).toBe('Add cantrip')
+    expect(formatSpellPickerDrawerTitle(SPELL_PICKER_MODE_PREPARED_SPELLS)).toBe(
+      'Add prepared spell',
     )
-    expect(formatSpellPickerDrawerDescription(spellPickerCantripChoiceSetFixture, ['a'])).toBe(
-      'Selected 1 of 2. Choose 1 more.',
+    expect(formatSpellPickerSelectionCountText(1, 3)).toBe('1 of 3 selected')
+    expect(formatSpellPickerSelectionMetadata(SPELL_PICKER_MODE_CANTRIPS, 'Wizard')).toBe(
+      'Wizard cantrips',
+    )
+    expect(formatSpellPickerSelectionMetadata(SPELL_PICKER_MODE_PREPARED_SPELLS, 'Wizard', 1)).toBe(
+      'Wizard spells · 1st level',
     )
   })
 
@@ -52,24 +65,40 @@ describe('spell-picker-drawer.lib', () => {
     )
   })
 
-  it('dims only unselected rows that cannot be selected', () => {
-    const selected = {
-      state: {
-        isAlreadySelected: true,
-        canSelect: false,
-        disabledReasons: [],
-      },
-    }
-    const blocked = {
-      state: {
-        isAlreadySelected: false,
-        canSelect: false,
-        disabledReasons: ['Selection full'],
-      },
-    }
+  it('resets invalid sort modes after mode changes', () => {
+    expect(
+      resolveValidSpellPickerSort(SPELL_PICKER_MODE_CANTRIPS, false, SPELL_PICKER_SORT_LEVEL_ASC),
+    ).toBe(SPELL_PICKER_SORT_NAME_ASC)
+  })
 
-    expect(isSpellPickerRowDimmed(selected as never)).toBe(false)
-    expect(isSpellPickerRowDimmed(blocked as never)).toBe(true)
-    expect(getSpellPickerDisabledNote(blocked as never)).toBe('Selection full')
+  it('normalizes level chip selections to and from All', () => {
+    expect(normalizeSpellPickerLevelSelection([1, 2], [1, 2])).toEqual([])
+    expect(toggleSpellPickerLevelSelection([], SPELL_PICKER_LEVELS_ALL, [1, 2])).toEqual([])
+    expect(toggleSpellPickerLevelSelection([], 1, [1, 2])).toEqual([1])
+  })
+
+  it('matches mechanics filters with OR within groups and AND across groups', () => {
+    const spell = spellPickerDetectMagicFixture
+    expect(
+      matchesSpellPickerMechanicsFilters(spell, {
+        castingTimes: ['action'],
+        traits: ['ritual'],
+        methods: [],
+      }),
+    ).toBe(true)
+    expect(
+      matchesSpellPickerMechanicsFilters(spell, {
+        castingTimes: ['bonus-action'],
+        traits: ['ritual'],
+        methods: [],
+      }),
+    ).toBe(false)
+  })
+
+  it('appends prepared level suffix only for a single active level', () => {
+    expect(resolveActivePreparedLevelSuffix(SPELL_PICKER_MODE_PREPARED_SPELLS, [1])).toBe(1)
+    expect(
+      resolveActivePreparedLevelSuffix(SPELL_PICKER_MODE_PREPARED_SPELLS, [1, 2]),
+    ).toBeUndefined()
   })
 })

@@ -11,9 +11,14 @@ export function CharactersOverview() {
         <Heading variant="page" as="h1">
           Characters
         </Heading>
-        <Link to={ROUTES.characters.new} className={buttonVariants({ variant: 'default' })}>
-          Create character
-        </Link>
+        <div className="flex flex-wrap gap-2">
+          <Link to={ROUTES.characters.import()} className={buttonVariants({ variant: 'outline' })}>
+            Import character (experimental)
+          </Link>
+          <Link to={ROUTES.characters.new} className={buttonVariants({ variant: 'default' })}>
+            Create character
+          </Link>
+        </div>
       </div>
       <Text variant="muted">Coming soon.</Text>
     </NarrowPage>
