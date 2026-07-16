@@ -136,19 +136,13 @@
       }
     },
     "modeling": {
-      "reviewedAt": "2026-07-15T00:00:00.000Z",
+      "blocker": {
+        "code": "targeting-model-missing"
+      },
       "gaps": [
-        {
-          "code": "targeting-model-missing",
-          "note": "Attackers must save before targeting warded creature"
-        },
         {
           "code": "conditional-effect-model-missing",
           "note": "Ward ends when warded creature attacks or deals damage"
-        },
-        {
-          "code": "effect-schema-missing",
-          "note": "Capability: condition — ward against targeted attacks"
         }
       ]
     }
@@ -190,7 +184,10 @@
       "somatic": true
     },
     "modeling": {
-      "reviewedAt": "2026-07-15T00:00:00.000Z",
+      "blocker": {
+        "code": "effect-schema-missing",
+        "capabilityId": "stat-modifier"
+      },
       "gaps": [
         {
           "code": "reaction-trigger",
@@ -199,10 +196,6 @@
         {
           "code": "conditional-effect-model-missing",
           "note": "Magic Missile immunity rider stays prose"
-        },
-        {
-          "code": "effect-schema-missing",
-          "note": "Capability: stat-modifier — +5 AC reaction ward"
         }
       ]
     }
@@ -252,13 +245,10 @@
       }
     },
     "modeling": {
-      "reviewedAt": "2026-07-15T00:00:00.000Z",
-      "gaps": [
-        {
-          "code": "effect-schema-missing",
-          "note": "Capability: stat-modifier — +2 AC buff"
-        }
-      ]
+      "blocker": {
+        "code": "effect-schema-missing",
+        "capabilityId": "stat-modifier"
+      }
     }
   },
   {
@@ -306,15 +296,14 @@
       }
     },
     "modeling": {
-      "reviewedAt": "2026-07-15T00:00:00.000Z",
+      "blocker": {
+        "code": "effect-schema-missing",
+        "capabilityId": "illusion"
+      },
       "gaps": [
         {
           "code": "moving-aura-origin",
           "note": "Image relocates with Magic action"
-        },
-        {
-          "code": "effect-schema-missing",
-          "note": "Capability: illusion — visual-only phenomenon"
         }
       ]
     }
@@ -365,15 +354,18 @@
       }
     },
     "modeling": {
-      "reviewedAt": "2026-07-15T00:00:00.000Z",
+      "blocker": {
+        "code": "effect-schema-missing",
+        "capabilityId": "condition"
+      },
       "gaps": [
+        {
+          "code": "chosen-within-area",
+          "note": "Caster picks creatures in sphere; each makes an independent save"
+        },
         {
           "code": "conditional-effect-model-missing",
           "note": "Multi-stage save, damage wake, and shake action stay prose"
-        },
-        {
-          "code": "effect-schema-missing",
-          "note": "Capability: condition — HP-ordered area allocation; future ordered-area-allocation"
         }
       ]
     }
@@ -414,13 +406,9 @@
       "somatic": true
     },
     "modeling": {
-      "reviewedAt": "2026-07-15T00:00:00.000Z",
-      "gaps": [
-        {
-          "code": "effect-schema-missing",
-          "note": "Capability: utility — Beast communication and Influence"
-        }
-      ]
+      "blocker": {
+        "code": "effect-schema-missing"
+      }
     }
   },
   {

@@ -99,9 +99,13 @@ Summary and generated inventory report **prose-only without documented blocker**
 ## Level seed shards
 
 Large level files are split alphabetically under `src/spells/data/srd-cc-5.2.1/` using
-`level-{n}-{firstInitial}-{lastInitial}.json` (e.g. `level-1-a-f.json`). The loader in
-`index.ts` concatenates shards; scripts iterate `SRD_521_SPELL_LEVEL_SEED_FILES` from
-`spell-level-seed-files.ts`.
+`level-{n}-{firstInitial}-{lastInitial}.json` (e.g. `level-0-a-f.json`, `level-1-a-f.json`).
+The loader in `index.ts` concatenates shards; scripts iterate `SRD_521_SPELL_LEVEL_SEED_FILES`
+from `spell-level-seed-files.ts`.
+
+**Status-relative progression:** editor-active spells may omit `progression-schema-missing`
+while at `meaningful-partial` if their next promotion rung does not require structured
+scaling; revisit before `sufficient-for-display` when cantrip or slot scaling affects output.
 
 ## Related manifests
 

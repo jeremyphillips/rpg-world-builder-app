@@ -1,0 +1,319 @@
+[
+  {
+    "id": "srd-cc-5.2.1:guidance",
+    "slug": "guidance",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Guidance",
+    "level": 0,
+    "description": "<p>You touch a willing creature and choose a skill. Until the spell ends, the creature adds 1d4 to any ability check using the chosen skill.</p>",
+    "school": "divination",
+    "classIds": ["cleric", "druid"],
+    "tags": {
+      "roles": ["buff"]
+    },
+    "castingTime": {
+      "normal": {
+        "value": 1,
+        "unit": "action"
+      },
+      "canBeCastAsRitual": false
+    },
+    "range": {
+      "kind": "touch"
+    },
+    "duration": {
+      "kind": "timed",
+      "value": 1,
+      "unit": "minute",
+      "concentration": true,
+      "upTo": true
+    },
+    "components": {
+      "verbal": true,
+      "somatic": true
+    },
+    "modeling": {
+      "blocker": {
+        "code": "effect-schema-missing",
+        "capabilityId": "stat-modifier"
+      },
+      "gaps": [
+        {
+          "code": "choice-model-missing",
+          "note": "Chosen skill for ability check bonus stays prose"
+        }
+      ]
+    }
+  },
+  {
+    "id": "srd-cc-5.2.1:light",
+    "slug": "light",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Light",
+    "level": 0,
+    "description": "<p>You touch one Large or smaller object that isn't being worn or carried by someone else. Until the spell ends, the object sheds Bright Light in a 20-foot radius and Dim Light for an additional 20 feet. The light can be colored as you like.</p><p>Covering the object with something opaque blocks the light. The spell ends if you cast it again.</p>",
+    "school": "evocation",
+    "classIds": ["bard", "cleric", "sorcerer", "wizard"],
+    "tags": {
+      "functions": ["utility"]
+    },
+    "castingTime": {
+      "normal": {
+        "value": 1,
+        "unit": "action"
+      },
+      "canBeCastAsRitual": false
+    },
+    "range": {
+      "kind": "touch"
+    },
+    "duration": {
+      "kind": "timed",
+      "value": 1,
+      "unit": "hour"
+    },
+    "components": {
+      "verbal": true,
+      "material": {
+        "description": "a firefly or phosphorescent moss"
+      }
+    },
+    "modeling": {
+      "blocker": {
+        "code": "effect-schema-missing"
+      },
+      "gaps": [
+        {
+          "code": "object-state-awareness",
+          "note": "Object not worn or carried stays prose"
+        },
+        {
+          "code": "area-origin-model-missing",
+          "note": "Object-attached light origin only — not self/point area geometry"
+        },
+        {
+          "code": "conditional-effect-model-missing",
+          "note": "Cover blocks light; recast ends prior light"
+        }
+      ]
+    }
+  },
+  {
+    "id": "srd-cc-5.2.1:mage-hand",
+    "slug": "mage-hand",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Mage Hand",
+    "level": 0,
+    "description": "<p>A spectral, floating hand appears at a point you choose within range. The hand lasts for the duration. The hand vanishes if it is ever more than 30 feet away from you or if you cast this spell again.</p><p>When you cast the spell, you can use the hand to manipulate an object, open an unlocked door or container, stow or retrieve an item from an open container, or pour the contents out of a vial.</p><p>As a Magic action on your later turns, you can control the hand thus again. As part of that action, you can move the hand up to 30 feet.</p><p>The hand can't attack, activate magic items, or carry more than 10 pounds.</p>",
+    "school": "conjuration",
+    "classIds": ["bard", "sorcerer", "warlock", "wizard"],
+    "tags": {
+      "functions": ["utility"]
+    },
+    "castingTime": {
+      "normal": {
+        "value": 1,
+        "unit": "action"
+      },
+      "canBeCastAsRitual": false
+    },
+    "range": {
+      "kind": "distance",
+      "value": {
+        "value": 30,
+        "unit": "ft"
+      }
+    },
+    "duration": {
+      "kind": "timed",
+      "value": 1,
+      "unit": "minute"
+    },
+    "components": {
+      "verbal": true,
+      "somatic": true
+    },
+    "modeling": {
+      "blocker": {
+        "code": "effect-schema-missing"
+      },
+      "gaps": [
+        {
+          "code": "object-state-awareness",
+          "note": "Weight limit and object manipulation eligibility stay prose"
+        },
+        {
+          "code": "conditional-effect-model-missing",
+          "note": "Distance vanish, recast ends, and no attack or magic-item activation stay prose"
+        }
+      ]
+    }
+  },
+  {
+    "id": "srd-cc-5.2.1:mending",
+    "slug": "mending",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Mending",
+    "description": "<p>This spell repairs a single break or tear in an object you touch, such as a broken chain link, two halves of a broken key, a torn cloak, or a leaking wineskin. As long as the break or tear is no larger than 1 foot in any dimension, you mend it, leaving no trace of the former damage. This spell can physically repair a magic item, but it can't restore magic to such an object.</p>",
+    "school": "transmutation",
+    "level": 0,
+    "classIds": ["bard", "cleric", "druid", "sorcerer", "wizard"],
+    "tags": {
+      "functions": ["utility"]
+    },
+    "castingTime": {
+      "normal": {
+        "value": 1,
+        "unit": "minute"
+      },
+      "canBeCastAsRitual": false
+    },
+    "range": {
+      "kind": "touch"
+    },
+    "duration": {
+      "kind": "instantaneous"
+    },
+    "components": {
+      "verbal": true,
+      "somatic": true,
+      "material": {
+        "description": "two lodestones"
+      }
+    },
+    "modeling": {
+      "blocker": {
+        "code": "effect-schema-missing"
+      },
+      "gaps": [
+        {
+          "code": "object-state-awareness",
+          "note": "Break size limit and magic-item repair bounds stay prose"
+        }
+      ]
+    }
+  },
+  {
+    "id": "srd-cc-5.2.1:message",
+    "slug": "message",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Message",
+    "level": 0,
+    "description": "<p>You point toward a creature within range and whisper a message. The target (and only the target) hears the message and can reply in a whisper that only you can hear.</p><p>You can cast this spell through solid objects if you are familiar with the target and know it is beyond the barrier. Magical silence; 1 foot of stone, metal, or wood; or a thin sheet of lead blocks the spell.</p>",
+    "school": "transmutation",
+    "classIds": ["bard", "druid", "sorcerer", "wizard"],
+    "tags": {
+      "functions": ["communication"]
+    },
+    "castingTime": {
+      "normal": {
+        "value": 1,
+        "unit": "action"
+      },
+      "canBeCastAsRitual": false
+    },
+    "range": {
+      "kind": "distance",
+      "value": {
+        "value": 120,
+        "unit": "ft"
+      }
+    },
+    "duration": {
+      "kind": "timed",
+      "value": 1,
+      "unit": "round"
+    },
+    "components": {
+      "somatic": true,
+      "material": {
+        "description": "a copper wire"
+      }
+    },
+    "modeling": {
+      "blocker": {
+        "code": "effect-schema-missing"
+      },
+      "gaps": [
+        {
+          "code": "conditional-effect-model-missing",
+          "note": "Barrier, silence, and familiar-target routing stay prose"
+        }
+      ]
+    }
+  },
+  {
+    "id": "srd-cc-5.2.1:minor-illusion",
+    "slug": "minor-illusion",
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Minor Illusion",
+    "description": "<p>You create a sound or an image of an object within range that lasts for the duration. The illusion ends if you cast this spell again. If a creature takes a Study action to examine the sound or image, the creature can determine that it is an illusion with a successful Intelligence (Investigation) check against your spell save DC. If a creature discerns the illusion for what it is, the illusion becomes faint to the creature.</p><p><strong>Sound:</strong> volume from whisper to scream; can be discrete sounds.</p><p><strong>Image:</strong> object no larger than 5-foot Cube; no sound, light, smell; physical interaction reveals illusion.</p>",
+    "school": "illusion",
+    "level": 0,
+    "classIds": ["bard", "sorcerer", "warlock", "wizard"],
+    "tags": {
+      "functions": ["deception", "utility"]
+    },
+    "castingTime": {
+      "normal": {
+        "value": 1,
+        "unit": "action"
+      },
+      "canBeCastAsRitual": false
+    },
+    "range": {
+      "kind": "distance",
+      "value": {
+        "value": 30,
+        "unit": "ft"
+      }
+    },
+    "duration": {
+      "kind": "timed",
+      "value": 1,
+      "unit": "minute"
+    },
+    "components": {
+      "somatic": true,
+      "material": {
+        "description": "a bit of fleece"
+      }
+    },
+    "modeling": {
+      "blocker": {
+        "code": "effect-schema-missing",
+        "capabilityId": "illusion"
+      },
+      "gaps": [
+        {
+          "code": "multi-mode-choice",
+          "note": "Sound vs image mode stays prose"
+        }
+      ]
+    }
+  }
+]

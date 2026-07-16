@@ -69,15 +69,23 @@ Prose-only spells should persist **`blocker`**; residual codes live in **`gaps`*
 
 Add to the gap registry when multiple spells share the pattern:
 
-| Code                                                           | Definition                                                                                              | Shared by              |
-| -------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- | ---------------------- |
-| `resurrection-model-missing`                                   | Death-state restoration (timing, body, eligibility, return state)                                       | revivify, reincarnate  |
-| `transformation-model-missing`                                 | Statistic replacement or override for a duration                                                        | polymorph, reincarnate |
-| `independent-effect-object-model-missing`                      | Spell-created entity with own AC/HP/duration                                                            | arcane-hand            |
-| `ordered-area-allocation` / `resource-distributed-across-area` | Finite resource applied across creatures in an area by HP order — not caster-chosen subset (e.g. Sleep) |
-| `environmental-dispersal`                                      | Zone ends from environmental interaction such as strong wind (e.g. Fog Cloud)                           |
+| Code                                                           | Definition                                                                                               | Shared by              |
+| -------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- | ---------------------- |
+| `resurrection-model-missing`                                   | Death-state restoration (timing, body, eligibility, return state)                                        | revivify, reincarnate  |
+| `transformation-model-missing`                                 | Statistic replacement or override for a duration                                                         | polymorph, reincarnate |
+| `independent-effect-object-model-missing`                      | Spell-created entity with own AC/HP/duration — or controllable construct (e.g. Dancing Lights)           |
+| `concurrent-effect-limit`                                      | Repeated casts leave multiple simultaneous non-instantaneous instances active                            |
+| `weapon-attack-modification-model-missing`                     | Weapon attack overlay — alternate ability, damage replacement, smite-like riders (document until shared) |
+| `ordered-area-allocation` / `resource-distributed-across-area` | Finite resource applied across creatures in an area by HP order — legacy 5e Sleep pattern; not SRD 5.2.1 |
+| `environmental-dispersal`                                      | Zone ends from environmental interaction such as strong wind (e.g. Fog Cloud)                            |
 
-**Not** `chosen-within-area` for Sleep — allocation follows spell rules, not subset choice.
+SRD 5.2.1 **Sleep** uses `chosen-within-area` — caster picks creatures in the sphere; each chosen creature makes an independent save.
+
+## Future capability IDs (document only)
+
+| Capability ID                  | Primary mechanic                                                                     | Example spells |
+| ------------------------------ | ------------------------------------------------------------------------------------ | -------------- |
+| **controllable-effect-entity** | Persistent caster-controlled construct without conventional AC/HP (move, manipulate) | Mage Hand      |
 
 ## Related docs
 

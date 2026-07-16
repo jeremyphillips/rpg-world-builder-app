@@ -113,15 +113,14 @@
       }
     },
     "modeling": {
-      "reviewedAt": "2026-07-15T00:00:00.000Z",
+      "blocker": {
+        "code": "effect-schema-missing",
+        "capabilityId": "movement"
+      },
       "gaps": [
         {
           "code": "reaction-trigger",
           "note": "Cast when a falling creature is seen within range"
-        },
-        {
-          "code": "effect-schema-missing",
-          "note": "Capability: movement — fall speed mitigation"
         }
       ]
     }
@@ -176,13 +175,10 @@
     },
     "higherLevelSlotEffect": "<p>The fog's radius increases by 20 feet for each spell slot level above 1.</p>",
     "modeling": {
-      "reviewedAt": "2026-07-15T00:00:00.000Z",
-      "gaps": [
-        {
-          "code": "effect-schema-missing",
-          "note": "Capability: utility — heavily obscured zone; future environmental-dispersal for wind"
-        }
-      ]
+      "blocker": {
+        "code": "effect-schema-missing",
+        "capabilityId": "persistent-zone"
+      }
     }
   },
   {
@@ -334,12 +330,12 @@
     },
     "higherLevelSlotEffect": "<p>Your Concentration can last longer with a spell slot of level 2 (up to 4 hours), 3–4 (up to 8 hours), or 5+ (24 hours).</p>",
     "modeling": {
-      "reviewedAt": "2026-07-15T00:00:00.000Z",
+      "blocker": {
+        "code": "effect-schema-missing",
+        "capabilityId": "condition",
+        "note": "May later split into condition + mark when mark family ships"
+      },
       "gaps": [
-        {
-          "code": "effect-schema-missing",
-          "note": "Capability: condition — curse, ability disadvantage, extra-damage defer"
-        },
         {
           "code": "choice-model-missing",
           "note": "Chosen ability for disadvantage stays prose"
@@ -402,15 +398,14 @@
     },
     "higherLevelSlotEffect": "<p>You can target one additional creature for each spell slot level above 1.</p>",
     "modeling": {
-      "reviewedAt": "2026-07-15T00:00:00.000Z",
+      "blocker": {
+        "code": "effect-schema-missing",
+        "capabilityId": "condition"
+      },
       "gaps": [
         {
           "code": "conditional-effect-model-missing",
           "note": "Repeating saves and damage-triggered save advantage stay prose"
-        },
-        {
-          "code": "effect-schema-missing",
-          "note": "Capability: condition — Prone and Incapacitated on failed save"
         }
       ]
     }
@@ -458,12 +453,12 @@
     },
     "higherLevelSlotEffect": "<p>Your Concentration can last longer with a spell slot of level 3–4 (up to 8 hours) or 5+ (up to 24 hours).</p>",
     "modeling": {
-      "reviewedAt": "2026-07-15T00:00:00.000Z",
+      "blocker": {
+        "code": "effect-schema-missing",
+        "capabilityId": "condition",
+        "note": "May later split into condition + mark when mark family ships"
+      },
       "gaps": [
-        {
-          "code": "effect-schema-missing",
-          "note": "Capability: condition — mark, Perception advantage, extra-damage defer"
-        },
         {
           "code": "retargetable-mark",
           "note": "Mark moves to a new creature when quarry drops to 0 HP"

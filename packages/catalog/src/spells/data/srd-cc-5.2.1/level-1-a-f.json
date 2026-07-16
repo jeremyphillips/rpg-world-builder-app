@@ -45,12 +45,11 @@
     },
     "higherLevelSlotEffect": "<p>You can target one additional creature for each spell slot level above 1.</p>",
     "modeling": {
-      "reviewedAt": "2026-07-15T00:00:00.000Z",
+      "blocker": {
+        "code": "effect-schema-missing",
+        "capabilityId": "stat-modifier"
+      },
       "gaps": [
-        {
-          "code": "effect-schema-missing",
-          "note": "Capability: stat-modifier — +1d4 attack and save bonus"
-        },
         {
           "code": "dynamic-target-count",
           "note": "Slot +1 target per level above 1"
@@ -199,7 +198,9 @@
     },
     "higherLevelSlotEffect": "<p>You create or destroy 10 additional gallons of water, or the size of the Cube increases by 5 feet, for each spell slot level above 1.</p>",
     "modeling": {
-      "reviewedAt": "2026-07-15T00:00:00.000Z",
+      "blocker": {
+        "code": "effect-schema-missing"
+      },
       "gaps": [
         {
           "code": "multi-mode-choice",
@@ -208,10 +209,6 @@
         {
           "code": "progression-schema-missing",
           "note": "Cube size and gallon volume slot scaling stay prose"
-        },
-        {
-          "code": "effect-schema-missing",
-          "note": "Capability: utility — creation and destruction of water"
         }
       ]
     }
@@ -335,13 +332,10 @@
       "somatic": true
     },
     "modeling": {
-      "reviewedAt": "2026-07-15T00:00:00.000Z",
-      "gaps": [
-        {
-          "code": "effect-schema-missing",
-          "note": "Capability: detection — creature-type and Hallow sensing"
-        }
-      ]
+      "blocker": {
+        "code": "effect-schema-missing",
+        "capabilityId": "detection"
+      }
     }
   },
   {
@@ -379,13 +373,10 @@
       "somatic": true
     },
     "modeling": {
-      "reviewedAt": "2026-07-15T00:00:00.000Z",
-      "gaps": [
-        {
-          "code": "effect-schema-missing",
-          "note": "Capability: detection — magic aura sensing within emanation"
-        }
-      ]
+      "blocker": {
+        "code": "effect-schema-missing",
+        "capabilityId": "detection"
+      }
     }
   },
   {
@@ -429,13 +420,10 @@
       }
     },
     "modeling": {
-      "reviewedAt": "2026-07-15T00:00:00.000Z",
-      "gaps": [
-        {
-          "code": "effect-schema-missing",
-          "note": "Capability: detection — poison and contagion sensing"
-        }
-      ]
+      "blocker": {
+        "code": "effect-schema-missing",
+        "capabilityId": "detection"
+      }
     }
   },
   {
@@ -476,13 +464,10 @@
       "somatic": true
     },
     "modeling": {
-      "reviewedAt": "2026-07-15T00:00:00.000Z",
-      "gaps": [
-        {
-          "code": "effect-schema-missing",
-          "note": "Capability: action-grant — bonus Dash action"
-        }
-      ]
+      "blocker": {
+        "code": "effect-schema-missing",
+        "capabilityId": "action-grant"
+      }
     }
   },
   {
@@ -527,15 +512,14 @@
       "verbal": true
     },
     "modeling": {
-      "reviewedAt": "2026-07-15T00:00:00.000Z",
+      "blocker": {
+        "code": "effect-schema-missing",
+        "capabilityId": "condition"
+      },
       "gaps": [
         {
           "code": "conditional-effect-model-missing",
-          "note": "Objects outlined automatically; creatures save for same effect"
-        },
-        {
-          "code": "effect-schema-missing",
-          "note": "Capability: condition — outline, advantage, and Invisible negation"
+          "note": "Creature save vs automatic object outline; may need per-recipient resolution later"
         }
       ]
     }

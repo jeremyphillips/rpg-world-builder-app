@@ -3,7 +3,9 @@ import { spellSchema } from '@rpg/contracts'
 import type { Spell, SystemRulesetId } from '@rpg/contracts'
 
 import { getBySlug } from '../lib/get-by-slug'
-import level0Raw from './data/srd-cc-5.2.1/level-0.json'
+import level0AFRaw from './data/srd-cc-5.2.1/level-0-a-f.json'
+import level0GMRaw from './data/srd-cc-5.2.1/level-0-g-m.json'
+import level0PTRaw from './data/srd-cc-5.2.1/level-0-p-t.json'
 import level1AFRaw from './data/srd-cc-5.2.1/level-1-a-f.json'
 import level1FIRaw from './data/srd-cc-5.2.1/level-1-f-i.json'
 import level1IPRaw from './data/srd-cc-5.2.1/level-1-i-p.json'
@@ -19,6 +21,8 @@ import level9Raw from './data/srd-cc-5.2.1/level-9.json'
 
 const spellArraySchema = z.array(spellSchema)
 
+const SRD_521_LEVEL_0 = spellArraySchema.parse([...level0AFRaw, ...level0GMRaw, ...level0PTRaw])
+
 const SRD_521_LEVEL_1 = spellArraySchema.parse([
   ...level1AFRaw,
   ...level1FIRaw,
@@ -27,7 +31,7 @@ const SRD_521_LEVEL_1 = spellArraySchema.parse([
 ])
 
 const SRD_521_BY_LEVEL = {
-  0: spellArraySchema.parse(level0Raw),
+  0: SRD_521_LEVEL_0,
   1: SRD_521_LEVEL_1,
   2: spellArraySchema.parse(level2Raw),
   3: spellArraySchema.parse(level3Raw),
@@ -82,6 +86,7 @@ export function getSpellBySlug(rulesetId: SystemRulesetId, slug: string): Spell 
 }
 
 export {
+  SRD_521_SPELL_LEVEL_0_SHARD_FILES,
   SRD_521_SPELL_LEVEL_1_SHARD_FILES,
   SRD_521_SPELL_LEVEL_SEED_FILES,
   type Srd521SpellLevelSeedFile,

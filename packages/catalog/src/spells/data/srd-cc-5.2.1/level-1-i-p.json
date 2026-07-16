@@ -37,13 +37,10 @@
       }
     },
     "modeling": {
-      "reviewedAt": "2026-07-15T00:00:00.000Z",
-      "gaps": [
-        {
-          "code": "effect-schema-missing",
-          "note": "Capability: detection — object or creature information reveal on touch"
-        }
-      ]
+      "blocker": {
+        "code": "effect-schema-missing",
+        "capabilityId": "information-reveal"
+      }
     }
   },
   {
@@ -84,15 +81,14 @@
       }
     },
     "modeling": {
-      "reviewedAt": "2026-07-15T00:00:00.000Z",
+      "blocker": {
+        "code": "effect-schema-missing",
+        "capabilityId": "illusion"
+      },
       "gaps": [
         {
           "code": "choice-model-missing",
           "note": "Designated viewers at cast time stay prose"
-        },
-        {
-          "code": "effect-schema-missing",
-          "note": "Capability: illusion — hidden script and viewer-specific text"
         }
       ]
     }
@@ -224,15 +220,14 @@
     },
     "higherLevelSlotEffect": "<p>You can target one additional creature for each spell slot level above 1.</p>",
     "modeling": {
-      "reviewedAt": "2026-07-15T00:00:00.000Z",
+      "blocker": {
+        "code": "effect-schema-missing",
+        "capabilityId": "movement"
+      },
       "gaps": [
         {
           "code": "dynamic-target-count",
           "note": "Slot +1 target per level above 1"
-        },
-        {
-          "code": "effect-schema-missing",
-          "note": "Capability: movement — enhanced jump distance"
         }
       ]
     }
@@ -278,15 +273,15 @@
     },
     "higherLevelSlotEffect": "<p>You can target one additional creature for each spell slot level above 1.</p>",
     "modeling": {
-      "reviewedAt": "2026-07-15T00:00:00.000Z",
+      "blocker": {
+        "code": "effect-schema-missing",
+        "capabilityId": "stat-modifier",
+        "note": "Future movement-modifier may group speed changes more usefully"
+      },
       "gaps": [
         {
           "code": "dynamic-target-count",
           "note": "Slot +1 target per level above 1"
-        },
-        {
-          "code": "effect-schema-missing",
-          "note": "Capability: stat-modifier — +10 ft Speed"
         }
       ]
     }
@@ -330,7 +325,10 @@
       }
     },
     "modeling": {
-      "reviewedAt": "2026-07-15T00:00:00.000Z",
+      "blocker": {
+        "code": "effect-schema-missing",
+        "capabilityId": "stat-modifier"
+      },
       "gaps": [
         {
           "code": "object-state-awareness",
@@ -339,10 +337,6 @@
         {
           "code": "conditional-effect-model-missing",
           "note": "Spell ends early if target dons armor"
-        },
-        {
-          "code": "effect-schema-missing",
-          "note": "Capability: stat-modifier — base AC formula"
         }
       ]
     }
@@ -468,7 +462,7 @@
         },
         {
           "code": "dynamic-target-count",
-          "note": "Dart count scales with spell slot level"
+          "note": "Slot level above 1 adds one projectile (dart), not additional target capacity"
         }
       ]
     }
@@ -511,15 +505,13 @@
       "somatic": true
     },
     "modeling": {
-      "reviewedAt": "2026-07-15T00:00:00.000Z",
+      "blocker": {
+        "code": "effect-schema-missing"
+      },
       "gaps": [
         {
           "code": "object-state-awareness",
           "note": "Nonmagical food and drink in sphere"
-        },
-        {
-          "code": "effect-schema-missing",
-          "note": "Capability: utility — purify poison and rot"
         }
       ]
     }

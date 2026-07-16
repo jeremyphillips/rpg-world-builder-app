@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest'
 
-import level0Raw from './data/srd-cc-5.2.1/level-0.json'
+import level0AFRaw from './data/srd-cc-5.2.1/level-0-a-f.json'
+import level0GMRaw from './data/srd-cc-5.2.1/level-0-g-m.json'
+import level0PTRaw from './data/srd-cc-5.2.1/level-0-p-t.json'
 import level1AFRaw from './data/srd-cc-5.2.1/level-1-a-f.json'
 import level1FIRaw from './data/srd-cc-5.2.1/level-1-f-i.json'
 import level1IPRaw from './data/srd-cc-5.2.1/level-1-i-p.json'
@@ -35,11 +37,77 @@ describe('spell modeling audit (srd-cc-5.2.1)', () => {
   })
 
   it('reports prose-only spells missing documented blocker', () => {
-    expect(audit.proseOnlyWithoutDocumentedBlocker.length).toBe(48)
+    expect(audit.proseOnlyWithoutDocumentedBlocker.length).toBe(10)
     for (const slug of audit.proseOnlyWithoutDocumentedBlocker) {
       const entry = audit.entries.find((item) => item.slug === slug)!
       expect(entry.effectiveStatus).toBe('prose-only')
       expect(entry.blocker).toBeUndefined()
+    }
+  })
+
+  it('documents blockers on all level-0 prose-only spells', () => {
+    const level0ProseOnly = audit.entries.filter(
+      (entry) =>
+        entry.effectiveStatus === 'prose-only' &&
+        [
+          'dancing-lights',
+          'druidcraft',
+          'elementalism',
+          'guidance',
+          'light',
+          'mage-hand',
+          'mending',
+          'message',
+          'minor-illusion',
+          'prestidigitation',
+          'resistance',
+          'spare-the-dying',
+          'thaumaturgy',
+          'true-strike',
+        ].includes(entry.slug),
+    )
+    expect(level0ProseOnly).toHaveLength(14)
+    for (const entry of level0ProseOnly) {
+      expect(entry.blocker, entry.slug).toBeDefined()
+      expect(entry.blockedFrom).toBe('meaningful-partial')
+    }
+  })
+
+  it('documents blockers on all level-1 prose-only spells', () => {
+    const level1ProseOnly = audit.entries.filter(
+      (entry) =>
+        entry.effectiveStatus === 'prose-only' &&
+        [
+          'bless',
+          'create-or-destroy-water',
+          'detect-evil-and-good',
+          'detect-magic',
+          'detect-poison-and-disease',
+          'expeditious-retreat',
+          'faerie-fire',
+          'feather-fall',
+          'fog-cloud',
+          'hex',
+          'hideous-laughter',
+          'hunters-mark',
+          'identify',
+          'illusory-script',
+          'jump',
+          'longstrider',
+          'mage-armor',
+          'purify-food-and-drink',
+          'sanctuary',
+          'shield',
+          'shield-of-faith',
+          'silent-image',
+          'sleep',
+          'speak-with-animals',
+        ].includes(entry.slug),
+    )
+    expect(level1ProseOnly).toHaveLength(24)
+    for (const entry of level1ProseOnly) {
+      expect(entry.blocker, entry.slug).toBeDefined()
+      expect(entry.blockedFrom).toBe('meaningful-partial')
     }
   })
 
@@ -127,7 +195,9 @@ describe('spell modeling audit (srd-cc-5.2.1)', () => {
 
 describe('spell seed JSON invariants', () => {
   const levelRaws = [
-    level0Raw,
+    level0AFRaw,
+    level0GMRaw,
+    level0PTRaw,
     level1AFRaw,
     level1FIRaw,
     level1IPRaw,
