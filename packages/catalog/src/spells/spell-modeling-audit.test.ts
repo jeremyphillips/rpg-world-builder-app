@@ -202,10 +202,22 @@ describe('spell modeling audit (srd-cc-5.2.1)', () => {
   })
 
   it('documents batch promotions for mechanics-ready and character-sheet spells', () => {
-    for (const slug of ['acid-splash', 'poison-spray', 'inflict-wounds', 'false-life'] as const) {
+    for (const slug of [
+      'acid-splash',
+      'chill-touch',
+      'poison-spray',
+      'inflict-wounds',
+      'false-life',
+    ] as const) {
       const entry = audit.entries.find((item) => item.slug === slug)
       expect(entry?.explicitStatus, slug).toBe('mechanics-ready')
-      expect(entry?.gaps ?? []).toHaveLength(0)
+      if (slug === 'chill-touch') {
+        expect(entry?.gaps?.map((gap) => gap.code)).toEqual(
+          expect.arrayContaining(['conditional-effect-model-missing', 'duration-model-missing']),
+        )
+      } else {
+        expect(entry?.gaps ?? []).toHaveLength(0)
+      }
     }
 
     for (const slug of ['burning-hands', 'fireball', 'ray-of-sickness'] as const) {
@@ -214,9 +226,8 @@ describe('spell modeling audit (srd-cc-5.2.1)', () => {
       expect(entry?.displayReady, slug).toBe(true)
     }
 
-    const chillTouch = audit.entries.find((entry) => entry.slug === 'chill-touch')
-    expect(chillTouch?.explicitStatus).toBe('meaningful-partial')
-    expect(chillTouch?.gaps?.map((gap) => gap.code)).toContain('duration-model-missing')
+    const rayOfSickness = audit.entries.find((entry) => entry.slug === 'ray-of-sickness')
+    expect(rayOfSickness?.gaps?.map((gap) => gap.code)).toContain('duration-model-missing')
   })
 
   it('derives prose-only for reviewed spells without resolution', () => {
@@ -239,10 +250,6 @@ describe('spell modeling audit (srd-cc-5.2.1)', () => {
     expect(report).toContain('| Spell | Reviewed | Effective status |')
     expect(report).toContain('acid-splash')
   })
-
-  it('reports no legacy root effects on parsed seeds', () => {
-    expect(audit.entries.every((entry) => !entry.hasLegacyEffects)).toBe(true)
-  })
 })
 
 describe('spell seed JSON invariants', () => {
@@ -264,7 +271,7 @@ describe('spell seed JSON invariants', () => {
     level9Raw,
   ] as const
 
-  it('does not persist legacy root effects in level JSON files', () => {
+  it('does not persist a spell-level effects array in level JSON files', () => {
     for (const spells of levelRaws) {
       for (const spell of spells as Array<Record<string, unknown>>) {
         expect(spell, String(spell.slug)).not.toHaveProperty('effects')

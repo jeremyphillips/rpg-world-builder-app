@@ -29,6 +29,25 @@ export const FIRE_BOLT_PROGRESSION: SpellResolutionProgression = {
   ],
 }
 
+/** Poison Spray — cantrip damage thresholds on primary damage roll (d12). */
+export const POISON_SPRAY_PROGRESSION: SpellResolutionProgression = {
+  basis: 'character-level',
+  tracks: [
+    {
+      kind: 'thresholds',
+      reference: {
+        subject: { kind: 'effect', effectId: SPELL_RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID },
+        property: 'roll',
+      },
+      entries: [
+        { threshold: 5, value: { kind: 'roll', roll: { dice: { count: 2, faces: 12 } } } },
+        { threshold: 11, value: { kind: 'roll', roll: { dice: { count: 3, faces: 12 } } } },
+        { threshold: 17, value: { kind: 'roll', roll: { dice: { count: 4, faces: 12 } } } },
+      ],
+    },
+  ],
+}
+
 /** Fireball — slot linear damage (+1d6 per slot above 3). */
 export const FIREBALL_PROGRESSION: SpellResolutionProgression = {
   basis: 'spell-slot-level',

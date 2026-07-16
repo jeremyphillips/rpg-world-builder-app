@@ -95,11 +95,6 @@ export type SpellDetailViewModel = {
     title: string
     subsections: SpellDetailResolutionSubsection[]
   }
-  /** @deprecated Use resolutionSection — root effects are no longer a display source. */
-  effectsSection?: {
-    title: string
-    lines: string[]
-  }
 }
 
 function collectTagLabels(tags: SpellTags, vocabulary: SpellDisplayVocabulary): string[] {

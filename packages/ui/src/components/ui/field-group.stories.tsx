@@ -164,7 +164,7 @@ export const DividerBottom: Story = {
 export const CalloutInfo: Story = {
   args: {
     legend: 'Hybrid spell',
-    description: 'Projectile scaling is still on legacy root effects.',
+    description: 'Resolution progression is authored on the resolution envelope.',
     fieldsChrome: { variant: 'callout', tone: 'info' },
     children: <TextField id="callout-field" label="Workaround note" />,
   },

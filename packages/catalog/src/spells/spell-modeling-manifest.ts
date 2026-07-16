@@ -72,7 +72,7 @@ const SRD_521_SPELL_MODELING_RESOLUTION_ENTRIES = {
     gap('flammability-rules', 'Ignition/burning state not automated; rider documented on outcome'),
     gap('object-state-awareness', 'Worn or carried carve-out on object ignition rider'),
   ]),
-  'chill-touch': editorEligible([
+  'chill-touch': mechanicsReady([
     gap('conditional-effect-model-missing', "Target can't regain Hit Points rider stays prose"),
     gap('duration-model-missing', 'Until the end of your next turn expiry stays prose'),
   ]),
@@ -561,6 +561,7 @@ const SRD_521_SPELL_MODELING_PROSE_ONLY_ENTRIES = {
       'conditional-effect-model-missing',
       'Multi-stage save, damage wake, and shake action stay prose',
     ),
+    gap('duration-model-missing', 'Until the end of its next turn on Incapacitated stays prose'),
   ]),
   'spare-the-dying': blockedProseOnly(
     { code: 'effect-schema-missing', capabilityId: 'condition' },
@@ -586,6 +587,7 @@ const SRD_521_SPELL_MODELING_PROSE_ONLY_ENTRIES = {
     gap('multi-mode-choice', 'Creature vs object branch stays prose'),
     gap('conditional-effect-model-missing', 'Saves, Restrained, suspended fall stay prose'),
     gap('object-state-awareness', 'Worn or carried object stays prose'),
+    gap('duration-model-missing', 'Until the end of your next turn on Restrained stays prose'),
   ]),
   thaumaturgy: blockedProseOnly({ code: 'effect-schema-missing' }, [
     gap('multi-mode-choice', 'Altered eyes, voice, fire, hand, sound, and tremor modes stay prose'),

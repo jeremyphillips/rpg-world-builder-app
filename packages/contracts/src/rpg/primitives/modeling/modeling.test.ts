@@ -92,7 +92,7 @@ describe('modeling helpers', () => {
 })
 
 describe('deriveSpellModelingStatus', () => {
-  it('derives prose-only when no resolution or legacy effects', () => {
+  it('derives prose-only when no resolution exists', () => {
     expect(deriveSpellModelingStatus({})).toBe('prose-only')
   })
 

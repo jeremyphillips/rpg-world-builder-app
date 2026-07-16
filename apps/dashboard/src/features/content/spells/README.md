@@ -41,15 +41,14 @@ The **Resolution** tab authors an optional `resolution` envelope matching
 `resolution` object — enable via **Add resolution** when absent — with no
 parallel boolean flag.
 
-| Concern          | Behavior                                                                                                        |
-| ---------------- | --------------------------------------------------------------------------------------------------------------- |
-| Form shape       | `ResolutionFormValues` with `effects[]` array + optional stored `outcomes[]` via `resolution-form-schema.ts`    |
-| Effects editor   | Searchable 3-template add menu (`damage`, `healing`, `temporary-hit-points`) mirroring root `effectArrayFields` |
-| Automatic method | Tier D healing/temp-HP seeds use `method: automatic` with `applied` outcomes                                    |
-| Outcomes         | Interactive method-derived outcome groups (`SpellResolutionOutcomes`)                                           |
-| Save             | **Disabled** — banner: "Resolution is not saved yet."                                                           |
-| Legacy effects   | Flat `effects[]` on the read model for catalog detail; Resolution tab reads `resolution.effects[]` only         |
-| Target proximity | `resolution.target.proximity` (touch / reach / distance) — separate from Check method                           |
+| Concern          | Behavior                                                                                                          |
+| ---------------- | ----------------------------------------------------------------------------------------------------------------- |
+| Form shape       | `ResolutionFormValues` with `resolution.effects[]` + optional stored `outcomes[]` via `resolution-form-schema.ts` |
+| Effects editor   | Searchable 3-template add menu (`damage`, `healing`, `temporary-hit-points`) in the Resolution tab                |
+| Automatic method | Tier D healing/temp-HP seeds use `method: automatic` with `applied` outcomes                                      |
+| Outcomes         | Interactive method-derived outcome groups (`SpellResolutionOutcomes`)                                             |
+| Save             | **Disabled** — banner: "Resolution is not saved yet."                                                             |
+| Target proximity | `resolution.target.proximity` (touch / reach / distance) — separate from Check method                             |
 
 Modules live under [`resolution/`](resolution/) (`lib/form/resolution-form-*.ts`,
 `fixtures.ts`, `components/spell-resolution-*.client.tsx`).
@@ -60,7 +59,6 @@ Catalog seeds ship optional `resolution` on the read model via
 hybrid, 4 Tier D healing/temporary-HP spells, Ice Knife and Arcane Hand multi-effect). Three
 effect spells remain explicitly deferred in the manifest with documented reason codes.
 Apply with `pnpm exec tsx packages/catalog/scripts/apply-spell-seed-resolution.mjs`.
-Flat `effects[]` remain on migrated spells until consolidation.
 
 Shared roll/damage form atoms live under
 [`content/lib/forms/mechanics/`](../../lib/forms/mechanics/) (`roll-value-fields`,
@@ -69,8 +67,7 @@ Shared roll/damage form atoms live under
 #### Persistence boundary (`spell.resolution.persistence`)
 
 Create/update API input **omits** `resolution` today. `buildSpellCreateInput` strips
-the field with a `TODO(spell.resolution.persistence)` comment alongside the existing
-`effects` omission.
+the field with a `TODO(spell.resolution.persistence)` comment.
 
 When persistence ships, touch these files:
 

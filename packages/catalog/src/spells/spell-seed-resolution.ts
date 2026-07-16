@@ -129,7 +129,7 @@ export const SRD_521_SPELL_SEED_RESOLUTION = {
   'wall-of-fire': { kind: 'derived', overrides: { saveAbility: 'dex' } },
   'delayed-blast-fireball': { kind: 'derived', overrides: { saveAbility: 'dex' } },
 
-  // Tier B — hybrid resolution + legacy effects[]
+  // Tier B — application pattern / automatic method
   'eldritch-blast': { kind: 'full', resolution: ELDRITCH_BLAST_RESOLUTION },
   'magic-missile': { kind: 'full', resolution: MAGIC_MISSILE_RESOLUTION },
 

@@ -9,8 +9,6 @@ Optional `resolution` on [`spellBodySchema`](../../src/rpg/content/spell/body.ts
 - `selectionMode`, optional `target`, optional `origin`, optional `areaOfEffect`
 - `method`, `effects[]`, `outcomes[]`, optional `applicationPattern`, optional `progression`
 
-Root `effects[]` may coexist during migration (`hybrid` modeling status).
-
 ## Progression scope (initial pass)
 
 Optional `resolution.progression` models **resolution-local scaling only** —

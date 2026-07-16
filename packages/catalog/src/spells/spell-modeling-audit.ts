@@ -9,7 +9,6 @@ import {
   deriveBlockedFrom,
   deriveSpellModelingStatus,
   effectiveSpellModelingStatus,
-  hasLegacySpellRootEffects,
   hasStructuredSpellResolution,
   isEditorEligible,
   isSpellModelingReviewed,
@@ -43,7 +42,6 @@ export type SpellModelingAuditEntry = {
   blockedFrom?: ExplicitModelingStatus
   gaps: readonly ModelingGapEntry[]
   hasResolution: boolean
-  hasLegacyEffects: boolean
   editorEligible: boolean
   displayReady: boolean
   violations: SpellModelingViolation[]
@@ -76,7 +74,6 @@ function toAuditEntry(spell: Spell): SpellModelingAuditEntry {
     blockedFrom: deriveBlockedFrom(effectiveStatus, blocker),
     gaps: spell.modeling?.gaps ?? [],
     hasResolution: hasStructuredSpellResolution(spell),
-    hasLegacyEffects: hasLegacySpellRootEffects(spell),
     editorEligible: isEditorEligible(effectiveStatus),
     displayReady: meetsConsumerThreshold(effectiveStatus, 'sufficient-for-display'),
     violations,

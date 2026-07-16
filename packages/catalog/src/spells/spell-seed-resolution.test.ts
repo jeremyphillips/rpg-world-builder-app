@@ -27,7 +27,7 @@ describe('SRD 5.2.1 spell seed resolution manifest', () => {
     for (const slug of SRD_521_SPELL_SEED_RESOLUTION_SLUGS) {
       const spell = spells.find((entry) => entry.slug === slug)
       expect(resolutionEnvelopeOnly(spell?.resolution), slug).toEqual(
-        resolveSpellSeedResolution(spell!),
+        resolutionEnvelopeOnly(resolveSpellSeedResolution(spell!)),
       )
     }
   })
@@ -45,7 +45,7 @@ describe('SRD 5.2.1 spell seed resolution manifest', () => {
     }
   })
 
-  it('does not persist root effects on applicable spells (manifest-only)', () => {
+  it('does not persist a spell-level effects array on applicable spells', () => {
     const spells = loadSeedSpells(RULESET)
 
     for (const slug of SRD_521_SPELL_SEED_RESOLUTION_SLUGS) {

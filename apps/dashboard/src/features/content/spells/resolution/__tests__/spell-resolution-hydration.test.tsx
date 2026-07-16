@@ -1,7 +1,7 @@
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { loadSeedSpells, SRD_521_SPELL_SEED_RESOLUTION_TIER_A_SLUGS } from '@rpg/catalog/spells'
-import { CHILL_TOUCH_RESOLUTION, type Spell } from '@rpg/contracts'
+import { type Spell } from '@rpg/contracts'
 import { TabbedForm } from '@rpg/ui/form'
 import { beforeAll, describe, expect, it } from 'vitest'
 
@@ -10,7 +10,7 @@ import { makeContentFormCtx } from '../../../lib/fixtures/content-form-ctx'
 import { buildSpellTabs, spellFormSchema } from '../../lib/spell-form-fields'
 import { spellFormDef } from '../../lib/spell-form-def'
 import { spellToFormValues } from '../../lib/spell-form-values'
-import { resolutionToStored } from '../lib/form/resolution-form-values'
+import { resolutionToForm, resolutionToStored } from '../lib/form/resolution-form-values'
 import { RESOLUTION_FORM_FIXTURES } from '../fixtures'
 
 const formCtx = makeContentFormCtx({
@@ -220,8 +220,8 @@ describe('spell resolution tab hydration', () => {
     const input = spellFormDef.toInput(formValues)
 
     expect(input).not.toHaveProperty('resolution')
-    expect(resolutionToStored(formValues.resolution)).toEqual(CHILL_TOUCH_RESOLUTION)
-    expect(formValues.resolution).toEqual(RESOLUTION_FORM_FIXTURES.chillTouch)
+    expect(resolutionToStored(formValues.resolution)).toEqual(editorEligibleSpell.resolution)
+    expect(formValues.resolution).toEqual(resolutionToForm(editorEligibleSpell.resolution!))
   })
 
   it('renders seeded damage type and roll for Tier A acid-splash without marking dirty', async () => {

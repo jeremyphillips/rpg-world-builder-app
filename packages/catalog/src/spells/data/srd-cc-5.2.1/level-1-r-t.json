@@ -371,6 +371,10 @@
         {
           "code": "conditional-effect-model-missing",
           "note": "Multi-stage save, damage wake, and shake action stay prose"
+        },
+        {
+          "code": "duration-model-missing",
+          "note": "Until the end of its next turn on Incapacitated stays prose"
         }
       ]
     }

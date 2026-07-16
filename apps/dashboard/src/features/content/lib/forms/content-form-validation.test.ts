@@ -84,7 +84,7 @@ const COMMON_SCHEMA_EXEMPT = [
 
 const EQUIPMENT_SCHEMA_EXEMPT = [...COMMON_SCHEMA_EXEMPT, ...EQUIPMENT_KIND_EXEMPT] as const
 
-/** Legacy flat effects tab removed; resolution method/note/outcomes wired via slots. */
+/** Spell root effects tab removed; atomic effects live under resolution. */
 const SPELLS_SCHEMA_EXEMPT = [
   ...COMMON_SCHEMA_EXEMPT,
   /^effects\b/,

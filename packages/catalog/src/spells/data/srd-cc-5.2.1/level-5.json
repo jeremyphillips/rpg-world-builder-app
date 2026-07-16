@@ -570,6 +570,10 @@
         {
           "code": "object-state-awareness",
           "note": "Worn or carried object stays prose"
+        },
+        {
+          "code": "duration-model-missing",
+          "note": "Until the end of your next turn on Restrained stays prose"
         }
       ]
     }

@@ -23,6 +23,12 @@ describe('SRD 5.2.1 spell seed progression manifest', () => {
     expect(resolveSpellSeedProgression('fire-bolt')).toEqual(
       SRD_521_SPELL_SEED_PROGRESSION['fire-bolt'],
     )
+    expect(resolveSpellSeedProgression('poison-spray')).toEqual(
+      SRD_521_SPELL_SEED_PROGRESSION['poison-spray'],
+    )
+    expect(resolveSpellSeedProgression('chill-touch')).toEqual(
+      SRD_521_SPELL_SEED_PROGRESSION['chill-touch'],
+    )
     expect(resolveSpellSeedProgression('bless')).toBeUndefined()
   })
 })

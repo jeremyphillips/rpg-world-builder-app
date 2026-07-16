@@ -172,10 +172,63 @@
           ],
           "note": "The target can't regain Hit Points until the end of your next turn."
         }
-      ]
+      ],
+      "progression": {
+        "basis": "character-level",
+        "tracks": [
+          {
+            "kind": "thresholds",
+            "reference": {
+              "subject": {
+                "kind": "effect",
+                "effectId": "damage"
+              },
+              "property": "roll"
+            },
+            "entries": [
+              {
+                "threshold": 5,
+                "value": {
+                  "kind": "roll",
+                  "roll": {
+                    "dice": {
+                      "count": 2,
+                      "faces": 10
+                    }
+                  }
+                }
+              },
+              {
+                "threshold": 11,
+                "value": {
+                  "kind": "roll",
+                  "roll": {
+                    "dice": {
+                      "count": 3,
+                      "faces": 10
+                    }
+                  }
+                }
+              },
+              {
+                "threshold": 17,
+                "value": {
+                  "kind": "roll",
+                  "roll": {
+                    "dice": {
+                      "count": 4,
+                      "faces": 10
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      }
     },
     "modeling": {
-      "status": "meaningful-partial",
+      "status": "mechanics-ready",
       "gaps": [
         {
           "code": "conditional-effect-model-missing",
