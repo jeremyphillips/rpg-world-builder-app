@@ -14,6 +14,7 @@ export const ROUTES = {
     detail: (characterId: string) => `/characters/${characterId}`,
   },
   account: '/account',
+  nameGenerator: '/name-generator',
   campaign: {
     create: '/campaigns/new',
     detail: (id: string) => `/campaigns/${id}`,

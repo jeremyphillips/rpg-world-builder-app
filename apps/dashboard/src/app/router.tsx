@@ -38,6 +38,7 @@ import {
   SkillProficiencyDetailRoute,
   SkillProficiencyEditRoute,
   HomebrewHubRoute,
+  NameGeneratorRoute,
   RulesConfigDetailRoute,
   VocabularyDetailRoute,
   SpeciesCreateRoute,
@@ -94,6 +95,11 @@ const router = createBrowserRouter(
               path: 'account',
               element: <AccountSettingsRoute />,
               handle: { crumb: () => ({ label: 'Account Settings' }) } satisfies CrumbHandle,
+            },
+            {
+              path: 'name-generator',
+              element: <NameGeneratorRoute />,
+              handle: { crumb: () => ({ label: 'Name Generator' }) } satisfies CrumbHandle,
             },
             {
               path: 'admin',

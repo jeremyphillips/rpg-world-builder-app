@@ -17,4 +17,4 @@ Import via `@rpg/contracts/name-generator` — **not** included in the root
 - UI and API routes
 
 See [`packages/name-generator-data/README.md`](../../../name-generator-data/README.md)
-(when added) for dataset and lazy-loading documentation.
+for dataset and lazy-loading documentation.

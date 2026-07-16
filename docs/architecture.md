@@ -138,6 +138,10 @@ and the API's cookie/CSRF model in [apps/api/README.md](../apps/api/README.md).
   Package layout → [packages/contracts/docs/structure.md](../packages/contracts/docs/structure.md).
   Campaign **rules vocabulary** (creature types, …) is documented in
   [vocabulary.md](./vocabulary.md).
+- **`@rpg/name-generator-core`** and **`@rpg/name-generator-data`** provide the
+  experimental name generator foundation (pure generation + lazy fixture data).
+  Contracts live on the isolated `@rpg/contracts/name-generator` subpath — not
+  the root contracts barrel.
 - **`@rpg/api-client`** provides same-origin `fetch` wrappers (CSRF header,
   `ApiError`, `fetchSession`, `logout`) shared by the public and dashboard apps.
   No React dependency — apps wire it through TanStack Query hooks locally.

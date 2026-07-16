@@ -250,6 +250,12 @@ importers:
       '@rpg/contracts':
         specifier: workspace:*
         version: link:../../packages/contracts
+      '@rpg/name-generator-core':
+        specifier: workspace:*
+        version: link:../../packages/name-generator-core
+      '@rpg/name-generator-data':
+        specifier: workspace:*
+        version: link:../../packages/name-generator-data
       '@rpg/ui':
         specifier: workspace:*
         version: link:../../packages/ui

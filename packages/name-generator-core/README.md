@@ -17,7 +17,7 @@ import { recommendConventions, generateNames, generateName } from '@rpg/name-gen
 import type { NamingConvention, NameCollection } from '@rpg/contracts/name-generator'
 ```
 
-Callers load collections via `@rpg/name-generator-data` (phase 3) and pass a
+Callers load collections via `@rpg/name-generator-data` and pass a
 `ReadonlyMap<string, NameCollection>` into `generateNames`.
 
 ## Commands

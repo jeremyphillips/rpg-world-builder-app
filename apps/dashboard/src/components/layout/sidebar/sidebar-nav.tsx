@@ -13,6 +13,9 @@ export function SidebarNav() {
         <NavItem to={ROUTES.home} label="Dashboard" end />
         <NavItem to={ROUTES.characters.list} label="Characters" />
       </NavSection>
+      <NavSection label="Tools">
+        <NavItem to={ROUTES.nameGenerator} label="Name Generator" />
+      </NavSection>
       <CampaignNavSection />
       <ManageNavSection />
       <AdminNavSection />
