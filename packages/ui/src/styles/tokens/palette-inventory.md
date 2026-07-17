@@ -14,12 +14,12 @@ tests + Storybook).
 
 ## Neutral ramp
 
-| Token                                           | Role                                                |
-| ----------------------------------------------- | --------------------------------------------------- |
-| `--palette-neutral-hue`                         | Adjustable warmth anchor for the neutral scale      |
-| `--palette-neutral-0` … `--palette-neutral-950` | Full lightness ramp (both themes)                   |
-| `--palette-neutral-800-muted`                   | Muted fill variant (slightly lower chroma than 800) |
-| `--palette-muted-foreground`                    | Secondary copy on surfaces                          |
+| Token                                           | Role                                                                  |
+| ----------------------------------------------- | --------------------------------------------------------------------- |
+| `--palette-neutral-hue`                         | Adjustable warmth anchor for the neutral scale                        |
+| `--palette-neutral-0` … `--palette-neutral-950` | Full lightness ramp (both themes; includes `400`/`450` mid-tan steps) |
+| `--palette-neutral-800-muted`                   | Muted fill variant (slightly lower chroma than 800)                   |
+| `--palette-muted-foreground`                    | Secondary copy on surfaces                                            |
 
 ## Layout surfaces
 

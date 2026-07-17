@@ -3,6 +3,7 @@
  * Structure mirrors semantic-light.css; palette refs target palette-dark.css.
  */
 .dark {
+  --bg-subtle: var(--palette-neutral-900);
   --background: var(--palette-page-surface);
   --foreground: var(--palette-neutral-50);
   --card: var(--palette-card-surface);

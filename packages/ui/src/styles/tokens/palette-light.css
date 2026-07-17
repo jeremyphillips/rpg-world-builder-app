@@ -1,46 +1,56 @@
 /*
  * Layer 1 — light palette primitives (oklch SSOT).
  * Inventory: tokens/palette-inventory.md — every name must exist in palette-dark.css.
+ *
+ * Motif: cream canvas, parch cards, primary-tinted sidebar, deep-red primary (hex refs:
+ * cream #fdf6e3, parch #f3e9cc, border #c9a85c, dim #7a6644, ink #1c1005, red #7a1f00).
  */
 :root {
-  /* Zinc-leaning neutrals for type; warm hue ~82 on surfaces below. */
-  --palette-neutral-hue: 268;
-  --palette-neutral-0: oklch(0.998 0.004 85);
-  --palette-neutral-50: oklch(0.982 0.006 82);
-  --palette-neutral-100: oklch(0.94 0.01 82);
-  --palette-neutral-150: oklch(0.922 0.012 82);
-  --palette-neutral-200: oklch(0.902 0.014 80);
-  --palette-neutral-300: oklch(0.86 0.012 80);
-  --palette-neutral-500: oklch(0.552 0.014 var(--palette-neutral-hue));
-  --palette-neutral-700: oklch(0.442 0.014 var(--palette-neutral-hue));
-  --palette-neutral-750: oklch(0.39 0.016 var(--palette-neutral-hue));
-  --palette-neutral-800: oklch(0.28 0.014 var(--palette-neutral-hue));
-  --palette-neutral-800-muted: oklch(0.3 0.012 var(--palette-neutral-hue));
-  --palette-neutral-900: oklch(0.21 0.012 var(--palette-neutral-hue));
-  --palette-neutral-950: oklch(0.18 0.012 var(--palette-neutral-hue));
-  --palette-muted-foreground: oklch(0.5 0.02 75);
+  /* Warm parchment axis — ink through cream. */
+  --palette-neutral-hue: 82;
+  --palette-neutral-0: oklch(0.974 0.026 90.1);
+  --palette-neutral-50: oklch(0.958 0.03 90);
+  --palette-neutral-100: oklch(0.934 0.04 91.2);
+  --palette-neutral-150: oklch(0.92 0.038 90);
+  --palette-neutral-200: oklch(0.9 0.048 88);
+  --palette-neutral-300: oklch(0.82 0.065 85);
+  --palette-neutral-400: oklch(0.745 0.043 86.4);
+  --palette-neutral-450: oklch(0.715 0.045 85);
+  --palette-neutral-500: oklch(0.521 0.055 80.3);
+  --palette-neutral-700: oklch(0.42 0.05 72);
+  --palette-neutral-750: oklch(0.36 0.045 70);
+  --palette-neutral-800: oklch(0.28 0.038 68);
+  --palette-neutral-800-muted: oklch(0.3 0.035 68);
+  --palette-neutral-900: oklch(0.186 0.029 64.3);
+  --palette-neutral-950: oklch(0.16 0.028 62);
+  --palette-muted-foreground: var(--palette-neutral-500);
 
-  /*
-   * Layout surfaces — parchment canvas with a clear elevation ladder:
-   * page < sidebar < muted < card (brightest plane).
-   */
-  --palette-page-surface: oklch(0.954 0.009 82);
-  --palette-sidebar-surface: oklch(0.938 0.011 80);
-  --palette-sidebar-shade: oklch(0.918 0.013 78);
-  --palette-card-surface: var(--palette-neutral-0);
-  --palette-muted-surface: oklch(0.926 0.013 82);
-  --palette-accent-surface: oklch(0.904 0.02 78);
-  --palette-secondary-surface: oklch(0.914 0.015 81);
+  /* Deep red primary — cream foreground for AA on fill. */
+  --palette-primary: oklch(0.386 0.13 36.6);
+  --palette-primary-foreground: var(--palette-neutral-0);
+  --palette-on-solid: var(--palette-neutral-0);
 
-  --palette-border-default: oklch(0.848 0.014 80);
-  --palette-border-input: oklch(0.828 0.016 80);
-  --palette-border-selected: oklch(0.848 0.014 80 / 42%);
-  --palette-overlay: oklch(0.21 0.012 var(--palette-neutral-hue) / 0.5);
+  /* Layout surfaces — role aliases onto the neutral ramp. */
+  --palette-page-surface: var(--palette-neutral-0);
+  --palette-sidebar-surface: color-mix(
+    in oklch,
+    var(--palette-primary) 6%,
+    var(--palette-neutral-200)
+  );
+  --palette-sidebar-shade: color-mix(
+    in oklch,
+    var(--palette-primary) 22%,
+    var(--palette-neutral-300)
+  );
+  --palette-card-surface: var(--palette-neutral-100);
+  --palette-muted-surface: var(--palette-neutral-300);
+  --palette-secondary-surface: var(--palette-neutral-150);
 
-  /* Deep bronze-gold: AA link text on parchment (5.4:1) and on primary fill. */
-  --palette-primary: oklch(0.52 0.11 70);
-  --palette-primary-foreground: oklch(0.985 0.003 var(--palette-neutral-hue));
-  --palette-on-solid: oklch(0.985 0 0);
+  --palette-border-default: oklch(0.745 0.103 86.4);
+  --palette-border-input: oklch(0.72 0.095 85);
+  --palette-border-selected: oklch(from var(--palette-border-default) l c h / 42%);
+  --palette-overlay: oklch(from var(--palette-neutral-900) l c h / 0.5);
+  --palette-accent-surface: var(--palette-border-default);
 
   --palette-destructive: oklch(0.577 0.245 27.325);
   --palette-destructive-muted: oklch(0.577 0.245 27.325 / 70%);
@@ -51,15 +61,15 @@
   --palette-success: oklch(0.52 0.14 145);
   --palette-success-muted: oklch(0.52 0.14 145 / 70%);
   --palette-success-subtle: oklch(0.52 0.14 145 / 12%);
-  --palette-warning: oklch(0.62 0.14 75);
-  --palette-warning-muted: oklch(0.62 0.14 75 / 70%);
-  --palette-warning-subtle: oklch(0.62 0.14 75 / 14%);
+  --palette-warning: oklch(0.62 0.14 55);
+  --palette-warning-muted: oklch(0.62 0.14 55 / 70%);
+  --palette-warning-subtle: oklch(0.62 0.14 55 / 14%);
 
   --palette-semantic-neutral: var(--palette-neutral-500);
   --palette-semantic-informative: oklch(0.48 0.13 250);
   --palette-semantic-informative-muted: oklch(0.42 0.07 250);
   --palette-semantic-positive: oklch(0.48 0.13 145);
-  --palette-semantic-caution: oklch(0.55 0.13 70);
+  --palette-semantic-caution: oklch(0.55 0.13 55);
   --palette-semantic-negative: oklch(0.52 0.2 27);
   --palette-semantic-negative-on-subtle: oklch(0.42 0.19 27);
 }

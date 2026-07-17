@@ -5,9 +5,9 @@
 :root {
   --radius: 0.525rem;
   --radius-card: var(--radius-lg);
-
+  --bg-subtle: var(--palette-neutral-50);
   --background: var(--palette-page-surface);
-  --foreground: var(--palette-neutral-900);
+  --foreground: var(--palette-neutral-800);
   --card: var(--palette-card-surface);
   --card-foreground: var(--palette-neutral-900);
   --popover: var(--palette-card-surface);

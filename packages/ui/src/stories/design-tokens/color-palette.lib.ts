@@ -104,6 +104,14 @@ export const COLOR_TOKEN_GROUPS: ColorTokenGroup[] = [
         foregroundTailwind: 'text-card-foreground',
       },
       {
+        name: 'bg-subtle',
+        cssVar: '--bg-subtle',
+        tailwind: 'bg-subtle',
+        usage: 'background',
+        foregroundVar: '--foreground',
+        foregroundTailwind: 'text-foreground',
+      },
+      {
         name: 'card-foreground',
         cssVar: '--card-foreground',
         tailwind: 'text-card-foreground',

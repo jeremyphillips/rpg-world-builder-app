@@ -11,6 +11,8 @@ export const PALETTE_NEUTRAL_STEPS = [
   'neutral-150',
   'neutral-200',
   'neutral-300',
+  'neutral-400',
+  'neutral-450',
   'neutral-500',
   'neutral-700',
   'neutral-750',
