@@ -9,7 +9,7 @@ describe('namingContextSchema', () => {
       namingContextSchema.safeParse({
         subjectKind: 'person',
         languageIds: ['elvish'],
-        cultureIds: ['high-elven'],
+        cultureIds: ['elven-general'],
         speciesIds: ['srd-cc-5.2.1:elf'],
         creatureTypes: ['humanoid'],
         regionIds: ['west-africa'],

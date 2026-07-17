@@ -24,7 +24,7 @@ export const halflingPersonalConvention = {
     },
   ],
   partBindings: [
-    { partKey: 'given', collectionId: 'halfling-given-pool', sourceKey: 'given-masc' },
+    { partKey: 'given', collectionId: 'halfling-given-pool' },
     { partKey: 'family', collectionId: 'halfling-family-pool', sourceKey: 'family' },
   ],
   collectionIds: ['halfling-given-pool', 'halfling-family-pool'],

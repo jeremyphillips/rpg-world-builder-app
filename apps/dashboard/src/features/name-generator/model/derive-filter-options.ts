@@ -5,7 +5,7 @@ import type {
 } from '@rpg/contracts/name-generator'
 import { getLanguageLabel } from '@rpg/contracts'
 import { loadSeedSpecies } from '@rpg/catalog/species'
-import { NAME_CULTURES } from '@rpg/name-generator-data'
+import { NAME_CULTURES, getConventionCultureId } from '@rpg/name-generator-data'
 
 import {
   DEFAULT_RULESET_ID,
@@ -56,9 +56,15 @@ function conventionHasLanguage(convention: NamingConvention, languageId: string)
   )
 }
 
+function isCultureSelectable(culture: (typeof NAME_CULTURES)[number]): boolean {
+  return !('selectable' in culture && culture.selectable === false)
+}
+
 function conventionHasCulture(convention: NamingConvention, cultureId: string): boolean {
+  const conventionCultureId = getConventionCultureId(cultureId)
   return convention.associations.some(
-    (association) => association.kind === 'culture' && association.cultureId === cultureId,
+    (association) =>
+      association.kind === 'culture' && association.cultureId === conventionCultureId,
   )
 }
 
@@ -172,10 +178,39 @@ function buildLanguageOptions(conventions: readonly NamingConvention[]): FilterO
     }))
 }
 
-function buildCultureOptions(conventions: readonly NamingConvention[]): FilterOption[] {
+function buildCultureOptions(
+  conventions: readonly NamingConvention[],
+  filters: PartialFilters,
+): FilterOption[] {
   const referencedCultureIds = new Set(collectAssociationIds(conventions, 'culture'))
+  const selectableCultures = new Map<string, (typeof NAME_CULTURES)[number]>()
 
-  return NAME_CULTURES.filter((culture) => referencedCultureIds.has(culture.id))
+  for (const culture of NAME_CULTURES) {
+    if (!isCultureSelectable(culture)) {
+      continue
+    }
+
+    if (referencedCultureIds.has(culture.id)) {
+      selectableCultures.set(culture.id, culture)
+    }
+  }
+
+  if (filters.speciesId !== undefined) {
+    for (const culture of NAME_CULTURES) {
+      if (!isCultureSelectable(culture)) {
+        continue
+      }
+
+      if (
+        'speciesIds' in culture &&
+        (culture.speciesIds as readonly string[]).includes(filters.speciesId)
+      ) {
+        selectableCultures.set(culture.id, culture)
+      }
+    }
+  }
+
+  return [...selectableCultures.values()]
     .map((culture) => ({
       id: culture.id,
       label: culture.label,
@@ -241,7 +276,11 @@ export function deriveFilterOptions(
     subjectKinds: buildSubjectOptions(conventions),
     speciesIds: buildSpeciesOptions(speciesConventions),
     languageIds: buildLanguageOptions(languageConventions),
-    cultureIds: buildCultureOptions(cultureConventions),
+    cultureIds: buildCultureOptions(cultureConventions, {
+      subjectKind: filters.subjectKind,
+      speciesId: filters.speciesId,
+      languageId: filters.languageId,
+    }),
     genderStyles: buildGenderStyleOptions(),
   }
 }

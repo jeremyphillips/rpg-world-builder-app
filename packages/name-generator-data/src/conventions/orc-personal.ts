@@ -20,7 +20,7 @@ export const orcPersonalConvention = {
       format: '{given}',
     },
   ],
-  partBindings: [{ partKey: 'given', collectionId: 'orc-given-pool', sourceKey: 'given-masc' }],
+  partBindings: [{ partKey: 'given', collectionId: 'orc-given-pool' }],
   collectionIds: ['orc-given-pool'],
   provenance: FIXTURE_COLLECTION_PROVENANCE.conventionCuration,
   version: 1,

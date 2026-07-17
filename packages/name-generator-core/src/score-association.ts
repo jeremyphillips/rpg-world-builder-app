@@ -46,11 +46,23 @@ function scoreCultureAssociation(
   context: NamingContext,
   reasons: NamingRecommendationReason[],
 ): number {
-  if (!context.cultureIds?.includes(association.cultureId)) {
+  const matchIds = context.conventionCultureIds ?? context.cultureIds
+  if (!matchIds?.includes(association.cultureId)) {
     return 0
   }
+
   const strength = defaultStrength(association.strength)
-  reasons.push({ kind: 'culture', cultureId: association.cultureId, strength })
+  const selectedIds = context.cultureIds ?? []
+  const resolutions = context.cultureResolutions ?? {}
+  const reportingIds =
+    selectedIds.length > 0
+      ? selectedIds.filter((id) => (resolutions[id] ?? id) === association.cultureId)
+      : [association.cultureId]
+
+  for (const cultureId of reportingIds) {
+    reasons.push({ kind: 'culture', cultureId, strength })
+  }
+
   return STRENGTH_WEIGHTS[strength]
 }
 

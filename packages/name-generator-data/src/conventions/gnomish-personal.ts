@@ -24,7 +24,7 @@ export const gnomishPersonalConvention = {
     },
   ],
   partBindings: [
-    { partKey: 'given', collectionId: 'gnomish-given-pool', sourceKey: 'given-masc' },
+    { partKey: 'given', collectionId: 'gnomish-given-pool' },
     { partKey: 'family', collectionId: 'gnomish-family-pool', sourceKey: 'family' },
   ],
   collectionIds: ['gnomish-given-pool', 'gnomish-family-pool'],

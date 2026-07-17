@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 import { generateName, generateNames, recommendConventions } from '@rpg/name-generator-core'
 
 import { clearNameCollectionCache, loadNameCollection } from './collections/load-name-collection'
+import { buildCultureContextFields } from './lib/resolve-naming-cultures'
 import { CONVENTIONS } from './conventions/manifest'
 import { getConvention } from './loader/list-conventions'
 
@@ -20,12 +21,33 @@ async function loadConventionCollections(conventionId: string) {
 }
 
 describe('name generator integration', () => {
+  it('ranks wood elf heritage culture for wood-elf naming context', () => {
+    const recommendations = recommendConventions(
+      {
+        subjectKind: 'person',
+        languageIds: ['elvish'],
+        cultureIds: ['wood-elf'],
+        conventionCultureIds: ['elven-general'],
+        cultureResolutions: { 'wood-elf': 'elven-general' },
+        speciesIds: ['srd-cc-5.2.1:elf'],
+      },
+      CONVENTIONS,
+    )
+
+    const elvish = recommendations.find((item) => item.conventionId === 'elvish-personal')
+    const akan = recommendations.find((item) => item.conventionId === 'akan-personal')
+
+    expect(elvish).toBeDefined()
+    expect(elvish?.score).toBeGreaterThan(akan?.score ?? 0)
+    expect(recommendations[0]?.conventionId).toBe('elvish-personal')
+  })
+
   it('ranks elvish conventions above unrelated cultures for elvish context', () => {
     const recommendations = recommendConventions(
       {
         subjectKind: 'person',
         languageIds: ['elvish'],
-        cultureIds: ['high-elven'],
+        ...buildCultureContextFields('high-elf'),
       },
       CONVENTIONS,
     )

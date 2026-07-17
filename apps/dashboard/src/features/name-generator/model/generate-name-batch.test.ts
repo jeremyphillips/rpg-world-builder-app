@@ -24,7 +24,7 @@ describe('generateNameBatch', () => {
     const filters = {
       subjectKind: 'person' as const,
       languageId: 'elvish' as const,
-      cultureId: 'high-elven',
+      cultureId: 'high-elf',
       speciesId: 'srd-cc-5.2.1:elf',
     }
 
@@ -56,6 +56,40 @@ describe('generateNameBatch', () => {
     ).rejects.toMatchObject({
       kind: 'no-matches',
     })
+  })
+
+  it('returns partial results when a convention pool is exhausted', async () => {
+    const tinyOrcGivenCollection = {
+      ...ELVISH_GIVEN_COLLECTION,
+      id: 'orc-given-pool',
+      generator: {
+        type: 'sample' as const,
+        pools: [
+          {
+            id: 'given-masc',
+            role: 'given' as const,
+            genderStyle: 'masculine' as const,
+            values: ['A', 'B', 'C'],
+          },
+        ],
+      },
+    }
+
+    const loadCollection = vi.fn(async () => tinyOrcGivenCollection)
+
+    const batch = await generateNameBatch(
+      {
+        subjectKind: 'person',
+        languageId: 'orc',
+        cultureId: 'common-orc',
+        speciesId: 'srd-cc-5.2.1:orc',
+      },
+      { seed: 'orc-partial', count: 10 },
+      { loadCollection, listConventions },
+    )
+
+    expect(batch.results).toHaveLength(3)
+    expect(batch.partialCount).toEqual({ generated: 3, requested: 10 })
   })
 })
 

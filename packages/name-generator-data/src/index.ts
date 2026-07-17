@@ -1,4 +1,9 @@
 export { NAME_CULTURES } from './cultures/cultures'
+export {
+  buildCultureContextFields,
+  getConventionCultureId,
+  getNameCulture,
+} from './lib/resolve-naming-cultures'
 export { CONVENTIONS } from './conventions/manifest'
 export { COLLECTION_MANIFEST_ENTRIES } from './collections/manifest'
 export { clearNameCollectionCache, loadNameCollection } from './collections/load-name-collection'

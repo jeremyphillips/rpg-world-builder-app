@@ -53,7 +53,7 @@ Typical orchestration:
 
 ## Culture vs region
 
-- `cultureIds` identify precise traditions (`akan`, `high-elven`).
+- `cultureIds` identify precise traditions (`akan`, `high-elf`, `elven-general`).
 - `regionIds` are broad browsing facets (`west-africa`) — not substitutes for
   culture labels.
 

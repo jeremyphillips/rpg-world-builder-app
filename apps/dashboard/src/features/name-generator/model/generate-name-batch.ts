@@ -81,21 +81,28 @@ async function generateNameForSlot(
   seen: Set<string>,
 ): Promise<GeneratedName | undefined> {
   for (let attempt = 0; attempt < MAX_DUPLICATE_ATTEMPTS; attempt += 1) {
-    const candidate = generateName(
-      convention,
-      collections,
-      {
-        conventionId: convention.id,
-        count: 1,
-        seed,
-        genderStyle,
-      },
-      slotIndex * MAX_DUPLICATE_ATTEMPTS + attempt,
-      seen,
-    )
+    try {
+      const candidate = generateName(
+        convention,
+        collections,
+        {
+          conventionId: convention.id,
+          count: 1,
+          seed,
+          genderStyle,
+        },
+        slotIndex * MAX_DUPLICATE_ATTEMPTS + attempt,
+        seen,
+      )
 
-    if (!seen.has(candidate.value)) {
-      return candidate
+      if (!seen.has(candidate.value)) {
+        return candidate
+      }
+    } catch (error) {
+      if (isNameGeneratorError(error) && error.code === 'generation-exhausted') {
+        return undefined
+      }
+      throw error
     }
   }
 

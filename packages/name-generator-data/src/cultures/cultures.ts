@@ -1,12 +1,46 @@
 import type { NameCulture } from '@rpg/contracts/name-generator'
 
+const ELF_SPECIES_ID = 'srd-cc-5.2.1:elf'
+
 export const NAME_CULTURES = [
   {
-    id: 'high-elven',
-    label: 'High Elven',
+    id: 'elven-general',
+    label: 'Elven',
     origin: 'fictional',
     languageIds: ['elvish'],
-    description: 'Refined elven naming traditions associated with elvish language affinity.',
+    selectable: false,
+    description:
+      'Shared elven personal and settlement naming — conventions bind here; heritage cultures resolve to this base.',
+  },
+  {
+    id: 'high-elf',
+    label: 'High Elf',
+    origin: 'fictional',
+    languageIds: ['elvish'],
+    speciesIds: [ELF_SPECIES_ID],
+    heritageIds: ['high-elf'],
+    resolvesToCultureId: 'elven-general',
+    description: 'High elf heritage naming — resolves to shared elven conventions.',
+  },
+  {
+    id: 'wood-elf',
+    label: 'Wood Elf',
+    origin: 'fictional',
+    languageIds: ['elvish'],
+    speciesIds: [ELF_SPECIES_ID],
+    heritageIds: ['wood-elf'],
+    resolvesToCultureId: 'elven-general',
+    description: 'Wood elf heritage naming — resolves to shared elven conventions.',
+  },
+  {
+    id: 'drow',
+    label: 'Drow',
+    origin: 'fictional',
+    languageIds: ['elvish'],
+    speciesIds: [ELF_SPECIES_ID],
+    heritageIds: ['drow'],
+    resolvesToCultureId: 'elven-general',
+    description: 'Drow heritage naming — resolves to shared elven conventions.',
   },
   {
     id: 'mountain-dwarf',

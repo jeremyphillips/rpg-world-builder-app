@@ -23,7 +23,7 @@ describe('formatResultsSummary', () => {
         [{ conventionId: 'elvish-personal', score: 20, reasons: [] }],
       ),
     ).toEqual({
-      title: 'High Elven personal names',
+      title: 'Elven personal names',
       subtitle: 'Elvish · Elf · Feminine',
     })
   })

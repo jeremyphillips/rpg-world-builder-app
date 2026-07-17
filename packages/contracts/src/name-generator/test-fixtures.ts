@@ -56,7 +56,7 @@ export const ELVISH_PERSONAL_CONVENTION: NamingConvention = {
   subjectKinds: ['person'],
   associations: [
     { kind: 'language', languageId: 'elvish', strength: 'primary' },
-    { kind: 'culture', cultureId: 'high-elven', strength: 'primary' },
+    { kind: 'culture', cultureId: 'elven-general', strength: 'primary' },
     { kind: 'species', speciesId: 'srd-cc-5.2.1:elf' },
   ],
   structures: [

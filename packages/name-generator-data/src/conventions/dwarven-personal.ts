@@ -24,7 +24,7 @@ export const dwarvenPersonalConvention = {
     },
   ],
   partBindings: [
-    { partKey: 'given', collectionId: 'dwarven-given-pool', sourceKey: 'given-masc' },
+    { partKey: 'given', collectionId: 'dwarven-given-pool' },
     { partKey: 'clan', collectionId: 'dwarven-clan-pool', sourceKey: 'clan' },
   ],
   collectionIds: ['dwarven-given-pool', 'dwarven-clan-pool'],

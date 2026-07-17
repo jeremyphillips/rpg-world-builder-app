@@ -30,7 +30,7 @@ export const infernalTieflingPersonalConvention = {
     },
   ],
   partBindings: [
-    { partKey: 'given', collectionId: 'infernal-tiefling-given-pool', sourceKey: 'given-masc' },
+    { partKey: 'given', collectionId: 'infernal-tiefling-given-pool' },
     { partKey: 'virtue', collectionId: 'infernal-tiefling-virtue-pool', sourceKey: 'virtue' },
   ],
   collectionIds: ['infernal-tiefling-given-pool', 'infernal-tiefling-virtue-pool'],

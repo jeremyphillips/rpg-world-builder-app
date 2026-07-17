@@ -21,7 +21,18 @@ describe('deriveFilterOptions', () => {
     const options = deriveFilterOptions({ subjectKind: 'person' }, conventions)
 
     expect(options.cultureIds.map((option) => option.id)).toContain('akan')
-    expect(options.cultureIds.map((option) => option.id)).toContain('high-elven')
+    expect(options.cultureIds.map((option) => option.id)).not.toContain('elven-general')
+  })
+
+  it('shows elf heritage cultures when elf species is selected', () => {
+    const options = deriveFilterOptions(
+      { subjectKind: 'person', speciesId: 'srd-cc-5.2.1:elf' },
+      conventions,
+    )
+
+    expect(options.cultureIds.map((option) => option.id)).toEqual(
+      expect.arrayContaining(['high-elf', 'wood-elf', 'drow']),
+    )
   })
 })
 
@@ -87,13 +98,16 @@ describe('buildNamingContext', () => {
       buildNamingContext({
         subjectKind: 'person',
         languageId: 'elvish',
-        cultureId: 'high-elven',
+        cultureId: 'high-elf',
         speciesId: 'srd-cc-5.2.1:elf',
       }),
     ).toEqual({
       subjectKind: 'person',
       languageIds: ['elvish'],
-      cultureIds: ['high-elven'],
+      cultureIds: ['high-elf'],
+      conventionCultureIds: ['elven-general'],
+      cultureResolutions: { 'high-elf': 'elven-general' },
+      heritageIds: ['high-elf'],
       speciesIds: ['srd-cc-5.2.1:elf'],
     })
   })

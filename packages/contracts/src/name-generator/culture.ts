@@ -23,6 +23,10 @@ export const nameCultureSchema = z.object({
   regionIds: z.array(nameCultureIdSchema).optional(),
   languageIds: z.array(nameCultureIdSchema).optional(),
   eraIds: z.array(nameCultureIdSchema).optional(),
+  speciesIds: z.array(z.string().min(1)).optional(),
+  heritageIds: z.array(z.string().min(1)).optional(),
+  resolvesToCultureId: nameCultureIdSchema.optional(),
+  selectable: z.boolean().optional(),
   description: z.string().min(1).optional(),
 })
 

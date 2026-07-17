@@ -4,12 +4,12 @@ import { FIXTURE_COLLECTION_PROVENANCE } from '../lib/provenance'
 
 export const elvishPersonalConvention = {
   id: 'elvish-personal',
-  label: 'High Elven personal names',
-  description: 'Given and family names for high-elven characters.',
+  label: 'Elven personal names',
+  description: 'Given and family names for elven characters.',
   subjectKinds: ['person'],
   associations: [
     { kind: 'language', languageId: 'elvish', strength: 'primary' },
-    { kind: 'culture', cultureId: 'high-elven', strength: 'primary' },
+    { kind: 'culture', cultureId: 'elven-general', strength: 'primary' },
     { kind: 'species', speciesId: 'srd-cc-5.2.1:elf' },
   ],
   structures: [
@@ -24,7 +24,7 @@ export const elvishPersonalConvention = {
     },
   ],
   partBindings: [
-    { partKey: 'given', collectionId: 'elvish-given-pool', sourceKey: 'given-masc' },
+    { partKey: 'given', collectionId: 'elvish-given-pool' },
     { partKey: 'family', collectionId: 'elvish-family-pool', sourceKey: 'family' },
   ],
   collectionIds: ['elvish-given-pool', 'elvish-family-pool'],
