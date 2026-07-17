@@ -1,5 +1,4 @@
-import { z } from 'zod'
-
+import { vocabEnumFromEntries, keysFromEntries } from '../enum-schema'
 import type { GameTermEntry } from '../types'
 
 // ---------------------------------------------------------------------------
@@ -51,12 +50,9 @@ export const WEAPON_MASTERY_ENTRIES = {
 
 export type WeaponMastery = keyof typeof WEAPON_MASTERY_ENTRIES
 
-export const WEAPON_MASTERIES = Object.keys(WEAPON_MASTERY_ENTRIES) as [
-  WeaponMastery,
-  ...WeaponMastery[],
-]
+export const WEAPON_MASTERIES = keysFromEntries(WEAPON_MASTERY_ENTRIES)
 
-export const weaponMasterySchema = z.enum(WEAPON_MASTERIES)
+export const weaponMasterySchema = vocabEnumFromEntries(WEAPON_MASTERY_ENTRIES)
 
 /** Returns the reference entry for a mastery id, if known. */
 export function getWeaponMasteryEntry(m: string): GameTermEntry | undefined {

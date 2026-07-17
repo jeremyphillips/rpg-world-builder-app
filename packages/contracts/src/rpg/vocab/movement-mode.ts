@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-import { vocabEnumFromEntries } from './enum-schema'
+import { closedSetEnum, keysFromEntries, vocabEnumFromEntries } from './enum-schema'
 import { getTermSentenceForm } from './types'
 import type { GameTermEntry } from './types'
 
@@ -59,21 +59,21 @@ export const MOVEMENT_MODE_ENTRIES = {
 
 export type MovementMode = keyof typeof MOVEMENT_MODE_ENTRIES
 
-export const MOVEMENT_MODES = Object.keys(MOVEMENT_MODE_ENTRIES) as [
-  MovementMode,
-  ...MovementMode[],
-]
+export const MOVEMENT_MODES = keysFromEntries(MOVEMENT_MODE_ENTRIES)
 
 export const movementModeSchema = vocabEnumFromEntries(MOVEMENT_MODE_ENTRIES)
 
 /** Modes beyond walk — only present when a creature has that movement type. */
-export const EXTRA_MOVEMENT_MODES = MOVEMENT_MODES.filter(
-  (mode): mode is Exclude<MovementMode, 'walk'> => mode !== 'walk',
-)
+export const EXTRA_MOVEMENT_MODES = [
+  'fly',
+  'swim',
+  'climb',
+  'burrow',
+] as const satisfies readonly Exclude<MovementMode, 'walk'>[]
 
 export type ExtraMovementMode = (typeof EXTRA_MOVEMENT_MODES)[number]
 
-export const extraMovementModeSchema = z.enum(EXTRA_MOVEMENT_MODES)
+export const extraMovementModeSchema = closedSetEnum(EXTRA_MOVEMENT_MODES)
 
 /** Returns the reference entry for a movement mode id, if known. */
 export function getMovementModeEntry(id: string): GameTermEntry | undefined {
@@ -171,10 +171,6 @@ export function formatMovementDisplay(speeds: MovementSpeeds): string {
 // extract MOVEMENT_OPERATIONS + operation-discriminated feet schemas to
 // packages/contracts/src/rpg/primitives/numeric-modifier.ts and compose here.
 
-export const MOVEMENT_OPERATIONS = ['set', 'increase', 'match'] as const
-
-export type MovementOperation = (typeof MOVEMENT_OPERATIONS)[number]
-
 export const MOVEMENT_OPERATION_ENTRIES = {
   set: {
     label: 'is',
@@ -188,7 +184,11 @@ export const MOVEMENT_OPERATION_ENTRIES = {
     label: 'equals',
     description: 'Sets this mode’s speed to the resolved value of another mode.',
   },
-} as const satisfies Record<MovementOperation, GameTermEntry>
+} as const satisfies Record<string, GameTermEntry>
+
+export type MovementOperation = keyof typeof MOVEMENT_OPERATION_ENTRIES
+
+export const MOVEMENT_OPERATIONS = keysFromEntries(MOVEMENT_OPERATION_ENTRIES)
 
 export const movementOperationSchema = vocabEnumFromEntries(MOVEMENT_OPERATION_ENTRIES)
 

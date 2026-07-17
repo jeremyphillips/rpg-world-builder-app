@@ -1,5 +1,6 @@
 import { z } from 'zod'
 
+import { vocabEnumFromEntries, keysFromEntries } from '../enum-schema'
 import type { GameTermEntry } from '../types'
 
 // ---------------------------------------------------------------------------
@@ -23,12 +24,9 @@ export const SPELL_RANGE_KIND_ENTRIES = {
 
 export type SpellRangeKind = keyof typeof SPELL_RANGE_KIND_ENTRIES
 
-export const SPELL_RANGE_KINDS = Object.keys(SPELL_RANGE_KIND_ENTRIES) as [
-  SpellRangeKind,
-  ...SpellRangeKind[],
-]
+export const SPELL_RANGE_KINDS = keysFromEntries(SPELL_RANGE_KIND_ENTRIES)
 
-export const spellRangeKindSchema = z.enum(SPELL_RANGE_KINDS)
+export const spellRangeKindSchema = vocabEnumFromEntries(SPELL_RANGE_KIND_ENTRIES)
 
 const spellRangeSelfSchema = z.object({ kind: z.literal('self') })
 const spellRangeTouchSchema = z.object({ kind: z.literal('touch') })

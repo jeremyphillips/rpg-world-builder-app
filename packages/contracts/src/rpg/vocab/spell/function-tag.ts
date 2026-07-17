@@ -1,5 +1,4 @@
-import { z } from 'zod'
-
+import { vocabEnumFromEntries, keysFromEntries } from '../enum-schema'
 import type { GameTermEntry } from '../types'
 
 // ---------------------------------------------------------------------------
@@ -30,12 +29,9 @@ export const SPELL_FUNCTION_TAG_ENTRIES = {
 
 export type SpellFunctionTag = keyof typeof SPELL_FUNCTION_TAG_ENTRIES
 
-export const SPELL_FUNCTION_TAGS = Object.keys(SPELL_FUNCTION_TAG_ENTRIES) as [
-  SpellFunctionTag,
-  ...SpellFunctionTag[],
-]
+export const SPELL_FUNCTION_TAGS = keysFromEntries(SPELL_FUNCTION_TAG_ENTRIES)
 
-export const spellFunctionTagSchema = z.enum(SPELL_FUNCTION_TAGS)
+export const spellFunctionTagSchema = vocabEnumFromEntries(SPELL_FUNCTION_TAG_ENTRIES)
 
 /** Returns the display label for a spell function tag. Falls back to the raw value. */
 export function getSpellFunctionTagLabel(id: string): string {

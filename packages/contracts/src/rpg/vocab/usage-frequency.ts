@@ -1,4 +1,4 @@
-import { vocabEnumFromEntries } from './enum-schema'
+import { vocabEnumFromEntries, keysFromEntries } from './enum-schema'
 import { getTermSentenceForm } from './types'
 import type { GameTermEntry } from './types'
 
@@ -39,10 +39,7 @@ export const USAGE_FREQUENCY_ENTRIES = {
 
 export type UsageFrequency = keyof typeof USAGE_FREQUENCY_ENTRIES
 
-export const USAGE_FREQUENCIES = Object.keys(USAGE_FREQUENCY_ENTRIES) as [
-  UsageFrequency,
-  ...UsageFrequency[],
-]
+export const USAGE_FREQUENCIES = keysFromEntries(USAGE_FREQUENCY_ENTRIES)
 
 export const usageFrequencySchema = vocabEnumFromEntries(USAGE_FREQUENCY_ENTRIES)
 

@@ -2,7 +2,6 @@ import { describe, expect, it } from 'vitest'
 
 import {
   WEAPON_CATEGORIES,
-  WEAPON_CATEGORY_ENTRIES,
   getWeaponCategoryCompactLabel,
   getWeaponCategoryEntry,
   getWeaponCategoryLabel,
@@ -23,10 +22,6 @@ describe('weaponCategorySchema', () => {
 })
 
 describe('weapon category vocabulary', () => {
-  it('exposes every category in WEAPON_CATEGORIES', () => {
-    expect([...WEAPON_CATEGORIES].sort()).toEqual(Object.keys(WEAPON_CATEGORY_ENTRIES).sort())
-  })
-
   it('has a label and description for every category', () => {
     for (const category of WEAPON_CATEGORIES) {
       const entry = getWeaponCategoryEntry(category)

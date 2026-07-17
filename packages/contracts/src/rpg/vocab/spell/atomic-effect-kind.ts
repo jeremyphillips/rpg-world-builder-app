@@ -1,17 +1,9 @@
+import { keysFromEntries } from '../enum-schema'
 import type { GameTermEntry } from '../types'
 
 // ---------------------------------------------------------------------------
 // Spell atomic effect kinds — labels for authoring UI and array item headers.
 // ---------------------------------------------------------------------------
-
-export const SPELL_ATOMIC_EFFECT_KINDS = [
-  'damage',
-  'healing',
-  'temporary-hit-points',
-  'projectile-count',
-] as const
-
-export type SpellAtomicEffectKind = (typeof SPELL_ATOMIC_EFFECT_KINDS)[number]
 
 export const SPELL_ATOMIC_EFFECT_KIND_ENTRIES = {
   damage: {
@@ -46,7 +38,11 @@ export const SPELL_ATOMIC_EFFECT_KIND_ENTRIES = {
       plural: 'projectile counts',
     },
   },
-} as const satisfies Record<SpellAtomicEffectKind, GameTermEntry>
+} as const satisfies Record<string, GameTermEntry>
+
+export type SpellAtomicEffectKind = keyof typeof SPELL_ATOMIC_EFFECT_KIND_ENTRIES
+
+export const SPELL_ATOMIC_EFFECT_KINDS = keysFromEntries(SPELL_ATOMIC_EFFECT_KIND_ENTRIES)
 
 /** Display label for an atomic effect kind (array item title prefix). */
 export function getSpellAtomicEffectKindLabel(kind: SpellAtomicEffectKind): string {

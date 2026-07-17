@@ -2,7 +2,6 @@ import { describe, expect, it } from 'vitest'
 
 import {
   USAGE_FREQUENCIES,
-  USAGE_FREQUENCY_ENTRIES,
   getUsageFrequencyEntry,
   getUsageFrequencyLabel,
   getUsageFrequencySentenceForm,
@@ -22,10 +21,6 @@ describe('usageFrequencySchema', () => {
 })
 
 describe('usage frequency vocabulary', () => {
-  it('derives USAGE_FREQUENCIES from the entry map', () => {
-    expect([...USAGE_FREQUENCIES].sort()).toEqual(Object.keys(USAGE_FREQUENCY_ENTRIES).sort())
-  })
-
   it('has a label and description for every usage frequency', () => {
     for (const frequency of USAGE_FREQUENCIES) {
       const entry = getUsageFrequencyEntry(frequency)

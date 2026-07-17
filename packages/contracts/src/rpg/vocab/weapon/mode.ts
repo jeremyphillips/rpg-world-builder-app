@@ -1,16 +1,9 @@
-import { z } from 'zod'
-
+import { keysFromEntries, vocabEnumFromEntries } from '../enum-schema'
 import type { GameTermEntry } from '../types'
 
 // ---------------------------------------------------------------------------
 // Weapon mode — melee vs ranged.
 // ---------------------------------------------------------------------------
-
-export const WEAPON_MODES = ['melee', 'ranged'] as const
-
-export const weaponModeSchema = z.enum(WEAPON_MODES)
-
-export type WeaponMode = z.infer<typeof weaponModeSchema>
 
 export const WEAPON_MODE_ENTRIES = {
   melee: {
@@ -21,7 +14,13 @@ export const WEAPON_MODE_ENTRIES = {
     label: 'Ranged',
     description: 'Used to make ranged attacks against targets at a distance.',
   },
-} as const satisfies Record<WeaponMode, GameTermEntry>
+} as const satisfies Record<string, GameTermEntry>
+
+export type WeaponMode = keyof typeof WEAPON_MODE_ENTRIES
+
+export const WEAPON_MODES = keysFromEntries(WEAPON_MODE_ENTRIES)
+
+export const weaponModeSchema = vocabEnumFromEntries(WEAPON_MODE_ENTRIES)
 
 /** Returns the reference entry for a weapon mode, if known. */
 export function getWeaponModeEntry(m: string): GameTermEntry | undefined {

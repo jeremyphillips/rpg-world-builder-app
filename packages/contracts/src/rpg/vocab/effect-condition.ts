@@ -1,5 +1,4 @@
-import { z } from 'zod'
-
+import { vocabEnumFromEntries, keysFromEntries } from './enum-schema'
 import type { GameTermEntry } from './types'
 
 // ---------------------------------------------------------------------------
@@ -80,12 +79,9 @@ export const EFFECT_CONDITION_ENTRIES = {
 
 export type EffectConditionId = keyof typeof EFFECT_CONDITION_ENTRIES
 
-export const EFFECT_CONDITION_IDS = Object.keys(EFFECT_CONDITION_ENTRIES) as [
-  EffectConditionId,
-  ...EffectConditionId[],
-]
+export const EFFECT_CONDITION_IDS = keysFromEntries(EFFECT_CONDITION_ENTRIES)
 
-export const effectConditionSchema = z.enum(EFFECT_CONDITION_IDS)
+export const effectConditionSchema = vocabEnumFromEntries(EFFECT_CONDITION_ENTRIES)
 
 /** Returns the reference entry for a condition id, if known. */
 export function getEffectConditionEntry(id: string): GameTermEntry | undefined {

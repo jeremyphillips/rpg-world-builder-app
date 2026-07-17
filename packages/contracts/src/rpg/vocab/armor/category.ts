@@ -1,4 +1,4 @@
-import { z } from 'zod'
+import { keysFromEntries, vocabEnumFromEntries } from '../enum-schema'
 
 import { formatVocabularySlugLabel } from '../format-slug-label'
 import { getTermLabelSingular, getTermSentenceForm, type GameTermEntry } from '../types'
@@ -7,12 +7,6 @@ import { getTermLabelSingular, getTermSentenceForm, type GameTermEntry } from '.
 // Armor categories — the closed SRD 5.2.1 category set. Used by class
 // proficiencies, species grants, and the full armor content type.
 // ---------------------------------------------------------------------------
-
-export const ARMOR_CATEGORIES = ['light', 'medium', 'heavy', 'shields'] as const
-
-export const armorCategorySchema = z.enum(ARMOR_CATEGORIES)
-
-export type ArmorCategory = z.infer<typeof armorCategorySchema>
 
 export const ARMOR_CATEGORY_ENTRIES = {
   light: {
@@ -47,7 +41,13 @@ export const ARMOR_CATEGORY_ENTRIES = {
       plural: 'shields',
     },
   },
-} as const satisfies Record<ArmorCategory, GameTermEntry>
+} as const satisfies Record<string, GameTermEntry>
+
+export type ArmorCategory = keyof typeof ARMOR_CATEGORY_ENTRIES
+
+export const ARMOR_CATEGORIES = keysFromEntries(ARMOR_CATEGORY_ENTRIES)
+
+export const armorCategorySchema = vocabEnumFromEntries(ARMOR_CATEGORY_ENTRIES)
 
 /** Returns the reference entry for an armor category, if known. */
 export function getArmorCategoryEntry(c: string): GameTermEntry | undefined {

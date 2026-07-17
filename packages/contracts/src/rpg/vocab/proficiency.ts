@@ -1,13 +1,10 @@
+import { keysFromEntries } from './enum-schema'
 import { getTermSentenceForm, type GameTermEntry } from './types'
 
 // ---------------------------------------------------------------------------
 // Proficiency grant kinds — weapon, tool, skill, and armor training terms
 // shared by grant formatters, authoring UI, and character builder surfaces.
 // ---------------------------------------------------------------------------
-
-export const PROFICIENCY_DOMAINS = ['weapon', 'tool', 'skill', 'armor'] as const
-
-export type ProficiencyDomain = (typeof PROFICIENCY_DOMAINS)[number]
 
 export const PROFICIENCY_DOMAIN_ENTRIES = {
   weapon: {
@@ -42,7 +39,11 @@ export const PROFICIENCY_DOMAIN_ENTRIES = {
       plural: 'armor training',
     },
   },
-} as const satisfies Record<ProficiencyDomain, GameTermEntry>
+} as const satisfies Record<string, GameTermEntry>
+
+export type ProficiencyDomain = keyof typeof PROFICIENCY_DOMAIN_ENTRIES
+
+export const PROFICIENCY_DOMAINS = keysFromEntries(PROFICIENCY_DOMAIN_ENTRIES)
 
 export const PROFICIENCY_POOL_ANY_LABELS = {
   weapon: 'any weapon',

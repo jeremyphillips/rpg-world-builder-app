@@ -1,5 +1,4 @@
-import { z } from 'zod'
-
+import { vocabEnumFromEntries, keysFromEntries } from '../enum-schema'
 import type { VocabularyOptionSetId } from '../vocabulary'
 import { getTermSentenceForm } from '../types'
 import type { GameTermEntry } from '../types'
@@ -62,12 +61,9 @@ export const ATTACK_RESOLUTION_MODE_ENTRIES = {
 
 export type AttackResolutionModeId = keyof typeof ATTACK_RESOLUTION_MODE_ENTRIES
 
-export const ATTACK_RESOLUTION_MODE_IDS = Object.keys(ATTACK_RESOLUTION_MODE_ENTRIES) as [
-  AttackResolutionModeId,
-  ...AttackResolutionModeId[],
-]
+export const ATTACK_RESOLUTION_MODE_IDS = keysFromEntries(ATTACK_RESOLUTION_MODE_ENTRIES)
 
-export const attackResolutionModeIdSchema = z.enum(ATTACK_RESOLUTION_MODE_IDS)
+export const attackResolutionModeIdSchema = vocabEnumFromEntries(ATTACK_RESOLUTION_MODE_ENTRIES)
 
 export const DEFAULT_ATTACK_RESOLUTION_MODE_ID =
   'proficiency_attack_vs_ac' as const satisfies AttackResolutionModeId

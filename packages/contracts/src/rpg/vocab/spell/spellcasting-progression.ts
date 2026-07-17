@@ -1,5 +1,5 @@
 import type { GameTermEntry } from '../types'
-import { vocabEnumFromEntries } from '../enum-schema'
+import { vocabEnumFromEntries, keysFromEntries } from '../enum-schema'
 
 // ---------------------------------------------------------------------------
 // Spellcasting progression — full, half, and pact magic advancement tables.
@@ -34,10 +34,7 @@ export const SPELLCASTING_PROGRESSION_ENTRIES = {
 
 export type SpellcastingProgression = keyof typeof SPELLCASTING_PROGRESSION_ENTRIES
 
-export const SPELLCASTING_PROGRESSIONS = Object.keys(SPELLCASTING_PROGRESSION_ENTRIES) as [
-  SpellcastingProgression,
-  ...SpellcastingProgression[],
-]
+export const SPELLCASTING_PROGRESSIONS = keysFromEntries(SPELLCASTING_PROGRESSION_ENTRIES)
 
 export const spellcastingProgressionSchema = vocabEnumFromEntries(SPELLCASTING_PROGRESSION_ENTRIES)
 

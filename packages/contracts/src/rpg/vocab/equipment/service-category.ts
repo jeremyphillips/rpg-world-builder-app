@@ -1,4 +1,4 @@
-import { z } from 'zod'
+import { keysFromEntries, vocabEnumFromEntries } from '../enum-schema'
 
 import { getTermSentenceForm } from '../types'
 import type { GameTermEntry } from '../types'
@@ -6,22 +6,6 @@ import type { GameTermEntry } from '../types'
 // ---------------------------------------------------------------------------
 // Service categories — hirelings, lodging, travel, and other paid services.
 // ---------------------------------------------------------------------------
-
-export const SERVICE_CATEGORIES = [
-  'hireling',
-  'lodging',
-  'meal',
-  'travel',
-  'transport',
-  'stable',
-  'spellcasting',
-  'lifestyle',
-  'other',
-] as const
-
-export const serviceCategorySchema = z.enum(SERVICE_CATEGORIES)
-
-export type ServiceCategory = z.infer<typeof serviceCategorySchema>
 
 export const SERVICE_CATEGORY_ENTRIES = {
   hireling: {
@@ -92,7 +76,13 @@ export const SERVICE_CATEGORY_ENTRIES = {
     label: 'Other',
     description: 'A service that does not fit another category.',
   },
-} as const satisfies Record<ServiceCategory, GameTermEntry>
+} as const satisfies Record<string, GameTermEntry>
+
+export type ServiceCategory = keyof typeof SERVICE_CATEGORY_ENTRIES
+
+export const SERVICE_CATEGORIES = keysFromEntries(SERVICE_CATEGORY_ENTRIES)
+
+export const serviceCategorySchema = vocabEnumFromEntries(SERVICE_CATEGORY_ENTRIES)
 
 /** Returns the reference entry for a service category, if known. */
 export function getServiceCategoryEntry(category: string): GameTermEntry | undefined {

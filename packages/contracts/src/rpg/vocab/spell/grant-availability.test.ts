@@ -1,7 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
 import {
-  SPELL_GRANT_AVAILABILITY_ENTRIES,
   SPELL_GRANT_AVAILABILITIES,
   getSpellGrantAvailabilityLabel,
   spellGrantAvailabilitySchema,
@@ -17,12 +16,6 @@ describe('spellGrantAvailabilitySchema', () => {
 
   it('rejects unknown availability values', () => {
     expect(spellGrantAvailabilitySchema.safeParse('known').success).toBe(false)
-  })
-
-  it('derives enum keys from the entry map', () => {
-    expect([...SPELL_GRANT_AVAILABILITIES].sort()).toEqual(
-      Object.keys(SPELL_GRANT_AVAILABILITY_ENTRIES).sort(),
-    )
   })
 
   it('returns labels and falls back for unknown ids', () => {

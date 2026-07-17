@@ -1,5 +1,4 @@
-import { z } from 'zod'
-
+import { vocabEnumFromEntries, keysFromEntries } from '../enum-schema'
 import type { GameTermEntry } from '../types'
 
 // ---------------------------------------------------------------------------
@@ -39,12 +38,9 @@ export const PHYSICAL_DAMAGE_TYPE_ENTRIES = {
 
 export type PhysicalDamageType = keyof typeof PHYSICAL_DAMAGE_TYPE_ENTRIES
 
-export const PHYSICAL_DAMAGE_TYPE_IDS = Object.keys(PHYSICAL_DAMAGE_TYPE_ENTRIES) as [
-  PhysicalDamageType,
-  ...PhysicalDamageType[],
-]
+export const PHYSICAL_DAMAGE_TYPE_IDS = keysFromEntries(PHYSICAL_DAMAGE_TYPE_ENTRIES)
 
-export const physicalDamageTypeSchema = z.enum(PHYSICAL_DAMAGE_TYPE_IDS)
+export const physicalDamageTypeSchema = vocabEnumFromEntries(PHYSICAL_DAMAGE_TYPE_ENTRIES)
 
 /** Returns the reference entry for a physical damage type id, if known. */
 export function getPhysicalDamageTypeEntry(id: string): GameTermEntry | undefined {

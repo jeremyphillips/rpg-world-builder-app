@@ -1,5 +1,4 @@
-import { z } from 'zod'
-
+import { keysFromEntries, vocabEnumFromEntries } from '../enum-schema'
 import { formatVocabularySlugLabel } from '../format-slug-label'
 import { getTermSentenceForm, type GameTermEntry } from '../types'
 
@@ -7,12 +6,6 @@ import { getTermSentenceForm, type GameTermEntry } from '../types'
 // Weapon categories — simple/martial taxonomy consumed by class proficiencies
 // and the full weapon content type.
 // ---------------------------------------------------------------------------
-
-export const WEAPON_CATEGORIES = ['simple', 'martial'] as const
-
-export const weaponCategorySchema = z.enum(WEAPON_CATEGORIES)
-
-export type WeaponCategory = z.infer<typeof weaponCategorySchema>
 
 export const WEAPON_CATEGORY_ENTRIES = {
   simple: {
@@ -33,7 +26,13 @@ export const WEAPON_CATEGORY_ENTRIES = {
       plural: 'martial weapons',
     },
   },
-} as const satisfies Record<WeaponCategory, GameTermEntry>
+} as const satisfies Record<string, GameTermEntry>
+
+export type WeaponCategory = keyof typeof WEAPON_CATEGORY_ENTRIES
+
+export const WEAPON_CATEGORIES = keysFromEntries(WEAPON_CATEGORY_ENTRIES)
+
+export const weaponCategorySchema = vocabEnumFromEntries(WEAPON_CATEGORY_ENTRIES)
 
 /** Returns the reference entry for a weapon category, if known. */
 export function getWeaponCategoryEntry(c: string): GameTermEntry | undefined {

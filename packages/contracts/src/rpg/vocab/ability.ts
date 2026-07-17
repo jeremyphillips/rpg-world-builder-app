@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-import { vocabEnumFromEntries } from './enum-schema'
+import { vocabEnumFromEntries, keysFromEntries } from './enum-schema'
 import { getTermSentenceForm } from './types'
 import type { GameTermEntry } from './types'
 import { abilityValidationMessages } from './ability-messages'
@@ -63,7 +63,7 @@ export const ABILITY_ENTRIES = {
 
 export type Ability = keyof typeof ABILITY_ENTRIES
 
-export const ABILITY_IDS = Object.keys(ABILITY_ENTRIES) as [Ability, ...Ability[]]
+export const ABILITY_IDS = keysFromEntries(ABILITY_ENTRIES)
 
 export const abilitySchema = vocabEnumFromEntries(ABILITY_ENTRIES)
 

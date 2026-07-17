@@ -1,16 +1,9 @@
-import { z } from 'zod'
-
+import { keysFromEntries, vocabEnumFromEntries } from '../enum-schema'
 import type { GameTermEntry } from '../types'
 
 // ---------------------------------------------------------------------------
 // Holy symbol usage — how a divine focus must be carried (SRD Holy Symbols table).
 // ---------------------------------------------------------------------------
-
-export const HOLY_SYMBOL_USAGES = ['worn', 'held', 'borne_on_fabric', 'borne_on_shield'] as const
-
-export const holySymbolUsageSchema = z.enum(HOLY_SYMBOL_USAGES)
-
-export type HolySymbolUsage = z.infer<typeof holySymbolUsageSchema>
 
 export const HOLY_SYMBOL_USAGE_ENTRIES = {
   worn: {
@@ -29,7 +22,13 @@ export const HOLY_SYMBOL_USAGE_ENTRIES = {
     label: 'Borne on shield',
     description: 'Emblazoned on a shield.',
   },
-} as const satisfies Record<HolySymbolUsage, GameTermEntry>
+} as const satisfies Record<string, GameTermEntry>
+
+export type HolySymbolUsage = keyof typeof HOLY_SYMBOL_USAGE_ENTRIES
+
+export const HOLY_SYMBOL_USAGES = keysFromEntries(HOLY_SYMBOL_USAGE_ENTRIES)
+
+export const holySymbolUsageSchema = vocabEnumFromEntries(HOLY_SYMBOL_USAGE_ENTRIES)
 
 /** Returns the display label for a holy symbol usage id. */
 export function getHolySymbolUsageLabel(usage: string): string {

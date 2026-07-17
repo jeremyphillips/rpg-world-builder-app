@@ -1,9 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import {
-  FEAT_CATEGORY_ENTRIES,
   FEAT_CATEGORY_IDS,
-  FEAT_PART_ENTRIES,
   FEAT_PART_IDS,
   getFeatCategoryEntry,
   getFeatCategoryLabel,
@@ -18,10 +16,6 @@ describe('featCategorySchema', () => {
     for (const id of FEAT_CATEGORY_IDS) {
       expect(featCategorySchema.parse(id)).toBe(id)
     }
-  })
-
-  it('derives ids from the category map', () => {
-    expect(FEAT_CATEGORY_IDS).toEqual(Object.keys(FEAT_CATEGORY_ENTRIES))
   })
 
   it('rejects unknown categories', () => {
@@ -51,10 +45,6 @@ describe('feat category vocabulary', () => {
 })
 
 describe('feat part vocabulary', () => {
-  it('derives part ids from the entry map', () => {
-    expect(FEAT_PART_IDS).toEqual(Object.keys(FEAT_PART_ENTRIES))
-  })
-
   it('has a label and description for every part', () => {
     for (const id of FEAT_PART_IDS) {
       const entry = getFeatPartEntry(id)

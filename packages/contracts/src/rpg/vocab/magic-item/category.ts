@@ -1,4 +1,4 @@
-import { z } from 'zod'
+import { keysFromEntries, vocabEnumFromEntries } from '../enum-schema'
 
 import { getTermSentenceForm } from '../types'
 import type { GameTermEntry } from '../types'
@@ -6,23 +6,6 @@ import type { GameTermEntry } from '../types'
 // ---------------------------------------------------------------------------
 // Magic item categories — DMG item types for filtering and display.
 // ---------------------------------------------------------------------------
-
-export const MAGIC_ITEM_CATEGORIES = [
-  'weapon',
-  'armor',
-  'wondrous_item',
-  'potion',
-  'ring',
-  'rod',
-  'scroll',
-  'staff',
-  'wand',
-  'other',
-] as const
-
-export const magicItemCategorySchema = z.enum(MAGIC_ITEM_CATEGORIES)
-
-export type MagicItemCategory = z.infer<typeof magicItemCategorySchema>
 
 export const MAGIC_ITEM_CATEGORY_ENTRIES = {
   weapon: {
@@ -101,7 +84,13 @@ export const MAGIC_ITEM_CATEGORY_ENTRIES = {
     label: 'Other',
     description: 'A magic item that does not fit another category.',
   },
-} as const satisfies Record<MagicItemCategory, GameTermEntry>
+} as const satisfies Record<string, GameTermEntry>
+
+export type MagicItemCategory = keyof typeof MAGIC_ITEM_CATEGORY_ENTRIES
+
+export const MAGIC_ITEM_CATEGORIES = keysFromEntries(MAGIC_ITEM_CATEGORY_ENTRIES)
+
+export const magicItemCategorySchema = vocabEnumFromEntries(MAGIC_ITEM_CATEGORY_ENTRIES)
 
 /** Returns the reference entry for a magic item category, if known. */
 export function getMagicItemCategoryEntry(category: string): GameTermEntry | undefined {

@@ -14,10 +14,6 @@ describe('equipmentKindSchema', () => {
     }
   })
 
-  it('derives enum keys from the entry map', () => {
-    expect([...EQUIPMENT_KINDS].sort()).toEqual(Object.keys(EQUIPMENT_KIND_ENTRIES).sort())
-  })
-
   it('has a label and description for every equipment kind', () => {
     for (const kind of EQUIPMENT_KINDS) {
       const entry = EQUIPMENT_KIND_ENTRIES[kind]

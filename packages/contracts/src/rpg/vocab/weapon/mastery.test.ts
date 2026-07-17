@@ -2,7 +2,6 @@ import { describe, expect, it } from 'vitest'
 
 import {
   WEAPON_MASTERIES,
-  WEAPON_MASTERY_ENTRIES,
   getWeaponMasteryEntry,
   getWeaponMasteryLabel,
   weaponMasterySchema,
@@ -21,10 +20,6 @@ describe('weaponMasterySchema', () => {
 })
 
 describe('weapon mastery vocabulary', () => {
-  it('exposes every mastery in WEAPON_MASTERIES', () => {
-    expect([...WEAPON_MASTERIES].sort()).toEqual(Object.keys(WEAPON_MASTERY_ENTRIES).sort())
-  })
-
   it('has a label and description for every mastery', () => {
     for (const mastery of WEAPON_MASTERIES) {
       const entry = getWeaponMasteryEntry(mastery)

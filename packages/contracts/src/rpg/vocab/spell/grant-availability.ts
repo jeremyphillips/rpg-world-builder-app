@@ -1,5 +1,5 @@
 import type { GameTermEntry } from '../types'
-import { vocabEnumFromEntries } from '../enum-schema'
+import { vocabEnumFromEntries, keysFromEntries } from '../enum-schema'
 
 // ---------------------------------------------------------------------------
 // Spell grant availability — per-spell access granted by traits and features.
@@ -20,10 +20,7 @@ export const SPELL_GRANT_AVAILABILITY_ENTRIES = {
 
 export type SpellGrantAvailability = keyof typeof SPELL_GRANT_AVAILABILITY_ENTRIES
 
-export const SPELL_GRANT_AVAILABILITIES = Object.keys(SPELL_GRANT_AVAILABILITY_ENTRIES) as [
-  SpellGrantAvailability,
-  ...SpellGrantAvailability[],
-]
+export const SPELL_GRANT_AVAILABILITIES = keysFromEntries(SPELL_GRANT_AVAILABILITY_ENTRIES)
 
 export const spellGrantAvailabilitySchema = vocabEnumFromEntries(SPELL_GRANT_AVAILABILITY_ENTRIES)
 

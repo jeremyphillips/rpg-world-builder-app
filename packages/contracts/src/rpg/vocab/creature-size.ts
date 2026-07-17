@@ -1,5 +1,4 @@
-import { z } from 'zod'
-
+import { vocabEnumFromEntries, keysFromEntries } from './enum-schema'
 import { getTermSentenceForm } from './types'
 import type { GameTermEntry } from './types'
 
@@ -64,12 +63,9 @@ export const CREATURE_SIZE_ENTRIES = {
 
 export type CreatureSize = keyof typeof CREATURE_SIZE_ENTRIES
 
-export const CREATURE_SIZES = Object.keys(CREATURE_SIZE_ENTRIES) as [
-  CreatureSize,
-  ...CreatureSize[],
-]
+export const CREATURE_SIZES = keysFromEntries(CREATURE_SIZE_ENTRIES)
 
-export const creatureSizeSchema = z.enum(CREATURE_SIZES)
+export const creatureSizeSchema = vocabEnumFromEntries(CREATURE_SIZE_ENTRIES)
 
 /** Returns the reference entry for a creature size id, if known. */
 export function getCreatureSizeEntry(id: string): GameTermEntry | undefined {

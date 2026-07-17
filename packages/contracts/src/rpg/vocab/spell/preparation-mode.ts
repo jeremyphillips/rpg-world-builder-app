@@ -1,5 +1,5 @@
 import type { GameTermEntry } from '../types'
-import { vocabEnumFromEntries } from '../enum-schema'
+import { vocabEnumFromEntries, keysFromEntries } from '../enum-schema'
 
 // ---------------------------------------------------------------------------
 // Spell preparation mode — how a class prepares or knows spells (SRD class block).
@@ -25,10 +25,7 @@ export const SPELL_PREPARATION_MODE_ENTRIES = {
 
 export type SpellPreparationMode = keyof typeof SPELL_PREPARATION_MODE_ENTRIES
 
-export const SPELL_PREPARATION_MODES = Object.keys(SPELL_PREPARATION_MODE_ENTRIES) as [
-  SpellPreparationMode,
-  ...SpellPreparationMode[],
-]
+export const SPELL_PREPARATION_MODES = keysFromEntries(SPELL_PREPARATION_MODE_ENTRIES)
 
 /** @deprecated Prefer `SPELL_PREPARATION_MODE_ENTRIES[id].label`. */
 export const SPELL_PREPARATION_MODE_LABELS = Object.fromEntries(
