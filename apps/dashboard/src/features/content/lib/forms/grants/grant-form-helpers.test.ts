@@ -37,8 +37,8 @@ function formItemKey(item: FormItem | RowConfig, index: number, namePrefix?: str
   switch (item.kind) {
     case 'group':
       return namePrefix ? `${namePrefix}.group-${index}` : `group-${index}`
-    case 'stack':
-      return namePrefix ? `${namePrefix}.stack-${index}` : `stack-${index}`
+    case 'dependent':
+      return namePrefix ? `${namePrefix}.dependent-${index}` : `dependent-${index}`
     case 'row':
       return namePrefix ? `${namePrefix}.row-${index}` : `row-${index}`
     case 'slot':
@@ -73,6 +73,14 @@ function walkDuplicateFormItemKeys(
 
   for (const item of items) {
     if (!isContainer(item) || item.kind === 'slot' || item.kind === 'array') continue
+    if (item.kind === 'dependent') {
+      walkDuplicateFormItemKeys(
+        [item.controller, ...item.dependents.fields],
+        namePrefix,
+        duplicates,
+      )
+      continue
+    }
     walkDuplicateFormItemKeys(item.fields, namePrefix, duplicates)
   }
 

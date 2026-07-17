@@ -31,9 +31,9 @@ describe('array-item-config.lib', () => {
       resolveArrayItemVariant(
         {
           kind: 'array',
+          item: { variant: 'detailed' },
           name: 'effects',
           legend: '',
-          itemVariant: 'detailed',
           fields: [{ type: 'text', name: 'kind', label: 'Kind' }],
         },
         { nested: true },

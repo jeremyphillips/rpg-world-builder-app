@@ -241,10 +241,9 @@ export {
   type FieldStackRhythm,
 } from './components/ui/field.variants'
 export {
-  fieldStackDependentsChromeVariants,
-  type FieldStackDependentsTone,
-  type FieldStackDependentsChromeVariantProps,
-} from './components/ui/field-stack.variants'
+  resolveFieldDependentsChromeClasses,
+  type FieldDependentsScope,
+} from './components/ui/field-dependent.variants'
 export { FieldRow, type FieldRowProps } from './components/ui/field-row'
 
 export { FormCard, formCardContentClass } from './components/ui/form-card'
@@ -371,7 +370,7 @@ export {
   type CollapsibleListItemProps,
   type CollapsibleListItemActionsAlign,
   type CollapsibleListItemShellProps,
-  type CollapsibleListItemShellTone,
+  type CollapsibleListItemShellPreset,
   type CollapsibleListItemToolbarProps,
 } from './components/ui/collapsible-list-item'
 export {

@@ -17,6 +17,8 @@ import {
 } from '../../../components/ui/field.variants'
 import {
   isNestedArraySection,
+  resolveArrayAddAction,
+  resolveArrayItemConfig,
   resolveArrayItemReorder,
   resolveArrayItemVariant,
 } from '../../config/array/array-item-config.lib'
@@ -53,19 +55,19 @@ export function useArrayFieldRendererState({
   const { addValidationSessionExpandKeys } = useFormUiContext()
   const validation = useFormValidationPresentation()
   const { rhythm, size, depth, inRhythmStack } = useFormSectionContext()
+  const itemConfig = resolveArrayItemConfig(config)
+  const addAction = resolveArrayAddAction(config)
   const {
-    addActionLabel = 'Add item',
-    addActionVariant = 'outline',
-    addActionLayout = 'stacked',
-    addActionSize,
-    showAddIcon = true,
-    min = 0,
-    max,
-    legend,
-    legendSize = 'array',
-    itemCollapsible = false,
-    itemCollapseKey,
-  } = config
+    label: addActionLabel = 'Add item',
+    variant: addActionVariant = 'outline',
+    layout: addActionLayout = 'stacked',
+    size: addActionSize,
+    icon: showAddIcon = true,
+    menu: addActionMenu,
+  } = addAction ?? {}
+  const { min = 0, max, legend, legendSize = 'array' } = config
+  const itemCollapsible = itemConfig.collapsible
+  const itemCollapseKey = itemConfig.collapseKey
 
   const legendScale = legendSize === 'array' ? resolveArrayLegendScale(size) : 'default'
   const itemListClasses = fieldArrayItemListClasses({ rhythm, size })
@@ -91,7 +93,7 @@ export function useArrayFieldRendererState({
   })
 
   const canRemove = fields.length > min
-  const showDefaultItemRemove = !config.hideItemRemove && !config.itemRemoveSlot
+  const showDefaultItemRemove = itemConfig.removable && !itemConfig.removeSlot
   const canAdd = max === undefined || fields.length < max
   const invalidRowCount = validation.hasAttemptedSubmit
     ? countInvalidArrayItems(validation.issues, fullName)
@@ -104,7 +106,7 @@ export function useArrayFieldRendererState({
     fullName,
     idPrefix,
     arrayPattern: config.arrayPattern,
-    itemCollapseKey: config.itemCollapseKey,
+    itemCollapseKey: itemConfig.collapseKey,
     issues: validation.issues,
     fields: validation.fields,
     getItemValues,
@@ -160,11 +162,13 @@ export function useArrayFieldRendererState({
   )
 
   return {
+    addAction,
     addActionLabel,
     addActionVariant,
     addActionLayout,
     addActionSize,
     showAddIcon,
+    addActionMenu,
     addActionMenuItems,
     appendFromAddMenu,
     appendItem,

@@ -1,8 +1,8 @@
 import { describe, expect, expectTypeOf, it } from 'vitest'
 
 import {
-  FIELD_SURFACE_TONES,
-  fieldSurfaceToneVariants,
+  FIELD_SURFACE_VARIANTS,
+  resolveFieldContainerChromeClasses,
 } from '../components/ui/field-surface.variants'
 import {
   FIELD_WIDTHS,
@@ -22,9 +22,9 @@ describe('form field vocabulary parity', () => {
     expectTypeOf<FieldWidth>().toEqualTypeOf<(typeof FIELD_WIDTHS)[number]>()
   })
 
-  it('FIELD_SURFACE_TONES entries are accepted by fieldSurfaceToneVariants', () => {
-    for (const tone of FIELD_SURFACE_TONES) {
-      expect(fieldSurfaceToneVariants({ tone })).toBeTypeOf('string')
+  it('FIELD_SURFACE_VARIANTS entries are accepted by resolveFieldContainerChromeClasses', () => {
+    for (const surface of FIELD_SURFACE_VARIANTS) {
+      expect(resolveFieldContainerChromeClasses({ surface })).toBeTypeOf('string')
     }
   })
 

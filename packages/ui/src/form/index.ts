@@ -75,6 +75,9 @@ export {
   combineFieldVisibilityAll,
   resolveDependentsVisibility,
   resolveFieldHint,
+  normalizeFieldHint,
+  resolveFieldHintPosition,
+  resolveFieldHintPresentation,
   applyOptionAvailabilityToFieldOptions,
   applyOptionAvailabilityToSelectOptions,
   flattenSelectFieldOptions,
@@ -126,7 +129,13 @@ export {
   type GroupFieldItem,
   type FieldGroupFieldsChrome,
   type FieldChrome,
-  type StackConfig,
+  type FieldHintConfig,
+  type DependentConfig,
+  type DependentDependentsConfig,
+  type ArrayAddActionConfig,
+  type ArrayItemConfig,
+  type ArrayFilterSelectConfig,
+  type ArrayFilterSelectFn,
   type ArrayConfig,
   type ArrayItemHeaderConfig,
   type ArrayItemReorder,
@@ -149,10 +158,19 @@ export {
   defineGroupField,
   defineInlineSentenceField,
   defineSelectField,
-  defineStackField,
+  defineDependentField,
 } from './form-authoring'
 export { FIELD_WIDTHS, type FieldWidth } from '../components/ui/field-control.variants'
-export { FIELD_SURFACE_TONES, type FieldSurfaceTone } from '../components/ui/field-surface.variants'
+export {
+  FIELD_SURFACE_VARIANTS,
+  FIELD_STATUS_TONES,
+  type FieldSurfaceVariant,
+  type FieldStatusTone,
+} from '../components/ui/field-surface.variants'
+export {
+  resolveFieldDependentsChromeClasses,
+  type FieldDependentsScope,
+} from '../components/ui/field-dependent.variants'
 export {
   DICE_FORMULA_TAIL_OPERATORS,
   DICE_FORMULA_OPERATORS,
@@ -250,10 +268,6 @@ export {
   fieldArrayItemListClasses,
   type FieldGroupLegendSize,
   type FieldSeparator,
-  type FieldStackLayout,
+  type FieldRhythm,
   type FieldStackRhythm,
 } from '../components/ui/field.variants'
-export type {
-  FieldStackDependentsChromeScope,
-  FieldStackDependentsTone,
-} from '../components/ui/field-stack.variants'

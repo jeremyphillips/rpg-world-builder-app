@@ -2,7 +2,7 @@
 
 import * as React from 'react'
 
-import type { ArrayConfig } from '../../field-config'
+import type { ArrayConfig, ArrayItemConfig } from '../../field-config'
 import type { ValidationSessionExpandKey } from '../../context/form-ui.context'
 import { buildValidationSessionExpandKey, sortFormIssues, type FormIssue } from '../../errors'
 import { collectArraySections } from '../../errors/resolve-field-order'
@@ -13,7 +13,7 @@ interface UseFocusFirstArrayIssueOptions {
   fullName: string
   idPrefix: string
   arrayPattern: ArrayConfig['arrayPattern']
-  itemCollapseKey: ArrayConfig['itemCollapseKey']
+  itemCollapseKey: ArrayItemConfig['collapseKey']
   issues: FormIssue[]
   fields: FormItem[]
   getItemValues: (index: number) => Record<string, unknown>

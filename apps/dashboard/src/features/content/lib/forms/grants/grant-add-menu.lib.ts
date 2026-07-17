@@ -1,5 +1,4 @@
 import type { WeightedSearchField } from '@rpg/ui'
-import type { ArrayConfig } from '@rpg/ui/form'
 
 import type { GrantType } from './grant-form-schema'
 import {
@@ -14,7 +13,9 @@ import {
 const VOCAB_LABEL_WEIGHT = 0.8
 const VOCAB_DESCRIPTION_WEIGHT = 0.8
 
-export type GrantArrayAddMenuConfig = NonNullable<ArrayConfig['addActionMenu']>
+export type GrantArrayAddMenuConfig = NonNullable<
+  import('@rpg/ui/form').ArrayAddActionConfig['menu']
+>
 
 function buildTemplateSearchTerms(template: GrantTemplate): WeightedSearchField[] {
   const fields: WeightedSearchField[] = [

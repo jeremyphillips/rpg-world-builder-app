@@ -4,7 +4,8 @@ import * as React from 'react'
 
 import { CollapsibleListItem } from './collapsible-list-item'
 import type { CatalogPickerSheetProps } from './catalog-picker-sheet.types'
-import type { CollapsibleListItemShellTone } from './collapsible-list-item/collapsible-list-item-shell.client'
+import type { CollapsibleListItemShellPreset } from './collapsible-list-item/collapsible-list-item-shell.client'
+import type { FieldSurfaceVariant } from './field-surface.variants'
 import { catalogPickerSheetListVariants } from './catalog-picker-sheet.variants'
 
 function CatalogPickerCollapsibleItemRow<TItem>({
@@ -15,7 +16,8 @@ function CatalogPickerCollapsibleItemRow<TItem>({
   renderItemSummary,
   renderItemActions,
   renderItemDetails,
-  rowTone = 'main',
+  rowPreset,
+  rowSurface = 'base',
   toolbarCompact = false,
   rowBodyClassName,
   rowShellClassName,
@@ -27,7 +29,8 @@ function CatalogPickerCollapsibleItemRow<TItem>({
   renderItemSummary?: (item: TItem) => React.ReactNode
   renderItemActions?: (item: TItem) => React.ReactNode
   renderItemDetails?: (item: TItem) => React.ReactNode
-  rowTone?: CollapsibleListItemShellTone
+  rowPreset?: CollapsibleListItemShellPreset
+  rowSurface?: FieldSurfaceVariant
   toolbarCompact?: boolean
   rowBodyClassName?: string
   rowShellClassName?: string
@@ -44,7 +47,8 @@ function CatalogPickerCollapsibleItemRow<TItem>({
         titleId={titleId}
         bodyId={bodyId}
         toolbarAriaLabel={toolbarLabel}
-        tone={rowTone}
+        preset={rowPreset}
+        surface={rowSurface}
         toolbarCompact={toolbarCompact}
         className={rowShellClassName}
         bodyClassName={rowBodyClassName}
@@ -86,7 +90,8 @@ export function CatalogPickerSheetResults<TItem>({
               renderItemSummary={rowProps.renderItemSummary}
               renderItemActions={rowProps.renderItemActions}
               renderItemDetails={rowProps.renderItemDetails}
-              rowTone={rowProps.rowTone}
+              rowPreset={rowProps.rowPreset}
+              rowSurface={rowProps.rowSurface}
               toolbarCompact={rowProps.toolbarCompact}
               rowBodyClassName={rowProps.rowBodyClassName}
               rowShellClassName={rowProps.rowShellClassName}

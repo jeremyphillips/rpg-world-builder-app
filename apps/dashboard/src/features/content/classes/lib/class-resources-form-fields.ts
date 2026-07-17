@@ -12,14 +12,16 @@ function resourceItemFields(ctx: ContentFormCtx): FormItem[] {
       kind: 'array',
       name: 'entries',
       legend: 'Level values',
-      addActionLabel: 'Add level value',
+      addAction: { label: 'Add level value' },
       min: 1,
-      itemCollapsible: true,
-      itemHeader: {
-        fallback: (index) => `Entry ${index + 1}`,
-        primaryField: 'level',
-        formatPrimary: (value) =>
-          value !== undefined && value !== '' ? `Level ${value}` : undefined,
+      item: {
+        collapsible: true,
+        header: {
+          fallback: (index) => `Entry ${index + 1}`,
+          primaryField: 'level',
+          formatPrimary: (value) =>
+            value !== undefined && value !== '' ? `Level ${value}` : undefined,
+        },
       },
       fields: [
         {
@@ -54,11 +56,13 @@ export function resourcesArrayField(ctx: ContentFormCtx): FormItem {
     kind: 'array',
     name: 'resources',
     legend: 'Resources',
-    addActionLabel: 'Add resource',
-    itemCollapsible: true,
-    itemHeader: {
-      fallback: (index) => `Resource ${index + 1}`,
-      primaryField: 'name',
+    addAction: { label: 'Add resource' },
+    item: {
+      collapsible: true,
+      header: {
+        fallback: (index) => `Resource ${index + 1}`,
+        primaryField: 'name',
+      },
     },
     fields: resourceItemFields(ctx),
   }

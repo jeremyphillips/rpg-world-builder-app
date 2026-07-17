@@ -4,6 +4,7 @@ import {
   resolveArraySectionSize,
   resolveFieldStackRhythm,
 } from '../../components/ui/field.variants'
+import { resolveArrayItemChrome } from '../config/array/array-item-config.lib'
 import {
   buildFormSectionChildContext,
   type FormSectionContextValue,
@@ -15,6 +16,7 @@ export function buildArraySectionChildContext(
   depth: number,
   config: ArrayConfig,
 ): FormSectionContextValue {
+  const chrome = resolveArrayItemChrome(config)
   return buildFormSectionChildContext(parent, depth, {
     rhythm: resolveFieldStackRhythm({
       explicit: config.rhythm,
@@ -26,7 +28,8 @@ export function buildArraySectionChildContext(
       inherited: parent.size,
       sectionDefault: DEFAULT_ARRAY_SECTION_SIZE,
     }),
-    arrayItemTone: config.itemChrome ?? parent.arrayItemTone,
+    arrayItemSurface: chrome.surface ?? parent.arrayItemSurface,
+    arrayItemStatus: chrome.status ?? parent.arrayItemStatus,
   })
 }
 

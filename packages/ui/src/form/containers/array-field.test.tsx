@@ -44,15 +44,17 @@ const collapsibleTraitFields: FormItem[] = [
     kind: 'array',
     name: 'traits',
     legend: 'Traits',
-    itemVariant: 'detailed',
-    itemCollapsible: true,
-    itemHeader: {
-      fallback: (index) => `Trait ${index + 1}`,
-      primaryField: 'name',
-      summary: (values) => (values.description as string) || 'No description',
+    item: {
+      variant: 'detailed',
+      collapsible: true,
+      header: {
+        fallback: (index) => `Trait ${index + 1}`,
+        primaryField: 'name',
+        summary: (values) => (values.description as string) || 'No description',
+      },
     },
     fields: traitFields,
-    addActionLabel: 'Add trait',
+    addAction: { label: 'Add trait' },
   },
 ]
 
@@ -61,14 +63,16 @@ const collapsibleTraitFieldsSimpleHeader: FormItem[] = [
     kind: 'array',
     name: 'traits',
     legend: 'Traits',
-    itemVariant: 'detailed',
-    itemCollapsible: true,
-    itemHeader: {
-      fallback: (index) => `Trait ${index + 1}`,
-      primaryField: 'name',
+    item: {
+      variant: 'detailed',
+      collapsible: true,
+      header: {
+        fallback: (index) => `Trait ${index + 1}`,
+        primaryField: 'name',
+      },
     },
     fields: traitFields,
-    addActionLabel: 'Add trait',
+    addAction: { label: 'Add trait' },
   },
 ]
 
@@ -79,7 +83,7 @@ const fields: FormItem[] = [
     name: 'traits',
     legend: 'Traits',
     fields: traitFields,
-    addActionLabel: 'Add trait',
+    addAction: { label: 'Add trait' },
   },
 ]
 
@@ -125,23 +129,25 @@ describe('ArrayFieldRenderer', () => {
 
     const nestedFields: FormItem[] = [
       {
-        kind: 'stack',
-        layout: 'dependent',
-        fields: [
-          {
-            type: 'switch',
-            name: 'enabled',
-            label: 'Class-specific limits',
-            defaultValue: true,
-          },
-          {
-            kind: 'array',
-            name: 'caps',
-            legend: '',
-            addActionLabel: 'Add class limit',
-            fields: [{ type: 'text', name: 'classId', label: 'Class' }],
-          },
-        ],
+        kind: 'dependent',
+        controller: {
+          type: 'switch',
+          name: 'enabled',
+          label: 'Class-specific limits',
+          defaultValue: true,
+        },
+
+        dependents: {
+          fields: [
+            {
+              kind: 'array',
+              name: 'caps',
+              legend: '',
+              addAction: { label: 'Add class limit' },
+              fields: [{ type: 'text', name: 'classId', label: 'Class' }],
+            },
+          ],
+        },
       },
     ]
 
@@ -167,7 +173,7 @@ describe('ArrayFieldRenderer', () => {
     const itemShell = screen.getByRole('group', { name: /Item #1/ })
     expect(itemShell).toHaveClass('bg-card')
     expect(itemShell).toHaveClass('shadow-surface-raised')
-    const dependentsRegion = addButton.closest('[data-field-stack-dependents]')
+    const dependentsRegion = addButton.closest('[data-field-dependent-fields]')
     expect(dependentsRegion?.querySelector(':scope > .p-3')).toBeNull()
     expect(dependentsRegion?.querySelector('.bg-card')).toBe(itemShell)
   })
@@ -179,9 +185,9 @@ describe('ArrayFieldRenderer', () => {
         kind: 'array',
         name: 'traits',
         legend: 'Traits',
-        itemChrome: 'subtle',
+        item: { surface: 'subtle' },
         fields: traitFields,
-        addActionLabel: 'Add trait',
+        addAction: { label: 'Add trait' },
       },
     ]
 
@@ -218,8 +224,7 @@ describe('ArrayFieldRenderer', () => {
         name: 'traits',
         legend: 'Movement',
         fields: traitFields,
-        addActionLabel: 'Add speed',
-        addActionLayout: 'inline',
+        addAction: { label: 'Add speed', layout: 'inline' },
       },
     ]
 
@@ -260,8 +265,7 @@ describe('ArrayFieldRenderer', () => {
         name: 'traits',
         legend: 'Traits',
         fields: traitFields,
-        addActionLabel: 'Choose preset',
-        showAddIcon: false,
+        addAction: { label: 'Choose preset', icon: false },
       },
     ]
 
@@ -285,8 +289,7 @@ describe('ArrayFieldRenderer', () => {
         name: 'traits',
         legend: 'Traits',
         fields: traitFields,
-        addActionLabel: 'Add trait',
-        addActionSize: 'sm',
+        addAction: { label: 'Add trait', size: 'sm' },
       },
     ]
 
@@ -311,8 +314,7 @@ describe('ArrayFieldRenderer', () => {
         name: 'traits',
         legend: 'Traits',
         fields: traitFields,
-        addActionLabel: 'Add trait',
-        addActionVariant: 'secondary',
+        addAction: { label: 'Add trait', variant: 'secondary' },
       },
     ]
 
@@ -341,20 +343,22 @@ describe('ArrayFieldRenderer', () => {
         kind: 'array',
         name: 'grants',
         legend: 'Grants',
-        addActionLabel: 'Add grant',
-        addActionVariant: 'default',
-        fields: [{ type: 'text', name: 'grantType', label: 'Grant type' }],
-        addActionMenu: {
-          groups: [{ id: 'traits', label: 'Traits' }],
-          items: [
-            {
-              id: 'movement-bonus',
-              label: 'Movement bonus',
-              groupId: 'traits',
-              appendDefaults: { grantType: 'movement-bonus' },
-            },
-          ],
+        addAction: {
+          label: 'Add grant',
+          variant: 'default',
+          menu: {
+            groups: [{ id: 'traits', label: 'Traits' }],
+            items: [
+              {
+                id: 'movement-bonus',
+                label: 'Movement bonus',
+                groupId: 'traits',
+                appendDefaults: { grantType: 'movement-bonus' },
+              },
+            ],
+          },
         },
+        fields: [{ type: 'text', name: 'grantType', label: 'Grant type' }],
       },
     ]
 
@@ -394,7 +398,7 @@ describe('ArrayFieldRenderer', () => {
         legend: 'Traits',
         rhythm: 'comfortable',
         fields: traitFields,
-        addActionLabel: 'Add trait',
+        addAction: { label: 'Add trait' },
       },
     ]
 
@@ -473,7 +477,7 @@ describe('ArrayFieldRenderer', () => {
         name: 'traits',
         legend: 'Traits',
         fields: traitFields,
-        addActionLabel: 'Add trait',
+        addAction: { label: 'Add trait' },
         max: 1,
       },
     ]
@@ -498,7 +502,7 @@ describe('ArrayFieldRenderer', () => {
         name: 'traits',
         legend: 'Traits',
         fields: traitFields,
-        addActionLabel: 'Add trait',
+        addAction: { label: 'Add trait' },
         min: 1,
       },
     ]
@@ -523,8 +527,8 @@ describe('ArrayFieldRenderer', () => {
         name: 'traits',
         legend: 'Traits',
         fields: traitFields,
-        addActionLabel: 'Add trait',
-        hideItemRemove: true,
+        addAction: { label: 'Add trait' },
+        item: { removable: false },
       },
     ]
     render(
@@ -547,11 +551,12 @@ describe('ArrayFieldRenderer', () => {
         name: 'traits',
         legend: 'Traits',
         fields: traitFields,
-        addActionLabel: 'Add trait',
-        hideItemRemove: true,
-        itemRemoveSlot: {
-          name: '_customTraitRemove',
-          render: () => <button type="button">Custom remove</button>,
+        addAction: { label: 'Add trait' },
+        item: {
+          removeSlot: {
+            name: '_customTraitRemove',
+            render: () => <button type="button">Custom remove</button>,
+          },
         },
       },
     ]
@@ -585,7 +590,7 @@ describe('ArrayFieldRenderer', () => {
         kind: 'array',
         name: 'grants',
         legend: 'Grants',
-        addActionLabel: 'Add grant',
+        addAction: { label: 'Add grant' },
         fields: [
           {
             type: 'text',
@@ -606,7 +611,7 @@ describe('ArrayFieldRenderer', () => {
             kind: 'array',
             name: 'entries',
             legend: 'Spell entries',
-            addActionLabel: 'Add entry',
+            addAction: { label: 'Add entry' },
             visibility: {
               dependsOn: ['grantType'],
               visibleWhen: (v) => v.grantType === 'spells',
@@ -660,7 +665,7 @@ describe('ArrayFieldRenderer', () => {
             },
           },
         ],
-        addActionLabel: 'Add entry',
+        addAction: { label: 'Add entry' },
       },
     ]
 
@@ -710,14 +715,14 @@ describe('ArrayFieldRenderer', () => {
         kind: 'array',
         name: 'items',
         legend: 'Items',
-        addActionLabel: 'Add item',
+        addAction: { label: 'Add item' },
         fields: [
           { type: 'text', name: 'name', label: 'Name' },
           {
             kind: 'array',
             name: 'tags',
             legend: 'Tags',
-            addActionLabel: 'Add tag',
+            addAction: { label: 'Add tag' },
             fields: [{ type: 'text', name: 'label', label: 'Label' }],
           },
         ],
@@ -747,9 +752,9 @@ describe('ArrayFieldRenderer', () => {
         kind: 'array',
         name: 'traits',
         legend: 'Traits',
-        reorder: false,
+        item: { reorder: false },
         fields: traitFields,
-        addActionLabel: 'Add trait',
+        addAction: { label: 'Add trait' },
       },
     ]
 
@@ -961,10 +966,12 @@ describe('ArrayFieldRenderer', () => {
         kind: 'array',
         name: 'traits',
         legend: 'Traits',
-        itemVariant: 'compact',
+        item: {
+          variant: 'compact',
+          header: { fallback: (index) => `Trait ${index + 1}`, srOnly: true },
+        },
         fields: traitFields,
-        addActionLabel: 'Add trait',
-        itemHeader: { fallback: (index) => `Trait ${index + 1}`, srOnly: true },
+        addAction: { label: 'Add trait' },
       },
     ]
 
@@ -994,7 +1001,10 @@ describe('ArrayFieldRenderer', () => {
         kind: 'array',
         name: 'grants',
         legend: 'Grants',
-        itemVariant: 'compact',
+        item: {
+          variant: 'compact',
+          header: { fallback: (index) => `Grant ${index + 1}`, srOnly: true },
+        },
         fields: [
           {
             kind: 'row',
@@ -1004,8 +1014,7 @@ describe('ArrayFieldRenderer', () => {
             ],
           },
         ],
-        addActionLabel: 'Add grant',
-        itemHeader: { fallback: (index) => `Grant ${index + 1}`, srOnly: true },
+        addAction: { label: 'Add grant' },
       },
     ]
 
@@ -1039,7 +1048,10 @@ describe('ArrayFieldRenderer', () => {
         kind: 'array',
         name: 'utilizes',
         legend: 'Utilize actions',
-        itemVariant: 'compact',
+        item: {
+          variant: 'compact',
+          header: { fallback: (index) => `Action ${index + 1}`, primaryField: 'description' },
+        },
         fields: [
           {
             kind: 'row',
@@ -1062,8 +1074,7 @@ describe('ArrayFieldRenderer', () => {
             ],
           },
         ],
-        addActionLabel: 'Add utilize action',
-        itemHeader: { fallback: (index) => `Action ${index + 1}`, primaryField: 'description' },
+        addAction: { label: 'Add utilize action' },
       },
     ]
 
@@ -1098,17 +1109,19 @@ describe('ArrayFieldRenderer', () => {
         kind: 'array',
         name: 'examples',
         legend: 'Examples',
-        itemVariant: 'compact',
-        compactInlineAlign: 'center',
-        reorder: 'dragHandle',
+        item: {
+          variant: 'compact',
+          inlineAlign: 'center',
+          reorder: 'dragHandle',
+          header: { fallback: (index) => `Example ${index + 1}`, primaryField: 'value' },
+        },
         fields: [
           {
             kind: 'row',
             fields: [{ type: 'text', name: 'value', label: '', placeholder: 'Example…' }],
           },
         ],
-        addActionLabel: 'Add example',
-        itemHeader: { fallback: (index) => `Example ${index + 1}`, primaryField: 'value' },
+        addAction: { label: 'Add example' },
       },
     ]
 
@@ -1246,14 +1259,16 @@ describe('ArrayFieldRenderer', () => {
         kind: 'array',
         name: 'grants',
         legend: 'Grants',
-        itemVariant: 'compact',
+        item: {
+          variant: 'compact',
+          header: { fallback: (index) => `Grant ${index + 1}`, srOnly: true },
+        },
         fields: [
           { type: 'text', name: 'rarity', label: 'Rarity', required: true },
           { type: 'text', name: 'quantity', label: 'Quantity', required: true },
         ],
-        addActionLabel: 'Add grant',
+        addAction: { label: 'Add grant' },
         min: 1,
-        itemHeader: { fallback: (index) => `Grant ${index + 1}`, srOnly: true },
       },
     ]
 
@@ -1295,29 +1310,33 @@ describe('ArrayFieldRenderer', () => {
         kind: 'array',
         name: 'grants',
         legend: 'Grants',
-        addActionLabel: 'Add grant',
-        itemCollapsible: true,
-        itemHeader: {
-          fallback: (index) => `Grant ${index + 1}`,
-          primary: (values) => (values.grantType as string | undefined) ?? undefined,
+        addAction: {
+          label: 'Add grant',
+          menu: {
+            groups: [{ id: 'traits', label: 'Traits' }],
+            items: [
+              {
+                id: 'movement-bonus',
+                label: 'Movement bonus',
+                description: 'Increase speed',
+                groupId: 'traits',
+                appendDefaults: { grantType: 'movement', detail: 'Walk +5' },
+              },
+              {
+                id: 'language',
+                label: 'Language',
+                groupId: 'traits',
+                appendDefaults: () => ({ grantType: 'languages' }),
+              },
+            ],
+          },
         },
-        addActionMenu: {
-          groups: [{ id: 'traits', label: 'Traits' }],
-          items: [
-            {
-              id: 'movement-bonus',
-              label: 'Movement bonus',
-              description: 'Increase speed',
-              groupId: 'traits',
-              appendDefaults: { grantType: 'movement', detail: 'Walk +5' },
-            },
-            {
-              id: 'language',
-              label: 'Language',
-              groupId: 'traits',
-              appendDefaults: () => ({ grantType: 'languages' }),
-            },
-          ],
+        item: {
+          collapsible: true,
+          header: {
+            fallback: (index) => `Grant ${index + 1}`,
+            primary: (values) => (values.grantType as string | undefined) ?? undefined,
+          },
         },
         fields: [
           { type: 'text', name: 'grantType', label: 'Grant type' },
@@ -1358,33 +1377,35 @@ describe('ArrayFieldRenderer', () => {
         kind: 'array',
         name: 'grants',
         legend: 'Grants',
-        addActionLabel: 'Add grant',
-        addActionMenu: {
-          groups: [{ id: 'traits', label: 'Traits' }],
-          items: [
-            {
-              id: 'movement-bonus',
-              label: 'Movement bonus',
-              groupId: 'traits',
-              appendDefaults: { grantType: 'movement' },
-              duplicatePolicy: 'block',
-              isDuplicate: (items) =>
-                (items as Array<{ grantType?: string }>).some(
-                  (row) => row.grantType === 'movement',
-                ),
-            },
-            {
-              id: 'language',
-              label: 'Language',
-              groupId: 'traits',
-              appendDefaults: { grantType: 'languages' },
-              duplicatePolicy: 'warn',
-              isDuplicate: (items) =>
-                (items as Array<{ grantType?: string }>).some(
-                  (row) => row.grantType === 'languages',
-                ),
-            },
-          ],
+        addAction: {
+          label: 'Add grant',
+          menu: {
+            groups: [{ id: 'traits', label: 'Traits' }],
+            items: [
+              {
+                id: 'movement-bonus',
+                label: 'Movement bonus',
+                groupId: 'traits',
+                appendDefaults: { grantType: 'movement' },
+                duplicatePolicy: 'block',
+                isDuplicate: (items) =>
+                  (items as Array<{ grantType?: string }>).some(
+                    (row) => row.grantType === 'movement',
+                  ),
+              },
+              {
+                id: 'language',
+                label: 'Language',
+                groupId: 'traits',
+                appendDefaults: { grantType: 'languages' },
+                duplicatePolicy: 'warn',
+                isDuplicate: (items) =>
+                  (items as Array<{ grantType?: string }>).some(
+                    (row) => row.grantType === 'languages',
+                  ),
+              },
+            ],
+          },
         },
         fields: [{ type: 'text', name: 'grantType', label: 'Grant type' }],
       },

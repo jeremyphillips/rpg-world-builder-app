@@ -1,5 +1,6 @@
 'use client'
 
+import type { FieldHintPosition } from '../../../components/ui/field.variants'
 import type { FieldConfig } from '../../field-config'
 import {
   chooseFromChipsToInlineSentence,
@@ -16,6 +17,8 @@ type SpecializedFieldRendererProps = {
   fullName: string
   id: string
   namePrefix?: string
+  hint?: string
+  hintPosition?: FieldHintPosition
 }
 
 /** Renders field types that bypass the standard `useController` registry path. */
@@ -24,6 +27,8 @@ export function renderSpecializedField({
   fullName,
   id,
   namePrefix,
+  hint,
+  hintPosition,
 }: SpecializedFieldRendererProps) {
   switch (renderConfig.type) {
     case 'inputSelect':
@@ -33,12 +38,22 @@ export function renderSpecializedField({
           fullName={fullName}
           id={id}
           namePrefix={namePrefix}
+          hint={hint}
+          hintPosition={hintPosition}
         />
       )
     case 'inputUnit':
       return <InputUnitFieldRenderer config={renderConfig} id={id} namePrefix={namePrefix} />
     case 'levelRange':
-      return <LevelRangeFieldRenderer config={renderConfig} id={id} namePrefix={namePrefix} />
+      return (
+        <LevelRangeFieldRenderer
+          config={renderConfig}
+          id={id}
+          namePrefix={namePrefix}
+          hint={hint}
+          hintPosition={hintPosition}
+        />
+      )
     case 'inlineChooseCount':
       return (
         <InlineSentenceFieldRenderer
@@ -58,7 +73,15 @@ export function renderSpecializedField({
     case 'inlineSentence':
       return <InlineSentenceFieldRenderer config={renderConfig} id={id} namePrefix={namePrefix} />
     case 'rollValue':
-      return <RollValueFieldRenderer config={renderConfig} fullName={fullName} id={id} />
+      return (
+        <RollValueFieldRenderer
+          config={renderConfig}
+          fullName={fullName}
+          id={id}
+          hint={hint}
+          hintPosition={hintPosition}
+        />
+      )
     default:
       return null
   }

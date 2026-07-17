@@ -15,7 +15,7 @@ import {
   defineGroupField,
   defineInlineSentenceField,
   defineSelectField,
-  defineStackField,
+  defineDependentField,
 } from './form-authoring'
 import { DICE_FORMULA_OPERATORS } from '../components/ui/dice-formula-field.lib'
 
@@ -41,20 +41,22 @@ describe('form-authoring helpers', () => {
       kind: 'array',
       name: 'traits',
       legend: 'Traits',
-      itemChrome: 'subtle',
-      addActionLabel: 'Add trait',
-      itemCollapsible: true,
+      addAction: { label: 'Add trait' },
       min: 1,
-      itemHeader: {
-        fallback: (index) => `Trait ${index + 1}`,
-        primaryField: 'name',
+      item: {
+        surface: 'subtle',
+        collapsible: true,
+        header: {
+          fallback: (index) => `Trait ${index + 1}`,
+          primaryField: 'name',
+        },
       },
       fields: [{ type: 'text', name: 'name', label: 'Name', required: true }],
     })
 
     expectTypeOf(field).toEqualTypeOf<typeof field>()
     expectTypeOf(field.kind).toEqualTypeOf<'array'>()
-    expectTypeOf(field.itemChrome).toEqualTypeOf<'subtle'>()
+    expect(field.item?.surface).toBe('subtle')
     expectTypeOf(field).toMatchTypeOf<ArrayConfig>()
   })
 
@@ -124,12 +126,12 @@ describe('form-authoring helpers', () => {
         legend: 'Identity',
         fields: [{ type: 'text', name: 'name', label: 'Name' }],
       }),
-      defineStackField({
-        kind: 'stack',
-        fields: [
-          { type: 'switch', name: 'enabled', label: 'Enabled' },
-          { type: 'text', name: 'value', label: 'Value' },
-        ],
+      defineDependentField({
+        kind: 'dependent',
+        controller: { type: 'switch', name: 'enabled', label: 'Enabled' },
+        dependents: {
+          fields: [{ type: 'text', name: 'value', label: 'Value' }],
+        },
       }),
       defineInlineSentenceField({
         type: 'inlineSentence',

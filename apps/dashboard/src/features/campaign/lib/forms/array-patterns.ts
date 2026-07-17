@@ -10,5 +10,4 @@ export type DashboardArrayPattern = ArrayPatternConfig
 
 export type LevelRangeArrayConfig = ArrayConfig & {
   arrayPattern: ArrayPatternConfig & { kind: 'levelRange' }
-  reorder: false
 }

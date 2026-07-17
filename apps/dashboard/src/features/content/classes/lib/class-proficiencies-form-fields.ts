@@ -129,10 +129,9 @@ export function proficienciesFields(ctx: ContentFormCtx): FormItem[] {
           name: 'weaponProficiencyMode',
           label: 'Weapon proficiency mode',
           labelHidden: true,
-          hintPosition: 'below-control',
+          hint: { text: INDIVIDUAL_WEAPONS_TOGGLE_HINT, position: 'below-control' },
           orientation: 'horizontal',
           options: WEAPON_PROFICIENCY_MODE_OPTIONS,
-          hint: INDIVIDUAL_WEAPONS_TOGGLE_HINT,
           separator: 'subtle',
         },
         {

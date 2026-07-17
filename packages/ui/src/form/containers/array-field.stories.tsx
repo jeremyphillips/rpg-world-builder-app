@@ -32,10 +32,12 @@ const flatFields: FormItem[] = [
       { type: 'text', name: 'name', label: 'Trait name', required: true },
       { type: 'textarea', name: 'description', label: 'Description', rows: 2 },
     ],
-    addActionLabel: 'Add trait',
-    itemHeader: {
-      fallback: (index) => `Trait ${index + 1}`,
-      primaryField: 'name',
+    addAction: { label: 'Add trait' },
+    item: {
+      header: {
+        fallback: (index) => `Trait ${index + 1}`,
+        primaryField: 'name',
+      },
     },
   },
 ]
@@ -119,12 +121,14 @@ const conditionalFields: FormItem[] = [
         },
       },
     ],
-    addActionLabel: 'Add grant',
-    itemHeader: {
-      fallback: (index) => `Grant ${index + 1}`,
-      primary: (values) => {
-        const type = values.type as string | undefined
-        return type ? `${type.charAt(0).toUpperCase()}${type.slice(1)}` : undefined
+    addAction: { label: 'Add grant' },
+    item: {
+      header: {
+        fallback: (index) => `Grant ${index + 1}`,
+        primary: (values) => {
+          const type = values.type as string | undefined
+          return type ? `${type.charAt(0).toUpperCase()}${type.slice(1)}` : undefined
+        },
       },
     },
   },
@@ -169,7 +173,7 @@ const boundedFields: FormItem[] = [
     name: 'tags',
     legend: 'Tags',
     fields: [{ type: 'text', name: 'label', label: 'Tag', required: true }],
-    addActionLabel: 'Add tag',
+    addAction: { label: 'Add tag' },
     min: 1,
     max: 3,
   },
@@ -208,7 +212,10 @@ const compactRowFields: FormItem[] = [
     kind: 'array',
     name: 'grants',
     legend: 'Grants',
-    itemVariant: 'compact',
+    item: {
+      variant: 'compact',
+      header: { fallback: (i) => `Grant ${i + 1}`, srOnly: true },
+    },
     fields: [
       {
         kind: 'row',
@@ -218,8 +225,7 @@ const compactRowFields: FormItem[] = [
         ],
       },
     ],
-    addActionLabel: 'Add grant',
-    itemHeader: { fallback: (i) => `Grant ${i + 1}`, srOnly: true },
+    addAction: { label: 'Add grant' },
   },
 ]
 
@@ -252,18 +258,20 @@ const detailedCollapsibleFields: FormItem[] = [
     kind: 'array',
     name: 'traits',
     legend: 'Traits',
-    itemVariant: 'detailed',
-    itemCollapsible: true,
+    item: {
+      variant: 'detailed',
+      collapsible: true,
+      header: {
+        fallback: (i) => `Trait ${i + 1}`,
+        primaryField: 'name',
+        summary: (values) => (values.description as string) || 'No description',
+      },
+    },
     fields: [
       { type: 'text', name: 'name', label: 'Trait name', required: true },
       { type: 'textarea', name: 'description', label: 'Description', rows: 2 },
     ],
-    addActionLabel: 'Add trait',
-    itemHeader: {
-      fallback: (i) => `Trait ${i + 1}`,
-      primaryField: 'name',
-      summary: (values) => (values.description as string) || 'No description',
-    },
+    addAction: { label: 'Add trait' },
   },
 ]
 
@@ -306,8 +314,14 @@ const nestedCompactFields: FormItem[] = [
     kind: 'array',
     name: 'packages',
     legend: 'Equipment packages',
-    itemVariant: 'detailed',
-    itemCollapsible: true,
+    item: {
+      variant: 'detailed',
+      collapsible: true,
+      header: {
+        fallback: (i) => `Package ${i + 1}`,
+        primaryField: 'label',
+      },
+    },
     fields: [
       { type: 'text', name: 'label', label: 'Package label', required: true },
       {
@@ -315,15 +329,11 @@ const nestedCompactFields: FormItem[] = [
         name: 'items',
         legend: 'Items',
         fields: [{ type: 'text', name: 'name', label: 'Item name', required: true }],
-        addActionLabel: 'Add item',
-        itemHeader: { fallback: (i) => `Item ${i + 1}`, primaryField: 'name' },
+        addAction: { label: 'Add item' },
+        item: { header: { fallback: (i) => `Item ${i + 1}`, primaryField: 'name' } },
       },
     ],
-    addActionLabel: 'Add package',
-    itemHeader: {
-      fallback: (i) => `Package ${i + 1}`,
-      primaryField: 'label',
-    },
+    addAction: { label: 'Add package' },
   },
 ]
 
@@ -363,13 +373,15 @@ const dragReorderFields: FormItem[] = [
     kind: 'array',
     name: 'steps',
     legend: 'Steps',
-    itemVariant: 'detailed',
-    fields: [{ type: 'text', name: 'instruction', label: 'Instruction', required: true }],
-    addActionLabel: 'Add step',
-    itemHeader: {
-      fallback: (i) => `Step ${i + 1}`,
-      primaryField: 'instruction',
+    item: {
+      variant: 'detailed',
+      header: {
+        fallback: (i) => `Step ${i + 1}`,
+        primaryField: 'instruction',
+      },
     },
+    fields: [{ type: 'text', name: 'instruction', label: 'Instruction', required: true }],
+    addAction: { label: 'Add step' },
   },
 ]
 
@@ -430,14 +442,16 @@ const validationIssueFields: FormItem[] = [
     kind: 'array',
     name: 'traits',
     legend: 'Traits',
-    itemVariant: 'detailed',
-    itemCollapsible: true,
-    fields: validationTraitFields,
-    addActionLabel: 'Add trait',
-    itemHeader: {
-      fallback: (i) => `Trait ${i + 1}`,
-      primaryField: 'name',
+    item: {
+      variant: 'detailed',
+      collapsible: true,
+      header: {
+        fallback: (i) => `Trait ${i + 1}`,
+        primaryField: 'name',
+      },
     },
+    fields: validationTraitFields,
+    addAction: { label: 'Add trait' },
   },
 ]
 

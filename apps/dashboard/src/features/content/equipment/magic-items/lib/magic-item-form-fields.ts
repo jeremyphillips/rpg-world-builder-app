@@ -43,21 +43,22 @@ export function magicItemFormFieldGroup(ctx: ContentFormCtx = {}): FormItem {
         ],
       },
       {
-        kind: 'stack',
-        layout: 'dependent',
-        dependentsChrome: 'subtle',
-        fields: [
-          {
-            type: 'switch',
-            name: 'requiresAttunement',
-            label: 'Requires attunement',
-          },
-          {
-            type: 'text',
-            name: 'attunementRequirement',
-            label: 'Attunement requirement',
-          },
-        ],
+        kind: 'dependent',
+        controller: {
+          type: 'switch',
+          name: 'requiresAttunement',
+          label: 'Requires attunement',
+        },
+        dependents: {
+          surface: 'subtle',
+          fields: [
+            {
+              type: 'text',
+              name: 'attunementRequirement',
+              label: 'Attunement requirement',
+            },
+          ],
+        },
       },
       {
         kind: 'row',

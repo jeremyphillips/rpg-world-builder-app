@@ -275,10 +275,12 @@ export function buildTicketDetailTabs(options: {
           kind: 'array',
           name: 'codeRefs',
           legend: 'Code references',
-          addActionLabel: 'Add code reference',
-          itemHeader: {
-            fallback: (index) => `Ref ${index + 1}`,
-            primaryField: 'path',
+          addAction: { label: 'Add code reference' },
+          item: {
+            header: {
+              fallback: (index: number) => `Ref ${index + 1}`,
+              primaryField: 'path',
+            },
           },
           fields: [
             { type: 'text', name: 'path', label: 'Path', required: true },
@@ -303,10 +305,12 @@ export function buildTicketDetailTabs(options: {
           kind: 'array',
           name: 'acceptanceCriteria',
           legend: 'Acceptance criteria',
-          addActionLabel: 'Add criterion',
-          itemHeader: {
-            fallback: (index) => `Criterion ${index + 1}`,
-            primaryField: 'text',
+          addAction: { label: 'Add criterion' },
+          item: {
+            header: {
+              fallback: (index: number) => `Criterion ${index + 1}`,
+              primaryField: 'text',
+            },
           },
           fields: [{ type: 'text', name: 'text', label: 'Criterion', required: true }],
         },

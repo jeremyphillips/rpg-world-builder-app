@@ -5,6 +5,7 @@ import type { ControllerRenderProps } from 'react-hook-form'
 
 import { OptionalFieldDisclosure } from '../../../components/ui/optional-field-disclosure.client'
 import { TextareaField } from '../../../components/ui/textarea-field'
+import type { FieldHintPosition } from '../../../components/ui/field.variants'
 import type { OptionalDisclosureConfig, TextareaFieldConfig } from '../../field-config'
 
 type OptionalDisclosureTextareaRendererProps = {
@@ -15,6 +16,8 @@ type OptionalDisclosureTextareaRendererProps = {
   error?: string
   invalid?: boolean
   describedBy?: string
+  hint?: string
+  hintPosition?: FieldHintPosition
 }
 
 export function OptionalDisclosureTextareaFieldRenderer({
@@ -25,6 +28,8 @@ export function OptionalDisclosureTextareaFieldRenderer({
   error,
   invalid,
   describedBy,
+  hint,
+  hintPosition,
 }: OptionalDisclosureTextareaRendererProps) {
   const [manualOpen, setManualOpen] = useState(false)
   const hasValue = Boolean(String(field.value ?? '').trim())
@@ -54,8 +59,8 @@ export function OptionalDisclosureTextareaFieldRenderer({
         error={error}
         invalid={invalid}
         describedBy={describedBy}
-        hint={config.hint}
-        hintPosition={config.hintPosition}
+        hint={hint}
+        hintPosition={hintPosition}
         info={config.info}
         required={config.required}
         width={config.width}

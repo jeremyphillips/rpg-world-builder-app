@@ -21,7 +21,10 @@ export function SelectFieldRenderer({
   namePrefix,
 }: SelectFieldRendererProps) {
   const state = useSelectFieldRendererState(config, fullName, namePrefix)
-  const chrome = pickSelectFieldChromeProps(state.renderConfig)
+  const chrome = pickSelectFieldChromeProps(state.renderConfig, {
+    hint: state.hint,
+    hintPosition: state.hintPosition,
+  })
 
   if (state.isReadOnly) {
     return (

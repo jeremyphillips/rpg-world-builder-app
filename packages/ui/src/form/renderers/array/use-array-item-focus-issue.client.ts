@@ -2,7 +2,7 @@
 
 import * as React from 'react'
 
-import type { ArrayConfig } from '../../field-config'
+import type { ArrayConfig, ArrayItemConfig } from '../../field-config'
 import type { ArrayItemIssueGroup } from '../../errors/form-issue.types'
 import { buildValidationSessionExpandKey } from '../../errors'
 import type { ValidationSessionExpandKey } from '../../context/form-ui.context'
@@ -17,7 +17,7 @@ interface UseArrayItemFocusIssueOptions {
   itemValues: Record<string, unknown>
   itemPrefix: string
   idPrefix: string
-  itemCollapseKey: ArrayConfig['itemCollapseKey']
+  itemCollapseKey: ArrayItemConfig['collapseKey']
   arrayPattern: ArrayConfig['arrayPattern']
 }
 

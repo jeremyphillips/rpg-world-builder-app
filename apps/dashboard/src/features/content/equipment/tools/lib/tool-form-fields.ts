@@ -58,15 +58,15 @@ export function toolFormFieldGroup(): FormItem[] {
       kind: 'array',
       name: 'utilizes',
       legend: 'Utilize actions',
-      addActionLabel: 'Add utilize action',
+      addAction: { label: 'Add utilize action', layout: 'inline' },
       min: 1,
-      itemCollapsible: true,
-      itemChrome: 'subtle',
-      size: 'md',
-      addActionLayout: 'inline',
-      itemHeader: {
-        fallback: (index) => `Action ${index + 1}`,
-        primaryField: 'description',
+      item: {
+        collapsible: true,
+        surface: 'subtle',
+        header: {
+          fallback: (index) => `Action ${index + 1}`,
+          primaryField: 'description',
+        },
       },
       fields: [
         {

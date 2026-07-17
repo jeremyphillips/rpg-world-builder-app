@@ -115,25 +115,24 @@ export function multiclassingPolicyFields(ctx: ContentFormCtx): FormItem[] {
       hint: 'Controls whether characters of this species can multiclass when the campaign allows multiclassing.',
     },
     {
-      kind: 'stack',
-      layout: 'dependent',
+      kind: 'dependent',
       separator: 'subtle',
-      dependentsVisibility: visibleWhenClassPolicyNeedsIds(),
-      dependentsChrome: 'subtle',
-      fields: [
-        {
-          type: 'select',
-          name: 'classPolicy.mode',
-          labelPosition: 'settings',
-          label: 'Class restrictions',
-          width: 'full',
-          options: speciesClassPolicyModeOptions,
-          required: true,
-          defaultValue: DEFAULT_SPECIES_CLASS_POLICY_MODE,
-          hint: 'Choose which classes this species may multiclass into.',
-        },
-        ...classPolicyClassIdFields(ctx),
-      ],
+      controller: {
+        type: 'select',
+        name: 'classPolicy.mode',
+        labelPosition: 'settings',
+        label: 'Class restrictions',
+        width: 'full',
+        options: speciesClassPolicyModeOptions,
+        required: true,
+        defaultValue: DEFAULT_SPECIES_CLASS_POLICY_MODE,
+        hint: 'Choose which classes this species may multiclass into.',
+      },
+      dependents: {
+        visibility: visibleWhenClassPolicyNeedsIds(),
+        surface: 'subtle',
+        fields: classPolicyClassIdFields(ctx),
+      },
     },
   ]
 }
@@ -176,64 +175,68 @@ export function speciesLevelLimitsFields(ctx: ContentFormCtx): FormItem[] {
 
   return [
     {
-      kind: 'stack',
-      layout: 'dependent',
+      kind: 'dependent',
       separator: 'subtle',
-      dependentsChrome: 'subtle',
-      fields: [
-        {
-          type: 'switch',
-          name: 'limitMaxCharacterLevel',
-          label: 'Set species maximum level',
-          hint: 'Caps the total character level for characters using this species. Leave off to use the campaign maximum.',
-          defaultValue: false,
-          labelPosition: 'settings',
-        },
-        {
-          type: 'select',
-          name: 'maxCharacterLevel',
-          label: 'Maximum character level',
-          options: levelOptions,
-          required: true,
-          digits: levelDigits,
-          labelPosition: 'settings',
-          defaultValue: String(campaignMax),
-          hint: `Must be at most the campaign maximum (${campaignMax}).`,
-        },
-      ],
+      controller: {
+        type: 'switch',
+        name: 'limitMaxCharacterLevel',
+        label: 'Set species maximum level',
+        hint: 'Caps the total character level for characters using this species. Leave off to use the campaign maximum.',
+        defaultValue: false,
+        labelPosition: 'settings',
+      },
+      dependents: {
+        surface: 'subtle',
+        fields: [
+          {
+            type: 'select',
+            name: 'maxCharacterLevel',
+            label: 'Maximum character level',
+            options: levelOptions,
+            required: true,
+            digits: levelDigits,
+            labelPosition: 'settings',
+            defaultValue: String(campaignMax),
+            hint: `Must be at most the campaign maximum (${campaignMax}).`,
+          },
+        ],
+      },
     },
     {
-      kind: 'stack',
-      layout: 'dependent',
-      fields: [
-        {
-          type: 'switch',
-          name: ENABLE_CLASS_LEVEL_CAPS_FIELD,
-          label: 'Class-specific limits',
-          hint: 'Optionally limit how far this species can progress in individual classes.',
-          defaultValue: false,
-          labelPosition: 'settings',
-        },
-        {
-          kind: 'array',
-          name: 'classLevelCaps',
-          legend: '',
-          addActionLabel: 'Add class limit',
-          itemCollapsible: true,
-          itemHeader: {
-            fallback: (index: number) => `Class limit ${index + 1}`,
-            primary: (values: Record<string, unknown>) => {
-              const classId = values['classId'] as string | undefined
-              const maxLevelValue = values['maxLevel'] as string | number | undefined
-              if (classId && maxLevelValue !== undefined) {
-                return `${classId} · level ${maxLevelValue}`
-              }
-              return undefined
+      kind: 'dependent',
+      controller: {
+        type: 'switch',
+        name: ENABLE_CLASS_LEVEL_CAPS_FIELD,
+        label: 'Class-specific limits',
+        hint: 'Optionally limit how far this species can progress in individual classes.',
+        defaultValue: false,
+        labelPosition: 'settings',
+      },
+      dependents: {
+        fields: [
+          {
+            kind: 'array',
+            name: 'classLevelCaps',
+            legend: '',
+            addAction: { label: 'Add class limit' },
+            item: {
+              collapsible: true,
+              header: {
+                fallback: (index: number) => `Class limit ${index + 1}`,
+                primary: (values: Record<string, unknown>) => {
+                  const classId = values['classId'] as string | undefined
+                  const maxLevelValue = values['maxLevel'] as string | number | undefined
+                  if (classId && maxLevelValue !== undefined) {
+                    return `${classId} · level ${maxLevelValue}`
+                  }
+                  return undefined
+                },
+              },
             },
+            fields: classLevelCapItemFields(ctx),
           },
-          fields: classLevelCapItemFields(ctx),
-        },
-      ],
+        ],
+      },
     },
   ]
 }

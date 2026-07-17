@@ -9,7 +9,7 @@ import {
   MAX_CHARACTER_LEVEL,
 } from '@rpg/contracts'
 
-import { type StackConfig, type FormItem } from '@rpg/ui/form'
+import { type DependentConfig, type FormItem } from '@rpg/ui/form'
 
 import { defaultCampaignRules } from '../../lib/form-options/content-campaign-rules'
 import {
@@ -31,9 +31,9 @@ import {
   refineSpeciesCharacterCreationForm,
 } from './species-rules-form-values'
 
-function expectStack(item: FormItem | undefined): StackConfig {
-  if (!item || !('kind' in item) || item.kind !== 'stack') {
-    throw new Error('expected dependent stack')
+function expectDependent(item: FormItem | undefined): DependentConfig {
+  if (!item || !('kind' in item) || item.kind !== 'dependent') {
+    throw new Error('expected dependent field')
   }
   return item
 }
@@ -47,19 +47,18 @@ describe('multiclassingPolicyFields', () => {
         defaultValue: DEFAULT_SPECIES_MULTICLASS_POLICY,
       }),
     )
-    const stack = expectStack(fields[1])
-    expect(stack).toMatchObject({
-      kind: 'stack',
-      layout: 'dependent',
+    const dependent = expectDependent(fields[1])
+    expect(dependent).toMatchObject({
+      kind: 'dependent',
       separator: 'subtle',
     })
-    expect(stack.fields[0]).toEqual(
+    expect(dependent.controller).toEqual(
       expect.objectContaining({
         name: 'classPolicy.mode',
         defaultValue: DEFAULT_SPECIES_CLASS_POLICY_MODE,
       }),
     )
-    expect(stack.fields[1]).toEqual(
+    expect(dependent.dependents.fields[0]).toEqual(
       expect.objectContaining({
         type: 'combobox',
         name: 'classPolicy.classIds',
@@ -68,7 +67,7 @@ describe('multiclassingPolicyFields', () => {
         visibility: expect.objectContaining({ dependsOn: ['classPolicy.mode'] }),
       }),
     )
-    expect(stack.fields[2]).toEqual(
+    expect(dependent.dependents.fields[1]).toEqual(
       expect.objectContaining({
         type: 'combobox',
         name: 'classPolicy.classIds',
@@ -86,13 +85,12 @@ describe('speciesLevelLimitsFields', () => {
     const fields = speciesLevelLimitsFields({
       campaignRules: { ...defaultCampaignRules(), maxCharacterLevel: campaignMax },
     })
-    const stack = expectStack(fields[0])
-    expect(stack).toMatchObject({
-      kind: 'stack',
-      layout: 'dependent',
+    const dependent = expectDependent(fields[0])
+    expect(dependent).toMatchObject({
+      kind: 'dependent',
       separator: 'subtle',
     })
-    expect(stack.fields[1]).toEqual(
+    expect(dependent.dependents.fields[0]).toEqual(
       expect.objectContaining({
         name: 'maxCharacterLevel',
         defaultValue: String(campaignMax),
@@ -103,21 +101,20 @@ describe('speciesLevelLimitsFields', () => {
 
   it('uses class-specific limits in a dependent stack with nested array', () => {
     const fields = speciesLevelLimitsFields({})
-    const stack = expectStack(fields[1])
-    expect(stack).toMatchObject({
-      kind: 'stack',
-      layout: 'dependent',
+    const dependent = expectDependent(fields[1])
+    expect(dependent).toMatchObject({
+      kind: 'dependent',
     })
-    expect(stack.fields[0]).toMatchObject({
+    expect(dependent.controller).toMatchObject({
       type: 'switch',
       name: ENABLE_CLASS_LEVEL_CAPS_FIELD,
       label: 'Class-specific limits',
       hint: 'Optionally limit how far this species can progress in individual classes.',
     })
-    expect(stack.fields[1]).toMatchObject({
+    expect(dependent.dependents.fields[0]).toMatchObject({
       kind: 'array',
       name: 'classLevelCaps',
-      addActionLabel: 'Add class limit',
+      addAction: { label: 'Add class limit' },
     })
   })
 })

@@ -1,3 +1,4 @@
+import type { FieldHintPosition } from '../../../components/ui/field.variants'
 import type { FieldOption, SelectFieldConfig } from '../../field-config'
 import type { FieldValidationProps } from '../../../components/ui/field-validation-props'
 
@@ -9,24 +10,26 @@ export function normalizedSelectFieldValue(value: unknown): string {
   return value != null && value !== '' ? String(value) : ''
 }
 
-export type SelectFieldChromeProps = Pick<
-  SelectFieldConfig,
-  | 'label'
-  | 'hint'
-  | 'hintPosition'
-  | 'info'
-  | 'required'
-  | 'width'
-  | 'size'
-  | 'digits'
-  | 'labelPosition'
->
+export type SelectFieldChromeProps = {
+  label: string
+  hint?: string
+  hintPosition?: FieldHintPosition
+  info?: SelectFieldConfig['info']
+  required?: boolean
+  width?: SelectFieldConfig['width']
+  size?: SelectFieldConfig['size']
+  digits?: SelectFieldConfig['digits']
+  labelPosition?: SelectFieldConfig['labelPosition']
+}
 
-export function pickSelectFieldChromeProps(config: SelectFieldConfig): SelectFieldChromeProps {
+export function pickSelectFieldChromeProps(
+  config: SelectFieldConfig,
+  presentation?: Pick<SelectFieldChromeProps, 'hint' | 'hintPosition'>,
+): SelectFieldChromeProps {
   return {
     label: config.label,
-    hint: config.hint,
-    hintPosition: config.hintPosition,
+    hint: presentation?.hint,
+    hintPosition: presentation?.hintPosition,
     info: config.info,
     required: config.required,
     width: config.width,

@@ -407,7 +407,7 @@ function visibleWhenGrantTypeMissing(): FieldVisibility {
 function grantTypeMissingRepairFields(): FormItem[] {
   return [
     {
-      kind: 'stack',
+      kind: 'group',
       visibility: visibleWhenGrantTypeMissing(),
       fields: [
         {
@@ -448,7 +448,7 @@ function proficiencyGrantFieldsForTypes(
     includesGrantType(grantTypes, grantType)
       ? [
           {
-            kind: 'stack' as const,
+            kind: 'group' as const,
             visibility: visibleFor(grantType),
             fields: proficiencyGrantItemFields(grantType, ctx),
           },
@@ -763,14 +763,18 @@ export function grantArrayFields<T extends string>(
       kind: 'array',
       name: 'grants',
       legend: 'Grants',
-      addActionLabel: 'Add grant',
-      itemCollapsible: true,
-      itemHeader: {
-        fallback: (index) => `Grant ${index + 1}`,
-        primary: (values, index) => formatGrantRowPrimary(values, index, headerContext),
-        summary: (values) => formatGrantRowSummary(values, headerContext),
+      addAction: {
+        label: 'Add grant',
+        menu: buildGrantArrayAddMenu(grantTypes as readonly GrantType[]),
       },
-      addActionMenu: buildGrantArrayAddMenu(grantTypes as readonly GrantType[]),
+      item: {
+        collapsible: true,
+        header: {
+          fallback: (index) => `Grant ${index + 1}`,
+          primary: (values, index) => formatGrantRowPrimary(values, index, headerContext),
+          summary: (values) => formatGrantRowSummary(values, headerContext),
+        },
+      },
       fields: grantItemFields(grantTypes, labels, ctx),
     },
   ]

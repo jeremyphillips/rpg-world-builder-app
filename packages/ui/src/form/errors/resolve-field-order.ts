@@ -30,6 +30,11 @@ function appendFieldPath(field: FieldConfig, prefix: string, paths: string[]): v
 function walkContainerItem(item: FieldOrderContainer, prefix: string, paths: string[]): void {
   if (item.kind === 'slot') return
 
+  if (item.kind === 'dependent') {
+    walkItems([item.controller, ...item.dependents.fields], prefix, paths)
+    return
+  }
+
   const nestedPrefix = item.kind === 'array' ? prefix : prefix
   walkItems(item.fields, nestedPrefix, paths)
 }
@@ -91,6 +96,11 @@ function walkArraySections(
     }
 
     if (item.kind === 'slot') continue
+
+    if (item.kind === 'dependent') {
+      walkArraySections([item.controller, ...item.dependents.fields], namePrefix, sections)
+      continue
+    }
 
     walkArraySections(item.fields, namePrefix, sections)
   }

@@ -44,12 +44,14 @@ export function buildSubclassFields(
       kind: 'array',
       name: 'features',
       legend: 'Features',
-      addActionLabel: 'Add feature',
-      itemCollapsible: true,
-      itemHeader: {
-        fallback: (index) => `Feature ${index + 1}`,
-        primaryField: 'name',
-        summary: (values) => formatFeatureRowSummary(values as FeatureRowForm),
+      addAction: { label: 'Add feature' },
+      item: {
+        collapsible: true,
+        header: {
+          fallback: (index) => `Feature ${index + 1}`,
+          primaryField: 'name',
+          summary: (values) => formatFeatureRowSummary(values as FeatureRowForm),
+        },
       },
       fields: classFeatureItemFields(ctx, options),
     },

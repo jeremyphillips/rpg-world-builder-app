@@ -14,7 +14,7 @@ import {
   arrayItemToolbarRowClasses,
   buildArrayItemCompactRowGridTemplate,
 } from './array-item-toolbar.variants'
-import { fieldSurfaceToneVariants } from '../../../components/ui/field-stack.variants'
+import { resolveFieldContainerChromeClasses } from '../../../components/ui/field-surface.variants'
 
 describe('array item shell variants', () => {
   it('uses a two-column grid with top-aligned actions and shell padding', () => {
@@ -79,14 +79,12 @@ describe('array item shell variants', () => {
     )
   })
 
-  it('applies shared surface tone classes when tone is set', () => {
-    expect(arrayItemShellVariants({ tone: 'default' })).not.toContain('bg-muted/30')
-    const classes = arrayItemShellVariants({ tone: 'subtle' })
-    expect(classes).toContain(fieldSurfaceToneVariants({ tone: 'subtle' }))
-    expect(classes).toContain('bg-muted/10')
-    const elevated = arrayItemShellVariants({ tone: 'elevated' })
-    expect(elevated).toContain('bg-card')
-    expect(elevated).toContain('shadow-surface-raised')
+  it('applies shared surface classes for array item chrome', () => {
+    expect(arrayItemShellVariants()).not.toContain('bg-muted/30')
+    expect(resolveFieldContainerChromeClasses({ surface: 'subtle' })).toContain('bg-muted/10')
+    const raised = resolveFieldContainerChromeClasses({ surface: 'raised' })
+    expect(raised).toContain('bg-card')
+    expect(raised).toContain('shadow-surface-raised')
   })
 
   it('uses a single-column shell for compact inline rows', () => {

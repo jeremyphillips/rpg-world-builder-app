@@ -18,7 +18,7 @@ import type {
   SwitchFieldConfig,
 } from '../field-config'
 import { useVisibilityValues } from './form-conditional.client'
-import type { RenderNestedFormItems } from './form-stack-section.client'
+import type { RenderNestedFormItems } from './form-dependent-section.client'
 
 interface GroupFieldSectionProps {
   item: GroupConfig

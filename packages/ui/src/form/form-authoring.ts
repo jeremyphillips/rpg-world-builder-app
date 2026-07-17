@@ -1,12 +1,12 @@
 import type {
   ArrayConfig,
   ComboboxFieldConfig,
+  DependentConfig,
   DiceFormulaFieldConfig,
   FormItem,
   GroupConfig,
   InlineSentenceFieldConfig,
   SelectFieldConfig,
-  StackConfig,
 } from './field-config'
 
 /**
@@ -42,8 +42,8 @@ export function defineSelectField<const T extends SelectFieldConfig>(config: T):
   return config
 }
 
-/** Controller + dependent fields column (`kind: 'stack'`). */
-export function defineStackField<const T extends StackConfig>(config: T): T {
+/** Controller + dependent fields column (`kind: 'dependent'`). */
+export function defineDependentField<const T extends DependentConfig>(config: T): T {
   return config
 }
 

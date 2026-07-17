@@ -120,7 +120,7 @@ export function ArrayItemShell({
   main,
   actions,
 }: ArrayItemShellProps) {
-  const { arrayItemTone } = useFormSectionContext()
+  const { arrayItemSurface, arrayItemStatus } = useFormSectionContext()
 
   return (
     <CollapsibleListItemShell
@@ -130,7 +130,8 @@ export function ArrayItemShell({
       collapsible={collapsible}
       dragging={dragging}
       layout={layout}
-      tone={arrayItemTone ?? 'elevated'}
+      surface={arrayItemSurface ?? 'raised'}
+      status={arrayItemStatus}
       className={className}
       main={main}
       actions={actions}

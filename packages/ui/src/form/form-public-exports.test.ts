@@ -1,24 +1,18 @@
 import { describe, expect, expectTypeOf, it } from 'vitest'
 
 import * as Form from './index'
-import type {
-  DiceFormulaTailOperator,
-  FieldChrome,
-  FieldSize,
-  FieldStackDependentsTone,
-  FieldWidth,
-} from './index'
+import type { FieldChrome, FieldSize, FieldSurfaceVariant, FieldWidth } from './index'
 
 const REQUIRED_PUBLIC_EXPORTS = [
   'FIELD_WIDTHS',
-  'FIELD_SURFACE_TONES',
+  'FIELD_SURFACE_VARIANTS',
   'DICE_FORMULA_TAIL_OPERATORS',
   'DICE_FORMULA_OPERATORS',
   'defineForm',
   'defineFormItems',
   'defineArrayField',
   'defineSelectField',
-  'defineStackField',
+  'defineDependentField',
   'defineGroupField',
   'defineComboboxField',
   'defineDiceFormulaField',
@@ -39,10 +33,10 @@ describe('@rpg/ui/form public exports', () => {
     expectTypeOf<FieldWidth>().toEqualTypeOf<(typeof Form.FIELD_WIDTHS)[number]>()
     expectTypeOf<FieldSize>().not.toBeAny()
     expectTypeOf<FieldChrome>().not.toBeAny()
-    expectTypeOf<FieldStackDependentsTone>().toEqualTypeOf<
-      (typeof Form.FIELD_SURFACE_TONES)[number]
+    expectTypeOf<FieldSurfaceVariant>().toEqualTypeOf<
+      (typeof Form.FIELD_SURFACE_VARIANTS)[number]
     >()
-    expectTypeOf<DiceFormulaTailOperator>().toEqualTypeOf<
+    expectTypeOf<import('./index').DiceFormulaTailOperator>().toEqualTypeOf<
       (typeof Form.DICE_FORMULA_TAIL_OPERATORS)[number]
     >()
   })

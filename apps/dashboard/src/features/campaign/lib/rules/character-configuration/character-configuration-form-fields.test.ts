@@ -187,6 +187,10 @@ function collectFieldNames(fields: ReturnType<typeof buildRulesFieldsForSurface>
     if ('name' in field && typeof field.name === 'string' && !field.name.startsWith('_')) {
       names.push(field.name)
     }
+    if ('kind' in field && field.kind === 'dependent') {
+      names.push(...collectFieldNames([field.controller, ...field.dependents.fields]))
+      continue
+    }
     if ('fields' in field && Array.isArray(field.fields)) {
       names.push(...collectFieldNames(field.fields))
     }

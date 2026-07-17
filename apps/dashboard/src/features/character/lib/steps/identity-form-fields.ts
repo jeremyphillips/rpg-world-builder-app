@@ -37,13 +37,7 @@ function narrativeArrayField(
     kind: 'array',
     name: `narrative.${name}`,
     legend,
-    itemVariant: 'compact',
-    addActionLayout: 'inline',
-    addActionVariant: 'ghost',
-    addActionSize: 'sm',
-    reorder: false,
     min: 1,
-    itemChrome: 'subtle',
     size: 'md',
     fields: [
       {
@@ -59,9 +53,19 @@ function narrativeArrayField(
         ],
       },
     ],
-    addActionLabel,
-    itemHeader: {
-      fallback: (index) => `${legend} ${index + 1}`,
+    item: {
+      variant: 'compact',
+      surface: 'subtle',
+      reorder: false,
+      header: {
+        fallback: (index) => `${legend} ${index + 1}`,
+      },
+    },
+    addAction: {
+      label: addActionLabel,
+      layout: 'inline',
+      variant: 'ghost',
+      size: 'sm',
     },
   }
 }

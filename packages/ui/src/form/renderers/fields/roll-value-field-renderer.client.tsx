@@ -6,6 +6,7 @@ import { useController } from 'react-hook-form'
 import { DIE_FACES } from '@rpg/contracts/primitives'
 
 import { RollValueField } from '../../../components/ui/roll-value-field.client'
+import type { FieldHintPosition } from '../../../components/ui/field.variants'
 import type { RollValueFieldPatchResult } from '../../../components/ui/roll-value-field.lib'
 import { resolveFirstFieldErrorMessage } from '../../errors/resolve-field-error-message'
 import type { RollValueFieldConfig } from '../../field-config'
@@ -15,6 +16,8 @@ export interface RollValueFieldRendererProps {
   fullName: string
   id: string
   error?: string
+  hint?: string
+  hintPosition?: FieldHintPosition
 }
 
 function subPath(fullName: string, suffix: string): string {
@@ -58,6 +61,8 @@ export function RollValueFieldRenderer({
   fullName,
   id,
   error,
+  hint,
+  hintPosition,
 }: RollValueFieldRendererProps) {
   const diceCount = useController({ name: subPath(fullName, 'dice.count') })
   const diceFaces = useController({ name: subPath(fullName, 'dice.faces') })
@@ -103,8 +108,8 @@ export function RollValueFieldRenderer({
       label={config.label}
       parts={parts}
       error={combinedError}
-      hint={config.hint}
-      hintPosition={config.hintPosition}
+      hint={hint}
+      hintPosition={hintPosition}
       info={config.info}
       required={config.required}
       disabled={config.disabled}

@@ -14,8 +14,12 @@ function findEffectsArray(fields: FormItem[]): ArrayConfig | undefined {
 describe('effectArrayFields', () => {
   it('registers a searchable add menu with four templates', () => {
     const arrayField = findEffectsArray(effectArrayFields({}))
-    expect(arrayField?.addActionMenu?.items).toHaveLength(4)
-    expect(arrayField?.addActionMenu?.items.map((item) => item.id)).toEqual([
+    const addAction = arrayField?.addAction
+    if (addAction === false || !addAction) {
+      throw new Error('expected searchable add menu')
+    }
+    expect(addAction.menu?.items).toHaveLength(4)
+    expect(addAction.menu?.items.map((item) => item.id)).toEqual([
       'damage',
       'healing',
       'temporary-hit-points',

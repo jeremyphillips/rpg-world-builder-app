@@ -11,6 +11,7 @@ import * as React from 'react'
 import type { UseFieldArrayAppend, UseFieldArrayReturn } from 'react-hook-form'
 
 import { buildArrayAddMenuItems } from '../../config/array/array-add-menu.lib'
+import { resolveArrayAddAction } from '../../config/array/array-item-config.lib'
 import type { ValidationSessionExpandKey } from '../../errors'
 import type { ArrayConfig } from '../../field-config'
 import {
@@ -81,19 +82,21 @@ export function useArrayFieldAppend({
 
   const appendFromAddMenu = React.useCallback(
     (itemId: string) => {
-      const menuItem = config.addActionMenu?.items.find((item) => item.id === itemId)
+      const menuItem = resolveArrayAddAction(config)?.menu?.items.find((item) => item.id === itemId)
       if (!menuItem) return
 
       const mergedDefaults = mergeArrayAddMenuDefaults(menuItem, staticItemDefaults)
       appendWithDefaults(mergedDefaults)
     },
-    [appendWithDefaults, config.addActionMenu?.items, staticItemDefaults],
+    [appendWithDefaults, config, staticItemDefaults],
   )
 
+  const addActionMenu = resolveArrayAddAction(config)?.menu
+
   const addActionMenuItems = React.useMemo(() => {
-    if (!config.addActionMenu) return []
-    return buildArrayAddMenuItems(config.addActionMenu, watchedItems ?? [])
-  }, [config.addActionMenu, watchedItems])
+    if (!addActionMenu) return []
+    return buildArrayAddMenuItems(addActionMenu, watchedItems ?? [])
+  }, [addActionMenu, watchedItems])
 
   return { appendItem, appendFromAddMenu, appendWithDefaults, addActionMenuItems }
 }

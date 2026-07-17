@@ -1,4 +1,4 @@
-import { cva, type VariantProps } from 'class-variance-authority'
+import { cva } from 'class-variance-authority'
 
 import { cn } from '../../lib/utils'
 import { compactLabelAppearanceToneClasses, type CompactLabelTone } from './compact-label.lib'
@@ -18,85 +18,80 @@ export const fieldGroupBodyShellLayoutClasses = cn(
 /** Subtle raised emboss for card-plane surfaces — inset highlight + drop shadow. */
 export const fieldSurfaceRaisedShadowClasses = 'shadow-surface-raised'
 
-/**
- * Closed vocabulary for surface wash tones on array items, stack dependents, and
- * group panels. Mixes elevation washes (`main`–`medium`) with semantic status
- * (`warning`, `error`) on one axis — see `ArrayConfig.itemChrome` JSDoc.
- */
-export const FIELD_SURFACE_TONES = [
-  'main',
-  'elevated',
-  'subtle',
-  'medium',
-  'warning',
-  'error',
-] as const
+/** Structural background plane for container chrome. */
+export const FIELD_SURFACE_VARIANTS = ['base', 'raised', 'subtle', 'medium', 'strong'] as const
 
-/** Surface tone for stack dependents, array item shells, and related chrome. */
-export type FieldSurfaceTone = (typeof FIELD_SURFACE_TONES)[number]
+export type FieldSurfaceVariant = (typeof FIELD_SURFACE_VARIANTS)[number]
 
-const fieldSurfaceToneClasses = {
-  main: 'border-border bg-background',
-  /** Opaque lift above the page plane — maps to the card surface token. */
-  elevated: cn('border-border bg-card', fieldSurfaceRaisedShadowClasses),
-  /** Very light wash — default for dependents and group panels. */
+/** Semantic emphasis for container chrome. */
+export const FIELD_STATUS_TONES = ['info', 'success', 'warning', 'destructive'] as const
+
+export type FieldStatusTone = (typeof FIELD_STATUS_TONES)[number]
+
+const fieldSurfaceVariantClasses = {
+  base: 'border-border bg-background',
+  raised: cn('border-border bg-card', fieldSurfaceRaisedShadowClasses),
   subtle: 'border-border bg-muted/10',
-  /** Medium wash — former `subtle` / `muted` panel strength. */
   medium: 'border-border bg-muted/30',
-  warning: 'border-border bg-accent/30',
-  error: 'border-destructive/50 bg-destructive/10',
-} satisfies Record<FieldSurfaceTone, string>
+  strong: 'border-border bg-muted/50',
+} satisfies Record<FieldSurfaceVariant, string>
+
+const fieldStatusToneClasses = {
+  info: 'border-info-muted bg-info-subtle',
+  success: 'border-success-muted bg-success-subtle',
+  warning: 'border-warning-muted bg-warning-subtle',
+  destructive: 'border-destructive-muted bg-destructive-subtle',
+} satisfies Record<FieldStatusTone, string>
+
+export function isFieldSurfaceVariant(value: string): value is FieldSurfaceVariant {
+  return (FIELD_SURFACE_VARIANTS as readonly string[]).includes(value)
+}
+
+export function isFieldStatusTone(value: string): value is FieldStatusTone {
+  return (FIELD_STATUS_TONES as readonly string[]).includes(value)
+}
+
+export interface FieldContainerChromeOptions {
+  surface?: FieldSurfaceVariant
+  status?: FieldStatusTone
+}
 
 /**
- * Border/bg tone only — no layout padding. Shared by stack dependents wrapper
- * chrome and array item shells when `dependentsChromeScope: 'arrayItems'`.
+ * Resolves border/background classes for array items, dependent containers, and
+ * similar shells. `status` replaces neutral fill/border from `surface`; `raised`
+ * shadow still applies when `surface === 'raised'` and a status is present.
  */
-export const fieldSurfaceToneVariants = cva('', {
-  variants: {
-    tone: fieldSurfaceToneClasses,
-  },
-  defaultVariants: {
-    tone: 'subtle',
-  },
-})
+export function resolveFieldContainerChromeClasses(
+  options: FieldContainerChromeOptions,
+  defaults: { surface: FieldSurfaceVariant } = { surface: 'subtle' },
+): string {
+  const surface = options.surface ?? (options.status ? 'subtle' : defaults.surface)
+  const { status } = options
 
-export type FieldSurfaceToneVariantProps = VariantProps<typeof fieldSurfaceToneVariants>
+  if (status) {
+    const statusClasses = fieldStatusToneClasses[status]
+    if (surface === 'raised') {
+      return cn(statusClasses, fieldSurfaceRaisedShadowClasses)
+    }
+    return statusClasses
+  }
+
+  return fieldSurfaceVariantClasses[surface]
+}
 
 /** Filled panel wash tones for group `fieldsChrome: { variant: 'panel' }`. */
-export type FieldGroupPanelTone =
-  | 'subtle'
-  | 'medium'
-  | 'emphasis'
-  | 'main'
-  | 'elevated'
-  | 'warning'
-  | 'error'
-  | CompactLabelTone
-  /** @deprecated Use `medium` */
-  | 'muted'
-  /** @deprecated Use `subtle` */
-  | 'subtle20'
+export type FieldGroupPanelTone = FieldSurfaceVariant | FieldStatusTone | CompactLabelTone
 
 /** Border-only outline tones for group `fieldsChrome: { variant: 'outline' }`. */
-export type FieldGroupOutlineTone = 'border' | 'primary' | 'destructive' | 'warning'
-
-const PANEL_TONE_CLASS: Record<Exclude<FieldGroupPanelTone, CompactLabelTone>, string> = {
-  subtle: 'border-border bg-muted/10',
-  medium: 'border-border bg-muted/30',
-  muted: 'border-border bg-muted/30',
-  subtle20: 'border-border bg-muted/10',
-  emphasis: 'border-border bg-muted/50',
-  main: 'border-border bg-background',
-  elevated: cn('border-border bg-card', fieldSurfaceRaisedShadowClasses),
-  warning: 'border-border bg-accent/30',
-  error: 'border-destructive/50 bg-destructive/10',
-}
+export type FieldGroupOutlineTone = 'border' | 'primary' | FieldStatusTone
 
 const OUTLINE_TONE_CLASS: Record<FieldGroupOutlineTone, string> = {
   border: 'border-border',
   primary: 'border-primary',
-  destructive: 'border-destructive',
+  info: 'border-info-muted',
+  success: 'border-success-muted',
   warning: 'border-warning-muted',
+  destructive: 'border-destructive',
 }
 
 export function isCompactLabelTone(value: string): value is CompactLabelTone {
@@ -109,20 +104,17 @@ export function isCompactLabelTone(value: string): value is CompactLabelTone {
   )
 }
 
-function normalizeFieldGroupPanelTone(tone: FieldGroupPanelTone): FieldGroupPanelTone {
-  if (tone === 'muted') return 'medium'
-  if (tone === 'subtle20') return 'subtle'
-  return tone
-}
-
 /** Resolves panel border/bg classes for neutral, status, and semantic tones. */
 export function resolveFieldGroupPanelToneClasses(tone: FieldGroupPanelTone = 'subtle'): string {
-  const resolved = normalizeFieldGroupPanelTone(tone)
-  if (isCompactLabelTone(resolved)) {
-    return compactLabelAppearanceToneClasses('soft', resolved)
+  if (isCompactLabelTone(tone)) {
+    return compactLabelAppearanceToneClasses('soft', tone)
   }
 
-  return PANEL_TONE_CLASS[resolved]
+  if (isFieldStatusTone(tone)) {
+    return resolveFieldContainerChromeClasses({ status: tone })
+  }
+
+  return resolveFieldContainerChromeClasses({ surface: tone })
 }
 
 /** Resolves outline border classes (no background wash). */
@@ -131,3 +123,20 @@ export function resolveFieldGroupOutlineToneClasses(
 ): string {
   return OUTLINE_TONE_CLASS[tone]
 }
+
+/** @deprecated Use `resolveFieldContainerChromeClasses` with `surface` / `status`. */
+export const fieldSurfaceToneVariants = cva('', {
+  variants: {
+    tone: {
+      main: fieldSurfaceVariantClasses.base,
+      elevated: fieldSurfaceVariantClasses.raised,
+      subtle: fieldSurfaceVariantClasses.subtle,
+      medium: fieldSurfaceVariantClasses.medium,
+      warning: fieldStatusToneClasses.warning,
+      error: fieldStatusToneClasses.destructive,
+    },
+  },
+  defaultVariants: {
+    tone: 'subtle',
+  },
+})

@@ -36,6 +36,20 @@ function prefixFormItem(item: FormItem, prefix: string): FormItem {
     }
   }
 
+  if (item.kind === 'dependent') {
+    return {
+      ...item,
+      controller: {
+        ...item.controller,
+        name: joinFieldPath(prefix, item.controller.name),
+      },
+      dependents: {
+        ...item.dependents,
+        fields: prefixFormItems(item.dependents.fields, prefix),
+      },
+    }
+  }
+
   return { ...item, fields: prefixFormItems(item.fields, prefix) }
 }
 

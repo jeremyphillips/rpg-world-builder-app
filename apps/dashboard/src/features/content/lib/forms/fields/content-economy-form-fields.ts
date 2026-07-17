@@ -93,8 +93,7 @@ export function optionalWeightFields(
             valueDigitsDependsOn: 'kind',
             valueDigitsLookup: EQUIPMENT_WEIGHT_VALUE_DIGITS,
           }),
-      hint: 'Leave blank if weightless or not tracked.',
-      hintPosition: 'below-control',
+      hint: { text: 'Leave blank if weightless or not tracked.', position: 'below-control' },
       ...(kind && isWeightEquipmentKind(kind)
         ? {}
         : {

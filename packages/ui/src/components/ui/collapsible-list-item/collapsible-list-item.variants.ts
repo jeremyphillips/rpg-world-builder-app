@@ -1,7 +1,6 @@
 import { cva } from 'class-variance-authority'
 
 import { cn } from '../../../lib/utils'
-import { fieldSurfaceToneVariants } from '../field-stack.variants'
 import {
   resolveCollapsibleListItemLeadingChrome,
   type CollapsibleListItemLeadingChromeOptions,
@@ -41,31 +40,20 @@ export const collapsibleListItemShellVariants = cva(cn('relative rounded-md bord
         'grid grid-cols-[minmax(0,1fr)_auto] items-start',
         collapsibleListItemShellPaddingClasses,
       ),
-      /** Flex header row + stacked summary/body — catalog picker rows. */
       headerActions: cn('flex flex-col', collapsibleListItemShellPaddingClasses),
-      /** Compact inline row — single column; actions live inside the row grid. */
       compactRow: cn(collapsibleListItemShellPaddingClasses, 'pt-[calc(var(--spacing)*2)]'),
-    },
-    tone: {
-      default: 'border-border',
-      main: fieldSurfaceToneVariants({ tone: 'main' }),
-      elevated: fieldSurfaceToneVariants({ tone: 'elevated' }),
-      subtle: fieldSurfaceToneVariants({ tone: 'subtle' }),
-      medium: fieldSurfaceToneVariants({ tone: 'medium' }),
-      warning: fieldSurfaceToneVariants({ tone: 'warning' }),
-      error: fieldSurfaceToneVariants({ tone: 'error' }),
-      /** Catalog picker row header — muted wash tuned for collapsible item shells. */
-      catalog: 'border-border bg-catalog-picker-row-surface',
     },
   },
   defaultVariants: {
     layout: 'default',
-    tone: 'default',
   },
 })
 
 /** Default shell classes — backward-compatible alias for tests and non-context usage. */
-export const collapsibleListItemShellClasses = collapsibleListItemShellVariants({ tone: 'default' })
+export const collapsibleListItemShellClasses = cn(
+  collapsibleListItemShellVariants(),
+  'border-border',
+)
 
 /** Main content column — top inset matches shell vertical rhythm. */
 export const collapsibleListItemMainClasses = 'min-w-0 pt-[calc(var(--spacing)*2)]'

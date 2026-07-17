@@ -4,6 +4,7 @@ import { useController } from 'react-hook-form'
 
 import { DiceFormulaField } from '../../../components/ui/dice-formula-field.client'
 import type { DiceFormulaValue } from '../../../components/ui/dice-formula-field.lib'
+import type { FieldHintPosition } from '../../../components/ui/field.variants'
 import type { DiceFormulaFieldConfig } from '../../field-config'
 
 export interface DiceFormulaFieldRendererProps {
@@ -15,6 +16,8 @@ export interface DiceFormulaFieldRendererProps {
   }
   id: string
   error?: string
+  hint?: string
+  hintPosition?: FieldHintPosition
   namePrefix?: string
 }
 
@@ -24,6 +27,8 @@ export function DiceFormulaFieldRenderer({
   field,
   id,
   error,
+  hint,
+  hintPosition,
   namePrefix,
 }: DiceFormulaFieldRendererProps) {
   const currencyConfig = config.currencyUnit
@@ -49,8 +54,8 @@ export function DiceFormulaFieldRenderer({
       id={id}
       label={config.label}
       error={error}
-      hint={config.hint}
-      hintPosition={config.hintPosition}
+      hint={hint}
+      hintPosition={hintPosition}
       info={config.info}
       required={config.required}
       width={config.width}

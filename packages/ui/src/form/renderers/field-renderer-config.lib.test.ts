@@ -20,6 +20,6 @@ describe('field-renderer-config.lib', () => {
       label: 'Title',
     } satisfies FieldConfig
 
-    expect(resolveFieldRenderConfig(config, 'md', {}, {}).size).toBe('md')
+    expect(resolveFieldRenderConfig(config, 'md', {}, {}).config.size).toBe('md')
   })
 })

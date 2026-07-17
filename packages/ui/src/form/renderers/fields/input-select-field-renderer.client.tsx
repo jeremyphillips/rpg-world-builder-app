@@ -3,6 +3,7 @@
 import { useController, useWatch } from 'react-hook-form'
 
 import { InputSelectField } from '../../../components/ui/input-select-field.client'
+import type { FieldHintPosition } from '../../../components/ui/field.variants'
 import { resolveValueDigitsFromConfig } from '../../config/input-field-value-digits.lib'
 import { resolveFirstFieldErrorMessage } from '../../errors/resolve-field-error-message'
 import { fieldDefaultValue, type InputSelectFieldConfig } from '../../field-config'
@@ -20,6 +21,8 @@ export interface InputSelectFieldRendererProps {
   id: string
   /** Prefix for `valueDigitsDependsOn` paths inside array items (e.g. `traits.0`). */
   namePrefix?: string
+  hint?: string
+  hintPosition?: FieldHintPosition
 }
 
 /**
@@ -58,6 +61,8 @@ export function InputSelectFieldRenderer({
   fullName,
   id,
   namePrefix,
+  hint,
+  hintPosition,
 }: InputSelectFieldRendererProps) {
   const valueKey = config.valueKey ?? 'value'
   const unitKey = config.unitKey ?? 'unit'
@@ -96,8 +101,8 @@ export function InputSelectFieldRenderer({
       searchable={config.searchable}
       unitPlaceholder={config.unitPlaceholder}
       error={error}
-      hint={config.hint}
-      hintPosition={config.hintPosition}
+      hint={hint}
+      hintPosition={hintPosition}
       info={config.info}
       required={config.required}
       disabled={config.disabled}

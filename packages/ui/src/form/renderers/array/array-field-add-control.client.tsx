@@ -19,7 +19,7 @@ import type {
 import { resolveArrayAddButtonSize } from '../../../components/ui/field-sizing.variants'
 import { cn } from '../../../lib/utils'
 import { useFormSectionContext } from '../../context/form-section.context'
-import type { ArrayAddActionLayout, ArrayConfig } from '../../field-config'
+import type { ArrayAddActionConfig, ArrayAddActionLayout } from '../../field-config'
 
 type ArrayFieldAddControlProps = {
   canAdd: boolean
@@ -28,7 +28,7 @@ type ArrayFieldAddControlProps = {
   addActionLayout?: ArrayAddActionLayout
   addActionSize?: NonNullable<ButtonVariantProps['size']>
   showAddIcon?: boolean
-  addActionMenu?: ArrayConfig['addActionMenu']
+  addActionMenu?: ArrayAddActionConfig['menu']
   addActionMenuItems: ButtonDropdownItem[]
   onAppendItem: () => void
   onAppendFromMenu: (itemId: string) => void

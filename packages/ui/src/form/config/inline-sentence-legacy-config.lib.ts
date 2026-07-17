@@ -47,14 +47,12 @@ export function inlineChooseCountToInlineSentence(
     segments,
     hideLabel: config.hideLabel,
     hint: config.hint,
-    hintPosition: config.hintPosition,
     info: config.info,
     required: config.required,
     disabled: config.disabled,
     size: config.size,
     width: config.width,
     visibility: config.visibility,
-    dynamicHint: config.dynamicHint,
   }
 }
 
@@ -87,7 +85,6 @@ export function chooseFromChipsToInlineSentence(
     ],
     below,
     hint: config.hint,
-    hintPosition: config.hintPosition,
     info: config.info,
     required: config.required,
     disabled: config.disabled,
@@ -95,7 +92,6 @@ export function chooseFromChipsToInlineSentence(
     width: config.width,
     chipSize: config.chipSize,
     visibility: config.visibility,
-    dynamicHint: config.dynamicHint,
   }
 }
 
@@ -118,13 +114,11 @@ export function inputUnitToInlineSentence(config: InputUnitFieldConfig): InlineS
       { kind: 'text', value: config.unit, tone: 'label' },
     ],
     hint: config.hint,
-    hintPosition: config.hintPosition,
     info: config.info,
     required: config.required,
     disabled: config.disabled,
     size: config.size,
     width: config.width,
     visibility: config.visibility,
-    dynamicHint: config.dynamicHint,
   }
 }

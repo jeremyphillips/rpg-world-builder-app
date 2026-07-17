@@ -33,8 +33,8 @@ import { Text } from './text'
 export type { FieldGroupLegendSize }
 
 export interface FieldGroupProps {
-  /** Group heading rendered as the fieldset legend. */
-  legend: string
+  /** Group heading rendered as the fieldset legend. Omit for layout-only wrappers. */
+  legend?: string
   /** Legend type scale — use `subsection` for nested groups, `array` for repeatable lists. */
   legendSize?: FieldGroupLegendSize
   /**
@@ -179,7 +179,9 @@ export function FieldGroup({
   const legendTypography = fieldGroupLegendVariants({ size: legendSize, scale: legendScale })
   const chromeClasses = resolveFieldGroupChromeClassNames(fieldsChrome)
   const resolvedCollapseKey =
-    collapseKey ?? id ?? (slugifyGroupCollapseKey(legend) || 'group-section')
+    collapseKey ??
+    id ??
+    (legend ? slugifyGroupCollapseKey(legend) || 'group-section' : 'group-section')
   const [open, onOpenChange] = useGroupCollapseState({
     collapseKey: resolvedCollapseKey,
     defaultOpen: chromeClasses.defaultOpen,
@@ -198,7 +200,7 @@ export function FieldGroup({
     <div className={cn(fieldStackRhythmVariants({ rhythm }), chromeClasses.body)}>{children}</div>
   )
 
-  const legendNode = (
+  const legendNode = legend ? (
     <FieldGroupLegend
       legend={legend}
       description={description}
@@ -209,10 +211,12 @@ export function FieldGroup({
       open={open}
       onToggle={() => onOpenChange(!open)}
     />
-  )
+  ) : null
+
+  const Wrapper = legend ? 'fieldset' : 'div'
 
   return (
-    <fieldset id={id} className={fieldsetClassName}>
+    <Wrapper id={id} className={fieldsetClassName}>
       {legendNode}
       {chromeClasses.isCollapsible ? (
         <Collapsible open={open} onOpenChange={onOpenChange} className="min-w-0">
@@ -223,6 +227,6 @@ export function FieldGroup({
       ) : (
         body
       )}
-    </fieldset>
+    </Wrapper>
   )
 }

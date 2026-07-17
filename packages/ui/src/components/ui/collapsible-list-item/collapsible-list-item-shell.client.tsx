@@ -4,6 +4,11 @@ import * as React from 'react'
 import type { CSSProperties } from 'react'
 
 import { cn } from '../../../lib/utils'
+import {
+  resolveFieldContainerChromeClasses,
+  type FieldStatusTone,
+  type FieldSurfaceVariant,
+} from '../field-surface.variants'
 import { resolveCollapsibleListItemLeadingChrome } from './collapsible-list-item-leading-chrome.lib'
 import { CollapsibleListItemActions } from './collapsible-list-item-actions.client'
 import {
@@ -15,15 +20,7 @@ import {
   type CollapsibleListItemLeadingChromeOptions,
 } from './collapsible-list-item.variants'
 
-export type CollapsibleListItemShellTone =
-  | 'default'
-  | 'main'
-  | 'elevated'
-  | 'subtle'
-  | 'medium'
-  | 'warning'
-  | 'error'
-  | 'catalog'
+export type CollapsibleListItemShellPreset = 'default' | 'catalog'
 
 export type CollapsibleListItemActionsAlign = 'start' | 'center'
 
@@ -33,17 +30,33 @@ export interface CollapsibleListItemShellProps extends CollapsibleListItemLeadin
   dragging?: boolean
   layout?: 'default' | 'compactRow'
   actionsAlign?: CollapsibleListItemActionsAlign
-  tone?: CollapsibleListItemShellTone
+  /** Non-form shell presets — bypass surface/status axes. */
+  preset?: CollapsibleListItemShellPreset
+  surface?: FieldSurfaceVariant
+  status?: FieldStatusTone
   className?: string
-  /** Preferred — toolbar/header row only. */
   toolbar?: React.ReactNode
-  /** Expanded content below the header row. */
   body?: React.ReactNode
-  /** Summary below the header row when actions center on the title row only. */
   summary?: React.ReactNode
-  /** Legacy combined toolbar + body (array items). */
   main?: React.ReactNode
   actions?: React.ReactNode
+}
+
+function resolveShellChromeClasses({
+  preset = 'default',
+  surface,
+  status,
+}: Pick<CollapsibleListItemShellProps, 'preset' | 'surface' | 'status'>): string {
+  if (preset === 'catalog') {
+    return 'border-border bg-catalog-picker-row-surface'
+  }
+  if (preset === 'default' && surface === undefined && status === undefined) {
+    return 'border-border'
+  }
+  return resolveFieldContainerChromeClasses(
+    { surface: surface ?? 'raised', status },
+    { surface: 'raised' },
+  )
 }
 
 /** Grid shell — toolbar row + optional body + trailing actions rail. */
@@ -55,7 +68,9 @@ export function CollapsibleListItemShell({
   dragging = false,
   layout = 'default',
   actionsAlign = 'start',
-  tone = 'default',
+  preset = 'default',
+  surface,
+  status,
   className,
   toolbar,
   body,
@@ -82,6 +97,7 @@ export function CollapsibleListItemShell({
     ) : (
       actions
     )
+  const chromeClasses = resolveShellChromeClasses({ preset, surface, status })
 
   return (
     <div
@@ -89,7 +105,8 @@ export function CollapsibleListItemShell({
       aria-labelledby={titleId}
       data-array-item-prefix={itemPrefix}
       className={cn(
-        collapsibleListItemShellVariants({ tone, layout: shellLayout }),
+        collapsibleListItemShellVariants({ layout: shellLayout }),
+        chromeClasses,
         dragging && collapsibleListItemDraggingClasses,
         className,
       )}
