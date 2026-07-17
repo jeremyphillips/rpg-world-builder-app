@@ -1,7 +1,7 @@
 [
   {
     "name": "Standard Starting Wealth",
-    "description": "<p>Default starting wealth tiers for higher-level character creation in SRD 5.2.1.</p>",
+    "description": "<p>Default starting wealth tiers for character creation.</p>",
     "scope": {
       "kind": "standard"
     },
