@@ -21,6 +21,11 @@ export default [
           pattern: 'src/character-import/**',
           mode: 'full',
         },
+        {
+          type: 'name-generator',
+          pattern: 'src/name-generator/**',
+          mode: 'full',
+        },
         { type: 'barrel', pattern: 'src/index.ts', mode: 'file' },
       ],
     },
@@ -50,6 +55,10 @@ export default [
             {
               from: ['character-import'],
               allow: ['validation', 'vocab', 'primitives', 'runtime', 'character-import'],
+            },
+            {
+              from: ['name-generator'],
+              allow: ['validation', 'vocab', 'name-generator'],
             },
             {
               from: ['barrel'],

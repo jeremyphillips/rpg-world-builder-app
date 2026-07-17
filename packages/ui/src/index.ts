@@ -386,6 +386,14 @@ export {
   type FilterPopoverProps,
 } from './components/ui/filter-popover.client'
 export {
+  FilterToolbar,
+  type FilterFieldConfig,
+  type FilterToolbarLabelLayout,
+  type FilterToolbarOption,
+  type FilterToolbarProps,
+  type SelectFilterFieldConfig,
+} from './components/ui/filter-toolbar.client'
+export {
   SegmentedControl,
   type SegmentedControlOption,
   type SegmentedControlProps,

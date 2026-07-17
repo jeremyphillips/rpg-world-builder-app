@@ -45,7 +45,7 @@ export const dataTablePaginationVariants = cva(
 
 /** Table container — elevated card plane on the page canvas. */
 export const dataTableTableWrapVariants = cva(
-  'overflow-hidden rounded-card border border-border bg-card text-card-foreground shadow-surface-raised',
+  'overflow-hidden rounded-card border border-border bg-subtle text-foreground shadow-surface-raised',
 )
 
 /**
@@ -60,9 +60,9 @@ export const dataTableHeaderRowVariants = cva(
   'border-b border-border bg-muted/45 hover:bg-muted/45 data-[state=selected]:bg-muted/45',
 )
 
-/** Body row — zebra striping and row-level hover wash. */
+/** Body row — uniform fill with row-level hover and selection. */
 export const dataTableRowVariants = cva(
-  'group/row h-14 border-b border-border/60 even:bg-muted/10 hover:bg-muted/15 data-[state=selected]:bg-muted/40',
+  'group/row h-14 border-b border-border/60 hover:bg-muted/15 data-[state=selected]:bg-muted/40',
 )
 
 /** Header cell — group context for sort icon hover/focus affordance. */
@@ -73,15 +73,15 @@ export const dataTableHeaderCellVariants = cva(
 /** Tighter body cell padding than the base TableCell default. */
 export const dataTableBodyCellPaddingVariants = cva('px-3 py-2')
 
-/** Body cell background tone — body only; headers stay flat. */
+/** Body cell tone — typography only; row supplies uniform background. */
 export const dataTableBodyCellVariants = cva('transition-colors', {
   variants: {
     tone: {
-      identity: 'bg-accent/35 group-hover/row:bg-accent/45',
-      data: 'bg-muted/30 text-muted-foreground group-hover/row:bg-muted/40',
-      source: 'bg-muted/35 text-muted-foreground group-hover/row:bg-muted/45',
-      actions: 'bg-muted/35 group-hover/row:bg-muted/45',
-      neutral: 'group-hover/row:bg-muted/15',
+      identity: '',
+      data: 'text-muted-foreground',
+      source: 'text-muted-foreground',
+      actions: '',
+      neutral: '',
     },
   },
   defaultVariants: { tone: 'neutral' },

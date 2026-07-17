@@ -27,6 +27,8 @@
     "@rpg/api-client": "workspace:*",
     "@rpg/catalog": "workspace:*",
     "@rpg/contracts": "workspace:*",
+    "@rpg/name-generator-core": "workspace:*",
+    "@rpg/name-generator-data": "workspace:*",
     "@rpg/ui": "workspace:*",
     "@tanstack/react-query": "^5.101.0",
     "class-variance-authority": "^0.7.1",

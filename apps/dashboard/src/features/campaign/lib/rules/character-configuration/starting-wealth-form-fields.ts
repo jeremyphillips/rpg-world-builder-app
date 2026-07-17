@@ -117,6 +117,7 @@ export function buildStartingWealthTiersField(): LevelRangeArrayConfig {
     max: STARTING_WEALTH_TIER_COUNT,
     rhythm: 'comfortable',
     itemVariant: 'detailed',
+    itemChrome: 'subtle',
     itemCollapsible: true,
     itemHeader: {
       primaryField: 'label',
@@ -190,6 +191,7 @@ export function buildStartingWealthTiersField(): LevelRangeArrayConfig {
         addActionLabel: 'Add magic item grant',
         min: 0,
         itemVariant: 'compact',
+        itemChrome: 'subtle',
         itemHeader: {
           fallback: (index) => `Grant #${index + 1}`,
           srOnly: true,

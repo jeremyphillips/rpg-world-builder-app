@@ -1,4 +1,7 @@
-import { PALETTE_PRIMITIVE_GROUPS } from '../../styles/tokens/palette-inventory'
+import {
+  PALETTE_ELEVATION_LADDER,
+  PALETTE_PRIMITIVE_GROUPS,
+} from '../../styles/tokens/palette-inventory'
 
 /** How the swatch renders the token in Storybook. */
 export type ColorTokenUsage = 'background' | 'text' | 'border'
@@ -33,22 +36,39 @@ export interface SurfaceBackground {
 
 export const SURFACE_BACKGROUNDS: SurfaceBackground[] = [
   { id: 'background', label: 'background', cssVar: '--background', tailwind: 'bg-background' },
-  { id: 'sidebar', label: 'sidebar', cssVar: '--sidebar', tailwind: 'bg-sidebar' },
+  { id: 'bg-subtle', label: 'bg-subtle', cssVar: '--bg-subtle', tailwind: 'bg-subtle' },
   { id: 'card', label: 'card', cssVar: '--card', tailwind: 'bg-card' },
   { id: 'muted', label: 'muted', cssVar: '--muted', tailwind: 'bg-muted' },
-  { id: 'accent', label: 'accent', cssVar: '--accent', tailwind: 'bg-accent' },
-  { id: 'primary', label: 'primary', cssVar: '--primary', tailwind: 'bg-primary' },
-  {
-    id: 'destructive-subtle',
-    label: 'destructive-subtle',
-    cssVar: '--destructive-subtle',
-    tailwind: 'bg-destructive-subtle',
-  },
+  { id: 'sidebar', label: 'sidebar', cssVar: '--sidebar', tailwind: 'bg-sidebar' },
 ]
+
+/** Layer 1 elevation ladder steps for stacked Storybook preview. */
+export const PALETTE_ELEVATION_LADDER_TOKENS: ColorToken[] = PALETTE_ELEVATION_LADDER.map(
+  (step) => ({
+    name: step,
+    cssVar: `--palette-${step}`,
+    tailwind: '(palette only)',
+    usage: 'background' as const,
+  }),
+)
+
+/** Orthogonal surface planes outside the elevation ladder. */
+export const PALETTE_ORTHOGONAL_SURFACE_TOKENS: ColorToken[] = [
+  'surface-secondary',
+  'surface-accent',
+].map((step) => ({
+  name: step,
+  cssVar: `--palette-${step}`,
+  tailwind: '(palette only)',
+  usage: 'background' as const,
+}))
 
 function palettePrimitiveUsage(step: string): ColorTokenUsage {
   if (step.startsWith('border-')) return 'border'
-  if (step.includes('foreground') || step.startsWith('semantic-')) return 'text'
+  if (step === 'neutral-hue') return 'background'
+  if (step.startsWith('fg-') || step.includes('foreground') || step.startsWith('semantic-')) {
+    return 'text'
+  }
   return 'background'
 }
 
@@ -58,12 +78,15 @@ export const PALETTE_PRIMITIVE_TOKEN_GROUPS: ColorTokenGroup[] = PALETTE_PRIMITI
     id: `palette-${group.id}`,
     label: `Palette · ${group.label}`,
     description: group.description,
-    tokens: group.steps.map((step) => ({
-      name: step,
-      cssVar: `--palette-${step}`,
-      tailwind: '(palette only)',
-      usage: palettePrimitiveUsage(step),
-    })),
+    tokens:
+      group.id === 'elevation'
+        ? PALETTE_ORTHOGONAL_SURFACE_TOKENS
+        : group.steps.map((step) => ({
+            name: step,
+            cssVar: `--palette-${step}`,
+            tailwind: '(palette only)',
+            usage: palettePrimitiveUsage(step),
+          })),
   }),
 )
 
@@ -102,6 +125,14 @@ export const COLOR_TOKEN_GROUPS: ColorTokenGroup[] = [
         usage: 'background',
         foregroundVar: '--card-foreground',
         foregroundTailwind: 'text-card-foreground',
+      },
+      {
+        name: 'bg-subtle',
+        cssVar: '--bg-subtle',
+        tailwind: 'bg-subtle',
+        usage: 'background',
+        foregroundVar: '--foreground',
+        foregroundTailwind: 'text-foreground',
       },
       {
         name: 'card-foreground',

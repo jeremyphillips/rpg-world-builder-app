@@ -33,6 +33,12 @@ export const CharacterImportRoute = withRouteSuspense(
 export const AccountSettingsRoute = withRouteSuspense(
   lazyNamed(() => import('@/features/user/routes/account-settings'), 'AccountSettings'),
 )
+export const NameGeneratorRoute = withRouteSuspense(
+  lazyNamed(
+    () => import('@/features/name-generator/routes/name-generator-route'),
+    'NameGeneratorRoute',
+  ),
+)
 export const AdminUsersRoute = withRouteSuspense(
   lazyNamed(() => import('@/features/admin/routes/admin-users'), 'AdminUsers'),
 )

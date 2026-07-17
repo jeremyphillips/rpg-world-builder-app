@@ -41,6 +41,7 @@ export type BuildLevelRangeTiersArrayFieldOptions = {
   size?: LevelRangeArrayConfig['size']
   itemHeader?: ArrayItemHeaderConfig
   itemVariant?: LevelRangeArrayConfig['itemVariant']
+  itemChrome?: LevelRangeArrayConfig['itemChrome']
   itemCollapsible?: LevelRangeArrayConfig['itemCollapsible']
   addActionLabel?: string
   /** Row fields after the level range control. */
@@ -67,6 +68,7 @@ export function buildLevelRangeTiersArrayField(
     size: options.size,
     itemHeader: options.itemHeader,
     itemVariant: options.itemVariant,
+    itemChrome: options.itemChrome,
     itemCollapsible: options.itemCollapsible ?? true,
     addActionLabel: options.addActionLabel,
     reorder: false,

@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, type ReactNode } from 'react'
+import { Fragment, useEffect, useState, type ReactNode } from 'react'
 
 import { cn } from '../../lib/utils'
 import { Heading } from '../../components/ui/heading'
@@ -9,6 +9,7 @@ import { useTheme } from '../../providers/theme-provider.client'
 import {
   COLOR_TOKEN_GROUPS,
   ON_SURFACE_TOKENS,
+  PALETTE_ELEVATION_LADDER_TOKENS,
   PALETTE_PRIMITIVE_TOKEN_GROUPS,
   SURFACE_BACKGROUNDS,
   type ColorToken,
@@ -122,6 +123,33 @@ function ColorSwatch({ token }: { token: ColorToken }) {
   )
 }
 
+function ElevationLadderSection() {
+  return (
+    <section className={colorPaletteGroupSectionClasses} aria-labelledby="palette-elevation-ladder">
+      <div className={colorPaletteGroupHeaderClasses}>
+        <Heading variant="section" as="h2" id="palette-elevation-ladder">
+          Palette · Elevation ladder
+        </Heading>
+        <Text variant="muted">
+          Canvas → subtle → raised; sunken recessed below base. Same role names in light and dark.
+        </Text>
+      </div>
+      <div className="flex max-w-md flex-col gap-1 rounded-xl border border-border p-4">
+        {PALETTE_ELEVATION_LADDER_TOKENS.map((token) => (
+          <div
+            key={token.cssVar}
+            className="flex items-center justify-between gap-4 rounded-lg border border-border/50 px-4 py-3"
+            style={{ backgroundColor: `var(${token.cssVar})` }}
+          >
+            <span className="font-mono text-sm text-foreground">{token.name}</span>
+            <span className="font-mono text-xs text-muted-foreground">{token.cssVar}</span>
+          </div>
+        ))}
+      </div>
+    </section>
+  )
+}
+
 function TokenGroupSection({ group }: { group: ColorTokenGroup }) {
   return (
     <section className={colorPaletteGroupSectionClasses} aria-labelledby={`palette-${group.id}`}>
@@ -154,9 +182,16 @@ export function ColorPaletteCatalog() {
           Tailwind utility, and computed value.
         </Text>
       </header>
-      {PALETTE_PRIMITIVE_TOKEN_GROUPS.map((group) => (
-        <TokenGroupSection key={group.id} group={group} />
-      ))}
+      {PALETTE_PRIMITIVE_TOKEN_GROUPS.map((group) =>
+        group.id === 'palette-elevation' ? (
+          <Fragment key={group.id}>
+            <ElevationLadderSection />
+            <TokenGroupSection group={group} />
+          </Fragment>
+        ) : (
+          <TokenGroupSection key={group.id} group={group} />
+        ),
+      )}
       {COLOR_TOKEN_GROUPS.map((group) => (
         <TokenGroupSection key={group.id} group={group} />
       ))}

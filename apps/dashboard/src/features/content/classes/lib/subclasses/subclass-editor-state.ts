@@ -1,6 +1,7 @@
 import type { ContentSource, Subclass } from '@rpg/contracts'
 
 import type { SubclassFormValues } from './subclass-form-fields'
+import { serializeSubclassFormValues } from './subclass-form-value-snapshot'
 import { subclassFormDef } from './subclass-form-values'
 import {
   createDraftSubclassId,
@@ -102,7 +103,7 @@ export function isSubclassModified(
 
   const merged = getMergedSubclassFormValues(id, subclasses, drafts, {})
   const current = getMergedSubclassFormValues(id, subclasses, drafts, edits)
-  return JSON.stringify(merged) !== JSON.stringify(current)
+  return serializeSubclassFormValues(merged) !== serializeSubclassFormValues(current)
 }
 
 export function selectNextSubclassId(

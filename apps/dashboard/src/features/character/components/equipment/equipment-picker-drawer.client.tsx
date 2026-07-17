@@ -6,6 +6,7 @@ import { CircleAlert } from 'lucide-react'
 import {
   CatalogPickerSheet,
   EmphasisDetailLine,
+  FilterToolbar,
   Text,
   type CatalogPickerSheetToolbarContext,
 } from '@rpg/ui'
@@ -22,14 +23,11 @@ import { buildEquipmentPickerRowViewModel } from '@/features/content'
 
 import { CatalogPickerFilterCheckbox } from '../picker/catalog-picker-filter-checkbox.client'
 import {
-  CatalogPickerFilterGroup,
-  CatalogPickerFilterSelectItem,
-} from '../picker/catalog-picker-filter-group.client'
-import {
   catalogPickerFiltersMainClasses,
   catalogPickerFiltersRowClasses,
   catalogPickerSortActionsGroupClasses,
 } from '../picker/catalog-picker-filter-toolbar.variants'
+import { catalogPickerInlineSelectFilter } from '../picker/catalog-picker-select-filter.lib'
 import { catalogPickerShellProps } from '../picker/catalog-picker-shell.lib'
 import { CatalogPickerSortGroup } from '../picker/catalog-picker-sort-group.client'
 import { pickerSortOption } from '../picker/catalog-picker-sort-labels.lib'
@@ -171,28 +169,39 @@ function EquipmentPickerFilterToolbarControls({
   sortMode: EquipmentPickerSortMode
   onSortModeChange: (mode: EquipmentPickerSortMode) => void
 }) {
+  const categoryFilterFields = React.useMemo(
+    () => [
+      catalogPickerInlineSelectFilter<{ selectedKind: EquipmentPickerKindFilter }, 'selectedKind'>({
+        key: 'selectedKind',
+        label: EQUIPMENT_PICKER_CATEGORY_LABEL,
+        ariaLabel: 'Filter by category',
+        triggerAriaLabel: 'Equipment category',
+        options: [
+          { value: EQUIPMENT_PICKER_KIND_ALL, label: 'All' },
+          ...kinds.map((kind) => ({ value: kind, label: getEquipmentKindLabel(kind) })),
+        ],
+      }),
+    ],
+    [kinds],
+  )
+
   const showCategoryFilter = kinds.length > 1
 
   return (
     <div className={catalogPickerFiltersRowClasses}>
       <div className={catalogPickerFiltersMainClasses}>
         {showCategoryFilter ? (
-          <CatalogPickerFilterGroup
-            label={EQUIPMENT_PICKER_CATEGORY_LABEL}
-            ariaLabel="Filter by category"
-            value={selectedKind}
-            onValueChange={(value) => onSelectedKindChange(value as EquipmentPickerKindFilter)}
-            triggerAriaLabel="Equipment category"
-          >
-            <CatalogPickerFilterSelectItem value={EQUIPMENT_PICKER_KIND_ALL}>
-              All
-            </CatalogPickerFilterSelectItem>
-            {kinds.map((kind) => (
-              <CatalogPickerFilterSelectItem key={kind} value={kind}>
-                {getEquipmentKindLabel(kind)}
-              </CatalogPickerFilterSelectItem>
-            ))}
-          </CatalogPickerFilterGroup>
+          <FilterToolbar
+            idPrefix="equipment-picker-category"
+            fields={categoryFilterFields}
+            values={{ selectedKind }}
+            className="flex-row flex-nowrap items-center gap-0"
+            onValueChange={(_key, value) => {
+              if (value !== undefined) {
+                onSelectedKindChange(value as EquipmentPickerKindFilter)
+              }
+            }}
+          />
         ) : null}
 
         {showAffordableFilter ? (

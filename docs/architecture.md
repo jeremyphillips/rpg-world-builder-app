@@ -19,6 +19,8 @@ packages/
   dev-bench-core/  # Dev Bench domain helpers (workflow, seeds, agent formatting)
   api-client/  # same-origin fetch + CSRF + auth helpers (fetchSession, logout)
   catalog/     # system SRD seed JSON + validated loaders (shared catalog data)
+  name-generator-core/  # pure name generation and convention recommendation
+  name-generator-data/  # naming conventions manifest + lazy collection loaders
   ui/          # shadcn primitives, Tailwind v4 preset, design tokens
                # Storybook (:6006) for primitives, forms, recipes
 tools/
@@ -27,19 +29,21 @@ tools/
 docs/          # this folder — cross-cutting architecture/env/run guides
 ```
 
-| Workspace             | README                                                                          |
-| --------------------- | ------------------------------------------------------------------------------- |
-| `@rpg/public`         | [apps/public/README.md](../apps/public/README.md)                               |
-| `@rpg/dashboard`      | [apps/dashboard/README.md](../apps/dashboard/README.md)                         |
-| `@rpg/bench`          | [apps/bench/README.md](../apps/bench/README.md)                                 |
-| `@rpg/api`            | [apps/api/README.md](../apps/api/README.md)                                     |
-| `@rpg/config`         | [packages/config/README.md](../packages/config/README.md)                       |
-| `@rpg/contracts`      | [packages/contracts/README.md](../packages/contracts/README.md)                 |
-| `@rpg/dev-bench-core` | [packages/dev-bench-core/src/index.ts](../packages/dev-bench-core/src/index.ts) |
-| `@rpg/bench-cli`      | [tools/bench/README.md](../tools/bench/README.md)                               |
-| `@rpg/api-client`     | [packages/api-client/README.md](../packages/api-client/README.md)               |
-| `@rpg/catalog`        | [packages/catalog/README.md](../packages/catalog/README.md)                     |
-| `@rpg/ui`             | [packages/ui/README.md](../packages/ui/README.md)                               |
+| Workspace                  | README                                                                              |
+| -------------------------- | ----------------------------------------------------------------------------------- |
+| `@rpg/public`              | [apps/public/README.md](../apps/public/README.md)                                   |
+| `@rpg/dashboard`           | [apps/dashboard/README.md](../apps/dashboard/README.md)                             |
+| `@rpg/bench`               | [apps/bench/README.md](../apps/bench/README.md)                                     |
+| `@rpg/api`                 | [apps/api/README.md](../apps/api/README.md)                                         |
+| `@rpg/config`              | [packages/config/README.md](../packages/config/README.md)                           |
+| `@rpg/contracts`           | [packages/contracts/README.md](../packages/contracts/README.md)                     |
+| `@rpg/dev-bench-core`      | [packages/dev-bench-core/src/index.ts](../packages/dev-bench-core/src/index.ts)     |
+| `@rpg/bench-cli`           | [tools/bench/README.md](../tools/bench/README.md)                                   |
+| `@rpg/api-client`          | [packages/api-client/README.md](../packages/api-client/README.md)                   |
+| `@rpg/catalog`             | [packages/catalog/README.md](../packages/catalog/README.md)                         |
+| `@rpg/name-generator-core` | [packages/name-generator-core/README.md](../packages/name-generator-core/README.md) |
+| `@rpg/name-generator-data` | [packages/name-generator-data/README.md](../packages/name-generator-data/README.md) |
+| `@rpg/ui`                  | [packages/ui/README.md](../packages/ui/README.md)                                   |
 
 ## Single-origin topology
 
@@ -134,6 +138,10 @@ and the API's cookie/CSRF model in [apps/api/README.md](../apps/api/README.md).
   Package layout → [packages/contracts/docs/structure.md](../packages/contracts/docs/structure.md).
   Campaign **rules vocabulary** (creature types, …) is documented in
   [vocabulary.md](./vocabulary.md).
+- **`@rpg/name-generator-core`** and **`@rpg/name-generator-data`** provide the
+  experimental name generator foundation (pure generation + lazy fixture data).
+  Contracts live on the isolated `@rpg/contracts/name-generator` subpath — not
+  the root contracts barrel.
 - **`@rpg/api-client`** provides same-origin `fetch` wrappers (CSRF header,
   `ApiError`, `fetchSession`, `logout`) shared by the public and dashboard apps.
   No React dependency — apps wire it through TanStack Query hooks locally.

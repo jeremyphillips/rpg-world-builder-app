@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useMemo, useRef } from 'react'
-import { FormProvider, useForm, useWatch } from 'react-hook-form'
+import { FormProvider, useForm } from 'react-hook-form'
 import { Badge, Button, InfoTooltip, Switch, Text } from '@rpg/ui'
 import { FormItems, makeResolver } from '@rpg/ui/form'
 import type { Subclass } from '@rpg/contracts'
@@ -17,6 +17,7 @@ import {
   buildSubclassFields,
   type SubclassFormValues,
 } from '../lib/subclasses/subclass-form-fields'
+import { isSubclassFormValuesLike } from '../lib/subclasses/subclass-form-value-snapshot'
 import { subclassFormDef } from '../lib/subclasses/subclass-form-values'
 
 export interface SubclassEditorPanelProps {
@@ -67,13 +68,15 @@ export function SubclassEditorPanel({
     mode: 'onSubmit',
   })
 
-  const watchedValues = useWatch({ control: form.control }) as SubclassFormValues
-
   // Remount via `key={subclassId}` on the parent handles selection changes — do not
   // reset when parent re-renders from local edit state (that caused an update loop).
   useEffect(() => {
-    onValuesChangeRef.current(watchedValues)
-  }, [watchedValues])
+    const subscription = form.watch((values) => {
+      if (!isSubclassFormValuesLike(values)) return
+      onValuesChangeRef.current(values)
+    })
+    return () => subscription.unsubscribe()
+  }, [form])
 
   const handleSaveStub = () => {
     void form.handleSubmit((values: SubclassFormValues) => {

@@ -2,6 +2,10 @@ import type { Subclass } from '@rpg/contracts'
 
 import type { SubclassFormValues } from './subclass-form-fields'
 import { getMergedSubclassFormValues, type SubclassDraft } from './subclass-editor-state'
+import {
+  isSubclassFormValuesLike,
+  serializeSubclassFormValues,
+} from './subclass-form-value-snapshot'
 
 export function applySubclassFormEdits(
   current: Record<string, Partial<SubclassFormValues>>,
@@ -10,17 +14,24 @@ export function applySubclassFormEdits(
   subclasses: Subclass[],
   drafts: SubclassDraft[],
 ): Record<string, Partial<SubclassFormValues>> {
-  const base = getMergedSubclassFormValues(selectedId, subclasses, drafts, {})
-  const serializedValues = JSON.stringify(values)
+  if (!isSubclassFormValuesLike(values)) return current
 
-  if (serializedValues === JSON.stringify(base)) {
+  const base = getMergedSubclassFormValues(selectedId, subclasses, drafts, {})
+  const serializedValues = serializeSubclassFormValues(values)
+
+  if (serializedValues === serializeSubclassFormValues(base)) {
     if (!(selectedId in current)) return current
     const copy = { ...current }
     delete copy[selectedId]
     return copy
   }
 
-  if (serializedValues === JSON.stringify(current[selectedId])) {
+  const stored = current[selectedId]
+  if (
+    stored &&
+    isSubclassFormValuesLike(stored) &&
+    serializedValues === serializeSubclassFormValues(stored)
+  ) {
     return current
   }
 

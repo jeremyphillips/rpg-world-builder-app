@@ -65,6 +65,14 @@
     "./character-import": {
       "types": "./src/character-import/index.ts",
       "default": "./src/character-import/index.ts"
+    },
+    "./name-generator": {
+      "types": "./src/name-generator/index.ts",
+      "default": "./src/name-generator/index.ts"
+    },
+    "./name-generator/test-fixtures": {
+      "types": "./src/name-generator/test-fixtures.ts",
+      "default": "./src/name-generator/test-fixtures.ts"
     }
   },
   "scripts": {

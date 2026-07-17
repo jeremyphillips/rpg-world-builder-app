@@ -18,30 +18,12 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
-/** Full token catalog grouped by role. */
-export const Palette: Story = {
+/** Palette roles + Layer 2 semantics — switch theme via Storybook toolbar. */
+export const Catalog: Story = {
   render: () => <ColorPaletteCatalog />,
 }
 
-/** Swatches layered on background, card, muted, accent, primary, and destructive-subtle planes. */
+/** Contrast matrix on background, bg-subtle, card, muted, and sidebar planes. */
 export const OnSurfaces: Story = {
-  render: () => <ColorOnSurfacesCatalog />,
-}
-
-/** Light theme snapshot — pin `globals.theme` for visual regression or design review. */
-export const Light: Story = {
-  globals: { theme: 'light' },
-  render: () => <ColorPaletteCatalog />,
-}
-
-/** Dark theme snapshot. */
-export const Dark: Story = {
-  globals: { theme: 'dark' },
-  render: () => <ColorPaletteCatalog />,
-}
-
-/** On-surface matrix in dark mode. */
-export const OnSurfacesDark: Story = {
-  globals: { theme: 'dark' },
   render: () => <ColorOnSurfacesCatalog />,
 }

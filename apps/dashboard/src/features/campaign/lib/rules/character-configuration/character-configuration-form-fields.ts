@@ -503,25 +503,33 @@ function creationSectionItems(): FormItem[] {
         },
         importedCharactersPolicyField(),
         {
-          type: 'text',
-          name: `${prefix}.name`,
-          label: 'Table name',
-          required: true,
-          width: 'full',
-        },
-        {
-          type: 'richtext',
-          name: `${prefix}.description`,
-          label: 'Description',
-          width: 'full',
+          kind: 'group',
+          legend: 'Equipment packages',
+          fieldsChrome: { variant: 'inset' },
+          fields: [
+            {
+              type: 'text',
+              name: `${prefix}.name`,
+              label: 'Table name',
+              required: true,
+              width: 'full',
+            },
+            {
+              type: 'richtext',
+              name: `${prefix}.description`,
+              label: 'Description',
+              width: 'full',
+            },
+            {
+              ...(buildStartingWealthTiersField() as ArrayConfig),
+              name: `${prefix}.tiers`,
+              id: 'starting-wealth',
+              itemChrome: 'subtle',
+              className: SCROLL_SECTION_ANCHOR_CLASS,
+            },
+          ],
         },
       ],
-    },
-    {
-      ...(buildStartingWealthTiersField() as ArrayConfig),
-      name: `${prefix}.tiers`,
-      id: 'starting-wealth',
-      className: SCROLL_SECTION_ANCHOR_CLASS,
     },
   ]
 }
