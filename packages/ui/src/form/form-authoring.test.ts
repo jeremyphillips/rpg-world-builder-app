@@ -1,9 +1,15 @@
 import { describe, expect, expectTypeOf, it } from 'vitest'
 
-import type { ArrayConfig, FormItem, SelectFieldConfig } from './field-config'
+import type {
+  ArrayConfig,
+  DiceFormulaFieldConfig,
+  FormItem,
+  SelectFieldConfig,
+} from './field-config'
 import {
   defineArrayField,
   defineComboboxField,
+  defineDiceFormulaField,
   defineForm,
   defineFormItems,
   defineGroupField,
@@ -11,6 +17,7 @@ import {
   defineSelectField,
   defineStackField,
 } from './form-authoring'
+import { DICE_FORMULA_OPERATORS } from '../components/ui/dice-formula-field.lib'
 
 describe('form-authoring helpers', () => {
   it('returns the same object reference (identity)', () => {
@@ -93,6 +100,21 @@ describe('form-authoring helpers', () => {
       multiple: false,
     })
     expectTypeOf(combobox.multiple).toEqualTypeOf<false>()
+  })
+
+  it('preserves dice formula config literals', () => {
+    const dice = defineDiceFormulaField({
+      type: 'diceFormula',
+      name: 'formula',
+      label: 'Roll',
+      modifierMode: 'required',
+      modifierOperators: DICE_FORMULA_OPERATORS,
+      faces: [6, 8, 10],
+    })
+
+    expectTypeOf(dice.type).toEqualTypeOf<'diceFormula'>()
+    expectTypeOf(dice.modifierMode).toEqualTypeOf<'required'>()
+    expectTypeOf(dice).toMatchTypeOf<DiceFormulaFieldConfig>()
   })
 
   it('assigns helper output to FormItem[] without friction', () => {

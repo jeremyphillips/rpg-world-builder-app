@@ -144,10 +144,13 @@ the renderer. Plain object literals remain fully valid.
 | `defineGroupField()`          | `kind: 'group'` — fieldset subsection             |
 | `defineComboboxField()`       | `type: 'combobox'`                                |
 | `defineInlineSentenceField()` | `type: 'inlineSentence'`                          |
+| `defineDiceFormulaField()`    | `type: 'diceFormula'` — XdY + tail operand        |
 
 Simple leaf types (`text`, `number`, `checkbox`, …) do not need helpers.
 
-**VS Code snippets** (`.vscode/form.code-snippets`): `form-def`, `form-items`, `form-array`.
+**VS Code snippets** (`.vscode/form.code-snippets`): `form-def`, `form-items`, `form-array`,
+`form-group`, `form-stack`. Snippet comments reference inventory const names (`FIELD_WIDTHS`,
+`FIELD_SURFACE_TONES`) — import from `@rpg/ui/form` when using those tokens in code.
 
 JSDoc on complex configs in [field-config.ts](../src/form/field-config.ts) documents
 common options, defaults, and allowed values — especially `ArrayConfig.itemChrome`.
@@ -164,7 +167,14 @@ Closed token sets are exported as const inventories from `@rpg/ui/form`:
 
 Types derive from inventories; CVA class maps use `satisfies Record<…>` for compile-time
 parity. JSDoc on `BaseFieldConfig` and variant interfaces explains semantics and defaults —
-review manually when authoring contracts change. No mass migration to `define*` required.
+review manually when authoring contracts change.
+
+### No migration policy
+
+Existing `*-form-fields.ts` modules stay as plain object literals. Adopt `define*` helpers and
+VS Code snippets only in **new** modules or when you are already touching a file for other
+reasons. There is no repo-wide migration to helpers — they exist for completion and readability,
+not as a renderer requirement.
 
 ## Container kinds
 

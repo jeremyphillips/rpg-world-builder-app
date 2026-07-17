@@ -41,6 +41,9 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile --prefer-offline
 
+      - name: JSON Schema freshness
+        run: pnpm gate:json-schemas
+
       - name: Typecheck and lint (affected)
         run: pnpm gate:ci:quality
 

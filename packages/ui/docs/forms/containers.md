@@ -187,6 +187,9 @@ Repeatable section via `useFieldArray`. Item field names are **relative** (rende
 `arrayName.index`). Item shells default to the **elevated** surface (`bg-card` + raised shadow);
 use `itemChrome` or stack `dependentsChrome` + `dependentsChromeScope: 'arrayItems'` to override.
 
+**Authoring guide:** [array-field-authoring.md](./array-field-authoring.md) — headers, chrome
+decision table, add menus, nested arrays, and common mistakes.
+
 **Implementation:** `form-item-node` dispatches `kind: 'array'` to
 [`array-form-item-section.client.tsx`](../src/form/renderers/array/array-form-item-section.client.tsx)
 (or [`conditional-array-field.client.tsx`](../src/form/renderers/array/conditional-array-field.client.tsx)

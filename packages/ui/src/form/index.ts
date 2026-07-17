@@ -143,6 +143,7 @@ export {
 export {
   defineArrayField,
   defineComboboxField,
+  defineDiceFormulaField,
   defineForm,
   defineFormItems,
   defineGroupField,

@@ -1,0 +1,18 @@
+{
+  "json.schemas": [
+    {
+      "fileMatch": ["packages/catalog/src/species/data/**/species.json"],
+      "url": "./packages/contracts/generated/catalog-species-list.schema.json"
+    },
+    {
+      "fileMatch": [
+        "packages/catalog/src/classes/data/*/{barbarian,bard,cleric,druid,fighter,monk,paladin,ranger,rogue,sorcerer,warlock,wizard}.json"
+      ],
+      "url": "./packages/contracts/generated/catalog-class.schema.json"
+    },
+    {
+      "fileMatch": ["packages/catalog/src/classes/data/**/subclasses.json"],
+      "url": "./packages/contracts/generated/catalog-subclass-list.schema.json"
+    }
+  ]
+}

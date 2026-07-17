@@ -28,6 +28,7 @@
     "description": "Repeatable array field skeleton with defineArrayField",
     "scope": "typescript,typescriptreact",
     "body": [
+      "// itemChrome: FIELD_SURFACE_TONES — main | elevated | subtle | medium | warning | error",
       "defineArrayField({",
       "  kind: 'array',",
       "  name: '${1:fieldName}',",
@@ -42,6 +43,39 @@
       "  },",
       "  fields: [",
       "    { type: 'text', name: '${8:name}', label: '${9:Name}', required: true },",
+      "    $0",
+      "  ],",
+      "})"
+    ]
+  },
+  "Form group field": {
+    "prefix": "form-group",
+    "description": "Named fieldset subsection with defineGroupField",
+    "scope": "typescript,typescriptreact",
+    "body": [
+      "defineGroupField({",
+      "  kind: 'group',",
+      "  legend: '${1:Section title}',",
+      "  rhythm: '${2|comfortable,compact|}',",
+      "  fields: [",
+      "    $0",
+      "  ],",
+      "})"
+    ]
+  },
+  "Dependent stack field": {
+    "prefix": "form-stack",
+    "description": "Controller + dependents column with defineStackField",
+    "scope": "typescript,typescriptreact",
+    "body": [
+      "// dependentsChrome: FIELD_SURFACE_TONES — main | elevated | subtle | medium | warning | error",
+      "defineStackField({",
+      "  kind: 'stack',",
+      "  layout: 'dependent',",
+      "  dependentsChrome: '${1|subtle,main,elevated,medium,warning,error|}',",
+      "  fields: [",
+      "    { type: 'switch', name: '${2:enabled}', label: '${3:Enable rule}' },",
+      "    { type: 'text', name: '${4:value}', label: '${5:Value}', labelPosition: 'settings' },",
       "    $0",
       "  ],",
       "})"

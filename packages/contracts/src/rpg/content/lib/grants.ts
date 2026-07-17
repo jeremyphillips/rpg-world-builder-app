@@ -459,8 +459,15 @@ export type GrantUnlock = z.infer<typeof grantUnlockSchema>
  * the trait is gained for species traits.
  */
 export const grantGroupSchema = z.object({
-  unlock: grantUnlockSchema.optional(),
-  grants: z.array(contentGrantSchema).min(1),
+  unlock: grantUnlockSchema
+    .optional()
+    .describe(
+      'When this group unlocks. Omit for the default group (granted when the trait or feature is first gained).',
+    ),
+  grants: z
+    .array(contentGrantSchema)
+    .min(1)
+    .describe('Atomic grants that unlock together. At least one grant is required.'),
 })
 
 export type GrantGroup = z.infer<typeof grantGroupSchema>

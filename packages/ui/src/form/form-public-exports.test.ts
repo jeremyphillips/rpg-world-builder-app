@@ -1,6 +1,13 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, expectTypeOf, it } from 'vitest'
 
 import * as Form from './index'
+import type {
+  DiceFormulaTailOperator,
+  FieldChrome,
+  FieldSize,
+  FieldStackDependentsTone,
+  FieldWidth,
+} from './index'
 
 const REQUIRED_PUBLIC_EXPORTS = [
   'FIELD_WIDTHS',
@@ -14,6 +21,7 @@ const REQUIRED_PUBLIC_EXPORTS = [
   'defineStackField',
   'defineGroupField',
   'defineComboboxField',
+  'defineDiceFormulaField',
   'defineInlineSentenceField',
   'Form',
   'makeResolver',
@@ -25,5 +33,17 @@ describe('@rpg/ui/form public exports', () => {
     for (const exportName of REQUIRED_PUBLIC_EXPORTS) {
       expect(Form).toHaveProperty(exportName)
     }
+  })
+
+  it('exports authoring types from the public entry', () => {
+    expectTypeOf<FieldWidth>().toEqualTypeOf<(typeof Form.FIELD_WIDTHS)[number]>()
+    expectTypeOf<FieldSize>().not.toBeAny()
+    expectTypeOf<FieldChrome>().not.toBeAny()
+    expectTypeOf<FieldStackDependentsTone>().toEqualTypeOf<
+      (typeof Form.FIELD_SURFACE_TONES)[number]
+    >()
+    expectTypeOf<DiceFormulaTailOperator>().toEqualTypeOf<
+      (typeof Form.DICE_FORMULA_TAIL_OPERATORS)[number]
+    >()
   })
 })

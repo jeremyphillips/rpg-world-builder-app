@@ -1,6 +1,7 @@
 import type {
   ArrayConfig,
   ComboboxFieldConfig,
+  DiceFormulaFieldConfig,
   FormItem,
   GroupConfig,
   InlineSentenceFieldConfig,
@@ -14,6 +15,7 @@ import type {
  * Three complementary layers:
  * - **`defineForm` / `defineFormItems`** — form-level structure and reusable field groups
  * - **`define*Field`** — variant-specific completion for complex field types
+ *   (`defineArrayField`, `defineDiceFormulaField`, …)
  * - **JSDoc on `field-config.ts`** — inline reference for defaults and allowed values
  *
  * Plain object literals remain fully valid; helpers are optional identity wrappers that
@@ -52,6 +54,11 @@ export function defineGroupField<const T extends GroupConfig>(config: T): T {
 
 /** Searchable option picker (`type: 'combobox'`). */
 export function defineComboboxField<const T extends ComboboxFieldConfig>(config: T): T {
+  return config
+}
+
+/** XdY dice notation with optional tail operand (`type: 'diceFormula'`). */
+export function defineDiceFormulaField<const T extends DiceFormulaFieldConfig>(config: T): T {
   return config
 }
 

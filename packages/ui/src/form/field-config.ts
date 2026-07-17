@@ -475,6 +475,17 @@ export type {
  */
 export interface InlineSentenceFieldConfig extends BaseFieldConfig {
   type: 'inlineSentence'
+  /**
+   * Inline prose + bound controls. Segment kinds:
+   *
+   * - `text` — static fragment (`value`, optional `tone`: `label` | `prose` | `mono`)
+   * - `number` — bound numeric input (`name`, `digits`, `min`/`max`, optional `visibility`)
+   * - `select` — bound dropdown (`name`, `options`, `width`, optional `visibility`)
+   *
+   * Optional `below: { kind: 'chips', … }` for chip pickers under the sentence.
+   *
+   * @see [field-types.md](../../docs/forms/field-types.md#inline-sentence-inlinesentence)
+   */
   segments: InlineSentenceSegment[]
   below?: InlineSentenceBelowChips
   /** When true, the legend is visually hidden but kept for assistive tech. */
@@ -571,14 +582,17 @@ export interface ComboboxFieldConfig extends BaseFieldConfig {
   options: FieldOption[]
   /**
    * Single vs multi selection. Defaults to `true` (`string[]` value).
-   * Set `false` for a single `string` value.
+   * Set `false` for a single `string` value (optional enums use `undefined`, not `''`).
    */
   multiple?: boolean
-  /** Maximum selections when `multiple` is true. */
+  /** Maximum selections when `multiple` is true. Omits the ceiling when unset. */
   max?: number
   placeholder?: string
   defaultValue?: string | string[]
-  /** Custom selected-value renderer in multi-select mode; defaults to `Chip mode="removable"`. */
+  /**
+   * Custom selected-value renderer in multi-select mode.
+   * Defaults to removable `Chip` pills. Use for links, badges, or compact summaries.
+   */
   renderSelectedItem?: ComboboxRenderSelectedItem
 }
 
@@ -609,10 +623,39 @@ export interface EditableGridFieldConfig extends BaseFieldConfig {
   defaultValue?: EditableGridValue
 }
 
+/**
+ * XdY dice notation with optional tail operand (`type: 'diceFormula'`).
+ *
+ * Common options: `modifierMode`, `modifierOperators`, `faces`, `countMin`/`countMax`,
+ * `modifierMin`/`modifierMax`, `currencyUnit`.
+ *
+ * Use `defineDiceFormulaField()` for completion. Storybook: `Forms/DiceFormulaField`.
+ *
+ * @see [field-types.md](../../docs/forms/field-types.md#dice-formula-diceformula)
+ *
+ * @example
+ * defineDiceFormulaField({
+ *   type: 'diceFormula',
+ *   name: 'formula',
+ *   label: 'Roll',
+ *   modifierMode: 'optional',
+ *   modifierOperators: DICE_FORMULA_OPERATORS,
+ * })
+ */
 export interface DiceFormulaFieldConfig extends BaseFieldConfig {
   type: 'diceFormula'
   labelPosition?: DiceFormulaLabelPosition
+  /**
+   * Tail modifier behavior — `none` strips modifier on change; `optional` shows add/remove;
+   * `required` always renders the tail group.
+   *
+   * @default optional
+   */
   modifierMode?: DiceFormulaModifierMode
+  /**
+   * Allowed die faces for the faces select. Defaults to standard RPG die set when omitted.
+   * Pass a subset (e.g. `[4, 6, 8]`) to constrain authoring surfaces.
+   */
   faces?: readonly number[]
   countMin?: number
   countMax?: number
@@ -780,11 +823,20 @@ export interface StackConfig {
    * When omitted and fields[0] is a switch, defaults to "switch is true".
    */
   dependentsVisibility?: FieldVisibility
-  /** Border/bg inset around dependents only (index ≥ 1). Omit for plain stack. */
+  /**
+   * Border/background wash on dependents only (fields index ≥ 1).
+   * Values from `FIELD_SURFACE_TONES`: `main` | `elevated` | `subtle` | `medium` |
+   * `warning` | `error`. Omit for a plain stack with indent only.
+   */
   dependentsChrome?: FieldStackDependentsTone
   /**
-   * Where `dependentsChrome` applies. Default `wrapper`. Use `arrayItems` when
-   * dependents include repeatable lists to avoid double borders on array shells.
+   * Where `dependentsChrome` applies.
+   *
+   * - `wrapper` (default) — tone on the dependents container; use for scalar dependents.
+   * - `arrayItems` — tone on nested array item shells only; avoids double borders when
+   *   dependents include repeatable lists.
+   *
+   * @default wrapper
    */
   dependentsChromeScope?: FieldStackDependentsChromeScope
   /**
@@ -836,7 +888,11 @@ export interface GroupConfig {
   rhythm?: FieldStackRhythm
   /** When hidden, the whole group unmounts and nested field values clear. */
   visibility?: FieldVisibility
-  /** Visual treatment for legend + field stack — variants are mutually exclusive. */
+  /**
+   * Visual treatment for the legend + field stack — variants are mutually exclusive.
+   * Shapes: `inset`, `panel`, `outline`, `divider`, `callout`, `accent`, `collapsible`.
+   * Tones vary by variant — see [containers.md](../../docs/forms/containers.md#group-fieldschrome).
+   */
   fieldsChrome?: FieldGroupFieldsChrome
 }
 
@@ -870,16 +926,37 @@ export type ArrayPatternConfig = {
   classifyIssueScope?: (issue: FormIssue) => FormIssueScope
 } & Record<string, unknown>
 
-/** Per-item header chrome for detailed and compact array rows. */
+/**
+ * Per-item header chrome for detailed and compact array rows.
+ *
+ * Title resolution order: `primary` → `formatPrimary(primaryField)` → `primaryField`
+ * raw value → `fallback(index)`. Use `primaryField` for a single watched column;
+ * use `primary` when the label is derived from multiple fields or domain formatters.
+ *
+ * @see [Array field authoring guide](../../docs/forms/array-field-authoring.md)
+ */
 export interface ArrayItemHeaderConfig {
-  /** Relative field name watched for the primary label (e.g. `'label'`). */
+  /**
+   * Relative field name watched for the primary label (e.g. `'name'`, `'path'`).
+   * Prefer this over `primary` when one column drives the title.
+   */
   primaryField?: string
   /** Optional formatter when `primaryField` is set. */
   formatPrimary?: (value: unknown, values: Record<string, unknown>) => string | undefined
-  /** Computed primary label; overrides `primaryField` when set. */
+  /**
+   * Computed primary label; overrides `primaryField` when set.
+   * Use for grant rows, tier summaries, or multi-field titles.
+   */
   primary?: (values: Record<string, unknown>, index: number) => string | undefined
+  /**
+   * Fallback title when the primary is empty — also used for aria labels.
+   * Required; typically `Item ${index + 1}` or a domain label like `Grant ${index + 1}`.
+   */
   fallback: (index: number) => string
-  /** Shown on its own row below the header title on detailed items. */
+  /**
+   * Shown on its own row below the header title on **detailed** items only.
+   * Pair with `summaryDependsOn` when the summary reads root-level context.
+   */
   summary?: (
     values: Record<string, unknown>,
     index: number,
@@ -889,7 +966,8 @@ export interface ArrayItemHeaderConfig {
   summaryDependsOn?: string[]
   /**
    * When true, appends ` · {fallback}` after the primary label in the header title.
-   * Defaults to false — fallback still drives aria labels and empty-primary titles.
+   *
+   * @default false — fallback still drives aria labels and empty-primary titles.
    */
   showFallbackInHeader?: boolean
   /** Renders a divider between primary and fallback when `showFallbackInHeader` is true. */
@@ -906,6 +984,8 @@ export interface ArrayItemHeaderConfig {
  *
  * Item `fields` use **relative** names — the renderer prefixes them with the array
  * name and index (e.g. `traits.0.name`). Use `defineArrayField()` for completion.
+ *
+ * @see [Array field authoring guide](../../docs/forms/array-field-authoring.md)
  *
  * @example
  * defineArrayField({
@@ -962,7 +1042,11 @@ export interface ArrayConfig {
    * rhythm (`sm`/`md` → `default`, `lg` → `lg`).
    */
   addActionSize?: NonNullable<ButtonVariantProps['size']>
-  /** Searchable template menu for the add action; replaces the plain button when set. */
+  /**
+   * Searchable template menu for the add action; replaces the plain add button when set.
+   * Each menu item supplies `appendDefaults` (and optional duplicate policy) for the
+   * new row. Use for grant pickers, preset tiers, or typed row templates.
+   */
   addActionMenu?: ArrayAddMenuConfig
   /** Minimum item count; removes the "Remove" button while at the floor. */
   min?: number
@@ -985,7 +1069,10 @@ export interface ArrayConfig {
    * @default elevated
    */
   itemChrome?: FieldStackDependentsTone
-  /** Header labels and optional collapsed summary for each item row. */
+  /**
+   * Header labels and optional collapsed summary for each item row.
+   * See [array-field-authoring.md](../../docs/forms/array-field-authoring.md).
+   */
   itemHeader?: ArrayItemHeaderConfig
   /** When true, detailed items collapse to their header row. Ignored for compact/nested. */
   itemCollapsible?: boolean
@@ -1002,7 +1089,11 @@ export interface ArrayConfig {
    */
   visibility?: FieldVisibility
 
-  /** Domain pattern hooks for validation navigation, focus, and severity classification. */
+  /**
+   * Domain pattern hooks for validation navigation, focus, and severity classification.
+   * Start with `kind: 'levelRange'` and `levelKeys` for tier tables; extend with
+   * `getErrorFocusTarget` when row errors should focus a specific field.
+   */
   arrayPattern?: ArrayPatternConfig
 
   /** Supplies default values for a newly appended row. */
@@ -1024,7 +1115,11 @@ export interface ArrayConfig {
   /** Field names whose values are passed to `filterSelectOptions` as `watchedValues`. */
   filterSelectDependsOn?: string[]
 
-  /** Cross-row select option filtering inside array items. */
+  /**
+   * Cross-row select option filtering inside array items.
+   * Pair with `filterSelectDependsOn` for root-level watched values (e.g. campaign
+   * vocabulary). `fieldName` and `options` are item-relative.
+   */
   filterSelectOptions?: (ctx: {
     arrayItems: unknown[]
     rowIndex: number
@@ -1037,8 +1132,13 @@ export interface ArrayConfig {
   /** Classes merged onto the array fieldset wrapper. */
   className?: string
   /**
-   * Where visible field errors render — `auto` suppresses per-field text on
-   * compact items; `row` always surfaces a joined row summary instead.
+   * Where visible field errors render after submit.
+   *
+   * - `auto` (default) — per-field text on detailed items; compact rows roll up to badges.
+   * - `field` — always show inline field messages inside the item body.
+   * - `row` — joined row summary in the header; suppress per-field inline text.
+   *
+   * @default auto
    */
   errorPlacement?: 'auto' | 'field' | 'row'
 }
