@@ -54,6 +54,12 @@
     "category": "standard"
   },
   {
+    "id": "orc",
+    "label": "Orc",
+    "description": "The language of orcs in the SRD 5.2.1 setting.",
+    "category": "standard"
+  },
+  {
     "id": "abyssal",
     "label": "Abyssal",
     "description": "The language of demons and the Lower Planes in the SRD 5.2.1 setting.",

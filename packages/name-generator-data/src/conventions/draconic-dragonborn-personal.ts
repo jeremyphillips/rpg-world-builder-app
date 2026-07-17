@@ -2,11 +2,11 @@ import type { NamingConvention } from '@rpg/contracts/name-generator'
 
 import { FIXTURE_COLLECTION_PROVENANCE } from '../lib/provenance'
 
-export const draconicDragonbornClanConvention = {
-  id: 'draconic-dragonborn-clan',
-  label: 'Draconic dragonborn clan names',
-  description: 'Clan names for dragonborn communities as a standalone subject.',
-  subjectKinds: ['clan', 'family'],
+export const draconicDragonbornPersonalConvention = {
+  id: 'draconic-dragonborn-personal',
+  label: 'Draconic dragonborn personal names',
+  description: 'Given and clan names for dragonborn characters.',
+  subjectKinds: ['person'],
   associations: [
     { kind: 'language', languageId: 'draconic', strength: 'primary' },
     { kind: 'culture', cultureId: 'draconic-dragonborn', strength: 'primary' },
@@ -14,16 +14,20 @@ export const draconicDragonbornClanConvention = {
   ],
   structures: [
     {
-      id: 'clan-only',
-      label: 'Clan name',
-      parts: [{ key: 'clan', role: 'clan', required: true }],
-      format: '{clan}',
+      id: 'full',
+      label: 'Given and clan',
+      parts: [
+        { key: 'given', role: 'given', required: true },
+        { key: 'clan', role: 'clan', required: true },
+      ],
+      format: '{given} {clan}',
     },
   ],
   partBindings: [
+    { partKey: 'given', collectionId: 'draconic-dragonborn-given-pool', sourceKey: 'given' },
     { partKey: 'clan', collectionId: 'draconic-dragonborn-clan-pool', sourceKey: 'clan' },
   ],
-  collectionIds: ['draconic-dragonborn-clan-pool'],
+  collectionIds: ['draconic-dragonborn-given-pool', 'draconic-dragonborn-clan-pool'],
   provenance: FIXTURE_COLLECTION_PROVENANCE.conventionCuration,
   version: 1,
 } as const satisfies NamingConvention

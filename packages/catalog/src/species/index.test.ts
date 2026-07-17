@@ -195,9 +195,10 @@ describe('SRD 5.2.1 species seed', () => {
     expect(withAffinities.get('gnome')).toEqual(['gnomish'])
     expect(withAffinities.get('goliath')).toEqual(['giant'])
     expect(withAffinities.get('halfling')).toEqual(['halfling'])
-    expect(withAffinities.size).toBe(6)
+    expect(withAffinities.get('orc')).toEqual(['orc'])
+    expect(withAffinities.size).toBe(7)
 
-    for (const slug of ['human', 'orc', 'tiefling'] as const) {
+    for (const slug of ['human', 'tiefling'] as const) {
       expect(species.find((entry) => entry.slug === slug)?.languageAffinities).toBeUndefined()
     }
   })

@@ -838,6 +838,7 @@
     "movement": {
       "walk": 30
     },
+    "languageAffinities": ["orc"],
     "traits": [
       {
         "kind": "custom",

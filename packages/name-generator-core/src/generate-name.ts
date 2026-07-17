@@ -9,6 +9,7 @@ import {
 
 import { assembleName } from './assemble-name'
 import { generateNameParts } from './generate-name-parts'
+import { createSeededRng } from './random/create-seeded-rng'
 
 // ---------------------------------------------------------------------------
 // Resolve the structure to use for generation.
@@ -17,6 +18,8 @@ import { generateNameParts } from './generate-name-parts'
 export function resolveStructure(
   convention: NamingConvention,
   structureId: string | undefined,
+  seed?: string,
+  attemptIndex = 0,
 ): NameStructureDefinition {
   if (structureId !== undefined) {
     const structure = convention.structures.find((candidate) => candidate.id === structureId)
@@ -29,14 +32,20 @@ export function resolveStructure(
     return structure
   }
 
-  const sole = convention.structures[0]
-  if (sole === undefined) {
+  const structures = convention.structures
+  if (structures.length === 0) {
     throw new NameGeneratorError(
       'unknown-structure',
       `Convention "${convention.id}" has no structures`,
     )
   }
-  return sole
+
+  if (structures.length === 1) {
+    return structures[0]!
+  }
+
+  const rng = createSeededRng(convention.id, seed ?? '', 'structure', String(attemptIndex))
+  return structures[rng.nextInt(structures.length)]!
 }
 
 export function generateName(
@@ -46,7 +55,7 @@ export function generateName(
   attemptIndex = 0,
   exclude: ReadonlySet<string> = new Set(),
 ): GeneratedName {
-  const structure = resolveStructure(convention, request.structureId)
+  const structure = resolveStructure(convention, request.structureId, request.seed, attemptIndex)
   const parts = generateNameParts(
     convention,
     structure,

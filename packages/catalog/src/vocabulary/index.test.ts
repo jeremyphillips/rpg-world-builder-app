@@ -183,14 +183,14 @@ describe('SRD 5.2.1 language vocabulary seed', () => {
 
   it('loads the languages set', () => {
     expect(languages.id).toBe(LANGUAGE_SET_ID)
-    expect(languages.options.length).toBe(18)
+    expect(languages.options.length).toBe(19)
   })
 
   it('has unique ids and standard/rare categories on seed rows', () => {
     const ids = languages.options.map((option) => option.id)
     expect(new Set(ids).size).toBe(ids.length)
-    expect(seedLanguageIds(RULESET).size).toBe(18)
-    expect(seedLanguageIdsByCategory(RULESET, 'standard').length).toBe(9)
+    expect(seedLanguageIds(RULESET).size).toBe(19)
+    expect(seedLanguageIdsByCategory(RULESET, 'standard').length).toBe(10)
     expect(seedLanguageIdsByCategory(RULESET, 'rare').length).toBe(9)
     expect(getSeedLanguageCategory(RULESET, 'common')).toBe('standard')
     expect(getSeedLanguageCategory(RULESET, 'druidic')).toBe('rare')

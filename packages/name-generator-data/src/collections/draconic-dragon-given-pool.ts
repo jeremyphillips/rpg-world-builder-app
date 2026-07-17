@@ -2,10 +2,10 @@ import type { NameCollection } from '@rpg/contracts/name-generator'
 
 import { FIXTURE_COLLECTION_PROVENANCE } from '../lib/provenance'
 
-export const draconicPersonalPoolCollection = {
-  id: 'draconic-personal-pool',
-  label: 'Draconic personal names',
-  description: 'Fixture personal names for true dragons.',
+export const draconicDragonGivenPoolCollection = {
+  id: 'draconic-dragon-given-pool',
+  label: 'True dragon given names',
+  description: 'Fixture given-name pool for true dragon personal conventions.',
   subjectKinds: ['person', 'creature'],
   generator: {
     type: 'sample',
@@ -14,7 +14,16 @@ export const draconicPersonalPoolCollection = {
         id: 'given',
         role: 'given',
         genderStyle: 'not-applicable',
-        values: ['Arjhan', 'Balasar', 'Bharash', 'Donaar', 'Ghesh', 'Kriv', 'Medrash', 'Torinn'],
+        values: [
+          'Aurixthar',
+          'Caesimyr',
+          'Drakomire',
+          'Glaurungar',
+          'Nithramor',
+          'Saryndrax',
+          'Thraxion',
+          'Vermithorax',
+        ],
       },
     ],
   },

@@ -2,19 +2,19 @@ import type { NameCollection } from '@rpg/contracts/name-generator'
 
 import { FIXTURE_COLLECTION_PROVENANCE } from '../lib/provenance'
 
-export const draconicClanPoolCollection = {
-  id: 'draconic-clan-pool',
-  label: 'Draconic clan names',
-  description: 'Fixture clan names influenced by draconic naming patterns.',
-  subjectKinds: ['clan', 'family'],
+export const goliathGivenPoolCollection = {
+  id: 'goliath-given-pool',
+  label: 'Goliath given names',
+  description: 'Fixture birth-name pool for giant-goliath personal conventions.',
+  subjectKinds: ['person'],
   generator: {
     type: 'sample',
     pools: [
       {
-        id: 'clan',
-        role: 'clan',
+        id: 'given',
+        role: 'given',
         genderStyle: 'shared',
-        values: ['Ashwing', 'Cinderclaw', 'Ironscale', 'Stormbreath', 'Sunfury', 'Voidmaw'],
+        values: ['Aukan', 'Eglath', 'Gauthak', 'Ilikan', 'Lo-Kag', 'Paavu', 'Thalai', 'Uthal'],
       },
     ],
   },
