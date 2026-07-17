@@ -1,5 +1,6 @@
 import { z } from 'zod'
 
+import { vocabEnumFromEntries, keysFromEntries } from './enum-schema'
 import { getTermSentenceForm } from './types'
 import type { GameTermEntry } from './types'
 import { abilityValidationMessages } from './ability-messages'
@@ -62,9 +63,9 @@ export const ABILITY_ENTRIES = {
 
 export type Ability = keyof typeof ABILITY_ENTRIES
 
-export const ABILITY_IDS = Object.keys(ABILITY_ENTRIES) as [Ability, ...Ability[]]
+export const ABILITY_IDS = keysFromEntries(ABILITY_ENTRIES)
 
-export const abilitySchema = z.enum(ABILITY_IDS)
+export const abilitySchema = vocabEnumFromEntries(ABILITY_ENTRIES)
 
 /** Standard spellcasting abilities (INT / WIS / CHA). */
 export const COMMON_SPELLCASTING_ABILITY_IDS = [

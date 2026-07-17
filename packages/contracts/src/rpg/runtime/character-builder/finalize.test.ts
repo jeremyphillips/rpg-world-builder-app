@@ -347,8 +347,8 @@ describe('finalizeCharacterBuild', () => {
     )
 
     expect(input.spells).toHaveLength(7)
-    expect(input.spells?.filter((entry) => entry.preparationState === undefined)).toHaveLength(3)
-    expect(input.spells?.filter((entry) => entry.preparationState === 'prepared')).toHaveLength(4)
+    expect(input.spells?.filter((entry) => entry.selection === undefined)).toHaveLength(3)
+    expect(input.spells?.filter((entry) => entry.selection?.prepared === true)).toHaveLength(4)
     expect(input.spells?.[0]?.sources).toEqual([
       {
         kind: 'classSpellcasting',

@@ -111,7 +111,7 @@ describe('classSchema', () => {
     expect(classSchema.safeParse({ ...fighter, hitDie: 4 }).success).toBe(false)
   })
 
-  it('parses class features with optional grants', () => {
+  it('parses class features with optional grant groups', () => {
     const withGrants = {
       ...fighter,
       features: [
@@ -121,18 +121,18 @@ describe('classSchema', () => {
           name: 'Words of Creation',
           level: 20,
           description: '<p>You always have Power Word Heal and Power Word Kill prepared.</p>',
-          grants: {
-            innateSpells: {
-              ability: 'cha',
-              entries: [
+          grantGroups: [
+            {
+              grants: [
                 {
-                  level: 20,
-                  kind: 'always_prepared',
+                  kind: 'spells',
+                  ability: 'cha',
+                  availability: 'always_prepared',
                   spellIds: ['power-word-heal', 'power-word-kill'],
                 },
               ],
             },
-          },
+          ],
         },
       ],
     }
@@ -402,7 +402,7 @@ describe('classFeatureSchema — grantGroups superRefine', () => {
   const spellGrant = {
     kind: 'spells' as const,
     ability: 'wis' as const,
-    mode: 'always_prepared' as const,
+    availability: 'always_prepared' as const,
     spellIds: ['bless'],
   }
 

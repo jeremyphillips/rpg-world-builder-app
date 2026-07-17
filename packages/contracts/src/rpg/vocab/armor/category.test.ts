@@ -2,7 +2,6 @@ import { describe, expect, it } from 'vitest'
 
 import {
   ARMOR_CATEGORIES,
-  ARMOR_CATEGORY_ENTRIES,
   armorCategorySchema,
   getArmorCategoryCompactLabel,
   getArmorCategoryEntry,
@@ -24,10 +23,6 @@ describe('armorCategorySchema', () => {
 })
 
 describe('armor category vocabulary', () => {
-  it('exposes every category in ARMOR_CATEGORIES', () => {
-    expect([...ARMOR_CATEGORIES].sort()).toEqual(Object.keys(ARMOR_CATEGORY_ENTRIES).sort())
-  })
-
   it('has a label and description for every category', () => {
     for (const category of ARMOR_CATEGORIES) {
       const entry = getArmorCategoryEntry(category)

@@ -129,6 +129,53 @@ Dense chip fields stack full-width — don't cram many options into a `FieldRow`
 
 Spacing tokens, `width`, `digits`, row layouts: [sizing-and-spacing.md](./forms/sizing-and-spacing.md).
 
+## Authoring helpers
+
+Optional identity helpers in `@rpg/ui/form` improve editor completion without changing
+the renderer. Plain object literals remain fully valid.
+
+| Helper                        | Use for                                           |
+| ----------------------------- | ------------------------------------------------- |
+| `defineForm()`                | Top-level `fields` passed to `<Form>` or a tab    |
+| `defineFormItems()`           | Reusable sections (tab panels, exported builders) |
+| `defineArrayField()`          | `kind: 'array'` — repeatable lists                |
+| `defineSelectField()`         | `type: 'select'`                                  |
+| `defineStackField()`          | `kind: 'stack'` — controller + dependents         |
+| `defineGroupField()`          | `kind: 'group'` — fieldset subsection             |
+| `defineComboboxField()`       | `type: 'combobox'`                                |
+| `defineInlineSentenceField()` | `type: 'inlineSentence'`                          |
+| `defineDiceFormulaField()`    | `type: 'diceFormula'` — XdY + tail operand        |
+
+Simple leaf types (`text`, `number`, `checkbox`, …) do not need helpers.
+
+**VS Code snippets** (`.vscode/form.code-snippets`): `form-def`, `form-items`, `form-array`,
+`form-group`, `form-stack`. Snippet comments reference inventory const names (`FIELD_WIDTHS`,
+`FIELD_SURFACE_TONES`) — import from `@rpg/ui/form` when using those tokens in code.
+
+JSDoc on complex configs in [field-config.ts](../src/form/field-config.ts) documents
+common options, defaults, and allowed values — especially `ArrayConfig.itemChrome`.
+
+### Vocabularies and hover documentation
+
+Closed token sets are exported as const inventories from `@rpg/ui/form`:
+
+| Export                        | Use                                        |
+| ----------------------------- | ------------------------------------------ |
+| `FIELD_WIDTHS`                | `BaseFieldConfig.width`                    |
+| `FIELD_SURFACE_TONES`         | `itemChrome`, `dependentsChrome`           |
+| `DICE_FORMULA_TAIL_OPERATORS` | `DiceFormulaFieldConfig.modifierOperators` |
+
+Types derive from inventories; CVA class maps use `satisfies Record<…>` for compile-time
+parity. JSDoc on `BaseFieldConfig` and variant interfaces explains semantics and defaults —
+review manually when authoring contracts change.
+
+### No migration policy
+
+Existing `*-form-fields.ts` modules stay as plain object literals. Adopt `define*` helpers and
+VS Code snippets only in **new** modules or when you are already touching a file for other
+reasons. There is no repo-wide migration to helpers — they exist for completion and readability,
+not as a renderer requirement.
+
 ## Container kinds
 
 | `kind`  | Purpose                          | Detail                                              |

@@ -23,6 +23,7 @@ import { useFieldErrorPresentation } from '../context/array-item-presentation.co
 import { resolveNestedFieldErrorMessage } from '../errors/resolve-field-error-message'
 import { DiceFormulaFieldRenderer } from './fields/dice-formula-field-renderer.client'
 import { buildFieldRendererIds, resolveFieldRenderConfig } from './field-renderer-config.lib'
+import { normalizeFieldHint } from '../field-config'
 import { renderSpecializedField } from './fields/field-renderer-specialized.client'
 import { OptionalDisclosureTextareaFieldRenderer } from './fields/optional-disclosure-field-renderer.client'
 import { SelectFieldRenderer } from './fields/select-field-renderer.client'
@@ -76,6 +77,8 @@ interface RenderArgs<K extends FieldType> {
   config: Extract<FieldConfig, { type: K }>
   field: ControllerRenderProps
   id: string
+  hint?: string
+  hintPosition?: import('../../components/ui/field.variants').FieldHintPosition
   error?: string
   invalid?: boolean
   describedBy?: string
@@ -111,13 +114,13 @@ const fieldRenderers: {
     | 'rollValue'
   >]: (args: RenderArgs<K>) => React.ReactElement
 } = {
-  text: ({ config, field, id, ...validation }) => (
+  text: ({ config, field, id, hint, hintPosition, ...validation }) => (
     <TextField
       id={id}
       label={config.label}
       {...fieldValidationProps(validation)}
-      hint={config.hint}
-      hintPosition={config.hintPosition}
+      hint={hint}
+      hintPosition={hintPosition}
       info={config.info}
       required={config.required}
       width={config.width}
@@ -132,13 +135,13 @@ const fieldRenderers: {
       onBlur={field.onBlur}
     />
   ),
-  number: ({ config, field, id, ...validation }) => (
+  number: ({ config, field, id, hint, hintPosition, ...validation }) => (
     <NumberField
       id={id}
       label={config.label}
       {...fieldValidationProps(validation)}
-      hint={config.hint}
-      hintPosition={config.hintPosition}
+      hint={hint}
+      hintPosition={hintPosition}
       info={config.info}
       required={config.required}
       width={config.width}
@@ -157,13 +160,13 @@ const fieldRenderers: {
       onBlur={field.onBlur}
     />
   ),
-  textarea: ({ config, field, id, ...validation }) => (
+  textarea: ({ config, field, id, hint, hintPosition, ...validation }) => (
     <TextareaField
       id={id}
       label={config.label}
       {...fieldValidationProps(validation)}
-      hint={config.hint}
-      hintPosition={config.hintPosition}
+      hint={hint}
+      hintPosition={hintPosition}
       info={config.info}
       required={config.required}
       width={config.width}
@@ -177,14 +180,14 @@ const fieldRenderers: {
       onBlur={field.onBlur}
     />
   ),
-  radio: ({ config, field, id, ...validation }) => (
+  radio: ({ config, field, id, hint, hintPosition, ...validation }) => (
     <RadioGroupField
       id={id}
       label={config.label}
       options={config.options}
       {...fieldValidationProps(validation)}
-      hint={config.hint}
-      hintPosition={config.hintPosition}
+      hint={hint}
+      hintPosition={hintPosition}
       info={config.info}
       required={config.required}
       width={config.width}
@@ -196,14 +199,14 @@ const fieldRenderers: {
       onBlur={field.onBlur}
     />
   ),
-  radioCard: ({ config, field, id, ...validation }) => (
+  radioCard: ({ config, field, id, hint, hintPosition, ...validation }) => (
     <RadioCardField
       id={id}
       label={config.label}
       options={config.options}
       {...fieldValidationProps(validation)}
-      hint={config.hint}
-      hintPosition={config.hintPosition}
+      hint={hint}
+      hintPosition={hintPosition}
       info={config.info}
       required={config.required}
       width={config.width}
@@ -214,12 +217,12 @@ const fieldRenderers: {
       onBlur={field.onBlur}
     />
   ),
-  checkbox: ({ config, field, id, ...validation }) => (
+  checkbox: ({ config, field, id, hint, hintPosition, ...validation }) => (
     <CheckboxField
       id={id}
       label={config.label}
       {...fieldValidationProps(validation)}
-      hint={config.hint}
+      hint={hint}
       info={config.info}
       required={config.required}
       width={config.width}
@@ -230,14 +233,14 @@ const fieldRenderers: {
       onBlur={field.onBlur}
     />
   ),
-  switch: ({ config, field, id, ...validation }) => (
+  switch: ({ config, field, id, hint, hintPosition, ...validation }) => (
     <SwitchField
       id={id}
       label={config.label}
       labelPosition={config.labelPosition}
       {...fieldValidationProps(validation)}
-      hint={config.hint}
-      hintPosition={config.hintPosition}
+      hint={hint}
+      hintPosition={hintPosition}
       info={config.info}
       required={config.required}
       width={config.width}
@@ -248,14 +251,14 @@ const fieldRenderers: {
       onBlur={field.onBlur}
     />
   ),
-  json: ({ config, field, id, ...validation }) => (
+  json: ({ config, field, id, hint, hintPosition, ...validation }) => (
     <LazyFieldSuspense>
       <LazyJsonField
         id={id}
         label={config.label}
         {...fieldValidationProps(validation)}
-        hint={config.hint}
-        hintPosition={config.hintPosition}
+        hint={hint}
+        hintPosition={hintPosition}
         info={config.info}
         required={config.required}
         width={config.width}
@@ -269,14 +272,14 @@ const fieldRenderers: {
       />
     </LazyFieldSuspense>
   ),
-  richtext: ({ config, field, id, ...validation }) => (
+  richtext: ({ config, field, id, hint, hintPosition, ...validation }) => (
     <LazyFieldSuspense>
       <LazyRichTextField
         id={id}
         label={config.label}
         {...fieldValidationProps(validation)}
-        hint={config.hint}
-        hintPosition={config.hintPosition}
+        hint={hint}
+        hintPosition={hintPosition}
         info={config.info}
         required={config.required}
         width={config.width}
@@ -292,13 +295,13 @@ const fieldRenderers: {
       />
     </LazyFieldSuspense>
   ),
-  markdown: ({ config, field, id, ...validation }) => (
+  markdown: ({ config, field, id, hint, hintPosition, ...validation }) => (
     <MarkdownField
       id={id}
       label={config.label}
       {...fieldValidationProps(validation)}
-      hint={config.hint}
-      hintPosition={config.hintPosition}
+      hint={hint}
+      hintPosition={hintPosition}
       info={config.info}
       required={config.required}
       width={config.width}
@@ -311,14 +314,14 @@ const fieldRenderers: {
       onBlur={field.onBlur}
     />
   ),
-  file: ({ config, field, id, remotePreview, ...validation }) => (
+  file: ({ config, field, id, hint, hintPosition, remotePreview, ...validation }) => (
     <LazyFieldSuspense>
       <LazyFileField
         id={id}
         label={config.label}
         {...fieldValidationProps(validation)}
-        hint={config.hint}
-        hintPosition={config.hintPosition}
+        hint={hint}
+        hintPosition={hintPosition}
         info={config.info}
         required={config.required}
         width={config.width}
@@ -335,7 +338,7 @@ const fieldRenderers: {
       />
     </LazyFieldSuspense>
   ),
-  chips: ({ config, field, id, ...validation }) => (
+  chips: ({ config, field, id, hint, hintPosition, ...validation }) => (
     <ChipsField
       id={id}
       label={config.label}
@@ -343,8 +346,8 @@ const fieldRenderers: {
       multiple={config.multiple}
       max={config.max}
       {...fieldValidationProps(validation)}
-      hint={config.hint}
-      hintPosition={config.hintPosition}
+      hint={hint}
+      hintPosition={hintPosition}
       info={config.info}
       required={config.required}
       size={config.size}
@@ -357,7 +360,7 @@ const fieldRenderers: {
       onBlur={field.onBlur}
     />
   ),
-  combobox: ({ config, field, id, ...validation }) => (
+  combobox: ({ config, field, id, hint, hintPosition, ...validation }) => (
     <ComboboxField
       id={id}
       label={config.label}
@@ -366,8 +369,8 @@ const fieldRenderers: {
       max={config.max}
       placeholder={config.placeholder}
       {...fieldValidationProps(validation)}
-      hint={config.hint}
-      hintPosition={config.hintPosition}
+      hint={hint}
+      hintPosition={hintPosition}
       info={config.info}
       required={config.required}
       width={config.width}
@@ -390,11 +393,13 @@ const fieldRenderers: {
       />
     </LazyFieldSuspense>
   ),
-  diceFormula: ({ config, field, id, namePrefix, ...validation }) => (
+  diceFormula: ({ config, field, id, hint, hintPosition, namePrefix, ...validation }) => (
     <DiceFormulaFieldRenderer
       config={config}
       field={field}
       id={id}
+      hint={hint}
+      hintPosition={hintPosition}
       {...fieldValidationProps(validation)}
       namePrefix={namePrefix}
     />
@@ -422,13 +427,21 @@ export function FieldRenderer({ config, idPrefix, namePrefix }: FieldRendererPro
   const { size: inheritedSize } = useFormSectionContext()
   const { fullName, id } = buildFieldRendererIds(config, idPrefix, namePrefix)
 
-  const hintValues = useDependsOnValues(config.dynamicHint?.dependsOn ?? [], namePrefix)
+  const hintDependsOn = normalizeFieldHint(config.hint).resolve?.dependsOn ?? []
+  const hintValues = useDependsOnValues(hintDependsOn, namePrefix)
   const optionAvailability =
     config.type === 'chips' || config.type === 'select' ? config.optionAvailability : undefined
   const optionValues = useDependsOnValues(optionAvailability?.dependsOn ?? [], namePrefix)
-  const renderConfig = resolveFieldRenderConfig(config, inheritedSize, hintValues, optionValues)
+  const resolved = resolveFieldRenderConfig(config, inheritedSize, hintValues, optionValues)
 
-  const specialized = renderSpecializedField({ renderConfig, fullName, id, namePrefix })
+  const specialized = renderSpecializedField({
+    renderConfig: resolved.config,
+    fullName,
+    id,
+    namePrefix,
+    hint: resolved.hint,
+    hintPosition: resolved.hintPosition,
+  })
   if (specialized) return specialized
 
   if (config.type === 'select') {
@@ -440,7 +453,9 @@ export function FieldRenderer({ config, idPrefix, namePrefix }: FieldRendererPro
   return (
     <StandardFieldRenderer
       config={config}
-      renderConfig={renderConfig as StandardFieldConfig}
+      renderConfig={resolved.config as StandardFieldConfig}
+      hint={resolved.hint}
+      hintPosition={resolved.hintPosition}
       fullName={fullName}
       id={id}
       namePrefix={namePrefix}
@@ -463,6 +478,8 @@ type StandardFieldConfig = Exclude<
 interface StandardFieldRendererProps {
   config: FieldConfig
   renderConfig: StandardFieldConfig
+  hint?: string
+  hintPosition?: import('../../components/ui/field.variants').FieldHintPosition
   fullName: string
   id: string
   namePrefix?: string
@@ -471,6 +488,8 @@ interface StandardFieldRendererProps {
 function StandardFieldRenderer({
   config,
   renderConfig,
+  hint,
+  hintPosition,
   fullName,
   id,
   namePrefix,
@@ -499,6 +518,8 @@ function StandardFieldRenderer({
         disclosure={renderConfig.optionalDisclosure}
         field={field}
         id={id}
+        hint={hint}
+        hintPosition={hintPosition}
         {...validation}
       />
     )
@@ -513,6 +534,8 @@ function StandardFieldRenderer({
     config: renderConfig,
     field,
     id,
+    hint,
+    hintPosition,
     ...validation,
     remotePreview,
     namePrefix,

@@ -1,19 +1,21 @@
 import { z } from 'zod'
 
+import { closedSetEnum } from '../enum-schema'
+
 // ---------------------------------------------------------------------------
 // Service duration units — billing cadence for priced services (SRD v1).
 // ---------------------------------------------------------------------------
 
 export const SERVICE_DURATION_UNITS = ['day', 'mile'] as const
 
-export const serviceDurationUnitSchema = z.enum(SERVICE_DURATION_UNITS)
-
-export type ServiceDurationUnit = z.infer<typeof serviceDurationUnitSchema>
+export type ServiceDurationUnit = (typeof SERVICE_DURATION_UNITS)[number]
 
 export const SERVICE_DURATION_UNIT_ENTRIES = {
   day: { label: 'Day', abbrev: 'day' },
   mile: { label: 'Mile', abbrev: 'mile' },
 } as const satisfies Record<ServiceDurationUnit, { label: string; abbrev: string }>
+
+export const serviceDurationUnitSchema = closedSetEnum(SERVICE_DURATION_UNITS)
 
 export const serviceDurationSchema = z.object({
   value: z.number().int().positive(),

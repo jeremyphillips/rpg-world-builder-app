@@ -1,5 +1,4 @@
-import { z } from 'zod'
-
+import { vocabEnumFromEntries, keysFromEntries } from '../enum-schema'
 import type { VocabularyOptionSetId } from '../vocabulary'
 import { getTermSentenceForm } from '../types'
 import type { GameTermEntry } from '../types'
@@ -68,10 +67,7 @@ export const EDITION_PRESET_ENTRIES = {
 
 export type EditionPresetId = keyof typeof EDITION_PRESET_ENTRIES
 
-export const EDITION_PRESET_IDS = Object.keys(EDITION_PRESET_ENTRIES) as [
-  EditionPresetId,
-  ...EditionPresetId[],
-]
+export const EDITION_PRESET_IDS = keysFromEntries(EDITION_PRESET_ENTRIES)
 
 /** UI display order for edition presets — most recent era first. */
 export const EDITION_PRESET_DISPLAY_ORDER = [
@@ -82,7 +78,7 @@ export const EDITION_PRESET_DISPLAY_ORDER = [
   'becmi',
 ] as const satisfies readonly EditionPresetId[]
 
-export const editionPresetIdSchema = z.enum(EDITION_PRESET_IDS)
+export const editionPresetIdSchema = vocabEnumFromEntries(EDITION_PRESET_ENTRIES)
 
 export const DEFAULT_EDITION_PRESET_ID = '5e' as const satisfies EditionPresetId
 

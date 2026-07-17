@@ -34,8 +34,7 @@ function serviceDurationField(): FieldConfig {
     valueDigits: 1,
     width: 'auto',
     unitPlaceholder: 'Select…',
-    hint: 'Leave blank for no duration',
-    hintPosition: 'below-control',
+    hint: { text: 'Leave blank for no duration', position: 'below-control' },
     defaultValue: { unit: 'day' },
   }
 }

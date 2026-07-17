@@ -6,29 +6,33 @@ import {
   spellcastingFocusGearKindSchema,
   spellcastingGearKindSchema,
 } from '../../../vocab/equipment/spellcasting-gear-kind'
+import { spellPreparationModeSchema } from '../../../vocab/spell/preparation-mode'
+import { spellcastingProgressionSchema } from '../../../vocab/spell/spellcasting-progression'
 
 // ---------------------------------------------------------------------------
 // Spellcasting — progressions and preparation modes shared by class records
 // and spell-slot lookup tables.
 // ---------------------------------------------------------------------------
 
-export const SPELLCASTING_PROGRESSIONS = ['full', 'half', 'pact'] as const
-export type SpellcastingProgression = (typeof SPELLCASTING_PROGRESSIONS)[number]
+export {
+  SPELL_PREPARATION_MODE_ENTRIES,
+  SPELL_PREPARATION_MODE_LABELS,
+  SPELL_PREPARATION_MODES,
+  getSpellPreparationModeEntry,
+  getSpellPreparationModeLabel,
+  spellPreparationModeSchema,
+  type SpellPreparationMode,
+} from '../../../vocab/spell/preparation-mode'
 
-export const SPELL_PREPARATION_MODE_LABELS = {
-  prepared: 'Prepared',
-  known: 'Known',
-  always_prepared: 'Always prepared',
-} as const
-
-export type SpellPreparationMode = keyof typeof SPELL_PREPARATION_MODE_LABELS
-
-export const SPELL_PREPARATION_MODES = Object.keys(SPELL_PREPARATION_MODE_LABELS) as [
-  SpellPreparationMode,
-  ...SpellPreparationMode[],
-]
-
-export const spellPreparationModeSchema = z.enum(SPELL_PREPARATION_MODES)
+export {
+  SPELLCASTING_PROGRESSION_ENTRIES,
+  SPELLCASTING_PROGRESSIONS,
+  getSpellcastingProgressionEntry,
+  getSpellcastingProgressionLabel,
+  spellcastingFeatureLabel,
+  spellcastingProgressionSchema,
+  type SpellcastingProgression,
+} from '../../../vocab/spell/spellcasting-progression'
 
 /**
  * Cantrips known is tabular data, not a closed taxonomy, so the schema stores an
@@ -58,7 +62,7 @@ export const spellcastingSchema = z.object({
   level: absoluteLevelSchema.default(DEFAULT_SPELLCASTING_LEVEL),
   /** SRD rules prose for the class's spellcasting feature (body HTML only). */
   description: z.string().optional(),
-  progression: z.enum(SPELLCASTING_PROGRESSIONS),
+  progression: spellcastingProgressionSchema,
   ability: abilitySchema,
   preparation: spellPreparationModeSchema,
   /**
@@ -93,9 +97,4 @@ export function isSpellcastingActiveAtLevel(
 ): boolean {
   const unlock = spellcastingUnlockLevel(spellcasting)
   return unlock !== undefined && classLevel >= unlock
-}
-
-/** Progression-table label derived from progression type (Pact Magic vs Spellcasting). */
-export function spellcastingFeatureLabel(progression: SpellcastingProgression): string {
-  return progression === 'pact' ? 'Pact Magic' : 'Spellcasting'
 }

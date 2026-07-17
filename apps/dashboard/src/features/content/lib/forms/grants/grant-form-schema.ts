@@ -8,7 +8,6 @@ import {
   featCategorySchema,
   gearKindSchema,
   spellcastingGearKindSchema,
-  INNATE_SPELL_KINDS,
   languageIdSchema,
   MAX_CHARACTER_LEVEL,
   PROFICIENCY_POOL_SOURCES,
@@ -152,7 +151,78 @@ function applyFormSchemaIssues(
   }
 }
 
-export function createGrantRowFormSchema(maxLevel: number = MAX_CHARACTER_LEVEL) {
+function validateSpellsGrantRow(
+  row: {
+    spellAvailability?: boolean
+    spellCastingEnabled?: boolean
+    spellCastingFrequency?: string
+    spellAllowsSlotCasting?: boolean
+  },
+  ctx: z.RefinementCtx,
+): void {
+  const hasAvailability = row.spellAvailability === true
+  const hasCasting = row.spellCastingEnabled === true
+
+  if (!hasAvailability && !hasCasting) {
+    ctx.addIssue({
+      code: 'custom',
+      message: 'Enable availability, casting, or both for this spell grant.',
+      path: ['spellAvailability'],
+    })
+  }
+
+  if (hasCasting && !row.spellCastingFrequency) {
+    ctx.addIssue({
+      code: 'custom',
+      message: 'Choose a cast frequency when casting is enabled.',
+      path: ['spellCastingFrequency'],
+    })
+  }
+
+  if (row.spellAllowsSlotCasting === true && !hasAvailability) {
+    ctx.addIssue({
+      code: 'custom',
+      message: 'Slot casting requires always-prepared availability.',
+      path: ['spellAllowsSlotCasting'],
+    })
+  }
+}
+
+function validateGrantRow(
+  row: z.infer<ReturnType<typeof createGrantRowFormSchemaBase>>,
+  ctx: z.RefinementCtx,
+): void {
+  if (row.grantType === 'equipment') {
+    applyFormSchemaIssues(ctx, equipmentGrantItemFormSchema.safeParse(row))
+    return
+  }
+
+  if (row.grantType === 'weaponProficiency') {
+    applyFormSchemaIssues(ctx, weaponProficiencyItemFormSchema.safeParse(row))
+    return
+  }
+
+  if (row.grantType === 'toolProficiency') {
+    applyFormSchemaIssues(ctx, toolProficiencyItemFormSchema.safeParse(row))
+    return
+  }
+
+  if (row.grantType === 'skillProficiency') {
+    applyFormSchemaIssues(ctx, skillProficiencyItemFormSchema.safeParse(row))
+    return
+  }
+
+  if (row.grantType === 'armorTraining') {
+    applyFormSchemaIssues(ctx, armorTrainingItemFormSchema.safeParse(row))
+    return
+  }
+
+  if (row.grantType === 'spells') {
+    validateSpellsGrantRow(row, ctx)
+  }
+}
+
+function createGrantRowFormSchemaBase(maxLevel: number = MAX_CHARACTER_LEVEL) {
   return z
     .object({
       grantType: z.enum(GRANT_ROW_TYPES),
@@ -178,10 +248,14 @@ export function createGrantRowFormSchema(maxLevel: number = MAX_CHARACTER_LEVEL)
       language: languageIdSchema.optional(),
       /** Spellcasting ability for a `spells` row. */
       spellAbility: abilitySchema.optional(),
-      /** Cast mode: `free_cast` (innate, via frequency) or `always_prepared` (slot-based). */
-      spellMode: z.enum(INNATE_SPELL_KINDS).optional(),
-      /** Usage frequency — only valid when `spellMode` is `free_cast`. */
-      spellFrequency: usageFrequencySchema.optional(),
+      /** When true, grants `availability: always_prepared`. */
+      spellAvailability: z.boolean().optional(),
+      /** When true, grants a nested `casting` free-cast entitlement. */
+      spellCastingEnabled: z.boolean().optional(),
+      /** Usage frequency — required when `spellCastingEnabled` is true. */
+      spellCastingFrequency: usageFrequencySchema.optional(),
+      /** Optional slot-casting permission on the free-cast entitlement (requires availability in v1). */
+      spellAllowsSlotCasting: z.boolean().optional(),
       /** Spell slugs granted by this row. */
       spellIds: z.array(z.string()).optional(),
       featCategory: featCategorySchema.optional(),
@@ -192,33 +266,13 @@ export function createGrantRowFormSchema(maxLevel: number = MAX_CHARACTER_LEVEL)
     })
     .merge(equipmentGrantRowFieldsSchema)
     .merge(proficiencyGrantRowFieldsSchema)
-    .superRefine((row, ctx) => {
-      if (row.grantType === 'equipment') {
-        applyFormSchemaIssues(ctx, equipmentGrantItemFormSchema.safeParse(row))
-        return
-      }
-
-      if (row.grantType === 'weaponProficiency') {
-        applyFormSchemaIssues(ctx, weaponProficiencyItemFormSchema.safeParse(row))
-        return
-      }
-
-      if (row.grantType === 'toolProficiency') {
-        applyFormSchemaIssues(ctx, toolProficiencyItemFormSchema.safeParse(row))
-        return
-      }
-
-      if (row.grantType === 'skillProficiency') {
-        applyFormSchemaIssues(ctx, skillProficiencyItemFormSchema.safeParse(row))
-        return
-      }
-
-      if (row.grantType === 'armorTraining') {
-        applyFormSchemaIssues(ctx, armorTrainingItemFormSchema.safeParse(row))
-      }
-    })
 }
 
-export const grantRowFormSchema = createGrantRowFormSchema()
+export function createGrantRowFormSchema(maxLevel: number = MAX_CHARACTER_LEVEL) {
+  return createGrantRowFormSchemaBase(maxLevel).superRefine(validateGrantRow)
+}
+
+const grantRowFormSchemaBase = createGrantRowFormSchemaBase()
+export const grantRowFormSchema = grantRowFormSchemaBase.superRefine(validateGrantRow)
 
 export type GrantRowForm = z.infer<typeof grantRowFormSchema>

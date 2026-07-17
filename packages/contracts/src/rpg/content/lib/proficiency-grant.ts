@@ -7,6 +7,7 @@ import {
   getArmorCategoryScopeForm,
   getArmorCategorySentenceForm,
 } from '../../vocab/armor/category'
+import { formatUnionBranchDescription } from '../../vocab/enum-schema'
 import {
   getToolCategoryLabel,
   getToolCategorySentenceForm,
@@ -39,6 +40,11 @@ import { grantValidationMessages } from './grant-messages'
 export const PROFICIENCY_GRANT_KINDS = ['fixed', 'choice'] as const
 
 export const proficiencyGrantKindSchema = z.enum(PROFICIENCY_GRANT_KINDS)
+
+const PROFICIENCY_GRANT_KIND_DESCRIPTION = formatUnionBranchDescription(
+  'kind',
+  PROFICIENCY_GRANT_KINDS,
+)
 
 export type ProficiencyGrantKind = z.infer<typeof proficiencyGrantKindSchema>
 
@@ -76,10 +82,12 @@ const filteredWeaponProficiencyPoolSchema = z.object({
   weaponCategory: weaponCategorySchema.optional(),
 })
 
-export const weaponProficiencyPoolSchema = z.discriminatedUnion('source', [
-  explicitWeaponProficiencyPoolSchema,
-  filteredWeaponProficiencyPoolSchema,
-])
+export const weaponProficiencyPoolSchema = z
+  .discriminatedUnion('source', [
+    explicitWeaponProficiencyPoolSchema,
+    filteredWeaponProficiencyPoolSchema,
+  ])
+  .describe(formatUnionBranchDescription('source', ['explicit', 'filtered']))
 
 export type WeaponProficiencyPool = z.infer<typeof weaponProficiencyPoolSchema>
 
@@ -108,10 +116,12 @@ export const weaponProficiencyChoiceGrantSchema = contentPoolChoiceSchema
 
 export type WeaponProficiencyChoiceGrant = z.infer<typeof weaponProficiencyChoiceGrantSchema>
 
-export const weaponProficiencyGrantSchema = z.discriminatedUnion('kind', [
-  fixedWeaponProficiencyGrantSchema,
-  weaponProficiencyChoiceGrantSchema,
-])
+export const weaponProficiencyGrantSchema = z
+  .discriminatedUnion('kind', [
+    fixedWeaponProficiencyGrantSchema,
+    weaponProficiencyChoiceGrantSchema,
+  ])
+  .describe(PROFICIENCY_GRANT_KIND_DESCRIPTION)
 
 export type WeaponProficiencyGrant = z.infer<typeof weaponProficiencyGrantSchema>
 
@@ -160,11 +170,13 @@ const anyToolProficiencyPoolSchema = z.object({
   source: z.literal('any'),
 })
 
-const toolProficiencyPoolObjectSchema = z.discriminatedUnion('source', [
-  explicitToolProficiencyPoolSchema,
-  filteredToolProficiencyPoolSchema,
-  anyToolProficiencyPoolSchema,
-])
+const toolProficiencyPoolObjectSchema = z
+  .discriminatedUnion('source', [
+    explicitToolProficiencyPoolSchema,
+    filteredToolProficiencyPoolSchema,
+    anyToolProficiencyPoolSchema,
+  ])
+  .describe(formatUnionBranchDescription('source', PROFICIENCY_POOL_SOURCES))
 
 export const toolProficiencyPoolSchema = z.preprocess(
   normalizeLegacyFilteredToolPool,
@@ -209,10 +221,9 @@ export const toolProficiencyChoiceGrantSchema = contentPoolChoiceSchema
 
 export type ToolProficiencyChoiceGrant = z.infer<typeof toolProficiencyChoiceGrantSchema>
 
-export const toolProficiencyGrantSchema = z.discriminatedUnion('kind', [
-  fixedToolProficiencyGrantSchema,
-  toolProficiencyChoiceGrantSchema,
-])
+export const toolProficiencyGrantSchema = z
+  .discriminatedUnion('kind', [fixedToolProficiencyGrantSchema, toolProficiencyChoiceGrantSchema])
+  .describe(PROFICIENCY_GRANT_KIND_DESCRIPTION)
 
 export type ToolProficiencyGrant = z.infer<typeof toolProficiencyGrantSchema>
 
@@ -227,10 +238,9 @@ const anySkillProficiencyPoolSchema = z.object({
   source: z.literal('any'),
 })
 
-export const skillProficiencyPoolSchema = z.discriminatedUnion('source', [
-  explicitSkillProficiencyPoolSchema,
-  anySkillProficiencyPoolSchema,
-])
+export const skillProficiencyPoolSchema = z
+  .discriminatedUnion('source', [explicitSkillProficiencyPoolSchema, anySkillProficiencyPoolSchema])
+  .describe(formatUnionBranchDescription('source', ['explicit', 'any']))
 
 export type SkillProficiencyPool = z.infer<typeof skillProficiencyPoolSchema>
 
@@ -250,10 +260,9 @@ export const skillProficiencyChoiceGrantSchema = contentPoolChoiceSchema
 
 export type SkillProficiencyChoiceGrant = z.infer<typeof skillProficiencyChoiceGrantSchema>
 
-export const skillProficiencyGrantSchema = z.discriminatedUnion('kind', [
-  fixedSkillProficiencyGrantSchema,
-  skillProficiencyChoiceGrantSchema,
-])
+export const skillProficiencyGrantSchema = z
+  .discriminatedUnion('kind', [fixedSkillProficiencyGrantSchema, skillProficiencyChoiceGrantSchema])
+  .describe(PROFICIENCY_GRANT_KIND_DESCRIPTION)
 
 export type SkillProficiencyGrant = z.infer<typeof skillProficiencyGrantSchema>
 
@@ -269,10 +278,9 @@ const filteredArmorTrainingPoolSchema = z.object({
   armorCategory: armorCategorySchema.optional(),
 })
 
-export const armorTrainingPoolSchema = z.discriminatedUnion('source', [
-  explicitArmorTrainingPoolSchema,
-  filteredArmorTrainingPoolSchema,
-])
+export const armorTrainingPoolSchema = z
+  .discriminatedUnion('source', [explicitArmorTrainingPoolSchema, filteredArmorTrainingPoolSchema])
+  .describe(formatUnionBranchDescription('source', ['explicit', 'filtered']))
 
 export type ArmorTrainingPool = z.infer<typeof armorTrainingPoolSchema>
 
@@ -299,10 +307,9 @@ export const armorTrainingChoiceGrantSchema = contentPoolChoiceSchema.omit({ lab
 
 export type ArmorTrainingChoiceGrant = z.infer<typeof armorTrainingChoiceGrantSchema>
 
-export const armorTrainingGrantSchema = z.discriminatedUnion('kind', [
-  fixedArmorTrainingGrantSchema,
-  armorTrainingChoiceGrantSchema,
-])
+export const armorTrainingGrantSchema = z
+  .discriminatedUnion('kind', [fixedArmorTrainingGrantSchema, armorTrainingChoiceGrantSchema])
+  .describe(PROFICIENCY_GRANT_KIND_DESCRIPTION)
 
 export type ArmorTrainingGrant = z.infer<typeof armorTrainingGrantSchema>
 

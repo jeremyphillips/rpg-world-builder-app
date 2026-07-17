@@ -1,5 +1,6 @@
 import { z } from 'zod'
 
+import { vocabEnumFromEntries, keysFromEntries } from '../enum-schema'
 import type { GameTermEntry } from '../types'
 
 // ---------------------------------------------------------------------------
@@ -15,12 +16,9 @@ export const DURATION_UNIT_ENTRIES = {
 
 export type DurationUnit = keyof typeof DURATION_UNIT_ENTRIES
 
-export const DURATION_UNITS = Object.keys(DURATION_UNIT_ENTRIES) as [
-  DurationUnit,
-  ...DurationUnit[],
-]
+export const DURATION_UNITS = keysFromEntries(DURATION_UNIT_ENTRIES)
 
-export const durationUnitSchema = z.enum(DURATION_UNITS)
+export const durationUnitSchema = vocabEnumFromEntries(DURATION_UNIT_ENTRIES)
 
 const spellDurationInstantaneousSchema = z.object({ kind: z.literal('instantaneous') })
 

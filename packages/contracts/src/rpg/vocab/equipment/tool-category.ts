@@ -1,23 +1,10 @@
-import { z } from 'zod'
+import { keysFromEntries, vocabEnumFromEntries } from '../enum-schema'
 
 import { getTermSentenceForm, type GameTermEntry } from '../types'
 
 // ---------------------------------------------------------------------------
 // Tool categories — artisan sets, kits, instruments, and specialty tools.
 // ---------------------------------------------------------------------------
-
-export const TOOL_CATEGORIES = [
-  'artisan',
-  'gaming_set',
-  'musical_instrument',
-  'navigator',
-  'thieves',
-  'other',
-] as const
-
-export const toolCategorySchema = z.enum(TOOL_CATEGORIES)
-
-export type ToolCategory = z.infer<typeof toolCategorySchema>
 
 export const TOOL_CATEGORY_ENTRIES = {
   artisan: {
@@ -68,7 +55,13 @@ export const TOOL_CATEGORY_ENTRIES = {
       plural: 'specialty tools',
     },
   },
-} as const satisfies Record<ToolCategory, GameTermEntry>
+} as const satisfies Record<string, GameTermEntry>
+
+export type ToolCategory = keyof typeof TOOL_CATEGORY_ENTRIES
+
+export const TOOL_CATEGORIES = keysFromEntries(TOOL_CATEGORY_ENTRIES)
+
+export const toolCategorySchema = vocabEnumFromEntries(TOOL_CATEGORY_ENTRIES)
 
 /** Returns the reference entry for a tool category, if known. */
 export function getToolCategoryEntry(category: string): GameTermEntry | undefined {

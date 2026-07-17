@@ -40,8 +40,7 @@ const columns = [
     labelDependsOn: ['preparation'],
     visibility: {
       dependsOn: ['preparation'],
-      visibleWhen: (watched: Record<string, unknown>) =>
-        watched['preparation'] !== 'always_prepared',
+      visibleWhen: (watched: Record<string, unknown>) => watched['preparation'] !== 'full_list',
     },
   },
 ]
@@ -55,7 +54,7 @@ describe('editableGridDependsOn', () => {
 describe('resolveEditableGridColumns', () => {
   it('hides columns when visibility is false and resolves dynamic labels', () => {
     expect(
-      resolveEditableGridColumns(columns, { preparation: 'always_prepared' }).map((c) => c.key),
+      resolveEditableGridColumns(columns, { preparation: 'full_list' }).map((c) => c.key),
     ).toEqual(['cantrips'])
 
     const prepared = resolveEditableGridColumns(columns, { preparation: 'prepared' })
@@ -85,7 +84,7 @@ describe('fieldDefaultValue', () => {
 })
 
 const schema = z.object({
-  preparation: z.enum(['prepared', 'known', 'always_prepared']),
+  preparation: z.enum(['prepared', 'known', 'full_list']),
   progressionTable: z.record(z.string(), z.array(z.number().nullable())),
 })
 
@@ -99,7 +98,7 @@ const fields: FormItem[] = [
     options: [
       { value: 'prepared', label: 'Prepared' },
       { value: 'known', label: 'Known' },
-      { value: 'always_prepared', label: 'Always prepared' },
+      { value: 'full_list', label: 'Full list' },
     ],
   },
   {
@@ -134,7 +133,7 @@ describe('EditableGrid in Form', () => {
     expect(await screen.findByRole('columnheader', { name: /Spells known/ })).toBeInTheDocument()
 
     await user.click(screen.getByLabelText('Preparation'))
-    await user.click(screen.getByRole('option', { name: 'Always prepared' }))
+    await user.click(screen.getByRole('option', { name: 'Full list' }))
     expect(screen.queryByRole('columnheader', { name: /Spells known/ })).not.toBeInTheDocument()
     expect(screen.queryByRole('columnheader', { name: /Spells prepared/ })).not.toBeInTheDocument()
   })

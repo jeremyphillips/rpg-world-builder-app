@@ -126,8 +126,10 @@ export function weaponFormFieldGroup(ctx: ContentFormCtx): FormItem {
             placeholder: WEAPON_SELECT_PLACEHOLDER,
             required: true,
             optionAvailability: weaponMasteryOptionAvailability,
-            dynamicHint: weaponMasteryDynamicHint,
-            hintPosition: 'below-control',
+            hint: {
+              position: 'below-control',
+              resolve: weaponMasteryDynamicHint,
+            },
           },
         ],
       },
@@ -137,7 +139,7 @@ export function weaponFormFieldGroup(ctx: ContentFormCtx): FormItem {
         label: 'Properties',
         options: weaponPropertyOptions,
         optionAvailability: weaponPropertyOptionAvailability,
-        dynamicHint: weaponPropertyDynamicHint,
+        hint: { resolve: weaponPropertyDynamicHint },
       },
       {
         kind: 'group',

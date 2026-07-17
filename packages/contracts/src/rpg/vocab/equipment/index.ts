@@ -1,4 +1,5 @@
 export * from './gear-kind'
+export * from './kind'
 export * from './spellcasting-gear-kind'
 export * from './holy-symbol-usage'
 export * from './service-category'

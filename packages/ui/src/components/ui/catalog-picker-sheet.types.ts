@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react'
 
-import type { CollapsibleListItemShellTone } from './collapsible-list-item/collapsible-list-item-shell.client'
+import type { CollapsibleListItemShellPreset } from './collapsible-list-item/collapsible-list-item-shell.client'
+import type { FieldSurfaceVariant } from './field-surface.variants'
 
 export type CatalogPickerTab = {
   id: string
@@ -61,8 +62,10 @@ export type CatalogPickerSheetProps<TItem> = {
   noResultsMessage?: string
   noScopedItemsMessage?: string
   noItemsMessage?: string
-  /** Collapsible row shell tone — defaults to `main`; equipment picker uses `catalog`. */
-  rowTone?: CollapsibleListItemShellTone
+  /** Collapsible row shell preset — equipment picker uses `catalog`. */
+  rowPreset?: CollapsibleListItemShellPreset
+  /** Collapsible row surface variant — defaults to `base`. */
+  rowSurface?: FieldSurfaceVariant
   /** Top-align caret/grip with the first header line for multi-line headers. */
   toolbarCompact?: boolean
   /** Optional class merged onto the sheet content panel. */

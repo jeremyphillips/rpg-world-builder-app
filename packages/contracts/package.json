@@ -79,7 +79,8 @@
     "build": "tsc -p tsconfig.build.json",
     "typecheck": "tsc -p tsconfig.json",
     "lint": "eslint .",
-    "test": "vitest run"
+    "test": "vitest run",
+    "generate:json-schemas": "tsx scripts/generate-json-schemas.ts"
   },
   "dependencies": {
     "zod": "^4.4.3"
@@ -87,6 +88,7 @@
   "devDependencies": {
     "@rpg/config": "workspace:*",
     "eslint": "^10.4.1",
+    "tsx": "^4.22.4",
     "typescript": "^6.0.3",
     "vitest": "^4.1.8"
   }

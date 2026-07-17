@@ -5,6 +5,7 @@ import {
   getArmorCategoryEntry,
   getArmorCategoryLabel,
 } from '../../vocab/armor/category'
+import { formatUnionBranchDescription } from '../../vocab/enum-schema'
 import { gearKindSchema, getGearKindEntry, getGearKindLabel } from '../../vocab/equipment/gear-kind'
 import {
   getSpellcastingGearKindEntry,
@@ -192,10 +193,16 @@ const filteredEquipmentPoolSchema = z
 
 export type FilteredEquipmentPool = z.infer<typeof filteredEquipmentPoolSchema>
 
-export const equipmentPoolSchema = z.discriminatedUnion('source', [
-  explicitEquipmentPoolSchema,
-  filteredEquipmentPoolSchema,
+const EQUIPMENT_POOL_SOURCE_DESCRIPTION = formatUnionBranchDescription('source', [
+  'explicit',
+  'filtered',
 ])
+
+const EQUIPMENT_GRANT_KIND_DESCRIPTION = formatUnionBranchDescription('kind', ['grant', 'choice'])
+
+export const equipmentPoolSchema = z
+  .discriminatedUnion('source', [explicitEquipmentPoolSchema, filteredEquipmentPoolSchema])
+  .describe(EQUIPMENT_POOL_SOURCE_DESCRIPTION)
 
 export type EquipmentPool = z.infer<typeof equipmentPoolSchema>
 
@@ -317,9 +324,13 @@ function normalizeEquipmentGrant(input: unknown): unknown {
   return input
 }
 
+const equipmentGrantObjectSchema = z
+  .discriminatedUnion('kind', [grantedEquipmentItemSchema, equipmentChoiceGrantObjectSchema])
+  .describe(EQUIPMENT_GRANT_KIND_DESCRIPTION)
+
 export const equipmentGrantSchema = z.preprocess(
   normalizeEquipmentGrant,
-  z.discriminatedUnion('kind', [grantedEquipmentItemSchema, equipmentChoiceGrantObjectSchema]),
+  equipmentGrantObjectSchema,
 )
 
 export type EquipmentGrant = z.infer<typeof equipmentGrantSchema>

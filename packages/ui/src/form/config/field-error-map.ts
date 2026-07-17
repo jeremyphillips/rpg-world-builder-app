@@ -63,8 +63,11 @@ function registerItems(
         label: item.label ?? item.name,
         category: 'text',
       })
-    } else {
-      registerItems(registry, prefix, item.fields)
+    } else if (item.kind === 'dependent') {
+      registerItems(registry, prefix, [item.controller])
+      registerItems(registry, prefix, item.dependents.fields as FormItem[])
+    } else if (item.kind === 'group' || item.kind === 'row') {
+      registerItems(registry, prefix, item.fields as FormItem[])
     }
   }
 }

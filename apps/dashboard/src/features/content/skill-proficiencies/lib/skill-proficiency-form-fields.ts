@@ -59,20 +59,20 @@ export function buildSkillProficiencyFields(_ctx: ContentFormCtx): FormItem[] {
           kind: 'array',
           name: 'examples',
           legend: 'Examples',
-          addActionLabel: 'Add example',
+          addAction: { label: 'Add example', layout: 'inline', size: 'sm' },
           min: 1,
-          reorder: 'dragHandle',
-          itemChrome: 'subtle',
           size: 'md',
-          itemCollapsible: true,
-          itemCollapseKey: 'example',
-          itemVariant: 'compact',
-          addActionLayout: 'inline',
-          addActionSize: 'sm',
-          compactInlineAlign: 'center',
-          itemHeader: {
-            fallback: (index) => `Example ${index + 1}`,
-            primaryField: 'value',
+          item: {
+            reorder: 'dragHandle',
+            surface: 'subtle',
+            collapsible: true,
+            collapseKey: 'example',
+            variant: 'compact',
+            inlineAlign: 'center',
+            header: {
+              fallback: (index) => `Example ${index + 1}`,
+              primaryField: 'value',
+            },
           },
           fields: [
             {

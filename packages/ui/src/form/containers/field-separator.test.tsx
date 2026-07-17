@@ -17,41 +17,42 @@ type Values = z.infer<typeof schema>
 
 const fields: FormItem[] = [
   {
-    kind: 'stack',
-    layout: 'dependent',
-    dependentsChrome: 'subtle',
-    fields: [
-      {
-        type: 'switch',
-        name: 'featureEnabled',
-        label: 'Enable feature',
-        defaultValue: false,
-      },
-      {
-        type: 'select',
-        name: 'featureLevel',
-        label: 'Feature level',
-        labelPosition: 'settings',
-        separator: 'subtle',
-        options: [
-          { label: '1', value: '1' },
-          { label: '2', value: '2' },
-        ],
-        visibility: {
-          dependsOn: ['featureEnabled'],
-          visibleWhen: (values) => values.featureEnabled === true,
+    kind: 'dependent',
+    controller: {
+      type: 'switch',
+      name: 'featureEnabled',
+      label: 'Enable feature',
+      defaultValue: false,
+    },
+    dependents: {
+      surface: 'subtle',
+      fields: [
+        {
+          type: 'select',
+          name: 'featureLevel',
+          label: 'Feature level',
+          labelPosition: 'settings',
+          separator: 'subtle',
+          options: [
+            { label: '1', value: '1' },
+            { label: '2', value: '2' },
+          ],
+          visibility: {
+            dependsOn: ['featureEnabled'],
+            visibleWhen: (values) => values.featureEnabled === true,
+          },
         },
-      },
-      {
-        type: 'text',
-        name: 'featureNote',
-        label: 'Feature note',
-        visibility: {
-          dependsOn: ['featureEnabled'],
-          visibleWhen: (values) => values.featureEnabled === true,
+        {
+          type: 'text',
+          name: 'featureNote',
+          label: 'Feature note',
+          visibility: {
+            dependsOn: ['featureEnabled'],
+            visibleWhen: (values) => values.featureEnabled === true,
+          },
         },
-      },
-    ],
+      ],
+    },
   },
 ]
 

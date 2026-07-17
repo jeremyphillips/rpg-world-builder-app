@@ -1,8 +1,6 @@
-import { z } from 'zod'
 import {
   STANDARD_STARTING_WEALTH_SLUG,
   standardStartingWealthTableId,
-  startingWealthRulesSchema,
   type StartingWealth,
   type StartingWealthRules,
   type SystemRulesetId,
@@ -10,21 +8,19 @@ import {
 
 import { getBySlug } from '../lib/get-by-slug'
 import startingWealthRaw from './data/srd-cc-5.2.1/starting-wealth.json'
+import { startingWealthSeedFileSchema } from '../seed-schemas'
 
 const SYSTEM_SEED_TIMESTAMP = '2024-05-21T00:00:00.000Z'
 
-const startingWealthSeedSchema = z
-  .array(startingWealthRulesSchema)
-  .length(1, 'Each SRD ruleset must ship exactly one starting wealth table')
-  .superRefine((tables, ctx) => {
-    if (tables[0]?.scope.kind !== 'standard') {
-      ctx.addIssue({
-        code: 'custom',
-        message: 'The SRD starting wealth table must use the standard scope',
-        path: [0, 'scope'],
-      })
-    }
-  })
+const startingWealthSeedSchema = startingWealthSeedFileSchema.superRefine((tables, ctx) => {
+  if (tables[0]?.scope.kind !== 'standard') {
+    ctx.addIssue({
+      code: 'custom',
+      message: 'The SRD starting wealth table must use the standard scope',
+      path: [0, 'scope'],
+    })
+  }
+})
 
 const SRD_521_STARTING_WEALTH_RULES = startingWealthSeedSchema.parse(startingWealthRaw)
 

@@ -183,17 +183,19 @@ export function startingEquipmentModifierFields(): FormItem[] {
       kind: 'array',
       name: 'modifiers',
       legend: 'Modifiers',
-      addActionLabel: 'Add modifier',
-      itemCollapsible: true,
       visibility: visibleForEquipmentGrantTarget(),
-      itemHeader: {
-        fallback: () => 'Modifier',
-        primary: (values) => {
-          const row = values as StartingEquipmentModifierForm | undefined
-          if (row?.spellcastingGearKind) {
-            return SPELLCASTING_GEAR_KIND_ENTRIES[row.spellcastingGearKind].label
-          }
-          return undefined
+      addAction: { label: 'Add modifier' },
+      item: {
+        collapsible: true,
+        header: {
+          fallback: () => 'Modifier',
+          primary: (values) => {
+            const row = values as StartingEquipmentModifierForm | undefined
+            if (row?.spellcastingGearKind) {
+              return SPELLCASTING_GEAR_KIND_ENTRIES[row.spellcastingGearKind].label
+            }
+            return undefined
+          },
         },
       },
       fields: [
@@ -283,20 +285,25 @@ export function startingEquipmentOptionItemFields(ctx: ContentFormCtx): FormItem
       kind: 'array',
       name: 'items',
       legend: 'Items',
-      addActionLabel: 'Add item',
-      itemVariant: 'detailed',
-      itemCollapsible: true,
-      itemHeader: {
-        fallback: (index) => `Item ${index + 1}`,
-        primary: (values, index) =>
-          startingEquipmentItemTitle(
-            values as StartingEquipmentItemForm | undefined,
-            index,
-            equipmentOptions,
-            proficiencyChoiceOptions,
-          ),
-        summary: (values) =>
-          equipmentGrantSummary(values as StartingEquipmentItemForm | undefined, equipmentOptions),
+      addAction: { label: 'Add item' },
+      item: {
+        variant: 'detailed',
+        collapsible: true,
+        header: {
+          fallback: (index) => `Item ${index + 1}`,
+          primary: (values, index) =>
+            startingEquipmentItemTitle(
+              values as StartingEquipmentItemForm | undefined,
+              index,
+              equipmentOptions,
+              proficiencyChoiceOptions,
+            ),
+          summary: (values) =>
+            equipmentGrantSummary(
+              values as StartingEquipmentItemForm | undefined,
+              equipmentOptions,
+            ),
+        },
       },
       fields: startingEquipmentItemFields(ctx),
     },

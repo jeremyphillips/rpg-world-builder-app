@@ -1,23 +1,10 @@
-import { z } from 'zod'
+import { keysFromEntries, vocabEnumFromEntries } from '../enum-schema'
 
 import type { GameTermEntry } from '../types'
 
 // ---------------------------------------------------------------------------
 // Adventuring gear sub-kinds — discriminates items within `kind: adventuring_gear`.
 // ---------------------------------------------------------------------------
-
-export const GEAR_KINDS = [
-  'general',
-  'ammunition',
-  'book',
-  'spellcasting',
-  'container',
-  'consumable',
-] as const
-
-export const gearKindSchema = z.enum(GEAR_KINDS)
-
-export type GearKind = z.infer<typeof gearKindSchema>
 
 export const GEAR_KIND_ENTRIES = {
   general: {
@@ -54,7 +41,13 @@ export const GEAR_KIND_ENTRIES = {
     label: 'Consumable',
     description: 'An item consumed on use, such as rations, oil, or a potion of healing.',
   },
-} as const satisfies Record<GearKind, GameTermEntry>
+} as const satisfies Record<string, GameTermEntry>
+
+export type GearKind = keyof typeof GEAR_KIND_ENTRIES
+
+export const GEAR_KINDS = keysFromEntries(GEAR_KIND_ENTRIES)
+
+export const gearKindSchema = vocabEnumFromEntries(GEAR_KIND_ENTRIES)
 
 /** Returns the reference entry for a gear kind, if known. */
 export function getGearKindEntry(kind: string): GameTermEntry | undefined {

@@ -1,0 +1,1400 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "unlock": {
+      "description": "When this group unlocks. Omit for the default group (granted when the trait or feature is first gained).",
+      "allOf": [
+        {
+          "$ref": "#/definitions/__schema0"
+        }
+      ]
+    },
+    "grants": {
+      "minItems": 1,
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/__schema1"
+      },
+      "description": "Atomic grants that unlock together. At least one grant is required."
+    }
+  },
+  "required": ["grants"],
+  "additionalProperties": false,
+  "definitions": {
+    "__schema0": {
+      "type": "object",
+      "properties": {
+        "level": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100
+        }
+      },
+      "required": ["level"],
+      "additionalProperties": false
+    },
+    "__schema1": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "$ref": "#/definitions/__schema2"
+            },
+            "range": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            "kind": {
+              "type": "string",
+              "const": "sense",
+              "description": "sense"
+            }
+          },
+          "required": ["type", "range", "kind"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "type": "string",
+              "const": "resistances",
+              "description": "resistances"
+            },
+            "damageTypes": {
+              "minItems": 1,
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/__schema2"
+              }
+            }
+          },
+          "required": ["kind", "damageTypes"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "type": "string",
+              "const": "damageType",
+              "description": "damageType"
+            },
+            "damageTypes": {
+              "minItems": 1,
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/__schema2"
+              }
+            }
+          },
+          "required": ["kind", "damageTypes"],
+          "additionalProperties": false
+        },
+        {
+          "oneOf": [
+            {
+              "type": "object",
+              "properties": {
+                "mode": {
+                  "type": "string",
+                  "enum": ["walk", "fly", "swim", "climb", "burrow"],
+                  "description": "walk | fly | swim | climb | burrow"
+                },
+                "operation": {
+                  "type": "string",
+                  "const": "set",
+                  "description": "set"
+                },
+                "feet": {
+                  "anyOf": [
+                    {
+                      "type": "number",
+                      "const": 5
+                    },
+                    {
+                      "type": "number",
+                      "const": 10
+                    },
+                    {
+                      "type": "number",
+                      "const": 15
+                    },
+                    {
+                      "type": "number",
+                      "const": 20
+                    },
+                    {
+                      "type": "number",
+                      "const": 25
+                    },
+                    {
+                      "type": "number",
+                      "const": 30
+                    },
+                    {
+                      "type": "number",
+                      "const": 35
+                    },
+                    {
+                      "type": "number",
+                      "const": 40
+                    },
+                    {
+                      "type": "number",
+                      "const": 45
+                    },
+                    {
+                      "type": "number",
+                      "const": 50
+                    },
+                    {
+                      "type": "number",
+                      "const": 55
+                    },
+                    {
+                      "type": "number",
+                      "const": 60
+                    },
+                    {
+                      "type": "number",
+                      "const": 65
+                    },
+                    {
+                      "type": "number",
+                      "const": 70
+                    },
+                    {
+                      "type": "number",
+                      "const": 75
+                    },
+                    {
+                      "type": "number",
+                      "const": 80
+                    },
+                    {
+                      "type": "number",
+                      "const": 85
+                    },
+                    {
+                      "type": "number",
+                      "const": 90
+                    },
+                    {
+                      "type": "number",
+                      "const": 95
+                    },
+                    {
+                      "type": "number",
+                      "const": 100
+                    },
+                    {
+                      "type": "number",
+                      "const": 105
+                    },
+                    {
+                      "type": "number",
+                      "const": 110
+                    },
+                    {
+                      "type": "number",
+                      "const": 115
+                    },
+                    {
+                      "type": "number",
+                      "const": 120
+                    }
+                  ]
+                },
+                "condition": {
+                  "$ref": "#/definitions/__schema4"
+                },
+                "kind": {
+                  "type": "string",
+                  "const": "movement",
+                  "description": "movement"
+                }
+              },
+              "required": ["mode", "operation", "feet", "kind"],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "mode": {
+                  "type": "string",
+                  "enum": ["walk", "fly", "swim", "climb", "burrow"],
+                  "description": "walk | fly | swim | climb | burrow"
+                },
+                "operation": {
+                  "type": "string",
+                  "const": "increase",
+                  "description": "increase"
+                },
+                "feet": {
+                  "anyOf": [
+                    {
+                      "type": "number",
+                      "const": 5
+                    },
+                    {
+                      "type": "number",
+                      "const": 10
+                    },
+                    {
+                      "type": "number",
+                      "const": 15
+                    },
+                    {
+                      "type": "number",
+                      "const": 20
+                    },
+                    {
+                      "type": "number",
+                      "const": 25
+                    },
+                    {
+                      "type": "number",
+                      "const": 30
+                    }
+                  ]
+                },
+                "condition": {
+                  "$ref": "#/definitions/__schema4"
+                },
+                "kind": {
+                  "type": "string",
+                  "const": "movement",
+                  "description": "movement"
+                }
+              },
+              "required": ["mode", "operation", "feet", "kind"],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "mode": {
+                  "type": "string",
+                  "enum": ["walk", "fly", "swim", "climb", "burrow"],
+                  "description": "walk | fly | swim | climb | burrow"
+                },
+                "operation": {
+                  "type": "string",
+                  "const": "match",
+                  "description": "match"
+                },
+                "matchMode": {
+                  "type": "string",
+                  "enum": ["walk", "fly", "swim", "climb", "burrow"],
+                  "description": "walk | fly | swim | climb | burrow"
+                },
+                "condition": {
+                  "$ref": "#/definitions/__schema4"
+                },
+                "kind": {
+                  "type": "string",
+                  "const": "movement",
+                  "description": "movement"
+                }
+              },
+              "required": ["mode", "operation", "matchMode", "kind"],
+              "additionalProperties": false
+            }
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "type": "string",
+              "const": "weaponProficiency",
+              "description": "weaponProficiency"
+            },
+            "grant": {
+              "oneOf": [
+                {
+                  "$ref": "#/definitions/__schema5"
+                },
+                {
+                  "$ref": "#/definitions/__schema10"
+                }
+              ],
+              "markdownDescription": "Branch on **kind**: **fixed** | **choice**"
+            }
+          },
+          "required": ["kind", "grant"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "type": "string",
+              "const": "toolProficiency",
+              "description": "toolProficiency"
+            },
+            "grant": {
+              "oneOf": [
+                {
+                  "$ref": "#/definitions/__schema16"
+                },
+                {
+                  "$ref": "#/definitions/__schema21"
+                }
+              ],
+              "markdownDescription": "Branch on **kind**: **fixed** | **choice**"
+            }
+          },
+          "required": ["kind", "grant"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "type": "string",
+              "const": "skillProficiency",
+              "description": "skillProficiency"
+            },
+            "grant": {
+              "oneOf": [
+                {
+                  "$ref": "#/definitions/__schema29"
+                },
+                {
+                  "$ref": "#/definitions/__schema31"
+                }
+              ],
+              "markdownDescription": "Branch on **kind**: **fixed** | **choice**"
+            }
+          },
+          "required": ["kind", "grant"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "type": "string",
+              "const": "armorTraining",
+              "description": "armorTraining"
+            },
+            "grant": {
+              "oneOf": [
+                {
+                  "$ref": "#/definitions/__schema34"
+                },
+                {
+                  "$ref": "#/definitions/__schema39"
+                }
+              ],
+              "markdownDescription": "Branch on **kind**: **fixed** | **choice**"
+            }
+          },
+          "required": ["kind", "grant"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "type": "string",
+              "const": "languages",
+              "description": "languages"
+            },
+            "languageIds": {
+              "minItems": 1,
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/__schema2"
+              }
+            }
+          },
+          "required": ["kind", "languageIds"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "type": "string",
+              "const": "languageChoice",
+              "description": "languageChoice"
+            },
+            "choose": {
+              "$ref": "#/definitions/__schema44"
+            },
+            "from": {
+              "$ref": "#/definitions/__schema45"
+            },
+            "categories": {
+              "$ref": "#/definitions/__schema46"
+            }
+          },
+          "required": ["kind", "choose"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "type": "string",
+              "const": "featChoice",
+              "description": "featChoice"
+            },
+            "category": {
+              "type": "string",
+              "enum": ["origin", "general", "fighting-style", "epic-boon"],
+              "description": "origin | general | fighting-style | epic-boon"
+            },
+            "choose": {
+              "$ref": "#/definitions/__schema50"
+            },
+            "allowAnyQualifying": {
+              "$ref": "#/definitions/__schema51"
+            },
+            "replaceable": {
+              "$ref": "#/definitions/__schema52"
+            },
+            "recommendedFeatIds": {
+              "$ref": "#/definitions/__schema53"
+            }
+          },
+          "required": ["kind", "category", "choose"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "type": "string",
+              "const": "equipment",
+              "description": "equipment"
+            },
+            "grant": {
+              "oneOf": [
+                {
+                  "$ref": "#/definitions/__schema54"
+                },
+                {
+                  "$ref": "#/definitions/__schema55"
+                }
+              ],
+              "markdownDescription": "Branch on **kind**: **grant** | **choice**"
+            }
+          },
+          "required": ["kind", "grant"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "type": "string",
+              "const": "spells",
+              "description": "spells"
+            },
+            "ability": {
+              "type": "string",
+              "enum": ["str", "dex", "con", "int", "wis", "cha"],
+              "description": "str | dex | con | int | wis | cha"
+            },
+            "spellIds": {
+              "$ref": "#/definitions/__schema72"
+            },
+            "availability": {
+              "type": "string",
+              "enum": ["always_prepared"],
+              "description": "always_prepared"
+            },
+            "casting": {
+              "$ref": "#/definitions/__schema75"
+            }
+          },
+          "required": ["kind", "ability", "spellIds"],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "__schema2": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(?:[-_][a-z0-9]+)*$"
+    },
+    "__schema3": {
+      "type": "string",
+      "enum": ["walk", "fly", "swim", "climb", "burrow"],
+      "description": "walk | fly | swim | climb | burrow"
+    },
+    "__schema4": {
+      "type": "string",
+      "minLength": 1
+    },
+    "__schema5": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "type": "string",
+          "const": "fixed",
+          "description": "fixed"
+        },
+        "weaponSlugs": {
+          "$ref": "#/definitions/__schema7"
+        },
+        "weaponCategories": {
+          "$ref": "#/definitions/__schema8"
+        }
+      },
+      "required": ["kind"],
+      "additionalProperties": false
+    },
+    "__schema6": {
+      "type": "string",
+      "const": "fixed",
+      "description": "fixed"
+    },
+    "__schema7": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "__schema8": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": ["simple", "martial"],
+        "description": "simple | martial"
+      }
+    },
+    "__schema9": {
+      "type": "string",
+      "enum": ["simple", "martial"],
+      "description": "simple | martial"
+    },
+    "__schema10": {
+      "type": "object",
+      "properties": {
+        "choose": {
+          "$ref": "#/definitions/__schema11"
+        },
+        "description": {
+          "$ref": "#/definitions/__schema12"
+        },
+        "kind": {
+          "type": "string",
+          "const": "choice",
+          "description": "choice"
+        },
+        "pool": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/__schema13"
+            },
+            {
+              "$ref": "#/definitions/__schema15"
+            }
+          ],
+          "markdownDescription": "Branch on **source**: **explicit** | **filtered**"
+        }
+      },
+      "required": ["choose", "kind", "pool"],
+      "additionalProperties": false
+    },
+    "__schema11": {
+      "default": 1,
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 9007199254740991
+    },
+    "__schema12": {
+      "type": "string"
+    },
+    "__schema13": {
+      "type": "object",
+      "properties": {
+        "source": {
+          "type": "string",
+          "const": "explicit",
+          "description": "explicit"
+        },
+        "weaponSlugs": {
+          "minItems": 1,
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/__schema14"
+          }
+        }
+      },
+      "required": ["source", "weaponSlugs"],
+      "additionalProperties": false
+    },
+    "__schema14": {
+      "type": "string",
+      "minLength": 1
+    },
+    "__schema15": {
+      "type": "object",
+      "properties": {
+        "source": {
+          "type": "string",
+          "const": "filtered",
+          "description": "filtered"
+        },
+        "weaponCategory": {
+          "allOf": [
+            {
+              "type": "string",
+              "enum": ["simple", "martial"],
+              "description": "simple | martial"
+            }
+          ]
+        }
+      },
+      "required": ["source"],
+      "additionalProperties": false
+    },
+    "__schema16": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "type": "string",
+          "const": "fixed",
+          "description": "fixed"
+        },
+        "toolSlugs": {
+          "$ref": "#/definitions/__schema18"
+        },
+        "toolCategories": {
+          "$ref": "#/definitions/__schema19"
+        }
+      },
+      "required": ["kind"],
+      "additionalProperties": false
+    },
+    "__schema17": {
+      "type": "string",
+      "const": "fixed",
+      "description": "fixed"
+    },
+    "__schema18": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "__schema19": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": ["artisan", "gaming_set", "musical_instrument", "navigator", "thieves", "other"],
+        "description": "artisan | gaming_set | musical_instrument | navigator | thieves | other"
+      }
+    },
+    "__schema20": {
+      "type": "string",
+      "enum": ["artisan", "gaming_set", "musical_instrument", "navigator", "thieves", "other"],
+      "description": "artisan | gaming_set | musical_instrument | navigator | thieves | other"
+    },
+    "__schema21": {
+      "type": "object",
+      "properties": {
+        "choose": {
+          "$ref": "#/definitions/__schema11"
+        },
+        "description": {
+          "$ref": "#/definitions/__schema12"
+        },
+        "kind": {
+          "type": "string",
+          "const": "choice",
+          "description": "choice"
+        },
+        "pool": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/__schema22"
+            },
+            {
+              "$ref": "#/definitions/__schema24"
+            },
+            {
+              "$ref": "#/definitions/__schema28"
+            }
+          ],
+          "markdownDescription": "Branch on **source**: **explicit** | **filtered** | **any**"
+        }
+      },
+      "required": ["choose", "kind", "pool"],
+      "additionalProperties": false
+    },
+    "__schema22": {
+      "type": "object",
+      "properties": {
+        "source": {
+          "type": "string",
+          "const": "explicit",
+          "description": "explicit"
+        },
+        "toolSlugs": {
+          "minItems": 1,
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/__schema23"
+          }
+        }
+      },
+      "required": ["source", "toolSlugs"],
+      "additionalProperties": false
+    },
+    "__schema23": {
+      "type": "string",
+      "minLength": 1
+    },
+    "__schema24": {
+      "type": "object",
+      "properties": {
+        "source": {
+          "type": "string",
+          "const": "filtered",
+          "description": "filtered"
+        },
+        "toolCategories": {
+          "$ref": "#/definitions/__schema26"
+        },
+        "toolSlugs": {
+          "$ref": "#/definitions/__schema27"
+        }
+      },
+      "required": ["source"],
+      "additionalProperties": false
+    },
+    "__schema25": {
+      "type": "string",
+      "const": "filtered",
+      "description": "filtered"
+    },
+    "__schema26": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": ["artisan", "gaming_set", "musical_instrument", "navigator", "thieves", "other"],
+        "description": "artisan | gaming_set | musical_instrument | navigator | thieves | other"
+      }
+    },
+    "__schema27": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "__schema28": {
+      "type": "object",
+      "properties": {
+        "source": {
+          "type": "string",
+          "const": "any",
+          "description": "any"
+        }
+      },
+      "required": ["source"],
+      "additionalProperties": false
+    },
+    "__schema29": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "type": "string",
+          "const": "fixed",
+          "description": "fixed"
+        },
+        "skillIds": {
+          "minItems": 1,
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/__schema30"
+          }
+        }
+      },
+      "required": ["kind", "skillIds"],
+      "additionalProperties": false
+    },
+    "__schema30": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+    },
+    "__schema31": {
+      "type": "object",
+      "properties": {
+        "choose": {
+          "$ref": "#/definitions/__schema11"
+        },
+        "description": {
+          "$ref": "#/definitions/__schema12"
+        },
+        "kind": {
+          "type": "string",
+          "const": "choice",
+          "description": "choice"
+        },
+        "pool": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/__schema32"
+            },
+            {
+              "$ref": "#/definitions/__schema33"
+            }
+          ],
+          "markdownDescription": "Branch on **source**: **explicit** | **any**"
+        }
+      },
+      "required": ["choose", "kind", "pool"],
+      "additionalProperties": false
+    },
+    "__schema32": {
+      "type": "object",
+      "properties": {
+        "source": {
+          "type": "string",
+          "const": "explicit",
+          "description": "explicit"
+        },
+        "skillIds": {
+          "minItems": 1,
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/__schema30"
+          }
+        }
+      },
+      "required": ["source", "skillIds"],
+      "additionalProperties": false
+    },
+    "__schema33": {
+      "type": "object",
+      "properties": {
+        "source": {
+          "type": "string",
+          "const": "any",
+          "description": "any"
+        }
+      },
+      "required": ["source"],
+      "additionalProperties": false
+    },
+    "__schema34": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "type": "string",
+          "const": "fixed",
+          "description": "fixed"
+        },
+        "armorSlugs": {
+          "$ref": "#/definitions/__schema36"
+        },
+        "armorCategories": {
+          "$ref": "#/definitions/__schema37"
+        }
+      },
+      "required": ["kind"],
+      "additionalProperties": false
+    },
+    "__schema35": {
+      "type": "string",
+      "const": "fixed",
+      "description": "fixed"
+    },
+    "__schema36": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "__schema37": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": ["light", "medium", "heavy", "shields"],
+        "description": "light | medium | heavy | shields"
+      }
+    },
+    "__schema38": {
+      "type": "string",
+      "enum": ["light", "medium", "heavy", "shields"],
+      "description": "light | medium | heavy | shields"
+    },
+    "__schema39": {
+      "type": "object",
+      "properties": {
+        "choose": {
+          "$ref": "#/definitions/__schema11"
+        },
+        "description": {
+          "$ref": "#/definitions/__schema12"
+        },
+        "kind": {
+          "type": "string",
+          "const": "choice",
+          "description": "choice"
+        },
+        "pool": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/__schema40"
+            },
+            {
+              "$ref": "#/definitions/__schema42"
+            }
+          ],
+          "markdownDescription": "Branch on **source**: **explicit** | **filtered**"
+        }
+      },
+      "required": ["choose", "kind", "pool"],
+      "additionalProperties": false
+    },
+    "__schema40": {
+      "type": "object",
+      "properties": {
+        "source": {
+          "type": "string",
+          "const": "explicit",
+          "description": "explicit"
+        },
+        "armorSlugs": {
+          "minItems": 1,
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/__schema41"
+          }
+        }
+      },
+      "required": ["source", "armorSlugs"],
+      "additionalProperties": false
+    },
+    "__schema41": {
+      "type": "string",
+      "minLength": 1
+    },
+    "__schema42": {
+      "type": "object",
+      "properties": {
+        "source": {
+          "type": "string",
+          "const": "filtered",
+          "description": "filtered"
+        },
+        "armorCategory": {
+          "allOf": [
+            {
+              "type": "string",
+              "enum": ["light", "medium", "heavy", "shields"],
+              "description": "light | medium | heavy | shields"
+            }
+          ]
+        }
+      },
+      "required": ["source"],
+      "additionalProperties": false
+    },
+    "__schema43": {
+      "type": "string",
+      "const": "languageChoice",
+      "description": "languageChoice"
+    },
+    "__schema44": {
+      "default": 1,
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 9007199254740991
+    },
+    "__schema45": {
+      "minItems": 1,
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/__schema2"
+      }
+    },
+    "__schema46": {
+      "minItems": 1,
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": ["standard", "rare"],
+        "description": "standard | rare"
+      }
+    },
+    "__schema47": {
+      "type": "string",
+      "enum": ["standard", "rare"],
+      "description": "standard | rare"
+    },
+    "__schema48": {
+      "type": "string",
+      "const": "featChoice",
+      "description": "featChoice"
+    },
+    "__schema49": {
+      "type": "string",
+      "enum": ["origin", "general", "fighting-style", "epic-boon"],
+      "description": "origin | general | fighting-style | epic-boon"
+    },
+    "__schema50": {
+      "default": 1,
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 9007199254740991
+    },
+    "__schema51": {
+      "type": "boolean"
+    },
+    "__schema52": {
+      "type": "boolean"
+    },
+    "__schema53": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "__schema54": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "type": "string",
+          "const": "grant",
+          "description": "grant"
+        },
+        "equipmentSlug": {
+          "type": "string",
+          "minLength": 1
+        },
+        "quantity": {
+          "default": 1,
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "equipped": {
+          "type": "boolean"
+        },
+        "modifiers": {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "kind": {
+                    "type": "string",
+                    "const": "spellcasting_focus",
+                    "description": "spellcasting_focus"
+                  },
+                  "spellcastingGearKind": {
+                    "type": "string",
+                    "enum": ["arcane_focus", "druidic_focus", "holy_symbol"],
+                    "description": "arcane_focus | druidic_focus | holy_symbol"
+                  }
+                },
+                "required": ["kind", "spellcastingGearKind"],
+                "additionalProperties": false
+              }
+            ]
+          }
+        }
+      },
+      "required": ["kind", "equipmentSlug", "quantity"],
+      "additionalProperties": false
+    },
+    "__schema55": {
+      "type": "object",
+      "properties": {
+        "choose": {
+          "$ref": "#/definitions/__schema11"
+        },
+        "description": {
+          "$ref": "#/definitions/__schema12"
+        },
+        "kind": {
+          "type": "string",
+          "const": "choice",
+          "description": "choice"
+        },
+        "pool": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/__schema56"
+            },
+            {
+              "$ref": "#/definitions/__schema58"
+            }
+          ],
+          "markdownDescription": "Branch on **source**: **explicit** | **filtered**"
+        }
+      },
+      "required": ["choose", "kind", "pool"],
+      "additionalProperties": false
+    },
+    "__schema56": {
+      "type": "object",
+      "properties": {
+        "source": {
+          "type": "string",
+          "const": "explicit",
+          "description": "explicit"
+        },
+        "equipmentSlugs": {
+          "minItems": 1,
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/__schema57"
+          }
+        }
+      },
+      "required": ["source", "equipmentSlugs"],
+      "additionalProperties": false
+    },
+    "__schema57": {
+      "type": "string",
+      "minLength": 1
+    },
+    "__schema58": {
+      "type": "object",
+      "properties": {
+        "source": {
+          "type": "string",
+          "const": "filtered",
+          "description": "filtered"
+        },
+        "equipmentKind": {
+          "type": "string",
+          "enum": [
+            "weapon",
+            "armor",
+            "adventuring_gear",
+            "tool",
+            "mount",
+            "vehicle",
+            "service",
+            "magic_item"
+          ],
+          "description": "weapon | armor | adventuring_gear | tool | mount | vehicle | service | magic_item"
+        },
+        "toolCategory": {
+          "$ref": "#/definitions/__schema61"
+        },
+        "weaponCategory": {
+          "$ref": "#/definitions/__schema62"
+        },
+        "armorCategory": {
+          "$ref": "#/definitions/__schema63"
+        },
+        "gearKind": {
+          "type": "string",
+          "enum": ["general", "ammunition", "book", "spellcasting", "container", "consumable"],
+          "description": "general | ammunition | book | spellcasting | container | consumable"
+        },
+        "spellcastingGearKind": {
+          "type": "string",
+          "enum": ["arcane_focus", "druidic_focus", "holy_symbol", "spellbook", "component_pouch"],
+          "description": "arcane_focus | druidic_focus | holy_symbol | spellbook | component_pouch"
+        },
+        "magicItemCategory": {
+          "type": "string",
+          "enum": [
+            "weapon",
+            "armor",
+            "wondrous_item",
+            "potion",
+            "ring",
+            "rod",
+            "scroll",
+            "staff",
+            "wand",
+            "other"
+          ],
+          "description": "weapon | armor | wondrous_item | potion | ring | rod | scroll | staff | wand | other"
+        },
+        "magicItemRarity": {
+          "type": "string",
+          "enum": ["common", "uncommon", "rare", "very_rare", "legendary", "artifact"],
+          "description": "common | uncommon | rare | very_rare | legendary | artifact"
+        },
+        "vehicleCategory": {
+          "type": "string",
+          "enum": ["land", "water", "air", "space", "other"],
+          "description": "land | water | air | space | other"
+        },
+        "serviceCategory": {
+          "type": "string",
+          "enum": [
+            "hireling",
+            "lodging",
+            "meal",
+            "travel",
+            "transport",
+            "stable",
+            "spellcasting",
+            "lifestyle",
+            "other"
+          ],
+          "description": "hireling | lodging | meal | travel | transport | stable | spellcasting | lifestyle | other"
+        }
+      },
+      "required": ["source", "equipmentKind"],
+      "additionalProperties": false
+    },
+    "__schema59": {
+      "type": "string",
+      "const": "filtered",
+      "description": "filtered"
+    },
+    "__schema60": {
+      "type": "string",
+      "enum": [
+        "weapon",
+        "armor",
+        "adventuring_gear",
+        "tool",
+        "mount",
+        "vehicle",
+        "service",
+        "magic_item"
+      ],
+      "description": "weapon | armor | adventuring_gear | tool | mount | vehicle | service | magic_item"
+    },
+    "__schema61": {
+      "allOf": [
+        {
+          "type": "string",
+          "enum": ["artisan", "gaming_set", "musical_instrument", "navigator", "thieves", "other"],
+          "description": "artisan | gaming_set | musical_instrument | navigator | thieves | other"
+        }
+      ]
+    },
+    "__schema62": {
+      "allOf": [
+        {
+          "type": "string",
+          "enum": ["simple", "martial"],
+          "description": "simple | martial"
+        }
+      ]
+    },
+    "__schema63": {
+      "allOf": [
+        {
+          "type": "string",
+          "enum": ["light", "medium", "heavy", "shields"],
+          "description": "light | medium | heavy | shields"
+        }
+      ]
+    },
+    "__schema64": {
+      "type": "string",
+      "enum": ["general", "ammunition", "book", "spellcasting", "container", "consumable"],
+      "description": "general | ammunition | book | spellcasting | container | consumable"
+    },
+    "__schema65": {
+      "type": "string",
+      "enum": ["arcane_focus", "druidic_focus", "holy_symbol", "spellbook", "component_pouch"],
+      "description": "arcane_focus | druidic_focus | holy_symbol | spellbook | component_pouch"
+    },
+    "__schema66": {
+      "type": "string",
+      "enum": [
+        "weapon",
+        "armor",
+        "wondrous_item",
+        "potion",
+        "ring",
+        "rod",
+        "scroll",
+        "staff",
+        "wand",
+        "other"
+      ],
+      "description": "weapon | armor | wondrous_item | potion | ring | rod | scroll | staff | wand | other"
+    },
+    "__schema67": {
+      "type": "string",
+      "enum": ["common", "uncommon", "rare", "very_rare", "legendary", "artifact"],
+      "description": "common | uncommon | rare | very_rare | legendary | artifact"
+    },
+    "__schema68": {
+      "type": "string",
+      "enum": ["land", "water", "air", "space", "other"],
+      "description": "land | water | air | space | other"
+    },
+    "__schema69": {
+      "type": "string",
+      "enum": [
+        "hireling",
+        "lodging",
+        "meal",
+        "travel",
+        "transport",
+        "stable",
+        "spellcasting",
+        "lifestyle",
+        "other"
+      ],
+      "description": "hireling | lodging | meal | travel | transport | stable | spellcasting | lifestyle | other"
+    },
+    "__schema70": {
+      "type": "string",
+      "const": "spells",
+      "description": "spells"
+    },
+    "__schema71": {
+      "type": "string",
+      "enum": ["str", "dex", "con", "int", "wis", "cha"],
+      "description": "str | dex | con | int | wis | cha"
+    },
+    "__schema72": {
+      "minItems": 1,
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/__schema73"
+      }
+    },
+    "__schema73": {
+      "type": "string",
+      "minLength": 1
+    },
+    "__schema74": {
+      "type": "string",
+      "enum": ["always_prepared"],
+      "description": "always_prepared"
+    },
+    "__schema75": {
+      "type": "object",
+      "properties": {
+        "mode": {
+          "type": "string",
+          "const": "free_cast",
+          "description": "free_cast"
+        },
+        "frequency": {
+          "type": "string",
+          "enum": ["at_will", "once_per_long_rest", "prof_bonus_per_long_rest"],
+          "description": "at_will | once_per_long_rest | prof_bonus_per_long_rest"
+        },
+        "allowsSlotCasting": {
+          "type": "boolean"
+        }
+      },
+      "required": ["mode", "frequency"],
+      "additionalProperties": false
+    }
+  }
+}

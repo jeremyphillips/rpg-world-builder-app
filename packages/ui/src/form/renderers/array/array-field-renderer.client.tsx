@@ -66,13 +66,13 @@ export function ArrayFieldRenderer({ config, idPrefix, fullName }: ArrayFieldRen
 
   const addControl = (
     <ArrayFieldAddControl
-      canAdd={state.canAdd && !config.hideAddAction}
+      canAdd={state.canAdd && state.addAction !== null}
       addActionLabel={state.addActionLabel}
       addActionVariant={state.addActionVariant}
       addActionLayout={state.addActionLayout}
       addActionSize={state.addActionSize}
       showAddIcon={state.showAddIcon}
-      addActionMenu={config.addActionMenu}
+      addActionMenu={state.addActionMenu}
       addActionMenuItems={state.addActionMenuItems}
       onAppendItem={state.appendItem}
       onAppendFromMenu={state.appendFromAddMenu}

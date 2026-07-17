@@ -37,10 +37,12 @@ const propertyField: FormItem = {
     dependsOn: ['mode'],
     enabledWhen: (values, optionValue) => values.mode !== 'ranged' || optionValue !== 'reach',
   },
-  dynamicHint: {
-    dependsOn: ['mode'],
-    hintWhen: (values) =>
-      values.mode === 'ranged' ? 'Reach is unavailable for ranged weapons.' : undefined,
+  hint: {
+    resolve: {
+      dependsOn: ['mode'],
+      hintWhen: (values) =>
+        values.mode === 'ranged' ? 'Reach is unavailable for ranged weapons.' : undefined,
+    },
   },
 }
 

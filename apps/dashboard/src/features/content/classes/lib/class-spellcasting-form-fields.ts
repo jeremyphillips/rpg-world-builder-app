@@ -18,7 +18,7 @@ import {
   type EditableGridFieldConfig,
   type FieldVisibility,
   type FormItem,
-  type StackConfig,
+  type DependentConfig,
 } from '@rpg/ui/form'
 
 import { effectiveMaxFromCtx } from '../../lib/form-options/content-campaign-rules'
@@ -130,95 +130,96 @@ function buildSpellProgressionGridField(rowCount: number): EditableGridFieldConf
 export function spellcastingFields(ctx: ContentFormCtx): FormItem[] {
   const levelOptions = getLevelFieldOptions(ctx)
   const levelDigits = levelSelectDigits(ctx)
-  const stack: StackConfig = {
-    kind: 'stack',
-    layout: 'dependent',
-    dependentsChrome: 'subtle',
+  const stack: DependentConfig = {
+    kind: 'dependent',
     rhythm: 'comfortable',
-    fields: [
-      {
-        type: 'switch',
-        name: 'hasSpellcasting',
-        label: 'Has spellcasting',
-      },
-      {
-        type: 'select',
-        name: 'spellcasting.level',
-        label: 'Spellcasting level',
-        labelPosition: 'settings',
-        separator: 'subtle',
-        options: levelOptions,
-        required: true,
-        digits: levelDigits,
-        hint: 'First class level at which this class gains spellcasting',
-        visibility: visibleWhenSpellcasting(),
-      },
-      {
-        kind: 'row',
-        visibility: visibleWhenSpellcasting(),
-        fields: [
-          {
-            type: 'select',
-            name: 'spellcasting.progression',
-            label: 'Progression',
-            options: spellcastingProgressionOptions,
-            required: true,
-          },
-          {
-            type: 'select',
-            name: 'spellcasting.ability',
-            label: 'Spellcasting ability',
-            options: abilityOptions,
-            required: true,
-          },
-          {
-            type: 'select',
-            name: 'spellcasting.preparation',
-            label: 'Preparation',
-            options: spellPreparationOptions,
-            required: true,
-          },
-        ],
-      },
-      {
-        type: 'combobox',
-        name: 'spellcasting.requiredGear',
-        label: 'Required gear',
-        options: spellcastingGearKindOptions,
-        multiple: true,
-        visibility: visibleWhenSpellcasting(),
-        hint: 'Class-critical spellcasting items (e.g. Wizard spellbook).',
-      },
-      {
-        type: 'combobox',
-        name: 'spellcasting.focusKinds',
-        label: 'Focus kinds',
-        options: spellcastingFocusKindOptions,
-        multiple: true,
-        visibility: visibleWhenSpellcasting(),
-        hint: 'Spellcasting foci this class can use.',
-      },
-      {
-        type: 'combobox',
-        name: 'spellcasting.recommendedGear',
-        label: 'Recommended gear',
-        options: spellcastingGearKindOptions,
-        multiple: true,
-        visibility: visibleWhenSpellcasting(),
-        hint: 'Strong-tier spellcasting gear suggestions.',
-      },
-      {
-        type: 'richtext',
-        name: 'spellcasting.description',
-        label: 'Rules description',
-        linkable: true,
-        internalLinkOptions: ctx.options?.richTextInternalLinkOptions,
-        contentTypeOptions: ctx.options?.richTextContentTypeOptions,
-        visibility: visibleWhenSpellcasting(),
-        hint: 'SRD spellcasting feature prose (shown on the class detail view)',
-      },
-      buildSpellProgressionGridField(effectiveMaxFromCtx(ctx)),
-    ],
+    controller: {
+      type: 'switch',
+      name: 'hasSpellcasting',
+      label: 'Has spellcasting',
+    },
+    dependents: {
+      surface: 'subtle',
+      fields: [
+        {
+          type: 'select',
+          name: 'spellcasting.level',
+          label: 'Spellcasting level',
+          labelPosition: 'settings',
+          separator: 'subtle',
+          options: levelOptions,
+          required: true,
+          digits: levelDigits,
+          hint: 'First class level at which this class gains spellcasting',
+          visibility: visibleWhenSpellcasting(),
+        },
+        {
+          kind: 'row',
+          visibility: visibleWhenSpellcasting(),
+          fields: [
+            {
+              type: 'select',
+              name: 'spellcasting.progression',
+              label: 'Progression',
+              options: spellcastingProgressionOptions,
+              required: true,
+            },
+            {
+              type: 'select',
+              name: 'spellcasting.ability',
+              label: 'Spellcasting ability',
+              options: abilityOptions,
+              required: true,
+            },
+            {
+              type: 'select',
+              name: 'spellcasting.preparation',
+              label: 'Preparation',
+              options: spellPreparationOptions,
+              required: true,
+            },
+          ],
+        },
+        {
+          type: 'combobox',
+          name: 'spellcasting.requiredGear',
+          label: 'Required gear',
+          options: spellcastingGearKindOptions,
+          multiple: true,
+          visibility: visibleWhenSpellcasting(),
+          hint: 'Class-critical spellcasting items (e.g. Wizard spellbook).',
+        },
+        {
+          type: 'combobox',
+          name: 'spellcasting.focusKinds',
+          label: 'Focus kinds',
+          options: spellcastingFocusKindOptions,
+          multiple: true,
+          visibility: visibleWhenSpellcasting(),
+          hint: 'Spellcasting foci this class can use.',
+        },
+        {
+          type: 'combobox',
+          name: 'spellcasting.recommendedGear',
+          label: 'Recommended gear',
+          options: spellcastingGearKindOptions,
+          multiple: true,
+          visibility: visibleWhenSpellcasting(),
+          hint: 'Strong-tier spellcasting gear suggestions.',
+        },
+        {
+          type: 'richtext',
+          name: 'spellcasting.description',
+          label: 'Rules description',
+          linkable: true,
+          internalLinkOptions: ctx.options?.richTextInternalLinkOptions,
+          contentTypeOptions: ctx.options?.richTextContentTypeOptions,
+          visibility: visibleWhenSpellcasting(),
+          hint: 'SRD spellcasting feature prose (shown on the class detail view)',
+        },
+        buildSpellProgressionGridField(effectiveMaxFromCtx(ctx)),
+      ],
+    },
   }
   return [stack]
 }

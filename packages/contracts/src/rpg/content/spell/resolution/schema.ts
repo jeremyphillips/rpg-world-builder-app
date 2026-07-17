@@ -1,5 +1,11 @@
 import { z } from 'zod'
 
+/**
+ * @todo Enum/vocab follow-up — migrate spell resolution closed sets (attack types,
+ *   target kinds, selection modes, outcome results, application amounts, etc.)
+ *   to `rpg/vocab` using the closed-set ownership rule. See
+ *   `packages/contracts/docs/enum-inventory.md` (defer section).
+ */
 import { areaGeometrySchema } from '../../../primitives/area-geometry'
 import { rollSchema } from '../../../primitives/mechanics/roll'
 import { abilitySchema } from '../../../vocab/ability'

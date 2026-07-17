@@ -3,7 +3,7 @@
 import * as React from 'react'
 import { useWatch } from 'react-hook-form'
 
-import type { ArrayConfig } from '../../field-config'
+import type { ArrayConfig, ArrayFilterSelectFn, ArrayItemConfig } from '../../field-config'
 import { useDependsOnValues } from '../../config/form-depends-on.client'
 import { resolveErrorPlacement } from '../../context/array-item-presentation.context'
 import {
@@ -25,11 +25,11 @@ export interface UseArrayItemRowStateArgs {
   variant?: 'compact' | 'detailed'
   collapsed?: boolean
   collapsible?: boolean
-  itemCollapseKey?: ArrayConfig['itemCollapseKey']
+  itemCollapseKey?: ArrayItemConfig['collapseKey']
   arrayPattern?: ArrayConfig['arrayPattern']
   errorPlacement?: ArrayConfig['errorPlacement']
   filterSelectDependsOn?: string[]
-  filterSelectOptions?: ArrayConfig['filterSelectOptions']
+  filterSelectOptions?: ArrayFilterSelectFn
   onRemoveItem?: () => void
 }
 

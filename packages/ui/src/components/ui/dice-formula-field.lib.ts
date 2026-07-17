@@ -1,4 +1,7 @@
-export type DiceFormulaTailOperator = '+' | '-' | '×' | '÷'
+/** All supported dice-formula tail operators. */
+export const DICE_FORMULA_TAIL_OPERATORS = ['+', '-', '×', '÷'] as const
+
+export type DiceFormulaTailOperator = (typeof DICE_FORMULA_TAIL_OPERATORS)[number]
 
 /** @deprecated Prefer `DiceFormulaTailOperator` — kept for existing imports. */
 export type DiceFormulaOperator = DiceFormulaTailOperator
@@ -27,8 +30,6 @@ export const DEFAULT_DICE_FORMULA_WITH_MODIFIER: DiceFormulaValue = {
 export type DiceFormulaModifierMode = 'none' | 'optional' | 'required'
 
 export type DiceFormulaLabelPosition = 'above' | 'inline'
-
-export const DICE_FORMULA_TAIL_OPERATORS = ['+', '-', '×', '÷'] as const
 
 /** Default flat-modifier operators for hit dice and similar controls. */
 export const DICE_FORMULA_OPERATORS: readonly DiceFormulaTailOperator[] = ['+', '-']

@@ -159,7 +159,11 @@ export const GRANT_TEMPLATES: readonly GrantTemplate[] = [
       'Grant innate spells with a spellcasting ability, cast mode, and optional frequency.',
     groupId: 'character-options',
     grantType: 'spells',
-    createDefault: () => ({ grantType: 'spells', spellMode: 'free_cast' }),
+    createDefault: () => ({
+      grantType: 'spells',
+      spellCastingEnabled: true,
+      spellCastingFrequency: 'at_will',
+    }),
     search: {
       aliases: ['innate spells', 'spellcasting', 'cantrips', 'always prepared'],
       keywords: ['spells', 'magic'],

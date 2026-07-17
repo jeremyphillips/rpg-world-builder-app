@@ -41,7 +41,7 @@ describe('resolveFieldGroupChromeClassNames', () => {
   })
 
   it('applies elevated panel tone', () => {
-    const classes = resolveFieldGroupChromeClassNames({ variant: 'panel', tone: 'elevated' })
+    const classes = resolveFieldGroupChromeClassNames({ variant: 'panel', tone: 'raised' })
     expect(classes.body).toContain('bg-card')
     expect(classes.body).toContain('shadow-surface-raised')
   })

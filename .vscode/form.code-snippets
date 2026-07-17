@@ -1,0 +1,84 @@
+{
+  "Form field tree": {
+    "prefix": "form-def",
+    "description": "Schema-driven form fields skeleton with defineForm",
+    "scope": "typescript,typescriptreact",
+    "body": [
+      "import { defineForm, type FormItem } from '@rpg/ui/form'",
+      "",
+      "export const ${1:name}FormFields = defineForm([",
+      "  $0",
+      "] satisfies readonly FormItem[])"
+    ]
+  },
+  "Reusable form field group": {
+    "prefix": "form-items",
+    "description": "Reusable form field group with defineFormItems",
+    "scope": "typescript,typescriptreact",
+    "body": [
+      "import { defineFormItems } from '@rpg/ui/form'",
+      "",
+      "export const ${1:name}FormItems = defineFormItems([",
+      "  $0",
+      "])"
+    ]
+  },
+  "Array form field": {
+    "prefix": "form-array",
+    "description": "Repeatable array field skeleton with defineArrayField",
+    "scope": "typescript,typescriptreact",
+    "body": [
+      "// itemChrome: FIELD_SURFACE_TONES — main | elevated | subtle | medium | warning | error",
+      "defineArrayField({",
+      "  kind: 'array',",
+      "  name: '${1:fieldName}',",
+      "  legend: '${2:Section title}',",
+      "  addActionLabel: '${3:Add item}',",
+      "  itemChrome: '${4|elevated,main,subtle,medium,warning,error|}',",
+      "  min: ${5:0},",
+      "  itemCollapsible: ${6|true,false|},",
+      "  itemHeader: {",
+      "    fallback: (index) => \\`${7:Item} \\${index + 1}\\`,",
+      "    primaryField: '${8:name}',",
+      "  },",
+      "  fields: [",
+      "    { type: 'text', name: '${8:name}', label: '${9:Name}', required: true },",
+      "    $0",
+      "  ],",
+      "})"
+    ]
+  },
+  "Form group field": {
+    "prefix": "form-group",
+    "description": "Named fieldset subsection with defineGroupField",
+    "scope": "typescript,typescriptreact",
+    "body": [
+      "defineGroupField({",
+      "  kind: 'group',",
+      "  legend: '${1:Section title}',",
+      "  rhythm: '${2|comfortable,compact|}',",
+      "  fields: [",
+      "    $0",
+      "  ],",
+      "})"
+    ]
+  },
+  "Dependent stack field": {
+    "prefix": "form-stack",
+    "description": "Controller + dependents column with defineStackField",
+    "scope": "typescript,typescriptreact",
+    "body": [
+      "// dependentsChrome: FIELD_SURFACE_TONES — main | elevated | subtle | medium | warning | error",
+      "defineStackField({",
+      "  kind: 'stack',",
+      "  layout: 'dependent',",
+      "  dependentsChrome: '${1|subtle,main,elevated,medium,warning,error|}',",
+      "  fields: [",
+      "    { type: 'switch', name: '${2:enabled}', label: '${3:Enable rule}' },",
+      "    { type: 'text', name: '${4:value}', label: '${5:Value}', labelPosition: 'settings' },",
+      "    $0",
+      "  ],",
+      "})"
+    ]
+  }
+}

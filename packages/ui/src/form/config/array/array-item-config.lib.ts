@@ -1,13 +1,19 @@
 import { singularizeLabel } from '@rpg/contracts'
 
 import type {
+  ArrayAddActionConfig,
   ArrayConfig,
+  ArrayItemConfig,
   ArrayItemHeaderConfig,
   ArrayItemReorder,
   ArrayItemVariant,
   FormItem,
   RowConfig,
 } from '../../field-config'
+import type {
+  FieldStatusTone,
+  FieldSurfaceVariant,
+} from '../../../components/ui/field-dependent.variants'
 
 const NESTED_ARRAY_SECTION_DEPTH = 2
 
@@ -32,13 +38,53 @@ export function resolveCompactInlineRow(fields: FormItem[]): RowConfig | undefin
   return only
 }
 
+export function resolveArrayItemConfig(
+  config: ArrayConfig,
+): Required<
+  Pick<ArrayItemConfig, 'variant' | 'surface' | 'collapsible' | 'reorder' | 'removable'>
+> &
+  ArrayItemConfig {
+  const item = config.item ?? {}
+  return {
+    ...item,
+    variant: item.variant ?? 'auto',
+    surface: item.surface ?? 'raised',
+    collapsible: item.collapsible ?? false,
+    reorder: item.reorder ?? 'dragHandle',
+    removable: item.removable ?? true,
+  }
+}
+
+export function resolveArrayItemChrome(config: ArrayConfig): {
+  surface?: FieldSurfaceVariant
+  status?: FieldStatusTone
+} {
+  const item = config.item ?? {}
+  return {
+    surface: item.surface,
+    status: item.status,
+  }
+}
+
+export function resolveArrayAddAction(config: ArrayConfig): ArrayAddActionConfig | null {
+  if (config.addAction === false) return null
+  const action = config.addAction ?? {}
+  return {
+    label: action.label ?? 'Add item',
+    icon: action.icon ?? true,
+    variant: action.variant ?? 'outline',
+    layout: action.layout ?? 'stacked',
+    size: action.size,
+    menu: action.menu,
+  }
+}
+
 export function resolveArrayItemVariant(
   config: ArrayConfig,
   options: { nested: boolean },
 ): Exclude<ArrayItemVariant, 'auto'> {
-  const explicit = config.itemVariant ?? 'auto'
+  const explicit = resolveArrayItemConfig(config).variant ?? 'auto'
   if (options.nested) {
-    // Nested sections default to compact; opt in to grant-style headers explicitly.
     if (explicit === 'detailed') return 'detailed'
     return 'compact'
   }
@@ -47,7 +93,7 @@ export function resolveArrayItemVariant(
 }
 
 export function resolveArrayItemReorder(config: ArrayConfig): ArrayItemReorder {
-  return config.reorder ?? 'dragHandle'
+  return resolveArrayItemConfig(config).reorder ?? 'dragHandle'
 }
 
 export function defaultArrayItemHeader(legend?: string): ArrayItemHeaderConfig {
@@ -61,7 +107,7 @@ export function resolveArrayItemHeader(
   config: ArrayConfig,
   legend?: string,
 ): ArrayItemHeaderConfig {
-  return config.itemHeader ?? defaultArrayItemHeader(legend)
+  return resolveArrayItemConfig(config).header ?? defaultArrayItemHeader(legend)
 }
 
 /** Middle-dot separator for array item header labels and summary segments. */

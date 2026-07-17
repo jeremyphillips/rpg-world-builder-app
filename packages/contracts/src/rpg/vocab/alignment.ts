@@ -1,5 +1,6 @@
 import { z } from 'zod'
 
+import { vocabEnumFromEntries, keysFromEntries } from './enum-schema'
 import { getTermSentenceForm } from './types'
 import type { GameTermEntry } from './types'
 
@@ -58,9 +59,9 @@ export const ALIGNMENT_ENTRIES = {
 
 export type Alignment = keyof typeof ALIGNMENT_ENTRIES
 
-export const ALIGNMENTS = Object.keys(ALIGNMENT_ENTRIES) as [Alignment, ...Alignment[]]
+export const ALIGNMENTS = keysFromEntries(ALIGNMENT_ENTRIES)
 
-export const alignmentSchema = z.enum(ALIGNMENTS)
+export const alignmentSchema = vocabEnumFromEntries(ALIGNMENT_ENTRIES)
 
 /** Coerces blank select sentinels before enum validation (forms, persisted drafts). */
 export const optionalAlignmentSchema = z.preprocess(

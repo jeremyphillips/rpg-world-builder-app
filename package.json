@@ -32,6 +32,8 @@
     "bench": "pnpm --filter @rpg/bench-cli bench",
     "catalog:spell-modeling-audit": "pnpm exec tsx packages/catalog/scripts/spell-modeling-audit.mjs",
     "catalog:spell-modeling-report": "pnpm exec tsx packages/catalog/scripts/generate-spell-modeling-report.mjs",
+    "generate:json-schemas": "pnpm --filter @rpg/contracts generate:json-schemas",
+    "gate:json-schemas": "pnpm generate:json-schemas && git diff --exit-code packages/contracts/generated && test -z \"$(git status --porcelain packages/contracts/generated)\"",
     "storybook": "concurrently -n ui,dash -c cyan,magenta \"pnpm storybook:ui\" \"pnpm storybook:dashboard\"",
     "storybook:ui": "pnpm --filter @rpg/ui storybook",
     "storybook:dashboard": "pnpm --filter @rpg/dashboard storybook",

@@ -10,6 +10,7 @@ import {
   formatLanguageRowSummary,
   formatResistanceRowSummary,
   formatSenseRowSummary,
+  formatSpellRowSummary,
   formatSpellRowTitle,
   grantItemFields,
   GRANT_TYPE_MISSING_PRIMARY,
@@ -36,8 +37,8 @@ function formItemKey(item: FormItem | RowConfig, index: number, namePrefix?: str
   switch (item.kind) {
     case 'group':
       return namePrefix ? `${namePrefix}.group-${index}` : `group-${index}`
-    case 'stack':
-      return namePrefix ? `${namePrefix}.stack-${index}` : `stack-${index}`
+    case 'dependent':
+      return namePrefix ? `${namePrefix}.dependent-${index}` : `dependent-${index}`
     case 'row':
       return namePrefix ? `${namePrefix}.row-${index}` : `row-${index}`
     case 'slot':
@@ -72,6 +73,14 @@ function walkDuplicateFormItemKeys(
 
   for (const item of items) {
     if (!isContainer(item) || item.kind === 'slot' || item.kind === 'array') continue
+    if (item.kind === 'dependent') {
+      walkDuplicateFormItemKeys(
+        [item.controller, ...item.dependents.fields],
+        namePrefix,
+        duplicates,
+      )
+      continue
+    }
     walkDuplicateFormItemKeys(item.fields, namePrefix, duplicates)
   }
 
@@ -88,15 +97,14 @@ describe('grantItemFields react keys', () => {
 })
 
 describe('grantGroupsToFormRows / formRowsToGrantGroups (atomic model)', () => {
-  it('round-trips a spells grant through grantGroups', () => {
+  it('round-trips a casting-only spells grant through grantGroups', () => {
     const groups: GrantGroups = [
       {
         grants: [
           {
             kind: 'spells',
             ability: 'cha',
-            mode: 'free_cast',
-            frequency: 'once_per_long_rest',
+            casting: { mode: 'free_cast', frequency: 'once_per_long_rest' },
             spellIds: ['power-word-heal', 'power-word-kill'],
           },
         ],
@@ -107,15 +115,16 @@ describe('grantGroupsToFormRows / formRowsToGrantGroups (atomic model)', () => {
     expect(rows[0]?.grantType).toBe('spells')
     expect(rows[0]?.spellIds).toEqual(['power-word-heal', 'power-word-kill'])
     expect(rows[0]?.spellAbility).toBe('cha')
-    expect(rows[0]?.spellMode).toBe('free_cast')
-    expect(rows[0]?.spellFrequency).toBe('once_per_long_rest')
+    expect(rows[0]?.spellCastingEnabled).toBe(true)
+    expect(rows[0]?.spellCastingFrequency).toBe('once_per_long_rest')
+    expect(rows[0]?.spellAvailability).toBe(false)
     expect(rows[0]?.unlockLevel).toBe(GRANT_DEFAULT_UNLOCK_LEVEL)
 
     const restored = formRowsToGrantGroups(rows)
     expect(restored).toEqual(groups)
   })
 
-  it('stamps unlockLevel from the group onto rows', () => {
+  it('round-trips an availability-only spells grant', () => {
     const groups: GrantGroups = [
       {
         unlock: { level: 5 },
@@ -123,14 +132,38 @@ describe('grantGroupsToFormRows / formRowsToGrantGroups (atomic model)', () => {
           {
             kind: 'spells',
             ability: 'wis',
-            mode: 'always_prepared',
+            availability: 'always_prepared',
             spellIds: ['bless', 'cure-wounds'],
           },
         ],
       },
     ]
     const rows = grantGroupsToFormRows(groups)
+    expect(rows[0]?.spellAvailability).toBe(true)
+    expect(rows[0]?.spellCastingEnabled).toBe(false)
     expect(rows[0]?.unlockLevel).toBe(5)
+    expect(formRowsToGrantGroups(rows)).toEqual(groups)
+  })
+
+  it('round-trips a combined availability + casting grant (Contact Patron pattern)', () => {
+    const groups: GrantGroups = [
+      {
+        grants: [
+          {
+            kind: 'spells',
+            ability: 'cha',
+            availability: 'always_prepared',
+            casting: { mode: 'free_cast', frequency: 'once_per_long_rest' },
+            spellIds: ['contact-other-plane'],
+          },
+        ],
+      },
+    ]
+    const rows = grantGroupsToFormRows(groups)
+    expect(rows[0]?.spellAvailability).toBe(true)
+    expect(rows[0]?.spellCastingEnabled).toBe(true)
+    expect(rows[0]?.spellCastingFrequency).toBe('once_per_long_rest')
+    expect(formRowsToGrantGroups(rows)).toEqual(groups)
   })
 
   it('groups rows by unlockLevel when saving', () => {
@@ -138,15 +171,16 @@ describe('grantGroupsToFormRows / formRowsToGrantGroups (atomic model)', () => {
       {
         grantType: 'spells' as const,
         spellAbility: 'cha' as const,
-        spellMode: 'free_cast' as const,
+        spellCastingEnabled: true,
+        spellCastingFrequency: 'at_will' as const,
         spellIds: ['dancing-lights'],
         unlockLevel: GRANT_DEFAULT_UNLOCK_LEVEL,
       },
       {
         grantType: 'spells' as const,
         spellAbility: 'cha' as const,
-        spellMode: 'free_cast' as const,
-        spellFrequency: 'once_per_long_rest' as const,
+        spellCastingEnabled: true,
+        spellCastingFrequency: 'once_per_long_rest' as const,
         spellIds: ['faerie-fire'],
         unlockLevel: 3,
       },
@@ -344,6 +378,17 @@ describe('grant row summaries', () => {
     expect(formatLanguageRowSummary('common')).toBe('Character knows Common.')
     expect(formatFeatChoiceRowSummary('general', 2)).toBe('Character chooses 2 general feats.')
   })
+
+  it('formats spell grant summaries from availability and casting toggles', () => {
+    expect(
+      formatSpellRowSummary({
+        spellAbility: 'cha',
+        spellCastingEnabled: true,
+        spellCastingFrequency: 'at_will',
+        spellIds: ['dancing-lights'],
+      }),
+    ).toBe('Character can cast dancing-lights at will.')
+  })
 })
 
 const grantRowHeaderContext = {
@@ -373,6 +418,18 @@ describe('formatGrantRowSummary', () => {
         grantRowHeaderContext,
       ),
     ).toBe('Character chooses 2 general feats.')
+    expect(
+      formatGrantRowSummary(
+        {
+          grantType: 'spells',
+          spellAbility: 'cha',
+          spellCastingEnabled: true,
+          spellCastingFrequency: 'at_will',
+          spellIds: ['power-word-heal'],
+        },
+        grantRowHeaderContext,
+      ),
+    ).toBe('Character can cast power-word-heal at will.')
     expect(formatGrantRowSummary({ grantType: 'spells' }, grantRowHeaderContext)).toBe('')
     expect(formatGrantRowSummary({}, grantRowHeaderContext)).toBe('')
   })

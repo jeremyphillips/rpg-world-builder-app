@@ -1,12 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import {
-  WEAPON_MODES,
-  WEAPON_MODE_ENTRIES,
-  getWeaponModeEntry,
-  getWeaponModeLabel,
-  weaponModeSchema,
-} from './mode'
+import { WEAPON_MODES, getWeaponModeEntry, getWeaponModeLabel, weaponModeSchema } from './mode'
 
 describe('weaponModeSchema', () => {
   it('accepts every known weapon mode', () => {
@@ -21,10 +15,6 @@ describe('weaponModeSchema', () => {
 })
 
 describe('weapon mode vocabulary', () => {
-  it('exposes every mode in WEAPON_MODES', () => {
-    expect([...WEAPON_MODES].sort()).toEqual(Object.keys(WEAPON_MODE_ENTRIES).sort())
-  })
-
   it('has a label and description for every mode', () => {
     for (const mode of WEAPON_MODES) {
       const entry = getWeaponModeEntry(mode)

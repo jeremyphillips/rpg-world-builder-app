@@ -374,8 +374,8 @@
             {
               "kind": "spells",
               "ability": "cha",
-              "mode": "always_prepared",
-              "spellIds": ["power-word-heal", "power-word-kill"]
+              "spellIds": ["power-word-heal", "power-word-kill"],
+              "availability": "always_prepared"
             }
           ]
         }

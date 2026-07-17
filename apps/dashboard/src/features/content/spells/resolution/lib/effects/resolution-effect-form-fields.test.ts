@@ -14,34 +14,46 @@ import { buildResolutionEffectAddMenuItems } from '../selection/resolution-selec
 import { resolutionFormToSelectionContext } from '../selection/resolution-selection-context.lib'
 import { RESOLUTION_FORM_FIXTURES } from '../../fixtures'
 
-function findResolutionEffectsArray(fields: FormItem[]): ArrayConfig | undefined {
+function walkNestedFormItems(fields: FormItem[], visit: (field: FormItem) => void): void {
   for (const field of fields) {
-    if ('kind' in field && field.kind === 'array' && field.name === 'resolution.effects') {
-      return field
+    visit(field)
+    if ('kind' in field && field.kind === 'group') {
+      walkNestedFormItems(field.fields, visit)
     }
-
-    if ('kind' in field && (field.kind === 'group' || field.kind === 'stack')) {
-      const nested = findResolutionEffectsArray(field.fields)
-      if (nested) return nested
+    if ('kind' in field && field.kind === 'dependent') {
+      visit(field.controller)
+      walkNestedFormItems(field.dependents.fields, visit)
     }
   }
+}
 
-  return undefined
+function findResolutionEffectsArray(fields: FormItem[]): ArrayConfig | undefined {
+  let found: ArrayConfig | undefined
+  walkNestedFormItems(fields, (field) => {
+    if (
+      !found &&
+      'kind' in field &&
+      field.kind === 'array' &&
+      field.name === 'resolution.effects'
+    ) {
+      found = field
+    }
+  })
+  return found
 }
 
 describe('resolutionFields effects array', () => {
   it('hides the generic add control in favor of the resolution-specific add slot', () => {
     const arrayField = findResolutionEffectsArray(resolutionFields({}))
-    expect(arrayField?.hideAddAction).toBe(true)
-    expect(arrayField?.hideItemRemove).toBe(true)
-    expect(arrayField?.addActionMenu).toBeUndefined()
+    expect(arrayField?.addAction).toBe(false)
+    expect(arrayField?.item?.removable).toBe(false)
   })
 
   it('hides the generic remove control in favor of the resolution-specific header remove slot', () => {
     const arrayField = findResolutionEffectsArray(resolutionFields({}))
-    expect(arrayField?.hideItemRemove).toBe(true)
-    expect(arrayField?.itemRemoveSlot?.name).toBe('_resolutionEffectHeaderRemove')
-    expect(arrayField?.itemRemoveSlot?.render).toBeTypeOf('function')
+    expect(arrayField?.item?.removable).toBe(false)
+    expect(arrayField?.item?.removeSlot?.name).toBe('_resolutionEffectHeaderRemove')
+    expect(arrayField?.item?.removeSlot?.render).toBeTypeOf('function')
   })
 
   it('does not include a body-level remove slot on effect rows', () => {
@@ -61,8 +73,8 @@ describe('resolutionFields effects array', () => {
 
   it('opts into detailed item chrome when nested inside resolution groups', () => {
     const arrayField = findResolutionEffectsArray(resolutionFields({}))
-    expect(arrayField?.itemVariant).toBe('detailed')
-    expect(arrayField?.itemCollapsible).toBe(true)
+    expect(arrayField?.item?.variant).toBe('detailed')
+    expect(arrayField?.item?.collapsible).toBe(true)
   })
 
   it('includes template descriptions in the resolution add menu', () => {
@@ -76,7 +88,7 @@ describe('resolutionFields effects array', () => {
 
   it('wires grant-style collapsible item headers with parent context summaries', () => {
     const arrayField = findResolutionEffectsArray(resolutionFields({}))
-    const itemHeader = arrayField?.itemHeader
+    const itemHeader = arrayField?.item?.header
 
     expect(itemHeader).toBeDefined()
     expect(itemHeader?.summaryDependsOn).toContain('resolution.proximityKind')

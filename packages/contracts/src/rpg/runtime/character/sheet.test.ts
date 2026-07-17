@@ -111,7 +111,21 @@ const baseCharacter = {
   spells: [
     {
       spellId: 'srd-cc-5.2.1:light',
-      preparationState: 'always_prepared',
+      access: { granted: true },
+      castingEntitlements: [
+        {
+          mode: 'free_cast',
+          frequency: 'at_will',
+          allowsSlotCasting: false,
+          sources: [
+            {
+              kind: 'heritageOption',
+              sourceId: 'srd-cc-5.2.1:elf',
+              grantId: 'high-elf-cantrip',
+            },
+          ],
+        },
+      ],
       sources: [
         {
           kind: 'heritageOption',

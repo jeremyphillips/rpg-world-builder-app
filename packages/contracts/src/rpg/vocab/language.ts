@@ -1,5 +1,7 @@
 import { z } from 'zod'
 
+import { keysFromEntries, vocabEnumFromEntries } from './enum-schema'
+
 import { formatVocabularySlugLabel } from './format-slug-label'
 import { getTermSentenceForm, type GameTermEntry } from './types'
 import {
@@ -12,12 +14,6 @@ import {
 // Languages — open vocabulary set. Standard/rare grouping stays on seed rows
 // (`languageSeedOptionSchema.category`) for grants and character creation.
 // ---------------------------------------------------------------------------
-
-export const LANGUAGE_CATEGORIES = ['standard', 'rare'] as const
-
-export const languageCategorySchema = z.enum(LANGUAGE_CATEGORIES)
-
-export type LanguageCategory = z.infer<typeof languageCategorySchema>
 
 export const LANGUAGE_CATEGORY_ENTRIES = {
   standard: {
@@ -36,7 +32,13 @@ export const LANGUAGE_CATEGORY_ENTRIES = {
       plural: 'rare languages',
     },
   },
-} as const satisfies Record<LanguageCategory, GameTermEntry>
+} as const satisfies Record<string, GameTermEntry>
+
+export type LanguageCategory = keyof typeof LANGUAGE_CATEGORY_ENTRIES
+
+export const LANGUAGE_CATEGORIES = keysFromEntries(LANGUAGE_CATEGORY_ENTRIES)
+
+export const languageCategorySchema = vocabEnumFromEntries(LANGUAGE_CATEGORY_ENTRIES)
 
 export const LANGUAGE_SET_ID = 'languages' as const satisfies VocabularyOptionSetId
 

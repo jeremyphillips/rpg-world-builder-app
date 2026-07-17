@@ -38,14 +38,14 @@ describe('ClassProgressionTable', () => {
     expect(screen.getByRole('columnheader', { name: 'Spells Known' })).toBeInTheDocument()
   })
 
-  it('hides the spells-available column for always_prepared mode', () => {
+  it('hides the spells-available column for full_list mode', () => {
     const cleric = pickClass('cleric')
     const alwaysPrepared: CharacterClass = {
       ...cleric,
       spellcasting: cleric.spellcasting
         ? {
             ...cleric.spellcasting,
-            preparation: 'always_prepared',
+            preparation: 'full_list',
             spellsAvailable: undefined,
           }
         : undefined,

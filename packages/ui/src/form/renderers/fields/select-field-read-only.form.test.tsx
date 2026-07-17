@@ -27,14 +27,26 @@ const fields: FormItem[] = [
     kind: 'array',
     name: 'rows',
     legend: 'Applications',
-    filterSelectDependsOn: [],
-    filterSelectOptions: ({ arrayItems, rowIndex, fieldName, options }) => {
-      if (fieldName !== 'amount') return [...options]
-      const row = arrayItems[rowIndex] as Values['rows'][number] | undefined
-      if (row?.kind === 'healing') {
-        return options.filter((option) => option.value === 'full')
-      }
-      return [...options]
+    filterSelect: {
+      dependsOn: [],
+      filter: ({
+        arrayItems,
+        rowIndex,
+        fieldName,
+        options,
+      }: {
+        arrayItems: unknown[]
+        rowIndex: number
+        fieldName: string
+        options: Array<{ value: string; label: string; disabled?: boolean }>
+      }) => {
+        if (fieldName !== 'amount') return [...options]
+        const row = arrayItems[rowIndex] as Values['rows'][number] | undefined
+        if (row?.kind === 'healing') {
+          return options.filter((option) => option.value === 'full')
+        }
+        return [...options]
+      },
     },
     fields: [
       {

@@ -193,7 +193,7 @@ describe('weapon kindFieldGroups', () => {
     )
     expect(propertiesField).toMatchObject({
       optionAvailability: { dependsOn: ['mode'] },
-      dynamicHint: { dependsOn: ['mode'] },
+      hint: { resolve: { dependsOn: ['mode'] } },
     })
   })
 })

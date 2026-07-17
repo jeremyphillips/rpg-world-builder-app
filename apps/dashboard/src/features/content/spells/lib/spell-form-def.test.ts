@@ -27,19 +27,27 @@ function findGroup(fields: FormItem[], legend: string): GroupConfig | undefined 
   return undefined
 }
 
-function findArrayField(fields: FormItem[], name: string): ArrayConfig | undefined {
+function walkNestedFormItems(fields: FormItem[], visit: (field: FormItem) => void): void {
   for (const field of fields) {
-    if ('kind' in field && field.kind === 'array' && field.name === name) {
-      return field
+    visit(field)
+    if ('kind' in field && field.kind === 'group') {
+      walkNestedFormItems(field.fields, visit)
     }
-
-    if ('kind' in field && (field.kind === 'group' || field.kind === 'stack')) {
-      const nested = findArrayField(field.fields, name)
-      if (nested) return nested
+    if ('kind' in field && field.kind === 'dependent') {
+      visit(field.controller)
+      walkNestedFormItems(field.dependents.fields, visit)
     }
   }
+}
 
-  return undefined
+function findArrayField(fields: FormItem[], name: string): ArrayConfig | undefined {
+  let found: ArrayConfig | undefined
+  walkNestedFormItems(fields, (field) => {
+    if (!found && 'kind' in field && field.kind === 'array' && field.name === name) {
+      found = field
+    }
+  })
+  return found
 }
 
 function findRow(fields: GroupConfig['fields']): RowConfig | undefined {
@@ -53,8 +61,11 @@ function collectFieldNames(fields: FormItem[]): string[] {
       names.push(field.name)
     } else if ('kind' in field && field.kind === 'row') {
       names.push(...collectFieldNames(field.fields))
-    } else if ('kind' in field && (field.kind === 'group' || field.kind === 'stack')) {
+    } else if ('kind' in field && field.kind === 'group') {
       names.push(...collectFieldNames(field.fields))
+    } else if ('kind' in field && field.kind === 'dependent') {
+      names.push(field.controller.name)
+      names.push(...collectFieldNames(field.dependents.fields))
     }
   }
   return names
@@ -133,7 +144,10 @@ describe('spellFormDef area of effect fields', () => {
         type: 'select',
         name: 'areaOfEffect.shape',
         width: 'auto',
-        hintPosition: 'below-control',
+        hint: {
+          text: 'Optional structured area geometry. Origin and movement are not modeled yet.',
+          position: 'below-control',
+        },
       }),
       expect.objectContaining({
         type: 'inputSelect',
@@ -254,10 +268,10 @@ describe('spellFormDef resolution tab', () => {
     const effectsArray = findArrayField(resolutionTab?.fields ?? [], 'resolution.effects')
     expect(effectsArray).toBeDefined()
     expect(effectsArray?.legend).toBe('')
-    expect(effectsArray?.itemVariant).toBe('detailed')
-    expect(effectsArray?.itemCollapsible).toBe(true)
-    expect(effectsArray?.itemHeader?.primary).toBeTypeOf('function')
-    expect(effectsArray?.itemHeader?.summary).toBeTypeOf('function')
+    expect(effectsArray?.item?.variant).toBe('detailed')
+    expect(effectsArray?.item?.collapsible).toBe(true)
+    expect(effectsArray?.item?.header?.primary).toBeTypeOf('function')
+    expect(effectsArray?.item?.header?.summary).toBeTypeOf('function')
     expect(findGroup(resolutionTab?.fields ?? [], 'Outcome branches')).toMatchObject({
       description: RESOLUTION_SECTION_LABELS.outcomesHint,
     })

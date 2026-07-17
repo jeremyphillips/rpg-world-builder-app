@@ -2,7 +2,7 @@
 
 import * as React from 'react'
 
-import type { ArrayConfig, FieldOption } from '../field-config'
+import type { ArrayFilterSelectFn, FieldOption } from '../field-config'
 
 export interface ArrayFieldContextValue {
   /** Current array item values from RHF. */
@@ -16,8 +16,8 @@ export interface ArrayFieldContextValue {
   /** Level-range key names for cascade edits inside level-range tier arrays. */
   levelRangeKeys?: { min: string; max: string }
   /** Optional cross-row select filtering from the parent array config. */
-  filterSelectOptions?: ArrayConfig['filterSelectOptions']
-  /** Watched form values for `filterSelectDependsOn` keys. */
+  filterSelectOptions?: ArrayFilterSelectFn
+  /** Watched form values for `filterSelect.dependsOn` keys. */
   watchedValues: Record<string, unknown>
 }
 

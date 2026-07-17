@@ -45,6 +45,7 @@ pnpm-debug.log*
 .vscode/*
 !.vscode/extensions.json
 !.vscode/settings.json
+!.vscode/form.code-snippets
 
 # Cursor
 .cursor/plans

@@ -6,10 +6,10 @@ import { FieldNode } from './form-conditional.client'
 import { ConditionalGroup, GroupFieldSection } from './form-group-section.client'
 import { ConditionalRow, RowFieldSection } from './form-row-section.client'
 import {
-  ConditionalStack,
-  StackSection,
+  ConditionalDependent,
+  DependentSection,
   type RenderNestedFormItemsProps,
-} from './form-stack-section.client'
+} from './form-dependent-section.client'
 import { ArrayFormItemSection } from '../renderers/array/array-form-item-section.client'
 import { ConditionalArrayField } from '../renderers/array/conditional-array-field.client'
 import { SlotFormItemSection } from '../renderers/fields/slot-field-renderer.client'
@@ -90,10 +90,10 @@ export function FormItemNode({ item, index, idPrefix, namePrefix, depth }: FormI
     )
   }
 
-  if (item.kind === 'stack') {
+  if (item.kind === 'dependent') {
     if (item.visibility) {
       return (
-        <ConditionalStack
+        <ConditionalDependent
           item={item}
           idPrefix={idPrefix}
           namePrefix={namePrefix}
@@ -103,7 +103,7 @@ export function FormItemNode({ item, index, idPrefix, namePrefix, depth }: FormI
       )
     }
     return (
-      <StackSection
+      <DependentSection
         item={item}
         idPrefix={idPrefix}
         namePrefix={namePrefix}
@@ -166,8 +166,8 @@ export function formItemKey(
   switch (item.kind) {
     case 'group':
       return prefixFormItemKey(namePrefix, `group-${index}`)
-    case 'stack':
-      return prefixFormItemKey(namePrefix, `stack-${index}`)
+    case 'dependent':
+      return prefixFormItemKey(namePrefix, `dependent-${index}`)
     case 'row':
       return prefixFormItemKey(namePrefix, `row-${index}`)
     case 'slot':
@@ -177,4 +177,4 @@ export function formItemKey(
   }
 }
 
-export type { RenderNestedFormItemsProps } from './form-stack-section.client'
+export type { RenderNestedFormItemsProps } from './form-dependent-section.client'

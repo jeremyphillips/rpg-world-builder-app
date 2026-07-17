@@ -12,7 +12,7 @@ import {
   resolveArrayItemHeader,
   type ResolvedArrayItemHeader,
 } from '../../config/array/array-item-config.lib'
-import type { ArrayConfig, RowConfig } from '../../field-config'
+import type { ArrayConfig, ArrayItemConfig, RowConfig } from '../../field-config'
 import { NestedFormItems } from '../../containers/form-item-node.client'
 import { FieldNode } from '../../containers/form-conditional.client'
 import { resolveIssueProminence } from '../../errors/resolve-issue-prominence'
@@ -106,7 +106,7 @@ interface CompactInlineArrayFieldItemProps extends ArrayFieldItemChromeProps {
   idPrefix: string
   itemPrefix: string
   compactInlineRow: RowConfig
-  compactInlineAlign?: ArrayConfig['compactInlineAlign']
+  compactInlineAlign?: ArrayItemConfig['inlineAlign']
   header: ResolvedArrayItemHeader
   suppressFieldErrorText: boolean
   rowSummaryId: string
@@ -331,6 +331,7 @@ export function ArrayFieldItemContent({
     chromeProps,
     showIssueChrome,
     issueGroup,
+    itemConfig,
   } = useArrayFieldItemContentState({
     config,
     idPrefix,
@@ -361,9 +362,9 @@ export function ArrayFieldItemContent({
     </ArrayItemPresentationContext.Provider>
   )
 
-  const customRemove = config.itemRemoveSlot ? (
+  const customRemove = itemConfig.removeSlot ? (
     <ArrayFieldContext.Provider value={arrayContext}>
-      {config.itemRemoveSlot.render()}
+      {itemConfig.removeSlot.render()}
     </ArrayFieldContext.Provider>
   ) : undefined
 
@@ -391,7 +392,7 @@ export function ArrayFieldItemContent({
         idPrefix={idPrefix}
         itemPrefix={itemPrefix}
         compactInlineRow={compactInlineRow}
-        compactInlineAlign={config.compactInlineAlign}
+        compactInlineAlign={itemConfig.inlineAlign}
         header={header}
         suppressFieldErrorText={suppressFieldErrorText}
         rowSummaryId={rowSummaryId}

@@ -29,9 +29,10 @@ import type {
   InlineSentenceSegment,
 } from '../components/ui/inline-sentence-field.types'
 import type {
-  FieldStackDependentsChromeScope,
-  FieldStackDependentsTone,
-} from '../components/ui/field-stack.variants'
+  FieldDependentsScope,
+  FieldStatusTone,
+  FieldSurfaceVariant,
+} from '../components/ui/field-dependent.variants'
 import type { FieldGroupFieldsChrome } from '../components/ui/field-group-chrome.variants'
 import type { ArrayAddMenuConfig } from './config/array/array-add-menu.lib'
 import type {
@@ -39,8 +40,7 @@ import type {
   FieldGroupLegendSize,
   FieldLabelPosition,
   FieldSeparator,
-  FieldStackLayout,
-  FieldStackRhythm,
+  FieldRhythm,
 } from '../components/ui/field.variants'
 
 export type { FieldGroupFieldsChrome } from '../components/ui/field-group-chrome.variants'
@@ -174,6 +174,13 @@ export interface FieldDynamicHint {
   hintWhen: (values: Record<string, unknown>) => string | undefined
 }
 
+/** Static and dynamic hint configuration on leaf fields. */
+export interface FieldHintConfig {
+  text?: string
+  position?: FieldHintPosition
+  resolve?: FieldDynamicHint
+}
+
 /**
  * Patches form values when watched driver fields change (after initial mount).
  * Used to remove dependent selections when a mode or category changes.
@@ -191,24 +198,53 @@ interface BaseFieldConfig {
   /** Form value key; also the basis of the generated control id. */
   name: string
   label: string
+  /**
+   * Control + label scale (`sm` | `md` | `lg`). Inherits form rhythm when omitted
+   * (`sm` for compact, `md` for comfortable top-level forms).
+   */
   size?: FieldSize
+  /**
+   * Width of the field wrapper within its container — see `FIELD_WIDTHS`.
+   *
+   * **Intrinsic** (`xs` ~64px, `sm`, `md`, `lg`, `xl`, `auto`): capped width; use
+   * `auto` or fractions inside a `kind: 'row'`. Standalone fields with `digits`
+   * usually keep `full` so label and hint span the column.
+   *
+   * **Row fractions** (`full`, `1/2`, `1/3`, `2/3`, `1/4`, `3/4`): meaningful
+   * only inside `kind: 'row'` — distributes flex grow weight on a base-12 scale.
+   *
+   * @default full
+   */
   width?: FieldWidth
-  hint?: string
-  /** Helper text placement relative to the label and control. Default `below-label`. */
-  hintPosition?: FieldHintPosition
+  hint?: string | FieldHintConfig
   /** Renders the label `[i]` InfoTooltip. */
   info?: ReactNode
   required?: boolean
   disabled?: boolean
-  /** Optional conditional rendering; omit for always-visible fields. */
+  /**
+   * Conditional rendering — field is required only while visible. List every
+   * field name `visibleWhen` reads in `dependsOn` so the renderer can subscribe
+   * narrowly via `useWatch`.
+   */
   visibility?: FieldVisibility
-  /** Optional helper text derived from other field values. */
-  dynamicHint?: FieldDynamicHint
   /** Trailing divider after this field within a group/stack rhythm. */
   separator?: FieldSeparator
-  /** Visual shell around the full field anatomy (label + control + messages). */
+  /**
+   * Visual shell around the full field anatomy (label + control + messages).
+   * Discriminated union — not a flat enum:
+   *
+   * - `{ variant: 'plain' }` — default, no extra shell
+   * - `{ variant: 'panel', tone? }` — filled panel wash
+   * - `{ variant: 'outline', tone? }` — border-only inset
+   *
+   * Distinct from container `surface` / `status` chrome on arrays and dependents.
+   */
   chrome?: FieldChrome
-  /** Optional presentation overrides (e.g. read-only when only one option remains). */
+  /**
+   * Presentation overrides for option-backed fields (`select`, `combobox`, …).
+   * `readOnlyWhen` swaps the control for read-only chrome when it returns true
+   * (e.g. only one option remains).
+   */
   presentation?: FieldPresentationConfig
 }
 
@@ -261,6 +297,23 @@ export interface TextareaFieldConfig extends BaseFieldConfig {
   optionalDisclosure?: OptionalDisclosureConfig
 }
 
+/**
+ * Dropdown bound to a single string value (`type: 'select'`).
+ *
+ * Common options: `options`, `placeholder`, `optionAvailability`, `digits`, `labelPosition`,
+ * `visibility`, `required`.
+ *
+ * Use `defineSelectField()` for variant-specific completion, or a plain object literal.
+ *
+ * @example
+ * defineSelectField({
+ *   type: 'select',
+ *   name: 'status',
+ *   label: 'Status',
+ *   options: toOptions(STATUSES, STATUS_LABELS),
+ *   required: true,
+ * })
+ */
 export interface SelectFieldConfig extends BaseFieldConfig {
   type: 'select'
   options: SelectFieldOptionListItem[]
@@ -399,9 +452,39 @@ export type {
   InlineSentenceTextSegment,
 } from '../components/ui/inline-sentence-field.types'
 
-/** Composable inline prose + bound controls (number, select) with optional chips below. */
+/**
+ * Composable inline prose + bound controls (`type: 'inlineSentence'`).
+ *
+ * Common options: `segments`, `below`, `hideLabel`, `chipSize`, `visibility`, `required`.
+ *
+ * Prefer over deprecated `chooseFromChips` / `inlineChooseCount` for new authoring.
+ * Use `defineInlineSentenceField()` for variant-specific completion.
+ *
+ * @example
+ * defineInlineSentenceField({
+ *   type: 'inlineSentence',
+ *   name: 'movement',
+ *   label: 'Speed',
+ *   segments: [
+ *     { kind: 'text', value: 'Walk' },
+ *     { kind: 'number', name: 'walk', digits: 'sm' },
+ *     { kind: 'text', value: 'ft.' },
+ *   ],
+ * })
+ */
 export interface InlineSentenceFieldConfig extends BaseFieldConfig {
   type: 'inlineSentence'
+  /**
+   * Inline prose + bound controls. Segment kinds:
+   *
+   * - `text` — static fragment (`value`, optional `tone`: `label` | `prose` | `mono`)
+   * - `number` — bound numeric input (`name`, `digits`, `min`/`max`, optional `visibility`)
+   * - `select` — bound dropdown (`name`, `options`, `width`, optional `visibility`)
+   *
+   * Optional `below: { kind: 'chips', … }` for chip pickers under the sentence.
+   *
+   * @see [field-types.md](../../docs/forms/field-types.md#inline-sentence-inlinesentence)
+   */
   segments: InlineSentenceSegment[]
   below?: InlineSentenceBelowChips
   /** When true, the legend is visually hidden but kept for assistive tech. */
@@ -474,19 +557,41 @@ export interface LevelRangeFieldConfig extends BaseFieldConfig {
 }
 
 /**
- * Searchable dropdown for picking one or many values from a large option list.
- * `multiple: true` (default) → value is `string[]`; selected values render as removable badges.
- * `multiple: false` → value is `string`; picking an option closes the panel.
+ * Searchable option picker (`type: 'combobox'`) for large lists.
+ *
+ * Common options: `options`, `multiple`, `max`, `placeholder`, `renderSelectedItem`,
+ * `visibility`, `required`.
+ *
+ * - `multiple: true` (default) — value is `string[]`; selections render as removable badges.
+ * - `multiple: false` — value is `string`; picking closes the panel.
+ *
+ * Use `defineComboboxField()` for variant-specific completion.
+ *
+ * @example
+ * defineComboboxField({
+ *   type: 'combobox',
+ *   name: 'tags',
+ *   label: 'Tags',
+ *   options: tagOptions,
+ *   placeholder: 'Search tags…',
+ * })
  */
 export interface ComboboxFieldConfig extends BaseFieldConfig {
   type: 'combobox'
   options: FieldOption[]
+  /**
+   * Single vs multi selection. Defaults to `true` (`string[]` value).
+   * Set `false` for a single `string` value (optional enums use `undefined`, not `''`).
+   */
   multiple?: boolean
-  /** Maximum selections when `multiple` is true. */
+  /** Maximum selections when `multiple` is true. Omits the ceiling when unset. */
   max?: number
   placeholder?: string
   defaultValue?: string | string[]
-  /** Custom selected-value renderer in multi-select mode; defaults to `Chip mode="removable"`. */
+  /**
+   * Custom selected-value renderer in multi-select mode.
+   * Defaults to removable `Chip` pills. Use for links, badges, or compact summaries.
+   */
   renderSelectedItem?: ComboboxRenderSelectedItem
 }
 
@@ -517,16 +622,49 @@ export interface EditableGridFieldConfig extends BaseFieldConfig {
   defaultValue?: EditableGridValue
 }
 
+/**
+ * XdY dice notation with optional tail operand (`type: 'diceFormula'`).
+ *
+ * Common options: `modifierMode`, `modifierOperators`, `faces`, `countMin`/`countMax`,
+ * `modifierMin`/`modifierMax`, `currencyUnit`.
+ *
+ * Use `defineDiceFormulaField()` for completion. Storybook: `Forms/DiceFormulaField`.
+ *
+ * @see [field-types.md](../../docs/forms/field-types.md#dice-formula-diceformula)
+ *
+ * @example
+ * defineDiceFormulaField({
+ *   type: 'diceFormula',
+ *   name: 'formula',
+ *   label: 'Roll',
+ *   modifierMode: 'optional',
+ *   modifierOperators: DICE_FORMULA_OPERATORS,
+ * })
+ */
 export interface DiceFormulaFieldConfig extends BaseFieldConfig {
   type: 'diceFormula'
   labelPosition?: DiceFormulaLabelPosition
+  /**
+   * Tail modifier behavior — `none` strips modifier on change; `optional` shows add/remove;
+   * `required` always renders the tail group.
+   *
+   * @default optional
+   */
   modifierMode?: DiceFormulaModifierMode
+  /**
+   * Allowed die faces for the faces select. Defaults to standard RPG die set when omitted.
+   * Pass a subset (e.g. `[4, 6, 8]`) to constrain authoring surfaces.
+   */
   faces?: readonly number[]
   countMin?: number
   countMax?: number
   modifierMin?: number
   modifierMax?: number
-  /** Allowed tail operators — single entry renders a static glyph instead of a select. */
+  /**
+   * Allowed tail operators (`DICE_FORMULA_TAIL_OPERATORS`: `'+'` | `'-'` | `'×'` | `'÷'`).
+   * A single entry renders a static glyph instead of an operator select.
+   * Defaults to `DICE_FORMULA_OPERATORS` (`['+', '-']`) when omitted.
+   */
   modifierOperators?: readonly DiceFormulaTailOperator[]
   /** sr-only / aria label for the tail amount input (e.g. "Multiplier"). */
   modifierAmountLabel?: string
@@ -603,7 +741,13 @@ export interface InputUnitFieldConfig extends BaseFieldConfig {
   defaultValue?: number
 }
 
-/** Discriminated union of every leaf field, keyed by `type`. */
+/**
+ * Discriminated union of every leaf field, keyed by `type`.
+ *
+ * Simple types (`text`, `number`, `checkbox`, …) need no authoring helper — use plain
+ * object literals. Complex types have `define*Field()` helpers in `form-authoring.ts`
+ * (`defineSelectField`, `defineComboboxField`, `defineInlineSentenceField`, …).
+ */
 export type FieldConfig =
   | TextFieldConfig
   | NumberFieldConfig
@@ -643,49 +787,88 @@ export interface RowConfig {
   errorPlacement?: 'auto' | 'field' | 'row'
 }
 
-/** Fields allowed inside a `group` or `stack` — may nest one level or more. */
+/** Fields allowed inside a `group` or `dependent` — may nest one level or more. */
 export type GroupFieldItem =
   | FieldConfig
   | RowConfig
   | SlotConfig
   | GroupConfig
-  | StackConfig
+  | DependentConfig
   | ArrayConfig
 
-/** Layout-only container for controller + dependent fields (no fieldset legend). */
-export interface StackConfig {
-  kind: 'stack'
-  layout?: FieldStackLayout
-  /**
-   * Gates fields [1..]: when false, dependents unmount and values clear.
-   * When omitted and fields[0] is a switch, defaults to "switch is true".
-   */
-  dependentsVisibility?: FieldVisibility
-  /** Border/bg inset around dependents only (index ≥ 1). Omit for plain stack. */
-  dependentsChrome?: FieldStackDependentsTone
-  /**
-   * Where `dependentsChrome` applies. Default `wrapper`. Use `arrayItems` when
-   * dependents include repeatable lists to avoid double borders on array shells.
-   */
-  dependentsChromeScope?: FieldStackDependentsChromeScope
-  /**
-   * Vertical gap between stack siblings. `compact` (default) — dense settings panels;
-   * `comfortable` — matches `fieldGroupStackClasses` rhythm for multi-field blocks.
-   */
-  rhythm?: FieldStackRhythm
+export interface DependentDependentsConfig {
   fields: GroupFieldItem[]
+  /**
+   * Gates dependent fields: when false, dependents unmount and values clear.
+   * When omitted and the controller is a switch, defaults to "switch is true".
+   */
   visibility?: FieldVisibility
-  /** Trailing divider after this stack (controller + dependents) within parent rhythm. */
+  surface?: FieldSurfaceVariant
+  status?: FieldStatusTone
+  /**
+   * Where dependent chrome applies.
+   *
+   * - `wrapper` (default) — chrome on the dependents container.
+   * - `arrayItems` — chrome on nested array item shells only.
+   *
+   * @default wrapper
+   */
+  scope?: FieldDependentsScope
+}
+
+/**
+ * Controller field plus gated dependents (`kind: 'dependent'`).
+ *
+ * Use `defineDependentField()` for completion.
+ *
+ * @example
+ * defineDependentField({
+ *   kind: 'dependent',
+ *   controller: { type: 'switch', name: 'enabled', label: 'Custom rule' },
+ *   dependents: {
+ *     fields: [{ type: 'text', name: 'formula', label: 'Formula' }],
+ *   },
+ * })
+ */
+export interface DependentConfig {
+  kind: 'dependent'
+  controller: FieldConfig
+  dependents: DependentDependentsConfig
+  /**
+   * Vertical gap between controller and dependents. `compact` (default) — dense
+   * settings panels; `comfortable` — matches group rhythm for multi-field blocks.
+   */
+  rhythm?: FieldRhythm
+  visibility?: FieldVisibility
+  /** Trailing divider after this dependent section within parent rhythm. */
   separator?: FieldSeparator
   className?: string
-  /** Optional DOM id on the stack wrapper — for in-page scroll anchors. */
+  /** Optional DOM id on the dependent wrapper — for in-page scroll anchors. */
   id?: string
 }
 
-/** A semantic fieldset/legend grouping, mapped to `FieldGroup`. */
+/**
+ * Named fieldset subsection (`kind: 'group'`).
+ *
+ * Common options: `legend`, `fields`, `legendSize`, `rhythm`, `fieldsChrome`,
+ * `description`, `visibility`.
+ *
+ * Nested groups inside another group often use `legendSize: 'subsection'`.
+ * Use `defineGroupField()` for completion.
+ *
+ * @example
+ * defineGroupField({
+ *   kind: 'group',
+ *   legend: 'Damage',
+ *   fields: [
+ *     { type: 'text', name: 'dice', label: 'Dice', required: true },
+ *   ],
+ * })
+ */
 export interface GroupConfig {
   kind: 'group'
-  legend: string
+  /** When omitted, renders as a layout/visibility wrapper without a legend. */
+  legend?: string
   description?: string
   fields: GroupFieldItem[]
   className?: string
@@ -697,10 +880,14 @@ export interface GroupConfig {
    * Vertical gap between sibling fields. Inherits form rhythm when omitted;
    * defaults to `comfortable` on standalone `FieldGroup`.
    */
-  rhythm?: FieldStackRhythm
+  rhythm?: FieldRhythm
   /** When hidden, the whole group unmounts and nested field values clear. */
   visibility?: FieldVisibility
-  /** Visual treatment for legend + field stack — variants are mutually exclusive. */
+  /**
+   * Visual treatment for the legend + field stack — variants are mutually exclusive.
+   * Shapes: `inset`, `panel`, `outline`, `divider`, `callout`, `accent`, `collapsible`.
+   * Tones vary by variant — see [containers.md](../../docs/forms/containers.md#group-fieldschrome).
+   */
   fieldsChrome?: FieldGroupFieldsChrome
 }
 
@@ -734,16 +921,37 @@ export type ArrayPatternConfig = {
   classifyIssueScope?: (issue: FormIssue) => FormIssueScope
 } & Record<string, unknown>
 
-/** Per-item header chrome for detailed and compact array rows. */
+/**
+ * Per-item header chrome for detailed and compact array rows.
+ *
+ * Title resolution order: `primary` → `formatPrimary(primaryField)` → `primaryField`
+ * raw value → `fallback(index)`. Use `primaryField` for a single watched column;
+ * use `primary` when the label is derived from multiple fields or domain formatters.
+ *
+ * @see [Array field authoring guide](../../docs/forms/array-field-authoring.md)
+ */
 export interface ArrayItemHeaderConfig {
-  /** Relative field name watched for the primary label (e.g. `'label'`). */
+  /**
+   * Relative field name watched for the primary label (e.g. `'name'`, `'path'`).
+   * Prefer this over `primary` when one column drives the title.
+   */
   primaryField?: string
   /** Optional formatter when `primaryField` is set. */
   formatPrimary?: (value: unknown, values: Record<string, unknown>) => string | undefined
-  /** Computed primary label; overrides `primaryField` when set. */
+  /**
+   * Computed primary label; overrides `primaryField` when set.
+   * Use for grant rows, tier summaries, or multi-field titles.
+   */
   primary?: (values: Record<string, unknown>, index: number) => string | undefined
+  /**
+   * Fallback title when the primary is empty — also used for aria labels.
+   * Required; typically `Item ${index + 1}` or a domain label like `Grant ${index + 1}`.
+   */
   fallback: (index: number) => string
-  /** Shown on its own row below the header title on detailed items. */
+  /**
+   * Shown on its own row below the header title on **detailed** items only.
+   * Pair with `summaryDependsOn` when the summary reads root-level context.
+   */
   summary?: (
     values: Record<string, unknown>,
     index: number,
@@ -753,7 +961,8 @@ export interface ArrayItemHeaderConfig {
   summaryDependsOn?: string[]
   /**
    * When true, appends ` · {fallback}` after the primary label in the header title.
-   * Defaults to false — fallback still drives aria labels and empty-primary titles.
+   *
+   * @default false — fallback still drives aria labels and empty-primary titles.
    */
   showFallbackInHeader?: boolean
   /** Renders a divider between primary and fallback when `showFallbackInHeader` is true. */
@@ -762,130 +971,81 @@ export interface ArrayItemHeaderConfig {
   srOnly?: boolean
 }
 
+export interface ArrayAddActionConfig {
+  label?: string
+  /** @default true */
+  icon?: boolean
+  variant?: NonNullable<ButtonVariantProps['variant']>
+  layout?: ArrayAddActionLayout
+  size?: NonNullable<ButtonVariantProps['size']>
+  menu?: ArrayAddMenuConfig
+}
+
+export interface ArrayItemConfig {
+  variant?: ArrayItemVariant
+  /** @default raised */
+  surface?: FieldSurfaceVariant
+  status?: FieldStatusTone
+  header?: ArrayItemHeaderConfig
+  collapsible?: boolean
+  collapseKey?: string
+  inlineAlign?: ArrayCompactInlineAlign
+  /** @default dragHandle */
+  reorder?: ArrayItemReorder
+  /** @default true */
+  removable?: boolean
+  removeSlot?: Pick<SlotConfig, 'name' | 'render' | 'visibility'>
+}
+
+export type ArrayFilterSelectFn = (ctx: {
+  arrayItems: unknown[]
+  rowIndex: number
+  fieldName: string
+  options: FieldOption[]
+  watchedValues: Record<string, unknown>
+}) => FieldOption[]
+
+export interface ArrayFilterSelectConfig {
+  dependsOn?: string[]
+  filter: ArrayFilterSelectFn
+}
+
 /**
- * A repeatable field array backed by `useFieldArray`. Item `fields` use
- * **relative** names (`name`, `description`) — the renderer prefixes them with
- * the array name and item index at render time (e.g. `traits.0.name`).
+ * Repeatable list section (`kind: 'array'`).
+ *
+ * @see [Array field authoring guide](../../docs/forms/array-field-authoring.md)
+ *
+ * @example
+ * defineArrayField({
+ *   kind: 'array',
+ *   name: 'traits',
+ *   legend: 'Traits',
+ *   addAction: { label: 'Add trait' },
+ *   item: {
+ *     header: { fallback: (i) => `Trait ${i + 1}`, primaryField: 'name' },
+ *   },
+ *   fields: [{ type: 'text', name: 'name', label: 'Name', required: true }],
+ * })
  */
 export interface ArrayConfig {
   kind: 'array'
-  /** Top-level field name that holds the array value (e.g. `'traits'`). */
   name: string
-  /** Heading rendered as the `<fieldset>` legend for the whole array. */
   legend: string
-  /**
-   * Legend scale — defaults to `array` (18px). Use `section` when the array is
-   * the primary top-level section heading.
-   */
   legendSize?: FieldGroupLegendSize
-  /**
-   * Vertical gap between array items and inside each item. Defaults to `compact`
-   * (`gap-2`); pass `comfortable` for multi-field item blocks.
-   */
-  rhythm?: FieldStackRhythm
-  /**
-   * Control + label scale for fields inside the array. Defaults to `sm`; pass
-   * `md` or `lg` when item fields should match the parent form scale.
-   */
+  rhythm?: FieldRhythm
   size?: FieldSize
-  /** Field configs for each item; names are relative to the item, not the root. */
   fields: FormItem[]
-  /** Label for the add action button. Defaults to `"Add item"`. */
-  addActionLabel?: string
-  /**
-   * When true (default), prefixes the add action with a `+` icon. Set false for
-   * non-add triggers such as "Choose preset" or "Import entries".
-   */
-  showAddIcon?: boolean
-  /**
-   * Visual style for the add action — mirrors `Button` / `ButtonDropdown` `variant`.
-   * Defaults to `outline`.
-   */
-  addActionVariant?: NonNullable<ButtonVariantProps['variant']>
-  /**
-   * Add action placement — `stacked` (default) renders below items; `inline` aligns
-   * the control to the right of the section legend.
-   */
-  addActionLayout?: ArrayAddActionLayout
-  /**
-   * Button size for the add action — overrides the size inferred from section
-   * rhythm (`sm`/`md` → `default`, `lg` → `lg`).
-   */
-  addActionSize?: NonNullable<ButtonVariantProps['size']>
-  /** Searchable template menu for the add action; replaces the plain button when set. */
-  addActionMenu?: ArrayAddMenuConfig
-  /** Minimum item count; removes the "Remove" button while at the floor. */
+  addAction?: false | ArrayAddActionConfig
   min?: number
-  /** Maximum item count; hides the "Add" button once reached. */
   max?: number
-  /** Item row layout — `auto` picks compact when item fields fit a single row. */
-  itemVariant?: ArrayItemVariant
-  /**
-   * Compact inline rows only — vertical alignment of grip, fields, and embedded
-   * actions. Use `center` for single control-only cells (no visible field label).
-   */
-  compactInlineAlign?: ArrayCompactInlineAlign
-  /**
-   * Border/background tone on each item shell (`main` | `elevated` | `subtle` | `medium` |
-   * `warning` | `error`). Defaults to `elevated` (`bg-card`); overrides inherited stack
-   * `dependentsChrome` when `dependentsChromeScope` is `arrayItems`.
-   */
-  itemChrome?: FieldStackDependentsTone
-  /** Header labels and optional collapsed summary for each item row. */
-  itemHeader?: ArrayItemHeaderConfig
-  /** When true, detailed items collapse to their header row. Ignored for compact/nested. */
-  itemCollapsible?: boolean
-  /**
-   * Relative field name used to persist collapse overrides across navigation.
-   * Defaults to `'id'`; falls back to `index:${index}` when absent on a row.
-   */
-  itemCollapseKey?: string
-  /** Reorder control — defaults to `dragHandle`; pass `false` for fixed order. */
-  reorder?: ArrayItemReorder
-  /**
-   * Item-scoped conditional visibility (same contract as leaf fields). When hidden,
-   * the array unmounts and RHF clears its value via `shouldUnregister`.
-   */
+  item?: ArrayItemConfig
   visibility?: FieldVisibility
-
-  /** Domain pattern hooks for validation navigation, focus, and severity classification. */
   arrayPattern?: ArrayPatternConfig
-
-  /** Supplies default values for a newly appended row. */
   appendDefaults?: (items: unknown[]) => Record<string, unknown>
-
-  /** When true, hides the default array add action (use an external slot instead). */
-  hideAddAction?: boolean
-
-  /** When true, omits the default per-item remove control (use `itemRemoveSlot` instead). */
-  hideItemRemove?: boolean
-
-  /**
-   * Custom per-item remove control rendered in the header actions rail instead of the
-   * default RHF `remove(index)` button. Pair with `hideItemRemove: true` when the slot
-   * fully replaces generic removal.
-   */
-  itemRemoveSlot?: Pick<SlotConfig, 'name' | 'render' | 'visibility'>
-
-  /** Field names whose values are passed to `filterSelectOptions` as `watchedValues`. */
-  filterSelectDependsOn?: string[]
-
-  /** Cross-row select option filtering inside array items. */
-  filterSelectOptions?: (ctx: {
-    arrayItems: unknown[]
-    rowIndex: number
-    fieldName: string
-    options: FieldOption[]
-    watchedValues: Record<string, unknown>
-  }) => FieldOption[]
-  /** Optional DOM id on the array fieldset — for in-page scroll anchors. */
+  filterSelect?: ArrayFilterSelectConfig
   id?: string
-  /** Classes merged onto the array fieldset wrapper. */
   className?: string
-  /**
-   * Where visible field errors render — `auto` suppresses per-field text on
-   * compact items; `row` always surfaces a joined row summary instead.
-   */
+  separator?: FieldSeparator
   errorPlacement?: 'auto' | 'field' | 'row'
 }
 
@@ -907,26 +1067,32 @@ export interface SlotConfig {
    * Vertical gap between slot content siblings. Defaults to `compact` array rhythm
    * (`gap-2`).
    */
-  rhythm?: FieldStackRhythm
+  rhythm?: FieldRhythm
   /**
    * Control + label scale for slot content. Defaults to `sm` (array section default).
    */
   size?: FieldSize
 }
 
-/** Any item allowed at the top level of a form's `fields` array. */
+/**
+ * Any item allowed at the top level of a form's `fields` array (or a tab panel).
+ *
+ * Leaf fields (`FieldConfig`), horizontal rows (`kind: 'row'`), and containers
+ * (`group`, `dependent`, `array`, `slot`). Wrap trees with `defineForm()` or reusable
+ * sections with `defineFormItems()` — plain arrays remain valid.
+ */
 export type FormItem =
   | FieldConfig
   | RowConfig
   | GroupConfig
-  | StackConfig
+  | DependentConfig
   | ArrayConfig
   | SlotConfig
 
-/** Narrows a `FormItem` to a container (row/group/stack/array/slot) vs. a leaf field. */
+/** Narrows a `FormItem` to a container (row/group/dependent/array/slot) vs. a leaf field. */
 export function isContainer(
   item: FormItem,
-): item is RowConfig | GroupConfig | StackConfig | ArrayConfig | SlotConfig {
+): item is RowConfig | GroupConfig | DependentConfig | ArrayConfig | SlotConfig {
   return 'kind' in item
 }
 
@@ -946,6 +1112,9 @@ export function flattenFields(items: Array<FormItem | RowConfig>): FieldConfig[]
       }
     } else if (item.kind === 'array' || item.kind === 'slot') {
       // Intentionally skipped — see JSDoc above.
+    } else if (item.kind === 'dependent') {
+      fields.push(item.controller)
+      fields.push(...flattenFields(item.dependents.fields as Array<FormItem | RowConfig>))
     } else {
       fields.push(...flattenFields(item.fields as Array<FormItem | RowConfig>))
     }
@@ -1130,8 +1299,11 @@ export function buildDefaultValues(items: FormItem[]): Record<string, unknown> {
       for (const field of item.fields) {
         assignFieldDefaultValues(field, values)
       }
-    } else if (item.kind === 'group' || item.kind === 'stack') {
+    } else if (item.kind === 'group') {
       Object.assign(values, buildDefaultValues(item.fields as FormItem[]))
+    } else if (item.kind === 'dependent') {
+      assignFieldDefaultValues(item.controller, values)
+      Object.assign(values, buildDefaultValues(item.dependents.fields as FormItem[]))
     } else if (item.kind === 'array') {
       values[item.name] = []
     } else if (item.kind === 'slot') {
@@ -1153,12 +1325,49 @@ export function hiddenFieldNames(items: FormItem[], values: Record<string, unkno
     .map((field) => field.name)
 }
 
+/** Normalizes static and dynamic hint configuration. */
+export function normalizeFieldHint(hint: string | FieldHintConfig | undefined): {
+  text?: string
+  position: FieldHintPosition
+  resolve?: FieldDynamicHint
+} {
+  if (hint === undefined) {
+    return { position: 'below-label' }
+  }
+  if (typeof hint === 'string') {
+    return { text: hint, position: 'below-label' }
+  }
+  return {
+    text: hint.text,
+    position: hint.position ?? 'below-label',
+    resolve: hint.resolve,
+  }
+}
+
 /** Resolves static and dynamic hint text for a field config. */
 export function resolveFieldHint(
-  field: Pick<BaseFieldConfig, 'hint' | 'dynamicHint'>,
+  field: Pick<BaseFieldConfig, 'hint'>,
   values: Record<string, unknown>,
 ): string | undefined {
-  return field.dynamicHint?.hintWhen(values) ?? field.hint
+  const normalized = normalizeFieldHint(field.hint)
+  return normalized.resolve?.hintWhen(values) ?? normalized.text
+}
+
+/** Resolves helper text placement for a field config. */
+export function resolveFieldHintPosition(field: Pick<BaseFieldConfig, 'hint'>): FieldHintPosition {
+  return normalizeFieldHint(field.hint).position
+}
+
+/** Resolves rendered hint text and placement for a field config. */
+export function resolveFieldHintPresentation(
+  field: Pick<BaseFieldConfig, 'hint'>,
+  values: Record<string, unknown>,
+): { text?: string; position: FieldHintPosition } {
+  const normalized = normalizeFieldHint(field.hint)
+  return {
+    text: normalized.resolve?.hintWhen(values) ?? normalized.text,
+    position: normalized.position,
+  }
 }
 
 /** Applies `optionAvailability` to a flat option list without mutating the source. */
@@ -1174,17 +1383,20 @@ export function applyOptionAvailabilityToFieldOptions(
 }
 
 /**
- * Resolves the visibility gate for dependent stack fields [1..].
- * Switch controllers auto-gate on truthy when `dependentsVisibility` is omitted.
+ * Resolves the visibility gate for dependent fields.
+ * Switch controllers auto-gate on truthy when `dependents.visibility` is omitted.
  */
 export function resolveDependentsVisibility(
-  stack: Pick<StackConfig, 'dependentsVisibility'>,
-  controller: GroupFieldItem | undefined,
+  dependent: Pick<DependentConfig, 'dependents'>,
+  controller: FieldConfig | undefined,
 ): FieldVisibility | null {
-  if (stack.dependentsVisibility) {
-    return stack.dependentsVisibility
+  if (dependent.dependents.visibility) {
+    return dependent.dependents.visibility
   }
-  if (controller && !('kind' in controller) && controller.type === 'switch') {
+  if (!controller) {
+    return null
+  }
+  if (controller.type === 'switch') {
     return {
       dependsOn: [controller.name],
       visibleWhen: (values) => values[controller.name] === true,

@@ -5,6 +5,7 @@ import type { useSortable } from '@dnd-kit/sortable'
 
 import { useDependsOnValues } from '../../config/form-depends-on.client'
 import {
+  resolveArrayItemConfig,
   resolveArrayItemHeader,
   resolveArrayItemHeaderLabels,
   resolveCompactInlineRow,
@@ -55,6 +56,7 @@ export function useArrayFieldItemContentState({
   })
   const itemValues = (useWatch({ name: `${fullName}.${index}` }) ?? {}) as Record<string, unknown>
 
+  const itemConfig = resolveArrayItemConfig(config)
   const rowState = useArrayItemRowState({
     idPrefix,
     fullName,
@@ -63,11 +65,11 @@ export function useArrayFieldItemContentState({
     variant,
     collapsed,
     collapsible,
-    itemCollapseKey: config.itemCollapseKey,
+    itemCollapseKey: itemConfig.collapseKey,
     arrayPattern: config.arrayPattern,
     errorPlacement: config.errorPlacement,
-    filterSelectDependsOn: config.filterSelectDependsOn,
-    filterSelectOptions: config.filterSelectOptions,
+    filterSelectDependsOn: config.filterSelect?.dependsOn,
+    filterSelectOptions: config.filterSelect?.filter,
     onRemoveItem,
   })
 
@@ -114,5 +116,6 @@ export function useArrayFieldItemContentState({
     chromeProps,
     showIssueChrome: rowState.showIssueChrome,
     issueGroup: rowState.issueGroup,
+    itemConfig,
   }
 }

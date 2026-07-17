@@ -6,7 +6,12 @@ import {
   minLevelSelectable,
   type LevelRangeRow,
 } from '@rpg/contracts'
-import type { ArrayItemHeaderConfig, FormItem, SelectFieldOptionListItem } from '@rpg/ui/form'
+import type {
+  ArrayItemConfig,
+  ArrayItemHeaderConfig,
+  FormItem,
+  SelectFieldOptionListItem,
+} from '@rpg/ui/form'
 
 import type { LevelRangeArrayConfig } from '../array-patterns'
 import { levelRangeArrayPattern } from '../array-patterns'
@@ -40,9 +45,9 @@ export type BuildLevelRangeTiersArrayFieldOptions = {
   rhythm?: LevelRangeArrayConfig['rhythm']
   size?: LevelRangeArrayConfig['size']
   itemHeader?: ArrayItemHeaderConfig
-  itemVariant?: LevelRangeArrayConfig['itemVariant']
-  itemChrome?: LevelRangeArrayConfig['itemChrome']
-  itemCollapsible?: LevelRangeArrayConfig['itemCollapsible']
+  itemVariant?: ArrayItemConfig['variant']
+  itemSurface?: ArrayItemConfig['surface']
+  itemCollapsible?: ArrayItemConfig['collapsible']
   addActionLabel?: string
   /** Row fields after the level range control. */
   fields: FormItem[]
@@ -66,29 +71,33 @@ export function buildLevelRangeTiersArrayField(
     max: options.max,
     rhythm: options.rhythm,
     size: options.size,
-    itemHeader: options.itemHeader,
-    itemVariant: options.itemVariant,
-    itemChrome: options.itemChrome,
-    itemCollapsible: options.itemCollapsible ?? true,
-    addActionLabel: options.addActionLabel,
-    reorder: false,
+    item: {
+      header: options.itemHeader,
+      variant: options.itemVariant,
+      surface: options.itemSurface,
+      collapsible: options.itemCollapsible ?? true,
+      reorder: false,
+    },
+    addAction: options.addActionLabel ? { label: options.addActionLabel } : undefined,
     arrayPattern: levelRangeArrayPattern({ min: 'minLevel', max: 'maxLevel' }),
-    filterSelectDependsOn: [...LEVEL_RANGE_FILTER_DEPENDS_ON],
-    filterSelectOptions: ({ arrayItems, rowIndex, fieldName, watchedValues }) => {
-      const effectiveMax = resolveEffectiveMax(watchedValues)
-      const rows = arrayItems as LevelRangeRow[]
-      const row = rows[rowIndex]
-      const rowMin = row?.minLevel ?? 1
+    filterSelect: {
+      dependsOn: [...LEVEL_RANGE_FILTER_DEPENDS_ON],
+      filter: ({ arrayItems, rowIndex, fieldName, watchedValues }) => {
+        const effectiveMax = resolveEffectiveMax(watchedValues)
+        const rows = arrayItems as LevelRangeRow[]
+        const row = rows[rowIndex]
+        const rowMin = row?.minLevel ?? 1
 
-      return buildLevelOptions(effectiveMax).map((option) => {
-        const level = Number(option.value)
-        const selectable =
-          fieldName === 'minLevel'
-            ? minLevelSelectable(rows, rowIndex, level, effectiveMax)
-            : maxLevelSelectable(rows, rowIndex, level, rowMin, effectiveMax)
+        return buildLevelOptions(effectiveMax).map((option) => {
+          const level = Number(option.value)
+          const selectable =
+            fieldName === 'minLevel'
+              ? minLevelSelectable(rows, rowIndex, level, effectiveMax)
+              : maxLevelSelectable(rows, rowIndex, level, rowMin, effectiveMax)
 
-        return { ...option, disabled: !selectable }
-      })
+          return { ...option, disabled: !selectable }
+        })
+      },
     },
     fields: [
       {

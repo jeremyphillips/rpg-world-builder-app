@@ -39,14 +39,28 @@ export function assembleClassSpellcasting(
     if (!grantId) continue
 
     const selections = draft.choiceSelections[choiceSet.id] ?? []
-    const preparationState = grantId === 'cantrips' ? undefined : profile.preparation
 
     for (const spellId of selections) {
-      spells.push({
+      if (grantId === 'cantrips') {
+        spells.push({
+          spellId,
+          access: { classKnown: true },
+          sources: classSpellcastingSource(profile.classId, grantId),
+        })
+        continue
+      }
+
+      const entry: CharacterSpellEntry = {
         spellId,
-        preparationState,
+        access: { classKnown: true },
         sources: classSpellcastingSource(profile.classId, grantId),
-      })
+      }
+
+      if (profile.preparation === 'prepared' || profile.preparation === 'full_list') {
+        entry.selection = { prepared: true }
+      }
+
+      spells.push(entry)
     }
   }
 

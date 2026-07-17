@@ -1,31 +1,10 @@
-import { z } from 'zod'
-
+import { closedSetEnum, keysFromEntries, vocabEnumFromEntries } from '../enum-schema'
 import type { GameTermEntry } from '../types'
 
 // ---------------------------------------------------------------------------
 // Spellcasting gear sub-kinds — discriminates items within
 // `kind: adventuring_gear` + `gearKind: spellcasting`.
 // ---------------------------------------------------------------------------
-
-export const SPELLCASTING_FOCUS_GEAR_KINDS = [
-  'arcane_focus',
-  'druidic_focus',
-  'holy_symbol',
-] as const
-
-export const SPELLCASTING_GEAR_KINDS = [
-  ...SPELLCASTING_FOCUS_GEAR_KINDS,
-  'spellbook',
-  'component_pouch',
-] as const
-
-export const spellcastingFocusGearKindSchema = z.enum(SPELLCASTING_FOCUS_GEAR_KINDS)
-
-export const spellcastingGearKindSchema = z.enum(SPELLCASTING_GEAR_KINDS)
-
-export type SpellcastingFocusGearKind = z.infer<typeof spellcastingFocusGearKindSchema>
-
-export type SpellcastingGearKind = z.infer<typeof spellcastingGearKindSchema>
 
 export const SPELLCASTING_GEAR_KIND_ENTRIES = {
   arcane_focus: {
@@ -54,7 +33,23 @@ export const SPELLCASTING_GEAR_KIND_ENTRIES = {
     label: 'Component Pouch',
     description: 'A watertight pouch with compartments for the material components of spells.',
   },
-} as const satisfies Record<SpellcastingGearKind, GameTermEntry>
+} as const satisfies Record<string, GameTermEntry>
+
+export type SpellcastingGearKind = keyof typeof SPELLCASTING_GEAR_KIND_ENTRIES
+
+export const SPELLCASTING_GEAR_KINDS = keysFromEntries(SPELLCASTING_GEAR_KIND_ENTRIES)
+
+export const SPELLCASTING_FOCUS_GEAR_KINDS = [
+  'arcane_focus',
+  'druidic_focus',
+  'holy_symbol',
+] as const satisfies readonly SpellcastingGearKind[]
+
+export type SpellcastingFocusGearKind = (typeof SPELLCASTING_FOCUS_GEAR_KINDS)[number]
+
+export const spellcastingGearKindSchema = vocabEnumFromEntries(SPELLCASTING_GEAR_KIND_ENTRIES)
+
+export const spellcastingFocusGearKindSchema = closedSetEnum(SPELLCASTING_FOCUS_GEAR_KINDS)
 
 /** Returns the reference entry for a spellcasting gear kind, if known. */
 export function getSpellcastingGearKindEntry(kind: string): GameTermEntry | undefined {

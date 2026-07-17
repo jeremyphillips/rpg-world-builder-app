@@ -1,17 +1,10 @@
-import { z } from 'zod'
-
+import { keysFromEntries, vocabEnumFromEntries } from '../enum-schema'
 import { getTermSentenceForm } from '../types'
 import type { GameTermEntry } from '../types'
 
 // ---------------------------------------------------------------------------
 // Vehicle categories — land, water, air, and exotic conveyances.
 // ---------------------------------------------------------------------------
-
-export const VEHICLE_CATEGORIES = ['land', 'water', 'air', 'space', 'other'] as const
-
-export const vehicleCategorySchema = z.enum(VEHICLE_CATEGORIES)
-
-export type VehicleCategory = z.infer<typeof vehicleCategorySchema>
 
 export const VEHICLE_CATEGORY_ENTRIES = {
   land: {
@@ -50,7 +43,13 @@ export const VEHICLE_CATEGORY_ENTRIES = {
     label: 'Other',
     description: 'A vehicle that does not fit another category.',
   },
-} as const satisfies Record<VehicleCategory, GameTermEntry>
+} as const satisfies Record<string, GameTermEntry>
+
+export type VehicleCategory = keyof typeof VEHICLE_CATEGORY_ENTRIES
+
+export const VEHICLE_CATEGORIES = keysFromEntries(VEHICLE_CATEGORY_ENTRIES)
+
+export const vehicleCategorySchema = vocabEnumFromEntries(VEHICLE_CATEGORY_ENTRIES)
 
 /** Returns the reference entry for a vehicle category, if known. */
 export function getVehicleCategoryEntry(category: string): GameTermEntry | undefined {

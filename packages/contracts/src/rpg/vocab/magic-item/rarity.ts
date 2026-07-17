@@ -1,4 +1,4 @@
-import { z } from 'zod'
+import { keysFromEntries, vocabEnumFromEntries } from '../enum-schema'
 
 import { getTermSentenceForm } from '../types'
 import type { GameTermEntry } from '../types'
@@ -6,19 +6,6 @@ import type { GameTermEntry } from '../types'
 // ---------------------------------------------------------------------------
 // Magic item rarity — standard DMG tiers.
 // ---------------------------------------------------------------------------
-
-export const MAGIC_ITEM_RARITIES = [
-  'common',
-  'uncommon',
-  'rare',
-  'very_rare',
-  'legendary',
-  'artifact',
-] as const
-
-export const magicItemRaritySchema = z.enum(MAGIC_ITEM_RARITIES)
-
-export type MagicItemRarity = z.infer<typeof magicItemRaritySchema>
 
 export const MAGIC_ITEM_RARITY_ENTRIES = {
   common: {
@@ -69,7 +56,13 @@ export const MAGIC_ITEM_RARITY_ENTRIES = {
       plural: 'artifacts',
     },
   },
-} as const satisfies Record<MagicItemRarity, GameTermEntry>
+} as const satisfies Record<string, GameTermEntry>
+
+export type MagicItemRarity = keyof typeof MAGIC_ITEM_RARITY_ENTRIES
+
+export const MAGIC_ITEM_RARITIES = keysFromEntries(MAGIC_ITEM_RARITY_ENTRIES)
+
+export const magicItemRaritySchema = vocabEnumFromEntries(MAGIC_ITEM_RARITY_ENTRIES)
 
 /** Returns the reference entry for a magic item rarity, if known. */
 export function getMagicItemRarityEntry(rarity: string): GameTermEntry | undefined {

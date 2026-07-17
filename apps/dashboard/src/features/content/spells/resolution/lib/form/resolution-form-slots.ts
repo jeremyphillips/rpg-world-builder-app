@@ -51,26 +51,26 @@ function resolutionEffectsArrayField(ctx: ContentFormCtx): FormItem {
     kind: 'array',
     name: `${RESOLUTION_PREFIX}.effects`,
     legend: '',
-    // Nested inside Effects & outcomes → Authored effects groups (depth ≥ 2). @rpg/ui
-    // defaults nested arrays to compact unless itemVariant is explicit.
-    itemVariant: 'detailed',
-    hideAddAction: true, // Add menu is a sibling slot — options depend on live form state.
-    hideItemRemove: true, // Remove is in the header slot so it can confirm / read context.
-    itemRemoveSlot: {
-      name: '_resolutionEffectHeaderRemove',
-      render: () => createElement(SpellResolutionEffectRemoveControl),
-    },
-    itemCollapsible: true,
-    itemHeader: {
-      fallback: (index) => `Effect ${index + 1}`,
-      primary: (values, index) => formatEffectRowPrimary(values, index),
-      summaryDependsOn: [...RESOLUTION_SUMMARY_DEPENDS_ON],
-      summary: (values, _index, watched) => {
-        const context = resolutionSelectionContextFromWatched(watched ?? {})
-        return formatEffectRowSummary(values, {
-          recipient: deriveDefaultEffectRecipient(context),
-          targetKind: context.targetKind as SpellResolutionTargetKind | undefined,
-        })
+    addAction: false,
+    item: {
+      variant: 'detailed',
+      removable: false,
+      removeSlot: {
+        name: '_resolutionEffectHeaderRemove',
+        render: () => createElement(SpellResolutionEffectRemoveControl),
+      },
+      collapsible: true,
+      header: {
+        fallback: (index) => `Effect ${index + 1}`,
+        primary: (values, index) => formatEffectRowPrimary(values, index),
+        summaryDependsOn: [...RESOLUTION_SUMMARY_DEPENDS_ON],
+        summary: (values, _index, watched) => {
+          const context = resolutionSelectionContextFromWatched(watched ?? {})
+          return formatEffectRowSummary(values, {
+            recipient: deriveDefaultEffectRecipient(context),
+            targetKind: context.targetKind as SpellResolutionTargetKind | undefined,
+          })
+        },
       },
     },
     fields: resolutionEffectItemFields(ctx),
@@ -156,7 +156,7 @@ function resolutionEffectsAndOutcomesGroup(ctx: ContentFormCtx): FormItem {
         description: RESOLUTION_SECTION_LABELS.authoredEffectsDescription,
         fields: [
           {
-            kind: 'stack',
+            kind: 'group',
             className: 'gap-3',
             fields: [
               {

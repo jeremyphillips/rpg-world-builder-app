@@ -6,9 +6,13 @@ import { defineMessage } from '../../../validation/define-message'
 // ---------------------------------------------------------------------------
 
 export const grantValidationMessages = {
-  frequencyNotAllowedAlwaysPrepared: defineMessage(
-    'validation.grant.frequencyNotAllowedAlwaysPrepared',
-    () => 'Cast frequency does not apply to always-prepared spells.',
+  spellsGrantRequiresAvailabilityOrCasting: defineMessage(
+    'validation.grant.spellsGrantRequiresAvailabilityOrCasting',
+    () => 'Spell grants require availability, casting, or both.',
+  ),
+  spellsGrantSlotCastingRequiresAvailability: defineMessage(
+    'validation.grant.spellsGrantSlotCastingRequiresAvailability',
+    () => 'Slot casting via a free-cast grant requires an availability entitlement.',
   ),
   languageChoicePoolRequired: defineMessage(
     'validation.grant.languageChoicePoolRequired',

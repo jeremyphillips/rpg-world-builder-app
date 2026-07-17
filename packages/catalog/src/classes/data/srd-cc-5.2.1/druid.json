@@ -211,8 +211,8 @@
             {
               "kind": "spells",
               "ability": "wis",
-              "mode": "always_prepared",
-              "spellIds": ["speak-with-animals"]
+              "spellIds": ["speak-with-animals"],
+              "availability": "always_prepared"
             },
             {
               "kind": "languages",

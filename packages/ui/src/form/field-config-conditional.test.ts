@@ -54,10 +54,13 @@ describe('resolveFieldHint', () => {
     expect(
       resolveFieldHint(
         {
-          hint: 'Static hint',
-          dynamicHint: {
-            dependsOn: ['mode'],
-            hintWhen: (values) => (values.mode === 'ranged' ? 'Ranged hint' : undefined),
+          hint: {
+            text: 'Static hint',
+            resolve: {
+              dependsOn: ['mode'],
+              hintWhen: (values: Record<string, unknown>) =>
+                values.mode === 'ranged' ? 'Ranged hint' : undefined,
+            },
           },
         },
         { mode: 'ranged' },
@@ -69,10 +72,12 @@ describe('resolveFieldHint', () => {
     expect(
       resolveFieldHint(
         {
-          hint: 'Static hint',
-          dynamicHint: {
-            dependsOn: ['mode'],
-            hintWhen: () => undefined,
+          hint: {
+            text: 'Static hint',
+            resolve: {
+              dependsOn: ['mode'],
+              hintWhen: () => undefined,
+            },
           },
         },
         { mode: 'melee' },

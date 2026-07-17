@@ -9,8 +9,9 @@ import { CollapsibleListItemActions } from './collapsible-list-item-actions.clie
 import {
   CollapsibleListItemShell,
   type CollapsibleListItemActionsAlign,
-  type CollapsibleListItemShellTone,
+  type CollapsibleListItemShellPreset,
 } from './collapsible-list-item-shell.client'
+import type { FieldStatusTone, FieldSurfaceVariant } from '../field-surface.variants'
 import {
   CollapsibleListItemCollapseButton,
   CollapsibleListItemDragHandle,
@@ -37,7 +38,9 @@ export interface CollapsibleListItemProps {
   onToggleCollapse: () => void
   showDragHandle?: boolean
   dragHandleProps?: CollapsibleListItemDragHandleConfig
-  tone?: CollapsibleListItemShellTone
+  preset?: CollapsibleListItemShellPreset
+  surface?: FieldSurfaceVariant
+  status?: FieldStatusTone
   layout?: 'default' | 'compactRow'
   actionsAlign?: CollapsibleListItemActionsAlign
   toolbarCompact?: boolean
@@ -63,7 +66,9 @@ interface CollapsibleListItemContextValue {
   onToggleCollapse: () => void
   gripVisible: boolean
   dragHandleProps?: CollapsibleListItemDragHandleProps
-  tone: CollapsibleListItemShellTone
+  preset: CollapsibleListItemShellPreset
+  surface?: FieldSurfaceVariant
+  status?: FieldStatusTone
   layout: 'default' | 'compactRow'
   dragging: boolean
   itemPrefix?: string
@@ -93,7 +98,9 @@ function CollapsibleListItemRoot({
   onToggleCollapse,
   showDragHandle = false,
   dragHandleProps,
-  tone = 'default',
+  preset = 'default',
+  surface,
+  status,
   layout = 'default',
   actionsAlign: actionsAlignProp,
   toolbarCompact = false,
@@ -136,7 +143,9 @@ function CollapsibleListItemRoot({
       onToggleCollapse,
       gripVisible,
       dragHandleProps: resolvedDragHandleProps,
-      tone,
+      preset,
+      surface,
+      status,
       layout,
       dragging: dragging || Boolean(dragHandleProps?.isDragging),
       itemPrefix,
@@ -153,7 +162,9 @@ function CollapsibleListItemRoot({
       onToggleCollapse,
       gripVisible,
       resolvedDragHandleProps,
-      tone,
+      preset,
+      surface,
+      status,
       layout,
       dragging,
       dragHandleProps?.isDragging,
@@ -172,7 +183,9 @@ function CollapsibleListItemRoot({
         dragging={contextValue.dragging}
         layout={layout}
         actionsAlign={actionsAlign}
-        tone={tone}
+        preset={preset}
+        surface={surface}
+        status={status}
         className={className}
         toolbar={
           <CollapsibleListItemToolbar
@@ -237,7 +250,9 @@ function CollapsibleListItemCompoundRoot({
             listeners: props.dragHandleProps.listeners,
           }
         : undefined,
-      tone: props.tone ?? 'default',
+      preset: props.preset ?? 'default',
+      surface: props.surface,
+      status: props.status,
       layout: props.layout ?? 'default',
       dragging: props.dragging || Boolean(props.dragHandleProps?.isDragging),
       itemPrefix: props.itemPrefix,
@@ -255,7 +270,9 @@ function CollapsibleListItemCompoundRoot({
         collapsible={collapsible}
         dragging={contextValue.dragging}
         layout={contextValue.layout}
-        tone={contextValue.tone}
+        preset={contextValue.preset}
+        surface={contextValue.surface}
+        status={contextValue.status}
         className={props.className}
         main={children}
         actions={actions}

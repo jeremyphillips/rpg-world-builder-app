@@ -44,22 +44,23 @@ export function movementArrayField(): FormItem {
     kind: 'array',
     name: 'movement',
     legend: 'Movement',
-    addActionLabel: 'Add speed',
-    addActionLayout: 'inline',
-    addActionSize: 'sm',
+    addAction: { label: 'Add speed', layout: 'inline', size: 'sm' },
     min: 1,
-    itemVariant: 'compact',
-    compactInlineAlign: 'center',
     size: 'md',
-    itemChrome: 'subtle',
-    itemHeader: {
-      fallback: (index) => `Movement ${index + 1}`,
-      primaryField: 'mode',
-      formatPrimary: (value, values) => {
-        if (typeof value !== 'string') return undefined
-        const feet = values?.feet
-        if (feet === undefined || feet === '') return getMovementModeLabel(value)
-        return `${getMovementModeLabel(value)} ${feet} ft`
+    item: {
+      variant: 'compact',
+      inlineAlign: 'center',
+      surface: 'subtle',
+      reorder: 'dragHandle',
+      header: {
+        fallback: (index) => `Movement ${index + 1}`,
+        primaryField: 'mode',
+        formatPrimary: (value, values) => {
+          if (typeof value !== 'string') return undefined
+          const feet = values?.feet
+          if (feet === undefined || feet === '') return getMovementModeLabel(value)
+          return `${getMovementModeLabel(value)} ${feet} ft`
+        },
       },
     },
     fields: [
@@ -67,7 +68,6 @@ export function movementArrayField(): FormItem {
         type: 'inlineSentence',
         name: 'movementRow',
         label: 'Movement',
-        reorder: 'dragHandle',
         hideLabel: true,
         segments: [
           {

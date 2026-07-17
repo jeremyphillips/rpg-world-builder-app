@@ -1,5 +1,6 @@
 import { z } from 'zod'
 
+import { vocabEnumFromEntries, keysFromEntries } from '../enum-schema'
 import type { GameTermEntry } from '../types'
 
 // ---------------------------------------------------------------------------
@@ -19,12 +20,9 @@ export const CASTING_TIME_UNIT_ENTRIES = {
 
 export type CastingTimeUnit = keyof typeof CASTING_TIME_UNIT_ENTRIES
 
-export const CASTING_TIME_UNITS = Object.keys(CASTING_TIME_UNIT_ENTRIES) as [
-  CastingTimeUnit,
-  ...CastingTimeUnit[],
-]
+export const CASTING_TIME_UNITS = keysFromEntries(CASTING_TIME_UNIT_ENTRIES)
 
-export const castingTimeUnitSchema = z.enum(CASTING_TIME_UNITS)
+export const castingTimeUnitSchema = vocabEnumFromEntries(CASTING_TIME_UNIT_ENTRIES)
 
 export const spellCastingTimeNormalSchema = z.object({
   value: z.number().int().min(1),

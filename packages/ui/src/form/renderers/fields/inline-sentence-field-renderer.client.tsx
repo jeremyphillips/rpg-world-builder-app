@@ -23,6 +23,7 @@ import { resolveFirstFieldErrorMessage } from '../../errors/resolve-field-error-
 import { resolveSelectPlaceholder } from '../../config/field-placeholder.lib'
 import { useDependsOnValues } from '../../config/form-depends-on.client'
 import type { InlineSentenceFieldConfig } from '../../field-config'
+import { resolveFieldHintPresentation } from '../../field-config'
 
 export interface InlineSentenceFieldRendererProps {
   config: InlineSentenceFieldConfig
@@ -205,6 +206,8 @@ export function InlineSentenceFieldRenderer({
     }
   }, [config.below, config.chipSize, controllerByName, id])
 
+  const hintPresentation = resolveFieldHintPresentation(config, {})
+
   return (
     <InlineSentenceField
       id={id}
@@ -214,8 +217,8 @@ export function InlineSentenceFieldRenderer({
       below={config.below}
       belowControl={belowControl}
       error={combinedError}
-      hint={config.hint}
-      hintPosition={config.hintPosition}
+      hint={hintPresentation.text}
+      hintPosition={hintPresentation.position}
       info={config.info}
       required={config.required}
       disabled={config.disabled}

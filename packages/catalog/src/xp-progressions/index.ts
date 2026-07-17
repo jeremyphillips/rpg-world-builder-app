@@ -1,22 +1,18 @@
-import { z } from 'zod'
-import { xpProgressionSchema } from '@rpg/contracts'
 import type { SystemRulesetId, XpProgression } from '@rpg/contracts'
 
 import { getBySlug } from '../lib/get-by-slug'
 import xpProgressionsRaw from './data/srd-cc-5.2.1/xp-progressions.json'
+import { xpProgressionSeedFileSchema } from '../seed-schemas'
 
-const xpProgressionSeedSchema = z
-  .array(xpProgressionSchema)
-  .length(1, 'Each SRD ruleset must ship exactly one XP progression')
-  .superRefine((progressions, ctx) => {
-    if (progressions[0]?.scope.kind !== 'standard') {
-      ctx.addIssue({
-        code: 'custom',
-        message: 'The SRD XP progression must use the standard scope',
-        path: [0, 'scope'],
-      })
-    }
-  })
+const xpProgressionSeedSchema = xpProgressionSeedFileSchema.superRefine((progressions, ctx) => {
+  if (progressions[0]?.scope.kind !== 'standard') {
+    ctx.addIssue({
+      code: 'custom',
+      message: 'The SRD XP progression must use the standard scope',
+      path: [0, 'scope'],
+    })
+  }
+})
 
 // Validate the shipped catalog against the contract at module load so malformed
 // seed data fails fast (and in CI) rather than at request time.

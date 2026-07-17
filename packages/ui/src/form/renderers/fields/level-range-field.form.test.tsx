@@ -26,25 +26,36 @@ type Values = z.infer<typeof schema>
 const fields: FormItem[] = [
   {
     kind: 'array',
+    item: { reorder: false },
     name: 'tiers',
     legend: 'Tiers',
-    reorder: false,
     arrayPattern: { kind: 'levelRange', levelKeys: { min: 'minLevel', max: 'maxLevel' } },
-    filterSelectOptions: ({ arrayItems, rowIndex, fieldName }) => {
-      const rows = arrayItems as LevelRangeRow[]
-      const row = rows[rowIndex]
-      const rowMin = row?.minLevel ?? 1
-      const effectiveMax = 20
+    filterSelect: {
+      dependsOn: [],
+      filter: ({
+        arrayItems,
+        rowIndex,
+        fieldName,
+      }: {
+        arrayItems: unknown[]
+        rowIndex: number
+        fieldName: string
+      }) => {
+        const rows = arrayItems as LevelRangeRow[]
+        const row = rows[rowIndex]
+        const rowMin = row?.minLevel ?? 1
+        const effectiveMax = 20
 
-      return buildLevelOptions(effectiveMax).map((option) => {
-        const level = Number(option.value)
-        const selectable =
-          fieldName === 'minLevel'
-            ? minLevelSelectable(rows, rowIndex, level, effectiveMax)
-            : maxLevelSelectable(rows, rowIndex, level, rowMin, effectiveMax)
+        return buildLevelOptions(effectiveMax).map((option) => {
+          const level = Number(option.value)
+          const selectable =
+            fieldName === 'minLevel'
+              ? minLevelSelectable(rows, rowIndex, level, effectiveMax)
+              : maxLevelSelectable(rows, rowIndex, level, rowMin, effectiveMax)
 
-        return { ...option, disabled: !selectable }
-      })
+          return { ...option, disabled: !selectable }
+        })
+      },
     },
     fields: [
       {

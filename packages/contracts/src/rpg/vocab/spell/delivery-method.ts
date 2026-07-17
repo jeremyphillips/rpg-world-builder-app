@@ -1,5 +1,4 @@
-import { z } from 'zod'
-
+import { vocabEnumFromEntries, keysFromEntries } from '../enum-schema'
 import { getTermCompactLabel } from '../types'
 import type { GameTermEntry } from '../types'
 
@@ -22,12 +21,9 @@ export const SPELL_DELIVERY_METHOD_ENTRIES = {
 
 export type SpellDeliveryMethod = keyof typeof SPELL_DELIVERY_METHOD_ENTRIES
 
-export const SPELL_DELIVERY_METHODS = Object.keys(SPELL_DELIVERY_METHOD_ENTRIES) as [
-  SpellDeliveryMethod,
-  ...SpellDeliveryMethod[],
-]
+export const SPELL_DELIVERY_METHODS = keysFromEntries(SPELL_DELIVERY_METHOD_ENTRIES)
 
-export const spellDeliveryMethodSchema = z.enum(SPELL_DELIVERY_METHODS)
+export const spellDeliveryMethodSchema = vocabEnumFromEntries(SPELL_DELIVERY_METHOD_ENTRIES)
 
 /** Returns the display label for a spell delivery method. Falls back to the raw value. */
 export function getSpellDeliveryMethodLabel(id: string): string {

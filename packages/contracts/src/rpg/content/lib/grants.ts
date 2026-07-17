@@ -11,12 +11,14 @@ import { absoluteLevelSchema } from '../../primitives/level'
 import {
   movementGrantIncreaseSchema,
   movementGrantMatchSchema,
-  movementGrantPayloadSchema,
   movementGrantSetSchema,
 } from '../../vocab/movement-mode'
 import { getSenseSentenceForm, senseSchema } from '../../vocab/sense'
-import { getUsageFrequencySentenceForm, usageFrequencySchema } from '../../vocab/usage-frequency'
+import { getUsageFrequencySentenceForm } from '../../vocab/usage-frequency'
 import { featCategorySchema, getFeatCategorySentenceForm } from '../../vocab/feat'
+import { spellGrantAvailabilitySchema } from '../../vocab/spell/grant-availability'
+import { spellGrantCastingSchema } from '../../vocab/spell/grant-casting'
+import { getSpellGrantAvailabilityEntry } from '../../vocab/spell/grant-availability'
 import {
   getLanguageCategorySentenceForm,
   getLanguageLabel,
@@ -40,49 +42,6 @@ import { joinNaturalList } from './proficiency-grant'
 // subclass features, and feat-choice features. Optional fields only; no rules engine.
 // Player choices (e.g. "choose two skills") stay in rich-text descriptions.
 // ---------------------------------------------------------------------------
-
-// --- Innate spellcasting (legacy bag model — kept for catalog backward compat) ----
-
-export const INNATE_SPELL_KINDS = ['free_cast', 'always_prepared'] as const
-
-export const innateSpellKindSchema = z.enum(INNATE_SPELL_KINDS)
-
-export type InnateSpellKind = z.infer<typeof innateSpellKindSchema>
-
-/**
- * Spells gained at a character level. `spellIds` are opaque spell slugs for now
- * (no Spell content type yet); wire to real references when spells land.
- *
- * - `free_cast` — slotless casting cadence via `frequency` (species lineage pattern).
- * - `always_prepared` — always on the prepared list; cast with normal slots when used.
- *
- * @deprecated Superseded by the `spells` atomic grant in `contentGrantSchema`.
- */
-const innateSpellEntryBaseSchema = z.object({
-  level: absoluteLevelSchema,
-  spellIds: z.array(z.string().min(1)).min(1),
-  kind: innateSpellKindSchema.default('free_cast'),
-  frequency: usageFrequencySchema.optional(),
-})
-
-export const innateSpellEntrySchema = innateSpellEntryBaseSchema.superRefine((val, ctx) => {
-  if (val.kind === 'always_prepared' && val.frequency !== undefined) {
-    ctx.addIssue({
-      code: 'custom',
-      message: grantValidationMessages.frequencyNotAllowedAlwaysPrepared(),
-      path: ['frequency'],
-    })
-  }
-})
-
-export type InnateSpellEntry = z.infer<typeof innateSpellEntrySchema>
-
-export const innateSpellsSchema = z.object({
-  ability: abilitySchema,
-  entries: z.array(innateSpellEntrySchema).min(1),
-})
-
-export type InnateSpells = z.infer<typeof innateSpellsSchema>
 
 // --- Language choices --------------------------------------------------------
 
@@ -200,67 +159,6 @@ export function formatResistanceGrantCompact(damageTypes: readonly string[]): st
   return `${labels} resistance`
 }
 
-// --- Grants bag (legacy — kept for catalog backward compat) -----------------
-
-/**
- * Structured, character-builder-facing payload. Every field is optional; purely
- * flavorful content omits `grants` and carries only rich-text description.
- *
- * @deprecated Superseded by the `grantGroups` model. Catalog seeds still use this
- *   shape and will be migrated to `grantGroups` in a subsequent phase.
- */
-export const contentGrantsSchema = z.object({
-  senses: z.array(senseSchema).optional(),
-  /** Movement bonus (e.g. Wood Elf +5 ft walking speed). */
-  movement: movementGrantPayloadSchema.optional(),
-  /** Chosen damage type(s), e.g. a Dragonborn's breath or a Goliath's ancestry. */
-  damageType: z.array(damageTypeIdSchema).optional(),
-  resistances: z.array(damageTypeIdSchema).optional(),
-  languages: z.array(languageIdSchema).optional(),
-  languageChoices: z.array(languageChoiceGrantSchema).optional(),
-  innateSpells: innateSpellsSchema.optional(),
-  featChoice: featChoiceGrantSchema.optional(),
-  equipment: z.array(equipmentGrantSchema).optional(),
-})
-
-export type ContentGrants = z.infer<typeof contentGrantsSchema>
-
-/** Returns grant bag keys that carry a non-empty value. */
-function definedGrantKeys(grants: ContentGrants): (keyof ContentGrants)[] {
-  return (Object.keys(grants) as (keyof ContentGrants)[]).filter((key) => {
-    const value = grants[key]
-    if (value === undefined) return false
-    if (Array.isArray(value) && value.length === 0) return false
-    return true
-  })
-}
-
-/**
- * Legacy eligibility check for the `grant` trait kind using the bag model.
- * Grants are eligible when fully described by a single atomic template
- * (one sense, one resistance, walk speed override, or one language).
- *
- * @deprecated Use {@link isGrantGroupsEligible} for the `grantGroups` model.
- */
-export function isGrantEligibleGrants(grants: ContentGrants): boolean {
-  const keys = definedGrantKeys(grants)
-  if (keys.length !== 1) return false
-
-  const key = keys[0]!
-  switch (key) {
-    case 'senses':
-      return grants.senses!.length === 1
-    case 'resistances':
-      return grants.resistances!.length === 1
-    case 'movement':
-      return grants.movement !== undefined
-    case 'languages':
-      return grants.languages!.length === 1
-    default:
-      return false
-  }
-}
-
 // ---------------------------------------------------------------------------
 // Atomic content grants — discriminated union model
 //
@@ -368,25 +266,33 @@ const equipmentContentGrantSchema = z.object({
 
 /**
  * Spells granted by a trait or feature at a given unlock level.
- * Replaces the legacy `innateSpells` bag entry in the atomic model.
  *
- * - `free_cast` — slotless casting via `frequency` (species lineage pattern).
- * - `always_prepared` — always on the prepared list; cast with normal slots.
+ * - `availability` — always on the prepared list; cast with normal slots.
+ * - `casting` — slotless casting via `frequency` (species lineage pattern).
  */
 const spellsContentGrantSchema = z
   .object({
     kind: z.literal('spells'),
     ability: abilitySchema,
-    mode: z.enum(INNATE_SPELL_KINDS),
-    frequency: usageFrequencySchema.optional(),
     spellIds: z.array(z.string().min(1)).min(1),
+    availability: spellGrantAvailabilitySchema.optional(),
+    casting: spellGrantCastingSchema.optional(),
   })
+  .strict()
   .superRefine((val, ctx) => {
-    if (val.mode === 'always_prepared' && val.frequency !== undefined) {
+    if (val.availability === undefined && val.casting === undefined) {
       ctx.addIssue({
         code: 'custom',
-        message: grantValidationMessages.frequencyNotAllowedAlwaysPrepared(),
-        path: ['frequency'],
+        message: grantValidationMessages.spellsGrantRequiresAvailabilityOrCasting(),
+        path: ['availability'],
+      })
+    }
+
+    if (val.casting?.allowsSlotCasting === true && val.availability === undefined) {
+      ctx.addIssue({
+        code: 'custom',
+        message: grantValidationMessages.spellsGrantSlotCastingRequiresAvailability(),
+        path: ['casting', 'allowsSlotCasting'],
       })
     }
   })
@@ -400,13 +306,22 @@ export function formatSpellsGrantSentence(
 ): string {
   const names = grant.spellIds.map((id) => resolveSpellName?.(id) ?? id)
   const spellList = joinNaturalList(names)
+  const hasAvailability = grant.availability === 'always_prepared'
+  const cadence = grant.casting?.frequency
+    ? getUsageFrequencySentenceForm(grant.casting.frequency)
+    : undefined
 
-  if (grant.mode === 'always_prepared') {
+  if (hasAvailability && cadence) {
+    const availabilityLabel =
+      getSpellGrantAvailabilityEntry('always_prepared')?.sentence?.plural ?? 'always prepared'
+    return `Character has ${spellList} ${availabilityLabel} and can cast ${spellList} ${cadence} without a spell slot.`
+  }
+
+  if (hasAvailability) {
     return `Character has ${spellList} always prepared.`
   }
 
-  if (grant.frequency) {
-    const cadence = getUsageFrequencySentenceForm(grant.frequency)
+  if (cadence) {
     return `Character can cast ${spellList} ${cadence}.`
   }
 
@@ -459,8 +374,15 @@ export type GrantUnlock = z.infer<typeof grantUnlockSchema>
  * the trait is gained for species traits.
  */
 export const grantGroupSchema = z.object({
-  unlock: grantUnlockSchema.optional(),
-  grants: z.array(contentGrantSchema).min(1),
+  unlock: grantUnlockSchema
+    .optional()
+    .describe(
+      'When this group unlocks. Omit for the default group (granted when the trait or feature is first gained).',
+    ),
+  grants: z
+    .array(contentGrantSchema)
+    .min(1)
+    .describe('Atomic grants that unlock together. At least one grant is required.'),
 })
 
 export type GrantGroup = z.infer<typeof grantGroupSchema>
@@ -659,12 +581,8 @@ export const contentTraitKindSchema = z.enum(CONTENT_TRAIT_KINDS)
 export type ContentTraitKind = z.infer<typeof contentTraitKindSchema>
 
 /**
- * Named trait or feature: SRD prose plus optional structured grants (hybrids).
+ * Named trait or feature: SRD prose plus optional structured grant groups (hybrids).
  * Class/subclass features always use this variant.
- *
- * Supports both the legacy `grants` bag and the new atomic `grantGroups` model.
- * New authoring uses `grantGroups`; the `grants` bag is preserved for catalog
- * backward compatibility until seeds are migrated.
  */
 export const customContentTraitSchema = z.object({
   kind: z.literal('custom'),
@@ -672,9 +590,7 @@ export const customContentTraitSchema = z.object({
   name: z.string().min(1),
   /** Rich-text HTML faithful to the SRD wording (body only — no "Level N:" prefix). */
   description: z.string().optional(),
-  /** @deprecated Use `grantGroups` for new authoring. */
-  grants: contentGrantsSchema.optional(),
-  /** Atomic grant groups — one group per unlock level. Replaces the `grants` bag. */
+  /** Atomic grant groups — one group per unlock level. */
   grantGroups: grantGroupsSchema.optional(),
 })
 

@@ -25,7 +25,7 @@ const ALWAYS_PREPARED_CLERIC: CharacterClass = {
   ...pickClass('cleric'),
   spellcasting: {
     ...pickClass('cleric').spellcasting!,
-    preparation: 'always_prepared',
+    preparation: 'full_list',
     spellsAvailable: undefined,
   },
 }

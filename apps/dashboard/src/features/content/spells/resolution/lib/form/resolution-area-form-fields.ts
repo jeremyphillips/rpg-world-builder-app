@@ -32,8 +32,10 @@ export function resolutionAreaFormFields(): FormItem[] {
               name: `${RESOLUTION_PREFIX}.areaOfEffect.shape`,
               label: 'Shape',
               options: areaGeometryShapeOptions,
-              hint: 'Mechanical area geometry for resolution preview and execution.',
-              hintPosition: 'below-control',
+              hint: {
+                text: 'Mechanical area geometry for resolution preview and execution.',
+                position: 'below-control',
+              },
               width: 'auto',
             },
             distanceInputSelectField({

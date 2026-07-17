@@ -2,7 +2,6 @@ import { describe, expect, it } from 'vitest'
 
 import {
   ALIGNMENTS,
-  ALIGNMENT_ENTRIES,
   alignmentSchema,
   formatAlignmentLabel,
   getAlignmentEntry,
@@ -32,10 +31,6 @@ describe('optionalAlignmentSchema', () => {
 })
 
 describe('alignment vocabulary', () => {
-  it('exposes every alignment in ALIGNMENTS', () => {
-    expect([...ALIGNMENTS].sort()).toEqual(Object.keys(ALIGNMENT_ENTRIES).sort())
-  })
-
   it('has a label and description for every alignment', () => {
     for (const alignment of ALIGNMENTS) {
       const entry = getAlignmentEntry(alignment)

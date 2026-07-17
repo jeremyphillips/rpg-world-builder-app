@@ -41,6 +41,24 @@ export const textareaVariants = cva(fieldControlBase, {
 
 export type TextareaVariantProps = VariantProps<typeof textareaVariants>
 
+/** Closed vocabulary for field wrapper width tokens — see `BaseFieldConfig.width` JSDoc. */
+export const FIELD_WIDTHS = [
+  'xs',
+  'sm',
+  'md',
+  'lg',
+  'xl',
+  'auto',
+  'full',
+  '1/2',
+  '1/3',
+  '2/3',
+  '1/4',
+  '3/4',
+] as const
+
+export type FieldWidth = (typeof FIELD_WIDTHS)[number]
+
 /**
  * Width tokens for a field wrapper (`Field.Root`); the control inside stays
  * `w-full` to fill it. One union expresses two intents:
@@ -61,22 +79,24 @@ export type TextareaVariantProps = VariantProps<typeof textareaVariants>
  * Fractions only compose horizontally inside a flex `FieldRow`. Outside a row,
  * `max-w-*` still caps width but `grow` follows the parent flex direction.
  */
+const fieldWidthClasses = {
+  xs: 'max-w-16 flex-none in-data-[field-row]:w-16',
+  sm: 'max-w-24 flex-none in-data-[field-row]:w-24',
+  md: 'max-w-36 flex-none in-data-[field-row]:w-36',
+  lg: 'max-w-48 flex-none in-data-[field-row]:w-48',
+  xl: 'max-w-64 flex-none in-data-[field-row]:w-64',
+  auto: 'w-fit flex-none',
+  full: 'w-full flex-1',
+  '1/2': 'min-w-0 max-w-1/2 basis-0 grow-[6]',
+  '1/3': 'min-w-0 max-w-1/3 basis-0 grow-[4]',
+  '2/3': 'min-w-0 max-w-2/3 basis-0 grow-[8]',
+  '1/4': 'min-w-0 max-w-1/4 basis-0 grow-[3]',
+  '3/4': 'min-w-0 max-w-3/4 basis-0 grow-[9]',
+} satisfies Record<FieldWidth, string>
+
 export const fieldWidthVariants = cva('', {
   variants: {
-    width: {
-      xs: 'max-w-16 flex-none in-data-[field-row]:w-16',
-      sm: 'max-w-24 flex-none in-data-[field-row]:w-24',
-      md: 'max-w-36 flex-none in-data-[field-row]:w-36',
-      lg: 'max-w-48 flex-none in-data-[field-row]:w-48',
-      xl: 'max-w-64 flex-none in-data-[field-row]:w-64',
-      auto: 'w-fit flex-none',
-      full: 'w-full flex-1',
-      '1/2': 'min-w-0 max-w-1/2 basis-0 grow-[6]',
-      '1/3': 'min-w-0 max-w-1/3 basis-0 grow-[4]',
-      '2/3': 'min-w-0 max-w-2/3 basis-0 grow-[8]',
-      '1/4': 'min-w-0 max-w-1/4 basis-0 grow-[3]',
-      '3/4': 'min-w-0 max-w-3/4 basis-0 grow-[9]',
-    },
+    width: fieldWidthClasses,
   },
   defaultVariants: {
     width: 'full',
@@ -84,4 +104,3 @@ export const fieldWidthVariants = cva('', {
 })
 
 export type FieldWidthVariantProps = VariantProps<typeof fieldWidthVariants>
-export type FieldWidth = NonNullable<FieldWidthVariantProps['width']>

@@ -1,5 +1,4 @@
-import { z } from 'zod'
-
+import { vocabEnumFromEntries, keysFromEntries } from './enum-schema'
 import { getTermSentenceForm } from './types'
 import type { GameTermEntry } from './types'
 
@@ -40,12 +39,9 @@ export const USAGE_FREQUENCY_ENTRIES = {
 
 export type UsageFrequency = keyof typeof USAGE_FREQUENCY_ENTRIES
 
-export const USAGE_FREQUENCIES = Object.keys(USAGE_FREQUENCY_ENTRIES) as [
-  UsageFrequency,
-  ...UsageFrequency[],
-]
+export const USAGE_FREQUENCIES = keysFromEntries(USAGE_FREQUENCY_ENTRIES)
 
-export const usageFrequencySchema = z.enum(USAGE_FREQUENCIES)
+export const usageFrequencySchema = vocabEnumFromEntries(USAGE_FREQUENCY_ENTRIES)
 
 /** Returns the reference entry for a usage frequency id, if known. */
 export function getUsageFrequencyEntry(id: string): GameTermEntry | undefined {

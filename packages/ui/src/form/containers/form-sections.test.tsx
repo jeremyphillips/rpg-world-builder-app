@@ -21,7 +21,7 @@ const fields: FormItem[] = [
     name: 'tags',
     legend: 'Tags',
     fields: [{ type: 'text', name: 'label', label: 'Label' }],
-    addActionLabel: 'Add tag',
+    addAction: { label: 'Add tag' },
   },
 ]
 

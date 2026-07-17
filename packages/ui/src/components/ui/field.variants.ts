@@ -121,7 +121,10 @@ export const fieldSettingsRowClasses =
   'grid grid-cols-1 items-start gap-x-6 gap-y-2 sm:grid-cols-[minmax(0,1fr)_auto]'
 
 /** Vertical gap between siblings in a stack or dependents region. */
-export type FieldStackRhythm = 'compact' | 'comfortable'
+export type FieldRhythm = 'compact' | 'comfortable'
+
+/** @deprecated Use `FieldRhythm`. */
+export type FieldStackRhythm = FieldRhythm
 
 /** Default vertical gap for form columns and groups (`gap-6`). */
 export const DEFAULT_FORM_RHYTHM: FieldStackRhythm = 'comfortable'

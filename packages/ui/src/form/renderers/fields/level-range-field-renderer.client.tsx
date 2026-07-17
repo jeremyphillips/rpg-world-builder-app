@@ -20,12 +20,15 @@ import {
 import { useFormSectionContext } from '../../context/form-section.context'
 import { resolveFirstFieldErrorMessage } from '../../errors/resolve-field-error-message'
 import { resolveInheritedFieldSize } from '../../../components/ui/field.variants'
+import type { FieldHintPosition } from '../../../components/ui/field.variants'
 import type { LevelRangeFieldConfig } from '../../field-config'
 
 export interface LevelRangeFieldRendererProps {
   config: LevelRangeFieldConfig
   id: string
   namePrefix?: string
+  hint?: string
+  hintPosition?: FieldHintPosition
 }
 
 function resolveLevelRangeNames(config: LevelRangeFieldConfig) {
@@ -77,7 +80,13 @@ function applyLevelRangeRowPatches(
 }
 
 /** RHF adapter for `LevelRangeField` — binds min/max sibling paths. */
-export function LevelRangeFieldRenderer({ config, id, namePrefix }: LevelRangeFieldRendererProps) {
+export function LevelRangeFieldRenderer({
+  config,
+  id,
+  namePrefix,
+  hint,
+  hintPosition,
+}: LevelRangeFieldRendererProps) {
   const { minName, maxName } = resolveLevelRangeNames(config)
   const minFullName = namePrefix ? `${namePrefix}.${minName}` : minName
   const maxFullName = namePrefix ? `${namePrefix}.${maxName}` : maxName
@@ -191,8 +200,8 @@ export function LevelRangeFieldRenderer({ config, id, namePrefix }: LevelRangeFi
       maxOptions={maxOptions}
       connector={config.connector}
       error={combinedError}
-      hint={config.hint}
-      hintPosition={config.hintPosition}
+      hint={hint}
+      hintPosition={hintPosition}
       info={config.info}
       required={config.required}
       disabled={config.disabled}

@@ -1,0 +1,62 @@
+{
+  "schemas": [
+    {
+      "file": "grant-group.schema.json",
+      "fileMatch": [],
+      "embedded": true
+    },
+    {
+      "file": "catalog-species-list.schema.json",
+      "fileMatch": ["packages/catalog/src/species/data/**/species.json"]
+    },
+    {
+      "file": "catalog-class.schema.json",
+      "fileMatch": [
+        "packages/catalog/src/classes/data/**/{barbarian,bard,cleric,druid,fighter,monk,paladin,ranger,rogue,sorcerer,warlock,wizard}.json"
+      ]
+    },
+    {
+      "file": "catalog-subclass-list.schema.json",
+      "fileMatch": ["packages/catalog/src/classes/data/**/subclasses.json"]
+    },
+    {
+      "file": "catalog-spell-list.schema.json",
+      "fileMatch": ["packages/catalog/src/spells/data/**/*.json"]
+    },
+    {
+      "file": "catalog-equipment-list.schema.json",
+      "fileMatch": ["packages/catalog/src/equipment/data/**/*.json"]
+    },
+    {
+      "file": "catalog-feat-list.schema.json",
+      "fileMatch": ["packages/catalog/src/feats/data/**/feats.json"]
+    },
+    {
+      "file": "catalog-skill-proficiency-list.schema.json",
+      "fileMatch": ["packages/catalog/src/skill-proficiencies/data/**/skill-proficiencies.json"]
+    },
+    {
+      "file": "catalog-language-list.schema.json",
+      "fileMatch": ["packages/catalog/src/vocabulary/data/**/languages.json"]
+    },
+    {
+      "file": "catalog-vocabulary-list.schema.json",
+      "fileMatch": [
+        "packages/catalog/src/vocabulary/data/**/attack-resolution-modes.json",
+        "packages/catalog/src/vocabulary/data/**/creature-types.json",
+        "packages/catalog/src/vocabulary/data/**/damage-types.json",
+        "packages/catalog/src/vocabulary/data/**/edition-presets.json",
+        "packages/catalog/src/vocabulary/data/**/senses.json",
+        "packages/catalog/src/vocabulary/data/**/spell-schools.json"
+      ]
+    },
+    {
+      "file": "catalog-starting-wealth-seed.schema.json",
+      "fileMatch": ["packages/catalog/src/starting-wealth/data/**/starting-wealth.json"]
+    },
+    {
+      "file": "catalog-xp-progression-seed.schema.json",
+      "fileMatch": ["packages/catalog/src/xp-progressions/data/**/xp-progressions.json"]
+    }
+  ]
+}

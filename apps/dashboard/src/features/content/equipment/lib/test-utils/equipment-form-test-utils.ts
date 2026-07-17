@@ -16,7 +16,7 @@ export function seedEquipmentOfKind(kind: EquipmentKind): Equipment[] {
 export function collectGroupLegends(fields: readonly FormItem[]): string[] {
   return fields
     .filter((field): field is GroupConfig => 'kind' in field && field.kind === 'group')
-    .map((field) => field.legend)
+    .flatMap((field) => (field.legend !== undefined ? [field.legend] : []))
 }
 
 /**

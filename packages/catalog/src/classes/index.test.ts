@@ -123,7 +123,7 @@ describe('SRD 5.2.1 class seed', () => {
     const spellGrant = words?.grantGroups?.[0]?.grants?.find((g) => g.kind === 'spells')
     expect(spellGrant).toMatchObject({
       kind: 'spells',
-      mode: 'always_prepared',
+      availability: 'always_prepared',
       spellIds: ['power-word-heal', 'power-word-kill'],
     })
   })
@@ -152,7 +152,7 @@ describe('SRD 5.2.1 class seed', () => {
     const spellGrant = favoredEnemy?.grantGroups?.[0]?.grants?.find((g) => g.kind === 'spells')
     expect(spellGrant).toMatchObject({
       kind: 'spells',
-      mode: 'always_prepared',
+      availability: 'always_prepared',
       spellIds: ['hunters-mark'],
     })
     expect(ranger.resources?.find((r) => r.name === 'Favored Enemy')?.entries).toEqual([
@@ -289,13 +289,17 @@ describe('SRD 5.2.1 class seed', () => {
     expect(domainSpells?.grantGroups).toHaveLength(4)
     expect(domainSpells?.grantGroups?.[0]?.grants[0]).toMatchObject({
       kind: 'spells',
-      mode: 'always_prepared',
+      availability: 'always_prepared',
       spellIds: ['aid', 'bless', 'cure-wounds', 'lesser-restoration'],
     })
     expect(domainSpells?.grantGroups?.[1]).toMatchObject({
       unlock: { level: 5 },
       grants: [
-        { kind: 'spells', mode: 'always_prepared', spellIds: ['mass-healing-word', 'revivify'] },
+        {
+          kind: 'spells',
+          availability: 'always_prepared',
+          spellIds: ['mass-healing-word', 'revivify'],
+        },
       ],
     })
     expect(domainSpells?.grantGroups?.[3]?.unlock).toEqual({ level: 9 })
@@ -314,7 +318,7 @@ describe('SRD 5.2.1 class seed', () => {
     const druidicSpell = druidicGrants.find((g) => g.kind === 'spells')
     expect(druidicSpell).toMatchObject({
       kind: 'spells',
-      mode: 'always_prepared',
+      availability: 'always_prepared',
       spellIds: ['speak-with-animals'],
     })
     const druidicLanguage = druidicGrants.find((g) => g.kind === 'languages')
@@ -501,7 +505,7 @@ describe('SRD 5.2.1 class seed', () => {
     const smiteSpell = paladinsSmite?.grantGroups?.[0]?.grants?.find((g) => g.kind === 'spells')
     expect(smiteSpell).toMatchObject({
       kind: 'spells',
-      mode: 'always_prepared',
+      availability: 'always_prepared',
       spellIds: ['divine-smite'],
     })
     expect(paladin.resources?.find((r) => r.name === 'Channel Divinity')?.entries).toEqual([
@@ -527,12 +531,14 @@ describe('SRD 5.2.1 class seed', () => {
     expect(oathSpells?.grantGroups).toHaveLength(5)
     expect(oathSpells?.grantGroups?.[0]?.grants[0]).toMatchObject({
       kind: 'spells',
-      mode: 'always_prepared',
+      availability: 'always_prepared',
       spellIds: ['protection-from-evil-and-good', 'shield-of-faith'],
     })
     expect(oathSpells?.grantGroups?.[4]).toMatchObject({
       unlock: { level: 17 },
-      grants: [{ kind: 'spells', mode: 'always_prepared', spellIds: ['commune', 'flame-strike'] }],
+      grants: [
+        { kind: 'spells', availability: 'always_prepared', spellIds: ['commune', 'flame-strike'] },
+      ],
     })
     const holyNimbus = devotion.features.find((f) => f.id === 'holy-nimbus')
     expect(holyNimbus?.description).toContain('<strong>Holy Ward.</strong>')
@@ -596,7 +602,7 @@ describe('SRD 5.2.1 class seed', () => {
     expect(draconicSpells?.grantGroups).toHaveLength(4)
     expect(draconicSpells?.grantGroups?.[0]?.grants[0]).toMatchObject({
       kind: 'spells',
-      mode: 'always_prepared',
+      availability: 'always_prepared',
       spellIds: ['alter-self', 'chromatic-orb', 'command', 'dragons-breath'],
     })
     expect(draconicSpells?.grantGroups?.[3]?.unlock).toEqual({ level: 9 })
@@ -605,8 +611,7 @@ describe('SRD 5.2.1 class seed', () => {
     const dragonSpell = dragonCompanion?.grantGroups?.[0]?.grants?.find((g) => g.kind === 'spells')
     expect(dragonSpell).toMatchObject({
       kind: 'spells',
-      mode: 'free_cast',
-      frequency: 'once_per_long_rest',
+      casting: { mode: 'free_cast', frequency: 'once_per_long_rest' },
       spellIds: ['summon-dragon'],
     })
   })
@@ -627,18 +632,12 @@ describe('SRD 5.2.1 class seed', () => {
       '<strong>Replacing and Gaining Invocations.</strong>',
     )
     const contactPatron = warlock.features.find((f) => f.id === 'contact-patron')
-    // both entries at level 9 (= feature level) → default group, two spell grants
     const contactGrants = contactPatron?.grantGroups?.[0]?.grants ?? []
-    expect(contactGrants).toHaveLength(2)
+    expect(contactGrants).toHaveLength(1)
     expect(contactGrants[0]).toMatchObject({
       kind: 'spells',
-      mode: 'always_prepared',
-      spellIds: ['contact-other-plane'],
-    })
-    expect(contactGrants[1]).toMatchObject({
-      kind: 'spells',
-      mode: 'free_cast',
-      frequency: 'once_per_long_rest',
+      availability: 'always_prepared',
+      casting: { mode: 'free_cast', frequency: 'once_per_long_rest' },
       spellIds: ['contact-other-plane'],
     })
     expect(warlock.resources?.find((r) => r.name === 'Eldritch Invocations')?.entries).toEqual([
@@ -671,7 +670,7 @@ describe('SRD 5.2.1 class seed', () => {
     expect(fiendSpells?.grantGroups).toHaveLength(4)
     expect(fiendSpells?.grantGroups?.[0]?.grants[0]).toMatchObject({
       kind: 'spells',
-      mode: 'always_prepared',
+      availability: 'always_prepared',
       spellIds: ['burning-hands', 'command', 'scorching-ray', 'suggestion'],
     })
     expect(fiendSpells?.grantGroups?.[3]?.unlock).toEqual({ level: 9 })

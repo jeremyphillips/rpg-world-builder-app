@@ -307,53 +307,56 @@ function extendedProgressionGroup(): FormItem {
     legend: 'Extended progression',
     fields: [
       {
-        kind: 'stack',
-        layout: 'dependent',
-        dependentsChrome: 'subtle',
-        fields: [
-          {
-            type: 'switch',
-            name: EXTENDED_PROGRESSION_ENABLED,
-            label: 'Extended progression',
-            hint: 'Use a named tier for levels beyond the standard cap.',
-            defaultValue: false,
-          },
-          {
-            kind: 'row',
-            visibility: visibleWhenExtendedProgression(),
-            fields: [
-              {
-                type: 'text',
-                name: 'extendedTierName',
-                label: 'Tier name',
-                hint: 'Examples: Epic Destiny, Epic Levels, Immortal Path',
-                required: true,
-                width: 'full',
-                hintPosition: 'below-control',
-              },
-              {
-                type: 'number',
-                name: 'extendedMaxLevel',
-                label: 'Extended max level',
-                min: 1,
-                max: ABSOLUTE_MAX_CHARACTER_LEVEL,
-                required: true,
-                width: 'auto',
-                digits: 2,
-              },
-            ],
-          },
-          {
-            kind: 'slot',
-            name: '_extendedProgressionEffects',
-            render: () => createElement(ExtendedProgressionEffects),
-          },
-          {
-            kind: 'slot',
-            name: '_extendedLevelRangeSummary',
-            render: () => createElement(ExtendedLevelRangeSummary),
-          },
-        ],
+        kind: 'dependent',
+        controller: {
+          type: 'switch',
+          name: EXTENDED_PROGRESSION_ENABLED,
+          label: 'Extended progression',
+          hint: 'Use a named tier for levels beyond the standard cap.',
+          defaultValue: false,
+        },
+        dependents: {
+          surface: 'subtle',
+          fields: [
+            {
+              kind: 'row',
+              visibility: visibleWhenExtendedProgression(),
+              fields: [
+                {
+                  type: 'text',
+                  name: 'extendedTierName',
+                  label: 'Tier name',
+                  hint: {
+                    text: 'Examples: Epic Destiny, Epic Levels, Immortal Path',
+                    position: 'below-control',
+                  },
+                  required: true,
+                  width: 'full',
+                },
+                {
+                  type: 'number',
+                  name: 'extendedMaxLevel',
+                  label: 'Extended max level',
+                  min: 1,
+                  max: ABSOLUTE_MAX_CHARACTER_LEVEL,
+                  required: true,
+                  width: 'auto',
+                  digits: 2,
+                },
+              ],
+            },
+            {
+              kind: 'slot',
+              name: '_extendedProgressionEffects',
+              render: () => createElement(ExtendedProgressionEffects),
+            },
+            {
+              kind: 'slot',
+              name: '_extendedLevelRangeSummary',
+              render: () => createElement(ExtendedLevelRangeSummary),
+            },
+          ],
+        },
       },
     ],
   }
@@ -373,33 +376,34 @@ function multiclassingGroup(): FormItem {
         separator: 'subtle',
       },
       {
-        kind: 'stack',
-        layout: 'dependent',
-        dependentsChrome: 'subtle',
+        kind: 'dependent',
         separator: 'subtle',
         visibility: visibleWhenMulticlassingEnabled(),
-        fields: [
-          {
-            type: 'switch',
-            name: PRIMARY_ABILITY_MINIMUM_ENABLED,
-            label: 'Primary ability minimum',
-            hint: 'Require a minimum score in each relevant class primary ability.',
-            defaultValue: DEFAULT_PRIMARY_ABILITY_MINIMUM_ENABLED,
-          },
-          {
-            type: 'number',
-            name: 'primaryAbilityMinimumScore',
-            label: 'Minimum ability score',
-            labelPosition: 'settings',
-            min: 1,
-            max: CHARACTER_ABILITY_SCORE_MAX,
-            defaultValue: DEFAULT_PRIMARY_ABILITY_MINIMUM,
-            required: true,
-            digits: 2,
-            hint: 'Applied to every primary ability on the target class and all current classes.',
-            visibility: visibleWhenPrimaryAbilityMinimumEnabled(),
-          },
-        ],
+        controller: {
+          type: 'switch',
+          name: PRIMARY_ABILITY_MINIMUM_ENABLED,
+          label: 'Primary ability minimum',
+          hint: 'Require a minimum score in each relevant class primary ability.',
+          defaultValue: DEFAULT_PRIMARY_ABILITY_MINIMUM_ENABLED,
+        },
+        dependents: {
+          surface: 'subtle',
+          fields: [
+            {
+              type: 'number',
+              name: 'primaryAbilityMinimumScore',
+              label: 'Minimum ability score',
+              labelPosition: 'settings',
+              min: 1,
+              max: CHARACTER_ABILITY_SCORE_MAX,
+              defaultValue: DEFAULT_PRIMARY_ABILITY_MINIMUM,
+              required: true,
+              digits: 2,
+              hint: 'Applied to every primary ability on the target class and all current classes.',
+              visibility: visibleWhenPrimaryAbilityMinimumEnabled(),
+            },
+          ],
+        },
       },
       {
         type: 'switch',
@@ -479,7 +483,7 @@ function applySectionAnchor(section: CharacterConfigurationSection, items: FormI
 
   return [
     {
-      kind: 'stack',
+      kind: 'group',
       id: section.id,
       className: SCROLL_SECTION_ANCHOR_CLASS,
       rhythm: 'comfortable',
@@ -496,7 +500,7 @@ function creationSectionItems(): FormItem[] {
       legend: 'Creation',
       fields: [
         {
-          kind: 'stack',
+          kind: 'group',
           id: 'starting-level',
           className: SCROLL_SECTION_ANCHOR_CLASS,
           fields: [startingLevelField()],
@@ -524,7 +528,7 @@ function creationSectionItems(): FormItem[] {
               ...(buildStartingWealthTiersField() as ArrayConfig),
               name: `${prefix}.tiers`,
               id: 'starting-wealth',
-              itemChrome: 'subtle',
+              item: { surface: 'subtle' },
               className: SCROLL_SECTION_ANCHOR_CLASS,
             },
           ],

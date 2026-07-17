@@ -50,7 +50,7 @@ export function resolveValidationExpandKeys(
         fullName,
         itemIndex,
         itemValues,
-        section?.config.itemCollapseKey ?? 'id',
+        section?.config.item?.collapseKey ?? 'id',
       ),
     )
   }

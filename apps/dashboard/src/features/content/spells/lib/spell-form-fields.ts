@@ -478,8 +478,10 @@ function castingFields(): FormItem[] {
               name: 'areaOfEffect.shape',
               label: 'Shape',
               options: areaGeometryShapeOptions,
-              hint: 'Optional structured area geometry. Origin and movement are not modeled yet.',
-              hintPosition: 'below-control',
+              hint: {
+                text: 'Optional structured area geometry. Origin and movement are not modeled yet.',
+                position: 'below-control',
+              },
               width: 'auto',
             },
             distanceInputSelectField({

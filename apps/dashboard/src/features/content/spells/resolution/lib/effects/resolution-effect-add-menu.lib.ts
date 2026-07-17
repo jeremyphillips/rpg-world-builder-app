@@ -4,7 +4,6 @@ import {
   SPELL_RESOLUTION_PRIMARY_HEALING_EFFECT_ID,
   SPELL_RESOLUTION_PRIMARY_TEMPORARY_HIT_POINTS_EFFECT_ID,
 } from '@rpg/contracts'
-import type { ArrayConfig } from '@rpg/ui/form'
 
 import { buildEffectArrayAddMenu } from '../../../lib/effects/effect-add-menu.lib'
 
@@ -58,7 +57,9 @@ export function createResolutionEffectAppendDefaults(
   }
 }
 
-export type ResolutionEffectArrayAddMenuConfig = NonNullable<ArrayConfig['addActionMenu']>
+export type ResolutionEffectArrayAddMenuConfig = NonNullable<
+  import('@rpg/ui/form').ArrayAddActionConfig['menu']
+>
 
 /** Builds the searchable resolution effect template add menu (3 kinds). */
 export function buildResolutionEffectArrayAddMenu(): ResolutionEffectArrayAddMenuConfig {

@@ -54,8 +54,10 @@ function emptyGrantRow(grantType: GrantRowType): GrantRowForm {
     movementMatchMode: undefined,
     language: undefined,
     spellAbility: undefined,
-    spellMode: undefined,
-    spellFrequency: undefined,
+    spellAvailability: false,
+    spellCastingEnabled: false,
+    spellCastingFrequency: undefined,
+    spellAllowsSlotCasting: false,
     spellIds: [],
     featCategory: undefined,
     featChoose: 1,
@@ -168,8 +170,10 @@ const CONTENT_GRANT_TO_FORM_ROWS = {
   spells: (grant, unlockLevel) =>
     grantRows('spells', unlockLevel, {
       spellAbility: grant.ability,
-      spellMode: grant.mode,
-      spellFrequency: grant.frequency,
+      spellAvailability: grant.availability === 'always_prepared',
+      spellCastingEnabled: grant.casting !== undefined,
+      spellCastingFrequency: grant.casting?.frequency,
+      spellAllowsSlotCasting: grant.casting?.allowsSlotCasting ?? false,
       spellIds: grant.spellIds,
     }),
   languageChoice: () => [],
@@ -298,15 +302,26 @@ function equipmentToGrant(row: GrantRowForm): ContentGrant | undefined {
 }
 
 function spellsToGrant(row: GrantRowForm): ContentGrant | undefined {
-  if (!row.spellAbility || !row.spellMode || !row.spellIds?.length) return undefined
+  const hasAvailability = row.spellAvailability === true
+  const hasCasting = row.spellCastingEnabled === true
+  if (!row.spellAbility || !row.spellIds?.length || (!hasAvailability && !hasCasting)) {
+    return undefined
+  }
+
   return {
     kind: 'spells',
     ability: row.spellAbility as Ability,
-    mode: row.spellMode,
-    ...(row.spellMode === 'free_cast' && row.spellFrequency
-      ? { frequency: row.spellFrequency }
-      : {}),
     spellIds: row.spellIds,
+    ...(hasAvailability ? { availability: 'always_prepared' as const } : {}),
+    ...(hasCasting && row.spellCastingFrequency
+      ? {
+          casting: {
+            mode: 'free_cast' as const,
+            frequency: row.spellCastingFrequency,
+            ...(row.spellAllowsSlotCasting ? { allowsSlotCasting: true } : {}),
+          },
+        }
+      : {}),
   }
 }
 

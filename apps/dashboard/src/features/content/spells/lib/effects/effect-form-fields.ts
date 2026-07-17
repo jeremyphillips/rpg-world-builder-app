@@ -12,14 +12,18 @@ export function effectArrayFields(ctx: ContentFormCtx): FormItem[] {
       kind: 'array',
       name: 'effects',
       legend: 'Effects',
-      addActionLabel: 'Add effect',
-      itemCollapsible: true,
-      itemHeader: {
-        fallback: (index) => `Effect ${index + 1}`,
-        primary: (values, index) => formatEffectRowPrimary(values, index),
-        summary: (values) => formatEffectRowSummary(values),
+      addAction: {
+        label: 'Add effect',
+        menu: buildEffectArrayAddMenu(),
       },
-      addActionMenu: buildEffectArrayAddMenu(),
+      item: {
+        collapsible: true,
+        header: {
+          fallback: (index) => `Effect ${index + 1}`,
+          primary: (values, index) => formatEffectRowPrimary(values, index),
+          summary: (values) => formatEffectRowSummary(values),
+        },
+      },
       fields: effectItemFieldsForKinds(ctx),
     },
   ]

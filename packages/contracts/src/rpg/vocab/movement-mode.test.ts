@@ -3,7 +3,6 @@ import { describe, expect, it } from 'vitest'
 import {
   EXTRA_MOVEMENT_MODES,
   MOVEMENT_MODES,
-  MOVEMENT_MODE_ENTRIES,
   extraMovementModeSchema,
   formatMovementGrantAuthoringSummary,
   formatMovementGrantCompact,
@@ -70,15 +69,9 @@ describe('resolveCreatureMovement', () => {
 })
 
 describe('movement mode vocabulary', () => {
-  it('derives MOVEMENT_MODES from the entry map', () => {
-    expect([...MOVEMENT_MODES].sort()).toEqual(Object.keys(MOVEMENT_MODE_ENTRIES).sort())
-  })
-
   it('derives EXTRA_MOVEMENT_MODES as all modes except walk', () => {
     expect([...EXTRA_MOVEMENT_MODES].sort()).toEqual(
-      Object.keys(MOVEMENT_MODE_ENTRIES)
-        .filter((mode) => mode !== 'walk')
-        .sort(),
+      [...MOVEMENT_MODES].filter((mode) => mode !== 'walk').sort(),
     )
   })
 

@@ -1,5 +1,4 @@
-import { z } from 'zod'
-
+import { vocabEnumFromEntries, keysFromEntries } from './enum-schema'
 import { getTermSentenceForm } from './types'
 import type { GameTermEntry } from './types'
 
@@ -46,12 +45,9 @@ export const FEAT_CATEGORY_ENTRIES = {
 
 export type FeatCategory = keyof typeof FEAT_CATEGORY_ENTRIES
 
-export const FEAT_CATEGORY_IDS = Object.keys(FEAT_CATEGORY_ENTRIES) as [
-  FeatCategory,
-  ...FeatCategory[],
-]
+export const FEAT_CATEGORY_IDS = keysFromEntries(FEAT_CATEGORY_ENTRIES)
 
-export const featCategorySchema = z.enum(FEAT_CATEGORY_IDS)
+export const featCategorySchema = vocabEnumFromEntries(FEAT_CATEGORY_ENTRIES)
 
 /** Returns the reference entry for a feat category id, if known. */
 export function getFeatCategoryEntry(id: string): GameTermEntry | undefined {
@@ -90,7 +86,7 @@ export const FEAT_PART_ENTRIES = {
 
 export type FeatPartId = keyof typeof FEAT_PART_ENTRIES
 
-export const FEAT_PART_IDS = Object.keys(FEAT_PART_ENTRIES) as [FeatPartId, ...FeatPartId[]]
+export const FEAT_PART_IDS = keysFromEntries(FEAT_PART_ENTRIES)
 
 /** Returns the reference entry for a feat part id, if known. */
 export function getFeatPartEntry(id: string): GameTermEntry | undefined {

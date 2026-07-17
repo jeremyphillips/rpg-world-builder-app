@@ -45,7 +45,7 @@ const druidClass = {
             {
               kind: 'spells',
               ability: 'wis',
-              mode: 'always_prepared',
+              availability: 'always_prepared',
               spellIds: ['speak-with-animals'],
             },
             { kind: 'languages', languageIds: ['druidic'] },
