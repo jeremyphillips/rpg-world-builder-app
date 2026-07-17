@@ -33,12 +33,13 @@ use property-level `.describe()` only.
 
 ## Phase 0 promotions (completed)
 
-| Concept                                                   | Module                                    | Catalog JSON                | Hover tier   |
-| --------------------------------------------------------- | ----------------------------------------- | --------------------------- | ------------ |
-| Spell grant casting mode (`free_cast`, `always_prepared`) | `vocab/spell/grant-casting-mode.ts`       | yes (`spells` grant `mode`) | vocab-backed |
-| Equipment kind                                            | `vocab/equipment/kind.ts`                 | yes                         | vocab-backed |
-| Spell preparation mode                                    | `vocab/spell/preparation-mode.ts`         | yes (class `spellcasting`)  | vocab-backed |
-| Spellcasting progression (`full`/`half`/`pact`)           | `vocab/spell/spellcasting-progression.ts` | yes                         | vocab-backed |
+| Concept                                                   | Module                                    | Catalog JSON                        | Hover tier   |
+| --------------------------------------------------------- | ----------------------------------------- | ----------------------------------- | ------------ |
+| Spell grant availability (`always_prepared`)              | `vocab/spell/grant-availability.ts`       | yes (`spells` grant `availability`) | vocab-backed |
+| Spell grant casting (`free_cast` + frequency)             | `vocab/spell/grant-casting.ts`            | yes (`spells` grant `casting`)      | local-exempt |
+| Spell preparation mode (`prepared`, `known`, `full_list`) | `vocab/spell/preparation-mode.ts`         | yes (class `spellcasting`)          | vocab-backed |
+| Equipment kind                                            | `vocab/equipment/kind.ts`                 | yes                                 | vocab-backed |
+| Spellcasting progression (`full`/`half`/`pact`)           | `vocab/spell/spellcasting-progression.ts` | yes                                 | vocab-backed |
 
 ---
 
@@ -53,7 +54,7 @@ use property-level `.describe()` only.
 | `movementOperationSchema`       | `vocab/movement-mode.ts`                  | full    | yes          |
 | `featCategorySchema`            | `vocab/feat.ts`                           | full    | yes          |
 | `equipmentKindSchema`           | `vocab/equipment/kind.ts`                 | full    | yes          |
-| `spellGrantCastingModeSchema`   | `vocab/spell/grant-casting-mode.ts`       | full    | yes          |
+| `spellGrantAvailabilitySchema`  | `vocab/spell/grant-availability.ts`       | full    | yes          |
 | `spellPreparationModeSchema`    | `vocab/spell/preparation-mode.ts`         | full    | yes          |
 | `spellcastingProgressionSchema` | `vocab/spell/spellcasting-progression.ts` | full    | yes          |
 

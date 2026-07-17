@@ -18,7 +18,7 @@ describe('SPELL_PREPARATION_MODES', () => {
 })
 
 describe('spellcastingSchema', () => {
-  it('parses all preparation modes including always_prepared', () => {
+  it('parses all preparation modes including full_list', () => {
     for (const preparation of SPELL_PREPARATION_MODES) {
       expect(
         spellcastingSchema.safeParse({

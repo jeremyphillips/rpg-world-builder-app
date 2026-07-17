@@ -202,8 +202,12 @@
             {
               "kind": "spells",
               "ability": "cha",
-              "mode": "always_prepared",
-              "spellIds": ["divine-smite"]
+              "spellIds": ["divine-smite"],
+              "availability": "always_prepared",
+              "casting": {
+                "mode": "free_cast",
+                "frequency": "once_per_long_rest"
+              }
             }
           ]
         }
@@ -258,8 +262,12 @@
             {
               "kind": "spells",
               "ability": "cha",
-              "mode": "always_prepared",
-              "spellIds": ["find-steed"]
+              "spellIds": ["find-steed"],
+              "availability": "always_prepared",
+              "casting": {
+                "mode": "free_cast",
+                "frequency": "once_per_long_rest"
+              }
             }
           ]
         }

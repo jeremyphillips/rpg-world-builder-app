@@ -16,10 +16,10 @@ export const SPELL_PREPARATION_MODE_ENTRIES = {
     description:
       'The caster knows a fixed set of spells that expands as they gain levels (e.g. Bard, Sorcerer).',
   },
-  always_prepared: {
-    label: 'Always prepared',
+  full_list: {
+    label: 'Full list',
     description:
-      'All class spells are always prepared; the caster does not choose a daily prepared list.',
+      'The entire applicable class spell list is available without daily prepared-subset selection (class-wide mode). Per-spell always-prepared grants use grant availability instead.',
   },
 } as const satisfies Record<string, GameTermEntry>
 

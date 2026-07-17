@@ -127,7 +127,7 @@ describe('classSchema', () => {
                 {
                   kind: 'spells',
                   ability: 'cha',
-                  mode: 'always_prepared',
+                  availability: 'always_prepared',
                   spellIds: ['power-word-heal', 'power-word-kill'],
                 },
               ],
@@ -402,7 +402,7 @@ describe('classFeatureSchema — grantGroups superRefine', () => {
   const spellGrant = {
     kind: 'spells' as const,
     ability: 'wis' as const,
-    mode: 'always_prepared' as const,
+    availability: 'always_prepared' as const,
     spellIds: ['bless'],
   }
 

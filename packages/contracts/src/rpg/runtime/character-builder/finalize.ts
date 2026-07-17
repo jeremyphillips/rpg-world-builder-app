@@ -9,6 +9,10 @@ import { indexCharacterBuildCatalog, type CharacterBuildContext } from './contex
 import type { CharacterBuilderDraft } from './draft'
 import type { CharacterBuildEngineOptions } from './engine-options'
 import { assembleClassSpellcasting } from './assembly/assemble-spellcasting'
+import {
+  assembleGrantedSpells,
+  mergeCharacterSpellEntries,
+} from './assembly/assemble-granted-spells'
 import { assembleStartingEquipment } from './assembly/assemble-starting-equipment'
 import { validateCharacterBuild } from './validate/validate-character-build'
 import type { CharacterBuildValidationResult } from './validate/types'
@@ -109,7 +113,10 @@ export function finalizeCharacterBuild(
       temporary: 0,
     },
     proficiencies,
-    spells: assembleClassSpellcasting(draft, context, choiceSets),
+    spells: mergeCharacterSpellEntries(
+      assembleClassSpellcasting(draft, context, choiceSets),
+      assembleGrantedSpells(draft, catalogIndex, characterClass),
+    ),
     equipment,
     wealth,
     narrative: draft.identity.narrative,

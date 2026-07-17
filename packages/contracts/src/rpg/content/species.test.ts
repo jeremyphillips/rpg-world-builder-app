@@ -48,8 +48,7 @@ const ELF_BODY = {
               {
                 kind: 'spells' as const,
                 ability: 'cha',
-                mode: 'free_cast',
-                frequency: 'at_will',
+                casting: { mode: 'free_cast', frequency: 'at_will' },
                 spellIds: ['dancing-lights'],
               },
             ],
@@ -60,8 +59,7 @@ const ELF_BODY = {
               {
                 kind: 'spells' as const,
                 ability: 'cha',
-                mode: 'free_cast',
-                frequency: 'once_per_long_rest',
+                casting: { mode: 'free_cast', frequency: 'once_per_long_rest' },
                 spellIds: ['faerie-fire'],
               },
             ],

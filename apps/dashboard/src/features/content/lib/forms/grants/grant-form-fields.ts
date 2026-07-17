@@ -8,9 +8,10 @@ import {
   formatMovementGrantCompact,
   formatResistanceGrantSentence,
   formatSenseGrantSentence,
+  formatSpellsGrantSentence,
   getMovementModeGrantLabel,
-  getSpellGrantCastingModeLabel,
-  SPELL_GRANT_CASTING_MODES,
+  getSpellGrantAvailabilityLabel,
+  getUsageFrequencyLabel,
   MOVEMENT_BONUS_FEET,
   MOVEMENT_MODES,
   MOVEMENT_OPERATION_ENTRIES,
@@ -250,6 +251,52 @@ export function formatFeatChoiceRowSummary(
   })
 }
 
+export function formatSpellRowSummary(values: GrantRowValues): string {
+  const ability = values['spellAbility']
+  const spellIds = values['spellIds'] as string[] | undefined
+  if (!ability || !spellIds?.length) return ''
+
+  const hasAvailability = values['spellAvailability'] === true
+  const hasCasting = values['spellCastingEnabled'] === true
+  if (!hasAvailability && !hasCasting) return ''
+
+  return formatSpellsGrantSentence({
+    kind: 'spells',
+    ability: ability as never,
+    spellIds,
+    ...(hasAvailability ? { availability: 'always_prepared' as const } : {}),
+    ...(hasCasting && values['spellCastingFrequency']
+      ? {
+          casting: {
+            mode: 'free_cast' as const,
+            frequency: values['spellCastingFrequency'] as UsageFrequency,
+            ...(values['spellAllowsSlotCasting'] === true ? { allowsSlotCasting: true } : {}),
+          },
+        }
+      : {}),
+  })
+}
+
+function formatSpellsGrantRowSummary(values: GrantRowValues, ctx: GrantRowHeaderContext): string {
+  const summary = formatSpellRowSummary(values)
+  if (summary) return summary
+
+  const parts: string[] = []
+  if (values['spellAvailability'] === true) {
+    parts.push(getSpellGrantAvailabilityLabel('always_prepared'))
+  }
+  if (values['spellCastingEnabled'] === true && values['spellCastingFrequency']) {
+    parts.push(`${getUsageFrequencyLabel(values['spellCastingFrequency'] as string)} free cast`)
+  }
+
+  const spellTitle = formatSpellRowTitle(
+    values['spellIds'] as string[] | undefined,
+    ctx.spellOptions,
+  )
+  if (parts.length) return `${parts.join(' · ')} · ${spellTitle}`
+  return ''
+}
+
 const senseRangeOptions: FieldOption[] = SENSE_RANGES.map((range) => ({
   value: String(range),
   label: String(range),
@@ -277,13 +324,6 @@ function senseRangeInlineSentenceField(
     ...overrides,
   }
 }
-
-const spellModeOptions = toOptions(
-  SPELL_GRANT_CASTING_MODES,
-  Object.fromEntries(
-    SPELL_GRANT_CASTING_MODES.map((k) => [k, getSpellGrantCastingModeLabel(k)]),
-  ) as Record<(typeof SPELL_GRANT_CASTING_MODES)[number], string>,
-)
 
 const usageFrequencyOptions = toOptions(
   USAGE_FREQUENCIES,
@@ -469,6 +509,7 @@ const GRANT_ROW_SUMMARY_BY_TYPE: Partial<Record<string, GrantRowSummaryFormatter
     skillProficiencyGrantSummary(values as SkillProficiencyItemForm, ctx.skillOptions),
   armorTraining: (values, ctx) =>
     armorTrainingGrantSummary(values as ArmorTrainingItemForm, ctx.armorOptions),
+  spells: (values, ctx) => formatSpellsGrantRowSummary(values, ctx),
 }
 
 /** Collapsed-row summary for a grant array item. */
@@ -599,24 +640,46 @@ export function grantItemFields<T extends string>(
           width: '1/3',
         },
         {
-          type: 'select',
-          name: 'spellMode',
-          label: 'Cast mode',
-          options: spellModeOptions,
-          defaultValue: 'free_cast',
-          width: '1/3',
+          type: 'checkbox',
+          name: 'spellAvailability',
+          label: 'Always prepared',
+          visibility: visibleFor('spells'),
         },
         {
+          type: 'checkbox',
+          name: 'spellCastingEnabled',
+          label: 'Free cast',
+          defaultValue: true,
+          visibility: visibleFor('spells'),
+        },
+      ],
+    },
+    {
+      kind: 'row',
+      visibility: visibleFor('spells'),
+      fields: [
+        {
           type: 'select',
-          name: 'spellFrequency',
-          label: 'Frequency',
+          name: 'spellCastingFrequency',
+          label: 'Cast frequency',
           options: usageFrequencyOptions,
-          width: '1/3',
+          width: '1/2',
           visibility: {
-            dependsOn: ['grantType', 'spellMode'],
+            dependsOn: ['grantType', 'spellCastingEnabled'],
+            visibleWhen: (watched) =>
+              watched['grantType'] === 'spells' && watched['spellCastingEnabled'] === true,
+          },
+        },
+        {
+          type: 'checkbox',
+          name: 'spellAllowsSlotCasting',
+          label: 'Also cast with spell slots',
+          visibility: {
+            dependsOn: ['grantType', 'spellAvailability', 'spellCastingEnabled'],
             visibleWhen: (watched) =>
               watched['grantType'] === 'spells' &&
-              (watched['spellMode'] === undefined || watched['spellMode'] === 'free_cast'),
+              watched['spellAvailability'] === true &&
+              watched['spellCastingEnabled'] === true,
           },
         },
       ],

@@ -6,9 +6,14 @@ import { grantValidationMessages } from './grant-messages'
 describe('grantValidationMessages', () => {
   it.each([
     [
-      'frequencyNotAllowedAlwaysPrepared',
-      formatFieldMessage(grantValidationMessages.frequencyNotAllowedAlwaysPrepared()),
-      'Cast frequency does not apply to always-prepared spells.',
+      'spellsGrantRequiresAvailabilityOrCasting',
+      formatFieldMessage(grantValidationMessages.spellsGrantRequiresAvailabilityOrCasting()),
+      'Spell grants require availability, casting, or both.',
+    ],
+    [
+      'spellsGrantSlotCastingRequiresAvailability',
+      formatFieldMessage(grantValidationMessages.spellsGrantSlotCastingRequiresAvailability()),
+      'Slot casting via a free-cast grant requires an availability entitlement.',
     ],
     [
       'languageChoicePoolRequired',

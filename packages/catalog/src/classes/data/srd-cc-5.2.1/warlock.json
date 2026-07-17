@@ -242,15 +242,12 @@
             {
               "kind": "spells",
               "ability": "cha",
-              "mode": "always_prepared",
-              "spellIds": ["contact-other-plane"]
-            },
-            {
-              "kind": "spells",
-              "ability": "cha",
-              "mode": "free_cast",
               "spellIds": ["contact-other-plane"],
-              "frequency": "once_per_long_rest"
+              "availability": "always_prepared",
+              "casting": {
+                "mode": "free_cast",
+                "frequency": "once_per_long_rest"
+              }
             }
           ]
         }

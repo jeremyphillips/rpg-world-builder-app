@@ -137,7 +137,7 @@ function hasSpellsAvailableProgression(
   preparation: Spellcasting['preparation'] | undefined,
   rows: ProgressionRow[],
 ): boolean {
-  return preparation !== 'always_prepared' && rows.some((r) => r.spellsAvailable !== undefined)
+  return preparation !== 'full_list' && rows.some((r) => r.spellsAvailable !== undefined)
 }
 
 function slotLevelRange(characterClass: CharacterClass): number[] {

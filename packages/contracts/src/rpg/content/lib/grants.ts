@@ -14,9 +14,11 @@ import {
   movementGrantSetSchema,
 } from '../../vocab/movement-mode'
 import { getSenseSentenceForm, senseSchema } from '../../vocab/sense'
-import { getUsageFrequencySentenceForm, usageFrequencySchema } from '../../vocab/usage-frequency'
+import { getUsageFrequencySentenceForm } from '../../vocab/usage-frequency'
 import { featCategorySchema, getFeatCategorySentenceForm } from '../../vocab/feat'
-import { spellGrantCastingModeSchema } from '../../vocab/spell/grant-casting-mode'
+import { spellGrantAvailabilitySchema } from '../../vocab/spell/grant-availability'
+import { spellGrantCastingSchema } from '../../vocab/spell/grant-casting'
+import { getSpellGrantAvailabilityEntry } from '../../vocab/spell/grant-availability'
 import {
   getLanguageCategorySentenceForm,
   getLanguageLabel,
@@ -265,23 +267,32 @@ const equipmentContentGrantSchema = z.object({
 /**
  * Spells granted by a trait or feature at a given unlock level.
  *
- * - `free_cast` — slotless casting via `frequency` (species lineage pattern).
- * - `always_prepared` — always on the prepared list; cast with normal slots.
+ * - `availability` — always on the prepared list; cast with normal slots.
+ * - `casting` — slotless casting via `frequency` (species lineage pattern).
  */
 const spellsContentGrantSchema = z
   .object({
     kind: z.literal('spells'),
     ability: abilitySchema,
-    mode: spellGrantCastingModeSchema,
-    frequency: usageFrequencySchema.optional(),
     spellIds: z.array(z.string().min(1)).min(1),
+    availability: spellGrantAvailabilitySchema.optional(),
+    casting: spellGrantCastingSchema.optional(),
   })
+  .strict()
   .superRefine((val, ctx) => {
-    if (val.mode === 'always_prepared' && val.frequency !== undefined) {
+    if (val.availability === undefined && val.casting === undefined) {
       ctx.addIssue({
         code: 'custom',
-        message: grantValidationMessages.frequencyNotAllowedAlwaysPrepared(),
-        path: ['frequency'],
+        message: grantValidationMessages.spellsGrantRequiresAvailabilityOrCasting(),
+        path: ['availability'],
+      })
+    }
+
+    if (val.casting?.allowsSlotCasting === true && val.availability === undefined) {
+      ctx.addIssue({
+        code: 'custom',
+        message: grantValidationMessages.spellsGrantSlotCastingRequiresAvailability(),
+        path: ['casting', 'allowsSlotCasting'],
       })
     }
   })
@@ -295,13 +306,22 @@ export function formatSpellsGrantSentence(
 ): string {
   const names = grant.spellIds.map((id) => resolveSpellName?.(id) ?? id)
   const spellList = joinNaturalList(names)
+  const hasAvailability = grant.availability === 'always_prepared'
+  const cadence = grant.casting?.frequency
+    ? getUsageFrequencySentenceForm(grant.casting.frequency)
+    : undefined
 
-  if (grant.mode === 'always_prepared') {
+  if (hasAvailability && cadence) {
+    const availabilityLabel =
+      getSpellGrantAvailabilityEntry('always_prepared')?.sentence?.plural ?? 'always prepared'
+    return `Character has ${spellList} ${availabilityLabel} and can cast ${spellList} ${cadence} without a spell slot.`
+  }
+
+  if (hasAvailability) {
     return `Character has ${spellList} always prepared.`
   }
 
-  if (grant.frequency) {
-    const cadence = getUsageFrequencySentenceForm(grant.frequency)
+  if (cadence) {
     return `Character can cast ${spellList} ${cadence}.`
   }
 

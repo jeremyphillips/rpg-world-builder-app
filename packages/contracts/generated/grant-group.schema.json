@@ -856,17 +856,17 @@
             "ability": {
               "$ref": "#/definitions/__schema50"
             },
-            "mode": {
+            "spellIds": {
               "$ref": "#/definitions/__schema51"
             },
-            "frequency": {
-              "$ref": "#/definitions/__schema52"
-            },
-            "spellIds": {
+            "availability": {
               "$ref": "#/definitions/__schema53"
+            },
+            "casting": {
+              "$ref": "#/definitions/__schema54"
             }
           },
-          "required": ["kind", "ability", "mode", "spellIds"],
+          "required": ["kind", "ability", "spellIds"],
           "additionalProperties": false
         }
       ]
@@ -877,7 +877,8 @@
     },
     "__schema3": {
       "type": "string",
-      "enum": ["walk", "fly", "swim", "climb", "burrow"]
+      "enum": ["walk", "fly", "swim", "climb", "burrow"],
+      "description": "- **walk**: Walk Speed is how far a creature can move on foot across open ground during its turn (e.g. 30 feet for most Medium humanoids).\n- **fly**: Fly Speed is how far a creature can move through the air. A creature without a Fly Speed cannot stay aloft unless a rule grants flight.\n- **swim**: Swim Speed is how far a creature can move through water. Without a Swim Speed, moving in water costs extra movement.\n- **climb**: Climb Speed is how far a creature can move while climbing. Without a Climb Speed, climbing costs extra movement.\n- **burrow**: Burrow Speed is how far a creature can move by tunneling through earth or loose material."
     },
     "__schema4": {
       "type": "string",
@@ -1022,7 +1023,8 @@
     },
     "__schema32": {
       "type": "string",
-      "enum": ["origin", "general", "fighting-style", "epic-boon"]
+      "enum": ["origin", "general", "fighting-style", "epic-boon"],
+      "description": "- **origin**: A feat taken at character creation or when a feature grants an Origin feat choice.\n- **general**: A feat typically taken at level 4+ when a class grants a General feat choice.\n- **fighting-style**: A feat granted by the Fighting Style feature or similar class features.\n- **epic-boon**: A high-level feat typically taken at level 19+."
     },
     "__schema33": {
       "default": 1,
@@ -1062,7 +1064,8 @@
         "vehicle",
         "service",
         "magic_item"
-      ]
+      ],
+      "description": "- **weapon**: A weapon item such as a sword, bow, or thrown weapon.\n- **armor**: Armor or a shield used for protection.\n- **adventuring_gear**: General equipment used while adventuring.\n- **tool**: A tool set, kit, game set, or musical instrument.\n- **mount**: A rideable animal or similar mount.\n- **vehicle**: A land or water vehicle.\n- **service**: A purchasable service.\n- **magic_item**: A magical item such as a potion, scroll, or wondrous item."
     },
     "__schema40": {
       "allOf": [
@@ -1136,26 +1139,43 @@
     },
     "__schema50": {
       "type": "string",
-      "enum": ["str", "dex", "con", "int", "wis", "cha"]
+      "enum": ["str", "dex", "con", "int", "wis", "cha"],
+      "description": "- **str**: Physical might\n- **dex**: Agility, reflexes, and balance\n- **con**: Health and stamina\n- **int**: Reasoning and memory\n- **wis**: Perceptiveness and mental fortitude\n- **cha**: Force of personality"
     },
     "__schema51": {
-      "type": "string",
-      "enum": ["free_cast", "always_prepared"]
-    },
-    "__schema52": {
-      "type": "string",
-      "enum": ["at_will", "once_per_long_rest", "prof_bonus_per_long_rest"]
-    },
-    "__schema53": {
       "minItems": 1,
       "type": "array",
       "items": {
-        "$ref": "#/definitions/__schema54"
+        "$ref": "#/definitions/__schema52"
       }
     },
-    "__schema54": {
+    "__schema52": {
       "type": "string",
       "minLength": 1
+    },
+    "__schema53": {
+      "type": "string",
+      "enum": ["always_prepared"],
+      "description": "- **always_prepared**: The spell is always on the character prepared list for this grant; cast with normal spell slots unless a separate free-cast entitlement applies."
+    },
+    "__schema54": {
+      "type": "object",
+      "properties": {
+        "mode": {
+          "type": "string",
+          "const": "free_cast"
+        },
+        "frequency": {
+          "type": "string",
+          "enum": ["at_will", "once_per_long_rest", "prof_bonus_per_long_rest"],
+          "description": "- **at_will**: You can use this ability at will, without expending a limited use.\n- **once_per_long_rest**: You can use this ability once, and you regain the ability to do so when you finish a Long Rest.\n- **prof_bonus_per_long_rest**: You can use this ability a number of times equal to your Proficiency Bonus, and you regain all expended uses when you finish a Long Rest."
+        },
+        "allowsSlotCasting": {
+          "type": "boolean"
+        }
+      },
+      "required": ["mode", "frequency"],
+      "additionalProperties": false
     }
   }
 }

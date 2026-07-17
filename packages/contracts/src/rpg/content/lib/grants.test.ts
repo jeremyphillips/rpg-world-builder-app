@@ -163,8 +163,7 @@ describe('grant sentence formatters', () => {
       formatSpellsGrantSentence({
         kind: 'spells',
         ability: 'cha',
-        mode: 'free_cast',
-        frequency: 'at_will',
+        casting: { mode: 'free_cast', frequency: 'at_will' },
         spellIds: ['dancing-lights'],
       }),
     ).toBe('Character can cast dancing-lights at will.')
@@ -174,8 +173,7 @@ describe('grant sentence formatters', () => {
         {
           kind: 'spells',
           ability: 'cha',
-          mode: 'free_cast',
-          frequency: 'once_per_long_rest',
+          casting: { mode: 'free_cast', frequency: 'once_per_long_rest' },
           spellIds: ['faerie-fire', 'darkness'],
         },
         (id) => ({ 'faerie-fire': 'Faerie Fire', darkness: 'Darkness' })[id],
@@ -187,7 +185,7 @@ describe('grant sentence formatters', () => {
         {
           kind: 'spells',
           ability: 'wis',
-          mode: 'always_prepared',
+          availability: 'always_prepared',
           spellIds: ['cure-wounds'],
         },
         () => 'Cure Wounds',
@@ -237,7 +235,12 @@ describe('grantContentTraitSchema', () => {
           {
             grants: [
               { kind: 'sense', type: 'darkvision', range: 120 },
-              { kind: 'spells', ability: 'cha', mode: 'free_cast', spellIds: ['dancing-lights'] },
+              {
+                kind: 'spells',
+                ability: 'cha',
+                casting: { mode: 'free_cast', frequency: 'at_will' },
+                spellIds: ['dancing-lights'],
+              },
             ],
           },
         ],
@@ -253,7 +256,12 @@ describe('grantContentTraitSchema', () => {
         grantGroups: [
           {
             grants: [
-              { kind: 'spells', ability: 'cha', mode: 'free_cast', spellIds: ['dancing-lights'] },
+              {
+                kind: 'spells',
+                ability: 'cha',
+                casting: { mode: 'free_cast', frequency: 'at_will' },
+                spellIds: ['dancing-lights'],
+              },
             ],
           },
         ],
@@ -480,13 +488,13 @@ describe('contentGrantSchema — spells', () => {
       contentGrantSchema.parse({
         kind: 'spells',
         ability: 'wis',
-        mode: 'always_prepared',
+        availability: 'always_prepared',
         spellIds: ['bless', 'cure-wounds'],
       }),
     ).toEqual({
       kind: 'spells',
       ability: 'wis',
-      mode: 'always_prepared',
+      availability: 'always_prepared',
       spellIds: ['bless', 'cure-wounds'],
     })
   })
@@ -496,27 +504,50 @@ describe('contentGrantSchema — spells', () => {
       contentGrantSchema.parse({
         kind: 'spells',
         ability: 'cha',
-        mode: 'free_cast',
-        frequency: 'at_will',
+        casting: { mode: 'free_cast', frequency: 'at_will' },
         spellIds: ['dancing-lights'],
       }),
     ).toEqual({
       kind: 'spells',
       ability: 'cha',
-      mode: 'free_cast',
-      frequency: 'at_will',
+      casting: { mode: 'free_cast', frequency: 'at_will' },
       spellIds: ['dancing-lights'],
     })
   })
 
-  it('rejects always_prepared with frequency', () => {
+  it('rejects availability with top-level frequency alias', () => {
     expect(
       contentGrantSchema.safeParse({
         kind: 'spells',
         ability: 'wis',
-        mode: 'always_prepared',
+        availability: 'always_prepared',
         frequency: 'at_will',
         spellIds: ['bless'],
+      }).success,
+    ).toBe(false)
+  })
+
+  it('rejects grants without availability or casting', () => {
+    expect(
+      contentGrantSchema.safeParse({
+        kind: 'spells',
+        ability: 'wis',
+        spellIds: ['bless'],
+      }).success,
+    ).toBe(false)
+  })
+
+  it('rejects allowsSlotCasting without availability', () => {
+    expect(
+      contentGrantSchema.safeParse({
+        kind: 'spells',
+        ability: 'wis',
+        spellIds: ['bless'],
+        casting: {
+          mode: 'free_cast',
+          frequency: 'at_will',
+          allowsSlotCasting: true,
+        },
       }).success,
     ).toBe(false)
   })
@@ -526,7 +557,7 @@ describe('contentGrantSchema — spells', () => {
       contentGrantSchema.safeParse({
         kind: 'spells',
         ability: 'wis',
-        mode: 'always_prepared',
+        availability: 'always_prepared',
         spellIds: [],
       }).success,
     ).toBe(false)
@@ -542,8 +573,7 @@ describe('grantGroupsSchema', () => {
   const spellGrant = {
     kind: 'spells' as const,
     ability: 'cha' as const,
-    mode: 'free_cast' as const,
-    frequency: 'at_will' as const,
+    casting: { mode: 'free_cast' as const, frequency: 'at_will' as const },
     spellIds: ['dancing-lights'],
   }
 
@@ -663,8 +693,7 @@ describe('flattenGrantGroups', () => {
     const spellGrant = {
       kind: 'spells' as const,
       ability: 'cha' as const,
-      mode: 'free_cast' as const,
-      frequency: 'at_will' as const,
+      casting: { mode: 'free_cast' as const, frequency: 'at_will' as const },
       spellIds: ['dancing-lights'],
     }
 
@@ -713,15 +742,13 @@ describe('getUnlockedGrantsAtLevel', () => {
   const spellGrant3 = {
     kind: 'spells' as const,
     ability: 'cha' as const,
-    mode: 'free_cast' as const,
-    frequency: 'once_per_long_rest' as const,
+    casting: { mode: 'free_cast' as const, frequency: 'once_per_long_rest' as const },
     spellIds: ['faerie-fire'],
   }
   const spellGrant5 = {
     kind: 'spells' as const,
     ability: 'cha' as const,
-    mode: 'free_cast' as const,
-    frequency: 'once_per_long_rest' as const,
+    casting: { mode: 'free_cast' as const, frequency: 'once_per_long_rest' as const },
     spellIds: ['darkness'],
   }
 
@@ -762,7 +789,7 @@ describe('isGrantGroupsEligible', () => {
   const spellGrant = {
     kind: 'spells' as const,
     ability: 'cha' as const,
-    mode: 'free_cast' as const,
+    casting: { mode: 'free_cast' as const, frequency: 'at_will' as const },
     spellIds: ['dancing-lights'],
   }
 
@@ -856,7 +883,7 @@ describe('resolveGrantGroupsFromContent', () => {
               {
                 kind: 'spells',
                 ability: 'wis',
-                mode: 'always_prepared',
+                availability: 'always_prepared',
                 spellIds: ['speak-with-animals'],
               },
             ],
@@ -873,7 +900,7 @@ describe('resolveGrantGroupsFromContent', () => {
           {
             kind: 'spells',
             ability: 'wis',
-            mode: 'always_prepared',
+            availability: 'always_prepared',
             spellIds: ['speak-with-animals'],
           },
         ],
