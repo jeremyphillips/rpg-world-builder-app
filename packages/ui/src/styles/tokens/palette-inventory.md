@@ -12,39 +12,43 @@ Source files:
 Machine-readable manifest: [`palette-inventory.ts`](./palette-inventory.ts) (parity
 tests + Storybook).
 
-## Neutral ramp
+## Warmth anchor
 
-| Token                                           | Role                                                                  |
-| ----------------------------------------------- | --------------------------------------------------------------------- |
-| `--palette-neutral-hue`                         | Adjustable warmth anchor for the neutral scale                        |
-| `--palette-neutral-0` … `--palette-neutral-950` | Full lightness ramp (both themes; includes `400`/`450` mid-tan steps) |
-| `--palette-neutral-800-muted`                   | Muted fill variant (slightly lower chroma than 800)                   |
-| `--palette-muted-foreground`                    | Secondary copy on surfaces                                            |
+| Token                   | Role                                          |
+| ----------------------- | --------------------------------------------- |
+| `--palette-neutral-hue` | Hue anchor for `color-mix` (sidebar, overlay) |
 
-## Layout surfaces
+## Elevation surfaces
 
-| Token                         | Semantic role                                           |
-| ----------------------------- | ------------------------------------------------------- |
-| `--palette-page-surface`      | `--background`                                          |
-| `--palette-sidebar-surface`   | `--sidebar`                                             |
-| `--palette-sidebar-shade`     | Sidebar mix ingredient (dark); light may mirror sidebar |
-| `--palette-card-surface`      | `--card`, `--popover`                                   |
-| `--palette-muted-surface`     | `--muted`                                               |
-| `--palette-accent-surface`    | `--accent`                                              |
-| `--palette-secondary-surface` | `--secondary`                                           |
+| Token                         | Layer 2 mapping       | Job                         |
+| ----------------------------- | --------------------- | --------------------------- |
+| `--palette-surface-base`      | `--background`        | Canvas / page               |
+| `--palette-surface-subtle`    | `--bg-subtle`         | Barely-off-canvas wells     |
+| `--palette-surface-raised`    | `--card`, `--popover` | Raised panels               |
+| `--palette-surface-sunken`    | `--muted`             | Recessed / inset fills      |
+| `--palette-surface-secondary` | `--secondary`         | Alternate plane             |
+| `--palette-surface-accent`    | `--accent`            | Hover / gold chrome (light) |
 
-Elevation (light): `page` → `sidebar` → `muted` → `card` by lightness.
+## Sidebar
 
-## Chrome
+| Token                       | Layer 2        |
+| --------------------------- | -------------- |
+| `--palette-sidebar-surface` | `--sidebar`    |
+| `--palette-sidebar-shade`   | Mix ingredient |
 
-| Token                       | Semantic role            |
-| --------------------------- | ------------------------ |
-| `--palette-border-default`  | `--border`               |
-| `--palette-border-input`    | `--input`                |
-| `--palette-border-selected` | `--card-selected-border` |
-| `--palette-overlay`         | `--overlay`              |
+## Foreground roles
 
-## Brand & status
+| Token                    | Layer 2 mapping (examples)                                  |
+| ------------------------ | ----------------------------------------------------------- |
+| `--palette-fg-default`   | `--foreground`                                              |
+| `--palette-fg-muted`     | `--muted-foreground`                                        |
+| `--palette-fg-secondary` | `--secondary-foreground`, `--accent-foreground`             |
+| `--palette-fg-on-solid`  | `--primary-foreground`, destructive/info/success fg (light) |
+| `--palette-fg-on-status` | Status badge fg (dark); `--warning-foreground` (light)      |
+
+## Chrome, brand, status
+
+Chrome: `--palette-border-*`, `--palette-overlay`.
 
 Brand: `--palette-primary`, `--palette-primary-foreground`, `--palette-on-solid`.
 
@@ -55,6 +59,26 @@ Status: `--palette-destructive*`, `--palette-info*`, `--palette-success*`,
 
 `--palette-semantic-*` holds oklch source values. Layer 2 exposes
 `--semantic-*` for components — never reference palette steps from UI code.
+
+## Retired numeric ramp
+
+Removed in favor of role names above:
+
+| Old token                          | Light remap                   | Dark remap                            |
+| ---------------------------------- | ----------------------------- | ------------------------------------- |
+| `neutral-0`                        | `surface-base`, `fg-on-solid` | —                                     |
+| `neutral-50`                       | `surface-subtle`              | `fg-default`, `fg-secondary`          |
+| `neutral-100`                      | `surface-raised`              | —                                     |
+| `neutral-150`                      | `surface-secondary`           | —                                     |
+| `neutral-300`                      | `surface-sunken`              | —                                     |
+| `neutral-500` / `muted-foreground` | `fg-muted`                    | `fg-muted`                            |
+| `neutral-700`                      | `fg-secondary`                | `semantic-neutral`                    |
+| `neutral-750`                      | —                             | `surface-accent`                      |
+| `neutral-800`                      | `fg-default`                  | `surface-raised`, `surface-secondary` |
+| `neutral-800-muted`                | —                             | `surface-sunken`                      |
+| `neutral-900`                      | `fg-on-status`                | `surface-subtle`                      |
+| `neutral-950`                      | —                             | `surface-base`, `fg-on-status`        |
+| `neutral-400`, `neutral-450`       | _(deleted — unused)_          | _(deleted)_                           |
 
 ## Layer 2 (semantic)
 

@@ -3,34 +3,25 @@
  * define every entry. Used by palette-parity tests and Storybook catalog.
  */
 
-export const PALETTE_NEUTRAL_STEPS = [
-  'neutral-hue',
-  'neutral-0',
-  'neutral-50',
-  'neutral-100',
-  'neutral-150',
-  'neutral-200',
-  'neutral-300',
-  'neutral-400',
-  'neutral-450',
-  'neutral-500',
-  'neutral-700',
-  'neutral-750',
-  'neutral-800',
-  'neutral-800-muted',
-  'neutral-900',
-  'neutral-950',
-  'muted-foreground',
+export const PALETTE_WARMTH_STEPS = ['neutral-hue'] as const
+
+export const PALETTE_SURFACE_ELEVATION_STEPS = [
+  'surface-base',
+  'surface-subtle',
+  'surface-raised',
+  'surface-sunken',
+  'surface-secondary',
+  'surface-accent',
 ] as const
 
-export const PALETTE_SURFACE_STEPS = [
-  'page-surface',
-  'sidebar-surface',
-  'sidebar-shade',
-  'card-surface',
-  'muted-surface',
-  'accent-surface',
-  'secondary-surface',
+export const PALETTE_SIDEBAR_STEPS = ['sidebar-surface', 'sidebar-shade'] as const
+
+export const PALETTE_FG_STEPS = [
+  'fg-default',
+  'fg-muted',
+  'fg-secondary',
+  'fg-on-solid',
+  'fg-on-status',
 ] as const
 
 export const PALETTE_CHROME_STEPS = [
@@ -68,8 +59,10 @@ export const PALETTE_SEMANTIC_TEXT_STEPS = [
 ] as const
 
 export const PALETTE_PRIMITIVE_STEPS = [
-  ...PALETTE_NEUTRAL_STEPS,
-  ...PALETTE_SURFACE_STEPS,
+  ...PALETTE_WARMTH_STEPS,
+  ...PALETTE_SURFACE_ELEVATION_STEPS,
+  ...PALETTE_SIDEBAR_STEPS,
+  ...PALETTE_FG_STEPS,
   ...PALETTE_CHROME_STEPS,
   ...PALETTE_BRAND_STEPS,
   ...PALETTE_STATUS_STEPS,
@@ -90,16 +83,27 @@ export interface PalettePrimitiveGroup {
 
 export const PALETTE_PRIMITIVE_GROUPS: PalettePrimitiveGroup[] = [
   {
-    id: 'neutral',
-    label: 'Neutral ramp',
-    description: 'Full neutral scale — both themes define every step.',
-    steps: PALETTE_NEUTRAL_STEPS,
+    id: 'warmth',
+    label: 'Warmth anchor',
+    description: 'Hue anchor for color-mix recipes (sidebar, overlay).',
+    steps: PALETTE_WARMTH_STEPS,
   },
   {
-    id: 'surface',
-    label: 'Layout surfaces',
-    description: 'Page, chrome, and elevation planes.',
-    steps: PALETTE_SURFACE_STEPS,
+    id: 'elevation',
+    label: 'Elevation surfaces',
+    description: 'Canvas → subtle → raised; sunken recessed plane.',
+    steps: PALETTE_SURFACE_ELEVATION_STEPS,
+  },
+  {
+    id: 'sidebar',
+    label: 'Sidebar',
+    steps: PALETTE_SIDEBAR_STEPS,
+  },
+  {
+    id: 'foreground',
+    label: 'Foreground',
+    description: 'Text roles — same names across themes, different oklch per theme.',
+    steps: PALETTE_FG_STEPS,
   },
   {
     id: 'chrome',
@@ -122,4 +126,12 @@ export const PALETTE_PRIMITIVE_GROUPS: PalettePrimitiveGroup[] = [
     description: 'Source hues for inline semantic copy — mapped by Layer 2 roles.',
     steps: PALETTE_SEMANTIC_TEXT_STEPS,
   },
+]
+
+/** Elevation ladder order for Storybook stacked previews (base → raised). */
+export const PALETTE_ELEVATION_LADDER: readonly string[] = [
+  'surface-base',
+  'surface-subtle',
+  'surface-raised',
+  'surface-sunken',
 ]

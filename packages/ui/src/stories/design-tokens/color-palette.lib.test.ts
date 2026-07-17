@@ -1,6 +1,11 @@
 import { describe, expect, it } from 'vitest'
 
-import { COLOR_TOKEN_GROUPS, ON_SURFACE_TOKENS, SURFACE_BACKGROUNDS } from './color-palette.lib'
+import {
+  COLOR_TOKEN_GROUPS,
+  ON_SURFACE_TOKENS,
+  PALETTE_ELEVATION_LADDER_TOKENS,
+  SURFACE_BACKGROUNDS,
+} from './color-palette.lib'
 
 describe('color-palette.lib', () => {
   it('defines unique css variables across groups', () => {
@@ -10,7 +15,7 @@ describe('color-palette.lib', () => {
 
   it('includes core surface backgrounds for on-surface matrices', () => {
     expect(SURFACE_BACKGROUNDS.map((surface) => surface.cssVar)).toEqual(
-      expect.arrayContaining(['--background', '--card', '--muted']),
+      expect.arrayContaining(['--background', '--bg-subtle', '--card', '--muted']),
     )
   })
 
@@ -20,5 +25,14 @@ describe('color-palette.lib', () => {
 
   it('includes sidebar in surface backgrounds for on-surface matrices', () => {
     expect(SURFACE_BACKGROUNDS.map((surface) => surface.cssVar)).toContain('--sidebar')
+  })
+
+  it('defines an elevation ladder for palette surface roles', () => {
+    expect(PALETTE_ELEVATION_LADDER_TOKENS.map((token) => token.name)).toEqual([
+      'surface-base',
+      'surface-subtle',
+      'surface-raised',
+      'surface-sunken',
+    ])
   })
 })

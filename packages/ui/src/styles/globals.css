@@ -26,9 +26,11 @@
  * (`--font-weight-heading`, …) mirror the same pattern. Meta/semantic aliases
  * (`--text-xs-meta`, `--text-eyebrow-sm`, …) sit below the type scale.
  *
- * Palette: warm amber/gold primary over zinc-leaning neutrals with adjustable
- * warmth (`--palette-neutral-hue`). Default is near-zinc (~268); nudge hue in
- * Layer 1 for incremental warmth — a few degrees reads subtle, 80+ reads parchment.
+ * Palette: role-named Layer 1 primitives (`surface-*`, `fg-*`, brand, chrome,
+ * status) with theme-local oklch in `palette-*.css`. Warmth anchor
+ * `--palette-neutral-hue` feeds color-mix recipes (sidebar, overlay). Light
+ * motif: cream canvas, parch cards, deep-red primary; dark: warm neutral planes
+ * with gold primary.
  *
  * Color tokens use three layers:
  * 1. `--palette-*` primitives — oklch SSOT in `tokens/palette-light.css` and

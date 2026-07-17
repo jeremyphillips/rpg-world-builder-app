@@ -2,39 +2,32 @@
  * Layer 1 — dark palette primitives (oklch SSOT).
  * Inventory: tokens/palette-inventory.md — mirrors palette-light.css names exactly.
  *
- * Warm neutral dark — nudged from hue 72 toward parchment (~80), lower surface
- * chroma to cut mud, soft burgundy primary hinting at light without matching it.
+ * Warm neutral dark — parchment-adjacent hue, low-chroma surfaces, gold primary.
  */
 .dark {
   --palette-neutral-hue: 80;
-  --palette-neutral-0: oklch(0.99 0.005 82);
-  --palette-neutral-50: oklch(0.985 0.006 82);
-  --palette-neutral-100: oklch(0.88 0.01 80);
-  --palette-neutral-150: oklch(0.78 0.012 80);
-  --palette-neutral-200: oklch(0.708 0.01 var(--palette-neutral-hue));
-  --palette-neutral-300: oklch(0.55 0.01 var(--palette-neutral-hue));
-  --palette-neutral-400: oklch(0.52 0.01 var(--palette-neutral-hue));
-  --palette-neutral-450: oklch(0.485 0.01 var(--palette-neutral-hue));
-  --palette-neutral-500: oklch(0.45 0.01 var(--palette-neutral-hue));
-  --palette-neutral-700: oklch(0.715 0.01 var(--palette-neutral-hue));
-  --palette-neutral-750: oklch(0.32 0.006 var(--palette-neutral-hue));
-  --palette-neutral-800: oklch(0.194 0.005 var(--palette-neutral-hue));
-  --palette-neutral-800-muted: oklch(0.194 0.004 var(--palette-neutral-hue));
-  --palette-neutral-900: oklch(0.155 0.004 var(--palette-neutral-hue));
-  --palette-neutral-950: oklch(0.141 0.004 var(--palette-neutral-hue));
-  --palette-muted-foreground: oklch(0.82 0.012 80);
 
-  --palette-page-surface: var(--palette-neutral-950);
+  /* Elevation surfaces */
+  --palette-surface-base: oklch(0.141 0.004 var(--palette-neutral-hue));
+  --palette-surface-subtle: oklch(0.155 0.004 var(--palette-neutral-hue));
+  --palette-surface-raised: oklch(0.194 0.005 var(--palette-neutral-hue));
+  --palette-surface-sunken: oklch(0.194 0.004 var(--palette-neutral-hue));
+  --palette-surface-secondary: oklch(0.194 0.005 var(--palette-neutral-hue));
+  --palette-surface-accent: oklch(0.32 0.006 var(--palette-neutral-hue));
+
+  /* Foreground roles */
+  --palette-fg-default: oklch(0.985 0.006 82);
+  --palette-fg-muted: oklch(0.82 0.012 80);
+  --palette-fg-secondary: oklch(0.985 0.006 82);
+  --palette-fg-on-solid: oklch(0.985 0 0);
+  --palette-fg-on-status: oklch(0.141 0.004 var(--palette-neutral-hue));
+
   --palette-sidebar-shade: oklch(0.11 0.005 var(--palette-neutral-hue));
   --palette-sidebar-surface: color-mix(
     in oklch,
-    var(--palette-page-surface) 55%,
+    var(--palette-surface-base) 55%,
     var(--palette-sidebar-shade)
   );
-  --palette-card-surface: var(--palette-neutral-800);
-  --palette-muted-surface: var(--palette-neutral-800-muted);
-  --palette-accent-surface: var(--palette-neutral-750);
-  --palette-secondary-surface: var(--palette-neutral-800);
 
   --palette-border-default: oklch(0.985 0.006 82 / 12%);
   --palette-border-input: oklch(0.745 0.006 82 / 16%);
@@ -43,7 +36,7 @@
 
   --palette-primary: oklch(0.78 0.13 75);
   --palette-primary-foreground: oklch(0.141 0.004 var(--palette-neutral-hue));
-  --palette-on-solid: oklch(0.985 0 0);
+  --palette-on-solid: var(--palette-fg-on-solid);
 
   --palette-destructive: oklch(0.704 0.191 22.216);
   --palette-destructive-muted: oklch(0.704 0.191 22.216 / 70%);
@@ -58,11 +51,11 @@
   --palette-warning-muted: oklch(0.78 0.13 75 / 70%);
   --palette-warning-subtle: oklch(0.78 0.13 75 / 14%);
 
-  --palette-semantic-neutral: var(--palette-neutral-700);
+  --palette-semantic-neutral: oklch(0.715 0.01 var(--palette-neutral-hue));
   --palette-semantic-informative: oklch(0.62 0.08 250);
   --palette-semantic-informative-muted: oklch(0.55 0.05 250);
   --palette-semantic-positive: oklch(0.72 0.11 145);
   --palette-semantic-caution: oklch(0.78 0.12 75);
   --palette-semantic-negative: oklch(0.72 0.16 22);
-  --palette-semantic-negative-on-subtle: var(--palette-neutral-50);
+  --palette-semantic-negative-on-subtle: var(--palette-fg-default);
 }
