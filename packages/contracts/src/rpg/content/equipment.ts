@@ -1,6 +1,8 @@
 import { z } from 'zod'
 
 import { massSchema, speedRateSchema } from '../primitives/units'
+import { EQUIPMENT_KINDS } from '../vocab/equipment/kind'
+import { formatUnionBranchDescription } from '../vocab/enum-schema'
 import { serviceCategorySchema } from '../vocab/equipment/service-category'
 import { serviceDurationSchema } from '../vocab/equipment/service-duration'
 import { vehicleCategorySchema } from '../vocab/equipment/vehicle-category'
@@ -196,21 +198,25 @@ const equipmentBodyVariants = [
 ] as const
 
 /** The editable shape: what a form authors and what a patch overrides. */
-export const equipmentBodySchema = z.discriminatedUnion('kind', [...equipmentBodyVariants])
+export const equipmentBodySchema = z
+  .discriminatedUnion('kind', [...equipmentBodyVariants])
+  .describe(formatUnionBranchDescription('kind', [...EQUIPMENT_KINDS]))
 
 export type EquipmentBody = z.infer<typeof equipmentBodySchema>
 
 /** Stored shape = ownership envelope + body, per variant. */
-export const equipmentSchema = z.discriminatedUnion('kind', [
-  contentMetaSchema.extend(weaponEquipmentBodyFields.shape).superRefine(refineWeaponEquipment),
-  contentMetaSchema.extend(armorEquipmentBodyFields.shape).superRefine(refineArmorEquipment),
-  contentMetaSchema.extend(adventuringGearBodySchema.shape),
-  contentMetaSchema.extend(toolEquipmentBodyFields.shape),
-  contentMetaSchema.extend(mountBodySchema.shape),
-  contentMetaSchema.extend(vehicleBodySchema.shape),
-  contentMetaSchema.extend(serviceBodySchema.shape),
-  contentMetaSchema.extend(magicItemBodySchema.shape),
-])
+export const equipmentSchema = z
+  .discriminatedUnion('kind', [
+    contentMetaSchema.extend(weaponEquipmentBodyFields.shape).superRefine(refineWeaponEquipment),
+    contentMetaSchema.extend(armorEquipmentBodyFields.shape).superRefine(refineArmorEquipment),
+    contentMetaSchema.extend(adventuringGearBodySchema.shape),
+    contentMetaSchema.extend(toolEquipmentBodyFields.shape),
+    contentMetaSchema.extend(mountBodySchema.shape),
+    contentMetaSchema.extend(vehicleBodySchema.shape),
+    contentMetaSchema.extend(serviceBodySchema.shape),
+    contentMetaSchema.extend(magicItemBodySchema.shape),
+  ])
+  .describe(formatUnionBranchDescription('kind', [...EQUIPMENT_KINDS]))
 
 export type Equipment = z.infer<typeof equipmentSchema>
 

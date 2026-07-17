@@ -43,6 +43,10 @@
     "./vocabulary": {
       "types": "./src/vocabulary/index.ts",
       "default": "./src/vocabulary/index.ts"
+    },
+    "./seed-schemas": {
+      "types": "./src/seed-schemas.ts",
+      "default": "./src/seed-schemas.ts"
     }
   },
   "scripts": {

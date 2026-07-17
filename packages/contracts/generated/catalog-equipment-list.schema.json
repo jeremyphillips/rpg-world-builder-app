@@ -1,0 +1,1138 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "array",
+  "items": {
+    "oneOf": [
+      {
+        "$ref": "#/definitions/__schema0"
+      },
+      {
+        "$ref": "#/definitions/__schema27"
+      },
+      {
+        "$ref": "#/definitions/__schema37"
+      },
+      {
+        "$ref": "#/definitions/__schema39"
+      },
+      {
+        "$ref": "#/definitions/__schema41"
+      },
+      {
+        "$ref": "#/definitions/__schema44"
+      },
+      {
+        "$ref": "#/definitions/__schema45"
+      },
+      {
+        "$ref": "#/definitions/__schema46"
+      }
+    ],
+    "markdownDescription": "Branch on **kind**: **weapon** | **armor** | **adventuring_gear** | **tool** | **mount** | **vehicle** | **service** | **magic_item**"
+  },
+  "definitions": {
+    "__schema0": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/definitions/__schema1"
+        },
+        "slug": {
+          "$ref": "#/definitions/__schema2"
+        },
+        "rulesetId": {
+          "type": "string",
+          "enum": ["srd-cc-5.2.1"],
+          "description": "srd-cc-5.2.1"
+        },
+        "source": {
+          "type": "string",
+          "enum": ["system", "homebrew"],
+          "description": "system | homebrew"
+        },
+        "campaignId": {
+          "$ref": "#/definitions/__schema5"
+        },
+        "createdAt": {
+          "$ref": "#/definitions/__schema6"
+        },
+        "updatedAt": {
+          "$ref": "#/definitions/__schema7"
+        },
+        "imageKey": {
+          "$ref": "#/definitions/__schema8"
+        },
+        "name": {
+          "$ref": "#/definitions/__schema9"
+        },
+        "description": {
+          "$ref": "#/definitions/__schema10"
+        },
+        "cost": {
+          "$ref": "#/definitions/__schema11"
+        },
+        "weight": {
+          "$ref": "#/definitions/__schema12"
+        },
+        "tags": {
+          "$ref": "#/definitions/__schema13"
+        },
+        "kind": {
+          "type": "string",
+          "const": "weapon",
+          "description": "weapon"
+        },
+        "category": {
+          "type": "string",
+          "enum": ["simple", "martial"],
+          "description": "simple | martial"
+        },
+        "mode": {
+          "type": "string",
+          "enum": ["melee", "ranged"],
+          "description": "melee | ranged"
+        },
+        "damage": {
+          "$ref": "#/definitions/__schema17"
+        },
+        "damageType": {
+          "type": "string",
+          "enum": ["bludgeoning", "piercing", "slashing"],
+          "description": "bludgeoning | piercing | slashing"
+        },
+        "versatileDamage": {
+          "$ref": "#/definitions/__schema22"
+        },
+        "properties": {
+          "$ref": "#/definitions/__schema23"
+        },
+        "mastery": {
+          "type": "string",
+          "enum": ["cleave", "graze", "nick", "push", "sap", "slow", "topple", "vex"],
+          "description": "cleave | graze | nick | push | sap | slow | topple | vex"
+        },
+        "range": {
+          "$ref": "#/definitions/__schema25"
+        },
+        "specialRules": {
+          "$ref": "#/definitions/__schema26"
+        }
+      },
+      "required": [
+        "id",
+        "slug",
+        "rulesetId",
+        "source",
+        "campaignId",
+        "createdAt",
+        "updatedAt",
+        "name",
+        "cost",
+        "kind",
+        "category",
+        "mode",
+        "properties",
+        "mastery"
+      ],
+      "additionalProperties": false
+    },
+    "__schema1": {
+      "type": "string",
+      "minLength": 1
+    },
+    "__schema2": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+    },
+    "__schema3": {
+      "type": "string",
+      "enum": ["srd-cc-5.2.1"],
+      "description": "srd-cc-5.2.1"
+    },
+    "__schema4": {
+      "type": "string",
+      "enum": ["system", "homebrew"],
+      "description": "system | homebrew"
+    },
+    "__schema5": {
+      "anyOf": [
+        {
+          "type": "string",
+          "minLength": 1
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "__schema6": {
+      "type": "string",
+      "format": "date-time",
+      "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
+    },
+    "__schema7": {
+      "type": "string",
+      "format": "date-time",
+      "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
+    },
+    "__schema8": {
+      "type": "string"
+    },
+    "__schema9": {
+      "type": "string",
+      "minLength": 1
+    },
+    "__schema10": {
+      "type": "string"
+    },
+    "__schema11": {
+      "type": "object",
+      "properties": {
+        "amount": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "currency": {
+          "type": "string",
+          "enum": ["cp", "sp", "gp", "pp"],
+          "description": "cp | sp | gp | pp"
+        }
+      },
+      "required": ["amount", "currency"],
+      "additionalProperties": false
+    },
+    "__schema12": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "type": "number",
+          "minimum": 0
+        },
+        "unit": {
+          "type": "string",
+          "const": "lb",
+          "description": "lb"
+        }
+      },
+      "required": ["value", "unit"],
+      "additionalProperties": false
+    },
+    "__schema13": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "__schema14": {
+      "type": "string",
+      "const": "weapon",
+      "description": "weapon"
+    },
+    "__schema15": {
+      "type": "string",
+      "enum": ["simple", "martial"],
+      "description": "simple | martial"
+    },
+    "__schema16": {
+      "type": "string",
+      "enum": ["melee", "ranged"],
+      "description": "melee | ranged"
+    },
+    "__schema17": {
+      "type": "object",
+      "properties": {
+        "dice": {
+          "$ref": "#/definitions/__schema18"
+        },
+        "flat": {
+          "$ref": "#/definitions/__schema20"
+        }
+      },
+      "additionalProperties": false
+    },
+    "__schema18": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/__schema19"
+        }
+      ]
+    },
+    "__schema19": {
+      "type": "object",
+      "properties": {
+        "count": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "faces": {
+          "anyOf": [
+            {
+              "type": "number",
+              "const": 4
+            },
+            {
+              "type": "number",
+              "const": 6
+            },
+            {
+              "type": "number",
+              "const": 8
+            },
+            {
+              "type": "number",
+              "const": 10
+            },
+            {
+              "type": "number",
+              "const": 12
+            },
+            {
+              "type": "number",
+              "const": 20
+            },
+            {
+              "type": "number",
+              "const": 100
+            }
+          ]
+        }
+      },
+      "required": ["count", "faces"],
+      "additionalProperties": false
+    },
+    "__schema20": {
+      "type": "integer",
+      "minimum": -9007199254740991,
+      "maximum": 9007199254740991
+    },
+    "__schema21": {
+      "type": "string",
+      "enum": ["bludgeoning", "piercing", "slashing"],
+      "description": "bludgeoning | piercing | slashing"
+    },
+    "__schema22": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/__schema19"
+        }
+      ]
+    },
+    "__schema23": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "ammunition",
+          "finesse",
+          "heavy",
+          "light",
+          "loading",
+          "reach",
+          "special",
+          "thrown",
+          "two-handed",
+          "versatile"
+        ],
+        "description": "ammunition | finesse | heavy | light | loading | reach | special | thrown | two-handed | versatile"
+      }
+    },
+    "__schema24": {
+      "type": "string",
+      "enum": ["cleave", "graze", "nick", "push", "sap", "slow", "topple", "vex"],
+      "description": "cleave | graze | nick | push | sap | slow | topple | vex"
+    },
+    "__schema25": {
+      "type": "object",
+      "properties": {
+        "normal": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "long": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        }
+      },
+      "required": ["normal"],
+      "additionalProperties": false
+    },
+    "__schema26": {
+      "type": "string"
+    },
+    "__schema27": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/definitions/__schema1"
+        },
+        "slug": {
+          "$ref": "#/definitions/__schema2"
+        },
+        "rulesetId": {
+          "type": "string",
+          "enum": ["srd-cc-5.2.1"],
+          "description": "srd-cc-5.2.1"
+        },
+        "source": {
+          "type": "string",
+          "enum": ["system", "homebrew"],
+          "description": "system | homebrew"
+        },
+        "campaignId": {
+          "$ref": "#/definitions/__schema5"
+        },
+        "createdAt": {
+          "$ref": "#/definitions/__schema6"
+        },
+        "updatedAt": {
+          "$ref": "#/definitions/__schema7"
+        },
+        "imageKey": {
+          "$ref": "#/definitions/__schema8"
+        },
+        "name": {
+          "$ref": "#/definitions/__schema9"
+        },
+        "description": {
+          "$ref": "#/definitions/__schema10"
+        },
+        "cost": {
+          "$ref": "#/definitions/__schema11"
+        },
+        "weight": {
+          "$ref": "#/definitions/__schema12"
+        },
+        "tags": {
+          "$ref": "#/definitions/__schema13"
+        },
+        "kind": {
+          "type": "string",
+          "const": "armor",
+          "description": "armor"
+        },
+        "category": {
+          "type": "string",
+          "enum": ["light", "medium", "heavy", "shields"],
+          "description": "light | medium | heavy | shields"
+        },
+        "material": {
+          "type": "string",
+          "enum": ["organic", "metal"],
+          "description": "organic | metal"
+        },
+        "baseAc": {
+          "$ref": "#/definitions/__schema31"
+        },
+        "acBonus": {
+          "$ref": "#/definitions/__schema32"
+        },
+        "addDexModifier": {
+          "$ref": "#/definitions/__schema33"
+        },
+        "maxDexBonus": {
+          "$ref": "#/definitions/__schema34"
+        },
+        "stealthDisadvantage": {
+          "$ref": "#/definitions/__schema35"
+        },
+        "strengthRequirement": {
+          "$ref": "#/definitions/__schema36"
+        }
+      },
+      "required": [
+        "id",
+        "slug",
+        "rulesetId",
+        "source",
+        "campaignId",
+        "createdAt",
+        "updatedAt",
+        "name",
+        "cost",
+        "kind",
+        "category",
+        "addDexModifier",
+        "stealthDisadvantage"
+      ],
+      "additionalProperties": false
+    },
+    "__schema28": {
+      "type": "string",
+      "const": "armor",
+      "description": "armor"
+    },
+    "__schema29": {
+      "type": "string",
+      "enum": ["light", "medium", "heavy", "shields"],
+      "description": "light | medium | heavy | shields"
+    },
+    "__schema30": {
+      "type": "string",
+      "enum": ["organic", "metal"],
+      "description": "organic | metal"
+    },
+    "__schema31": {
+      "type": "integer",
+      "minimum": -9007199254740991,
+      "maximum": 9007199254740991
+    },
+    "__schema32": {
+      "type": "integer",
+      "minimum": -9007199254740991,
+      "maximum": 9007199254740991
+    },
+    "__schema33": {
+      "type": "boolean"
+    },
+    "__schema34": {
+      "type": "integer",
+      "minimum": -9007199254740991,
+      "maximum": 9007199254740991
+    },
+    "__schema35": {
+      "type": "boolean"
+    },
+    "__schema36": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 30
+    },
+    "__schema37": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/definitions/__schema1"
+        },
+        "slug": {
+          "$ref": "#/definitions/__schema2"
+        },
+        "rulesetId": {
+          "type": "string",
+          "enum": ["srd-cc-5.2.1"],
+          "description": "srd-cc-5.2.1"
+        },
+        "source": {
+          "type": "string",
+          "enum": ["system", "homebrew"],
+          "description": "system | homebrew"
+        },
+        "campaignId": {
+          "$ref": "#/definitions/__schema5"
+        },
+        "createdAt": {
+          "$ref": "#/definitions/__schema6"
+        },
+        "updatedAt": {
+          "$ref": "#/definitions/__schema7"
+        },
+        "imageKey": {
+          "$ref": "#/definitions/__schema8"
+        },
+        "name": {
+          "$ref": "#/definitions/__schema9"
+        },
+        "description": {
+          "$ref": "#/definitions/__schema10"
+        },
+        "cost": {
+          "$ref": "#/definitions/__schema11"
+        },
+        "weight": {
+          "$ref": "#/definitions/__schema12"
+        },
+        "tags": {
+          "$ref": "#/definitions/__schema13"
+        },
+        "kind": {
+          "type": "string",
+          "const": "adventuring_gear",
+          "description": "adventuring_gear"
+        },
+        "gearKind": {
+          "type": "string",
+          "enum": ["general", "ammunition", "book", "spellcasting", "container", "consumable"],
+          "description": "general | ammunition | book | spellcasting | container | consumable"
+        },
+        "spellcastingGearKind": {
+          "type": "string",
+          "enum": ["arcane_focus", "druidic_focus", "holy_symbol", "spellbook", "component_pouch"],
+          "description": "arcane_focus | druidic_focus | holy_symbol | spellbook | component_pouch"
+        },
+        "bundleSize": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "storage": {
+          "type": "string"
+        },
+        "properties": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "capacity": {
+          "type": "string"
+        },
+        "holySymbolUsage": {
+          "minItems": 1,
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["worn", "held", "borne_on_fabric", "borne_on_shield"],
+            "description": "worn | held | borne_on_fabric | borne_on_shield"
+          }
+        },
+        "alsoWeaponSlug": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/__schema2"
+            }
+          ]
+        }
+      },
+      "required": [
+        "id",
+        "slug",
+        "rulesetId",
+        "source",
+        "campaignId",
+        "createdAt",
+        "updatedAt",
+        "name",
+        "cost",
+        "kind",
+        "gearKind"
+      ],
+      "additionalProperties": false
+    },
+    "__schema38": {
+      "type": "string",
+      "enum": ["worn", "held", "borne_on_fabric", "borne_on_shield"],
+      "description": "worn | held | borne_on_fabric | borne_on_shield"
+    },
+    "__schema39": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/definitions/__schema1"
+        },
+        "slug": {
+          "$ref": "#/definitions/__schema2"
+        },
+        "rulesetId": {
+          "type": "string",
+          "enum": ["srd-cc-5.2.1"],
+          "description": "srd-cc-5.2.1"
+        },
+        "source": {
+          "type": "string",
+          "enum": ["system", "homebrew"],
+          "description": "system | homebrew"
+        },
+        "campaignId": {
+          "$ref": "#/definitions/__schema5"
+        },
+        "createdAt": {
+          "$ref": "#/definitions/__schema6"
+        },
+        "updatedAt": {
+          "$ref": "#/definitions/__schema7"
+        },
+        "imageKey": {
+          "$ref": "#/definitions/__schema8"
+        },
+        "name": {
+          "$ref": "#/definitions/__schema9"
+        },
+        "description": {
+          "$ref": "#/definitions/__schema10"
+        },
+        "cost": {
+          "$ref": "#/definitions/__schema11"
+        },
+        "weight": {
+          "$ref": "#/definitions/__schema12"
+        },
+        "tags": {
+          "$ref": "#/definitions/__schema13"
+        },
+        "kind": {
+          "type": "string",
+          "const": "tool",
+          "description": "tool"
+        },
+        "toolCategory": {
+          "type": "string",
+          "enum": ["artisan", "gaming_set", "musical_instrument", "navigator", "thieves", "other"],
+          "description": "artisan | gaming_set | musical_instrument | navigator | thieves | other"
+        },
+        "ability": {
+          "type": "string",
+          "enum": ["str", "dex", "con", "int", "wis", "cha"],
+          "description": "str | dex | con | int | wis | cha"
+        },
+        "utilizes": {
+          "minItems": 1,
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/__schema40"
+          }
+        },
+        "crafts": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      },
+      "required": [
+        "id",
+        "slug",
+        "rulesetId",
+        "source",
+        "campaignId",
+        "createdAt",
+        "updatedAt",
+        "name",
+        "cost",
+        "kind",
+        "toolCategory",
+        "ability",
+        "utilizes"
+      ],
+      "additionalProperties": false
+    },
+    "__schema40": {
+      "type": "object",
+      "properties": {
+        "description": {
+          "type": "string",
+          "minLength": 1
+        },
+        "dc": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 30
+        }
+      },
+      "required": ["description", "dc"],
+      "additionalProperties": false
+    },
+    "__schema41": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/definitions/__schema1"
+        },
+        "slug": {
+          "$ref": "#/definitions/__schema2"
+        },
+        "rulesetId": {
+          "type": "string",
+          "enum": ["srd-cc-5.2.1"],
+          "description": "srd-cc-5.2.1"
+        },
+        "source": {
+          "type": "string",
+          "enum": ["system", "homebrew"],
+          "description": "system | homebrew"
+        },
+        "campaignId": {
+          "$ref": "#/definitions/__schema5"
+        },
+        "createdAt": {
+          "$ref": "#/definitions/__schema6"
+        },
+        "updatedAt": {
+          "$ref": "#/definitions/__schema7"
+        },
+        "imageKey": {
+          "$ref": "#/definitions/__schema8"
+        },
+        "name": {
+          "$ref": "#/definitions/__schema9"
+        },
+        "description": {
+          "$ref": "#/definitions/__schema10"
+        },
+        "cost": {
+          "$ref": "#/definitions/__schema11"
+        },
+        "weight": {
+          "$ref": "#/definitions/__schema12"
+        },
+        "tags": {
+          "$ref": "#/definitions/__schema13"
+        },
+        "kind": {
+          "type": "string",
+          "const": "mount",
+          "description": "mount"
+        },
+        "carryingCapacity": {
+          "$ref": "#/definitions/__schema42"
+        },
+        "speed": {
+          "$ref": "#/definitions/__schema43"
+        }
+      },
+      "required": [
+        "id",
+        "slug",
+        "rulesetId",
+        "source",
+        "campaignId",
+        "createdAt",
+        "updatedAt",
+        "name",
+        "cost",
+        "kind",
+        "carryingCapacity",
+        "speed"
+      ],
+      "additionalProperties": false
+    },
+    "__schema42": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "type": "number",
+          "minimum": 0
+        },
+        "unit": {
+          "type": "string",
+          "enum": ["lb", "ton"],
+          "description": "lb | ton"
+        }
+      },
+      "required": ["value", "unit"],
+      "additionalProperties": false
+    },
+    "__schema43": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "type": "number",
+          "minimum": 0
+        },
+        "unit": {
+          "type": "string",
+          "enum": ["ft", "mph"],
+          "description": "ft | mph"
+        }
+      },
+      "required": ["value", "unit"],
+      "additionalProperties": false
+    },
+    "__schema44": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/definitions/__schema1"
+        },
+        "slug": {
+          "$ref": "#/definitions/__schema2"
+        },
+        "rulesetId": {
+          "type": "string",
+          "enum": ["srd-cc-5.2.1"],
+          "description": "srd-cc-5.2.1"
+        },
+        "source": {
+          "type": "string",
+          "enum": ["system", "homebrew"],
+          "description": "system | homebrew"
+        },
+        "campaignId": {
+          "$ref": "#/definitions/__schema5"
+        },
+        "createdAt": {
+          "$ref": "#/definitions/__schema6"
+        },
+        "updatedAt": {
+          "$ref": "#/definitions/__schema7"
+        },
+        "imageKey": {
+          "$ref": "#/definitions/__schema8"
+        },
+        "name": {
+          "$ref": "#/definitions/__schema9"
+        },
+        "description": {
+          "$ref": "#/definitions/__schema10"
+        },
+        "cost": {
+          "$ref": "#/definitions/__schema11"
+        },
+        "weight": {
+          "$ref": "#/definitions/__schema12"
+        },
+        "tags": {
+          "$ref": "#/definitions/__schema13"
+        },
+        "kind": {
+          "type": "string",
+          "const": "vehicle",
+          "description": "vehicle"
+        },
+        "vehicleCategory": {
+          "type": "string",
+          "enum": ["land", "water", "air", "space", "other"],
+          "description": "land | water | air | space | other"
+        },
+        "speed": {
+          "$ref": "#/definitions/__schema43"
+        },
+        "cargoCapacity": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/__schema42"
+            }
+          ]
+        },
+        "crew": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "passengers": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "ac": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "hp": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "damageThreshold": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        }
+      },
+      "required": [
+        "id",
+        "slug",
+        "rulesetId",
+        "source",
+        "campaignId",
+        "createdAt",
+        "updatedAt",
+        "name",
+        "cost",
+        "kind",
+        "vehicleCategory",
+        "speed"
+      ],
+      "additionalProperties": false
+    },
+    "__schema45": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/definitions/__schema1"
+        },
+        "slug": {
+          "$ref": "#/definitions/__schema2"
+        },
+        "rulesetId": {
+          "type": "string",
+          "enum": ["srd-cc-5.2.1"],
+          "description": "srd-cc-5.2.1"
+        },
+        "source": {
+          "type": "string",
+          "enum": ["system", "homebrew"],
+          "description": "system | homebrew"
+        },
+        "campaignId": {
+          "$ref": "#/definitions/__schema5"
+        },
+        "createdAt": {
+          "$ref": "#/definitions/__schema6"
+        },
+        "updatedAt": {
+          "$ref": "#/definitions/__schema7"
+        },
+        "imageKey": {
+          "$ref": "#/definitions/__schema8"
+        },
+        "name": {
+          "$ref": "#/definitions/__schema9"
+        },
+        "description": {
+          "$ref": "#/definitions/__schema10"
+        },
+        "cost": {
+          "$ref": "#/definitions/__schema11"
+        },
+        "tags": {
+          "$ref": "#/definitions/__schema13"
+        },
+        "kind": {
+          "type": "string",
+          "const": "service",
+          "description": "service"
+        },
+        "serviceCategory": {
+          "type": "string",
+          "enum": [
+            "hireling",
+            "lodging",
+            "meal",
+            "travel",
+            "transport",
+            "stable",
+            "spellcasting",
+            "lifestyle",
+            "other"
+          ],
+          "description": "hireling | lodging | meal | travel | transport | stable | spellcasting | lifestyle | other"
+        },
+        "duration": {
+          "type": "object",
+          "properties": {
+            "value": {
+              "type": "integer",
+              "exclusiveMinimum": 0,
+              "maximum": 9007199254740991
+            },
+            "unit": {
+              "type": "string",
+              "enum": ["day", "mile"],
+              "description": "day | mile"
+            }
+          },
+          "required": ["value", "unit"],
+          "additionalProperties": false
+        },
+        "notes": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "slug",
+        "rulesetId",
+        "source",
+        "campaignId",
+        "createdAt",
+        "updatedAt",
+        "name",
+        "cost",
+        "kind",
+        "serviceCategory"
+      ],
+      "additionalProperties": false
+    },
+    "__schema46": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/definitions/__schema1"
+        },
+        "slug": {
+          "$ref": "#/definitions/__schema2"
+        },
+        "rulesetId": {
+          "type": "string",
+          "enum": ["srd-cc-5.2.1"],
+          "description": "srd-cc-5.2.1"
+        },
+        "source": {
+          "type": "string",
+          "enum": ["system", "homebrew"],
+          "description": "system | homebrew"
+        },
+        "campaignId": {
+          "$ref": "#/definitions/__schema5"
+        },
+        "createdAt": {
+          "$ref": "#/definitions/__schema6"
+        },
+        "updatedAt": {
+          "$ref": "#/definitions/__schema7"
+        },
+        "imageKey": {
+          "$ref": "#/definitions/__schema8"
+        },
+        "name": {
+          "$ref": "#/definitions/__schema9"
+        },
+        "description": {
+          "$ref": "#/definitions/__schema10"
+        },
+        "cost": {
+          "$ref": "#/definitions/__schema11"
+        },
+        "weight": {
+          "$ref": "#/definitions/__schema12"
+        },
+        "tags": {
+          "$ref": "#/definitions/__schema13"
+        },
+        "kind": {
+          "type": "string",
+          "const": "magic_item",
+          "description": "magic_item"
+        },
+        "rarity": {
+          "type": "string",
+          "enum": ["common", "uncommon", "rare", "very_rare", "legendary", "artifact"],
+          "description": "common | uncommon | rare | very_rare | legendary | artifact"
+        },
+        "requiresAttunement": {
+          "type": "boolean"
+        },
+        "attunementRequirement": {
+          "type": "string"
+        },
+        "magicItemCategory": {
+          "type": "string",
+          "enum": [
+            "weapon",
+            "armor",
+            "wondrous_item",
+            "potion",
+            "ring",
+            "rod",
+            "scroll",
+            "staff",
+            "wand",
+            "other"
+          ],
+          "description": "weapon | armor | wondrous_item | potion | ring | rod | scroll | staff | wand | other"
+        },
+        "baseEquipmentId": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "slug",
+        "rulesetId",
+        "source",
+        "campaignId",
+        "createdAt",
+        "updatedAt",
+        "name",
+        "cost",
+        "kind"
+      ],
+      "additionalProperties": false
+    }
+  }
+}

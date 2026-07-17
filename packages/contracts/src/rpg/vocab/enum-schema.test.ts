@@ -22,8 +22,8 @@ const SAMPLE_ENTRIES = {
 } as const satisfies Record<string, GameTermEntry>
 
 describe('formatEnumDescription', () => {
-  it('lists enum keys only by default', () => {
-    expect(formatEnumDescription(SAMPLE_ENTRIES)).toBe('- **alpha**\n- **beta**')
+  it('lists enum keys as a pipe-separated list by default', () => {
+    expect(formatEnumDescription(SAMPLE_ENTRIES)).toBe('alpha | beta')
   })
 
   it('includes per-value prose when showDescription is true', () => {
@@ -35,7 +35,7 @@ describe('formatEnumDescription', () => {
 
 describe('formatClosedSetDescription', () => {
   it('formats structural closed sets without entries', () => {
-    expect(formatClosedSetDescription(['fixed', 'choice'])).toBe('- **fixed**\n- **choice**')
+    expect(formatClosedSetDescription(['fixed', 'choice'])).toBe('fixed | choice')
   })
 })
 

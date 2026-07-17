@@ -13,7 +13,7 @@ export type FormatEnumDescriptionOptions = {
   showDescription?: boolean
 }
 
-/** Markdown bullet list of closed-set values for JSON Schema hover. */
+/** Closed-set hover text for JSON Schema — pipe list by default, bullets when prose is enabled. */
 export function formatClosedSetDescription(
   values: readonly string[],
   options: FormatEnumDescriptionOptions & {
@@ -23,10 +23,14 @@ export function formatClosedSetDescription(
   const showDescription = options.showDescription ?? false
   const { entries } = options
 
+  if (!showDescription) {
+    return values.join(' | ')
+  }
+
   return values
     .map((value) => {
       const entry = entries?.[value]
-      if (showDescription && entry) {
+      if (entry) {
         return `- **${value}**: ${entry.description}`
       }
       return `- **${value}**`
@@ -42,7 +46,7 @@ export function formatUnionBranchDescription(
   return `Branch on **${discriminant}**: ${branches.map((branch) => `**${branch}**`).join(' | ')}`
 }
 
-/** Markdown bullet list of enum values for Zod `.describe()`; promoted to `markdownDescription` in generated JSON Schema. */
+/** Hover copy for Zod `.describe()`; promoted to `description` or `markdownDescription` in JSON Schema. */
 export function formatEnumDescription(
   entries: Record<string, GameTermEntry>,
   options: FormatEnumDescriptionOptions = {},
