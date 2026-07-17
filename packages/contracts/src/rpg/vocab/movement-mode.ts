@@ -1,5 +1,6 @@
 import { z } from 'zod'
 
+import { vocabEnumFromEntries } from './enum-schema'
 import { getTermSentenceForm } from './types'
 import type { GameTermEntry } from './types'
 
@@ -63,7 +64,7 @@ export const MOVEMENT_MODES = Object.keys(MOVEMENT_MODE_ENTRIES) as [
   ...MovementMode[],
 ]
 
-export const movementModeSchema = z.enum(MOVEMENT_MODES)
+export const movementModeSchema = vocabEnumFromEntries(MOVEMENT_MODE_ENTRIES)
 
 /** Modes beyond walk — only present when a creature has that movement type. */
 export const EXTRA_MOVEMENT_MODES = MOVEMENT_MODES.filter(
@@ -174,8 +175,6 @@ export const MOVEMENT_OPERATIONS = ['set', 'increase', 'match'] as const
 
 export type MovementOperation = (typeof MOVEMENT_OPERATIONS)[number]
 
-export const movementOperationSchema = z.enum(MOVEMENT_OPERATIONS)
-
 export const MOVEMENT_OPERATION_ENTRIES = {
   set: {
     label: 'is',
@@ -190,6 +189,8 @@ export const MOVEMENT_OPERATION_ENTRIES = {
     description: 'Sets this mode’s speed to the resolved value of another mode.',
   },
 } as const satisfies Record<MovementOperation, GameTermEntry>
+
+export const movementOperationSchema = vocabEnumFromEntries(MOVEMENT_OPERATION_ENTRIES)
 
 /** Preset foot bonuses shown in movement-grant authoring UIs. */
 export const MOVEMENT_BONUS_FEET = [5, 10, 15, 20, 25, 30] as const

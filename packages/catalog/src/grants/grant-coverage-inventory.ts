@@ -9,7 +9,6 @@ import { loadSeedClasses } from '../classes'
 import { loadSeedSpecies } from '../species'
 
 export type GrantCoverageInventory = {
-  legacyBagCount: number
   normalizeRoundTripFailures: string[]
   choiceShapeKeys: string[]
   heritageOptionCounts: Record<string, number>
@@ -17,7 +16,6 @@ export type GrantCoverageInventory = {
 }
 
 type InventoryAccumulator = {
-  legacyBagCount: number
   normalizeRoundTripFailures: string[]
   choiceShapes: Set<string>
   heritageOptionCounts: Record<string, number>
@@ -26,7 +24,6 @@ type InventoryAccumulator = {
 
 function createInventoryAccumulator(): InventoryAccumulator {
   return {
-    legacyBagCount: 0,
     normalizeRoundTripFailures: [],
     choiceShapes: new Set(),
     heritageOptionCounts: {},
@@ -36,16 +33,11 @@ function createInventoryAccumulator(): InventoryAccumulator {
 
 function toGrantCoverageInventory(acc: InventoryAccumulator): GrantCoverageInventory {
   return {
-    legacyBagCount: acc.legacyBagCount,
     normalizeRoundTripFailures: acc.normalizeRoundTripFailures,
     choiceShapeKeys: Array.from(acc.choiceShapes).sort(),
     heritageOptionCounts: acc.heritageOptionCounts,
     classSkillChoose: acc.classSkillChoose,
   }
-}
-
-function hasLegacyGrantsBag(record: { grants?: unknown }): boolean {
-  return record.grants !== undefined && record.grants !== null
 }
 
 function recordNormalizeFailure(
@@ -118,9 +110,6 @@ function accumulateGrantContent(
   parentLevel: number,
   parentUnlock: { level: number } | undefined,
 ): void {
-  if ('grants' in content && content.kind === 'custom' && hasLegacyGrantsBag(content)) {
-    acc.legacyBagCount += 1
-  }
   walkGrantGroupsAtLevel1(acc, path, content, parentLevel, parentUnlock)
 }
 
@@ -158,9 +147,6 @@ function accumulateStartingEquipmentChoices(cls: CharacterClass, acc: InventoryA
 
 function accumulateClassFeatures(cls: CharacterClass, acc: InventoryAccumulator): void {
   for (const feature of cls.features) {
-    if (hasLegacyGrantsBag(feature)) {
-      acc.legacyBagCount += 1
-    }
     if (feature.grantGroups?.length) {
       recordNormalizeFailure(acc, `${cls.slug}/feature/${feature.id}`, feature.grantGroups, {
         level: feature.level,

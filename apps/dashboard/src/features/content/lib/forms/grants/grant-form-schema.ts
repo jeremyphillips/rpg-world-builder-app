@@ -8,7 +8,7 @@ import {
   featCategorySchema,
   gearKindSchema,
   spellcastingGearKindSchema,
-  INNATE_SPELL_KINDS,
+  spellGrantCastingModeSchema,
   languageIdSchema,
   MAX_CHARACTER_LEVEL,
   PROFICIENCY_POOL_SOURCES,
@@ -179,7 +179,7 @@ export function createGrantRowFormSchema(maxLevel: number = MAX_CHARACTER_LEVEL)
       /** Spellcasting ability for a `spells` row. */
       spellAbility: abilitySchema.optional(),
       /** Cast mode: `free_cast` (innate, via frequency) or `always_prepared` (slot-based). */
-      spellMode: z.enum(INNATE_SPELL_KINDS).optional(),
+      spellMode: spellGrantCastingModeSchema.optional(),
       /** Usage frequency — only valid when `spellMode` is `free_cast`. */
       spellFrequency: usageFrequencySchema.optional(),
       /** Spell slugs granted by this row. */

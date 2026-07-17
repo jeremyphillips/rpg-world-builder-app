@@ -11,14 +11,11 @@ import { creatureTypeSchema } from '../vocab/creature-type'
 import { movementSpeedsSchema } from '../vocab/movement-mode'
 import { contentNamedChoiceSchema } from './lib/choice'
 import {
-  contentGrantsSchema,
   contentTraitSchema,
   contentGrantSchema,
   grantUnlockSchema,
   grantGroupSchema,
   grantGroupsSchema,
-  innateSpellEntrySchema,
-  innateSpellsSchema,
 } from './lib/grants'
 import { languageIdSchema } from '../vocab/language'
 import { speciesCharacterCreationSchema } from './species-character-creation'
@@ -32,26 +29,13 @@ import { speciesCharacterCreationSchema } from './species-character-creation'
 
 // Re-export shared grant types for species authoring.
 export {
-  contentGrantsSchema,
   contentTraitSchema,
   contentGrantSchema,
   grantUnlockSchema,
   grantGroupSchema,
   grantGroupsSchema,
-  innateSpellEntrySchema,
-  innateSpellsSchema,
 }
-export type {
-  ContentGrants,
-  ContentTrait,
-  InnateSpellEntry,
-  InnateSpells,
-  InnateSpellKind,
-  ContentGrant,
-  GrantUnlock,
-  GrantGroup,
-  GrantGroups,
-} from './lib/grants'
+export type { ContentTrait, ContentGrant, GrantUnlock, GrantGroup, GrantGroups } from './lib/grants'
 
 export type SpeciesTrait = z.infer<typeof contentTraitSchema>
 

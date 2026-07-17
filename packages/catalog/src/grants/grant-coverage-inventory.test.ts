@@ -7,10 +7,6 @@ const RULESET = 'srd-cc-5.2.1' as const
 describe('grant coverage inventory (srd-cc-5.2.1)', () => {
   const inventory = buildGrantCoverageInventory(RULESET)
 
-  it('has no legacy grants bags on system seeds', () => {
-    expect(inventory.legacyBagCount).toBe(0)
-  })
-
   it('has canonical grantGroups on all seeded grant-bearing content', () => {
     expect(inventory.normalizeRoundTripFailures).toEqual([])
   })

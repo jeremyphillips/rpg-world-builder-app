@@ -1,5 +1,4 @@
-import { z } from 'zod'
-
+import { vocabEnumFromEntries } from './enum-schema'
 import { getTermSentenceForm } from './types'
 import type { GameTermEntry } from './types'
 
@@ -51,7 +50,7 @@ export const FEAT_CATEGORY_IDS = Object.keys(FEAT_CATEGORY_ENTRIES) as [
   ...FeatCategory[],
 ]
 
-export const featCategorySchema = z.enum(FEAT_CATEGORY_IDS)
+export const featCategorySchema = vocabEnumFromEntries(FEAT_CATEGORY_ENTRIES)
 
 /** Returns the reference entry for a feat category id, if known. */
 export function getFeatCategoryEntry(id: string): GameTermEntry | undefined {

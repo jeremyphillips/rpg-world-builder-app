@@ -1,0 +1,50 @@
+import type { GameTermEntry } from '../types'
+import { vocabEnumFromEntries } from '../enum-schema'
+
+// ---------------------------------------------------------------------------
+// Spell preparation mode — how a class prepares or knows spells (SRD class block).
+// ---------------------------------------------------------------------------
+
+export const SPELL_PREPARATION_MODE_ENTRIES = {
+  prepared: {
+    label: 'Prepared',
+    description:
+      'The caster prepares a subset of spells from their class list after a long rest (e.g. Cleric, Wizard).',
+  },
+  known: {
+    label: 'Known',
+    description:
+      'The caster knows a fixed set of spells that expands as they gain levels (e.g. Bard, Sorcerer).',
+  },
+  always_prepared: {
+    label: 'Always prepared',
+    description:
+      'All class spells are always prepared; the caster does not choose a daily prepared list.',
+  },
+} as const satisfies Record<string, GameTermEntry>
+
+export type SpellPreparationMode = keyof typeof SPELL_PREPARATION_MODE_ENTRIES
+
+export const SPELL_PREPARATION_MODES = Object.keys(SPELL_PREPARATION_MODE_ENTRIES) as [
+  SpellPreparationMode,
+  ...SpellPreparationMode[],
+]
+
+/** @deprecated Prefer `SPELL_PREPARATION_MODE_ENTRIES[id].label`. */
+export const SPELL_PREPARATION_MODE_LABELS = Object.fromEntries(
+  Object.entries(SPELL_PREPARATION_MODE_ENTRIES).map(([id, entry]) => [id, entry.label]),
+) as {
+  readonly [Mode in SpellPreparationMode]: (typeof SPELL_PREPARATION_MODE_ENTRIES)[Mode]['label']
+}
+
+export const spellPreparationModeSchema = vocabEnumFromEntries(SPELL_PREPARATION_MODE_ENTRIES)
+
+/** Returns the reference entry for a spell preparation mode id, if known. */
+export function getSpellPreparationModeEntry(id: string): GameTermEntry | undefined {
+  return SPELL_PREPARATION_MODE_ENTRIES[id as SpellPreparationMode]
+}
+
+/** Returns the display label for a spell preparation mode. Falls back to the raw value. */
+export function getSpellPreparationModeLabel(id: string): string {
+  return getSpellPreparationModeEntry(id)?.label ?? id
+}

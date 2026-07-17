@@ -38,25 +38,53 @@ const ELF_BODY = {
         id: 'drow',
         name: 'Drow',
         description: '<p>Drow trace their lineage to the Underdark.</p>',
-        grants: {
-          senses: [{ type: 'darkvision' as const, range: 120 }],
-          innateSpells: {
-            ability: 'cha' as const,
-            entries: [
-              { level: 1, spellIds: ['dancing-lights'], frequency: 'at_will' as const },
-              { level: 3, spellIds: ['faerie-fire'], frequency: 'once_per_long_rest' as const },
+        grantGroups: [
+          {
+            grants: [{ kind: 'sense' as const, type: 'darkvision', range: 120 }],
+          },
+          {
+            unlock: { level: 1 },
+            grants: [
+              {
+                kind: 'spells' as const,
+                ability: 'cha',
+                mode: 'free_cast',
+                frequency: 'at_will',
+                spellIds: ['dancing-lights'],
+              },
             ],
           },
-        },
+          {
+            unlock: { level: 3 },
+            grants: [
+              {
+                kind: 'spells' as const,
+                ability: 'cha',
+                mode: 'free_cast',
+                frequency: 'once_per_long_rest',
+                spellIds: ['faerie-fire'],
+              },
+            ],
+          },
+        ],
       },
       {
         kind: 'custom' as const,
         id: 'wood-elf',
         name: 'Wood Elf',
         description: '<p>Your Speed is 35 feet.</p>',
-        grants: {
-          movement: { mode: 'walk', operation: 'increase', feet: 5 },
-        },
+        grantGroups: [
+          {
+            grants: [
+              {
+                kind: 'movement' as const,
+                mode: 'walk',
+                operation: 'increase',
+                feet: 5,
+              },
+            ],
+          },
+        ],
       },
     ],
   },

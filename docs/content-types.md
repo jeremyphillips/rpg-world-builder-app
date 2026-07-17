@@ -2,7 +2,7 @@
 
 This guide covers the end-to-end steps for adding a fully wired catalog content type to RPG World Builder. The pattern is contracts-first: the Zod schema is the single source of truth, and every layer derives from it.
 
-**Reference implementations**: `classes` (full Mongoose homebrew/patch support), `skill-proficiencies` (patch support via shared factory, homebrew deferred), and `species` (embedded heritage choices for lineages/ancestries, structured `grants` bag on traits).
+**Reference implementations**: `classes` (full Mongoose homebrew/patch support), `skill-proficiencies` (patch support via shared factory, homebrew deferred), and `species` (embedded heritage choices for lineages/ancestries, atomic `grantGroups` on traits).
 
 ---
 
@@ -16,7 +16,7 @@ Add a new content type when the domain entity:
 
 If the entity is always embedded inside another (e.g. class features, spell components), model it as a nested schema on the parent type instead.
 
-When sub-choices are small, fixed sets owned by one catalog record (lineages, ancestries), embed them as optional **heritage** on the parent body rather than a separate content type. See `content/species.ts` — `{ id, name, description?, options }` where `name` carries lineage/ancestry wording (e.g. "Draconic Ancestry", "Elven Lineage") and `options` are `contentTraitSchema` rows with optional `grants`.
+When sub-choices are small, fixed sets owned by one catalog record (lineages, ancestries), embed them as optional **heritage** on the parent body rather than a separate content type. See `content/species.ts` — `{ id, name, description?, options }` where `name` carries lineage/ancestry wording (e.g. "Draconic Ancestry", "Elven Lineage") and `options` are `contentTraitSchema` rows with optional `grantGroups`.
 
 **Not a content type:** starting wealth (higher-level character creation tier tables) lives in `rpg/campaign/rules/starting-wealth.ts` and is patched via `CampaignRulesetPatch.characterCreation.startingWealth` — not the content API registry. SRD defaults ship from `@rpg/catalog/starting-wealth`.
 
@@ -26,10 +26,10 @@ When sub-choices are small, fixed sets owned by one catalog record (lineages, an
 
 Species traits and heritage options share `contentTraitSchema` — a discriminated union on `kind`:
 
-| Kind     | Stored fields                                                        | Rendering                                                      |
-| -------- | -------------------------------------------------------------------- | -------------------------------------------------------------- |
-| `custom` | `name`, optional `description`, optional `grants`                    | Use stored prose; grants supplement mechanics                  |
-| `grant`  | `grants` (required), optional `nameOverride` / `descriptionOverride` | Derive display via `resolveTraitDisplay()` in `@rpg/contracts` |
+| Kind     | Stored fields                                                             | Rendering                                                      |
+| -------- | ------------------------------------------------------------------------- | -------------------------------------------------------------- |
+| `custom` | `name`, optional `description`, optional `grantGroups`                    | Use stored prose; grant groups supplement mechanics            |
+| `grant`  | `grantGroups` (required), optional `nameOverride` / `descriptionOverride` | Derive display via `resolveTraitDisplay()` in `@rpg/contracts` |
 
 **Class and subclass features are always `custom`** (`classFeatureSchema` extends the custom variant + `level`). Progression UI requires a stored feature name.
 
@@ -38,7 +38,7 @@ named `<Class> Subclass`). The feature level is the source of truth for when sub
 and default subclass feature levels unlock; there is no top-level `subclassChoiceLevel` field on
 the class body.
 
-Grant-only traits must pass `isGrantEligibleGrants()` — phase 1 allows a single atomic grant: one sense, one resistance, walk speed override, or one language. Hybrids (Drow: senses + innate spells), named heritage options (Dragonborn ancestry), and supplemental rules stay `custom`.
+Grant-only traits must pass `isGrantGroupsEligible()` — exactly one default group containing exactly one sense, resistance, walk speed override, or language grant. Hybrids (Drow: senses + spells), named heritage options (Dragonborn ancestry), and supplemental rules stay `custom`.
 
 - **Render** trait lists with `resolveTraitDisplay(trait)` (name + description HTML).
 - **Aggregate** mechanics (e.g. species stat-row senses) with `flattenGrantGroups(resolveGrantGroupsFromContent(trait))` — read atomic grants, not derived prose.
@@ -46,12 +46,13 @@ Grant-only traits must pass `isGrantEligibleGrants()` — phase 1 allows a singl
 
 Legacy records without `kind` normalize to `custom` on parse (`normalizeContentTrait`).
 
-### `grants.featChoice` (feat picks)
+### `featChoice` atomic grants
 
-Class features, subclass features, and species traits that grant a feat choice store
-`grants.featChoice` on the **source** record (Fighting Style, Epic Boon, Human Versatile,
-Ability Score Improvement milestones). The character builder filters feats by `category`;
-granted feats do not need a matching `prerequisite` on the feat record.
+Class features, subclass features, and species traits that grant a feat choice store a
+`{ kind: "featChoice", ... }` grant inside `grantGroups` on the **source** record
+(Fighting Style, Epic Boon, Human Versatile, Ability Score Improvement milestones).
+The character builder filters feats by `category`; granted feats do not need a matching
+`prerequisite` on the feat record.
 
 | Field                | Meaning                                                                 |
 | -------------------- | ----------------------------------------------------------------------- |
@@ -62,7 +63,7 @@ granted feats do not need a matching `prerequisite` on the feat record.
 | `recommendedFeatIds` | Feat slugs surfaced as recommendations (not duplicated in HTML prose)   |
 
 **Ability Score Improvements** are modeled as class features (`ability-score-improvement-{level}`)
-with `grants.featChoice` (`category: general`, `allowAnyQualifying: true`,
+with a `featChoice` grant (`category: general`, `allowAnyQualifying: true`,
 `recommendedFeatIds: ["ability-score-improvement"]`). The class editor keeps an ASI level
 picker for convenience; on save it generates/replaces those feature rows — there is no
 top-level `asiLevels` field on the class body.
@@ -70,14 +71,19 @@ top-level `asiLevels` field on the class body.
 Example (Fighter Fighting Style):
 
 ```json
-"grants": {
-  "featChoice": {
-    "category": "fighting-style",
-    "choose": 1,
-    "replaceable": true,
-    "recommendedFeatIds": ["defense"]
+"grantGroups": [
+  {
+    "grants": [
+      {
+        "kind": "featChoice",
+        "category": "fighting-style",
+        "choose": 1,
+        "replaceable": true,
+        "recommendedFeatIds": ["defense"]
+      }
+    ]
   }
-}
+]
 ```
 
 Example (ASI at level 4):
@@ -87,14 +93,19 @@ Example (ASI at level 4):
   "id": "ability-score-improvement-4",
   "name": "Ability Score Improvement",
   "level": 4,
-  "grants": {
-    "featChoice": {
-      "category": "general",
-      "choose": 1,
-      "allowAnyQualifying": true,
-      "recommendedFeatIds": ["ability-score-improvement"]
+  "grantGroups": [
+    {
+      "grants": [
+        {
+          "kind": "featChoice",
+          "category": "general",
+          "choose": 1,
+          "allowAnyQualifying": true,
+          "recommendedFeatIds": ["ability-score-improvement"]
+        }
+      ]
     }
-  }
+  ]
 }
 ```
 

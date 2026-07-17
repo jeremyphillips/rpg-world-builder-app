@@ -1,4 +1,5 @@
 export * from './types'
+export * from './enum-schema'
 export * from './vocabulary-messages'
 export * from './vocabulary'
 export * from './ability-messages'

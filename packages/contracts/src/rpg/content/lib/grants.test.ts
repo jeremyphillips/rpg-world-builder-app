@@ -2,7 +2,6 @@ import { describe, expect, it } from 'vitest'
 
 import {
   contentGrantSchema,
-  contentGrantsSchema,
   contentTraitSchema,
   customContentTraitSchema,
   featChoiceGrantSchema,
@@ -21,8 +20,6 @@ import {
   getUnlockedGrantsAtLevel,
   grantContentTraitSchema,
   grantGroupsSchema,
-  innateSpellEntrySchema,
-  isGrantEligibleGrants,
   isGrantGroupsEligible,
   languageChoiceGrantSchema,
   normalizeContentTrait,
@@ -30,89 +27,6 @@ import {
   resolveGrantGroupsFromContent,
 } from './grants'
 import { resolveTraitDisplay } from './trait-display'
-
-describe('isGrantEligibleGrants', () => {
-  it('accepts a single sense grant', () => {
-    expect(isGrantEligibleGrants({ senses: [{ type: 'darkvision', range: 60 }] })).toBe(true)
-  })
-
-  it('rejects multi-key grant bags', () => {
-    expect(
-      isGrantEligibleGrants({
-        senses: [{ type: 'darkvision', range: 120 }],
-        innateSpells: {
-          ability: 'cha',
-          entries: [{ level: 1, kind: 'free_cast' as const, spellIds: ['dancing-lights'] }],
-        },
-      }),
-    ).toBe(false)
-  })
-
-  it('rejects innateSpells-only grants', () => {
-    expect(
-      isGrantEligibleGrants({
-        innateSpells: {
-          ability: 'cha',
-          entries: [{ level: 1, kind: 'free_cast' as const, spellIds: ['dancing-lights'] }],
-        },
-      }),
-    ).toBe(false)
-  })
-
-  it('rejects equipment-only grants', () => {
-    expect(
-      isGrantEligibleGrants({
-        equipment: [{ kind: 'grant', equipmentSlug: 'dagger', quantity: 1 }],
-      }),
-    ).toBe(false)
-  })
-})
-
-describe('innateSpellEntrySchema', () => {
-  it('defaults kind to free_cast when omitted', () => {
-    const result = innateSpellEntrySchema.parse({
-      level: 1,
-      spellIds: ['dancing-lights'],
-      frequency: 'at_will',
-    })
-    expect(result.kind).toBe('free_cast')
-  })
-
-  it('parses free_cast with frequency', () => {
-    expect(
-      innateSpellEntrySchema.safeParse({
-        level: 3,
-        spellIds: ['faerie-fire'],
-        kind: 'free_cast',
-        frequency: 'once_per_long_rest',
-      }).success,
-    ).toBe(true)
-  })
-
-  it('parses always_prepared without frequency', () => {
-    const result = innateSpellEntrySchema.parse({
-      level: 20,
-      kind: 'always_prepared',
-      spellIds: ['power-word-heal', 'power-word-kill'],
-    })
-    expect(result).toEqual({
-      level: 20,
-      kind: 'always_prepared',
-      spellIds: ['power-word-heal', 'power-word-kill'],
-    })
-  })
-
-  it('rejects always_prepared with frequency', () => {
-    expect(
-      innateSpellEntrySchema.safeParse({
-        level: 20,
-        kind: 'always_prepared',
-        spellIds: ['power-word-heal'],
-        frequency: 'at_will',
-      }).success,
-    ).toBe(false)
-  })
-})
 
 describe('featChoiceGrantSchema', () => {
   it('parses a fighting-style feat choice', () => {
@@ -282,64 +196,6 @@ describe('grant sentence formatters', () => {
   })
 })
 
-describe('contentGrantsSchema', () => {
-  it('parses a grants bag with innateSpells', () => {
-    const grants = {
-      innateSpells: {
-        ability: 'cha' as const,
-        entries: [
-          {
-            level: 20,
-            kind: 'always_prepared' as const,
-            spellIds: ['power-word-heal', 'power-word-kill'],
-          },
-        ],
-      },
-    }
-    expect(contentGrantsSchema.parse(grants)).toEqual(grants)
-  })
-
-  it('parses a grants bag with featChoice', () => {
-    const grants = {
-      featChoice: {
-        category: 'origin' as const,
-        choose: 1,
-      },
-    }
-    expect(contentGrantsSchema.parse(grants)).toEqual(grants)
-  })
-
-  it('parses fixed language grants and language choices', () => {
-    const grants = {
-      languages: ['thieves-cant' as const],
-      languageChoices: [{ choose: 1, categories: ['standard' as const] }],
-    }
-    expect(contentGrantsSchema.parse(grants)).toEqual(grants)
-  })
-
-  it('rejects display labels in fixed language grants', () => {
-    expect(contentGrantsSchema.safeParse({ languages: ['Common'] }).success).toBe(false)
-  })
-
-  it('parses equipment grant arrays', () => {
-    const grants = {
-      equipment: [
-        { kind: 'grant' as const, equipmentSlug: 'dagger', quantity: 1 },
-        {
-          kind: 'choice' as const,
-          choose: 1,
-          pool: {
-            source: 'filtered' as const,
-            equipmentKind: 'tool' as const,
-            toolCategory: 'musical_instrument' as const,
-          },
-        },
-      ],
-    }
-    expect(contentGrantsSchema.parse(grants)).toEqual(grants)
-  })
-})
-
 describe('customContentTraitSchema', () => {
   it('parses a custom trait with optional grants', () => {
     const trait = {
@@ -431,7 +287,7 @@ describe('contentTraitSchema', () => {
       id: 'darkvision',
       name: 'Darkvision',
       description: '<p>You have Darkvision with a range of 60 feet.</p>',
-      grants: { senses: [{ type: 'darkvision' as const, range: 60 }] },
+      grantGroups: [{ grants: [{ kind: 'sense' as const, type: 'darkvision', range: 60 }] }],
     }
     expect(contentTraitSchema.parse(trait)).toEqual({
       ...trait,

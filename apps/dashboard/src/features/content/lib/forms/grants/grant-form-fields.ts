@@ -9,7 +9,8 @@ import {
   formatResistanceGrantSentence,
   formatSenseGrantSentence,
   getMovementModeGrantLabel,
-  INNATE_SPELL_KINDS,
+  getSpellGrantCastingModeLabel,
+  SPELL_GRANT_CASTING_MODES,
   MOVEMENT_BONUS_FEET,
   MOVEMENT_MODES,
   MOVEMENT_OPERATION_ENTRIES,
@@ -44,7 +45,6 @@ import {
 import type { ContentFormCtx } from '../content-form-registry'
 import { getLevelFieldOptions, withLevelOptionLabels } from '../../form-options/level-field-options'
 import { getSpellcastingAbilityFieldOptions } from '../../form-options/spellcasting-ability-field-options'
-import { titleCase } from '../../utils/title-case'
 import {
   equipmentGrantItemFields,
   type EquipmentGrantItemForm,
@@ -279,10 +279,10 @@ function senseRangeInlineSentenceField(
 }
 
 const spellModeOptions = toOptions(
-  INNATE_SPELL_KINDS,
+  SPELL_GRANT_CASTING_MODES,
   Object.fromEntries(
-    INNATE_SPELL_KINDS.map((k) => [k, titleCase(k.replaceAll('_', ' '))]),
-  ) as Record<(typeof INNATE_SPELL_KINDS)[number], string>,
+    SPELL_GRANT_CASTING_MODES.map((k) => [k, getSpellGrantCastingModeLabel(k)]),
+  ) as Record<(typeof SPELL_GRANT_CASTING_MODES)[number], string>,
 )
 
 const usageFrequencyOptions = toOptions(

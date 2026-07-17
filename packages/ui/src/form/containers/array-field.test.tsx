@@ -605,11 +605,11 @@ describe('ArrayFieldRenderer', () => {
           {
             kind: 'array',
             name: 'entries',
-            legend: 'Innate spell entries',
+            legend: 'Spell entries',
             addActionLabel: 'Add entry',
             visibility: {
               dependsOn: ['grantType'],
-              visibleWhen: (v) => v.grantType === 'innateSpells',
+              visibleWhen: (v) => v.grantType === 'spells',
             },
             fields: [{ type: 'text', name: 'spell', label: 'Spell', required: true }],
           },
@@ -631,7 +631,7 @@ describe('ArrayFieldRenderer', () => {
     expect(screen.queryByRole('button', { name: 'Add entry' })).not.toBeInTheDocument()
 
     await user.clear(screen.getByLabelText('Grant type'))
-    await user.type(screen.getByLabelText('Grant type'), 'innateSpells')
+    await user.type(screen.getByLabelText('Grant type'), 'spells')
 
     expect(screen.queryByLabelText('Sense detail')).not.toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Add entry' })).toBeInTheDocument()
