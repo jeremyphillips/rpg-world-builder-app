@@ -18,8 +18,34 @@ export const fieldGroupBodyShellLayoutClasses = cn(
 /** Subtle raised emboss for card-plane surfaces — inset highlight + drop shadow. */
 export const fieldSurfaceRaisedShadowClasses = 'shadow-surface-raised'
 
-/** Surface tone for stack dependents and array item shells. */
-export type FieldSurfaceTone = 'main' | 'elevated' | 'subtle' | 'medium' | 'warning' | 'error'
+/**
+ * Closed vocabulary for surface wash tones on array items, stack dependents, and
+ * group panels. Mixes elevation washes (`main`–`medium`) with semantic status
+ * (`warning`, `error`) on one axis — see `ArrayConfig.itemChrome` JSDoc.
+ */
+export const FIELD_SURFACE_TONES = [
+  'main',
+  'elevated',
+  'subtle',
+  'medium',
+  'warning',
+  'error',
+] as const
+
+/** Surface tone for stack dependents, array item shells, and related chrome. */
+export type FieldSurfaceTone = (typeof FIELD_SURFACE_TONES)[number]
+
+const fieldSurfaceToneClasses = {
+  main: 'border-border bg-background',
+  /** Opaque lift above the page plane — maps to the card surface token. */
+  elevated: cn('border-border bg-card', fieldSurfaceRaisedShadowClasses),
+  /** Very light wash — default for dependents and group panels. */
+  subtle: 'border-border bg-muted/10',
+  /** Medium wash — former `subtle` / `muted` panel strength. */
+  medium: 'border-border bg-muted/30',
+  warning: 'border-border bg-accent/30',
+  error: 'border-destructive/50 bg-destructive/10',
+} satisfies Record<FieldSurfaceTone, string>
 
 /**
  * Border/bg tone only — no layout padding. Shared by stack dependents wrapper
@@ -27,17 +53,7 @@ export type FieldSurfaceTone = 'main' | 'elevated' | 'subtle' | 'medium' | 'warn
  */
 export const fieldSurfaceToneVariants = cva('', {
   variants: {
-    tone: {
-      main: 'border-border bg-background',
-      /** Opaque lift above the page plane — maps to the card surface token. */
-      elevated: cn('border-border bg-card', fieldSurfaceRaisedShadowClasses),
-      /** Very light wash — default for dependents and group panels. */
-      subtle: 'border-border bg-muted/10',
-      /** Medium wash — former `subtle` / `muted` panel strength. */
-      medium: 'border-border bg-muted/30',
-      warning: 'border-border bg-accent/30',
-      error: 'border-destructive/50 bg-destructive/10',
-    },
+    tone: fieldSurfaceToneClasses,
   },
   defaultVariants: {
     tone: 'subtle',

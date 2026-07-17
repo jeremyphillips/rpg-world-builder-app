@@ -191,24 +191,61 @@ interface BaseFieldConfig {
   /** Form value key; also the basis of the generated control id. */
   name: string
   label: string
+  /**
+   * Control + label scale (`sm` | `md` | `lg`). Inherits form rhythm when omitted
+   * (`sm` for compact, `md` for comfortable top-level forms).
+   */
   size?: FieldSize
+  /**
+   * Width of the field wrapper within its container — see `FIELD_WIDTHS`.
+   *
+   * **Intrinsic** (`xs` ~64px, `sm`, `md`, `lg`, `xl`, `auto`): capped width; use
+   * `auto` or fractions inside a `kind: 'row'`. Standalone fields with `digits`
+   * usually keep `full` so label and hint span the column.
+   *
+   * **Row fractions** (`full`, `1/2`, `1/3`, `2/3`, `1/4`, `3/4`): meaningful
+   * only inside `kind: 'row'` — distributes flex grow weight on a base-12 scale.
+   *
+   * @default full
+   */
   width?: FieldWidth
   hint?: string
-  /** Helper text placement relative to the label and control. Default `below-label`. */
+  /**
+   * Helper text placement relative to the label and control.
+   *
+   * @default below-label
+   */
   hintPosition?: FieldHintPosition
   /** Renders the label `[i]` InfoTooltip. */
   info?: ReactNode
   required?: boolean
   disabled?: boolean
-  /** Optional conditional rendering; omit for always-visible fields. */
+  /**
+   * Conditional rendering — field is required only while visible. List every
+   * field name `visibleWhen` reads in `dependsOn` so the renderer can subscribe
+   * narrowly via `useWatch`.
+   */
   visibility?: FieldVisibility
   /** Optional helper text derived from other field values. */
   dynamicHint?: FieldDynamicHint
   /** Trailing divider after this field within a group/stack rhythm. */
   separator?: FieldSeparator
-  /** Visual shell around the full field anatomy (label + control + messages). */
+  /**
+   * Visual shell around the full field anatomy (label + control + messages).
+   * Discriminated union — not a flat enum:
+   *
+   * - `{ variant: 'plain' }` — default, no extra shell
+   * - `{ variant: 'panel', tone? }` — filled panel wash
+   * - `{ variant: 'outline', tone? }` — border-only inset
+   *
+   * Distinct from `itemChrome` / `dependentsChrome` surface tones on containers.
+   */
   chrome?: FieldChrome
-  /** Optional presentation overrides (e.g. read-only when only one option remains). */
+  /**
+   * Presentation overrides for option-backed fields (`select`, `combobox`, …).
+   * `readOnlyWhen` swaps the control for read-only chrome when it returns true
+   * (e.g. only one option remains).
+   */
   presentation?: FieldPresentationConfig
 }
 
@@ -581,7 +618,11 @@ export interface DiceFormulaFieldConfig extends BaseFieldConfig {
   countMax?: number
   modifierMin?: number
   modifierMax?: number
-  /** Allowed tail operators — single entry renders a static glyph instead of a select. */
+  /**
+   * Allowed tail operators (`DICE_FORMULA_TAIL_OPERATORS`: `'+'` | `'-'` | `'×'` | `'÷'`).
+   * A single entry renders a static glyph instead of an operator select.
+   * Defaults to `DICE_FORMULA_OPERATORS` (`['+', '-']`) when omitted.
+   */
   modifierOperators?: readonly DiceFormulaTailOperator[]
   /** sr-only / aria label for the tail amount input (e.g. "Multiplier"). */
   modifierAmountLabel?: string
@@ -935,9 +976,11 @@ export interface ArrayConfig {
    */
   compactInlineAlign?: ArrayCompactInlineAlign
   /**
-   * Border/background tone on each item shell.
+   * Border/background tone on each item shell (`FIELD_SURFACE_TONES`).
    *
-   * Allowed: `main` | `elevated` | `subtle` | `medium` | `warning` | `error`.
+   * Elevation washes: `main` | `elevated` | `subtle` | `medium`.
+   * Semantic status: `warning` | `error`.
+   * These share one prop axis today — not separate tone/emphasis fields.
    *
    * @default elevated
    */

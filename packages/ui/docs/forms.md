@@ -152,6 +152,20 @@ Simple leaf types (`text`, `number`, `checkbox`, …) do not need helpers.
 JSDoc on complex configs in [field-config.ts](../src/form/field-config.ts) documents
 common options, defaults, and allowed values — especially `ArrayConfig.itemChrome`.
 
+### Vocabularies and hover documentation
+
+Closed token sets are exported as const inventories from `@rpg/ui/form`:
+
+| Export                        | Use                                        |
+| ----------------------------- | ------------------------------------------ |
+| `FIELD_WIDTHS`                | `BaseFieldConfig.width`                    |
+| `FIELD_SURFACE_TONES`         | `itemChrome`, `dependentsChrome`           |
+| `DICE_FORMULA_TAIL_OPERATORS` | `DiceFormulaFieldConfig.modifierOperators` |
+
+Types derive from inventories; CVA class maps use `satisfies Record<…>` for compile-time
+parity. JSDoc on `BaseFieldConfig` and variant interfaces explains semantics and defaults —
+review manually when authoring contracts change. No mass migration to `define*` required.
+
 ## Container kinds
 
 | `kind`  | Purpose                          | Detail                                              |

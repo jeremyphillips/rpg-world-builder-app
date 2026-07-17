@@ -1,6 +1,6 @@
 import { cva, type VariantProps } from 'class-variance-authority'
 
-import { fieldSurfaceToneVariants } from './field-surface.variants'
+import { fieldSurfaceToneVariants, type FieldSurfaceTone } from './field-surface.variants'
 
 export type {
   FieldSurfaceTone,
@@ -16,13 +16,7 @@ export {
 } from './field-surface.variants'
 
 /** Surface tone for dependents-only chrome on toggle-dependent stacks. */
-export type FieldStackDependentsTone =
-  | 'main'
-  | 'elevated'
-  | 'subtle'
-  | 'medium'
-  | 'warning'
-  | 'error'
+export type FieldStackDependentsTone = FieldSurfaceTone
 
 /** Where `dependentsChrome` tone applies on toggle-dependent stacks. */
 export type FieldStackDependentsChromeScope = 'wrapper' | 'arrayItems'

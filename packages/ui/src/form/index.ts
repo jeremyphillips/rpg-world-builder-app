@@ -150,6 +150,14 @@ export {
   defineSelectField,
   defineStackField,
 } from './form-authoring'
+export { FIELD_WIDTHS, type FieldWidth } from '../components/ui/field-control.variants'
+export { FIELD_SURFACE_TONES, type FieldSurfaceTone } from '../components/ui/field-surface.variants'
+export {
+  DICE_FORMULA_TAIL_OPERATORS,
+  DICE_FORMULA_OPERATORS,
+  type DiceFormulaTailOperator,
+} from '../components/ui/dice-formula-field.lib'
+export type { FieldSize } from '../components/ui/field.client'
 export { makeFieldErrorMap, type RawZodIssueLike } from './config/field-error-map'
 export { makeResolver } from './config/form-resolver'
 export { navigateInvalidSubmit } from './config/navigate-invalid-submit.client'
