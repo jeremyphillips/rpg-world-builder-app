@@ -261,6 +261,23 @@ export interface TextareaFieldConfig extends BaseFieldConfig {
   optionalDisclosure?: OptionalDisclosureConfig
 }
 
+/**
+ * Dropdown bound to a single string value (`type: 'select'`).
+ *
+ * Common options: `options`, `placeholder`, `optionAvailability`, `digits`, `labelPosition`,
+ * `visibility`, `required`.
+ *
+ * Use `defineSelectField()` for variant-specific completion, or a plain object literal.
+ *
+ * @example
+ * defineSelectField({
+ *   type: 'select',
+ *   name: 'status',
+ *   label: 'Status',
+ *   options: toOptions(STATUSES, STATUS_LABELS),
+ *   required: true,
+ * })
+ */
 export interface SelectFieldConfig extends BaseFieldConfig {
   type: 'select'
   options: SelectFieldOptionListItem[]
@@ -399,7 +416,26 @@ export type {
   InlineSentenceTextSegment,
 } from '../components/ui/inline-sentence-field.types'
 
-/** Composable inline prose + bound controls (number, select) with optional chips below. */
+/**
+ * Composable inline prose + bound controls (`type: 'inlineSentence'`).
+ *
+ * Common options: `segments`, `below`, `hideLabel`, `chipSize`, `visibility`, `required`.
+ *
+ * Prefer over deprecated `chooseFromChips` / `inlineChooseCount` for new authoring.
+ * Use `defineInlineSentenceField()` for variant-specific completion.
+ *
+ * @example
+ * defineInlineSentenceField({
+ *   type: 'inlineSentence',
+ *   name: 'movement',
+ *   label: 'Speed',
+ *   segments: [
+ *     { kind: 'text', value: 'Walk' },
+ *     { kind: 'number', name: 'walk', digits: 'sm' },
+ *     { kind: 'text', value: 'ft.' },
+ *   ],
+ * })
+ */
 export interface InlineSentenceFieldConfig extends BaseFieldConfig {
   type: 'inlineSentence'
   segments: InlineSentenceSegment[]
@@ -474,13 +510,32 @@ export interface LevelRangeFieldConfig extends BaseFieldConfig {
 }
 
 /**
- * Searchable dropdown for picking one or many values from a large option list.
- * `multiple: true` (default) → value is `string[]`; selected values render as removable badges.
- * `multiple: false` → value is `string`; picking an option closes the panel.
+ * Searchable option picker (`type: 'combobox'`) for large lists.
+ *
+ * Common options: `options`, `multiple`, `max`, `placeholder`, `renderSelectedItem`,
+ * `visibility`, `required`.
+ *
+ * - `multiple: true` (default) — value is `string[]`; selections render as removable badges.
+ * - `multiple: false` — value is `string`; picking closes the panel.
+ *
+ * Use `defineComboboxField()` for variant-specific completion.
+ *
+ * @example
+ * defineComboboxField({
+ *   type: 'combobox',
+ *   name: 'tags',
+ *   label: 'Tags',
+ *   options: tagOptions,
+ *   placeholder: 'Search tags…',
+ * })
  */
 export interface ComboboxFieldConfig extends BaseFieldConfig {
   type: 'combobox'
   options: FieldOption[]
+  /**
+   * Single vs multi selection. Defaults to `true` (`string[]` value).
+   * Set `false` for a single `string` value.
+   */
   multiple?: boolean
   /** Maximum selections when `multiple` is true. */
   max?: number
@@ -603,7 +658,13 @@ export interface InputUnitFieldConfig extends BaseFieldConfig {
   defaultValue?: number
 }
 
-/** Discriminated union of every leaf field, keyed by `type`. */
+/**
+ * Discriminated union of every leaf field, keyed by `type`.
+ *
+ * Simple types (`text`, `number`, `checkbox`, …) need no authoring helper — use plain
+ * object literals. Complex types have `define*Field()` helpers in `form-authoring.ts`
+ * (`defineSelectField`, `defineComboboxField`, `defineInlineSentenceField`, …).
+ */
 export type FieldConfig =
   | TextFieldConfig
   | NumberFieldConfig
@@ -652,7 +713,24 @@ export type GroupFieldItem =
   | StackConfig
   | ArrayConfig
 
-/** Layout-only container for controller + dependent fields (no fieldset legend). */
+/**
+ * Layout-only column for a controller field plus dependents (`kind: 'stack'`).
+ *
+ * Common options: `fields` (index 0 = controller), `dependentsVisibility`,
+ * `dependentsChrome`, `dependentsChromeScope`, `rhythm`, `visibility`.
+ *
+ * When `fields[0]` is a switch and `dependentsVisibility` is omitted, dependents
+ * show only while the switch is on. Use `defineStackField()` for completion.
+ *
+ * @example
+ * defineStackField({
+ *   kind: 'stack',
+ *   fields: [
+ *     { type: 'switch', name: 'enabled', label: 'Custom rule' },
+ *     { type: 'text', name: 'formula', label: 'Formula' },
+ *   ],
+ * })
+ */
 export interface StackConfig {
   kind: 'stack'
   layout?: FieldStackLayout
@@ -682,7 +760,24 @@ export interface StackConfig {
   id?: string
 }
 
-/** A semantic fieldset/legend grouping, mapped to `FieldGroup`. */
+/**
+ * Named fieldset subsection (`kind: 'group'`).
+ *
+ * Common options: `legend`, `fields`, `legendSize`, `rhythm`, `fieldsChrome`,
+ * `description`, `visibility`.
+ *
+ * Nested groups inside another group often use `legendSize: 'subsection'`.
+ * Use `defineGroupField()` for completion.
+ *
+ * @example
+ * defineGroupField({
+ *   kind: 'group',
+ *   legend: 'Damage',
+ *   fields: [
+ *     { type: 'text', name: 'dice', label: 'Dice', required: true },
+ *   ],
+ * })
+ */
 export interface GroupConfig {
   kind: 'group'
   legend: string
@@ -763,9 +858,23 @@ export interface ArrayItemHeaderConfig {
 }
 
 /**
- * A repeatable field array backed by `useFieldArray`. Item `fields` use
- * **relative** names (`name`, `description`) — the renderer prefixes them with
- * the array name and item index at render time (e.g. `traits.0.name`).
+ * Repeatable list section (`kind: 'array'`).
+ *
+ * Common options: `legend`, `fields`, `itemHeader`, `itemCollapsible`, `itemChrome`,
+ * `min`, `max`, `addActionLabel`, `itemVariant`, `addActionMenu`.
+ *
+ * Item `fields` use **relative** names — the renderer prefixes them with the array
+ * name and index (e.g. `traits.0.name`). Use `defineArrayField()` for completion.
+ *
+ * @example
+ * defineArrayField({
+ *   kind: 'array',
+ *   name: 'traits',
+ *   legend: 'Traits',
+ *   addActionLabel: 'Add trait',
+ *   itemHeader: { fallback: (i) => `Trait ${i + 1}`, primaryField: 'name' },
+ *   fields: [{ type: 'text', name: 'name', label: 'Name', required: true }],
+ * })
  */
 export interface ArrayConfig {
   kind: 'array'
@@ -826,9 +935,11 @@ export interface ArrayConfig {
    */
   compactInlineAlign?: ArrayCompactInlineAlign
   /**
-   * Border/background tone on each item shell (`main` | `elevated` | `subtle` | `medium` |
-   * `warning` | `error`). Defaults to `elevated` (`bg-card`); overrides inherited stack
-   * `dependentsChrome` when `dependentsChromeScope` is `arrayItems`.
+   * Border/background tone on each item shell.
+   *
+   * Allowed: `main` | `elevated` | `subtle` | `medium` | `warning` | `error`.
+   *
+   * @default elevated
    */
   itemChrome?: FieldStackDependentsTone
   /** Header labels and optional collapsed summary for each item row. */
@@ -914,7 +1025,13 @@ export interface SlotConfig {
   size?: FieldSize
 }
 
-/** Any item allowed at the top level of a form's `fields` array. */
+/**
+ * Any item allowed at the top level of a form's `fields` array (or a tab panel).
+ *
+ * Leaf fields (`FieldConfig`), horizontal rows (`kind: 'row'`), and containers
+ * (`group`, `stack`, `array`, `slot`). Wrap trees with `defineForm()` or reusable
+ * sections with `defineFormItems()` — plain arrays remain valid.
+ */
 export type FormItem =
   | FieldConfig
   | RowConfig

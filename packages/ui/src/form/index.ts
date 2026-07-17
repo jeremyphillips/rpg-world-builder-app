@@ -140,6 +140,16 @@ export {
   type ArrayPatternConfig,
   type ArrayErrorFocusContext,
 } from './field-config'
+export {
+  defineArrayField,
+  defineComboboxField,
+  defineForm,
+  defineFormItems,
+  defineGroupField,
+  defineInlineSentenceField,
+  defineSelectField,
+  defineStackField,
+} from './form-authoring'
 export { makeFieldErrorMap, type RawZodIssueLike } from './config/field-error-map'
 export { makeResolver } from './config/form-resolver'
 export { navigateInvalidSubmit } from './config/navigate-invalid-submit.client'

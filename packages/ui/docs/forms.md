@@ -129,6 +129,29 @@ Dense chip fields stack full-width — don't cram many options into a `FieldRow`
 
 Spacing tokens, `width`, `digits`, row layouts: [sizing-and-spacing.md](./forms/sizing-and-spacing.md).
 
+## Authoring helpers
+
+Optional identity helpers in `@rpg/ui/form` improve editor completion without changing
+the renderer. Plain object literals remain fully valid.
+
+| Helper                        | Use for                                           |
+| ----------------------------- | ------------------------------------------------- |
+| `defineForm()`                | Top-level `fields` passed to `<Form>` or a tab    |
+| `defineFormItems()`           | Reusable sections (tab panels, exported builders) |
+| `defineArrayField()`          | `kind: 'array'` — repeatable lists                |
+| `defineSelectField()`         | `type: 'select'`                                  |
+| `defineStackField()`          | `kind: 'stack'` — controller + dependents         |
+| `defineGroupField()`          | `kind: 'group'` — fieldset subsection             |
+| `defineComboboxField()`       | `type: 'combobox'`                                |
+| `defineInlineSentenceField()` | `type: 'inlineSentence'`                          |
+
+Simple leaf types (`text`, `number`, `checkbox`, …) do not need helpers.
+
+**VS Code snippets** (`.vscode/form.code-snippets`): `form-def`, `form-items`, `form-array`.
+
+JSDoc on complex configs in [field-config.ts](../src/form/field-config.ts) documents
+common options, defaults, and allowed values — especially `ArrayConfig.itemChrome`.
+
 ## Container kinds
 
 | `kind`  | Purpose                          | Detail                                              |
