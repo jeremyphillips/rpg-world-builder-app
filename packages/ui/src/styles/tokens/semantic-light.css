@@ -14,7 +14,7 @@
   --popover: var(--palette-surface-panel);
   --popover-foreground: var(--foreground);
   --secondary: var(--palette-surface-secondary);
-  --secondary-foreground: var(--palette-fg-secondary);
+  --secondary-foreground: var(--foreground);
   --surface-subtle: var(--palette-surface-subtle);
   --surface-muted: var(--palette-surface-muted);
   --surface-strong: var(--palette-surface-strong);
@@ -22,7 +22,7 @@
   --sunken: var(--palette-surface-sunken);
   --muted-foreground: var(--palette-fg-muted);
   --accent: var(--palette-surface-accent);
-  --accent-foreground: var(--palette-fg-secondary);
+  --accent-foreground: var(--foreground);
 
   /* Text — default body copy (`text-foreground`, `text-muted-foreground`, …) */
   --foreground: var(--palette-fg-default);
@@ -119,16 +119,16 @@
 
   /*
    * Shared interaction recipes — public contract for hover/selected/drag/track chrome.
-   * May alias surface/border ladder steps; tune independently per theme at Layer 1.
+   * Composed at Layer 2 toward concrete surfaces (no transparent washes).
    */
-  --control-hover-bg: var(--palette-control-hover-bg);
-  --control-selected-bg: var(--palette-control-selected-bg);
-  --row-hover-bg: var(--palette-row-hover-bg);
-  --row-selected-bg: var(--palette-row-selected-bg);
-  --row-selected-border: var(--palette-row-selected-border);
-  --drop-target-bg: var(--palette-drop-target-bg);
-  --drop-target-border: var(--palette-drop-target-border);
-  --segmented-track-bg: var(--palette-segmented-track-bg);
+  --control-hover-bg: color-mix(in oklch, var(--accent) 35%, var(--background));
+  --control-selected-bg: color-mix(in oklch, var(--accent) 22%, var(--background));
+  --row-hover-bg: var(--surface-subtle);
+  --row-selected-bg: var(--surface-strong);
+  --row-selected-border: var(--border-strong);
+  --drop-target-bg: color-mix(in oklch, var(--accent) 35%, var(--background));
+  --drop-target-border: var(--primary);
+  --segmented-track-bg: var(--surface-strong);
 
   /* Component recipes — one-off surfaces not covered by roles above */
   --catalog-picker-row-surface: var(--surface-muted);

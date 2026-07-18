@@ -3,7 +3,7 @@
  * define every entry. Used by palette-parity tests and Storybook catalog.
  */
 
-export const PALETTE_WARMTH_STEPS = ['neutral-hue'] as const
+export const PALETTE_WARMTH_STEPS = ['neutral-hue', 'neutral-contrast'] as const
 
 export const PALETTE_SURFACE_ELEVATION_STEPS = [
   'surface-base',
@@ -11,7 +11,7 @@ export const PALETTE_SURFACE_ELEVATION_STEPS = [
   'surface-muted',
   'surface-strong',
   'surface-panel',
-  'surface-raised',
+  'surface-field',
   'surface-sunken',
   'surface-secondary',
   'surface-accent',
@@ -19,18 +19,6 @@ export const PALETTE_SURFACE_ELEVATION_STEPS = [
 
 export const PALETTE_FIELD_STEPS = [
   'field-bg',
-  'field-bg-on-raised',
-  'field-bg-on-raised-readonly',
-  'field-bg-on-raised-disabled',
-  'field-bg-on-wash-subtle',
-  'field-bg-on-wash-subtle-readonly',
-  'field-bg-on-wash-subtle-disabled',
-  'field-bg-on-wash-muted',
-  'field-bg-on-wash-muted-readonly',
-  'field-bg-on-wash-muted-disabled',
-  'field-bg-on-wash-strong',
-  'field-bg-on-wash-strong-readonly',
-  'field-bg-on-wash-strong-disabled',
   'field-border',
   'field-border-hover',
   'field-fg-disabled',
@@ -52,7 +40,7 @@ export const PALETTE_SIDEBAR_STEPS = ['sidebar-surface', 'sidebar-shade'] as con
 export const PALETTE_FG_STEPS = [
   'fg-default',
   'fg-muted',
-  'fg-secondary',
+  'fg-disabled',
   'fg-on-solid',
   'fg-on-status',
 ] as const
@@ -63,17 +51,6 @@ export const PALETTE_CHROME_STEPS = [
   'border-strong',
   'border-selected',
   'overlay',
-] as const
-
-export const PALETTE_INTERACTION_STEPS = [
-  'control-hover-bg',
-  'control-selected-bg',
-  'row-hover-bg',
-  'row-selected-bg',
-  'row-selected-border',
-  'drop-target-bg',
-  'drop-target-border',
-  'segmented-track-bg',
 ] as const
 
 export const PALETTE_BRAND_STEPS = ['primary', 'primary-foreground', 'on-solid'] as const
@@ -111,7 +88,6 @@ export const PALETTE_PRIMITIVE_STEPS = [
   ...PALETTE_SIDEBAR_STEPS,
   ...PALETTE_FG_STEPS,
   ...PALETTE_CHROME_STEPS,
-  ...PALETTE_INTERACTION_STEPS,
   ...PALETTE_BRAND_STEPS,
   ...PALETTE_STATUS_STEPS,
   ...PALETTE_SEMANTIC_TEXT_STEPS,
@@ -121,6 +97,22 @@ export const PALETTE_PRIMITIVE_STEPS = [
 export const PALETTE_PRIMITIVE_VARS: readonly string[] = PALETTE_PRIMITIVE_STEPS.map(
   (step) => `--palette-${step}`,
 )
+
+/** Layer 1 tokens removed by the neutral foundation reset — absence tests guard these. */
+export const DEPRECATED_PALETTE_TOKENS = [
+  '--palette-surface-raised',
+  '--palette-fg-secondary',
+  '--palette-control-hover-bg',
+  '--palette-control-selected-bg',
+  '--palette-row-hover-bg',
+  '--palette-row-selected-bg',
+  '--palette-row-selected-border',
+  '--palette-drop-target-bg',
+  '--palette-drop-target-border',
+  '--palette-segmented-track-bg',
+] as const
+
+export const DEPRECATED_PALETTE_TOKEN_PREFIXES = ['--palette-field-bg-on-'] as const
 
 export interface PalettePrimitiveGroup {
   id: string
@@ -133,13 +125,15 @@ export const PALETTE_PRIMITIVE_GROUPS: PalettePrimitiveGroup[] = [
   {
     id: 'warmth',
     label: 'Warmth anchor',
-    description: 'Hue anchor for color-mix recipes (sidebar, overlay).',
+    description:
+      'Hue and contrast ingredients for color-mix recipes (sidebar, washes, derived borders).',
     steps: PALETTE_WARMTH_STEPS,
   },
   {
     id: 'elevation',
     label: 'Elevation surfaces',
-    description: 'Canvas → wash ladder → warm panel; sunken recessed; raised = field fill only.',
+    description:
+      'Authored canvas/panel/field anchors plus formula-derived wash ladder; sunken recessed.',
     steps: PALETTE_SURFACE_ELEVATION_STEPS,
   },
   {
@@ -162,19 +156,13 @@ export const PALETTE_PRIMITIVE_GROUPS: PalettePrimitiveGroup[] = [
   {
     id: 'foreground',
     label: 'Foreground',
-    description: 'Text roles — same names across themes, different oklch per theme.',
+    description: 'Text roles — fg-muted/disabled derived from fg-default toward canvas.',
     steps: PALETTE_FG_STEPS,
   },
   {
     id: 'chrome',
     label: 'Chrome',
     steps: PALETTE_CHROME_STEPS,
-  },
-  {
-    id: 'interaction',
-    label: 'Interaction recipes',
-    description: 'Shared hover/selected/drag/track washes — mapped by Layer 2 recipe roles.',
-    steps: PALETTE_INTERACTION_STEPS,
   },
   {
     id: 'brand',
@@ -194,7 +182,7 @@ export const PALETTE_PRIMITIVE_GROUPS: PalettePrimitiveGroup[] = [
   },
 ]
 
-/** Elevation ladder order for Storybook stacked previews (base → raised). */
+/** Elevation ladder order for Storybook stacked previews (base → panel). */
 export const PALETTE_ELEVATION_LADDER: readonly string[] = [
   'surface-base',
   'surface-subtle',
@@ -224,4 +212,16 @@ export const FIELD_CONTROL_SEMANTIC_ROLES = [
   '--field-control-bg-invalid',
   '--field-control-border-invalid',
   '--field-control-ring-invalid',
+] as const
+
+/** Layer 2 interaction recipe roles composed in semantic-*.css (not Layer 1). */
+export const INTERACTION_SEMANTIC_ROLES = [
+  '--control-hover-bg',
+  '--control-selected-bg',
+  '--row-hover-bg',
+  '--row-selected-bg',
+  '--row-selected-border',
+  '--drop-target-bg',
+  '--drop-target-border',
+  '--segmented-track-bg',
 ] as const

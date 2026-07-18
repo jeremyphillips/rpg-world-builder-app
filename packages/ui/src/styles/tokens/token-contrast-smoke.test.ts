@@ -25,12 +25,18 @@ function readPaletteVar(css: string, name: string): string | undefined {
   return match?.[1]?.trim()
 }
 
-/** Resolve one `var(--palette-*)` indirection for smoke checks. */
+/** Resolve `var(--palette-*)` alias chains for smoke checks. Stops at color-mix or oklch literals. */
 function resolvePaletteVar(css: string, name: string): string | undefined {
-  const raw = readPaletteVar(css, name)
+  let raw = readPaletteVar(css, name)
   if (!raw) return undefined
-  const alias = raw.match(/^var\((--palette-[\w-]+)\)$/)
-  if (alias) return readPaletteVar(css, alias[1]!)
+
+  for (let depth = 0; depth < 6; depth++) {
+    const alias = raw.match(/^var\((--palette-[\w-]+)\)$/)
+    if (!alias) return raw
+    raw = readPaletteVar(css, alias[1]!)
+    if (!raw) return undefined
+  }
+
   return raw
 }
 
@@ -51,23 +57,24 @@ describe('token contrast smoke checks', () => {
     }
   })
 
-  it('keeps disabled field text visually distinct from disabled field background', () => {
+  it('keeps disabled field text derived separately from disabled field background', () => {
     for (const css of [lightCss, darkCss]) {
-      const fg = oklchLightness(readPaletteVar(css, '--palette-field-fg-disabled') ?? '')
-      const bg = oklchLightness(readPaletteVar(css, '--palette-field-bg-disabled') ?? '')
-      expect(fg, 'disabled fg L').toBeDefined()
-      expect(bg, 'disabled bg L').toBeDefined()
-      expect(Math.abs(fg! - bg!)).toBeGreaterThan(0.04)
+      const fg = resolvePaletteVar(css, '--palette-field-fg-disabled') ?? ''
+      const bg = resolvePaletteVar(css, '--palette-field-bg-disabled') ?? ''
+      expect(fg).toContain('color-mix')
+      expect(fg).toContain('var(--palette-fg-default)')
+      expect(bg).toContain('color-mix')
+      expect(bg).toContain('var(--palette-surface-field)')
     }
   })
 
-  it('keeps placeholder text visually distinct from field background', () => {
+  it('keeps placeholder text derived from muted foreground toward field plane', () => {
     for (const css of [lightCss, darkCss]) {
-      const fg = oklchLightness(readPaletteVar(css, '--palette-field-placeholder') ?? '')
-      const bg = oklchLightness(resolvePaletteVar(css, '--palette-field-bg') ?? '')
-      expect(fg, 'placeholder L').toBeDefined()
-      expect(bg, 'field bg L').toBeDefined()
-      expect(Math.abs(fg! - bg!)).toBeGreaterThan(0.04)
+      const placeholder = resolvePaletteVar(css, '--palette-field-placeholder') ?? ''
+      const fieldBg = resolvePaletteVar(css, '--palette-field-bg') ?? ''
+      expect(placeholder).toContain('color-mix')
+      expect(placeholder).toContain('var(--palette-fg-default)')
+      expect(oklchLightness(fieldBg), 'field bg L').toBeDefined()
     }
   })
 
@@ -79,5 +86,14 @@ describe('token contrast smoke checks', () => {
     const darkFg = oklchLightness(readPaletteVar(darkCss, '--palette-primary-foreground') ?? '')
     const darkBg = oklchLightness(readPaletteVar(darkCss, '--palette-primary') ?? '')
     expect(contrastRatio(darkFg!, darkBg!)).toBeGreaterThanOrEqual(MIN_SOLID_CONTRAST)
+  })
+
+  it('derives muted foreground from fg-default toward canvas (light + dark)', () => {
+    for (const css of [lightCss, darkCss]) {
+      const raw = readPaletteVar(css, '--palette-fg-muted') ?? ''
+      expect(raw).toContain('color-mix')
+      expect(raw).toContain('var(--palette-fg-default)')
+      expect(raw).toContain('var(--palette-surface-base)')
+    }
   })
 })

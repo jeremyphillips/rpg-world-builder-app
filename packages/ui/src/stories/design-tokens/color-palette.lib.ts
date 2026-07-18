@@ -17,6 +17,8 @@ export interface ColorToken {
   /** Optional paired foreground for text-on-fill samples. */
   foregroundVar?: `--${string}`
   foregroundTailwind?: string
+  /** Demo fill behind `usage: 'text'` swatches that are meant for solid/status planes (not canvas). */
+  textDemoSurfaceVar?: `--${string}`
 }
 
 export interface ColorTokenGroup {
@@ -77,6 +79,22 @@ function palettePrimitiveUsage(step: string): ColorTokenUsage {
   return 'background'
 }
 
+/** Canvas would hide ink-on-solid samples — show on the plane each role is authored for. */
+const PALETTE_TEXT_DEMO_SURFACES: Partial<Record<string, `--${string}`>> = {
+  'fg-on-solid': '--palette-primary',
+  'fg-on-status': '--palette-warning',
+}
+
+function palettePrimitiveToken(step: string): ColorToken {
+  return {
+    name: step,
+    cssVar: `--palette-${step}`,
+    tailwind: '(palette only)',
+    usage: palettePrimitiveUsage(step),
+    textDemoSurfaceVar: PALETTE_TEXT_DEMO_SURFACES[step],
+  }
+}
+
 /** Layer 1 palette primitives — not Tailwind utilities; tune in `tokens/palette-*.css`. */
 export const PALETTE_PRIMITIVE_TOKEN_GROUPS: ColorTokenGroup[] = PALETTE_PRIMITIVE_GROUPS.map(
   (group) => ({
@@ -86,12 +104,7 @@ export const PALETTE_PRIMITIVE_TOKEN_GROUPS: ColorTokenGroup[] = PALETTE_PRIMITI
     tokens:
       group.id === 'elevation'
         ? PALETTE_ORTHOGONAL_SURFACE_TOKENS
-        : group.steps.map((step) => ({
-            name: step,
-            cssVar: `--palette-${step}`,
-            tailwind: '(palette only)',
-            usage: palettePrimitiveUsage(step),
-          })),
+        : group.steps.map((step) => palettePrimitiveToken(step)),
   }),
 )
 

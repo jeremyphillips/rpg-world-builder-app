@@ -74,8 +74,14 @@ function ColorSwatch({ token }: { token: ColorToken }) {
       <div
         className={cn(
           colorPaletteSwatchVisualClasses,
-          'flex items-center justify-center rounded-lg border border-border bg-background px-4',
+          'flex items-center justify-center rounded-lg border border-border px-4',
+          token.textDemoSurfaceVar ? undefined : 'bg-background',
         )}
+        style={
+          token.textDemoSurfaceVar
+            ? { backgroundColor: `var(${token.textDemoSurfaceVar})` }
+            : undefined
+        }
       >
         <span
           className={cn('text-base font-medium', token.tailwind)}
@@ -244,8 +250,14 @@ function OnSurfaceSwatch({ token }: { token: ColorToken }) {
         <div
           className={cn(
             colorPaletteOnSurfaceVisualClasses,
-            'flex items-center rounded-lg border border-border-subtle bg-surface-subtle px-3',
+            'flex items-center rounded-lg border border-border-subtle px-3',
+            token.textDemoSurfaceVar ? undefined : 'bg-surface-subtle',
           )}
+          style={
+            token.textDemoSurfaceVar
+              ? { backgroundColor: `var(${token.textDemoSurfaceVar})` }
+              : undefined
+          }
         >
           <p
             className={cn('truncate text-sm font-medium', token.tailwind)}

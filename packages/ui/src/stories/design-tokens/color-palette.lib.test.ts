@@ -4,6 +4,7 @@ import {
   COLOR_TOKEN_GROUPS,
   ON_SURFACE_TOKENS,
   PALETTE_ELEVATION_LADDER_TOKENS,
+  PALETTE_PRIMITIVE_TOKEN_GROUPS,
   SURFACE_BACKGROUNDS,
 } from './color-palette.lib'
 
@@ -36,5 +37,13 @@ describe('color-palette.lib', () => {
       'surface-panel',
       'surface-sunken',
     ])
+  })
+
+  it('shows ink-on-solid palette foregrounds on a demo solid surface', () => {
+    const fgGroup = PALETTE_PRIMITIVE_TOKEN_GROUPS.find(
+      (group) => group.id === 'palette-foreground',
+    )
+    const onSolid = fgGroup?.tokens.find((token) => token.name === 'fg-on-solid')
+    expect(onSolid?.textDemoSurfaceVar).toBe('--palette-primary')
   })
 })

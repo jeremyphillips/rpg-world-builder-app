@@ -16,9 +16,20 @@ Layer 3  globals.css @theme + custom utilities  bg-*, text-*, border-input, …
 
 **Components consume Layer 2 / Tailwind utilities only** — never `--palette-*` in UI code.
 
-Layer 2 color roles map to `var(--palette-…)` or `var(--<other-layer-2-role>)` only. No raw
+Layer 2 color roles map to `var(--palette-…)`, `var(--<other-layer-2-role>)`, or
+`color-mix` of those roles toward a **concrete surface** (not `transparent`). No raw
 color literals and no references to component recipes (`--catalog-picker-row-surface`,
-`--surface-raised-shadow`) inside semantic role definitions.
+`--surface-raised-shadow`) inside generic semantic role definitions.
+
+## Anchors vs derived scales
+
+Layer 1 neutrals split into **authored anchors** (canvas, panel, field plane, primary ink)
+and **formula-derived scales** (wash ladder, muted/disabled text, generic borders, field
+strokes). Ratios may differ by theme; role names do not.
+
+Derived roles resolve to **final usable colors** — consumers do not stack `/NN` alpha on them.
+
+See [`palette-inventory.md`](../src/styles/tokens/palette-inventory.md) for the full inventory.
 
 ## Ladder vs recipe
 
@@ -62,18 +73,19 @@ Status borders stay status-specific (`border-destructive-muted`, …). Recipe bo
 
 ## Interaction recipes
 
-Shared recipes (Layer 2 → Tailwind):
+Shared recipes (Layer 2 → Tailwind). Tinted washes mix toward `--background` (or another
+concrete surface), not `transparent`:
 
-| CSS role                | Utility                      |
-| ----------------------- | ---------------------------- |
-| `--control-hover-bg`    | `bg-control-hover`           |
-| `--control-selected-bg` | `bg-control-selected`        |
-| `--row-hover-bg`        | `hover:bg-row-hover`         |
-| `--row-selected-bg`     | `bg-row-selected`            |
-| `--row-selected-border` | `border-row-selected-border` |
-| `--drop-target-bg`      | `bg-drop-target`             |
-| `--drop-target-border`  | `border-drop-target-border`  |
-| `--segmented-track-bg`  | `bg-segmented-track`         |
+| CSS role                | Utility                      | Composition (light/dark)         |
+| ----------------------- | ---------------------------- | -------------------------------- |
+| `--control-hover-bg`    | `bg-control-hover`           | `color-mix(accent → background)` |
+| `--control-selected-bg` | `bg-control-selected`        | `color-mix(accent → background)` |
+| `--row-hover-bg`        | `hover:bg-row-hover`         | `--surface-subtle`               |
+| `--row-selected-bg`     | `bg-row-selected`            | `--surface-strong`               |
+| `--row-selected-border` | `border-row-selected-border` | `--border-strong`                |
+| `--drop-target-bg`      | `bg-drop-target`             | `color-mix(accent → background)` |
+| `--drop-target-border`  | `border-drop-target-border`  | `--primary`                      |
+| `--segmented-track-bg`  | `bg-segmented-track`         | `--surface-strong`               |
 
 Add a new recipe only when the state is reused, owned by a shared primitive, or must stay
 independently tunable across light/dark. One-offs stay in local CVA using the ladder or status
@@ -106,14 +118,27 @@ Do not merge text-tuned values onto solid status hues.
 
 - Layer 2: `--field-control-*` matrix in `semantic-*.css`.
 - Public utilities: `border-input`, `bg-input`, and state variants in `globals.css`.
-- **On panel/wash:** `.bg-card`, `.bg-popover`, and `.bg-surface-subtle|muted|strong` re-scope
-  `--field-control-bg` (and readonly/disabled) via `--palette-field-bg-on-raised` and
-  `--palette-field-bg-on-wash-*`. Panels use the canonical near-white field fill; wash shells
-  recess controls one ladder step (e.g. dependent `surface: 'subtle'`).
+- **Global fill:** `--field-control-bg` → `--palette-surface-field` everywhere. No
+  parent-scoped re-scoping in `globals.css` under `.bg-card` / `.bg-surface-*`.
+- **Rare overrides:** set `--field-control-bg` locally in the component that creates an
+  unusual shell context.
 - **Single recipe owner:** [`field-input-chrome.variants.ts`](../src/components/ui/field-input-chrome.variants.ts).
 - Individual controls import that recipe; do not reconstruct field chrome with ad-hoc opacity stacks.
 
 Switch unchecked track uses `--switch-track*` — separate from field border ownership.
+
+## Visual acceptance checklist
+
+Review in Storybook (both modes) without pixel-matching:
+
+- Page → panel → field
+- Page → subtle wash → field
+- Panel → read-only field
+- Panel → disabled field (disabled quieter than readonly and default)
+- Muted text on page and on panel
+- Placeholder on field
+- Default / subtle / strong border on page and on panel
+- Control-hover / row-hover on page and on panel (opaque mix holds up)
 
 ## Shared tone enum
 
@@ -127,6 +152,7 @@ Token tests in `packages/ui/src/styles/tokens/`:
 
 - Palette name parity (light ↔ dark)
 - Semantic role parity + Layer 2 composition rule
+- Neutral foundation absence checks (`neutral-foundation-absence.test.ts`)
 - Field-control role completeness
 - Contrast smoke checks on key pairs
 - Alpha utility ban (`alpha-utility-ban.test.ts`)

@@ -4,15 +4,19 @@ import { fileURLToPath } from 'node:url'
 
 import { describe, expect, it } from 'vitest'
 
-import { FIELD_CONTROL_SEMANTIC_ROLES } from './palette-inventory'
+import { FIELD_CONTROL_SEMANTIC_ROLES, INTERACTION_SEMANTIC_ROLES } from './palette-inventory'
 
 const tokensDir = join(dirname(fileURLToPath(import.meta.url)), '.')
 
 /** Theme-invariant layout tokens live only in semantic-light.css. */
 const LAYOUT_SEMANTIC_ROLES = new Set(['--radius', '--radius-card'])
 
-/** Component recipes may use color-mix — excluded from palette-only mapping checks. */
-const RECIPE_SEMANTIC_ROLES = new Set(['--catalog-picker-row-surface', '--surface-raised-shadow'])
+/** Component recipes and Layer 2 compositions may use color-mix — excluded from palette-only mapping checks. */
+const RECIPE_SEMANTIC_ROLES = new Set([
+  '--catalog-picker-row-surface',
+  '--surface-raised-shadow',
+  ...INTERACTION_SEMANTIC_ROLES,
+])
 
 function extractSemanticRoleVars(css: string): Set<string> {
   return new Set([...css.matchAll(/^\s*(--(?!palette-)[\w-]+)\s*:/gm)].map((match) => match[1]!))
