@@ -9,9 +9,9 @@
 
   /* Surfaces — page canvas, cards, popovers (`bg-background`, `bg-card`, `bg-popover`, …) */
   --background: var(--palette-surface-base);
-  --card: var(--palette-surface-raised);
+  --card: var(--palette-surface-panel);
   --card-foreground: var(--foreground);
-  --popover: var(--palette-surface-raised);
+  --popover: var(--palette-surface-panel);
   --popover-foreground: var(--foreground);
   --secondary: var(--palette-surface-secondary);
   --secondary-foreground: var(--palette-fg-secondary);

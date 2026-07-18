@@ -10,6 +10,7 @@ export const PALETTE_SURFACE_ELEVATION_STEPS = [
   'surface-subtle',
   'surface-muted',
   'surface-strong',
+  'surface-panel',
   'surface-raised',
   'surface-sunken',
   'surface-secondary',
@@ -18,6 +19,18 @@ export const PALETTE_SURFACE_ELEVATION_STEPS = [
 
 export const PALETTE_FIELD_STEPS = [
   'field-bg',
+  'field-bg-on-raised',
+  'field-bg-on-raised-readonly',
+  'field-bg-on-raised-disabled',
+  'field-bg-on-wash-subtle',
+  'field-bg-on-wash-subtle-readonly',
+  'field-bg-on-wash-subtle-disabled',
+  'field-bg-on-wash-muted',
+  'field-bg-on-wash-muted-readonly',
+  'field-bg-on-wash-muted-disabled',
+  'field-bg-on-wash-strong',
+  'field-bg-on-wash-strong-readonly',
+  'field-bg-on-wash-strong-disabled',
   'field-border',
   'field-border-hover',
   'field-fg-disabled',
@@ -126,7 +139,7 @@ export const PALETTE_PRIMITIVE_GROUPS: PalettePrimitiveGroup[] = [
   {
     id: 'elevation',
     label: 'Elevation surfaces',
-    description: 'Canvas → subtle wash → raised; sunken recessed plane.',
+    description: 'Canvas → wash ladder → warm panel; sunken recessed; raised = field fill only.',
     steps: PALETTE_SURFACE_ELEVATION_STEPS,
   },
   {
@@ -187,7 +200,7 @@ export const PALETTE_ELEVATION_LADDER: readonly string[] = [
   'surface-subtle',
   'surface-muted',
   'surface-strong',
-  'surface-raised',
+  'surface-panel',
   'surface-sunken',
 ]
 

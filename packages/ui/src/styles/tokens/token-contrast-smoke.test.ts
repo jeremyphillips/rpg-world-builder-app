@@ -25,6 +25,15 @@ function readPaletteVar(css: string, name: string): string | undefined {
   return match?.[1]?.trim()
 }
 
+/** Resolve one `var(--palette-*)` indirection for smoke checks. */
+function resolvePaletteVar(css: string, name: string): string | undefined {
+  const raw = readPaletteVar(css, name)
+  if (!raw) return undefined
+  const alias = raw.match(/^var\((--palette-[\w-]+)\)$/)
+  if (alias) return readPaletteVar(css, alias[1]!)
+  return raw
+}
+
 /** Minimum contrast ratio for smoke checks — oklch-L approximation, not full WCAG. */
 const MIN_SOLID_CONTRAST = 2.3
 
@@ -35,7 +44,7 @@ describe('token contrast smoke checks', () => {
   it('keeps readable field text on default field background (light + dark)', () => {
     for (const css of [lightCss, darkCss]) {
       const fg = oklchLightness(readPaletteVar(css, '--palette-fg-default') ?? '')
-      const bg = oklchLightness(readPaletteVar(css, '--palette-field-bg') ?? '')
+      const bg = oklchLightness(resolvePaletteVar(css, '--palette-field-bg') ?? '')
       expect(fg, 'field fg L').toBeDefined()
       expect(bg, 'field bg L').toBeDefined()
       expect(contrastRatio(fg!, bg!)).toBeGreaterThanOrEqual(MIN_SOLID_CONTRAST)
@@ -55,7 +64,7 @@ describe('token contrast smoke checks', () => {
   it('keeps placeholder text visually distinct from field background', () => {
     for (const css of [lightCss, darkCss]) {
       const fg = oklchLightness(readPaletteVar(css, '--palette-field-placeholder') ?? '')
-      const bg = oklchLightness(readPaletteVar(css, '--palette-field-bg') ?? '')
+      const bg = oklchLightness(resolvePaletteVar(css, '--palette-field-bg') ?? '')
       expect(fg, 'placeholder L').toBeDefined()
       expect(bg, 'field bg L').toBeDefined()
       expect(Math.abs(fg! - bg!)).toBeGreaterThan(0.04)

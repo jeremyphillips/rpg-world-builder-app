@@ -335,6 +335,43 @@
   background-color: var(--field-control-bg-invalid);
 }
 
+/**
+ * Re-scope `--field-control-*` fills inside non-canvas containers.
+ * Panel (card/popover): near-white field fill. Wash shells: one ladder step inset.
+ */
+.bg-card,
+.bg-popover {
+  --field-control-bg: var(--palette-field-bg-on-raised);
+  --field-control-bg-hover: var(--field-control-bg);
+  --field-control-bg-focus: var(--field-control-bg);
+  --field-control-bg-readonly: var(--palette-field-bg-on-raised-readonly);
+  --field-control-bg-disabled: var(--palette-field-bg-on-raised-disabled);
+}
+
+.bg-surface-subtle {
+  --field-control-bg: var(--palette-field-bg-on-wash-subtle);
+  --field-control-bg-hover: var(--field-control-bg);
+  --field-control-bg-focus: var(--field-control-bg);
+  --field-control-bg-readonly: var(--palette-field-bg-on-wash-subtle-readonly);
+  --field-control-bg-disabled: var(--palette-field-bg-on-wash-subtle-disabled);
+}
+
+.bg-surface-muted {
+  --field-control-bg: var(--palette-field-bg-on-wash-muted);
+  --field-control-bg-hover: var(--field-control-bg);
+  --field-control-bg-focus: var(--field-control-bg);
+  --field-control-bg-readonly: var(--palette-field-bg-on-wash-muted-readonly);
+  --field-control-bg-disabled: var(--palette-field-bg-on-wash-muted-disabled);
+}
+
+.bg-surface-strong {
+  --field-control-bg: var(--palette-field-bg-on-wash-strong);
+  --field-control-bg-hover: var(--field-control-bg);
+  --field-control-bg-focus: var(--field-control-bg);
+  --field-control-bg-readonly: var(--palette-field-bg-on-wash-strong-readonly);
+  --field-control-bg-disabled: var(--palette-field-bg-on-wash-strong-disabled);
+}
+
 /*
  * Prose theme — maps @tailwindcss/typography to design tokens so rich-text HTML
  * (TipTap / CMS output) matches light/dark automatically via CSS variables.

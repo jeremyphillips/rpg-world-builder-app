@@ -37,13 +37,13 @@ Recipes are the public contract; ladder steps are implementation details recipes
 | Role        | Utility                    | Meaning                                                     |
 | ----------- | -------------------------- | ----------------------------------------------------------- |
 | Base        | `bg-background`            | Page canvas                                                 |
-| Raised      | `bg-card`, `bg-popover`    | Elevated panels / overlays                                  |
+| Panel       | `bg-card`, `bg-popover`    | Warm elevated panels / overlays                             |
 | Subtle wash | `bg-surface-subtle`        | Barely visible grouping                                     |
 | Muted wash  | `bg-surface-muted`         | Standard secondary panel / chrome                           |
 | Strong wash | `bg-surface-strong`        | Dense neutral chrome (not brand/selected meaning)           |
 | Sunken      | `bg-sunken`                | Recessed / inset fill                                       |
 | Secondary   | `bg-secondary`             | Alternate **interactive** surface (e.g. Button `secondary`) |
-| Field       | `bg-input`, `border-input` | Editable control chrome (`field-input-chrome.variants.ts`)  |
+| Field       | `bg-input`, `border-input` | Editable control chrome — near-white in light mode only     |
 
 `bg-muted` aliases `bg-surface-muted` for shadcn compatibility — prefer `bg-surface-*` in new code.
 
@@ -106,6 +106,10 @@ Do not merge text-tuned values onto solid status hues.
 
 - Layer 2: `--field-control-*` matrix in `semantic-*.css`.
 - Public utilities: `border-input`, `bg-input`, and state variants in `globals.css`.
+- **On panel/wash:** `.bg-card`, `.bg-popover`, and `.bg-surface-subtle|muted|strong` re-scope
+  `--field-control-bg` (and readonly/disabled) via `--palette-field-bg-on-raised` and
+  `--palette-field-bg-on-wash-*`. Panels use the canonical near-white field fill; wash shells
+  recess controls one ladder step (e.g. dependent `surface: 'subtle'`).
 - **Single recipe owner:** [`field-input-chrome.variants.ts`](../src/components/ui/field-input-chrome.variants.ts).
 - Individual controls import that recipe; do not reconstruct field chrome with ad-hoc opacity stacks.
 

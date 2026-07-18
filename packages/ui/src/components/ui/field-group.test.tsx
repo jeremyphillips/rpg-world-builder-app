@@ -115,7 +115,7 @@ describe('FieldGroup', () => {
       </FieldGroup>,
     )
     const stack = fieldStack(screen.getByRole('group', { name: /Effects/ }))
-    expect(stack).toHaveClass('border-l-2', 'pl-6', 'sm:pl-10', 'border-border')
+    expect(stack).toHaveClass('border-l-2', 'pl-6', 'sm:pl-8', 'border-border')
   })
 
   it('applies divider top chrome on the fieldset', () => {

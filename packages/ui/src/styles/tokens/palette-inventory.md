@@ -37,7 +37,8 @@ Exact allowlist for intentional solid-control / backdrop opacity:
 | `--palette-surface-subtle`    | `--surface-subtle`           | Barely visible grouping                        |
 | `--palette-surface-muted`     | `--surface-muted`, `--muted` | Standard secondary panel / chrome              |
 | `--palette-surface-strong`    | `--surface-strong`           | Dense neutral chrome                           |
-| `--palette-surface-raised`    | `--card`, `--popover`        | Raised panels                                  |
+| `--palette-surface-panel`     | `--card`, `--popover`        | Warm elevated panels / overlays                |
+| `--palette-surface-raised`    | `--palette-field-bg` (alias) | Near-white field control fill only (light)     |
 | `--palette-surface-sunken`    | `--sunken`                   | Recessed / inset fills                         |
 | `--palette-surface-secondary` | `--secondary`                | Alternate low-emphasis **interactive** surface |
 | `--palette-surface-accent`    | `--accent`                   | Hover / gold chrome (light)                    |
@@ -50,17 +51,22 @@ controls — not a generic page/section fill.
 Mode-specific concrete values only. Focus and invalid states alias Layer 2 roles
 (`--primary`, `--ring`, `--destructive`, `--destructive-subtle`) — not palette steps.
 
-| Token                             | Layer 2 mapping                   |
-| --------------------------------- | --------------------------------- |
-| `--palette-field-bg`              | `--field-control-bg`              |
-| `--palette-field-border`          | `--field-control-border`          |
-| `--palette-field-border-hover`    | `--field-control-border-hover`    |
-| `--palette-field-placeholder`     | `--field-control-placeholder`     |
-| `--palette-field-bg-readonly`     | `--field-control-bg-readonly`     |
-| `--palette-field-border-readonly` | `--field-control-border-readonly` |
-| `--palette-field-bg-disabled`     | `--field-control-bg-disabled`     |
-| `--palette-field-fg-disabled`     | `--field-control-fg-disabled`     |
-| `--palette-field-border-disabled` | `--field-control-border-disabled` |
+| Token                               | Layer 2 mapping                                                |
+| ----------------------------------- | -------------------------------------------------------------- |
+| `--palette-field-bg`                | `--field-control-bg` on page canvas (`bg-background`)          |
+| `--palette-field-bg-on-raised`      | Scoped fill under `.bg-card`, `.bg-popover`                    |
+| `--palette-field-bg-on-wash-subtle` | Scoped fill under `.bg-surface-subtle` (e.g. dependent fields) |
+| `--palette-field-bg-on-wash-muted`  | Scoped fill under `.bg-surface-muted`                          |
+| `--palette-field-bg-on-wash-strong` | Scoped fill under `.bg-surface-strong`                         |
+| `*-readonly` / `*-disabled` pairs   | Matching scoped readonly/disabled fills per container          |
+| `--palette-field-border`            | `--field-control-border`                                       |
+| `--palette-field-border-hover`      | `--field-control-border-hover`                                 |
+| `--palette-field-placeholder`       | `--field-control-placeholder`                                  |
+| `--palette-field-bg-readonly`       | `--field-control-bg-readonly`                                  |
+| `--palette-field-border-readonly`   | `--field-control-border-readonly`                              |
+| `--palette-field-bg-disabled`       | `--field-control-bg-disabled`                                  |
+| `--palette-field-fg-disabled`       | `--field-control-fg-disabled`                                  |
+| `--palette-field-border-disabled`   | `--field-control-border-disabled`                              |
 
 ## Switch (Layer 1)
 

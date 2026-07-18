@@ -50,7 +50,7 @@ surfaces instead of inline copy.
 
 | Mode / state              | Surface                                                   |
 | ------------------------- | --------------------------------------------------------- |
-| `selectable` / unselected | transparent, `border-border`, weight 300                  |
+| `selectable` / unselected | `background`, `border-border`, weight 300                 |
 | `selectable` / selected   | `selected-control` fill, auto leading `Check`, weight 500 |
 | `removable`               | neutral filled surface, trailing remove control           |
 

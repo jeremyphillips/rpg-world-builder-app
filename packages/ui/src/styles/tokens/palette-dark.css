@@ -12,7 +12,10 @@
   --palette-surface-subtle: oklch(0.155 0.004 var(--palette-neutral-hue));
   --palette-surface-muted: oklch(0.175 0.005 var(--palette-neutral-hue));
   --palette-surface-strong: oklch(0.2 0.005 var(--palette-neutral-hue));
-  --palette-surface-raised: oklch(0.22 0.005 var(--palette-neutral-hue));
+  /* Elevated content planes — card, popover, modals. */
+  --palette-surface-panel: oklch(0.22 0.008 var(--palette-neutral-hue));
+  /* Field control fill — slightly recessed vs panel. */
+  --palette-surface-raised: oklch(0.17 0.004 var(--palette-neutral-hue));
   --palette-surface-sunken: oklch(0.12 0.004 var(--palette-neutral-hue));
   --palette-surface-secondary: oklch(0.194 0.005 var(--palette-neutral-hue));
   --palette-surface-accent: oklch(0.32 0.006 var(--palette-neutral-hue));
@@ -56,7 +59,27 @@
   --palette-overlay: oklch(0.05 0.003 var(--palette-neutral-hue) / 0.7);
 
   /* Field control — opaque fill, not derived from border */
-  --palette-field-bg: oklch(0.17 0.004 var(--palette-neutral-hue));
+  --palette-field-bg: var(--palette-surface-raised);
+  /*
+   * Field fills on non-canvas containers — scoped in globals.css.
+   * Panel: canonical field fill; wash shells: recessed vs container.
+   */
+  /* `bg-card` / `bg-popover` */
+  --palette-field-bg-on-raised: var(--palette-field-bg);
+  --palette-field-bg-on-raised-readonly: var(--palette-field-bg-readonly);
+  --palette-field-bg-on-raised-disabled: var(--palette-field-bg-disabled);
+  /* `bg-surface-subtle` container */
+  --palette-field-bg-on-wash-subtle: var(--palette-surface-base);
+  --palette-field-bg-on-wash-subtle-readonly: var(--palette-surface-sunken);
+  --palette-field-bg-on-wash-subtle-disabled: var(--palette-surface-sunken);
+  /* `bg-surface-muted` container */
+  --palette-field-bg-on-wash-muted: var(--palette-surface-base);
+  --palette-field-bg-on-wash-muted-readonly: var(--palette-surface-sunken);
+  --palette-field-bg-on-wash-muted-disabled: var(--palette-surface-sunken);
+  /* `bg-surface-strong` container */
+  --palette-field-bg-on-wash-strong: var(--palette-surface-sunken);
+  --palette-field-bg-on-wash-strong-readonly: var(--palette-surface-sunken);
+  --palette-field-bg-on-wash-strong-disabled: var(--palette-surface-sunken);
   --palette-field-border: oklch(0.985 0.006 82 / 16%);
   --palette-field-border-hover: oklch(0.985 0.006 82 / 24%);
   --palette-field-fg-disabled: oklch(0.715 0.01 var(--palette-neutral-hue));

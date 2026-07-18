@@ -82,7 +82,7 @@ export const fieldGroupDividerTopPaddingClasses = 'pt-7'
 /** Spacing below a bottom divider — 28px (`pb-7`). */
 export const fieldGroupDividerBottomPaddingClasses = 'pb-7'
 
-const fieldGroupInsetBodyVariants = cva('border-l-2 pl-6 sm:pl-10', {
+const fieldGroupInsetBodyVariants = cva('border-l-2 pl-6 sm:pl-8', {
   variants: {
     tone: {
       border: 'border-border',

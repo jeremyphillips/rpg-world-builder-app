@@ -2,7 +2,7 @@
  * Layer 1 — light theme palette roles (oklch SSOT).
  * Inventory: tokens/palette-inventory.md — every name must exist in palette-dark.css.
  *
- * Motif: cream canvas, near-white raised panels, beige muted/sunken washes, deep-red primary.
+ * Motif: cream canvas, warm panel (card/popover), beige washes, near-white field inputs only.
  */
 :root {
   --palette-neutral-hue: 82;
@@ -12,6 +12,9 @@
   --palette-surface-subtle: oklch(0.958 0.03 90);
   --palette-surface-muted: oklch(0.94 0.036 90.2);
   --palette-surface-strong: oklch(0.915 0.039 90.5);
+  /* Elevated content planes — card, popover, modals (warmer than canvas, not near-white). */
+  --palette-surface-panel: oklch(0.934 0.039 90);
+  /* Field control fill only — the sole near-white surface in light mode. */
   --palette-surface-raised: oklch(0.995 0.002 90);
   --palette-surface-sunken: oklch(0.92 0.038 90);
   --palette-surface-secondary: oklch(0.934 0.04 91.2);
@@ -60,7 +63,28 @@
   --palette-overlay: oklch(from var(--palette-fg-on-status) l c h / 0.5);
 
   /* Field control — fill + stroke tuned independently per mode */
-  --palette-field-bg: oklch(0.995 0.002 90);
+  --palette-field-bg: var(--palette-surface-raised);
+  /*
+   * Field fills on non-canvas containers — scoped in globals.css.
+   * Panel (card/popover): use canonical near-white field fill for contrast on warm panel.
+   * Wash shells: one ladder step darker than the container.
+   */
+  /* `bg-card` / `bg-popover` */
+  --palette-field-bg-on-raised: var(--palette-field-bg);
+  --palette-field-bg-on-raised-readonly: var(--palette-field-bg-readonly);
+  --palette-field-bg-on-raised-disabled: var(--palette-field-bg-disabled);
+  /* `bg-surface-subtle` container */
+  --palette-field-bg-on-wash-subtle: var(--palette-surface-muted);
+  --palette-field-bg-on-wash-subtle-readonly: var(--palette-surface-strong);
+  --palette-field-bg-on-wash-subtle-disabled: var(--palette-surface-strong);
+  /* `bg-surface-muted` container */
+  --palette-field-bg-on-wash-muted: var(--palette-surface-strong);
+  --palette-field-bg-on-wash-muted-readonly: var(--palette-surface-sunken);
+  --palette-field-bg-on-wash-muted-disabled: var(--palette-surface-sunken);
+  /* `bg-surface-strong` container */
+  --palette-field-bg-on-wash-strong: var(--palette-surface-sunken);
+  --palette-field-bg-on-wash-strong-readonly: var(--palette-surface-sunken);
+  --palette-field-bg-on-wash-strong-disabled: var(--palette-surface-sunken);
   --palette-field-border: oklch(0.86 0.035 82);
   --palette-field-border-hover: oklch(0.78 0.045 78);
   --palette-field-fg-disabled: oklch(0.521 0.055 80.3);

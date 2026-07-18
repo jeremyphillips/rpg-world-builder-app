@@ -16,7 +16,7 @@ describe('resolveFieldGroupChromeClassNames', () => {
     const classes = resolveFieldGroupChromeClassNames({ variant: 'inset' })
     expect(classes.body).toContain('border-l-2')
     expect(classes.body).toContain('pl-6')
-    expect(classes.body).toContain('sm:pl-10')
+    expect(classes.body).toContain('sm:pl-8')
     expect(classes.body).toContain('border-border')
   })
 

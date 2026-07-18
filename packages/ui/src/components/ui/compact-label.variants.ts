@@ -65,7 +65,7 @@ export const compactLabelVariants = cva(
       {
         selected: false,
         interactive: true,
-        className: 'border-border bg-transparent text-foreground',
+        className: 'border-border bg-background text-foreground',
       },
       {
         removable: true,

@@ -33,7 +33,7 @@ describe('color-palette.lib', () => {
       'surface-subtle',
       'surface-muted',
       'surface-strong',
-      'surface-raised',
+      'surface-panel',
       'surface-sunken',
     ])
   })
