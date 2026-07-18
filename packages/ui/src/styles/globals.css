@@ -79,7 +79,10 @@
   --color-warning-subtle: var(--warning-subtle);
   --color-border: var(--border);
   --color-card-selected-border: var(--card-selected-border);
-  --color-input: var(--input);
+  --color-input: var(--input-border);
+  --color-input-invalid: var(--input-border-invalid);
+  --color-input-invalid-subtle: var(--input-bg-invalid);
+  --color-switch-track: var(--switch-track);
   --color-ring: var(--ring);
   --color-overlay: var(--overlay);
   --color-semantic-neutral: var(--semantic-neutral);
@@ -262,6 +265,11 @@
   --animate-accordion-down: accordion-down 0.2s ease-out;
   --animate-accordion-up: accordion-up 0.2s ease-out;
   --animate-attention-ring: attention-ring 1.5s ease-out;
+}
+
+/** Field control fill — separate from `border-input` (`--color-input` → `--input-border`). */
+@utility bg-input {
+  background-color: var(--input-bg);
 }
 
 /*

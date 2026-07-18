@@ -1,10 +1,16 @@
 import { cva, type VariantProps } from 'class-variance-authority'
 
 import { cn } from '../../lib/utils'
+import {
+  fieldInputFocusWithinClasses,
+  fieldInputInvalidClasses,
+  fieldInputInvalidSegmentClasses,
+  fieldInputShellClasses,
+} from './field-input-chrome.variants'
 import { fieldGroupedControlSizeClasses } from './field-sizing.variants'
 
 export const inputSelectGroupVariants = cva(
-  'grid items-center rounded-md border border-input bg-transparent shadow-sm transition-colors focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 focus-within:ring-offset-background dark:bg-input/30',
+  cn('grid items-center', fieldInputShellClasses, fieldInputFocusWithinClasses),
   {
     variants: {
       layout: {
@@ -12,7 +18,7 @@ export const inputSelectGroupVariants = cva(
         stretch: 'w-full grid-cols-[1fr_1px_auto]',
       },
       invalid: {
-        true: 'border-destructive focus-within:ring-destructive [&_[data-input-select-value]]:bg-destructive/5',
+        true: cn(fieldInputInvalidClasses, fieldInputInvalidSegmentClasses),
         false: '',
       },
       disabled: {

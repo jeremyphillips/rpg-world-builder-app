@@ -28,6 +28,7 @@ tests + Storybook).
 | `--palette-surface-sunken`    | `--muted`             | Recessed / inset fills      |
 | `--palette-surface-secondary` | `--secondary`         | Alternate plane             |
 | `--palette-surface-accent`    | `--accent`            | Hover / gold chrome (light) |
+| `--palette-surface-input`     | `--input-bg`          | Recessed field control fill |
 
 ## Sidebar
 
@@ -48,7 +49,7 @@ tests + Storybook).
 
 ## Chrome, brand, status
 
-Chrome: `--palette-border-*`, `--palette-overlay`.
+Chrome: `--palette-border-*`, `--palette-overlay`, `--palette-surface-input` (field fill).
 
 Brand: `--palette-primary`, `--palette-primary-foreground`, `--palette-on-solid`.
 
@@ -84,3 +85,7 @@ Removed in favor of role names above:
 
 See [`semantic-light.css`](./semantic-light.css) and [`semantic-dark.css`](./semantic-dark.css).
 Structure is identical across themes; only `var(--palette-…)` targets differ.
+
+Field control chrome: `--input-border`, `--input-bg`, `--input-ring`, invalid
+aliases (`--input-border-invalid`, `--input-ring-invalid`, `--input-bg-invalid`),
+and `--switch-track` for the Switch unchecked track.

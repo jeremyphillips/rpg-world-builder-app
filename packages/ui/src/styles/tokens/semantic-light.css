@@ -39,8 +39,14 @@
   --warning-subtle: var(--palette-warning-subtle);
   --border: var(--palette-border-default);
   --card-selected-border: var(--palette-border-selected);
-  --input: var(--palette-border-input);
   --ring: var(--palette-primary);
+  --input-border: var(--palette-border-input);
+  --input-bg: var(--palette-surface-input);
+  --input-ring: var(--ring);
+  --input-border-invalid: var(--destructive);
+  --input-ring-invalid: var(--destructive);
+  --input-bg-invalid: var(--destructive-subtle);
+  --switch-track: var(--palette-border-input);
   --overlay: var(--palette-overlay);
   --sidebar: var(--palette-sidebar-surface);
   --semantic-neutral: var(--palette-semantic-neutral);

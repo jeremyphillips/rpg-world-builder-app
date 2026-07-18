@@ -31,6 +31,7 @@
 
   --palette-border-default: oklch(0.985 0.006 82 / 12%);
   --palette-border-input: oklch(0.745 0.006 82 / 16%);
+  --palette-surface-input: color-mix(in oklab, var(--palette-border-input) 30%, transparent);
   --palette-border-selected: oklch(0.985 0.006 82 / 30%);
   --palette-overlay: oklch(0.05 0.003 var(--palette-neutral-hue) / 0.7);
 

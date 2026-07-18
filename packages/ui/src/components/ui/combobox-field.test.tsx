@@ -165,7 +165,7 @@ describe('ComboboxField', () => {
 
     expect(trigger).toHaveClass('invisible')
     expect(search).toHaveClass('dark:bg-transparent')
-    expect(search.closest('[class*="dark:bg-input/30"]')).not.toBeNull()
+    expect(search.closest('[class*="bg-input"]')).not.toBeNull()
   })
 
   it('omits the search row when enableSearch is false', async () => {

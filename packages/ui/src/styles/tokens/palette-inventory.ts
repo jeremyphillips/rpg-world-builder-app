@@ -12,6 +12,7 @@ export const PALETTE_SURFACE_ELEVATION_STEPS = [
   'surface-sunken',
   'surface-secondary',
   'surface-accent',
+  'surface-input',
 ] as const
 
 export const PALETTE_SIDEBAR_STEPS = ['sidebar-surface', 'sidebar-shade'] as const

@@ -1,6 +1,13 @@
 import { cva, type VariantProps } from 'class-variance-authority'
 
 import { fieldControlSizeClasses, fieldTextareaSizeClasses } from './field-sizing.variants'
+import {
+  fieldInputDisabledClasses,
+  fieldInputFocusClasses,
+  fieldInputInvalidAriaClasses,
+  fieldInputPlaceholderClasses,
+  fieldInputShellClasses,
+} from './field-input-chrome.variants'
 
 /**
  * Look shared by every text-like field control: border, background, focus ring,
@@ -9,8 +16,14 @@ import { fieldControlSizeClasses, fieldTextareaSizeClasses } from './field-sizin
  * prop, so any control — even a hand-written one — picks it up for free once
  * `aria-invalid` is set.
  */
-const fieldControlBase =
-  'flex w-full rounded-md border border-input bg-transparent shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:border-destructive aria-invalid:focus-visible:ring-destructive dark:bg-input/30'
+const fieldControlBase = [
+  'flex w-full',
+  fieldInputShellClasses,
+  fieldInputPlaceholderClasses,
+  fieldInputFocusClasses,
+  fieldInputInvalidAriaClasses,
+  fieldInputDisabledClasses,
+].join(' ')
 
 /**
  * Single-line controls (Input, the Select trigger): a fixed height per size.

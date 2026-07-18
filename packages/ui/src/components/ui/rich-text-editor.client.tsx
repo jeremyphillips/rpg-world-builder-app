@@ -4,6 +4,11 @@ import * as React from 'react'
 import { EditorContent, useEditor } from '@tiptap/react'
 
 import { cn } from '../../lib/utils'
+import {
+  fieldInputFocusWithinClasses,
+  fieldInputInvalidClasses,
+  fieldInputShellClasses,
+} from './field-input-chrome.variants'
 import { createRichTextEditorExtensions } from './rich-text-editor-extensions'
 import { richTextEditorProseClasses } from './rich-text-content.variants'
 import type { FieldSize } from './field.client'
@@ -156,8 +161,10 @@ export function RichTextEditor({
     <div
       ref={rootRef}
       className={cn(
-        'relative rounded-md border border-input shadow-sm transition-colors focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 focus-within:ring-offset-background',
-        ariaInvalid && 'border-destructive focus-within:ring-destructive',
+        'relative',
+        fieldInputShellClasses,
+        fieldInputFocusWithinClasses,
+        ariaInvalid && fieldInputInvalidClasses,
         disabled && 'cursor-not-allowed opacity-50',
         className,
       )}

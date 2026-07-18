@@ -334,7 +334,36 @@ export const COLOR_TOKEN_GROUPS: ColorTokenGroup[] = [
     label: 'Chrome',
     tokens: [
       { name: 'border', cssVar: '--border', tailwind: 'border-border', usage: 'border' },
-      { name: 'input', cssVar: '--input', tailwind: 'border-input', usage: 'border' },
+      {
+        name: 'input-border',
+        cssVar: '--input-border',
+        tailwind: 'border-input',
+        usage: 'border',
+      },
+      {
+        name: 'input-bg',
+        cssVar: '--input-bg',
+        tailwind: 'bg-input',
+        usage: 'background',
+      },
+      {
+        name: 'input-border-invalid',
+        cssVar: '--input-border-invalid',
+        tailwind: 'border-input-invalid',
+        usage: 'border',
+      },
+      {
+        name: 'input-bg-invalid',
+        cssVar: '--input-bg-invalid',
+        tailwind: 'bg-input-invalid-subtle',
+        usage: 'background',
+      },
+      {
+        name: 'switch-track',
+        cssVar: '--switch-track',
+        tailwind: 'bg-switch-track',
+        usage: 'background',
+      },
       { name: 'ring', cssVar: '--ring', tailwind: 'ring-ring', usage: 'border' },
       { name: 'overlay', cssVar: '--overlay', tailwind: 'bg-overlay', usage: 'background' },
       {
