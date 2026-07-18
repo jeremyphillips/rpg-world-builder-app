@@ -1,12 +1,37 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 
-import { listConventions } from '@rpg/name-generator-data'
-
+import {
+  composeNameGeneratorConventions,
+  type SpeciesCultureInput,
+} from '../model/compose-name-generator-conventions'
 import { deriveFilterOptions, deriveVisibleFilters } from '../model/derive-filter-options'
 import { resetNameGeneratorFilters } from '../model/sanitize-filters-on-change'
 import { NameGeneratorFilters } from './name-generator-filters.client'
 
-const conventions = listConventions()
+const STORY_ELF_SPECIES: SpeciesCultureInput = {
+  id: 'srd-cc-5.2.1:elf',
+  slug: 'elf',
+  name: 'Elf',
+  source: 'system',
+  culture: {
+    id: 'elven',
+    name: 'Elven',
+    naming: { supported: true, personalNameComponents: ['family'] },
+  },
+  languageAffinities: ['elvish'],
+}
+
+const { conventions, speciesNamingOptions } = composeNameGeneratorConventions([STORY_ELF_SPECIES])
+const filterContext = {
+  speciesNamingOptions,
+  cultures: [
+    {
+      id: 'elven',
+      label: 'Elven',
+      languageIds: ['elvish'],
+    },
+  ],
+}
 const defaultFilters = resetNameGeneratorFilters()
 
 const meta = {
@@ -14,8 +39,8 @@ const meta = {
   component: NameGeneratorFilters,
   args: {
     filters: defaultFilters,
-    filterOptions: deriveFilterOptions(defaultFilters, conventions),
-    visibleFilters: deriveVisibleFilters(defaultFilters, conventions),
+    filterOptions: deriveFilterOptions(defaultFilters, conventions, filterContext),
+    visibleFilters: deriveVisibleFilters(defaultFilters, conventions, filterContext),
     onFilterChange: () => undefined,
     onResetFilters: () => undefined,
   },
@@ -45,6 +70,7 @@ export const ElvishContext: Story = {
         genderStyle: 'feminine',
       },
       conventions,
+      filterContext,
     ),
     visibleFilters: deriveVisibleFilters(
       {
@@ -55,6 +81,7 @@ export const ElvishContext: Story = {
         genderStyle: 'feminine',
       },
       conventions,
+      filterContext,
     ),
   },
 }
@@ -62,7 +89,7 @@ export const ElvishContext: Story = {
 export const SettlementSubject: Story = {
   args: {
     filters: { subjectKind: 'settlement' },
-    filterOptions: deriveFilterOptions({ subjectKind: 'settlement' }, conventions),
-    visibleFilters: deriveVisibleFilters({ subjectKind: 'settlement' }, conventions),
+    filterOptions: deriveFilterOptions({ subjectKind: 'settlement' }, conventions, filterContext),
+    visibleFilters: deriveVisibleFilters({ subjectKind: 'settlement' }, conventions, filterContext),
   },
 }

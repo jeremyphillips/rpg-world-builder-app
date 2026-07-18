@@ -1,20 +1,34 @@
 import { describe, expect, it } from 'vitest'
 
+import { namingConventionSchema } from '@rpg/contracts/name-generator'
+
 import { COLLECTION_IMPORT_MAP } from './collections/import-map'
 import { COLLECTION_MANIFEST_ENTRIES, COLLECTION_MANIFEST_IDS } from './collections/manifest'
-import { CONVENTIONS } from './conventions/manifest'
+import { STATIC_CONVENTIONS } from './conventions/manifest'
 
 describe('convention manifest', () => {
   it('has unique convention ids', () => {
-    const ids = CONVENTIONS.map((convention) => convention.id)
+    const ids = STATIC_CONVENTIONS.map((convention) => convention.id)
     expect(new Set(ids).size).toBe(ids.length)
   })
 
+  it('excludes migrated elf conventions from the static list', () => {
+    const ids = STATIC_CONVENTIONS.map((convention) => convention.id)
+    expect(ids).not.toContain('elvish-personal')
+    expect(ids).not.toContain('elvish-settlement')
+  })
+
   it('references only known collection ids in part bindings', () => {
-    for (const convention of CONVENTIONS) {
+    for (const convention of STATIC_CONVENTIONS) {
       for (const binding of convention.partBindings) {
         expect(COLLECTION_MANIFEST_IDS.has(binding.collectionId)).toBe(true)
       }
+    }
+  })
+
+  it('parses every static convention', () => {
+    for (const convention of STATIC_CONVENTIONS) {
+      expect(namingConventionSchema.safeParse(convention).success).toBe(true)
     }
   })
 })

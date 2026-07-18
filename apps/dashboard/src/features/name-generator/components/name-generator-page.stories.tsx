@@ -1,17 +1,43 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { listConventions } from '@rpg/name-generator-data'
 
 import type { GeneratedName } from '@rpg/contracts/name-generator'
 
+import {
+  composeNameGeneratorConventions,
+  type SpeciesCultureInput,
+} from '../model/compose-name-generator-conventions'
 import { deriveFilterOptions, deriveVisibleFilters } from '../model/derive-filter-options'
 import { formatMatchCountLabel } from '../model/format-results-summary'
 import { resetNameGeneratorFilters } from '../model/sanitize-filters-on-change'
 import { NameGeneratorPage, NameGeneratorPageView } from './name-generator-page.client'
 
-const conventions = listConventions()
+const STORY_ELF_SPECIES: SpeciesCultureInput = {
+  id: 'srd-cc-5.2.1:elf',
+  slug: 'elf',
+  name: 'Elf',
+  source: 'system',
+  culture: {
+    id: 'elven',
+    name: 'Elven',
+    naming: { supported: true, personalNameComponents: ['family'] },
+  },
+  languageAffinities: ['elvish'],
+}
+
+const { conventions, speciesNamingOptions } = composeNameGeneratorConventions([STORY_ELF_SPECIES])
+const filterContext = {
+  speciesNamingOptions,
+  cultures: [
+    {
+      id: 'elven',
+      label: 'Elven',
+      languageIds: ['elvish'],
+    },
+  ],
+}
 const defaultFilters = resetNameGeneratorFilters()
-const defaultFilterOptions = deriveFilterOptions(defaultFilters, conventions)
-const defaultVisibleFilters = deriveVisibleFilters(defaultFilters, conventions)
+const defaultFilterOptions = deriveFilterOptions(defaultFilters, conventions, filterContext)
+const defaultVisibleFilters = deriveVisibleFilters(defaultFilters, conventions, filterContext)
 const noop = () => undefined
 
 const FIXTURE_RESULTS: GeneratedName[] = [
@@ -66,10 +92,12 @@ export const WithResults: Story = {
       filterOptions={deriveFilterOptions(
         { subjectKind: 'person', languageId: 'elvish', genderStyle: 'feminine' },
         conventions,
+        filterContext,
       )}
       visibleFilters={deriveVisibleFilters(
         { subjectKind: 'person', languageId: 'elvish', genderStyle: 'feminine' },
         conventions,
+        filterContext,
       )}
       matchCount={1}
       matchCountLabel={formatMatchCountLabel(1)}
@@ -93,8 +121,8 @@ export const NoMatch: Story = {
   render: () => (
     <NameGeneratorPageView
       filters={{ subjectKind: 'ship' }}
-      filterOptions={deriveFilterOptions({ subjectKind: 'ship' }, conventions)}
-      visibleFilters={deriveVisibleFilters({ subjectKind: 'ship' }, conventions)}
+      filterOptions={deriveFilterOptions({ subjectKind: 'ship' }, conventions, filterContext)}
+      visibleFilters={deriveVisibleFilters({ subjectKind: 'ship' }, conventions, filterContext)}
       matchCount={0}
       matchCountLabel={formatMatchCountLabel(0)}
       results={[]}

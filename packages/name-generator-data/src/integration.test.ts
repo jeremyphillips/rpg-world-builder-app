@@ -3,12 +3,11 @@ import { describe, expect, it } from 'vitest'
 import { generateName, generateNames, recommendConventions } from '@rpg/name-generator-core'
 
 import { clearNameCollectionCache, loadNameCollection } from './collections/load-name-collection'
-import { buildCultureContextFields } from './lib/resolve-naming-cultures'
-import { CONVENTIONS } from './conventions/manifest'
-import { getConvention } from './loader/list-conventions'
+import { STATIC_CONVENTIONS } from './conventions/manifest'
+import { getStaticConvention } from './loader/list-conventions'
 
 async function loadConventionCollections(conventionId: string) {
-  const convention = getConvention(conventionId)
+  const convention = getStaticConvention(conventionId)
   if (convention === undefined) {
     throw new Error(`Missing convention ${conventionId}`)
   }
@@ -21,24 +20,6 @@ async function loadConventionCollections(conventionId: string) {
 }
 
 describe('name generator integration', () => {
-  it('ranks elven conventions above unrelated cultures for elven context', () => {
-    const recommendations = recommendConventions(
-      {
-        subjectKind: 'person',
-        languageIds: ['elvish'],
-        ...buildCultureContextFields('elven'),
-      },
-      CONVENTIONS,
-    )
-
-    const elvish = recommendations.find((item) => item.conventionId === 'elvish-personal')
-    const akan = recommendations.find((item) => item.conventionId === 'akan-personal')
-
-    expect(elvish).toBeDefined()
-    expect(elvish?.score).toBeGreaterThan(akan?.score ?? 0)
-    expect(recommendations[0]?.conventionId).toBe('elvish-personal')
-  })
-
   it('ranks dwarven personal above unrelated cultures for dwarf context', () => {
     const recommendations = recommendConventions(
       {
@@ -46,7 +27,7 @@ describe('name generator integration', () => {
         languageIds: ['dwarvish'],
         cultureIds: ['dwarf'],
       },
-      CONVENTIONS,
+      STATIC_CONVENTIONS,
     )
 
     const dwarven = recommendations.find((item) => item.conventionId === 'dwarven-personal')
@@ -64,7 +45,7 @@ describe('name generator integration', () => {
         languageIds: ['halfling'],
         cultureIds: ['halfling'],
       },
-      CONVENTIONS,
+      STATIC_CONVENTIONS,
     )
 
     const halfling = recommendations.find((item) => item.conventionId === 'halfling-personal')
@@ -82,7 +63,7 @@ describe('name generator integration', () => {
         languageIds: ['draconic'],
         cultureIds: ['dragonborn'],
       },
-      CONVENTIONS,
+      STATIC_CONVENTIONS,
     )
 
     const dragonborn = recommendations.find(
@@ -101,7 +82,7 @@ describe('name generator integration', () => {
         subjectKind: 'person',
         cultureIds: ['tiefling'],
       },
-      CONVENTIONS,
+      STATIC_CONVENTIONS,
     )
 
     const tiefling = recommendations.find(
@@ -121,7 +102,7 @@ describe('name generator integration', () => {
         languageIds: ['gnomish'],
         cultureIds: ['gnome'],
       },
-      CONVENTIONS,
+      STATIC_CONVENTIONS,
     )
 
     const gnomish = recommendations.find((item) => item.conventionId === 'gnomish-personal')
@@ -139,7 +120,7 @@ describe('name generator integration', () => {
         languageIds: ['giant'],
         cultureIds: ['goliath'],
       },
-      CONVENTIONS,
+      STATIC_CONVENTIONS,
     )
 
     const goliath = recommendations.find((item) => item.conventionId === 'goliath-personal')
@@ -157,7 +138,7 @@ describe('name generator integration', () => {
         languageIds: ['orc'],
         cultureIds: ['orc'],
       },
-      CONVENTIONS,
+      STATIC_CONVENTIONS,
     )
 
     const orc = recommendations.find((item) => item.conventionId === 'orc-personal')
@@ -195,8 +176,6 @@ describe('name generator integration', () => {
   })
 
   it.each([
-    'elvish-personal',
-    'elvish-settlement',
     'draconic-dragon-personal',
     'draconic-dragonborn-personal',
     'draconic-dragonborn-clan',

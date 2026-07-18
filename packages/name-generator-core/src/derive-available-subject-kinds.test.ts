@@ -38,4 +38,14 @@ describe('deriveAvailableSubjectKinds', () => {
       }),
     ).toEqual([])
   })
+
+  it('resolves heritage target culture ids when matching conventions', () => {
+    expect(
+      deriveAvailableSubjectKinds({
+        cultureIds: ['drow'],
+        conventions: [ELVISH_PERSONAL_CONVENTION],
+        resolveConventionCultureId: (cultureId) => (cultureId === 'drow' ? 'elven' : cultureId),
+      }),
+    ).toEqual(['person'])
+  })
 })

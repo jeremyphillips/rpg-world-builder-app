@@ -5,9 +5,25 @@ import {
   ELVISH_GIVEN_COLLECTION,
   ELVISH_FAMILY_COLLECTION,
 } from '@rpg/contracts/name-generator/test-fixtures'
-import { listConventions } from '@rpg/name-generator-data'
+import { listStaticConventions } from '@rpg/name-generator-data'
 
+import { composeNameGeneratorConventions } from './compose-name-generator-conventions'
 import { generateNameBatch, mapNameGeneratorError } from './generate-name-batch'
+
+const ELF_SPECIES = {
+  id: 'srd-cc-5.2.1:elf',
+  slug: 'elf',
+  name: 'Elf',
+  source: 'system' as const,
+  culture: {
+    id: 'elven',
+    name: 'Elven',
+    naming: { supported: true, personalNameComponents: ['family' as const] },
+  },
+  languageAffinities: ['elvish'],
+}
+
+const { conventions, getConvention } = composeNameGeneratorConventions([ELF_SPECIES])
 
 describe('generateNameBatch', () => {
   it('generates deterministic names for a seeded request', async () => {
@@ -31,12 +47,12 @@ describe('generateNameBatch', () => {
     const first = await generateNameBatch(
       filters,
       { seed: 'batch-seed', count: 3 },
-      { loadCollection },
+      { loadCollection, conventions, getConvention },
     )
     const second = await generateNameBatch(
       filters,
       { seed: 'batch-seed', count: 3 },
-      { loadCollection },
+      { loadCollection, conventions, getConvention },
     )
 
     expect(first.results).toEqual(second.results)
@@ -51,7 +67,7 @@ describe('generateNameBatch', () => {
           subjectKind: 'ship',
         },
         { seed: 'empty', count: 3 },
-        { listConventions },
+        { conventions: listStaticConventions() },
       ),
     ).rejects.toMatchObject({
       kind: 'no-matches',
@@ -85,7 +101,7 @@ describe('generateNameBatch', () => {
         speciesId: 'srd-cc-5.2.1:orc',
       },
       { seed: 'orc-partial', count: 10 },
-      { loadCollection, listConventions },
+      { loadCollection, conventions: listStaticConventions() },
     )
 
     expect(batch.results).toHaveLength(3)

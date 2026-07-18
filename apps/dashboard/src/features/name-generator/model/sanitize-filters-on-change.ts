@@ -1,14 +1,19 @@
 import type { NamingConvention } from '@rpg/contracts/name-generator'
 
 import { DEFAULT_FILTERS } from './name-generator.constants'
-import { deriveFilterOptions, isFilterValueValid } from './derive-filter-options'
+import {
+  deriveFilterOptions,
+  isFilterValueValid,
+  type NameGeneratorFilterContext,
+} from './derive-filter-options'
 import type { NameGeneratorFilters } from './name-generator-filters'
 
 function stripInvalidOptionalFilters(
   filters: NameGeneratorFilters,
   conventions: readonly NamingConvention[],
+  context?: NameGeneratorFilterContext,
 ): NameGeneratorFilters {
-  const options = deriveFilterOptions(filters, conventions)
+  const options = deriveFilterOptions(filters, conventions, context)
   const next: NameGeneratorFilters = { subjectKind: filters.subjectKind }
 
   if (isFilterValueValid('speciesId', filters.speciesId, options)) {
@@ -31,6 +36,7 @@ export function sanitizeFiltersOnChange(
   previous: NameGeneratorFilters,
   next: NameGeneratorFilters,
   conventions: readonly NamingConvention[],
+  context?: NameGeneratorFilterContext,
 ): NameGeneratorFilters {
   if (next.subjectKind !== previous.subjectKind) {
     return stripInvalidOptionalFilters(
@@ -38,10 +44,11 @@ export function sanitizeFiltersOnChange(
         subjectKind: next.subjectKind,
       },
       conventions,
+      context,
     )
   }
 
-  return stripInvalidOptionalFilters(next, conventions)
+  return stripInvalidOptionalFilters(next, conventions, context)
 }
 
 export function resetNameGeneratorFilters(): NameGeneratorFilters {

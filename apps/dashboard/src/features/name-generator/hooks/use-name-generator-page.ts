@@ -2,11 +2,22 @@
 
 import { useCallback, useMemo, useState } from 'react'
 
-import type { GeneratedName, NameGenderStyle, NameSubjectKind } from '@rpg/contracts/name-generator'
-import { listConventions } from '@rpg/name-generator-data'
+import type { GeneratedName } from '@rpg/contracts/name-generator'
+import { useCampaignStore } from '@/features/campaign/store/campaign-store'
+import { useSpecies } from '@/features/content/species/hooks/use-species'
 
+import { applyNameGeneratorFilterChange } from '../model/apply-name-generator-filter-change'
+import {
+  buildCultureFilterContexts,
+  composeNameGeneratorConventions,
+  toSpeciesCultureInput,
+} from '../model/compose-name-generator-conventions'
 import { buildNamingContext } from '../model/build-naming-context'
-import { deriveFilterOptions, deriveVisibleFilters } from '../model/derive-filter-options'
+import {
+  deriveFilterOptions,
+  deriveVisibleFilters,
+  type NameGeneratorFilterContext,
+} from '../model/derive-filter-options'
 import { formatMatchCountLabel, formatResultsSummary } from '../model/format-results-summary'
 import { generateNameBatch, mapNameGeneratorError } from '../model/generate-name-batch'
 import type {
@@ -34,7 +45,29 @@ function isNameGeneratorPageError(error: unknown): error is NameGeneratorPageErr
 }
 
 export function useNameGeneratorPage() {
-  const conventions = useMemo(() => listConventions(), [])
+  const activeCampaignId = useCampaignStore((state) => state.activeCampaignId)
+  const { data: campaignSpecies = [] } = useSpecies(activeCampaignId ?? undefined)
+
+  const speciesInputs = useMemo(
+    () => campaignSpecies.map((species) => toSpeciesCultureInput(species)),
+    [campaignSpecies],
+  )
+
+  const { conventions, speciesNamingOptions, getConvention } = useMemo(
+    () => composeNameGeneratorConventions(speciesInputs),
+    [speciesInputs],
+  )
+
+  const cultureContexts = useMemo(() => buildCultureFilterContexts(speciesInputs), [speciesInputs])
+
+  const filterContext: NameGeneratorFilterContext = useMemo(
+    () => ({
+      speciesNamingOptions,
+      cultures: cultureContexts,
+    }),
+    [cultureContexts, speciesNamingOptions],
+  )
+
   const [filters, setFiltersState] = useState<NameGeneratorFilters>(resetNameGeneratorFilters())
   const [results, setResults] = useState<GeneratedName[]>([])
   const [seed, setSeed] = useState<string | undefined>()
@@ -53,12 +86,12 @@ export function useNameGeneratorPage() {
     [namingContext, conventions, filters],
   )
   const filterOptions: NameGeneratorFilterOptions = useMemo(
-    () => deriveFilterOptions(filters, conventions),
-    [filters, conventions],
+    () => deriveFilterOptions(filters, conventions, filterContext),
+    [filters, conventions, filterContext],
   )
   const visibleFilters: NameGeneratorVisibleFilters = useMemo(
-    () => deriveVisibleFilters(filters, conventions),
-    [filters, conventions],
+    () => deriveVisibleFilters(filters, conventions, filterContext),
+    [filters, conventions, filterContext],
   )
   const matchCountLabel = useMemo(() => formatMatchCountLabel(matches.length), [matches.length])
   const resultsSummary: NameGeneratorResultsSummary | undefined = useMemo(() => {
@@ -66,30 +99,23 @@ export function useNameGeneratorPage() {
       return undefined
     }
 
-    return formatResultsSummary(filters, activeMatches, partialCount)
-  }, [activeMatches, filters, partialCount, status])
+    return formatResultsSummary(filters, activeMatches, partialCount, getConvention)
+  }, [activeMatches, filters, getConvention, partialCount, status])
 
   const setFilter = useCallback(
     (key: keyof NameGeneratorFilters, value: string | undefined) => {
-      const next: NameGeneratorFilters = { ...filters }
+      const next = applyNameGeneratorFilterChange({
+        filters,
+        key,
+        value,
+        speciesNamingOptions,
+        conventions,
+        cultureContexts,
+      })
 
-      if (key === 'subjectKind') {
-        next.subjectKind = (value ?? 'person') as NameSubjectKind
-      } else if (value === undefined || value === '') {
-        delete next[key]
-      } else if (key === 'genderStyle') {
-        next.genderStyle = value as NameGenderStyle
-      } else if (key === 'speciesId') {
-        next.speciesId = value
-      } else if (key === 'languageId') {
-        next.languageId = value
-      } else if (key === 'cultureId') {
-        next.cultureId = value
-      }
-
-      setFiltersState(sanitizeFiltersOnChange(filters, next, conventions))
+      setFiltersState(sanitizeFiltersOnChange(filters, next, conventions, filterContext))
     },
-    [conventions, filters],
+    [conventions, cultureContexts, filterContext, filters, speciesNamingOptions],
   )
 
   const resetFilters = useCallback(() => {
@@ -103,10 +129,17 @@ export function useNameGeneratorPage() {
       setPartialCount(undefined)
 
       try {
-        const batch = await generateNameBatch(filters, {
-          seed: nextSeed,
-          count: GENERATE_COUNT,
-        })
+        const batch = await generateNameBatch(
+          filters,
+          {
+            seed: nextSeed,
+            count: GENERATE_COUNT,
+          },
+          {
+            conventions,
+            getConvention,
+          },
+        )
 
         setResults(batch.results)
         setSeed(batch.seed)
@@ -126,7 +159,7 @@ export function useNameGeneratorPage() {
         setStatus('error')
       }
     },
-    [filters],
+    [conventions, filters, getConvention],
   )
 
   const generate = useCallback(async () => {

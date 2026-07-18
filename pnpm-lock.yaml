@@ -256,6 +256,9 @@ importers:
       '@rpg/name-generator-data':
         specifier: workspace:*
         version: link:../../packages/name-generator-data
+      '@rpg/name-generator-integrations':
+        specifier: workspace:*
+        version: link:../../packages/name-generator-integrations
       '@rpg/ui':
         specifier: workspace:*
         version: link:../../packages/ui
@@ -628,6 +631,31 @@ importers:
       '@rpg/name-generator-core':
         specifier: workspace:*
         version: link:../name-generator-core
+      eslint:
+        specifier: ^10.4.1
+        version: 10.4.1(jiti@2.6.1)
+      typescript:
+        specifier: ^6.0.3
+        version: 6.0.3
+      vitest:
+        specifier: ^4.1.8
+        version: 4.1.8(@types/node@25.9.2)(@vitest/coverage-v8@4.1.8)(jsdom@26.1.0)(vite@8.0.16(@types/node@25.9.2)(esbuild@0.28.0)(jiti@2.6.1)(tsx@4.22.4)(yaml@2.9.0))
+
+  packages/name-generator-integrations:
+    dependencies:
+      '@rpg/contracts':
+        specifier: workspace:*
+        version: link:../contracts
+      '@rpg/name-generator-core':
+        specifier: workspace:*
+        version: link:../name-generator-core
+      '@rpg/name-generator-data':
+        specifier: workspace:*
+        version: link:../name-generator-data
+    devDependencies:
+      '@rpg/config':
+        specifier: workspace:*
+        version: link:../config
       eslint:
         specifier: ^10.4.1
         version: 10.4.1(jiti@2.6.1)
@@ -5194,6 +5222,7 @@ packages:
   git-raw-commits@5.0.1:
     resolution: {integrity: sha512-Y+csSm2GD/PCSh6Isd/WiMjNAydu0VBiG9J7EdQsNA5P9uXvLayqjmTsNlK5Gs9IhblFZqOU0yid5Il5JPoLiQ==}
     engines: {node: '>=18'}
+    deprecated: Deprecated and no longer maintained. Use @conventional-changelog/git-client instead.
     hasBin: true
 
   glob-parent@5.1.2:

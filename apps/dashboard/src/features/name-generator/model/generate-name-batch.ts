@@ -7,7 +7,7 @@ import {
   type NamingRecommendation,
 } from '@rpg/contracts/name-generator'
 import { generateName } from '@rpg/name-generator-core'
-import { getConvention, listConventions, loadNameCollection } from '@rpg/name-generator-data'
+import { getConvention, listStaticConventions, loadNameCollection } from '@rpg/name-generator-data'
 
 import { allocateNameCounts, buildWeightedRoundRobinOrder } from './allocate-name-counts'
 import { buildNamingContext } from './build-naming-context'
@@ -24,8 +24,8 @@ export type GenerateNameBatchResult = {
 }
 
 export type GenerateNameBatchDeps = {
-  listConventions?: typeof listConventions
-  getConvention?: typeof getConvention
+  conventions?: readonly NamingConvention[]
+  getConvention?: (conventionId: string) => NamingConvention | undefined
   loadCollection?: LoadNameCollectionFn
 }
 
@@ -162,7 +162,7 @@ export async function generateNameBatch(
   },
   deps: GenerateNameBatchDeps = {},
 ): Promise<GenerateNameBatchResult> {
-  const conventions = (deps.listConventions ?? listConventions)()
+  const conventions = deps.conventions ?? listStaticConventions()
   const getConventionById = deps.getConvention ?? getConvention
   const loadCollection = deps.loadCollection ?? loadNameCollection
 
