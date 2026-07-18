@@ -1,12 +1,12 @@
 import type { NamingConventionDefinition } from '@rpg/contracts/name-generator'
 
-import { FIXTURE_COLLECTION_PROVENANCE } from '../../lib/provenance'
+import { FIXTURE_COLLECTION_PROVENANCE } from '../../../lib/provenance'
 
-export const halflingSettlementDefinition = {
+export const gnomeSettlementDefinition = {
   key: 'settlement',
-  id: 'halfling-settlement',
-  label: 'Common Halfling settlement names',
-  description: 'Settlement names sharing halfling linguistic pools with personal conventions.',
+  id: 'gnomish-settlement',
+  label: 'Common Gnomish settlement names',
+  description: 'Settlement names sharing gnomish linguistic pools with personal conventions.',
   subjectKinds: ['settlement', 'landmark'],
   structures: [
     {
@@ -20,14 +20,10 @@ export const halflingSettlementDefinition = {
     },
   ],
   partBindings: [
-    { partKey: 'placeRoot', collectionId: 'halfling-place-root-pool', sourceKey: 'placeRoot' },
-    {
-      partKey: 'placeSuffix',
-      collectionId: 'halfling-place-suffix-pool',
-      sourceKey: 'placeSuffix',
-    },
+    { partKey: 'placeRoot', collectionId: 'gnomish-place-root-pool', sourceKey: 'placeRoot' },
+    { partKey: 'placeSuffix', collectionId: 'gnomish-place-suffix-pool', sourceKey: 'placeSuffix' },
   ],
-  collectionIds: ['halfling-place-root-pool', 'halfling-place-suffix-pool'],
+  collectionIds: ['gnomish-place-root-pool', 'gnomish-place-suffix-pool'],
   provenance: FIXTURE_COLLECTION_PROVENANCE.conventionCuration,
   version: 1,
 } as const satisfies NamingConventionDefinition

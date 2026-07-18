@@ -1,6 +1,6 @@
 import type { NamingConventionDefinition } from '@rpg/contracts/name-generator'
 
-import { FIXTURE_COLLECTION_PROVENANCE } from '../../lib/provenance'
+import { FIXTURE_COLLECTION_PROVENANCE } from '../../../lib/provenance'
 
 export const elvenSettlementDefinition = {
   key: 'settlement',

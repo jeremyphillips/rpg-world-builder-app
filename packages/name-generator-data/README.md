@@ -76,7 +76,7 @@ Do not add a `listConventions()` that silently merges static and resolved output
 
 ## Adding a culture-bound convention
 
-1. Add `src/definitions/<culture>/<key>.ts` as a `NamingConventionDefinition`.
+1. Add `src/definitions/culture/<cultureId>/<key>.ts` or `src/definitions/species/<slug>/<key>.ts` as a `NamingConventionDefinition`.
 2. Register definition objects in `definitions/culture-bindings.ts`.
 3. Remove the legacy full convention from `conventions/manifest.ts` once parity tests pass.
 

@@ -1,5 +1,4 @@
 export { STANDALONE_NAMING_CULTURES } from './cultures/standalone-cultures'
-export { NAMING_CULTURES } from './cultures/cultures'
 export { CULTURE_CONVENTION_BINDINGS } from './definitions/culture-bindings'
 export { HERITAGE_CULTURE_ALIASES } from './heritage/heritage-culture-aliases'
 export {
