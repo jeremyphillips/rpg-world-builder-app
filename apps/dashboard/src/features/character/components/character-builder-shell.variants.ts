@@ -47,15 +47,15 @@ export const characterBuilderStepPanelClasses =
 
 export const characterBuilderPreviewPanelRootClasses = 'flex min-h-0 min-w-0 flex-1 flex-col gap-2'
 
-/** Scrollable bordered preview body — eyebrow sits above this container. */
-export const characterBuilderPreviewPanelBodyClasses =
-  'scrollbar-slim flex min-h-0 flex-1 flex-col overflow-y-auto rounded-lg border border-border bg-surface-muted'
-
-export const characterBuilderPreviewPanelBodyInnerClasses = 'min-w-0 p-4'
+/** Scrollable layout for preview inset panel — surface chrome from `InsetPanel`. */
+export const characterBuilderPreviewPanelInsetClasses =
+  'scrollbar-slim flex min-h-0 min-w-0 flex-1 flex-col overflow-y-auto rounded-lg'
 
 export const characterBuilderPreviewIdentitySummaryClasses = 'space-y-1 border-b border-border pb-4'
 
 export const characterBuilderPreviewCombatGridClasses = 'grid grid-cols-2 gap-3'
+
+export const characterBuilderPreviewCombatStackClasses = 'flex flex-col gap-3'
 
 export const characterBuilderPreviewStatGridClasses = 'grid grid-cols-3 gap-3'
 

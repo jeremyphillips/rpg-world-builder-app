@@ -1,6 +1,6 @@
 'use client'
 
-import { Button, InsetPanel } from '@rpg/ui'
+import { Button } from '@rpg/ui'
 
 import {
   EQUIPMENT_PURCHASED_INVENTORY_SECTION_LABEL,
@@ -41,13 +41,11 @@ export function EquipmentPurchasedInventoryColumn({
       }
       reserveToolbarRow={isPackageMode}
     >
-      <InsetPanel size="sm" className="rounded-lg">
-        <EquipmentPurchasedInventorySection
-          purchased={purchased}
-          onRemoveItem={onRemoveItem}
-          onSetPurchaseQuantity={onSetPurchaseQuantity}
-        />
-      </InsetPanel>
+      <EquipmentPurchasedInventorySection
+        purchased={purchased}
+        onRemoveItem={onRemoveItem}
+        onSetPurchaseQuantity={onSetPurchaseQuantity}
+      />
     </EquipmentInventoryColumn>
   )
 }

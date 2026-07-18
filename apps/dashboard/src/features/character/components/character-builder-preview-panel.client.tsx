@@ -8,7 +8,7 @@ import {
   type CharacterBuildPreview,
   type StandaloneBuildContext,
 } from '@rpg/contracts'
-import { Eyebrow, Text } from '@rpg/ui'
+import { Eyebrow, InsetPanel, Text } from '@rpg/ui'
 
 import {
   getBuilderDraftNarrative,
@@ -25,8 +25,7 @@ import {
 import { CharacterBuilderPreviewAccordion } from './character-builder-preview-accordion.client'
 import {
   characterBuilderPreviewIdentitySummaryClasses,
-  characterBuilderPreviewPanelBodyClasses,
-  characterBuilderPreviewPanelBodyInnerClasses,
+  characterBuilderPreviewPanelInsetClasses,
   characterBuilderPreviewPanelRootClasses,
 } from './character-builder-shell.variants'
 
@@ -65,39 +64,37 @@ export function CharacterBuilderPreviewPanel({
         Preview
       </Eyebrow>
 
-      <div className={characterBuilderPreviewPanelBodyClasses}>
-        <div className={characterBuilderPreviewPanelBodyInnerClasses}>
-          <div className={characterBuilderPreviewIdentitySummaryClasses}>
-            <Text as="p" variant="body" className="font-medium">
-              {getPreviewIdentityName(draft)}
-            </Text>
-            <Text as="p" variant="muted" className="text-sm">
-              {getPreviewLevelClassLine(draft, catalogIndex)}
-            </Text>
-            <Text as="p" variant="muted" className="text-sm">
-              {getPreviewSpeciesLine(draft, catalogIndex)}
-            </Text>
-            <Text as="p" variant="muted" className="text-sm">
-              {getPreviewAlignmentLine(draft)}
-            </Text>
-          </div>
-
-          {!preview ? (
-            <Text variant="muted">Preview will appear once builder context is ready.</Text>
-          ) : (
-            <CharacterBuilderPreviewAccordion
-              preview={preview}
-              catalogIndex={catalogIndex}
-              draft={draft}
-              resolvedChoiceSets={resolvedChoiceSets}
-              narrative={narrative}
-              narrativeCount={narrativeCount}
-              hasCharacterClass={characterClass !== undefined}
-              spellcastingActive={spellcastingActive}
-            />
-          )}
+      <InsetPanel size="md" className={characterBuilderPreviewPanelInsetClasses}>
+        <div className={characterBuilderPreviewIdentitySummaryClasses}>
+          <Text as="p" variant="body" className="font-medium">
+            {getPreviewIdentityName(draft)}
+          </Text>
+          <Text as="p" variant="muted" className="text-sm">
+            {getPreviewLevelClassLine(draft, catalogIndex)}
+          </Text>
+          <Text as="p" variant="muted" className="text-sm">
+            {getPreviewSpeciesLine(draft, catalogIndex)}
+          </Text>
+          <Text as="p" variant="muted" className="text-sm">
+            {getPreviewAlignmentLine(draft)}
+          </Text>
         </div>
-      </div>
+
+        {!preview ? (
+          <Text variant="muted">Preview will appear once builder context is ready.</Text>
+        ) : (
+          <CharacterBuilderPreviewAccordion
+            preview={preview}
+            catalogIndex={catalogIndex}
+            draft={draft}
+            resolvedChoiceSets={resolvedChoiceSets}
+            narrative={narrative}
+            narrativeCount={narrativeCount}
+            hasCharacterClass={characterClass !== undefined}
+            spellcastingActive={spellcastingActive}
+          />
+        )}
+      </InsetPanel>
     </aside>
   )
 }

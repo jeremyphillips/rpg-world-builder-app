@@ -47,6 +47,7 @@ import {
   characterBuilderPreviewAccordionTriggerClasses,
   characterBuilderPreviewAccordionTriggerStackClasses,
   characterBuilderPreviewCombatGridClasses,
+  characterBuilderPreviewCombatStackClasses,
 } from './character-builder-shell.variants'
 
 export type CharacterBuilderPreviewAccordionProps = {
@@ -138,16 +139,18 @@ function PreviewCombatSection({ preview }: { preview: CharacterBuildPreview }) {
       </AccordionTrigger>
       <AccordionContent>
         <CharacterBuilderPreviewSectionContent>
-          <dl className={characterBuilderPreviewCombatGridClasses}>
-            <PreviewStat label="HP" value={formatPreviewOptionalNumber(preview.maxHp)} />
-            <PreviewStat label="AC" value={formatPreviewOptionalNumber(preview.ac)} />
-          </dl>
-          <dl>
-            <PreviewStat
-              label="Proficiency bonus"
-              value={formatPreviewOptionalNumber(preview.proficiencyBonus, '+')}
-            />
-          </dl>
+          <div className={characterBuilderPreviewCombatStackClasses}>
+            <dl className={characterBuilderPreviewCombatGridClasses}>
+              <PreviewStat label="HP" value={formatPreviewOptionalNumber(preview.maxHp)} />
+              <PreviewStat label="AC" value={formatPreviewOptionalNumber(preview.ac)} />
+            </dl>
+            <dl>
+              <PreviewStat
+                label="Proficiency bonus"
+                value={formatPreviewOptionalNumber(preview.proficiencyBonus, '+')}
+              />
+            </dl>
+          </div>
         </CharacterBuilderPreviewSectionContent>
       </AccordionContent>
     </AccordionItem>

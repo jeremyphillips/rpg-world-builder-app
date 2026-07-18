@@ -1,4 +1,3 @@
-import { InsetPanel } from '@rpg/ui'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { useState } from 'react'
 
@@ -90,20 +89,18 @@ function PurchasedInventorySectionDemo(args: {
   }))
 
   return (
-    <InsetPanel size="sm" className="rounded-lg">
-      <EquipmentPurchasedInventorySection
-        purchased={groups}
-        showGroupHeadings={args.showGroupHeadings}
-        allowZeroQuantity={args.allowZeroQuantity}
-        onSetPurchaseQuantity={(target, quantity) => {
-          setQuantities((current) => ({ ...current, [target.purchaseId]: quantity }))
-        }}
-        onRemoveItem={(target) => {
-          if (target.kind !== 'purchase') return
-          setQuantities((current) => ({ ...current, [target.purchaseId]: 0 }))
-        }}
-      />
-    </InsetPanel>
+    <EquipmentPurchasedInventorySection
+      purchased={groups}
+      showGroupHeadings={args.showGroupHeadings}
+      allowZeroQuantity={args.allowZeroQuantity}
+      onSetPurchaseQuantity={(target, quantity) => {
+        setQuantities((current) => ({ ...current, [target.purchaseId]: quantity }))
+      }}
+      onRemoveItem={(target) => {
+        if (target.kind !== 'purchase') return
+        setQuantities((current) => ({ ...current, [target.purchaseId]: 0 }))
+      }}
+    />
   )
 }
 
@@ -124,6 +121,12 @@ export const WithGroupHeadings: Story = {
     purchased: purchasedGroups,
   },
   render: () => <PurchasedInventorySectionDemo />,
+}
+
+export const Empty: Story = {
+  args: {
+    purchased: [],
+  },
 }
 
 export const FlatListWithoutHeadings: Story = {
