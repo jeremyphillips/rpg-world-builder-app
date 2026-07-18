@@ -11,6 +11,7 @@ import {
   buildNamingCultureContext,
   buildSpeciesNamingOptions,
   resolveCampaignConventions,
+  resolveStandaloneConventions,
   type SpeciesCultureInput,
   type SpeciesNamingOption,
 } from '@rpg/name-generator-integrations'
@@ -52,7 +53,11 @@ export function composeNameGeneratorConventions(
     bindings: CULTURE_CONVENTION_BINDINGS,
     heritageAliases: HERITAGE_CULTURE_ALIASES,
   })
-  const conventions = [...campaignConventions, ...staticConventions]
+  const standaloneConventions = resolveStandaloneConventions({
+    cultures: STANDALONE_NAMING_CULTURES,
+    bindings: CULTURE_CONVENTION_BINDINGS,
+  })
+  const conventions = [...campaignConventions, ...standaloneConventions, ...staticConventions]
   const conventionById = new Map(conventions.map((convention) => [convention.id, convention]))
   const speciesNamingOptions = buildSpeciesNamingOptions({
     species,

@@ -1,16 +1,12 @@
-import type { NamingConvention } from '@rpg/contracts/name-generator'
+import type { NamingConventionDefinition } from '@rpg/contracts/name-generator'
 
-import { FIXTURE_COLLECTION_PROVENANCE } from '../lib/provenance'
+import { FIXTURE_COLLECTION_PROVENANCE } from '../../lib/provenance'
 
-export const goliathPersonalConvention = {
+export const goliathPersonalDefinition = {
+  key: 'personal',
   id: 'goliath-personal',
   label: 'Giant Goliath personal names',
   description: 'Birth name, earned epithet, and clan name for goliath characters.',
-  subjectKinds: ['person'],
-  associations: [
-    { kind: 'language', languageId: 'giant', strength: 'primary' },
-    { kind: 'culture', cultureId: 'goliath', strength: 'primary' },
-  ],
   structures: [
     {
       id: 'full',
@@ -31,4 +27,4 @@ export const goliathPersonalConvention = {
   collectionIds: ['goliath-given-pool', 'goliath-epithet-pool', 'goliath-clan-pool'],
   provenance: FIXTURE_COLLECTION_PROVENANCE.conventionCuration,
   version: 1,
-} as const satisfies NamingConvention
+} as const satisfies NamingConventionDefinition

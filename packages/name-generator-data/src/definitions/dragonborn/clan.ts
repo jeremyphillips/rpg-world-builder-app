@@ -1,16 +1,13 @@
-import type { NamingConvention } from '@rpg/contracts/name-generator'
+import type { NamingConventionDefinition } from '@rpg/contracts/name-generator'
 
-import { FIXTURE_COLLECTION_PROVENANCE } from '../lib/provenance'
+import { FIXTURE_COLLECTION_PROVENANCE } from '../../lib/provenance'
 
-export const draconicDragonbornClanConvention = {
+export const dragonbornClanDefinition = {
+  key: 'clan',
   id: 'draconic-dragonborn-clan',
   label: 'Draconic dragonborn clan names',
   description: 'Clan names for dragonborn communities as a standalone subject.',
   subjectKinds: ['clan', 'family'],
-  associations: [
-    { kind: 'language', languageId: 'draconic', strength: 'primary' },
-    { kind: 'culture', cultureId: 'dragonborn', strength: 'primary' },
-  ],
   structures: [
     {
       id: 'clan-only',
@@ -25,4 +22,4 @@ export const draconicDragonbornClanConvention = {
   collectionIds: ['draconic-dragonborn-clan-pool'],
   provenance: FIXTURE_COLLECTION_PROVENANCE.conventionCuration,
   version: 1,
-} as const satisfies NamingConvention
+} as const satisfies NamingConventionDefinition

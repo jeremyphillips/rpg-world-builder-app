@@ -1,16 +1,13 @@
-import type { NamingConvention } from '@rpg/contracts/name-generator'
+import type { NamingConventionDefinition } from '@rpg/contracts/name-generator'
 
-import { FIXTURE_COLLECTION_PROVENANCE } from '../lib/provenance'
+import { FIXTURE_COLLECTION_PROVENANCE } from '../../lib/provenance'
 
-export const infernalTieflingPersonalConvention = {
+export const tieflingPersonalDefinition = {
+  key: 'personal',
   id: 'infernal-tiefling-personal',
   label: 'Infernal Tiefling personal names',
   description: 'Given names with optional virtue surnames for tiefling characters.',
-  subjectKinds: ['person'],
-  associations: [
-    { kind: 'language', languageId: 'infernal', strength: 'influenced' },
-    { kind: 'culture', cultureId: 'tiefling', strength: 'primary' },
-  ],
+  associations: [{ kind: 'language', languageId: 'infernal', strength: 'influenced' }],
   structures: [
     {
       id: 'given-only',
@@ -35,4 +32,4 @@ export const infernalTieflingPersonalConvention = {
   collectionIds: ['infernal-tiefling-given-pool', 'infernal-tiefling-virtue-pool'],
   provenance: FIXTURE_COLLECTION_PROVENANCE.conventionCuration,
   version: 1,
-} as const satisfies NamingConvention
+} as const satisfies NamingConventionDefinition

@@ -23,7 +23,20 @@ const ELF_SPECIES = {
   languageAffinities: ['elvish'],
 }
 
+const ORC_SPECIES = {
+  id: 'srd-cc-5.2.1:orc',
+  slug: 'orc',
+  name: 'Orc',
+  source: 'system' as const,
+  culture: {
+    naming: { supported: true },
+  },
+  languageAffinities: ['orc'],
+}
+
 const { conventions, getConvention } = composeNameGeneratorConventions([ELF_SPECIES])
+const { conventions: orcConventions, getConvention: getOrcConvention } =
+  composeNameGeneratorConventions([ORC_SPECIES])
 
 describe('generateNameBatch', () => {
   it('generates deterministic names for a seeded request', async () => {
@@ -101,7 +114,7 @@ describe('generateNameBatch', () => {
         speciesId: 'srd-cc-5.2.1:orc',
       },
       { seed: 'orc-partial', count: 10 },
-      { loadCollection, conventions: listStaticConventions() },
+      { loadCollection, conventions: orcConventions, getConvention: getOrcConvention },
     )
 
     expect(batch.results).toHaveLength(3)

@@ -1,16 +1,12 @@
-import type { NamingConvention } from '@rpg/contracts/name-generator'
+import type { NamingConventionDefinition } from '@rpg/contracts/name-generator'
 
-import { FIXTURE_COLLECTION_PROVENANCE } from '../lib/provenance'
+import { FIXTURE_COLLECTION_PROVENANCE } from '../../lib/provenance'
 
-export const gnomishPersonalConvention = {
+export const gnomePersonalDefinition = {
+  key: 'personal',
   id: 'gnomish-personal',
   label: 'Common Gnomish personal names',
   description: 'Given and family names for gnome characters.',
-  subjectKinds: ['person'],
-  associations: [
-    { kind: 'language', languageId: 'gnomish', strength: 'primary' },
-    { kind: 'culture', cultureId: 'gnome', strength: 'primary' },
-  ],
   structures: [
     {
       id: 'full',
@@ -29,4 +25,4 @@ export const gnomishPersonalConvention = {
   collectionIds: ['gnomish-given-pool', 'gnomish-family-pool'],
   provenance: FIXTURE_COLLECTION_PROVENANCE.conventionCuration,
   version: 1,
-} as const satisfies NamingConvention
+} as const satisfies NamingConventionDefinition

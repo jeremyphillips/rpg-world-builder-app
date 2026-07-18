@@ -1,16 +1,13 @@
-import type { NamingConvention } from '@rpg/contracts/name-generator'
+import type { NamingConventionDefinition } from '@rpg/contracts/name-generator'
 
-import { FIXTURE_COLLECTION_PROVENANCE } from '../lib/provenance'
+import { FIXTURE_COLLECTION_PROVENANCE } from '../../lib/provenance'
 
-export const akanPersonalConvention = {
+export const akanPersonalDefinition = {
+  key: 'personal',
   id: 'akan-personal',
   label: 'Akan personal names',
   description: 'Historical akan personal naming with given and family structure.',
-  subjectKinds: ['person'],
-  associations: [
-    { kind: 'culture', cultureId: 'akan', strength: 'primary' },
-    { kind: 'region', regionId: 'west-africa' },
-  ],
+  associations: [{ kind: 'region', regionId: 'west-africa' }],
   structures: [
     {
       id: 'full',
@@ -29,4 +26,4 @@ export const akanPersonalConvention = {
   collectionIds: ['akan-given-pool', 'akan-family-pool'],
   provenance: FIXTURE_COLLECTION_PROVENANCE.historicalCurated,
   version: 1,
-} as const satisfies NamingConvention
+} as const satisfies NamingConventionDefinition

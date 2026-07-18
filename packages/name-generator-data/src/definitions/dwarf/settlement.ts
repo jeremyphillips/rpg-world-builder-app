@@ -1,16 +1,12 @@
-import type { NamingConvention } from '@rpg/contracts/name-generator'
+import type { NamingConventionDefinition } from '@rpg/contracts/name-generator'
 
-import { FIXTURE_COLLECTION_PROVENANCE } from '../lib/provenance'
+import { FIXTURE_COLLECTION_PROVENANCE } from '../../lib/provenance'
 
-export const dwarvenSettlementConvention = {
+export const dwarfSettlementDefinition = {
+  key: 'settlement',
   id: 'dwarven-settlement',
   label: 'Mountain Dwarven settlement names',
   description: 'Hold-style settlement names for dwarf communities.',
-  subjectKinds: ['settlement'],
-  associations: [
-    { kind: 'language', languageId: 'dwarvish', strength: 'primary' },
-    { kind: 'culture', cultureId: 'dwarf', strength: 'primary' },
-  ],
   structures: [
     {
       id: 'hold',
@@ -23,4 +19,4 @@ export const dwarvenSettlementConvention = {
   collectionIds: ['dwarven-settlement-pool'],
   provenance: FIXTURE_COLLECTION_PROVENANCE.conventionCuration,
   version: 1,
-} as const satisfies NamingConvention
+} as const satisfies NamingConventionDefinition

@@ -1,16 +1,12 @@
-import type { NamingConvention } from '@rpg/contracts/name-generator'
+import type { NamingConventionDefinition } from '@rpg/contracts/name-generator'
 
-import { FIXTURE_COLLECTION_PROVENANCE } from '../lib/provenance'
+import { FIXTURE_COLLECTION_PROVENANCE } from '../../lib/provenance'
 
-export const halflingPersonalConvention = {
+export const halflingPersonalDefinition = {
+  key: 'personal',
   id: 'halfling-personal',
   label: 'Common Halfling personal names',
   description: 'Given and family names for halfling characters.',
-  subjectKinds: ['person'],
-  associations: [
-    { kind: 'language', languageId: 'halfling', strength: 'primary' },
-    { kind: 'culture', cultureId: 'halfling', strength: 'primary' },
-  ],
   structures: [
     {
       id: 'full',
@@ -29,4 +25,4 @@ export const halflingPersonalConvention = {
   collectionIds: ['halfling-given-pool', 'halfling-family-pool'],
   provenance: FIXTURE_COLLECTION_PROVENANCE.conventionCuration,
   version: 1,
-} as const satisfies NamingConvention
+} as const satisfies NamingConventionDefinition

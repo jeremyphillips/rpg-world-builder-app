@@ -1,16 +1,13 @@
-import type { NamingConvention } from '@rpg/contracts/name-generator'
+import type { NamingConventionDefinition } from '@rpg/contracts/name-generator'
 
-import { FIXTURE_COLLECTION_PROVENANCE } from '../lib/provenance'
+import { FIXTURE_COLLECTION_PROVENANCE } from '../../lib/provenance'
 
-export const gnomishSettlementConvention = {
+export const gnomeSettlementDefinition = {
+  key: 'settlement',
   id: 'gnomish-settlement',
   label: 'Common Gnomish settlement names',
   description: 'Settlement names sharing gnomish linguistic pools with personal conventions.',
   subjectKinds: ['settlement', 'landmark'],
-  associations: [
-    { kind: 'language', languageId: 'gnomish', strength: 'primary' },
-    { kind: 'culture', cultureId: 'gnome', strength: 'primary' },
-  ],
   structures: [
     {
       id: 'compound-place',
@@ -29,4 +26,4 @@ export const gnomishSettlementConvention = {
   collectionIds: ['gnomish-place-root-pool', 'gnomish-place-suffix-pool'],
   provenance: FIXTURE_COLLECTION_PROVENANCE.conventionCuration,
   version: 1,
-} as const satisfies NamingConvention
+} as const satisfies NamingConventionDefinition

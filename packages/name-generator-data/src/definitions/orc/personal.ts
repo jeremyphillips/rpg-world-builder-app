@@ -1,16 +1,12 @@
-import type { NamingConvention } from '@rpg/contracts/name-generator'
+import type { NamingConventionDefinition } from '@rpg/contracts/name-generator'
 
-import { FIXTURE_COLLECTION_PROVENANCE } from '../lib/provenance'
+import { FIXTURE_COLLECTION_PROVENANCE } from '../../lib/provenance'
 
-export const orcPersonalConvention = {
+export const orcPersonalDefinition = {
+  key: 'personal',
   id: 'orc-personal',
   label: 'Common Orc personal names',
   description: 'Given names for orc characters.',
-  subjectKinds: ['person'],
-  associations: [
-    { kind: 'language', languageId: 'orc', strength: 'primary' },
-    { kind: 'culture', cultureId: 'orc', strength: 'primary' },
-  ],
   structures: [
     {
       id: 'given-only',
@@ -23,4 +19,4 @@ export const orcPersonalConvention = {
   collectionIds: ['orc-given-pool'],
   provenance: FIXTURE_COLLECTION_PROVENANCE.conventionCuration,
   version: 1,
-} as const satisfies NamingConvention
+} as const satisfies NamingConventionDefinition

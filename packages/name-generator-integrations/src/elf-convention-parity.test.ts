@@ -1,69 +1,18 @@
 import { describe, expect, it } from 'vitest'
 
-import type { NamingAssociation, NamingConvention } from '@rpg/contracts/name-generator'
+import type { NamingAssociation } from '@rpg/contracts/name-generator'
 
-import { dedupeAssociations } from './dedupe-associations'
-import { getDefaultSubjectKinds } from './default-subject-kinds'
+import { CULTURE_CONVENTION_BINDINGS } from '@rpg/name-generator-data'
+
 import {
   buildSpeciesNamingOption,
   HOMEBREW_SPECIES_NAMING_DISABLED_REASON,
   NO_PERSONAL_NAMING_CONVENTION_REASON,
   SPECIES_NAMING_UNSUPPORTED_REASON,
 } from './build-species-naming-options'
-import {
-  resolveCampaignConventions,
-  type SpeciesCultureInput,
-} from './resolve-campaign-conventions'
-import { resolveNamingConvention } from './resolve-naming-convention'
-import { buildNamingCultureContext } from './build-naming-culture-context'
-import { CULTURE_CONVENTION_BINDINGS } from '@rpg/name-generator-data'
-
-const [elvenPersonalDefinition, elvenSettlementDefinition] = CULTURE_CONVENTION_BINDINGS.elven
-
-const LEGACY_ELVISH_PERSONAL = {
-  id: 'elvish-personal',
-  label: 'Elven personal names',
-  description: 'Given and family names for elven characters.',
-  subjectKinds: ['person'],
-  associations: [
-    { kind: 'culture', cultureId: 'elven', strength: 'primary' },
-    { kind: 'language', languageId: 'elvish', strength: 'primary' },
-  ],
-  structures: [...elvenPersonalDefinition.structures],
-  partBindings: [...elvenPersonalDefinition.partBindings],
-  collectionIds: [...elvenPersonalDefinition.collectionIds],
-  provenance: elvenPersonalDefinition.provenance,
-  version: elvenPersonalDefinition.version,
-} as NamingConvention
-
-const LEGACY_ELVISH_SETTLEMENT = {
-  id: 'elvish-settlement',
-  label: 'Elven settlement names',
-  description: 'Settlement names sharing elvish linguistic pools with personal conventions.',
-  subjectKinds: ['settlement', 'landmark'],
-  associations: [
-    { kind: 'culture', cultureId: 'elven', strength: 'primary' },
-    { kind: 'language', languageId: 'elvish', strength: 'primary' },
-  ],
-  structures: [...elvenSettlementDefinition.structures],
-  partBindings: [...elvenSettlementDefinition.partBindings],
-  collectionIds: [...elvenSettlementDefinition.collectionIds],
-  provenance: elvenSettlementDefinition.provenance,
-  version: elvenSettlementDefinition.version,
-} as NamingConvention
-
-const ELF_SPECIES: SpeciesCultureInput = {
-  id: 'srd-cc-5.2.1:elf',
-  slug: 'elf',
-  name: 'Elf',
-  source: 'system',
-  culture: {
-    id: 'elven',
-    name: 'Elven',
-    naming: { supported: true, personalNameComponents: ['family'] },
-  },
-  languageAffinities: ['elvish'],
-}
+import { dedupeAssociations } from './dedupe-associations'
+import { getDefaultSubjectKinds } from './default-subject-kinds'
+import type { SpeciesCultureInput } from './resolve-campaign-conventions'
 
 const HUMAN_SPECIES: SpeciesCultureInput = {
   id: 'srd-cc-5.2.1:human',
@@ -84,36 +33,6 @@ const HOMEBREW_SPECIES: SpeciesCultureInput = {
     naming: { supported: true },
   },
 }
-
-describe('resolveNamingConvention', () => {
-  it('matches legacy elvish personal convention output', () => {
-    const context = buildNamingCultureContext(ELF_SPECIES)
-    expect(resolveNamingConvention({ context, definition: elvenPersonalDefinition })).toEqual(
-      LEGACY_ELVISH_PERSONAL,
-    )
-  })
-
-  it('matches legacy elvish settlement convention output', () => {
-    const context = buildNamingCultureContext(ELF_SPECIES)
-    expect(resolveNamingConvention({ context, definition: elvenSettlementDefinition })).toEqual(
-      LEGACY_ELVISH_SETTLEMENT,
-    )
-  })
-})
-
-describe('resolveCampaignConventions', () => {
-  it('preserves elf convention ordering and dedupes by resolved id', () => {
-    const conventions = resolveCampaignConventions({
-      species: [ELF_SPECIES, ELF_SPECIES],
-      bindings: CULTURE_CONVENTION_BINDINGS,
-    })
-
-    expect(conventions.map((convention) => convention.id)).toEqual([
-      'elvish-personal',
-      'elvish-settlement',
-    ])
-  })
-})
 
 describe('dedupeAssociations', () => {
   it('merges duplicate culture and language associations by semantic key', () => {
@@ -143,7 +62,11 @@ describe('getDefaultSubjectKinds', () => {
 
 describe('buildSpeciesNamingOption', () => {
   it('marks homebrew species disabled with a dedicated reason', () => {
-    expect(buildSpeciesNamingOption(HOMEBREW_SPECIES, [LEGACY_ELVISH_PERSONAL])).toEqual({
+    expect(
+      buildSpeciesNamingOption(HOMEBREW_SPECIES, [
+        { id: 'elvish-personal', subjectKinds: ['person'], associations: [] } as never,
+      ]),
+    ).toEqual({
       speciesId: 'homebrew:custom',
       label: 'Custom Folk',
       disabled: true,
@@ -175,7 +98,11 @@ describe('buildSpeciesNamingOption', () => {
       },
     }
 
-    expect(buildSpeciesNamingOption(supportedWithoutConvention, [LEGACY_ELVISH_PERSONAL])).toEqual({
+    expect(
+      buildSpeciesNamingOption(supportedWithoutConvention, [
+        { id: 'elvish-personal', subjectKinds: ['person'], associations: [] } as never,
+      ]),
+    ).toEqual({
       speciesId: 'srd-cc-5.2.1:human',
       label: 'Human',
       disabled: true,

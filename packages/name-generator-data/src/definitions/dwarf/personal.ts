@@ -1,16 +1,12 @@
-import type { NamingConvention } from '@rpg/contracts/name-generator'
+import type { NamingConventionDefinition } from '@rpg/contracts/name-generator'
 
-import { FIXTURE_COLLECTION_PROVENANCE } from '../lib/provenance'
+import { FIXTURE_COLLECTION_PROVENANCE } from '../../lib/provenance'
 
-export const dwarvenPersonalConvention = {
+export const dwarfPersonalDefinition = {
+  key: 'personal',
   id: 'dwarven-personal',
   label: 'Mountain Dwarven personal names',
   description: 'Given and clan names for dwarf characters.',
-  subjectKinds: ['person'],
-  associations: [
-    { kind: 'language', languageId: 'dwarvish', strength: 'primary' },
-    { kind: 'culture', cultureId: 'dwarf', strength: 'primary' },
-  ],
   structures: [
     {
       id: 'full',
@@ -29,4 +25,4 @@ export const dwarvenPersonalConvention = {
   collectionIds: ['dwarven-given-pool', 'dwarven-clan-pool'],
   provenance: FIXTURE_COLLECTION_PROVENANCE.conventionCuration,
   version: 1,
-} as const satisfies NamingConvention
+} as const satisfies NamingConventionDefinition

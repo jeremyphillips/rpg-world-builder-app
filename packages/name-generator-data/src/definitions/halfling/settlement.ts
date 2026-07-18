@@ -1,16 +1,13 @@
-import type { NamingConvention } from '@rpg/contracts/name-generator'
+import type { NamingConventionDefinition } from '@rpg/contracts/name-generator'
 
-import { FIXTURE_COLLECTION_PROVENANCE } from '../lib/provenance'
+import { FIXTURE_COLLECTION_PROVENANCE } from '../../lib/provenance'
 
-export const halflingSettlementConvention = {
+export const halflingSettlementDefinition = {
+  key: 'settlement',
   id: 'halfling-settlement',
   label: 'Common Halfling settlement names',
   description: 'Settlement names sharing halfling linguistic pools with personal conventions.',
   subjectKinds: ['settlement', 'landmark'],
-  associations: [
-    { kind: 'language', languageId: 'halfling', strength: 'primary' },
-    { kind: 'culture', cultureId: 'halfling', strength: 'primary' },
-  ],
   structures: [
     {
       id: 'compound-place',
@@ -33,4 +30,4 @@ export const halflingSettlementConvention = {
   collectionIds: ['halfling-place-root-pool', 'halfling-place-suffix-pool'],
   provenance: FIXTURE_COLLECTION_PROVENANCE.conventionCuration,
   version: 1,
-} as const satisfies NamingConvention
+} as const satisfies NamingConventionDefinition
