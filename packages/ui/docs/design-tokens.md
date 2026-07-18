@@ -58,7 +58,7 @@ Recipes are the public contract; ladder steps are implementation details recipes
 `--surface-sunken-shadow`) — raised panels use the former; `InsetPanel` defaults to `surface="sunken"`
 (fill + sunken shadow). Use `surface="muted"` or `surface="subtle"` for flat wash panels.
 | Secondary | `bg-secondary` | Alternate **interactive** surface (e.g. Button `secondary`) |
-| Field | `bg-input`, `border-input` | Editable control chrome — near-white in light mode only |
+| Field | `bg-input`, `border-input` | Editable control chrome — canvas lifted toward white (light) or panel (dark) |
 
 `bg-muted` aliases `bg-surface-muted` for shadcn compatibility — prefer `bg-surface-*` in new code.
 
@@ -80,16 +80,19 @@ Status borders stay status-specific (`border-destructive-muted`, …). Recipe bo
 Shared recipes (Layer 2 → Tailwind). Tinted washes mix toward `--background` (or another
 concrete surface), not `transparent`:
 
-| CSS role                | Utility                      | Composition (light/dark)         |
-| ----------------------- | ---------------------------- | -------------------------------- |
-| `--control-hover-bg`    | `bg-control-hover`           | `color-mix(accent → background)` |
-| `--control-selected-bg` | `bg-control-selected`        | `color-mix(accent → background)` |
-| `--row-hover-bg`        | `hover:bg-row-hover`         | `--surface-subtle`               |
-| `--row-selected-bg`     | `bg-row-selected`            | `--surface-strong`               |
-| `--row-selected-border` | `border-row-selected-border` | `--border-strong`                |
-| `--drop-target-bg`      | `bg-drop-target`             | `color-mix(accent → background)` |
-| `--drop-target-border`  | `border-drop-target-border`  | `--primary`                      |
-| `--segmented-track-bg`  | `bg-segmented-track`         | `--surface-strong`               |
+| CSS role                     | Utility                           | Composition (light/dark)         |
+| ---------------------------- | --------------------------------- | -------------------------------- |
+| `--control-hover-bg`         | `bg-control-hover`                | `color-mix(accent → background)` |
+| `--control-selected-bg`      | `bg-control-selected`             | `color-mix(accent → background)` |
+| `--row-hover-bg`             | `hover:bg-row-hover`              | `--surface-subtle`               |
+| `--row-selected-bg`          | `bg-row-selected`                 | `--surface-strong`               |
+| `--row-selected-border`      | `border-row-selected-border`      | `--border-strong`                |
+| `--drop-target-bg`           | `bg-drop-target`                  | `color-mix(accent → background)` |
+| `--drop-target-border`       | `border-drop-target-border`       | `--primary`                      |
+| `--segmented-track-bg`       | `bg-segmented-track`              | `--surface-strong`               |
+| `--outline-button-border`    | `border-outline-button-border`    | `--foreground`                   |
+| `--outline-button-hover-bg`  | `hover:bg-outline-button-hover`   | `--surface-subtle`               |
+| `--outline-button-active-bg` | `active:bg-outline-button-active` | `--surface-muted`                |
 
 Add a new recipe only when the state is reused, owned by a shared primitive, or must stay
 independently tunable across light/dark. One-offs stay in local CVA using the ladder or status

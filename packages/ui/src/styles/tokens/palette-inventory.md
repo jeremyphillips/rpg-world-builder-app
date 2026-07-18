@@ -14,12 +14,12 @@ tests + Storybook).
 
 ## Model: anchors → derived scales → semantic aliases
 
-| Kind                 | Examples                                                                  | Rule                                                                                         |
-| -------------------- | ------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- | --------------------------------------------------------------- | ---------------------------------------------------------- |
-| **Authored anchors** | `surface-base`, `surface-panel`, `surface-field`, `fg-default`, `primary` | Independent oklch identity — not derived from the wash ladder                                |
-| **Mix ingredient**   | `neutral-contrast`                                                        | Direction-appropriate contrast ingredient per mode (warmer/darker in light; lighter in dark) |
-| **Derived scales**   | `surface-subtle                                                           | muted                                                                                        | strong`, `fg-muted`, `fg-disabled`, `border-_`, `field-border_` | `color-mix` toward concrete surfaces — final usable colors |
-| **Semantic aliases** | `field-placeholder` → `fg-muted`, `field-bg` → `surface-field`            | Preserve component intent even when values match                                             |
+| Kind                 | Examples                                                                     | Rule                                                                               |
+| -------------------- | ---------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
+| **Authored anchors** | `surface-base`, `surface-panel`, `fg-default`, `primary`, `neutral-contrast` | Independent oklch identity — not derived from the wash ladder                      |
+| **Mix ingredient**   | `neutral-contrast`                                                           | Gold wash ingredient per mode (chromatic — not achromatic neutral)                 |
+| **Derived surfaces** | `surface-field`, `surface-subtle`, `surface-muted`, …                        | `color-mix` from anchors — field lifts canvas toward white (light) or panel (dark) |
+| **Semantic aliases** | `field-placeholder` → `fg-muted`, `field-bg` → `surface-field`               | Preserve component intent even when values match                                   |
 
 Interaction recipes (`control-hover`, `row-hover`, …) live at **Layer 2** only — not in this inventory.
 
@@ -36,24 +36,24 @@ Exact allowlist for intentional solid-control / backdrop opacity:
 
 ## Warmth anchor
 
-| Token                        | Role                                                      |
-| ---------------------------- | --------------------------------------------------------- |
-| `--palette-neutral-hue`      | Hue anchor for sidebar and overlay recipes                |
-| `--palette-neutral-contrast` | Mix ingredient for wash ladder and derived neutral chrome |
+| Token                        | Role                                                              |
+| ---------------------------- | ----------------------------------------------------------------- |
+| `--palette-neutral-hue`      | Hue anchor for sidebar and overlay recipes                        |
+| `--palette-neutral-contrast` | Mix ingredient for wash ladder; aliases `surface-accent` in light |
 
 ## Elevation surfaces
 
-| Token                         | Layer 2 mapping              | Job                                               |
-| ----------------------------- | ---------------------------- | ------------------------------------------------- |
-| `--palette-surface-base`      | `--background`               | Canvas / page                                     |
-| `--palette-surface-subtle`    | `--surface-subtle`           | Derived wash — barely visible grouping            |
-| `--palette-surface-muted`     | `--surface-muted`, `--muted` | Derived wash — standard secondary panel           |
-| `--palette-surface-strong`    | `--surface-strong`           | Derived wash — dense neutral chrome               |
-| `--palette-surface-panel`     | `--card`, `--popover`        | Authored warm elevated panels / overlays          |
-| `--palette-surface-field`     | `--palette-field-bg` (alias) | Authored editable control plane                   |
-| `--palette-surface-sunken`    | `--sunken`                   | Recessed / inset fills (derived or thin-authored) |
-| `--palette-surface-secondary` | `--secondary`                | Alternate low-emphasis **interactive** surface    |
-| `--palette-surface-accent`    | `--accent`                   | Hover / gold chrome (light)                       |
+| Token                         | Layer 2 mapping              | Job                                                                         |
+| ----------------------------- | ---------------------------- | --------------------------------------------------------------------------- |
+| `--palette-surface-base`      | `--background`               | Canvas / page                                                               |
+| `--palette-surface-subtle`    | `--surface-subtle`           | Derived wash — barely visible grouping                                      |
+| `--palette-surface-muted`     | `--surface-muted`, `--muted` | Derived wash — standard secondary panel                                     |
+| `--palette-surface-strong`    | `--surface-strong`           | Derived wash — dense neutral chrome                                         |
+| `--palette-surface-panel`     | `--card`, `--popover`        | Authored warm elevated panels / overlays                                    |
+| `--palette-surface-field`     | `--palette-field-bg` (alias) | Derived editable plane — canvas lifted toward white (light) or panel (dark) |
+| `--palette-surface-sunken`    | `--sunken`                   | Recessed / inset fills (derived or thin-authored)                           |
+| `--palette-surface-secondary` | `--secondary`                | Aliases `surface-panel` in light; alternate interactive surface in dark     |
+| `--palette-surface-accent`    | `--accent`                   | Aliases `neutral-contrast` in light; hover chrome in dark                   |
 
 `--secondary` is for shadcn-compatible Button `secondary` and similar interactive
 controls — not a generic page/section fill.

@@ -149,7 +149,7 @@ export function buildStartingWealthTiersField(): LevelRangeArrayConfig {
           defaultValue: false,
         },
         dependents: {
-          surface: 'subtle',
+          surface: 'muted',
           fields: [
             {
               type: 'inputSelect',
@@ -193,7 +193,7 @@ export function buildStartingWealthTiersField(): LevelRangeArrayConfig {
         min: 0,
         item: {
           variant: 'compact',
-          surface: 'subtle',
+          surface: 'strong',
           header: {
             fallback: (index) => `Grant #${index + 1}`,
             srOnly: true,

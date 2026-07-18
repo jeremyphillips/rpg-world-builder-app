@@ -217,6 +217,13 @@ export const FIELD_CONTROL_SEMANTIC_ROLES = [
 /** Layer 2 choice-indicator roles composed in semantic-*.css (not field-input chrome). */
 export const CHOICE_CONTROL_SEMANTIC_ROLES = ['--choice-control-border'] as const
 
+/** Layer 2 outline button recipe roles composed in semantic-*.css. */
+export const OUTLINE_BUTTON_SEMANTIC_ROLES = [
+  '--outline-button-border',
+  '--outline-button-hover-bg',
+  '--outline-button-active-bg',
+] as const
+
 /** Layer 2 interaction recipe roles composed in semantic-*.css (not Layer 1). */
 export const INTERACTION_SEMANTIC_ROLES = [
   '--control-hover-bg',

@@ -123,6 +123,13 @@
   --choice-control-border: color-mix(in oklch, var(--foreground) 32%, var(--card));
 
   /*
+   * Outline button — full ink border, neutral hover wash (not accent fill).
+   */
+  --outline-button-border: var(--foreground);
+  --outline-button-hover-bg: var(--surface-subtle);
+  --outline-button-active-bg: var(--surface-muted);
+
+  /*
    * Shared interaction recipes — public contract for hover/selected/drag/track chrome.
    * Composed at Layer 2 toward concrete surfaces (no transparent washes).
    */

@@ -2,21 +2,23 @@
  * Layer 1 — light theme palette roles (oklch SSOT).
  * Inventory: tokens/palette-inventory.md — every name must exist in palette-dark.css.
  *
- * Motif: cream canvas, warm panel (card/popover), formula-derived washes, near-white field plane.
+ * Motif: cream canvas, warm panel (card/popover), formula-derived washes, field lift from canvas.
  */
 :root {
   --palette-neutral-hue: 82;
 
   /* Authored anchors — visual identity */
-  --palette-neutral-contrast: oklch(0.745 0.103 86.4);
-  --palette-surface-base: oklch(0.974 0.026 90.1);
+  --palette-surface-base: oklch(0.98 0.0179 89.36);
   --palette-surface-panel: oklch(0.934 0.039 90);
-  --palette-surface-field: oklch(0.995 0.002 90);
+  --palette-neutral-contrast: oklch(0.745 0.103 86.4);
   --palette-fg-default: oklch(0.28 0.038 68);
-  --palette-fg-on-solid: oklch(0.974 0.026 90.1);
   --palette-fg-on-status: oklch(0.186 0.029 64.3);
-  --palette-surface-secondary: oklch(0.934 0.04 91.2);
-  --palette-surface-accent: oklch(0.745 0.103 86.4);
+
+  /* Derived or aliased surfaces — keep semantic names, single source of truth */
+  --palette-surface-field: color-mix(in oklch, var(--palette-surface-base) 50%, white);
+  --palette-fg-on-solid: var(--palette-surface-base);
+  --palette-surface-secondary: var(--palette-surface-panel);
+  --palette-surface-accent: var(--palette-neutral-contrast);
 
   /* Derived foreground scale */
   --palette-fg-muted: color-mix(
@@ -43,7 +45,7 @@
   );
   --palette-surface-strong: color-mix(
     in oklch,
-    var(--palette-neutral-contrast) 22%,
+    var(--palette-neutral-contrast) 32%,
     var(--palette-surface-base)
   );
   --palette-surface-sunken: color-mix(

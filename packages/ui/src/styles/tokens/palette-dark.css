@@ -11,12 +11,18 @@
   --palette-neutral-contrast: oklch(0.985 0.006 82);
   --palette-surface-base: oklch(0.141 0.004 var(--palette-neutral-hue));
   --palette-surface-panel: oklch(0.22 0.008 var(--palette-neutral-hue));
-  --palette-surface-field: oklch(0.17 0.004 var(--palette-neutral-hue));
   --palette-fg-default: oklch(0.985 0.006 82);
   --palette-fg-on-solid: oklch(0.985 0 0);
   --palette-fg-on-status: oklch(0.141 0.004 var(--palette-neutral-hue));
   --palette-surface-secondary: oklch(0.194 0.005 var(--palette-neutral-hue));
   --palette-surface-accent: oklch(0.32 0.006 var(--palette-neutral-hue));
+
+  /* Derived surfaces — editable plane lifted from canvas toward panel */
+  --palette-surface-field: color-mix(
+    in oklch,
+    var(--palette-surface-base) 30%,
+    var(--palette-surface-panel)
+  );
 
   /* Derived foreground scale */
   --palette-fg-muted: color-mix(
