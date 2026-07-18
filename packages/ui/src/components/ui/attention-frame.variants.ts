@@ -6,7 +6,7 @@ export const attentionFrameVariants = cva(
   {
     variants: {
       active: {
-        true: 'border-primary bg-accent/20 ring-1 ring-primary/20 motion-safe:animate-attention-ring',
+        true: 'border-primary bg-control-selected ring-1 ring-primary/20 motion-safe:animate-attention-ring',
         false: 'border-transparent',
       },
     },

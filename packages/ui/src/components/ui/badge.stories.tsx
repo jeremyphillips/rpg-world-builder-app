@@ -54,7 +54,7 @@ export const Sizes: Story = {
 }
 
 function SurfaceMatrix({ surface }: { surface: 'base' | 'subtle' }) {
-  const surfaceClass = surface === 'subtle' ? 'bg-muted/30' : 'bg-background'
+  const surfaceClass = surface === 'subtle' ? 'bg-surface-muted' : 'bg-background'
 
   return (
     <div className="space-y-6">
@@ -97,7 +97,7 @@ export const LegibilitySmWeight300: Story = {
           11px outline
         </Badge>
       </div>
-      <div className="rounded-lg bg-muted/30 p-4">
+      <div className="rounded-lg bg-surface-muted p-4">
         <Badge appearance="accent-outline" tone="warning" size="sm">
           11px accent-outline
         </Badge>

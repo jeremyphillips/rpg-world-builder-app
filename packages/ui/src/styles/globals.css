@@ -34,7 +34,7 @@
  *
  * Alpha policy: public semantic surface tokens resolve to final usable colors.
  * Avoid stacking opacity utilities on tokens that already contain alpha unless
- * intentional (see `tokens/palette-inventory.md`).
+ * intentional (see `tokens/palette-inventory.md` and `alpha-utility-allowlist.ts`).
  *
  * Color tokens use three layers:
  * 1. `--palette-*` theme roles — oklch SSOT in `tokens/palette-light.css` and
@@ -63,6 +63,9 @@
   --color-secondary-foreground: var(--secondary-foreground);
   --color-muted: var(--muted);
   --color-sunken: var(--sunken);
+  --color-surface-subtle: var(--surface-subtle);
+  --color-surface-muted: var(--surface-muted);
+  --color-surface-strong: var(--surface-strong);
   --color-muted-foreground: var(--muted-foreground);
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
@@ -83,6 +86,8 @@
   --color-warning-muted: var(--warning-muted);
   --color-warning-subtle: var(--warning-subtle);
   --color-border: var(--border);
+  --color-border-subtle: var(--border-subtle);
+  --color-border-strong: var(--border-strong);
   --color-card-selected-border: var(--card-selected-border);
   /* No `--color-input` — `border-input` / `bg-input` are custom utilities (see below). */
   --color-input-invalid: var(--field-control-border-invalid);
@@ -114,6 +119,14 @@
   --color-selected-control-border: var(--selected-control-border);
   --color-catalog-picker-row-surface: var(--catalog-picker-row-surface);
   --color-sidebar: var(--sidebar);
+  --color-control-hover: var(--control-hover-bg);
+  --color-control-selected: var(--control-selected-bg);
+  --color-row-hover: var(--row-hover-bg);
+  --color-row-selected: var(--row-selected-bg);
+  --color-row-selected-border: var(--row-selected-border);
+  --color-drop-target: var(--drop-target-bg);
+  --color-drop-target-border: var(--drop-target-border);
+  --color-segmented-track: var(--segmented-track-bg);
 
   --shadow-surface-raised: var(--surface-raised-shadow);
 

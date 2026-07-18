@@ -2,7 +2,7 @@
 export const ticketCardRootClasses = 'group'
 
 export const ticketCardInteractiveClasses =
-  'transition-colors hover:bg-accent/50 focus-within:bg-accent/50'
+  'transition-colors hover:bg-control-hover focus-within:bg-control-hover'
 
 export const ticketCardHeaderClasses =
   'flex flex-row items-center justify-between gap-2 space-y-0 p-0 px-3 pb-0 pt-3'

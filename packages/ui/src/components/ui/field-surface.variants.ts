@@ -19,7 +19,7 @@ export const fieldGroupBodyShellLayoutClasses = cn(
 export const fieldSurfaceRaisedShadowClasses = 'shadow-surface-raised'
 
 /** Structural background plane for container chrome. */
-export const FIELD_SURFACE_VARIANTS = ['base', 'raised', 'subtle', 'medium', 'strong'] as const
+export const FIELD_SURFACE_VARIANTS = ['base', 'raised', 'subtle', 'muted', 'strong'] as const
 
 export type FieldSurfaceVariant = (typeof FIELD_SURFACE_VARIANTS)[number]
 
@@ -31,9 +31,9 @@ export type FieldStatusTone = (typeof FIELD_STATUS_TONES)[number]
 const fieldSurfaceVariantClasses = {
   base: 'border-border bg-background',
   raised: cn('border-border bg-card', fieldSurfaceRaisedShadowClasses),
-  subtle: 'border-border bg-muted/10',
-  medium: 'border-border bg-muted/30',
-  strong: 'border-border bg-muted/50',
+  subtle: 'border-border bg-surface-subtle',
+  muted: 'border-border bg-surface-muted',
+  strong: 'border-border bg-surface-strong',
 } satisfies Record<FieldSurfaceVariant, string>
 
 const fieldStatusToneClasses = {
@@ -131,7 +131,7 @@ export const fieldSurfaceToneVariants = cva('', {
       main: fieldSurfaceVariantClasses.base,
       elevated: fieldSurfaceVariantClasses.raised,
       subtle: fieldSurfaceVariantClasses.subtle,
-      medium: fieldSurfaceVariantClasses.medium,
+      muted: fieldSurfaceVariantClasses.muted,
       warning: fieldStatusToneClasses.warning,
       error: fieldStatusToneClasses.destructive,
     },

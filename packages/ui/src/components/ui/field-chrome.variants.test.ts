@@ -17,7 +17,7 @@ describe('resolveFieldChromeClassNames', () => {
     const classes = resolveFieldChromeClassNames({ variant: 'panel' }, 'md')
     expect(classes).toContain(fieldShellLayoutClasses)
     expect(classes).toContain(fieldChromePaddingMdClasses)
-    expect(classes).toContain('bg-muted/10')
+    expect(classes).toContain('bg-surface-subtle')
   })
 
   it('uses separate sm padding token', () => {

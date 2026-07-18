@@ -8,9 +8,9 @@ export const fixedScoresScorePoolHeaderClasses = 'flex items-center justify-betw
 
 /** Dashed container for unassigned score tokens — expandable token set. */
 export const fixedScoresScorePoolContainerClasses =
-  'flex flex-col gap-2 rounded-md border border-dashed border-muted-foreground/20 bg-muted/5 p-4 transition-colors'
+  'flex flex-col gap-2 rounded-md border border-dashed border-muted-foreground/20 bg-surface-subtle p-4 transition-colors'
 
-export const fixedScoresScorePoolContainerDragOverClasses = 'border-primary/50 bg-muted/10'
+export const fixedScoresScorePoolContainerDragOverClasses = 'border-primary/50 bg-drop-target'
 
 export const fixedScoresScorePoolContainerTokensClasses =
   'flex min-h-16 flex-wrap items-center gap-3'
@@ -26,7 +26,7 @@ export const abilityScoreCardStateClasses = {
   empty: 'border-border bg-card',
   dragOverValid: 'border-primary ring-2 ring-primary/30 bg-card',
   filled: 'border-border bg-card',
-  draggingFrom: 'border-dashed border-muted-foreground/40 bg-muted/30',
+  draggingFrom: 'border-dashed border-muted-foreground/40 bg-surface-muted',
   invalidAfterAttempt: 'border-destructive ring-2 ring-destructive/30 bg-card',
   suggested: 'border-border bg-card',
 } as const

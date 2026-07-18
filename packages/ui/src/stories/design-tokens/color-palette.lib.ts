@@ -38,7 +38,12 @@ export const SURFACE_BACKGROUNDS: SurfaceBackground[] = [
   { id: 'background', label: 'background', cssVar: '--background', tailwind: 'bg-background' },
   { id: 'sunken', label: 'sunken', cssVar: '--sunken', tailwind: 'bg-sunken' },
   { id: 'card', label: 'card', cssVar: '--card', tailwind: 'bg-card' },
-  { id: 'muted', label: 'muted', cssVar: '--muted', tailwind: 'bg-muted' },
+  {
+    id: 'surface-muted',
+    label: 'surface-muted',
+    cssVar: '--surface-muted',
+    tailwind: 'bg-surface-muted',
+  },
   { id: 'sidebar', label: 'sidebar', cssVar: '--sidebar', tailwind: 'bg-sidebar' },
 ]
 
@@ -197,6 +202,24 @@ export const COLOR_TOKEN_GROUPS: ColorTokenGroup[] = [
         foregroundTailwind: 'text-muted-foreground',
       },
       {
+        name: 'surface-subtle',
+        cssVar: '--surface-subtle',
+        tailwind: 'bg-surface-subtle',
+        usage: 'background',
+      },
+      {
+        name: 'surface-muted',
+        cssVar: '--surface-muted',
+        tailwind: 'bg-surface-muted',
+        usage: 'background',
+      },
+      {
+        name: 'surface-strong',
+        cssVar: '--surface-strong',
+        tailwind: 'bg-surface-strong',
+        usage: 'background',
+      },
+      {
         name: 'muted-foreground',
         cssVar: '--muted-foreground',
         tailwind: 'text-muted-foreground',
@@ -334,6 +357,18 @@ export const COLOR_TOKEN_GROUPS: ColorTokenGroup[] = [
     label: 'Chrome',
     tokens: [
       { name: 'border', cssVar: '--border', tailwind: 'border-border', usage: 'border' },
+      {
+        name: 'border-subtle',
+        cssVar: '--border-subtle',
+        tailwind: 'border-border-subtle',
+        usage: 'border',
+      },
+      {
+        name: 'border-strong',
+        cssVar: '--border-strong',
+        tailwind: 'border-border-strong',
+        usage: 'border',
+      },
       {
         name: 'field-control-border',
         cssVar: '--field-control-border',
@@ -496,6 +531,61 @@ export const COLOR_TOKEN_GROUPS: ColorTokenGroup[] = [
         name: 'semantic-destructive-subtle',
         cssVar: '--semantic-destructive-subtle',
         tailwind: 'bg-semantic-destructive-subtle',
+        usage: 'background',
+      },
+    ],
+  },
+  {
+    id: 'interaction-recipes',
+    label: 'Interaction recipes',
+    description: 'Shared hover/selected/drag/track chrome — tune per theme at Layer 1.',
+    tokens: [
+      {
+        name: 'control-hover-bg',
+        cssVar: '--control-hover-bg',
+        tailwind: 'bg-control-hover',
+        usage: 'background',
+      },
+      {
+        name: 'control-selected-bg',
+        cssVar: '--control-selected-bg',
+        tailwind: 'bg-control-selected',
+        usage: 'background',
+      },
+      {
+        name: 'row-hover-bg',
+        cssVar: '--row-hover-bg',
+        tailwind: 'bg-row-hover',
+        usage: 'background',
+      },
+      {
+        name: 'row-selected-bg',
+        cssVar: '--row-selected-bg',
+        tailwind: 'bg-row-selected',
+        usage: 'background',
+      },
+      {
+        name: 'row-selected-border',
+        cssVar: '--row-selected-border',
+        tailwind: 'border-row-selected-border',
+        usage: 'border',
+      },
+      {
+        name: 'drop-target-bg',
+        cssVar: '--drop-target-bg',
+        tailwind: 'bg-drop-target',
+        usage: 'background',
+      },
+      {
+        name: 'drop-target-border',
+        cssVar: '--drop-target-border',
+        tailwind: 'border-drop-target-border',
+        usage: 'border',
+      },
+      {
+        name: 'segmented-track-bg',
+        cssVar: '--segmented-track-bg',
+        tailwind: 'bg-segmented-track',
         usage: 'background',
       },
     ],

@@ -22,7 +22,7 @@ export const dataTableFilterControlVariants = cva('', {
 
 /** Collapsible advanced-filters panel border + padding. */
 export const dataTableAdvancedPanelVariants = cva(
-  'overflow-hidden rounded-md border border-border bg-muted/35',
+  'overflow-hidden rounded-md border border-border bg-surface-muted',
 )
 
 /** Inner grid for secondary filter controls. */
@@ -45,7 +45,7 @@ export const dataTablePaginationVariants = cva(
 
 /** Table container — elevated card plane on the page canvas. */
 export const dataTableTableWrapVariants = cva(
-  'overflow-hidden rounded-card border border-border bg-muted text-foreground shadow-surface-raised',
+  'overflow-hidden rounded-card border border-border bg-surface-muted text-foreground shadow-surface-raised',
 )
 
 /**
@@ -57,12 +57,12 @@ export const dataTableTableVariants = cva('min-w-max text-table-body lg:min-w-0'
 
 /** Header row — recessed band; hover matches fill so sort controls stay stable. */
 export const dataTableHeaderRowVariants = cva(
-  'border-b border-border bg-muted/45 hover:bg-muted/45 data-[state=selected]:bg-muted/45',
+  'border-b border-border bg-surface-strong hover:bg-surface-strong data-[state=selected]:bg-surface-strong',
 )
 
 /** Body row — uniform fill with row-level hover and selection. */
 export const dataTableRowVariants = cva(
-  'group/row h-14 border-b border-border/60 hover:bg-muted/15 data-[state=selected]:bg-muted/40',
+  'group/row h-14 border-b border-border-subtle hover:bg-row-hover data-[state=selected]:bg-row-selected',
 )
 
 /** Header cell — group context for sort icon hover/focus affordance. */

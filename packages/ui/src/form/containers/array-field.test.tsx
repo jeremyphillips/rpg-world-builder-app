@@ -203,7 +203,7 @@ describe('ArrayFieldRenderer', () => {
     await user.click(screen.getByRole('button', { name: 'Add trait' }))
 
     const itemShell = screen.getByRole('group', { name: 'Trait #1' })
-    expect(itemShell).toHaveClass('bg-muted/10')
+    expect(itemShell).toHaveClass('bg-surface-subtle')
     expect(itemShell).toHaveClass('border-border')
     expect(itemShell).not.toHaveClass('bg-card')
   })

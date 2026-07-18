@@ -11,7 +11,10 @@
   --popover-foreground: var(--foreground);
   --secondary: var(--palette-surface-secondary);
   --secondary-foreground: var(--palette-fg-secondary);
-  --muted: var(--palette-surface-subtle);
+  --surface-subtle: var(--palette-surface-subtle);
+  --surface-muted: var(--palette-surface-muted);
+  --surface-strong: var(--palette-surface-strong);
+  --muted: var(--surface-muted);
   --sunken: var(--palette-surface-sunken);
   --muted-foreground: var(--palette-fg-muted);
   --accent: var(--palette-surface-accent);
@@ -43,7 +46,10 @@
   --warning-subtle: var(--palette-warning-subtle);
 
   /* Chrome — generic borders, selection, overlay, sidebar (`border-border`, `bg-overlay`, `bg-sidebar`, …) */
-  --border: var(--palette-border-default);
+  --border-default: var(--palette-border-default);
+  --border-subtle: var(--palette-border-subtle);
+  --border-strong: var(--palette-border-strong);
+  --border: var(--border-default);
   --card-selected-border: var(--palette-border-selected);
   --ring: var(--palette-primary);
   --overlay: var(--palette-overlay);
@@ -107,8 +113,21 @@
   --semantic-destructive-border: var(--destructive-muted);
   --semantic-destructive-subtle: var(--destructive-subtle);
 
+  /*
+   * Shared interaction recipes — public contract for hover/selected/drag/track chrome.
+   * May alias surface/border ladder steps; tune independently per theme at Layer 1.
+   */
+  --control-hover-bg: var(--palette-control-hover-bg);
+  --control-selected-bg: var(--palette-control-selected-bg);
+  --row-hover-bg: var(--palette-row-hover-bg);
+  --row-selected-bg: var(--palette-row-selected-bg);
+  --row-selected-border: var(--palette-row-selected-border);
+  --drop-target-bg: var(--palette-drop-target-bg);
+  --drop-target-border: var(--palette-drop-target-border);
+  --segmented-track-bg: var(--palette-segmented-track-bg);
+
   /* Component recipes — one-off surfaces not covered by roles above */
-  --catalog-picker-row-surface: color-mix(in oklab, var(--muted) 20%, transparent);
+  --catalog-picker-row-surface: var(--surface-muted);
   --surface-raised-shadow:
     inset 0 1px 0 0 color-mix(in oklab, var(--foreground) 6%, transparent),
     0 1px 3px 0 color-mix(in oklab, var(--background) 55%, black);

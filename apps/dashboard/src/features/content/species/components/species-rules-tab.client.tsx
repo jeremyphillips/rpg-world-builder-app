@@ -45,7 +45,7 @@ function RulesSectionDisabled({
   campaignId: string
 }) {
   return (
-    <section className="space-y-2 rounded-md border border-border bg-muted/30 p-4">
+    <section className="space-y-2 rounded-md border border-border bg-surface-muted p-4">
       <Heading variant="subsection" as="h3">
         {title}
       </Heading>
@@ -88,7 +88,7 @@ function SpeciesRulesEditor({ formCtx }: { formCtx: ContentFormCtx }) {
 
   if (!policyEnabled && !limitsEnabled) {
     return (
-      <div className="space-y-3 rounded-md border border-border bg-muted/30 p-4">
+      <div className="space-y-3 rounded-md border border-border bg-surface-muted p-4">
         <Text variant="muted" className="text-sm">
           Enable species multiclass policy or species level limits in campaign rules to author
           species-specific multiclass data.

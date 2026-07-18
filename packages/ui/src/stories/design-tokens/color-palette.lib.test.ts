@@ -15,7 +15,7 @@ describe('color-palette.lib', () => {
 
   it('includes core surface backgrounds for on-surface matrices', () => {
     expect(SURFACE_BACKGROUNDS.map((surface) => surface.cssVar)).toEqual(
-      expect.arrayContaining(['--background', '--sunken', '--card', '--muted']),
+      expect.arrayContaining(['--background', '--sunken', '--card', '--surface-muted']),
     )
   })
 
@@ -31,6 +31,8 @@ describe('color-palette.lib', () => {
     expect(PALETTE_ELEVATION_LADDER_TOKENS.map((token) => token.name)).toEqual([
       'surface-base',
       'surface-subtle',
+      'surface-muted',
+      'surface-strong',
       'surface-raised',
       'surface-sunken',
     ])

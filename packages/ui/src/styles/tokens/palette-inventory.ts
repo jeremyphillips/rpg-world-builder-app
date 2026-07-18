@@ -8,6 +8,8 @@ export const PALETTE_WARMTH_STEPS = ['neutral-hue'] as const
 export const PALETTE_SURFACE_ELEVATION_STEPS = [
   'surface-base',
   'surface-subtle',
+  'surface-muted',
+  'surface-strong',
   'surface-raised',
   'surface-sunken',
   'surface-secondary',
@@ -42,7 +44,24 @@ export const PALETTE_FG_STEPS = [
   'fg-on-status',
 ] as const
 
-export const PALETTE_CHROME_STEPS = ['border-default', 'border-selected', 'overlay'] as const
+export const PALETTE_CHROME_STEPS = [
+  'border-default',
+  'border-subtle',
+  'border-strong',
+  'border-selected',
+  'overlay',
+] as const
+
+export const PALETTE_INTERACTION_STEPS = [
+  'control-hover-bg',
+  'control-selected-bg',
+  'row-hover-bg',
+  'row-selected-bg',
+  'row-selected-border',
+  'drop-target-bg',
+  'drop-target-border',
+  'segmented-track-bg',
+] as const
 
 export const PALETTE_BRAND_STEPS = ['primary', 'primary-foreground', 'on-solid'] as const
 
@@ -79,6 +98,7 @@ export const PALETTE_PRIMITIVE_STEPS = [
   ...PALETTE_SIDEBAR_STEPS,
   ...PALETTE_FG_STEPS,
   ...PALETTE_CHROME_STEPS,
+  ...PALETTE_INTERACTION_STEPS,
   ...PALETTE_BRAND_STEPS,
   ...PALETTE_STATUS_STEPS,
   ...PALETTE_SEMANTIC_TEXT_STEPS,
@@ -138,6 +158,12 @@ export const PALETTE_PRIMITIVE_GROUPS: PalettePrimitiveGroup[] = [
     steps: PALETTE_CHROME_STEPS,
   },
   {
+    id: 'interaction',
+    label: 'Interaction recipes',
+    description: 'Shared hover/selected/drag/track washes — mapped by Layer 2 recipe roles.',
+    steps: PALETTE_INTERACTION_STEPS,
+  },
+  {
     id: 'brand',
     label: 'Brand',
     steps: PALETTE_BRAND_STEPS,
@@ -159,6 +185,8 @@ export const PALETTE_PRIMITIVE_GROUPS: PalettePrimitiveGroup[] = [
 export const PALETTE_ELEVATION_LADDER: readonly string[] = [
   'surface-base',
   'surface-subtle',
+  'surface-muted',
+  'surface-strong',
   'surface-raised',
   'surface-sunken',
 ]

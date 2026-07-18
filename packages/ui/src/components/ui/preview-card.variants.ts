@@ -8,7 +8,7 @@ export const previewCardRootVariants = cva('w-full text-left transition-colors',
     tone: {
       default: 'border border-border bg-background',
       transparent: 'border-0 bg-transparent',
-      selected: 'border border-border bg-muted/30',
+      selected: 'border border-border bg-surface-muted',
     },
     density: {
       compact: '',
@@ -53,7 +53,7 @@ export const previewCardRootVariants = cva('w-full text-left transition-colors',
     {
       tone: 'selected',
       interactive: true,
-      className: 'hover:bg-muted/40 hover:text-foreground',
+      className: 'hover:bg-row-hover hover:text-foreground',
     },
   ],
   defaultVariants: {

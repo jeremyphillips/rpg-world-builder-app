@@ -23,7 +23,7 @@ describe('resolveFieldGroupChromeClassNames', () => {
   it('applies primary inset tone', () => {
     const classes = resolveFieldGroupChromeClassNames({ variant: 'inset', tone: 'primary' })
     expect(classes.body).toContain('border-primary')
-    expect(classes.body).not.toContain('bg-muted/40')
+    expect(classes.body).not.toContain('bg-surface-strong')
   })
 
   it('applies panel body classes with subtle default', () => {
@@ -32,12 +32,12 @@ describe('resolveFieldGroupChromeClassNames', () => {
     expect(classes.body).toContain('rounded-md')
     expect(classes.body).toContain('border')
     expect(classes.body).toContain('p-4')
-    expect(classes.body).toContain('bg-muted/10')
+    expect(classes.body).toContain('bg-surface-subtle')
   })
 
-  it('applies medium panel tone', () => {
-    const classes = resolveFieldGroupChromeClassNames({ variant: 'panel', tone: 'medium' })
-    expect(classes.body).toContain('bg-muted/30')
+  it('applies muted panel tone', () => {
+    const classes = resolveFieldGroupChromeClassNames({ variant: 'panel', tone: 'muted' })
+    expect(classes.body).toContain('bg-surface-muted')
   })
 
   it('applies elevated panel tone', () => {

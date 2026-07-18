@@ -105,7 +105,7 @@ describe('FieldGroup', () => {
     const fieldset = screen.getByRole('group', { name: /Target/ })
     expect(fieldset).not.toHaveClass('rounded-md')
     const stack = fieldStack(fieldset)
-    expect(stack).toHaveClass('rounded-md', 'border', 'p-4', 'bg-muted/10')
+    expect(stack).toHaveClass('rounded-md', 'border', 'p-4', 'bg-surface-subtle')
   })
 
   it('applies inset chrome on the field stack', () => {

@@ -183,7 +183,7 @@ describe('RadioCard', () => {
     expect(drow).toHaveClass('rounded-md')
     expect(drow).not.toHaveClass('shadow-sm')
     expect(drow).toHaveClass('border-0')
-    expect(drow).toHaveClass('data-[state=checked]:bg-muted/50')
+    expect(drow).toHaveClass('data-[state=checked]:bg-row-selected')
     expect(drow).not.toHaveClass('data-[state=checked]:ring-1')
   })
 
@@ -206,7 +206,7 @@ describe('RadioCard', () => {
       />,
     )
 
-    const panel = container.querySelector('[class*="bg-muted"]')
+    const panel = container.querySelector('[class*="bg-surface-muted"]')
     expect(panel).toHaveTextContent('Configuration panel')
     expect(panel?.className).toContain('-mx-3')
     expect(panel?.className).toContain('rounded-b-card')

@@ -50,7 +50,7 @@ export const compactLabelVariants = cva(
       interactive: {
         true: cn(
           'cursor-pointer transition-colors',
-          'hover:bg-muted',
+          'hover:bg-control-hover',
           'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background',
           'disabled:pointer-events-none disabled:opacity-50',
         ),
@@ -123,7 +123,7 @@ export type CompactLabelVariants = VariantProps<typeof compactLabelVariants>
 export const chipRemoveButtonVariants = cva(
   cn(
     'inline-flex shrink-0 items-center justify-center rounded-full text-muted-foreground',
-    'hover:bg-muted hover:text-foreground',
+    'hover:bg-control-hover hover:text-foreground',
     'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background',
     'disabled:pointer-events-none disabled:opacity-50',
   ),

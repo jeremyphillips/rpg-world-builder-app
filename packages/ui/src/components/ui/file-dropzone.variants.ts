@@ -13,9 +13,9 @@ export const dropzoneVariants = cva(
     variants: {
       state: {
         idle: 'border-border bg-background text-muted-foreground hover:border-ring hover:bg-accent',
-        dragover: 'border-primary bg-primary/5 text-primary',
+        dragover: 'border-drop-target-border bg-drop-target text-primary',
         disabled:
-          'pointer-events-none cursor-not-allowed border-border bg-muted text-muted-foreground opacity-50',
+          'pointer-events-none cursor-not-allowed border-border bg-surface-muted text-muted-foreground opacity-50',
       },
     },
     defaultVariants: {
@@ -46,7 +46,7 @@ export const fileItemVariants = cva(
 export const fileThumbnailVariants = cva('size-10 shrink-0 rounded object-cover')
 
 export const fileIconVariants = cva(
-  'size-10 shrink-0 flex items-center justify-center rounded bg-muted text-muted-foreground',
+  'size-10 shrink-0 flex items-center justify-center rounded bg-surface-muted text-muted-foreground',
 )
 
 export const removeButtonVariants = cva([

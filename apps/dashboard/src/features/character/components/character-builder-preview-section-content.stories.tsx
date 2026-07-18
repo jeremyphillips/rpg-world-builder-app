@@ -17,7 +17,7 @@ type Story = StoryObj<typeof CharacterBuilderPreviewSectionContent>
 
 export const SubsectionsLayout: Story = {
   render: () => (
-    <div className="max-w-xs rounded-lg border border-border bg-muted/20">
+    <div className="max-w-xs rounded-lg border border-border bg-surface-muted">
       <CharacterBuilderPreviewSectionContent
         layout="subsections"
         hint="Choose a class to see class proficiencies."
@@ -44,7 +44,7 @@ export const SubsectionsLayout: Story = {
 
 export const DefaultLayout: Story = {
   render: () => (
-    <div className="max-w-xs rounded-lg border border-border bg-muted/20">
+    <div className="max-w-xs rounded-lg border border-border bg-surface-muted">
       <CharacterBuilderPreviewSectionContent>
         <CharacterBuilderPreviewSubsectionHint>
           Choose a class to see equipment options.

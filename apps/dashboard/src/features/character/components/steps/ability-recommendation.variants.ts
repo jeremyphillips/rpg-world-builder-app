@@ -6,7 +6,7 @@ export const abilityScoreCardColumnClasses = 'flex min-w-0 flex-col gap-1'
 
 /** Gentle advisory callout — muted fill without alert semantics. */
 export const abilityRecommendationCalloutClasses =
-  'rounded-md border border-border bg-muted/10 px-3 py-2.5 text-sm'
+  'rounded-md border border-border bg-surface-subtle px-3 py-2.5 text-sm'
 
 export const abilityRecommendationCalloutTitleClasses = 'font-medium text-foreground'
 

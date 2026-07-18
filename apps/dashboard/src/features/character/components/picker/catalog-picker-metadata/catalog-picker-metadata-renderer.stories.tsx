@@ -31,7 +31,7 @@ export const MixedBadgeAndText: Story = {
   },
   decorators: [
     (Story) => (
-      <div className="rounded-md bg-muted/30 p-3">
+      <div className="rounded-md bg-surface-muted p-3">
         <Story />
       </div>
     ),

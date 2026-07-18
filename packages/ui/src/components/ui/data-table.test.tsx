@@ -216,12 +216,12 @@ describe('DataTable — sorting', () => {
     const rows = screen.getAllByRole('row').slice(1)
     const firstRowCells = within(rows[0]!).getAllByRole('cell')
 
-    expect(firstRowCells[0]).not.toHaveClass('bg-accent/35')
+    expect(firstRowCells[0]).not.toHaveClass('bg-control-selected')
     expect(firstRowCells[0]).not.toHaveClass('text-muted-foreground')
     expect(firstRowCells[1]).toHaveClass('text-muted-foreground')
-    expect(firstRowCells[1]).not.toHaveClass('bg-muted/30')
-    expect(firstRowCells[2]).not.toHaveClass('bg-muted/30')
-    expect(firstRowCells[2]).not.toHaveClass('bg-accent/35')
+    expect(firstRowCells[1]).not.toHaveClass('bg-surface-muted')
+    expect(firstRowCells[2]).not.toHaveClass('bg-surface-muted')
+    expect(firstRowCells[2]).not.toHaveClass('bg-control-selected')
   })
 })
 

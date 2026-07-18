@@ -9,7 +9,7 @@ export const alertVariants = cva(
   {
     variants: {
       variant: {
-        default: 'border-border bg-muted text-foreground',
+        default: 'border-border bg-surface-muted text-foreground',
         info: 'border-info-muted bg-info-subtle text-foreground',
         success: 'border-success-muted bg-success-subtle text-foreground',
         warning: 'border-warning-muted bg-warning-subtle text-foreground',

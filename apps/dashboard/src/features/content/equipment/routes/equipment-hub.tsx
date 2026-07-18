@@ -26,7 +26,7 @@ export function EquipmentHubContent({ campaignId }: EquipmentHubContentProps) {
               to={ROUTES.content.equipment.family(campaignId, family)}
               className="block h-full rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             >
-              <Card className="h-full transition-colors hover:bg-muted/40">
+              <Card className="h-full transition-colors hover:bg-row-hover">
                 <CardHeader>
                   <CardTitle>{getEquipmentFamilyLabel(family as EquipmentFamilyPath)}</CardTitle>
                 </CardHeader>

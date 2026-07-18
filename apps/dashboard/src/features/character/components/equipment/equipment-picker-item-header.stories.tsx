@@ -48,7 +48,7 @@ export const StandardGear: Story = {
   },
   decorators: [
     (Story) => (
-      <div className="rounded-md bg-muted/30 p-3">
+      <div className="rounded-md bg-surface-muted p-3">
         <Story />
       </div>
     ),
@@ -75,7 +75,7 @@ export const NotProficient: Story = {
   },
   decorators: [
     (Story) => (
-      <div className="rounded-md bg-muted/30 p-3">
+      <div className="rounded-md bg-surface-muted p-3">
         <Story />
       </div>
     ),
@@ -94,7 +94,7 @@ export const CannotAfford: Story = {
   },
   decorators: [
     (Story) => (
-      <div className="rounded-md bg-muted/30 p-3">
+      <div className="rounded-md bg-surface-muted p-3">
         <Story />
       </div>
     ),

@@ -27,10 +27,10 @@ export const characterBuilderShellFooterClasses =
 export const characterBuilderStepRailClasses = 'space-y-1'
 
 export const characterBuilderStepRailItemClasses =
-  'relative flex w-full items-start gap-3 rounded-md px-3 py-2 text-left transition-colors hover:bg-muted/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2'
+  'relative flex w-full items-start gap-3 rounded-md px-3 py-2 text-left transition-colors hover:bg-row-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2'
 
 export const characterBuilderStepRailItemActiveClasses =
-  'bg-muted/40 before:absolute before:inset-y-1 before:left-0 before:w-0.5 before:rounded-full before:bg-primary'
+  'bg-row-selected before:absolute before:inset-y-1 before:left-0 before:w-0.5 before:rounded-full before:bg-primary'
 
 export const characterBuilderStepRailItemLabelActiveClasses = 'font-semibold text-foreground'
 
@@ -49,7 +49,7 @@ export const characterBuilderPreviewPanelRootClasses = 'flex min-h-0 min-w-0 fle
 
 /** Scrollable bordered preview body — eyebrow sits above this container. */
 export const characterBuilderPreviewPanelBodyClasses =
-  'scrollbar-slim flex min-h-0 flex-1 flex-col overflow-y-auto rounded-lg border border-border bg-muted/20'
+  'scrollbar-slim flex min-h-0 flex-1 flex-col overflow-y-auto rounded-lg border border-border bg-surface-muted'
 
 export const characterBuilderPreviewPanelBodyInnerClasses = 'min-w-0 p-4'
 

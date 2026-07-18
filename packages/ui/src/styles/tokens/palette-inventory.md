@@ -14,10 +14,14 @@ tests + Storybook).
 
 ## Alpha policy
 
-Public semantic surface tokens should resolve to **final usable colors**. Avoid
-stacking opacity utilities (`bg-muted/30`, `border-border/60`, …) on tokens that
-already contain alpha unless the blending behavior is intentional. Status subtle
-fills (`--*-subtle`) are authored at ~12–14% and treated as final colors.
+Public semantic surface tokens should resolve to **final usable colors**. Do not
+construct layout/selection/chrome hierarchy with Tailwind `/NN` on semantic utilities
+(`bg-muted/30`, `border-border/60`, …). Use the surface/border ladder or named
+interaction recipes. Status subtle fills (`--*-subtle`) are authored at ~12–14% and
+treated as final colors — never stack additional `/NN` on them.
+
+Exact allowlist for intentional solid-control / backdrop opacity:
+[`alpha-utility-allowlist.ts`](./alpha-utility-allowlist.ts).
 
 ## Warmth anchor
 
@@ -27,14 +31,16 @@ fills (`--*-subtle`) are authored at ~12–14% and treated as final colors.
 
 ## Elevation surfaces
 
-| Token                         | Layer 2 mapping       | Job                                            |
-| ----------------------------- | --------------------- | ---------------------------------------------- |
-| `--palette-surface-base`      | `--background`        | Canvas / page                                  |
-| `--palette-surface-subtle`    | `--muted`             | Low-emphasis wash                              |
-| `--palette-surface-raised`    | `--card`, `--popover` | Raised panels                                  |
-| `--palette-surface-sunken`    | `--sunken`            | Recessed / inset fills                         |
-| `--palette-surface-secondary` | `--secondary`         | Alternate low-emphasis **interactive** surface |
-| `--palette-surface-accent`    | `--accent`            | Hover / gold chrome (light)                    |
+| Token                         | Layer 2 mapping              | Job                                            |
+| ----------------------------- | ---------------------------- | ---------------------------------------------- |
+| `--palette-surface-base`      | `--background`               | Canvas / page                                  |
+| `--palette-surface-subtle`    | `--surface-subtle`           | Barely visible grouping                        |
+| `--palette-surface-muted`     | `--surface-muted`, `--muted` | Standard secondary panel / chrome              |
+| `--palette-surface-strong`    | `--surface-strong`           | Dense neutral chrome                           |
+| `--palette-surface-raised`    | `--card`, `--popover`        | Raised panels                                  |
+| `--palette-surface-sunken`    | `--sunken`                   | Recessed / inset fills                         |
+| `--palette-surface-secondary` | `--secondary`                | Alternate low-emphasis **interactive** surface |
+| `--palette-surface-accent`    | `--accent`                   | Hover / gold chrome (light)                    |
 
 `--secondary` is for shadcn-compatible Button `secondary` and similar interactive
 controls — not a generic page/section fill.
@@ -83,7 +89,14 @@ Mode-specific concrete values only. Focus and invalid states alias Layer 2 roles
 
 ## Chrome, brand, status
 
-Chrome: `--palette-border-*`, `--palette-overlay`.
+Chrome borders: `--palette-border-default` → `--border`; `--palette-border-subtle` →
+`--border-subtle`; `--palette-border-strong` → `--border-strong`;
+`--palette-border-selected` → `--card-selected-border`. Overlay: `--palette-overlay`.
+
+Interaction recipes (Layer 1 SSOT, Layer 2 public roles): `--palette-control-hover-bg`,
+`--palette-control-selected-bg`, `--palette-row-hover-bg`, `--palette-row-selected-bg`,
+`--palette-row-selected-border`, `--palette-drop-target-bg`, `--palette-drop-target-border`,
+`--palette-segmented-track-bg`.
 
 Brand: `--palette-primary`, `--palette-primary-foreground`, `--palette-on-solid`.
 

@@ -102,7 +102,7 @@ const fieldGroupDividerContainerVariants = cva('', {
     },
     tone: {
       border: 'border-border',
-      muted: 'border-border/60',
+      muted: 'border-border-subtle',
     },
   },
   defaultVariants: {
@@ -174,7 +174,7 @@ function isAlertVariant(value: string): value is AlertVariant {
 function resolveCalloutBodyClasses(tone: FieldGroupCalloutTone = 'info'): string {
   if (isAlertVariant(tone)) {
     const calloutSurface: Record<AlertVariant, string> = {
-      default: 'border-border bg-muted text-foreground',
+      default: 'border-border bg-surface-muted text-foreground',
       info: 'border-info-muted bg-info-subtle text-foreground',
       success: 'border-success-muted bg-success-subtle text-foreground',
       warning: 'border-warning-muted bg-warning-subtle text-foreground',
@@ -188,7 +188,7 @@ function resolveCalloutBodyClasses(tone: FieldGroupCalloutTone = 'info'): string
     return cn('rounded-lg border p-4', compactLabelAppearanceToneClasses('soft', tone))
   }
 
-  return cn('rounded-lg border p-4', 'border-border bg-muted text-foreground')
+  return cn('rounded-lg border p-4', 'border-border bg-surface-muted text-foreground')
 }
 
 function resolveAccentTone(

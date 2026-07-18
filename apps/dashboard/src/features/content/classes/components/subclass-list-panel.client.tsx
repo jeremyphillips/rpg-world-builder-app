@@ -30,8 +30,8 @@ const SOURCE_BADGE = {
 function subclassRowShellClass(isSelected: boolean, active: boolean) {
   return cn(
     'flex items-center gap-1 rounded-md border border-transparent',
-    !active && 'border-dashed border-border/60',
-    isSelected && 'border-border bg-muted/40',
+    !active && 'border-dashed border-border-subtle',
+    isSelected && 'border-row-selected-border bg-row-selected',
   )
 }
 
@@ -120,7 +120,7 @@ function SubclassListRow({
           type="button"
           aria-current={isSelected ? 'true' : undefined}
           onClick={() => onSelect(item.id)}
-          className="min-w-0 flex-1 rounded-md px-3 py-2 text-left text-sm hover:bg-muted/60"
+          className="min-w-0 flex-1 rounded-md px-3 py-2 text-left text-sm hover:bg-row-hover"
         >
           <span className={subclassRowTitleClass(active)}>
             {item.name || UNTITLED_SUBCLASS_LABEL}

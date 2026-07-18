@@ -138,7 +138,7 @@ function ElevationLadderSection() {
         {PALETTE_ELEVATION_LADDER_TOKENS.map((token) => (
           <div
             key={token.cssVar}
-            className="flex items-center justify-between gap-4 rounded-lg border border-border/50 px-4 py-3"
+            className="flex items-center justify-between gap-4 rounded-lg border border-border-subtle px-4 py-3"
             style={{ backgroundColor: `var(${token.cssVar})` }}
           >
             <span className="font-mono text-sm text-foreground">{token.name}</span>
@@ -244,7 +244,7 @@ function OnSurfaceSwatch({ token }: { token: ColorToken }) {
         <div
           className={cn(
             colorPaletteOnSurfaceVisualClasses,
-            'flex items-center rounded-lg border border-border/50 bg-background/40 px-3',
+            'flex items-center rounded-lg border border-border-subtle bg-surface-subtle px-3',
           )}
         >
           <p
@@ -264,7 +264,7 @@ function OnSurfaceSwatch({ token }: { token: ColorToken }) {
       <div
         className={cn(
           colorPaletteOnSurfaceVisualClasses,
-          'border border-border/60',
+          'border border-border-subtle',
           token.tailwind,
         )}
         style={{ backgroundColor: `var(${token.cssVar})` }}

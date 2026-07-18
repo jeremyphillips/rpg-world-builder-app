@@ -10,7 +10,7 @@ export const equipmentPackageSwitchResolutionModalInventoryScrollClasses =
   'max-h-72 overflow-y-auto'
 
 export const equipmentPackageSwitchResolutionBudgetSummaryClasses =
-  'rounded-lg border border-border bg-muted/20 p-4'
+  'rounded-lg border border-border bg-surface-muted p-4'
 
 export const equipmentPackageSwitchResolutionBudgetSummaryTitleClasses =
   'mb-3 text-sm font-medium text-foreground'

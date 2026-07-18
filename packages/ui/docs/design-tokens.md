@@ -20,28 +20,75 @@ Layer 2 color roles map to `var(--palette-…)` or `var(--<other-layer-2-role>)`
 color literals and no references to component recipes (`--catalog-picker-row-surface`,
 `--surface-raised-shadow`) inside semantic role definitions.
 
+## Ladder vs recipe
+
+| Consumer                      | Consumes          | Examples                                                          |
+| ----------------------------- | ----------------- | ----------------------------------------------------------------- |
+| Generic containers / grouping | Global **ladder** | `bg-surface-muted`, `border-border-subtle`                        |
+| Repeated interaction states   | Named **recipes** | `hover:bg-row-hover`, `bg-control-selected`, `bg-segmented-track` |
+
+Do **not** construct layout, selection, callout, or chrome surfaces by applying arbitrary alpha
+to semantic color utilities (`bg-muted/30`, `border-border/60`, …).
+
+Recipes are the public contract; ladder steps are implementation details recipes may alias.
+
 ## Surface hierarchy
 
-| Role        | Utility                    | Meaning                                                                                 |
-| ----------- | -------------------------- | --------------------------------------------------------------------------------------- |
-| Base        | `bg-background`            | Page canvas                                                                             |
-| Raised      | `bg-card`, `bg-popover`    | Elevated panels / overlays                                                              |
-| Subtle wash | `bg-muted`                 | Low-emphasis background                                                                 |
-| Sunken      | `bg-sunken`                | Recessed / inset fill                                                                   |
-| Secondary   | `bg-secondary`             | Alternate **interactive** surface (e.g. Button `secondary`) — not a generic layout fill |
-| Field       | `bg-input`, `border-input` | Editable control chrome (via `field-input-chrome.variants.ts`)                          |
+| Role        | Utility                    | Meaning                                                     |
+| ----------- | -------------------------- | ----------------------------------------------------------- |
+| Base        | `bg-background`            | Page canvas                                                 |
+| Raised      | `bg-card`, `bg-popover`    | Elevated panels / overlays                                  |
+| Subtle wash | `bg-surface-subtle`        | Barely visible grouping                                     |
+| Muted wash  | `bg-surface-muted`         | Standard secondary panel / chrome                           |
+| Strong wash | `bg-surface-strong`        | Dense neutral chrome (not brand/selected meaning)           |
+| Sunken      | `bg-sunken`                | Recessed / inset fill                                       |
+| Secondary   | `bg-secondary`             | Alternate **interactive** surface (e.g. Button `secondary`) |
+| Field       | `bg-input`, `border-input` | Editable control chrome (`field-input-chrome.variants.ts`)  |
 
-Prefer these named surfaces over opacity modifiers (`bg-muted/30`, …) in new code. Existing
-centralized tiers in `field-surface.variants.ts` (`subtle` / `medium` / `strong`) still use
-`bg-muted/10|30|50` — treat that as shared recipe debt, not a pattern to copy into features.
+`bg-muted` aliases `bg-surface-muted` for shadcn compatibility — prefer `bg-surface-*` in new code.
+
+`field-surface.variants.ts` wash variants use the same names: `subtle | muted | strong`.
+
+## Border ladder
+
+| Role    | Utility                | Meaning                               |
+| ------- | ---------------------- | ------------------------------------- |
+| Subtle  | `border-border-subtle` | Quiet separators, low-emphasis shells |
+| Default | `border-border`        | Normal component structure            |
+| Strong  | `border-border-strong` | Selected or emphasized structure      |
+
+Status borders stay status-specific (`border-destructive-muted`, …). Recipe borders (e.g.
+`border-row-selected-border`) may alias `--border-strong` or a brand/status role.
+
+## Interaction recipes
+
+Shared recipes (Layer 2 → Tailwind):
+
+| CSS role                | Utility                      |
+| ----------------------- | ---------------------------- |
+| `--control-hover-bg`    | `bg-control-hover`           |
+| `--control-selected-bg` | `bg-control-selected`        |
+| `--row-hover-bg`        | `hover:bg-row-hover`         |
+| `--row-selected-bg`     | `bg-row-selected`            |
+| `--row-selected-border` | `border-row-selected-border` |
+| `--drop-target-bg`      | `bg-drop-target`             |
+| `--drop-target-border`  | `border-drop-target-border`  |
+| `--segmented-track-bg`  | `bg-segmented-track`         |
+
+Add a new recipe only when the state is reused, owned by a shared primitive, or must stay
+independently tunable across light/dark. One-offs stay in local CVA using the ladder or status
+roles.
 
 ## Alpha policy
 
-Public semantic surface tokens should resolve to **final usable colors**. Status subtle fills
+Public semantic surface tokens resolve to **final usable colors**. Status subtle fills
 (`bg-info-subtle`, `bg-destructive-subtle`, …) are authored at ~12–14% and used as-is.
 
-Avoid stacking opacity utilities on tokens that already contain alpha unless the blend is
-intentional and documented.
+**Never** stack `/NN` on `*-subtle` or `*-muted` status roles (`bg-destructive-subtle/50`).
+
+Solid-control, backdrop, and selective text opacity are allowed only via the exact allowlist in
+[`alpha-utility-allowlist.ts`](../src/styles/tokens/alpha-utility-allowlist.ts), enforced by
+`alpha-utility-ban.test.ts`.
 
 ## Status namespaces
 
@@ -59,8 +106,8 @@ Do not merge text-tuned values onto solid status hues.
 
 - Layer 2: `--field-control-*` matrix in `semantic-*.css`.
 - Public utilities: `border-input`, `bg-input`, and state variants in `globals.css`.
-- **Single recipe owner:** [`field-input-chrome.variants.ts`](../src/components/ui/field-input-chrome.variants.ts) — shell, focus, invalid, disabled, readonly, autofill.
-- Individual controls import that recipe; do not reconstruct field chrome with ad-hoc `disabled:bg-muted` or opacity stacks.
+- **Single recipe owner:** [`field-input-chrome.variants.ts`](../src/components/ui/field-input-chrome.variants.ts).
+- Individual controls import that recipe; do not reconstruct field chrome with ad-hoc opacity stacks.
 
 Switch unchecked track uses `--switch-track*` — separate from field border ownership.
 
@@ -78,5 +125,6 @@ Token tests in `packages/ui/src/styles/tokens/`:
 - Semantic role parity + Layer 2 composition rule
 - Field-control role completeness
 - Contrast smoke checks on key pairs
+- Alpha utility ban (`alpha-utility-ban.test.ts`)
 
 `field-input-chrome.variants.test.ts` guards approved utility tokens for field shells.

@@ -44,7 +44,7 @@ function SurfaceMatrix({ surface }: { surface: 'base' | 'subtle' }) {
     <div
       className={
         surface === 'subtle'
-          ? 'space-y-3 rounded-md bg-muted/30 p-4'
+          ? 'space-y-3 rounded-md bg-surface-muted p-4'
           : 'space-y-3 rounded-md border border-border p-4'
       }
     >
@@ -60,7 +60,7 @@ function EquipmentCalloutComparison({ surface }: { surface: 'base' | 'subtle' })
     <div
       className={
         surface === 'subtle'
-          ? 'space-y-2 rounded-md bg-muted/30 p-4'
+          ? 'space-y-2 rounded-md bg-surface-muted p-4'
           : 'space-y-2 rounded-md border border-border bg-background p-4'
       }
     >
@@ -116,7 +116,7 @@ export const EquipmentCalloutsBaseSurface: Story = {
   render: () => <EquipmentCalloutComparison surface="base" />,
 }
 
-/** Equipment picker callout severities on `bg-muted/30` row shells (dark theme recommended). */
+/** Equipment picker callout severities on `bg-surface-muted` row shells (dark theme recommended). */
 export const EquipmentCalloutsSubtleSurface: Story = {
   render: () => <EquipmentCalloutComparison surface="subtle" />,
 }

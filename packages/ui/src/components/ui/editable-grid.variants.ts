@@ -10,7 +10,7 @@ export const editableGridStickyHeaderVariants = cva(
 )
 
 export const editableGridStickyCellVariants = cva(
-  `sticky left-0 z-10 ${COMPACT_COL} bg-background px-2 text-center font-medium text-foreground shadow-[1px_0_0_0_hsl(var(--border))] group-hover:bg-muted/50`,
+  `sticky left-0 z-10 ${COMPACT_COL} bg-background px-2 text-center font-medium text-foreground shadow-[1px_0_0_0_hsl(var(--border))] group-hover:bg-row-hover`,
 )
 
 export const editableGridDataCellVariants = cva(`${COMPACT_COL} p-2 text-center`)

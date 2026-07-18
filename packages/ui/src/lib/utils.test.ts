@@ -6,11 +6,11 @@ describe('cn', () => {
   it('keeps custom table font-size utilities alongside text color classes', () => {
     expect(
       cn(
-        'bg-muted/10 text-muted-foreground',
+        'bg-surface-subtle text-muted-foreground',
         'px-3 py-2',
         'text-table-stat font-medium text-foreground',
       ),
-    ).toBe('bg-muted/10 px-3 py-2 text-table-stat font-medium text-foreground')
+    ).toBe('bg-surface-subtle px-3 py-2 text-table-stat font-medium text-foreground')
   })
 
   it('keeps badge-sm font-size when merged with muted text color', () => {

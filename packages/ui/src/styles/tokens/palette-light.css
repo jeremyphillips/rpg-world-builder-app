@@ -10,6 +10,8 @@
   /* Elevation surfaces */
   --palette-surface-base: oklch(0.974 0.026 90.1);
   --palette-surface-subtle: oklch(0.958 0.03 90);
+  --palette-surface-muted: oklch(0.94 0.036 90.2);
+  --palette-surface-strong: oklch(0.915 0.039 90.5);
   --palette-surface-raised: oklch(0.995 0.002 90);
   --palette-surface-sunken: oklch(0.92 0.038 90);
   --palette-surface-secondary: oklch(0.934 0.04 91.2);
@@ -34,7 +36,27 @@
   );
 
   --palette-border-default: oklch(0.745 0.103 86.4);
+  --palette-border-subtle: oklch(from var(--palette-border-default) l c h / 50%);
+  --palette-border-strong: oklch(from var(--palette-border-default) l c h / 85%);
   --palette-border-selected: oklch(from var(--palette-border-default) l c h / 42%);
+
+  /* Interaction washes — accent/control and row chrome (recipes alias these at Layer 2) */
+  --palette-control-hover-bg: color-mix(in oklch, var(--palette-surface-accent) 50%, transparent);
+  --palette-control-selected-bg: color-mix(
+    in oklch,
+    var(--palette-surface-accent) 30%,
+    transparent
+  );
+  --palette-row-hover-bg: color-mix(
+    in oklch,
+    var(--palette-surface-muted) 22%,
+    var(--palette-surface-base)
+  );
+  --palette-row-selected-bg: var(--palette-surface-strong);
+  --palette-row-selected-border: var(--palette-border-strong);
+  --palette-drop-target-bg: color-mix(in oklch, var(--palette-surface-accent) 40%, transparent);
+  --palette-drop-target-border: var(--palette-primary);
+  --palette-segmented-track-bg: var(--palette-surface-strong);
   --palette-overlay: oklch(from var(--palette-fg-on-status) l c h / 0.5);
 
   /* Field control — fill + stroke tuned independently per mode */
