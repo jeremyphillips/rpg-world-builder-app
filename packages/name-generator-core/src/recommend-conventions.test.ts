@@ -13,13 +13,32 @@ import { recommendConventions } from './recommend-conventions'
 describe('recommendConventions', () => {
   const conventions = [ELVISH_PERSONAL_CONVENTION, FACTION_CONVENTION]
 
+  it('scores selected elven culture conventions', () => {
+    const recommendations = recommendConventions(
+      {
+        subjectKind: 'person',
+        languageIds: ['elvish'],
+        cultureIds: ['elven'],
+        conventionCultureIds: ['elven'],
+        cultureResolutions: { elven: 'elven' },
+      },
+      conventions,
+    )
+
+    expect(recommendations[0]?.conventionId).toBe('elvish-personal')
+    expect(recommendations[0]?.reasons).toContainEqual({
+      kind: 'culture',
+      cultureId: 'elven',
+      strength: 'primary',
+    })
+  })
+
   it('ranks language-primary conventions above tag-only matches', () => {
     const recommendations = recommendConventions(
       {
         subjectKind: 'person',
         languageIds: ['elvish'],
-        cultureIds: ['high-elven'],
-        speciesIds: ['srd-cc-5.2.1:elf'],
+        cultureIds: ['elven'],
       },
       conventions,
     )

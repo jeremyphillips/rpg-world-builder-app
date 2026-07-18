@@ -5,97 +5,87 @@ loaders for the experimental name generator foundation.
 
 ## Scope
 
-- Eager convention manifest (`listConventions`, `getConvention`)
+- Slim `NamingConventionDefinition` objects and `CULTURE_CONVENTION_BINDINGS`
+- `listStaticConventions()` for unmigrated exceptional conventions only
+- `STANDALONE_NAMING_CULTURES` and `HERITAGE_CULTURE_ALIASES`
 - Lazy collection loading (`loadNameCollection`) via trusted import map
-- Fixture cultures and cross-domain sample data (not production datasets)
 
-## Out of scope
+Resolution of catalog-bound definitions into full `NamingConvention` objects
+belongs in `@rpg/name-generator-integrations` — this package never imports it.
 
-- UI, API routes, and campaign persistence
-- Character-builder or species schema coupling
-- `@rpg/name-generator-integrations` (future resolver layer)
+## Package boundary
+
+```text
+contracts
+  ↑
+data          (definitions, pools, static conventions, standalone cultures)
+
+contracts + core + data
+  ↑
+integrations  (buildNamingCultureContext, resolveCampaignConventions, …)
+```
 
 ## Consumers
 
-| Workspace          | Use                                          |
-| ------------------ | -------------------------------------------- |
-| Dashboard (future) | Standalone name-generator page               |
-| Tests / tooling    | End-to-end convention + collection workflows |
+| Workspace    | Use                                                                   |
+| ------------ | --------------------------------------------------------------------- |
+| Dashboard    | Composes `listStaticConventions` + integrations resolution explicitly |
+| Integrations | Binds species/standalone cultures to `CULTURE_CONVENTION_BINDINGS`    |
+| Tests        | End-to-end convention + collection workflows                          |
 
 ## Imports
 
 ```ts
 import {
-  listConventions,
+  CULTURE_CONVENTION_BINDINGS,
+  HERITAGE_CULTURE_ALIASES,
+  listStaticConventions,
   loadNameCollection,
-  listCollectionManifestEntries,
+  STANDALONE_NAMING_CULTURES,
 } from '@rpg/name-generator-data'
-import { recommendConventions, generateNames } from '@rpg/name-generator-core'
+import {
+  resolveCampaignConventions,
+  resolveStandaloneConventions,
+} from '@rpg/name-generator-integrations'
 ```
 
-Typical orchestration:
+Dashboard convention composition:
 
-1. `recommendConventions(context, listConventions())`
-2. `loadNameCollection(id)` for each `collectionId` on the chosen convention
-3. `generateNames(convention, collectionsMap, request)`
+```ts
+const campaignConventions = resolveCampaignConventions({
+  species,
+  bindings: CULTURE_CONVENTION_BINDINGS,
+})
+const standaloneConventions = resolveStandaloneConventions({
+  cultures: STANDALONE_NAMING_CULTURES,
+  bindings: CULTURE_CONVENTION_BINDINGS,
+})
+const conventions = [...campaignConventions, ...standaloneConventions, ...listStaticConventions()]
+```
 
-## Language-as-affinity rules
+## Static vs resolved conventions
 
-- A language can influence **many** naming conventions (e.g. `elvish` → personal
-  and settlement conventions).
-- A convention may be influenced by **several** languages and cultures.
-- Knowing a language does **not** imply membership in an associated culture.
-- Creature type is a **broad fallback**, not a precise naming identity.
-- Species, faction, and location associations are **recommendations**, never
-  mandatory constraints.
-- Campaign data may override or rank conventions without mutating global
-  collections (future `CampaignNamingProfile` in integrations package).
+| API                              | Package      | Role                                                                        |
+| -------------------------------- | ------------ | --------------------------------------------------------------------------- |
+| `CULTURE_CONVENTION_BINDINGS`    | data         | Slim definitions keyed by culture id                                        |
+| `listStaticConventions()`        | data         | Unmigrated full conventions (`faction-general`, `draconic-dragon-personal`) |
+| `resolveCampaignConventions()`   | integrations | Species catalog → conventions                                               |
+| `resolveStandaloneConventions()` | integrations | Standalone cultures (e.g. akan) → conventions                               |
 
-## Culture vs region
+Do not add a `listConventions()` that silently merges static and resolved output.
 
-- `cultureIds` identify precise traditions (`akan`, `high-elven`).
-- `regionIds` are broad browsing facets (`west-africa`) — not substitutes for
-  culture labels.
+## Adding a culture-bound convention
 
-## Provenance
+1. Add `src/definitions/culture/<cultureId>/<key>.ts` or `src/definitions/species/<slug>/<key>.ts` as a `NamingConventionDefinition`.
+2. Register definition objects in `definitions/culture-bindings.ts`.
+3. Remove the legacy full convention from `conventions/manifest.ts` once parity tests pass.
 
-Every **collection** carries data-source provenance. Every **convention** carries
-curation provenance. Both are required before a dataset is production-eligible.
+Preserve explicit `id`, `label`, and `description` when they differ from generated defaults.
 
-## Lazy-loading boundaries
+## Adding a static (exceptional) convention
 
-| Module                      | Loads                                         |
-| --------------------------- | --------------------------------------------- |
-| `conventions/manifest.ts`   | Convention metadata only (eager)              |
-| `collections/manifest.ts`   | Manifest entries only (eager)                 |
-| `collections/import-map.ts` | Dynamic `import()` map (no eager assets)      |
-| `loadNameCollection`        | Validates and caches one collection at a time |
-
-Callers must not supply asset paths — ids resolve only through the manifest and
-import map.
-
-## Adding a collection
-
-1. Add `src/collections/<id>.ts` with provenance and generator definition.
-2. Register the id in `collections/manifest.ts` and `collections/import-map.ts`.
-3. Reference the id from convention `partBindings` and `collectionIds`.
-
-## Adding a convention
-
-1. Add `src/conventions/<id>.ts` with associations, structures, and bindings.
-2. Register in `conventions/manifest.ts`.
-3. Add co-located tests if the convention introduces new binding patterns.
-
-## Production eligibility
-
-A collection is production-eligible when it has:
-
-- Complete provenance (source, license, methodology)
-- Non-trivial, rights-cleared or original data
-- Schema validation passing at load time
-- Manifest entry with accurate `generatorKinds` and approximate counts
-
-Fixture pools in this package are **not** production-eligible.
+1. Add `src/conventions/<id>.ts` with full `NamingConvention` shape.
+2. Register in `conventions/manifest.ts` only when the convention is not culture-bound.
 
 ## Commands
 

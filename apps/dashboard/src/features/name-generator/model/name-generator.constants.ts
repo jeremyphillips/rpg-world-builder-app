@@ -29,20 +29,3 @@ export const GENDER_STYLE_LABELS = {
   shared: 'Shared',
   'not-applicable': 'Not applicable',
 } as const
-
-export const SUBJECT_KIND_LABELS: Partial<Record<NameSubjectKind, string>> = {
-  person: 'Person',
-  creature: 'Creature',
-  settlement: 'Settlement',
-  region: 'Region',
-  landmark: 'Landmark',
-  organization: 'Organization',
-  faction: 'Faction',
-  family: 'Family',
-  clan: 'Clan',
-  deity: 'Deity',
-  ship: 'Ship',
-  item: 'Item',
-  title: 'Title',
-  event: 'Event',
-}

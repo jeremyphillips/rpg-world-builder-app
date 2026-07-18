@@ -11,7 +11,7 @@ import {
 } from '@rpg/contracts'
 import { toOptions, type FormItem, type TabbedFormTab } from '@rpg/ui/form'
 
-import { buildActiveLanguageFieldOptions, vocabularySelectField } from '@/features/homebrew'
+import { vocabularySelectField } from '@/features/homebrew'
 
 import { getCharacterCreatureTypeFieldOptions } from './creature-type-field-options'
 import { descriptionField, nameField } from '../../lib/forms/fields/content-identity-form-fields'
@@ -25,6 +25,11 @@ import { SpeciesHeritageTab } from '../components/species-heritage-tab.client'
 import { SpeciesRulesTab } from '../components/species-rules-tab.client'
 import { SpeciesTraitsTab } from '../components/species-traits-tab.client'
 import { heritageScalarFields } from './species-heritage-form-fields'
+import {
+  cultureFields,
+  cultureFormSchemaRefinement,
+  speciesCultureFormSchema,
+} from './species-culture-form-fields'
 import {
   LEVEL_LIMITS_FIELD_PREFIX,
   multiclassingPolicyFields,
@@ -80,6 +85,7 @@ export function createSpeciesFormSchema(
       traits: z.array(traitRowFormSchema),
       heritage: heritageFormSchema.optional(),
       characterCreation: speciesCharacterCreationFormSchema.optional(),
+      culture: speciesCultureFormSchema.optional(),
     })
     .superRefine((values, ctx) => {
       if (!allowedSet.has(values.creatureType)) {
@@ -98,6 +104,13 @@ export function createSpeciesFormSchema(
       }
       refineSpeciesMovementRows(values.movement, ctx)
       refineSpeciesCharacterCreationForm(values.characterCreation, formCtx, ctx)
+      cultureFormSchemaRefinement(values, formCtx, (issue) => {
+        ctx.addIssue({
+          code: 'custom',
+          message: issue.message,
+          path: issue.path,
+        })
+      })
     })
 }
 
@@ -118,15 +131,6 @@ function attributesFields(ctx: ContentFormCtx): FormItem[] {
         }),
       ],
     },
-    movementArrayField(),
-    {
-      type: 'chips',
-      name: 'languageAffinities',
-      label: 'Language affinities',
-      hint: 'Recommended languages for origin picks. Does not grant languages or expand selectable pools.',
-      options: buildActiveLanguageFieldOptions(ctx.languageVocabulary),
-      chrome: { variant: 'panel' },
-    },
     {
       type: 'chips',
       name: 'sizes',
@@ -135,6 +139,7 @@ function attributesFields(ctx: ContentFormCtx): FormItem[] {
       required: true,
       chrome: { variant: 'panel' },
     },
+    movementArrayField(),
   ]
 }
 
@@ -143,7 +148,7 @@ export function buildSpeciesTabs(ctx: ContentFormCtx): TabbedFormTab[] {
     {
       id: 'basics',
       label: 'Basics',
-      fields: [nameField(), ...attributesFields(ctx), descriptionField(ctx)],
+      fields: [nameField(), ...attributesFields(ctx), cultureFields(ctx), descriptionField(ctx)],
     },
     {
       id: 'traits',

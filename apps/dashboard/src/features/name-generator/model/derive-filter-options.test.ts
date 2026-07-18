@@ -1,100 +1,56 @@
 import { describe, expect, it } from 'vitest'
 
-import { buildNamingContext } from './build-naming-context'
-import { deriveFilterOptions, deriveVisibleFilters } from './derive-filter-options'
-import { resetNameGeneratorFilters, sanitizeFiltersOnChange } from './sanitize-filters-on-change'
-import { listConventions } from '@rpg/name-generator-data'
+import { NAME_SUBJECT_KIND_ENTRIES, toVocabOptions } from '@rpg/contracts/name-generator'
+import { ELVISH_PERSONAL_CONVENTION } from '@rpg/contracts/name-generator/test-fixtures'
+import { STATIC_CONVENTIONS } from '@rpg/name-generator-data'
 
-describe('deriveFilterOptions', () => {
-  const conventions = listConventions()
+import { deriveFilterOptions, isFilterValueValid } from './derive-filter-options'
+import type { NameGeneratorFilters } from './name-generator-filters'
+import type { SpeciesNamingOption } from '@rpg/name-generator-integrations'
 
-  it('narrows language options when elf species is selected', () => {
+const subjectKindLabelById = new Map(
+  toVocabOptions(NAME_SUBJECT_KIND_ENTRIES).map((option) => [option.value, option.label]),
+)
+
+const filterContext = {
+  speciesNamingOptions: [
+    {
+      speciesId: 'srd-cc-5.2.1:elf',
+      label: 'Elf',
+      disabled: false,
+      cultureIds: ['elven'],
+      subjectKinds: ['person'],
+    },
+  ] satisfies SpeciesNamingOption[],
+  cultures: [{ id: 'elven', label: 'Elven', languageIds: ['elvish'] }],
+}
+
+describe('deriveFilterOptions subject kind labels', () => {
+  it('labels every convention-derived subject kind from contracts vocab', () => {
+    const conventionSubjectKinds = new Set(
+      STATIC_CONVENTIONS.flatMap((convention) => convention.subjectKinds),
+    )
+
+    for (const subjectKind of conventionSubjectKinds) {
+      expect(subjectKindLabelById.has(subjectKind)).toBe(true)
+    }
+  })
+
+  it('builds subject filter options without raw-id fallbacks', () => {
+    const filters = { subjectKind: 'person' } as NameGeneratorFilters
+    const options = deriveFilterOptions(filters, STATIC_CONVENTIONS)
+
+    expect(options.subjectKinds.every((option) => option.label !== option.id)).toBe(true)
+  })
+
+  it('treats elvish as a valid language when campaign conventions are composed', () => {
+    const filters = { subjectKind: 'person', languageId: 'elvish' } as NameGeneratorFilters
     const options = deriveFilterOptions(
-      { subjectKind: 'person', speciesId: 'srd-cc-5.2.1:elf' },
-      conventions,
+      filters,
+      [ELVISH_PERSONAL_CONVENTION, ...STATIC_CONVENTIONS],
+      filterContext,
     )
 
-    expect(options.languageIds.map((option) => option.id)).toContain('elvish')
-  })
-
-  it('includes akan culture for person subject', () => {
-    const options = deriveFilterOptions({ subjectKind: 'person' }, conventions)
-
-    expect(options.cultureIds.map((option) => option.id)).toContain('akan')
-    expect(options.cultureIds.map((option) => option.id)).toContain('high-elven')
-  })
-})
-
-describe('deriveVisibleFilters', () => {
-  const conventions = listConventions()
-
-  it('shows species and gender filters for person', () => {
-    expect(deriveVisibleFilters({ subjectKind: 'person' }, conventions)).toEqual({
-      species: true,
-      language: true,
-      culture: true,
-      genderStyle: true,
-    })
-  })
-
-  it('hides species for settlement subject', () => {
-    expect(deriveVisibleFilters({ subjectKind: 'settlement' }, conventions)).toEqual({
-      species: false,
-      language: true,
-      culture: true,
-      genderStyle: false,
-    })
-  })
-})
-
-describe('sanitizeFiltersOnChange', () => {
-  const conventions = listConventions()
-
-  it('clears species when subject changes away from person', () => {
-    const next = sanitizeFiltersOnChange(
-      { subjectKind: 'person', speciesId: 'srd-cc-5.2.1:elf' },
-      { subjectKind: 'settlement', speciesId: 'srd-cc-5.2.1:elf' },
-      conventions,
-    )
-
-    expect(next).toEqual({ subjectKind: 'settlement' })
-  })
-
-  it('preserves unrelated valid filters', () => {
-    const next = sanitizeFiltersOnChange(
-      { subjectKind: 'person', languageId: 'elvish' },
-      { subjectKind: 'person', languageId: 'elvish', genderStyle: 'feminine' },
-      conventions,
-    )
-
-    expect(next).toEqual({
-      subjectKind: 'person',
-      languageId: 'elvish',
-      genderStyle: 'feminine',
-    })
-  })
-})
-
-describe('resetNameGeneratorFilters', () => {
-  it('returns person defaults', () => {
-    expect(resetNameGeneratorFilters()).toEqual({ subjectKind: 'person' })
-  })
-})
-
-describe('buildNamingContext', () => {
-  it('maps optional filters to naming context arrays', () => {
-    expect(
-      buildNamingContext({
-        subjectKind: 'person',
-        languageId: 'elvish',
-        cultureId: 'high-elven',
-        speciesId: 'srd-cc-5.2.1:elf',
-      }),
-    ).toEqual({
-      subjectKind: 'person',
-      languageIds: ['elvish'],
-      cultureIds: ['high-elven'],
-      speciesIds: ['srd-cc-5.2.1:elf'],
-    })
+    expect(isFilterValueValid('languageId', 'elvish', options)).toBe(true)
   })
 })

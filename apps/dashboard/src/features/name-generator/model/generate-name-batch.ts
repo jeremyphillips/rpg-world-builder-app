@@ -7,7 +7,7 @@ import {
   type NamingRecommendation,
 } from '@rpg/contracts/name-generator'
 import { generateName } from '@rpg/name-generator-core'
-import { getConvention, listConventions, loadNameCollection } from '@rpg/name-generator-data'
+import { getConvention, listStaticConventions, loadNameCollection } from '@rpg/name-generator-data'
 
 import { allocateNameCounts, buildWeightedRoundRobinOrder } from './allocate-name-counts'
 import { buildNamingContext } from './build-naming-context'
@@ -24,8 +24,8 @@ export type GenerateNameBatchResult = {
 }
 
 export type GenerateNameBatchDeps = {
-  listConventions?: typeof listConventions
-  getConvention?: typeof getConvention
+  conventions?: readonly NamingConvention[]
+  getConvention?: (conventionId: string) => NamingConvention | undefined
   loadCollection?: LoadNameCollectionFn
 }
 
@@ -81,21 +81,28 @@ async function generateNameForSlot(
   seen: Set<string>,
 ): Promise<GeneratedName | undefined> {
   for (let attempt = 0; attempt < MAX_DUPLICATE_ATTEMPTS; attempt += 1) {
-    const candidate = generateName(
-      convention,
-      collections,
-      {
-        conventionId: convention.id,
-        count: 1,
-        seed,
-        genderStyle,
-      },
-      slotIndex * MAX_DUPLICATE_ATTEMPTS + attempt,
-      seen,
-    )
+    try {
+      const candidate = generateName(
+        convention,
+        collections,
+        {
+          conventionId: convention.id,
+          count: 1,
+          seed,
+          genderStyle,
+        },
+        slotIndex * MAX_DUPLICATE_ATTEMPTS + attempt,
+        seen,
+      )
 
-    if (!seen.has(candidate.value)) {
-      return candidate
+      if (!seen.has(candidate.value)) {
+        return candidate
+      }
+    } catch (error) {
+      if (isNameGeneratorError(error) && error.code === 'generation-exhausted') {
+        return undefined
+      }
+      throw error
     }
   }
 
@@ -155,7 +162,7 @@ export async function generateNameBatch(
   },
   deps: GenerateNameBatchDeps = {},
 ): Promise<GenerateNameBatchResult> {
-  const conventions = (deps.listConventions ?? listConventions)()
+  const conventions = deps.conventions ?? listStaticConventions()
   const getConventionById = deps.getConvention ?? getConvention
   const loadCollection = deps.loadCollection ?? loadNameCollection
 

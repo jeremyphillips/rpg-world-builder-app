@@ -1,6 +1,7 @@
 import { z } from 'zod'
 
 import { nameGenderStyleSchema } from './generation'
+import { type NamePartRole } from './name-structure'
 import { nameCollectionProvenanceSchema } from './provenance'
 import { nameSubjectKindSchema } from './subject-kind'
 
@@ -18,11 +19,14 @@ export const nameGeneratorKindSchema = z.enum(NAME_GENERATOR_KINDS)
 
 export type NameGeneratorKind = z.infer<typeof nameGeneratorKindSchema>
 
+export type NamePoolRole = NamePartRole | 'complete'
+
 export const NAME_POOL_ROLES = [
   'given',
   'family',
   'clan',
   'house',
+  'virtue',
   'epithet',
   'title',
   'descriptor',
@@ -33,8 +37,6 @@ export const NAME_POOL_ROLES = [
 ] as const
 
 export const namePoolRoleSchema = z.enum(NAME_POOL_ROLES)
-
-export type NamePoolRole = z.infer<typeof namePoolRoleSchema>
 
 export const namePoolSchema = z.object({
   id: z.string().min(1),

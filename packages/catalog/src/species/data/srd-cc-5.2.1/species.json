@@ -256,6 +256,12 @@
           ]
         }
       ]
+    },
+    "culture": {
+      "naming": {
+        "supported": true,
+        "personalNameComponents": ["clan"]
+      }
     }
   },
   {
@@ -317,7 +323,13 @@
         "name": "Stonecunning",
         "description": "<p>As a Bonus Action, you gain Tremorsense with a range of 60 feet for 10 minutes. You must be on a stone surface or touching a stone surface to use this Tremorsense. The stone can be natural or worked. You can use this Bonus Action a number of times equal to your Proficiency Bonus, and you regain all expended uses when you finish a Long Rest.</p>"
       }
-    ]
+    ],
+    "culture": {
+      "naming": {
+        "supported": true,
+        "personalNameComponents": ["clan"]
+      }
+    }
   },
   {
     "id": "srd-cc-5.2.1:elf",
@@ -532,6 +544,14 @@
           ]
         }
       ]
+    },
+    "culture": {
+      "id": "elven",
+      "name": "Elven",
+      "naming": {
+        "supported": true,
+        "personalNameComponents": ["family"]
+      }
     }
   },
   {
@@ -630,6 +650,12 @@
           ]
         }
       ]
+    },
+    "culture": {
+      "naming": {
+        "supported": true,
+        "personalNameComponents": ["family"]
+      }
     }
   },
   {
@@ -733,6 +759,12 @@
           ]
         }
       ]
+    },
+    "culture": {
+      "naming": {
+        "supported": true,
+        "personalNameComponents": ["epithet", "clan"]
+      }
     }
   },
   {
@@ -775,7 +807,13 @@
         "name": "Naturally Stealthy",
         "description": "<p>You can take the Hide action even when you are obscured only by a creature that is at least one size larger than you.</p>"
       }
-    ]
+    ],
+    "culture": {
+      "naming": {
+        "supported": true,
+        "personalNameComponents": ["family"]
+      }
+    }
   },
   {
     "id": "srd-cc-5.2.1:human",
@@ -822,7 +860,12 @@
           }
         ]
       }
-    ]
+    ],
+    "culture": {
+      "naming": {
+        "supported": false
+      }
+    }
   },
   {
     "id": "srd-cc-5.2.1:orc",
@@ -838,6 +881,7 @@
     "movement": {
       "walk": 30
     },
+    "languageAffinities": ["orc"],
     "traits": [
       {
         "kind": "custom",
@@ -866,7 +910,12 @@
         "name": "Relentless Endurance",
         "description": "<p>When you are reduced to 0 Hit Points but not killed outright, you can drop to 1 Hit Point instead. Once you use this trait, you can't do so again until you finish a Long Rest.</p>"
       }
-    ]
+    ],
+    "culture": {
+      "naming": {
+        "supported": true
+      }
+    }
   },
   {
     "id": "srd-cc-5.2.1:tiefling",
@@ -1097,6 +1146,12 @@
           ]
         }
       ]
+    },
+    "culture": {
+      "naming": {
+        "supported": true,
+        "personalNameComponents": ["virtue"]
+      }
     }
   }
 ]

@@ -1,6 +1,22 @@
 import { describe, expect, it } from 'vitest'
 
+import { composeNameGeneratorConventions } from './compose-name-generator-conventions'
 import { formatMatchCountLabel, formatResultsSummary } from './format-results-summary'
+
+const ELF_SPECIES = {
+  id: 'srd-cc-5.2.1:elf',
+  slug: 'elf',
+  name: 'Elf',
+  source: 'system' as const,
+  culture: {
+    id: 'elven',
+    name: 'Elven',
+    naming: { supported: true, personalNameComponents: ['family' as const] },
+  },
+  languageAffinities: ['elvish'],
+}
+
+const { getConvention } = composeNameGeneratorConventions([ELF_SPECIES])
 
 describe('formatMatchCountLabel', () => {
   it('formats zero, one, and many matches', () => {
@@ -21,9 +37,11 @@ describe('formatResultsSummary', () => {
           genderStyle: 'feminine',
         },
         [{ conventionId: 'elvish-personal', score: 20, reasons: [] }],
+        undefined,
+        getConvention,
       ),
     ).toEqual({
-      title: 'High Elven personal names',
+      title: 'Elven personal names',
       subtitle: 'Elvish · Elf · Feminine',
     })
   })

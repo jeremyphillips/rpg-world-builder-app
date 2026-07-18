@@ -2,7 +2,7 @@ import { z } from 'zod'
 
 import { creatureTypeSchema } from '../rpg/vocab/creature-type'
 import { languageIdSchema } from '../rpg/vocab/language'
-import { nameCultureIdSchema, nameFacetIdSchema } from './culture'
+import { namingCultureIdSchema, nameFacetIdSchema } from './culture'
 import { namingAssociationStrengthSchema } from './naming-association'
 import { nameSubjectKindSchema } from './subject-kind'
 
@@ -13,8 +13,11 @@ import { nameSubjectKindSchema } from './subject-kind'
 export const namingContextSchema = z.object({
   subjectKind: nameSubjectKindSchema,
   languageIds: z.array(languageIdSchema).optional(),
-  cultureIds: z.array(nameCultureIdSchema).optional(),
+  cultureIds: z.array(namingCultureIdSchema).optional(),
+  conventionCultureIds: z.array(namingCultureIdSchema).optional(),
+  cultureResolutions: z.record(namingCultureIdSchema, namingCultureIdSchema).optional(),
   speciesIds: z.array(z.string().min(1)).optional(),
+  heritageIds: z.array(z.string().min(1)).optional(),
   creatureTypes: z.array(creatureTypeSchema).optional(),
   regionIds: z.array(nameFacetIdSchema).optional(),
   fictionSettingIds: z.array(nameFacetIdSchema).optional(),
@@ -31,7 +34,7 @@ const namingRecommendationReasonLanguageSchema = z.object({
 
 const namingRecommendationReasonCultureSchema = z.object({
   kind: z.literal('culture'),
-  cultureId: nameCultureIdSchema,
+  cultureId: namingCultureIdSchema,
   strength: namingAssociationStrengthSchema,
 })
 

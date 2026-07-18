@@ -9,6 +9,7 @@ export const NAME_PART_ROLES = [
   'family',
   'clan',
   'house',
+  'virtue',
   'epithet',
   'title',
   'descriptor',

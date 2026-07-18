@@ -8,7 +8,7 @@ import { resetNameGeneratorFilters } from './sanitize-filters-on-change'
 describe('buildNameGeneratorFilterFields', () => {
   const conventions = listConventions()
 
-  it('includes optional species field only when visible for person', () => {
+  it('keeps species field hidden until campaign catalog integration supplies options', () => {
     const filters = resetNameGeneratorFilters()
     const fields = buildNameGeneratorFilterFields({
       filterOptions: deriveFilterOptions(filters, conventions),
@@ -17,7 +17,7 @@ describe('buildNameGeneratorFilterFields', () => {
 
     expect(fields.find((field) => field.key === 'speciesId')).toMatchObject({
       allowAny: true,
-      visible: true,
+      visible: false,
     })
   })
 

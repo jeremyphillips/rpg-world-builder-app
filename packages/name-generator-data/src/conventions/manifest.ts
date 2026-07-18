@@ -1,27 +1,20 @@
 import { namingConventionSchema, type NamingConvention } from '@rpg/contracts/name-generator'
 
-import { akanPersonalConvention } from './akan-personal'
 import { draconicDragonPersonalConvention } from './draconic-dragon-personal'
-import { draconicDragonbornClanConvention } from './draconic-dragonborn-clan'
-import { dwarvenSettlementConvention } from './dwarven-settlement'
-import { elvishPersonalConvention } from './elvish-personal'
-import { elvishSettlementConvention } from './elvish-settlement'
 import { factionGeneralConvention } from './faction-general'
 
-const RAW_CONVENTIONS = [
-  elvishPersonalConvention,
-  elvishSettlementConvention,
-  draconicDragonPersonalConvention,
-  draconicDragonbornClanConvention,
-  dwarvenSettlementConvention,
-  factionGeneralConvention,
-  akanPersonalConvention,
-] as const
+const RAW_STATIC_CONVENTIONS = [draconicDragonPersonalConvention, factionGeneralConvention] as const
 
-export const CONVENTIONS: readonly NamingConvention[] = RAW_CONVENTIONS.map((convention) =>
-  namingConventionSchema.parse(convention),
+export const STATIC_CONVENTIONS: readonly NamingConvention[] = RAW_STATIC_CONVENTIONS.map(
+  (convention) => namingConventionSchema.parse(convention),
 )
 
-export const CONVENTION_BY_ID = new Map(
-  CONVENTIONS.map((convention) => [convention.id, convention]),
+export const STATIC_CONVENTION_BY_ID = new Map(
+  STATIC_CONVENTIONS.map((convention) => [convention.id, convention]),
 )
+
+/** @deprecated Use STATIC_CONVENTIONS — unmigrated conventions only. */
+export const CONVENTIONS = STATIC_CONVENTIONS
+
+/** @deprecated Use STATIC_CONVENTION_BY_ID */
+export const CONVENTION_BY_ID = STATIC_CONVENTION_BY_ID

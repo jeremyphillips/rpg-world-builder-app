@@ -32,7 +32,7 @@ import {
   useSenseVocabulary,
 } from '@/features/homebrew'
 import { STORY_CAMPAIGN_ID } from '../../lib/fixtures/constants'
-import { ELF, ORC } from '../fixtures'
+import { ELF, HUMAN } from '../fixtures'
 import { SpeciesDetailContent } from './species-detail'
 
 const useCreatureTypeVocabularyMock = vi.mocked(useCreatureTypeVocabulary)
@@ -76,7 +76,7 @@ describe('SpeciesDetailContent language affinities', () => {
   })
 
   it('omits the language affinities stat row when absent', () => {
-    renderSpeciesDetail(ORC)
+    renderSpeciesDetail(HUMAN)
 
     expect(screen.queryByText(SPECIES_STAT_LABELS.languageAffinities)).not.toBeInTheDocument()
     expect(screen.getByRole('heading', { name: 'Traits' })).toBeInTheDocument()

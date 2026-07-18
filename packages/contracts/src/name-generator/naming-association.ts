@@ -2,7 +2,7 @@ import { z } from 'zod'
 
 import { creatureTypeSchema } from '../rpg/vocab/creature-type'
 import { languageIdSchema } from '../rpg/vocab/language'
-import { nameCultureIdSchema, nameFacetIdSchema } from './culture'
+import { namingCultureIdSchema, nameFacetIdSchema } from './culture'
 
 // ---------------------------------------------------------------------------
 // Naming associations — independently weighted links between conventions and
@@ -23,7 +23,7 @@ const namingAssociationLanguageSchema = z.object({
 
 const namingAssociationCultureSchema = z.object({
   kind: z.literal('culture'),
-  cultureId: nameCultureIdSchema,
+  cultureId: namingCultureIdSchema,
   strength: namingAssociationStrengthSchema.optional(),
 })
 

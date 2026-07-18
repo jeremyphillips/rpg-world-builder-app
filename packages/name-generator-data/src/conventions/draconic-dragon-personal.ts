@@ -19,8 +19,10 @@ export const draconicDragonPersonalConvention = {
       format: '{given}',
     },
   ],
-  partBindings: [{ partKey: 'given', collectionId: 'draconic-personal-pool', sourceKey: 'given' }],
-  collectionIds: ['draconic-personal-pool'],
+  partBindings: [
+    { partKey: 'given', collectionId: 'draconic-dragon-given-pool', sourceKey: 'given' },
+  ],
+  collectionIds: ['draconic-dragon-given-pool'],
   provenance: FIXTURE_COLLECTION_PROVENANCE.conventionCuration,
   version: 1,
 } as const satisfies NamingConvention

@@ -47,6 +47,7 @@ export function formatResultsSummary(
   filters: NameGeneratorFilters,
   matches: readonly NamingRecommendation[],
   partialCount?: { generated: number; requested: number },
+  getConventionById: (conventionId: string) => { label: string } | undefined = getConvention,
 ): NameGeneratorResultsSummary {
   if (partialCount !== undefined && partialCount.generated < partialCount.requested) {
     return {
@@ -56,7 +57,7 @@ export function formatResultsSummary(
   }
 
   if (matches.length === 1) {
-    const convention = getConvention(matches[0]?.conventionId ?? '')
+    const convention = getConventionById(matches[0]?.conventionId ?? '')
     return {
       title: convention?.label ?? 'Generated names',
       subtitle: buildFilterSubtitle(filters),

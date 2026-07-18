@@ -56,8 +56,7 @@ export const ELVISH_PERSONAL_CONVENTION: NamingConvention = {
   subjectKinds: ['person'],
   associations: [
     { kind: 'language', languageId: 'elvish', strength: 'primary' },
-    { kind: 'culture', cultureId: 'high-elven', strength: 'primary' },
-    { kind: 'species', speciesId: 'srd-cc-5.2.1:elf' },
+    { kind: 'culture', cultureId: 'elven', strength: 'primary' },
   ],
   structures: [
     {
@@ -183,10 +182,7 @@ export const COMPOUND_CONVENTION: NamingConvention = {
   id: 'dwarven-settlement',
   label: 'Dwarven settlement',
   subjectKinds: ['settlement'],
-  associations: [
-    { kind: 'culture', cultureId: 'mountain-dwarf', strength: 'primary' },
-    { kind: 'species', speciesId: 'srd-cc-5.2.1:dwarf' },
-  ],
+  associations: [{ kind: 'culture', cultureId: 'dwarf', strength: 'primary' }],
   structures: [
     {
       id: 'hold',
