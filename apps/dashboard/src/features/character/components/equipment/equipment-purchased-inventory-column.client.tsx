@@ -1,6 +1,6 @@
 'use client'
 
-import { Button } from '@rpg/ui'
+import { Button, InsetPanel } from '@rpg/ui'
 
 import {
   EQUIPMENT_PURCHASED_INVENTORY_SECTION_LABEL,
@@ -11,7 +11,6 @@ import {
 import { EquipmentInventoryColumn } from './equipment-inventory-column.client'
 import { EquipmentPurchasedInventorySection } from './equipment-purchased-inventory-section.client'
 import type { PurchasedCategoryGroup } from './equipment-inventory-summary.lib'
-import { equipmentPurchasedInventoryPanelClasses } from './equipment-inventory-summary.variants'
 
 export type EquipmentPurchasedInventoryColumnProps = {
   purchased: PurchasedCategoryGroup[]
@@ -42,13 +41,13 @@ export function EquipmentPurchasedInventoryColumn({
       }
       reserveToolbarRow={isPackageMode}
     >
-      <div className={equipmentPurchasedInventoryPanelClasses}>
+      <InsetPanel size="sm" className="rounded-lg">
         <EquipmentPurchasedInventorySection
           purchased={purchased}
           onRemoveItem={onRemoveItem}
           onSetPurchaseQuantity={onSetPurchaseQuantity}
         />
-      </div>
+      </InsetPanel>
     </EquipmentInventoryColumn>
   )
 }

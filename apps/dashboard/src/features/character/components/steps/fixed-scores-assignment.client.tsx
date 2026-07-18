@@ -36,6 +36,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  InsetPanel,
   Text,
   cn,
 } from '@rpg/ui'
@@ -84,9 +85,7 @@ import {
   fixedScoresAbilityGridClasses,
   fixedScoresAssignmentIntroClasses,
   fixedScoresAssignmentRootClasses,
-  fixedScoresScorePoolContainerClasses,
   fixedScoresScorePoolContainerDragOverClasses,
-  fixedScoresScorePoolContainerProgressClasses,
   fixedScoresScorePoolContainerTokensClasses,
   fixedScoresScorePoolHeaderClasses,
   fixedScoresTokenPoolSectionClasses,
@@ -314,10 +313,13 @@ function ScorePoolSection({
           <AutoFillRemainingAction label={poolActionLabel} onAutoFill={onPoolAction} />
         ) : null}
       </div>
-      <div
+      <InsetPanel
         ref={setNodeRef}
+        borderStyle="dashed"
+        surface="subtle"
+        size="md"
         className={cn(
-          fixedScoresScorePoolContainerClasses,
+          'flex flex-col gap-2 transition-colors',
           isAssignedDrag && isOver && fixedScoresScorePoolContainerDragOverClasses,
         )}
       >
@@ -339,10 +341,10 @@ function ScorePoolSection({
             />
           ))}
         </div>
-        <p className={fixedScoresScorePoolContainerProgressClasses} aria-live="polite">
+        <InsetPanel.Text as="p" variant="small" aria-live="polite">
           {abilitiesFormCopy.scoresRemaining(remainingCount)}
-        </p>
-      </div>
+        </InsetPanel.Text>
+      </InsetPanel>
     </section>
   )
 }

@@ -1,10 +1,10 @@
+import { InsetPanel } from '@rpg/ui'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { useState } from 'react'
 
 import type { EquipmentInventoryRow } from '../../lib/equipment-step.lib'
 import { EquipmentPurchasedInventorySection } from './equipment-purchased-inventory-section.client'
 import type { PurchasedCategoryGroup } from './equipment-inventory-summary.lib'
-import { equipmentPurchasedInventoryPanelClasses } from './equipment-inventory-summary.variants'
 
 const stackableRow: EquipmentInventoryRow = {
   group: 'gear',
@@ -90,7 +90,7 @@ function PurchasedInventorySectionDemo(args: {
   }))
 
   return (
-    <div className={equipmentPurchasedInventoryPanelClasses}>
+    <InsetPanel size="sm" className="rounded-lg">
       <EquipmentPurchasedInventorySection
         purchased={groups}
         showGroupHeadings={args.showGroupHeadings}
@@ -103,7 +103,7 @@ function PurchasedInventorySectionDemo(args: {
           setQuantities((current) => ({ ...current, [target.purchaseId]: 0 }))
         }}
       />
-    </div>
+    </InsetPanel>
   )
 }
 

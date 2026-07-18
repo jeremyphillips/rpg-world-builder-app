@@ -130,6 +130,7 @@
   --color-segmented-track: var(--segmented-track-bg);
 
   --shadow-surface-raised: var(--surface-raised-shadow);
+  --shadow-surface-sunken: var(--surface-sunken-shadow);
 
   --font-sans: var(--font-body, 'Inter Variable'), 'Inter', ui-sans-serif, system-ui, sans-serif;
   --font-display:

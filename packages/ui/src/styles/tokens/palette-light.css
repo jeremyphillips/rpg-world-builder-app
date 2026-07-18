@@ -48,7 +48,7 @@
   );
   --palette-surface-sunken: color-mix(
     in oklch,
-    var(--palette-neutral-contrast) 26%,
+    var(--palette-neutral-contrast) 32%,
     var(--palette-surface-base)
   );
 

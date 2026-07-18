@@ -1,9 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { Button } from '@rpg/ui'
+import { Button, InsetPanel } from '@rpg/ui'
 
 import { EquipmentStartingPackageToolbar } from './equipment-starting-package-toolbar.client'
 import { EquipmentInventoryColumn } from './equipment-inventory-column.client'
-import { equipmentPurchasedInventoryPanelClasses } from './equipment-inventory-summary.variants'
 
 const meta = {
   title: 'Character Builder/EquipmentInventoryColumn',
@@ -11,9 +10,9 @@ const meta = {
   args: {
     title: 'Standard Equipment',
     children: (
-      <div className={equipmentPurchasedInventoryPanelClasses}>
-        <p className="text-sm text-muted-foreground">Column body content</p>
-      </div>
+      <InsetPanel size="sm" className="rounded-lg">
+        <InsetPanel.Text>Column body content</InsetPanel.Text>
+      </InsetPanel>
     ),
   },
 } satisfies Meta<typeof EquipmentInventoryColumn>

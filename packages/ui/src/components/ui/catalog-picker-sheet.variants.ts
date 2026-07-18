@@ -17,8 +17,6 @@ export const catalogPickerSheetBodyVariants = cva(cn(sheetBodyVariants(), 'pt-0'
 
 export const catalogPickerSheetListVariants = cva('space-y-2')
 
-export const catalogPickerSheetEmptyVariants = cva(
-  'rounded-md border border-dashed border-border px-4 py-8 text-center text-sm text-muted-foreground',
-)
+export { insetPanelEmptyStateVariants as catalogPickerSheetEmptyVariants } from './inset-panel.variants'
 
 export const catalogPickerSheetLoadingVariants = cva('flex justify-center py-12')

@@ -45,16 +45,20 @@ Recipes are the public contract; ladder steps are implementation details recipes
 
 ## Surface hierarchy
 
-| Role        | Utility                    | Meaning                                                     |
-| ----------- | -------------------------- | ----------------------------------------------------------- |
-| Base        | `bg-background`            | Page canvas                                                 |
-| Panel       | `bg-card`, `bg-popover`    | Warm elevated panels / overlays                             |
-| Subtle wash | `bg-surface-subtle`        | Barely visible grouping                                     |
-| Muted wash  | `bg-surface-muted`         | Standard secondary panel / chrome                           |
-| Strong wash | `bg-surface-strong`        | Dense neutral chrome (not brand/selected meaning)           |
-| Sunken      | `bg-sunken`                | Recessed / inset fill                                       |
-| Secondary   | `bg-secondary`             | Alternate **interactive** surface (e.g. Button `secondary`) |
-| Field       | `bg-input`, `border-input` | Editable control chrome — near-white in light mode only     |
+| Role        | Utility                 | Meaning                                                             |
+| ----------- | ----------------------- | ------------------------------------------------------------------- |
+| Base        | `bg-background`         | Page canvas                                                         |
+| Panel       | `bg-card`, `bg-popover` | Warm elevated panels / overlays                                     |
+| Subtle wash | `bg-surface-subtle`     | Barely visible grouping                                             |
+| Muted wash  | `bg-surface-muted`      | Standard secondary panel / chrome                                   |
+| Strong wash | `bg-surface-strong`     | Dense neutral chrome (not brand/selected meaning)                   |
+| Sunken      | `bg-sunken`             | Recessed / inset fill — pair with `shadow-surface-sunken` for wells |
+
+`shadow-surface-raised` and `shadow-surface-sunken` are Layer 2 recipes (`--surface-raised-shadow`,
+`--surface-sunken-shadow`) — raised panels use the former; `InsetPanel` defaults to `surface="sunken"`
+(fill + sunken shadow). Use `surface="muted"` or `surface="subtle"` for flat wash panels.
+| Secondary | `bg-secondary` | Alternate **interactive** surface (e.g. Button `secondary`) |
+| Field | `bg-input`, `border-input` | Editable control chrome — near-white in light mode only |
 
 `bg-muted` aliases `bg-surface-muted` for shadcn compatibility — prefer `bg-surface-*` in new code.
 

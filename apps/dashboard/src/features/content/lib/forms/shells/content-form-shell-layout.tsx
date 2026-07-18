@@ -2,7 +2,7 @@ import { useNavigate } from 'react-router-dom'
 import * as React from 'react'
 import type { DefaultValues, FieldValues, UseFormReturn } from 'react-hook-form'
 import type { ZodType } from 'zod'
-import { Heading, Text, Button } from '@rpg/ui'
+import { Heading, InsetPanel, Button } from '@rpg/ui'
 import {
   Form,
   FormFooterActions,
@@ -27,9 +27,9 @@ import { useAdvisoryFormSubmit, type AdvisoryFormSubmitOptions } from './use-adv
 
 export function ContentFormComingSoon() {
   return (
-    <div className="rounded-lg border border-dashed border-border p-8 text-center">
-      <Text variant="muted">Form coming soon.</Text>
-    </div>
+    <InsetPanel borderStyle="dashed" surface="none" size="lg" align="center">
+      <InsetPanel.Text>Form coming soon.</InsetPanel.Text>
+    </InsetPanel>
   )
 }
 

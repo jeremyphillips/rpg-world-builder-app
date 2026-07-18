@@ -9,7 +9,6 @@ export const catalogPickerRowShellClasses = 'pb-0'
 export const catalogPickerRowBodyClasses =
   'border-t border-border-subtle bg-surface-muted -ml-2 -mr-3 pb-3 pt-0'
 
-export const catalogPickerEmptyStateClasses =
-  'rounded-md border border-dashed border-border px-4 py-8 text-center text-sm text-muted-foreground'
+export { insetPanelEmptyStateClasses as catalogPickerEmptyStateClasses } from '@rpg/ui'
 
 export const catalogPickerDisabledRowClasses = 'opacity-60'

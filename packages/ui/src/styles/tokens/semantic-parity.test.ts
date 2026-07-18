@@ -19,6 +19,7 @@ const LAYOUT_SEMANTIC_ROLES = new Set(['--radius', '--radius-card'])
 const RECIPE_SEMANTIC_ROLES = new Set([
   '--catalog-picker-row-surface',
   '--surface-raised-shadow',
+  '--surface-sunken-shadow',
   ...INTERACTION_SEMANTIC_ROLES,
   ...CHOICE_CONTROL_SEMANTIC_ROLES,
 ])
