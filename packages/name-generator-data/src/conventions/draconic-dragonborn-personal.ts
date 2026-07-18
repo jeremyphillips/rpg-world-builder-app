@@ -9,8 +9,7 @@ export const draconicDragonbornPersonalConvention = {
   subjectKinds: ['person'],
   associations: [
     { kind: 'language', languageId: 'draconic', strength: 'primary' },
-    { kind: 'culture', cultureId: 'draconic-dragonborn', strength: 'primary' },
-    { kind: 'species', speciesId: 'srd-cc-5.2.1:dragonborn' },
+    { kind: 'culture', cultureId: 'dragonborn', strength: 'primary' },
   ],
   structures: [
     {

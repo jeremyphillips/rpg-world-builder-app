@@ -1,97 +1,70 @@
-import type { NameCulture } from '@rpg/contracts/name-generator'
+import type { NamingCulture } from '@rpg/contracts/name-generator'
 
-const ELF_SPECIES_ID = 'srd-cc-5.2.1:elf'
-
-export const NAME_CULTURES = [
+export const NAMING_CULTURES = [
   {
-    id: 'elven-general',
+    id: 'elven',
     label: 'Elven',
     origin: 'fictional',
     languageIds: ['elvish'],
-    selectable: false,
-    description:
-      'Shared elven personal and settlement naming — conventions bind here; heritage cultures resolve to this base.',
+    description: 'Elven personal and settlement naming traditions.',
   },
   {
-    id: 'high-elf',
-    label: 'High Elf',
-    origin: 'fictional',
-    languageIds: ['elvish'],
-    speciesIds: [ELF_SPECIES_ID],
-    heritageIds: ['high-elf'],
-    resolvesToCultureId: 'elven-general',
-    description: 'High elf heritage naming — resolves to shared elven conventions.',
-  },
-  {
-    id: 'wood-elf',
-    label: 'Wood Elf',
-    origin: 'fictional',
-    languageIds: ['elvish'],
-    speciesIds: [ELF_SPECIES_ID],
-    heritageIds: ['wood-elf'],
-    resolvesToCultureId: 'elven-general',
-    description: 'Wood elf heritage naming — resolves to shared elven conventions.',
-  },
-  {
-    id: 'drow',
-    label: 'Drow',
-    origin: 'fictional',
-    languageIds: ['elvish'],
-    speciesIds: [ELF_SPECIES_ID],
-    heritageIds: ['drow'],
-    resolvesToCultureId: 'elven-general',
-    description: 'Drow heritage naming — resolves to shared elven conventions.',
-  },
-  {
-    id: 'mountain-dwarf',
-    label: 'Mountain Dwarf',
+    id: 'dwarf',
+    label: 'Dwarf',
     origin: 'fictional',
     languageIds: ['dwarvish'],
     description: 'Hold- and clan-oriented dwarven naming patterns.',
   },
   {
-    id: 'common-halfling',
-    label: 'Common Halfling',
+    id: 'halfling',
+    label: 'Halfling',
     origin: 'fictional',
     languageIds: ['halfling'],
-    description: 'Pastoral halfling naming traditions associated with halfling language affinity.',
+    description: 'Pastoral halfling naming traditions.',
   },
   {
-    id: 'draconic-dragonborn',
-    label: 'Draconic Dragonborn',
+    id: 'dragonborn',
+    label: 'Dragonborn',
     origin: 'fictional',
     languageIds: ['draconic'],
     description:
       'Dragonborn naming traditions drawing on draconic lexical patterns — distinct from true dragon naming.',
   },
   {
-    id: 'infernal-tiefling',
-    label: 'Infernal Tiefling',
+    id: 'tiefling',
+    label: 'Tiefling',
     origin: 'fictional',
     languageIds: ['infernal'],
     description: 'Fiend-touched personal naming — virtue names as optional chosen surnames.',
   },
   {
-    id: 'common-gnome',
-    label: 'Common Gnome',
+    id: 'gnome',
+    label: 'Gnome',
     origin: 'fictional',
     languageIds: ['gnomish'],
-    description:
-      'Gnomish personal and settlement naming — single culture covering forest and rock lineages at fixture depth.',
+    description: 'Gnomish personal and settlement naming traditions.',
   },
   {
-    id: 'giant-goliath',
-    label: 'Giant Goliath',
+    id: 'goliath',
+    label: 'Goliath',
     origin: 'fictional',
     languageIds: ['giant'],
     description: 'Goliath naming with birth name, earned epithet, and clan name.',
   },
   {
-    id: 'common-orc',
-    label: 'Common Orc',
+    id: 'orc',
+    label: 'Orc',
     origin: 'fictional',
     languageIds: ['orc'],
     description: 'Orc personal naming — short, harsh given names without modeled clan surnames.',
+  },
+  {
+    id: 'human',
+    label: 'Human',
+    origin: 'fictional',
+    selectable: false,
+    description:
+      'Human cultural affiliation — name generation is not yet modeled for this tradition.',
   },
   {
     id: 'akan',
@@ -100,4 +73,4 @@ export const NAME_CULTURES = [
     regionIds: ['west-africa'],
     description: 'Precisely labeled akan naming tradition — not a broad regional label.',
   },
-] as const satisfies readonly NameCulture[]
+] as const satisfies readonly NamingCulture[]

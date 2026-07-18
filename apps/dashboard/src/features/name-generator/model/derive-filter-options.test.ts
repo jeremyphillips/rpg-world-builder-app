@@ -17,31 +17,20 @@ describe('deriveFilterOptions', () => {
     expect(options.languageIds.map((option) => option.id)).toContain('elvish')
   })
 
-  it('includes akan culture for person subject', () => {
+  it('includes akan and elven cultures for person subject', () => {
     const options = deriveFilterOptions({ subjectKind: 'person' }, conventions)
 
     expect(options.cultureIds.map((option) => option.id)).toContain('akan')
-    expect(options.cultureIds.map((option) => option.id)).not.toContain('elven-general')
-  })
-
-  it('shows elf heritage cultures when elf species is selected', () => {
-    const options = deriveFilterOptions(
-      { subjectKind: 'person', speciesId: 'srd-cc-5.2.1:elf' },
-      conventions,
-    )
-
-    expect(options.cultureIds.map((option) => option.id)).toEqual(
-      expect.arrayContaining(['high-elf', 'wood-elf', 'drow']),
-    )
+    expect(options.cultureIds.map((option) => option.id)).toContain('elven')
   })
 })
 
 describe('deriveVisibleFilters', () => {
   const conventions = listConventions()
 
-  it('shows species and gender filters for person', () => {
+  it('hides species until campaign catalog integration supplies species options', () => {
     expect(deriveVisibleFilters({ subjectKind: 'person' }, conventions)).toEqual({
-      species: true,
+      species: false,
       language: true,
       culture: true,
       genderStyle: true,
@@ -98,16 +87,15 @@ describe('buildNamingContext', () => {
       buildNamingContext({
         subjectKind: 'person',
         languageId: 'elvish',
-        cultureId: 'high-elf',
+        cultureId: 'elven',
         speciesId: 'srd-cc-5.2.1:elf',
       }),
     ).toEqual({
       subjectKind: 'person',
       languageIds: ['elvish'],
-      cultureIds: ['high-elf'],
-      conventionCultureIds: ['elven-general'],
-      cultureResolutions: { 'high-elf': 'elven-general' },
-      heritageIds: ['high-elf'],
+      cultureIds: ['elven'],
+      conventionCultureIds: ['elven'],
+      cultureResolutions: { elven: 'elven' },
       speciesIds: ['srd-cc-5.2.1:elf'],
     })
   })

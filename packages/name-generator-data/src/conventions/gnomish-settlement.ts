@@ -9,7 +9,7 @@ export const gnomishSettlementConvention = {
   subjectKinds: ['settlement', 'landmark'],
   associations: [
     { kind: 'language', languageId: 'gnomish', strength: 'primary' },
-    { kind: 'culture', cultureId: 'common-gnome', strength: 'primary' },
+    { kind: 'culture', cultureId: 'gnome', strength: 'primary' },
   ],
   structures: [
     {

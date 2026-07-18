@@ -1,14 +1,14 @@
-import type { NameCulture, NamingContext } from '@rpg/contracts/name-generator'
+import type { NamingCulture, NamingContext } from '@rpg/contracts/name-generator'
 
-import { NAME_CULTURES } from '../cultures/cultures'
+import { NAMING_CULTURES } from '../cultures/cultures'
 
-export function getNameCulture(cultureId: string): NameCulture | undefined {
-  return NAME_CULTURES.find((culture) => culture.id === cultureId)
+export function getNamingCulture(cultureId: string): NamingCulture | undefined {
+  return NAMING_CULTURES.find((culture) => culture.id === cultureId)
 }
 
 export function getConventionCultureId(
   cultureId: string,
-  cultures: readonly NameCulture[] = NAME_CULTURES,
+  cultures: readonly NamingCulture[] = NAMING_CULTURES,
 ): string {
   const culture = cultures.find((entry) => entry.id === cultureId)
   return culture?.resolvesToCultureId ?? cultureId
@@ -16,7 +16,7 @@ export function getConventionCultureId(
 
 export function buildCultureContextFields(
   selectedCultureId: string,
-  cultures: readonly NameCulture[] = NAME_CULTURES,
+  cultures: readonly NamingCulture[] = NAMING_CULTURES,
 ): Pick<
   NamingContext,
   'cultureIds' | 'conventionCultureIds' | 'cultureResolutions' | 'heritageIds'

@@ -19,6 +19,7 @@ import {
 } from './lib/grants'
 import { languageIdSchema } from '../vocab/language'
 import { speciesCharacterCreationSchema } from './species-character-creation'
+import { speciesCultureConfigSchema } from './species-culture'
 
 // ---------------------------------------------------------------------------
 // Species — a playable people/ancestry. SRD-faithful prose lives in rich-text
@@ -63,6 +64,8 @@ export const speciesBodySchema = contentBodyBaseSchema.extend({
    * as recommended in the UI; does not grant languages or expand selectable pools.
    */
   languageAffinities: z.array(languageIdSchema).optional(),
+  /** Cultural affiliation and naming capability for generator integration. */
+  culture: speciesCultureConfigSchema.optional(),
   traits: z.array(contentTraitSchema),
   heritage: speciesHeritageSchema.optional(),
   /** Species-authored data consumed only when the campaign enables the matching rule. */

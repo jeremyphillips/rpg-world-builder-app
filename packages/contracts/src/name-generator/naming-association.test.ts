@@ -7,7 +7,7 @@ describe('namingAssociationSchema', () => {
   it('accepts all association kinds', () => {
     const kinds = [
       { kind: 'language' as const, languageId: 'elvish', strength: 'primary' as const },
-      { kind: 'culture' as const, cultureId: 'elven-general' },
+      { kind: 'culture' as const, cultureId: 'elven' },
       { kind: 'species' as const, speciesId: 'srd-cc-5.2.1:elf' },
       { kind: 'creatureType' as const, creatureType: 'dragon' },
       { kind: 'region' as const, regionId: 'west-africa' },

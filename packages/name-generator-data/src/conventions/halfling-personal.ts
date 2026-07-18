@@ -5,12 +5,11 @@ import { FIXTURE_COLLECTION_PROVENANCE } from '../lib/provenance'
 export const halflingPersonalConvention = {
   id: 'halfling-personal',
   label: 'Common Halfling personal names',
-  description: 'Given and family names for common-halfling characters.',
+  description: 'Given and family names for halfling characters.',
   subjectKinds: ['person'],
   associations: [
     { kind: 'language', languageId: 'halfling', strength: 'primary' },
-    { kind: 'culture', cultureId: 'common-halfling', strength: 'primary' },
-    { kind: 'species', speciesId: 'srd-cc-5.2.1:halfling' },
+    { kind: 'culture', cultureId: 'halfling', strength: 'primary' },
   ],
   structures: [
     {

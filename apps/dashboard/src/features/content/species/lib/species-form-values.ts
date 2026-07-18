@@ -1,7 +1,13 @@
 import { type CreateSpeciesInput, type Species } from '@rpg/contracts'
 
-import { envelopeSlugFields, finalizeContentInput } from '../../lib/forms/content-form-key-helpers'
+import {
+  deriveSlugForCreate,
+  envelopeSlugFields,
+  finalizeContentInput,
+} from '../../lib/forms/content-form-key-helpers'
 import type { ContentFormInputCtx } from '../../lib/forms/content-form-registry'
+import { cultureToFormValues } from './species-culture-form-fields'
+import { cultureFromFormValues } from './species-culture-form-values'
 import { heritageFromFormValues, heritageToFormRow } from './species-heritage-form-values'
 import { movementRecordToRows, movementRowsToRecord } from './species-movement-form-fields'
 import {
@@ -17,6 +23,7 @@ export const speciesCreateDefaultValues: Partial<SpeciesFormValues> = {
   movement: [{ mode: 'walk', feet: 30 }],
   languageAffinities: [],
   traits: [],
+  culture: cultureToFormValues(),
 }
 
 export function speciesToFormValues(entity: Species): SpeciesFormValues {
@@ -31,6 +38,7 @@ export function speciesToFormValues(entity: Species): SpeciesFormValues {
     traits: entity.traits.map(traitToFormRow),
     heritage: entity.heritage ? heritageToFormRow(entity.heritage) : undefined,
     characterCreation: characterCreationToFormValues(entity.characterCreation),
+    culture: cultureToFormValues(entity.culture),
   }
 }
 
@@ -39,6 +47,11 @@ export function buildSpeciesCreateInput(
   ctx?: ContentFormInputCtx<Species>,
 ): CreateSpeciesInput {
   const characterCreation = characterCreationFromFormValues(values.characterCreation)
+  const slug = ctx?.entity?.slug ?? deriveSlugForCreate(values.name)
+  const culture = cultureFromFormValues(values.culture, {
+    slug,
+    existingCultureId: ctx?.entity?.culture?.id,
+  })
 
   return finalizeContentInput(
     {
@@ -51,6 +64,7 @@ export function buildSpeciesCreateInput(
       ...(values.languageAffinities && values.languageAffinities.length > 0
         ? { languageAffinities: values.languageAffinities }
         : {}),
+      ...(culture ? { culture } : {}),
       traits: traitsFromFormValues(values.traits, ctx?.entity?.traits),
       heritage: heritageFromFormValues(values.heritage, ctx?.entity?.heritage),
       ...(characterCreation ? { characterCreation } : {}),

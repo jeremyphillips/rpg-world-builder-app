@@ -26,6 +26,11 @@ import { SpeciesRulesTab } from '../components/species-rules-tab.client'
 import { SpeciesTraitsTab } from '../components/species-traits-tab.client'
 import { heritageScalarFields } from './species-heritage-form-fields'
 import {
+  cultureFields,
+  cultureFormSchemaRefinement,
+  speciesCultureFormSchema,
+} from './species-culture-form-fields'
+import {
   LEVEL_LIMITS_FIELD_PREFIX,
   multiclassingPolicyFields,
   MULTICLASSING_FIELD_PREFIX,
@@ -80,6 +85,7 @@ export function createSpeciesFormSchema(
       traits: z.array(traitRowFormSchema),
       heritage: heritageFormSchema.optional(),
       characterCreation: speciesCharacterCreationFormSchema.optional(),
+      culture: speciesCultureFormSchema.optional(),
     })
     .superRefine((values, ctx) => {
       if (!allowedSet.has(values.creatureType)) {
@@ -98,6 +104,13 @@ export function createSpeciesFormSchema(
       }
       refineSpeciesMovementRows(values.movement, ctx)
       refineSpeciesCharacterCreationForm(values.characterCreation, formCtx, ctx)
+      cultureFormSchemaRefinement(values, formCtx, (issue) => {
+        ctx.addIssue({
+          code: 'custom',
+          message: issue.message,
+          path: issue.path,
+        })
+      })
     })
 }
 
@@ -143,7 +156,7 @@ export function buildSpeciesTabs(ctx: ContentFormCtx): TabbedFormTab[] {
     {
       id: 'basics',
       label: 'Basics',
-      fields: [nameField(), ...attributesFields(ctx), descriptionField(ctx)],
+      fields: [nameField(), ...attributesFields(ctx), cultureFields(ctx), descriptionField(ctx)],
     },
     {
       id: 'traits',

@@ -9,8 +9,7 @@ export const goliathPersonalConvention = {
   subjectKinds: ['person'],
   associations: [
     { kind: 'language', languageId: 'giant', strength: 'primary' },
-    { kind: 'culture', cultureId: 'giant-goliath', strength: 'primary' },
-    { kind: 'species', speciesId: 'srd-cc-5.2.1:goliath' },
+    { kind: 'culture', cultureId: 'goliath', strength: 'primary' },
   ],
   structures: [
     {

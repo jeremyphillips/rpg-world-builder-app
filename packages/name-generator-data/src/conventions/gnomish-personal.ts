@@ -5,12 +5,11 @@ import { FIXTURE_COLLECTION_PROVENANCE } from '../lib/provenance'
 export const gnomishPersonalConvention = {
   id: 'gnomish-personal',
   label: 'Common Gnomish personal names',
-  description: 'Given and family names for common-gnome characters.',
+  description: 'Given and family names for gnome characters.',
   subjectKinds: ['person'],
   associations: [
     { kind: 'language', languageId: 'gnomish', strength: 'primary' },
-    { kind: 'culture', cultureId: 'common-gnome', strength: 'primary' },
-    { kind: 'species', speciesId: 'srd-cc-5.2.1:gnome' },
+    { kind: 'culture', cultureId: 'gnome', strength: 'primary' },
   ],
   structures: [
     {

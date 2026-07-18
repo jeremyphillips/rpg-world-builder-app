@@ -24,7 +24,7 @@ describe('generateNameBatch', () => {
     const filters = {
       subjectKind: 'person' as const,
       languageId: 'elvish' as const,
-      cultureId: 'high-elf',
+      cultureId: 'elven',
       speciesId: 'srd-cc-5.2.1:elf',
     }
 
@@ -81,7 +81,7 @@ describe('generateNameBatch', () => {
       {
         subjectKind: 'person',
         languageId: 'orc',
-        cultureId: 'common-orc',
+        cultureId: 'orc',
         speciesId: 'srd-cc-5.2.1:orc',
       },
       { seed: 'orc-partial', count: 10 },

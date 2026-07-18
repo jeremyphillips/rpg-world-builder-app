@@ -5,7 +5,7 @@ import type {
 } from '@rpg/contracts/name-generator'
 import { getLanguageLabel } from '@rpg/contracts'
 import { loadSeedSpecies } from '@rpg/catalog/species'
-import { NAME_CULTURES, getConventionCultureId } from '@rpg/name-generator-data'
+import { NAMING_CULTURES, getConventionCultureId } from '@rpg/name-generator-data'
 
 import {
   DEFAULT_RULESET_ID,
@@ -29,7 +29,7 @@ type PartialFilters = Pick<
 >
 
 function getCultureLanguageIds(cultureId: string): readonly string[] {
-  const culture = NAME_CULTURES.find((entry) => entry.id === cultureId)
+  const culture = NAMING_CULTURES.find((entry) => entry.id === cultureId)
   if (culture === undefined || !('languageIds' in culture)) {
     return []
   }
@@ -56,7 +56,7 @@ function conventionHasLanguage(convention: NamingConvention, languageId: string)
   )
 }
 
-function isCultureSelectable(culture: (typeof NAME_CULTURES)[number]): boolean {
+function isCultureSelectable(culture: (typeof NAMING_CULTURES)[number]): boolean {
   return !('selectable' in culture && culture.selectable === false)
 }
 
@@ -69,7 +69,14 @@ function conventionHasCulture(convention: NamingConvention, cultureId: string): 
 }
 
 function conventionHasSpecies(convention: NamingConvention, speciesId: string): boolean {
-  return convention.associations.some(
+  const speciesAssociations = convention.associations.filter(
+    (association) => association.kind === 'species',
+  )
+  if (speciesAssociations.length === 0) {
+    return true
+  }
+
+  return speciesAssociations.some(
     (association) => association.kind === 'species' && association.speciesId === speciesId,
   )
 }
@@ -183,9 +190,9 @@ function buildCultureOptions(
   filters: PartialFilters,
 ): FilterOption[] {
   const referencedCultureIds = new Set(collectAssociationIds(conventions, 'culture'))
-  const selectableCultures = new Map<string, (typeof NAME_CULTURES)[number]>()
+  const selectableCultures = new Map<string, (typeof NAMING_CULTURES)[number]>()
 
-  for (const culture of NAME_CULTURES) {
+  for (const culture of NAMING_CULTURES) {
     if (!isCultureSelectable(culture)) {
       continue
     }
@@ -196,7 +203,7 @@ function buildCultureOptions(
   }
 
   if (filters.speciesId !== undefined) {
-    for (const culture of NAME_CULTURES) {
+    for (const culture of NAMING_CULTURES) {
       if (!isCultureSelectable(culture)) {
         continue
       }

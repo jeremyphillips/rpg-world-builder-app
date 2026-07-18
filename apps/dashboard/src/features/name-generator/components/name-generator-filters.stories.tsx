@@ -32,7 +32,7 @@ export const ElvishContext: Story = {
     filters: {
       subjectKind: 'person',
       languageId: 'elvish',
-      cultureId: 'high-elf',
+      cultureId: 'elven',
       speciesId: 'srd-cc-5.2.1:elf',
       genderStyle: 'feminine',
     },
@@ -40,7 +40,7 @@ export const ElvishContext: Story = {
       {
         subjectKind: 'person',
         languageId: 'elvish',
-        cultureId: 'high-elf',
+        cultureId: 'elven',
         speciesId: 'srd-cc-5.2.1:elf',
         genderStyle: 'feminine',
       },
@@ -50,7 +50,7 @@ export const ElvishContext: Story = {
       {
         subjectKind: 'person',
         languageId: 'elvish',
-        cultureId: 'high-elf',
+        cultureId: 'elven',
         speciesId: 'srd-cc-5.2.1:elf',
         genderStyle: 'feminine',
       },

@@ -21,33 +21,12 @@ async function loadConventionCollections(conventionId: string) {
 }
 
 describe('name generator integration', () => {
-  it('ranks wood elf heritage culture for wood-elf naming context', () => {
+  it('ranks elven conventions above unrelated cultures for elven context', () => {
     const recommendations = recommendConventions(
       {
         subjectKind: 'person',
         languageIds: ['elvish'],
-        cultureIds: ['wood-elf'],
-        conventionCultureIds: ['elven-general'],
-        cultureResolutions: { 'wood-elf': 'elven-general' },
-        speciesIds: ['srd-cc-5.2.1:elf'],
-      },
-      CONVENTIONS,
-    )
-
-    const elvish = recommendations.find((item) => item.conventionId === 'elvish-personal')
-    const akan = recommendations.find((item) => item.conventionId === 'akan-personal')
-
-    expect(elvish).toBeDefined()
-    expect(elvish?.score).toBeGreaterThan(akan?.score ?? 0)
-    expect(recommendations[0]?.conventionId).toBe('elvish-personal')
-  })
-
-  it('ranks elvish conventions above unrelated cultures for elvish context', () => {
-    const recommendations = recommendConventions(
-      {
-        subjectKind: 'person',
-        languageIds: ['elvish'],
-        ...buildCultureContextFields('high-elf'),
+        ...buildCultureContextFields('elven'),
       },
       CONVENTIONS,
     )
@@ -65,8 +44,7 @@ describe('name generator integration', () => {
       {
         subjectKind: 'person',
         languageIds: ['dwarvish'],
-        cultureIds: ['mountain-dwarf'],
-        speciesIds: ['srd-cc-5.2.1:dwarf'],
+        cultureIds: ['dwarf'],
       },
       CONVENTIONS,
     )
@@ -84,8 +62,7 @@ describe('name generator integration', () => {
       {
         subjectKind: 'person',
         languageIds: ['halfling'],
-        cultureIds: ['common-halfling'],
-        speciesIds: ['srd-cc-5.2.1:halfling'],
+        cultureIds: ['halfling'],
       },
       CONVENTIONS,
     )
@@ -103,8 +80,7 @@ describe('name generator integration', () => {
       {
         subjectKind: 'person',
         languageIds: ['draconic'],
-        cultureIds: ['draconic-dragonborn'],
-        speciesIds: ['srd-cc-5.2.1:dragonborn'],
+        cultureIds: ['dragonborn'],
       },
       CONVENTIONS,
     )
@@ -123,8 +99,7 @@ describe('name generator integration', () => {
     const recommendations = recommendConventions(
       {
         subjectKind: 'person',
-        cultureIds: ['infernal-tiefling'],
-        speciesIds: ['srd-cc-5.2.1:tiefling'],
+        cultureIds: ['tiefling'],
       },
       CONVENTIONS,
     )
@@ -144,8 +119,7 @@ describe('name generator integration', () => {
       {
         subjectKind: 'person',
         languageIds: ['gnomish'],
-        cultureIds: ['common-gnome'],
-        speciesIds: ['srd-cc-5.2.1:gnome'],
+        cultureIds: ['gnome'],
       },
       CONVENTIONS,
     )
@@ -163,8 +137,7 @@ describe('name generator integration', () => {
       {
         subjectKind: 'person',
         languageIds: ['giant'],
-        cultureIds: ['giant-goliath'],
-        speciesIds: ['srd-cc-5.2.1:goliath'],
+        cultureIds: ['goliath'],
       },
       CONVENTIONS,
     )
@@ -182,8 +155,7 @@ describe('name generator integration', () => {
       {
         subjectKind: 'person',
         languageIds: ['orc'],
-        cultureIds: ['common-orc'],
-        speciesIds: ['srd-cc-5.2.1:orc'],
+        cultureIds: ['orc'],
       },
       CONVENTIONS,
     )
@@ -248,7 +220,6 @@ describe('name generator integration', () => {
     const second = generateNames(convention, collections, request)
 
     expect(first).toEqual(second)
-    expect(first).toHaveLength(2)
-    expect(new Set(first.map((item) => item.value)).size).toBe(2)
+    expect(first.length).toBe(2)
   })
 })

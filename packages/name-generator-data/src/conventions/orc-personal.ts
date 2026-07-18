@@ -5,12 +5,11 @@ import { FIXTURE_COLLECTION_PROVENANCE } from '../lib/provenance'
 export const orcPersonalConvention = {
   id: 'orc-personal',
   label: 'Common Orc personal names',
-  description: 'Given names for common-orc characters.',
+  description: 'Given names for orc characters.',
   subjectKinds: ['person'],
   associations: [
     { kind: 'language', languageId: 'orc', strength: 'primary' },
-    { kind: 'culture', cultureId: 'common-orc', strength: 'primary' },
-    { kind: 'species', speciesId: 'srd-cc-5.2.1:orc' },
+    { kind: 'culture', cultureId: 'orc', strength: 'primary' },
   ],
   structures: [
     {

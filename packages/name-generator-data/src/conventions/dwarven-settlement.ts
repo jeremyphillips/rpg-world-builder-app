@@ -5,12 +5,11 @@ import { FIXTURE_COLLECTION_PROVENANCE } from '../lib/provenance'
 export const dwarvenSettlementConvention = {
   id: 'dwarven-settlement',
   label: 'Mountain Dwarven settlement names',
-  description: 'Hold-style settlement names for mountain-dwarf communities.',
+  description: 'Hold-style settlement names for dwarf communities.',
   subjectKinds: ['settlement'],
   associations: [
     { kind: 'language', languageId: 'dwarvish', strength: 'primary' },
-    { kind: 'culture', cultureId: 'mountain-dwarf', strength: 'primary' },
-    { kind: 'species', speciesId: 'srd-cc-5.2.1:dwarf' },
+    { kind: 'culture', cultureId: 'dwarf', strength: 'primary' },
   ],
   structures: [
     {

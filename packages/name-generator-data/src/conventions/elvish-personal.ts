@@ -9,8 +9,7 @@ export const elvishPersonalConvention = {
   subjectKinds: ['person'],
   associations: [
     { kind: 'language', languageId: 'elvish', strength: 'primary' },
-    { kind: 'culture', cultureId: 'elven-general', strength: 'primary' },
-    { kind: 'species', speciesId: 'srd-cc-5.2.1:elf' },
+    { kind: 'culture', cultureId: 'elven', strength: 'primary' },
   ],
   structures: [
     {

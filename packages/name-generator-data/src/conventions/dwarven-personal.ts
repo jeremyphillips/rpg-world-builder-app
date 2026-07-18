@@ -5,12 +5,11 @@ import { FIXTURE_COLLECTION_PROVENANCE } from '../lib/provenance'
 export const dwarvenPersonalConvention = {
   id: 'dwarven-personal',
   label: 'Mountain Dwarven personal names',
-  description: 'Given and clan names for mountain-dwarf characters.',
+  description: 'Given and clan names for dwarf characters.',
   subjectKinds: ['person'],
   associations: [
     { kind: 'language', languageId: 'dwarvish', strength: 'primary' },
-    { kind: 'culture', cultureId: 'mountain-dwarf', strength: 'primary' },
-    { kind: 'species', speciesId: 'srd-cc-5.2.1:dwarf' },
+    { kind: 'culture', cultureId: 'dwarf', strength: 'primary' },
   ],
   structures: [
     {

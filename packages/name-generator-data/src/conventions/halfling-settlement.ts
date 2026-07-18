@@ -9,7 +9,7 @@ export const halflingSettlementConvention = {
   subjectKinds: ['settlement', 'landmark'],
   associations: [
     { kind: 'language', languageId: 'halfling', strength: 'primary' },
-    { kind: 'culture', cultureId: 'common-halfling', strength: 'primary' },
+    { kind: 'culture', cultureId: 'halfling', strength: 'primary' },
   ],
   structures: [
     {

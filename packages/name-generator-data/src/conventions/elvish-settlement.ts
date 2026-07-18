@@ -9,7 +9,7 @@ export const elvishSettlementConvention = {
   subjectKinds: ['settlement', 'landmark'],
   associations: [
     { kind: 'language', languageId: 'elvish', strength: 'primary' },
-    { kind: 'culture', cultureId: 'elven-general', strength: 'primary' },
+    { kind: 'culture', cultureId: 'elven', strength: 'primary' },
   ],
   structures: [
     {

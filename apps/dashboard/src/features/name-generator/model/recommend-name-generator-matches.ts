@@ -29,15 +29,6 @@ function matchSatisfiesSelectedFilters(
     }
   }
 
-  if (filters.speciesId !== undefined) {
-    const hasSpecies = match.reasons.some(
-      (reason) => reason.kind === 'species' && reason.speciesId === filters.speciesId,
-    )
-    if (!hasSpecies) {
-      return false
-    }
-  }
-
   return true
 }
 

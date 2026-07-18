@@ -9,8 +9,7 @@ export const infernalTieflingPersonalConvention = {
   subjectKinds: ['person'],
   associations: [
     { kind: 'language', languageId: 'infernal', strength: 'influenced' },
-    { kind: 'culture', cultureId: 'infernal-tiefling', strength: 'primary' },
-    { kind: 'species', speciesId: 'srd-cc-5.2.1:tiefling' },
+    { kind: 'culture', cultureId: 'tiefling', strength: 'primary' },
   ],
   structures: [
     {
