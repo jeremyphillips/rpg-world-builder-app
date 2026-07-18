@@ -1,7 +1,5 @@
 import { describe, expect, it } from 'vitest'
 
-import { deriveContentKey } from '@rpg/contracts'
-
 import { cultureToFormValues } from './species-culture-form-fields'
 import {
   cultureFromFormValues,
@@ -13,10 +11,39 @@ describe('normalizeSpeciesCultureForPersist', () => {
     expect(
       normalizeSpeciesCultureForPersist({
         slug: 'dwarf',
-        culture: cultureToFormValues({ naming: { supported: true, subjectKinds: ['settlement'] } }),
+        culture: cultureToFormValues({
+          naming: { supported: true, personalNameComponents: ['clan'] },
+        }),
+        entitySource: 'system',
       }),
     ).toEqual({
-      naming: { supported: true, subjectKinds: ['settlement'] },
+      naming: { supported: true, personalNameComponents: ['clan'] },
+    })
+  })
+
+  it('omits empty personalNameComponents arrays on save', () => {
+    expect(
+      normalizeSpeciesCultureForPersist({
+        slug: 'orc',
+        culture: cultureToFormValues({ naming: { supported: true, personalNameComponents: [] } }),
+        entitySource: 'system',
+      }),
+    ).toEqual({
+      naming: { supported: true },
+    })
+  })
+
+  it('forces unsupported naming for homebrew species', () => {
+    expect(
+      normalizeSpeciesCultureForPersist({
+        slug: 'custom-folk',
+        culture: cultureToFormValues({
+          naming: { supported: true, personalNameComponents: ['family'] },
+        }),
+        entitySource: 'homebrew',
+      }),
+    ).toEqual({
+      naming: { supported: false },
     })
   })
 
@@ -29,11 +56,12 @@ describe('normalizeSpeciesCultureForPersist', () => {
           name: 'Elven',
           naming: { supported: true },
         },
+        entitySource: 'homebrew',
       }),
     ).toEqual({
       id: 'elven',
       name: 'Elven',
-      naming: { supported: true },
+      naming: { supported: false },
     })
   })
 
@@ -48,6 +76,7 @@ describe('normalizeSpeciesCultureForPersist', () => {
           naming: { supported: true },
         },
         existingCultureId: 'elven',
+        entitySource: 'system',
       }),
     ).toEqual({
       id: 'elven',
@@ -65,6 +94,7 @@ describe('normalizeSpeciesCultureForPersist', () => {
           name: 'Dwarf',
           naming: { supported: true },
         },
+        entitySource: 'system',
       }),
     ).toEqual({
       naming: { supported: true },
@@ -81,6 +111,7 @@ describe('normalizeSpeciesCultureForPersist', () => {
       {
         slug: 'elf',
         existingCultureId: 'elven',
+        entitySource: 'system',
       },
     )
 
@@ -89,6 +120,5 @@ describe('normalizeSpeciesCultureForPersist', () => {
       name: 'Renamed Elven',
       naming: { supported: true },
     })
-    expect(deriveContentKey('Renamed Elven')).not.toBe('elven')
   })
 })

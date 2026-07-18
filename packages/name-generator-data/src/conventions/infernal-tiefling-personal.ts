@@ -23,7 +23,7 @@ export const infernalTieflingPersonalConvention = {
       label: 'Given and virtue',
       parts: [
         { key: 'given', role: 'given', required: true },
-        { key: 'virtue', role: 'epithet', required: true },
+        { key: 'virtue', role: 'virtue', required: true },
       ],
       format: '{given} {virtue}',
     },

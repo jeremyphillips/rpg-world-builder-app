@@ -6,7 +6,7 @@ import {
   getSpeciesCultureDisplayName,
   getSpeciesCulturePrimaryId,
   getSpeciesLanguageAffinity,
-  getSpeciesNamingSubjectKinds,
+  getSpeciesPersonalNameComponents,
   hasSpeciesCultureOverride,
   isSpeciesNamingSupported,
   speciesCultureConfigSchema,
@@ -23,10 +23,10 @@ describe('speciesCultureConfigSchema', () => {
     ).toBe(true)
   })
 
-  it('accepts supported naming with additional subject kinds', () => {
+  it('accepts supported naming with personal name components', () => {
     expect(
       speciesCultureConfigSchema.safeParse({
-        naming: { supported: true, subjectKinds: ['clan', 'family'] },
+        naming: { supported: true, personalNameComponents: ['clan', 'family'] },
       }).success,
     ).toBe(true)
   })
@@ -36,7 +36,7 @@ describe('speciesCultureConfigSchema', () => {
       speciesCultureConfigSchema.safeParse({
         id: 'elven',
         name: 'Elven',
-        naming: { supported: true, subjectKinds: ['settlement'] },
+        naming: { supported: true, personalNameComponents: ['family'] },
       }).success,
     ).toBe(true)
   })
@@ -57,20 +57,20 @@ describe('speciesCultureConfigSchema', () => {
     expect(result.success).toBe(false)
   })
 
-  it('rejects persisted person in subjectKinds', () => {
+  it('rejects given in personalNameComponents', () => {
     expect(
       speciesNamingConfigSchema.safeParse({
         supported: true,
-        subjectKinds: ['person'],
+        personalNameComponents: ['given'],
       }).success,
     ).toBe(false)
   })
 
-  it('rejects subjectKinds when naming is unsupported', () => {
+  it('rejects personalNameComponents when naming is unsupported', () => {
     expect(
       speciesNamingConfigSchema.safeParse({
         supported: false,
-        subjectKinds: ['clan'],
+        personalNameComponents: ['clan'],
       }).success,
     ).toBe(false)
   })
@@ -128,30 +128,27 @@ describe('species culture helpers', () => {
 
     expect(getSpeciesCulturePrimaryId({ slug: 'human', culture: species.culture })).toBe('human')
     expect(isSpeciesNamingSupported(species)).toBe(false)
-    expect(getSpeciesNamingSubjectKinds(species)).toEqual([])
+    expect(getSpeciesPersonalNameComponents(species)).toEqual([])
   })
 
-  it('derives person implicitly when naming is supported', () => {
+  it('returns persisted personal name components when naming is supported', () => {
     const species: { culture: SpeciesCultureConfig } = {
       culture: {
-        naming: { supported: true, subjectKinds: ['settlement'] },
+        naming: { supported: true, personalNameComponents: ['family', 'clan'] },
       },
     }
 
-    expect(getSpeciesNamingSubjectKinds(species)).toEqual(['person', 'settlement'])
+    expect(getSpeciesPersonalNameComponents(species)).toEqual(['family', 'clan'])
   })
 
-  it('deduplicates subject kinds in canonical order', () => {
+  it('returns an empty array when supported naming omits personal components', () => {
     const species: { culture: SpeciesCultureConfig } = {
       culture: {
-        naming: {
-          supported: true,
-          subjectKinds: ['clan', 'family', 'clan'],
-        },
+        naming: { supported: true },
       },
     }
 
-    expect(getSpeciesNamingSubjectKinds(species)).toEqual(['person', 'family', 'clan'])
+    expect(getSpeciesPersonalNameComponents(species)).toEqual([])
   })
 
   it('reads species language affinity without heritage override', () => {

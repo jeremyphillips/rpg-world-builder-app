@@ -1,33 +1,21 @@
+import { createElement } from 'react'
 import { z } from 'zod'
-import {
-  speciesNamingSubjectKindSchema,
-  type SpeciesCultureConfig,
-  type SpeciesNamingSubjectKind,
-} from '@rpg/contracts'
-import { NAME_SUBJECT_KINDS } from '@rpg/contracts/name-generator'
-import { toOptions, type FormItem } from '@rpg/ui/form'
+import { type SpeciesCultureConfig } from '@rpg/contracts'
+import { personalNameComponentSchema } from '@rpg/contracts/name-generator'
+import { type FormItem } from '@rpg/ui/form'
 
-import { SUBJECT_KIND_LABELS } from '@/features/name-generator/model/name-generator.constants'
+import { buildActiveLanguageFieldOptions } from '@/features/homebrew'
 
 import type { ContentFormCtx } from '../../lib/forms/content-form-registry'
+import { SpeciesCultureNamingAlert } from '../components/species-culture-naming-alert.client'
+import { SpeciesPersonalNameComponentsField } from '../components/species-personal-name-components-field.client'
 
 export const CULTURE_FIELD_PREFIX = 'culture'
 export const CULTURE_USE_OVERRIDE_FIELD = 'culture.useOverride'
 export const CULTURE_NAME_FIELD = 'culture.name'
 export const CULTURE_ID_FIELD = 'culture.id'
 export const CULTURE_NAMING_SUPPORTED_FIELD = 'culture.naming.supported'
-export const CULTURE_NAMING_SUBJECT_KINDS_FIELD = 'culture.naming.subjectKinds'
-
-const speciesNamingSubjectKinds = NAME_SUBJECT_KINDS.filter(
-  (kind): kind is SpeciesNamingSubjectKind => kind !== 'person',
-)
-
-const speciesNamingSubjectKindOptions = toOptions(
-  speciesNamingSubjectKinds,
-  Object.fromEntries(
-    speciesNamingSubjectKinds.map((kind) => [kind, SUBJECT_KIND_LABELS[kind] ?? kind]),
-  ) as Record<SpeciesNamingSubjectKind, string>,
-)
+export const CULTURE_NAMING_PERSONAL_NAME_COMPONENTS_FIELD = 'culture.naming.personalNameComponents'
 
 export const speciesCultureFormSchema = z
   .object({
@@ -38,7 +26,7 @@ export const speciesCultureFormSchema = z
       z.object({ supported: z.literal(false) }).strict(),
       z.object({
         supported: z.literal(true),
-        subjectKinds: z.array(speciesNamingSubjectKindSchema).optional(),
+        personalNameComponents: z.array(personalNameComponentSchema).optional(),
       }),
     ]),
   })
@@ -50,6 +38,10 @@ function isSystemSpecies(ctx: ContentFormCtx): boolean {
   return ctx.entitySource === 'system'
 }
 
+function isHomebrewSpecies(ctx: ContentFormCtx): boolean {
+  return ctx.entitySource === 'homebrew'
+}
+
 function visibleWhenCultureOverrideActive() {
   return {
     dependsOn: [CULTURE_USE_OVERRIDE_FIELD],
@@ -57,36 +49,47 @@ function visibleWhenCultureOverrideActive() {
   }
 }
 
-function visibleWhenNamingSupported() {
+function visibleWhenNamingSupportedAndNotHomebrew(ctx: ContentFormCtx) {
   return {
     dependsOn: [CULTURE_NAMING_SUPPORTED_FIELD],
     visibleWhen: (watched: Record<string, unknown>) =>
-      watched[CULTURE_NAMING_SUPPORTED_FIELD] === true,
+      watched[CULTURE_NAMING_SUPPORTED_FIELD] === true && !isHomebrewSpecies(ctx),
   }
 }
 
 export function cultureToFormValues(culture?: SpeciesCultureConfig): SpeciesCultureFormValues {
   const useOverride = culture?.id !== undefined
+  const naming =
+    culture?.naming ??
+    ({
+      supported: false,
+    } as const)
 
   return {
     useOverride,
     ...(culture?.id !== undefined ? { id: culture.id } : {}),
     ...(culture?.name !== undefined ? { name: culture.name } : {}),
     naming:
-      culture?.naming ??
-      ({
-        supported: false,
-      } as const),
+      naming.supported === true
+        ? {
+            supported: true as const,
+            ...(naming.personalNameComponents && naming.personalNameComponents.length > 0
+              ? { personalNameComponents: naming.personalNameComponents }
+              : {}),
+          }
+        : { supported: false as const },
   }
 }
 
 export function cultureFields(ctx: ContentFormCtx): FormItem {
   const systemSpecies = isSystemSpecies(ctx)
+  const homebrewSpecies = isHomebrewSpecies(ctx)
 
   return {
     kind: 'group',
     legend: 'Culture',
     legendSize: 'subsection',
+    fieldsChrome: { variant: 'panel', tone: 'subtle' },
     fields: [
       {
         type: 'switch',
@@ -117,20 +120,39 @@ export function cultureFields(ctx: ContentFormCtx): FormItem {
         visibility: visibleWhenCultureOverrideActive(),
       },
       {
-        type: 'switch',
-        name: CULTURE_NAMING_SUPPORTED_FIELD,
-        label: 'Name generation',
-        disabled: systemSpecies,
+        type: 'chips',
+        name: 'languageAffinities',
+        label: 'Language affinities',
+        hint: 'Recommended languages for origin picks. Does not grant languages or expand selectable pools.',
+        options: buildActiveLanguageFieldOptions(ctx.languageVocabulary),
+        chrome: { variant: 'panel' },
       },
       {
-        type: 'chips',
-        name: CULTURE_NAMING_SUBJECT_KINDS_FIELD,
-        label: 'Additional name subjects',
-        hint: 'Personal names are included automatically.',
-        options: speciesNamingSubjectKindOptions,
-        disabled: systemSpecies,
-        visibility: visibleWhenNamingSupported(),
-        chrome: { variant: 'panel' },
+        type: 'switch',
+        name: CULTURE_NAMING_SUPPORTED_FIELD,
+        label: 'Name generation supported',
+        visibility: {
+          dependsOn: [],
+          visibleWhen: () => false,
+        },
+      },
+      ...(homebrewSpecies
+        ? [
+            {
+              kind: 'slot' as const,
+              name: 'cultureNamingAlert',
+              render: () => createElement(SpeciesCultureNamingAlert),
+            },
+          ]
+        : []),
+      {
+        kind: 'slot',
+        name: CULTURE_NAMING_PERSONAL_NAME_COMPONENTS_FIELD,
+        visibility: visibleWhenNamingSupportedAndNotHomebrew(ctx),
+        render: () =>
+          createElement(SpeciesPersonalNameComponentsField, {
+            disabled: systemSpecies,
+          }),
       },
     ],
   }

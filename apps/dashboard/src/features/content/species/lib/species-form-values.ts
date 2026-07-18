@@ -1,4 +1,4 @@
-import { type CreateSpeciesInput, type Species } from '@rpg/contracts'
+import { type CreateSpeciesInput, type Species, type SpeciesCultureConfig } from '@rpg/contracts'
 
 import {
   deriveSlugForCreate,
@@ -42,6 +42,22 @@ export function speciesToFormValues(entity: Species): SpeciesFormValues {
   }
 }
 
+function optionalLanguageAffinities(
+  languageAffinities: SpeciesFormValues['languageAffinities'],
+): Pick<CreateSpeciesInput, 'languageAffinities'> | undefined {
+  if (languageAffinities === undefined || languageAffinities.length === 0) {
+    return undefined
+  }
+
+  return { languageAffinities }
+}
+
+function optionalCulture(
+  culture: SpeciesCultureConfig | undefined,
+): Pick<CreateSpeciesInput, 'culture'> | undefined {
+  return culture === undefined ? undefined : { culture }
+}
+
 export function buildSpeciesCreateInput(
   values: SpeciesFormValues,
   ctx?: ContentFormInputCtx<Species>,
@@ -51,6 +67,7 @@ export function buildSpeciesCreateInput(
   const culture = cultureFromFormValues(values.culture, {
     slug,
     existingCultureId: ctx?.entity?.culture?.id,
+    entitySource: ctx?.entity?.source ?? 'homebrew',
   })
 
   return finalizeContentInput(
@@ -61,10 +78,8 @@ export function buildSpeciesCreateInput(
       creatureType: values.creatureType,
       sizes: values.sizes,
       movement: movementRowsToRecord(values.movement),
-      ...(values.languageAffinities && values.languageAffinities.length > 0
-        ? { languageAffinities: values.languageAffinities }
-        : {}),
-      ...(culture ? { culture } : {}),
+      ...optionalLanguageAffinities(values.languageAffinities),
+      ...optionalCulture(culture),
       traits: traitsFromFormValues(values.traits, ctx?.entity?.traits),
       heritage: heritageFromFormValues(values.heritage, ctx?.entity?.heritage),
       ...(characterCreation ? { characterCreation } : {}),

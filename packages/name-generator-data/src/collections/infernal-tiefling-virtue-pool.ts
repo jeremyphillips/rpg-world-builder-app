@@ -12,7 +12,7 @@ export const infernalTieflingVirtuePoolCollection = {
     pools: [
       {
         id: 'virtue',
-        role: 'epithet',
+        role: 'virtue',
         genderStyle: 'shared',
         values: [
           'Art',

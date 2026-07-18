@@ -260,7 +260,7 @@
     "culture": {
       "naming": {
         "supported": true,
-        "subjectKinds": ["clan", "family"]
+        "personalNameComponents": ["clan"]
       }
     }
   },
@@ -327,7 +327,7 @@
     "culture": {
       "naming": {
         "supported": true,
-        "subjectKinds": ["settlement"]
+        "personalNameComponents": ["clan"]
       }
     }
   },
@@ -550,7 +550,7 @@
       "name": "Elven",
       "naming": {
         "supported": true,
-        "subjectKinds": ["settlement", "landmark"]
+        "personalNameComponents": ["family"]
       }
     }
   },
@@ -654,7 +654,7 @@
     "culture": {
       "naming": {
         "supported": true,
-        "subjectKinds": ["settlement", "landmark"]
+        "personalNameComponents": ["family"]
       }
     }
   },
@@ -762,7 +762,8 @@
     },
     "culture": {
       "naming": {
-        "supported": true
+        "supported": true,
+        "personalNameComponents": ["epithet", "clan"]
       }
     }
   },
@@ -810,7 +811,7 @@
     "culture": {
       "naming": {
         "supported": true,
-        "subjectKinds": ["settlement", "landmark"]
+        "personalNameComponents": ["family"]
       }
     }
   },
@@ -1148,7 +1149,8 @@
     },
     "culture": {
       "naming": {
-        "supported": true
+        "supported": true,
+        "personalNameComponents": ["virtue"]
       }
     }
   }

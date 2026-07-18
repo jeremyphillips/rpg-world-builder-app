@@ -11,7 +11,7 @@ import {
 } from '@rpg/contracts'
 import { toOptions, type FormItem, type TabbedFormTab } from '@rpg/ui/form'
 
-import { buildActiveLanguageFieldOptions, vocabularySelectField } from '@/features/homebrew'
+import { vocabularySelectField } from '@/features/homebrew'
 
 import { getCharacterCreatureTypeFieldOptions } from './creature-type-field-options'
 import { descriptionField, nameField } from '../../lib/forms/fields/content-identity-form-fields'
@@ -131,15 +131,6 @@ function attributesFields(ctx: ContentFormCtx): FormItem[] {
         }),
       ],
     },
-    movementArrayField(),
-    {
-      type: 'chips',
-      name: 'languageAffinities',
-      label: 'Language affinities',
-      hint: 'Recommended languages for origin picks. Does not grant languages or expand selectable pools.',
-      options: buildActiveLanguageFieldOptions(ctx.languageVocabulary),
-      chrome: { variant: 'panel' },
-    },
     {
       type: 'chips',
       name: 'sizes',
@@ -148,6 +139,7 @@ function attributesFields(ctx: ContentFormCtx): FormItem[] {
       required: true,
       chrome: { variant: 'panel' },
     },
+    movementArrayField(),
   ]
 }
 

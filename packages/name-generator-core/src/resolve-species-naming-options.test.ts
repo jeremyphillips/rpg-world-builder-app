@@ -21,7 +21,7 @@ const ELF_SPECIES: SpeciesCultureInput = {
   culture: {
     id: 'elven',
     name: 'Elven',
-    naming: { supported: true, subjectKinds: ['settlement'] },
+    naming: { supported: true, personalNameComponents: ['family'] },
   },
   heritage: {
     options: [
@@ -192,7 +192,7 @@ describe('resolveSpeciesNamingOptions', () => {
         label: 'Elf',
         disabled: false,
         cultureIds: ['elven'],
-        subjectKinds: ['person', 'settlement'],
+        subjectKinds: ['person'],
         heritageOptions: [{ id: 'drow', label: 'Drow' }],
       },
       {

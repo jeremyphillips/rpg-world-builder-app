@@ -4,11 +4,9 @@ import type {
   NameSubjectKind,
 } from '@rpg/contracts/name-generator'
 import type { SpeciesCultureConfig } from '@rpg/contracts/rpg/content'
-import {
-  getSpeciesCulturePrimaryId,
-  getSpeciesNamingSubjectKinds,
-  isSpeciesNamingSupported,
-} from '@rpg/contracts/rpg/content'
+import { getSpeciesCulturePrimaryId, isSpeciesNamingSupported } from '@rpg/contracts/rpg/content'
+
+import { deriveAvailableSubjectKinds } from './derive-available-subject-kinds'
 
 export const HOMEBREW_SPECIES_NAMING_DISABLED_REASON =
   'Name generation is not yet available for homebrew species.'
@@ -178,13 +176,14 @@ function resolveEnabledSpeciesNamingOption(
   }
 
   const heritageOptions = getNamingRelevantHeritages({ species, cultures, conventions })
+  const subjectKinds = deriveAvailableSubjectKinds({ cultureIds, conventions })
 
   return {
     speciesId: species.id,
     label: species.name,
     disabled: false,
     cultureIds,
-    subjectKinds: getSpeciesNamingSubjectKinds(species),
+    subjectKinds,
     ...(heritageOptions.length > 0 ? { heritageOptions } : {}),
   }
 }

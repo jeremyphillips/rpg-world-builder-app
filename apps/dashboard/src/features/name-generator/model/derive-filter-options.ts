@@ -3,6 +3,7 @@ import type {
   NamingConvention,
   NameSubjectKind,
 } from '@rpg/contracts/name-generator'
+import { NAME_SUBJECT_KIND_ENTRIES, toVocabOptions } from '@rpg/contracts/name-generator'
 import { getLanguageLabel } from '@rpg/contracts'
 import { loadSeedSpecies } from '@rpg/catalog/species'
 import { NAMING_CULTURES, getConventionCultureId } from '@rpg/name-generator-data'
@@ -11,7 +12,6 @@ import {
   DEFAULT_RULESET_ID,
   GENDER_STYLE_LABELS,
   PERSON_GENDER_STYLES,
-  SUBJECT_KIND_LABELS,
   SUBJECTS_WITH_GENDER_FILTER,
   SUBJECTS_WITH_LANGUAGE_CULTURE_FILTER,
   SUBJECTS_WITH_SPECIES_FILTER,
@@ -140,6 +140,10 @@ function collectAssociationIds(
   return [...ids]
 }
 
+const subjectKindLabelById = new Map(
+  toVocabOptions(NAME_SUBJECT_KIND_ENTRIES).map((option) => [option.value, option.label]),
+)
+
 function buildSubjectOptions(conventions: readonly NamingConvention[]): FilterOption[] {
   const ids = new Set<NameSubjectKind>()
   for (const convention of conventions) {
@@ -150,10 +154,14 @@ function buildSubjectOptions(conventions: readonly NamingConvention[]): FilterOp
 
   return [...ids]
     .sort((left, right) => left.localeCompare(right))
-    .map((id) => ({
-      id,
-      label: SUBJECT_KIND_LABELS[id] ?? id,
-    }))
+    .map((id) => {
+      const label = subjectKindLabelById.get(id)
+      if (label === undefined) {
+        throw new Error(`Missing subject kind label for "${id}"`)
+      }
+
+      return { id, label }
+    })
 }
 
 function buildSpeciesOptions(conventions: readonly NamingConvention[]): FilterOption[] {

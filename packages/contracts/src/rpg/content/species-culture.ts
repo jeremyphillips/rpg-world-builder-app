@@ -1,7 +1,7 @@
 import { z } from 'zod'
 
-import { nameSubjectKindSchema, NAME_SUBJECT_KINDS } from '../../name-generator/subject-kind'
-import type { NameSubjectKind } from '../../name-generator/subject-kind'
+import { personalNameComponentSchema } from '../../name-generator/personal-name-component'
+import type { PersonalNameComponent } from '../../name-generator/personal-name-component'
 import type { LanguageId } from '../vocab/language'
 import { vocabularyOptionIdSchema } from '../vocab/vocabulary'
 import type { ContentTrait } from './lib/grants'
@@ -11,16 +11,11 @@ import { formatSlugAsLabel } from '../primitives/format-slug'
 // Species culture — cultural affiliation separate from naming capability.
 // ---------------------------------------------------------------------------
 
-/** Additional subject kinds beyond implicit `person`. Never persist `person`. */
-export const speciesNamingSubjectKindSchema = nameSubjectKindSchema.exclude(['person'])
-
-export type SpeciesNamingSubjectKind = z.infer<typeof speciesNamingSubjectKindSchema>
-
 export const speciesNamingConfigSchema = z.discriminatedUnion('supported', [
   z.object({ supported: z.literal(false) }).strict(),
   z.object({
     supported: z.literal(true),
-    subjectKinds: z.array(speciesNamingSubjectKindSchema).optional(),
+    personalNameComponents: z.array(personalNameComponentSchema).optional(),
   }),
 ])
 
@@ -54,8 +49,6 @@ export const speciesCultureConfigSchema = z
   })
 
 export type SpeciesCultureConfig = z.infer<typeof speciesCultureConfigSchema>
-
-const PERSON_SUBJECT_KIND = 'person' as const satisfies NameSubjectKind
 
 export type SpeciesCultureResolutionInput = {
   slug: string
@@ -97,16 +90,14 @@ export function isSpeciesNamingSupported(species: { culture?: SpeciesCultureConf
   return species.culture?.naming.supported === true
 }
 
-export function getSpeciesNamingSubjectKinds(species: {
+export function getSpeciesPersonalNameComponents(species: {
   culture?: SpeciesCultureConfig
-}): NameSubjectKind[] {
+}): PersonalNameComponent[] {
   if (!isSpeciesNamingSupported(species) || species.culture?.naming.supported !== true) {
     return []
   }
 
-  const additional = species.culture.naming.subjectKinds ?? []
-  const merged = new Set<NameSubjectKind>([PERSON_SUBJECT_KIND, ...additional])
-  return NAME_SUBJECT_KINDS.filter((kind) => merged.has(kind))
+  return [...(species.culture.naming.personalNameComponents ?? [])]
 }
 
 export function getSpeciesLanguageAffinity(species: {

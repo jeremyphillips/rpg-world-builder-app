@@ -12,6 +12,41 @@ describe('SRD species culture seeds', () => {
     }
   })
 
+  it('never persists subjectKinds on culture naming', () => {
+    for (const entry of species) {
+      expect(entry.culture?.naming).not.toHaveProperty('subjectKinds')
+    }
+  })
+
+  it('persists expected personalNameComponents per species', () => {
+    const expected: Record<string, string[] | undefined> = {
+      dragonborn: ['clan'],
+      dwarf: ['clan'],
+      elf: ['family'],
+      gnome: ['family'],
+      goliath: ['epithet', 'clan'],
+      halfling: ['family'],
+      tiefling: ['virtue'],
+      orc: undefined,
+      human: undefined,
+    }
+
+    for (const entry of species) {
+      const naming = entry.culture?.naming
+      expect(naming, `${entry.slug} missing naming`).toBeDefined()
+      if (naming?.supported !== true) {
+        expect(expected[entry.slug]).toBeUndefined()
+        continue
+      }
+
+      if (expected[entry.slug] === undefined) {
+        expect(naming.personalNameComponents).toBeUndefined()
+      } else {
+        expect(naming.personalNameComponents).toEqual(expected[entry.slug])
+      }
+    }
+  })
+
   it('persists id/name override only for elf', () => {
     const overrides = species.filter((entry) =>
       hasSpeciesCultureOverride({ culture: entry.culture }),

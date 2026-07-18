@@ -1,26 +1,40 @@
-import type { SpeciesCultureConfig } from '@rpg/contracts'
+import type { ContentSource, SpeciesCultureConfig } from '@rpg/contracts'
 
 import { deriveSlugForCreate } from '../../lib/forms/content-form-key-helpers'
 import type { SpeciesCultureFormValues } from './species-culture-form-fields'
+
+function buildPersistedNaming(
+  culture: SpeciesCultureFormValues,
+  entitySource: ContentSource,
+): SpeciesCultureConfig['naming'] {
+  if (entitySource === 'homebrew') {
+    return { supported: false }
+  }
+
+  if (culture.naming.supported !== true) {
+    return { supported: false }
+  }
+
+  return {
+    supported: true,
+    ...(culture.naming.personalNameComponents && culture.naming.personalNameComponents.length > 0
+      ? { personalNameComponents: culture.naming.personalNameComponents }
+      : {}),
+  }
+}
 
 export function normalizeSpeciesCultureForPersist({
   slug,
   culture,
   existingCultureId,
+  entitySource = 'homebrew',
 }: {
   slug: string
   culture: SpeciesCultureFormValues
   existingCultureId?: string
+  entitySource?: ContentSource
 }): SpeciesCultureConfig {
-  const naming =
-    culture.naming.supported === true
-      ? {
-          supported: true as const,
-          ...(culture.naming.subjectKinds && culture.naming.subjectKinds.length > 0
-            ? { subjectKinds: culture.naming.subjectKinds }
-            : {}),
-        }
-      : { supported: false as const }
+  const naming = buildPersistedNaming(culture, entitySource)
 
   if (culture.useOverride !== true) {
     return { naming }
@@ -48,14 +62,16 @@ export function cultureFromFormValues(
   {
     slug,
     existingCultureId,
+    entitySource = 'homebrew',
   }: {
     slug: string
     existingCultureId?: string
+    entitySource?: ContentSource
   },
 ): SpeciesCultureConfig | undefined {
   if (culture === undefined) {
     return undefined
   }
 
-  return normalizeSpeciesCultureForPersist({ slug, culture, existingCultureId })
+  return normalizeSpeciesCultureForPersist({ slug, culture, existingCultureId, entitySource })
 }
