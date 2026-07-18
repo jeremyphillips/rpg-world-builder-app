@@ -118,6 +118,11 @@
   --semantic-destructive-subtle: var(--destructive-subtle);
 
   /*
+   * Choice indicators — radio/checkbox rings on panel surfaces (not field-input chrome).
+   */
+  --choice-control-border: color-mix(in oklch, var(--foreground) 32%, var(--card));
+
+  /*
    * Shared interaction recipes — public contract for hover/selected/drag/track chrome.
    * Composed at Layer 2 toward concrete surfaces (no transparent washes).
    */

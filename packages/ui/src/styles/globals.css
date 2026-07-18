@@ -89,6 +89,7 @@
   --color-border-subtle: var(--border-subtle);
   --color-border-strong: var(--border-strong);
   --color-card-selected-border: var(--card-selected-border);
+  --color-choice-control-border: var(--choice-control-border);
   /* No `--color-input` — `border-input` / `bg-input` are custom utilities (see below). */
   --color-input-invalid: var(--field-control-border-invalid);
   --color-input-invalid-subtle: var(--field-control-bg-invalid);
@@ -294,6 +295,10 @@
  */
 @utility border-input {
   border-color: var(--field-control-border);
+}
+
+@utility border-choice-control {
+  border-color: var(--choice-control-border);
 }
 
 @utility bg-input {

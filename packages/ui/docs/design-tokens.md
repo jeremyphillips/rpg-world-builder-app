@@ -127,6 +127,10 @@ Do not merge text-tuned values onto solid status hues.
 
 Switch unchecked track uses `--switch-track*` — separate from field border ownership.
 
+**Choice indicators** (radio, checkbox, RadioCard decorative control) use
+`border-choice-control` (`--choice-control-border`), composed toward `--card` — not
+`border-input`.
+
 ## Visual acceptance checklist
 
 Review in Storybook (both modes) without pixel-matching:

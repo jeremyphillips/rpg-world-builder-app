@@ -1,6 +1,10 @@
 import { cva } from 'class-variance-authority'
 
 import { cardRadiusClasses } from './card.variants'
+import {
+  choiceControlIndicatorGroupCheckedBorderClasses,
+  choiceControlIndicatorShellClasses,
+} from './choice-control-chrome.variants'
 import { fieldSurfaceRaisedShadowClasses } from './field-surface.variants'
 
 const radioCardCardBase = `group relative flex w-full cursor-pointer flex-col ${cardRadiusClasses} border border-border bg-card text-left text-card-foreground ${fieldSurfaceRaisedShadowClasses} transition-colors hover:border-primary/50 hover:bg-control-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:border-primary data-[state=checked]:bg-control-selected data-[state=checked]:ring-1 data-[state=checked]:ring-primary/20 aria-invalid:border-destructive`
@@ -79,7 +83,7 @@ export const radioCardDetailsInlineSlotVariants = cva('col-start-3 row-start-1 s
 
 /** Decorative radio circle shown inside the card, synced to the parent item state. */
 export const radioCardControlVariants = cva(
-  'flex aspect-square shrink-0 items-center justify-center rounded-full border border-input text-primary shadow-sm transition-colors group-data-[state=checked]:border-primary',
+  `${choiceControlIndicatorShellClasses} ${choiceControlIndicatorGroupCheckedBorderClasses} flex aspect-square shrink-0 items-center justify-center rounded-full text-primary`,
   {
     variants: {
       variant: {

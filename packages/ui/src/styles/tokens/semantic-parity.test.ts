@@ -4,7 +4,11 @@ import { fileURLToPath } from 'node:url'
 
 import { describe, expect, it } from 'vitest'
 
-import { FIELD_CONTROL_SEMANTIC_ROLES, INTERACTION_SEMANTIC_ROLES } from './palette-inventory'
+import {
+  FIELD_CONTROL_SEMANTIC_ROLES,
+  INTERACTION_SEMANTIC_ROLES,
+  CHOICE_CONTROL_SEMANTIC_ROLES,
+} from './palette-inventory'
 
 const tokensDir = join(dirname(fileURLToPath(import.meta.url)), '.')
 
@@ -16,6 +20,7 @@ const RECIPE_SEMANTIC_ROLES = new Set([
   '--catalog-picker-row-surface',
   '--surface-raised-shadow',
   ...INTERACTION_SEMANTIC_ROLES,
+  ...CHOICE_CONTROL_SEMANTIC_ROLES,
 ])
 
 function extractSemanticRoleVars(css: string): Set<string> {
