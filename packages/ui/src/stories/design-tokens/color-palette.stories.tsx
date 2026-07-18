@@ -23,7 +23,7 @@ export const Catalog: Story = {
   render: () => <ColorPaletteCatalog />,
 }
 
-/** Contrast matrix on background, bg-subtle, card, muted, and sidebar planes. */
+/** Contrast matrix on background, sunken, card, muted, and sidebar planes. */
 export const OnSurfaces: Story = {
   render: () => <ColorOnSurfacesCatalog />,
 }

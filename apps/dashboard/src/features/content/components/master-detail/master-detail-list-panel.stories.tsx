@@ -53,7 +53,7 @@ export const WithProtectedSystemRow: Story = {
         eyebrow: 'Level 5',
         badges: [
           { label: 'System', appearance: 'neutral', tone: 'neutral' },
-          { label: 'Inactive', appearance: 'outline', tone: 'caution' },
+          { label: 'Inactive', appearance: 'outline', tone: 'warning' },
         ],
         active: false,
         deletable: false,

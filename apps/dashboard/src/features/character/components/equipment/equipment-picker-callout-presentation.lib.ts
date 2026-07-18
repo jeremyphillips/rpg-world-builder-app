@@ -25,61 +25,61 @@ export type EquipmentCalloutPresentation = {
 
 const EQUIPMENT_CALLOUT_AUTHORED_LABEL_PRESENTATION = {
   appearance: 'outline',
-  tone: 'informative',
+  tone: 'info',
   size: 'sm',
 } as const satisfies EquipmentCalloutPresentation
 
 const EQUIPMENT_CALLOUT_LABEL_PRESENTATION = {
   [EQUIPMENT_PICKER_STANDARD_GEAR_LABEL]: {
     appearance: 'outline',
-    tone: 'informative',
+    tone: 'info',
     size: 'sm',
   },
   [EQUIPMENT_PICKER_PROFICIENCY_AVAILABLE_LABEL]: {
     appearance: 'outline',
-    tone: 'informative',
+    tone: 'info',
     size: 'sm',
   },
   [EQUIPMENT_PICKER_COMMON_FOR_CLASS_LABEL]: {
     appearance: 'outline',
-    tone: 'informative',
+    tone: 'info',
     size: 'sm',
   },
   [EQUIPMENT_PICKER_STARTING_OPTION_LABEL]: {
     appearance: 'accent-outline',
-    tone: 'informative',
+    tone: 'info',
     size: 'sm',
   },
   [EQUIPMENT_PICKER_SPELLCASTING_FOCUS_LABEL]: {
     appearance: 'accent-outline',
-    tone: 'informative',
+    tone: 'info',
     size: 'sm',
   },
   [EQUIPMENT_PICKER_ESSENTIAL_LABEL]: {
     appearance: 'soft',
-    tone: 'informative',
+    tone: 'info',
     size: 'sm',
   },
   [EQUIPMENT_PICKER_CLASS_TOOL_LABEL]: {
     appearance: 'soft',
-    tone: 'informative',
+    tone: 'info',
     size: 'sm',
   },
   [EQUIPMENT_PICKER_PROFICIENT_LABEL]: {
     appearance: 'soft',
-    tone: 'positive',
+    tone: 'success',
     size: 'sm',
     leadingIcon: 'check',
   },
   [EQUIPMENT_PICKER_NOT_PROFICIENT_LABEL]: {
     appearance: 'soft',
-    tone: 'caution',
+    tone: 'warning',
     size: 'sm',
     leadingIcon: 'warning',
   },
   [EQUIPMENT_PICKER_CANNOT_AFFORD_LABEL]: {
     appearance: 'soft',
-    tone: 'negative',
+    tone: 'destructive',
     size: 'sm',
     leadingIcon: 'warning',
   },

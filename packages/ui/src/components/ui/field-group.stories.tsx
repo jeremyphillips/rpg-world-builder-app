@@ -115,7 +115,7 @@ export const PanelTones: Story = {
       <FieldGroup legend="Emphasis" fieldsChrome={{ variant: 'panel', tone: 'strong' }}>
         <TextField id="panel-emphasis" label="Field" />
       </FieldGroup>
-      <FieldGroup legend="Informative" fieldsChrome={{ variant: 'panel', tone: 'informative' }}>
+      <FieldGroup legend="Informative" fieldsChrome={{ variant: 'panel', tone: 'info' }}>
         <TextField id="panel-informative" label="Field" />
       </FieldGroup>
     </div>

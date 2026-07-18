@@ -38,10 +38,10 @@ export const EQUIPMENT_PICKER_ADDED_LABEL = 'Added'
 export const EQUIPMENT_PICKER_OWNED_QUANTITY_LABEL_PREFIX = 'Owned:'
 
 export type EquipmentPickerCalloutIntent =
-  | 'informative'
+  | 'info'
   | 'recommended'
   | 'compatible'
-  | 'caution'
+  | 'warning'
   | 'blocking'
 
 export type EquipmentPickerCalloutImportance = 'low' | 'medium' | 'high'

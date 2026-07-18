@@ -68,7 +68,7 @@ describe('buildEmbeddedMasterDetailListItem', () => {
     expect(item.active).toBe(false)
     expect(item.badges).toEqual([
       { label: 'Homebrew', appearance: 'outline', tone: 'neutral' },
-      { label: 'Inactive', appearance: 'outline', tone: 'caution' },
+      { label: 'Inactive', appearance: 'outline', tone: 'warning' },
     ])
     expect(hasRowError).toHaveBeenCalledWith(0)
   })

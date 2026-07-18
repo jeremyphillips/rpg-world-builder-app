@@ -29,7 +29,7 @@ describe('equipment-picker-callout.lib', () => {
     it('picks the highest priority and keeps the first on ties', () => {
       const low: EquipmentCalloutCandidate = {
         priority: 50,
-        callout: { label: 'Low', intent: 'caution', importance: 'medium' },
+        callout: { label: 'Low', intent: 'warning', importance: 'medium' },
       }
       const high: EquipmentCalloutCandidate = {
         priority: 400,
@@ -37,11 +37,11 @@ describe('equipment-picker-callout.lib', () => {
       }
       const tieFirst: EquipmentCalloutCandidate = {
         priority: 100,
-        callout: { label: 'First', intent: 'informative', importance: 'low' },
+        callout: { label: 'First', intent: 'info', importance: 'low' },
       }
       const tieSecond: EquipmentCalloutCandidate = {
         priority: 100,
-        callout: { label: 'Second', intent: 'informative', importance: 'low' },
+        callout: { label: 'Second', intent: 'info', importance: 'low' },
       }
 
       expect(selectHighestPriorityCallout([low, high])).toEqual(high.callout)
@@ -121,7 +121,7 @@ describe('equipment-picker-callout.lib', () => {
 
       expect(getEquipmentPickerCallout(item)).toEqual({
         label: EQUIPMENT_PICKER_PROFICIENCY_AVAILABLE_LABEL,
-        intent: 'informative',
+        intent: 'info',
         importance: 'low',
       })
     })
@@ -164,7 +164,7 @@ describe('equipment-picker-callout.lib', () => {
 
       expect(getEquipmentPickerCallout(item)).toEqual({
         label: EQUIPMENT_PICKER_COMMON_FOR_CLASS_LABEL,
-        intent: 'informative',
+        intent: 'info',
         importance: 'low',
       })
     })
@@ -178,7 +178,7 @@ describe('equipment-picker-callout.lib', () => {
 
       expect(getEquipmentPickerCallout(item, { isGoldShoppingPath: true })).toEqual({
         label: EQUIPMENT_PICKER_STANDARD_GEAR_LABEL,
-        intent: 'informative',
+        intent: 'info',
         importance: 'low',
       })
       expect(getEquipmentPickerCallout(item, { isGoldShoppingPath: false })).toBeUndefined()
@@ -213,7 +213,7 @@ describe('equipment-picker-callout.lib', () => {
 
       expect(getEquipmentPickerCallout(item)).toEqual({
         label: EQUIPMENT_PICKER_NOT_PROFICIENT_LABEL,
-        intent: 'caution',
+        intent: 'warning',
         importance: 'medium',
       })
     })

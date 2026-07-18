@@ -61,7 +61,7 @@ describe('resolveAvailabilityBadge', () => {
           { code: 'subclasses-disabled', settingId: 'characterCreation.subclasses.enabled' },
         ],
       }),
-    ).toEqual({ appearance: 'outline', tone: 'caution', label: 'Inactive' })
+    ).toEqual({ appearance: 'outline', tone: 'warning', label: 'Inactive' })
   })
 
   it('breaks severity ties using registry order', () => {
@@ -73,7 +73,7 @@ describe('resolveAvailabilityBadge', () => {
           { code: 'subclasses-disabled', settingId: 'characterCreation.subclasses.enabled' },
         ],
       }),
-    ).toEqual({ appearance: 'outline', tone: 'caution', label: 'Inactive' })
+    ).toEqual({ appearance: 'outline', tone: 'warning', label: 'Inactive' })
   })
 })
 

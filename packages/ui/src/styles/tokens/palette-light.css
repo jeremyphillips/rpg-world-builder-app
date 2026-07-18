@@ -1,8 +1,8 @@
 /*
- * Layer 1 — light palette primitives (oklch SSOT).
+ * Layer 1 — light theme palette roles (oklch SSOT).
  * Inventory: tokens/palette-inventory.md — every name must exist in palette-dark.css.
  *
- * Motif: cream canvas, parch cards, primary-tinted sidebar, deep-red primary.
+ * Motif: cream canvas, near-white raised panels, beige muted/sunken washes, deep-red primary.
  */
 :root {
   --palette-neutral-hue: 82;
@@ -10,9 +10,9 @@
   /* Elevation surfaces */
   --palette-surface-base: oklch(0.974 0.026 90.1);
   --palette-surface-subtle: oklch(0.958 0.03 90);
-  --palette-surface-raised: oklch(0.934 0.04 91.2);
-  --palette-surface-sunken: oklch(0.82 0.065 85);
-  --palette-surface-secondary: oklch(0.92 0.038 90);
+  --palette-surface-raised: oklch(0.995 0.002 90);
+  --palette-surface-sunken: oklch(0.92 0.038 90);
+  --palette-surface-secondary: oklch(0.934 0.04 91.2);
   --palette-surface-accent: oklch(0.745 0.103 86.4);
 
   /* Foreground roles */
@@ -34,14 +34,28 @@
   );
 
   --palette-border-default: oklch(0.745 0.103 86.4);
-  --palette-border-input: oklch(0.72 0.095 85);
-  --palette-surface-input: color-mix(in oklab, var(--palette-surface-sunken) 12%, transparent);
   --palette-border-selected: oklch(from var(--palette-border-default) l c h / 42%);
   --palette-overlay: oklch(from var(--palette-fg-on-status) l c h / 0.5);
 
+  /* Field control — fill + stroke tuned independently per mode */
+  --palette-field-bg: oklch(0.995 0.002 90);
+  --palette-field-border: oklch(0.86 0.035 82);
+  --palette-field-border-hover: oklch(0.78 0.045 78);
+  --palette-field-fg-disabled: oklch(0.521 0.055 80.3);
+  --palette-field-bg-readonly: oklch(0.958 0.03 90);
+  --palette-field-border-readonly: oklch(0.86 0.035 82 / 70%);
+  --palette-field-bg-disabled: oklch(0.958 0.03 90);
+  --palette-field-border-disabled: oklch(0.86 0.035 82 / 50%);
+  --palette-field-placeholder: oklch(0.521 0.055 80.3);
+
+  /* Switch track — distinct from field border ownership */
+  --palette-switch-track: oklch(0.86 0.035 82 / 80%);
+  --palette-switch-track-hover: oklch(0.78 0.045 78 / 80%);
+  --palette-switch-track-disabled: oklch(0.86 0.035 82 / 40%);
+
   --palette-destructive: oklch(0.577 0.245 27.325);
   --palette-destructive-muted: oklch(0.577 0.245 27.325 / 70%);
-  --palette-destructive-subtle: oklch(0.577 0.245 27.325 / 50%);
+  --palette-destructive-subtle: oklch(0.577 0.245 27.325 / 13%);
   --palette-info: oklch(0.52 0.14 250);
   --palette-info-muted: oklch(0.52 0.14 250 / 70%);
   --palette-info-subtle: oklch(0.52 0.14 250 / 12%);
@@ -53,10 +67,10 @@
   --palette-warning-subtle: oklch(0.62 0.14 55 / 14%);
 
   --palette-semantic-neutral: var(--palette-fg-muted);
-  --palette-semantic-informative: oklch(0.48 0.13 250);
-  --palette-semantic-informative-muted: oklch(0.42 0.07 250);
-  --palette-semantic-positive: oklch(0.48 0.13 145);
-  --palette-semantic-caution: oklch(0.55 0.13 55);
-  --palette-semantic-negative: oklch(0.52 0.2 27);
-  --palette-semantic-negative-on-subtle: oklch(0.42 0.19 27);
+  --palette-semantic-info: oklch(0.48 0.13 250);
+  --palette-semantic-info-muted: oklch(0.42 0.07 250);
+  --palette-semantic-success: oklch(0.48 0.13 145);
+  --palette-semantic-warning: oklch(0.55 0.13 55);
+  --palette-semantic-destructive: oklch(0.52 0.2 27);
+  --palette-semantic-destructive-on-subtle: oklch(0.42 0.19 27);
 }

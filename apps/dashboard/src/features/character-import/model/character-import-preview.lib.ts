@@ -103,19 +103,19 @@ export function extractionValueTone(result: CharacterImportFieldResult<unknown>)
   if (isExtractionValueUnset(result)) {
     switch (result.status) {
       case 'missing-source':
-        return 'informative'
+        return 'info'
       case 'invalid-value':
-        return 'negative'
+        return 'destructive'
       case 'unsupported':
       case 'unresolved-reference':
-        return 'caution'
+        return 'warning'
       default:
-        return 'informative'
+        return 'info'
     }
   }
 
   if (result.issues.length > 0) {
-    return 'caution'
+    return 'warning'
   }
 
   return 'neutral'
@@ -133,18 +133,18 @@ export function extractionValueEmphasis(
 
 export function extractionIssueTone(result: CharacterImportFieldResult<unknown>): SemanticTextTone {
   if (result.status === 'invalid-value') {
-    return 'negative'
+    return 'destructive'
   }
 
   if (result.status === 'unsupported' || result.status === 'unresolved-reference') {
-    return 'caution'
+    return 'warning'
   }
 
   if (result.issues.length > 0) {
-    return 'caution'
+    return 'warning'
   }
 
-  return 'informative'
+  return 'info'
 }
 
 export function shouldShowExtractionIssue(result: CharacterImportFieldResult<unknown>): boolean {
@@ -231,7 +231,7 @@ export function formatNarrativeFieldValue(
 }
 
 export function narrativeFieldTone(isUnset: boolean): SemanticTextTone {
-  return isUnset ? 'informative' : 'neutral'
+  return isUnset ? 'info' : 'neutral'
 }
 
 export function formatHitPointsValue(
@@ -368,12 +368,12 @@ export function formatExtractionDisplayValue<K extends ExtractionFieldKey>(
 export function coverageStateTone(state: CharacterImportCoverageState): SemanticTextTone {
   switch (state) {
     case 'mapped':
-      return 'positive'
+      return 'success'
     case 'deferred':
     case 'unresolved-reference':
-      return 'caution'
+      return 'warning'
     case 'server-owned':
-      return 'informative'
+      return 'info'
     case 'not-applicable':
       return 'neutral'
     default:

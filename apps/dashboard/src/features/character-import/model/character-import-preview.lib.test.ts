@@ -31,7 +31,7 @@ const missingAlignment = {
 
 describe('character-import-preview.lib', () => {
   it('uses muted tone for missing extraction values', () => {
-    expect(extractionValueTone(missingAlignment)).toBe('informative')
+    expect(extractionValueTone(missingAlignment)).toBe('info')
     expect(formatExtractionDisplayValue('alignment', missingAlignment)).toBe(
       EXTRACTION_UNSET_DISPLAY_VALUE,
     )

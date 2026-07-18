@@ -1,6 +1,6 @@
-# Palette inventory (Layer 1)
+# Theme palette inventory (Layer 1)
 
-Canonical list of `--palette-*` primitives. **Both** `:root` (light) and `.dark`
+Canonical list of `--palette-*` theme roles. **Both** `:root` (light) and `.dark`
 must define every name in this inventory. If a dark block omits a token, the light
 value inherits on `html.dark` and leaks across themes.
 
@@ -12,6 +12,13 @@ Source files:
 Machine-readable manifest: [`palette-inventory.ts`](./palette-inventory.ts) (parity
 tests + Storybook).
 
+## Alpha policy
+
+Public semantic surface tokens should resolve to **final usable colors**. Avoid
+stacking opacity utilities (`bg-muted/30`, `border-border/60`, …) on tokens that
+already contain alpha unless the blending behavior is intentional. Status subtle
+fills (`--*-subtle`) are authored at ~12–14% and treated as final colors.
+
 ## Warmth anchor
 
 | Token                   | Role                                          |
@@ -20,15 +27,42 @@ tests + Storybook).
 
 ## Elevation surfaces
 
-| Token                         | Layer 2 mapping       | Job                         |
-| ----------------------------- | --------------------- | --------------------------- |
-| `--palette-surface-base`      | `--background`        | Canvas / page               |
-| `--palette-surface-subtle`    | `--bg-subtle`         | Barely-off-canvas wells     |
-| `--palette-surface-raised`    | `--card`, `--popover` | Raised panels               |
-| `--palette-surface-sunken`    | `--muted`             | Recessed / inset fills      |
-| `--palette-surface-secondary` | `--secondary`         | Alternate plane             |
-| `--palette-surface-accent`    | `--accent`            | Hover / gold chrome (light) |
-| `--palette-surface-input`     | `--input-bg`          | Recessed field control fill |
+| Token                         | Layer 2 mapping       | Job                                            |
+| ----------------------------- | --------------------- | ---------------------------------------------- |
+| `--palette-surface-base`      | `--background`        | Canvas / page                                  |
+| `--palette-surface-subtle`    | `--muted`             | Low-emphasis wash                              |
+| `--palette-surface-raised`    | `--card`, `--popover` | Raised panels                                  |
+| `--palette-surface-sunken`    | `--sunken`            | Recessed / inset fills                         |
+| `--palette-surface-secondary` | `--secondary`         | Alternate low-emphasis **interactive** surface |
+| `--palette-surface-accent`    | `--accent`            | Hover / gold chrome (light)                    |
+
+`--secondary` is for shadcn-compatible Button `secondary` and similar interactive
+controls — not a generic page/section fill.
+
+## Field control (Layer 1)
+
+Mode-specific concrete values only. Focus and invalid states alias Layer 2 roles
+(`--primary`, `--ring`, `--destructive`, `--destructive-subtle`) — not palette steps.
+
+| Token                             | Layer 2 mapping                   |
+| --------------------------------- | --------------------------------- |
+| `--palette-field-bg`              | `--field-control-bg`              |
+| `--palette-field-border`          | `--field-control-border`          |
+| `--palette-field-border-hover`    | `--field-control-border-hover`    |
+| `--palette-field-placeholder`     | `--field-control-placeholder`     |
+| `--palette-field-bg-readonly`     | `--field-control-bg-readonly`     |
+| `--palette-field-border-readonly` | `--field-control-border-readonly` |
+| `--palette-field-bg-disabled`     | `--field-control-bg-disabled`     |
+| `--palette-field-fg-disabled`     | `--field-control-fg-disabled`     |
+| `--palette-field-border-disabled` | `--field-control-border-disabled` |
+
+## Switch (Layer 1)
+
+| Token                             | Layer 2 mapping           |
+| --------------------------------- | ------------------------- |
+| `--palette-switch-track`          | `--switch-track`          |
+| `--palette-switch-track-hover`    | `--switch-track-hover`    |
+| `--palette-switch-track-disabled` | `--switch-track-disabled` |
 
 ## Sidebar
 
@@ -49,43 +83,36 @@ tests + Storybook).
 
 ## Chrome, brand, status
 
-Chrome: `--palette-border-*`, `--palette-overlay`, `--palette-surface-input` (field fill).
+Chrome: `--palette-border-*`, `--palette-overlay`.
 
 Brand: `--palette-primary`, `--palette-primary-foreground`, `--palette-on-solid`.
 
-Status: `--palette-destructive*`, `--palette-info*`, `--palette-success*`,
-`--palette-warning*` (base + muted + subtle tiers).
+Status chrome: `--palette-destructive*`, `--palette-info*`, `--palette-success*`,
+`--palette-warning*` (base + muted + subtle tiers). Destructive subtle is ~12–14%,
+comparable to info/success/warning.
 
 ## Semantic text (palette)
 
-`--palette-semantic-*` holds oklch source values. Layer 2 exposes
-`--semantic-*` for components — never reference palette steps from UI code.
+`--palette-semantic-*` holds oklch source values. Layer 2 exposes `--semantic-*`
+for inline/status text — never reference palette steps from UI code.
 
-## Retired numeric ramp
+| Palette source                   | Layer 2 inline text      | Status chrome alias |
+| -------------------------------- | ------------------------ | ------------------- |
+| `--palette-semantic-info`        | `--semantic-info`        | `--info-*`          |
+| `--palette-semantic-success`     | `--semantic-success`     | `--success-*`       |
+| `--palette-semantic-warning`     | `--semantic-warning`     | `--warning-*`       |
+| `--palette-semantic-destructive` | `--semantic-destructive` | `--destructive-*`   |
 
-Removed in favor of role names above:
+## Layer 2 composition rule
 
-| Old token                          | Light remap                   | Dark remap                            |
-| ---------------------------------- | ----------------------------- | ------------------------------------- |
-| `neutral-0`                        | `surface-base`, `fg-on-solid` | —                                     |
-| `neutral-50`                       | `surface-subtle`              | `fg-default`, `fg-secondary`          |
-| `neutral-100`                      | `surface-raised`              | —                                     |
-| `neutral-150`                      | `surface-secondary`           | —                                     |
-| `neutral-300`                      | `surface-sunken`              | —                                     |
-| `neutral-500` / `muted-foreground` | `fg-muted`                    | `fg-muted`                            |
-| `neutral-700`                      | `fg-secondary`                | `semantic-neutral`                    |
-| `neutral-750`                      | —                             | `surface-accent`                      |
-| `neutral-800`                      | `fg-default`                  | `surface-raised`, `surface-secondary` |
-| `neutral-800-muted`                | —                             | `surface-sunken`                      |
-| `neutral-900`                      | `fg-on-status`                | `surface-subtle`                      |
-| `neutral-950`                      | —                             | `surface-base`, `fg-on-status`        |
-| `neutral-400`, `neutral-450`       | _(deleted — unused)_          | _(deleted)_                           |
+Layer 2 roles may reference `--palette-*` theme roles or another established Layer 2
+semantic role. They must not contain raw color literals or reference component
+recipes (`--catalog-picker-row-surface`, `--surface-raised-shadow`).
 
 ## Layer 2 (semantic)
 
 See [`semantic-light.css`](./semantic-light.css) and [`semantic-dark.css`](./semantic-dark.css).
 Structure is identical across themes; only `var(--palette-…)` targets differ.
 
-Field control chrome: `--input-border`, `--input-bg`, `--input-ring`, invalid
-aliases (`--input-border-invalid`, `--input-ring-invalid`, `--input-bg-invalid`),
-and `--switch-track` for the Switch unchecked track.
+Field control API: `--field-control-*` matrix + public utilities `border-input` /
+`bg-input` (and state variants) in `globals.css`. Switch: `--switch-track*`.

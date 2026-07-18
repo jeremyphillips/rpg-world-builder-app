@@ -2,10 +2,12 @@ import { cva, type VariantProps } from 'class-variance-authority'
 
 import { fieldControlSizeClasses, fieldTextareaSizeClasses } from './field-sizing.variants'
 import {
+  fieldInputAutofillClasses,
   fieldInputDisabledClasses,
   fieldInputFocusClasses,
   fieldInputInvalidAriaClasses,
   fieldInputPlaceholderClasses,
+  fieldInputReadonlyClasses,
   fieldInputShellClasses,
 } from './field-input-chrome.variants'
 
@@ -23,6 +25,8 @@ const fieldControlBase = [
   fieldInputFocusClasses,
   fieldInputInvalidAriaClasses,
   fieldInputDisabledClasses,
+  fieldInputReadonlyClasses,
+  fieldInputAutofillClasses,
 ].join(' ')
 
 /**

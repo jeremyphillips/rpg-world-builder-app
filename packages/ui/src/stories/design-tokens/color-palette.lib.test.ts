@@ -15,7 +15,7 @@ describe('color-palette.lib', () => {
 
   it('includes core surface backgrounds for on-surface matrices', () => {
     expect(SURFACE_BACKGROUNDS.map((surface) => surface.cssVar)).toEqual(
-      expect.arrayContaining(['--background', '--bg-subtle', '--card', '--muted']),
+      expect.arrayContaining(['--background', '--sunken', '--card', '--muted']),
     )
   })
 

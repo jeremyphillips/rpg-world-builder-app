@@ -28,8 +28,8 @@ export const equipmentPackageSwitchResolutionBudgetStatusVariants = cva(
   {
     variants: {
       tone: {
-        caution: 'text-destructive',
-        positive: 'text-semantic-positive',
+        warning: 'text-destructive',
+        success: 'text-semantic-success',
         neutral: 'text-foreground',
       },
     },

@@ -1,5 +1,5 @@
 /*
- * Layer 1 — dark palette primitives (oklch SSOT).
+ * Layer 1 — dark theme palette roles (oklch SSOT).
  * Inventory: tokens/palette-inventory.md — mirrors palette-light.css names exactly.
  *
  * Warm neutral dark — parchment-adjacent hue, low-chroma surfaces, gold primary.
@@ -10,8 +10,8 @@
   /* Elevation surfaces */
   --palette-surface-base: oklch(0.141 0.004 var(--palette-neutral-hue));
   --palette-surface-subtle: oklch(0.155 0.004 var(--palette-neutral-hue));
-  --palette-surface-raised: oklch(0.194 0.005 var(--palette-neutral-hue));
-  --palette-surface-sunken: oklch(0.194 0.004 var(--palette-neutral-hue));
+  --palette-surface-raised: oklch(0.22 0.005 var(--palette-neutral-hue));
+  --palette-surface-sunken: oklch(0.12 0.004 var(--palette-neutral-hue));
   --palette-surface-secondary: oklch(0.194 0.005 var(--palette-neutral-hue));
   --palette-surface-accent: oklch(0.32 0.006 var(--palette-neutral-hue));
 
@@ -30,10 +30,24 @@
   );
 
   --palette-border-default: oklch(0.985 0.006 82 / 12%);
-  --palette-border-input: oklch(0.745 0.006 82 / 16%);
-  --palette-surface-input: color-mix(in oklab, var(--palette-border-input) 30%, transparent);
   --palette-border-selected: oklch(0.985 0.006 82 / 30%);
   --palette-overlay: oklch(0.05 0.003 var(--palette-neutral-hue) / 0.7);
+
+  /* Field control — opaque fill, not derived from border */
+  --palette-field-bg: oklch(0.17 0.004 var(--palette-neutral-hue));
+  --palette-field-border: oklch(0.985 0.006 82 / 16%);
+  --palette-field-border-hover: oklch(0.985 0.006 82 / 24%);
+  --palette-field-fg-disabled: oklch(0.715 0.01 var(--palette-neutral-hue));
+  --palette-field-bg-readonly: oklch(0.155 0.004 var(--palette-neutral-hue));
+  --palette-field-border-readonly: oklch(0.985 0.006 82 / 10%);
+  --palette-field-bg-disabled: oklch(0.155 0.004 var(--palette-neutral-hue));
+  --palette-field-border-disabled: oklch(0.985 0.006 82 / 8%);
+  --palette-field-placeholder: oklch(0.715 0.01 var(--palette-neutral-hue));
+
+  /* Switch track — distinct from field border ownership */
+  --palette-switch-track: oklch(0.985 0.006 82 / 20%);
+  --palette-switch-track-hover: oklch(0.985 0.006 82 / 28%);
+  --palette-switch-track-disabled: oklch(0.985 0.006 82 / 10%);
 
   --palette-primary: oklch(0.78 0.13 75);
   --palette-primary-foreground: oklch(0.141 0.004 var(--palette-neutral-hue));
@@ -41,7 +55,7 @@
 
   --palette-destructive: oklch(0.704 0.191 22.216);
   --palette-destructive-muted: oklch(0.704 0.191 22.216 / 70%);
-  --palette-destructive-subtle: oklch(0.704 0.191 22.216 / 50%);
+  --palette-destructive-subtle: oklch(0.704 0.191 22.216 / 14%);
   --palette-info: oklch(0.72 0.12 250);
   --palette-info-muted: oklch(0.72 0.12 250 / 70%);
   --palette-info-subtle: oklch(0.72 0.12 250 / 14%);
@@ -53,10 +67,10 @@
   --palette-warning-subtle: oklch(0.78 0.13 75 / 14%);
 
   --palette-semantic-neutral: oklch(0.715 0.01 var(--palette-neutral-hue));
-  --palette-semantic-informative: oklch(0.62 0.08 250);
-  --palette-semantic-informative-muted: oklch(0.55 0.05 250);
-  --palette-semantic-positive: oklch(0.72 0.11 145);
-  --palette-semantic-caution: oklch(0.78 0.12 75);
-  --palette-semantic-negative: oklch(0.72 0.16 22);
-  --palette-semantic-negative-on-subtle: var(--palette-fg-default);
+  --palette-semantic-info: oklch(0.62 0.08 250);
+  --palette-semantic-info-muted: oklch(0.55 0.05 250);
+  --palette-semantic-success: oklch(0.72 0.11 145);
+  --palette-semantic-warning: oklch(0.78 0.12 75);
+  --palette-semantic-destructive: oklch(0.72 0.16 22);
+  --palette-semantic-destructive-on-subtle: var(--palette-fg-default);
 }

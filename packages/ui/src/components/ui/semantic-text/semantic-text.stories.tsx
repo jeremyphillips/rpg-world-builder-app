@@ -18,13 +18,13 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
-const TONES: SemanticTextTone[] = ['neutral', 'informative', 'positive', 'caution', 'negative']
+const TONES: SemanticTextTone[] = ['neutral', 'info', 'success', 'warning', 'destructive']
 const EMPHASES: SemanticTextEmphasis[] = ['low', 'medium', 'high']
 
 const EQUIPMENT_CALLOUT_SAMPLES = [
-  { label: 'Standard gear', tone: 'informative' as const, emphasis: 'low' as const },
-  { label: 'Spellcasting focus', tone: 'informative' as const, emphasis: 'medium' as const },
-  { label: 'Essential', tone: 'informative' as const, emphasis: 'high' as const },
+  { label: 'Standard gear', tone: 'info' as const, emphasis: 'low' as const },
+  { label: 'Spellcasting focus', tone: 'info' as const, emphasis: 'medium' as const },
+  { label: 'Essential', tone: 'info' as const, emphasis: 'high' as const },
 ]
 
 function ToneRow({ tone }: { tone: SemanticTextTone }) {
@@ -78,16 +78,16 @@ export const Neutral: Story = {
 }
 
 export const Informative: Story = {
-  args: { tone: 'informative', children: 'Starting option' },
+  args: { tone: 'info', children: 'Starting option' },
 }
 
 export const Positive: Story = {
-  args: { tone: 'positive', children: 'Proficient' },
+  args: { tone: 'success', children: 'Proficient' },
 }
 
 export const Caution: Story = {
   args: {
-    tone: 'caution',
+    tone: 'warning',
     emphasis: 'medium',
     icon: <TriangleAlert aria-hidden />,
     children: 'Not proficient',
@@ -96,7 +96,7 @@ export const Caution: Story = {
 
 export const Negative: Story = {
   args: {
-    tone: 'negative',
+    tone: 'destructive',
     emphasis: 'high',
     icon: <TriangleAlert aria-hidden />,
     children: 'Cannot afford',

@@ -97,10 +97,10 @@ const OUTLINE_TONE_CLASS: Record<FieldGroupOutlineTone, string> = {
 export function isCompactLabelTone(value: string): value is CompactLabelTone {
   return (
     value === 'neutral' ||
-    value === 'informative' ||
-    value === 'positive' ||
-    value === 'caution' ||
-    value === 'negative'
+    value === 'info' ||
+    value === 'success' ||
+    value === 'warning' ||
+    value === 'destructive'
   )
 }
 

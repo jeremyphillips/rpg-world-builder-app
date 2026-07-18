@@ -130,7 +130,7 @@ function getGeneralRecommendationCandidate(
       priority: EQUIPMENT_CALLOUT_SOURCE_PRIORITY.generalRecommendation,
       callout: {
         label: EQUIPMENT_PICKER_PROFICIENCY_AVAILABLE_LABEL,
-        intent: 'informative',
+        intent: 'info',
         importance: 'low',
       },
     }
@@ -141,7 +141,7 @@ function getGeneralRecommendationCandidate(
       priority: EQUIPMENT_CALLOUT_SOURCE_PRIORITY.generalRecommendation,
       callout: {
         label: EQUIPMENT_PICKER_COMMON_FOR_CLASS_LABEL,
-        intent: 'informative',
+        intent: 'info',
         importance: 'low',
       },
     }
@@ -163,7 +163,7 @@ function getGeneralRecommendationCandidate(
       priority: EQUIPMENT_CALLOUT_SOURCE_PRIORITY.generalRecommendation,
       callout: {
         label: EQUIPMENT_PICKER_STANDARD_GEAR_LABEL,
-        intent: 'informative',
+        intent: 'info',
         importance: 'low',
       },
     }
@@ -185,7 +185,7 @@ function getGeneralRecommendationCandidate(
       priority: EQUIPMENT_CALLOUT_SOURCE_PRIORITY.generalRecommendation,
       callout: {
         label,
-        intent: 'informative',
+        intent: 'info',
         importance: 'medium',
       },
     }
@@ -203,7 +203,7 @@ function getProficiencyCautionCandidate(
     priority: EQUIPMENT_CALLOUT_SOURCE_PRIORITY.proficiencyCaution,
     callout: {
       label: EQUIPMENT_PICKER_NOT_PROFICIENT_LABEL,
-      intent: 'caution',
+      intent: 'warning',
       importance: 'medium',
     },
   }

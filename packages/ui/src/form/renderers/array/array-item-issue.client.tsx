@@ -45,7 +45,7 @@ export function ArrayItemIssueBadge({
     <Badge
       asChild
       appearance="soft"
-      tone="negative"
+      tone="destructive"
       size="sm"
       className={cn('h-6 shrink-0 gap-1', compact && 'mt-0')}
     >

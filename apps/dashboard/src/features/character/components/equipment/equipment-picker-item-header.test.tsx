@@ -54,7 +54,7 @@ describe('EquipmentPickerItemHeader', () => {
         item={item}
         callout={{
           label: EQUIPMENT_PICKER_NOT_PROFICIENT_LABEL,
-          intent: 'caution',
+          intent: 'warning',
           importance: 'medium',
         }}
         commerce={

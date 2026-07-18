@@ -36,7 +36,7 @@ function BadgeIconSlot({ icon, size }: { icon: React.ReactNode; size: BadgeSize 
 function Badge({
   className,
   appearance = 'soft',
-  tone = 'informative',
+  tone = 'info',
   size = 'md',
   leadingIcon,
   trailingIcon,

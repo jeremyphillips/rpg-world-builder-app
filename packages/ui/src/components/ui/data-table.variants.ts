@@ -45,7 +45,7 @@ export const dataTablePaginationVariants = cva(
 
 /** Table container — elevated card plane on the page canvas. */
 export const dataTableTableWrapVariants = cva(
-  'overflow-hidden rounded-card border border-border bg-subtle text-foreground shadow-surface-raised',
+  'overflow-hidden rounded-card border border-border bg-muted text-foreground shadow-surface-raised',
 )
 
 /**

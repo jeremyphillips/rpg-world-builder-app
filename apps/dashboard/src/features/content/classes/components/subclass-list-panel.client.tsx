@@ -61,7 +61,7 @@ function SubclassListRowBadges({
         </Badge>
       ) : null}
       {!active ? (
-        <Badge appearance="outline" tone="caution" size="sm">
+        <Badge appearance="outline" tone="warning" size="sm">
           Inactive
         </Badge>
       ) : null}

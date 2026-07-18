@@ -62,7 +62,7 @@ export function CharacterImportEquipmentPreviewSection({
           {unsupported.length > 0 ? (
             <div className="grid gap-1">
               <Text variant="emphasis">Unsupported:</Text>
-              <SemanticText tone="caution" emphasis="medium" className={PREVIEW_VALUE_TEXT_CLASS}>
+              <SemanticText tone="warning" emphasis="medium" className={PREVIEW_VALUE_TEXT_CLASS}>
                 {unsupported.map((entry) => formatEquipmentItemLabel(entry)).join(', ')}
               </SemanticText>
             </div>

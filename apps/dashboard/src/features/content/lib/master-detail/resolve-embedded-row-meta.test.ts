@@ -21,7 +21,7 @@ describe('resolveEmbeddedRowMeta', () => {
     ])
     expect(meta.badges).toEqual([
       { label: 'System', appearance: 'neutral', tone: 'neutral' },
-      { label: 'Inactive', appearance: 'outline', tone: 'caution' },
+      { label: 'Inactive', appearance: 'outline', tone: 'warning' },
     ])
   })
 
@@ -40,7 +40,7 @@ describe('resolveEmbeddedRowMeta', () => {
     expect(meta.badges.at(-1)).toEqual({
       label: 'Inactive',
       appearance: 'outline',
-      tone: 'caution',
+      tone: 'warning',
     })
   })
 })

@@ -66,11 +66,15 @@ import '@rpg/ui/styles.css'
 
 The stylesheet defines CSS-variable design tokens on `:root` and `.dark`; toggle
 the `dark` class on a root element to switch themes. Color tokens use three
-layers: `--palette-*` primitives in `src/styles/tokens/palette-*.css` (oklch
-SSOT; both themes declare the same inventory — see `palette-inventory.md`),
-semantic roles in `semantic-*.css` (`--background`, `--card`, …), and the
-`@theme inline` bridge in `globals.css` for Tailwind utilities. Components use
-semantic roles only, never `--palette-*` directly.
+layers: `--palette-*` theme roles in `src/styles/tokens/palette-*.css` (oklch
+SSOT; both themes declare the same inventory), semantic roles in `semantic-*.css`
+(`--background`, `--field-control-*`, `--semantic-*`, …), and the `@theme inline`
+bridge in `globals.css` for Tailwind utilities. Components use semantic roles
+only, never `--palette-*` directly.
+
+Full guide — surface hierarchy, alpha policy, field chrome, status namespaces:
+**[docs/design-tokens.md](docs/design-tokens.md)**. Inventory SSOT:
+[`src/styles/tokens/palette-inventory.md`](src/styles/tokens/palette-inventory.md).
 
 ### Fonts
 
@@ -95,6 +99,9 @@ primitive rules: **[docs/typography.md](docs/typography.md)**.
 
 Compact labels (`Badge`, `Chip`) — tone vs appearance, size scale, selected-control
 tokens: **[docs/compact-labels.md](docs/compact-labels.md)**.
+
+Design tokens — layers, surfaces, field chrome, status vocabulary:
+**[docs/design-tokens.md](docs/design-tokens.md)**.
 
 ```tsx
 import { Heading, Text, RichTextContent } from '@rpg/ui'
