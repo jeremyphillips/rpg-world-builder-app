@@ -48,10 +48,17 @@ describe('creatureAbilityScoresSchema', () => {
 
 describe('creature hit point schemas', () => {
   it('parses runtime hit points for owned sheets or encounter state', () => {
-    expect(creatureRuntimeHitPointsSchema.parse({ base: 42, temporary: 5 })).toEqual({
+    expect(creatureRuntimeHitPointsSchema.parse({ base: 42, current: 40, temporary: 5 })).toEqual({
       base: 42,
+      current: 40,
       temporary: 5,
     })
+  })
+
+  it('rejects current hit points above base', () => {
+    expect(
+      creatureRuntimeHitPointsSchema.safeParse({ base: 10, current: 11, temporary: 0 }).success,
+    ).toBe(false)
   })
 
   it('parses monster stat-block hit points with an optional formula', () => {
@@ -118,7 +125,7 @@ describe('character schema creature reuse', () => {
         wis: 12,
         cha: 8,
       },
-      hitPoints: { base: 12, temporary: 0 },
+      hitPoints: { base: 12, current: 12, temporary: 0 },
       proficiencies: {},
       equipment: {},
       wealth: {},
@@ -134,6 +141,6 @@ describe('character schema creature reuse', () => {
       wis: 12,
       cha: 8,
     })
-    expect(parsed.hitPoints).toEqual({ base: 12, temporary: 0 })
+    expect(parsed.hitPoints).toEqual({ base: 12, current: 12, temporary: 0 })
   })
 })

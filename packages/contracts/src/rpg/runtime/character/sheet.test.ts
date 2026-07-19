@@ -40,6 +40,7 @@ const baseCharacter = {
   },
   hitPoints: {
     base: 58,
+    current: 58,
     temporary: 0,
   },
   proficiencies: {

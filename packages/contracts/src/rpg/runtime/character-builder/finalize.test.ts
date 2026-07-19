@@ -41,7 +41,7 @@ describe('finalizeCharacterBuild', () => {
 
   it('computes hitPoints.base and xp 0', () => {
     const input = finalizeCharacterBuild(makeCompleteDraft(), builderTestContext)
-    expect(input.hitPoints).toEqual({ base: 11, temporary: 0 })
+    expect(input.hitPoints).toEqual({ base: 11, current: 11, temporary: 0 })
     expect(input.xp).toBe(0)
   })
 

@@ -110,6 +110,7 @@ export function finalizeCharacterBuild(
     abilityScores,
     hitPoints: {
       base: levelOneMaxHp(characterClass.hitDie, abilityScores.con),
+      current: levelOneMaxHp(characterClass.hitDie, abilityScores.con),
       temporary: 0,
     },
     proficiencies,

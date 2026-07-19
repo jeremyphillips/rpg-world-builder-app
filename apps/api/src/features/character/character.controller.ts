@@ -3,7 +3,12 @@ import type { Request, Response } from 'express'
 import type { CreateCharacterInput } from '@rpg/contracts'
 
 import { HttpError } from '../../lib/http-error'
-import { createCharacter, findCharacterForUser, listCharactersForUser } from './character.service'
+import {
+  createCharacter,
+  deleteCharacterForUser,
+  findCharacterForUser,
+  listCharactersForUser,
+} from './character.service'
 
 export async function create(req: Request, res: Response): Promise<void> {
   const character = await createCharacter(req.body as CreateCharacterInput, req.user!.id)
@@ -22,4 +27,13 @@ export async function getById(req: Request, res: Response): Promise<void> {
     throw new HttpError(404, 'not_found', 'Character not found.')
   }
   res.status(200).json({ character })
+}
+
+export async function remove(req: Request, res: Response): Promise<void> {
+  const { characterId } = req.params as { characterId: string }
+  const deleted = await deleteCharacterForUser(characterId, req.user!.id)
+  if (!deleted) {
+    throw new HttpError(404, 'not_found', 'Character not found.')
+  }
+  res.status(204).send()
 }

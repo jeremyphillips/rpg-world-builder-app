@@ -458,6 +458,7 @@ function extractHitPoints(
 
   const hitPoints: CharacterHitPointsPreview = {
     base,
+    current: base,
     temporary,
   }
 

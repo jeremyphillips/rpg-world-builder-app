@@ -106,7 +106,7 @@ describe('adaptDndBeyondCharacter', () => {
   })
 
   it('maps hit point inputs without inferring from class or constitution', () => {
-    expect(result.extraction.hitPoints.value).toEqual({ base: 6, temporary: 0 })
+    expect(result.extraction.hitPoints.value).toEqual({ base: 6, current: 6, temporary: 0 })
   })
 
   it('extracts languages from modifier groups', () => {

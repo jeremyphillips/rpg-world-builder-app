@@ -237,7 +237,7 @@ export function narrativeFieldTone(isUnset: boolean): SemanticTextTone {
 export function formatHitPointsValue(
   hitPoints: NonNullable<CharacterImportExtraction['hitPoints']['value']>,
 ): string {
-  return `Base ${hitPoints.base}, Temporary ${hitPoints.temporary}`
+  return `Current ${hitPoints.current} / ${hitPoints.base}, Temporary ${hitPoints.temporary}`
 }
 
 export function formatLanguagesValue(languages: RecognizedLanguage[]): string {

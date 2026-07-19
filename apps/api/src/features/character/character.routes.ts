@@ -18,3 +18,4 @@ characterRouter.post(
   controller.create,
 )
 characterRouter.get('/:characterId', requireAuth, controller.getById)
+characterRouter.delete('/:characterId', requireAuth, controller.remove)

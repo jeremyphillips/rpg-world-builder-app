@@ -1,5 +1,6 @@
 export {
   createCharacter,
+  deleteCharacter,
   getCharacter,
   listCharacters,
   type CreateCharacterInput,
@@ -20,6 +21,7 @@ export {
 } from './hooks/use-character-builder-store'
 export { charactersQueryKey, useCharacters } from './hooks/use-characters'
 export { useCreateCharacter } from './hooks/use-create-character'
+export { useDeleteCharacter } from './hooks/use-delete-character'
 export { isNonEmptyCharacterBuilderDraft } from './lib/is-non-empty-character-builder-draft'
 export {
   createCharacterBuilderStore,

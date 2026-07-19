@@ -46,3 +46,17 @@ export async function findCharacterForUser(
 
   return toCharacter(doc)
 }
+
+export async function deleteCharacterForUser(
+  characterId: string,
+  userId: string,
+): Promise<boolean> {
+  if (!isValidObjectId(characterId)) return false
+
+  const result = await CharacterModel.deleteOne({
+    _id: characterId,
+    userId,
+  })
+
+  return result.deletedCount === 1
+}
