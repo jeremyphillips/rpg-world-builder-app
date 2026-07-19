@@ -15,6 +15,8 @@ export function useCatalogPickerSheetState<TItem>({
   defaultTabId,
   hasStructuredFilters = false,
   transformVisibleItems,
+  initialSearchQuery = '',
+  toolbarStateKey,
 }: Pick<
   CatalogPickerSheetProps<TItem>,
   | 'items'
@@ -24,10 +26,18 @@ export function useCatalogPickerSheetState<TItem>({
   | 'defaultTabId'
   | 'hasStructuredFilters'
   | 'transformVisibleItems'
+  | 'initialSearchQuery'
+  | 'toolbarStateKey'
 >) {
   const resolvedDefaultTabId = defaultTabId ?? tabs?.[0]?.id ?? ''
-  const [searchQuery, setSearchQuery] = React.useState('')
+  const [searchQuery, setSearchQuery] = React.useState(initialSearchQuery)
   const [activeTabId, setActiveTabId] = React.useState(() => resolvedDefaultTabId)
+
+  React.useEffect(() => {
+    if (toolbarStateKey === undefined) return
+    setSearchQuery(initialSearchQuery)
+    setActiveTabId(resolvedDefaultTabId)
+  }, [initialSearchQuery, resolvedDefaultTabId, toolbarStateKey])
 
   // Browse context (search, tab) is preserved across close/reopen within a builder session.
   // Reset only via explicit Clear filters / Reset view or a future context-key change.

@@ -1,13 +1,13 @@
 import { render, screen } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 
-import { CatalogPickerSortGroup } from './catalog-picker-sort-group.client'
+import { CatalogSortControl } from './catalog-sort-control.client'
 import { pickerSortOption } from './catalog-picker-sort-labels.lib'
 
-describe('CatalogPickerSortGroup', () => {
+describe('CatalogSortControl', () => {
   it('shows compact trigger labels for name sorts', () => {
     render(
-      <CatalogPickerSortGroup
+      <CatalogSortControl
         value="name-asc"
         options={[
           pickerSortOption('name-asc', 'Name: A–Z'),

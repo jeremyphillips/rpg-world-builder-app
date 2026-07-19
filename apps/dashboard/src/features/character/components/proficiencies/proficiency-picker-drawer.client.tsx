@@ -2,25 +2,16 @@
 
 import * as React from 'react'
 
-import {
-  CatalogPickerSheet,
-  InsetPanel,
-  Text,
-  type CatalogPickerSheetToolbarContext,
-} from '@rpg/ui'
+import { CatalogPickerSheet, InsetPanel, Text } from '@rpg/ui'
 
 import { hasCatalogPickerResetViewCriteria } from '../picker/catalog-picker-filter-state.lib'
-import {
-  catalogPickerFiltersRowClasses,
-  catalogPickerSortActionsGroupClasses,
-} from '../picker/catalog-picker-filter-toolbar.variants'
 import { CatalogPickerItemHeader } from '../picker/catalog-picker-item-header.client'
 import { mapSkillProficiencyCompactSummaryToMetadataLines } from '../picker/catalog-picker-metadata'
 import { CatalogPickerSelectionActions } from '../picker/catalog-picker-selection-actions.client'
 import { catalogPickerShellProps } from '../picker/catalog-picker-shell.lib'
-import { CatalogPickerSortGroup } from '../picker/catalog-picker-sort-group.client'
+import { CatalogSortControl } from '../picker/catalog-sort-control.client'
 import { pickerSortOption } from '../picker/catalog-picker-sort-labels.lib'
-import { CatalogPickerToolbarResetButton } from '../picker/catalog-picker-toolbar-reset-button.client'
+import { CatalogToolbarResetAction } from '../picker/catalog-toolbar-reset-action.client'
 import {
   filterAndSortProficiencyPickerItems,
   formatProficiencyPickerDrawerDescription,
@@ -47,16 +38,16 @@ export type { ProficiencyPickerDrawerProps } from './proficiency-picker-drawer.t
 
 function ProficiencyPickerToolbarReset({
   sortMode,
-  toolbarContext,
+  searchQuery,
   onResetView,
 }: {
   sortMode: ProficiencyPickerSortMode
-  toolbarContext: CatalogPickerSheetToolbarContext
+  searchQuery: string
   onResetView: () => void
 }) {
   const showResetView = hasCatalogPickerResetViewCriteria({
     structuredFilterCount: 0,
-    searchQuery: toolbarContext.searchQuery,
+    searchQuery,
     sortMode,
     defaultSortMode: PROFICIENCY_PICKER_VIEW_DEFAULTS.sortMode,
   })
@@ -64,10 +55,7 @@ function ProficiencyPickerToolbarReset({
   if (!showResetView) return null
 
   return (
-    <CatalogPickerToolbarResetButton
-      label={PROFICIENCY_PICKER_RESET_VIEW_LABEL}
-      onClick={onResetView}
-    />
+    <CatalogToolbarResetAction label={PROFICIENCY_PICKER_RESET_VIEW_LABEL} onClick={onResetView} />
   )
 }
 
@@ -132,35 +120,33 @@ export function ProficiencyPickerDrawer({
           </InsetPanel>
         ) : undefined
       }
-      tabToolbarActions={(toolbarContext) => {
+      actions={({ searchQuery, resetSearchQuery }) => {
         const handleResetView = () => {
           setSortMode(PROFICIENCY_PICKER_VIEW_DEFAULTS.sortMode)
-          toolbarContext.clearSearchQuery()
+          resetSearchQuery()
         }
 
         return (
           <ProficiencyPickerToolbarReset
             sortMode={sortMode}
-            toolbarContext={toolbarContext}
+            searchQuery={searchQuery}
             onResetView={handleResetView}
           />
         )
       }}
-      toolbarControls={() => (
-        <div className={catalogPickerFiltersRowClasses}>
-          <div className={catalogPickerSortActionsGroupClasses}>
-            <CatalogPickerSortGroup
-              value={sortMode}
-              options={PROFICIENCY_PICKER_SORT_MODES.map((mode) =>
-                pickerSortOption(mode, PROFICIENCY_PICKER_SORT_LABELS[mode]),
-              )}
-              onValueChange={setSortMode}
-              triggerAriaLabel="Proficiency sort order"
-              ariaLabel="Sort proficiencies"
-            />
-          </div>
-        </div>
-      )}
+      filterRow={{
+        actions: (
+          <CatalogSortControl
+            value={sortMode}
+            options={PROFICIENCY_PICKER_SORT_MODES.map((mode) =>
+              pickerSortOption(mode, PROFICIENCY_PICKER_SORT_LABELS[mode]),
+            )}
+            onValueChange={setSortMode}
+            triggerAriaLabel="Proficiency sort order"
+            ariaLabel="Sort proficiencies"
+          />
+        ),
+      }}
       renderItemHeader={(item) => {
         const disabledNote = getProficiencyPickerDisabledNote(item)
 

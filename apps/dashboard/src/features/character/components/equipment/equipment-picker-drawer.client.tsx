@@ -3,35 +3,22 @@
 import * as React from 'react'
 import { CircleAlert } from 'lucide-react'
 
-import {
-  CatalogPickerSheet,
-  EmphasisDetailLine,
-  FilterToolbar,
-  Text,
-  type CatalogPickerSheetToolbarContext,
-} from '@rpg/ui'
+import { CatalogFilterChips, CatalogPickerSheet, EmphasisDetailLine, Text } from '@rpg/ui'
 import {
   formatMoney,
   formatWealthAsGold,
   getEquipmentKindLabel,
   isEquipmentPickerSupportedKind,
   isEquipmentStackable,
-  type EquipmentPickerSupportedKind,
 } from '@rpg/contracts'
 
 import { buildEquipmentPickerRowViewModel } from '@/features/content'
 
 import { CatalogPickerFilterCheckbox } from '../picker/catalog-picker-filter-checkbox.client'
-import {
-  catalogPickerFiltersMainClasses,
-  catalogPickerFiltersRowClasses,
-  catalogPickerSortActionsGroupClasses,
-} from '../picker/catalog-picker-filter-toolbar.variants'
-import { catalogPickerInlineSelectFilter } from '../picker/catalog-picker-select-filter.lib'
 import { catalogPickerShellProps } from '../picker/catalog-picker-shell.lib'
-import { CatalogPickerSortGroup } from '../picker/catalog-picker-sort-group.client'
+import { CatalogSortControl } from '../picker/catalog-sort-control.client'
 import { pickerSortOption } from '../picker/catalog-picker-sort-labels.lib'
-import { CatalogPickerToolbarResetSlot } from '../picker/catalog-picker-toolbar-reset-button.client'
+import { CatalogToolbarResetSlot } from '../picker/catalog-toolbar-reset-action.client'
 import {
   countEquipmentPickerAffordableHiddenImpact,
   countEquipmentPickerClearableCriteria,
@@ -82,7 +69,8 @@ function EquipmentPickerTabToolbarActions({
   selectedKind,
   showAffordableOnly,
   sortMode,
-  toolbarContext,
+  searchQuery,
+  activeTabId,
   onClearStructuredFilters,
   onResetView,
 }: {
@@ -91,14 +79,15 @@ function EquipmentPickerTabToolbarActions({
   selectedKind: EquipmentPickerKindFilter
   showAffordableOnly: boolean
   sortMode: EquipmentPickerSortMode
-  toolbarContext: CatalogPickerSheetToolbarContext
+  searchQuery: string
+  activeTabId: string
   onClearStructuredFilters: () => void
   onResetView: () => void
 }) {
   const clearableCriteriaCount = countEquipmentPickerClearableCriteria({
     selectedKind,
     showAffordableOnly,
-    searchQuery: toolbarContext.searchQuery,
+    searchQuery,
   })
   const showClearFilters =
     toolbarResetMode === 'clear_filters' &&
@@ -108,20 +97,19 @@ function EquipmentPickerTabToolbarActions({
     hasEquipmentPickerResetViewCriteria({
       selectedKind,
       showAffordableOnly,
-      searchQuery: toolbarContext.searchQuery,
+      searchQuery,
       sortMode,
-      activeTabId: toolbarContext.activeTabId,
+      activeTabId,
       defaultTabId,
     })
 
   const handleClearFilters = () => {
-    toolbarContext.clearSearchQuery()
     onClearStructuredFilters()
   }
 
   if (!showClearFilters && !showResetView) {
     return (
-      <CatalogPickerToolbarResetSlot
+      <CatalogToolbarResetSlot
         visible={false}
         label={EQUIPMENT_PICKER_RESET_VIEW_LABEL}
         onClick={() => undefined}
@@ -131,7 +119,7 @@ function EquipmentPickerTabToolbarActions({
 
   if (showClearFilters) {
     return (
-      <CatalogPickerToolbarResetSlot
+      <CatalogToolbarResetSlot
         visible
         label={EQUIPMENT_PICKER_CLEAR_FILTERS_LABEL}
         onClick={handleClearFilters}
@@ -140,7 +128,7 @@ function EquipmentPickerTabToolbarActions({
   }
 
   return (
-    <CatalogPickerToolbarResetSlot
+    <CatalogToolbarResetSlot
       visible
       label={EQUIPMENT_PICKER_RESET_VIEW_LABEL}
       onClick={onResetView}
@@ -148,86 +136,27 @@ function EquipmentPickerTabToolbarActions({
   )
 }
 
-function EquipmentPickerFilterToolbarControls({
-  kinds,
-  selectedKind,
-  onSelectedKindChange,
+function EquipmentPickerAffordableFilter({
   showAffordableOnly,
   onShowAffordableOnlyChange,
   showAffordableFilter,
   affordableHiddenCount,
-  sortMode,
-  onSortModeChange,
 }: {
-  kinds: EquipmentPickerSupportedKind[]
-  selectedKind: EquipmentPickerKindFilter
-  onSelectedKindChange: (kind: EquipmentPickerKindFilter) => void
   showAffordableOnly: boolean
   onShowAffordableOnlyChange: (checked: boolean) => void
   showAffordableFilter: boolean
   affordableHiddenCount: number
-  sortMode: EquipmentPickerSortMode
-  onSortModeChange: (mode: EquipmentPickerSortMode) => void
 }) {
-  const categoryFilterFields = React.useMemo(
-    () => [
-      catalogPickerInlineSelectFilter<{ selectedKind: EquipmentPickerKindFilter }, 'selectedKind'>({
-        key: 'selectedKind',
-        label: EQUIPMENT_PICKER_CATEGORY_LABEL,
-        ariaLabel: 'Filter by category',
-        triggerAriaLabel: 'Equipment category',
-        options: [
-          { value: EQUIPMENT_PICKER_KIND_ALL, label: 'All' },
-          ...kinds.map((kind) => ({ value: kind, label: getEquipmentKindLabel(kind) })),
-        ],
-      }),
-    ],
-    [kinds],
-  )
-
-  const showCategoryFilter = kinds.length > 1
+  if (!showAffordableFilter) return null
 
   return (
-    <div className={catalogPickerFiltersRowClasses}>
-      <div className={catalogPickerFiltersMainClasses}>
-        {showCategoryFilter ? (
-          <FilterToolbar
-            idPrefix="equipment-picker-category"
-            fields={categoryFilterFields}
-            values={{ selectedKind }}
-            className="flex-row flex-nowrap items-center gap-0"
-            onValueChange={(_key, value) => {
-              if (value !== undefined) {
-                onSelectedKindChange(value as EquipmentPickerKindFilter)
-              }
-            }}
-          />
-        ) : null}
-
-        {showAffordableFilter ? (
-          <CatalogPickerFilterCheckbox
-            id="equipment-picker-affordable-now"
-            label={EQUIPMENT_PICKER_AFFORDABLE_NOW_LABEL}
-            checked={showAffordableOnly}
-            onCheckedChange={onShowAffordableOnlyChange}
-            hiddenCount={showAffordableOnly ? affordableHiddenCount : undefined}
-          />
-        ) : null}
-      </div>
-
-      <div className={catalogPickerSortActionsGroupClasses}>
-        <CatalogPickerSortGroup
-          value={sortMode}
-          label={EQUIPMENT_PICKER_SORT_LABEL}
-          ariaLabel="Sort equipment"
-          triggerAriaLabel="Equipment sort order"
-          options={EQUIPMENT_PICKER_SORT_MODES.map((mode) =>
-            pickerSortOption(mode, EQUIPMENT_PICKER_SORT_LABELS[mode]),
-          )}
-          onValueChange={(value) => onSortModeChange(value as EquipmentPickerSortMode)}
-        />
-      </div>
-    </div>
+    <CatalogPickerFilterCheckbox
+      id="equipment-picker-affordable-now"
+      label={EQUIPMENT_PICKER_AFFORDABLE_NOW_LABEL}
+      checked={showAffordableOnly}
+      onCheckedChange={onShowAffordableOnlyChange}
+      hiddenCount={showAffordableOnly ? affordableHiddenCount : undefined}
+    />
   )
 }
 
@@ -355,6 +284,8 @@ export function EquipmentPickerDrawer({
     setShowAffordableOnly(EQUIPMENT_PICKER_VIEW_DEFAULTS.showAffordableOnly)
   }, [])
 
+  const showCategoryFilter = kindOptions.length > 1
+
   const handleQuickAdd = React.useCallback(
     (item: EquipmentPickerItem) => {
       onAddItem(item, 1)
@@ -406,13 +337,36 @@ export function EquipmentPickerDrawer({
       hasStructuredFilters={structuredFilterCount > 0}
       headerExtra={budget ? <EquipmentBudgetHeader budget={budget} /> : undefined}
       transformVisibleItems={transformVisibleItems}
-      tabToolbarActions={(toolbarContext) => {
+      primaryControls={
+        showCategoryFilter ? (
+          <CatalogFilterChips
+            id="equipment-picker-category"
+            label={EQUIPMENT_PICKER_CATEGORY_LABEL}
+            selectionMode="single-required"
+            value={selectedKind}
+            onValueChange={(value) => handleSelectedKindChange(value as EquipmentPickerKindFilter)}
+            options={[
+              { value: EQUIPMENT_PICKER_KIND_ALL, label: 'All' },
+              ...kindOptions.map((kind) => ({
+                value: kind,
+                label: getEquipmentKindLabel(kind),
+              })),
+            ]}
+          />
+        ) : undefined
+      }
+      actions={({ searchQuery, activeTabId, resetSearchQuery, resetActiveTab }) => {
         const handleResetView = () => {
           setSelectedKind(EQUIPMENT_PICKER_VIEW_DEFAULTS.selectedKind)
           setShowAffordableOnly(EQUIPMENT_PICKER_VIEW_DEFAULTS.showAffordableOnly)
           setSortMode(EQUIPMENT_PICKER_VIEW_DEFAULTS.sortMode)
-          toolbarContext.clearSearchQuery()
-          toolbarContext.resetActiveTab()
+          resetSearchQuery()
+          resetActiveTab()
+        }
+
+        const handleClearFilters = () => {
+          resetSearchQuery()
+          handleClearStructuredFilters()
         }
 
         return (
@@ -422,32 +376,42 @@ export function EquipmentPickerDrawer({
             selectedKind={selectedKind}
             showAffordableOnly={showAffordableOnly}
             sortMode={sortMode}
-            toolbarContext={toolbarContext}
-            onClearStructuredFilters={handleClearStructuredFilters}
+            searchQuery={searchQuery}
+            activeTabId={activeTabId}
+            onClearStructuredFilters={handleClearFilters}
             onResetView={handleResetView}
           />
         )
       }}
-      toolbarControls={(toolbarContext) => (
-        <EquipmentPickerFilterToolbarControls
-          kinds={kindOptions}
-          selectedKind={selectedKind}
-          onSelectedKindChange={handleSelectedKindChange}
-          showAffordableOnly={showAffordableOnly}
-          onShowAffordableOnlyChange={setShowAffordableOnly}
-          showAffordableFilter={Boolean(budget)}
-          affordableHiddenCount={countEquipmentPickerAffordableHiddenImpact(supportedItems, {
-            activeTabId: toolbarContext.activeTabId,
-            searchQuery: toolbarContext.searchQuery,
-            filterOutUnaffordable,
-            filterOutNonProficient,
-            selectedKind,
-            showAffordableOnly,
-          })}
-          sortMode={sortMode}
-          onSortModeChange={setSortMode}
-        />
-      )}
+      filterRow={{
+        controls: ({ activeTabId, searchQuery }) => (
+          <EquipmentPickerAffordableFilter
+            showAffordableOnly={showAffordableOnly}
+            onShowAffordableOnlyChange={setShowAffordableOnly}
+            showAffordableFilter={Boolean(budget)}
+            affordableHiddenCount={countEquipmentPickerAffordableHiddenImpact(supportedItems, {
+              activeTabId,
+              searchQuery,
+              filterOutUnaffordable,
+              filterOutNonProficient,
+              selectedKind,
+              showAffordableOnly,
+            })}
+          />
+        ),
+        actions: (
+          <CatalogSortControl
+            value={sortMode}
+            label={EQUIPMENT_PICKER_SORT_LABEL}
+            ariaLabel="Sort equipment"
+            triggerAriaLabel="Equipment sort order"
+            options={EQUIPMENT_PICKER_SORT_MODES.map((mode) =>
+              pickerSortOption(mode, EQUIPMENT_PICKER_SORT_LABELS[mode]),
+            )}
+            onValueChange={(value) => setSortMode(value as EquipmentPickerSortMode)}
+          />
+        ),
+      }}
       renderItemHeader={(item) => {
         const row = buildEquipmentPickerRowViewModel(item.equipment)
         const callout = getEquipmentPickerCallout(item, { isGoldShoppingPath })

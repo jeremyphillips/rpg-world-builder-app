@@ -6,17 +6,17 @@ import { Button } from '@rpg/ui'
 
 import { catalogPickerToolbarResetButtonClasses } from './catalog-picker-filter-toolbar.variants'
 
-export type CatalogPickerToolbarResetButtonProps = {
+export type CatalogToolbarResetActionProps = {
   label: string
   onClick: () => void
   tabIndex?: number
 }
 
-export function CatalogPickerToolbarResetButton({
+export function CatalogToolbarResetAction({
   label,
   onClick,
   tabIndex,
-}: CatalogPickerToolbarResetButtonProps) {
+}: CatalogToolbarResetActionProps) {
   return (
     <Button
       type="button"
@@ -32,21 +32,17 @@ export function CatalogPickerToolbarResetButton({
   )
 }
 
-export type CatalogPickerToolbarResetSlotProps = {
+export type CatalogToolbarResetSlotProps = {
   visible: boolean
   label: string
   onClick: () => void
 }
 
 /** Reserves toolbar space so the reset action does not shift sibling controls. */
-export function CatalogPickerToolbarResetSlot({
-  visible,
-  label,
-  onClick,
-}: CatalogPickerToolbarResetSlotProps) {
+export function CatalogToolbarResetSlot({ visible, label, onClick }: CatalogToolbarResetSlotProps) {
   return (
     <div className={visible ? undefined : 'invisible'} aria-hidden={visible ? undefined : true}>
-      <CatalogPickerToolbarResetButton
+      <CatalogToolbarResetAction
         label={label}
         onClick={onClick}
         tabIndex={visible ? undefined : -1}

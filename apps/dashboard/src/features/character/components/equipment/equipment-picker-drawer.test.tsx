@@ -230,8 +230,7 @@ describe('EquipmentPickerDrawer', () => {
     )
 
     await user.type(screen.getByRole('textbox', { name: 'Search catalog' }), 'rope')
-    await user.click(screen.getByRole('combobox', { name: 'Equipment category' }))
-    await user.click(screen.getByRole('option', { name: 'Weapon' }))
+    await user.click(screen.getByRole('radio', { name: 'Weapon' }))
     await user.click(screen.getByRole('checkbox', { name: EQUIPMENT_PICKER_AFFORDABLE_NOW_LABEL }))
 
     expect(
@@ -244,7 +243,7 @@ describe('EquipmentPickerDrawer', () => {
     await user.click(screen.getByRole('button', { name: EQUIPMENT_PICKER_CLEAR_FILTERS_LABEL }))
 
     expect(screen.getByRole('textbox', { name: 'Search catalog' })).toHaveValue('')
-    expect(screen.getByRole('combobox', { name: 'Equipment category' })).toHaveTextContent('All')
+    expect(screen.getByRole('radio', { name: 'All' })).toHaveAttribute('aria-checked', 'true')
     expect(
       screen.getByRole('checkbox', { name: EQUIPMENT_PICKER_AFFORDABLE_NOW_LABEL }),
     ).not.toBeChecked()
@@ -255,6 +254,29 @@ describe('EquipmentPickerDrawer', () => {
       'Best match',
     )
     expect(screen.getByRole('tab', { selected: true, name: /All/i })).toBeInTheDocument()
+  })
+
+  it('keeps category selected when the active chip is clicked again', async () => {
+    const user = userEvent.setup()
+
+    render(
+      <EquipmentPickerDrawer
+        open
+        onOpenChange={vi.fn()}
+        items={equipmentPickerItemsFixture}
+        budget={equipmentPickerBudgetFixture}
+        filterOutUnaffordable={false}
+        defaultTab="all"
+        onAddItem={vi.fn()}
+      />,
+    )
+
+    const weaponChip = screen.getByRole('radio', { name: 'Weapon' })
+    await user.click(weaponChip)
+    expect(weaponChip).toHaveAttribute('aria-checked', 'true')
+
+    await user.click(weaponChip)
+    expect(weaponChip).toHaveAttribute('aria-checked', 'true')
   })
 
   it('resets sort, tab, search, and structured filters with reset_view mode', async () => {
@@ -273,8 +295,7 @@ describe('EquipmentPickerDrawer', () => {
     )
 
     await user.type(screen.getByRole('textbox', { name: 'Search catalog' }), 'rope')
-    await user.click(screen.getByRole('combobox', { name: 'Equipment category' }))
-    await user.click(screen.getByRole('option', { name: 'Weapon' }))
+    await user.click(screen.getByRole('radio', { name: 'Weapon' }))
     await user.click(screen.getByRole('checkbox', { name: EQUIPMENT_PICKER_AFFORDABLE_NOW_LABEL }))
     await user.click(screen.getByRole('combobox', { name: 'Equipment sort order' }))
     await user.click(screen.getByRole('option', { name: 'Price: Low to high' }))
@@ -287,7 +308,7 @@ describe('EquipmentPickerDrawer', () => {
     await user.click(screen.getByRole('button', { name: EQUIPMENT_PICKER_RESET_VIEW_LABEL }))
 
     expect(screen.getByRole('textbox', { name: 'Search catalog' })).toHaveValue('')
-    expect(screen.getByRole('combobox', { name: 'Equipment category' })).toHaveTextContent('All')
+    expect(screen.getByRole('radio', { name: 'All' })).toHaveAttribute('aria-checked', 'true')
     expect(
       screen.getByRole('checkbox', { name: EQUIPMENT_PICKER_AFFORDABLE_NOW_LABEL }),
     ).not.toBeChecked()

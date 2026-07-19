@@ -13,7 +13,7 @@ import {
 
 export type { CatalogPickerSortOption } from './catalog-picker-sort-labels.lib'
 
-export type CatalogPickerSortGroupProps<TMode extends string = string> = {
+export type CatalogSortControlProps<TMode extends string = string> = {
   label?: string
   ariaLabel?: string
   triggerAriaLabel?: string
@@ -22,14 +22,14 @@ export type CatalogPickerSortGroupProps<TMode extends string = string> = {
   onValueChange: (mode: TMode) => void
 }
 
-export function CatalogPickerSortGroup<TMode extends string = string>({
+export function CatalogSortControl<TMode extends string = string>({
   label = 'Sort',
   ariaLabel = 'Sort items',
   triggerAriaLabel = 'Sort order',
   value,
   options,
   onValueChange,
-}: CatalogPickerSortGroupProps<TMode>) {
+}: CatalogSortControlProps<TMode>) {
   const selectedOption = options.find((option) => option.value === value)
   const triggerLabel = selectedOption ? resolvePickerSortTriggerLabel(selectedOption) : undefined
 
