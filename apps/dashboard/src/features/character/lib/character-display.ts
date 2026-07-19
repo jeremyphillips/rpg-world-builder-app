@@ -18,8 +18,6 @@ import {
   type Ability,
   type CharacterBuildCatalogIndex,
   type CharacterClassEntry,
-  type CharacterEquipment,
-  type CharacterEquipmentEntry,
   type CharacterNarrative,
   type CharacterProficiencies,
   type Equipment,
@@ -31,6 +29,12 @@ import {
 } from '@rpg/contracts'
 
 import { resolveLanguagePreviewLabel } from './language-preview-label'
+import {
+  buildCharacterSheetEquipmentCards,
+  buildCharacterSheetSpellCards,
+  type CharacterSheetEquipmentCard,
+  type CharacterSheetSpellCard,
+} from './detail/character-sheet-catalog'
 import {
   formatPreviewOptionalNumber,
   formatPreviewSignedNumber,
@@ -180,8 +184,8 @@ export type CharacterDetailViewModel = {
   actions: CharacterActionRowViewModel[]
   savingThrows: CharacterDetailListSection
   proficiencies: CharacterProficienciesViewModel
-  spells: CharacterDetailListSection
-  equipment: CharacterDetailListSection
+  spells: CharacterSheetSpellCard[]
+  equipment: CharacterSheetEquipmentCard[]
   wealth: CharacterWealthViewModel
   classFeatures: CharacterDetailListSection
   speciesTraits: CharacterDetailListSection
@@ -284,38 +288,6 @@ function isCharacterProficientWithWeapon(
     if (entry.weaponCategory) return entry.weaponCategory === weapon.category
     return false
   })
-}
-
-function resolveEquipmentEntryLabel(
-  entry: CharacterEquipmentEntry,
-  catalogIndex: CharacterBuildCatalogIndex,
-): string {
-  const equipment = catalogIndex.equipment.get(entry.equipmentId)
-  const baseName = entry.customName ?? equipment?.name ?? formatContentIdLabel(entry.equipmentId)
-  return entry.quantity > 1 ? `${baseName} ×${entry.quantity}` : baseName
-}
-
-function collectEquipmentEntries(
-  equipment: CharacterEquipment,
-  catalogIndex: CharacterBuildCatalogIndex,
-): CharacterDetailListItem[] {
-  const buckets = [
-    equipment.weapons,
-    equipment.armor,
-    equipment.tools,
-    equipment.gear,
-    equipment.magicItems,
-    equipment.vehicles,
-    equipment.mounts,
-  ] as const
-
-  return buckets.flatMap((entries) =>
-    entries.map((entry) => ({
-      id: entry.entryId ?? entry.equipmentId,
-      label: resolveEquipmentEntryLabel(entry, catalogIndex),
-      detail: entry.equipped ? 'Equipped' : undefined,
-    })),
-  )
 }
 
 function buildActionRows(
@@ -456,23 +428,6 @@ function buildProficienciesSection(
     title: CHARACTER_SECTION_LABELS.proficiencies,
     groups,
     emptyText: CHARACTER_EMPTY_SECTION_TEXT.proficiencies,
-  }
-}
-
-function buildSpellsSection(
-  character: PcCharacter,
-  catalogIndex: CharacterBuildCatalogIndex,
-): CharacterDetailListSection {
-  const items = character.spells.map((entry) => ({
-    id: entry.spellId,
-    label: catalogIndex.spells.get(entry.spellId)?.name ?? formatContentIdLabel(entry.spellId),
-    detail: entry.selection?.prepared ? 'Prepared' : undefined,
-  }))
-
-  return {
-    title: CHARACTER_SECTION_LABELS.spells,
-    items,
-    emptyText: CHARACTER_EMPTY_SECTION_TEXT.spells,
   }
 }
 
@@ -666,7 +621,6 @@ export function buildCharacterDetailViewModel({
   xpProgression,
 }: CharacterDisplayInput): CharacterDetailViewModel {
   const level = getCharacterTotalLevel(character)
-  const equipmentItems = collectEquipmentEntries(character.equipment, catalogIndex)
 
   return {
     id: character.id,
@@ -681,12 +635,8 @@ export function buildCharacterDetailViewModel({
     actions: buildActionRows(character, catalogIndex, level),
     savingThrows: buildSavingThrowSection(character, catalogIndex, rules),
     proficiencies: buildProficienciesSection(character, catalogIndex, rules),
-    spells: buildSpellsSection(character, catalogIndex),
-    equipment: {
-      title: CHARACTER_SECTION_LABELS.equipment,
-      items: equipmentItems,
-      emptyText: CHARACTER_EMPTY_SECTION_TEXT.equipment,
-    },
+    spells: buildCharacterSheetSpellCards(character, catalogIndex),
+    equipment: buildCharacterSheetEquipmentCards(character, catalogIndex),
     wealth: {
       label: CHARACTER_SECTION_LABELS.wealth,
       value: `${character.wealth.gp} gp`,

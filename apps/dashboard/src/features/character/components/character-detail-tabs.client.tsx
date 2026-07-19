@@ -11,16 +11,19 @@ import {
   type CharacterDetailListSection,
   type CharacterWealthViewModel,
 } from '../lib/character-display'
+import type {
+  CharacterSheetEquipmentCard,
+  CharacterSheetSpellCard,
+} from '../lib/detail/character-sheet-catalog'
 import { narrativeFieldCount } from '../lib/narrative-preview'
+import { CharacterDetailEquipmentTab } from './detail/character-detail-equipment-tab.client'
 import { CharacterDetailNarrativeSection } from './character-detail-narrative-section.client'
-import {
-  characterDetailListItemClasses,
-  characterDetailTabPanelClasses,
-} from './character-detail-sheet.variants'
+import { CharacterDetailSpellsTab } from './detail/character-detail-spells-tab.client'
+import { characterDetailTabPanelClasses } from './character-detail-sheet.variants'
 
 export type CharacterDetailTabsProps = {
-  spells: CharacterDetailListSection
-  equipment: CharacterDetailListSection
+  spells: readonly CharacterSheetSpellCard[]
+  equipment: readonly CharacterSheetEquipmentCard[]
   wealth: CharacterWealthViewModel
   classFeatures: CharacterDetailListSection
   speciesTraits: CharacterDetailListSection
@@ -53,18 +56,13 @@ export function CharacterDetailTabs({
 
       <TabsContent value="spells">
         <CharacterDetailTabPanel>
-          <CharacterDetailListItems items={spells.items} emptyText={spells.emptyText} />
+          <CharacterDetailSpellsTab cards={spells} />
         </CharacterDetailTabPanel>
       </TabsContent>
 
       <TabsContent value="equipment">
         <CharacterDetailTabPanel>
-          <div className="space-y-4">
-            <Text variant="muted">
-              {wealth.label}: {wealth.value}
-            </Text>
-            <CharacterDetailListItems items={equipment.items} emptyText={equipment.emptyText} />
-          </div>
+          <CharacterDetailEquipmentTab cards={equipment} wealth={wealth} />
         </CharacterDetailTabPanel>
       </TabsContent>
 
@@ -108,7 +106,7 @@ function CharacterDetailListItems({
   return (
     <ul className="space-y-2">
       {items.map((item) => (
-        <li key={item.id} className={characterDetailListItemClasses}>
+        <li key={item.id} className="rounded-md bg-surface-subtle px-3 py-2">
           <div className="font-medium">{item.label}</div>
           {item.detail ? <div className="text-muted-foreground">{item.detail}</div> : null}
         </li>

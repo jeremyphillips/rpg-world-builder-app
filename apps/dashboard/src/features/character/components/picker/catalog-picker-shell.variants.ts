@@ -2,13 +2,6 @@ export const catalogPickerHeadlineClasses = 'heading-style-sheet-title'
 
 export const catalogPickerSheetContentClasses = 'bg-background'
 
-/** Collapsible row shell — drop default bottom pad; expanded body owns vertical rhythm. */
-export const catalogPickerRowShellClasses = 'pb-0'
-
-/** Expanded panel wash — bleeds to shell edges; inner details pad restores copy alignment with header. */
-export const catalogPickerRowBodyClasses =
-  'border-t border-border-subtle bg-surface-muted -ml-2 -mr-3 pb-3 pt-0'
-
 export { insetPanelEmptyStateClasses as catalogPickerEmptyStateClasses } from '@rpg/ui'
 
 export const catalogPickerDisabledRowClasses = 'opacity-60'

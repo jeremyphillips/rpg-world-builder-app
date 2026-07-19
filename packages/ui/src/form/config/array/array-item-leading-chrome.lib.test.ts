@@ -30,8 +30,8 @@ describe('resolveArrayItemLeadingChrome', () => {
     expect(caretOnly.chromeCount).toBe(1)
     expect(gripOnly.chromeCount).toBe(1)
     expect(caretOnly.chromeColumnClasses).toBe(arrayItemChromeColumnClasses)
-    expect(caretOnly.toolbarContentGapClasses).toContain('pl-[calc(var(--spacing)*1)]')
-    expect(gripOnly.contentColumnIndentClasses).toContain('--array-item-chrome-count')
+    expect(caretOnly.toolbarContentGapClasses).toContain('pl-[var(--leading-chrome-gap)]')
+    expect(gripOnly.contentColumnIndentClasses).toContain('--content-column-indent')
   })
 
   it('reserves two chrome columns when grip and caret are both visible', () => {

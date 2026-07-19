@@ -24,8 +24,7 @@ import {
   resolveModeBrowseState,
   updateModeBrowseState,
 } from '../picker/catalog-picker-browse-mode.lib'
-import { CatalogPickerItemHeader } from '../picker/catalog-picker-item-header.client'
-import { CatalogPickerItemMarkers } from '../picker/catalog-picker-item-markers.client'
+import { SpellCatalogItemHeader } from '@/features/content'
 import { CatalogPickerLevelChips } from '../picker/catalog-picker-mechanics-filter-popover.client'
 import { CatalogPickerFilterPopover } from '../picker/catalog-picker-mechanics-filter-popover.client'
 import { mapSpellPickerCompactSummaryToMetadataLines } from '../picker/catalog-picker-metadata'
@@ -523,19 +522,15 @@ export function SpellPickerDrawer({
         const markers = collectSpellPickerMarkers(item.spell, item.compactSummary)
 
         return (
-          <CatalogPickerItemHeader
+          <SpellCatalogItemHeader
             name={item.spell.name}
             metadataLines={mapSpellPickerCompactSummaryToMetadataLines(item.compactSummary)}
-            disabled={isSpellPickerRowDimmed(item)}
-            footer={
-              <>
-                {recommendationsEnabled && item.state.isRecommended ? (
-                  <CatalogPickerItemMarkers markers={['Recommended']} />
-                ) : null}
-                <CatalogPickerItemMarkers markers={markers} />
-                {disabledNote ? <Text variant="muted">{disabledNote}</Text> : null}
-              </>
-            }
+            markers={[
+              ...(recommendationsEnabled && item.state.isRecommended ? ['Recommended'] : []),
+              ...markers,
+            ]}
+            tone={isSpellPickerRowDimmed(item) ? 'muted' : 'default'}
+            footer={disabledNote ? <Text variant="muted">{disabledNote}</Text> : undefined}
             actions={
               <CatalogPickerSelectionActions
                 selected={item.state.isAlreadySelected}

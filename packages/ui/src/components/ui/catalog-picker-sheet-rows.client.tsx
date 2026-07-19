@@ -7,6 +7,7 @@ import type { CatalogPickerSheetProps } from './catalog-picker-sheet.types'
 import type { CollapsibleListItemShellPreset } from './collapsible-list-item/collapsible-list-item-shell.client'
 import type { FieldSurfaceVariant } from './field-surface.variants'
 import { catalogPickerSheetListVariants } from './catalog-picker-sheet.variants'
+import { resolveCollapsibleListItemDomIds } from './collapsible-list-item/collapsible-list-item.variants'
 
 function CatalogPickerCollapsibleItemRow<TItem>({
   item,
@@ -19,8 +20,6 @@ function CatalogPickerCollapsibleItemRow<TItem>({
   rowPreset,
   rowSurface = 'base',
   toolbarCompact = false,
-  rowBodyClassName,
-  rowShellClassName,
 }: {
   item: TItem
   itemKey: string
@@ -32,30 +31,22 @@ function CatalogPickerCollapsibleItemRow<TItem>({
   rowPreset?: CollapsibleListItemShellPreset
   rowSurface?: FieldSurfaceVariant
   toolbarCompact?: boolean
-  rowBodyClassName?: string
-  rowShellClassName?: string
 }) {
-  const titleId = `${itemKey}-title`
-  const bodyId = `${itemKey}-body`
-  const [collapsed, setCollapsed] = React.useState(true)
+  const domIds = resolveCollapsibleListItemDomIds(itemKey)
   const hasDetails = Boolean(renderItemDetails)
 
   return (
     <div data-picker-item-key={itemKey}>
       <CollapsibleListItem
-        itemId={itemKey}
-        titleId={titleId}
-        bodyId={bodyId}
+        itemId={domIds.itemId}
+        titleId={domIds.titleId}
+        bodyId={domIds.bodyId}
         toolbarAriaLabel={toolbarLabel}
         preset={rowPreset}
         surface={rowSurface}
         toolbarCompact={toolbarCompact}
-        className={rowShellClassName}
-        bodyClassName={rowBodyClassName}
         actionsAlign="center"
         collapsible={hasDetails}
-        collapsed={collapsed}
-        onToggleCollapse={() => setCollapsed((current) => !current)}
         showDragHandle={false}
         header={renderItemHeader(item)}
         summary={renderItemSummary?.(item)}
@@ -93,8 +84,6 @@ export function CatalogPickerSheetResults<TItem>({
               rowPreset={rowProps.rowPreset}
               rowSurface={rowProps.rowSurface}
               toolbarCompact={rowProps.toolbarCompact}
-              rowBodyClassName={rowProps.rowBodyClassName}
-              rowShellClassName={rowProps.rowShellClassName}
             />
           </div>
         )

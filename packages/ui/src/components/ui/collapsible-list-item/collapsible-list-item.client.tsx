@@ -1,8 +1,6 @@
 'use client'
 
 import * as React from 'react'
-import type { DraggableAttributes } from '@dnd-kit/core'
-import type { SyntheticListenerMap } from '@dnd-kit/core/dist/hooks/utilities'
 
 import { cn } from '../../../lib/utils'
 import { CollapsibleListItemActions } from './collapsible-list-item-actions.client'
@@ -20,22 +18,27 @@ import {
 } from './collapsible-list-item-toolbar.client'
 import {
   collapsibleListItemBodyClasses,
+  resolveCollapsibleListItemDomIds,
   type CollapsibleListItemLeadingChromeOptions,
 } from './collapsible-list-item.variants'
+import {
+  buildCollapsibleListItemLeadingChrome,
+  resolveCollapsibleListItemActionsAlign,
+  resolveCollapsibleListItemDragHandleProps,
+  type CollapsibleListItemDragHandleConfig,
+} from './collapsible-list-item-root.lib'
 
-export type CollapsibleListItemDragHandleConfig = {
-  attributes: DraggableAttributes
-  listeners: SyntheticListenerMap | undefined
-  isDragging?: boolean
-}
+export type { CollapsibleListItemDragHandleConfig } from './collapsible-list-item-root.lib'
 
 export interface CollapsibleListItemProps {
   itemId: string
-  titleId: string
+  titleId?: string
   toolbarAriaLabel: string
   collapsible?: boolean
-  collapsed: boolean
-  onToggleCollapse: () => void
+  collapsed?: boolean
+  onToggleCollapse?: () => void
+  /** Uncontrolled initial state when `collapsed` is omitted. Defaults to collapsed. */
+  defaultCollapsed?: boolean
   showDragHandle?: boolean
   dragHandleProps?: CollapsibleListItemDragHandleConfig
   preset?: CollapsibleListItemShellPreset
@@ -85,17 +88,35 @@ function useCollapsibleListItemContext(component: string): CollapsibleListItemCo
   return context
 }
 
-function resolveBodyId(itemId: string, bodyId?: string): string {
-  return bodyId ?? `${itemId}-body`
+function useCollapseState(
+  collapsed: boolean | undefined,
+  onToggleCollapse: (() => void) | undefined,
+  defaultCollapsed = true,
+): readonly [boolean, () => void] {
+  const [internalCollapsed, setInternalCollapsed] = React.useState(defaultCollapsed)
+  const isControlled = collapsed !== undefined
+
+  const resolvedCollapsed = isControlled ? collapsed : internalCollapsed
+  const resolvedToggle = React.useCallback(() => {
+    if (isControlled) {
+      onToggleCollapse?.()
+      return
+    }
+
+    setInternalCollapsed((current) => !current)
+  }, [isControlled, onToggleCollapse])
+
+  return [resolvedCollapsed, resolvedToggle] as const
 }
 
 function CollapsibleListItemRoot({
   itemId,
-  titleId,
+  titleId: titleIdProp,
   toolbarAriaLabel,
   collapsible = false,
-  collapsed,
+  collapsed: collapsedProp,
   onToggleCollapse,
+  defaultCollapsed = true,
   showDragHandle = false,
   dragHandleProps,
   preset = 'default',
@@ -114,22 +135,21 @@ function CollapsibleListItemRoot({
   bodyId,
   actions,
 }: CollapsibleListItemProps) {
-  const resolvedBodyId = resolveBodyId(itemId, bodyId)
+  const domIds = resolveCollapsibleListItemDomIds(itemId)
+  const titleId = titleIdProp ?? domIds.titleId
+  const resolvedBodyId = bodyId ?? domIds.bodyId
+  const [collapsed, handleToggleCollapse] = useCollapseState(
+    collapsedProp,
+    onToggleCollapse,
+    defaultCollapsed,
+  )
   const gripVisible = showDragHandle && Boolean(dragHandleProps)
-  const actionsAlign =
-    actionsAlignProp ?? (gripVisible || layout === 'compactRow' ? 'start' : 'center')
-  const leadingChrome: CollapsibleListItemLeadingChromeOptions = {
-    showDragHandle: gripVisible,
-    collapsible,
-  }
-
-  const resolvedDragHandleProps = dragHandleProps
-    ? {
-        ariaLabel: `Drag to reorder ${toolbarAriaLabel}`,
-        attributes: dragHandleProps.attributes,
-        listeners: dragHandleProps.listeners,
-      }
-    : undefined
+  const actionsAlign = resolveCollapsibleListItemActionsAlign(actionsAlignProp, gripVisible, layout)
+  const leadingChrome = buildCollapsibleListItemLeadingChrome(gripVisible, collapsible)
+  const resolvedDragHandleProps = resolveCollapsibleListItemDragHandleProps(
+    toolbarAriaLabel,
+    dragHandleProps,
+  )
 
   const contextValue = React.useMemo(
     (): CollapsibleListItemContextValue => ({
@@ -140,7 +160,7 @@ function CollapsibleListItemRoot({
       leadingChrome,
       collapsible,
       collapsed,
-      onToggleCollapse,
+      onToggleCollapse: handleToggleCollapse,
       gripVisible,
       dragHandleProps: resolvedDragHandleProps,
       preset,
@@ -159,7 +179,7 @@ function CollapsibleListItemRoot({
       leadingChrome,
       collapsible,
       collapsed,
-      onToggleCollapse,
+      handleToggleCollapse,
       gripVisible,
       resolvedDragHandleProps,
       preset,
@@ -196,7 +216,7 @@ function CollapsibleListItemRoot({
             dragHandleProps={resolvedDragHandleProps}
             collapsible={collapsible}
             collapsed={collapsed}
-            onToggleCollapse={onToggleCollapse}
+            onToggleCollapse={handleToggleCollapse}
             bodyId={resolvedBodyId}
             compact={toolbarCompact}
             header={header}
@@ -209,7 +229,10 @@ function CollapsibleListItemRoot({
             <CollapsibleListItemBody
               bodyId={resolvedBodyId}
               hidden={collapsed}
-              className={cn(collapsibleListItemBodyClasses(leadingChrome), bodyClassName)}
+              className={cn(
+                collapsibleListItemBodyClasses({ ...leadingChrome, preset }),
+                bodyClassName,
+              )}
             >
               {body}
             </CollapsibleListItemBody>
@@ -228,28 +251,32 @@ function CollapsibleListItemCompoundRoot({
 }: Omit<CollapsibleListItemProps, 'header' | 'summary' | 'body'> & {
   children: React.ReactNode
 }) {
-  const resolvedBodyId = resolveBodyId(props.itemId, props.bodyId)
+  const domIds = resolveCollapsibleListItemDomIds(props.itemId)
+  const titleId = props.titleId ?? domIds.titleId
+  const resolvedBodyId = props.bodyId ?? domIds.bodyId
   const gripVisible = (props.showDragHandle ?? false) && Boolean(props.dragHandleProps)
   const collapsible = props.collapsible ?? false
+  const [collapsed, handleToggleCollapse] = useCollapseState(
+    props.collapsed,
+    props.onToggleCollapse,
+    props.defaultCollapsed ?? true,
+  )
 
   const contextValue = React.useMemo(
     (): CollapsibleListItemContextValue => ({
       itemId: props.itemId,
-      titleId: props.titleId,
+      titleId,
       bodyId: resolvedBodyId,
       toolbarAriaLabel: props.toolbarAriaLabel,
       leadingChrome: { showDragHandle: gripVisible, collapsible },
       collapsible,
-      collapsed: props.collapsed,
-      onToggleCollapse: props.onToggleCollapse,
+      collapsed,
+      onToggleCollapse: handleToggleCollapse,
       gripVisible,
-      dragHandleProps: props.dragHandleProps
-        ? {
-            ariaLabel: `Drag to reorder ${props.toolbarAriaLabel}`,
-            attributes: props.dragHandleProps.attributes,
-            listeners: props.dragHandleProps.listeners,
-          }
-        : undefined,
+      dragHandleProps: resolveCollapsibleListItemDragHandleProps(
+        props.toolbarAriaLabel,
+        props.dragHandleProps,
+      ),
       preset: props.preset ?? 'default',
       surface: props.surface,
       status: props.status,
@@ -258,13 +285,13 @@ function CollapsibleListItemCompoundRoot({
       itemPrefix: props.itemPrefix,
       className: props.className,
     }),
-    [props, resolvedBodyId, gripVisible, collapsible],
+    [props, titleId, resolvedBodyId, gripVisible, collapsible, collapsed, handleToggleCollapse],
   )
 
   return (
     <CollapsibleListItemContext.Provider value={contextValue}>
       <CollapsibleListItemShell
-        titleId={props.titleId}
+        titleId={titleId}
         itemPrefix={props.itemPrefix}
         showDragHandle={gripVisible}
         collapsible={collapsible}
@@ -360,7 +387,10 @@ function CollapsibleListItemCompoundBody({
     <CollapsibleListItemBody
       bodyId={resolvedBodyId}
       hidden={isHidden}
-      className={cn(collapsibleListItemBodyClasses(context.leadingChrome), className)}
+      className={cn(
+        collapsibleListItemBodyClasses({ ...context.leadingChrome, preset: context.preset }),
+        className,
+      )}
     >
       {children}
     </CollapsibleListItemBody>

@@ -5,9 +5,9 @@ import { Check, TriangleAlert } from 'lucide-react'
 
 import { Badge } from '@rpg/ui'
 
+import { EquipmentCatalogItemHeader } from '@/features/content/equipment'
 import type { EquipmentPickerRowViewModel } from '@/features/content'
 
-import { CatalogPickerItemHeader } from '../picker/catalog-picker-item-header.client'
 import { mapEquipmentCompactSummaryToMetadataLines } from '../picker/catalog-picker-metadata'
 import { getEquipmentCalloutPresentation } from './equipment-picker-callout-presentation.lib'
 import type { EquipmentPickerCallout } from './equipment-picker-drawer.types'
@@ -36,10 +36,10 @@ export function EquipmentPickerItemHeader({
   })
 
   return (
-    <CatalogPickerItemHeader
+    <EquipmentCatalogItemHeader
       name={item.name}
       metadataLines={metadataLines}
-      disabled={disabled}
+      tone={disabled ? 'muted' : 'default'}
       footer={
         <div className={EQUIPMENT_PICKER_ITEM_HEADER_FOOTER_META_CLASSES}>
           <span className={EQUIPMENT_PICKER_ITEM_HEADER_KIND_CLASSES}>{item.kindLabel}</span>

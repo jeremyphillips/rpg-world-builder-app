@@ -74,6 +74,18 @@ export {
   type SpellDisplayVocabulary,
 } from './spells/lib/spell-display'
 export { SpellDetailMetadata } from './spells/components/spell-detail-metadata.client'
+export { SpellCatalogItemHeader } from './spells/components/spell-catalog-item-header.client'
+export type {
+  SpellCatalogItemHeaderProps,
+  SpellMarker,
+} from './spells/components/spell-catalog-item-header.client'
+export {
+  CatalogCollapsibleList,
+  buildCatalogDisclosureLabel,
+  CatalogMetadataRenderer,
+  type CatalogCollapsibleListProps,
+  type CatalogMetadataLine,
+} from './components/catalog'
 export {
   ContentCreateShell,
   ContentFormShellResolver,
