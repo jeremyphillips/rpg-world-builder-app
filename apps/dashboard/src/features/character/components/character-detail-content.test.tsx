@@ -44,8 +44,12 @@ describe('CharacterDetailContent', () => {
     expect(screen.getByRole('heading', { name: 'Verna' })).toBeInTheDocument()
     expect(screen.getByText('Dwarf · Level 1 Fighter')).toBeInTheDocument()
     expect(screen.getByText('0 XP')).toBeInTheDocument()
+    expect(screen.getByText('Hit points')).toBeInTheDocument()
+    expect(screen.getByText('Proficiency')).toBeInTheDocument()
+    expect(screen.getByText('Bonus')).toBeInTheDocument()
     expect(screen.getByText('Current')).toBeInTheDocument()
     expect(screen.getByText('Max')).toBeInTheDocument()
+    expect(screen.getByText('Temp')).toBeInTheDocument()
   })
 
   it('renders tab panels for spells, equipment, features, and narrative', async () => {

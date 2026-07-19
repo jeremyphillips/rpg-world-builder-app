@@ -40,8 +40,9 @@ export const CHARACTER_STAT_LABELS = {
   armorClass: 'AC',
   initiative: 'Initiative',
   speed: 'Speed',
-  proficiencyBonus: 'Proficiency bonus',
-  hitPoints: 'HP',
+  proficiency: 'Proficiency',
+  proficiencyBonusFooter: 'Bonus',
+  hitPoints: 'Hit points',
   experience: 'XP',
 } as const
 
@@ -99,13 +100,20 @@ export type CharacterCardViewModel = {
   summary: string
 }
 
+export type CharacterDetailStatTileFooterKind = 'meta' | 'label'
+
+export type CharacterDetailStatTileFooter = {
+  kind: CharacterDetailStatTileFooterKind
+  text: string
+}
+
 export type CharacterDetailStatTileId = 'ac' | 'initiative' | 'speed' | 'proficiencyBonus'
 
 export type CharacterDetailStatTile = {
   id: CharacterDetailStatTileId
   label: string
   value: string
-  caption?: string
+  footer?: CharacterDetailStatTileFooter
 }
 
 export type CharacterAbilityTile = {
@@ -553,9 +561,12 @@ function resolvePrimaryMovementMode(species: Species | undefined): MovementMode 
   return MOVEMENT_MODES.find((mode) => speeds[mode] !== undefined)
 }
 
-function resolveSpeedStatTile(
-  species: Species | undefined,
-): Pick<CharacterDetailStatTile, 'value' | 'caption'> {
+function resolveSpeedStatTile(species: Species | undefined): Pick<
+  CharacterDetailStatTile,
+  'value'
+> & {
+  footer?: CharacterDetailStatTileFooter
+} {
   const mode = resolvePrimaryMovementMode(species)
   if (!mode) return { value: '—' }
 
@@ -565,7 +576,7 @@ function resolveSpeedStatTile(
 
   return {
     value: String(feet),
-    caption: getMovementModeLabel(mode),
+    footer: { kind: 'meta', text: getMovementModeLabel(mode) },
   }
 }
 
@@ -594,12 +605,13 @@ function buildStats(
       id: 'speed',
       label: CHARACTER_STAT_LABELS.speed,
       value: speed.value,
-      caption: speed.caption,
+      footer: speed.footer,
     },
     {
       id: 'proficiencyBonus',
-      label: CHARACTER_STAT_LABELS.proficiencyBonus,
+      label: CHARACTER_STAT_LABELS.proficiency,
       value: formatPreviewOptionalNumber(profile.proficiencyBonus, '+'),
+      footer: { kind: 'label', text: CHARACTER_STAT_LABELS.proficiencyBonusFooter },
     },
   ]
 }

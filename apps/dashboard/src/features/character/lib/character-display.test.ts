@@ -61,14 +61,18 @@ describe('buildCharacterDetailViewModel', () => {
     expect(viewModel.stats).toEqual(
       expect.arrayContaining([
         expect.objectContaining({ id: 'ac', label: 'AC' }),
-        expect.objectContaining({ id: 'speed', caption: 'Walk', value: '30' }),
+        expect.objectContaining({
+          id: 'speed',
+          footer: { kind: 'meta', text: 'Walk' },
+          value: '30',
+        }),
       ]),
     )
     expect(viewModel.stats.find((stat) => stat.id === 'speed')).toEqual({
       id: 'speed',
       label: 'Speed',
       value: '30',
-      caption: 'Walk',
+      footer: { kind: 'meta', text: 'Walk' },
     })
     expect(viewModel.hitPoints).toEqual({
       current: '11',

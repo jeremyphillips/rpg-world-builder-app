@@ -11,7 +11,6 @@ import { useDeleteCharacter } from '../hooks/use-delete-character'
 import type { CharacterDetailViewModel } from '../lib/character-display'
 import { CharacterDetailAbilitiesRow } from './character-detail-abilities-row.client'
 import { CharacterDetailCombatRow } from './character-detail-combat-row.client'
-import { CharacterDetailHitPoints } from './character-detail-hit-points.client'
 import { CharacterDetailStatsRow } from './character-detail-stats-row.client'
 import { CharacterDetailTabs } from './character-detail-tabs.client'
 
@@ -56,8 +55,7 @@ export function CharacterDetailContent({ viewModel }: CharacterDetailContentProp
       </header>
 
       <CharacterDetailAbilitiesRow abilities={viewModel.abilities} />
-      <CharacterDetailStatsRow stats={viewModel.stats} />
-      <CharacterDetailHitPoints hitPoints={viewModel.hitPoints} />
+      <CharacterDetailStatsRow stats={viewModel.stats} hitPoints={viewModel.hitPoints} />
       <CharacterDetailCombatRow
         actions={viewModel.actions}
         savingThrows={viewModel.savingThrows}
