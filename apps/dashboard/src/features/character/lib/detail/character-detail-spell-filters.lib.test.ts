@@ -8,34 +8,11 @@ import {
   formatCharacterDetailSpellLevelChipLabel,
   resolveCharacterDetailSpellLevelChipOptions,
 } from './character-detail-spell-filters.lib'
-import type { CharacterSheetSpellCard } from './character-sheet-catalog'
-
-function resolvedSpellCard(
-  spell: ReturnType<typeof pickSpell>,
-  id = spell.id,
-): CharacterSheetSpellCard {
-  return {
-    id,
-    displayName: spell.name,
-    referenceId: spell.id,
-    prepared: true,
-    sources: [{ label: 'Class' }],
-    status: 'resolved',
-    spell,
-    entry: {
-      spellId: spell.id,
-      sources: [
-        { kind: 'classSpellcasting', sourceId: 'srd-cc-5.2.1:wizard', grantId: 'cantrips' },
-      ],
-      access: { classKnown: true },
-      selection: { prepared: true },
-    },
-  }
-}
+import { resolvedSpellSheetCardFixture } from './character-sheet-catalog.fixtures'
 
 describe('character-detail-spell-filters.lib', () => {
-  const cantrip = resolvedSpellCard(pickSpell('fire-bolt'), 'cantrip-1')
-  const firstLevel = resolvedSpellCard(pickSpell('magic-missile'), 'spell-1')
+  const cantrip = resolvedSpellSheetCardFixture(pickSpell('fire-bolt'), 'cantrip-1')
+  const firstLevel = resolvedSpellSheetCardFixture(pickSpell('magic-missile'), 'spell-1')
 
   it('formats level chip labels as plain numbers', () => {
     expect(formatCharacterDetailSpellLevelChipLabel(0)).toBe('0')

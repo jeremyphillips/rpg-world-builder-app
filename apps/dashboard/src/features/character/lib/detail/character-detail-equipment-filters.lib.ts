@@ -6,6 +6,11 @@ import {
 } from '@rpg/contracts'
 import { normalizeSearchQuery } from '@rpg/ui'
 
+import {
+  CHARACTER_DETAIL_CATALOG_SEARCH_MIN_ITEMS,
+  countCharacterDetailStructuredFilters,
+  matchesCharacterDetailCatalogSearchQuery,
+} from './character-detail-catalog-filters.lib'
 import type { CharacterSheetEquipmentCard } from './character-sheet-catalog'
 
 export const CHARACTER_DETAIL_EQUIPMENT_KIND_ALL = '__all__' as const
@@ -45,8 +50,7 @@ export const CHARACTER_DETAIL_EQUIPMENT_VIEW_DEFAULTS = {
   searchQuery: '',
 } as const
 
-/** Show search once the inventory is large enough to benefit from it. */
-export const CHARACTER_DETAIL_EQUIPMENT_SEARCH_MIN_ITEMS = 6
+export const CHARACTER_DETAIL_EQUIPMENT_SEARCH_MIN_ITEMS = CHARACTER_DETAIL_CATALOG_SEARCH_MIN_ITEMS
 
 const equipmentNameCollator = new Intl.Collator(undefined, {
   sensitivity: 'base',
@@ -70,15 +74,7 @@ export function resolveCharacterDetailEquipmentKindOptions(
 export function countCharacterDetailEquipmentStructuredFilters(
   selectedKind: CharacterDetailEquipmentKindFilter,
 ): number {
-  return selectedKind === CHARACTER_DETAIL_EQUIPMENT_KIND_ALL ? 0 : 1
-}
-
-function matchesEquipmentSearchQuery(
-  card: CharacterSheetEquipmentCard,
-  normalizedQuery: string,
-): boolean {
-  if (normalizedQuery.length === 0) return true
-  return normalizeSearchQuery(card.displayName).includes(normalizedQuery)
+  return countCharacterDetailStructuredFilters(selectedKind, CHARACTER_DETAIL_EQUIPMENT_KIND_ALL)
 }
 
 export function filterCharacterDetailEquipmentCards(
@@ -91,7 +87,7 @@ export function filterCharacterDetailEquipmentCards(
   const normalizedQuery = normalizeSearchQuery(options.searchQuery)
 
   return cards.filter((card) => {
-    if (!matchesEquipmentSearchQuery(card, normalizedQuery)) return false
+    if (!matchesCharacterDetailCatalogSearchQuery(card, normalizedQuery)) return false
 
     if (options.selectedKind === CHARACTER_DETAIL_EQUIPMENT_KIND_ALL) return true
     if (card.status !== 'resolved') return false

@@ -31,6 +31,7 @@ import {
 } from '@rpg/contracts'
 
 import { resolveLanguagePreviewLabel } from './language-preview-label'
+import { formatContentReferenceLabel } from './format-content-reference-label'
 import {
   buildCharacterSheetEquipmentCards,
   buildCharacterSheetSpellCards,
@@ -202,14 +203,6 @@ export type CharacterDisplayInput = {
   xpProgression: Pick<XpProgressionBody, 'entries'>
 }
 
-function formatContentIdLabel(id: string): string {
-  const slug = id.includes(':') ? (id.split(':').pop() ?? id) : id
-  return slug
-    .split('-')
-    .map((segment) => segment.charAt(0).toUpperCase() + segment.slice(1))
-    .join(' ')
-}
-
 function resolveHeritageName(
   catalogIndex: CharacterBuildCatalogIndex,
   speciesRef: Character['species'],
@@ -221,16 +214,16 @@ function resolveHeritageName(
   const heritageOption = species?.heritage?.options.find((option) => option.id === heritageId)
   return heritageOption
     ? resolveTraitDisplay(heritageOption).name
-    : formatContentIdLabel(heritageId)
+    : formatContentReferenceLabel(heritageId)
 }
 
 function resolveClassName(catalogIndex: CharacterBuildCatalogIndex, classId: string): string {
-  return catalogIndex.classes.get(classId)?.name ?? formatContentIdLabel(classId)
+  return catalogIndex.classes.get(classId)?.name ?? formatContentReferenceLabel(classId)
 }
 
 function resolveSubclassLabel(subclassId: string | undefined): string | undefined {
   if (!subclassId) return undefined
-  return formatContentIdLabel(subclassId)
+  return formatContentReferenceLabel(subclassId)
 }
 
 function formatSingleClassSegment(
@@ -257,7 +250,7 @@ export function formatCharacterSummary(
   catalogIndex: CharacterBuildCatalogIndex,
 ): string {
   const species = catalogIndex.species.get(character.species.id)
-  const speciesName = species?.name ?? formatContentIdLabel(character.species.id)
+  const speciesName = species?.name ?? formatContentReferenceLabel(character.species.id)
   const heritageName = resolveHeritageName(catalogIndex, character.species)
   const speciesPart = heritageName ? `${speciesName} (${heritageName})` : speciesName
   const totalLevel = getCharacterTotalLevel(character)
@@ -398,9 +391,9 @@ function buildProficienciesSection(
         id: weapon.weaponId ?? `${weapon.weaponCategory ?? 'weapon'}-${index}`,
         label: weapon.weaponId
           ? (catalogIndex.equipment.get(weapon.weaponId)?.name ??
-            formatContentIdLabel(weapon.weaponId))
+            formatContentReferenceLabel(weapon.weaponId))
           : weapon.weaponCategory
-            ? formatContentIdLabel(weapon.weaponCategory)
+            ? formatContentReferenceLabel(weapon.weaponCategory)
             : 'Weapon proficiency',
       })),
     ),
@@ -410,9 +403,10 @@ function buildProficienciesSection(
       character.proficiencies.tools.map((tool, index) => ({
         id: tool.toolId ?? `${tool.toolCategory ?? 'tool'}-${index}`,
         label: tool.toolId
-          ? (catalogIndex.equipment.get(tool.toolId)?.name ?? formatContentIdLabel(tool.toolId))
+          ? (catalogIndex.equipment.get(tool.toolId)?.name ??
+            formatContentReferenceLabel(tool.toolId))
           : tool.toolCategory
-            ? formatContentIdLabel(tool.toolCategory)
+            ? formatContentReferenceLabel(tool.toolCategory)
             : 'Tool proficiency',
       })),
     ),
@@ -421,7 +415,7 @@ function buildProficienciesSection(
       CHARACTER_PROFICIENCY_GROUP_LABELS.armor,
       character.proficiencies.armor.map((armor, index) => ({
         id: `${armor.armorCategory}-${index}`,
-        label: formatContentIdLabel(armor.armorCategory),
+        label: formatContentReferenceLabel(armor.armorCategory),
       })),
     ),
   ].filter((group): group is CharacterProficiencyGroup => group !== undefined)
@@ -498,7 +492,7 @@ function buildSpeciesTraitsSection(
 function buildFeatsSection(character: Character): CharacterDetailListSection {
   const items = character.feats.map((entry) => ({
     id: entry.featId,
-    label: formatContentIdLabel(entry.featId),
+    label: formatContentReferenceLabel(entry.featId),
     detail: entry.notes,
   }))
 

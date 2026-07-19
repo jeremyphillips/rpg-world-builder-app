@@ -18,6 +18,36 @@ import type { EquipmentCatalogItemHeaderTone } from '@/features/content/equipmen
 import type { SpellCatalogItemHeaderTone } from '@/features/content/spells/components/spell-catalog-item-header.client'
 import type { SpellMarker } from '@/features/content/spells/components/spell-catalog-item-header.client'
 
+import { formatContentReferenceLabel } from '../format-content-reference-label'
+import {
+  buildMissingCatalogCard,
+  buildResolvedCatalogCard,
+  catalogHeaderAvailability,
+  type CatalogHeaderModelBase,
+  type CharacterSheetCatalogCard,
+  type CharacterSheetItemSource,
+} from './character-sheet-catalog-card.lib'
+
+/**
+ * Character sheet catalog cards — resolved/missing view models for equipment and spells.
+ *
+ * Growth direction:
+ * - Add new catalog-backed detail tabs by defining a `CharacterSheetCatalogCard<…>` alias
+ *   with a domain-specific entity key (`equipment`, `spell`, …) and extra fields.
+ * - Register unavailable copy in `CHARACTER_SHEET_CATALOG_UNAVAILABLE_MESSAGES` before wiring
+ *   a `to*CatalogHeaderModel` mapper.
+ * - Keep domain-specific builders, metadata mappers, and filter dimensions in per-content
+ *   modules; only lift logic here when a second consumer needs the same primitive.
+ *
+ * Watch for:
+ * - Occurrence identity: equipment rows need stable `id` values across duplicate references
+ *   (see `resolveEquipmentOccurrenceId`); spells currently key on `spellId` or index fallback.
+ * - Missing cards still carry the character `entry` so editors can repair broken references.
+ * - Structured filters should exclude `status: 'missing'` cards (they lack catalog metadata).
+ * - Header mappers own presentation-only fields; card types own sheet/builder data.
+ */
+export type { CharacterSheetItemSource }
+
 export const EQUIPMENT_COLLECTION_BUCKETS = [
   'weapons',
   'armor',
@@ -30,83 +60,55 @@ export const EQUIPMENT_COLLECTION_BUCKETS = [
 
 export type EquipmentCollectionBucket = (typeof EQUIPMENT_COLLECTION_BUCKETS)[number]
 
-export type CharacterSheetItemSource = {
-  label: string
-}
-
-type CharacterSheetEquipmentCardBase = {
-  id: string
-  displayName: string
-  referenceId: string
+type CharacterSheetEquipmentCardExtra = {
   bucket: EquipmentCollectionBucket
   quantity: number
   equipped: boolean
-  sources: readonly CharacterSheetItemSource[]
 }
 
-export type CharacterSheetEquipmentCardResolved = CharacterSheetEquipmentCardBase & {
-  status: 'resolved'
-  equipment: Equipment
-  entry: CharacterEquipmentEntry
-}
+export type CharacterSheetEquipmentCard = CharacterSheetCatalogCard<
+  Equipment,
+  CharacterEquipmentEntry,
+  CharacterSheetEquipmentCardExtra,
+  'equipment'
+>
 
-export type CharacterSheetEquipmentCardMissing = CharacterSheetEquipmentCardBase & {
-  status: 'missing'
-  entry: CharacterEquipmentEntry
-}
+export type CharacterSheetEquipmentCardResolved = Extract<
+  CharacterSheetEquipmentCard,
+  { status: 'resolved' }
+>
 
-export type CharacterSheetEquipmentCard =
-  | CharacterSheetEquipmentCardResolved
-  | CharacterSheetEquipmentCardMissing
+export type CharacterSheetEquipmentCardMissing = Extract<
+  CharacterSheetEquipmentCard,
+  { status: 'missing' }
+>
 
-type CharacterSheetSpellCardBase = {
-  id: string
-  displayName: string
-  referenceId: string
+type CharacterSheetSpellCardExtra = {
   prepared: boolean
-  sources: readonly CharacterSheetItemSource[]
 }
 
-export type CharacterSheetSpellCardResolved = CharacterSheetSpellCardBase & {
-  status: 'resolved'
-  spell: Spell
-  entry: CharacterSpellEntry
-}
+export type CharacterSheetSpellCard = CharacterSheetCatalogCard<
+  Spell,
+  CharacterSpellEntry,
+  CharacterSheetSpellCardExtra,
+  'spell'
+>
 
-export type CharacterSheetSpellCardMissing = CharacterSheetSpellCardBase & {
-  status: 'missing'
-  entry: CharacterSpellEntry
-}
+export type CharacterSheetSpellCardResolved = Extract<
+  CharacterSheetSpellCard,
+  { status: 'resolved' }
+>
 
-export type CharacterSheetSpellCard =
-  | CharacterSheetSpellCardResolved
-  | CharacterSheetSpellCardMissing
+export type CharacterSheetSpellCardMissing = Extract<CharacterSheetSpellCard, { status: 'missing' }>
 
-export type EquipmentCatalogHeaderModel = {
-  name: string
-  metadataLines: readonly CatalogMetadataLine[]
-  tone: EquipmentCatalogItemHeaderTone
+export type EquipmentCatalogHeaderModel = CatalogHeaderModelBase<EquipmentCatalogItemHeaderTone> & {
   sourceLabel?: string
   equipped: boolean
-  unavailableMessage?: string
 }
 
-export type SpellCatalogHeaderModel = {
-  name: string
-  metadataLines: readonly CatalogMetadataLine[]
+export type SpellCatalogHeaderModel = CatalogHeaderModelBase<SpellCatalogItemHeaderTone> & {
   markers: readonly SpellMarker[]
-  tone: SpellCatalogItemHeaderTone
   footerLabels: readonly string[]
-  unavailableMessage?: string
-}
-
-function formatContentIdLabel(id: string): string {
-  const slug = id.includes(':') ? (id.split(':').pop() ?? id) : id
-  return slug
-    .split(/[-_]/)
-    .filter(Boolean)
-    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-    .join(' ')
 }
 
 /** Canonical provenance signature for duplicate occurrence identity. */
@@ -132,7 +134,7 @@ function resolveEquipmentDisplayName(
   catalogIndex: CharacterBuildCatalogIndex,
 ): string {
   const equipment = catalogIndex.equipment.get(entry.equipmentId)
-  return entry.customName ?? equipment?.name ?? formatContentIdLabel(entry.equipmentId)
+  return entry.customName ?? equipment?.name ?? formatContentReferenceLabel(entry.equipmentId)
 }
 
 function resolveEquipmentOccurrenceId(
@@ -173,8 +175,8 @@ function buildEquipmentCards(
 
       cards.push(
         equipment
-          ? { ...base, status: 'resolved', equipment, entry }
-          : { ...base, status: 'missing', entry },
+          ? buildResolvedCatalogCard(base, entry, equipment, 'equipment')
+          : buildMissingCatalogCard(base, entry),
       )
     }
   }
@@ -188,7 +190,7 @@ function buildSpellCards(
 ): CharacterSheetSpellCard[] {
   return character.spells.map((entry, index) => {
     const spell = catalogIndex.spells.get(entry.spellId)
-    const displayName = spell?.name ?? formatContentIdLabel(entry.spellId)
+    const displayName = spell?.name ?? formatContentReferenceLabel(entry.spellId)
     const sources = normalizeSheetSources(entry.sources, catalogIndex)
     const base = {
       displayName,
@@ -198,21 +200,10 @@ function buildSpellCards(
     }
 
     if (spell) {
-      return {
-        ...base,
-        id: entry.spellId,
-        status: 'resolved' as const,
-        spell,
-        entry,
-      }
+      return buildResolvedCatalogCard({ ...base, id: entry.spellId }, entry, spell, 'spell')
     }
 
-    return {
-      ...base,
-      id: `${entry.spellId}:${index}`,
-      status: 'missing' as const,
-      entry,
-    }
+    return buildMissingCatalogCard({ ...base, id: `${entry.spellId}:${index}` }, entry)
   })
 }
 
@@ -249,14 +240,15 @@ function mapEquipmentCompactSummaryToMetadataLines(
 export function toEquipmentCatalogHeaderModel(
   card: CharacterSheetEquipmentCard,
 ): EquipmentCatalogHeaderModel {
+  const availability = catalogHeaderAvailability(card.status, 'equipment')
+
   return {
     name: card.displayName,
     metadataLines:
       card.status === 'resolved' ? mapEquipmentCompactSummaryToMetadataLines(card.equipment) : [],
-    tone: card.status === 'missing' ? 'unavailable' : 'default',
     sourceLabel: card.sources[0]?.label,
     equipped: card.equipped,
-    unavailableMessage: card.status === 'missing' ? 'Equipment reference unavailable' : undefined,
+    ...availability,
   }
 }
 
@@ -286,14 +278,14 @@ export function toSpellCatalogHeaderModel(card: CharacterSheetSpellCard): SpellC
   const footerLabels = [card.sources[0]?.label, card.prepared ? 'Prepared' : undefined].filter(
     (label): label is string => Boolean(label),
   )
+  const availability = catalogHeaderAvailability(card.status, 'spell')
 
   return {
     name: card.displayName,
     metadataLines:
       card.status === 'resolved' ? mapSpellCompactSummaryToMetadataLines(card.spell) : [],
     markers: card.status === 'resolved' ? collectSpellMarkers(card.spell) : [],
-    tone: card.status === 'missing' ? 'unavailable' : 'default',
     footerLabels,
-    unavailableMessage: card.status === 'missing' ? 'Spell reference unavailable' : undefined,
+    ...availability,
   }
 }

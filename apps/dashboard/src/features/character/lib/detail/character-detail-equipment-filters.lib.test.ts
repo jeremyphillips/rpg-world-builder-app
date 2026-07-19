@@ -1,7 +1,5 @@
 import { describe, expect, it } from 'vitest'
 
-import type { Equipment } from '@rpg/contracts'
-
 import {
   equipmentPickerChainMailFixture,
   equipmentPickerLongswordFixture,
@@ -14,30 +12,11 @@ import {
   resolveCharacterDetailEquipmentKindOptions,
   sortCharacterDetailEquipmentCards,
 } from './character-detail-equipment-filters.lib'
-import type { CharacterSheetEquipmentCard } from './character-sheet-catalog'
-
-function resolvedEquipmentCard(equipment: Equipment, id: string): CharacterSheetEquipmentCard {
-  return {
-    id,
-    displayName: equipment.name,
-    referenceId: equipment.id,
-    bucket: 'weapons',
-    quantity: 1,
-    equipped: false,
-    sources: [{ label: 'Manual' }],
-    status: 'resolved',
-    equipment,
-    entry: {
-      equipmentId: equipment.id,
-      quantity: 1,
-      sources: [{ kind: 'manual' }],
-    },
-  }
-}
+import { resolvedEquipmentSheetCardFixture } from './character-sheet-catalog.fixtures'
 
 describe('character-detail-equipment-filters.lib', () => {
-  const weaponCard = resolvedEquipmentCard(equipmentPickerLongswordFixture, 'weapon-1')
-  const armorCard = resolvedEquipmentCard(equipmentPickerChainMailFixture, 'armor-1')
+  const weaponCard = resolvedEquipmentSheetCardFixture(equipmentPickerLongswordFixture, 'weapon-1')
+  const armorCard = resolvedEquipmentSheetCardFixture(equipmentPickerChainMailFixture, 'armor-1')
 
   it('derives kind options from resolved cards only', () => {
     expect(resolveCharacterDetailEquipmentKindOptions([weaponCard, armorCard])).toEqual([
