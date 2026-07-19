@@ -43,6 +43,7 @@ describe('CharacterDetailContent', () => {
 
     expect(screen.getByRole('heading', { name: 'Verna' })).toBeInTheDocument()
     expect(screen.getByText('Dwarf · Level 1 Fighter')).toBeInTheDocument()
+    expect(screen.getByText('0 XP')).toBeInTheDocument()
     expect(screen.getByText('HP')).toBeInTheDocument()
     expect(screen.getByText('11/11')).toBeInTheDocument()
     expect(screen.getByText('A hardy dwarf fighter from the northern holds.')).toBeInTheDocument()

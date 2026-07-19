@@ -13,6 +13,7 @@ import {
   CHARACTER_SECTION_LABELS,
   type CharacterDetailListSection,
   type CharacterDetailViewModel,
+  type CharacterProficienciesViewModel,
 } from '../lib/character-display'
 import { CharacterDetailNarrativeSection } from './character-detail-narrative-section.client'
 import {
@@ -48,6 +49,7 @@ export function CharacterDetailContent({ viewModel }: CharacterDetailContentProp
             {viewModel.identity.name}
           </Heading>
           <Text variant="muted">{viewModel.identity.summary}</Text>
+          <Text variant="muted">{viewModel.identity.xp} XP</Text>
         </div>
         <Button
           type="button"
@@ -61,7 +63,7 @@ export function CharacterDetailContent({ viewModel }: CharacterDetailContentProp
 
       <dl className={characterBuilderPreviewStatGridClasses}>
         {viewModel.stats.map((stat) => (
-          <DetailStat key={stat.label} label={stat.label} value={stat.value} />
+          <DetailStat key={stat.id} label={stat.label} value={stat.value} detail={stat.caption} />
         ))}
       </dl>
 
@@ -73,7 +75,9 @@ export function CharacterDetailContent({ viewModel }: CharacterDetailContentProp
           {viewModel.abilities.map((ability) => (
             <div key={ability.id} className="rounded-md border border-border px-2 py-1.5">
               <dt className="text-xs text-muted-foreground">{ability.label}</dt>
-              <dd className="text-sm font-medium">{ability.display}</dd>
+              <dd className="text-sm font-medium">
+                {ability.score} ({ability.modifier})
+              </dd>
             </div>
           ))}
         </dl>
@@ -81,7 +85,7 @@ export function CharacterDetailContent({ viewModel }: CharacterDetailContentProp
 
       <CharacterActionsSection actions={viewModel.actions} />
       <CharacterDetailListSection section={viewModel.savingThrows} />
-      <CharacterDetailListSection section={viewModel.proficiencies} />
+      <CharacterProficienciesSection section={viewModel.proficiencies} />
       <CharacterDetailListSection section={viewModel.spells} />
       <CharacterDetailListSection section={viewModel.equipment} />
       <dl className={characterBuilderPreviewStatGridClasses}>
@@ -109,11 +113,12 @@ export function CharacterDetailContent({ viewModel }: CharacterDetailContentProp
   )
 }
 
-function DetailStat({ label, value }: { label: string; value: string }) {
+function DetailStat({ label, value, detail }: { label: string; value: string; detail?: string }) {
   return (
     <div className="rounded-md border border-border px-3 py-2">
       <dt className="text-xs text-muted-foreground">{label}</dt>
       <dd className="text-sm font-medium">{value}</dd>
+      {detail ? <dd className="text-xs text-muted-foreground">{detail}</dd> : null}
     </div>
   )
 }
@@ -137,6 +142,41 @@ function CharacterActionsSection({ actions }: { actions: CharacterDetailViewMode
             </li>
           ))}
         </ul>
+      )}
+    </div>
+  )
+}
+
+function CharacterProficienciesSection({ section }: { section: CharacterProficienciesViewModel }) {
+  const hasItems = section.groups.length > 0
+
+  return (
+    <div className="space-y-2">
+      <Text as="p" variant="body" className="font-medium">
+        {section.title}
+      </Text>
+      {!hasItems ? (
+        <Text variant="muted">{section.emptyText}</Text>
+      ) : (
+        <div className="space-y-4">
+          {section.groups.map((group) => (
+            <div key={group.id} className="space-y-2">
+              <Text as="p" variant="muted" className="text-xs font-medium uppercase tracking-wide">
+                {group.title}
+              </Text>
+              <ul className="space-y-2 text-sm">
+                {group.items.map((item) => (
+                  <li key={item.id} className="rounded-md border border-border px-3 py-2">
+                    <div className="font-medium">{item.label}</div>
+                    {item.detail ? (
+                      <div className="text-muted-foreground">{item.detail}</div>
+                    ) : null}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
       )}
     </div>
   )

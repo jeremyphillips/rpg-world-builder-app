@@ -2,10 +2,11 @@ import {
   ABILITY_ENTRIES,
   ABILITY_IDS,
   deriveCharacterProfile,
-  formatMovementDisplay,
   formatSignedModifier,
   formatWeaponDamageWithModifier,
   getCharacterTotalLevel,
+  getMovementModeLabel,
+  MOVEMENT_MODES,
   proficiencyBonus,
   resolveCharacterXpDisplay,
   resolveCreatureInitiativeModifier,
@@ -22,14 +23,15 @@ import {
   type CharacterNarrative,
   type CharacterProficiencies,
   type Equipment,
+  type MovementMode,
   type PcCharacter,
   type ResolvedCharacterCreationRules,
+  type Species,
   type XpProgressionBody,
 } from '@rpg/contracts'
 
 import { resolveLanguagePreviewLabel } from './language-preview-label'
 import {
-  formatPreviewAbilityCell,
   formatPreviewOptionalNumber,
   formatPreviewSignedNumber,
 } from './character-builder-preview-panel.lib'
@@ -68,21 +70,58 @@ export const CHARACTER_EMPTY_SECTION_TEXT = {
   feats: 'No feats.',
 } as const
 
+export const CHARACTER_PROFICIENCY_GROUP_LABELS = {
+  skills: 'Skills',
+  languages: 'Languages',
+  weapons: 'Weapons',
+  tools: 'Tools',
+  armor: 'Armor Training',
+} as const
+
 export type CharacterCardViewModel = {
   id: string
   name: string
   summary: string
 }
 
-export type CharacterDetailStatRow = {
+export type CharacterDetailStatTileId =
+  | 'ac'
+  | 'initiative'
+  | 'speed'
+  | 'proficiencyBonus'
+  | 'hitPoints'
+
+export type CharacterDetailStatTile = {
+  id: CharacterDetailStatTileId
+  label: string
+  value: string
+  caption?: string
+}
+
+export type CharacterAbilityTile = {
+  id: Ability
+  label: string
+  score: string
+  modifier: string
+}
+
+export type CharacterWealthViewModel = {
   label: string
   value: string
 }
 
-export type CharacterAbilityViewModel = {
-  id: Ability
-  label: string
-  display: string
+export type CharacterProficiencyGroupId = 'skills' | 'languages' | 'weapons' | 'tools' | 'armor'
+
+export type CharacterProficiencyGroup = {
+  id: CharacterProficiencyGroupId
+  title: string
+  items: CharacterDetailListItem[]
+}
+
+export type CharacterProficienciesViewModel = {
+  title: string
+  groups: CharacterProficiencyGroup[]
+  emptyText: string
 }
 
 export type CharacterActionRowViewModel = {
@@ -109,15 +148,16 @@ export type CharacterDetailViewModel = {
   identity: {
     name: string
     summary: string
+    xp: string
   }
-  stats: CharacterDetailStatRow[]
-  abilities: CharacterAbilityViewModel[]
+  stats: CharacterDetailStatTile[]
+  abilities: CharacterAbilityTile[]
   actions: CharacterActionRowViewModel[]
   savingThrows: CharacterDetailListSection
-  proficiencies: CharacterDetailListSection
+  proficiencies: CharacterProficienciesViewModel
   spells: CharacterDetailListSection
   equipment: CharacterDetailListSection
-  wealth: CharacterDetailStatRow
+  wealth: CharacterWealthViewModel
   classFeatures: CharacterDetailListSection
   speciesTraits: CharacterDetailListSection
   feats: CharacterDetailListSection
@@ -310,57 +350,86 @@ function buildSavingThrowSection(
   }
 }
 
+function buildProficiencyGroup(
+  id: CharacterProficiencyGroupId,
+  title: string,
+  items: CharacterDetailListItem[],
+): CharacterProficiencyGroup | undefined {
+  if (items.length === 0) return undefined
+  return { id, title, items }
+}
+
 function buildProficienciesSection(
   character: PcCharacter,
   catalogIndex: CharacterBuildCatalogIndex,
   rules: ResolvedCharacterCreationRules,
-): CharacterDetailListSection {
+): CharacterProficienciesViewModel {
   const derivationInput = toCharacterSheetDerivationInput(character, catalogIndex, rules)
   const profile = deriveCharacterProfile(derivationInput)
 
-  const items: CharacterDetailListItem[] = [
-    ...profile.skills
-      .filter((skill) => skill.rank !== undefined)
-      .map((skill) => ({
-        id: skill.skillId,
-        label: skill.label,
-        detail:
-          skill.modifier === undefined
-            ? undefined
-            : skill.modifier >= 0
-              ? `+${skill.modifier}`
-              : String(skill.modifier),
+  const groups = [
+    buildProficiencyGroup(
+      'skills',
+      CHARACTER_PROFICIENCY_GROUP_LABELS.skills,
+      profile.skills
+        .filter((skill) => skill.rank !== undefined)
+        .map((skill) => ({
+          id: skill.skillId,
+          label: skill.label,
+          detail:
+            skill.modifier === undefined
+              ? undefined
+              : skill.modifier >= 0
+                ? `+${skill.modifier}`
+                : String(skill.modifier),
+        })),
+    ),
+    buildProficiencyGroup(
+      'languages',
+      CHARACTER_PROFICIENCY_GROUP_LABELS.languages,
+      character.proficiencies.languages.map((entry) => ({
+        id: entry.language,
+        label: resolveLanguagePreviewLabel(entry.language, catalogIndex),
       })),
-    ...character.proficiencies.languages.map((entry) => ({
-      id: entry.language,
-      label: resolveLanguagePreviewLabel(entry.language, catalogIndex),
-    })),
-    ...character.proficiencies.tools.map((tool, index) => ({
-      id: tool.toolId ?? `${tool.toolCategory ?? 'tool'}-${index}`,
-      label: tool.toolId
-        ? (catalogIndex.equipment.get(tool.toolId)?.name ?? formatContentIdLabel(tool.toolId))
-        : tool.toolCategory
-          ? formatContentIdLabel(tool.toolCategory)
-          : 'Tool proficiency',
-    })),
-    ...character.proficiencies.weapons.map((weapon, index) => ({
-      id: weapon.weaponId ?? `${weapon.weaponCategory ?? 'weapon'}-${index}`,
-      label: weapon.weaponId
-        ? (catalogIndex.equipment.get(weapon.weaponId)?.name ??
-          formatContentIdLabel(weapon.weaponId))
-        : weapon.weaponCategory
-          ? formatContentIdLabel(weapon.weaponCategory)
-          : 'Weapon proficiency',
-    })),
-    ...character.proficiencies.armor.map((armor, index) => ({
-      id: `${armor.armorCategory}-${index}`,
-      label: formatContentIdLabel(armor.armorCategory),
-    })),
-  ]
+    ),
+    buildProficiencyGroup(
+      'weapons',
+      CHARACTER_PROFICIENCY_GROUP_LABELS.weapons,
+      character.proficiencies.weapons.map((weapon, index) => ({
+        id: weapon.weaponId ?? `${weapon.weaponCategory ?? 'weapon'}-${index}`,
+        label: weapon.weaponId
+          ? (catalogIndex.equipment.get(weapon.weaponId)?.name ??
+            formatContentIdLabel(weapon.weaponId))
+          : weapon.weaponCategory
+            ? formatContentIdLabel(weapon.weaponCategory)
+            : 'Weapon proficiency',
+      })),
+    ),
+    buildProficiencyGroup(
+      'tools',
+      CHARACTER_PROFICIENCY_GROUP_LABELS.tools,
+      character.proficiencies.tools.map((tool, index) => ({
+        id: tool.toolId ?? `${tool.toolCategory ?? 'tool'}-${index}`,
+        label: tool.toolId
+          ? (catalogIndex.equipment.get(tool.toolId)?.name ?? formatContentIdLabel(tool.toolId))
+          : tool.toolCategory
+            ? formatContentIdLabel(tool.toolCategory)
+            : 'Tool proficiency',
+      })),
+    ),
+    buildProficiencyGroup(
+      'armor',
+      CHARACTER_PROFICIENCY_GROUP_LABELS.armor,
+      character.proficiencies.armor.map((armor, index) => ({
+        id: `${armor.armorCategory}-${index}`,
+        label: formatContentIdLabel(armor.armorCategory),
+      })),
+    ),
+  ].filter((group): group is CharacterProficiencyGroup => group !== undefined)
 
   return {
     title: CHARACTER_SECTION_LABELS.proficiencies,
-    items,
+    groups,
     emptyText: CHARACTER_EMPTY_SECTION_TEXT.proficiencies,
   }
 }
@@ -458,43 +527,69 @@ function buildFeatsSection(character: PcCharacter): CharacterDetailListSection {
   }
 }
 
+function resolvePrimaryMovementMode(species: Species | undefined): MovementMode | undefined {
+  if (!species) return undefined
+
+  const speeds = resolveCreatureMovement(species)
+  if (speeds.walk !== undefined) return 'walk'
+
+  return MOVEMENT_MODES.find((mode) => speeds[mode] !== undefined)
+}
+
+function resolveSpeedStatTile(
+  species: Species | undefined,
+): Pick<CharacterDetailStatTile, 'value' | 'caption'> {
+  const mode = resolvePrimaryMovementMode(species)
+  if (!mode) return { value: '—' }
+
+  const speeds = resolveCreatureMovement(species!)
+  const feet = speeds[mode]
+  if (feet === undefined) return { value: '—' }
+
+  return {
+    value: String(feet),
+    caption: getMovementModeLabel(mode),
+  }
+}
+
 function buildStats(
   character: PcCharacter,
   catalogIndex: CharacterBuildCatalogIndex,
   rules: ResolvedCharacterCreationRules,
-  xpProgression: Pick<XpProgressionBody, 'entries'>,
-): CharacterDetailStatRow[] {
+): CharacterDetailStatTile[] {
   const derivationInput = toCharacterSheetDerivationInput(character, catalogIndex, rules)
   const profile = deriveCharacterProfile(derivationInput)
   const species = catalogIndex.species.get(character.species.id)
-  const speed = species ? formatMovementDisplay(resolveCreatureMovement(species)) : '—'
+  const speed = resolveSpeedStatTile(species)
   const initiative = resolveCreatureInitiativeModifier(character.abilityScores.dex)
-  const xp = resolveCharacterXpDisplay(character, xpProgression)
+  const maxHp = formatPreviewOptionalNumber(profile.maxHp ?? character.hitPoints.base)
 
   return [
     {
+      id: 'ac',
       label: CHARACTER_STAT_LABELS.armorClass,
       value: formatPreviewOptionalNumber(profile.ac),
     },
     {
+      id: 'initiative',
       label: CHARACTER_STAT_LABELS.initiative,
       value: formatPreviewSignedNumber(initiative),
     },
     {
+      id: 'speed',
       label: CHARACTER_STAT_LABELS.speed,
-      value: speed,
+      value: speed.value,
+      caption: speed.caption,
     },
     {
+      id: 'proficiencyBonus',
       label: CHARACTER_STAT_LABELS.proficiencyBonus,
       value: formatPreviewOptionalNumber(profile.proficiencyBonus, '+'),
     },
     {
+      id: 'hitPoints',
       label: CHARACTER_STAT_LABELS.hitPoints,
-      value: `${character.hitPoints.current ?? character.hitPoints.base}/${formatPreviewOptionalNumber(profile.maxHp ?? character.hitPoints.base)}`,
-    },
-    {
-      label: CHARACTER_STAT_LABELS.experience,
-      value: String(xp),
+      value: `${character.hitPoints.current ?? character.hitPoints.base}/${maxHp}`,
     },
   ]
 }
@@ -503,7 +598,7 @@ function buildAbilities(
   character: PcCharacter,
   catalogIndex: CharacterBuildCatalogIndex,
   rules: ResolvedCharacterCreationRules,
-): CharacterAbilityViewModel[] {
+): CharacterAbilityTile[] {
   const derivationInput = toCharacterSheetDerivationInput(character, catalogIndex, rules)
   const profile = deriveCharacterProfile(derivationInput)
 
@@ -512,9 +607,17 @@ function buildAbilities(
     return {
       id: ability,
       label: ABILITY_ENTRIES[ability].label,
-      display: formatPreviewAbilityCell(entry?.score, entry?.modifier),
+      score: formatPreviewOptionalNumber(entry?.score),
+      modifier: formatPreviewSignedNumber(entry?.modifier),
     }
   })
+}
+
+function buildIdentityXp(
+  character: PcCharacter,
+  xpProgression: Pick<XpProgressionBody, 'entries'>,
+): string {
+  return String(resolveCharacterXpDisplay(character, xpProgression))
 }
 
 export function buildCharacterDetailViewModel({
@@ -531,8 +634,9 @@ export function buildCharacterDetailViewModel({
     identity: {
       name: character.name,
       summary: formatCharacterSummary(character, catalogIndex),
+      xp: buildIdentityXp(character, xpProgression),
     },
-    stats: buildStats(character, catalogIndex, rules, xpProgression),
+    stats: buildStats(character, catalogIndex, rules),
     abilities: buildAbilities(character, catalogIndex, rules),
     actions: buildActionRows(character, catalogIndex, level),
     savingThrows: buildSavingThrowSection(character, catalogIndex, rules),

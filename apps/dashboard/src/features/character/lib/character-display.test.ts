@@ -48,7 +48,7 @@ describe('buildCharacterCardViewModel', () => {
 })
 
 describe('buildCharacterDetailViewModel', () => {
-  it('derives combat stats and HP from the persisted sheet', () => {
+  it('derives combat stats, XP, and structured ability tiles from the persisted sheet', () => {
     const viewModel = buildCharacterDetailViewModel({
       character: SAMPLE_PC,
       catalogIndex,
@@ -57,13 +57,28 @@ describe('buildCharacterDetailViewModel', () => {
     })
 
     expect(viewModel.identity.summary).toBe('Dwarf · Level 1 Fighter')
+    expect(viewModel.identity.xp).toBe('0')
     expect(viewModel.stats).toEqual(
       expect.arrayContaining([
-        expect.objectContaining({ label: 'HP', value: '11/11' }),
-        expect.objectContaining({ label: 'XP', value: '0' }),
+        expect.objectContaining({ id: 'hitPoints', label: 'HP', value: '11/11' }),
+        expect.objectContaining({ id: 'speed', caption: 'Walk', value: '30' }),
       ]),
     )
-    expect(viewModel.abilities).toHaveLength(6)
+    expect(viewModel.stats.find((stat) => stat.id === 'speed')).toEqual({
+      id: 'speed',
+      label: 'Speed',
+      value: '30',
+      caption: 'Walk',
+    })
+    expect(viewModel.abilities[0]).toEqual(
+      expect.objectContaining({
+        id: 'str',
+        label: 'Strength',
+        score: '15',
+        modifier: '+2',
+      }),
+    )
+    expect(viewModel.proficiencies.groups).toEqual([])
     expect(viewModel.narrative?.backstory).toContain('hardy dwarf fighter')
   })
 })
