@@ -44,8 +44,28 @@ describe('CharacterDetailContent', () => {
     expect(screen.getByRole('heading', { name: 'Verna' })).toBeInTheDocument()
     expect(screen.getByText('Dwarf · Level 1 Fighter')).toBeInTheDocument()
     expect(screen.getByText('0 XP')).toBeInTheDocument()
-    expect(screen.getByText('HP')).toBeInTheDocument()
-    expect(screen.getByText('11/11')).toBeInTheDocument()
+    expect(screen.getByText('Current')).toBeInTheDocument()
+    expect(screen.getByText('Max')).toBeInTheDocument()
+  })
+
+  it('renders tab panels for spells, equipment, features, and narrative', async () => {
+    const user = userEvent.setup()
+
+    render(
+      <MemoryRouter>
+        <CharacterDetailContent viewModel={viewModel} />
+      </MemoryRouter>,
+    )
+
+    expect(screen.getByRole('tab', { name: 'Spells' })).toBeInTheDocument()
+    expect(screen.getByRole('tab', { name: 'Equipment' })).toBeInTheDocument()
+    expect(screen.getByRole('tab', { name: 'Features & Traits' })).toBeInTheDocument()
+    expect(screen.getByRole('tab', { name: 'Narrative' })).toBeInTheDocument()
+
+    await user.click(screen.getByRole('tab', { name: 'Equipment' }))
+    expect(screen.getByText('Wealth: 0 gp')).toBeInTheDocument()
+
+    await user.click(screen.getByRole('tab', { name: 'Narrative' }))
     expect(screen.getByText('A hardy dwarf fighter from the northern holds.')).toBeInTheDocument()
   })
 

@@ -4,7 +4,7 @@ import { type SystemRulesetId } from '@rpg/contracts'
 import { getStandardXpProgression } from '@rpg/catalog/xp-progressions'
 
 import { PageLoadState } from '@/components/layout/page-load-state'
-import { NarrowPage } from '@/components/layout/narrow-page'
+import { WidePage } from '@/components/layout/wide-page'
 
 import { CharacterDetailContent } from '../components/character-detail-content.client'
 import { useBuildContext } from '../hooks/use-build-context'
@@ -43,7 +43,7 @@ export function CharacterDetail() {
   const errorLabel = characterError?.message ?? catalogError?.message
 
   return (
-    <NarrowPage>
+    <WidePage spacing="relaxed">
       <PageLoadState
         isPending={isPending}
         isError={isError}
@@ -52,6 +52,6 @@ export function CharacterDetail() {
       >
         {viewModel ? <CharacterDetailContent viewModel={viewModel} /> : null}
       </PageLoadState>
-    </NarrowPage>
+    </WidePage>
   )
 }

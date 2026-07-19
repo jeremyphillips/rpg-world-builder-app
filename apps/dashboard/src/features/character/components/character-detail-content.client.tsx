@@ -8,18 +8,12 @@ import { ROUTES } from '@/app/routes'
 import { useSetBreadcrumbLabel } from '@/components/layout/use-breadcrumb-label'
 
 import { useDeleteCharacter } from '../hooks/use-delete-character'
-import {
-  CHARACTER_EMPTY_SECTION_TEXT,
-  CHARACTER_SECTION_LABELS,
-  type CharacterDetailListSection,
-  type CharacterDetailViewModel,
-  type CharacterProficienciesViewModel,
-} from '../lib/character-display'
-import { CharacterDetailNarrativeSection } from './character-detail-narrative-section.client'
-import {
-  characterBuilderPreviewAbilityGridClasses,
-  characterBuilderPreviewStatGridClasses,
-} from './character-builder-shell.variants'
+import type { CharacterDetailViewModel } from '../lib/character-display'
+import { CharacterDetailAbilitiesRow } from './character-detail-abilities-row.client'
+import { CharacterDetailCombatRow } from './character-detail-combat-row.client'
+import { CharacterDetailHitPoints } from './character-detail-hit-points.client'
+import { CharacterDetailStatsRow } from './character-detail-stats-row.client'
+import { CharacterDetailTabs } from './character-detail-tabs.client'
 
 export type CharacterDetailContentProps = {
   viewModel: CharacterDetailViewModel
@@ -61,40 +55,23 @@ export function CharacterDetailContent({ viewModel }: CharacterDetailContentProp
         </Button>
       </header>
 
-      <dl className={characterBuilderPreviewStatGridClasses}>
-        {viewModel.stats.map((stat) => (
-          <DetailStat key={stat.id} label={stat.label} value={stat.value} detail={stat.caption} />
-        ))}
-      </dl>
-
-      <div className="space-y-2">
-        <Text as="p" variant="body" className="font-medium">
-          Abilities
-        </Text>
-        <dl className={characterBuilderPreviewAbilityGridClasses}>
-          {viewModel.abilities.map((ability) => (
-            <div key={ability.id} className="rounded-md border border-border px-2 py-1.5">
-              <dt className="text-xs text-muted-foreground">{ability.label}</dt>
-              <dd className="text-sm font-medium">
-                {ability.score} ({ability.modifier})
-              </dd>
-            </div>
-          ))}
-        </dl>
-      </div>
-
-      <CharacterActionsSection actions={viewModel.actions} />
-      <CharacterDetailListSection section={viewModel.savingThrows} />
-      <CharacterProficienciesSection section={viewModel.proficiencies} />
-      <CharacterDetailListSection section={viewModel.spells} />
-      <CharacterDetailListSection section={viewModel.equipment} />
-      <dl className={characterBuilderPreviewStatGridClasses}>
-        <DetailStat label={viewModel.wealth.label} value={viewModel.wealth.value} />
-      </dl>
-      <CharacterDetailListSection section={viewModel.classFeatures} />
-      <CharacterDetailListSection section={viewModel.speciesTraits} />
-      <CharacterDetailListSection section={viewModel.feats} />
-      <CharacterDetailNarrativeSection narrative={viewModel.narrative} />
+      <CharacterDetailAbilitiesRow abilities={viewModel.abilities} />
+      <CharacterDetailStatsRow stats={viewModel.stats} />
+      <CharacterDetailHitPoints hitPoints={viewModel.hitPoints} />
+      <CharacterDetailCombatRow
+        actions={viewModel.actions}
+        savingThrows={viewModel.savingThrows}
+        proficiencies={viewModel.proficiencies}
+      />
+      <CharacterDetailTabs
+        spells={viewModel.spells}
+        equipment={viewModel.equipment}
+        wealth={viewModel.wealth}
+        classFeatures={viewModel.classFeatures}
+        speciesTraits={viewModel.speciesTraits}
+        feats={viewModel.feats}
+        narrative={viewModel.narrative}
+      />
 
       <ConfirmDialog
         open={confirmDeleteOpen}
@@ -109,97 +86,6 @@ export function CharacterDetailContent({ viewModel }: CharacterDetailContentProp
         confirmVariant="destructive"
         onConfirm={handleDelete}
       />
-    </div>
-  )
-}
-
-function DetailStat({ label, value, detail }: { label: string; value: string; detail?: string }) {
-  return (
-    <div className="rounded-md border border-border px-3 py-2">
-      <dt className="text-xs text-muted-foreground">{label}</dt>
-      <dd className="text-sm font-medium">{value}</dd>
-      {detail ? <dd className="text-xs text-muted-foreground">{detail}</dd> : null}
-    </div>
-  )
-}
-
-function CharacterActionsSection({ actions }: { actions: CharacterDetailViewModel['actions'] }) {
-  return (
-    <div className="space-y-2">
-      <Text as="p" variant="body" className="font-medium">
-        {CHARACTER_SECTION_LABELS.actions}
-      </Text>
-      {actions.length === 0 ? (
-        <Text variant="muted">{CHARACTER_EMPTY_SECTION_TEXT.actions}</Text>
-      ) : (
-        <ul className="space-y-2 text-sm">
-          {actions.map((action) => (
-            <li key={action.id} className="rounded-md border border-border px-3 py-2">
-              <div className="font-medium">{action.name}</div>
-              <div className="text-muted-foreground">
-                Attack {action.attackBonus} · Damage {action.damage}
-              </div>
-            </li>
-          ))}
-        </ul>
-      )}
-    </div>
-  )
-}
-
-function CharacterProficienciesSection({ section }: { section: CharacterProficienciesViewModel }) {
-  const hasItems = section.groups.length > 0
-
-  return (
-    <div className="space-y-2">
-      <Text as="p" variant="body" className="font-medium">
-        {section.title}
-      </Text>
-      {!hasItems ? (
-        <Text variant="muted">{section.emptyText}</Text>
-      ) : (
-        <div className="space-y-4">
-          {section.groups.map((group) => (
-            <div key={group.id} className="space-y-2">
-              <Text as="p" variant="muted" className="text-xs font-medium uppercase tracking-wide">
-                {group.title}
-              </Text>
-              <ul className="space-y-2 text-sm">
-                {group.items.map((item) => (
-                  <li key={item.id} className="rounded-md border border-border px-3 py-2">
-                    <div className="font-medium">{item.label}</div>
-                    {item.detail ? (
-                      <div className="text-muted-foreground">{item.detail}</div>
-                    ) : null}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
-  )
-}
-
-function CharacterDetailListSection({ section }: { section: CharacterDetailListSection }) {
-  return (
-    <div className="space-y-2">
-      <Text as="p" variant="body" className="font-medium">
-        {section.title}
-      </Text>
-      {section.items.length === 0 ? (
-        <Text variant="muted">{section.emptyText}</Text>
-      ) : (
-        <ul className="space-y-2 text-sm">
-          {section.items.map((item) => (
-            <li key={item.id} className="rounded-md border border-border px-3 py-2">
-              <div className="font-medium">{item.label}</div>
-              {item.detail ? <div className="text-muted-foreground">{item.detail}</div> : null}
-            </li>
-          ))}
-        </ul>
-      )}
     </div>
   )
 }

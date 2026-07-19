@@ -68,6 +68,21 @@ export const CHARACTER_EMPTY_SECTION_TEXT = {
   classFeatures: 'No class features at this level.',
   speciesTraits: 'No species traits.',
   feats: 'No feats.',
+  featuresAndTraits: 'No features, traits, or feats.',
+  narrative: 'No narrative details recorded.',
+} as const
+
+export const CHARACTER_HIT_POINT_LABELS = {
+  current: 'Current',
+  max: 'Max',
+  temporary: 'Temp',
+} as const
+
+export const CHARACTER_DETAIL_TAB_LABELS = {
+  spells: 'Spells',
+  equipment: 'Equipment',
+  featuresAndTraits: 'Features & Traits',
+  narrative: 'Narrative',
 } as const
 
 export const CHARACTER_PROFICIENCY_GROUP_LABELS = {
@@ -84,12 +99,7 @@ export type CharacterCardViewModel = {
   summary: string
 }
 
-export type CharacterDetailStatTileId =
-  | 'ac'
-  | 'initiative'
-  | 'speed'
-  | 'proficiencyBonus'
-  | 'hitPoints'
+export type CharacterDetailStatTileId = 'ac' | 'initiative' | 'speed' | 'proficiencyBonus'
 
 export type CharacterDetailStatTile = {
   id: CharacterDetailStatTileId
@@ -103,6 +113,12 @@ export type CharacterAbilityTile = {
   label: string
   score: string
   modifier: string
+}
+
+export type CharacterHitPointsViewModel = {
+  current: string
+  max: string
+  temporary: string
 }
 
 export type CharacterWealthViewModel = {
@@ -152,6 +168,7 @@ export type CharacterDetailViewModel = {
   }
   stats: CharacterDetailStatTile[]
   abilities: CharacterAbilityTile[]
+  hitPoints: CharacterHitPointsViewModel
   actions: CharacterActionRowViewModel[]
   savingThrows: CharacterDetailListSection
   proficiencies: CharacterProficienciesViewModel
@@ -562,8 +579,6 @@ function buildStats(
   const species = catalogIndex.species.get(character.species.id)
   const speed = resolveSpeedStatTile(species)
   const initiative = resolveCreatureInitiativeModifier(character.abilityScores.dex)
-  const maxHp = formatPreviewOptionalNumber(profile.maxHp ?? character.hitPoints.base)
-
   return [
     {
       id: 'ac',
@@ -586,12 +601,24 @@ function buildStats(
       label: CHARACTER_STAT_LABELS.proficiencyBonus,
       value: formatPreviewOptionalNumber(profile.proficiencyBonus, '+'),
     },
-    {
-      id: 'hitPoints',
-      label: CHARACTER_STAT_LABELS.hitPoints,
-      value: `${character.hitPoints.current ?? character.hitPoints.base}/${maxHp}`,
-    },
   ]
+}
+
+function buildHitPoints(
+  character: PcCharacter,
+  catalogIndex: CharacterBuildCatalogIndex,
+  rules: ResolvedCharacterCreationRules,
+): CharacterHitPointsViewModel {
+  const derivationInput = toCharacterSheetDerivationInput(character, catalogIndex, rules)
+  const profile = deriveCharacterProfile(derivationInput)
+  const maxHp = formatPreviewOptionalNumber(profile.maxHp ?? character.hitPoints.base)
+  const temporary = character.hitPoints.temporary
+
+  return {
+    current: formatPreviewOptionalNumber(character.hitPoints.current ?? character.hitPoints.base),
+    max: maxHp,
+    temporary: temporary && temporary > 0 ? String(temporary) : '—',
+  }
 }
 
 function buildAbilities(
@@ -638,6 +665,7 @@ export function buildCharacterDetailViewModel({
     },
     stats: buildStats(character, catalogIndex, rules),
     abilities: buildAbilities(character, catalogIndex, rules),
+    hitPoints: buildHitPoints(character, catalogIndex, rules),
     actions: buildActionRows(character, catalogIndex, level),
     savingThrows: buildSavingThrowSection(character, catalogIndex, rules),
     proficiencies: buildProficienciesSection(character, catalogIndex, rules),

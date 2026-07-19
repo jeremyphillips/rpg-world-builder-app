@@ -60,7 +60,7 @@ describe('buildCharacterDetailViewModel', () => {
     expect(viewModel.identity.xp).toBe('0')
     expect(viewModel.stats).toEqual(
       expect.arrayContaining([
-        expect.objectContaining({ id: 'hitPoints', label: 'HP', value: '11/11' }),
+        expect.objectContaining({ id: 'ac', label: 'AC' }),
         expect.objectContaining({ id: 'speed', caption: 'Walk', value: '30' }),
       ]),
     )
@@ -69,6 +69,11 @@ describe('buildCharacterDetailViewModel', () => {
       label: 'Speed',
       value: '30',
       caption: 'Walk',
+    })
+    expect(viewModel.hitPoints).toEqual({
+      current: '11',
+      max: '11',
+      temporary: '—',
     })
     expect(viewModel.abilities[0]).toEqual(
       expect.objectContaining({

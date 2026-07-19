@@ -27,10 +27,10 @@ export const Speed: Story = {
   },
 }
 
-export const HitPoints: Story = {
+export const HitPointsCurrent: Story = {
   args: {
-    label: 'HP',
-    value: '11/11',
+    label: 'Current',
+    value: '11',
   },
 }
 
