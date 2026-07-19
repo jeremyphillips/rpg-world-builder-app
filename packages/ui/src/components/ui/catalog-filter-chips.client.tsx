@@ -1,8 +1,10 @@
 'use client'
 
-import { ChipsFieldOptions } from './chips-field.client'
+import { ChipsFieldOptions, type ChipSize } from './chips-field.client'
 import { Text } from './text'
 import { catalogFilterChipsLabelVariants } from './catalog-toolbar.variants'
+
+export type { ChipSize as CatalogFilterChipsSize }
 
 export type CatalogFilterChipsOption = {
   value: string
@@ -13,6 +15,8 @@ type CatalogFilterChipsBaseProps = {
   id: string
   label?: string
   options: readonly CatalogFilterChipsOption[]
+  /** Defaults to `md` for toolbar filter chips. */
+  chipSize?: ChipSize
 }
 
 type CatalogFilterChipsSingleRequiredProps = CatalogFilterChipsBaseProps & {
@@ -32,7 +36,7 @@ export type CatalogFilterChipsProps =
   | CatalogFilterChipsMultipleProps
 
 export function CatalogFilterChips(props: CatalogFilterChipsProps) {
-  const { id, label, options } = props
+  const { id, label, options, chipSize = 'md' } = props
   const labelId = `${id}-label`
 
   return (
@@ -58,7 +62,7 @@ export function CatalogFilterChips(props: CatalogFilterChipsProps) {
               props.onValueChange(String(value))
             }
           }}
-          chipSize="sm"
+          chipSize={chipSize}
           showSelectedCheckmark={false}
         />
       ) : (
@@ -71,7 +75,7 @@ export function CatalogFilterChips(props: CatalogFilterChipsProps) {
           onChange={(value) =>
             props.onSelectedValuesChange(Array.isArray(value) ? value.map(String) : [])
           }
-          chipSize="sm"
+          chipSize={chipSize}
           showSelectedCheckmark={false}
         />
       )}

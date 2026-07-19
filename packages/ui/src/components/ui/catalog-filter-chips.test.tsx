@@ -69,6 +69,39 @@ describe('CatalogFilterChips', () => {
     expect(onValueChange).toHaveBeenCalledWith('two')
   })
 
+  it('uses md chip size by default', () => {
+    render(
+      <CatalogFilterChips
+        id="category"
+        label="Category"
+        selectionMode="single-required"
+        options={options}
+        value="all"
+        onValueChange={vi.fn()}
+      />,
+    )
+
+    expect(screen.getByRole('radio', { name: 'All' })).toHaveClass('text-sm-meta')
+    expect(screen.getByRole('radio', { name: 'All' })).toHaveClass('px-3')
+  })
+
+  it('accepts an optional chipSize override', () => {
+    render(
+      <CatalogFilterChips
+        id="category"
+        label="Category"
+        selectionMode="single-required"
+        options={options}
+        value="all"
+        onValueChange={vi.fn()}
+        chipSize="sm"
+      />,
+    )
+
+    expect(screen.getByRole('radio', { name: 'All' })).toHaveClass('text-xs-meta')
+    expect(screen.getByRole('radio', { name: 'All' })).toHaveClass('px-2')
+  })
+
   it('associates the chip group with the visible label', () => {
     render(
       <CatalogFilterChips

@@ -413,6 +413,7 @@ export {
   CatalogFilterChips,
   type CatalogFilterChipsOption,
   type CatalogFilterChipsProps,
+  type CatalogFilterChipsSize,
 } from './components/ui/catalog-filter-chips.client'
 export {
   FilterPopover,
