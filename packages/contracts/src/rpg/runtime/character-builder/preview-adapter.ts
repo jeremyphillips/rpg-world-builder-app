@@ -1,5 +1,6 @@
 import type { CharacterDerivationInput } from '../character/derive/profile'
 import { assembleCharacterProficiencies } from './assembly/assemble-proficiencies'
+import { getCharacterBuilderTotalLevel } from './builder-level'
 import type { ChoiceSet } from './choice-set'
 import type { CharacterBuildCatalogIndex, ResolvedCharacterCreationRules } from './context'
 import type { SystemRulesetId } from '../../primitives/ruleset'
@@ -24,7 +25,7 @@ export function toCharacterDerivationInput(
   })
 
   return {
-    level: rules.startingLevel,
+    level: getCharacterBuilderTotalLevel(draft),
     armorClassBase: rules.armorClass.base,
     abilityScores: draft.abilities.scores,
     characterClass,

@@ -179,7 +179,7 @@ export type CharacterDetailViewModel = {
   identity: {
     name: string
     summary: string
-    xp: string
+    xp: string | null
   }
   stats: CharacterDetailStatTile[]
   abilities: CharacterAbilityTile[]
@@ -606,8 +606,9 @@ function buildAbilities(
 function buildIdentityXp(
   character: Character,
   xpProgression: Pick<XpProgressionBody, 'entries'>,
-): string {
-  return String(resolveCharacterXpDisplay(character, xpProgression))
+): string | null {
+  const xp = resolveCharacterXpDisplay(character, xpProgression)
+  return xp === null ? null : String(xp)
 }
 
 export function buildCharacterDetailViewModel({

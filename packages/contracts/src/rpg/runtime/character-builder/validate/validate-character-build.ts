@@ -33,7 +33,7 @@ const STEP_VALIDATORS: Record<
     ...validateSpecies(draft),
     ...validateChoiceSetsForStep(draft, context, choiceSets, 'species'),
   ],
-  class: (draft) => validateClass(draft),
+  class: (draft, context) => validateClass(draft, context),
   abilities: (draft, context) =>
     validateAbilities(draft, context.characterCreationRules.abilityGeneration.standardArray),
   proficiencies: (draft, context, choiceSets) =>

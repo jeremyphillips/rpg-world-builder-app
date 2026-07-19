@@ -25,6 +25,7 @@ describe('resolveCharacterXpDisplay', () => {
   it('returns stored character xp', () => {
     expect(resolveCharacterXpDisplay({ xp: 0 }, STANDARD_PROGRESSION)).toBe(0)
     expect(resolveCharacterXpDisplay({ xp: 300 }, STANDARD_PROGRESSION)).toBe(300)
+    expect(resolveCharacterXpDisplay({ xp: null }, STANDARD_PROGRESSION)).toBeNull()
   })
 })
 

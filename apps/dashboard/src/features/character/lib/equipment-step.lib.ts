@@ -28,6 +28,7 @@ import {
   STEP_CHOICE_TYPES_BY_STEP,
   wealthToCopper,
   type CharacterBuildCatalogIndex,
+  type CharacterBuildContext,
   type CharacterBuilderDraft,
   type CharacterBuilderDraftEquipmentPurchase,
   type CharacterClass,
@@ -554,8 +555,11 @@ export function resolvePurchaseSourceMode(): CharacterBuilderDraftEquipmentPurch
 export function resolveEquipmentStepBudget(
   draft: CharacterBuilderDraft,
   catalogIndex: CharacterBuildCatalogIndex,
+  context?: CharacterBuildContext,
 ): EquipmentBudgetSummary | undefined {
-  return deriveEquipmentBudgetSummary(draft, catalogIndex)
+  return deriveEquipmentBudgetSummary(draft, catalogIndex, {
+    startingWealth: context?.characterCreationRules.startingWealth,
+  })
 }
 
 export type EquipmentStepPickerItemsResult = {

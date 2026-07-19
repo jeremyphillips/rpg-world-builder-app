@@ -191,8 +191,9 @@ const EMPTY_IMPORTED_WEALTH = { cp: 0, sp: 0, gp: 0, pp: 0 } as const
 
 type CharacterImportExtraction = CharacterImportResult['extraction']
 
-function resolveImportedXp(extraction: CharacterImportExtraction): number {
-  return extraction.xp.status === 'mapped' ? (extraction.xp.value ?? 0) : 0
+function resolveImportedXp(extraction: CharacterImportExtraction): number | null {
+  if (extraction.xp.status !== 'mapped') return null
+  return extraction.xp.value ?? null
 }
 
 function resolveImportedWealth(extraction: CharacterImportExtraction) {

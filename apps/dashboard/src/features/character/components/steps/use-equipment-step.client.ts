@@ -107,8 +107,8 @@ export function useEquipmentStep(args: {
   const showBudget = shouldShowEquipmentBudget(draft, selectedOptionId)
   const showShopping = shouldShowEquipmentShopping(draft, selectedOptionId)
   const budget = useMemo(
-    () => (showBudget ? resolveEquipmentStepBudget(draft, catalogIndex) : undefined),
-    [catalogIndex, draft, showBudget],
+    () => (showBudget ? resolveEquipmentStepBudget(draft, catalogIndex, context) : undefined),
+    [catalogIndex, context, draft, showBudget],
   )
   const { items: pickerItems, browseSortContext: pickerBrowseSortContext } = useMemo(
     () =>

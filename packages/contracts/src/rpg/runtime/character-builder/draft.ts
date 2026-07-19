@@ -1,6 +1,7 @@
 import { z } from 'zod'
 
 import { equipmentModifierSchema } from '../../content/equipment/modifier'
+import { absoluteLevelSchema } from '../../primitives/level'
 import { abilitySchema } from '../../vocab/ability'
 import { optionalAlignmentSchema } from '../../vocab/alignment'
 import { characterNarrativeSchema } from '../character/narrative'
@@ -34,8 +35,8 @@ export type CharacterBuilderDraftSpecies = z.infer<typeof characterBuilderDraftS
 
 export const characterBuilderDraftClassSchema = z.object({
   classId: z.string().min(1).optional(),
-  /** MVP builds level-1 characters only; the level-up wizard owns progression. */
-  level: z.literal(1),
+  /** Selected class level for single-class builder creation. */
+  level: absoluteLevelSchema,
 })
 
 export type CharacterBuilderDraftClass = z.infer<typeof characterBuilderDraftClassSchema>
@@ -153,7 +154,7 @@ export function createEmptyCharacterBuilderDraft(): CharacterBuilderDraft {
 // rehydration drops mismatched or unparseable state instead of migrating.
 // ---------------------------------------------------------------------------
 
-export const CHARACTER_BUILDER_DRAFT_VERSION = 2
+export const CHARACTER_BUILDER_DRAFT_VERSION = 3
 
 export const persistedCharacterBuilderStateSchema = z.object({
   version: z.literal(CHARACTER_BUILDER_DRAFT_VERSION),

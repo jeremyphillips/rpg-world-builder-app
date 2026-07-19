@@ -176,3 +176,22 @@ export function startingWealthTierForLevel(
 ): StartingWealthTier | undefined {
   return rules.tiers.find((tier) => level >= tier.minLevel && level <= tier.maxLevel)
 }
+
+/**
+ * Resolves the starting wealth tier for builder equipment economics.
+ * Falls back to the highest tier at or below the selected starting level when
+ * no exact match exists.
+ */
+export function resolveStartingWealthTierForBuilder(
+  rules: Pick<StartingWealthRules, 'tiers'>,
+  startingLevel: number,
+): StartingWealthTier | undefined {
+  const exact = startingWealthTierForLevel(rules, startingLevel)
+  if (exact) return exact
+
+  const tiersAtOrBelow = rules.tiers
+    .filter((tier) => startingLevel >= tier.minLevel)
+    .sort((left, right) => right.minLevel - left.minLevel)
+
+  return tiersAtOrBelow[0]
+}

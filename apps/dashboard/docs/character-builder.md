@@ -46,6 +46,14 @@ hidden until a class is chosen.
 
 Readiness does not replace `validateCharacterBuild` on Continue / Create.
 
+### Builder level (phase 1)
+
+- `draft.class.level` is the selected class level (schema: `absoluteLevelSchema`, default `1`).
+- `getCharacterBuilderTotalLevel(draft)` — proficiency bonus and preview derivation.
+- `getBuilderSelectedStartingLevel(draft)` — starting wealth tier lookup (single-class today).
+- `validateBuilderCharacterLevel` / `resolveBuilderLevelConstraints` — context-specific caps; campaign PC requires `level === startingLevel` when that flow is active.
+- Preview and finalize share `resolveBuilderMaxHitPoints`; builder finalize sets `xp: null` until experience tracking is modeled.
+
 ### Copy layers
 
 Dependent-choice workflow strings (heritage, future subclass) use a three-layer model:

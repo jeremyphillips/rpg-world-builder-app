@@ -30,7 +30,7 @@ const characterBaseSchema = z.object({
   classes: characterClassesSchema,
   species: characterSpeciesSchema,
   alignment: alignmentSchema,
-  xp: z.number().int().min(0),
+  xp: z.number().int().min(0).nullable(),
   abilityScores: characterAbilityScoresSchema,
   hitPoints: characterHitPointsSchema,
   proficiencies: characterProficienciesSchema,

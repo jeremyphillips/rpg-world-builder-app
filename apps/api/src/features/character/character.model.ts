@@ -15,7 +15,7 @@ const characterSchema = new Schema(
     classes: { type: [Schema.Types.Mixed], required: true },
     species: { type: Schema.Types.Mixed, required: true },
     alignment: { type: String, required: true },
-    xp: { type: Number, required: true },
+    xp: { type: Number, default: null },
     abilityScores: { type: Schema.Types.Mixed, required: true },
     hitPoints: { type: Schema.Types.Mixed, required: true },
     proficiencies: { type: Schema.Types.Mixed, required: true },

@@ -3,7 +3,7 @@ import type { CharacterBuildCatalogIndex } from '../../context'
 import type { CharacterBuilderDraft } from '../../draft'
 import { unlockedGrantChoiceSets } from '../grants/unlocked-grant-choice-sets'
 
-/** Builds L1 class feature grant ChoiceSets from unlocked grant groups. */
+/** Builds class feature grant ChoiceSets unlocked at the draft class level. */
 export function resolveClassFeatureGrantChoiceSets(
   draft: CharacterBuilderDraft,
   catalogIndex: CharacterBuildCatalogIndex,
@@ -15,7 +15,7 @@ export function resolveClassFeatureGrantChoiceSets(
   if (!characterClass) return []
 
   return characterClass.features.flatMap((feature) => {
-    if (feature.level !== 1) return []
+    if (feature.level > draft.class.level) return []
 
     return unlockedGrantChoiceSets(
       feature,

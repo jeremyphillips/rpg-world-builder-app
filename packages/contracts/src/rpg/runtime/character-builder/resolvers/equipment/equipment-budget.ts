@@ -1,4 +1,7 @@
+import type { StartingWealthRules } from '../../../../campaign/rules/starting-wealth'
+import { resolveStartingWealthTierForBuilder } from '../../../../campaign/rules/starting-wealth'
 import type { Equipment } from '../../../../content/equipment'
+import { averageTierBonusGold } from '../../../../primitives/currency-formula'
 import {
   copperToWealth,
   formatWealth,
@@ -14,7 +17,25 @@ import {
 } from '../../../character/equipment-inventory'
 import type { CharacterBuildCatalogIndex } from '../../context'
 import type { CharacterBuilderDraft, CharacterBuilderDraftEquipmentPurchase } from '../../draft'
+import { getBuilderSelectedStartingLevel } from '../../builder-level'
 import { readSelectedStartingEquipmentOptionId } from './resolve-starting-equipment-choice-sets'
+
+export type DeriveEquipmentBudgetSummaryOptions = {
+  startingWealth?: StartingWealthRules
+}
+
+function resolveTierBonusCopper(
+  startingWealth: StartingWealthRules | undefined,
+  startingLevel: number,
+): number {
+  if (!startingWealth) return 0
+
+  const tier = resolveStartingWealthTierForBuilder(startingWealth, startingLevel)
+  if (!tier?.bonusGold) return 0
+
+  const bonusGp = Math.floor(averageTierBonusGold(tier.bonusGold))
+  return bonusGp * 100
+}
 
 /** Derived shopping budget for equipment picker affordability. */
 export type EquipmentBudgetSummary = {
@@ -74,30 +95,56 @@ function sumPurchaseCostCp(
   }, 0)
 }
 
-/** Derives starting/spent/remaining wealth from the selected package and draft purchases. */
-export function deriveEquipmentBudgetSummary(
+function buildEquipmentBudgetSummary(
+  startingCp: number,
+  purchases: readonly CharacterBuilderDraftEquipmentPurchase[],
+  catalogIndex: CharacterBuildCatalogIndex,
+): EquipmentBudgetSummary {
+  const starting = copperToWealth(startingCp)
+  const spentCp = sumPurchaseCostCp(purchases, catalogIndex)
+  const spent = copperToWealth(spentCp)
+  const remaining = subtractFromWealth(starting, spentCp)
+  return { starting, spent, remaining }
+}
+
+function resolvePackageStartingCopper(
   draft: CharacterBuilderDraft,
   catalogIndex: CharacterBuildCatalogIndex,
-): EquipmentBudgetSummary | undefined {
+): number | undefined {
   const classId = draft.class.classId
   if (!classId) return undefined
 
   const characterClass = catalogIndex.classes.get(classId)
   const startingEquipment = characterClass?.characterCreation?.startingEquipment
-  if (!startingEquipment) return undefined
-
   const selectedOptionId = readSelectedStartingEquipmentOptionId(draft, classId)
-  if (!selectedOptionId) return undefined
+  if (!startingEquipment || !selectedOptionId) return undefined
 
   const option = startingEquipment.options.find((entry) => entry.id === selectedOptionId)
   if (!option) return undefined
 
-  const starting = characterWealthFromGrant(option.wealth)
-  const spentCp = sumPurchaseCostCp(draft.equipment?.purchases ?? [], catalogIndex)
-  const spent = copperToWealth(spentCp)
-  const remaining = subtractFromWealth(starting, spentCp)
+  return wealthToCopper(characterWealthFromGrant(option.wealth))
+}
 
-  return { starting, spent, remaining }
+/** Derives starting/spent/remaining wealth from the selected package and draft purchases. */
+export function deriveEquipmentBudgetSummary(
+  draft: CharacterBuilderDraft,
+  catalogIndex: CharacterBuildCatalogIndex,
+  options?: DeriveEquipmentBudgetSummaryOptions,
+): EquipmentBudgetSummary | undefined {
+  const classId = draft.class.classId
+  if (!classId) return undefined
+
+  const startingLevel = getBuilderSelectedStartingLevel(draft)
+  const tierBonusCp = resolveTierBonusCopper(options?.startingWealth, startingLevel)
+  const purchases = draft.equipment?.purchases ?? []
+  const packageStartingCp = resolvePackageStartingCopper(draft, catalogIndex)
+
+  if (packageStartingCp === undefined) {
+    if (tierBonusCp <= 0) return undefined
+    return buildEquipmentBudgetSummary(tierBonusCp, purchases, catalogIndex)
+  }
+
+  return buildEquipmentBudgetSummary(packageStartingCp + tierBonusCp, purchases, catalogIndex)
 }
 
 export type { CoinWealth }

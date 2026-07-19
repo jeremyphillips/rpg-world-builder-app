@@ -14,11 +14,11 @@ export function resolveXpRequiredForLevel(
   return xpRequiredForLevel(progression, level)
 }
 
-/** Stored XP on a character sheet (formatting is a UI concern). */
+/** Stored XP on a character sheet. null = not tracked / not initialized. */
 export function resolveCharacterXpDisplay(
   character: Pick<Character, 'xp'>,
   _progression: Pick<XpProgressionBody, 'entries'>,
-): number {
+): number | null {
   return character.xp
 }
 

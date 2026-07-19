@@ -84,7 +84,9 @@ export function CharacterDetailContent({
             {viewModel.identity.name}
           </Heading>
           <Text variant="muted">{viewModel.identity.summary}</Text>
-          <Text variant="muted">{viewModel.identity.xp} XP</Text>
+          {viewModel.identity.xp !== null ? (
+            <Text variant="muted">{viewModel.identity.xp} XP</Text>
+          ) : null}
         </div>
         {showDelete ? (
           <Button

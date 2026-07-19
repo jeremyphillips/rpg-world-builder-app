@@ -1,10 +1,10 @@
 import { createCharacterInputSchema } from '../character/create-input'
 import type { CreateCharacterInput } from '../character/create-input'
-import { levelOneMaxHp } from '../character/derive/index'
 import { formatFieldMessage } from '../../../validation/define-message'
 import { ABILITY_IDS, type Ability } from '../../vocab/ability'
 import { assembleCharacterProficiencies } from './assembly/assemble-proficiencies'
 import { characterBuilderValidationMessages } from './character-builder-messages'
+import { DEFAULT_BUILDER_HIT_POINT_SOURCE, resolveBuilderMaxHitPoints } from './builder-hit-points'
 import { indexCharacterBuildCatalog, type CharacterBuildContext } from './context'
 import type { CharacterBuilderDraft } from './draft'
 import type { CharacterBuildEngineOptions } from './engine-options'
@@ -94,6 +94,10 @@ export function finalizeCharacterBuild(
   )
   const { equipment, wealth } = assembleStartingEquipment(draft, catalogIndex)
 
+  const maxHp = resolveBuilderMaxHitPoints(draft, characterClass, {
+    source: DEFAULT_BUILDER_HIT_POINT_SOURCE,
+  })
+
   const input: CreateCharacterInput = {
     characterType: 'pc',
     campaignId: null,
@@ -106,11 +110,11 @@ export function finalizeCharacterBuild(
       heritageId: draft.species.heritageId,
     },
     alignment: draft.identity.alignment!,
-    xp: 0,
+    xp: null,
     abilityScores,
     hitPoints: {
-      base: levelOneMaxHp(characterClass.hitDie, abilityScores.con),
-      current: levelOneMaxHp(characterClass.hitDie, abilityScores.con),
+      base: maxHp,
+      current: maxHp,
       temporary: 0,
     },
     proficiencies,

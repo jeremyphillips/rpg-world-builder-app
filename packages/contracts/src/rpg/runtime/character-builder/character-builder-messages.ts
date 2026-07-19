@@ -85,6 +85,18 @@ export const characterBuilderValidationMessages = {
     'validation.characterBuilder.proficiencyNoLongerAvailable',
     ({ proficiencyLabel }) => `${proficiencyLabel} is no longer available.`,
   ),
+  levelBelowAllowedMinimum: defineMessage(
+    'validation.characterBuilder.levelBelowAllowedMinimum',
+    () => 'Character level must be at least 1.',
+  ),
+  levelExceedsCampaignMaximum: defineMessage<{ maxLevel: number }>(
+    'validation.characterBuilder.levelExceedsCampaignMaximum',
+    ({ maxLevel }) => `Character level cannot exceed ${maxLevel}.`,
+  ),
+  levelMustMatchStartingLevel: defineMessage<{ startingLevel: number }>(
+    'validation.characterBuilder.levelMustMatchStartingLevel',
+    ({ startingLevel }) => `Campaign characters must be created at level ${startingLevel}.`,
+  ),
   speciesRequiredForLanguageRecommendations: defineMessage(
     'validation.characterBuilder.speciesRequiredForLanguageRecommendations',
     () => 'Choose a species to see recommended languages for your ancestry.',
