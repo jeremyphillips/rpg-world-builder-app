@@ -1,6 +1,8 @@
 'use client'
 
-import { CollapsibleListItem, Text } from '@rpg/ui'
+import * as React from 'react'
+
+import { CatalogFilterChips, CatalogToolbar, CollapsibleListItem, Text } from '@rpg/ui'
 
 import {
   buildCatalogDisclosureLabel,
@@ -13,10 +15,31 @@ import {
 } from '@/features/content/equipment'
 import { CHARACTER_EMPTY_SECTION_TEXT } from '../../lib/character-display'
 import {
+  buildCharacterDetailEquipmentKindChipOptions,
+  CHARACTER_DETAIL_EQUIPMENT_CATEGORY_LABEL,
+  CHARACTER_DETAIL_EQUIPMENT_RESET_VIEW_LABEL,
+  CHARACTER_DETAIL_EQUIPMENT_SEARCH_MIN_ITEMS,
+  CHARACTER_DETAIL_EQUIPMENT_SEARCH_PLACEHOLDER,
+  CHARACTER_DETAIL_EQUIPMENT_SORT_LABEL,
+  CHARACTER_DETAIL_EQUIPMENT_SORT_LABELS,
+  CHARACTER_DETAIL_EQUIPMENT_SORT_MODES,
+  CHARACTER_DETAIL_EQUIPMENT_VIEW_DEFAULTS,
+  countCharacterDetailEquipmentStructuredFilters,
+  filterCharacterDetailEquipmentCards,
+  resolveCharacterDetailEquipmentKindOptions,
+  sortCharacterDetailEquipmentCards,
+  type CharacterDetailEquipmentKindFilter,
+  type CharacterDetailEquipmentSortMode,
+} from '../../lib/detail/character-detail-equipment-filters.lib'
+import {
   toEquipmentCatalogHeaderModel,
   type CharacterSheetEquipmentCard,
 } from '../../lib/detail/character-sheet-catalog'
 import type { CharacterWealthViewModel } from '../../lib/character-display'
+import { hasCatalogPickerResetViewCriteria } from '../picker/catalog-picker-filter-state.lib'
+import { CatalogSortControl } from '../picker/catalog-sort-control.client'
+import { pickerSortOption } from '../picker/catalog-picker-sort-labels.lib'
+import { CatalogToolbarResetAction } from '../picker/catalog-toolbar-reset-action.client'
 import { CharacterEquipmentQuantityLabel } from '../equipment/character-equipment-quantity-label.client'
 
 export type CharacterDetailEquipmentTabProps = {
@@ -72,6 +95,55 @@ function EquipmentCatalogRow({ card }: { card: CharacterSheetEquipmentCard }) {
 }
 
 export function CharacterDetailEquipmentTab({ cards, wealth }: CharacterDetailEquipmentTabProps) {
+  const [selectedKind, setSelectedKind] = React.useState<CharacterDetailEquipmentKindFilter>(
+    CHARACTER_DETAIL_EQUIPMENT_VIEW_DEFAULTS.selectedKind,
+  )
+  const [searchQuery, setSearchQuery] = React.useState<string>(
+    CHARACTER_DETAIL_EQUIPMENT_VIEW_DEFAULTS.searchQuery,
+  )
+  const [sortMode, setSortMode] = React.useState<CharacterDetailEquipmentSortMode>(
+    CHARACTER_DETAIL_EQUIPMENT_VIEW_DEFAULTS.sortMode,
+  )
+
+  const kindOptions = React.useMemo(
+    () => resolveCharacterDetailEquipmentKindOptions(cards),
+    [cards],
+  )
+
+  React.useEffect(() => {
+    setSelectedKind((current) => {
+      if (current === CHARACTER_DETAIL_EQUIPMENT_VIEW_DEFAULTS.selectedKind) return current
+      return kindOptions.includes(current)
+        ? current
+        : CHARACTER_DETAIL_EQUIPMENT_VIEW_DEFAULTS.selectedKind
+    })
+  }, [kindOptions])
+
+  const visibleCards = React.useMemo(() => {
+    const filtered = filterCharacterDetailEquipmentCards(cards, {
+      selectedKind,
+      searchQuery,
+    })
+    return sortCharacterDetailEquipmentCards(filtered, sortMode)
+  }, [cards, searchQuery, selectedKind, sortMode])
+
+  const showCategoryFilter = kindOptions.length > 1
+  const showSearch = cards.length >= CHARACTER_DETAIL_EQUIPMENT_SEARCH_MIN_ITEMS
+  const showSort = cards.length > 1
+  const structuredFilterCount = countCharacterDetailEquipmentStructuredFilters(selectedKind)
+  const showResetView = hasCatalogPickerResetViewCriteria({
+    structuredFilterCount,
+    searchQuery,
+    sortMode,
+    defaultSortMode: CHARACTER_DETAIL_EQUIPMENT_VIEW_DEFAULTS.sortMode,
+  })
+
+  const handleResetView = () => {
+    setSelectedKind(CHARACTER_DETAIL_EQUIPMENT_VIEW_DEFAULTS.selectedKind)
+    setSearchQuery(CHARACTER_DETAIL_EQUIPMENT_VIEW_DEFAULTS.searchQuery)
+    setSortMode(CHARACTER_DETAIL_EQUIPMENT_VIEW_DEFAULTS.sortMode)
+  }
+
   return (
     <div className="space-y-4">
       <Text variant="muted">
@@ -80,11 +152,67 @@ export function CharacterDetailEquipmentTab({ cards, wealth }: CharacterDetailEq
       {cards.length === 0 ? (
         <Text variant="muted">{CHARACTER_EMPTY_SECTION_TEXT.equipment}</Text>
       ) : (
-        <CatalogCollapsibleList
-          items={cards}
-          getItemId={(card) => card.id}
-          renderItem={(card) => <EquipmentCatalogRow card={card} />}
-        />
+        <>
+          <CatalogToolbar
+            className="px-0 pb-0"
+            search={
+              showSearch
+                ? {
+                    query: searchQuery,
+                    onQueryChange: setSearchQuery,
+                    placeholder: CHARACTER_DETAIL_EQUIPMENT_SEARCH_PLACEHOLDER,
+                  }
+                : undefined
+            }
+            primaryControls={
+              showCategoryFilter ? (
+                <CatalogFilterChips
+                  id="character-detail-equipment-category"
+                  label={CHARACTER_DETAIL_EQUIPMENT_CATEGORY_LABEL}
+                  selectionMode="single-required"
+                  value={selectedKind}
+                  onValueChange={(value) =>
+                    setSelectedKind(value as CharacterDetailEquipmentKindFilter)
+                  }
+                  options={buildCharacterDetailEquipmentKindChipOptions(kindOptions)}
+                />
+              ) : undefined
+            }
+            filterRow={
+              showSort
+                ? {
+                    actions: (
+                      <CatalogSortControl
+                        value={sortMode}
+                        label={CHARACTER_DETAIL_EQUIPMENT_SORT_LABEL}
+                        ariaLabel="Sort equipment"
+                        triggerAriaLabel="Equipment sort order"
+                        options={CHARACTER_DETAIL_EQUIPMENT_SORT_MODES.map((mode) =>
+                          pickerSortOption(mode, CHARACTER_DETAIL_EQUIPMENT_SORT_LABELS[mode]),
+                        )}
+                        onValueChange={(value) =>
+                          setSortMode(value as CharacterDetailEquipmentSortMode)
+                        }
+                      />
+                    ),
+                  }
+                : undefined
+            }
+            actions={
+              showResetView ? (
+                <CatalogToolbarResetAction
+                  label={CHARACTER_DETAIL_EQUIPMENT_RESET_VIEW_LABEL}
+                  onClick={handleResetView}
+                />
+              ) : undefined
+            }
+          />
+          <CatalogCollapsibleList
+            items={visibleCards}
+            getItemId={(card) => card.id}
+            renderItem={(card) => <EquipmentCatalogRow card={card} />}
+          />
+        </>
       )}
     </div>
   )

@@ -23,6 +23,7 @@ export type CatalogToolbarSearch = {
 }
 
 export type CatalogToolbarProps = {
+  className?: string
   /** Omit to hide search — supports detail tabs with filters/sort only */
   search?: CatalogToolbarSearch
 

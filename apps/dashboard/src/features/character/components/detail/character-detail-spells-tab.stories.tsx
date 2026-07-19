@@ -12,22 +12,35 @@ import { CharacterDetailSpellsTab } from './character-detail-spells-tab.client'
 
 const context = createPopulatedStandaloneBuilderContextFixture()
 const baseCatalogIndex = createStandaloneBuilderCatalogIndexFixture(context)
-const spell = pickSpell('fire-bolt')
+const cantrip = pickSpell('fire-bolt')
+const firstLevel = pickSpell('magic-missile')
 const catalogIndex = {
   ...baseCatalogIndex,
-  spells: new Map([...baseCatalogIndex.spells, [spell.id, spell]]),
+  spells: new Map([...baseCatalogIndex.spells, [cantrip.id, cantrip], [firstLevel.id, firstLevel]]),
 }
 const cards = buildCharacterSheetSpellCards(
   {
     ...SAMPLE_PC,
     spells: [
       {
-        spellId: spell.id,
+        spellId: cantrip.id,
         sources: [
           {
             kind: 'classSpellcasting' as const,
             sourceId: 'srd-cc-5.2.1:wizard',
             grantId: 'cantrips',
+          },
+        ],
+        access: { classKnown: true },
+        selection: { prepared: true },
+      },
+      {
+        spellId: firstLevel.id,
+        sources: [
+          {
+            kind: 'classSpellcasting' as const,
+            sourceId: 'srd-cc-5.2.1:wizard',
+            grantId: 'prepared',
           },
         ],
         access: { classKnown: true },

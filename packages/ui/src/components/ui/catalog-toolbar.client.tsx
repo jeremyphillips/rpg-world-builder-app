@@ -12,6 +12,7 @@ import type {
   CatalogToolbarTab,
   CatalogToolbarTabs,
 } from './catalog-toolbar.types'
+import { cn } from '../../lib/utils'
 import { resolveCatalogToolbarLayout } from './catalog-toolbar.lib'
 import {
   catalogToolbarFilterActionsVariants,
@@ -102,6 +103,7 @@ function CatalogToolbarStandaloneActions({ actions }: { actions: ReactNode }) {
 }
 
 export function CatalogToolbar({
+  className,
   search,
   tabs,
   primaryControls,
@@ -113,7 +115,7 @@ export function CatalogToolbar({
     layout.hasTabs && tabs ? <CatalogToolbarTabRow tabs={tabs} actions={actions} /> : null
 
   return (
-    <div className={catalogToolbarVariants()}>
+    <div className={cn(catalogToolbarVariants(), className)}>
       {layout.tabsBeforeSearch ? tabRow : null}
       {search ? <CatalogToolbarSearchField search={search} /> : null}
       {layout.tabsAfterSearch ? tabRow : null}

@@ -1,5 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 
+import { pickEquipment } from '@/features/content/lib/fixtures/pick'
+
 import {
   createPopulatedStandaloneBuilderContextFixture,
   createStandaloneBuilderCatalogIndexFixture,
@@ -10,6 +12,8 @@ import { CharacterDetailEquipmentTab } from './character-detail-equipment-tab.cl
 
 const context = createPopulatedStandaloneBuilderContextFixture()
 const catalogIndex = createStandaloneBuilderCatalogIndexFixture(context)
+const dagger = pickEquipment('dagger')
+const chainMail = pickEquipment('chain-mail')
 const cards = buildCharacterSheetEquipmentCards(
   {
     ...SAMPLE_PC,
@@ -18,15 +22,26 @@ const cards = buildCharacterSheetEquipmentCards(
       weapons: [
         {
           entryId: 'weapon-1',
-          equipmentId: 'srd-cc-5.2.1:dagger',
+          equipmentId: dagger.id,
           quantity: 2,
           equipped: true,
           sources: [{ kind: 'manual' }],
         },
       ],
+      armor: [
+        {
+          entryId: 'armor-1',
+          equipmentId: chainMail.id,
+          quantity: 1,
+          sources: [{ kind: 'manual' }],
+        },
+      ],
     },
   },
-  catalogIndex,
+  {
+    ...catalogIndex,
+    equipment: new Map([...catalogIndex.equipment, [dagger.id, dagger], [chainMail.id, chainMail]]),
+  },
 )
 
 const meta = {
