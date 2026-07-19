@@ -96,8 +96,13 @@ export function createStandaloneBuilderContextFixture(
   const rulesetId = overrides.rulesetId ?? DEFAULT_SYSTEM_RULESET_ID
 
   return {
+    channel: 'build',
+    surface: 'dashboard',
+    characterKind: 'pc',
     mode: 'dashboard',
     scope: { type: 'standalone', rulesetId },
+    rulesScope: { type: 'ruleset', rulesetId },
+    ownershipTarget: { type: 'user' },
     rulesetId,
     catalog: emptyCatalog,
     characterCreationRules: {

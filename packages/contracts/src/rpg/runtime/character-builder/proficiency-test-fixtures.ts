@@ -3,6 +3,7 @@ import type { Equipment } from '../../content/equipment'
 import type { SkillProficiency } from '../../content/skill-proficiency'
 import { resolveCharacterCreationPatch } from '../../campaign/patches/campaign-character-creation-patch'
 import { defaultCampaignMechanicsPatch } from '../../campaign/patches/campaign-mechanics-patch'
+import { resolveCharacterOwnershipTarget } from '../character-acquisition'
 import { DEFAULT_ABILITY_GENERATION_RULES } from './ability-generation'
 import type { CharacterBuildCatalog, CharacterBuildContext } from './context'
 import { builderTestLanguages, dwarfSpecies, startingWealthSeed } from './test-fixtures'
@@ -200,8 +201,16 @@ export const proficiencyTestCatalog: CharacterBuildCatalog = {
 }
 
 export const proficiencyTestContext: CharacterBuildContext = {
+  channel: 'build',
+  surface: 'dashboard',
+  characterKind: 'pc',
   mode: 'dashboard',
   scope: { type: 'standalone', rulesetId: 'srd-cc-5.2.1' },
+  rulesScope: { type: 'ruleset', rulesetId: 'srd-cc-5.2.1' },
+  ownershipTarget: resolveCharacterOwnershipTarget('pc', {
+    type: 'ruleset',
+    rulesetId: 'srd-cc-5.2.1',
+  }),
   rulesetId: 'srd-cc-5.2.1',
   catalog: proficiencyTestCatalog,
   characterCreationRules: {

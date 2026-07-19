@@ -6,6 +6,7 @@ import { errorHandler, notFound } from './middleware/error-handler'
 import { loadEnv } from './env'
 import { authRouter } from './features/auth'
 import { campaignRouter } from './features/campaign'
+import { campaignNpcRouter } from './features/campaign/npc/npc.routes'
 import { characterRouter } from './features/character'
 import { contentRouter, homebrewRouter } from './features/content'
 import { benchRouter } from './features/dev-bench'
@@ -41,6 +42,7 @@ export function createApp(): Express {
   })
   api.use('/auth', authRouter)
   api.use('/campaigns', campaignRouter)
+  api.use('/campaigns/:campaignId/npcs', campaignNpcRouter)
   api.use('/characters', characterRouter)
   api.use('/rulesets', rulesetRouter)
   api.use('/campaigns/:campaignId/content', contentRouter)

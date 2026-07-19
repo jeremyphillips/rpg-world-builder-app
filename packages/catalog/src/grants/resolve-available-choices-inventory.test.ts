@@ -18,8 +18,13 @@ const RULESET = 'srd-cc-5.2.1' as const
 
 function seedBuildContext(): CharacterBuildContext {
   return {
+    channel: 'build',
+    surface: 'dashboard',
+    characterKind: 'pc',
     mode: 'dashboard',
     scope: { type: 'standalone', rulesetId: RULESET },
+    rulesScope: { type: 'ruleset', rulesetId: RULESET },
+    ownershipTarget: { type: 'user' },
     rulesetId: RULESET,
     catalog: {
       species: loadSeedSpecies(RULESET),

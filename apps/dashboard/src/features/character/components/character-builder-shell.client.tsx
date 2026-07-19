@@ -16,7 +16,6 @@ import {
 import { buttonVariants, Heading, Spinner, Text } from '@rpg/ui'
 
 import { ROUTES } from '@/app/routes'
-import { useCampaignStore } from '@/features/campaign'
 
 import { useResolvedChoiceSets } from '../hooks/use-resolved-choice-sets'
 import { useCharacterPreview } from '../hooks/use-character-preview'
@@ -66,7 +65,6 @@ export type CharacterBuilderShellProps = {
 /** Full-viewport builder chrome: step rail, step panel, live preview, footer nav. */
 export function CharacterBuilderShell({ context, catalogIndex }: CharacterBuilderShellProps) {
   const navigate = useNavigate()
-  const activeCampaignId = useCampaignStore((state) => state.activeCampaignId)
   const { mutateAsync: createCharacterMutation, isPending: isCreating } = useCreateCharacter()
   const hasHydrated = useCharacterBuilderStore(context, (state) => state._hasHydrated)
   const hasPendingRestore = useCharacterBuilderStore(context, (state) => state.hasPendingRestore)
@@ -295,10 +293,7 @@ export function CharacterBuilderShell({ context, catalogIndex }: CharacterBuilde
             New character
           </Heading>
           <div className="flex flex-wrap gap-2">
-            <Link
-              to={ROUTES.characters.import(activeCampaignId ?? undefined)}
-              className={buttonVariants({ variant: 'outline' })}
-            >
+            <Link to={ROUTES.characters.import} className={buttonVariants({ variant: 'outline' })}>
               Import character (experimental)
             </Link>
             <Link to={ROUTES.characters.list} className={buttonVariants({ variant: 'outline' })}>

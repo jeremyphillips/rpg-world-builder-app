@@ -46,7 +46,7 @@ export function CharactersOverview() {
           Characters
         </Heading>
         <div className="flex flex-wrap gap-2">
-          <Link to={ROUTES.characters.import()} className={buttonVariants({ variant: 'outline' })}>
+          <Link to={ROUTES.characters.import} className={buttonVariants({ variant: 'outline' })}>
             Import character (experimental)
           </Link>
           <Link to={ROUTES.characters.new} className={buttonVariants({ variant: 'default' })}>

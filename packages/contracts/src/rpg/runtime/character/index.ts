@@ -1,6 +1,7 @@
 export * from './character-messages'
 export * from './core'
 export * from './create-input'
+export * from './create-npc-input'
 export * from './derive/index'
 export * from './equipment-inventory'
 export * from './format-selection-source-label'

@@ -4,6 +4,7 @@ import { resolveCharacterCreationPatch } from '../../campaign/patches/campaign-c
 import { defaultCampaignMechanicsPatch } from '../../campaign/patches/campaign-mechanics-patch'
 import type { Species } from '../../content/species'
 import type { SkillProficiency } from '../../content/skill-proficiency'
+import { resolveCharacterOwnershipTarget } from '../character-acquisition'
 import { DEFAULT_ABILITY_GENERATION_RULES } from './ability-generation'
 import type { CharacterBuildCatalog, CharacterBuildContext } from './context'
 import { dwarfSpecies, startingWealthSeed, storedFighter } from './test-fixtures'
@@ -208,8 +209,13 @@ export const spellcastingTestCatalog: CharacterBuildCatalog = {
 }
 
 export const spellcastingTestContext: CharacterBuildContext = {
+  channel: 'build',
+  surface: 'dashboard',
+  characterKind: 'pc',
   mode: 'dashboard',
   scope: { type: 'standalone', rulesetId: RULESET },
+  rulesScope: { type: 'ruleset', rulesetId: RULESET },
+  ownershipTarget: resolveCharacterOwnershipTarget('pc', { type: 'ruleset', rulesetId: RULESET }),
   rulesetId: RULESET,
   catalog: spellcastingTestCatalog,
   characterCreationRules: {

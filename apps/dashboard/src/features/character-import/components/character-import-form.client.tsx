@@ -18,13 +18,32 @@ import { CharacterImportPreview } from './character-import-preview.client'
 
 export type CharacterImportFormProps = {
   initialInput?: string
-  campaignId?: string | null
 }
 
-// fallow-ignore-next-line complexity
+function CharacterImportFormAlerts({ error }: { error: unknown }) {
+  const importError = error instanceof ApiError ? getCharacterImportErrorAlert(error.code) : null
+  const genericError = error && !importError ? 'Could not preview the D&D Beyond character.' : null
+
+  if (!importError && !genericError) return null
+
+  return (
+    <>
+      {importError ? (
+        <Alert
+          variant="destructive"
+          title={importError.title}
+          description={importError.description}
+        />
+      ) : null}
+      {genericError ? (
+        <Alert variant="destructive" title="Import preview failed" description={genericError} />
+      ) : null}
+    </>
+  )
+}
+
 export function CharacterImportForm({
   initialInput = CHARACTER_IMPORT_DEFAULT_CHARACTER_ID,
-  campaignId,
 }: CharacterImportFormProps) {
   const inputId = useId()
   const {
@@ -45,9 +64,6 @@ export function CharacterImportForm({
     mutate(values.input)
   })
 
-  const importError = error instanceof ApiError ? getCharacterImportErrorAlert(error.code) : null
-  const genericError = error && !importError ? 'Could not preview the D&D Beyond character.' : null
-
   return (
     <div className="flex flex-col gap-6">
       <Alert
@@ -55,10 +71,6 @@ export function CharacterImportForm({
         title="Experimental import"
         description="This preview fetches a public D&D Beyond character and shows what can be extracted. Characters are not saved from this screen."
       />
-
-      {campaignId ? (
-        <Text variant="muted">Campaign context: {campaignId} (navigation only)</Text>
-      ) : null}
 
       <form className="flex flex-col gap-4" onSubmit={onSubmit} noValidate>
         <div className="flex flex-col gap-2">
@@ -91,17 +103,7 @@ export function CharacterImportForm({
         </div>
       </form>
 
-      {importError ? (
-        <Alert
-          variant="destructive"
-          title={importError.title}
-          description={importError.description}
-        />
-      ) : null}
-
-      {genericError ? (
-        <Alert variant="destructive" title="Import preview failed" description={genericError} />
-      ) : null}
+      <CharacterImportFormAlerts error={error} />
 
       {data ? <CharacterImportPreview result={data} key={currentInput} /> : null}
     </div>
