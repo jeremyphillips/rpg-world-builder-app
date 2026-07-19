@@ -6,7 +6,7 @@ import { getStandardXpProgression } from '@rpg/catalog/xp-progressions'
 import { PageLoadState } from '@/components/layout/page-load-state'
 import { WidePage } from '@/components/layout/wide-page'
 
-import { CharacterDetailContent } from '../components/character-detail-content.client'
+import { CharacterDetailContent } from '../components/detail/character-detail-content.client'
 import { useBuildContext } from '../hooks/use-build-context'
 import { useCharacter } from '../hooks/use-character'
 import { buildCharacterDetailViewModel } from '../lib/character-display'

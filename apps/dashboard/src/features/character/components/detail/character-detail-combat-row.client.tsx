@@ -9,7 +9,7 @@ import {
   type CharacterDetailListItem,
   type CharacterDetailListSection,
   type CharacterProficienciesViewModel,
-} from '../lib/character-display'
+} from '../../lib/character-display'
 import {
   characterDetailActionsPanelClasses,
   characterDetailCombatCardClasses,

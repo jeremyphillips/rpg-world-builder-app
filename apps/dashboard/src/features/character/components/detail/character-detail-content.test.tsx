@@ -7,9 +7,9 @@ import { expectNoAxeViolations } from '@rpg/ui/test-utils'
 import {
   createPopulatedStandaloneBuilderContextFixture,
   createStandaloneBuilderCatalogIndexFixture,
-} from '../lib/character-builder-fixtures'
-import { buildCharacterDetailViewModel } from '../lib/character-display'
-import { SAMPLE_PC } from '../lib/character-fixtures'
+} from '../../lib/character-builder-fixtures'
+import { buildCharacterDetailViewModel } from '../../lib/character-display'
+import { SAMPLE_PC } from '../../lib/character-fixtures'
 import { CharacterDetailContent } from './character-detail-content.client'
 
 vi.mock('@/components/layout/use-breadcrumb-label', () => ({
@@ -17,7 +17,7 @@ vi.mock('@/components/layout/use-breadcrumb-label', () => ({
 }))
 
 const mutate = vi.fn()
-vi.mock('../hooks/use-delete-character', () => ({
+vi.mock('../../hooks/use-delete-character', () => ({
   useDeleteCharacter: () => ({
     mutate,
     isPending: false,

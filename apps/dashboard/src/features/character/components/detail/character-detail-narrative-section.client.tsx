@@ -3,7 +3,7 @@
 import type { CharacterNarrative } from '@rpg/contracts'
 import { RichTextContent, Text } from '@rpg/ui'
 
-import { narrativeFieldCount } from '../lib/narrative-preview'
+import { narrativeFieldCount } from '../../lib/narrative-preview'
 
 export type CharacterDetailNarrativeSectionProps = {
   narrative: CharacterNarrative | undefined
