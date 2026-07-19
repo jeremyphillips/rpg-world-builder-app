@@ -1,33 +1,16 @@
 import {
-  BUILDER_STEPS,
   characterBuilderLevelMessages,
   formatFieldMessage,
   type BuilderLevelConstraints,
   type BuilderSelectionRemoval,
   type CharacterBuildContext,
   type CharacterBuilderDraft,
-  type CharacterBuilderStepId,
   type ChoiceSet,
   pruneInvalidBuilderSelections,
 } from '@rpg/contracts'
 import type { SelectFieldOption } from '@rpg/ui'
 
 import { mergeCharacterBuilderDraft } from './merge-character-builder-draft'
-
-export function getBuilderStepIndex(stepId: CharacterBuilderStepId): number {
-  return BUILDER_STEPS.findIndex((step) => step.id === stepId)
-}
-
-export function shouldShowBuilderLevelControl(
-  stepId: CharacterBuilderStepId,
-  constraints: BuilderLevelConstraints,
-): boolean {
-  if (constraints.mode === 'fixed') {
-    return true
-  }
-
-  return getBuilderStepIndex(stepId) >= getBuilderStepIndex('class')
-}
 
 export function buildBuilderLevelSelectOptions(
   constraints: BuilderLevelConstraints,

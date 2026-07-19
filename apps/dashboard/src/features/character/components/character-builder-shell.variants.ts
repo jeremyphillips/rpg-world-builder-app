@@ -9,11 +9,15 @@ export const characterBuilderRouteClasses =
 export const characterBuilderShellRootClasses =
   'flex min-h-0 flex-1 flex-col gap-6 [--character-builder-header-offset:0px]'
 
-export const characterBuilderShellHeaderClasses = 'flex shrink-0 items-center justify-between gap-4'
+export const characterBuilderShellHeaderClasses = 'flex shrink-0 items-start justify-between gap-4'
+
+/** Page title row — headline and persistent level control share one line when space allows. */
+export const characterBuilderShellHeaderTitleRowClasses =
+  'flex min-w-0 flex-1 flex-wrap items-center gap-x-4 gap-y-2'
 
 /** Three-column body — columns scroll independently inside the remaining height. */
 export const characterBuilderShellBodyClasses =
-  'grid min-h-0 flex-1 grid-cols-1 gap-6 overflow-hidden lg:grid-cols-[minmax(12rem,16rem)_minmax(0,1fr)_minmax(14rem,18rem)]'
+  'grid min-h-0 flex-1 grid-cols-1 gap-8 overflow-hidden lg:grid-cols-[minmax(12rem,16rem)_minmax(0,1fr)_minmax(14rem,18rem)]'
 
 export const characterBuilderShellColumnClasses = 'scrollbar-slim min-h-0 min-w-0 overflow-y-auto'
 

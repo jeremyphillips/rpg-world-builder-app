@@ -11,7 +11,7 @@ describe('characterBuilderLevelMessages', () => {
   })
 
   it('formats representative copy', () => {
-    expect(formatFieldMessage(characterBuilderLevelMessages.fieldLabel())).toBe('Level')
+    expect(formatFieldMessage(characterBuilderLevelMessages.fieldLabel())).toBe('Choose level')
     expect(
       formatFieldMessage(characterBuilderLevelMessages.fixedHelper({ startingLevel: 3 })),
     ).toBe('Campaign entry level (3).')

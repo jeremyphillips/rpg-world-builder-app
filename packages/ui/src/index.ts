@@ -161,6 +161,7 @@ export {
   SelectField,
   type SelectFieldProps,
   type SelectFieldOption,
+  type SelectLabelPosition,
 } from './components/ui/select-field'
 export {
   FieldReadOnlyValue,

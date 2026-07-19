@@ -39,11 +39,7 @@ describe('CharacterBuilderLevelControl', () => {
       screen.getByText(formatFieldMessage(characterBuilderLevelMessages.fieldLabel())),
     ).toBeInTheDocument()
     expect(screen.getByText('3')).toBeInTheDocument()
-    expect(
-      screen.getByText(
-        formatFieldMessage(characterBuilderLevelMessages.fixedHelper({ startingLevel: 3 })),
-      ),
-    ).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'About Choose level' })).toBeInTheDocument()
   })
 
   it('renders a selectable level field for standalone PCs', () => {
@@ -57,12 +53,8 @@ describe('CharacterBuilderLevelControl', () => {
       />,
     )
 
-    expect(screen.getByRole('combobox', { name: /Level/i })).toBeInTheDocument()
-    expect(
-      screen.getByText(
-        formatFieldMessage(characterBuilderLevelMessages.selectableHelper({ maxLevel: 20 })),
-      ),
-    ).toBeInTheDocument()
+    expect(screen.getByRole('combobox', { name: /Choose level/i })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'About Choose level' })).toBeInTheDocument()
   })
 
   it('applies level changes immediately when no selections are removed', async () => {
@@ -82,7 +74,7 @@ describe('CharacterBuilderLevelControl', () => {
       />,
     )
 
-    await user.click(screen.getByRole('combobox', { name: /Level/i }))
+    await user.click(screen.getByRole('combobox', { name: /Choose level/i }))
     await user.click(screen.getByRole('option', { name: '2' }))
 
     expect(onApplyLevelDraft).toHaveBeenCalledWith(
@@ -112,7 +104,7 @@ describe('CharacterBuilderLevelControl', () => {
       />,
     )
 
-    await user.click(screen.getByRole('combobox', { name: /Level/i }))
+    await user.click(screen.getByRole('combobox', { name: /Choose level/i }))
     await user.click(screen.getByRole('option', { name: '2' }))
 
     const dialog = screen.getByRole('dialog')

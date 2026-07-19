@@ -6,18 +6,11 @@ import { createStandaloneBuilderContextFixture } from './character-builder-fixtu
 import {
   buildBuilderLevelSelectOptions,
   evaluateBuilderLevelChange,
-  shouldShowBuilderLevelControl,
 } from './builder-level-control.lib'
 
 describe('builder-level-control.lib', () => {
   const context = createStandaloneBuilderContextFixture()
   const constraints = resolveBuilderLevelConstraints(context)
-
-  it('shows selectable level control from the class step onward', () => {
-    expect(shouldShowBuilderLevelControl('species', constraints)).toBe(false)
-    expect(shouldShowBuilderLevelControl('class', constraints)).toBe(true)
-    expect(shouldShowBuilderLevelControl('review', constraints)).toBe(true)
-  })
 
   it('builds level options within campaign maximum', () => {
     const options = buildBuilderLevelSelectOptions(constraints)

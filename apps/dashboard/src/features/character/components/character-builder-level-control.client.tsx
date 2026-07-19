@@ -10,7 +10,7 @@ import {
   type CharacterBuildContext,
   type CharacterBuilderDraft,
 } from '@rpg/contracts'
-import { Badge, Button, Modal, SelectField, Text } from '@rpg/ui'
+import { Badge, Button, InfoTooltip, Modal, SelectField, Text } from '@rpg/ui'
 
 import {
   buildBuilderLevelSelectOptions,
@@ -137,33 +137,38 @@ export function CharacterBuilderLevelControl({
 
   if (constraints.mode === 'fixed') {
     return (
-      <div className="flex flex-wrap items-center gap-2">
+      <div className="flex shrink-0 items-center gap-2">
         <Text as="span" variant="muted" className="text-sm">
           {formatFieldMessage(characterBuilderLevelMessages.fieldLabel())}
         </Text>
         <Badge appearance="neutral" tone="neutral">
           {constraints.fixedLevel ?? draft.class.level}
         </Badge>
-        <Text as="span" variant="muted" className="text-sm">
+        <InfoTooltip
+          aria-label={`About ${formatFieldMessage(characterBuilderLevelMessages.fieldLabel())}`}
+        >
           {helperText}
-        </Text>
+        </InfoTooltip>
       </div>
     )
   }
 
   return (
     <>
-      <SelectField
-        id="character-builder-level"
-        label={formatFieldMessage(characterBuilderLevelMessages.fieldLabel())}
-        hint={helperText}
-        options={levelOptions}
-        value={String(displayLevel)}
-        onValueChange={handleLevelChange}
-        width="xs"
-        digits={2}
-        labelPosition="settings"
-      />
+      <div className="w-fit shrink-0">
+        <SelectField
+          id="character-builder-level"
+          label={formatFieldMessage(characterBuilderLevelMessages.fieldLabel())}
+          info={helperText}
+          options={levelOptions}
+          value={String(displayLevel)}
+          onValueChange={handleLevelChange}
+          width="auto"
+          size="sm"
+          digits={2}
+          labelPosition="inline"
+        />
+      </div>
 
       <CharacterBuilderLevelChangeConfirmationModal
         open={confirmation !== null}

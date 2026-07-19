@@ -43,7 +43,6 @@ import {
   mergeAttemptedStepIds,
   resolveCurrentStepId,
 } from '../lib/character-builder-navigation'
-import { shouldShowBuilderLevelControl } from '../lib/builder-level-control.lib'
 import { mergeCharacterBuilderDraft } from '../lib/merge-character-builder-draft'
 import {
   issuesForStep,
@@ -60,6 +59,7 @@ import {
   characterBuilderShellBodyClasses,
   characterBuilderShellColumnClasses,
   characterBuilderShellHeaderClasses,
+  characterBuilderShellHeaderTitleRowClasses,
   characterBuilderShellPreviewColumnClasses,
   characterBuilderShellRootClasses,
 } from './character-builder-shell.variants'
@@ -98,7 +98,6 @@ export function CharacterBuilderShell({ context, catalogIndex }: CharacterBuilde
 
   const currentStepId = resolveCurrentStepId(draft.currentStepId)
   const levelConstraints = useMemo(() => resolveBuilderLevelConstraints(context), [context])
-  const showLevelControl = shouldShowBuilderLevelControl(currentStepId, levelConstraints)
 
   useEffect(() => {
     if (levelConstraints.mode !== 'fixed' || levelConstraints.fixedLevel === undefined) {
@@ -344,19 +343,17 @@ export function CharacterBuilderShell({ context, catalogIndex }: CharacterBuilde
 
       <div className={characterBuilderShellRootClasses}>
         <header className={characterBuilderShellHeaderClasses}>
-          <div className="space-y-2">
-            <Heading variant="page" as="h1">
+          <div className={characterBuilderShellHeaderTitleRowClasses}>
+            <Heading variant="page" as="h1" className="shrink-0">
               {chrome.pageHeading}
             </Heading>
-            {showLevelControl ? (
-              <CharacterBuilderLevelControl
-                context={context}
-                draft={draft}
-                onApplyLevelDraft={applyLevelDraft}
-              />
-            ) : null}
+            <CharacterBuilderLevelControl
+              context={context}
+              draft={draft}
+              onApplyLevelDraft={applyLevelDraft}
+            />
           </div>
-          <div className="flex flex-wrap gap-2">
+          <div className="flex shrink-0 flex-wrap gap-2">
             {chrome.importHref && chrome.importLabel ? (
               <Link to={chrome.importHref} className={buttonVariants({ variant: 'outline' })}>
                 {chrome.importLabel}

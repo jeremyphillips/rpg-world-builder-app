@@ -16,6 +16,7 @@ shapes: [`field-config.ts`](../../src/form/field-config.ts). Runnable examples: 
 | `radioCard` | `string`  | Card-style options with `meta` / `badge`                                   |
 | `checkbox`  | `boolean` |                                                                            |
 | `switch`    | `boolean` | `labelPosition`: `inline`, `above`, `settings`                             |
+| `select`    | `string`  | `labelPosition`: `inline`, `above`, `settings`                             |
 | `file`      | `File[]`  | `accept`, `multiple`, `maxFiles`, `maxSize`                                |
 
 `select` and `combobox` fields default to `Select {label}…` when `placeholder` is omitted.

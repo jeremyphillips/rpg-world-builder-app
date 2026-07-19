@@ -6,7 +6,7 @@ import { defineMessage } from '../../../validation/define-message'
 // ---------------------------------------------------------------------------
 
 export const characterBuilderLevelMessages = {
-  fieldLabel: defineMessage('validation.characterBuilder.level.fieldLabel', () => 'Level'),
+  fieldLabel: defineMessage('validation.characterBuilder.level.fieldLabel', () => 'Choose level'),
   fixedHelper: defineMessage<{ startingLevel: number }>(
     'validation.characterBuilder.level.fixedHelper',
     ({ startingLevel }) => `Campaign entry level (${startingLevel}).`,

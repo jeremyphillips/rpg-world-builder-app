@@ -56,7 +56,7 @@ Readiness does not replace `validateCharacterBuild` on Continue / Create.
 
 ### Builder level UI (phase 2)
 
-- Shell chrome hosts `CharacterBuilderLevelControl` from the class step onward (always visible for fixed campaign PC).
+- Shell chrome hosts `CharacterBuilderLevelControl` inline with the page heading at every step.
 - Standalone PC and campaign NPC use a selectable level field; campaign PC uses a read-only badge seeded to `startingLevel`.
 - Level changes run `pruneInvalidBuilderSelections` on a candidate draft; removals open a confirmation modal before patching.
 - Copy lives in `characterBuilderLevelMessages` (`@rpg/contracts`).
