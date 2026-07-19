@@ -11,6 +11,10 @@ import { useDeleteCharacter } from '../hooks/use-delete-character'
 import type { CharacterDetailViewModel } from '../lib/character-display'
 import { CharacterDetailAbilitiesRow } from './character-detail-abilities-row.client'
 import { CharacterDetailCombatRow } from './character-detail-combat-row.client'
+import {
+  characterDetailAbilitiesStatsSectionClasses,
+  characterDetailBodyGridClasses,
+} from './character-detail-sheet.variants'
 import { CharacterDetailStatsRow } from './character-detail-stats-row.client'
 import { CharacterDetailTabs } from './character-detail-tabs.client'
 
@@ -54,22 +58,26 @@ export function CharacterDetailContent({ viewModel }: CharacterDetailContentProp
         </Button>
       </header>
 
-      <CharacterDetailAbilitiesRow abilities={viewModel.abilities} />
-      <CharacterDetailStatsRow stats={viewModel.stats} hitPoints={viewModel.hitPoints} />
-      <CharacterDetailCombatRow
-        actions={viewModel.actions}
-        savingThrows={viewModel.savingThrows}
-        proficiencies={viewModel.proficiencies}
-      />
-      <CharacterDetailTabs
-        spells={viewModel.spells}
-        equipment={viewModel.equipment}
-        wealth={viewModel.wealth}
-        classFeatures={viewModel.classFeatures}
-        speciesTraits={viewModel.speciesTraits}
-        feats={viewModel.feats}
-        narrative={viewModel.narrative}
-      />
+      <div className={characterDetailAbilitiesStatsSectionClasses}>
+        <CharacterDetailAbilitiesRow abilities={viewModel.abilities} />
+        <CharacterDetailStatsRow stats={viewModel.stats} hitPoints={viewModel.hitPoints} />
+      </div>
+      <div className={characterDetailBodyGridClasses}>
+        <CharacterDetailCombatRow
+          actions={viewModel.actions}
+          savingThrows={viewModel.savingThrows}
+          proficiencies={viewModel.proficiencies}
+        />
+        <CharacterDetailTabs
+          spells={viewModel.spells}
+          equipment={viewModel.equipment}
+          wealth={viewModel.wealth}
+          classFeatures={viewModel.classFeatures}
+          speciesTraits={viewModel.speciesTraits}
+          feats={viewModel.feats}
+          narrative={viewModel.narrative}
+        />
+      </div>
 
       <ConfirmDialog
         open={confirmDeleteOpen}

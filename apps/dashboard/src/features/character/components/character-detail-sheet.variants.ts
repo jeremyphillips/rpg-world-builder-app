@@ -48,13 +48,23 @@ export const characterDetailStatTileHitPointsSlashClasses =
 export const characterDetailStatTileHitPointsNumberClasses =
   'heading-style-page font-semibold tabular-nums text-foreground px-3'
 
+export const characterDetailAbilitiesStatsSectionClasses = 'flex flex-wrap items-start gap-2'
+
 export const characterDetailAbilitiesContainerClasses = 'w-fit rounded-md bg-surface-subtle p-3'
 
 export const characterDetailAbilitiesRowClasses = 'flex flex-wrap gap-2'
 
 export const characterDetailStatsRowClasses = 'flex flex-wrap gap-2'
 
-export const characterDetailCombatRowGridClasses = 'grid grid-cols-1 gap-4 md:grid-cols-3'
+/** Main body — combat/proficiencies beside tabs on large screens. */
+export const characterDetailBodyGridClasses = 'grid grid-cols-1 gap-6 lg:grid-cols-2 lg:items-start'
+
+/** Combat section — actions/saves beside proficiencies on medium screens. */
+export const characterDetailCombatSectionClasses =
+  'grid grid-cols-1 gap-4 md:grid-cols-2 md:items-start'
+
+/** Stacks actions and saving throws in the combat section's first column. */
+export const characterDetailCombatPrimaryColumnClasses = 'space-y-4'
 
 export const characterDetailCombatColumnClasses = 'space-y-2'
 

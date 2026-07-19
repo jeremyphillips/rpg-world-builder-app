@@ -14,7 +14,8 @@ import {
   characterDetailActionsPanelClasses,
   characterDetailCombatCardClasses,
   characterDetailCombatColumnClasses,
-  characterDetailCombatRowGridClasses,
+  characterDetailCombatPrimaryColumnClasses,
+  characterDetailCombatSectionClasses,
   characterDetailListItemClasses,
 } from './character-detail-sheet.variants'
 
@@ -24,16 +25,18 @@ export type CharacterDetailCombatRowProps = {
   proficiencies: CharacterProficienciesViewModel
 }
 
-/** Actions, saving throws, and proficiencies in a responsive three-column row. */
+/** Actions, saving throws, and proficiencies in a responsive two-column combat section. */
 export function CharacterDetailCombatRow({
   actions,
   savingThrows,
   proficiencies,
 }: CharacterDetailCombatRowProps) {
   return (
-    <div className={characterDetailCombatRowGridClasses}>
-      <CharacterDetailActionsPanel actions={actions} />
-      <CharacterDetailSavingThrowsPanel section={savingThrows} />
+    <div className={characterDetailCombatSectionClasses}>
+      <div className={characterDetailCombatPrimaryColumnClasses}>
+        <CharacterDetailActionsPanel actions={actions} />
+        <CharacterDetailSavingThrowsPanel section={savingThrows} />
+      </div>
       <CharacterDetailProficienciesPanel section={proficiencies} />
     </div>
   )
