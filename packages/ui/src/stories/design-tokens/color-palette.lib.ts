@@ -17,6 +17,8 @@ export interface ColorToken {
   /** Optional paired foreground for text-on-fill samples. */
   foregroundVar?: `--${string}`
   foregroundTailwind?: string
+  /** Demo fill behind `usage: 'text'` swatches that are meant for solid/status planes (not canvas). */
+  textDemoSurfaceVar?: `--${string}`
 }
 
 export interface ColorTokenGroup {
@@ -36,9 +38,14 @@ export interface SurfaceBackground {
 
 export const SURFACE_BACKGROUNDS: SurfaceBackground[] = [
   { id: 'background', label: 'background', cssVar: '--background', tailwind: 'bg-background' },
-  { id: 'bg-subtle', label: 'bg-subtle', cssVar: '--bg-subtle', tailwind: 'bg-subtle' },
+  { id: 'sunken', label: 'sunken', cssVar: '--sunken', tailwind: 'bg-sunken' },
   { id: 'card', label: 'card', cssVar: '--card', tailwind: 'bg-card' },
-  { id: 'muted', label: 'muted', cssVar: '--muted', tailwind: 'bg-muted' },
+  {
+    id: 'surface-muted',
+    label: 'surface-muted',
+    cssVar: '--surface-muted',
+    tailwind: 'bg-surface-muted',
+  },
   { id: 'sidebar', label: 'sidebar', cssVar: '--sidebar', tailwind: 'bg-sidebar' },
 ]
 
@@ -72,6 +79,22 @@ function palettePrimitiveUsage(step: string): ColorTokenUsage {
   return 'background'
 }
 
+/** Canvas would hide ink-on-solid samples — show on the plane each role is authored for. */
+const PALETTE_TEXT_DEMO_SURFACES: Partial<Record<string, `--${string}`>> = {
+  'fg-on-solid': '--palette-primary',
+  'fg-on-status': '--palette-warning',
+}
+
+function palettePrimitiveToken(step: string): ColorToken {
+  return {
+    name: step,
+    cssVar: `--palette-${step}`,
+    tailwind: '(palette only)',
+    usage: palettePrimitiveUsage(step),
+    textDemoSurfaceVar: PALETTE_TEXT_DEMO_SURFACES[step],
+  }
+}
+
 /** Layer 1 palette primitives — not Tailwind utilities; tune in `tokens/palette-*.css`. */
 export const PALETTE_PRIMITIVE_TOKEN_GROUPS: ColorTokenGroup[] = PALETTE_PRIMITIVE_GROUPS.map(
   (group) => ({
@@ -81,12 +104,7 @@ export const PALETTE_PRIMITIVE_TOKEN_GROUPS: ColorTokenGroup[] = PALETTE_PRIMITI
     tokens:
       group.id === 'elevation'
         ? PALETTE_ORTHOGONAL_SURFACE_TOKENS
-        : group.steps.map((step) => ({
-            name: step,
-            cssVar: `--palette-${step}`,
-            tailwind: '(palette only)',
-            usage: palettePrimitiveUsage(step),
-          })),
+        : group.steps.map((step) => palettePrimitiveToken(step)),
   }),
 )
 
@@ -127,9 +145,9 @@ export const COLOR_TOKEN_GROUPS: ColorTokenGroup[] = [
         foregroundTailwind: 'text-card-foreground',
       },
       {
-        name: 'bg-subtle',
-        cssVar: '--bg-subtle',
-        tailwind: 'bg-subtle',
+        name: 'sunken',
+        cssVar: '--sunken',
+        tailwind: 'bg-sunken',
         usage: 'background',
         foregroundVar: '--foreground',
         foregroundTailwind: 'text-foreground',
@@ -195,6 +213,24 @@ export const COLOR_TOKEN_GROUPS: ColorTokenGroup[] = [
         usage: 'background',
         foregroundVar: '--muted-foreground',
         foregroundTailwind: 'text-muted-foreground',
+      },
+      {
+        name: 'surface-subtle',
+        cssVar: '--surface-subtle',
+        tailwind: 'bg-surface-subtle',
+        usage: 'background',
+      },
+      {
+        name: 'surface-muted',
+        cssVar: '--surface-muted',
+        tailwind: 'bg-surface-muted',
+        usage: 'background',
+      },
+      {
+        name: 'surface-strong',
+        cssVar: '--surface-strong',
+        tailwind: 'bg-surface-strong',
+        usage: 'background',
       },
       {
         name: 'muted-foreground',
@@ -334,7 +370,60 @@ export const COLOR_TOKEN_GROUPS: ColorTokenGroup[] = [
     label: 'Chrome',
     tokens: [
       { name: 'border', cssVar: '--border', tailwind: 'border-border', usage: 'border' },
-      { name: 'input', cssVar: '--input', tailwind: 'border-input', usage: 'border' },
+      {
+        name: 'border-subtle',
+        cssVar: '--border-subtle',
+        tailwind: 'border-border-subtle',
+        usage: 'border',
+      },
+      {
+        name: 'border-strong',
+        cssVar: '--border-strong',
+        tailwind: 'border-border-strong',
+        usage: 'border',
+      },
+      {
+        name: 'field-control-border',
+        cssVar: '--field-control-border',
+        tailwind: 'border-input',
+        usage: 'border',
+      },
+      {
+        name: 'field-control-bg',
+        cssVar: '--field-control-bg',
+        tailwind: 'bg-input',
+        usage: 'background',
+      },
+      {
+        name: 'field-control-border-invalid',
+        cssVar: '--field-control-border-invalid',
+        tailwind: 'border-input-invalid',
+        usage: 'border',
+      },
+      {
+        name: 'field-control-bg-invalid',
+        cssVar: '--field-control-bg-invalid',
+        tailwind: 'bg-input-invalid-subtle',
+        usage: 'background',
+      },
+      {
+        name: 'switch-track',
+        cssVar: '--switch-track',
+        tailwind: 'bg-switch-track',
+        usage: 'background',
+      },
+      {
+        name: 'switch-track-hover',
+        cssVar: '--switch-track-hover',
+        tailwind: 'bg-switch-track-hover',
+        usage: 'background',
+      },
+      {
+        name: 'switch-track-disabled',
+        cssVar: '--switch-track-disabled',
+        tailwind: 'bg-switch-track-disabled',
+        usage: 'background',
+      },
       { name: 'ring', cssVar: '--ring', tailwind: 'ring-ring', usage: 'border' },
       { name: 'overlay', cssVar: '--overlay', tailwind: 'bg-overlay', usage: 'background' },
       {
@@ -356,39 +445,39 @@ export const COLOR_TOKEN_GROUPS: ColorTokenGroup[] = [
         usage: 'text',
       },
       {
-        name: 'semantic-informative',
-        cssVar: '--semantic-informative',
-        tailwind: 'text-semantic-informative',
+        name: 'semantic-info',
+        cssVar: '--semantic-info',
+        tailwind: 'text-semantic-info',
         usage: 'text',
       },
       {
-        name: 'semantic-informative-muted',
-        cssVar: '--semantic-informative-muted',
-        tailwind: 'text-semantic-informative-muted',
+        name: 'semantic-info-muted',
+        cssVar: '--semantic-info-muted',
+        tailwind: 'text-semantic-info-muted',
         usage: 'text',
       },
       {
-        name: 'semantic-positive',
-        cssVar: '--semantic-positive',
-        tailwind: 'text-semantic-positive',
+        name: 'semantic-success',
+        cssVar: '--semantic-success',
+        tailwind: 'text-semantic-success',
         usage: 'text',
       },
       {
-        name: 'semantic-caution',
-        cssVar: '--semantic-caution',
-        tailwind: 'text-semantic-caution',
+        name: 'semantic-warning',
+        cssVar: '--semantic-warning',
+        tailwind: 'text-semantic-warning',
         usage: 'text',
       },
       {
-        name: 'semantic-negative',
-        cssVar: '--semantic-negative',
-        tailwind: 'text-semantic-negative',
+        name: 'semantic-destructive',
+        cssVar: '--semantic-destructive',
+        tailwind: 'text-semantic-destructive',
         usage: 'text',
       },
       {
-        name: 'semantic-negative-on-subtle',
-        cssVar: '--semantic-negative-on-subtle',
-        tailwind: 'text-semantic-negative-on-subtle',
+        name: 'semantic-destructive-on-subtle',
+        cssVar: '--semantic-destructive-on-subtle',
+        tailwind: 'text-semantic-destructive-on-subtle',
         usage: 'text',
       },
     ],
@@ -410,51 +499,106 @@ export const COLOR_TOKEN_GROUPS: ColorTokenGroup[] = [
         usage: 'background',
       },
       {
-        name: 'semantic-informative-border',
-        cssVar: '--semantic-informative-border',
-        tailwind: 'border-semantic-informative-border',
+        name: 'semantic-info-border',
+        cssVar: '--semantic-info-border',
+        tailwind: 'border-semantic-info-border',
         usage: 'border',
       },
       {
-        name: 'semantic-informative-subtle',
-        cssVar: '--semantic-informative-subtle',
-        tailwind: 'bg-semantic-informative-subtle',
+        name: 'semantic-info-subtle',
+        cssVar: '--semantic-info-subtle',
+        tailwind: 'bg-semantic-info-subtle',
         usage: 'background',
       },
       {
-        name: 'semantic-positive-border',
-        cssVar: '--semantic-positive-border',
-        tailwind: 'border-semantic-positive-border',
+        name: 'semantic-success-border',
+        cssVar: '--semantic-success-border',
+        tailwind: 'border-semantic-success-border',
         usage: 'border',
       },
       {
-        name: 'semantic-positive-subtle',
-        cssVar: '--semantic-positive-subtle',
-        tailwind: 'bg-semantic-positive-subtle',
+        name: 'semantic-success-subtle',
+        cssVar: '--semantic-success-subtle',
+        tailwind: 'bg-semantic-success-subtle',
         usage: 'background',
       },
       {
-        name: 'semantic-caution-border',
-        cssVar: '--semantic-caution-border',
-        tailwind: 'border-semantic-caution-border',
+        name: 'semantic-warning-border',
+        cssVar: '--semantic-warning-border',
+        tailwind: 'border-semantic-warning-border',
         usage: 'border',
       },
       {
-        name: 'semantic-caution-subtle',
-        cssVar: '--semantic-caution-subtle',
-        tailwind: 'bg-semantic-caution-subtle',
+        name: 'semantic-warning-subtle',
+        cssVar: '--semantic-warning-subtle',
+        tailwind: 'bg-semantic-warning-subtle',
         usage: 'background',
       },
       {
-        name: 'semantic-negative-border',
-        cssVar: '--semantic-negative-border',
-        tailwind: 'border-semantic-negative-border',
+        name: 'semantic-destructive-border',
+        cssVar: '--semantic-destructive-border',
+        tailwind: 'border-semantic-destructive-border',
         usage: 'border',
       },
       {
-        name: 'semantic-negative-subtle',
-        cssVar: '--semantic-negative-subtle',
-        tailwind: 'bg-semantic-negative-subtle',
+        name: 'semantic-destructive-subtle',
+        cssVar: '--semantic-destructive-subtle',
+        tailwind: 'bg-semantic-destructive-subtle',
+        usage: 'background',
+      },
+    ],
+  },
+  {
+    id: 'interaction-recipes',
+    label: 'Interaction recipes',
+    description: 'Shared hover/selected/drag/track chrome — tune per theme at Layer 1.',
+    tokens: [
+      {
+        name: 'control-hover-bg',
+        cssVar: '--control-hover-bg',
+        tailwind: 'bg-control-hover',
+        usage: 'background',
+      },
+      {
+        name: 'control-selected-bg',
+        cssVar: '--control-selected-bg',
+        tailwind: 'bg-control-selected',
+        usage: 'background',
+      },
+      {
+        name: 'row-hover-bg',
+        cssVar: '--row-hover-bg',
+        tailwind: 'bg-row-hover',
+        usage: 'background',
+      },
+      {
+        name: 'row-selected-bg',
+        cssVar: '--row-selected-bg',
+        tailwind: 'bg-row-selected',
+        usage: 'background',
+      },
+      {
+        name: 'row-selected-border',
+        cssVar: '--row-selected-border',
+        tailwind: 'border-row-selected-border',
+        usage: 'border',
+      },
+      {
+        name: 'drop-target-bg',
+        cssVar: '--drop-target-bg',
+        tailwind: 'bg-drop-target',
+        usage: 'background',
+      },
+      {
+        name: 'drop-target-border',
+        cssVar: '--drop-target-border',
+        tailwind: 'border-drop-target-border',
+        usage: 'border',
+      },
+      {
+        name: 'segmented-track-bg',
+        cssVar: '--segmented-track-bg',
+        tailwind: 'bg-segmented-track',
         usage: 'background',
       },
     ],

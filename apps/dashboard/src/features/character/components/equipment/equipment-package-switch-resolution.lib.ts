@@ -72,26 +72,26 @@ export function resolvePackageSwitchDescription(
 export function resolvePackageSwitchBudgetStatusLabel(
   evaluation: EquipmentPackageSwitchEvaluation,
   hasDraftEdits: boolean,
-): { label: string; tone: 'caution' | 'positive' | 'neutral' } {
+): { label: string; tone: 'warning' | 'success' | 'neutral' } {
   const { budget } = evaluation
 
   if (hasDraftEdits) {
     if (budget.amountOverBudgetCp > 0) {
       return {
         label: 'Still over budget',
-        tone: 'caution',
+        tone: 'warning',
       }
     }
 
     return {
       label: 'Remaining allowance',
-      tone: 'positive',
+      tone: 'success',
     }
   }
 
   return {
     label: 'Amount to remove',
-    tone: 'caution',
+    tone: 'warning',
   }
 }
 

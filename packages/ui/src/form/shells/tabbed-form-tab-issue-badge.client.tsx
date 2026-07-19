@@ -22,7 +22,7 @@ export function TabbedFormTabIssueBadge({ count }: TabbedFormTabIssueBadgeProps)
       </span>
       <Badge
         appearance="soft"
-        tone="negative"
+        tone="destructive"
         size="sm"
         aria-hidden
         className="min-w-5 justify-center px-1 tabular-nums leading-none"

@@ -16,7 +16,7 @@ export const equipmentPickerPurchaseDividerClasses = 'border-b border-border'
 export const equipmentPickerPurchaseQuantityStepperShimClasses = 'relative right-2 shrink-0'
 
 export const equipmentPickerPurchaseInsetPanelClasses =
-  'rounded border border-border/60 bg-muted/20 px-3 py-2'
+  'rounded border border-border-subtle bg-surface-muted px-3 py-2'
 
 export const equipmentPickerPurchaseInsetPanelContentClasses = 'space-y-3'
 

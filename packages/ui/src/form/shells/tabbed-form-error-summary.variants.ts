@@ -1,7 +1,7 @@
 import { cn } from '../../lib/utils'
 
 export const tabbedFormErrorSummaryClasses = cn(
-  'mb-3 flex flex-col gap-2 rounded-md border border-destructive/20 bg-destructive/5 p-3',
+  'mb-3 flex flex-col gap-2 rounded-md border border-destructive-muted bg-destructive-subtle p-3',
   'text-sm text-destructive',
 )
 

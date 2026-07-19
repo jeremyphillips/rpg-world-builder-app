@@ -201,6 +201,31 @@ export {
   type AttentionFrameProps,
 } from './components/ui/attention-frame.client'
 export { attentionFrameVariants } from './components/ui/attention-frame.variants'
+export {
+  InsetPanel,
+  InsetPanelText,
+  type InsetPanelProps,
+  type InsetPanelTextProps,
+} from './components/ui/inset-panel.client'
+export {
+  INSET_PANEL_ALIGNS,
+  INSET_PANEL_BORDER_STYLES,
+  INSET_PANEL_SIZES,
+  INSET_PANEL_SURFACES,
+  insetPanelEmptyStateClasses,
+  insetPanelEmptyStateVariants,
+  insetPanelGateClasses,
+  insetPanelGateVariants,
+  insetPanelSunkenShadowClasses,
+  insetPanelTextVariantBySize,
+  insetPanelVariants,
+  resolveInsetPanelTextVariant,
+  type InsetPanelAlign,
+  type InsetPanelBorderStyle,
+  type InsetPanelSize,
+  type InsetPanelSurface,
+  type InsetPanelVariantProps,
+} from './components/ui/inset-panel.variants'
 export { RadioCardField, type RadioCardFieldProps } from './components/ui/radio-card-field'
 export { JsonField, type JsonFieldProps } from './components/ui/json-field.client'
 export { RichTextField, type RichTextFieldProps } from './components/ui/rich-text-field'

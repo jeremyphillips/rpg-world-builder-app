@@ -440,7 +440,7 @@ export function RequirementEditor({
 
   return (
     <div className="space-y-6">
-      <div aria-live="polite" className="rounded-md bg-muted/60 px-4 py-4">
+      <div aria-live="polite" className="rounded-md bg-surface-strong px-4 py-4">
         <span className="sr-only">{PREVIEW_LABEL}</span>
         <Text variant="lead">{preview}</Text>
       </div>

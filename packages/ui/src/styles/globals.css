@@ -26,18 +26,23 @@
  * (`--font-weight-heading`, …) mirror the same pattern. Meta/semantic aliases
  * (`--text-xs-meta`, `--text-eyebrow-sm`, …) sit below the type scale.
  *
- * Palette: role-named Layer 1 primitives (`surface-*`, `fg-*`, brand, chrome,
- * status) with theme-local oklch in `palette-*.css`. Warmth anchor
+ * Theme palette: role-named Layer 1 roles (`surface-*`, `field-*`, `fg-*`,
+ * brand, chrome, status) with theme-local oklch in `palette-*.css`. Warmth anchor
  * `--palette-neutral-hue` feeds color-mix recipes (sidebar, overlay). Light
- * motif: cream canvas, parch cards, deep-red primary; dark: warm neutral planes
- * with gold primary.
+ * motif: cream canvas, near-white raised panels, deep-red primary; dark: warm
+ * neutral planes with distinct raised/muted/sunken hierarchy and gold primary.
+ *
+ * Alpha policy: public semantic surface tokens resolve to final usable colors.
+ * Avoid stacking opacity utilities on tokens that already contain alpha unless
+ * intentional (see `tokens/palette-inventory.md` and `alpha-utility-allowlist.ts`).
  *
  * Color tokens use three layers:
- * 1. `--palette-*` primitives — oklch SSOT in `tokens/palette-light.css` and
+ * 1. `--palette-*` theme roles — oklch SSOT in `tokens/palette-light.css` and
  *    `tokens/palette-dark.css`. Both themes declare the same inventory
  *    (`tokens/palette-inventory.md`).
- * 2. Semantic roles (`--background`, `--card`, …) in `tokens/semantic-*.css` —
- *    stable API for components; map to theme-local palette via `var()` only.
+ * 2. Semantic roles (`--background`, `--field-control-*`, …) in
+ *    `tokens/semantic-*.css` — stable API for components; map to palette or
+ *    other Layer 2 aliases via `var()` only (no raw color literals).
  * 3. `@theme inline` below — Tailwind bridge (`bg-*`, `text-*`, …).
  *
  * Fonts: apps provide the actual font faces. The public app (Next.js) sets
@@ -48,7 +53,6 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --color-subtle: var(--bg-subtle);
   --color-card: var(--card);
   --color-card-foreground: var(--card-foreground);
   --color-popover: var(--popover);
@@ -58,6 +62,10 @@
   --color-secondary: var(--secondary);
   --color-secondary-foreground: var(--secondary-foreground);
   --color-muted: var(--muted);
+  --color-sunken: var(--sunken);
+  --color-surface-subtle: var(--surface-subtle);
+  --color-surface-muted: var(--surface-muted);
+  --color-surface-strong: var(--surface-strong);
   --color-muted-foreground: var(--muted-foreground);
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
@@ -78,34 +86,54 @@
   --color-warning-muted: var(--warning-muted);
   --color-warning-subtle: var(--warning-subtle);
   --color-border: var(--border);
+  --color-border-subtle: var(--border-subtle);
+  --color-border-strong: var(--border-strong);
   --color-card-selected-border: var(--card-selected-border);
-  --color-input: var(--input);
+  --color-choice-control-border: var(--choice-control-border);
+  /* No `--color-input` — `border-input` / `bg-input` are custom utilities (see below). */
+  --color-input-invalid: var(--field-control-border-invalid);
+  --color-input-invalid-subtle: var(--field-control-bg-invalid);
+  --color-switch-track: var(--switch-track);
+  --color-switch-track-hover: var(--switch-track-hover);
+  --color-switch-track-disabled: var(--switch-track-disabled);
   --color-ring: var(--ring);
   --color-overlay: var(--overlay);
   --color-semantic-neutral: var(--semantic-neutral);
-  --color-semantic-informative: var(--semantic-informative);
-  --color-semantic-informative-muted: var(--semantic-informative-muted);
-  --color-semantic-positive: var(--semantic-positive);
-  --color-semantic-caution: var(--semantic-caution);
-  --color-semantic-negative: var(--semantic-negative);
-  --color-semantic-negative-on-subtle: var(--semantic-negative-on-subtle);
+  --color-semantic-info: var(--semantic-info);
+  --color-semantic-info-muted: var(--semantic-info-muted);
+  --color-semantic-success: var(--semantic-success);
+  --color-semantic-warning: var(--semantic-warning);
+  --color-semantic-destructive: var(--semantic-destructive);
+  --color-semantic-destructive-on-subtle: var(--semantic-destructive-on-subtle);
   --color-semantic-neutral-border: var(--semantic-neutral-border);
   --color-semantic-neutral-subtle: var(--semantic-neutral-subtle);
-  --color-semantic-informative-border: var(--semantic-informative-border);
-  --color-semantic-informative-subtle: var(--semantic-informative-subtle);
-  --color-semantic-positive-border: var(--semantic-positive-border);
-  --color-semantic-positive-subtle: var(--semantic-positive-subtle);
-  --color-semantic-caution-border: var(--semantic-caution-border);
-  --color-semantic-caution-subtle: var(--semantic-caution-subtle);
-  --color-semantic-negative-border: var(--semantic-negative-border);
-  --color-semantic-negative-subtle: var(--semantic-negative-subtle);
+  --color-semantic-info-border: var(--semantic-info-border);
+  --color-semantic-info-subtle: var(--semantic-info-subtle);
+  --color-semantic-success-border: var(--semantic-success-border);
+  --color-semantic-success-subtle: var(--semantic-success-subtle);
+  --color-semantic-warning-border: var(--semantic-warning-border);
+  --color-semantic-warning-subtle: var(--semantic-warning-subtle);
+  --color-semantic-destructive-border: var(--semantic-destructive-border);
+  --color-semantic-destructive-subtle: var(--semantic-destructive-subtle);
   --color-selected-control: var(--selected-control);
   --color-selected-control-foreground: var(--selected-control-foreground);
   --color-selected-control-border: var(--selected-control-border);
   --color-catalog-picker-row-surface: var(--catalog-picker-row-surface);
   --color-sidebar: var(--sidebar);
+  --color-control-hover: var(--control-hover-bg);
+  --color-control-selected: var(--control-selected-bg);
+  --color-row-hover: var(--row-hover-bg);
+  --color-row-selected: var(--row-selected-bg);
+  --color-row-selected-border: var(--row-selected-border);
+  --color-drop-target: var(--drop-target-bg);
+  --color-drop-target-border: var(--drop-target-border);
+  --color-segmented-track: var(--segmented-track-bg);
+  --color-outline-button-border: var(--outline-button-border);
+  --color-outline-button-hover: var(--outline-button-hover-bg);
+  --color-outline-button-active: var(--outline-button-active-bg);
 
   --shadow-surface-raised: var(--surface-raised-shadow);
+  --shadow-surface-sunken: var(--surface-sunken-shadow);
 
   --font-sans: var(--font-body, 'Inter Variable'), 'Inter', ui-sans-serif, system-ui, sans-serif;
   --font-display:
@@ -263,6 +291,64 @@
   --animate-accordion-up: accordion-up 0.2s ease-out;
   --animate-attention-ring: attention-ring 1.5s ease-out;
 }
+
+/**
+ * Field chrome — `border-input` and `bg-input` are separate utilities because
+ * Tailwind maps one `--color-*` token to every utility prefix (`bg-`, `border-`, …).
+ * State variants swap `--field-control-*` roles via the chrome recipe.
+ */
+@utility border-input {
+  border-color: var(--field-control-border);
+}
+
+@utility border-choice-control {
+  border-color: var(--choice-control-border);
+}
+
+@utility bg-input {
+  background-color: var(--field-control-bg);
+  color: var(--field-control-fg);
+}
+
+@utility border-input-hover {
+  border-color: var(--field-control-border-hover);
+}
+
+@utility border-input-focus {
+  border-color: var(--field-control-border-focus);
+}
+
+@utility border-input-readonly {
+  border-color: var(--field-control-border-readonly);
+}
+
+@utility bg-input-readonly {
+  background-color: var(--field-control-bg-readonly);
+  color: var(--field-control-fg-readonly);
+}
+
+@utility border-input-disabled {
+  border-color: var(--field-control-border-disabled);
+}
+
+@utility bg-input-disabled {
+  background-color: var(--field-control-bg-disabled);
+  color: var(--field-control-fg-disabled);
+}
+
+@utility text-input-disabled {
+  color: var(--field-control-fg-disabled);
+}
+
+@utility bg-input-invalid-subtle {
+  background-color: var(--field-control-bg-invalid);
+}
+
+/*
+ * Field control fills resolve globally via `--field-control-bg` in semantic-*.css
+ * (`--palette-surface-field`). Rare shell overrides set `--field-control-bg` locally
+ * in the component that creates an unusual parent context — no global parent matrix.
+ */
 
 /*
  * Prose theme — maps @tailwindcss/typography to design tokens so rich-text HTML

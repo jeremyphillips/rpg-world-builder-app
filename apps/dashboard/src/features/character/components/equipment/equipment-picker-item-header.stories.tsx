@@ -41,14 +41,14 @@ export const StandardGear: Story = {
     item: buildEquipmentPickerRowViewModel(pickEquipment('holy-symbol-amulet')),
     callout: {
       label: EQUIPMENT_PICKER_STANDARD_GEAR_LABEL,
-      intent: 'informative',
+      intent: 'info',
       importance: 'low',
     },
     commerce: commerceRail('5 GP'),
   },
   decorators: [
     (Story) => (
-      <div className="rounded-md bg-muted/30 p-3">
+      <div className="rounded-md bg-surface-muted p-3">
         <Story />
       </div>
     ),
@@ -68,14 +68,14 @@ export const NotProficient: Story = {
     item: buildEquipmentPickerRowViewModel(pickEquipment('plate-armor')),
     callout: {
       label: EQUIPMENT_PICKER_NOT_PROFICIENT_LABEL,
-      intent: 'caution',
+      intent: 'warning',
       importance: 'medium',
     },
     commerce: commerceRail('1,500 GP'),
   },
   decorators: [
     (Story) => (
-      <div className="rounded-md bg-muted/30 p-3">
+      <div className="rounded-md bg-surface-muted p-3">
         <Story />
       </div>
     ),
@@ -94,7 +94,7 @@ export const CannotAfford: Story = {
   },
   decorators: [
     (Story) => (
-      <div className="rounded-md bg-muted/30 p-3">
+      <div className="rounded-md bg-surface-muted p-3">
         <Story />
       </div>
     ),
@@ -113,7 +113,7 @@ export const OwnedStackable: Story = {
     item: buildEquipmentPickerRowViewModel(pickEquipment('rope')),
     callout: {
       label: EQUIPMENT_PICKER_STANDARD_GEAR_LABEL,
-      intent: 'informative',
+      intent: 'info',
       importance: 'low',
     },
     commerce: commerceRail('1 GP', { owned: true, stackable: true, ownedQuantity: 2 }),

@@ -4,7 +4,7 @@ export const tabsListVariants = cva('inline-flex items-center', {
   variants: {
     variant: {
       line: 'w-full border-b border-border gap-0 text-muted-foreground',
-      pill: 'h-9 rounded-lg bg-muted p-1 gap-1',
+      pill: 'h-9 rounded-lg bg-segmented-track p-1 gap-1',
     },
   },
   defaultVariants: {

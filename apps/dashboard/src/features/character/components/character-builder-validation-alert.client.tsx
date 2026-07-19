@@ -21,7 +21,7 @@ export function CharacterBuilderValidationAlert({
   return (
     <div
       role="alert"
-      className="rounded-md border border-destructive/40 bg-destructive/5 px-4 py-3"
+      className="rounded-md border border-destructive-muted bg-destructive-subtle px-4 py-3"
     >
       <Text variant="destructive" className="font-medium">
         {displayHeading}

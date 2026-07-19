@@ -105,7 +105,7 @@ describe('FieldGroup', () => {
     const fieldset = screen.getByRole('group', { name: /Target/ })
     expect(fieldset).not.toHaveClass('rounded-md')
     const stack = fieldStack(fieldset)
-    expect(stack).toHaveClass('rounded-md', 'border', 'p-4', 'bg-muted/10')
+    expect(stack).toHaveClass('rounded-md', 'border', 'p-4', 'bg-surface-subtle')
   })
 
   it('applies inset chrome on the field stack', () => {
@@ -115,7 +115,7 @@ describe('FieldGroup', () => {
       </FieldGroup>,
     )
     const stack = fieldStack(screen.getByRole('group', { name: /Effects/ }))
-    expect(stack).toHaveClass('border-l-2', 'pl-6', 'sm:pl-10', 'border-border')
+    expect(stack).toHaveClass('border-l-2', 'pl-6', 'sm:pl-8', 'border-border')
   })
 
   it('applies divider top chrome on the fieldset', () => {

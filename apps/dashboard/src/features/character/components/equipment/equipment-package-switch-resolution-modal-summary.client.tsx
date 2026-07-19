@@ -53,7 +53,7 @@ export function PackageSwitchBudgetSummary({
   const status = resolvePackageSwitchBudgetStatusLabel(evaluation, hasDraftEdits)
   const statusValue = hasDraftEdits
     ? formatPackageSwitchWealth(
-        status.tone === 'caution' ? budget.amountOverBudgetCp : budget.remainingAllowanceCp,
+        status.tone === 'warning' ? budget.amountOverBudgetCp : budget.remainingAllowanceCp,
       )
     : formatPackageSwitchWealth(budget.initialAmountOverBudgetCp)
 

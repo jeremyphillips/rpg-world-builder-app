@@ -3,7 +3,10 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { expectNoAxeViolations } from '@rpg/ui/test-utils'
 
-import type { EquipmentInventoryRow } from '../../lib/equipment-step.lib'
+import {
+  EQUIPMENT_PURCHASED_INVENTORY_EMPTY_MESSAGE,
+  type EquipmentInventoryRow,
+} from '../../lib/equipment-step.lib'
 import { EquipmentPurchasedInventorySection } from './equipment-purchased-inventory-section.client'
 import type { PurchasedCategoryGroup } from './equipment-inventory-summary.lib'
 
@@ -59,6 +62,15 @@ const purchasedWithHeadings: PurchasedCategoryGroup[] = [
 ]
 
 describe('EquipmentPurchasedInventorySection', () => {
+  it('renders a centered inset panel when there are no purchases', () => {
+    const { container } = render(<EquipmentPurchasedInventorySection purchased={[]} />)
+
+    expect(screen.getByText(EQUIPMENT_PURCHASED_INVENTORY_EMPTY_MESSAGE)).toBeInTheDocument()
+    expect(container.firstChild).toHaveClass('bg-sunken')
+    expect(container.firstChild).toHaveClass('text-center')
+    expect(container.firstChild).not.toHaveClass('border-dashed')
+  })
+
   it('renders category headings by default', () => {
     render(<EquipmentPurchasedInventorySection purchased={purchasedWithHeadings} />)
 

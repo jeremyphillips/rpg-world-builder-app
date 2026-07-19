@@ -1,10 +1,4 @@
-export const COMPACT_LABEL_TONES = [
-  'neutral',
-  'informative',
-  'positive',
-  'caution',
-  'negative',
-] as const
+export const COMPACT_LABEL_TONES = ['neutral', 'info', 'success', 'warning', 'destructive'] as const
 
 export const COMPACT_LABEL_APPEARANCES = ['outline', 'accent-outline', 'soft', 'neutral'] as const
 
@@ -20,34 +14,34 @@ export function compactLabelFilledFromAppearance(appearance: CompactLabelAppeara
 
 const toneTextClass: Record<CompactLabelTone, string> = {
   neutral: 'text-semantic-neutral',
-  informative: 'text-semantic-informative',
-  positive: 'text-semantic-positive',
-  caution: 'text-semantic-caution',
-  negative: 'text-semantic-negative',
+  info: 'text-semantic-info',
+  success: 'text-semantic-success',
+  warning: 'text-semantic-warning',
+  destructive: 'text-semantic-destructive',
 }
 
 const toneBorderClass: Record<CompactLabelTone, string> = {
   neutral: 'border-semantic-neutral-border',
-  informative: 'border-semantic-informative-border',
-  positive: 'border-semantic-positive-border',
-  caution: 'border-semantic-caution-border',
-  negative: 'border-semantic-negative-border',
+  info: 'border-semantic-info-border',
+  success: 'border-semantic-success-border',
+  warning: 'border-semantic-warning-border',
+  destructive: 'border-semantic-destructive-border',
 }
 
 const toneSoftTextClass: Record<CompactLabelTone, string> = {
   neutral: toneTextClass.neutral,
-  informative: toneTextClass.informative,
-  positive: toneTextClass.positive,
-  caution: toneTextClass.caution,
-  negative: 'text-semantic-negative-on-subtle',
+  info: toneTextClass.info,
+  success: toneTextClass.success,
+  warning: toneTextClass.warning,
+  destructive: 'text-semantic-destructive-on-subtle',
 }
 
 const toneSubtleBgClass: Record<CompactLabelTone, string> = {
   neutral: 'bg-semantic-neutral-subtle',
-  informative: 'bg-semantic-informative-subtle',
-  positive: 'bg-semantic-positive-subtle',
-  caution: 'bg-semantic-caution-subtle',
-  negative: 'bg-semantic-negative-subtle',
+  info: 'bg-semantic-info-subtle',
+  success: 'bg-semantic-success-subtle',
+  warning: 'bg-semantic-warning-subtle',
+  destructive: 'bg-semantic-destructive-subtle',
 }
 
 /** Appearance × tone surface classes for Badge (not selected-control chip state). */

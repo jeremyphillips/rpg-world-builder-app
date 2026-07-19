@@ -73,7 +73,7 @@ export const RemovableLg: Story = {
 }
 
 function ChipSurfaceRow({ surface }: { surface: 'base' | 'subtle' }) {
-  const surfaceClass = surface === 'subtle' ? 'bg-muted/30' : 'bg-background'
+  const surfaceClass = surface === 'subtle' ? 'bg-surface-muted' : 'bg-background'
   const [selected, setSelected] = useState(true)
 
   return (

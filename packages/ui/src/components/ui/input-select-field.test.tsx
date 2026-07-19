@@ -101,7 +101,7 @@ describe('InputSelectField', () => {
   it('marks only the value segment invalid when error is set', () => {
     const { container } = render(<ControlledField error="Too low." />)
     const group = container.querySelector('[role="group"]')
-    expect(group).toHaveClass('border-destructive')
+    expect(group).toHaveClass('border-input-invalid')
 
     const valueSegments = container.querySelectorAll('[data-input-select-value]')
     expect(valueSegments).toHaveLength(1)

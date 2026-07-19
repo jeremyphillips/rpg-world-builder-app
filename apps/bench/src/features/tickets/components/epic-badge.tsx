@@ -42,12 +42,7 @@ export function EpicBadge({ epic, className, stopActivation = false }: EpicBadge
       onClick={stopActivation ? stopCardActivation : undefined}
       onKeyDown={stopActivation ? stopCardActivation : undefined}
     >
-      <Badge
-        appearance="accent-outline"
-        tone="informative"
-        size="sm"
-        className="max-w-full truncate"
-      >
+      <Badge appearance="accent-outline" tone="info" size="sm" className="max-w-full truncate">
         {epic.title}
       </Badge>
     </Link>

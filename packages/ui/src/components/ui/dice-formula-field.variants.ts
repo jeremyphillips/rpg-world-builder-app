@@ -1,18 +1,26 @@
 import { cva, type VariantProps } from 'class-variance-authority'
 
 import { cn } from '../../lib/utils'
+import {
+  fieldInputFocusWithinClasses,
+  fieldInputInvalidClasses,
+  fieldInputShellClasses,
+} from './field-input-chrome.variants'
 import { fieldGroupedControlSizeClasses } from './field-sizing.variants'
 import { fieldInlineSentenceClasses } from './field.variants'
 
 /** Shared bordered shell for grouped dice segments (mirrors InputSelectField group). */
-const diceFormulaGroupShellClasses =
-  'inline-flex w-fit max-w-full items-center rounded-md border border-input bg-transparent shadow-sm transition-colors focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 focus-within:ring-offset-background dark:bg-input/30'
+const diceFormulaGroupShellClasses = cn(
+  'inline-flex w-fit max-w-full items-center',
+  fieldInputShellClasses,
+  fieldInputFocusWithinClasses,
+)
 
 /** Core cluster shell — count + d + faces. */
 export const diceFormulaCoreGroupVariants = cva(diceFormulaGroupShellClasses, {
   variants: {
     invalid: {
-      true: 'border-destructive focus-within:ring-destructive',
+      true: fieldInputInvalidClasses,
       false: '',
     },
     disabled: {
@@ -30,7 +38,7 @@ export const diceFormulaCoreGroupVariants = cva(diceFormulaGroupShellClasses, {
 export const diceFormulaModifierGroupVariants = cva(diceFormulaGroupShellClasses, {
   variants: {
     invalid: {
-      true: 'border-destructive focus-within:ring-destructive',
+      true: fieldInputInvalidClasses,
       false: '',
     },
     disabled: {

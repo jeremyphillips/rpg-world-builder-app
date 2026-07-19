@@ -124,17 +124,20 @@ export function characterCreationProficienciesFields(
     {
       kind: 'group',
       legend: 'Proficiencies',
+      fieldsChrome: { variant: 'inset' },
       fields: [
         {
           kind: 'group',
           legend: 'Skill Proficiencies',
           legendSize: 'subsection',
+          fieldsChrome: { variant: 'panel' },
           fields: characterCreationSkillChoiceFields(ctx),
         },
         {
           kind: 'group',
           legend: 'Tool Proficiencies',
           legendSize: 'subsection',
+          fieldsChrome: { variant: 'panel' },
           id: 'class-character-creation-tool-proficiencies',
           fields: characterCreationToolChoiceFields(ctx, toolChoiceExtraFields),
         },

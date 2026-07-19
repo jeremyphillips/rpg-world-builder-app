@@ -28,7 +28,7 @@ function ProficiencyGroup({ label, values }: { label: string; values: string[] }
     <div className="grid gap-1">
       <Text variant="emphasis">{label}</Text>
       <SemanticText
-        tone={isUnset ? 'informative' : 'neutral'}
+        tone={isUnset ? 'info' : 'neutral'}
         emphasis={isUnset ? 'low' : 'medium'}
         className={PREVIEW_VALUE_TEXT_CLASS}
       >

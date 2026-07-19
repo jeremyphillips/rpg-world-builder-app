@@ -88,6 +88,14 @@ assertions, the Storybook test runner's axe-playwright check, and introduce no
 Never hardcode color values or font sizes — use design-token classes. Tailwind
 classes belong in `*.variants.ts` via CVA, not long inline strings.
 
+- Components consume Layer 2 / Tailwind utilities only — never `--palette-*`.
+- Prefer named surfaces (`bg-background`, `bg-muted`, `bg-sunken`, `bg-card`) over
+  opacity modifiers (`bg-muted/30`) in new code.
+- Field chrome: use `field-input-chrome.variants.ts`; do not ad-hoc disabled/muted stacks.
+- Status tones: `neutral | info | success | warning | destructive` (Badge, SemanticText, …).
+
+Detail: [packages/ui/docs/design-tokens.md](packages/ui/docs/design-tokens.md).
+
 ## Feature boundaries
 
 - Feature folder layout (`routes/`, `components/`, `hooks/`, `api/`, `lib/`, …) →

@@ -7,7 +7,7 @@ import { Badge } from './badge'
 describe('Badge', () => {
   it('renders a span by default', () => {
     render(
-      <Badge appearance="soft" tone="informative">
+      <Badge appearance="soft" tone="info">
         System
       </Badge>,
     )
@@ -16,25 +16,25 @@ describe('Badge', () => {
 
   it('applies appearance and tone classes', () => {
     render(
-      <Badge appearance="outline" tone="caution" size="sm">
+      <Badge appearance="outline" tone="warning" size="sm">
         Stale
       </Badge>,
     )
     const el = screen.getByText('Stale')
-    expect(el).toHaveClass('text-foreground', 'border-semantic-caution-border', 'font-light')
+    expect(el).toHaveClass('text-foreground', 'border-semantic-warning-border', 'font-light')
     expect(el).toHaveClass('text-xs-meta', 'rounded-full')
   })
 
   it('uses font-medium for filled soft appearance', () => {
     render(
-      <Badge appearance="soft" tone="negative">
+      <Badge appearance="soft" tone="destructive">
         Error
       </Badge>,
     )
     expect(screen.getByText('Error')).toHaveClass(
       'font-medium',
-      'bg-semantic-negative-subtle',
-      'text-semantic-negative-on-subtle',
+      'bg-semantic-destructive-subtle',
+      'text-semantic-destructive-on-subtle',
     )
   })
 
@@ -50,7 +50,7 @@ describe('Badge', () => {
   it('has no accessibility violations for soft negative on card surface', async () => {
     const { container } = render(
       <div className="rounded-lg bg-card p-4">
-        <Badge appearance="soft" tone="negative">
+        <Badge appearance="soft" tone="destructive">
           Error
         </Badge>
       </div>,

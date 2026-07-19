@@ -1,15 +1,16 @@
 /** Outer row chrome shared by every list item. */
 export const masterDetailListRowClasses =
-  'flex items-center gap-0 rounded-md border border-transparent hover:bg-muted/60'
+  'flex items-center gap-0 rounded-md border border-transparent hover:bg-row-hover'
 
 /** Enables hover/focus reveal for the drag handle in sortable rows. */
 export const masterDetailListRowSortableClasses = 'group'
 
 /** Selected row — same footprint as hover, stronger fill + border. */
-export const masterDetailListRowSelectedClasses = 'border-border bg-muted/40 hover:bg-muted/40'
+export const masterDetailListRowSelectedClasses =
+  'border-row-selected-border bg-row-selected hover:bg-row-selected'
 
 /** Inactive row — dashed border and muted title (matches subclass list). */
-export const masterDetailListRowInactiveClasses = 'border-dashed border-border/60'
+export const masterDetailListRowInactiveClasses = 'border-dashed border-border-subtle'
 
 export const masterDetailListRowInactiveTitleClasses = 'text-muted-foreground'
 

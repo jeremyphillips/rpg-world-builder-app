@@ -4,7 +4,7 @@ import type { BadgeAppearance, BadgeTone } from '@rpg/ui'
 import { Badge } from '@rpg/ui'
 
 const statusBadge: Record<EpicStatus, { appearance: BadgeAppearance; tone: BadgeTone }> = {
-  active: { appearance: 'soft', tone: 'informative' },
+  active: { appearance: 'soft', tone: 'info' },
   paused: { appearance: 'outline', tone: 'neutral' },
   done: { appearance: 'neutral', tone: 'neutral' },
 }

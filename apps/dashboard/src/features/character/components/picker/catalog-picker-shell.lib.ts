@@ -10,7 +10,7 @@ export function catalogPickerShellProps() {
   return {
     headlineClassName: catalogPickerHeadlineClasses,
     sheetContentClassName: catalogPickerSheetContentClasses,
-    rowTone: 'catalog' as const,
+    rowPreset: 'catalog' as const,
     toolbarCompact: true,
     rowShellClassName: catalogPickerRowShellClasses,
     rowBodyClassName: catalogPickerRowBodyClasses,

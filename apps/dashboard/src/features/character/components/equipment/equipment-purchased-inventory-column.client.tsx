@@ -11,7 +11,6 @@ import {
 import { EquipmentInventoryColumn } from './equipment-inventory-column.client'
 import { EquipmentPurchasedInventorySection } from './equipment-purchased-inventory-section.client'
 import type { PurchasedCategoryGroup } from './equipment-inventory-summary.lib'
-import { equipmentPurchasedInventoryPanelClasses } from './equipment-inventory-summary.variants'
 
 export type EquipmentPurchasedInventoryColumnProps = {
   purchased: PurchasedCategoryGroup[]
@@ -42,13 +41,11 @@ export function EquipmentPurchasedInventoryColumn({
       }
       reserveToolbarRow={isPackageMode}
     >
-      <div className={equipmentPurchasedInventoryPanelClasses}>
-        <EquipmentPurchasedInventorySection
-          purchased={purchased}
-          onRemoveItem={onRemoveItem}
-          onSetPurchaseQuantity={onSetPurchaseQuantity}
-        />
-      </div>
+      <EquipmentPurchasedInventorySection
+        purchased={purchased}
+        onRemoveItem={onRemoveItem}
+        onSetPurchaseQuantity={onSetPurchaseQuantity}
+      />
     </EquipmentInventoryColumn>
   )
 }

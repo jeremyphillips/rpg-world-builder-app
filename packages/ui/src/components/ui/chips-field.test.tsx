@@ -316,7 +316,7 @@ describe('ChipsField', () => {
 
     const fieldset = container.querySelector('fieldset')!
     const legend = fieldset.querySelector('legend')
-    const chromeShell = fieldset.querySelector('.rounded-md.border.bg-muted\\/10')
+    const chromeShell = fieldset.querySelector('.rounded-md.border.bg-surface-subtle')
 
     expect(legend).toHaveTextContent('Alignment')
     expect(chromeShell).toBeTruthy()

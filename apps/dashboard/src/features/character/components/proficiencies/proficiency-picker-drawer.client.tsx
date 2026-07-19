@@ -2,7 +2,12 @@
 
 import * as React from 'react'
 
-import { CatalogPickerSheet, Text, type CatalogPickerSheetToolbarContext } from '@rpg/ui'
+import {
+  CatalogPickerSheet,
+  InsetPanel,
+  Text,
+  type CatalogPickerSheetToolbarContext,
+} from '@rpg/ui'
 
 import { hasCatalogPickerResetViewCriteria } from '../picker/catalog-picker-filter-state.lib'
 import {
@@ -13,7 +18,6 @@ import { CatalogPickerItemHeader } from '../picker/catalog-picker-item-header.cl
 import { mapSkillProficiencyCompactSummaryToMetadataLines } from '../picker/catalog-picker-metadata'
 import { CatalogPickerSelectionActions } from '../picker/catalog-picker-selection-actions.client'
 import { catalogPickerShellProps } from '../picker/catalog-picker-shell.lib'
-import { catalogPickerEmptyStateClasses } from '../picker/catalog-picker-shell.variants'
 import { CatalogPickerSortGroup } from '../picker/catalog-picker-sort-group.client'
 import { pickerSortOption } from '../picker/catalog-picker-sort-labels.lib'
 import { CatalogPickerToolbarResetButton } from '../picker/catalog-picker-toolbar-reset-button.client'
@@ -116,9 +120,16 @@ export function ProficiencyPickerDrawer({
       transformVisibleItems={transformVisibleItems}
       emptyState={
         emptyStateMessage ? (
-          <div className={catalogPickerEmptyStateClasses} role="status">
-            {emptyStateMessage}
-          </div>
+          <InsetPanel
+            borderStyle="dashed"
+            surface="none"
+            size="md"
+            align="center"
+            className="py-8"
+            role="status"
+          >
+            <InsetPanel.Text>{emptyStateMessage}</InsetPanel.Text>
+          </InsetPanel>
         ) : undefined
       }
       tabToolbarActions={(toolbarContext) => {

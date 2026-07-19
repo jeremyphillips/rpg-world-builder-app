@@ -5,6 +5,13 @@ import * as CheckboxPrimitive from '@radix-ui/react-checkbox'
 import { Check } from 'lucide-react'
 
 import { cn } from '../../lib/utils'
+import {
+  choiceControlIndicatorCheckedBorderClasses,
+  choiceControlIndicatorDisabledClasses,
+  choiceControlIndicatorFocusClasses,
+  choiceControlIndicatorInvalidClasses,
+  choiceControlIndicatorShellClasses,
+} from './choice-control-chrome.variants'
 
 const Checkbox = React.forwardRef<
   React.ComponentRef<typeof CheckboxPrimitive.Root>,
@@ -13,7 +20,13 @@ const Checkbox = React.forwardRef<
   <CheckboxPrimitive.Root
     ref={ref}
     className={cn(
-      'peer size-4 shrink-0 rounded-sm border border-input shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:border-primary data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground aria-invalid:border-destructive',
+      'peer size-4 shrink-0 rounded-sm text-primary',
+      choiceControlIndicatorShellClasses,
+      choiceControlIndicatorFocusClasses,
+      choiceControlIndicatorCheckedBorderClasses,
+      choiceControlIndicatorDisabledClasses,
+      choiceControlIndicatorInvalidClasses,
+      'data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground',
       className,
     )}
     {...props}

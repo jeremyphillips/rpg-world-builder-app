@@ -3,18 +3,14 @@ import { Button } from '@rpg/ui'
 
 import { EquipmentStartingPackageToolbar } from './equipment-starting-package-toolbar.client'
 import { EquipmentInventoryColumn } from './equipment-inventory-column.client'
-import { equipmentPurchasedInventoryPanelClasses } from './equipment-inventory-summary.variants'
+import { EquipmentPurchasedInventorySection } from './equipment-purchased-inventory-section.client'
 
 const meta = {
   title: 'Character Builder/EquipmentInventoryColumn',
   component: EquipmentInventoryColumn,
   args: {
     title: 'Standard Equipment',
-    children: (
-      <div className={equipmentPurchasedInventoryPanelClasses}>
-        <p className="text-sm text-muted-foreground">Column body content</p>
-      </div>
-    ),
+    children: <EquipmentPurchasedInventorySection purchased={[]} />,
   },
 } satisfies Meta<typeof EquipmentInventoryColumn>
 

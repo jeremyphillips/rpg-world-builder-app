@@ -7,7 +7,7 @@ export type BadgeSize = 'sm' | 'md' | 'lg'
 export const badgeVariants = {
   defaultVariants: {
     appearance: 'soft' as const,
-    tone: 'informative' as const,
+    tone: 'info' as const,
     size: 'md' as const,
   },
 }

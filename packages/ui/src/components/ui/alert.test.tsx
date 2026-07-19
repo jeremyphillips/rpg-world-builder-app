@@ -36,7 +36,7 @@ describe('Alert', () => {
     render(<Alert variant={variant} title="Status" />)
     const alert = screen.getByRole('alert')
     if (variant === 'default') {
-      expect(alert).toHaveClass('border-border', 'bg-muted')
+      expect(alert).toHaveClass('border-border', 'bg-surface-muted')
       return
     }
     expect(alert).toHaveClass(`border-${variant}-muted`, `bg-${variant}-subtle`)

@@ -6,6 +6,7 @@ import { getSpellSchoolLabel } from '@rpg/contracts'
 import {
   CatalogPickerSheet,
   FilterToolbar,
+  InsetPanel,
   SegmentedControl,
   Text,
   type CatalogPickerSheetToolbarContext,
@@ -30,7 +31,6 @@ import { CatalogPickerFilterPopover } from '../picker/catalog-picker-mechanics-f
 import { mapSpellPickerCompactSummaryToMetadataLines } from '../picker/catalog-picker-metadata'
 import { CatalogPickerSelectionActions } from '../picker/catalog-picker-selection-actions.client'
 import { catalogPickerShellProps } from '../picker/catalog-picker-shell.lib'
-import { catalogPickerEmptyStateClasses } from '../picker/catalog-picker-shell.variants'
 import { CatalogPickerSelectionSummary } from '../picker/catalog-picker-selection-summary.client'
 import { CatalogPickerSortGroup } from '../picker/catalog-picker-sort-group.client'
 import { pickerSortOption } from '../picker/catalog-picker-sort-labels.lib'
@@ -368,9 +368,16 @@ export function SpellPickerDrawer({
       }
       emptyState={
         emptyStateMessage ? (
-          <div className={catalogPickerEmptyStateClasses} role="status">
-            {emptyStateMessage}
-          </div>
+          <InsetPanel
+            borderStyle="dashed"
+            surface="none"
+            size="md"
+            align="center"
+            className="py-8"
+            role="status"
+          >
+            <InsetPanel.Text>{emptyStateMessage}</InsetPanel.Text>
+          </InsetPanel>
         ) : undefined
       }
       tabToolbarActions={(toolbarContext) => {

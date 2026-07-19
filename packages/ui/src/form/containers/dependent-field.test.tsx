@@ -124,7 +124,7 @@ describe('dependent field', () => {
 
     await waitFor(() => {
       const shell = queryChromeShell(container)
-      expect(shell).toHaveClass('bg-muted/10')
+      expect(shell).toHaveClass('bg-surface-subtle')
       expect(queryDependentsRegion(container)).toHaveClass(fieldToggleDependentIndentClasses)
     })
   })
@@ -264,7 +264,7 @@ describe('dependent field', () => {
       expect(queryChromeShell(container)).toBeNull()
 
       const itemShell = screen.getByRole('group', { name: /Item #1/ })
-      expect(itemShell).toHaveClass('bg-muted/10')
+      expect(itemShell).toHaveClass('bg-surface-subtle')
       expect(itemShell).toHaveClass('border-border')
     })
   })

@@ -1,21 +1,21 @@
-import { Spinner, Text } from '@rpg/ui'
+import { InsetPanel, Spinner } from '@rpg/ui'
 
 export function SubclassCreateGate() {
   return (
-    <div className="rounded-lg border border-dashed border-border p-8 text-center">
-      <Text variant="muted">Save this class first to add subclasses.</Text>
-    </div>
+    <InsetPanel borderStyle="dashed" surface="sunken" size="lg" align="center">
+      <InsetPanel.Text>Save this class first to add subclasses.</InsetPanel.Text>
+    </InsetPanel>
   )
 }
 
 export function SubclassChoiceLevelGate() {
   return (
-    <div className="rounded-lg border border-dashed border-border p-8 text-center">
-      <Text variant="muted">
+    <InsetPanel borderStyle="dashed" surface="sunken" size="lg" align="center">
+      <InsetPanel.Text>
         Add a subclass choice feature on the <strong>Features</strong> tab before authoring
         subclasses.
-      </Text>
-    </div>
+      </InsetPanel.Text>
+    </InsetPanel>
   )
 }
 
@@ -29,8 +29,8 @@ export function SubclassLoadingGate() {
 
 export function SubclassEmptySelectionGate() {
   return (
-    <div className="rounded-lg border border-dashed border-border p-8 text-center">
-      <Text variant="muted">Select a subclass or add a new one.</Text>
-    </div>
+    <InsetPanel borderStyle="dashed" surface="none" size="lg" align="center">
+      <InsetPanel.Text>Select a subclass or add a new one.</InsetPanel.Text>
+    </InsetPanel>
   )
 }

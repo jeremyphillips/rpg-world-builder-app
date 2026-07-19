@@ -1,12 +1,16 @@
 import { cva } from 'class-variance-authority'
 
 import { cardRadiusClasses } from './card.variants'
+import {
+  choiceControlIndicatorGroupCheckedBorderClasses,
+  choiceControlIndicatorShellClasses,
+} from './choice-control-chrome.variants'
 import { fieldSurfaceRaisedShadowClasses } from './field-surface.variants'
 
-const radioCardCardBase = `group relative flex w-full cursor-pointer flex-col ${cardRadiusClasses} border border-border bg-card text-left text-card-foreground ${fieldSurfaceRaisedShadowClasses} transition-colors hover:border-primary/50 hover:bg-accent/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:border-primary data-[state=checked]:bg-accent/30 data-[state=checked]:ring-1 data-[state=checked]:ring-primary/20 aria-invalid:border-destructive`
+const radioCardCardBase = `group relative flex w-full cursor-pointer flex-col ${cardRadiusClasses} border border-border bg-card text-left text-card-foreground ${fieldSurfaceRaisedShadowClasses} transition-colors hover:border-primary/50 hover:bg-control-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:border-primary data-[state=checked]:bg-control-selected data-[state=checked]:ring-1 data-[state=checked]:ring-primary/20 aria-invalid:border-destructive`
 
 const radioCardRowBase =
-  'group relative flex w-full cursor-pointer flex-col rounded-md border-0 bg-transparent text-left text-card-foreground transition-colors hover:bg-muted/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-muted/50 aria-invalid:border aria-invalid:border-destructive'
+  'group relative flex w-full cursor-pointer flex-col rounded-md border-0 bg-transparent text-left text-card-foreground transition-colors hover:bg-row-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-row-selected aria-invalid:border aria-invalid:border-destructive'
 
 /** Card-style radio option: selected, hover, and focus states use design tokens only. */
 export const radioCardVariants = cva('', {
@@ -42,8 +46,8 @@ export const radioCardShellVariants = cva(
         compact: 'p-3',
       },
       selected: {
-        true: 'border-card-selected-border bg-accent/30',
-        false: 'hover:border-primary/50 hover:bg-accent/50',
+        true: 'border-card-selected-border bg-control-selected',
+        false: 'hover:border-primary/50 hover:bg-control-hover',
       },
     },
     defaultVariants: {
@@ -79,7 +83,7 @@ export const radioCardDetailsInlineSlotVariants = cva('col-start-3 row-start-1 s
 
 /** Decorative radio circle shown inside the card, synced to the parent item state. */
 export const radioCardControlVariants = cva(
-  'flex aspect-square shrink-0 items-center justify-center rounded-full border border-input text-primary shadow-sm transition-colors group-data-[state=checked]:border-primary',
+  `${choiceControlIndicatorShellClasses} ${choiceControlIndicatorGroupCheckedBorderClasses} flex aspect-square shrink-0 items-center justify-center rounded-full text-primary`,
   {
     variants: {
       variant: {
@@ -160,7 +164,7 @@ export const radioCardEmbeddedSlotVariants = cva('', {
   variants: {
     tone: {
       divider: 'border-t border-border',
-      panel: 'border-t border-border bg-muted',
+      panel: 'border-t border-border bg-surface-muted',
     },
     density: {
       default: '',

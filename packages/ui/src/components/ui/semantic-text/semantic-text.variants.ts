@@ -4,10 +4,10 @@ export const semanticTextVariants = cva('inline-flex items-center gap-1 text-xs'
   variants: {
     tone: {
       neutral: 'text-semantic-neutral',
-      informative: 'text-semantic-informative',
-      positive: 'text-semantic-positive',
-      caution: 'text-semantic-caution',
-      negative: 'text-semantic-negative',
+      info: 'text-semantic-info',
+      success: 'text-semantic-success',
+      warning: 'text-semantic-warning',
+      destructive: 'text-semantic-destructive',
     },
     emphasis: {
       low: 'font-normal',
@@ -17,9 +17,9 @@ export const semanticTextVariants = cva('inline-flex items-center gap-1 text-xs'
   },
   compoundVariants: [
     {
-      tone: 'informative',
+      tone: 'info',
       emphasis: 'low',
-      class: 'text-semantic-informative-muted',
+      class: 'text-semantic-info-muted',
     },
   ],
   defaultVariants: { tone: 'neutral', emphasis: 'medium' },

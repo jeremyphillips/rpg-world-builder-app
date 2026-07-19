@@ -4,6 +4,7 @@ import {
   COLOR_TOKEN_GROUPS,
   ON_SURFACE_TOKENS,
   PALETTE_ELEVATION_LADDER_TOKENS,
+  PALETTE_PRIMITIVE_TOKEN_GROUPS,
   SURFACE_BACKGROUNDS,
 } from './color-palette.lib'
 
@@ -15,7 +16,7 @@ describe('color-palette.lib', () => {
 
   it('includes core surface backgrounds for on-surface matrices', () => {
     expect(SURFACE_BACKGROUNDS.map((surface) => surface.cssVar)).toEqual(
-      expect.arrayContaining(['--background', '--bg-subtle', '--card', '--muted']),
+      expect.arrayContaining(['--background', '--sunken', '--card', '--surface-muted']),
     )
   })
 
@@ -31,8 +32,18 @@ describe('color-palette.lib', () => {
     expect(PALETTE_ELEVATION_LADDER_TOKENS.map((token) => token.name)).toEqual([
       'surface-base',
       'surface-subtle',
-      'surface-raised',
+      'surface-muted',
+      'surface-strong',
+      'surface-panel',
       'surface-sunken',
     ])
+  })
+
+  it('shows ink-on-solid palette foregrounds on a demo solid surface', () => {
+    const fgGroup = PALETTE_PRIMITIVE_TOKEN_GROUPS.find(
+      (group) => group.id === 'palette-foreground',
+    )
+    const onSolid = fgGroup?.tokens.find((token) => token.name === 'fg-on-solid')
+    expect(onSolid?.textDemoSurfaceVar).toBe('--palette-primary')
   })
 })

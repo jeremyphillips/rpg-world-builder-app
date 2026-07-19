@@ -34,7 +34,7 @@ export const comboboxContentVariants = cva(
  * height/background so the open panel reads as one expanded input.
  */
 export const comboboxSearchRowVariants = cva(
-  'flex items-center gap-2 border-b border-border bg-transparent px-3 dark:bg-input/30',
+  'flex items-center gap-2 border-b border-border bg-input px-3',
   {
     variants: {
       size: {

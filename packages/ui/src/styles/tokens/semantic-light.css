@@ -1,26 +1,37 @@
 /*
  * Layer 2 — light semantic roles (component / Tailwind API).
- * Maps to palette-light.css primitives only — no raw oklch here.
+ * Maps to palette-light.css theme roles or other Layer 2 aliases — no raw oklch here.
  */
 :root {
+  /* Layout */
   --radius: 0.525rem;
   --radius-card: var(--radius-lg);
 
+  /* Surfaces — page canvas, cards, popovers (`bg-background`, `bg-card`, `bg-popover`, …) */
   --background: var(--palette-surface-base);
-  --bg-subtle: var(--palette-surface-subtle);
-  --foreground: var(--palette-fg-default);
-  --card: var(--palette-surface-raised);
+  --card: var(--palette-surface-panel);
   --card-foreground: var(--foreground);
-  --popover: var(--palette-surface-raised);
+  --popover: var(--palette-surface-panel);
   --popover-foreground: var(--foreground);
-  --primary: var(--palette-primary);
-  --primary-foreground: var(--palette-fg-on-solid);
   --secondary: var(--palette-surface-secondary);
-  --secondary-foreground: var(--palette-fg-secondary);
-  --muted: var(--palette-surface-sunken);
+  --secondary-foreground: var(--foreground);
+  --surface-subtle: var(--palette-surface-subtle);
+  --surface-muted: var(--palette-surface-muted);
+  --surface-strong: var(--palette-surface-strong);
+  --muted: var(--surface-muted);
+  --sunken: var(--palette-surface-sunken);
   --muted-foreground: var(--palette-fg-muted);
   --accent: var(--palette-surface-accent);
-  --accent-foreground: var(--palette-fg-secondary);
+  --accent-foreground: var(--foreground);
+
+  /* Text — default body copy (`text-foreground`, `text-muted-foreground`, …) */
+  --foreground: var(--palette-fg-default);
+
+  /* Brand — primary actions, links, focus accents (`bg-primary`, `text-primary`, `ring-ring`, …) */
+  --primary: var(--palette-primary);
+  --primary-foreground: var(--palette-fg-on-solid);
+
+  /* Status — alerts, badges, destructive form errors (`bg-destructive-subtle`, `border-info-muted`, …) */
   --destructive: var(--palette-destructive);
   --destructive-foreground: var(--palette-on-solid);
   --destructive-muted: var(--palette-destructive-muted);
@@ -37,35 +48,107 @@
   --warning-foreground: var(--palette-fg-on-status);
   --warning-muted: var(--palette-warning-muted);
   --warning-subtle: var(--palette-warning-subtle);
-  --border: var(--palette-border-default);
+
+  /* Chrome — generic borders, selection, overlay, sidebar (`border-border`, `bg-overlay`, `bg-sidebar`, …) */
+  --border-default: var(--palette-border-default);
+  --border-subtle: var(--palette-border-subtle);
+  --border-strong: var(--palette-border-strong);
+  --border: var(--border-default);
   --card-selected-border: var(--palette-border-selected);
-  --input: var(--palette-border-input);
   --ring: var(--palette-primary);
   --overlay: var(--palette-overlay);
   --sidebar: var(--palette-sidebar-surface);
-  --semantic-neutral: var(--palette-semantic-neutral);
-  --semantic-informative: var(--palette-semantic-informative);
-  --semantic-informative-muted: var(--palette-semantic-informative-muted);
-  --semantic-positive: var(--palette-semantic-positive);
-  --semantic-caution: var(--palette-semantic-caution);
-  --semantic-negative: var(--palette-semantic-negative);
-  --semantic-negative-on-subtle: var(--palette-semantic-negative-on-subtle);
-  --semantic-neutral-border: var(--border);
-  --semantic-neutral-subtle: var(--muted);
-  --semantic-informative-border: var(--info-muted);
-  --semantic-informative-subtle: var(--info-subtle);
-  --semantic-positive-border: var(--success-muted);
-  --semantic-positive-subtle: var(--success-subtle);
-  --semantic-caution-border: var(--warning-muted);
-  --semantic-caution-subtle: var(--warning-subtle);
-  --semantic-negative-border: var(--destructive-muted);
-  --semantic-negative-subtle: var(--destructive-subtle);
+
+  /*
+   * Field control chrome — text-like inputs and grouped field shells.
+   * Public utilities: `border-input`, `bg-input`, and state variants in globals.css.
+   */
+  --field-control-bg: var(--palette-field-bg);
+  --field-control-fg: var(--foreground);
+  --field-control-border: var(--palette-field-border);
+  --field-control-placeholder: var(--palette-field-placeholder);
+  --field-control-bg-hover: var(--field-control-bg);
+  --field-control-border-hover: var(--palette-field-border-hover);
+  --field-control-bg-focus: var(--field-control-bg);
+  --field-control-border-focus: var(--primary);
+  --field-control-ring-focus: var(--ring);
+  --field-control-bg-readonly: var(--palette-field-bg-readonly);
+  --field-control-fg-readonly: var(--foreground);
+  --field-control-border-readonly: var(--palette-field-border-readonly);
+  --field-control-bg-disabled: var(--palette-field-bg-disabled);
+  --field-control-fg-disabled: var(--palette-field-fg-disabled);
+  --field-control-border-disabled: var(--palette-field-border-disabled);
+  --field-control-bg-invalid: var(--destructive-subtle);
+  --field-control-border-invalid: var(--destructive);
+  --field-control-ring-invalid: var(--destructive);
+
+  /* Switch — unchecked track only; checked state uses `--primary` */
+  --switch-track: var(--palette-switch-track);
+  --switch-track-hover: var(--palette-switch-track-hover);
+  --switch-track-disabled: var(--palette-switch-track-disabled);
+
+  /*
+   * Selected compact control — inverted fill for chosen options.
+   * Affects: selectable Chip, compact-label selected appearance (`bg-selected-control`, …).
+   */
   --selected-control: var(--foreground);
   --selected-control-foreground: var(--background);
   --selected-control-border: var(--foreground);
-  --catalog-picker-row-surface: color-mix(in oklab, var(--muted) 35%, transparent);
+
+  /*
+   * Semantic inline text (`--semantic-*`) vs status chrome (`--info-*`, …).
+   * Text roles are tuned for readability; status roles are for fills/borders/badges.
+   */
+  --semantic-neutral: var(--palette-semantic-neutral);
+  --semantic-info: var(--palette-semantic-info);
+  --semantic-info-muted: var(--palette-semantic-info-muted);
+  --semantic-success: var(--palette-semantic-success);
+  --semantic-warning: var(--palette-semantic-warning);
+  --semantic-destructive: var(--palette-semantic-destructive);
+  --semantic-destructive-on-subtle: var(--palette-semantic-destructive-on-subtle);
+  --semantic-neutral-border: var(--border);
+  --semantic-neutral-subtle: var(--muted);
+  --semantic-info-border: var(--info-muted);
+  --semantic-info-subtle: var(--info-subtle);
+  --semantic-success-border: var(--success-muted);
+  --semantic-success-subtle: var(--success-subtle);
+  --semantic-warning-border: var(--warning-muted);
+  --semantic-warning-subtle: var(--warning-subtle);
+  --semantic-destructive-border: var(--destructive-muted);
+  --semantic-destructive-subtle: var(--destructive-subtle);
+
+  /*
+   * Choice indicators — radio/checkbox rings on panel surfaces (not field-input chrome).
+   */
+  --choice-control-border: color-mix(in oklch, var(--foreground) 32%, var(--card));
+
+  /*
+   * Outline button — full ink border, neutral hover wash (not accent fill).
+   */
+  --outline-button-border: var(--foreground);
+  --outline-button-hover-bg: var(--surface-subtle);
+  --outline-button-active-bg: var(--surface-muted);
+
+  /*
+   * Shared interaction recipes — public contract for hover/selected/drag/track chrome.
+   * Composed at Layer 2 toward concrete surfaces (no transparent washes).
+   */
+  --control-hover-bg: color-mix(in oklch, var(--accent) 35%, var(--background));
+  --control-selected-bg: color-mix(in oklch, var(--accent) 22%, var(--background));
+  --row-hover-bg: var(--surface-subtle);
+  --row-selected-bg: var(--surface-strong);
+  --row-selected-border: var(--border-strong);
+  --drop-target-bg: color-mix(in oklch, var(--accent) 35%, var(--background));
+  --drop-target-border: var(--primary);
+  --segmented-track-bg: var(--surface-strong);
+
+  /* Component recipes — one-off surfaces not covered by roles above */
+  --catalog-picker-row-surface: var(--card);
   --surface-raised-shadow:
     inset 0 1px 0 0 color-mix(in oklab, var(--foreground) 5%, transparent),
     0 1px 2px 0 color-mix(in oklab, var(--foreground) 8%, transparent),
     0 2px 6px -1px color-mix(in oklab, var(--foreground) 6%, transparent);
+  --surface-sunken-shadow:
+    inset 0 1px 2px 0 color-mix(in oklab, var(--foreground) 8%, transparent),
+    inset 0 0 0 1px color-mix(in oklab, var(--foreground) 4%, transparent);
 }

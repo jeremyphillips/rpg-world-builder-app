@@ -165,7 +165,7 @@ function RadioCardTitleRowContent({
       <span className={cn(radioCardTitleVariants(), titleClassName)}>{label}</span>
       {titleMeta ? <RadioCardTitleMeta titleMeta={titleMeta} /> : null}
       {badge ? (
-        <Badge appearance="soft" tone="informative" size="sm">
+        <Badge appearance="soft" tone="info" size="sm">
           {badge}
         </Badge>
       ) : null}

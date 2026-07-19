@@ -10,9 +10,9 @@ const APPROVED_SURFACE_TOKENS = [
   'border-border',
   'bg-background',
   'bg-card',
-  'bg-muted/10',
-  'bg-muted/30',
-  'bg-muted/50',
+  'bg-surface-subtle',
+  'bg-surface-muted',
+  'bg-surface-strong',
   'shadow-surface-raised',
 ]
 
@@ -49,7 +49,7 @@ describe('resolveFieldContainerChromeClasses', () => {
     const classes = resolveFieldContainerChromeClasses({ surface: 'subtle', status: 'warning' })
     expect(classes).toContain('border-warning-muted')
     expect(classes).toContain('bg-warning-subtle')
-    expect(classes).not.toContain('bg-muted/10')
+    expect(classes).not.toContain('bg-surface-subtle')
   })
 
   it('defaults surface behavior to subtle when only status is set', () => {

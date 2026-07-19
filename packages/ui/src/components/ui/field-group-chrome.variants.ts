@@ -1,6 +1,6 @@
 import { cva } from 'class-variance-authority'
 
-import { type AlertVariant } from './alert.variants'
+import { type AlertVariant, ALERT_VARIANTS } from './alert.variants'
 import { compactLabelAppearanceToneClasses, type CompactLabelTone } from './compact-label.lib'
 import { cn } from '../../lib/utils'
 import {
@@ -82,7 +82,7 @@ export const fieldGroupDividerTopPaddingClasses = 'pt-7'
 /** Spacing below a bottom divider — 28px (`pb-7`). */
 export const fieldGroupDividerBottomPaddingClasses = 'pb-7'
 
-const fieldGroupInsetBodyVariants = cva('border-l-2 pl-6 sm:pl-10', {
+const fieldGroupInsetBodyVariants = cva('border-l-2 pl-6 sm:pl-8', {
   variants: {
     tone: {
       border: 'border-border',
@@ -102,7 +102,7 @@ const fieldGroupDividerContainerVariants = cva('', {
     },
     tone: {
       border: 'border-border',
-      muted: 'border-border/60',
+      muted: 'border-border-subtle',
     },
   },
   defaultVariants: {
@@ -121,18 +121,18 @@ const fieldGroupAccentContainerVariants = cva('', {
       border: 'border-border',
       primary: 'border-primary',
       neutral: '',
-      informative: '',
-      positive: '',
-      caution: '',
-      negative: '',
+      info: '',
+      success: '',
+      warning: '',
+      destructive: '',
     },
   },
   compoundVariants: [
     { edge: 'top', tone: 'neutral', class: 'border-semantic-neutral-border' },
-    { edge: 'top', tone: 'informative', class: 'border-semantic-informative-border' },
-    { edge: 'top', tone: 'positive', class: 'border-semantic-positive-border' },
-    { edge: 'top', tone: 'caution', class: 'border-semantic-caution-border' },
-    { edge: 'top', tone: 'negative', class: 'border-semantic-negative-border' },
+    { edge: 'top', tone: 'info', class: 'border-semantic-info-border' },
+    { edge: 'top', tone: 'success', class: 'border-semantic-success-border' },
+    { edge: 'top', tone: 'warning', class: 'border-semantic-warning-border' },
+    { edge: 'top', tone: 'destructive', class: 'border-semantic-destructive-border' },
   ],
   defaultVariants: {
     edge: 'top',
@@ -146,10 +146,10 @@ const fieldGroupAccentLegendRailVariants = cva('relative w-full', {
       border: 'before:bg-border',
       primary: 'before:bg-primary',
       neutral: 'before:bg-semantic-neutral-border',
-      informative: 'before:bg-semantic-informative-border',
-      positive: 'before:bg-semantic-positive-border',
-      caution: 'before:bg-semantic-caution-border',
-      negative: 'before:bg-semantic-negative-border',
+      info: 'before:bg-semantic-info-border',
+      success: 'before:bg-semantic-success-border',
+      warning: 'before:bg-semantic-warning-border',
+      destructive: 'before:bg-semantic-destructive-border',
     },
   },
   defaultVariants: {
@@ -167,20 +167,28 @@ export function resolveFieldGroupAccentLegendRailClasses(
   )
 }
 
+function isAlertVariant(value: string): value is AlertVariant {
+  return (ALERT_VARIANTS as readonly string[]).includes(value)
+}
+
 function resolveCalloutBodyClasses(tone: FieldGroupCalloutTone = 'info'): string {
+  if (isAlertVariant(tone)) {
+    const calloutSurface: Record<AlertVariant, string> = {
+      default: 'border-border bg-surface-muted text-foreground',
+      info: 'border-info-muted bg-info-subtle text-foreground',
+      success: 'border-success-muted bg-success-subtle text-foreground',
+      warning: 'border-warning-muted bg-warning-subtle text-foreground',
+      destructive: 'border-destructive-muted bg-destructive-subtle text-foreground',
+    }
+
+    return cn('rounded-lg border p-4', calloutSurface[tone])
+  }
+
   if (isCompactLabelTone(tone)) {
     return cn('rounded-lg border p-4', compactLabelAppearanceToneClasses('soft', tone))
   }
 
-  const calloutSurface: Record<AlertVariant, string> = {
-    default: 'border-border bg-muted text-foreground',
-    info: 'border-info-muted bg-info-subtle text-foreground',
-    success: 'border-success-muted bg-success-subtle text-foreground',
-    warning: 'border-warning-muted bg-warning-subtle text-foreground',
-    destructive: 'border-destructive-muted bg-destructive-subtle text-foreground',
-  }
-
-  return cn('rounded-lg border p-4', calloutSurface[tone])
+  return cn('rounded-lg border p-4', 'border-border bg-surface-muted text-foreground')
 }
 
 function resolveAccentTone(

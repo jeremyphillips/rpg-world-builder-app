@@ -16,16 +16,16 @@ Consumers use the public component APIs — not the internal CVA.
 
 ## Tone vs appearance
 
-**Tone** communicates meaning (`neutral`, `informative`, `positive`, `caution`, `negative`).
+**Tone** communicates meaning (`neutral`, `info`, `success`, `warning`, `destructive`).
 **Appearance** controls presentation strength (`outline`, `accent-outline`, `soft`, `neutral`).
 
 They are independent — do not shift hue to signal importance or selection.
 
-- **Selected chips** use **selected-control** tokens (`bg-selected-control`, …), not `tone="positive"`.
+- **Selected chips** use **selected-control** tokens (`bg-selected-control`, …), not `tone="success"`.
 - **Semantic soft badges** (`appearance="soft"`) are not the same surface as a selected chip.
 
-Shared tone names align with [`SemanticText`](src/components/ui/semantic-text/) but render bordered
-pill surfaces instead of inline copy.
+Shared tone names align with [`SemanticText`](./semantic-text.md) but render bordered pill
+surfaces instead of inline copy.
 
 ## Size scale
 
@@ -50,7 +50,7 @@ pill surfaces instead of inline copy.
 
 | Mode / state              | Surface                                                   |
 | ------------------------- | --------------------------------------------------------- |
-| `selectable` / unselected | transparent, `border-border`, weight 300                  |
+| `selectable` / unselected | `background`, `border-border`, weight 300                 |
 | `selectable` / selected   | `selected-control` fill, auto leading `Check`, weight 500 |
 | `removable`               | neutral filled surface, trailing remove control           |
 
@@ -59,12 +59,15 @@ pill surfaces instead of inline copy.
 Role tokens live in [`globals.css`](../src/styles/globals.css):
 
 - `--semantic-*-border`, `--semantic-*-subtle` — badge soft/outline surfaces
-- `--semantic-negative-on-subtle` — soft negative badge copy (AA on `destructive-subtle` fill)
+- `--semantic-destructive-on-subtle` — soft destructive badge copy on `destructive-subtle` fill
 - `--selected-control`, `--selected-control-foreground`, `--selected-control-border` — chip selection
+
+Status chrome (`--info-subtle`, …) vs inline text (`--semantic-info`, …): [design-tokens.md](./design-tokens.md#status-namespaces).
 
 Typography aliases: `text-xs-meta`, `text-sm-meta` (see [typography.md](./typography.md)).
 
 ## Further reading
 
 - [Semantic text](./semantic-text.md) — inline copy with the same tone enum
+- [Design tokens](./design-tokens.md) — layers, surfaces, alpha policy
 - [Forms](./forms.md) — `ChipsField`, combobox selected-value rendering

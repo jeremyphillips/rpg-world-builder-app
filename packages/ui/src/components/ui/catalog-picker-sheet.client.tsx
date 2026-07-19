@@ -2,6 +2,7 @@
 
 import * as React from 'react'
 
+import { InsetPanel } from './inset-panel.client'
 import { Sheet } from './sheet.client'
 import { Spinner } from './spinner'
 import { CatalogPickerSheetResults } from './catalog-picker-sheet-rows.client'
@@ -11,7 +12,6 @@ import type { CatalogPickerSheetProps } from './catalog-picker-sheet.types'
 import {
   catalogPickerSheetBodyVariants,
   catalogPickerSheetContentVariants,
-  catalogPickerSheetEmptyVariants,
   catalogPickerSheetLoadingVariants,
 } from './catalog-picker-sheet.variants'
 
@@ -54,9 +54,16 @@ function CatalogPickerSheetEmpty({
   if (emptyState) return <>{emptyState}</>
 
   return (
-    <div className={catalogPickerSheetEmptyVariants()} role="status">
-      {message}
-    </div>
+    <InsetPanel
+      borderStyle="dashed"
+      surface="none"
+      size="md"
+      align="center"
+      className="py-8"
+      role="status"
+    >
+      <InsetPanel.Text>{message}</InsetPanel.Text>
+    </InsetPanel>
   )
 }
 

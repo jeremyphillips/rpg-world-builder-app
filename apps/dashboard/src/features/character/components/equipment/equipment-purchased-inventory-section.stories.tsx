@@ -4,7 +4,6 @@ import { useState } from 'react'
 import type { EquipmentInventoryRow } from '../../lib/equipment-step.lib'
 import { EquipmentPurchasedInventorySection } from './equipment-purchased-inventory-section.client'
 import type { PurchasedCategoryGroup } from './equipment-inventory-summary.lib'
-import { equipmentPurchasedInventoryPanelClasses } from './equipment-inventory-summary.variants'
 
 const stackableRow: EquipmentInventoryRow = {
   group: 'gear',
@@ -90,20 +89,18 @@ function PurchasedInventorySectionDemo(args: {
   }))
 
   return (
-    <div className={equipmentPurchasedInventoryPanelClasses}>
-      <EquipmentPurchasedInventorySection
-        purchased={groups}
-        showGroupHeadings={args.showGroupHeadings}
-        allowZeroQuantity={args.allowZeroQuantity}
-        onSetPurchaseQuantity={(target, quantity) => {
-          setQuantities((current) => ({ ...current, [target.purchaseId]: quantity }))
-        }}
-        onRemoveItem={(target) => {
-          if (target.kind !== 'purchase') return
-          setQuantities((current) => ({ ...current, [target.purchaseId]: 0 }))
-        }}
-      />
-    </div>
+    <EquipmentPurchasedInventorySection
+      purchased={groups}
+      showGroupHeadings={args.showGroupHeadings}
+      allowZeroQuantity={args.allowZeroQuantity}
+      onSetPurchaseQuantity={(target, quantity) => {
+        setQuantities((current) => ({ ...current, [target.purchaseId]: quantity }))
+      }}
+      onRemoveItem={(target) => {
+        if (target.kind !== 'purchase') return
+        setQuantities((current) => ({ ...current, [target.purchaseId]: 0 }))
+      }}
+    />
   )
 }
 
@@ -124,6 +121,12 @@ export const WithGroupHeadings: Story = {
     purchased: purchasedGroups,
   },
   render: () => <PurchasedInventorySectionDemo />,
+}
+
+export const Empty: Story = {
+  args: {
+    purchased: [],
+  },
 }
 
 export const FlatListWithoutHeadings: Story = {

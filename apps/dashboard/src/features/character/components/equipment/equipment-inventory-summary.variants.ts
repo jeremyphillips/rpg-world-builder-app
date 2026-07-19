@@ -26,11 +26,6 @@ export const equipmentInventorySummaryGroupClasses = 'space-y-1'
 
 export const equipmentInventorySummaryListClasses = ''
 
-export const equipmentPurchasedInventoryPanelClasses =
-  'rounded-lg border border-border bg-muted/20 px-3 py-3'
-
-export const equipmentPurchasedInventoryEmptyClasses = 'px-4 py-2 text-sm text-muted-foreground'
-
 export const equipmentPurchasedInventoryCategoryListClasses = 'divide-y divide-border'
 
 export const equipmentPurchasedInventoryCategoryClasses = 'space-y-1 py-3 first:pt-0 last:pb-0'

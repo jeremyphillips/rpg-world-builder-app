@@ -22,6 +22,15 @@ describe('Button', () => {
     expect(button).toHaveClass('h-8')
   })
 
+  it('applies outline button chrome from token recipes', () => {
+    render(<Button variant="outline">Cancel</Button>)
+    const button = screen.getByRole('button', { name: 'Cancel' })
+    expect(button).toHaveClass('border-outline-button-border')
+    expect(button).toHaveClass('hover:bg-outline-button-hover')
+    expect(button).not.toHaveClass('shadow-sm')
+    expect(button).not.toHaveClass('border-input')
+  })
+
   it('fires onClick when pressed', async () => {
     const onClick = vi.fn()
     render(<Button onClick={onClick}>Click</Button>)

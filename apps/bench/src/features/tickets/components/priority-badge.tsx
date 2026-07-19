@@ -6,8 +6,8 @@ import { Badge } from '@rpg/ui'
 const priorityBadge: Record<TicketPriority, { appearance: BadgeAppearance; tone: BadgeTone }> = {
   low: { appearance: 'neutral', tone: 'neutral' },
   medium: { appearance: 'outline', tone: 'neutral' },
-  high: { appearance: 'soft', tone: 'informative' },
-  critical: { appearance: 'soft', tone: 'negative' },
+  high: { appearance: 'soft', tone: 'info' },
+  critical: { appearance: 'soft', tone: 'destructive' },
 }
 
 interface PriorityBadgeProps {

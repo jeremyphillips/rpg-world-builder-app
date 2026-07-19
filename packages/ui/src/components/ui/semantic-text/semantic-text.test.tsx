@@ -5,7 +5,7 @@ import { describe, expect, it } from 'vitest'
 
 import { SemanticText } from './semantic-text'
 
-const TONES = ['neutral', 'informative', 'positive', 'caution', 'negative'] as const
+const TONES = ['neutral', 'info', 'success', 'warning', 'destructive'] as const
 const EMPHASES = ['low', 'medium', 'high'] as const
 
 describe('SemanticText', () => {
@@ -13,39 +13,35 @@ describe('SemanticText', () => {
     render(<SemanticText tone={tone}>Label</SemanticText>)
     const el = screen.getByText('Label')
     expect(el.tagName).toBe('SPAN')
-    const expectedToneClass =
-      tone === 'informative' ? 'text-semantic-informative' : `text-semantic-${tone}`
+    const expectedToneClass = tone === 'info' ? 'text-semantic-info' : `text-semantic-${tone}`
     expect(el).toHaveClass(expectedToneClass)
   })
 
-  it('uses informative-muted for informative low emphasis', () => {
+  it('uses info-muted for info low emphasis', () => {
     render(
-      <SemanticText tone="informative" emphasis="low">
+      <SemanticText tone="info" emphasis="low">
         Standard gear
       </SemanticText>,
     )
     const el = screen.getByText('Standard gear')
-    expect(el).toHaveClass('text-semantic-informative-muted', 'font-normal')
-    expect(el).not.toHaveClass('text-semantic-informative')
+    expect(el).toHaveClass('text-semantic-info-muted', 'font-normal')
+    expect(el).not.toHaveClass('text-semantic-info')
   })
 
-  it('keeps informative token for medium and high emphasis', () => {
+  it('keeps info token for medium and high emphasis', () => {
     const { rerender } = render(
-      <SemanticText tone="informative" emphasis="medium">
+      <SemanticText tone="info" emphasis="medium">
         Spellcasting focus
       </SemanticText>,
     )
-    expect(screen.getByText('Spellcasting focus')).toHaveClass(
-      'text-semantic-informative',
-      'font-medium',
-    )
+    expect(screen.getByText('Spellcasting focus')).toHaveClass('text-semantic-info', 'font-medium')
 
     rerender(
-      <SemanticText tone="informative" emphasis="high">
+      <SemanticText tone="info" emphasis="high">
         Essential
       </SemanticText>,
     )
-    expect(screen.getByText('Essential')).toHaveClass('text-semantic-informative', 'font-semibold')
+    expect(screen.getByText('Essential')).toHaveClass('text-semantic-info', 'font-semibold')
   })
 
   it.each(EMPHASES)('applies %s emphasis via font weight', (emphasis) => {
@@ -57,7 +53,7 @@ describe('SemanticText', () => {
 
   it('wraps icons with leading-none and sizes descendant SVGs', () => {
     const { container } = render(
-      <SemanticText icon={<TriangleAlert data-testid="icon" />} tone="caution">
+      <SemanticText icon={<TriangleAlert data-testid="icon" />} tone="warning">
         Warning
       </SemanticText>,
     )
@@ -69,7 +65,7 @@ describe('SemanticText', () => {
 
   it('has no axe accessibility violations', async () => {
     const { container } = render(
-      <SemanticText tone="negative" emphasis="high" icon={<TriangleAlert aria-hidden />}>
+      <SemanticText tone="destructive" emphasis="high" icon={<TriangleAlert aria-hidden />}>
         Cannot afford
       </SemanticText>,
     )

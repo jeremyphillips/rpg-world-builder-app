@@ -256,7 +256,7 @@ function TierSeparatorRow({ tierName, colSpan }: { tierName: string; colSpan: nu
     <TableRow>
       <TableCell
         colSpan={colSpan}
-        className="border-border border-y bg-muted/30 py-2 text-center text-sm font-medium"
+        className="border-border border-y bg-surface-muted py-2 text-center text-sm font-medium"
       >
         {tierName}
       </TableCell>

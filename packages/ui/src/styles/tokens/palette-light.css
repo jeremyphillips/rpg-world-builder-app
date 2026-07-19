@@ -1,26 +1,80 @@
 /*
- * Layer 1 — light palette primitives (oklch SSOT).
+ * Layer 1 — light theme palette roles (oklch SSOT).
  * Inventory: tokens/palette-inventory.md — every name must exist in palette-dark.css.
  *
- * Motif: cream canvas, parch cards, primary-tinted sidebar, deep-red primary.
+ * Motif: cream canvas, warm panel (card/popover), formula-derived washes, field lift from canvas.
  */
 :root {
   --palette-neutral-hue: 82;
 
-  /* Elevation surfaces */
-  --palette-surface-base: oklch(0.974 0.026 90.1);
-  --palette-surface-subtle: oklch(0.958 0.03 90);
-  --palette-surface-raised: oklch(0.934 0.04 91.2);
-  --palette-surface-sunken: oklch(0.82 0.065 85);
-  --palette-surface-secondary: oklch(0.92 0.038 90);
-  --palette-surface-accent: oklch(0.745 0.103 86.4);
-
-  /* Foreground roles */
+  /* Authored anchors — visual identity */
+  --palette-surface-base: oklch(0.98 0.0179 89.36);
+  --palette-surface-panel: oklch(0.934 0.039 90);
+  --palette-neutral-contrast: oklch(0.745 0.103 86.4);
   --palette-fg-default: oklch(0.28 0.038 68);
-  --palette-fg-muted: oklch(0.521 0.055 80.3);
-  --palette-fg-secondary: oklch(0.42 0.05 72);
-  --palette-fg-on-solid: oklch(0.974 0.026 90.1);
   --palette-fg-on-status: oklch(0.186 0.029 64.3);
+
+  /* Derived or aliased surfaces — keep semantic names, single source of truth */
+  --palette-surface-field: color-mix(in oklch, var(--palette-surface-base) 50%, white);
+  --palette-fg-on-solid: var(--palette-surface-base);
+  --palette-surface-secondary: var(--palette-surface-panel);
+  --palette-surface-accent: var(--palette-neutral-contrast);
+
+  /* Derived foreground scale */
+  --palette-fg-muted: color-mix(
+    in oklch,
+    var(--palette-fg-default) 58%,
+    var(--palette-surface-base)
+  );
+  --palette-fg-disabled: color-mix(
+    in oklch,
+    var(--palette-fg-default) 42%,
+    var(--palette-surface-base)
+  );
+
+  /* Derived wash ladder */
+  --palette-surface-subtle: color-mix(
+    in oklch,
+    var(--palette-neutral-contrast) 8%,
+    var(--palette-surface-base)
+  );
+  --palette-surface-muted: color-mix(
+    in oklch,
+    var(--palette-neutral-contrast) 15%,
+    var(--palette-surface-base)
+  );
+  --palette-surface-strong: color-mix(
+    in oklch,
+    var(--palette-neutral-contrast) 32%,
+    var(--palette-surface-base)
+  );
+  --palette-surface-sunken: color-mix(
+    in oklch,
+    var(--palette-neutral-contrast) 32%,
+    var(--palette-surface-base)
+  );
+
+  /* Derived generic borders — canvas hierarchy */
+  --palette-border-subtle: color-mix(
+    in oklch,
+    var(--palette-fg-default) 14%,
+    var(--palette-surface-base)
+  );
+  --palette-border-default: color-mix(
+    in oklch,
+    var(--palette-fg-default) 24%,
+    var(--palette-surface-base)
+  );
+  --palette-border-strong: color-mix(
+    in oklch,
+    var(--palette-fg-default) 34%,
+    var(--palette-surface-base)
+  );
+  --palette-border-selected: color-mix(
+    in oklch,
+    var(--palette-fg-default) 20%,
+    var(--palette-surface-base)
+  );
 
   --palette-primary: oklch(0.386 0.13 36.6);
   --palette-primary-foreground: var(--palette-fg-on-solid);
@@ -33,14 +87,47 @@
     var(--palette-surface-sunken)
   );
 
-  --palette-border-default: oklch(0.745 0.103 86.4);
-  --palette-border-input: oklch(0.72 0.095 85);
-  --palette-border-selected: oklch(from var(--palette-border-default) l c h / 42%);
   --palette-overlay: oklch(from var(--palette-fg-on-status) l c h / 0.5);
+
+  /* Field control — global fill; no parent-context matrix */
+  --palette-field-bg: var(--palette-surface-field);
+  --palette-field-bg-readonly: var(--palette-surface-subtle);
+  --palette-field-bg-disabled: color-mix(
+    in oklch,
+    var(--palette-surface-field) 35%,
+    var(--palette-surface-base)
+  );
+  --palette-field-border: color-mix(
+    in oklch,
+    var(--palette-fg-default) 20%,
+    var(--palette-surface-field)
+  );
+  --palette-field-border-hover: color-mix(
+    in oklch,
+    var(--palette-fg-default) 32%,
+    var(--palette-surface-field)
+  );
+  --palette-field-border-readonly: color-mix(
+    in oklch,
+    var(--palette-field-border) 55%,
+    var(--palette-field-bg-readonly)
+  );
+  --palette-field-border-disabled: color-mix(
+    in oklch,
+    var(--palette-field-border) 40%,
+    var(--palette-field-bg-disabled)
+  );
+  --palette-field-placeholder: var(--palette-fg-muted);
+  --palette-field-fg-disabled: var(--palette-fg-disabled);
+
+  /* Switch track — distinct from field border ownership */
+  --palette-switch-track: oklch(0.86 0.035 82 / 80%);
+  --palette-switch-track-hover: oklch(0.78 0.045 78 / 80%);
+  --palette-switch-track-disabled: oklch(0.86 0.035 82 / 40%);
 
   --palette-destructive: oklch(0.577 0.245 27.325);
   --palette-destructive-muted: oklch(0.577 0.245 27.325 / 70%);
-  --palette-destructive-subtle: oklch(0.577 0.245 27.325 / 50%);
+  --palette-destructive-subtle: oklch(0.577 0.245 27.325 / 13%);
   --palette-info: oklch(0.52 0.14 250);
   --palette-info-muted: oklch(0.52 0.14 250 / 70%);
   --palette-info-subtle: oklch(0.52 0.14 250 / 12%);
@@ -52,10 +139,10 @@
   --palette-warning-subtle: oklch(0.62 0.14 55 / 14%);
 
   --palette-semantic-neutral: var(--palette-fg-muted);
-  --palette-semantic-informative: oklch(0.48 0.13 250);
-  --palette-semantic-informative-muted: oklch(0.42 0.07 250);
-  --palette-semantic-positive: oklch(0.48 0.13 145);
-  --palette-semantic-caution: oklch(0.55 0.13 55);
-  --palette-semantic-negative: oklch(0.52 0.2 27);
-  --palette-semantic-negative-on-subtle: oklch(0.42 0.19 27);
+  --palette-semantic-info: oklch(0.48 0.13 250);
+  --palette-semantic-info-muted: oklch(0.42 0.07 250);
+  --palette-semantic-success: oklch(0.48 0.13 145);
+  --palette-semantic-warning: oklch(0.55 0.13 55);
+  --palette-semantic-destructive: oklch(0.52 0.2 27);
+  --palette-semantic-destructive-on-subtle: oklch(0.42 0.19 27);
 }

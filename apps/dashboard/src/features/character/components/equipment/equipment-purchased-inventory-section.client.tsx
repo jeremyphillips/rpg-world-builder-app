@@ -1,6 +1,6 @@
 'use client'
 
-import { Eyebrow, Text } from '@rpg/ui'
+import { Eyebrow, InsetPanel } from '@rpg/ui'
 
 import {
   EQUIPMENT_PURCHASED_INVENTORY_EMPTY_MESSAGE,
@@ -16,7 +16,6 @@ import {
   equipmentInventoryRowListClasses,
   equipmentPurchasedInventoryCategoryClasses,
   equipmentPurchasedInventoryCategoryListClasses,
-  equipmentPurchasedInventoryEmptyClasses,
 } from './equipment-inventory-summary.variants'
 
 export type EquipmentPurchasedInventorySectionProps = {
@@ -38,9 +37,9 @@ export function EquipmentPurchasedInventorySection({
 
   if (!hasPurchases) {
     return (
-      <Text as="p" className={equipmentPurchasedInventoryEmptyClasses}>
-        {EQUIPMENT_PURCHASED_INVENTORY_EMPTY_MESSAGE}
-      </Text>
+      <InsetPanel size="sm" align="center" className="rounded-lg">
+        <InsetPanel.Text>{EQUIPMENT_PURCHASED_INVENTORY_EMPTY_MESSAGE}</InsetPanel.Text>
+      </InsetPanel>
     )
   }
 

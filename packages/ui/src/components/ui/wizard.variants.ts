@@ -10,7 +10,7 @@ export const wizardStepBubbleVariants = cva(
       state: {
         idle: 'border-2 border-border bg-background text-muted-foreground',
         active: 'border-2 border-primary bg-primary text-primary-foreground',
-        complete: 'border-2 border-primary bg-primary/10 text-primary',
+        complete: 'border-2 border-primary bg-surface-subtle text-primary',
       },
     },
     defaultVariants: { state: 'idle' },

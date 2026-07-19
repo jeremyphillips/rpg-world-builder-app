@@ -38,7 +38,7 @@ function renderAccordionStory(draft = createEmptyCharacterBuilderDraft()) {
     : undefined
 
   return (
-    <div className="max-w-xs rounded-lg border border-border bg-muted/20 p-2">
+    <div className="max-w-xs rounded-lg border border-border bg-surface-muted p-2">
       <CharacterBuilderPreviewAccordion
         preview={preview}
         catalogIndex={catalogIndex}

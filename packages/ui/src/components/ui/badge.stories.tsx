@@ -17,7 +17,7 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 export const SoftInformative: Story = {
-  args: { appearance: 'soft', tone: 'informative', children: 'System' },
+  args: { appearance: 'soft', tone: 'info', children: 'System' },
 }
 
 export const Neutral: Story = {
@@ -29,7 +29,7 @@ export const Outline: Story = {
 }
 
 export const AccentOutline: Story = {
-  args: { appearance: 'accent-outline', tone: 'positive', children: 'Equipped' },
+  args: { appearance: 'accent-outline', tone: 'success', children: 'Equipped' },
 }
 
 export const Small: Story = {
@@ -54,7 +54,7 @@ export const Sizes: Story = {
 }
 
 function SurfaceMatrix({ surface }: { surface: 'base' | 'subtle' }) {
-  const surfaceClass = surface === 'subtle' ? 'bg-muted/30' : 'bg-background'
+  const surfaceClass = surface === 'subtle' ? 'bg-surface-muted' : 'bg-background'
 
   return (
     <div className="space-y-6">
@@ -93,12 +93,12 @@ export const LegibilitySmWeight300: Story = {
   render: () => (
     <div className="space-y-4">
       <div className="rounded-lg bg-background p-4">
-        <Badge appearance="outline" tone="informative" size="sm">
+        <Badge appearance="outline" tone="info" size="sm">
           11px outline
         </Badge>
       </div>
-      <div className="rounded-lg bg-muted/30 p-4">
-        <Badge appearance="accent-outline" tone="caution" size="sm">
+      <div className="rounded-lg bg-surface-muted p-4">
+        <Badge appearance="accent-outline" tone="warning" size="sm">
           11px accent-outline
         </Badge>
       </div>

@@ -99,12 +99,13 @@ export function proficienciesFields(ctx: ContentFormCtx): FormItem[] {
     {
       kind: 'group',
       legend: 'Defenses',
-      fieldsChrome: { variant: 'panel' },
+      fieldsChrome: { variant: 'outline' },
       fields: [
         {
           type: 'chips',
           name: 'proficiencies.savingThrows',
           label: 'Saving throws',
+          chrome: { variant: 'panel' },
           options: abilityOptions,
           max: 2,
           required: true,
@@ -115,6 +116,7 @@ export function proficienciesFields(ctx: ContentFormCtx): FormItem[] {
           type: 'chips',
           name: 'proficiencies.armor',
           label: 'Armor training',
+          chrome: { variant: 'panel' },
           options: armorCategoryOptions,
         },
       ],
@@ -122,7 +124,7 @@ export function proficienciesFields(ctx: ContentFormCtx): FormItem[] {
     {
       kind: 'group',
       legend: 'Weapons',
-      fieldsChrome: { variant: 'panel' },
+      fieldsChrome: { variant: 'outline' },
       fields: [
         {
           type: 'radio',
@@ -138,6 +140,7 @@ export function proficienciesFields(ctx: ContentFormCtx): FormItem[] {
           type: 'chips',
           name: 'proficiencies.weapons.categories',
           label: 'Weapon proficiencies',
+          chrome: { variant: 'panel' },
           options: weaponCategoryOptions,
           hint: WEAPON_PROFICIENCIES_HINT,
           visibility: visibleWhenWeaponCategories(),
@@ -157,7 +160,7 @@ export function proficienciesFields(ctx: ContentFormCtx): FormItem[] {
     {
       kind: 'group',
       legend: 'Granted skills & tools',
-      fieldsChrome: { variant: 'panel' },
+      fieldsChrome: { variant: 'outline' },
       fields: [
         {
           type: 'chips',
