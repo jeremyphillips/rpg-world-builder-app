@@ -4,12 +4,12 @@ import type {
 } from '../character-builder/context'
 import type { CharacterDerivationInput } from './derive/profile'
 import { resolveEquippedArmorFromInventory } from './equipment-inventory'
-import type { PcCharacter } from './sheet'
+import type { Character } from './sheet'
 import { getCharacterTotalLevel } from './sheet'
 
-/** Adapts a persisted PC sheet into the global character derivation input shape. */
+/** Adapts a persisted character sheet into the global character derivation input shape. */
 export function toCharacterSheetDerivationInput(
-  character: PcCharacter,
+  character: Character,
   catalogIndex: CharacterBuildCatalogIndex,
   rules: ResolvedCharacterCreationRules,
 ): CharacterDerivationInput {

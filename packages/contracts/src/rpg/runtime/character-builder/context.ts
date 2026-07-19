@@ -20,6 +20,7 @@ import type {
 import type {
   CharacterBuilderMode,
   CharacterBuildScope,
+  CampaignCharacterBuildScope,
   StandaloneCharacterBuilderMode,
   StandaloneCharacterBuildScope,
 } from './mode-scope'
@@ -115,4 +116,13 @@ export type StandaloneBuildContext = CharacterBuildContext & {
   rulesScope: Extract<CharacterRulesScope, { type: 'ruleset' }>
   ownershipTarget: { type: 'user' }
   characterKind: 'pc'
+}
+
+/** Campaign-scoped NPC authoring — rules and catalog from campaign patch + content. */
+export type CampaignBuildContext = CharacterBuildContext & {
+  mode: 'dashboard'
+  scope: CampaignCharacterBuildScope
+  rulesScope: Extract<CharacterRulesScope, { type: 'campaign' }>
+  ownershipTarget: { type: 'campaign'; campaignId: string }
+  characterKind: 'npc'
 }

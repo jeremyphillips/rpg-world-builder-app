@@ -20,6 +20,9 @@ import {
   CharacterDetailRoute,
   CharacterImportRoute,
   CharactersOverviewRoute,
+  NpcCreateRoute,
+  NpcDetailRoute,
+  NpcsOverviewRoute,
   ClassCreateRoute,
   ClassDetailRoute,
   ClassEditRoute,
@@ -143,6 +146,33 @@ const router = createBrowserRouter(
                   path: 'settings',
                   element: <CampaignSettingsRoute />,
                   handle: { crumb: () => ({ label: 'Settings' }) } satisfies CrumbHandle,
+                },
+                {
+                  path: 'npcs',
+                  element: <Outlet />,
+                  handle: {
+                    crumb: (params) => ({
+                      label: 'NPCs',
+                      href: ROUTES.campaign.npcs.list(params.campaignId!),
+                    }),
+                  } satisfies CrumbHandle,
+                  children: [
+                    { index: true, element: <NpcsOverviewRoute /> },
+                    {
+                      path: 'new',
+                      element: <NpcCreateRoute />,
+                      handle: { crumb: () => ({ label: 'New' }) } satisfies CrumbHandle,
+                    },
+                    {
+                      path: ':npcId',
+                      element: <NpcDetailRoute />,
+                      handle: {
+                        crumb: (_params, { entityLabel }) => ({
+                          label: entityLabel ?? '…',
+                        }),
+                      } satisfies CrumbHandle,
+                    },
+                  ],
                 },
                 {
                   path: 'classes',

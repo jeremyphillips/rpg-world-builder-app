@@ -1,7 +1,7 @@
 import { NavSection } from '@rpg/ui'
 
 import { ROUTES } from '@/app/routes'
-import { CampaignSwitcher } from '@/features/campaign'
+import { CampaignSwitcher, useCanManageCampaign } from '@/features/campaign'
 import { VISIBLE_SIDEBAR_CONTENT } from '@/features/homebrew'
 import { useCampaignStore } from '@/features/campaign/store/campaign-store'
 
@@ -9,6 +9,7 @@ import { NavItem } from './nav-item'
 
 export function CampaignNavSection() {
   const activeCampaignId = useCampaignStore((s) => s.activeCampaignId)
+  const canManageCampaign = useCanManageCampaign(activeCampaignId ?? undefined)
 
   return (
     <NavSection label="Campaign">
@@ -19,6 +20,9 @@ export function CampaignNavSection() {
         <>
           <NavItem to={ROUTES.campaign.detail(activeCampaignId)} label="Overview" end />
           <NavItem to={ROUTES.campaign.sessions(activeCampaignId)} label="Sessions" />
+          {canManageCampaign ? (
+            <NavItem to={ROUTES.campaign.npcs.list(activeCampaignId)} label="NPCs" />
+          ) : null}
           {VISIBLE_SIDEBAR_CONTENT.map((entry) => (
             <NavItem
               key={entry.contentType}

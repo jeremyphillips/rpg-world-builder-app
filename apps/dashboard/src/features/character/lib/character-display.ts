@@ -1,3 +1,16 @@
+import type {
+  Ability,
+  Character,
+  CharacterBuildCatalogIndex,
+  CharacterClassEntry,
+  CharacterNarrative,
+  CharacterProficiencies,
+  Equipment,
+  MovementMode,
+  ResolvedCharacterCreationRules,
+  Species,
+  XpProgressionBody,
+} from '@rpg/contracts'
 import {
   ABILITY_ENTRIES,
   ABILITY_IDS,
@@ -15,17 +28,6 @@ import {
   resolveWeaponAttackAbilityModifier,
   toCharacterSheetDerivationInput,
   weaponAttackBonus,
-  type Ability,
-  type CharacterBuildCatalogIndex,
-  type CharacterClassEntry,
-  type CharacterNarrative,
-  type CharacterProficiencies,
-  type Equipment,
-  type MovementMode,
-  type PcCharacter,
-  type ResolvedCharacterCreationRules,
-  type Species,
-  type XpProgressionBody,
 } from '@rpg/contracts'
 
 import { resolveLanguagePreviewLabel } from './language-preview-label'
@@ -194,7 +196,7 @@ export type CharacterDetailViewModel = {
 }
 
 export type CharacterDisplayInput = {
-  character: PcCharacter
+  character: Character
   catalogIndex: CharacterBuildCatalogIndex
   rules: ResolvedCharacterCreationRules
   xpProgression: Pick<XpProgressionBody, 'entries'>
@@ -210,12 +212,12 @@ function formatContentIdLabel(id: string): string {
 
 function resolveHeritageName(
   catalogIndex: CharacterBuildCatalogIndex,
-  character: PcCharacter,
+  speciesRef: Character['species'],
 ): string | undefined {
-  const heritageId = character.species.heritageId
+  const heritageId = speciesRef.heritageId
   if (!heritageId) return undefined
 
-  const species = catalogIndex.species.get(character.species.id)
+  const species = catalogIndex.species.get(speciesRef.id)
   const heritageOption = species?.heritage?.options.find((option) => option.id === heritageId)
   return heritageOption
     ? resolveTraitDisplay(heritageOption).name
@@ -251,12 +253,12 @@ function formatMulticlassSegment(
 }
 
 export function formatCharacterSummary(
-  character: PcCharacter,
+  character: Pick<Character, 'classes' | 'species'>,
   catalogIndex: CharacterBuildCatalogIndex,
 ): string {
   const species = catalogIndex.species.get(character.species.id)
   const speciesName = species?.name ?? formatContentIdLabel(character.species.id)
-  const heritageName = resolveHeritageName(catalogIndex, character)
+  const heritageName = resolveHeritageName(catalogIndex, character.species)
   const speciesPart = heritageName ? `${speciesName} (${heritageName})` : speciesName
   const totalLevel = getCharacterTotalLevel(character)
 
@@ -269,7 +271,7 @@ export function formatCharacterSummary(
 }
 
 export function buildCharacterCardViewModel(
-  character: PcCharacter,
+  character: Pick<Character, 'id' | 'name' | 'classes' | 'species'>,
   catalogIndex: CharacterBuildCatalogIndex,
 ): CharacterCardViewModel {
   return {
@@ -291,7 +293,7 @@ function isCharacterProficientWithWeapon(
 }
 
 function buildActionRows(
-  character: PcCharacter,
+  character: Character,
   catalogIndex: CharacterBuildCatalogIndex,
   level: number,
 ): CharacterActionRowViewModel[] {
@@ -320,7 +322,7 @@ function buildActionRows(
 }
 
 function buildSavingThrowSection(
-  character: PcCharacter,
+  character: Character,
   catalogIndex: CharacterBuildCatalogIndex,
   rules: ResolvedCharacterCreationRules,
 ): CharacterDetailListSection {
@@ -357,7 +359,7 @@ function buildProficiencyGroup(
 }
 
 function buildProficienciesSection(
-  character: PcCharacter,
+  character: Character,
   catalogIndex: CharacterBuildCatalogIndex,
   rules: ResolvedCharacterCreationRules,
 ): CharacterProficienciesViewModel {
@@ -432,7 +434,7 @@ function buildProficienciesSection(
 }
 
 function buildClassFeaturesSection(
-  character: PcCharacter,
+  character: Character,
   catalogIndex: CharacterBuildCatalogIndex,
 ): CharacterDetailListSection {
   const items: CharacterDetailListItem[] = []
@@ -459,7 +461,7 @@ function buildClassFeaturesSection(
 }
 
 function buildSpeciesTraitsSection(
-  character: PcCharacter,
+  character: Character,
   catalogIndex: CharacterBuildCatalogIndex,
 ): CharacterDetailListSection {
   const species = catalogIndex.species.get(character.species.id)
@@ -493,7 +495,7 @@ function buildSpeciesTraitsSection(
   }
 }
 
-function buildFeatsSection(character: PcCharacter): CharacterDetailListSection {
+function buildFeatsSection(character: Character): CharacterDetailListSection {
   const items = character.feats.map((entry) => ({
     id: entry.featId,
     label: formatContentIdLabel(entry.featId),
@@ -536,7 +538,7 @@ function resolveSpeedStatTile(species: Species | undefined): Pick<
 }
 
 function buildStats(
-  character: PcCharacter,
+  character: Character,
   catalogIndex: CharacterBuildCatalogIndex,
   rules: ResolvedCharacterCreationRules,
 ): CharacterDetailStatTile[] {
@@ -572,7 +574,7 @@ function buildStats(
 }
 
 function buildHitPoints(
-  character: PcCharacter,
+  character: Character,
   catalogIndex: CharacterBuildCatalogIndex,
   rules: ResolvedCharacterCreationRules,
 ): CharacterHitPointsViewModel {
@@ -589,7 +591,7 @@ function buildHitPoints(
 }
 
 function buildAbilities(
-  character: PcCharacter,
+  character: Character,
   catalogIndex: CharacterBuildCatalogIndex,
   rules: ResolvedCharacterCreationRules,
 ): CharacterAbilityTile[] {
@@ -608,7 +610,7 @@ function buildAbilities(
 }
 
 function buildIdentityXp(
-  character: PcCharacter,
+  character: Character,
   xpProgression: Pick<XpProgressionBody, 'entries'>,
 ): string {
   return String(resolveCharacterXpDisplay(character, xpProgression))

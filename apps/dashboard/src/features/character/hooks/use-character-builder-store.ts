@@ -8,7 +8,10 @@ import {
   type CharacterBuilderStoreState,
 } from '../store/character-builder-store'
 
-type CharacterBuilderContextSlice = Pick<CharacterBuildContext, 'mode' | 'scope'> | null
+type CharacterBuilderContextSlice = Pick<
+  CharacterBuildContext,
+  'mode' | 'scope' | 'characterKind' | 'rulesScope'
+> | null
 
 export function useCharacterBuilderStore<T>(
   context: CharacterBuilderContextSlice,

@@ -2,11 +2,12 @@
 
 import { ConfirmDialog } from '@rpg/ui'
 
+import type { CharacterBuildContext } from '@rpg/contracts'
+
 import { useCharacterBuilderStore } from '../hooks/use-character-builder-store'
-import type { BuildContextResult } from '../hooks/use-build-context'
 
 type CharacterBuilderDraftRestoreProps = {
-  context: NonNullable<BuildContextResult['context']>
+  context: CharacterBuildContext
 }
 
 export function CharacterBuilderDraftRestore({ context }: CharacterBuilderDraftRestoreProps) {

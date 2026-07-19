@@ -14,6 +14,14 @@ export {
 } from './api/ruleset-content-client'
 export { CharacterBuilderDraftRestore } from './components/character-builder-draft-restore.client'
 export { useBuildContext, type BuildContextResult } from './hooks/use-build-context'
+export {
+  useCampaignBuildContext,
+  type CampaignBuildContextResult,
+} from './hooks/use-campaign-build-context'
+export {
+  campaignBuildContextQueryKey,
+  fetchCampaignBuilderCatalog,
+} from './api/campaign-content-client'
 export { characterQueryKey, useCharacter } from './hooks/use-character'
 export {
   useCharacterBuilderStorageKey,

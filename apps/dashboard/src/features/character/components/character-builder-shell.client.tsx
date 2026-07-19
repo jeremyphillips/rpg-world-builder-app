@@ -8,10 +8,10 @@ import {
   finalizeCharacterBuild,
   getErrorMessage,
   type CharacterBuildCatalogIndex,
+  type CharacterBuildContext,
   type CharacterBuilderDraft,
   type CharacterBuilderStepId,
   type CharacterBuildValidationIssue,
-  type StandaloneBuildContext,
 } from '@rpg/contracts'
 import { buttonVariants, Heading, Spinner, Text } from '@rpg/ui'
 
@@ -58,7 +58,7 @@ import { CharacterBuilderStepContent } from './character-builder-step-content.cl
 import { CharacterBuilderStepRail } from './character-builder-step-rail.client'
 
 export type CharacterBuilderShellProps = {
-  context: StandaloneBuildContext
+  context: CharacterBuildContext
   catalogIndex: CharacterBuildCatalogIndex
 }
 

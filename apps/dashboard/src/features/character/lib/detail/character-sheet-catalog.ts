@@ -9,7 +9,7 @@ import {
   type CharacterSelectionSource,
   type CharacterSpellEntry,
   type Equipment,
-  type PcCharacter,
+  type Character,
   type Spell,
 } from '@rpg/contracts'
 
@@ -146,7 +146,7 @@ function resolveEquipmentOccurrenceId(
 }
 
 function buildEquipmentCards(
-  character: PcCharacter,
+  character: Character,
   catalogIndex: CharacterBuildCatalogIndex,
 ): CharacterSheetEquipmentCard[] {
   const occurrenceCounts = new Map<string, number>()
@@ -183,7 +183,7 @@ function buildEquipmentCards(
 }
 
 function buildSpellCards(
-  character: PcCharacter,
+  character: Character,
   catalogIndex: CharacterBuildCatalogIndex,
 ): CharacterSheetSpellCard[] {
   return character.spells.map((entry, index) => {
@@ -217,14 +217,14 @@ function buildSpellCards(
 }
 
 export function buildCharacterSheetEquipmentCards(
-  character: PcCharacter,
+  character: Character,
   catalogIndex: CharacterBuildCatalogIndex,
 ): CharacterSheetEquipmentCard[] {
   return buildEquipmentCards(character, catalogIndex)
 }
 
 export function buildCharacterSheetSpellCards(
-  character: PcCharacter,
+  character: Character,
   catalogIndex: CharacterBuildCatalogIndex,
 ): CharacterSheetSpellCard[] {
   return buildSpellCards(character, catalogIndex)
