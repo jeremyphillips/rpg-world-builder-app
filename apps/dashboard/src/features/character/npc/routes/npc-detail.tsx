@@ -1,19 +1,25 @@
-import { useMemo } from 'react'
-import { useParams } from 'react-router-dom'
+import { useMemo, useState } from 'react'
+import { useNavigate, useParams } from 'react-router-dom'
 import { type SystemRulesetId } from '@rpg/contracts'
 import { getStandardXpProgression } from '@rpg/catalog/xp-progressions'
 
+import { ROUTES } from '@/app/routes'
 import { PageLoadState } from '@/components/layout/page-load-state'
 import { WidePage } from '@/components/layout/wide-page'
+import { useCanManageCampaign } from '@/features/campaign'
 
 import { CharacterDetailContent } from '../../components/detail/character-detail-content.client'
 import { useCampaignBuildContext } from '../../hooks/use-campaign-build-context'
 import { buildCharacterDetailViewModel } from '../../lib/character-display'
-import { NpcAuthoringGate } from '../components/npc-authoring-gate.client'
+import { useDeleteNpc } from '../hooks/use-delete-npc'
 import { useNpc } from '../hooks/use-npcs'
 
 export function NpcDetail() {
+  const navigate = useNavigate()
   const { campaignId = '', npcId } = useParams<{ campaignId: string; npcId: string }>()
+  const canManage = useCanManageCampaign(campaignId)
+  const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false)
+  const deleteNpc = useDeleteNpc()
   const {
     data: npc,
     isPending: isNpcPending,
@@ -43,18 +49,52 @@ export function NpcDetail() {
   const isError = isNpcError || isContextError
   const errorLabel = npcError?.message ?? contextError?.message
 
+  const handleDelete = () => {
+    if (!npcId) return
+
+    deleteNpc.mutate(
+      { campaignId, npcId },
+      {
+        onSuccess: () => {
+          setConfirmDeleteOpen(false)
+          void navigate(ROUTES.campaign.npcs.list(campaignId))
+        },
+      },
+    )
+  }
+
   return (
-    <NpcAuthoringGate campaignId={campaignId}>
-      <WidePage spacing="relaxed">
-        <PageLoadState
-          isPending={isPending}
-          isError={isError}
-          errorLabel={errorLabel}
-          defaultErrorLabel="Could not load NPC."
-        >
-          {viewModel ? <CharacterDetailContent viewModel={viewModel} /> : null}
-        </PageLoadState>
-      </WidePage>
-    </NpcAuthoringGate>
+    <WidePage spacing="relaxed">
+      <PageLoadState
+        isPending={isPending}
+        isError={isError}
+        errorLabel={errorLabel}
+        defaultErrorLabel="Could not load NPC."
+      >
+        {viewModel ? (
+          <CharacterDetailContent
+            viewModel={viewModel}
+            showDelete={canManage}
+            deleteConfig={
+              canManage
+                ? {
+                    open: confirmDeleteOpen,
+                    onOpenChange: setConfirmDeleteOpen,
+                    onConfirm: handleDelete,
+                    isPending: deleteNpc.isPending,
+                    headline: 'Delete NPC?',
+                    description: (
+                      <>
+                        Permanently delete <strong>{viewModel.identity.name}</strong>? This cannot
+                        be undone.
+                      </>
+                    ),
+                  }
+                : undefined
+            }
+          />
+        ) : null}
+      </PageLoadState>
+    </WidePage>
   )
 }

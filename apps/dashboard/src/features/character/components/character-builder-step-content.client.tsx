@@ -24,6 +24,7 @@ export type CharacterBuilderStepContentProps = {
   preview: CharacterBuildPreview | null
   resolvedChoiceSets: readonly ChoiceSet[]
   validationIssues: CharacterBuildValidationIssue[]
+  reviewValidationHeading: string
   onDraftChange: (patch: Partial<CharacterBuilderDraft>) => void
   onStepComplete: (patch?: Partial<CharacterBuilderDraft>) => void
   onFormContinueValidationFailed: (patch: Partial<CharacterBuilderDraft>) => void
@@ -37,6 +38,7 @@ export function CharacterBuilderStepContent({
   preview,
   resolvedChoiceSets,
   validationIssues,
+  reviewValidationHeading,
   onDraftChange,
   onStepComplete,
   onFormContinueValidationFailed,
@@ -91,6 +93,7 @@ export function CharacterBuilderStepContent({
           preview={preview}
           resolvedChoiceSets={resolvedChoiceSets}
           validationIssues={validationIssues}
+          validationHeading={reviewValidationHeading}
           onNavigateToStep={onNavigateToStep}
         />
       )

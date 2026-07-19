@@ -13,6 +13,9 @@ import { characterBuilderShellFooterClasses } from './character-builder-shell.va
 export type CharacterBuilderFooterProps = {
   currentStepId: CharacterBuilderStepId
   canCreateCharacter?: boolean
+  createLabel: string
+  creatingLabel: string
+  reviewFooterHint: string
   onBack: () => void
   onContinue: () => void
   onCreateCharacter: () => void
@@ -22,6 +25,9 @@ export type CharacterBuilderFooterProps = {
 export function CharacterBuilderFooter({
   currentStepId,
   canCreateCharacter = true,
+  createLabel,
+  creatingLabel,
+  reviewFooterHint,
   onBack,
   onContinue,
   onCreateCharacter,
@@ -37,7 +43,7 @@ export function CharacterBuilderFooter({
       <div className="flex flex-col gap-2">
         {onReview && !canCreateCharacter ? (
           <Text variant="muted" className="text-sm">
-            Resolve the issues above before creating your character.
+            {reviewFooterHint}
           </Text>
         ) : null}
 
@@ -50,7 +56,7 @@ export function CharacterBuilderFooter({
 
           {onReview ? (
             <Button type="button" disabled={createDisabled} onClick={onCreateCharacter}>
-              {isCreating ? 'Creating…' : 'Create character'}
+              {isCreating ? creatingLabel : createLabel}
             </Button>
           ) : canContinue ? (
             <Button type="button" onClick={onContinue}>

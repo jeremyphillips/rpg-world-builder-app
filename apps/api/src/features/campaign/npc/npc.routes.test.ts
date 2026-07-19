@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import { CSRF_HEADER } from '../../../lib/cookies'
+import { CampaignMembershipModel } from '../../campaign/campaign-membership.model'
 import { createTestCampaign, registerAndLoginTestUser } from '../../../test/auth-agent'
 import { minimalNpcRequestInput } from '../../../test/fixtures/npcs'
 import { useIntegrationApp } from '../../../test/setup/integration-app'
@@ -75,9 +76,9 @@ describe('campaign NPC routes', () => {
     expect(res.body.error.message).toContain('campaignId')
   })
 
-  it('forbids NPC routes for non-owner campaign members', async () => {
+  it('forbids NPC routes for users who are not campaign members', async () => {
     const owner = await authedOwnerCampaign('npc-owner-2@example.com')
-    const member = await registerAndLoginTestUser(getApp(), {
+    const outsider = await registerAndLoginTestUser(getApp(), {
       email: 'npc-outsider@example.com',
       password: 'supersecret',
       displayName: 'Outsider',
@@ -89,8 +90,60 @@ describe('campaign NPC routes', () => {
       .send(minimalNpcRequestInput)
       .expect(201)
 
+    await outsider.agent
+      .get(`/api/campaigns/${owner.campaignId}/npcs`)
+      .set(CSRF_HEADER, outsider.csrfToken)
+      .expect(403)
+  })
+
+  it('allows campaign members to list and read NPCs but not mutate them', async () => {
+    const owner = await authedOwnerCampaign('npc-owner-3@example.com')
+    const member = await registerAndLoginTestUser(getApp(), {
+      email: 'npc-member@example.com',
+      password: 'supersecret',
+      displayName: 'Player',
+    })
+
+    const meRes = await member.agent
+      .get('/api/auth/me')
+      .set(CSRF_HEADER, member.csrfToken)
+      .expect(200)
+
+    await CampaignMembershipModel.create({
+      campaignId: owner.campaignId,
+      userId: meRes.body.user.id as string,
+      campaignRole: 'pc',
+      characterIds: [],
+      invitedAt: new Date(),
+      joinedAt: new Date(),
+    })
+
+    const createRes = await owner.agent
+      .post(`/api/campaigns/${owner.campaignId}/npcs`)
+      .set(CSRF_HEADER, owner.csrfToken)
+      .send(minimalNpcRequestInput)
+      .expect(201)
+
+    const npcId = createRes.body.npc.id as string
+
     await member.agent
       .get(`/api/campaigns/${owner.campaignId}/npcs`)
+      .set(CSRF_HEADER, member.csrfToken)
+      .expect(200)
+
+    await member.agent
+      .get(`/api/campaigns/${owner.campaignId}/npcs/${npcId}`)
+      .set(CSRF_HEADER, member.csrfToken)
+      .expect(200)
+
+    await member.agent
+      .post(`/api/campaigns/${owner.campaignId}/npcs`)
+      .set(CSRF_HEADER, member.csrfToken)
+      .send(minimalNpcRequestInput)
+      .expect(403)
+
+    await member.agent
+      .delete(`/api/campaigns/${owner.campaignId}/npcs/${npcId}`)
       .set(CSRF_HEADER, member.csrfToken)
       .expect(403)
   })

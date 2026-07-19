@@ -17,7 +17,6 @@ vi.mock('@/features/campaign', async (importOriginal) => {
   return {
     ...actual,
     CampaignSwitcher: () => <div data-testid="campaign-switcher" />,
-    useCanManageCampaign: () => true,
   }
 })
 

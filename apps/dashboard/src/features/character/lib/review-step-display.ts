@@ -8,21 +8,23 @@ import {
   type ChoiceSet,
 } from '@rpg/contracts'
 
+import { getBuilderChromeCopyForContext } from './builder-chrome-copy'
+
 export function resolveReviewReadyMessage(
   draft: CharacterBuilderDraft,
   context: CharacterBuildContext,
   displayIssues: CharacterBuildValidationIssue[],
   resolvedChoiceSets: readonly ChoiceSet[],
 ): string | null {
+  const chrome = getBuilderChromeCopyForContext(context)
+
   if (displayIssues.length > 0) return null
 
   const validation = validateCharacterBuild(draft, context, 'finalSubmit', {
     resolvedChoiceSets,
   })
 
-  return validation.ok
-    ? 'Your character is ready to create.'
-    : 'Resolve the issues above before creating your character.'
+  return validation.ok ? chrome.reviewReadyMessage : chrome.reviewBlockedMessage
 }
 
 export function formatAbilityMethodLabel(

@@ -3,12 +3,11 @@ import { DataTable, Text, buttonVariants } from '@rpg/ui'
 
 import { ROUTES } from '@/app/routes'
 import { PageLoadState } from '@/components/layout/page-load-state'
-import { NarrowPage } from '@/components/layout/narrow-page'
+import { WidePage } from '@/components/layout/wide-page'
 import { PageHeader } from '@/components/layout/page-header'
 import { useCanManageCampaign } from '@/features/campaign'
 
 import { useCampaignBuildContext } from '../../hooks/use-campaign-build-context'
-import { NpcAuthoringGate } from '../components/npc-authoring-gate.client'
 import { useNpcs } from '../hooks/use-npcs'
 import { npcsOverviewColumns } from '../lib/npcs-overview-columns'
 
@@ -34,28 +33,26 @@ export function NpcsOverview() {
   ) : undefined
 
   return (
-    <NpcAuthoringGate campaignId={campaignId}>
-      <NarrowPage spacing="list">
-        <PageHeader heading="NPCs" actions={actions} />
-        <PageLoadState
-          isPending={isPending}
-          isError={isError}
-          errorLabel={contextError?.message}
-          defaultErrorLabel="Could not load NPCs."
-        >
-          {catalogIndex ? (
-            npcs.length === 0 ? (
-              <Text variant="muted">{NPCS_EMPTY_MESSAGE}</Text>
-            ) : (
-              <DataTable
-                columns={npcsOverviewColumns(campaignId, catalogIndex)}
-                data={npcs}
-                caption="Non-player characters in this campaign"
-              />
-            )
-          ) : null}
-        </PageLoadState>
-      </NarrowPage>
-    </NpcAuthoringGate>
+    <WidePage spacing="list">
+      <PageHeader heading="NPCs" actions={actions} />
+      <PageLoadState
+        isPending={isPending}
+        isError={isError}
+        errorLabel={contextError?.message}
+        defaultErrorLabel="Could not load NPCs."
+      >
+        {catalogIndex ? (
+          npcs.length === 0 ? (
+            <Text variant="muted">{NPCS_EMPTY_MESSAGE}</Text>
+          ) : (
+            <DataTable
+              columns={npcsOverviewColumns(campaignId, catalogIndex)}
+              data={npcs}
+              caption="Non-player characters in this campaign"
+            />
+          )
+        ) : null}
+      </PageLoadState>
+    </WidePage>
   )
 }

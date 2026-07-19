@@ -1,9 +1,9 @@
 import { useParams } from 'react-router-dom'
 
 import { PageLoadState } from '@/components/layout/page-load-state'
+import { WidePage } from '@/components/layout/wide-page'
 
 import { CharacterBuilderShell } from '../../components/character-builder-shell.client'
-import { characterBuilderRouteClasses } from '../../components/character-builder-shell.variants'
 import { useCampaignBuildContext } from '../../hooks/use-campaign-build-context'
 import { NpcAuthoringGate } from '../components/npc-authoring-gate.client'
 
@@ -13,7 +13,7 @@ export function NpcCreate() {
 
   return (
     <NpcAuthoringGate campaignId={campaignId}>
-      <div className={characterBuilderRouteClasses}>
+      <WidePage spacing="relaxed" className="flex min-h-0 flex-1 flex-col">
         <PageLoadState
           isPending={isPending}
           isError={isError}
@@ -21,12 +21,10 @@ export function NpcCreate() {
           defaultErrorLabel="Could not load NPC builder."
         >
           {context && catalogIndex ? (
-            <div className="flex min-h-0 flex-1 flex-col">
-              <CharacterBuilderShell context={context} catalogIndex={catalogIndex} />
-            </div>
+            <CharacterBuilderShell context={context} catalogIndex={catalogIndex} />
           ) : null}
         </PageLoadState>
-      </div>
+      </WidePage>
     </NpcAuthoringGate>
   )
 }

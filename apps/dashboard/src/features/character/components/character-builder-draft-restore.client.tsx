@@ -5,12 +5,14 @@ import { ConfirmDialog } from '@rpg/ui'
 import type { CharacterBuildContext } from '@rpg/contracts'
 
 import { useCharacterBuilderStore } from '../hooks/use-character-builder-store'
+import { getBuilderChromeCopyForContext } from '../lib/builder-chrome-copy'
 
 type CharacterBuilderDraftRestoreProps = {
   context: CharacterBuildContext
 }
 
 export function CharacterBuilderDraftRestore({ context }: CharacterBuilderDraftRestoreProps) {
+  const chrome = getBuilderChromeCopyForContext(context)
   const hasPendingRestore = useCharacterBuilderStore(context, (state) => state.hasPendingRestore)
   const continuePreviousDraft = useCharacterBuilderStore(
     context,
@@ -22,10 +24,10 @@ export function CharacterBuilderDraftRestore({ context }: CharacterBuilderDraftR
     <ConfirmDialog
       open={hasPendingRestore}
       onOpenChange={() => {}}
-      headline="Continue your character?"
-      description="A previous draft for this ruleset was saved in this browser session. Continue where you left off or start a new character."
-      confirmLabel="Continue previous draft"
-      cancelLabel="Start over"
+      headline={chrome.draftRestoreHeadline}
+      description={chrome.draftRestoreDescription}
+      confirmLabel={chrome.draftRestoreConfirmLabel}
+      cancelLabel={chrome.draftRestoreCancelLabel}
       onConfirm={continuePreviousDraft}
       onCancel={startOver}
     />

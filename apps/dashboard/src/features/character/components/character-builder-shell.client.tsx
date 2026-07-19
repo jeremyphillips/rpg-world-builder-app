@@ -6,6 +6,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import {
   CharacterBuildFinalizationError,
   finalizeCharacterBuild,
+  finalizeNpcCharacterBuild,
   getErrorMessage,
   type CharacterBuildCatalogIndex,
   type CharacterBuildContext,
@@ -21,6 +22,11 @@ import { useResolvedChoiceSets } from '../hooks/use-resolved-choice-sets'
 import { useCharacterPreview } from '../hooks/use-character-preview'
 import { useCharacterBuilderStore } from '../hooks/use-character-builder-store'
 import { useCreateCharacter } from '../hooks/use-create-character'
+import { useCreateNpc } from '../npc/hooks/use-create-npc'
+import {
+  getBuilderChromeCopyForContext,
+  resolveCampaignIdFromContext,
+} from '../lib/builder-chrome-copy'
 import {
   mergeValidationVisibleStepIds,
   pruneValidationVisibleStepIds,
@@ -65,7 +71,11 @@ export type CharacterBuilderShellProps = {
 /** Full-viewport builder chrome: step rail, step panel, live preview, footer nav. */
 export function CharacterBuilderShell({ context, catalogIndex }: CharacterBuilderShellProps) {
   const navigate = useNavigate()
-  const { mutateAsync: createCharacterMutation, isPending: isCreating } = useCreateCharacter()
+  const chrome = getBuilderChromeCopyForContext(context)
+  const campaignId = resolveCampaignIdFromContext(context)
+  const { mutateAsync: createCharacterMutation, isPending: isCreatingPc } = useCreateCharacter()
+  const { mutateAsync: createNpcMutation, isPending: isCreatingNpc } = useCreateNpc()
+  const isCreating = isCreatingPc || isCreatingNpc
   const hasHydrated = useCharacterBuilderStore(context, (state) => state._hasHydrated)
   const hasPendingRestore = useCharacterBuilderStore(context, (state) => state.hasPendingRestore)
   const draft = useCharacterBuilderStore(context, (state) => state.draft)
@@ -262,6 +272,19 @@ export function CharacterBuilderShell({ context, catalogIndex }: CharacterBuilde
     }
 
     try {
+      if (context.characterKind === 'npc') {
+        if (!campaignId) {
+          setCreateError(chrome.createErrorDefault)
+          return
+        }
+
+        const input = finalizeNpcCharacterBuild(draft, context, { resolvedChoiceSets })
+        const npc = await createNpcMutation({ campaignId, input })
+        await clearPersistedDraft()
+        navigate(ROUTES.campaign.npcs.detail(campaignId, npc.id))
+        return
+      }
+
       const input = finalizeCharacterBuild(draft, context, { resolvedChoiceSets })
       const character = await createCharacterMutation(input)
       await clearPersistedDraft()
@@ -279,7 +302,7 @@ export function CharacterBuilderShell({ context, catalogIndex }: CharacterBuilde
         return
       }
 
-      setCreateError(getErrorMessage(error, 'Could not create character.'))
+      setCreateError(getErrorMessage(error, chrome.createErrorDefault))
     }
   }
 
@@ -290,14 +313,16 @@ export function CharacterBuilderShell({ context, catalogIndex }: CharacterBuilde
       <div className={characterBuilderShellRootClasses}>
         <header className={characterBuilderShellHeaderClasses}>
           <Heading variant="page" as="h1">
-            New character
+            {chrome.pageHeading}
           </Heading>
           <div className="flex flex-wrap gap-2">
-            <Link to={ROUTES.characters.import} className={buttonVariants({ variant: 'outline' })}>
-              Import character (experimental)
-            </Link>
-            <Link to={ROUTES.characters.list} className={buttonVariants({ variant: 'outline' })}>
-              Exit
+            {chrome.importHref && chrome.importLabel ? (
+              <Link to={chrome.importHref} className={buttonVariants({ variant: 'outline' })}>
+                {chrome.importLabel}
+              </Link>
+            ) : null}
+            <Link to={chrome.exitHref} className={buttonVariants({ variant: 'outline' })}>
+              {chrome.exitLabel}
             </Link>
           </div>
         </header>
@@ -324,6 +349,7 @@ export function CharacterBuilderShell({ context, catalogIndex }: CharacterBuilde
               preview={preview}
               resolvedChoiceSets={resolvedChoiceSets}
               validationIssues={stepValidationIssues}
+              reviewValidationHeading={chrome.reviewValidationHeading}
               onDraftChange={applyDraftPatch}
               onStepComplete={attemptStepAdvance}
               onFormContinueValidationFailed={handleFormContinueValidationFailed}
@@ -350,6 +376,9 @@ export function CharacterBuilderShell({ context, catalogIndex }: CharacterBuilde
           currentStepId={currentStepId}
           canCreateCharacter={canCreateCharacter}
           isCreating={isCreating}
+          createLabel={chrome.createLabel}
+          creatingLabel={chrome.creatingLabel}
+          reviewFooterHint={chrome.reviewFooterHint}
           onBack={() => shiftStep('back')}
           onContinue={handleContinue}
           onCreateCharacter={() => {

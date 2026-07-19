@@ -18,6 +18,7 @@ import {
   resolveStepRailKeyboardDirection,
   resolveStepRailKeyboardTarget,
 } from '../lib/character-builder-step-rail-keyboard.lib'
+import { resolveBuilderStepDescription } from '../lib/builder-chrome-copy'
 import {
   resolveStepVisualStatus,
   stepStatusAriaLabel,
@@ -151,7 +152,7 @@ export function CharacterBuilderStepRail({
                     {step.label}
                   </Text>
                   <Text as="span" variant="muted" className="block text-xs">
-                    {step.description}
+                    {resolveBuilderStepDescription(step.id, step.description, context)}
                   </Text>
                 </span>
               </button>

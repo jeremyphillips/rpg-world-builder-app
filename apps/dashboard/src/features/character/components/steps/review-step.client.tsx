@@ -19,14 +19,13 @@ import { ReviewAdvisoryWarnings } from './review-advisory-warnings.client'
 import { ReviewRequiredItems } from './review-required-items.client'
 import { ReviewStepSummary } from './review-step-summary.client'
 
-const REVIEW_VALIDATION_HEADING = 'Fix the following before creating:'
-
 export type ReviewStepProps = {
   context: CharacterBuildContext
   draft: CharacterBuilderDraft
   preview: CharacterBuildPreview | null
   resolvedChoiceSets: readonly ChoiceSet[]
   validationIssues?: CharacterBuildValidationIssue[]
+  validationHeading: string
   onNavigateToStep: (stepId: CharacterBuilderStepId) => void
 }
 
@@ -36,6 +35,7 @@ export function ReviewStep({
   preview,
   resolvedChoiceSets,
   validationIssues = [],
+  validationHeading,
   onNavigateToStep,
 }: ReviewStepProps) {
   const blockingSummary = useMemo(
@@ -53,7 +53,7 @@ export function ReviewStep({
     <BuilderStepFrame
       stepId="review"
       validationIssues={blockingSummary.alertIssues}
-      validationHeading={REVIEW_VALIDATION_HEADING}
+      validationHeading={validationHeading}
     >
       <div className="space-y-6">
         <ReviewStepSummary context={context} draft={draft} preview={preview} />

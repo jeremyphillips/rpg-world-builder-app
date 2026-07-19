@@ -1,12 +1,18 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { fn } from 'storybook/test'
 
+import { getBuilderChromeCopy } from '../lib/builder-chrome-copy'
 import { CharacterBuilderFooter } from './character-builder-footer.client'
+
+const pcChrome = getBuilderChromeCopy('pc')
 
 const meta = {
   title: 'Character Builder/CharacterBuilderFooter',
   component: CharacterBuilderFooter,
   args: {
+    createLabel: pcChrome.createLabel,
+    creatingLabel: pcChrome.creatingLabel,
+    reviewFooterHint: pcChrome.reviewFooterHint,
     onBack: fn(),
     onContinue: fn(),
     onCreateCharacter: fn(),

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, type ReactNode } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Button, ConfirmDialog, Heading, Text } from '@rpg/ui'
 
@@ -18,18 +18,41 @@ import {
 import { CharacterDetailStatsRow } from './character-detail-stats-row.client'
 import { CharacterDetailTabs } from './character-detail-tabs.client'
 
+export type CharacterDetailDeleteConfig = {
+  open: boolean
+  onOpenChange: (open: boolean) => void
+  onConfirm: () => void
+  isPending?: boolean
+  headline?: string
+  description?: ReactNode
+}
+
 export type CharacterDetailContentProps = {
   viewModel: CharacterDetailViewModel
+  showDelete?: boolean
+  deleteConfig?: CharacterDetailDeleteConfig
 }
 
 /** Read-only character sheet driven by the display registry view model. */
-export function CharacterDetailContent({ viewModel }: CharacterDetailContentProps) {
+export function CharacterDetailContent({
+  viewModel,
+  showDelete = true,
+  deleteConfig,
+}: CharacterDetailContentProps) {
   useSetBreadcrumbLabel(viewModel.identity.name)
   const navigate = useNavigate()
   const deleteCharacter = useDeleteCharacter()
   const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false)
 
+  const deleteDialogOpen = deleteConfig?.open ?? confirmDeleteOpen
+  const setDeleteDialogOpen = deleteConfig?.onOpenChange ?? setConfirmDeleteOpen
+
   const handleDelete = () => {
+    if (deleteConfig) {
+      deleteConfig.onConfirm()
+      return
+    }
+
     deleteCharacter.mutate(viewModel.id, {
       onSuccess: () => {
         setConfirmDeleteOpen(false)
@@ -48,14 +71,16 @@ export function CharacterDetailContent({ viewModel }: CharacterDetailContentProp
           <Text variant="muted">{viewModel.identity.summary}</Text>
           <Text variant="muted">{viewModel.identity.xp} XP</Text>
         </div>
-        <Button
-          type="button"
-          variant="outline"
-          size="sm"
-          onClick={() => setConfirmDeleteOpen(true)}
-        >
-          Delete
-        </Button>
+        {showDelete ? (
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() => setDeleteDialogOpen(true)}
+          >
+            Delete
+          </Button>
+        ) : null}
       </header>
 
       <div className={characterDetailAbilitiesStatsSectionClasses}>
@@ -80,13 +105,15 @@ export function CharacterDetailContent({ viewModel }: CharacterDetailContentProp
       </div>
 
       <ConfirmDialog
-        open={confirmDeleteOpen}
-        onOpenChange={setConfirmDeleteOpen}
-        headline="Delete character?"
+        open={deleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
+        headline={deleteConfig?.headline ?? 'Delete character?'}
         description={
-          <>
-            Permanently delete <strong>{viewModel.identity.name}</strong>? This cannot be undone.
-          </>
+          deleteConfig?.description ?? (
+            <>
+              Permanently delete <strong>{viewModel.identity.name}</strong>? This cannot be undone.
+            </>
+          )
         }
         confirmLabel="Delete"
         confirmVariant="destructive"
