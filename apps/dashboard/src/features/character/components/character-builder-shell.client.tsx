@@ -8,6 +8,7 @@ import {
   finalizeCharacterBuild,
   finalizeNpcCharacterBuild,
   getErrorMessage,
+  resolveBuilderLevelConstraints,
   type CharacterBuildCatalogIndex,
   type CharacterBuildContext,
   type CharacterBuilderDraft,
@@ -42,6 +43,7 @@ import {
   mergeAttemptedStepIds,
   resolveCurrentStepId,
 } from '../lib/character-builder-navigation'
+import { shouldShowBuilderLevelControl } from '../lib/builder-level-control.lib'
 import { mergeCharacterBuilderDraft } from '../lib/merge-character-builder-draft'
 import {
   issuesForStep,
@@ -52,6 +54,7 @@ import {
 } from '../lib/validate-builder-step'
 import { CharacterBuilderDraftRestore } from './character-builder-draft-restore.client'
 import { CharacterBuilderFooter } from './character-builder-footer.client'
+import { CharacterBuilderLevelControl } from './character-builder-level-control.client'
 import { CharacterBuilderPreviewPanel } from './character-builder-preview-panel.client'
 import {
   characterBuilderShellBodyClasses,
@@ -94,6 +97,25 @@ export function CharacterBuilderShell({ context, catalogIndex }: CharacterBuilde
   const resolvedChoiceSets = useResolvedChoiceSets(draft, context)
 
   const currentStepId = resolveCurrentStepId(draft.currentStepId)
+  const levelConstraints = useMemo(() => resolveBuilderLevelConstraints(context), [context])
+  const showLevelControl = shouldShowBuilderLevelControl(currentStepId, levelConstraints)
+
+  useEffect(() => {
+    if (levelConstraints.mode !== 'fixed' || levelConstraints.fixedLevel === undefined) {
+      return
+    }
+
+    if (draft.class.level === levelConstraints.fixedLevel) {
+      return
+    }
+
+    patchDraft({
+      class: {
+        ...draft.class,
+        level: levelConstraints.fixedLevel,
+      },
+    })
+  }, [draft.class, levelConstraints.fixedLevel, levelConstraints.mode, patchDraft])
 
   const preview = useCharacterPreview(
     draft,
@@ -114,6 +136,16 @@ export function CharacterBuilderShell({ context, catalogIndex }: CharacterBuilde
       )
     },
     [draft.currentStepId, draft.touchedStepIds, patchDraft],
+  )
+
+  const applyLevelDraft = useCallback(
+    (nextDraft: CharacterBuilderDraft) => {
+      applyDraftPatch({
+        class: nextDraft.class,
+        choiceSelections: nextDraft.choiceSelections,
+      })
+    },
+    [applyDraftPatch],
   )
 
   const canCreateCharacter = useMemo(
@@ -312,9 +344,18 @@ export function CharacterBuilderShell({ context, catalogIndex }: CharacterBuilde
 
       <div className={characterBuilderShellRootClasses}>
         <header className={characterBuilderShellHeaderClasses}>
-          <Heading variant="page" as="h1">
-            {chrome.pageHeading}
-          </Heading>
+          <div className="space-y-2">
+            <Heading variant="page" as="h1">
+              {chrome.pageHeading}
+            </Heading>
+            {showLevelControl ? (
+              <CharacterBuilderLevelControl
+                context={context}
+                draft={draft}
+                onApplyLevelDraft={applyLevelDraft}
+              />
+            ) : null}
+          </div>
           <div className="flex flex-wrap gap-2">
             {chrome.importHref && chrome.importLabel ? (
               <Link to={chrome.importHref} className={buttonVariants({ variant: 'outline' })}>

@@ -54,6 +54,13 @@ Readiness does not replace `validateCharacterBuild` on Continue / Create.
 - `validateBuilderCharacterLevel` / `resolveBuilderLevelConstraints` — context-specific caps; campaign PC requires `level === startingLevel` when that flow is active.
 - Preview and finalize share `resolveBuilderMaxHitPoints`; builder finalize sets `xp: null` until experience tracking is modeled.
 
+### Builder level UI (phase 2)
+
+- Shell chrome hosts `CharacterBuilderLevelControl` from the class step onward (always visible for fixed campaign PC).
+- Standalone PC and campaign NPC use a selectable level field; campaign PC uses a read-only badge seeded to `startingLevel`.
+- Level changes run `pruneInvalidBuilderSelections` on a candidate draft; removals open a confirmation modal before patching.
+- Copy lives in `characterBuilderLevelMessages` (`@rpg/contracts`).
+
 ### Copy layers
 
 Dependent-choice workflow strings (heritage, future subclass) use a three-layer model:

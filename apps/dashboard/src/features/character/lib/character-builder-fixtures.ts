@@ -4,8 +4,10 @@ import {
   defaultCampaignMechanicsPatch,
   indexCharacterBuildCatalog,
   resolveCharacterCreationPatch,
+  type CampaignBuildContext,
   type CharacterBuildCatalog,
   type CharacterBuildCatalogIndex,
+  type CharacterBuildContext,
   type ClassStored,
   type SkillProficiency,
   type Species,
@@ -128,4 +130,60 @@ export function createStandaloneBuilderCatalogIndexFixture(
   context: StandaloneBuildContext = createStandaloneBuilderContextFixture(),
 ): CharacterBuildCatalogIndex {
   return indexCharacterBuildCatalog(context.catalog)
+}
+
+const TEST_CAMPAIGN_ID = 'campaign-test-1'
+
+export function createCampaignNpcBuilderContextFixture(
+  overrides: Partial<CampaignBuildContext> = {},
+): CampaignBuildContext {
+  const rulesetId = overrides.rulesetId ?? DEFAULT_SYSTEM_RULESET_ID
+  const campaignId = overrides.rulesScope?.campaignId ?? TEST_CAMPAIGN_ID
+
+  return {
+    channel: 'build',
+    surface: 'dashboard',
+    characterKind: 'npc',
+    mode: 'dashboard',
+    scope: { type: 'campaign', campaignId, rulesetId },
+    rulesScope: { type: 'campaign', campaignId, rulesetId },
+    ownershipTarget: { type: 'campaign', campaignId },
+    rulesetId,
+    catalog: emptyCatalog,
+    characterCreationRules: {
+      ...resolveCharacterCreationPatch(undefined, getStandardStartingWealthRules(rulesetId)),
+      abilityGeneration: DEFAULT_ABILITY_GENERATION_RULES,
+      armorClass: defaultCampaignMechanicsPatch().armorClass,
+    },
+    permissions: { canCreateCharacter: true },
+    ...overrides,
+  }
+}
+
+export function createCampaignPcBuilderContextFixture(
+  overrides: Partial<CharacterBuildContext> = {},
+): CharacterBuildContext {
+  const rulesetId = overrides.rulesetId ?? DEFAULT_SYSTEM_RULESET_ID
+  const campaignId =
+    overrides.rulesScope?.type === 'campaign' ? overrides.rulesScope.campaignId : TEST_CAMPAIGN_ID
+
+  return {
+    channel: 'build',
+    surface: 'dashboard',
+    characterKind: 'pc',
+    mode: 'dashboard',
+    scope: { type: 'campaign', campaignId, rulesetId },
+    rulesScope: { type: 'campaign', campaignId, rulesetId },
+    ownershipTarget: { type: 'user' },
+    rulesetId,
+    catalog: emptyCatalog,
+    characterCreationRules: {
+      ...resolveCharacterCreationPatch(undefined, getStandardStartingWealthRules(rulesetId)),
+      startingLevel: 3,
+      abilityGeneration: DEFAULT_ABILITY_GENERATION_RULES,
+      armorClass: defaultCampaignMechanicsPatch().armorClass,
+    },
+    permissions: { canCreateCharacter: true },
+    ...overrides,
+  }
 }
