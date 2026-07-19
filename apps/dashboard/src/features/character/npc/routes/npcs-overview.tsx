@@ -27,9 +27,17 @@ export function NpcsOverview() {
   const isPending = isNpcsPending || isContextPending
   const isError = isNpcsError || isContextError
   const actions = canManage ? (
-    <Link to={ROUTES.campaign.npcs.new(campaignId)} className={buttonVariants({ size: 'sm' })}>
-      Create NPC
-    </Link>
+    <div className="flex flex-wrap gap-2">
+      <Link
+        to={ROUTES.campaign.npcs.import(campaignId)}
+        className={buttonVariants({ size: 'sm', variant: 'outline' })}
+      >
+        Import NPC
+      </Link>
+      <Link to={ROUTES.campaign.npcs.new(campaignId)} className={buttonVariants({ size: 'sm' })}>
+        Create NPC
+      </Link>
+    </div>
   ) : undefined
 
   return (

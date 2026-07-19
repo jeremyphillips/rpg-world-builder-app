@@ -14,6 +14,7 @@ import { buildCharacterDetailViewModel } from '../../lib/character-display'
 import { useDeleteNpc } from '../hooks/use-delete-npc'
 import { useNpc } from '../hooks/use-npcs'
 
+/** Campaign NPC detail — reuses {@link CharacterDetailContent}; see its growth comment for the PC/NPC boundary. */
 export function NpcDetail() {
   const navigate = useNavigate()
   const { campaignId = '', npcId } = useParams<{ campaignId: string; npcId: string }>()

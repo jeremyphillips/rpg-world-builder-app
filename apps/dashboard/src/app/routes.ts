@@ -20,6 +20,7 @@ export const ROUTES = {
     npcs: {
       list: (id: string) => `/campaigns/${id}/npcs`,
       new: (id: string) => `/campaigns/${id}/npcs/new`,
+      import: (id: string) => `/campaigns/${id}/npcs/import`,
       detail: (id: string, npcId: string) => `/campaigns/${id}/npcs/${npcId}`,
     },
   },

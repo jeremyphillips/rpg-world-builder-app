@@ -22,6 +22,7 @@ import {
   CharactersOverviewRoute,
   NpcCreateRoute,
   NpcDetailRoute,
+  NpcImportRoute,
   NpcsOverviewRoute,
   ClassCreateRoute,
   ClassDetailRoute,
@@ -162,6 +163,11 @@ const router = createBrowserRouter(
                       path: 'new',
                       element: <NpcCreateRoute />,
                       handle: { crumb: () => ({ label: 'New' }) } satisfies CrumbHandle,
+                    },
+                    {
+                      path: 'import',
+                      element: <NpcImportRoute />,
+                      handle: { crumb: () => ({ label: 'Import' }) } satisfies CrumbHandle,
                     },
                     {
                       path: ':npcId',

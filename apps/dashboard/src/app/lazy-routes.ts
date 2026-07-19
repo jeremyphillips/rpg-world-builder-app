@@ -65,6 +65,9 @@ export const NpcsOverviewRoute = withRouteSuspense(
 export const NpcCreateRoute = withRouteSuspense(
   lazyNamed(() => import('@/features/character/npc/routes/npc-create'), 'NpcCreate'),
 )
+export const NpcImportRoute = withRouteSuspense(
+  lazyNamed(() => import('@/features/character/npc/routes/npc-import'), 'NpcImport'),
+)
 export const NpcDetailRoute = withRouteSuspense(
   lazyNamed(() => import('@/features/character/npc/routes/npc-detail'), 'NpcDetail'),
 )

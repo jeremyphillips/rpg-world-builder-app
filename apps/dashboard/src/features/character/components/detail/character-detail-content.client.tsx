@@ -33,7 +33,22 @@ export type CharacterDetailContentProps = {
   deleteConfig?: CharacterDetailDeleteConfig
 }
 
-/** Read-only character sheet driven by the display registry view model. */
+/**
+ * Read-only character sheet driven by the display registry view model.
+ *
+ * Shared by PC detail (`/characters/:id`) and NPC detail (`/campaigns/:id/npcs/:npcId`).
+ *
+ * Growth direction (phase 7 — detail polish):
+ * - Keep sheet layout, tabs, and catalog rows kind-neutral here and in child `character-detail-*`
+ *   components; both kinds use the same `CharacterDetailViewModel`.
+ * - Route wrappers own kind-specific data loading and mutations (PC vs campaign NPC API).
+ * - Hide user-ownership affordances on NPC surfaces: roster/submit-to-campaign links, PC delete
+ *   defaults (`useDeleteCharacter`, `ROUTES.characters.list`), and copy that implies "your
+ *   character". NPC routes should pass `deleteConfig` / `showDelete` instead of relying on PC
+ *   defaults (see `npc-detail.tsx`).
+ * - When adding PC-only actions (edit, campaign submission, transfer), gate with an explicit prop
+ *   or `characterKind` — do not assume every detail view is user-owned.
+ */
 export function CharacterDetailContent({
   viewModel,
   showDelete = true,
