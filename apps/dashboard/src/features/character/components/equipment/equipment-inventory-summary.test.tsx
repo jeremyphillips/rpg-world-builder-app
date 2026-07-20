@@ -27,7 +27,7 @@ const inventoryManagementProps = {
   context: equipmentStepContextFixture,
   onReleaseGrant: vi.fn(),
   onRemovePurchase: vi.fn(),
-  onAddAnother: vi.fn(),
+  onApplyMagicItemAcquisition: vi.fn(() => true),
 }
 
 describe('EquipmentInventorySummary', () => {

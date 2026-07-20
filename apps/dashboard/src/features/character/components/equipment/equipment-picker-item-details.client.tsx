@@ -1,6 +1,11 @@
 'use client'
 
-import { type Equipment } from '@rpg/contracts'
+import {
+  type Equipment,
+  type CharacterBuildCatalogIndex,
+  type CharacterBuildContext,
+  type CharacterBuilderDraft,
+} from '@rpg/contracts'
 
 import {
   buildEquipmentDetailViewModel,
@@ -45,7 +50,10 @@ export type EquipmentPickerItemDetailsProps = {
   characterPreviewContext?: EquipmentPickerCharacterPreviewContext
   rowActionVm?: EquipmentPickerRowActionViewModel
   manageSources?: EquipmentPickerGrantManageSource
-  onApplyMagicItemAcquisition?: (requestedQuantity: number) => void
+  draft?: CharacterBuilderDraft
+  context?: CharacterBuildContext
+  catalogIndex?: CharacterBuildCatalogIndex
+  onApplyMagicItemAcquisition?: (requestedQuantity: number) => boolean
   onApplyPurchase?: (requestedQuantity: number) => void
   onReleaseGrant?: (args: { allowanceId: string; equipmentId: string; quantity: number }) => void
   onRemovePurchase?: (args: { purchaseId: string; quantity: number }) => void
@@ -66,6 +74,9 @@ export function EquipmentPickerItemDetails({
   characterPreviewContext,
   rowActionVm,
   manageSources,
+  draft,
+  context,
+  catalogIndex,
   onApplyMagicItemAcquisition,
   onApplyPurchase,
   onReleaseGrant,
@@ -111,9 +122,13 @@ export function EquipmentPickerItemDetails({
         <EquipmentPickerAcquisitionPanel
           equipment={equipment}
           rowActionVm={rowActionVm}
-          grantViewModel={grantViewModel}
           manageSources={manageSources}
+          draft={draft}
+          context={context}
+          catalogIndex={catalogIndex}
+          budget={budget}
           purchaseViewModel={purchaseViewModel}
+          grantViewModel={grantViewModel}
           ownedQuantity={ownedQuantity}
           purchaseDisabled={purchaseDisabled}
           addQuantity={addQuantity}

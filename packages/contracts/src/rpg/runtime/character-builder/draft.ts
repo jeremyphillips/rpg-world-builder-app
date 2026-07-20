@@ -90,6 +90,8 @@ export const characterBuilderDraftEquipmentPurchaseSchema = z.object({
   equipped: z.boolean().optional(),
   /** Deep-copied equipment configuration; uses canonical content modifier shape. */
   modifiers: z.array(equipmentModifierSchema).optional(),
+  /** Unit price in copper stamped at purchase time — not recomputed from catalog. */
+  unitCostCp: z.number().int().min(0).optional(),
 })
 
 /** Parsed persisted purchase row — `id` and `origin` optional until hydration normalization. */

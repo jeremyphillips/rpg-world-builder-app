@@ -1,5 +1,7 @@
 'use client'
 
+import { useState } from 'react'
+
 import type {
   CharacterBuildCatalogIndex,
   CharacterBuildContext,
@@ -31,7 +33,9 @@ export type EquipmentAddedInventorySectionProps = {
   onSetPurchaseQuantity?: (target: EquipmentInventoryQuantityTarget, quantity: number) => void
   onReleaseGrant: (args: { allowanceId: string; equipmentId: string; quantity: number }) => void
   onRemovePurchase: (args: { purchaseId: string; quantity: number }) => void
-  onAddAnother: (equipmentId: string) => void
+  onApplyMagicItemAcquisition: (args: { equipmentId: string; requestedQuantity: number }) => boolean
+  openEquipmentId?: string | null
+  onOpenEquipmentChange?: (equipmentId: string | null) => void
 }
 
 export function EquipmentAddedInventorySection({
@@ -44,8 +48,14 @@ export function EquipmentAddedInventorySection({
   onSetPurchaseQuantity,
   onReleaseGrant,
   onRemovePurchase,
-  onAddAnother,
+  onApplyMagicItemAcquisition,
+  openEquipmentId,
+  onOpenEquipmentChange,
 }: EquipmentAddedInventorySectionProps) {
+  const [localOpenEquipmentId, setLocalOpenEquipmentId] = useState<string | null>(null)
+  const resolvedOpenEquipmentId = openEquipmentId ?? localOpenEquipmentId
+  const setOpenEquipmentId = onOpenEquipmentChange ?? setLocalOpenEquipmentId
+
   const hasEntries = addedEquipment.some((group) => group.entries.length > 0)
 
   if (!hasEntries) {
@@ -72,7 +82,9 @@ export function EquipmentAddedInventorySection({
             onSetPurchaseQuantity={onSetPurchaseQuantity}
             onReleaseGrant={onReleaseGrant}
             onRemovePurchase={onRemovePurchase}
-            onAddAnother={onAddAnother}
+            onApplyMagicItemAcquisition={onApplyMagicItemAcquisition}
+            open={resolvedOpenEquipmentId === entry.equipmentId}
+            onOpenChange={(open) => setOpenEquipmentId(open ? entry.equipmentId : null)}
           />
         </li>
       ))}

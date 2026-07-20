@@ -8,6 +8,7 @@ import { createEmptyCharacterBuilderDraft } from '@rpg/contracts'
 import {
   equipmentStepCatalogIndexFixture,
   equipmentStepContextFixture,
+  equipmentStepPotionOfHealingFixture,
 } from '../../lib/equipment-step.fixtures'
 import type { EquipmentInventoryRow } from '../../lib/equipment-step.lib'
 import { EquipmentAddedInventoryRowItem } from './equipment-added-inventory-row.client'
@@ -22,6 +23,7 @@ const grantRow: EquipmentInventoryRow = {
     sources: [{ kind: 'startingWealthTier', sourceId: 'tier', grantId: 'allowance-common' }],
   },
   equipmentName: 'Potion of Healing',
+  equipment: equipmentStepPotionOfHealingFixture,
   sourceLabel: 'Common choice',
   isStackable: true,
   quantityMode: 'locked',
@@ -50,6 +52,15 @@ function entry(
   }
 }
 
+const defaultProps = {
+  draft: createEmptyCharacterBuilderDraft(),
+  context: equipmentStepContextFixture,
+  catalogIndex: equipmentStepCatalogIndexFixture,
+  onReleaseGrant: vi.fn(),
+  onRemovePurchase: vi.fn(),
+  onApplyMagicItemAcquisition: vi.fn(() => true),
+}
+
 describe('EquipmentAddedInventoryRowItem', () => {
   it('renders inline release for a single grant copy', async () => {
     const user = userEvent.setup()
@@ -61,12 +72,8 @@ describe('EquipmentAddedInventoryRowItem', () => {
           provenanceLabel: '1 Common choice',
           totalQuantity: 1,
         })}
-        draft={createEmptyCharacterBuilderDraft()}
-        context={equipmentStepContextFixture}
-        catalogIndex={equipmentStepCatalogIndexFixture}
+        {...defaultProps}
         onReleaseGrant={onReleaseGrant}
-        onRemovePurchase={vi.fn()}
-        onAddAnother={vi.fn()}
       />,
     )
 
@@ -78,21 +85,18 @@ describe('EquipmentAddedInventoryRowItem', () => {
     })
   })
 
-  it('renders manage for multi-copy grant rows without purchase controls', () => {
-    render(
-      <EquipmentAddedInventoryRowItem
-        entry={entry([grantRow])}
-        draft={createEmptyCharacterBuilderDraft()}
-        context={equipmentStepContextFixture}
-        catalogIndex={equipmentStepCatalogIndexFixture}
-        onReleaseGrant={vi.fn()}
-        onRemovePurchase={vi.fn()}
-        onAddAnother={vi.fn()}
-      />,
-    )
+  it('renders manage disclosure for multi-copy grant rows without purchase controls', async () => {
+    const user = userEvent.setup()
+
+    render(<EquipmentAddedInventoryRowItem entry={entry([grantRow])} {...defaultProps} />)
 
     expect(screen.getByText('Qty 2')).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Manage' })).toBeInTheDocument()
+    const trigger = screen.getByRole('button', { name: 'Manage' })
+    expect(trigger).toHaveAttribute('aria-expanded', 'false')
+
+    await user.click(trigger)
+    expect(screen.getByRole('button', { name: 'Done' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Owned copies' })).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: /Remove all/ })).not.toBeInTheDocument()
   })
 
@@ -120,12 +124,7 @@ describe('EquipmentAddedInventoryRowItem', () => {
           provenanceLabel: '2 Common choices · Purchased · 50 GP',
           totalQuantity: 3,
         })}
-        draft={createEmptyCharacterBuilderDraft()}
-        context={equipmentStepContextFixture}
-        catalogIndex={equipmentStepCatalogIndexFixture}
-        onReleaseGrant={vi.fn()}
-        onRemovePurchase={vi.fn()}
-        onAddAnother={vi.fn()}
+        {...defaultProps}
       />,
     )
 
@@ -137,15 +136,7 @@ describe('EquipmentAddedInventoryRowItem', () => {
 
   it('has no axe accessibility violations', async () => {
     const { container } = render(
-      <EquipmentAddedInventoryRowItem
-        entry={entry([grantRow])}
-        draft={createEmptyCharacterBuilderDraft()}
-        context={equipmentStepContextFixture}
-        catalogIndex={equipmentStepCatalogIndexFixture}
-        onReleaseGrant={vi.fn()}
-        onRemovePurchase={vi.fn()}
-        onAddAnother={vi.fn()}
-      />,
+      <EquipmentAddedInventoryRowItem entry={entry([grantRow])} {...defaultProps} />,
     )
 
     await expectNoAxeViolations(container)

@@ -36,7 +36,8 @@ describe('EquipmentAcquisitionGuidance', () => {
     )
 
     expect(screen.getByRole('region', { name: 'Acquisition guidance' })).toBeInTheDocument()
-    expect(screen.getByRole('heading', { name: 'GP remaining' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: '40 GP remaining' })).toBeInTheDocument()
+    expect(screen.getByText('100 GP starting · 15 GP spent')).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: 'Magic item choices' })).toBeInTheDocument()
     expect(screen.getByText('1/2 Common')).toBeInTheDocument()
 
@@ -60,7 +61,7 @@ describe('EquipmentAcquisitionGuidance', () => {
     )
 
     expect(screen.getByRole('heading', { name: 'Magic item choices' })).toBeInTheDocument()
-    expect(screen.queryByRole('heading', { name: 'GP remaining' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('heading', { name: /GP remaining/ })).not.toBeInTheDocument()
   })
 
   it('renders a single full-width purchase card when magic items are unavailable', () => {
@@ -75,7 +76,7 @@ describe('EquipmentAcquisitionGuidance', () => {
       />,
     )
 
-    expect(screen.getByRole('heading', { name: 'GP remaining' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: '40 GP remaining' })).toBeInTheDocument()
     expect(screen.queryByRole('heading', { name: 'Magic item choices' })).not.toBeInTheDocument()
   })
 

@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo } from 'react'
+import { useCallback, useId } from 'react'
 
 import type {
   CharacterBuildCatalogIndex,
@@ -9,198 +9,101 @@ import type {
   Equipment,
   EquipmentBudgetSummary,
 } from '@rpg/contracts'
-import { Button, Collapsible, CollapsibleContent, CollapsibleTrigger, Heading, Text } from '@rpg/ui'
+import { Button, Collapsible, CollapsibleContent, CollapsibleTrigger } from '@rpg/ui'
 
 import {
-  EQUIPMENT_INVENTORY_ACQUIRED_THROUGH_LABEL,
-  EQUIPMENT_INVENTORY_ADD_ANOTHER_LABEL,
   EQUIPMENT_INVENTORY_MANAGE_LABEL,
-  EQUIPMENT_INVENTORY_RELEASE_ONE_LABEL,
-  EQUIPMENT_INVENTORY_REMOVE_ONE_PURCHASE_LABEL,
-  formatEquipmentInventoryManageHeadline,
+  buildMagicItemAcquisitionPatch,
   type EquipmentInventoryRow,
 } from '../../lib/equipment-step.lib'
 import type { AddedEquipmentEntryViewModel } from './equipment-inventory-summary.lib'
+import type { EquipmentOwnedSourceAction } from './equipment-acquisition-panel.lib'
+import { EquipmentAcquisitionPanelBody } from './equipment-acquisition-panel-body.client'
 import {
-  formatInventoryAddAnotherPreview,
-  resolveEquipmentInventoryManageSources,
-} from './equipment-inventory-manage.lib'
-import {
-  equipmentInventoryManagePanelAddAnotherClasses,
   equipmentInventoryManagePanelContentClasses,
-  equipmentInventoryManagePanelHeaderClasses,
   equipmentInventoryManagePanelRootClasses,
-  equipmentInventoryManagePanelSectionClasses,
-  equipmentInventoryManagePanelSourceActionsClasses,
-  equipmentInventoryManagePanelSourceListClasses,
-  equipmentInventoryManagePanelSourceMetaClasses,
-  equipmentInventoryManagePanelSourceRowClasses,
 } from './equipment-inventory-manage-panel.variants'
+import { useEquipmentAcquisitionQuantityCommit } from './use-equipment-acquisition-quantity-commit.client'
 
 export type EquipmentInventoryManagePanelBodyProps = {
-  equipmentName: string
-  equipment?: Equipment
+  equipment: Equipment
   rows: readonly EquipmentInventoryRow[]
   draft: CharacterBuilderDraft
   context: CharacterBuildContext
   catalogIndex: CharacterBuildCatalogIndex
   budget?: EquipmentBudgetSummary
-  showAddAnother?: boolean
   onReleaseGrant: (args: { allowanceId: string; equipmentId: string; quantity: number }) => void
   onRemovePurchase: (args: { purchaseId: string; quantity: number }) => void
-  onAddAnother: (equipmentId: string) => void
-}
-
-function ManageSourceSection({
-  sources,
-  onReleaseGrant,
-  onRemovePurchase,
-}: {
-  sources: ReturnType<typeof resolveEquipmentInventoryManageSources>
-  onReleaseGrant: EquipmentInventoryManagePanelBodyProps['onReleaseGrant']
-  onRemovePurchase: EquipmentInventoryManagePanelBodyProps['onRemovePurchase']
-}) {
-  return (
-    <div className={equipmentInventoryManagePanelSourceListClasses}>
-      {sources.grants.map((grant) => (
-        <div key={grant.allowanceId} className={equipmentInventoryManagePanelSourceRowClasses}>
-          <div className={equipmentInventoryManagePanelSourceMetaClasses}>
-            <Text as="p" className="text-sm text-foreground">
-              {grant.label}
-            </Text>
-            <Text as="p" variant="caption" className="text-muted-foreground">
-              {grant.quantity}
-            </Text>
-          </div>
-          <div className={equipmentInventoryManagePanelSourceActionsClasses}>
-            <Button
-              type="button"
-              size="sm"
-              variant="secondary"
-              onClick={() =>
-                onReleaseGrant({
-                  allowanceId: grant.allowanceId,
-                  equipmentId: grant.equipmentId,
-                  quantity: 1,
-                })
-              }
-            >
-              {EQUIPMENT_INVENTORY_RELEASE_ONE_LABEL}
-            </Button>
-          </div>
-        </div>
-      ))}
-
-      {sources.purchases.map((purchase) => (
-        <div key={purchase.purchaseId} className={equipmentInventoryManagePanelSourceRowClasses}>
-          <div className={equipmentInventoryManagePanelSourceMetaClasses}>
-            <Text as="p" className="text-sm text-foreground">
-              {purchase.label}
-            </Text>
-            <Text as="p" variant="caption" className="text-muted-foreground">
-              {purchase.quantity}
-            </Text>
-            <Text as="p" variant="caption" className="text-muted-foreground">
-              {purchase.totalPriceLabel} total
-            </Text>
-          </div>
-          <div className={equipmentInventoryManagePanelSourceActionsClasses}>
-            <Button
-              type="button"
-              size="sm"
-              variant="secondary"
-              onClick={() =>
-                onRemovePurchase({
-                  purchaseId: purchase.purchaseId,
-                  quantity: 1,
-                })
-              }
-            >
-              {EQUIPMENT_INVENTORY_REMOVE_ONE_PURCHASE_LABEL}
-            </Button>
-          </div>
-        </div>
-      ))}
-    </div>
-  )
+  onApplyMagicItemAcquisition: (args: { equipmentId: string; requestedQuantity: number }) => boolean
 }
 
 export function EquipmentInventoryManagePanelBody({
-  equipmentName,
   equipment,
   rows,
   draft,
   context,
   catalogIndex,
   budget,
-  showAddAnother = true,
   onReleaseGrant,
   onRemovePurchase,
-  onAddAnother,
+  onApplyMagicItemAcquisition,
 }: EquipmentInventoryManagePanelBodyProps) {
-  const sources = useMemo(() => resolveEquipmentInventoryManageSources(rows), [rows])
-  const addAnotherPreview = useMemo(() => {
-    if (!showAddAnother || !equipment) return undefined
+  const commitAcquisition = useCallback(
+    (requestedQuantity: number) =>
+      onApplyMagicItemAcquisition({ equipmentId: equipment.id, requestedQuantity }),
+    [equipment.id, onApplyMagicItemAcquisition],
+  )
 
-    return formatInventoryAddAnotherPreview({
-      draft,
-      context,
-      catalogIndex,
-      equipment,
-      budget,
-    })
-  }, [budget, catalogIndex, context, draft, equipment, showAddAnother])
+  const { quantity, setQuantity, isPending, successMessage, commitQuantity } =
+    useEquipmentAcquisitionQuantityCommit({ commit: commitAcquisition })
+
+  const handleSourceAction = useCallback(
+    (action: EquipmentOwnedSourceAction) => {
+      if (action.target.kind === 'magicItemGrant') {
+        onReleaseGrant({
+          allowanceId: action.target.allowanceId,
+          equipmentId: action.target.equipmentId,
+          quantity: action.quantity,
+        })
+        return
+      }
+
+      onRemovePurchase({
+        purchaseId: action.target.purchaseId,
+        quantity: action.quantity,
+      })
+    },
+    [onReleaseGrant, onRemovePurchase],
+  )
 
   return (
-    <div className={equipmentInventoryManagePanelSectionClasses}>
-      <div className={equipmentInventoryManagePanelHeaderClasses}>
-        <Heading variant="group" as="h4">
-          {formatEquipmentInventoryManageHeadline(equipmentName)}
-        </Heading>
-        <Text as="p" variant="muted" className="text-sm">
-          {EQUIPMENT_INVENTORY_ACQUIRED_THROUGH_LABEL}
-        </Text>
-      </div>
-
-      <ManageSourceSection
-        sources={sources}
-        onReleaseGrant={onReleaseGrant}
-        onRemovePurchase={onRemovePurchase}
-      />
-
-      {addAnotherPreview ? (
-        <div className={equipmentInventoryManagePanelAddAnotherClasses}>
-          <Text as="p" className="text-sm font-body-emphasis text-foreground">
-            {EQUIPMENT_INVENTORY_ADD_ANOTHER_LABEL}
-          </Text>
-          <Text as="p" variant="muted" className="text-sm">
-            {addAnotherPreview.label}
-          </Text>
-          {addAnotherPreview.blockerNote ? (
-            <Text as="p" variant="warning" className="text-sm">
-              {addAnotherPreview.blockerNote}
-            </Text>
-          ) : null}
-          <Button
-            type="button"
-            size="sm"
-            disabled={!addAnotherPreview.canAdd}
-            onClick={() => {
-              if (!equipment) return
-              onAddAnother(equipment.id)
-            }}
-          >
-            {EQUIPMENT_INVENTORY_ADD_ANOTHER_LABEL}
-          </Button>
-        </div>
-      ) : null}
-    </div>
+    <EquipmentAcquisitionPanelBody
+      draft={draft}
+      context={context}
+      catalogIndex={catalogIndex}
+      equipment={equipment}
+      rows={rows}
+      budget={budget}
+      quantity={quantity}
+      onQuantityChange={setQuantity}
+      isPending={isPending}
+      successMessage={successMessage}
+      onSourceAction={handleSourceAction}
+      onCommit={commitQuantity}
+    />
   )
 }
 
-export type EquipmentInventoryManagePanelProps = EquipmentInventoryManagePanelBodyProps
+export type EquipmentInventoryManagePanelProps = EquipmentInventoryManagePanelBodyProps & {
+  equipmentName: string
+}
 
-export function EquipmentInventoryManagePanel(props: EquipmentInventoryManagePanelProps) {
+export function EquipmentInventoryManagePanel({
+  equipmentName: _equipmentName,
+  ...props
+}: EquipmentInventoryManagePanelProps) {
+  const contentId = useId()
+
   return (
     <Collapsible className={equipmentInventoryManagePanelRootClasses}>
       <CollapsibleTrigger asChild>
@@ -208,7 +111,7 @@ export function EquipmentInventoryManagePanel(props: EquipmentInventoryManagePan
           {EQUIPMENT_INVENTORY_MANAGE_LABEL}
         </Button>
       </CollapsibleTrigger>
-      <CollapsibleContent className={equipmentInventoryManagePanelContentClasses}>
+      <CollapsibleContent id={contentId} className={equipmentInventoryManagePanelContentClasses}>
         <EquipmentInventoryManagePanelBody {...props} />
       </CollapsibleContent>
     </Collapsible>
@@ -217,7 +120,7 @@ export function EquipmentInventoryManagePanel(props: EquipmentInventoryManagePan
 
 export type EquipmentInventoryManageEntryProps = Omit<
   EquipmentInventoryManagePanelProps,
-  'equipmentName' | 'rows'
+  'equipment' | 'rows'
 > & {
   entry: AddedEquipmentEntryViewModel
 }
@@ -226,12 +129,34 @@ export function EquipmentInventoryManageEntryPanel({
   entry,
   ...props
 }: EquipmentInventoryManageEntryProps) {
-  return (
-    <EquipmentInventoryManagePanel
-      equipmentName={entry.equipmentName}
-      equipment={entry.rows.find((row) => row.equipment)?.equipment}
-      rows={entry.rows}
-      {...props}
-    />
-  )
+  const equipment = entry.rows.find((row) => row.equipment)?.equipment
+  if (!equipment) return null
+
+  return <EquipmentInventoryManagePanel equipment={equipment} rows={entry.rows} {...props} />
+}
+
+export function createStorybookApplyMagicItemAcquisition(args: {
+  draft: CharacterBuilderDraft
+  context: CharacterBuildContext
+  catalogIndex: CharacterBuildCatalogIndex
+  onDraftChange?: (patch: Partial<CharacterBuilderDraft>) => void
+}) {
+  return ({
+    equipmentId,
+    requestedQuantity,
+  }: {
+    equipmentId: string
+    requestedQuantity: number
+  }) => {
+    const patch = buildMagicItemAcquisitionPatch({
+      draft: args.draft,
+      context: args.context,
+      catalogIndex: args.catalogIndex,
+      equipmentId,
+      requestedQuantity,
+    })
+    if (!patch) return false
+    args.onDraftChange?.(patch)
+    return true
+  }
 }

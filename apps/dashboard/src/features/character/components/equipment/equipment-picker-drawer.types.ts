@@ -1,4 +1,7 @@
 import type {
+  CharacterBuildCatalogIndex,
+  CharacterBuildContext,
+  CharacterBuilderDraft,
   EquipmentBudgetSummary,
   EquipmentPickerBrowseSortContext,
   EquipmentPickerItem,
@@ -153,7 +156,13 @@ export type EquipmentPickerDrawerProps = {
     requestedQuantity: number
   }) => EquipmentPickerRowActionViewModel
   resolveGrantManageSources?: (equipmentId: string) => EquipmentPickerGrantManageSource
-  onApplyMagicItemAcquisition?: (args: { equipmentId: string; requestedQuantity: number }) => void
+  draft?: CharacterBuilderDraft
+  context?: CharacterBuildContext
+  catalogIndex?: CharacterBuildCatalogIndex
+  onApplyMagicItemAcquisition?: (args: {
+    equipmentId: string
+    requestedQuantity: number
+  }) => boolean
   onApplyPurchase?: (args: { equipmentId: string; requestedQuantity: number }) => void
   onReleaseGrant?: (args: { allowanceId: string; equipmentId: string; quantity: number }) => void
   onRemovePurchase?: (args: { purchaseId: string; quantity: number }) => void

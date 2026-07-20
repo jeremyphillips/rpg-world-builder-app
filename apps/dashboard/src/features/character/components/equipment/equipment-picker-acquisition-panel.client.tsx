@@ -2,7 +2,19 @@
 
 import { isEquipmentStackable, formatEquipmentBundleLabel, type Equipment } from '@rpg/contracts'
 
-import type { EquipmentPickerRowActionViewModel } from './equipment-picker-action.lib'
+import type {
+  CharacterBuildCatalogIndex,
+  CharacterBuildContext,
+  CharacterBuilderDraft,
+  EquipmentBudgetSummary,
+} from '@rpg/contracts'
+
+import { listEquipmentInventoryRowsForEquipment } from '../../lib/equipment-step.lib'
+import {
+  EQUIPMENT_PICKER_GRANT_MANAGE_LABEL,
+  EQUIPMENT_PICKER_GRANT_SECTION_LABEL,
+  type EquipmentPickerRowActionViewModel,
+} from './equipment-picker-action.lib'
 import type { EquipmentPickerPurchaseViewModel } from './equipment-picker-purchase.lib'
 import type { EquipmentPickerGrantViewModel } from './equipment-picker-grant.lib'
 import {
@@ -14,8 +26,8 @@ import {
 export function EquipmentPickerAcquisitionPanel({
   equipment,
   rowActionVm,
-  grantViewModel,
-  manageSources,
+  grantViewModel: _grantViewModel,
+  manageSources: _manageSources,
   purchaseViewModel,
   ownedQuantity,
   purchaseDisabled,
@@ -28,6 +40,10 @@ export function EquipmentPickerAcquisitionPanel({
   onRemovePurchase,
   onRemoveFromInventory,
   onRemoveOneFromInventory,
+  draft,
+  context,
+  catalogIndex,
+  budget,
 }: {
   equipment: Equipment
   rowActionVm?: EquipmentPickerRowActionViewModel
@@ -39,23 +55,49 @@ export function EquipmentPickerAcquisitionPanel({
   addQuantity: number
   onAddQuantityChange: (quantity: number) => void
   onCommit: () => void
-  onApplyMagicItemAcquisition?: (requestedQuantity: number) => void
+  onApplyMagicItemAcquisition?: (requestedQuantity: number) => boolean
   onApplyPurchase?: (requestedQuantity: number) => void
   onReleaseGrant?: (args: { allowanceId: string; equipmentId: string; quantity: number }) => void
   onRemovePurchase?: (args: { purchaseId: string; quantity: number }) => void
   onRemoveFromInventory?: () => void
   onRemoveOneFromInventory?: () => void
+  draft?: CharacterBuilderDraft
+  context?: CharacterBuildContext
+  catalogIndex?: CharacterBuildCatalogIndex
+  budget?: EquipmentBudgetSummary
 }) {
-  if (rowActionVm?.kind === 'magic_item_grant' && grantViewModel && manageSources) {
+  if (
+    rowActionVm?.kind === 'magic_item_grant' &&
+    draft &&
+    context &&
+    catalogIndex &&
+    onApplyMagicItemAcquisition
+  ) {
+    const rows = listEquipmentInventoryRowsForEquipment({
+      equipmentId: equipment.id,
+      draft,
+      catalogIndex,
+      budget,
+      context,
+    })
+    const sectionLabel = rowActionVm.capabilities.canManage
+      ? EQUIPMENT_PICKER_GRANT_MANAGE_LABEL
+      : EQUIPMENT_PICKER_GRANT_SECTION_LABEL
+
     return (
       <EquipmentPickerGrantPanel
         equipment={equipment}
         rowActionVm={rowActionVm}
-        grantViewModel={grantViewModel}
-        manageSources={manageSources}
+        grantViewModel={_grantViewModel!}
+        manageSources={_manageSources ?? { grants: [], purchases: [] }}
+        draft={draft}
+        context={context}
+        catalogIndex={catalogIndex}
+        budget={budget}
+        rows={rows}
         disabled={rowActionVm.disabled}
-        onAddQuantityChange={onAddQuantityChange}
-        onApplyMagicItemAcquisition={(quantity) => onApplyMagicItemAcquisition?.(quantity)}
+        sectionLabel={sectionLabel}
+        onApplyMagicItemAcquisition={onApplyMagicItemAcquisition}
         onReleaseGrant={onReleaseGrant}
         onRemovePurchase={onRemovePurchase}
       />

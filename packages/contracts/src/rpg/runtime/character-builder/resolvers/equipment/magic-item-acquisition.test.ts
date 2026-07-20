@@ -293,6 +293,7 @@ describe('magic item acquisition contracts', () => {
     expect(result.applied).toBe(true)
     expect(readMagicItemSelections(result.draft)).toEqual([])
     expect(result.draft.equipment?.purchases).toHaveLength(1)
+    expect(result.draft.equipment?.purchases?.[0]?.unitCostCp).toBe(100)
     expect(result.draft.equipment?.mode).toBe('gold')
   })
 

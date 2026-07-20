@@ -33,11 +33,11 @@ export type EquipmentPickerRowActionViewModel =
       partialActionLabel?: string
     }
 
-export const EQUIPMENT_PICKER_GRANT_SECTION_LABEL = 'Choose as a magic item'
+export const EQUIPMENT_PICKER_GRANT_SECTION_LABEL = 'Magic item acquisition'
 export const EQUIPMENT_PICKER_GRANT_QUANTITY_LABEL = 'Quantity to add'
 export const EQUIPMENT_PICKER_GRANT_MANAGE_LABEL = 'Manage choice'
-export const EQUIPMENT_PICKER_GRANT_RELEASE_LABEL = 'Release choice'
-export const EQUIPMENT_PICKER_GRANT_COMMIT_LABEL = 'Choose as a magic item'
+export const EQUIPMENT_PICKER_GRANT_RELEASE_LABEL = 'Release one'
+export const EQUIPMENT_PICKER_GRANT_COMMIT_LABEL = 'Use magic item choice'
 export const EQUIPMENT_PICKER_GRANT_PARTIAL_PREFIX = 'Add'
 
 export function formatPartialActionLabel(

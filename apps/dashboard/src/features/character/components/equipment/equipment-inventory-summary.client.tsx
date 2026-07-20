@@ -37,7 +37,10 @@ export type EquipmentInventorySummaryProps = {
   onSetPurchaseQuantity?: (target: EquipmentInventoryQuantityTarget, quantity: number) => void
   onReleaseGrant?: (args: { allowanceId: string; equipmentId: string; quantity: number }) => void
   onRemovePurchase?: (args: { purchaseId: string; quantity: number }) => void
-  onAddAnother?: (equipmentId: string) => void
+  onApplyMagicItemAcquisition?: (args: {
+    equipmentId: string
+    requestedQuantity: number
+  }) => boolean
   onCustomizePackage?: () => void
   onChangeEquipmentOption?: () => void
   onSelectedPackageItemKeysChange?: (keys: ReadonlySet<string>) => void
@@ -59,7 +62,7 @@ export function EquipmentInventorySummary({
   onSetPurchaseQuantity,
   onReleaseGrant,
   onRemovePurchase,
-  onAddAnother,
+  onApplyMagicItemAcquisition,
   onCustomizePackage,
   onChangeEquipmentOption,
   onSelectedPackageItemKeysChange,
@@ -113,7 +116,7 @@ export function EquipmentInventorySummary({
         onSetPurchaseQuantity={onSetPurchaseQuantity}
         onReleaseGrant={onReleaseGrant ?? (() => undefined)}
         onRemovePurchase={onRemovePurchase ?? (() => undefined)}
-        onAddAnother={onAddAnother ?? (() => undefined)}
+        onApplyMagicItemAcquisition={onApplyMagicItemAcquisition ?? (() => false)}
       />
     </div>
   )

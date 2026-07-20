@@ -62,7 +62,7 @@ const inventoryManagementArgs = {
   context: equipmentStepContextFixture,
   onReleaseGrant: () => undefined,
   onRemovePurchase: () => undefined,
-  onAddAnother: () => undefined,
+  onApplyMagicItemAcquisition: () => false,
 } as const
 
 const commonAllowanceId = buildMagicItemAllowanceId({

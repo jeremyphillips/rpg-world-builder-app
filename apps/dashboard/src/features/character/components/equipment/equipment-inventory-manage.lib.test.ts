@@ -4,9 +4,12 @@ import { equipmentStepLeatherArmorFixture } from '../../lib/equipment-step.fixtu
 import type { EquipmentInventoryRow } from '../../lib/equipment-step.lib'
 import {
   formatGrantManageSourceLabel,
+  formatTotalPurchaseSpendFromSnapshots,
+  grantedQuantity,
   resolveDistinctAcquisitionSourceKinds,
   resolveEquipmentInventoryManageSources,
   resolveEquipmentInventoryRowManagementMode,
+  usesInlineManagement,
   usesMixedSourceManagement,
 } from './equipment-inventory-manage.lib'
 
@@ -57,6 +60,12 @@ describe('equipment-inventory-manage.lib', () => {
     ])
     expect(usesMixedSourceManagement([grant, purchase])).toBe(true)
     expect(
+      usesInlineManagement({
+        sourceKinds: resolveDistinctAcquisitionSourceKinds([grant, purchase]),
+        grantedQuantity: grantedQuantity([grant, purchase]),
+      }),
+    ).toBe(true)
+    expect(
       usesMixedSourceManagement([
         purchase,
         {
@@ -88,22 +97,36 @@ describe('equipment-inventory-manage.lib', () => {
         equipmentId: 'potion',
       },
     })
+    const singleGrant = row({
+      group: 'magicItems',
+      groupLabel: 'Magic Items',
+      sourceLabel: 'Common choice',
+      entry: { equipmentId: 'potion', quantity: 1, sources: [] },
+      removeTarget: {
+        kind: 'magicItemGrant',
+        allowanceId: 'allowance-common',
+        equipmentId: 'potion',
+      },
+    })
 
     expect(resolveEquipmentInventoryRowManagementMode([purchase])).toEqual({
       kind: 'purchase_only',
     })
+    expect(resolveEquipmentInventoryRowManagementMode([singleGrant])).toEqual({
+      kind: 'purchase_only',
+    })
     expect(resolveEquipmentInventoryRowManagementMode([grant])).toEqual({
-      kind: 'grant_only',
+      kind: 'inline',
       totalQuantity: 2,
     })
     expect(resolveEquipmentInventoryRowManagementMode([grant, purchase])).toEqual({
-      kind: 'mixed',
+      kind: 'inline',
       totalQuantity: 3,
     })
   })
 
   it('formats grant manage labels and purchase totals for the manage panel', () => {
-    expect(formatGrantManageSourceLabel('Common choice')).toBe('Common magic-item choices')
+    expect(formatGrantManageSourceLabel('Common choice')).toBe('Common choices')
 
     const sources = resolveEquipmentInventoryManageSources([
       row({
@@ -125,7 +148,7 @@ describe('equipment-inventory-manage.lib', () => {
     ])
 
     expect(sources.grants[0]).toMatchObject({
-      label: 'Common magic-item choices',
+      label: 'Common choices',
       quantity: 2,
     })
     expect(sources.purchases[0]).toMatchObject({
@@ -133,5 +156,14 @@ describe('equipment-inventory-manage.lib', () => {
       quantity: 1,
       totalPriceLabel: '10 GP',
     })
+  })
+
+  it('sums purchase spend from stored unit cost snapshots', () => {
+    expect(
+      formatTotalPurchaseSpendFromSnapshots([
+        { quantity: 15, unitCostCp: 5000 },
+        { quantity: 1, unitCostCp: undefined },
+      ]),
+    ).toBe('750 GP spent')
   })
 })

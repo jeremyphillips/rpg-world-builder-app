@@ -224,6 +224,9 @@ export function EquipmentPickerDrawer({
   isGoldShoppingPath = false,
   resolveRowActionViewModel,
   resolveGrantManageSources,
+  draft,
+  context,
+  catalogIndex,
   onApplyMagicItemAcquisition,
   onApplyPurchase,
   onReleaseGrant,
@@ -568,11 +571,14 @@ export function EquipmentPickerDrawer({
             characterPreviewContext={characterPreviewContext}
             rowActionVm={rowActionVm}
             manageSources={manageSources}
+            draft={draft}
+            context={context}
+            catalogIndex={catalogIndex}
             onApplyMagicItemAcquisition={(requestedQuantity) =>
               onApplyMagicItemAcquisition?.({
                 equipmentId: item.equipment.id,
                 requestedQuantity,
-              })
+              }) ?? false
             }
             onApplyPurchase={(requestedQuantity) =>
               onApplyPurchase?.({ equipmentId: item.equipment.id, requestedQuantity })

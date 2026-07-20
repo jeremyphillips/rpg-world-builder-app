@@ -1,8 +1,12 @@
 import {
   formatEquipmentPurchaseTotalPriceLabel,
+  formatWealthAsGold,
   getMagicItemRarityLabel,
   resolveEquipmentAcquisitionActionState,
+  resolveEquipmentPurchaseIndex,
   resolveMagicItemAcquisitionState,
+  unitCostCpForEquipment,
+  copperToWealth,
   type CharacterBuildCatalogIndex,
   type CharacterBuildContext,
   type CharacterBuilderDraft,
@@ -20,11 +24,6 @@ import { formatAcquisitionBlockerNote } from './equipment-picker-action.lib'
 
 export type EquipmentAcquisitionSourceKind = 'magicItemGrant' | 'purchase'
 
-export type EquipmentInventoryRowManagementMode =
-  | { kind: 'purchase_only' }
-  | { kind: 'grant_only'; totalQuantity: number }
-  | { kind: 'mixed'; totalQuantity: number }
-
 export type EquipmentInventoryManageGrantSource = {
   allowanceId: string
   equipmentId: string
@@ -36,6 +35,7 @@ export type EquipmentInventoryManagePurchaseSource = {
   purchaseId: string
   label: string
   quantity: number
+  unitCostCp?: number
   totalPriceLabel: string
 }
 
@@ -68,8 +68,28 @@ export function resolveDistinctAcquisitionSourceKinds(
   return ACQUISITION_SOURCE_KIND_ORDER.filter((kind) => kinds.has(kind))
 }
 
+export function grantedQuantity(rows: readonly EquipmentInventoryRow[]): number {
+  return rows.reduce((sum, row) => {
+    if (row.removeTarget?.kind === 'magicItemGrant') {
+      return sum + row.entry.quantity
+    }
+    return sum
+  }, 0)
+}
+
+export function usesInlineManagement(args: {
+  sourceKinds: EquipmentAcquisitionSourceKind[]
+  grantedQuantity: number
+}): boolean {
+  return args.sourceKinds.length > 1 || args.grantedQuantity > 1
+}
+
+/** @deprecated Use {@link usesInlineManagement}. */
 export function usesMixedSourceManagement(rows: readonly EquipmentInventoryRow[]): boolean {
-  return resolveDistinctAcquisitionSourceKinds(rows).length > 1
+  return usesInlineManagement({
+    sourceKinds: resolveDistinctAcquisitionSourceKinds(rows),
+    grantedQuantity: grantedQuantity(rows),
+  })
 }
 
 function sumRowQuantity(rows: readonly EquipmentInventoryRow[]): number {
@@ -78,31 +98,62 @@ function sumRowQuantity(rows: readonly EquipmentInventoryRow[]): number {
 
 export function resolveEquipmentInventoryRowManagementMode(
   rows: readonly EquipmentInventoryRow[],
-): EquipmentInventoryRowManagementMode {
-  const kinds = resolveDistinctAcquisitionSourceKinds(rows)
+): { kind: 'purchase_only' } | { kind: 'inline'; totalQuantity: number } {
+  const sourceKinds = resolveDistinctAcquisitionSourceKinds(rows)
+  const grantQty = grantedQuantity(rows)
 
-  if (kinds.length === 0) {
+  if (sourceKinds.length === 0 || (sourceKinds.length === 1 && sourceKinds[0] === 'purchase')) {
     return { kind: 'purchase_only' }
   }
 
-  if (kinds.length > 1) {
-    return { kind: 'mixed', totalQuantity: sumRowQuantity(rows) }
-  }
-
-  if (kinds[0] === 'purchase') {
+  if (sourceKinds.length === 1 && grantQty === 1) {
     return { kind: 'purchase_only' }
   }
 
-  return { kind: 'grant_only', totalQuantity: sumRowQuantity(rows) }
+  return { kind: 'inline', totalQuantity: sumRowQuantity(rows) }
 }
 
 export function formatGrantManageSourceLabel(sourceLabel: string): string {
   const rarity = sourceLabel.replace(/\s+choice$/i, '')
-  return `${rarity} magic-item choices`
+  return `${rarity} choices`
+}
+
+export function formatTotalPurchaseSpendFromSnapshots(
+  purchases: readonly Pick<EquipmentInventoryManagePurchaseSource, 'quantity' | 'unitCostCp'>[],
+): string | undefined {
+  let totalCp = 0
+  let hasSnapshot = false
+
+  for (const purchase of purchases) {
+    if (purchase.unitCostCp === undefined) continue
+    hasSnapshot = true
+    totalCp += purchase.unitCostCp * purchase.quantity
+  }
+
+  if (!hasSnapshot || totalCp <= 0) return undefined
+  return `${formatWealthAsGold(copperToWealth(totalCp))} spent`
+}
+
+function resolvePurchaseUnitCostCp(args: {
+  purchaseId: string
+  draft: CharacterBuilderDraft
+  equipment?: Equipment
+}): number | undefined {
+  const purchases = args.draft.equipment?.purchases ?? []
+  const resolvedIndex = resolveEquipmentPurchaseIndex(purchases, args.purchaseId)
+  if (resolvedIndex === undefined) {
+    return args.equipment ? unitCostCpForEquipment(args.equipment) : undefined
+  }
+
+  const purchase = purchases[resolvedIndex]
+  return (
+    purchase?.unitCostCp ?? (args.equipment ? unitCostCpForEquipment(args.equipment) : undefined)
+  )
 }
 
 export function resolveEquipmentInventoryManageSources(
   rows: readonly EquipmentInventoryRow[],
+  draft?: CharacterBuilderDraft,
 ): EquipmentInventoryManageSources {
   const grants = new Map<string, EquipmentInventoryManageGrantSource>()
   const purchases: EquipmentInventoryManagePurchaseSource[] = []
@@ -124,12 +175,29 @@ export function resolveEquipmentInventoryManageSources(
       continue
     }
 
-    if (row.removeTarget?.kind === 'purchase' && row.equipment) {
+    if (row.removeTarget?.kind === 'purchase') {
+      const unitCostCp =
+        draft !== undefined
+          ? resolvePurchaseUnitCostCp({
+              purchaseId: row.removeTarget.purchaseId,
+              draft,
+              equipment: row.equipment,
+            })
+          : undefined
+
+      const totalPriceLabel =
+        unitCostCp !== undefined
+          ? formatWealthAsGold(copperToWealth(unitCostCp * row.entry.quantity))
+          : row.equipment
+            ? formatEquipmentPurchaseTotalPriceLabel(row.equipment, row.entry.quantity)
+            : ''
+
       purchases.push({
         purchaseId: row.removeTarget.purchaseId,
         label: 'Purchased',
         quantity: row.entry.quantity,
-        totalPriceLabel: formatEquipmentPurchaseTotalPriceLabel(row.equipment, row.entry.quantity),
+        unitCostCp,
+        totalPriceLabel,
       })
     }
   }
@@ -218,6 +286,7 @@ export function formatInventoryAddAnotherPreview(args: {
   catalogIndex: CharacterBuildCatalogIndex
   equipment: Equipment
   budget?: EquipmentBudgetSummary
+  requestedQuantity?: number
 }): EquipmentInventoryAddAnotherPreview {
   const acquisitionContext = resolveEquipmentAcquisitionContext({
     context: args.context,
@@ -228,7 +297,7 @@ export function formatInventoryAddAnotherPreview(args: {
     context: acquisitionContext,
     equipment: args.equipment,
     workflowMode: 'magic_items',
-    requestedQuantity: 1,
+    requestedQuantity: args.requestedQuantity ?? 1,
   })
 
   if (actionState.kind !== 'magic_item_grant') {

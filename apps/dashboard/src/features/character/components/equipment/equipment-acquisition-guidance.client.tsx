@@ -2,21 +2,24 @@
 
 import type { EquipmentBudgetSummary, MagicItemGrantProgress } from '@rpg/contracts'
 import { getMagicItemRarityLabel } from '@rpg/contracts'
-import { Badge, Button, Heading } from '@rpg/ui'
+import { Badge, Button, Heading, Text } from '@rpg/ui'
 
 import {
   EQUIPMENT_MAGIC_ITEMS_CHOOSE_LABEL,
   EQUIPMENT_MAGIC_ITEMS_PROGRESS_LABEL,
   EQUIPMENT_STEP_BROWSE_LABEL,
 } from '../../lib/equipment-step.lib'
-import { EquipmentBudgetHeader } from './equipment-budget-header.client'
+import { formatEquipmentBudgetGuidanceCopy } from './equipment-acquisition-guidance.lib'
 import {
   equipmentAcquisitionGuidanceBadgeListClasses,
   equipmentAcquisitionGuidanceCardClasses,
-  equipmentAcquisitionGuidanceCardHeaderClasses,
   equipmentAcquisitionGuidanceGridClasses,
   equipmentAcquisitionGuidanceGridTwoColumnClasses,
 } from './equipment-acquisition-guidance.variants'
+import {
+  equipmentAcquisitionGuidanceCardActionClasses,
+  equipmentAcquisitionGuidanceCardDescriptionClasses,
+} from './equipment-acquisition-panel.variants'
 
 export type EquipmentAcquisitionGuidanceProps = {
   showPurchaseWorkflow: boolean
@@ -34,17 +37,24 @@ function EquipmentPurchaseGuidanceCard({
   budget: EquipmentBudgetSummary
   onBrowse: () => void
 }) {
+  const copy = formatEquipmentBudgetGuidanceCopy(budget)
+
   return (
     <article className={equipmentAcquisitionGuidanceCardClasses}>
-      <div className={equipmentAcquisitionGuidanceCardHeaderClasses}>
-        <Heading variant="subsection" as="h3">
-          GP remaining
-        </Heading>
-        <Button type="button" size="sm" onClick={onBrowse}>
-          {EQUIPMENT_STEP_BROWSE_LABEL}
-        </Button>
-      </div>
-      <EquipmentBudgetHeader budget={budget} />
+      <Heading variant="subsection" as="h3">
+        {copy.heading}
+      </Heading>
+      <Text as="p" className={equipmentAcquisitionGuidanceCardDescriptionClasses}>
+        {copy.description}
+      </Text>
+      <Button
+        type="button"
+        size="sm"
+        className={equipmentAcquisitionGuidanceCardActionClasses}
+        onClick={onBrowse}
+      >
+        {EQUIPMENT_STEP_BROWSE_LABEL}
+      </Button>
     </article>
   )
 }
@@ -58,14 +68,9 @@ function EquipmentMagicItemGuidanceCard({
 }) {
   return (
     <article className={equipmentAcquisitionGuidanceCardClasses}>
-      <div className={equipmentAcquisitionGuidanceCardHeaderClasses}>
-        <Heading variant="subsection" as="h3">
-          {EQUIPMENT_MAGIC_ITEMS_PROGRESS_LABEL}
-        </Heading>
-        <Button type="button" size="sm" onClick={onChoose}>
-          {EQUIPMENT_MAGIC_ITEMS_CHOOSE_LABEL}
-        </Button>
-      </div>
+      <Heading variant="subsection" as="h3">
+        {EQUIPMENT_MAGIC_ITEMS_PROGRESS_LABEL}
+      </Heading>
       <div className={equipmentAcquisitionGuidanceBadgeListClasses}>
         {progress.map((entry) => (
           <Badge
@@ -78,6 +83,14 @@ function EquipmentMagicItemGuidanceCard({
           </Badge>
         ))}
       </div>
+      <Button
+        type="button"
+        size="sm"
+        className={equipmentAcquisitionGuidanceCardActionClasses}
+        onClick={onChoose}
+      >
+        {EQUIPMENT_MAGIC_ITEMS_CHOOSE_LABEL}
+      </Button>
     </article>
   )
 }

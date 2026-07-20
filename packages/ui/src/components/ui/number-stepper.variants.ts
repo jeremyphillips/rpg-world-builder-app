@@ -35,7 +35,7 @@ export const numberStepperButtonVariants = cva(
 )
 
 export const numberStepperInputVariants = cva(
-  'shrink-0 border-0 bg-transparent text-center text-foreground tabular-nums outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none focus-visible:ring-0',
+  'shrink-0 border-0 bg-input text-center text-foreground tabular-nums outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none focus-visible:ring-0',
   {
     variants: {
       size: {

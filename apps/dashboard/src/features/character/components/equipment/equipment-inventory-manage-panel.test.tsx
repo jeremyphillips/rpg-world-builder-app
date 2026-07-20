@@ -18,7 +18,10 @@ import {
   equipmentStepPotionOfHealingFixture,
 } from '../../lib/equipment-step.fixtures'
 import type { EquipmentInventoryRow } from '../../lib/equipment-step.lib'
-import { EquipmentInventoryManagePanel } from './equipment-inventory-manage-panel.client'
+import {
+  EquipmentInventoryManagePanel,
+  createStorybookApplyMagicItemAcquisition,
+} from './equipment-inventory-manage-panel.client'
 
 const rows: EquipmentInventoryRow[] = [
   {
@@ -30,6 +33,7 @@ const rows: EquipmentInventoryRow[] = [
       sources: [{ kind: 'startingWealthTier', sourceId: 'tier', grantId: 'allowance-common' }],
     },
     equipmentName: 'Potion of Healing',
+    equipment: equipmentStepPotionOfHealingFixture,
     sourceLabel: 'Common choice',
     isStackable: true,
     quantityMode: 'locked',
@@ -50,18 +54,19 @@ describe('EquipmentInventoryManagePanel', () => {
     render(
       <EquipmentInventoryManagePanel
         equipmentName="Potion of Healing"
+        equipment={equipmentStepPotionOfHealingFixture}
         rows={rows}
         draft={createEmptyCharacterBuilderDraft()}
         context={equipmentStepContextFixture}
         catalogIndex={equipmentStepCatalogIndexFixture}
         onReleaseGrant={onReleaseGrant}
         onRemovePurchase={vi.fn()}
-        onAddAnother={vi.fn()}
+        onApplyMagicItemAcquisition={vi.fn(() => true)}
       />,
     )
 
     await user.click(screen.getByRole('button', { name: 'Manage' }))
-    await user.click(screen.getByRole('button', { name: 'Release one choice' }))
+    await user.click(screen.getByRole('button', { name: 'Release one' }))
 
     expect(onReleaseGrant).toHaveBeenCalledWith({
       allowanceId: 'allowance-common',
@@ -70,7 +75,7 @@ describe('EquipmentInventoryManagePanel', () => {
     })
   })
 
-  it('shows add-another preview before confirming another grant copy', async () => {
+  it('shows next-copy preview and add label before confirming another grant copy', async () => {
     const user = userEvent.setup()
     const allowanceId = buildMagicItemAllowanceId({
       startingWealthTableId: standardStartingWealthTableId('srd-cc-5.2.1'),
@@ -109,13 +114,18 @@ describe('EquipmentInventoryManagePanel', () => {
         catalogIndex={equipmentStepCatalogIndexFixture}
         onReleaseGrant={vi.fn()}
         onRemovePurchase={vi.fn()}
-        onAddAnother={vi.fn()}
+        onApplyMagicItemAcquisition={createStorybookApplyMagicItemAcquisition({
+          draft,
+          context,
+          catalogIndex: equipmentStepCatalogIndexFixture,
+        })}
       />,
     )
 
     await user.click(screen.getByRole('button', { name: 'Manage' }))
 
-    expect(screen.getByText('Uses 1 Common choice')).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Next copy' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Use magic item choice' })).toBeInTheDocument()
   })
 
   it('lists grant and purchase sources for mixed rows', async () => {
@@ -151,28 +161,29 @@ describe('EquipmentInventoryManagePanel', () => {
         catalogIndex={equipmentStepCatalogIndexFixture}
         onReleaseGrant={vi.fn()}
         onRemovePurchase={vi.fn()}
-        onAddAnother={vi.fn()}
+        onApplyMagicItemAcquisition={vi.fn(() => true)}
       />,
     )
 
     await user.click(screen.getByRole('button', { name: 'Manage' }))
 
-    expect(screen.getByText('Common magic-item choices')).toBeInTheDocument()
+    expect(screen.getByText('Common choices')).toBeInTheDocument()
     expect(screen.getByText('Purchased')).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Remove one purchase' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Remove one' })).toBeInTheDocument()
   })
 
   it('has no axe accessibility violations', async () => {
     const { container } = render(
       <EquipmentInventoryManagePanel
         equipmentName="Potion of Healing"
+        equipment={equipmentStepPotionOfHealingFixture}
         rows={rows}
         draft={createEmptyCharacterBuilderDraft()}
         context={equipmentStepContextFixture}
         catalogIndex={equipmentStepCatalogIndexFixture}
         onReleaseGrant={vi.fn()}
         onRemovePurchase={vi.fn()}
-        onAddAnother={vi.fn()}
+        onApplyMagicItemAcquisition={vi.fn(() => true)}
       />,
     )
 

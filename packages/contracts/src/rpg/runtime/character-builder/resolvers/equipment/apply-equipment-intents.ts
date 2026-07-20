@@ -20,8 +20,9 @@ function upsertPurchaseQuantity(args: {
   draft: CharacterBuilderDraft
   equipment: Equipment
   quantity: number
+  unitCostCp?: number
 }): CharacterBuilderDraftEquipmentPurchases {
-  const { draft, equipment, quantity } = args
+  const { draft, equipment, quantity, unitCostCp } = args
   const purchases = (draft.equipment?.purchases ?? []).map((_, index) =>
     normalizeEquipmentPurchase(draft.equipment!.purchases, index),
   )
@@ -33,6 +34,7 @@ function upsertPurchaseQuantity(args: {
       quantity,
       sourceMode: 'startingGold',
       origin: 'picker',
+      ...(unitCostCp !== undefined ? { unitCostCp } : {}),
     },
     equipment,
   })
@@ -59,6 +61,7 @@ export function applyEquipmentPurchaseIntent(args: {
     draft,
     equipment,
     quantity: plan.purchaseQuantity,
+    unitCostCp: plan.unitCostCp,
   })
 
   return {
@@ -103,6 +106,7 @@ export function applyMagicItemAcquisitionIntent(args: {
       draft,
       equipment,
       quantity: plan.purchaseQuantity,
+      unitCostCp: plan.unitCostCp,
     })
   }
 

@@ -106,11 +106,26 @@ export const EQUIPMENT_MAGIC_ITEM_REMOVE_PURCHASE_LABEL = 'Remove purchase'
 
 export const EQUIPMENT_INVENTORY_MANAGE_LABEL = 'Manage'
 
+export const EQUIPMENT_INVENTORY_DONE_LABEL = 'Done'
+
 export const EQUIPMENT_INVENTORY_RELEASE_LABEL = 'Release'
 
-export const EQUIPMENT_INVENTORY_RELEASE_ONE_LABEL = 'Release one choice'
+export const EQUIPMENT_INVENTORY_RELEASE_ONE_LABEL = 'Release one'
 
-export const EQUIPMENT_INVENTORY_REMOVE_ONE_PURCHASE_LABEL = 'Remove one purchase'
+export const EQUIPMENT_INVENTORY_REMOVE_ONE_PURCHASE_LABEL = 'Remove one'
+
+export const EQUIPMENT_INVENTORY_OWNED_COPIES_LABEL = 'Owned copies'
+
+export const EQUIPMENT_INVENTORY_NEXT_COPY_LABEL = 'Next copy'
+
+export const EQUIPMENT_ACQUISITION_QUANTITY_LABEL = 'Quantity to add'
+
+export const EQUIPMENT_ACQUISITION_ADDING_LABEL = 'Adding…'
+
+export const EQUIPMENT_ACQUISITION_BLOCKED_NOTE =
+  'No additional copies can be added during character creation.'
+
+export const EQUIPMENT_MAGIC_ITEM_USE_CHOICE_LABEL = 'Use magic item choice'
 
 export const EQUIPMENT_INVENTORY_ACQUIRED_THROUGH_LABEL = 'Acquired through'
 
@@ -1292,6 +1307,21 @@ export function listEquipmentInventoryRowsFromDraft(
     ...(context ? listMagicItemGrantInventoryRows({ draft, catalogIndex, context }) : []),
     ...listPurchaseInventoryRows({ draft, catalogIndex, classId, selectedOptionId, budget }),
   ]
+}
+
+export function listEquipmentInventoryRowsForEquipment(args: {
+  equipmentId: string
+  draft: CharacterBuilderDraft
+  catalogIndex: CharacterBuildCatalogIndex
+  budget?: EquipmentBudgetSummary
+  context?: CharacterBuildContext
+}): EquipmentInventoryRow[] {
+  return listEquipmentInventoryRowsFromDraft(
+    args.draft,
+    args.catalogIndex,
+    args.budget,
+    args.context,
+  ).filter((row) => row.entry.equipmentId === args.equipmentId)
 }
 
 function upsertEquipmentPurchase(args: {

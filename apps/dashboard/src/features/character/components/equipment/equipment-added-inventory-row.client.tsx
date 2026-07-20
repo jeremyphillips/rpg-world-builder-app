@@ -1,5 +1,9 @@
 'use client'
 
+import { useCallback, useId, useState } from 'react'
+
+import { ChevronDown, ChevronUp } from 'lucide-react'
+
 import type {
   CharacterBuildCatalogIndex,
   CharacterBuildContext,
@@ -9,25 +13,26 @@ import type {
 import { Button, Collapsible, CollapsibleContent, CollapsibleTrigger, Text } from '@rpg/ui'
 
 import {
+  EQUIPMENT_INVENTORY_DONE_LABEL,
   EQUIPMENT_INVENTORY_MANAGE_LABEL,
   EQUIPMENT_INVENTORY_RELEASE_LABEL,
   type EquipmentInventoryQuantityTarget,
   type EquipmentInventoryRemoveTarget,
 } from '../../lib/equipment-step.lib'
-import {
-  EquipmentInventoryManagePanelBody,
-  type EquipmentInventoryManagePanelBodyProps,
-} from './equipment-inventory-manage-panel.client'
+import type { EquipmentOwnedSourceAction } from './equipment-acquisition-panel.lib'
+import { EquipmentAcquisitionPanelBody } from './equipment-acquisition-panel-body.client'
+import { equipmentInventoryDisclosureTriggerClasses } from './equipment-acquisition-panel.variants'
 import {
   groupEquipmentInventoryRowsForDisplay,
   type AddedEquipmentEntryViewModel,
 } from './equipment-inventory-summary.lib'
 import { EquipmentInventoryRowItem } from './equipment-inventory-row.client'
-import { resolveEquipmentInventoryRowManagementMode } from './equipment-inventory-manage.lib'
 import {
-  equipmentInventoryManagePanelContentClasses,
-  equipmentInventoryManageRowClasses,
-} from './equipment-inventory-manage-panel.variants'
+  grantedQuantity,
+  resolveDistinctAcquisitionSourceKinds,
+  usesInlineManagement,
+} from './equipment-inventory-manage.lib'
+import { equipmentInventoryManageRowClasses } from './equipment-inventory-manage-panel.variants'
 import {
   equipmentInventoryRowActionsClasses,
   equipmentInventoryRowClasses,
@@ -38,6 +43,7 @@ import {
   equipmentInventoryRowQtyLabelClasses,
 } from './equipment-inventory-summary.variants'
 import { builderInventoryRowMetaClasses } from '../builder/builder-inventory-row.variants'
+import { useEquipmentAcquisitionQuantityCommit } from './use-equipment-acquisition-quantity-commit.client'
 
 export type EquipmentAddedInventoryRowItemProps = {
   entry: AddedEquipmentEntryViewModel
@@ -49,7 +55,9 @@ export type EquipmentAddedInventoryRowItemProps = {
   onSetPurchaseQuantity?: (target: EquipmentInventoryQuantityTarget, quantity: number) => void
   onReleaseGrant: (args: { allowanceId: string; equipmentId: string; quantity: number }) => void
   onRemovePurchase: (args: { purchaseId: string; quantity: number }) => void
-  onAddAnother: (equipmentId: string) => void
+  onApplyMagicItemAcquisition: (args: { equipmentId: string; requestedQuantity: number }) => boolean
+  open?: boolean
+  onOpenChange?: (open: boolean) => void
 }
 
 function InventoryRowDetailLine({ label }: { label?: string }) {
@@ -108,21 +116,78 @@ function GrantOnlySingleReleaseRow({
 
 function ManagedInventoryRow({
   entry,
-  mode,
-  managePanelProps,
+  totalQuantity,
+  draft,
+  context,
+  catalogIndex,
+  budget,
+  onReleaseGrant,
+  onRemovePurchase,
+  onApplyMagicItemAcquisition,
+  open,
+  onOpenChange,
 }: {
   entry: AddedEquipmentEntryViewModel
-  mode: Extract<
-    ReturnType<typeof resolveEquipmentInventoryRowManagementMode>,
-    { kind: 'grant_only' | 'mixed' }
-  >
-  managePanelProps: EquipmentInventoryManagePanelBodyProps
+  totalQuantity: number
+  draft: CharacterBuilderDraft
+  context: CharacterBuildContext
+  catalogIndex: CharacterBuildCatalogIndex
+  budget?: EquipmentBudgetSummary
+  onReleaseGrant: EquipmentAddedInventoryRowItemProps['onReleaseGrant']
+  onRemovePurchase: EquipmentAddedInventoryRowItemProps['onRemovePurchase']
+  onApplyMagicItemAcquisition: EquipmentAddedInventoryRowItemProps['onApplyMagicItemAcquisition']
+  open?: boolean
+  onOpenChange?: (open: boolean) => void
 }) {
-  const showQuantity = mode.kind === 'mixed' || mode.totalQuantity > 1
+  const contentId = useId()
+  const [internalOpen, setInternalOpen] = useState(false)
+  const isOpen = open ?? internalOpen
+  const equipment = entry.rows.find((row) => row.equipment)?.equipment
+  if (!equipment) return null
+
+  const handleOpenChange = useCallback(
+    (next: boolean) => {
+      if (onOpenChange) onOpenChange(next)
+      else setInternalOpen(next)
+    },
+    [onOpenChange],
+  )
+
+  const commitAcquisition = useCallback(
+    (requestedQuantity: number) =>
+      onApplyMagicItemAcquisition({ equipmentId: equipment.id, requestedQuantity }),
+    [equipment.id, onApplyMagicItemAcquisition],
+  )
+
+  const { quantity, setQuantity, isPending, successMessage, commitQuantity } =
+    useEquipmentAcquisitionQuantityCommit({ commit: commitAcquisition })
+
+  const handleSourceAction = useCallback(
+    (action: EquipmentOwnedSourceAction) => {
+      if (action.target.kind === 'magicItemGrant') {
+        onReleaseGrant({
+          allowanceId: action.target.allowanceId,
+          equipmentId: action.target.equipmentId,
+          quantity: action.quantity,
+        })
+        return
+      }
+
+      onRemovePurchase({
+        purchaseId: action.target.purchaseId,
+        quantity: action.quantity,
+      })
+    },
+    [onReleaseGrant, onRemovePurchase],
+  )
 
   return (
     <article className={equipmentInventoryRowClasses}>
-      <Collapsible className={equipmentInventoryManageRowClasses}>
+      <Collapsible
+        className={equipmentInventoryManageRowClasses}
+        open={isOpen}
+        onOpenChange={handleOpenChange}
+      >
         <div className={equipmentInventoryRowHeaderClasses}>
           <div className={builderInventoryRowMetaClasses}>
             <Text as="p" className={equipmentInventoryRowNameClasses}>
@@ -130,21 +195,41 @@ function ManagedInventoryRow({
             </Text>
           </div>
           <div className={equipmentInventoryRowActionsClasses}>
-            {showQuantity ? (
-              <Text as="span" className={equipmentInventoryRowQtyLabelClasses}>
-                Qty {mode.totalQuantity}
-              </Text>
-            ) : null}
+            <Text as="span" className={equipmentInventoryRowQtyLabelClasses}>
+              Qty {totalQuantity}
+            </Text>
             <CollapsibleTrigger asChild>
-              <Button type="button" size="sm" variant="secondary">
-                {EQUIPMENT_INVENTORY_MANAGE_LABEL}
-              </Button>
+              <button
+                type="button"
+                className={equipmentInventoryDisclosureTriggerClasses}
+                aria-controls={contentId}
+              >
+                {isOpen ? EQUIPMENT_INVENTORY_DONE_LABEL : EQUIPMENT_INVENTORY_MANAGE_LABEL}
+                {isOpen ? (
+                  <ChevronUp aria-hidden className="size-3.5" />
+                ) : (
+                  <ChevronDown aria-hidden className="size-3.5" />
+                )}
+              </button>
             </CollapsibleTrigger>
           </div>
         </div>
         <InventoryRowDetailLine label={entry.provenanceLabel} />
-        <CollapsibleContent className={equipmentInventoryManagePanelContentClasses}>
-          <EquipmentInventoryManagePanelBody {...managePanelProps} />
+        <CollapsibleContent id={contentId}>
+          <EquipmentAcquisitionPanelBody
+            draft={draft}
+            context={context}
+            catalogIndex={catalogIndex}
+            equipment={equipment}
+            rows={entry.rows}
+            budget={budget}
+            quantity={quantity}
+            onQuantityChange={setQuantity}
+            isPending={isPending}
+            successMessage={successMessage}
+            onSourceAction={handleSourceAction}
+            onCommit={commitQuantity}
+          />
         </CollapsibleContent>
       </Collapsible>
     </article>
@@ -161,11 +246,18 @@ export function EquipmentAddedInventoryRowItem({
   onSetPurchaseQuantity,
   onReleaseGrant,
   onRemovePurchase,
-  onAddAnother,
+  onApplyMagicItemAcquisition,
+  open,
+  onOpenChange,
 }: EquipmentAddedInventoryRowItemProps) {
-  const mode = resolveEquipmentInventoryRowManagementMode(entry.rows)
+  const sourceKinds = resolveDistinctAcquisitionSourceKinds(entry.rows)
+  const grantQty = grantedQuantity(entry.rows)
 
-  if (mode.kind === 'purchase_only') {
+  if (!usesInlineManagement({ sourceKinds, grantedQuantity: grantQty })) {
+    if (sourceKinds.length === 1 && sourceKinds[0] === 'magicItemGrant' && grantQty === 1) {
+      return <GrantOnlySingleReleaseRow entry={entry} onReleaseGrant={onReleaseGrant} />
+    }
+
     const display = groupEquipmentInventoryRowsForDisplay(entry.rows, {
       allowCombinedRows: true,
     })[0]
@@ -181,27 +273,19 @@ export function EquipmentAddedInventoryRowItem({
     )
   }
 
-  if (mode.kind === 'grant_only' && mode.totalQuantity === 1) {
-    return <GrantOnlySingleReleaseRow entry={entry} onReleaseGrant={onReleaseGrant} />
-  }
-
   return (
     <ManagedInventoryRow
       entry={entry}
-      mode={mode}
-      managePanelProps={{
-        equipmentName: entry.equipmentName,
-        equipment: entry.rows.find((row) => row.equipment)?.equipment,
-        rows: entry.rows,
-        draft,
-        context,
-        catalogIndex,
-        budget,
-        showAddAnother: mode.kind === 'mixed' || mode.kind === 'grant_only',
-        onReleaseGrant,
-        onRemovePurchase,
-        onAddAnother,
-      }}
+      totalQuantity={entry.totalQuantity}
+      draft={draft}
+      context={context}
+      catalogIndex={catalogIndex}
+      budget={budget}
+      onReleaseGrant={onReleaseGrant}
+      onRemovePurchase={onRemovePurchase}
+      onApplyMagicItemAcquisition={onApplyMagicItemAcquisition}
+      open={open}
+      onOpenChange={onOpenChange}
     />
   )
 }

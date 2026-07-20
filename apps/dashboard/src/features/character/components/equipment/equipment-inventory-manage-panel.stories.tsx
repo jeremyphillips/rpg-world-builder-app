@@ -7,7 +7,10 @@ import {
   equipmentStepContextFixture,
   equipmentStepPotionOfHealingFixture,
 } from '../../lib/equipment-step.fixtures'
-import { EquipmentInventoryManagePanel } from './equipment-inventory-manage-panel.client'
+import {
+  EquipmentInventoryManagePanel,
+  createStorybookApplyMagicItemAcquisition,
+} from './equipment-inventory-manage-panel.client'
 import type { EquipmentInventoryRow } from '../../lib/equipment-step.lib'
 
 const rows: EquipmentInventoryRow[] = [
@@ -20,6 +23,7 @@ const rows: EquipmentInventoryRow[] = [
       sources: [{ kind: 'startingWealthTier', sourceId: 'tier', grantId: 'allowance-common' }],
     },
     equipmentName: 'Potion of Healing',
+    equipment: equipmentStepPotionOfHealingFixture,
     sourceLabel: 'Common choice',
     isStackable: true,
     quantityMode: 'locked',
@@ -38,13 +42,18 @@ const meta = {
   parameters: { layout: 'padded' },
   args: {
     equipmentName: 'Potion of Healing',
+    equipment: equipmentStepPotionOfHealingFixture,
     rows,
     draft: createEmptyCharacterBuilderDraft(),
     context: equipmentStepContextFixture,
     catalogIndex: equipmentStepCatalogIndexFixture,
     onReleaseGrant: () => undefined,
     onRemovePurchase: () => undefined,
-    onAddAnother: () => undefined,
+    onApplyMagicItemAcquisition: createStorybookApplyMagicItemAcquisition({
+      draft: createEmptyCharacterBuilderDraft(),
+      context: equipmentStepContextFixture,
+      catalogIndex: equipmentStepCatalogIndexFixture,
+    }),
   },
 } satisfies Meta<typeof EquipmentInventoryManagePanel>
 

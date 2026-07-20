@@ -90,7 +90,9 @@ export function useEquipmentPickerAcquisition(args: {
         equipmentId,
         requestedQuantity,
       })
-      if (patch) onDraftChange(patch)
+      if (!patch) return false
+      onDraftChange(patch)
+      return true
     },
     [catalogIndex, context, draft, onDraftChange],
   )

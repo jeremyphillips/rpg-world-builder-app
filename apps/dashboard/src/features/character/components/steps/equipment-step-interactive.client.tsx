@@ -141,12 +141,7 @@ export function EquipmentStepInteractive({
           onSetPurchaseQuantity={handleSetPurchaseQuantity}
           onReleaseGrant={pickerAcquisition.handleReleaseGrant}
           onRemovePurchase={pickerAcquisition.handleRemovePurchase}
-          onAddAnother={(equipmentId) =>
-            pickerAcquisition.handleApplyMagicItemAcquisition({
-              equipmentId,
-              requestedQuantity: 1,
-            })
-          }
+          onApplyMagicItemAcquisition={pickerAcquisition.handleApplyMagicItemAcquisition}
           onCustomizePackage={() => step.openConversionEditor()}
           onChangeEquipmentOption={() => {
             step.expandPackageChooser()
@@ -179,6 +174,9 @@ export function EquipmentStepInteractive({
         isGoldShoppingPath={showShopping}
         resolveRowActionViewModel={pickerAcquisition.resolveRowActionViewModel}
         resolveGrantManageSources={pickerAcquisition.resolveGrantManageSources}
+        draft={draft}
+        context={step.context}
+        catalogIndex={catalogIndex}
         onApplyMagicItemAcquisition={pickerAcquisition.handleApplyMagicItemAcquisition}
         onApplyPurchase={pickerAcquisition.handleApplyPurchase}
         onReleaseGrant={pickerAcquisition.handleReleaseGrant}
