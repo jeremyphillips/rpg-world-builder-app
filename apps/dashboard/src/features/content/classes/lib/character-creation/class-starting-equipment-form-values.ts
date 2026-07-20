@@ -96,7 +96,6 @@ export function startingEquipmentOptionToFormRow(
   return {
     id: option.id,
     label: option.label,
-    description: option.description,
     wealth: wealthGrantMoneyToForm(option.wealth),
     items: option.items.map(startingEquipmentItemToFormRow),
   }
@@ -109,9 +108,6 @@ export function startingEquipmentOptionFromFormRow(
     id: row.id,
     label: row.label,
     items: row.items.map(startingEquipmentItemFromFormRow),
-  }
-  if (row.description) {
-    option.description = row.description
   }
   const wealth = wealthGrantMoneyFromForm(row.wealth)
   if (wealth) {
@@ -161,7 +157,6 @@ export function startingEquipmentDefaultValues(ctx: ContentFormCtx): StartingEqu
   const goldOption: StartingEquipmentOptionForm = {
     id: 'gold',
     label: 'Starting Gold',
-    description: '',
     items: [],
   }
 

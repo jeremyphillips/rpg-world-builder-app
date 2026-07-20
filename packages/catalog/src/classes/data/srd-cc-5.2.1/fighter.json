@@ -32,7 +32,6 @@
         {
           "id": "heavy",
           "label": "Heavy Armor",
-          "description": "Chain Mail, Greatsword, Flail, 8 Javelins, Dungeoneer's Pack, and 4 GP.",
           "items": [
             {
               "kind": "grant",
@@ -69,7 +68,6 @@
         {
           "id": "skirmisher",
           "label": "Skirmisher",
-          "description": "Studded Leather Armor, Scimitar, Shortsword, Longbow, 20 Arrows, Quiver, Dungeoneer's Pack, and 11 GP.",
           "items": [
             {
               "kind": "grant",
@@ -117,7 +115,6 @@
         {
           "id": "gold",
           "label": "Starting Gold",
-          "description": "Take 155 GP instead of standard equipment.",
           "items": [],
           "wealth": {
             "gp": 155

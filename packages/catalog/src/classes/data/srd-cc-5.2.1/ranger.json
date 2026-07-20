@@ -88,7 +88,6 @@
         {
           "id": "standard",
           "label": "Standard Equipment",
-          "description": "Studded Leather Armor, Scimitar, Shortsword, Longbow, 20 Arrows, Quiver, Druidic Focus (sprig of mistletoe), Explorer's Pack, and 7 GP.",
           "items": [
             {
               "kind": "grant",
@@ -141,7 +140,6 @@
         {
           "id": "gold",
           "label": "Starting Gold",
-          "description": "Take 150 GP instead of standard equipment.",
           "items": [],
           "wealth": {
             "gp": 150

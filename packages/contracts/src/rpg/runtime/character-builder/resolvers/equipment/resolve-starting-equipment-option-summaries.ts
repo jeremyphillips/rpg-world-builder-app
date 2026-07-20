@@ -5,6 +5,7 @@ import type { EquipmentPool } from '../../../../content/lib/equipment-grant'
 import type { StartingEquipmentOption } from '../../../../content/starting-equipment'
 import {
   isProficiencyLinkedStartingEquipmentGrant,
+  isWealthOnlyStartingEquipmentOption,
   startingEquipmentGrantEquipmentSlug,
   startingEquipmentGrantProficiencyChoiceId,
 } from '../../../../content/starting-equipment'
@@ -18,8 +19,21 @@ import {
 import type { CharacterEquipment } from '../../../character/equipment-inventory'
 import type { CharacterBuildCatalogIndex } from '../../context'
 import type { CharacterBuilderDraft } from '../../draft'
+import {
+  characterWealthFromGrant,
+  type CharacterWealth,
+} from '../../../character/equipment-inventory'
 import { equipmentPoolSummaryLabel } from './equipment-pool-choice-options'
+import {
+  formatStartingEquipmentPackageDescription,
+  formatStartingGoldOptionDescription,
+} from './format-starting-equipment-option-description'
 import { resolveProficiencyLinkedEquipmentGrant } from './resolve-proficiency-linked-equipment-grant'
+
+/** Pre-resolved display inputs for starting-equipment summaries. No campaign policy inside. */
+export type StartingEquipmentSummaryContext = {
+  resolvedGoldOptionWealthByOptionId: ReadonlyMap<string, CharacterWealth>
+}
 
 export const STARTING_EQUIPMENT_MISSING_ITEM_MESSAGE = 'Missing from catalog'
 export const STARTING_EQUIPMENT_UNAVAILABLE_POOL_MESSAGE = 'No matching items in catalog'
@@ -63,6 +77,7 @@ export type StartingEquipmentOptionSummary = {
   label: string
   description?: string
   wealth?: CharacterWealthGrant
+  orderedItems: readonly StartingEquipmentOptionSummaryItem[]
   itemsByGroup: Record<StartingEquipmentInventoryGroup, StartingEquipmentOptionSummaryItem[]>
   missingItemSlugs: string[]
   unselectableReasons: readonly string[]
@@ -277,9 +292,11 @@ function summarizeOption(
   option: StartingEquipmentOption,
   catalogIndex: CharacterBuildCatalogIndex,
   draft?: CharacterBuilderDraft,
+  context?: StartingEquipmentSummaryContext,
 ): StartingEquipmentOptionSummary {
   const rulesetId = characterClass.rulesetId
   const itemsByGroup = EMPTY_ITEMS_BY_GROUP()
+  const orderedItems: StartingEquipmentOptionSummaryItem[] = []
   const missingItemSlugs: string[] = []
   const unselectableReasons: string[] = []
 
@@ -292,12 +309,14 @@ function summarizeOption(
           catalogIndex,
           draft,
         )
+        orderedItems.push(summary)
         unselectableReasons.push(...reasons)
         if (group) itemsByGroup[group].push(summary)
         continue
       }
 
       const { summary, group, reasons } = summarizeGrantItem(item, rulesetId, catalogIndex)
+      orderedItems.push(summary)
       if (summary.isMissing) {
         const equipmentSlug = startingEquipmentGrantEquipmentSlug(item)
         if (equipmentSlug) missingItemSlugs.push(equipmentSlug)
@@ -308,15 +327,28 @@ function summarizeOption(
     }
 
     const { summary, reasons } = summarizeChoiceItem(item, rulesetId, catalogIndex)
+    orderedItems.push(summary)
     unselectableReasons.push(...reasons)
     itemsByGroup[inventoryGroupForChoice(item.pool)].push(summary)
   }
 
+  const description = isWealthOnlyStartingEquipmentOption(option)
+    ? formatStartingGoldOptionDescription({
+        wealth:
+          context?.resolvedGoldOptionWealthByOptionId.get(option.id) ??
+          characterWealthFromGrant(option.wealth!),
+      })
+    : formatStartingEquipmentPackageDescription({
+        orderedItems,
+        wealth: option.wealth,
+      })
+
   return {
     optionId: option.id,
     label: option.label,
-    description: option.description,
+    description,
     wealth: option.wealth,
+    orderedItems,
     itemsByGroup,
     missingItemSlugs,
     unselectableReasons,
@@ -329,11 +361,12 @@ export function resolveStartingEquipmentOptionSummaries(
   characterClass: CharacterClass,
   catalogIndex: CharacterBuildCatalogIndex,
   draft?: CharacterBuilderDraft,
+  context?: StartingEquipmentSummaryContext,
 ): StartingEquipmentOptionSummary[] {
   const startingEquipment = characterClass.characterCreation?.startingEquipment
   if (!startingEquipment) return []
 
   return startingEquipment.options.map((option) =>
-    summarizeOption(characterClass, option, catalogIndex, draft),
+    summarizeOption(characterClass, option, catalogIndex, draft, context),
   )
 }

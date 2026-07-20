@@ -11,7 +11,11 @@ import {
 import { indexCharacterBuildCatalog } from '../../context'
 import { createEmptyCharacterBuilderDraft } from '../../draft'
 import { startingEquipmentChoiceSetId } from './resolve-starting-equipment-choice-sets'
-import { deriveEquipmentBudgetSummary, maxAffordableEquipmentQuantity } from './equipment-budget'
+import {
+  deriveEquipmentBudgetSummary,
+  maxAffordableEquipmentQuantity,
+  resolveStartingGoldOptionWealthByOptionId,
+} from './equipment-budget'
 
 const RULESET = 'srd-cc-5.2.1' as const
 
@@ -120,6 +124,53 @@ describe('deriveEquipmentBudgetSummary', () => {
     }
 
     expect(maxAffordableEquipmentQuantity(rope, budget, 2)).toBe(8)
+  })
+})
+
+describe('resolveStartingGoldOptionWealthByOptionId', () => {
+  it('includes tier bonus for wealth-only options', () => {
+    const catalogIndex = indexCharacterBuildCatalog({
+      species: [],
+      classes: [storedDruid],
+      spells: [],
+      equipment: [rope],
+      skillProficiencies: [],
+      languages: [],
+    })
+
+    const characterClass = catalogIndex.classes.get(storedDruid.id)!
+    const draft = {
+      ...createEmptyCharacterBuilderDraft(),
+      class: { classId: storedDruid.id, level: 5 as const },
+    }
+
+    const wealthByOptionId = resolveStartingGoldOptionWealthByOptionId(characterClass, draft, {
+      startingWealth: {
+        name: 'Tier bonus',
+        scope: { kind: 'standard' },
+        tiers: [
+          {
+            id: 'tier-5',
+            label: 'Level 5+',
+            minLevel: 5,
+            maxLevel: 20,
+            includeNormalStartingEquipment: true,
+            magicItemGrants: [],
+            bonusGold: {
+              baseGp: 100,
+              formula: {
+                kind: 'dice',
+                dice: { count: 1, faces: 6 },
+                multiplier: 0,
+                currency: 'gp',
+              },
+            },
+          },
+        ],
+      },
+    })
+
+    expect(wealthToCopper(wealthByOptionId.get('gold')!)).toBe(15_000)
   })
 })
 

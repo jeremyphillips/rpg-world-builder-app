@@ -88,7 +88,6 @@
         {
           "id": "standard",
           "label": "Standard Equipment",
-          "description": "Chain Mail, Shield, Longsword, 6 Javelins, Holy Symbol, Priest's Pack, and 9 GP.",
           "items": [
             {
               "kind": "grant",
@@ -131,7 +130,6 @@
         {
           "id": "gold",
           "label": "Starting Gold",
-          "description": "Take 150 GP instead of standard equipment.",
           "items": [],
           "wealth": {
             "gp": 150

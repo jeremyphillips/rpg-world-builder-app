@@ -139,6 +139,8 @@ describe('resolveStartingEquipmentOptionSummaries', () => {
 
     expect(standard.isSelectable).toBe(true)
     expect(standard.wealth).toEqual({ gp: 19 })
+    expect(standard.description).toBe('Leather Armor, 1× Musical Instrument, and 19 GP.')
+    expect(standard.orderedItems).toHaveLength(2)
     expect(standard.itemsByGroup.armor).toHaveLength(1)
     expect(standard.itemsByGroup.tools).toHaveLength(1)
     expect(standard.itemsByGroup.armor[0]).toMatchObject({

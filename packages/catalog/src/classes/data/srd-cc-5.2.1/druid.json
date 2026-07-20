@@ -134,7 +134,6 @@
         {
           "id": "standard",
           "label": "Standard Equipment",
-          "description": "Leather Armor, Shield, Sickle, Druidic Focus, Explorer's Pack, Herbalism Kit, and 9 GP.",
           "items": [
             {
               "kind": "grant",
@@ -178,7 +177,6 @@
         {
           "id": "gold",
           "label": "Starting Gold",
-          "description": "Take 50 GP instead of standard equipment.",
           "items": [],
           "wealth": {
             "gp": 50

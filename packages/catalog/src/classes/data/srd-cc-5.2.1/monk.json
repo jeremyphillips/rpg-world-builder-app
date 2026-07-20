@@ -32,7 +32,6 @@
         {
           "id": "standard",
           "label": "Standard Equipment",
-          "description": "Spear, 5 Daggers, Artisan's Tools or Musical Instrument (from your tool proficiency above), Explorer's Pack, and 11 GP.",
           "items": [
             {
               "kind": "grant",
@@ -75,7 +74,6 @@
         {
           "id": "gold",
           "label": "Starting Gold",
-          "description": "Take 50 GP instead of standard equipment.",
           "items": [],
           "wealth": {
             "gp": 50

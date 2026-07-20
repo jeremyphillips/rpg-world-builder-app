@@ -104,6 +104,7 @@ export function EquipmentStepInteractive({
         <EquipmentStepInventorySection
           draft={draft}
           catalogIndex={catalogIndex}
+          budget={budget}
           conversionEditorOpen={step.conversionEditorOpen}
           selectedPackageItemKeys={step.selectedPackageItemKeys}
           conversionCommitStatusMessage={step.conversionCommitStatusMessage}

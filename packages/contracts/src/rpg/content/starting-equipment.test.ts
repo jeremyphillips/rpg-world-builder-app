@@ -14,8 +14,6 @@ const DRUID_STARTING_EQUIPMENT = {
     {
       id: 'standard',
       label: 'Standard Equipment',
-      description:
-        "Leather Armor, Shield, Sickle, Druidic Focus, Explorer's Pack, Herbalism Kit, and 9 GP.",
       items: [
         { kind: 'grant', equipmentSlug: 'leather-armor', quantity: 1, equipped: true },
         { kind: 'grant', equipmentSlug: 'shield', quantity: 1, equipped: true },
@@ -35,7 +33,6 @@ const DRUID_STARTING_EQUIPMENT = {
     {
       id: 'gold',
       label: 'Starting Gold',
-      description: 'Take 50 GP instead of standard equipment.',
       items: [],
       wealth: { gp: 50 },
     },
@@ -112,6 +109,21 @@ describe('startingEquipmentChoiceSchema', () => {
       target: { source: 'equipment', equipmentSlug: 'quarterstaff' },
       modifiers: [{ kind: 'spellcasting_focus', spellcastingGearKind: 'druidic_focus' }],
     })
+  })
+
+  it('rejects options with no items and no wealth grant', () => {
+    expect(
+      startingEquipmentChoiceSchema.safeParse({
+        choose: 1,
+        options: [
+          {
+            id: 'empty',
+            label: 'Empty Package',
+            items: [],
+          },
+        ],
+      }).success,
+    ).toBe(false)
   })
 
   it('accepts structured item choices filtered by tool category', () => {

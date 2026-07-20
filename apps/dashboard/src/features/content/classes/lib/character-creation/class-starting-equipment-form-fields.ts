@@ -32,7 +32,6 @@ import {
   equipmentGrantTitle,
   equipmentGrantSummary,
 } from '../../../lib/forms/grants/equipment-grant-form-values'
-import { STARTING_EQUIPMENT_OPTION_DESCRIPTION_HINT } from './class-starting-equipment-form-labels'
 
 /** Starting equipment validation messages (tier 3 form overrides). */
 export const startingEquipmentValidationMessages = {
@@ -129,7 +128,6 @@ export const startingEquipmentOptionFormSchema = z
   .object({
     id: z.string().min(1).optional(),
     label: z.string().min(1),
-    description: z.string().optional(),
     wealth: wealthGrantMoneyFormSchema.optional(),
     items: z.array(startingEquipmentItemFormSchema),
   })
@@ -270,15 +268,6 @@ export function startingEquipmentOptionItemFields(ctx: ContentFormCtx): FormItem
       name: 'label',
       label: 'Label',
       required: true,
-    },
-    {
-      type: 'richtext',
-      name: 'description',
-      label: 'Description',
-      linkable: true,
-      internalLinkOptions: ctx.options?.richTextInternalLinkOptions,
-      contentTypeOptions: ctx.options?.richTextContentTypeOptions,
-      hint: STARTING_EQUIPMENT_OPTION_DESCRIPTION_HINT,
     },
     ...wealthGrantMoneyField('wealth'),
     {

@@ -1,6 +1,8 @@
 import type { StartingWealthRules } from '../../../../campaign/rules/starting-wealth'
 import { resolveStartingWealthTierForBuilder } from '../../../../campaign/rules/starting-wealth'
+import type { CharacterClass } from '../../../../content/classes/class'
 import type { Equipment } from '../../../../content/equipment'
+import { isWealthOnlyStartingEquipmentOption } from '../../../../content/starting-equipment'
 import { averageTierBonusGold } from '../../../../primitives/currency-formula'
 import {
   copperToWealth,
@@ -22,6 +24,7 @@ import { readSelectedStartingEquipmentOptionId } from './resolve-starting-equipm
 
 export type DeriveEquipmentBudgetSummaryOptions = {
   startingWealth?: StartingWealthRules
+  resolvedGoldOptionWealthByOptionId?: ReadonlyMap<string, CharacterWealth>
 }
 
 function resolveTierBonusCopper(
@@ -110,6 +113,7 @@ function buildEquipmentBudgetSummary(
 function resolvePackageStartingCopper(
   draft: CharacterBuilderDraft,
   catalogIndex: CharacterBuildCatalogIndex,
+  resolvedGoldOptionWealthByOptionId?: ReadonlyMap<string, CharacterWealth>,
 ): number | undefined {
   const classId = draft.class.classId
   if (!classId) return undefined
@@ -122,7 +126,83 @@ function resolvePackageStartingCopper(
   const option = startingEquipment.options.find((entry) => entry.id === selectedOptionId)
   if (!option) return undefined
 
+  if (
+    isWealthOnlyStartingEquipmentOption(option) &&
+    resolvedGoldOptionWealthByOptionId?.has(selectedOptionId)
+  ) {
+    return wealthToCopper(resolvedGoldOptionWealthByOptionId.get(selectedOptionId)!)
+  }
+
   return wealthToCopper(characterWealthFromGrant(option.wealth))
+}
+
+/** Tier-aware starting wealth for each wealth-only starting-equipment option. */
+export function resolveStartingGoldOptionWealthByOptionId(
+  characterClass: CharacterClass,
+  draft: CharacterBuilderDraft,
+  options?: { startingWealth?: StartingWealthRules },
+): ReadonlyMap<string, CharacterWealth> {
+  const startingEquipment = characterClass.characterCreation?.startingEquipment
+  if (!startingEquipment) return new Map()
+
+  const startingLevel = getBuilderSelectedStartingLevel(draft)
+  const tierBonusCp = resolveTierBonusCopper(options?.startingWealth, startingLevel)
+  const result = new Map<string, CharacterWealth>()
+
+  for (const option of startingEquipment.options) {
+    if (!isWealthOnlyStartingEquipmentOption(option)) continue
+
+    const baseCp = wealthToCopper(characterWealthFromGrant(option.wealth!))
+    result.set(option.id, copperToWealth(baseCp + tierBonusCp))
+  }
+
+  return result
+}
+
+function isPreResolvedGoldSelection(
+  draft: CharacterBuilderDraft,
+  catalogIndex: CharacterBuildCatalogIndex,
+  resolvedGoldOptionWealthByOptionId?: ReadonlyMap<string, CharacterWealth>,
+): boolean {
+  const classId = draft.class.classId
+  if (!classId) return false
+
+  const selectedOptionId = readSelectedStartingEquipmentOptionId(draft, classId)
+  if (!selectedOptionId || !resolvedGoldOptionWealthByOptionId?.has(selectedOptionId)) {
+    return false
+  }
+
+  const characterClass = catalogIndex.classes.get(classId)
+  const selectedOption = characterClass?.characterCreation?.startingEquipment?.options.find(
+    (entry) => entry.id === selectedOptionId,
+  )
+
+  return selectedOption !== undefined && isWealthOnlyStartingEquipmentOption(selectedOption)
+}
+
+function resolveBudgetStartingCopper(
+  draft: CharacterBuilderDraft,
+  catalogIndex: CharacterBuildCatalogIndex,
+  tierBonusCp: number,
+  options?: DeriveEquipmentBudgetSummaryOptions,
+): number | undefined {
+  const packageStartingCp = resolvePackageStartingCopper(
+    draft,
+    catalogIndex,
+    options?.resolvedGoldOptionWealthByOptionId,
+  )
+
+  if (packageStartingCp === undefined) {
+    return tierBonusCp > 0 ? tierBonusCp : undefined
+  }
+
+  if (
+    isPreResolvedGoldSelection(draft, catalogIndex, options?.resolvedGoldOptionWealthByOptionId)
+  ) {
+    return packageStartingCp
+  }
+
+  return packageStartingCp + tierBonusCp
 }
 
 /** Derives starting/spent/remaining wealth from the selected package and draft purchases. */
@@ -131,20 +211,16 @@ export function deriveEquipmentBudgetSummary(
   catalogIndex: CharacterBuildCatalogIndex,
   options?: DeriveEquipmentBudgetSummaryOptions,
 ): EquipmentBudgetSummary | undefined {
-  const classId = draft.class.classId
-  if (!classId) return undefined
+  if (!draft.class.classId) return undefined
 
   const startingLevel = getBuilderSelectedStartingLevel(draft)
   const tierBonusCp = resolveTierBonusCopper(options?.startingWealth, startingLevel)
   const purchases = draft.equipment?.purchases ?? []
-  const packageStartingCp = resolvePackageStartingCopper(draft, catalogIndex)
+  const startingCp = resolveBudgetStartingCopper(draft, catalogIndex, tierBonusCp, options)
 
-  if (packageStartingCp === undefined) {
-    if (tierBonusCp <= 0) return undefined
-    return buildEquipmentBudgetSummary(tierBonusCp, purchases, catalogIndex)
-  }
+  if (startingCp === undefined) return undefined
 
-  return buildEquipmentBudgetSummary(packageStartingCp + tierBonusCp, purchases, catalogIndex)
+  return buildEquipmentBudgetSummary(startingCp, purchases, catalogIndex)
 }
 
 export type { CoinWealth }

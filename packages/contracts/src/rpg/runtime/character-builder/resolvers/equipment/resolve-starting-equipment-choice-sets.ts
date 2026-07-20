@@ -67,7 +67,6 @@ export function resolveStartingEquipmentChoiceSets(
       options: startingEquipment.options.map((option) => ({
         id: option.id,
         label: option.label,
-        description: option.description,
       })),
       required: true,
     },

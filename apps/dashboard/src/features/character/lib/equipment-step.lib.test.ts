@@ -4,8 +4,15 @@ import {
   createEmptyCharacterBuilderDraft,
   buildChoiceSetId,
   createDeterministicLegacyPurchaseId,
+  defaultCampaignMechanicsPatch,
+  DEFAULT_ABILITY_GENERATION_RULES,
+  deriveEquipmentBudgetSummary,
+  resolveCharacterCreationPatch,
   resolveStartingEquipmentOptionSummaries,
   startingEquipmentChoiceSetId,
+  wealthToCopper,
+  type CharacterBuildContext,
+  type StartingWealthRules,
 } from '@rpg/contracts'
 
 import {
@@ -15,13 +22,14 @@ import {
   buildEquipmentSetPurchaseQuantityPatch,
   formatEquipmentInventoryRemoveLabel,
   formatEquipmentSourceLabel,
-  formatStartingEquipmentOptionMeta,
   hasSelectableStartingEquipmentOption,
   isStartingGoldOptionId,
   isSelectedStartingEquipmentReady,
   isUniqueEquipmentOwnedInDraft,
   listEquipmentInventoryRowsFromDraft,
   listProficiencyLinksForOption,
+  resolveEquipmentStepBudget,
+  resolveEquipmentStepPickerItems,
   resolvePurchaseSourceMode,
   shouldShowEquipmentFallback,
   shouldShowEquipmentBudget,
@@ -29,6 +37,8 @@ import {
 } from './equipment-step.lib'
 import {
   equipmentStepBardClassFixture,
+  equipmentStepBreastplateFixture,
+  equipmentStepCatalogFixture,
   equipmentStepCatalogIndexFixture,
   equipmentStepDaggerFixture,
   equipmentStepLeatherArmorFixture,
@@ -36,10 +46,108 @@ import {
   equipmentStepMonkClassFixture,
 } from './equipment-step.fixtures'
 
+const tierBonusStartingWealthFixture: StartingWealthRules = {
+  name: 'Tier bonus test wealth',
+  scope: { kind: 'standard' },
+  tiers: [
+    {
+      id: 'tier-5-plus',
+      label: 'Levels 5–20',
+      minLevel: 5,
+      maxLevel: 20,
+      includeNormalStartingEquipment: true,
+      magicItemGrants: [],
+      bonusGold: {
+        baseGp: 500,
+        formula: {
+          kind: 'dice',
+          dice: { count: 1, faces: 10 },
+          multiplier: 25,
+          currency: 'gp',
+        },
+      },
+    },
+  ],
+}
+
+function createEquipmentStepContextWithStartingWealth(
+  startingWealth: StartingWealthRules,
+): CharacterBuildContext {
+  return {
+    channel: 'build',
+    surface: 'dashboard',
+    characterKind: 'pc',
+    mode: 'dashboard',
+    scope: { type: 'standalone', rulesetId: equipmentStepBardClassFixture.rulesetId },
+    rulesScope: { type: 'ruleset', rulesetId: equipmentStepBardClassFixture.rulesetId },
+    ownershipTarget: { type: 'user' },
+    rulesetId: equipmentStepBardClassFixture.rulesetId,
+    catalog: equipmentStepCatalogFixture,
+    characterCreationRules: {
+      ...resolveCharacterCreationPatch(undefined, startingWealth),
+      abilityGeneration: DEFAULT_ABILITY_GENERATION_RULES,
+      armorClass: defaultCampaignMechanicsPatch().armorClass,
+    },
+    permissions: { canCreateCharacter: true },
+  }
+}
+
 describe('equipment-step.lib', () => {
   it('detects gold options', () => {
     expect(isStartingGoldOptionId('gold')).toBe(true)
     expect(isStartingGoldOptionId('standard')).toBe(false)
+  })
+
+  it('aligns picker affordability with the same campaign tier bonus budget as the drawer', () => {
+    const context = createEquipmentStepContextWithStartingWealth(tierBonusStartingWealthFixture)
+    const draft = {
+      ...createEmptyCharacterBuilderDraft(),
+      class: { classId: equipmentStepBardClassFixture.id, level: 5 as const },
+      choiceSelections: {
+        [startingEquipmentChoiceSetId(equipmentStepBardClassFixture.id)]: ['gold'],
+      },
+      equipment: {
+        mode: 'gold' as const,
+        purchases: [],
+        removedPackageItemKeys: [],
+        customized: false,
+      },
+    }
+
+    const budget = resolveEquipmentStepBudget(draft, equipmentStepCatalogIndexFixture, context)
+    expect(budget).toBeDefined()
+    expect(wealthToCopper(budget!.starting)).toBeGreaterThan(
+      wealthToCopper({ gp: 90, sp: 0, cp: 0, pp: 0 }),
+    )
+
+    const { items } = resolveEquipmentStepPickerItems({
+      draft,
+      characterClass: equipmentStepBardClassFixture,
+      catalogIndex: equipmentStepCatalogIndexFixture,
+      choiceSets: [],
+      budget,
+    })
+
+    const breastplate = items.find(
+      (item) => item.equipment.id === equipmentStepBreastplateFixture.id,
+    )
+    expect(breastplate?.state.isWithinRemainingBudget).toBe(true)
+
+    const budgetWithoutTierBonus = deriveEquipmentBudgetSummary(
+      draft,
+      equipmentStepCatalogIndexFixture,
+    )
+    const { items: itemsWithoutTierBonus } = resolveEquipmentStepPickerItems({
+      draft,
+      characterClass: equipmentStepBardClassFixture,
+      catalogIndex: equipmentStepCatalogIndexFixture,
+      choiceSets: [],
+      budget: budgetWithoutTierBonus,
+    })
+    expect(
+      itemsWithoutTierBonus.find((item) => item.equipment.id === equipmentStepBreastplateFixture.id)
+        ?.state.isWithinRemainingBudget,
+    ).toBe(false)
   })
 
   it('shows equipment shopping only on the gold path', () => {
@@ -802,6 +910,7 @@ describe('starting equipment fallback helpers', () => {
       {
         optionId: 'standard',
         label: 'Standard',
+        orderedItems: [],
         itemsByGroup: {
           weapons: [],
           armor: [],
@@ -824,6 +933,7 @@ describe('starting equipment fallback helpers', () => {
       {
         optionId: 'broken',
         label: 'Broken',
+        orderedItems: [],
         itemsByGroup: {
           weapons: [],
           armor: [],
@@ -842,15 +952,13 @@ describe('starting equipment fallback helpers', () => {
     expect(shouldShowEquipmentFallback(broken)).toBe(true)
   })
 
-  it('formats option meta from resolved summaries', () => {
+  it('derives option descriptions from resolved summaries', () => {
     const summaries = resolveStartingEquipmentOptionSummaries(
       equipmentStepBardClassFixture,
       equipmentStepCatalogIndexFixture,
     )
     const standard = summaries.find((summary) => summary.optionId === 'standard')!
 
-    expect(formatStartingEquipmentOptionMeta(standard)).toEqual(
-      expect.arrayContaining(['Leather Armor (equipped)', '1× Musical Instrument', '19 GP']),
-    )
+    expect(standard.description).toBe('Leather Armor, 1× Musical Instrument, and 19 GP.')
   })
 })

@@ -14,6 +14,7 @@ import {
   rebuildPackageSwitchDraftQuantities,
   resolveBuilderStepReadiness,
   resolveStartingEquipmentOptionSummaries,
+  resolveStartingGoldOptionWealthByOptionId,
   type CharacterBuildContext,
   type CharacterBuilderDraft,
   type ChoiceSet,
@@ -94,12 +95,23 @@ export function useEquipmentStep(args: {
   const startingEquipmentChoiceSet = classId
     ? findStartingEquipmentChoiceSet(resolvedChoiceSets, classId)
     : undefined
+  const goldOptionWealthById = useMemo(
+    () =>
+      characterClass
+        ? resolveStartingGoldOptionWealthByOptionId(characterClass, draft, {
+            startingWealth: context.characterCreationRules.startingWealth,
+          })
+        : new Map(),
+    [characterClass, context.characterCreationRules.startingWealth, draft],
+  )
   const summaries = useMemo(
     () =>
       characterClass
-        ? resolveStartingEquipmentOptionSummaries(characterClass, catalogIndex, draft)
+        ? resolveStartingEquipmentOptionSummaries(characterClass, catalogIndex, draft, {
+            resolvedGoldOptionWealthByOptionId: goldOptionWealthById,
+          })
         : [],
-    [catalogIndex, characterClass, draft],
+    [catalogIndex, characterClass, draft, goldOptionWealthById],
   )
   const selectedOptionId = readSelectedStartingEquipmentOption(draft, classId)
   const showFallback =
@@ -107,8 +119,11 @@ export function useEquipmentStep(args: {
   const showBudget = shouldShowEquipmentBudget(draft, selectedOptionId)
   const showShopping = shouldShowEquipmentShopping(draft, selectedOptionId)
   const budget = useMemo(
-    () => (showBudget ? resolveEquipmentStepBudget(draft, catalogIndex, context) : undefined),
-    [catalogIndex, context, draft, showBudget],
+    () =>
+      showBudget
+        ? resolveEquipmentStepBudget(draft, catalogIndex, context, goldOptionWealthById)
+        : undefined,
+    [catalogIndex, context, draft, goldOptionWealthById, showBudget],
   )
   const { items: pickerItems, browseSortContext: pickerBrowseSortContext } = useMemo(
     () =>
@@ -118,9 +133,10 @@ export function useEquipmentStep(args: {
             characterClass,
             catalogIndex,
             choiceSets: resolvedChoiceSets,
+            budget,
           })
         : { items: [], browseSortContext: { preferMartialWeaponBrowseOrder: false } },
-    [catalogIndex, characterClass, draft, resolvedChoiceSets],
+    [budget, catalogIndex, characterClass, draft, resolvedChoiceSets],
   )
   const characterPreviewContext = useMemo(
     () =>
@@ -399,6 +415,7 @@ export function useEquipmentStep(args: {
       equipmentId: item.equipment.id,
       sourceMode: resolvePurchaseSourceMode(),
       quantity,
+      budget,
     })
     if (patch) onDraftChange(patch)
   }
@@ -412,6 +429,7 @@ export function useEquipmentStep(args: {
       catalogIndex,
       purchaseId: target.purchaseId,
       quantity,
+      budget,
     })
     if (patch) onDraftChange(patch)
   }
@@ -450,6 +468,7 @@ export function useEquipmentStep(args: {
       catalogIndex,
       purchaseId,
       quantity: currentQuantity - 1,
+      budget,
     })
     if (patch) onDraftChange(patch)
   }

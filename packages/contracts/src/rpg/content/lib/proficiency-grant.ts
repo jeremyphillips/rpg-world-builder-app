@@ -1,5 +1,6 @@
 import { z } from 'zod'
 
+import { joinNaturalList } from '../../primitives/prose'
 import {
   armorCategorySchema,
   getArmorCategoryCompactLabel,
@@ -314,13 +315,6 @@ export const armorTrainingGrantSchema = z
 export type ArmorTrainingGrant = z.infer<typeof armorTrainingGrantSchema>
 
 // --- Formatters -------------------------------------------------------------
-
-export function joinNaturalList(items: string[]): string {
-  if (items.length === 0) return ''
-  if (items.length === 1) return items[0]!
-  if (items.length === 2) return `${items[0]} and ${items[1]}`
-  return `${items.slice(0, -1).join(', ')}, and ${items.at(-1)}`
-}
 
 function formatAllCategoriesPhrase(
   categories: string[],

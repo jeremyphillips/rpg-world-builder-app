@@ -196,7 +196,6 @@ export const equipmentStepBardClassFixture = {
         {
           id: 'standard',
           label: 'Standard Equipment',
-          description: 'Leather armor, a musical instrument, and starting gold.',
           items: [
             {
               kind: 'grant',
@@ -219,7 +218,6 @@ export const equipmentStepBardClassFixture = {
         {
           id: 'gold',
           label: 'Starting Gold',
-          description: 'Take gold instead of a gear package.',
           items: [],
           wealth: { gp: 90 },
         },
@@ -253,8 +251,6 @@ export const equipmentStepMonkClassFixture = {
         {
           id: 'standard',
           label: 'Standard Equipment',
-          description:
-            "Spear, 5 Daggers, Artisan's Tools or Musical Instrument (from your tool proficiency above), Explorer's Pack, and 11 GP.",
           items: [
             {
               kind: 'grant',
@@ -283,7 +279,6 @@ export const equipmentStepMonkClassFixture = {
         {
           id: 'gold',
           label: 'Starting Gold',
-          description: 'Take gold instead of a gear package.',
           items: [],
           wealth: { gp: 50 },
         },

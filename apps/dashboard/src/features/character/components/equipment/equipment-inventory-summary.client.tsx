@@ -2,7 +2,11 @@
 
 import { useMemo } from 'react'
 
-import type { CharacterBuildCatalogIndex, CharacterBuilderDraft } from '@rpg/contracts'
+import type {
+  CharacterBuildCatalogIndex,
+  CharacterBuilderDraft,
+  EquipmentBudgetSummary,
+} from '@rpg/contracts'
 import { Text } from '@rpg/ui'
 
 import type {
@@ -23,6 +27,7 @@ import {
 export type EquipmentInventorySummaryProps = {
   draft: CharacterBuilderDraft
   catalogIndex: CharacterBuildCatalogIndex
+  budget?: EquipmentBudgetSummary
   conversionEditorOpen?: boolean
   selectedPackageItemKeys?: ReadonlySet<string>
   conversionCommitStatusMessage?: string
@@ -40,6 +45,7 @@ export type EquipmentInventorySummaryProps = {
 export function EquipmentInventorySummary({
   draft,
   catalogIndex,
+  budget,
   conversionEditorOpen = false,
   selectedPackageItemKeys = new Set(),
   conversionCommitStatusMessage,
@@ -54,8 +60,8 @@ export function EquipmentInventorySummary({
   onOpenPicker,
 }: EquipmentInventorySummaryProps) {
   const layout = useMemo(
-    () => buildEquipmentInventoryLayout(draft, catalogIndex),
-    [catalogIndex, draft],
+    () => buildEquipmentInventoryLayout(draft, catalogIndex, budget),
+    [budget, catalogIndex, draft],
   )
 
   if (!shouldRenderEquipmentInventorySummary(layout, showBrowseEquipment)) {

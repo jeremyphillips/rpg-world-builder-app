@@ -21,8 +21,6 @@ import {
   STARTING_EQUIPMENT_GOLD_OPTION_ID,
   areNestedPoolsResolved,
   findChoiceSetById,
-  formatStartingEquipmentOptionMeta,
-  formatStartingEquipmentWealth,
   isStartingGoldOptionId,
   listNestedPoolsForOption,
   listProficiencyLinksForOption,
@@ -197,7 +195,6 @@ function PackageOptionCard({
     [characterClass, option],
   )
   const disabled = !summary.isSelectable
-  const meta = formatStartingEquipmentOptionMeta(summary)
   const isSelected = selectedOptionId === summary.optionId
   const showNestedFields = isSelected && (nestedPools.length > 0 || proficiencyLinks.length > 0)
 
@@ -213,7 +210,6 @@ function PackageOptionCard({
         disabled={disabled}
         label={summary.label}
         description={summary.description}
-        meta={meta}
         className={startingEquipmentOptionCardRadioItemClasses}
         titleClassName={startingEquipmentOptionCardTitleClasses}
         onClick={() => {
@@ -310,7 +306,6 @@ function GoldOptionCard({
   isPackageChooserExpanded: boolean
   onCollapseChooser: StartingEquipmentOptionCardsProps['onCollapseChooser']
 }) {
-  const wealth = formatStartingEquipmentWealth(summary.wealth)
   const isSelected = selectedOptionId === summary.optionId
 
   return (
@@ -324,8 +319,7 @@ function GoldOptionCard({
         value={summary.optionId}
         disabled={!summary.isSelectable}
         label={summary.label}
-        description={summary.description ?? 'Buy your own gear with starting gold.'}
-        meta={wealth ? [wealth] : undefined}
+        description={summary.description}
         className={startingEquipmentOptionCardRadioItemClasses}
         titleClassName={startingEquipmentOptionCardTitleClasses}
         onClick={() => {

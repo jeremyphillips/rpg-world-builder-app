@@ -131,7 +131,7 @@ describe('EquipmentStep', () => {
 
     expect(screen.queryByRole('combobox', { name: 'Musical Instrument' })).not.toBeInTheDocument()
 
-    await user.click(screen.getByRole('radio', { name: /Standard Equipment/i }))
+    await user.click(screen.getByRole('radio', { name: /^Standard Equipment/ }))
 
     expect(onDraftChange).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -227,7 +227,7 @@ describe('EquipmentStep', () => {
     await user.click(screen.getByRole('button', { name: EQUIPMENT_CHANGE_PACKAGE_LABEL }))
 
     expect(screen.getByRole('radio', { name: /^Starting Gold/ })).toBeInTheDocument()
-    expect(screen.getByRole('radio', { name: /Standard Equipment/i })).toBeInTheDocument()
+    expect(screen.getByRole('radio', { name: /^Standard Equipment/ })).toBeInTheDocument()
   })
 
   it('collapses the chooser when clicking the already-selected package', async () => {
@@ -519,7 +519,7 @@ describe('EquipmentStep', () => {
 
     async function openPackageSwitchToStandard(user: ReturnType<typeof userEvent.setup>) {
       await user.click(screen.getByRole('button', { name: EQUIPMENT_CHANGE_PACKAGE_LABEL }))
-      await user.click(screen.getByRole('radio', { name: /Standard Equipment/i }))
+      await user.click(screen.getByRole('radio', { name: /^Standard Equipment/ }))
     }
 
     it('opens the resolution modal when gold purchases exceed the target allowance', async () => {
@@ -650,7 +650,7 @@ describe('EquipmentStep monk proficiency-linked grants', () => {
       class: { classId: equipmentStepMonkClassFixture.id, level: 1 as const },
     })
 
-    await user.click(screen.getByRole('radio', { name: /Standard Equipment/i }))
+    await user.click(screen.getByRole('radio', { name: /^Standard Equipment/ }))
 
     expect(onDraftChange).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -851,7 +851,7 @@ describe('EquipmentStep monk proficiency-linked grants', () => {
     expect(screen.queryByText(EQUIPMENT_INCLUDED_TOOL_SECTION_LABEL)).not.toBeInTheDocument()
 
     await user.click(screen.getByRole('button', { name: EQUIPMENT_CHANGE_PACKAGE_LABEL }))
-    await user.click(screen.getByRole('radio', { name: /Standard Equipment/i }))
+    await user.click(screen.getByRole('radio', { name: /^Standard Equipment/ }))
 
     expect(onDraftChange).toHaveBeenLastCalledWith(
       expect.objectContaining({

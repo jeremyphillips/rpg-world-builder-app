@@ -3,6 +3,9 @@
 How class starting equipment can depend on tool proficiency choices. Two SRD patterns
 ship today; choose based on whether the player should make **one** decision or **two**.
 
+Package display copy in the character builder is **derived** from structured grants and
+wealth at runtime — it is not authored prose on starting-equipment options.
+
 ## Core rule
 
 A proficiency-linked equipment grant may render its referenced ChoiceSet in the selected

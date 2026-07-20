@@ -24,8 +24,6 @@ describe('startingEquipment round-trip', () => {
     expect(startingEquipmentFormSchema.parse(formValues)).toEqual(formValues)
 
     const standard = formValues.options.find((option) => option.id === 'standard')
-    expect(standard?.description).toContain('Artisan')
-    expect(standard?.description).not.toContain('FOLLOWUP')
     expect(
       standard?.items.some(
         (item) =>

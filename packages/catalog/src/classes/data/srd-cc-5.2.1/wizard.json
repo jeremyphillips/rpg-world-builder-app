@@ -137,7 +137,6 @@
         {
           "id": "standard",
           "label": "Standard Equipment",
-          "description": "2 Daggers, Arcane Focus (Staff), Robe, Spellbook, Scholar's Pack, and 5 GP.",
           "items": [
             {
               "kind": "grant",
@@ -174,7 +173,6 @@
         {
           "id": "gold",
           "label": "Starting Gold",
-          "description": "Take 55 GP instead of standard equipment.",
           "items": [],
           "wealth": {
             "gp": 55

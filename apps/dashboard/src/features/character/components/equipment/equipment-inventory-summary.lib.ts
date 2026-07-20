@@ -1,14 +1,17 @@
 import {
+  characterWealthFromGrant,
   formatEquipmentInventoryPriceLine,
+  formatWealth,
   readSelectedStartingEquipmentOptionId,
   resolveGoldStartingEquipmentAlternative,
   type CharacterBuildCatalogIndex,
   type CharacterBuilderDraft,
   type CharacterEquipment,
+  type CharacterWealthGrant,
+  type EquipmentBudgetSummary,
 } from '@rpg/contracts'
 
 import {
-  formatStartingEquipmentWealth,
   isStartingGoldOptionId,
   listEquipmentInventoryRowsFromDraft,
   type EquipmentInventoryRow,
@@ -16,6 +19,13 @@ import {
   type StartingPackageCategoryGroup,
   type StartingPackageInventoryGroup,
 } from '../../lib/equipment-step.lib'
+
+function formatStartingEquipmentWealth(
+  wealth: CharacterWealthGrant | undefined,
+): string | undefined {
+  if (!wealth) return undefined
+  return formatWealth(characterWealthFromGrant(wealth))
+}
 
 export type EquipmentInventorySourceBreakdown = {
   included: number
@@ -235,6 +245,7 @@ function buildPurchasedCategoryGroups(
 export function buildEquipmentInventoryLayout(
   draft: CharacterBuilderDraft,
   catalogIndex: CharacterBuildCatalogIndex,
+  budget?: EquipmentBudgetSummary,
 ): EquipmentInventoryLayout | undefined {
   const classId = draft.class.classId
   if (!classId) return undefined
@@ -248,7 +259,7 @@ export function buildEquipmentInventoryLayout(
   if (!option) return undefined
 
   const isGoldPath = draft.equipment?.mode === 'gold' || isStartingGoldOptionId(selectedOptionId)
-  const allRows = listEquipmentInventoryRowsFromDraft(draft, catalogIndex)
+  const allRows = listEquipmentInventoryRowsFromDraft(draft, catalogIndex, budget)
   const packageRows = allRows.filter((row) => row.removeTarget?.kind === 'package')
   const purchasedRows = allRows.filter((row) => row.removeTarget?.kind === 'purchase')
 

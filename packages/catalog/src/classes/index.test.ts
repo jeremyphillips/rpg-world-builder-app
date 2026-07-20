@@ -853,8 +853,7 @@ describe('SRD 5.2.1 class seed', () => {
     expect(startingEquipment).toBeDefined()
 
     const standard = startingEquipment!.options.find((option) => option.id === 'standard')
-    expect(standard?.description).toContain('Artisan')
-    expect(standard?.description).not.toContain('FOLLOWUP')
+    expect(standard?.items.length).toBeGreaterThan(0)
 
     const linkedGrant = standard?.items.find(
       (item) =>

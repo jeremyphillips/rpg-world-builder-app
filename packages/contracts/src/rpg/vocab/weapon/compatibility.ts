@@ -1,3 +1,4 @@
+import { joinNaturalList } from '../../primitives/prose'
 import { getWeaponModeLabel, type WeaponMode } from './mode'
 import { getWeaponMasteryLabel, type WeaponMastery } from './mastery'
 import { getWeaponPropertyLabel, type WeaponProperty } from './property'
@@ -35,13 +36,6 @@ function incompatiblePropertiesForMode(mode: WeaponMode): readonly WeaponPropert
 
 function incompatibleMasteriesForMode(mode: WeaponMode): readonly WeaponMastery[] {
   return WEAPON_MASTERIES_INCOMPATIBLE_WITH_MODE[mode]
-}
-
-function joinLabels(labels: readonly string[]): string {
-  if (labels.length === 0) return ''
-  if (labels.length === 1) return labels[0]!
-  if (labels.length === 2) return `${labels[0]} and ${labels[1]}`
-  return `${labels.slice(0, -1).join(', ')}, and ${labels.at(-1)}`
 }
 
 function unavailableForModePhrase(mode: WeaponMode, subject: string): string {
@@ -111,7 +105,7 @@ export function formatWeaponPropertyModeHint(mode: WeaponMode | undefined): stri
   )
   if (labels.length === 0) return undefined
 
-  return unavailableForModePhrase(mode, joinLabels(labels))
+  return unavailableForModePhrase(mode, joinNaturalList(labels))
 }
 
 /**
@@ -124,5 +118,5 @@ export function formatWeaponMasteryModeHint(mode: WeaponMode | undefined): strin
   const labels = incompatibleMasteriesForMode(mode).map((mastery) => getWeaponMasteryLabel(mastery))
   if (labels.length === 0) return undefined
 
-  return unavailableForModePhrase(mode, joinLabels(labels))
+  return unavailableForModePhrase(mode, joinNaturalList(labels))
 }

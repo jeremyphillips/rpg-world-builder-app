@@ -8,6 +8,7 @@ const goldSummary = {
   optionId: 'gold',
   label: 'Starting Gold',
   description: 'Take 155 GP instead of standard equipment.',
+  orderedItems: [],
   itemsByGroup: {
     weapons: [],
     armor: [],

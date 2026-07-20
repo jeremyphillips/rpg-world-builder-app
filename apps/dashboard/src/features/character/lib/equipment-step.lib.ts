@@ -7,7 +7,6 @@ import {
   equipmentPoolSummaryLabel,
   formatEquipmentBundleLabel,
   formatEquipmentInventoryPriceLine,
-  formatWealth,
   getInvalidStartingEquipmentProficiencyLinks,
   isEquipmentStackable,
   isProficiencyLinkedStartingEquipmentGrant,
@@ -35,6 +34,7 @@ import {
   type CharacterEquipment,
   type CharacterEquipmentEntry,
   type CharacterSelectionSource,
+  type CharacterWealth,
   formatSelectionSourceLabel,
   type ChoiceSet,
   type Equipment,
@@ -43,8 +43,6 @@ import {
   type EquipmentPickerItem,
   type StartingEquipmentOption,
   type StartingEquipmentOptionSummary,
-  type StartingEquipmentOptionSummaryGrant,
-  type StartingEquipmentOptionSummaryItem,
 } from '@rpg/contracts'
 
 import { clampEquipmentStepQuantity } from './equipment-quantity.lib'
@@ -219,68 +217,6 @@ export function shouldShowEquipmentFallback(
   summaries: readonly StartingEquipmentOptionSummary[],
 ): boolean {
   return summaries.length > 0 && !hasSelectableStartingEquipmentOption(summaries)
-}
-
-export function formatStartingEquipmentWealth(
-  wealth: StartingEquipmentOptionSummary['wealth'],
-): string | undefined {
-  if (!wealth) return undefined
-  return formatWealth({
-    cp: wealth.cp ?? 0,
-    sp: wealth.sp ?? 0,
-    gp: wealth.gp ?? 0,
-    pp: wealth.pp ?? 0,
-  })
-}
-
-function summarizeGrantItem(item: StartingEquipmentOptionSummaryGrant): string {
-  const quantity = item.quantity > 1 ? `${item.quantity}× ` : ''
-  const name = item.equipment?.name ?? item.equipmentSlug
-  const equipped = item.equipped ? ' (equipped)' : ''
-  return `${quantity}${name}${equipped}`
-}
-
-function summarizeChoiceItem(
-  item: Extract<StartingEquipmentOptionSummaryItem, { kind: 'choice' }>,
-): string {
-  return `${item.choose}× ${item.poolLabel}`
-}
-
-function summarizeProficiencyLinkedGrantItem(
-  item: Extract<StartingEquipmentOptionSummaryItem, { kind: 'proficiency_linked_grant' }>,
-): string {
-  if (item.status === 'invalid') {
-    return item.issue ?? `Invalid link to "${item.choiceLabel}"`
-  }
-  if (item.status === 'resolved' && item.resolvedEquipment) {
-    return item.resolvedEquipment.name
-  }
-  return `Selection from "${item.choiceLabel}"`
-}
-
-export function formatStartingEquipmentOptionMeta(
-  summary: StartingEquipmentOptionSummary,
-): string[] {
-  const meta: string[] = []
-
-  for (const group of Object.keys(
-    EQUIPMENT_INVENTORY_GROUP_LABELS,
-  ) as (keyof CharacterEquipment)[]) {
-    for (const item of summary.itemsByGroup[group]) {
-      if (item.kind === 'grant') {
-        meta.push(summarizeGrantItem(item))
-      } else if (item.kind === 'proficiency_linked_grant') {
-        meta.push(summarizeProficiencyLinkedGrantItem(item))
-      } else {
-        meta.push(summarizeChoiceItem(item))
-      }
-    }
-  }
-
-  const wealth = formatStartingEquipmentWealth(summary.wealth)
-  if (wealth) meta.push(wealth)
-
-  return meta
 }
 
 export function listNestedPoolsForOption(
@@ -556,12 +492,20 @@ export function resolveEquipmentStepBudget(
   draft: CharacterBuilderDraft,
   catalogIndex: CharacterBuildCatalogIndex,
   context?: CharacterBuildContext,
+  resolvedGoldOptionWealthByOptionId?: ReadonlyMap<string, CharacterWealth>,
 ): EquipmentBudgetSummary | undefined {
   return deriveEquipmentBudgetSummary(draft, catalogIndex, {
     startingWealth: context?.characterCreationRules.startingWealth,
+    resolvedGoldOptionWealthByOptionId,
   })
 }
 
+/**
+ * Equipment budget is resolved once per step state via {@link resolveEquipmentStepBudget}.
+ * Picker rows, filtering, quantity limits, purchase validation, and displayed budget copy
+ * must consume the same `EquipmentBudgetSummary`; lower-level picker resolvers must not
+ * independently reconstruct campaign wealth.
+ */
 export type EquipmentStepPickerItemsResult = {
   items: EquipmentPickerItem[]
   browseSortContext: EquipmentPickerBrowseSortContext
@@ -572,15 +516,16 @@ export function resolveEquipmentStepPickerItems(args: {
   characterClass: CharacterClass
   catalogIndex: CharacterBuildCatalogIndex
   choiceSets: readonly ChoiceSet[]
+  /** Resolved via `resolveEquipmentStepBudget` — must match drawer/header/purchase validation. */
+  budget?: EquipmentBudgetSummary
 }): EquipmentStepPickerItemsResult {
-  const { draft, characterClass, catalogIndex, choiceSets } = args
+  const { draft, characterClass, catalogIndex, choiceSets, budget } = args
   const proficiencies = assembleCharacterProficiencies(
     draft,
     catalogIndex,
     choiceSets,
     characterClass,
   )
-  const budget = deriveEquipmentBudgetSummary(draft, catalogIndex)
   const recommendations = deriveEquipmentRecommendations({
     characterClass,
     catalogIndex,
@@ -947,6 +892,7 @@ function canAddEquipmentPurchase(args: {
 export function listEquipmentInventoryRowsFromDraft(
   draft: CharacterBuilderDraft,
   catalogIndex: CharacterBuildCatalogIndex,
+  budget?: EquipmentBudgetSummary,
 ): EquipmentInventoryRow[] {
   const classId = draft.class.classId
   if (!classId) return []
@@ -958,8 +904,6 @@ export function listEquipmentInventoryRowsFromDraft(
 
   const option = startingEquipment.options.find((entry) => entry.id === selectedOptionId)
   if (!option) return []
-
-  const budget = deriveEquipmentBudgetSummary(draft, catalogIndex)
 
   const packageRows =
     draft.equipment?.mode === 'gold'
@@ -1027,11 +971,11 @@ export function buildEquipmentAddPurchasePatch(args: {
   equipmentId: string
   sourceMode: CharacterBuilderDraftEquipmentPurchase['sourceMode']
   quantity?: number
+  /** Resolved via `resolveEquipmentStepBudget` when tier bonus or campaign wealth applies. */
+  budget?: EquipmentBudgetSummary
 }): Partial<CharacterBuilderDraft> | undefined {
-  const { draft, catalogIndex, equipmentId, sourceMode, quantity = 1 } = args
+  const { draft, catalogIndex, equipmentId, sourceMode, quantity = 1, budget } = args
   const equipment = catalogIndex.equipment.get(equipmentId)
-
-  const budget = deriveEquipmentBudgetSummary(draft, catalogIndex)
 
   if (
     !equipment ||
@@ -1068,8 +1012,10 @@ export function buildEquipmentSetPurchaseQuantityPatch(args: {
   catalogIndex: CharacterBuildCatalogIndex
   purchaseId: string
   quantity: number
+  /** Resolved via `resolveEquipmentStepBudget` when tier bonus or campaign wealth applies. */
+  budget?: EquipmentBudgetSummary
 }): Partial<CharacterBuilderDraft> | undefined {
-  const { draft, catalogIndex, purchaseId, quantity } = args
+  const { draft, catalogIndex, purchaseId, quantity, budget } = args
   const current = draft.equipment
   if (!current) return undefined
 
@@ -1084,7 +1030,6 @@ export function buildEquipmentSetPurchaseQuantityPatch(args: {
 
   if (quantity < 1) return undefined
 
-  const budget = deriveEquipmentBudgetSummary(draft, catalogIndex)
   const limits = resolveEquipmentPurchaseQuantityLimits({
     equipment,
     sourceMode: purchase.sourceMode,

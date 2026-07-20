@@ -110,7 +110,6 @@
         {
           "id": "standard",
           "label": "Standard Equipment",
-          "description": "Leather Armor, Sickle, 2 Daggers, Arcane Focus (orb), Book (occult lore), Scholar's Pack, and 15 GP.",
           "items": [
             {
               "kind": "grant",
@@ -152,7 +151,6 @@
         {
           "id": "gold",
           "label": "Starting Gold",
-          "description": "Take 100 GP instead of standard equipment.",
           "items": [],
           "wealth": {
             "gp": 100

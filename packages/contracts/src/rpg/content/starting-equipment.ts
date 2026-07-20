@@ -136,10 +136,15 @@ export const startingEquipmentItemSchema = z.preprocess(
 
 export type StartingEquipmentItem = z.infer<typeof startingEquipmentItemSchema>
 
-export const startingEquipmentOptionSchema = contentChoiceOptionSchema.extend({
-  items: z.array(startingEquipmentItemSchema),
-  wealth: characterWealthGrantSchema.optional(),
-})
+export const startingEquipmentOptionSchema = contentChoiceOptionSchema
+  .omit({ description: true })
+  .extend({
+    items: z.array(startingEquipmentItemSchema),
+    wealth: characterWealthGrantSchema.optional(),
+  })
+  .refine((option) => option.items.length > 0 || option.wealth != null, {
+    message: 'Starting equipment option must include items or be wealth-only',
+  })
 
 export type StartingEquipmentOption = z.infer<typeof startingEquipmentOptionSchema>
 

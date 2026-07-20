@@ -35,7 +35,7 @@ import {
   toolProficiencyGrantSchema,
   weaponProficiencyGrantSchema,
 } from './proficiency-grant'
-import { joinNaturalList } from './proficiency-grant'
+import { joinNaturalList } from '../../primitives/prose'
 
 // ---------------------------------------------------------------------------
 // Content grants — shared mechanical payload for species traits, class features,
