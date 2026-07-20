@@ -7,6 +7,7 @@ import { Button, Heading, Text } from '@rpg/ui'
 
 import {
   EQUIPMENT_CLASS_OPTIONS_REPLACED_MESSAGE,
+  EQUIPMENT_MAGIC_ITEMS_PROGRESS_LABEL,
   EQUIPMENT_STEP_CONTINUE_WITHOUT_LABEL,
   EQUIPMENT_STEP_NO_VALID_OPTIONS_MESSAGE,
   formatEquipmentReplacedStartingWealthTitle,
@@ -43,6 +44,30 @@ export function EquipmentStepShoppingSection({ budget }: { budget: EquipmentBudg
         Budget
       </Heading>
       <EquipmentBudgetHeader budget={budget} />
+    </section>
+  )
+}
+
+export function EquipmentStepMagicItemsSection({
+  progressLabel,
+  onOpenPicker,
+}: {
+  progressLabel: string
+  onOpenPicker: () => void
+}) {
+  return (
+    <section className="space-y-3" aria-label="Magic item grants">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <Heading variant="subsection" as="h3">
+          Magic items
+        </Heading>
+        <Button type="button" size="sm" onClick={onOpenPicker}>
+          Choose magic items
+        </Button>
+      </div>
+      <Text variant="muted">
+        {EQUIPMENT_MAGIC_ITEMS_PROGRESS_LABEL}: {progressLabel}
+      </Text>
     </section>
   )
 }

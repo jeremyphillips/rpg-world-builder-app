@@ -529,6 +529,7 @@ export function buildStartingPackageConversionPatch(args: {
     equipment: {
       mode: 'gold',
       purchases: mergeConversionPurchases({ ...args, preview }),
+      magicItemSelections: args.draft.equipment?.magicItemSelections ?? [],
       removedPackageItemKeys: [],
       customized: conversionWasCustomized(preview, args.selectedPackageItemKeys),
       skipped: false,

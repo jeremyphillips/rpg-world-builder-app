@@ -3,7 +3,13 @@
 import * as React from 'react'
 import { CircleAlert } from 'lucide-react'
 
-import { CatalogFilterChips, CatalogPickerSheet, EmphasisDetailLine, Text } from '@rpg/ui'
+import {
+  CatalogFilterChips,
+  CatalogPickerSheet,
+  EmphasisDetailLine,
+  SegmentedControl,
+  Text,
+} from '@rpg/ui'
 import {
   formatMoney,
   formatWealthAsGold,
@@ -39,17 +45,22 @@ import {
   EQUIPMENT_PICKER_CATEGORY_LABEL,
   EQUIPMENT_PICKER_CLEAR_FILTERS_LABEL,
   EQUIPMENT_PICKER_KIND_ALL,
-  EQUIPMENT_PICKER_NO_RECOMMENDATIONS_MESSAGE,
+  EQUIPMENT_PICKER_MODE_LABELS,
+  EQUIPMENT_PICKER_MODE_MAGIC_ITEMS,
+  EQUIPMENT_PICKER_MODE_PURCHASE,
   EQUIPMENT_PICKER_RESET_VIEW_LABEL,
   EQUIPMENT_PICKER_SORT_LABEL,
   EQUIPMENT_PICKER_SORT_LABELS,
   EQUIPMENT_PICKER_SORT_MODES,
+  EQUIPMENT_PICKER_SORT_PRICE_ASC,
+  EQUIPMENT_PICKER_SORT_PRICE_DESC,
   EQUIPMENT_PICKER_TAB_ALL,
   EQUIPMENT_PICKER_TAB_RECOMMENDED,
   type EquipmentPickerDrawerProps,
   type EquipmentPickerItem,
   type EquipmentPickerKindFilter,
   type EquipmentPickerSortMode,
+  EQUIPMENT_PICKER_NO_RECOMMENDATIONS_MESSAGE,
   type EquipmentPickerToolbarResetMode,
 } from './equipment-picker-drawer.types'
 import { EquipmentBudgetHeader } from './equipment-budget-header.client'
@@ -60,6 +71,7 @@ import {
   clampEquipmentStepQuantity,
   resolveEquipmentStepPurchaseMaxQuantity,
 } from '../../lib/equipment-quantity.lib'
+import type { EquipmentPickerWorkflowMode } from '../../lib/equipment-step.lib'
 
 export type { EquipmentPickerDrawerProps } from './equipment-picker-drawer.types'
 
@@ -203,12 +215,25 @@ export function EquipmentPickerDrawer({
   showCharacterPreview = false,
   characterPreviewContext,
   ownedPurchaseQuantities = {},
+  ownedGrantQuantities = {},
+  workflowMode = EQUIPMENT_PICKER_MODE_PURCHASE,
+  workflowModes = [EQUIPMENT_PICKER_MODE_PURCHASE],
+  onWorkflowModeChange,
   toolbarResetMode = 'reset_view',
   isGoldShoppingPath = false,
   onAddItem,
   onRemoveFromInventory,
   onRemoveOneFromInventory,
 }: EquipmentPickerDrawerProps) {
+  const isMagicItemsWorkflow = workflowMode === EQUIPMENT_PICKER_MODE_MAGIC_ITEMS
+  const showWorkflowSegment = workflowModes.length === 2
+  const effectiveBudget = isMagicItemsWorkflow ? undefined : budget
+  const effectiveSortModes = isMagicItemsWorkflow
+    ? EQUIPMENT_PICKER_SORT_MODES.filter(
+        (mode) =>
+          mode !== EQUIPMENT_PICKER_SORT_PRICE_ASC && mode !== EQUIPMENT_PICKER_SORT_PRICE_DESC,
+      )
+    : EQUIPMENT_PICKER_SORT_MODES
   const supportedItems = React.useMemo(
     () => items.filter((item) => isEquipmentPickerSupportedKind(item.equipment.kind)),
     [items],
@@ -299,7 +324,7 @@ export function EquipmentPickerDrawer({
       const ownedQuantity = ownedPurchaseQuantities[itemKey] ?? 0
       const maxQuantity = resolveEquipmentStepPurchaseMaxQuantity({
         equipment: item.equipment,
-        budget,
+        budget: effectiveBudget,
         currentQuantity: ownedQuantity,
       })
       const quantity = clampEquipmentStepQuantity(addQuantities[itemKey] ?? 1, maxQuantity)
@@ -308,7 +333,14 @@ export function EquipmentPickerDrawer({
         setAddQuantities((current) => ({ ...current, [itemKey]: 1 }))
       }
     },
-    [addQuantities, budget, onAddItem, ownedPurchaseQuantities],
+    [
+      addQuantities,
+      effectiveBudget,
+      onAddItem,
+      ownedPurchaseQuantities,
+      ownedGrantQuantities,
+      isMagicItemsWorkflow,
+    ],
   )
 
   const handleAddQuantityChange = React.useCallback((itemKey: string, quantity: number) => {
@@ -335,7 +367,22 @@ export function EquipmentPickerDrawer({
       ]}
       noScopedItemsMessage={EQUIPMENT_PICKER_NO_RECOMMENDATIONS_MESSAGE}
       hasStructuredFilters={structuredFilterCount > 0}
-      headerExtra={budget ? <EquipmentBudgetHeader budget={budget} /> : undefined}
+      headerExtra={
+        showWorkflowSegment && onWorkflowModeChange ? (
+          <SegmentedControl
+            value={workflowMode}
+            onValueChange={(value) => onWorkflowModeChange(value as EquipmentPickerWorkflowMode)}
+            options={workflowModes.map((mode) => ({
+              value: mode,
+              label: EQUIPMENT_PICKER_MODE_LABELS[mode],
+            }))}
+            aria-label="Equipment picker workflow"
+            fullWidth
+          />
+        ) : effectiveBudget ? (
+          <EquipmentBudgetHeader budget={effectiveBudget} />
+        ) : undefined
+      }
       transformVisibleItems={transformVisibleItems}
       primaryControls={
         showCategoryFilter ? (
@@ -388,7 +435,7 @@ export function EquipmentPickerDrawer({
           <EquipmentPickerAffordableFilter
             showAffordableOnly={showAffordableOnly}
             onShowAffordableOnlyChange={setShowAffordableOnly}
-            showAffordableFilter={Boolean(budget)}
+            showAffordableFilter={Boolean(effectiveBudget)}
             affordableHiddenCount={countEquipmentPickerAffordableHiddenImpact(supportedItems, {
               activeTabId,
               searchQuery,
@@ -405,7 +452,7 @@ export function EquipmentPickerDrawer({
             label={EQUIPMENT_PICKER_SORT_LABEL}
             ariaLabel="Sort equipment"
             triggerAriaLabel="Equipment sort order"
-            options={EQUIPMENT_PICKER_SORT_MODES.map((mode) =>
+            options={effectiveSortModes.map((mode) =>
               pickerSortOption(mode, EQUIPMENT_PICKER_SORT_LABELS[mode]),
             )}
             onValueChange={(value) => setSortMode(value as EquipmentPickerSortMode)}
@@ -416,7 +463,9 @@ export function EquipmentPickerDrawer({
         const row = buildEquipmentPickerRowViewModel(item.equipment)
         const callout = getEquipmentPickerCallout(item, { isGoldShoppingPath })
         const disabled = isEquipmentPickerItemDisabled(item)
-        const ownedQuantity = ownedPurchaseQuantities[item.equipment.id] ?? 0
+        const ownedQuantity = isMagicItemsWorkflow
+          ? (ownedGrantQuantities[item.equipment.id] ?? 0)
+          : (ownedPurchaseQuantities[item.equipment.id] ?? 0)
         const owned = ownedQuantity > 0
         const stackable = isEquipmentStackable(item.equipment)
 
@@ -426,25 +475,35 @@ export function EquipmentPickerDrawer({
             callout={callout}
             disabled={disabled}
             commerce={
-              <EquipmentPickerCommerce
-                priceLabel={row.priceLabel}
-                owned={owned}
-                stackable={stackable}
-                ownedQuantity={ownedQuantity}
-                disabled={disabled}
-                onAdd={() => handleQuickAdd(item)}
-              />
+              isMagicItemsWorkflow ? undefined : (
+                <EquipmentPickerCommerce
+                  priceLabel={row.priceLabel}
+                  owned={owned}
+                  stackable={stackable}
+                  ownedQuantity={ownedQuantity}
+                  disabled={disabled}
+                  onAdd={() => handleQuickAdd(item)}
+                />
+              )
             }
           />
         )
       }}
-      renderItemSummary={(item) => <EquipmentPickerRowSummary item={item} budget={budget} />}
+      renderItemSummary={(item) =>
+        isMagicItemsWorkflow ? null : (
+          <EquipmentPickerRowSummary item={item} budget={effectiveBudget} />
+        )
+      }
       renderItemDetails={(item) => (
         <EquipmentPickerItemDetails
           equipment={item.equipment}
           itemState={item.state}
-          budget={budget}
-          ownedQuantity={ownedPurchaseQuantities[item.equipment.id] ?? 0}
+          budget={effectiveBudget}
+          ownedQuantity={
+            isMagicItemsWorkflow
+              ? (ownedGrantQuantities[item.equipment.id] ?? 0)
+              : (ownedPurchaseQuantities[item.equipment.id] ?? 0)
+          }
           addQuantity={addQuantities[item.equipment.id] ?? 1}
           onAddQuantityChange={(quantity) => handleAddQuantityChange(item.equipment.id, quantity)}
           onCommit={() => handleCommitAdd(item)}

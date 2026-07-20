@@ -30,19 +30,23 @@ import {
   buildEquipmentRemoveEntryPatch,
   buildEquipmentSelectionPatch,
   buildEquipmentSetPurchaseQuantityPatch,
+  buildMagicItemAcquisitionPatch,
   choiceSetsForEquipmentStep,
   findStartingEquipmentChoiceSet,
   hasGoldStartingEquipmentOption,
-  readSelectedStartingEquipmentOption,
   readEquipmentPurchaseQuantity,
+  readSelectedStartingEquipmentOption,
   resolveEquipmentStepBudget,
   resolveEquipmentStepPickerItems,
   resolvePurchaseSourceMode,
   resolveStartingGoldPurchaseId,
   shouldShowEquipmentBudget,
   shouldShowEquipmentFallback,
+  shouldShowEquipmentPurchaseWorkflow,
   shouldShowEquipmentShopping,
+  type EquipmentPickerWorkflowMode,
 } from '../../lib/equipment-step.lib'
+import { useEquipmentMagicItemWorkflow } from './use-equipment-magic-item-workflow.client'
 import { withChoiceSetSelections } from '../../lib/choice-set-selections'
 import { resolveEquipmentPickerCharacterPreviewContext } from '../equipment/equipment-picker-character-preview.lib'
 import type { EquipmentPickerDrawer } from '../equipment/equipment-picker-drawer.client'
@@ -74,6 +78,8 @@ export function useEquipmentStep(args: {
     useState<PendingEquipmentPackageSwitch | null>(null)
   const [isPackageSwitchCommitting, setIsPackageSwitchCommitting] = useState(false)
   const [pickerOpen, setPickerOpen] = useState(false)
+  const [pickerWorkflowMode, setPickerWorkflowMode] =
+    useState<EquipmentPickerWorkflowMode>('purchase')
   const [conversionEditorOpen, setConversionEditorOpen] = useState(false)
   const [selectedPackageItemKeys, setSelectedPackageItemKeys] = useState<ReadonlySet<string>>(
     () => new Set(),
@@ -153,6 +159,7 @@ export function useEquipmentStep(args: {
   const resolveTargetFunding = (
     targetOptionId: string,
   ): ResolvedStartingEquipmentFunding | undefined => fundingByOptionId.get(targetOptionId)
+  const showPurchaseWorkflow = shouldShowEquipmentPurchaseWorkflow(draft, selectedOptionId, budget)
   const { items: pickerItems, browseSortContext: pickerBrowseSortContext } = useMemo(
     () =>
       characterClass
@@ -166,6 +173,14 @@ export function useEquipmentStep(args: {
         : { items: [], browseSortContext: { preferMartialWeaponBrowseOrder: false } },
     [budget, catalogIndex, characterClass, draft, resolvedChoiceSets],
   )
+  const magicItemWorkflow = useEquipmentMagicItemWorkflow({
+    draft,
+    context,
+    catalogIndex,
+    pickerItems,
+    pickerWorkflowMode,
+    showPurchaseWorkflow,
+  })
   const characterPreviewContext = useMemo(
     () =>
       showBudget
@@ -402,7 +417,8 @@ export function useEquipmentStep(args: {
     applySelection(nextSelection)
   }
 
-  const openPicker = () => {
+  const openPicker = (mode: EquipmentPickerWorkflowMode = 'purchase') => {
+    setPickerWorkflowMode(mode)
     setPickerOpen(true)
   }
 
@@ -470,6 +486,18 @@ export function useEquipmentStep(args: {
     item,
     quantity,
   ) => {
+    if (pickerWorkflowMode === 'magic_items') {
+      const patch = buildMagicItemAcquisitionPatch({
+        draft,
+        context,
+        catalogIndex,
+        equipmentId: item.equipment.id,
+        requestedQuantity: quantity,
+      })
+      if (patch) onDraftChange(patch)
+      return
+    }
+
     if (!showBudget) return
 
     const patch = buildEquipmentAddPurchasePatch({
@@ -479,6 +507,7 @@ export function useEquipmentStep(args: {
       sourceMode: resolvePurchaseSourceMode(),
       quantity,
       budget,
+      context,
     })
     if (patch) onDraftChange(patch)
   }
@@ -538,6 +567,7 @@ export function useEquipmentStep(args: {
 
   return {
     catalogIndex,
+    context,
     characterClass,
     classId,
     equipmentChoiceSets,
@@ -551,11 +581,19 @@ export function useEquipmentStep(args: {
     showFallback,
     showBudget,
     showShopping,
+    showMagicItemGrants: magicItemWorkflow.showMagicItemGrants,
+    showPurchaseWorkflow,
+    acquisition: magicItemWorkflow.acquisition,
+    magicItemProgressLabel: magicItemWorkflow.magicItemProgressLabel,
+    pickerWorkflowMode,
+    pickerWorkflowModes: magicItemWorkflow.pickerWorkflowModes,
     budget,
-    pickerItems,
+    pickerItems: magicItemWorkflow.filteredPickerItems,
+    allPickerItems: pickerItems,
     pickerBrowseSortContext,
     characterPreviewContext,
     ownedPurchaseQuantities,
+    ownedGrantQuantities: magicItemWorkflow.ownedGrantQuantities,
     pendingSelection,
     setPendingSelection,
     pendingPackageSwitch,
@@ -566,6 +604,7 @@ export function useEquipmentStep(args: {
     isPackageSwitchCommitting,
     pickerOpen,
     setPickerOpen,
+    setPickerWorkflowMode,
     conversionEditorOpen,
     setConversionEditorOpen,
     selectedPackageItemKeys,

@@ -6,6 +6,7 @@ import {
   readSelectedStartingEquipmentOptionId,
   resolveGoldStartingEquipmentAlternative,
   type CharacterBuildCatalogIndex,
+  type CharacterBuildContext,
   type CharacterBuilderDraft,
   type CharacterEquipment,
   type CharacterWealthGrant,
@@ -22,6 +23,12 @@ import {
   type StartingPackageInventoryGroup,
 } from '../../lib/equipment-step.lib'
 
+type CatalogClass = NonNullable<ReturnType<CharacterBuildCatalogIndex['classes']['get']>>
+type ClassStartingEquipment = NonNullable<
+  NonNullable<CatalogClass['characterCreation']>['startingEquipment']
+>
+type ClassStartingEquipmentOption = ClassStartingEquipment['options'][number]
+
 function formatStartingEquipmentWealth(
   wealth: CharacterWealthGrant | undefined,
 ): string | undefined {
@@ -33,6 +40,7 @@ export type EquipmentInventorySourceBreakdown = {
   included: number
   purchased: number
   manual: number
+  grant: number
 }
 
 export type EquipmentInventoryDisplayItem =
@@ -51,20 +59,23 @@ export type EquipmentInventoryDisplayItem =
 
 function breakdownBucket(row: EquipmentInventoryRow): keyof EquipmentInventorySourceBreakdown {
   if (row.removeTarget?.kind === 'package') return 'included'
+  if (row.removeTarget?.kind === 'magicItemGrant') return 'grant'
 
   const sourceKind = row.entry.sources?.[0]?.kind
   if (sourceKind === 'manual') return 'manual'
   if (sourceKind === 'startingGold') return 'purchased'
+  if (sourceKind === 'startingWealthTier') return 'grant'
   return 'included'
 }
 
 export function formatEquipmentInventorySourceBreakdownLabel(
   breakdown: EquipmentInventorySourceBreakdown,
 ): string {
-  const total = breakdown.included + breakdown.purchased + breakdown.manual
+  const total = breakdown.included + breakdown.purchased + breakdown.manual + breakdown.grant
   const parts = [`${total} total`]
 
   if (breakdown.included > 0) parts.push(`${breakdown.included} included`)
+  if (breakdown.grant > 0) parts.push(`${breakdown.grant} grant choice`)
   if (breakdown.purchased > 0) parts.push(`${breakdown.purchased} purchased`)
   if (breakdown.manual > 0) parts.push(`${breakdown.manual} manual`)
 
@@ -126,7 +137,7 @@ export function groupEquipmentInventoryRowsForDisplay(
         totals[breakdownBucket(row)] += row.entry.quantity
         return totals
       },
-      { included: 0, purchased: 0, manual: 0 },
+      { included: 0, purchased: 0, manual: 0, grant: 0 },
     )
 
     items.push({
@@ -135,7 +146,7 @@ export function groupEquipmentInventoryRowsForDisplay(
       equipmentId: first.entry.equipmentId,
       equipmentName: first.equipmentName,
       equipment: first.equipment,
-      totalQuantity: breakdown.included + breakdown.purchased + breakdown.manual,
+      totalQuantity: breakdown.included + breakdown.purchased + breakdown.manual + breakdown.grant,
       breakdownLabel: formatEquipmentInventorySourceBreakdownLabel(breakdown),
       bundleLabel: first.bundleLabel,
       rows: groupRows,
@@ -151,7 +162,9 @@ export function equipmentInventoryRowKey(row: EquipmentInventoryRow): string {
       ? row.removeTarget.purchaseId
       : row.removeTarget?.kind === 'package'
         ? row.removeTarget.packageItemKey
-        : 'static'
+        : row.removeTarget?.kind === 'magicItemGrant'
+          ? `${row.removeTarget.allowanceId}:${row.removeTarget.equipmentId}`
+          : 'static'
 
   return `${row.group}-${row.entry.equipmentId}-${row.sourceLabel}-${removeKey}`
 }
@@ -172,17 +185,21 @@ export type EquipmentInventoryLayout =
   | {
       mode: 'package'
       startingPackage: StartingPackageInventoryGroup
+      magicItems: PurchasedCategoryGroup[]
       purchased: PurchasedCategoryGroup[]
     }
-  | { mode: 'gold'; purchased: PurchasedCategoryGroup[] }
+  | { mode: 'gold'; magicItems: PurchasedCategoryGroup[]; purchased: PurchasedCategoryGroup[] }
 
 export function hasEquipmentInventoryContent(layout: EquipmentInventoryLayout): boolean {
+  const hasMagicItems = layout.magicItems.some((group) => group.displays.length > 0)
+
   if (layout.mode === 'gold') {
-    return layout.purchased.some((group) => group.displays.length > 0)
+    return hasMagicItems || layout.purchased.some((group) => group.displays.length > 0)
   }
 
   return (
     layout.startingPackage.categoryGroups.some((group) => group.rows.length > 0) ||
+    hasMagicItems ||
     layout.purchased.some((group) => group.displays.length > 0)
   )
 }
@@ -243,12 +260,61 @@ function buildPurchasedCategoryGroups(
   })
 }
 
+function partitionInventoryRowsBySource(rows: readonly EquipmentInventoryRow[]) {
+  return {
+    packageRows: rows.filter((row) => row.removeTarget?.kind === 'package'),
+    magicItemRows: rows.filter((row) => row.removeTarget?.kind === 'magicItemGrant'),
+    purchasedRows: rows.filter((row) => row.removeTarget?.kind === 'purchase'),
+  }
+}
+
+function buildPackageCustomizeAffordance(
+  classOptionPolicy: ClassOptionPolicy,
+  startingEquipment: ClassStartingEquipment,
+): PackageCustomizeAffordance {
+  if (classOptionPolicy === 'replaced') {
+    return {
+      status: 'disabled',
+      reason: EQUIPMENT_CLASS_OPTIONS_REPLACED_MESSAGE,
+    }
+  }
+
+  const goldAlternative = resolveGoldStartingEquipmentAlternative(startingEquipment.options)
+  return goldAlternative.status === 'available'
+    ? { status: 'available' }
+    : { status: 'disabled', reason: goldAlternative.reason }
+}
+
+function buildPackageModeLayout(args: {
+  selectedOptionId: string
+  option: ClassStartingEquipmentOption
+  packageRows: EquipmentInventoryRow[]
+  magicItems: PurchasedCategoryGroup[]
+  purchased: PurchasedCategoryGroup[]
+  classOptionPolicy: ClassOptionPolicy
+  startingEquipment: ClassStartingEquipment
+}): EquipmentInventoryLayout {
+  return {
+    mode: 'package',
+    startingPackage: {
+      optionId: args.selectedOptionId,
+      optionLabel: args.option.label,
+      categoryGroups: groupRowsByCategory(args.packageRows),
+      includedWealthLabel: formatStartingEquipmentWealth(args.option.wealth),
+      customize: buildPackageCustomizeAffordance(args.classOptionPolicy, args.startingEquipment),
+    },
+    magicItems: args.magicItems,
+    purchased: args.purchased,
+  }
+}
+
 /** Builds source-grouped inventory layout for package vs purchased sections. */
 export function buildEquipmentInventoryLayout(
   draft: CharacterBuilderDraft,
   catalogIndex: CharacterBuildCatalogIndex,
   budget?: EquipmentBudgetSummary,
   classOptionPolicy: ClassOptionPolicy = 'included',
+  context?: CharacterBuildContext,
 ): EquipmentInventoryLayout | undefined {
   const classId = draft.class.classId
   if (!classId) return undefined
@@ -262,36 +328,23 @@ export function buildEquipmentInventoryLayout(
   if (!option) return undefined
 
   const isGoldPath = draft.equipment?.mode === 'gold' || isStartingGoldOption(option)
-  const allRows = listEquipmentInventoryRowsFromDraft(draft, catalogIndex, budget)
-  const packageRows = allRows.filter((row) => row.removeTarget?.kind === 'package')
-  const purchasedRows = allRows.filter((row) => row.removeTarget?.kind === 'purchase')
+  const allRows = listEquipmentInventoryRowsFromDraft(draft, catalogIndex, budget, context)
+  const { packageRows, magicItemRows, purchasedRows } = partitionInventoryRowsBySource(allRows)
 
+  const magicItems = buildPurchasedCategoryGroups(magicItemRows)
   const purchased = buildPurchasedCategoryGroups(purchasedRows)
 
   if (isGoldPath) {
-    return { mode: 'gold', purchased }
+    return { mode: 'gold', magicItems, purchased }
   }
 
-  const goldAlternative = resolveGoldStartingEquipmentAlternative(startingEquipment.options)
-  const classOptionsReplaced = classOptionPolicy === 'replaced'
-  const customize: PackageCustomizeAffordance = classOptionsReplaced
-    ? {
-        status: 'disabled',
-        reason: EQUIPMENT_CLASS_OPTIONS_REPLACED_MESSAGE,
-      }
-    : goldAlternative.status === 'available'
-      ? { status: 'available' }
-      : { status: 'disabled', reason: goldAlternative.reason }
-
-  return {
-    mode: 'package',
-    startingPackage: {
-      optionId: selectedOptionId,
-      optionLabel: option.label,
-      categoryGroups: groupRowsByCategory(packageRows),
-      includedWealthLabel: formatStartingEquipmentWealth(option.wealth),
-      customize,
-    },
+  return buildPackageModeLayout({
+    selectedOptionId,
+    option,
+    packageRows,
+    magicItems,
     purchased,
-  }
+    classOptionPolicy,
+    startingEquipment,
+  })
 }

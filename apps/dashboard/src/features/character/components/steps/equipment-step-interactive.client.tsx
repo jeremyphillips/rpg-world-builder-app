@@ -17,6 +17,7 @@ import { equipmentStepSwitchConfirmHeadlineClasses } from './equipment-step-inte
 import {
   EquipmentStepFallback,
   EquipmentStepInventorySection,
+  EquipmentStepMagicItemsSection,
   EquipmentStepReplacedClassOptionsNotice,
   EquipmentStepShoppingSection,
 } from './equipment-step-sections.client'
@@ -45,7 +46,6 @@ export function EquipmentStepInteractive({
     showBudget,
     showShopping,
     budget,
-    pickerItems,
     pickerBrowseSortContext,
     characterPreviewContext,
     ownedPurchaseQuantities,
@@ -60,7 +60,6 @@ export function EquipmentStepInteractive({
     pickerOpen,
     setPickerOpen,
     requestSelection,
-    openPicker,
     handleAddItem,
     handleSetPurchaseQuantity,
     handleRemoveFromInventory,
@@ -102,11 +101,19 @@ export function EquipmentStepInteractive({
           />
         ) : null}
 
+        {step.showMagicItemGrants && step.magicItemProgressLabel ? (
+          <EquipmentStepMagicItemsSection
+            progressLabel={step.magicItemProgressLabel}
+            onOpenPicker={() => step.openPicker('magic_items')}
+          />
+        ) : null}
+
         {showBudget && budget ? <EquipmentStepShoppingSection budget={budget} /> : null}
 
         <EquipmentStepInventorySection
           draft={draft}
           catalogIndex={catalogIndex}
+          context={step.context}
           budget={budget}
           goldOptionFunding={step.goldOptionFunding}
           classOptionPolicy={step.classOptionPolicy}
@@ -115,8 +122,10 @@ export function EquipmentStepInteractive({
           conversionCommitStatusMessage={step.conversionCommitStatusMessage}
           onRemoveItem={onRemoveItem}
           onSetPurchaseQuantity={handleSetPurchaseQuantity}
-          showBrowseEquipment={showBudget}
-          onOpenPicker={openPicker}
+          showBrowseEquipment={step.showPurchaseWorkflow}
+          onOpenPicker={() => step.openPicker('purchase')}
+          showMagicItemGrants={step.showMagicItemGrants}
+          onOpenMagicItemsPicker={() => step.openPicker('magic_items')}
           onCustomizePackage={() => step.openConversionEditor()}
           onChangeEquipmentOption={() => {
             step.expandPackageChooser()
@@ -135,13 +144,17 @@ export function EquipmentStepInteractive({
       <EquipmentPickerDrawer
         open={pickerOpen}
         onOpenChange={setPickerOpen}
-        items={pickerItems}
+        items={step.pickerItems}
         browseSortContext={pickerBrowseSortContext}
-        budget={budget}
+        budget={step.pickerWorkflowMode === 'purchase' ? budget : undefined}
         defaultTab="recommended"
         showCharacterPreview
         characterPreviewContext={characterPreviewContext}
         ownedPurchaseQuantities={ownedPurchaseQuantities}
+        ownedGrantQuantities={step.ownedGrantQuantities}
+        workflowMode={step.pickerWorkflowMode}
+        workflowModes={step.pickerWorkflowModes}
+        onWorkflowModeChange={step.setPickerWorkflowMode}
         isGoldShoppingPath={showShopping}
         onAddItem={handleAddItem}
         onRemoveFromInventory={handleRemoveFromInventory}

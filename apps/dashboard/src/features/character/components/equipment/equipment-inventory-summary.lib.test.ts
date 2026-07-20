@@ -40,6 +40,7 @@ describe('equipment-inventory-summary.lib', () => {
         included: 5,
         purchased: 2,
         manual: 0,
+        grant: 0,
       }),
     ).toBe('7 total · 5 included · 2 purchased')
   })
@@ -185,6 +186,7 @@ describe('equipment-inventory-summary.lib', () => {
 
     expect(buildEquipmentInventoryLayout(draft, equipmentStepCatalogIndexFixture)).toEqual({
       mode: 'gold',
+      magicItems: [],
       purchased: [],
     })
   })

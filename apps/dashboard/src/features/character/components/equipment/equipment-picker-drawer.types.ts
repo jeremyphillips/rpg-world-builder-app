@@ -5,6 +5,7 @@ import type {
   EquipmentPickerSupportedKind,
 } from '@rpg/contracts'
 
+import type { EquipmentPickerWorkflowMode } from '../../lib/equipment-step.lib'
 import type { EquipmentPickerCharacterPreviewContext } from './equipment-picker-character-preview.lib'
 
 export type {
@@ -33,6 +34,16 @@ export const EQUIPMENT_PICKER_MATCHES_PROFICIENCY_LABEL = 'Matches your proficie
 export const EQUIPMENT_PICKER_SPELLCASTING_FOCUS_LABEL = 'Spellcasting focus'
 
 export const EQUIPMENT_PICKER_CANNOT_AFFORD_LABEL = 'Cannot afford'
+
+export const EQUIPMENT_PICKER_MODE_PURCHASE = 'purchase' as const
+export const EQUIPMENT_PICKER_MODE_MAGIC_ITEMS = 'magic_items' as const
+
+export const EQUIPMENT_PICKER_MODE_LABELS: Record<EquipmentPickerWorkflowMode, string> = {
+  purchase: 'Purchase',
+  magic_items: 'Magic items',
+}
+
+export const EQUIPMENT_PICKER_ADD_PARTIAL_PREFIX = 'Add'
 
 export const EQUIPMENT_PICKER_ADDED_LABEL = 'Added'
 export const EQUIPMENT_PICKER_OWNED_QUANTITY_LABEL_PREFIX = 'Owned:'
@@ -122,11 +133,19 @@ export type EquipmentPickerDrawerProps = {
   characterPreviewContext?: EquipmentPickerCharacterPreviewContext
   /** Purchased quantities for the active source mode, keyed by equipment id. */
   ownedPurchaseQuantities?: Readonly<Record<string, number>>
+  /** Grant-selected quantities keyed by equipment id (magic-items workflow). */
+  ownedGrantQuantities?: Readonly<Record<string, number>>
+  /** Active browse workflow — purchase vs magic-item grants. */
+  workflowMode?: EquipmentPickerWorkflowMode
+  /** Available workflows; segmented control renders only when length is 2. */
+  workflowModes?: readonly EquipmentPickerWorkflowMode[]
+  onWorkflowModeChange?: (mode: EquipmentPickerWorkflowMode) => void
   /** Mutually exclusive toolbar action — default resets full view including sort and tab. */
   toolbarResetMode?: EquipmentPickerToolbarResetMode
   /** When true, `availableInStartingOption` rows show the Standard gear badge. */
   isGoldShoppingPath?: boolean
   onAddItem: (item: EquipmentPickerItem, quantity: number) => void
+  onAddPartialItem?: (item: EquipmentPickerItem, quantity: number) => void
   onRemoveFromInventory?: (item: EquipmentPickerItem) => void
   onRemoveOneFromInventory?: (item: EquipmentPickerItem) => void
 }

@@ -29,6 +29,19 @@ import {
   startingEquipmentPackageItemKey,
   STEP_CHOICE_TYPES_BY_STEP,
   wealthToCopper,
+  applyEquipmentPurchaseIntent,
+  applyMagicItemAcquisitionIntent,
+  formatInventorySourceSummary,
+  getMagicItemRarityLabel,
+  reconcileMagicItemSelections,
+  resolveEquipmentAcquisitionBuilderContext,
+  resolveEquipmentAcquisitionPlan,
+  resolveMagicItemAcquisitionState,
+  resolveMagicItemAllowanceEligibility,
+  resolveMagicItemGrantProgressList,
+  readMagicItemSelections,
+  standardStartingWealthTableId,
+  totalSelectedForEquipment,
   type CharacterBuildCatalogIndex,
   type CharacterBuildContext,
   type CharacterBuilderDraft,
@@ -72,6 +85,18 @@ export const EQUIPMENT_PURCHASED_INVENTORY_EMPTY_MESSAGE =
 export const EQUIPMENT_STARTING_PACKAGE_SECTION_LABEL = 'Starting Equipment'
 
 export const EQUIPMENT_PURCHASED_INVENTORY_SECTION_LABEL = 'Purchased Equipment'
+
+export const EQUIPMENT_MAGIC_ITEMS_SECTION_LABEL = 'Magic Items'
+
+export const EQUIPMENT_MAGIC_ITEMS_CHOOSE_LABEL = 'Choose magic items'
+
+export const EQUIPMENT_MAGIC_ITEMS_PROGRESS_LABEL = 'Magic item choices'
+
+export const EQUIPMENT_MAGIC_ITEM_RELEASE_LABEL = 'Release choice'
+
+export const EQUIPMENT_MAGIC_ITEM_REMOVE_PURCHASE_LABEL = 'Remove purchase'
+
+export type EquipmentPickerWorkflowMode = 'purchase' | 'magic_items'
 
 export const EQUIPMENT_PACKAGE_CUSTOMIZE_LABEL = 'Customize'
 
@@ -142,6 +167,7 @@ export function startingEquipmentOptionFundingSummaryLines(
 export type EquipmentInventoryRemoveTarget =
   | { kind: 'package'; packageItemKey: string }
   | { kind: 'purchase'; purchaseId: string }
+  | { kind: 'magicItemGrant'; allowanceId: string; equipmentId: string }
 
 export type EquipmentInventoryQuantityTarget = {
   kind: 'purchase'
@@ -458,6 +484,7 @@ export function buildEquipmentSkipPatch(): CharacterBuilderDraft['equipment'] {
   return {
     mode: 'package',
     purchases: [],
+    magicItemSelections: [],
     removedPackageItemKeys: [],
     customized: false,
     skipped: true,
@@ -487,6 +514,7 @@ export function buildEquipmentSelectionPatch(args: {
     equipment: {
       mode,
       purchases: draft.equipment?.purchases ?? [],
+      magicItemSelections: draft.equipment?.magicItemSelections ?? [],
       removedPackageItemKeys: [],
       customized: draft.equipment?.customized ?? false,
       skipped: false,
@@ -918,11 +946,248 @@ function canAddEquipmentPurchase(args: {
   return currentQuantity + quantity <= limits.max
 }
 
+function listMagicItemGrantInventoryRows(args: {
+  draft: CharacterBuilderDraft
+  catalogIndex: CharacterBuildCatalogIndex
+  context: CharacterBuildContext
+}): EquipmentInventoryRow[] {
+  const { draft, catalogIndex, context } = args
+  const acquisition = resolveMagicItemAcquisitionState({
+    draft,
+    context,
+    catalogIndex,
+  })
+
+  const allowanceById = new Map(acquisition.allowances.map((entry) => [entry.id, entry]))
+  const selections = readMagicItemSelections(draft)
+
+  return selections.flatMap((selection) => {
+    const allowance = allowanceById.get(selection.allowanceId)
+    const equipment = catalogIndex.equipment.get(selection.equipmentId)
+    if (!allowance || !equipment) return []
+
+    const entry: CharacterEquipmentEntry = {
+      equipmentId: selection.equipmentId,
+      quantity: selection.quantity,
+      sources: [
+        {
+          kind: 'startingWealthTier',
+          sourceId: allowance.source.sourceId,
+          grantId: selection.allowanceId,
+        },
+      ],
+    }
+
+    return [
+      {
+        group: 'magicItems' as const,
+        groupLabel: EQUIPMENT_INVENTORY_GROUP_LABELS.magicItems,
+        entry,
+        equipment,
+        equipmentName: equipment.name,
+        sourceLabel: `${getMagicItemRarityLabel(allowance.rarity)} choice`,
+        isStackable: isEquipmentStackable(equipment),
+        quantityMode: 'locked' as const,
+        removeLabel: `${EQUIPMENT_MAGIC_ITEM_RELEASE_LABEL} ${equipment.name}`,
+        removeTarget: {
+          kind: 'magicItemGrant' as const,
+          allowanceId: selection.allowanceId,
+          equipmentId: selection.equipmentId,
+        },
+      },
+    ]
+  })
+}
+
+export function resolveEquipmentAcquisitionContext(args: {
+  context: CharacterBuildContext
+  catalogIndex: CharacterBuildCatalogIndex
+}) {
+  return resolveEquipmentAcquisitionBuilderContext({
+    context: args.context,
+    catalogIndex: args.catalogIndex,
+    startingWealthTableId: standardStartingWealthTableId(args.context.rulesetId),
+  })
+}
+
+export function resolveEquipmentStepAcquisitionState(args: {
+  draft: CharacterBuilderDraft
+  context: CharacterBuildContext
+  catalogIndex: CharacterBuildCatalogIndex
+}) {
+  return resolveMagicItemAcquisitionState({
+    draft: args.draft,
+    context: args.context,
+    catalogIndex: args.catalogIndex,
+  })
+}
+
+export function shouldShowMagicItemGrants(
+  acquisition: ReturnType<typeof resolveMagicItemAcquisitionState>,
+): boolean {
+  return acquisition.allowances.length > 0
+}
+
+export function shouldShowEquipmentPurchaseWorkflow(
+  draft: CharacterBuilderDraft,
+  selectedOptionId: string | undefined,
+  budget?: EquipmentBudgetSummary,
+): boolean {
+  if (selectedOptionId === undefined || draft.equipment?.skipped) return false
+  if (!budget) return false
+  return wealthToCopper(budget.starting) > 0
+}
+
+export function resolveEquipmentPickerWorkflowModes(args: {
+  showPurchase: boolean
+  showMagicItems: boolean
+}): EquipmentPickerWorkflowMode[] {
+  const modes: EquipmentPickerWorkflowMode[] = []
+  if (args.showMagicItems) modes.push('magic_items')
+  if (args.showPurchase) modes.push('purchase')
+  return modes
+}
+
+export function formatMagicItemGrantProgressLabel(
+  progress: ReturnType<typeof resolveMagicItemGrantProgressList>,
+): string {
+  if (progress.length === 0) return ''
+
+  const parts = progress.map(
+    (entry) => `${entry.selected}/${entry.capacity} ${getMagicItemRarityLabel(entry.rarity)}`,
+  )
+  return parts.join(' · ')
+}
+
+export function isMagicItemPickerItemVisible(args: {
+  equipment: Equipment
+  acquisition: ReturnType<typeof resolveMagicItemAcquisitionState>
+  ownedGrantQuantity: number
+}): boolean {
+  const { equipment, acquisition, ownedGrantQuantity } = args
+  if (equipment.kind !== 'magic_item' || !equipment.rarity) return false
+  if (ownedGrantQuantity > 0) return true
+
+  const progress = acquisition.progress
+  for (const allowance of acquisition.allowances) {
+    if (allowance.rarity !== equipment.rarity) continue
+    const entry = progress.find((row) => row.allowanceId === allowance.id)
+    const eligibility = resolveMagicItemAllowanceEligibility({
+      equipment,
+      allowance,
+      progress: entry ?? {
+        allowanceId: allowance.id,
+        rarity: allowance.rarity,
+        capacity: allowance.count,
+        selected: 0,
+        remainingCapacity: allowance.count,
+        isFilled: false,
+      },
+    })
+    if (eligibility.eligible) return true
+  }
+
+  return false
+}
+
+export function buildMagicItemAcquisitionPatch(args: {
+  draft: CharacterBuilderDraft
+  context: CharacterBuildContext
+  catalogIndex: CharacterBuildCatalogIndex
+  equipmentId: string
+  requestedQuantity: number
+}): Partial<CharacterBuilderDraft> | undefined {
+  const { draft, context, catalogIndex, equipmentId, requestedQuantity } = args
+  const equipment = catalogIndex.equipment.get(equipmentId)
+  if (!equipment) return undefined
+
+  const result = applyMagicItemAcquisitionIntent({
+    draft,
+    context: resolveEquipmentAcquisitionContext({ context, catalogIndex }),
+    equipment,
+    requestedQuantity,
+  })
+
+  if (!result.applied) return undefined
+  return { equipment: result.draft.equipment }
+}
+
+export function buildEquipmentPurchaseIntentPatch(args: {
+  draft: CharacterBuilderDraft
+  context: CharacterBuildContext
+  catalogIndex: CharacterBuildCatalogIndex
+  equipmentId: string
+  requestedQuantity: number
+}): Partial<CharacterBuilderDraft> | undefined {
+  const { draft, context, catalogIndex, equipmentId, requestedQuantity } = args
+  const equipment = catalogIndex.equipment.get(equipmentId)
+  if (!equipment) return undefined
+
+  const result = applyEquipmentPurchaseIntent({
+    draft,
+    context: resolveEquipmentAcquisitionContext({ context, catalogIndex }),
+    equipment,
+    requestedQuantity,
+  })
+
+  if (!result.applied) return undefined
+  return { equipment: result.draft.equipment }
+}
+
+export function previewMagicItemAcquisitionPlan(args: {
+  draft: CharacterBuilderDraft
+  context: CharacterBuildContext
+  catalogIndex: CharacterBuildCatalogIndex
+  equipmentId: string
+  requestedQuantity: number
+}) {
+  const equipment = args.catalogIndex.equipment.get(args.equipmentId)
+  if (!equipment) return undefined
+
+  return resolveEquipmentAcquisitionPlan({
+    draft: args.draft,
+    context: resolveEquipmentAcquisitionContext({
+      context: args.context,
+      catalogIndex: args.catalogIndex,
+    }),
+    equipment,
+    requestedQuantity: args.requestedQuantity,
+  })
+}
+
+export function readMagicItemGrantQuantity(
+  draft: CharacterBuilderDraft,
+  equipmentId: string,
+): number {
+  return totalSelectedForEquipment(readMagicItemSelections(draft), equipmentId)
+}
+
+export function formatAggregatedInventoryProvenance(
+  draft: CharacterBuilderDraft,
+  _catalogIndex: CharacterBuildCatalogIndex,
+  _context: CharacterBuildContext,
+  equipmentId: string,
+): string | undefined {
+  const grantQty = readMagicItemGrantQuantity(draft, equipmentId)
+  const purchaseQty = readEquipmentPurchaseQuantity(draft, equipmentId, 'startingGold')
+  if (grantQty === 0 && purchaseQty === 0) return undefined
+
+  const parts: string[] = []
+  if (grantQty > 0) parts.push(`${grantQty} grant choice`)
+  if (purchaseQty > 0) parts.push(`${purchaseQty} purchased`)
+
+  return formatInventorySourceSummary([
+    ...(grantQty > 0 ? [{ kind: 'startingWealthTier' as const, quantity: grantQty }] : []),
+    ...(purchaseQty > 0 ? [{ kind: 'startingGold' as const, quantity: purchaseQty }] : []),
+  ])
+}
+
 /** Lists inventory rows with removal targets derived from draft decisions. */
 export function listEquipmentInventoryRowsFromDraft(
   draft: CharacterBuilderDraft,
   catalogIndex: CharacterBuildCatalogIndex,
   budget?: EquipmentBudgetSummary,
+  context?: CharacterBuildContext,
 ): EquipmentInventoryRow[] {
   const classId = draft.class.classId
   if (!classId) return []
@@ -950,6 +1215,7 @@ export function listEquipmentInventoryRowsFromDraft(
 
   return [
     ...packageRows,
+    ...(context ? listMagicItemGrantInventoryRows({ draft, catalogIndex, context }) : []),
     ...listPurchaseInventoryRows({ draft, catalogIndex, classId, selectedOptionId, budget }),
   ]
 }
@@ -1003,8 +1269,21 @@ export function buildEquipmentAddPurchasePatch(args: {
   quantity?: number
   /** Resolved via `resolveEquipmentStepBudget` when tier bonus or campaign wealth applies. */
   budget?: EquipmentBudgetSummary
+  context?: CharacterBuildContext
 }): Partial<CharacterBuilderDraft> | undefined {
-  const { draft, catalogIndex, equipmentId, sourceMode, quantity = 1, budget } = args
+  const { draft, catalogIndex, equipmentId, sourceMode, quantity = 1, context } = args
+
+  if (sourceMode === 'startingGold' && context) {
+    return buildEquipmentPurchaseIntentPatch({
+      draft,
+      context,
+      catalogIndex,
+      equipmentId,
+      requestedQuantity: quantity,
+    })
+  }
+
+  const { budget } = args
   const equipment = catalogIndex.equipment.get(equipmentId)
 
   if (
@@ -1098,6 +1377,14 @@ export function buildEquipmentRemoveEntryPatch(args: {
 
   if (target.kind === 'package') {
     return { equipment: current }
+  }
+
+  if (target.kind === 'magicItemGrant') {
+    const next = reconcileMagicItemSelections({
+      draft,
+      remove: [{ allowanceId: target.allowanceId, equipmentId: target.equipmentId }],
+    })
+    return { equipment: next.equipment }
   }
 
   const purchaseIndex = resolveEquipmentPurchaseIndex(current.purchases, target.purchaseId)

@@ -8,6 +8,7 @@ import { characterNarrativeSchema } from '../character/narrative'
 import { abilityGenerationMethodSchema } from './ability-generation'
 import { characterBuilderStepIdSchema } from './step-ids'
 import { normalizeCharacterBuilderDraft } from './equipment-purchase'
+import { magicItemGrantSelectionSchema } from './magic-item-selection'
 
 // ---------------------------------------------------------------------------
 // CharacterBuilderDraft — the temporary workflow object. Allowed to represent
@@ -108,6 +109,8 @@ export type CharacterBuilderDraftEquipmentPurchase = PersistedCharacterBuilderDr
 export const characterBuilderDraftEquipmentSchema = z.object({
   mode: characterBuilderDraftEquipmentModeSchema,
   purchases: z.array(characterBuilderDraftEquipmentPurchaseSchema).default([]),
+  /** Magic-item grant selections keyed by allowanceId + equipmentId (upserted). */
+  magicItemSelections: z.array(magicItemGrantSelectionSchema).optional(),
   /**
    * Package slot keys `${classId}:${optionId}:${itemIndex}` removed from the
    * selected starting package (index into option `items[]`, not equipmentId).
