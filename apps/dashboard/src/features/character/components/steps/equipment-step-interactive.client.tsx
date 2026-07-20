@@ -139,6 +139,14 @@ export function EquipmentStepInteractive({
           conversionCommitStatusMessage={step.conversionCommitStatusMessage}
           onRemoveItem={onRemoveItem}
           onSetPurchaseQuantity={handleSetPurchaseQuantity}
+          onReleaseGrant={pickerAcquisition.handleReleaseGrant}
+          onRemovePurchase={pickerAcquisition.handleRemovePurchase}
+          onAddAnother={(equipmentId) =>
+            pickerAcquisition.handleApplyMagicItemAcquisition({
+              equipmentId,
+              requestedQuantity: 1,
+            })
+          }
           onCustomizePackage={() => step.openConversionEditor()}
           onChangeEquipmentOption={() => {
             step.expandPackageChooser()

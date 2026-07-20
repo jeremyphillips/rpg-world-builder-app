@@ -1,7 +1,12 @@
+import { getStandardStartingWealthRules } from '@rpg/catalog/starting-wealth'
 import {
+  DEFAULT_ABILITY_GENERATION_RULES,
   DEFAULT_SYSTEM_RULESET_ID,
+  defaultCampaignMechanicsPatch,
   indexCharacterBuildCatalog,
+  resolveCharacterCreationPatch,
   type CharacterBuildCatalog,
+  type CharacterBuildContext,
   type ClassStored,
   type Equipment,
 } from '@rpg/contracts'
@@ -341,3 +346,30 @@ export const equipmentStepCatalogFixture = {
 export const equipmentStepCatalogIndexFixture = indexCharacterBuildCatalog(
   equipmentStepCatalogFixture,
 )
+
+export function createEquipmentStepContextFixture(
+  overrides: Partial<CharacterBuildContext> = {},
+): CharacterBuildContext {
+  const rulesetId = overrides.rulesetId ?? DEFAULT_SYSTEM_RULESET_ID
+
+  return {
+    channel: 'build',
+    surface: 'dashboard',
+    characterKind: 'pc',
+    mode: 'dashboard',
+    scope: { type: 'standalone', rulesetId },
+    rulesScope: { type: 'ruleset', rulesetId },
+    ownershipTarget: { type: 'user' },
+    rulesetId,
+    catalog: equipmentStepCatalogFixture,
+    characterCreationRules: {
+      ...resolveCharacterCreationPatch(undefined, getStandardStartingWealthRules(rulesetId)),
+      abilityGeneration: DEFAULT_ABILITY_GENERATION_RULES,
+      armorClass: defaultCampaignMechanicsPatch().armorClass,
+    },
+    permissions: { canCreateCharacter: true },
+    ...overrides,
+  }
+}
+
+export const equipmentStepContextFixture = createEquipmentStepContextFixture()

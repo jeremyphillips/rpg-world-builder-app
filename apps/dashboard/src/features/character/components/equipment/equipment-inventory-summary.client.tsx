@@ -26,7 +26,7 @@ import { equipmentInventorySummaryGridClasses } from './equipment-inventory-summ
 export type EquipmentInventorySummaryProps = {
   draft: CharacterBuilderDraft
   catalogIndex: CharacterBuildCatalogIndex
-  context?: CharacterBuildContext
+  context: CharacterBuildContext
   budget?: EquipmentBudgetSummary
   goldOptionFunding?: ResolvedStartingEquipmentFunding
   classOptionPolicy?: ClassOptionPolicy
@@ -35,6 +35,9 @@ export type EquipmentInventorySummaryProps = {
   conversionCommitStatusMessage?: string
   onRemoveItem?: (target: EquipmentInventoryRemoveTarget) => void
   onSetPurchaseQuantity?: (target: EquipmentInventoryQuantityTarget, quantity: number) => void
+  onReleaseGrant?: (args: { allowanceId: string; equipmentId: string; quantity: number }) => void
+  onRemovePurchase?: (args: { purchaseId: string; quantity: number }) => void
+  onAddAnother?: (equipmentId: string) => void
   onCustomizePackage?: () => void
   onChangeEquipmentOption?: () => void
   onSelectedPackageItemKeysChange?: (keys: ReadonlySet<string>) => void
@@ -54,6 +57,9 @@ export function EquipmentInventorySummary({
   conversionCommitStatusMessage,
   onRemoveItem,
   onSetPurchaseQuantity,
+  onReleaseGrant,
+  onRemovePurchase,
+  onAddAnother,
   onCustomizePackage,
   onChangeEquipmentOption,
   onSelectedPackageItemKeysChange,
@@ -99,8 +105,15 @@ export function EquipmentInventorySummary({
 
       <EquipmentAddedInventoryColumn
         addedEquipment={viewModel.addedEquipment}
+        draft={draft}
+        context={context}
+        catalogIndex={catalogIndex}
+        budget={budget}
         onRemoveItem={onRemoveItem}
         onSetPurchaseQuantity={onSetPurchaseQuantity}
+        onReleaseGrant={onReleaseGrant ?? (() => undefined)}
+        onRemovePurchase={onRemovePurchase ?? (() => undefined)}
+        onAddAnother={onAddAnother ?? (() => undefined)}
       />
     </div>
   )

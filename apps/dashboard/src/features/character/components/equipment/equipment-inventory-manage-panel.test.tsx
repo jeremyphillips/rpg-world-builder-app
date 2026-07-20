@@ -1,0 +1,81 @@
+import { describe, expect, it, vi } from 'vitest'
+import { render, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
+import { expectNoAxeViolations } from '@rpg/ui/test-utils'
+
+import { createEmptyCharacterBuilderDraft } from '@rpg/contracts'
+
+import {
+  equipmentStepCatalogIndexFixture,
+  equipmentStepContextFixture,
+} from '../../lib/equipment-step.fixtures'
+import type { EquipmentInventoryRow } from '../../lib/equipment-step.lib'
+import { EquipmentInventoryManagePanel } from './equipment-inventory-manage-panel.client'
+
+const rows: EquipmentInventoryRow[] = [
+  {
+    group: 'magicItems',
+    groupLabel: 'Magic Items',
+    entry: {
+      equipmentId: 'srd-cc-5.2.1:potion-of-healing',
+      quantity: 2,
+      sources: [{ kind: 'startingWealthTier', sourceId: 'tier', grantId: 'allowance-common' }],
+    },
+    equipmentName: 'Potion of Healing',
+    sourceLabel: 'Common choice',
+    isStackable: true,
+    quantityMode: 'locked',
+    removeLabel: 'Release choice Potion of Healing',
+    removeTarget: {
+      kind: 'magicItemGrant',
+      allowanceId: 'allowance-common',
+      equipmentId: 'srd-cc-5.2.1:potion-of-healing',
+    },
+  },
+]
+
+describe('EquipmentInventoryManagePanel', () => {
+  it('releases one grant copy from the manage panel', async () => {
+    const user = userEvent.setup()
+    const onReleaseGrant = vi.fn()
+
+    render(
+      <EquipmentInventoryManagePanel
+        equipmentName="Potion of Healing"
+        rows={rows}
+        draft={createEmptyCharacterBuilderDraft()}
+        context={equipmentStepContextFixture}
+        catalogIndex={equipmentStepCatalogIndexFixture}
+        onReleaseGrant={onReleaseGrant}
+        onRemovePurchase={vi.fn()}
+        onAddAnother={vi.fn()}
+      />,
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Manage' }))
+    await user.click(screen.getByRole('button', { name: 'Release one choice' }))
+
+    expect(onReleaseGrant).toHaveBeenCalledWith({
+      allowanceId: 'allowance-common',
+      equipmentId: 'srd-cc-5.2.1:potion-of-healing',
+      quantity: 1,
+    })
+  })
+
+  it('has no axe accessibility violations', async () => {
+    const { container } = render(
+      <EquipmentInventoryManagePanel
+        equipmentName="Potion of Healing"
+        rows={rows}
+        draft={createEmptyCharacterBuilderDraft()}
+        context={equipmentStepContextFixture}
+        catalogIndex={equipmentStepCatalogIndexFixture}
+        onReleaseGrant={vi.fn()}
+        onRemovePurchase={vi.fn()}
+        onAddAnother={vi.fn()}
+      />,
+    )
+
+    await expectNoAxeViolations(container)
+  })
+})

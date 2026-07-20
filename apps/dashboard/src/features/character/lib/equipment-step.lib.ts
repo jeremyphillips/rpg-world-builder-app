@@ -104,6 +104,22 @@ export const EQUIPMENT_MAGIC_ITEM_RELEASE_LABEL = 'Release choice'
 
 export const EQUIPMENT_MAGIC_ITEM_REMOVE_PURCHASE_LABEL = 'Remove purchase'
 
+export const EQUIPMENT_INVENTORY_MANAGE_LABEL = 'Manage'
+
+export const EQUIPMENT_INVENTORY_RELEASE_LABEL = 'Release'
+
+export const EQUIPMENT_INVENTORY_RELEASE_ONE_LABEL = 'Release one choice'
+
+export const EQUIPMENT_INVENTORY_REMOVE_ONE_PURCHASE_LABEL = 'Remove one purchase'
+
+export const EQUIPMENT_INVENTORY_ACQUIRED_THROUGH_LABEL = 'Acquired through'
+
+export const EQUIPMENT_INVENTORY_ADD_ANOTHER_LABEL = 'Add another'
+
+export function formatEquipmentInventoryManageHeadline(equipmentName: string): string {
+  return `Manage ${equipmentName}`
+}
+
 export type EquipmentPickerWorkflowMode = 'purchase' | 'magic_items'
 
 export const EQUIPMENT_PACKAGE_CUSTOMIZE_LABEL = 'Customize'

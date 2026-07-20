@@ -11,6 +11,7 @@ import {
 
 import {
   equipmentStepCatalogIndexFixture,
+  equipmentStepContextFixture,
   equipmentStepLuteFixture,
   equipmentStepMonkClassFixture,
 } from '../../lib/equipment-step.fixtures'
@@ -46,6 +47,13 @@ function monkStandardDraft(extra?: {
   }
 }
 
+const inventoryManagementArgs = {
+  context: equipmentStepContextFixture,
+  onReleaseGrant: () => undefined,
+  onRemovePurchase: () => undefined,
+  onAddAnother: () => undefined,
+} as const
+
 const meta = {
   title: 'Character Builder/EquipmentInventorySummary',
   component: EquipmentInventorySummary,
@@ -53,6 +61,7 @@ const meta = {
   args: {
     draft: monkStandardDraft(),
     catalogIndex: equipmentStepCatalogIndexFixture,
+    ...inventoryManagementArgs,
   },
 } satisfies Meta<typeof EquipmentInventorySummary>
 
@@ -117,6 +126,7 @@ function PackageCustomizationStory({ overBudget = false }: { overBudget?: boolea
         onChangeEquipmentOption={() => undefined}
         onCancelConversion={() => undefined}
         onCommitConversion={() => undefined}
+        {...inventoryManagementArgs}
       />
     )
   }
@@ -133,6 +143,7 @@ function PackageCustomizationStory({ overBudget = false }: { overBudget?: boolea
       onChangeEquipmentOption={() => undefined}
       onCancelConversion={() => undefined}
       onCommitConversion={() => undefined}
+      {...inventoryManagementArgs}
     />
   )
 }

@@ -13,11 +13,19 @@ import {
 import {
   equipmentStepBardClassFixture,
   equipmentStepCatalogIndexFixture,
+  equipmentStepContextFixture,
   equipmentStepLeatherArmorFixture,
 } from '../../lib/equipment-step.fixtures'
 import { EquipmentInventorySummary } from './equipment-inventory-summary.client'
 import { EquipmentInventoryRowItem } from './equipment-inventory-row.client'
 import type { EquipmentInventoryRow } from '../../lib/equipment-step.lib'
+
+const inventoryManagementProps = {
+  context: equipmentStepContextFixture,
+  onReleaseGrant: vi.fn(),
+  onRemovePurchase: vi.fn(),
+  onAddAnother: vi.fn(),
+}
 
 describe('EquipmentInventorySummary', () => {
   it('renders package rows with name and value pricing', async () => {
@@ -41,7 +49,11 @@ describe('EquipmentInventorySummary', () => {
     }
 
     render(
-      <EquipmentInventorySummary draft={draft} catalogIndex={equipmentStepCatalogIndexFixture} />,
+      <EquipmentInventorySummary
+        draft={draft}
+        catalogIndex={equipmentStepCatalogIndexFixture}
+        {...inventoryManagementProps}
+      />,
     )
 
     expect(screen.getByText('Leather Armor')).toBeInTheDocument()
@@ -106,6 +118,7 @@ describe('EquipmentInventorySummary', () => {
         catalogIndex={catalogIndex}
         onRemoveItem={vi.fn()}
         onSetPurchaseQuantity={onSetPurchaseQuantity}
+        {...inventoryManagementProps}
       />,
     )
 
@@ -158,6 +171,7 @@ describe('EquipmentInventorySummary', () => {
         catalogIndex={equipmentStepCatalogIndexFixture}
         onRemoveItem={vi.fn()}
         onSetPurchaseQuantity={onSetPurchaseQuantity}
+        {...inventoryManagementProps}
       />,
     )
 
@@ -264,6 +278,7 @@ describe('EquipmentInventorySummary', () => {
         draft={draft}
         catalogIndex={equipmentStepCatalogIndexFixture}
         onRemoveItem={vi.fn()}
+        {...inventoryManagementProps}
       />,
     )
 

@@ -1,5 +1,11 @@
 'use client'
 
+import type {
+  CharacterBuildCatalogIndex,
+  CharacterBuildContext,
+  CharacterBuilderDraft,
+  EquipmentBudgetSummary,
+} from '@rpg/contracts'
 import { Eyebrow, InsetPanel } from '@rpg/ui'
 
 import {
@@ -7,11 +13,8 @@ import {
   type EquipmentInventoryQuantityTarget,
   type EquipmentInventoryRemoveTarget,
 } from '../../lib/equipment-step.lib'
-import { EquipmentInventoryRowItem } from './equipment-inventory-row.client'
-import {
-  groupEquipmentInventoryRowsForDisplay,
-  type AddedEquipmentCategoryGroup,
-} from './equipment-inventory-summary.lib'
+import { EquipmentAddedInventoryRowItem } from './equipment-added-inventory-row.client'
+import type { AddedEquipmentCategoryGroup } from './equipment-inventory-summary.lib'
 import {
   equipmentInventoryRowListClasses,
   equipmentPurchasedInventoryCategoryClasses,
@@ -20,14 +23,28 @@ import {
 
 export type EquipmentAddedInventorySectionProps = {
   addedEquipment: AddedEquipmentCategoryGroup[]
+  draft: CharacterBuilderDraft
+  context: CharacterBuildContext
+  catalogIndex: CharacterBuildCatalogIndex
+  budget?: EquipmentBudgetSummary
   onRemoveItem?: (target: EquipmentInventoryRemoveTarget) => void
   onSetPurchaseQuantity?: (target: EquipmentInventoryQuantityTarget, quantity: number) => void
+  onReleaseGrant: (args: { allowanceId: string; equipmentId: string; quantity: number }) => void
+  onRemovePurchase: (args: { purchaseId: string; quantity: number }) => void
+  onAddAnother: (equipmentId: string) => void
 }
 
 export function EquipmentAddedInventorySection({
   addedEquipment,
+  draft,
+  context,
+  catalogIndex,
+  budget,
   onRemoveItem,
   onSetPurchaseQuantity,
+  onReleaseGrant,
+  onRemovePurchase,
+  onAddAnother,
 }: EquipmentAddedInventorySectionProps) {
   const hasEntries = addedEquipment.some((group) => group.entries.length > 0)
 
@@ -43,23 +60,22 @@ export function EquipmentAddedInventorySection({
 
   const renderEntryList = (entries: AddedEquipmentCategoryGroup['entries']) => (
     <ul className={equipmentInventoryRowListClasses}>
-      {entries.map((entry) => {
-        const display = groupEquipmentInventoryRowsForDisplay(entry.rows, {
-          allowCombinedRows: true,
-        })[0]
-        if (!display) return null
-
-        return (
-          <li key={entry.equipmentId}>
-            <EquipmentInventoryRowItem
-              display={display}
-              detailLabelOverride={entry.provenanceLabel}
-              onRemoveItem={onRemoveItem}
-              onSetPurchaseQuantity={onSetPurchaseQuantity}
-            />
-          </li>
-        )
-      })}
+      {entries.map((entry) => (
+        <li key={entry.equipmentId}>
+          <EquipmentAddedInventoryRowItem
+            entry={entry}
+            draft={draft}
+            context={context}
+            catalogIndex={catalogIndex}
+            budget={budget}
+            onRemoveItem={onRemoveItem}
+            onSetPurchaseQuantity={onSetPurchaseQuantity}
+            onReleaseGrant={onReleaseGrant}
+            onRemovePurchase={onRemovePurchase}
+            onAddAnother={onAddAnother}
+          />
+        </li>
+      ))}
     </ul>
   )
 
