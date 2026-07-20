@@ -1,6 +1,6 @@
 import {
   buildEquipmentCompactSummary,
-  formatMoney,
+  formatEquipmentCostLabel,
   getEquipmentKindLabel,
   type Equipment,
   type EquipmentKind,
@@ -45,7 +45,7 @@ export type EquipmentDetailViewModel = {
 const NO_MARKET_PRICE_LABEL = 'No market price'
 
 function formatEquipmentCostDisplay(cost: Equipment['cost']): string {
-  return cost ? formatMoney(cost) : NO_MARKET_PRICE_LABEL
+  return formatEquipmentCostLabel(cost) ?? NO_MARKET_PRICE_LABEL
 }
 
 function buildEquipmentStatRows(equipment: Equipment): ContentStatRowData[] {
@@ -63,7 +63,7 @@ export function buildEquipmentPickerRowViewModel(
 
   return {
     name: equipment.name,
-    priceLabel: equipment.cost ? formatMoney(equipment.cost) : '',
+    priceLabel: formatEquipmentCostLabel(equipment.cost) ?? '',
     kindLabel,
     comparisonGroups,
   }

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { formatMoney, getEquipmentKindLabel } from '@rpg/contracts'
+import { formatEquipmentCostLabel, getEquipmentKindLabel } from '@rpg/contracts'
 
 import { pickEquipment } from '../../lib/fixtures/pick'
 import { getEquipmentKindStatRows } from './shared/equipment-detail-stat-rows'
@@ -24,12 +24,12 @@ const KIND_FIXTURES = [
 
 function expectedCostLabel(slug: string) {
   const equipment = pickEquipment(slug)
-  return equipment.cost ? formatMoney(equipment.cost) : 'No market price'
+  return formatEquipmentCostLabel(equipment.cost) ?? 'No market price'
 }
 
 function expectedPickerPriceLabel(slug: string) {
   const equipment = pickEquipment(slug)
-  return equipment.cost ? formatMoney(equipment.cost) : ''
+  return formatEquipmentCostLabel(equipment.cost) ?? ''
 }
 
 function expectedDetailStatRows(slug: string) {

@@ -206,6 +206,26 @@ describe('equipment purchase price labels', () => {
     expect(formatEquipmentPurchaseTotalPriceLabel(rations, 2)).toBe('1 GP')
   })
 
+  it('returns empty price labels for unpriced equipment', () => {
+    const unpriced = equipmentSchema.parse({
+      ...longsword,
+      id: `${RULESET}:token`,
+      slug: 'token',
+      name: 'Token',
+      cost: null,
+    })
+
+    expect(formatEquipmentPurchaseUnitPriceLabel(unpriced)).toBe('')
+    expect(formatEquipmentPurchaseTotalPriceLabel(unpriced, 2)).toBe('')
+    expect(
+      formatEquipmentInventoryPriceLine({
+        equipment: unpriced,
+        quantity: 2,
+        priceContext: 'startingGold',
+      }),
+    ).toBe('')
+  })
+
   it('formats inventory price lines for stackable, bundle, and non-stackable rows', () => {
     expect(
       formatEquipmentInventoryPriceLine({

@@ -59,6 +59,8 @@ export { equipmentBaseSchema, type EquipmentBaseFields } from './equipment/base'
 
 export { canPurchaseEquipment } from './equipment/can-purchase-equipment'
 
+export { formatEquipmentCostLabel } from './equipment/format-equipment-cost-label'
+
 export { equipmentVariantValidationMessages } from './equipment/equipment-variant-messages'
 
 export {

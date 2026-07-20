@@ -1,4 +1,4 @@
-import { formatMoney, moneyToCp, type EquipmentCost } from '@rpg/contracts'
+import { formatEquipmentCostLabel, moneyToCp, type EquipmentCost } from '@rpg/contracts'
 import { dataTableColumnMeta, dataTableWidthMeta, SortableHeader } from '@rpg/ui'
 import type { ColumnDef, FilterDef } from '@rpg/ui'
 
@@ -54,7 +54,7 @@ export function costColumn<T extends WithCost>(): ColumnDef<T> {
     id: 'cost',
     accessorFn: (row) => (row.cost ? moneyToCp(row.cost) : -1),
     header: ({ column }) => <SortableHeader column={column}>Cost</SortableHeader>,
-    cell: ({ row }) => (row.original.cost ? formatMoney(row.original.cost) : NO_MARKET_PRICE_LABEL),
+    cell: ({ row }) => formatEquipmentCostLabel(row.original.cost) ?? NO_MARKET_PRICE_LABEL,
     meta: { label: 'Cost' },
   }
 }
