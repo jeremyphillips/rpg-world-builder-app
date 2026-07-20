@@ -65,7 +65,6 @@ export function applyEquipmentPurchaseIntent(args: {
     draft: {
       ...draft,
       equipment: cloneEquipmentDraftChannel(draft, {
-        mode: 'gold',
         purchases,
         skipped: false,
       }),

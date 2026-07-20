@@ -327,7 +327,7 @@ export function buildEquipmentInventoryLayout(
   const option = startingEquipment.options.find((entry) => entry.id === selectedOptionId)
   if (!option) return undefined
 
-  const isGoldPath = draft.equipment?.mode === 'gold' || isStartingGoldOption(option)
+  const isGoldPath = isStartingGoldOption(option)
   const allRows = listEquipmentInventoryRowsFromDraft(draft, catalogIndex, budget, context)
   const { packageRows, magicItemRows, purchasedRows } = partitionInventoryRowsBySource(allRows)
 

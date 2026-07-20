@@ -59,10 +59,9 @@ export function categoryOnlyToolProficiencyPool(
 }
 
 export function isGoldShoppingPath(
-  draft: CharacterBuilderDraft,
+  _draft: CharacterBuilderDraft,
   selectedOption: StartingEquipmentOption | undefined,
 ): boolean {
-  if (draft.equipment?.mode === 'gold') return true
   return selectedOption !== undefined && isWealthOnlyStartingEquipmentOption(selectedOption)
 }
 

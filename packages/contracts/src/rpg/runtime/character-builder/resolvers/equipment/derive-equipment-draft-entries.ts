@@ -13,7 +13,10 @@ import {
   resolveStartingEquipmentOption,
   type ResolvedStartingEquipmentItem,
 } from '../../assembly/assemble-starting-equipment'
-import type { StartingEquipmentOption } from '../../../../content/starting-equipment'
+import {
+  isStartingGoldOption,
+  type StartingEquipmentOption,
+} from '../../../../content/starting-equipment'
 import { readSelectedStartingEquipmentOptionId } from './resolve-starting-equipment-choice-sets'
 import { readMagicItemSelections } from './resolve-magic-item-grant-progress'
 import { resolveMagicItemGrantAllowances } from './resolve-magic-item-grant-allowances'
@@ -58,7 +61,7 @@ function appendPackageItemsFromDraft(
   catalogIndex: CharacterBuildCatalogIndex,
   inventory: CharacterEquipment,
 ): CharacterEquipment {
-  if (!shouldIncludePackageItems(draft)) return inventory
+  if (!shouldIncludePackageItems(context.option)) return inventory
 
   const { classId, characterClass, option, selectedOptionId } = context
   const removedKeys = new Set(draft.equipment?.removedPackageItemKeys ?? [])
@@ -232,8 +235,8 @@ function appendPurchase(
   })
 }
 
-function shouldIncludePackageItems(draft: CharacterBuilderDraft): boolean {
-  return draft.equipment?.mode !== 'gold'
+function shouldIncludePackageItems(option: StartingEquipmentOption): boolean {
+  return !isStartingGoldOption(option)
 }
 
 /**

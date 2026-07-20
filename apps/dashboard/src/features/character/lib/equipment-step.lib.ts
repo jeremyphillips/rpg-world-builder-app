@@ -1250,18 +1250,17 @@ export function listEquipmentInventoryRowsFromDraft(
   const option = startingEquipment.options.find((entry) => entry.id === selectedOptionId)
   if (!option) return []
 
-  const packageRows =
-    draft.equipment?.mode === 'gold'
-      ? []
-      : listPackageInventoryRows({
-          draft,
-          catalogIndex,
-          characterClass,
-          option,
-          classId,
-          selectedOptionId,
-          budget,
-        })
+  const packageRows = isStartingGoldOption(option)
+    ? []
+    : listPackageInventoryRows({
+        draft,
+        catalogIndex,
+        characterClass,
+        option,
+        classId,
+        selectedOptionId,
+        budget,
+      })
 
   return [
     ...packageRows,
@@ -1295,15 +1294,34 @@ function upsertEquipmentPurchase(args: {
   })
 }
 
+function resolveCachedEquipmentMode(
+  draft: CharacterBuilderDraft,
+  catalogIndex: CharacterBuildCatalogIndex,
+): NonNullable<CharacterBuilderDraft['equipment']>['mode'] {
+  if (draft.equipment?.mode) return draft.equipment.mode
+
+  const classId = draft.class.classId
+  if (!classId) return 'package'
+
+  const selectedOptionId = readSelectedStartingEquipmentOptionId(draft, classId)
+  const characterClass = catalogIndex.classes.get(classId)
+  const option = characterClass?.characterCreation?.startingEquipment?.options.find(
+    (entry) => entry.id === selectedOptionId,
+  )
+
+  return option ? resolveEquipmentModeFromOption(option) : 'package'
+}
+
 function buildEquipmentDraftFromPurchase(args: {
   draft: CharacterBuilderDraft
+  catalogIndex: CharacterBuildCatalogIndex
   purchases: CharacterBuilderDraftEquipmentPurchase[]
   sourceMode: CharacterBuilderDraftEquipmentPurchase['sourceMode']
 }): CharacterBuilderDraft['equipment'] {
-  const { draft, purchases, sourceMode } = args
+  const { draft, catalogIndex, purchases, sourceMode } = args
 
   return {
-    mode: draft.equipment?.mode ?? (sourceMode === 'startingGold' ? 'gold' : 'package'),
+    mode: resolveCachedEquipmentMode(draft, catalogIndex),
     purchases,
     removedPackageItemKeys: draft.equipment?.removedPackageItemKeys ?? [],
     customized: sourceMode === 'manual' ? true : (draft.equipment?.customized ?? false),
@@ -1353,6 +1371,7 @@ export function buildEquipmentAddPurchasePatch(args: {
   return {
     equipment: buildEquipmentDraftFromPurchase({
       draft,
+      catalogIndex,
       sourceMode,
       purchases: upsertEquipmentPurchase({
         purchases: [...(draft.equipment?.purchases ?? [])],

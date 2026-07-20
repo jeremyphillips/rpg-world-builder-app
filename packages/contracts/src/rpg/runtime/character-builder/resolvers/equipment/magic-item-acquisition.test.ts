@@ -293,6 +293,77 @@ describe('magic item acquisition contracts', () => {
     expect(result.applied).toBe(true)
     expect(readMagicItemSelections(result.draft)).toEqual([])
     expect(result.draft.equipment?.purchases).toHaveLength(1)
+    expect(result.draft.equipment?.mode).toBe('gold')
+  })
+
+  it('preserves package mode when purchasing on the standard-equipment path', () => {
+    const druidClass: ClassStored = {
+      ...fighterClass,
+      id: `${RULESET}:druid-package`,
+      slug: 'druid-package',
+      name: 'Druid',
+      characterCreation: {
+        startingEquipment: {
+          choose: 1,
+          options: [
+            {
+              id: 'standard-equipment',
+              label: 'Standard Equipment',
+              items: [
+                {
+                  kind: 'grant',
+                  target: { source: 'equipment', equipmentSlug: 'rope' },
+                  quantity: 1,
+                },
+              ],
+              wealth: { gp: 50 },
+            },
+            {
+              id: 'starting-gold',
+              label: 'Starting Gold',
+              items: [],
+              wealth: { gp: 100 },
+            },
+          ],
+        },
+      },
+    }
+
+    const catalogIndex = indexCharacterBuildCatalog({
+      species: [],
+      classes: [druidClass],
+      spells: [],
+      equipment: [rope],
+      skillProficiencies: [],
+      languages: [],
+    })
+
+    const draft = {
+      ...createEmptyCharacterBuilderDraft(),
+      class: { classId: druidClass.id, level: 1 as const },
+      choiceSelections: {
+        [startingEquipmentChoiceSetId(druidClass.id)]: ['standard-equipment'],
+      },
+      equipment: {
+        mode: 'package' as const,
+        purchases: [],
+        magicItemSelections: [],
+        removedPackageItemKeys: [],
+        customized: false,
+      },
+    }
+
+    const context = builderContext(catalogIndex)
+    const result = applyEquipmentPurchaseIntent({
+      draft,
+      context,
+      equipment: rope,
+      requestedQuantity: 1,
+    })
+
+    expect(result.applied).toBe(true)
+    expect(result.draft.equipment?.mode).toBe('package')
+    expect(result.draft.equipment?.purchases).toHaveLength(1)
   })
 
   it('reconcile removes only explicit composite keys', () => {
