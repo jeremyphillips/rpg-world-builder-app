@@ -1039,8 +1039,8 @@ export function resolveEquipmentPickerWorkflowModes(args: {
   showMagicItems: boolean
 }): EquipmentPickerWorkflowMode[] {
   const modes: EquipmentPickerWorkflowMode[] = []
-  if (args.showMagicItems) modes.push('magic_items')
   if (args.showPurchase) modes.push('purchase')
+  if (args.showMagicItems) modes.push('magic_items')
   return modes
 }
 

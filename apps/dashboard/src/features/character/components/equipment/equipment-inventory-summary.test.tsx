@@ -12,10 +12,13 @@ import {
 
 import {
   equipmentStepBardClassFixture,
+  equipmentStepBattleaxeFixture,
   equipmentStepCatalogIndexFixture,
   equipmentStepContextFixture,
   equipmentStepLeatherArmorFixture,
+  equipmentStepMonkClassFixture,
 } from '../../lib/equipment-step.fixtures'
+import { EQUIPMENT_STEP_BROWSE_LABEL } from '../../lib/equipment-step.lib'
 import { EquipmentInventorySummary } from './equipment-inventory-summary.client'
 import { EquipmentInventoryRowItem } from './equipment-inventory-row.client'
 import type { EquipmentInventoryRow } from '../../lib/equipment-step.lib'
@@ -60,6 +63,51 @@ describe('EquipmentInventorySummary', () => {
     expect(screen.getByText('Lute')).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Remove from package' })).not.toBeInTheDocument()
     expect(screen.getByText('Added Equipment')).toBeInTheDocument()
+  })
+
+  it('keeps package gear visible after a purchase on the package path', () => {
+    const catalogIndex = {
+      ...equipmentStepCatalogIndexFixture,
+      equipment: new Map([
+        ...equipmentStepCatalogIndexFixture.equipment,
+        [equipmentStepBattleaxeFixture.id, equipmentStepBattleaxeFixture],
+      ]),
+    }
+    const draft = {
+      ...createEmptyCharacterBuilderDraft(),
+      class: { classId: equipmentStepMonkClassFixture.id, level: 1 as const },
+      choiceSelections: {
+        [startingEquipmentChoiceSetId(equipmentStepMonkClassFixture.id)]: ['standard-equipment'],
+      },
+      equipment: {
+        mode: 'package' as const,
+        purchases: [
+          {
+            equipmentId: equipmentStepBattleaxeFixture.id,
+            quantity: 1,
+            sourceMode: 'startingGold' as const,
+            origin: 'picker' as const,
+          },
+        ],
+        removedPackageItemKeys: [],
+        customized: false,
+      },
+    }
+
+    render(
+      <EquipmentInventorySummary
+        draft={draft}
+        catalogIndex={catalogIndex}
+        {...inventoryManagementProps}
+      />,
+    )
+
+    expect(screen.getByText('Spear')).toBeInTheDocument()
+    expect(screen.getByText('Battleaxe')).toBeInTheDocument()
+    expect(
+      screen.queryByRole('button', { name: EQUIPMENT_STEP_BROWSE_LABEL }),
+    ).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Choose magic items' })).not.toBeInTheDocument()
   })
 
   it('renders editable starting-gold stackable rows with quantity controls', async () => {

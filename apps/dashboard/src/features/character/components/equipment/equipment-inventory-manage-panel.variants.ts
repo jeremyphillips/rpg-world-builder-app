@@ -1,5 +1,10 @@
+export const equipmentInventoryManagePanelRootClasses =
+  'flex w-full min-w-0 flex-col items-end gap-2'
+
+export const equipmentInventoryManageRowClasses = 'flex w-full min-w-0 flex-col gap-2'
+
 export const equipmentInventoryManagePanelContentClasses =
-  'z-50 w-[min(100vw-2rem,22rem)] rounded-lg border border-border bg-card p-4 shadow-md outline-none'
+  'w-full min-w-0 rounded-lg border border-border bg-card p-4 shadow-sm outline-none'
 
 export const equipmentInventoryManagePanelHeaderClasses = 'space-y-1'
 

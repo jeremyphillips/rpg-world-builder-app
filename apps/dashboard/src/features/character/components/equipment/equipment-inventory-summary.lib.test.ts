@@ -1,12 +1,16 @@
 import { describe, expect, it } from 'vitest'
 
 import { createEmptyCharacterBuilderDraft, startingEquipmentChoiceSetId } from '@rpg/contracts'
+import { buildMagicItemAllowanceId, standardStartingWealthTableId } from '@rpg/contracts'
 
 import {
   equipmentStepBardClassFixture,
+  equipmentStepBattleaxeFixture,
   equipmentStepCatalogIndexFixture,
   equipmentStepLeatherArmorFixture,
   equipmentStepMonkClassFixture,
+  equipmentStepPotionOfHealingFixture,
+  createEquipmentStepContextWithMagicItemGrantsFixture,
 } from '../../lib/equipment-step.fixtures'
 import type { EquipmentInventoryRow } from '../../lib/equipment-step.lib'
 import {
@@ -259,5 +263,101 @@ describe('equipment-inventory-summary.lib', () => {
     expect(gearEntries?.entries).toHaveLength(1)
     expect(gearEntries?.entries[0]?.totalQuantity).toBe(2)
     expect(gearEntries?.entries[0]?.sources).toEqual([{ kind: 'startingGold', quantity: 2 }])
+  })
+
+  it('aggregates grant and purchased potions into one magic-items entry', () => {
+    const allowanceId = buildMagicItemAllowanceId({
+      startingWealthTableId: standardStartingWealthTableId('srd-cc-5.2.1'),
+      tierId: 'hero',
+      rarity: 'common',
+    })
+    const draft = {
+      ...createEmptyCharacterBuilderDraft(),
+      class: { classId: equipmentStepBardClassFixture.id, level: 1 as const },
+      choiceSelections: {
+        [startingEquipmentChoiceSetId(equipmentStepBardClassFixture.id)]: ['standard-equipment'],
+      },
+      equipment: {
+        mode: 'package' as const,
+        purchases: [
+          {
+            equipmentId: equipmentStepPotionOfHealingFixture.id,
+            quantity: 1,
+            sourceMode: 'startingGold' as const,
+            origin: 'picker' as const,
+          },
+        ],
+        magicItemSelections: [
+          {
+            allowanceId,
+            equipmentId: equipmentStepPotionOfHealingFixture.id,
+            quantity: 2,
+          },
+        ],
+        removedPackageItemKeys: [],
+        customized: false,
+      },
+    }
+
+    const context = createEquipmentStepContextWithMagicItemGrantsFixture()
+    const viewModel = buildEquipmentInventoryViewModel(
+      draft,
+      equipmentStepCatalogIndexFixture,
+      undefined,
+      'included',
+      context,
+    )
+    const magicItems = viewModel?.addedEquipment.find((group) => group.groupLabel === 'Magic Items')
+
+    expect(magicItems?.entries).toHaveLength(1)
+    expect(magicItems?.entries[0]).toMatchObject({
+      equipmentId: equipmentStepPotionOfHealingFixture.id,
+      totalQuantity: 3,
+      rows: expect.arrayContaining([
+        expect.objectContaining({
+          removeTarget: expect.objectContaining({ kind: 'magicItemGrant' }),
+        }),
+        expect.objectContaining({
+          removeTarget: expect.objectContaining({ kind: 'purchase' }),
+        }),
+      ]),
+    })
+  })
+
+  it('groups purchased weapons under the weapons category on the package path', () => {
+    const catalogIndex = {
+      ...equipmentStepCatalogIndexFixture,
+      equipment: new Map([
+        ...equipmentStepCatalogIndexFixture.equipment,
+        [equipmentStepBattleaxeFixture.id, equipmentStepBattleaxeFixture],
+      ]),
+    }
+    const draft = {
+      ...createEmptyCharacterBuilderDraft(),
+      class: { classId: equipmentStepMonkClassFixture.id, level: 1 as const },
+      choiceSelections: {
+        [startingEquipmentChoiceSetId(equipmentStepMonkClassFixture.id)]: ['standard-equipment'],
+      },
+      equipment: {
+        mode: 'package' as const,
+        purchases: [
+          {
+            equipmentId: equipmentStepBattleaxeFixture.id,
+            quantity: 1,
+            sourceMode: 'startingGold' as const,
+            origin: 'picker' as const,
+          },
+        ],
+        removedPackageItemKeys: [],
+        customized: false,
+      },
+    }
+
+    const viewModel = buildEquipmentInventoryViewModel(draft, catalogIndex)
+    const weapons = viewModel?.addedEquipment.find((group) => group.groupLabel === 'Weapons')
+
+    expect(viewModel?.startingEquipment.kind).toBe('package')
+    expect(weapons?.entries).toHaveLength(1)
+    expect(weapons?.entries[0]?.equipmentName).toBe('Battleaxe')
   })
 })

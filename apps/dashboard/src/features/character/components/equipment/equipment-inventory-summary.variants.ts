@@ -26,14 +26,15 @@ export const equipmentInventorySummaryGroupClasses = 'space-y-1'
 
 export const equipmentInventorySummaryListClasses = ''
 
-export const equipmentPurchasedInventoryCategoryListClasses = 'divide-y divide-border'
+export const equipmentPurchasedInventoryCategoryListClasses =
+  'divide-y divide-border overflow-visible'
 
 export const equipmentPurchasedInventoryCategoryClasses = 'space-y-1 py-3 first:pt-0 last:pb-0'
 
 /** Vertical spacing between inventory row cards in a category list. */
-export const equipmentInventoryRowListClasses = 'flex flex-col gap-2'
+export const equipmentInventoryRowListClasses = 'flex flex-col gap-2 overflow-visible'
 
-export const equipmentInventoryRowClasses = 'py-1'
+export const equipmentInventoryRowClasses = 'overflow-visible py-1'
 
 export const equipmentInventoryRowQuantityClasses = 'flex items-center gap-1.5'
 

@@ -96,6 +96,45 @@ describe('EquipmentAddedInventoryRowItem', () => {
     expect(screen.queryByRole('button', { name: /Remove all/ })).not.toBeInTheDocument()
   })
 
+  it('renders manage without trash controls for mixed grant and purchase rows', () => {
+    const purchaseRow: EquipmentInventoryRow = {
+      group: 'magicItems',
+      groupLabel: 'Magic Items',
+      entry: {
+        equipmentId: 'srd-cc-5.2.1:potion-of-healing',
+        quantity: 1,
+        sources: [{ kind: 'startingGold' }],
+      },
+      equipmentName: 'Potion of Healing',
+      sourceLabel: 'Purchased with starting gold',
+      isStackable: true,
+      quantityMode: 'editable',
+      removeLabel: 'Remove Potion of Healing',
+      removeTarget: { kind: 'purchase', purchaseId: 'purchase-1' },
+      quantityTarget: { kind: 'purchase', purchaseId: 'purchase-1' },
+    }
+
+    render(
+      <EquipmentAddedInventoryRowItem
+        entry={entry([grantRow, purchaseRow], {
+          provenanceLabel: '2 Common choices · Purchased · 50 GP',
+          totalQuantity: 3,
+        })}
+        draft={createEmptyCharacterBuilderDraft()}
+        context={equipmentStepContextFixture}
+        catalogIndex={equipmentStepCatalogIndexFixture}
+        onReleaseGrant={vi.fn()}
+        onRemovePurchase={vi.fn()}
+        onAddAnother={vi.fn()}
+      />,
+    )
+
+    expect(screen.getByText('Qty 3')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Manage' })).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /Remove all/ })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Release' })).not.toBeInTheDocument()
+  })
+
   it('has no axe accessibility violations', async () => {
     const { container } = render(
       <EquipmentAddedInventoryRowItem

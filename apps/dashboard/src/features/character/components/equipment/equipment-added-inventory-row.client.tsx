@@ -6,20 +6,28 @@ import type {
   CharacterBuilderDraft,
   EquipmentBudgetSummary,
 } from '@rpg/contracts'
-import { Button, Text } from '@rpg/ui'
+import { Button, Collapsible, CollapsibleContent, CollapsibleTrigger, Text } from '@rpg/ui'
 
 import {
+  EQUIPMENT_INVENTORY_MANAGE_LABEL,
   EQUIPMENT_INVENTORY_RELEASE_LABEL,
   type EquipmentInventoryQuantityTarget,
   type EquipmentInventoryRemoveTarget,
 } from '../../lib/equipment-step.lib'
-import { EquipmentInventoryManageEntryPanel } from './equipment-inventory-manage-panel.client'
+import {
+  EquipmentInventoryManagePanelBody,
+  type EquipmentInventoryManagePanelBodyProps,
+} from './equipment-inventory-manage-panel.client'
 import {
   groupEquipmentInventoryRowsForDisplay,
   type AddedEquipmentEntryViewModel,
 } from './equipment-inventory-summary.lib'
 import { EquipmentInventoryRowItem } from './equipment-inventory-row.client'
 import { resolveEquipmentInventoryRowManagementMode } from './equipment-inventory-manage.lib'
+import {
+  equipmentInventoryManagePanelContentClasses,
+  equipmentInventoryManageRowClasses,
+} from './equipment-inventory-manage-panel.variants'
 import {
   equipmentInventoryRowActionsClasses,
   equipmentInventoryRowClasses,
@@ -101,57 +109,44 @@ function GrantOnlySingleReleaseRow({
 function ManagedInventoryRow({
   entry,
   mode,
-  draft,
-  context,
-  catalogIndex,
-  budget,
-  onReleaseGrant,
-  onRemovePurchase,
-  onAddAnother,
+  managePanelProps,
 }: {
   entry: AddedEquipmentEntryViewModel
   mode: Extract<
     ReturnType<typeof resolveEquipmentInventoryRowManagementMode>,
     { kind: 'grant_only' | 'mixed' }
   >
-  draft: CharacterBuilderDraft
-  context: CharacterBuildContext
-  catalogIndex: CharacterBuildCatalogIndex
-  budget?: EquipmentBudgetSummary
-  onReleaseGrant: EquipmentAddedInventoryRowItemProps['onReleaseGrant']
-  onRemovePurchase: EquipmentAddedInventoryRowItemProps['onRemovePurchase']
-  onAddAnother: EquipmentAddedInventoryRowItemProps['onAddAnother']
+  managePanelProps: EquipmentInventoryManagePanelBodyProps
 }) {
   const showQuantity = mode.kind === 'mixed' || mode.totalQuantity > 1
 
   return (
     <article className={equipmentInventoryRowClasses}>
-      <div className={equipmentInventoryRowHeaderClasses}>
-        <div className={builderInventoryRowMetaClasses}>
-          <Text as="p" className={equipmentInventoryRowNameClasses}>
-            {entry.equipmentName}
-          </Text>
-        </div>
-        <div className={equipmentInventoryRowActionsClasses}>
-          {showQuantity ? (
-            <Text as="span" className={equipmentInventoryRowQtyLabelClasses}>
-              Qty {mode.totalQuantity}
+      <Collapsible className={equipmentInventoryManageRowClasses}>
+        <div className={equipmentInventoryRowHeaderClasses}>
+          <div className={builderInventoryRowMetaClasses}>
+            <Text as="p" className={equipmentInventoryRowNameClasses}>
+              {entry.equipmentName}
             </Text>
-          ) : null}
-          <EquipmentInventoryManageEntryPanel
-            entry={entry}
-            draft={draft}
-            context={context}
-            catalogIndex={catalogIndex}
-            budget={budget}
-            showAddAnother={mode.kind === 'mixed' || mode.kind === 'grant_only'}
-            onReleaseGrant={onReleaseGrant}
-            onRemovePurchase={onRemovePurchase}
-            onAddAnother={onAddAnother}
-          />
+          </div>
+          <div className={equipmentInventoryRowActionsClasses}>
+            {showQuantity ? (
+              <Text as="span" className={equipmentInventoryRowQtyLabelClasses}>
+                Qty {mode.totalQuantity}
+              </Text>
+            ) : null}
+            <CollapsibleTrigger asChild>
+              <Button type="button" size="sm" variant="secondary">
+                {EQUIPMENT_INVENTORY_MANAGE_LABEL}
+              </Button>
+            </CollapsibleTrigger>
+          </div>
         </div>
-      </div>
-      <InventoryRowDetailLine label={entry.provenanceLabel} />
+        <InventoryRowDetailLine label={entry.provenanceLabel} />
+        <CollapsibleContent className={equipmentInventoryManagePanelContentClasses}>
+          <EquipmentInventoryManagePanelBody {...managePanelProps} />
+        </CollapsibleContent>
+      </Collapsible>
     </article>
   )
 }
@@ -194,13 +189,19 @@ export function EquipmentAddedInventoryRowItem({
     <ManagedInventoryRow
       entry={entry}
       mode={mode}
-      draft={draft}
-      context={context}
-      catalogIndex={catalogIndex}
-      budget={budget}
-      onReleaseGrant={onReleaseGrant}
-      onRemovePurchase={onRemovePurchase}
-      onAddAnother={onAddAnother}
+      managePanelProps={{
+        equipmentName: entry.equipmentName,
+        equipment: entry.rows.find((row) => row.equipment)?.equipment,
+        rows: entry.rows,
+        draft,
+        context,
+        catalogIndex,
+        budget,
+        showAddAnother: mode.kind === 'mixed' || mode.kind === 'grant_only',
+        onReleaseGrant,
+        onRemovePurchase,
+        onAddAnother,
+      }}
     />
   )
 }

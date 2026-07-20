@@ -29,6 +29,7 @@ import {
   equipmentInventoryManagePanelAddAnotherClasses,
   equipmentInventoryManagePanelContentClasses,
   equipmentInventoryManagePanelHeaderClasses,
+  equipmentInventoryManagePanelRootClasses,
   equipmentInventoryManagePanelSectionClasses,
   equipmentInventoryManagePanelSourceActionsClasses,
   equipmentInventoryManagePanelSourceListClasses,
@@ -36,7 +37,7 @@ import {
   equipmentInventoryManagePanelSourceRowClasses,
 } from './equipment-inventory-manage-panel.variants'
 
-export type EquipmentInventoryManagePanelProps = {
+export type EquipmentInventoryManagePanelBodyProps = {
   equipmentName: string
   equipment?: Equipment
   rows: readonly EquipmentInventoryRow[]
@@ -56,8 +57,8 @@ function ManageSourceSection({
   onRemovePurchase,
 }: {
   sources: ReturnType<typeof resolveEquipmentInventoryManageSources>
-  onReleaseGrant: EquipmentInventoryManagePanelProps['onReleaseGrant']
-  onRemovePurchase: EquipmentInventoryManagePanelProps['onRemovePurchase']
+  onReleaseGrant: EquipmentInventoryManagePanelBodyProps['onReleaseGrant']
+  onRemovePurchase: EquipmentInventoryManagePanelBodyProps['onRemovePurchase']
 }) {
   return (
     <div className={equipmentInventoryManagePanelSourceListClasses}>
@@ -124,7 +125,7 @@ function ManageSourceSection({
   )
 }
 
-export function EquipmentInventoryManagePanel({
+export function EquipmentInventoryManagePanelBody({
   equipmentName,
   equipment,
   rows,
@@ -136,7 +137,7 @@ export function EquipmentInventoryManagePanel({
   onReleaseGrant,
   onRemovePurchase,
   onAddAnother,
-}: EquipmentInventoryManagePanelProps) {
+}: EquipmentInventoryManagePanelBodyProps) {
   const sources = useMemo(() => resolveEquipmentInventoryManageSources(rows), [rows])
   const addAnotherPreview = useMemo(() => {
     if (!showAddAnother || !equipment) return undefined
@@ -151,56 +152,64 @@ export function EquipmentInventoryManagePanel({
   }, [budget, catalogIndex, context, draft, equipment, showAddAnother])
 
   return (
-    <Collapsible>
+    <div className={equipmentInventoryManagePanelSectionClasses}>
+      <div className={equipmentInventoryManagePanelHeaderClasses}>
+        <Heading variant="group" as="h4">
+          {formatEquipmentInventoryManageHeadline(equipmentName)}
+        </Heading>
+        <Text as="p" variant="muted" className="text-sm">
+          {EQUIPMENT_INVENTORY_ACQUIRED_THROUGH_LABEL}
+        </Text>
+      </div>
+
+      <ManageSourceSection
+        sources={sources}
+        onReleaseGrant={onReleaseGrant}
+        onRemovePurchase={onRemovePurchase}
+      />
+
+      {addAnotherPreview ? (
+        <div className={equipmentInventoryManagePanelAddAnotherClasses}>
+          <Text as="p" className="text-sm font-body-emphasis text-foreground">
+            {EQUIPMENT_INVENTORY_ADD_ANOTHER_LABEL}
+          </Text>
+          <Text as="p" variant="muted" className="text-sm">
+            {addAnotherPreview.label}
+          </Text>
+          {addAnotherPreview.blockerNote ? (
+            <Text as="p" variant="warning" className="text-sm">
+              {addAnotherPreview.blockerNote}
+            </Text>
+          ) : null}
+          <Button
+            type="button"
+            size="sm"
+            disabled={!addAnotherPreview.canAdd}
+            onClick={() => {
+              if (!equipment) return
+              onAddAnother(equipment.id)
+            }}
+          >
+            {EQUIPMENT_INVENTORY_ADD_ANOTHER_LABEL}
+          </Button>
+        </div>
+      ) : null}
+    </div>
+  )
+}
+
+export type EquipmentInventoryManagePanelProps = EquipmentInventoryManagePanelBodyProps
+
+export function EquipmentInventoryManagePanel(props: EquipmentInventoryManagePanelProps) {
+  return (
+    <Collapsible className={equipmentInventoryManagePanelRootClasses}>
       <CollapsibleTrigger asChild>
         <Button type="button" size="sm" variant="secondary">
           {EQUIPMENT_INVENTORY_MANAGE_LABEL}
         </Button>
       </CollapsibleTrigger>
       <CollapsibleContent className={equipmentInventoryManagePanelContentClasses}>
-        <div className={equipmentInventoryManagePanelSectionClasses}>
-          <div className={equipmentInventoryManagePanelHeaderClasses}>
-            <Heading variant="group" as="h4">
-              {formatEquipmentInventoryManageHeadline(equipmentName)}
-            </Heading>
-            <Text as="p" variant="muted" className="text-sm">
-              {EQUIPMENT_INVENTORY_ACQUIRED_THROUGH_LABEL}
-            </Text>
-          </div>
-
-          <ManageSourceSection
-            sources={sources}
-            onReleaseGrant={onReleaseGrant}
-            onRemovePurchase={onRemovePurchase}
-          />
-
-          {addAnotherPreview ? (
-            <div className={equipmentInventoryManagePanelAddAnotherClasses}>
-              <Text as="p" className="text-sm font-body-emphasis text-foreground">
-                {EQUIPMENT_INVENTORY_ADD_ANOTHER_LABEL}
-              </Text>
-              <Text as="p" variant="muted" className="text-sm">
-                {addAnotherPreview.label}
-              </Text>
-              {addAnotherPreview.blockerNote ? (
-                <Text as="p" variant="warning" className="text-sm">
-                  {addAnotherPreview.blockerNote}
-                </Text>
-              ) : null}
-              <Button
-                type="button"
-                size="sm"
-                disabled={!addAnotherPreview.canAdd}
-                onClick={() => {
-                  if (!equipment) return
-                  onAddAnother(equipment.id)
-                }}
-              >
-                {EQUIPMENT_INVENTORY_ADD_ANOTHER_LABEL}
-              </Button>
-            </div>
-          ) : null}
-        </div>
+        <EquipmentInventoryManagePanelBody {...props} />
       </CollapsibleContent>
     </Collapsible>
   )

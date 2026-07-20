@@ -163,7 +163,7 @@ export const MagicItemsWorkflow: Story = {
     onOpenChange: () => undefined,
     items: equipmentPickerMagicItemsFixture,
     workflowMode: 'magic_items',
-    workflowModes: ['magic_items', 'purchase'],
+    workflowModes: ['purchase', 'magic_items'],
     onWorkflowModeChange: () => undefined,
     onAddItem: () => undefined,
   },

@@ -9,6 +9,7 @@ import {
   type CharacterBuildContext,
   type ClassStored,
   type Equipment,
+  type StartingWealthRules,
 } from '@rpg/contracts'
 
 export const equipmentStepBreastplateFixture = {
@@ -141,6 +142,28 @@ export const equipmentStepSpearFixture = {
   mastery: 'sap',
   versatileDamage: { count: 1, faces: 8 },
   range: { normal: 20, long: 60 },
+} as const satisfies Equipment
+
+export const equipmentStepBattleaxeFixture = {
+  id: 'srd-cc-5.2.1:battleaxe',
+  slug: 'battleaxe',
+  rulesetId: DEFAULT_SYSTEM_RULESET_ID,
+  source: 'system',
+  campaignId: null,
+  createdAt: '2026-01-01T00:00:00.000Z',
+  updatedAt: '2026-01-01T00:00:00.000Z',
+  name: 'Battleaxe',
+  description: '',
+  cost: { amount: 10, currency: 'gp' },
+  weight: { value: 4, unit: 'lb' },
+  kind: 'weapon',
+  category: 'martial',
+  mode: 'melee',
+  damage: { dice: { count: 1, faces: 8 } },
+  damageType: 'slashing',
+  properties: ['versatile'],
+  mastery: 'topple',
+  versatileDamage: { count: 1, faces: 10 },
 } as const satisfies Equipment
 
 export const equipmentStepDaggerFixture = {
@@ -334,6 +357,7 @@ export const equipmentStepCatalogFixture = {
     equipmentStepLuteFixture,
     equipmentStepDrumFixture,
     equipmentStepSpearFixture,
+    equipmentStepBattleaxeFixture,
     equipmentStepDaggerFixture,
     equipmentStepExplorersPackFixture,
     equipmentStepPotionOfHealingFixture,
@@ -373,3 +397,32 @@ export function createEquipmentStepContextFixture(
 }
 
 export const equipmentStepContextFixture = createEquipmentStepContextFixture()
+
+/** Starting wealth with common magic-item grants at level 1 (cart integration tests). */
+export const equipmentStepHeroMagicItemWealthFixture = {
+  name: 'Hero test wealth',
+  scope: { kind: 'standard' as const },
+  tiers: [
+    {
+      id: 'hero',
+      label: 'Hero',
+      minLevel: 1,
+      maxLevel: 20,
+      includeNormalStartingEquipment: true,
+      bonusGold: null,
+      magicItemGrants: [{ rarity: 'common' as const, quantity: 2 }],
+    },
+  ],
+} satisfies StartingWealthRules
+
+export function createEquipmentStepContextWithMagicItemGrantsFixture(
+  overrides: Partial<CharacterBuildContext> = {},
+): CharacterBuildContext {
+  return createEquipmentStepContextFixture({
+    characterCreationRules: {
+      ...createEquipmentStepContextFixture().characterCreationRules,
+      startingWealth: equipmentStepHeroMagicItemWealthFixture,
+    },
+    ...overrides,
+  })
+}

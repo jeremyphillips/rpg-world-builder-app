@@ -32,6 +32,7 @@ import {
   EQUIPMENT_PACKAGE_CUSTOMIZE_LABEL,
   EQUIPMENT_SELECTED_PACKAGE_EYEBROW,
   EQUIPMENT_STEP_BROWSE_LABEL,
+  EQUIPMENT_GOLD_OPTION_STARTING_MESSAGE,
 } from '../../lib/equipment-step.lib'
 import { EQUIPMENT_PICKER_PROFICIENCY_AVAILABLE_LABEL } from '../equipment/equipment-picker-drawer.types'
 import { EQUIPMENT_PICKER_PURCHASE_COMMIT_LABEL } from '../equipment/equipment-picker-purchase.lib'
@@ -492,6 +493,28 @@ describe('EquipmentStep', () => {
     await user.click(screen.getByRole('button', { name: EQUIPMENT_PACKAGE_CUSTOMIZE_LABEL }))
 
     expect(screen.getByRole('heading', { name: /Customize Starting Gold/i })).toBeInTheDocument()
+  })
+
+  it('shows the gold-option empty state in inventory while guidance handles shopping', () => {
+    const draft = {
+      ...createEmptyCharacterBuilderDraft(),
+      class: { classId: equipmentStepBardClassFixture.id, level: 1 as const },
+      choiceSelections: {
+        [startingEquipmentChoiceSetId(equipmentStepBardClassFixture.id)]: ['starting-gold'],
+      },
+      equipment: {
+        mode: 'gold' as const,
+        purchases: [],
+        removedPackageItemKeys: [],
+        customized: false,
+      },
+    }
+
+    renderEquipmentStep(draft)
+
+    expect(screen.getByText(EQUIPMENT_GOLD_OPTION_STARTING_MESSAGE)).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'GP remaining' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: EQUIPMENT_STEP_BROWSE_LABEL })).toBeInTheDocument()
   })
 
   describe('package switch resolution', () => {

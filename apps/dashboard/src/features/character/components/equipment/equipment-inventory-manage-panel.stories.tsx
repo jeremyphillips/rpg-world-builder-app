@@ -5,6 +5,7 @@ import { createEmptyCharacterBuilderDraft } from '@rpg/contracts'
 import {
   equipmentStepCatalogIndexFixture,
   equipmentStepContextFixture,
+  equipmentStepPotionOfHealingFixture,
 } from '../../lib/equipment-step.fixtures'
 import { EquipmentInventoryManagePanel } from './equipment-inventory-manage-panel.client'
 import type { EquipmentInventoryRow } from '../../lib/equipment-step.lib'
@@ -51,3 +52,29 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 export const GrantOnly: Story = {}
+
+export const MixedSource: Story = {
+  args: {
+    equipment: equipmentStepPotionOfHealingFixture,
+    rows: [
+      ...rows,
+      {
+        group: 'magicItems',
+        groupLabel: 'Magic Items',
+        entry: {
+          equipmentId: equipmentStepPotionOfHealingFixture.id,
+          quantity: 1,
+          sources: [{ kind: 'startingGold' }],
+        },
+        equipment: equipmentStepPotionOfHealingFixture,
+        equipmentName: 'Potion of Healing',
+        sourceLabel: 'Purchased with starting gold',
+        isStackable: true,
+        quantityMode: 'editable',
+        removeLabel: 'Remove Potion of Healing',
+        removeTarget: { kind: 'purchase', purchaseId: 'purchase-1' },
+        quantityTarget: { kind: 'purchase', purchaseId: 'purchase-1' },
+      },
+    ],
+  },
+}

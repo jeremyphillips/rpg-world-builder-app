@@ -3,17 +3,22 @@ import { useState } from 'react'
 
 import {
   buildChoiceSetId,
+  buildMagicItemAllowanceId,
   buildStartingPackageConversionPreview,
   createEmptyCharacterBuilderDraft,
   resolveStartingEquipmentFundingOptions,
+  standardStartingWealthTableId,
   startingEquipmentChoiceSetId,
 } from '@rpg/contracts'
 
 import {
+  createEquipmentStepContextWithMagicItemGrantsFixture,
+  equipmentStepBattleaxeFixture,
   equipmentStepCatalogIndexFixture,
   equipmentStepContextFixture,
   equipmentStepLuteFixture,
   equipmentStepMonkClassFixture,
+  equipmentStepPotionOfHealingFixture,
 } from '../../lib/equipment-step.fixtures'
 import { EquipmentInventorySummary } from './equipment-inventory-summary.client'
 
@@ -30,6 +35,11 @@ function monkStandardDraft(extra?: {
     sourceMode: 'startingGold'
     origin?: 'picker'
   }>
+  magicItemSelections?: Array<{
+    allowanceId: string
+    equipmentId: string
+    quantity: number
+  }>
 }) {
   return {
     ...createEmptyCharacterBuilderDraft(),
@@ -41,6 +51,7 @@ function monkStandardDraft(extra?: {
     equipment: {
       mode: 'package' as const,
       purchases: extra?.purchases ?? [],
+      magicItemSelections: extra?.magicItemSelections ?? [],
       removedPackageItemKeys: [],
       customized: false,
     },
@@ -53,6 +64,20 @@ const inventoryManagementArgs = {
   onRemovePurchase: () => undefined,
   onAddAnother: () => undefined,
 } as const
+
+const commonAllowanceId = buildMagicItemAllowanceId({
+  startingWealthTableId: standardStartingWealthTableId('srd-cc-5.2.1'),
+  tierId: 'hero',
+  rarity: 'common',
+})
+
+const cartCatalogIndex = {
+  ...equipmentStepCatalogIndexFixture,
+  equipment: new Map([
+    ...equipmentStepCatalogIndexFixture.equipment,
+    [equipmentStepBattleaxeFixture.id, equipmentStepBattleaxeFixture],
+  ]),
+}
 
 const meta = {
   title: 'Character Builder/EquipmentInventorySummary',
@@ -80,14 +105,57 @@ export const StandardPackageWithPurchases: Story = {
     draft: monkStandardDraft({
       purchases: [
         {
-          equipmentId: 'srd-cc-5.2.1:rations',
-          quantity: 2,
+          equipmentId: equipmentStepBattleaxeFixture.id,
+          quantity: 1,
           sourceMode: 'startingGold',
           origin: 'picker',
         },
       ],
     }),
+    catalogIndex: cartCatalogIndex,
+  },
+}
+
+export const GoldOptionEmptyState: Story = {
+  args: {
+    draft: {
+      ...createEmptyCharacterBuilderDraft(),
+      class: { classId: equipmentStepMonkClassFixture.id, level: 1 as const },
+      choiceSelections: {
+        [startingEquipmentChoiceSetId(equipmentStepMonkClassFixture.id)]: ['starting-gold'],
+      },
+      equipment: {
+        mode: 'gold' as const,
+        purchases: [],
+        removedPackageItemKeys: [],
+        customized: false,
+      },
+    },
     catalogIndex: equipmentStepCatalogIndexFixture,
+  },
+}
+
+export const MixedSourceMagicItem: Story = {
+  args: {
+    draft: monkStandardDraft({
+      purchases: [
+        {
+          equipmentId: equipmentStepPotionOfHealingFixture.id,
+          quantity: 1,
+          sourceMode: 'startingGold',
+          origin: 'picker',
+        },
+      ],
+      magicItemSelections: [
+        {
+          allowanceId: commonAllowanceId,
+          equipmentId: equipmentStepPotionOfHealingFixture.id,
+          quantity: 2,
+        },
+      ],
+    }),
+    catalogIndex: equipmentStepCatalogIndexFixture,
+    context: createEquipmentStepContextWithMagicItemGrantsFixture(),
   },
 }
 

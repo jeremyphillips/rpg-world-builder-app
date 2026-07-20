@@ -3,11 +3,19 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { expectNoAxeViolations } from '@rpg/ui/test-utils'
 
-import { createEmptyCharacterBuilderDraft } from '@rpg/contracts'
+import {
+  buildMagicItemAllowanceId,
+  createEmptyCharacterBuilderDraft,
+  standardStartingWealthTableId,
+  startingEquipmentChoiceSetId,
+} from '@rpg/contracts'
 
 import {
+  createEquipmentStepContextWithMagicItemGrantsFixture,
   equipmentStepCatalogIndexFixture,
   equipmentStepContextFixture,
+  equipmentStepMonkClassFixture,
+  equipmentStepPotionOfHealingFixture,
 } from '../../lib/equipment-step.fixtures'
 import type { EquipmentInventoryRow } from '../../lib/equipment-step.lib'
 import { EquipmentInventoryManagePanel } from './equipment-inventory-manage-panel.client'
@@ -60,6 +68,98 @@ describe('EquipmentInventoryManagePanel', () => {
       equipmentId: 'srd-cc-5.2.1:potion-of-healing',
       quantity: 1,
     })
+  })
+
+  it('shows add-another preview before confirming another grant copy', async () => {
+    const user = userEvent.setup()
+    const allowanceId = buildMagicItemAllowanceId({
+      startingWealthTableId: standardStartingWealthTableId('srd-cc-5.2.1'),
+      tierId: 'hero',
+      rarity: 'common',
+    })
+    const draft = {
+      ...createEmptyCharacterBuilderDraft(),
+      class: { classId: equipmentStepMonkClassFixture.id, level: 1 as const },
+      choiceSelections: {
+        [startingEquipmentChoiceSetId(equipmentStepMonkClassFixture.id)]: ['standard-equipment'],
+      },
+      equipment: {
+        mode: 'package' as const,
+        purchases: [],
+        magicItemSelections: [
+          {
+            allowanceId,
+            equipmentId: equipmentStepPotionOfHealingFixture.id,
+            quantity: 1,
+          },
+        ],
+        removedPackageItemKeys: [],
+        customized: false,
+      },
+    }
+    const context = createEquipmentStepContextWithMagicItemGrantsFixture()
+
+    render(
+      <EquipmentInventoryManagePanel
+        equipmentName="Potion of Healing"
+        equipment={equipmentStepPotionOfHealingFixture}
+        rows={rows}
+        draft={draft}
+        context={context}
+        catalogIndex={equipmentStepCatalogIndexFixture}
+        onReleaseGrant={vi.fn()}
+        onRemovePurchase={vi.fn()}
+        onAddAnother={vi.fn()}
+      />,
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Manage' }))
+
+    expect(screen.getByText('Uses 1 Common choice')).toBeInTheDocument()
+  })
+
+  it('lists grant and purchase sources for mixed rows', async () => {
+    const user = userEvent.setup()
+    const mixedRows: EquipmentInventoryRow[] = [
+      ...rows,
+      {
+        group: 'magicItems',
+        groupLabel: 'Magic Items',
+        entry: {
+          equipmentId: equipmentStepPotionOfHealingFixture.id,
+          quantity: 1,
+          sources: [{ kind: 'startingGold' }],
+        },
+        equipment: equipmentStepPotionOfHealingFixture,
+        equipmentName: 'Potion of Healing',
+        sourceLabel: 'Purchased with starting gold',
+        isStackable: true,
+        quantityMode: 'editable',
+        removeLabel: 'Remove Potion of Healing',
+        removeTarget: { kind: 'purchase', purchaseId: 'purchase-1' },
+        quantityTarget: { kind: 'purchase', purchaseId: 'purchase-1' },
+      },
+    ]
+
+    render(
+      <EquipmentInventoryManagePanel
+        equipmentName="Potion of Healing"
+        equipment={equipmentStepPotionOfHealingFixture}
+        rows={mixedRows}
+        draft={createEmptyCharacterBuilderDraft()}
+        context={equipmentStepContextFixture}
+        catalogIndex={equipmentStepCatalogIndexFixture}
+        onReleaseGrant={vi.fn()}
+        onRemovePurchase={vi.fn()}
+        onAddAnother={vi.fn()}
+      />,
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Manage' }))
+
+    expect(screen.getByText('Common magic-item choices')).toBeInTheDocument()
+    expect(screen.getByText('Purchased')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Remove one purchase' })).toBeInTheDocument()
   })
 
   it('has no axe accessibility violations', async () => {

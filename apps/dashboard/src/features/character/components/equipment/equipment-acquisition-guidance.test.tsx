@@ -63,6 +63,22 @@ describe('EquipmentAcquisitionGuidance', () => {
     expect(screen.queryByRole('heading', { name: 'GP remaining' })).not.toBeInTheDocument()
   })
 
+  it('renders a single full-width purchase card when magic items are unavailable', () => {
+    render(
+      <EquipmentAcquisitionGuidance
+        showPurchaseWorkflow
+        budget={equipmentPickerBudgetFixture}
+        onOpenPurchasePicker={vi.fn()}
+        showMagicItemGrants={false}
+        magicItemProgress={[]}
+        onOpenMagicItemsPicker={vi.fn()}
+      />,
+    )
+
+    expect(screen.getByRole('heading', { name: 'GP remaining' })).toBeInTheDocument()
+    expect(screen.queryByRole('heading', { name: 'Magic item choices' })).not.toBeInTheDocument()
+  })
+
   it('has no axe accessibility violations', async () => {
     const { container } = render(
       <EquipmentAcquisitionGuidance
