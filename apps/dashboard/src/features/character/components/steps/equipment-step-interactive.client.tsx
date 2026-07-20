@@ -24,6 +24,7 @@ import {
 import { BuilderStepReadinessPanel } from './builder-step-readiness-panel.client'
 import type { EquipmentStepProps } from './equipment-step.types'
 import type { useEquipmentStep } from './use-equipment-step.client'
+import { useEquipmentPickerAcquisition } from './use-equipment-picker-acquisition.client'
 
 type EquipmentStepInteractiveProps = Pick<EquipmentStepProps, 'draft' | 'onDraftChange'> & {
   step: ReturnType<typeof useEquipmentStep>
@@ -70,6 +71,16 @@ export function EquipmentStepInteractive({
     onChoiceSelectionChange,
     resolvedChoiceSets,
   } = step
+
+  const pickerAcquisition = useEquipmentPickerAcquisition({
+    draft,
+    context: step.context,
+    catalogIndex: step.catalogIndex,
+    budget,
+    showBudget: Boolean(showBudget),
+    focusedAllowanceId: step.focusedAllowanceId,
+    onDraftChange,
+  })
 
   return (
     <>
@@ -156,6 +167,12 @@ export function EquipmentStepInteractive({
         workflowModes={step.pickerWorkflowModes}
         onWorkflowModeChange={step.setPickerWorkflowMode}
         isGoldShoppingPath={showShopping}
+        resolveRowActionViewModel={pickerAcquisition.resolveRowActionViewModel}
+        resolveGrantManageSources={pickerAcquisition.resolveGrantManageSources}
+        onApplyMagicItemAcquisition={pickerAcquisition.handleApplyMagicItemAcquisition}
+        onApplyPurchase={pickerAcquisition.handleApplyPurchase}
+        onReleaseGrant={pickerAcquisition.handleReleaseGrant}
+        onRemovePurchase={pickerAcquisition.handleRemovePurchase}
         onAddItem={handleAddItem}
         onRemoveFromInventory={handleRemoveFromInventory}
         onRemoveOneFromInventory={handleRemoveOneFromInventory}

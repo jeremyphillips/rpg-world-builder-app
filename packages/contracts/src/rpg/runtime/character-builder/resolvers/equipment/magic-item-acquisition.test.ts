@@ -18,6 +18,8 @@ import {
   resolveEquipmentAcquisitionPlan,
   resolveEquipmentPurchasePlan,
 } from './resolve-equipment-acquisition-plan'
+import { resolveEquipmentAcquisitionActionState } from './resolve-equipment-acquisition-action-state'
+import { resolveEquipmentAcquisitionQuantityBounds } from './resolve-equipment-acquisition-quantity-bounds'
 import { resolveEquipmentPurchaseAvailability } from './resolve-equipment-purchase-availability'
 import { resolveMagicItemDuplicatePolicy } from './resolve-magic-item-duplicate-policy'
 import { resolveMagicItemGrantAllowances } from './resolve-magic-item-grant-allowances'
@@ -425,5 +427,221 @@ describe('magic item acquisition contracts', () => {
 
     expect(readiness.complete).toBe(false)
     expect(readiness.issues[0]?.remaining).toBe(1)
+  })
+
+  it('resolves quantity bounds from draft ownership', () => {
+    const catalogIndex = indexCharacterBuildCatalog({
+      species: [],
+      classes: [fighterClass],
+      spells: [],
+      equipment: [commonPotion, rareAmulet],
+      skillProficiencies: [],
+      languages: [],
+    })
+    const context = builderContext(catalogIndex)
+    const allowanceId = buildMagicItemAllowanceId({
+      startingWealthTableId: TABLE_ID,
+      tierId: 'hero',
+      rarity: 'rare',
+    })
+
+    expect(
+      resolveEquipmentAcquisitionQuantityBounds({
+        equipment: rareAmulet,
+        draft: draftWithGoldOption(),
+        context,
+      }),
+    ).toEqual({ maxAdditionalQuantity: 1 })
+
+    const ownedRare = {
+      ...draftWithGoldOption(),
+      equipment: {
+        ...draftWithGoldOption().equipment!,
+        magicItemSelections: [{ allowanceId, equipmentId: rareAmulet.id, quantity: 1 }],
+      },
+    }
+
+    expect(
+      resolveEquipmentAcquisitionQuantityBounds({
+        equipment: rareAmulet,
+        draft: ownedRare,
+        context,
+      }),
+    ).toEqual({ maxAdditionalQuantity: 0 })
+  })
+
+  it('enables null-price rare rows in magic-items action state', () => {
+    const rareWealth = {
+      ...startingWealth,
+      tiers: [
+        {
+          ...startingWealth.tiers[0]!,
+          magicItemGrants: [{ rarity: 'rare' as const, quantity: 1 }],
+        },
+      ],
+    }
+
+    const catalogIndex = indexCharacterBuildCatalog({
+      species: [],
+      classes: [fighterClass],
+      spells: [],
+      equipment: [rareAmulet],
+      skillProficiencies: [],
+      languages: [],
+    })
+    const context = resolveEquipmentAcquisitionBuilderContext({
+      context: {
+        rulesetId: RULESET,
+        characterCreationRules: { startingWealth: rareWealth },
+        catalog: { equipment: [rareAmulet] },
+      },
+      catalogIndex,
+      startingWealthTableId: TABLE_ID,
+    })
+
+    const state = resolveEquipmentAcquisitionActionState({
+      draft: draftWithGoldOption(),
+      context,
+      equipment: rareAmulet,
+      workflowMode: 'magic_items',
+      requestedQuantity: 1,
+    })
+
+    expect(state.kind).toBe('magic_item_grant')
+    if (state.kind !== 'magic_item_grant') return
+
+    expect(state.capabilities.canExpand).toBe(true)
+    expect(state.capabilities.canAdd).toBe(true)
+    expect(state.eligibility.eligible).toBe(true)
+    if (state.eligibility.eligible) {
+      expect(state.eligibility.allowanceId).toContain('rare')
+    }
+  })
+
+  it('keeps purchase-mode null-price rows unavailable', () => {
+    const state = resolveEquipmentAcquisitionActionState({
+      draft: draftWithGoldOption(),
+      context: builderContext(
+        indexCharacterBuildCatalog({
+          species: [],
+          classes: [fighterClass],
+          spells: [],
+          equipment: [rareAmulet],
+          skillProficiencies: [],
+          languages: [],
+        }),
+      ),
+      equipment: rareAmulet,
+      workflowMode: 'purchase',
+      requestedQuantity: 1,
+    })
+
+    expect(state).toEqual({
+      kind: 'purchase',
+      availability: { status: 'unavailable', reason: 'no_market_price' },
+    })
+  })
+
+  it('surfaces partialAction for resource-limited mixed allocation', () => {
+    const goldSink = equipmentSchema.parse({
+      id: `${RULESET}:gold-sink`,
+      slug: 'gold-sink',
+      rulesetId: RULESET,
+      source: 'system',
+      campaignId: null,
+      createdAt: '2026-01-01T00:00:00.000Z',
+      updatedAt: '2026-01-01T00:00:00.000Z',
+      name: 'Gold Sink',
+      description: '',
+      cost: { amount: 50, currency: 'gp' },
+      kind: 'adventuring_gear',
+      gearKind: 'general',
+    })
+
+    const catalogIndex = indexCharacterBuildCatalog({
+      species: [],
+      classes: [fighterClass],
+      spells: [],
+      equipment: [commonPotion, goldSink],
+      skillProficiencies: [],
+      languages: [],
+    })
+    const context = builderContext(catalogIndex)
+
+    const draft = {
+      ...draftWithGoldOption(),
+      equipment: {
+        ...draftWithGoldOption().equipment!,
+        purchases: [{ equipmentId: goldSink.id, quantity: 1, sourceMode: 'startingGold' as const }],
+        magicItemSelections: [],
+      },
+    }
+
+    const plan = resolveEquipmentAcquisitionPlan({
+      draft,
+      context,
+      equipment: commonPotion,
+      requestedQuantity: 3,
+    })
+
+    expect(plan.partialAction).toEqual({
+      requestedQuantity: 2,
+      grantQuantity: 1,
+      purchaseQuantity: 1,
+      totalCostCp: 5000,
+    })
+  })
+
+  it('omits partialAction for structural duplicate blocks', () => {
+    const rareWealth = {
+      ...startingWealth,
+      tiers: [
+        {
+          ...startingWealth.tiers[0]!,
+          magicItemGrants: [{ rarity: 'rare' as const, quantity: 1 }],
+        },
+      ],
+    }
+
+    const catalogIndex = indexCharacterBuildCatalog({
+      species: [],
+      classes: [fighterClass],
+      spells: [],
+      equipment: [rareAmulet],
+      skillProficiencies: [],
+      languages: [],
+    })
+    const context = resolveEquipmentAcquisitionBuilderContext({
+      context: {
+        rulesetId: RULESET,
+        characterCreationRules: { startingWealth: rareWealth },
+        catalog: { equipment: [rareAmulet] },
+      },
+      catalogIndex,
+      startingWealthTableId: TABLE_ID,
+    })
+    const allowanceId = buildMagicItemAllowanceId({
+      startingWealthTableId: TABLE_ID,
+      tierId: 'hero',
+      rarity: 'rare',
+    })
+
+    const draft = {
+      ...draftWithGoldOption(),
+      equipment: {
+        ...draftWithGoldOption().equipment!,
+        magicItemSelections: [{ allowanceId, equipmentId: rareAmulet.id, quantity: 1 }],
+      },
+    }
+
+    const plan = resolveEquipmentAcquisitionPlan({
+      draft,
+      context,
+      equipment: rareAmulet,
+      requestedQuantity: 2,
+    })
+
+    expect(plan.partialAction).toBeUndefined()
+    expect(plan.blockers.some((blocker) => blocker.code === 'duplicate_not_allowed')).toBe(true)
   })
 })

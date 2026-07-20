@@ -598,6 +598,7 @@ export function useEquipmentStep(args: {
     magicItemProgressLabel: magicItemWorkflow.magicItemProgressLabel,
     pickerWorkflowMode,
     pickerWorkflowModes: magicItemWorkflow.pickerWorkflowModes,
+    focusedAllowanceId,
     budget,
     pickerItems: magicItemWorkflow.filteredPickerItems,
     allPickerItems: pickerItems,

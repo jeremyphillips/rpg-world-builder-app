@@ -7,6 +7,8 @@ import type {
 
 import type { EquipmentPickerWorkflowMode } from '../../lib/equipment-step.lib'
 import type { EquipmentPickerCharacterPreviewContext } from './equipment-picker-character-preview.lib'
+import type { EquipmentPickerRowActionViewModel } from './equipment-picker-action.lib'
+import type { EquipmentPickerGrantManageSource } from './equipment-picker-grant.lib'
 
 export type {
   EquipmentBudgetSummary,
@@ -145,6 +147,16 @@ export type EquipmentPickerDrawerProps = {
   toolbarResetMode?: EquipmentPickerToolbarResetMode
   /** When true, `availableInStartingOption` rows show the Standard gear badge. */
   isGoldShoppingPath?: boolean
+  resolveRowActionViewModel?: (args: {
+    equipment: EquipmentPickerItem['equipment']
+    workflowMode: EquipmentPickerWorkflowMode
+    requestedQuantity: number
+  }) => EquipmentPickerRowActionViewModel
+  resolveGrantManageSources?: (equipmentId: string) => EquipmentPickerGrantManageSource
+  onApplyMagicItemAcquisition?: (args: { equipmentId: string; requestedQuantity: number }) => void
+  onApplyPurchase?: (args: { equipmentId: string; requestedQuantity: number }) => void
+  onReleaseGrant?: (args: { allowanceId: string; equipmentId: string; quantity: number }) => void
+  onRemovePurchase?: (args: { purchaseId: string; quantity: number }) => void
   onAddItem: (item: EquipmentPickerItem, quantity: number) => void
   onAddPartialItem?: (item: EquipmentPickerItem, quantity: number) => void
   onRemoveFromInventory?: (item: EquipmentPickerItem) => void

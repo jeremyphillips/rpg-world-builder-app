@@ -40,6 +40,7 @@ import {
   resolveEquipmentKindFilterOptions,
 } from './equipment-picker-drawer.lib'
 import { getEquipmentPickerCallout } from './equipment-picker-callout.lib'
+import type { EquipmentPickerRowActionViewModel } from './equipment-picker-action.lib'
 import {
   EQUIPMENT_PICKER_AFFORDABLE_NOW_LABEL,
   EQUIPMENT_PICKER_CATEGORY_LABEL,
@@ -221,6 +222,12 @@ export function EquipmentPickerDrawer({
   onWorkflowModeChange,
   toolbarResetMode = 'reset_view',
   isGoldShoppingPath = false,
+  resolveRowActionViewModel,
+  resolveGrantManageSources,
+  onApplyMagicItemAcquisition,
+  onApplyPurchase,
+  onReleaseGrant,
+  onRemovePurchase,
   onAddItem,
   onRemoveFromInventory,
   onRemoveOneFromInventory,
@@ -321,14 +328,32 @@ export function EquipmentPickerDrawer({
   const handleCommitAdd = React.useCallback(
     (item: EquipmentPickerItem) => {
       const itemKey = item.equipment.id
+      const quantity = addQuantities[itemKey] ?? 1
+
+      if (isMagicItemsWorkflow && onApplyMagicItemAcquisition) {
+        onApplyMagicItemAcquisition({ equipmentId: itemKey, requestedQuantity: quantity })
+        if (isEquipmentStackable(item.equipment)) {
+          setAddQuantities((current) => ({ ...current, [itemKey]: 1 }))
+        }
+        return
+      }
+
+      if (!isMagicItemsWorkflow && onApplyPurchase) {
+        onApplyPurchase({ equipmentId: itemKey, requestedQuantity: quantity })
+        if (isEquipmentStackable(item.equipment)) {
+          setAddQuantities((current) => ({ ...current, [itemKey]: 1 }))
+        }
+        return
+      }
+
       const ownedQuantity = ownedPurchaseQuantities[itemKey] ?? 0
       const maxQuantity = resolveEquipmentStepPurchaseMaxQuantity({
         equipment: item.equipment,
         budget: effectiveBudget,
         currentQuantity: ownedQuantity,
       })
-      const quantity = clampEquipmentStepQuantity(addQuantities[itemKey] ?? 1, maxQuantity)
-      onAddItem(item, quantity)
+      const cappedQuantity = clampEquipmentStepQuantity(quantity, maxQuantity)
+      onAddItem(item, cappedQuantity)
       if (isEquipmentStackable(item.equipment)) {
         setAddQuantities((current) => ({ ...current, [itemKey]: 1 }))
       }
@@ -336,11 +361,27 @@ export function EquipmentPickerDrawer({
     [
       addQuantities,
       effectiveBudget,
-      onAddItem,
-      ownedPurchaseQuantities,
-      ownedGrantQuantities,
       isMagicItemsWorkflow,
+      onAddItem,
+      onApplyMagicItemAcquisition,
+      onApplyPurchase,
+      ownedPurchaseQuantities,
     ],
+  )
+
+  const resolveRowVm = React.useCallback(
+    (
+      item: EquipmentPickerItem,
+      requestedQuantity: number,
+    ): EquipmentPickerRowActionViewModel | undefined => {
+      if (!resolveRowActionViewModel) return undefined
+      return resolveRowActionViewModel({
+        equipment: item.equipment,
+        workflowMode,
+        requestedQuantity,
+      })
+    },
+    [resolveRowActionViewModel, workflowMode],
   )
 
   const handleAddQuantityChange = React.useCallback((itemKey: string, quantity: number) => {
@@ -462,7 +503,9 @@ export function EquipmentPickerDrawer({
       renderItemHeader={(item) => {
         const row = buildEquipmentPickerRowViewModel(item.equipment)
         const callout = getEquipmentPickerCallout(item, { isGoldShoppingPath })
-        const disabled = isEquipmentPickerItemDisabled(item)
+        const addQuantity = addQuantities[item.equipment.id] ?? 1
+        const rowActionVm = resolveRowVm(item, addQuantity)
+        const disabled = rowActionVm ? rowActionVm.disabled : isEquipmentPickerItemDisabled(item)
         const ownedQuantity = isMagicItemsWorkflow
           ? (ownedGrantQuantities[item.equipment.id] ?? 0)
           : (ownedPurchaseQuantities[item.equipment.id] ?? 0)
@@ -475,7 +518,7 @@ export function EquipmentPickerDrawer({
             callout={callout}
             disabled={disabled}
             commerce={
-              isMagicItemsWorkflow ? undefined : (
+              isMagicItemsWorkflow || rowActionVm?.kind === 'magic_item_grant' ? undefined : (
                 <EquipmentPickerCommerce
                   priceLabel={row.priceLabel}
                   owned={owned}
@@ -494,29 +537,51 @@ export function EquipmentPickerDrawer({
           <EquipmentPickerRowSummary item={item} budget={effectiveBudget} />
         )
       }
-      renderItemDetails={(item) => (
-        <EquipmentPickerItemDetails
-          equipment={item.equipment}
-          itemState={item.state}
-          budget={effectiveBudget}
-          ownedQuantity={
-            isMagicItemsWorkflow
-              ? (ownedGrantQuantities[item.equipment.id] ?? 0)
-              : (ownedPurchaseQuantities[item.equipment.id] ?? 0)
-          }
-          addQuantity={addQuantities[item.equipment.id] ?? 1}
-          onAddQuantityChange={(quantity) => handleAddQuantityChange(item.equipment.id, quantity)}
-          onCommit={() => handleCommitAdd(item)}
-          onRemoveFromInventory={
-            onRemoveFromInventory ? () => onRemoveFromInventory(item) : undefined
-          }
-          onRemoveOneFromInventory={
-            onRemoveOneFromInventory ? () => onRemoveOneFromInventory(item) : undefined
-          }
-          showCharacterPreview={showCharacterPreview}
-          characterPreviewContext={characterPreviewContext}
-        />
-      )}
+      renderItemDetails={(item) => {
+        const addQuantity = addQuantities[item.equipment.id] ?? 1
+        const rowActionVm = resolveRowVm(item, addQuantity)
+        const manageSources = resolveGrantManageSources?.(item.equipment.id) ?? {
+          grants: [],
+          purchases: [],
+        }
+
+        return (
+          <EquipmentPickerItemDetails
+            equipment={item.equipment}
+            itemState={item.state}
+            budget={effectiveBudget}
+            ownedQuantity={
+              isMagicItemsWorkflow
+                ? (ownedGrantQuantities[item.equipment.id] ?? 0)
+                : (ownedPurchaseQuantities[item.equipment.id] ?? 0)
+            }
+            addQuantity={addQuantity}
+            onAddQuantityChange={(quantity) => handleAddQuantityChange(item.equipment.id, quantity)}
+            onCommit={() => handleCommitAdd(item)}
+            onRemoveFromInventory={
+              onRemoveFromInventory ? () => onRemoveFromInventory(item) : undefined
+            }
+            onRemoveOneFromInventory={
+              onRemoveOneFromInventory ? () => onRemoveOneFromInventory(item) : undefined
+            }
+            showCharacterPreview={showCharacterPreview}
+            characterPreviewContext={characterPreviewContext}
+            rowActionVm={rowActionVm}
+            manageSources={manageSources}
+            onApplyMagicItemAcquisition={(requestedQuantity) =>
+              onApplyMagicItemAcquisition?.({
+                equipmentId: item.equipment.id,
+                requestedQuantity,
+              })
+            }
+            onApplyPurchase={(requestedQuantity) =>
+              onApplyPurchase?.({ equipmentId: item.equipment.id, requestedQuantity })
+            }
+            onReleaseGrant={onReleaseGrant}
+            onRemovePurchase={onRemovePurchase}
+          />
+        )
+      }}
     />
   )
 }

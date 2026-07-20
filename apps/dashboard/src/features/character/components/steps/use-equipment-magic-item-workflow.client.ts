@@ -12,6 +12,7 @@ import {
   formatMagicItemGrantProgressLabel,
   isMagicItemPickerItemVisible,
   readMagicItemGrantQuantity,
+  resolveEquipmentAcquisitionContext,
   resolveEquipmentPickerWorkflowModes,
   resolveEquipmentStepAcquisitionState,
   shouldShowMagicItemGrants,
@@ -57,8 +58,11 @@ export function useEquipmentMagicItemWorkflow(args: {
     return args.pickerItems.filter((item) =>
       isMagicItemPickerItemVisible({
         equipment: item.equipment,
-        acquisition,
-        ownedGrantQuantity: readMagicItemGrantQuantity(args.draft, item.equipment.id),
+        draft: args.draft,
+        context: resolveEquipmentAcquisitionContext({
+          context: args.context,
+          catalogIndex: args.catalogIndex,
+        }),
         focusedAllowanceId: args.focusedAllowanceId,
       }),
     )

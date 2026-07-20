@@ -61,6 +61,15 @@ export function finalizeAcquisitionPlan(args: {
         })
       : []
 
+  const partialAction = resolvePartialAction({
+    requestedQuantity: args.requestedQuantity,
+    fulfilledQuantity,
+    grantQuantity,
+    purchaseQuantity: args.purchaseQuantity,
+    totalCostCp,
+    blockers,
+  })
+
   return {
     requestedQuantity: args.requestedQuantity,
     fulfilledQuantity,
@@ -71,6 +80,42 @@ export function finalizeAcquisitionPlan(args: {
     unitCostCp,
     canApplyRequestedQuantity: unfulfilledQuantity === 0,
     blockers,
+    partialAction,
+  }
+}
+
+function resolvePartialAction(args: {
+  requestedQuantity: number
+  fulfilledQuantity: number
+  grantQuantity: number
+  purchaseQuantity: number
+  totalCostCp: number
+  blockers: EquipmentAcquisitionBlocker[]
+}): EquipmentAcquisitionPlan['partialAction'] {
+  const {
+    requestedQuantity,
+    fulfilledQuantity,
+    grantQuantity,
+    purchaseQuantity,
+    totalCostCp,
+    blockers,
+  } = args
+
+  if (fulfilledQuantity <= 0 || fulfilledQuantity >= requestedQuantity) return undefined
+
+  const isStructuralBlock = blockers.some((blocker) => blocker.code === 'duplicate_not_allowed')
+  if (isStructuralBlock) return undefined
+
+  const isResourceLimited = blockers.some(
+    (blocker) => blocker.code === 'cannot_afford' || blocker.code === 'no_matching_grant',
+  )
+  if (!isResourceLimited && grantQuantity === 0 && purchaseQuantity === 0) return undefined
+
+  return {
+    requestedQuantity: fulfilledQuantity,
+    grantQuantity,
+    purchaseQuantity,
+    totalCostCp,
   }
 }
 

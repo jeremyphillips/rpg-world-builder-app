@@ -23,6 +23,9 @@ import {
   equipmentPickerPurchaseRemoveActionsClasses,
 } from './equipment-picker-purchase.variants'
 
+export { EquipmentPickerGrantPanel } from './equipment-picker-grant-panel.client'
+export type { EquipmentPickerGrantManageSource } from './equipment-picker-grant.lib'
+
 export type EquipmentPickerCharacterPreviewSectionProps = {
   equipmentId: string
   previewLines: string[]

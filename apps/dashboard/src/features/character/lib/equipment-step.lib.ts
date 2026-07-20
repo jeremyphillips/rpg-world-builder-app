@@ -35,9 +35,10 @@ import {
   resolveEquipmentAcquisitionBuilderContext,
   resolveEquipmentAcquisitionPlan,
   resolveMagicItemAcquisitionState,
-  resolveMagicItemAllowanceEligibility,
+  resolveMagicItemGrantEligibility,
   resolveMagicItemGrantProgressList,
   readMagicItemSelections,
+  upsertMagicItemGrantSelection,
   standardStartingWealthTableId,
   totalSelectedForEquipment,
   type CharacterBuildCatalogIndex,
@@ -1031,38 +1032,29 @@ export function formatMagicItemGrantProgressLabel(
 
 export function isMagicItemPickerItemVisible(args: {
   equipment: Equipment
-  acquisition: ReturnType<typeof resolveMagicItemAcquisitionState>
-  ownedGrantQuantity: number
+  draft: CharacterBuilderDraft
+  context: ReturnType<typeof resolveEquipmentAcquisitionContext>
   focusedAllowanceId?: string
 }): boolean {
-  const { equipment, acquisition, ownedGrantQuantity, focusedAllowanceId } = args
+  const { equipment, draft, context, focusedAllowanceId } = args
   if (equipment.kind !== 'magic_item' || !equipment.rarity) return false
-  if (ownedGrantQuantity > 0) return true
 
-  const allowances = focusedAllowanceId
-    ? acquisition.allowances.filter((entry) => entry.id === focusedAllowanceId)
-    : acquisition.allowances
+  const grantQuantity = totalSelectedForEquipment(readMagicItemSelections(draft), equipment.id)
+  if (grantQuantity > 0) return true
 
-  const progress = acquisition.progress
-  for (const allowance of allowances) {
-    if (allowance.rarity !== equipment.rarity) continue
-    const entry = progress.find((row) => row.allowanceId === allowance.id)
-    const eligibility = resolveMagicItemAllowanceEligibility({
-      equipment,
-      allowance,
-      progress: entry ?? {
-        allowanceId: allowance.id,
-        rarity: allowance.rarity,
-        capacity: allowance.count,
-        selected: 0,
-        remainingCapacity: allowance.count,
-        isFilled: false,
-      },
-    })
-    if (eligibility.eligible) return true
-  }
+  const purchaseQuantity = (draft.equipment?.purchases ?? [])
+    .filter((row) => row.equipmentId === equipment.id)
+    .reduce((sum, row) => sum + row.quantity, 0)
+  if (purchaseQuantity > 0) return true
 
-  return false
+  const eligibility = resolveMagicItemGrantEligibility({
+    equipment,
+    draft,
+    context,
+    focusedAllowanceId,
+  })
+
+  return eligibility.eligible
 }
 
 export function buildMagicItemAcquisitionPatch(args: {
@@ -1107,6 +1099,89 @@ export function buildEquipmentPurchaseIntentPatch(args: {
 
   if (!result.applied) return undefined
   return { equipment: result.draft.equipment }
+}
+
+export function buildMagicItemGrantReleasePatch(args: {
+  draft: CharacterBuilderDraft
+  allowanceId: string
+  equipmentId: string
+  quantity: number
+}): Partial<CharacterBuilderDraft> | undefined {
+  const { draft, allowanceId, equipmentId, quantity } = args
+  const selections = readMagicItemSelections(draft)
+  const existing = selections.find(
+    (row) => row.allowanceId === allowanceId && row.equipmentId === equipmentId,
+  )
+
+  if (!existing) return undefined
+
+  if (quantity >= existing.quantity) {
+    return buildEquipmentRemoveEntryPatch({
+      draft,
+      target: { kind: 'magicItemGrant', allowanceId, equipmentId },
+    })
+  }
+
+  const current = draft.equipment
+  if (!current) return undefined
+
+  return {
+    equipment: {
+      ...current,
+      magicItemSelections: upsertMagicItemGrantSelection({
+        selections,
+        allowanceId,
+        equipmentId,
+        quantity: existing.quantity - quantity,
+      }),
+    },
+  }
+}
+
+export function buildMagicItemPurchaseRemovalPatch(args: {
+  draft: CharacterBuilderDraft
+  catalogIndex: CharacterBuildCatalogIndex
+  purchaseId: string
+  quantity: number
+  budget?: EquipmentBudgetSummary
+}): Partial<CharacterBuilderDraft> | undefined {
+  const { draft, catalogIndex, purchaseId, quantity, budget } = args
+  const current = draft.equipment
+  if (!current) return undefined
+
+  const purchaseIndex = resolveEquipmentPurchaseIndex(current.purchases, purchaseId)
+  if (purchaseIndex === undefined) return undefined
+
+  const purchase = current.purchases[purchaseIndex]
+  if (!purchase) return undefined
+
+  if (quantity >= purchase.quantity) {
+    return buildEquipmentRemoveEntryPatch({
+      draft,
+      target: { kind: 'purchase', purchaseId },
+    })
+  }
+
+  return buildEquipmentSetPurchaseQuantityPatch({
+    draft,
+    catalogIndex,
+    purchaseId,
+    quantity: purchase.quantity - quantity,
+    budget,
+  })
+}
+
+export function readMagicItemGrantSelection(args: {
+  draft: CharacterBuilderDraft
+  allowanceId: string
+  equipmentId: string
+}): { quantity: number } | undefined {
+  const selection = readMagicItemSelections(args.draft).find(
+    (row) => row.allowanceId === args.allowanceId && row.equipmentId === args.equipmentId,
+  )
+
+  if (!selection) return undefined
+  return { quantity: selection.quantity }
 }
 
 export function previewMagicItemAcquisitionPlan(args: {

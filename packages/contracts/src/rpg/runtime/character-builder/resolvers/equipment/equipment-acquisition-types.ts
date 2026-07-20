@@ -32,6 +32,14 @@ export type EquipmentAcquisitionBlocker =
   | { code: 'cannot_afford'; shortfallCp: number }
   | { code: 'duplicate_not_allowed' }
 
+export type EquipmentAcquisitionPartialAction = {
+  /** Quantity to pass to a fresh apply intent — preview only, not a mutation payload. */
+  requestedQuantity: number
+  grantQuantity: number
+  purchaseQuantity: number
+  totalCostCp: number
+}
+
 export type EquipmentAcquisitionPlan = {
   requestedQuantity: number
   fulfilledQuantity: number
@@ -42,7 +50,37 @@ export type EquipmentAcquisitionPlan = {
   unitCostCp?: number
   canApplyRequestedQuantity: boolean
   blockers: EquipmentAcquisitionBlocker[]
+  /** Resource-limited partial preview when fulfilled < requested but apply is still valid. */
+  partialAction?: EquipmentAcquisitionPartialAction
 }
+
+export type EquipmentAcquisitionQuantityBounds = {
+  maxAdditionalQuantity: number
+}
+
+export type MagicItemGrantEligibility =
+  | { eligible: true; allowanceId: string }
+  | {
+      eligible: false
+      reason: 'not_magic_item' | 'rarity_mismatch' | 'allowance_full'
+    }
+
+export type EquipmentPickerRowCapabilities = {
+  canExpand: boolean
+  canAdd: boolean
+  canManage: boolean
+  addBlockedReason?: EquipmentAcquisitionBlocker
+}
+
+export type EquipmentAcquisitionActionState =
+  | { kind: 'purchase'; availability: EquipmentPurchaseAvailability }
+  | {
+      kind: 'magic_item_grant'
+      eligibility: MagicItemGrantEligibility
+      plan: EquipmentAcquisitionPlan
+      capabilities: EquipmentPickerRowCapabilities
+      quantityBounds: EquipmentAcquisitionQuantityBounds
+    }
 
 export type ApplyEquipmentIntentResult = {
   draft: CharacterBuilderDraft

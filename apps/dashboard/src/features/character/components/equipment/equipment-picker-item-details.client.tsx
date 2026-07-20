@@ -1,6 +1,6 @@
 'use client'
 
-import { isEquipmentStackable, formatEquipmentBundleLabel, type Equipment } from '@rpg/contracts'
+import { type Equipment } from '@rpg/contracts'
 
 import {
   buildEquipmentDetailViewModel,
@@ -12,16 +12,19 @@ import {
   resolveEquipmentPickerCharacterPreviewLines,
   type EquipmentPickerCharacterPreviewContext,
 } from './equipment-picker-character-preview.lib'
-import { buildEquipmentPickerPurchaseViewModel } from './equipment-picker-purchase.lib'
+import { EquipmentPickerAcquisitionPanel } from './equipment-picker-acquisition-panel.client'
+import type { EquipmentPickerRowActionViewModel } from './equipment-picker-action.lib'
+import {
+  buildEquipmentPickerItemDetailsViewModels,
+  resolveEquipmentPickerItemDetailsDisabled,
+} from './equipment-picker-item-details.lib'
 import type {
   EquipmentBudgetSummary,
-  EquipmentPickerItem,
   EquipmentPickerItemState,
 } from './equipment-picker-drawer.types'
-import { isEquipmentPickerItemDisabled } from './equipment-picker-drawer.lib'
 import {
   EquipmentPickerCharacterPreviewSection,
-  EquipmentPickerPurchasePanel,
+  type EquipmentPickerGrantManageSource,
 } from './equipment-picker-item-details-sections.client'
 import {
   equipmentPickerItemDetailsPurchaseSectionClasses,
@@ -40,9 +43,15 @@ export type EquipmentPickerItemDetailsProps = {
   onRemoveOneFromInventory?: () => void
   showCharacterPreview?: boolean
   characterPreviewContext?: EquipmentPickerCharacterPreviewContext
+  rowActionVm?: EquipmentPickerRowActionViewModel
+  manageSources?: EquipmentPickerGrantManageSource
+  onApplyMagicItemAcquisition?: (requestedQuantity: number) => void
+  onApplyPurchase?: (requestedQuantity: number) => void
+  onReleaseGrant?: (args: { allowanceId: string; equipmentId: string; quantity: number }) => void
+  onRemovePurchase?: (args: { purchaseId: string; quantity: number }) => void
 }
 
-/** Expanded equipment picker body — metadata, optional character preview, and purchase review. */
+/** Expanded equipment picker body — metadata, optional character preview, and acquisition panel. */
 export function EquipmentPickerItemDetails({
   equipment,
   itemState,
@@ -55,10 +64,14 @@ export function EquipmentPickerItemDetails({
   onRemoveOneFromInventory,
   showCharacterPreview = false,
   characterPreviewContext,
+  rowActionVm,
+  manageSources,
+  onApplyMagicItemAcquisition,
+  onApplyPurchase,
+  onReleaseGrant,
+  onRemovePurchase,
 }: EquipmentPickerItemDetailsProps) {
   const detailViewModel = buildEquipmentDetailViewModel(equipment)
-  const pickerItem = { equipment, state: itemState, searchText: '' } satisfies EquipmentPickerItem
-  const disabled = isEquipmentPickerItemDisabled(pickerItem)
   const previewContext =
     showCharacterPreview && characterPreviewContext
       ? { ...characterPreviewContext, budget: undefined }
@@ -68,9 +81,11 @@ export function EquipmentPickerItemDetails({
     resolveEquipmentPickerCharacterPreviewLines(equipment, previewContext, {
       isProficient: itemState.isProficient,
     })
-  const purchaseViewModel = buildEquipmentPickerPurchaseViewModel({
+  const purchaseDisabled = resolveEquipmentPickerItemDetailsDisabled({ rowActionVm, itemState })
+  const { purchaseViewModel, grantViewModel } = buildEquipmentPickerItemDetailsViewModels({
     equipment,
-    quantity: addQuantity,
+    rowActionVm,
+    addQuantity,
     budget,
     ownedQuantity,
   })
@@ -93,15 +108,21 @@ export function EquipmentPickerItemDetails({
       ) : null}
 
       <div className={equipmentPickerItemDetailsPurchaseSectionClasses}>
-        <EquipmentPickerPurchasePanel
+        <EquipmentPickerAcquisitionPanel
           equipment={equipment}
-          ownedQuantity={ownedQuantity}
-          stackable={isEquipmentStackable(equipment)}
-          disabled={disabled}
-          bundleLabel={formatEquipmentBundleLabel(equipment)}
+          rowActionVm={rowActionVm}
+          grantViewModel={grantViewModel}
+          manageSources={manageSources}
           purchaseViewModel={purchaseViewModel}
+          ownedQuantity={ownedQuantity}
+          purchaseDisabled={purchaseDisabled}
+          addQuantity={addQuantity}
           onAddQuantityChange={onAddQuantityChange}
           onCommit={onCommit}
+          onApplyMagicItemAcquisition={onApplyMagicItemAcquisition}
+          onApplyPurchase={onApplyPurchase}
+          onReleaseGrant={onReleaseGrant}
+          onRemovePurchase={onRemovePurchase}
           onRemoveFromInventory={onRemoveFromInventory}
           onRemoveOneFromInventory={onRemoveOneFromInventory}
         />
