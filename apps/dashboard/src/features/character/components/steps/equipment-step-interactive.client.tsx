@@ -10,6 +10,7 @@ import {
   buildEquipmentSkipPatch,
 } from '../../lib/equipment-step.lib'
 import { showsBuilderStepReviewMessage } from '../../lib/builder-step-readiness.lib'
+import { EquipmentAcquisitionGuidance } from '../equipment/equipment-acquisition-guidance.client'
 import { EquipmentPackageSwitchResolutionModal } from '../equipment/equipment-package-switch-resolution-modal.client'
 import { EquipmentPickerDrawer } from '../equipment/equipment-picker-drawer.client'
 import { StartingEquipmentOptionSection } from '../equipment/starting-equipment-option-section.client'
@@ -17,9 +18,7 @@ import { equipmentStepSwitchConfirmHeadlineClasses } from './equipment-step-inte
 import {
   EquipmentStepFallback,
   EquipmentStepInventorySection,
-  EquipmentStepMagicItemsSection,
   EquipmentStepReplacedClassOptionsNotice,
-  EquipmentStepShoppingSection,
 } from './equipment-step-sections.client'
 import { BuilderStepReadinessPanel } from './builder-step-readiness-panel.client'
 import type { EquipmentStepProps } from './equipment-step.types'
@@ -82,6 +81,11 @@ export function EquipmentStepInteractive({
     onDraftChange,
   })
 
+  const showAcquisitionGuidance =
+    selectedOptionId !== undefined &&
+    !showFallback &&
+    (step.showPurchaseWorkflow || step.showMagicItemGrants)
+
   return (
     <>
       <div className="space-y-8">
@@ -112,14 +116,16 @@ export function EquipmentStepInteractive({
           />
         ) : null}
 
-        {step.showMagicItemGrants && step.magicItemProgressLabel ? (
-          <EquipmentStepMagicItemsSection
-            progressLabel={step.magicItemProgressLabel}
-            onOpenPicker={() => step.openPicker('magic_items')}
+        {showAcquisitionGuidance ? (
+          <EquipmentAcquisitionGuidance
+            showPurchaseWorkflow={step.showPurchaseWorkflow}
+            budget={budget}
+            onOpenPurchasePicker={() => step.openPicker('purchase')}
+            showMagicItemGrants={step.showMagicItemGrants}
+            magicItemProgress={step.acquisition.progress}
+            onOpenMagicItemsPicker={() => step.openPicker('magic_items')}
           />
         ) : null}
-
-        {showBudget && budget ? <EquipmentStepShoppingSection budget={budget} /> : null}
 
         <EquipmentStepInventorySection
           draft={draft}
@@ -133,10 +139,6 @@ export function EquipmentStepInteractive({
           conversionCommitStatusMessage={step.conversionCommitStatusMessage}
           onRemoveItem={onRemoveItem}
           onSetPurchaseQuantity={handleSetPurchaseQuantity}
-          showBrowseEquipment={step.showPurchaseWorkflow}
-          onOpenPicker={() => step.openPicker('purchase')}
-          showMagicItemGrants={step.showMagicItemGrants}
-          onOpenMagicItemsPicker={() => step.openPicker('magic_items')}
           onCustomizePackage={() => step.openConversionEditor()}
           onChangeEquipmentOption={() => {
             step.expandPackageChooser()

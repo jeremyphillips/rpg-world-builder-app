@@ -31,6 +31,7 @@ import { builderInventoryRowMetaClasses } from '../builder/builder-inventory-row
 export type EquipmentInventoryRowProps = {
   display: EquipmentInventoryDisplayItem
   allowZeroQuantity?: boolean
+  detailLabelOverride?: string
   onRemoveItem?: (target: EquipmentInventoryRemoveTarget) => void
   onSetPurchaseQuantity?: (target: EquipmentInventoryQuantityTarget, quantity: number) => void
 }
@@ -159,12 +160,13 @@ function InventoryRowDetailLine({ label }: { label?: string }) {
 export function EquipmentInventoryRowItem({
   display,
   allowZeroQuantity = false,
+  detailLabelOverride,
   onRemoveItem,
   onSetPurchaseQuantity,
 }: EquipmentInventoryRowProps) {
   if (display.kind === 'single') {
     const { row } = display
-    const detailLabel = resolveDetailLineLabel(row)
+    const detailLabel = detailLabelOverride ?? resolveDetailLineLabel(row)
     const actions = (
       <InventoryRowActions
         row={row}
@@ -192,7 +194,7 @@ export function EquipmentInventoryRowItem({
   )
   const removablePurchaseRow = display.rows.find((row) => canRemovePurchaseRow(row, onRemoveItem))
   const equipped = display.rows.some((row) => row.entry.equipped)
-  const detailLabel = resolveCombinedInventoryDetailLineLabel(display)
+  const detailLabel = detailLabelOverride ?? resolveCombinedInventoryDetailLineLabel(display)
   const actionsRow = editableRow ?? removablePurchaseRow
 
   return (

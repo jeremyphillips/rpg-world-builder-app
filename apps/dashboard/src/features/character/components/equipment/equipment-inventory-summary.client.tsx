@@ -10,23 +10,18 @@ import type {
   EquipmentBudgetSummary,
   ResolvedStartingEquipmentFunding,
 } from '@rpg/contracts'
-import { Text } from '@rpg/ui'
+import { InsetPanel, Text } from '@rpg/ui'
 
-import type {
-  EquipmentInventoryQuantityTarget,
-  EquipmentInventoryRemoveTarget,
+import {
+  EQUIPMENT_STARTING_PACKAGE_SECTION_LABEL,
+  type EquipmentInventoryQuantityTarget,
+  type EquipmentInventoryRemoveTarget,
 } from '../../lib/equipment-step.lib'
-import { EquipmentMagicItemsInventoryColumn } from './equipment-magic-items-inventory-column.client'
-import { EquipmentPurchasedInventoryColumn } from './equipment-purchased-inventory-column.client'
+import { EquipmentAddedInventoryColumn } from './equipment-added-inventory-column.client'
+import { EquipmentInventoryColumn } from './equipment-inventory-column.client'
 import { EquipmentStartingPackageSection } from './equipment-starting-package-section.client'
-import {
-  buildEquipmentInventoryLayout,
-  shouldRenderEquipmentInventorySummary,
-} from './equipment-inventory-summary.lib'
-import {
-  equipmentInventorySummaryClasses,
-  equipmentInventorySummaryGridClasses,
-} from './equipment-inventory-summary.variants'
+import { buildEquipmentInventoryViewModel } from './equipment-inventory-summary.lib'
+import { equipmentInventorySummaryGridClasses } from './equipment-inventory-summary.variants'
 
 export type EquipmentInventorySummaryProps = {
   draft: CharacterBuilderDraft
@@ -45,10 +40,6 @@ export type EquipmentInventorySummaryProps = {
   onSelectedPackageItemKeysChange?: (keys: ReadonlySet<string>) => void
   onCancelConversion?: () => void
   onCommitConversion?: (preview: import('@rpg/contracts').StartingPackageConversionPreview) => void
-  showBrowseEquipment?: boolean
-  onOpenPicker?: () => void
-  showMagicItemGrants?: boolean
-  onOpenMagicItemsPicker?: () => void
 }
 
 export function EquipmentInventorySummary({
@@ -68,31 +59,21 @@ export function EquipmentInventorySummary({
   onSelectedPackageItemKeysChange,
   onCancelConversion,
   onCommitConversion,
-  showBrowseEquipment = false,
-  onOpenPicker,
-  showMagicItemGrants = false,
-  onOpenMagicItemsPicker,
 }: EquipmentInventorySummaryProps) {
-  const layout = useMemo(
-    () => buildEquipmentInventoryLayout(draft, catalogIndex, budget, classOptionPolicy, context),
+  const viewModel = useMemo(
+    () => buildEquipmentInventoryViewModel(draft, catalogIndex, budget, classOptionPolicy, context),
     [budget, catalogIndex, classOptionPolicy, context, draft],
   )
 
-  if (!shouldRenderEquipmentInventorySummary(layout, showBrowseEquipment || showMagicItemGrants)) {
+  if (!viewModel) {
     return <Text variant="muted">No equipment selected yet.</Text>
   }
 
-  const isPackageMode = layout.mode === 'package'
-
   return (
-    <div
-      className={
-        isPackageMode ? equipmentInventorySummaryGridClasses : equipmentInventorySummaryClasses
-      }
-    >
-      {isPackageMode ? (
+    <div className={equipmentInventorySummaryGridClasses}>
+      {viewModel.startingEquipment.kind === 'package' ? (
         <EquipmentStartingPackageSection
-          packageGroup={layout.startingPackage}
+          packageGroup={viewModel.startingEquipment.group}
           draft={draft}
           catalogIndex={catalogIndex}
           goldOptionFunding={goldOptionFunding}
@@ -105,21 +86,19 @@ export function EquipmentInventorySummary({
           onCancelConversion={onCancelConversion ?? (() => undefined)}
           onCommitConversion={onCommitConversion ?? (() => undefined)}
         />
-      ) : null}
+      ) : (
+        <EquipmentInventoryColumn title={EQUIPMENT_STARTING_PACKAGE_SECTION_LABEL}>
+          <InsetPanel size="sm" align="center" className="rounded-lg">
+            <InsetPanel.Text>{viewModel.startingEquipment.message}</InsetPanel.Text>
+            <InsetPanel.Text variant="muted">
+              {viewModel.startingEquipment.description}
+            </InsetPanel.Text>
+          </InsetPanel>
+        </EquipmentInventoryColumn>
+      )}
 
-      <EquipmentMagicItemsInventoryColumn
-        magicItems={layout.magicItems}
-        showChooseMagicItems={showMagicItemGrants}
-        onOpenMagicItemsPicker={onOpenMagicItemsPicker}
-        onRemoveItem={onRemoveItem}
-        onSetPurchaseQuantity={onSetPurchaseQuantity}
-      />
-
-      <EquipmentPurchasedInventoryColumn
-        purchased={layout.purchased}
-        isPackageMode={isPackageMode}
-        showBrowseEquipment={showBrowseEquipment}
-        onOpenPicker={onOpenPicker}
+      <EquipmentAddedInventoryColumn
+        addedEquipment={viewModel.addedEquipment}
         onRemoveItem={onRemoveItem}
         onSetPurchaseQuantity={onSetPurchaseQuantity}
       />

@@ -10,12 +10,11 @@ import {
 } from '../../lib/equipment-step.fixtures'
 import type { EquipmentInventoryRow } from '../../lib/equipment-step.lib'
 import {
-  buildEquipmentInventoryLayout,
+  buildEquipmentInventoryViewModel,
+  formatAddedEquipmentProvenanceLabel,
   formatEquipmentInventorySourceBreakdownLabel,
   groupEquipmentInventoryRowsForDisplay,
-  hasEquipmentInventoryContent,
   resolveCombinedInventoryDetailLineLabel,
-  shouldRenderEquipmentInventorySummary,
 } from './equipment-inventory-summary.lib'
 
 function row(
@@ -144,7 +143,44 @@ describe('equipment-inventory-summary.lib', () => {
     expect(resolveCombinedInventoryDetailLineLabel(combined)).toBe('10 GP each · 20 GP total')
   })
 
-  it('builds package and purchased sections for monk standard equipment', () => {
+  it('formats added-equipment provenance across grant and purchase sources', () => {
+    const grant = row({
+      group: 'magicItems',
+      groupLabel: 'Magic Items',
+      entry: {
+        equipmentId: 'srd-cc-5.2.1:potion-of-healing',
+        quantity: 2,
+        sources: [{ kind: 'startingWealthTier', sourceId: 'tier', grantId: 'allowance' }],
+      },
+      sourceLabel: 'Common choice',
+      removeTarget: {
+        kind: 'magicItemGrant',
+        allowanceId: 'allowance',
+        equipmentId: 'srd-cc-5.2.1:potion-of-healing',
+      },
+    })
+    const purchased = row({
+      group: 'magicItems',
+      groupLabel: 'Magic Items',
+      entry: {
+        equipmentId: 'srd-cc-5.2.1:potion-of-healing',
+        quantity: 1,
+        sources: [{ kind: 'startingGold' }],
+      },
+      equipment: equipmentStepLeatherArmorFixture,
+      sourceLabel: 'Purchased with starting gold',
+      quantityMode: 'editable',
+      quantityTarget: { kind: 'purchase', purchaseId: 'purchase-test-0' },
+      removeTarget: { kind: 'purchase', purchaseId: 'purchase-test-0' },
+      removeLabel: 'Remove Potion of Healing',
+    })
+
+    expect(formatAddedEquipmentProvenanceLabel([grant, purchased])).toBe(
+      '2 Common choices · Purchased · 10 GP',
+    )
+  })
+
+  it('builds package and added equipment channels for monk standard equipment', () => {
     const draft = {
       ...createEmptyCharacterBuilderDraft(),
       class: { classId: equipmentStepMonkClassFixture.id, level: 1 as const },
@@ -159,17 +195,17 @@ describe('equipment-inventory-summary.lib', () => {
       },
     }
 
-    const layout = buildEquipmentInventoryLayout(draft, equipmentStepCatalogIndexFixture)
+    const viewModel = buildEquipmentInventoryViewModel(draft, equipmentStepCatalogIndexFixture)
 
-    expect(layout?.mode).toBe('package')
-    if (layout?.mode !== 'package') return
+    expect(viewModel?.startingEquipment.kind).toBe('package')
+    if (viewModel?.startingEquipment.kind !== 'package') return
 
-    expect(layout.startingPackage.optionLabel).toBe('Standard Equipment')
-    expect(layout.startingPackage.customize.status).toBe('available')
-    expect(layout.purchased.every((group) => group.displays.length === 0)).toBe(true)
+    expect(viewModel.startingEquipment.group.optionLabel).toBe('Standard Equipment')
+    expect(viewModel.startingEquipment.group.customize.status).toBe('available')
+    expect(viewModel.addedEquipment.every((group) => group.entries.length === 0)).toBe(true)
   })
 
-  it('hides package section on gold path', () => {
+  it('uses gold-option starting channel instead of hiding the left column', () => {
     const draft = {
       ...createEmptyCharacterBuilderDraft(),
       class: { classId: equipmentStepBardClassFixture.id, level: 1 as const },
@@ -184,36 +220,44 @@ describe('equipment-inventory-summary.lib', () => {
       },
     }
 
-    expect(buildEquipmentInventoryLayout(draft, equipmentStepCatalogIndexFixture)).toEqual({
-      mode: 'gold',
-      magicItems: [],
-      purchased: [],
+    expect(buildEquipmentInventoryViewModel(draft, equipmentStepCatalogIndexFixture)).toEqual({
+      startingEquipment: {
+        kind: 'gold_option',
+        message: 'Starting gold selected',
+        description: 'Use the guidance above to purchase gear with your starting gold.',
+      },
+      addedEquipment: [],
     })
   })
 
-  it('renders empty gold inventory when browse equipment is available', () => {
-    const layout = buildEquipmentInventoryLayout(
-      {
-        ...createEmptyCharacterBuilderDraft(),
-        class: { classId: equipmentStepBardClassFixture.id, level: 1 as const },
-        choiceSelections: {
-          [startingEquipmentChoiceSetId(equipmentStepBardClassFixture.id)]: ['starting-gold'],
-        },
-        equipment: {
-          mode: 'gold' as const,
-          purchases: [],
-          removedPackageItemKeys: [],
-          customized: false,
-        },
+  it('aggregates mixed-source magic items into one added-equipment entry', () => {
+    const draft = {
+      ...createEmptyCharacterBuilderDraft(),
+      class: { classId: equipmentStepMonkClassFixture.id, level: 1 as const },
+      choiceSelections: {
+        [startingEquipmentChoiceSetId(equipmentStepMonkClassFixture.id)]: ['standard-equipment'],
       },
-      equipmentStepCatalogIndexFixture,
-    )
+      equipment: {
+        mode: 'package' as const,
+        purchases: [
+          {
+            equipmentId: 'srd-cc-5.2.1:rations',
+            quantity: 2,
+            sourceMode: 'startingGold' as const,
+            origin: 'picker' as const,
+          },
+        ],
+        removedPackageItemKeys: [],
+        customized: false,
+      },
+    }
 
-    expect(layout).toBeDefined()
-    if (!layout) return
+    const viewModel = buildEquipmentInventoryViewModel(draft, equipmentStepCatalogIndexFixture)
+    const gearEntries = viewModel?.addedEquipment.find((group) => group.groupLabel === 'Gear')
 
-    expect(hasEquipmentInventoryContent(layout)).toBe(false)
-    expect(shouldRenderEquipmentInventorySummary(layout, false)).toBe(false)
-    expect(shouldRenderEquipmentInventorySummary(layout, true)).toBe(true)
+    expect(viewModel?.startingEquipment.kind).toBe('package')
+    expect(gearEntries?.entries).toHaveLength(1)
+    expect(gearEntries?.entries[0]?.totalQuantity).toBe(2)
+    expect(gearEntries?.entries[0]?.sources).toEqual([{ kind: 'startingGold', quantity: 2 }])
   })
 })

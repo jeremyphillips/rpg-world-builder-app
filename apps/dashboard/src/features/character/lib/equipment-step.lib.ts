@@ -81,9 +81,18 @@ export const EQUIPMENT_STEP_REMOVE_ITEM_LABEL = 'Remove'
 export const EQUIPMENT_PURCHASED_INVENTORY_EMPTY_MESSAGE =
   'No items purchased with starting gold yet.'
 
+export const EQUIPMENT_ADDED_INVENTORY_EMPTY_MESSAGE = 'No additional equipment yet.'
+
 export const EQUIPMENT_STARTING_PACKAGE_SECTION_LABEL = 'Starting Equipment'
 
+export const EQUIPMENT_ADDED_INVENTORY_SECTION_LABEL = 'Added Equipment'
+
 export const EQUIPMENT_PURCHASED_INVENTORY_SECTION_LABEL = 'Purchased Equipment'
+
+export const EQUIPMENT_GOLD_OPTION_STARTING_MESSAGE = 'Starting gold selected'
+
+export const EQUIPMENT_GOLD_OPTION_STARTING_DESCRIPTION =
+  'Use the guidance above to purchase gear with your starting gold.'
 
 export const EQUIPMENT_MAGIC_ITEMS_SECTION_LABEL = 'Magic Items'
 

@@ -10,7 +10,10 @@ import type {
 } from '@rpg/contracts'
 import { Text } from '@rpg/ui'
 
-import type { StartingPackageInventoryGroup } from '../../lib/equipment-step.lib'
+import {
+  EQUIPMENT_STARTING_PACKAGE_SECTION_LABEL,
+  type StartingPackageInventoryGroup,
+} from '../../lib/equipment-step.lib'
 import { EquipmentInventoryColumn } from './equipment-inventory-column.client'
 import { EquipmentPackageConversionEditor } from './equipment-package-conversion-editor.client'
 import {
@@ -22,6 +25,7 @@ import { equipmentStartingPackageCustomizeReasonClasses } from './equipment-star
 
 export type EquipmentStartingPackageSectionProps = {
   packageGroup: StartingPackageInventoryGroup
+  columnTitle?: string
   draft: CharacterBuilderDraft
   catalogIndex: CharacterBuildCatalogIndex
   goldOptionFunding?: ResolvedStartingEquipmentFunding
@@ -37,6 +41,7 @@ export type EquipmentStartingPackageSectionProps = {
 
 export function EquipmentStartingPackageSection({
   packageGroup,
+  columnTitle = EQUIPMENT_STARTING_PACKAGE_SECTION_LABEL,
   draft,
   catalogIndex,
   goldOptionFunding,
@@ -54,7 +59,7 @@ export function EquipmentStartingPackageSection({
 
   return (
     <EquipmentInventoryColumn
-      title={packageGroup.optionLabel}
+      title={columnTitle}
       toolbar={
         <EquipmentStartingPackageToolbar
           customizeDisabled={customizeDisabled}

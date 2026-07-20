@@ -47,7 +47,7 @@ describe('EquipmentInventorySummary', () => {
     expect(screen.getByText('Leather Armor')).toBeInTheDocument()
     expect(screen.getByText('Lute')).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Remove from package' })).not.toBeInTheDocument()
-    expect(screen.getByText('Purchased Equipment')).toBeInTheDocument()
+    expect(screen.getByText('Added Equipment')).toBeInTheDocument()
   })
 
   it('renders editable starting-gold stackable rows with quantity controls', async () => {
@@ -110,7 +110,7 @@ describe('EquipmentInventorySummary', () => {
     )
 
     expect(screen.getByText('Rations')).toBeInTheDocument()
-    expect(screen.getByText('5 SP each · 1 GP total')).toBeInTheDocument()
+    expect(screen.getByText('2 purchased for 1 GP')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Remove all 2 Rations' })).toBeInTheDocument()
 
     await user.click(screen.getByRole('button', { name: 'Increase Rations quantity' }))

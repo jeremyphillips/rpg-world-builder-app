@@ -1,6 +1,7 @@
 import {
   characterWealthFromGrant,
   formatEquipmentInventoryPriceLine,
+  formatEquipmentPurchaseTotalPriceLabel,
   formatWealth,
   isStartingGoldOption,
   readSelectedStartingEquipmentOptionId,
@@ -12,10 +13,13 @@ import {
   type CharacterWealthGrant,
   type ClassOptionPolicy,
   type EquipmentBudgetSummary,
+  type EquipmentSourceAllocation,
 } from '@rpg/contracts'
 
 import {
   EQUIPMENT_CLASS_OPTIONS_REPLACED_MESSAGE,
+  EQUIPMENT_GOLD_OPTION_STARTING_DESCRIPTION,
+  EQUIPMENT_GOLD_OPTION_STARTING_MESSAGE,
   listEquipmentInventoryRowsFromDraft,
   type EquipmentInventoryRow,
   type PackageCustomizeAffordance,
@@ -181,35 +185,178 @@ export type PurchasedCategoryGroup = {
   displays: EquipmentInventoryDisplayItem[]
 }
 
-export type EquipmentInventoryLayout =
-  | {
-      mode: 'package'
-      startingPackage: StartingPackageInventoryGroup
-      magicItems: PurchasedCategoryGroup[]
-      purchased: PurchasedCategoryGroup[]
-    }
-  | { mode: 'gold'; magicItems: PurchasedCategoryGroup[]; purchased: PurchasedCategoryGroup[] }
-
-export function hasEquipmentInventoryContent(layout: EquipmentInventoryLayout): boolean {
-  const hasMagicItems = layout.magicItems.some((group) => group.displays.length > 0)
-
-  if (layout.mode === 'gold') {
-    return hasMagicItems || layout.purchased.some((group) => group.displays.length > 0)
-  }
-
-  return (
-    layout.startingPackage.categoryGroups.some((group) => group.rows.length > 0) ||
-    hasMagicItems ||
-    layout.purchased.some((group) => group.displays.length > 0)
-  )
+export type AddedEquipmentEntryViewModel = {
+  equipmentId: string
+  equipmentName: string
+  group: keyof CharacterEquipment
+  groupLabel: string
+  totalQuantity: number
+  sources: EquipmentSourceAllocation[]
+  provenanceLabel: string
+  rows: EquipmentInventoryRow[]
 }
 
-export function shouldRenderEquipmentInventorySummary(
-  layout: EquipmentInventoryLayout | undefined,
-  showBrowseEquipment: boolean,
-): layout is EquipmentInventoryLayout {
-  if (!layout) return false
-  return showBrowseEquipment || hasEquipmentInventoryContent(layout)
+export type AddedEquipmentCategoryGroup = {
+  group: keyof CharacterEquipment
+  groupLabel: string
+  entries: AddedEquipmentEntryViewModel[]
+}
+
+export type EquipmentInventoryViewModel = {
+  startingEquipment:
+    | { kind: 'package'; group: StartingPackageInventoryGroup }
+    | { kind: 'gold_option'; message: string; description: string }
+  addedEquipment: AddedEquipmentCategoryGroup[]
+}
+
+function magicItemGrantSourceAllocation(
+  row: EquipmentInventoryRow,
+  removeTarget: Extract<EquipmentInventoryRow['removeTarget'], { kind: 'magicItemGrant' }>,
+): EquipmentSourceAllocation {
+  const source = row.entry.sources?.[0]
+  return {
+    kind: 'startingWealthTier',
+    sourceId: source?.sourceId,
+    grantId: source?.grantId,
+    allowanceId: removeTarget.allowanceId,
+    quantity: row.entry.quantity,
+  }
+}
+
+function rowToSourceAllocation(row: EquipmentInventoryRow): EquipmentSourceAllocation | undefined {
+  if (row.removeTarget?.kind === 'magicItemGrant') {
+    return magicItemGrantSourceAllocation(row, row.removeTarget)
+  }
+
+  if (row.removeTarget?.kind === 'purchase') {
+    return { kind: 'startingGold', quantity: row.entry.quantity }
+  }
+
+  const source = row.entry.sources?.[0]
+  if (source?.kind !== 'manual') return undefined
+
+  return {
+    kind: 'manual',
+    sourceId: source.sourceId,
+    grantId: source.grantId,
+    quantity: row.entry.quantity,
+  }
+}
+
+function formatGrantProvenancePart(label: string, quantity: number): string {
+  const normalized = label.replace(/\s+choice$/i, '')
+  return `${quantity} ${normalized} choice${quantity === 1 ? '' : 's'}`
+}
+
+function formatPurchaseProvenancePart(
+  rows: readonly EquipmentInventoryRow[],
+  quantity: number,
+): string {
+  const equipment = rows.find((row) => row.equipment)?.equipment
+  if (!equipment || quantity <= 0) {
+    return quantity === 1 ? '1 purchased' : `${quantity} purchased`
+  }
+
+  const totalLabel = formatEquipmentPurchaseTotalPriceLabel(equipment, quantity)
+  return quantity === 1 ? `Purchased · ${totalLabel}` : `${quantity} purchased for ${totalLabel}`
+}
+
+/** Formats aggregated added-equipment provenance for inventory subtitles. */
+export function formatAddedEquipmentProvenanceLabel(
+  rows: readonly EquipmentInventoryRow[],
+): string {
+  const grantTotals = new Map<string, number>()
+  const purchaseRows: EquipmentInventoryRow[] = []
+  let purchaseQuantity = 0
+
+  for (const row of rows) {
+    if (row.removeTarget?.kind === 'magicItemGrant') {
+      grantTotals.set(row.sourceLabel, (grantTotals.get(row.sourceLabel) ?? 0) + row.entry.quantity)
+      continue
+    }
+
+    if (row.removeTarget?.kind === 'purchase') {
+      purchaseRows.push(row)
+      purchaseQuantity += row.entry.quantity
+    }
+  }
+
+  const parts: string[] = []
+
+  for (const [label, quantity] of grantTotals) {
+    parts.push(formatGrantProvenancePart(label, quantity))
+  }
+
+  if (purchaseQuantity > 0) {
+    parts.push(formatPurchaseProvenancePart(purchaseRows, purchaseQuantity))
+  }
+
+  return parts.join(' · ')
+}
+
+function aggregateAddedEquipmentRows(
+  rows: readonly EquipmentInventoryRow[],
+): AddedEquipmentEntryViewModel[] {
+  const byEquipmentId = new Map<string, EquipmentInventoryRow[]>()
+  const order: string[] = []
+
+  for (const row of rows) {
+    const key = row.entry.equipmentId
+    if (!byEquipmentId.has(key)) {
+      byEquipmentId.set(key, [])
+      order.push(key)
+    }
+    byEquipmentId.get(key)!.push(row)
+  }
+
+  return order.flatMap((equipmentId) => {
+    const entryRows = byEquipmentId.get(equipmentId)!
+    const first = entryRows[0]
+    if (!first) return []
+
+    const totalQuantity = entryRows.reduce((sum, row) => sum + row.entry.quantity, 0)
+    const sources = entryRows.flatMap((row) => {
+      const allocation = rowToSourceAllocation(row)
+      return allocation ? [allocation] : []
+    })
+
+    return [
+      {
+        equipmentId,
+        equipmentName: first.equipmentName,
+        group: first.group,
+        groupLabel: first.groupLabel,
+        totalQuantity,
+        sources,
+        provenanceLabel: formatAddedEquipmentProvenanceLabel(entryRows),
+        rows: entryRows,
+      },
+    ]
+  })
+}
+
+function groupAddedEquipmentByCategory(
+  entries: readonly AddedEquipmentEntryViewModel[],
+): AddedEquipmentCategoryGroup[] {
+  const grouped = new Map<string, AddedEquipmentEntryViewModel[]>()
+  const order: string[] = []
+
+  for (const entry of entries) {
+    if (!grouped.has(entry.groupLabel)) {
+      grouped.set(entry.groupLabel, [])
+      order.push(entry.groupLabel)
+    }
+    grouped.get(entry.groupLabel)!.push(entry)
+  }
+
+  return order.map((groupLabel) => {
+    const categoryEntries = grouped.get(groupLabel)!
+    return {
+      group: categoryEntries[0]!.group,
+      groupLabel,
+      entries: categoryEntries,
+    }
+  })
 }
 
 function groupRowsByCategory(
@@ -236,38 +383,6 @@ function groupRowsByCategory(
   })
 }
 
-function buildPurchasedCategoryGroups(
-  rows: readonly EquipmentInventoryRow[],
-): PurchasedCategoryGroup[] {
-  const grouped = new Map<string, EquipmentInventoryRow[]>()
-  const order: string[] = []
-
-  for (const row of rows) {
-    if (!grouped.has(row.groupLabel)) {
-      grouped.set(row.groupLabel, [])
-      order.push(row.groupLabel)
-    }
-    grouped.get(row.groupLabel)!.push(row)
-  }
-
-  return order.map((groupLabel) => {
-    const groupRows = grouped.get(groupLabel)!
-    return {
-      group: groupRows[0]!.group,
-      groupLabel,
-      displays: groupEquipmentInventoryRowsForDisplay(groupRows, { allowCombinedRows: true }),
-    }
-  })
-}
-
-function partitionInventoryRowsBySource(rows: readonly EquipmentInventoryRow[]) {
-  return {
-    packageRows: rows.filter((row) => row.removeTarget?.kind === 'package'),
-    magicItemRows: rows.filter((row) => row.removeTarget?.kind === 'magicItemGrant'),
-    purchasedRows: rows.filter((row) => row.removeTarget?.kind === 'purchase'),
-  }
-}
-
 function buildPackageCustomizeAffordance(
   classOptionPolicy: ClassOptionPolicy,
   startingEquipment: ClassStartingEquipment,
@@ -285,37 +400,30 @@ function buildPackageCustomizeAffordance(
     : { status: 'disabled', reason: goldAlternative.reason }
 }
 
-function buildPackageModeLayout(args: {
+function buildStartingPackageGroup(args: {
   selectedOptionId: string
   option: ClassStartingEquipmentOption
   packageRows: EquipmentInventoryRow[]
-  magicItems: PurchasedCategoryGroup[]
-  purchased: PurchasedCategoryGroup[]
   classOptionPolicy: ClassOptionPolicy
   startingEquipment: ClassStartingEquipment
-}): EquipmentInventoryLayout {
+}): StartingPackageInventoryGroup {
   return {
-    mode: 'package',
-    startingPackage: {
-      optionId: args.selectedOptionId,
-      optionLabel: args.option.label,
-      categoryGroups: groupRowsByCategory(args.packageRows),
-      includedWealthLabel: formatStartingEquipmentWealth(args.option.wealth),
-      customize: buildPackageCustomizeAffordance(args.classOptionPolicy, args.startingEquipment),
-    },
-    magicItems: args.magicItems,
-    purchased: args.purchased,
+    optionId: args.selectedOptionId,
+    optionLabel: args.option.label,
+    categoryGroups: groupRowsByCategory(args.packageRows),
+    includedWealthLabel: formatStartingEquipmentWealth(args.option.wealth),
+    customize: buildPackageCustomizeAffordance(args.classOptionPolicy, args.startingEquipment),
   }
 }
 
-/** Builds source-grouped inventory layout for package vs purchased sections. */
-export function buildEquipmentInventoryLayout(
+/** Builds stable two-channel inventory view model for the equipment step. */
+export function buildEquipmentInventoryViewModel(
   draft: CharacterBuilderDraft,
   catalogIndex: CharacterBuildCatalogIndex,
   budget?: EquipmentBudgetSummary,
   classOptionPolicy: ClassOptionPolicy = 'included',
   context?: CharacterBuildContext,
-): EquipmentInventoryLayout | undefined {
+): EquipmentInventoryViewModel | undefined {
   const classId = draft.class.classId
   if (!classId) return undefined
 
@@ -327,24 +435,97 @@ export function buildEquipmentInventoryLayout(
   const option = startingEquipment.options.find((entry) => entry.id === selectedOptionId)
   if (!option) return undefined
 
-  const isGoldPath = isStartingGoldOption(option)
   const allRows = listEquipmentInventoryRowsFromDraft(draft, catalogIndex, budget, context)
-  const { packageRows, magicItemRows, purchasedRows } = partitionInventoryRowsBySource(allRows)
+  const packageRows = allRows.filter((row) => row.removeTarget?.kind === 'package')
+  const addedRows = allRows.filter((row) => row.removeTarget?.kind !== 'package')
 
-  const magicItems = buildPurchasedCategoryGroups(magicItemRows)
-  const purchased = buildPurchasedCategoryGroups(purchasedRows)
+  const startingEquipmentChannel = isStartingGoldOption(option)
+    ? {
+        kind: 'gold_option' as const,
+        message: EQUIPMENT_GOLD_OPTION_STARTING_MESSAGE,
+        description: EQUIPMENT_GOLD_OPTION_STARTING_DESCRIPTION,
+      }
+    : {
+        kind: 'package' as const,
+        group: buildStartingPackageGroup({
+          selectedOptionId,
+          option,
+          packageRows,
+          classOptionPolicy,
+          startingEquipment,
+        }),
+      }
 
-  if (isGoldPath) {
-    return { mode: 'gold', magicItems, purchased }
+  return {
+    startingEquipment: startingEquipmentChannel,
+    addedEquipment: groupAddedEquipmentByCategory(aggregateAddedEquipmentRows(addedRows)),
+  }
+}
+
+/** @deprecated Use `buildEquipmentInventoryViewModel`. */
+export function buildEquipmentInventoryLayout(
+  draft: CharacterBuilderDraft,
+  catalogIndex: CharacterBuildCatalogIndex,
+  budget?: EquipmentBudgetSummary,
+  classOptionPolicy: ClassOptionPolicy = 'included',
+  context?: CharacterBuildContext,
+) {
+  const viewModel = buildEquipmentInventoryViewModel(
+    draft,
+    catalogIndex,
+    budget,
+    classOptionPolicy,
+    context,
+  )
+  if (!viewModel) return undefined
+
+  if (viewModel.startingEquipment.kind === 'gold_option') {
+    return {
+      mode: 'gold' as const,
+      magicItems: viewModel.addedEquipment
+        .filter((group) => group.group === 'magicItems')
+        .map((group) => ({
+          group: group.group,
+          groupLabel: group.groupLabel,
+          displays: group.entries.flatMap((entry) =>
+            groupEquipmentInventoryRowsForDisplay(entry.rows, { allowCombinedRows: true }),
+          ),
+        })),
+      purchased: viewModel.addedEquipment
+        .filter((group) => group.group !== 'magicItems')
+        .map((group) => ({
+          group: group.group,
+          groupLabel: group.groupLabel,
+          displays: group.entries.flatMap((entry) =>
+            groupEquipmentInventoryRowsForDisplay(entry.rows, { allowCombinedRows: true }),
+          ),
+        })),
+    }
   }
 
-  return buildPackageModeLayout({
-    selectedOptionId,
-    option,
-    packageRows,
+  const magicItems = viewModel.addedEquipment
+    .filter((group) => group.group === 'magicItems')
+    .map((group) => ({
+      group: group.group,
+      groupLabel: group.groupLabel,
+      displays: group.entries.flatMap((entry) =>
+        groupEquipmentInventoryRowsForDisplay(entry.rows, { allowCombinedRows: true }),
+      ),
+    }))
+  const purchased = viewModel.addedEquipment
+    .filter((group) => group.group !== 'magicItems')
+    .map((group) => ({
+      group: group.group,
+      groupLabel: group.groupLabel,
+      displays: group.entries.flatMap((entry) =>
+        groupEquipmentInventoryRowsForDisplay(entry.rows, { allowCombinedRows: true }),
+      ),
+    }))
+
+  return {
+    mode: 'package' as const,
+    startingPackage: viewModel.startingEquipment.group,
     magicItems,
     purchased,
-    classOptionPolicy,
-    startingEquipment,
-  })
+  }
 }
