@@ -55,7 +55,7 @@ export function EquipmentPickerGrantPanel({
     [onApplyMagicItemAcquisition],
   )
 
-  const { quantity, setQuantity, isPending, successMessage, commitQuantity } =
+  const { quantity, setQuantity, isPending, successQuantity, commitQuantity } =
     useEquipmentAcquisitionQuantityCommit({ commit: commitAcquisition })
 
   const handleSourceAction = useCallback(
@@ -97,7 +97,7 @@ export function EquipmentPickerGrantPanel({
             quantity={quantity}
             onQuantityChange={setQuantity}
             isPending={disabled || isPending}
-            successMessage={successMessage}
+            successQuantity={successQuantity}
             onSourceAction={handleSourceAction}
             onCommit={commitQuantity}
           />

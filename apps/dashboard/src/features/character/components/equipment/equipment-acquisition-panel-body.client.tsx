@@ -11,16 +11,18 @@ import {
 } from '../../lib/equipment-quantity.lib'
 import {
   buildEquipmentAcquisitionPanelViewModel,
-  type EquipmentAcquisitionPanelViewModel,
+  formatAcquisitionCommitSuccessAnnouncement,
+  formatAcquisitionCommitSuccessButtonLabel,
   type EquipmentOwnedSourceAction,
+  type EquipmentOwnedSourceViewModel,
 } from './equipment-acquisition-panel.lib'
 import {
   equipmentAcquisitionPanelBlockerClasses,
   equipmentAcquisitionPanelBodyClasses,
+  equipmentAcquisitionPanelCommitButtonClasses,
   equipmentAcquisitionPanelDividerClasses,
   equipmentAcquisitionPanelNextActionClasses,
   equipmentAcquisitionPanelPreviewLineClasses,
-  equipmentAcquisitionPanelPurchaseFooterClasses,
   equipmentAcquisitionPanelQuantityLabelClasses,
   equipmentAcquisitionPanelQuantityRowClasses,
   equipmentAcquisitionPanelSectionHeadingClasses,
@@ -29,35 +31,57 @@ import {
   equipmentAcquisitionPanelSourceListClasses,
   equipmentAcquisitionPanelSourceMetaClasses,
   equipmentAcquisitionPanelSourceQuantityClasses,
+  equipmentAcquisitionPanelSourceQuantityInlineClasses,
+  equipmentAcquisitionPanelSourceQuantityWrapClasses,
   equipmentAcquisitionPanelSourceRowClasses,
-  equipmentAcquisitionPanelSuccessClasses,
+  equipmentAcquisitionPanelSourceSpendSuffixClasses,
 } from './equipment-acquisition-panel.variants'
 import type { EquipmentAcquisitionPanelBodyProps } from './equipment-acquisition-panel-body.types'
+
+function OwnedSourceQuantity({ source }: { source: EquipmentOwnedSourceViewModel }) {
+  if (!source.spendSuffix) {
+    return (
+      <Text as="span" className={equipmentAcquisitionPanelSourceQuantityClasses}>
+        {source.quantityLabel}
+      </Text>
+    )
+  }
+
+  return (
+    <div className={equipmentAcquisitionPanelSourceQuantityWrapClasses}>
+      <span className={equipmentAcquisitionPanelSourceQuantityInlineClasses}>
+        <span>{source.quantityLabel}</span>
+        <span className="hidden min-[22rem]:inline"> · {source.spendSuffix}</span>
+      </span>
+      <span className={`${equipmentAcquisitionPanelSourceSpendSuffixClasses} min-[22rem]:hidden`}>
+        {source.spendSuffix}
+      </span>
+    </div>
+  )
+}
 
 function OwnedSourceRow({
   source,
   onSourceAction,
   disabled,
 }: {
-  source: NonNullable<EquipmentAcquisitionPanelViewModel['owned']>['sources'][number]
+  source: EquipmentOwnedSourceViewModel
   onSourceAction: (action: EquipmentOwnedSourceAction) => void
   disabled?: boolean
 }) {
   return (
     <div className={equipmentAcquisitionPanelSourceRowClasses}>
-      <div className={equipmentAcquisitionPanelSourceMetaClasses}>
-        <Text as="p" className={equipmentAcquisitionPanelSourceLabelClasses}>
-          {source.label}
-        </Text>
-      </div>
-      <Text as="span" className={equipmentAcquisitionPanelSourceQuantityClasses}>
-        {source.quantity}
+      <Text as="span" className={equipmentAcquisitionPanelSourceLabelClasses}>
+        {source.label}
       </Text>
+      <div className={equipmentAcquisitionPanelSourceMetaClasses}>
+        <OwnedSourceQuantity source={source} />
+      </div>
       <div className={equipmentAcquisitionPanelSourceActionsClasses}>
         <Button
           type="button"
           size="sm"
-          variant="secondary"
+          variant="ghost"
           disabled={disabled}
           onClick={() => onSourceAction(source.action)}
         >
@@ -66,6 +90,18 @@ function OwnedSourceRow({
       </div>
     </div>
   )
+}
+
+function resolveCommitButtonLabel(args: {
+  isPending?: boolean
+  successQuantity?: number
+  primaryActionLabel: string
+}): string {
+  if (args.isPending) return EQUIPMENT_ACQUISITION_ADDING_LABEL
+  if (args.successQuantity !== undefined) {
+    return formatAcquisitionCommitSuccessButtonLabel(args.successQuantity)
+  }
+  return args.primaryActionLabel
 }
 
 export function EquipmentAcquisitionPanelBody({
@@ -78,7 +114,7 @@ export function EquipmentAcquisitionPanelBody({
   quantity,
   onQuantityChange,
   isPending,
-  successMessage,
+  successQuantity,
   onSourceAction,
   onCommit,
 }: EquipmentAcquisitionPanelBodyProps) {
@@ -95,12 +131,20 @@ export function EquipmentAcquisitionPanelBody({
         requestedQuantity: quantity,
         budget,
         isPending,
-        successMessage,
       }),
-    [budget, catalogIndex, context, draft, equipment, isPending, quantity, rows, successMessage],
+    [budget, catalogIndex, context, draft, equipment, isPending, quantity, rows],
   )
 
   const { owned, nextAction } = viewModel
+  const commitButtonLabel = resolveCommitButtonLabel({
+    isPending,
+    successQuantity,
+    primaryActionLabel: nextAction.primaryActionLabel,
+  })
+  const successAnnouncement =
+    successQuantity !== undefined
+      ? formatAcquisitionCommitSuccessAnnouncement(successQuantity)
+      : undefined
 
   return (
     <div className={equipmentAcquisitionPanelBodyClasses}>
@@ -123,11 +167,6 @@ export function EquipmentAcquisitionPanelBody({
                   disabled={isPending}
                 />
               ))}
-              {owned.purchaseSpendLabel ? (
-                <div className={equipmentAcquisitionPanelPurchaseFooterClasses}>
-                  {owned.purchaseSpendLabel}
-                </div>
-              ) : null}
             </div>
           </div>
           <div className={equipmentAcquisitionPanelDividerClasses} />
@@ -135,9 +174,15 @@ export function EquipmentAcquisitionPanelBody({
       ) : null}
 
       <div className={equipmentAcquisitionPanelNextActionClasses}>
-        <Heading variant="group" as="h4" className={equipmentAcquisitionPanelSectionHeadingClasses}>
-          {nextAction.heading}
-        </Heading>
+        {nextAction.heading ? (
+          <Heading
+            variant="group"
+            as="h4"
+            className={equipmentAcquisitionPanelSectionHeadingClasses}
+          >
+            {nextAction.heading}
+          </Heading>
+        ) : null}
 
         {nextAction.blocked ? (
           <Text as="p" className={equipmentAcquisitionPanelBlockerClasses}>
@@ -175,24 +220,18 @@ export function EquipmentAcquisitionPanelBody({
             <Button
               type="button"
               size="sm"
+              className={equipmentAcquisitionPanelCommitButtonClasses}
               disabled={nextAction.disabled}
               onClick={() => onCommit(nextAction.commitQuantity)}
             >
-              {isPending ? EQUIPMENT_ACQUISITION_ADDING_LABEL : nextAction.primaryActionLabel}
+              {commitButtonLabel}
             </Button>
           </>
         )}
 
-        {successMessage ? (
-          <>
-            <Text as="p" className={equipmentAcquisitionPanelSuccessClasses} aria-live="polite">
-              {successMessage}
-            </Text>
-            <div id={liveRegionId} aria-live="polite" aria-atomic="true" className="sr-only">
-              {successMessage}
-            </div>
-          </>
-        ) : null}
+        <div id={liveRegionId} aria-live="polite" aria-atomic="true" className="sr-only">
+          {successAnnouncement}
+        </div>
       </div>
     </div>
   )

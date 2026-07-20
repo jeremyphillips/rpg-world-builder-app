@@ -2,7 +2,9 @@ import { describe, expect, it } from 'vitest'
 
 import {
   formatAcquisitionCommitLabel,
-  formatAcquisitionSuccessMessage,
+  formatAcquisitionCommitSuccessAnnouncement,
+  formatAcquisitionCommitSuccessButtonLabel,
+  formatOwnedPurchaseQuantityLabel,
   formatTotalPurchaseSpendFromSnapshots,
 } from './equipment-acquisition-panel.lib'
 
@@ -27,6 +29,25 @@ describe('equipment-acquisition-panel.lib', () => {
     expect(
       formatAcquisitionCommitLabel({
         plan: {
+          requestedQuantity: 2,
+          fulfilledQuantity: 2,
+          unfulfilledQuantity: 0,
+          grantAllocations: [
+            { allowanceId: 'allowance-common', quantity: 1 },
+            { allowanceId: 'allowance-common', quantity: 1 },
+          ],
+          purchaseQuantity: 0,
+          totalCostCp: 0,
+          canApplyRequestedQuantity: true,
+          blockers: [],
+        },
+        quantity: 2,
+      }),
+    ).toBe('Use 2 magic item choices')
+
+    expect(
+      formatAcquisitionCommitLabel({
+        plan: {
           requestedQuantity: 3,
           fulfilledQuantity: 3,
           unfulfilledQuantity: 0,
@@ -41,15 +62,26 @@ describe('equipment-acquisition-panel.lib', () => {
     ).toBe('Add 3 to inventory')
   })
 
-  it('sums snapshot-based GP spent labels', () => {
+  it('formats owned purchase quantity labels from snapshots', () => {
     expect(
-      formatTotalPurchaseSpendFromSnapshots([
-        { purchaseId: 'purchase-1', quantity: 15, unitCostCp: 5000 },
-      ]),
-    ).toBe('750 GP spent')
+      formatOwnedPurchaseQuantityLabel({
+        quantity: 1,
+        unitCostCp: 5000,
+      }),
+    ).toEqual({
+      quantityLabel: '1',
+      spendSuffix: '50 GP spent',
+    })
   })
 
-  it('formats success messages for live-region announcements', () => {
-    expect(formatAcquisitionSuccessMessage(3)).toBe('Added 3 to inventory')
+  it('sums snapshot-based GP spent labels', () => {
+    expect(formatTotalPurchaseSpendFromSnapshots([{ quantity: 15, unitCostCp: 5000 }])).toBe(
+      '750 GP spent',
+    )
+  })
+
+  it('formats commit success button and announcement labels', () => {
+    expect(formatAcquisitionCommitSuccessButtonLabel(3)).toBe('Added 3 ✓')
+    expect(formatAcquisitionCommitSuccessAnnouncement(3)).toBe('Added 3 to inventory')
   })
 })

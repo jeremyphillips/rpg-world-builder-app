@@ -22,7 +22,7 @@ import {
   EQUIPMENT_INVENTORY_OWNED_COPIES_LABEL,
   EQUIPMENT_INVENTORY_RELEASE_ONE_LABEL,
   EQUIPMENT_INVENTORY_REMOVE_ONE_PURCHASE_LABEL,
-  EQUIPMENT_MAGIC_ITEM_USE_CHOICE_LABEL,
+  formatMagicItemUseChoicesLabel,
   resolveEquipmentAcquisitionContext,
   type EquipmentInventoryRow,
 } from '../../lib/equipment-step.lib'
@@ -38,20 +38,23 @@ export type EquipmentOwnedSourceAction = {
     | { kind: 'purchase'; purchaseId: string }
 }
 
+export type EquipmentOwnedSourceViewModel = {
+  key: string
+  label: string
+  quantity: number
+  quantityLabel: string
+  spendSuffix?: string
+  action: EquipmentOwnedSourceAction
+}
+
 export type EquipmentAcquisitionPanelViewModel = {
   title?: string
   owned?: {
     heading: string
-    sources: Array<{
-      key: string
-      label: string
-      quantity: number
-      action: EquipmentOwnedSourceAction
-    }>
-    purchaseSpendLabel?: string
+    sources: EquipmentOwnedSourceViewModel[]
   }
   nextAction: {
-    heading: string
+    heading?: string
     quantityLabel: typeof EQUIPMENT_ACQUISITION_QUANTITY_LABEL
     showQuantity: boolean
     quantity: number
@@ -63,7 +66,6 @@ export type EquipmentAcquisitionPanelViewModel = {
     isPending?: boolean
     blocked?: boolean
     blockerNote?: string
-    successMessage?: string
   }
 }
 
@@ -73,8 +75,12 @@ type PurchaseSnapshot = {
   unitCostCp?: number
 }
 
+export function sumOwnedInventoryQuantity(rows: readonly EquipmentInventoryRow[]): number {
+  return rows.reduce((sum, row) => sum + row.entry.quantity, 0)
+}
+
 export function formatTotalPurchaseSpendFromSnapshots(
-  purchases: readonly PurchaseSnapshot[],
+  purchases: readonly Pick<PurchaseSnapshot, 'quantity' | 'unitCostCp'>[],
 ): string | undefined {
   let totalCp = 0
   let hasSnapshot = false
@@ -87,6 +93,24 @@ export function formatTotalPurchaseSpendFromSnapshots(
 
   if (!hasSnapshot || totalCp <= 0) return undefined
   return `${formatWealthAsGold(copperToWealth(totalCp))} spent`
+}
+
+export function formatOwnedPurchaseQuantityLabel(args: { quantity: number; unitCostCp?: number }): {
+  quantityLabel: string
+  spendSuffix?: string
+} {
+  const spendSuffix = formatTotalPurchaseSpendFromSnapshots([
+    { quantity: args.quantity, unitCostCp: args.unitCostCp },
+  ])
+
+  if (!spendSuffix) {
+    return { quantityLabel: String(args.quantity) }
+  }
+
+  return {
+    quantityLabel: String(args.quantity),
+    spendSuffix,
+  }
 }
 
 export function formatAcquisitionCommitLabel(args: {
@@ -102,12 +126,12 @@ export function formatAcquisitionCommitLabel(args: {
   const grantQuantity = plan.grantAllocations.reduce((sum, row) => sum + row.quantity, 0)
   const purchaseQuantity = plan.purchaseQuantity
 
-  if (quantity > 1) {
-    return `Add ${quantity} to inventory`
+  if (grantQuantity > 0 && purchaseQuantity === 0) {
+    return formatMagicItemUseChoicesLabel(quantity)
   }
 
-  if (grantQuantity > 0 && purchaseQuantity === 0) {
-    return EQUIPMENT_MAGIC_ITEM_USE_CHOICE_LABEL
+  if (quantity > 1) {
+    return `Add ${quantity} to inventory`
   }
 
   return 'Add to inventory'
@@ -182,11 +206,12 @@ function buildOwnedSourcesSection(
   draft: CharacterBuilderDraft,
 ): EquipmentAcquisitionPanelViewModel['owned'] {
   const manageSources = resolveEquipmentInventoryManageSources(rows, draft)
-  const sources = [
+  const sources: EquipmentOwnedSourceViewModel[] = [
     ...manageSources.grants.map((grant) => ({
       key: `grant:${grant.allowanceId}`,
       label: grant.label,
       quantity: grant.quantity,
+      quantityLabel: String(grant.quantity),
       action: {
         kind: 'release_grant' as const,
         quantity: 1 as const,
@@ -198,20 +223,29 @@ function buildOwnedSourcesSection(
         },
       },
     })),
-    ...manageSources.purchases.map((purchase) => ({
-      key: `purchase:${purchase.purchaseId}`,
-      label: purchase.label,
-      quantity: purchase.quantity,
-      action: {
-        kind: 'remove_purchase' as const,
-        quantity: 1 as const,
-        label: EQUIPMENT_INVENTORY_REMOVE_ONE_PURCHASE_LABEL,
-        target: {
-          kind: 'purchase' as const,
-          purchaseId: purchase.purchaseId,
+    ...manageSources.purchases.map((purchase) => {
+      const { quantityLabel, spendSuffix } = formatOwnedPurchaseQuantityLabel({
+        quantity: purchase.quantity,
+        unitCostCp: purchase.unitCostCp,
+      })
+
+      return {
+        key: `purchase:${purchase.purchaseId}`,
+        label: purchase.label,
+        quantity: purchase.quantity,
+        quantityLabel,
+        spendSuffix,
+        action: {
+          kind: 'remove_purchase' as const,
+          quantity: 1 as const,
+          label: EQUIPMENT_INVENTORY_REMOVE_ONE_PURCHASE_LABEL,
+          target: {
+            kind: 'purchase' as const,
+            purchaseId: purchase.purchaseId,
+          },
         },
-      },
-    })),
+      }
+    }),
   ]
 
   if (sources.length === 0) return undefined
@@ -219,23 +253,16 @@ function buildOwnedSourcesSection(
   return {
     heading: EQUIPMENT_INVENTORY_OWNED_COPIES_LABEL,
     sources,
-    purchaseSpendLabel: formatTotalPurchaseSpendFromSnapshots(
-      manageSources.purchases.map((purchase) => ({
-        purchaseId: purchase.purchaseId,
-        quantity: purchase.quantity,
-        unitCostCp: purchase.unitCostCp,
-      })),
-    ),
   }
 }
 
 function buildBlockedNextAction(args: {
   requestedQuantity: number
   isPending?: boolean
-  successMessage?: string
+  nextActionHeading?: string
 }): EquipmentAcquisitionPanelViewModel['nextAction'] {
   return {
-    heading: EQUIPMENT_INVENTORY_NEXT_COPY_LABEL,
+    heading: args.nextActionHeading,
     quantityLabel: EQUIPMENT_ACQUISITION_QUANTITY_LABEL,
     showQuantity: false,
     quantity: args.requestedQuantity,
@@ -247,7 +274,6 @@ function buildBlockedNextAction(args: {
     blocked: true,
     blockerNote: EQUIPMENT_ACQUISITION_BLOCKED_NOTE,
     isPending: args.isPending,
-    successMessage: args.successMessage,
   }
 }
 
@@ -259,7 +285,7 @@ function buildGrantNextAction(args: {
   catalogIndex: CharacterBuildCatalogIndex
   requestedQuantity: number
   isPending?: boolean
-  successMessage?: string
+  nextActionHeading?: string
 }): EquipmentAcquisitionPanelViewModel['nextAction'] {
   const {
     actionState,
@@ -269,7 +295,7 @@ function buildGrantNextAction(args: {
     catalogIndex,
     requestedQuantity,
     isPending,
-    successMessage,
+    nextActionHeading,
   } = args
   const { plan, capabilities, quantityBounds } = actionState
   const maxAdditionalQuantity = quantityBounds.maxAdditionalQuantity
@@ -284,7 +310,7 @@ function buildGrantNextAction(args: {
         : undefined
 
   return {
-    heading: EQUIPMENT_INVENTORY_NEXT_COPY_LABEL,
+    heading: nextActionHeading,
     quantityLabel: EQUIPMENT_ACQUISITION_QUANTITY_LABEL,
     showQuantity: maxAdditionalQuantity > 1,
     quantity: requestedQuantity,
@@ -305,7 +331,6 @@ function buildGrantNextAction(args: {
     isPending,
     blocked,
     blockerNote,
-    successMessage,
   }
 }
 
@@ -318,18 +343,12 @@ export function buildEquipmentAcquisitionPanelViewModel(args: {
   requestedQuantity: number
   budget?: EquipmentBudgetSummary
   isPending?: boolean
-  successMessage?: string
 }): EquipmentAcquisitionPanelViewModel {
-  const {
-    draft,
-    context,
-    catalogIndex,
-    equipment,
-    rows,
-    requestedQuantity,
-    isPending,
-    successMessage,
-  } = args
+  const { draft, context, catalogIndex, equipment, rows, requestedQuantity, isPending } = args
+
+  const ownedTotalQuantity = sumOwnedInventoryQuantity(rows)
+  const showOwnedSection = ownedTotalQuantity > 0
+  const nextActionHeading = showOwnedSection ? EQUIPMENT_INVENTORY_NEXT_COPY_LABEL : undefined
 
   const acquisitionContext = resolveEquipmentAcquisitionContext({ context, catalogIndex })
   const actionState = resolveEquipmentAcquisitionActionState({
@@ -340,12 +359,12 @@ export function buildEquipmentAcquisitionPanelViewModel(args: {
     requestedQuantity,
   })
 
-  const owned = buildOwnedSourcesSection(rows, draft)
+  const owned = showOwnedSection ? buildOwnedSourcesSection(rows, draft) : undefined
 
   if (actionState.kind !== 'magic_item_grant') {
     return {
       owned,
-      nextAction: buildBlockedNextAction({ requestedQuantity, isPending, successMessage }),
+      nextAction: buildBlockedNextAction({ requestedQuantity, isPending, nextActionHeading }),
     }
   }
 
@@ -359,11 +378,21 @@ export function buildEquipmentAcquisitionPanelViewModel(args: {
       catalogIndex,
       requestedQuantity,
       isPending,
-      successMessage,
+      nextActionHeading,
     }),
   }
 }
 
-export function formatAcquisitionSuccessMessage(quantity: number): string {
+export function formatAcquisitionCommitSuccessButtonLabel(quantity: number): string {
+  return `Added ${quantity} ✓`
+}
+
+/** Screen-reader announcement for a successful quantity commit. */
+export function formatAcquisitionCommitSuccessAnnouncement(quantity: number): string {
   return `Added ${quantity} to inventory`
+}
+
+/** @deprecated Use {@link formatAcquisitionCommitSuccessAnnouncement}. */
+export function formatAcquisitionSuccessMessage(quantity: number): string {
+  return formatAcquisitionCommitSuccessAnnouncement(quantity)
 }

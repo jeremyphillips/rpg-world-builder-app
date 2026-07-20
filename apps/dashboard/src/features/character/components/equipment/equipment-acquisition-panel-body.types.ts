@@ -19,7 +19,7 @@ export type EquipmentAcquisitionPanelBodyProps = {
   quantity: number
   onQuantityChange: (quantity: number) => void
   isPending?: boolean
-  successMessage?: string
+  successQuantity?: number
   onSourceAction: (action: EquipmentOwnedSourceAction) => void
   onCommit: (requestedQuantity: number) => void
 }

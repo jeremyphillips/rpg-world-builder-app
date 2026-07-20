@@ -54,7 +54,7 @@ export function EquipmentInventoryManagePanelBody({
     [equipment.id, onApplyMagicItemAcquisition],
   )
 
-  const { quantity, setQuantity, isPending, successMessage, commitQuantity } =
+  const { quantity, setQuantity, isPending, successQuantity, commitQuantity } =
     useEquipmentAcquisitionQuantityCommit({ commit: commitAcquisition })
 
   const handleSourceAction = useCallback(
@@ -87,7 +87,7 @@ export function EquipmentInventoryManagePanelBody({
       quantity={quantity}
       onQuantityChange={setQuantity}
       isPending={isPending}
-      successMessage={successMessage}
+      successQuantity={successQuantity}
       onSourceAction={handleSourceAction}
       onCommit={commitQuantity}
     />

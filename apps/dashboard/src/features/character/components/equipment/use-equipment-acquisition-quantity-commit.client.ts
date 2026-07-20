@@ -1,8 +1,8 @@
 'use client'
 
-import { useCallback, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 
-import { formatAcquisitionSuccessMessage } from './equipment-acquisition-panel.lib'
+const COMMIT_SUCCESS_DISPLAY_MS = 2000
 
 export function useEquipmentAcquisitionQuantityCommit(args: {
   commit: (requestedQuantity: number) => boolean
@@ -10,10 +10,17 @@ export function useEquipmentAcquisitionQuantityCommit(args: {
   const { commit } = args
   const [quantity, setQuantityState] = useState(1)
   const [isPending, setIsPending] = useState(false)
-  const [successMessage, setSuccessMessage] = useState<string | undefined>()
+  const [successQuantity, setSuccessQuantity] = useState<number | undefined>()
+
+  useEffect(() => {
+    if (successQuantity === undefined) return
+
+    const timer = window.setTimeout(() => setSuccessQuantity(undefined), COMMIT_SUCCESS_DISPLAY_MS)
+    return () => window.clearTimeout(timer)
+  }, [successQuantity])
 
   const setQuantity = useCallback((next: number) => {
-    setSuccessMessage(undefined)
+    setSuccessQuantity(undefined)
     setQuantityState(next)
   }, [])
 
@@ -26,7 +33,7 @@ export function useEquipmentAcquisitionQuantityCommit(args: {
         const applied = commit(requestedQuantity)
         if (applied) {
           setQuantityState(1)
-          setSuccessMessage(formatAcquisitionSuccessMessage(requestedQuantity))
+          setSuccessQuantity(requestedQuantity)
         }
         return applied
       } finally {
@@ -40,7 +47,7 @@ export function useEquipmentAcquisitionQuantityCommit(args: {
     quantity,
     setQuantity,
     isPending,
-    successMessage,
+    successQuantity,
     commitQuantity,
   }
 }

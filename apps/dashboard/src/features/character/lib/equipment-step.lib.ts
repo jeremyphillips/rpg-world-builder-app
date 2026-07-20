@@ -127,6 +127,11 @@ export const EQUIPMENT_ACQUISITION_BLOCKED_NOTE =
 
 export const EQUIPMENT_MAGIC_ITEM_USE_CHOICE_LABEL = 'Use magic item choice'
 
+export function formatMagicItemUseChoicesLabel(quantity: number): string {
+  if (quantity === 1) return EQUIPMENT_MAGIC_ITEM_USE_CHOICE_LABEL
+  return `Use ${quantity} magic item choices`
+}
+
 export const EQUIPMENT_INVENTORY_ACQUIRED_THROUGH_LABEL = 'Acquired through'
 
 export const EQUIPMENT_INVENTORY_ADD_ANOTHER_LABEL = 'Add another'

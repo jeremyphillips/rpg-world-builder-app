@@ -7,16 +7,25 @@ export const equipmentAcquisitionPanelSectionHeadingClasses =
 
 export const equipmentAcquisitionPanelSourceListClasses = 'space-y-3'
 
-export const equipmentAcquisitionPanelSourceRowClasses = 'flex items-start justify-between gap-3'
+export const equipmentAcquisitionPanelSourceRowClasses =
+  'grid grid-cols-[minmax(0,1fr)_auto_auto] items-center gap-x-3'
 
-export const equipmentAcquisitionPanelSourceMetaClasses = 'min-w-0 flex-1'
+export const equipmentAcquisitionPanelSourceMetaClasses = 'min-w-0'
 
 export const equipmentAcquisitionPanelSourceLabelClasses = 'text-sm text-foreground'
 
 export const equipmentAcquisitionPanelSourceQuantityClasses =
+  'text-sm tabular-nums text-muted-foreground text-right'
+
+export const equipmentAcquisitionPanelSourceQuantityWrapClasses =
+  'flex min-w-0 flex-col items-end text-right'
+
+export const equipmentAcquisitionPanelSourceQuantityInlineClasses =
   'text-sm tabular-nums text-muted-foreground'
 
-export const equipmentAcquisitionPanelSourceActionsClasses = 'shrink-0'
+export const equipmentAcquisitionPanelSourceSpendSuffixClasses = 'text-sm text-muted-foreground'
+
+export const equipmentAcquisitionPanelSourceActionsClasses = 'flex justify-end'
 
 export const equipmentAcquisitionPanelPurchaseFooterClasses =
   'flex justify-end text-sm text-muted-foreground'
@@ -29,7 +38,8 @@ export const equipmentAcquisitionPanelQuantityLabelClasses = 'text-sm text-foreg
 
 export const equipmentAcquisitionPanelPreviewLineClasses = 'text-sm text-muted-foreground'
 
-export const equipmentAcquisitionPanelSuccessClasses = 'text-sm text-success'
+export const equipmentAcquisitionPanelCommitButtonClasses =
+  'min-w-[13rem] justify-center tabular-nums'
 
 export const equipmentAcquisitionPanelBlockerClasses = 'text-sm text-muted-foreground'
 
