@@ -29,9 +29,8 @@ import type { ResolvedStartingEquipmentFunding } from './resolvers/equipment/res
 import {
   resolveEquipmentPurchasePricing,
   type EquipmentPurchasePricing,
+  type EquipmentPurchaseUnavailableReason,
 } from './resolvers/equipment/resolve-equipment-purchase-pricing'
-
-export const STARTING_EQUIPMENT_GOLD_OPTION_ID = 'gold'
 
 export type GoldStartingEquipmentAlternative =
   | { status: 'available'; option: StartingEquipmentOption }
@@ -217,13 +216,14 @@ function buildBlockedConversionItem(args: {
   equipmentId: string
   equipmentName: string
   blockingIssue: string
+  reason?: EquipmentPurchaseUnavailableReason
 }): StartingPackageConversionItem {
   return {
     ...args.shared,
     equipmentId: args.equipmentId,
     equipmentName: args.equipmentName,
     purchaseQuantity: 1,
-    pricing: { status: 'unavailable' },
+    pricing: { status: 'unavailable', reason: args.reason ?? 'no_market_price' },
     status: 'blocked',
     blockingIssue: args.blockingIssue,
   }
@@ -243,6 +243,7 @@ function buildSelectableConversionItem(args: {
       equipmentId: args.equipmentId,
       equipmentName: args.equipment.name,
       blockingIssue: 'This item has no market price and cannot be purchased with starting gold.',
+      reason: pricing.reason,
     })
   }
 

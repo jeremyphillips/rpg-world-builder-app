@@ -57,6 +57,8 @@ export {
 
 export { equipmentBaseSchema, type EquipmentBaseFields } from './equipment/base'
 
+export { canPurchaseEquipment } from './equipment/can-purchase-equipment'
+
 export { equipmentVariantValidationMessages } from './equipment/equipment-variant-messages'
 
 export {

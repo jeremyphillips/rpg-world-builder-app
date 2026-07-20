@@ -1,4 +1,5 @@
 import {
+  canPurchaseEquipment,
   formatEquipmentPurchaseTotalPriceLabel,
   formatMoney,
   formatWealthAsGold,
@@ -52,6 +53,7 @@ function formatRemainingAfterPurchase(
   equipment: Equipment,
   quantity: number,
 ): string {
+  if (!canPurchaseEquipment(equipment)) return '—'
   const totalCp = moneyToCopper(equipment.cost) * quantity
   return formatWealthAsGold(subtractFromWealth(budget.remaining, totalCp))
 }
@@ -67,7 +69,7 @@ function buildEquipmentPickerPurchasePricingViewModel(args: {
   const { equipment, quantity, budget } = args
 
   return {
-    unitPriceLabel: formatMoney(equipment.cost),
+    unitPriceLabel: canPurchaseEquipment(equipment) ? formatMoney(equipment.cost) : '',
     totalLabel: formatEquipmentPurchaseTotalPriceLabel(equipment, quantity),
     remainingAfterLabel: budget ? formatRemainingAfterPurchase(budget, equipment, quantity) : '—',
   }

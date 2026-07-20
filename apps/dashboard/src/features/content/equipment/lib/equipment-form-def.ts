@@ -1,9 +1,9 @@
 import type { ZodType } from 'zod'
 import { type CreateEquipmentInput, type Equipment } from '@rpg/contracts'
 
-import { costToFormDefaults } from '../../lib/forms/fields/content-economy-form-fields'
 import { contentFormRegistry, type ContentFormDef } from '../../lib/forms/content-form-registry'
 import { useEquipment, equipmentQueryKey } from '../hooks/use-equipment'
+import { equipmentEconomyFormDefaults } from './equipment-economy-form-values'
 import {
   buildEquipmentFields,
   equipmentFormSchema,
@@ -20,7 +20,7 @@ const equipmentFormDef: ContentFormDef<Equipment, EquipmentFormValues, CreateEqu
   createDefaultValues: {
     kind: 'adventuring_gear',
     gearKind: 'general',
-    cost: costToFormDefaults(),
+    ...equipmentEconomyFormDefaults('adventuring_gear'),
   },
   buildFields: buildEquipmentFields,
   toFormValues: equipmentToFormValues,

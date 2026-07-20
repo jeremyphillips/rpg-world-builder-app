@@ -1,6 +1,7 @@
 import {
   assembleCharacterProficiencies,
   buildChoiceSetId,
+  canPurchaseEquipment,
   characterPrefersMartialWeaponBrowseOrder,
   deriveEquipmentBudgetSummary,
   deriveEquipmentRecommendations,
@@ -47,8 +48,6 @@ import {
 } from '@rpg/contracts'
 
 import { clampEquipmentStepQuantity } from './equipment-quantity.lib'
-
-export const STARTING_EQUIPMENT_GOLD_OPTION_ID = 'gold'
 
 export const EQUIPMENT_STEP_NO_VALID_OPTIONS_MESSAGE =
   'No valid starting equipment options are currently available — this may be caused by missing catalog data.'
@@ -214,10 +213,6 @@ export function findStartingEquipmentChoiceSet(
 ): ChoiceSet | undefined {
   const choiceSetId = startingEquipmentChoiceSetId(classId)
   return choiceSets.find((choiceSet) => choiceSet.id === choiceSetId)
-}
-
-export function isStartingGoldOptionId(optionId: string): boolean {
-  return optionId === STARTING_EQUIPMENT_GOLD_OPTION_ID
 }
 
 export function hasGoldStartingEquipmentOption(
@@ -517,7 +512,7 @@ export function shouldShowEquipmentShopping(
     (entry) => entry.id === selectedOptionId,
   )
 
-  return option ? isStartingGoldOption(option) : isStartingGoldOptionId(selectedOptionId)
+  return option !== undefined && isStartingGoldOption(option)
 }
 
 export function resolvePurchaseSourceMode(): CharacterBuilderDraftEquipmentPurchase['sourceMode'] {
@@ -898,6 +893,7 @@ function canAddEquipmentPurchase(args: {
 }): boolean {
   const { equipment, draft, catalogIndex, equipmentId, sourceMode, quantity, budget } = args
   if (sourceMode === 'manual') return false
+  if (!canPurchaseEquipment(equipment)) return false
   if (quantity < 1) return false
 
   if (!isEquipmentStackable(equipment)) {

@@ -1,4 +1,4 @@
-import { formatMoney, moneyToCp, type Money } from '@rpg/contracts'
+import { formatMoney, moneyToCp, type EquipmentCost } from '@rpg/contracts'
 import { dataTableColumnMeta, dataTableWidthMeta, SortableHeader } from '@rpg/ui'
 import type { ColumnDef, FilterDef } from '@rpg/ui'
 
@@ -44,15 +44,17 @@ export type ContentTableOptions<T> = {
   nameHref?: (row: T) => string
 }
 
-type WithCost = { cost: Money }
+type WithCost = { cost: EquipmentCost }
+
+const NO_MARKET_PRICE_LABEL = 'No market price'
 
 /** Sortable cost column shared by armor, equipment, and weapon overview tables. */
 export function costColumn<T extends WithCost>(): ColumnDef<T> {
   return {
     id: 'cost',
-    accessorFn: (row) => moneyToCp(row.cost),
+    accessorFn: (row) => (row.cost ? moneyToCp(row.cost) : -1),
     header: ({ column }) => <SortableHeader column={column}>Cost</SortableHeader>,
-    cell: ({ row }) => formatMoney(row.original.cost),
+    cell: ({ row }) => (row.original.cost ? formatMoney(row.original.cost) : NO_MARKET_PRICE_LABEL),
     meta: { label: 'Cost' },
   }
 }

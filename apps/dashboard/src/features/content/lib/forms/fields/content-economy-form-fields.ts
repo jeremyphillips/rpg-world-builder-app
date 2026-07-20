@@ -7,10 +7,10 @@ import {
 } from '@rpg/contracts'
 import {
   toOptions,
+  type DependentConfig,
   type FieldConfig,
   type FieldOption,
   type FormItem,
-  type RowConfig,
 } from '@rpg/ui/form'
 
 import {
@@ -24,8 +24,6 @@ import {
 } from '../../../equipment/lib/equipment-weight-config'
 import { scalarUnitInputSelectField } from './content-speed-form-fields'
 
-type GroupField = FieldConfig | RowConfig
-
 const currencyOptions = toOptions(
   CURRENCY_IDS,
   Object.fromEntries(CURRENCY_IDS.map((c) => [c, getCurrencyAbbrev(c)])) as Record<
@@ -36,31 +34,53 @@ const currencyOptions = toOptions(
 
 const weightUnitOptions: FieldOption[] = [{ value: 'lb', label: 'lb.' }]
 
-/** Cost amount + currency composite (`cost.amount`, `cost.currency`). */
+const MARKET_PRICE_TOOLTIP =
+  'Items without a market price cannot be purchased through standard equipment purchasing flows, but may still be granted or added through other workflows.'
+
+function costInputField(
+  options: { kind?: EquipmentKind; width?: FieldConfig['width'] } = {},
+): FieldConfig {
+  const { kind, width = 'auto' } = options
+  return {
+    type: 'inputSelect',
+    name: 'cost',
+    label: 'Cost',
+    inputType: 'number',
+    valueKey: 'amount',
+    unitKey: 'currency',
+    options: currencyOptions,
+    min: 1,
+    width,
+    required: true,
+    formatGrouped: true,
+    ...(kind
+      ? { valueDigits: costValueDigitsForKind(kind) }
+      : {
+          valueDigitsDependsOn: 'kind',
+          valueDigitsLookup: EQUIPMENT_COST_VALUE_DIGITS,
+        }),
+  }
+}
+
+/** Has market price switch with conditional cost amount + currency fields. */
 export function costFields(
-  options: { kind?: EquipmentKind; required?: boolean; width?: FieldConfig['width'] } = {},
-): FieldConfig[] {
-  const { kind, required = true, width = 'auto' } = options
+  options: { kind?: EquipmentKind; width?: FieldConfig['width'] } = {},
+): DependentConfig[] {
+  const { kind, width = 'auto' } = options
   return [
     {
-      type: 'inputSelect',
-      name: 'cost',
-      label: 'Cost',
-      inputType: 'number',
-      valueKey: 'amount',
-      unitKey: 'currency',
-      options: currencyOptions,
-      min: 0,
-      width,
-      required,
-      formatGrouped: true,
-      defaultValue: costToFormDefaults(),
-      ...(kind
-        ? { valueDigits: costValueDigitsForKind(kind) }
-        : {
-            valueDigitsDependsOn: 'kind',
-            valueDigitsLookup: EQUIPMENT_COST_VALUE_DIGITS,
-          }),
+      kind: 'dependent',
+      controller: {
+        type: 'switch',
+        name: 'hasMarketPrice',
+        label: 'Has market price',
+        info: MARKET_PRICE_TOOLTIP,
+        width,
+      },
+      dependents: {
+        surface: 'subtle',
+        fields: [costInputField({ kind, width })],
+      },
     },
   ]
 }
@@ -106,16 +126,12 @@ export function optionalWeightFields(
   ]
 }
 
-/** Cost and weight side-by-side in the Economy group at intrinsic width. */
-export function economyFields(
-  options: { kind?: EquipmentKind; required?: boolean } = {},
-): GroupField[] {
-  const fields = [
+/** Cost and weight in the Economy group at intrinsic width. */
+export function economyFields(options: { kind?: EquipmentKind } = {}): FormItem[] {
+  return [
     ...costFields({ ...options, width: 'auto' }),
     ...optionalWeightFields({ kind: options.kind, width: 'auto' }),
   ]
-
-  return [{ kind: 'row', fields }]
 }
 
 export function weightFromForm(
@@ -135,8 +151,9 @@ export function weightToFormDefaults(): { unit: 'lb' } {
   return { unit: 'lb' }
 }
 
-export function costToFormDefaults(): { amount: number; currency: Currency } {
-  return { amount: 0, currency: 'gp' }
+/** @deprecated Use equipmentEconomyFormDefaults from equipment-economy-form-values for create defaults. */
+export function costToFormDefaults(): { currency: Currency } {
+  return { currency: 'gp' }
 }
 
 const WEALTH_GRANT_DENOMINATIONS = [

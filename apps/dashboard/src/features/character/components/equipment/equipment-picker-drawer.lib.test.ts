@@ -345,7 +345,7 @@ describe('equipment-picker-drawer.lib', () => {
         id: 'srd-cc-5.2.1:priceless-rope',
         slug: 'priceless-rope',
         name: 'Priceless Rope',
-        cost: undefined as never,
+        cost: null,
       },
       searchText: 'priceless rope adventuring gear',
     }

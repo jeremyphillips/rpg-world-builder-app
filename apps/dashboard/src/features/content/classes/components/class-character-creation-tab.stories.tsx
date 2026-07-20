@@ -92,7 +92,7 @@ export const HomebrewWithStartingEquipment: Story = {
         choose: 1,
         options: [
           {
-            id: 'standard',
+            id: 'standard-equipment',
             label: 'Standard Equipment',
             items: [
               {
@@ -106,7 +106,7 @@ export const HomebrewWithStartingEquipment: Story = {
             wealth: { amount: 10, currency: 'gp' },
           },
           {
-            id: 'gold',
+            id: 'starting-gold',
             label: 'Starting Gold',
             items: [],
             wealth: { amount: 100, currency: 'gp' },

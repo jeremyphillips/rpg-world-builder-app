@@ -50,7 +50,7 @@ import { createSpeciesFormSchema, buildSpeciesTabs } from '../../species/lib/spe
 import { createFeatFormSchema } from '../../feats/lib/feat-form-fields'
 import { equipmentFormDef } from '../../equipment/lib/equipment-form-def'
 import { resolveEquipmentFormSchema } from '../../equipment/lib/equipment-form-fields'
-import { costToFormDefaults } from './fields/content-economy-form-fields'
+import { equipmentEconomyFormDefaults } from '../../equipment/lib/equipment-economy-form-values'
 import { assertHeaderOnlyTabsHaveValidationWiring } from './tabbed-form-validation-test-utils'
 import { buildClassTabs } from '../../classes/lib/class-form-fields'
 
@@ -172,7 +172,11 @@ describe('resolveEquipmentFormSchema dispatcher', () => {
 })
 
 function minimalValidEquipmentFor(kind: (typeof EQUIPMENT_KINDS)[number]): Record<string, unknown> {
-  const base = { name: 'Test item', cost: costToFormDefaults() }
+  const economy =
+    kind === 'magic_item'
+      ? equipmentEconomyFormDefaults('magic_item')
+      : { ...equipmentEconomyFormDefaults(kind), cost: { amount: 1, currency: 'gp' } }
+  const base = { name: 'Test item', ...economy }
 
   switch (kind) {
     case 'weapon':

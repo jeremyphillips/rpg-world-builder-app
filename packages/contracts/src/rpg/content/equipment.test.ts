@@ -197,7 +197,7 @@ const SAMPLE_BODIES = {
   magic_item: {
     kind: 'magic_item',
     name: 'Bracers of Defense',
-    cost: { amount: 0, currency: 'gp' },
+    cost: null,
     rarity: 'rare',
     requiresAttunement: true,
     magicItemCategory: 'wondrous_item',
@@ -262,6 +262,27 @@ describe('equipmentSchema', () => {
   it('rejects a record missing the universal cost field', () => {
     const { cost: _omit, ...body } = SAMPLE_BODIES.adventuring_gear
     expect(equipmentSchema.safeParse(systemRecord('torch', body)).success).toBe(false)
+  })
+
+  it('rejects zero-cost equipment prices', () => {
+    expect(
+      equipmentSchema.safeParse(
+        systemRecord('free-torch', {
+          ...SAMPLE_BODIES.adventuring_gear,
+          cost: { amount: 0, currency: 'gp' },
+        }),
+      ).success,
+    ).toBe(false)
+  })
+
+  it('accepts null cost for equipment without a market price', () => {
+    const parsed = equipmentSchema.parse(
+      systemRecord('mystery-charm', {
+        ...SAMPLE_BODIES.magic_item,
+        cost: null,
+      }),
+    )
+    expect(parsed.cost).toBeNull()
   })
 })
 

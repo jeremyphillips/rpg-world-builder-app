@@ -135,13 +135,7 @@ export function EquipmentPackageConversionEditor({
                   checked={checked}
                   disabled={disabled}
                   label={`${item.grantQuantity} × ${item.equipmentName}`}
-                  hint={
-                    disabled
-                      ? item.blockingIssue
-                      : item.pricing.status === 'free'
-                        ? 'Free'
-                        : undefined
-                  }
+                  hint={disabled ? item.blockingIssue : undefined}
                   onCheckedChange={(nextChecked) =>
                     toggleItem(item.packageItemKey, nextChecked === true)
                   }

@@ -83,7 +83,7 @@ const storedFighter: ClassStored = {
       choose: 1,
       options: [
         {
-          id: 'gold',
+          id: 'starting-gold',
           label: 'Starting Gold',
           items: [],
           wealth: { gp: 100 },
@@ -178,7 +178,7 @@ describe('resolveEquipmentPickerItems', () => {
       ...createEmptyCharacterBuilderDraft(),
       class: { classId: storedFighter.id, level: 1 as const },
       choiceSelections: {
-        [startingEquipmentChoiceSetId(storedFighter.id)]: ['gold'],
+        [startingEquipmentChoiceSetId(storedFighter.id)]: ['starting-gold'],
       },
       equipment: {
         mode: 'package' as const,

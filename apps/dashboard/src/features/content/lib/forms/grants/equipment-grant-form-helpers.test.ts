@@ -52,7 +52,7 @@ describe('equipmentGrantToFormRow / equipmentGrantFromFormRow', () => {
   it('round-trips a filtered pool choice', () => {
     const bard = pickClass('bard')
     const instrumentChoice = bard.characterCreation?.startingEquipment?.options
-      .find((option) => option.id === 'standard')
+      .find((option) => option.id === 'standard-equipment')
       ?.items.find((item) => item.kind === 'choice')
     expect(instrumentChoice).toBeDefined()
 

@@ -9,6 +9,7 @@ import {
   getEquipmentFamilyLabel,
   type EquipmentFamilyPath,
 } from '../lib/shared/equipment-family-paths'
+import { equipmentEconomyFormDefaults } from '../lib/equipment-economy-form-values'
 
 type EquipmentFamilyCreateProps = {
   family: EquipmentFamilyPath
@@ -25,7 +26,7 @@ export function EquipmentFamilyCreate({ family }: EquipmentFamilyCreateProps) {
       campaignId={campaignId}
       heading={`New ${label.replace(/s$/, '')}`}
       backHref={ROUTES.content.equipment.family(campaignId, family)}
-      initialValues={kind ? { kind } : undefined}
+      initialValues={kind ? { kind, ...equipmentEconomyFormDefaults(kind) } : undefined}
       formCtx={
         kind
           ? {

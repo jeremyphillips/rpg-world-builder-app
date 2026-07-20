@@ -49,7 +49,7 @@ const monkWithLinkedGrant: ClassStored = {
       choose: 1,
       options: [
         {
-          id: 'standard',
+          id: 'standard-equipment',
           label: 'Standard Equipment',
           items: [
             {
@@ -106,7 +106,7 @@ describe('validateStartingEquipmentProficiencyLinks', () => {
         expect.objectContaining({
           code: 'missing_choice',
           choiceId: 'class-tools',
-          optionId: 'standard',
+          optionId: 'standard-equipment',
         }),
         expect.objectContaining({
           code: 'missing_choice',
@@ -137,7 +137,7 @@ describe('validateStartingEquipmentProficiencyLinks', () => {
           choose: 1,
           options: [
             {
-              id: 'standard',
+              id: 'standard-equipment',
               label: 'Standard Equipment',
               items: [
                 {
@@ -171,7 +171,7 @@ describe('validateStartingEquipmentProficiencyLinks', () => {
           choose: 1,
           options: [
             {
-              id: 'standard',
+              id: 'standard-equipment',
               label: 'Standard Equipment',
               items: [
                 {
@@ -209,7 +209,9 @@ describe('validateStartingEquipmentProficiencyLinks', () => {
 
     const issues = validateStartingEquipmentProficiencyLinks(duplicateInPackage, catalogIndex)
     expect(
-      issues.some((issue) => issue.code === 'duplicate_link' && issue.optionId === 'standard'),
+      issues.some(
+        (issue) => issue.code === 'duplicate_link' && issue.optionId === 'standard-equipment',
+      ),
     ).toBe(true)
     expect(
       issues.some((issue) => issue.code === 'duplicate_link' && issue.optionId === 'alternate'),
@@ -225,7 +227,7 @@ describe('validateStartingEquipmentProficiencyLinks', () => {
           choose: 1,
           options: [
             {
-              id: 'standard',
+              id: 'standard-equipment',
               label: 'Standard Equipment',
               items: [
                 {
@@ -261,7 +263,7 @@ describe('findStartingEquipmentGrantsReferencingProficiencyChoice', () => {
     expect(
       findStartingEquipmentGrantsReferencingProficiencyChoice(monkWithLinkedGrant, 'class-tools'),
     ).toEqual([
-      { optionId: 'standard', itemIndex: 0 },
+      { optionId: 'standard-equipment', itemIndex: 0 },
       { optionId: 'alternate', itemIndex: 0 },
     ])
   })

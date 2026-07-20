@@ -72,6 +72,19 @@ export const moneySchema = z.object({
 
 export type Money = z.infer<typeof moneySchema>
 
+/** Equipment market price — positive integer amounts only when present. */
+export const positiveMoneySchema = z.object({
+  amount: z.number().int().min(1),
+  currency: currencySchema,
+})
+
+export type PositiveMoney = z.infer<typeof positiveMoneySchema>
+
+/** Stored equipment cost — null means no market price. */
+export const equipmentCostSchema = positiveMoneySchema.nullable()
+
+export type EquipmentCost = z.infer<typeof equipmentCostSchema>
+
 /** Normalizes a price to copper pieces — the canonical sort/compare key. */
 export function moneyToCp(m: Money): number {
   return m.amount * CURRENCIES[m.currency].cp

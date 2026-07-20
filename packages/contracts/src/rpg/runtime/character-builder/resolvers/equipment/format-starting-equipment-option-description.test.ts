@@ -93,7 +93,7 @@ const storedFighter: ClassStored = {
       choose: 1,
       options: [
         {
-          id: 'heavy',
+          id: 'heavy-armor',
           label: 'Heavy Armor',
           items: [
             {
@@ -127,7 +127,7 @@ const storedFighter: ClassStored = {
           wealth: { gp: 4 },
         },
         {
-          id: 'gold',
+          id: 'starting-gold',
           label: 'Starting Gold',
           items: [],
           wealth: { gp: 155 },
@@ -190,7 +190,7 @@ describe('formatStartingEquipmentPackageDescription', () => {
     })
 
     const summaries = resolveStartingEquipmentOptionSummaries(storedFighter, catalogIndex)
-    const heavy = summaries.find((summary) => summary.optionId === 'heavy')!
+    const heavy = summaries.find((summary) => summary.optionId === 'heavy-armor')!
 
     expect(heavy.orderedItems.map((item) => item.kind)).toEqual([
       'grant',
@@ -223,9 +223,9 @@ describe('resolveStartingEquipmentOptionSummaries descriptions', () => {
     const summaries = resolveStartingEquipmentOptionSummaries(storedFighter, catalogIndex, draft, {
       fundingByOptionId: new Map([
         [
-          'gold',
+          'starting-gold',
           {
-            classOptionId: 'gold',
+            classOptionId: 'starting-gold',
             classOptionWealth: { cp: 0, sp: 0, gp: 155, pp: 0 },
             tierAdditionalWealth: { cp: 0, sp: 0, gp: 600, pp: 0 },
             totalStartingWealth: { cp: 0, sp: 0, gp: 755, pp: 0 },
@@ -236,7 +236,7 @@ describe('resolveStartingEquipmentOptionSummaries descriptions', () => {
       ]),
     })
 
-    const gold = summaries.find((summary) => summary.optionId === 'gold')!
+    const gold = summaries.find((summary) => summary.optionId === 'starting-gold')!
     expect(gold.description).toBe(`Take 155 GP instead of ${DEFAULT_STANDARD_EQUIPMENT_LABEL}.`)
     expect(gold.tierAdjustment?.label).toBe('Legend tier adds 600 GP')
     expect(gold.totalStartingWealthLabel).toBe('Total: 755 GP')

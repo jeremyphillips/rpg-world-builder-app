@@ -12,7 +12,7 @@ const DRUID_STARTING_EQUIPMENT = {
   choose: 1,
   options: [
     {
-      id: 'standard',
+      id: 'standard-equipment',
       label: 'Standard Equipment',
       items: [
         { kind: 'grant', equipmentSlug: 'leather-armor', quantity: 1, equipped: true },
@@ -31,7 +31,7 @@ const DRUID_STARTING_EQUIPMENT = {
       wealth: { gp: 9 },
     },
     {
-      id: 'gold',
+      id: 'starting-gold',
       label: 'Starting Gold',
       items: [],
       wealth: { gp: 50 },
@@ -157,7 +157,7 @@ describe('startingEquipmentChoiceSchema', () => {
         choose: 1,
         options: [
           {
-            id: 'standard',
+            id: 'standard-equipment',
             label: 'Standard Equipment',
             items: [
               {
@@ -190,7 +190,7 @@ describe('startingEquipmentChoiceSchema', () => {
         choose: 1,
         options: [
           {
-            id: 'standard',
+            id: 'standard-equipment',
             label: 'Standard Equipment',
             items: [
               {
@@ -212,7 +212,7 @@ describe('startingEquipmentChoiceSchema', () => {
         choose: 1,
         options: [
           {
-            id: 'standard',
+            id: 'standard-equipment',
             label: 'Standard Equipment',
             items: [
               {

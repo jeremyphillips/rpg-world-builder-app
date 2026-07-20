@@ -1,4 +1,5 @@
 import {
+  canPurchaseEquipment,
   compareEquipmentPickerItemsByRecommendation,
   EQUIPMENT_PICKER_SUPPORTED_KINDS,
   formatMoney,
@@ -58,7 +59,9 @@ export function getEquipmentUnaffordableAmounts(
   item: EquipmentPickerItem,
   budget?: EquipmentBudgetSummary,
 ): EquipmentUnaffordableAmounts | undefined {
-  if (!budget || item.state.isWithinRemainingBudget) return undefined
+  if (!budget || item.state.isWithinRemainingBudget || !canPurchaseEquipment(item.equipment)) {
+    return undefined
+  }
 
   return {
     required: item.equipment.cost,
@@ -118,7 +121,7 @@ export function hasEquipmentPickerResetViewCriteria(args: {
 }
 
 function isEquipmentPickerItemPriced(item: EquipmentPickerItem): boolean {
-  return item.equipment.cost != null
+  return canPurchaseEquipment(item.equipment)
 }
 
 function scoreEquipmentPickerItem(item: EquipmentPickerItem, searchQuery: string): number {
@@ -150,7 +153,7 @@ function compareEquipmentPickerItemsByPrice(
   const leftPriced = isEquipmentPickerItemPriced(left)
   const rightPriced = isEquipmentPickerItemPriced(right)
 
-  if (leftPriced && rightPriced) {
+  if (canPurchaseEquipment(left.equipment) && canPurchaseEquipment(right.equipment)) {
     const diff = moneyToCopper(left.equipment.cost) - moneyToCopper(right.equipment.cost)
     return direction === 'asc' ? diff : -diff
   }

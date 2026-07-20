@@ -90,7 +90,7 @@ const equipmentBardClass: ClassStored = {
       choose: 1,
       options: [
         {
-          id: 'standard',
+          id: 'standard-equipment',
           label: 'Standard Equipment',
           items: [
             {
@@ -114,7 +114,7 @@ const equipmentMonkClass: ClassStored = {
       choose: 1,
       options: [
         {
-          id: 'standard',
+          id: 'standard-equipment',
           label: 'Standard Equipment',
           items: [
             {
@@ -308,7 +308,7 @@ describe('resolveBuilderStepReadiness', () => {
       const draft = draftWith({
         class: { classId: equipmentBardClass.id, level: 1 },
         choiceSelections: {
-          [startingEquipmentChoiceSetId(equipmentBardClass.id)]: ['standard'],
+          [startingEquipmentChoiceSetId(equipmentBardClass.id)]: ['standard-equipment'],
         },
       })
       const choiceSets = resolveAvailableChoices(draft, equipmentTestContext)
@@ -324,7 +324,7 @@ describe('resolveBuilderStepReadiness', () => {
       const draft = draftWith({
         class: { classId: equipmentBardClass.id, level: 1 },
         choiceSelections: {
-          [startingEquipmentChoiceSetId(equipmentBardClass.id)]: ['gold'],
+          [startingEquipmentChoiceSetId(equipmentBardClass.id)]: ['starting-gold'],
         },
         equipment: {
           mode: 'gold',
@@ -353,7 +353,7 @@ describe('resolveBuilderStepReadiness', () => {
       const draft = draftWith({
         class: { classId: equipmentMonkClass.id, level: 1 },
         choiceSelections: {
-          [startingEquipmentChoiceSetId(equipmentMonkClass.id)]: ['standard'],
+          [startingEquipmentChoiceSetId(equipmentMonkClass.id)]: ['standard-equipment'],
         },
       })
       const monkContext = {
@@ -379,7 +379,7 @@ describe('resolveBuilderStepReadiness', () => {
       const draft = draftWith({
         class: { classId: equipmentMonkClass.id, level: 1 },
         choiceSelections: {
-          [startingEquipmentChoiceSetId(equipmentMonkClass.id)]: ['standard'],
+          [startingEquipmentChoiceSetId(equipmentMonkClass.id)]: ['standard-equipment'],
           [monkToolChoiceSetId]: [luteTool.id],
         },
       })
@@ -403,7 +403,7 @@ describe('resolveBuilderStepReadiness', () => {
       const draft = draftWith({
         class: { classId: equipmentMonkClass.id, level: 1 },
         choiceSelections: {
-          [startingEquipmentChoiceSetId(equipmentMonkClass.id)]: ['standard'],
+          [startingEquipmentChoiceSetId(equipmentMonkClass.id)]: ['standard-equipment'],
           [monkToolChoiceSetId]: [luteTool.id, fluteTool.id],
         },
       })

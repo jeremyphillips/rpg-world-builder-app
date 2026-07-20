@@ -1,4 +1,5 @@
 import type { StartingWealthRules } from '../../../../campaign/rules/starting-wealth'
+import { canPurchaseEquipment } from '../../../../content/equipment/can-purchase-equipment'
 import {
   copperToWealth,
   formatWealth,
@@ -42,6 +43,7 @@ export function isEquipmentAffordableAtStartingBudget(
   equipment: Equipment,
   budget: EquipmentBudgetSummary,
 ): boolean {
+  if (!canPurchaseEquipment(equipment)) return false
   return moneyToCopper(equipment.cost) <= wealthToCopper(budget.starting)
 }
 
@@ -50,6 +52,7 @@ export function isEquipmentWithinRemainingBudget(
   equipment: Equipment,
   budget: EquipmentBudgetSummary,
 ): boolean {
+  if (!canPurchaseEquipment(equipment)) return false
   return moneyToCopper(equipment.cost) <= wealthToCopper(budget.remaining)
 }
 
@@ -59,9 +62,9 @@ export function maxAffordableEquipmentQuantity(
   budget: EquipmentBudgetSummary,
   currentQuantity = 0,
 ): number {
-  const unitCost = moneyToCopper(equipment.cost)
-  if (unitCost <= 0) return Math.max(currentQuantity, 1)
+  if (!canPurchaseEquipment(equipment)) return currentQuantity
 
+  const unitCost = moneyToCopper(equipment.cost)
   const additional = Math.floor(wealthToCopper(budget.remaining) / unitCost)
   return currentQuantity + additional
 }

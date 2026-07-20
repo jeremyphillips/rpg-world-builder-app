@@ -1,4 +1,5 @@
 import type { StartingWealthRules } from '../../../../campaign/rules/starting-wealth'
+import { canPurchaseEquipment } from '../../../../content/equipment/can-purchase-equipment'
 import { resolveStartingWealthTierForBuilder } from '../../../../campaign/rules/starting-wealth'
 import {
   isStartingGoldOption,
@@ -158,7 +159,7 @@ function sumPurchaseCostCp(
 ): number {
   return purchases.reduce((total, purchase) => {
     const equipment = catalogIndex.equipment.get(purchase.equipmentId)
-    if (!equipment) return total
+    if (!equipment || !canPurchaseEquipment(equipment)) return total
     return total + moneyToCopper(equipment.cost) * purchase.quantity
   }, 0)
 }

@@ -1,4 +1,5 @@
 import { describe, expect, expectTypeOf, it } from 'vitest'
+import type { DependentConfig } from '@rpg/ui/form'
 import { loadSeedEquipment } from '@rpg/catalog/equipment'
 import { deriveContentKey, type CreateEquipmentInput } from '@rpg/contracts'
 
@@ -44,16 +45,21 @@ describe('equipmentFormDef kind-scoped fields', () => {
   })
 
   it('service route omits the weight field from Economy', () => {
-    const economyFields = equipmentFormDef
+    const economyGroupFields = equipmentFormDef
       .buildFields({ equipmentKind: 'service' })
       .filter(isGroupField)
       .find((group) => group.legend === 'Economy')?.fields
-    const row = economyFields?.find(
-      (field): field is Extract<typeof field, { kind: 'row' }> =>
-        'kind' in field && field.kind === 'row',
+    expect(economyGroupFields?.some((field) => 'name' in field && field.name === 'weight')).toBe(
+      false,
     )
-    expect(row?.fields.some((field) => 'name' in field && field.name === 'weight')).toBe(false)
-    expect(row?.fields.some((field) => 'name' in field && field.name === 'cost')).toBe(true)
+    expect(
+      economyGroupFields?.some(
+        (field) =>
+          'kind' in field &&
+          field.kind === 'dependent' &&
+          (field as DependentConfig).controller.name === 'hasMarketPrice',
+      ),
+    ).toBe(true)
   })
 
   it('service route omits the Kind select', () => {
@@ -125,6 +131,7 @@ describe('equipmentFormDef create vs update modes', () => {
     const formValues = {
       ...equipmentFormDef.createDefaultValues,
       name: 'Custom Rope',
+      cost: { amount: 1, currency: 'gp' as const },
     } as EquipmentFormValues
     const input = equipmentFormDef.toInput(formValues)
     expect(input.slug).toBe(deriveContentKey('Custom Rope'))

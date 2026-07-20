@@ -149,13 +149,13 @@ export function startingEquipmentDefaultValues(ctx: ContentFormCtx): StartingEqu
     ...(buildItemDefaultValues(
       startingEquipmentOptionItemFields(ctx),
     ) as StartingEquipmentOptionForm),
-    id: 'standard',
+    id: 'standard-equipment',
     label: 'Standard Equipment',
     items: [],
   }
 
   const goldOption: StartingEquipmentOptionForm = {
-    id: 'gold',
+    id: 'starting-gold',
     label: 'Starting Gold',
     items: [],
   }

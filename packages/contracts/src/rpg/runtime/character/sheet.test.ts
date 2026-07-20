@@ -292,14 +292,14 @@ describe('characterSelectionSourceSchema', () => {
       characterSelectionSourceSchema.safeParse({
         kind: 'classStartingEquipment',
         sourceId: 'srd-cc-5.2.1:druid',
-        grantId: 'standard',
+        grantId: 'standard-equipment',
       }).success,
     ).toBe(true)
     expect(
       characterSelectionSourceSchema.safeParse({
         kind: 'backgroundStartingEquipment',
         sourceId: 'srd-cc-5.2.1:acolyte',
-        grantId: 'standard',
+        grantId: 'standard-equipment',
       }).success,
     ).toBe(true)
     expect(
@@ -329,7 +329,7 @@ describe('characterEquipmentEntrySchema', () => {
                 {
                   kind: 'classStartingEquipment',
                   sourceId: 'srd-cc-5.2.1:druid',
-                  grantId: 'standard',
+                  grantId: 'standard-equipment',
                 },
               ],
             },

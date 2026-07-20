@@ -89,7 +89,7 @@ const storedDruid: ClassStored = {
       choose: 1,
       options: [
         {
-          id: 'standard',
+          id: 'standard-equipment',
           label: 'Standard Equipment',
           items: [
             {
@@ -108,7 +108,7 @@ const storedDruid: ClassStored = {
           wealth: { gp: 9 },
         },
         {
-          id: 'gold',
+          id: 'starting-gold',
           label: 'Starting Gold',
           items: [],
           wealth: { gp: 50 },
@@ -131,8 +131,8 @@ function makeCatalogIndex() {
 
 describe('startingEquipmentPackageItemKey', () => {
   it('uses classId, optionId, and item index', () => {
-    expect(startingEquipmentPackageItemKey(storedDruid.id, 'standard', 1)).toBe(
-      `${storedDruid.id}:standard:1`,
+    expect(startingEquipmentPackageItemKey(storedDruid.id, 'standard-equipment', 1)).toBe(
+      `${storedDruid.id}:standard-equipment:1`,
     )
   })
 })
@@ -143,7 +143,7 @@ describe('deriveEquipmentDraftEntries', () => {
       ...createEmptyCharacterBuilderDraft(),
       class: { classId: storedDruid.id, level: 1 as const },
       choiceSelections: {
-        [startingEquipmentChoiceSetId(storedDruid.id)]: ['standard'],
+        [startingEquipmentChoiceSetId(storedDruid.id)]: ['standard-equipment'],
       },
       equipment: {
         mode: 'package' as const,
@@ -164,7 +164,7 @@ describe('deriveEquipmentDraftEntries', () => {
           {
             kind: 'classStartingEquipment',
             sourceId: storedDruid.id,
-            grantId: 'standard',
+            grantId: 'standard-equipment',
           },
         ],
       },
@@ -176,7 +176,7 @@ describe('deriveEquipmentDraftEntries', () => {
           {
             kind: 'classStartingEquipment',
             sourceId: storedDruid.id,
-            grantId: 'standard',
+            grantId: 'standard-equipment',
           },
         ],
       },
@@ -188,12 +188,14 @@ describe('deriveEquipmentDraftEntries', () => {
       ...createEmptyCharacterBuilderDraft(),
       class: { classId: storedDruid.id, level: 1 as const },
       choiceSelections: {
-        [startingEquipmentChoiceSetId(storedDruid.id)]: ['standard'],
+        [startingEquipmentChoiceSetId(storedDruid.id)]: ['standard-equipment'],
       },
       equipment: {
         mode: 'package' as const,
         purchases: [],
-        removedPackageItemKeys: [startingEquipmentPackageItemKey(storedDruid.id, 'standard', 0)],
+        removedPackageItemKeys: [
+          startingEquipmentPackageItemKey(storedDruid.id, 'standard-equipment', 0),
+        ],
         customized: true,
       },
     }
@@ -209,7 +211,7 @@ describe('deriveEquipmentDraftEntries', () => {
           {
             kind: 'classStartingEquipment',
             sourceId: storedDruid.id,
-            grantId: 'standard',
+            grantId: 'standard-equipment',
           },
         ],
       },
@@ -221,7 +223,7 @@ describe('deriveEquipmentDraftEntries', () => {
       ...createEmptyCharacterBuilderDraft(),
       class: { classId: storedDruid.id, level: 1 as const },
       choiceSelections: {
-        [startingEquipmentChoiceSetId(storedDruid.id)]: ['gold'],
+        [startingEquipmentChoiceSetId(storedDruid.id)]: ['starting-gold'],
       },
       equipment: {
         mode: 'gold' as const,
@@ -250,7 +252,7 @@ describe('deriveEquipmentDraftEntries', () => {
       {
         equipmentId: rope.id,
         quantity: 4,
-        sources: [{ kind: 'startingGold', sourceId: storedDruid.id, grantId: 'gold' }],
+        sources: [{ kind: 'startingGold', sourceId: storedDruid.id, grantId: 'starting-gold' }],
       },
     ])
     expect(equipment.armor).toEqual([

@@ -58,7 +58,7 @@ const storedDruid: ClassStored = {
       choose: 1,
       options: [
         {
-          id: 'standard',
+          id: 'standard-equipment',
           label: 'Standard Equipment',
           items: [
             { kind: 'grant', target: { source: 'equipment', equipmentSlug: 'rope' }, quantity: 1 },
@@ -66,7 +66,7 @@ const storedDruid: ClassStored = {
           wealth: { gp: 9, sp: 5, cp: 3 },
         },
         {
-          id: 'gold',
+          id: 'starting-gold',
           label: 'Starting Gold',
           items: [],
           wealth: { gp: 50 },
@@ -91,7 +91,7 @@ describe('deriveEquipmentBudgetSummary', () => {
       ...createEmptyCharacterBuilderDraft(),
       class: { classId: storedDruid.id, level: 1 as const },
       choiceSelections: {
-        [startingEquipmentChoiceSetId(storedDruid.id)]: ['standard'],
+        [startingEquipmentChoiceSetId(storedDruid.id)]: ['standard-equipment'],
       },
       equipment: {
         mode: 'package' as const,
@@ -173,7 +173,7 @@ describe('resolveStartingEquipmentFundingOptions', () => {
       },
     })
 
-    expect(wealthToCopper(fundingByOptionId.get('gold')!.totalStartingWealth)).toBe(15_000)
+    expect(wealthToCopper(fundingByOptionId.get('starting-gold')!.totalStartingWealth)).toBe(15_000)
   })
 
   it('marks funding inactive and tier-only when class options are replaced', () => {
@@ -219,7 +219,7 @@ describe('resolveStartingEquipmentFundingOptions', () => {
       },
     })
 
-    const gold = fundingByOptionId.get('gold')!
+    const gold = fundingByOptionId.get('starting-gold')!
     expect(gold.classOptionPolicy).toBe('replaced')
     expect(gold.classOptionId).toBeUndefined()
     expect(wealthToCopper(gold.classOptionWealth)).toBe(0)
@@ -271,8 +271,8 @@ describe('resolveStartingEquipmentFundingOptions', () => {
       startingWealth,
     })
 
-    const standard = fundingByOptionId.get('standard')!
-    const gold = fundingByOptionId.get('gold')!
+    const standard = fundingByOptionId.get('standard-equipment')!
+    const gold = fundingByOptionId.get('starting-gold')!
 
     expect(
       wealthToCopper(gold.totalStartingWealth) - wealthToCopper(standard.totalStartingWealth),
@@ -295,7 +295,7 @@ describe('deriveEquipmentBudgetSummaryFromFunding', () => {
       ...createEmptyCharacterBuilderDraft(),
       class: { classId: storedDruid.id, level: 1 as const },
       choiceSelections: {
-        [startingEquipmentChoiceSetId(storedDruid.id)]: ['gold'],
+        [startingEquipmentChoiceSetId(storedDruid.id)]: ['starting-gold'],
       },
       equipment: {
         mode: 'gold' as const,
@@ -312,7 +312,9 @@ describe('deriveEquipmentBudgetSummaryFromFunding', () => {
       },
     }
 
-    const funding = resolveStartingEquipmentFundingOptions({ draft, catalogIndex }).get('gold')!
+    const funding = resolveStartingEquipmentFundingOptions({ draft, catalogIndex }).get(
+      'starting-gold',
+    )!
     const fromFunding = deriveEquipmentBudgetSummaryFromFunding({
       funding,
       purchases: draft.equipment.purchases,

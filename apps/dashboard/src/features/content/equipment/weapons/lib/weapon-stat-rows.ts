@@ -39,7 +39,7 @@ export function getWeaponStatRows(item: WeaponEquipment): ContentStatRowData[] {
     },
     ...(item.range ? [{ label: 'Range', value: formatWeaponRange(item.range) }] : []),
     ...(item.weight ? [{ label: 'Weight', value: formatWeight(item.weight) }] : []),
-    { label: 'Cost', value: formatMoney(item.cost) },
+    { label: 'Cost', value: item.cost ? formatMoney(item.cost) : 'No market price' },
     ...(item.specialRules ? [{ label: 'Special Rules', value: item.specialRules }] : []),
   ]
 }

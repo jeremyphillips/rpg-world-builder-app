@@ -21,6 +21,6 @@ export function getArmorStatRows(item: ArmorEquipment): ContentStatRowData[] {
       : []),
     ...(item.material ? [{ label: 'Material', value: titleCase(item.material) }] : []),
     ...(item.weight ? [{ label: 'Weight', value: formatWeight(item.weight) }] : []),
-    { label: 'Cost', value: formatMoney(item.cost) },
+    { label: 'Cost', value: item.cost ? formatMoney(item.cost) : 'No market price' },
   ]
 }

@@ -34,7 +34,7 @@ const storedBarbarian: ClassStored = {
       choose: 1,
       options: [
         {
-          id: 'standard',
+          id: 'standard-equipment',
           label: 'Standard Equipment',
           items: [
             {
@@ -46,7 +46,7 @@ const storedBarbarian: ClassStored = {
           wealth: { gp: 15 },
         },
         {
-          id: 'gold',
+          id: 'starting-gold',
           label: 'Starting Gold',
           items: [],
           wealth: { gp: 75 },
@@ -95,7 +95,7 @@ describe('resolveEquipmentStepModel', () => {
       ...createEmptyCharacterBuilderDraft(),
       class: { classId: storedBarbarian.id, level: 19 as const },
       choiceSelections: {
-        [startingEquipmentChoiceSetId(storedBarbarian.id)]: ['gold'],
+        [startingEquipmentChoiceSetId(storedBarbarian.id)]: ['starting-gold'],
       },
       equipment: {
         mode: 'gold' as const,
@@ -136,7 +136,7 @@ describe('resolveEquipmentStepModel', () => {
       ...createEmptyCharacterBuilderDraft(),
       class: { classId: storedBarbarian.id, level: 19 as const },
       choiceSelections: {
-        [startingEquipmentChoiceSetId(storedBarbarian.id)]: ['standard'],
+        [startingEquipmentChoiceSetId(storedBarbarian.id)]: ['standard-equipment'],
       },
       equipment: {
         mode: 'package' as const,
@@ -153,11 +153,11 @@ describe('resolveEquipmentStepModel', () => {
       includeBudget: true,
     })
 
-    const targetFunding = stepModel!.fundingByOptionId.get('gold')!
+    const targetFunding = stepModel!.fundingByOptionId.get('starting-gold')!
     const evaluation = evaluateEquipmentPackageSwitch({
       draft,
       catalogIndex,
-      targetOptionId: 'gold',
+      targetOptionId: 'starting-gold',
       targetFunding,
     })
 
@@ -165,7 +165,7 @@ describe('resolveEquipmentStepModel', () => {
       wealthToCopper(targetFunding.totalStartingWealth),
     )
     expect(stepModel?.budget?.starting).toEqual(
-      stepModel?.fundingByOptionId.get('standard')?.totalStartingWealth,
+      stepModel?.fundingByOptionId.get('standard-equipment')?.totalStartingWealth,
     )
   })
 })

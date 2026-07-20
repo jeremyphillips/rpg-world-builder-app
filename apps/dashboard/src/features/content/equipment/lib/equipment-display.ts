@@ -42,10 +42,16 @@ export type EquipmentDetailViewModel = {
   description?: string
 }
 
+const NO_MARKET_PRICE_LABEL = 'No market price'
+
+function formatEquipmentCostDisplay(cost: Equipment['cost']): string {
+  return cost ? formatMoney(cost) : NO_MARKET_PRICE_LABEL
+}
+
 function buildEquipmentStatRows(equipment: Equipment): ContentStatRowData[] {
   return [
     { label: EQUIPMENT_STAT_LABELS.kind, value: getEquipmentKindLabel(equipment.kind) },
-    { label: EQUIPMENT_STAT_LABELS.cost, value: formatMoney(equipment.cost) },
+    { label: EQUIPMENT_STAT_LABELS.cost, value: formatEquipmentCostDisplay(equipment.cost) },
     ...getEquipmentKindStatRows(equipment),
   ].filter((row) => !OMITTED_EQUIPMENT_DETAIL_STAT_ROW_LABELS.has(row.label))
 }
@@ -57,7 +63,7 @@ export function buildEquipmentPickerRowViewModel(
 
   return {
     name: equipment.name,
-    priceLabel: formatMoney(equipment.cost),
+    priceLabel: equipment.cost ? formatMoney(equipment.cost) : '',
     kindLabel,
     comparisonGroups,
   }
