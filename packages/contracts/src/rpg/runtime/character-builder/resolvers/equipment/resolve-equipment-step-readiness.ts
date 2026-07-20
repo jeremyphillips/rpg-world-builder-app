@@ -1,6 +1,6 @@
 import { characterBuilderStepReadinessMessages } from '../../character-builder-messages'
 import type { ChoiceSet } from '../../choice-set'
-import type { CharacterBuildContext } from '../../context'
+import type { CharacterBuildCatalogIndex, CharacterBuildContext } from '../../context'
 import { indexCharacterBuildCatalog } from '../../context'
 import type { CharacterBuilderDraft } from '../../draft'
 import type { BuilderStepReadinessState } from '../../step-readiness'
@@ -13,7 +13,94 @@ import {
   getInvalidStartingEquipmentProficiencyLinks,
   getUnresolvedStartingEquipmentDependencies,
 } from './get-unresolved-starting-equipment-dependencies'
+import {
+  formatMagicItemGrantIncompleteLabel,
+  resolveUnresolvedMagicItemGrantIssues,
+} from './resolve-equipment-magic-item-grant-step-issues'
 import { readSelectedStartingEquipmentOptionId } from './resolve-starting-equipment-choice-sets'
+
+function resolveMagicItemGrantStepBlock(args: {
+  draft: CharacterBuilderDraft
+  context: CharacterBuildContext
+}): BuilderStepReadinessState | undefined {
+  const issues = resolveUnresolvedMagicItemGrantIssues(args)
+  if (issues.length === 0) return undefined
+
+  const first = issues[0]!
+
+  return {
+    readiness: 'readyWithChoices',
+    message: formatStepReadinessMessage(
+      characterBuilderStepReadinessMessages.equipmentMagicItemGrantIncomplete,
+      {
+        rarityLabel: formatMagicItemGrantIncompleteLabel(first.rarity),
+        remaining: first.remaining,
+      },
+    ),
+  }
+}
+
+function resolveSkippedEquipmentStepReadiness(args: {
+  draft: CharacterBuilderDraft
+  context: CharacterBuildContext
+}): BuilderStepReadinessState {
+  const magicItemBlock = resolveMagicItemGrantStepBlock(args)
+  if (magicItemBlock) return magicItemBlock
+
+  return {
+    readiness: 'complete',
+    message: formatStepReadinessMessage(
+      characterBuilderStepReadinessMessages.equipmentContinuingWithout,
+    ),
+  }
+}
+
+function resolveStartingEquipmentOptionStepBlock(args: {
+  draft: CharacterBuilderDraft
+  classId: string
+  catalogIndex: CharacterBuildCatalogIndex
+}): BuilderStepReadinessState | undefined {
+  const { draft, classId, catalogIndex } = args
+  const characterClass = catalogIndex.classes.get(classId)
+  const selectedOptionId = readSelectedStartingEquipmentOptionId(draft, classId)
+  const option = characterClass?.characterCreation?.startingEquipment?.options.find(
+    (entry) => entry.id === selectedOptionId,
+  )
+
+  if (!characterClass || !option) return undefined
+
+  const invalidLinks = getInvalidStartingEquipmentProficiencyLinks({
+    option,
+    classId,
+    characterClass,
+    choiceSelections: draft.choiceSelections,
+    catalogIndex,
+  })
+  if (invalidLinks.length > 0) {
+    return {
+      readiness: 'readyWithChoices',
+      message: invalidLinks[0]!.issue,
+    }
+  }
+
+  const pendingDependencies = getUnresolvedStartingEquipmentDependencies({
+    option,
+    classId,
+    characterClass,
+    choiceSelections: draft.choiceSelections,
+    catalogIndex,
+  })
+  if (pendingDependencies.length > 0) {
+    return {
+      readiness: 'readyWithChoices',
+      message: formatStepReadinessMessage(
+        characterBuilderStepReadinessMessages.equipmentPendingIncludedTool,
+      ),
+    }
+  }
+
+  return undefined
+}
 
 export function resolveEquipmentStepReadiness(
   draft: CharacterBuilderDraft,
@@ -30,12 +117,7 @@ export function resolveEquipmentStepReadiness(
   }
 
   if (draft.equipment?.skipped === true) {
-    return {
-      readiness: 'complete',
-      message: formatStepReadinessMessage(
-        characterBuilderStepReadinessMessages.equipmentContinuingWithout,
-      ),
-    }
+    return resolveSkippedEquipmentStepReadiness({ draft, context })
   }
 
   const stepChoiceSets = choiceSetsForStep('equipment', resolvedChoiceSets)
@@ -53,43 +135,11 @@ export function resolveEquipmentStepReadiness(
 
   const classId = draft.class.classId
   const catalogIndex = indexCharacterBuildCatalog(context.catalog)
-  const characterClass = catalogIndex.classes.get(classId)
-  const selectedOptionId = readSelectedStartingEquipmentOptionId(draft, classId)
-  const option = characterClass?.characterCreation?.startingEquipment?.options.find(
-    (entry) => entry.id === selectedOptionId,
-  )
+  const optionBlock = resolveStartingEquipmentOptionStepBlock({ draft, classId, catalogIndex })
+  if (optionBlock) return optionBlock
 
-  if (characterClass && option) {
-    const invalidLinks = getInvalidStartingEquipmentProficiencyLinks({
-      option,
-      classId,
-      characterClass,
-      choiceSelections: draft.choiceSelections,
-      catalogIndex,
-    })
-    if (invalidLinks.length > 0) {
-      return {
-        readiness: 'readyWithChoices',
-        message: invalidLinks[0]!.issue,
-      }
-    }
-
-    const pendingDependencies = getUnresolvedStartingEquipmentDependencies({
-      option,
-      classId,
-      characterClass,
-      choiceSelections: draft.choiceSelections,
-      catalogIndex,
-    })
-    if (pendingDependencies.length > 0) {
-      return {
-        readiness: 'readyWithChoices',
-        message: formatStepReadinessMessage(
-          characterBuilderStepReadinessMessages.equipmentPendingIncludedTool,
-        ),
-      }
-    }
-  }
+  const magicItemBlock = resolveMagicItemGrantStepBlock({ draft, context })
+  if (magicItemBlock) return magicItemBlock
 
   return {
     readiness: 'complete',

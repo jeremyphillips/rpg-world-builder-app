@@ -34,6 +34,7 @@ export const EQUIPMENT_PICKER_MATCHES_PROFICIENCY_LABEL = 'Matches your proficie
 export const EQUIPMENT_PICKER_SPELLCASTING_FOCUS_LABEL = 'Spellcasting focus'
 
 export const EQUIPMENT_PICKER_CANNOT_AFFORD_LABEL = 'Cannot afford'
+export const EQUIPMENT_PICKER_NOT_PURCHASABLE_LABEL = 'Not for sale'
 
 export const EQUIPMENT_PICKER_MODE_PURCHASE = 'purchase' as const
 export const EQUIPMENT_PICKER_MODE_MAGIC_ITEMS = 'magic_items' as const

@@ -1,7 +1,6 @@
 import {
   assembleCharacterProficiencies,
   buildChoiceSetId,
-  canPurchaseEquipment,
   characterPrefersMartialWeaponBrowseOrder,
   deriveEquipmentBudgetSummary,
   deriveEquipmentRecommendations,
@@ -12,7 +11,6 @@ import {
   isEquipmentStackable,
   isProficiencyLinkedStartingEquipmentGrant,
   isStartingGoldOption,
-  maxAffordableEquipmentQuantity,
   mergeCompatiblePurchasedEntries,
   normalizeEquipmentPurchase,
   nestedStartingEquipmentChoiceSetId,
@@ -397,14 +395,6 @@ export function readSelectedStartingEquipmentOption(
   return readSelectedStartingEquipmentOptionId(draft, classId)
 }
 
-/** @deprecated Use {@link formatSelectionSourceLabel} from `@rpg/contracts`. */
-export function formatEquipmentSourceLabel(
-  sources: CharacterSelectionSource[] | undefined,
-  catalogIndex: CharacterBuildCatalogIndex,
-): string {
-  return formatSelectionSourceLabel(sources, catalogIndex)
-}
-
 export function listEquipmentInventoryRows(
   inventory: CharacterEquipment,
   catalogIndex: CharacterBuildCatalogIndex,
@@ -422,7 +412,7 @@ export function listEquipmentInventoryRows(
         entry,
         equipment,
         equipmentName: equipment?.name ?? entry.equipmentId,
-        sourceLabel: formatEquipmentSourceLabel(entry.sources, catalogIndex),
+        sourceLabel: formatSelectionSourceLabel(entry.sources, catalogIndex),
         isStackable: equipment ? isEquipmentStackable(equipment) : false,
         quantityMode: 'locked',
         removeLabel: formatEquipmentInventoryRemoveLabel(
@@ -470,14 +460,6 @@ export function resolveStartingGoldPurchaseId(
   )
   if (purchaseIndex === -1) return undefined
   return resolveEquipmentPurchaseId(purchases, purchaseIndex)
-}
-
-export function resolveMaxAffordablePurchaseQuantity(args: {
-  equipment: Equipment
-  budget: EquipmentBudgetSummary
-  currentQuantity: number
-}): number {
-  return maxAffordableEquipmentQuantity(args.equipment, args.budget, args.currentQuantity)
 }
 
 export function buildEquipmentSkipPatch(): CharacterBuilderDraft['equipment'] {
@@ -819,7 +801,7 @@ function purchaseRowFromEntry(args: {
   const sourceLabel =
     packageOptionLabel !== undefined
       ? formatPackageGrantSourceLabel(packageOptionLabel, entry.quantity)
-      : formatEquipmentSourceLabel(entry.sources, catalogIndex)
+      : formatSelectionSourceLabel(entry.sources, catalogIndex)
 
   return buildInventoryRowPresentation({
     entry,
@@ -910,25 +892,17 @@ function listPurchaseInventoryRows(args: {
   })
 }
 
-function canAddEquipmentPurchase(args: {
+function canIncreasePurchaseQuantity(args: {
   equipment: Equipment
   draft: CharacterBuilderDraft
-  catalogIndex: CharacterBuildCatalogIndex
   equipmentId: string
   sourceMode: CharacterBuilderDraftEquipmentPurchase['sourceMode']
   quantity: number
   budget?: EquipmentBudgetSummary
 }): boolean {
-  const { equipment, draft, catalogIndex, equipmentId, sourceMode, quantity, budget } = args
+  const { equipment, draft, equipmentId, sourceMode, quantity, budget } = args
   if (sourceMode === 'manual') return false
-  if (!canPurchaseEquipment(equipment)) return false
   if (quantity < 1) return false
-
-  if (!isEquipmentStackable(equipment)) {
-    if (quantity !== 1) return false
-    if (readEquipmentPurchaseQuantity(draft, equipmentId, sourceMode) > 0) return false
-    if (isUniqueEquipmentOwnedInDraft(draft, catalogIndex, equipmentId)) return false
-  }
 
   const currentQuantity = readEquipmentPurchaseQuantity(draft, equipmentId, sourceMode)
   const limits = resolveEquipmentPurchaseQuantityLimits({
@@ -938,10 +912,6 @@ function canAddEquipmentPurchase(args: {
     currentQuantity,
     isPurchaseRow: true,
   })
-
-  if (budget && wealthToCopper(budget.starting) > 0) {
-    return currentQuantity + quantity <= limits.max
-  }
 
   return currentQuantity + quantity <= limits.max
 }
@@ -1288,10 +1258,9 @@ export function buildEquipmentAddPurchasePatch(args: {
 
   if (
     !equipment ||
-    !canAddEquipmentPurchase({
+    !canIncreasePurchaseQuantity({
       equipment,
       draft,
-      catalogIndex,
       equipmentId,
       sourceMode,
       quantity,

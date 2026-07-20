@@ -3,6 +3,7 @@ import type {
   CharacterBuilderDraft,
   CharacterBuildValidationIssue,
   ChoiceSet,
+  EquipmentPickerFocusIntent,
 } from '@rpg/contracts'
 
 export type EquipmentStepProps = {
@@ -11,4 +12,6 @@ export type EquipmentStepProps = {
   resolvedChoiceSets: readonly ChoiceSet[]
   validationIssues: CharacterBuildValidationIssue[]
   onDraftChange: (patch: Partial<CharacterBuilderDraft>) => void
+  equipmentPickerFocus?: EquipmentPickerFocusIntent
+  onEquipmentPickerFocusConsumed?: () => void
 }

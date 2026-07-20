@@ -9,6 +9,7 @@ import {
   deriveEquipmentBudgetSummary,
   resolveCharacterCreationPatch,
   resolveStartingEquipmentOptionSummaries,
+  formatSelectionSourceLabel,
   startingEquipmentChoiceSetId,
   wealthToCopper,
   type CharacterBuildContext,
@@ -21,7 +22,6 @@ import {
   buildEquipmentSelectionPatch,
   buildEquipmentSetPurchaseQuantityPatch,
   formatEquipmentInventoryRemoveLabel,
-  formatEquipmentSourceLabel,
   hasSelectableStartingEquipmentOption,
   isSelectedStartingEquipmentReady,
   isUniqueEquipmentOwnedInDraft,
@@ -374,7 +374,7 @@ describe('equipment-step.lib', () => {
 
   it('formats equipment source labels', () => {
     expect(
-      formatEquipmentSourceLabel(
+      formatSelectionSourceLabel(
         [
           {
             kind: 'classStartingEquipment',
@@ -387,7 +387,7 @@ describe('equipment-step.lib', () => {
     ).toBe('From Bard starting equipment')
 
     expect(
-      formatEquipmentSourceLabel([{ kind: 'startingGold' }], equipmentStepCatalogIndexFixture),
+      formatSelectionSourceLabel([{ kind: 'startingGold' }], equipmentStepCatalogIndexFixture),
     ).toBe('Purchased with starting gold')
   })
 

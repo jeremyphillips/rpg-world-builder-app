@@ -49,7 +49,7 @@ function getKnownBlockingCandidate(
 function getAffordabilityCandidate(
   item: EquipmentPickerItem,
 ): EquipmentCalloutCandidate | undefined {
-  if (item.state.isWithinRemainingBudget) return undefined
+  if (item.state.purchaseAvailability.status !== 'unaffordable') return undefined
 
   return {
     priority: EQUIPMENT_CALLOUT_SOURCE_PRIORITY.affordability,

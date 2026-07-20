@@ -48,6 +48,7 @@ function makePickerItem(
       isRecommended: recommendation.tier === 'essential' || recommendation.tier === 'strong',
       isProficient: true,
       ...affordability,
+      purchaseAvailability: { status: 'available' as const },
       recommendation: {
         ...recommendation,
         specificity: recommendation.specificity ?? 'exact',

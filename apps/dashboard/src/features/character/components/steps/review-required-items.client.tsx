@@ -1,16 +1,36 @@
 'use client'
 
-import type { CharacterBuilderStepId, ReviewRequiredItem } from '@rpg/contracts'
-import { formatReviewRequiredItemProgress } from '@rpg/contracts'
+import {
+  buildEquipmentPickerFocusIntent,
+  createEquipmentPickerFocusRequestId,
+  formatReviewRequiredItemProgress,
+  type ReviewRequiredItem,
+} from '@rpg/contracts'
 import { Button, Text } from '@rpg/ui'
+
+import type { CharacterBuilderNavigateToStep } from '../../lib/character-builder-navigation-options'
 
 export type ReviewRequiredItemsProps = {
   requiredItems: readonly ReviewRequiredItem[]
-  onNavigateToStep: (stepId: CharacterBuilderStepId) => void
+  onNavigateToStep: CharacterBuilderNavigateToStep
 }
 
 export function ReviewRequiredItems({ requiredItems, onNavigateToStep }: ReviewRequiredItemsProps) {
   if (requiredItems.length === 0) return null
+
+  const handleNavigate = (item: ReviewRequiredItem) => {
+    if (item.equipmentPickerFocus) {
+      onNavigateToStep(item.stepId, {
+        equipmentPickerFocus: buildEquipmentPickerFocusIntent(
+          item.equipmentPickerFocus,
+          createEquipmentPickerFocusRequestId(),
+        ),
+      })
+      return
+    }
+
+    onNavigateToStep(item.stepId)
+  }
 
   return (
     <div className="space-y-2">
@@ -42,7 +62,7 @@ export function ReviewRequiredItems({ requiredItems, onNavigateToStep }: ReviewR
                   variant="link"
                   size="sm"
                   className="h-auto shrink-0 px-0"
-                  onClick={() => onNavigateToStep(item.stepId)}
+                  onClick={() => handleNavigate(item)}
                 >
                   Go to {item.stepLabel}
                 </Button>

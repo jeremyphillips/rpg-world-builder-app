@@ -11,6 +11,7 @@ import {
   equipmentPickerLowRemainingBudgetFixture,
   equipmentPickerRowboatFixture,
   equipmentPickerSkilledHirelingFixture,
+  pickerState,
 } from './equipment-picker-drawer.fixtures'
 import {
   EQUIPMENT_PICKER_AFFORDABLE_NOW_LABEL,
@@ -638,7 +639,7 @@ describe('EquipmentPickerDrawer', () => {
       {
         equipment: equipmentPickerRowboatFixture,
         searchText: 'rowboat water vehicle',
-        state: {
+        state: pickerState({
           isAvailable: true,
           isRecommended: false,
           isProficient: true,
@@ -650,12 +651,12 @@ describe('EquipmentPickerDrawer', () => {
             specificity: 'broad_pool' as const,
           },
           disabledReasons: [],
-        },
+        }),
       },
       {
         equipment: equipmentPickerSkilledHirelingFixture,
         searchText: 'skilled hireling service',
-        state: {
+        state: pickerState({
           isAvailable: true,
           isRecommended: false,
           isProficient: true,
@@ -667,7 +668,7 @@ describe('EquipmentPickerDrawer', () => {
             specificity: 'broad_pool' as const,
           },
           disabledReasons: [],
-        },
+        }),
       },
     ]
 

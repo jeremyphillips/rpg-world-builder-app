@@ -4,6 +4,8 @@ import type { CharacterBuildContext } from './context'
 import type { CharacterBuilderDraft } from './draft'
 import type { CharacterBuilderStepId } from './step-ids'
 import { BUILDER_STEPS } from './steps'
+import type { EquipmentPickerFocusRequest } from './resolvers/equipment/equipment-picker-focus'
+import { isMagicItemGrantIncompleteIssueCode } from './resolvers/equipment/resolve-equipment-magic-item-grant-step-issues'
 import { resolveUnresolvedChoiceSetSummaries } from './resolve-unresolved-choice-set-summaries'
 import { validateCharacterBuild } from './validate/validate-character-build'
 import type { CharacterBuildValidationIssue } from './validate/types'
@@ -16,6 +18,7 @@ export type ReviewRequiredItem = {
   stepId: CharacterBuilderStepId
   stepLabel: string
   progress?: { current: number; total: number; max?: number }
+  equipmentPickerFocus?: EquipmentPickerFocusRequest
 }
 
 export type ReviewNonActionableIssue = {
@@ -123,6 +126,11 @@ function stepFieldRequiredItems(
     const progress =
       issue.code === 'abilities_incomplete' ? resolveAbilityScoreProgress(draft) : undefined
 
+    const equipmentPickerFocus =
+      issue.allowanceId && isMagicItemGrantIncompleteIssueCode(issue.code)
+        ? { mode: 'magic_items' as const, allowanceId: issue.allowanceId }
+        : undefined
+
     items.push({
       id: `stepField:${issue.stepId}:${issue.code}`,
       kind: 'stepField',
@@ -131,6 +139,7 @@ function stepFieldRequiredItems(
       stepId: issue.stepId,
       stepLabel: resolveBuilderStepLabel(issue.stepId),
       progress,
+      equipmentPickerFocus,
     })
   }
 

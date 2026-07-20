@@ -4,12 +4,8 @@ import { isEquipmentStackable } from '../../../../content/equipment/stackable'
 import { formatMoney } from '../../../../primitives/units'
 import { copperToDisplayWealth, formatWealth } from '../../../../primitives/wealth'
 import type { CharacterBuilderDraftEquipmentPurchase } from '../../draft'
-import {
-  maxAffordableEquipmentQuantity,
-  moneyToCopper,
-  wealthToCopper,
-  type EquipmentBudgetSummary,
-} from './equipment-budget'
+import { moneyToCopper, wealthToCopper, type EquipmentBudgetSummary } from './equipment-budget'
+import { maxAffordablePurchaseQuantity } from './resolve-equipment-purchase-availability'
 
 /** Hard cap per purchase row (bundle units). */
 export const EQUIPMENT_PURCHASE_QUANTITY_MAX = 99
@@ -33,8 +29,12 @@ export function resolveEquipmentAcquisitionMaxQuantity(args: {
   const hasSpendableBudget = budget !== undefined && wealthToCopper(budget.starting) > 0
 
   let budgetMax: number
-  if (hasSpendableBudget && budget) {
-    budgetMax = maxAffordableEquipmentQuantity(equipment, budget, currentQuantity)
+  if (hasSpendableBudget) {
+    budgetMax = maxAffordablePurchaseQuantity({
+      equipment,
+      budget,
+      currentPurchaseQuantity: currentQuantity,
+    })
   } else {
     budgetMax = EQUIPMENT_PURCHASE_QUANTITY_MAX
   }

@@ -10,6 +10,8 @@ export type CharacterBuildValidationIssue = {
   path?: string
   stepId?: CharacterBuilderStepId
   choiceSetId?: string
+  /** Magic-item grant review navigation — first incomplete allowance. */
+  allowanceId?: string
 }
 
 export type CharacterBuildValidationResult = {

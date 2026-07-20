@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 import { createEmptyCharacterBuilderDraft } from './draft'
 import { resolveReviewBlockingSummary } from './resolve-review-blocking-summary'
 import { builderTestContext } from './test-fixtures'
+import { magicItemGrantIncompleteIssueCode } from './resolvers/equipment/resolve-equipment-magic-item-grant-step-issues'
 
 describe('resolveReviewBlockingSummary', () => {
   it('maps submit-blocking field issues and unresolved choice sets to required items', () => {
@@ -58,6 +59,31 @@ describe('resolveReviewBlockingSummary', () => {
       ]),
     )
     expect(summary.nonActionable).toEqual([])
+  })
+
+  it('attaches equipment picker focus for magic-item grant review items', () => {
+    const allowanceId = 'startingWealthTier:table:tier-b:common'
+    const summary = resolveReviewBlockingSummary(
+      createEmptyCharacterBuilderDraft(),
+      builderTestContext,
+      [],
+      [
+        {
+          code: magicItemGrantIncompleteIssueCode(allowanceId),
+          message: 'Choose 1 Common magic item grant.',
+          path: 'equipment.magicItemSelections',
+          stepId: 'equipment',
+          allowanceId,
+        },
+      ],
+    )
+
+    expect(summary.requiredItems).toEqual([
+      expect.objectContaining({
+        stepId: 'equipment',
+        equipmentPickerFocus: { mode: 'magic_items', allowanceId },
+      }),
+    ])
   })
 
   it('derives alert issues from final submit validation when none are provided', () => {

@@ -105,6 +105,13 @@ export const characterBuilderValidationMessages = {
     'validation.characterBuilder.finalizationFailed',
     () => 'Fix the highlighted issues before creating your character.',
   ),
+  magicItemGrantIncomplete: defineMessage<{ rarityLabel: string; remaining: number }>(
+    'validation.characterBuilder.magicItemGrantIncomplete',
+    ({ rarityLabel, remaining }) =>
+      remaining === 1
+        ? `Choose 1 ${rarityLabel} magic item grant.`
+        : `Choose ${remaining} ${rarityLabel} magic item grants.`,
+  ),
 }
 
 // ---------------------------------------------------------------------------
@@ -137,6 +144,13 @@ export const characterBuilderStepReadinessMessages = {
     'validation.characterBuilder.readiness.equipmentPendingIncludedTool',
     () =>
       'Choose the tool included with this equipment package. This selection also completes your Tool Proficiency choice.',
+  ),
+  equipmentMagicItemGrantIncomplete: defineMessage<{ rarityLabel: string; remaining: number }>(
+    'validation.characterBuilder.readiness.equipmentMagicItemGrantIncomplete',
+    ({ rarityLabel, remaining }) =>
+      remaining === 1
+        ? `Choose 1 ${rarityLabel} magic item.`
+        : `Choose ${remaining} ${rarityLabel} magic items.`,
   ),
   spellsBlockedNoClass: defineMessage(
     'validation.characterBuilder.readiness.spellsBlockedNoClass',

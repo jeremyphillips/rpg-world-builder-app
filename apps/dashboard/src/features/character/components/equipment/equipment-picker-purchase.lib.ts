@@ -25,10 +25,6 @@ export const EQUIPMENT_PICKER_PURCHASE_REMOVE_ONE_LABEL = 'Remove one from inven
 export const EQUIPMENT_PICKER_PURCHASE_REMOVE_ALL_LABEL = 'Remove from inventory'
 export const EQUIPMENT_PICKER_PURCHASE_ADD_ANOTHER_LABEL = 'Add another'
 
-/** @deprecated Use {@link EQUIPMENT_PICKER_PURCHASE_INVENTORY_LABEL}. */
-export const EQUIPMENT_PICKER_PURCHASE_ALREADY_OWNED_LABEL =
-  EQUIPMENT_PICKER_PURCHASE_INVENTORY_LABEL
-
 export type EquipmentPickerPurchasePricingViewModel = {
   quantity: number
   maxQuantity: number

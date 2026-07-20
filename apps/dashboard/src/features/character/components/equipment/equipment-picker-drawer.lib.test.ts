@@ -7,6 +7,7 @@ import {
   equipmentPickerRopeFixture,
   equipmentPickerRowboatFixture,
   equipmentPickerSkilledHirelingFixture,
+  pickerState,
 } from './equipment-picker-drawer.fixtures'
 import {
   countEquipmentPickerAffordableHiddenImpact,
@@ -191,7 +192,7 @@ describe('equipment-picker-drawer.lib', () => {
       {
         equipment: equipmentPickerRowboatFixture,
         searchText: 'rowboat water vehicle',
-        state: {
+        state: pickerState({
           isAvailable: true,
           isRecommended: false,
           isProficient: true,
@@ -203,12 +204,12 @@ describe('equipment-picker-drawer.lib', () => {
             specificity: 'broad_pool' as const,
           },
           disabledReasons: [],
-        },
+        }),
       },
       {
         equipment: equipmentPickerSkilledHirelingFixture,
         searchText: 'skilled hireling service',
-        state: {
+        state: pickerState({
           isAvailable: true,
           isRecommended: false,
           isProficient: true,
@@ -220,7 +221,7 @@ describe('equipment-picker-drawer.lib', () => {
             specificity: 'broad_pool' as const,
           },
           disabledReasons: [],
-        },
+        }),
       },
     ]
 

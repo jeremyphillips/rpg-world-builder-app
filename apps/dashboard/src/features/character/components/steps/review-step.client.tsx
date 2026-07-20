@@ -6,7 +6,6 @@ import {
   resolveReviewBlockingSummary,
   type CharacterBuildContext,
   type CharacterBuilderDraft,
-  type CharacterBuilderStepId,
   type CharacterBuildPreview,
   type CharacterBuildValidationIssue,
   type ChoiceSet,
@@ -19,6 +18,8 @@ import { ReviewAdvisoryWarnings } from './review-advisory-warnings.client'
 import { ReviewRequiredItems } from './review-required-items.client'
 import { ReviewStepSummary } from './review-step-summary.client'
 
+import type { CharacterBuilderNavigateToStep } from '../../lib/character-builder-navigation-options'
+
 export type ReviewStepProps = {
   context: CharacterBuildContext
   draft: CharacterBuilderDraft
@@ -26,7 +27,7 @@ export type ReviewStepProps = {
   resolvedChoiceSets: readonly ChoiceSet[]
   validationIssues?: CharacterBuildValidationIssue[]
   validationHeading: string
-  onNavigateToStep: (stepId: CharacterBuilderStepId) => void
+  onNavigateToStep: CharacterBuilderNavigateToStep
 }
 
 export function ReviewStep({

@@ -14,6 +14,7 @@ import {
   type CharacterBuilderDraft,
   type CharacterBuilderStepId,
   type CharacterBuildValidationIssue,
+  type EquipmentPickerFocusIntent,
 } from '@rpg/contracts'
 import { buttonVariants, Heading, Spinner, Text } from '@rpg/ui'
 
@@ -44,6 +45,7 @@ import {
   resolveCurrentStepId,
 } from '../lib/character-builder-navigation'
 import { mergeCharacterBuilderDraft } from '../lib/merge-character-builder-draft'
+import type { CharacterBuilderNavigateToStepOptions } from '../lib/character-builder-navigation-options'
 import {
   issuesForStep,
   resolveBuilderDraftValidationIssues,
@@ -93,6 +95,9 @@ export function CharacterBuilderShell({ context, catalogIndex }: CharacterBuilde
     CharacterBuilderStepId[]
   >([])
   const [createError, setCreateError] = useState<string | null>(null)
+  const [pendingEquipmentPickerFocus, setPendingEquipmentPickerFocus] = useState<
+    EquipmentPickerFocusIntent | undefined
+  >()
 
   const resolvedChoiceSets = useResolvedChoiceSets(draft, context)
 
@@ -190,6 +195,10 @@ export function CharacterBuilderShell({ context, catalogIndex }: CharacterBuilde
     )
   }, [context, currentStepId, draft, resolvedChoiceSets, validationVisibleStepIds])
 
+  const handleEquipmentPickerFocusConsumed = useCallback(() => {
+    setPendingEquipmentPickerFocus(undefined)
+  }, [])
+
   if (!hasHydrated) {
     return (
       <div className="flex flex-1 items-center justify-center py-16">
@@ -215,7 +224,14 @@ export function CharacterBuilderShell({ context, catalogIndex }: CharacterBuilde
     ? validationIssues
     : issuesForStep(validationIssues, currentStepId)
 
-  const navigateToStep = (stepId: typeof currentStepId) => {
+  const navigateToStep = (
+    stepId: typeof currentStepId,
+    options?: CharacterBuilderNavigateToStepOptions,
+  ) => {
+    if (options?.equipmentPickerFocus) {
+      setPendingEquipmentPickerFocus(options.equipmentPickerFocus)
+    }
+
     if (railValidationVisibleStepIds.includes(stepId)) {
       const result = validateBuilderStepSubmit(draft, context, stepId, resolvedChoiceSets)
       setValidationIssues(result.ok ? [] : result.issues)
@@ -392,6 +408,8 @@ export function CharacterBuilderShell({ context, catalogIndex }: CharacterBuilde
               onStepComplete={attemptStepAdvance}
               onFormContinueValidationFailed={handleFormContinueValidationFailed}
               onNavigateToStep={navigateToStep}
+              equipmentPickerFocus={pendingEquipmentPickerFocus}
+              onEquipmentPickerFocusConsumed={handleEquipmentPickerFocusConsumed}
             />
           </div>
           <div className={characterBuilderShellPreviewColumnClasses}>

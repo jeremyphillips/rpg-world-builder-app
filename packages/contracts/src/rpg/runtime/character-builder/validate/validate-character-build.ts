@@ -13,6 +13,7 @@ import type {
   CharacterBuildValidationResult,
 } from './types'
 import { validateChoiceSetsForStep } from './validate-choice-sets'
+import { validateEquipment } from './validate-equipment'
 import {
   validateAbilities,
   validateClass,
@@ -38,8 +39,10 @@ const STEP_VALIDATORS: Record<
     validateAbilities(draft, context.characterCreationRules.abilityGeneration.standardArray),
   proficiencies: (draft, context, choiceSets) =>
     validateChoiceSetsForStep(draft, context, choiceSets, 'proficiencies'),
-  equipment: (draft, context, choiceSets) =>
-    validateChoiceSetsForStep(draft, context, choiceSets, 'equipment'),
+  equipment: (draft, context, choiceSets) => [
+    ...validateChoiceSetsForStep(draft, context, choiceSets, 'equipment'),
+    ...validateEquipment(draft, context),
+  ],
   spells: (draft, context, choiceSets) =>
     validateChoiceSetsForStep(draft, context, choiceSets, 'spells'),
   review: () => [],

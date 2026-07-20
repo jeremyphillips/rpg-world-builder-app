@@ -16,6 +16,7 @@ import { normalizeSearchQuery, scoreItem } from '@rpg/ui'
 
 import {
   EQUIPMENT_PICKER_KIND_ALL,
+  EQUIPMENT_PICKER_NOT_PURCHASABLE_LABEL,
   EQUIPMENT_PICKER_SORT_BEST_MATCH,
   EQUIPMENT_PICKER_SORT_NAME_ASC,
   EQUIPMENT_PICKER_SORT_NAME_DESC,
@@ -59,7 +60,11 @@ export function getEquipmentUnaffordableAmounts(
   item: EquipmentPickerItem,
   budget?: EquipmentBudgetSummary,
 ): EquipmentUnaffordableAmounts | undefined {
-  if (!budget || item.state.isWithinRemainingBudget || !canPurchaseEquipment(item.equipment)) {
+  if (!budget || item.state.purchaseAvailability.status !== 'unaffordable') {
+    return undefined
+  }
+
+  if (!canPurchaseEquipment(item.equipment)) {
     return undefined
   }
 
@@ -381,7 +386,10 @@ export function sortEquipmentPickerItems(
 }
 
 export function isEquipmentPickerItemDisabled(item: EquipmentPickerItem): boolean {
-  return item.state.disabledReasons.length > 0 || !item.state.isWithinRemainingBudget
+  if (item.state.disabledReasons.length > 0) return true
+
+  const availability = item.state.purchaseAvailability
+  return availability.status === 'unavailable' || availability.status === 'unaffordable'
 }
 
 export function getEquipmentPickerDisabledNote(
@@ -392,7 +400,11 @@ export function getEquipmentPickerDisabledNote(
     return item.state.disabledReasons[0]
   }
 
-  if (!item.state.isWithinRemainingBudget) {
+  if (item.state.purchaseAvailability.status === 'unavailable') {
+    return EQUIPMENT_PICKER_NOT_PURCHASABLE_LABEL
+  }
+
+  if (item.state.purchaseAvailability.status === 'unaffordable') {
     return formatEquipmentUnaffordableReason(item, budget)
   }
 

@@ -28,7 +28,10 @@ import {
   wizardLevelOneSpells,
 } from './spellcasting-test-fixtures'
 import { builderTestContext, fighterClass } from './test-fixtures'
+import { minimalStartingWealthSeedCoveringStandardMax } from '../../../test/fixtures/starting-wealth-minimal'
+import { resolveCharacterCreationPatch } from '../../campaign/patches/campaign-character-creation-patch'
 import { resolveBuilderStepReadiness } from './step-readiness'
+import { formatStepReadinessMessage } from './step-readiness-helpers'
 
 const RULESET = 'srd-cc-5.2.1' as const
 
@@ -395,6 +398,38 @@ describe('resolveBuilderStepReadiness', () => {
 
       expect(resolveBuilderStepReadiness('equipment', draft, monkContext, choiceSets)).toEqual({
         readiness: 'complete',
+      })
+    })
+
+    it('stays incomplete when exact magic-item grants remain after skip', () => {
+      const magicItemContext = {
+        ...equipmentTestContext,
+        characterCreationRules: {
+          ...equipmentTestContext.characterCreationRules,
+          ...resolveCharacterCreationPatch(undefined, minimalStartingWealthSeedCoveringStandardMax),
+        },
+      }
+      const draft = draftWith({
+        class: { classId: equipmentBardClass.id, level: 2 },
+        equipment: {
+          mode: 'package',
+          purchases: [],
+          removedPackageItemKeys: [],
+          customized: false,
+          skipped: true,
+          magicItemSelections: [],
+        },
+      })
+
+      expect(resolveBuilderStepReadiness('equipment', draft, magicItemContext, [])).toEqual({
+        readiness: 'readyWithChoices',
+        message: formatStepReadinessMessage(
+          characterBuilderStepReadinessMessages.equipmentMagicItemGrantIncomplete,
+          {
+            rarityLabel: 'Common',
+            remaining: 1,
+          },
+        ),
       })
     })
 
