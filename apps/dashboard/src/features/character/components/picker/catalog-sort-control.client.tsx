@@ -39,7 +39,11 @@ export function CatalogSortControl<TMode extends string = string>({
         {label}
       </Text>
       <Select value={value} onValueChange={(next) => onValueChange(next as TMode)}>
-        <SelectTrigger size="sm" aria-label={triggerAriaLabel}>
+        <SelectTrigger
+          size="sm"
+          className="w-auto shrink-0 min-w-[4.5rem]"
+          aria-label={triggerAriaLabel}
+        >
           <SelectValue>{triggerLabel}</SelectValue>
         </SelectTrigger>
         <SelectContent>

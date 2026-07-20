@@ -22,7 +22,7 @@ describe('getBuilderChromeCopy', () => {
       createLabel: 'Create NPC',
       exitHref: ROUTES.campaign.npcs.list('camp-1'),
       importHref: ROUTES.campaign.npcs.import('camp-1'),
-      importLabel: 'Import NPC (experimental)',
+      importLabel: 'Import NPC',
       reviewReadyMessage: 'This NPC is ready to add to your campaign.',
       draftRestoreHeadline: 'Continue your NPC draft?',
     })

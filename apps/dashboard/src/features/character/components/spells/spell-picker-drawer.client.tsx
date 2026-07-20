@@ -41,6 +41,7 @@ import {
   resolveSpellPickerSchoolFilterOptions,
   resolveSpellPickerTraitFilterOptions,
   resolveValidSpellPickerSortModes,
+  resolveSpellPickerLevelChipChange,
   sanitizeSpellPickerBrowseState,
   selectedIdsForSpellPickerMode,
   collectSpellPickerMarkers,
@@ -70,14 +71,6 @@ export type { SpellPickerDrawerProps } from './spell-picker-drawer.types'
 function spellPickerLevelChipValues(selectedLevels: readonly number[]): string[] {
   if (selectedLevels.length === 0) return [SPELL_PICKER_LEVELS_ALL]
   return selectedLevels.map(String)
-}
-
-function spellPickerLevelChipSelection(
-  values: string[],
-  availableLevels: readonly number[],
-): number[] {
-  if (values.includes(SPELL_PICKER_LEVELS_ALL) || values.length === 0) return []
-  return values.map(Number).filter((level) => availableLevels.includes(level))
 }
 
 export function SpellPickerDrawer({
@@ -328,13 +321,13 @@ export function SpellPickerDrawer({
           levelOptions={levelOptions}
           selectedLevelValues={spellPickerLevelChipValues(browseState.selectedLevels)}
           onSelectedLevelsChange={(values) => {
-            if (values.includes(SPELL_PICKER_LEVELS_ALL)) {
-              persistBrowseState({ ...browseState, selectedLevels: [] })
-              return
-            }
             persistBrowseState({
               ...browseState,
-              selectedLevels: spellPickerLevelChipSelection(values, levelOptions),
+              selectedLevels: resolveSpellPickerLevelChipChange(
+                browseState.selectedLevels,
+                values,
+                levelOptions,
+              ),
             })
           }}
         />
