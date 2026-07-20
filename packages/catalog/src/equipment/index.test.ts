@@ -25,8 +25,8 @@ function armor() {
 describe('SRD 5.2.1 equipment seed', () => {
   const equipment = loadSeedEquipment(RULESET)
 
-  it('loads 202 unified equipment records', () => {
-    expect(equipment).toHaveLength(202)
+  it('loads 222 unified equipment records', () => {
+    expect(equipment).toHaveLength(222)
   })
 
   it('uses deterministic system ids and null campaignId', () => {

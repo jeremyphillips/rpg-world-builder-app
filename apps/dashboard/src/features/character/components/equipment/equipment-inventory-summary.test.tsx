@@ -25,10 +25,12 @@ describe('EquipmentInventorySummary', () => {
       ...createEmptyCharacterBuilderDraft(),
       class: { classId: equipmentStepBardClassFixture.id, level: 1 as const },
       choiceSelections: {
-        [startingEquipmentChoiceSetId(equipmentStepBardClassFixture.id)]: ['standard'],
-        [nestedStartingEquipmentChoiceSetId(equipmentStepBardClassFixture.id, 'standard', 1)]: [
-          'srd-cc-5.2.1:lute',
-        ],
+        [startingEquipmentChoiceSetId(equipmentStepBardClassFixture.id)]: ['standard-equipment'],
+        [nestedStartingEquipmentChoiceSetId(
+          equipmentStepBardClassFixture.id,
+          'standard-equipment',
+          1,
+        )]: ['srd-cc-5.2.1:lute'],
       },
       equipment: {
         mode: 'package' as const,
@@ -56,7 +58,7 @@ describe('EquipmentInventorySummary', () => {
       ...createEmptyCharacterBuilderDraft(),
       class: { classId: equipmentStepBardClassFixture.id, level: 1 as const },
       choiceSelections: {
-        [startingEquipmentChoiceSetId(equipmentStepBardClassFixture.id)]: ['gold'],
+        [startingEquipmentChoiceSetId(equipmentStepBardClassFixture.id)]: ['starting-gold'],
       },
       equipment: {
         mode: 'gold' as const,
@@ -133,7 +135,7 @@ describe('EquipmentInventorySummary', () => {
       ...createEmptyCharacterBuilderDraft(),
       class: { classId: equipmentStepBardClassFixture.id, level: 1 as const },
       choiceSelections: {
-        [startingEquipmentChoiceSetId(equipmentStepBardClassFixture.id)]: ['gold'],
+        [startingEquipmentChoiceSetId(equipmentStepBardClassFixture.id)]: ['starting-gold'],
       },
       equipment: {
         mode: 'gold' as const,
@@ -180,7 +182,7 @@ describe('EquipmentInventorySummary', () => {
           {
             kind: 'classStartingEquipment',
             sourceId: equipmentStepBardClassFixture.id,
-            grantId: 'standard',
+            grantId: 'standard-equipment',
           },
         ],
       },
@@ -192,7 +194,7 @@ describe('EquipmentInventorySummary', () => {
       removeLabel: 'Remove all 2 Dagger',
       removeTarget: {
         kind: 'package',
-        packageItemKey: `${equipmentStepBardClassFixture.id}:standard:0`,
+        packageItemKey: `${equipmentStepBardClassFixture.id}:standard-equipment:0`,
       },
     }
 
@@ -247,7 +249,7 @@ describe('EquipmentInventorySummary', () => {
       ...createEmptyCharacterBuilderDraft(),
       class: { classId: equipmentStepBardClassFixture.id, level: 1 as const },
       choiceSelections: {
-        [startingEquipmentChoiceSetId(equipmentStepBardClassFixture.id)]: ['gold'],
+        [startingEquipmentChoiceSetId(equipmentStepBardClassFixture.id)]: ['starting-gold'],
       },
       equipment: {
         mode: 'gold' as const,

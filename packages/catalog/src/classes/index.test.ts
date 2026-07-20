@@ -818,9 +818,9 @@ describe('SRD 5.2.1 class seed', () => {
     const startingEquipment = fighter.characterCreation?.startingEquipment
     expect(startingEquipment).toBeDefined()
     expect(startingEquipment!.options.map((option) => option.id)).toEqual([
-      'heavy',
+      'heavy-armor',
       'skirmisher',
-      'gold',
+      'starting-gold',
     ])
   })
 
@@ -853,7 +853,7 @@ describe('SRD 5.2.1 class seed', () => {
     const startingEquipment = monk.characterCreation?.startingEquipment
     expect(startingEquipment).toBeDefined()
 
-    const standard = startingEquipment!.options.find((option) => option.id === 'standard')
+    const standard = startingEquipment!.options.find((option) => option.id === 'standard-equipment')
     expect(standard?.items.length).toBeGreaterThan(0)
 
     const linkedGrant = standard?.items.find(
@@ -888,7 +888,7 @@ describe('SRD 5.2.1 class seed', () => {
       ...createEmptyCharacterBuilderDraft(),
       class: { classId: monk.id, level: 1 as const },
       choiceSelections: {
-        [startingEquipmentChoiceSetId(monk.id)]: ['standard'],
+        [startingEquipmentChoiceSetId(monk.id)]: ['standard-equipment'],
         [monkToolChoiceSetId]: [lute!.id],
       },
     }

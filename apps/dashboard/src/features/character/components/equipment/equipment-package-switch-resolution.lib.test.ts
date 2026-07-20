@@ -59,7 +59,7 @@ const storedDruid: ClassStored = {
       choose: 1,
       options: [
         {
-          id: 'standard',
+          id: 'standard-equipment',
           label: 'Standard Equipment',
           items: [
             { kind: 'grant', target: { source: 'equipment', equipmentSlug: 'rope' }, quantity: 1 },
@@ -67,7 +67,7 @@ const storedDruid: ClassStored = {
           wealth: { gp: 9, sp: 5, cp: 3 },
         },
         {
-          id: 'gold',
+          id: 'starting-gold',
           label: 'Starting Gold',
           items: [],
           wealth: { gp: 50 },
@@ -90,7 +90,7 @@ const goldDraft = {
   ...createEmptyCharacterBuilderDraft(),
   class: { classId: storedDruid.id, level: 1 as const },
   choiceSelections: {
-    [startingEquipmentChoiceSetId(storedDruid.id)]: ['gold'],
+    [startingEquipmentChoiceSetId(storedDruid.id)]: ['starting-gold'],
   },
   equipment: {
     mode: 'gold' as const,
@@ -128,8 +128,8 @@ describe('equipment-package-switch-resolution.lib', () => {
     const evaluation = evaluateEquipmentPackageSwitch({
       draft: goldDraft,
       catalogIndex,
-      targetOptionId: 'standard',
-      targetFunding: targetFundingFor('standard'),
+      targetOptionId: 'standard-equipment',
+      targetFunding: targetFundingFor('standard-equipment'),
     })!
 
     const groups = buildPackageSwitchDraftPurchasedGroups({
@@ -154,8 +154,8 @@ describe('equipment-package-switch-resolution.lib', () => {
     const evaluation = evaluateEquipmentPackageSwitch({
       draft: goldDraft,
       catalogIndex,
-      targetOptionId: 'standard',
-      targetFunding: targetFundingFor('standard'),
+      targetOptionId: 'standard-equipment',
+      targetFunding: targetFundingFor('standard-equipment'),
     })!
 
     expect(
@@ -174,8 +174,8 @@ describe('equipment-package-switch-resolution.lib', () => {
     const evaluation = evaluateEquipmentPackageSwitch({
       draft: goldDraft,
       catalogIndex,
-      targetOptionId: 'standard',
-      targetFunding: targetFundingFor('standard'),
+      targetOptionId: 'standard-equipment',
+      targetFunding: targetFundingFor('standard-equipment'),
     })!
 
     expect(resolvePackageSwitchDescription(evaluation)).toContain('Standard Equipment allows')

@@ -118,7 +118,7 @@ describe('EquipmentStep', () => {
     expect(onDraftChange).toHaveBeenCalledWith(
       expect.objectContaining({
         choiceSelections: expect.objectContaining({
-          [startingEquipmentChoiceSetId(equipmentStepBardClassFixture.id)]: ['gold'],
+          [startingEquipmentChoiceSetId(equipmentStepBardClassFixture.id)]: ['starting-gold'],
         }),
         equipment: expect.objectContaining({ mode: 'gold' }),
       }),
@@ -136,7 +136,7 @@ describe('EquipmentStep', () => {
     expect(onDraftChange).toHaveBeenCalledWith(
       expect.objectContaining({
         choiceSelections: expect.objectContaining({
-          [startingEquipmentChoiceSetId(equipmentStepBardClassFixture.id)]: ['standard'],
+          [startingEquipmentChoiceSetId(equipmentStepBardClassFixture.id)]: ['standard-equipment'],
         }),
         equipment: expect.objectContaining({ mode: 'package' }),
       }),
@@ -149,7 +149,7 @@ describe('EquipmentStep', () => {
       ...createEmptyCharacterBuilderDraft(),
       class: { classId: equipmentStepBardClassFixture.id, level: 1 as const },
       choiceSelections: {
-        [startingEquipmentChoiceSetId(equipmentStepBardClassFixture.id)]: ['standard'],
+        [startingEquipmentChoiceSetId(equipmentStepBardClassFixture.id)]: ['standard-equipment'],
       },
       equipment: {
         mode: 'package' as const,
@@ -166,9 +166,11 @@ describe('EquipmentStep', () => {
     expect(onDraftChange).toHaveBeenCalledWith(
       expect.objectContaining({
         choiceSelections: expect.objectContaining({
-          [nestedStartingEquipmentChoiceSetId(equipmentStepBardClassFixture.id, 'standard', 1)]: [
-            'srd-cc-5.2.1:lute',
-          ],
+          [nestedStartingEquipmentChoiceSetId(
+            equipmentStepBardClassFixture.id,
+            'standard-equipment',
+            1,
+          )]: ['srd-cc-5.2.1:lute'],
         }),
       }),
     )
@@ -180,7 +182,7 @@ describe('EquipmentStep', () => {
       ...createEmptyCharacterBuilderDraft(),
       class: { classId: equipmentStepBardClassFixture.id, level: 1 as const },
       choiceSelections: {
-        [startingEquipmentChoiceSetId(equipmentStepBardClassFixture.id)]: ['gold'],
+        [startingEquipmentChoiceSetId(equipmentStepBardClassFixture.id)]: ['starting-gold'],
       },
       equipment: {
         mode: 'gold' as const,
@@ -210,7 +212,7 @@ describe('EquipmentStep', () => {
       ...createEmptyCharacterBuilderDraft(),
       class: { classId: equipmentStepBardClassFixture.id, level: 1 as const },
       choiceSelections: {
-        [startingEquipmentChoiceSetId(equipmentStepBardClassFixture.id)]: ['gold'],
+        [startingEquipmentChoiceSetId(equipmentStepBardClassFixture.id)]: ['starting-gold'],
       },
       equipment: {
         mode: 'gold' as const,
@@ -237,7 +239,7 @@ describe('EquipmentStep', () => {
       ...createEmptyCharacterBuilderDraft(),
       class: { classId: equipmentStepBardClassFixture.id, level: 1 as const },
       choiceSelections: {
-        [startingEquipmentChoiceSetId(equipmentStepBardClassFixture.id)]: ['gold'],
+        [startingEquipmentChoiceSetId(equipmentStepBardClassFixture.id)]: ['starting-gold'],
       },
       equipment: {
         mode: 'gold' as const,
@@ -265,7 +267,7 @@ describe('EquipmentStep', () => {
       ...createEmptyCharacterBuilderDraft(),
       class: { classId: equipmentStepBardClassFixture.id, level: 1 as const },
       choiceSelections: {
-        [startingEquipmentChoiceSetId(equipmentStepBardClassFixture.id)]: ['gold'],
+        [startingEquipmentChoiceSetId(equipmentStepBardClassFixture.id)]: ['starting-gold'],
       },
       equipment: {
         mode: 'gold' as const,
@@ -295,7 +297,7 @@ describe('EquipmentStep', () => {
       ...createEmptyCharacterBuilderDraft(),
       class: { classId: equipmentStepBardClassFixture.id, level: 1 as const },
       choiceSelections: {
-        [startingEquipmentChoiceSetId(equipmentStepBardClassFixture.id)]: ['gold'],
+        [startingEquipmentChoiceSetId(equipmentStepBardClassFixture.id)]: ['starting-gold'],
       },
       equipment: {
         mode: 'gold' as const,
@@ -325,7 +327,7 @@ describe('EquipmentStep', () => {
       ...createEmptyCharacterBuilderDraft(),
       class: { classId: equipmentStepBardClassFixture.id, level: 1 as const },
       choiceSelections: {
-        [startingEquipmentChoiceSetId(equipmentStepBardClassFixture.id)]: ['gold'],
+        [startingEquipmentChoiceSetId(equipmentStepBardClassFixture.id)]: ['starting-gold'],
       },
       equipment: {
         mode: 'gold' as const,
@@ -366,7 +368,7 @@ describe('EquipmentStep', () => {
       ...createEmptyCharacterBuilderDraft(),
       class: { classId: equipmentStepBardClassFixture.id, level: 1 as const },
       choiceSelections: {
-        [startingEquipmentChoiceSetId(equipmentStepBardClassFixture.id)]: ['gold'],
+        [startingEquipmentChoiceSetId(equipmentStepBardClassFixture.id)]: ['starting-gold'],
       },
       equipment: {
         mode: 'gold' as const,
@@ -418,7 +420,7 @@ describe('EquipmentStep', () => {
       ...createEmptyCharacterBuilderDraft(),
       class: { classId: equipmentStepBardClassFixture.id, level: 1 as const },
       choiceSelections: {
-        [startingEquipmentChoiceSetId(equipmentStepBardClassFixture.id)]: ['gold'],
+        [startingEquipmentChoiceSetId(equipmentStepBardClassFixture.id)]: ['starting-gold'],
       },
       equipment: {
         mode: 'gold' as const,
@@ -459,10 +461,12 @@ describe('EquipmentStep', () => {
       ...createEmptyCharacterBuilderDraft(),
       class: { classId: equipmentStepBardClassFixture.id, level: 1 as const },
       choiceSelections: {
-        [startingEquipmentChoiceSetId(equipmentStepBardClassFixture.id)]: ['standard'],
-        [nestedStartingEquipmentChoiceSetId(equipmentStepBardClassFixture.id, 'standard', 1)]: [
-          'srd-cc-5.2.1:lute',
-        ],
+        [startingEquipmentChoiceSetId(equipmentStepBardClassFixture.id)]: ['standard-equipment'],
+        [nestedStartingEquipmentChoiceSetId(
+          equipmentStepBardClassFixture.id,
+          'standard-equipment',
+          1,
+        )]: ['srd-cc-5.2.1:lute'],
       },
       equipment: {
         mode: 'package' as const,
@@ -498,7 +502,7 @@ describe('EquipmentStep', () => {
         ...createEmptyCharacterBuilderDraft(),
         class: { classId: equipmentStepBardClassFixture.id, level: 1 as const },
         choiceSelections: {
-          [startingEquipmentChoiceSetId(equipmentStepBardClassFixture.id)]: ['gold'],
+          [startingEquipmentChoiceSetId(equipmentStepBardClassFixture.id)]: ['starting-gold'],
         },
         equipment: {
           mode: 'gold' as const,
@@ -554,7 +558,7 @@ describe('EquipmentStep', () => {
         ...createEmptyCharacterBuilderDraft(),
         class: { classId: equipmentStepBardClassFixture.id, level: 1 as const },
         choiceSelections: {
-          [startingEquipmentChoiceSetId(equipmentStepBardClassFixture.id)]: ['gold'],
+          [startingEquipmentChoiceSetId(equipmentStepBardClassFixture.id)]: ['starting-gold'],
         },
         equipment: {
           mode: 'gold' as const,
@@ -596,7 +600,9 @@ describe('EquipmentStep', () => {
       expect(onDraftChange).toHaveBeenCalledWith(
         expect.objectContaining({
           choiceSelections: expect.objectContaining({
-            [startingEquipmentChoiceSetId(equipmentStepBardClassFixture.id)]: ['standard'],
+            [startingEquipmentChoiceSetId(equipmentStepBardClassFixture.id)]: [
+              'standard-equipment',
+            ],
           }),
           equipment: expect.objectContaining({
             mode: 'package',
@@ -626,7 +632,7 @@ describe('EquipmentStep monk proficiency-linked grants', () => {
       ...createEmptyCharacterBuilderDraft(),
       class: { classId: equipmentStepMonkClassFixture.id, level: 1 as const },
       choiceSelections: {
-        [startingEquipmentChoiceSetId(equipmentStepMonkClassFixture.id)]: ['standard'],
+        [startingEquipmentChoiceSetId(equipmentStepMonkClassFixture.id)]: ['standard-equipment'],
       },
       equipment: {
         mode: 'package' as const,
@@ -655,7 +661,7 @@ describe('EquipmentStep monk proficiency-linked grants', () => {
     expect(onDraftChange).toHaveBeenCalledWith(
       expect.objectContaining({
         choiceSelections: expect.objectContaining({
-          [startingEquipmentChoiceSetId(equipmentStepMonkClassFixture.id)]: ['standard'],
+          [startingEquipmentChoiceSetId(equipmentStepMonkClassFixture.id)]: ['standard-equipment'],
         }),
         equipment: expect.objectContaining({ mode: 'package' }),
       }),
@@ -668,7 +674,7 @@ describe('EquipmentStep monk proficiency-linked grants', () => {
       ...createEmptyCharacterBuilderDraft(),
       class: { classId: equipmentStepMonkClassFixture.id, level: 1 as const },
       choiceSelections: {
-        [startingEquipmentChoiceSetId(equipmentStepMonkClassFixture.id)]: ['standard'],
+        [startingEquipmentChoiceSetId(equipmentStepMonkClassFixture.id)]: ['standard-equipment'],
       },
       equipment: {
         mode: 'package' as const,
@@ -694,7 +700,7 @@ describe('EquipmentStep monk proficiency-linked grants', () => {
       ...createEmptyCharacterBuilderDraft(),
       class: { classId: equipmentStepMonkClassFixture.id, level: 1 as const },
       choiceSelections: {
-        [startingEquipmentChoiceSetId(equipmentStepMonkClassFixture.id)]: ['standard'],
+        [startingEquipmentChoiceSetId(equipmentStepMonkClassFixture.id)]: ['standard-equipment'],
         [monkToolChoiceSetId]: [equipmentStepLuteFixture.id],
       },
       equipment: {
@@ -756,7 +762,7 @@ describe('EquipmentStep monk proficiency-linked grants', () => {
       ...createEmptyCharacterBuilderDraft(),
       class: { classId: equipmentStepMonkClassFixture.id, level: 1 as const },
       choiceSelections: {
-        [startingEquipmentChoiceSetId(equipmentStepMonkClassFixture.id)]: ['standard'],
+        [startingEquipmentChoiceSetId(equipmentStepMonkClassFixture.id)]: ['standard-equipment'],
         [monkToolChoiceSetId]: [equipmentStepDrumFixture.id],
       },
       equipment: {
@@ -790,7 +796,7 @@ describe('EquipmentStep monk proficiency-linked grants', () => {
       ...createEmptyCharacterBuilderDraft(),
       class: { classId: equipmentStepMonkClassFixture.id, level: 1 as const },
       choiceSelections: {
-        [startingEquipmentChoiceSetId(equipmentStepMonkClassFixture.id)]: ['standard'],
+        [startingEquipmentChoiceSetId(equipmentStepMonkClassFixture.id)]: ['standard-equipment'],
         [monkToolChoiceSetId]: [equipmentStepLuteFixture.id],
       },
       equipment: {
@@ -827,7 +833,7 @@ describe('EquipmentStep monk proficiency-linked grants', () => {
     draft = {
       ...draft,
       choiceSelections: {
-        [startingEquipmentChoiceSetId(equipmentStepMonkClassFixture.id)]: ['gold'],
+        [startingEquipmentChoiceSetId(equipmentStepMonkClassFixture.id)]: ['starting-gold'],
         [monkToolChoiceSetId]: [equipmentStepLuteFixture.id],
       },
       equipment: {

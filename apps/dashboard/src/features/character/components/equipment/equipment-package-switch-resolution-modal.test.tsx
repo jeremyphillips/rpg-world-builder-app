@@ -76,7 +76,7 @@ const storedDruid: ClassStored = {
       choose: 1,
       options: [
         {
-          id: 'standard',
+          id: 'standard-equipment',
           label: 'Standard Equipment',
           items: [
             { kind: 'grant', target: { source: 'equipment', equipmentSlug: 'rope' }, quantity: 1 },
@@ -84,7 +84,7 @@ const storedDruid: ClassStored = {
           wealth: { gp: 9, sp: 5, cp: 3 },
         },
         {
-          id: 'gold',
+          id: 'starting-gold',
           label: 'Starting Gold',
           items: [],
           wealth: { gp: 50 },
@@ -107,7 +107,7 @@ const goldDraft = {
   ...createEmptyCharacterBuilderDraft(),
   class: { classId: storedDruid.id, level: 1 as const },
   choiceSelections: {
-    [startingEquipmentChoiceSetId(storedDruid.id)]: ['gold'],
+    [startingEquipmentChoiceSetId(storedDruid.id)]: ['starting-gold'],
   },
   equipment: {
     mode: 'gold' as const,
@@ -133,8 +133,8 @@ describe('EquipmentPackageSwitchResolutionModal', () => {
   const evaluation = evaluateEquipmentPackageSwitch({
     draft: goldDraft,
     catalogIndex,
-    targetOptionId: 'standard',
-    targetFunding: targetFundingFor(goldDraft, 'standard'),
+    targetOptionId: 'standard-equipment',
+    targetFunding: targetFundingFor(goldDraft, 'standard-equipment'),
   })!
 
   it('renders the resolvable package-switch resolution dialog', () => {
@@ -192,8 +192,8 @@ describe('EquipmentPackageSwitchResolutionModal', () => {
     const blockedEvaluation = evaluateEquipmentPackageSwitch({
       draft: blockedDraft,
       catalogIndex,
-      targetOptionId: 'standard',
-      targetFunding: targetFundingFor(blockedDraft, 'standard'),
+      targetOptionId: 'standard-equipment',
+      targetFunding: targetFundingFor(blockedDraft, 'standard-equipment'),
     })!
 
     render(

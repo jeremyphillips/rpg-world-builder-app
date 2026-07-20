@@ -194,7 +194,7 @@ export const equipmentStepBardClassFixture = {
       choose: 1,
       options: [
         {
-          id: 'standard',
+          id: 'standard-equipment',
           label: 'Standard Equipment',
           items: [
             {
@@ -216,7 +216,7 @@ export const equipmentStepBardClassFixture = {
           wealth: { gp: 19 },
         },
         {
-          id: 'gold',
+          id: 'starting-gold',
           label: 'Starting Gold',
           items: [],
           wealth: { gp: 90 },
@@ -249,7 +249,7 @@ export const equipmentStepMonkClassFixture = {
       choose: 1,
       options: [
         {
-          id: 'standard',
+          id: 'standard-equipment',
           label: 'Standard Equipment',
           items: [
             {
@@ -277,7 +277,7 @@ export const equipmentStepMonkClassFixture = {
           wealth: { gp: 11 },
         },
         {
-          id: 'gold',
+          id: 'starting-gold',
           label: 'Starting Gold',
           items: [],
           wealth: { gp: 50 },

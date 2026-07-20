@@ -34,7 +34,7 @@ function monkStandardDraft(extra?: {
     ...createEmptyCharacterBuilderDraft(),
     class: { classId: equipmentStepMonkClassFixture.id, level: 1 as const },
     choiceSelections: {
-      [startingEquipmentChoiceSetId(equipmentStepMonkClassFixture.id)]: ['standard'],
+      [startingEquipmentChoiceSetId(equipmentStepMonkClassFixture.id)]: ['standard-equipment'],
       [monkToolChoiceSetId]: [equipmentStepLuteFixture.id],
     },
     equipment: {
@@ -87,11 +87,11 @@ function PackageCustomizationStory({ overBudget = false }: { overBudget?: boolea
   const goldOptionFunding = resolveStartingEquipmentFundingOptions({
     draft,
     catalogIndex: equipmentStepCatalogIndexFixture,
-  }).get('gold')!
+  }).get('starting-gold')!
   const preview = buildStartingPackageConversionPreview({
     draft,
     catalogIndex: equipmentStepCatalogIndexFixture,
-    departingOptionId: 'standard',
+    departingOptionId: 'standard-equipment',
     targetFunding: goldOptionFunding,
     selectedPackageItemKeys: new Set(),
   })
@@ -151,7 +151,7 @@ export const PackageWithLinkedProficiencyItem: Story = {
       ...createEmptyCharacterBuilderDraft(),
       class: { classId: equipmentStepMonkClassFixture.id, level: 1 as const },
       choiceSelections: {
-        [startingEquipmentChoiceSetId(equipmentStepMonkClassFixture.id)]: ['standard'],
+        [startingEquipmentChoiceSetId(equipmentStepMonkClassFixture.id)]: ['standard-equipment'],
       },
       equipment: {
         mode: 'package' as const,
@@ -172,7 +172,7 @@ export const GoldPurchasesWithStackableQuantities: Story = {
       ...createEmptyCharacterBuilderDraft(),
       class: { classId: equipmentStepMonkClassFixture.id, level: 1 as const },
       choiceSelections: {
-        [startingEquipmentChoiceSetId(equipmentStepMonkClassFixture.id)]: ['gold'],
+        [startingEquipmentChoiceSetId(equipmentStepMonkClassFixture.id)]: ['starting-gold'],
       },
       equipment: {
         mode: 'gold' as const,
@@ -227,7 +227,7 @@ const monkWithTorchGrantCatalog = {
             choose: 1,
             options: [
               {
-                id: 'standard',
+                id: 'standard-equipment',
                 label: 'Standard Equipment',
                 items: [
                   {
@@ -239,7 +239,7 @@ const monkWithTorchGrantCatalog = {
                 wealth: { gp: 11 },
               },
               {
-                id: 'gold',
+                id: 'starting-gold',
                 label: 'Starting Gold',
                 items: [],
                 wealth: { gp: 50 },
@@ -258,7 +258,7 @@ export const PackageConversionSameOriginMerge: Story = {
       ...createEmptyCharacterBuilderDraft(),
       class: { classId: equipmentStepMonkClassFixture.id, level: 1 as const },
       choiceSelections: {
-        [startingEquipmentChoiceSetId(equipmentStepMonkClassFixture.id)]: ['standard'],
+        [startingEquipmentChoiceSetId(equipmentStepMonkClassFixture.id)]: ['standard-equipment'],
       },
       equipment: {
         mode: 'package' as const,
@@ -277,7 +277,7 @@ export const PackageConversionSameOriginMerge: Story = {
     },
     catalogIndex: monkWithTorchGrantCatalog,
     conversionEditorOpen: true,
-    selectedPackageItemKeys: new Set([`${equipmentStepMonkClassFixture.id}:standard:0`]),
+    selectedPackageItemKeys: new Set([`${equipmentStepMonkClassFixture.id}:standard-equipment:0`]),
   },
 }
 
@@ -295,7 +295,7 @@ const packageOnlyClassCatalog = {
             choose: 1,
             options: [
               {
-                id: 'standard',
+                id: 'standard-equipment',
                 label: 'Standard Equipment',
                 items: [
                   {

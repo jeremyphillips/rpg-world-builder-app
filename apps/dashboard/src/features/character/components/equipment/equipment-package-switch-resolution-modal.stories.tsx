@@ -91,7 +91,7 @@ const storedDruid: ClassStored = {
       choose: 1,
       options: [
         {
-          id: 'standard',
+          id: 'standard-equipment',
           label: 'Standard Equipment',
           items: [
             { kind: 'grant', target: { source: 'equipment', equipmentSlug: 'rope' }, quantity: 1 },
@@ -99,7 +99,7 @@ const storedDruid: ClassStored = {
           wealth: { gp: 9, sp: 5, cp: 3 },
         },
         {
-          id: 'gold',
+          id: 'starting-gold',
           label: 'Starting Gold',
           items: [],
           wealth: { gp: 50 },
@@ -130,7 +130,7 @@ function buildGoldDraft(
     ...createEmptyCharacterBuilderDraft(),
     class: { classId: storedDruid.id, level: 1 as const },
     choiceSelections: {
-      [startingEquipmentChoiceSetId(storedDruid.id)]: ['gold'],
+      [startingEquipmentChoiceSetId(storedDruid.id)]: ['starting-gold'],
     },
     equipment: {
       mode: 'gold' as const,
@@ -174,9 +174,9 @@ function PackageSwitchResolutionModalStory({
       evaluateEquipmentPackageSwitch({
         draft,
         catalogIndex,
-        targetOptionId: 'standard',
+        targetOptionId: 'standard-equipment',
         targetFunding: resolveStartingEquipmentFundingOptions({ draft, catalogIndex }).get(
-          'standard',
+          'standard-equipment',
         )!,
         draftQuantitiesByPurchaseId: draftQuantities,
       })!,

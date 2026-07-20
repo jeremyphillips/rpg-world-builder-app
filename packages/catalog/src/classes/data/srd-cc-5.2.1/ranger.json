@@ -86,7 +86,7 @@
       "choose": 1,
       "options": [
         {
-          "id": "standard",
+          "id": "standard-equipment",
           "label": "Standard Equipment",
           "items": [
             {
@@ -138,7 +138,7 @@
           }
         },
         {
-          "id": "gold",
+          "id": "starting-gold",
           "label": "Starting Gold",
           "items": [],
           "wealth": {

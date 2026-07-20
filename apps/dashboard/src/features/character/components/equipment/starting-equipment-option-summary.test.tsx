@@ -12,7 +12,7 @@ import {
 import { StartingEquipmentOptionSummaryCard } from './starting-equipment-option-summary.client'
 
 const summary = {
-  optionId: 'gold',
+  optionId: 'starting-gold',
   label: 'Starting Gold',
   description: 'Take 90 GP instead of standard equipment.',
   orderedItems: [],
@@ -29,7 +29,7 @@ const summary = {
   unselectableReasons: [],
   isSelectable: true,
   funding: {
-    classOptionId: 'gold',
+    classOptionId: 'starting-gold',
     classOptionWealth: { cp: 0, sp: 0, gp: 90, pp: 0 },
     tierAdditionalWealth: { cp: 0, sp: 0, gp: 0, pp: 0 },
     totalStartingWealth: { cp: 0, sp: 0, gp: 90, pp: 0 },

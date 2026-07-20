@@ -49,9 +49,11 @@ describe('equipment-inventory-summary.lib', () => {
       entry: {
         equipmentId: 'srd-cc-5.2.1:arrows',
         quantity: 5,
-        sources: [{ kind: 'classStartingEquipment', sourceId: 'class', grantId: 'standard' }],
+        sources: [
+          { kind: 'classStartingEquipment', sourceId: 'class', grantId: 'standard-equipment' },
+        ],
       },
-      removeTarget: { kind: 'package', packageItemKey: 'class:standard:0' },
+      removeTarget: { kind: 'package', packageItemKey: 'class:standard-equipment:0' },
     })
     const purchased = row({
       entry: {
@@ -84,9 +86,11 @@ describe('equipment-inventory-summary.lib', () => {
       entry: {
         equipmentId: 'srd-cc-5.2.1:arrows',
         quantity: 5,
-        sources: [{ kind: 'classStartingEquipment', sourceId: 'class', grantId: 'standard' }],
+        sources: [
+          { kind: 'classStartingEquipment', sourceId: 'class', grantId: 'standard-equipment' },
+        ],
       },
-      removeTarget: { kind: 'package', packageItemKey: 'class:standard:0' },
+      removeTarget: { kind: 'package', packageItemKey: 'class:standard-equipment:0' },
     })
     const purchased = row({
       entry: {
@@ -144,7 +148,7 @@ describe('equipment-inventory-summary.lib', () => {
       ...createEmptyCharacterBuilderDraft(),
       class: { classId: equipmentStepMonkClassFixture.id, level: 1 as const },
       choiceSelections: {
-        [startingEquipmentChoiceSetId(equipmentStepMonkClassFixture.id)]: ['standard'],
+        [startingEquipmentChoiceSetId(equipmentStepMonkClassFixture.id)]: ['standard-equipment'],
       },
       equipment: {
         mode: 'package' as const,
@@ -169,7 +173,7 @@ describe('equipment-inventory-summary.lib', () => {
       ...createEmptyCharacterBuilderDraft(),
       class: { classId: equipmentStepBardClassFixture.id, level: 1 as const },
       choiceSelections: {
-        [startingEquipmentChoiceSetId(equipmentStepBardClassFixture.id)]: ['gold'],
+        [startingEquipmentChoiceSetId(equipmentStepBardClassFixture.id)]: ['starting-gold'],
       },
       equipment: {
         mode: 'gold' as const,
@@ -191,7 +195,7 @@ describe('equipment-inventory-summary.lib', () => {
         ...createEmptyCharacterBuilderDraft(),
         class: { classId: equipmentStepBardClassFixture.id, level: 1 as const },
         choiceSelections: {
-          [startingEquipmentChoiceSetId(equipmentStepBardClassFixture.id)]: ['gold'],
+          [startingEquipmentChoiceSetId(equipmentStepBardClassFixture.id)]: ['starting-gold'],
         },
         equipment: {
           mode: 'gold' as const,
