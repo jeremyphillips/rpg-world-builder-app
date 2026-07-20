@@ -44,6 +44,44 @@ describe('ReviewRequiredItems', () => {
     expect(onNavigateToStep).toHaveBeenCalledWith('proficiencies')
   })
 
+  it('navigates to equipment with picker focus for magic-item grant issues', async () => {
+    const user = userEvent.setup()
+    const onNavigateToStep = vi.fn()
+
+    render(
+      <ReviewRequiredItems
+        requiredItems={[
+          {
+            id: 'stepField:equipment:magic_item_grant_incomplete:allowance',
+            kind: 'stepField',
+            label: 'Equipment',
+            message: 'Choose 1 Common magic item grant.',
+            stepId: 'equipment',
+            stepLabel: 'Equipment',
+            progress: { current: 0, total: 1 },
+            equipmentPickerFocus: { mode: 'magic_items', allowanceId: 'allowance:common' },
+          },
+        ]}
+        onNavigateToStep={onNavigateToStep}
+      />,
+    )
+
+    expect(screen.getByText('0 of 1 selected')).toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: 'Go to Equipment' }))
+
+    expect(onNavigateToStep).toHaveBeenCalledWith(
+      'equipment',
+      expect.objectContaining({
+        equipmentPickerFocus: expect.objectContaining({
+          mode: 'magic_items',
+          allowanceId: 'allowance:common',
+          requestId: expect.stringMatching(/^equipment-picker-focus:/),
+        }),
+      }),
+    )
+  })
+
   it('has no axe accessibility violations', async () => {
     const { container } = render(
       <ReviewRequiredItems

@@ -10,6 +10,7 @@ import {
   equipmentPickerDefaultPathItemsFixture,
   equipmentPickerItemsFixture,
   equipmentPickerLowRemainingBudgetFixture,
+  equipmentPickerMagicItemsFixture,
   equipmentPickerRopeFixture,
 } from './equipment-picker-drawer.fixtures'
 import { EQUIPMENT_PICKER_PURCHASE_ADD_ANOTHER_LABEL } from './equipment-picker-purchase.lib'
@@ -153,5 +154,17 @@ export const OwnedStackable: Story = {
         story: `Owned stackables show ${EQUIPMENT_PICKER_PURCHASE_ADD_ANOTHER_LABEL} in the header rail.`,
       },
     },
+  },
+}
+
+export const MagicItemsWorkflow: Story = {
+  args: {
+    open: true,
+    onOpenChange: () => undefined,
+    items: equipmentPickerMagicItemsFixture,
+    workflowMode: 'magic_items',
+    workflowModes: ['magic_items', 'purchase'],
+    onWorkflowModeChange: () => undefined,
+    onAddItem: () => undefined,
   },
 }

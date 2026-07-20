@@ -10,7 +10,7 @@ import {
 export function useEquipmentPickerFocusIntent(args: {
   equipmentPickerFocus?: EquipmentPickerFocusIntent
   onEquipmentPickerFocusConsumed?: () => void
-  onOpenMagicItemsPicker: () => void
+  onOpenMagicItemsPicker: (allowanceId?: string) => void
 }) {
   const { equipmentPickerFocus, onEquipmentPickerFocusConsumed, onOpenMagicItemsPicker } = args
   const [consumedEquipmentPickerFocusIds, setConsumedEquipmentPickerFocusIds] = useState(
@@ -33,7 +33,7 @@ export function useEquipmentPickerFocusIntent(args: {
       next.add(equipmentPickerFocus.requestId)
       return next
     })
-    onOpenMagicItemsPicker()
+    onOpenMagicItemsPicker(equipmentPickerFocus.allowanceId)
     onEquipmentPickerFocusConsumed?.()
   }, [
     consumedEquipmentPickerFocusIds,

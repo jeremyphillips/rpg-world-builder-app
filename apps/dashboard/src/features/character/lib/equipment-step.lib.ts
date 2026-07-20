@@ -1033,13 +1033,18 @@ export function isMagicItemPickerItemVisible(args: {
   equipment: Equipment
   acquisition: ReturnType<typeof resolveMagicItemAcquisitionState>
   ownedGrantQuantity: number
+  focusedAllowanceId?: string
 }): boolean {
-  const { equipment, acquisition, ownedGrantQuantity } = args
+  const { equipment, acquisition, ownedGrantQuantity, focusedAllowanceId } = args
   if (equipment.kind !== 'magic_item' || !equipment.rarity) return false
   if (ownedGrantQuantity > 0) return true
 
+  const allowances = focusedAllowanceId
+    ? acquisition.allowances.filter((entry) => entry.id === focusedAllowanceId)
+    : acquisition.allowances
+
   const progress = acquisition.progress
-  for (const allowance of acquisition.allowances) {
+  for (const allowance of allowances) {
     if (allowance.rarity !== equipment.rarity) continue
     const entry = progress.find((row) => row.allowanceId === allowance.id)
     const eligibility = resolveMagicItemAllowanceEligibility({

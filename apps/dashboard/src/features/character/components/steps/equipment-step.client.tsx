@@ -17,7 +17,8 @@ export function EquipmentStep({
   useEquipmentPickerFocusIntent({
     equipmentPickerFocus,
     onEquipmentPickerFocusConsumed,
-    onOpenMagicItemsPicker: () => step.openPicker('magic_items'),
+    onOpenMagicItemsPicker: (allowanceId) =>
+      step.openPicker('magic_items', allowanceId ? { allowanceId } : undefined),
   })
 
   return <EquipmentStepView {...props} step={step} />

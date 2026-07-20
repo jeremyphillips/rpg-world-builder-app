@@ -240,6 +240,38 @@ describe('equipment-picker-drawer.lib', () => {
     expect(filtered.map((item) => item.equipment.name)).toEqual(['Longsword', 'Chain Mail', 'Rope'])
   })
 
+  it('keeps unpriced rows visible when filterOutUnaffordable is enabled', () => {
+    const unpricedMagicItem: EquipmentPickerItem = {
+      ...equipmentPickerItemsFixture[0]!,
+      equipment: {
+        ...equipmentPickerItemsFixture[0]!.equipment,
+        id: 'srd-cc-5.2.1:amulet-of-health',
+        slug: 'amulet-of-health',
+        name: 'Amulet of Health',
+        kind: 'magic_item',
+        rarity: 'rare',
+        magicItemCategory: 'wondrous_item',
+        cost: null,
+      },
+      state: {
+        ...equipmentPickerItemsFixture[0]!.state,
+        isAffordable: false,
+        isWithinRemainingBudget: false,
+        purchaseAvailability: { status: 'unavailable', reason: 'no_market_price' },
+      },
+    }
+
+    const filtered = filterEquipmentPickerItems([unpricedMagicItem], {
+      filterOutUnaffordable: true,
+      filterOutNonProficient: false,
+      selectedKind: EQUIPMENT_PICKER_KIND_ALL,
+    })
+
+    expect(filtered).toHaveLength(1)
+    expect(isEquipmentPickerItemDisabled(unpricedMagicItem)).toBe(true)
+    expect(getEquipmentPickerDisabledNote(unpricedMagicItem)).toBe('Not for sale')
+  })
+
   it('filters remaining-unaffordable rows when showAffordableOnly is on', () => {
     const filtered = filterEquipmentPickerItems(equipmentPickerItemsFixture, {
       filterOutUnaffordable: false,

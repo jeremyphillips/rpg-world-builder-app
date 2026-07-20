@@ -324,7 +324,13 @@ export function filterEquipmentPickerItems(
 ): EquipmentPickerItem[] {
   return items.filter((item) => {
     if (!isEquipmentPickerSupportedKind(item.equipment.kind)) return false
-    if (options.filterOutUnaffordable && !item.state.isAffordable) return false
+    if (
+      options.filterOutUnaffordable &&
+      canPurchaseEquipment(item.equipment) &&
+      !item.state.isAffordable
+    ) {
+      return false
+    }
     if (options.filterOutNonProficient && !item.state.isProficient) return false
     if (options.showAffordableOnly && !item.state.isWithinRemainingBudget) return false
     if (

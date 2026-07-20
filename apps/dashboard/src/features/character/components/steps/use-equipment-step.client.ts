@@ -80,6 +80,7 @@ export function useEquipmentStep(args: {
   const [pickerOpen, setPickerOpen] = useState(false)
   const [pickerWorkflowMode, setPickerWorkflowMode] =
     useState<EquipmentPickerWorkflowMode>('purchase')
+  const [focusedAllowanceId, setFocusedAllowanceId] = useState<string | undefined>(undefined)
   const [conversionEditorOpen, setConversionEditorOpen] = useState(false)
   const [selectedPackageItemKeys, setSelectedPackageItemKeys] = useState<ReadonlySet<string>>(
     () => new Set(),
@@ -180,6 +181,7 @@ export function useEquipmentStep(args: {
     pickerItems,
     pickerWorkflowMode,
     showPurchaseWorkflow,
+    focusedAllowanceId,
   })
   const characterPreviewContext = useMemo(
     () =>
@@ -417,9 +419,18 @@ export function useEquipmentStep(args: {
     applySelection(nextSelection)
   }
 
-  const openPicker = (mode: EquipmentPickerWorkflowMode = 'purchase') => {
+  const openPicker = (
+    mode: EquipmentPickerWorkflowMode = 'purchase',
+    options?: { allowanceId?: string },
+  ) => {
     setPickerWorkflowMode(mode)
+    setFocusedAllowanceId(options?.allowanceId)
     setPickerOpen(true)
+  }
+
+  const handlePickerOpenChange = (open: boolean) => {
+    setPickerOpen(open)
+    if (!open) setFocusedAllowanceId(undefined)
   }
 
   const expandPackageChooser = () => {
@@ -603,7 +614,7 @@ export function useEquipmentStep(args: {
     handleCommitPackageSwitch,
     isPackageSwitchCommitting,
     pickerOpen,
-    setPickerOpen,
+    setPickerOpen: handlePickerOpenChange,
     setPickerWorkflowMode,
     conversionEditorOpen,
     setConversionEditorOpen,

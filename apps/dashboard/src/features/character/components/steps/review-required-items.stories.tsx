@@ -43,3 +43,20 @@ export const Empty: Story = {
     requiredItems: [],
   },
 }
+
+export const MagicItemGrantRequired: Story = {
+  args: {
+    requiredItems: [
+      {
+        id: 'stepField:equipment:magic_item_grant_incomplete:allowance',
+        kind: 'stepField',
+        label: 'Equipment',
+        message: 'Choose 1 Common magic item grant.',
+        stepId: 'equipment',
+        stepLabel: 'Equipment',
+        progress: { current: 0, total: 1 },
+        equipmentPickerFocus: { mode: 'magic_items', allowanceId: 'allowance:common' },
+      },
+    ],
+  },
+}

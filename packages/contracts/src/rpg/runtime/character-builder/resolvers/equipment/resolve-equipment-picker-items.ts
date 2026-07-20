@@ -45,7 +45,7 @@ export function resolveEquipmentPickerItems({
           isRecommended: isRecommendedEquipmentTier(recommendation.tier),
           isProficient: isEquipmentProficient(row, proficiencies),
           isAffordable: budget ? isEquipmentAffordableAtStartingBudget(row, budget) : true,
-          isWithinRemainingBudget: purchaseAvailability.status !== 'unaffordable',
+          isWithinRemainingBudget: purchaseAvailability.status === 'available',
           purchaseAvailability,
           recommendation,
           disabledReasons: [],

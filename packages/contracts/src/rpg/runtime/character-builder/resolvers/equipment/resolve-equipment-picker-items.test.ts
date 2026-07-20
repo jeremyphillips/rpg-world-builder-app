@@ -164,6 +164,41 @@ describe('resolveEquipmentPickerItems', () => {
     expect(item!.state.isWithinRemainingBudget).toBe(false)
   })
 
+  it('marks unavailable equipment as outside the remaining budget', () => {
+    const unpriced = equipmentSchema.parse({
+      id: `${RULESET}:amulet-of-health`,
+      slug: 'amulet-of-health',
+      rulesetId: RULESET,
+      source: 'system',
+      campaignId: null,
+      createdAt: '2026-01-01T00:00:00.000Z',
+      updatedAt: '2026-01-01T00:00:00.000Z',
+      name: 'Amulet of Health',
+      description: '',
+      cost: null,
+      kind: 'magic_item',
+      rarity: 'rare',
+      magicItemCategory: 'wondrous_item',
+    })
+
+    const [item] = resolveEquipmentPickerItems({
+      equipment: [unpriced],
+      proficiencies: emptyProficiencies,
+      recommendations,
+      budget: {
+        starting: { cp: 0, sp: 0, gp: 100, pp: 0 },
+        spent: { cp: 0, sp: 0, gp: 0, pp: 0 },
+        remaining: { cp: 0, sp: 0, gp: 100, pp: 0 },
+      },
+    })
+
+    expect(item!.state.purchaseAvailability).toEqual({
+      status: 'unavailable',
+      reason: 'no_market_price',
+    })
+    expect(item!.state.isWithinRemainingBudget).toBe(false)
+  })
+
   it('keeps remaining within starting on derived budgets', () => {
     const catalogIndex = indexCharacterBuildCatalog({
       species: [],

@@ -26,6 +26,7 @@ export function useEquipmentMagicItemWorkflow(args: {
   pickerItems: readonly EquipmentPickerItem[]
   pickerWorkflowMode: EquipmentPickerWorkflowMode
   showPurchaseWorkflow: boolean
+  focusedAllowanceId?: string
 }) {
   const acquisition = useMemo(
     () =>
@@ -58,9 +59,10 @@ export function useEquipmentMagicItemWorkflow(args: {
         equipment: item.equipment,
         acquisition,
         ownedGrantQuantity: readMagicItemGrantQuantity(args.draft, item.equipment.id),
+        focusedAllowanceId: args.focusedAllowanceId,
       }),
     )
-  }, [acquisition, args.draft, args.pickerItems, args.pickerWorkflowMode])
+  }, [acquisition, args.draft, args.focusedAllowanceId, args.pickerItems, args.pickerWorkflowMode])
 
   const ownedGrantQuantities = useMemo(() => {
     const quantities: Record<string, number> = {}

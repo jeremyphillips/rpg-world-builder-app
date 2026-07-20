@@ -82,6 +82,23 @@ export const equipmentStepDrumFixture = {
   utilizes: [{ description: 'Keep a steady beat', dc: 10 }],
 } as const satisfies Equipment
 
+export const equipmentStepPotionOfHealingFixture = {
+  id: 'srd-cc-5.2.1:potion-of-healing',
+  slug: 'potion-of-healing',
+  rulesetId: DEFAULT_SYSTEM_RULESET_ID,
+  source: 'system',
+  campaignId: null,
+  createdAt: '2026-01-01T00:00:00.000Z',
+  updatedAt: '2026-01-01T00:00:00.000Z',
+  name: 'Potion of Healing',
+  description: '',
+  kind: 'magic_item',
+  rarity: 'common',
+  magicItemCategory: 'potion',
+  cost: { amount: 50, currency: 'gp' },
+  weight: { value: 0.5, unit: 'lb' },
+} as const satisfies Equipment
+
 export const equipmentStepRationsFixture = {
   id: 'srd-cc-5.2.1:rations',
   slug: 'rations',
@@ -314,6 +331,7 @@ export const equipmentStepCatalogFixture = {
     equipmentStepSpearFixture,
     equipmentStepDaggerFixture,
     equipmentStepExplorersPackFixture,
+    equipmentStepPotionOfHealingFixture,
     equipmentStepRationsFixture,
   ],
   skillProficiencies: [],

@@ -169,6 +169,23 @@ export const equipmentPickerExpensiveGearFixture = {
   description: '<p>Expensive adventuring gear.</p>',
 } as const satisfies Equipment
 
+export const equipmentPickerPotionFixture = {
+  id: 'srd-cc-5.2.1:potion-of-healing',
+  slug: 'potion-of-healing',
+  rulesetId: DEFAULT_SYSTEM_RULESET_ID,
+  source: 'system',
+  campaignId: null,
+  createdAt: '2026-01-01T00:00:00.000Z',
+  updatedAt: '2026-01-01T00:00:00.000Z',
+  name: 'Potion of Healing',
+  kind: 'magic_item',
+  rarity: 'common',
+  magicItemCategory: 'potion',
+  cost: { amount: 50, currency: 'gp' },
+  weight: { value: 0.5, unit: 'lb' },
+  description: '<p>Restores hit points when consumed.</p>',
+} as const satisfies Equipment
+
 const purchaseAvailabilityAvailable = { status: 'available' as const }
 const purchaseAvailabilityUnaffordable = { status: 'unaffordable' as const, shortfallCp: 1 }
 
@@ -262,6 +279,22 @@ export const equipmentPickerItemsFixture: EquipmentPickerItem[] = [
   {
     equipment: equipmentPickerRopeFixture,
     searchText: 'rope adventuring gear',
+    state: pickerState({
+      isAvailable: true,
+      isRecommended: false,
+      isProficient: true,
+      isAffordable: true,
+      isWithinRemainingBudget: true,
+      recommendation: { tier: 'neutral', reasons: [], specificity: 'broad_pool' },
+      disabledReasons: [],
+    }),
+  },
+]
+
+export const equipmentPickerMagicItemsFixture: EquipmentPickerItem[] = [
+  {
+    equipment: equipmentPickerPotionFixture,
+    searchText: 'potion of healing magic item',
     state: pickerState({
       isAvailable: true,
       isRecommended: false,

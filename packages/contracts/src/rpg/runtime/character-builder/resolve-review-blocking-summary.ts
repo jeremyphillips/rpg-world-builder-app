@@ -5,7 +5,10 @@ import type { CharacterBuilderDraft } from './draft'
 import type { CharacterBuilderStepId } from './step-ids'
 import { BUILDER_STEPS } from './steps'
 import type { EquipmentPickerFocusRequest } from './resolvers/equipment/equipment-picker-focus'
-import { isMagicItemGrantIncompleteIssueCode } from './resolvers/equipment/resolve-equipment-magic-item-grant-step-issues'
+import {
+  isMagicItemGrantIncompleteIssueCode,
+  resolveMagicItemGrantReviewProgress,
+} from './resolvers/equipment/resolve-equipment-magic-item-grant-step-issues'
 import { resolveUnresolvedChoiceSetSummaries } from './resolve-unresolved-choice-set-summaries'
 import { validateCharacterBuild } from './validate/validate-character-build'
 import type { CharacterBuildValidationIssue } from './validate/types'
@@ -111,6 +114,7 @@ function choiceSetRequiredItems(
 
 function stepFieldRequiredItems(
   draft: CharacterBuilderDraft,
+  context: CharacterBuildContext,
   alertIssues: readonly CharacterBuildValidationIssue[],
 ): ReviewRequiredItem[] {
   const items: ReviewRequiredItem[] = []
@@ -124,7 +128,15 @@ function stepFieldRequiredItems(
     seen.add(dedupeKey)
 
     const progress =
-      issue.code === 'abilities_incomplete' ? resolveAbilityScoreProgress(draft) : undefined
+      issue.code === 'abilities_incomplete'
+        ? resolveAbilityScoreProgress(draft)
+        : issue.allowanceId && isMagicItemGrantIncompleteIssueCode(issue.code)
+          ? resolveMagicItemGrantReviewProgress({
+              draft,
+              context,
+              allowanceId: issue.allowanceId,
+            })
+          : undefined
 
     const equipmentPickerFocus =
       issue.allowanceId && isMagicItemGrantIncompleteIssueCode(issue.code)
@@ -189,7 +201,7 @@ export function resolveReviewBlockingSummary(
       : validateCharacterBuild(draft, context, 'finalSubmit', { resolvedChoiceSets }).issues
 
   const choiceItems = choiceSetRequiredItems(draft, resolvedChoiceSets, alertIssues)
-  const fieldItems = stepFieldRequiredItems(draft, alertIssues)
+  const fieldItems = stepFieldRequiredItems(draft, context, alertIssues)
   const requiredItems = [...choiceItems, ...fieldItems]
   const nonActionable = resolveNonActionableIssues(alertIssues, requiredItems)
 
@@ -203,6 +215,10 @@ export function formatReviewRequiredItemProgress(item: ReviewRequiredItem): stri
 
   if (item.kind === 'choiceSet') {
     return formatChoiceProgress(current, total, max)
+  }
+
+  if (item.equipmentPickerFocus) {
+    return `${current} of ${total} selected`
   }
 
   return `${current} of ${total} assigned`
