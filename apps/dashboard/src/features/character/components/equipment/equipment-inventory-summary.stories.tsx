@@ -5,6 +5,7 @@ import {
   buildChoiceSetId,
   buildStartingPackageConversionPreview,
   createEmptyCharacterBuilderDraft,
+  resolveStartingEquipmentFundingOptions,
   startingEquipmentChoiceSetId,
 } from '@rpg/contracts'
 
@@ -83,10 +84,15 @@ export const StandardPackageWithPurchases: Story = {
 
 function PackageCustomizationStory({ overBudget = false }: { overBudget?: boolean }) {
   const draft = monkStandardDraft()
+  const goldOptionFunding = resolveStartingEquipmentFundingOptions({
+    draft,
+    catalogIndex: equipmentStepCatalogIndexFixture,
+  }).get('gold')!
   const preview = buildStartingPackageConversionPreview({
     draft,
     catalogIndex: equipmentStepCatalogIndexFixture,
     departingOptionId: 'standard',
+    targetFunding: goldOptionFunding,
     selectedPackageItemKeys: new Set(),
   })
 
@@ -103,6 +109,7 @@ function PackageCustomizationStory({ overBudget = false }: { overBudget?: boolea
       <EquipmentInventorySummary
         draft={draft}
         catalogIndex={equipmentStepCatalogIndexFixture}
+        goldOptionFunding={goldOptionFunding}
         conversionEditorOpen
         selectedPackageItemKeys={selectedPackageItemKeys}
         onSelectedPackageItemKeysChange={(keys) => setSelectedPackageItemKeys(new Set(keys))}
@@ -118,6 +125,7 @@ function PackageCustomizationStory({ overBudget = false }: { overBudget?: boolea
     <EquipmentInventorySummary
       draft={draft}
       catalogIndex={equipmentStepCatalogIndexFixture}
+      goldOptionFunding={goldOptionFunding}
       conversionEditorOpen
       selectedPackageItemKeys={selectedPackageItemKeys}
       onSelectedPackageItemKeysChange={(keys) => setSelectedPackageItemKeys(new Set(keys))}

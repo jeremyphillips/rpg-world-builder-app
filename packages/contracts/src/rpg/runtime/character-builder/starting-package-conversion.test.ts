@@ -16,6 +16,9 @@ import {
   nestedStartingEquipmentChoiceSetId,
   startingEquipmentChoiceSetId,
 } from './resolvers/equipment/resolve-starting-equipment-choice-sets'
+import { isStartingGoldOption } from '../../content/starting-equipment'
+import { resolveStartingEquipmentFundingOptions } from './resolvers/equipment/resolve-starting-equipment-funding'
+import type { CharacterBuilderDraft } from './draft'
 
 const RULESET = 'srd-cc-5.2.1' as const
 
@@ -224,6 +227,12 @@ const catalogIndex = indexCharacterBuildCatalog({
 
 const monkToolChoiceSetId = buildChoiceSetId('class', monkClass.id, 'class-tools')
 
+function goldTargetFunding(draft: CharacterBuilderDraft) {
+  const goldOption =
+    monkClass.characterCreation!.startingEquipment!.options.find(isStartingGoldOption)!
+  return resolveStartingEquipmentFundingOptions({ draft, catalogIndex }).get(goldOption.id)!
+}
+
 function monkStandardDraft(extra?: Partial<ReturnType<typeof createEmptyCharacterBuilderDraft>>) {
   return {
     ...createEmptyCharacterBuilderDraft(),
@@ -268,7 +277,6 @@ describe('resolveGoldStartingEquipmentAlternative', () => {
     expect(
       resolveGoldStartingEquipmentAlternative(
         monkClass.characterCreation!.startingEquipment!.options,
-        'standard',
       ),
     ).toEqual({
       status: 'available',
@@ -292,11 +300,13 @@ describe('buildStartingPackageConversionPreview', () => {
       draft,
       catalogIndex,
       departingOptionId: 'standard',
+      targetFunding: goldTargetFunding(draft),
       selectedPackageItemKeys: allPackageItemKeys(
         buildStartingPackageConversionPreview({
           draft,
           catalogIndex,
           departingOptionId: 'standard',
+          targetFunding: goldTargetFunding(draft),
           selectedPackageItemKeys: new Set(),
         })!,
       ),
@@ -317,6 +327,7 @@ describe('buildStartingPackageConversionPreview', () => {
       draft,
       catalogIndex,
       departingOptionId: 'standard',
+      targetFunding: goldTargetFunding(draft),
       selectedPackageItemKeys: new Set(),
     })
 
@@ -384,6 +395,7 @@ describe('buildStartingPackageConversionPreview', () => {
       draft,
       catalogIndex: index,
       departingOptionId: 'standard',
+      targetFunding: goldTargetFunding(draft),
       selectedPackageItemKeys: new Set([`${classWithFreeGrant.id}:standard:0`]),
     })
 
@@ -399,11 +411,13 @@ describe('canConvertStartingPackageToGold', () => {
       draft,
       catalogIndex,
       departingOptionId: 'standard',
+      targetFunding: goldTargetFunding(draft),
       selectedPackageItemKeys: allPackageItemKeys(
         buildStartingPackageConversionPreview({
           draft,
           catalogIndex,
           departingOptionId: 'standard',
+          targetFunding: goldTargetFunding(draft),
           selectedPackageItemKeys: new Set(),
         })!,
       ),
@@ -433,6 +447,7 @@ describe('buildStartingPackageConversionPatch', () => {
       draft,
       catalogIndex,
       departingOptionId: 'standard',
+      targetFunding: goldTargetFunding(draft),
       selectedPackageItemKeys: new Set([
         `${monkClass.id}:standard:0`,
         `${monkClass.id}:standard:3`,
@@ -443,6 +458,7 @@ describe('buildStartingPackageConversionPatch', () => {
       draft,
       catalogIndex,
       departingOptionId: 'standard',
+      targetFunding: goldTargetFunding(draft),
       selectedPackageItemKeys: new Set([
         `${monkClass.id}:standard:0`,
         `${monkClass.id}:standard:3`,
@@ -533,6 +549,7 @@ describe('buildStartingPackageConversionPatch', () => {
       draft,
       catalogIndex: index,
       departingOptionId: 'standard',
+      targetFunding: goldTargetFunding(draft),
       selectedPackageItemKeys: new Set([`${classWithTorchGrant.id}:standard:0`]),
     })
 
@@ -612,6 +629,7 @@ describe('buildStartingPackageConversionPatch', () => {
       draft: arrowDraft,
       catalogIndex: index,
       departingOptionId: 'standard',
+      targetFunding: goldTargetFunding(arrowDraft),
       selectedPackageItemKeys: new Set([`${classWithArrowGrant.id}:standard:0`]),
     })
 

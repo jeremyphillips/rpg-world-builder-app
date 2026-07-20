@@ -5,6 +5,7 @@ import { useId } from 'react'
 import type {
   CharacterBuildCatalogIndex,
   CharacterBuilderDraft,
+  ResolvedStartingEquipmentFunding,
   StartingPackageConversionPreview,
 } from '@rpg/contracts'
 import { Text } from '@rpg/ui'
@@ -23,6 +24,7 @@ export type EquipmentStartingPackageSectionProps = {
   packageGroup: StartingPackageInventoryGroup
   draft: CharacterBuilderDraft
   catalogIndex: CharacterBuildCatalogIndex
+  goldOptionFunding?: ResolvedStartingEquipmentFunding
   conversionEditorOpen: boolean
   selectedPackageItemKeys: ReadonlySet<string>
   commitStatusMessage?: string
@@ -37,6 +39,7 @@ export function EquipmentStartingPackageSection({
   packageGroup,
   draft,
   catalogIndex,
+  goldOptionFunding,
   conversionEditorOpen,
   selectedPackageItemKeys,
   commitStatusMessage,
@@ -69,12 +72,13 @@ export function EquipmentStartingPackageSection({
       ) : null}
 
       <EquipmentStartingPackageCard optionLabel={packageGroup.optionLabel}>
-        {conversionEditorOpen ? (
+        {conversionEditorOpen && goldOptionFunding ? (
           <EquipmentPackageConversionEditor
             embedded
             draft={draft}
             catalogIndex={catalogIndex}
             departingOptionId={packageGroup.optionId}
+            targetFunding={goldOptionFunding}
             selectedPackageItemKeys={selectedPackageItemKeys}
             editorId={editorId}
             commitStatusMessage={commitStatusMessage}

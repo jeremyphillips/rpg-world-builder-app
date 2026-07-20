@@ -105,6 +105,16 @@ export function isWealthOnlyStartingEquipmentOption(option: StartingEquipmentOpt
   return option.items.length === 0 && option.wealth != null
 }
 
+/** User-facing alias — same predicate. Prefer at call sites that mean "purchase path". */
+export const isStartingGoldOption = isWealthOnlyStartingEquipmentOption
+
+/** Derives persisted equipment mode from option shape (not option id). */
+export function resolveEquipmentModeFromOption(
+  option: StartingEquipmentOption,
+): 'package' | 'gold' {
+  return isStartingGoldOption(option) ? 'gold' : 'package'
+}
+
 /**
  * Structured pick within a starting package (e.g. Bard musical instrument).
  *
@@ -148,9 +158,13 @@ export const startingEquipmentOptionSchema = contentChoiceOptionSchema
 
 export type StartingEquipmentOption = z.infer<typeof startingEquipmentOptionSchema>
 
-export const startingEquipmentChoiceSchema = contentChoiceSchema.extend({
-  options: z.array(startingEquipmentOptionSchema).min(1),
-})
+export const startingEquipmentChoiceSchema = contentChoiceSchema
+  .extend({
+    options: z.array(startingEquipmentOptionSchema).min(1),
+  })
+  .refine((choice) => choice.options.filter(isWealthOnlyStartingEquipmentOption).length <= 1, {
+    message: 'At most one wealth-only (starting gold) option is allowed',
+  })
 
 export type StartingEquipmentChoice = z.infer<typeof startingEquipmentChoiceSchema>
 

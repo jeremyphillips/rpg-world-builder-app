@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { createElement } from 'react'
 import {
   choiceOptionTitle,
   defineMessage,
@@ -6,6 +7,7 @@ import {
   SPELLCASTING_GEAR_KIND_ENTRIES,
   spellcastingFocusGearKindSchema,
 } from '@rpg/contracts'
+import { Heading } from '@rpg/ui'
 import { toOptions, type FieldVisibility, type FormItem } from '@rpg/ui/form'
 
 import {
@@ -28,6 +30,7 @@ import {
   INELIGIBLE_PROFICIENCY_CHOICE_ERROR,
   STARTING_EQUIPMENT_ITEM_TYPE_LABEL,
 } from './class-character-creation-link-labels'
+import { STARTING_EQUIPMENT_CHOICE_COPY } from './class-starting-equipment-form-labels'
 import {
   equipmentGrantTitle,
   equipmentGrantSummary,
@@ -144,7 +147,7 @@ export const startingEquipmentOptionFormSchema = z
 export type StartingEquipmentOptionForm = z.infer<typeof startingEquipmentOptionFormSchema>
 
 export const startingEquipmentFormSchema = z.object({
-  choose: z.coerce.number().int().min(1).default(1),
+  choose: z.literal(1).default(1),
   options: z.array(startingEquipmentOptionFormSchema).min(1),
 })
 
@@ -220,20 +223,10 @@ export function startingEquipmentModifierFields(): FormItem[] {
 export function startingEquipmentChooseFields(): FormItem[] {
   return [
     {
-      type: 'inlineSentence',
-      name: 'choose',
-      label: 'Packages to choose',
-      hideLabel: true,
-      segments: [
-        { kind: 'text', value: 'Character can choose', tone: 'label' },
-        {
-          kind: 'number',
-          name: 'choose',
-          min: 1,
-          defaultValue: 1,
-        },
-        { kind: 'text', value: 'package(s) from list', tone: 'label' },
-      ],
+      kind: 'slot',
+      name: '_startingEquipmentChoiceCopy',
+      render: () =>
+        createElement(Heading, { variant: 'subsection', as: 'p' }, STARTING_EQUIPMENT_CHOICE_COPY),
     },
   ]
 }

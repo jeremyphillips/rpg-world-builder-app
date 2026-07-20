@@ -105,6 +105,7 @@ export function EquipmentStepInteractive({
           draft={draft}
           catalogIndex={catalogIndex}
           budget={budget}
+          goldOptionFunding={step.goldOptionFunding}
           conversionEditorOpen={step.conversionEditorOpen}
           selectedPackageItemKeys={step.selectedPackageItemKeys}
           conversionCommitStatusMessage={step.conversionCommitStatusMessage}

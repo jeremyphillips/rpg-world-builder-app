@@ -11,15 +11,17 @@ import {
   evaluateEquipmentPackageSwitch,
   indexCharacterBuildCatalog,
   initPackageSwitchDraftQuantities,
+  isStartingGoldOption,
   rebuildPackageSwitchDraftQuantities,
   resolveBuilderStepReadiness,
+  resolveEquipmentStepModel,
   resolveStartingEquipmentOptionSummaries,
-  resolveStartingGoldOptionWealthByOptionId,
   type CharacterBuildContext,
   type CharacterBuilderDraft,
   type ChoiceSet,
   type EquipmentPackageSwitchBlockingReason,
   type EquipmentPackageSwitchInventorySnapshot,
+  type ResolvedStartingEquipmentFunding,
   type StartingPackageConversionPreview,
 } from '@rpg/contracts'
 
@@ -95,36 +97,52 @@ export function useEquipmentStep(args: {
   const startingEquipmentChoiceSet = classId
     ? findStartingEquipmentChoiceSet(resolvedChoiceSets, classId)
     : undefined
-  const goldOptionWealthById = useMemo(
+  const stepModel = useMemo(
     () =>
       characterClass
-        ? resolveStartingGoldOptionWealthByOptionId(characterClass, draft, {
+        ? resolveEquipmentStepModel({
+            draft,
+            catalogIndex,
             startingWealth: context.characterCreationRules.startingWealth,
           })
-        : new Map(),
-    [characterClass, context.characterCreationRules.startingWealth, draft],
+        : undefined,
+    [catalogIndex, characterClass, context.characterCreationRules.startingWealth, draft],
   )
+  const fundingByOptionId =
+    stepModel?.fundingByOptionId ?? new Map<string, ResolvedStartingEquipmentFunding>()
   const summaries = useMemo(
     () =>
       characterClass
         ? resolveStartingEquipmentOptionSummaries(characterClass, catalogIndex, draft, {
-            resolvedGoldOptionWealthByOptionId: goldOptionWealthById,
+            fundingByOptionId,
           })
         : [],
-    [catalogIndex, characterClass, draft, goldOptionWealthById],
+    [catalogIndex, characterClass, draft, fundingByOptionId],
   )
   const selectedOptionId = readSelectedStartingEquipmentOption(draft, classId)
   const showFallback =
     shouldShowEquipmentFallback(summaries) && !hasGoldStartingEquipmentOption(summaries)
   const showBudget = shouldShowEquipmentBudget(draft, selectedOptionId)
-  const showShopping = shouldShowEquipmentShopping(draft, selectedOptionId)
+  const showShopping = shouldShowEquipmentShopping(draft, selectedOptionId, characterClass)
   const budget = useMemo(
-    () =>
-      showBudget
-        ? resolveEquipmentStepBudget(draft, catalogIndex, context, goldOptionWealthById)
-        : undefined,
-    [catalogIndex, context, draft, goldOptionWealthById, showBudget],
+    () => (showBudget ? resolveEquipmentStepBudget(draft, catalogIndex, context) : undefined),
+    [catalogIndex, context, draft, showBudget],
   )
+
+  const goldOptionFunding = useMemo(() => {
+    const startingEquipment = characterClass?.characterCreation?.startingEquipment
+    if (!startingEquipment) return undefined
+
+    const goldOption = startingEquipment.options.find(isStartingGoldOption)
+    return goldOption ? fundingByOptionId.get(goldOption.id) : undefined
+  }, [characterClass, fundingByOptionId])
+
+  const resolveGoldOptionFunding = (): ResolvedStartingEquipmentFunding | undefined =>
+    goldOptionFunding
+
+  const resolveTargetFunding = (
+    targetOptionId: string,
+  ): ResolvedStartingEquipmentFunding | undefined => fundingByOptionId.get(targetOptionId)
   const { items: pickerItems, browseSortContext: pickerBrowseSortContext } = useMemo(
     () =>
       characterClass
@@ -173,6 +191,7 @@ export function useEquipmentStep(args: {
         optionId: selection.optionId,
         choiceSetId: startingEquipmentChoiceSet.id,
         nestedSelections: selection.nestedSelections,
+        characterClass: characterClass!,
       }),
     )
     setIsPackageChooserExpanded(false)
@@ -182,10 +201,14 @@ export function useEquipmentStep(args: {
     optionId: string,
     nestedSelections: CharacterBuilderDraft['choiceSelections'],
   ) => {
+    const targetFunding = resolveTargetFunding(optionId)
+    if (!targetFunding) return
+
     const evaluation = evaluateEquipmentPackageSwitch({
       draft,
       catalogIndex,
       targetOptionId: optionId,
+      targetFunding,
       nestedSelections,
     })
 
@@ -225,10 +248,17 @@ export function useEquipmentStep(args: {
 
     setIsPackageSwitchCommitting(true)
 
+    const targetFunding = resolveTargetFunding(pendingPackageSwitch.targetOptionId)
+    if (!targetFunding) {
+      dismissPackageSwitch()
+      return
+    }
+
     const result = buildEquipmentPackageSwitchPatch({
       draft,
       catalogIndex,
       targetOptionId: pendingPackageSwitch.targetOptionId,
+      targetFunding,
       choiceSetId: startingEquipmentChoiceSet.id,
       nestedSelections: pendingPackageSwitch.nestedSelections,
       draftQuantitiesByPurchaseId: pendingPackageSwitch.draftQuantitiesByPurchaseId,
@@ -241,6 +271,7 @@ export function useEquipmentStep(args: {
           draft,
           catalogIndex,
           targetOptionId: pendingPackageSwitch.targetOptionId,
+          targetFunding,
           nestedSelections: pendingPackageSwitch.nestedSelections,
         })
 
@@ -278,14 +309,18 @@ export function useEquipmentStep(args: {
   const packageSwitchEvaluation = useMemo(() => {
     if (!pendingPackageSwitch) return undefined
 
+    const targetFunding = resolveTargetFunding(pendingPackageSwitch.targetOptionId)
+    if (!targetFunding) return undefined
+
     return evaluateEquipmentPackageSwitch({
       draft,
       catalogIndex,
       targetOptionId: pendingPackageSwitch.targetOptionId,
+      targetFunding,
       nestedSelections: pendingPackageSwitch.nestedSelections,
       draftQuantitiesByPurchaseId: pendingPackageSwitch.draftQuantitiesByPurchaseId,
     })
-  }, [catalogIndex, draft, pendingPackageSwitch])
+  }, [catalogIndex, draft, fundingByOptionId, pendingPackageSwitch])
 
   useEffect(() => {
     setPendingPackageSwitch((prev) => {
@@ -296,10 +331,14 @@ export function useEquipmentStep(args: {
         return prev
       }
 
+      const targetFunding = resolveTargetFunding(prev.targetOptionId)
+      if (!targetFunding) return null
+
       const evaluation = evaluateEquipmentPackageSwitch({
         draft,
         catalogIndex,
         targetOptionId: prev.targetOptionId,
+        targetFunding,
         nestedSelections: prev.nestedSelections,
       })
 
@@ -316,7 +355,7 @@ export function useEquipmentStep(args: {
         commitErrorReason: undefined,
       }
     })
-  }, [catalogIndex, draft])
+  }, [catalogIndex, draft, fundingByOptionId])
 
   const requestSelection = (
     optionId: string,
@@ -329,12 +368,16 @@ export function useEquipmentStep(args: {
     }
 
     const nextSelection = { optionId, nestedSelections }
-    const packageSwitchPreview = evaluateEquipmentPackageSwitch({
-      draft,
-      catalogIndex,
-      targetOptionId: optionId,
-      nestedSelections,
-    })
+    const targetFunding = resolveTargetFunding(optionId)
+    const packageSwitchPreview =
+      targetFunding &&
+      evaluateEquipmentPackageSwitch({
+        draft,
+        catalogIndex,
+        targetOptionId: optionId,
+        targetFunding,
+        nestedSelections,
+      })
 
     if (packageSwitchPreview && packageSwitchPreview.status !== 'noConflict') {
       openPackageSwitchResolution(optionId, nestedSelections)
@@ -364,11 +407,15 @@ export function useEquipmentStep(args: {
   const defaultSelectedPackageItemKeys = (deselectedKeys: ReadonlySet<string> = new Set()) => {
     if (!selectedOptionId) return new Set<string>()
 
+    const targetFunding = resolveGoldOptionFunding()
+    if (!targetFunding) return new Set<string>()
+
     const preview = buildStartingPackageConversionPreview({
       draft,
       catalogIndex,
       departingOptionId: selectedOptionId,
       selectedPackageItemKeys: new Set(),
+      targetFunding,
     })
 
     if (!preview) return new Set<string>()
@@ -389,11 +436,15 @@ export function useEquipmentStep(args: {
   const handleCommitConversion = (_preview: StartingPackageConversionPreview) => {
     if (!selectedOptionId) return
 
+    const targetFunding = resolveGoldOptionFunding()
+    if (!targetFunding) return
+
     const patch = buildStartingPackageConversionPatch({
       draft,
       catalogIndex,
       departingOptionId: selectedOptionId,
       selectedPackageItemKeys,
+      targetFunding,
     })
 
     if (!patch) return
@@ -481,6 +532,7 @@ export function useEquipmentStep(args: {
     resolvedChoiceSets,
     summaries,
     selectedOptionId,
+    goldOptionFunding,
     showFallback,
     showBudget,
     showShopping,

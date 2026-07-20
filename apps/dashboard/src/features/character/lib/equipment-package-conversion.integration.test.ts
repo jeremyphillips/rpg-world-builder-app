@@ -8,6 +8,7 @@ import {
   indexCharacterBuildCatalog,
   resolveEquipmentAcquisitionMaxQuantity,
   resolveEquipmentPurchaseQuantityLimits,
+  resolveStartingEquipmentFundingOptions,
   startingEquipmentChoiceSetId,
   wealthToCopper,
   type ClassStored,
@@ -117,6 +118,10 @@ function allSelectablePackageItemKeys(
   )
 }
 
+function goldTargetFunding(draft: ReturnType<typeof monkPackageDraft>) {
+  return resolveStartingEquipmentFundingOptions({ draft, catalogIndex }).get('gold')!
+}
+
 describe('equipment package conversion integration', () => {
   it('converts a monk package with fixed daggers and stackable torches into editable purchased rows', () => {
     const draft = monkPackageDraft()
@@ -124,6 +129,7 @@ describe('equipment package conversion integration', () => {
       draft,
       catalogIndex,
       departingOptionId: 'standard',
+      targetFunding: goldTargetFunding(draft),
       selectedPackageItemKeys: new Set(),
     })!
 
@@ -132,6 +138,7 @@ describe('equipment package conversion integration', () => {
       draft,
       catalogIndex,
       departingOptionId: 'standard',
+      targetFunding: goldTargetFunding(draft),
       selectedPackageItemKeys: selectedKeys,
     })!
 
@@ -212,6 +219,7 @@ describe('equipment package conversion integration', () => {
       draft,
       catalogIndex,
       departingOptionId: 'standard',
+      targetFunding: goldTargetFunding(draft),
       selectedPackageItemKeys: selectedKeys,
     })!
     expect(wealthToCopper(budget.remaining)).toBe(conversionPreview.budget.remainingCp)

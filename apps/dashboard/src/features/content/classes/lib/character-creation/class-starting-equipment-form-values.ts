@@ -120,7 +120,7 @@ export function startingEquipmentToFormValues(
   startingEquipment: StartingEquipmentChoice,
 ): StartingEquipmentForm {
   return {
-    choose: startingEquipment.choose,
+    choose: 1,
     options: startingEquipment.options.map(startingEquipmentOptionToFormRow),
   }
 }
@@ -139,7 +139,7 @@ export function startingEquipmentFromFormValues(
   if (!options.length) return undefined
 
   return {
-    choose: row.choose ?? existing?.choose ?? 1,
+    choose: 1,
     options,
   }
 }

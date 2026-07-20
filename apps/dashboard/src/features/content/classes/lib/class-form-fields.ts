@@ -15,7 +15,6 @@ import type { ContentFormCtx } from '../../lib/forms/content-form-registry'
 import {
   embeddedArrayResolverField,
   embeddedMasterDetailTabValidation,
-  prefixFormItems,
 } from '../../lib/forms/tabbed-form-resolver-fields'
 import { ClassFeaturesTab } from '../components/class-features-tab.client'
 import { ClassCharacterCreationTab } from '../components/class-character-creation-tab.client'
@@ -34,9 +33,7 @@ import {
   characterCreationToolChoiceFields,
 } from './character-creation/class-character-creation-proficiencies-form-fields'
 import {
-  STARTING_EQUIPMENT_FIELD_NAME,
   STARTING_EQUIPMENT_OPTIONS_FIELD_NAME,
-  startingEquipmentChooseFields,
   startingEquipmentOptionItemFields,
 } from './character-creation/class-starting-equipment-form-fields'
 
@@ -136,7 +133,6 @@ export function buildClassTabs(ctx: ContentFormCtx): TabbedFormTab[] {
       fields: [],
       errorPaths: ['characterCreation'],
       resolverFields: [
-        ...prefixFormItems(startingEquipmentChooseFields(), STARTING_EQUIPMENT_FIELD_NAME),
         embeddedArrayResolverField(
           STARTING_EQUIPMENT_OPTIONS_FIELD_NAME,
           'Starting equipment packages',

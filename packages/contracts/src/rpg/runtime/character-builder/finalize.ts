@@ -92,7 +92,9 @@ export function finalizeCharacterBuild(
     characterClass,
     context,
   )
-  const { equipment, wealth } = assembleStartingEquipment(draft, catalogIndex)
+  const { equipment, wealth } = assembleStartingEquipment(draft, catalogIndex, {
+    startingWealth: context.characterCreationRules.startingWealth,
+  })
 
   const maxHp = resolveBuilderMaxHitPoints(draft, characterClass, {
     source: DEFAULT_BUILDER_HIT_POINT_SOURCE,

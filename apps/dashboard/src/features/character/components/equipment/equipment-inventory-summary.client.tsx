@@ -6,6 +6,7 @@ import type {
   CharacterBuildCatalogIndex,
   CharacterBuilderDraft,
   EquipmentBudgetSummary,
+  ResolvedStartingEquipmentFunding,
 } from '@rpg/contracts'
 import { Text } from '@rpg/ui'
 
@@ -28,6 +29,7 @@ export type EquipmentInventorySummaryProps = {
   draft: CharacterBuilderDraft
   catalogIndex: CharacterBuildCatalogIndex
   budget?: EquipmentBudgetSummary
+  goldOptionFunding?: ResolvedStartingEquipmentFunding
   conversionEditorOpen?: boolean
   selectedPackageItemKeys?: ReadonlySet<string>
   conversionCommitStatusMessage?: string
@@ -46,6 +48,7 @@ export function EquipmentInventorySummary({
   draft,
   catalogIndex,
   budget,
+  goldOptionFunding,
   conversionEditorOpen = false,
   selectedPackageItemKeys = new Set(),
   conversionCommitStatusMessage,
@@ -81,6 +84,7 @@ export function EquipmentInventorySummary({
           packageGroup={layout.startingPackage}
           draft={draft}
           catalogIndex={catalogIndex}
+          goldOptionFunding={goldOptionFunding}
           conversionEditorOpen={conversionEditorOpen}
           selectedPackageItemKeys={selectedPackageItemKeys}
           commitStatusMessage={conversionCommitStatusMessage}

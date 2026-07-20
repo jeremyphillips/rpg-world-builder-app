@@ -1,3 +1,4 @@
+import type { StartingWealthRules } from '../../../campaign/rules/starting-wealth'
 import type { Equipment } from '../../../content/equipment'
 import type { EquipmentChoiceGrant } from '../../../content/lib/equipment-grant'
 import type { CharacterWealthGrant } from '../../../content/lib/wealth-grant'
@@ -24,6 +25,8 @@ import type { CharacterSelectionSource } from '../../character/selection-sources
 import type { CharacterBuildCatalogIndex } from '../context'
 import type { CharacterBuilderDraft } from '../draft'
 import { deriveEquipmentBudgetSummary } from '../resolvers/equipment/equipment-budget'
+import { deriveEquipmentBudgetSummaryFromFunding } from '../resolvers/equipment/resolve-starting-equipment-funding'
+import type { ResolvedStartingEquipmentFunding } from '../resolvers/equipment/resolve-starting-equipment-funding'
 import { deriveEquipmentDraftEntries } from '../resolvers/equipment/derive-equipment-draft-entries'
 import { resolveProficiencyLinkedEquipmentGrant } from '../resolvers/equipment/resolve-proficiency-linked-equipment-grant'
 import {
@@ -241,47 +244,54 @@ function appendResolvedItem(
   })
 }
 
-/** Assembles finalized equipment and wealth from draft equipment decisions. */
-export function assembleStartingEquipment(
+function emptyStartingEquipmentResult(): {
+  equipment: CharacterEquipment
+  wealth: CharacterWealth
+} {
+  return { equipment: EMPTY_CHARACTER_EQUIPMENT, wealth: characterWealthFromGrant(undefined) }
+}
+
+function assembleFromDraftEquipment(
+  draft: CharacterBuilderDraft,
+  catalogIndex: CharacterBuildCatalogIndex,
+  options?: AssembleStartingEquipmentOptions,
+): { equipment: CharacterEquipment; wealth: CharacterWealth } {
+  const purchases = draft.equipment!.purchases ?? []
+  const budget = options?.funding
+    ? deriveEquipmentBudgetSummaryFromFunding({
+        funding: options.funding,
+        purchases,
+        catalogIndex,
+      })
+    : deriveEquipmentBudgetSummary(draft, catalogIndex, {
+        startingWealth: options?.startingWealth,
+      })
+
+  return {
+    equipment: deriveEquipmentDraftEntries(draft, catalogIndex),
+    wealth: budget?.remaining ?? characterWealthFromGrant(undefined),
+  }
+}
+
+function assembleFromSelectedPackage(
   draft: CharacterBuilderDraft,
   catalogIndex: CharacterBuildCatalogIndex,
 ): { equipment: CharacterEquipment; wealth: CharacterWealth } {
-  if (draft.equipment?.skipped) {
-    return { equipment: EMPTY_CHARACTER_EQUIPMENT, wealth: characterWealthFromGrant(undefined) }
-  }
-
-  if (draft.equipment) {
-    const budget = deriveEquipmentBudgetSummary(draft, catalogIndex)
-    return {
-      equipment: deriveEquipmentDraftEntries(draft, catalogIndex),
-      wealth: budget?.remaining ?? characterWealthFromGrant(undefined),
-    }
-  }
-
   const classId = draft.class.classId
-  if (!classId) {
-    return { equipment: EMPTY_CHARACTER_EQUIPMENT, wealth: characterWealthFromGrant(undefined) }
-  }
+  if (!classId) return emptyStartingEquipmentResult()
 
   const characterClass = catalogIndex.classes.get(classId)
   const startingEquipment = characterClass?.characterCreation?.startingEquipment
-  if (!startingEquipment) {
-    return { equipment: EMPTY_CHARACTER_EQUIPMENT, wealth: characterWealthFromGrant(undefined) }
-  }
+  if (!characterClass || !startingEquipment) return emptyStartingEquipmentResult()
 
   const selectedOptionId = readSelectedStartingEquipmentOptionId(draft, classId)
-  if (!selectedOptionId) {
-    return { equipment: EMPTY_CHARACTER_EQUIPMENT, wealth: characterWealthFromGrant(undefined) }
-  }
+  if (!selectedOptionId) return emptyStartingEquipmentResult()
 
   const option = startingEquipment.options.find((entry) => entry.id === selectedOptionId)
-  if (!option) {
-    return { equipment: EMPTY_CHARACTER_EQUIPMENT, wealth: characterWealthFromGrant(undefined) }
-  }
+  if (!option) return emptyStartingEquipmentResult()
 
-  const resolved = resolveStartingEquipmentOption(characterClass!, option, draft, catalogIndex)
+  const resolved = resolveStartingEquipmentOption(characterClass, option, draft, catalogIndex)
   const sources = classStartingEquipmentSource(classId, selectedOptionId)
-
   const equipment = resolved.items.reduce(
     (inventory, item) => appendResolvedItem(inventory, item, sources),
     EMPTY_CHARACTER_EQUIPMENT,
@@ -291,4 +301,27 @@ export function assembleStartingEquipment(
     equipment,
     wealth: characterWealthFromGrant(resolved.wealth),
   }
+}
+
+export type AssembleStartingEquipmentOptions = {
+  /** Pre-resolved funding snapshot — tier rules are not re-resolved when provided. */
+  funding?: ResolvedStartingEquipmentFunding
+  startingWealth?: StartingWealthRules
+}
+
+/** Assembles finalized equipment and wealth from draft equipment decisions. */
+export function assembleStartingEquipment(
+  draft: CharacterBuilderDraft,
+  catalogIndex: CharacterBuildCatalogIndex,
+  options?: AssembleStartingEquipmentOptions,
+): { equipment: CharacterEquipment; wealth: CharacterWealth } {
+  if (draft.equipment?.skipped) {
+    return emptyStartingEquipmentResult()
+  }
+
+  if (draft.equipment) {
+    return assembleFromDraftEquipment(draft, catalogIndex, options)
+  }
+
+  return assembleFromSelectedPackage(draft, catalogIndex)
 }

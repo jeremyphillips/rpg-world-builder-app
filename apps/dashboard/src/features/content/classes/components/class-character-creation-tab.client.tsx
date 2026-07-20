@@ -13,6 +13,7 @@ import {
   ADD_STARTING_EQUIPMENT_OPTION_LABEL,
   STARTING_EQUIPMENT_EMPTY_MESSAGE,
   STARTING_EQUIPMENT_OPTION_NOUN,
+  STARTING_EQUIPMENT_SECTION_DESCRIPTION,
 } from '../lib/character-creation/class-starting-equipment-form-labels'
 import {
   STARTING_EQUIPMENT_FIELD_NAME,
@@ -141,9 +142,14 @@ export function ClassCharacterCreationTab({ formCtx }: ClassCharacterCreationTab
   return (
     <div className="space-y-8">
       <section aria-labelledby="class-starting-equipment-heading">
-        <Heading variant="section" as="h3" id="class-starting-equipment-heading" className="mb-4">
-          Starting equipment
-        </Heading>
+        <div className="mb-4 space-y-2">
+          <Heading variant="section" as="h3" id="class-starting-equipment-heading">
+            Starting equipment
+          </Heading>
+          <Text variant="muted" className="text-sm">
+            {STARTING_EQUIPMENT_SECTION_DESCRIPTION}
+          </Text>
+        </div>
         {hasStartingEquipment ? (
           <StartingEquipmentEditor formCtx={formCtx} />
         ) : (

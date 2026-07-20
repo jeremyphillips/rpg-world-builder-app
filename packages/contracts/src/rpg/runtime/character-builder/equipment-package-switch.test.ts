@@ -12,8 +12,11 @@ import {
   initPackageSwitchDraftQuantities,
   rebuildPackageSwitchDraftQuantities,
 } from './equipment-package-switch'
+import { resolveStartingEquipmentFundingOptions } from './resolvers/equipment/resolve-starting-equipment-funding'
 import { startingEquipmentChoiceSetId } from './resolvers/equipment/resolve-starting-equipment-choice-sets'
 import { createEquipmentPurchaseId } from './equipment-purchase'
+import type { CharacterBuilderDraft } from './draft'
+import type { CharacterBuildCatalogIndex } from './context'
 
 const RULESET = 'srd-cc-5.2.1' as const
 
@@ -95,7 +98,9 @@ const storedDruid: ClassStored = {
         {
           id: 'standard',
           label: 'Standard Equipment',
-          items: [],
+          items: [
+            { kind: 'grant', target: { source: 'equipment', equipmentSlug: 'rope' }, quantity: 1 },
+          ],
           wealth: { gp: 9, sp: 5, cp: 3 },
         },
         {
@@ -118,6 +123,14 @@ function buildCatalogIndex() {
     skillProficiencies: [],
     languages: [],
   })
+}
+
+function targetFundingFor(
+  draft: CharacterBuilderDraft,
+  catalogIndex: CharacterBuildCatalogIndex,
+  targetOptionId: string,
+) {
+  return resolveStartingEquipmentFundingOptions({ draft, catalogIndex }).get(targetOptionId)!
 }
 
 function goldDraftWithPurchases(
@@ -162,6 +175,7 @@ describe('evaluateEquipmentPackageSwitch', () => {
       draft,
       catalogIndex,
       targetOptionId: 'standard',
+      targetFunding: targetFundingFor(draft, catalogIndex, 'standard'),
     })
 
     expect(evaluation?.status).toBe('noConflict')
@@ -178,6 +192,7 @@ describe('evaluateEquipmentPackageSwitch', () => {
       draft,
       catalogIndex,
       targetOptionId: 'standard',
+      targetFunding: targetFundingFor(draft, catalogIndex, 'standard'),
     })
 
     expect(evaluation?.status).toBe('resolvable')
@@ -196,6 +211,7 @@ describe('evaluateEquipmentPackageSwitch', () => {
       draft,
       catalogIndex,
       targetOptionId: 'standard',
+      targetFunding: targetFundingFor(draft, catalogIndex, 'standard'),
     })
 
     expect(evaluation?.budget.nonEditableRetainedCostCp).toBe(2000)
@@ -213,6 +229,7 @@ describe('evaluateEquipmentPackageSwitch', () => {
       draft,
       catalogIndex,
       targetOptionId: 'standard',
+      targetFunding: targetFundingFor(draft, catalogIndex, 'standard'),
     })
 
     expect(evaluation?.status).toBe('blocked')
@@ -232,6 +249,7 @@ describe('evaluateEquipmentPackageSwitch', () => {
       draft,
       catalogIndex,
       targetOptionId: 'standard',
+      targetFunding: targetFundingFor(draft, catalogIndex, 'standard'),
       draftQuantitiesByPurchaseId: { 'purchase-needle': 199 },
     })
 
@@ -247,6 +265,7 @@ describe('evaluateEquipmentPackageSwitch', () => {
       draft,
       catalogIndex,
       targetOptionId: 'standard',
+      targetFunding: targetFundingFor(draft, catalogIndex, 'standard'),
       draftQuantitiesByPurchaseId: { 'purchase-needle': 19 },
     })
 
@@ -264,6 +283,7 @@ describe('evaluateEquipmentPackageSwitch', () => {
       draft,
       catalogIndex,
       targetOptionId: 'standard',
+      targetFunding: targetFundingFor(draft, catalogIndex, 'standard'),
       draftQuantitiesByPurchaseId: { 'purchase-rope': 0 },
     })
 
@@ -285,6 +305,7 @@ describe('evaluateEquipmentPackageSwitch', () => {
       draft: changedDraft,
       catalogIndex,
       targetOptionId: 'standard',
+      targetFunding: targetFundingFor(draft, catalogIndex, 'standard'),
       draftQuantitiesByPurchaseId: { 'purchase-rope': 50 },
       committedInventorySnapshot: snapshot,
     })
@@ -312,6 +333,7 @@ describe('buildEquipmentPackageSwitchPatch', () => {
       draft,
       catalogIndex,
       targetOptionId: 'standard',
+      targetFunding: targetFundingFor(draft, catalogIndex, 'standard'),
     })!
     const draftQuantities = initPackageSwitchDraftQuantities(evaluation)
     draftQuantities['purchase-rope'] = 9
@@ -323,6 +345,7 @@ describe('buildEquipmentPackageSwitchPatch', () => {
       draft,
       catalogIndex,
       targetOptionId: 'standard',
+      targetFunding: targetFundingFor(draft, catalogIndex, 'standard'),
       choiceSetId,
       nestedSelections: {},
       draftQuantitiesByPurchaseId: draftQuantities,
@@ -349,6 +372,7 @@ describe('buildEquipmentPackageSwitchPatch', () => {
       draft,
       catalogIndex,
       targetOptionId: 'standard',
+      targetFunding: targetFundingFor(draft, catalogIndex, 'standard'),
     })!
     const draftQuantities = initPackageSwitchDraftQuantities(evaluation)
     draftQuantities['purchase-rope'] = 9
@@ -361,6 +385,7 @@ describe('buildEquipmentPackageSwitchPatch', () => {
       draft: changedDraft,
       catalogIndex,
       targetOptionId: 'standard',
+      targetFunding: targetFundingFor(draft, catalogIndex, 'standard'),
       choiceSetId: startingEquipmentChoiceSetId(storedDruid.id),
       nestedSelections: {},
       draftQuantitiesByPurchaseId: draftQuantities,
@@ -381,6 +406,7 @@ describe('buildEquipmentPackageSwitchPatch', () => {
       draft,
       catalogIndex,
       targetOptionId: 'standard',
+      targetFunding: targetFundingFor(draft, catalogIndex, 'standard'),
       choiceSetId: startingEquipmentChoiceSetId(storedDruid.id),
       nestedSelections: {},
       draftQuantitiesByPurchaseId: { [purchaseId]: 0 },
@@ -405,6 +431,7 @@ describe('rebuildPackageSwitchDraftQuantities', () => {
       draft,
       catalogIndex,
       targetOptionId: 'standard',
+      targetFunding: targetFundingFor(draft, catalogIndex, 'standard'),
     })!
 
     const rebuilt = rebuildPackageSwitchDraftQuantities({

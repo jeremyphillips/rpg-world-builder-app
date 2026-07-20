@@ -136,8 +136,8 @@ export function buildStartingWealthTiersField(): LevelRangeArrayConfig {
       {
         type: 'switch',
         name: 'includeNormalStartingEquipment',
-        label: 'Include class starting equipment',
-        hint: 'Adds equipment from Class → Character Creation in addition to this starting wealth.',
+        label: 'Include class starting option',
+        hint: 'Characters receive their selected class option (Class → Character Creation) in addition to this tier’s bonus gold and magic-item grants. Turn this off when the tier fully replaces class starting equipment.',
         defaultValue: true,
       },
       {
@@ -145,7 +145,7 @@ export function buildStartingWealthTiersField(): LevelRangeArrayConfig {
         controller: {
           type: 'switch',
           name: BONUS_GOLD_ENABLED,
-          label: 'Bonus gold',
+          label: 'Additional gold',
           defaultValue: false,
         },
         dependents: {

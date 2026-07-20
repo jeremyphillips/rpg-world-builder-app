@@ -508,7 +508,8 @@ function creationSectionItems(): FormItem[] {
         importedCharactersPolicyField(),
         {
           kind: 'group',
-          legend: 'Equipment packages',
+          legend: 'Starting wealth by level',
+          hint: 'Adds or replaces the class’s baseline starting equipment for characters created at higher levels.',
           fieldsChrome: { variant: 'inset' },
           fields: [
             {

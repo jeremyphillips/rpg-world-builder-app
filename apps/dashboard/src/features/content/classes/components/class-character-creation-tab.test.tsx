@@ -55,6 +55,7 @@ describe('ClassCharacterCreationTab', () => {
     render(<TabShell />)
     expect(screen.getAllByText('Character chooses').length).toBeGreaterThanOrEqual(1)
     expect(screen.getByText('Skill Proficiencies from:')).toBeInTheDocument()
+    expect(screen.getByText(/Define the class’s baseline starting options/i)).toBeInTheDocument()
     expect(screen.getByText(/No starting equipment yet/i)).toBeInTheDocument()
   })
 
@@ -64,19 +65,15 @@ describe('ClassCharacterCreationTab', () => {
     expect(screen.getByRole('button', { name: /Add starting equipment/i })).toBeInTheDocument()
   })
 
-  it('adds starting equipment and shows inline choose field plus package master-detail', async () => {
+  it('adds starting equipment and shows choice copy plus package master-detail', async () => {
     const user = userEvent.setup()
     render(<TabShell />)
 
     await user.click(screen.getByRole('button', { name: /Add starting equipment/i }))
 
     await waitFor(() => {
-      expect(
-        screen.getByRole('spinbutton', { name: /Packages to choose count/i }),
-      ).toBeInTheDocument()
+      expect(screen.getByText('Character can choose one package from below')).toBeInTheDocument()
     })
-    expect(screen.getByText('package(s) from list')).toBeInTheDocument()
-    expect(screen.getAllByText('Character can choose').length).toBeGreaterThanOrEqual(1)
     expect(
       screen.getByRole('button', { name: /^(?!Remove|Drag).*Standard Equipment/ }),
     ).toBeInTheDocument()
@@ -97,9 +94,7 @@ describe('ClassCharacterCreationTab', () => {
         }}
       />,
     )
-    expect(
-      screen.getByRole('spinbutton', { name: /Packages to choose count/i }),
-    ).toBeInTheDocument()
+    expect(screen.getByText('Character can choose one package from below')).toBeInTheDocument()
     expect(
       screen.getByRole('button', { name: /^(?!Remove|Drag).*Standard Equipment/ }),
     ).toBeInTheDocument()

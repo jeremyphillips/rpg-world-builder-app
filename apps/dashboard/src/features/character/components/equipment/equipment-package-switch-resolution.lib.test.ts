@@ -4,7 +4,10 @@ import { equipmentSchema } from '@rpg/contracts'
 import { indexCharacterBuildCatalog } from '@rpg/contracts'
 import type { ClassStored } from '@rpg/contracts'
 import { createEmptyCharacterBuilderDraft } from '@rpg/contracts'
-import { evaluateEquipmentPackageSwitch } from '@rpg/contracts'
+import {
+  evaluateEquipmentPackageSwitch,
+  resolveStartingEquipmentFundingOptions,
+} from '@rpg/contracts'
 import { startingEquipmentChoiceSetId } from '@rpg/contracts'
 
 import {
@@ -58,7 +61,9 @@ const storedDruid: ClassStored = {
         {
           id: 'standard',
           label: 'Standard Equipment',
-          items: [],
+          items: [
+            { kind: 'grant', target: { source: 'equipment', equipmentSlug: 'rope' }, quantity: 1 },
+          ],
           wealth: { gp: 9, sp: 5, cp: 3 },
         },
         {
@@ -103,6 +108,12 @@ const goldDraft = {
   },
 }
 
+function targetFundingFor(targetOptionId: string) {
+  return resolveStartingEquipmentFundingOptions({ draft: goldDraft, catalogIndex }).get(
+    targetOptionId,
+  )!
+}
+
 describe('equipment-package-switch-resolution.lib', () => {
   it('maps blocking reasons to user-facing copy', () => {
     expect(
@@ -118,6 +129,7 @@ describe('equipment-package-switch-resolution.lib', () => {
       draft: goldDraft,
       catalogIndex,
       targetOptionId: 'standard',
+      targetFunding: targetFundingFor('standard'),
     })!
 
     const groups = buildPackageSwitchDraftPurchasedGroups({
@@ -143,6 +155,7 @@ describe('equipment-package-switch-resolution.lib', () => {
       draft: goldDraft,
       catalogIndex,
       targetOptionId: 'standard',
+      targetFunding: targetFundingFor('standard'),
     })!
 
     expect(
@@ -162,6 +175,7 @@ describe('equipment-package-switch-resolution.lib', () => {
       draft: goldDraft,
       catalogIndex,
       targetOptionId: 'standard',
+      targetFunding: targetFundingFor('standard'),
     })!
 
     expect(resolvePackageSwitchDescription(evaluation)).toContain('Standard Equipment allows')

@@ -32,7 +32,11 @@ import { resolveProficiencyLinkedEquipmentGrant } from './resolve-proficiency-li
 
 /** Pre-resolved display inputs for starting-equipment summaries. No campaign policy inside. */
 export type StartingEquipmentSummaryContext = {
-  resolvedGoldOptionWealthByOptionId: ReadonlyMap<string, CharacterWealth>
+  fundingByOptionId?: ReadonlyMap<
+    string,
+    import('./resolve-starting-equipment-funding').ResolvedStartingEquipmentFunding
+  >
+  resolvedGoldOptionWealthByOptionId?: ReadonlyMap<string, CharacterWealth>
 }
 
 export const STARTING_EQUIPMENT_MISSING_ITEM_MESSAGE = 'Missing from catalog'
@@ -287,13 +291,16 @@ function inventoryGroupForChoice(pool: EquipmentPool): StartingEquipmentInventor
   return 'gear'
 }
 
-function summarizeOption(
-  characterClass: CharacterClass,
-  option: StartingEquipmentOption,
-  catalogIndex: CharacterBuildCatalogIndex,
-  draft?: CharacterBuilderDraft,
-  context?: StartingEquipmentSummaryContext,
-): StartingEquipmentOptionSummary {
+function summarizeOptionItems(args: {
+  option: StartingEquipmentOption
+  characterClass: CharacterClass
+  catalogIndex: CharacterBuildCatalogIndex
+  draft?: CharacterBuilderDraft
+}): Pick<
+  StartingEquipmentOptionSummary,
+  'orderedItems' | 'itemsByGroup' | 'missingItemSlugs' | 'unselectableReasons'
+> {
+  const { option, characterClass, catalogIndex, draft } = args
   const rulesetId = characterClass.rulesetId
   const itemsByGroup = EMPTY_ITEMS_BY_GROUP()
   const orderedItems: StartingEquipmentOptionSummaryItem[] = []
@@ -332,21 +339,45 @@ function summarizeOption(
     itemsByGroup[inventoryGroupForChoice(item.pool)].push(summary)
   }
 
-  const description = isWealthOnlyStartingEquipmentOption(option)
-    ? formatStartingGoldOptionDescription({
-        wealth:
-          context?.resolvedGoldOptionWealthByOptionId.get(option.id) ??
-          characterWealthFromGrant(option.wealth!),
-      })
-    : formatStartingEquipmentPackageDescription({
-        orderedItems,
-        wealth: option.wealth,
-      })
+  return { orderedItems, itemsByGroup, missingItemSlugs, unselectableReasons }
+}
+
+function startingEquipmentOptionDescription(args: {
+  option: StartingEquipmentOption
+  orderedItems: readonly StartingEquipmentOptionSummaryItem[]
+  context?: StartingEquipmentSummaryContext
+}): string | undefined {
+  const { option, orderedItems, context } = args
+
+  if (isWealthOnlyStartingEquipmentOption(option)) {
+    return formatStartingGoldOptionDescription({
+      wealth:
+        context?.fundingByOptionId?.get(option.id)?.totalStartingWealth ??
+        context?.resolvedGoldOptionWealthByOptionId?.get(option.id) ??
+        characterWealthFromGrant(option.wealth!),
+    })
+  }
+
+  return formatStartingEquipmentPackageDescription({
+    orderedItems,
+    wealth: option.wealth,
+  })
+}
+
+function summarizeOption(
+  characterClass: CharacterClass,
+  option: StartingEquipmentOption,
+  catalogIndex: CharacterBuildCatalogIndex,
+  draft?: CharacterBuilderDraft,
+  context?: StartingEquipmentSummaryContext,
+): StartingEquipmentOptionSummary {
+  const { orderedItems, itemsByGroup, missingItemSlugs, unselectableReasons } =
+    summarizeOptionItems({ option, characterClass, catalogIndex, draft })
 
   return {
     optionId: option.id,
     label: option.label,
-    description,
+    description: startingEquipmentOptionDescription({ option, orderedItems, context }),
     wealth: option.wealth,
     orderedItems,
     itemsByGroup,

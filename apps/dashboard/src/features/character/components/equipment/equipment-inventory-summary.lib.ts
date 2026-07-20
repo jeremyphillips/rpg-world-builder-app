@@ -269,10 +269,7 @@ export function buildEquipmentInventoryLayout(
     return { mode: 'gold', purchased }
   }
 
-  const goldAlternative = resolveGoldStartingEquipmentAlternative(
-    startingEquipment.options,
-    selectedOptionId,
-  )
+  const goldAlternative = resolveGoldStartingEquipmentAlternative(startingEquipment.options)
   const customize: PackageCustomizeAffordance =
     goldAlternative.status === 'available'
       ? { status: 'available' }

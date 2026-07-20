@@ -304,6 +304,7 @@ describe('equipment-step.lib', () => {
       optionId: 'standard',
       choiceSetId,
       nestedSelections: {},
+      characterClass: equipmentStepBardClassFixture,
     })
 
     expect(packagePatch.choiceSelections?.[choiceSetId]).toEqual(['standard'])
@@ -315,6 +316,7 @@ describe('equipment-step.lib', () => {
       optionId: 'gold',
       choiceSetId,
       nestedSelections: {},
+      characterClass: equipmentStepBardClassFixture,
     })
 
     expect(goldPatch.equipment?.mode).toBe('gold')

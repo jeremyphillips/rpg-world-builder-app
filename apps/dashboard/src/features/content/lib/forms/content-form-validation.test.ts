@@ -69,6 +69,9 @@ const SERVER_ROW_EXEMPT = ['id', 'kind'] as const
 /** Heritage scalar paths not authored as visible fields (optional id, defaulted choose). */
 const HERITAGE_FORM_EXEMPT = ['heritage.id', 'heritage.choose'] as const
 
+/** Starting equipment package count is locked to 1 — not authored as a visible field. */
+const STARTING_EQUIPMENT_FORM_EXEMPT = ['characterCreation.startingEquipment.choose'] as const
+
 /** Grant union variants explode many schema paths; grant rows are tested at row scope. */
 const GRANT_NESTED_EXEMPT = [/\.grants\.\*\./] as const
 
@@ -79,6 +82,7 @@ const COMMON_SCHEMA_EXEMPT = [
   ...SLOT_IGNORE,
   ...SLUG_EXEMPT,
   ...HERITAGE_FORM_EXEMPT,
+  ...STARTING_EQUIPMENT_FORM_EXEMPT,
   ...GRANT_NESTED_EXEMPT,
 ] as const
 

@@ -10,6 +10,7 @@ import {
   getInvalidStartingEquipmentProficiencyLinks,
   isEquipmentStackable,
   isProficiencyLinkedStartingEquipmentGrant,
+  isStartingGoldOption,
   maxAffordableEquipmentQuantity,
   mergeCompatiblePurchasedEntries,
   normalizeEquipmentPurchase,
@@ -20,6 +21,7 @@ import {
   resolveEquipmentPurchaseIndex,
   resolveEquipmentPurchaseId,
   resolveEquipmentPurchaseQuantityLimits,
+  resolveEquipmentModeFromOption,
   resolveStartingEquipmentOption,
   startingEquipmentChoiceSetId,
   startingEquipmentGrantProficiencyChoiceId,
@@ -34,7 +36,6 @@ import {
   type CharacterEquipment,
   type CharacterEquipmentEntry,
   type CharacterSelectionSource,
-  type CharacterWealth,
   formatSelectionSourceLabel,
   type ChoiceSet,
   type Equipment,
@@ -203,8 +204,18 @@ export function isStartingGoldOptionId(optionId: string): boolean {
 
 export function hasGoldStartingEquipmentOption(
   summaries: readonly StartingEquipmentOptionSummary[],
+  characterClass?: CharacterClass,
 ): boolean {
-  return summaries.some((summary) => isStartingGoldOptionId(summary.optionId))
+  if (characterClass) {
+    return (
+      characterClass.characterCreation?.startingEquipment?.options.some(isStartingGoldOption) ??
+      false
+    )
+  }
+
+  return summaries.some(
+    (summary) => summary.wealth !== undefined && summary.orderedItems.length === 0,
+  )
 }
 
 export function hasSelectableStartingEquipmentOption(
@@ -446,9 +457,13 @@ export function buildEquipmentSelectionPatch(args: {
   optionId: string
   choiceSetId: string
   nestedSelections: CharacterBuilderDraft['choiceSelections']
+  characterClass: CharacterClass
 }): Partial<CharacterBuilderDraft> {
-  const { draft, optionId, choiceSetId, nestedSelections } = args
-  const isGold = isStartingGoldOptionId(optionId)
+  const { draft, optionId, choiceSetId, nestedSelections, characterClass } = args
+  const option = characterClass.characterCreation?.startingEquipment?.options.find(
+    (entry) => entry.id === optionId,
+  )
+  const mode = option ? resolveEquipmentModeFromOption(option) : 'package'
 
   return {
     choiceSelections: {
@@ -457,7 +472,7 @@ export function buildEquipmentSelectionPatch(args: {
       [choiceSetId]: [optionId],
     },
     equipment: {
-      mode: isGold ? 'gold' : 'package',
+      mode,
       purchases: draft.equipment?.purchases ?? [],
       removedPackageItemKeys: [],
       customized: draft.equipment?.customized ?? false,
@@ -476,12 +491,15 @@ export function shouldShowEquipmentBudget(
 export function shouldShowEquipmentShopping(
   draft: CharacterBuilderDraft,
   selectedOptionId: string | undefined,
+  characterClass?: CharacterClass,
 ): boolean {
-  return (
-    selectedOptionId !== undefined &&
-    isStartingGoldOptionId(selectedOptionId) &&
-    !draft.equipment?.skipped
+  if (selectedOptionId === undefined || draft.equipment?.skipped) return false
+
+  const option = characterClass?.characterCreation?.startingEquipment?.options.find(
+    (entry) => entry.id === selectedOptionId,
   )
+
+  return option ? isStartingGoldOption(option) : isStartingGoldOptionId(selectedOptionId)
 }
 
 export function resolvePurchaseSourceMode(): CharacterBuilderDraftEquipmentPurchase['sourceMode'] {
@@ -492,11 +510,9 @@ export function resolveEquipmentStepBudget(
   draft: CharacterBuilderDraft,
   catalogIndex: CharacterBuildCatalogIndex,
   context?: CharacterBuildContext,
-  resolvedGoldOptionWealthByOptionId?: ReadonlyMap<string, CharacterWealth>,
 ): EquipmentBudgetSummary | undefined {
   return deriveEquipmentBudgetSummary(draft, catalogIndex, {
     startingWealth: context?.characterCreationRules.startingWealth,
-    resolvedGoldOptionWealthByOptionId,
   })
 }
 

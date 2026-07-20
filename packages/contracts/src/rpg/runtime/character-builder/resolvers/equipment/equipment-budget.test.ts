@@ -11,11 +11,11 @@ import {
 import { indexCharacterBuildCatalog } from '../../context'
 import { createEmptyCharacterBuilderDraft } from '../../draft'
 import { startingEquipmentChoiceSetId } from './resolve-starting-equipment-choice-sets'
+import { deriveEquipmentBudgetSummary, maxAffordableEquipmentQuantity } from './equipment-budget'
 import {
-  deriveEquipmentBudgetSummary,
-  maxAffordableEquipmentQuantity,
-  resolveStartingGoldOptionWealthByOptionId,
-} from './equipment-budget'
+  deriveEquipmentBudgetSummaryFromFunding,
+  resolveStartingEquipmentFundingOptions,
+} from './resolve-starting-equipment-funding'
 
 const RULESET = 'srd-cc-5.2.1' as const
 
@@ -60,7 +60,9 @@ const storedDruid: ClassStored = {
         {
           id: 'standard',
           label: 'Standard Equipment',
-          items: [],
+          items: [
+            { kind: 'grant', target: { source: 'equipment', equipmentSlug: 'rope' }, quantity: 1 },
+          ],
           wealth: { gp: 9, sp: 5, cp: 3 },
         },
         {
@@ -127,7 +129,7 @@ describe('deriveEquipmentBudgetSummary', () => {
   })
 })
 
-describe('resolveStartingGoldOptionWealthByOptionId', () => {
+describe('resolveStartingEquipmentFundingOptions', () => {
   it('includes tier bonus for wealth-only options', () => {
     const catalogIndex = indexCharacterBuildCatalog({
       species: [],
@@ -138,13 +140,14 @@ describe('resolveStartingGoldOptionWealthByOptionId', () => {
       languages: [],
     })
 
-    const characterClass = catalogIndex.classes.get(storedDruid.id)!
     const draft = {
       ...createEmptyCharacterBuilderDraft(),
       class: { classId: storedDruid.id, level: 5 as const },
     }
 
-    const wealthByOptionId = resolveStartingGoldOptionWealthByOptionId(characterClass, draft, {
+    const fundingByOptionId = resolveStartingEquipmentFundingOptions({
+      draft,
+      catalogIndex,
       startingWealth: {
         name: 'Tier bonus',
         scope: { kind: 'standard' },
@@ -170,7 +173,104 @@ describe('resolveStartingGoldOptionWealthByOptionId', () => {
       },
     })
 
-    expect(wealthToCopper(wealthByOptionId.get('gold')!)).toBe(15_000)
+    expect(wealthToCopper(fundingByOptionId.get('gold')!.totalStartingWealth)).toBe(15_000)
+  })
+
+  it('keeps tier delta equal to class-option wealth delta', () => {
+    const catalogIndex = indexCharacterBuildCatalog({
+      species: [],
+      classes: [storedDruid],
+      spells: [],
+      equipment: [rope],
+      skillProficiencies: [],
+      languages: [],
+    })
+
+    const draft = {
+      ...createEmptyCharacterBuilderDraft(),
+      class: { classId: storedDruid.id, level: 19 as const },
+    }
+
+    const startingWealth = {
+      name: 'Legend tier',
+      scope: { kind: 'standard' as const },
+      tiers: [
+        {
+          id: 'legend',
+          label: 'Legend',
+          minLevel: 19,
+          maxLevel: 20,
+          includeNormalStartingEquipment: true,
+          magicItemGrants: [],
+          bonusGold: {
+            baseGp: 21_375,
+            formula: {
+              kind: 'dice' as const,
+              dice: { count: 1, faces: 6 as const },
+              multiplier: 0,
+              currency: 'gp' as const,
+            },
+          },
+        },
+      ],
+    }
+
+    const fundingByOptionId = resolveStartingEquipmentFundingOptions({
+      draft,
+      catalogIndex,
+      startingWealth,
+    })
+
+    const standard = fundingByOptionId.get('standard')!
+    const gold = fundingByOptionId.get('gold')!
+
+    expect(
+      wealthToCopper(gold.totalStartingWealth) - wealthToCopper(standard.totalStartingWealth),
+    ).toBe(wealthToCopper(gold.classOptionWealth) - wealthToCopper(standard.classOptionWealth))
+  })
+})
+
+describe('deriveEquipmentBudgetSummaryFromFunding', () => {
+  it('matches deriveEquipmentBudgetSummary for the same snapshot', () => {
+    const catalogIndex = indexCharacterBuildCatalog({
+      species: [],
+      classes: [storedDruid],
+      spells: [],
+      equipment: [rope],
+      skillProficiencies: [],
+      languages: [],
+    })
+
+    const draft = {
+      ...createEmptyCharacterBuilderDraft(),
+      class: { classId: storedDruid.id, level: 1 as const },
+      choiceSelections: {
+        [startingEquipmentChoiceSetId(storedDruid.id)]: ['gold'],
+      },
+      equipment: {
+        mode: 'gold' as const,
+        purchases: [
+          {
+            equipmentId: rope.id,
+            quantity: 1,
+            sourceMode: 'startingGold' as const,
+            origin: 'picker' as const,
+          },
+        ],
+        removedPackageItemKeys: [],
+        customized: false,
+      },
+    }
+
+    const funding = resolveStartingEquipmentFundingOptions({ draft, catalogIndex }).get('gold')!
+    const fromFunding = deriveEquipmentBudgetSummaryFromFunding({
+      funding,
+      purchases: draft.equipment.purchases,
+      catalogIndex,
+    })
+    const fromDraft = deriveEquipmentBudgetSummary(draft, catalogIndex)
+
+    expect(fromFunding).toEqual(fromDraft)
   })
 })
 
