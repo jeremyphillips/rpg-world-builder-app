@@ -4,6 +4,7 @@ import type { ClassStored } from '../../../../content/classes/class'
 import { wealthToCopper } from '../../../../primitives/wealth'
 import { indexCharacterBuildCatalog } from '../../context'
 import { createEmptyCharacterBuilderDraft } from '../../draft'
+import { evaluateEquipmentPackageSwitch } from '../../equipment-package-switch'
 import { startingEquipmentChoiceSetId } from './resolve-starting-equipment-choice-sets'
 import { deriveEquipmentBudgetSummary } from './equipment-budget'
 import { resolveEquipmentStepModel } from './resolve-equipment-step-model'
@@ -118,6 +119,53 @@ describe('resolveEquipmentStepModel', () => {
     expect(stepModel?.budget?.starting).toEqual(finalizedBudget?.starting)
     expect(wealthToCopper(stepModel?.budget?.starting ?? { cp: 0, sp: 0, gp: 0, pp: 0 })).toBe(
       2_145_000,
+    )
+  })
+
+  it('agrees with package-switch target allowance for the alternate option', () => {
+    const catalogIndex = indexCharacterBuildCatalog({
+      species: [],
+      classes: [storedBarbarian],
+      spells: [],
+      equipment: [],
+      skillProficiencies: [],
+      languages: [],
+    })
+
+    const draft = {
+      ...createEmptyCharacterBuilderDraft(),
+      class: { classId: storedBarbarian.id, level: 19 as const },
+      choiceSelections: {
+        [startingEquipmentChoiceSetId(storedBarbarian.id)]: ['standard'],
+      },
+      equipment: {
+        mode: 'package' as const,
+        purchases: [],
+        removedPackageItemKeys: [],
+        customized: false,
+      },
+    }
+
+    const stepModel = resolveEquipmentStepModel({
+      draft,
+      catalogIndex,
+      startingWealth: legendStartingWealth,
+      includeBudget: true,
+    })
+
+    const targetFunding = stepModel!.fundingByOptionId.get('gold')!
+    const evaluation = evaluateEquipmentPackageSwitch({
+      draft,
+      catalogIndex,
+      targetOptionId: 'gold',
+      targetFunding,
+    })
+
+    expect(evaluation?.budget.targetAllowanceCp).toBe(
+      wealthToCopper(targetFunding.totalStartingWealth),
+    )
+    expect(stepModel?.budget?.starting).toEqual(
+      stepModel?.fundingByOptionId.get('standard')?.totalStartingWealth,
     )
   })
 })

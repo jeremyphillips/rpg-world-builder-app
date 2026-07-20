@@ -17,6 +17,7 @@ import {
   buildChoiceSetId,
   createEmptyCharacterBuilderDraft,
   indexCharacterBuildCatalog,
+  isStartingGoldOption,
   startingEquipmentChoiceSetId,
   startingEquipmentGrantProficiencyChoiceId,
   type CharacterClass,
@@ -823,7 +824,7 @@ describe('SRD 5.2.1 class seed', () => {
     ])
   })
 
-  it('gold alternatives match SRD starting wealth amounts', () => {
+  it('wealth-only starting-gold alternatives match SRD starting wealth amounts', () => {
     const expectedGoldGp: Record<string, number> = {
       barbarian: 75,
       bard: 90,
@@ -841,8 +842,8 @@ describe('SRD 5.2.1 class seed', () => {
 
     for (const cls of classes) {
       const startingEquipment = cls.characterCreation?.startingEquipment
-      const goldOption = startingEquipment?.options.find((option) => option.id === 'gold')
-      expect(goldOption, `${cls.slug} missing gold starting equipment option`).toBeDefined()
+      const goldOption = startingEquipment?.options.find(isStartingGoldOption)
+      expect(goldOption, `${cls.slug} missing wealth-only starting equipment option`).toBeDefined()
       expect(goldOption!.wealth).toEqual({ gp: expectedGoldGp[cls.slug] })
     }
   })

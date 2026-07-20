@@ -9,3 +9,5 @@ export const startingEquipmentOptionSummaryTitleClasses =
   'mb-3 font-heading heading-style-subsection text-foreground'
 
 export const startingEquipmentOptionSummaryDescriptionClasses = 'text-md text-muted-foreground'
+
+export const startingEquipmentOptionSummaryFundingLineClasses = 'mt-1 text-sm text-muted-foreground'

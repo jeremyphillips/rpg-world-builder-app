@@ -55,7 +55,10 @@ describe('ClassCharacterCreationTab', () => {
     render(<TabShell />)
     expect(screen.getAllByText('Character chooses').length).toBeGreaterThanOrEqual(1)
     expect(screen.getByText('Skill Proficiencies from:')).toBeInTheDocument()
-    expect(screen.getByText(/Define the class’s baseline starting options/i)).toBeInTheDocument()
+    expect(
+      screen.getByText(/Define the class's baseline equipment and wealth/i),
+    ).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Class starting options' })).toBeInTheDocument()
     expect(screen.getByText(/No starting equipment yet/i)).toBeInTheDocument()
   })
 

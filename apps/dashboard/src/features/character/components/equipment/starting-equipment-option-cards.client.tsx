@@ -2,13 +2,14 @@
 
 import { useMemo, useState } from 'react'
 
-import type {
-  CharacterBuilderDraft,
-  CharacterBuildCatalogIndex,
-  CharacterClass,
-  ChoiceSet,
-  StartingEquipmentOption,
-  StartingEquipmentOptionSummary,
+import {
+  isStartingGoldOption,
+  type CharacterBuilderDraft,
+  type CharacterBuildCatalogIndex,
+  type CharacterClass,
+  type ChoiceSet,
+  type StartingEquipmentOption,
+  type StartingEquipmentOptionSummary,
 } from '@rpg/contracts'
 import { ComboboxField, RadioCardItem, RadioGroup, Text, cn } from '@rpg/ui'
 
@@ -18,13 +19,12 @@ import {
   EQUIPMENT_INCLUDED_TOOL_RESOLVED_ANNOTATION,
   EQUIPMENT_INCLUDED_TOOL_SECTION_LABEL,
   EQUIPMENT_INVALID_PROFICIENCY_LINK_MESSAGE,
-  STARTING_EQUIPMENT_GOLD_OPTION_ID,
   areNestedPoolsResolved,
   findChoiceSetById,
-  isStartingGoldOptionId,
   listNestedPoolsForOption,
   listProficiencyLinksForOption,
   resolveProficiencyLinkFieldState,
+  startingEquipmentOptionFundingSummaryLines,
   type StartingEquipmentNestedPool,
 } from '../../lib/equipment-step.lib'
 import {
@@ -210,6 +210,7 @@ function PackageOptionCard({
         disabled={disabled}
         label={summary.label}
         description={summary.description}
+        summaryLines={startingEquipmentOptionFundingSummaryLines(summary)}
         className={startingEquipmentOptionCardRadioItemClasses}
         titleClassName={startingEquipmentOptionCardTitleClasses}
         onClick={() => {
@@ -295,7 +296,7 @@ function PackageOptionCard({
   )
 }
 
-function GoldOptionCard({
+function StartingGoldOptionCard({
   summary,
   selectedOptionId,
   isPackageChooserExpanded,
@@ -320,6 +321,7 @@ function GoldOptionCard({
         disabled={!summary.isSelectable}
         label={summary.label}
         description={summary.description}
+        summaryLines={startingEquipmentOptionFundingSummaryLines(summary)}
         className={startingEquipmentOptionCardRadioItemClasses}
         titleClassName={startingEquipmentOptionCardTitleClasses}
         onClick={() => {
@@ -357,10 +359,15 @@ export function StartingEquipmentOptionCards({
     {},
   )
 
-  const packageSummaries = summaries.filter((summary) => !isStartingGoldOptionId(summary.optionId))
-  const goldSummary = summaries.find(
-    (summary) => summary.optionId === STARTING_EQUIPMENT_GOLD_OPTION_ID,
+  const options = characterClass.characterCreation?.startingEquipment?.options ?? []
+  const goldOption = options.find(isStartingGoldOption)
+  const packageOptionIds = new Set(
+    options.filter((option) => !isStartingGoldOption(option)).map((option) => option.id),
   )
+  const packageSummaries = summaries.filter((summary) => packageOptionIds.has(summary.optionId))
+  const goldSummary = goldOption
+    ? summaries.find((summary) => summary.optionId === goldOption.id)
+    : undefined
 
   const handleNestedPoolChange: StartingEquipmentOptionCardsProps['onNestedPoolChange'] = (
     optionId,
@@ -413,7 +420,7 @@ export function StartingEquipmentOptionCards({
       ))}
 
       {goldSummary ? (
-        <GoldOptionCard
+        <StartingGoldOptionCard
           summary={goldSummary}
           selectedOptionId={selectedOptionId}
           isPackageChooserExpanded={isPackageChooserExpanded}

@@ -5,6 +5,7 @@ import type { EquipmentPool } from '../../../../content/lib/equipment-grant'
 import type { StartingEquipmentOption } from '../../../../content/starting-equipment'
 import {
   isProficiencyLinkedStartingEquipmentGrant,
+  isStartingGoldOption,
   isWealthOnlyStartingEquipmentOption,
   startingEquipmentGrantEquipmentSlug,
   startingEquipmentGrantProficiencyChoiceId,
@@ -26,17 +27,17 @@ import {
 import { equipmentPoolSummaryLabel } from './equipment-pool-choice-options'
 import {
   formatStartingEquipmentPackageDescription,
+  formatStartingEquipmentTierAdjustment,
+  formatStartingEquipmentTotalWealthLabel,
   formatStartingGoldOptionDescription,
+  type StartingEquipmentTierAdjustment,
 } from './format-starting-equipment-option-description'
+import { type ResolvedStartingEquipmentFunding } from './resolve-starting-equipment-funding'
 import { resolveProficiencyLinkedEquipmentGrant } from './resolve-proficiency-linked-equipment-grant'
 
 /** Pre-resolved display inputs for starting-equipment summaries. No campaign policy inside. */
 export type StartingEquipmentSummaryContext = {
-  fundingByOptionId?: ReadonlyMap<
-    string,
-    import('./resolve-starting-equipment-funding').ResolvedStartingEquipmentFunding
-  >
-  resolvedGoldOptionWealthByOptionId?: ReadonlyMap<string, CharacterWealth>
+  fundingByOptionId?: ReadonlyMap<string, ResolvedStartingEquipmentFunding>
 }
 
 export const STARTING_EQUIPMENT_MISSING_ITEM_MESSAGE = 'Missing from catalog'
@@ -79,6 +80,7 @@ export type StartingEquipmentOptionSummaryItem =
 export type StartingEquipmentOptionSummary = {
   optionId: string
   label: string
+  /** Class baseline content only — tier additions live in structured fields below. */
   description?: string
   wealth?: CharacterWealthGrant
   orderedItems: readonly StartingEquipmentOptionSummaryItem[]
@@ -86,6 +88,24 @@ export type StartingEquipmentOptionSummary = {
   missingItemSlugs: string[]
   unselectableReasons: readonly string[]
   isSelectable: boolean
+  tierAdjustment?: StartingEquipmentTierAdjustment
+  totalStartingWealthLabel?: string
+  funding: ResolvedStartingEquipmentFunding
+}
+
+const EMPTY_WEALTH: CharacterWealth = { cp: 0, sp: 0, gp: 0, pp: 0 }
+
+function baselineFundingForOption(
+  option: StartingEquipmentOption,
+): ResolvedStartingEquipmentFunding {
+  const classOptionWealth = characterWealthFromGrant(option.wealth)
+  return {
+    classOptionId: option.id,
+    classOptionWealth,
+    tierAdditionalWealth: EMPTY_WEALTH,
+    totalStartingWealth: classOptionWealth,
+    classOptionPolicy: 'included',
+  }
 }
 
 const EMPTY_ITEMS_BY_GROUP = (): Record<
@@ -345,16 +365,12 @@ function summarizeOptionItems(args: {
 function startingEquipmentOptionDescription(args: {
   option: StartingEquipmentOption
   orderedItems: readonly StartingEquipmentOptionSummaryItem[]
-  context?: StartingEquipmentSummaryContext
 }): string | undefined {
-  const { option, orderedItems, context } = args
+  const { option, orderedItems } = args
 
   if (isWealthOnlyStartingEquipmentOption(option)) {
     return formatStartingGoldOptionDescription({
-      wealth:
-        context?.fundingByOptionId?.get(option.id)?.totalStartingWealth ??
-        context?.resolvedGoldOptionWealthByOptionId?.get(option.id) ??
-        characterWealthFromGrant(option.wealth!),
+      wealth: characterWealthFromGrant(option.wealth!),
     })
   }
 
@@ -373,17 +389,32 @@ function summarizeOption(
 ): StartingEquipmentOptionSummary {
   const { orderedItems, itemsByGroup, missingItemSlugs, unselectableReasons } =
     summarizeOptionItems({ option, characterClass, catalogIndex, draft })
+  const funding = context?.fundingByOptionId?.get(option.id) ?? baselineFundingForOption(option)
+  const goldOption = isStartingGoldOption(option)
+  const tierAdjustment = formatStartingEquipmentTierAdjustment({
+    tierLabel: funding.tierLabel,
+    tierAdditionalWealth: funding.tierAdditionalWealth,
+  })
+  const totalStartingWealthLabel = tierAdjustment
+    ? formatStartingEquipmentTotalWealthLabel({
+        totalStartingWealth: funding.totalStartingWealth,
+        isStartingGoldOption: goldOption,
+      })
+    : undefined
 
   return {
     optionId: option.id,
     label: option.label,
-    description: startingEquipmentOptionDescription({ option, orderedItems, context }),
+    description: startingEquipmentOptionDescription({ option, orderedItems }),
     wealth: option.wealth,
     orderedItems,
     itemsByGroup,
     missingItemSlugs,
     unselectableReasons,
     isSelectable: unselectableReasons.length === 0,
+    tierAdjustment,
+    totalStartingWealthLabel,
+    funding,
   }
 }
 

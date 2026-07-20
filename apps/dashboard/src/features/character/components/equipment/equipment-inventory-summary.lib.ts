@@ -2,17 +2,19 @@ import {
   characterWealthFromGrant,
   formatEquipmentInventoryPriceLine,
   formatWealth,
+  isStartingGoldOption,
   readSelectedStartingEquipmentOptionId,
   resolveGoldStartingEquipmentAlternative,
   type CharacterBuildCatalogIndex,
   type CharacterBuilderDraft,
   type CharacterEquipment,
   type CharacterWealthGrant,
+  type ClassOptionPolicy,
   type EquipmentBudgetSummary,
 } from '@rpg/contracts'
 
 import {
-  isStartingGoldOptionId,
+  EQUIPMENT_CLASS_OPTIONS_REPLACED_MESSAGE,
   listEquipmentInventoryRowsFromDraft,
   type EquipmentInventoryRow,
   type PackageCustomizeAffordance,
@@ -246,6 +248,7 @@ export function buildEquipmentInventoryLayout(
   draft: CharacterBuilderDraft,
   catalogIndex: CharacterBuildCatalogIndex,
   budget?: EquipmentBudgetSummary,
+  classOptionPolicy: ClassOptionPolicy = 'included',
 ): EquipmentInventoryLayout | undefined {
   const classId = draft.class.classId
   if (!classId) return undefined
@@ -258,7 +261,7 @@ export function buildEquipmentInventoryLayout(
   const option = startingEquipment.options.find((entry) => entry.id === selectedOptionId)
   if (!option) return undefined
 
-  const isGoldPath = draft.equipment?.mode === 'gold' || isStartingGoldOptionId(selectedOptionId)
+  const isGoldPath = draft.equipment?.mode === 'gold' || isStartingGoldOption(option)
   const allRows = listEquipmentInventoryRowsFromDraft(draft, catalogIndex, budget)
   const packageRows = allRows.filter((row) => row.removeTarget?.kind === 'package')
   const purchasedRows = allRows.filter((row) => row.removeTarget?.kind === 'purchase')
@@ -270,8 +273,13 @@ export function buildEquipmentInventoryLayout(
   }
 
   const goldAlternative = resolveGoldStartingEquipmentAlternative(startingEquipment.options)
-  const customize: PackageCustomizeAffordance =
-    goldAlternative.status === 'available'
+  const classOptionsReplaced = classOptionPolicy === 'replaced'
+  const customize: PackageCustomizeAffordance = classOptionsReplaced
+    ? {
+        status: 'disabled',
+        reason: EQUIPMENT_CLASS_OPTIONS_REPLACED_MESSAGE,
+      }
+    : goldAlternative.status === 'available'
       ? { status: 'available' }
       : { status: 'disabled', reason: goldAlternative.reason }
 

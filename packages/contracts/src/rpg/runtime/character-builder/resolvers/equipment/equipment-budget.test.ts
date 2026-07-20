@@ -176,6 +176,56 @@ describe('resolveStartingEquipmentFundingOptions', () => {
     expect(wealthToCopper(fundingByOptionId.get('gold')!.totalStartingWealth)).toBe(15_000)
   })
 
+  it('marks funding inactive and tier-only when class options are replaced', () => {
+    const catalogIndex = indexCharacterBuildCatalog({
+      species: [],
+      classes: [storedDruid],
+      spells: [],
+      equipment: [rope],
+      skillProficiencies: [],
+      languages: [],
+    })
+
+    const draft = {
+      ...createEmptyCharacterBuilderDraft(),
+      class: { classId: storedDruid.id, level: 19 as const },
+    }
+
+    const fundingByOptionId = resolveStartingEquipmentFundingOptions({
+      draft,
+      catalogIndex,
+      startingWealth: {
+        name: 'Legend',
+        scope: { kind: 'standard' },
+        tiers: [
+          {
+            id: 'legend',
+            label: 'Legend',
+            minLevel: 19,
+            maxLevel: 20,
+            includeNormalStartingEquipment: false,
+            magicItemGrants: [],
+            bonusGold: {
+              baseGp: 21_375,
+              formula: {
+                kind: 'dice',
+                dice: { count: 1, faces: 6 },
+                multiplier: 0,
+                currency: 'gp',
+              },
+            },
+          },
+        ],
+      },
+    })
+
+    const gold = fundingByOptionId.get('gold')!
+    expect(gold.classOptionPolicy).toBe('replaced')
+    expect(gold.classOptionId).toBeUndefined()
+    expect(wealthToCopper(gold.classOptionWealth)).toBe(0)
+    expect(wealthToCopper(gold.totalStartingWealth)).toBe(2_137_500)
+  })
+
   it('keeps tier delta equal to class-option wealth delta', () => {
     const catalogIndex = indexCharacterBuildCatalog({
       species: [],

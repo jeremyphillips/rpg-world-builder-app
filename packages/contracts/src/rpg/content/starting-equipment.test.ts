@@ -126,6 +126,31 @@ describe('startingEquipmentChoiceSchema', () => {
     ).toBe(false)
   })
 
+  it('rejects more than one wealth-only starting-gold option', () => {
+    const result = startingEquipmentChoiceSchema.safeParse({
+      choose: 1,
+      options: [
+        {
+          id: 'starting-gold',
+          label: 'Starting Gold',
+          items: [],
+          wealth: { gp: 75 },
+        },
+        {
+          id: 'buy-your-own-gear',
+          label: 'Buy Your Own Gear',
+          items: [],
+          wealth: { gp: 50 },
+        },
+      ],
+    })
+
+    expect(result.success).toBe(false)
+    if (!result.success) {
+      expect(result.error.issues.some((issue) => issue.message.includes('wealth-only'))).toBe(true)
+    }
+  })
+
   it('accepts structured item choices filtered by tool category', () => {
     expect(
       startingEquipmentChoiceSchema.parse({

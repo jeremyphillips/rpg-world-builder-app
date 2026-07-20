@@ -146,12 +146,12 @@ describe('formatStartingGoldOptionDescription', () => {
     ).toBe(`Take 155 GP instead of ${DEFAULT_STANDARD_EQUIPMENT_LABEL}.`)
   })
 
-  it('formats tier-adjusted wealth passed in by orchestration', () => {
+  it('keeps description on baseline wealth only (tier lines are structured separately)', () => {
     expect(
       formatStartingGoldOptionDescription({
-        wealth: { cp: 0, sp: 0, gp: 675, pp: 0 },
+        wealth: { cp: 0, sp: 0, gp: 75, pp: 0 },
       }),
-    ).toBe(`Take 675 GP instead of ${DEFAULT_STANDARD_EQUIPMENT_LABEL}.`)
+    ).toBe(`Take 75 GP instead of ${DEFAULT_STANDARD_EQUIPMENT_LABEL}.`)
   })
 })
 
@@ -205,7 +205,7 @@ describe('formatStartingEquipmentPackageDescription', () => {
 })
 
 describe('resolveStartingEquipmentOptionSummaries descriptions', () => {
-  it('derives gold option copy from resolved wealth map', () => {
+  it('keeps gold description on baseline wealth and exposes structured tier metadata', () => {
     const catalogIndex = indexCharacterBuildCatalog({
       species: [],
       classes: [storedFighter],
@@ -221,10 +221,24 @@ describe('resolveStartingEquipmentOptionSummaries descriptions', () => {
     }
 
     const summaries = resolveStartingEquipmentOptionSummaries(storedFighter, catalogIndex, draft, {
-      resolvedGoldOptionWealthByOptionId: new Map([['gold', { cp: 0, sp: 0, gp: 675, pp: 0 }]]),
+      fundingByOptionId: new Map([
+        [
+          'gold',
+          {
+            classOptionId: 'gold',
+            classOptionWealth: { cp: 0, sp: 0, gp: 155, pp: 0 },
+            tierAdditionalWealth: { cp: 0, sp: 0, gp: 600, pp: 0 },
+            totalStartingWealth: { cp: 0, sp: 0, gp: 755, pp: 0 },
+            classOptionPolicy: 'included',
+            tierLabel: 'Legend',
+          },
+        ],
+      ]),
     })
 
     const gold = summaries.find((summary) => summary.optionId === 'gold')!
-    expect(gold.description).toBe(`Take 675 GP instead of ${DEFAULT_STANDARD_EQUIPMENT_LABEL}.`)
+    expect(gold.description).toBe(`Take 155 GP instead of ${DEFAULT_STANDARD_EQUIPMENT_LABEL}.`)
+    expect(gold.tierAdjustment?.label).toBe('Legend tier adds 600 GP')
+    expect(gold.totalStartingWealthLabel).toBe('Total: 755 GP')
   })
 })

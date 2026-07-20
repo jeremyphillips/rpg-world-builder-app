@@ -1,8 +1,10 @@
 import { z } from 'zod'
 import { createElement } from 'react'
 import {
+  characterWealthFromGrant,
   choiceOptionTitle,
   defineMessage,
+  formatWealth,
   SPELLCASTING_FOCUS_GEAR_KINDS,
   SPELLCASTING_GEAR_KIND_ENTRIES,
   spellcastingFocusGearKindSchema,
@@ -30,7 +32,11 @@ import {
   INELIGIBLE_PROFICIENCY_CHOICE_ERROR,
   STARTING_EQUIPMENT_ITEM_TYPE_LABEL,
 } from './class-character-creation-link-labels'
-import { STARTING_EQUIPMENT_CHOICE_COPY } from './class-starting-equipment-form-labels'
+import {
+  STARTING_EQUIPMENT_CHOICE_COPY,
+  STARTING_EQUIPMENT_GOLD_WEALTH_HINT_PREFIX,
+  STARTING_EQUIPMENT_PACKAGE_WEALTH_HINT_PREFIX,
+} from './class-starting-equipment-form-labels'
 import {
   equipmentGrantTitle,
   equipmentGrantSummary,
@@ -158,6 +164,23 @@ export function startingEquipmentOptionTitle(
 ): string {
   if (!row) return ''
   return choiceOptionTitle({ id: row.id ?? '', label: row.label })
+}
+
+/** Master-detail eyebrow describing baseline wealth composition for an option. */
+export function startingEquipmentOptionWealthHint(
+  row: StartingEquipmentOptionForm | undefined,
+): string | undefined {
+  if (!row) return undefined
+
+  const wealth = wealthGrantMoneyFromForm(row.wealth)
+  if (!wealth) return undefined
+
+  const amount = formatWealth(characterWealthFromGrant(wealth))
+  const isWealthOnly = (row.items?.length ?? 0) === 0
+  const prefix = isWealthOnly
+    ? STARTING_EQUIPMENT_GOLD_WEALTH_HINT_PREFIX
+    : STARTING_EQUIPMENT_PACKAGE_WEALTH_HINT_PREFIX
+  return `${prefix}: ${amount}`
 }
 
 export function startingEquipmentItemTitle(

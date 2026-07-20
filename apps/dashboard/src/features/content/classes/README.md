@@ -4,7 +4,7 @@ Character classes — overview, detail (with read-only progression table), and s
 
 Part of the [`content`](../README.md) feature; see [feature-conventions](../../../../docs/feature-conventions.md) for layout.
 
-Create/edit forms use [`TabbedForm`](../../../../../packages/ui/docs/forms.md) with tabs: **Basics**, **Proficiencies**, **Spellcasting**, **Features**, **Subclasses** (master-detail editor for per-subclass authoring — local state only until persistence is wired), and **Character creation** (starting equipment packages — always editable, including on system classes).
+Create/edit forms use [`TabbedForm`](../../../../../packages/ui/docs/forms.md) with tabs: **Basics**, **Proficiencies**, **Spellcasting**, **Features**, **Subclasses** (master-detail editor for per-subclass authoring — local state only until persistence is wired), and **Character creation** (**Class starting options** — always editable, including on system classes).
 
 The **Features** tab is a master-detail editor over the class's embedded `features` array, built on the shared content master-detail abstraction (see [`content` README](../README.md#master-detail-abstraction)): a selectable list on the left (each row shows a **Level** eyebrow), the selected feature's form on the right. It binds to the parent form via `useFieldArray`, so global save and validation are unchanged from the previous inline array. Resources remain inline below.
 

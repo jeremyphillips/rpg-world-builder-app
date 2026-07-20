@@ -6,6 +6,7 @@ import { Button, Eyebrow, Text, cn } from '@rpg/ui'
 import {
   EQUIPMENT_CHANGE_PACKAGE_LABEL,
   EQUIPMENT_SELECTED_PACKAGE_EYEBROW,
+  startingEquipmentOptionFundingSummaryLines,
 } from '../../lib/equipment-step.lib'
 import {
   startingEquipmentOptionCardSelectedShellClasses,
@@ -16,6 +17,7 @@ import {
   startingEquipmentOptionSummaryChangePackageLinkClasses,
   startingEquipmentOptionSummaryDescriptionClasses,
   startingEquipmentOptionSummaryEyebrowRowClasses,
+  startingEquipmentOptionSummaryFundingLineClasses,
   startingEquipmentOptionSummaryTitleClasses,
 } from './starting-equipment-option-summary.variants'
 
@@ -56,6 +58,11 @@ export function StartingEquipmentOptionSummaryCard({
             {summary.description}
           </Text>
         ) : null}
+        {startingEquipmentOptionFundingSummaryLines(summary).map((line) => (
+          <Text key={line} as="p" className={startingEquipmentOptionSummaryFundingLineClasses}>
+            {line}
+          </Text>
+        ))}
       </div>
     </article>
   )

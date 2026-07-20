@@ -17,6 +17,7 @@ import { equipmentStepSwitchConfirmHeadlineClasses } from './equipment-step-inte
 import {
   EquipmentStepFallback,
   EquipmentStepInventorySection,
+  EquipmentStepReplacedClassOptionsNotice,
   EquipmentStepShoppingSection,
 } from './equipment-step-sections.client'
 import { BuilderStepReadinessPanel } from './builder-step-readiness-panel.client'
@@ -78,7 +79,9 @@ export function EquipmentStepInteractive({
           <BuilderStepReadinessPanel state={readiness} />
         ) : null}
 
-        {showFallback ? (
+        {step.classOptionsReplaced ? (
+          <EquipmentStepReplacedClassOptionsNotice tierLabel={step.tierLabel} />
+        ) : showFallback ? (
           <EquipmentStepFallback
             onContinueWithout={() => onDraftChange({ equipment: buildEquipmentSkipPatch() })}
           />
@@ -106,6 +109,7 @@ export function EquipmentStepInteractive({
           catalogIndex={catalogIndex}
           budget={budget}
           goldOptionFunding={step.goldOptionFunding}
+          classOptionPolicy={step.classOptionPolicy}
           conversionEditorOpen={step.conversionEditorOpen}
           selectedPackageItemKeys={step.selectedPackageItemKeys}
           conversionCommitStatusMessage={step.conversionCommitStatusMessage}

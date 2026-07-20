@@ -32,11 +32,11 @@ const startingWealthTierItemLabel = singularizeLabel(STARTING_WEALTH_TIERS_LEGEN
 /** Starting-wealth form validation messages (tier 3 form overrides). */
 export const startingWealthValidationMessages = {
   bonusGoldRequired: defineMessage('validation.startingWealth.bonusGoldRequired', () =>
-    requiredWhenCopy('Bonus gold details', 'bonus gold is enabled'),
+    requiredWhenCopy('Additional gold details', 'additional gold is enabled'),
   ),
   bonusGoldMultiplier: defineMessage(
     'validation.startingWealth.bonusGoldMultiplier',
-    () => 'Bonus gold rolls must use a multiplier (×).',
+    () => 'Additional gold rolls must use a multiplier (×).',
   ),
 }
 
@@ -136,8 +136,8 @@ export function buildStartingWealthTiersField(): LevelRangeArrayConfig {
       {
         type: 'switch',
         name: 'includeNormalStartingEquipment',
-        label: 'Include class starting option',
-        hint: 'Characters receive their selected class option (Class → Character Creation) in addition to this tier’s bonus gold and magic-item grants. Turn this off when the tier fully replaces class starting equipment.',
+        label: 'Include selected class starting option',
+        hint: "Includes the selected class option's equipment and baseline wealth, then adds this tier's gold and magic-item grants.",
         defaultValue: true,
       },
       {
@@ -146,6 +146,7 @@ export function buildStartingWealthTiersField(): LevelRangeArrayConfig {
           type: 'switch',
           name: BONUS_GOLD_ENABLED,
           label: 'Additional gold',
+          hint: "Added to the selected class option's baseline wealth.",
           defaultValue: false,
         },
         dependents: {
@@ -169,7 +170,7 @@ export function buildStartingWealthTiersField(): LevelRangeArrayConfig {
             {
               type: 'diceFormula',
               name: 'bonusGold.formula',
-              label: 'Bonus roll',
+              label: 'Additional roll',
               modifierMode: 'required',
               modifierOperators: ['×'],
               modifierMin: 1,

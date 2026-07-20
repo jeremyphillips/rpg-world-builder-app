@@ -104,7 +104,7 @@ function resolveFundingForOption(
   const classOptionWealth = resolveClassOptionWealth(option, tier.classOptionPolicy)
 
   return {
-    classOptionId: option.id,
+    ...(tier.classOptionPolicy === 'included' ? { classOptionId: option.id } : {}),
     classOptionWealth,
     tierAdditionalWealth: tier.tierAdditionalWealth,
     totalStartingWealth: addWealth(classOptionWealth, tier.tierAdditionalWealth),

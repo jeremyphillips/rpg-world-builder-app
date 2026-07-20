@@ -110,6 +110,13 @@ export function useEquipmentStep(args: {
   )
   const fundingByOptionId =
     stepModel?.fundingByOptionId ?? new Map<string, ResolvedStartingEquipmentFunding>()
+  const classOptionPolicy =
+    stepModel?.currentFunding?.classOptionPolicy ??
+    [...fundingByOptionId.values()][0]?.classOptionPolicy ??
+    'included'
+  const classOptionsReplaced = classOptionPolicy === 'replaced'
+  const tierLabel =
+    stepModel?.currentFunding?.tierLabel ?? [...fundingByOptionId.values()][0]?.tierLabel
   const summaries = useMemo(
     () =>
       characterClass
@@ -121,9 +128,12 @@ export function useEquipmentStep(args: {
   )
   const selectedOptionId = readSelectedStartingEquipmentOption(draft, classId)
   const showFallback =
-    shouldShowEquipmentFallback(summaries) && !hasGoldStartingEquipmentOption(summaries)
+    !classOptionsReplaced &&
+    shouldShowEquipmentFallback(summaries) &&
+    !hasGoldStartingEquipmentOption(summaries)
   const showBudget = shouldShowEquipmentBudget(draft, selectedOptionId)
-  const showShopping = shouldShowEquipmentShopping(draft, selectedOptionId, characterClass)
+  const showShopping =
+    !classOptionsReplaced && shouldShowEquipmentShopping(draft, selectedOptionId, characterClass)
   const budget = useMemo(
     () => (showBudget ? resolveEquipmentStepBudget(draft, catalogIndex, context) : undefined),
     [catalogIndex, context, draft, showBudget],
@@ -361,7 +371,7 @@ export function useEquipmentStep(args: {
     optionId: string,
     nestedSelections: CharacterBuilderDraft['choiceSelections'],
   ) => {
-    if (!classId || !startingEquipmentChoiceSet) return
+    if (!classId || !startingEquipmentChoiceSet || classOptionsReplaced) return
     if (optionId === selectedOptionId) {
       setIsPackageChooserExpanded(false)
       return
@@ -397,6 +407,7 @@ export function useEquipmentStep(args: {
   }
 
   const expandPackageChooser = () => {
+    if (classOptionsReplaced) return
     setIsPackageChooserExpanded(true)
   }
 
@@ -428,6 +439,7 @@ export function useEquipmentStep(args: {
   }
 
   const openConversionEditor = (deselectedKeys: ReadonlySet<string> = new Set()) => {
+    if (classOptionsReplaced) return
     setConversionCommitStatusMessage(undefined)
     setSelectedPackageItemKeys(defaultSelectedPackageItemKeys(deselectedKeys))
     setConversionEditorOpen(true)
@@ -533,6 +545,9 @@ export function useEquipmentStep(args: {
     summaries,
     selectedOptionId,
     goldOptionFunding,
+    classOptionPolicy,
+    classOptionsReplaced,
+    tierLabel,
     showFallback,
     showBudget,
     showShopping,

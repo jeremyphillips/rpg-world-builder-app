@@ -21,6 +21,13 @@ const goldSummary = {
   missingItemSlugs: [],
   unselectableReasons: [],
   isSelectable: true,
+  funding: {
+    classOptionId: 'gold',
+    classOptionWealth: { cp: 0, sp: 0, gp: 155, pp: 0 },
+    tierAdditionalWealth: { cp: 0, sp: 0, gp: 0, pp: 0 },
+    totalStartingWealth: { cp: 0, sp: 0, gp: 155, pp: 0 },
+    classOptionPolicy: 'included' as const,
+  },
 } satisfies StartingEquipmentOptionSummary
 
 const meta = {

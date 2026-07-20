@@ -122,6 +122,24 @@ export const EQUIPMENT_INCLUDED_TOOL_RESOLVED_ANNOTATION = 'Selected for Tool Pr
 export const EQUIPMENT_INVALID_PROFICIENCY_LINK_MESSAGE =
   'The linked Tool Proficiency choice is unavailable. This class content must be corrected before the package can resolve.'
 
+export const EQUIPMENT_CLASS_OPTIONS_REPLACED_MESSAGE =
+  'Class starting options are replaced at this level.'
+
+export function formatEquipmentReplacedStartingWealthTitle(tierLabel?: string): string {
+  const label = tierLabel?.trim()
+  return label ? `${label} starting wealth` : 'Starting wealth'
+}
+
+/** Compact secondary lines for option cards / selected summary (tier + total). */
+export function startingEquipmentOptionFundingSummaryLines(
+  summary: Pick<StartingEquipmentOptionSummary, 'tierAdjustment' | 'totalStartingWealthLabel'>,
+): string[] {
+  const lines: string[] = []
+  if (summary.tierAdjustment) lines.push(summary.tierAdjustment.label)
+  if (summary.totalStartingWealthLabel) lines.push(summary.totalStartingWealthLabel)
+  return lines
+}
+
 export type EquipmentInventoryRemoveTarget =
   | { kind: 'package'; packageItemKey: string }
   | { kind: 'purchase'; purchaseId: string }

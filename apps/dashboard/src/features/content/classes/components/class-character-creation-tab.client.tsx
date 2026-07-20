@@ -14,6 +14,7 @@ import {
   STARTING_EQUIPMENT_EMPTY_MESSAGE,
   STARTING_EQUIPMENT_OPTION_NOUN,
   STARTING_EQUIPMENT_SECTION_DESCRIPTION,
+  STARTING_EQUIPMENT_SECTION_TITLE,
 } from '../lib/character-creation/class-starting-equipment-form-labels'
 import {
   STARTING_EQUIPMENT_FIELD_NAME,
@@ -21,6 +22,7 @@ import {
   startingEquipmentChooseFields,
   startingEquipmentOptionItemFields,
   startingEquipmentOptionTitle,
+  startingEquipmentOptionWealthHint,
   type StartingEquipmentForm,
   type StartingEquipmentOptionForm,
 } from '../lib/character-creation/class-starting-equipment-form-fields'
@@ -111,9 +113,13 @@ function StartingEquipmentEditor({ formCtx }: { formCtx: ContentFormCtx }) {
           namePrefix={STARTING_EQUIPMENT_FIELD_NAME}
         />
       }
-      mapListItem={({ row }) => ({
-        title: startingEquipmentOptionTitle(row as StartingEquipmentOptionForm | undefined),
-      })}
+      mapListItem={({ row }) => {
+        const option = row as StartingEquipmentOptionForm | undefined
+        return {
+          title: startingEquipmentOptionTitle(option),
+          eyebrow: startingEquipmentOptionWealthHint(option),
+        }
+      }}
     />
   )
 }
@@ -144,7 +150,7 @@ export function ClassCharacterCreationTab({ formCtx }: ClassCharacterCreationTab
       <section aria-labelledby="class-starting-equipment-heading">
         <div className="mb-4 space-y-2">
           <Heading variant="section" as="h3" id="class-starting-equipment-heading">
-            Starting equipment
+            {STARTING_EQUIPMENT_SECTION_TITLE}
           </Heading>
           <Text variant="muted" className="text-sm">
             {STARTING_EQUIPMENT_SECTION_DESCRIPTION}

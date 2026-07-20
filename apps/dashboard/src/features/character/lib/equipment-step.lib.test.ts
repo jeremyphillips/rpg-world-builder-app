@@ -98,6 +98,60 @@ describe('equipment-step.lib', () => {
     expect(isStartingGoldOptionId('standard')).toBe(false)
   })
 
+  it('enables shopping for a homebrew wealth-only option id via option shape', () => {
+    const homebrewClass = {
+      ...equipmentStepBardClassFixture,
+      characterCreation: {
+        ...equipmentStepBardClassFixture.characterCreation!,
+        startingEquipment: {
+          choose: 1 as const,
+          options: [
+            {
+              id: 'standard',
+              label: 'Standard Equipment',
+              items:
+                equipmentStepBardClassFixture.characterCreation!.startingEquipment!.options[0]!
+                  .items,
+              wealth: { gp: 15 },
+            },
+            {
+              id: 'buy-your-own-gear',
+              label: 'Buy Your Own Gear',
+              items: [],
+              wealth: { gp: 75 },
+            },
+          ],
+        },
+      },
+    }
+
+    const draft = {
+      ...createEmptyCharacterBuilderDraft(),
+      class: { classId: homebrewClass.id, level: 1 as const },
+      choiceSelections: {
+        [startingEquipmentChoiceSetId(homebrewClass.id)]: ['buy-your-own-gear'],
+      },
+      equipment: {
+        mode: 'gold' as const,
+        purchases: [],
+        removedPackageItemKeys: [],
+        customized: false,
+      },
+    }
+
+    const patch = buildEquipmentSelectionPatch({
+      draft: { ...draft, equipment: { ...draft.equipment, mode: 'package' } },
+      classId: homebrewClass.id,
+      optionId: 'buy-your-own-gear',
+      choiceSetId: startingEquipmentChoiceSetId(homebrewClass.id),
+      nestedSelections: {},
+      characterClass: homebrewClass,
+    })
+
+    expect(patch.equipment?.mode).toBe('gold')
+    expect(shouldShowEquipmentShopping(draft, 'buy-your-own-gear', homebrewClass)).toBe(true)
+  })
+
   it('aligns picker affordability with the same campaign tier bonus budget as the drawer', () => {
     const context = createEquipmentStepContextWithStartingWealth(tierBonusStartingWealthFixture)
     const draft = {
@@ -908,6 +962,12 @@ describe('equipment purchase quantity regressions', () => {
 
 describe('starting equipment fallback helpers', () => {
   it('shows fallback only when every package is unselectable and gold is absent', () => {
+    const emptyFunding = {
+      classOptionWealth: { cp: 0, sp: 0, gp: 0, pp: 0 },
+      tierAdditionalWealth: { cp: 0, sp: 0, gp: 0, pp: 0 },
+      totalStartingWealth: { cp: 0, sp: 0, gp: 0, pp: 0 },
+      classOptionPolicy: 'included' as const,
+    }
     const selectable = [
       {
         optionId: 'standard',
@@ -925,6 +985,7 @@ describe('starting equipment fallback helpers', () => {
         missingItemSlugs: [],
         unselectableReasons: [],
         isSelectable: true,
+        funding: { ...emptyFunding, classOptionId: 'standard' },
       },
     ]
 
@@ -948,6 +1009,7 @@ describe('starting equipment fallback helpers', () => {
         missingItemSlugs: ['cloak'],
         unselectableReasons: ['cloak: Missing from catalog'],
         isSelectable: false,
+        funding: { ...emptyFunding, classOptionId: 'broken' },
       },
     ]
 
