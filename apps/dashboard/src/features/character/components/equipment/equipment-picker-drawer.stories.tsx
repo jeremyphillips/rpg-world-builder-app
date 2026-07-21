@@ -13,7 +13,6 @@ import {
   equipmentPickerMagicItemsFixture,
   equipmentPickerRopeFixture,
 } from './equipment-picker-drawer.fixtures'
-import { EQUIPMENT_PICKER_PURCHASE_ADD_ANOTHER_LABEL } from './equipment-picker-purchase.lib'
 
 const meta = {
   title: 'Character Builder/EquipmentPickerDrawer',
@@ -151,7 +150,7 @@ export const OwnedStackable: Story = {
   parameters: {
     docs: {
       description: {
-        story: `Owned stackables show ${EQUIPMENT_PICKER_PURCHASE_ADD_ANOTHER_LABEL} in the header rail.`,
+        story: 'Owned stackables show an owned-count badge and Add in the header row.',
       },
     },
   },

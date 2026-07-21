@@ -97,7 +97,7 @@ export const collapsibleListItemMainClasses = 'min-w-0 pt-[calc(var(--spacing)*2
 /** Toolbar + actions on one row when actions center on the title row only. */
 export const collapsibleListItemHeaderRowClasses = cn(
   'flex w-full min-w-0 items-center gap-2',
-  'pt-[calc(var(--spacing)*2)]',
+  'py-[calc(var(--spacing)*2)]',
 )
 
 /** Summary below the header row — left indent matches body/content column. */

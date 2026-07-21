@@ -22,6 +22,36 @@ describe('Button', () => {
     expect(button).toHaveClass('h-8')
   })
 
+  it('applies compact density heights for each size', () => {
+    const { rerender } = render(
+      <Button size="sm" density="compact">
+        Compact
+      </Button>,
+    )
+    expect(screen.getByRole('button', { name: 'Compact' })).toHaveClass('h-6')
+
+    rerender(
+      <Button size="default" density="compact">
+        Compact
+      </Button>,
+    )
+    expect(screen.getByRole('button', { name: 'Compact' })).toHaveClass('h-8')
+
+    rerender(
+      <Button size="lg" density="compact">
+        Compact
+      </Button>,
+    )
+    expect(screen.getByRole('button', { name: 'Compact' })).toHaveClass('h-9')
+
+    rerender(
+      <Button size="icon" density="compact" aria-label="Icon action">
+        <span aria-hidden>+</span>
+      </Button>,
+    )
+    expect(screen.getByRole('button', { name: 'Icon action' })).toHaveClass('size-8')
+  })
+
   it('applies outline button chrome from token recipes', () => {
     render(<Button variant="outline">Cancel</Button>)
     const button = screen.getByRole('button', { name: 'Cancel' })

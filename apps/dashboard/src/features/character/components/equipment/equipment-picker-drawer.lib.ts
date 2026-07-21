@@ -14,6 +14,11 @@ import {
 
 import { normalizeSearchQuery, scoreItem } from '@rpg/ui'
 
+import { buildEquipmentPickerRowViewModel } from '@/features/content'
+
+import { getEquipmentPickerCallout } from './equipment-picker-callout.lib'
+import type { EquipmentPickerRowActionViewModel } from './equipment-picker-action.lib'
+import type { EquipmentPickerItemHeaderProps } from './equipment-picker-item-header.client'
 import {
   EQUIPMENT_PICKER_KIND_ALL,
   EQUIPMENT_PICKER_NOT_PURCHASABLE_LABEL,
@@ -415,4 +420,39 @@ export function getEquipmentPickerDisabledNote(
   }
 
   return undefined
+}
+
+export function resolveEquipmentPickerDrawerItemHeaderProps(args: {
+  item: EquipmentPickerItem
+  isGoldShoppingPath: boolean
+  isMagicItemsWorkflow: boolean
+  ownedGrantQuantities: Readonly<Record<string, number>>
+  ownedPurchaseQuantities: Readonly<Record<string, number>>
+  rowActionVm?: EquipmentPickerRowActionViewModel
+  onQuickAdd: (item: EquipmentPickerItem) => void
+}): Pick<
+  EquipmentPickerItemHeaderProps,
+  'item' | 'callout' | 'disabled' | 'priceLabel' | 'ownedQuantity' | 'onAdd'
+> {
+  const row = buildEquipmentPickerRowViewModel(args.item.equipment)
+  const callout = getEquipmentPickerCallout(args.item, {
+    isGoldShoppingPath: args.isGoldShoppingPath,
+  })
+  const disabled = args.rowActionVm
+    ? args.rowActionVm.disabled
+    : isEquipmentPickerItemDisabled(args.item)
+  const ownedQuantity = args.isMagicItemsWorkflow
+    ? (args.ownedGrantQuantities[args.item.equipment.id] ?? 0)
+    : (args.ownedPurchaseQuantities[args.item.equipment.id] ?? 0)
+  const hidePurchaseChrome =
+    args.isMagicItemsWorkflow || args.rowActionVm?.kind === 'magic_item_grant'
+
+  return {
+    item: row,
+    callout,
+    disabled,
+    priceLabel: hidePurchaseChrome ? undefined : row.priceLabel,
+    ownedQuantity,
+    onAdd: hidePurchaseChrome ? undefined : () => args.onQuickAdd(args.item),
+  }
 }

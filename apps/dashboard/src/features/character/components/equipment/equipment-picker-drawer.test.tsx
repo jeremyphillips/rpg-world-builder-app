@@ -17,14 +17,12 @@ import {
   EQUIPMENT_PICKER_AFFORDABLE_NOW_LABEL,
   EQUIPMENT_PICKER_CANNOT_AFFORD_LABEL,
   EQUIPMENT_PICKER_CLEAR_FILTERS_LABEL,
-  EQUIPMENT_PICKER_OWNED_QUANTITY_LABEL_PREFIX,
   EQUIPMENT_PICKER_RESET_VIEW_LABEL,
   EQUIPMENT_PICKER_SORT_LABEL,
   EQUIPMENT_PICKER_STARTING_OPTION_LABEL,
   type EquipmentPickerItem,
 } from './equipment-picker-drawer.types'
 import {
-  EQUIPMENT_PICKER_PURCHASE_ADD_ANOTHER_LABEL,
   EQUIPMENT_PICKER_PURCHASE_COMMIT_LABEL,
   EQUIPMENT_PICKER_PURCHASE_REMOVE_ALL_LABEL,
   EQUIPMENT_PICKER_PURCHASE_REMOVE_ONE_LABEL,
@@ -554,7 +552,7 @@ describe('EquipmentPickerDrawer', () => {
     expect(onAddItem).toHaveBeenCalledWith(ropeRow, 3)
   })
 
-  it('shows owned quantity and Add another for owned stackables', async () => {
+  it('shows owned quantity badge and Add for owned stackables', async () => {
     const user = userEvent.setup()
     const onAddItem = vi.fn()
     const ropeRow = equipmentPickerItemsFixture[2]!
@@ -571,12 +569,9 @@ describe('EquipmentPickerDrawer', () => {
       />,
     )
 
-    expect(
-      screen.getByText(`${EQUIPMENT_PICKER_OWNED_QUANTITY_LABEL_PREFIX} 2`),
-    ).toBeInTheDocument()
-    await user.click(
-      screen.getByRole('button', { name: EQUIPMENT_PICKER_PURCHASE_ADD_ANOTHER_LABEL }),
-    )
+    const addButton = screen.getByRole('button', { name: 'Add' })
+    expect(addButton.parentElement).toHaveTextContent('2')
+    await user.click(addButton)
     expect(onAddItem).toHaveBeenCalledWith(ropeRow, 1)
   })
 
@@ -612,7 +607,7 @@ describe('EquipmentPickerDrawer', () => {
     expect(onRemoveFromInventory).toHaveBeenCalledWith(ropeRow)
   })
 
-  it('shows owned stackable header controls for owned items while stack rules are permissive', () => {
+  it('shows owned quantity badge and Add for owned items while stack rules are permissive', () => {
     const longsword = equipmentPickerItemsFixture[0]!
 
     render(
@@ -626,12 +621,9 @@ describe('EquipmentPickerDrawer', () => {
       />,
     )
 
-    expect(
-      screen.getByText(`${EQUIPMENT_PICKER_OWNED_QUANTITY_LABEL_PREFIX} 1`),
-    ).toBeInTheDocument()
-    expect(
-      screen.getByRole('button', { name: EQUIPMENT_PICKER_PURCHASE_ADD_ANOTHER_LABEL }),
-    ).toBeInTheDocument()
+    const addButton = screen.getByRole('button', { name: 'Add' })
+    expect(addButton.parentElement).toHaveTextContent('1')
+    expect(addButton).toBeInTheDocument()
   })
 
   it('excludes vehicle and service rows from search results and category filter', () => {

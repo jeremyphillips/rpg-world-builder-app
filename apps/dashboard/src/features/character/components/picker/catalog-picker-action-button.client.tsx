@@ -8,6 +8,7 @@ export type CatalogPickerActionButtonProps = {
   onClick: () => void
   variant?: ButtonProps['variant']
   size?: ButtonProps['size']
+  density?: ButtonProps['density']
   className?: string
 }
 
@@ -18,6 +19,7 @@ export function CatalogPickerActionButton({
   onClick,
   variant = 'outline',
   size = 'sm',
+  density = 'compact',
   className,
 }: CatalogPickerActionButtonProps) {
   return (
@@ -25,6 +27,7 @@ export function CatalogPickerActionButton({
       type="button"
       variant={variant}
       size={size}
+      density={density}
       className={className}
       disabled={disabled}
       onClick={onClick}

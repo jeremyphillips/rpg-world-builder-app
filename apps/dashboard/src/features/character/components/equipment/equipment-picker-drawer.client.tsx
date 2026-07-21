@@ -18,8 +18,6 @@ import {
   isEquipmentStackable,
 } from '@rpg/contracts'
 
-import { buildEquipmentPickerRowViewModel } from '@/features/content'
-
 import { CatalogPickerFilterCheckbox } from '../picker/catalog-picker-filter-checkbox.client'
 import { catalogPickerShellProps } from '../picker/catalog-picker-shell.lib'
 import { CatalogSortControl } from '../picker/catalog-sort-control.client'
@@ -36,10 +34,9 @@ import {
   getEquipmentPickerItemTab,
   hasEquipmentPickerClearableCriteria,
   hasEquipmentPickerResetViewCriteria,
-  isEquipmentPickerItemDisabled,
   resolveEquipmentKindFilterOptions,
+  resolveEquipmentPickerDrawerItemHeaderProps,
 } from './equipment-picker-drawer.lib'
-import { getEquipmentPickerCallout } from './equipment-picker-callout.lib'
 import type { EquipmentPickerRowActionViewModel } from './equipment-picker-action.lib'
 import {
   EQUIPMENT_PICKER_AFFORDABLE_NOW_LABEL,
@@ -65,7 +62,6 @@ import {
   type EquipmentPickerToolbarResetMode,
 } from './equipment-picker-drawer.types'
 import { EquipmentBudgetHeader } from './equipment-budget-header.client'
-import { EquipmentPickerCommerce } from './equipment-picker-commerce.client'
 import { EquipmentPickerItemDetails } from './equipment-picker-item-details.client'
 import { EquipmentPickerItemHeader } from './equipment-picker-item-header.client'
 import {
@@ -199,10 +195,6 @@ function EquipmentPickerRowSummary({
 }
 
 /** Equipment catalog drawer — thin wrapper over `CatalogPickerSheet`. */
-/**
- * Equipment picker rows compose purchase actions inside {@link EquipmentPickerItemHeader}
- * (line 3) instead of `renderItemActions` because the generic row API pins actions to row 1.
- */
 export function EquipmentPickerDrawer({
   open,
   onOpenChange,
@@ -503,38 +495,19 @@ export function EquipmentPickerDrawer({
           />
         ),
       }}
-      renderItemHeader={(item) => {
-        const row = buildEquipmentPickerRowViewModel(item.equipment)
-        const callout = getEquipmentPickerCallout(item, { isGoldShoppingPath })
-        const addQuantity = addQuantities[item.equipment.id] ?? 1
-        const rowActionVm = resolveRowVm(item, addQuantity)
-        const disabled = rowActionVm ? rowActionVm.disabled : isEquipmentPickerItemDisabled(item)
-        const ownedQuantity = isMagicItemsWorkflow
-          ? (ownedGrantQuantities[item.equipment.id] ?? 0)
-          : (ownedPurchaseQuantities[item.equipment.id] ?? 0)
-        const owned = ownedQuantity > 0
-        const stackable = isEquipmentStackable(item.equipment)
-
-        return (
-          <EquipmentPickerItemHeader
-            item={row}
-            callout={callout}
-            disabled={disabled}
-            commerce={
-              isMagicItemsWorkflow || rowActionVm?.kind === 'magic_item_grant' ? undefined : (
-                <EquipmentPickerCommerce
-                  priceLabel={row.priceLabel}
-                  owned={owned}
-                  stackable={stackable}
-                  ownedQuantity={ownedQuantity}
-                  disabled={disabled}
-                  onAdd={() => handleQuickAdd(item)}
-                />
-              )
-            }
-          />
-        )
-      }}
+      renderItemHeader={(item) => (
+        <EquipmentPickerItemHeader
+          {...resolveEquipmentPickerDrawerItemHeaderProps({
+            item,
+            isGoldShoppingPath,
+            isMagicItemsWorkflow,
+            ownedGrantQuantities,
+            ownedPurchaseQuantities,
+            rowActionVm: resolveRowVm(item, addQuantities[item.equipment.id] ?? 1),
+            onQuickAdd: handleQuickAdd,
+          })}
+        />
+      )}
       renderItemSummary={(item) =>
         isMagicItemsWorkflow ? null : (
           <EquipmentPickerRowSummary item={item} budget={effectiveBudget} />
