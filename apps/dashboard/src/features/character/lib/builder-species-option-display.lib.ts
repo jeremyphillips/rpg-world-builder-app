@@ -1,5 +1,6 @@
 import { type CharacterBuildLanguageOption, type Species, type Spell } from '@rpg/contracts'
 
+import { getContentTypeItemLabel } from '@/features/content/lib/content-type-labels'
 import {
   buildSeedCreatureTypeVocabulary,
   buildSeedSenseVocabulary,
@@ -19,7 +20,7 @@ import type { BuilderOptionDetailsSection } from '@rpg/ui'
 const creatureTypeVocabulary = buildSeedCreatureTypeVocabulary()
 const senseVocabulary = buildSeedSenseVocabulary()
 
-export const BUILDER_SPECIES_EYEBROW = 'Species'
+export const BUILDER_SPECIES_EYEBROW = getContentTypeItemLabel('species')
 
 function resolveLanguageLabel(
   languages: readonly CharacterBuildLanguageOption[],

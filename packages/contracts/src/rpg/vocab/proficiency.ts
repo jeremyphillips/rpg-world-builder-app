@@ -1,5 +1,11 @@
 import { keysFromEntries } from './enum-schema'
-import { getTermSentenceForm, type GameTermEntry, type VocabularyTerm } from './types'
+import { SKILL_PROFICIENCY_SENTENCE } from './proficiency-sentence'
+import {
+  getTermCompactLabel,
+  getTermSentenceForm,
+  type GameTermEntry,
+  type VocabularyTerm,
+} from './types'
 
 // ---------------------------------------------------------------------------
 // Proficiency grant kinds — weapon, tool, skill, and armor training terms
@@ -34,11 +40,9 @@ export const PROFICIENCY_DOMAIN_ENTRIES = {
   },
   skill: {
     label: 'Skill Proficiency',
+    compactLabel: 'Skills',
     description: 'Training with specific skills.',
-    sentence: {
-      singular: 'skill proficiency',
-      plural: 'skill proficiencies',
-    },
+    sentence: SKILL_PROFICIENCY_SENTENCE,
   },
   armor: {
     label: 'Armor Training',
@@ -87,6 +91,11 @@ export function getProficiencyDomainSentenceForm(domain: ProficiencyDomain, coun
 export function getProficiencyDomainLabel(domain: ProficiencyDomain): string {
   const phrase = getProficiencyDomainSentenceForm(domain, 1)
   return `${phrase.charAt(0).toUpperCase()}${phrase.slice(1)}`
+}
+
+/** Compact domain label for tight UI surfaces (e.g. "Skills"). */
+export function getProficiencyDomainCompactLabel(domain: ProficiencyDomain): string {
+  return getTermCompactLabel(PROFICIENCY_DOMAIN_ENTRIES[domain])
 }
 
 /** Compact suffix for fixed weapon/tool/skill grant summaries. */

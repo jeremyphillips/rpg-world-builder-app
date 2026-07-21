@@ -7,6 +7,7 @@ import type {
 } from '@rpg/contracts'
 import { Alert, Text } from '@rpg/ui'
 
+import { getContentTypeItemLabel } from '@/features/content/lib/content-type-labels'
 import { characterBuilderPreviewStatGridClasses } from '../character-builder-shell.variants'
 import { resolveBuilderModelingAdvisories } from '../../lib/builder-review-advisories.lib'
 import {
@@ -32,7 +33,7 @@ export function ReviewStepSummary({ context, draft, preview }: ReviewStepSummary
         <ReviewRow label="Name" value={draft.identity.name?.trim() || 'Not set'} />
         <ReviewRow label="Alignment" value={formatReviewAlignment(draft.identity.alignment)} />
         <ReviewRow label="Level" value={String(draft.class.level)} />
-        <ReviewRow label="Species" value={speciesName} />
+        <ReviewRow label={getContentTypeItemLabel('species')} value={speciesName} />
         <ReviewRow label="Class" value={className} />
         <ReviewRow
           label="Ability method"

@@ -350,6 +350,28 @@ categories, skill slugs, etc.), add reference vocabulary under
 the schema into your content module — do not define vocab maps on the entity
 file. See [packages/contracts/docs/structure.md](../packages/contracts/docs/structure.md).
 
+#### Catalog content-type terms (`CONTENT_TYPE_TERMS`)
+
+Catalog **collection names** (sidebar, breadcrumbs, overview headings, create
+titles) are not field vocabulary. They live in
+`packages/contracts/src/rpg/content/lib/content-type-terms.ts` as
+`CONTENT_TYPE_TERMS`, keyed by `ContentTypeKey`.
+
+Three display layers — do not conflate them:
+
+| Layer                | Registry                                     | Example                                |
+| -------------------- | -------------------------------------------- | -------------------------------------- |
+| Catalog content type | `CONTENT_TYPE_TERMS` / `*_CONTENT_TYPE_TERM` | `Species`, `Skill Proficiencies` (nav) |
+| Proficiency domain   | `PROFICIENCY_DOMAIN_ENTRIES`                 | `Skills` (compact), grant row labels   |
+| Field taxonomy       | `*_TERM` / option-set registry               | `CREATURE_TYPE_TERM` (within species)  |
+| Workflow copy        | `defineMessage` catalogs                     | full validation sentences              |
+
+Dashboard derives surface labels from key-based helpers in
+`features/content/lib/content-type-labels.ts` (`getContentTypeCollectionLabel`,
+`formatContentCreateHeading`, …). Contracts modules import `getContentTypeTerm`
+directly. Sidebar and router crumbs derive collection labels from the same
+helpers — do not hand-roll display strings.
+
 #### Reference vocabulary (`GameTermEntry`)
 
 Use this when a closed id set needs both a display label and SRD rule text
@@ -760,12 +782,13 @@ the entity resolves).
 
 Add an entry to `VISIBLE_SIDEBAR_CONTENT` (drives campaign sidebar **and**
 Homebrew hub cards — keep in sync with `HOMEBREW_SUMMARY_CONTENT_TYPE_KEYS` in
-contracts):
+contracts). Derive `label` from `getContentTypeCollectionLabel(contentType)` —
+do not hardcode the display string:
 
 ```typescript
 {
   contentType: '<kebab-plural>',
-  label: '<Display Plural>',
+  label: getContentTypeCollectionLabel('<kebab-plural>'),
   overview: ROUTES.content.<camelPlural>.overview,
   create: ROUTES.content.<camelPlural>.create,
 },

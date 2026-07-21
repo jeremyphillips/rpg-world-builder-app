@@ -5,6 +5,10 @@ import type { Species } from '@rpg/contracts'
 import { useSetBreadcrumbLabel } from '@/components/layout/use-breadcrumb-label'
 import { WidePage } from '@/components/layout/wide-page'
 import {
+  formatContentNotFoundMessage,
+  getContentTypeMidSentenceLabel,
+} from '@/features/content/lib/content-type-labels'
+import {
   useCreatureTypeVocabulary,
   useLanguageVocabulary,
   useSenseVocabulary,
@@ -152,8 +156,8 @@ export function SpeciesDetail() {
       isError={isError}
       items={species}
       itemId={speciesId}
-      loadErrorLabel="Could not load species."
-      notFoundLabel="Species not found."
+      loadErrorLabel={`Could not load ${getContentTypeMidSentenceLabel('species')}.`}
+      notFoundLabel={formatContentNotFoundMessage('species')}
     >
       {(item) => <SpeciesDetailContent species={item} campaignId={campaignId} />}
     </ContentDetailResolver>

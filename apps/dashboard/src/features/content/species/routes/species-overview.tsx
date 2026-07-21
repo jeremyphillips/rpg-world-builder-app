@@ -4,6 +4,12 @@ import type { Species } from '@rpg/contracts'
 
 import { ROUTES } from '@/app/routes'
 import { useCreatureTypeVocabulary } from '@/features/homebrew'
+import {
+  formatContentCreateHeading,
+  formatContentOverviewCaption,
+  getContentTypeCollectionLabel,
+  getContentTypeMidSentenceLabel,
+} from '@/features/content/lib/content-type-labels'
 import { useSpecies } from '../hooks/use-species'
 import { speciesColumns, speciesFilters } from '../lib/species-overview-columns'
 import { ContentOverviewShell } from '../../lib/overview/content-overview-shell'
@@ -16,7 +22,7 @@ function SpeciesRowActions({ row, campaignId }: { row: Species; campaignId: stri
       editHref={ROUTES.content.species.edit(campaignId, row.id)}
       enabled={true}
       onToggleEnabled={() => {}}
-      itemLabel="species"
+      itemLabel={getContentTypeMidSentenceLabel('species')}
     />
   )
 }
@@ -32,19 +38,19 @@ export function SpeciesOverview() {
 
   return (
     <ContentOverviewShell
-      heading="Species"
+      heading={getContentTypeCollectionLabel('species')}
       campaignId={campaignId}
       isPending={isPending || isVocabularyPending}
       isError={isError || isVocabularyError}
       newHref={ROUTES.content.species.create(campaignId)}
-      newLabel="New Species"
+      newLabel={formatContentCreateHeading('species')}
     >
       <DataTable
         columns={speciesColumns(campaignId, vocabulary)}
         data={species}
         filters={speciesFilters(vocabulary)}
         rowActions={(row) => <SpeciesRowActions row={row} campaignId={campaignId} />}
-        caption="Playable species available in this campaign"
+        caption={formatContentOverviewCaption('species', 'Playable')}
       />
     </ContentOverviewShell>
   )

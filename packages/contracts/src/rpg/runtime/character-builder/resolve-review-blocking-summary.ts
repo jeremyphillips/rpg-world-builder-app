@@ -1,4 +1,5 @@
 import { ABILITY_IDS } from '../../vocab/ability'
+import { getContentTypeTerm } from '../../content/lib/content-type-terms'
 import type { ChoiceSet } from './choice-set'
 import type { CharacterBuildContext } from './context'
 import type { CharacterBuilderDraft } from './draft'
@@ -37,7 +38,7 @@ export type ReviewBlockingSummary = {
 
 const STEP_FIELD_LABELS: Record<CharacterBuilderStepId, string> = {
   identity: 'Identity',
-  species: 'Species',
+  species: getContentTypeTerm('species').label,
   class: 'Class',
   abilities: 'Ability Scores',
   proficiencies: 'Proficiencies',

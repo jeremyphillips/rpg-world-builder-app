@@ -2,6 +2,8 @@ import type { HomebrewSummaryContentType } from '@rpg/contracts'
 
 import { ROUTES } from '@/app/routes'
 
+import { getContentTypeCollectionLabel } from '@/features/content/lib/content-type-labels'
+
 export type VisibleSidebarContentEntry = {
   contentType: HomebrewSummaryContentType
   /** Sidebar nav and hub card label. */
@@ -18,36 +20,36 @@ export type VisibleSidebarContentEntry = {
 export const VISIBLE_SIDEBAR_CONTENT: readonly VisibleSidebarContentEntry[] = [
   {
     contentType: 'classes',
-    label: 'Classes',
+    label: getContentTypeCollectionLabel('classes'),
     overview: ROUTES.content.classes.overview,
     create: ROUTES.content.classes.create,
   },
   {
     contentType: 'spells',
-    label: 'Spells',
+    label: getContentTypeCollectionLabel('spells'),
     overview: ROUTES.content.spells.overview,
     create: ROUTES.content.spells.create,
   },
   {
     contentType: 'species',
-    label: 'Species',
+    label: getContentTypeCollectionLabel('species'),
     overview: ROUTES.content.species.overview,
     create: ROUTES.content.species.create,
   },
   {
     contentType: 'feats',
-    label: 'Feats',
+    label: getContentTypeCollectionLabel('feats'),
     overview: ROUTES.content.feats.overview,
     create: ROUTES.content.feats.create,
   },
   {
     contentType: 'equipment',
-    label: 'Equipment',
+    label: getContentTypeCollectionLabel('equipment'),
     overview: ROUTES.content.equipment.hub,
   },
   {
     contentType: 'skill-proficiencies',
-    label: 'Skill Proficiencies',
+    label: getContentTypeCollectionLabel('skill-proficiencies'),
     overview: ROUTES.content.skillProficiencies.overview,
     create: ROUTES.content.skillProficiencies.create,
   },

@@ -1,4 +1,5 @@
 export * from './content-type-keys'
+export * from './content-type-terms'
 export * from './homebrew-summary'
 export * from './envelope'
 export * from './content-key'

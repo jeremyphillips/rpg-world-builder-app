@@ -213,6 +213,24 @@ Pattern: `*_TERM` + `*_ENTRIES` map → derived id tuple → `z.enum` schema →
 `vocabularyOptionIdSchema` and catalog seeds; see
 [docs/vocabulary.md](../../../docs/vocabulary.md).
 
+### Catalog content-type terms (`CONTENT_TYPE_TERMS`)
+
+Catalog collection chrome uses a separate registry in
+[`content-type-terms.ts`](../src/rpg/content/lib/content-type-terms.ts), keyed
+by `ContentTypeKey`. Each entry is a `VocabularyTerm` with `label`,
+`description`, and `sentence` forms. Exported aliases use the `*_CONTENT_TYPE_TERM`
+qualifier (e.g. `SPECIES_CONTENT_TYPE_TERM`) — not generic `SPECIES_TERM`, which
+would collide with field taxonomy.
+
+`compactLabel` on content-type terms is reserved for semantically distinct
+abbreviations. Most types rely on `label` + `sentence.plural` + dashboard
+`getContentTypeCollectionLabel`. Proficiency-domain compact labels (e.g.
+`Skills`) live on `PROFICIENCY_DOMAIN_ENTRIES`, not on catalog content types.
+
+Shared grammar between registries (e.g. `SKILL_PROFICIENCY_SENTENCE`) is extracted
+to a small constant consumed by both — never cross-reference one registry from
+another's shape definition.
+
 Entity-specific fields stay on the content schema in `rpg/content/`, not in vocab maps.
 
 Spell catalog content lives under `rpg/content/spell/` (`body.ts`, `levels.ts`,
