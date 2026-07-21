@@ -30,6 +30,7 @@
     "format:check": "prettier --check .",
     "analyze": "fallow --format human || true",
     "bench": "pnpm --filter @rpg/bench-cli bench",
+    "vocab:audit": "pnpm --filter @rpg/term-audit run audit",
     "catalog:spell-modeling-audit": "pnpm exec tsx packages/catalog/scripts/spell-modeling-audit.mjs",
     "catalog:spell-modeling-report": "pnpm exec tsx packages/catalog/scripts/generate-spell-modeling-report.mjs",
     "generate:json-schemas": "pnpm --filter @rpg/contracts generate:json-schemas",

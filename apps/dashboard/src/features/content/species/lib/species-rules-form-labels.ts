@@ -15,16 +15,17 @@ export const SPECIES_MULTICLASS_POLICY_LABELS = {
   restricted: 'Restricted',
 } as const satisfies Record<SpeciesMulticlassPolicy, string>
 
+const speciesMidSentence = getContentTypeMidSentenceLabel('species')
+const classesPlural = getContentTypeMidSentenceLabel('classes', { plural: true })
+
 export const SPECIES_CLASS_POLICY_MODE_LABELS = {
-  all: 'All classes',
-  only: 'Only listed classes',
-  all_except: 'All except listed classes',
+  all: `All ${classesPlural}`,
+  only: `Only listed ${classesPlural}`,
+  all_except: `All except listed ${classesPlural}`,
 } as const satisfies Record<SpeciesClassPolicyMode, string>
 
-export const SPECIES_CLASS_POLICY_ALLOWED_CLASSES_LABEL = 'Allowed classes'
-export const SPECIES_CLASS_POLICY_FORBIDDEN_CLASSES_LABEL = 'Forbidden classes'
-
-const speciesMidSentence = getContentTypeMidSentenceLabel('species')
+export const SPECIES_CLASS_POLICY_ALLOWED_CLASSES_LABEL = `Allowed ${classesPlural}`
+export const SPECIES_CLASS_POLICY_FORBIDDEN_CLASSES_LABEL = `Forbidden ${classesPlural}`
 
 export const SPECIES_CLASS_POLICY_ALLOWED_CLASSES_HINT = `Characters of this ${speciesMidSentence} may multiclass only into these classes.`
 export const SPECIES_CLASS_POLICY_FORBIDDEN_CLASSES_HINT = `Characters of this ${speciesMidSentence} may multiclass into any class except these.`

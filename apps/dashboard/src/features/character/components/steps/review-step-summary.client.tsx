@@ -34,7 +34,7 @@ export function ReviewStepSummary({ context, draft, preview }: ReviewStepSummary
         <ReviewRow label="Alignment" value={formatReviewAlignment(draft.identity.alignment)} />
         <ReviewRow label="Level" value={String(draft.class.level)} />
         <ReviewRow label={getContentTypeItemLabel('species')} value={speciesName} />
-        <ReviewRow label="Class" value={className} />
+        <ReviewRow label={getContentTypeItemLabel('classes')} value={className} />
         <ReviewRow
           label="Ability method"
           value={formatAbilityMethodLabel(draft.abilities.method)}

@@ -83,3 +83,26 @@ export function formatContentOverviewCaption(key: ContentTypeKey, qualifier: str
   })
   return `${qualifier} ${phrase} available in this campaign`
 }
+
+/** Collection availability caption — e.g. "Spells available in this campaign". */
+export function formatContentCollectionAvailabilityCaption(key: ContentTypeKey): string {
+  return `${getContentTypeCollectionLabel(key)} available in this campaign`
+}
+
+/** Rich-text internal link overview row title — e.g. "Spell Overview". */
+export function formatContentOverviewLinkTitle(key: ContentTypeKey): string {
+  return `${getContentTypeItemLabel(key)} Overview`
+}
+
+/** Combobox placeholder — e.g. "Choose classes…". */
+export function formatChooseContentTypePlaceholder(
+  key: ContentTypeKey,
+  options?: { plural?: boolean },
+): string {
+  return `Choose ${getContentTypeMidSentenceLabel(key, options)}…`
+}
+
+/** Action label — e.g. "Add equipment". */
+export function formatAddContentTypeLabel(key: ContentTypeKey): string {
+  return `Add ${getContentTypeMidSentenceLabel(key)}`
+}

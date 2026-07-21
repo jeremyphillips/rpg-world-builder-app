@@ -24,7 +24,10 @@ import {
   type RecognizedSpeciesPreview,
   type RecognizedSpellPreview,
 } from '@rpg/contracts/character-import'
-import { getContentTypeItemLabel } from '@/features/content/lib/content-type-labels'
+import {
+  getContentTypeCollectionLabel,
+  getContentTypeItemLabel,
+} from '@/features/content/lib/content-type-labels'
 import type { SemanticTextEmphasis, SemanticTextTone } from '@rpg/ui'
 
 /** Display copy when a source field has no mapped value. */
@@ -36,7 +39,7 @@ export const PREVIEW_VALUE_TEXT_CLASS = 'text-sm'
 export const EXTRACTION_FIELD_LABELS = {
   name: 'Name',
   species: getContentTypeItemLabel('species'),
-  classes: 'Classes',
+  classes: getContentTypeCollectionLabel('classes'),
   abilityScores: 'Abilities',
   alignment: 'Alignment',
   xp: 'XP',

@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { classSchema, classStoredSchema, subclassSchema } from '@rpg/contracts'
+import { classSchema, classStoredSchema, subclassSchema, getContentTypeTerm } from '@rpg/contracts'
 import type { CharacterClass, ClassStored, Subclass, SystemRulesetId } from '@rpg/contracts'
 
 import { getBySlug } from '../lib/get-by-slug'
@@ -106,7 +106,7 @@ export function seedClassSlugs(rulesetId: SystemRulesetId): ReadonlySet<string> 
 }
 
 export function getClassBySlug(rulesetId: SystemRulesetId, slug: string): CharacterClass {
-  return getBySlug(loadSeedClasses, rulesetId, slug, 'Class')
+  return getBySlug(loadSeedClasses, rulesetId, slug, getContentTypeTerm('classes').label)
 }
 
 export function getSubclassBySlug(rulesetId: SystemRulesetId, slug: string): Subclass {

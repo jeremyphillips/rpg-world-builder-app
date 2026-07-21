@@ -29,6 +29,10 @@ import {
 } from '@rpg/ui/form'
 
 import type { ContentFormCtx } from '../content-form-registry'
+import {
+  formatChooseContentTypePlaceholder,
+  getContentTypeItemLabel,
+} from '../../content-type-labels'
 import { ProficiencyLinkedGrantRowCue } from '../../../classes/components/character-creation/proficiency-linked-grant-row-cue.client'
 import {
   LINKED_PROFICIENCY_CHOICE_LABEL,
@@ -364,10 +368,10 @@ export function grantedEquipmentItemFields(
         {
           type: 'combobox',
           name: 'equipmentSlug',
-          label: 'Equipment',
+          label: getContentTypeItemLabel('equipment'),
           options: equipmentOptions,
           multiple: false,
-          placeholder: 'Choose equipment…',
+          placeholder: formatChooseContentTypePlaceholder('equipment'),
           required: true,
           width: 'full',
         },
@@ -442,10 +446,10 @@ export function equipmentChoiceGrantFields(
     {
       type: 'combobox',
       name: 'poolEquipmentSlugs',
-      label: 'Equipment',
+      label: getContentTypeItemLabel('equipment'),
       multiple: true,
       options: equipmentOptions,
-      placeholder: 'Choose equipment…',
+      placeholder: formatChooseContentTypePlaceholder('equipment'),
       visibility: visibleForChoicePoolSource('explicit', guard),
     },
     {

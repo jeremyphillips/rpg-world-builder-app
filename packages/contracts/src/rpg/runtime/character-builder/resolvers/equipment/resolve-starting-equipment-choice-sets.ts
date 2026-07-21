@@ -1,4 +1,5 @@
 import type { CharacterClass } from '../../../../content/classes/class'
+import { getContentTypeCapitalizedSentenceLabel } from '../../../../content/lib/content-type-terms'
 import { formatEquipmentPoolLabel } from '../../../../content/lib/equipment-grant'
 import type { StartingEquipmentItem } from '../../../../content/starting-equipment'
 import { buildChoiceSetId, type ChoiceSet } from '../../choice-set'
@@ -61,7 +62,7 @@ export function resolveStartingEquipmentChoiceSets(
       sourceType: 'class',
       sourceId: characterClass.id,
       choiceType: 'equipment',
-      label: 'Choose Starting Equipment',
+      label: `Choose Starting ${getContentTypeCapitalizedSentenceLabel('equipment')}`,
       min: startingEquipment.choose,
       max: startingEquipment.choose,
       options: startingEquipment.options.map((option) => ({

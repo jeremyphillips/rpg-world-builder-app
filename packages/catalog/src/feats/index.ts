@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { featSchema } from '@rpg/contracts'
+import { featSchema, getContentTypeTerm } from '@rpg/contracts'
 import type { Feat, SystemRulesetId } from '@rpg/contracts'
 
 import { getBySlug } from '../lib/get-by-slug'
@@ -23,5 +23,5 @@ export function seedFeatSlugs(rulesetId: SystemRulesetId): ReadonlySet<string> {
 }
 
 export function getFeatBySlug(rulesetId: SystemRulesetId, slug: string): Feat {
-  return getBySlug(loadSeedFeats, rulesetId, slug, 'Feat')
+  return getBySlug(loadSeedFeats, rulesetId, slug, getContentTypeTerm('feats').label)
 }

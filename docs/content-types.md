@@ -372,6 +372,60 @@ Dashboard derives surface labels from key-based helpers in
 directly. Sidebar and router crumbs derive collection labels from the same
 helpers — do not hand-roll display strings.
 
+Keep this registry centralized while its entries share ownership and dependencies.
+Split it into domain modules only when those conditions change or the file becomes
+hard to navigate; preserve the existing content barrel and aliases if it is split.
+
+`pnpm vocab:audit` audits direct term usage across the workspace. Its repository-wide
+usage-budget regression gate is intentionally deferred pending a baseline-stability
+spike; see the audit package README. Vocabulary option-set
+audits share the tool, so [vocabulary.md](./vocabulary.md) links here rather than
+duplicating its policy.
+
+##### Audit CLI (`@rpg/term-audit`)
+
+Run from the repository root:
+
+```sh
+pnpm vocab:audit --content-type classes
+pnpm vocab:audit --term skill-proficiencies --format json
+pnpm vocab:audit --vocab-set creature-types
+```
+
+Target namespaces:
+
+| Flag                  | Resolves                                                           |
+| --------------------- | ------------------------------------------------------------------ |
+| `--content-type <id>` | Catalog `ContentTypeKey` (`classes`, `spells`, …)                  |
+| `--vocab-set <id>`    | Configurable vocabulary option set (`creature-types`, …)           |
+| `--term <id>`         | Unambiguous id only; rejects collisions between the two registries |
+
+Checked-in JSON baselines live under `tools/vocab/term-audit/baselines/` (with
+`pre-migration/` snapshots). Regenerate after intentional copy changes; see the
+package README.
+
+**Configuration** — `tools/vocab/term-audit/term-audit.config.ts` records:
+
+- `ignore` globs for generated artifacts and non-source files
+- `contextual` entries: target, path glob, reason, and owner for occurrences that
+  should remain literal (domain mechanics, field taxonomy, named game options)
+
+Add a contextual entry when audit findings are intentional — do not maintain
+prose-only exception lists. File-level entries mark every literal in that path as
+`contextual` for the target.
+
+**Intentional-exception policy** — migrate generic catalog nouns to
+`content-type-labels.ts` helpers (dashboard) or `getContentTypeTerm` /
+`getContentTypeSentenceForm` (contracts, catalog, API). Keep literals when the
+phrase is domain-owned: spellcasting mechanics, feat eligibility rules, armor
+class (AC), or named packages such as “Standard Equipment”.
+
+**Equipment acceptance matrix** — parent catalog chrome uses the `equipment`
+content-type term; family, kind, and category surfaces use their dedicated
+vocab registries (`equipment-family-paths`, `EQUIPMENT_KIND_LABELS`, …). Do not
+substitute parent-term copy into family/kind contexts, and do not use family
+labels for the hub/parent collection heading.
+
 #### Reference vocabulary (`GameTermEntry`)
 
 Use this when a closed id set needs both a display label and SRD rule text

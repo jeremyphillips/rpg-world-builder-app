@@ -35,6 +35,7 @@ describe('buildRichTextInternalLinkOptions', () => {
       href: `/campaigns/${campaignId}/spells`,
       contentType: 'spell',
       kind: 'overview',
+      eyebrowLabel: 'Spell',
     })
     expect(options).toContainEqual({
       id: '__feat_overview__',
@@ -42,6 +43,7 @@ describe('buildRichTextInternalLinkOptions', () => {
       href: `/campaigns/${campaignId}/feats`,
       contentType: 'feat',
       kind: 'overview',
+      eyebrowLabel: 'Feat',
     })
     expect(options).toContainEqual({
       id: fireBolt.slug,
@@ -49,6 +51,7 @@ describe('buildRichTextInternalLinkOptions', () => {
       href: `/campaigns/${campaignId}/spells/${fireBolt.slug}`,
       contentType: 'spell',
       kind: 'detail',
+      eyebrowLabel: 'Spell',
     })
     expect(options).toContainEqual({
       id: alert.slug,
@@ -56,6 +59,7 @@ describe('buildRichTextInternalLinkOptions', () => {
       href: `/campaigns/${campaignId}/feats/${alert.slug}`,
       contentType: 'feat',
       kind: 'detail',
+      eyebrowLabel: 'Feat',
     })
   })
 

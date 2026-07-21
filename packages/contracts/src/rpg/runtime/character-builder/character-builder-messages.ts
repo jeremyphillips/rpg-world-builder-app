@@ -25,11 +25,11 @@ export const characterBuilderValidationMessages = {
   ),
   speciesRequired: defineMessage(
     'validation.characterBuilder.speciesRequired',
-    () => 'Choose a species.',
+    () => `Choose a ${getContentTypeSentenceForm('species')}.`,
   ),
   classRequired: defineMessage(
     'validation.characterBuilder.classRequired',
-    () => 'Choose a class.',
+    () => `Choose a ${getContentTypeSentenceForm('classes')}.`,
   ),
   abilityMethodRequired: defineMessage(
     'validation.characterBuilder.abilityMethodRequired',
@@ -74,7 +74,8 @@ export const characterBuilderValidationMessages = {
   ),
   spellNoLongerAvailable: defineMessage<{ spellLabel: string }>(
     'validation.characterBuilder.spellNoLongerAvailable',
-    ({ spellLabel }) => `${spellLabel} is no longer available for this class.`,
+    ({ spellLabel }) =>
+      `${spellLabel} is no longer available for this ${getContentTypeSentenceForm('classes')}.`,
   ),
   spellNotSelectableAtLevel: defineMessage<{ spellLabel: string; maxLevel: number }>(
     'validation.characterBuilder.spellNotSelectableAtLevel',
@@ -125,19 +126,21 @@ export const characterBuilderValidationMessages = {
 export const characterBuilderStepReadinessMessages = {
   equipmentBlockedNoClass: defineMessage(
     'validation.characterBuilder.readiness.equipmentBlockedNoClass',
-    () => 'Choose a class to see equipment options.',
+    () =>
+      `Choose a ${getContentTypeSentenceForm('classes')} to see ${getContentTypeSentenceForm('equipment')} options.`,
   ),
   equipmentNoOptions: defineMessage(
     'validation.characterBuilder.readiness.equipmentNoOptions',
-    () => 'No starting equipment options are available for this class.',
+    () =>
+      `No starting ${getContentTypeSentenceForm('equipment')} options are available for this ${getContentTypeSentenceForm('classes')}.`,
   ),
   equipmentReviewComplete: defineMessage(
     'validation.characterBuilder.readiness.equipmentReviewComplete',
-    () => 'Review your starting equipment.',
+    () => `Review your starting ${getContentTypeSentenceForm('equipment')}.`,
   ),
   equipmentContinuingWithout: defineMessage(
     'validation.characterBuilder.readiness.equipmentContinuingWithout',
-    () => 'Continuing without starting equipment.',
+    () => `Continuing without starting ${getContentTypeSentenceForm('equipment')}.`,
   ),
   equipmentPendingProficiencyLinked: defineMessage(
     'validation.characterBuilder.readiness.equipmentPendingProficiencyLinked',
@@ -157,7 +160,8 @@ export const characterBuilderStepReadinessMessages = {
   ),
   spellsBlockedNoClass: defineMessage(
     'validation.characterBuilder.readiness.spellsBlockedNoClass',
-    () => 'Choose a class to see spell options.',
+    () =>
+      `Choose a ${getContentTypeSentenceForm('classes')} to see ${getContentTypeSentenceForm('spells')} options.`,
   ),
   spellsNotApplicableNoSpellcasting: defineMessage<{ className: string }>(
     'validation.characterBuilder.readiness.spellsNotApplicableNoSpellcasting',
@@ -169,11 +173,11 @@ export const characterBuilderStepReadinessMessages = {
   ),
   spellsReviewComplete: defineMessage(
     'validation.characterBuilder.readiness.spellsReviewComplete',
-    () => 'Review your starting spells.',
+    () => `Review your starting ${getContentTypeSentenceForm('spells', 2)}.`,
   ),
   proficienciesBlockedNoClass: defineMessage(
     'validation.characterBuilder.readiness.proficienciesBlockedNoClass',
-    () => 'Choose a class to see class proficiencies.',
+    () => `Choose a ${getContentTypeSentenceForm('classes')} to see class proficiencies.`,
   ),
   proficienciesBlockedNoClassHelper: defineMessage(
     'validation.characterBuilder.readiness.proficienciesBlockedNoClassHelper',

@@ -3,6 +3,12 @@ import { DataTable } from '@rpg/ui'
 import type { Feat } from '@rpg/contracts'
 
 import { ROUTES } from '@/app/routes'
+import {
+  formatContentCollectionAvailabilityCaption,
+  formatContentCreateHeading,
+  getContentTypeCollectionLabel,
+  getContentTypeMidSentenceLabel,
+} from '@/features/content/lib/content-type-labels'
 import { useFeats } from '../hooks/use-feats'
 import { featsColumns, featsFilters } from '../lib/feats-overview-columns'
 import { ContentOverviewShell } from '../../lib/overview/content-overview-shell'
@@ -15,7 +21,7 @@ function FeatRowActions({ row, campaignId }: { row: Feat; campaignId: string }) 
       editHref={ROUTES.content.feats.edit(campaignId, row.id)}
       enabled={true}
       onToggleEnabled={() => {}}
-      itemLabel="feat"
+      itemLabel={getContentTypeMidSentenceLabel('feats')}
     />
   )
 }
@@ -26,19 +32,19 @@ export function FeatsOverview() {
 
   return (
     <ContentOverviewShell
-      heading="Feats"
+      heading={getContentTypeCollectionLabel('feats')}
       campaignId={campaignId}
       isPending={isPending}
       isError={isError}
       newHref={ROUTES.content.feats.create(campaignId)}
-      newLabel="New Feat"
+      newLabel={formatContentCreateHeading('feats')}
     >
       <DataTable
         columns={featsColumns(campaignId)}
         data={feats}
         filters={featsFilters}
         rowActions={(row) => <FeatRowActions row={row} campaignId={campaignId} />}
-        caption="Feats available in this campaign"
+        caption={formatContentCollectionAvailabilityCaption('feats')}
       />
     </ContentOverviewShell>
   )

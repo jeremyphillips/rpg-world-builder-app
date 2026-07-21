@@ -4,6 +4,12 @@ import type { Spell } from '@rpg/contracts'
 
 import { ROUTES } from '@/app/routes'
 import { useSpellSchoolVocabulary } from '@/features/homebrew'
+import {
+  formatContentCollectionAvailabilityCaption,
+  formatContentCreateHeading,
+  getContentTypeCollectionLabel,
+  getContentTypeMidSentenceLabel,
+} from '@/features/content/lib/content-type-labels'
 import { useSpells } from '../hooks/use-spells'
 import { spellsColumns, spellsFilters } from '../lib/spells-overview-columns'
 import { ContentOverviewShell } from '../../lib/overview/content-overview-shell'
@@ -16,7 +22,7 @@ function SpellRowActions({ row, campaignId }: { row: Spell; campaignId: string }
       editHref={ROUTES.content.spells.edit(campaignId, row.id)}
       enabled={true}
       onToggleEnabled={() => {}}
-      itemLabel="spell"
+      itemLabel={getContentTypeMidSentenceLabel('spells')}
     />
   )
 }
@@ -28,19 +34,19 @@ export function SpellsOverview() {
 
   return (
     <ContentOverviewShell
-      heading="Spells"
+      heading={getContentTypeCollectionLabel('spells')}
       campaignId={campaignId}
       isPending={isPending}
       isError={isError}
       newHref={ROUTES.content.spells.create(campaignId)}
-      newLabel="New Spell"
+      newLabel={formatContentCreateHeading('spells')}
     >
       <DataTable
         columns={spellsColumns(campaignId, spellSchoolVocabulary)}
         data={spells}
         filters={spellsFilters(spellSchoolVocabulary)}
         rowActions={(row) => <SpellRowActions row={row} campaignId={campaignId} />}
-        caption="Spells available in this campaign"
+        caption={formatContentCollectionAvailabilityCaption('spells')}
       />
     </ContentOverviewShell>
   )

@@ -1,5 +1,6 @@
 import { ABILITY_IDS } from '../../vocab/ability'
 import {
+  getContentTypeCapitalizedSentenceLabel,
   getContentTypeSentenceForm,
   getContentTypeTerm,
 } from '../../content/lib/content-type-terms'
@@ -60,8 +61,8 @@ const BUILDER_STEP_METADATA = {
     description: `Choose your character's ${getContentTypeSentenceForm('species')} and heritage`,
   },
   class: {
-    label: 'Class',
-    description: "Choose your character's class",
+    label: getContentTypeTerm('classes').label,
+    description: `Choose your character's ${getContentTypeSentenceForm('classes')}`,
   },
   abilities: {
     label: 'Abilities',
@@ -73,13 +74,13 @@ const BUILDER_STEP_METADATA = {
     deferredUntilChoiceSetsResolved: true,
   },
   equipment: {
-    label: 'Equipment',
-    description: 'Choose your starting equipment',
+    label: getContentTypeTerm('equipment').label,
+    description: `Choose your starting ${getContentTypeSentenceForm('equipment')}`,
     deferredUntilChoiceSetsResolved: true,
   },
   spells: {
-    label: 'Spells',
-    description: 'Choose your starting spells',
+    label: getContentTypeCapitalizedSentenceLabel('spells', { plural: true }),
+    description: `Choose your starting ${getContentTypeSentenceForm('spells', 2)}`,
     deferredUntilChoiceSetsResolved: true,
   },
   review: {

@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { spellSchema } from '@rpg/contracts'
+import { spellSchema, getContentTypeTerm } from '@rpg/contracts'
 import type { Spell, SystemRulesetId } from '@rpg/contracts'
 
 import { getBySlug } from '../lib/get-by-slug'
@@ -82,7 +82,7 @@ export function seedSpellSlugs(rulesetId: SystemRulesetId): ReadonlySet<string> 
 }
 
 export function getSpellBySlug(rulesetId: SystemRulesetId, slug: string): Spell {
-  return getBySlug(loadSeedSpells, rulesetId, slug, 'Spell')
+  return getBySlug(loadSeedSpells, rulesetId, slug, getContentTypeTerm('spells').label)
 }
 
 export {

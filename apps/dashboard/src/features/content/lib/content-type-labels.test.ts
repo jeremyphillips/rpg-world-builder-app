@@ -2,11 +2,15 @@ import { SPECIES_CONTENT_TYPE_TERM, SPELL_CONTENT_TYPE_TERM } from '@rpg/contrac
 import { describe, expect, it } from 'vitest'
 
 import {
+  formatAddContentTypeLabel,
+  formatChooseContentTypePlaceholder,
+  formatContentCollectionAvailabilityCaption,
   formatContentCreateHeading,
   formatContentListLoadErrorMessage,
   formatContentLoadErrorMessage,
   formatContentNotFoundMessage,
   formatContentOverviewCaption,
+  formatContentOverviewLinkTitle,
   getContentTypeCollectionLabel,
   getContentTypeItemLabel,
   getContentTypeMidSentenceLabel,
@@ -66,6 +70,16 @@ describe('content type labels', () => {
     expect(formatContentOverviewCaption('classes', 'Character')).toBe(
       'Character classes available in this campaign',
     )
+    expect(formatContentCollectionAvailabilityCaption('spells')).toBe(
+      'Spells available in this campaign',
+    )
+    expect(formatContentOverviewLinkTitle('spells')).toBe('Spell Overview')
+    expect(formatContentOverviewLinkTitle('feats')).toBe('Feat Overview')
+  })
+
+  it('formats choose and add helpers', () => {
+    expect(formatChooseContentTypePlaceholder('classes', { plural: true })).toBe('Choose classes…')
+    expect(formatAddContentTypeLabel('equipment')).toBe('Add equipment')
   })
 
   it('derives aliases from the registry', () => {

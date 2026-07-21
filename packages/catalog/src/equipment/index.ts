@@ -1,11 +1,13 @@
 import { z } from 'zod'
-import { EQUIPMENT_KINDS, equipmentSchema } from '@rpg/contracts'
-import type {
-  ArmorEquipment,
-  Equipment,
-  EquipmentKind,
-  SystemRulesetId,
-  WeaponEquipment,
+import {
+  EQUIPMENT_KINDS,
+  equipmentSchema,
+  getContentTypeTerm,
+  type ArmorEquipment,
+  type Equipment,
+  type EquipmentKind,
+  type SystemRulesetId,
+  type WeaponEquipment,
 } from '@rpg/contracts'
 
 import { getBySlug } from '../lib/get-by-slug'
@@ -73,7 +75,7 @@ export function seedEquipmentSlugs(rulesetId: SystemRulesetId): ReadonlySet<stri
 }
 
 export function getEquipmentBySlug(rulesetId: SystemRulesetId, slug: string): Equipment {
-  return getBySlug(loadSeedEquipment, rulesetId, slug, 'Equipment')
+  return getBySlug(loadSeedEquipment, rulesetId, slug, getContentTypeTerm('equipment').label)
 }
 
 /** @deprecated Use {@link loadSeedEquipment} filtered by `kind === 'weapon'`. */

@@ -28,6 +28,10 @@ import {
   nameField,
   SPELL_RANGE_DISTANCE_INLINE_COUNT_DIGITS,
 } from '../../lib/forms/fields/content-identity-form-fields'
+import {
+  formatChooseContentTypePlaceholder,
+  getContentTypeCollectionLabel,
+} from '../../lib/content-type-labels'
 import { distanceInputSelectField } from '../../lib/forms/fields/content-speed-form-fields'
 import type { ContentFormCtx } from '../../lib/forms/content-form-registry'
 import {
@@ -266,10 +270,10 @@ function basicsFields(ctx: ContentFormCtx): FormItem[] {
         {
           type: 'combobox',
           name: 'classIds',
-          label: 'Classes',
+          label: getContentTypeCollectionLabel('classes'),
           multiple: true,
           options: ctx.options?.spellcastingClasses ?? [],
-          placeholder: 'Choose classes…',
+          placeholder: formatChooseContentTypePlaceholder('classes', { plural: true }),
           required: true,
           width: '1/2',
         },

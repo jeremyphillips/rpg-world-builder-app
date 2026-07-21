@@ -1,5 +1,6 @@
 import type { CharacterEquipmentEntry, CharacterSpellEntry, Equipment, Spell } from '@rpg/contracts'
 
+import { getContentTypeItemLabel } from '@/features/content/lib/content-type-labels'
 import type {
   CharacterSheetEquipmentCard,
   CharacterSheetSpellCard,
@@ -64,7 +65,7 @@ export function resolvedSpellSheetCardFixture(
       displayName: spell.name,
       referenceId: spell.id,
       prepared: options.prepared ?? true,
-      sources: [{ label: 'Class' }],
+      sources: [{ label: getContentTypeItemLabel('classes') }],
     },
     entry,
     spell,

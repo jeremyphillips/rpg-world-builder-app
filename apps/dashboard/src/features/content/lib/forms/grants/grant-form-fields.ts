@@ -45,6 +45,12 @@ import {
   vocabularyFieldLabel,
 } from '@/features/homebrew'
 
+import {
+  formatChooseContentTypePlaceholder,
+  getContentTypeCollectionLabel,
+  getContentTypeMidSentenceLabel,
+} from '@/features/content/lib/content-type-labels'
+
 import type { ContentFormCtx } from '../content-form-registry'
 import { getLevelFieldOptions, withLevelOptionLabels } from '../../form-options/level-field-options'
 import { getSpellcastingAbilityFieldOptions } from '../../form-options/spellcasting-ability-field-options'
@@ -689,10 +695,10 @@ export function grantItemFields<T extends string>(
     {
       type: 'combobox',
       name: 'spellIds',
-      label: 'Spells',
+      label: getContentTypeCollectionLabel('spells'),
       multiple: true,
       options: spellOptions,
-      placeholder: 'Choose spells…',
+      placeholder: formatChooseContentTypePlaceholder('spells', { plural: true }),
       required: true,
       visibility: visibleFor('spells'),
     },
@@ -714,10 +720,10 @@ export function grantItemFields<T extends string>(
     {
       type: 'combobox',
       name: 'featRecommendedIds',
-      label: 'Recommended feats',
+      label: `Recommended ${getContentTypeMidSentenceLabel('feats', { plural: true })}`,
       multiple: true,
       options: featOptions,
-      placeholder: 'Choose feats…',
+      placeholder: formatChooseContentTypePlaceholder('feats', { plural: true }),
       visibility: visibleFor('featChoice'),
     },
     {

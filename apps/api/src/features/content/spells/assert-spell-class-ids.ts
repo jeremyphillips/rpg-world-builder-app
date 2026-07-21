@@ -1,4 +1,9 @@
-import { classHasSpellcasting, type CharacterClass } from '@rpg/contracts'
+import {
+  classHasSpellcasting,
+  getContentTypeCapitalizedSentenceLabel,
+  getContentTypeSentenceForm,
+  type CharacterClass,
+} from '@rpg/contracts'
 
 import { HttpError } from '../../../lib/http-error'
 
@@ -31,13 +36,15 @@ export function assertSpellClassIdsHaveSpellcasting(
 
   const parts: string[] = []
   if (unknown.length > 0) {
-    const label = unknown.length === 1 ? 'class' : 'classes'
-    parts.push(`Unknown ${label}: ${unknown.map((slug) => `"${slug}"`).join(', ')}.`)
+    parts.push(
+      `Unknown ${getContentTypeSentenceForm('classes', unknown.length)}: ${unknown.map((slug) => `"${slug}"`).join(', ')}.`,
+    )
   }
   if (withoutSpellcasting.length > 0) {
-    const label = withoutSpellcasting.length === 1 ? 'Class' : 'Classes'
     parts.push(
-      `${label} without spellcasting: ${withoutSpellcasting
+      `${getContentTypeCapitalizedSentenceLabel('classes', {
+        plural: withoutSpellcasting.length !== 1,
+      })} without spellcasting: ${withoutSpellcasting
         .map((slug) => `"${bySlug.get(slug)?.name ?? slug}"`)
         .join(', ')}.`,
     )

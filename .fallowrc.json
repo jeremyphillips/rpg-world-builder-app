@@ -7,12 +7,7 @@
     "react-hook-form",
     "@hookform/resolvers"
   ],
-  "ignorePatterns": [
-    "**/*.config.*",
-    "**/__mocks__/**",
-    "**/*.stories.tsx",
-    "packages/catalog/scripts/**"
-  ],
+  "ignorePatterns": ["**/*.config.*", "**/__mocks__/**", "**/*.stories.tsx", "**/scripts/**"],
   "rules": {
     "unused-files": "warn",
     "unused-exports": "warn",

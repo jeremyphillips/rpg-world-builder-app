@@ -15,6 +15,8 @@ function toEyebrow(contentType: string): string {
 export interface RichTextLinkPreviewCardProps extends PreviewCardRootVariantProps {
   title: string
   contentType: string
+  /** Resolved eyebrow copy from the caller; falls back to a title-cased contentType. */
+  eyebrowLabel?: string
   sourceLabel?: string
   className?: string
   onSelect?: () => void
@@ -26,6 +28,7 @@ export interface RichTextLinkPreviewCardProps extends PreviewCardRootVariantProp
 export function RichTextLinkPreviewCard({
   title,
   contentType,
+  eyebrowLabel,
   sourceLabel,
   tone = 'default',
   interactive = false,
@@ -40,7 +43,7 @@ export function RichTextLinkPreviewCard({
   return (
     <PreviewCard
       title={title}
-      eyebrow={toEyebrow(contentType)}
+      eyebrow={eyebrowLabel ?? toEyebrow(contentType)}
       description={sourceLabel}
       tone={tone}
       layout={layout}
