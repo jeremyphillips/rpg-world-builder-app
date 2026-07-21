@@ -1359,7 +1359,7 @@
     },
     {
       "path": "apps/dashboard/src/features/character-import/model/character-import-preview.lib.ts",
-      "line": 38,
+      "line": 41,
       "column": 12,
       "context": "canonical_usage",
       "disposition": "ignored",
@@ -1368,7 +1368,7 @@
     },
     {
       "path": "apps/dashboard/src/features/character-import/model/character-import-preview.lib.ts",
-      "line": 39,
+      "line": 42,
       "column": 12,
       "context": "canonical_usage",
       "disposition": "ignored",
@@ -1377,7 +1377,7 @@
     },
     {
       "path": "apps/dashboard/src/features/character-import/model/character-import-preview.lib.ts",
-      "line": 39,
+      "line": 42,
       "column": 42,
       "context": "unknown",
       "disposition": "unknown",
@@ -1386,7 +1386,7 @@
     },
     {
       "path": "apps/dashboard/src/features/character-import/model/character-import-preview.lib.ts",
-      "line": 83,
+      "line": 86,
       "column": 7,
       "context": "unknown",
       "disposition": "unknown",
@@ -1395,7 +1395,7 @@
     },
     {
       "path": "apps/dashboard/src/features/character-import/model/character-import-preview.lib.ts",
-      "line": 444,
+      "line": 447,
       "column": 10,
       "context": "unknown",
       "disposition": "unknown",
@@ -1404,7 +1404,7 @@
     },
     {
       "path": "apps/dashboard/src/features/character-import/model/character-import-preview.lib.ts",
-      "line": 445,
+      "line": 448,
       "column": 14,
       "context": "unknown",
       "disposition": "unknown",
@@ -1773,7 +1773,7 @@
     },
     {
       "path": "apps/dashboard/src/features/character/components/equipment/equipment-picker-drawer.client.tsx",
-      "line": 467,
+      "line": 466,
       "column": 28,
       "context": "canonical_usage",
       "disposition": "ignored",
@@ -6156,7 +6156,7 @@
     },
     {
       "path": "apps/dashboard/src/features/content/lib/forms/grants/equipment-grant-form-fields.ts",
-      "line": 37,
+      "line": 36,
       "column": 46,
       "context": "unknown",
       "disposition": "unknown",
@@ -6165,7 +6165,7 @@
     },
     {
       "path": "apps/dashboard/src/features/content/lib/forms/grants/equipment-grant-form-fields.ts",
-      "line": 41,
+      "line": 40,
       "column": 8,
       "context": "unknown",
       "disposition": "unknown",
@@ -6174,7 +6174,7 @@
     },
     {
       "path": "apps/dashboard/src/features/content/lib/forms/grants/equipment-grant-form-fields.ts",
-      "line": 372,
+      "line": 371,
       "column": 18,
       "context": "canonical_usage",
       "disposition": "ignored",
@@ -6183,7 +6183,7 @@
     },
     {
       "path": "apps/dashboard/src/features/content/lib/forms/grants/equipment-grant-form-fields.ts",
-      "line": 450,
+      "line": 449,
       "column": 14,
       "context": "canonical_usage",
       "disposition": "ignored",
@@ -6192,7 +6192,7 @@
     },
     {
       "path": "apps/dashboard/src/features/content/lib/forms/grants/equipment-grant-form-fields.ts",
-      "line": 523,
+      "line": 522,
       "column": 3,
       "context": "comment",
       "disposition": "unknown",
@@ -10523,8 +10523,8 @@
     },
     {
       "path": "packages/contracts/src/rpg/runtime/character-builder/character-builder-messages.ts",
-      "line": 129,
-      "column": 23,
+      "line": 130,
+      "column": 19,
       "context": "canonical_usage",
       "disposition": "ignored",
       "value": "getContentTypeSentenceForm('classes')",
@@ -10532,8 +10532,8 @@
     },
     {
       "path": "packages/contracts/src/rpg/runtime/character-builder/character-builder-messages.ts",
-      "line": 129,
-      "column": 50,
+      "line": 130,
+      "column": 46,
       "context": "message",
       "disposition": "unknown",
       "value": "classes",
@@ -10541,8 +10541,8 @@
     },
     {
       "path": "packages/contracts/src/rpg/runtime/character-builder/character-builder-messages.ts",
-      "line": 129,
-      "column": 71,
+      "line": 130,
+      "column": 67,
       "context": "canonical_usage",
       "disposition": "ignored",
       "value": "getContentTypeSentenceForm('equipment')",
@@ -10550,7 +10550,7 @@
     },
     {
       "path": "packages/contracts/src/rpg/runtime/character-builder/character-builder-messages.ts",
-      "line": 134,
+      "line": 135,
       "column": 22,
       "context": "canonical_usage",
       "disposition": "ignored",
@@ -10559,7 +10559,7 @@
     },
     {
       "path": "packages/contracts/src/rpg/runtime/character-builder/character-builder-messages.ts",
-      "line": 134,
+      "line": 135,
       "column": 96,
       "context": "canonical_usage",
       "disposition": "ignored",
@@ -10568,7 +10568,7 @@
     },
     {
       "path": "packages/contracts/src/rpg/runtime/character-builder/character-builder-messages.ts",
-      "line": 134,
+      "line": 135,
       "column": 123,
       "context": "message",
       "disposition": "unknown",
@@ -10577,7 +10577,7 @@
     },
     {
       "path": "packages/contracts/src/rpg/runtime/character-builder/character-builder-messages.ts",
-      "line": 138,
+      "line": 139,
       "column": 35,
       "context": "canonical_usage",
       "disposition": "ignored",
@@ -10586,7 +10586,7 @@
     },
     {
       "path": "packages/contracts/src/rpg/runtime/character-builder/character-builder-messages.ts",
-      "line": 142,
+      "line": 143,
       "column": 42,
       "context": "canonical_usage",
       "disposition": "ignored",
@@ -10595,8 +10595,8 @@
     },
     {
       "path": "packages/contracts/src/rpg/runtime/character-builder/character-builder-messages.ts",
-      "line": 162,
-      "column": 23,
+      "line": 164,
+      "column": 19,
       "context": "canonical_usage",
       "disposition": "ignored",
       "value": "getContentTypeSentenceForm('classes')",
@@ -10604,8 +10604,8 @@
     },
     {
       "path": "packages/contracts/src/rpg/runtime/character-builder/character-builder-messages.ts",
-      "line": 162,
-      "column": 50,
+      "line": 164,
+      "column": 46,
       "context": "message",
       "disposition": "unknown",
       "value": "classes",
@@ -10613,16 +10613,16 @@
     },
     {
       "path": "packages/contracts/src/rpg/runtime/character-builder/character-builder-messages.ts",
-      "line": 162,
-      "column": 71,
+      "line": 164,
+      "column": 67,
       "context": "canonical_usage",
       "disposition": "ignored",
-      "value": "getContentTypeSentenceForm('spells', 2)",
+      "value": "getContentTypeSentenceForm('spells')",
       "variantForms": []
     },
     {
       "path": "packages/contracts/src/rpg/runtime/character-builder/character-builder-messages.ts",
-      "line": 174,
+      "line": 176,
       "column": 35,
       "context": "canonical_usage",
       "disposition": "ignored",
@@ -10631,7 +10631,7 @@
     },
     {
       "path": "packages/contracts/src/rpg/runtime/character-builder/character-builder-messages.ts",
-      "line": 178,
+      "line": 180,
       "column": 23,
       "context": "canonical_usage",
       "disposition": "ignored",
@@ -10640,7 +10640,7 @@
     },
     {
       "path": "packages/contracts/src/rpg/runtime/character-builder/character-builder-messages.ts",
-      "line": 178,
+      "line": 180,
       "column": 50,
       "context": "message",
       "disposition": "unknown",
@@ -10649,7 +10649,7 @@
     },
     {
       "path": "packages/contracts/src/rpg/runtime/character-builder/character-builder-messages.ts",
-      "line": 178,
+      "line": 180,
       "column": 60,
       "context": "message",
       "disposition": "unknown",
@@ -10658,7 +10658,7 @@
     },
     {
       "path": "packages/contracts/src/rpg/runtime/character-builder/character-builder-messages.ts",
-      "line": 182,
+      "line": 184,
       "column": 11,
       "context": "message",
       "disposition": "unknown",
@@ -11936,7 +11936,7 @@
     },
     {
       "path": "packages/contracts/src/rpg/runtime/character-builder/resolvers/equipment/resolve-starting-equipment-choice-sets.ts",
-      "line": 13,
+      "line": 11,
       "column": 27,
       "context": "unknown",
       "disposition": "unknown",
@@ -11945,7 +11945,7 @@
     },
     {
       "path": "packages/contracts/src/rpg/runtime/character-builder/resolvers/equipment/resolve-starting-equipment-choice-sets.ts",
-      "line": 21,
+      "line": 19,
       "column": 27,
       "context": "unknown",
       "disposition": "unknown",
@@ -11954,7 +11954,7 @@
     },
     {
       "path": "packages/contracts/src/rpg/runtime/character-builder/resolvers/equipment/resolve-starting-equipment-choice-sets.ts",
-      "line": 41,
+      "line": 39,
       "column": 17,
       "context": "unknown",
       "disposition": "unknown",
@@ -11963,7 +11963,7 @@
     },
     {
       "path": "packages/contracts/src/rpg/runtime/character-builder/resolvers/equipment/resolve-starting-equipment-choice-sets.ts",
-      "line": 52,
+      "line": 50,
       "column": 1,
       "context": "comment",
       "disposition": "unknown",
@@ -11972,7 +11972,7 @@
     },
     {
       "path": "packages/contracts/src/rpg/runtime/character-builder/resolvers/equipment/resolve-starting-equipment-choice-sets.ts",
-      "line": 64,
+      "line": 62,
       "column": 19,
       "context": "unknown",
       "disposition": "unknown",
@@ -11981,7 +11981,7 @@
     },
     {
       "path": "packages/contracts/src/rpg/runtime/character-builder/resolvers/equipment/resolve-starting-equipment-choice-sets.ts",
-      "line": 67,
+      "line": 65,
       "column": 33,
       "context": "canonical_usage",
       "disposition": "ignored",
@@ -12215,7 +12215,7 @@
     },
     {
       "path": "packages/contracts/src/rpg/runtime/character-builder/resolvers/spellcasting/resolve-spellcasting-choice-sets.ts",
-      "line": 56,
+      "line": 54,
       "column": 26,
       "context": "canonical_usage",
       "disposition": "ignored",
