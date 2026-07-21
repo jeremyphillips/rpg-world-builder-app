@@ -281,8 +281,26 @@ When adding a referencing feature, increment the stub for matching
 ## Consuming reference vocabulary in UI
 
 Display code should never render raw vocabulary slugs. Use label helpers from
-`@rpg/contracts` (`get*Label()`, `format*()`, `*_ENTRIES` maps) so copy stays
-consistent with catalog seed and campaign patches.
+`@rpg/contracts` (`get*Label()`, `format*()`, `*_ENTRIES` maps,
+`vocabularyTermLabel`, `vocabularyTermFieldCopy`) so copy stays consistent with
+catalog seed and campaign patches.
+
+### Four layers (do not mix)
+
+| Layer                            | Owns                                       | Example                             |
+| -------------------------------- | ------------------------------------------ | ----------------------------------- |
+| **`*_TERM`**                     | What the taxonomy is called and means      | `Creature Type`, `creature type`    |
+| **`*_ENTRIES` / resolved vocab** | Permitted or canonical values              | `Humanoid`, campaign-patched labels |
+| **Option-set registry**          | Which taxonomies are campaign-configurable | `VOCABULARY_OPTION_SET_TERMS`       |
+| **Message catalogs**             | Complete UI sentences                      | `defineMessage` validation copy     |
+
+`*_TERM` supplies **nouns and noun phrases** only. Message catalogs own full
+workflow and validation sentences — embed `getTermSentenceForm(TERM, n)` inside
+`defineMessage` formatters; do not generate entire messages from term metadata.
+
+Contracts grammar (`vocabularyTermLabel`, `vocabularyTermFieldCopy`) is
+surface-neutral. Dashboard wrappers (`vocabularyHubLabel`, `vocabularyFieldLabel`)
+apply product casing conventions.
 
 ### Campaign vocab vs closed reference sets
 

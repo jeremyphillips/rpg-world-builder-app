@@ -1,5 +1,5 @@
 import { vocabEnumFromEntries, keysFromEntries } from '../enum-schema'
-import type { GameTermEntry } from '../types'
+import type { GameTermEntry, VocabularyTerm } from '../types'
 
 // ---------------------------------------------------------------------------
 // Physical damage — closed forever (3 SRD types). Weapons use this subset only;
@@ -13,7 +13,7 @@ export const PHYSICAL_DAMAGE_TYPE_TERM = {
     singular: 'physical damage type',
     plural: 'physical damage types',
   },
-} as const satisfies GameTermEntry
+} as const satisfies VocabularyTerm
 
 export const PHYSICAL_DAMAGE_TYPE_ENTRIES = {
   bludgeoning: {

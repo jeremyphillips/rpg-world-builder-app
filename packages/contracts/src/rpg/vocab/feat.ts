@@ -1,6 +1,6 @@
 import { vocabEnumFromEntries, keysFromEntries } from './enum-schema'
 import { getTermSentenceForm } from './types'
-import type { GameTermEntry } from './types'
+import type { GameTermEntry, VocabularyTerm } from './types'
 
 // ---------------------------------------------------------------------------
 // Feat categories — closed SRD 5.2.1 set (v1). Homebrew-only categories may
@@ -14,7 +14,7 @@ export const FEAT_CATEGORY_TERM = {
     singular: 'feat category',
     plural: 'feat categories',
   },
-} as const satisfies GameTermEntry
+} as const satisfies VocabularyTerm
 
 export const FEAT_CATEGORY_ENTRIES = {
   origin: {
@@ -87,7 +87,7 @@ export const FEAT_PART_TERM = {
     singular: 'feat section',
     plural: 'feat sections',
   },
-} as const satisfies GameTermEntry
+} as const satisfies VocabularyTerm
 
 export const FEAT_PART_ENTRIES = {
   benefit: {

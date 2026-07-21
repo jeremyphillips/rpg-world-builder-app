@@ -2,7 +2,7 @@ import { z } from 'zod'
 
 import { vocabEnumFromEntries, keysFromEntries } from './enum-schema'
 import { getTermSentenceForm } from './types'
-import type { GameTermEntry } from './types'
+import type { GameTermEntry, VocabularyTerm } from './types'
 import { abilityValidationMessages } from './ability-messages'
 
 // ---------------------------------------------------------------------------
@@ -17,7 +17,7 @@ export const ABILITY_SCORE_TERM = {
     singular: 'ability score',
     plural: 'ability scores',
   },
-} as const satisfies GameTermEntry
+} as const satisfies VocabularyTerm
 
 export const ABILITY_ENTRIES = {
   str: {

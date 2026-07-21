@@ -1,6 +1,6 @@
 import { vocabEnumFromEntries, keysFromEntries } from '../enum-schema'
 import { getTermCompactLabel } from '../types'
-import type { GameTermEntry } from '../types'
+import type { GameTermEntry, VocabularyTerm } from '../types'
 
 // ---------------------------------------------------------------------------
 // Spell delivery methods — display metadata for attack-roll cantrips/spells.
@@ -13,7 +13,7 @@ export const SPELL_DELIVERY_METHOD_TERM = {
     singular: 'spell delivery method',
     plural: 'spell delivery methods',
   },
-} as const satisfies GameTermEntry
+} as const satisfies VocabularyTerm
 
 export const SPELL_DELIVERY_METHOD_ENTRIES = {
   'melee-spell-attack': {

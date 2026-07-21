@@ -1,7 +1,7 @@
 import { z } from 'zod'
 
 import { vocabEnumFromEntries, keysFromEntries } from '../enum-schema'
-import type { GameTermEntry } from '../types'
+import type { GameTermEntry, VocabularyTerm } from '../types'
 
 // ---------------------------------------------------------------------------
 // Duration units — closed SRD set for timed spell durations.
@@ -14,7 +14,7 @@ export const DURATION_UNIT_TERM = {
     singular: 'duration unit',
     plural: 'duration units',
   },
-} as const satisfies GameTermEntry
+} as const satisfies VocabularyTerm
 
 export const DURATION_UNIT_ENTRIES = {
   round: { label: 'Round', description: 'Lasts for one or more rounds of combat.' },

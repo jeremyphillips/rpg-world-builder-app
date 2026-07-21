@@ -1,6 +1,6 @@
 import type { z } from 'zod'
 
-import type { GameTermEntry } from './types'
+import type { VocabularyTerm } from './types'
 import { vocabularyOptionIdSchema, type VocabularyOptionSetId } from './vocabulary'
 
 // ---------------------------------------------------------------------------
@@ -16,7 +16,7 @@ export const CREATURE_TYPE_TERM = {
     singular: 'creature type',
     plural: 'creature types',
   },
-} as const satisfies GameTermEntry
+} as const satisfies VocabularyTerm
 
 export const CREATURE_TYPE_SET_ID = 'creature-types' as const satisfies VocabularyOptionSetId
 

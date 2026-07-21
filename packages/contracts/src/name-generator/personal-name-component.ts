@@ -1,7 +1,7 @@
 import { z } from 'zod'
 
 import { keysFromEntries, vocabEnumFromEntries } from '../rpg/vocab/enum-schema'
-import type { GameTermEntry } from '../rpg/vocab/types'
+import type { GameTermEntry, VocabularyTerm } from '../rpg/vocab/types'
 
 // ---------------------------------------------------------------------------
 // Personal name components — optional parts beyond implicit given names.
@@ -14,7 +14,7 @@ export const PERSONAL_NAME_COMPONENT_TERM = {
     singular: 'personal name component',
     plural: 'personal name components',
   },
-} as const satisfies GameTermEntry
+} as const satisfies VocabularyTerm
 
 export const PERSONAL_NAME_COMPONENT_ENTRIES = {
   family: {

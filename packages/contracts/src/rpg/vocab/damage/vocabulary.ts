@@ -1,7 +1,7 @@
 import type { z } from 'zod'
 
 import { formatVocabularySlugLabel } from '../format-slug-label'
-import { getTermSentenceForm, type GameTermEntry } from '../types'
+import { getTermSentenceForm, type GameTermEntry, type VocabularyTerm } from '../types'
 import { vocabularyOptionIdSchema, type VocabularyOptionSetId } from '../vocabulary'
 import { getPhysicalDamageTypeEntry, getPhysicalDamageTypeLabel } from './physical'
 
@@ -17,7 +17,7 @@ export const DAMAGE_TYPE_TERM = {
     singular: 'damage type',
     plural: 'damage types',
   },
-} as const satisfies GameTermEntry
+} as const satisfies VocabularyTerm
 
 export const DAMAGE_TYPE_SET_ID = 'damage-types' as const satisfies VocabularyOptionSetId
 

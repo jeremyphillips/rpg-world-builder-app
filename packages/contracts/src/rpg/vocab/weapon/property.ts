@@ -1,5 +1,5 @@
 import { vocabEnumFromEntries, keysFromEntries } from '../enum-schema'
-import type { GameTermEntry } from '../types'
+import type { GameTermEntry, VocabularyTerm } from '../types'
 
 // ---------------------------------------------------------------------------
 // Properties — the closed SRD 5.2.1 property set
@@ -12,7 +12,7 @@ export const WEAPON_PROPERTY_TERM = {
     singular: 'weapon property',
     plural: 'weapon properties',
   },
-} as const satisfies GameTermEntry
+} as const satisfies VocabularyTerm
 
 export const WEAPON_PROPERTY_ENTRIES = {
   ammunition: {

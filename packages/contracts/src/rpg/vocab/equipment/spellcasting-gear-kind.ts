@@ -1,5 +1,5 @@
 import { closedSetEnum, keysFromEntries, vocabEnumFromEntries } from '../enum-schema'
-import type { GameTermEntry } from '../types'
+import type { GameTermEntry, VocabularyTerm } from '../types'
 
 // ---------------------------------------------------------------------------
 // Spellcasting gear sub-kinds — discriminates items within
@@ -13,7 +13,7 @@ export const SPELLCASTING_GEAR_KIND_TERM = {
     singular: 'spellcasting gear kind',
     plural: 'spellcasting gear kinds',
   },
-} as const satisfies GameTermEntry
+} as const satisfies VocabularyTerm
 
 export const SPELLCASTING_GEAR_KIND_ENTRIES = {
   arcane_focus: {

@@ -1,6 +1,6 @@
 import { keysFromEntries, vocabEnumFromEntries } from '../enum-schema'
 
-import { getTermSentenceForm, type GameTermEntry } from '../types'
+import { getTermSentenceForm, type GameTermEntry, type VocabularyTerm } from '../types'
 
 // ---------------------------------------------------------------------------
 // Tool categories — artisan sets, kits, instruments, and specialty tools.
@@ -13,7 +13,7 @@ export const TOOL_CATEGORY_TERM = {
     singular: 'tool category',
     plural: 'tool categories',
   },
-} as const satisfies GameTermEntry
+} as const satisfies VocabularyTerm
 
 export const TOOL_CATEGORY_ENTRIES = {
   artisan: {

@@ -1,7 +1,7 @@
 import { vocabEnumFromEntries, keysFromEntries } from '../enum-schema'
 import type { VocabularyOptionSetId } from '../vocabulary'
 import { getTermSentenceForm } from '../types'
-import type { GameTermEntry } from '../types'
+import type { GameTermEntry, VocabularyTerm } from '../types'
 
 // ---------------------------------------------------------------------------
 // Attack resolution modes — how attack rolls are resolved against armor class.
@@ -18,7 +18,7 @@ export const ATTACK_RESOLUTION_MODE_TERM = {
     singular: 'attack resolution mode',
     plural: 'attack resolution modes',
   },
-} as const satisfies GameTermEntry
+} as const satisfies VocabularyTerm
 
 export const ATTACK_RESOLUTION_MODE_ENTRIES = {
   attack_matrix: {

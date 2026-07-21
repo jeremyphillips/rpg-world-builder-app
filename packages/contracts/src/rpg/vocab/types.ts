@@ -1,4 +1,6 @@
-/** Shared shape for closed-set game terms (labels, SRD rule text, tooltips). */
+import { midSentenceLabel, withArticle } from '../../validation/messages'
+
+/** A value within a taxonomy — label, description, and optional prose forms. */
 export type GameTermEntry = {
   readonly label: string
   readonly description: string
@@ -11,12 +13,64 @@ export type GameTermEntry = {
   }
 }
 
-/** The concept a closed `*_ENTRIES` map classifies (sibling `*_TERM` constant). */
+/**
+ * The taxonomy concept itself (`*_TERM`). Same shape as `GameTermEntry` today;
+ * kept distinct so taxonomy-level metadata can diverge from option entries later.
+ */
 export type VocabularyTerm = GameTermEntry
 
-/** Title-case label for a vocabulary concept. */
+export type VocabularyTermLabelNumber = 'singular' | 'plural'
+export type VocabularyTermLabelCasing = 'sentence' | 'title'
+
+export type VocabularyTermLabelOptions = {
+  number?: VocabularyTermLabelNumber
+  casing?: VocabularyTermLabelCasing
+}
+
+/** Title-case navigation label for a taxonomy concept (`term.label`). */
 export function getVocabularyTermLabel(term: VocabularyTerm): string {
   return term.label
+}
+
+/**
+ * Grammatical label from a taxonomy concept — not surface-specific.
+ * Title + singular → `term.label`. All other combinations use curated `sentence` forms.
+ */
+export function vocabularyTermLabel(
+  term: VocabularyTerm,
+  options: VocabularyTermLabelOptions = {},
+): string {
+  const number = options.number ?? 'singular'
+  const casing = options.casing ?? 'title'
+
+  if (casing === 'title' && number === 'singular') {
+    return term.label
+  }
+
+  return getTermSentenceForm(term, number === 'singular' ? 1 : 2)
+}
+
+export type VocabularyTermFieldCopyOptions = {
+  multiple?: boolean
+}
+
+/** Default form field label and combobox placeholder from a taxonomy term. */
+export function vocabularyTermFieldCopy(
+  term: VocabularyTerm,
+  options: VocabularyTermFieldCopyOptions = {},
+): { label: string; placeholder: string } {
+  const phrase = vocabularyTermLabel(term, {
+    number: options.multiple ? 'plural' : 'singular',
+    casing: 'sentence',
+  })
+  const label = phrase.charAt(0).toUpperCase() + phrase.slice(1)
+
+  return {
+    label,
+    placeholder: options.multiple
+      ? `Choose ${midSentenceLabel(phrase)}…`
+      : `Choose ${withArticle(midSentenceLabel(phrase))}…`,
+  }
 }
 
 /** Lowercase display label for simple generated prose. */

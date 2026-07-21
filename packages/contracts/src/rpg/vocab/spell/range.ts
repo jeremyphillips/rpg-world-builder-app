@@ -1,7 +1,7 @@
 import { z } from 'zod'
 
 import { vocabEnumFromEntries, keysFromEntries } from '../enum-schema'
-import type { GameTermEntry } from '../types'
+import type { GameTermEntry, VocabularyTerm } from '../types'
 
 // ---------------------------------------------------------------------------
 // Spell range kinds — closed SRD set for spell metadata.
@@ -14,7 +14,7 @@ export const SPELL_RANGE_KIND_TERM = {
     singular: 'spell range',
     plural: 'spell ranges',
   },
-} as const satisfies GameTermEntry
+} as const satisfies VocabularyTerm
 
 export const SPELL_RANGE_KIND_ENTRIES = {
   self: { label: 'Self', description: 'The spell affects only the caster.' },

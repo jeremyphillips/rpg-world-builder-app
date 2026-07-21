@@ -2,7 +2,7 @@ import { z } from 'zod'
 
 import { vocabEnumFromEntries, keysFromEntries } from './enum-schema'
 import { getTermSentenceForm } from './types'
-import type { GameTermEntry } from './types'
+import type { GameTermEntry, VocabularyTerm } from './types'
 
 // ---------------------------------------------------------------------------
 // Alignments — the closed SRD 5.2.1 moral compass set. Shared by characters,
@@ -16,7 +16,7 @@ export const ALIGNMENT_TERM = {
     singular: 'alignment',
     plural: 'alignments',
   },
-} as const satisfies GameTermEntry
+} as const satisfies VocabularyTerm
 
 export const ALIGNMENT_ENTRIES = {
   lg: {

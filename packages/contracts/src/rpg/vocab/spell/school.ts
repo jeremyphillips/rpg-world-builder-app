@@ -1,7 +1,7 @@
 import type { z } from 'zod'
 
 import { formatVocabularySlugLabel } from '../format-slug-label'
-import type { GameTermEntry } from '../types'
+import type { VocabularyTerm } from '../types'
 import { vocabularyOptionIdSchema, type VocabularyOptionSetId } from '../vocabulary'
 
 // ---------------------------------------------------------------------------
@@ -15,7 +15,7 @@ export const SPELL_SCHOOL_TERM = {
     singular: 'school of magic',
     plural: 'schools of magic',
   },
-} as const satisfies GameTermEntry
+} as const satisfies VocabularyTerm
 
 export const SPELL_SCHOOL_SET_ID = 'spell-schools' as const satisfies VocabularyOptionSetId
 

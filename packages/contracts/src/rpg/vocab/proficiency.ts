@@ -1,5 +1,5 @@
 import { keysFromEntries } from './enum-schema'
-import { getTermSentenceForm, type GameTermEntry } from './types'
+import { getTermSentenceForm, type GameTermEntry, type VocabularyTerm } from './types'
 
 // ---------------------------------------------------------------------------
 // Proficiency grant kinds — weapon, tool, skill, and armor training terms
@@ -13,7 +13,7 @@ export const PROFICIENCY_TERM = {
     singular: 'proficiency',
     plural: 'proficiencies',
   },
-} as const satisfies GameTermEntry
+} as const satisfies VocabularyTerm
 
 export const PROFICIENCY_DOMAIN_ENTRIES = {
   weapon: {

@@ -1,5 +1,5 @@
 import { keysFromEntries, vocabEnumFromEntries } from '../enum-schema'
-import type { GameTermEntry } from '../types'
+import type { GameTermEntry, VocabularyTerm } from '../types'
 
 // ---------------------------------------------------------------------------
 // Weapon mode — melee vs ranged.
@@ -12,7 +12,7 @@ export const WEAPON_MODE_TERM = {
     singular: 'weapon mode',
     plural: 'weapon modes',
   },
-} as const satisfies GameTermEntry
+} as const satisfies VocabularyTerm
 
 export const WEAPON_MODE_ENTRIES = {
   melee: {

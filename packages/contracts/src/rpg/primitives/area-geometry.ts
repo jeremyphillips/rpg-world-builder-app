@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-import type { GameTermEntry } from '../vocab/types'
+import type { GameTermEntry, VocabularyTerm } from '../vocab/types'
 import { getTermCompactLabel } from '../vocab/types'
 
 import { formatFractionalNumber } from './number-format'
@@ -17,7 +17,7 @@ export const AREA_GEOMETRY_SHAPE_TERM = {
     singular: 'area shape',
     plural: 'area shapes',
   },
-} as const satisfies GameTermEntry
+} as const satisfies VocabularyTerm
 
 export const AREA_GEOMETRY_SHAPE_ENTRIES = {
   sphere: {

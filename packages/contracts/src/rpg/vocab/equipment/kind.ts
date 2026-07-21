@@ -1,4 +1,4 @@
-import type { GameTermEntry } from '../types'
+import type { GameTermEntry, VocabularyTerm } from '../types'
 import { vocabEnumFromEntries } from '../enum-schema'
 
 // ---------------------------------------------------------------------------
@@ -12,7 +12,7 @@ export const EQUIPMENT_KIND_TERM = {
     singular: 'equipment kind',
     plural: 'equipment kinds',
   },
-} as const satisfies GameTermEntry
+} as const satisfies VocabularyTerm
 
 export const EQUIPMENT_KIND_ENTRIES = {
   weapon: {

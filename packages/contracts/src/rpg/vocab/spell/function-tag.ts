@@ -1,5 +1,5 @@
 import { vocabEnumFromEntries, keysFromEntries } from '../enum-schema'
-import type { GameTermEntry } from '../types'
+import type { GameTermEntry, VocabularyTerm } from '../types'
 
 // ---------------------------------------------------------------------------
 // Spell function tags — closed browse/filter vocabulary for spell discovery.
@@ -12,7 +12,7 @@ export const SPELL_FUNCTION_TAG_TERM = {
     singular: 'spell function tag',
     plural: 'spell function tags',
   },
-} as const satisfies GameTermEntry
+} as const satisfies VocabularyTerm
 
 export const SPELL_FUNCTION_TAG_ENTRIES = {
   communication: {

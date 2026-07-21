@@ -1,5 +1,5 @@
 import { keysFromEntries } from '../rpg/vocab/enum-schema'
-import type { GameTermEntry } from '../rpg/vocab/types'
+import type { GameTermEntry, VocabularyTerm } from '../rpg/vocab/types'
 import { z } from 'zod'
 
 // ---------------------------------------------------------------------------
@@ -13,7 +13,7 @@ export const NAME_SUBJECT_KIND_TERM = {
     singular: 'name subject',
     plural: 'name subjects',
   },
-} as const satisfies GameTermEntry
+} as const satisfies VocabularyTerm
 
 export const NAME_SUBJECT_KINDS = [
   'person',

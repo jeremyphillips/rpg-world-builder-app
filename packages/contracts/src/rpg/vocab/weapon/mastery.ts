@@ -1,5 +1,5 @@
 import { vocabEnumFromEntries, keysFromEntries } from '../enum-schema'
-import type { GameTermEntry } from '../types'
+import type { GameTermEntry, VocabularyTerm } from '../types'
 
 // ---------------------------------------------------------------------------
 // Mastery — every SRD 5.2.1 weapon has exactly one mastery
@@ -12,7 +12,7 @@ export const WEAPON_MASTERY_TERM = {
     singular: 'weapon mastery',
     plural: 'weapon masteries',
   },
-} as const satisfies GameTermEntry
+} as const satisfies VocabularyTerm
 
 export const WEAPON_MASTERY_ENTRIES = {
   cleave: {

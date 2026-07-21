@@ -2,7 +2,7 @@ import { z } from 'zod'
 
 import { closedSetEnum, keysFromEntries, vocabEnumFromEntries } from './enum-schema'
 import { getTermSentenceForm } from './types'
-import type { GameTermEntry } from './types'
+import type { GameTermEntry, VocabularyTerm } from './types'
 
 // ---------------------------------------------------------------------------
 // Movement modes — the closed SRD 5.2.1 movement types shared by species,
@@ -16,7 +16,7 @@ export const MOVEMENT_MODE_TERM = {
     singular: 'movement mode',
     plural: 'movement modes',
   },
-} as const satisfies GameTermEntry
+} as const satisfies VocabularyTerm
 
 export const MOVEMENT_MODE_ENTRIES = {
   walk: {
@@ -187,7 +187,7 @@ export const MOVEMENT_OPERATION_TERM = {
     singular: 'movement operation',
     plural: 'movement operations',
   },
-} as const satisfies GameTermEntry
+} as const satisfies VocabularyTerm
 
 export const MOVEMENT_OPERATION_ENTRIES = {
   set: {

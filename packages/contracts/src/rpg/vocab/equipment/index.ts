@@ -1,3 +1,4 @@
+export * from './equipment-category'
 export * from './gear-kind'
 export * from './kind'
 export * from './spellcasting-gear-kind'

@@ -3,7 +3,7 @@ import { z } from 'zod'
 import { keysFromEntries, vocabEnumFromEntries } from './enum-schema'
 
 import { formatVocabularySlugLabel } from './format-slug-label'
-import { getTermSentenceForm, type GameTermEntry } from './types'
+import { getTermSentenceForm, type GameTermEntry, type VocabularyTerm } from './types'
 import {
   vocabularyOptionIdSchema,
   vocabularySeedOptionSchema,
@@ -22,7 +22,7 @@ export const LANGUAGE_CATEGORY_TERM = {
     singular: 'language category',
     plural: 'language categories',
   },
-} as const satisfies GameTermEntry
+} as const satisfies VocabularyTerm
 
 export const LANGUAGE_CATEGORY_ENTRIES = {
   standard: {
@@ -58,7 +58,7 @@ export const LANGUAGE_TERM = {
     singular: 'language',
     plural: 'languages',
   },
-} as const satisfies GameTermEntry
+} as const satisfies VocabularyTerm
 
 /** Extended catalog seed row — category is validated at catalog load. */
 export const languageSeedOptionSchema = vocabularySeedOptionSchema.extend({

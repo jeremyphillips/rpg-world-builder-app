@@ -1,6 +1,6 @@
 import { keysFromEntries, vocabEnumFromEntries } from '../enum-schema'
 import { getTermSentenceForm } from '../types'
-import type { GameTermEntry } from '../types'
+import type { GameTermEntry, VocabularyTerm } from '../types'
 
 // ---------------------------------------------------------------------------
 // Vehicle categories — land, water, air, and exotic conveyances.
@@ -13,7 +13,7 @@ export const VEHICLE_CATEGORY_TERM = {
     singular: 'vehicle category',
     plural: 'vehicle categories',
   },
-} as const satisfies GameTermEntry
+} as const satisfies VocabularyTerm
 
 export const VEHICLE_CATEGORY_ENTRIES = {
   land: {

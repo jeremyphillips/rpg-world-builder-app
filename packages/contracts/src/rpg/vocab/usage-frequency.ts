@@ -1,6 +1,6 @@
 import { vocabEnumFromEntries, keysFromEntries } from './enum-schema'
 import { getTermSentenceForm } from './types'
-import type { GameTermEntry } from './types'
+import type { GameTermEntry, VocabularyTerm } from './types'
 
 // ---------------------------------------------------------------------------
 // Usage frequency — how often a limited-use ability can be invoked for free
@@ -15,7 +15,7 @@ export const USAGE_FREQUENCY_TERM = {
     singular: 'usage frequency',
     plural: 'usage frequencies',
   },
-} as const satisfies GameTermEntry
+} as const satisfies VocabularyTerm
 
 export const USAGE_FREQUENCY_ENTRIES = {
   at_will: {

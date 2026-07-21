@@ -1,7 +1,7 @@
 import { vocabEnumFromEntries, keysFromEntries } from '../enum-schema'
 import type { VocabularyOptionSetId } from '../vocabulary'
 import { getTermSentenceForm } from '../types'
-import type { GameTermEntry } from '../types'
+import type { GameTermEntry, VocabularyTerm } from '../types'
 
 // ---------------------------------------------------------------------------
 // Edition presets — rules-era bundles for campaign mechanics configuration.
@@ -19,7 +19,7 @@ export const EDITION_PRESET_TERM = {
     singular: 'edition preset',
     plural: 'edition presets',
   },
-} as const satisfies GameTermEntry
+} as const satisfies VocabularyTerm
 
 export const EDITION_PRESET_ENTRIES = {
   becmi: {

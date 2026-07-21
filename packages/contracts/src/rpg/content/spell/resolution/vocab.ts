@@ -1,4 +1,4 @@
-import type { GameTermEntry } from '../../../vocab/types'
+import type { GameTermEntry, VocabularyTerm } from '../../../vocab/types'
 
 // ---------------------------------------------------------------------------
 // Spell resolution vocabulary — closed sets for the resolution envelope MVP.
@@ -11,7 +11,7 @@ export const SPELL_RESOLUTION_TARGET_KIND_TERM = {
     singular: 'resolution target',
     plural: 'resolution targets',
   },
-} as const satisfies GameTermEntry
+} as const satisfies VocabularyTerm
 
 export const SPELL_RESOLUTION_TARGET_KIND_ENTRIES = {
   creature: {
@@ -58,7 +58,7 @@ export const SPELL_RESOLUTION_ATTACK_TYPE_TERM = {
     singular: 'resolution attack type',
     plural: 'resolution attack types',
   },
-} as const satisfies GameTermEntry
+} as const satisfies VocabularyTerm
 
 export const SPELL_RESOLUTION_ATTACK_TYPE_ENTRIES = {
   'melee-spell': {
@@ -87,7 +87,7 @@ export const SPELL_RESOLUTION_OUTCOME_RESULT_TERM = {
     singular: 'resolution outcome',
     plural: 'resolution outcomes',
   },
-} as const satisfies GameTermEntry
+} as const satisfies VocabularyTerm
 
 export const SPELL_RESOLUTION_OUTCOME_RESULT_ENTRIES = {
   hit: {
@@ -125,7 +125,7 @@ export const SPELL_RESOLUTION_APPLICATION_AMOUNT_TERM = {
     singular: 'application amount',
     plural: 'application amounts',
   },
-} as const satisfies GameTermEntry
+} as const satisfies VocabularyTerm
 
 export const SPELL_RESOLUTION_APPLICATION_AMOUNT_ENTRIES = {
   full: {
@@ -152,7 +152,7 @@ export const SPELL_RESOLUTION_PROXIMITY_KIND_TERM = {
     singular: 'resolution proximity',
     plural: 'resolution proximities',
   },
-} as const satisfies GameTermEntry
+} as const satisfies VocabularyTerm
 
 export const SPELL_RESOLUTION_PROXIMITY_KIND_ENTRIES = {
   self: {
@@ -187,7 +187,7 @@ export const SPELL_RESOLUTION_SELECTION_MODE_TERM = {
     singular: 'resolution selection mode',
     plural: 'resolution selection modes',
   },
-} as const satisfies GameTermEntry
+} as const satisfies VocabularyTerm
 
 export const SPELL_RESOLUTION_SELECTION_MODE_ENTRIES = {
   self: {
@@ -221,7 +221,7 @@ export const SPELL_RESOLUTION_TARGET_COUNT_KIND_TERM = {
     singular: 'target count',
     plural: 'target counts',
   },
-} as const satisfies GameTermEntry
+} as const satisfies VocabularyTerm
 
 export const SPELL_RESOLUTION_TARGET_COUNT_KIND_ENTRIES = {
   exact: {
@@ -330,7 +330,7 @@ export const SPELL_APPLICATION_PATTERN_TERM = {
     singular: 'application pattern',
     plural: 'application patterns',
   },
-} as const satisfies GameTermEntry
+} as const satisfies VocabularyTerm
 
 export const SPELL_APPLICATION_PATTERN_KIND_ENTRIES = {
   projectiles: {

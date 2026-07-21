@@ -1,7 +1,7 @@
 import { keysFromEntries, vocabEnumFromEntries } from '../enum-schema'
 
 import { getTermSentenceForm } from '../types'
-import type { GameTermEntry } from '../types'
+import type { GameTermEntry, VocabularyTerm } from '../types'
 
 // ---------------------------------------------------------------------------
 // Service categories — hirelings, lodging, travel, and other paid services.
@@ -14,7 +14,7 @@ export const SERVICE_CATEGORY_TERM = {
     singular: 'service category',
     plural: 'service categories',
   },
-} as const satisfies GameTermEntry
+} as const satisfies VocabularyTerm
 
 export const SERVICE_CATEGORY_ENTRIES = {
   hireling: {

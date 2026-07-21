@@ -1,4 +1,4 @@
-import type { GameTermEntry } from '../types'
+import type { GameTermEntry, VocabularyTerm } from '../types'
 import { vocabEnumFromEntries, keysFromEntries } from '../enum-schema'
 
 // ---------------------------------------------------------------------------
@@ -13,7 +13,7 @@ export const SPELL_GRANT_AVAILABILITY_TERM = {
     singular: 'spell grant availability',
     plural: 'spell grant availabilities',
   },
-} as const satisfies GameTermEntry
+} as const satisfies VocabularyTerm
 
 export const SPELL_GRANT_AVAILABILITY_ENTRIES = {
   always_prepared: {

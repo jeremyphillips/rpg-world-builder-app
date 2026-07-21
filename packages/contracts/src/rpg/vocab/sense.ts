@@ -1,7 +1,7 @@
 import { z } from 'zod'
 
 import { formatVocabularySlugLabel } from './format-slug-label'
-import { getTermSentenceForm, type GameTermEntry } from './types'
+import { getTermSentenceForm, type GameTermEntry, type VocabularyTerm } from './types'
 import { vocabularyOptionIdSchema, type VocabularyOptionSetId } from './vocabulary'
 
 // ---------------------------------------------------------------------------
@@ -15,7 +15,7 @@ export const SENSE_TERM = {
     singular: 'sense',
     plural: 'senses',
   },
-} as const satisfies GameTermEntry
+} as const satisfies VocabularyTerm
 
 export const SENSE_SET_ID = 'senses' as const satisfies VocabularyOptionSetId
 

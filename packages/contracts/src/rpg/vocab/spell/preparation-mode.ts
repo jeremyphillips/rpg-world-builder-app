@@ -1,4 +1,4 @@
-import type { GameTermEntry } from '../types'
+import type { GameTermEntry, VocabularyTerm } from '../types'
 import { vocabEnumFromEntries, keysFromEntries } from '../enum-schema'
 
 // ---------------------------------------------------------------------------
@@ -12,7 +12,7 @@ export const SPELL_PREPARATION_MODE_TERM = {
     singular: 'spell preparation mode',
     plural: 'spell preparation modes',
   },
-} as const satisfies GameTermEntry
+} as const satisfies VocabularyTerm
 
 export const SPELL_PREPARATION_MODE_ENTRIES = {
   prepared: {
