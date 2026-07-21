@@ -21,7 +21,7 @@ packages/contracts/src/
   shared/               # auth, user, roles, routes, errors, csrf, upload, assets
   rpg/
     vocab/              # closed-set game terms + open vocabulary set ids
-    primitives/         # shared value types (levels, dice, units, ruleset id)
+    primitives/         # shared value types (levels, dice, units, authored content, ruleset id)
     content/            # catalog content types (species, weapons, classes, …)
       lib/              # envelope, grants, content-key, content-type-keys, …
       classes/          # class body, spellcasting, subclasses
@@ -74,7 +74,7 @@ flowchart BT
 | ------------------------------------------------------- | ----------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
 | A shared validation message or message primitive        | `validation/`           | `validation/messages.ts` (see [validation-messages.md](validation-messages.md))                                              |
 | A closed id set with labels (and optional SRD text)     | `rpg/vocab/`            | `rpg/vocab/sense.ts`, `rpg/vocab/weapon/property.ts`                                                                         |
-| A reusable value type used across content types         | `rpg/primitives/`       | `rpg/primitives/dice.ts`, `rpg/primitives/units.ts`, `rpg/primitives/wealth.ts`                                              |
+| A reusable value type used across content types         | `rpg/primitives/`       | `rpg/primitives/dice.ts`, `rpg/primitives/units.ts`, `rpg/primitives/authored-content.ts`                                    |
 | A catalog content type or its DTOs/patches              | `rpg/content/`          | `rpg/content/species.ts`, `rpg/content/classes/class.ts`                                                                     |
 | Shared content helpers (grants, envelope, keys)         | `rpg/content/lib/`      | `rpg/content/lib/grants.ts`                                                                                                  |
 | Creature-like runtime primitives (PC, NPC, monster)     | `rpg/runtime/creature/` | `languages.ts`, `equipment.ts`, `spellcasting.ts` — see [runtime-resolution-boundaries.md](runtime-resolution-boundaries.md) |
@@ -88,6 +88,13 @@ flowchart BT
 
 Nested folders are fine when a domain splits cleanly (e.g. `rpg/content/classes/`
 for spellcasting + class body, `rpg/vocab/weapon/` for weapon term maps).
+
+Named authored RPG records share `authoredContentBodySchema` from
+`rpg/primitives/authored-content.ts` (`name`, optional rich-text `description`,
+and optional `imageKey`). Persistence and ownership fields do not belong in this
+primitive. Rules catalog bodies consume it through the existing
+`contentBodyBaseSchema` alias; future campaign-owned world records and shipped
+seed-entry contracts can compose the neutral primitive with their own envelopes.
 
 Each layer has an `index.ts` barrel. Re-export new public symbols from that
 barrel (the root barrel picks up `shared/` and `rpg/*` automatically).
