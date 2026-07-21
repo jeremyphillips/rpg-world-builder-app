@@ -4,6 +4,10 @@ import { classesOfferingSkillChoice } from '@rpg/contracts'
 import type { SkillProficiency } from '@rpg/contracts'
 
 import { ROUTES } from '@/app/routes'
+import {
+  formatContentNotFoundMessage,
+  getContentTypeMidSentenceLabel,
+} from '@/features/content/lib/content-type-labels'
 import { useSetBreadcrumbLabel } from '@/components/layout/use-breadcrumb-label'
 import { WidePage } from '@/components/layout/wide-page'
 import { useClasses } from '../../classes/hooks/use-classes'
@@ -119,8 +123,8 @@ export function SkillProficiencyDetail() {
       isError={isError}
       items={skillProficiencies}
       itemId={skillId}
-      loadErrorLabel="Could not load skill proficiency."
-      notFoundLabel="Skill proficiency not found."
+      loadErrorLabel={`Could not load ${getContentTypeMidSentenceLabel('skill-proficiencies')}.`}
+      notFoundLabel={formatContentNotFoundMessage('skill-proficiencies')}
     >
       {(skill) => <SkillDetailContent skill={skill} campaignId={campaignId} skillId={skillId} />}
     </ContentDetailResolver>

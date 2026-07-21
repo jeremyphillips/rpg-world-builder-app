@@ -5,6 +5,7 @@ import { personalNameComponentSchema } from '@rpg/contracts/name-generator'
 import { type FormItem } from '@rpg/ui/form'
 
 import { buildActiveLanguageFieldOptions } from '@/features/homebrew'
+import { getContentTypeMidSentenceLabel } from '@/features/content/lib/content-type-labels'
 
 import type { ContentFormCtx } from '../../lib/forms/content-form-registry'
 import { SpeciesCultureNamingAlert } from '../components/species-culture-naming-alert.client'
@@ -95,7 +96,7 @@ export function cultureFields(ctx: ContentFormCtx): FormItem {
         type: 'switch',
         name: CULTURE_USE_OVERRIDE_FIELD,
         label: 'Use a different culture tradition',
-        hint: 'Override the default culture id derived from this species slug.',
+        hint: `Override the default culture id derived from this ${getContentTypeMidSentenceLabel('species')} slug.`,
         visibility: {
           dependsOn: [],
           visibleWhen: () => !systemSpecies,

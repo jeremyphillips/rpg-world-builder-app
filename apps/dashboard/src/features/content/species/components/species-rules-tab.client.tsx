@@ -8,6 +8,7 @@ import { FormItems } from '@rpg/ui/form'
 
 import { AvailabilityAlert, campaignSettingHref, resolveAvailability } from '@/lib/availability'
 import { disableFormItems } from '@/lib/disable-form-items'
+import { getContentTypeMidSentenceLabel } from '@/features/content/lib/content-type-labels'
 
 import type { ContentFormCtx } from '../../lib/forms/content-form-registry'
 import { campaignRulesFromCtx } from '../../lib/form-options/content-campaign-rules'
@@ -90,8 +91,7 @@ function SpeciesRulesEditor({ formCtx }: { formCtx: ContentFormCtx }) {
     return (
       <div className="space-y-3 rounded-md border border-border bg-surface-muted p-4">
         <Text variant="muted" className="text-sm">
-          Enable species multiclass policy or species level limits in campaign rules to author
-          species-specific multiclass data.
+          {`Enable ${getContentTypeMidSentenceLabel('species')} multiclass policy or ${getContentTypeMidSentenceLabel('species')} level limits in campaign rules to author ${getContentTypeMidSentenceLabel('species')}-specific multiclass data.`}
         </Text>
         <RulesConfigLink campaignId={campaignId} />
       </div>

@@ -28,6 +28,7 @@ import {
   resolveWeaponAttackAbilityModifier,
   toCharacterSheetDerivationInput,
   weaponAttackBonus,
+  getProficiencyDomainCompactLabel,
 } from '@rpg/contracts'
 
 import { resolveLanguagePreviewLabel } from './language-preview-label'
@@ -94,7 +95,7 @@ export const CHARACTER_DETAIL_TAB_LABELS = {
 } as const
 
 export const CHARACTER_PROFICIENCY_GROUP_LABELS = {
-  skills: 'Skills',
+  skills: getProficiencyDomainCompactLabel('skill'),
   languages: 'Languages',
   weapons: 'Weapons',
   tools: 'Tools',

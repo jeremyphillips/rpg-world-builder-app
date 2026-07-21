@@ -7,6 +7,7 @@ import { CONTENT_TYPE_KEYS } from './content-type-keys'
 import {
   CONTENT_TYPE_TERMS,
   CONTENT_TYPE_TERM_KEYS,
+  getContentTypeSentenceForm,
   getContentTypeTerm,
 } from './content-type-terms'
 
@@ -25,5 +26,10 @@ describe('content type terms', () => {
   it('keeps skill proficiency grammar aligned between content-type and domain registries', () => {
     expect(CONTENT_TYPE_TERMS['skill-proficiencies'].sentence).toEqual(SKILL_PROFICIENCY_SENTENCE)
     expect(PROFICIENCY_DOMAIN_ENTRIES.skill.sentence).toEqual(SKILL_PROFICIENCY_SENTENCE)
+  })
+
+  it('resolves counted sentence forms for catalog prose', () => {
+    expect(getContentTypeSentenceForm('species')).toBe('species')
+    expect(getContentTypeSentenceForm('classes', 2)).toBe('classes')
   })
 })

@@ -8,6 +8,7 @@ import {
   getArmorTrainingCompactSuffix,
   getProficiencyGrantAddLabel,
   getProficiencyGrantCompactSuffix,
+  getProficiencyDomainCompactLabel,
   getProficiencyDomainLabel,
   getProficiencyDomainSentenceForm,
   getProficiencyPoolAnyLabel,
@@ -29,6 +30,11 @@ describe('proficiency grant vocabulary', () => {
   it('returns title-case domain labels', () => {
     expect(getProficiencyDomainLabel('weapon')).toBe('Weapon proficiency')
     expect(getProficiencyDomainLabel('armor')).toBe('Armor training')
+  })
+
+  it('returns compact domain labels for tight UI surfaces', () => {
+    expect(getProficiencyDomainCompactLabel('skill')).toBe('Skills')
+    expect(getProficiencyDomainCompactLabel('weapon')).toBe('Weapon Proficiency')
   })
 
   it('returns compact suffixes and pool phrases', () => {

@@ -4,6 +4,7 @@ import { formatVocabularySlugLabel } from '../../../../vocab/format-slug-label'
 import { getArmorCategoryLabel } from '../../../../vocab/armor/category'
 import { getToolCategoryLabel } from '../../../../vocab/equipment/tool-category'
 import { getWeaponCategoryLabel } from '../../../../vocab/weapon/category'
+import { getProficiencyDomainCompactLabel } from '../../../../vocab/proficiency'
 import type { CharacterBuildPreview } from '../../preview'
 import { isChoiceSetSatisfied } from '../../choice-set'
 import type { ChoiceSet } from '../../choice-set'
@@ -73,7 +74,7 @@ export const PROFICIENCY_STALE_REASON = 'This proficiency is no longer available
 
 const PROFICIENCY_SECTION_HEADINGS: Record<ProficiencyStepSectionKind, string> = {
   savingThrows: 'Saving Throws',
-  skills: 'Skills',
+  skills: getProficiencyDomainCompactLabel('skill'),
   tools: 'Tools',
   languages: 'Languages',
   weapons: 'Weapons',

@@ -1,6 +1,7 @@
 'use client'
 
 import { SemanticText, Text } from '@rpg/ui'
+import { getProficiencyDomainCompactLabel } from '@rpg/contracts'
 import type {
   CharacterImportFieldResult,
   CharacterImportProficienciesPreview,
@@ -69,7 +70,7 @@ export function CharacterImportProficienciesPreviewSection({
       ) : (
         <>
           <ProficiencyGroup
-            label="Skills"
+            label={getProficiencyDomainCompactLabel('skill')}
             values={formatProficienciesPreviewValue(preview.skills)}
           />
           <ProficiencyGroup label="Tools" values={formatProficienciesPreviewValue(preview.tools)} />

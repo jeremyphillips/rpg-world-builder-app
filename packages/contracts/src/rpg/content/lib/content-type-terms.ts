@@ -1,6 +1,6 @@
 import { CONTENT_TYPE_KEYS, type ContentTypeKey } from './content-type-keys'
 import { SKILL_PROFICIENCY_SENTENCE } from '../../vocab/proficiency-sentence'
-import type { VocabularyTerm } from '../../vocab/types'
+import { getTermSentenceForm, type VocabularyTerm } from '../../vocab/types'
 
 export const CONTENT_TYPE_TERMS = {
   classes: {
@@ -53,6 +53,11 @@ export const CONTENT_TYPE_TERMS = {
 /** Returns the catalog content-type term for a collection key. */
 export function getContentTypeTerm(key: ContentTypeKey): VocabularyTerm {
   return CONTENT_TYPE_TERMS[key]
+}
+
+/** Counted noun phrase for generated prose (e.g. "species", "classes"). */
+export function getContentTypeSentenceForm(key: ContentTypeKey, count = 1): string {
+  return getTermSentenceForm(getContentTypeTerm(key), count)
 }
 
 export const CLASS_CONTENT_TYPE_TERM = CONTENT_TYPE_TERMS.classes

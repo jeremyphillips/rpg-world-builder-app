@@ -1,5 +1,8 @@
 import { ABILITY_IDS } from '../../vocab/ability'
-import { getContentTypeTerm } from '../../content/lib/content-type-terms'
+import {
+  getContentTypeSentenceForm,
+  getContentTypeTerm,
+} from '../../content/lib/content-type-terms'
 import { isStandardArrayAssignment, STANDARD_ARRAY } from './ability-generation'
 import { areRequiredChoiceSetsSatisfied } from './choice-set'
 import type { ChoiceSet, ChoiceType } from './choice-set'
@@ -54,7 +57,7 @@ const BUILDER_STEP_METADATA = {
   },
   species: {
     label: getContentTypeTerm('species').label,
-    description: "Choose your character's species and heritage",
+    description: `Choose your character's ${getContentTypeSentenceForm('species')} and heritage`,
   },
   class: {
     label: 'Class',

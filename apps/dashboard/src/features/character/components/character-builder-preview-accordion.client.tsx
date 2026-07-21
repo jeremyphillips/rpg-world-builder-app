@@ -7,6 +7,7 @@ import {
   type CharacterBuilderDraft,
   type CharacterNarrative,
   type ChoiceSet,
+  getProficiencyDomainCompactLabel,
 } from '@rpg/contracts'
 import {
   Accordion,
@@ -253,7 +254,7 @@ function PreviewProficienciesSection({
             />
           </CharacterBuilderPreviewSubsection>
 
-          <CharacterBuilderPreviewSubsection title="Skills">
+          <CharacterBuilderPreviewSubsection title={getProficiencyDomainCompactLabel('skill')}>
             <PreviewProficiencySubsectionContent
               subsection={formatPreviewSkillsSubsection(preview, skillChoicesRemaining)}
             />

@@ -1,5 +1,6 @@
 import { formatSlugAsLabel } from '../../primitives/format-slug'
 import { getAbilityLabel, type Ability } from '../../vocab/ability'
+import { getContentTypeSentenceForm } from './content-type-terms'
 import {
   DEFAULT_SPECIES_MULTICLASS_POLICY,
   type SpeciesLevelLimits,
@@ -117,7 +118,7 @@ function checkSpeciesPolicy(input: ValidateMulticlassInput): MulticlassError[] {
     return [
       {
         code: 'species_policy_forbidden',
-        message: 'This species cannot multiclass.',
+        message: `This ${getContentTypeSentenceForm('species')} cannot multiclass.`,
       },
     ]
   }
@@ -138,7 +139,7 @@ function checkSpeciesPolicy(input: ValidateMulticlassInput): MulticlassError[] {
     {
       code: 'species_policy_class_not_allowed',
       classSlug: targetSlug,
-      message: `This species cannot multiclass into ${className}.`,
+      message: `This ${getContentTypeSentenceForm('species')} cannot multiclass into ${className}.`,
     },
   ]
 }
@@ -158,7 +159,7 @@ function checkSpeciesLevelLimits(input: ValidateMulticlassInput): MulticlassErro
   ) {
     errors.push({
       code: 'species_level_limit_character',
-      message: `This species is limited to character level ${levelLimits.maxCharacterLevel}.`,
+      message: `This ${getContentTypeSentenceForm('species')} is limited to character level ${levelLimits.maxCharacterLevel}.`,
     })
   }
 
@@ -171,7 +172,7 @@ function checkSpeciesLevelLimits(input: ValidateMulticlassInput): MulticlassErro
     errors.push({
       code: 'species_level_limit_class',
       classSlug: targetSlug,
-      message: `This species limits ${resolveClassDisplayName(input, targetSlug)} to level ${cap.maxLevel}.`,
+      message: `This ${getContentTypeSentenceForm('species')} limits ${resolveClassDisplayName(input, targetSlug)} to level ${cap.maxLevel}.`,
     })
   }
 

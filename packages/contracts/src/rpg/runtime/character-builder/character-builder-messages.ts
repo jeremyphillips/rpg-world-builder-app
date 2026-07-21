@@ -1,4 +1,5 @@
 import { defineMessage } from '../../../validation/define-message'
+import { getContentTypeSentenceForm } from '../../content/lib/content-type-terms'
 
 // ---------------------------------------------------------------------------
 // Character builder validation messages (surface catalog).
@@ -99,7 +100,8 @@ export const characterBuilderValidationMessages = {
   ),
   speciesRequiredForLanguageRecommendations: defineMessage(
     'validation.characterBuilder.speciesRequiredForLanguageRecommendations',
-    () => 'Choose a species to see recommended languages for your ancestry.',
+    () =>
+      `Choose a ${getContentTypeSentenceForm('species')} to see recommended languages for your ancestry.`,
   ),
   finalizationFailed: defineMessage(
     'validation.characterBuilder.finalizationFailed',
