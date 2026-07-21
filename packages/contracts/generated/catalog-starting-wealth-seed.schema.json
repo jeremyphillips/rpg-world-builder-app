@@ -155,24 +155,11 @@
         },
         "magicItemGrants": {
           "default": [],
-          "type": "array",
-          "items": {
-            "type": "object",
-            "properties": {
-              "rarity": {
-                "type": "string",
-                "enum": ["common", "uncommon", "rare", "very_rare", "legendary", "artifact"],
-                "description": "common | uncommon | rare | very_rare | legendary | artifact"
-              },
-              "quantity": {
-                "type": "integer",
-                "minimum": 1,
-                "maximum": 9007199254740991
-              }
-            },
-            "required": ["rarity", "quantity"],
-            "additionalProperties": false
-          }
+          "allOf": [
+            {
+              "$ref": "#/definitions/__schema3"
+            }
+          ]
         }
       },
       "required": [
@@ -189,6 +176,26 @@
       "type": "integer",
       "minimum": 1,
       "maximum": 100
+    },
+    "__schema3": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "rarity": {
+            "type": "string",
+            "enum": ["common", "uncommon", "rare", "very_rare", "legendary", "artifact"],
+            "description": "common | uncommon | rare | very_rare | legendary | artifact"
+          },
+          "quantity": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9007199254740991
+          }
+        },
+        "required": ["rarity", "quantity"],
+        "additionalProperties": false
+      }
     }
   }
 }
