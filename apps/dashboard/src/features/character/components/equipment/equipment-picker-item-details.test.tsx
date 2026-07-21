@@ -79,7 +79,7 @@ describe('EquipmentPickerItemDetails', () => {
       name: EQUIPMENT_PICKER_PURCHASE_SECTION_LABEL,
     }).nextElementSibling
 
-    expect(quantityRow).toHaveClass('mb-4')
+    expect(quantityRow).not.toHaveClass('mb-4')
     expect(purchasePanel).toHaveClass(equipmentPickerPurchaseInsetPanelClasses)
     expect(quantityRow?.nextElementSibling?.textContent).toContain('Unit price')
   })

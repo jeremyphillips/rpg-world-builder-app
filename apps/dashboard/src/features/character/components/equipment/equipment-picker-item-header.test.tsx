@@ -43,7 +43,7 @@ describe('EquipmentPickerItemHeader', () => {
     expect(screen.getByText('Finesse · Light · Thrown')).toBeInTheDocument()
     expect(screen.getByText('Weapon')).toBeInTheDocument()
     expect(screen.getByText(EQUIPMENT_PICKER_ESSENTIAL_LABEL)).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Add' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Add' })).toHaveClass('border-outline-button-border')
   })
 
   it('renders warning icon for caution callouts', () => {

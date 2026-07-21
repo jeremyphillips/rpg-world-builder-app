@@ -21,7 +21,14 @@ import {
 } from '../../lib/equipment-step.lib'
 import type { EquipmentOwnedSourceAction } from './equipment-acquisition-panel.lib'
 import { EquipmentAcquisitionPanelBody } from './equipment-acquisition-panel-body.client'
-import { equipmentInventoryDisclosureTriggerClasses } from './equipment-acquisition-panel.variants'
+import {
+  equipmentAddedInventoryManageActionsClasses,
+  equipmentAddedInventoryManageDetailLineClasses,
+  equipmentAddedInventoryManageHeaderClasses,
+  equipmentAddedInventoryManageMetaClasses,
+  equipmentAddedInventoryManagePanelContentClasses,
+  equipmentAddedInventoryManageTriggerClasses,
+} from './equipment-acquisition-panel.variants'
 import {
   groupEquipmentInventoryRowsForDisplay,
   type AddedEquipmentEntryViewModel,
@@ -60,11 +67,11 @@ export type EquipmentAddedInventoryRowItemProps = {
   onOpenChange?: (open: boolean) => void
 }
 
-function InventoryRowDetailLine({ label }: { label?: string }) {
+function InventoryRowDetailLine({ label, className }: { label?: string; className?: string }) {
   if (!label) return null
 
   return (
-    <div className={equipmentInventoryRowDetailLineClasses}>
+    <div className={className ?? equipmentInventoryRowDetailLineClasses}>
       <Text as="p" variant="caption" className={equipmentInventoryRowPriceLineClasses}>
         {label}
       </Text>
@@ -188,34 +195,42 @@ function ManagedInventoryRow({
         open={isOpen}
         onOpenChange={handleOpenChange}
       >
-        <div className={equipmentInventoryRowHeaderClasses}>
-          <div className={builderInventoryRowMetaClasses}>
-            <Text as="p" className={equipmentInventoryRowNameClasses}>
-              {entry.equipmentName}
-            </Text>
+        <div className={equipmentAddedInventoryManageMetaClasses}>
+          <div className={equipmentAddedInventoryManageHeaderClasses}>
+            <div className={builderInventoryRowMetaClasses}>
+              <Text as="p" className={equipmentInventoryRowNameClasses}>
+                {entry.equipmentName}
+              </Text>
+            </div>
+            <div className={equipmentAddedInventoryManageActionsClasses}>
+              <Text as="span" className={equipmentInventoryRowQtyLabelClasses}>
+                Qty {totalQuantity}
+              </Text>
+              <CollapsibleTrigger asChild>
+                <button
+                  type="button"
+                  className={equipmentAddedInventoryManageTriggerClasses}
+                  aria-controls={contentId}
+                >
+                  {isOpen ? EQUIPMENT_INVENTORY_DONE_LABEL : EQUIPMENT_INVENTORY_MANAGE_LABEL}
+                  {isOpen ? (
+                    <ChevronUp aria-hidden className="size-3.5" />
+                  ) : (
+                    <ChevronDown aria-hidden className="size-3.5" />
+                  )}
+                </button>
+              </CollapsibleTrigger>
+            </div>
           </div>
-          <div className={equipmentInventoryRowActionsClasses}>
-            <Text as="span" className={equipmentInventoryRowQtyLabelClasses}>
-              Qty {totalQuantity}
-            </Text>
-            <CollapsibleTrigger asChild>
-              <button
-                type="button"
-                className={equipmentInventoryDisclosureTriggerClasses}
-                aria-controls={contentId}
-              >
-                {isOpen ? EQUIPMENT_INVENTORY_DONE_LABEL : EQUIPMENT_INVENTORY_MANAGE_LABEL}
-                {isOpen ? (
-                  <ChevronUp aria-hidden className="size-3.5" />
-                ) : (
-                  <ChevronDown aria-hidden className="size-3.5" />
-                )}
-              </button>
-            </CollapsibleTrigger>
-          </div>
+          <InventoryRowDetailLine
+            label={entry.provenanceLabel}
+            className={equipmentAddedInventoryManageDetailLineClasses}
+          />
         </div>
-        <InventoryRowDetailLine label={entry.provenanceLabel} />
-        <CollapsibleContent id={contentId}>
+        <CollapsibleContent
+          id={contentId}
+          className={equipmentAddedInventoryManagePanelContentClasses}
+        >
           <EquipmentAcquisitionPanelBody
             draft={draft}
             context={context}
@@ -229,6 +244,7 @@ function ManagedInventoryRow({
             successQuantity={successQuantity}
             onSourceAction={handleSourceAction}
             onCommit={commitQuantity}
+            layout="disclosure"
           />
         </CollapsibleContent>
       </Collapsible>

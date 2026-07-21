@@ -2,7 +2,7 @@
 
 import { useId, useMemo } from 'react'
 
-import { Button, Heading, NumberStepper, Text } from '@rpg/ui'
+import { Badge, Button, Heading, NumberStepper, Text } from '@rpg/ui'
 
 import { EQUIPMENT_ACQUISITION_ADDING_LABEL } from '../../lib/equipment-step.lib'
 import {
@@ -22,9 +22,16 @@ import {
   equipmentAcquisitionPanelCommitButtonClasses,
   equipmentAcquisitionPanelDividerClasses,
   equipmentAcquisitionPanelNextActionClasses,
+  equipmentAcquisitionPanelNextActionDisclosureClasses,
+  equipmentAcquisitionPanelOwnedHeadingRowClasses,
+  equipmentAcquisitionPanelOwnedSectionClasses,
+  equipmentAcquisitionPanelOwnedSectionDisclosureClasses,
+  equipmentAcquisitionPanelOwnedSourceListDisclosureClasses,
   equipmentAcquisitionPanelPreviewLineClasses,
+  equipmentAcquisitionPanelPreviewLineDisclosureClasses,
   equipmentAcquisitionPanelQuantityLabelClasses,
   equipmentAcquisitionPanelQuantityRowClasses,
+  equipmentAcquisitionPanelQuantityRowDisclosureClasses,
   equipmentAcquisitionPanelSectionHeadingClasses,
   equipmentAcquisitionPanelSourceActionsClasses,
   equipmentAcquisitionPanelSourceLabelClasses,
@@ -117,8 +124,10 @@ export function EquipmentAcquisitionPanelBody({
   successQuantity,
   onSourceAction,
   onCommit,
+  layout = 'default',
 }: EquipmentAcquisitionPanelBodyProps) {
   const liveRegionId = useId()
+  const isDisclosureLayout = layout === 'disclosure'
 
   const viewModel = useMemo(
     () =>
@@ -150,15 +159,34 @@ export function EquipmentAcquisitionPanelBody({
     <div className={equipmentAcquisitionPanelBodyClasses}>
       {owned ? (
         <>
-          <div className="space-y-3">
-            <Heading
-              variant="group"
-              as="h4"
-              className={equipmentAcquisitionPanelSectionHeadingClasses}
+          <div
+            className={
+              isDisclosureLayout
+                ? equipmentAcquisitionPanelOwnedSectionDisclosureClasses
+                : equipmentAcquisitionPanelOwnedSectionClasses
+            }
+          >
+            <div className={equipmentAcquisitionPanelOwnedHeadingRowClasses}>
+              <Heading
+                variant="group"
+                as="h4"
+                className={equipmentAcquisitionPanelSectionHeadingClasses}
+              >
+                {owned.heading}
+              </Heading>
+              {owned.totalQuantity > 0 ? (
+                <Badge appearance="neutral" tone="neutral" size="sm">
+                  {owned.totalQuantity}
+                </Badge>
+              ) : null}
+            </div>
+            <div
+              className={
+                isDisclosureLayout
+                  ? equipmentAcquisitionPanelOwnedSourceListDisclosureClasses
+                  : equipmentAcquisitionPanelSourceListClasses
+              }
             >
-              {owned.heading}
-            </Heading>
-            <div className={equipmentAcquisitionPanelSourceListClasses}>
               {owned.sources.map((source) => (
                 <OwnedSourceRow
                   key={source.key}
@@ -173,7 +201,13 @@ export function EquipmentAcquisitionPanelBody({
         </>
       ) : null}
 
-      <div className={equipmentAcquisitionPanelNextActionClasses}>
+      <div
+        className={
+          isDisclosureLayout
+            ? equipmentAcquisitionPanelNextActionDisclosureClasses
+            : equipmentAcquisitionPanelNextActionClasses
+        }
+      >
         {nextAction.heading ? (
           <Heading
             variant="group"
@@ -191,7 +225,13 @@ export function EquipmentAcquisitionPanelBody({
         ) : (
           <>
             {nextAction.showQuantity ? (
-              <div className={equipmentAcquisitionPanelQuantityRowClasses}>
+              <div
+                className={
+                  isDisclosureLayout
+                    ? equipmentAcquisitionPanelQuantityRowDisclosureClasses
+                    : equipmentAcquisitionPanelQuantityRowClasses
+                }
+              >
                 <Text as="span" className={equipmentAcquisitionPanelQuantityLabelClasses}>
                   {nextAction.quantityLabel}
                 </Text>
@@ -212,7 +252,15 @@ export function EquipmentAcquisitionPanelBody({
             ) : null}
 
             {nextAction.previewLines.map((line) => (
-              <Text key={line} as="p" className={equipmentAcquisitionPanelPreviewLineClasses}>
+              <Text
+                key={line}
+                as="p"
+                className={
+                  isDisclosureLayout
+                    ? equipmentAcquisitionPanelPreviewLineDisclosureClasses
+                    : equipmentAcquisitionPanelPreviewLineClasses
+                }
+              >
                 {line}
               </Text>
             ))}

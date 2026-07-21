@@ -30,13 +30,30 @@ export const equipmentAcquisitionPanelSourceActionsClasses = 'flex justify-end'
 export const equipmentAcquisitionPanelPurchaseFooterClasses =
   'flex justify-end text-sm text-muted-foreground'
 
+export const equipmentAcquisitionPanelOwnedSectionClasses = 'space-y-3'
+
+export const equipmentAcquisitionPanelOwnedSectionDisclosureClasses = 'space-y-3'
+
+export const equipmentAcquisitionPanelOwnedSourceListDisclosureClasses = 'space-y-3'
+
+export const equipmentAcquisitionPanelOwnedHeadingRowClasses =
+  'flex min-w-0 flex-wrap items-center gap-2'
+
 export const equipmentAcquisitionPanelNextActionClasses = 'space-y-2'
 
+export const equipmentAcquisitionPanelNextActionDisclosureClasses = 'space-y-0'
+
 export const equipmentAcquisitionPanelQuantityRowClasses = 'flex items-center justify-between gap-3'
+
+export const equipmentAcquisitionPanelQuantityRowDisclosureClasses =
+  'flex items-center justify-between gap-3'
 
 export const equipmentAcquisitionPanelQuantityLabelClasses = 'text-sm text-foreground'
 
 export const equipmentAcquisitionPanelPreviewLineClasses = 'text-sm text-muted-foreground'
+
+export const equipmentAcquisitionPanelPreviewLineDisclosureClasses =
+  'mb-3 text-sm text-muted-foreground'
 
 export const equipmentAcquisitionPanelCommitButtonClasses =
   'min-w-[13rem] justify-center tabular-nums'
@@ -45,6 +62,19 @@ export const equipmentAcquisitionPanelBlockerClasses = 'text-sm text-muted-foreg
 
 export const equipmentInventoryDisclosureTriggerClasses =
   'inline-flex shrink-0 cursor-pointer items-center gap-1 border-0 bg-transparent p-0 text-sm text-foreground underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring'
+
+export const equipmentAddedInventoryManageHeaderClasses = 'flex items-start justify-between gap-2'
+
+export const equipmentAddedInventoryManageActionsClasses = 'flex shrink-0 items-start gap-3'
+
+export const equipmentAddedInventoryManageDetailLineClasses = 'mt-0'
+
+export const equipmentAddedInventoryManageTriggerClasses =
+  'inline-flex shrink-0 cursor-pointer items-center gap-1 border-0 bg-transparent p-0 text-xs text-foreground underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring'
+
+export const equipmentAddedInventoryManageMetaClasses = 'space-y-0'
+
+export const equipmentAddedInventoryManagePanelContentClasses = 'mt-3'
 
 export const equipmentAddedInventoryPanelFilledClasses = 'rounded-lg border border-border px-4 py-4'
 

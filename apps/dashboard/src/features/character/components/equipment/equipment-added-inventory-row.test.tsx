@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { expectNoAxeViolations } from '@rpg/ui/test-utils'
 
@@ -95,10 +95,11 @@ describe('EquipmentAddedInventoryRowItem', () => {
     expect(screen.getByText('Qty 2')).toBeInTheDocument()
     const trigger = screen.getByRole('button', { name: 'Manage' })
     expect(trigger).toHaveAttribute('aria-expanded', 'false')
+    expect(trigger).toHaveClass('text-xs')
 
     await user.click(trigger)
-    expect(screen.getByRole('button', { name: 'Done' })).toBeInTheDocument()
-    expect(screen.getByRole('heading', { name: 'Owned copies' })).toBeInTheDocument()
+    const ownedHeadingRow = screen.getByRole('heading', { name: 'Owned copies' }).parentElement
+    expect(within(ownedHeadingRow!).getByText('2')).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: /Remove all/ })).not.toBeInTheDocument()
   })
 

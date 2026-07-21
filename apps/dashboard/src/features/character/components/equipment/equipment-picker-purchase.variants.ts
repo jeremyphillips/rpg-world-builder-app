@@ -1,11 +1,6 @@
-import { cn } from '@rpg/ui'
-
 export const equipmentPickerPurchaseRowClasses = 'flex items-center justify-between gap-3 text-sm'
 
-export const equipmentPickerPurchaseQuantityRowClasses = cn(
-  equipmentPickerPurchaseRowClasses,
-  'mb-4',
-)
+export const equipmentPickerPurchaseQuantityRowClasses = equipmentPickerPurchaseRowClasses
 
 export const equipmentPickerPurchaseDividerClasses = 'border-b border-border'
 

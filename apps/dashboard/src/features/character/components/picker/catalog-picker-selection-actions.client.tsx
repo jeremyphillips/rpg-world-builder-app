@@ -1,9 +1,8 @@
 'use client'
 
-import {
-  catalogPickerSelectionAddButtonClasses,
-  catalogPickerSelectionRemoveButtonClasses,
-} from './catalog-picker-selection-actions.variants'
+import type { ButtonProps } from '@rpg/ui'
+
+import { CatalogPickerActionButton } from './catalog-picker-action-button.client'
 import { catalogPickerSelectionActionsClasses } from './catalog-picker-item-header.variants'
 
 export type CatalogPickerSelectionActionsProps = {
@@ -11,6 +10,7 @@ export type CatalogPickerSelectionActionsProps = {
   canSelect: boolean
   onAdd: () => void
   onRemove: () => void
+  buttonVariant?: ButtonProps['variant']
 }
 
 export function CatalogPickerSelectionActions({
@@ -18,26 +18,18 @@ export function CatalogPickerSelectionActions({
   canSelect,
   onAdd,
   onRemove,
+  buttonVariant,
 }: CatalogPickerSelectionActionsProps) {
   return (
     <div className={catalogPickerSelectionActionsClasses}>
       {selected ? (
-        <button
-          type="button"
-          className={catalogPickerSelectionRemoveButtonClasses}
-          onClick={onRemove}
-        >
+        <CatalogPickerActionButton variant={buttonVariant} onClick={onRemove}>
           Remove
-        </button>
+        </CatalogPickerActionButton>
       ) : (
-        <button
-          type="button"
-          className={catalogPickerSelectionAddButtonClasses}
-          disabled={!canSelect}
-          onClick={onAdd}
-        >
+        <CatalogPickerActionButton variant={buttonVariant} disabled={!canSelect} onClick={onAdd}>
           Add
-        </button>
+        </CatalogPickerActionButton>
       )}
     </div>
   )

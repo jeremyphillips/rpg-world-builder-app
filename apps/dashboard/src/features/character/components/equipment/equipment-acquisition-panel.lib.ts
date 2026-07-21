@@ -52,6 +52,7 @@ export type EquipmentAcquisitionPanelViewModel = {
   title?: string
   owned?: {
     heading: string
+    totalQuantity: number
     sources: EquipmentOwnedSourceViewModel[]
   }
   nextAction: {
@@ -359,6 +360,7 @@ function buildOwnedSourcesSection(
 
   return {
     heading: EQUIPMENT_INVENTORY_OWNED_COPIES_LABEL,
+    totalQuantity: sumOwnedInventoryQuantity(rows),
     sources,
   }
 }

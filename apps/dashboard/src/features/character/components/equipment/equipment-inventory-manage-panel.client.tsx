@@ -90,6 +90,7 @@ export function EquipmentInventoryManagePanelBody({
       successQuantity={successQuantity}
       onSourceAction={handleSourceAction}
       onCommit={commitQuantity}
+      layout="disclosure"
     />
   )
 }
