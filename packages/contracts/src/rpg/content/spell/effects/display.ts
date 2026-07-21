@@ -1,6 +1,7 @@
 import { formatRollValue, type RollValue } from '../../../primitives/mechanics/roll'
 import { getDamageTypeLabel } from '../../../vocab/damage/vocabulary'
-import { HIT_POINTS_TERM } from '../../../primitives/mechanics/hit-points-term'
+import { HIT_POINTS_TERM } from '../../../vocab/mechanics/hit-points'
+import { vocabularyTermLabel } from '../../../vocab/types'
 import {
   getSpellAtomicEffectKindLabel,
   type SpellAtomicEffectKind,
@@ -67,7 +68,7 @@ export function formatAtomicEffectSummary(effect: SpellAtomicEffect): string {
     case 'healing':
       return `${formatRollValue(effect.roll)} healing`
     case 'temporary-hit-points':
-      return `${formatRollValue(effect.roll)} temporary ${HIT_POINTS_TERM.plural}`
+      return `${formatRollValue(effect.roll)} temporary ${vocabularyTermLabel(HIT_POINTS_TERM, { number: 'plural', casing: 'sentence' })}`
     default: {
       const _exhaustive: never = effect
       return _exhaustive

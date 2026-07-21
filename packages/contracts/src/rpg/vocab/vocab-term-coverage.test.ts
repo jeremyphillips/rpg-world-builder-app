@@ -35,6 +35,7 @@ import { MAGIC_ITEM_CATEGORY_TERM } from './magic-item/category'
 import { MAGIC_ITEM_RARITY_TERM } from './magic-item/rarity'
 import { ATTACK_RESOLUTION_MODE_TERM } from './mechanics/attack-resolution-mode'
 import { EDITION_PRESET_TERM } from './mechanics/edition-preset'
+import { HIT_POINTS_TERM } from './mechanics/hit-points'
 import { MOVEMENT_MODE_TERM, MOVEMENT_OPERATION_TERM } from './movement-mode'
 import { PROFICIENCY_TERM } from './proficiency'
 import { SENSE_TERM } from './sense'
@@ -115,6 +116,9 @@ const NAME_GENERATOR_TERMS = [
 
 const PRIMITIVE_TERMS = [AREA_GEOMETRY_SHAPE_TERM] as const satisfies readonly VocabularyTerm[]
 
+/** Taxonomies with `*_TERM` only — no `*_ENTRIES`, not in `VOCABULARY_OPTION_SET_TERMS`. */
+const CONCEPT_ONLY_TERMS = [HIT_POINTS_TERM] as const satisfies readonly VocabularyTerm[]
+
 const SPELL_RESOLUTION_TERMS = [
   SPELL_RESOLUTION_TARGET_KIND_TERM,
   SPELL_RESOLUTION_ATTACK_TYPE_TERM,
@@ -162,6 +166,15 @@ describe('primitives term coverage', () => {
   it('defines vocab terms for GameTermEntry *_ENTRIES maps', () => {
     expect(PRIMITIVE_TERMS).toHaveLength(1)
     for (const term of PRIMITIVE_TERMS) {
+      expectVocabularyTerm(term)
+    }
+  })
+})
+
+describe('concept-only term coverage', () => {
+  it('defines vocab terms without *_ENTRIES maps', () => {
+    expect(CONCEPT_ONLY_TERMS).toHaveLength(1)
+    for (const term of CONCEPT_ONLY_TERMS) {
       expectVocabularyTerm(term)
     }
   })

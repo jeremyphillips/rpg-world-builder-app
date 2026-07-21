@@ -196,7 +196,7 @@ export const MAGIC_ITEM_RARITY_TERM = {
 export const MAGIC_ITEM_RARITY_ENTRIES = { common: { … }, … }
 ```
 
-**Concept-only terms** (no `*_ENTRIES`, not in the option-set registry) export `*_TERM` alone — e.g. hit points for generated effect prose.
+**Concept-only terms** (no `*_ENTRIES`, not in the option-set registry) export `*_TERM` alone — e.g. [`hit-points.ts`](../src/rpg/vocab/mechanics/hit-points.ts) for generated effect prose.
 
 **Configurable option sets** map set ids to taxonomy terms via
 [`vocabulary-option-set-terms.ts`](../src/rpg/vocab/vocabulary-option-set-terms.ts)

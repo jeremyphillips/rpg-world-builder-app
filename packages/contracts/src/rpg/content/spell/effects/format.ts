@@ -1,6 +1,7 @@
 import { formatRollValue, type RollValue } from '../../../primitives/mechanics/roll'
 import { getDamageTypeLabel } from '../../../vocab/damage/vocabulary'
-import { HIT_POINTS_TERM } from '../../../primitives/mechanics/hit-points-term'
+import { HIT_POINTS_TERM } from '../../../vocab/mechanics/hit-points'
+import { vocabularyTermLabel } from '../../../vocab/types'
 import type { SpellResolutionTargetKind } from '../resolution/vocab'
 import type { EffectRecipient } from './recipient'
 import type { SpellAtomicEffect } from './schema'
@@ -31,10 +32,11 @@ function formatDamageRoll(roll: RollValue, damageTypeId: string, lowercaseType =
 }
 
 function hitPointsLabel(register: EffectSentenceRegister, plural: boolean): string {
-  if (register === 'resolution-preview') {
-    return plural ? 'hit points' : 'hit point'
-  }
-  return plural ? HIT_POINTS_TERM.plural : HIT_POINTS_TERM.singular
+  const phrase = vocabularyTermLabel(HIT_POINTS_TERM, {
+    number: plural ? 'plural' : 'singular',
+    casing: 'sentence',
+  })
+  return register === 'resolution-preview' ? phrase.toLowerCase() : phrase
 }
 
 function previewSubject(recipient: EffectRecipient): string {
@@ -86,7 +88,7 @@ function formatAuthoringHealingSentence(
   recipient: EffectRecipient,
   targetKind?: SpellResolutionTargetKind,
 ): string {
-  return `${recipientVerb(recipient, 'heal', targetKind)} ${formatRollValue(parts.roll)} ${HIT_POINTS_TERM.plural}.`
+  return `${recipientVerb(recipient, 'heal', targetKind)} ${formatRollValue(parts.roll)} ${hitPointsLabel('authoring', true)}.`
 }
 
 function formatPreviewHealingSentence(parts: EffectRowParts, recipient: EffectRecipient): string {
@@ -104,7 +106,7 @@ function formatAuthoringTemporaryHitPointsSentence(
   recipient: EffectRecipient,
   targetKind?: SpellResolutionTargetKind,
 ): string {
-  return `${recipientVerb(recipient, 'gain', targetKind)} ${formatRollValue(parts.roll)} temporary ${HIT_POINTS_TERM.plural}.`
+  return `${recipientVerb(recipient, 'gain', targetKind)} ${formatRollValue(parts.roll)} temporary ${hitPointsLabel('authoring', true)}.`
 }
 
 function formatPreviewTemporaryHitPointsSentence(
