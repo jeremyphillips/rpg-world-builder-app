@@ -10,6 +10,7 @@ import {
 import {
   buildEquipmentAcquisitionPanelViewModel,
   formatAcquisitionCommitSuccessAnnouncement,
+  type EquipmentAcquisitionPanelViewModel,
   type EquipmentOwnedSourceAction,
   type EquipmentOwnedSourceViewModel,
 } from './equipment-acquisition-panel.lib'
@@ -22,6 +23,7 @@ import {
   equipmentAcquisitionPanelNextActionClasses,
   equipmentAcquisitionPanelNextActionDisclosureClasses,
   equipmentAcquisitionPanelOwnedHeadingRowClasses,
+  equipmentAcquisitionPanelOwnedHeadingRowDisclosureClasses,
   equipmentAcquisitionPanelOwnedSectionClasses,
   equipmentAcquisitionPanelOwnedSectionDisclosureClasses,
   equipmentAcquisitionPanelOwnedSourceListDisclosureClasses,
@@ -43,6 +45,18 @@ import {
 } from './equipment-acquisition-panel.variants'
 import { EquipmentInventorySourceActionButton } from './equipment-inventory-source-action-button.client'
 import type { EquipmentAcquisitionPanelBodyProps } from './equipment-acquisition-panel-body.types'
+
+type LayoutVariant = {
+  default: string
+  disclosure: string
+}
+
+function resolveAcquisitionPanelLayoutClass(
+  isDisclosureLayout: boolean,
+  classes: LayoutVariant,
+): string {
+  return isDisclosureLayout ? classes.disclosure : classes.default
+}
 
 function OwnedSourceQuantity({ source }: { source: EquipmentOwnedSourceViewModel }) {
   if (!source.spendSuffix) {
@@ -95,12 +109,228 @@ function OwnedSourceRow({
   )
 }
 
-function resolveCommitButtonLabel(args: {
+function AcquisitionOwnedSection({
+  owned,
+  isDisclosureLayout,
+  isPending,
+  onSourceAction,
+}: {
+  owned: NonNullable<EquipmentAcquisitionPanelViewModel['owned']>
+  isDisclosureLayout: boolean
   isPending?: boolean
-  successQuantity?: number
-  primaryActionLabel: string
-}): string {
-  return resolveAcquisitionCommitButtonLabel(args)
+  onSourceAction: (action: EquipmentOwnedSourceAction) => void
+}) {
+  return (
+    <>
+      <div
+        className={resolveAcquisitionPanelLayoutClass(isDisclosureLayout, {
+          default: equipmentAcquisitionPanelOwnedSectionClasses,
+          disclosure: equipmentAcquisitionPanelOwnedSectionDisclosureClasses,
+        })}
+      >
+        <div
+          className={resolveAcquisitionPanelLayoutClass(isDisclosureLayout, {
+            default: equipmentAcquisitionPanelOwnedHeadingRowClasses,
+            disclosure: equipmentAcquisitionPanelOwnedHeadingRowDisclosureClasses,
+          })}
+        >
+          <Heading
+            variant="group"
+            as="h4"
+            className={equipmentAcquisitionPanelSectionHeadingClasses}
+          >
+            {owned.heading}
+          </Heading>
+          {owned.totalQuantity > 0 ? (
+            <Badge appearance="neutral" tone="neutral" size="sm">
+              {owned.totalQuantity}
+            </Badge>
+          ) : null}
+        </div>
+        <div
+          className={resolveAcquisitionPanelLayoutClass(isDisclosureLayout, {
+            default: equipmentAcquisitionPanelSourceListClasses,
+            disclosure: equipmentAcquisitionPanelOwnedSourceListDisclosureClasses,
+          })}
+        >
+          {owned.sources.map((source) => (
+            <OwnedSourceRow
+              key={source.key}
+              source={source}
+              onSourceAction={onSourceAction}
+              disabled={isPending}
+            />
+          ))}
+        </div>
+      </div>
+      <div className={equipmentAcquisitionPanelDividerClasses} />
+    </>
+  )
+}
+
+function AcquisitionNextActionQuantityRow({
+  nextAction,
+  quantity,
+  isDisclosureLayout,
+  isPending,
+  onQuantityChange,
+}: {
+  nextAction: EquipmentAcquisitionPanelViewModel['nextAction']
+  quantity: number
+  isDisclosureLayout: boolean
+  isPending?: boolean
+  onQuantityChange: (quantity: number) => void
+}) {
+  if (!nextAction.showQuantity) {
+    return null
+  }
+
+  return (
+    <div
+      className={resolveAcquisitionPanelLayoutClass(isDisclosureLayout, {
+        default: equipmentAcquisitionPanelQuantityRowClasses,
+        disclosure: equipmentAcquisitionPanelQuantityRowDisclosureClasses,
+      })}
+    >
+      <Text as="span" className={equipmentAcquisitionPanelQuantityLabelClasses}>
+        {nextAction.quantityLabel}
+      </Text>
+      <NumberStepper
+        aria-label={nextAction.quantityLabel}
+        size="sm"
+        bordered
+        digits={EQUIPMENT_STEP_QUANTITY_INPUT_DIGITS}
+        min={1}
+        max={nextAction.maxQuantity}
+        value={quantity}
+        disabled={isPending}
+        onChange={(next) =>
+          onQuantityChange(clampEquipmentStepQuantity(next, nextAction.maxQuantity))
+        }
+      />
+    </div>
+  )
+}
+
+function AcquisitionPreviewLines({
+  lines,
+  isDisclosureLayout,
+}: {
+  lines: readonly string[]
+  isDisclosureLayout: boolean
+}) {
+  return lines.map((line) => (
+    <Text
+      key={line}
+      as="p"
+      className={resolveAcquisitionPanelLayoutClass(isDisclosureLayout, {
+        default: equipmentAcquisitionPanelPreviewLineClasses,
+        disclosure: equipmentAcquisitionPanelPreviewLineDisclosureClasses,
+      })}
+    >
+      {line}
+    </Text>
+  ))
+}
+
+function AcquisitionNextActionActiveContent({
+  nextAction,
+  quantity,
+  isDisclosureLayout,
+  isPending,
+  commitButtonLabel,
+  onQuantityChange,
+  onCommit,
+}: {
+  nextAction: EquipmentAcquisitionPanelViewModel['nextAction']
+  quantity: number
+  isDisclosureLayout: boolean
+  isPending?: boolean
+  commitButtonLabel: string
+  onQuantityChange: (quantity: number) => void
+  onCommit: (requestedQuantity: number) => void
+}) {
+  return (
+    <>
+      <AcquisitionNextActionQuantityRow
+        nextAction={nextAction}
+        quantity={quantity}
+        isDisclosureLayout={isDisclosureLayout}
+        isPending={isPending}
+        onQuantityChange={onQuantityChange}
+      />
+      <AcquisitionPreviewLines
+        lines={nextAction.previewLines}
+        isDisclosureLayout={isDisclosureLayout}
+      />
+      <Button
+        type="button"
+        size="sm"
+        className={equipmentAcquisitionPanelCommitButtonClasses}
+        disabled={nextAction.disabled}
+        onClick={() => onCommit(nextAction.commitQuantity)}
+      >
+        {commitButtonLabel}
+      </Button>
+    </>
+  )
+}
+
+function AcquisitionNextActionSection({
+  nextAction,
+  quantity,
+  isDisclosureLayout,
+  isPending,
+  commitButtonLabel,
+  successAnnouncement,
+  liveRegionId,
+  onQuantityChange,
+  onCommit,
+}: {
+  nextAction: EquipmentAcquisitionPanelViewModel['nextAction']
+  quantity: number
+  isDisclosureLayout: boolean
+  isPending?: boolean
+  commitButtonLabel: string
+  successAnnouncement?: string
+  liveRegionId: string
+  onQuantityChange: (quantity: number) => void
+  onCommit: (requestedQuantity: number) => void
+}) {
+  return (
+    <div
+      className={resolveAcquisitionPanelLayoutClass(isDisclosureLayout, {
+        default: equipmentAcquisitionPanelNextActionClasses,
+        disclosure: equipmentAcquisitionPanelNextActionDisclosureClasses,
+      })}
+    >
+      {nextAction.heading ? (
+        <Heading variant="group" as="h4" className={equipmentAcquisitionPanelSectionHeadingClasses}>
+          {nextAction.heading}
+        </Heading>
+      ) : null}
+
+      {nextAction.blocked ? (
+        <Text as="p" className={equipmentAcquisitionPanelBlockerClasses}>
+          {nextAction.blockerNote}
+        </Text>
+      ) : (
+        <AcquisitionNextActionActiveContent
+          nextAction={nextAction}
+          quantity={quantity}
+          isDisclosureLayout={isDisclosureLayout}
+          isPending={isPending}
+          commitButtonLabel={commitButtonLabel}
+          onQuantityChange={onQuantityChange}
+          onCommit={onCommit}
+        />
+      )}
+
+      <div id={liveRegionId} aria-live="polite" aria-atomic="true" className="sr-only">
+        {successAnnouncement}
+      </div>
+    </div>
+  )
 }
 
 export function EquipmentAcquisitionPanelBody({
@@ -137,7 +367,7 @@ export function EquipmentAcquisitionPanelBody({
   )
 
   const { owned, nextAction } = viewModel
-  const commitButtonLabel = resolveCommitButtonLabel({
+  const commitButtonLabel = resolveAcquisitionCommitButtonLabel({
     isPending,
     successQuantity,
     primaryActionLabel: nextAction.primaryActionLabel,
@@ -150,129 +380,25 @@ export function EquipmentAcquisitionPanelBody({
   return (
     <div className={equipmentAcquisitionPanelBodyClasses}>
       {owned ? (
-        <>
-          <div
-            className={
-              isDisclosureLayout
-                ? equipmentAcquisitionPanelOwnedSectionDisclosureClasses
-                : equipmentAcquisitionPanelOwnedSectionClasses
-            }
-          >
-            <div className={equipmentAcquisitionPanelOwnedHeadingRowClasses}>
-              <Heading
-                variant="group"
-                as="h4"
-                className={equipmentAcquisitionPanelSectionHeadingClasses}
-              >
-                {owned.heading}
-              </Heading>
-              {owned.totalQuantity > 0 ? (
-                <Badge appearance="neutral" tone="neutral" size="sm">
-                  {owned.totalQuantity}
-                </Badge>
-              ) : null}
-            </div>
-            <div
-              className={
-                isDisclosureLayout
-                  ? equipmentAcquisitionPanelOwnedSourceListDisclosureClasses
-                  : equipmentAcquisitionPanelSourceListClasses
-              }
-            >
-              {owned.sources.map((source) => (
-                <OwnedSourceRow
-                  key={source.key}
-                  source={source}
-                  onSourceAction={onSourceAction}
-                  disabled={isPending}
-                />
-              ))}
-            </div>
-          </div>
-          <div className={equipmentAcquisitionPanelDividerClasses} />
-        </>
+        <AcquisitionOwnedSection
+          owned={owned}
+          isDisclosureLayout={isDisclosureLayout}
+          isPending={isPending}
+          onSourceAction={onSourceAction}
+        />
       ) : null}
 
-      <div
-        className={
-          isDisclosureLayout
-            ? equipmentAcquisitionPanelNextActionDisclosureClasses
-            : equipmentAcquisitionPanelNextActionClasses
-        }
-      >
-        {nextAction.heading ? (
-          <Heading
-            variant="group"
-            as="h4"
-            className={equipmentAcquisitionPanelSectionHeadingClasses}
-          >
-            {nextAction.heading}
-          </Heading>
-        ) : null}
-
-        {nextAction.blocked ? (
-          <Text as="p" className={equipmentAcquisitionPanelBlockerClasses}>
-            {nextAction.blockerNote}
-          </Text>
-        ) : (
-          <>
-            {nextAction.showQuantity ? (
-              <div
-                className={
-                  isDisclosureLayout
-                    ? equipmentAcquisitionPanelQuantityRowDisclosureClasses
-                    : equipmentAcquisitionPanelQuantityRowClasses
-                }
-              >
-                <Text as="span" className={equipmentAcquisitionPanelQuantityLabelClasses}>
-                  {nextAction.quantityLabel}
-                </Text>
-                <NumberStepper
-                  aria-label={nextAction.quantityLabel}
-                  size="sm"
-                  bordered
-                  digits={EQUIPMENT_STEP_QUANTITY_INPUT_DIGITS}
-                  min={1}
-                  max={nextAction.maxQuantity}
-                  value={quantity}
-                  disabled={isPending}
-                  onChange={(next) =>
-                    onQuantityChange(clampEquipmentStepQuantity(next, nextAction.maxQuantity))
-                  }
-                />
-              </div>
-            ) : null}
-
-            {nextAction.previewLines.map((line) => (
-              <Text
-                key={line}
-                as="p"
-                className={
-                  isDisclosureLayout
-                    ? equipmentAcquisitionPanelPreviewLineDisclosureClasses
-                    : equipmentAcquisitionPanelPreviewLineClasses
-                }
-              >
-                {line}
-              </Text>
-            ))}
-
-            <Button
-              type="button"
-              size="sm"
-              className={equipmentAcquisitionPanelCommitButtonClasses}
-              disabled={nextAction.disabled}
-              onClick={() => onCommit(nextAction.commitQuantity)}
-            >
-              {commitButtonLabel}
-            </Button>
-          </>
-        )}
-
-        <div id={liveRegionId} aria-live="polite" aria-atomic="true" className="sr-only">
-          {successAnnouncement}
-        </div>
-      </div>
+      <AcquisitionNextActionSection
+        nextAction={nextAction}
+        quantity={quantity}
+        isDisclosureLayout={isDisclosureLayout}
+        isPending={isPending}
+        commitButtonLabel={commitButtonLabel}
+        successAnnouncement={successAnnouncement}
+        liveRegionId={liveRegionId}
+        onQuantityChange={onQuantityChange}
+        onCommit={onCommit}
+      />
     </div>
   )
 }

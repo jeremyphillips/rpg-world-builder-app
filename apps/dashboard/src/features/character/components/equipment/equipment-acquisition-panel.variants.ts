@@ -32,7 +32,10 @@ export const equipmentAcquisitionPanelPurchaseFooterClasses =
 
 export const equipmentAcquisitionPanelOwnedSectionClasses = 'space-y-3'
 
-export const equipmentAcquisitionPanelOwnedSectionDisclosureClasses = 'space-y-3'
+export const equipmentAcquisitionPanelOwnedSectionDisclosureClasses = 'space-y-0'
+
+export const equipmentAcquisitionPanelOwnedHeadingRowDisclosureClasses =
+  'mb-0 flex min-w-0 flex-wrap items-center gap-2 mb-1'
 
 export const equipmentAcquisitionPanelOwnedSourceListDisclosureClasses = 'space-y-3'
 
