@@ -12,6 +12,14 @@ import type { EquipmentPickerWorkflowMode } from '../../lib/equipment-step.lib'
 import type { EquipmentPickerCharacterPreviewContext } from './equipment-picker-character-preview.lib'
 import type { EquipmentPickerRowActionViewModel } from './equipment-picker-action.lib'
 import type { EquipmentPickerGrantManageSource } from './equipment-picker-grant.lib'
+import {
+  CATALOG_PICKER_SORT_BEST_MATCH,
+  CATALOG_PICKER_SORT_LABEL_BEST_MATCH,
+  CATALOG_PICKER_SORT_LABEL_NAME_ASC,
+  CATALOG_PICKER_SORT_LABEL_NAME_DESC,
+  CATALOG_PICKER_SORT_NAME_ASC,
+  CATALOG_PICKER_SORT_NAME_DESC,
+} from '../picker/catalog-picker-sort-modes.lib'
 
 export type {
   EquipmentBudgetSummary,
@@ -20,9 +28,6 @@ export type {
   EquipmentPickerItemState,
   EquipmentPickerSupportedKind,
 } from '@rpg/contracts'
-
-export const EQUIPMENT_PICKER_TAB_RECOMMENDED = 'recommended'
-export const EQUIPMENT_PICKER_TAB_ALL = 'all'
 
 export const EQUIPMENT_PICKER_NOT_PROFICIENT_LABEL = 'Not proficient'
 
@@ -81,13 +86,12 @@ export const EQUIPMENT_PICKER_AFFORDABLE_NOW_LABEL = 'Affordable now'
 export const EQUIPMENT_PICKER_SORT_LABEL = 'Sort'
 export const EQUIPMENT_PICKER_CLEAR_FILTERS_LABEL = 'Clear filters'
 export const EQUIPMENT_PICKER_RESET_VIEW_LABEL = 'Reset view'
-export const EQUIPMENT_PICKER_NO_RECOMMENDATIONS_MESSAGE = 'No recommendations match this view.'
 
-export const EQUIPMENT_PICKER_SORT_BEST_MATCH = 'best_match' as const
+export const EQUIPMENT_PICKER_SORT_BEST_MATCH = CATALOG_PICKER_SORT_BEST_MATCH
 export const EQUIPMENT_PICKER_SORT_PRICE_ASC = 'price_asc' as const
 export const EQUIPMENT_PICKER_SORT_PRICE_DESC = 'price_desc' as const
-export const EQUIPMENT_PICKER_SORT_NAME_ASC = 'name_asc' as const
-export const EQUIPMENT_PICKER_SORT_NAME_DESC = 'name_desc' as const
+export const EQUIPMENT_PICKER_SORT_NAME_ASC = CATALOG_PICKER_SORT_NAME_ASC
+export const EQUIPMENT_PICKER_SORT_NAME_DESC = CATALOG_PICKER_SORT_NAME_DESC
 
 export type EquipmentPickerSortMode =
   | typeof EQUIPMENT_PICKER_SORT_BEST_MATCH
@@ -105,11 +109,11 @@ export const EQUIPMENT_PICKER_SORT_MODES = [
 ] as const satisfies readonly EquipmentPickerSortMode[]
 
 export const EQUIPMENT_PICKER_SORT_LABELS: Record<EquipmentPickerSortMode, string> = {
-  [EQUIPMENT_PICKER_SORT_BEST_MATCH]: 'Best match',
+  [EQUIPMENT_PICKER_SORT_BEST_MATCH]: CATALOG_PICKER_SORT_LABEL_BEST_MATCH,
   [EQUIPMENT_PICKER_SORT_PRICE_ASC]: 'Price: Low to high',
   [EQUIPMENT_PICKER_SORT_PRICE_DESC]: 'Price: High to low',
-  [EQUIPMENT_PICKER_SORT_NAME_ASC]: 'Name: A–Z',
-  [EQUIPMENT_PICKER_SORT_NAME_DESC]: 'Name: Z–A',
+  [EQUIPMENT_PICKER_SORT_NAME_ASC]: CATALOG_PICKER_SORT_LABEL_NAME_ASC,
+  [EQUIPMENT_PICKER_SORT_NAME_DESC]: CATALOG_PICKER_SORT_LABEL_NAME_DESC,
 }
 
 export type EquipmentPickerToolbarResetMode = 'clear_filters' | 'reset_view' | 'none'
@@ -130,7 +134,6 @@ export type EquipmentPickerDrawerProps = {
   items: readonly EquipmentPickerItem[]
   browseSortContext?: EquipmentPickerBrowseSortContext
   budget?: EquipmentBudgetSummary
-  defaultTab?: typeof EQUIPMENT_PICKER_TAB_RECOMMENDED | typeof EQUIPMENT_PICKER_TAB_ALL
   allowedKinds?: readonly EquipmentPickerSupportedKind[]
   /** Hides rows whose cost exceeds the starting (package) budget. */
   filterOutUnaffordable?: boolean
@@ -146,7 +149,7 @@ export type EquipmentPickerDrawerProps = {
   /** Available workflows; segmented control renders only when length is 2. */
   workflowModes?: readonly EquipmentPickerWorkflowMode[]
   onWorkflowModeChange?: (mode: EquipmentPickerWorkflowMode) => void
-  /** Mutually exclusive toolbar action — default resets full view including sort and tab. */
+  /** Mutually exclusive toolbar action — default resets full view including sort. */
   toolbarResetMode?: EquipmentPickerToolbarResetMode
   /** When true, `availableInStartingOption` rows show the Standard gear badge. */
   isGoldShoppingPath?: boolean

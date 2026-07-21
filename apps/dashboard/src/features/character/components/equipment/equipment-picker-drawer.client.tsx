@@ -31,7 +31,6 @@ import {
   filterAndSortEquipmentPickerItems,
   filterEquipmentPickerItems,
   getEquipmentUnaffordableAmounts,
-  getEquipmentPickerItemTab,
   hasEquipmentPickerClearableCriteria,
   hasEquipmentPickerResetViewCriteria,
   resolveEquipmentKindFilterOptions,
@@ -52,13 +51,10 @@ import {
   EQUIPMENT_PICKER_SORT_MODES,
   EQUIPMENT_PICKER_SORT_PRICE_ASC,
   EQUIPMENT_PICKER_SORT_PRICE_DESC,
-  EQUIPMENT_PICKER_TAB_ALL,
-  EQUIPMENT_PICKER_TAB_RECOMMENDED,
   type EquipmentPickerDrawerProps,
   type EquipmentPickerItem,
   type EquipmentPickerKindFilter,
   type EquipmentPickerSortMode,
-  EQUIPMENT_PICKER_NO_RECOMMENDATIONS_MESSAGE,
   type EquipmentPickerToolbarResetMode,
 } from './equipment-picker-drawer.types'
 import { EquipmentBudgetHeader } from './equipment-budget-header.client'
@@ -75,24 +71,20 @@ import {
 
 export type { EquipmentPickerDrawerProps } from './equipment-picker-drawer.types'
 
-function EquipmentPickerTabToolbarActions({
+function EquipmentPickerToolbarActions({
   toolbarResetMode,
-  defaultTabId,
   selectedKind,
   showAffordableOnly,
   sortMode,
   searchQuery,
-  activeTabId,
   onClearStructuredFilters,
   onResetView,
 }: {
   toolbarResetMode: EquipmentPickerToolbarResetMode
-  defaultTabId: string
   selectedKind: EquipmentPickerKindFilter
   showAffordableOnly: boolean
   sortMode: EquipmentPickerSortMode
   searchQuery: string
-  activeTabId: string
   onClearStructuredFilters: () => void
   onResetView: () => void
 }) {
@@ -111,8 +103,6 @@ function EquipmentPickerTabToolbarActions({
       showAffordableOnly,
       searchQuery,
       sortMode,
-      activeTabId,
-      defaultTabId,
     })
 
   const handleClearFilters = () => {
@@ -204,7 +194,6 @@ export function EquipmentPickerDrawer({
   items,
   browseSortContext,
   budget,
-  defaultTab = EQUIPMENT_PICKER_TAB_RECOMMENDED,
   allowedKinds,
   filterOutUnaffordable = false,
   filterOutNonProficient = false,
@@ -296,8 +285,8 @@ export function EquipmentPickerDrawer({
   )
 
   const transformVisibleItems = React.useCallback(
-    (tabItems: readonly EquipmentPickerItem[], context: { searchQuery: string }) =>
-      filterAndSortEquipmentPickerItems(tabItems, {
+    (visibleItems: readonly EquipmentPickerItem[], context: { searchQuery: string }) =>
+      filterAndSortEquipmentPickerItems(visibleItems, {
         searchQuery: context.searchQuery,
         sortMode,
         browseSortContext,
@@ -425,18 +414,10 @@ export function EquipmentPickerDrawer({
       title="Add equipment"
       description="Search the catalog and add items to your loadout."
       {...catalogPickerShellProps()}
-      recommendationsEnabled
       items={filteredItems}
       getItemKey={(item) => item.equipment.id}
       getItemToolbarLabel={(item) => item.equipment.name}
       getSearchText={(item) => item.searchText}
-      getItemTab={getEquipmentPickerItemTab}
-      defaultTabId={defaultTab}
-      tabs={[
-        { id: EQUIPMENT_PICKER_TAB_RECOMMENDED, label: 'Recommended' },
-        { id: EQUIPMENT_PICKER_TAB_ALL, label: 'All' },
-      ]}
-      noScopedItemsMessage={EQUIPMENT_PICKER_NO_RECOMMENDATIONS_MESSAGE}
       hasStructuredFilters={structuredFilterCount > 0}
       headerExtra={
         showWorkflowSegment && onWorkflowModeChange ? (
@@ -473,13 +454,12 @@ export function EquipmentPickerDrawer({
           />
         ) : undefined
       }
-      actions={({ searchQuery, activeTabId, resetSearchQuery, resetActiveTab }) => {
+      actions={({ searchQuery, resetSearchQuery }) => {
         const handleResetView = () => {
           setSelectedKind(EQUIPMENT_PICKER_VIEW_DEFAULTS.selectedKind)
           setShowAffordableOnly(EQUIPMENT_PICKER_VIEW_DEFAULTS.showAffordableOnly)
           setSortMode(EQUIPMENT_PICKER_VIEW_DEFAULTS.sortMode)
           resetSearchQuery()
-          resetActiveTab()
         }
 
         const handleClearFilters = () => {
@@ -488,27 +468,24 @@ export function EquipmentPickerDrawer({
         }
 
         return (
-          <EquipmentPickerTabToolbarActions
+          <EquipmentPickerToolbarActions
             toolbarResetMode={toolbarResetMode}
-            defaultTabId={defaultTab}
             selectedKind={selectedKind}
             showAffordableOnly={showAffordableOnly}
             sortMode={sortMode}
             searchQuery={searchQuery}
-            activeTabId={activeTabId}
             onClearStructuredFilters={handleClearFilters}
             onResetView={handleResetView}
           />
         )
       }}
       filterRow={{
-        controls: ({ activeTabId, searchQuery }) => (
+        controls: ({ searchQuery }) => (
           <EquipmentPickerAffordableFilter
             showAffordableOnly={showAffordableOnly}
             onShowAffordableOnlyChange={setShowAffordableOnly}
             showAffordableFilter={Boolean(effectiveBudget)}
             affordableHiddenCount={countEquipmentPickerAffordableHiddenImpact(supportedItems, {
-              activeTabId,
               searchQuery,
               filterOutUnaffordable,
               filterOutNonProficient,

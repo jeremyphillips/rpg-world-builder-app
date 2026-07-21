@@ -163,7 +163,6 @@ export function EquipmentStepInteractive({
         items={step.pickerItems}
         browseSortContext={pickerBrowseSortContext}
         budget={step.pickerWorkflowMode === 'purchase' ? budget : undefined}
-        defaultTab="recommended"
         showCharacterPreview
         characterPreviewContext={characterPreviewContext}
         ownedPurchaseQuantities={ownedPurchaseQuantities}

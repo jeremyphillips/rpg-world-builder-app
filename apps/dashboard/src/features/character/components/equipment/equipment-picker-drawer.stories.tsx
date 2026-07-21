@@ -53,7 +53,6 @@ export const DefaultPathAffordableNow: Story = {
     items: equipmentPickerDefaultPathItemsFixture,
     budget: equipmentPickerLowRemainingBudgetFixture,
     filterOutUnaffordable: true,
-    defaultTab: 'all',
     onAddItem: () => undefined,
   },
 }
@@ -65,7 +64,6 @@ export const LowRemainingBudget: Story = {
     items: equipmentPickerDefaultPathItemsFixture,
     budget: equipmentPickerLowRemainingBudgetFixture,
     filterOutUnaffordable: false,
-    defaultTab: 'all',
     onAddItem: () => undefined,
   },
 }
@@ -119,7 +117,6 @@ export const ClearFilters: Story = {
     items: equipmentPickerItemsFixture,
     budget: equipmentPickerBudgetFixture,
     filterOutUnaffordable: false,
-    defaultTab: 'all',
     toolbarResetMode: 'clear_filters',
     onAddItem: () => undefined,
   },
@@ -132,7 +129,6 @@ export const SortByPrice: Story = {
     items: equipmentPickerDefaultPathItemsFixture,
     budget: equipmentPickerLowRemainingBudgetFixture,
     filterOutUnaffordable: false,
-    defaultTab: 'all',
     onAddItem: () => undefined,
   },
 }
@@ -144,7 +140,6 @@ export const OwnedStackable: Story = {
     items: [equipmentPickerItemsFixture[2]!],
     budget: equipmentPickerBudgetFixture,
     ownedPurchaseQuantities: { [equipmentPickerRopeFixture.id]: 2 },
-    defaultTab: 'all',
     onAddItem: () => undefined,
   },
   parameters: {

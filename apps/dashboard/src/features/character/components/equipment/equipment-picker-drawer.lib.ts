@@ -34,8 +34,6 @@ import {
   EQUIPMENT_PICKER_SORT_NAME_DESC,
   EQUIPMENT_PICKER_SORT_PRICE_ASC,
   EQUIPMENT_PICKER_SORT_PRICE_DESC,
-  EQUIPMENT_PICKER_TAB_ALL,
-  EQUIPMENT_PICKER_TAB_RECOMMENDED,
   type EquipmentBudgetSummary,
   type EquipmentPickerItem,
   type EquipmentPickerKindFilter,
@@ -62,10 +60,6 @@ type EquipmentPickerScoredItem = {
 export type EquipmentUnaffordableAmounts = {
   required: Money
   remaining: CharacterWealth
-}
-
-export function getEquipmentPickerItemTab(item: EquipmentPickerItem): string {
-  return item.state.isRecommended ? EQUIPMENT_PICKER_TAB_RECOMMENDED : EQUIPMENT_PICKER_TAB_ALL
 }
 
 export function getEquipmentUnaffordableAmounts(
@@ -127,13 +121,10 @@ export function hasEquipmentPickerResetViewCriteria(args: {
   showAffordableOnly: boolean
   searchQuery: string
   sortMode: EquipmentPickerSortMode
-  activeTabId: string
-  defaultTabId: string
 }): boolean {
   if (args.searchQuery.trim().length > 0) return true
   if (countEquipmentPickerStructuredFilters(args) > 0) return true
   if (args.sortMode !== EQUIPMENT_PICKER_SORT_BEST_MATCH) return true
-  if (args.activeTabId !== args.defaultTabId) return true
   return false
 }
 
@@ -153,13 +144,6 @@ function filterEquipmentPickerItemsBySearch(
   if (!normalizedQuery) return [...items]
 
   return items.filter((item) => scoreEquipmentPickerItem(item, searchQuery) > 0)
-}
-
-function filterEquipmentPickerItemsForTab(
-  items: readonly EquipmentPickerItem[],
-  activeTabId: string,
-): EquipmentPickerItem[] {
-  return items.filter((item) => getEquipmentPickerItemTab(item) === activeTabId)
 }
 
 function compareEquipmentPickerItemsByPrice(
@@ -356,13 +340,12 @@ export function filterEquipmentPickerItems(
 }
 
 /**
- * Rows hidden by Affordable now within the active tab, after search/category/starting-budget
- * filters. Informational only — not part of checkbox label or active-filter counts.
+ * Rows hidden by Affordable now after search/category/starting-budget filters.
+ * Informational only — not part of checkbox label or active-filter counts.
  */
 export function countEquipmentPickerAffordableHiddenImpact(
   items: readonly EquipmentPickerItem[],
   options: {
-    activeTabId: string
     searchQuery: string
     filterOutUnaffordable: boolean
     filterOutNonProficient: boolean
@@ -372,8 +355,7 @@ export function countEquipmentPickerAffordableHiddenImpact(
 ): number {
   if (!options.showAffordableOnly) return 0
 
-  const tabScoped = filterEquipmentPickerItemsForTab(items, options.activeTabId)
-  const searchScoped = filterEquipmentPickerItemsBySearch(tabScoped, options.searchQuery)
+  const searchScoped = filterEquipmentPickerItemsBySearch(items, options.searchQuery)
   const structuredFilterOptions = {
     filterOutUnaffordable: options.filterOutUnaffordable,
     filterOutNonProficient: options.filterOutNonProficient,
@@ -393,7 +375,7 @@ export function countEquipmentPickerAffordableHiddenImpact(
   return hiddenCount > 0 ? hiddenCount : 0
 }
 
-/** Stable within-tab ordering: essential → strong → compatible → neutral → not proficient. */
+/** Stable unified-list ordering: essential → strong → compatible → neutral → not proficient. */
 export function sortEquipmentPickerItems(
   items: readonly EquipmentPickerItem[],
   browseSortContext?: EquipmentPickerBrowseSortContext,

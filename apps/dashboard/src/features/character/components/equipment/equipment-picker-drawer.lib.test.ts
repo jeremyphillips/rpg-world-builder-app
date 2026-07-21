@@ -18,7 +18,6 @@ import {
   formatEquipmentUnaffordableReason,
   getEquipmentPickerDisabledNote,
   getEquipmentUnaffordableAmounts,
-  getEquipmentPickerItemTab,
   hasEquipmentPickerClearableCriteria,
   hasEquipmentPickerResetViewCriteria,
   isEquipmentPickerItemDisabled,
@@ -29,24 +28,10 @@ import {
   EQUIPMENT_PICKER_KIND_ALL,
   EQUIPMENT_PICKER_SORT_BEST_MATCH,
   EQUIPMENT_PICKER_SORT_PRICE_ASC,
-  EQUIPMENT_PICKER_TAB_ALL,
-  EQUIPMENT_PICKER_TAB_RECOMMENDED,
   type EquipmentPickerItem,
 } from './equipment-picker-drawer.types'
 
 describe('equipment-picker-drawer.lib', () => {
-  it('routes essential/strong tiers to the recommended tab and the rest to all', () => {
-    expect(getEquipmentPickerItemTab(equipmentPickerItemsFixture[0]!)).toBe(
-      EQUIPMENT_PICKER_TAB_RECOMMENDED,
-    )
-    expect(getEquipmentPickerItemTab(equipmentPickerItemsFixture[1]!)).toBe(
-      EQUIPMENT_PICKER_TAB_ALL,
-    )
-    expect(getEquipmentPickerItemTab(equipmentPickerItemsFixture[2]!)).toBe(
-      EQUIPMENT_PICKER_TAB_ALL,
-    )
-  })
-
   it('sorts items by recommendation tier with not-proficient gear last', () => {
     const sorted = sortEquipmentPickerItems([
       equipmentPickerItemsFixture[1]!,
@@ -57,7 +42,7 @@ describe('equipment-picker-drawer.lib', () => {
     expect(sorted.map((item) => item.equipment.name)).toEqual(['Longsword', 'Rope', 'Chain Mail'])
   })
 
-  it('sorts compatible proficient items above neutral in All without Recommended-tab membership', () => {
+  it('sorts compatible proficient items above neutral peers in a unified list', () => {
     const neutralRope = equipmentPickerItemsFixture[2]!
     const compatibleRope: EquipmentPickerItem = {
       ...neutralRope,
@@ -77,7 +62,6 @@ describe('equipment-picker-drawer.lib', () => {
 
     const sorted = sortEquipmentPickerItems([neutralRope, compatibleRope])
     expect(sorted.map((item) => item.equipment.name)).toEqual(['Silk Rope', 'Rope'])
-    expect(getEquipmentPickerItemTab(compatibleRope)).toBe(EQUIPMENT_PICKER_TAB_ALL)
     expect(compatibleRope.state.isRecommended).toBe(false)
   })
 
@@ -414,15 +398,13 @@ describe('equipment-picker-drawer.lib', () => {
     expect(priceSorted.map((item) => item.equipment.name)).toEqual(['Longsword'])
   })
 
-  it('detects reset-view criteria including sort and tab drift', () => {
+  it('detects reset-view criteria including sort drift', () => {
     expect(
       hasEquipmentPickerResetViewCriteria({
         selectedKind: EQUIPMENT_PICKER_KIND_ALL,
         showAffordableOnly: false,
         searchQuery: '',
         sortMode: EQUIPMENT_PICKER_SORT_PRICE_ASC,
-        activeTabId: EQUIPMENT_PICKER_TAB_ALL,
-        defaultTabId: EQUIPMENT_PICKER_TAB_RECOMMENDED,
       }),
     ).toBe(true)
     expect(
@@ -431,16 +413,13 @@ describe('equipment-picker-drawer.lib', () => {
         showAffordableOnly: false,
         searchQuery: '',
         sortMode: EQUIPMENT_PICKER_SORT_BEST_MATCH,
-        activeTabId: EQUIPMENT_PICKER_TAB_RECOMMENDED,
-        defaultTabId: EQUIPMENT_PICKER_TAB_RECOMMENDED,
       }),
     ).toBe(false)
   })
 
-  it('counts affordable hidden impact within the active tab after search and structured filters', () => {
+  it('counts affordable hidden impact after search and structured filters', () => {
     expect(
       countEquipmentPickerAffordableHiddenImpact(equipmentPickerDefaultPathItemsFixture, {
-        activeTabId: EQUIPMENT_PICKER_TAB_ALL,
         searchQuery: '',
         filterOutUnaffordable: true,
         filterOutNonProficient: false,
@@ -451,7 +430,6 @@ describe('equipment-picker-drawer.lib', () => {
 
     expect(
       countEquipmentPickerAffordableHiddenImpact(equipmentPickerDefaultPathItemsFixture, {
-        activeTabId: EQUIPMENT_PICKER_TAB_ALL,
         searchQuery: 'cheap',
         filterOutUnaffordable: true,
         filterOutNonProficient: false,
@@ -464,7 +442,6 @@ describe('equipment-picker-drawer.lib', () => {
   it('hides affordable impact count when the toggle is off or nothing is excluded', () => {
     expect(
       countEquipmentPickerAffordableHiddenImpact(equipmentPickerDefaultPathItemsFixture, {
-        activeTabId: EQUIPMENT_PICKER_TAB_ALL,
         searchQuery: '',
         filterOutUnaffordable: true,
         filterOutNonProficient: false,

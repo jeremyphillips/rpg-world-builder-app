@@ -8,10 +8,10 @@ describe('CatalogSortControl', () => {
   it('shows compact trigger labels for name sorts', () => {
     render(
       <CatalogSortControl
-        value="name-asc"
+        value="name_asc"
         options={[
-          pickerSortOption('name-asc', 'Name: A–Z'),
-          pickerSortOption('name-desc', 'Name: Z–A'),
+          pickerSortOption('name_asc', 'Name: A–Z'),
+          pickerSortOption('name_desc', 'Name: Z–A'),
         ]}
         onValueChange={vi.fn()}
         triggerAriaLabel="Spell sort order"

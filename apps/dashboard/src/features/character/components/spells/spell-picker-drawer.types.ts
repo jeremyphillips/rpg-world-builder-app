@@ -2,6 +2,15 @@ import type { ChoiceSet, SpellPickerItem } from '@rpg/contracts'
 
 import type { SpellDisplayVocabulary } from '@/features/content'
 
+import {
+  CATALOG_PICKER_SORT_BEST_MATCH,
+  CATALOG_PICKER_SORT_LABEL_BEST_MATCH,
+  CATALOG_PICKER_SORT_LABEL_NAME_ASC,
+  CATALOG_PICKER_SORT_LABEL_NAME_DESC,
+  CATALOG_PICKER_SORT_NAME_ASC,
+  CATALOG_PICKER_SORT_NAME_DESC,
+} from '../picker/catalog-picker-sort-modes.lib'
+
 export type { ChoiceSet, SpellPickerItem, SpellPickerItemState } from '@rpg/contracts'
 
 export const SPELL_PICKER_MODE_CANTRIPS = 'cantrips' as const
@@ -25,11 +34,11 @@ export const SPELL_PICKER_SORT_LABEL = 'Sort'
 export const SPELL_PICKER_MECHANICS_LABEL = 'Casting & mechanics'
 export const SPELL_PICKER_RESET_VIEW_LABEL = 'Reset view'
 
-export const SPELL_PICKER_SORT_BEST_MATCH = 'best-match' as const
-export const SPELL_PICKER_SORT_NAME_ASC = 'name-asc' as const
-export const SPELL_PICKER_SORT_NAME_DESC = 'name-desc' as const
-export const SPELL_PICKER_SORT_LEVEL_ASC = 'level-asc' as const
-export const SPELL_PICKER_SORT_LEVEL_DESC = 'level-desc' as const
+export const SPELL_PICKER_SORT_BEST_MATCH = CATALOG_PICKER_SORT_BEST_MATCH
+export const SPELL_PICKER_SORT_NAME_ASC = CATALOG_PICKER_SORT_NAME_ASC
+export const SPELL_PICKER_SORT_NAME_DESC = CATALOG_PICKER_SORT_NAME_DESC
+export const SPELL_PICKER_SORT_LEVEL_ASC = 'level_asc' as const
+export const SPELL_PICKER_SORT_LEVEL_DESC = 'level_desc' as const
 
 export type SpellPickerSortMode =
   | typeof SPELL_PICKER_SORT_BEST_MATCH
@@ -47,9 +56,9 @@ export const SPELL_PICKER_SORT_MODES = [
 ] as const satisfies readonly SpellPickerSortMode[]
 
 export const SPELL_PICKER_SORT_LABELS: Record<SpellPickerSortMode, string> = {
-  [SPELL_PICKER_SORT_BEST_MATCH]: 'Best match',
-  [SPELL_PICKER_SORT_NAME_ASC]: 'Name: A–Z',
-  [SPELL_PICKER_SORT_NAME_DESC]: 'Name: Z–A',
+  [SPELL_PICKER_SORT_BEST_MATCH]: CATALOG_PICKER_SORT_LABEL_BEST_MATCH,
+  [SPELL_PICKER_SORT_NAME_ASC]: CATALOG_PICKER_SORT_LABEL_NAME_ASC,
+  [SPELL_PICKER_SORT_NAME_DESC]: CATALOG_PICKER_SORT_LABEL_NAME_DESC,
   [SPELL_PICKER_SORT_LEVEL_ASC]: 'Level: low to high',
   [SPELL_PICKER_SORT_LEVEL_DESC]: 'Level: high to low',
 }

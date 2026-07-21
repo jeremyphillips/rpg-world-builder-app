@@ -62,10 +62,10 @@ unknown-cost pairs defer to search score / recommendation tiebreakers.
 Mutually exclusive toolbar actions (`toolbarResetMode` on `EquipmentPickerDrawer`;
 production default `reset_view`):
 
-| Action            | Resets                                                       | Preserves        |
-| ----------------- | ------------------------------------------------------------ | ---------------- |
-| **Clear filters** | search, category, Affordable now                             | sort, active tab |
-| **Reset view**    | search, category, Affordable now, sort, tab → `defaultTabId` | —                |
+| Action            | Resets                                 | Preserves |
+| ----------------- | -------------------------------------- | --------- |
+| **Clear filters** | search, category, Affordable now       | sort      |
+| **Reset view**    | search, category, Affordable now, sort | —         |
 
 Action buttons show no counts.
 
@@ -105,7 +105,7 @@ The equipment picker exposes two independent affordability controls:
 | `filterOutUnaffordable` prop                       | `state.isAffordable`            | `false` | When `true`, hides rows above the package starting budget; default shows them disabled instead.                                                                                 |
 | **Affordable now** checkbox (`showAffordableOnly`) | `state.isWithinRemainingBudget` | `false` | Disabled in the equipment picker drawer for now; when enabled, user opt-in hides rows the character cannot purchase with remaining budget. Shown only when a budget is present. |
 
-Browse context (search, category, sort, active tab) is **preserved** across drawer
+Browse context (search, category, sort) is **preserved** across drawer
 close/reopen within a builder session. **Reset view** (default) resets the full view;
 **Clear filters** resets structured inclusion and search only.
 Context-key reset (character, equipment method, budget change) is a documented follow-up.
