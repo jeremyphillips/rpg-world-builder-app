@@ -7,6 +7,15 @@ import type { GameTermEntry } from '../types'
 // Casting time units — closed SRD set for spell metadata.
 // ---------------------------------------------------------------------------
 
+export const CASTING_TIME_UNIT_TERM = {
+  label: 'Casting Time Unit',
+  description: 'The time cost to cast a spell.',
+  sentence: {
+    singular: 'casting time unit',
+    plural: 'casting time units',
+  },
+} as const satisfies GameTermEntry
+
 export const CASTING_TIME_UNIT_ENTRIES = {
   action: { label: 'Action', description: 'Cast using an action on your turn.' },
   'bonus-action': { label: 'Bonus action', description: 'Cast using a bonus action on your turn.' },

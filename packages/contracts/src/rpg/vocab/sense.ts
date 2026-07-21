@@ -8,6 +8,15 @@ import { vocabularyOptionIdSchema, type VocabularyOptionSetId } from './vocabula
 // Senses — open vocabulary set. Range in feet stays on `senseSchema`.
 // ---------------------------------------------------------------------------
 
+export const SENSE_TERM = {
+  label: 'Sense',
+  description: 'A special perception such as darkvision or blindsight.',
+  sentence: {
+    singular: 'sense',
+    plural: 'senses',
+  },
+} as const satisfies GameTermEntry
+
 export const SENSE_SET_ID = 'senses' as const satisfies VocabularyOptionSetId
 
 /**

@@ -10,6 +10,15 @@ import { getPhysicalDamageTypeEntry, getPhysicalDamageTypeLabel } from './physic
 // closed in `./physical.ts`. Catalog seed + campaign patch govern membership.
 // ---------------------------------------------------------------------------
 
+export const DAMAGE_TYPE_TERM = {
+  label: 'Damage Type',
+  description: 'Elemental or planar damage beyond physical types.',
+  sentence: {
+    singular: 'damage type',
+    plural: 'damage types',
+  },
+} as const satisfies GameTermEntry
+
 export const DAMAGE_TYPE_SET_ID = 'damage-types' as const satisfies VocabularyOptionSetId
 
 /**

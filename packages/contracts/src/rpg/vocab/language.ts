@@ -15,6 +15,15 @@ import {
 // (`languageSeedOptionSchema.category`) for grants and character creation.
 // ---------------------------------------------------------------------------
 
+export const LANGUAGE_CATEGORY_TERM = {
+  label: 'Language Category',
+  description: 'Whether a language is commonly known or rare.',
+  sentence: {
+    singular: 'language category',
+    plural: 'language categories',
+  },
+} as const satisfies GameTermEntry
+
 export const LANGUAGE_CATEGORY_ENTRIES = {
   standard: {
     label: 'Standard',
@@ -41,6 +50,15 @@ export const LANGUAGE_CATEGORIES = keysFromEntries(LANGUAGE_CATEGORY_ENTRIES)
 export const languageCategorySchema = vocabEnumFromEntries(LANGUAGE_CATEGORY_ENTRIES)
 
 export const LANGUAGE_SET_ID = 'languages' as const satisfies VocabularyOptionSetId
+
+export const LANGUAGE_TERM = {
+  label: 'Language',
+  description: 'A language a creature can speak, read, or write.',
+  sentence: {
+    singular: 'language',
+    plural: 'languages',
+  },
+} as const satisfies GameTermEntry
 
 /** Extended catalog seed row — category is validated at catalog load. */
 export const languageSeedOptionSchema = vocabularySeedOptionSchema.extend({

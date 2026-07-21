@@ -8,6 +8,15 @@ import { getTermLabelSingular, getTermSentenceForm, type GameTermEntry } from '.
 // proficiencies, species grants, and the full armor content type.
 // ---------------------------------------------------------------------------
 
+export const ARMOR_CATEGORY_TERM = {
+  label: 'Armor Category',
+  description: 'Light, medium, or heavy armor classification.',
+  sentence: {
+    singular: 'armor category',
+    plural: 'armor categories',
+  },
+} as const satisfies GameTermEntry
+
 export const ARMOR_CATEGORY_ENTRIES = {
   light: {
     label: 'Light Armor',

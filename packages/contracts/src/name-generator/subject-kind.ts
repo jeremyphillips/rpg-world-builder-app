@@ -6,6 +6,15 @@ import { z } from 'zod'
 // Name subject kinds — what entity type a naming convention targets.
 // ---------------------------------------------------------------------------
 
+export const NAME_SUBJECT_KIND_TERM = {
+  label: 'Name Subject',
+  description: 'The entity type a naming convention targets.',
+  sentence: {
+    singular: 'name subject',
+    plural: 'name subjects',
+  },
+} as const satisfies GameTermEntry
+
 export const NAME_SUBJECT_KINDS = [
   'person',
   'creature',

@@ -8,6 +8,15 @@ import type { GameTermEntry } from './types'
 // the same cadence applies wherever the SRD uses at-will or per-long-rest limits.
 // ---------------------------------------------------------------------------
 
+export const USAGE_FREQUENCY_TERM = {
+  label: 'Usage Frequency',
+  description: 'How often a limited-use ability can be invoked for free.',
+  sentence: {
+    singular: 'usage frequency',
+    plural: 'usage frequencies',
+  },
+} as const satisfies GameTermEntry
+
 export const USAGE_FREQUENCY_ENTRIES = {
   at_will: {
     label: 'At Will',

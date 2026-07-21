@@ -1,5 +1,6 @@
 import type { z } from 'zod'
 
+import type { GameTermEntry } from './types'
 import { vocabularyOptionIdSchema, type VocabularyOptionSetId } from './vocabulary'
 
 // ---------------------------------------------------------------------------
@@ -7,6 +8,15 @@ import { vocabularyOptionIdSchema, type VocabularyOptionSetId } from './vocabula
 // sheets. Seed data lives in `@rpg/catalog/vocabulary`; campaign rules may
 // restrict which types are allowed on character sheets (PC and NPC).
 // ---------------------------------------------------------------------------
+
+export const CREATURE_TYPE_TERM = {
+  label: 'Creature Type',
+  description: 'Taxonomic classification shared by species and monsters.',
+  sentence: {
+    singular: 'creature type',
+    plural: 'creature types',
+  },
+} as const satisfies GameTermEntry
 
 export const CREATURE_TYPE_SET_ID = 'creature-types' as const satisfies VocabularyOptionSetId
 

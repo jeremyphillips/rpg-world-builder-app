@@ -11,6 +11,14 @@ export type GameTermEntry = {
   }
 }
 
+/** The concept a closed `*_ENTRIES` map classifies (sibling `*_TERM` constant). */
+export type VocabularyTerm = GameTermEntry
+
+/** Title-case label for a vocabulary concept. */
+export function getVocabularyTermLabel(term: VocabularyTerm): string {
+  return term.label
+}
+
 /** Lowercase display label for simple generated prose. */
 export function getTermLabelSingular(label: string): string {
   return label.toLowerCase()

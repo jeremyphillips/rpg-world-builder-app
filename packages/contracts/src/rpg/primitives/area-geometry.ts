@@ -10,6 +10,15 @@ import { type PositiveDistance, positiveDistanceSchema } from './units'
 // Area geometry shapes — closed vocabulary for formatter grammar and form selects.
 // ---------------------------------------------------------------------------
 
+export const AREA_GEOMETRY_SHAPE_TERM = {
+  label: 'Area Shape',
+  description: 'The geometric form of a spell or effect area.',
+  sentence: {
+    singular: 'area shape',
+    plural: 'area shapes',
+  },
+} as const satisfies GameTermEntry
+
 export const AREA_GEOMETRY_SHAPE_ENTRIES = {
   sphere: {
     label: 'Sphere',

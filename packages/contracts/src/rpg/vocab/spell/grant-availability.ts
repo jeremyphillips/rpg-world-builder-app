@@ -6,6 +6,15 @@ import { vocabEnumFromEntries, keysFromEntries } from '../enum-schema'
 // Distinct from class spellcasting.preparation (prepared | known | full_list).
 // ---------------------------------------------------------------------------
 
+export const SPELL_GRANT_AVAILABILITY_TERM = {
+  label: 'Spell Grant Availability',
+  description: 'How a trait or feature grants access to a specific spell.',
+  sentence: {
+    singular: 'spell grant availability',
+    plural: 'spell grant availabilities',
+  },
+} as const satisfies GameTermEntry
+
 export const SPELL_GRANT_AVAILABILITY_ENTRIES = {
   always_prepared: {
     label: 'Always prepared',

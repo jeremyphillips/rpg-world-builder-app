@@ -5,6 +5,15 @@ import type { GameTermEntry } from '../types'
 // Weapon mode — melee vs ranged.
 // ---------------------------------------------------------------------------
 
+export const WEAPON_MODE_TERM = {
+  label: 'Weapon Mode',
+  description: 'Whether a weapon is used in melee or at range.',
+  sentence: {
+    singular: 'weapon mode',
+    plural: 'weapon modes',
+  },
+} as const satisfies GameTermEntry
+
 export const WEAPON_MODE_ENTRIES = {
   melee: {
     label: 'Melee',

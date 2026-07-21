@@ -7,6 +7,15 @@ import { getTermSentenceForm, type GameTermEntry } from '../types'
 // and the full weapon content type.
 // ---------------------------------------------------------------------------
 
+export const WEAPON_CATEGORY_TERM = {
+  label: 'Weapon Category',
+  description: 'Simple or martial weapon classification.',
+  sentence: {
+    singular: 'weapon category',
+    plural: 'weapon categories',
+  },
+} as const satisfies GameTermEntry
+
 export const WEAPON_CATEGORY_ENTRIES = {
   simple: {
     label: 'Simple Weapon',

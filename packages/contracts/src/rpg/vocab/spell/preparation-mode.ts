@@ -5,6 +5,15 @@ import { vocabEnumFromEntries, keysFromEntries } from '../enum-schema'
 // Spell preparation mode — how a class prepares or knows spells (SRD class block).
 // ---------------------------------------------------------------------------
 
+export const SPELL_PREPARATION_MODE_TERM = {
+  label: 'Spell Preparation Mode',
+  description: 'How a spellcasting class prepares or knows spells.',
+  sentence: {
+    singular: 'spell preparation mode',
+    plural: 'spell preparation modes',
+  },
+} as const satisfies GameTermEntry
+
 export const SPELL_PREPARATION_MODE_ENTRIES = {
   prepared: {
     label: 'Prepared',

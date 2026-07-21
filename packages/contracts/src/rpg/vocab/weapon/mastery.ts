@@ -5,6 +5,15 @@ import type { GameTermEntry } from '../types'
 // Mastery — every SRD 5.2.1 weapon has exactly one mastery
 // ---------------------------------------------------------------------------
 
+export const WEAPON_MASTERY_TERM = {
+  label: 'Weapon Mastery',
+  description: 'A special property every SRD weapon has exactly one of.',
+  sentence: {
+    singular: 'weapon mastery',
+    plural: 'weapon masteries',
+  },
+} as const satisfies GameTermEntry
+
 export const WEAPON_MASTERY_ENTRIES = {
   cleave: {
     label: 'Cleave',

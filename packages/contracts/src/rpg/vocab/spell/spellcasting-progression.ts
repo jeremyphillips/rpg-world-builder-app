@@ -5,6 +5,15 @@ import { vocabEnumFromEntries, keysFromEntries } from '../enum-schema'
 // Spellcasting progression — full, half, and pact magic advancement tables.
 // ---------------------------------------------------------------------------
 
+export const SPELLCASTING_PROGRESSION_TERM = {
+  label: 'Spellcasting Progression',
+  description: 'Full, half, or pact magic slot advancement.',
+  sentence: {
+    singular: 'spellcasting progression',
+    plural: 'spellcasting progressions',
+  },
+} as const satisfies GameTermEntry
+
 export const SPELLCASTING_PROGRESSION_ENTRIES = {
   full: {
     label: 'Full caster',

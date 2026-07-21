@@ -11,6 +11,15 @@ import type { GameTermEntry } from '../types'
 export const ATTACK_RESOLUTION_MODE_SET_ID =
   'attack-resolution-modes' as const satisfies VocabularyOptionSetId
 
+export const ATTACK_RESOLUTION_MODE_TERM = {
+  label: 'Attack Resolution Mode',
+  description: 'How attack rolls are resolved against armor class.',
+  sentence: {
+    singular: 'attack resolution mode',
+    plural: 'attack resolution modes',
+  },
+} as const satisfies GameTermEntry
+
 export const ATTACK_RESOLUTION_MODE_ENTRIES = {
   attack_matrix: {
     label: 'Attack matrix',

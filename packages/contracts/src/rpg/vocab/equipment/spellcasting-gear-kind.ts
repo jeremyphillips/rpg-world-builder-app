@@ -6,6 +6,15 @@ import type { GameTermEntry } from '../types'
 // `kind: adventuring_gear` + `gearKind: spellcasting`.
 // ---------------------------------------------------------------------------
 
+export const SPELLCASTING_GEAR_KIND_TERM = {
+  label: 'Spellcasting Gear Kind',
+  description: 'Arcane or divine spellcasting focus classification.',
+  sentence: {
+    singular: 'spellcasting gear kind',
+    plural: 'spellcasting gear kinds',
+  },
+} as const satisfies GameTermEntry
+
 export const SPELLCASTING_GEAR_KIND_ENTRIES = {
   arcane_focus: {
     label: 'Arcane Focus',

@@ -9,6 +9,15 @@ import type { GameTermEntry } from './types'
 // NPCs, and monsters. Two-letter ids match SRD abbreviations (LG → lg).
 // ---------------------------------------------------------------------------
 
+export const ALIGNMENT_TERM = {
+  label: 'Alignment',
+  description: "A creature's moral and ethical outlook on the alignment grid.",
+  sentence: {
+    singular: 'alignment',
+    plural: 'alignments',
+  },
+} as const satisfies GameTermEntry
+
 export const ALIGNMENT_ENTRIES = {
   lg: {
     label: 'Lawful Good',

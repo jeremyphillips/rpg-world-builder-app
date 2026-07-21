@@ -5,6 +5,15 @@ import type { GameTermEntry } from '../types'
 // Properties — the closed SRD 5.2.1 property set
 // ---------------------------------------------------------------------------
 
+export const WEAPON_PROPERTY_TERM = {
+  label: 'Weapon Property',
+  description: 'A mechanical trait that modifies how a weapon works.',
+  sentence: {
+    singular: 'weapon property',
+    plural: 'weapon properties',
+  },
+} as const satisfies GameTermEntry
+
 export const WEAPON_PROPERTY_ENTRIES = {
   ammunition: {
     label: 'Ammunition',

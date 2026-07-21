@@ -10,6 +10,15 @@ import { abilityValidationMessages } from './ability-messages'
 // and characters). `class.ts` references ability *ids* only, not scores.
 // ---------------------------------------------------------------------------
 
+export const ABILITY_SCORE_TERM = {
+  label: 'Ability Score',
+  description: 'One of the six fundamental attributes of a creature.',
+  sentence: {
+    singular: 'ability score',
+    plural: 'ability scores',
+  },
+} as const satisfies GameTermEntry
+
 export const ABILITY_ENTRIES = {
   str: {
     label: 'Strength',

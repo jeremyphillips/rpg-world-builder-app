@@ -6,8 +6,10 @@ import {
   getMagicItemRaritySentenceForm,
   MAGIC_ITEM_RARITIES,
   MAGIC_ITEM_RARITY_ENTRIES,
+  MAGIC_ITEM_RARITY_TERM,
   magicItemRaritySchema,
 } from './rarity'
+import { getTermSentenceForm } from '../types'
 
 describe('magicItemRaritySchema', () => {
   it('matches MAGIC_ITEM_RARITIES', () => {
@@ -26,6 +28,12 @@ describe('magicItemRaritySchema', () => {
 })
 
 describe('magic item rarity vocabulary', () => {
+  it('defines the magic item rarity vocabulary term', () => {
+    expect(MAGIC_ITEM_RARITY_TERM.label).toBe('Magic Item Rarity')
+    expect(getTermSentenceForm(MAGIC_ITEM_RARITY_TERM, 1)).toBe('magic item rarity')
+    expect(getTermSentenceForm(MAGIC_ITEM_RARITY_TERM, 2)).toBe('magic item rarities')
+  })
+
   it('has a label and description for every rarity', () => {
     for (const rarity of MAGIC_ITEM_RARITIES) {
       const entry = getMagicItemRarityEntry(rarity)

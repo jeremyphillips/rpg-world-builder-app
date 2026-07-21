@@ -7,6 +7,15 @@ import type { GameTermEntry } from '../types'
 // Spell range kinds — closed SRD set for spell metadata.
 // ---------------------------------------------------------------------------
 
+export const SPELL_RANGE_KIND_TERM = {
+  label: 'Spell Range',
+  description: 'How far or to whom a spell can reach.',
+  sentence: {
+    singular: 'spell range',
+    plural: 'spell ranges',
+  },
+} as const satisfies GameTermEntry
+
 export const SPELL_RANGE_KIND_ENTRIES = {
   self: { label: 'Self', description: 'The spell affects only the caster.' },
   touch: { label: 'Touch', description: 'The spell requires touching a target.' },

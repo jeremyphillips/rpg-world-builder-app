@@ -79,8 +79,10 @@ Shared shapes live in `@rpg/contracts`:
 | `activeVocabularyOptionIds(set)`          | `rpg/vocab/`                      | Active id set from a resolved option set            |
 
 **Closed reference vocab** (physical damage, weapon properties) remains in
-`rpg/vocab/*_ENTRIES` maps when the set is not campaign-customizable. Open sets
-(damage types, senses, languages, spell schools, creature types) use catalog seed
+`rpg/vocab/*_ENTRIES` maps when the set is not campaign-customizable. Each closed
+map also exports a sibling `*_TERM` describing the set concept (label,
+description, counted `sentence` forms). Open sets (damage types, senses, languages,
+spell schools, creature types) export `*_TERM` plus `*_SET_ID` and use catalog seed
 JSON + campaign patch instead.
 
 **Campaign-customizable sets** (creature types first) use catalog seed JSON +

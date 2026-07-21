@@ -6,6 +6,15 @@ import { getTermSentenceForm, type GameTermEntry } from './types'
 // shared by grant formatters, authoring UI, and character builder surfaces.
 // ---------------------------------------------------------------------------
 
+export const PROFICIENCY_TERM = {
+  label: 'Proficiency',
+  description: 'Training with weapons, armor, tools, or skills.',
+  sentence: {
+    singular: 'proficiency',
+    plural: 'proficiencies',
+  },
+} as const satisfies GameTermEntry
+
 export const PROFICIENCY_DOMAIN_ENTRIES = {
   weapon: {
     label: 'Weapon Proficiency',

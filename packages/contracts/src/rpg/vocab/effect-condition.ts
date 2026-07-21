@@ -6,6 +6,15 @@ import type { GameTermEntry } from './types'
 // and (future) creature/encounter surfaces. Stripped to id + label + rules text.
 // ---------------------------------------------------------------------------
 
+export const CONDITION_TERM = {
+  label: 'Condition',
+  description: 'A harmful state that alters what a creature can do.',
+  sentence: {
+    singular: 'condition',
+    plural: 'conditions',
+  },
+} as const satisfies GameTermEntry
+
 export const EFFECT_CONDITION_ENTRIES = {
   blinded: {
     label: 'Blinded',

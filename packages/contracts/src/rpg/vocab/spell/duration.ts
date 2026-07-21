@@ -7,6 +7,15 @@ import type { GameTermEntry } from '../types'
 // Duration units — closed SRD set for timed spell durations.
 // ---------------------------------------------------------------------------
 
+export const DURATION_UNIT_TERM = {
+  label: 'Duration Unit',
+  description: "The time scale for a spell's duration.",
+  sentence: {
+    singular: 'duration unit',
+    plural: 'duration units',
+  },
+} as const satisfies GameTermEntry
+
 export const DURATION_UNIT_ENTRIES = {
   round: { label: 'Round', description: 'Lasts for one or more rounds of combat.' },
   minute: { label: 'Minute', description: 'Lasts for one or more minutes.' },

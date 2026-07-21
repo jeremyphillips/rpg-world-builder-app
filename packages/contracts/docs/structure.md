@@ -177,12 +177,34 @@ Closed game-term maps live in `rpg/vocab/`. Shared shape in `rpg/vocab/types.ts`
 export type GameTermEntry = {
   readonly label: string
   readonly description: string
+  readonly compactLabel?: string
+  readonly sentence?: { readonly singular?: string; readonly plural?: string }
 }
+
+/** The concept a closed `*_ENTRIES` map classifies. */
+export type VocabularyTerm = GameTermEntry
 ```
 
-Pattern: `*_ENTRIES` map → derived id tuple → `z.enum` schema →
-`get*Entry` / `get*Label` helpers. Open vocabulary sets use catalog seeds +
-`vocabularyOptionIdSchema`; see [docs/vocabulary.md](../../../docs/vocabulary.md).
+Every closed vocab module defines **two layers**:
+
+1. **`*_TERM`** — the set concept (`label`, `description`, `sentence` for counted
+   prose about the classification itself).
+2. **`*_ENTRIES`** — per-value entries in the same `GameTermEntry` shape.
+
+```ts
+export const MAGIC_ITEM_RARITY_TERM = {
+  label: 'Magic Item Rarity',
+  description: 'A classification of a magic item’s relative power and availability.',
+  sentence: { singular: 'magic item rarity', plural: 'magic item rarities' },
+} as const satisfies GameTermEntry
+
+export const MAGIC_ITEM_RARITY_ENTRIES = { common: { … }, … }
+```
+
+Pattern: `*_TERM` + `*_ENTRIES` map → derived id tuple → `z.enum` schema →
+`get*Entry` / `get*Label` helpers. Open vocabulary sets define a `*_TERM` plus
+`vocabularyOptionIdSchema` and catalog seeds; see
+[docs/vocabulary.md](../../../docs/vocabulary.md).
 
 Entity-specific fields stay on the content schema in `rpg/content/`, not in vocab maps.
 

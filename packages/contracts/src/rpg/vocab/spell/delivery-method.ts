@@ -6,6 +6,15 @@ import type { GameTermEntry } from '../types'
 // Spell delivery methods — display metadata for attack-roll cantrips/spells.
 // ---------------------------------------------------------------------------
 
+export const SPELL_DELIVERY_METHOD_TERM = {
+  label: 'Spell Delivery Method',
+  description: 'How a spell attack reaches its target.',
+  sentence: {
+    singular: 'spell delivery method',
+    plural: 'spell delivery methods',
+  },
+} as const satisfies GameTermEntry
+
 export const SPELL_DELIVERY_METHOD_ENTRIES = {
   'melee-spell-attack': {
     label: 'Melee spell attack',

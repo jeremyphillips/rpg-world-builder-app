@@ -5,6 +5,15 @@ import type { GameTermEntry } from '../types'
 // Spell function tags — closed browse/filter vocabulary for spell discovery.
 // ---------------------------------------------------------------------------
 
+export const SPELL_FUNCTION_TAG_TERM = {
+  label: 'Spell Function Tag',
+  description: 'A browse/filter tag describing what a spell accomplishes.',
+  sentence: {
+    singular: 'spell function tag',
+    plural: 'spell function tags',
+  },
+} as const satisfies GameTermEntry
+
 export const SPELL_FUNCTION_TAG_ENTRIES = {
   communication: {
     label: 'Communication',

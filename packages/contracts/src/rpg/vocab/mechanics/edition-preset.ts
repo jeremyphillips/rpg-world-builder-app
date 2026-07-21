@@ -12,6 +12,15 @@ export const EDITION_PRESET_SET_ID = 'edition-presets' as const satisfies Vocabu
 
 type EditionPresetEntry = GameTermEntry & { readonly meta: readonly string[] }
 
+export const EDITION_PRESET_TERM = {
+  label: 'Edition Preset',
+  description: 'A rules-era bundle for campaign mechanics configuration.',
+  sentence: {
+    singular: 'edition preset',
+    plural: 'edition presets',
+  },
+} as const satisfies GameTermEntry
+
 export const EDITION_PRESET_ENTRIES = {
   becmi: {
     label: 'Classic Basic',

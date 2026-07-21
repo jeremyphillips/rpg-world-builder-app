@@ -5,6 +5,15 @@ import type { GameTermEntry } from '../types'
 // Spell atomic effect kinds — labels for authoring UI and array item headers.
 // ---------------------------------------------------------------------------
 
+export const SPELL_ATOMIC_EFFECT_KIND_TERM = {
+  label: 'Spell Effect Kind',
+  description: 'A building block in structured spell effect authoring.',
+  sentence: {
+    singular: 'spell effect kind',
+    plural: 'spell effect kinds',
+  },
+} as const satisfies GameTermEntry
+
 export const SPELL_ATOMIC_EFFECT_KIND_ENTRIES = {
   damage: {
     label: 'Damage',

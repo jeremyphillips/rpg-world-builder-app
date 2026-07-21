@@ -14,9 +14,14 @@ import { LANGUAGE_CATEGORY_ENTRIES } from './language'
 import { ATTACK_RESOLUTION_MODE_ENTRIES } from './mechanics/attack-resolution-mode'
 import { EDITION_PRESET_ENTRIES } from './mechanics/edition-preset'
 import { MAGIC_ITEM_CATEGORY_ENTRIES } from './magic-item/category'
-import { MAGIC_ITEM_RARITY_ENTRIES } from './magic-item/rarity'
+import { MAGIC_ITEM_RARITY_ENTRIES, MAGIC_ITEM_RARITY_TERM } from './magic-item/rarity'
 import { MOVEMENT_MODE_ENTRIES } from './movement-mode'
-import { getTermSentenceForm, pluralizeTermLabel, type GameTermEntry } from './types'
+import {
+  getTermSentenceForm,
+  getVocabularyTermLabel,
+  pluralizeTermLabel,
+  type GameTermEntry,
+} from './types'
 import { USAGE_FREQUENCY_ENTRIES } from './usage-frequency'
 import { WEAPON_CATEGORY_ENTRIES } from './weapon/category'
 
@@ -40,6 +45,12 @@ const ROLLOUT_ENTRY_TABLES = [
   EDITION_PRESET_ENTRIES,
   ATTACK_RESOLUTION_MODE_ENTRIES,
 ] as const
+
+describe('vocabulary term helpers', () => {
+  it('returns the title-case label for a vocabulary concept', () => {
+    expect(getVocabularyTermLabel(MAGIC_ITEM_RARITY_TERM)).toBe('Magic Item Rarity')
+  })
+})
 
 describe('term sentence forms', () => {
   it('derives lowercase singular and simple plural forms by default', () => {

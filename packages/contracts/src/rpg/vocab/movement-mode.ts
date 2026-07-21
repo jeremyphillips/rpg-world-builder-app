@@ -9,6 +9,15 @@ import type { GameTermEntry } from './types'
 // monsters, and any creature with a movement block.
 // ---------------------------------------------------------------------------
 
+export const MOVEMENT_MODE_TERM = {
+  label: 'Movement Mode',
+  description: 'A way a creature can move across the battlefield.',
+  sentence: {
+    singular: 'movement mode',
+    plural: 'movement modes',
+  },
+} as const satisfies GameTermEntry
+
 export const MOVEMENT_MODE_ENTRIES = {
   walk: {
     label: 'Walk',
@@ -170,6 +179,15 @@ export function formatMovementDisplay(speeds: MovementSpeeds): string {
 // TODO(primitives): When a second grant type adopts set|increase|match,
 // extract MOVEMENT_OPERATIONS + operation-discriminated feet schemas to
 // packages/contracts/src/rpg/primitives/numeric-modifier.ts and compose here.
+
+export const MOVEMENT_OPERATION_TERM = {
+  label: 'Movement Operation',
+  description: "How a grant changes a creature's speed for a movement mode.",
+  sentence: {
+    singular: 'movement operation',
+    plural: 'movement operations',
+  },
+} as const satisfies GameTermEntry
 
 export const MOVEMENT_OPERATION_ENTRIES = {
   set: {

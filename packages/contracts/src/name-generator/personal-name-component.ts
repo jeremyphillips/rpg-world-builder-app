@@ -7,6 +7,15 @@ import type { GameTermEntry } from '../rpg/vocab/types'
 // Personal name components — optional parts beyond implicit given names.
 // ---------------------------------------------------------------------------
 
+export const PERSONAL_NAME_COMPONENT_TERM = {
+  label: 'Personal Name Component',
+  description: 'An optional part of a personal name beyond the given name.',
+  sentence: {
+    singular: 'personal name component',
+    plural: 'personal name components',
+  },
+} as const satisfies GameTermEntry
+
 export const PERSONAL_NAME_COMPONENT_ENTRIES = {
   family: {
     label: 'Family name',

@@ -5,6 +5,15 @@ import type { GameTermEntry } from '../types'
 // Armor material — drives the druid non-metal rule and flavor display.
 // ---------------------------------------------------------------------------
 
+export const ARMOR_MATERIAL_TERM = {
+  label: 'Armor Material',
+  description: 'Whether armor is made of metal or organic materials.',
+  sentence: {
+    singular: 'armor material',
+    plural: 'armor materials',
+  },
+} as const satisfies GameTermEntry
+
 export const ARMOR_MATERIAL_ENTRIES = {
   organic: {
     label: 'Non-Metal',

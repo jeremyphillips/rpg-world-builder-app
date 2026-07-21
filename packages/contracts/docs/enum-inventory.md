@@ -29,6 +29,11 @@ use property-level `.describe()` only.
 - `termOptionsFromEntries(entries)` — neutral `{ value, label, description? }[]` for apps
 - `formatEnumDescription(entries)` — markdown bullets for schema descriptions
 
+Every `GameTermEntry` `*_ENTRIES` map (and every open `*_SET_ID` module) must also
+export a sibling `*_TERM` constant describing the set concept itself. Coverage is
+enforced by `vocab-term-coverage.test.ts`. Detail:
+[`structure.md`](structure.md#reference-vocabulary-gametermentry).
+
 ---
 
 ## Phase 0 promotions (completed)
@@ -91,6 +96,9 @@ catalog JSON.
 | `effectConditionSchema`        | `vocab/effect-condition.ts`                 | full             |
 | `attackResolutionModeIdSchema` | `vocab/mechanics/attack-resolution-mode.ts` | full             |
 | `editionPresetIdSchema`        | `vocab/mechanics/edition-preset.ts`         | full             |
+
+Spell resolution closed sets (`content/spell/resolution/vocab.ts`) also define
+`*_TERM` + `*_ENTRIES` pairs; schema wiring remains deferred from catalog JSON.
 
 ---
 

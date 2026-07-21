@@ -5,6 +5,15 @@ import type { GameTermEntry } from '../types'
 // Holy symbol usage — how a divine focus must be carried (SRD Holy Symbols table).
 // ---------------------------------------------------------------------------
 
+export const HOLY_SYMBOL_USAGE_TERM = {
+  label: 'Holy Symbol Usage',
+  description: 'How a divine focus must be carried.',
+  sentence: {
+    singular: 'holy symbol usage',
+    plural: 'holy symbol usages',
+  },
+} as const satisfies GameTermEntry
+
 export const HOLY_SYMBOL_USAGE_ENTRIES = {
   worn: {
     label: 'Worn',

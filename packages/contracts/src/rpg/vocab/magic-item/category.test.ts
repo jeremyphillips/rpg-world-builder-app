@@ -6,8 +6,10 @@ import {
   getMagicItemCategorySentenceForm,
   MAGIC_ITEM_CATEGORIES,
   MAGIC_ITEM_CATEGORY_ENTRIES,
+  MAGIC_ITEM_CATEGORY_TERM,
   magicItemCategorySchema,
 } from './category'
+import { getTermSentenceForm } from '../types'
 
 describe('magicItemCategorySchema', () => {
   it('matches MAGIC_ITEM_CATEGORIES', () => {
@@ -20,6 +22,12 @@ describe('magicItemCategorySchema', () => {
 })
 
 describe('magic item category vocabulary', () => {
+  it('defines the magic item category vocabulary term', () => {
+    expect(MAGIC_ITEM_CATEGORY_TERM.label).toBe('Magic Item Category')
+    expect(getTermSentenceForm(MAGIC_ITEM_CATEGORY_TERM, 1)).toBe('magic item category')
+    expect(getTermSentenceForm(MAGIC_ITEM_CATEGORY_TERM, 2)).toBe('magic item categories')
+  })
+
   it('has a label and description for every category', () => {
     for (const category of MAGIC_ITEM_CATEGORIES) {
       const entry = getMagicItemCategoryEntry(category)
