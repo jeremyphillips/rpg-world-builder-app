@@ -11,11 +11,15 @@ export function loadCampaignTemplates(): CampaignTemplate[] {
 }
 
 export function getCampaignTemplateById(id: string): CampaignTemplate {
-  const template = CAMPAIGN_TEMPLATES.find((entry) => entry.metadata.id === id)
+  const template = findCampaignTemplateById(id)
 
   if (!template) {
     throw new Error(`Campaign template not found: ${id}`)
   }
 
   return template
+}
+
+export function findCampaignTemplateById(id: string): CampaignTemplate | undefined {
+  return CAMPAIGN_TEMPLATES.find((entry) => entry.metadata.id === id)
 }

@@ -35,6 +35,7 @@ export {
 } from './lib/rules/mechanics/mechanics-form-values'
 export { useCampaignRules } from './hooks/use-campaign-rules'
 export { useCampaigns, campaignsQueryKey } from './hooks/use-campaigns'
+export { useCampaignTemplates, campaignTemplatesQueryKey } from './hooks/use-campaign-templates'
 export { useSelectCampaign } from './hooks/use-select-campaign'
 export { useSyncActiveCampaign } from './hooks/use-sync-active-campaign'
 export { useCanManageCampaign } from './hooks/use-can-manage-campaign'

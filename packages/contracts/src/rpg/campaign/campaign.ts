@@ -156,6 +156,8 @@ export type CampaignListItem = z.infer<typeof campaignListItemSchema>
  * defaults for any omitted configuration.
  */
 export const createCampaignInputSchema = campaignIdentitySchema.extend({
+  /** Stable shipped template id. Resolved server-side and never stored as campaign state. */
+  campaignTemplateId: z.string().min(1).optional(),
   /** Written to CampaignRulesetPatch on create — not stored on the campaign document. */
   characterCreation: updateCampaignCharacterCreationInputSchema.optional(),
   flavor: campaignFlavorSchema.optional(),
@@ -177,7 +179,7 @@ export type CreateCampaignInput = z.infer<typeof createCampaignInputSchema>
  */
 export const updateCampaignInputSchema = createCampaignInputSchema
   .partial({ name: true })
-  .omit({ rulesetId: true, characterCreation: true })
+  .omit({ rulesetId: true, characterCreation: true, campaignTemplateId: true })
 
 export type UpdateCampaignInput = z.infer<typeof updateCampaignInputSchema>
 

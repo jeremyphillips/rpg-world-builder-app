@@ -3,10 +3,13 @@ import type {
   Campaign,
   CampaignListItem,
   CampaignRole,
+  CampaignTemplate,
   CreateCampaignInput,
   UpdateCampaignInput,
 } from '@rpg/contracts'
+import { loadCampaignTemplates, resolveCampaignCreationPreset } from '@rpg/catalog/presets'
 
+import { HttpError } from '../../lib/http-error'
 import { writeInitialCharacterCreation, writeInitialMechanics } from '../vocabulary'
 import { CampaignModel, type CampaignSchemaType } from './campaign.model'
 import { CampaignMembershipModel } from './campaign-membership.model'
@@ -21,18 +24,37 @@ type CampaignRecord = CampaignSchemaType & {
 export async function createCampaign(
   input: CreateCampaignInput & { createdBy: string },
 ): Promise<Campaign> {
+  const { createdBy, ...createInput } = input
+  const presetResolution = resolveCampaignCreationPreset(createInput)
+  if (!presetResolution.ok) {
+    const message =
+      presetResolution.reason === 'template_not_found'
+        ? `Campaign template not found: ${presetResolution.campaignTemplateId}`
+        : `Campaign template ruleset does not match the requested ruleset: ${presetResolution.campaignTemplateId}`
+    throw HttpError.badRequest(message)
+  }
+
+  // WorldSeedPack is descriptor-only. Fail closed if a pack is linked before
+  // the typed world-content materializer is implemented.
+  if (presetResolution.worldSeedPacks.length > 0) {
+    throw HttpError.badRequest('World seed pack materialization is not available yet.')
+  }
+
+  const materializedInput = presetResolution.input
   const doc = await CampaignModel.create({
     identity: {
-      name: input.name,
-      ...(input.description !== undefined && { description: input.description }),
-      ...(input.imageKey !== undefined && { imageKey: input.imageKey }),
+      name: materializedInput.name,
+      ...(materializedInput.description !== undefined && {
+        description: materializedInput.description,
+      }),
+      ...(materializedInput.imageKey !== undefined && { imageKey: materializedInput.imageKey }),
     },
     configuration: {
-      ...(input.flavor !== undefined && { flavor: input.flavor }),
+      ...(materializedInput.flavor !== undefined && { flavor: materializedInput.flavor }),
     },
     // Omit when undefined so the model default (DEFAULT_SYSTEM_RULESET_ID) applies.
-    ...(input.rulesetId !== undefined && { rulesetId: input.rulesetId }),
-    createdBy: input.createdBy,
+    ...(materializedInput.rulesetId !== undefined && { rulesetId: materializedInput.rulesetId }),
+    createdBy,
   })
 
   const campaignId = String(doc._id)
@@ -44,15 +66,19 @@ export async function createCampaign(
   try {
     await CampaignMembershipModel.create({
       campaignId,
-      userId: input.createdBy,
+      userId: createdBy,
       campaignRole: 'owner',
       characterIds: [],
       invitedAt: new Date(),
       joinedAt: new Date(),
     })
 
-    if (input.characterCreation) {
-      await writeInitialCharacterCreation(campaignId, rulesetId, input.characterCreation)
+    if (materializedInput.characterCreation) {
+      await writeInitialCharacterCreation(
+        campaignId,
+        rulesetId,
+        materializedInput.characterCreation,
+      )
     }
 
     await writeInitialMechanics(campaignId, rulesetId)
@@ -62,6 +88,11 @@ export async function createCampaign(
   }
 
   return toCampaign(doc.toObject() as CampaignRecord)
+}
+
+/** Shipped campaign templates available to the creation experience. */
+export function listCampaignTemplates(): CampaignTemplate[] {
+  return loadCampaignTemplates()
 }
 
 /**

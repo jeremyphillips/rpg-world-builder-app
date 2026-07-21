@@ -13,6 +13,16 @@ Each collection has a validated JSON file and a narrow package export. The
 aggregate `@rpg/catalog/presets` export validates collection uniqueness and
 template-to-pack references at module load.
 
+`resolveCampaignCreationPreset()` is the write-free materialization boundary. It
+resolves the selected template, rejects incompatible rulesets, applies sparse
+defaults, and returns referenced seed-pack descriptors. Explicit create input
+wins over template defaults; nested character-creation objects merge while
+arrays replace defaults wholesale.
+
+The API currently fails closed if a template references a world seed pack. When
+the first typed contents field lands, replace that guard with the corresponding
+idempotent content writer rather than silently skipping a pack.
+
 ## Versioning
 
 Every record has stable `metadata.id` and a semantic `metadata.version`. Increment

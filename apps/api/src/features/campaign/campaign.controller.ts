@@ -6,6 +6,7 @@ import { updateLastSelectedCampaign } from '../user'
 import {
   createCampaign,
   isCampaignMember,
+  listCampaignTemplates,
   listCampaignsForUser,
   updateCampaign,
 } from './campaign.service'
@@ -13,18 +14,16 @@ import {
 export async function create(req: Request, res: Response): Promise<void> {
   // `req.body` is validated by `validate(createCampaignInputSchema)`; `req.user`
   // is guaranteed by `requireAuth` running before this handler.
-  const { name, description, imageKey, characterCreation, flavor, rulesetId } =
-    req.body as CreateCampaignInput
+  const input = req.body as CreateCampaignInput
   const campaign = await createCampaign({
-    name,
-    description,
-    imageKey,
-    characterCreation,
-    flavor,
-    rulesetId,
+    ...input,
     createdBy: req.user!.id,
   })
   res.status(201).json({ campaign })
+}
+
+export function listTemplates(_req: Request, res: Response): void {
+  res.status(200).json({ campaignTemplates: listCampaignTemplates() })
 }
 
 export async function list(req: Request, res: Response): Promise<void> {

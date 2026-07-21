@@ -20,6 +20,16 @@ Player-owned PCs live under `/characters/*`, not under the campaign shell. See
 [character-acquisition.md](../../../docs/character-acquisition.md) for the
 acquisition model (axes, ownership, build/import finalization).
 
+## Campaign template pipeline
+
+- `GET /api/campaigns/templates` exposes the shipped, validated templates.
+- `listCampaignTemplates()` and `useCampaignTemplates()` provide the dashboard
+  data boundary for a future creation-step chooser.
+- `POST /api/campaigns` accepts optional `campaignTemplateId`; the API resolves
+  defaults before persistence, with explicit request values taking precedence.
+- No chooser is rendered yet. The existing wizard remains unchanged until the
+  template-selection and template-default form hydration UX is designed.
+
 ## NPC authoring
 
 - **Who:** `owner` and `co-owner` only (`useCanManageCampaign`, API

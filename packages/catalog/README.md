@@ -57,6 +57,10 @@ The aggregate preset loader additionally checks unique ids/slugs, valid seed-pac
 references, and matching rulesets. Generated JSON Schemas provide editor feedback
 for both preset files before the runtime validation step.
 
+Campaign creation calls `resolveCampaignCreationPreset()` before persistence.
+This keeps catalog lookup and default precedence deterministic while the API owns
+database writes and rollback behavior.
+
 Campaign-customizable vocabulary sets (`@rpg/catalog/vocabulary`) follow the
 same pattern; see [docs/vocabulary.md](../../docs/vocabulary.md).
 
