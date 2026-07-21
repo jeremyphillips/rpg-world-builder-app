@@ -24,9 +24,39 @@ export const VOCAB_TERM_AUDIT_CONFIG = {
     },
     {
       target: 'content-type:classes',
-      path: 'packages/contracts/src/rpg/runtime/**/*.ts',
-      reason: 'Runtime workflow copy deferred to Phase 5',
-      owner: 'contracts',
+      path: 'apps/bench/**',
+      reason: 'Bench fixture copy; not player-facing catalog chrome',
+      owner: 'bench',
+    },
+    {
+      target: 'content-type:classes',
+      path: 'apps/dashboard/src/features/campaign/lib/rules/mechanics/mechanics-form-fields.ts',
+      reason: 'Armor class (AC) mechanic label, not catalog class content type',
+      owner: 'dashboard',
+    },
+    {
+      target: 'content-type:classes',
+      path: 'apps/dashboard/src/features/campaign/lib/rules/character-configuration/starting-wealth-form-fields.ts',
+      reason: 'Domain-specific starting-wealth option copy',
+      owner: 'dashboard',
+    },
+    {
+      target: 'content-type:classes',
+      path: 'apps/dashboard/src/features/content/lib/forms/grants/grant-form-fields.ts',
+      reason: 'Feat-choice and class-progression grant copy owned by grant vocabulary',
+      owner: 'dashboard',
+    },
+    {
+      target: 'content-type:classes',
+      path: 'apps/dashboard/src/features/content/classes/lib/character-creation/class-starting-equipment-form-values.ts',
+      reason: 'Named starting package label (Standard Equipment), not parent catalog chrome',
+      owner: 'dashboard',
+    },
+    {
+      target: 'content-type:classes',
+      path: 'apps/dashboard/src/features/character/lib/equipment-step.fixtures.ts',
+      reason: 'Named starting package fixture label (Standard Equipment)',
+      owner: 'dashboard',
     },
     {
       target: 'content-type:classes',
@@ -42,7 +72,7 @@ export const VOCAB_TERM_AUDIT_CONFIG = {
     },
     {
       target: 'content-type:spells',
-      path: 'packages/contracts/src/rpg/vocab/spell/**/*.ts',
+      path: 'packages/contracts/src/rpg/vocab/spell/**',
       reason: 'Spell field taxonomy and resolution vocabulary, not catalog chrome',
       owner: 'contracts',
     },
@@ -54,9 +84,39 @@ export const VOCAB_TERM_AUDIT_CONFIG = {
     },
     {
       target: 'content-type:spells',
-      path: 'packages/contracts/src/rpg/runtime/**/*.ts',
-      reason: 'Runtime workflow copy deferred to Phase 5',
-      owner: 'contracts',
+      path: 'apps/dashboard/src/features/character/components/spells/spell-picker-drawer.client.tsx',
+      reason: 'Spell picker workflow chrome, not catalog collection label',
+      owner: 'dashboard',
+    },
+    {
+      target: 'content-type:spells',
+      path: 'apps/dashboard/src/features/character/components/spells/spellcasting-summary-card.client.tsx',
+      reason: 'Spellcasting mechanic labels (save DC, attack, slots), not catalog chrome',
+      owner: 'dashboard',
+    },
+    {
+      target: 'content-type:spells',
+      path: 'apps/dashboard/src/features/content/classes/lib/class-spellcasting-form-fields.ts',
+      reason: 'Class spellcasting progression domain copy',
+      owner: 'dashboard',
+    },
+    {
+      target: 'content-type:spells',
+      path: 'apps/dashboard/src/features/content/lib/forms/grants/grant-form-fields.ts',
+      reason: 'Spell grant and slot-casting domain copy',
+      owner: 'dashboard',
+    },
+    {
+      target: 'content-type:spells',
+      path: 'apps/dashboard/src/features/content/spells/lib/effects/effect-template-registry.ts',
+      reason: 'Spell effect template taxonomy label',
+      owner: 'dashboard',
+    },
+    {
+      target: 'content-type:spells',
+      path: 'apps/dashboard/src/features/content/spells/resolution/lib/form/resolution-form-labels.ts',
+      reason: 'Spell resolution mechanic labels',
+      owner: 'dashboard',
     },
     {
       target: 'content-type:spells',
@@ -78,9 +138,9 @@ export const VOCAB_TERM_AUDIT_CONFIG = {
     },
     {
       target: 'content-type:feats',
-      path: 'packages/contracts/src/rpg/runtime/**/*.ts',
-      reason: 'Runtime workflow copy deferred to Phase 5',
-      owner: 'contracts',
+      path: 'apps/dashboard/src/features/content/lib/forms/grants/grant-form-fields.ts',
+      reason: 'Feat-choice grant eligibility copy owned by grant vocabulary',
+      owner: 'dashboard',
     },
     {
       target: 'content-type:feats',
@@ -96,14 +156,8 @@ export const VOCAB_TERM_AUDIT_CONFIG = {
     },
     {
       target: 'content-type:equipment',
-      path: 'packages/contracts/src/rpg/vocab/equipment/**/*.ts',
+      path: 'packages/contracts/src/rpg/vocab/equipment/**',
       reason: 'Equipment family/kind/category vocabulary, not parent catalog chrome',
-      owner: 'contracts',
-    },
-    {
-      target: 'content-type:equipment',
-      path: 'packages/contracts/src/rpg/runtime/**/*.ts',
-      reason: 'Runtime workflow copy deferred to Phase 5',
       owner: 'contracts',
     },
     {
@@ -116,6 +170,24 @@ export const VOCAB_TERM_AUDIT_CONFIG = {
       target: 'content-type:equipment',
       path: 'apps/dashboard/src/features/content/equipment/hooks/use-equipment-family-overview.ts',
       reason: 'Family-scoped create labels derived from family headings',
+      owner: 'dashboard',
+    },
+    {
+      target: 'content-type:equipment',
+      path: 'apps/dashboard/src/features/content/lib/forms/grants/equipment-grant-form-fields.ts',
+      reason: 'Equipment kind/category pool filters use equipment taxonomy labels',
+      owner: 'dashboard',
+    },
+    {
+      target: 'content-type:equipment',
+      path: 'apps/dashboard/src/features/content/classes/lib/character-creation/class-starting-equipment-form-values.ts',
+      reason: 'Named starting package label (Standard Equipment), not parent catalog chrome',
+      owner: 'dashboard',
+    },
+    {
+      target: 'content-type:equipment',
+      path: 'apps/dashboard/src/features/character/lib/equipment-step.fixtures.ts',
+      reason: 'Named starting package fixture label (Standard Equipment)',
       owner: 'dashboard',
     },
     {

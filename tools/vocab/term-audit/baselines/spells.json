@@ -123,12 +123,30 @@
     },
     {
       "path": "apps/api/src/features/content/spells/assert-spell-class-ids.ts",
-      "line": 5,
+      "line": 10,
       "column": 1,
       "context": "comment",
       "disposition": "unknown",
       "value": "/**\n * Ensures every spell `classIds` slug references a campaign-resolved class with\n * spellcasting (system seed, overlay patch, or homebrew).\n */",
       "variantForms": ["singular"]
+    },
+    {
+      "path": "apps/api/src/features/content/spells/assert-spell-class-ids.ts",
+      "line": 40,
+      "column": 18,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeSentenceForm('classes', unknown.length)",
+      "variantForms": []
+    },
+    {
+      "path": "apps/api/src/features/content/spells/assert-spell-class-ids.ts",
+      "line": 45,
+      "column": 10,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeCapitalizedSentenceLabel('classes', {\n        plural: withoutSpellcasting.length !== 1,\n      })",
+      "variantForms": []
     },
     {
       "path": "apps/api/src/features/content/spells/spell-write-hooks.ts",
@@ -591,6 +609,15 @@
     },
     {
       "path": "apps/dashboard/src/features/character-import/model/character-import-preview.lib.ts",
+      "line": 39,
+      "column": 12,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeCollectionLabel('classes')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/character-import/model/character-import-preview.lib.ts",
       "line": 47,
       "column": 90,
       "context": "unknown",
@@ -887,6 +914,24 @@
       "variantForms": ["plural"]
     },
     {
+      "path": "apps/dashboard/src/features/character/components/equipment/equipment-picker-drawer.client.tsx",
+      "line": 467,
+      "column": 28,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeItemLabel('equipment')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/character/components/equipment/starting-equipment-option-section.client.tsx",
+      "line": 83,
+      "column": 31,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeMidSentenceLabel('equipment')",
+      "variantForms": []
+    },
+    {
       "path": "apps/dashboard/src/features/character/components/picker/catalog-picker-metadata/catalog-picker-metadata.integration.test.tsx",
       "line": 7,
       "column": 61,
@@ -999,7 +1044,7 @@
       "line": 48,
       "column": 8,
       "context": "unknown",
-      "disposition": "unknown",
+      "disposition": "contextual",
       "value": "./spell-picker-drawer.lib",
       "variantForms": ["singular"]
     },
@@ -1008,7 +1053,7 @@
       "line": 61,
       "column": 8,
       "context": "unknown",
-      "disposition": "unknown",
+      "disposition": "contextual",
       "value": "./spell-picker-drawer.types",
       "variantForms": ["singular"]
     },
@@ -1017,7 +1062,7 @@
       "line": 62,
       "column": 40,
       "context": "unknown",
-      "disposition": "unknown",
+      "disposition": "contextual",
       "value": "./spell-picker-item-details.client",
       "variantForms": ["singular"]
     },
@@ -1026,7 +1071,7 @@
       "line": 67,
       "column": 8,
       "context": "unknown",
-      "disposition": "unknown",
+      "disposition": "contextual",
       "value": "./spell-picker-toolbar.client",
       "variantForms": ["singular"]
     },
@@ -1035,7 +1080,7 @@
       "line": 69,
       "column": 45,
       "context": "unknown",
-      "disposition": "unknown",
+      "disposition": "contextual",
       "value": "./spell-picker-drawer.types",
       "variantForms": ["singular"]
     },
@@ -1044,7 +1089,7 @@
       "line": 205,
       "column": 27,
       "context": "unknown",
-      "disposition": "unknown",
+      "disposition": "contextual",
       "value": "Spell school",
       "variantForms": ["label"]
     },
@@ -1053,7 +1098,7 @@
       "line": 269,
       "column": 66,
       "context": "unknown",
-      "disposition": "unknown",
+      "disposition": "contextual",
       "value": "Prepared spells",
       "variantForms": ["plural"]
     },
@@ -1062,7 +1107,7 @@
       "line": 298,
       "column": 24,
       "context": "heading",
-      "disposition": "replaceable",
+      "disposition": "contextual",
       "value": "Spell picker mode",
       "variantForms": ["label"],
       "suggestion": "getContentTypeCollectionLabel('spells')"
@@ -1072,7 +1117,7 @@
       "line": 310,
       "column": 25,
       "context": "unknown",
-      "disposition": "unknown",
+      "disposition": "contextual",
       "value": "Search spells",
       "variantForms": ["plural"]
     },
@@ -1468,7 +1513,7 @@
       "line": 16,
       "column": 8,
       "context": "unknown",
-      "disposition": "unknown",
+      "disposition": "contextual",
       "value": "../../lib/spells-step.lib",
       "variantForms": ["plural"]
     },
@@ -1486,7 +1531,7 @@
       "line": 50,
       "column": 29,
       "context": "label",
-      "disposition": "replaceable",
+      "disposition": "contextual",
       "value": "Spell save DC",
       "variantForms": ["label"],
       "suggestion": "getContentTypeItemLabel('spells')"
@@ -1496,7 +1541,7 @@
       "line": 51,
       "column": 29,
       "context": "label",
-      "disposition": "replaceable",
+      "disposition": "contextual",
       "value": "Spell attack",
       "variantForms": ["label"],
       "suggestion": "getContentTypeItemLabel('spells')"
@@ -1506,7 +1551,7 @@
       "line": 52,
       "column": 29,
       "context": "label",
-      "disposition": "replaceable",
+      "disposition": "contextual",
       "value": "Spell slots",
       "variantForms": ["label"],
       "suggestion": "getContentTypeItemLabel('spells')"
@@ -1518,6 +1563,15 @@
       "context": "canonical_usage",
       "disposition": "ignored",
       "value": "getContentTypeItemLabel('species')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/character/components/steps/review-step-summary.client.tsx",
+      "line": 37,
+      "column": 27,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeItemLabel('classes')",
       "variantForms": []
     },
     {
@@ -2044,7 +2098,16 @@
     },
     {
       "path": "apps/dashboard/src/features/character/lib/detail/character-sheet-catalog.fixtures.ts",
-      "line": 71,
+      "line": 68,
+      "column": 26,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeItemLabel('classes')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/character/lib/detail/character-sheet-catalog.fixtures.ts",
+      "line": 72,
       "column": 5,
       "context": "unknown",
       "disposition": "unknown",
@@ -2479,7 +2542,7 @@
       "line": 97,
       "column": 12,
       "context": "label",
-      "disposition": "replaceable",
+      "disposition": "contextual",
       "value": "Spell progression",
       "variantForms": ["label"],
       "suggestion": "getContentTypeItemLabel('spells')"
@@ -2489,7 +2552,7 @@
       "line": 111,
       "column": 61,
       "context": "unknown",
-      "disposition": "unknown",
+      "disposition": "contextual",
       "value": "Spells known",
       "variantForms": ["derived_collection_label"]
     },
@@ -2498,7 +2561,7 @@
       "line": 111,
       "column": 78,
       "context": "unknown",
-      "disposition": "unknown",
+      "disposition": "contextual",
       "value": "Spells prepared",
       "variantForms": ["derived_collection_label"]
     },
@@ -2635,6 +2698,15 @@
       "context": "canonical_usage",
       "disposition": "ignored",
       "value": "formatContentListLoadErrorMessage('equipment')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/equipment/magic-items/lib/magic-item-form-fields.ts",
+      "line": 73,
+      "column": 28,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeMidSentenceLabel('equipment')",
       "variantForms": []
     },
     {
@@ -2891,7 +2963,7 @@
     },
     {
       "path": "apps/dashboard/src/features/content/lib/content-type-labels.test.ts",
-      "line": 20,
+      "line": 22,
       "column": 12,
       "context": "canonical_usage",
       "disposition": "ignored",
@@ -2900,7 +2972,7 @@
     },
     {
       "path": "apps/dashboard/src/features/content/lib/content-type-labels.test.ts",
-      "line": 21,
+      "line": 23,
       "column": 12,
       "context": "canonical_usage",
       "disposition": "ignored",
@@ -2909,7 +2981,7 @@
     },
     {
       "path": "apps/dashboard/src/features/content/lib/content-type-labels.test.ts",
-      "line": 22,
+      "line": 24,
       "column": 12,
       "context": "canonical_usage",
       "disposition": "ignored",
@@ -2918,7 +2990,7 @@
     },
     {
       "path": "apps/dashboard/src/features/content/lib/content-type-labels.test.ts",
-      "line": 26,
+      "line": 28,
       "column": 12,
       "context": "canonical_usage",
       "disposition": "ignored",
@@ -2927,7 +2999,7 @@
     },
     {
       "path": "apps/dashboard/src/features/content/lib/content-type-labels.test.ts",
-      "line": 27,
+      "line": 29,
       "column": 12,
       "context": "canonical_usage",
       "disposition": "ignored",
@@ -2936,7 +3008,7 @@
     },
     {
       "path": "apps/dashboard/src/features/content/lib/content-type-labels.test.ts",
-      "line": 28,
+      "line": 30,
       "column": 12,
       "context": "canonical_usage",
       "disposition": "ignored",
@@ -2945,7 +3017,7 @@
     },
     {
       "path": "apps/dashboard/src/features/content/lib/content-type-labels.test.ts",
-      "line": 32,
+      "line": 34,
       "column": 12,
       "context": "canonical_usage",
       "disposition": "ignored",
@@ -2954,7 +3026,7 @@
     },
     {
       "path": "apps/dashboard/src/features/content/lib/content-type-labels.test.ts",
-      "line": 33,
+      "line": 35,
       "column": 12,
       "context": "canonical_usage",
       "disposition": "ignored",
@@ -2963,7 +3035,7 @@
     },
     {
       "path": "apps/dashboard/src/features/content/lib/content-type-labels.test.ts",
-      "line": 34,
+      "line": 36,
       "column": 12,
       "context": "canonical_usage",
       "disposition": "ignored",
@@ -2972,7 +3044,7 @@
     },
     {
       "path": "apps/dashboard/src/features/content/lib/content-type-labels.test.ts",
-      "line": 40,
+      "line": 42,
       "column": 12,
       "context": "canonical_usage",
       "disposition": "ignored",
@@ -2981,7 +3053,7 @@
     },
     {
       "path": "apps/dashboard/src/features/content/lib/content-type-labels.test.ts",
-      "line": 41,
+      "line": 43,
       "column": 12,
       "context": "canonical_usage",
       "disposition": "ignored",
@@ -2990,7 +3062,7 @@
     },
     {
       "path": "apps/dashboard/src/features/content/lib/content-type-labels.test.ts",
-      "line": 45,
+      "line": 47,
       "column": 12,
       "context": "canonical_usage",
       "disposition": "ignored",
@@ -2999,7 +3071,7 @@
     },
     {
       "path": "apps/dashboard/src/features/content/lib/content-type-labels.test.ts",
-      "line": 46,
+      "line": 48,
       "column": 12,
       "context": "canonical_usage",
       "disposition": "ignored",
@@ -3008,7 +3080,7 @@
     },
     {
       "path": "apps/dashboard/src/features/content/lib/content-type-labels.test.ts",
-      "line": 47,
+      "line": 49,
       "column": 12,
       "context": "canonical_usage",
       "disposition": "ignored",
@@ -3017,7 +3089,7 @@
     },
     {
       "path": "apps/dashboard/src/features/content/lib/content-type-labels.test.ts",
-      "line": 48,
+      "line": 50,
       "column": 12,
       "context": "canonical_usage",
       "disposition": "ignored",
@@ -3026,7 +3098,7 @@
     },
     {
       "path": "apps/dashboard/src/features/content/lib/content-type-labels.test.ts",
-      "line": 52,
+      "line": 54,
       "column": 12,
       "context": "canonical_usage",
       "disposition": "ignored",
@@ -3035,7 +3107,7 @@
     },
     {
       "path": "apps/dashboard/src/features/content/lib/content-type-labels.test.ts",
-      "line": 53,
+      "line": 55,
       "column": 12,
       "context": "canonical_usage",
       "disposition": "ignored",
@@ -3044,7 +3116,7 @@
     },
     {
       "path": "apps/dashboard/src/features/content/lib/content-type-labels.test.ts",
-      "line": 54,
+      "line": 56,
       "column": 12,
       "context": "canonical_usage",
       "disposition": "ignored",
@@ -3053,7 +3125,7 @@
     },
     {
       "path": "apps/dashboard/src/features/content/lib/content-type-labels.test.ts",
-      "line": 57,
+      "line": 59,
       "column": 12,
       "context": "canonical_usage",
       "disposition": "ignored",
@@ -3062,7 +3134,7 @@
     },
     {
       "path": "apps/dashboard/src/features/content/lib/content-type-labels.test.ts",
-      "line": 60,
+      "line": 62,
       "column": 12,
       "context": "canonical_usage",
       "disposition": "ignored",
@@ -3071,7 +3143,7 @@
     },
     {
       "path": "apps/dashboard/src/features/content/lib/content-type-labels.test.ts",
-      "line": 61,
+      "line": 63,
       "column": 12,
       "context": "canonical_usage",
       "disposition": "ignored",
@@ -3080,7 +3152,7 @@
     },
     {
       "path": "apps/dashboard/src/features/content/lib/content-type-labels.test.ts",
-      "line": 65,
+      "line": 67,
       "column": 12,
       "context": "canonical_usage",
       "disposition": "ignored",
@@ -3089,7 +3161,7 @@
     },
     {
       "path": "apps/dashboard/src/features/content/lib/content-type-labels.test.ts",
-      "line": 68,
+      "line": 70,
       "column": 12,
       "context": "canonical_usage",
       "disposition": "ignored",
@@ -3098,7 +3170,7 @@
     },
     {
       "path": "apps/dashboard/src/features/content/lib/content-type-labels.test.ts",
-      "line": 71,
+      "line": 73,
       "column": 12,
       "context": "canonical_usage",
       "disposition": "ignored",
@@ -3107,7 +3179,7 @@
     },
     {
       "path": "apps/dashboard/src/features/content/lib/content-type-labels.test.ts",
-      "line": 71,
+      "line": 73,
       "column": 55,
       "context": "test_expectation",
       "disposition": "unknown",
@@ -3116,7 +3188,7 @@
     },
     {
       "path": "apps/dashboard/src/features/content/lib/content-type-labels.test.ts",
-      "line": 72,
+      "line": 74,
       "column": 7,
       "context": "test_expectation",
       "disposition": "unknown",
@@ -3125,7 +3197,7 @@
     },
     {
       "path": "apps/dashboard/src/features/content/lib/content-type-labels.test.ts",
-      "line": 74,
+      "line": 76,
       "column": 12,
       "context": "canonical_usage",
       "disposition": "ignored",
@@ -3134,7 +3206,7 @@
     },
     {
       "path": "apps/dashboard/src/features/content/lib/content-type-labels.test.ts",
-      "line": 74,
+      "line": 76,
       "column": 43,
       "context": "test_expectation",
       "disposition": "unknown",
@@ -3143,7 +3215,7 @@
     },
     {
       "path": "apps/dashboard/src/features/content/lib/content-type-labels.test.ts",
-      "line": 74,
+      "line": 76,
       "column": 59,
       "context": "test_expectation",
       "disposition": "unknown",
@@ -3152,7 +3224,7 @@
     },
     {
       "path": "apps/dashboard/src/features/content/lib/content-type-labels.test.ts",
-      "line": 75,
+      "line": 77,
       "column": 12,
       "context": "canonical_usage",
       "disposition": "ignored",
@@ -3161,7 +3233,7 @@
     },
     {
       "path": "apps/dashboard/src/features/content/lib/content-type-labels.test.ts",
-      "line": 79,
+      "line": 86,
       "column": 12,
       "context": "canonical_usage",
       "disposition": "ignored",
@@ -3170,7 +3242,7 @@
     },
     {
       "path": "apps/dashboard/src/features/content/lib/content-type-labels.test.ts",
-      "line": 79,
+      "line": 86,
       "column": 50,
       "context": "canonical_usage",
       "disposition": "ignored",
@@ -3179,7 +3251,7 @@
     },
     {
       "path": "apps/dashboard/src/features/content/lib/content-type-labels.test.ts",
-      "line": 80,
+      "line": 87,
       "column": 12,
       "context": "canonical_usage",
       "disposition": "ignored",
@@ -3188,7 +3260,7 @@
     },
     {
       "path": "apps/dashboard/src/features/content/lib/content-type-labels.test.ts",
-      "line": 80,
+      "line": 87,
       "column": 48,
       "context": "canonical_usage",
       "disposition": "ignored",
@@ -3197,7 +3269,7 @@
     },
     {
       "path": "apps/dashboard/src/features/content/lib/content-type-labels.test.ts",
-      "line": 80,
+      "line": 87,
       "column": 72,
       "context": "test_expectation",
       "disposition": "unknown",
@@ -3328,6 +3400,24 @@
       "context": "canonical_usage",
       "disposition": "ignored",
       "value": "getContentTypeItemLabel(key)",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/lib/content-type-labels.ts",
+      "line": 102,
+      "column": 20,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeMidSentenceLabel(key, options)",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/lib/content-type-labels.ts",
+      "line": 107,
+      "column": 17,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeMidSentenceLabel(key)",
       "variantForms": []
     },
     {
@@ -3691,17 +3781,35 @@
       "variantForms": ["singular"]
     },
     {
+      "path": "apps/dashboard/src/features/content/lib/forms/grants/equipment-grant-form-fields.ts",
+      "line": 372,
+      "column": 18,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeItemLabel('equipment')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/lib/forms/grants/equipment-grant-form-fields.ts",
+      "line": 450,
+      "column": 14,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeItemLabel('equipment')",
+      "variantForms": []
+    },
+    {
       "path": "apps/dashboard/src/features/content/lib/forms/grants/grant-form-fields.ts",
-      "line": 266,
+      "line": 272,
       "column": 11,
       "context": "unknown",
-      "disposition": "unknown",
+      "disposition": "contextual",
       "value": "spells",
       "variantForms": ["plural"]
     },
     {
       "path": "apps/dashboard/src/features/content/lib/forms/grants/grant-form-fields.ts",
-      "line": 462,
+      "line": 468,
       "column": 1,
       "context": "comment",
       "disposition": "unknown",
@@ -3710,25 +3818,25 @@
     },
     {
       "path": "apps/dashboard/src/features/content/lib/forms/grants/grant-form-fields.ts",
-      "line": 467,
+      "line": 473,
       "column": 33,
       "context": "unknown",
-      "disposition": "unknown",
+      "disposition": "contextual",
       "value": "Spells",
       "variantForms": ["derived_collection_label"]
     },
     {
       "path": "apps/dashboard/src/features/content/lib/forms/grants/grant-form-fields.ts",
-      "line": 471,
+      "line": 477,
       "column": 67,
       "context": "unknown",
-      "disposition": "unknown",
+      "disposition": "contextual",
       "value": "spells",
       "variantForms": ["plural"]
     },
     {
       "path": "apps/dashboard/src/features/content/lib/forms/grants/grant-form-fields.ts",
-      "line": 632,
+      "line": 638,
       "column": 5,
       "context": "comment",
       "disposition": "unknown",
@@ -3737,96 +3845,112 @@
     },
     {
       "path": "apps/dashboard/src/features/content/lib/forms/grants/grant-form-fields.ts",
-      "line": 635,
+      "line": 641,
       "column": 30,
       "context": "unknown",
-      "disposition": "unknown",
+      "disposition": "contextual",
       "value": "spells",
       "variantForms": ["plural"]
     },
     {
       "path": "apps/dashboard/src/features/content/lib/forms/grants/grant-form-fields.ts",
-      "line": 648,
+      "line": 654,
       "column": 34,
       "context": "unknown",
-      "disposition": "unknown",
-      "value": "spells",
-      "variantForms": ["plural"]
-    },
-    {
-      "path": "apps/dashboard/src/features/content/lib/forms/grants/grant-form-fields.ts",
-      "line": 655,
-      "column": 34,
-      "context": "unknown",
-      "disposition": "unknown",
+      "disposition": "contextual",
       "value": "spells",
       "variantForms": ["plural"]
     },
     {
       "path": "apps/dashboard/src/features/content/lib/forms/grants/grant-form-fields.ts",
       "line": 661,
-      "column": 30,
+      "column": 34,
       "context": "unknown",
-      "disposition": "unknown",
+      "disposition": "contextual",
       "value": "spells",
       "variantForms": ["plural"]
     },
     {
       "path": "apps/dashboard/src/features/content/lib/forms/grants/grant-form-fields.ts",
-      "line": 672,
-      "column": 40,
+      "line": 667,
+      "column": 30,
       "context": "unknown",
-      "disposition": "unknown",
+      "disposition": "contextual",
       "value": "spells",
       "variantForms": ["plural"]
     },
     {
       "path": "apps/dashboard/src/features/content/lib/forms/grants/grant-form-fields.ts",
       "line": 678,
+      "column": 40,
+      "context": "unknown",
+      "disposition": "contextual",
+      "value": "spells",
+      "variantForms": ["plural"]
+    },
+    {
+      "path": "apps/dashboard/src/features/content/lib/forms/grants/grant-form-fields.ts",
+      "line": 684,
       "column": 18,
       "context": "label",
-      "disposition": "replaceable",
+      "disposition": "contextual",
       "value": "Also cast with spell slots",
       "variantForms": ["singular"],
       "suggestion": "getContentTypeItemLabel('spells')"
     },
     {
       "path": "apps/dashboard/src/features/content/lib/forms/grants/grant-form-fields.ts",
-      "line": 682,
+      "line": 688,
       "column": 40,
       "context": "unknown",
-      "disposition": "unknown",
+      "disposition": "contextual",
       "value": "spells",
       "variantForms": ["plural"]
     },
     {
       "path": "apps/dashboard/src/features/content/lib/forms/grants/grant-form-fields.ts",
-      "line": 692,
+      "line": 698,
       "column": 14,
-      "context": "label",
-      "disposition": "replaceable",
-      "value": "Spells",
-      "variantForms": ["derived_collection_label"],
-      "suggestion": "getContentTypeItemLabel('spells')"
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeCollectionLabel('spells')",
+      "variantForms": []
     },
     {
       "path": "apps/dashboard/src/features/content/lib/forms/grants/grant-form-fields.ts",
-      "line": 695,
-      "column": 20,
-      "context": "placeholder",
-      "disposition": "replaceable",
-      "value": "Choose spells…",
-      "variantForms": ["plural"],
-      "suggestion": "getContentTypeSentenceLabel('spells')"
+      "line": 698,
+      "column": 44,
+      "context": "unknown",
+      "disposition": "contextual",
+      "value": "spells",
+      "variantForms": ["plural"]
     },
     {
       "path": "apps/dashboard/src/features/content/lib/forms/grants/grant-form-fields.ts",
-      "line": 697,
+      "line": 701,
+      "column": 55,
+      "context": "unknown",
+      "disposition": "contextual",
+      "value": "spells",
+      "variantForms": ["plural"]
+    },
+    {
+      "path": "apps/dashboard/src/features/content/lib/forms/grants/grant-form-fields.ts",
+      "line": 703,
       "column": 30,
       "context": "unknown",
-      "disposition": "unknown",
+      "disposition": "contextual",
       "value": "spells",
       "variantForms": ["plural"]
+    },
+    {
+      "path": "apps/dashboard/src/features/content/lib/forms/grants/grant-form-fields.ts",
+      "line": 723,
+      "column": 29,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeMidSentenceLabel('feats', { plural: true })",
+      "variantForms": []
     },
     {
       "path": "apps/dashboard/src/features/content/lib/forms/grants/grant-form-helpers.test.ts",
@@ -4604,7 +4728,7 @@
     },
     {
       "path": "apps/dashboard/src/features/content/species/lib/species-rules-form-fields.ts",
-      "line": 112,
+      "line": 113,
       "column": 17,
       "context": "canonical_usage",
       "disposition": "ignored",
@@ -4613,7 +4737,7 @@
     },
     {
       "path": "apps/dashboard/src/features/content/species/lib/species-rules-form-fields.ts",
-      "line": 119,
+      "line": 120,
       "column": 52,
       "context": "canonical_usage",
       "disposition": "ignored",
@@ -4622,7 +4746,16 @@
     },
     {
       "path": "apps/dashboard/src/features/content/species/lib/species-rules-form-fields.ts",
-      "line": 133,
+      "line": 129,
+      "column": 19,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeItemLabel('classes')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/species/lib/species-rules-form-fields.ts",
+      "line": 134,
       "column": 44,
       "context": "canonical_usage",
       "disposition": "ignored",
@@ -4631,7 +4764,25 @@
     },
     {
       "path": "apps/dashboard/src/features/content/species/lib/species-rules-form-fields.ts",
-      "line": 187,
+      "line": 156,
+      "column": 18,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeItemLabel('classes')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/species/lib/species-rules-form-fields.ts",
+      "line": 165,
+      "column": 29,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeMidSentenceLabel('classes')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/species/lib/species-rules-form-fields.ts",
+      "line": 188,
       "column": 23,
       "context": "canonical_usage",
       "disposition": "ignored",
@@ -4640,7 +4791,7 @@
     },
     {
       "path": "apps/dashboard/src/features/content/species/lib/species-rules-form-fields.ts",
-      "line": 188,
+      "line": 189,
       "column": 75,
       "context": "canonical_usage",
       "disposition": "ignored",
@@ -4650,6 +4801,15 @@
     {
       "path": "apps/dashboard/src/features/content/species/lib/species-rules-form-fields.ts",
       "line": 215,
+      "column": 19,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeItemLabel('classes')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/species/lib/species-rules-form-fields.ts",
+      "line": 216,
       "column": 48,
       "context": "canonical_usage",
       "disposition": "ignored",
@@ -4657,12 +4817,30 @@
       "variantForms": []
     },
     {
+      "path": "apps/dashboard/src/features/content/species/lib/species-rules-form-fields.ts",
+      "line": 226,
+      "column": 40,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeMidSentenceLabel('classes')",
+      "variantForms": []
+    },
+    {
       "path": "apps/dashboard/src/features/content/species/lib/species-rules-form-labels.ts",
-      "line": 27,
+      "line": 18,
       "column": 28,
       "context": "canonical_usage",
       "disposition": "ignored",
       "value": "getContentTypeMidSentenceLabel('species')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/species/lib/species-rules-form-labels.ts",
+      "line": 19,
+      "column": 23,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeMidSentenceLabel('classes', { plural: true })",
       "variantForms": []
     },
     {
@@ -5102,7 +5280,7 @@
       "line": 15,
       "column": 27,
       "context": "label",
-      "disposition": "replaceable",
+      "disposition": "contextual",
       "value": "Spell effects",
       "variantForms": ["label"],
       "suggestion": "getContentTypeItemLabel('spells')"
@@ -5343,7 +5521,7 @@
     },
     {
       "path": "apps/dashboard/src/features/content/spells/lib/spell-form-fields.ts",
-      "line": 45,
+      "line": 49,
       "column": 8,
       "context": "unknown",
       "disposition": "unknown",
@@ -5352,7 +5530,7 @@
     },
     {
       "path": "apps/dashboard/src/features/content/spells/lib/spell-form-fields.ts",
-      "line": 46,
+      "line": 50,
       "column": 38,
       "context": "unknown",
       "disposition": "unknown",
@@ -5361,7 +5539,16 @@
     },
     {
       "path": "apps/dashboard/src/features/content/spells/lib/spell-form-fields.ts",
-      "line": 540,
+      "line": 273,
+      "column": 18,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeCollectionLabel('classes')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/spells/lib/spell-form-fields.ts",
+      "line": 544,
       "column": 13,
       "context": "sentence",
       "disposition": "unknown",
@@ -5868,7 +6055,7 @@
       "line": 39,
       "column": 27,
       "context": "sentence",
-      "disposition": "unknown",
+      "disposition": "contextual",
       "value": "Define what the spell does, then choose when each effect applies.",
       "variantForms": ["singular"]
     },
@@ -5877,7 +6064,7 @@
       "line": 79,
       "column": 5,
       "context": "sentence",
-      "disposition": "unknown",
+      "disposition": "contextual",
       "value": "Define how this spell changes with character level or higher-level spell slots.",
       "variantForms": ["singular"]
     },
@@ -5886,7 +6073,7 @@
       "line": 161,
       "column": 29,
       "context": "label",
-      "disposition": "replaceable",
+      "disposition": "contextual",
       "value": "Spell attack",
       "variantForms": ["label"],
       "suggestion": "getContentTypeItemLabel('spells')"
@@ -7233,6 +7420,24 @@
       "variantForms": ["plural"]
     },
     {
+      "path": "packages/catalog/src/classes/index.ts",
+      "line": 109,
+      "column": 54,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeTerm('classes')",
+      "variantForms": []
+    },
+    {
+      "path": "packages/catalog/src/equipment/index.ts",
+      "line": 78,
+      "column": 56,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeTerm('equipment')",
+      "variantForms": []
+    },
+    {
       "path": "packages/catalog/src/feats/index.test.ts",
       "line": 77,
       "column": 8,
@@ -7267,6 +7472,15 @@
       "disposition": "unknown",
       "value": "boon-of-spell-recall",
       "variantForms": ["singular"]
+    },
+    {
+      "path": "packages/catalog/src/feats/index.ts",
+      "line": 26,
+      "column": 52,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeTerm('feats')",
+      "variantForms": []
     },
     {
       "path": "packages/catalog/src/skill-proficiencies/index.ts",
@@ -7380,10 +7594,19 @@
       "path": "packages/catalog/src/spells/index.ts",
       "line": 85,
       "column": 53,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeTerm('spells')",
+      "variantForms": []
+    },
+    {
+      "path": "packages/catalog/src/spells/index.ts",
+      "line": 85,
+      "column": 72,
       "context": "unknown",
       "disposition": "unknown",
-      "value": "Spell",
-      "variantForms": ["label"]
+      "value": "spells",
+      "variantForms": ["plural"]
     },
     {
       "path": "packages/catalog/src/spells/index.ts",
@@ -8674,7 +8897,7 @@
     },
     {
       "path": "packages/contracts/src/rpg/content/lib/content-type-term-coverage.test.ts",
-      "line": 20,
+      "line": 21,
       "column": 20,
       "context": "canonical_usage",
       "disposition": "ignored",
@@ -8683,7 +8906,7 @@
     },
     {
       "path": "packages/contracts/src/rpg/content/lib/content-type-term-coverage.test.ts",
-      "line": 42,
+      "line": 43,
       "column": 12,
       "context": "canonical_usage",
       "disposition": "ignored",
@@ -8692,11 +8915,29 @@
     },
     {
       "path": "packages/contracts/src/rpg/content/lib/content-type-term-coverage.test.ts",
-      "line": 43,
+      "line": 44,
       "column": 12,
       "context": "canonical_usage",
       "disposition": "ignored",
       "value": "getContentTypeSentenceForm('classes', 2)",
+      "variantForms": []
+    },
+    {
+      "path": "packages/contracts/src/rpg/content/lib/content-type-term-coverage.test.ts",
+      "line": 45,
+      "column": 12,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeCapitalizedSentenceLabel('classes')",
+      "variantForms": []
+    },
+    {
+      "path": "packages/contracts/src/rpg/content/lib/content-type-term-coverage.test.ts",
+      "line": 46,
+      "column": 12,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeCapitalizedSentenceLabel('classes', { plural: true })",
       "variantForms": []
     },
     {
@@ -8743,6 +8984,15 @@
       "context": "canonical_usage",
       "disposition": "ignored",
       "value": "getContentTypeTerm(key)",
+      "variantForms": []
+    },
+    {
+      "path": "packages/contracts/src/rpg/content/lib/content-type-terms.ts",
+      "line": 68,
+      "column": 18,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeSentenceForm(key, options?.plural ? 2 : 1)",
       "variantForms": []
     },
     {
@@ -10426,7 +10676,7 @@
       "line": 3,
       "column": 67,
       "context": "test_expectation",
-      "disposition": "contextual",
+      "disposition": "unknown",
       "value": "./assemble-granted-spells",
       "variantForms": ["plural"]
     },
@@ -10435,7 +10685,7 @@
       "line": 4,
       "column": 42,
       "context": "test_expectation",
-      "disposition": "contextual",
+      "disposition": "unknown",
       "value": "../../character/spells",
       "variantForms": ["plural"]
     },
@@ -10444,7 +10694,7 @@
       "line": 7,
       "column": 6,
       "context": "test_expectation",
-      "disposition": "contextual",
+      "disposition": "unknown",
       "value": "assembles free-cast-only racial spells outside class collections",
       "variantForms": ["plural"]
     },
@@ -10453,7 +10703,7 @@
       "line": 30,
       "column": 33,
       "context": "test_expectation",
-      "disposition": "contextual",
+      "disposition": "unknown",
       "value": "spells",
       "variantForms": ["plural"]
     },
@@ -10462,7 +10712,7 @@
       "line": 95,
       "column": 31,
       "context": "test_expectation",
-      "disposition": "contextual",
+      "disposition": "unknown",
       "value": "spells",
       "variantForms": ["plural"]
     },
@@ -10471,7 +10721,7 @@
       "line": 151,
       "column": 77,
       "context": "test_expectation",
-      "disposition": "contextual",
+      "disposition": "unknown",
       "value": "spells",
       "variantForms": ["plural"]
     },
@@ -10480,7 +10730,7 @@
       "line": 3,
       "column": 64,
       "context": "unknown",
-      "disposition": "contextual",
+      "disposition": "unknown",
       "value": "../../character/spells",
       "variantForms": ["plural"]
     },
@@ -10498,7 +10748,7 @@
       "line": 14,
       "column": 25,
       "context": "unknown",
-      "disposition": "contextual",
+      "disposition": "unknown",
       "value": "spells",
       "variantForms": ["plural"]
     },
@@ -10516,7 +10766,7 @@
       "line": 46,
       "column": 21,
       "context": "test_expectation",
-      "disposition": "contextual",
+      "disposition": "unknown",
       "value": "spells",
       "variantForms": ["plural"]
     },
@@ -10525,7 +10775,7 @@
       "line": 1,
       "column": 42,
       "context": "unknown",
-      "disposition": "contextual",
+      "disposition": "unknown",
       "value": "../../character/spells",
       "variantForms": ["plural"]
     },
@@ -10543,7 +10793,7 @@
       "line": 15,
       "column": 25,
       "context": "unknown",
-      "disposition": "contextual",
+      "disposition": "unknown",
       "value": "spells",
       "variantForms": ["plural"]
     },
@@ -10552,7 +10802,7 @@
       "line": 20,
       "column": 73,
       "context": "unknown",
-      "disposition": "contextual",
+      "disposition": "unknown",
       "value": "spells",
       "variantForms": ["plural"]
     },
@@ -10561,7 +10811,7 @@
       "line": 22,
       "column": 32,
       "context": "unknown",
-      "disposition": "contextual",
+      "disposition": "unknown",
       "value": "spell",
       "variantForms": ["singular"]
     },
@@ -10570,7 +10820,7 @@
       "line": 22,
       "column": 48,
       "context": "unknown",
-      "disposition": "contextual",
+      "disposition": "unknown",
       "value": "spells",
       "variantForms": ["plural"]
     },
@@ -10585,10 +10835,28 @@
     },
     {
       "path": "packages/contracts/src/rpg/runtime/character-builder/character-builder-messages.ts",
+      "line": 28,
+      "column": 23,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeSentenceForm('species')",
+      "variantForms": []
+    },
+    {
+      "path": "packages/contracts/src/rpg/runtime/character-builder/character-builder-messages.ts",
+      "line": 32,
+      "column": 23,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeSentenceForm('classes')",
+      "variantForms": []
+    },
+    {
+      "path": "packages/contracts/src/rpg/runtime/character-builder/character-builder-messages.ts",
       "line": 65,
       "column": 21,
       "context": "message",
-      "disposition": "contextual",
+      "disposition": "unknown",
       "value": "Choose 1 more prepared spell.",
       "variantForms": ["singular"]
     },
@@ -10597,7 +10865,7 @@
       "line": 65,
       "column": 70,
       "context": "message",
-      "disposition": "contextual",
+      "disposition": "unknown",
       "value": "more prepared spells.",
       "variantForms": ["plural"]
     },
@@ -10606,7 +10874,7 @@
       "line": 73,
       "column": 35,
       "context": "message",
-      "disposition": "contextual",
+      "disposition": "unknown",
       "value": "Remove 1 prepared spell.",
       "variantForms": ["singular"]
     },
@@ -10615,31 +10883,40 @@
       "line": 73,
       "column": 79,
       "context": "message",
-      "disposition": "contextual",
+      "disposition": "unknown",
       "value": "prepared spells.",
       "variantForms": ["plural"]
     },
     {
       "path": "packages/contracts/src/rpg/runtime/character-builder/character-builder-messages.ts",
-      "line": 83,
-      "column": 24,
-      "context": "message",
-      "disposition": "contextual",
-      "value": "is not a level 1 spell.",
-      "variantForms": ["singular"]
+      "line": 78,
+      "column": 56,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeSentenceForm('classes')",
+      "variantForms": []
     },
     {
       "path": "packages/contracts/src/rpg/runtime/character-builder/character-builder-messages.ts",
       "line": 84,
       "column": 24,
       "context": "message",
-      "disposition": "contextual",
+      "disposition": "unknown",
+      "value": "is not a level 1 spell.",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "packages/contracts/src/rpg/runtime/character-builder/character-builder-messages.ts",
+      "line": 85,
+      "column": 24,
+      "context": "message",
+      "disposition": "unknown",
       "value": "is above the highest spell level you can select.",
       "variantForms": ["singular"]
     },
     {
       "path": "packages/contracts/src/rpg/runtime/character-builder/character-builder-messages.ts",
-      "line": 105,
+      "line": 106,
       "column": 19,
       "context": "canonical_usage",
       "disposition": "ignored",
@@ -10648,7 +10925,7 @@
     },
     {
       "path": "packages/contracts/src/rpg/runtime/character-builder/character-builder-messages.ts",
-      "line": 122,
+      "line": 123,
       "column": 1,
       "context": "comment",
       "disposition": "unknown",
@@ -10657,28 +10934,118 @@
     },
     {
       "path": "packages/contracts/src/rpg/runtime/character-builder/character-builder-messages.ts",
-      "line": 160,
-      "column": 11,
-      "context": "message",
-      "disposition": "contextual",
-      "value": "Choose a class to see spell options.",
-      "variantForms": ["singular"]
+      "line": 129,
+      "column": 23,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeSentenceForm('classes')",
+      "variantForms": []
     },
     {
       "path": "packages/contracts/src/rpg/runtime/character-builder/character-builder-messages.ts",
-      "line": 172,
-      "column": 11,
+      "line": 129,
+      "column": 71,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeSentenceForm('equipment')",
+      "variantForms": []
+    },
+    {
+      "path": "packages/contracts/src/rpg/runtime/character-builder/character-builder-messages.ts",
+      "line": 134,
+      "column": 22,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeSentenceForm('equipment')",
+      "variantForms": []
+    },
+    {
+      "path": "packages/contracts/src/rpg/runtime/character-builder/character-builder-messages.ts",
+      "line": 134,
+      "column": 96,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeSentenceForm('classes')",
+      "variantForms": []
+    },
+    {
+      "path": "packages/contracts/src/rpg/runtime/character-builder/character-builder-messages.ts",
+      "line": 138,
+      "column": 35,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeSentenceForm('equipment')",
+      "variantForms": []
+    },
+    {
+      "path": "packages/contracts/src/rpg/runtime/character-builder/character-builder-messages.ts",
+      "line": 142,
+      "column": 42,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeSentenceForm('equipment')",
+      "variantForms": []
+    },
+    {
+      "path": "packages/contracts/src/rpg/runtime/character-builder/character-builder-messages.ts",
+      "line": 162,
+      "column": 23,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeSentenceForm('classes')",
+      "variantForms": []
+    },
+    {
+      "path": "packages/contracts/src/rpg/runtime/character-builder/character-builder-messages.ts",
+      "line": 162,
+      "column": 71,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeSentenceForm('spells', 2)",
+      "variantForms": []
+    },
+    {
+      "path": "packages/contracts/src/rpg/runtime/character-builder/character-builder-messages.ts",
+      "line": 162,
+      "column": 98,
       "context": "message",
-      "disposition": "contextual",
-      "value": "Review your starting spells.",
+      "disposition": "unknown",
+      "value": "spells",
       "variantForms": ["plural"]
+    },
+    {
+      "path": "packages/contracts/src/rpg/runtime/character-builder/character-builder-messages.ts",
+      "line": 174,
+      "column": 35,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeSentenceForm('spells', 2)",
+      "variantForms": []
+    },
+    {
+      "path": "packages/contracts/src/rpg/runtime/character-builder/character-builder-messages.ts",
+      "line": 174,
+      "column": 62,
+      "context": "message",
+      "disposition": "unknown",
+      "value": "spells",
+      "variantForms": ["plural"]
+    },
+    {
+      "path": "packages/contracts/src/rpg/runtime/character-builder/character-builder-messages.ts",
+      "line": 178,
+      "column": 23,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeSentenceForm('classes')",
+      "variantForms": []
     },
     {
       "path": "packages/contracts/src/rpg/runtime/character-builder/choice-set.test.ts",
       "line": 51,
       "column": 7,
       "context": "test_expectation",
-      "disposition": "contextual",
+      "disposition": "unknown",
       "value": "spell",
       "variantForms": ["singular"]
     },
@@ -10687,7 +11054,7 @@
       "line": 76,
       "column": 68,
       "context": "test_expectation",
-      "disposition": "contextual",
+      "disposition": "unknown",
       "value": "spells",
       "variantForms": ["plural"]
     },
@@ -10696,7 +11063,7 @@
       "line": 77,
       "column": 7,
       "context": "test_expectation",
-      "disposition": "contextual",
+      "disposition": "unknown",
       "value": "spellcasting:srd-cc-5.2.1:wizard:spells",
       "variantForms": ["plural"]
     },
@@ -10705,7 +11072,7 @@
       "line": 34,
       "column": 3,
       "context": "unknown",
-      "disposition": "contextual",
+      "disposition": "unknown",
       "value": "spell",
       "variantForms": ["singular"]
     },
@@ -10732,7 +11099,7 @@
       "line": 8,
       "column": 28,
       "context": "unknown",
-      "disposition": "contextual",
+      "disposition": "unknown",
       "value": "../../content/spell",
       "variantForms": ["singular"]
     },
@@ -10750,7 +11117,7 @@
       "line": 342,
       "column": 42,
       "context": "test_expectation",
-      "disposition": "contextual",
+      "disposition": "unknown",
       "value": ":spells",
       "variantForms": ["plural"]
     },
@@ -10759,7 +11126,7 @@
       "line": 363,
       "column": 18,
       "context": "test_expectation",
-      "disposition": "contextual",
+      "disposition": "unknown",
       "value": "spells",
       "variantForms": ["plural"]
     },
@@ -10768,7 +11135,7 @@
       "line": 15,
       "column": 8,
       "context": "unknown",
-      "disposition": "contextual",
+      "disposition": "unknown",
       "value": "./assembly/assemble-granted-spells",
       "variantForms": ["plural"]
     },
@@ -10777,7 +11144,7 @@
       "line": 9,
       "column": 15,
       "context": "unknown",
-      "disposition": "contextual",
+      "disposition": "unknown",
       "value": "./assembly/assemble-granted-spells",
       "variantForms": ["plural"]
     },
@@ -10786,7 +11153,7 @@
       "line": 72,
       "column": 15,
       "context": "unknown",
-      "disposition": "contextual",
+      "disposition": "unknown",
       "value": "./resolvers/spellcasting/format-spell-picker-metadata",
       "variantForms": ["singular"]
     },
@@ -10795,7 +11162,7 @@
       "line": 73,
       "column": 15,
       "context": "unknown",
-      "disposition": "contextual",
+      "disposition": "unknown",
       "value": "./resolvers/spellcasting/resolve-spell-picker-items",
       "variantForms": ["singular"]
     },
@@ -10804,7 +11171,7 @@
       "line": 74,
       "column": 15,
       "context": "unknown",
-      "disposition": "contextual",
+      "disposition": "unknown",
       "value": "./resolvers/spellcasting/resolve-spell-step-applicability",
       "variantForms": ["singular"]
     },
@@ -10813,7 +11180,7 @@
       "line": 75,
       "column": 15,
       "context": "unknown",
-      "disposition": "contextual",
+      "disposition": "unknown",
       "value": "./resolvers/spellcasting/resolve-spells-step-readiness",
       "variantForms": ["plural"]
     },
@@ -10822,7 +11189,7 @@
       "line": 6,
       "column": 28,
       "context": "test_expectation",
-      "disposition": "contextual",
+      "disposition": "unknown",
       "value": "../../content/spell",
       "variantForms": ["singular"]
     },
@@ -10831,7 +11198,7 @@
       "line": 176,
       "column": 6,
       "context": "test_expectation",
-      "disposition": "contextual",
+      "disposition": "unknown",
       "value": "filters spells to those learnable by available classes",
       "variantForms": ["plural"]
     },
@@ -10840,13 +11207,13 @@
       "line": 5,
       "column": 28,
       "context": "unknown",
-      "disposition": "contextual",
+      "disposition": "unknown",
       "value": "../../content/spell",
       "variantForms": ["singular"]
     },
     {
       "path": "packages/contracts/src/rpg/runtime/character-builder/resolve-review-blocking-summary.ts",
-      "line": 41,
+      "line": 44,
       "column": 12,
       "context": "canonical_usage",
       "disposition": "ignored",
@@ -10855,12 +11222,48 @@
     },
     {
       "path": "packages/contracts/src/rpg/runtime/character-builder/resolve-review-blocking-summary.ts",
-      "line": 46,
+      "line": 45,
+      "column": 10,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeTerm('classes')",
+      "variantForms": []
+    },
+    {
+      "path": "packages/contracts/src/rpg/runtime/character-builder/resolve-review-blocking-summary.ts",
+      "line": 48,
+      "column": 14,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeTerm('equipment')",
+      "variantForms": []
+    },
+    {
+      "path": "packages/contracts/src/rpg/runtime/character-builder/resolve-review-blocking-summary.ts",
+      "line": 49,
       "column": 11,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeCapitalizedSentenceLabel('spells', { plural: true })",
+      "variantForms": []
+    },
+    {
+      "path": "packages/contracts/src/rpg/runtime/character-builder/resolve-review-blocking-summary.ts",
+      "line": 49,
+      "column": 50,
       "context": "unknown",
-      "disposition": "contextual",
-      "value": "Spells",
-      "variantForms": ["derived_collection_label"]
+      "disposition": "unknown",
+      "value": "spells",
+      "variantForms": ["plural"]
+    },
+    {
+      "path": "packages/contracts/src/rpg/runtime/character-builder/resolvers/equipment/resolve-starting-equipment-choice-sets.ts",
+      "line": 67,
+      "column": 33,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeCapitalizedSentenceLabel('equipment')",
+      "variantForms": []
     },
     {
       "path": "packages/contracts/src/rpg/runtime/character-builder/resolvers/picker/picker-item-state.ts",
@@ -10885,7 +11288,7 @@
       "line": 3,
       "column": 28,
       "context": "test_expectation",
-      "disposition": "contextual",
+      "disposition": "unknown",
       "value": "../../../../content/spell",
       "variantForms": ["singular"]
     },
@@ -10894,7 +11297,7 @@
       "line": 15,
       "column": 8,
       "context": "test_expectation",
-      "disposition": "contextual",
+      "disposition": "unknown",
       "value": "./format-spell-picker-metadata",
       "variantForms": ["singular"]
     },
@@ -10903,7 +11306,7 @@
       "line": 61,
       "column": 6,
       "context": "test_expectation",
-      "disposition": "contextual",
+      "disposition": "unknown",
       "value": "labels cantrips and leveled spells",
       "variantForms": ["plural"]
     },
@@ -10912,7 +11315,7 @@
       "line": 118,
       "column": 6,
       "context": "test_expectation",
-      "disposition": "contextual",
+      "disposition": "unknown",
       "value": "returns Concentration only for timed concentration spells",
       "variantForms": ["plural"]
     },
@@ -10921,7 +11324,7 @@
       "line": 132,
       "column": 6,
       "context": "test_expectation",
-      "disposition": "contextual",
+      "disposition": "unknown",
       "value": "returns Ritual when the spell can be cast as a ritual",
       "variantForms": ["singular"]
     },
@@ -10930,7 +11333,7 @@
       "line": 158,
       "column": 25,
       "context": "test_expectation",
-      "disposition": "contextual",
+      "disposition": "unknown",
       "value": "ranged-spell-attack",
       "variantForms": ["singular"]
     },
@@ -10939,7 +11342,7 @@
       "line": 1,
       "column": 28,
       "context": "unknown",
-      "disposition": "contextual",
+      "disposition": "unknown",
       "value": "../../../../content/spell",
       "variantForms": ["singular"]
     },
@@ -10948,7 +11351,7 @@
       "line": 2,
       "column": 34,
       "context": "unknown",
-      "disposition": "contextual",
+      "disposition": "unknown",
       "value": "../../../../content/spell/levels",
       "variantForms": ["singular"]
     },
@@ -10957,7 +11360,7 @@
       "line": 3,
       "column": 32,
       "context": "unknown",
-      "disposition": "contextual",
+      "disposition": "unknown",
       "value": "../../../../vocab/spell/tags",
       "variantForms": ["singular"]
     },
@@ -10966,7 +11369,7 @@
       "line": 4,
       "column": 41,
       "context": "unknown",
-      "disposition": "contextual",
+      "disposition": "unknown",
       "value": "../../../../vocab/spell/casting-time",
       "variantForms": ["singular"]
     },
@@ -10975,7 +11378,7 @@
       "line": 10,
       "column": 8,
       "context": "unknown",
-      "disposition": "contextual",
+      "disposition": "unknown",
       "value": "../../../../vocab/spell",
       "variantForms": ["singular"]
     },
@@ -10984,7 +11387,7 @@
       "line": 11,
       "column": 52,
       "context": "unknown",
-      "disposition": "contextual",
+      "disposition": "unknown",
       "value": "../../../../vocab/spell/delivery-method",
       "variantForms": ["singular"]
     },
@@ -10993,7 +11396,7 @@
       "line": 12,
       "column": 38,
       "context": "unknown",
-      "disposition": "contextual",
+      "disposition": "unknown",
       "value": "../../../../vocab/spell/duration",
       "variantForms": ["singular"]
     },
@@ -11002,7 +11405,7 @@
       "line": 13,
       "column": 40,
       "context": "unknown",
-      "disposition": "contextual",
+      "disposition": "unknown",
       "value": "../../../../vocab/spell/range",
       "variantForms": ["singular"]
     },
@@ -11011,7 +11414,7 @@
       "line": 14,
       "column": 37,
       "context": "unknown",
-      "disposition": "contextual",
+      "disposition": "unknown",
       "value": "../../../../vocab/spell/school",
       "variantForms": ["singular"]
     },
@@ -11083,7 +11486,7 @@
       "line": 15,
       "column": 41,
       "context": "test_expectation",
-      "disposition": "contextual",
+      "disposition": "unknown",
       "value": "./resolve-spell-picker-items",
       "variantForms": ["singular"]
     },
@@ -11092,7 +11495,7 @@
       "line": 93,
       "column": 22,
       "context": "test_expectation",
-      "disposition": "contextual",
+      "disposition": "unknown",
       "value": "spellcasting:missing:spells",
       "variantForms": ["plural"]
     },
@@ -11101,7 +11504,7 @@
       "line": 1,
       "column": 28,
       "context": "unknown",
-      "disposition": "contextual",
+      "disposition": "unknown",
       "value": "../../../../content/spell",
       "variantForms": ["singular"]
     },
@@ -11110,7 +11513,7 @@
       "line": 12,
       "column": 8,
       "context": "unknown",
-      "disposition": "contextual",
+      "disposition": "unknown",
       "value": "./format-spell-picker-metadata",
       "variantForms": ["singular"]
     },
@@ -11128,7 +11531,7 @@
       "line": 10,
       "column": 47,
       "context": "test_expectation",
-      "disposition": "contextual",
+      "disposition": "unknown",
       "value": "./resolve-spell-step-applicability",
       "variantForms": ["singular"]
     },
@@ -11146,22 +11549,22 @@
       "line": 1,
       "column": 28,
       "context": "unknown",
-      "disposition": "contextual",
+      "disposition": "unknown",
       "value": "../../../../content/spell",
       "variantForms": ["singular"]
     },
     {
       "path": "packages/contracts/src/rpg/runtime/character-builder/resolvers/spellcasting/resolve-spellcasting-choice-sets.ts",
-      "line": 11,
+      "line": 14,
       "column": 52,
       "context": "unknown",
-      "disposition": "contextual",
+      "disposition": "unknown",
       "value": "spells",
       "variantForms": ["plural"]
     },
     {
       "path": "packages/contracts/src/rpg/runtime/character-builder/resolvers/spellcasting/resolve-spellcasting-choice-sets.ts",
-      "line": 25,
+      "line": 28,
       "column": 1,
       "context": "comment",
       "disposition": "unknown",
@@ -11170,29 +11573,37 @@
     },
     {
       "path": "packages/contracts/src/rpg/runtime/character-builder/resolvers/spellcasting/resolve-spellcasting-choice-sets.ts",
-      "line": 52,
+      "line": 55,
       "column": 19,
       "context": "unknown",
-      "disposition": "contextual",
+      "disposition": "unknown",
       "value": "spell",
       "variantForms": ["singular"]
     },
     {
       "path": "packages/contracts/src/rpg/runtime/character-builder/resolvers/spellcasting/resolve-spellcasting-choice-sets.ts",
-      "line": 53,
-      "column": 14,
-      "context": "label",
-      "disposition": "contextual",
-      "value": "Prepared Spells",
-      "variantForms": ["derived_collection_label"],
-      "suggestion": "getContentTypeItemLabel('spells')"
+      "line": 56,
+      "column": 26,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeCapitalizedSentenceLabel('spells', { plural: true })",
+      "variantForms": []
+    },
+    {
+      "path": "packages/contracts/src/rpg/runtime/character-builder/resolvers/spellcasting/resolve-spellcasting-choice-sets.ts",
+      "line": 56,
+      "column": 65,
+      "context": "unknown",
+      "disposition": "unknown",
+      "value": "spells",
+      "variantForms": ["plural"]
     },
     {
       "path": "packages/contracts/src/rpg/runtime/character-builder/resolvers/spellcasting/resolve-spellcasting-choices.test.ts",
       "line": 31,
       "column": 6,
       "context": "test_expectation",
-      "disposition": "contextual",
+      "disposition": "unknown",
       "value": "emits cantrip and spell ChoiceSets with class-specific counts",
       "variantForms": ["singular"]
     },
@@ -11201,7 +11612,7 @@
       "line": 48,
       "column": 41,
       "context": "test_expectation",
-      "disposition": "contextual",
+      "disposition": "unknown",
       "value": ":spells",
       "variantForms": ["plural"]
     },
@@ -11210,7 +11621,7 @@
       "line": 49,
       "column": 19,
       "context": "test_expectation",
-      "disposition": "contextual",
+      "disposition": "unknown",
       "value": "spell",
       "variantForms": ["singular"]
     },
@@ -11219,7 +11630,7 @@
       "line": 56,
       "column": 6,
       "context": "test_expectation",
-      "disposition": "contextual",
+      "disposition": "unknown",
       "value": "filters options by class spell list and spell level",
       "variantForms": ["singular"]
     },
@@ -11228,7 +11639,7 @@
       "line": 73,
       "column": 6,
       "context": "test_expectation",
-      "disposition": "contextual",
+      "disposition": "unknown",
       "value": "emits only spell ChoiceSets for paladin",
       "variantForms": ["singular"]
     },
@@ -11237,7 +11648,7 @@
       "line": 81,
       "column": 44,
       "context": "test_expectation",
-      "disposition": "contextual",
+      "disposition": "unknown",
       "value": "spell",
       "variantForms": ["singular"]
     },
@@ -11246,7 +11657,7 @@
       "line": 93,
       "column": 85,
       "context": "test_expectation",
-      "disposition": "contextual",
+      "disposition": "unknown",
       "value": "spell",
       "variantForms": ["singular"]
     },
@@ -11255,7 +11666,7 @@
       "line": 102,
       "column": 6,
       "context": "test_expectation",
-      "disposition": "contextual",
+      "disposition": "unknown",
       "value": "emits satisfiable spell ChoiceSets for every seeded caster fixture",
       "variantForms": ["singular"]
     },
@@ -11264,7 +11675,7 @@
       "line": 11,
       "column": 47,
       "context": "unknown",
-      "disposition": "contextual",
+      "disposition": "unknown",
       "value": "./resolve-spell-step-applicability",
       "variantForms": ["singular"]
     },
@@ -11273,7 +11684,7 @@
       "line": 47,
       "column": 44,
       "context": "unknown",
-      "disposition": "contextual",
+      "disposition": "unknown",
       "value": "spells",
       "variantForms": ["plural"]
     },
@@ -11282,7 +11693,7 @@
       "line": 69,
       "column": 47,
       "context": "test_expectation",
-      "disposition": "contextual",
+      "disposition": "unknown",
       "value": ":spells",
       "variantForms": ["plural"]
     },
@@ -11291,7 +11702,7 @@
       "line": 83,
       "column": 78,
       "context": "test_expectation",
-      "disposition": "contextual",
+      "disposition": "unknown",
       "value": ":spells",
       "variantForms": ["plural"]
     },
@@ -11318,7 +11729,7 @@
       "line": 44,
       "column": 79,
       "context": "unknown",
-      "disposition": "contextual",
+      "disposition": "unknown",
       "value": "spells",
       "variantForms": ["plural"]
     },
@@ -11327,7 +11738,7 @@
       "line": 2,
       "column": 28,
       "context": "unknown",
-      "disposition": "contextual",
+      "disposition": "unknown",
       "value": "../../content/spell",
       "variantForms": ["singular"]
     },
@@ -11336,7 +11747,7 @@
       "line": 126,
       "column": 18,
       "context": "unknown",
-      "disposition": "contextual",
+      "disposition": "unknown",
       "value": "<p>Test spell.</p>",
       "variantForms": ["singular"]
     },
@@ -11345,7 +11756,7 @@
       "line": 16,
       "column": 3,
       "context": "unknown",
-      "disposition": "contextual",
+      "disposition": "unknown",
       "value": "spells",
       "variantForms": ["plural"]
     },
@@ -11354,7 +11765,7 @@
       "line": 8,
       "column": 79,
       "context": "unknown",
-      "disposition": "contextual",
+      "disposition": "unknown",
       "value": "spells",
       "variantForms": ["plural"]
     },
@@ -11363,7 +11774,7 @@
       "line": 160,
       "column": 12,
       "context": "test_expectation",
-      "disposition": "contextual",
+      "disposition": "unknown",
       "value": "spells",
       "variantForms": ["plural"]
     },
@@ -11372,7 +11783,7 @@
       "line": 165,
       "column": 37,
       "context": "test_expectation",
-      "disposition": "contextual",
+      "disposition": "unknown",
       "value": "spells",
       "variantForms": ["plural"]
     },
@@ -11381,7 +11792,7 @@
       "line": 177,
       "column": 37,
       "context": "test_expectation",
-      "disposition": "contextual",
+      "disposition": "unknown",
       "value": "spells",
       "variantForms": ["plural"]
     },
@@ -11390,7 +11801,7 @@
       "line": 206,
       "column": 42,
       "context": "test_expectation",
-      "disposition": "contextual",
+      "disposition": "unknown",
       "value": "spells",
       "variantForms": ["plural"]
     },
@@ -11399,7 +11810,7 @@
       "line": 217,
       "column": 8,
       "context": "test_expectation",
-      "disposition": "contextual",
+      "disposition": "unknown",
       "value": "returns readyWithChoices while spell picks are pending",
       "variantForms": ["singular"]
     },
@@ -11408,7 +11819,7 @@
       "line": 222,
       "column": 37,
       "context": "test_expectation",
-      "disposition": "contextual",
+      "disposition": "unknown",
       "value": "spells",
       "variantForms": ["plural"]
     },
@@ -11417,7 +11828,7 @@
       "line": 228,
       "column": 8,
       "context": "test_expectation",
-      "disposition": "contextual",
+      "disposition": "unknown",
       "value": "returns complete when required spell choices are satisfied",
       "variantForms": ["singular"]
     },
@@ -11426,7 +11837,7 @@
       "line": 235,
       "column": 42,
       "context": "test_expectation",
-      "disposition": "contextual",
+      "disposition": "unknown",
       "value": ":spells",
       "variantForms": ["plural"]
     },
@@ -11435,7 +11846,7 @@
       "line": 243,
       "column": 37,
       "context": "test_expectation",
-      "disposition": "contextual",
+      "disposition": "unknown",
       "value": "spells",
       "variantForms": ["plural"]
     },
@@ -11444,7 +11855,7 @@
       "line": 6,
       "column": 44,
       "context": "unknown",
-      "disposition": "contextual",
+      "disposition": "unknown",
       "value": "./resolvers/spellcasting/resolve-spells-step-readiness",
       "variantForms": ["plural"]
     },
@@ -11453,7 +11864,7 @@
       "line": 52,
       "column": 10,
       "context": "unknown",
-      "disposition": "contextual",
+      "disposition": "unknown",
       "value": "spells",
       "variantForms": ["plural"]
     },
@@ -11462,7 +11873,7 @@
       "line": 59,
       "column": 47,
       "context": "unknown",
-      "disposition": "contextual",
+      "disposition": "unknown",
       "value": "./resolvers/spellcasting/resolve-spell-step-applicability",
       "variantForms": ["singular"]
     },
@@ -11471,7 +11882,7 @@
       "line": 147,
       "column": 91,
       "context": "test_expectation",
-      "disposition": "contextual",
+      "disposition": "unknown",
       "value": "spells",
       "variantForms": ["plural"]
     },
@@ -11480,7 +11891,7 @@
       "line": 390,
       "column": 10,
       "context": "test_expectation",
-      "disposition": "contextual",
+      "disposition": "unknown",
       "value": "getBuilderStepStatus — spells",
       "variantForms": ["plural"]
     },
@@ -11489,7 +11900,7 @@
       "line": 392,
       "column": 33,
       "context": "test_expectation",
-      "disposition": "contextual",
+      "disposition": "unknown",
       "value": "spells",
       "variantForms": ["plural"]
     },
@@ -11498,7 +11909,7 @@
       "line": 395,
       "column": 6,
       "context": "test_expectation",
-      "disposition": "contextual",
+      "disposition": "unknown",
       "value": "returns complete when resolver ran and no spell ChoiceSets (non-caster)",
       "variantForms": ["singular"]
     },
@@ -11507,7 +11918,7 @@
       "line": 396,
       "column": 33,
       "context": "test_expectation",
-      "disposition": "contextual",
+      "disposition": "unknown",
       "value": "spells",
       "variantForms": ["plural"]
     },
@@ -11516,7 +11927,7 @@
       "line": 399,
       "column": 6,
       "context": "test_expectation",
-      "disposition": "contextual",
+      "disposition": "unknown",
       "value": "returns incomplete when required spell ChoiceSet is unsatisfied",
       "variantForms": ["singular"]
     },
@@ -11525,7 +11936,7 @@
       "line": 400,
       "column": 33,
       "context": "test_expectation",
-      "disposition": "contextual",
+      "disposition": "unknown",
       "value": "spells",
       "variantForms": ["plural"]
     },
@@ -11540,7 +11951,7 @@
     },
     {
       "path": "packages/contracts/src/rpg/runtime/character-builder/steps.ts",
-      "line": 23,
+      "line": 24,
       "column": 3,
       "context": "comment",
       "disposition": "unknown",
@@ -11549,7 +11960,7 @@
     },
     {
       "path": "packages/contracts/src/rpg/runtime/character-builder/steps.ts",
-      "line": 59,
+      "line": 60,
       "column": 12,
       "context": "canonical_usage",
       "disposition": "ignored",
@@ -11558,7 +11969,7 @@
     },
     {
       "path": "packages/contracts/src/rpg/runtime/character-builder/steps.ts",
-      "line": 60,
+      "line": 61,
       "column": 45,
       "context": "canonical_usage",
       "disposition": "ignored",
@@ -11567,44 +11978,97 @@
     },
     {
       "path": "packages/contracts/src/rpg/runtime/character-builder/steps.ts",
-      "line": 81,
+      "line": 64,
       "column": 12,
-      "context": "label",
-      "disposition": "contextual",
-      "value": "Spells",
-      "variantForms": ["derived_collection_label"],
-      "suggestion": "getContentTypeItemLabel('spells')"
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeTerm('classes')",
+      "variantForms": []
+    },
+    {
+      "path": "packages/contracts/src/rpg/runtime/character-builder/steps.ts",
+      "line": 65,
+      "column": 45,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeSentenceForm('classes')",
+      "variantForms": []
+    },
+    {
+      "path": "packages/contracts/src/rpg/runtime/character-builder/steps.ts",
+      "line": 77,
+      "column": 12,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeTerm('equipment')",
+      "variantForms": []
+    },
+    {
+      "path": "packages/contracts/src/rpg/runtime/character-builder/steps.ts",
+      "line": 78,
+      "column": 42,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeSentenceForm('equipment')",
+      "variantForms": []
     },
     {
       "path": "packages/contracts/src/rpg/runtime/character-builder/steps.ts",
       "line": 82,
-      "column": 18,
+      "column": 12,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeCapitalizedSentenceLabel('spells', { plural: true })",
+      "variantForms": []
+    },
+    {
+      "path": "packages/contracts/src/rpg/runtime/character-builder/steps.ts",
+      "line": 82,
+      "column": 51,
       "context": "unknown",
-      "disposition": "contextual",
-      "value": "Choose your starting spells",
+      "disposition": "unknown",
+      "value": "spells",
       "variantForms": ["plural"]
     },
     {
       "path": "packages/contracts/src/rpg/runtime/character-builder/steps.ts",
-      "line": 114,
-      "column": 12,
+      "line": 83,
+      "column": 42,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeSentenceForm('spells', 2)",
+      "variantForms": []
+    },
+    {
+      "path": "packages/contracts/src/rpg/runtime/character-builder/steps.ts",
+      "line": 83,
+      "column": 69,
       "context": "unknown",
-      "disposition": "contextual",
+      "disposition": "unknown",
       "value": "spells",
       "variantForms": ["plural"]
     },
     {
       "path": "packages/contracts/src/rpg/runtime/character-builder/steps.ts",
       "line": 115,
-      "column": 10,
+      "column": 12,
       "context": "unknown",
-      "disposition": "contextual",
+      "disposition": "unknown",
       "value": "spells",
       "variantForms": ["plural"]
     },
     {
       "path": "packages/contracts/src/rpg/runtime/character-builder/steps.ts",
-      "line": 285,
+      "line": 116,
+      "column": 10,
+      "context": "unknown",
+      "disposition": "unknown",
+      "value": "spells",
+      "variantForms": ["plural"]
+    },
+    {
+      "path": "packages/contracts/src/rpg/runtime/character-builder/steps.ts",
+      "line": 286,
       "column": 1,
       "context": "comment",
       "disposition": "unknown",
@@ -11616,7 +12080,7 @@
       "line": 152,
       "column": 6,
       "context": "test_expectation",
-      "disposition": "contextual",
+      "disposition": "unknown",
       "value": "reports spell-specific choose, remove, stale, and wrong-level issues",
       "variantForms": ["singular"]
     },
@@ -11625,7 +12089,7 @@
       "line": 165,
       "column": 41,
       "context": "test_expectation",
-      "disposition": "contextual",
+      "disposition": "unknown",
       "value": ":spells",
       "variantForms": ["plural"]
     },
@@ -11634,7 +12098,7 @@
       "line": 168,
       "column": 19,
       "context": "test_expectation",
-      "disposition": "contextual",
+      "disposition": "unknown",
       "value": "spell",
       "variantForms": ["singular"]
     },
@@ -11643,7 +12107,7 @@
       "line": 169,
       "column": 14,
       "context": "test_expectation",
-      "disposition": "contextual",
+      "disposition": "unknown",
       "value": "Prepared Spells",
       "variantForms": ["derived_collection_label"]
     },
@@ -11652,7 +12116,7 @@
       "line": 190,
       "column": 17,
       "context": "test_expectation",
-      "disposition": "contextual",
+      "disposition": "unknown",
       "value": "spells",
       "variantForms": ["plural"]
     },
@@ -11661,7 +12125,7 @@
       "line": 223,
       "column": 17,
       "context": "test_expectation",
-      "disposition": "contextual",
+      "disposition": "unknown",
       "value": "spells",
       "variantForms": ["plural"]
     },
@@ -11670,7 +12134,7 @@
       "line": 243,
       "column": 17,
       "context": "test_expectation",
-      "disposition": "contextual",
+      "disposition": "unknown",
       "value": "spells",
       "variantForms": ["plural"]
     },
@@ -11679,7 +12143,7 @@
       "line": 268,
       "column": 17,
       "context": "test_expectation",
-      "disposition": "contextual",
+      "disposition": "unknown",
       "value": "spells",
       "variantForms": ["plural"]
     },
@@ -11688,7 +12152,7 @@
       "line": 47,
       "column": 59,
       "context": "unknown",
-      "disposition": "contextual",
+      "disposition": "unknown",
       "value": "spells",
       "variantForms": ["plural"]
     },
@@ -11697,7 +12161,7 @@
       "line": 24,
       "column": 53,
       "context": "unknown",
-      "disposition": "contextual",
+      "disposition": "unknown",
       "value": "spell",
       "variantForms": ["singular"]
     },
@@ -11706,7 +12170,7 @@
       "line": 79,
       "column": 32,
       "context": "unknown",
-      "disposition": "contextual",
+      "disposition": "unknown",
       "value": "spell",
       "variantForms": ["singular"]
     },
@@ -11715,7 +12179,7 @@
       "line": 240,
       "column": 18,
       "context": "unknown",
-      "disposition": "contextual",
+      "disposition": "unknown",
       "value": "spells",
       "variantForms": ["plural"]
     },
@@ -11742,7 +12206,7 @@
       "line": 11,
       "column": 15,
       "context": "unknown",
-      "disposition": "contextual",
+      "disposition": "unknown",
       "value": "./resolve-spell-mechanics",
       "variantForms": ["singular"]
     },
@@ -11751,7 +12215,7 @@
       "line": 15,
       "column": 15,
       "context": "unknown",
-      "disposition": "contextual",
+      "disposition": "unknown",
       "value": "./spells",
       "variantForms": ["plural"]
     },
@@ -11760,7 +12224,7 @@
       "line": 3,
       "column": 40,
       "context": "test_expectation",
-      "disposition": "contextual",
+      "disposition": "unknown",
       "value": "../../content/spell/resolution/fixtures",
       "variantForms": ["singular"]
     },
@@ -11769,7 +12233,7 @@
       "line": 4,
       "column": 56,
       "context": "test_expectation",
-      "disposition": "contextual",
+      "disposition": "unknown",
       "value": "./resolve-spell-mechanics",
       "variantForms": ["singular"]
     },
@@ -11778,7 +12242,7 @@
       "line": 1,
       "column": 28,
       "context": "unknown",
-      "disposition": "contextual",
+      "disposition": "unknown",
       "value": "../../content/spell/body",
       "variantForms": ["singular"]
     },
@@ -11787,7 +12251,7 @@
       "line": 2,
       "column": 46,
       "context": "unknown",
-      "disposition": "contextual",
+      "disposition": "unknown",
       "value": "../../content/spell/modeling/derive",
       "variantForms": ["singular"]
     },
@@ -11805,7 +12269,7 @@
       "line": 16,
       "column": 43,
       "context": "unknown",
-      "disposition": "contextual",
+      "disposition": "unknown",
       "value": "./spells",
       "variantForms": ["plural"]
     },
@@ -11832,7 +12296,7 @@
       "line": 24,
       "column": 6,
       "context": "test_expectation",
-      "disposition": "contextual",
+      "disposition": "unknown",
       "value": "returns the highest spell level with at least one slot",
       "variantForms": ["singular"]
     },
@@ -11958,7 +12422,7 @@
       "line": 5,
       "column": 10,
       "context": "test_expectation",
-      "disposition": "unknown",
+      "disposition": "contextual",
       "value": "spell atomic effect kind vocabulary",
       "variantForms": ["singular"]
     },
@@ -11976,7 +12440,7 @@
       "line": 9,
       "column": 10,
       "context": "label",
-      "disposition": "replaceable",
+      "disposition": "contextual",
       "value": "Spell Effect Kind",
       "variantForms": ["label"],
       "suggestion": "getContentTypeItemLabel('spells')"
@@ -11986,7 +12450,7 @@
       "line": 10,
       "column": 16,
       "context": "sentence",
-      "disposition": "unknown",
+      "disposition": "contextual",
       "value": "A building block in structured spell effect authoring.",
       "variantForms": ["singular"]
     },
@@ -11995,7 +12459,7 @@
       "line": 12,
       "column": 15,
       "context": "unknown",
-      "disposition": "unknown",
+      "disposition": "contextual",
       "value": "spell effect kind",
       "variantForms": ["singular"]
     },
@@ -12004,7 +12468,7 @@
       "line": 13,
       "column": 13,
       "context": "unknown",
-      "disposition": "unknown",
+      "disposition": "contextual",
       "value": "spell effect kinds",
       "variantForms": ["singular"]
     },
@@ -12022,7 +12486,7 @@
       "line": 12,
       "column": 16,
       "context": "sentence",
-      "disposition": "unknown",
+      "disposition": "contextual",
       "value": "The time cost to cast a spell.",
       "variantForms": ["singular"]
     },
@@ -12031,7 +12495,7 @@
       "line": 3,
       "column": 41,
       "context": "unknown",
-      "disposition": "unknown",
+      "disposition": "contextual",
       "value": "./spell-messages",
       "variantForms": ["singular"]
     },
@@ -12049,7 +12513,7 @@
       "line": 10,
       "column": 10,
       "context": "label",
-      "disposition": "replaceable",
+      "disposition": "contextual",
       "value": "Spell Delivery Method",
       "variantForms": ["label"],
       "suggestion": "getContentTypeItemLabel('spells')"
@@ -12059,7 +12523,7 @@
       "line": 11,
       "column": 16,
       "context": "sentence",
-      "disposition": "unknown",
+      "disposition": "contextual",
       "value": "How a spell attack reaches its target.",
       "variantForms": ["singular"]
     },
@@ -12068,7 +12532,7 @@
       "line": 13,
       "column": 15,
       "context": "unknown",
-      "disposition": "unknown",
+      "disposition": "contextual",
       "value": "spell delivery method",
       "variantForms": ["singular"]
     },
@@ -12077,7 +12541,7 @@
       "line": 14,
       "column": 13,
       "context": "unknown",
-      "disposition": "unknown",
+      "disposition": "contextual",
       "value": "spell delivery methods",
       "variantForms": ["singular"]
     },
@@ -12086,7 +12550,7 @@
       "line": 19,
       "column": 3,
       "context": "unknown",
-      "disposition": "unknown",
+      "disposition": "contextual",
       "value": "melee-spell-attack",
       "variantForms": ["singular"]
     },
@@ -12095,7 +12559,7 @@
       "line": 20,
       "column": 12,
       "context": "label",
-      "disposition": "replaceable",
+      "disposition": "contextual",
       "value": "Melee spell attack",
       "variantForms": ["singular"],
       "suggestion": "getContentTypeItemLabel('spells')"
@@ -12105,7 +12569,7 @@
       "line": 22,
       "column": 18,
       "context": "sentence",
-      "disposition": "unknown",
+      "disposition": "contextual",
       "value": "Resolved with a melee spell attack roll against a target within reach.",
       "variantForms": ["singular"]
     },
@@ -12114,7 +12578,7 @@
       "line": 24,
       "column": 3,
       "context": "unknown",
-      "disposition": "unknown",
+      "disposition": "contextual",
       "value": "ranged-spell-attack",
       "variantForms": ["singular"]
     },
@@ -12123,7 +12587,7 @@
       "line": 25,
       "column": 12,
       "context": "label",
-      "disposition": "replaceable",
+      "disposition": "contextual",
       "value": "Ranged spell attack",
       "variantForms": ["singular"],
       "suggestion": "getContentTypeItemLabel('spells')"
@@ -12133,7 +12597,7 @@
       "line": 27,
       "column": 18,
       "context": "sentence",
-      "disposition": "unknown",
+      "disposition": "contextual",
       "value": "Resolved with a ranged spell attack roll against a target within range.",
       "variantForms": ["singular"]
     },
@@ -12169,7 +12633,7 @@
       "line": 12,
       "column": 16,
       "context": "sentence",
-      "disposition": "unknown",
+      "disposition": "contextual",
       "value": "The time scale for a spell's duration.",
       "variantForms": ["singular"]
     },
@@ -12187,7 +12651,7 @@
       "line": 9,
       "column": 10,
       "context": "label",
-      "disposition": "replaceable",
+      "disposition": "contextual",
       "value": "Spell Function Tag",
       "variantForms": ["label"],
       "suggestion": "getContentTypeItemLabel('spells')"
@@ -12197,7 +12661,7 @@
       "line": 10,
       "column": 16,
       "context": "sentence",
-      "disposition": "unknown",
+      "disposition": "contextual",
       "value": "A browse/filter tag describing what a spell accomplishes.",
       "variantForms": ["singular"]
     },
@@ -12206,7 +12670,7 @@
       "line": 12,
       "column": 15,
       "context": "unknown",
-      "disposition": "unknown",
+      "disposition": "contextual",
       "value": "spell function tag",
       "variantForms": ["singular"]
     },
@@ -12215,7 +12679,7 @@
       "line": 13,
       "column": 13,
       "context": "unknown",
-      "disposition": "unknown",
+      "disposition": "contextual",
       "value": "spell function tags",
       "variantForms": ["singular"]
     },
@@ -12242,7 +12706,7 @@
       "line": 10,
       "column": 10,
       "context": "label",
-      "disposition": "replaceable",
+      "disposition": "contextual",
       "value": "Spell Grant Availability",
       "variantForms": ["label"],
       "suggestion": "getContentTypeItemLabel('spells')"
@@ -12252,7 +12716,7 @@
       "line": 11,
       "column": 16,
       "context": "sentence",
-      "disposition": "unknown",
+      "disposition": "contextual",
       "value": "How a trait or feature grants access to a specific spell.",
       "variantForms": ["singular"]
     },
@@ -12261,7 +12725,7 @@
       "line": 13,
       "column": 15,
       "context": "unknown",
-      "disposition": "unknown",
+      "disposition": "contextual",
       "value": "spell grant availability",
       "variantForms": ["singular"]
     },
@@ -12270,7 +12734,7 @@
       "line": 14,
       "column": 13,
       "context": "unknown",
-      "disposition": "unknown",
+      "disposition": "contextual",
       "value": "spell grant availabilities",
       "variantForms": ["singular"]
     },
@@ -12279,7 +12743,7 @@
       "line": 22,
       "column": 7,
       "context": "sentence",
-      "disposition": "unknown",
+      "disposition": "contextual",
       "value": "The spell is always on the character prepared list for this grant; cast with normal spell slots unless a separate free-cast entitlement applies.",
       "variantForms": ["singular"]
     },
@@ -12324,7 +12788,7 @@
       "line": 1,
       "column": 15,
       "context": "unknown",
-      "disposition": "unknown",
+      "disposition": "contextual",
       "value": "./spell-messages",
       "variantForms": ["singular"]
     },
@@ -12342,7 +12806,7 @@
       "line": 9,
       "column": 10,
       "context": "label",
-      "disposition": "replaceable",
+      "disposition": "contextual",
       "value": "Spell Preparation Mode",
       "variantForms": ["label"],
       "suggestion": "getContentTypeItemLabel('spells')"
@@ -12352,7 +12816,7 @@
       "line": 10,
       "column": 16,
       "context": "sentence",
-      "disposition": "unknown",
+      "disposition": "contextual",
       "value": "How a spellcasting class prepares or knows spells.",
       "variantForms": ["plural"]
     },
@@ -12361,7 +12825,7 @@
       "line": 12,
       "column": 15,
       "context": "unknown",
-      "disposition": "unknown",
+      "disposition": "contextual",
       "value": "spell preparation mode",
       "variantForms": ["singular"]
     },
@@ -12370,7 +12834,7 @@
       "line": 13,
       "column": 13,
       "context": "unknown",
-      "disposition": "unknown",
+      "disposition": "contextual",
       "value": "spell preparation modes",
       "variantForms": ["singular"]
     },
@@ -12379,7 +12843,7 @@
       "line": 21,
       "column": 7,
       "context": "sentence",
-      "disposition": "unknown",
+      "disposition": "contextual",
       "value": "The caster prepares a subset of spells from their class list after a long rest (e.g. Cleric, Wizard).",
       "variantForms": ["plural"]
     },
@@ -12388,7 +12852,7 @@
       "line": 26,
       "column": 7,
       "context": "sentence",
-      "disposition": "unknown",
+      "disposition": "contextual",
       "value": "The caster knows a fixed set of spells that expands as they gain levels (e.g. Bard, Sorcerer).",
       "variantForms": ["plural"]
     },
@@ -12397,7 +12861,7 @@
       "line": 31,
       "column": 7,
       "context": "sentence",
-      "disposition": "unknown",
+      "disposition": "contextual",
       "value": "The entire applicable class spell list is available without daily prepared-subset selection (class-wide mode). Per-spell always-prepared grants use grant availability instead.",
       "variantForms": ["singular"]
     },
@@ -12424,7 +12888,7 @@
       "line": 53,
       "column": 67,
       "context": "test_expectation",
-      "disposition": "unknown",
+      "disposition": "contextual",
       "value": "See spell text.",
       "variantForms": ["singular"]
     },
@@ -12433,7 +12897,7 @@
       "line": 55,
       "column": 20,
       "context": "test_expectation",
-      "disposition": "unknown",
+      "disposition": "contextual",
       "value": "See spell text.",
       "variantForms": ["singular"]
     },
@@ -12442,7 +12906,7 @@
       "line": 60,
       "column": 10,
       "context": "test_expectation",
-      "disposition": "unknown",
+      "disposition": "contextual",
       "value": "spell range vocabulary",
       "variantForms": ["singular"]
     },
@@ -12460,7 +12924,7 @@
       "line": 11,
       "column": 10,
       "context": "label",
-      "disposition": "replaceable",
+      "disposition": "contextual",
       "value": "Spell Range",
       "variantForms": ["label"],
       "suggestion": "getContentTypeItemLabel('spells')"
@@ -12470,7 +12934,7 @@
       "line": 12,
       "column": 16,
       "context": "sentence",
-      "disposition": "unknown",
+      "disposition": "contextual",
       "value": "How far or to whom a spell can reach.",
       "variantForms": ["singular"]
     },
@@ -12479,7 +12943,7 @@
       "line": 14,
       "column": 15,
       "context": "unknown",
-      "disposition": "unknown",
+      "disposition": "contextual",
       "value": "spell range",
       "variantForms": ["singular"]
     },
@@ -12488,7 +12952,7 @@
       "line": 15,
       "column": 13,
       "context": "unknown",
-      "disposition": "unknown",
+      "disposition": "contextual",
       "value": "spell ranges",
       "variantForms": ["singular"]
     },
@@ -12497,7 +12961,7 @@
       "line": 20,
       "column": 39,
       "context": "sentence",
-      "disposition": "unknown",
+      "disposition": "contextual",
       "value": "The spell affects only the caster.",
       "variantForms": ["singular"]
     },
@@ -12506,7 +12970,7 @@
       "line": 21,
       "column": 41,
       "context": "sentence",
-      "disposition": "unknown",
+      "disposition": "contextual",
       "value": "The spell requires touching a target.",
       "variantForms": ["singular"]
     },
@@ -12515,7 +12979,7 @@
       "line": 22,
       "column": 41,
       "context": "sentence",
-      "disposition": "unknown",
+      "disposition": "contextual",
       "value": "The spell requires seeing the target or point.",
       "variantForms": ["singular"]
     },
@@ -12524,7 +12988,7 @@
       "line": 25,
       "column": 18,
       "context": "sentence",
-      "disposition": "unknown",
+      "disposition": "contextual",
       "value": "The spell reaches a point or target within a measured distance.",
       "variantForms": ["singular"]
     },
@@ -12533,7 +12997,7 @@
       "line": 27,
       "column": 49,
       "context": "sentence",
-      "disposition": "unknown",
+      "disposition": "contextual",
       "value": "The spell has no range limit.",
       "variantForms": ["singular"]
     },
@@ -12542,7 +13006,7 @@
       "line": 30,
       "column": 18,
       "context": "sentence",
-      "disposition": "unknown",
+      "disposition": "contextual",
       "value": "The spell has a non-standard range described in the rules text.",
       "variantForms": ["singular"]
     },
@@ -12569,7 +13033,7 @@
       "line": 9,
       "column": 10,
       "context": "label",
-      "disposition": "replaceable",
+      "disposition": "contextual",
       "value": "Spell Role Tag",
       "variantForms": ["label"],
       "suggestion": "getContentTypeItemLabel('spells')"
@@ -12579,7 +13043,7 @@
       "line": 10,
       "column": 16,
       "context": "sentence",
-      "disposition": "unknown",
+      "disposition": "contextual",
       "value": "A browse/filter tag describing a spell's primary role in play.",
       "variantForms": ["singular"]
     },
@@ -12588,7 +13052,7 @@
       "line": 12,
       "column": 15,
       "context": "unknown",
-      "disposition": "unknown",
+      "disposition": "contextual",
       "value": "spell role tag",
       "variantForms": ["singular"]
     },
@@ -12597,7 +13061,7 @@
       "line": 13,
       "column": 13,
       "context": "unknown",
-      "disposition": "unknown",
+      "disposition": "contextual",
       "value": "spell role tags",
       "variantForms": ["singular"]
     },
@@ -12615,7 +13079,7 @@
       "line": 17,
       "column": 10,
       "context": "test_expectation",
-      "disposition": "unknown",
+      "disposition": "contextual",
       "value": "spell school vocabulary",
       "variantForms": ["singular"]
     },
@@ -12624,7 +13088,7 @@
       "line": 18,
       "column": 6,
       "context": "test_expectation",
-      "disposition": "unknown",
+      "disposition": "contextual",
       "value": "registers the spell school option set id",
       "variantForms": ["singular"]
     },
@@ -12633,7 +13097,7 @@
       "line": 19,
       "column": 38,
       "context": "test_expectation",
-      "disposition": "unknown",
+      "disposition": "contextual",
       "value": "spell-schools",
       "variantForms": ["singular"]
     },
@@ -12651,7 +13115,7 @@
       "line": 13,
       "column": 16,
       "context": "sentence",
-      "disposition": "unknown",
+      "disposition": "contextual",
       "value": "The magical tradition a spell belongs to.",
       "variantForms": ["singular"]
     },
@@ -12660,7 +13124,7 @@
       "line": 20,
       "column": 36,
       "context": "unknown",
-      "disposition": "unknown",
+      "disposition": "contextual",
       "value": "spell-schools",
       "variantForms": ["singular"]
     },
@@ -12687,7 +13151,7 @@
       "line": 10,
       "column": 5,
       "context": "message",
-      "disposition": "unknown",
+      "disposition": "contextual",
       "value": "validation.spell.componentRequired",
       "variantForms": ["singular"]
     },
@@ -12696,7 +13160,7 @@
       "line": 11,
       "column": 11,
       "context": "message",
-      "disposition": "unknown",
+      "disposition": "contextual",
       "value": "Select at least one spell component (verbal, somatic, or material).",
       "variantForms": ["singular"]
     },
@@ -12705,7 +13169,7 @@
       "line": 13,
       "column": 46,
       "context": "message",
-      "disposition": "unknown",
+      "disposition": "contextual",
       "value": "validation.spell.materialDescriptionRequired",
       "variantForms": ["singular"]
     },
@@ -12714,7 +13178,7 @@
       "line": 20,
       "column": 18,
       "context": "sentence",
-      "disposition": "unknown",
+      "disposition": "contextual",
       "value": "Full spell slot progression (e.g. Wizard, Cleric, Druid).",
       "variantForms": ["singular"]
     },
@@ -12723,7 +13187,7 @@
       "line": 28,
       "column": 18,
       "context": "sentence",
-      "disposition": "unknown",
+      "disposition": "contextual",
       "value": "Half spell slot progression (e.g. Paladin, Ranger).",
       "variantForms": ["singular"]
     },
@@ -14656,7 +15120,16 @@
     },
     {
       "path": "tools/vocab/term-audit/term-audit.config.ts",
-      "line": 38,
+      "line": 27,
+      "column": 24,
+      "context": "comment",
+      "disposition": "unknown",
+      "value": "/**',\n      reason: 'Bench fixture copy; not player-facing catalog chrome',\n      owner: 'bench',\n    },\n    {\n      target: 'content-type:classes',\n      path: 'apps/dashboard/src/features/campaign/lib/rules/mechanics/mechanics-form-fields.ts',\n      reason: 'Armor class (AC) mechanic label, not catalog class content type',\n      owner: 'dashboard',\n    },\n    {\n      target: 'content-type:classes',\n      path: 'apps/dashboard/src/features/campaign/lib/rules/character-configuration/starting-wealth-form-fields.ts',\n      reason: 'Domain-specific starting-wealth option copy',\n      owner: 'dashboard',\n    },\n    {\n      target: 'content-type:classes',\n      path: 'apps/dashboard/src/features/content/lib/forms/grants/grant-form-fields.ts',\n      reason: 'Feat-choice and class-progression grant copy owned by grant vocabulary',\n      owner: 'dashboard',\n    },\n    {\n      target: 'content-type:classes',\n      path: 'apps/dashboard/src/features/content/classes/lib/character-creation/class-starting-equipment-form-values.ts',\n      reason: 'Named starting package label (Standard Equipment), not parent catalog chrome',\n      owner: 'dashboard',\n    },\n    {\n      target: 'content-type:classes',\n      path: 'apps/dashboard/src/features/character/lib/equipment-step.fixtures.ts',\n      reason: 'Named starting package fixture label (Standard Equipment)',\n      owner: 'dashboard',\n    },\n    {\n      target: 'content-type:classes',\n      path: 'packages/ui/src/components/ui/rich-text-link-picker.client.tsx',\n      reason: 'Storybook defaults; dashboard passes term-derived options',\n      owner: 'ui',\n    },\n    {\n      target: 'content-type:spells',\n      path: 'packages/contracts/src/rpg/content/lib/content-type-terms.ts',\n      reason: 'Canonical catalog content-type term registry',\n      owner: 'contracts',\n    },\n    {\n      target: 'content-type:spells',\n      path: 'packages/contracts/src/rpg/vocab/spell/**',\n      reason: 'Spell field taxonomy and resolution vocabulary, not catalog chrome',\n      owner: 'contracts',\n    },\n    {\n      target: 'content-type:spells',\n      path: 'packages/contracts/src/rpg/content/spell/**/",
+      "variantForms": ["label", "plural", "singular"]
+    },
+    {
+      "path": "tools/vocab/term-audit/term-audit.config.ts",
+      "line": 68,
       "column": 15,
       "context": "unknown",
       "disposition": "unknown",
@@ -14665,7 +15138,7 @@
     },
     {
       "path": "tools/vocab/term-audit/term-audit.config.ts",
-      "line": 44,
+      "line": 74,
       "column": 15,
       "context": "unknown",
       "disposition": "unknown",
@@ -14674,16 +15147,16 @@
     },
     {
       "path": "tools/vocab/term-audit/term-audit.config.ts",
-      "line": 45,
+      "line": 75,
       "column": 13,
       "context": "unknown",
       "disposition": "unknown",
-      "value": "packages/contracts/src/rpg/vocab/spell/**/*.ts",
+      "value": "packages/contracts/src/rpg/vocab/spell/**",
       "variantForms": ["singular"]
     },
     {
       "path": "tools/vocab/term-audit/term-audit.config.ts",
-      "line": 46,
+      "line": 76,
       "column": 15,
       "context": "unknown",
       "disposition": "unknown",
@@ -14692,7 +15165,7 @@
     },
     {
       "path": "tools/vocab/term-audit/term-audit.config.ts",
-      "line": 50,
+      "line": 80,
       "column": 15,
       "context": "unknown",
       "disposition": "unknown",
@@ -14701,7 +15174,7 @@
     },
     {
       "path": "tools/vocab/term-audit/term-audit.config.ts",
-      "line": 51,
+      "line": 81,
       "column": 13,
       "context": "unknown",
       "disposition": "unknown",
@@ -14710,7 +15183,7 @@
     },
     {
       "path": "tools/vocab/term-audit/term-audit.config.ts",
-      "line": 52,
+      "line": 82,
       "column": 15,
       "context": "unknown",
       "disposition": "unknown",
@@ -14719,7 +15192,7 @@
     },
     {
       "path": "tools/vocab/term-audit/term-audit.config.ts",
-      "line": 56,
+      "line": 86,
       "column": 15,
       "context": "unknown",
       "disposition": "unknown",
@@ -14728,7 +15201,124 @@
     },
     {
       "path": "tools/vocab/term-audit/term-audit.config.ts",
-      "line": 62,
+      "line": 87,
+      "column": 13,
+      "context": "unknown",
+      "disposition": "unknown",
+      "value": "apps/dashboard/src/features/character/components/spells/spell-picker-drawer.client.tsx",
+      "variantForms": ["plural", "singular"]
+    },
+    {
+      "path": "tools/vocab/term-audit/term-audit.config.ts",
+      "line": 88,
+      "column": 15,
+      "context": "unknown",
+      "disposition": "unknown",
+      "value": "Spell picker workflow chrome, not catalog collection label",
+      "variantForms": ["label"]
+    },
+    {
+      "path": "tools/vocab/term-audit/term-audit.config.ts",
+      "line": 92,
+      "column": 15,
+      "context": "unknown",
+      "disposition": "unknown",
+      "value": "content-type:spells",
+      "variantForms": ["plural"]
+    },
+    {
+      "path": "tools/vocab/term-audit/term-audit.config.ts",
+      "line": 93,
+      "column": 13,
+      "context": "unknown",
+      "disposition": "unknown",
+      "value": "apps/dashboard/src/features/character/components/spells/spellcasting-summary-card.client.tsx",
+      "variantForms": ["plural"]
+    },
+    {
+      "path": "tools/vocab/term-audit/term-audit.config.ts",
+      "line": 98,
+      "column": 15,
+      "context": "unknown",
+      "disposition": "unknown",
+      "value": "content-type:spells",
+      "variantForms": ["plural"]
+    },
+    {
+      "path": "tools/vocab/term-audit/term-audit.config.ts",
+      "line": 104,
+      "column": 15,
+      "context": "unknown",
+      "disposition": "unknown",
+      "value": "content-type:spells",
+      "variantForms": ["plural"]
+    },
+    {
+      "path": "tools/vocab/term-audit/term-audit.config.ts",
+      "line": 106,
+      "column": 15,
+      "context": "unknown",
+      "disposition": "unknown",
+      "value": "Spell grant and slot-casting domain copy",
+      "variantForms": ["label"]
+    },
+    {
+      "path": "tools/vocab/term-audit/term-audit.config.ts",
+      "line": 110,
+      "column": 15,
+      "context": "unknown",
+      "disposition": "unknown",
+      "value": "content-type:spells",
+      "variantForms": ["plural"]
+    },
+    {
+      "path": "tools/vocab/term-audit/term-audit.config.ts",
+      "line": 111,
+      "column": 13,
+      "context": "unknown",
+      "disposition": "unknown",
+      "value": "apps/dashboard/src/features/content/spells/lib/effects/effect-template-registry.ts",
+      "variantForms": ["plural"]
+    },
+    {
+      "path": "tools/vocab/term-audit/term-audit.config.ts",
+      "line": 112,
+      "column": 15,
+      "context": "unknown",
+      "disposition": "unknown",
+      "value": "Spell effect template taxonomy label",
+      "variantForms": ["label"]
+    },
+    {
+      "path": "tools/vocab/term-audit/term-audit.config.ts",
+      "line": 116,
+      "column": 15,
+      "context": "unknown",
+      "disposition": "unknown",
+      "value": "content-type:spells",
+      "variantForms": ["plural"]
+    },
+    {
+      "path": "tools/vocab/term-audit/term-audit.config.ts",
+      "line": 117,
+      "column": 13,
+      "context": "unknown",
+      "disposition": "unknown",
+      "value": "apps/dashboard/src/features/content/spells/resolution/lib/form/resolution-form-labels.ts",
+      "variantForms": ["plural"]
+    },
+    {
+      "path": "tools/vocab/term-audit/term-audit.config.ts",
+      "line": 118,
+      "column": 15,
+      "context": "unknown",
+      "disposition": "unknown",
+      "value": "Spell resolution mechanic labels",
+      "variantForms": ["label"]
+    },
+    {
+      "path": "tools/vocab/term-audit/term-audit.config.ts",
+      "line": 122,
       "column": 15,
       "context": "unknown",
       "disposition": "unknown",
@@ -14853,10 +15443,10 @@
   ],
   "parseFailures": [],
   "summary": {
-    "canonical": 177,
-    "replaceable": 19,
-    "contextual": 216,
+    "canonical": 229,
+    "replaceable": 0,
+    "contextual": 188,
     "ignored": 0,
-    "unknown": 1220
+    "unknown": 1281
   }
 }

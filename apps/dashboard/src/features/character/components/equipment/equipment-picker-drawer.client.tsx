@@ -19,6 +19,10 @@ import {
   isEquipmentStackable,
 } from '@rpg/contracts'
 
+import {
+  formatAddContentTypeLabel,
+  getContentTypeItemLabel,
+} from '@/features/content/lib/content-type-labels'
 import { CatalogPickerFilterCheckbox } from '../picker/catalog-picker-filter-checkbox.client'
 import { catalogPickerShellProps } from '../picker/catalog-picker-shell.lib'
 import { CatalogSortControl } from '../picker/catalog-sort-control.client'
@@ -442,7 +446,7 @@ export function EquipmentPickerDrawer({
     <CatalogPickerSheet
       open={open}
       onOpenChange={onOpenChange}
-      title="Add equipment"
+      title={formatAddContentTypeLabel('equipment')}
       description="Search the catalog and add items to your loadout."
       {...catalogPickerShellProps()}
       items={filteredItems}
@@ -459,7 +463,7 @@ export function EquipmentPickerDrawer({
               value: mode,
               label: EQUIPMENT_PICKER_MODE_LABELS[mode],
             }))}
-            aria-label="Equipment picker workflow"
+            aria-label={`${getContentTypeItemLabel('equipment')} picker workflow`}
             fullWidth
           />
         ) : effectiveBudget ? (

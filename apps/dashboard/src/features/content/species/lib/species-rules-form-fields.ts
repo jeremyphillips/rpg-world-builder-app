@@ -13,6 +13,7 @@ import { getLevelFieldOptions, levelSelectDigits } from '../../lib/form-options/
 import {
   getContentTypeItemLabel,
   getContentTypeMidSentenceLabel,
+  formatChooseContentTypePlaceholder,
 } from '../../lib/content-type-labels'
 import type { ContentFormCtx } from '../../lib/forms/content-form-registry'
 import { campaignSettingHref } from '@/lib/availability'
@@ -82,7 +83,7 @@ function classPolicyClassIdFields(ctx: ContentFormCtx): FormItem[] {
       hint: SPECIES_CLASS_POLICY_ALLOWED_CLASSES_HINT,
       multiple: true,
       options: classOptions,
-      placeholder: 'Choose classes…',
+      placeholder: formatChooseContentTypePlaceholder('classes', { plural: true }),
       required: true,
       visibility: visibleWhenClassPolicyMode('only'),
     },
@@ -93,7 +94,7 @@ function classPolicyClassIdFields(ctx: ContentFormCtx): FormItem[] {
       hint: SPECIES_CLASS_POLICY_FORBIDDEN_CLASSES_HINT,
       multiple: true,
       options: classOptions,
-      placeholder: 'Choose classes…',
+      placeholder: formatChooseContentTypePlaceholder('classes', { plural: true }),
       required: true,
       visibility: visibleWhenClassPolicyMode('all_except'),
     },
@@ -125,7 +126,7 @@ export function multiclassingPolicyFields(ctx: ContentFormCtx): FormItem[] {
         type: 'select',
         name: 'classPolicy.mode',
         labelPosition: 'settings',
-        label: 'Class restrictions',
+        label: `${getContentTypeItemLabel('classes')} restrictions`,
         width: 'full',
         options: speciesClassPolicyModeOptions,
         required: true,
@@ -152,16 +153,16 @@ function classLevelCapItemFields(ctx: ContentFormCtx): FormItem[] {
         {
           type: 'combobox',
           name: 'classId',
-          label: 'Class',
+          label: getContentTypeItemLabel('classes'),
           options: ctx.options?.classes ?? [],
-          placeholder: 'Choose a class…',
+          placeholder: formatChooseContentTypePlaceholder('classes'),
           required: true,
           width: 'lg',
         },
         {
           type: 'select',
           name: 'maxLevel',
-          label: 'Maximum class level',
+          label: `Maximum ${getContentTypeMidSentenceLabel('classes')} level`,
           options: levelOptions,
           required: true,
           digits: levelDigits,
@@ -211,7 +212,7 @@ export function speciesLevelLimitsFields(ctx: ContentFormCtx): FormItem[] {
       controller: {
         type: 'switch',
         name: ENABLE_CLASS_LEVEL_CAPS_FIELD,
-        label: 'Class-specific limits',
+        label: `${getContentTypeItemLabel('classes')}-specific limits`,
         hint: `Optionally limit how far this ${getContentTypeMidSentenceLabel('species')} can progress in individual classes.`,
         defaultValue: false,
         labelPosition: 'settings',
@@ -222,7 +223,7 @@ export function speciesLevelLimitsFields(ctx: ContentFormCtx): FormItem[] {
             kind: 'array',
             name: 'classLevelCaps',
             legend: '',
-            addAction: { label: 'Add class limit' },
+            addAction: { label: `Add ${getContentTypeMidSentenceLabel('classes')} limit` },
             item: {
               collapsible: true,
               header: {

@@ -60,6 +60,15 @@ export function getContentTypeSentenceForm(key: ContentTypeKey, count = 1): stri
   return getTermSentenceForm(getContentTypeTerm(key), count)
 }
 
+/** Sentence-case noun phrase with leading capital for messages and errors. */
+export function getContentTypeCapitalizedSentenceLabel(
+  key: ContentTypeKey,
+  options?: { plural?: boolean },
+): string {
+  const phrase = getContentTypeSentenceForm(key, options?.plural ? 2 : 1)
+  return phrase.charAt(0).toUpperCase() + phrase.slice(1)
+}
+
 export const CLASS_CONTENT_TYPE_TERM = CONTENT_TYPE_TERMS.classes
 export const SPELL_CONTENT_TYPE_TERM = CONTENT_TYPE_TERMS.spells
 export const SPECIES_CONTENT_TYPE_TERM = CONTENT_TYPE_TERMS.species

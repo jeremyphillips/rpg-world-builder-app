@@ -93,3 +93,16 @@ export function formatContentCollectionAvailabilityCaption(key: ContentTypeKey):
 export function formatContentOverviewLinkTitle(key: ContentTypeKey): string {
   return `${getContentTypeItemLabel(key)} Overview`
 }
+
+/** Combobox placeholder — e.g. "Choose classes…". */
+export function formatChooseContentTypePlaceholder(
+  key: ContentTypeKey,
+  options?: { plural?: boolean },
+): string {
+  return `Choose ${getContentTypeMidSentenceLabel(key, options)}…`
+}
+
+/** Action label — e.g. "Add equipment". */
+export function formatAddContentTypeLabel(key: ContentTypeKey): string {
+  return `Add ${getContentTypeMidSentenceLabel(key)}`
+}

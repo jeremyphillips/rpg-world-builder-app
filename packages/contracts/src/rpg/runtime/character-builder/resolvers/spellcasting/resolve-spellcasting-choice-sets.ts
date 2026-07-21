@@ -1,4 +1,5 @@
 import type { Spell } from '../../../../content/spell'
+import { getContentTypeCapitalizedSentenceLabel } from '../../../../content/lib/content-type-terms'
 import { buildChoiceSetId, type ChoiceSet, type ChoiceSetOption } from '../../choice-set'
 import type { CharacterBuildCatalogIndex } from '../../context'
 import type { SpellcastingProfile } from './spellcasting-profile'
@@ -50,7 +51,7 @@ export function resolveSpellcastingChoiceSets(
       sourceType: 'spellcasting',
       sourceId: profile.classId,
       choiceType: 'spell',
-      label: 'Prepared Spells',
+      label: `Prepared ${getContentTypeCapitalizedSentenceLabel('spells', { plural: true })}`,
       min: profile.spellsAvailable,
       max: profile.spellsAvailable,
       options: spellOptionsForClass(

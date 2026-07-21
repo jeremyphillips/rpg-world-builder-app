@@ -10,6 +10,7 @@ import type {
   StartingEquipmentOptionSummary,
 } from '@rpg/contracts'
 
+import { getContentTypeMidSentenceLabel } from '@/features/content/lib/content-type-labels'
 import { isSelectedStartingEquipmentReady } from '../../lib/equipment-step.lib'
 import { StartingEquipmentOptionCards } from './starting-equipment-option-cards.client'
 import { StartingEquipmentOptionSummaryCard } from './starting-equipment-option-summary.client'
@@ -79,7 +80,7 @@ export function StartingEquipmentOptionSection({
       id="starting-equipment-options"
       tabIndex={-1}
       className="outline-none"
-      aria-label="Starting equipment options"
+      aria-label={`Starting ${getContentTypeMidSentenceLabel('equipment')} options`}
     >
       {showSummary && selectedSummary ? (
         <StartingEquipmentOptionSummaryCard

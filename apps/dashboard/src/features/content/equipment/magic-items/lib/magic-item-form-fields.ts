@@ -9,6 +9,7 @@ import { toOptions, type FormItem } from '@rpg/ui/form'
 
 import { vocabularyFieldLabel } from '@/features/homebrew'
 
+import { getContentTypeMidSentenceLabel } from '@/features/content/lib/content-type-labels'
 import type { ContentFormCtx } from '../../../lib/forms/content-form-registry'
 import { labelsFromEntries } from '../../lib/equipment-form-field-helpers'
 
@@ -69,7 +70,7 @@ export function magicItemFormFieldGroup(ctx: ContentFormCtx = {}): FormItem {
           {
             type: 'combobox',
             name: 'baseEquipmentId',
-            label: 'Base equipment',
+            label: `Base ${getContentTypeMidSentenceLabel('equipment')}`,
             multiple: false,
             width: 'full',
             options: ctx.options?.magicItemBaseEquipment ?? [],

@@ -176,6 +176,24 @@
       "variantForms": ["singular"]
     },
     {
+      "path": "apps/api/src/features/content/spells/assert-spell-class-ids.ts",
+      "line": 40,
+      "column": 18,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeSentenceForm('classes', unknown.length)",
+      "variantForms": []
+    },
+    {
+      "path": "apps/api/src/features/content/spells/assert-spell-class-ids.ts",
+      "line": 45,
+      "column": 10,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeCapitalizedSentenceLabel('classes', {\n        plural: withoutSpellcasting.length !== 1,\n      })",
+      "variantForms": []
+    },
+    {
       "path": "apps/api/src/features/ruleset/ruleset.service.ts",
       "line": 21,
       "column": 18,
@@ -393,6 +411,15 @@
     },
     {
       "path": "apps/dashboard/src/features/character-import/model/character-import-preview.lib.ts",
+      "line": 39,
+      "column": 12,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeCollectionLabel('classes')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/character-import/model/character-import-preview.lib.ts",
       "line": 89,
       "column": 7,
       "context": "unknown",
@@ -401,12 +428,39 @@
       "variantForms": ["plural"]
     },
     {
+      "path": "apps/dashboard/src/features/character/components/equipment/equipment-picker-drawer.client.tsx",
+      "line": 467,
+      "column": 28,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeItemLabel('equipment')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/character/components/equipment/starting-equipment-option-section.client.tsx",
+      "line": 83,
+      "column": 31,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeMidSentenceLabel('equipment')",
+      "variantForms": []
+    },
+    {
       "path": "apps/dashboard/src/features/character/components/steps/review-step-summary.client.tsx",
       "line": 36,
       "column": 27,
       "context": "canonical_usage",
       "disposition": "ignored",
       "value": "getContentTypeItemLabel('species')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/character/components/steps/review-step-summary.client.tsx",
+      "line": 37,
+      "column": 27,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeItemLabel('classes')",
       "variantForms": []
     },
     {
@@ -551,6 +605,15 @@
       "context": "canonical_usage",
       "disposition": "ignored",
       "value": "formatContentReferenceLabel(entry.featId)",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/character/lib/detail/character-sheet-catalog.fixtures.ts",
+      "line": 68,
+      "column": 26,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeItemLabel('classes')",
       "variantForms": []
     },
     {
@@ -749,6 +812,15 @@
       "context": "canonical_usage",
       "disposition": "ignored",
       "value": "formatContentListLoadErrorMessage('equipment')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/equipment/magic-items/lib/magic-item-form-fields.ts",
+      "line": 73,
+      "column": 28,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeMidSentenceLabel('equipment')",
       "variantForms": []
     },
     {
@@ -1527,7 +1599,7 @@
     },
     {
       "path": "apps/dashboard/src/features/content/lib/content-type-labels.test.ts",
-      "line": 20,
+      "line": 22,
       "column": 12,
       "context": "canonical_usage",
       "disposition": "ignored",
@@ -1536,7 +1608,7 @@
     },
     {
       "path": "apps/dashboard/src/features/content/lib/content-type-labels.test.ts",
-      "line": 21,
+      "line": 23,
       "column": 12,
       "context": "canonical_usage",
       "disposition": "ignored",
@@ -1545,7 +1617,7 @@
     },
     {
       "path": "apps/dashboard/src/features/content/lib/content-type-labels.test.ts",
-      "line": 22,
+      "line": 24,
       "column": 12,
       "context": "canonical_usage",
       "disposition": "ignored",
@@ -1554,7 +1626,7 @@
     },
     {
       "path": "apps/dashboard/src/features/content/lib/content-type-labels.test.ts",
-      "line": 26,
+      "line": 28,
       "column": 12,
       "context": "canonical_usage",
       "disposition": "ignored",
@@ -1563,7 +1635,7 @@
     },
     {
       "path": "apps/dashboard/src/features/content/lib/content-type-labels.test.ts",
-      "line": 27,
+      "line": 29,
       "column": 12,
       "context": "canonical_usage",
       "disposition": "ignored",
@@ -1572,7 +1644,7 @@
     },
     {
       "path": "apps/dashboard/src/features/content/lib/content-type-labels.test.ts",
-      "line": 28,
+      "line": 30,
       "column": 12,
       "context": "canonical_usage",
       "disposition": "ignored",
@@ -1581,7 +1653,7 @@
     },
     {
       "path": "apps/dashboard/src/features/content/lib/content-type-labels.test.ts",
-      "line": 32,
+      "line": 34,
       "column": 12,
       "context": "canonical_usage",
       "disposition": "ignored",
@@ -1590,7 +1662,7 @@
     },
     {
       "path": "apps/dashboard/src/features/content/lib/content-type-labels.test.ts",
-      "line": 33,
+      "line": 35,
       "column": 12,
       "context": "canonical_usage",
       "disposition": "ignored",
@@ -1599,7 +1671,7 @@
     },
     {
       "path": "apps/dashboard/src/features/content/lib/content-type-labels.test.ts",
-      "line": 34,
+      "line": 36,
       "column": 12,
       "context": "canonical_usage",
       "disposition": "ignored",
@@ -1608,7 +1680,7 @@
     },
     {
       "path": "apps/dashboard/src/features/content/lib/content-type-labels.test.ts",
-      "line": 40,
+      "line": 42,
       "column": 12,
       "context": "canonical_usage",
       "disposition": "ignored",
@@ -1617,7 +1689,7 @@
     },
     {
       "path": "apps/dashboard/src/features/content/lib/content-type-labels.test.ts",
-      "line": 41,
+      "line": 43,
       "column": 12,
       "context": "canonical_usage",
       "disposition": "ignored",
@@ -1626,7 +1698,7 @@
     },
     {
       "path": "apps/dashboard/src/features/content/lib/content-type-labels.test.ts",
-      "line": 45,
+      "line": 47,
       "column": 12,
       "context": "canonical_usage",
       "disposition": "ignored",
@@ -1635,7 +1707,7 @@
     },
     {
       "path": "apps/dashboard/src/features/content/lib/content-type-labels.test.ts",
-      "line": 46,
+      "line": 48,
       "column": 12,
       "context": "canonical_usage",
       "disposition": "ignored",
@@ -1644,7 +1716,7 @@
     },
     {
       "path": "apps/dashboard/src/features/content/lib/content-type-labels.test.ts",
-      "line": 47,
+      "line": 49,
       "column": 12,
       "context": "canonical_usage",
       "disposition": "ignored",
@@ -1653,7 +1725,7 @@
     },
     {
       "path": "apps/dashboard/src/features/content/lib/content-type-labels.test.ts",
-      "line": 48,
+      "line": 50,
       "column": 12,
       "context": "canonical_usage",
       "disposition": "ignored",
@@ -1662,7 +1734,7 @@
     },
     {
       "path": "apps/dashboard/src/features/content/lib/content-type-labels.test.ts",
-      "line": 52,
+      "line": 54,
       "column": 12,
       "context": "canonical_usage",
       "disposition": "ignored",
@@ -1671,7 +1743,7 @@
     },
     {
       "path": "apps/dashboard/src/features/content/lib/content-type-labels.test.ts",
-      "line": 53,
+      "line": 55,
       "column": 12,
       "context": "canonical_usage",
       "disposition": "ignored",
@@ -1680,7 +1752,7 @@
     },
     {
       "path": "apps/dashboard/src/features/content/lib/content-type-labels.test.ts",
-      "line": 54,
+      "line": 56,
       "column": 12,
       "context": "canonical_usage",
       "disposition": "ignored",
@@ -1689,7 +1761,7 @@
     },
     {
       "path": "apps/dashboard/src/features/content/lib/content-type-labels.test.ts",
-      "line": 57,
+      "line": 59,
       "column": 12,
       "context": "canonical_usage",
       "disposition": "ignored",
@@ -1698,7 +1770,7 @@
     },
     {
       "path": "apps/dashboard/src/features/content/lib/content-type-labels.test.ts",
-      "line": 60,
+      "line": 62,
       "column": 12,
       "context": "canonical_usage",
       "disposition": "ignored",
@@ -1707,7 +1779,7 @@
     },
     {
       "path": "apps/dashboard/src/features/content/lib/content-type-labels.test.ts",
-      "line": 61,
+      "line": 63,
       "column": 12,
       "context": "canonical_usage",
       "disposition": "ignored",
@@ -1716,7 +1788,7 @@
     },
     {
       "path": "apps/dashboard/src/features/content/lib/content-type-labels.test.ts",
-      "line": 65,
+      "line": 67,
       "column": 12,
       "context": "canonical_usage",
       "disposition": "ignored",
@@ -1725,7 +1797,7 @@
     },
     {
       "path": "apps/dashboard/src/features/content/lib/content-type-labels.test.ts",
-      "line": 68,
+      "line": 70,
       "column": 12,
       "context": "canonical_usage",
       "disposition": "ignored",
@@ -1734,7 +1806,7 @@
     },
     {
       "path": "apps/dashboard/src/features/content/lib/content-type-labels.test.ts",
-      "line": 71,
+      "line": 73,
       "column": 12,
       "context": "canonical_usage",
       "disposition": "ignored",
@@ -1743,7 +1815,7 @@
     },
     {
       "path": "apps/dashboard/src/features/content/lib/content-type-labels.test.ts",
-      "line": 74,
+      "line": 76,
       "column": 12,
       "context": "canonical_usage",
       "disposition": "ignored",
@@ -1752,7 +1824,7 @@
     },
     {
       "path": "apps/dashboard/src/features/content/lib/content-type-labels.test.ts",
-      "line": 75,
+      "line": 77,
       "column": 12,
       "context": "canonical_usage",
       "disposition": "ignored",
@@ -1761,7 +1833,7 @@
     },
     {
       "path": "apps/dashboard/src/features/content/lib/content-type-labels.test.ts",
-      "line": 75,
+      "line": 77,
       "column": 43,
       "context": "test_expectation",
       "disposition": "unknown",
@@ -1770,7 +1842,7 @@
     },
     {
       "path": "apps/dashboard/src/features/content/lib/content-type-labels.test.ts",
-      "line": 75,
+      "line": 77,
       "column": 58,
       "context": "test_expectation",
       "disposition": "unknown",
@@ -1779,7 +1851,7 @@
     },
     {
       "path": "apps/dashboard/src/features/content/lib/content-type-labels.test.ts",
-      "line": 79,
+      "line": 86,
       "column": 12,
       "context": "canonical_usage",
       "disposition": "ignored",
@@ -1788,7 +1860,7 @@
     },
     {
       "path": "apps/dashboard/src/features/content/lib/content-type-labels.test.ts",
-      "line": 79,
+      "line": 86,
       "column": 50,
       "context": "canonical_usage",
       "disposition": "ignored",
@@ -1797,7 +1869,7 @@
     },
     {
       "path": "apps/dashboard/src/features/content/lib/content-type-labels.test.ts",
-      "line": 80,
+      "line": 87,
       "column": 12,
       "context": "canonical_usage",
       "disposition": "ignored",
@@ -1806,7 +1878,7 @@
     },
     {
       "path": "apps/dashboard/src/features/content/lib/content-type-labels.test.ts",
-      "line": 80,
+      "line": 87,
       "column": 48,
       "context": "canonical_usage",
       "disposition": "ignored",
@@ -1919,6 +1991,24 @@
       "context": "canonical_usage",
       "disposition": "ignored",
       "value": "getContentTypeItemLabel(key)",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/lib/content-type-labels.ts",
+      "line": 102,
+      "column": 20,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeMidSentenceLabel(key, options)",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/lib/content-type-labels.ts",
+      "line": 107,
+      "column": 17,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeMidSentenceLabel(key)",
       "variantForms": []
     },
     {
@@ -2165,17 +2255,44 @@
       "variantForms": ["plural"]
     },
     {
+      "path": "apps/dashboard/src/features/content/lib/forms/grants/equipment-grant-form-fields.ts",
+      "line": 372,
+      "column": 18,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeItemLabel('equipment')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/lib/forms/grants/equipment-grant-form-fields.ts",
+      "line": 450,
+      "column": 14,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeItemLabel('equipment')",
+      "variantForms": []
+    },
+    {
       "path": "apps/dashboard/src/features/content/lib/forms/grants/grant-form-fields.ts",
-      "line": 369,
+      "line": 375,
       "column": 20,
       "context": "unknown",
-      "disposition": "unknown",
+      "disposition": "contextual",
       "value": "Feat category",
       "variantForms": ["label"]
     },
     {
       "path": "apps/dashboard/src/features/content/lib/forms/grants/grant-form-fields.ts",
-      "line": 699,
+      "line": 698,
+      "column": 14,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeCollectionLabel('spells')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/lib/forms/grants/grant-form-fields.ts",
+      "line": 705,
       "column": 5,
       "context": "comment",
       "disposition": "unknown",
@@ -2184,33 +2301,40 @@
     },
     {
       "path": "apps/dashboard/src/features/content/lib/forms/grants/grant-form-fields.ts",
-      "line": 706,
+      "line": 712,
       "column": 14,
       "context": "label",
-      "disposition": "replaceable",
+      "disposition": "contextual",
       "value": "Allow any qualifying feat (Epic Boon or another feat the character qualifies for)",
       "variantForms": ["singular"],
       "suggestion": "getContentTypeItemLabel('feats')"
     },
     {
       "path": "apps/dashboard/src/features/content/lib/forms/grants/grant-form-fields.ts",
-      "line": 717,
-      "column": 14,
-      "context": "label",
-      "disposition": "replaceable",
-      "value": "Recommended feats",
-      "variantForms": ["plural"],
-      "suggestion": "getContentTypeItemLabel('feats')"
+      "line": 723,
+      "column": 29,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeMidSentenceLabel('feats', { plural: true })",
+      "variantForms": []
     },
     {
       "path": "apps/dashboard/src/features/content/lib/forms/grants/grant-form-fields.ts",
-      "line": 720,
-      "column": 20,
-      "context": "placeholder",
-      "disposition": "replaceable",
-      "value": "Choose feats…",
-      "variantForms": ["plural"],
-      "suggestion": "getContentTypeSentenceLabel('feats')"
+      "line": 723,
+      "column": 60,
+      "context": "unknown",
+      "disposition": "contextual",
+      "value": "feats",
+      "variantForms": ["plural"]
+    },
+    {
+      "path": "apps/dashboard/src/features/content/lib/forms/grants/grant-form-fields.ts",
+      "line": 726,
+      "column": 55,
+      "context": "unknown",
+      "disposition": "contextual",
+      "value": "feats",
+      "variantForms": ["plural"]
     },
     {
       "path": "apps/dashboard/src/features/content/lib/forms/grants/grant-form-helpers.test.ts",
@@ -2502,7 +2626,7 @@
     },
     {
       "path": "apps/dashboard/src/features/content/species/lib/species-rules-form-fields.ts",
-      "line": 112,
+      "line": 113,
       "column": 17,
       "context": "canonical_usage",
       "disposition": "ignored",
@@ -2511,7 +2635,7 @@
     },
     {
       "path": "apps/dashboard/src/features/content/species/lib/species-rules-form-fields.ts",
-      "line": 119,
+      "line": 120,
       "column": 52,
       "context": "canonical_usage",
       "disposition": "ignored",
@@ -2520,7 +2644,16 @@
     },
     {
       "path": "apps/dashboard/src/features/content/species/lib/species-rules-form-fields.ts",
-      "line": 133,
+      "line": 129,
+      "column": 19,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeItemLabel('classes')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/species/lib/species-rules-form-fields.ts",
+      "line": 134,
       "column": 44,
       "context": "canonical_usage",
       "disposition": "ignored",
@@ -2529,7 +2662,25 @@
     },
     {
       "path": "apps/dashboard/src/features/content/species/lib/species-rules-form-fields.ts",
-      "line": 187,
+      "line": 156,
+      "column": 18,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeItemLabel('classes')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/species/lib/species-rules-form-fields.ts",
+      "line": 165,
+      "column": 29,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeMidSentenceLabel('classes')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/species/lib/species-rules-form-fields.ts",
+      "line": 188,
       "column": 23,
       "context": "canonical_usage",
       "disposition": "ignored",
@@ -2538,7 +2689,7 @@
     },
     {
       "path": "apps/dashboard/src/features/content/species/lib/species-rules-form-fields.ts",
-      "line": 188,
+      "line": 189,
       "column": 75,
       "context": "canonical_usage",
       "disposition": "ignored",
@@ -2548,6 +2699,15 @@
     {
       "path": "apps/dashboard/src/features/content/species/lib/species-rules-form-fields.ts",
       "line": 215,
+      "column": 19,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeItemLabel('classes')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/species/lib/species-rules-form-fields.ts",
+      "line": 216,
       "column": 48,
       "context": "canonical_usage",
       "disposition": "ignored",
@@ -2555,12 +2715,30 @@
       "variantForms": []
     },
     {
+      "path": "apps/dashboard/src/features/content/species/lib/species-rules-form-fields.ts",
+      "line": 226,
+      "column": 40,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeMidSentenceLabel('classes')",
+      "variantForms": []
+    },
+    {
       "path": "apps/dashboard/src/features/content/species/lib/species-rules-form-labels.ts",
-      "line": 27,
+      "line": 18,
       "column": 28,
       "context": "canonical_usage",
       "disposition": "ignored",
       "value": "getContentTypeMidSentenceLabel('species')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/species/lib/species-rules-form-labels.ts",
+      "line": 19,
+      "column": 23,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeMidSentenceLabel('classes', { plural: true })",
       "variantForms": []
     },
     {
@@ -2660,6 +2838,15 @@
       "context": "canonical_usage",
       "disposition": "ignored",
       "value": "formatContentListLoadErrorMessage('spells')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/spells/lib/spell-form-fields.ts",
+      "line": 273,
+      "column": 18,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeCollectionLabel('classes')",
       "variantForms": []
     },
     {
@@ -2861,6 +3048,24 @@
       "variantForms": []
     },
     {
+      "path": "packages/catalog/src/classes/index.ts",
+      "line": 109,
+      "column": 54,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeTerm('classes')",
+      "variantForms": []
+    },
+    {
+      "path": "packages/catalog/src/equipment/index.ts",
+      "line": 78,
+      "column": 56,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeTerm('equipment')",
+      "variantForms": []
+    },
+    {
       "path": "packages/catalog/src/feats/index.test.ts",
       "line": 10,
       "column": 30,
@@ -2945,10 +3150,19 @@
       "path": "packages/catalog/src/feats/index.ts",
       "line": 26,
       "column": 52,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeTerm('feats')",
+      "variantForms": []
+    },
+    {
+      "path": "packages/catalog/src/feats/index.ts",
+      "line": 26,
+      "column": 71,
       "context": "unknown",
       "disposition": "unknown",
-      "value": "Feat",
-      "variantForms": ["label"]
+      "value": "feats",
+      "variantForms": ["plural"]
     },
     {
       "path": "packages/catalog/src/grants/resolve-available-choices-inventory.test.ts",
@@ -2966,6 +3180,15 @@
       "context": "canonical_usage",
       "disposition": "ignored",
       "value": "getContentTypeTerm('skill-proficiencies')",
+      "variantForms": []
+    },
+    {
+      "path": "packages/catalog/src/spells/index.ts",
+      "line": 85,
+      "column": 53,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeTerm('spells')",
       "variantForms": []
     },
     {
@@ -3222,7 +3445,7 @@
     },
     {
       "path": "packages/contracts/src/rpg/content/lib/content-type-term-coverage.test.ts",
-      "line": 20,
+      "line": 21,
       "column": 20,
       "context": "canonical_usage",
       "disposition": "ignored",
@@ -3231,7 +3454,7 @@
     },
     {
       "path": "packages/contracts/src/rpg/content/lib/content-type-term-coverage.test.ts",
-      "line": 42,
+      "line": 43,
       "column": 12,
       "context": "canonical_usage",
       "disposition": "ignored",
@@ -3240,11 +3463,29 @@
     },
     {
       "path": "packages/contracts/src/rpg/content/lib/content-type-term-coverage.test.ts",
-      "line": 43,
+      "line": 44,
       "column": 12,
       "context": "canonical_usage",
       "disposition": "ignored",
       "value": "getContentTypeSentenceForm('classes', 2)",
+      "variantForms": []
+    },
+    {
+      "path": "packages/contracts/src/rpg/content/lib/content-type-term-coverage.test.ts",
+      "line": 45,
+      "column": 12,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeCapitalizedSentenceLabel('classes')",
+      "variantForms": []
+    },
+    {
+      "path": "packages/contracts/src/rpg/content/lib/content-type-term-coverage.test.ts",
+      "line": 46,
+      "column": 12,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeCapitalizedSentenceLabel('classes', { plural: true })",
       "variantForms": []
     },
     {
@@ -3282,6 +3523,15 @@
       "context": "canonical_usage",
       "disposition": "ignored",
       "value": "getContentTypeTerm(key)",
+      "variantForms": []
+    },
+    {
+      "path": "packages/contracts/src/rpg/content/lib/content-type-terms.ts",
+      "line": 68,
+      "column": 18,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeSentenceForm(key, options?.plural ? 2 : 1)",
       "variantForms": []
     },
     {
@@ -3448,7 +3698,34 @@
     },
     {
       "path": "packages/contracts/src/rpg/runtime/character-builder/character-builder-messages.ts",
-      "line": 105,
+      "line": 28,
+      "column": 23,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeSentenceForm('species')",
+      "variantForms": []
+    },
+    {
+      "path": "packages/contracts/src/rpg/runtime/character-builder/character-builder-messages.ts",
+      "line": 32,
+      "column": 23,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeSentenceForm('classes')",
+      "variantForms": []
+    },
+    {
+      "path": "packages/contracts/src/rpg/runtime/character-builder/character-builder-messages.ts",
+      "line": 78,
+      "column": 56,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeSentenceForm('classes')",
+      "variantForms": []
+    },
+    {
+      "path": "packages/contracts/src/rpg/runtime/character-builder/character-builder-messages.ts",
+      "line": 106,
       "column": 19,
       "context": "canonical_usage",
       "disposition": "ignored",
@@ -3456,17 +3733,107 @@
       "variantForms": []
     },
     {
+      "path": "packages/contracts/src/rpg/runtime/character-builder/character-builder-messages.ts",
+      "line": 129,
+      "column": 23,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeSentenceForm('classes')",
+      "variantForms": []
+    },
+    {
+      "path": "packages/contracts/src/rpg/runtime/character-builder/character-builder-messages.ts",
+      "line": 129,
+      "column": 71,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeSentenceForm('equipment')",
+      "variantForms": []
+    },
+    {
+      "path": "packages/contracts/src/rpg/runtime/character-builder/character-builder-messages.ts",
+      "line": 134,
+      "column": 22,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeSentenceForm('equipment')",
+      "variantForms": []
+    },
+    {
+      "path": "packages/contracts/src/rpg/runtime/character-builder/character-builder-messages.ts",
+      "line": 134,
+      "column": 96,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeSentenceForm('classes')",
+      "variantForms": []
+    },
+    {
+      "path": "packages/contracts/src/rpg/runtime/character-builder/character-builder-messages.ts",
+      "line": 138,
+      "column": 35,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeSentenceForm('equipment')",
+      "variantForms": []
+    },
+    {
+      "path": "packages/contracts/src/rpg/runtime/character-builder/character-builder-messages.ts",
+      "line": 142,
+      "column": 42,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeSentenceForm('equipment')",
+      "variantForms": []
+    },
+    {
+      "path": "packages/contracts/src/rpg/runtime/character-builder/character-builder-messages.ts",
+      "line": 162,
+      "column": 23,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeSentenceForm('classes')",
+      "variantForms": []
+    },
+    {
+      "path": "packages/contracts/src/rpg/runtime/character-builder/character-builder-messages.ts",
+      "line": 162,
+      "column": 71,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeSentenceForm('spells', 2)",
+      "variantForms": []
+    },
+    {
+      "path": "packages/contracts/src/rpg/runtime/character-builder/character-builder-messages.ts",
+      "line": 174,
+      "column": 35,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeSentenceForm('spells', 2)",
+      "variantForms": []
+    },
+    {
+      "path": "packages/contracts/src/rpg/runtime/character-builder/character-builder-messages.ts",
+      "line": 178,
+      "column": 23,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeSentenceForm('classes')",
+      "variantForms": []
+    },
+    {
       "path": "packages/contracts/src/rpg/runtime/character-builder/choice-set.ts",
       "line": 31,
       "column": 3,
       "context": "unknown",
-      "disposition": "contextual",
+      "disposition": "unknown",
       "value": "feat",
       "variantForms": ["singular"]
     },
     {
       "path": "packages/contracts/src/rpg/runtime/character-builder/resolve-review-blocking-summary.ts",
-      "line": 41,
+      "line": 44,
       "column": 12,
       "context": "canonical_usage",
       "disposition": "ignored",
@@ -3474,11 +3841,47 @@
       "variantForms": []
     },
     {
+      "path": "packages/contracts/src/rpg/runtime/character-builder/resolve-review-blocking-summary.ts",
+      "line": 45,
+      "column": 10,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeTerm('classes')",
+      "variantForms": []
+    },
+    {
+      "path": "packages/contracts/src/rpg/runtime/character-builder/resolve-review-blocking-summary.ts",
+      "line": 48,
+      "column": 14,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeTerm('equipment')",
+      "variantForms": []
+    },
+    {
+      "path": "packages/contracts/src/rpg/runtime/character-builder/resolve-review-blocking-summary.ts",
+      "line": 49,
+      "column": 11,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeCapitalizedSentenceLabel('spells', { plural: true })",
+      "variantForms": []
+    },
+    {
+      "path": "packages/contracts/src/rpg/runtime/character-builder/resolvers/equipment/resolve-starting-equipment-choice-sets.ts",
+      "line": 67,
+      "column": 33,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeCapitalizedSentenceLabel('equipment')",
+      "variantForms": []
+    },
+    {
       "path": "packages/contracts/src/rpg/runtime/character-builder/resolvers/grants/grant-choice-sets.ts",
       "line": 2,
       "column": 38,
       "context": "unknown",
-      "disposition": "contextual",
+      "disposition": "unknown",
       "value": "../../../../vocab/feat",
       "variantForms": ["singular"]
     },
@@ -3487,7 +3890,7 @@
       "line": 91,
       "column": 5,
       "context": "unknown",
-      "disposition": "contextual",
+      "disposition": "unknown",
       "value": "feat",
       "variantForms": ["singular"]
     },
@@ -3496,7 +3899,7 @@
       "line": 96,
       "column": 28,
       "context": "unknown",
-      "disposition": "contextual",
+      "disposition": "unknown",
       "value": "Feat",
       "variantForms": ["label"]
     },
@@ -3514,7 +3917,7 @@
       "line": 96,
       "column": 6,
       "context": "test_expectation",
-      "disposition": "contextual",
+      "disposition": "unknown",
       "value": "emits deferred feat ChoiceSets as optional advisory picks",
       "variantForms": ["singular"]
     },
@@ -3523,13 +3926,22 @@
       "line": 139,
       "column": 19,
       "context": "test_expectation",
-      "disposition": "contextual",
+      "disposition": "unknown",
       "value": "feat",
       "variantForms": ["singular"]
     },
     {
+      "path": "packages/contracts/src/rpg/runtime/character-builder/resolvers/spellcasting/resolve-spellcasting-choice-sets.ts",
+      "line": 56,
+      "column": 26,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeCapitalizedSentenceLabel('spells', { plural: true })",
+      "variantForms": []
+    },
+    {
       "path": "packages/contracts/src/rpg/runtime/character-builder/steps.ts",
-      "line": 59,
+      "line": 60,
       "column": 12,
       "context": "canonical_usage",
       "disposition": "ignored",
@@ -3538,7 +3950,7 @@
     },
     {
       "path": "packages/contracts/src/rpg/runtime/character-builder/steps.ts",
-      "line": 60,
+      "line": 61,
       "column": 45,
       "context": "canonical_usage",
       "disposition": "ignored",
@@ -3546,11 +3958,65 @@
       "variantForms": []
     },
     {
+      "path": "packages/contracts/src/rpg/runtime/character-builder/steps.ts",
+      "line": 64,
+      "column": 12,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeTerm('classes')",
+      "variantForms": []
+    },
+    {
+      "path": "packages/contracts/src/rpg/runtime/character-builder/steps.ts",
+      "line": 65,
+      "column": 45,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeSentenceForm('classes')",
+      "variantForms": []
+    },
+    {
+      "path": "packages/contracts/src/rpg/runtime/character-builder/steps.ts",
+      "line": 77,
+      "column": 12,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeTerm('equipment')",
+      "variantForms": []
+    },
+    {
+      "path": "packages/contracts/src/rpg/runtime/character-builder/steps.ts",
+      "line": 78,
+      "column": 42,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeSentenceForm('equipment')",
+      "variantForms": []
+    },
+    {
+      "path": "packages/contracts/src/rpg/runtime/character-builder/steps.ts",
+      "line": 82,
+      "column": 12,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeCapitalizedSentenceLabel('spells', { plural: true })",
+      "variantForms": []
+    },
+    {
+      "path": "packages/contracts/src/rpg/runtime/character-builder/steps.ts",
+      "line": 83,
+      "column": 42,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeSentenceForm('spells', 2)",
+      "variantForms": []
+    },
+    {
       "path": "packages/contracts/src/rpg/runtime/character-builder/validate/validate-choice-sets.ts",
       "line": 20,
       "column": 3,
       "context": "unknown",
-      "disposition": "contextual",
+      "disposition": "unknown",
       "value": "feat",
       "variantForms": ["singular"]
     },
@@ -3568,7 +4034,7 @@
       "line": 21,
       "column": 9,
       "context": "unknown",
-      "disposition": "contextual",
+      "disposition": "unknown",
       "value": "Granted by Feat",
       "variantForms": ["label"]
     },
@@ -3577,7 +4043,7 @@
       "line": 14,
       "column": 3,
       "context": "unknown",
-      "disposition": "contextual",
+      "disposition": "unknown",
       "value": "feat",
       "variantForms": ["singular"]
     },
@@ -3586,7 +4052,7 @@
       "line": 58,
       "column": 19,
       "context": "test_expectation",
-      "disposition": "contextual",
+      "disposition": "unknown",
       "value": "feat",
       "variantForms": ["singular"]
     },
@@ -3595,7 +4061,7 @@
       "line": 281,
       "column": 69,
       "context": "test_expectation",
-      "disposition": "contextual",
+      "disposition": "unknown",
       "value": "feat",
       "variantForms": ["singular"]
     },
@@ -4405,7 +4871,25 @@
     },
     {
       "path": "tools/vocab/term-audit/term-audit.config.ts",
-      "line": 68,
+      "line": 27,
+      "column": 24,
+      "context": "comment",
+      "disposition": "unknown",
+      "value": "/**',\n      reason: 'Bench fixture copy; not player-facing catalog chrome',\n      owner: 'bench',\n    },\n    {\n      target: 'content-type:classes',\n      path: 'apps/dashboard/src/features/campaign/lib/rules/mechanics/mechanics-form-fields.ts',\n      reason: 'Armor class (AC) mechanic label, not catalog class content type',\n      owner: 'dashboard',\n    },\n    {\n      target: 'content-type:classes',\n      path: 'apps/dashboard/src/features/campaign/lib/rules/character-configuration/starting-wealth-form-fields.ts',\n      reason: 'Domain-specific starting-wealth option copy',\n      owner: 'dashboard',\n    },\n    {\n      target: 'content-type:classes',\n      path: 'apps/dashboard/src/features/content/lib/forms/grants/grant-form-fields.ts',\n      reason: 'Feat-choice and class-progression grant copy owned by grant vocabulary',\n      owner: 'dashboard',\n    },\n    {\n      target: 'content-type:classes',\n      path: 'apps/dashboard/src/features/content/classes/lib/character-creation/class-starting-equipment-form-values.ts',\n      reason: 'Named starting package label (Standard Equipment), not parent catalog chrome',\n      owner: 'dashboard',\n    },\n    {\n      target: 'content-type:classes',\n      path: 'apps/dashboard/src/features/character/lib/equipment-step.fixtures.ts',\n      reason: 'Named starting package fixture label (Standard Equipment)',\n      owner: 'dashboard',\n    },\n    {\n      target: 'content-type:classes',\n      path: 'packages/ui/src/components/ui/rich-text-link-picker.client.tsx',\n      reason: 'Storybook defaults; dashboard passes term-derived options',\n      owner: 'ui',\n    },\n    {\n      target: 'content-type:spells',\n      path: 'packages/contracts/src/rpg/content/lib/content-type-terms.ts',\n      reason: 'Canonical catalog content-type term registry',\n      owner: 'contracts',\n    },\n    {\n      target: 'content-type:spells',\n      path: 'packages/contracts/src/rpg/vocab/spell/**',\n      reason: 'Spell field taxonomy and resolution vocabulary, not catalog chrome',\n      owner: 'contracts',\n    },\n    {\n      target: 'content-type:spells',\n      path: 'packages/contracts/src/rpg/content/spell/**/",
+      "variantForms": ["label"]
+    },
+    {
+      "path": "tools/vocab/term-audit/term-audit.config.ts",
+      "line": 46,
+      "column": 15,
+      "context": "unknown",
+      "disposition": "unknown",
+      "value": "Feat-choice and class-progression grant copy owned by grant vocabulary",
+      "variantForms": ["label"]
+    },
+    {
+      "path": "tools/vocab/term-audit/term-audit.config.ts",
+      "line": 128,
       "column": 15,
       "context": "unknown",
       "disposition": "unknown",
@@ -4414,7 +4898,7 @@
     },
     {
       "path": "tools/vocab/term-audit/term-audit.config.ts",
-      "line": 74,
+      "line": 134,
       "column": 15,
       "context": "unknown",
       "disposition": "unknown",
@@ -4423,7 +4907,7 @@
     },
     {
       "path": "tools/vocab/term-audit/term-audit.config.ts",
-      "line": 75,
+      "line": 135,
       "column": 13,
       "context": "unknown",
       "disposition": "unknown",
@@ -4432,7 +4916,7 @@
     },
     {
       "path": "tools/vocab/term-audit/term-audit.config.ts",
-      "line": 76,
+      "line": 136,
       "column": 15,
       "context": "unknown",
       "disposition": "unknown",
@@ -4441,7 +4925,7 @@
     },
     {
       "path": "tools/vocab/term-audit/term-audit.config.ts",
-      "line": 80,
+      "line": 140,
       "column": 15,
       "context": "unknown",
       "disposition": "unknown",
@@ -4450,7 +4934,16 @@
     },
     {
       "path": "tools/vocab/term-audit/term-audit.config.ts",
-      "line": 86,
+      "line": 142,
+      "column": 15,
+      "context": "unknown",
+      "disposition": "unknown",
+      "value": "Feat-choice grant eligibility copy owned by grant vocabulary",
+      "variantForms": ["label"]
+    },
+    {
+      "path": "tools/vocab/term-audit/term-audit.config.ts",
+      "line": 146,
       "column": 15,
       "context": "unknown",
       "disposition": "unknown",
@@ -4575,10 +5068,10 @@
   ],
   "parseFailures": [],
   "summary": {
-    "canonical": 177,
-    "replaceable": 3,
-    "contextual": 38,
+    "canonical": 229,
+    "replaceable": 0,
+    "contextual": 31,
     "ignored": 0,
-    "unknown": 274
+    "unknown": 287
   }
 }
