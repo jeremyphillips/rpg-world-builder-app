@@ -1,6 +1,7 @@
 import { z } from 'zod'
 import {
   AREA_GEOMETRY_SHAPES,
+  DAMAGE_TYPE_TERM,
   castingTimeUnitSchema,
   damageTypeIdSchema,
   durationUnitSchema,
@@ -18,6 +19,7 @@ import { type FieldVisibility, type FormItem, type TabbedFormTab } from '@rpg/ui
 import {
   buildActiveDamageTypeFieldOptions,
   buildActiveSpellSchoolFieldOptions,
+  vocabularyFieldLabel,
 } from '@/features/homebrew'
 
 import {
@@ -560,7 +562,7 @@ function tagFields(ctx: ContentFormCtx): FormItem[] {
     {
       type: 'chips',
       name: 'tags.damageTypes',
-      label: 'Damage types',
+      label: vocabularyFieldLabel(DAMAGE_TYPE_TERM, { plural: true }),
       options: damageTypeOptions,
     },
     {

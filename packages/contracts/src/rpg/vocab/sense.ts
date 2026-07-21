@@ -1,12 +1,21 @@
 import { z } from 'zod'
 
 import { formatVocabularySlugLabel } from './format-slug-label'
-import { getTermSentenceForm, type GameTermEntry } from './types'
+import { getTermSentenceForm, type GameTermEntry, type VocabularyTerm } from './types'
 import { vocabularyOptionIdSchema, type VocabularyOptionSetId } from './vocabulary'
 
 // ---------------------------------------------------------------------------
 // Senses — open vocabulary set. Range in feet stays on `senseSchema`.
 // ---------------------------------------------------------------------------
+
+export const SENSE_TERM = {
+  label: 'Sense',
+  description: 'A special perception such as darkvision or blindsight.',
+  sentence: {
+    singular: 'sense',
+    plural: 'senses',
+  },
+} as const satisfies VocabularyTerm
 
 export const SENSE_SET_ID = 'senses' as const satisfies VocabularyOptionSetId
 

@@ -1,11 +1,20 @@
 import { z } from 'zod'
 
 import { vocabEnumFromEntries, keysFromEntries } from '../enum-schema'
-import type { GameTermEntry } from '../types'
+import type { GameTermEntry, VocabularyTerm } from '../types'
 
 // ---------------------------------------------------------------------------
 // Casting time units — closed SRD set for spell metadata.
 // ---------------------------------------------------------------------------
+
+export const CASTING_TIME_UNIT_TERM = {
+  label: 'Casting Time Unit',
+  description: 'The time cost to cast a spell.',
+  sentence: {
+    singular: 'casting time unit',
+    plural: 'casting time units',
+  },
+} as const satisfies VocabularyTerm
 
 export const CASTING_TIME_UNIT_ENTRIES = {
   action: { label: 'Action', description: 'Cast using an action on your turn.' },

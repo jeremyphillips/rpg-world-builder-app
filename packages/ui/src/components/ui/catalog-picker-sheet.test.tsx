@@ -116,7 +116,7 @@ describe('CatalogPickerSheet', () => {
     expect(search.compareDocumentPosition(tablist) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
   })
 
-  it('resolves toolbar control render props with tab reset helpers', async () => {
+  it('exposes sheet reset helpers through the actions render prop', async () => {
     const user = userEvent.setup()
 
     render(
@@ -135,11 +135,11 @@ describe('CatalogPickerSheet', () => {
           { id: 'all', label: 'All' },
         ]}
         renderItemHeader={(item) => <span>{item.name}</span>}
-        toolbarControls={({ searchQuery, clearSearchQuery, activeTabId, resetActiveTab }) => (
+        actions={({ searchQuery, resetSearchQuery, activeTabId, resetActiveTab }) => (
           <div>
             <span>Query: {searchQuery}</span>
             <span>Tab: {activeTabId}</span>
-            <button type="button" onClick={clearSearchQuery}>
+            <button type="button" onClick={resetSearchQuery}>
               Clear search
             </button>
             <button type="button" onClick={resetActiveTab}>
@@ -163,7 +163,7 @@ describe('CatalogPickerSheet', () => {
     expect(screen.getByText('Query:')).toBeInTheDocument()
   })
 
-  it('renders tab toolbar actions inline with tabs', () => {
+  it('renders actions inline with tabs when recommendations are enabled', () => {
     render(
       <CatalogPickerSheet
         open
@@ -180,7 +180,7 @@ describe('CatalogPickerSheet', () => {
           { id: 'all', label: 'All' },
         ]}
         renderItemHeader={(item) => <span>{item.name}</span>}
-        tabToolbarActions={<button type="button">Reset view</button>}
+        actions={<button type="button">Reset view</button>}
       />,
     )
 

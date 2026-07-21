@@ -13,7 +13,7 @@ describe('findProficiencyEquipmentReferences', () => {
     expect(findProficiencyEquipmentReferences(monkStartingEquipment, 'class-tools')).toEqual([
       expect.objectContaining({
         choiceId: 'class-tools',
-        packageId: 'standard',
+        packageId: 'standard-equipment',
         packageLabel: 'Standard Equipment',
       }),
     ])
@@ -25,6 +25,6 @@ describe('findProficiencyEquipmentReferences', () => {
 
   it('does not treat gold-only packages as linked grants', () => {
     const references = findProficiencyEquipmentReferences(monkStartingEquipment, 'class-tools')
-    expect(references.some((reference) => reference.packageId === 'gold')).toBe(false)
+    expect(references.some((reference) => reference.packageId === 'starting-gold')).toBe(false)
   })
 })

@@ -1,11 +1,21 @@
 import type { z } from 'zod'
 
 import { formatVocabularySlugLabel } from '../format-slug-label'
+import type { VocabularyTerm } from '../types'
 import { vocabularyOptionIdSchema, type VocabularyOptionSetId } from '../vocabulary'
 
 // ---------------------------------------------------------------------------
 // Schools of magic — open vocabulary set for spell metadata.
 // ---------------------------------------------------------------------------
+
+export const SPELL_SCHOOL_TERM = {
+  label: 'School of Magic',
+  description: 'The magical tradition a spell belongs to.',
+  sentence: {
+    singular: 'school of magic',
+    plural: 'schools of magic',
+  },
+} as const satisfies VocabularyTerm
 
 export const SPELL_SCHOOL_SET_ID = 'spell-schools' as const satisfies VocabularyOptionSetId
 

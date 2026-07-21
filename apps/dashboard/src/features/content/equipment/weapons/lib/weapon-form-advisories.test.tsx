@@ -17,7 +17,8 @@ describe('getWeaponFormPropertyAdvisories', () => {
       getWeaponFormPropertyAdvisories({
         kind: 'weapon',
         name: 'Test',
-        cost: { amount: 0, currency: 'gp' },
+        hasMarketPrice: true,
+        cost: { amount: 1, currency: 'gp' },
         category: 'simple',
         mode: 'ranged',
         mastery: 'vex',
@@ -39,7 +40,8 @@ describe('weaponFormHasInvalidMastery', () => {
       weaponFormHasInvalidMastery({
         kind: 'weapon',
         name: 'Test',
-        cost: { amount: 0, currency: 'gp' },
+        hasMarketPrice: true,
+        cost: { amount: 1, currency: 'gp' },
         category: 'simple',
         mode: 'ranged',
         mastery: 'cleave',
@@ -52,7 +54,8 @@ describe('weaponFormHasInvalidMastery', () => {
       weaponFormHasInvalidMastery({
         kind: 'weapon',
         name: 'Test',
-        cost: { amount: 0, currency: 'gp' },
+        hasMarketPrice: true,
+        cost: { amount: 1, currency: 'gp' },
         category: 'simple',
         mode: 'ranged',
         mastery: 'vex',
@@ -68,7 +71,8 @@ describe('blockWeaponSaveForInvalidMastery', () => {
         defaultValues: {
           kind: 'weapon',
           name: 'Test',
-          cost: { amount: 0, currency: 'gp' },
+          hasMarketPrice: true,
+          cost: { amount: 1, currency: 'gp' },
           category: 'simple',
           mode: 'ranged',
           mastery: 'cleave',
@@ -96,7 +100,8 @@ describe('blockWeaponSaveForInvalidMastery', () => {
         defaultValues: {
           kind: 'weapon',
           name: 'Test',
-          cost: { amount: 0, currency: 'gp' },
+          hasMarketPrice: true,
+          cost: { amount: 1, currency: 'gp' },
           category: 'simple',
           mode: 'ranged',
           mastery: 'vex',

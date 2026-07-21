@@ -8,6 +8,7 @@ import {
 import { weightFromForm, weightToForm } from '../../lib/forms/fields/content-economy-form-fields'
 import { finalizeContentInput } from '../../lib/forms/content-form-key-helpers'
 import type { ContentFormInputCtx } from '../../lib/forms/content-form-registry'
+import { costToForm } from './equipment-economy-form-values'
 import { armorFormValuesFromEntity, buildArmorInput } from '../armor/lib/armor-form-values'
 import {
   adventuringGearFormValuesFromEntity,
@@ -35,7 +36,7 @@ function sharedWeightToForm(
 
 function sharedFormValues(entity: Equipment): Pick<
   EquipmentFormValues,
-  'name' | 'slug' | 'description' | 'kind' | 'cost'
+  'name' | 'slug' | 'description' | 'kind' | 'hasMarketPrice' | 'cost'
 > & {
   weight?: EquipmentFormValuesFor<'weapon'>['weight']
 } {
@@ -44,7 +45,7 @@ function sharedFormValues(entity: Equipment): Pick<
     slug: entity.slug,
     description: entity.description,
     kind: entity.kind,
-    cost: entity.cost,
+    ...costToForm(entity.cost),
     weight: sharedWeightToForm(entity),
   }
 }

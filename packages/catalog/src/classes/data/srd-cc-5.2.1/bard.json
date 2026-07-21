@@ -132,9 +132,8 @@
       "choose": 1,
       "options": [
         {
-          "id": "standard",
+          "id": "standard-equipment",
           "label": "Standard Equipment",
-          "description": "Leather Armor, 2 Daggers, Musical Instrument of your choice, Entertainer's Pack, and 19 GP.",
           "items": [
             {
               "kind": "grant",
@@ -168,9 +167,8 @@
           }
         },
         {
-          "id": "gold",
+          "id": "starting-gold",
           "label": "Starting Gold",
-          "description": "Take 90 GP instead of standard equipment.",
           "items": [],
           "wealth": {
             "gp": 90

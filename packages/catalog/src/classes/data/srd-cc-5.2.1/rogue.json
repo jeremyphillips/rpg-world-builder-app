@@ -34,9 +34,8 @@
       "choose": 1,
       "options": [
         {
-          "id": "standard",
+          "id": "standard-equipment",
           "label": "Standard Equipment",
-          "description": "Leather Armor, 2 Daggers, Shortsword, Shortbow, 20 Arrows, Quiver, Thieves' Tools, Burglar's Pack, and 8 GP.",
           "items": [
             {
               "kind": "grant",
@@ -88,9 +87,8 @@
           }
         },
         {
-          "id": "gold",
+          "id": "starting-gold",
           "label": "Starting Gold",
-          "description": "Take 100 GP instead of standard equipment.",
           "items": [],
           "wealth": {
             "gp": 100

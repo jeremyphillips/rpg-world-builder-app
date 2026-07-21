@@ -51,7 +51,7 @@ export function resolveLevelOneMaxHp({
   defaultConModifier = 0,
 }: ResolveLevelOneMaxHpInput): number {
   const conModifier = typeof conScore === 'number' ? abilityModifier(conScore) : defaultConModifier
-  return hitDie + conModifier
+  return Math.max(1, hitDie + conModifier)
 }
 
 // ---------------------------------------------------------------------------
@@ -166,6 +166,7 @@ export function resolveUnarmoredAc({
 }
 
 export * from './armor-class'
+export * from './hit-points-at-level'
 export * from './preview-equipped-armor'
 export * from './profile'
 export * from './weapon-attack'

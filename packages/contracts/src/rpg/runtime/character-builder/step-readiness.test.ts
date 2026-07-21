@@ -28,7 +28,10 @@ import {
   wizardLevelOneSpells,
 } from './spellcasting-test-fixtures'
 import { builderTestContext, fighterClass } from './test-fixtures'
+import { minimalStartingWealthSeedCoveringStandardMax } from '../../../test/fixtures/starting-wealth-minimal'
+import { resolveCharacterCreationPatch } from '../../campaign/patches/campaign-character-creation-patch'
 import { resolveBuilderStepReadiness } from './step-readiness'
+import { formatStepReadinessMessage } from './step-readiness-helpers'
 
 const RULESET = 'srd-cc-5.2.1' as const
 
@@ -90,7 +93,7 @@ const equipmentBardClass: ClassStored = {
       choose: 1,
       options: [
         {
-          id: 'standard',
+          id: 'standard-equipment',
           label: 'Standard Equipment',
           items: [
             {
@@ -114,7 +117,7 @@ const equipmentMonkClass: ClassStored = {
       choose: 1,
       options: [
         {
-          id: 'standard',
+          id: 'standard-equipment',
           label: 'Standard Equipment',
           items: [
             {
@@ -308,7 +311,7 @@ describe('resolveBuilderStepReadiness', () => {
       const draft = draftWith({
         class: { classId: equipmentBardClass.id, level: 1 },
         choiceSelections: {
-          [startingEquipmentChoiceSetId(equipmentBardClass.id)]: ['standard'],
+          [startingEquipmentChoiceSetId(equipmentBardClass.id)]: ['standard-equipment'],
         },
       })
       const choiceSets = resolveAvailableChoices(draft, equipmentTestContext)
@@ -324,7 +327,7 @@ describe('resolveBuilderStepReadiness', () => {
       const draft = draftWith({
         class: { classId: equipmentBardClass.id, level: 1 },
         choiceSelections: {
-          [startingEquipmentChoiceSetId(equipmentBardClass.id)]: ['gold'],
+          [startingEquipmentChoiceSetId(equipmentBardClass.id)]: ['starting-gold'],
         },
         equipment: {
           mode: 'gold',
@@ -353,7 +356,7 @@ describe('resolveBuilderStepReadiness', () => {
       const draft = draftWith({
         class: { classId: equipmentMonkClass.id, level: 1 },
         choiceSelections: {
-          [startingEquipmentChoiceSetId(equipmentMonkClass.id)]: ['standard'],
+          [startingEquipmentChoiceSetId(equipmentMonkClass.id)]: ['standard-equipment'],
         },
       })
       const monkContext = {
@@ -379,7 +382,7 @@ describe('resolveBuilderStepReadiness', () => {
       const draft = draftWith({
         class: { classId: equipmentMonkClass.id, level: 1 },
         choiceSelections: {
-          [startingEquipmentChoiceSetId(equipmentMonkClass.id)]: ['standard'],
+          [startingEquipmentChoiceSetId(equipmentMonkClass.id)]: ['standard-equipment'],
           [monkToolChoiceSetId]: [luteTool.id],
         },
       })
@@ -398,12 +401,44 @@ describe('resolveBuilderStepReadiness', () => {
       })
     })
 
+    it('stays incomplete when exact magic-item grants remain after skip', () => {
+      const magicItemContext = {
+        ...equipmentTestContext,
+        characterCreationRules: {
+          ...equipmentTestContext.characterCreationRules,
+          ...resolveCharacterCreationPatch(undefined, minimalStartingWealthSeedCoveringStandardMax),
+        },
+      }
+      const draft = draftWith({
+        class: { classId: equipmentBardClass.id, level: 2 },
+        equipment: {
+          mode: 'package',
+          purchases: [],
+          removedPackageItemKeys: [],
+          customized: false,
+          skipped: true,
+          magicItemSelections: [],
+        },
+      })
+
+      expect(resolveBuilderStepReadiness('equipment', draft, magicItemContext, [])).toEqual({
+        readiness: 'readyWithChoices',
+        message: formatStepReadinessMessage(
+          characterBuilderStepReadinessMessages.equipmentMagicItemGrantIncomplete,
+          {
+            rarityLabel: 'Common',
+            remaining: 1,
+          },
+        ),
+      })
+    })
+
     it('reports invalid linked proficiency answers separately from pending guidance', () => {
       const monkToolChoiceSetId = buildChoiceSetId('class', equipmentMonkClass.id, 'class-tools')
       const draft = draftWith({
         class: { classId: equipmentMonkClass.id, level: 1 },
         choiceSelections: {
-          [startingEquipmentChoiceSetId(equipmentMonkClass.id)]: ['standard'],
+          [startingEquipmentChoiceSetId(equipmentMonkClass.id)]: ['standard-equipment'],
           [monkToolChoiceSetId]: [luteTool.id, fluteTool.id],
         },
       })

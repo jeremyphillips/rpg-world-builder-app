@@ -1,4 +1,5 @@
 import {
+  canPurchaseEquipment,
   formatEquipmentPurchaseTotalPriceLabel,
   formatMoney,
   formatWealthAsGold,
@@ -24,10 +25,6 @@ export const EQUIPMENT_PICKER_PURCHASE_REMOVE_ONE_LABEL = 'Remove one from inven
 export const EQUIPMENT_PICKER_PURCHASE_REMOVE_ALL_LABEL = 'Remove from inventory'
 export const EQUIPMENT_PICKER_PURCHASE_ADD_ANOTHER_LABEL = 'Add another'
 
-/** @deprecated Use {@link EQUIPMENT_PICKER_PURCHASE_INVENTORY_LABEL}. */
-export const EQUIPMENT_PICKER_PURCHASE_ALREADY_OWNED_LABEL =
-  EQUIPMENT_PICKER_PURCHASE_INVENTORY_LABEL
-
 export type EquipmentPickerPurchasePricingViewModel = {
   quantity: number
   maxQuantity: number
@@ -52,6 +49,7 @@ function formatRemainingAfterPurchase(
   equipment: Equipment,
   quantity: number,
 ): string {
+  if (!canPurchaseEquipment(equipment)) return '—'
   const totalCp = moneyToCopper(equipment.cost) * quantity
   return formatWealthAsGold(subtractFromWealth(budget.remaining, totalCp))
 }
@@ -67,7 +65,7 @@ function buildEquipmentPickerPurchasePricingViewModel(args: {
   const { equipment, quantity, budget } = args
 
   return {
-    unitPriceLabel: formatMoney(equipment.cost),
+    unitPriceLabel: canPurchaseEquipment(equipment) ? formatMoney(equipment.cost) : '',
     totalLabel: formatEquipmentPurchaseTotalPriceLabel(equipment, quantity),
     remainingAfterLabel: budget ? formatRemainingAfterPurchase(budget, equipment, quantity) : '—',
   }

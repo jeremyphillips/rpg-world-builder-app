@@ -1,12 +1,14 @@
 import { z } from 'zod'
 
 import { equipmentModifierSchema } from '../../content/equipment/modifier'
+import { absoluteLevelSchema } from '../../primitives/level'
 import { abilitySchema } from '../../vocab/ability'
 import { optionalAlignmentSchema } from '../../vocab/alignment'
 import { characterNarrativeSchema } from '../character/narrative'
 import { abilityGenerationMethodSchema } from './ability-generation'
 import { characterBuilderStepIdSchema } from './step-ids'
 import { normalizeCharacterBuilderDraft } from './equipment-purchase'
+import { magicItemGrantSelectionSchema } from './magic-item-selection'
 
 // ---------------------------------------------------------------------------
 // CharacterBuilderDraft — the temporary workflow object. Allowed to represent
@@ -34,8 +36,8 @@ export type CharacterBuilderDraftSpecies = z.infer<typeof characterBuilderDraftS
 
 export const characterBuilderDraftClassSchema = z.object({
   classId: z.string().min(1).optional(),
-  /** MVP builds level-1 characters only; the level-up wizard owns progression. */
-  level: z.literal(1),
+  /** Selected class level for single-class builder creation. */
+  level: absoluteLevelSchema,
 })
 
 export type CharacterBuilderDraftClass = z.infer<typeof characterBuilderDraftClassSchema>
@@ -88,6 +90,8 @@ export const characterBuilderDraftEquipmentPurchaseSchema = z.object({
   equipped: z.boolean().optional(),
   /** Deep-copied equipment configuration; uses canonical content modifier shape. */
   modifiers: z.array(equipmentModifierSchema).optional(),
+  /** Unit price in copper stamped at purchase time — not recomputed from catalog. */
+  unitCostCp: z.number().int().min(0).optional(),
 })
 
 /** Parsed persisted purchase row — `id` and `origin` optional until hydration normalization. */
@@ -107,6 +111,8 @@ export type CharacterBuilderDraftEquipmentPurchase = PersistedCharacterBuilderDr
 export const characterBuilderDraftEquipmentSchema = z.object({
   mode: characterBuilderDraftEquipmentModeSchema,
   purchases: z.array(characterBuilderDraftEquipmentPurchaseSchema).default([]),
+  /** Magic-item grant selections keyed by allowanceId + equipmentId (upserted). */
+  magicItemSelections: z.array(magicItemGrantSelectionSchema).optional(),
   /**
    * Package slot keys `${classId}:${optionId}:${itemIndex}` removed from the
    * selected starting package (index into option `items[]`, not equipmentId).
@@ -153,7 +159,7 @@ export function createEmptyCharacterBuilderDraft(): CharacterBuilderDraft {
 // rehydration drops mismatched or unparseable state instead of migrating.
 // ---------------------------------------------------------------------------
 
-export const CHARACTER_BUILDER_DRAFT_VERSION = 2
+export const CHARACTER_BUILDER_DRAFT_VERSION = 3
 
 export const persistedCharacterBuilderStateSchema = z.object({
   version: z.literal(CHARACTER_BUILDER_DRAFT_VERSION),

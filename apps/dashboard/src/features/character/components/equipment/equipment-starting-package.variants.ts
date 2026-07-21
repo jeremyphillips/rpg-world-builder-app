@@ -1,5 +1,23 @@
-export const equipmentStartingPackageCardClasses =
-  'overflow-hidden rounded-card border border-border bg-card shadow-sm'
+import { cva, type VariantProps } from 'class-variance-authority'
+
+export const equipmentStartingPackageCardVariants = cva(
+  'overflow-hidden rounded-card border border-border shadow-sm',
+  {
+    variants: {
+      surface: {
+        subtle: 'bg-surface-subtle',
+        card: 'bg-card',
+      },
+    },
+    defaultVariants: {
+      surface: 'subtle',
+    },
+  },
+)
+
+export type EquipmentStartingPackageCardSurface = NonNullable<
+  VariantProps<typeof equipmentStartingPackageCardVariants>['surface']
+>
 
 export const equipmentStartingPackageCardBodyClasses = 'divide-y divide-border'
 

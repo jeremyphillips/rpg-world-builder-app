@@ -4,7 +4,10 @@ import { useMemo, useState } from 'react'
 import { equipmentSchema } from '@rpg/contracts'
 import type { ClassStored, EquipmentPackageSwitchBlockingReason } from '@rpg/contracts'
 import { createEmptyCharacterBuilderDraft } from '@rpg/contracts'
-import { evaluateEquipmentPackageSwitch } from '@rpg/contracts'
+import {
+  evaluateEquipmentPackageSwitch,
+  resolveStartingEquipmentFundingOptions,
+} from '@rpg/contracts'
 import { indexCharacterBuildCatalog } from '@rpg/contracts'
 import { startingEquipmentChoiceSetId } from '@rpg/contracts'
 
@@ -88,13 +91,15 @@ const storedDruid: ClassStored = {
       choose: 1,
       options: [
         {
-          id: 'standard',
+          id: 'standard-equipment',
           label: 'Standard Equipment',
-          items: [],
+          items: [
+            { kind: 'grant', target: { source: 'equipment', equipmentSlug: 'rope' }, quantity: 1 },
+          ],
           wealth: { gp: 9, sp: 5, cp: 3 },
         },
         {
-          id: 'gold',
+          id: 'starting-gold',
           label: 'Starting Gold',
           items: [],
           wealth: { gp: 50 },
@@ -125,7 +130,7 @@ function buildGoldDraft(
     ...createEmptyCharacterBuilderDraft(),
     class: { classId: storedDruid.id, level: 1 as const },
     choiceSelections: {
-      [startingEquipmentChoiceSetId(storedDruid.id)]: ['gold'],
+      [startingEquipmentChoiceSetId(storedDruid.id)]: ['starting-gold'],
     },
     equipment: {
       mode: 'gold' as const,
@@ -169,7 +174,10 @@ function PackageSwitchResolutionModalStory({
       evaluateEquipmentPackageSwitch({
         draft,
         catalogIndex,
-        targetOptionId: 'standard',
+        targetOptionId: 'standard-equipment',
+        targetFunding: resolveStartingEquipmentFundingOptions({ draft, catalogIndex }).get(
+          'standard-equipment',
+        )!,
         draftQuantitiesByPurchaseId: draftQuantities,
       })!,
     [draft, draftQuantities],

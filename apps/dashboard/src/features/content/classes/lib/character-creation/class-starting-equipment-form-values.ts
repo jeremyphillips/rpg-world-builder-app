@@ -96,7 +96,6 @@ export function startingEquipmentOptionToFormRow(
   return {
     id: option.id,
     label: option.label,
-    description: option.description,
     wealth: wealthGrantMoneyToForm(option.wealth),
     items: option.items.map(startingEquipmentItemToFormRow),
   }
@@ -110,9 +109,6 @@ export function startingEquipmentOptionFromFormRow(
     label: row.label,
     items: row.items.map(startingEquipmentItemFromFormRow),
   }
-  if (row.description) {
-    option.description = row.description
-  }
   const wealth = wealthGrantMoneyFromForm(row.wealth)
   if (wealth) {
     option.wealth = wealth
@@ -124,7 +120,7 @@ export function startingEquipmentToFormValues(
   startingEquipment: StartingEquipmentChoice,
 ): StartingEquipmentForm {
   return {
-    choose: startingEquipment.choose,
+    choose: 1,
     options: startingEquipment.options.map(startingEquipmentOptionToFormRow),
   }
 }
@@ -143,7 +139,7 @@ export function startingEquipmentFromFormValues(
   if (!options.length) return undefined
 
   return {
-    choose: row.choose ?? existing?.choose ?? 1,
+    choose: 1,
     options,
   }
 }
@@ -153,15 +149,14 @@ export function startingEquipmentDefaultValues(ctx: ContentFormCtx): StartingEqu
     ...(buildItemDefaultValues(
       startingEquipmentOptionItemFields(ctx),
     ) as StartingEquipmentOptionForm),
-    id: 'standard',
+    id: 'standard-equipment',
     label: 'Standard Equipment',
     items: [],
   }
 
   const goldOption: StartingEquipmentOptionForm = {
-    id: 'gold',
+    id: 'starting-gold',
     label: 'Starting Gold',
-    description: '',
     items: [],
   }
 

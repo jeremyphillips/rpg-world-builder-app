@@ -1,7 +1,7 @@
 import { vocabEnumFromEntries, keysFromEntries } from '../enum-schema'
 import type { VocabularyOptionSetId } from '../vocabulary'
 import { getTermSentenceForm } from '../types'
-import type { GameTermEntry } from '../types'
+import type { GameTermEntry, VocabularyTerm } from '../types'
 
 // ---------------------------------------------------------------------------
 // Edition presets — rules-era bundles for campaign mechanics configuration.
@@ -11,6 +11,15 @@ import type { GameTermEntry } from '../types'
 export const EDITION_PRESET_SET_ID = 'edition-presets' as const satisfies VocabularyOptionSetId
 
 type EditionPresetEntry = GameTermEntry & { readonly meta: readonly string[] }
+
+export const EDITION_PRESET_TERM = {
+  label: 'Edition Preset',
+  description: 'A rules-era bundle for campaign mechanics configuration.',
+  sentence: {
+    singular: 'edition preset',
+    plural: 'edition presets',
+  },
+} as const satisfies VocabularyTerm
 
 export const EDITION_PRESET_ENTRIES = {
   becmi: {

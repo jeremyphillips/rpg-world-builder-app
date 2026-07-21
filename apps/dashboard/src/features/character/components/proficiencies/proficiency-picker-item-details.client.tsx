@@ -21,9 +21,5 @@ export function ProficiencyPickerItemDetails({
 
   const viewModel = buildSkillProficiencyDetailViewModel(skill)
 
-  return (
-    <div className="px-2 pt-3">
-      <SkillProficiencyDetailMetadata viewModel={viewModel} statRowSize="sm" />
-    </div>
-  )
+  return <SkillProficiencyDetailMetadata viewModel={viewModel} statRowSize="sm" />
 }

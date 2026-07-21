@@ -105,6 +105,9 @@ Do **not** combine `digits` with mixed-length enum labels — use full-width siz
 `labelPosition: 'settings'` on `number`, `select`, and `switch` — label + hint left,
 compact control right; stacks on narrow viewports.
 
+`labelPosition: 'inline'` on `select` — label left, compact control right on one
+centered row (toolbar / chrome). Use `info` for helper copy when horizontal space is tight.
+
 ```ts
 {
   type: 'number',

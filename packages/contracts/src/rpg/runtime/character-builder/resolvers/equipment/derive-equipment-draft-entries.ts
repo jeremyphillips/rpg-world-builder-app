@@ -13,8 +13,20 @@ import {
   resolveStartingEquipmentOption,
   type ResolvedStartingEquipmentItem,
 } from '../../assembly/assemble-starting-equipment'
-import type { StartingEquipmentOption } from '../../../../content/starting-equipment'
+import {
+  isStartingGoldOption,
+  type StartingEquipmentOption,
+} from '../../../../content/starting-equipment'
 import { readSelectedStartingEquipmentOptionId } from './resolve-starting-equipment-choice-sets'
+import { readMagicItemSelections } from './resolve-magic-item-grant-progress'
+import { resolveMagicItemGrantAllowances } from './resolve-magic-item-grant-allowances'
+import {
+  resolveStartingWealthTierForBuilder,
+  standardStartingWealthTableId,
+  type StartingWealthRules,
+} from '../../../../campaign/rules/starting-wealth'
+import { getBuilderSelectedStartingLevel } from '../../builder-level'
+import type { SystemRulesetId } from '../../../../primitives/ruleset'
 
 type EquipmentDraftContext = {
   classId: string
@@ -49,7 +61,7 @@ function appendPackageItemsFromDraft(
   catalogIndex: CharacterBuildCatalogIndex,
   inventory: CharacterEquipment,
 ): CharacterEquipment {
-  if (!shouldIncludePackageItems(draft)) return inventory
+  if (!shouldIncludePackageItems(context.option)) return inventory
 
   const { classId, characterClass, option, selectedOptionId } = context
   const removedKeys = new Set(draft.equipment?.removedPackageItemKeys ?? [])
@@ -81,6 +93,53 @@ function appendPurchasesFromDraft(
       equipment,
       purchaseSources(purchase, classId, selectedOptionId),
     )
+  }
+
+  return result
+}
+
+function appendMagicItemGrantsFromDraft(
+  draft: CharacterBuilderDraft,
+  catalogIndex: CharacterBuildCatalogIndex,
+  startingWealth: StartingWealthRules | undefined,
+  rulesetId: string,
+  inventory: CharacterEquipment,
+): CharacterEquipment {
+  const selections = readMagicItemSelections(draft)
+  if (selections.length === 0) return inventory
+
+  const startingLevel = getBuilderSelectedStartingLevel(draft)
+  const tier = startingWealth
+    ? resolveStartingWealthTierForBuilder(startingWealth, startingLevel)
+    : undefined
+  if (!tier) return inventory
+
+  const startingWealthTableId = standardStartingWealthTableId(rulesetId as SystemRulesetId)
+  const allowances = resolveMagicItemGrantAllowances({ startingWealthTableId, tier })
+  const allowanceById = new Map(allowances.map((entry) => [entry.id, entry]))
+
+  let result = inventory
+
+  for (const selection of selections) {
+    const allowance = allowanceById.get(selection.allowanceId)
+    if (!allowance) continue
+
+    const equipment = catalogIndex.equipment.get(selection.equipmentId)
+    if (!equipment) continue
+
+    const sources: CharacterSelectionSource[] = [
+      {
+        kind: 'startingWealthTier',
+        sourceId: allowance.source.sourceId,
+        grantId: selection.allowanceId,
+      },
+    ]
+
+    result = appendEquipmentEntry(result, equipment, {
+      equipmentId: selection.equipmentId,
+      quantity: selection.quantity,
+      sources,
+    })
   }
 
   return result
@@ -176,17 +235,18 @@ function appendPurchase(
   })
 }
 
-function shouldIncludePackageItems(draft: CharacterBuilderDraft): boolean {
-  return draft.equipment?.mode !== 'gold'
+function shouldIncludePackageItems(option: StartingEquipmentOption): boolean {
+  return !isStartingGoldOption(option)
 }
 
 /**
- * Composes package items (minus removals) and draft purchases into inventory
- * rows with selection sources.
+ * Composes package items (minus removals), magic-item grant selections, and draft
+ * purchases into inventory rows with selection sources.
  */
 export function deriveEquipmentDraftEntries(
   draft: CharacterBuilderDraft,
   catalogIndex: CharacterBuildCatalogIndex,
+  options?: { startingWealth?: StartingWealthRules; rulesetId?: SystemRulesetId },
 ): CharacterEquipment {
   const context = resolveEquipmentDraftContext(draft, catalogIndex)
   if (!context) return EMPTY_CHARACTER_EQUIPMENT
@@ -197,5 +257,20 @@ export function deriveEquipmentDraftEntries(
     catalogIndex,
     EMPTY_CHARACTER_EQUIPMENT,
   )
-  return appendPurchasesFromDraft(draft, context, catalogIndex, withPackage)
+
+  const characterClass = catalogIndex.classes.get(context.classId)
+  const rulesetId = options?.rulesetId ?? characterClass?.rulesetId
+
+  const withGrants =
+    rulesetId !== undefined
+      ? appendMagicItemGrantsFromDraft(
+          draft,
+          catalogIndex,
+          options?.startingWealth,
+          rulesetId,
+          withPackage,
+        )
+      : withPackage
+
+  return appendPurchasesFromDraft(draft, context, catalogIndex, withGrants)
 }

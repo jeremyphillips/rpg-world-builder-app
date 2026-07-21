@@ -17,6 +17,10 @@ const meta = {
       control: 'select',
       options: ['default', 'sm', 'lg', 'icon'],
     },
+    density: {
+      control: 'select',
+      options: ['default', 'compact'],
+    },
   },
 } satisfies Meta<typeof Button>
 
@@ -51,6 +55,10 @@ export const Text: Story = {
 
 export const Small: Story = {
   args: { size: 'sm' },
+}
+
+export const SmallCompact: Story = {
+  args: { size: 'sm', density: 'compact' },
 }
 
 export const Large: Story = {

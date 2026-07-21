@@ -6,9 +6,17 @@ import {
   type CollapsibleListItemLeadingChromeOptions,
 } from './collapsible-list-item-leading-chrome.lib'
 
+export type CollapsibleListItemShellPreset = 'default' | 'catalog'
+
 export {
   collapsibleListItemChromeColumnClasses,
   resolveCollapsibleListItemLeadingChrome,
+  buildCollapsibleListItemLeadingChromeStyle,
+  collapsibleListItemContentColumnIndentClasses,
+  collapsibleListItemContentInlineStartClasses,
+  LEADING_CHROME_COUNT_VAR,
+  CONTENT_COLUMN_INDENT_VAR,
+  CONTENT_INLINE_START_VAR,
   type CollapsibleListItemLeadingChromeOptions,
   type ResolvedCollapsibleListItemLeadingChrome,
 } from './collapsible-list-item-leading-chrome.lib'
@@ -32,6 +40,19 @@ export const collapsibleListItemShellPaddingClasses = cn('pl-2 pr-3 pb-3 pt-0')
 export const collapsibleListItemChromeButtonClasses =
   'flex size-6 shrink-0 items-center justify-center rounded-sm p-0 text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring'
 
+/** Catalog row shell — drop default bottom pad; expanded body owns vertical rhythm. */
+export const collapsibleListItemCatalogShellExtraClasses = 'pb-0'
+
+/** Catalog row chrome — picker/sheet row surface tone. */
+export const collapsibleListItemCatalogChromeClasses = 'border-border bg-catalog-picker-row-surface'
+
+/**
+ * Expanded catalog panel wash — bleeds to shell edges; inner details restore copy
+ * alignment with the header.
+ */
+export const collapsibleListItemCatalogBodyClasses =
+  'border-t border-border-subtle bg-surface-muted -ml-2 -mr-3 pb-3 pt-0'
+
 /** Item shell — border and shell padding; actions rail sits inside padded box on row 1. */
 export const collapsibleListItemShellVariants = cva(cn('relative rounded-md border'), {
   variants: {
@@ -43,11 +64,26 @@ export const collapsibleListItemShellVariants = cva(cn('relative rounded-md bord
       headerActions: cn('flex flex-col', collapsibleListItemShellPaddingClasses),
       compactRow: cn(collapsibleListItemShellPaddingClasses, 'pt-[calc(var(--spacing)*2)]'),
     },
+    preset: {
+      default: 'border-border',
+      catalog: cn(
+        collapsibleListItemCatalogChromeClasses,
+        collapsibleListItemCatalogShellExtraClasses,
+      ),
+    },
   },
   defaultVariants: {
     layout: 'default',
+    preset: 'default',
   },
 })
+
+/** Preset-aware shell classes — use when composing rows outside the shell component. */
+export function collapsibleListItemShellPresetClasses(
+  preset: CollapsibleListItemShellPreset = 'default',
+): string {
+  return collapsibleListItemShellVariants({ preset })
+}
 
 /** Default shell classes — backward-compatible alias for tests and non-context usage. */
 export const collapsibleListItemShellClasses = cn(
@@ -61,7 +97,7 @@ export const collapsibleListItemMainClasses = 'min-w-0 pt-[calc(var(--spacing)*2
 /** Toolbar + actions on one row when actions center on the title row only. */
 export const collapsibleListItemHeaderRowClasses = cn(
   'flex w-full min-w-0 items-center gap-2',
-  'pt-[calc(var(--spacing)*2)]',
+  'py-[calc(var(--spacing)*2)]',
 )
 
 /** Summary below the header row — left indent matches body/content column. */
@@ -116,11 +152,52 @@ export function collapsibleListItemToolbarContentClasses(
   return cn('min-w-0', resolveCollapsibleListItemLeadingChrome(options).toolbarContentGapClasses)
 }
 
+export type CollapsibleListItemBodyClassOptions =
+  Partial<CollapsibleListItemLeadingChromeOptions> & {
+    preset?: CollapsibleListItemShellPreset
+  }
+
 /** Aligns detailed item bodies with the toolbar content column. */
 export function collapsibleListItemBodyClasses(
-  options: CollapsibleListItemLeadingChromeOptions,
+  options: CollapsibleListItemBodyClassOptions = {},
 ): string {
-  return cn(resolveCollapsibleListItemLeadingChrome(options).contentColumnIndentClasses, 'pt-3')
+  const leadingChrome: CollapsibleListItemLeadingChromeOptions = {
+    showDragHandle: options.showDragHandle ?? false,
+    collapsible: options.collapsible ?? false,
+  }
+  const resolved = resolveCollapsibleListItemLeadingChrome(leadingChrome)
+
+  if (options.preset === 'catalog') {
+    return cn(
+      collapsibleListItemCatalogBodyClasses,
+      resolved.contentInlineStartClasses,
+      'pt-3 pr-3',
+    )
+  }
+
+  return cn(resolved.contentColumnIndentClasses, 'pt-3')
+}
+
+/**
+ * Stable semantic identity normalized for disclosure DOM ids.
+ * Distinct from, but should normally match, the React list key.
+ */
+export function normalizeCollapsibleListItemDomId(itemId: string): string {
+  return itemId.replace(/[^a-zA-Z0-9_-]/g, '-')
+}
+
+export function resolveCollapsibleListItemDomIds(itemId: string): {
+  itemId: string
+  titleId: string
+  bodyId: string
+} {
+  const normalizedItemId = normalizeCollapsibleListItemDomId(itemId)
+
+  return {
+    itemId: normalizedItemId,
+    titleId: `${normalizedItemId}-title`,
+    bodyId: `${normalizedItemId}-body`,
+  }
 }
 
 /** Applied to the item wrapper while it is being dragged. */

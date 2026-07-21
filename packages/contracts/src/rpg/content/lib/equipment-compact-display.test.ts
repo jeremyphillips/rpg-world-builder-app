@@ -76,7 +76,7 @@ const bracersOfDefense = {
   updatedAt: '2026-01-01T00:00:00.000Z',
   name: 'Bracers of Defense',
   description: '',
-  cost: { amount: 0, currency: 'gp' },
+  cost: null,
   kind: 'magic_item',
   rarity: 'rare',
   requiresAttunement: true,

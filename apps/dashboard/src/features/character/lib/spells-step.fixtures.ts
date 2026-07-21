@@ -145,8 +145,13 @@ export function createSpellsStepContextFixture(
   const rulesetId = overrides.rulesetId ?? RULESET
 
   return {
+    channel: 'build',
+    surface: 'dashboard',
+    characterKind: 'pc',
     mode: 'dashboard',
     scope: { type: 'standalone', rulesetId },
+    rulesScope: { type: 'ruleset', rulesetId },
+    ownershipTarget: { type: 'user' },
     rulesetId,
     catalog: {
       species: [spellsStepDwarfSpecies],

@@ -10,9 +10,10 @@ import {
   equipmentPickerDefaultPathItemsFixture,
   equipmentPickerItemsFixture,
   equipmentPickerLowRemainingBudgetFixture,
+  equipmentPickerMagicItemProgressFixture,
+  equipmentPickerMagicItemsFixture,
   equipmentPickerRopeFixture,
 } from './equipment-picker-drawer.fixtures'
-import { EQUIPMENT_PICKER_PURCHASE_ADD_ANOTHER_LABEL } from './equipment-picker-purchase.lib'
 
 const meta = {
   title: 'Character Builder/EquipmentPickerDrawer',
@@ -53,7 +54,6 @@ export const DefaultPathAffordableNow: Story = {
     items: equipmentPickerDefaultPathItemsFixture,
     budget: equipmentPickerLowRemainingBudgetFixture,
     filterOutUnaffordable: true,
-    defaultTab: 'all',
     onAddItem: () => undefined,
   },
 }
@@ -65,7 +65,6 @@ export const LowRemainingBudget: Story = {
     items: equipmentPickerDefaultPathItemsFixture,
     budget: equipmentPickerLowRemainingBudgetFixture,
     filterOutUnaffordable: false,
-    defaultTab: 'all',
     onAddItem: () => undefined,
   },
 }
@@ -119,7 +118,6 @@ export const ClearFilters: Story = {
     items: equipmentPickerItemsFixture,
     budget: equipmentPickerBudgetFixture,
     filterOutUnaffordable: false,
-    defaultTab: 'all',
     toolbarResetMode: 'clear_filters',
     onAddItem: () => undefined,
   },
@@ -132,7 +130,6 @@ export const SortByPrice: Story = {
     items: equipmentPickerDefaultPathItemsFixture,
     budget: equipmentPickerLowRemainingBudgetFixture,
     filterOutUnaffordable: false,
-    defaultTab: 'all',
     onAddItem: () => undefined,
   },
 }
@@ -144,14 +141,27 @@ export const OwnedStackable: Story = {
     items: [equipmentPickerItemsFixture[2]!],
     budget: equipmentPickerBudgetFixture,
     ownedPurchaseQuantities: { [equipmentPickerRopeFixture.id]: 2 },
-    defaultTab: 'all',
     onAddItem: () => undefined,
   },
   parameters: {
     docs: {
       description: {
-        story: `Owned stackables show ${EQUIPMENT_PICKER_PURCHASE_ADD_ANOTHER_LABEL} in the header rail.`,
+        story: 'Owned stackables show an owned-count badge and Add in the header row.',
       },
     },
+  },
+}
+
+export const MagicItemsWorkflow: Story = {
+  args: {
+    open: true,
+    onOpenChange: () => undefined,
+    items: equipmentPickerMagicItemsFixture,
+    workflowMode: 'magic_items',
+    workflowModes: ['purchase', 'magic_items'],
+    magicItemGrantProgress: equipmentPickerMagicItemProgressFixture,
+    onWorkflowModeChange: () => undefined,
+    onFocusedAllowanceIdChange: () => undefined,
+    onAddItem: () => undefined,
   },
 }

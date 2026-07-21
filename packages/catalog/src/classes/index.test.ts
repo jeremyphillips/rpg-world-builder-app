@@ -17,6 +17,7 @@ import {
   buildChoiceSetId,
   createEmptyCharacterBuilderDraft,
   indexCharacterBuildCatalog,
+  isStartingGoldOption,
   startingEquipmentChoiceSetId,
   startingEquipmentGrantProficiencyChoiceId,
   type CharacterClass,
@@ -817,13 +818,13 @@ describe('SRD 5.2.1 class seed', () => {
     const startingEquipment = fighter.characterCreation?.startingEquipment
     expect(startingEquipment).toBeDefined()
     expect(startingEquipment!.options.map((option) => option.id)).toEqual([
-      'heavy',
+      'heavy-armor',
       'skirmisher',
-      'gold',
+      'starting-gold',
     ])
   })
 
-  it('gold alternatives match SRD starting wealth amounts', () => {
+  it('wealth-only starting-gold alternatives match SRD starting wealth amounts', () => {
     const expectedGoldGp: Record<string, number> = {
       barbarian: 75,
       bard: 90,
@@ -841,8 +842,8 @@ describe('SRD 5.2.1 class seed', () => {
 
     for (const cls of classes) {
       const startingEquipment = cls.characterCreation?.startingEquipment
-      const goldOption = startingEquipment?.options.find((option) => option.id === 'gold')
-      expect(goldOption, `${cls.slug} missing gold starting equipment option`).toBeDefined()
+      const goldOption = startingEquipment?.options.find(isStartingGoldOption)
+      expect(goldOption, `${cls.slug} missing wealth-only starting equipment option`).toBeDefined()
       expect(goldOption!.wealth).toEqual({ gp: expectedGoldGp[cls.slug] })
     }
   })
@@ -852,9 +853,8 @@ describe('SRD 5.2.1 class seed', () => {
     const startingEquipment = monk.characterCreation?.startingEquipment
     expect(startingEquipment).toBeDefined()
 
-    const standard = startingEquipment!.options.find((option) => option.id === 'standard')
-    expect(standard?.description).toContain('Artisan')
-    expect(standard?.description).not.toContain('FOLLOWUP')
+    const standard = startingEquipment!.options.find((option) => option.id === 'standard-equipment')
+    expect(standard?.items.length).toBeGreaterThan(0)
 
     const linkedGrant = standard?.items.find(
       (item) =>
@@ -888,7 +888,7 @@ describe('SRD 5.2.1 class seed', () => {
       ...createEmptyCharacterBuilderDraft(),
       class: { classId: monk.id, level: 1 as const },
       choiceSelections: {
-        [startingEquipmentChoiceSetId(monk.id)]: ['standard'],
+        [startingEquipmentChoiceSetId(monk.id)]: ['standard-equipment'],
         [monkToolChoiceSetId]: [lute!.id],
       },
     }

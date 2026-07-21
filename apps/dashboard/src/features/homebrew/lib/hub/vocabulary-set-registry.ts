@@ -1,4 +1,7 @@
 import type { VocabularyOptionSetId } from '@rpg/contracts'
+import { getVocabularyOptionSetTerm, VOCABULARY_OPTION_SET_IDS } from '@rpg/contracts'
+
+import { vocabularyHubLabel } from '../vocabulary/term-labels'
 
 export type HomebrewVocabularySetEntry = {
   setId: VocabularyOptionSetId
@@ -7,20 +10,15 @@ export type HomebrewVocabularySetEntry = {
   enabled: boolean
 }
 
+const ENABLED_SETS = new Set<VocabularyOptionSetId>(['creature-types'])
+
 /** Rules vocabulary sets surfaced on the Homebrew hub — expand as managers ship. */
-export const HOMEBREW_VOCABULARY_SETS: readonly HomebrewVocabularySetEntry[] = [
-  { setId: 'creature-types', label: 'Creature Types', enabled: true },
-  { setId: 'damage-types', label: 'Damage Types', enabled: false },
-  { setId: 'conditions', label: 'Conditions', enabled: false },
-  { setId: 'languages', label: 'Languages', enabled: false },
-  { setId: 'senses', label: 'Senses', enabled: false },
-  { setId: 'sizes', label: 'Sizes', enabled: false },
-  { setId: 'spell-schools', label: 'Spell Schools', enabled: false },
-  { setId: 'weapon-properties', label: 'Weapon Properties', enabled: false },
-  { setId: 'equipment-categories', label: 'Equipment Categories', enabled: false },
-  { setId: 'edition-presets', label: 'Edition Presets', enabled: false },
-  { setId: 'attack-resolution-modes', label: 'Attack Resolution Modes', enabled: false },
-]
+export const HOMEBREW_VOCABULARY_SETS: readonly HomebrewVocabularySetEntry[] =
+  VOCABULARY_OPTION_SET_IDS.map((setId) => ({
+    setId,
+    label: vocabularyHubLabel(getVocabularyOptionSetTerm(setId)),
+    enabled: ENABLED_SETS.has(setId),
+  }))
 
 export function findVocabularySetEntry(setId: string): HomebrewVocabularySetEntry | undefined {
   return HOMEBREW_VOCABULARY_SETS.find((entry) => entry.setId === setId)

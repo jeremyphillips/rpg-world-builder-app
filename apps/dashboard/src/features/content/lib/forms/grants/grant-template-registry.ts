@@ -1,6 +1,8 @@
 import {
   ARMOR_CATEGORY_ENTRIES,
   FEAT_CATEGORY_ENTRIES,
+  getProficiencyDomainCompactLabel,
+  getProficiencyDomainLabel,
   MOVEMENT_MODE_ENTRIES,
   MOVEMENT_MODES,
   MOVEMENT_OPERATION_ENTRIES,
@@ -115,7 +117,7 @@ export const GRANT_TEMPLATES: readonly GrantTemplate[] = [
   {
     id: 'skill-proficiency',
     label: GRANT_TYPE_LABELS.skillProficiency,
-    description: 'Grant proficiency with specific skills or a player choice from a pool.',
+    description: `Grant ${getProficiencyDomainLabel('skill').toLowerCase()} with specific ${getProficiencyDomainCompactLabel('skill').toLowerCase()} or a player choice from a pool.`,
     groupId: 'proficiencies',
     grantType: 'skillProficiency',
     createDefault: () => ({ grantType: 'skillProficiency', proficiencySource: 'specific' }),

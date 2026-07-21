@@ -6,6 +6,8 @@ import {
 } from '@rpg/contracts'
 import { toOptions } from '@rpg/ui/form'
 
+import { getContentTypeMidSentenceLabel } from '@/features/content/lib/content-type-labels'
+
 export const SPECIES_MULTICLASS_POLICY_LABELS = {
   inherit: 'Inherit campaign default',
   allowed: 'Allowed',
@@ -22,10 +24,10 @@ export const SPECIES_CLASS_POLICY_MODE_LABELS = {
 export const SPECIES_CLASS_POLICY_ALLOWED_CLASSES_LABEL = 'Allowed classes'
 export const SPECIES_CLASS_POLICY_FORBIDDEN_CLASSES_LABEL = 'Forbidden classes'
 
-export const SPECIES_CLASS_POLICY_ALLOWED_CLASSES_HINT =
-  'Characters of this species may multiclass only into these classes.'
-export const SPECIES_CLASS_POLICY_FORBIDDEN_CLASSES_HINT =
-  'Characters of this species may multiclass into any class except these.'
+const speciesMidSentence = getContentTypeMidSentenceLabel('species')
+
+export const SPECIES_CLASS_POLICY_ALLOWED_CLASSES_HINT = `Characters of this ${speciesMidSentence} may multiclass only into these classes.`
+export const SPECIES_CLASS_POLICY_FORBIDDEN_CLASSES_HINT = `Characters of this ${speciesMidSentence} may multiclass into any class except these.`
 
 export const speciesMulticlassPolicyOptions = toOptions(
   SPECIES_MULTICLASS_POLICIES,

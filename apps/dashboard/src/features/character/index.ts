@@ -1,5 +1,6 @@
 export {
   createCharacter,
+  deleteCharacter,
   getCharacter,
   listCharacters,
   type CreateCharacterInput,
@@ -13,6 +14,14 @@ export {
 } from './api/ruleset-content-client'
 export { CharacterBuilderDraftRestore } from './components/character-builder-draft-restore.client'
 export { useBuildContext, type BuildContextResult } from './hooks/use-build-context'
+export {
+  useCampaignBuildContext,
+  type CampaignBuildContextResult,
+} from './hooks/use-campaign-build-context'
+export {
+  campaignBuildContextQueryKey,
+  fetchCampaignBuilderCatalog,
+} from './api/campaign-content-client'
 export { characterQueryKey, useCharacter } from './hooks/use-character'
 export {
   useCharacterBuilderStorageKey,
@@ -20,6 +29,7 @@ export {
 } from './hooks/use-character-builder-store'
 export { charactersQueryKey, useCharacters } from './hooks/use-characters'
 export { useCreateCharacter } from './hooks/use-create-character'
+export { useDeleteCharacter } from './hooks/use-delete-character'
 export { isNonEmptyCharacterBuilderDraft } from './lib/is-non-empty-character-builder-draft'
 export {
   createCharacterBuilderStore,

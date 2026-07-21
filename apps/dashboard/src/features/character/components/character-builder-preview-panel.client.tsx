@@ -6,7 +6,7 @@ import {
   type CharacterBuildCatalogIndex,
   type CharacterBuilderDraft,
   type CharacterBuildPreview,
-  type StandaloneBuildContext,
+  type CharacterBuildContext,
 } from '@rpg/contracts'
 import { Eyebrow, InsetPanel, Text } from '@rpg/ui'
 
@@ -34,7 +34,7 @@ export type { CharacterBuilderPreviewSectionId }
 
 export type CharacterBuilderPreviewPanelProps = {
   draft: CharacterBuilderDraft
-  context: StandaloneBuildContext
+  context: CharacterBuildContext
   catalogIndex: CharacterBuildCatalogIndex
   preview: CharacterBuildPreview | null
 }

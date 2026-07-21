@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { formatMoney, getEquipmentKindLabel } from '@rpg/contracts'
+import { formatEquipmentCostLabel, getEquipmentKindLabel } from '@rpg/contracts'
 
 import { pickEquipment } from '../../lib/fixtures/pick'
 import { getEquipmentKindStatRows } from './shared/equipment-detail-stat-rows'
@@ -22,11 +22,21 @@ const KIND_FIXTURES = [
   { slug: 'bracers-of-defense', kind: 'magic_item' as const },
 ] as const
 
+function expectedCostLabel(slug: string) {
+  const equipment = pickEquipment(slug)
+  return formatEquipmentCostLabel(equipment.cost) ?? 'No market price'
+}
+
+function expectedPickerPriceLabel(slug: string) {
+  const equipment = pickEquipment(slug)
+  return formatEquipmentCostLabel(equipment.cost) ?? ''
+}
+
 function expectedDetailStatRows(slug: string) {
   const equipment = pickEquipment(slug)
   return [
     { label: EQUIPMENT_STAT_LABELS.kind, value: getEquipmentKindLabel(equipment.kind) },
-    { label: EQUIPMENT_STAT_LABELS.cost, value: formatMoney(equipment.cost) },
+    { label: EQUIPMENT_STAT_LABELS.cost, value: expectedCostLabel(slug) },
     ...getEquipmentKindStatRows(equipment),
   ].filter((row) => row.label !== EQUIPMENT_STAT_LABELS.gearKind)
 }
@@ -40,7 +50,7 @@ describe('equipment-display', () => {
       const viewModel = buildEquipmentPickerRowViewModel(equipment)
 
       expect(viewModel.name).toBe(equipment.name)
-      expect(viewModel.priceLabel).toBe(formatMoney(equipment.cost))
+      expect(viewModel.priceLabel).toBe(expectedPickerPriceLabel(slug))
       expect(viewModel.kindLabel).toBe(getEquipmentKindLabel(kind))
       expect(viewModel.comparisonGroups.length).toBeLessThanOrEqual(3)
     })

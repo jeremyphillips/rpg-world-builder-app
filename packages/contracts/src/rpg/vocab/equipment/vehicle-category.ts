@@ -1,10 +1,19 @@
 import { keysFromEntries, vocabEnumFromEntries } from '../enum-schema'
 import { getTermSentenceForm } from '../types'
-import type { GameTermEntry } from '../types'
+import type { GameTermEntry, VocabularyTerm } from '../types'
 
 // ---------------------------------------------------------------------------
 // Vehicle categories — land, water, air, and exotic conveyances.
 // ---------------------------------------------------------------------------
+
+export const VEHICLE_CATEGORY_TERM = {
+  label: 'Vehicle Category',
+  description: 'Land, water, air, or exotic conveyance classification.',
+  sentence: {
+    singular: 'vehicle category',
+    plural: 'vehicle categories',
+  },
+} as const satisfies VocabularyTerm
 
 export const VEHICLE_CATEGORY_ENTRIES = {
   land: {

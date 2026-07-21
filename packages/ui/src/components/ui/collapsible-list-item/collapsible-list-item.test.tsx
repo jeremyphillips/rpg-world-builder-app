@@ -100,12 +100,8 @@ describe('CollapsibleListItem', () => {
     expect(shell).not.toHaveClass('grid-cols-[minmax(0,1fr)_auto]')
     expect(headerRow).toHaveClass('flex', 'items-center')
     expect(headerRow.contains(addButton)).toBe(true)
-    expect(summary).toHaveClass(
-      'pl-[calc(var(--array-item-chrome-count)*var(--spacing)*6+min(1,var(--array-item-chrome-count))*var(--spacing))]',
-    )
-    expect(body).toHaveClass(
-      'pl-[calc(var(--array-item-chrome-count)*var(--spacing)*6+min(1,var(--array-item-chrome-count))*var(--spacing))]',
-    )
+    expect(summary).toHaveClass('pl-[var(--content-column-indent)]')
+    expect(body).toHaveClass('pl-[var(--content-column-indent)]')
     expect(screen.getByRole('group', { name: 'Item actions' })).toBeInTheDocument()
   })
 
@@ -141,7 +137,24 @@ describe('CollapsibleListItem', () => {
     )
 
     const shell = container.firstChild
-    expect(shell).toHaveClass('border-border', 'bg-catalog-picker-row-surface')
+    expect(shell).toHaveClass('border-border', 'bg-catalog-picker-row-surface', 'pb-0')
+  })
+
+  it('applies catalog body wash classes when preset is catalog', () => {
+    render(
+      <CollapsibleListItem
+        itemId="catalog-body"
+        toolbarAriaLabel="Catalog body"
+        preset="catalog"
+        collapsible
+        header={<span>Catalog header</span>}
+        body={<p>Catalog details</p>}
+      />,
+    )
+
+    const body = screen.getByText('Catalog details').parentElement
+    expect(body).toHaveClass('border-t', 'bg-surface-muted')
+    expect(body).toHaveClass('pl-[var(--content-inline-start)]')
   })
 
   it('has no axe accessibility violations', async () => {

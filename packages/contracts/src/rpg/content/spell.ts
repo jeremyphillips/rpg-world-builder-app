@@ -7,4 +7,4 @@ export {
   getSpellAtomicEffectKindLabel,
   SPELL_ATOMIC_EFFECT_KIND_ENTRIES,
 } from '../vocab/spell/atomic-effect-kind'
-export { HIT_POINTS_TERM } from '../primitives/mechanics/hit-points-term'
+export { HIT_POINTS_TERM } from '../vocab/mechanics/hit-points'

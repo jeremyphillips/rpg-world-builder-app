@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 import {
   buildCharacterPreview,
   createEmptyCharacterBuilderDraft,
+  formatProficiencyChoiceEmptyMessage,
   indexCharacterBuildCatalog,
   resolveAvailableChoices,
 } from '@rpg/contracts'
@@ -13,7 +14,6 @@ import {
   formatPreviewLanguagesSubsection,
   formatPreviewSavingThrowsSubsection,
   formatPreviewSkillsSubsection,
-  PREVIEW_NO_SKILLS_HINT,
   PREVIEW_PENDING_ABILITY_LABEL,
   PREVIEW_SAVING_THROWS_NO_CLASS_HINT,
 } from './format-preview-proficiency-subsection.lib'
@@ -134,6 +134,6 @@ describe('formatPreviewProficiencySubsection', () => {
         preview,
         countProficiencyChoicesRemaining(resolvedChoiceSets, draft, 'skillProficiency'),
       ).emptyHint,
-    ).toBe(PREVIEW_NO_SKILLS_HINT)
+    ).toBe(formatProficiencyChoiceEmptyMessage('skillProficiency'))
   })
 })

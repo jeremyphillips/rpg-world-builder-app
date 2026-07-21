@@ -5,8 +5,13 @@ import * as React from 'react'
 import { InsetPanel } from './inset-panel.client'
 import { Sheet } from './sheet.client'
 import { Spinner } from './spinner'
+import { CatalogToolbar } from './catalog-toolbar.client'
 import { CatalogPickerSheetResults } from './catalog-picker-sheet-rows.client'
-import { CatalogPickerSheetToolbar } from './catalog-picker-sheet-toolbar.client'
+import {
+  resolveCatalogPickerSheetFilterRow,
+  resolveCatalogPickerSheetRenderedActions,
+  resolveCatalogPickerSheetToolbarTabs,
+} from './catalog-picker-sheet-toolbar.lib'
 import { useCatalogPickerSheetState } from './catalog-picker-sheet.use.client'
 import type { CatalogPickerSheetProps } from './catalog-picker-sheet.types'
 import {
@@ -17,9 +22,15 @@ import {
 
 export type {
   CatalogPickerSheetProps,
-  CatalogPickerSheetToolbarContext,
+  CatalogPickerSheetActionsHelpers,
   CatalogPickerTab,
 } from './catalog-picker-sheet.types'
+export type {
+  CatalogToolbarProps,
+  CatalogToolbarSearch,
+  CatalogToolbarTab,
+  CatalogToolbarTabs,
+} from './catalog-toolbar.types'
 
 const DEFAULT_SEARCH_PLACEHOLDER = 'Search catalog'
 const DEFAULT_NO_RESULTS_MESSAGE = 'No items match your search.'
@@ -91,9 +102,11 @@ export function CatalogPickerSheet<TItem>({
   recommendationsEnabled = false,
   recommendationTabsPosition = 'before-search',
   headerBelowDescription,
-  postSearchContent,
-  toolbarControls,
-  tabToolbarActions,
+  primaryControls,
+  filterRow,
+  actions,
+  initialSearchQuery,
+  toolbarStateKey,
   transformVisibleItems,
   hasStructuredFilters = false,
   headerExtra,
@@ -130,6 +143,8 @@ export function CatalogPickerSheet<TItem>({
     defaultTabId,
     hasStructuredFilters,
     transformVisibleItems,
+    initialSearchQuery,
+    toolbarStateKey,
   })
 
   const emptyMessage = resolveEmptyMessage({
@@ -163,6 +178,28 @@ export function CatalogPickerSheet<TItem>({
     <CatalogPickerSheetResults items={visibleItems} getItemKey={getItemKey} rowProps={rowProps} />
   )
 
+  const actionHelpers = React.useMemo(
+    () => ({
+      searchQuery,
+      activeTabId,
+      resetSearchQuery: () => setSearchQuery(''),
+      resetActiveTab,
+    }),
+    [activeTabId, resetActiveTab, searchQuery, setSearchQuery],
+  )
+
+  const renderedActions = resolveCatalogPickerSheetRenderedActions(actions, actionHelpers)
+  const renderedFilterRow = resolveCatalogPickerSheetFilterRow(filterRow, actionHelpers)
+  const toolbarTabs = resolveCatalogPickerSheetToolbarTabs({
+    title,
+    tabs,
+    recommendationsEnabled,
+    recommendationTabsPosition,
+    activeTabId,
+    onActiveTabIdChange: setActiveTabId,
+    tabCounts,
+  })
+
   return (
     <Sheet.Root open={open} onOpenChange={onOpenChange}>
       <Sheet.Content
@@ -178,21 +215,17 @@ export function CatalogPickerSheet<TItem>({
 
         {headerBelowDescription ? <div className="px-6 pb-4">{headerBelowDescription}</div> : null}
 
-        <CatalogPickerSheetToolbar
-          title={title}
-          searchQuery={searchQuery}
-          onSearchQueryChange={setSearchQuery}
-          searchPlaceholder={searchPlaceholder}
-          tabs={tabs}
-          recommendationsEnabled={recommendationsEnabled}
-          recommendationTabsPosition={recommendationTabsPosition}
-          activeTabId={activeTabId}
-          onActiveTabIdChange={setActiveTabId}
-          onResetActiveTab={resetActiveTab}
-          tabCounts={tabCounts}
-          postSearchContent={postSearchContent}
-          tabToolbarActions={tabToolbarActions}
-          toolbarControls={toolbarControls}
+        <CatalogToolbar
+          search={{
+            query: searchQuery,
+            onQueryChange: setSearchQuery,
+            placeholder: searchPlaceholder,
+            ariaLabel: searchPlaceholder,
+          }}
+          tabs={toolbarTabs}
+          primaryControls={primaryControls}
+          filterRow={renderedFilterRow}
+          actions={renderedActions}
         />
 
         <Sheet.Body className={catalogPickerSheetBodyVariants({ className: sheetBodyClassName })}>

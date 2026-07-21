@@ -3,38 +3,21 @@
 import * as React from 'react'
 
 import { getSpellSchoolLabel } from '@rpg/contracts'
-import {
-  CatalogPickerSheet,
-  FilterToolbar,
-  InsetPanel,
-  SegmentedControl,
-  Text,
-  type CatalogPickerSheetToolbarContext,
-} from '@rpg/ui'
+import { CatalogPickerSheet, InsetPanel, SegmentedControl, Text } from '@rpg/ui'
 
 import { hasCatalogPickerResetViewCriteria } from '../picker/catalog-picker-filter-state.lib'
-import {
-  catalogPickerFiltersMainClasses,
-  catalogPickerFiltersRowClasses,
-  catalogPickerSortActionsGroupClasses,
-} from '../picker/catalog-picker-filter-toolbar.variants'
 import { catalogPickerInlineSelectFilter } from '../picker/catalog-picker-select-filter.lib'
 import {
   createBrowseStateByMode,
   resolveModeBrowseState,
   updateModeBrowseState,
 } from '../picker/catalog-picker-browse-mode.lib'
-import { CatalogPickerItemHeader } from '../picker/catalog-picker-item-header.client'
-import { CatalogPickerItemMarkers } from '../picker/catalog-picker-item-markers.client'
-import { CatalogPickerLevelChips } from '../picker/catalog-picker-mechanics-filter-popover.client'
-import { CatalogPickerFilterPopover } from '../picker/catalog-picker-mechanics-filter-popover.client'
+import { SpellCatalogItemHeader } from '@/features/content'
 import { mapSpellPickerCompactSummaryToMetadataLines } from '../picker/catalog-picker-metadata'
 import { CatalogPickerSelectionActions } from '../picker/catalog-picker-selection-actions.client'
 import { catalogPickerShellProps } from '../picker/catalog-picker-shell.lib'
 import { CatalogPickerSelectionSummary } from '../picker/catalog-picker-selection-summary.client'
-import { CatalogPickerSortGroup } from '../picker/catalog-picker-sort-group.client'
-import { pickerSortOption } from '../picker/catalog-picker-sort-labels.lib'
-import { CatalogPickerToolbarResetSlot } from '../picker/catalog-picker-toolbar-reset-button.client'
+import { CatalogToolbarResetSlot } from '../picker/catalog-toolbar-reset-action.client'
 import {
   choiceSetForSpellPickerMode,
   countSpellPickerStructuredFilters,
@@ -42,14 +25,9 @@ import {
   filterAndSortSpellPickerItems,
   filterSpellPickerItems,
   formatSpellPickerDrawerTitle,
-  formatSpellPickerLevelChipLabel,
-  formatSpellPickerMechanicsTriggerLabel,
   formatSpellPickerSelectionCountText,
   formatSpellPickerSelectionMetadata,
-  getSpellPickerCastingTimeFilterLabel,
   getSpellPickerDisabledNote,
-  getSpellPickerMethodFilterLabel,
-  getSpellPickerTraitFilterLabel,
   itemsForSpellPickerMode,
   isSpellPickerRowDimmed,
   resolveActivePreparedLevelSuffix,
@@ -63,6 +41,7 @@ import {
   resolveSpellPickerSchoolFilterOptions,
   resolveSpellPickerTraitFilterOptions,
   resolveValidSpellPickerSortModes,
+  resolveSpellPickerLevelChipChange,
   sanitizeSpellPickerBrowseState,
   selectedIdsForSpellPickerMode,
   collectSpellPickerMarkers,
@@ -76,27 +55,22 @@ import {
   SPELL_PICKER_RESET_VIEW_LABEL,
   SPELL_PICKER_SCHOOL_ALL,
   SPELL_PICKER_SCHOOL_LABEL,
-  SPELL_PICKER_SORT_LABEL,
-  SPELL_PICKER_SORT_LABELS,
   type SpellPickerBrowseState,
   type SpellPickerDrawerProps,
   type SpellPickerMode,
 } from './spell-picker-drawer.types'
 import { SpellPickerItemDetails } from './spell-picker-item-details.client'
+import {
+  SpellPickerFilterControls,
+  SpellPickerLevelControls,
+  SpellPickerSortControl,
+} from './spell-picker-toolbar.client'
 
 export type { SpellPickerDrawerProps } from './spell-picker-drawer.types'
 
 function spellPickerLevelChipValues(selectedLevels: readonly number[]): string[] {
   if (selectedLevels.length === 0) return [SPELL_PICKER_LEVELS_ALL]
   return selectedLevels.map(String)
-}
-
-function spellPickerLevelChipSelection(
-  values: string[],
-  availableLevels: readonly number[],
-): number[] {
-  if (values.includes(SPELL_PICKER_LEVELS_ALL) || values.length === 0) return []
-  return values.map(Number).filter((level) => availableLevels.includes(level))
 }
 
 export function SpellPickerDrawer({
@@ -133,7 +107,8 @@ export function SpellPickerDrawer({
       recommendationsEnabled,
     ),
   )
-  const toolbarContextRef = React.useRef<CatalogPickerSheetToolbarContext | null>(null)
+  const [openSyncKey, setOpenSyncKey] = React.useState(0)
+  const sheetStateRef = React.useRef({ searchQuery: '', activeTabId: '' })
 
   React.useEffect(() => {
     if (!open) return
@@ -149,8 +124,7 @@ export function SpellPickerDrawer({
       recommendationsEnabled,
     )
     setBrowseState(sanitized)
-    toolbarContextRef.current?.setSearchQuery(sanitized.searchQuery)
-    toolbarContextRef.current?.setActiveTabId(sanitized.activeTabId)
+    setOpenSyncKey((current) => current + 1)
   }, [open, initialMode, modes, recommendationsEnabled])
 
   const activeChoiceSet = choiceSetForSpellPickerMode(mode, cantripChoiceSet, preparedChoiceSet)
@@ -256,13 +230,12 @@ export function SpellPickerDrawer({
   )
 
   const handleModeChange = (nextMode: SpellPickerMode) => {
-    const toolbarContext = toolbarContextRef.current
     const outgoingState = sanitizeSpellPickerBrowseState(
       mode,
       {
         ...browseState,
-        searchQuery: toolbarContext?.searchQuery ?? browseState.searchQuery,
-        activeTabId: toolbarContext?.activeTabId ?? browseState.activeTabId,
+        searchQuery: sheetStateRef.current.searchQuery,
+        activeTabId: sheetStateRef.current.activeTabId,
       },
       recommendationsEnabled,
     )
@@ -281,8 +254,6 @@ export function SpellPickerDrawer({
     )
     setMode(nextMode)
     setBrowseState(sanitized)
-    toolbarContext?.setSearchQuery(sanitized.searchQuery)
-    toolbarContext?.setActiveTabId(sanitized.activeTabId)
   }
 
   const segmentedOptions = modes.map((entry) => {
@@ -340,31 +311,26 @@ export function SpellPickerDrawer({
       noResultsMessage={SPELL_PICKER_NO_RESULTS_MESSAGE}
       noItemsMessage={SPELL_PICKER_NO_OPTIONS_MESSAGE}
       hasStructuredFilters={structuredFilterCount > 0}
+      initialSearchQuery={browseState.searchQuery}
+      toolbarStateKey={`${mode}-${openSyncKey}`}
+      defaultTabId={browseState.activeTabId}
       transformVisibleItems={transformVisibleItems}
-      postSearchContent={
-        showLevelChips ? (
-          <CatalogPickerLevelChips
-            id="spell-picker-levels"
-            options={[
-              { value: SPELL_PICKER_LEVELS_ALL, label: 'All' },
-              ...levelOptions.map((level) => ({
-                value: String(level),
-                label: formatSpellPickerLevelChipLabel(level),
-              })),
-            ]}
-            selectedValues={spellPickerLevelChipValues(browseState.selectedLevels)}
-            onSelectedValuesChange={(values) => {
-              if (values.includes(SPELL_PICKER_LEVELS_ALL)) {
-                persistBrowseState({ ...browseState, selectedLevels: [] })
-                return
-              }
-              persistBrowseState({
-                ...browseState,
-                selectedLevels: spellPickerLevelChipSelection(values, levelOptions),
-              })
-            }}
-          />
-        ) : undefined
+      primaryControls={
+        <SpellPickerLevelControls
+          showLevelChips={showLevelChips}
+          levelOptions={levelOptions}
+          selectedLevelValues={spellPickerLevelChipValues(browseState.selectedLevels)}
+          onSelectedLevelsChange={(values) => {
+            persistBrowseState({
+              ...browseState,
+              selectedLevels: resolveSpellPickerLevelChipChange(
+                browseState.selectedLevels,
+                values,
+                levelOptions,
+              ),
+            })
+          }}
+        />
       }
       emptyState={
         emptyStateMessage ? (
@@ -380,14 +346,15 @@ export function SpellPickerDrawer({
           </InsetPanel>
         ) : undefined
       }
-      tabToolbarActions={(toolbarContext) => {
-        toolbarContextRef.current = toolbarContext
+      actions={({ searchQuery, activeTabId, resetSearchQuery, resetActiveTab }) => {
+        sheetStateRef.current = { searchQuery, activeTabId }
+
         const showResetView = hasCatalogPickerResetViewCriteria({
           structuredFilterCount,
-          searchQuery: toolbarContext.searchQuery,
+          searchQuery,
           sortMode: browseState.sortMode,
           defaultSortMode: defaultBrowseState.sortMode,
-          activeTabId: toolbarContext.activeTabId,
+          activeTabId,
           defaultTabId: defaultBrowseState.activeTabId,
         })
 
@@ -398,144 +365,52 @@ export function SpellPickerDrawer({
             defaultBrowseState.activeTabId,
           )
           persistBrowseState(resetState)
-          toolbarContext.clearSearchQuery()
-          toolbarContext.resetActiveTab()
+          resetSearchQuery()
+          resetActiveTab()
         }
 
         return (
-          <CatalogPickerToolbarResetSlot
+          <CatalogToolbarResetSlot
             visible={showResetView}
             label={SPELL_PICKER_RESET_VIEW_LABEL}
             onClick={handleResetView}
           />
         )
       }}
-      toolbarControls={() => (
-        <div className={catalogPickerFiltersRowClasses}>
-          <div className={catalogPickerFiltersMainClasses}>
-            {showSchoolFilter ? (
-              <FilterToolbar
-                idPrefix="spell-picker-school"
-                fields={schoolFilterFields}
-                values={{ selectedSchool: browseState.selectedSchool }}
-                className="flex-row flex-nowrap items-center gap-0"
-                onValueChange={(_key, value) => {
-                  if (value !== undefined) {
-                    persistBrowseState({
-                      ...browseState,
-                      selectedSchool: value as typeof browseState.selectedSchool,
-                    })
-                  }
-                }}
-              />
-            ) : null}
-
-            {castingTimeOptions.length > 0 ||
-            traitOptions.length > 0 ||
-            methodOptions.length > 0 ? (
-              <CatalogPickerFilterPopover
-                triggerLabel={formatSpellPickerMechanicsTriggerLabel(
-                  browseState.mechanicsFilters.castingTimes.length +
-                    browseState.mechanicsFilters.traits.length +
-                    browseState.mechanicsFilters.methods.length,
-                )}
-                triggerAriaLabel="Casting and mechanics filters"
-                groups={[
-                  castingTimeOptions.length > 0
-                    ? {
-                        id: 'casting-time',
-                        label: 'Casting time',
-                        options: castingTimeOptions.map((filter) => ({
-                          value: filter,
-                          label: getSpellPickerCastingTimeFilterLabel(filter),
-                        })),
-                        selectedValues: browseState.mechanicsFilters.castingTimes,
-                        onSelectedValuesChange: (castingTimes: string[]) =>
-                          persistBrowseState({
-                            ...browseState,
-                            mechanicsFilters: {
-                              ...browseState.mechanicsFilters,
-                              castingTimes:
-                                castingTimes as typeof browseState.mechanicsFilters.castingTimes,
-                            },
-                          }),
-                      }
-                    : null,
-                  traitOptions.length > 0
-                    ? {
-                        id: 'traits',
-                        label: 'Traits',
-                        options: traitOptions.map((filter) => ({
-                          value: filter,
-                          label: getSpellPickerTraitFilterLabel(filter),
-                        })),
-                        selectedValues: browseState.mechanicsFilters.traits,
-                        onSelectedValuesChange: (traits: string[]) =>
-                          persistBrowseState({
-                            ...browseState,
-                            mechanicsFilters: {
-                              ...browseState.mechanicsFilters,
-                              traits: traits as typeof browseState.mechanicsFilters.traits,
-                            },
-                          }),
-                      }
-                    : null,
-                  methodOptions.length > 0
-                    ? {
-                        id: 'method',
-                        label: 'Method',
-                        options: methodOptions.map((filter) => ({
-                          value: filter,
-                          label: getSpellPickerMethodFilterLabel(filter),
-                        })),
-                        selectedValues: browseState.mechanicsFilters.methods,
-                        onSelectedValuesChange: (methods: string[]) =>
-                          persistBrowseState({
-                            ...browseState,
-                            mechanicsFilters: {
-                              ...browseState.mechanicsFilters,
-                              methods: methods as typeof browseState.mechanicsFilters.methods,
-                            },
-                          }),
-                      }
-                    : null,
-                ].filter((group): group is NonNullable<typeof group> => group !== null)}
-              />
-            ) : null}
-          </div>
-
-          <div className={catalogPickerSortActionsGroupClasses}>
-            <CatalogPickerSortGroup
-              value={browseState.sortMode}
-              label={SPELL_PICKER_SORT_LABEL}
-              ariaLabel="Sort spells"
-              triggerAriaLabel="Spell sort order"
-              options={validSortModes.map((sortMode) =>
-                pickerSortOption(sortMode, SPELL_PICKER_SORT_LABELS[sortMode]),
-              )}
-              onValueChange={(sortMode) => persistBrowseState({ ...browseState, sortMode })}
-            />
-          </div>
-        </div>
-      )}
+      filterRow={{
+        controls: (
+          <SpellPickerFilterControls
+            showSchoolFilter={showSchoolFilter}
+            schoolFilterFields={schoolFilterFields}
+            browseState={browseState}
+            onBrowseStateChange={persistBrowseState}
+            castingTimeOptions={castingTimeOptions}
+            traitOptions={traitOptions}
+            methodOptions={methodOptions}
+          />
+        ),
+        actions: (
+          <SpellPickerSortControl
+            sortMode={browseState.sortMode}
+            validSortModes={validSortModes}
+            onSortModeChange={(sortMode) => persistBrowseState({ ...browseState, sortMode })}
+          />
+        ),
+      }}
       renderItemHeader={(item) => {
         const disabledNote = getSpellPickerDisabledNote(item)
         const markers = collectSpellPickerMarkers(item.spell, item.compactSummary)
 
         return (
-          <CatalogPickerItemHeader
+          <SpellCatalogItemHeader
             name={item.spell.name}
             metadataLines={mapSpellPickerCompactSummaryToMetadataLines(item.compactSummary)}
-            disabled={isSpellPickerRowDimmed(item)}
-            footer={
-              <>
-                {recommendationsEnabled && item.state.isRecommended ? (
-                  <CatalogPickerItemMarkers markers={['Recommended']} />
-                ) : null}
-                <CatalogPickerItemMarkers markers={markers} />
-                {disabledNote ? <Text variant="muted">{disabledNote}</Text> : null}
-              </>
-            }
+            markers={[
+              ...(recommendationsEnabled && item.state.isRecommended ? ['Recommended'] : []),
+              ...markers,
+            ]}
+            tone={isSpellPickerRowDimmed(item) ? 'muted' : 'default'}
+            footer={disabledNote ? <Text variant="muted">{disabledNote}</Text> : undefined}
             actions={
               <CatalogPickerSelectionActions
                 selected={item.state.isAlreadySelected}

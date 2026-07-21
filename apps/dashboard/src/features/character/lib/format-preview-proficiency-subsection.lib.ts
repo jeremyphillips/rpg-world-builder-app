@@ -1,4 +1,5 @@
 import {
+  formatProficiencyChoiceEmptyMessage,
   getToolCategoryLabel,
   type CharacterBuildCatalogIndex,
   type CharacterBuildPreview,
@@ -11,7 +12,6 @@ import { resolveLanguagePreviewLabel } from './language-preview-label'
 
 export const PREVIEW_PENDING_ABILITY_LABEL = 'pending'
 
-export const PREVIEW_NO_SKILLS_HINT = 'No skills chosen yet.'
 export const PREVIEW_NO_TOOL_PROFICIENCIES_HINT = 'No tool proficiencies chosen yet.'
 export const PREVIEW_SAVING_THROWS_NO_CLASS_HINT =
   'Class saving throws appear after you choose a class.'
@@ -100,7 +100,8 @@ export function formatPreviewSkillsSubsection(
 
   return {
     resolvedText: resolvedText.length > 0 ? resolvedText : null,
-    emptyHint: resolvedText.length > 0 ? null : PREVIEW_NO_SKILLS_HINT,
+    emptyHint:
+      resolvedText.length > 0 ? null : formatProficiencyChoiceEmptyMessage('skillProficiency'),
     remainingText: formatRemainingChoiceLine(skillChoicesRemaining, 'skill'),
   }
 }

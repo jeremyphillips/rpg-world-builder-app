@@ -1,5 +1,6 @@
 import {
   ABILITY_IDS,
+  DAMAGE_TYPE_TERM,
   getAbilityLabel,
   getSpellApplicationPatternKindLabel,
   getSpellResolutionAttackTypeLabel,
@@ -26,6 +27,8 @@ import {
   type SpellResolutionTargetCountKind,
 } from '@rpg/contracts'
 import { toOptions, type FieldOption } from '@rpg/ui/form'
+
+import { vocabularyFieldLabel } from '@/features/homebrew'
 
 export const RESOLUTION_SECTION_LABELS = {
   selection: 'Selection',
@@ -131,7 +134,7 @@ export const RESOLUTION_FIELD_LABELS = {
   attackType: 'Attack type',
   saveAbility: 'Saving throw',
   damageRoll: 'Damage roll',
-  damageType: 'Damage type',
+  damageType: vocabularyFieldLabel(DAMAGE_TYPE_TERM),
   hitNote: RESOLUTION_SECTION_LABELS.hitNote,
   outcomeApplicationAmount: 'Application',
 } as const

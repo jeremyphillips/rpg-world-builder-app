@@ -1,5 +1,5 @@
 import { isEquipmentStackable } from '../../content/equipment/stackable'
-import { characterWealthFromGrant } from '../character/equipment-inventory'
+import { resolveEquipmentModeFromOption } from '../../content/starting-equipment'
 import type { CharacterBuildCatalogIndex } from './context'
 import type {
   CharacterBuilderDraft,
@@ -14,11 +14,14 @@ import {
 } from './equipment-purchase'
 import { wealthToCopper } from './resolvers/equipment/equipment-budget'
 import {
+  deriveEquipmentBudgetSummaryFromFunding,
+  type ResolvedStartingEquipmentFunding,
+} from './resolvers/equipment/resolve-starting-equipment-funding'
+import {
   resolveEquipmentPurchasePricing,
   type EquipmentPurchasePricing,
 } from './resolvers/equipment/resolve-equipment-purchase-pricing'
 import { startingEquipmentChoiceSetId } from './resolvers/equipment/resolve-starting-equipment-choice-sets'
-import { STARTING_EQUIPMENT_GOLD_OPTION_ID } from './starting-package-conversion'
 
 export type EquipmentPackageSwitchInventorySnapshot = {
   purchases: ReadonlyArray<{
@@ -338,21 +341,20 @@ function resolvePackageSwitchStatus(args: {
 
 function buildPackageSwitchSelectionPatch(args: {
   draft: CharacterBuilderDraft
-  targetOptionId: string
+  targetOption: { id: string }
+  targetOptionShape: Parameters<typeof resolveEquipmentModeFromOption>[0]
   choiceSetId: string
   nestedSelections: CharacterBuilderDraft['choiceSelections']
   purchases: CharacterBuilderDraftEquipmentPurchase[]
 }): Partial<CharacterBuilderDraft> {
-  const isGold = args.targetOptionId === STARTING_EQUIPMENT_GOLD_OPTION_ID
-
   return {
     choiceSelections: {
       ...args.draft.choiceSelections,
       ...args.nestedSelections,
-      [args.choiceSetId]: [args.targetOptionId],
+      [args.choiceSetId]: [args.targetOption.id],
     },
     equipment: {
-      mode: isGold ? 'gold' : 'package',
+      mode: resolveEquipmentModeFromOption(args.targetOptionShape),
       purchases: args.purchases,
       removedPackageItemKeys: [],
       customized: args.draft.equipment?.customized ?? false,
@@ -365,6 +367,7 @@ export function evaluateEquipmentPackageSwitch(args: {
   draft: CharacterBuilderDraft
   catalogIndex: CharacterBuildCatalogIndex
   targetOptionId: string
+  targetFunding: ResolvedStartingEquipmentFunding
   nestedSelections?: CharacterBuilderDraft['choiceSelections']
   draftQuantitiesByPurchaseId?: Record<string, number>
   committedInventorySnapshot?: EquipmentPackageSwitchInventorySnapshot
@@ -388,7 +391,12 @@ export function evaluateEquipmentPackageSwitch(args: {
     })
   }
 
-  const targetAllowanceCp = wealthToCopper(characterWealthFromGrant(targetOption.wealth))
+  const targetBudget = deriveEquipmentBudgetSummaryFromFunding({
+    funding: args.targetFunding,
+    purchases: args.draft.equipment?.purchases ?? [],
+    catalogIndex: args.catalogIndex,
+  })
+  const targetAllowanceCp = wealthToCopper(targetBudget.starting)
   const rows = resolvePurchaseRows(args.draft, args.catalogIndex)
 
   if (args.committedInventorySnapshot) {
@@ -454,6 +462,7 @@ export function buildEquipmentPackageSwitchPreview(args: {
   draft: CharacterBuilderDraft
   catalogIndex: CharacterBuildCatalogIndex
   targetOptionId: string
+  targetFunding: ResolvedStartingEquipmentFunding
   nestedSelections?: CharacterBuilderDraft['choiceSelections']
 }): EquipmentPackageSwitchEvaluation | undefined {
   return evaluateEquipmentPackageSwitch(args)
@@ -518,6 +527,7 @@ export function buildEquipmentPackageSwitchPatch(args: {
   draft: CharacterBuilderDraft
   catalogIndex: CharacterBuildCatalogIndex
   targetOptionId: string
+  targetFunding: ResolvedStartingEquipmentFunding
   choiceSetId: string
   nestedSelections: CharacterBuilderDraft['choiceSelections']
   draftQuantitiesByPurchaseId: Record<string, number>
@@ -527,12 +537,18 @@ export function buildEquipmentPackageSwitchPatch(args: {
     draft: args.draft,
     catalogIndex: args.catalogIndex,
     targetOptionId: args.targetOptionId,
+    targetFunding: args.targetFunding,
     nestedSelections: args.nestedSelections,
     draftQuantitiesByPurchaseId: args.draftQuantitiesByPurchaseId,
     committedInventorySnapshot: args.committedInventorySnapshot,
   })
 
-  if (!evaluation) {
+  const characterClass = args.catalogIndex.classes.get(args.draft.class.classId!)
+  const targetOption = characterClass?.characterCreation?.startingEquipment?.options.find(
+    (entry) => entry.id === args.targetOptionId,
+  )
+
+  if (!evaluation || !targetOption) {
     return { status: 'failure', commitError: { kind: 'missingTargetOption' } }
   }
 
@@ -545,7 +561,8 @@ export function buildEquipmentPackageSwitchPatch(args: {
       status: 'success',
       patch: buildPackageSwitchSelectionPatch({
         draft: args.draft,
-        targetOptionId: args.targetOptionId,
+        targetOption,
+        targetOptionShape: targetOption,
         choiceSetId: args.choiceSetId,
         nestedSelections: args.nestedSelections,
         purchases: args.draft.equipment?.purchases ?? [],
@@ -577,7 +594,8 @@ export function buildEquipmentPackageSwitchPatch(args: {
     status: 'success',
     patch: buildPackageSwitchSelectionPatch({
       draft: args.draft,
-      targetOptionId: args.targetOptionId,
+      targetOption,
+      targetOptionShape: targetOption,
       choiceSetId: args.choiceSetId,
       nestedSelections: args.nestedSelections,
       purchases: nextPurchases,

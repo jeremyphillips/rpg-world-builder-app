@@ -4,6 +4,31 @@ Browse and recommendation ordering for character-builder pickers. Resolver
 implementations live under `packages/contracts/src/rpg/runtime/character-builder/`;
 this document is the canonical description of rank semantics.
 
+## Canonical best-match pipeline
+
+Every character-builder picker follows the same documented stages:
+
+```
+visibility / workflow eligibility
+  → active structured filters (category, affordable, …)
+  → query match (exclude score ≤ 0 when query non-empty)
+  → sort mode switch
+```
+
+### `best_match` compare order
+
+```text
+if (hasQuery) compare searchScore desc
+compare workflowDomainRank        // magic-item action rank, proficiency eligibility, …
+compare recommendationRank        // equipment tier/reason; proficiency isRecommended/canSelect
+compare name                      // deterministic fallback
+```
+
+**Name sort modes** use name as the primary key, then search score (when a query is present), then domain/recommendation rank as tiebreaker. Recommendation rank is never the primary key for name sorts.
+
+Shared sort mode values (`best_match`, `name_asc`, `name_desc`) live in
+`catalog-picker-sort-modes.lib.ts`. Domain-specific modes (`price_*`, `level_*`) stay in each picker's `*.types.ts`.
+
 ## Equipment picker browse order
 
 When the equipment picker search query is empty and sort mode is **Best match**,
@@ -12,8 +37,38 @@ rows sort via `compareEquipmentPickerItemsByRecommendation` in
 
 The equipment picker owns search inclusion and ordering through
 `filterAndSortEquipmentPickerItems` in the dashboard
-(`equipment-picker-drawer.lib.ts`). Spell and proficiency pickers still use the
-default `CatalogPickerSheet` `rankPickerItems` path (text-score-first).
+(`equipment-picker-drawer.lib.ts`). Proficiency picker sorting uses the same
+score-once pipeline via `filterAndSortProficiencyPickerItems`. Spell picker
+sorting remains in spell drawer lib with snake_case shared mode values.
+
+### Magic-items workflow action rank
+
+Magic-item rows are enriched once per item with `magicItemAction` before the
+drawer receives them (`enrichEquipmentPickerItemsWithMagicItemAction`). The
+comparator reads only enriched state — never draft, context, or
+`focusedAllowanceId`.
+
+| Rank | `reason`             | Condition                                                 |
+| ---- | -------------------- | --------------------------------------------------------- |
+| 0    | `grant_available`    | `eligibility.eligible` — open choice slot                 |
+| 1    | `manageable`         | Owned grant/purchase, can manage                          |
+| 2    | `no_matching_choice` | Visible but no slot (`rarity_mismatch`, `allowance_full`) |
+| 3    | `unavailable`        | `!canExpand`                                              |
+
+Owned items outside a focused allowance rarity keep `reason: manageable` but
+sink with `outOfFocusedScope: true` (effective rank 2).
+
+Magic-items `best_match` order:
+
+```text
+if (hasQuery) searchScore desc
+→ magicItemAction.rank
+→ compareEquipmentPickerItemsByRecommendation
+→ name
+```
+
+Purchase workflow omits `magicItemAction` enrichment and uses recommendation
+rank only after search.
 
 ### Comparator steps (recommendation / best-match tiebreaker)
 
@@ -45,7 +100,7 @@ pools, starting-equipment pools, fulfillment-aware gold elevation).
 | `price_asc` / `price_desc` | price (`moneyToCopper`)           | search score              | recommendation comparator |
 | `name_asc` / `name_desc`   | `Intl.Collator` on name           | search score              | recommendation comparator |
 
-**Empty-query best match:** recommendation comparator only — no search-score step.
+**Empty-query best match (purchase):** recommendation comparator only — no search-score step.
 
 **Search inclusion:** when the query is non-empty, rows with `scoreItem` ≤ 0 on
 `searchText` (`role: 'label'`, `weight: 1`) are excluded before sort.
@@ -57,15 +112,33 @@ unknown-cost pairs defer to search score / recommendation tiebreakers.
 **View defaults:** `EQUIPMENT_PICKER_VIEW_DEFAULTS` in `equipment-picker-drawer.lib.ts`
 — category All, Affordable now off, sort Best match.
 
+## Proficiency picker browse order
+
+`filterAndSortProficiencyPickerItems` in `proficiency-picker-drawer.lib.ts`
+implements the canonical pipeline. Domain rank comes from
+`compareProficiencyPickerItemsByRecommendation` in
+[`proficiency-picker-item.ts`](../src/rpg/runtime/character-builder/resolvers/picker/proficiency-picker-item.ts):
+
+1. **Recommended** — `state.isRecommended` (`true` before `false`; languages only today)
+2. **Selectable** — `state.canSelect` (`true` before `false`)
+3. **Label** — `localeCompare` (base sensitivity)
+
+| Mode         | Primary         | Tiebreaker 1 (query only) | Tiebreaker 2      |
+| ------------ | --------------- | ------------------------- | ----------------- |
+| `best_match` | search score    | —                         | domain comparator |
+| `name_*`     | `Intl.Collator` | search score              | domain comparator |
+
+Empty-query best match uses domain rank only — not name-only fallback.
+
 ### Clear filters vs Reset view
 
 Mutually exclusive toolbar actions (`toolbarResetMode` on `EquipmentPickerDrawer`;
 production default `reset_view`):
 
-| Action            | Resets                                                       | Preserves        |
-| ----------------- | ------------------------------------------------------------ | ---------------- |
-| **Clear filters** | search, category, Affordable now                             | sort, active tab |
-| **Reset view**    | search, category, Affordable now, sort, tab → `defaultTabId` | —                |
+| Action            | Resets                                 | Preserves |
+| ----------------- | -------------------------------------- | --------- |
+| **Clear filters** | search, category, Affordable now       | sort      |
+| **Reset view**    | search, category, Affordable now, sort | —         |
 
 Action buttons show no counts.
 
@@ -105,7 +178,7 @@ The equipment picker exposes two independent affordability controls:
 | `filterOutUnaffordable` prop                       | `state.isAffordable`            | `false` | When `true`, hides rows above the package starting budget; default shows them disabled instead.                                                                                 |
 | **Affordable now** checkbox (`showAffordableOnly`) | `state.isWithinRemainingBudget` | `false` | Disabled in the equipment picker drawer for now; when enabled, user opt-in hides rows the character cannot purchase with remaining budget. Shown only when a budget is present. |
 
-Browse context (search, category, sort, active tab) is **preserved** across drawer
+Browse context (search, category, sort) is **preserved** across drawer
 close/reopen within a builder session. **Reset view** (default) resets the full view;
 **Clear filters** resets structured inclusion and search only.
 Context-key reset (character, equipment method, budget change) is a documented follow-up.

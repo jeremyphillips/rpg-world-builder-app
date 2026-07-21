@@ -3,8 +3,11 @@ import {
   MAGIC_ITEM_CATEGORY_ENTRIES,
   MAGIC_ITEM_RARITIES,
   MAGIC_ITEM_RARITY_ENTRIES,
+  MAGIC_ITEM_RARITY_TERM,
 } from '@rpg/contracts'
 import { toOptions, type FormItem } from '@rpg/ui/form'
+
+import { vocabularyFieldLabel } from '@/features/homebrew'
 
 import type { ContentFormCtx } from '../../../lib/forms/content-form-registry'
 import { labelsFromEntries } from '../../lib/equipment-form-field-helpers'
@@ -31,7 +34,7 @@ export function magicItemFormFieldGroup(ctx: ContentFormCtx = {}): FormItem {
           {
             type: 'select',
             name: 'rarity',
-            label: 'Rarity',
+            label: vocabularyFieldLabel(MAGIC_ITEM_RARITY_TERM),
             options: magicItemRarityOptions,
           },
           {

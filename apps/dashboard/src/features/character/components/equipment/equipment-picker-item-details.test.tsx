@@ -79,7 +79,7 @@ describe('EquipmentPickerItemDetails', () => {
       name: EQUIPMENT_PICKER_PURCHASE_SECTION_LABEL,
     }).nextElementSibling
 
-    expect(quantityRow).toHaveClass('mb-4')
+    expect(quantityRow).not.toHaveClass('mb-4')
     expect(purchasePanel).toHaveClass(equipmentPickerPurchaseInsetPanelClasses)
     expect(quantityRow?.nextElementSibling?.textContent).toContain('Unit price')
   })
@@ -154,7 +154,7 @@ describe('EquipmentPickerItemDetails', () => {
     expect(screen.getByText(/Quantity to add/)).toBeInTheDocument()
     expect(
       screen.getByRole('button', { name: EQUIPMENT_PICKER_PURCHASE_REMOVE_ONE_LABEL }),
-    ).toBeInTheDocument()
+    ).toHaveClass('h-6')
 
     await user.click(
       screen.getByRole('button', { name: EQUIPMENT_PICKER_PURCHASE_ADD_ANOTHER_LABEL }),

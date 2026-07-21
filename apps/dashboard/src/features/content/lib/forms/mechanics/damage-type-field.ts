@@ -1,11 +1,13 @@
 import {
+  DAMAGE_TYPE_TERM,
+  PHYSICAL_DAMAGE_TYPE_TERM,
   getPhysicalDamageTypeLabel,
   PHYSICAL_DAMAGE_TYPE_IDS,
   type PhysicalDamageType,
 } from '@rpg/contracts'
 import { toOptions, type FieldConfig, type FieldOption, type FieldVisibility } from '@rpg/ui/form'
 
-import { buildActiveDamageTypeFieldOptions } from '@/features/homebrew'
+import { buildActiveDamageTypeFieldOptions, vocabularyFieldLabel } from '@/features/homebrew'
 
 import type { ContentFormCtx } from '../content-form-registry'
 
@@ -49,15 +51,20 @@ export function damageTypeField({
   name,
   scope = 'vocabulary',
   ctx,
-  label = 'Damage type',
+  label,
   visibility,
   required,
   width = 'md',
 }: DamageTypeFieldOptions): FieldConfig {
+  const defaultLabel =
+    scope === 'physical'
+      ? vocabularyFieldLabel(PHYSICAL_DAMAGE_TYPE_TERM)
+      : vocabularyFieldLabel(DAMAGE_TYPE_TERM)
+
   return {
     type: 'select',
     name,
-    label,
+    label: label ?? defaultLabel,
     options: resolveDamageTypeFieldOptions(scope, ctx),
     placeholder: DAMAGE_TYPE_PLACEHOLDER,
     width,

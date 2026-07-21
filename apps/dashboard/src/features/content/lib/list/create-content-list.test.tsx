@@ -3,6 +3,8 @@ import { renderHook } from '@testing-library/react'
 
 import { makeQueryWrapper } from '@/test/make-wrapper'
 
+import { formatContentListLoadErrorMessage } from '../content-type-labels'
+
 vi.mock('@/lib/api-client', () => ({
   request: vi.fn(),
 }))
@@ -24,7 +26,7 @@ describe('createContentListApi', () => {
     const listEquipment = createContentListApi<{ id: string }>({
       routeKey: 'equipment',
       responseKey: 'equipment',
-      errorMessage: 'Could not load equipment.',
+      errorMessage: formatContentListLoadErrorMessage('equipment'),
     })
 
     const result = await listEquipment('camp-1')
@@ -32,7 +34,7 @@ describe('createContentListApi', () => {
     expect(mockRequest).toHaveBeenCalledWith(
       '/api/campaigns/camp-1/content/equipment',
       undefined,
-      'Could not load equipment.',
+      formatContentListLoadErrorMessage('equipment'),
     )
     expect(result).toEqual([{ id: 'w1' }])
   })
@@ -42,7 +44,7 @@ describe('createContentQueryHook', () => {
   const config = {
     routeKey: 'skill-proficiencies',
     responseKey: 'skillProficiencies',
-    errorMessage: 'Could not load skill proficiencies.',
+    errorMessage: formatContentListLoadErrorMessage('skill-proficiencies'),
   } as const
 
   it('builds the query key from routeKey', () => {

@@ -20,6 +20,7 @@ import {
   spellAttackBonus,
   spellSaveDc,
 } from './index'
+import { resolveMaxHpAtLevel } from './hit-points-at-level'
 import { resolveEquippedArmorClass } from './armor-class'
 
 // ---------------------------------------------------------------------------
@@ -183,10 +184,17 @@ export function deriveCharacterProfile(input: CharacterDerivationInput): Charact
     abilityScores: deriveAbilityScores(input.abilityScores),
     proficiencyBonus: profBonus,
     maxHp: input.characterClass
-      ? resolveLevelOneMaxHp({
-          hitDie: input.characterClass.hitDie,
-          conScore,
-        })
+      ? input.level <= 1
+        ? resolveLevelOneMaxHp({
+            hitDie: input.characterClass.hitDie,
+            conScore,
+          })
+        : resolveMaxHpAtLevel({
+            hitDie: input.characterClass.hitDie,
+            constitutionModifier: typeof conScore === 'number' ? abilityModifier(conScore) : 0,
+            level: input.level,
+            method: 'average',
+          })
       : undefined,
     ac:
       input.equippedArmor && input.equippedArmor.length > 0

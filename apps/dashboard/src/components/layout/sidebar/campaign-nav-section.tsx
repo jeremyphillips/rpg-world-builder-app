@@ -19,6 +19,7 @@ export function CampaignNavSection() {
         <>
           <NavItem to={ROUTES.campaign.detail(activeCampaignId)} label="Overview" end />
           <NavItem to={ROUTES.campaign.sessions(activeCampaignId)} label="Sessions" />
+          <NavItem to={ROUTES.campaign.npcs.list(activeCampaignId)} label="NPCs" />
           {VISIBLE_SIDEBAR_CONTENT.map((entry) => (
             <NavItem
               key={entry.contentType}

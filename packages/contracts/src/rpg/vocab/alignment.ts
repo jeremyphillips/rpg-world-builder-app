@@ -2,12 +2,21 @@ import { z } from 'zod'
 
 import { vocabEnumFromEntries, keysFromEntries } from './enum-schema'
 import { getTermSentenceForm } from './types'
-import type { GameTermEntry } from './types'
+import type { GameTermEntry, VocabularyTerm } from './types'
 
 // ---------------------------------------------------------------------------
 // Alignments — the closed SRD 5.2.1 moral compass set. Shared by characters,
 // NPCs, and monsters. Two-letter ids match SRD abbreviations (LG → lg).
 // ---------------------------------------------------------------------------
+
+export const ALIGNMENT_TERM = {
+  label: 'Alignment',
+  description: "A creature's moral and ethical outlook on the alignment grid.",
+  sentence: {
+    singular: 'alignment',
+    plural: 'alignments',
+  },
+} as const satisfies VocabularyTerm
 
 export const ALIGNMENT_ENTRIES = {
   lg: {

@@ -11,6 +11,7 @@ import {
   WEAPON_MODE_ENTRIES,
   WEAPON_PROPERTIES,
   WEAPON_PROPERTY_ENTRIES,
+  WEAPON_PROPERTY_TERM,
   weaponFormValuesHaveRange,
   type WeaponMastery,
   type WeaponMode,
@@ -23,6 +24,8 @@ import {
   type FieldVisibility,
   type FormItem,
 } from '@rpg/ui/form'
+
+import { vocabularyFieldLabel } from '@/features/homebrew'
 
 import { labelsFromEntries } from '../../lib/equipment-form-field-helpers'
 import {
@@ -136,7 +139,7 @@ export function weaponFormFieldGroup(ctx: ContentFormCtx): FormItem {
       {
         type: 'chips',
         name: 'properties',
-        label: 'Properties',
+        label: vocabularyFieldLabel(WEAPON_PROPERTY_TERM, { plural: true }),
         options: weaponPropertyOptions,
         optionAvailability: weaponPropertyOptionAvailability,
         hint: { resolve: weaponPropertyDynamicHint },

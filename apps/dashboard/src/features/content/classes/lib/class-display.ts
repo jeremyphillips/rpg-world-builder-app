@@ -6,6 +6,7 @@ import {
   getWeaponCategoryEntry,
   isMeaningfulProficiencyChoice,
   isMeaningfulToolProficiencyChoice,
+  getProficiencyDomainCompactLabel,
   type CharacterClass,
   type ClassFeature,
   type ProficiencyChoice,
@@ -32,7 +33,7 @@ export const CLASS_PROFICIENCY_ROW_LABELS = {
   armorTraining: 'Armor Training',
   weapons: 'Weapons',
   tools: 'Tools',
-  skills: 'Skills',
+  skills: getProficiencyDomainCompactLabel('skill'),
   languages: 'Languages',
 } as const
 

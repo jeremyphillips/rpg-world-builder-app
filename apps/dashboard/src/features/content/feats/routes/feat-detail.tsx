@@ -2,6 +2,10 @@ import { useParams } from 'react-router-dom'
 import { Heading, RichTextContent } from '@rpg/ui'
 import type { Feat } from '@rpg/contracts'
 
+import {
+  formatContentNotFoundMessage,
+  formatContentListLoadErrorMessage,
+} from '@/features/content/lib/content-type-labels'
 import { useSetBreadcrumbLabel } from '@/components/layout/use-breadcrumb-label'
 import { WidePage } from '@/components/layout/wide-page'
 import { useFeats } from '../hooks/use-feats'
@@ -58,8 +62,8 @@ export function FeatDetail() {
       isError={isError}
       items={feats}
       itemId={featId}
-      loadErrorLabel="Could not load feats."
-      notFoundLabel="Feat not found."
+      loadErrorLabel={formatContentListLoadErrorMessage('feats')}
+      notFoundLabel={formatContentNotFoundMessage('feats')}
     >
       {(feat) => <FeatDetailContent feat={feat} campaignId={campaignId} />}
     </ContentDetailResolver>

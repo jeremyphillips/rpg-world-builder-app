@@ -5,9 +5,10 @@ import type { StartingEquipmentOptionSummary } from '@rpg/contracts'
 import { StartingEquipmentOptionSummaryCard } from './starting-equipment-option-summary.client'
 
 const goldSummary = {
-  optionId: 'gold',
+  optionId: 'starting-gold',
   label: 'Starting Gold',
   description: 'Take 155 GP instead of standard equipment.',
+  orderedItems: [],
   itemsByGroup: {
     weapons: [],
     armor: [],
@@ -20,6 +21,13 @@ const goldSummary = {
   missingItemSlugs: [],
   unselectableReasons: [],
   isSelectable: true,
+  funding: {
+    classOptionId: 'starting-gold',
+    classOptionWealth: { cp: 0, sp: 0, gp: 155, pp: 0 },
+    tierAdditionalWealth: { cp: 0, sp: 0, gp: 0, pp: 0 },
+    totalStartingWealth: { cp: 0, sp: 0, gp: 155, pp: 0 },
+    classOptionPolicy: 'included' as const,
+  },
 } satisfies StartingEquipmentOptionSummary
 
 const meta = {
@@ -41,7 +49,7 @@ export const HeavyArmorPackage: Story = {
   args: {
     summary: {
       ...goldSummary,
-      optionId: 'heavy',
+      optionId: 'heavy-armor',
       label: 'Heavy Armor',
       description: "Chain Mail, Greatsword, Flail, 8 Javelins, Dungeoneer's Pack, and 4 GP.",
     },

@@ -1,11 +1,15 @@
 import { z } from 'zod'
+import { createElement } from 'react'
 import {
+  characterWealthFromGrant,
   choiceOptionTitle,
   defineMessage,
+  formatWealth,
   SPELLCASTING_FOCUS_GEAR_KINDS,
   SPELLCASTING_GEAR_KIND_ENTRIES,
   spellcastingFocusGearKindSchema,
 } from '@rpg/contracts'
+import { Heading } from '@rpg/ui'
 import { toOptions, type FieldVisibility, type FormItem } from '@rpg/ui/form'
 
 import {
@@ -29,10 +33,14 @@ import {
   STARTING_EQUIPMENT_ITEM_TYPE_LABEL,
 } from './class-character-creation-link-labels'
 import {
+  STARTING_EQUIPMENT_CHOICE_COPY,
+  STARTING_EQUIPMENT_GOLD_WEALTH_HINT_PREFIX,
+  STARTING_EQUIPMENT_PACKAGE_WEALTH_HINT_PREFIX,
+} from './class-starting-equipment-form-labels'
+import {
   equipmentGrantTitle,
   equipmentGrantSummary,
 } from '../../../lib/forms/grants/equipment-grant-form-values'
-import { STARTING_EQUIPMENT_OPTION_DESCRIPTION_HINT } from './class-starting-equipment-form-labels'
 
 /** Starting equipment validation messages (tier 3 form overrides). */
 export const startingEquipmentValidationMessages = {
@@ -129,7 +137,6 @@ export const startingEquipmentOptionFormSchema = z
   .object({
     id: z.string().min(1).optional(),
     label: z.string().min(1),
-    description: z.string().optional(),
     wealth: wealthGrantMoneyFormSchema.optional(),
     items: z.array(startingEquipmentItemFormSchema),
   })
@@ -146,7 +153,7 @@ export const startingEquipmentOptionFormSchema = z
 export type StartingEquipmentOptionForm = z.infer<typeof startingEquipmentOptionFormSchema>
 
 export const startingEquipmentFormSchema = z.object({
-  choose: z.coerce.number().int().min(1).default(1),
+  choose: z.literal(1).default(1),
   options: z.array(startingEquipmentOptionFormSchema).min(1),
 })
 
@@ -157,6 +164,23 @@ export function startingEquipmentOptionTitle(
 ): string {
   if (!row) return ''
   return choiceOptionTitle({ id: row.id ?? '', label: row.label })
+}
+
+/** Master-detail eyebrow describing baseline wealth composition for an option. */
+export function startingEquipmentOptionWealthHint(
+  row: StartingEquipmentOptionForm | undefined,
+): string | undefined {
+  if (!row) return undefined
+
+  const wealth = wealthGrantMoneyFromForm(row.wealth)
+  if (!wealth) return undefined
+
+  const amount = formatWealth(characterWealthFromGrant(wealth))
+  const isWealthOnly = (row.items?.length ?? 0) === 0
+  const prefix = isWealthOnly
+    ? STARTING_EQUIPMENT_GOLD_WEALTH_HINT_PREFIX
+    : STARTING_EQUIPMENT_PACKAGE_WEALTH_HINT_PREFIX
+  return `${prefix}: ${amount}`
 }
 
 export function startingEquipmentItemTitle(
@@ -222,20 +246,10 @@ export function startingEquipmentModifierFields(): FormItem[] {
 export function startingEquipmentChooseFields(): FormItem[] {
   return [
     {
-      type: 'inlineSentence',
-      name: 'choose',
-      label: 'Packages to choose',
-      hideLabel: true,
-      segments: [
-        { kind: 'text', value: 'Character can choose', tone: 'label' },
-        {
-          kind: 'number',
-          name: 'choose',
-          min: 1,
-          defaultValue: 1,
-        },
-        { kind: 'text', value: 'package(s) from list', tone: 'label' },
-      ],
+      kind: 'slot',
+      name: '_startingEquipmentChoiceCopy',
+      render: () =>
+        createElement(Heading, { variant: 'subsection', as: 'p' }, STARTING_EQUIPMENT_CHOICE_COPY),
     },
   ]
 }
@@ -270,15 +284,6 @@ export function startingEquipmentOptionItemFields(ctx: ContentFormCtx): FormItem
       name: 'label',
       label: 'Label',
       required: true,
-    },
-    {
-      type: 'richtext',
-      name: 'description',
-      label: 'Description',
-      linkable: true,
-      internalLinkOptions: ctx.options?.richTextInternalLinkOptions,
-      contentTypeOptions: ctx.options?.richTextContentTypeOptions,
-      hint: STARTING_EQUIPMENT_OPTION_DESCRIPTION_HINT,
     },
     ...wealthGrantMoneyField('wealth'),
     {

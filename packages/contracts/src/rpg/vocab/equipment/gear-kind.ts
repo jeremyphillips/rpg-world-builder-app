@@ -1,10 +1,19 @@
 import { keysFromEntries, vocabEnumFromEntries } from '../enum-schema'
 
-import type { GameTermEntry } from '../types'
+import type { GameTermEntry, VocabularyTerm } from '../types'
 
 // ---------------------------------------------------------------------------
 // Adventuring gear sub-kinds — discriminates items within `kind: adventuring_gear`.
 // ---------------------------------------------------------------------------
+
+export const GEAR_KIND_TERM = {
+  label: 'Gear Kind',
+  description: 'A sub-classification within adventuring gear.',
+  sentence: {
+    singular: 'gear kind',
+    plural: 'gear kinds',
+  },
+} as const satisfies VocabularyTerm
 
 export const GEAR_KIND_ENTRIES = {
   general: {

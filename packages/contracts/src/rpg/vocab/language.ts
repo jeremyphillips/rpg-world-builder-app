@@ -3,7 +3,7 @@ import { z } from 'zod'
 import { keysFromEntries, vocabEnumFromEntries } from './enum-schema'
 
 import { formatVocabularySlugLabel } from './format-slug-label'
-import { getTermSentenceForm, type GameTermEntry } from './types'
+import { getTermSentenceForm, type GameTermEntry, type VocabularyTerm } from './types'
 import {
   vocabularyOptionIdSchema,
   vocabularySeedOptionSchema,
@@ -14,6 +14,15 @@ import {
 // Languages — open vocabulary set. Standard/rare grouping stays on seed rows
 // (`languageSeedOptionSchema.category`) for grants and character creation.
 // ---------------------------------------------------------------------------
+
+export const LANGUAGE_CATEGORY_TERM = {
+  label: 'Language Category',
+  description: 'Whether a language is commonly known or rare.',
+  sentence: {
+    singular: 'language category',
+    plural: 'language categories',
+  },
+} as const satisfies VocabularyTerm
 
 export const LANGUAGE_CATEGORY_ENTRIES = {
   standard: {
@@ -41,6 +50,15 @@ export const LANGUAGE_CATEGORIES = keysFromEntries(LANGUAGE_CATEGORY_ENTRIES)
 export const languageCategorySchema = vocabEnumFromEntries(LANGUAGE_CATEGORY_ENTRIES)
 
 export const LANGUAGE_SET_ID = 'languages' as const satisfies VocabularyOptionSetId
+
+export const LANGUAGE_TERM = {
+  label: 'Language',
+  description: 'A language a creature can speak, read, or write.',
+  sentence: {
+    singular: 'language',
+    plural: 'languages',
+  },
+} as const satisfies VocabularyTerm
 
 /** Extended catalog seed row — category is validated at catalog load. */
 export const languageSeedOptionSchema = vocabularySeedOptionSchema.extend({

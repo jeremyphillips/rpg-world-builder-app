@@ -10,6 +10,10 @@ import { type FieldVisibility, type FormItem } from '@rpg/ui/form'
 
 import { effectiveMaxFromCtx } from '../../lib/form-options/content-campaign-rules'
 import { getLevelFieldOptions, levelSelectDigits } from '../../lib/form-options/level-field-options'
+import {
+  getContentTypeItemLabel,
+  getContentTypeMidSentenceLabel,
+} from '../../lib/content-type-labels'
 import type { ContentFormCtx } from '../../lib/forms/content-form-registry'
 import { campaignSettingHref } from '@/lib/availability'
 import {
@@ -105,14 +109,14 @@ export function multiclassingPolicyFields(ctx: ContentFormCtx): FormItem[] {
     {
       type: 'select',
       name: 'policy',
-      label: 'Species multiclassing',
+      label: `${getContentTypeItemLabel('species')} multiclassing`,
       labelPosition: 'settings',
       separator: 'subtle',
       options: speciesMulticlassPolicyOptions,
       required: true,
       width: 'full',
       defaultValue: DEFAULT_SPECIES_MULTICLASS_POLICY,
-      hint: 'Controls whether characters of this species can multiclass when the campaign allows multiclassing.',
+      hint: `Controls whether characters of this ${getContentTypeMidSentenceLabel('species')} can multiclass when the campaign allows multiclassing.`,
     },
     {
       kind: 'dependent',
@@ -126,7 +130,7 @@ export function multiclassingPolicyFields(ctx: ContentFormCtx): FormItem[] {
         options: speciesClassPolicyModeOptions,
         required: true,
         defaultValue: DEFAULT_SPECIES_CLASS_POLICY_MODE,
-        hint: 'Choose which classes this species may multiclass into.',
+        hint: `Choose which classes this ${getContentTypeMidSentenceLabel('species')} may multiclass into.`,
       },
       dependents: {
         visibility: visibleWhenClassPolicyNeedsIds(),
@@ -180,8 +184,8 @@ export function speciesLevelLimitsFields(ctx: ContentFormCtx): FormItem[] {
       controller: {
         type: 'switch',
         name: 'limitMaxCharacterLevel',
-        label: 'Set species maximum level',
-        hint: 'Caps the total character level for characters using this species. Leave off to use the campaign maximum.',
+        label: `Set ${getContentTypeMidSentenceLabel('species')} maximum level`,
+        hint: `Caps the total character level for characters using this ${getContentTypeMidSentenceLabel('species')}. Leave off to use the campaign maximum.`,
         defaultValue: false,
         labelPosition: 'settings',
       },
@@ -208,7 +212,7 @@ export function speciesLevelLimitsFields(ctx: ContentFormCtx): FormItem[] {
         type: 'switch',
         name: ENABLE_CLASS_LEVEL_CAPS_FIELD,
         label: 'Class-specific limits',
-        hint: 'Optionally limit how far this species can progress in individual classes.',
+        hint: `Optionally limit how far this ${getContentTypeMidSentenceLabel('species')} can progress in individual classes.`,
         defaultValue: false,
         labelPosition: 'settings',
       },

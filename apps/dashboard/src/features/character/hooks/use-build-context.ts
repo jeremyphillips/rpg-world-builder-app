@@ -33,8 +33,13 @@ export function useBuildContext(rulesetId: SystemRulesetId | undefined) {
     if (!rulesetId || !query.data) return null
 
     return {
+      channel: 'build',
+      surface: 'dashboard',
+      characterKind: 'pc',
       mode: 'dashboard',
       scope: { type: 'standalone', rulesetId },
+      rulesScope: { type: 'ruleset', rulesetId },
+      ownershipTarget: { type: 'user' },
       rulesetId,
       catalog: query.data.catalog,
       characterCreationRules: {

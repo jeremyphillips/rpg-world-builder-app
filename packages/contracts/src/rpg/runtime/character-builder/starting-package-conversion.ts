@@ -1,10 +1,9 @@
 import type { Equipment } from '../../content/equipment'
 import { isEquipmentStackable } from '../../content/equipment/stackable'
 import {
-  isWealthOnlyStartingEquipmentOption,
+  isStartingGoldOption,
   type StartingEquipmentOption,
 } from '../../content/starting-equipment'
-import { characterWealthFromGrant } from '../character/equipment-inventory'
 import type { CharacterBuildCatalogIndex } from './context'
 import type {
   CharacterBuilderDraft,
@@ -26,12 +25,12 @@ import {
 } from './resolvers/equipment/resolve-starting-equipment-choice-sets'
 import { startingEquipmentPackageItemKey } from './resolvers/equipment/derive-equipment-draft-entries'
 import { wealthToCopper } from './resolvers/equipment/equipment-budget'
+import type { ResolvedStartingEquipmentFunding } from './resolvers/equipment/resolve-starting-equipment-funding'
 import {
   resolveEquipmentPurchasePricing,
   type EquipmentPurchasePricing,
+  type EquipmentPurchaseUnavailableReason,
 } from './resolvers/equipment/resolve-equipment-purchase-pricing'
-
-export const STARTING_EQUIPMENT_GOLD_OPTION_ID = 'gold'
 
 export type GoldStartingEquipmentAlternative =
   | { status: 'available'; option: StartingEquipmentOption }
@@ -164,29 +163,16 @@ function blockingIssueForResolvedItem(item: ResolvedStartingEquipmentItem): stri
 /** Finds the wealth-only gold alternative paired with a departing package option. */
 export function resolveGoldStartingEquipmentAlternative(
   options: readonly StartingEquipmentOption[],
-  departingOptionId: string,
 ): GoldStartingEquipmentAlternative {
-  const goldById = options.find((option) => option.id === STARTING_EQUIPMENT_GOLD_OPTION_ID)
-  if (goldById && isWealthOnlyStartingEquipmentOption(goldById)) {
-    return { status: 'available', option: goldById }
-  }
-
-  const wealthOnly = options.filter(isWealthOnlyStartingEquipmentOption)
-  if (wealthOnly.length === 1 && wealthOnly[0]!.id !== departingOptionId) {
-    return { status: 'available', option: wealthOnly[0]! }
-  }
-
-  if (wealthOnly.length > 1) {
+  const option = options.find(isStartingGoldOption)
+  if (!option) {
     return {
       status: 'unavailable',
-      reason: 'Multiple starting-gold alternatives are configured for this class.',
+      reason: 'No starting-gold alternative is configured for this package.',
     }
   }
 
-  return {
-    status: 'unavailable',
-    reason: 'No starting-gold alternative is configured for this package.',
-  }
+  return { status: 'available', option }
 }
 
 /** Converts authored grant item units to purchase bundle units. */
@@ -230,13 +216,14 @@ function buildBlockedConversionItem(args: {
   equipmentId: string
   equipmentName: string
   blockingIssue: string
+  reason?: EquipmentPurchaseUnavailableReason
 }): StartingPackageConversionItem {
   return {
     ...args.shared,
     equipmentId: args.equipmentId,
     equipmentName: args.equipmentName,
     purchaseQuantity: 1,
-    pricing: { status: 'unavailable' },
+    pricing: { status: 'unavailable', reason: args.reason ?? 'no_market_price' },
     status: 'blocked',
     blockingIssue: args.blockingIssue,
   }
@@ -256,6 +243,7 @@ function buildSelectableConversionItem(args: {
       equipmentId: args.equipmentId,
       equipmentName: args.equipment.name,
       blockingIssue: 'This item has no market price and cannot be purchased with starting gold.',
+      reason: pricing.reason,
     })
   }
 
@@ -313,10 +301,7 @@ function resolvePackageConversionContext(args: {
   )
   if (!departingOption) return undefined
 
-  const goldAlternative = resolveGoldStartingEquipmentAlternative(
-    startingEquipment.options,
-    departingOptionId,
-  )
+  const goldAlternative = resolveGoldStartingEquipmentAlternative(startingEquipment.options)
   if (goldAlternative.status === 'unavailable') return undefined
 
   return { classId, departingOption, goldAlternative }
@@ -361,11 +346,11 @@ function listPackageConversionItems(args: {
 function buildConversionBudget(args: {
   draft: CharacterBuilderDraft
   catalogIndex: CharacterBuildCatalogIndex
-  goldAlternative: PackageConversionContext['goldAlternative']
+  targetFunding: ResolvedStartingEquipmentFunding
   items: StartingPackageConversionItem[]
   selectedPackageItemKeys: ReadonlySet<string>
 }): StartingPackageConversionBudget {
-  const startingCp = wealthToCopper(characterWealthFromGrant(args.goldAlternative.option.wealth))
+  const startingCp = wealthToCopper(args.targetFunding.totalStartingWealth)
   const existingPurchaseCostCp = sumPurchaseCostCp(
     args.draft.equipment?.purchases ?? [],
     args.catalogIndex,
@@ -389,6 +374,7 @@ export function buildStartingPackageConversionPreview(args: {
   catalogIndex: CharacterBuildCatalogIndex
   departingOptionId: string
   selectedPackageItemKeys: ReadonlySet<string>
+  targetFunding: ResolvedStartingEquipmentFunding
 }): StartingPackageConversionPreview | undefined {
   const context = resolvePackageConversionContext(args)
   if (!context) return undefined
@@ -407,7 +393,7 @@ export function buildStartingPackageConversionPreview(args: {
     budget: buildConversionBudget({
       draft: args.draft,
       catalogIndex: args.catalogIndex,
-      goldAlternative: context.goldAlternative,
+      targetFunding: args.targetFunding,
       items,
       selectedPackageItemKeys: args.selectedPackageItemKeys,
     }),
@@ -517,6 +503,7 @@ export function buildStartingPackageConversionPatch(args: {
   catalogIndex: CharacterBuildCatalogIndex
   departingOptionId: string
   selectedPackageItemKeys: ReadonlySet<string>
+  targetFunding: ResolvedStartingEquipmentFunding
 }): Partial<CharacterBuilderDraft> | undefined {
   const classId = args.draft.class.classId
   if (!classId) return undefined
@@ -542,6 +529,7 @@ export function buildStartingPackageConversionPatch(args: {
     equipment: {
       mode: 'gold',
       purchases: mergeConversionPurchases({ ...args, preview }),
+      magicItemSelections: args.draft.equipment?.magicItemSelections ?? [],
       removedPackageItemKeys: [],
       customized: conversionWasCustomized(preview, args.selectedPackageItemKeys),
       skipped: false,

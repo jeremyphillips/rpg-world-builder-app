@@ -4,6 +4,7 @@ import type { Species } from '../../content/species'
 import { resolveCharacterCreationPatch } from '../../campaign/patches/campaign-character-creation-patch'
 import { defaultCampaignMechanicsPatch } from '../../campaign/patches/campaign-mechanics-patch'
 import type { StartingWealthRules } from '../../campaign/rules/starting-wealth'
+import { resolveCharacterOwnershipTarget } from '../character-acquisition'
 import { DEFAULT_ABILITY_GENERATION_RULES } from './ability-generation'
 import type {
   CharacterBuildCatalog,
@@ -133,11 +134,27 @@ export const builderTestRules = {
   armorClass: defaultCampaignMechanicsPatch().armorClass,
 }
 
-export const builderTestContext: CharacterBuildContext = {
-  mode: 'dashboard',
-  scope: { type: 'standalone', rulesetId: 'srd-cc-5.2.1' },
-  rulesetId: 'srd-cc-5.2.1',
-  catalog: builderTestCatalog,
-  characterCreationRules: builderTestRules,
-  permissions: { canCreateCharacter: true },
+export function createCharacterBuildContext(
+  overrides: Partial<CharacterBuildContext> = {},
+): CharacterBuildContext {
+  const rulesetId = overrides.rulesetId ?? 'srd-cc-5.2.1'
+  const rulesScope = overrides.rulesScope ?? { type: 'ruleset', rulesetId }
+  const characterKind = overrides.characterKind ?? 'pc'
+
+  return {
+    channel: 'build',
+    surface: 'dashboard',
+    characterKind,
+    mode: 'dashboard',
+    scope: { type: 'standalone', rulesetId },
+    rulesScope,
+    ownershipTarget: resolveCharacterOwnershipTarget(characterKind, rulesScope),
+    rulesetId,
+    catalog: builderTestCatalog,
+    characterCreationRules: builderTestRules,
+    permissions: { canCreateCharacter: true },
+    ...overrides,
+  }
 }
+
+export const builderTestContext: CharacterBuildContext = createCharacterBuildContext()

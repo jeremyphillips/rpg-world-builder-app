@@ -26,12 +26,12 @@ const pricedWeapon = equipmentSchema.parse({
   mastery: 'nick',
 })
 
-const freeItem = equipmentSchema.parse({
+const unpricedItem = equipmentSchema.parse({
   ...pricedWeapon,
-  id: `${RULESET}:free-token`,
-  slug: 'free-token',
-  name: 'Free Token',
-  cost: { amount: 0, currency: 'gp' },
+  id: `${RULESET}:token`,
+  slug: 'token',
+  name: 'Token',
+  cost: null,
 })
 
 const serviceItem = equipmentSchema.parse({
@@ -57,14 +57,17 @@ describe('resolveEquipmentPurchasePricing', () => {
     })
   })
 
-  it('returns free status for zero-cost items', () => {
-    expect(resolveEquipmentPurchasePricing(freeItem)).toEqual({
-      status: 'free',
-      unitCostCp: 0,
+  it('returns no_market_price for null cost', () => {
+    expect(resolveEquipmentPurchasePricing(unpricedItem)).toEqual({
+      status: 'unavailable',
+      reason: 'no_market_price',
     })
   })
 
-  it('returns unavailable for non-purchasable kinds', () => {
-    expect(resolveEquipmentPurchasePricing(serviceItem)).toEqual({ status: 'unavailable' })
+  it('returns unsupported_kind for non-purchasable kinds', () => {
+    expect(resolveEquipmentPurchasePricing(serviceItem)).toEqual({
+      status: 'unavailable',
+      reason: 'unsupported_kind',
+    })
   })
 })

@@ -6,6 +6,7 @@ import type { Species } from '../../content/species'
 import type { Spell } from '../../content/spell'
 import { resolveCharacterCreationPatch } from '../../campaign/patches/campaign-character-creation-patch'
 import { defaultCampaignMechanicsPatch } from '../../campaign/patches/campaign-mechanics-patch'
+import { resolveCharacterOwnershipTarget } from '../character-acquisition'
 import type { CharacterBuildContext } from './context'
 import { DEFAULT_ABILITY_GENERATION_RULES } from './ability-generation'
 import { startingWealthSeed } from './test-fixtures'
@@ -87,8 +88,16 @@ function makeContext(
   }
 
   return {
+    channel: 'build',
+    surface: 'dashboard',
+    characterKind: 'pc',
     mode: 'dashboard',
     scope: { type: 'standalone', rulesetId: 'srd-cc-5.2.1' },
+    rulesScope: { type: 'ruleset', rulesetId: 'srd-cc-5.2.1' },
+    ownershipTarget: resolveCharacterOwnershipTarget('pc', {
+      type: 'ruleset',
+      rulesetId: 'srd-cc-5.2.1',
+    }),
     rulesetId: 'srd-cc-5.2.1',
     catalog: {
       species: [],

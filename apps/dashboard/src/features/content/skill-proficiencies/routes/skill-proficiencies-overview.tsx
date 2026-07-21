@@ -3,6 +3,12 @@ import { DataTable } from '@rpg/ui'
 import type { SkillProficiency } from '@rpg/contracts'
 
 import { ROUTES } from '@/app/routes'
+import {
+  formatContentCreateHeading,
+  getContentTypeCollectionLabel,
+  getContentTypeMidSentenceLabel,
+  getContentTypeSentenceLabel,
+} from '@/features/content/lib/content-type-labels'
 import { useSkillProficiencies } from '../hooks/use-skill-proficiencies'
 import {
   skillProficienciesColumns,
@@ -18,7 +24,7 @@ function SkillRowActions({ row, campaignId }: { row: SkillProficiency; campaignI
       editHref={ROUTES.content.skillProficiencies.edit(campaignId, row.id)}
       enabled={true}
       onToggleEnabled={() => {}}
-      itemLabel="skill proficiency"
+      itemLabel={getContentTypeMidSentenceLabel('skill-proficiencies')}
     />
   )
 }
@@ -29,19 +35,19 @@ export function SkillProficienciesOverview() {
 
   return (
     <ContentOverviewShell
-      heading="Skill Proficiencies"
+      heading={getContentTypeCollectionLabel('skill-proficiencies')}
       campaignId={campaignId}
       isPending={isPending}
       isError={isError}
       newHref={ROUTES.content.skillProficiencies.create(campaignId)}
-      newLabel="New Skill Proficiency"
+      newLabel={formatContentCreateHeading('skill-proficiencies')}
     >
       <DataTable
         columns={skillProficienciesColumns(campaignId)}
         data={skillProficiencies}
         filters={skillProficienciesFilters}
         rowActions={(row) => <SkillRowActions row={row} campaignId={campaignId} />}
-        caption="Skill proficiencies available in this campaign"
+        caption={`${getContentTypeSentenceLabel('skill-proficiencies', { plural: true })} available in this campaign`}
       />
     </ContentOverviewShell>
   )

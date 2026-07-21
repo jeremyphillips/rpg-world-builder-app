@@ -1,4 +1,6 @@
 import { defineMessage } from '../../../validation/define-message'
+import { getContentTypeSentenceForm } from '../../content/lib/content-type-terms'
+import { getProficiencyDomainCompactLabel } from '../../vocab/proficiency'
 
 // ---------------------------------------------------------------------------
 // Character builder validation messages (surface catalog).
@@ -85,13 +87,33 @@ export const characterBuilderValidationMessages = {
     'validation.characterBuilder.proficiencyNoLongerAvailable',
     ({ proficiencyLabel }) => `${proficiencyLabel} is no longer available.`,
   ),
+  levelBelowAllowedMinimum: defineMessage(
+    'validation.characterBuilder.levelBelowAllowedMinimum',
+    () => 'Character level must be at least 1.',
+  ),
+  levelExceedsCampaignMaximum: defineMessage<{ maxLevel: number }>(
+    'validation.characterBuilder.levelExceedsCampaignMaximum',
+    ({ maxLevel }) => `Character level cannot exceed ${maxLevel}.`,
+  ),
+  levelMustMatchStartingLevel: defineMessage<{ startingLevel: number }>(
+    'validation.characterBuilder.levelMustMatchStartingLevel',
+    ({ startingLevel }) => `Campaign characters must be created at level ${startingLevel}.`,
+  ),
   speciesRequiredForLanguageRecommendations: defineMessage(
     'validation.characterBuilder.speciesRequiredForLanguageRecommendations',
-    () => 'Choose a species to see recommended languages for your ancestry.',
+    () =>
+      `Choose a ${getContentTypeSentenceForm('species')} to see recommended languages for your ancestry.`,
   ),
   finalizationFailed: defineMessage(
     'validation.characterBuilder.finalizationFailed',
     () => 'Fix the highlighted issues before creating your character.',
+  ),
+  magicItemGrantIncomplete: defineMessage<{ rarityLabel: string; remaining: number }>(
+    'validation.characterBuilder.magicItemGrantIncomplete',
+    ({ rarityLabel, remaining }) =>
+      remaining === 1
+        ? `Choose 1 ${rarityLabel} magic item grant.`
+        : `Choose ${remaining} ${rarityLabel} magic item grants.`,
   ),
 }
 
@@ -125,6 +147,13 @@ export const characterBuilderStepReadinessMessages = {
     'validation.characterBuilder.readiness.equipmentPendingIncludedTool',
     () =>
       'Choose the tool included with this equipment package. This selection also completes your Tool Proficiency choice.',
+  ),
+  equipmentMagicItemGrantIncomplete: defineMessage<{ rarityLabel: string; remaining: number }>(
+    'validation.characterBuilder.readiness.equipmentMagicItemGrantIncomplete',
+    ({ rarityLabel, remaining }) =>
+      remaining === 1
+        ? `Choose 1 ${rarityLabel} magic item.`
+        : `Choose ${remaining} ${rarityLabel} magic items.`,
   ),
   spellsBlockedNoClass: defineMessage(
     'validation.characterBuilder.readiness.spellsBlockedNoClass',
@@ -167,7 +196,7 @@ export const characterBuilderProficiencyChoiceEmptyMessages = {
   ),
   skillProficiency: defineMessage(
     'validation.characterBuilder.proficiencyChoiceEmpty.skillProficiency',
-    () => 'No skills chosen yet.',
+    () => `No ${getProficiencyDomainCompactLabel('skill').toLowerCase()} chosen yet.`,
   ),
   toolProficiency: defineMessage(
     'validation.characterBuilder.proficiencyChoiceEmpty.toolProficiency',

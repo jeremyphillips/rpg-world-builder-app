@@ -8,6 +8,7 @@ import {
   EQUIPMENT_FAMILY_PATHS,
   getEquipmentFamilyLabel,
 } from '@/features/content/equipment/lib/shared/equipment-family-paths'
+import { getContentTypeCollectionLabel } from '@/features/content/lib/content-type-labels'
 import {
   AccountSettingsRoute,
   AdminSettingsRoute,
@@ -20,6 +21,10 @@ import {
   CharacterDetailRoute,
   CharacterImportRoute,
   CharactersOverviewRoute,
+  NpcCreateRoute,
+  NpcDetailRoute,
+  NpcImportRoute,
+  NpcsOverviewRoute,
   ClassCreateRoute,
   ClassDetailRoute,
   ClassEditRoute,
@@ -145,11 +150,43 @@ const router = createBrowserRouter(
                   handle: { crumb: () => ({ label: 'Settings' }) } satisfies CrumbHandle,
                 },
                 {
+                  path: 'npcs',
+                  element: <Outlet />,
+                  handle: {
+                    crumb: (params) => ({
+                      label: 'NPCs',
+                      href: ROUTES.campaign.npcs.list(params.campaignId!),
+                    }),
+                  } satisfies CrumbHandle,
+                  children: [
+                    { index: true, element: <NpcsOverviewRoute /> },
+                    {
+                      path: 'new',
+                      element: <NpcCreateRoute />,
+                      handle: { crumb: () => ({ label: 'New' }) } satisfies CrumbHandle,
+                    },
+                    {
+                      path: 'import',
+                      element: <NpcImportRoute />,
+                      handle: { crumb: () => ({ label: 'Import' }) } satisfies CrumbHandle,
+                    },
+                    {
+                      path: ':npcId',
+                      element: <NpcDetailRoute />,
+                      handle: {
+                        crumb: (_params, { entityLabel }) => ({
+                          label: entityLabel ?? '…',
+                        }),
+                      } satisfies CrumbHandle,
+                    },
+                  ],
+                },
+                {
                   path: 'classes',
                   element: <Outlet />,
                   handle: {
                     crumb: (params) => ({
-                      label: 'Classes',
+                      label: getContentTypeCollectionLabel('classes'),
                       href: ROUTES.content.classes.overview(params.campaignId!),
                     }),
                   } satisfies CrumbHandle,
@@ -184,7 +221,7 @@ const router = createBrowserRouter(
                   element: <Outlet />,
                   handle: {
                     crumb: (params) => ({
-                      label: 'Species',
+                      label: getContentTypeCollectionLabel('species'),
                       href: ROUTES.content.species.overview(params.campaignId!),
                     }),
                   } satisfies CrumbHandle,
@@ -219,7 +256,7 @@ const router = createBrowserRouter(
                   element: <Outlet />,
                   handle: {
                     crumb: (params) => ({
-                      label: 'Feats',
+                      label: getContentTypeCollectionLabel('feats'),
                       href: ROUTES.content.feats.overview(params.campaignId!),
                     }),
                   } satisfies CrumbHandle,
@@ -254,7 +291,7 @@ const router = createBrowserRouter(
                   element: <Outlet />,
                   handle: {
                     crumb: (params) => ({
-                      label: 'Spells',
+                      label: getContentTypeCollectionLabel('spells'),
                       href: ROUTES.content.spells.overview(params.campaignId!),
                     }),
                   } satisfies CrumbHandle,
@@ -289,7 +326,7 @@ const router = createBrowserRouter(
                   element: <Outlet />,
                   handle: {
                     crumb: (params) => ({
-                      label: 'Equipment',
+                      label: getContentTypeCollectionLabel('equipment'),
                       href: ROUTES.content.equipment.hub(params.campaignId!),
                     }),
                   } satisfies CrumbHandle,
@@ -343,7 +380,7 @@ const router = createBrowserRouter(
                   element: <Outlet />,
                   handle: {
                     crumb: (params) => ({
-                      label: 'Skill Proficiencies',
+                      label: getContentTypeCollectionLabel('skill-proficiencies'),
                       href: ROUTES.content.skillProficiencies.overview(params.campaignId!),
                     }),
                   } satisfies CrumbHandle,

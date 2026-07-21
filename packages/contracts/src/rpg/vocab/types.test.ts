@@ -14,9 +14,18 @@ import { LANGUAGE_CATEGORY_ENTRIES } from './language'
 import { ATTACK_RESOLUTION_MODE_ENTRIES } from './mechanics/attack-resolution-mode'
 import { EDITION_PRESET_ENTRIES } from './mechanics/edition-preset'
 import { MAGIC_ITEM_CATEGORY_ENTRIES } from './magic-item/category'
-import { MAGIC_ITEM_RARITY_ENTRIES } from './magic-item/rarity'
+import { CREATURE_TYPE_TERM } from './creature-type'
+import { DAMAGE_TYPE_TERM } from './damage/vocabulary'
+import { MAGIC_ITEM_RARITY_ENTRIES, MAGIC_ITEM_RARITY_TERM } from './magic-item/rarity'
 import { MOVEMENT_MODE_ENTRIES } from './movement-mode'
-import { getTermSentenceForm, pluralizeTermLabel, type GameTermEntry } from './types'
+import {
+  getTermSentenceForm,
+  getVocabularyTermLabel,
+  pluralizeTermLabel,
+  vocabularyTermFieldCopy,
+  vocabularyTermLabel,
+  type GameTermEntry,
+} from './types'
 import { USAGE_FREQUENCY_ENTRIES } from './usage-frequency'
 import { WEAPON_CATEGORY_ENTRIES } from './weapon/category'
 
@@ -40,6 +49,50 @@ const ROLLOUT_ENTRY_TABLES = [
   EDITION_PRESET_ENTRIES,
   ATTACK_RESOLUTION_MODE_ENTRIES,
 ] as const
+
+describe('vocabularyTermLabel', () => {
+  it('returns title-case singular from term.label', () => {
+    expect(vocabularyTermLabel(CREATURE_TYPE_TERM)).toBe('Creature Type')
+    expect(vocabularyTermLabel(MAGIC_ITEM_RARITY_TERM)).toBe('Magic Item Rarity')
+  })
+
+  it('returns curated sentence forms for mid-sentence copy', () => {
+    expect(
+      vocabularyTermLabel(CREATURE_TYPE_TERM, { number: 'singular', casing: 'sentence' }),
+    ).toBe('creature type')
+    expect(vocabularyTermLabel(CREATURE_TYPE_TERM, { number: 'plural', casing: 'sentence' })).toBe(
+      'creature types',
+    )
+    expect(vocabularyTermLabel(DAMAGE_TYPE_TERM, { number: 'plural', casing: 'sentence' })).toBe(
+      'damage types',
+    )
+  })
+
+  it('uses sentence plural for title plural until explicit title metadata exists', () => {
+    expect(vocabularyTermLabel(CREATURE_TYPE_TERM, { number: 'plural', casing: 'title' })).toBe(
+      'creature types',
+    )
+  })
+})
+
+describe('vocabularyTermFieldCopy', () => {
+  it('builds sentence-case field labels and choose placeholders', () => {
+    expect(vocabularyTermFieldCopy(CREATURE_TYPE_TERM)).toEqual({
+      label: 'Creature type',
+      placeholder: 'Choose a creature type…',
+    })
+    expect(vocabularyTermFieldCopy(DAMAGE_TYPE_TERM, { multiple: true })).toEqual({
+      label: 'Damage types',
+      placeholder: 'Choose damage types…',
+    })
+  })
+})
+
+describe('vocabulary term helpers', () => {
+  it('returns the title-case label for a vocabulary concept', () => {
+    expect(getVocabularyTermLabel(MAGIC_ITEM_RARITY_TERM)).toBe('Magic Item Rarity')
+  })
+})
 
 describe('term sentence forms', () => {
   it('derives lowercase singular and simple plural forms by default', () => {

@@ -11,14 +11,17 @@ import {
   evaluateEquipmentPackageSwitch,
   indexCharacterBuildCatalog,
   initPackageSwitchDraftQuantities,
+  isStartingGoldOption,
   rebuildPackageSwitchDraftQuantities,
   resolveBuilderStepReadiness,
+  resolveEquipmentStepModel,
   resolveStartingEquipmentOptionSummaries,
   type CharacterBuildContext,
   type CharacterBuilderDraft,
   type ChoiceSet,
   type EquipmentPackageSwitchBlockingReason,
   type EquipmentPackageSwitchInventorySnapshot,
+  type ResolvedStartingEquipmentFunding,
   type StartingPackageConversionPreview,
 } from '@rpg/contracts'
 
@@ -27,19 +30,23 @@ import {
   buildEquipmentRemoveEntryPatch,
   buildEquipmentSelectionPatch,
   buildEquipmentSetPurchaseQuantityPatch,
+  buildMagicItemAcquisitionPatch,
   choiceSetsForEquipmentStep,
   findStartingEquipmentChoiceSet,
   hasGoldStartingEquipmentOption,
-  readSelectedStartingEquipmentOption,
   readEquipmentPurchaseQuantity,
+  readSelectedStartingEquipmentOption,
   resolveEquipmentStepBudget,
   resolveEquipmentStepPickerItems,
   resolvePurchaseSourceMode,
   resolveStartingGoldPurchaseId,
   shouldShowEquipmentBudget,
   shouldShowEquipmentFallback,
+  shouldShowEquipmentPurchaseWorkflow,
   shouldShowEquipmentShopping,
+  type EquipmentPickerWorkflowMode,
 } from '../../lib/equipment-step.lib'
+import { useEquipmentMagicItemWorkflow } from './use-equipment-magic-item-workflow.client'
 import { withChoiceSetSelections } from '../../lib/choice-set-selections'
 import { resolveEquipmentPickerCharacterPreviewContext } from '../equipment/equipment-picker-character-preview.lib'
 import type { EquipmentPickerDrawer } from '../equipment/equipment-picker-drawer.client'
@@ -71,6 +78,9 @@ export function useEquipmentStep(args: {
     useState<PendingEquipmentPackageSwitch | null>(null)
   const [isPackageSwitchCommitting, setIsPackageSwitchCommitting] = useState(false)
   const [pickerOpen, setPickerOpen] = useState(false)
+  const [pickerWorkflowMode, setPickerWorkflowMode] =
+    useState<EquipmentPickerWorkflowMode>('purchase')
+  const [focusedAllowanceId, setFocusedAllowanceId] = useState<string | undefined>(undefined)
   const [conversionEditorOpen, setConversionEditorOpen] = useState(false)
   const [selectedPackageItemKeys, setSelectedPackageItemKeys] = useState<ReadonlySet<string>>(
     () => new Set(),
@@ -94,22 +104,63 @@ export function useEquipmentStep(args: {
   const startingEquipmentChoiceSet = classId
     ? findStartingEquipmentChoiceSet(resolvedChoiceSets, classId)
     : undefined
+  const stepModel = useMemo(
+    () =>
+      characterClass
+        ? resolveEquipmentStepModel({
+            draft,
+            catalogIndex,
+            startingWealth: context.characterCreationRules.startingWealth,
+          })
+        : undefined,
+    [catalogIndex, characterClass, context.characterCreationRules.startingWealth, draft],
+  )
+  const fundingByOptionId =
+    stepModel?.fundingByOptionId ?? new Map<string, ResolvedStartingEquipmentFunding>()
+  const classOptionPolicy =
+    stepModel?.currentFunding?.classOptionPolicy ??
+    [...fundingByOptionId.values()][0]?.classOptionPolicy ??
+    'included'
+  const classOptionsReplaced = classOptionPolicy === 'replaced'
+  const tierLabel =
+    stepModel?.currentFunding?.tierLabel ?? [...fundingByOptionId.values()][0]?.tierLabel
   const summaries = useMemo(
     () =>
       characterClass
-        ? resolveStartingEquipmentOptionSummaries(characterClass, catalogIndex, draft)
+        ? resolveStartingEquipmentOptionSummaries(characterClass, catalogIndex, draft, {
+            fundingByOptionId,
+          })
         : [],
-    [catalogIndex, characterClass, draft],
+    [catalogIndex, characterClass, draft, fundingByOptionId],
   )
   const selectedOptionId = readSelectedStartingEquipmentOption(draft, classId)
   const showFallback =
-    shouldShowEquipmentFallback(summaries) && !hasGoldStartingEquipmentOption(summaries)
+    !classOptionsReplaced &&
+    shouldShowEquipmentFallback(summaries) &&
+    !hasGoldStartingEquipmentOption(summaries)
   const showBudget = shouldShowEquipmentBudget(draft, selectedOptionId)
-  const showShopping = shouldShowEquipmentShopping(draft, selectedOptionId)
+  const showShopping =
+    !classOptionsReplaced && shouldShowEquipmentShopping(draft, selectedOptionId, characterClass)
   const budget = useMemo(
-    () => (showBudget ? resolveEquipmentStepBudget(draft, catalogIndex) : undefined),
-    [catalogIndex, draft, showBudget],
+    () => (showBudget ? resolveEquipmentStepBudget(draft, catalogIndex, context) : undefined),
+    [catalogIndex, context, draft, showBudget],
   )
+
+  const goldOptionFunding = useMemo(() => {
+    const startingEquipment = characterClass?.characterCreation?.startingEquipment
+    if (!startingEquipment) return undefined
+
+    const goldOption = startingEquipment.options.find(isStartingGoldOption)
+    return goldOption ? fundingByOptionId.get(goldOption.id) : undefined
+  }, [characterClass, fundingByOptionId])
+
+  const resolveGoldOptionFunding = (): ResolvedStartingEquipmentFunding | undefined =>
+    goldOptionFunding
+
+  const resolveTargetFunding = (
+    targetOptionId: string,
+  ): ResolvedStartingEquipmentFunding | undefined => fundingByOptionId.get(targetOptionId)
+  const showPurchaseWorkflow = shouldShowEquipmentPurchaseWorkflow(draft, selectedOptionId, budget)
   const { items: pickerItems, browseSortContext: pickerBrowseSortContext } = useMemo(
     () =>
       characterClass
@@ -118,10 +169,20 @@ export function useEquipmentStep(args: {
             characterClass,
             catalogIndex,
             choiceSets: resolvedChoiceSets,
+            budget,
           })
         : { items: [], browseSortContext: { preferMartialWeaponBrowseOrder: false } },
-    [catalogIndex, characterClass, draft, resolvedChoiceSets],
+    [budget, catalogIndex, characterClass, draft, resolvedChoiceSets],
   )
+  const magicItemWorkflow = useEquipmentMagicItemWorkflow({
+    draft,
+    context,
+    catalogIndex,
+    pickerItems,
+    pickerWorkflowMode,
+    showPurchaseWorkflow,
+    focusedAllowanceId,
+  })
   const characterPreviewContext = useMemo(
     () =>
       showBudget
@@ -157,6 +218,7 @@ export function useEquipmentStep(args: {
         optionId: selection.optionId,
         choiceSetId: startingEquipmentChoiceSet.id,
         nestedSelections: selection.nestedSelections,
+        characterClass: characterClass!,
       }),
     )
     setIsPackageChooserExpanded(false)
@@ -166,10 +228,14 @@ export function useEquipmentStep(args: {
     optionId: string,
     nestedSelections: CharacterBuilderDraft['choiceSelections'],
   ) => {
+    const targetFunding = resolveTargetFunding(optionId)
+    if (!targetFunding) return
+
     const evaluation = evaluateEquipmentPackageSwitch({
       draft,
       catalogIndex,
       targetOptionId: optionId,
+      targetFunding,
       nestedSelections,
     })
 
@@ -209,10 +275,17 @@ export function useEquipmentStep(args: {
 
     setIsPackageSwitchCommitting(true)
 
+    const targetFunding = resolveTargetFunding(pendingPackageSwitch.targetOptionId)
+    if (!targetFunding) {
+      dismissPackageSwitch()
+      return
+    }
+
     const result = buildEquipmentPackageSwitchPatch({
       draft,
       catalogIndex,
       targetOptionId: pendingPackageSwitch.targetOptionId,
+      targetFunding,
       choiceSetId: startingEquipmentChoiceSet.id,
       nestedSelections: pendingPackageSwitch.nestedSelections,
       draftQuantitiesByPurchaseId: pendingPackageSwitch.draftQuantitiesByPurchaseId,
@@ -225,6 +298,7 @@ export function useEquipmentStep(args: {
           draft,
           catalogIndex,
           targetOptionId: pendingPackageSwitch.targetOptionId,
+          targetFunding,
           nestedSelections: pendingPackageSwitch.nestedSelections,
         })
 
@@ -262,14 +336,18 @@ export function useEquipmentStep(args: {
   const packageSwitchEvaluation = useMemo(() => {
     if (!pendingPackageSwitch) return undefined
 
+    const targetFunding = resolveTargetFunding(pendingPackageSwitch.targetOptionId)
+    if (!targetFunding) return undefined
+
     return evaluateEquipmentPackageSwitch({
       draft,
       catalogIndex,
       targetOptionId: pendingPackageSwitch.targetOptionId,
+      targetFunding,
       nestedSelections: pendingPackageSwitch.nestedSelections,
       draftQuantitiesByPurchaseId: pendingPackageSwitch.draftQuantitiesByPurchaseId,
     })
-  }, [catalogIndex, draft, pendingPackageSwitch])
+  }, [catalogIndex, draft, fundingByOptionId, pendingPackageSwitch])
 
   useEffect(() => {
     setPendingPackageSwitch((prev) => {
@@ -280,10 +358,14 @@ export function useEquipmentStep(args: {
         return prev
       }
 
+      const targetFunding = resolveTargetFunding(prev.targetOptionId)
+      if (!targetFunding) return null
+
       const evaluation = evaluateEquipmentPackageSwitch({
         draft,
         catalogIndex,
         targetOptionId: prev.targetOptionId,
+        targetFunding,
         nestedSelections: prev.nestedSelections,
       })
 
@@ -300,25 +382,29 @@ export function useEquipmentStep(args: {
         commitErrorReason: undefined,
       }
     })
-  }, [catalogIndex, draft])
+  }, [catalogIndex, draft, fundingByOptionId])
 
   const requestSelection = (
     optionId: string,
     nestedSelections: CharacterBuilderDraft['choiceSelections'],
   ) => {
-    if (!classId || !startingEquipmentChoiceSet) return
+    if (!classId || !startingEquipmentChoiceSet || classOptionsReplaced) return
     if (optionId === selectedOptionId) {
       setIsPackageChooserExpanded(false)
       return
     }
 
     const nextSelection = { optionId, nestedSelections }
-    const packageSwitchPreview = evaluateEquipmentPackageSwitch({
-      draft,
-      catalogIndex,
-      targetOptionId: optionId,
-      nestedSelections,
-    })
+    const targetFunding = resolveTargetFunding(optionId)
+    const packageSwitchPreview =
+      targetFunding &&
+      evaluateEquipmentPackageSwitch({
+        draft,
+        catalogIndex,
+        targetOptionId: optionId,
+        targetFunding,
+        nestedSelections,
+      })
 
     if (packageSwitchPreview && packageSwitchPreview.status !== 'noConflict') {
       openPackageSwitchResolution(optionId, nestedSelections)
@@ -333,11 +419,22 @@ export function useEquipmentStep(args: {
     applySelection(nextSelection)
   }
 
-  const openPicker = () => {
+  const openPicker = (
+    mode: EquipmentPickerWorkflowMode = 'purchase',
+    options?: { allowanceId?: string },
+  ) => {
+    setPickerWorkflowMode(mode)
+    setFocusedAllowanceId(options?.allowanceId)
     setPickerOpen(true)
   }
 
+  const handlePickerOpenChange = (open: boolean) => {
+    setPickerOpen(open)
+    if (!open) setFocusedAllowanceId(undefined)
+  }
+
   const expandPackageChooser = () => {
+    if (classOptionsReplaced) return
     setIsPackageChooserExpanded(true)
   }
 
@@ -348,11 +445,15 @@ export function useEquipmentStep(args: {
   const defaultSelectedPackageItemKeys = (deselectedKeys: ReadonlySet<string> = new Set()) => {
     if (!selectedOptionId) return new Set<string>()
 
+    const targetFunding = resolveGoldOptionFunding()
+    if (!targetFunding) return new Set<string>()
+
     const preview = buildStartingPackageConversionPreview({
       draft,
       catalogIndex,
       departingOptionId: selectedOptionId,
       selectedPackageItemKeys: new Set(),
+      targetFunding,
     })
 
     if (!preview) return new Set<string>()
@@ -365,6 +466,7 @@ export function useEquipmentStep(args: {
   }
 
   const openConversionEditor = (deselectedKeys: ReadonlySet<string> = new Set()) => {
+    if (classOptionsReplaced) return
     setConversionCommitStatusMessage(undefined)
     setSelectedPackageItemKeys(defaultSelectedPackageItemKeys(deselectedKeys))
     setConversionEditorOpen(true)
@@ -373,11 +475,15 @@ export function useEquipmentStep(args: {
   const handleCommitConversion = (_preview: StartingPackageConversionPreview) => {
     if (!selectedOptionId) return
 
+    const targetFunding = resolveGoldOptionFunding()
+    if (!targetFunding) return
+
     const patch = buildStartingPackageConversionPatch({
       draft,
       catalogIndex,
       departingOptionId: selectedOptionId,
       selectedPackageItemKeys,
+      targetFunding,
     })
 
     if (!patch) return
@@ -391,6 +497,18 @@ export function useEquipmentStep(args: {
     item,
     quantity,
   ) => {
+    if (pickerWorkflowMode === 'magic_items') {
+      const patch = buildMagicItemAcquisitionPatch({
+        draft,
+        context,
+        catalogIndex,
+        equipmentId: item.equipment.id,
+        requestedQuantity: quantity,
+      })
+      if (patch) onDraftChange(patch)
+      return
+    }
+
     if (!showBudget) return
 
     const patch = buildEquipmentAddPurchasePatch({
@@ -399,6 +517,8 @@ export function useEquipmentStep(args: {
       equipmentId: item.equipment.id,
       sourceMode: resolvePurchaseSourceMode(),
       quantity,
+      budget,
+      context,
     })
     if (patch) onDraftChange(patch)
   }
@@ -412,6 +532,7 @@ export function useEquipmentStep(args: {
       catalogIndex,
       purchaseId: target.purchaseId,
       quantity,
+      budget,
     })
     if (patch) onDraftChange(patch)
   }
@@ -450,26 +571,42 @@ export function useEquipmentStep(args: {
       catalogIndex,
       purchaseId,
       quantity: currentQuantity - 1,
+      budget,
     })
     if (patch) onDraftChange(patch)
   }
 
   return {
     catalogIndex,
+    context,
     characterClass,
     classId,
     equipmentChoiceSets,
     resolvedChoiceSets,
     summaries,
     selectedOptionId,
+    goldOptionFunding,
+    classOptionPolicy,
+    classOptionsReplaced,
+    tierLabel,
     showFallback,
     showBudget,
     showShopping,
+    showMagicItemGrants: magicItemWorkflow.showMagicItemGrants,
+    showPurchaseWorkflow,
+    acquisition: magicItemWorkflow.acquisition,
+    magicItemProgressLabel: magicItemWorkflow.magicItemProgressLabel,
+    pickerWorkflowMode,
+    pickerWorkflowModes: magicItemWorkflow.pickerWorkflowModes,
+    focusedAllowanceId,
+    setFocusedAllowanceId,
     budget,
-    pickerItems,
+    pickerItems: magicItemWorkflow.filteredPickerItems,
+    allPickerItems: pickerItems,
     pickerBrowseSortContext,
     characterPreviewContext,
     ownedPurchaseQuantities,
+    ownedGrantQuantities: magicItemWorkflow.ownedGrantQuantities,
     pendingSelection,
     setPendingSelection,
     pendingPackageSwitch,
@@ -479,7 +616,8 @@ export function useEquipmentStep(args: {
     handleCommitPackageSwitch,
     isPackageSwitchCommitting,
     pickerOpen,
-    setPickerOpen,
+    setPickerOpen: handlePickerOpenChange,
+    setPickerWorkflowMode,
     conversionEditorOpen,
     setConversionEditorOpen,
     selectedPackageItemKeys,

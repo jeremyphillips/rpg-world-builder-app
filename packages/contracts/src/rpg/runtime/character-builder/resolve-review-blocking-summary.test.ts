@@ -1,8 +1,16 @@
 import { describe, expect, it } from 'vitest'
 
+import { resolveCharacterCreationPatch } from '../../campaign/patches/campaign-character-creation-patch'
+import { standardStartingWealthTableId } from '../../campaign/rules/starting-wealth'
+import {
+  MINIMAL_TIER_B_ID,
+  minimalStartingWealthSeedCoveringStandardMax,
+} from '../../../test/fixtures/starting-wealth-minimal'
 import { createEmptyCharacterBuilderDraft } from './draft'
+import { buildMagicItemAllowanceId } from './magic-item-selection'
 import { resolveReviewBlockingSummary } from './resolve-review-blocking-summary'
 import { builderTestContext } from './test-fixtures'
+import { magicItemGrantIncompleteIssueCode } from './resolvers/equipment/resolve-equipment-magic-item-grant-step-issues'
 
 describe('resolveReviewBlockingSummary', () => {
   it('maps submit-blocking field issues and unresolved choice sets to required items', () => {
@@ -58,6 +66,54 @@ describe('resolveReviewBlockingSummary', () => {
       ]),
     )
     expect(summary.nonActionable).toEqual([])
+  })
+
+  it('attaches equipment picker focus for magic-item grant review items', () => {
+    const context = {
+      ...builderTestContext,
+      characterCreationRules: {
+        ...builderTestContext.characterCreationRules,
+        ...resolveCharacterCreationPatch(undefined, minimalStartingWealthSeedCoveringStandardMax),
+      },
+    }
+    const draft = {
+      ...createEmptyCharacterBuilderDraft(),
+      class: { classId: 'srd-cc-5.2.1:fighter', level: 2 },
+      equipment: {
+        mode: 'package' as const,
+        purchases: [],
+        removedPackageItemKeys: [],
+        customized: false,
+        magicItemSelections: [],
+      },
+    }
+    const allowanceId = buildMagicItemAllowanceId({
+      startingWealthTableId: standardStartingWealthTableId('srd-cc-5.2.1'),
+      tierId: MINIMAL_TIER_B_ID,
+      rarity: 'common',
+    })
+    const summary = resolveReviewBlockingSummary(
+      draft,
+      context,
+      [],
+      [
+        {
+          code: magicItemGrantIncompleteIssueCode(allowanceId),
+          message: 'Choose 1 Common magic item grant.',
+          path: 'equipment.magicItemSelections',
+          stepId: 'equipment',
+          allowanceId,
+        },
+      ],
+    )
+
+    expect(summary.requiredItems).toEqual([
+      expect.objectContaining({
+        stepId: 'equipment',
+        equipmentPickerFocus: { mode: 'magic_items', allowanceId },
+        progress: { current: 0, total: 1 },
+      }),
+    ])
   })
 
   it('derives alert issues from final submit validation when none are provided', () => {

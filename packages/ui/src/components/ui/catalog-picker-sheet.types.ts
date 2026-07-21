@@ -2,22 +2,17 @@ import type { ReactNode } from 'react'
 
 import type { CollapsibleListItemShellPreset } from './collapsible-list-item/collapsible-list-item-shell.client'
 import type { FieldSurfaceVariant } from './field-surface.variants'
+import type { CatalogToolbarTab, CatalogToolbarTabs } from './catalog-toolbar.types'
 
-export type CatalogPickerTab = {
-  id: string
-  label: string
-  count?: number
-}
+export type CatalogPickerTab = CatalogToolbarTab
 
-/** Coordinated toolbar actions (e.g. clear search, reset tab) — not for implementing search inside toolbar controls. */
-export type CatalogPickerSheetToolbarContext = {
+export type CatalogPickerSheetActionsHelpers = {
   searchQuery: string
-  setSearchQuery: (query: string) => void
-  clearSearchQuery: () => void
   activeTabId: string
-  setActiveTabId: (tabId: string) => void
+  resetSearchQuery: () => void
   resetActiveTab: () => void
 }
+
 export type CatalogPickerSheetProps<TItem> = {
   open: boolean
   onOpenChange: (open: boolean) => void
@@ -40,14 +35,20 @@ export type CatalogPickerSheetProps<TItem> = {
   /** When false (default), tabs and recommendation browse UI are not rendered. */
   recommendationsEnabled?: boolean
   /** Placement of recommendation tabs relative to search. Defaults to before-search. */
-  recommendationTabsPosition?: 'before-search' | 'after-search'
+  recommendationTabsPosition?: CatalogToolbarTabs['position']
   /** Content between header description and toolbar (e.g. segmented mode control). */
   headerBelowDescription?: ReactNode
-  /** Content after search and optional recommendation tabs (e.g. level chips). */
-  postSearchContent?: ReactNode
-  toolbarControls?: ReactNode | ((context: CatalogPickerSheetToolbarContext) => ReactNode)
-  /** Trailing actions rendered inline with the tab row (e.g. Reset view). */
-  tabToolbarActions?: ReactNode | ((context: CatalogPickerSheetToolbarContext) => ReactNode)
+  /** Content below search and optional tabs (e.g. level chips). */
+  primaryControls?: ReactNode
+  filterRow?: {
+    controls?: ReactNode | ((helpers: CatalogPickerSheetActionsHelpers) => ReactNode)
+    actions?: ReactNode
+  }
+  actions?: ReactNode | ((helpers: CatalogPickerSheetActionsHelpers) => ReactNode)
+  /** Restores sheet-managed search when `toolbarStateKey` changes. */
+  initialSearchQuery?: string
+  /** When this value changes, sheet search/tab state resets to defaults. */
+  toolbarStateKey?: string
   transformVisibleItems?: (
     items: readonly TItem[],
     context: { searchQuery: string },

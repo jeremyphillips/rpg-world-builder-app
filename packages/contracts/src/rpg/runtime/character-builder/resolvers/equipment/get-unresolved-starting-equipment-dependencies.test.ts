@@ -24,7 +24,7 @@ const monkWithLinkedGrant: ClassStored = {
       choose: 1,
       options: [
         {
-          id: 'standard',
+          id: 'standard-equipment',
           label: 'Standard Equipment',
           items: [
             {
@@ -54,7 +54,7 @@ describe('getUnresolvedStartingEquipmentDependencies', () => {
       ...createEmptyCharacterBuilderDraft(),
       class: { classId: monkWithLinkedGrant.id, level: 1 as const },
       choiceSelections: {
-        [startingEquipmentChoiceSetId(monkWithLinkedGrant.id)]: ['standard'],
+        [startingEquipmentChoiceSetId(monkWithLinkedGrant.id)]: ['standard-equipment'],
       },
     }
 
@@ -80,7 +80,7 @@ describe('getUnresolvedStartingEquipmentDependencies', () => {
       ...createEmptyCharacterBuilderDraft(),
       class: { classId: monkWithLinkedGrant.id, level: 1 as const },
       choiceSelections: {
-        [startingEquipmentChoiceSetId(monkWithLinkedGrant.id)]: ['standard'],
+        [startingEquipmentChoiceSetId(monkWithLinkedGrant.id)]: ['standard-equipment'],
         [monkToolChoiceSetId]: [luteTool.id],
       },
     }

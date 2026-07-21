@@ -1,7 +1,7 @@
 import {
   EQUIPMENT_PURCHASE_QUANTITY_MAX,
   isEquipmentStackable,
-  resolveEquipmentAcquisitionMaxQuantity,
+  maxAffordablePurchaseQuantity,
   type CharacterBuilderDraftEquipmentPurchase,
   type Equipment,
   type EquipmentBudgetSummary,
@@ -40,9 +40,12 @@ export function resolveEquipmentStepPurchaseMaxQuantity(args: {
     return currentQuantity > 0 ? currentQuantity : 1
   }
 
-  return resolveEquipmentAcquisitionMaxQuantity({
-    equipment: args.equipment,
-    budget: args.budget,
-    currentQuantity,
-  })
+  return Math.min(
+    EQUIPMENT_PURCHASE_QUANTITY_MAX,
+    maxAffordablePurchaseQuantity({
+      equipment: args.equipment,
+      budget: args.budget,
+      currentPurchaseQuantity: currentQuantity,
+    }),
+  )
 }

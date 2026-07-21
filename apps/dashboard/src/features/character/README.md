@@ -14,7 +14,7 @@ Folder layout and the feature-boundary rule are documented in
 | List route         | `routes/characters-overview.tsx`                           |
 | Create route       | `routes/character-create.tsx` (concentration mode)         |
 | Detail route       | `routes/character-detail.tsx`                              |
-| Detail content     | `components/character-detail-content.client.tsx`           |
+| Detail content     | `components/detail/character-detail-content.client.tsx`    |
 | API clients        | `api/character-client.ts`, `api/ruleset-content-client.ts` |
 | Build context      | `hooks/use-build-context.ts`                               |
 | Character queries  | `hooks/use-character.ts`, `hooks/use-characters.ts`        |

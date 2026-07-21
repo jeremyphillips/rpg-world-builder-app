@@ -32,6 +32,7 @@ import {
   EQUIPMENT_PACKAGE_CUSTOMIZE_LABEL,
   EQUIPMENT_SELECTED_PACKAGE_EYEBROW,
   EQUIPMENT_STEP_BROWSE_LABEL,
+  EQUIPMENT_GOLD_OPTION_STARTING_MESSAGE,
 } from '../../lib/equipment-step.lib'
 import { EQUIPMENT_PICKER_PROFICIENCY_AVAILABLE_LABEL } from '../equipment/equipment-picker-drawer.types'
 import { EQUIPMENT_PICKER_PURCHASE_COMMIT_LABEL } from '../equipment/equipment-picker-purchase.lib'
@@ -118,7 +119,7 @@ describe('EquipmentStep', () => {
     expect(onDraftChange).toHaveBeenCalledWith(
       expect.objectContaining({
         choiceSelections: expect.objectContaining({
-          [startingEquipmentChoiceSetId(equipmentStepBardClassFixture.id)]: ['gold'],
+          [startingEquipmentChoiceSetId(equipmentStepBardClassFixture.id)]: ['starting-gold'],
         }),
         equipment: expect.objectContaining({ mode: 'gold' }),
       }),
@@ -131,12 +132,12 @@ describe('EquipmentStep', () => {
 
     expect(screen.queryByRole('combobox', { name: 'Musical Instrument' })).not.toBeInTheDocument()
 
-    await user.click(screen.getByRole('radio', { name: /Standard Equipment/i }))
+    await user.click(screen.getByRole('radio', { name: /^Standard Equipment/ }))
 
     expect(onDraftChange).toHaveBeenCalledWith(
       expect.objectContaining({
         choiceSelections: expect.objectContaining({
-          [startingEquipmentChoiceSetId(equipmentStepBardClassFixture.id)]: ['standard'],
+          [startingEquipmentChoiceSetId(equipmentStepBardClassFixture.id)]: ['standard-equipment'],
         }),
         equipment: expect.objectContaining({ mode: 'package' }),
       }),
@@ -149,7 +150,7 @@ describe('EquipmentStep', () => {
       ...createEmptyCharacterBuilderDraft(),
       class: { classId: equipmentStepBardClassFixture.id, level: 1 as const },
       choiceSelections: {
-        [startingEquipmentChoiceSetId(equipmentStepBardClassFixture.id)]: ['standard'],
+        [startingEquipmentChoiceSetId(equipmentStepBardClassFixture.id)]: ['standard-equipment'],
       },
       equipment: {
         mode: 'package' as const,
@@ -166,9 +167,11 @@ describe('EquipmentStep', () => {
     expect(onDraftChange).toHaveBeenCalledWith(
       expect.objectContaining({
         choiceSelections: expect.objectContaining({
-          [nestedStartingEquipmentChoiceSetId(equipmentStepBardClassFixture.id, 'standard', 1)]: [
-            'srd-cc-5.2.1:lute',
-          ],
+          [nestedStartingEquipmentChoiceSetId(
+            equipmentStepBardClassFixture.id,
+            'standard-equipment',
+            1,
+          )]: ['srd-cc-5.2.1:lute'],
         }),
       }),
     )
@@ -180,7 +183,7 @@ describe('EquipmentStep', () => {
       ...createEmptyCharacterBuilderDraft(),
       class: { classId: equipmentStepBardClassFixture.id, level: 1 as const },
       choiceSelections: {
-        [startingEquipmentChoiceSetId(equipmentStepBardClassFixture.id)]: ['gold'],
+        [startingEquipmentChoiceSetId(equipmentStepBardClassFixture.id)]: ['starting-gold'],
       },
       equipment: {
         mode: 'gold' as const,
@@ -195,7 +198,7 @@ describe('EquipmentStep', () => {
     expect(screen.getByText(EQUIPMENT_SELECTED_PACKAGE_EYEBROW)).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: 'Starting Gold' })).toBeInTheDocument()
     expect(screen.queryByRole('radio', { name: /^Starting Gold/ })).not.toBeInTheDocument()
-    expect(screen.getByText('Budget')).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: /\d[\d,]* GP remaining/ })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: EQUIPMENT_STEP_BROWSE_LABEL })).toBeInTheDocument()
     expect(screen.getAllByText(/90 GP/).length).toBeGreaterThanOrEqual(1)
 
@@ -210,7 +213,7 @@ describe('EquipmentStep', () => {
       ...createEmptyCharacterBuilderDraft(),
       class: { classId: equipmentStepBardClassFixture.id, level: 1 as const },
       choiceSelections: {
-        [startingEquipmentChoiceSetId(equipmentStepBardClassFixture.id)]: ['gold'],
+        [startingEquipmentChoiceSetId(equipmentStepBardClassFixture.id)]: ['starting-gold'],
       },
       equipment: {
         mode: 'gold' as const,
@@ -227,7 +230,7 @@ describe('EquipmentStep', () => {
     await user.click(screen.getByRole('button', { name: EQUIPMENT_CHANGE_PACKAGE_LABEL }))
 
     expect(screen.getByRole('radio', { name: /^Starting Gold/ })).toBeInTheDocument()
-    expect(screen.getByRole('radio', { name: /Standard Equipment/i })).toBeInTheDocument()
+    expect(screen.getByRole('radio', { name: /^Standard Equipment/ })).toBeInTheDocument()
   })
 
   it('collapses the chooser when clicking the already-selected package', async () => {
@@ -237,7 +240,7 @@ describe('EquipmentStep', () => {
       ...createEmptyCharacterBuilderDraft(),
       class: { classId: equipmentStepBardClassFixture.id, level: 1 as const },
       choiceSelections: {
-        [startingEquipmentChoiceSetId(equipmentStepBardClassFixture.id)]: ['gold'],
+        [startingEquipmentChoiceSetId(equipmentStepBardClassFixture.id)]: ['starting-gold'],
       },
       equipment: {
         mode: 'gold' as const,
@@ -265,7 +268,7 @@ describe('EquipmentStep', () => {
       ...createEmptyCharacterBuilderDraft(),
       class: { classId: equipmentStepBardClassFixture.id, level: 1 as const },
       choiceSelections: {
-        [startingEquipmentChoiceSetId(equipmentStepBardClassFixture.id)]: ['gold'],
+        [startingEquipmentChoiceSetId(equipmentStepBardClassFixture.id)]: ['starting-gold'],
       },
       equipment: {
         mode: 'gold' as const,
@@ -295,7 +298,7 @@ describe('EquipmentStep', () => {
       ...createEmptyCharacterBuilderDraft(),
       class: { classId: equipmentStepBardClassFixture.id, level: 1 as const },
       choiceSelections: {
-        [startingEquipmentChoiceSetId(equipmentStepBardClassFixture.id)]: ['gold'],
+        [startingEquipmentChoiceSetId(equipmentStepBardClassFixture.id)]: ['starting-gold'],
       },
       equipment: {
         mode: 'gold' as const,
@@ -308,7 +311,6 @@ describe('EquipmentStep', () => {
     renderEquipmentStep(draft)
 
     await user.click(screen.getByRole('button', { name: EQUIPMENT_STEP_BROWSE_LABEL }))
-    await user.click(screen.getByRole('tab', { name: /All/i }))
     await user.type(screen.getByRole('textbox', { name: 'Search catalog' }), 'breastplate')
 
     const breastplateRow = screen
@@ -325,7 +327,7 @@ describe('EquipmentStep', () => {
       ...createEmptyCharacterBuilderDraft(),
       class: { classId: equipmentStepBardClassFixture.id, level: 1 as const },
       choiceSelections: {
-        [startingEquipmentChoiceSetId(equipmentStepBardClassFixture.id)]: ['gold'],
+        [startingEquipmentChoiceSetId(equipmentStepBardClassFixture.id)]: ['starting-gold'],
       },
       equipment: {
         mode: 'gold' as const,
@@ -366,7 +368,7 @@ describe('EquipmentStep', () => {
       ...createEmptyCharacterBuilderDraft(),
       class: { classId: equipmentStepBardClassFixture.id, level: 1 as const },
       choiceSelections: {
-        [startingEquipmentChoiceSetId(equipmentStepBardClassFixture.id)]: ['gold'],
+        [startingEquipmentChoiceSetId(equipmentStepBardClassFixture.id)]: ['starting-gold'],
       },
       equipment: {
         mode: 'gold' as const,
@@ -378,7 +380,6 @@ describe('EquipmentStep', () => {
     const { onDraftChange } = renderEquipmentStep(draft)
 
     await user.click(screen.getByRole('button', { name: EQUIPMENT_STEP_BROWSE_LABEL }))
-    await user.click(screen.getByRole('tab', { name: /All/i }))
     await user.type(screen.getByRole('textbox', { name: 'Search catalog' }), 'rations')
 
     const rationsRow = screen
@@ -418,7 +419,7 @@ describe('EquipmentStep', () => {
       ...createEmptyCharacterBuilderDraft(),
       class: { classId: equipmentStepBardClassFixture.id, level: 1 as const },
       choiceSelections: {
-        [startingEquipmentChoiceSetId(equipmentStepBardClassFixture.id)]: ['gold'],
+        [startingEquipmentChoiceSetId(equipmentStepBardClassFixture.id)]: ['starting-gold'],
       },
       equipment: {
         mode: 'gold' as const,
@@ -459,10 +460,12 @@ describe('EquipmentStep', () => {
       ...createEmptyCharacterBuilderDraft(),
       class: { classId: equipmentStepBardClassFixture.id, level: 1 as const },
       choiceSelections: {
-        [startingEquipmentChoiceSetId(equipmentStepBardClassFixture.id)]: ['standard'],
-        [nestedStartingEquipmentChoiceSetId(equipmentStepBardClassFixture.id, 'standard', 1)]: [
-          'srd-cc-5.2.1:lute',
-        ],
+        [startingEquipmentChoiceSetId(equipmentStepBardClassFixture.id)]: ['standard-equipment'],
+        [nestedStartingEquipmentChoiceSetId(
+          equipmentStepBardClassFixture.id,
+          'standard-equipment',
+          1,
+        )]: ['srd-cc-5.2.1:lute'],
       },
       equipment: {
         mode: 'package' as const,
@@ -477,7 +480,7 @@ describe('EquipmentStep', () => {
     expect(
       screen.getByRole('button', { name: EQUIPMENT_PACKAGE_CUSTOMIZE_LABEL }),
     ).toBeInTheDocument()
-    expect(screen.getByText('Budget')).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: /\d[\d,]* GP remaining/ })).toBeInTheDocument()
     expect(screen.getAllByText(/19 GP/).length).toBeGreaterThanOrEqual(1)
     expect(screen.getByRole('button', { name: EQUIPMENT_STEP_BROWSE_LABEL })).toBeInTheDocument()
 
@@ -488,6 +491,29 @@ describe('EquipmentStep', () => {
     await user.click(screen.getByRole('button', { name: EQUIPMENT_PACKAGE_CUSTOMIZE_LABEL }))
 
     expect(screen.getByRole('heading', { name: /Customize Starting Gold/i })).toBeInTheDocument()
+    expect(document.querySelector('.bg-card')).toBeInTheDocument()
+  })
+
+  it('shows the gold-option empty state in inventory while guidance handles shopping', () => {
+    const draft = {
+      ...createEmptyCharacterBuilderDraft(),
+      class: { classId: equipmentStepBardClassFixture.id, level: 1 as const },
+      choiceSelections: {
+        [startingEquipmentChoiceSetId(equipmentStepBardClassFixture.id)]: ['starting-gold'],
+      },
+      equipment: {
+        mode: 'gold' as const,
+        purchases: [],
+        removedPackageItemKeys: [],
+        customized: false,
+      },
+    }
+
+    renderEquipmentStep(draft)
+
+    expect(screen.getByText(EQUIPMENT_GOLD_OPTION_STARTING_MESSAGE)).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: /\d[\d,]* GP remaining/ })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: EQUIPMENT_STEP_BROWSE_LABEL })).toBeInTheDocument()
   })
 
   describe('package switch resolution', () => {
@@ -498,7 +524,7 @@ describe('EquipmentStep', () => {
         ...createEmptyCharacterBuilderDraft(),
         class: { classId: equipmentStepBardClassFixture.id, level: 1 as const },
         choiceSelections: {
-          [startingEquipmentChoiceSetId(equipmentStepBardClassFixture.id)]: ['gold'],
+          [startingEquipmentChoiceSetId(equipmentStepBardClassFixture.id)]: ['starting-gold'],
         },
         equipment: {
           mode: 'gold' as const,
@@ -519,7 +545,7 @@ describe('EquipmentStep', () => {
 
     async function openPackageSwitchToStandard(user: ReturnType<typeof userEvent.setup>) {
       await user.click(screen.getByRole('button', { name: EQUIPMENT_CHANGE_PACKAGE_LABEL }))
-      await user.click(screen.getByRole('radio', { name: /Standard Equipment/i }))
+      await user.click(screen.getByRole('radio', { name: /^Standard Equipment/ }))
     }
 
     it('opens the resolution modal when gold purchases exceed the target allowance', async () => {
@@ -554,7 +580,7 @@ describe('EquipmentStep', () => {
         ...createEmptyCharacterBuilderDraft(),
         class: { classId: equipmentStepBardClassFixture.id, level: 1 as const },
         choiceSelections: {
-          [startingEquipmentChoiceSetId(equipmentStepBardClassFixture.id)]: ['gold'],
+          [startingEquipmentChoiceSetId(equipmentStepBardClassFixture.id)]: ['starting-gold'],
         },
         equipment: {
           mode: 'gold' as const,
@@ -596,7 +622,9 @@ describe('EquipmentStep', () => {
       expect(onDraftChange).toHaveBeenCalledWith(
         expect.objectContaining({
           choiceSelections: expect.objectContaining({
-            [startingEquipmentChoiceSetId(equipmentStepBardClassFixture.id)]: ['standard'],
+            [startingEquipmentChoiceSetId(equipmentStepBardClassFixture.id)]: [
+              'standard-equipment',
+            ],
           }),
           equipment: expect.objectContaining({
             mode: 'package',
@@ -626,7 +654,7 @@ describe('EquipmentStep monk proficiency-linked grants', () => {
       ...createEmptyCharacterBuilderDraft(),
       class: { classId: equipmentStepMonkClassFixture.id, level: 1 as const },
       choiceSelections: {
-        [startingEquipmentChoiceSetId(equipmentStepMonkClassFixture.id)]: ['standard'],
+        [startingEquipmentChoiceSetId(equipmentStepMonkClassFixture.id)]: ['standard-equipment'],
       },
       equipment: {
         mode: 'package' as const,
@@ -650,12 +678,12 @@ describe('EquipmentStep monk proficiency-linked grants', () => {
       class: { classId: equipmentStepMonkClassFixture.id, level: 1 as const },
     })
 
-    await user.click(screen.getByRole('radio', { name: /Standard Equipment/i }))
+    await user.click(screen.getByRole('radio', { name: /^Standard Equipment/ }))
 
     expect(onDraftChange).toHaveBeenCalledWith(
       expect.objectContaining({
         choiceSelections: expect.objectContaining({
-          [startingEquipmentChoiceSetId(equipmentStepMonkClassFixture.id)]: ['standard'],
+          [startingEquipmentChoiceSetId(equipmentStepMonkClassFixture.id)]: ['standard-equipment'],
         }),
         equipment: expect.objectContaining({ mode: 'package' }),
       }),
@@ -668,7 +696,7 @@ describe('EquipmentStep monk proficiency-linked grants', () => {
       ...createEmptyCharacterBuilderDraft(),
       class: { classId: equipmentStepMonkClassFixture.id, level: 1 as const },
       choiceSelections: {
-        [startingEquipmentChoiceSetId(equipmentStepMonkClassFixture.id)]: ['standard'],
+        [startingEquipmentChoiceSetId(equipmentStepMonkClassFixture.id)]: ['standard-equipment'],
       },
       equipment: {
         mode: 'package' as const,
@@ -694,7 +722,7 @@ describe('EquipmentStep monk proficiency-linked grants', () => {
       ...createEmptyCharacterBuilderDraft(),
       class: { classId: equipmentStepMonkClassFixture.id, level: 1 as const },
       choiceSelections: {
-        [startingEquipmentChoiceSetId(equipmentStepMonkClassFixture.id)]: ['standard'],
+        [startingEquipmentChoiceSetId(equipmentStepMonkClassFixture.id)]: ['standard-equipment'],
         [monkToolChoiceSetId]: [equipmentStepLuteFixture.id],
       },
       equipment: {
@@ -756,7 +784,7 @@ describe('EquipmentStep monk proficiency-linked grants', () => {
       ...createEmptyCharacterBuilderDraft(),
       class: { classId: equipmentStepMonkClassFixture.id, level: 1 as const },
       choiceSelections: {
-        [startingEquipmentChoiceSetId(equipmentStepMonkClassFixture.id)]: ['standard'],
+        [startingEquipmentChoiceSetId(equipmentStepMonkClassFixture.id)]: ['standard-equipment'],
         [monkToolChoiceSetId]: [equipmentStepDrumFixture.id],
       },
       equipment: {
@@ -790,7 +818,7 @@ describe('EquipmentStep monk proficiency-linked grants', () => {
       ...createEmptyCharacterBuilderDraft(),
       class: { classId: equipmentStepMonkClassFixture.id, level: 1 as const },
       choiceSelections: {
-        [startingEquipmentChoiceSetId(equipmentStepMonkClassFixture.id)]: ['standard'],
+        [startingEquipmentChoiceSetId(equipmentStepMonkClassFixture.id)]: ['standard-equipment'],
         [monkToolChoiceSetId]: [equipmentStepLuteFixture.id],
       },
       equipment: {
@@ -827,7 +855,7 @@ describe('EquipmentStep monk proficiency-linked grants', () => {
     draft = {
       ...draft,
       choiceSelections: {
-        [startingEquipmentChoiceSetId(equipmentStepMonkClassFixture.id)]: ['gold'],
+        [startingEquipmentChoiceSetId(equipmentStepMonkClassFixture.id)]: ['starting-gold'],
         [monkToolChoiceSetId]: [equipmentStepLuteFixture.id],
       },
       equipment: {
@@ -851,7 +879,7 @@ describe('EquipmentStep monk proficiency-linked grants', () => {
     expect(screen.queryByText(EQUIPMENT_INCLUDED_TOOL_SECTION_LABEL)).not.toBeInTheDocument()
 
     await user.click(screen.getByRole('button', { name: EQUIPMENT_CHANGE_PACKAGE_LABEL }))
-    await user.click(screen.getByRole('radio', { name: /Standard Equipment/i }))
+    await user.click(screen.getByRole('radio', { name: /^Standard Equipment/ }))
 
     expect(onDraftChange).toHaveBeenLastCalledWith(
       expect.objectContaining({

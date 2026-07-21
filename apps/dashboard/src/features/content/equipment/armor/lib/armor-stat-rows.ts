@@ -1,5 +1,10 @@
 import type { ArmorEquipment } from '@rpg/contracts'
-import { formatMoney, formatWeight, getArmorAcDisplay, getArmorCategoryLabel } from '@rpg/contracts'
+import {
+  formatEquipmentCostLabel,
+  formatWeight,
+  getArmorAcDisplay,
+  getArmorCategoryLabel,
+} from '@rpg/contracts'
 
 import type { ContentStatRowData } from '../../../lib/detail/content-stat-rows'
 import { titleCase } from '../../../lib/utils/title-case'
@@ -21,6 +26,6 @@ export function getArmorStatRows(item: ArmorEquipment): ContentStatRowData[] {
       : []),
     ...(item.material ? [{ label: 'Material', value: titleCase(item.material) }] : []),
     ...(item.weight ? [{ label: 'Weight', value: formatWeight(item.weight) }] : []),
-    { label: 'Cost', value: formatMoney(item.cost) },
+    { label: 'Cost', value: formatEquipmentCostLabel(item.cost) ?? 'No market price' },
   ]
 }

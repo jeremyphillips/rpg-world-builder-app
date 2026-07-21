@@ -4,6 +4,10 @@ import { formatSlugAsLabel } from '@rpg/contracts'
 import type { Spell } from '@rpg/contracts'
 
 import { ROUTES } from '@/app/routes'
+import {
+  formatContentNotFoundMessage,
+  formatContentListLoadErrorMessage,
+} from '@/features/content/lib/content-type-labels'
 import { useSetBreadcrumbLabel } from '@/components/layout/use-breadcrumb-label'
 import { WidePage } from '@/components/layout/wide-page'
 import { useClasses } from '../../classes/hooks/use-classes'
@@ -229,8 +233,8 @@ export function SpellDetail() {
       isError={isError}
       items={spells}
       itemId={spellId}
-      loadErrorLabel="Could not load spells."
-      notFoundLabel="Spell not found."
+      loadErrorLabel={formatContentListLoadErrorMessage('spells')}
+      notFoundLabel={formatContentNotFoundMessage('spells')}
     >
       {(spell) => <SpellDetailContent spell={spell} campaignId={campaignId} />}
     </ContentDetailResolver>

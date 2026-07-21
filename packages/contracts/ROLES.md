@@ -63,16 +63,35 @@ Govern what a user can do within a specific campaign. Always scoped to a single
 
 ## Character Ownership
 
-Characters are owned by users at the platform level, independent of campaigns.
+Stored characters are discriminated by `characterType`: `pc` or `npc`. Ownership
+semantics differ — do not apply PC rules to NPCs or vice versa. Dashboard
+acquisition detail: [character-acquisition.md](../../apps/dashboard/docs/character-acquisition.md).
 
-- Every user owns all characters they create.
-- A user can own multiple characters.
-- A character can be submitted to at most one campaign at a time
+### Player characters (`characterType: 'pc'`)
+
+User-owned at the platform level, independent of campaigns.
+
+- Every PC has a required `userId` (the creating user).
+- `campaignId` is nullable at create time; ordinary PC create never sets it.
+- A PC can be associated with at most one campaign at a time
   (`Character.campaignId` is either `null` or a single campaign ID).
-- Only characters owned by the `userId` on a `CampaignMembership` may be added
-  to that membership's `characterIds`.
-- When a user leaves a campaign, their characters are removed from the campaign;
-  character ownership remains with the user.
+- Campaign association for PCs is designed to go through an owner-approved
+  **submission workflow** (not yet implemented). Until then, `campaignId` stays
+  `null` on user-created PCs.
+- Only PCs owned by the `userId` on a `CampaignMembership` may appear on that
+  membership's `characterIds`.
+- When a user leaves a campaign, their PCs are removed from the campaign;
+  ownership remains with the user.
+
+### Campaign NPCs (`characterType: 'npc'`)
+
+Campaign-owned sheet records — not tied to a user account.
+
+- Every NPC has a required `campaignId` (set by the API from the route param).
+- NPCs have no `userId`; they are not player characters and do not use
+  `CampaignMembership.characterIds`.
+- Created by campaign `owner` or `co-owner` via `POST /api/campaigns/:campaignId/npcs`.
+- Deleted when removed from the campaign roster; there is no separate user roster.
 
 ---
 
@@ -82,9 +101,9 @@ Enforced in the service layer (not at the schema level):
 
 1. `(campaignId, userId)` is unique — a user has at most one membership per campaign.
 2. Membership `owner` role cannot be removed; only transferred.
-3. `characterIds` on a membership may only reference characters owned by that
-   membership's `userId`.
-4. A `Character.campaignId` may only point to a campaign where the character
+3. `characterIds` on a membership may only reference **PC** characters owned by
+   that membership's `userId` (not NPCs).
+4. A PC's `Character.campaignId` may only point to a campaign where the character
    owner has an active membership.
 
 ---

@@ -5,7 +5,6 @@ import { describe, expect, it } from 'vitest'
 import { buildEquipmentPickerRowViewModel } from '@/features/content'
 import { pickEquipment } from '@/features/content/lib/fixtures/pick'
 
-import { EquipmentPickerCommerce } from './equipment-picker-commerce.client'
 import { EquipmentPickerItemHeader } from './equipment-picker-item-header.client'
 import {
   EQUIPMENT_PICKER_CANNOT_AFFORD_LABEL,
@@ -14,7 +13,7 @@ import {
 } from './equipment-picker-drawer.types'
 
 describe('EquipmentPickerItemHeader', () => {
-  it('renders name, metadata, kind label, callout, and commerce actions', () => {
+  it('renders name, metadata, kind label, callout, and purchase actions', () => {
     const item = buildEquipmentPickerRowViewModel(pickEquipment('dagger'))
 
     render(
@@ -25,15 +24,9 @@ describe('EquipmentPickerItemHeader', () => {
           intent: 'recommended',
           importance: 'high',
         }}
-        commerce={
-          <EquipmentPickerCommerce
-            priceLabel="2 GP"
-            owned={false}
-            stackable={false}
-            ownedQuantity={0}
-            onAdd={() => undefined}
-          />
-        }
+        summaryTrailingLabel="2 GP"
+        action={{ kind: 'add', disabled: false }}
+        onAdd={() => undefined}
       />,
     )
 
@@ -42,8 +35,45 @@ describe('EquipmentPickerItemHeader', () => {
     expect(screen.getByText('1d4 Piercing')).toBeInTheDocument()
     expect(screen.getByText('Finesse · Light · Thrown')).toBeInTheDocument()
     expect(screen.getByText('Weapon')).toBeInTheDocument()
+    expect(screen.getByText('2 GP')).toBeInTheDocument()
     expect(screen.getByText(EQUIPMENT_PICKER_ESSENTIAL_LABEL)).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Add' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Add' })).toHaveClass('border-outline-button-border')
+  })
+
+  it('renders owned quantity badge and Add in the title row', () => {
+    const item = buildEquipmentPickerRowViewModel(pickEquipment('rope'))
+
+    render(
+      <EquipmentPickerItemHeader
+        item={item}
+        summaryTrailingLabel="1 GP"
+        action={{ kind: 'add', disabled: false }}
+        ownedQuantity={2}
+        onAdd={() => undefined}
+      />,
+    )
+
+    const addButton = screen.getByRole('button', { name: 'Add' })
+    expect(addButton.parentElement).toHaveTextContent('2')
+    expect(screen.getByText('1 GP')).toBeInTheDocument()
+  })
+
+  it('renders owned badge without add for manage-only rows', () => {
+    const item = buildEquipmentPickerRowViewModel(pickEquipment('bracers-of-defense'))
+
+    const { container } = render(
+      <EquipmentPickerItemHeader
+        item={item}
+        summaryTrailingLabel="No Rare choices"
+        summaryTrailingTone="blocked"
+        action={{ kind: 'manage_only' }}
+        ownedQuantity={1}
+      />,
+    )
+
+    expect(screen.getByText('1')).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Add' })).not.toBeInTheDocument()
+    expect(container.firstChild).not.toHaveClass('opacity-60')
   })
 
   it('renders warning icon for caution callouts', () => {
@@ -57,15 +87,9 @@ describe('EquipmentPickerItemHeader', () => {
           intent: 'warning',
           importance: 'medium',
         }}
-        commerce={
-          <EquipmentPickerCommerce
-            priceLabel="1,500 GP"
-            owned={false}
-            stackable={false}
-            ownedQuantity={0}
-            onAdd={() => undefined}
-          />
-        }
+        summaryTrailingLabel="1,500 GP"
+        action={{ kind: 'add', disabled: false }}
+        onAdd={() => undefined}
       />,
     )
 
@@ -84,15 +108,9 @@ describe('EquipmentPickerItemHeader', () => {
           intent: 'blocking',
           importance: 'high',
         }}
-        commerce={
-          <EquipmentPickerCommerce
-            priceLabel="15 GP"
-            owned={false}
-            stackable={false}
-            ownedQuantity={0}
-            onAdd={() => undefined}
-          />
-        }
+        summaryTrailingLabel="15 GP"
+        action={{ kind: 'add', disabled: true }}
+        onAdd={() => undefined}
       />,
     )
 

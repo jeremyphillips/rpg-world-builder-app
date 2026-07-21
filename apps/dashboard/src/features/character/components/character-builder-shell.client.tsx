@@ -6,22 +6,29 @@ import { Link, useNavigate } from 'react-router-dom'
 import {
   CharacterBuildFinalizationError,
   finalizeCharacterBuild,
+  finalizeNpcCharacterBuild,
   getErrorMessage,
+  resolveBuilderLevelConstraints,
   type CharacterBuildCatalogIndex,
+  type CharacterBuildContext,
   type CharacterBuilderDraft,
   type CharacterBuilderStepId,
   type CharacterBuildValidationIssue,
-  type StandaloneBuildContext,
+  type EquipmentPickerFocusIntent,
 } from '@rpg/contracts'
 import { buttonVariants, Heading, Spinner, Text } from '@rpg/ui'
 
 import { ROUTES } from '@/app/routes'
-import { useCampaignStore } from '@/features/campaign'
 
 import { useResolvedChoiceSets } from '../hooks/use-resolved-choice-sets'
 import { useCharacterPreview } from '../hooks/use-character-preview'
 import { useCharacterBuilderStore } from '../hooks/use-character-builder-store'
 import { useCreateCharacter } from '../hooks/use-create-character'
+import { useCreateNpc } from '../npc/hooks/use-create-npc'
+import {
+  getBuilderChromeCopyForContext,
+  resolveCampaignIdFromContext,
+} from '../lib/builder-chrome-copy'
 import {
   mergeValidationVisibleStepIds,
   pruneValidationVisibleStepIds,
@@ -38,6 +45,7 @@ import {
   resolveCurrentStepId,
 } from '../lib/character-builder-navigation'
 import { mergeCharacterBuilderDraft } from '../lib/merge-character-builder-draft'
+import type { CharacterBuilderNavigateToStepOptions } from '../lib/character-builder-navigation-options'
 import {
   issuesForStep,
   resolveBuilderDraftValidationIssues,
@@ -47,11 +55,13 @@ import {
 } from '../lib/validate-builder-step'
 import { CharacterBuilderDraftRestore } from './character-builder-draft-restore.client'
 import { CharacterBuilderFooter } from './character-builder-footer.client'
+import { CharacterBuilderLevelControl } from './character-builder-level-control.client'
 import { CharacterBuilderPreviewPanel } from './character-builder-preview-panel.client'
 import {
   characterBuilderShellBodyClasses,
   characterBuilderShellColumnClasses,
   characterBuilderShellHeaderClasses,
+  characterBuilderShellHeaderTitleRowClasses,
   characterBuilderShellPreviewColumnClasses,
   characterBuilderShellRootClasses,
 } from './character-builder-shell.variants'
@@ -59,15 +69,18 @@ import { CharacterBuilderStepContent } from './character-builder-step-content.cl
 import { CharacterBuilderStepRail } from './character-builder-step-rail.client'
 
 export type CharacterBuilderShellProps = {
-  context: StandaloneBuildContext
+  context: CharacterBuildContext
   catalogIndex: CharacterBuildCatalogIndex
 }
 
 /** Full-viewport builder chrome: step rail, step panel, live preview, footer nav. */
 export function CharacterBuilderShell({ context, catalogIndex }: CharacterBuilderShellProps) {
   const navigate = useNavigate()
-  const activeCampaignId = useCampaignStore((state) => state.activeCampaignId)
-  const { mutateAsync: createCharacterMutation, isPending: isCreating } = useCreateCharacter()
+  const chrome = getBuilderChromeCopyForContext(context)
+  const campaignId = resolveCampaignIdFromContext(context)
+  const { mutateAsync: createCharacterMutation, isPending: isCreatingPc } = useCreateCharacter()
+  const { mutateAsync: createNpcMutation, isPending: isCreatingNpc } = useCreateNpc()
+  const isCreating = isCreatingPc || isCreatingNpc
   const hasHydrated = useCharacterBuilderStore(context, (state) => state._hasHydrated)
   const hasPendingRestore = useCharacterBuilderStore(context, (state) => state.hasPendingRestore)
   const draft = useCharacterBuilderStore(context, (state) => state.draft)
@@ -82,10 +95,31 @@ export function CharacterBuilderShell({ context, catalogIndex }: CharacterBuilde
     CharacterBuilderStepId[]
   >([])
   const [createError, setCreateError] = useState<string | null>(null)
+  const [pendingEquipmentPickerFocus, setPendingEquipmentPickerFocus] = useState<
+    EquipmentPickerFocusIntent | undefined
+  >()
 
   const resolvedChoiceSets = useResolvedChoiceSets(draft, context)
 
   const currentStepId = resolveCurrentStepId(draft.currentStepId)
+  const levelConstraints = useMemo(() => resolveBuilderLevelConstraints(context), [context])
+
+  useEffect(() => {
+    if (levelConstraints.mode !== 'fixed' || levelConstraints.fixedLevel === undefined) {
+      return
+    }
+
+    if (draft.class.level === levelConstraints.fixedLevel) {
+      return
+    }
+
+    patchDraft({
+      class: {
+        ...draft.class,
+        level: levelConstraints.fixedLevel,
+      },
+    })
+  }, [draft.class, levelConstraints.fixedLevel, levelConstraints.mode, patchDraft])
 
   const preview = useCharacterPreview(
     draft,
@@ -106,6 +140,16 @@ export function CharacterBuilderShell({ context, catalogIndex }: CharacterBuilde
       )
     },
     [draft.currentStepId, draft.touchedStepIds, patchDraft],
+  )
+
+  const applyLevelDraft = useCallback(
+    (nextDraft: CharacterBuilderDraft) => {
+      applyDraftPatch({
+        class: nextDraft.class,
+        choiceSelections: nextDraft.choiceSelections,
+      })
+    },
+    [applyDraftPatch],
   )
 
   const canCreateCharacter = useMemo(
@@ -151,6 +195,10 @@ export function CharacterBuilderShell({ context, catalogIndex }: CharacterBuilde
     )
   }, [context, currentStepId, draft, resolvedChoiceSets, validationVisibleStepIds])
 
+  const handleEquipmentPickerFocusConsumed = useCallback(() => {
+    setPendingEquipmentPickerFocus(undefined)
+  }, [])
+
   if (!hasHydrated) {
     return (
       <div className="flex flex-1 items-center justify-center py-16">
@@ -176,7 +224,14 @@ export function CharacterBuilderShell({ context, catalogIndex }: CharacterBuilde
     ? validationIssues
     : issuesForStep(validationIssues, currentStepId)
 
-  const navigateToStep = (stepId: typeof currentStepId) => {
+  const navigateToStep = (
+    stepId: typeof currentStepId,
+    options?: CharacterBuilderNavigateToStepOptions,
+  ) => {
+    if (options?.equipmentPickerFocus) {
+      setPendingEquipmentPickerFocus(options.equipmentPickerFocus)
+    }
+
     if (railValidationVisibleStepIds.includes(stepId)) {
       const result = validateBuilderStepSubmit(draft, context, stepId, resolvedChoiceSets)
       setValidationIssues(result.ok ? [] : result.issues)
@@ -264,6 +319,19 @@ export function CharacterBuilderShell({ context, catalogIndex }: CharacterBuilde
     }
 
     try {
+      if (context.characterKind === 'npc') {
+        if (!campaignId) {
+          setCreateError(chrome.createErrorDefault)
+          return
+        }
+
+        const input = finalizeNpcCharacterBuild(draft, context, { resolvedChoiceSets })
+        const npc = await createNpcMutation({ campaignId, input })
+        await clearPersistedDraft()
+        navigate(ROUTES.campaign.npcs.detail(campaignId, npc.id))
+        return
+      }
+
       const input = finalizeCharacterBuild(draft, context, { resolvedChoiceSets })
       const character = await createCharacterMutation(input)
       await clearPersistedDraft()
@@ -281,7 +349,7 @@ export function CharacterBuilderShell({ context, catalogIndex }: CharacterBuilde
         return
       }
 
-      setCreateError(getErrorMessage(error, 'Could not create character.'))
+      setCreateError(getErrorMessage(error, chrome.createErrorDefault))
     }
   }
 
@@ -291,18 +359,24 @@ export function CharacterBuilderShell({ context, catalogIndex }: CharacterBuilde
 
       <div className={characterBuilderShellRootClasses}>
         <header className={characterBuilderShellHeaderClasses}>
-          <Heading variant="page" as="h1">
-            New character
-          </Heading>
-          <div className="flex flex-wrap gap-2">
-            <Link
-              to={ROUTES.characters.import(activeCampaignId ?? undefined)}
-              className={buttonVariants({ variant: 'outline' })}
-            >
-              Import character (experimental)
-            </Link>
-            <Link to={ROUTES.characters.list} className={buttonVariants({ variant: 'outline' })}>
-              Exit
+          <div className={characterBuilderShellHeaderTitleRowClasses}>
+            <Heading variant="page" as="h1" className="shrink-0">
+              {chrome.pageHeading}
+            </Heading>
+            <CharacterBuilderLevelControl
+              context={context}
+              draft={draft}
+              onApplyLevelDraft={applyLevelDraft}
+            />
+          </div>
+          <div className="flex shrink-0 flex-wrap gap-2">
+            {chrome.importHref && chrome.importLabel ? (
+              <Link to={chrome.importHref} className={buttonVariants({ variant: 'outline' })}>
+                {chrome.importLabel}
+              </Link>
+            ) : null}
+            <Link to={chrome.exitHref} className={buttonVariants({ variant: 'outline' })}>
+              {chrome.exitLabel}
             </Link>
           </div>
         </header>
@@ -329,10 +403,13 @@ export function CharacterBuilderShell({ context, catalogIndex }: CharacterBuilde
               preview={preview}
               resolvedChoiceSets={resolvedChoiceSets}
               validationIssues={stepValidationIssues}
+              reviewValidationHeading={chrome.reviewValidationHeading}
               onDraftChange={applyDraftPatch}
               onStepComplete={attemptStepAdvance}
               onFormContinueValidationFailed={handleFormContinueValidationFailed}
               onNavigateToStep={navigateToStep}
+              equipmentPickerFocus={pendingEquipmentPickerFocus}
+              onEquipmentPickerFocusConsumed={handleEquipmentPickerFocusConsumed}
             />
           </div>
           <div className={characterBuilderShellPreviewColumnClasses}>
@@ -355,6 +432,9 @@ export function CharacterBuilderShell({ context, catalogIndex }: CharacterBuilde
           currentStepId={currentStepId}
           canCreateCharacter={canCreateCharacter}
           isCreating={isCreating}
+          createLabel={chrome.createLabel}
+          creatingLabel={chrome.creatingLabel}
+          reviewFooterHint={chrome.reviewFooterHint}
           onBack={() => shiftStep('back')}
           onContinue={handleContinue}
           onCreateCharacter={() => {

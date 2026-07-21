@@ -39,10 +39,10 @@ describe('finalizeCharacterBuild', () => {
     expect((input as Record<string, unknown>)['createdAt']).toBeUndefined()
   })
 
-  it('computes hitPoints.base and xp 0', () => {
+  it('computes hitPoints.base and xp null', () => {
     const input = finalizeCharacterBuild(makeCompleteDraft(), builderTestContext)
-    expect(input.hitPoints).toEqual({ base: 11, temporary: 0 })
-    expect(input.xp).toBe(0)
+    expect(input.hitPoints).toEqual({ base: 11, current: 11, temporary: 0 })
+    expect(input.xp).toBeNull()
   })
 
   it('carries narrative from the draft identity', () => {

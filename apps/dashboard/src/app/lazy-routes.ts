@@ -59,6 +59,19 @@ export const CampaignSettingsRoute = withRouteSuspense(
   lazyNamed(() => import('@/features/campaign/routes/campaign-settings'), 'CampaignSettings'),
 )
 
+export const NpcsOverviewRoute = withRouteSuspense(
+  lazyNamed(() => import('@/features/character/npc/routes/npcs-overview'), 'NpcsOverview'),
+)
+export const NpcCreateRoute = withRouteSuspense(
+  lazyNamed(() => import('@/features/character/npc/routes/npc-create'), 'NpcCreate'),
+)
+export const NpcImportRoute = withRouteSuspense(
+  lazyNamed(() => import('@/features/character/npc/routes/npc-import'), 'NpcImport'),
+)
+export const NpcDetailRoute = withRouteSuspense(
+  lazyNamed(() => import('@/features/character/npc/routes/npc-detail'), 'NpcDetail'),
+)
+
 export const ClassesOverviewRoute = withRouteSuspense(
   lazyNamed(() => import('@/features/content/classes/routes/classes-overview'), 'ClassesOverview'),
 )

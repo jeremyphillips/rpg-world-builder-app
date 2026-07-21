@@ -6,10 +6,12 @@ import { expectNoAxeViolations } from '@rpg/ui/test-utils'
 import { createEmptyCharacterBuilderDraft } from '@rpg/contracts'
 
 import { createStandaloneBuilderContextFixture } from '../../lib/character-builder-fixtures'
+import { getBuilderChromeCopy } from '../../lib/builder-chrome-copy'
 import { ReviewStep } from './review-step.client'
 
 describe('ReviewStep', () => {
   const context = createStandaloneBuilderContextFixture()
+  const chrome = getBuilderChromeCopy('pc')
 
   it('shows blocking issues, required items, and advisory warnings', async () => {
     const user = userEvent.setup()
@@ -59,11 +61,12 @@ describe('ReviewStep', () => {
             stepId: 'identity',
           },
         ]}
+        validationHeading={chrome.reviewValidationHeading}
         onNavigateToStep={onNavigateToStep}
       />,
     )
 
-    expect(screen.getByText('Fix the following before creating:')).toBeInTheDocument()
+    expect(screen.getByText(chrome.reviewValidationHeading)).toBeInTheDocument()
     expect(screen.getAllByText('Enter a character name.')).toHaveLength(2)
     expect(screen.getByText('Required items')).toBeInTheDocument()
     expect(screen.getByText('Choose Skills')).toBeInTheDocument()
@@ -93,11 +96,12 @@ describe('ReviewStep', () => {
         draft={draft}
         preview={null}
         resolvedChoiceSets={[]}
+        validationHeading={chrome.reviewValidationHeading}
         onNavigateToStep={vi.fn()}
       />,
     )
 
-    expect(screen.getByText('Your character is ready to create.')).toBeInTheDocument()
+    expect(screen.getByText(chrome.reviewReadyMessage)).toBeInTheDocument()
   })
 
   it('has no axe accessibility violations', async () => {
@@ -115,6 +119,7 @@ describe('ReviewStep', () => {
             stepId: 'identity',
           },
         ]}
+        validationHeading={chrome.reviewValidationHeading}
         onNavigateToStep={vi.fn()}
       />,
     )

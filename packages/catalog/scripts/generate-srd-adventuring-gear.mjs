@@ -665,7 +665,7 @@ const magicItems = [
     'bracers-of-defense',
     'Bracers of Defense',
     '<p>While wearing these bracers, you gain a +2 bonus to Armor Class if you are wearing no armor and using no shield.</p>',
-    gp(0),
+    null,
     undefined,
     {
       rarity: 'rare',

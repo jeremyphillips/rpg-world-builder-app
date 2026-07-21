@@ -71,7 +71,7 @@ const storedBard: ClassStored = {
       choose: 1,
       options: [
         {
-          id: 'standard',
+          id: 'standard-equipment',
           label: 'Standard Equipment',
           items: [
             {
@@ -135,10 +135,12 @@ describe('resolveStartingEquipmentOptionSummaries', () => {
     })
 
     const summaries = resolveStartingEquipmentOptionSummaries(storedBard, catalogIndex)
-    const standard = summaries.find((summary) => summary.optionId === 'standard')!
+    const standard = summaries.find((summary) => summary.optionId === 'standard-equipment')!
 
     expect(standard.isSelectable).toBe(true)
     expect(standard.wealth).toEqual({ gp: 19 })
+    expect(standard.description).toBe('Leather Armor, 1× Musical Instrument, and 19 GP.')
+    expect(standard.orderedItems).toHaveLength(2)
     expect(standard.itemsByGroup.armor).toHaveLength(1)
     expect(standard.itemsByGroup.tools).toHaveLength(1)
     expect(standard.itemsByGroup.armor[0]).toMatchObject({

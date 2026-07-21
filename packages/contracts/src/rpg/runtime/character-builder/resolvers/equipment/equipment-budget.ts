@@ -1,4 +1,5 @@
-import type { Equipment } from '../../../../content/equipment'
+import type { StartingWealthRules } from '../../../../campaign/rules/starting-wealth'
+import { canPurchaseEquipment } from '../../../../content/equipment/can-purchase-equipment'
 import {
   copperToWealth,
   formatWealth,
@@ -8,19 +9,24 @@ import {
   wealthToCopper,
   type CoinWealth,
 } from '../../../../primitives/wealth'
-import {
-  characterWealthFromGrant,
-  type CharacterWealth,
-} from '../../../character/equipment-inventory'
+import type { Equipment } from '../../../../content/equipment'
 import type { CharacterBuildCatalogIndex } from '../../context'
-import type { CharacterBuilderDraft, CharacterBuilderDraftEquipmentPurchase } from '../../draft'
-import { readSelectedStartingEquipmentOptionId } from './resolve-starting-equipment-choice-sets'
+import type { CharacterBuilderDraft } from '../../draft'
+import {
+  deriveEquipmentBudgetSummaryFromFunding,
+  resolveSelectedStartingEquipmentFunding,
+  resolveTierOnlyStartingEquipmentFunding,
+} from './resolve-starting-equipment-funding'
+
+export type DeriveEquipmentBudgetSummaryOptions = {
+  startingWealth?: StartingWealthRules
+}
 
 /** Derived shopping budget for equipment picker affordability. */
 export type EquipmentBudgetSummary = {
-  starting: CharacterWealth
-  spent: CharacterWealth
-  remaining: CharacterWealth
+  starting: CoinWealth
+  spent: CoinWealth
+  remaining: CoinWealth
 }
 
 export {
@@ -37,6 +43,7 @@ export function isEquipmentAffordableAtStartingBudget(
   equipment: Equipment,
   budget: EquipmentBudgetSummary,
 ): boolean {
+  if (!canPurchaseEquipment(equipment)) return false
   return moneyToCopper(equipment.cost) <= wealthToCopper(budget.starting)
 }
 
@@ -45,6 +52,7 @@ export function isEquipmentWithinRemainingBudget(
   equipment: Equipment,
   budget: EquipmentBudgetSummary,
 ): boolean {
+  if (!canPurchaseEquipment(equipment)) return false
   return moneyToCopper(equipment.cost) <= wealthToCopper(budget.remaining)
 }
 
@@ -54,50 +62,40 @@ export function maxAffordableEquipmentQuantity(
   budget: EquipmentBudgetSummary,
   currentQuantity = 0,
 ): number {
-  const unitCost = moneyToCopper(equipment.cost)
-  if (unitCost <= 0) return Math.max(currentQuantity, 1)
+  if (!canPurchaseEquipment(equipment)) return currentQuantity
 
+  const unitCost = moneyToCopper(equipment.cost)
   const additional = Math.floor(wealthToCopper(budget.remaining) / unitCost)
   return currentQuantity + additional
-}
-
-function sumPurchaseCostCp(
-  purchases: readonly CharacterBuilderDraftEquipmentPurchase[],
-  catalogIndex: CharacterBuildCatalogIndex,
-): number {
-  if (!purchases) return 0
-
-  return purchases.reduce((total, purchase) => {
-    const equipment = catalogIndex.equipment.get(purchase.equipmentId)
-    if (!equipment) return total
-    return total + moneyToCopper(equipment.cost) * purchase.quantity
-  }, 0)
 }
 
 /** Derives starting/spent/remaining wealth from the selected package and draft purchases. */
 export function deriveEquipmentBudgetSummary(
   draft: CharacterBuilderDraft,
   catalogIndex: CharacterBuildCatalogIndex,
+  options?: DeriveEquipmentBudgetSummaryOptions,
 ): EquipmentBudgetSummary | undefined {
-  const classId = draft.class.classId
-  if (!classId) return undefined
+  if (!draft.class.classId) return undefined
 
-  const characterClass = catalogIndex.classes.get(classId)
-  const startingEquipment = characterClass?.characterCreation?.startingEquipment
-  if (!startingEquipment) return undefined
+  const purchases = draft.equipment?.purchases ?? []
+  const funding =
+    resolveSelectedStartingEquipmentFunding({
+      draft,
+      catalogIndex,
+      startingWealth: options?.startingWealth,
+    }) ??
+    resolveTierOnlyStartingEquipmentFunding({
+      draft,
+      startingWealth: options?.startingWealth,
+    })
 
-  const selectedOptionId = readSelectedStartingEquipmentOptionId(draft, classId)
-  if (!selectedOptionId) return undefined
+  if (!funding) return undefined
 
-  const option = startingEquipment.options.find((entry) => entry.id === selectedOptionId)
-  if (!option) return undefined
-
-  const starting = characterWealthFromGrant(option.wealth)
-  const spentCp = sumPurchaseCostCp(draft.equipment?.purchases ?? [], catalogIndex)
-  const spent = copperToWealth(spentCp)
-  const remaining = subtractFromWealth(starting, spentCp)
-
-  return { starting, spent, remaining }
+  return deriveEquipmentBudgetSummaryFromFunding({
+    funding,
+    purchases,
+    catalogIndex,
+  })
 }
 
 export type { CoinWealth }

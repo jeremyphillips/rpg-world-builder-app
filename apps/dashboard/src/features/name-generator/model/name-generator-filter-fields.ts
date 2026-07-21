@@ -1,5 +1,7 @@
 import type { FilterFieldConfig, FilterToolbarOption } from '@rpg/ui'
 
+import { getContentTypeItemLabel } from '@/features/content/lib/content-type-labels'
+
 import type {
   FilterOption,
   NameGeneratorFilterOptions,
@@ -30,7 +32,7 @@ export function buildNameGeneratorFilterFields(
     {
       key: 'speciesId',
       type: 'select',
-      label: 'Species',
+      label: getContentTypeItemLabel('species'),
       options: toToolbarOptions(ctx.filterOptions.speciesIds),
       allowAny: true,
       placeholder: 'Any species',

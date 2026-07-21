@@ -6,6 +6,25 @@ import { absoluteLevelSchema } from '../../primitives/level'
 import { levelRangeTiersSchema } from '../../primitives/level-range-table'
 import { magicItemRaritySchema } from '../../vocab/magic-item/rarity'
 
+function refineUniqueMagicItemGrantRarities(
+  grants: ReadonlyArray<{ rarity: string }>,
+  ctx: z.RefinementCtx,
+  pathPrefix: (string | number)[] = [],
+): void {
+  const seen = new Set<string>()
+
+  grants.forEach((grant, index) => {
+    if (seen.has(grant.rarity)) {
+      ctx.addIssue({
+        code: 'custom',
+        message: 'Duplicate magic item rarity grant per tier',
+        path: [...pathPrefix, index, 'rarity'],
+      })
+    }
+    seen.add(grant.rarity)
+  })
+}
+
 // ---------------------------------------------------------------------------
 // Starting wealth — campaign rules for higher-level character creation tiers.
 // SRD defaults ship from @rpg/catalog; campaigns patch via ruleset-patch.
@@ -45,12 +64,17 @@ export const magicItemRarityGrantSchema = z.object({
 
 export type MagicItemRarityGrant = z.infer<typeof magicItemRarityGrantSchema>
 
+const magicItemGrantsSchema = z
+  .array(magicItemRarityGrantSchema)
+  .default([])
+  .superRefine((grants, ctx) => refineUniqueMagicItemGrantRarities(grants, ctx))
+
 const startingWealthTierRowShape = {
   id: z.string().min(1),
   label: z.string().min(1),
   includeNormalStartingEquipment: z.boolean().default(true),
   bonusGold: tierBonusGoldSchema.nullable().optional(),
-  magicItemGrants: z.array(magicItemRarityGrantSchema).default([]),
+  magicItemGrants: magicItemGrantsSchema,
 }
 
 export const startingWealthTierSchema = z.object({
@@ -175,4 +199,23 @@ export function startingWealthTierForLevel(
   level: number,
 ): StartingWealthTier | undefined {
   return rules.tiers.find((tier) => level >= tier.minLevel && level <= tier.maxLevel)
+}
+
+/**
+ * Resolves the starting wealth tier for builder equipment economics.
+ * Falls back to the highest tier at or below the selected starting level when
+ * no exact match exists.
+ */
+export function resolveStartingWealthTierForBuilder(
+  rules: Pick<StartingWealthRules, 'tiers'>,
+  startingLevel: number,
+): StartingWealthTier | undefined {
+  const exact = startingWealthTierForLevel(rules, startingLevel)
+  if (exact) return exact
+
+  const tiersAtOrBelow = rules.tiers
+    .filter((tier) => startingLevel >= tier.minLevel)
+    .sort((left, right) => right.minLevel - left.minLevel)
+
+  return tiersAtOrBelow[0]
 }

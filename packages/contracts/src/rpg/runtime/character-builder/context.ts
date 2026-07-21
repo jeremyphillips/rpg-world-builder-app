@@ -11,8 +11,16 @@ import { resolvedCampaignCharacterCreationPatchSchema } from '../../campaign/pat
 import { resolvedArmorClassSchema } from '../../campaign/patches/campaign-mechanics-patch'
 import { abilityGenerationRulesSchema } from './ability-generation'
 import type {
+  CharacterAcquisitionChannel,
+  CharacterAuthoringSurface,
+  CharacterKind,
+  CharacterOwnershipTarget,
+  CharacterRulesScope,
+} from '../character-acquisition'
+import type {
   CharacterBuilderMode,
   CharacterBuildScope,
+  CampaignCharacterBuildScope,
   StandaloneCharacterBuilderMode,
   StandaloneCharacterBuildScope,
 } from './mode-scope'
@@ -86,8 +94,15 @@ export type CharacterBuilderPermissions = {
 }
 
 export type CharacterBuildContext = {
+  channel: CharacterAcquisitionChannel
+  surface: CharacterAuthoringSurface
+  characterKind: CharacterKind
+  /** @deprecated Prefer `surface` + `characterKind`. */
   mode: CharacterBuilderMode
+  /** @deprecated Prefer `rulesScope` from acquisition types. */
   scope: CharacterBuildScope
+  ownershipTarget: CharacterOwnershipTarget
+  rulesScope: CharacterRulesScope
   rulesetId: SystemRulesetId
   catalog: CharacterBuildCatalog
   characterCreationRules: ResolvedCharacterCreationRules
@@ -98,4 +113,16 @@ export type CharacterBuildContext = {
 export type StandaloneBuildContext = CharacterBuildContext & {
   mode: StandaloneCharacterBuilderMode
   scope: StandaloneCharacterBuildScope
+  rulesScope: Extract<CharacterRulesScope, { type: 'ruleset' }>
+  ownershipTarget: { type: 'user' }
+  characterKind: 'pc'
+}
+
+/** Campaign-scoped NPC authoring — rules and catalog from campaign patch + content. */
+export type CampaignBuildContext = CharacterBuildContext & {
+  mode: 'dashboard'
+  scope: CampaignCharacterBuildScope
+  rulesScope: Extract<CharacterRulesScope, { type: 'campaign' }>
+  ownershipTarget: { type: 'campaign'; campaignId: string }
+  characterKind: 'npc'
 }

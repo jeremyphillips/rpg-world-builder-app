@@ -1,6 +1,7 @@
 import {
   abilityModifier,
   assembleStartingEquipment,
+  canPurchaseEquipment,
   formatSignedModifier,
   formatWeaponDamageWithModifier,
   isArmorEquipment,
@@ -53,7 +54,7 @@ export function resolveEquipmentPickerCharacterPreviewContext(args: {
   })
 
   return {
-    level: characterCreationRules.startingLevel,
+    level: draft.class.level,
     armorClassBase: characterCreationRules.armorClass.base,
     abilityScores: draft.abilities.scores,
     equippedArmor,
@@ -108,7 +109,7 @@ function resolveBudgetPreviewLine(
   context: EquipmentPickerCharacterPreviewContext,
   equipment: Equipment,
 ) {
-  if (!context.budget) return undefined
+  if (!context.budget || !canPurchaseEquipment(equipment)) return undefined
 
   const remaining = subtractFromWealth(context.budget.remaining, equipment.cost)
   return `${EQUIPMENT_PICKER_PREVIEW_REMAINING_AFTER_PURCHASE_LABEL}: ${formatWealthAsGold(remaining)}`

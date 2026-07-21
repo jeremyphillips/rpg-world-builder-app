@@ -9,6 +9,7 @@ import {
   formatWealth,
   type CharacterBuildCatalogIndex,
   type CharacterBuilderDraft,
+  type ResolvedStartingEquipmentFunding,
   type StartingPackageConversionPreview,
 } from '@rpg/contracts'
 import { Button, CheckboxField, Heading, Text } from '@rpg/ui'
@@ -29,6 +30,7 @@ export type EquipmentPackageConversionEditorProps = {
   draft: CharacterBuilderDraft
   catalogIndex: CharacterBuildCatalogIndex
   departingOptionId: string
+  targetFunding: ResolvedStartingEquipmentFunding
   selectedPackageItemKeys: ReadonlySet<string>
   editorId?: string
   commitStatusMessage?: string
@@ -52,6 +54,7 @@ export function EquipmentPackageConversionEditor({
   draft,
   catalogIndex,
   departingOptionId,
+  targetFunding,
   selectedPackageItemKeys,
   editorId,
   commitStatusMessage,
@@ -69,6 +72,7 @@ export function EquipmentPackageConversionEditor({
     catalogIndex,
     departingOptionId,
     selectedPackageItemKeys,
+    targetFunding,
   })
 
   useEffect(() => {
@@ -131,13 +135,7 @@ export function EquipmentPackageConversionEditor({
                   checked={checked}
                   disabled={disabled}
                   label={`${item.grantQuantity} × ${item.equipmentName}`}
-                  hint={
-                    disabled
-                      ? item.blockingIssue
-                      : item.pricing.status === 'free'
-                        ? 'Free'
-                        : undefined
-                  }
+                  hint={disabled ? item.blockingIssue : undefined}
                   onCheckedChange={(nextChecked) =>
                     toggleItem(item.packageItemKey, nextChecked === true)
                   }

@@ -1,7 +1,7 @@
 import type { z } from 'zod'
 
 import { formatVocabularySlugLabel } from '../format-slug-label'
-import { getTermSentenceForm, type GameTermEntry } from '../types'
+import { getTermSentenceForm, type GameTermEntry, type VocabularyTerm } from '../types'
 import { vocabularyOptionIdSchema, type VocabularyOptionSetId } from '../vocabulary'
 import { getPhysicalDamageTypeEntry, getPhysicalDamageTypeLabel } from './physical'
 
@@ -9,6 +9,15 @@ import { getPhysicalDamageTypeEntry, getPhysicalDamageTypeLabel } from './physic
 // Damage types (elemental + planar) — open vocabulary set. Physical types stay
 // closed in `./physical.ts`. Catalog seed + campaign patch govern membership.
 // ---------------------------------------------------------------------------
+
+export const DAMAGE_TYPE_TERM = {
+  label: 'Damage Type',
+  description: 'Elemental or planar damage beyond physical types.',
+  sentence: {
+    singular: 'damage type',
+    plural: 'damage types',
+  },
+} as const satisfies VocabularyTerm
 
 export const DAMAGE_TYPE_SET_ID = 'damage-types' as const satisfies VocabularyOptionSetId
 

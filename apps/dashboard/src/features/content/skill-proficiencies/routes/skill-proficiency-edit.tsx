@@ -1,6 +1,10 @@
 import { useParams } from 'react-router-dom'
 
 import { ROUTES } from '@/app/routes'
+import {
+  formatContentNotFoundMessage,
+  formatContentListLoadErrorMessage,
+} from '@/features/content/lib/content-type-labels'
 import { ContentEditShell } from '../../lib/forms/shells/content-edit-shell'
 import { useSkillProficiencies } from '../hooks/use-skill-proficiencies'
 // Registers the skill proficiency form def into the content form registry on module load.
@@ -20,8 +24,8 @@ export function SkillProficiencyEdit() {
       entityId={skillId}
       isPending={isPending}
       isError={isError}
-      loadErrorLabel="Could not load skill proficiencies."
-      notFoundLabel="Skill proficiency not found."
+      loadErrorLabel={formatContentListLoadErrorMessage('skill-proficiencies')}
+      notFoundLabel={formatContentNotFoundMessage('skill-proficiencies')}
       backHref={ROUTES.content.skillProficiencies.detail(campaignId, skillId)}
     />
   )

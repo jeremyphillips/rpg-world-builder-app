@@ -313,6 +313,38 @@ export function toggleSpellPickerLevelSelection(
   return normalizeSpellPickerLevelSelection(next, availableLevels)
 }
 
+/** Maps chip-group value changes to prepared-spell level filter state. */
+export function resolveSpellPickerLevelChipChange(
+  selectedLevels: readonly number[],
+  nextValues: readonly string[],
+  availableLevels: readonly number[],
+): number[] {
+  const previousValues =
+    selectedLevels.length === 0 ? [SPELL_PICKER_LEVELS_ALL] : selectedLevels.map(String)
+  const previousSet = new Set(previousValues)
+  const nextSet = new Set(nextValues)
+
+  for (const value of [...new Set([...previousSet, ...nextSet])]) {
+    if (previousSet.has(value) === nextSet.has(value)) continue
+
+    if (value === SPELL_PICKER_LEVELS_ALL) {
+      return []
+    }
+
+    const level = Number(value)
+    if (!Number.isFinite(level)) continue
+    return toggleSpellPickerLevelSelection(selectedLevels, level, availableLevels)
+  }
+
+  const withoutAll = nextValues.filter((value) => value !== SPELL_PICKER_LEVELS_ALL)
+  if (withoutAll.length === 0) return []
+
+  return normalizeSpellPickerLevelSelection(
+    withoutAll.map(Number).filter((level) => availableLevels.includes(level)),
+    availableLevels,
+  )
+}
+
 export function resolveSpellPickerCastingTimeFilterOptions(
   items: readonly SpellPickerItem[],
 ): SpellPickerCastingTimeFilter[] {

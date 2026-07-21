@@ -7,6 +7,7 @@ import type {
   CharacterBuildPreview,
   CharacterBuildValidationIssue,
   ChoiceSet,
+  EquipmentPickerFocusIntent,
 } from '@rpg/contracts'
 import { AbilitiesStep } from './steps/abilities-step.client'
 import { ClassStep } from './steps/class-step.client'
@@ -16,6 +17,7 @@ import { EquipmentStep } from './steps/equipment-step.client'
 import { ReviewStep } from './steps/review-step.client'
 import { SpeciesStep } from './steps/species-step.client'
 import { SpellsStep } from './steps/spells-step.client'
+import type { CharacterBuilderNavigateToStep } from '../lib/character-builder-navigation-options'
 
 export type CharacterBuilderStepContentProps = {
   stepId: CharacterBuilderStepId
@@ -24,10 +26,13 @@ export type CharacterBuilderStepContentProps = {
   preview: CharacterBuildPreview | null
   resolvedChoiceSets: readonly ChoiceSet[]
   validationIssues: CharacterBuildValidationIssue[]
+  reviewValidationHeading: string
   onDraftChange: (patch: Partial<CharacterBuilderDraft>) => void
   onStepComplete: (patch?: Partial<CharacterBuilderDraft>) => void
   onFormContinueValidationFailed: (patch: Partial<CharacterBuilderDraft>) => void
-  onNavigateToStep: (stepId: CharacterBuilderStepId) => void
+  onNavigateToStep: CharacterBuilderNavigateToStep
+  equipmentPickerFocus?: EquipmentPickerFocusIntent
+  onEquipmentPickerFocusConsumed?: () => void
 }
 
 export function CharacterBuilderStepContent({
@@ -37,10 +42,13 @@ export function CharacterBuilderStepContent({
   preview,
   resolvedChoiceSets,
   validationIssues,
+  reviewValidationHeading,
   onDraftChange,
   onStepComplete,
   onFormContinueValidationFailed,
   onNavigateToStep,
+  equipmentPickerFocus,
+  onEquipmentPickerFocusConsumed,
 }: CharacterBuilderStepContentProps) {
   switch (stepId) {
     case 'identity':
@@ -91,6 +99,7 @@ export function CharacterBuilderStepContent({
           preview={preview}
           resolvedChoiceSets={resolvedChoiceSets}
           validationIssues={validationIssues}
+          validationHeading={reviewValidationHeading}
           onNavigateToStep={onNavigateToStep}
         />
       )
@@ -113,6 +122,8 @@ export function CharacterBuilderStepContent({
           resolvedChoiceSets={resolvedChoiceSets}
           validationIssues={validationIssues}
           onDraftChange={onDraftChange}
+          equipmentPickerFocus={equipmentPickerFocus}
+          onEquipmentPickerFocusConsumed={onEquipmentPickerFocusConsumed}
         />
       )
     case 'spells':

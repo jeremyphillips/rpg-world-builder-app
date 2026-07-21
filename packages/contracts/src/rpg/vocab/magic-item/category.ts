@@ -1,11 +1,20 @@
 import { keysFromEntries, vocabEnumFromEntries } from '../enum-schema'
 
 import { getTermSentenceForm } from '../types'
-import type { GameTermEntry } from '../types'
+import type { GameTermEntry, VocabularyTerm } from '../types'
 
 // ---------------------------------------------------------------------------
 // Magic item categories — DMG item types for filtering and display.
 // ---------------------------------------------------------------------------
+
+export const MAGIC_ITEM_CATEGORY_TERM = {
+  label: 'Magic Item Category',
+  description: 'The DMG item type used for filtering and display.',
+  sentence: {
+    singular: 'magic item category',
+    plural: 'magic item categories',
+  },
+} as const satisfies VocabularyTerm
 
 export const MAGIC_ITEM_CATEGORY_ENTRIES = {
   weapon: {

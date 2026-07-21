@@ -13,23 +13,26 @@ import { EquipmentInventoryRowItem } from './equipment-inventory-row.client'
 import { equipmentInventoryRowListClasses } from './equipment-inventory-summary.variants'
 import {
   equipmentStartingPackageCardBodyClasses,
-  equipmentStartingPackageCardClasses,
+  equipmentStartingPackageCardVariants,
+  type EquipmentStartingPackageCardSurface,
   equipmentStartingPackageCategoryClasses,
   equipmentStartingPackageFooterClasses,
 } from './equipment-starting-package.variants'
 
 export type EquipmentStartingPackageCardProps = {
   optionLabel: string
+  surface?: EquipmentStartingPackageCardSurface
   children: ReactNode
 }
 
 export function EquipmentStartingPackageCard({
   optionLabel,
+  surface = 'subtle',
   children,
 }: EquipmentStartingPackageCardProps) {
   return (
     <section
-      className={equipmentStartingPackageCardClasses}
+      className={equipmentStartingPackageCardVariants({ surface })}
       aria-label={`${optionLabel} starting equipment`}
     >
       {children}

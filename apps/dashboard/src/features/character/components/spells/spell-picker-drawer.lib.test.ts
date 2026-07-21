@@ -15,6 +15,7 @@ import {
   resolveActivePreparedLevelSuffix,
   resolveSpellPickerEmptyStateKind,
   resolveSpellPickerEmptyStateMessage,
+  resolveSpellPickerLevelChipChange,
   resolveValidSpellPickerSort,
   toggleSpellPickerLevelSelection,
 } from './spell-picker-drawer.lib'
@@ -75,6 +76,11 @@ describe('spell-picker-drawer.lib', () => {
     expect(normalizeSpellPickerLevelSelection([1, 2], [1, 2])).toEqual([])
     expect(toggleSpellPickerLevelSelection([], SPELL_PICKER_LEVELS_ALL, [1, 2])).toEqual([])
     expect(toggleSpellPickerLevelSelection([], 1, [1, 2])).toEqual([1])
+  })
+
+  it('selects a specific level when All is active without snapping back to All', () => {
+    expect(resolveSpellPickerLevelChipChange([], ['__all__', '1'], [1, 2])).toEqual([1])
+    expect(resolveSpellPickerLevelChipChange([1], ['1', '__all__'], [1, 2])).toEqual([])
   })
 
   it('matches mechanics filters with OR within groups and AND across groups', () => {

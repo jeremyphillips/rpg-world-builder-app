@@ -1,11 +1,20 @@
 import { keysFromEntries, vocabEnumFromEntries } from '../enum-schema'
 
 import { getTermSentenceForm } from '../types'
-import type { GameTermEntry } from '../types'
+import type { GameTermEntry, VocabularyTerm } from '../types'
 
 // ---------------------------------------------------------------------------
 // Magic item rarity — standard DMG tiers.
 // ---------------------------------------------------------------------------
+
+export const MAGIC_ITEM_RARITY_TERM = {
+  label: 'Magic Item Rarity',
+  description: 'A classification of a magic item’s relative power and availability.',
+  sentence: {
+    singular: 'magic item rarity',
+    plural: 'magic item rarities',
+  },
+} as const satisfies VocabularyTerm
 
 export const MAGIC_ITEM_RARITY_ENTRIES = {
   common: {

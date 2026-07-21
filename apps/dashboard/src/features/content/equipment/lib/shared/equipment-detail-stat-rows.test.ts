@@ -1,3 +1,4 @@
+import { getVocabularyTermLabel, MAGIC_ITEM_RARITY_TERM } from '@rpg/contracts'
 import { describe, expect, it } from 'vitest'
 
 import { pickEquipment } from '../../../lib/fixtures/pick'
@@ -32,7 +33,9 @@ describe('getEquipmentKindStatRows', () => {
   it('returns magic item stat rows for bracers of defense', () => {
     const bracers = pickEquipment('bracers-of-defense')
     const rows = getEquipmentKindStatRows(bracers)
-    expect(rows.some((row) => row.label === 'Rarity')).toBe(true)
+    expect(rows.some((row) => row.label === getVocabularyTermLabel(MAGIC_ITEM_RARITY_TERM))).toBe(
+      true,
+    )
   })
 
   it('returns service stat rows for skilled hireling', () => {

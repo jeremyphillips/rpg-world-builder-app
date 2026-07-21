@@ -1,6 +1,7 @@
 import type { ContentGrant } from '../../../../content/lib/grants'
 import { getFeatCategoryLabel } from '../../../../vocab/feat'
 import { getLanguageLabel } from '../../../../vocab/language'
+import { getProficiencyDomainLabel } from '../../../../vocab/proficiency'
 import { formatEquipmentPoolLabel } from '../../../../content/lib/equipment-grant'
 import type { EquipmentGrant } from '../../../../content/lib/equipment-grant'
 import { resolveLanguagesFromChoiceSource } from '../../../creature/languages'
@@ -153,7 +154,7 @@ function skillProficiencyChoiceSet(
     grant.grant.choose,
     options,
     true,
-    'Choose Skill Proficiency',
+    `Choose ${getProficiencyDomainLabel('skill')}`,
   )
 }
 

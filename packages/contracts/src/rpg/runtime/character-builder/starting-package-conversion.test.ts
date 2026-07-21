@@ -16,6 +16,9 @@ import {
   nestedStartingEquipmentChoiceSetId,
   startingEquipmentChoiceSetId,
 } from './resolvers/equipment/resolve-starting-equipment-choice-sets'
+import { isStartingGoldOption } from '../../content/starting-equipment'
+import { resolveStartingEquipmentFundingOptions } from './resolvers/equipment/resolve-starting-equipment-funding'
+import type { CharacterBuilderDraft } from './draft'
 
 const RULESET = 'srd-cc-5.2.1' as const
 
@@ -134,7 +137,7 @@ const freeToken = equipmentSchema.parse({
   id: `${RULESET}:free-token`,
   slug: 'free-token',
   name: 'Free Token',
-  cost: { amount: 0, currency: 'gp' },
+  cost: null,
 })
 
 const monkClass: ClassStored = {
@@ -160,7 +163,7 @@ const monkClass: ClassStored = {
       choose: 1,
       options: [
         {
-          id: 'standard',
+          id: 'standard-equipment',
           label: 'Standard Equipment',
           items: [
             {
@@ -188,7 +191,7 @@ const monkClass: ClassStored = {
           wealth: { gp: 11 },
         },
         {
-          id: 'gold',
+          id: 'starting-gold',
           label: 'Starting Gold',
           items: [],
           wealth: { gp: 50 },
@@ -224,12 +227,18 @@ const catalogIndex = indexCharacterBuildCatalog({
 
 const monkToolChoiceSetId = buildChoiceSetId('class', monkClass.id, 'class-tools')
 
+function goldTargetFunding(draft: CharacterBuilderDraft) {
+  const goldOption =
+    monkClass.characterCreation!.startingEquipment!.options.find(isStartingGoldOption)!
+  return resolveStartingEquipmentFundingOptions({ draft, catalogIndex }).get(goldOption.id)!
+}
+
 function monkStandardDraft(extra?: Partial<ReturnType<typeof createEmptyCharacterBuilderDraft>>) {
   return {
     ...createEmptyCharacterBuilderDraft(),
     class: { classId: monkClass.id, level: 1 as const },
     choiceSelections: {
-      [startingEquipmentChoiceSetId(monkClass.id)]: ['standard'],
+      [startingEquipmentChoiceSetId(monkClass.id)]: ['standard-equipment'],
       [monkToolChoiceSetId]: [lute.id],
       ...extra?.choiceSelections,
     },
@@ -268,7 +277,6 @@ describe('resolveGoldStartingEquipmentAlternative', () => {
     expect(
       resolveGoldStartingEquipmentAlternative(
         monkClass.characterCreation!.startingEquipment!.options,
-        'standard',
       ),
     ).toEqual({
       status: 'available',
@@ -291,12 +299,14 @@ describe('buildStartingPackageConversionPreview', () => {
     const preview = buildStartingPackageConversionPreview({
       draft,
       catalogIndex,
-      departingOptionId: 'standard',
+      departingOptionId: 'standard-equipment',
+      targetFunding: goldTargetFunding(draft),
       selectedPackageItemKeys: allPackageItemKeys(
         buildStartingPackageConversionPreview({
           draft,
           catalogIndex,
-          departingOptionId: 'standard',
+          departingOptionId: 'standard-equipment',
+          targetFunding: goldTargetFunding(draft),
           selectedPackageItemKeys: new Set(),
         })!,
       ),
@@ -309,25 +319,26 @@ describe('buildStartingPackageConversionPreview', () => {
   it('blocks unresolved linked proficiency grants', () => {
     const draft = monkStandardDraft({
       choiceSelections: {
-        [startingEquipmentChoiceSetId(monkClass.id)]: ['standard'],
+        [startingEquipmentChoiceSetId(monkClass.id)]: ['standard-equipment'],
       },
     })
 
     const preview = buildStartingPackageConversionPreview({
       draft,
       catalogIndex,
-      departingOptionId: 'standard',
+      departingOptionId: 'standard-equipment',
+      targetFunding: goldTargetFunding(draft),
       selectedPackageItemKeys: new Set(),
     })
 
     const linked = preview?.items.find(
-      (item) => item.packageItemKey === `${monkClass.id}:standard:2`,
+      (item) => item.packageItemKey === `${monkClass.id}:standard-equipment:2`,
     )
     expect(linked?.status).toBe('blocked')
     expect(linked?.blockingIssue).toMatch(/proficiency/i)
   })
 
-  it('treats free items as zero-cost conversion lines', () => {
+  it('blocks items without a market price from conversion', () => {
     const classWithFreeGrant: ClassStored = {
       ...monkClass,
       characterCreation: {
@@ -336,7 +347,7 @@ describe('buildStartingPackageConversionPreview', () => {
           choose: 1,
           options: [
             {
-              id: 'standard',
+              id: 'standard-equipment',
               label: 'Standard Equipment',
               items: [
                 {
@@ -347,7 +358,7 @@ describe('buildStartingPackageConversionPreview', () => {
               ],
             },
             {
-              id: 'gold',
+              id: 'starting-gold',
               label: 'Starting Gold',
               items: [],
               wealth: { gp: 10 },
@@ -370,7 +381,7 @@ describe('buildStartingPackageConversionPreview', () => {
       ...createEmptyCharacterBuilderDraft(),
       class: { classId: classWithFreeGrant.id, level: 1 as const },
       choiceSelections: {
-        [startingEquipmentChoiceSetId(classWithFreeGrant.id)]: ['standard'],
+        [startingEquipmentChoiceSetId(classWithFreeGrant.id)]: ['standard-equipment'],
       },
       equipment: {
         mode: 'package' as const,
@@ -383,11 +394,16 @@ describe('buildStartingPackageConversionPreview', () => {
     const preview = buildStartingPackageConversionPreview({
       draft,
       catalogIndex: index,
-      departingOptionId: 'standard',
-      selectedPackageItemKeys: new Set([`${classWithFreeGrant.id}:standard:0`]),
+      departingOptionId: 'standard-equipment',
+      targetFunding: goldTargetFunding(draft),
+      selectedPackageItemKeys: new Set([`${classWithFreeGrant.id}:standard-equipment:0`]),
     })
 
-    expect(preview?.items[0]?.pricing).toEqual({ status: 'free', unitCostCp: 0 })
+    expect(preview?.items[0]?.pricing).toEqual({
+      status: 'unavailable',
+      reason: 'no_market_price',
+    })
+    expect(preview?.items[0]?.status).toBe('blocked')
     expect(preview?.budget.selectedConversionCostCp).toBe(0)
   })
 })
@@ -398,12 +414,14 @@ describe('canConvertStartingPackageToGold', () => {
     const preview = buildStartingPackageConversionPreview({
       draft,
       catalogIndex,
-      departingOptionId: 'standard',
+      departingOptionId: 'standard-equipment',
+      targetFunding: goldTargetFunding(draft),
       selectedPackageItemKeys: allPackageItemKeys(
         buildStartingPackageConversionPreview({
           draft,
           catalogIndex,
-          departingOptionId: 'standard',
+          departingOptionId: 'standard-equipment',
+          targetFunding: goldTargetFunding(draft),
           selectedPackageItemKeys: new Set(),
         })!,
       ),
@@ -423,35 +441,41 @@ describe('buildStartingPackageConversionPatch', () => {
   it('prunes nested standard choice keys and switches to gold', () => {
     const draft = monkStandardDraft({
       choiceSelections: {
-        [startingEquipmentChoiceSetId(monkClass.id)]: ['standard'],
+        [startingEquipmentChoiceSetId(monkClass.id)]: ['standard-equipment'],
         [monkToolChoiceSetId]: [lute.id],
-        [nestedStartingEquipmentChoiceSetId(monkClass.id, 'standard', 99)]: ['orphan'],
+        [nestedStartingEquipmentChoiceSetId(monkClass.id, 'standard-equipment', 99)]: ['orphan'],
       },
     })
 
     const preview = buildStartingPackageConversionPreview({
       draft,
       catalogIndex,
-      departingOptionId: 'standard',
+      departingOptionId: 'standard-equipment',
+      targetFunding: goldTargetFunding(draft),
       selectedPackageItemKeys: new Set([
-        `${monkClass.id}:standard:0`,
-        `${monkClass.id}:standard:3`,
+        `${monkClass.id}:standard-equipment:0`,
+        `${monkClass.id}:standard-equipment:3`,
       ]),
     })!
 
     const patch = buildStartingPackageConversionPatch({
       draft,
       catalogIndex,
-      departingOptionId: 'standard',
+      departingOptionId: 'standard-equipment',
+      targetFunding: goldTargetFunding(draft),
       selectedPackageItemKeys: new Set([
-        `${monkClass.id}:standard:0`,
-        `${monkClass.id}:standard:3`,
+        `${monkClass.id}:standard-equipment:0`,
+        `${monkClass.id}:standard-equipment:3`,
       ]),
     })
 
-    expect(patch?.choiceSelections?.[startingEquipmentChoiceSetId(monkClass.id)]).toEqual(['gold'])
+    expect(patch?.choiceSelections?.[startingEquipmentChoiceSetId(monkClass.id)]).toEqual([
+      'starting-gold',
+    ])
     expect(
-      patch?.choiceSelections?.[nestedStartingEquipmentChoiceSetId(monkClass.id, 'standard', 99)],
+      patch?.choiceSelections?.[
+        nestedStartingEquipmentChoiceSetId(monkClass.id, 'standard-equipment', 99)
+      ],
     ).toBeUndefined()
     expect(patch?.choiceSelections?.[monkToolChoiceSetId]).toEqual([lute.id])
     expect(patch?.equipment?.mode).toBe('gold')
@@ -461,8 +485,8 @@ describe('buildStartingPackageConversionPatch', () => {
       canConvertStartingPackageToGold({
         preview,
         selectedPackageItemKeys: new Set([
-          `${monkClass.id}:standard:0`,
-          `${monkClass.id}:standard:3`,
+          `${monkClass.id}:standard-equipment:0`,
+          `${monkClass.id}:standard-equipment:3`,
         ]),
       }),
     ).toBe(true)
@@ -477,7 +501,7 @@ describe('buildStartingPackageConversionPatch', () => {
           choose: 1,
           options: [
             {
-              id: 'standard',
+              id: 'standard-equipment',
               label: 'Standard Equipment',
               items: [
                 {
@@ -488,7 +512,7 @@ describe('buildStartingPackageConversionPatch', () => {
               ],
             },
             {
-              id: 'gold',
+              id: 'starting-gold',
               label: 'Starting Gold',
               items: [],
               wealth: { gp: 100 },
@@ -511,7 +535,7 @@ describe('buildStartingPackageConversionPatch', () => {
       ...createEmptyCharacterBuilderDraft(),
       class: { classId: classWithTorchGrant.id, level: 1 as const },
       choiceSelections: {
-        [startingEquipmentChoiceSetId(classWithTorchGrant.id)]: ['standard'],
+        [startingEquipmentChoiceSetId(classWithTorchGrant.id)]: ['standard-equipment'],
       },
       equipment: {
         mode: 'package' as const,
@@ -532,8 +556,9 @@ describe('buildStartingPackageConversionPatch', () => {
     const patch = buildStartingPackageConversionPatch({
       draft,
       catalogIndex: index,
-      departingOptionId: 'standard',
-      selectedPackageItemKeys: new Set([`${classWithTorchGrant.id}:standard:0`]),
+      departingOptionId: 'standard-equipment',
+      targetFunding: goldTargetFunding(draft),
+      selectedPackageItemKeys: new Set([`${classWithTorchGrant.id}:standard-equipment:0`]),
     })
 
     expect(patch?.equipment?.purchases).toHaveLength(1)
@@ -570,7 +595,7 @@ describe('buildStartingPackageConversionPatch', () => {
           choose: 1,
           options: [
             {
-              id: 'standard',
+              id: 'standard-equipment',
               label: 'Standard Equipment',
               items: [
                 {
@@ -581,7 +606,7 @@ describe('buildStartingPackageConversionPatch', () => {
               ],
             },
             {
-              id: 'gold',
+              id: 'starting-gold',
               label: 'Starting Gold',
               items: [],
               wealth: { gp: 100 },
@@ -604,15 +629,16 @@ describe('buildStartingPackageConversionPatch', () => {
       ...draft,
       class: { classId: classWithArrowGrant.id, level: 1 as const },
       choiceSelections: {
-        [startingEquipmentChoiceSetId(classWithArrowGrant.id)]: ['standard'],
+        [startingEquipmentChoiceSetId(classWithArrowGrant.id)]: ['standard-equipment'],
       },
     }
 
     const patch = buildStartingPackageConversionPatch({
       draft: arrowDraft,
       catalogIndex: index,
-      departingOptionId: 'standard',
-      selectedPackageItemKeys: new Set([`${classWithArrowGrant.id}:standard:0`]),
+      departingOptionId: 'standard-equipment',
+      targetFunding: goldTargetFunding(arrowDraft),
+      selectedPackageItemKeys: new Set([`${classWithArrowGrant.id}:standard-equipment:0`]),
     })
 
     expect(patch?.equipment?.purchases).toHaveLength(2)

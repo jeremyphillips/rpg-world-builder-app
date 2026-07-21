@@ -66,7 +66,7 @@ export const GoldShopping: Story = {
       ...createEmptyCharacterBuilderDraft(),
       class: { classId: equipmentStepBardClassFixture.id, level: 1 as const },
       choiceSelections: {
-        [startingEquipmentChoiceSetId(equipmentStepBardClassFixture.id)]: ['gold'],
+        [startingEquipmentChoiceSetId(equipmentStepBardClassFixture.id)]: ['starting-gold'],
       },
       equipment: {
         mode: 'gold' as const,
@@ -100,7 +100,7 @@ export const MonkLinkedGrantPending: Story = {
       ...createEmptyCharacterBuilderDraft(),
       class: { classId: equipmentStepMonkClassFixture.id, level: 1 as const },
       choiceSelections: {
-        [startingEquipmentChoiceSetId(equipmentStepMonkClassFixture.id)]: ['standard'],
+        [startingEquipmentChoiceSetId(equipmentStepMonkClassFixture.id)]: ['standard-equipment'],
       },
     }
 
@@ -122,8 +122,37 @@ export const MonkLinkedGrantResolved: Story = {
       ...createEmptyCharacterBuilderDraft(),
       class: { classId: equipmentStepMonkClassFixture.id, level: 1 as const },
       choiceSelections: {
-        [startingEquipmentChoiceSetId(equipmentStepMonkClassFixture.id)]: ['standard'],
+        [startingEquipmentChoiceSetId(equipmentStepMonkClassFixture.id)]: ['standard-equipment'],
         [monkToolChoiceSetId]: [equipmentStepLuteFixture.id],
+      },
+    }
+
+    return (
+      <EquipmentStep
+        context={context}
+        draft={draft}
+        resolvedChoiceSets={resolveAvailableChoices(draft, context)}
+        validationIssues={[]}
+        onDraftChange={() => undefined}
+      />
+    )
+  },
+}
+
+export const MagicItemGrants: Story = {
+  render: () => {
+    const draft = {
+      ...createEmptyCharacterBuilderDraft(),
+      class: { classId: equipmentStepBardClassFixture.id, level: 2 as const },
+      choiceSelections: {
+        [startingEquipmentChoiceSetId(equipmentStepBardClassFixture.id)]: ['starting-gold'],
+      },
+      equipment: {
+        mode: 'gold' as const,
+        purchases: [],
+        removedPackageItemKeys: [],
+        customized: false,
+        magicItemSelections: [],
       },
     }
 

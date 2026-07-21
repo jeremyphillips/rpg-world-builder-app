@@ -1,6 +1,10 @@
 import { useParams } from 'react-router-dom'
 
 import { ROUTES } from '@/app/routes'
+import {
+  formatContentNotFoundMessage,
+  formatContentListLoadErrorMessage,
+} from '@/features/content/lib/content-type-labels'
 import { ContentEditShell } from '../../lib/forms/shells/content-edit-shell'
 // Registers the equipment form def into the content form registry on module load.
 import '../lib/equipment-form-def'
@@ -36,8 +40,8 @@ export function EquipmentEdit({ family }: EquipmentEditProps) {
       entityId={equipmentId}
       isPending={isPending}
       isError={isError}
-      loadErrorLabel="Could not load equipment."
-      notFoundLabel="Equipment not found."
+      loadErrorLabel={formatContentListLoadErrorMessage('equipment')}
+      notFoundLabel={formatContentNotFoundMessage('equipment')}
       backHref={ROUTES.content.equipment.detail(campaignId, family, equipmentId)}
       formCtx={expectedKind ? { equipmentKind: expectedKind, equipmentFamily: family } : undefined}
     />

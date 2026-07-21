@@ -11,8 +11,8 @@ describe('contentChoiceSchema', () => {
   it('accepts a pick-one option set with default choose count', () => {
     const result = contentChoiceSchema.parse({
       options: [
-        { id: 'standard', label: 'Standard Equipment' },
-        { id: 'gold', label: 'Starting Gold' },
+        { id: 'standard-equipment', label: 'Standard Equipment' },
+        { id: 'starting-gold', label: 'Starting Gold' },
       ],
     })
 
@@ -75,7 +75,7 @@ describe('contentPoolChoiceSchema', () => {
 describe('choiceOptionTitle', () => {
   it('prefers label over name for package-style options', () => {
     expect(
-      choiceOptionTitle({ id: 'standard', label: 'Standard Equipment', name: 'Ignored' }),
+      choiceOptionTitle({ id: 'standard-equipment', label: 'Standard Equipment', name: 'Ignored' }),
     ).toBe('Standard Equipment')
   })
 

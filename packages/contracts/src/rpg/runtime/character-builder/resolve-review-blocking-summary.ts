@@ -1,9 +1,15 @@
 import { ABILITY_IDS } from '../../vocab/ability'
+import { getContentTypeTerm } from '../../content/lib/content-type-terms'
 import type { ChoiceSet } from './choice-set'
 import type { CharacterBuildContext } from './context'
 import type { CharacterBuilderDraft } from './draft'
 import type { CharacterBuilderStepId } from './step-ids'
 import { BUILDER_STEPS } from './steps'
+import type { EquipmentPickerFocusRequest } from './resolvers/equipment/equipment-picker-focus'
+import {
+  isMagicItemGrantIncompleteIssueCode,
+  resolveMagicItemGrantReviewProgress,
+} from './resolvers/equipment/resolve-equipment-magic-item-grant-step-issues'
 import { resolveUnresolvedChoiceSetSummaries } from './resolve-unresolved-choice-set-summaries'
 import { validateCharacterBuild } from './validate/validate-character-build'
 import type { CharacterBuildValidationIssue } from './validate/types'
@@ -16,6 +22,7 @@ export type ReviewRequiredItem = {
   stepId: CharacterBuilderStepId
   stepLabel: string
   progress?: { current: number; total: number; max?: number }
+  equipmentPickerFocus?: EquipmentPickerFocusRequest
 }
 
 export type ReviewNonActionableIssue = {
@@ -31,7 +38,7 @@ export type ReviewBlockingSummary = {
 
 const STEP_FIELD_LABELS: Record<CharacterBuilderStepId, string> = {
   identity: 'Identity',
-  species: 'Species',
+  species: getContentTypeTerm('species').label,
   class: 'Class',
   abilities: 'Ability Scores',
   proficiencies: 'Proficiencies',
@@ -108,6 +115,7 @@ function choiceSetRequiredItems(
 
 function stepFieldRequiredItems(
   draft: CharacterBuilderDraft,
+  context: CharacterBuildContext,
   alertIssues: readonly CharacterBuildValidationIssue[],
 ): ReviewRequiredItem[] {
   const items: ReviewRequiredItem[] = []
@@ -121,7 +129,20 @@ function stepFieldRequiredItems(
     seen.add(dedupeKey)
 
     const progress =
-      issue.code === 'abilities_incomplete' ? resolveAbilityScoreProgress(draft) : undefined
+      issue.code === 'abilities_incomplete'
+        ? resolveAbilityScoreProgress(draft)
+        : issue.allowanceId && isMagicItemGrantIncompleteIssueCode(issue.code)
+          ? resolveMagicItemGrantReviewProgress({
+              draft,
+              context,
+              allowanceId: issue.allowanceId,
+            })
+          : undefined
+
+    const equipmentPickerFocus =
+      issue.allowanceId && isMagicItemGrantIncompleteIssueCode(issue.code)
+        ? { mode: 'magic_items' as const, allowanceId: issue.allowanceId }
+        : undefined
 
     items.push({
       id: `stepField:${issue.stepId}:${issue.code}`,
@@ -131,6 +152,7 @@ function stepFieldRequiredItems(
       stepId: issue.stepId,
       stepLabel: resolveBuilderStepLabel(issue.stepId),
       progress,
+      equipmentPickerFocus,
     })
   }
 
@@ -180,7 +202,7 @@ export function resolveReviewBlockingSummary(
       : validateCharacterBuild(draft, context, 'finalSubmit', { resolvedChoiceSets }).issues
 
   const choiceItems = choiceSetRequiredItems(draft, resolvedChoiceSets, alertIssues)
-  const fieldItems = stepFieldRequiredItems(draft, alertIssues)
+  const fieldItems = stepFieldRequiredItems(draft, context, alertIssues)
   const requiredItems = [...choiceItems, ...fieldItems]
   const nonActionable = resolveNonActionableIssues(alertIssues, requiredItems)
 
@@ -194,6 +216,10 @@ export function formatReviewRequiredItemProgress(item: ReviewRequiredItem): stri
 
   if (item.kind === 'choiceSet') {
     return formatChoiceProgress(current, total, max)
+  }
+
+  if (item.equipmentPickerFocus) {
+    return `${current} of ${total} selected`
   }
 
   return `${current} of ${total} assigned`

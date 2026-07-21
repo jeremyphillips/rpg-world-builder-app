@@ -1,9 +1,15 @@
+import { getStandardStartingWealthRules } from '@rpg/catalog/starting-wealth'
 import {
+  DEFAULT_ABILITY_GENERATION_RULES,
   DEFAULT_SYSTEM_RULESET_ID,
+  defaultCampaignMechanicsPatch,
   indexCharacterBuildCatalog,
+  resolveCharacterCreationPatch,
   type CharacterBuildCatalog,
+  type CharacterBuildContext,
   type ClassStored,
   type Equipment,
+  type StartingWealthRules,
 } from '@rpg/contracts'
 
 export const equipmentStepBreastplateFixture = {
@@ -82,6 +88,23 @@ export const equipmentStepDrumFixture = {
   utilizes: [{ description: 'Keep a steady beat', dc: 10 }],
 } as const satisfies Equipment
 
+export const equipmentStepPotionOfHealingFixture = {
+  id: 'srd-cc-5.2.1:potion-of-healing',
+  slug: 'potion-of-healing',
+  rulesetId: DEFAULT_SYSTEM_RULESET_ID,
+  source: 'system',
+  campaignId: null,
+  createdAt: '2026-01-01T00:00:00.000Z',
+  updatedAt: '2026-01-01T00:00:00.000Z',
+  name: 'Potion of Healing',
+  description: '',
+  kind: 'magic_item',
+  rarity: 'common',
+  magicItemCategory: 'potion',
+  cost: { amount: 50, currency: 'gp' },
+  weight: { value: 0.5, unit: 'lb' },
+} as const satisfies Equipment
+
 export const equipmentStepRationsFixture = {
   id: 'srd-cc-5.2.1:rations',
   slug: 'rations',
@@ -119,6 +142,28 @@ export const equipmentStepSpearFixture = {
   mastery: 'sap',
   versatileDamage: { count: 1, faces: 8 },
   range: { normal: 20, long: 60 },
+} as const satisfies Equipment
+
+export const equipmentStepBattleaxeFixture = {
+  id: 'srd-cc-5.2.1:battleaxe',
+  slug: 'battleaxe',
+  rulesetId: DEFAULT_SYSTEM_RULESET_ID,
+  source: 'system',
+  campaignId: null,
+  createdAt: '2026-01-01T00:00:00.000Z',
+  updatedAt: '2026-01-01T00:00:00.000Z',
+  name: 'Battleaxe',
+  description: '',
+  cost: { amount: 10, currency: 'gp' },
+  weight: { value: 4, unit: 'lb' },
+  kind: 'weapon',
+  category: 'martial',
+  mode: 'melee',
+  damage: { dice: { count: 1, faces: 8 } },
+  damageType: 'slashing',
+  properties: ['versatile'],
+  mastery: 'topple',
+  versatileDamage: { count: 1, faces: 10 },
 } as const satisfies Equipment
 
 export const equipmentStepDaggerFixture = {
@@ -194,9 +239,8 @@ export const equipmentStepBardClassFixture = {
       choose: 1,
       options: [
         {
-          id: 'standard',
+          id: 'standard-equipment',
           label: 'Standard Equipment',
-          description: 'Leather armor, a musical instrument, and starting gold.',
           items: [
             {
               kind: 'grant',
@@ -217,9 +261,8 @@ export const equipmentStepBardClassFixture = {
           wealth: { gp: 19 },
         },
         {
-          id: 'gold',
+          id: 'starting-gold',
           label: 'Starting Gold',
-          description: 'Take gold instead of a gear package.',
           items: [],
           wealth: { gp: 90 },
         },
@@ -251,10 +294,8 @@ export const equipmentStepMonkClassFixture = {
       choose: 1,
       options: [
         {
-          id: 'standard',
+          id: 'standard-equipment',
           label: 'Standard Equipment',
-          description:
-            "Spear, 5 Daggers, Artisan's Tools or Musical Instrument (from your tool proficiency above), Explorer's Pack, and 11 GP.",
           items: [
             {
               kind: 'grant',
@@ -281,9 +322,8 @@ export const equipmentStepMonkClassFixture = {
           wealth: { gp: 11 },
         },
         {
-          id: 'gold',
+          id: 'starting-gold',
           label: 'Starting Gold',
-          description: 'Take gold instead of a gear package.',
           items: [],
           wealth: { gp: 50 },
         },
@@ -317,8 +357,10 @@ export const equipmentStepCatalogFixture = {
     equipmentStepLuteFixture,
     equipmentStepDrumFixture,
     equipmentStepSpearFixture,
+    equipmentStepBattleaxeFixture,
     equipmentStepDaggerFixture,
     equipmentStepExplorersPackFixture,
+    equipmentStepPotionOfHealingFixture,
     equipmentStepRationsFixture,
   ],
   skillProficiencies: [],
@@ -328,3 +370,59 @@ export const equipmentStepCatalogFixture = {
 export const equipmentStepCatalogIndexFixture = indexCharacterBuildCatalog(
   equipmentStepCatalogFixture,
 )
+
+export function createEquipmentStepContextFixture(
+  overrides: Partial<CharacterBuildContext> = {},
+): CharacterBuildContext {
+  const rulesetId = overrides.rulesetId ?? DEFAULT_SYSTEM_RULESET_ID
+
+  return {
+    channel: 'build',
+    surface: 'dashboard',
+    characterKind: 'pc',
+    mode: 'dashboard',
+    scope: { type: 'standalone', rulesetId },
+    rulesScope: { type: 'ruleset', rulesetId },
+    ownershipTarget: { type: 'user' },
+    rulesetId,
+    catalog: equipmentStepCatalogFixture,
+    characterCreationRules: {
+      ...resolveCharacterCreationPatch(undefined, getStandardStartingWealthRules(rulesetId)),
+      abilityGeneration: DEFAULT_ABILITY_GENERATION_RULES,
+      armorClass: defaultCampaignMechanicsPatch().armorClass,
+    },
+    permissions: { canCreateCharacter: true },
+    ...overrides,
+  }
+}
+
+export const equipmentStepContextFixture = createEquipmentStepContextFixture()
+
+/** Starting wealth with common magic-item grants at level 1 (cart integration tests). */
+export const equipmentStepHeroMagicItemWealthFixture = {
+  name: 'Hero test wealth',
+  scope: { kind: 'standard' as const },
+  tiers: [
+    {
+      id: 'hero',
+      label: 'Hero',
+      minLevel: 1,
+      maxLevel: 20,
+      includeNormalStartingEquipment: true,
+      bonusGold: null,
+      magicItemGrants: [{ rarity: 'common' as const, quantity: 2 }],
+    },
+  ],
+} satisfies StartingWealthRules
+
+export function createEquipmentStepContextWithMagicItemGrantsFixture(
+  overrides: Partial<CharacterBuildContext> = {},
+): CharacterBuildContext {
+  return createEquipmentStepContextFixture({
+    characterCreationRules: {
+      ...createEquipmentStepContextFixture().characterCreationRules,
+      startingWealth: equipmentStepHeroMagicItemWealthFixture,
+    },
+    ...overrides,
+  })
+}

@@ -8,6 +8,8 @@ import {
 import type { EquipmentPickerBrowseSortContext } from './equipment-picker-browse-sort-context'
 import { getEquipmentRecommendationKindRank } from './equipment-picker-item-kind-rank'
 import { getEquipmentWeaponCategoryBrowseRank } from './equipment-picker-item-weapon-category-rank'
+import type { EquipmentPurchaseAvailability } from '../equipment/resolve-equipment-purchase-availability'
+import type { MagicItemActionState } from './magic-item-picker-action-rank'
 import type { PickerItemStateBase } from './picker-item-state'
 
 export type { EquipmentPickerBrowseSortContext } from './equipment-picker-browse-sort-context'
@@ -28,8 +30,12 @@ export type EquipmentPickerItemState = PickerItemStateBase & {
    * gating is inactive, not proof that a comparison ran.
    */
   isWithinRemainingBudget: boolean
-  /** Tiered classification; `isRecommended` mirrors Recommended-tab membership (essential/strong). */
+  /** Wealth-aware purchase gate for quantity=1 — null cost is unavailable, never unaffordable. */
+  purchaseAvailability: EquipmentPurchaseAvailability
+  /** Tiered classification; `isRecommended` mirrors essential/strong recommendation tiers. */
   recommendation: EquipmentRecommendation
+  /** Populated in magic-items workflow only — drives actionability best-match rank. */
+  magicItemAction?: MagicItemActionState
 }
 
 export type EquipmentPickerItem = {

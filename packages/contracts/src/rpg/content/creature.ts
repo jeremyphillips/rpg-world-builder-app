@@ -52,10 +52,21 @@ export type CreatureAbilityScores = z.infer<typeof creatureAbilityScoresSchema>
  *
  * This represents mutable creature state, not monster catalog stat-block text.
  */
-export const creatureRuntimeHitPointsSchema = z.object({
-  base: z.number().int().min(0),
-  temporary: z.number().int().min(0),
-})
+export const creatureRuntimeHitPointsSchema = z
+  .object({
+    base: z.number().int().min(0),
+    current: z.number().int().min(0),
+    temporary: z.number().int().min(0),
+  })
+  .superRefine((hitPoints, ctx) => {
+    if (hitPoints.current > hitPoints.base) {
+      ctx.addIssue({
+        code: 'custom',
+        message: 'Current hit points cannot exceed the maximum.',
+        path: ['current'],
+      })
+    }
+  })
 
 export type CreatureRuntimeHitPoints = z.infer<typeof creatureRuntimeHitPointsSchema>
 

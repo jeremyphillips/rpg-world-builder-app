@@ -177,12 +177,12 @@ describe('classFormDef round-trips', () => {
     const formValues = classFormDef.toFormValues(fighter) as ClassFormValues
     expect(
       formValues.characterCreation?.startingEquipment?.options.map((option) => option.id),
-    ).toEqual(['heavy', 'skirmisher', 'gold'])
+    ).toEqual(['heavy-armor', 'skirmisher', 'starting-gold'])
     const input = classFormDef.toInput(formValues, { entity: fighter })
     expect(input.characterCreation?.startingEquipment?.options.map((option) => option.id)).toEqual([
-      'heavy',
+      'heavy-armor',
       'skirmisher',
-      'gold',
+      'starting-gold',
     ])
   })
 
@@ -207,7 +207,7 @@ describe('classFormDef round-trips', () => {
     const bard = SRD_CLASSES.find((c) => c.slug === 'bard')!
     const formValues = classFormDef.toFormValues(bard) as ClassFormValues
     const instrumentChoice = formValues.characterCreation?.startingEquipment?.options
-      .find((option) => option.id === 'standard')
+      .find((option) => option.id === 'standard-equipment')
       ?.items.find((item) => item.itemKind === 'choice')
     expect(instrumentChoice).toMatchObject({
       itemKind: 'choice',
@@ -225,7 +225,7 @@ describe('classFormDef round-trips', () => {
     const monk = SRD_CLASSES.find((c) => c.slug === 'monk')!
     const formValues = classFormDef.toFormValues(monk) as ClassFormValues
     const linkedGrant = formValues.characterCreation?.startingEquipment?.options
-      .find((option) => option.id === 'standard')
+      .find((option) => option.id === 'standard-equipment')
       ?.items.find(
         (item) =>
           item.itemKind === 'grant' &&
@@ -248,7 +248,7 @@ describe('classFormDef round-trips', () => {
     const druid = SRD_CLASSES.find((c) => c.slug === 'druid')!
     const formValues = classFormDef.toFormValues(druid) as ClassFormValues
     const standardOption = formValues.characterCreation?.startingEquipment?.options.find(
-      (option) => option.id === 'standard',
+      (option) => option.id === 'standard-equipment',
     )
     const woodenStaff = standardOption?.items.find(
       (item) => item.itemKind === 'grant' && item.equipmentSlug === 'wooden-staff',

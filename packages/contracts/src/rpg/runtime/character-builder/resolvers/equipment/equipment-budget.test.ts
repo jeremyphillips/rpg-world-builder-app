@@ -12,6 +12,10 @@ import { indexCharacterBuildCatalog } from '../../context'
 import { createEmptyCharacterBuilderDraft } from '../../draft'
 import { startingEquipmentChoiceSetId } from './resolve-starting-equipment-choice-sets'
 import { deriveEquipmentBudgetSummary, maxAffordableEquipmentQuantity } from './equipment-budget'
+import {
+  deriveEquipmentBudgetSummaryFromFunding,
+  resolveStartingEquipmentFundingOptions,
+} from './resolve-starting-equipment-funding'
 
 const RULESET = 'srd-cc-5.2.1' as const
 
@@ -54,13 +58,15 @@ const storedDruid: ClassStored = {
       choose: 1,
       options: [
         {
-          id: 'standard',
+          id: 'standard-equipment',
           label: 'Standard Equipment',
-          items: [],
+          items: [
+            { kind: 'grant', target: { source: 'equipment', equipmentSlug: 'rope' }, quantity: 1 },
+          ],
           wealth: { gp: 9, sp: 5, cp: 3 },
         },
         {
-          id: 'gold',
+          id: 'starting-gold',
           label: 'Starting Gold',
           items: [],
           wealth: { gp: 50 },
@@ -85,7 +91,7 @@ describe('deriveEquipmentBudgetSummary', () => {
       ...createEmptyCharacterBuilderDraft(),
       class: { classId: storedDruid.id, level: 1 as const },
       choiceSelections: {
-        [startingEquipmentChoiceSetId(storedDruid.id)]: ['standard'],
+        [startingEquipmentChoiceSetId(storedDruid.id)]: ['standard-equipment'],
       },
       equipment: {
         mode: 'package' as const,
@@ -120,6 +126,203 @@ describe('deriveEquipmentBudgetSummary', () => {
     }
 
     expect(maxAffordableEquipmentQuantity(rope, budget, 2)).toBe(8)
+  })
+})
+
+describe('resolveStartingEquipmentFundingOptions', () => {
+  it('includes tier bonus for wealth-only options', () => {
+    const catalogIndex = indexCharacterBuildCatalog({
+      species: [],
+      classes: [storedDruid],
+      spells: [],
+      equipment: [rope],
+      skillProficiencies: [],
+      languages: [],
+    })
+
+    const draft = {
+      ...createEmptyCharacterBuilderDraft(),
+      class: { classId: storedDruid.id, level: 5 as const },
+    }
+
+    const fundingByOptionId = resolveStartingEquipmentFundingOptions({
+      draft,
+      catalogIndex,
+      startingWealth: {
+        name: 'Tier bonus',
+        scope: { kind: 'standard' },
+        tiers: [
+          {
+            id: 'tier-5',
+            label: 'Level 5+',
+            minLevel: 5,
+            maxLevel: 20,
+            includeNormalStartingEquipment: true,
+            magicItemGrants: [],
+            bonusGold: {
+              baseGp: 100,
+              formula: {
+                kind: 'dice',
+                dice: { count: 1, faces: 6 },
+                multiplier: 0,
+                currency: 'gp',
+              },
+            },
+          },
+        ],
+      },
+    })
+
+    expect(wealthToCopper(fundingByOptionId.get('starting-gold')!.totalStartingWealth)).toBe(15_000)
+  })
+
+  it('marks funding inactive and tier-only when class options are replaced', () => {
+    const catalogIndex = indexCharacterBuildCatalog({
+      species: [],
+      classes: [storedDruid],
+      spells: [],
+      equipment: [rope],
+      skillProficiencies: [],
+      languages: [],
+    })
+
+    const draft = {
+      ...createEmptyCharacterBuilderDraft(),
+      class: { classId: storedDruid.id, level: 19 as const },
+    }
+
+    const fundingByOptionId = resolveStartingEquipmentFundingOptions({
+      draft,
+      catalogIndex,
+      startingWealth: {
+        name: 'Legend',
+        scope: { kind: 'standard' },
+        tiers: [
+          {
+            id: 'legend',
+            label: 'Legend',
+            minLevel: 19,
+            maxLevel: 20,
+            includeNormalStartingEquipment: false,
+            magicItemGrants: [],
+            bonusGold: {
+              baseGp: 21_375,
+              formula: {
+                kind: 'dice',
+                dice: { count: 1, faces: 6 },
+                multiplier: 0,
+                currency: 'gp',
+              },
+            },
+          },
+        ],
+      },
+    })
+
+    const gold = fundingByOptionId.get('starting-gold')!
+    expect(gold.classOptionPolicy).toBe('replaced')
+    expect(gold.classOptionId).toBeUndefined()
+    expect(wealthToCopper(gold.classOptionWealth)).toBe(0)
+    expect(wealthToCopper(gold.totalStartingWealth)).toBe(2_137_500)
+  })
+
+  it('keeps tier delta equal to class-option wealth delta', () => {
+    const catalogIndex = indexCharacterBuildCatalog({
+      species: [],
+      classes: [storedDruid],
+      spells: [],
+      equipment: [rope],
+      skillProficiencies: [],
+      languages: [],
+    })
+
+    const draft = {
+      ...createEmptyCharacterBuilderDraft(),
+      class: { classId: storedDruid.id, level: 19 as const },
+    }
+
+    const startingWealth = {
+      name: 'Legend tier',
+      scope: { kind: 'standard' as const },
+      tiers: [
+        {
+          id: 'legend',
+          label: 'Legend',
+          minLevel: 19,
+          maxLevel: 20,
+          includeNormalStartingEquipment: true,
+          magicItemGrants: [],
+          bonusGold: {
+            baseGp: 21_375,
+            formula: {
+              kind: 'dice' as const,
+              dice: { count: 1, faces: 6 as const },
+              multiplier: 0,
+              currency: 'gp' as const,
+            },
+          },
+        },
+      ],
+    }
+
+    const fundingByOptionId = resolveStartingEquipmentFundingOptions({
+      draft,
+      catalogIndex,
+      startingWealth,
+    })
+
+    const standard = fundingByOptionId.get('standard-equipment')!
+    const gold = fundingByOptionId.get('starting-gold')!
+
+    expect(
+      wealthToCopper(gold.totalStartingWealth) - wealthToCopper(standard.totalStartingWealth),
+    ).toBe(wealthToCopper(gold.classOptionWealth) - wealthToCopper(standard.classOptionWealth))
+  })
+})
+
+describe('deriveEquipmentBudgetSummaryFromFunding', () => {
+  it('matches deriveEquipmentBudgetSummary for the same snapshot', () => {
+    const catalogIndex = indexCharacterBuildCatalog({
+      species: [],
+      classes: [storedDruid],
+      spells: [],
+      equipment: [rope],
+      skillProficiencies: [],
+      languages: [],
+    })
+
+    const draft = {
+      ...createEmptyCharacterBuilderDraft(),
+      class: { classId: storedDruid.id, level: 1 as const },
+      choiceSelections: {
+        [startingEquipmentChoiceSetId(storedDruid.id)]: ['starting-gold'],
+      },
+      equipment: {
+        mode: 'gold' as const,
+        purchases: [
+          {
+            equipmentId: rope.id,
+            quantity: 1,
+            sourceMode: 'startingGold' as const,
+            origin: 'picker' as const,
+          },
+        ],
+        removedPackageItemKeys: [],
+        customized: false,
+      },
+    }
+
+    const funding = resolveStartingEquipmentFundingOptions({ draft, catalogIndex }).get(
+      'starting-gold',
+    )!
+    const fromFunding = deriveEquipmentBudgetSummaryFromFunding({
+      funding,
+      purchases: draft.equipment.purchases,
+      catalogIndex,
+    })
+    const fromDraft = deriveEquipmentBudgetSummary(draft, catalogIndex)
+
+    expect(fromFunding).toEqual(fromDraft)
   })
 })
 

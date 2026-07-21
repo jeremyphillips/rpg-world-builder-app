@@ -268,8 +268,8 @@ describe('useMasterDetailArray', () => {
         startingEquipment: {
           choose: 1,
           options: [
-            { id: 'standard', label: 'Standard Equipment', items: [] },
-            { id: 'gold', label: '', items: [] },
+            { id: 'standard-equipment', label: 'Standard Equipment', items: [] },
+            { id: 'starting-gold', label: '', items: [] },
           ],
         },
       },

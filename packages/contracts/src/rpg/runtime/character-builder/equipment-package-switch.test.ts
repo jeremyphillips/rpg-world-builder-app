@@ -12,8 +12,12 @@ import {
   initPackageSwitchDraftQuantities,
   rebuildPackageSwitchDraftQuantities,
 } from './equipment-package-switch'
+import { wealthToCopper } from './resolvers/equipment/equipment-budget'
+import { resolveStartingEquipmentFundingOptions } from './resolvers/equipment/resolve-starting-equipment-funding'
 import { startingEquipmentChoiceSetId } from './resolvers/equipment/resolve-starting-equipment-choice-sets'
 import { createEquipmentPurchaseId } from './equipment-purchase'
+import type { CharacterBuilderDraft } from './draft'
+import type { CharacterBuildCatalogIndex } from './context'
 
 const RULESET = 'srd-cc-5.2.1' as const
 
@@ -93,13 +97,15 @@ const storedDruid: ClassStored = {
       choose: 1,
       options: [
         {
-          id: 'standard',
+          id: 'standard-equipment',
           label: 'Standard Equipment',
-          items: [],
+          items: [
+            { kind: 'grant', target: { source: 'equipment', equipmentSlug: 'rope' }, quantity: 1 },
+          ],
           wealth: { gp: 9, sp: 5, cp: 3 },
         },
         {
-          id: 'gold',
+          id: 'starting-gold',
           label: 'Starting Gold',
           items: [],
           wealth: { gp: 50 },
@@ -120,6 +126,14 @@ function buildCatalogIndex() {
   })
 }
 
+function targetFundingFor(
+  draft: CharacterBuilderDraft,
+  catalogIndex: CharacterBuildCatalogIndex,
+  targetOptionId: string,
+) {
+  return resolveStartingEquipmentFundingOptions({ draft, catalogIndex }).get(targetOptionId)!
+}
+
 function goldDraftWithPurchases(
   purchases: Array<{
     id: string
@@ -133,7 +147,7 @@ function goldDraftWithPurchases(
     ...createEmptyCharacterBuilderDraft(),
     class: { classId: storedDruid.id, level: 1 as const },
     choiceSelections: {
-      [startingEquipmentChoiceSetId(storedDruid.id)]: ['gold'],
+      [startingEquipmentChoiceSetId(storedDruid.id)]: ['starting-gold'],
     },
     equipment: {
       mode: 'gold' as const,
@@ -161,7 +175,8 @@ describe('evaluateEquipmentPackageSwitch', () => {
     const evaluation = evaluateEquipmentPackageSwitch({
       draft,
       catalogIndex,
-      targetOptionId: 'standard',
+      targetOptionId: 'standard-equipment',
+      targetFunding: targetFundingFor(draft, catalogIndex, 'standard-equipment'),
     })
 
     expect(evaluation?.status).toBe('noConflict')
@@ -177,7 +192,8 @@ describe('evaluateEquipmentPackageSwitch', () => {
     const evaluation = evaluateEquipmentPackageSwitch({
       draft,
       catalogIndex,
-      targetOptionId: 'standard',
+      targetOptionId: 'standard-equipment',
+      targetFunding: targetFundingFor(draft, catalogIndex, 'standard-equipment'),
     })
 
     expect(evaluation?.status).toBe('resolvable')
@@ -195,7 +211,8 @@ describe('evaluateEquipmentPackageSwitch', () => {
     const evaluation = evaluateEquipmentPackageSwitch({
       draft,
       catalogIndex,
-      targetOptionId: 'standard',
+      targetOptionId: 'standard-equipment',
+      targetFunding: targetFundingFor(draft, catalogIndex, 'standard-equipment'),
     })
 
     expect(evaluation?.budget.nonEditableRetainedCostCp).toBe(2000)
@@ -212,7 +229,8 @@ describe('evaluateEquipmentPackageSwitch', () => {
     const evaluation = evaluateEquipmentPackageSwitch({
       draft,
       catalogIndex,
-      targetOptionId: 'standard',
+      targetOptionId: 'standard-equipment',
+      targetFunding: targetFundingFor(draft, catalogIndex, 'standard-equipment'),
     })
 
     expect(evaluation?.status).toBe('blocked')
@@ -231,7 +249,8 @@ describe('evaluateEquipmentPackageSwitch', () => {
     const evaluation = evaluateEquipmentPackageSwitch({
       draft,
       catalogIndex,
-      targetOptionId: 'standard',
+      targetOptionId: 'standard-equipment',
+      targetFunding: targetFundingFor(draft, catalogIndex, 'standard-equipment'),
       draftQuantitiesByPurchaseId: { 'purchase-needle': 199 },
     })
 
@@ -246,7 +265,8 @@ describe('evaluateEquipmentPackageSwitch', () => {
     const validEvaluation = evaluateEquipmentPackageSwitch({
       draft,
       catalogIndex,
-      targetOptionId: 'standard',
+      targetOptionId: 'standard-equipment',
+      targetFunding: targetFundingFor(draft, catalogIndex, 'standard-equipment'),
       draftQuantitiesByPurchaseId: { 'purchase-needle': 19 },
     })
 
@@ -263,7 +283,8 @@ describe('evaluateEquipmentPackageSwitch', () => {
     const evaluation = evaluateEquipmentPackageSwitch({
       draft,
       catalogIndex,
-      targetOptionId: 'standard',
+      targetOptionId: 'standard-equipment',
+      targetFunding: targetFundingFor(draft, catalogIndex, 'standard-equipment'),
       draftQuantitiesByPurchaseId: { 'purchase-rope': 0 },
     })
 
@@ -284,7 +305,8 @@ describe('evaluateEquipmentPackageSwitch', () => {
     const evaluation = evaluateEquipmentPackageSwitch({
       draft: changedDraft,
       catalogIndex,
-      targetOptionId: 'standard',
+      targetOptionId: 'standard-equipment',
+      targetFunding: targetFundingFor(draft, catalogIndex, 'standard-equipment'),
       draftQuantitiesByPurchaseId: { 'purchase-rope': 50 },
       committedInventorySnapshot: snapshot,
     })
@@ -311,7 +333,8 @@ describe('buildEquipmentPackageSwitchPatch', () => {
     const evaluation = evaluateEquipmentPackageSwitch({
       draft,
       catalogIndex,
-      targetOptionId: 'standard',
+      targetOptionId: 'standard-equipment',
+      targetFunding: targetFundingFor(draft, catalogIndex, 'standard-equipment'),
     })!
     const draftQuantities = initPackageSwitchDraftQuantities(evaluation)
     draftQuantities['purchase-rope'] = 9
@@ -322,7 +345,8 @@ describe('buildEquipmentPackageSwitchPatch', () => {
     const result = buildEquipmentPackageSwitchPatch({
       draft,
       catalogIndex,
-      targetOptionId: 'standard',
+      targetOptionId: 'standard-equipment',
+      targetFunding: targetFundingFor(draft, catalogIndex, 'standard-equipment'),
       choiceSetId,
       nestedSelections: {},
       draftQuantitiesByPurchaseId: draftQuantities,
@@ -332,7 +356,7 @@ describe('buildEquipmentPackageSwitchPatch', () => {
     expect(result.status).toBe('success')
     if (result.status !== 'success') return
 
-    expect(result.patch.choiceSelections?.[choiceSetId]).toEqual(['standard'])
+    expect(result.patch.choiceSelections?.[choiceSetId]).toEqual(['standard-equipment'])
     expect(result.patch.equipment?.mode).toBe('package')
     expect(result.patch.equipment?.purchases).toEqual([
       expect.objectContaining({ equipmentId: rope.id, quantity: 9 }),
@@ -348,7 +372,8 @@ describe('buildEquipmentPackageSwitchPatch', () => {
     const evaluation = evaluateEquipmentPackageSwitch({
       draft,
       catalogIndex,
-      targetOptionId: 'standard',
+      targetOptionId: 'standard-equipment',
+      targetFunding: targetFundingFor(draft, catalogIndex, 'standard-equipment'),
     })!
     const draftQuantities = initPackageSwitchDraftQuantities(evaluation)
     draftQuantities['purchase-rope'] = 9
@@ -360,7 +385,8 @@ describe('buildEquipmentPackageSwitchPatch', () => {
     const result = buildEquipmentPackageSwitchPatch({
       draft: changedDraft,
       catalogIndex,
-      targetOptionId: 'standard',
+      targetOptionId: 'standard-equipment',
+      targetFunding: targetFundingFor(draft, catalogIndex, 'standard-equipment'),
       choiceSetId: startingEquipmentChoiceSetId(storedDruid.id),
       nestedSelections: {},
       draftQuantitiesByPurchaseId: draftQuantities,
@@ -380,7 +406,8 @@ describe('buildEquipmentPackageSwitchPatch', () => {
     const result = buildEquipmentPackageSwitchPatch({
       draft,
       catalogIndex,
-      targetOptionId: 'standard',
+      targetOptionId: 'standard-equipment',
+      targetFunding: targetFundingFor(draft, catalogIndex, 'standard-equipment'),
       choiceSetId: startingEquipmentChoiceSetId(storedDruid.id),
       nestedSelections: {},
       draftQuantitiesByPurchaseId: { [purchaseId]: 0 },
@@ -404,7 +431,8 @@ describe('rebuildPackageSwitchDraftQuantities', () => {
     const evaluation = evaluateEquipmentPackageSwitch({
       draft,
       catalogIndex,
-      targetOptionId: 'standard',
+      targetOptionId: 'standard-equipment',
+      targetFunding: targetFundingFor(draft, catalogIndex, 'standard-equipment'),
     })!
 
     const rebuilt = rebuildPackageSwitchDraftQuantities({
@@ -420,5 +448,151 @@ describe('rebuildPackageSwitchDraftQuantities', () => {
       'purchase-rope': 40,
       'purchase-dagger': 2,
     })
+  })
+})
+
+describe('evaluateEquipmentPackageSwitch with Legend-tier funding', () => {
+  const legendStartingWealth = {
+    name: 'Legend',
+    scope: { kind: 'standard' as const },
+    tiers: [
+      {
+        id: 'legend',
+        label: 'Legend',
+        minLevel: 19,
+        maxLevel: 20,
+        includeNormalStartingEquipment: true,
+        magicItemGrants: [],
+        bonusGold: {
+          baseGp: 21_375,
+          formula: {
+            kind: 'dice' as const,
+            dice: { count: 1, faces: 6 as const },
+            multiplier: 0,
+            currency: 'gp' as const,
+          },
+        },
+      },
+    ],
+  }
+
+  const storedBarbarian: ClassStored = {
+    ...storedDruid,
+    id: `${RULESET}:barbarian`,
+    slug: 'barbarian',
+    name: 'Barbarian',
+    hitDie: 12,
+    characterCreation: {
+      startingEquipment: {
+        choose: 1,
+        options: [
+          {
+            id: 'standard-equipment',
+            label: 'Standard Equipment',
+            items: [
+              {
+                kind: 'grant',
+                target: { source: 'equipment', equipmentSlug: 'rope' },
+                quantity: 1,
+              },
+            ],
+            wealth: { gp: 15 },
+          },
+          {
+            id: 'starting-gold',
+            label: 'Starting Gold',
+            items: [],
+            wealth: { gp: 75 },
+          },
+        ],
+      },
+    },
+  }
+
+  const catalogIndex = indexCharacterBuildCatalog({
+    species: [],
+    classes: [storedBarbarian],
+    spells: [],
+    equipment: [rope, dagger],
+    skillProficiencies: [],
+    languages: [],
+  })
+
+  function legendDraft(purchases: Array<{ equipmentId: string; quantity: number }>) {
+    return {
+      ...createEmptyCharacterBuilderDraft(),
+      class: { classId: storedBarbarian.id, level: 19 as const },
+      choiceSelections: {
+        [startingEquipmentChoiceSetId(storedBarbarian.id)]: ['standard-equipment'],
+      },
+      equipment: {
+        mode: 'package' as const,
+        purchases: purchases.map((purchase, index) => ({
+          id: `purchase-${index}`,
+          equipmentId: purchase.equipmentId,
+          quantity: purchase.quantity,
+          sourceMode: 'startingGold' as const,
+          origin: 'picker' as const,
+        })),
+        removedPackageItemKeys: [],
+        customized: false,
+      },
+    }
+  }
+
+  function goldTargetFunding(draft: CharacterBuilderDraft) {
+    return resolveStartingEquipmentFundingOptions({
+      draft,
+      catalogIndex,
+      startingWealth: legendStartingWealth,
+    }).get('starting-gold')!
+  }
+
+  it('returns noConflict for 195 GP retained purchases against tier-aware gold allowance', () => {
+    const draft = legendDraft([{ equipmentId: rope.id, quantity: 195 }])
+    const targetFunding = goldTargetFunding(draft)
+
+    const evaluation = evaluateEquipmentPackageSwitch({
+      draft,
+      catalogIndex,
+      targetOptionId: 'starting-gold',
+      targetFunding,
+    })
+
+    expect(wealthToCopper(targetFunding.totalStartingWealth)).toBe(2_145_000)
+    expect(evaluation?.status).toBe('noConflict')
+    expect(evaluation?.budget.targetAllowanceCp).toBe(2_145_000)
+    expect(evaluation?.budget.totalRetainedCostCp).toBe(19_500)
+  })
+
+  it('returns resolvable with 120 GP overage for 21,570 GP retained purchases', () => {
+    const draft = legendDraft([{ equipmentId: rope.id, quantity: 21_570 }])
+    const targetFunding = goldTargetFunding(draft)
+
+    const evaluation = evaluateEquipmentPackageSwitch({
+      draft,
+      catalogIndex,
+      targetOptionId: 'starting-gold',
+      targetFunding,
+    })
+
+    expect(evaluation?.status).toBe('resolvable')
+    expect(evaluation?.budget.targetAllowanceCp).toBe(2_145_000)
+    expect(evaluation?.budget.initialAmountOverBudgetCp).toBe(12_000)
+  })
+
+  it('does not count package grants toward retained purchase cost when switching to gold', () => {
+    const draft = legendDraft([])
+    const targetFunding = goldTargetFunding(draft)
+
+    const evaluation = evaluateEquipmentPackageSwitch({
+      draft,
+      catalogIndex,
+      targetOptionId: 'starting-gold',
+      targetFunding,
+    })
+
+    expect(evaluation?.status).toBe('noConflict')
+    expect(evaluation?.budget.totalRetainedCostCp).toBe(0)
   })
 })

@@ -4,8 +4,16 @@ import {
   createEmptyCharacterBuilderDraft,
   buildChoiceSetId,
   createDeterministicLegacyPurchaseId,
+  defaultCampaignMechanicsPatch,
+  DEFAULT_ABILITY_GENERATION_RULES,
+  deriveEquipmentBudgetSummary,
+  resolveCharacterCreationPatch,
   resolveStartingEquipmentOptionSummaries,
+  formatSelectionSourceLabel,
   startingEquipmentChoiceSetId,
+  wealthToCopper,
+  type CharacterBuildContext,
+  type StartingWealthRules,
 } from '@rpg/contracts'
 
 import {
@@ -14,14 +22,13 @@ import {
   buildEquipmentSelectionPatch,
   buildEquipmentSetPurchaseQuantityPatch,
   formatEquipmentInventoryRemoveLabel,
-  formatEquipmentSourceLabel,
-  formatStartingEquipmentOptionMeta,
   hasSelectableStartingEquipmentOption,
-  isStartingGoldOptionId,
   isSelectedStartingEquipmentReady,
   isUniqueEquipmentOwnedInDraft,
   listEquipmentInventoryRowsFromDraft,
   listProficiencyLinksForOption,
+  resolveEquipmentStepBudget,
+  resolveEquipmentStepPickerItems,
   resolvePurchaseSourceMode,
   shouldShowEquipmentFallback,
   shouldShowEquipmentBudget,
@@ -29,6 +36,8 @@ import {
 } from './equipment-step.lib'
 import {
   equipmentStepBardClassFixture,
+  equipmentStepBreastplateFixture,
+  equipmentStepCatalogFixture,
   equipmentStepCatalogIndexFixture,
   equipmentStepDaggerFixture,
   equipmentStepLeatherArmorFixture,
@@ -36,10 +45,157 @@ import {
   equipmentStepMonkClassFixture,
 } from './equipment-step.fixtures'
 
+const tierBonusStartingWealthFixture: StartingWealthRules = {
+  name: 'Tier bonus test wealth',
+  scope: { kind: 'standard' },
+  tiers: [
+    {
+      id: 'tier-5-plus',
+      label: 'Levels 5–20',
+      minLevel: 5,
+      maxLevel: 20,
+      includeNormalStartingEquipment: true,
+      magicItemGrants: [],
+      bonusGold: {
+        baseGp: 500,
+        formula: {
+          kind: 'dice',
+          dice: { count: 1, faces: 10 },
+          multiplier: 25,
+          currency: 'gp',
+        },
+      },
+    },
+  ],
+}
+
+function createEquipmentStepContextWithStartingWealth(
+  startingWealth: StartingWealthRules,
+): CharacterBuildContext {
+  return {
+    channel: 'build',
+    surface: 'dashboard',
+    characterKind: 'pc',
+    mode: 'dashboard',
+    scope: { type: 'standalone', rulesetId: equipmentStepBardClassFixture.rulesetId },
+    rulesScope: { type: 'ruleset', rulesetId: equipmentStepBardClassFixture.rulesetId },
+    ownershipTarget: { type: 'user' },
+    rulesetId: equipmentStepBardClassFixture.rulesetId,
+    catalog: equipmentStepCatalogFixture,
+    characterCreationRules: {
+      ...resolveCharacterCreationPatch(undefined, startingWealth),
+      abilityGeneration: DEFAULT_ABILITY_GENERATION_RULES,
+      armorClass: defaultCampaignMechanicsPatch().armorClass,
+    },
+    permissions: { canCreateCharacter: true },
+  }
+}
+
 describe('equipment-step.lib', () => {
-  it('detects gold options', () => {
-    expect(isStartingGoldOptionId('gold')).toBe(true)
-    expect(isStartingGoldOptionId('standard')).toBe(false)
+  it('enables shopping for a homebrew wealth-only option id via option shape', () => {
+    const homebrewClass = {
+      ...equipmentStepBardClassFixture,
+      characterCreation: {
+        ...equipmentStepBardClassFixture.characterCreation!,
+        startingEquipment: {
+          choose: 1 as const,
+          options: [
+            {
+              id: 'standard-equipment',
+              label: 'Standard Equipment',
+              items:
+                equipmentStepBardClassFixture.characterCreation!.startingEquipment!.options[0]!
+                  .items,
+              wealth: { gp: 15 },
+            },
+            {
+              id: 'buy-your-own-gear',
+              label: 'Buy Your Own Gear',
+              items: [],
+              wealth: { gp: 75 },
+            },
+          ],
+        },
+      },
+    }
+
+    const draft = {
+      ...createEmptyCharacterBuilderDraft(),
+      class: { classId: homebrewClass.id, level: 1 as const },
+      choiceSelections: {
+        [startingEquipmentChoiceSetId(homebrewClass.id)]: ['buy-your-own-gear'],
+      },
+      equipment: {
+        mode: 'gold' as const,
+        purchases: [],
+        removedPackageItemKeys: [],
+        customized: false,
+      },
+    }
+
+    const patch = buildEquipmentSelectionPatch({
+      draft: { ...draft, equipment: { ...draft.equipment, mode: 'package' } },
+      classId: homebrewClass.id,
+      optionId: 'buy-your-own-gear',
+      choiceSetId: startingEquipmentChoiceSetId(homebrewClass.id),
+      nestedSelections: {},
+      characterClass: homebrewClass,
+    })
+
+    expect(patch.equipment?.mode).toBe('gold')
+    expect(shouldShowEquipmentShopping(draft, 'buy-your-own-gear', homebrewClass)).toBe(true)
+  })
+
+  it('aligns picker affordability with the same campaign tier bonus budget as the drawer', () => {
+    const context = createEquipmentStepContextWithStartingWealth(tierBonusStartingWealthFixture)
+    const draft = {
+      ...createEmptyCharacterBuilderDraft(),
+      class: { classId: equipmentStepBardClassFixture.id, level: 5 as const },
+      choiceSelections: {
+        [startingEquipmentChoiceSetId(equipmentStepBardClassFixture.id)]: ['starting-gold'],
+      },
+      equipment: {
+        mode: 'gold' as const,
+        purchases: [],
+        removedPackageItemKeys: [],
+        customized: false,
+      },
+    }
+
+    const budget = resolveEquipmentStepBudget(draft, equipmentStepCatalogIndexFixture, context)
+    expect(budget).toBeDefined()
+    expect(wealthToCopper(budget!.starting)).toBeGreaterThan(
+      wealthToCopper({ gp: 90, sp: 0, cp: 0, pp: 0 }),
+    )
+
+    const { items } = resolveEquipmentStepPickerItems({
+      draft,
+      characterClass: equipmentStepBardClassFixture,
+      catalogIndex: equipmentStepCatalogIndexFixture,
+      choiceSets: [],
+      budget,
+    })
+
+    const breastplate = items.find(
+      (item) => item.equipment.id === equipmentStepBreastplateFixture.id,
+    )
+    expect(breastplate?.state.isWithinRemainingBudget).toBe(true)
+
+    const budgetWithoutTierBonus = deriveEquipmentBudgetSummary(
+      draft,
+      equipmentStepCatalogIndexFixture,
+    )
+    const { items: itemsWithoutTierBonus } = resolveEquipmentStepPickerItems({
+      draft,
+      characterClass: equipmentStepBardClassFixture,
+      catalogIndex: equipmentStepCatalogIndexFixture,
+      choiceSets: [],
+      budget: budgetWithoutTierBonus,
+    })
+    expect(
+      itemsWithoutTierBonus.find((item) => item.equipment.id === equipmentStepBreastplateFixture.id)
+        ?.state.isWithinRemainingBudget,
+    ).toBe(false)
   })
 
   it('shows equipment shopping only on the gold path', () => {
@@ -47,7 +203,7 @@ describe('equipment-step.lib', () => {
       ...createEmptyCharacterBuilderDraft(),
       class: { classId: equipmentStepBardClassFixture.id, level: 1 as const },
       choiceSelections: {
-        [startingEquipmentChoiceSetId(equipmentStepBardClassFixture.id)]: ['standard'],
+        [startingEquipmentChoiceSetId(equipmentStepBardClassFixture.id)]: ['standard-equipment'],
       },
       equipment: {
         mode: 'package' as const,
@@ -61,13 +217,14 @@ describe('equipment-step.lib', () => {
       shouldShowEquipmentShopping(
         draft,
         draft.choiceSelections[startingEquipmentChoiceSetId(equipmentStepBardClassFixture.id)]?.[0],
+        equipmentStepBardClassFixture,
       ),
     ).toBe(false)
 
     const goldDraft = {
       ...draft,
       choiceSelections: {
-        [startingEquipmentChoiceSetId(equipmentStepBardClassFixture.id)]: ['gold'],
+        [startingEquipmentChoiceSetId(equipmentStepBardClassFixture.id)]: ['starting-gold'],
       },
       equipment: { ...draft.equipment, mode: 'gold' as const },
     }
@@ -78,6 +235,7 @@ describe('equipment-step.lib', () => {
         goldDraft.choiceSelections[
           startingEquipmentChoiceSetId(equipmentStepBardClassFixture.id)
         ]?.[0],
+        equipmentStepBardClassFixture,
       ),
     ).toBe(true)
   })
@@ -87,7 +245,7 @@ describe('equipment-step.lib', () => {
       ...createEmptyCharacterBuilderDraft(),
       class: { classId: equipmentStepBardClassFixture.id, level: 1 as const },
       choiceSelections: {
-        [startingEquipmentChoiceSetId(equipmentStepBardClassFixture.id)]: ['standard'],
+        [startingEquipmentChoiceSetId(equipmentStepBardClassFixture.id)]: ['standard-equipment'],
       },
       equipment: {
         mode: 'package' as const,
@@ -118,7 +276,7 @@ describe('equipment-step.lib', () => {
       ...createEmptyCharacterBuilderDraft(),
       class: { classId: equipmentStepBardClassFixture.id, level: 1 as const },
       choiceSelections: {
-        [startingEquipmentChoiceSetId(equipmentStepBardClassFixture.id)]: ['gold'],
+        [startingEquipmentChoiceSetId(equipmentStepBardClassFixture.id)]: ['starting-gold'],
       },
       equipment: {
         mode: 'gold' as const,
@@ -143,7 +301,7 @@ describe('equipment-step.lib', () => {
       ...createEmptyCharacterBuilderDraft(),
       class: { classId: equipmentStepBardClassFixture.id, level: 1 as const },
       choiceSelections: {
-        [startingEquipmentChoiceSetId(equipmentStepBardClassFixture.id)]: ['standard'],
+        [startingEquipmentChoiceSetId(equipmentStepBardClassFixture.id)]: ['standard-equipment'],
       },
       equipment: {
         mode: 'package' as const,
@@ -157,7 +315,7 @@ describe('equipment-step.lib', () => {
       draft,
       target: {
         kind: 'package',
-        packageItemKey: `${equipmentStepBardClassFixture.id}:standard:0`,
+        packageItemKey: `${equipmentStepBardClassFixture.id}:standard-equipment:0`,
       },
     })
 
@@ -170,12 +328,12 @@ describe('equipment-step.lib', () => {
       ...createEmptyCharacterBuilderDraft(),
       class: { classId: equipmentStepBardClassFixture.id, level: 1 as const },
       choiceSelections: {
-        [startingEquipmentChoiceSetId(equipmentStepBardClassFixture.id)]: ['standard'],
+        [startingEquipmentChoiceSetId(equipmentStepBardClassFixture.id)]: ['standard-equipment'],
       },
       equipment: {
         mode: 'package' as const,
         purchases: [],
-        removedPackageItemKeys: [`${equipmentStepBardClassFixture.id}:standard:0`],
+        removedPackageItemKeys: [`${equipmentStepBardClassFixture.id}:standard-equipment:0`],
         customized: true,
       },
     }
@@ -193,20 +351,22 @@ describe('equipment-step.lib', () => {
     const packagePatch = buildEquipmentSelectionPatch({
       draft,
       classId,
-      optionId: 'standard',
+      optionId: 'standard-equipment',
       choiceSetId,
       nestedSelections: {},
+      characterClass: equipmentStepBardClassFixture,
     })
 
-    expect(packagePatch.choiceSelections?.[choiceSetId]).toEqual(['standard'])
+    expect(packagePatch.choiceSelections?.[choiceSetId]).toEqual(['standard-equipment'])
     expect(packagePatch.equipment?.mode).toBe('package')
 
     const goldPatch = buildEquipmentSelectionPatch({
       draft,
       classId,
-      optionId: 'gold',
+      optionId: 'starting-gold',
       choiceSetId,
       nestedSelections: {},
+      characterClass: equipmentStepBardClassFixture,
     })
 
     expect(goldPatch.equipment?.mode).toBe('gold')
@@ -214,12 +374,12 @@ describe('equipment-step.lib', () => {
 
   it('formats equipment source labels', () => {
     expect(
-      formatEquipmentSourceLabel(
+      formatSelectionSourceLabel(
         [
           {
             kind: 'classStartingEquipment',
             sourceId: equipmentStepBardClassFixture.id,
-            grantId: 'standard',
+            grantId: 'standard-equipment',
           },
         ],
         equipmentStepCatalogIndexFixture,
@@ -227,7 +387,7 @@ describe('equipment-step.lib', () => {
     ).toBe('From Bard starting equipment')
 
     expect(
-      formatEquipmentSourceLabel([{ kind: 'startingGold' }], equipmentStepCatalogIndexFixture),
+      formatSelectionSourceLabel([{ kind: 'startingGold' }], equipmentStepCatalogIndexFixture),
     ).toBe('Purchased with starting gold')
   })
 
@@ -236,7 +396,7 @@ describe('equipment-step.lib', () => {
       ...createEmptyCharacterBuilderDraft(),
       class: { classId: equipmentStepBardClassFixture.id, level: 1 as const },
       choiceSelections: {
-        [startingEquipmentChoiceSetId(equipmentStepBardClassFixture.id)]: ['gold'],
+        [startingEquipmentChoiceSetId(equipmentStepBardClassFixture.id)]: ['starting-gold'],
       },
       equipment: {
         mode: 'gold' as const,
@@ -304,7 +464,7 @@ describe('equipment-step.lib', () => {
       ...createEmptyCharacterBuilderDraft(),
       class: { classId, level: 1 as const },
       choiceSelections: {
-        [startingEquipmentChoiceSetId(classId)]: ['gold'],
+        [startingEquipmentChoiceSetId(classId)]: ['starting-gold'],
       },
       equipment: {
         mode: 'gold' as const,
@@ -335,7 +495,7 @@ describe('equipment-step.lib', () => {
       ...createEmptyCharacterBuilderDraft(),
       class: { classId: equipmentStepBardClassFixture.id, level: 1 as const },
       choiceSelections: {
-        [startingEquipmentChoiceSetId(equipmentStepBardClassFixture.id)]: ['gold'],
+        [startingEquipmentChoiceSetId(equipmentStepBardClassFixture.id)]: ['starting-gold'],
       },
       equipment: {
         mode: 'gold' as const,
@@ -402,7 +562,7 @@ describe('equipment-step.lib', () => {
       ...createEmptyCharacterBuilderDraft(),
       class: { classId: equipmentStepBardClassFixture.id, level: 1 as const },
       choiceSelections: {
-        [startingEquipmentChoiceSetId(equipmentStepBardClassFixture.id)]: ['gold'],
+        [startingEquipmentChoiceSetId(equipmentStepBardClassFixture.id)]: ['starting-gold'],
       },
       equipment: {
         mode: 'gold' as const,
@@ -479,7 +639,7 @@ describe('equipment-step.lib', () => {
       ...createEmptyCharacterBuilderDraft(),
       class: { classId: equipmentStepBardClassFixture.id, level: 1 as const },
       choiceSelections: {
-        [startingEquipmentChoiceSetId(equipmentStepBardClassFixture.id)]: ['standard'],
+        [startingEquipmentChoiceSetId(equipmentStepBardClassFixture.id)]: ['standard-equipment'],
       },
       equipment: {
         mode: 'package' as const,
@@ -505,7 +665,7 @@ describe('equipment-step.lib', () => {
       ...createEmptyCharacterBuilderDraft(),
       class: { classId: equipmentStepBardClassFixture.id, level: 1 as const },
       choiceSelections: {
-        [startingEquipmentChoiceSetId(equipmentStepBardClassFixture.id)]: ['gold'],
+        [startingEquipmentChoiceSetId(equipmentStepBardClassFixture.id)]: ['starting-gold'],
       },
       equipment: {
         mode: 'gold' as const,
@@ -566,7 +726,7 @@ describe('equipment-step.lib', () => {
       ...createEmptyCharacterBuilderDraft(),
       class: { classId: equipmentStepBardClassFixture.id, level: 1 as const },
       choiceSelections: {
-        [startingEquipmentChoiceSetId(equipmentStepBardClassFixture.id)]: ['standard'],
+        [startingEquipmentChoiceSetId(equipmentStepBardClassFixture.id)]: ['standard-equipment'],
       },
       equipment: {
         mode: 'package' as const,
@@ -581,7 +741,7 @@ describe('equipment-step.lib', () => {
     expect(rows).toHaveLength(1)
     expect(rows[0]?.removeTarget).toEqual({
       kind: 'package',
-      packageItemKey: `${equipmentStepBardClassFixture.id}:standard:0`,
+      packageItemKey: `${equipmentStepBardClassFixture.id}:standard-equipment:0`,
     })
     expect(rows[0]?.quantityMode).toBe('locked')
   })
@@ -603,7 +763,7 @@ describe('equipment-step.lib', () => {
       ...createEmptyCharacterBuilderDraft(),
       class: { classId: equipmentStepMonkClassFixture.id, level: 1 as const },
       choiceSelections: {
-        [startingEquipmentChoiceSetId(equipmentStepMonkClassFixture.id)]: ['standard'],
+        [startingEquipmentChoiceSetId(equipmentStepMonkClassFixture.id)]: ['standard-equipment'],
       },
       equipment: {
         mode: 'package' as const,
@@ -618,7 +778,7 @@ describe('equipment-step.lib', () => {
         characterClass: equipmentStepMonkClassFixture,
         catalogIndex: equipmentStepCatalogIndexFixture,
         draft,
-        selectedOptionId: 'standard',
+        selectedOptionId: 'standard-equipment',
       }),
     ).toBe(false)
 
@@ -635,7 +795,7 @@ describe('equipment-step.lib', () => {
             ],
           },
         },
-        selectedOptionId: 'standard',
+        selectedOptionId: 'standard-equipment',
       }),
     ).toBe(true)
   })
@@ -645,7 +805,7 @@ describe('equipment-step.lib', () => {
       ...createEmptyCharacterBuilderDraft(),
       class: { classId: equipmentStepBardClassFixture.id, level: 1 as const },
       choiceSelections: {
-        [startingEquipmentChoiceSetId(equipmentStepBardClassFixture.id)]: ['gold'],
+        [startingEquipmentChoiceSetId(equipmentStepBardClassFixture.id)]: ['starting-gold'],
       },
       equipment: {
         mode: 'gold' as const,
@@ -660,7 +820,7 @@ describe('equipment-step.lib', () => {
         characterClass: equipmentStepBardClassFixture,
         catalogIndex: equipmentStepCatalogIndexFixture,
         draft,
-        selectedOptionId: 'gold',
+        selectedOptionId: 'starting-gold',
       }),
     ).toBe(true)
   })
@@ -675,7 +835,7 @@ describe('equipment-step.lib', () => {
       ...createEmptyCharacterBuilderDraft(),
       class: { classId: equipmentStepMonkClassFixture.id, level: 1 as const },
       choiceSelections: {
-        [startingEquipmentChoiceSetId(equipmentStepMonkClassFixture.id)]: ['standard'],
+        [startingEquipmentChoiceSetId(equipmentStepMonkClassFixture.id)]: ['standard-equipment'],
         [monkToolChoiceSetId]: [equipmentStepLuteFixture.id],
       },
       equipment: {
@@ -714,7 +874,7 @@ describe('equipment purchase quantity regressions', () => {
       ...createEmptyCharacterBuilderDraft(),
       class: { classId, level: 1 as const },
       choiceSelections: {
-        [startingEquipmentChoiceSetId(classId)]: ['gold'],
+        [startingEquipmentChoiceSetId(classId)]: ['starting-gold'],
       },
       equipment: {
         mode: 'gold' as const,
@@ -798,10 +958,17 @@ describe('equipment purchase quantity regressions', () => {
 
 describe('starting equipment fallback helpers', () => {
   it('shows fallback only when every package is unselectable and gold is absent', () => {
+    const emptyFunding = {
+      classOptionWealth: { cp: 0, sp: 0, gp: 0, pp: 0 },
+      tierAdditionalWealth: { cp: 0, sp: 0, gp: 0, pp: 0 },
+      totalStartingWealth: { cp: 0, sp: 0, gp: 0, pp: 0 },
+      classOptionPolicy: 'included' as const,
+    }
     const selectable = [
       {
-        optionId: 'standard',
+        optionId: 'standard-equipment',
         label: 'Standard',
+        orderedItems: [],
         itemsByGroup: {
           weapons: [],
           armor: [],
@@ -814,6 +981,7 @@ describe('starting equipment fallback helpers', () => {
         missingItemSlugs: [],
         unselectableReasons: [],
         isSelectable: true,
+        funding: { ...emptyFunding, classOptionId: 'standard-equipment' },
       },
     ]
 
@@ -824,6 +992,7 @@ describe('starting equipment fallback helpers', () => {
       {
         optionId: 'broken',
         label: 'Broken',
+        orderedItems: [],
         itemsByGroup: {
           weapons: [],
           armor: [],
@@ -836,21 +1005,20 @@ describe('starting equipment fallback helpers', () => {
         missingItemSlugs: ['cloak'],
         unselectableReasons: ['cloak: Missing from catalog'],
         isSelectable: false,
+        funding: { ...emptyFunding, classOptionId: 'broken' },
       },
     ]
 
     expect(shouldShowEquipmentFallback(broken)).toBe(true)
   })
 
-  it('formats option meta from resolved summaries', () => {
+  it('derives option descriptions from resolved summaries', () => {
     const summaries = resolveStartingEquipmentOptionSummaries(
       equipmentStepBardClassFixture,
       equipmentStepCatalogIndexFixture,
     )
-    const standard = summaries.find((summary) => summary.optionId === 'standard')!
+    const standard = summaries.find((summary) => summary.optionId === 'standard-equipment')!
 
-    expect(formatStartingEquipmentOptionMeta(standard)).toEqual(
-      expect.arrayContaining(['Leather Armor (equipped)', '1× Musical Instrument', '19 GP']),
-    )
+    expect(standard.description).toBe('Leather Armor, 1× Musical Instrument, and 19 GP.')
   })
 })

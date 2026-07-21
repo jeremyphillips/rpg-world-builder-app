@@ -12,10 +12,8 @@ const DRUID_STARTING_EQUIPMENT = {
   choose: 1,
   options: [
     {
-      id: 'standard',
+      id: 'standard-equipment',
       label: 'Standard Equipment',
-      description:
-        "Leather Armor, Shield, Sickle, Druidic Focus, Explorer's Pack, Herbalism Kit, and 9 GP.",
       items: [
         { kind: 'grant', equipmentSlug: 'leather-armor', quantity: 1, equipped: true },
         { kind: 'grant', equipmentSlug: 'shield', quantity: 1, equipped: true },
@@ -33,9 +31,8 @@ const DRUID_STARTING_EQUIPMENT = {
       wealth: { gp: 9 },
     },
     {
-      id: 'gold',
+      id: 'starting-gold',
       label: 'Starting Gold',
-      description: 'Take 50 GP instead of standard equipment.',
       items: [],
       wealth: { gp: 50 },
     },
@@ -114,13 +111,53 @@ describe('startingEquipmentChoiceSchema', () => {
     })
   })
 
+  it('rejects options with no items and no wealth grant', () => {
+    expect(
+      startingEquipmentChoiceSchema.safeParse({
+        choose: 1,
+        options: [
+          {
+            id: 'empty',
+            label: 'Empty Package',
+            items: [],
+          },
+        ],
+      }).success,
+    ).toBe(false)
+  })
+
+  it('rejects more than one wealth-only starting-gold option', () => {
+    const result = startingEquipmentChoiceSchema.safeParse({
+      choose: 1,
+      options: [
+        {
+          id: 'starting-gold',
+          label: 'Starting Gold',
+          items: [],
+          wealth: { gp: 75 },
+        },
+        {
+          id: 'buy-your-own-gear',
+          label: 'Buy Your Own Gear',
+          items: [],
+          wealth: { gp: 50 },
+        },
+      ],
+    })
+
+    expect(result.success).toBe(false)
+    if (!result.success) {
+      expect(result.error.issues.some((issue) => issue.message.includes('wealth-only'))).toBe(true)
+    }
+  })
+
   it('accepts structured item choices filtered by tool category', () => {
     expect(
       startingEquipmentChoiceSchema.parse({
         choose: 1,
         options: [
           {
-            id: 'standard',
+            id: 'standard-equipment',
             label: 'Standard Equipment',
             items: [
               {
@@ -153,7 +190,7 @@ describe('startingEquipmentChoiceSchema', () => {
         choose: 1,
         options: [
           {
-            id: 'standard',
+            id: 'standard-equipment',
             label: 'Standard Equipment',
             items: [
               {
@@ -175,7 +212,7 @@ describe('startingEquipmentChoiceSchema', () => {
         choose: 1,
         options: [
           {
-            id: 'standard',
+            id: 'standard-equipment',
             label: 'Standard Equipment',
             items: [
               {

@@ -1,7 +1,6 @@
 'use client'
 
 import * as React from 'react'
-import type { CSSProperties } from 'react'
 
 import { cn } from '../../../lib/utils'
 import {
@@ -9,7 +8,7 @@ import {
   type FieldStatusTone,
   type FieldSurfaceVariant,
 } from '../field-surface.variants'
-import { resolveCollapsibleListItemLeadingChrome } from './collapsible-list-item-leading-chrome.lib'
+import { buildCollapsibleListItemLeadingChromeStyle } from './collapsible-list-item-leading-chrome.lib'
 import { CollapsibleListItemActions } from './collapsible-list-item-actions.client'
 import {
   collapsibleListItemDraggingClasses,
@@ -18,9 +17,10 @@ import {
   collapsibleListItemMainClasses,
   collapsibleListItemShellVariants,
   type CollapsibleListItemLeadingChromeOptions,
+  type CollapsibleListItemShellPreset,
 } from './collapsible-list-item.variants'
 
-export type CollapsibleListItemShellPreset = 'default' | 'catalog'
+export type { CollapsibleListItemShellPreset } from './collapsible-list-item.variants'
 
 export type CollapsibleListItemActionsAlign = 'start' | 'center'
 
@@ -48,7 +48,7 @@ function resolveShellChromeClasses({
   status,
 }: Pick<CollapsibleListItemShellProps, 'preset' | 'surface' | 'status'>): string {
   if (preset === 'catalog') {
-    return 'border-border bg-catalog-picker-row-surface'
+    return ''
   }
   if (preset === 'default' && surface === undefined && status === undefined) {
     return 'border-border'
@@ -83,9 +83,7 @@ export function CollapsibleListItemShell({
     collapsible,
   }
 
-  const leadingChromeStyle = {
-    '--array-item-chrome-count': resolveCollapsibleListItemLeadingChrome(leadingChrome).chromeCount,
-  } as CSSProperties
+  const leadingChromeStyle = buildCollapsibleListItemLeadingChromeStyle(leadingChrome)
 
   const shellLayout =
     layout === 'compactRow' ? 'compactRow' : actionsAlign === 'center' ? 'headerActions' : 'default'
@@ -105,7 +103,7 @@ export function CollapsibleListItemShell({
       aria-labelledby={titleId}
       data-array-item-prefix={itemPrefix}
       className={cn(
-        collapsibleListItemShellVariants({ layout: shellLayout }),
+        collapsibleListItemShellVariants({ layout: shellLayout, preset }),
         chromeClasses,
         dragging && collapsibleListItemDraggingClasses,
         className,

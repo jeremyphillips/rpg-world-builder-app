@@ -1,11 +1,20 @@
 import { vocabEnumFromEntries, keysFromEntries } from './enum-schema'
 import { getTermSentenceForm } from './types'
-import type { GameTermEntry } from './types'
+import type { GameTermEntry, VocabularyTerm } from './types'
 
 // ---------------------------------------------------------------------------
 // Feat categories — closed SRD 5.2.1 set (v1). Homebrew-only categories may
 // extend this map in a future ruleset or via a separate field.
 // ---------------------------------------------------------------------------
+
+export const FEAT_CATEGORY_TERM = {
+  label: 'Feat Category',
+  description: 'When or how a feat may be selected during character building.',
+  sentence: {
+    singular: 'feat category',
+    plural: 'feat categories',
+  },
+} as const satisfies VocabularyTerm
 
 export const FEAT_CATEGORY_ENTRIES = {
   origin: {
@@ -70,6 +79,15 @@ export function getFeatCategorySentenceForm(id: string, count = 1): string {
 // Parts of a Feat — SRD rules prose for contextual help (tooltips, authoring).
 // Not stored on individual feat records.
 // ---------------------------------------------------------------------------
+
+export const FEAT_PART_TERM = {
+  label: 'Feat Section',
+  description: 'A labeled subsection of feat rules text.',
+  sentence: {
+    singular: 'feat section',
+    plural: 'feat sections',
+  },
+} as const satisfies VocabularyTerm
 
 export const FEAT_PART_ENTRIES = {
   benefit: {

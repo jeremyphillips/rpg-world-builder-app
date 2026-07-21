@@ -1,3 +1,4 @@
+import { vocabularyTermFieldCopy, type VocabularyTerm } from '@rpg/contracts'
 import type { ComboboxFieldConfig, FieldOption, SelectFieldConfig } from '@rpg/ui/form'
 
 /** Default combobox placeholder for vocabulary-backed multi-select fields. */
@@ -37,4 +38,44 @@ export function vocabularyComboboxField(
     placeholder: config.placeholder ?? VOCABULARY_COMBOBOX_PLACEHOLDER,
     ...config,
   }
+}
+
+type VocabularySelectFieldForTermConfig = Omit<VocabularyMemberFieldBase, 'label'> & {
+  placeholder?: string
+  defaultValue?: string
+  label?: string
+}
+
+/** Select field with default label and placeholder from a taxonomy term. */
+export function vocabularySelectFieldForTerm(
+  term: VocabularyTerm,
+  config: VocabularySelectFieldForTermConfig,
+): SelectFieldConfig {
+  const copy = vocabularyTermFieldCopy(term)
+  return vocabularySelectField({
+    ...config,
+    label: config.label ?? copy.label,
+    placeholder: config.placeholder ?? copy.placeholder,
+  })
+}
+
+type VocabularyComboboxFieldForTermConfig = Omit<VocabularyMemberFieldBase, 'label'> & {
+  multiple?: boolean
+  max?: number
+  placeholder?: string
+  defaultValue?: string | string[]
+  label?: string
+}
+
+/** Combobox field with default label and placeholder from a taxonomy term. */
+export function vocabularyComboboxFieldForTerm(
+  term: VocabularyTerm,
+  config: VocabularyComboboxFieldForTermConfig,
+): ComboboxFieldConfig {
+  const copy = vocabularyTermFieldCopy(term, { multiple: config.multiple })
+  return vocabularyComboboxField({
+    ...config,
+    label: config.label ?? copy.label,
+    placeholder: config.placeholder ?? copy.placeholder,
+  })
 }

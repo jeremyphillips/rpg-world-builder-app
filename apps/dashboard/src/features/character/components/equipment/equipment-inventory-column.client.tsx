@@ -2,7 +2,7 @@
 
 import type { ReactNode } from 'react'
 
-import { Heading } from '@rpg/ui'
+import { Badge, Heading } from '@rpg/ui'
 
 import {
   EQUIPMENT_INVENTORY_COLUMN_TITLE_VARIANT,
@@ -14,6 +14,8 @@ import {
 
 export type EquipmentInventoryColumnProps = {
   title: string
+  /** Count badge rendered adjacent to the heading when greater than zero. */
+  titleBadgeCount?: number
   /** Inline actions on the title row (e.g. Browse equipment). */
   titleActions?: ReactNode
   /** Secondary row below the title (e.g. Customize · Change option links). */
@@ -26,6 +28,7 @@ export type EquipmentInventoryColumnProps = {
 /** Shared inventory column chrome — title, optional actions, and scrollable body. */
 export function EquipmentInventoryColumn({
   title,
+  titleBadgeCount,
   titleActions,
   toolbar,
   reserveToolbarRow = false,
@@ -35,9 +38,16 @@ export function EquipmentInventoryColumn({
     <section className={equipmentInventoryColumnClasses}>
       <div className={equipmentInventoryColumnHeaderClasses}>
         <div className={equipmentInventoryColumnTitleRowClasses}>
-          <Heading variant={EQUIPMENT_INVENTORY_COLUMN_TITLE_VARIANT} as="h3">
-            {title}
-          </Heading>
+          <div className="flex min-w-0 flex-wrap items-center gap-2">
+            <Heading variant={EQUIPMENT_INVENTORY_COLUMN_TITLE_VARIANT} as="h3">
+              {title}
+            </Heading>
+            {titleBadgeCount !== undefined && titleBadgeCount > 0 ? (
+              <Badge appearance="neutral" tone="neutral" size="sm">
+                {titleBadgeCount}
+              </Badge>
+            ) : null}
+          </div>
           {titleActions}
         </div>
         {toolbar}

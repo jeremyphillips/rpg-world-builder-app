@@ -4,34 +4,26 @@ import * as React from 'react'
 import { CircleAlert } from 'lucide-react'
 
 import {
+  CatalogFilterChips,
   CatalogPickerSheet,
   EmphasisDetailLine,
-  FilterToolbar,
+  SegmentedControl,
   Text,
-  type CatalogPickerSheetToolbarContext,
 } from '@rpg/ui'
 import {
   formatMoney,
   formatWealthAsGold,
   getEquipmentKindLabel,
+  getMagicItemRarityLabel,
   isEquipmentPickerSupportedKind,
   isEquipmentStackable,
-  type EquipmentPickerSupportedKind,
 } from '@rpg/contracts'
 
-import { buildEquipmentPickerRowViewModel } from '@/features/content'
-
 import { CatalogPickerFilterCheckbox } from '../picker/catalog-picker-filter-checkbox.client'
-import {
-  catalogPickerFiltersMainClasses,
-  catalogPickerFiltersRowClasses,
-  catalogPickerSortActionsGroupClasses,
-} from '../picker/catalog-picker-filter-toolbar.variants'
-import { catalogPickerInlineSelectFilter } from '../picker/catalog-picker-select-filter.lib'
 import { catalogPickerShellProps } from '../picker/catalog-picker-shell.lib'
-import { CatalogPickerSortGroup } from '../picker/catalog-picker-sort-group.client'
+import { CatalogSortControl } from '../picker/catalog-sort-control.client'
 import { pickerSortOption } from '../picker/catalog-picker-sort-labels.lib'
-import { CatalogPickerToolbarResetSlot } from '../picker/catalog-picker-toolbar-reset-button.client'
+import { CatalogToolbarResetSlot } from '../picker/catalog-toolbar-reset-action.client'
 import {
   countEquipmentPickerAffordableHiddenImpact,
   countEquipmentPickerClearableCriteria,
@@ -40,25 +32,28 @@ import {
   filterAndSortEquipmentPickerItems,
   filterEquipmentPickerItems,
   getEquipmentUnaffordableAmounts,
-  getEquipmentPickerItemTab,
   hasEquipmentPickerClearableCriteria,
   hasEquipmentPickerResetViewCriteria,
-  isEquipmentPickerItemDisabled,
   resolveEquipmentKindFilterOptions,
+  resolveEquipmentPickerDrawerItemHeaderPresentation,
 } from './equipment-picker-drawer.lib'
-import { getEquipmentPickerCallout } from './equipment-picker-callout.lib'
+import type { EquipmentPickerRowActionViewModel } from './equipment-picker-action.lib'
 import {
   EQUIPMENT_PICKER_AFFORDABLE_NOW_LABEL,
   EQUIPMENT_PICKER_CATEGORY_LABEL,
   EQUIPMENT_PICKER_CLEAR_FILTERS_LABEL,
   EQUIPMENT_PICKER_KIND_ALL,
-  EQUIPMENT_PICKER_NO_RECOMMENDATIONS_MESSAGE,
+  EQUIPMENT_PICKER_MODE_LABELS,
+  EQUIPMENT_PICKER_MODE_MAGIC_ITEMS,
+  EQUIPMENT_PICKER_MODE_PURCHASE,
+  EQUIPMENT_PICKER_RARITY_ALL,
+  EQUIPMENT_PICKER_RARITY_LABEL,
   EQUIPMENT_PICKER_RESET_VIEW_LABEL,
   EQUIPMENT_PICKER_SORT_LABEL,
   EQUIPMENT_PICKER_SORT_LABELS,
   EQUIPMENT_PICKER_SORT_MODES,
-  EQUIPMENT_PICKER_TAB_ALL,
-  EQUIPMENT_PICKER_TAB_RECOMMENDED,
+  EQUIPMENT_PICKER_SORT_PRICE_ASC,
+  EQUIPMENT_PICKER_SORT_PRICE_DESC,
   type EquipmentPickerDrawerProps,
   type EquipmentPickerItem,
   type EquipmentPickerKindFilter,
@@ -66,39 +61,49 @@ import {
   type EquipmentPickerToolbarResetMode,
 } from './equipment-picker-drawer.types'
 import { EquipmentBudgetHeader } from './equipment-budget-header.client'
-import { EquipmentPickerCommerce } from './equipment-picker-commerce.client'
 import { EquipmentPickerItemDetails } from './equipment-picker-item-details.client'
-import { EquipmentPickerItemHeader } from './equipment-picker-item-header.client'
+import { EquipmentPickerItemHeaderRail } from './equipment-picker-item-header-rail.client'
 import {
   clampEquipmentStepQuantity,
   resolveEquipmentStepPurchaseMaxQuantity,
 } from '../../lib/equipment-quantity.lib'
+import {
+  resolveEquipmentOwnedQuantity,
+  type EquipmentPickerWorkflowMode,
+} from '../../lib/equipment-step.lib'
 
 export type { EquipmentPickerDrawerProps } from './equipment-picker-drawer.types'
 
-function EquipmentPickerTabToolbarActions({
+function EquipmentPickerToolbarActions({
   toolbarResetMode,
-  defaultTabId,
   selectedKind,
   showAffordableOnly,
   sortMode,
-  toolbarContext,
+  searchQuery,
+  focusedAllowanceId,
+  workflowMode,
   onClearStructuredFilters,
   onResetView,
 }: {
   toolbarResetMode: EquipmentPickerToolbarResetMode
-  defaultTabId: string
   selectedKind: EquipmentPickerKindFilter
   showAffordableOnly: boolean
   sortMode: EquipmentPickerSortMode
-  toolbarContext: CatalogPickerSheetToolbarContext
+  searchQuery: string
+  focusedAllowanceId?: string
+  workflowMode: EquipmentPickerWorkflowMode
   onClearStructuredFilters: () => void
   onResetView: () => void
 }) {
-  const clearableCriteriaCount = countEquipmentPickerClearableCriteria({
+  const structuredFilterArgs = {
     selectedKind,
     showAffordableOnly,
-    searchQuery: toolbarContext.searchQuery,
+    focusedAllowanceId,
+    workflowMode,
+  }
+  const clearableCriteriaCount = countEquipmentPickerClearableCriteria({
+    ...structuredFilterArgs,
+    searchQuery,
   })
   const showClearFilters =
     toolbarResetMode === 'clear_filters' &&
@@ -106,22 +111,18 @@ function EquipmentPickerTabToolbarActions({
   const showResetView =
     toolbarResetMode === 'reset_view' &&
     hasEquipmentPickerResetViewCriteria({
-      selectedKind,
-      showAffordableOnly,
-      searchQuery: toolbarContext.searchQuery,
+      ...structuredFilterArgs,
+      searchQuery,
       sortMode,
-      activeTabId: toolbarContext.activeTabId,
-      defaultTabId,
     })
 
   const handleClearFilters = () => {
-    toolbarContext.clearSearchQuery()
     onClearStructuredFilters()
   }
 
   if (!showClearFilters && !showResetView) {
     return (
-      <CatalogPickerToolbarResetSlot
+      <CatalogToolbarResetSlot
         visible={false}
         label={EQUIPMENT_PICKER_RESET_VIEW_LABEL}
         onClick={() => undefined}
@@ -131,7 +132,7 @@ function EquipmentPickerTabToolbarActions({
 
   if (showClearFilters) {
     return (
-      <CatalogPickerToolbarResetSlot
+      <CatalogToolbarResetSlot
         visible
         label={EQUIPMENT_PICKER_CLEAR_FILTERS_LABEL}
         onClick={handleClearFilters}
@@ -140,7 +141,7 @@ function EquipmentPickerTabToolbarActions({
   }
 
   return (
-    <CatalogPickerToolbarResetSlot
+    <CatalogToolbarResetSlot
       visible
       label={EQUIPMENT_PICKER_RESET_VIEW_LABEL}
       onClick={onResetView}
@@ -148,86 +149,27 @@ function EquipmentPickerTabToolbarActions({
   )
 }
 
-function EquipmentPickerFilterToolbarControls({
-  kinds,
-  selectedKind,
-  onSelectedKindChange,
+function EquipmentPickerAffordableFilter({
   showAffordableOnly,
   onShowAffordableOnlyChange,
   showAffordableFilter,
   affordableHiddenCount,
-  sortMode,
-  onSortModeChange,
 }: {
-  kinds: EquipmentPickerSupportedKind[]
-  selectedKind: EquipmentPickerKindFilter
-  onSelectedKindChange: (kind: EquipmentPickerKindFilter) => void
   showAffordableOnly: boolean
   onShowAffordableOnlyChange: (checked: boolean) => void
   showAffordableFilter: boolean
   affordableHiddenCount: number
-  sortMode: EquipmentPickerSortMode
-  onSortModeChange: (mode: EquipmentPickerSortMode) => void
 }) {
-  const categoryFilterFields = React.useMemo(
-    () => [
-      catalogPickerInlineSelectFilter<{ selectedKind: EquipmentPickerKindFilter }, 'selectedKind'>({
-        key: 'selectedKind',
-        label: EQUIPMENT_PICKER_CATEGORY_LABEL,
-        ariaLabel: 'Filter by category',
-        triggerAriaLabel: 'Equipment category',
-        options: [
-          { value: EQUIPMENT_PICKER_KIND_ALL, label: 'All' },
-          ...kinds.map((kind) => ({ value: kind, label: getEquipmentKindLabel(kind) })),
-        ],
-      }),
-    ],
-    [kinds],
-  )
-
-  const showCategoryFilter = kinds.length > 1
+  if (!showAffordableFilter) return null
 
   return (
-    <div className={catalogPickerFiltersRowClasses}>
-      <div className={catalogPickerFiltersMainClasses}>
-        {showCategoryFilter ? (
-          <FilterToolbar
-            idPrefix="equipment-picker-category"
-            fields={categoryFilterFields}
-            values={{ selectedKind }}
-            className="flex-row flex-nowrap items-center gap-0"
-            onValueChange={(_key, value) => {
-              if (value !== undefined) {
-                onSelectedKindChange(value as EquipmentPickerKindFilter)
-              }
-            }}
-          />
-        ) : null}
-
-        {showAffordableFilter ? (
-          <CatalogPickerFilterCheckbox
-            id="equipment-picker-affordable-now"
-            label={EQUIPMENT_PICKER_AFFORDABLE_NOW_LABEL}
-            checked={showAffordableOnly}
-            onCheckedChange={onShowAffordableOnlyChange}
-            hiddenCount={showAffordableOnly ? affordableHiddenCount : undefined}
-          />
-        ) : null}
-      </div>
-
-      <div className={catalogPickerSortActionsGroupClasses}>
-        <CatalogPickerSortGroup
-          value={sortMode}
-          label={EQUIPMENT_PICKER_SORT_LABEL}
-          ariaLabel="Sort equipment"
-          triggerAriaLabel="Equipment sort order"
-          options={EQUIPMENT_PICKER_SORT_MODES.map((mode) =>
-            pickerSortOption(mode, EQUIPMENT_PICKER_SORT_LABELS[mode]),
-          )}
-          onValueChange={(value) => onSortModeChange(value as EquipmentPickerSortMode)}
-        />
-      </div>
-    </div>
+    <CatalogPickerFilterCheckbox
+      id="equipment-picker-affordable-now"
+      label={EQUIPMENT_PICKER_AFFORDABLE_NOW_LABEL}
+      checked={showAffordableOnly}
+      onCheckedChange={onShowAffordableOnlyChange}
+      hiddenCount={showAffordableOnly ? affordableHiddenCount : undefined}
+    />
   )
 }
 
@@ -257,29 +199,49 @@ function EquipmentPickerRowSummary({
 }
 
 /** Equipment catalog drawer — thin wrapper over `CatalogPickerSheet`. */
-/**
- * Equipment picker rows compose purchase actions inside {@link EquipmentPickerItemHeader}
- * (line 3) instead of `renderItemActions` because the generic row API pins actions to row 1.
- */
 export function EquipmentPickerDrawer({
   open,
   onOpenChange,
   items,
   browseSortContext,
   budget,
-  defaultTab = EQUIPMENT_PICKER_TAB_RECOMMENDED,
   allowedKinds,
   filterOutUnaffordable = false,
   filterOutNonProficient = false,
   showCharacterPreview = false,
   characterPreviewContext,
   ownedPurchaseQuantities = {},
+  ownedGrantQuantities = {},
+  workflowMode = EQUIPMENT_PICKER_MODE_PURCHASE,
+  workflowModes = [EQUIPMENT_PICKER_MODE_PURCHASE],
+  onWorkflowModeChange,
+  magicItemGrantProgress,
+  focusedAllowanceId,
+  onFocusedAllowanceIdChange,
   toolbarResetMode = 'reset_view',
   isGoldShoppingPath = false,
+  resolveRowActionViewModel,
+  resolveGrantManageSources,
+  draft,
+  context,
+  catalogIndex,
+  onApplyMagicItemAcquisition,
+  onApplyPurchase,
+  onReleaseGrant,
+  onRemovePurchase,
   onAddItem,
   onRemoveFromInventory,
   onRemoveOneFromInventory,
 }: EquipmentPickerDrawerProps) {
+  const isMagicItemsWorkflow = workflowMode === EQUIPMENT_PICKER_MODE_MAGIC_ITEMS
+  const showWorkflowSegment = workflowModes.length === 2
+  const effectiveBudget = isMagicItemsWorkflow ? undefined : budget
+  const effectiveSortModes = isMagicItemsWorkflow
+    ? EQUIPMENT_PICKER_SORT_MODES.filter(
+        (mode) =>
+          mode !== EQUIPMENT_PICKER_SORT_PRICE_ASC && mode !== EQUIPMENT_PICKER_SORT_PRICE_DESC,
+      )
+    : EQUIPMENT_PICKER_SORT_MODES
   const supportedItems = React.useMemo(
     () => items.filter((item) => isEquipmentPickerSupportedKind(item.equipment.kind)),
     [items],
@@ -317,7 +279,22 @@ export function EquipmentPickerDrawer({
   const structuredFilterCount = countEquipmentPickerStructuredFilters({
     selectedKind,
     showAffordableOnly,
+    focusedAllowanceId,
+    workflowMode,
   })
+
+  const showRarityFilter =
+    isMagicItemsWorkflow &&
+    magicItemGrantProgress !== undefined &&
+    magicItemGrantProgress.length > 1
+  const selectedRarityFilter = focusedAllowanceId ?? EQUIPMENT_PICKER_RARITY_ALL
+
+  const handleSelectedRarityFilterChange = React.useCallback(
+    (value: string) => {
+      onFocusedAllowanceIdChange?.(value === EQUIPMENT_PICKER_RARITY_ALL ? undefined : value)
+    },
+    [onFocusedAllowanceIdChange],
+  )
 
   const filteredItems = React.useMemo(
     () =>
@@ -337,13 +314,14 @@ export function EquipmentPickerDrawer({
   )
 
   const transformVisibleItems = React.useCallback(
-    (tabItems: readonly EquipmentPickerItem[], context: { searchQuery: string }) =>
-      filterAndSortEquipmentPickerItems(tabItems, {
+    (visibleItems: readonly EquipmentPickerItem[], context: { searchQuery: string }) =>
+      filterAndSortEquipmentPickerItems(visibleItems, {
         searchQuery: context.searchQuery,
         sortMode,
         browseSortContext,
+        workflowMode,
       }),
-    [browseSortContext, sortMode],
+    [browseSortContext, sortMode, workflowMode],
   )
 
   const handleSelectedKindChange = React.useCallback((kind: EquipmentPickerKindFilter) => {
@@ -353,31 +331,107 @@ export function EquipmentPickerDrawer({
   const handleClearStructuredFilters = React.useCallback(() => {
     setSelectedKind(EQUIPMENT_PICKER_VIEW_DEFAULTS.selectedKind)
     setShowAffordableOnly(EQUIPMENT_PICKER_VIEW_DEFAULTS.showAffordableOnly)
-  }, [])
+    onFocusedAllowanceIdChange?.(undefined)
+  }, [onFocusedAllowanceIdChange])
 
-  const handleQuickAdd = React.useCallback(
-    (item: EquipmentPickerItem) => {
-      onAddItem(item, 1)
+  const showCategoryFilter = kindOptions.length > 1
+
+  const handleHeaderCommit = React.useCallback(
+    (item: EquipmentPickerItem): boolean => {
+      const itemKey = item.equipment.id
+
+      if (isMagicItemsWorkflow && onApplyMagicItemAcquisition) {
+        return onApplyMagicItemAcquisition({ equipmentId: itemKey, requestedQuantity: 1 })
+      }
+
+      if (!isMagicItemsWorkflow && onApplyPurchase) {
+        onApplyPurchase({ equipmentId: itemKey, requestedQuantity: 1 })
+        return true
+      }
+
+      const ownedQuantity = draft
+        ? resolveEquipmentOwnedQuantity({ equipmentId: itemKey, draft })
+        : (ownedPurchaseQuantities[itemKey] ?? 0)
+      const maxQuantity = resolveEquipmentStepPurchaseMaxQuantity({
+        equipment: item.equipment,
+        budget: effectiveBudget,
+        currentQuantity: ownedQuantity,
+      })
+      const cappedQuantity = clampEquipmentStepQuantity(1, maxQuantity)
+      onAddItem(item, cappedQuantity)
+      return true
     },
-    [onAddItem],
+    [
+      draft,
+      effectiveBudget,
+      isMagicItemsWorkflow,
+      onAddItem,
+      onApplyMagicItemAcquisition,
+      onApplyPurchase,
+      ownedPurchaseQuantities,
+    ],
   )
 
   const handleCommitAdd = React.useCallback(
     (item: EquipmentPickerItem) => {
       const itemKey = item.equipment.id
-      const ownedQuantity = ownedPurchaseQuantities[itemKey] ?? 0
+      const quantity = addQuantities[itemKey] ?? 1
+
+      if (isMagicItemsWorkflow && onApplyMagicItemAcquisition) {
+        onApplyMagicItemAcquisition({ equipmentId: itemKey, requestedQuantity: quantity })
+        if (isEquipmentStackable(item.equipment)) {
+          setAddQuantities((current) => ({ ...current, [itemKey]: 1 }))
+        }
+        return
+      }
+
+      if (!isMagicItemsWorkflow && onApplyPurchase) {
+        onApplyPurchase({ equipmentId: itemKey, requestedQuantity: quantity })
+        if (isEquipmentStackable(item.equipment)) {
+          setAddQuantities((current) => ({ ...current, [itemKey]: 1 }))
+        }
+        return
+      }
+
+      const ownedQuantity = draft
+        ? resolveEquipmentOwnedQuantity({ equipmentId: itemKey, draft })
+        : (ownedPurchaseQuantities[itemKey] ?? 0)
       const maxQuantity = resolveEquipmentStepPurchaseMaxQuantity({
         equipment: item.equipment,
-        budget,
+        budget: effectiveBudget,
         currentQuantity: ownedQuantity,
       })
-      const quantity = clampEquipmentStepQuantity(addQuantities[itemKey] ?? 1, maxQuantity)
-      onAddItem(item, quantity)
+      const cappedQuantity = clampEquipmentStepQuantity(quantity, maxQuantity)
+      onAddItem(item, cappedQuantity)
       if (isEquipmentStackable(item.equipment)) {
         setAddQuantities((current) => ({ ...current, [itemKey]: 1 }))
       }
     },
-    [addQuantities, budget, onAddItem, ownedPurchaseQuantities],
+    [
+      addQuantities,
+      draft,
+      effectiveBudget,
+      isMagicItemsWorkflow,
+      onAddItem,
+      onApplyMagicItemAcquisition,
+      onApplyPurchase,
+      ownedPurchaseQuantities,
+    ],
+  )
+
+  const resolveRowVm = React.useCallback(
+    (
+      item: EquipmentPickerItem,
+      requestedQuantity: number,
+    ): EquipmentPickerRowActionViewModel | undefined => {
+      if (!resolveRowActionViewModel) return undefined
+      return resolveRowActionViewModel({
+        equipment: item.equipment,
+        workflowMode,
+        requestedQuantity,
+      })
+    },
+    [resolveRowActionViewModel, workflowMode],
   )
 
   const handleAddQuantityChange = React.useCallback((itemKey: string, quantity: number) => {
@@ -391,109 +445,197 @@ export function EquipmentPickerDrawer({
       title="Add equipment"
       description="Search the catalog and add items to your loadout."
       {...catalogPickerShellProps()}
-      recommendationsEnabled
       items={filteredItems}
       getItemKey={(item) => item.equipment.id}
       getItemToolbarLabel={(item) => item.equipment.name}
       getSearchText={(item) => item.searchText}
-      getItemTab={getEquipmentPickerItemTab}
-      defaultTabId={defaultTab}
-      tabs={[
-        { id: EQUIPMENT_PICKER_TAB_RECOMMENDED, label: 'Recommended' },
-        { id: EQUIPMENT_PICKER_TAB_ALL, label: 'All' },
-      ]}
-      noScopedItemsMessage={EQUIPMENT_PICKER_NO_RECOMMENDATIONS_MESSAGE}
       hasStructuredFilters={structuredFilterCount > 0}
-      headerExtra={budget ? <EquipmentBudgetHeader budget={budget} /> : undefined}
+      headerExtra={
+        showWorkflowSegment && onWorkflowModeChange ? (
+          <SegmentedControl
+            value={workflowMode}
+            onValueChange={(value) => onWorkflowModeChange(value as EquipmentPickerWorkflowMode)}
+            options={workflowModes.map((mode) => ({
+              value: mode,
+              label: EQUIPMENT_PICKER_MODE_LABELS[mode],
+            }))}
+            aria-label="Equipment picker workflow"
+            fullWidth
+          />
+        ) : effectiveBudget ? (
+          <EquipmentBudgetHeader budget={effectiveBudget} />
+        ) : undefined
+      }
       transformVisibleItems={transformVisibleItems}
-      tabToolbarActions={(toolbarContext) => {
+      primaryControls={
+        showRarityFilter ? (
+          <CatalogFilterChips
+            id="equipment-picker-rarity"
+            label={EQUIPMENT_PICKER_RARITY_LABEL}
+            selectionMode="single-required"
+            value={selectedRarityFilter}
+            onValueChange={handleSelectedRarityFilterChange}
+            options={[
+              { value: EQUIPMENT_PICKER_RARITY_ALL, label: 'All' },
+              ...magicItemGrantProgress.map((entry) => ({
+                value: entry.allowanceId,
+                label: getMagicItemRarityLabel(entry.rarity),
+              })),
+            ]}
+          />
+        ) : showCategoryFilter ? (
+          <CatalogFilterChips
+            id="equipment-picker-category"
+            label={EQUIPMENT_PICKER_CATEGORY_LABEL}
+            selectionMode="single-required"
+            value={selectedKind}
+            onValueChange={(value) => handleSelectedKindChange(value as EquipmentPickerKindFilter)}
+            options={[
+              { value: EQUIPMENT_PICKER_KIND_ALL, label: 'All' },
+              ...kindOptions.map((kind) => ({
+                value: kind,
+                label: getEquipmentKindLabel(kind),
+              })),
+            ]}
+          />
+        ) : undefined
+      }
+      actions={({ searchQuery, resetSearchQuery }) => {
         const handleResetView = () => {
           setSelectedKind(EQUIPMENT_PICKER_VIEW_DEFAULTS.selectedKind)
           setShowAffordableOnly(EQUIPMENT_PICKER_VIEW_DEFAULTS.showAffordableOnly)
           setSortMode(EQUIPMENT_PICKER_VIEW_DEFAULTS.sortMode)
-          toolbarContext.clearSearchQuery()
-          toolbarContext.resetActiveTab()
+          onFocusedAllowanceIdChange?.(undefined)
+          resetSearchQuery()
+        }
+
+        const handleClearFilters = () => {
+          resetSearchQuery()
+          handleClearStructuredFilters()
         }
 
         return (
-          <EquipmentPickerTabToolbarActions
+          <EquipmentPickerToolbarActions
             toolbarResetMode={toolbarResetMode}
-            defaultTabId={defaultTab}
             selectedKind={selectedKind}
             showAffordableOnly={showAffordableOnly}
             sortMode={sortMode}
-            toolbarContext={toolbarContext}
-            onClearStructuredFilters={handleClearStructuredFilters}
+            searchQuery={searchQuery}
+            focusedAllowanceId={focusedAllowanceId}
+            workflowMode={workflowMode}
+            onClearStructuredFilters={handleClearFilters}
             onResetView={handleResetView}
           />
         )
       }}
-      toolbarControls={(toolbarContext) => (
-        <EquipmentPickerFilterToolbarControls
-          kinds={kindOptions}
-          selectedKind={selectedKind}
-          onSelectedKindChange={handleSelectedKindChange}
-          showAffordableOnly={showAffordableOnly}
-          onShowAffordableOnlyChange={setShowAffordableOnly}
-          showAffordableFilter={Boolean(budget)}
-          affordableHiddenCount={countEquipmentPickerAffordableHiddenImpact(supportedItems, {
-            activeTabId: toolbarContext.activeTabId,
-            searchQuery: toolbarContext.searchQuery,
-            filterOutUnaffordable,
-            filterOutNonProficient,
-            selectedKind,
-            showAffordableOnly,
-          })}
-          sortMode={sortMode}
-          onSortModeChange={setSortMode}
-        />
-      )}
+      filterRow={{
+        controls: ({ searchQuery }) => (
+          <EquipmentPickerAffordableFilter
+            showAffordableOnly={showAffordableOnly}
+            onShowAffordableOnlyChange={setShowAffordableOnly}
+            showAffordableFilter={Boolean(effectiveBudget)}
+            affordableHiddenCount={countEquipmentPickerAffordableHiddenImpact(supportedItems, {
+              searchQuery,
+              filterOutUnaffordable,
+              filterOutNonProficient,
+              selectedKind,
+              showAffordableOnly,
+            })}
+          />
+        ),
+        actions: (
+          <CatalogSortControl
+            value={sortMode}
+            label={EQUIPMENT_PICKER_SORT_LABEL}
+            ariaLabel="Sort equipment"
+            triggerAriaLabel="Equipment sort order"
+            options={effectiveSortModes.map((mode) =>
+              pickerSortOption(mode, EQUIPMENT_PICKER_SORT_LABELS[mode]),
+            )}
+            onValueChange={(value) => setSortMode(value as EquipmentPickerSortMode)}
+          />
+        ),
+      }}
       renderItemHeader={(item) => {
-        const row = buildEquipmentPickerRowViewModel(item.equipment)
-        const callout = getEquipmentPickerCallout(item, { isGoldShoppingPath })
-        const disabled = isEquipmentPickerItemDisabled(item)
-        const ownedQuantity = ownedPurchaseQuantities[item.equipment.id] ?? 0
-        const owned = ownedQuantity > 0
-        const stackable = isEquipmentStackable(item.equipment)
+        const rowActionVm = resolveRowVm(item, 1)
+        const presentation = resolveEquipmentPickerDrawerItemHeaderPresentation({
+          item,
+          workflowMode,
+          draft,
+          rowActionVm,
+        })
+        const ownedQuantity = draft
+          ? resolveEquipmentOwnedQuantity({ equipmentId: item.equipment.id, draft })
+          : isMagicItemsWorkflow
+            ? (ownedGrantQuantities[item.equipment.id] ?? 0)
+            : (ownedPurchaseQuantities[item.equipment.id] ?? 0)
+        const canQuickAdd = presentation.action.kind === 'add' && !presentation.action.disabled
 
         return (
-          <EquipmentPickerItemHeader
-            item={row}
-            callout={callout}
-            disabled={disabled}
-            commerce={
-              <EquipmentPickerCommerce
-                priceLabel={row.priceLabel}
-                owned={owned}
-                stackable={stackable}
-                ownedQuantity={ownedQuantity}
-                disabled={disabled}
-                onAdd={() => handleQuickAdd(item)}
-              />
-            }
+          <EquipmentPickerItemHeaderRail
+            item={item}
+            presentation={presentation}
+            ownedQuantity={ownedQuantity}
+            isGoldShoppingPath={isGoldShoppingPath}
+            onCommit={canQuickAdd ? () => handleHeaderCommit(item) : undefined}
           />
         )
       }}
-      renderItemSummary={(item) => <EquipmentPickerRowSummary item={item} budget={budget} />}
-      renderItemDetails={(item) => (
-        <EquipmentPickerItemDetails
-          equipment={item.equipment}
-          itemState={item.state}
-          budget={budget}
-          ownedQuantity={ownedPurchaseQuantities[item.equipment.id] ?? 0}
-          addQuantity={addQuantities[item.equipment.id] ?? 1}
-          onAddQuantityChange={(quantity) => handleAddQuantityChange(item.equipment.id, quantity)}
-          onCommit={() => handleCommitAdd(item)}
-          onRemoveFromInventory={
-            onRemoveFromInventory ? () => onRemoveFromInventory(item) : undefined
-          }
-          onRemoveOneFromInventory={
-            onRemoveOneFromInventory ? () => onRemoveOneFromInventory(item) : undefined
-          }
-          showCharacterPreview={showCharacterPreview}
-          characterPreviewContext={characterPreviewContext}
-        />
-      )}
+      renderItemSummary={(item) =>
+        isMagicItemsWorkflow ? null : (
+          <EquipmentPickerRowSummary item={item} budget={effectiveBudget} />
+        )
+      }
+      renderItemDetails={(item) => {
+        const addQuantity = addQuantities[item.equipment.id] ?? 1
+        const rowActionVm = resolveRowVm(item, addQuantity)
+        const manageSources = resolveGrantManageSources?.(item.equipment.id) ?? {
+          grants: [],
+          purchases: [],
+        }
+
+        return (
+          <EquipmentPickerItemDetails
+            equipment={item.equipment}
+            itemState={item.state}
+            budget={effectiveBudget}
+            ownedQuantity={
+              draft
+                ? resolveEquipmentOwnedQuantity({ equipmentId: item.equipment.id, draft })
+                : isMagicItemsWorkflow
+                  ? (ownedGrantQuantities[item.equipment.id] ?? 0)
+                  : (ownedPurchaseQuantities[item.equipment.id] ?? 0)
+            }
+            addQuantity={addQuantity}
+            onAddQuantityChange={(quantity) => handleAddQuantityChange(item.equipment.id, quantity)}
+            onCommit={() => handleCommitAdd(item)}
+            onRemoveFromInventory={
+              onRemoveFromInventory ? () => onRemoveFromInventory(item) : undefined
+            }
+            onRemoveOneFromInventory={
+              onRemoveOneFromInventory ? () => onRemoveOneFromInventory(item) : undefined
+            }
+            showCharacterPreview={showCharacterPreview}
+            characterPreviewContext={characterPreviewContext}
+            rowActionVm={rowActionVm}
+            manageSources={manageSources}
+            draft={draft}
+            context={context}
+            catalogIndex={catalogIndex}
+            onApplyMagicItemAcquisition={(requestedQuantity) =>
+              onApplyMagicItemAcquisition?.({
+                equipmentId: item.equipment.id,
+                requestedQuantity,
+              }) ?? false
+            }
+            onApplyPurchase={(requestedQuantity) =>
+              onApplyPurchase?.({ equipmentId: item.equipment.id, requestedQuantity })
+            }
+            onReleaseGrant={onReleaseGrant}
+            onRemovePurchase={onRemovePurchase}
+          />
+        )
+      }}
     />
   )
 }

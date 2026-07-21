@@ -27,6 +27,8 @@ describe('damageTypeField physical scope', () => {
       />,
     )
 
-    expect(screen.getByRole('combobox', { name: 'Damage type' })).toHaveTextContent('Slashing')
+    expect(screen.getByRole('combobox', { name: 'Physical damage type' })).toHaveTextContent(
+      'Slashing',
+    )
   })
 })

@@ -1,14 +1,11 @@
 import type { Equipment } from '../../../../content/equipment'
+import { canPurchaseEquipment } from '../../../../content/equipment/can-purchase-equipment'
 import { isEquipmentStackable } from '../../../../content/equipment/stackable'
 import { formatMoney } from '../../../../primitives/units'
 import { copperToDisplayWealth, formatWealth } from '../../../../primitives/wealth'
 import type { CharacterBuilderDraftEquipmentPurchase } from '../../draft'
-import {
-  maxAffordableEquipmentQuantity,
-  moneyToCopper,
-  wealthToCopper,
-  type EquipmentBudgetSummary,
-} from './equipment-budget'
+import { moneyToCopper, wealthToCopper, type EquipmentBudgetSummary } from './equipment-budget'
+import { maxAffordablePurchaseQuantity } from './resolve-equipment-purchase-availability'
 
 /** Hard cap per purchase row (bundle units). */
 export const EQUIPMENT_PURCHASE_QUANTITY_MAX = 99
@@ -27,14 +24,17 @@ export function resolveEquipmentAcquisitionMaxQuantity(args: {
   currentQuantity: number
 }): number {
   const { equipment, budget, currentQuantity } = args
-  const unitCost = moneyToCopper(equipment.cost)
+  if (!canPurchaseEquipment(equipment)) return currentQuantity
+
   const hasSpendableBudget = budget !== undefined && wealthToCopper(budget.starting) > 0
 
   let budgetMax: number
-  if (unitCost <= 0) {
-    budgetMax = currentQuantity + EQUIPMENT_PURCHASE_QUANTITY_MAX
-  } else if (hasSpendableBudget && budget) {
-    budgetMax = maxAffordableEquipmentQuantity(equipment, budget, currentQuantity)
+  if (hasSpendableBudget) {
+    budgetMax = maxAffordablePurchaseQuantity({
+      equipment,
+      budget,
+      currentPurchaseQuantity: currentQuantity,
+    })
   } else {
     budgetMax = EQUIPMENT_PURCHASE_QUANTITY_MAX
   }
@@ -92,11 +92,13 @@ export function formatEquipmentPurchaseTotalPriceLabel(
   equipment: Equipment,
   quantity: number,
 ): string {
+  if (!canPurchaseEquipment(equipment)) return ''
   const totalCopper = moneyToCopper(equipment.cost) * quantity
   return formatWealth(copperToDisplayWealth(totalCopper))
 }
 
 export function formatEquipmentPurchaseUnitPriceLabel(equipment: Equipment): string {
+  if (!canPurchaseEquipment(equipment)) return ''
   if (isBundledEquipment(equipment)) {
     return `${formatMoney(equipment.cost)} per bundle`
   }
@@ -112,6 +114,7 @@ export function formatEquipmentInventoryPriceLine(args: {
   priceContext: 'package' | 'startingGold'
 }): string {
   const { equipment, quantity, priceContext } = args
+  if (!canPurchaseEquipment(equipment)) return ''
   const stackable = isEquipmentStackable(equipment)
   const bundled = isBundledEquipment(equipment)
   const unitPrice = formatMoney(equipment.cost)

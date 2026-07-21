@@ -43,6 +43,17 @@ describe('EquipmentInventoryColumn', () => {
     expect(container.querySelector('[aria-hidden="true"]')).toBeInTheDocument()
   })
 
+  it('renders a count badge adjacent to the heading when titleBadgeCount is set', () => {
+    render(
+      <EquipmentInventoryColumn title="Added Equipment" titleBadgeCount={3}>
+        <p>Added items</p>
+      </EquipmentInventoryColumn>,
+    )
+
+    expect(screen.getByRole('heading', { name: 'Added Equipment' })).toBeInTheDocument()
+    expect(screen.getByText('3')).toBeInTheDocument()
+  })
+
   it('has no axe accessibility violations', async () => {
     const { container } = render(
       <EquipmentInventoryColumn title="Standard Equipment">

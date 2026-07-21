@@ -5,6 +5,8 @@ import type { EquipmentPool } from '../../../../content/lib/equipment-grant'
 import type { StartingEquipmentOption } from '../../../../content/starting-equipment'
 import {
   isProficiencyLinkedStartingEquipmentGrant,
+  isStartingGoldOption,
+  isWealthOnlyStartingEquipmentOption,
   startingEquipmentGrantEquipmentSlug,
   startingEquipmentGrantProficiencyChoiceId,
 } from '../../../../content/starting-equipment'
@@ -18,8 +20,25 @@ import {
 import type { CharacterEquipment } from '../../../character/equipment-inventory'
 import type { CharacterBuildCatalogIndex } from '../../context'
 import type { CharacterBuilderDraft } from '../../draft'
+import {
+  characterWealthFromGrant,
+  type CharacterWealth,
+} from '../../../character/equipment-inventory'
 import { equipmentPoolSummaryLabel } from './equipment-pool-choice-options'
+import {
+  formatStartingEquipmentPackageDescription,
+  formatStartingEquipmentTierAdjustment,
+  formatStartingEquipmentTotalWealthLabel,
+  formatStartingGoldOptionDescription,
+  type StartingEquipmentTierAdjustment,
+} from './format-starting-equipment-option-description'
+import { type ResolvedStartingEquipmentFunding } from './resolve-starting-equipment-funding'
 import { resolveProficiencyLinkedEquipmentGrant } from './resolve-proficiency-linked-equipment-grant'
+
+/** Pre-resolved display inputs for starting-equipment summaries. No campaign policy inside. */
+export type StartingEquipmentSummaryContext = {
+  fundingByOptionId?: ReadonlyMap<string, ResolvedStartingEquipmentFunding>
+}
 
 export const STARTING_EQUIPMENT_MISSING_ITEM_MESSAGE = 'Missing from catalog'
 export const STARTING_EQUIPMENT_UNAVAILABLE_POOL_MESSAGE = 'No matching items in catalog'
@@ -61,12 +80,32 @@ export type StartingEquipmentOptionSummaryItem =
 export type StartingEquipmentOptionSummary = {
   optionId: string
   label: string
+  /** Class baseline content only — tier additions live in structured fields below. */
   description?: string
   wealth?: CharacterWealthGrant
+  orderedItems: readonly StartingEquipmentOptionSummaryItem[]
   itemsByGroup: Record<StartingEquipmentInventoryGroup, StartingEquipmentOptionSummaryItem[]>
   missingItemSlugs: string[]
   unselectableReasons: readonly string[]
   isSelectable: boolean
+  tierAdjustment?: StartingEquipmentTierAdjustment
+  totalStartingWealthLabel?: string
+  funding: ResolvedStartingEquipmentFunding
+}
+
+const EMPTY_WEALTH: CharacterWealth = { cp: 0, sp: 0, gp: 0, pp: 0 }
+
+function baselineFundingForOption(
+  option: StartingEquipmentOption,
+): ResolvedStartingEquipmentFunding {
+  const classOptionWealth = characterWealthFromGrant(option.wealth)
+  return {
+    classOptionId: option.id,
+    classOptionWealth,
+    tierAdditionalWealth: EMPTY_WEALTH,
+    totalStartingWealth: classOptionWealth,
+    classOptionPolicy: 'included',
+  }
 }
 
 const EMPTY_ITEMS_BY_GROUP = (): Record<
@@ -272,14 +311,19 @@ function inventoryGroupForChoice(pool: EquipmentPool): StartingEquipmentInventor
   return 'gear'
 }
 
-function summarizeOption(
-  characterClass: CharacterClass,
-  option: StartingEquipmentOption,
-  catalogIndex: CharacterBuildCatalogIndex,
-  draft?: CharacterBuilderDraft,
-): StartingEquipmentOptionSummary {
+function summarizeOptionItems(args: {
+  option: StartingEquipmentOption
+  characterClass: CharacterClass
+  catalogIndex: CharacterBuildCatalogIndex
+  draft?: CharacterBuilderDraft
+}): Pick<
+  StartingEquipmentOptionSummary,
+  'orderedItems' | 'itemsByGroup' | 'missingItemSlugs' | 'unselectableReasons'
+> {
+  const { option, characterClass, catalogIndex, draft } = args
   const rulesetId = characterClass.rulesetId
   const itemsByGroup = EMPTY_ITEMS_BY_GROUP()
+  const orderedItems: StartingEquipmentOptionSummaryItem[] = []
   const missingItemSlugs: string[] = []
   const unselectableReasons: string[] = []
 
@@ -292,12 +336,14 @@ function summarizeOption(
           catalogIndex,
           draft,
         )
+        orderedItems.push(summary)
         unselectableReasons.push(...reasons)
         if (group) itemsByGroup[group].push(summary)
         continue
       }
 
       const { summary, group, reasons } = summarizeGrantItem(item, rulesetId, catalogIndex)
+      orderedItems.push(summary)
       if (summary.isMissing) {
         const equipmentSlug = startingEquipmentGrantEquipmentSlug(item)
         if (equipmentSlug) missingItemSlugs.push(equipmentSlug)
@@ -308,19 +354,67 @@ function summarizeOption(
     }
 
     const { summary, reasons } = summarizeChoiceItem(item, rulesetId, catalogIndex)
+    orderedItems.push(summary)
     unselectableReasons.push(...reasons)
     itemsByGroup[inventoryGroupForChoice(item.pool)].push(summary)
   }
 
+  return { orderedItems, itemsByGroup, missingItemSlugs, unselectableReasons }
+}
+
+function startingEquipmentOptionDescription(args: {
+  option: StartingEquipmentOption
+  orderedItems: readonly StartingEquipmentOptionSummaryItem[]
+}): string | undefined {
+  const { option, orderedItems } = args
+
+  if (isWealthOnlyStartingEquipmentOption(option)) {
+    return formatStartingGoldOptionDescription({
+      wealth: characterWealthFromGrant(option.wealth!),
+    })
+  }
+
+  return formatStartingEquipmentPackageDescription({
+    orderedItems,
+    wealth: option.wealth,
+  })
+}
+
+function summarizeOption(
+  characterClass: CharacterClass,
+  option: StartingEquipmentOption,
+  catalogIndex: CharacterBuildCatalogIndex,
+  draft?: CharacterBuilderDraft,
+  context?: StartingEquipmentSummaryContext,
+): StartingEquipmentOptionSummary {
+  const { orderedItems, itemsByGroup, missingItemSlugs, unselectableReasons } =
+    summarizeOptionItems({ option, characterClass, catalogIndex, draft })
+  const funding = context?.fundingByOptionId?.get(option.id) ?? baselineFundingForOption(option)
+  const goldOption = isStartingGoldOption(option)
+  const tierAdjustment = formatStartingEquipmentTierAdjustment({
+    tierLabel: funding.tierLabel,
+    tierAdditionalWealth: funding.tierAdditionalWealth,
+  })
+  const totalStartingWealthLabel = tierAdjustment
+    ? formatStartingEquipmentTotalWealthLabel({
+        totalStartingWealth: funding.totalStartingWealth,
+        isStartingGoldOption: goldOption,
+      })
+    : undefined
+
   return {
     optionId: option.id,
     label: option.label,
-    description: option.description,
+    description: startingEquipmentOptionDescription({ option, orderedItems }),
     wealth: option.wealth,
+    orderedItems,
     itemsByGroup,
     missingItemSlugs,
     unselectableReasons,
     isSelectable: unselectableReasons.length === 0,
+    tierAdjustment,
+    totalStartingWealthLabel,
+    funding,
   }
 }
 
@@ -329,11 +423,12 @@ export function resolveStartingEquipmentOptionSummaries(
   characterClass: CharacterClass,
   catalogIndex: CharacterBuildCatalogIndex,
   draft?: CharacterBuilderDraft,
+  context?: StartingEquipmentSummaryContext,
 ): StartingEquipmentOptionSummary[] {
   const startingEquipment = characterClass.characterCreation?.startingEquipment
   if (!startingEquipment) return []
 
   return startingEquipment.options.map((option) =>
-    summarizeOption(characterClass, option, catalogIndex, draft),
+    summarizeOption(characterClass, option, catalogIndex, draft, context),
   )
 }

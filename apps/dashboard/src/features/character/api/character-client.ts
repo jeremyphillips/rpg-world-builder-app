@@ -1,8 +1,9 @@
 import type { PcCharacter, CreateCharacterInput, SystemRulesetId } from '@rpg/contracts'
 
-import { postJson, request } from '@/lib/api-client'
+import { deleteJson, postJson, request } from '@/lib/api-client'
 
 const CREATE_CHARACTER_ERROR = 'Could not create character.'
+const DELETE_CHARACTER_ERROR = 'Could not delete character.'
 const LIST_CHARACTERS_ERROR = 'Could not load characters.'
 const GET_CHARACTER_ERROR = 'Could not load character.'
 
@@ -31,6 +32,10 @@ export async function getCharacter(characterId: string): Promise<PcCharacter> {
     GET_CHARACTER_ERROR,
   )
   return character
+}
+
+export async function deleteCharacter(characterId: string): Promise<void> {
+  await deleteJson(`/api/characters/${characterId}`, DELETE_CHARACTER_ERROR)
 }
 
 export type { CreateCharacterInput, PcCharacter, SystemRulesetId }

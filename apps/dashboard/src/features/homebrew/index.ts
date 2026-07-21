@@ -83,5 +83,8 @@ export {
 export {
   VOCABULARY_COMBOBOX_PLACEHOLDER,
   vocabularyComboboxField,
+  vocabularyComboboxFieldForTerm,
   vocabularySelectField,
+  vocabularySelectFieldForTerm,
 } from './lib/vocabulary/field-factories'
+export { vocabularyFieldLabel, vocabularyHubLabel } from './lib/vocabulary/term-labels'

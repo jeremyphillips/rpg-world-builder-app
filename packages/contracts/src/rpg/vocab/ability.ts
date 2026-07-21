@@ -2,13 +2,22 @@ import { z } from 'zod'
 
 import { vocabEnumFromEntries, keysFromEntries } from './enum-schema'
 import { getTermSentenceForm } from './types'
-import type { GameTermEntry } from './types'
+import type { GameTermEntry, VocabularyTerm } from './types'
 import { abilityValidationMessages } from './ability-messages'
 
 // ---------------------------------------------------------------------------
 // Abilities — the six creature ability scores (shared by classes, monsters,
 // and characters). `class.ts` references ability *ids* only, not scores.
 // ---------------------------------------------------------------------------
+
+export const ABILITY_SCORE_TERM = {
+  label: 'Ability Score',
+  description: 'One of the six fundamental attributes of a creature.',
+  sentence: {
+    singular: 'ability score',
+    plural: 'ability scores',
+  },
+} as const satisfies VocabularyTerm
 
 export const ABILITY_ENTRIES = {
   str: {

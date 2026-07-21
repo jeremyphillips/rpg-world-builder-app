@@ -1,9 +1,18 @@
 import { keysFromEntries } from '../enum-schema'
-import type { GameTermEntry } from '../types'
+import type { GameTermEntry, VocabularyTerm } from '../types'
 
 // ---------------------------------------------------------------------------
 // Spell atomic effect kinds — labels for authoring UI and array item headers.
 // ---------------------------------------------------------------------------
+
+export const SPELL_ATOMIC_EFFECT_KIND_TERM = {
+  label: 'Spell Effect Kind',
+  description: 'A building block in structured spell effect authoring.',
+  sentence: {
+    singular: 'spell effect kind',
+    plural: 'spell effect kinds',
+  },
+} as const satisfies VocabularyTerm
 
 export const SPELL_ATOMIC_EFFECT_KIND_ENTRIES = {
   damage: {

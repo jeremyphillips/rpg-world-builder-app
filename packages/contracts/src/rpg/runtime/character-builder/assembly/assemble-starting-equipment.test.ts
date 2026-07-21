@@ -95,7 +95,7 @@ const storedDruid: ClassStored = {
       choose: 1,
       options: [
         {
-          id: 'standard',
+          id: 'standard-equipment',
           label: 'Standard Equipment',
           items: [
             {
@@ -114,7 +114,7 @@ const storedDruid: ClassStored = {
           wealth: { gp: 9 },
         },
         {
-          id: 'gold',
+          id: 'starting-gold',
           label: 'Starting Gold',
           items: [],
           wealth: { gp: 50 },
@@ -141,7 +141,7 @@ describe('assembleStartingEquipment', () => {
       ...createEmptyCharacterBuilderDraft(),
       class: { classId: druidClass.id, level: 1 as const },
       choiceSelections: {
-        [startingEquipmentChoiceSetId(druidClass.id)]: ['standard'],
+        [startingEquipmentChoiceSetId(druidClass.id)]: ['standard-equipment'],
       },
     }
 
@@ -157,7 +157,7 @@ describe('assembleStartingEquipment', () => {
           {
             kind: 'classStartingEquipment',
             sourceId: druidClass.id,
-            grantId: 'standard',
+            grantId: 'standard-equipment',
           },
         ],
       },
@@ -169,7 +169,7 @@ describe('assembleStartingEquipment', () => {
           {
             kind: 'classStartingEquipment',
             sourceId: druidClass.id,
-            grantId: 'standard',
+            grantId: 'standard-equipment',
           },
         ],
       },
@@ -190,7 +190,7 @@ describe('assembleStartingEquipment', () => {
       ...createEmptyCharacterBuilderDraft(),
       class: { classId: druidClass.id, level: 1 as const },
       choiceSelections: {
-        [startingEquipmentChoiceSetId(druidClass.id)]: ['gold'],
+        [startingEquipmentChoiceSetId(druidClass.id)]: ['starting-gold'],
       },
     }
 
@@ -222,7 +222,7 @@ describe('assembleStartingEquipment', () => {
       ...createEmptyCharacterBuilderDraft(),
       class: { classId: druidClass.id, level: 1 as const },
       choiceSelections: {
-        [startingEquipmentChoiceSetId(druidClass.id)]: ['standard'],
+        [startingEquipmentChoiceSetId(druidClass.id)]: ['standard-equipment'],
       },
       equipment: {
         mode: 'package' as const,
@@ -234,7 +234,7 @@ describe('assembleStartingEquipment', () => {
             origin: 'picker' as const,
           },
         ],
-        removedPackageItemKeys: [`${druidClass.id}:standard:0`],
+        removedPackageItemKeys: [`${druidClass.id}:standard-equipment:0`],
         customized: true,
       },
     }
@@ -248,7 +248,7 @@ describe('assembleStartingEquipment', () => {
       {
         equipmentId: `${RULESET}:rope`,
         quantity: 1,
-        sources: [{ kind: 'startingGold', sourceId: druidClass.id, grantId: 'standard' }],
+        sources: [{ kind: 'startingGold', sourceId: druidClass.id, grantId: 'standard-equipment' }],
       },
     ])
   })
@@ -280,7 +280,7 @@ const monkWithLinkedGrant: ClassStored = {
       choose: 1,
       options: [
         {
-          id: 'standard',
+          id: 'standard-equipment',
           label: 'Standard Equipment',
           items: [
             {
@@ -310,7 +310,7 @@ describe('proficiency-linked starting equipment lifecycle', () => {
       ...createEmptyCharacterBuilderDraft(),
       class: { classId: monkWithLinkedGrant.id, level: 1 as const },
       choiceSelections: {
-        [startingEquipmentChoiceSetId(monkWithLinkedGrant.id)]: ['standard'],
+        [startingEquipmentChoiceSetId(monkWithLinkedGrant.id)]: ['standard-equipment'],
         [monkToolChoiceSetId]: [luteTool.id],
       },
     }
@@ -341,7 +341,7 @@ describe('proficiency-linked starting equipment lifecycle', () => {
           {
             kind: 'classStartingEquipment',
             sourceId: monkWithLinkedGrant.id,
-            grantId: 'standard',
+            grantId: 'standard-equipment',
           },
         ],
       },
@@ -353,7 +353,7 @@ describe('proficiency-linked starting equipment lifecycle', () => {
       ...createEmptyCharacterBuilderDraft(),
       class: { classId: monkWithLinkedGrant.id, level: 1 as const },
       choiceSelections: {
-        [startingEquipmentChoiceSetId(monkWithLinkedGrant.id)]: ['standard'],
+        [startingEquipmentChoiceSetId(monkWithLinkedGrant.id)]: ['standard-equipment'],
         [monkToolChoiceSetId]: [luteTool.id],
       },
     }

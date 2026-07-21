@@ -1,11 +1,20 @@
 import { keysFromEntries, vocabEnumFromEntries } from '../enum-schema'
 import { formatVocabularySlugLabel } from '../format-slug-label'
-import { getTermSentenceForm, type GameTermEntry } from '../types'
+import { getTermSentenceForm, type GameTermEntry, type VocabularyTerm } from '../types'
 
 // ---------------------------------------------------------------------------
 // Weapon categories — simple/martial taxonomy consumed by class proficiencies
 // and the full weapon content type.
 // ---------------------------------------------------------------------------
+
+export const WEAPON_CATEGORY_TERM = {
+  label: 'Weapon Category',
+  description: 'Simple or martial weapon classification.',
+  sentence: {
+    singular: 'weapon category',
+    plural: 'weapon categories',
+  },
+} as const satisfies VocabularyTerm
 
 export const WEAPON_CATEGORY_ENTRIES = {
   simple: {

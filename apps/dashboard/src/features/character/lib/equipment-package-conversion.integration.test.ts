@@ -8,6 +8,7 @@ import {
   indexCharacterBuildCatalog,
   resolveEquipmentAcquisitionMaxQuantity,
   resolveEquipmentPurchaseQuantityLimits,
+  resolveStartingEquipmentFundingOptions,
   startingEquipmentChoiceSetId,
   wealthToCopper,
   type ClassStored,
@@ -51,7 +52,7 @@ const monkWithTorchGrant: ClassStored = {
       choose: 1,
       options: [
         {
-          id: 'standard',
+          id: 'standard-equipment',
           label: 'Standard Equipment',
           items: [
             {
@@ -74,7 +75,7 @@ const monkWithTorchGrant: ClassStored = {
           wealth: { gp: 11 },
         },
         {
-          id: 'gold',
+          id: 'starting-gold',
           label: 'Starting Gold',
           items: [],
           wealth: { gp: 50 },
@@ -98,7 +99,7 @@ function monkPackageDraft() {
     ...createEmptyCharacterBuilderDraft(),
     class: { classId: monkWithTorchGrant.id, level: 1 as const },
     choiceSelections: {
-      [startingEquipmentChoiceSetId(monkWithTorchGrant.id)]: ['standard'],
+      [startingEquipmentChoiceSetId(monkWithTorchGrant.id)]: ['standard-equipment'],
     },
     equipment: {
       mode: 'package' as const,
@@ -117,13 +118,18 @@ function allSelectablePackageItemKeys(
   )
 }
 
+function goldTargetFunding(draft: ReturnType<typeof monkPackageDraft>) {
+  return resolveStartingEquipmentFundingOptions({ draft, catalogIndex }).get('starting-gold')!
+}
+
 describe('equipment package conversion integration', () => {
   it('converts a monk package with fixed daggers and stackable torches into editable purchased rows', () => {
     const draft = monkPackageDraft()
     const preview = buildStartingPackageConversionPreview({
       draft,
       catalogIndex,
-      departingOptionId: 'standard',
+      departingOptionId: 'standard-equipment',
+      targetFunding: goldTargetFunding(draft),
       selectedPackageItemKeys: new Set(),
     })!
 
@@ -131,7 +137,8 @@ describe('equipment package conversion integration', () => {
     const patch = buildStartingPackageConversionPatch({
       draft,
       catalogIndex,
-      departingOptionId: 'standard',
+      departingOptionId: 'standard-equipment',
+      targetFunding: goldTargetFunding(draft),
       selectedPackageItemKeys: selectedKeys,
     })!
 
@@ -211,7 +218,8 @@ describe('equipment package conversion integration', () => {
     const conversionPreview = buildStartingPackageConversionPreview({
       draft,
       catalogIndex,
-      departingOptionId: 'standard',
+      departingOptionId: 'standard-equipment',
+      targetFunding: goldTargetFunding(draft),
       selectedPackageItemKeys: selectedKeys,
     })!
     expect(wealthToCopper(budget.remaining)).toBe(conversionPreview.budget.remainingCp)

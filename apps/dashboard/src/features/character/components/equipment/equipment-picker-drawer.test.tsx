@@ -9,21 +9,22 @@ import {
   equipmentPickerDefaultPathItemsFixture,
   equipmentPickerItemsFixture,
   equipmentPickerLowRemainingBudgetFixture,
+  equipmentPickerMagicItemProgressFixture,
+  equipmentPickerMagicItemsFixture,
   equipmentPickerRowboatFixture,
   equipmentPickerSkilledHirelingFixture,
+  pickerState,
 } from './equipment-picker-drawer.fixtures'
 import {
   EQUIPMENT_PICKER_AFFORDABLE_NOW_LABEL,
   EQUIPMENT_PICKER_CANNOT_AFFORD_LABEL,
   EQUIPMENT_PICKER_CLEAR_FILTERS_LABEL,
-  EQUIPMENT_PICKER_OWNED_QUANTITY_LABEL_PREFIX,
   EQUIPMENT_PICKER_RESET_VIEW_LABEL,
   EQUIPMENT_PICKER_SORT_LABEL,
   EQUIPMENT_PICKER_STARTING_OPTION_LABEL,
   type EquipmentPickerItem,
 } from './equipment-picker-drawer.types'
 import {
-  EQUIPMENT_PICKER_PURCHASE_ADD_ANOTHER_LABEL,
   EQUIPMENT_PICKER_PURCHASE_COMMIT_LABEL,
   EQUIPMENT_PICKER_PURCHASE_REMOVE_ALL_LABEL,
   EQUIPMENT_PICKER_PURCHASE_REMOVE_ONE_LABEL,
@@ -49,7 +50,6 @@ describe('EquipmentPickerDrawer', () => {
         items={[equipmentPickerItemsFixture[1]!]}
         budget={equipmentPickerBudgetFixture}
         filterOutUnaffordable={false}
-        defaultTab="all"
         onAddItem={vi.fn()}
       />,
     )
@@ -64,7 +64,7 @@ describe('EquipmentPickerDrawer', () => {
     expect(screen.getByRole('button', { name: 'Add' })).toBeDisabled()
   })
 
-  it('shows recommendation badges on the recommended tab', () => {
+  it('shows recommendation badges in the unified list', () => {
     render(
       <EquipmentPickerDrawer
         open
@@ -79,7 +79,7 @@ describe('EquipmentPickerDrawer', () => {
 
     expect(within(list).getByText('Longsword')).toBeInTheDocument()
     expect(within(list).getByText(EQUIPMENT_PICKER_STARTING_OPTION_LABEL)).toBeInTheDocument()
-    expect(within(list).queryByText('Rope')).not.toBeInTheDocument()
+    expect(within(list).getByText('Rope')).toBeInTheDocument()
   })
 
   it('shows starting-unaffordable rows by default with purchase disabled', () => {
@@ -106,7 +106,6 @@ describe('EquipmentPickerDrawer', () => {
         onOpenChange={vi.fn()}
         items={[plateArmor]}
         budget={equipmentPickerBudgetFixture}
-        defaultTab="all"
         onAddItem={vi.fn()}
       />,
     )
@@ -141,7 +140,6 @@ describe('EquipmentPickerDrawer', () => {
         onOpenChange={vi.fn()}
         items={[plateArmor, equipmentPickerItemsFixture[2]!]}
         budget={equipmentPickerBudgetFixture}
-        defaultTab="all"
         filterOutUnaffordable
         onAddItem={vi.fn()}
       />,
@@ -161,7 +159,6 @@ describe('EquipmentPickerDrawer', () => {
         items={equipmentPickerDefaultPathItemsFixture}
         budget={equipmentPickerLowRemainingBudgetFixture}
         filterOutUnaffordable={false}
-        defaultTab="all"
         onAddItem={vi.fn()}
       />,
     )
@@ -178,7 +175,6 @@ describe('EquipmentPickerDrawer', () => {
         onOpenChange={vi.fn()}
         items={equipmentPickerDefaultPathItemsFixture}
         filterOutUnaffordable={false}
-        defaultTab="all"
         onAddItem={vi.fn()}
       />,
     )
@@ -198,7 +194,6 @@ describe('EquipmentPickerDrawer', () => {
         items={equipmentPickerDefaultPathItemsFixture}
         budget={equipmentPickerLowRemainingBudgetFixture}
         filterOutUnaffordable={false}
-        defaultTab="all"
         onAddItem={vi.fn()}
       />,
     )
@@ -223,15 +218,13 @@ describe('EquipmentPickerDrawer', () => {
         items={equipmentPickerItemsFixture}
         budget={equipmentPickerBudgetFixture}
         filterOutUnaffordable={false}
-        defaultTab="all"
         toolbarResetMode="clear_filters"
         onAddItem={vi.fn()}
       />,
     )
 
     await user.type(screen.getByRole('textbox', { name: 'Search catalog' }), 'rope')
-    await user.click(screen.getByRole('combobox', { name: 'Equipment category' }))
-    await user.click(screen.getByRole('option', { name: 'Weapon' }))
+    await user.click(screen.getByRole('radio', { name: 'Weapon' }))
     await user.click(screen.getByRole('checkbox', { name: EQUIPMENT_PICKER_AFFORDABLE_NOW_LABEL }))
 
     expect(
@@ -244,7 +237,7 @@ describe('EquipmentPickerDrawer', () => {
     await user.click(screen.getByRole('button', { name: EQUIPMENT_PICKER_CLEAR_FILTERS_LABEL }))
 
     expect(screen.getByRole('textbox', { name: 'Search catalog' })).toHaveValue('')
-    expect(screen.getByRole('combobox', { name: 'Equipment category' })).toHaveTextContent('All')
+    expect(screen.getByRole('radio', { name: 'All' })).toHaveAttribute('aria-checked', 'true')
     expect(
       screen.getByRole('checkbox', { name: EQUIPMENT_PICKER_AFFORDABLE_NOW_LABEL }),
     ).not.toBeChecked()
@@ -254,10 +247,9 @@ describe('EquipmentPickerDrawer', () => {
     expect(screen.getByRole('combobox', { name: 'Equipment sort order' })).toHaveTextContent(
       'Best match',
     )
-    expect(screen.getByRole('tab', { selected: true, name: /All/i })).toBeInTheDocument()
   })
 
-  it('resets sort, tab, search, and structured filters with reset_view mode', async () => {
+  it('keeps category selected when the active chip is clicked again', async () => {
     const user = userEvent.setup()
 
     render(
@@ -267,18 +259,37 @@ describe('EquipmentPickerDrawer', () => {
         items={equipmentPickerItemsFixture}
         budget={equipmentPickerBudgetFixture}
         filterOutUnaffordable={false}
-        defaultTab="all"
+        onAddItem={vi.fn()}
+      />,
+    )
+
+    const weaponChip = screen.getByRole('radio', { name: 'Weapon' })
+    await user.click(weaponChip)
+    expect(weaponChip).toHaveAttribute('aria-checked', 'true')
+
+    await user.click(weaponChip)
+    expect(weaponChip).toHaveAttribute('aria-checked', 'true')
+  })
+
+  it('resets sort, search, and structured filters with reset_view mode', async () => {
+    const user = userEvent.setup()
+
+    render(
+      <EquipmentPickerDrawer
+        open
+        onOpenChange={vi.fn()}
+        items={equipmentPickerItemsFixture}
+        budget={equipmentPickerBudgetFixture}
+        filterOutUnaffordable={false}
         onAddItem={vi.fn()}
       />,
     )
 
     await user.type(screen.getByRole('textbox', { name: 'Search catalog' }), 'rope')
-    await user.click(screen.getByRole('combobox', { name: 'Equipment category' }))
-    await user.click(screen.getByRole('option', { name: 'Weapon' }))
+    await user.click(screen.getByRole('radio', { name: 'Weapon' }))
     await user.click(screen.getByRole('checkbox', { name: EQUIPMENT_PICKER_AFFORDABLE_NOW_LABEL }))
     await user.click(screen.getByRole('combobox', { name: 'Equipment sort order' }))
     await user.click(screen.getByRole('option', { name: 'Price: Low to high' }))
-    await user.click(screen.getByRole('tab', { name: /Recommended/i }))
 
     expect(
       screen.getByRole('button', { name: EQUIPMENT_PICKER_RESET_VIEW_LABEL }),
@@ -287,14 +298,13 @@ describe('EquipmentPickerDrawer', () => {
     await user.click(screen.getByRole('button', { name: EQUIPMENT_PICKER_RESET_VIEW_LABEL }))
 
     expect(screen.getByRole('textbox', { name: 'Search catalog' })).toHaveValue('')
-    expect(screen.getByRole('combobox', { name: 'Equipment category' })).toHaveTextContent('All')
+    expect(screen.getByRole('radio', { name: 'All' })).toHaveAttribute('aria-checked', 'true')
     expect(
       screen.getByRole('checkbox', { name: EQUIPMENT_PICKER_AFFORDABLE_NOW_LABEL }),
     ).not.toBeChecked()
     expect(screen.getByRole('combobox', { name: 'Equipment sort order' })).toHaveTextContent(
       'Best match',
     )
-    expect(screen.getByRole('tab', { selected: true, name: /All/i })).toBeInTheDocument()
     expect(
       screen.queryByRole('button', { name: EQUIPMENT_PICKER_RESET_VIEW_LABEL }),
     ).not.toBeInTheDocument()
@@ -310,7 +320,6 @@ describe('EquipmentPickerDrawer', () => {
         items={equipmentPickerDefaultPathItemsFixture}
         budget={equipmentPickerLowRemainingBudgetFixture}
         filterOutUnaffordable={false}
-        defaultTab="all"
         onAddItem={vi.fn()}
       />,
     )
@@ -333,7 +342,7 @@ describe('EquipmentPickerDrawer', () => {
     expect(names).toEqual(['Cheap Gear', 'Mid Gear', 'Expensive Gear'])
   })
 
-  it('preserves sort mode across tab switches', async () => {
+  it('renders reset view when browse criteria drift from defaults', async () => {
     const user = userEvent.setup()
 
     render(
@@ -347,33 +356,10 @@ describe('EquipmentPickerDrawer', () => {
       />,
     )
 
-    await user.click(screen.getByRole('combobox', { name: 'Equipment sort order' }))
-    await user.click(screen.getByRole('option', { name: 'Name: Z–A' }))
-    await user.click(screen.getByRole('tab', { name: /All/i }))
-
-    expect(screen.getByRole('combobox', { name: 'Equipment sort order' })).toHaveTextContent('Z–A')
-  })
-
-  it('renders reset view inline with the tab row', async () => {
-    const user = userEvent.setup()
-
-    render(
-      <EquipmentPickerDrawer
-        open
-        onOpenChange={vi.fn()}
-        items={equipmentPickerItemsFixture}
-        budget={equipmentPickerBudgetFixture}
-        filterOutUnaffordable={false}
-        defaultTab="all"
-        onAddItem={vi.fn()}
-      />,
-    )
-
-    const tablist = screen.getByRole('tablist')
-    await user.click(screen.getByRole('tab', { name: /Recommended/i }))
+    await user.type(screen.getByRole('textbox', { name: 'Search catalog' }), 'rope')
 
     const resetButton = screen.getByRole('button', { name: EQUIPMENT_PICKER_RESET_VIEW_LABEL })
-    expect(tablist.parentElement?.parentElement).toContainElement(resetButton)
+    expect(resetButton).toBeInTheDocument()
     expect(resetButton).toHaveClass('[&_svg]:size-3')
   })
 
@@ -403,7 +389,6 @@ describe('EquipmentPickerDrawer', () => {
         items={equipmentPickerItemsFixture}
         budget={equipmentPickerBudgetFixture}
         filterOutUnaffordable={false}
-        defaultTab="all"
         onAddItem={vi.fn()}
       />,
     )
@@ -418,7 +403,6 @@ describe('EquipmentPickerDrawer', () => {
         items={equipmentPickerItemsFixture}
         budget={equipmentPickerBudgetFixture}
         filterOutUnaffordable={false}
-        defaultTab="all"
         onAddItem={vi.fn()}
       />,
     )
@@ -430,7 +414,6 @@ describe('EquipmentPickerDrawer', () => {
         items={equipmentPickerItemsFixture}
         budget={equipmentPickerBudgetFixture}
         filterOutUnaffordable={false}
-        defaultTab="all"
         onAddItem={vi.fn()}
       />,
     )
@@ -450,7 +433,6 @@ describe('EquipmentPickerDrawer', () => {
         items={equipmentPickerDefaultPathItemsFixture}
         budget={equipmentPickerLowRemainingBudgetFixture}
         filterOutUnaffordable={false}
-        defaultTab="all"
         ownedPurchaseQuantities={{}}
         onAddItem={onAddItem}
       />,
@@ -473,7 +455,6 @@ describe('EquipmentPickerDrawer', () => {
         onOpenChange={vi.fn()}
         items={[equipmentPickerItemsFixture[2]!]}
         budget={equipmentPickerBudgetFixture}
-        defaultTab="all"
         onAddItem={onAddItem}
       />,
     )
@@ -494,7 +475,6 @@ describe('EquipmentPickerDrawer', () => {
         onOpenChange={vi.fn()}
         items={[equipmentPickerItemsFixture[2]!]}
         budget={equipmentPickerBudgetFixture}
-        defaultTab="all"
         onAddItem={onAddItem}
       />,
     )
@@ -517,7 +497,6 @@ describe('EquipmentPickerDrawer', () => {
         onOpenChange={vi.fn()}
         items={[equipmentPickerItemsFixture[2]!]}
         budget={equipmentPickerBudgetFixture}
-        defaultTab="all"
         onAddItem={onAddItem}
       />,
     )
@@ -532,7 +511,7 @@ describe('EquipmentPickerDrawer', () => {
     expect(onAddItem).toHaveBeenCalledWith(ropeRow, 3)
   })
 
-  it('shows owned quantity and Add another for owned stackables', async () => {
+  it('shows owned quantity badge and Add for owned stackables', async () => {
     const user = userEvent.setup()
     const onAddItem = vi.fn()
     const ropeRow = equipmentPickerItemsFixture[2]!
@@ -544,17 +523,13 @@ describe('EquipmentPickerDrawer', () => {
         items={[ropeRow]}
         budget={equipmentPickerBudgetFixture}
         ownedPurchaseQuantities={{ [ropeRow.equipment.id]: 2 }}
-        defaultTab="all"
         onAddItem={onAddItem}
       />,
     )
 
-    expect(
-      screen.getByText(`${EQUIPMENT_PICKER_OWNED_QUANTITY_LABEL_PREFIX} 2`),
-    ).toBeInTheDocument()
-    await user.click(
-      screen.getByRole('button', { name: EQUIPMENT_PICKER_PURCHASE_ADD_ANOTHER_LABEL }),
-    )
+    const addButton = screen.getByRole('button', { name: 'Add' })
+    expect(addButton.parentElement).toHaveTextContent('2')
+    await user.click(addButton)
     expect(onAddItem).toHaveBeenCalledWith(ropeRow, 1)
   })
 
@@ -571,7 +546,6 @@ describe('EquipmentPickerDrawer', () => {
         items={[ropeRow]}
         budget={equipmentPickerBudgetFixture}
         ownedPurchaseQuantities={{ [ropeRow.equipment.id]: 2 }}
-        defaultTab="all"
         onAddItem={vi.fn()}
         onRemoveFromInventory={onRemoveFromInventory}
         onRemoveOneFromInventory={onRemoveOneFromInventory}
@@ -590,7 +564,7 @@ describe('EquipmentPickerDrawer', () => {
     expect(onRemoveFromInventory).toHaveBeenCalledWith(ropeRow)
   })
 
-  it('shows owned stackable header controls for owned items while stack rules are permissive', () => {
+  it('shows owned quantity badge and Add for owned items while stack rules are permissive', () => {
     const longsword = equipmentPickerItemsFixture[0]!
 
     render(
@@ -604,12 +578,13 @@ describe('EquipmentPickerDrawer', () => {
       />,
     )
 
-    expect(
-      screen.getByText(`${EQUIPMENT_PICKER_OWNED_QUANTITY_LABEL_PREFIX} 1`),
-    ).toBeInTheDocument()
-    expect(
-      screen.getByRole('button', { name: EQUIPMENT_PICKER_PURCHASE_ADD_ANOTHER_LABEL }),
-    ).toBeInTheDocument()
+    const list = screen.getByRole('list')
+    const longswordRow = within(list)
+      .getByText('Longsword')
+      .closest('[role="listitem"]') as HTMLElement
+    const addButton = within(longswordRow).getByRole('button', { name: 'Add' })
+    expect(addButton.parentElement).toHaveTextContent('1')
+    expect(addButton).toBeInTheDocument()
   })
 
   it('excludes vehicle and service rows from search results and category filter', () => {
@@ -617,7 +592,7 @@ describe('EquipmentPickerDrawer', () => {
       {
         equipment: equipmentPickerRowboatFixture,
         searchText: 'rowboat water vehicle',
-        state: {
+        state: pickerState({
           isAvailable: true,
           isRecommended: false,
           isProficient: true,
@@ -629,12 +604,12 @@ describe('EquipmentPickerDrawer', () => {
             specificity: 'broad_pool' as const,
           },
           disabledReasons: [],
-        },
+        }),
       },
       {
         equipment: equipmentPickerSkilledHirelingFixture,
         searchText: 'skilled hireling service',
-        state: {
+        state: pickerState({
           isAvailable: true,
           isRecommended: false,
           isProficient: true,
@@ -646,7 +621,7 @@ describe('EquipmentPickerDrawer', () => {
             specificity: 'broad_pool' as const,
           },
           disabledReasons: [],
-        },
+        }),
       },
     ]
 
@@ -657,7 +632,6 @@ describe('EquipmentPickerDrawer', () => {
         items={[...equipmentPickerItemsFixture, ...unsupportedItems]}
         budget={equipmentPickerBudgetFixture}
         filterOutUnaffordable={false}
-        defaultTab="all"
         onAddItem={vi.fn()}
       />,
     )
@@ -668,6 +642,33 @@ describe('EquipmentPickerDrawer', () => {
     expect(within(list).queryByText('Skilled Hireling')).not.toBeInTheDocument()
     expect(screen.queryByRole('option', { name: 'Vehicle' })).not.toBeInTheDocument()
     expect(screen.queryByRole('option', { name: 'Service' })).not.toBeInTheDocument()
+  })
+
+  it('renders rarity chips in magic-items workflow when multiple allowances exist', async () => {
+    const user = userEvent.setup()
+    const onFocusedAllowanceIdChange = vi.fn()
+
+    render(
+      <EquipmentPickerDrawer
+        open
+        onOpenChange={vi.fn()}
+        items={equipmentPickerMagicItemsFixture}
+        workflowMode="magic_items"
+        magicItemGrantProgress={equipmentPickerMagicItemProgressFixture}
+        onFocusedAllowanceIdChange={onFocusedAllowanceIdChange}
+        onAddItem={vi.fn()}
+      />,
+    )
+
+    expect(screen.getByRole('radio', { name: 'All' })).toBeInTheDocument()
+    expect(screen.getByRole('radio', { name: 'Common' })).toBeInTheDocument()
+    expect(screen.getByRole('radio', { name: 'Uncommon' })).toBeInTheDocument()
+
+    await user.click(screen.getByRole('radio', { name: 'Uncommon' }))
+
+    expect(onFocusedAllowanceIdChange).toHaveBeenCalledWith(
+      equipmentPickerMagicItemProgressFixture[1]!.allowanceId,
+    )
   })
 
   it('has no axe accessibility violations', async () => {

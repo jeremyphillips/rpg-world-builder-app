@@ -1,12 +1,21 @@
 import { vocabEnumFromEntries, keysFromEntries } from './enum-schema'
 import { getTermSentenceForm } from './types'
-import type { GameTermEntry } from './types'
+import type { GameTermEntry, VocabularyTerm } from './types'
 
 // ---------------------------------------------------------------------------
 // Usage frequency — how often a limited-use ability can be invoked for free
 // (innate spells, racial features, feat-granted abilities, etc.). Spell-agnostic:
 // the same cadence applies wherever the SRD uses at-will or per-long-rest limits.
 // ---------------------------------------------------------------------------
+
+export const USAGE_FREQUENCY_TERM = {
+  label: 'Usage Frequency',
+  description: 'How often a limited-use ability can be invoked for free.',
+  sentence: {
+    singular: 'usage frequency',
+    plural: 'usage frequencies',
+  },
+} as const satisfies VocabularyTerm
 
 export const USAGE_FREQUENCY_ENTRIES = {
   at_will: {

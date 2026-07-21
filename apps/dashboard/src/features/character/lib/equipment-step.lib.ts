@@ -7,11 +7,10 @@ import {
   equipmentPoolSummaryLabel,
   formatEquipmentBundleLabel,
   formatEquipmentInventoryPriceLine,
-  formatWealth,
   getInvalidStartingEquipmentProficiencyLinks,
   isEquipmentStackable,
   isProficiencyLinkedStartingEquipmentGrant,
-  maxAffordableEquipmentQuantity,
+  isStartingGoldOption,
   mergeCompatiblePurchasedEntries,
   normalizeEquipmentPurchase,
   nestedStartingEquipmentChoiceSetId,
@@ -21,13 +20,29 @@ import {
   resolveEquipmentPurchaseIndex,
   resolveEquipmentPurchaseId,
   resolveEquipmentPurchaseQuantityLimits,
+  resolveEquipmentModeFromOption,
   resolveStartingEquipmentOption,
   startingEquipmentChoiceSetId,
   startingEquipmentGrantProficiencyChoiceId,
   startingEquipmentPackageItemKey,
   STEP_CHOICE_TYPES_BY_STEP,
   wealthToCopper,
+  applyEquipmentPurchaseIntent,
+  applyMagicItemAcquisitionIntent,
+  formatInventorySourceSummary,
+  getMagicItemRarityLabel,
+  reconcileMagicItemSelections,
+  resolveEquipmentAcquisitionBuilderContext,
+  resolveEquipmentAcquisitionPlan,
+  resolveMagicItemAcquisitionState,
+  resolveMagicItemGrantEligibility,
+  resolveMagicItemGrantProgressList,
+  readMagicItemSelections,
+  upsertMagicItemGrantSelection,
+  standardStartingWealthTableId,
+  totalSelectedForEquipment,
   type CharacterBuildCatalogIndex,
+  type CharacterBuildContext,
   type CharacterBuilderDraft,
   type CharacterBuilderDraftEquipmentPurchase,
   type CharacterClass,
@@ -42,13 +57,9 @@ import {
   type EquipmentPickerItem,
   type StartingEquipmentOption,
   type StartingEquipmentOptionSummary,
-  type StartingEquipmentOptionSummaryGrant,
-  type StartingEquipmentOptionSummaryItem,
 } from '@rpg/contracts'
 
 import { clampEquipmentStepQuantity } from './equipment-quantity.lib'
-
-export const STARTING_EQUIPMENT_GOLD_OPTION_ID = 'gold'
 
 export const EQUIPMENT_STEP_NO_VALID_OPTIONS_MESSAGE =
   'No valid starting equipment options are currently available — this may be caused by missing catalog data.'
@@ -70,9 +81,79 @@ export const EQUIPMENT_STEP_REMOVE_ITEM_LABEL = 'Remove'
 export const EQUIPMENT_PURCHASED_INVENTORY_EMPTY_MESSAGE =
   'No items purchased with starting gold yet.'
 
+export const EQUIPMENT_ADDED_INVENTORY_EMPTY_MESSAGE = 'No additional equipment yet.'
+
 export const EQUIPMENT_STARTING_PACKAGE_SECTION_LABEL = 'Starting Equipment'
 
+export const EQUIPMENT_ADDED_INVENTORY_SECTION_LABEL = 'Added Equipment'
+
 export const EQUIPMENT_PURCHASED_INVENTORY_SECTION_LABEL = 'Purchased Equipment'
+
+export const EQUIPMENT_GOLD_OPTION_STARTING_MESSAGE = 'No package gear in this option'
+
+export const EQUIPMENT_GOLD_OPTION_STARTING_DESCRIPTION_BASE =
+  'This character is using the gold option, so all equipment is added through purchases'
+
+export const EQUIPMENT_GOLD_OPTION_STARTING_DESCRIPTION_MAGIC_ITEM_SUFFIX =
+  ' or magic item choices.'
+
+export function formatEquipmentGoldOptionStartingDescription(
+  includeMagicItemChoices: boolean,
+): string {
+  if (includeMagicItemChoices) {
+    return `${EQUIPMENT_GOLD_OPTION_STARTING_DESCRIPTION_BASE}${EQUIPMENT_GOLD_OPTION_STARTING_DESCRIPTION_MAGIC_ITEM_SUFFIX}`
+  }
+
+  return `${EQUIPMENT_GOLD_OPTION_STARTING_DESCRIPTION_BASE}.`
+}
+
+export const EQUIPMENT_MAGIC_ITEMS_SECTION_LABEL = 'Magic Items'
+
+export const EQUIPMENT_MAGIC_ITEMS_CHOOSE_LABEL = 'Choose magic items'
+
+export const EQUIPMENT_MAGIC_ITEMS_PROGRESS_LABEL = 'Magic item choices'
+
+export const EQUIPMENT_MAGIC_ITEM_RELEASE_LABEL = 'Release choice'
+
+export const EQUIPMENT_MAGIC_ITEM_REMOVE_PURCHASE_LABEL = 'Remove purchase'
+
+export const EQUIPMENT_INVENTORY_MANAGE_LABEL = 'Manage'
+
+export const EQUIPMENT_INVENTORY_DONE_LABEL = 'Done'
+
+export const EQUIPMENT_INVENTORY_RELEASE_LABEL = 'Release'
+
+export const EQUIPMENT_INVENTORY_RELEASE_ONE_LABEL = 'Release one'
+
+export const EQUIPMENT_INVENTORY_REMOVE_ONE_PURCHASE_LABEL = 'Remove one'
+
+export const EQUIPMENT_INVENTORY_OWNED_COPIES_LABEL = 'Owned copies'
+
+export const EQUIPMENT_INVENTORY_NEXT_COPY_LABEL = 'Next copy'
+
+export const EQUIPMENT_ACQUISITION_QUANTITY_LABEL = 'Quantity to add'
+
+export const EQUIPMENT_ACQUISITION_ADDING_LABEL = 'Adding…'
+
+export const EQUIPMENT_ACQUISITION_BLOCKED_NOTE =
+  'No additional copies can be added during character creation.'
+
+export const EQUIPMENT_MAGIC_ITEM_USE_CHOICE_LABEL = 'Use magic item choice'
+
+export function formatMagicItemUseChoicesLabel(quantity: number): string {
+  if (quantity === 1) return EQUIPMENT_MAGIC_ITEM_USE_CHOICE_LABEL
+  return `Use ${quantity} magic item choices`
+}
+
+export const EQUIPMENT_INVENTORY_ACQUIRED_THROUGH_LABEL = 'Acquired through'
+
+export const EQUIPMENT_INVENTORY_ADD_ANOTHER_LABEL = 'Add another'
+
+export function formatEquipmentInventoryManageHeadline(equipmentName: string): string {
+  return `Manage ${equipmentName}`
+}
+
+export type EquipmentPickerWorkflowMode = 'purchase' | 'magic_items'
 
 export const EQUIPMENT_PACKAGE_CUSTOMIZE_LABEL = 'Customize'
 
@@ -122,9 +203,28 @@ export const EQUIPMENT_INCLUDED_TOOL_RESOLVED_ANNOTATION = 'Selected for Tool Pr
 export const EQUIPMENT_INVALID_PROFICIENCY_LINK_MESSAGE =
   'The linked Tool Proficiency choice is unavailable. This class content must be corrected before the package can resolve.'
 
+export const EQUIPMENT_CLASS_OPTIONS_REPLACED_MESSAGE =
+  'Class starting options are replaced at this level.'
+
+export function formatEquipmentReplacedStartingWealthTitle(tierLabel?: string): string {
+  const label = tierLabel?.trim()
+  return label ? `${label} starting wealth` : 'Starting wealth'
+}
+
+/** Compact secondary lines for option cards / selected summary (tier + total). */
+export function startingEquipmentOptionFundingSummaryLines(
+  summary: Pick<StartingEquipmentOptionSummary, 'tierAdjustment' | 'totalStartingWealthLabel'>,
+): string[] {
+  const lines: string[] = []
+  if (summary.tierAdjustment) lines.push(summary.tierAdjustment.label)
+  if (summary.totalStartingWealthLabel) lines.push(summary.totalStartingWealthLabel)
+  return lines
+}
+
 export type EquipmentInventoryRemoveTarget =
   | { kind: 'package'; packageItemKey: string }
   | { kind: 'purchase'; purchaseId: string }
+  | { kind: 'magicItemGrant'; allowanceId: string; equipmentId: string }
 
 export type EquipmentInventoryQuantityTarget = {
   kind: 'purchase'
@@ -198,14 +298,20 @@ export function findStartingEquipmentChoiceSet(
   return choiceSets.find((choiceSet) => choiceSet.id === choiceSetId)
 }
 
-export function isStartingGoldOptionId(optionId: string): boolean {
-  return optionId === STARTING_EQUIPMENT_GOLD_OPTION_ID
-}
-
 export function hasGoldStartingEquipmentOption(
   summaries: readonly StartingEquipmentOptionSummary[],
+  characterClass?: CharacterClass,
 ): boolean {
-  return summaries.some((summary) => isStartingGoldOptionId(summary.optionId))
+  if (characterClass) {
+    return (
+      characterClass.characterCreation?.startingEquipment?.options.some(isStartingGoldOption) ??
+      false
+    )
+  }
+
+  return summaries.some(
+    (summary) => summary.wealth !== undefined && summary.orderedItems.length === 0,
+  )
 }
 
 export function hasSelectableStartingEquipmentOption(
@@ -218,68 +324,6 @@ export function shouldShowEquipmentFallback(
   summaries: readonly StartingEquipmentOptionSummary[],
 ): boolean {
   return summaries.length > 0 && !hasSelectableStartingEquipmentOption(summaries)
-}
-
-export function formatStartingEquipmentWealth(
-  wealth: StartingEquipmentOptionSummary['wealth'],
-): string | undefined {
-  if (!wealth) return undefined
-  return formatWealth({
-    cp: wealth.cp ?? 0,
-    sp: wealth.sp ?? 0,
-    gp: wealth.gp ?? 0,
-    pp: wealth.pp ?? 0,
-  })
-}
-
-function summarizeGrantItem(item: StartingEquipmentOptionSummaryGrant): string {
-  const quantity = item.quantity > 1 ? `${item.quantity}× ` : ''
-  const name = item.equipment?.name ?? item.equipmentSlug
-  const equipped = item.equipped ? ' (equipped)' : ''
-  return `${quantity}${name}${equipped}`
-}
-
-function summarizeChoiceItem(
-  item: Extract<StartingEquipmentOptionSummaryItem, { kind: 'choice' }>,
-): string {
-  return `${item.choose}× ${item.poolLabel}`
-}
-
-function summarizeProficiencyLinkedGrantItem(
-  item: Extract<StartingEquipmentOptionSummaryItem, { kind: 'proficiency_linked_grant' }>,
-): string {
-  if (item.status === 'invalid') {
-    return item.issue ?? `Invalid link to "${item.choiceLabel}"`
-  }
-  if (item.status === 'resolved' && item.resolvedEquipment) {
-    return item.resolvedEquipment.name
-  }
-  return `Selection from "${item.choiceLabel}"`
-}
-
-export function formatStartingEquipmentOptionMeta(
-  summary: StartingEquipmentOptionSummary,
-): string[] {
-  const meta: string[] = []
-
-  for (const group of Object.keys(
-    EQUIPMENT_INVENTORY_GROUP_LABELS,
-  ) as (keyof CharacterEquipment)[]) {
-    for (const item of summary.itemsByGroup[group]) {
-      if (item.kind === 'grant') {
-        meta.push(summarizeGrantItem(item))
-      } else if (item.kind === 'proficiency_linked_grant') {
-        meta.push(summarizeProficiencyLinkedGrantItem(item))
-      } else {
-        meta.push(summarizeChoiceItem(item))
-      }
-    }
-  }
-
-  const wealth = formatStartingEquipmentWealth(summary.wealth)
-  if (wealth) meta.push(wealth)
-
-  return meta
 }
 
 export function listNestedPoolsForOption(
@@ -410,14 +454,6 @@ export function readSelectedStartingEquipmentOption(
   return readSelectedStartingEquipmentOptionId(draft, classId)
 }
 
-/** @deprecated Use {@link formatSelectionSourceLabel} from `@rpg/contracts`. */
-export function formatEquipmentSourceLabel(
-  sources: CharacterSelectionSource[] | undefined,
-  catalogIndex: CharacterBuildCatalogIndex,
-): string {
-  return formatSelectionSourceLabel(sources, catalogIndex)
-}
-
 export function listEquipmentInventoryRows(
   inventory: CharacterEquipment,
   catalogIndex: CharacterBuildCatalogIndex,
@@ -435,7 +471,7 @@ export function listEquipmentInventoryRows(
         entry,
         equipment,
         equipmentName: equipment?.name ?? entry.equipmentId,
-        sourceLabel: formatEquipmentSourceLabel(entry.sources, catalogIndex),
+        sourceLabel: formatSelectionSourceLabel(entry.sources, catalogIndex),
         isStackable: equipment ? isEquipmentStackable(equipment) : false,
         quantityMode: 'locked',
         removeLabel: formatEquipmentInventoryRemoveLabel(
@@ -485,18 +521,11 @@ export function resolveStartingGoldPurchaseId(
   return resolveEquipmentPurchaseId(purchases, purchaseIndex)
 }
 
-export function resolveMaxAffordablePurchaseQuantity(args: {
-  equipment: Equipment
-  budget: EquipmentBudgetSummary
-  currentQuantity: number
-}): number {
-  return maxAffordableEquipmentQuantity(args.equipment, args.budget, args.currentQuantity)
-}
-
 export function buildEquipmentSkipPatch(): CharacterBuilderDraft['equipment'] {
   return {
     mode: 'package',
     purchases: [],
+    magicItemSelections: [],
     removedPackageItemKeys: [],
     customized: false,
     skipped: true,
@@ -509,9 +538,13 @@ export function buildEquipmentSelectionPatch(args: {
   optionId: string
   choiceSetId: string
   nestedSelections: CharacterBuilderDraft['choiceSelections']
+  characterClass: CharacterClass
 }): Partial<CharacterBuilderDraft> {
-  const { draft, optionId, choiceSetId, nestedSelections } = args
-  const isGold = isStartingGoldOptionId(optionId)
+  const { draft, optionId, choiceSetId, nestedSelections, characterClass } = args
+  const option = characterClass.characterCreation?.startingEquipment?.options.find(
+    (entry) => entry.id === optionId,
+  )
+  const mode = option ? resolveEquipmentModeFromOption(option) : 'package'
 
   return {
     choiceSelections: {
@@ -520,8 +553,9 @@ export function buildEquipmentSelectionPatch(args: {
       [choiceSetId]: [optionId],
     },
     equipment: {
-      mode: isGold ? 'gold' : 'package',
+      mode,
       purchases: draft.equipment?.purchases ?? [],
+      magicItemSelections: draft.equipment?.magicItemSelections ?? [],
       removedPackageItemKeys: [],
       customized: draft.equipment?.customized ?? false,
       skipped: false,
@@ -539,12 +573,15 @@ export function shouldShowEquipmentBudget(
 export function shouldShowEquipmentShopping(
   draft: CharacterBuilderDraft,
   selectedOptionId: string | undefined,
+  characterClass?: CharacterClass,
 ): boolean {
-  return (
-    selectedOptionId !== undefined &&
-    isStartingGoldOptionId(selectedOptionId) &&
-    !draft.equipment?.skipped
+  if (selectedOptionId === undefined || draft.equipment?.skipped) return false
+
+  const option = characterClass?.characterCreation?.startingEquipment?.options.find(
+    (entry) => entry.id === selectedOptionId,
   )
+
+  return option !== undefined && isStartingGoldOption(option)
 }
 
 export function resolvePurchaseSourceMode(): CharacterBuilderDraftEquipmentPurchase['sourceMode'] {
@@ -554,10 +591,19 @@ export function resolvePurchaseSourceMode(): CharacterBuilderDraftEquipmentPurch
 export function resolveEquipmentStepBudget(
   draft: CharacterBuilderDraft,
   catalogIndex: CharacterBuildCatalogIndex,
+  context?: CharacterBuildContext,
 ): EquipmentBudgetSummary | undefined {
-  return deriveEquipmentBudgetSummary(draft, catalogIndex)
+  return deriveEquipmentBudgetSummary(draft, catalogIndex, {
+    startingWealth: context?.characterCreationRules.startingWealth,
+  })
 }
 
+/**
+ * Equipment budget is resolved once per step state via {@link resolveEquipmentStepBudget}.
+ * Picker rows, filtering, quantity limits, purchase validation, and displayed budget copy
+ * must consume the same `EquipmentBudgetSummary`; lower-level picker resolvers must not
+ * independently reconstruct campaign wealth.
+ */
 export type EquipmentStepPickerItemsResult = {
   items: EquipmentPickerItem[]
   browseSortContext: EquipmentPickerBrowseSortContext
@@ -568,15 +614,16 @@ export function resolveEquipmentStepPickerItems(args: {
   characterClass: CharacterClass
   catalogIndex: CharacterBuildCatalogIndex
   choiceSets: readonly ChoiceSet[]
+  /** Resolved via `resolveEquipmentStepBudget` — must match drawer/header/purchase validation. */
+  budget?: EquipmentBudgetSummary
 }): EquipmentStepPickerItemsResult {
-  const { draft, characterClass, catalogIndex, choiceSets } = args
+  const { draft, characterClass, catalogIndex, choiceSets, budget } = args
   const proficiencies = assembleCharacterProficiencies(
     draft,
     catalogIndex,
     choiceSets,
     characterClass,
   )
-  const budget = deriveEquipmentBudgetSummary(draft, catalogIndex)
   const recommendations = deriveEquipmentRecommendations({
     characterClass,
     catalogIndex,
@@ -813,7 +860,7 @@ function purchaseRowFromEntry(args: {
   const sourceLabel =
     packageOptionLabel !== undefined
       ? formatPackageGrantSourceLabel(packageOptionLabel, entry.quantity)
-      : formatEquipmentSourceLabel(entry.sources, catalogIndex)
+      : formatSelectionSourceLabel(entry.sources, catalogIndex)
 
   return buildInventoryRowPresentation({
     entry,
@@ -904,24 +951,17 @@ function listPurchaseInventoryRows(args: {
   })
 }
 
-function canAddEquipmentPurchase(args: {
+function canIncreasePurchaseQuantity(args: {
   equipment: Equipment
   draft: CharacterBuilderDraft
-  catalogIndex: CharacterBuildCatalogIndex
   equipmentId: string
   sourceMode: CharacterBuilderDraftEquipmentPurchase['sourceMode']
   quantity: number
   budget?: EquipmentBudgetSummary
 }): boolean {
-  const { equipment, draft, catalogIndex, equipmentId, sourceMode, quantity, budget } = args
+  const { equipment, draft, equipmentId, sourceMode, quantity, budget } = args
   if (sourceMode === 'manual') return false
   if (quantity < 1) return false
-
-  if (!isEquipmentStackable(equipment)) {
-    if (quantity !== 1) return false
-    if (readEquipmentPurchaseQuantity(draft, equipmentId, sourceMode) > 0) return false
-    if (isUniqueEquipmentOwnedInDraft(draft, catalogIndex, equipmentId)) return false
-  }
 
   const currentQuantity = readEquipmentPurchaseQuantity(draft, equipmentId, sourceMode)
   const limits = resolveEquipmentPurchaseQuantityLimits({
@@ -932,17 +972,344 @@ function canAddEquipmentPurchase(args: {
     isPurchaseRow: true,
   })
 
-  if (budget && wealthToCopper(budget.starting) > 0) {
-    return currentQuantity + quantity <= limits.max
+  return currentQuantity + quantity <= limits.max
+}
+
+function listMagicItemGrantInventoryRows(args: {
+  draft: CharacterBuilderDraft
+  catalogIndex: CharacterBuildCatalogIndex
+  context: CharacterBuildContext
+}): EquipmentInventoryRow[] {
+  const { draft, catalogIndex, context } = args
+  const acquisition = resolveMagicItemAcquisitionState({
+    draft,
+    context,
+    catalogIndex,
+  })
+
+  const allowanceById = new Map(acquisition.allowances.map((entry) => [entry.id, entry]))
+  const selections = readMagicItemSelections(draft)
+
+  return selections.flatMap((selection) => {
+    const allowance = allowanceById.get(selection.allowanceId)
+    const equipment = catalogIndex.equipment.get(selection.equipmentId)
+    if (!allowance || !equipment) return []
+
+    const entry: CharacterEquipmentEntry = {
+      equipmentId: selection.equipmentId,
+      quantity: selection.quantity,
+      sources: [
+        {
+          kind: 'startingWealthTier',
+          sourceId: allowance.source.sourceId,
+          grantId: selection.allowanceId,
+        },
+      ],
+    }
+
+    return [
+      {
+        group: 'magicItems' as const,
+        groupLabel: EQUIPMENT_INVENTORY_GROUP_LABELS.magicItems,
+        entry,
+        equipment,
+        equipmentName: equipment.name,
+        sourceLabel: `${getMagicItemRarityLabel(allowance.rarity)} choice`,
+        isStackable: isEquipmentStackable(equipment),
+        quantityMode: 'locked' as const,
+        removeLabel: `${EQUIPMENT_MAGIC_ITEM_RELEASE_LABEL} ${equipment.name}`,
+        removeTarget: {
+          kind: 'magicItemGrant' as const,
+          allowanceId: selection.allowanceId,
+          equipmentId: selection.equipmentId,
+        },
+      },
+    ]
+  })
+}
+
+export function resolveEquipmentAcquisitionContext(args: {
+  context: CharacterBuildContext
+  catalogIndex: CharacterBuildCatalogIndex
+}) {
+  return resolveEquipmentAcquisitionBuilderContext({
+    context: args.context,
+    catalogIndex: args.catalogIndex,
+    startingWealthTableId: standardStartingWealthTableId(args.context.rulesetId),
+  })
+}
+
+export function resolveEquipmentStepAcquisitionState(args: {
+  draft: CharacterBuilderDraft
+  context: CharacterBuildContext
+  catalogIndex: CharacterBuildCatalogIndex
+}) {
+  return resolveMagicItemAcquisitionState({
+    draft: args.draft,
+    context: args.context,
+    catalogIndex: args.catalogIndex,
+  })
+}
+
+export function shouldShowMagicItemGrants(
+  acquisition: ReturnType<typeof resolveMagicItemAcquisitionState>,
+): boolean {
+  return acquisition.allowances.length > 0
+}
+
+export function shouldShowEquipmentPurchaseWorkflow(
+  draft: CharacterBuilderDraft,
+  selectedOptionId: string | undefined,
+  budget?: EquipmentBudgetSummary,
+): boolean {
+  if (selectedOptionId === undefined || draft.equipment?.skipped) return false
+  if (!budget) return false
+  return wealthToCopper(budget.starting) > 0
+}
+
+export function resolveEquipmentPickerWorkflowModes(args: {
+  showPurchase: boolean
+  showMagicItems: boolean
+}): EquipmentPickerWorkflowMode[] {
+  const modes: EquipmentPickerWorkflowMode[] = []
+  if (args.showPurchase) modes.push('purchase')
+  if (args.showMagicItems) modes.push('magic_items')
+  return modes
+}
+
+export function formatMagicItemGrantProgressLabel(
+  progress: ReturnType<typeof resolveMagicItemGrantProgressList>,
+): string {
+  if (progress.length === 0) return ''
+
+  const parts = progress.map(
+    (entry) => `${entry.selected}/${entry.capacity} ${getMagicItemRarityLabel(entry.rarity)}`,
+  )
+  return parts.join(' · ')
+}
+
+export function resolveEquipmentOwnedQuantity(args: {
+  equipmentId: string
+  draft: CharacterBuilderDraft
+}): number {
+  const grantQuantity = readMagicItemGrantQuantity(args.draft, args.equipmentId)
+  const purchaseQuantity = (args.draft.equipment?.purchases ?? [])
+    .filter((row) => row.equipmentId === args.equipmentId)
+    .reduce((sum, row) => sum + row.quantity, 0)
+
+  return grantQuantity + purchaseQuantity
+}
+
+export function isMagicItemPickerItemVisible(args: {
+  equipment: Equipment
+  draft: CharacterBuilderDraft
+  context: ReturnType<typeof resolveEquipmentAcquisitionContext>
+  focusedAllowanceId?: string
+}): boolean {
+  const { equipment, draft, context, focusedAllowanceId } = args
+  if (equipment.kind !== 'magic_item' || !equipment.rarity) return false
+
+  if (resolveEquipmentOwnedQuantity({ equipmentId: equipment.id, draft }) > 0) return true
+
+  if (!focusedAllowanceId) return true
+
+  const focusedRarity = focusedAllowanceId.split(':').at(-1)
+  if (focusedRarity && equipment.rarity !== focusedRarity) return false
+
+  const eligibility = resolveMagicItemGrantEligibility({
+    equipment,
+    draft,
+    context,
+    focusedAllowanceId,
+  })
+
+  if (eligibility.eligible) return true
+  if (eligibility.reason === 'allowance_full') return true
+
+  return false
+}
+
+export function buildMagicItemAcquisitionPatch(args: {
+  draft: CharacterBuilderDraft
+  context: CharacterBuildContext
+  catalogIndex: CharacterBuildCatalogIndex
+  equipmentId: string
+  requestedQuantity: number
+}): Partial<CharacterBuilderDraft> | undefined {
+  const { draft, context, catalogIndex, equipmentId, requestedQuantity } = args
+  const equipment = catalogIndex.equipment.get(equipmentId)
+  if (!equipment) return undefined
+
+  const result = applyMagicItemAcquisitionIntent({
+    draft,
+    context: resolveEquipmentAcquisitionContext({ context, catalogIndex }),
+    equipment,
+    requestedQuantity,
+  })
+
+  if (!result.applied) return undefined
+  return { equipment: result.draft.equipment }
+}
+
+export function buildEquipmentPurchaseIntentPatch(args: {
+  draft: CharacterBuilderDraft
+  context: CharacterBuildContext
+  catalogIndex: CharacterBuildCatalogIndex
+  equipmentId: string
+  requestedQuantity: number
+}): Partial<CharacterBuilderDraft> | undefined {
+  const { draft, context, catalogIndex, equipmentId, requestedQuantity } = args
+  const equipment = catalogIndex.equipment.get(equipmentId)
+  if (!equipment) return undefined
+
+  const result = applyEquipmentPurchaseIntent({
+    draft,
+    context: resolveEquipmentAcquisitionContext({ context, catalogIndex }),
+    equipment,
+    requestedQuantity,
+  })
+
+  if (!result.applied) return undefined
+  return { equipment: result.draft.equipment }
+}
+
+export function buildMagicItemGrantReleasePatch(args: {
+  draft: CharacterBuilderDraft
+  allowanceId: string
+  equipmentId: string
+  quantity: number
+}): Partial<CharacterBuilderDraft> | undefined {
+  const { draft, allowanceId, equipmentId, quantity } = args
+  const selections = readMagicItemSelections(draft)
+  const existing = selections.find(
+    (row) => row.allowanceId === allowanceId && row.equipmentId === equipmentId,
+  )
+
+  if (!existing) return undefined
+
+  if (quantity >= existing.quantity) {
+    return buildEquipmentRemoveEntryPatch({
+      draft,
+      target: { kind: 'magicItemGrant', allowanceId, equipmentId },
+    })
   }
 
-  return currentQuantity + quantity <= limits.max
+  const current = draft.equipment
+  if (!current) return undefined
+
+  return {
+    equipment: {
+      ...current,
+      magicItemSelections: upsertMagicItemGrantSelection({
+        selections,
+        allowanceId,
+        equipmentId,
+        quantity: existing.quantity - quantity,
+      }),
+    },
+  }
+}
+
+export function buildMagicItemPurchaseRemovalPatch(args: {
+  draft: CharacterBuilderDraft
+  catalogIndex: CharacterBuildCatalogIndex
+  purchaseId: string
+  quantity: number
+  budget?: EquipmentBudgetSummary
+}): Partial<CharacterBuilderDraft> | undefined {
+  const { draft, catalogIndex, purchaseId, quantity, budget } = args
+  const current = draft.equipment
+  if (!current) return undefined
+
+  const purchaseIndex = resolveEquipmentPurchaseIndex(current.purchases, purchaseId)
+  if (purchaseIndex === undefined) return undefined
+
+  const purchase = current.purchases[purchaseIndex]
+  if (!purchase) return undefined
+
+  if (quantity >= purchase.quantity) {
+    return buildEquipmentRemoveEntryPatch({
+      draft,
+      target: { kind: 'purchase', purchaseId },
+    })
+  }
+
+  return buildEquipmentSetPurchaseQuantityPatch({
+    draft,
+    catalogIndex,
+    purchaseId,
+    quantity: purchase.quantity - quantity,
+    budget,
+  })
+}
+
+export function readMagicItemGrantSelection(args: {
+  draft: CharacterBuilderDraft
+  allowanceId: string
+  equipmentId: string
+}): { quantity: number } | undefined {
+  const selection = readMagicItemSelections(args.draft).find(
+    (row) => row.allowanceId === args.allowanceId && row.equipmentId === args.equipmentId,
+  )
+
+  if (!selection) return undefined
+  return { quantity: selection.quantity }
+}
+
+export function previewMagicItemAcquisitionPlan(args: {
+  draft: CharacterBuilderDraft
+  context: CharacterBuildContext
+  catalogIndex: CharacterBuildCatalogIndex
+  equipmentId: string
+  requestedQuantity: number
+}) {
+  const equipment = args.catalogIndex.equipment.get(args.equipmentId)
+  if (!equipment) return undefined
+
+  return resolveEquipmentAcquisitionPlan({
+    draft: args.draft,
+    context: resolveEquipmentAcquisitionContext({
+      context: args.context,
+      catalogIndex: args.catalogIndex,
+    }),
+    equipment,
+    requestedQuantity: args.requestedQuantity,
+  })
+}
+
+export function readMagicItemGrantQuantity(
+  draft: CharacterBuilderDraft,
+  equipmentId: string,
+): number {
+  return totalSelectedForEquipment(readMagicItemSelections(draft), equipmentId)
+}
+
+export function formatAggregatedInventoryProvenance(
+  draft: CharacterBuilderDraft,
+  _catalogIndex: CharacterBuildCatalogIndex,
+  _context: CharacterBuildContext,
+  equipmentId: string,
+): string | undefined {
+  const grantQty = readMagicItemGrantQuantity(draft, equipmentId)
+  const purchaseQty = readEquipmentPurchaseQuantity(draft, equipmentId, 'startingGold')
+  if (grantQty === 0 && purchaseQty === 0) return undefined
+
+  const parts: string[] = []
+  if (grantQty > 0) parts.push(`${grantQty} grant choice`)
+  if (purchaseQty > 0) parts.push(`${purchaseQty} purchased`)
+
+  return formatInventorySourceSummary([
+    ...(grantQty > 0 ? [{ kind: 'startingWealthTier' as const, quantity: grantQty }] : []),
+    ...(purchaseQty > 0 ? [{ kind: 'startingGold' as const, quantity: purchaseQty }] : []),
+  ])
 }
 
 /** Lists inventory rows with removal targets derived from draft decisions. */
 export function listEquipmentInventoryRowsFromDraft(
   draft: CharacterBuilderDraft,
   catalogIndex: CharacterBuildCatalogIndex,
+  budget?: EquipmentBudgetSummary,
+  context?: CharacterBuildContext,
 ): EquipmentInventoryRow[] {
   const classId = draft.class.classId
   if (!classId) return []
@@ -955,25 +1322,38 @@ export function listEquipmentInventoryRowsFromDraft(
   const option = startingEquipment.options.find((entry) => entry.id === selectedOptionId)
   if (!option) return []
 
-  const budget = deriveEquipmentBudgetSummary(draft, catalogIndex)
-
-  const packageRows =
-    draft.equipment?.mode === 'gold'
-      ? []
-      : listPackageInventoryRows({
-          draft,
-          catalogIndex,
-          characterClass,
-          option,
-          classId,
-          selectedOptionId,
-          budget,
-        })
+  const packageRows = isStartingGoldOption(option)
+    ? []
+    : listPackageInventoryRows({
+        draft,
+        catalogIndex,
+        characterClass,
+        option,
+        classId,
+        selectedOptionId,
+        budget,
+      })
 
   return [
     ...packageRows,
+    ...(context ? listMagicItemGrantInventoryRows({ draft, catalogIndex, context }) : []),
     ...listPurchaseInventoryRows({ draft, catalogIndex, classId, selectedOptionId, budget }),
   ]
+}
+
+export function listEquipmentInventoryRowsForEquipment(args: {
+  equipmentId: string
+  draft: CharacterBuilderDraft
+  catalogIndex: CharacterBuildCatalogIndex
+  budget?: EquipmentBudgetSummary
+  context?: CharacterBuildContext
+}): EquipmentInventoryRow[] {
+  return listEquipmentInventoryRowsFromDraft(
+    args.draft,
+    args.catalogIndex,
+    args.budget,
+    args.context,
+  ).filter((row) => row.entry.equipmentId === args.equipmentId)
 }
 
 function upsertEquipmentPurchase(args: {
@@ -1001,15 +1381,34 @@ function upsertEquipmentPurchase(args: {
   })
 }
 
+function resolveCachedEquipmentMode(
+  draft: CharacterBuilderDraft,
+  catalogIndex: CharacterBuildCatalogIndex,
+): NonNullable<CharacterBuilderDraft['equipment']>['mode'] {
+  if (draft.equipment?.mode) return draft.equipment.mode
+
+  const classId = draft.class.classId
+  if (!classId) return 'package'
+
+  const selectedOptionId = readSelectedStartingEquipmentOptionId(draft, classId)
+  const characterClass = catalogIndex.classes.get(classId)
+  const option = characterClass?.characterCreation?.startingEquipment?.options.find(
+    (entry) => entry.id === selectedOptionId,
+  )
+
+  return option ? resolveEquipmentModeFromOption(option) : 'package'
+}
+
 function buildEquipmentDraftFromPurchase(args: {
   draft: CharacterBuilderDraft
+  catalogIndex: CharacterBuildCatalogIndex
   purchases: CharacterBuilderDraftEquipmentPurchase[]
   sourceMode: CharacterBuilderDraftEquipmentPurchase['sourceMode']
 }): CharacterBuilderDraft['equipment'] {
-  const { draft, purchases, sourceMode } = args
+  const { draft, catalogIndex, purchases, sourceMode } = args
 
   return {
-    mode: draft.equipment?.mode ?? (sourceMode === 'startingGold' ? 'gold' : 'package'),
+    mode: resolveCachedEquipmentMode(draft, catalogIndex),
     purchases,
     removedPackageItemKeys: draft.equipment?.removedPackageItemKeys ?? [],
     customized: sourceMode === 'manual' ? true : (draft.equipment?.customized ?? false),
@@ -1023,18 +1422,30 @@ export function buildEquipmentAddPurchasePatch(args: {
   equipmentId: string
   sourceMode: CharacterBuilderDraftEquipmentPurchase['sourceMode']
   quantity?: number
+  /** Resolved via `resolveEquipmentStepBudget` when tier bonus or campaign wealth applies. */
+  budget?: EquipmentBudgetSummary
+  context?: CharacterBuildContext
 }): Partial<CharacterBuilderDraft> | undefined {
-  const { draft, catalogIndex, equipmentId, sourceMode, quantity = 1 } = args
-  const equipment = catalogIndex.equipment.get(equipmentId)
+  const { draft, catalogIndex, equipmentId, sourceMode, quantity = 1, context } = args
 
-  const budget = deriveEquipmentBudgetSummary(draft, catalogIndex)
+  if (sourceMode === 'startingGold' && context) {
+    return buildEquipmentPurchaseIntentPatch({
+      draft,
+      context,
+      catalogIndex,
+      equipmentId,
+      requestedQuantity: quantity,
+    })
+  }
+
+  const { budget } = args
+  const equipment = catalogIndex.equipment.get(equipmentId)
 
   if (
     !equipment ||
-    !canAddEquipmentPurchase({
+    !canIncreasePurchaseQuantity({
       equipment,
       draft,
-      catalogIndex,
       equipmentId,
       sourceMode,
       quantity,
@@ -1047,6 +1458,7 @@ export function buildEquipmentAddPurchasePatch(args: {
   return {
     equipment: buildEquipmentDraftFromPurchase({
       draft,
+      catalogIndex,
       sourceMode,
       purchases: upsertEquipmentPurchase({
         purchases: [...(draft.equipment?.purchases ?? [])],
@@ -1064,8 +1476,10 @@ export function buildEquipmentSetPurchaseQuantityPatch(args: {
   catalogIndex: CharacterBuildCatalogIndex
   purchaseId: string
   quantity: number
+  /** Resolved via `resolveEquipmentStepBudget` when tier bonus or campaign wealth applies. */
+  budget?: EquipmentBudgetSummary
 }): Partial<CharacterBuilderDraft> | undefined {
-  const { draft, catalogIndex, purchaseId, quantity } = args
+  const { draft, catalogIndex, purchaseId, quantity, budget } = args
   const current = draft.equipment
   if (!current) return undefined
 
@@ -1080,7 +1494,6 @@ export function buildEquipmentSetPurchaseQuantityPatch(args: {
 
   if (quantity < 1) return undefined
 
-  const budget = deriveEquipmentBudgetSummary(draft, catalogIndex)
   const limits = resolveEquipmentPurchaseQuantityLimits({
     equipment,
     sourceMode: purchase.sourceMode,
@@ -1119,6 +1532,14 @@ export function buildEquipmentRemoveEntryPatch(args: {
 
   if (target.kind === 'package') {
     return { equipment: current }
+  }
+
+  if (target.kind === 'magicItemGrant') {
+    const next = reconcileMagicItemSelections({
+      draft,
+      remove: [{ allowanceId: target.allowanceId, equipmentId: target.equipmentId }],
+    })
+    return { equipment: next.equipment }
   }
 
   const purchaseIndex = resolveEquipmentPurchaseIndex(current.purchases, target.purchaseId)

@@ -1,9 +1,18 @@
-import type { GameTermEntry } from '../types'
+import type { GameTermEntry, VocabularyTerm } from '../types'
 import { vocabEnumFromEntries } from '../enum-schema'
 
 // ---------------------------------------------------------------------------
 // Equipment kind — discriminant for the unified equipment catalog content type.
 // ---------------------------------------------------------------------------
+
+export const EQUIPMENT_KIND_TERM = {
+  label: 'Equipment Kind',
+  description: 'The top-level type of an equipment catalog item.',
+  sentence: {
+    singular: 'equipment kind',
+    plural: 'equipment kinds',
+  },
+} as const satisfies VocabularyTerm
 
 export const EQUIPMENT_KIND_ENTRIES = {
   weapon: {

@@ -4,6 +4,8 @@ import {
   ABILITY_IDS,
   ARMOR_CATEGORIES,
   ARMOR_CATEGORY_ENTRIES,
+  getProficiencyDomainCompactLabel,
+  getProficiencyDomainSentenceForm,
   TOOL_CATEGORIES,
   TOOL_CATEGORY_ENTRIES,
   WEAPON_CATEGORIES,
@@ -159,13 +161,13 @@ export function proficienciesFields(ctx: ContentFormCtx): FormItem[] {
     },
     {
       kind: 'group',
-      legend: 'Granted skills & tools',
+      legend: `Granted ${getProficiencyDomainCompactLabel('skill').toLowerCase()} & tools`,
       fieldsChrome: { variant: 'outline' },
       fields: [
         {
           type: 'chips',
           name: 'proficiencies.skills.items',
-          label: 'Granted skill proficiencies',
+          label: `Granted ${getProficiencyDomainSentenceForm('skill', 2)}`,
           chrome: { variant: 'panel' },
           options: skillOptions,
         },

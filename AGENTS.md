@@ -58,6 +58,11 @@ coverage from `pnpm coverage` via `--coverage ./coverage/coverage-final.json`
 
 Any string literal used in 2+ places → extract to a named constant.
 
+Closed vocabulary maps in `@rpg/contracts` use a two-layer pattern: `*_TERM`
+(the set concept) plus `*_ENTRIES` (per-value labels). New `*_ENTRIES` maps
+require a sibling `*_TERM` — see
+[packages/contracts/docs/structure.md](packages/contracts/docs/structure.md#reference-vocabulary-gametermentry).
+
 ## Storybook (dashboard)
 
 No nested routers in `*.stories.tsx` (preview provides `MemoryRouter`) — [.cursor/rules/storybook-router.mdc](.cursor/rules/storybook-router.mdc). Port **6007**; primitives → `@rpg/ui` Storybook (`:6006`).

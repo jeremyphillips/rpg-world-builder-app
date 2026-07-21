@@ -32,7 +32,7 @@ const lockedPackageGrantRow: EquipmentInventoryRow = {
       {
         kind: 'classStartingEquipment',
         sourceId: 'srd-cc-5.2.1:bard',
-        grantId: 'standard',
+        grantId: 'standard-equipment',
       },
     ],
   },
@@ -41,7 +41,7 @@ const lockedPackageGrantRow: EquipmentInventoryRow = {
   isStackable: false,
   quantityMode: 'locked',
   removeLabel: 'Remove all 2 Dagger',
-  removeTarget: { kind: 'package', packageItemKey: 'srd-cc-5.2.1:bard:standard:0' },
+  removeTarget: { kind: 'package', packageItemKey: 'srd-cc-5.2.1:bard:standard-equipment:0' },
 }
 
 const meta = {

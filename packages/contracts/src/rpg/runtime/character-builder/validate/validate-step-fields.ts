@@ -2,6 +2,8 @@ import { ABILITY_IDS, ABILITY_SCORE_MIN, CHARACTER_ABILITY_SCORE_MAX } from '../
 import { abilityValidationMessages } from '../../../vocab/ability-messages'
 import { isStandardArrayAssignment } from '../ability-generation'
 import { characterBuilderValidationMessages } from '../character-builder-messages'
+import { validateBuilderCharacterLevel } from '../builder-level'
+import type { CharacterBuildContext } from '../context'
 import type { CharacterBuilderDraft } from '../draft'
 
 import { validationIssue } from './issue'
@@ -49,15 +51,33 @@ export function validateSpecies(draft: CharacterBuilderDraft): CharacterBuildVal
   ]
 }
 
-export function validateClass(draft: CharacterBuilderDraft): CharacterBuildValidationIssue[] {
-  if (draft.class.classId) return []
+export function validateClass(
+  draft: CharacterBuilderDraft,
+  context?: CharacterBuildContext,
+): CharacterBuildValidationIssue[] {
+  const issues: CharacterBuildValidationIssue[] = []
 
-  return [
-    validationIssue('class_required', characterBuilderValidationMessages.classRequired(), {
-      path: 'class.classId',
-      stepId: 'class',
-    }),
-  ]
+  if (!draft.class.classId) {
+    issues.push(
+      validationIssue('class_required', characterBuilderValidationMessages.classRequired(), {
+        path: 'class.classId',
+        stepId: 'class',
+      }),
+    )
+  }
+
+  if (context) {
+    issues.push(
+      ...validateBuilderCharacterLevel({
+        level: draft.class.level,
+        characterKind: context.characterKind,
+        rulesScope: context.rulesScope,
+        characterCreationRules: context.characterCreationRules,
+      }),
+    )
+  }
+
+  return issues
 }
 
 export function validateAbilities(

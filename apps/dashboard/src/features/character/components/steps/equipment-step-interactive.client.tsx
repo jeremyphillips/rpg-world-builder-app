@@ -10,6 +10,7 @@ import {
   buildEquipmentSkipPatch,
 } from '../../lib/equipment-step.lib'
 import { showsBuilderStepReviewMessage } from '../../lib/builder-step-readiness.lib'
+import { EquipmentAcquisitionGuidance } from '../equipment/equipment-acquisition-guidance.client'
 import { EquipmentPackageSwitchResolutionModal } from '../equipment/equipment-package-switch-resolution-modal.client'
 import { EquipmentPickerDrawer } from '../equipment/equipment-picker-drawer.client'
 import { StartingEquipmentOptionSection } from '../equipment/starting-equipment-option-section.client'
@@ -17,11 +18,12 @@ import { equipmentStepSwitchConfirmHeadlineClasses } from './equipment-step-inte
 import {
   EquipmentStepFallback,
   EquipmentStepInventorySection,
-  EquipmentStepShoppingSection,
+  EquipmentStepReplacedClassOptionsNotice,
 } from './equipment-step-sections.client'
 import { BuilderStepReadinessPanel } from './builder-step-readiness-panel.client'
 import type { EquipmentStepProps } from './equipment-step.types'
 import type { useEquipmentStep } from './use-equipment-step.client'
+import { useEquipmentPickerAcquisition } from './use-equipment-picker-acquisition.client'
 
 type EquipmentStepInteractiveProps = Pick<EquipmentStepProps, 'draft' | 'onDraftChange'> & {
   step: ReturnType<typeof useEquipmentStep>
@@ -44,7 +46,6 @@ export function EquipmentStepInteractive({
     showBudget,
     showShopping,
     budget,
-    pickerItems,
     pickerBrowseSortContext,
     characterPreviewContext,
     ownedPurchaseQuantities,
@@ -59,7 +60,6 @@ export function EquipmentStepInteractive({
     pickerOpen,
     setPickerOpen,
     requestSelection,
-    openPicker,
     handleAddItem,
     handleSetPurchaseQuantity,
     handleRemoveFromInventory,
@@ -71,6 +71,21 @@ export function EquipmentStepInteractive({
     resolvedChoiceSets,
   } = step
 
+  const pickerAcquisition = useEquipmentPickerAcquisition({
+    draft,
+    context: step.context,
+    catalogIndex: step.catalogIndex,
+    budget,
+    showBudget: Boolean(showBudget),
+    focusedAllowanceId: step.focusedAllowanceId,
+    onDraftChange,
+  })
+
+  const showAcquisitionGuidance =
+    selectedOptionId !== undefined &&
+    !showFallback &&
+    (step.showPurchaseWorkflow || step.showMagicItemGrants)
+
   return (
     <>
       <div className="space-y-8">
@@ -78,7 +93,9 @@ export function EquipmentStepInteractive({
           <BuilderStepReadinessPanel state={readiness} />
         ) : null}
 
-        {showFallback ? (
+        {step.classOptionsReplaced ? (
+          <EquipmentStepReplacedClassOptionsNotice tierLabel={step.tierLabel} />
+        ) : showFallback ? (
           <EquipmentStepFallback
             onContinueWithout={() => onDraftChange({ equipment: buildEquipmentSkipPatch() })}
           />
@@ -99,18 +116,32 @@ export function EquipmentStepInteractive({
           />
         ) : null}
 
-        {showBudget && budget ? <EquipmentStepShoppingSection budget={budget} /> : null}
+        {showAcquisitionGuidance ? (
+          <EquipmentAcquisitionGuidance
+            showPurchaseWorkflow={step.showPurchaseWorkflow}
+            budget={budget}
+            onOpenPurchasePicker={() => step.openPicker('purchase')}
+            showMagicItemGrants={step.showMagicItemGrants}
+            magicItemProgress={step.acquisition.progress}
+            onOpenMagicItemsPicker={() => step.openPicker('magic_items')}
+          />
+        ) : null}
 
         <EquipmentStepInventorySection
           draft={draft}
           catalogIndex={catalogIndex}
+          context={step.context}
+          budget={budget}
+          goldOptionFunding={step.goldOptionFunding}
+          classOptionPolicy={step.classOptionPolicy}
           conversionEditorOpen={step.conversionEditorOpen}
           selectedPackageItemKeys={step.selectedPackageItemKeys}
           conversionCommitStatusMessage={step.conversionCommitStatusMessage}
           onRemoveItem={onRemoveItem}
           onSetPurchaseQuantity={handleSetPurchaseQuantity}
-          showBrowseEquipment={showBudget}
-          onOpenPicker={openPicker}
+          onReleaseGrant={pickerAcquisition.handleReleaseGrant}
+          onRemovePurchase={pickerAcquisition.handleRemovePurchase}
+          onApplyMagicItemAcquisition={pickerAcquisition.handleApplyMagicItemAcquisition}
           onCustomizePackage={() => step.openConversionEditor()}
           onChangeEquipmentOption={() => {
             step.expandPackageChooser()
@@ -129,14 +160,29 @@ export function EquipmentStepInteractive({
       <EquipmentPickerDrawer
         open={pickerOpen}
         onOpenChange={setPickerOpen}
-        items={pickerItems}
+        items={step.pickerItems}
         browseSortContext={pickerBrowseSortContext}
-        budget={budget}
-        defaultTab="recommended"
+        budget={step.pickerWorkflowMode === 'purchase' ? budget : undefined}
         showCharacterPreview
         characterPreviewContext={characterPreviewContext}
         ownedPurchaseQuantities={ownedPurchaseQuantities}
+        ownedGrantQuantities={step.ownedGrantQuantities}
+        workflowMode={step.pickerWorkflowMode}
+        workflowModes={step.pickerWorkflowModes}
+        onWorkflowModeChange={step.setPickerWorkflowMode}
+        magicItemGrantProgress={step.showMagicItemGrants ? step.acquisition.progress : undefined}
+        focusedAllowanceId={step.focusedAllowanceId}
+        onFocusedAllowanceIdChange={step.setFocusedAllowanceId}
         isGoldShoppingPath={showShopping}
+        resolveRowActionViewModel={pickerAcquisition.resolveRowActionViewModel}
+        resolveGrantManageSources={pickerAcquisition.resolveGrantManageSources}
+        draft={draft}
+        context={step.context}
+        catalogIndex={catalogIndex}
+        onApplyMagicItemAcquisition={pickerAcquisition.handleApplyMagicItemAcquisition}
+        onApplyPurchase={pickerAcquisition.handleApplyPurchase}
+        onReleaseGrant={pickerAcquisition.handleReleaseGrant}
+        onRemovePurchase={pickerAcquisition.handleRemovePurchase}
         onAddItem={handleAddItem}
         onRemoveFromInventory={handleRemoveFromInventory}
         onRemoveOneFromInventory={handleRemoveOneFromInventory}

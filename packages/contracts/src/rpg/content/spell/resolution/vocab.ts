@@ -1,8 +1,17 @@
-import type { GameTermEntry } from '../../../vocab/types'
+import type { GameTermEntry, VocabularyTerm } from '../../../vocab/types'
 
 // ---------------------------------------------------------------------------
 // Spell resolution vocabulary — closed sets for the resolution envelope MVP.
 // ---------------------------------------------------------------------------
+
+export const SPELL_RESOLUTION_TARGET_KIND_TERM = {
+  label: 'Resolution Target',
+  description: 'What kind of entity a spell resolution step can target.',
+  sentence: {
+    singular: 'resolution target',
+    plural: 'resolution targets',
+  },
+} as const satisfies VocabularyTerm
 
 export const SPELL_RESOLUTION_TARGET_KIND_ENTRIES = {
   creature: {
@@ -42,6 +51,15 @@ export function getSpellResolutionTargetKindNoun(kind: SpellResolutionTargetKind
   }
 }
 
+export const SPELL_RESOLUTION_ATTACK_TYPE_TERM = {
+  label: 'Resolution Attack Type',
+  description: 'How a spell attack roll is resolved against a target.',
+  sentence: {
+    singular: 'resolution attack type',
+    plural: 'resolution attack types',
+  },
+} as const satisfies VocabularyTerm
+
 export const SPELL_RESOLUTION_ATTACK_TYPE_ENTRIES = {
   'melee-spell': {
     label: 'Melee spell attack',
@@ -61,6 +79,15 @@ export const SPELL_RESOLUTION_ATTACK_TYPES = Object.keys(SPELL_RESOLUTION_ATTACK
   SpellResolutionAttackType,
   ...SpellResolutionAttackType[],
 ]
+
+export const SPELL_RESOLUTION_OUTCOME_RESULT_TERM = {
+  label: 'Resolution Outcome',
+  description: 'The result of an attack roll, saving throw, or automatic application.',
+  sentence: {
+    singular: 'resolution outcome',
+    plural: 'resolution outcomes',
+  },
+} as const satisfies VocabularyTerm
 
 export const SPELL_RESOLUTION_OUTCOME_RESULT_ENTRIES = {
   hit: {
@@ -91,6 +118,15 @@ export const SPELL_RESOLUTION_OUTCOME_RESULTS = Object.keys(
   SPELL_RESOLUTION_OUTCOME_RESULT_ENTRIES,
 ) as [SpellResolutionOutcomeResult, ...SpellResolutionOutcomeResult[]]
 
+export const SPELL_RESOLUTION_APPLICATION_AMOUNT_TERM = {
+  label: 'Application Amount',
+  description: 'Whether a resolution outcome applies full or half of an effect value.',
+  sentence: {
+    singular: 'application amount',
+    plural: 'application amounts',
+  },
+} as const satisfies VocabularyTerm
+
 export const SPELL_RESOLUTION_APPLICATION_AMOUNT_ENTRIES = {
   full: {
     label: 'Full effect',
@@ -108,6 +144,15 @@ export type SpellResolutionApplicationAmount =
 export const SPELL_RESOLUTION_APPLICATION_AMOUNTS = Object.keys(
   SPELL_RESOLUTION_APPLICATION_AMOUNT_ENTRIES,
 ) as [SpellResolutionApplicationAmount, ...SpellResolutionApplicationAmount[]]
+
+export const SPELL_RESOLUTION_PROXIMITY_KIND_TERM = {
+  label: 'Resolution Proximity',
+  description: 'How close a target or origin must be to the caster.',
+  sentence: {
+    singular: 'resolution proximity',
+    plural: 'resolution proximities',
+  },
+} as const satisfies VocabularyTerm
 
 export const SPELL_RESOLUTION_PROXIMITY_KIND_ENTRIES = {
   self: {
@@ -135,6 +180,15 @@ export const SPELL_RESOLUTION_PROXIMITY_KINDS = Object.keys(
   SPELL_RESOLUTION_PROXIMITY_KIND_ENTRIES,
 ) as [SpellResolutionProximityKind, ...SpellResolutionProximityKind[]]
 
+export const SPELL_RESOLUTION_SELECTION_MODE_TERM = {
+  label: 'Resolution Selection Mode',
+  description: 'How the caster selects targets, origins, or locations for a resolution step.',
+  sentence: {
+    singular: 'resolution selection mode',
+    plural: 'resolution selection modes',
+  },
+} as const satisfies VocabularyTerm
+
 export const SPELL_RESOLUTION_SELECTION_MODE_ENTRIES = {
   self: {
     label: 'Self',
@@ -159,6 +213,15 @@ export type SpellResolutionSelectionMode = keyof typeof SPELL_RESOLUTION_SELECTI
 export const SPELL_RESOLUTION_SELECTION_MODES = Object.keys(
   SPELL_RESOLUTION_SELECTION_MODE_ENTRIES,
 ) as [SpellResolutionSelectionMode, ...SpellResolutionSelectionMode[]]
+
+export const SPELL_RESOLUTION_TARGET_COUNT_KIND_TERM = {
+  label: 'Target Count',
+  description: 'Whether the caster must select exactly or up to a number of targets.',
+  sentence: {
+    singular: 'target count',
+    plural: 'target counts',
+  },
+} as const satisfies VocabularyTerm
 
 export const SPELL_RESOLUTION_TARGET_COUNT_KIND_ENTRIES = {
   exact: {
@@ -259,6 +322,15 @@ export const SPELL_RESOLUTION_OUTCOME_RESULTS_BY_METHOD = {
   'saving-throw': ['failed-save', 'successful-save'],
   automatic: ['applied'],
 } as const satisfies Record<string, readonly SpellResolutionOutcomeResult[]>
+
+export const SPELL_APPLICATION_PATTERN_TERM = {
+  label: 'Application Pattern',
+  description: 'How repeated applications of a resolution effect are modeled.',
+  sentence: {
+    singular: 'application pattern',
+    plural: 'application patterns',
+  },
+} as const satisfies VocabularyTerm
 
 export const SPELL_APPLICATION_PATTERN_KIND_ENTRIES = {
   projectiles: {

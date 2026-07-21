@@ -2,79 +2,93 @@
 
 import { useMemo } from 'react'
 
-import type { CharacterBuildCatalogIndex, CharacterBuilderDraft } from '@rpg/contracts'
-import { Text } from '@rpg/ui'
-
 import type {
-  EquipmentInventoryQuantityTarget,
-  EquipmentInventoryRemoveTarget,
+  CharacterBuildCatalogIndex,
+  CharacterBuildContext,
+  CharacterBuilderDraft,
+  ClassOptionPolicy,
+  EquipmentBudgetSummary,
+  ResolvedStartingEquipmentFunding,
+} from '@rpg/contracts'
+import { Heading, Text } from '@rpg/ui'
+
+import {
+  EQUIPMENT_STARTING_PACKAGE_SECTION_LABEL,
+  type EquipmentInventoryQuantityTarget,
+  type EquipmentInventoryRemoveTarget,
 } from '../../lib/equipment-step.lib'
-import { EquipmentPurchasedInventoryColumn } from './equipment-purchased-inventory-column.client'
+import { EquipmentAddedInventoryColumn } from './equipment-added-inventory-column.client'
+import { EquipmentInventoryColumn } from './equipment-inventory-column.client'
 import { EquipmentStartingPackageSection } from './equipment-starting-package-section.client'
+import { buildEquipmentInventoryViewModel } from './equipment-inventory-summary.lib'
 import {
-  buildEquipmentInventoryLayout,
-  shouldRenderEquipmentInventorySummary,
-} from './equipment-inventory-summary.lib'
-import {
-  equipmentInventorySummaryClasses,
+  equipmentGoldOptionPanelClasses,
   equipmentInventorySummaryGridClasses,
 } from './equipment-inventory-summary.variants'
 
 export type EquipmentInventorySummaryProps = {
   draft: CharacterBuilderDraft
   catalogIndex: CharacterBuildCatalogIndex
+  context: CharacterBuildContext
+  budget?: EquipmentBudgetSummary
+  goldOptionFunding?: ResolvedStartingEquipmentFunding
+  classOptionPolicy?: ClassOptionPolicy
   conversionEditorOpen?: boolean
   selectedPackageItemKeys?: ReadonlySet<string>
   conversionCommitStatusMessage?: string
   onRemoveItem?: (target: EquipmentInventoryRemoveTarget) => void
   onSetPurchaseQuantity?: (target: EquipmentInventoryQuantityTarget, quantity: number) => void
+  onReleaseGrant?: (args: { allowanceId: string; equipmentId: string; quantity: number }) => void
+  onRemovePurchase?: (args: { purchaseId: string; quantity: number }) => void
+  onApplyMagicItemAcquisition?: (args: {
+    equipmentId: string
+    requestedQuantity: number
+  }) => boolean
   onCustomizePackage?: () => void
   onChangeEquipmentOption?: () => void
   onSelectedPackageItemKeysChange?: (keys: ReadonlySet<string>) => void
   onCancelConversion?: () => void
   onCommitConversion?: (preview: import('@rpg/contracts').StartingPackageConversionPreview) => void
-  showBrowseEquipment?: boolean
-  onOpenPicker?: () => void
 }
 
 export function EquipmentInventorySummary({
   draft,
   catalogIndex,
+  context,
+  budget,
+  goldOptionFunding,
+  classOptionPolicy = 'included',
   conversionEditorOpen = false,
   selectedPackageItemKeys = new Set(),
   conversionCommitStatusMessage,
   onRemoveItem,
   onSetPurchaseQuantity,
+  onReleaseGrant,
+  onRemovePurchase,
+  onApplyMagicItemAcquisition,
   onCustomizePackage,
   onChangeEquipmentOption,
   onSelectedPackageItemKeysChange,
   onCancelConversion,
   onCommitConversion,
-  showBrowseEquipment = false,
-  onOpenPicker,
 }: EquipmentInventorySummaryProps) {
-  const layout = useMemo(
-    () => buildEquipmentInventoryLayout(draft, catalogIndex),
-    [catalogIndex, draft],
+  const viewModel = useMemo(
+    () => buildEquipmentInventoryViewModel(draft, catalogIndex, budget, classOptionPolicy, context),
+    [budget, catalogIndex, classOptionPolicy, context, draft],
   )
 
-  if (!shouldRenderEquipmentInventorySummary(layout, showBrowseEquipment)) {
+  if (!viewModel) {
     return <Text variant="muted">No equipment selected yet.</Text>
   }
 
-  const isPackageMode = layout.mode === 'package'
-
   return (
-    <div
-      className={
-        isPackageMode ? equipmentInventorySummaryGridClasses : equipmentInventorySummaryClasses
-      }
-    >
-      {isPackageMode ? (
+    <div className={equipmentInventorySummaryGridClasses}>
+      {viewModel.startingEquipment.kind === 'package' ? (
         <EquipmentStartingPackageSection
-          packageGroup={layout.startingPackage}
+          packageGroup={viewModel.startingEquipment.group}
           draft={draft}
           catalogIndex={catalogIndex}
+          goldOptionFunding={goldOptionFunding}
           conversionEditorOpen={conversionEditorOpen}
           selectedPackageItemKeys={selectedPackageItemKeys}
           commitStatusMessage={conversionCommitStatusMessage}
@@ -84,15 +98,31 @@ export function EquipmentInventorySummary({
           onCancelConversion={onCancelConversion ?? (() => undefined)}
           onCommitConversion={onCommitConversion ?? (() => undefined)}
         />
-      ) : null}
+      ) : (
+        <EquipmentInventoryColumn title={EQUIPMENT_STARTING_PACKAGE_SECTION_LABEL}>
+          <div className={equipmentGoldOptionPanelClasses}>
+            <Heading variant="group" as="h4">
+              {viewModel.startingEquipment.message}
+            </Heading>
+            <Text as="p" className="text-sm text-muted-foreground">
+              {viewModel.startingEquipment.description}
+            </Text>
+          </div>
+        </EquipmentInventoryColumn>
+      )}
 
-      <EquipmentPurchasedInventoryColumn
-        purchased={layout.purchased}
-        isPackageMode={isPackageMode}
-        showBrowseEquipment={showBrowseEquipment}
-        onOpenPicker={onOpenPicker}
+      <EquipmentAddedInventoryColumn
+        addedEquipment={viewModel.addedEquipment}
+        draft={draft}
+        context={context}
+        catalogIndex={catalogIndex}
+        budget={budget}
+        reserveToolbarRow={viewModel.startingEquipment.kind === 'package'}
         onRemoveItem={onRemoveItem}
         onSetPurchaseQuantity={onSetPurchaseQuantity}
+        onReleaseGrant={onReleaseGrant ?? (() => undefined)}
+        onRemovePurchase={onRemovePurchase ?? (() => undefined)}
+        onApplyMagicItemAcquisition={onApplyMagicItemAcquisition ?? (() => false)}
       />
     </div>
   )

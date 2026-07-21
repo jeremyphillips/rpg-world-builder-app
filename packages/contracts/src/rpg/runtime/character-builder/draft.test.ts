@@ -40,9 +40,9 @@ describe('characterBuilderDraftSchema', () => {
     expect(characterBuilderDraftSchema.safeParse(draft).success).toBe(true)
   })
 
-  it('rejects levels other than 1', () => {
-    const draft = { ...createEmptyCharacterBuilderDraft(), class: { level: 2 } }
-    expect(characterBuilderDraftSchema.safeParse(draft).success).toBe(false)
+  it('accepts levels above 1', () => {
+    const draft = { ...createEmptyCharacterBuilderDraft(), class: { level: 5 } }
+    expect(characterBuilderDraftSchema.safeParse(draft).success).toBe(true)
   })
 
   it('rejects unknown step ids', () => {

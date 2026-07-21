@@ -3,10 +3,8 @@ import { z } from 'zod'
 import { systemRulesetIdSchema } from '../../primitives/ruleset'
 
 // ---------------------------------------------------------------------------
-// Builder mode = where/how the builder is used. Build scope = which rules and
-// content context applies. Kept separate so standalone creation is never
-// forced through a campaign-shaped context. The full unions are typed now;
-// MVP implements only 'dashboard' + standalone.
+// Legacy builder mode / build scope — prefer character-acquisition axes
+// (channel, surface, characterKind, rulesScope) on CharacterBuildContext.
 // ---------------------------------------------------------------------------
 
 export const CHARACTER_BUILDER_MODES = ['public', 'dashboard', 'npc', 'import'] as const

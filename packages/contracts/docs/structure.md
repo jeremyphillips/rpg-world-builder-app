@@ -169,20 +169,67 @@ import { campaignSchema } from '@rpg/contracts/rpg/campaign'
 
 Subpath exports are defined in [`package.json`](../package.json) `exports`.
 
-## Reference vocabulary (`GameTermEntry`)
+## Reference vocabulary (`GameTermEntry` / `VocabularyTerm`)
 
-Closed game-term maps live in `rpg/vocab/`. Shared shape in `rpg/vocab/types.ts`:
+Closed game-term maps live in `rpg/vocab/`. Shared shapes in `rpg/vocab/types.ts`:
 
 ```ts
-export type GameTermEntry = {
-  readonly label: string
-  readonly description: string
-}
+/** A value within a taxonomy. */
+export type GameTermEntry = { label; description; compactLabel?; sentence? }
+
+/** The taxonomy concept (`*_TERM`) — same shape today; distinct for APIs and future metadata. */
+export type VocabularyTerm = GameTermEntry
 ```
 
-Pattern: `*_ENTRIES` map → derived id tuple → `z.enum` schema →
-`get*Entry` / `get*Label` helpers. Open vocabulary sets use catalog seeds +
-`vocabularyOptionIdSchema`; see [docs/vocabulary.md](../../../docs/vocabulary.md).
+Every closed vocab module defines **two layers**:
+
+1. **`*_TERM`** — the taxonomy concept (`satisfies VocabularyTerm`).
+2. **`*_ENTRIES`** — per-value entries (`satisfies Record<string, GameTermEntry>`).
+
+```ts
+export const MAGIC_ITEM_RARITY_TERM = {
+  label: 'Magic Item Rarity',
+  description: '…',
+  sentence: { singular: 'magic item rarity', plural: 'magic item rarities' },
+} as const satisfies VocabularyTerm
+
+export const MAGIC_ITEM_RARITY_ENTRIES = { common: { … }, … }
+```
+
+**Concept-only terms** (no `*_ENTRIES`, not in the option-set registry) export `*_TERM` alone — e.g. [`hit-points.ts`](../src/rpg/vocab/mechanics/hit-points.ts) for generated effect prose.
+
+**Configurable option sets** map set ids to taxonomy terms via
+[`vocabulary-option-set-terms.ts`](../src/rpg/vocab/vocabulary-option-set-terms.ts)
+(`VOCABULARY_OPTION_SET_TERMS`, `getVocabularyOptionSetTerm`). Not every `*_TERM`
+belongs in that registry.
+
+**Grammar helpers** (contracts — not surface-specific):
+
+- `vocabularyTermLabel(term, { number, casing })` — title or sentence forms from curated fields
+- `vocabularyTermFieldCopy(term, { multiple? })` — default form `{ label, placeholder }`
+
+Pattern: `*_TERM` + `*_ENTRIES` map → derived id tuple → `z.enum` schema →
+`get*Entry` / `get*Label` helpers. Open vocabulary sets define a `*_TERM` plus
+`vocabularyOptionIdSchema` and catalog seeds; see
+[docs/vocabulary.md](../../../docs/vocabulary.md).
+
+### Catalog content-type terms (`CONTENT_TYPE_TERMS`)
+
+Catalog collection chrome uses a separate registry in
+[`content-type-terms.ts`](../src/rpg/content/lib/content-type-terms.ts), keyed
+by `ContentTypeKey`. Each entry is a `VocabularyTerm` with `label`,
+`description`, and `sentence` forms. Exported aliases use the `*_CONTENT_TYPE_TERM`
+qualifier (e.g. `SPECIES_CONTENT_TYPE_TERM`) — not generic `SPECIES_TERM`, which
+would collide with field taxonomy.
+
+`compactLabel` on content-type terms is reserved for semantically distinct
+abbreviations. Most types rely on `label` + `sentence.plural` + dashboard
+`getContentTypeCollectionLabel`. Proficiency-domain compact labels (e.g.
+`Skills`) live on `PROFICIENCY_DOMAIN_ENTRIES`, not on catalog content types.
+
+Shared grammar between registries (e.g. `SKILL_PROFICIENCY_SENTENCE`) is extracted
+to a small constant consumed by both — never cross-reference one registry from
+another's shape definition.
 
 Entity-specific fields stay on the content schema in `rpg/content/`, not in vocab maps.
 

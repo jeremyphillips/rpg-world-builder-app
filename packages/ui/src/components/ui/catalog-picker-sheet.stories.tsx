@@ -94,11 +94,13 @@ export const Default: Story = {
           {...args}
           open={open}
           onOpenChange={setOpen}
-          toolbarControls={
-            <Text variant="muted" className="text-sm">
-              Toolbar controls render here without the shell interpreting them.
-            </Text>
-          }
+          filterRow={{
+            controls: (
+              <Text variant="muted" className="text-sm">
+                Toolbar controls render here without the shell interpreting them.
+              </Text>
+            ),
+          }}
           footer={<Button onClick={() => setOpen(false)}>Done</Button>}
         />
       </>

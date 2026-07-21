@@ -116,4 +116,31 @@ describe('buildEquipmentPickerPurchaseViewModel', () => {
       })?.remainingAfterLabel,
     ).toBe('—')
   })
+
+  it('omits unit and total price labels for unpriced equipment', () => {
+    const unpriced = {
+      ...equipmentPickerLongswordFixture,
+      id: 'srd-cc-5.2.1:priceless-longsword',
+      slug: 'priceless-longsword',
+      name: 'Priceless Longsword',
+      cost: null,
+    }
+
+    expect(
+      buildEquipmentPickerPurchaseViewModel({
+        equipment: unpriced,
+        quantity: 1,
+        budget: equipmentPickerBudgetFixture,
+        ownedQuantity: 0,
+      }),
+    ).toEqual({
+      mode: 'new',
+      quantity: 1,
+      maxQuantity: 0,
+      unitPriceLabel: '',
+      totalLabel: '',
+      remainingAfterLabel: '—',
+      commitLabel: EQUIPMENT_PICKER_PURCHASE_COMMIT_LABEL,
+    })
+  })
 })

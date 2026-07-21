@@ -86,6 +86,43 @@ describe('SelectField', () => {
     expect(screen.getByText(hint)).toBeInTheDocument()
   })
 
+  it('renders label and control on one row when labelPosition is inline', () => {
+    render(
+      <SelectField
+        id="level"
+        label="Choose level"
+        info="Up to level 20."
+        labelPosition="inline"
+        digits={2}
+        defaultValue="3"
+        width="auto"
+        options={[
+          { label: '1', value: '1' },
+          { label: '3', value: '3' },
+        ]}
+      />,
+    )
+
+    const trigger = screen.getByRole('combobox', { name: /Choose level/i })
+    const row = trigger.closest('.flex')
+    expect(row).toHaveClass('items-center')
+    expect(screen.getByRole('button', { name: 'About Choose level' })).toBeInTheDocument()
+  })
+
+  it('has no axe accessibility violations with inline layout', async () => {
+    const { container } = render(
+      <SelectField
+        id="level"
+        label="Choose level"
+        labelPosition="inline"
+        digits={2}
+        defaultValue="1"
+        options={[{ label: '1', value: '1' }]}
+      />,
+    )
+    await expectNoAxeViolations(container)
+  })
+
   it('renders label and hint in the left column when labelPosition is settings', () => {
     const hint = 'First class level at which this class gains spellcasting'
     render(

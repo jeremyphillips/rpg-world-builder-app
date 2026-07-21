@@ -1,6 +1,10 @@
 import { useParams } from 'react-router-dom'
 
 import { ROUTES } from '@/app/routes'
+import {
+  formatContentNotFoundMessage,
+  formatContentListLoadErrorMessage,
+} from '@/features/content/lib/content-type-labels'
 import { ContentEditShell } from '../../lib/forms/shells/content-edit-shell'
 import { useFeats } from '../hooks/use-feats'
 // Registers the feat form def into the content form registry on module load.
@@ -20,8 +24,8 @@ export function FeatEdit() {
       entityId={featId}
       isPending={isPending}
       isError={isError}
-      loadErrorLabel="Could not load feats."
-      notFoundLabel="Feat not found."
+      loadErrorLabel={formatContentListLoadErrorMessage('feats')}
+      notFoundLabel={formatContentNotFoundMessage('feats')}
       backHref={ROUTES.content.feats.detail(campaignId, featId)}
     />
   )

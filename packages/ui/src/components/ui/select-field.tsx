@@ -14,7 +14,12 @@ import {
   SelectValue,
 } from './select.client'
 import type { FieldWidth } from './field-control.variants'
-import type { FieldHintPosition, FieldLabelPosition } from './field.variants'
+import {
+  fieldInlineControlRowClasses,
+  fieldLabelHintStackClasses,
+  type FieldHintPosition,
+  type FieldLabelPosition,
+} from './field.variants'
 import type { FieldDigits } from './field-digit-metrics'
 import {
   isFieldOptionGroup,
@@ -26,6 +31,8 @@ import { resolveSelectPlaceholder } from '../../form/config/field-placeholder.li
 export type SelectFieldOption = FieldOption
 
 import type { FieldValidationProps } from './field-validation-props'
+
+export type SelectLabelPosition = FieldLabelPosition | 'inline'
 
 export interface SelectFieldProps extends FieldValidationProps {
   id: string
@@ -43,8 +50,12 @@ export interface SelectFieldProps extends FieldValidationProps {
    * the form column unless the field shares a `FieldRow`.
    */
   digits?: FieldDigits
-  /** `above` (default) — label over control. `settings` — label + hint left, control right. */
-  labelPosition?: FieldLabelPosition
+  /**
+   * `above` (default) — label over control.
+   * `inline` — label left, compact control right (`items-center`).
+   * `settings` — label + hint left, control right (dense settings panels).
+   */
+  labelPosition?: SelectLabelPosition
   placeholder?: string
   name?: string
   disabled?: boolean
@@ -106,6 +117,21 @@ export function SelectField({
   onBlur,
 }: SelectFieldProps) {
   const resolvedPlaceholder = resolveSelectPlaceholder(label, placeholder)
+  const resolvedHintPosition = hintPosition ?? 'below-label'
+
+  const selectTrigger =
+    labelPosition === 'settings' ? (
+      <SelectTrigger id={id} size={size} digits={digits} onBlur={onBlur}>
+        <SelectValue placeholder={resolvedPlaceholder} />
+      </SelectTrigger>
+    ) : (
+      <Field.Control>
+        <SelectTrigger size={size} digits={digits} onBlur={onBlur}>
+          <SelectValue placeholder={resolvedPlaceholder} />
+        </SelectTrigger>
+      </Field.Control>
+    )
+
   const select = (
     <Select
       value={value}
@@ -114,17 +140,7 @@ export function SelectField({
       name={name}
       disabled={disabled}
     >
-      {labelPosition === 'settings' ? (
-        <SelectTrigger id={id} size={size} digits={digits} onBlur={onBlur}>
-          <SelectValue placeholder={resolvedPlaceholder} />
-        </SelectTrigger>
-      ) : (
-        <Field.Control>
-          <SelectTrigger size={size} digits={digits} onBlur={onBlur}>
-            <SelectValue placeholder={resolvedPlaceholder} />
-          </SelectTrigger>
-        </Field.Control>
-      )}
+      {selectTrigger}
       {renderSelectContent(options)}
     </Select>
   )
@@ -147,6 +163,39 @@ export function SelectField({
       >
         {select}
       </FormField>
+    )
+  }
+
+  if (labelPosition === 'inline') {
+    return (
+      <Field.Root
+        id={id}
+        error={error}
+        invalid={invalid}
+        describedBy={describedBy}
+        hint={hint}
+        required={required}
+        width={width}
+        size={size}
+      >
+        <div className={fieldInlineControlRowClasses}>
+          {resolvedHintPosition === 'below-label' ? (
+            <div className={fieldLabelHintStackClasses}>
+              <Field.Label>
+                <FieldLabelContent label={label} info={info} />
+              </Field.Label>
+              <Field.Hint />
+            </div>
+          ) : (
+            <Field.Label>
+              <FieldLabelContent label={label} info={info} />
+            </Field.Label>
+          )}
+          {select}
+        </div>
+        {resolvedHintPosition === 'below-control' ? <Field.Hint /> : null}
+        <Field.Error />
+      </Field.Root>
     )
   }
 

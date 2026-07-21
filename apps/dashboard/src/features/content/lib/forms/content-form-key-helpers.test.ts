@@ -31,11 +31,14 @@ describe('applyStableIdsForUpdate', () => {
 
 describe('applyStableIdsForChoiceOptions', () => {
   it('preserves existing ids and derives new ones from labels', () => {
-    const existing = [{ id: 'standard' }]
-    const rows = [{ id: 'standard', label: 'Standard Equipment' }, { label: 'Starting Gold' }]
+    const existing = [{ id: 'standard-equipment' }]
+    const rows = [
+      { id: 'standard-equipment', label: 'Standard Equipment' },
+      { label: 'Starting Gold' },
+    ]
 
     expect(applyStableIdsForChoiceOptions(rows, existing)).toEqual([
-      { id: 'standard', label: 'Standard Equipment' },
+      { id: 'standard-equipment', label: 'Standard Equipment' },
       { id: 'starting-gold', label: 'Starting Gold' },
     ])
   })

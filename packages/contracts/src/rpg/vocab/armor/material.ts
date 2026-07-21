@@ -1,9 +1,18 @@
 import { keysFromEntries, vocabEnumFromEntries } from '../enum-schema'
-import type { GameTermEntry } from '../types'
+import type { GameTermEntry, VocabularyTerm } from '../types'
 
 // ---------------------------------------------------------------------------
 // Armor material — drives the druid non-metal rule and flavor display.
 // ---------------------------------------------------------------------------
+
+export const ARMOR_MATERIAL_TERM = {
+  label: 'Armor Material',
+  description: 'Whether armor is made of metal or organic materials.',
+  sentence: {
+    singular: 'armor material',
+    plural: 'armor materials',
+  },
+} as const satisfies VocabularyTerm
 
 export const ARMOR_MATERIAL_ENTRIES = {
   organic: {

@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-import type { GameTermEntry } from '../vocab/types'
+import type { GameTermEntry, VocabularyTerm } from '../vocab/types'
 import { getTermCompactLabel } from '../vocab/types'
 
 import { formatFractionalNumber } from './number-format'
@@ -9,6 +9,15 @@ import { type PositiveDistance, positiveDistanceSchema } from './units'
 // ---------------------------------------------------------------------------
 // Area geometry shapes — closed vocabulary for formatter grammar and form selects.
 // ---------------------------------------------------------------------------
+
+export const AREA_GEOMETRY_SHAPE_TERM = {
+  label: 'Area Shape',
+  description: 'The geometric form of a spell or effect area.',
+  sentence: {
+    singular: 'area shape',
+    plural: 'area shapes',
+  },
+} as const satisfies VocabularyTerm
 
 export const AREA_GEOMETRY_SHAPE_ENTRIES = {
   sphere: {

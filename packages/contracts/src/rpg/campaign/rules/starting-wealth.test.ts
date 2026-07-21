@@ -5,6 +5,7 @@ import {
   computeStartingWealthSparsePatch,
   mergeStartingWealthRulesPatch,
   resolveStartingWealthRules,
+  resolveStartingWealthTierForBuilder,
   startingWealthRulesSchema,
   startingWealthTierForLevel,
   startingWealthTierSchema,
@@ -13,6 +14,7 @@ import {
 import {
   MINIMAL_TIER_A_ID,
   MINIMAL_TIER_B_ID,
+  MINIMAL_TIER_C_ID,
   minimalStartingWealthSeed,
 } from '../../../test/fixtures/starting-wealth-minimal'
 import { patchTierById } from '../../../test/helpers/patch-tier'
@@ -160,5 +162,13 @@ describe('startingWealthTierForLevel', () => {
 
   it('returns undefined when no tier matches', () => {
     expect(startingWealthTierForLevel(minimalStartingWealthSeed, 20)).toBeUndefined()
+  })
+})
+
+describe('resolveStartingWealthTierForBuilder', () => {
+  it('falls back to the highest tier at or below the selected level', () => {
+    expect(resolveStartingWealthTierForBuilder(minimalStartingWealthSeed, 7)?.id).toBe(
+      MINIMAL_TIER_C_ID,
+    )
   })
 })

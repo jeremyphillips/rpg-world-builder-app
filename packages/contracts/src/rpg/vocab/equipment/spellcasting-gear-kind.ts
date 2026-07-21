@@ -1,10 +1,19 @@
 import { closedSetEnum, keysFromEntries, vocabEnumFromEntries } from '../enum-schema'
-import type { GameTermEntry } from '../types'
+import type { GameTermEntry, VocabularyTerm } from '../types'
 
 // ---------------------------------------------------------------------------
 // Spellcasting gear sub-kinds — discriminates items within
 // `kind: adventuring_gear` + `gearKind: spellcasting`.
 // ---------------------------------------------------------------------------
+
+export const SPELLCASTING_GEAR_KIND_TERM = {
+  label: 'Spellcasting Gear Kind',
+  description: 'Arcane or divine spellcasting focus classification.',
+  sentence: {
+    singular: 'spellcasting gear kind',
+    plural: 'spellcasting gear kinds',
+  },
+} as const satisfies VocabularyTerm
 
 export const SPELLCASTING_GEAR_KIND_ENTRIES = {
   arcane_focus: {

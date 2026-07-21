@@ -23,9 +23,7 @@ describe('startingEquipment round-trip', () => {
     const formValues = startingEquipmentToFormValues(startingEquipment!)
     expect(startingEquipmentFormSchema.parse(formValues)).toEqual(formValues)
 
-    const standard = formValues.options.find((option) => option.id === 'standard')
-    expect(standard?.description).toContain('Artisan')
-    expect(standard?.description).not.toContain('FOLLOWUP')
+    const standard = formValues.options.find((option) => option.id === 'standard-equipment')
     expect(
       standard?.items.some(
         (item) =>
@@ -45,17 +43,17 @@ describe('startingEquipment round-trip', () => {
     expect(startingEquipment).toBeDefined()
 
     const formValues = startingEquipmentToFormValues(startingEquipment!)
-    const gold = formValues.options.find((option) => option.id === 'gold')
+    const gold = formValues.options.find((option) => option.id === 'starting-gold')
     expect(gold).toMatchObject({
-      id: 'gold',
+      id: 'starting-gold',
       label: 'Starting Gold',
       items: [],
       wealth: { amount: 75, currency: 'gp' },
     })
 
     const roundTripped = startingEquipmentFromFormValues(formValues, startingEquipment)
-    expect(roundTripped?.options.find((option) => option.id === 'gold')).toEqual(
-      startingEquipment!.options.find((option) => option.id === 'gold'),
+    expect(roundTripped?.options.find((option) => option.id === 'starting-gold')).toEqual(
+      startingEquipment!.options.find((option) => option.id === 'starting-gold'),
     )
   })
 
@@ -66,7 +64,7 @@ describe('startingEquipment round-trip', () => {
 
     const formValues = startingEquipmentToFormValues(startingEquipment!)
     const woodenStaff = formValues.options
-      .find((option) => option.id === 'standard')
+      .find((option) => option.id === 'standard-equipment')
       ?.items.find((item) => item.itemKind === 'grant' && item.equipmentSlug === 'wooden-staff')
 
     expect(woodenStaff).toMatchObject({
@@ -87,7 +85,7 @@ describe('startingEquipment round-trip', () => {
 
     const formValues = startingEquipmentToFormValues(startingEquipment!)
     const instrumentChoice = formValues.options
-      .find((option) => option.id === 'standard')
+      .find((option) => option.id === 'standard-equipment')
       ?.items.find((item) => item.itemKind === 'choice')
 
     expect(instrumentChoice).toMatchObject({
@@ -215,7 +213,7 @@ describe('startingEquipmentFormSchema validation', () => {
 
   it('rejects a package with empty items and no wealth grant', () => {
     const result = startingEquipmentOptionFormSchema.safeParse({
-      id: 'gold',
+      id: 'starting-gold',
       label: 'Starting Gold',
       items: [],
     })
@@ -225,7 +223,7 @@ describe('startingEquipmentFormSchema validation', () => {
 
   it('accepts a gold-only package with wealth and no items', () => {
     const result = startingEquipmentOptionFormSchema.safeParse({
-      id: 'gold',
+      id: 'starting-gold',
       label: 'Starting Gold',
       items: [],
       wealth: { amount: 75, currency: 'gp' },
@@ -238,7 +236,9 @@ describe('startingEquipmentFormSchema validation', () => {
     const existing = pickClass('monk').characterCreation!.startingEquipment!
     const formValues = startingEquipmentToFormValues(existing)
     const renamed = formValues.options.map((option) =>
-      option.id === 'standard' ? { ...option, label: 'Renamed Standard Equipment' } : option,
+      option.id === 'standard-equipment'
+        ? { ...option, label: 'Renamed Standard Equipment' }
+        : option,
     )
 
     const roundTripped = startingEquipmentFromFormValues(
@@ -246,7 +246,7 @@ describe('startingEquipmentFormSchema validation', () => {
       existing,
     )
 
-    expect(roundTripped?.options.find((option) => option.id === 'standard')?.label).toBe(
+    expect(roundTripped?.options.find((option) => option.id === 'standard-equipment')?.label).toBe(
       'Renamed Standard Equipment',
     )
   })
@@ -312,7 +312,7 @@ describe('startingEquipmentFormSchema validation', () => {
       choose: 1,
       options: [
         {
-          id: 'standard',
+          id: 'standard-equipment',
           label: 'Standard Equipment',
           items: [linkedGrant],
         },

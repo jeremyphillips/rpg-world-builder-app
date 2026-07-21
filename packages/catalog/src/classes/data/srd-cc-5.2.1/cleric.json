@@ -132,9 +132,8 @@
       "choose": 1,
       "options": [
         {
-          "id": "standard",
+          "id": "standard-equipment",
           "label": "Standard Equipment",
-          "description": "Chain Shirt, Shield, Mace, Holy Symbol, Priest's Pack, and 7 GP.",
           "items": [
             {
               "kind": "grant",
@@ -170,9 +169,8 @@
           }
         },
         {
-          "id": "gold",
+          "id": "starting-gold",
           "label": "Starting Gold",
-          "description": "Take 110 GP instead of standard equipment.",
           "items": [],
           "wealth": {
             "gp": 110

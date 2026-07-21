@@ -87,4 +87,17 @@ describe('CatalogPickerSelectionActions', () => {
     await user.click(screen.getByRole('button', { name: 'Remove' }))
     expect(onRemove).toHaveBeenCalledOnce()
   })
+
+  it('uses outline buttons by default', () => {
+    render(
+      <CatalogPickerSelectionActions
+        selected={false}
+        canSelect
+        onAdd={vi.fn()}
+        onRemove={vi.fn()}
+      />,
+    )
+
+    expect(screen.getByRole('button', { name: 'Add' })).toHaveClass('border-outline-button-border')
+  })
 })

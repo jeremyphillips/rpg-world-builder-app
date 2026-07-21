@@ -16,7 +16,7 @@ const baseInput: CreateCharacterInput = {
   alignment: 'ng',
   xp: 23000,
   abilityScores: { str: 16, dex: 14, con: 15, int: 10, wis: 12, cha: 8 },
-  hitPoints: { base: 58, temporary: 0 },
+  hitPoints: { base: 58, current: 58, temporary: 0 },
   proficiencies: {
     skills: [
       {

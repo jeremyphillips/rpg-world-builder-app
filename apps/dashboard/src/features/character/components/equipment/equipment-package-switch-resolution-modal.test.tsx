@@ -4,8 +4,11 @@ import { expectNoAxeViolations } from '@rpg/ui/test-utils'
 
 import { equipmentSchema } from '@rpg/contracts'
 import type { ClassStored } from '@rpg/contracts'
-import { createEmptyCharacterBuilderDraft } from '@rpg/contracts'
-import { evaluateEquipmentPackageSwitch } from '@rpg/contracts'
+import { createEmptyCharacterBuilderDraft, type CharacterBuilderDraft } from '@rpg/contracts'
+import {
+  evaluateEquipmentPackageSwitch,
+  resolveStartingEquipmentFundingOptions,
+} from '@rpg/contracts'
 import { indexCharacterBuildCatalog } from '@rpg/contracts'
 import { startingEquipmentChoiceSetId } from '@rpg/contracts'
 
@@ -73,13 +76,15 @@ const storedDruid: ClassStored = {
       choose: 1,
       options: [
         {
-          id: 'standard',
+          id: 'standard-equipment',
           label: 'Standard Equipment',
-          items: [],
+          items: [
+            { kind: 'grant', target: { source: 'equipment', equipmentSlug: 'rope' }, quantity: 1 },
+          ],
           wealth: { gp: 9, sp: 5, cp: 3 },
         },
         {
-          id: 'gold',
+          id: 'starting-gold',
           label: 'Starting Gold',
           items: [],
           wealth: { gp: 50 },
@@ -102,7 +107,7 @@ const goldDraft = {
   ...createEmptyCharacterBuilderDraft(),
   class: { classId: storedDruid.id, level: 1 as const },
   choiceSelections: {
-    [startingEquipmentChoiceSetId(storedDruid.id)]: ['gold'],
+    [startingEquipmentChoiceSetId(storedDruid.id)]: ['starting-gold'],
   },
   equipment: {
     mode: 'gold' as const,
@@ -120,11 +125,16 @@ const goldDraft = {
   },
 }
 
+function targetFundingFor(draft: CharacterBuilderDraft, targetOptionId: string) {
+  return resolveStartingEquipmentFundingOptions({ draft, catalogIndex }).get(targetOptionId)!
+}
+
 describe('EquipmentPackageSwitchResolutionModal', () => {
   const evaluation = evaluateEquipmentPackageSwitch({
     draft: goldDraft,
     catalogIndex,
-    targetOptionId: 'standard',
+    targetOptionId: 'standard-equipment',
+    targetFunding: targetFundingFor(goldDraft, 'standard-equipment'),
   })!
 
   it('renders the resolvable package-switch resolution dialog', () => {
@@ -164,24 +174,26 @@ describe('EquipmentPackageSwitchResolutionModal', () => {
   })
 
   it('renders the blocked package-switch dialog without inventory controls', () => {
-    const blockedEvaluation = evaluateEquipmentPackageSwitch({
-      draft: {
-        ...goldDraft,
-        equipment: {
-          ...goldDraft.equipment!,
-          purchases: [
-            {
-              id: 'purchase-dagger',
-              equipmentId: dagger.id,
-              quantity: 10,
-              sourceMode: 'manual' as const,
-              origin: 'picker' as const,
-            },
-          ],
-        },
+    const blockedDraft = {
+      ...goldDraft,
+      equipment: {
+        ...goldDraft.equipment!,
+        purchases: [
+          {
+            id: 'purchase-dagger',
+            equipmentId: dagger.id,
+            quantity: 10,
+            sourceMode: 'manual' as const,
+            origin: 'picker' as const,
+          },
+        ],
       },
+    }
+    const blockedEvaluation = evaluateEquipmentPackageSwitch({
+      draft: blockedDraft,
       catalogIndex,
-      targetOptionId: 'standard',
+      targetOptionId: 'standard-equipment',
+      targetFunding: targetFundingFor(blockedDraft, 'standard-equipment'),
     })!
 
     render(

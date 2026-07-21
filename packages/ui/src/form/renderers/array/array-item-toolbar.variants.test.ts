@@ -58,7 +58,7 @@ describe('array item shell variants', () => {
     })
 
     expect(gripOnly).toBe(caretOnly)
-    expect(gripOnly).toContain('pl-[calc(var(--spacing)*1)]')
+    expect(gripOnly).toContain('pl-[var(--leading-chrome-gap)]')
   })
 
   it('uses flex for the leading toolbar row so chrome aligns with title copy', () => {
@@ -72,10 +72,10 @@ describe('array item shell variants', () => {
 
   it('derives body indent from chrome count via shell CSS variable', () => {
     expect(arrayItemBodyClasses({ showDragHandle: true, collapsible: false })).toContain(
-      '--array-item-chrome-count',
+      '--content-column-indent',
     )
     expect(arrayItemBodyClasses({ showDragHandle: true, collapsible: true })).toContain(
-      '--array-item-chrome-count',
+      '--content-column-indent',
     )
   })
 

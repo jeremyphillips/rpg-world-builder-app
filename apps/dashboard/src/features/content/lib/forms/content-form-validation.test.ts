@@ -50,7 +50,7 @@ import { createSpeciesFormSchema, buildSpeciesTabs } from '../../species/lib/spe
 import { createFeatFormSchema } from '../../feats/lib/feat-form-fields'
 import { equipmentFormDef } from '../../equipment/lib/equipment-form-def'
 import { resolveEquipmentFormSchema } from '../../equipment/lib/equipment-form-fields'
-import { costToFormDefaults } from './fields/content-economy-form-fields'
+import { equipmentEconomyFormDefaults } from '../../equipment/lib/equipment-economy-form-values'
 import { assertHeaderOnlyTabsHaveValidationWiring } from './tabbed-form-validation-test-utils'
 import { buildClassTabs } from '../../classes/lib/class-form-fields'
 
@@ -69,6 +69,9 @@ const SERVER_ROW_EXEMPT = ['id', 'kind'] as const
 /** Heritage scalar paths not authored as visible fields (optional id, defaulted choose). */
 const HERITAGE_FORM_EXEMPT = ['heritage.id', 'heritage.choose'] as const
 
+/** Starting equipment package count is locked to 1 — not authored as a visible field. */
+const STARTING_EQUIPMENT_FORM_EXEMPT = ['characterCreation.startingEquipment.choose'] as const
+
 /** Grant union variants explode many schema paths; grant rows are tested at row scope. */
 const GRANT_NESTED_EXEMPT = [/\.grants\.\*\./] as const
 
@@ -79,6 +82,7 @@ const COMMON_SCHEMA_EXEMPT = [
   ...SLOT_IGNORE,
   ...SLUG_EXEMPT,
   ...HERITAGE_FORM_EXEMPT,
+  ...STARTING_EQUIPMENT_FORM_EXEMPT,
   ...GRANT_NESTED_EXEMPT,
 ] as const
 
@@ -168,7 +172,11 @@ describe('resolveEquipmentFormSchema dispatcher', () => {
 })
 
 function minimalValidEquipmentFor(kind: (typeof EQUIPMENT_KINDS)[number]): Record<string, unknown> {
-  const base = { name: 'Test item', cost: costToFormDefaults() }
+  const economy =
+    kind === 'magic_item'
+      ? equipmentEconomyFormDefaults('magic_item')
+      : { ...equipmentEconomyFormDefaults(kind), cost: { amount: 1, currency: 'gp' } }
+  const base = { name: 'Test item', ...economy }
 
   switch (kind) {
     case 'weapon':

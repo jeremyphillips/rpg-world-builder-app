@@ -7,10 +7,7 @@ export const ROUTES = {
   characters: {
     list: '/characters',
     new: '/characters/new',
-    import: (campaignId?: string) =>
-      campaignId
-        ? `/characters/import?campaignId=${encodeURIComponent(campaignId)}`
-        : '/characters/import',
+    import: '/characters/import',
     detail: (characterId: string) => `/characters/${characterId}`,
   },
   account: '/account',
@@ -20,6 +17,12 @@ export const ROUTES = {
     detail: (id: string) => `/campaigns/${id}`,
     sessions: (id: string) => `/campaigns/${id}/sessions`,
     settings: (id: string) => `/campaigns/${id}/settings`,
+    npcs: {
+      list: (id: string) => `/campaigns/${id}/npcs`,
+      new: (id: string) => `/campaigns/${id}/npcs/new`,
+      import: (id: string) => `/campaigns/${id}/npcs/import`,
+      detail: (id: string, npcId: string) => `/campaigns/${id}/npcs/${npcId}`,
+    },
   },
   admin: ADMIN_ROUTES,
   content: CONTENT_ROUTES,

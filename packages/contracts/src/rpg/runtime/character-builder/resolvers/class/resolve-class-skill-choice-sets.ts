@@ -1,5 +1,6 @@
 import { buildChoiceSetId, type ChoiceSet } from '../../choice-set'
 import { isMeaningfulProficiencyChoice } from '../../../../content/lib/proficiency-grant-set'
+import { getProficiencyDomainCompactLabel } from '../../../../vocab/proficiency'
 import type { CharacterBuildCatalogIndex } from '../../context'
 import type { CharacterBuilderDraft } from '../../draft'
 
@@ -44,7 +45,7 @@ export function resolveClassSkillChoiceSets(
       sourceType: 'class',
       sourceId: characterClass.id,
       choiceType: 'skillProficiency',
-      label: choice.label ?? 'Choose Skills',
+      label: choice.label ?? `Choose ${getProficiencyDomainCompactLabel('skill')}`,
       min: choose,
       max: choose,
       options: from.map((skillSlug) =>

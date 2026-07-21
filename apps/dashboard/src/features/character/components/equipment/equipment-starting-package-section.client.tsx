@@ -5,11 +5,15 @@ import { useId } from 'react'
 import type {
   CharacterBuildCatalogIndex,
   CharacterBuilderDraft,
+  ResolvedStartingEquipmentFunding,
   StartingPackageConversionPreview,
 } from '@rpg/contracts'
 import { Text } from '@rpg/ui'
 
-import type { StartingPackageInventoryGroup } from '../../lib/equipment-step.lib'
+import {
+  EQUIPMENT_STARTING_PACKAGE_SECTION_LABEL,
+  type StartingPackageInventoryGroup,
+} from '../../lib/equipment-step.lib'
 import { EquipmentInventoryColumn } from './equipment-inventory-column.client'
 import { EquipmentPackageConversionEditor } from './equipment-package-conversion-editor.client'
 import {
@@ -21,8 +25,10 @@ import { equipmentStartingPackageCustomizeReasonClasses } from './equipment-star
 
 export type EquipmentStartingPackageSectionProps = {
   packageGroup: StartingPackageInventoryGroup
+  columnTitle?: string
   draft: CharacterBuilderDraft
   catalogIndex: CharacterBuildCatalogIndex
+  goldOptionFunding?: ResolvedStartingEquipmentFunding
   conversionEditorOpen: boolean
   selectedPackageItemKeys: ReadonlySet<string>
   commitStatusMessage?: string
@@ -35,8 +41,10 @@ export type EquipmentStartingPackageSectionProps = {
 
 export function EquipmentStartingPackageSection({
   packageGroup,
+  columnTitle = EQUIPMENT_STARTING_PACKAGE_SECTION_LABEL,
   draft,
   catalogIndex,
+  goldOptionFunding,
   conversionEditorOpen,
   selectedPackageItemKeys,
   commitStatusMessage,
@@ -51,7 +59,7 @@ export function EquipmentStartingPackageSection({
 
   return (
     <EquipmentInventoryColumn
-      title={packageGroup.optionLabel}
+      title={columnTitle}
       toolbar={
         <EquipmentStartingPackageToolbar
           customizeDisabled={customizeDisabled}
@@ -68,13 +76,17 @@ export function EquipmentStartingPackageSection({
         </Text>
       ) : null}
 
-      <EquipmentStartingPackageCard optionLabel={packageGroup.optionLabel}>
-        {conversionEditorOpen ? (
+      <EquipmentStartingPackageCard
+        optionLabel={packageGroup.optionLabel}
+        surface={conversionEditorOpen ? 'card' : 'subtle'}
+      >
+        {conversionEditorOpen && goldOptionFunding ? (
           <EquipmentPackageConversionEditor
             embedded
             draft={draft}
             catalogIndex={catalogIndex}
             departingOptionId={packageGroup.optionId}
+            targetFunding={goldOptionFunding}
             selectedPackageItemKeys={selectedPackageItemKeys}
             editorId={editorId}
             commitStatusMessage={commitStatusMessage}

@@ -161,6 +161,7 @@ export {
   SelectField,
   type SelectFieldProps,
   type SelectFieldOption,
+  type SelectLabelPosition,
 } from './components/ui/select-field'
 export {
   FieldReadOnlyValue,
@@ -401,9 +402,20 @@ export {
 export {
   CatalogPickerSheet,
   type CatalogPickerSheetProps,
-  type CatalogPickerSheetToolbarContext,
+  type CatalogPickerSheetActionsHelpers,
   type CatalogPickerTab,
+  type CatalogToolbarProps,
+  type CatalogToolbarSearch,
+  type CatalogToolbarTab,
+  type CatalogToolbarTabs,
 } from './components/ui/catalog-picker-sheet.client'
+export { CatalogToolbar } from './components/ui/catalog-toolbar.client'
+export {
+  CatalogFilterChips,
+  type CatalogFilterChipsOption,
+  type CatalogFilterChipsProps,
+  type CatalogFilterChipsSize,
+} from './components/ui/catalog-filter-chips.client'
 export {
   FilterPopover,
   type FilterPopoverGroup,

@@ -72,7 +72,7 @@ const storedBard: ClassStored = {
       choose: 1,
       options: [
         {
-          id: 'standard',
+          id: 'standard-equipment',
           label: 'Standard Equipment',
           items: [
             {
@@ -94,7 +94,7 @@ const storedBard: ClassStored = {
           wealth: { gp: 19 },
         },
         {
-          id: 'gold',
+          id: 'starting-gold',
           label: 'Starting Gold',
           items: [],
           wealth: { gp: 90 },
@@ -136,8 +136,8 @@ describe('resolveStartingEquipmentChoices', () => {
       max: 1,
       required: true,
       options: [
-        { id: 'standard', label: 'Standard Equipment' },
-        { id: 'gold', label: 'Starting Gold' },
+        { id: 'standard-equipment', label: 'Standard Equipment' },
+        { id: 'starting-gold', label: 'Starting Gold' },
       ],
     })
     expect(choiceSets).toHaveLength(1)
@@ -149,11 +149,11 @@ describe('resolveStartingEquipmentChoices', () => {
       ...createEmptyCharacterBuilderDraft(),
       class: { classId: bardClass.id, level: 1 as const },
       choiceSelections: {
-        [startingEquipmentChoiceSetId(bardClass.id)]: ['standard'],
+        [startingEquipmentChoiceSetId(bardClass.id)]: ['standard-equipment'],
       },
     }
 
-    const nestedId = nestedStartingEquipmentChoiceSetId(bardClass.id, 'standard', 1)
+    const nestedId = nestedStartingEquipmentChoiceSetId(bardClass.id, 'standard-equipment', 1)
     const choiceSets = resolveStartingEquipmentChoices(draft, {} as never, catalogIndex)
     const nested = choiceSets.find((choiceSet) => choiceSet.id === nestedId)
 

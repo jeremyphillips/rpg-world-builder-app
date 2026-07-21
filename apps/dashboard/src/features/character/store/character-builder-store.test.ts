@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import {
+  CHARACTER_BUILDER_DRAFT_VERSION,
   createEmptyCharacterBuilderDraft,
   createPersistedCharacterBuilderState,
 } from '@rpg/contracts'
@@ -54,7 +55,7 @@ describe('character-builder-store', () => {
     const raw = sessionStorage.getItem('character-builder:test:standalone:ruleset-a')
     const parsed = JSON.parse(raw!) as { state: unknown }
     const persisted = parsed.state as ReturnType<typeof createPersistedCharacterBuilderState>
-    expect(persisted.version).toBe(2)
+    expect(persisted.version).toBe(CHARACTER_BUILDER_DRAFT_VERSION)
     expect(persisted.draft.identity.name).toBe('Verna')
     expect(persisted).not.toHaveProperty('catalog')
     expect(persisted).not.toHaveProperty('context')

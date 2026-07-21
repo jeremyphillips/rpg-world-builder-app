@@ -92,9 +92,8 @@ export const HomebrewWithStartingEquipment: Story = {
         choose: 1,
         options: [
           {
-            id: 'standard',
+            id: 'standard-equipment',
             label: 'Standard Equipment',
-            description: '<p>Leather armor and a dagger.</p>',
             items: [
               {
                 itemKind: 'grant',
@@ -107,9 +106,8 @@ export const HomebrewWithStartingEquipment: Story = {
             wealth: { amount: 10, currency: 'gp' },
           },
           {
-            id: 'gold',
+            id: 'starting-gold',
             label: 'Starting Gold',
-            description: '',
             items: [],
             wealth: { amount: 100, currency: 'gp' },
           },

@@ -11,7 +11,7 @@ export const minimalStandalonePcInput: CreateCharacterInput = {
   alignment: 'ng',
   xp: 0,
   abilityScores: { str: 15, dex: 14, con: 13, int: 12, wis: 10, cha: 8 },
-  hitPoints: { base: 11, temporary: 0 },
+  hitPoints: { base: 11, current: 11, temporary: 0 },
   proficiencies: {
     skills: [],
     weapons: [

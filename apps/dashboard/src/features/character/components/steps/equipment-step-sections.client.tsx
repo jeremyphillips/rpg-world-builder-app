@@ -2,14 +2,14 @@
 
 import type { ComponentProps } from 'react'
 
-import type { EquipmentBudgetSummary } from '@rpg/contracts'
 import { Button, Heading, Text } from '@rpg/ui'
 
 import {
+  EQUIPMENT_CLASS_OPTIONS_REPLACED_MESSAGE,
   EQUIPMENT_STEP_CONTINUE_WITHOUT_LABEL,
   EQUIPMENT_STEP_NO_VALID_OPTIONS_MESSAGE,
+  formatEquipmentReplacedStartingWealthTitle,
 } from '../../lib/equipment-step.lib'
-import { EquipmentBudgetHeader } from '../equipment/equipment-budget-header.client'
 import { EquipmentInventorySummary } from '../equipment/equipment-inventory-summary.client'
 
 export function EquipmentStepFallback({ onContinueWithout }: { onContinueWithout: () => void }) {
@@ -23,13 +23,13 @@ export function EquipmentStepFallback({ onContinueWithout }: { onContinueWithout
   )
 }
 
-export function EquipmentStepShoppingSection({ budget }: { budget: EquipmentBudgetSummary }) {
+export function EquipmentStepReplacedClassOptionsNotice({ tierLabel }: { tierLabel?: string }) {
   return (
-    <section className="space-y-4">
+    <section className="space-y-2" aria-label="Starting wealth replacement">
       <Heading variant="subsection" as="h3">
-        Budget
+        {formatEquipmentReplacedStartingWealthTitle(tierLabel)}
       </Heading>
-      <EquipmentBudgetHeader budget={budget} />
+      <Text variant="muted">{EQUIPMENT_CLASS_OPTIONS_REPLACED_MESSAGE}</Text>
     </section>
   )
 }

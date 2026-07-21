@@ -123,4 +123,27 @@ describe('character routes', () => {
     await request(getApp()).get('/api/characters').expect(401)
     await request(getApp()).get('/api/characters/000000000000000000000000').expect(401)
   })
+
+  it('deletes an owned character and returns 404 afterward', async () => {
+    const { agent, csrfToken } = await registerAndLogin('delete@example.com')
+    const characterId = await createCharacter(agent, csrfToken)
+
+    await agent.delete(`/api/characters/${characterId}`).set(CSRF_HEADER, csrfToken).expect(204)
+    await agent.get(`/api/characters/${characterId}`).expect(404)
+  })
+
+  it('returns 404 when deleting another user character', async () => {
+    const owner = await registerAndLogin('delete-owner@example.com')
+    const other = await registerAndLogin('delete-other@example.com')
+    const ownedId = await createCharacter(owner.agent, owner.csrfToken)
+
+    await other.agent
+      .delete(`/api/characters/${ownedId}`)
+      .set(CSRF_HEADER, other.csrfToken)
+      .expect(404)
+  })
+
+  it('requires authentication for delete', async () => {
+    await request(getApp()).delete('/api/characters/000000000000000000000000').expect(403)
+  })
 })

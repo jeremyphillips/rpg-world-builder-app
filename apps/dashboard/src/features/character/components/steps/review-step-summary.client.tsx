@@ -5,9 +5,11 @@ import type {
   CharacterBuilderDraft,
   CharacterBuildContext,
 } from '@rpg/contracts'
-import { Text } from '@rpg/ui'
+import { Alert, Text } from '@rpg/ui'
 
+import { getContentTypeItemLabel } from '@/features/content/lib/content-type-labels'
 import { characterBuilderPreviewStatGridClasses } from '../character-builder-shell.variants'
+import { resolveBuilderModelingAdvisories } from '../../lib/builder-review-advisories.lib'
 import {
   formatAbilityMethodLabel,
   formatReviewAlignment,
@@ -23,19 +25,31 @@ export type ReviewStepSummaryProps = {
 export function ReviewStepSummary({ context, draft, preview }: ReviewStepSummaryProps) {
   const speciesName = resolveCatalogEntryName(context.catalog.species, draft.species.speciesId)
   const className = resolveCatalogEntryName(context.catalog.classes, draft.class.classId)
+  const modelingAdvisories = resolveBuilderModelingAdvisories(draft)
 
   return (
     <>
       <dl className="grid gap-3 sm:grid-cols-2">
         <ReviewRow label="Name" value={draft.identity.name?.trim() || 'Not set'} />
         <ReviewRow label="Alignment" value={formatReviewAlignment(draft.identity.alignment)} />
-        <ReviewRow label="Species" value={speciesName} />
+        <ReviewRow label="Level" value={String(draft.class.level)} />
+        <ReviewRow label={getContentTypeItemLabel('species')} value={speciesName} />
         <ReviewRow label="Class" value={className} />
         <ReviewRow
           label="Ability method"
           value={formatAbilityMethodLabel(draft.abilities.method)}
         />
       </dl>
+
+      {modelingAdvisories.length > 0 ? (
+        <div className="space-y-2">
+          {modelingAdvisories.map((message) => (
+            <Alert key={message} variant="info" title="Modeling note">
+              {message}
+            </Alert>
+          ))}
+        </div>
+      ) : null}
 
       {preview ? (
         <div className="space-y-2">

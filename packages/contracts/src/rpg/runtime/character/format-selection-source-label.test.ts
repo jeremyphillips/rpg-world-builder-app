@@ -52,7 +52,7 @@ describe('formatSelectionSourceLabel', () => {
           {
             kind: 'classStartingEquipment',
             sourceId: 'srd-cc-5.2.1:bard',
-            grantId: 'standard',
+            grantId: 'standard-equipment',
           },
         ],
         catalogIndex,

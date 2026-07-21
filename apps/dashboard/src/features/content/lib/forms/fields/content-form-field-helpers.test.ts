@@ -10,6 +10,7 @@ import {
   weightFromForm,
   weightToForm,
 } from './content-economy-form-fields'
+import type { DependentConfig } from '@rpg/ui/form'
 import {
   descriptionField,
   feetInputUnitField,
@@ -21,33 +22,48 @@ import { EQUIPMENT_COST_VALUE_DIGITS } from '../../../equipment/lib/equipment-co
 import { EQUIPMENT_WEIGHT_VALUE_DIGITS } from '../../../equipment/lib/equipment-weight-config'
 
 describe('costFields', () => {
-  it('uses static valueDigits when equipment kind is known', () => {
+  function costInputFromFields(fields: ReturnType<typeof costFields>) {
+    const dependent = fields[0] as DependentConfig
+    return dependent.dependents.fields[0]
+  }
+
+  it('uses a has market price switch with conditional cost input', () => {
     const [field] = costFields({ kind: 'weapon' })
     expect(field).toMatchObject({
+      kind: 'dependent',
+      controller: {
+        type: 'switch',
+        name: 'hasMarketPrice',
+        label: 'Has market price',
+      },
+    })
+    expect(costInputFromFields(costFields({ kind: 'weapon' }))).toMatchObject({
       type: 'inputSelect',
       name: 'cost',
       valueKey: 'amount',
       unitKey: 'currency',
       valueDigits: 2,
+      min: 1,
       formatGrouped: true,
     })
-    expect(field).not.toHaveProperty('valueDigitsDependsOn')
+    expect(costInputFromFields(costFields({ kind: 'weapon' }))).not.toHaveProperty(
+      'valueDigitsDependsOn',
+    )
   })
 
   it('resolves valueDigits dynamically from kind on the hub route', () => {
-    const [field] = costFields()
-    expect(field).toMatchObject({
+    const costField = costInputFromFields(costFields())
+    expect(costField).toMatchObject({
       type: 'inputSelect',
       name: 'cost',
       valueDigitsDependsOn: 'kind',
       valueDigitsLookup: EQUIPMENT_COST_VALUE_DIGITS,
     })
-    expect(field).not.toHaveProperty('valueDigits')
+    expect(costField).not.toHaveProperty('valueDigits')
   })
 
   it('maps vehicle costs to five digit slots', () => {
-    const [field] = costFields({ kind: 'vehicle' })
-    expect(field).toMatchObject({ valueDigits: 5 })
+    expect(costInputFromFields(costFields({ kind: 'vehicle' }))).toMatchObject({ valueDigits: 5 })
   })
 })
 
@@ -98,24 +114,23 @@ describe('optionalWeightFields', () => {
 })
 
 describe('economyFields', () => {
-  it('places cost and weight in an auto-width row', () => {
-    const row = economyFields({ kind: 'weapon' })[0]
-    expect(row).toMatchObject({ kind: 'row' })
-    if (row && 'kind' in row && row.kind === 'row') {
-      expect(row).not.toHaveProperty('className')
-      expect(row.fields).toHaveLength(2)
-      expect(row.fields[0]).toMatchObject({ name: 'cost', width: 'auto' })
-      expect(row.fields[1]).toMatchObject({ name: 'weight', width: 'auto' })
-    }
+  it('includes market price and weight fields for physical equipment', () => {
+    const fields = economyFields({ kind: 'weapon' })
+    expect(fields).toHaveLength(2)
+    expect(fields[0]).toMatchObject({
+      kind: 'dependent',
+      controller: { name: 'hasMarketPrice', width: 'auto' },
+    })
+    expect(fields[1]).toMatchObject({ name: 'weight', width: 'auto' })
   })
 
-  it('returns a row with only cost for service', () => {
-    const row = economyFields({ kind: 'service' })[0]
-    expect(row).toMatchObject({ kind: 'row' })
-    if (row && 'kind' in row && row.kind === 'row') {
-      expect(row.fields).toHaveLength(1)
-      expect(row.fields[0]).toMatchObject({ name: 'cost', width: 'auto' })
-    }
+  it('returns only market price fields for service', () => {
+    const fields = economyFields({ kind: 'service' })
+    expect(fields).toHaveLength(1)
+    expect(fields[0]).toMatchObject({
+      kind: 'dependent',
+      controller: { name: 'hasMarketPrice', width: 'auto' },
+    })
   })
 })
 

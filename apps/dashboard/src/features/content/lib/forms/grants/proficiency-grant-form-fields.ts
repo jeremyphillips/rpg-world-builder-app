@@ -11,6 +11,7 @@ import {
   toolCategorySchema,
   weaponCategorySchema,
   skillSchema,
+  getProficiencyDomainCompactLabel,
 } from '@rpg/contracts'
 import {
   combineFieldVisibilityAll,
@@ -425,7 +426,7 @@ function skillProficiencyPoolFields(ctx: ContentFormCtx, guard?: FieldVisibility
     {
       type: 'chips',
       name: 'skillProficiencyPoolIds',
-      label: 'Skills',
+      label: getProficiencyDomainCompactLabel('skill'),
       options: skillOptions,
       required: true,
       visibility: visibleForPoolSource('explicit', guard),
@@ -445,7 +446,7 @@ export function skillProficiencyGrantItemFields(
     {
       type: 'chips',
       name: 'skillProficiencyIds',
-      label: 'Skills',
+      label: getProficiencyDomainCompactLabel('skill'),
       options: skillOptions,
       required: true,
       visibility: visibleForProficiencySource('specific', guard),

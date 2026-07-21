@@ -3,15 +3,19 @@ import { z } from 'zod'
 import {
   CREATURE_SIZES,
   CREATURE_SIZE_ENTRIES,
+  CREATURE_SIZE_TERM,
+  CREATURE_TYPE_TERM,
   creatureSizeSchema,
   creatureTypeSchema,
   defineMessage,
+  getTermSentenceForm,
+  getVocabularyTermLabel,
   slugSchema,
   type CreatureTypeId,
 } from '@rpg/contracts'
 import { toOptions, type FormItem, type TabbedFormTab } from '@rpg/ui/form'
 
-import { vocabularySelectField } from '@/features/homebrew'
+import { vocabularyFieldLabel, vocabularySelectFieldForTerm } from '@/features/homebrew'
 
 import { getCharacterCreatureTypeFieldOptions } from './creature-type-field-options'
 import { descriptionField, nameField } from '../../lib/forms/fields/content-identity-form-fields'
@@ -58,11 +62,13 @@ const creatureSizeOptions = toOptions(
 export const speciesValidationMessages = {
   creatureTypeNotAllowed: defineMessage(
     'validation.species.creatureTypeNotAllowed',
-    () => 'Creature type is not allowed for character sheets in this campaign.',
+    () =>
+      `${vocabularyFieldLabel(CREATURE_TYPE_TERM)} is not allowed for character sheets in this campaign.`,
   ),
   creatureTypeUnavailable: defineMessage(
     'validation.species.creatureTypeUnavailable',
-    () => 'Creature type is not available in this campaign vocabulary.',
+    () =>
+      `This ${getTermSentenceForm(CREATURE_TYPE_TERM, 1)} is not available in this campaign vocabulary.`,
   ),
 }
 
@@ -122,9 +128,8 @@ function attributesFields(ctx: ContentFormCtx): FormItem[] {
     {
       kind: 'row',
       fields: [
-        vocabularySelectField({
+        vocabularySelectFieldForTerm(CREATURE_TYPE_TERM, {
           name: 'creatureType',
-          label: 'Creature type',
           options: getCharacterCreatureTypeFieldOptions(ctx),
           required: true,
           width: 'lg',
@@ -134,7 +139,7 @@ function attributesFields(ctx: ContentFormCtx): FormItem[] {
     {
       type: 'chips',
       name: 'sizes',
-      label: 'Size',
+      label: getVocabularyTermLabel(CREATURE_SIZE_TERM),
       options: creatureSizeOptions,
       required: true,
       chrome: { variant: 'panel' },

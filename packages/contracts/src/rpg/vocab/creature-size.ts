@@ -1,12 +1,21 @@
 import { vocabEnumFromEntries, keysFromEntries } from './enum-schema'
 import { getTermSentenceForm } from './types'
-import type { GameTermEntry } from './types'
+import type { GameTermEntry, VocabularyTerm } from './types'
 
 // ---------------------------------------------------------------------------
 // Creature sizes — the closed SRD 5.2.1 size categories, shared by species,
 // monsters, and any creature with a footprint. Ordered smallest to largest;
 // descriptions note the space each size occupies on a grid.
 // ---------------------------------------------------------------------------
+
+export const CREATURE_SIZE_TERM = {
+  label: 'Size',
+  description: 'How much space a creature occupies on the battlefield.',
+  sentence: {
+    singular: 'size category',
+    plural: 'size categories',
+  },
+} as const satisfies VocabularyTerm
 
 export const CREATURE_SIZE_ENTRIES = {
   tiny: {

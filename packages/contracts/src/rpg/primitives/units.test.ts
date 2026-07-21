@@ -17,6 +17,8 @@ import {
   massToLb,
   moneySchema,
   moneyToCp,
+  positiveMoneySchema,
+  equipmentCostSchema,
   MOUNT_CARRYING_CAPACITY_LABEL,
   parseSpeedRateString,
   speedRateSchema,
@@ -99,6 +101,33 @@ describe('moneySchema', () => {
   it('rejects negative and fractional amounts', () => {
     expect(moneySchema.safeParse({ amount: -1, currency: 'gp' }).success).toBe(false)
     expect(moneySchema.safeParse({ amount: 1.5, currency: 'gp' }).success).toBe(false)
+  })
+})
+
+describe('positiveMoneySchema', () => {
+  it('parses positive integer amounts', () => {
+    expect(positiveMoneySchema.parse({ amount: 1, currency: 'gp' })).toEqual({
+      amount: 1,
+      currency: 'gp',
+    })
+  })
+
+  it('rejects zero amounts', () => {
+    expect(positiveMoneySchema.safeParse({ amount: 0, currency: 'gp' }).success).toBe(false)
+  })
+})
+
+describe('equipmentCostSchema', () => {
+  it('accepts null and positive money', () => {
+    expect(equipmentCostSchema.parse(null)).toBeNull()
+    expect(equipmentCostSchema.parse({ amount: 5, currency: 'sp' })).toEqual({
+      amount: 5,
+      currency: 'sp',
+    })
+  })
+
+  it('rejects zero-cost prices', () => {
+    expect(equipmentCostSchema.safeParse({ amount: 0, currency: 'gp' }).success).toBe(false)
   })
 })
 

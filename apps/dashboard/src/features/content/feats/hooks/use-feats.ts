@@ -1,12 +1,13 @@
 import { createContentQueryHook } from '../../lib/list/create-content-list'
 import { createContentMutationHooks } from '../../lib/list/use-content-mutations'
+import { formatContentListLoadErrorMessage } from '../../lib/content-type-labels'
 import { listFeats } from '../api/feats-api'
 
 const featsContentList = createContentQueryHook(
   {
     routeKey: 'feats',
     responseKey: 'feats',
-    errorMessage: 'Could not load feats.',
+    errorMessage: formatContentListLoadErrorMessage('feats'),
   },
   listFeats,
 )

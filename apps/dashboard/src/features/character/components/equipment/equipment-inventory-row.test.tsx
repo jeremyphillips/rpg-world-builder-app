@@ -84,7 +84,7 @@ describe('EquipmentInventoryRowItem', () => {
           {
             kind: 'classStartingEquipment',
             sourceId: equipmentStepBardClassFixture.id,
-            grantId: 'standard',
+            grantId: 'standard-equipment',
           },
         ],
       },
@@ -96,7 +96,7 @@ describe('EquipmentInventoryRowItem', () => {
       removeLabel: 'Remove all 2 Dagger',
       removeTarget: {
         kind: 'package',
-        packageItemKey: `${equipmentStepBardClassFixture.id}:standard:0`,
+        packageItemKey: `${equipmentStepBardClassFixture.id}:standard-equipment:0`,
       },
     }
 

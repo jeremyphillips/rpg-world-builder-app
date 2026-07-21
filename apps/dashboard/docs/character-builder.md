@@ -46,6 +46,21 @@ hidden until a class is chosen.
 
 Readiness does not replace `validateCharacterBuild` on Continue / Create.
 
+### Builder level (phase 1)
+
+- `draft.class.level` is the selected class level (schema: `absoluteLevelSchema`, default `1`).
+- `getCharacterBuilderTotalLevel(draft)` — proficiency bonus and preview derivation.
+- `getBuilderSelectedStartingLevel(draft)` — starting wealth tier lookup (single-class today).
+- `validateBuilderCharacterLevel` / `resolveBuilderLevelConstraints` — context-specific caps; campaign PC requires `level === startingLevel` when that flow is active.
+- Preview and finalize share `resolveBuilderMaxHitPoints`; builder finalize sets `xp: null` until experience tracking is modeled.
+
+### Builder level UI (phase 2)
+
+- Shell chrome hosts `CharacterBuilderLevelControl` inline with the page heading at every step.
+- Standalone PC and campaign NPC use a selectable level field; campaign PC uses a read-only badge seeded to `startingLevel`.
+- Level changes run `pruneInvalidBuilderSelections` on a candidate draft; removals open a confirmation modal before patching.
+- Copy lives in `characterBuilderLevelMessages` (`@rpg/contracts`).
+
 ### Copy layers
 
 Dependent-choice workflow strings (heritage, future subclass) use a three-layer model:

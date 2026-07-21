@@ -1,6 +1,8 @@
 import { z } from 'zod'
-import { skillSchema } from '@rpg/contracts'
+import { PROFICIENCY_DOMAIN_ENTRIES, skillSchema } from '@rpg/contracts'
 import { type FormItem } from '@rpg/ui/form'
+
+import { vocabularyHubLabel } from '@/features/homebrew/lib/vocabulary/term-labels'
 
 import type { ContentFormCtx } from '../../../lib/forms/content-form-registry'
 import {
@@ -19,6 +21,7 @@ import {
 
 const SKILL_CHOICE_CHOOSE_PATH = 'characterCreation.proficiencies.skills.choose' as const
 const SKILL_CHOICE_FROM_PATH = 'characterCreation.proficiencies.skills.from' as const
+const SKILL_PROFICIENCY_PLURAL_LABEL = vocabularyHubLabel(PROFICIENCY_DOMAIN_ENTRIES.skill)
 
 /**
  * First-choice-only outlier: flat choose/from form fields map to
@@ -82,7 +85,7 @@ export function characterCreationSkillChoiceFields(ctx: ContentFormCtx): FormIte
           min: 0,
           ...(skillCount > 0 ? { max: skillCount } : {}),
         },
-        { kind: 'text', value: 'Skill Proficiencies from:', tone: 'label' },
+        { kind: 'text', value: `${SKILL_PROFICIENCY_PLURAL_LABEL} from:`, tone: 'label' },
       ],
       below: {
         kind: 'chips',
@@ -128,7 +131,7 @@ export function characterCreationProficienciesFields(
       fields: [
         {
           kind: 'group',
-          legend: 'Skill Proficiencies',
+          legend: SKILL_PROFICIENCY_PLURAL_LABEL,
           legendSize: 'subsection',
           fieldsChrome: { variant: 'panel' },
           fields: characterCreationSkillChoiceFields(ctx),

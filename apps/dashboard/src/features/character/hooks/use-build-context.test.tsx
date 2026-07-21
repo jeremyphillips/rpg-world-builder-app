@@ -65,8 +65,13 @@ describe('useBuildContext', () => {
     await waitFor(() => expect(result.current.context).not.toBeNull())
 
     expect(result.current.context).toMatchObject({
+      channel: 'build',
+      surface: 'dashboard',
+      characterKind: 'pc',
       mode: 'dashboard',
       scope: { type: 'standalone', rulesetId: 'srd-cc-5.2.1' },
+      rulesScope: { type: 'ruleset', rulesetId: 'srd-cc-5.2.1' },
+      ownershipTarget: { type: 'user' },
       rulesetId: 'srd-cc-5.2.1',
       catalog: emptyCatalog,
       permissions: { canCreateCharacter: true },

@@ -1,9 +1,18 @@
 import { vocabEnumFromEntries, keysFromEntries } from '../enum-schema'
-import type { GameTermEntry } from '../types'
+import type { GameTermEntry, VocabularyTerm } from '../types'
 
 // ---------------------------------------------------------------------------
 // Spell role tags — closed browse/filter vocabulary for spell discovery.
 // ---------------------------------------------------------------------------
+
+export const SPELL_ROLE_TAG_TERM = {
+  label: 'Spell Role Tag',
+  description: "A browse/filter tag describing a spell's primary role in play.",
+  sentence: {
+    singular: 'spell role tag',
+    plural: 'spell role tags',
+  },
+} as const satisfies VocabularyTerm
 
 export const SPELL_ROLE_TAG_ENTRIES = {
   damage: { label: 'Damage', description: 'Primarily deals hit point loss or harm.' },
