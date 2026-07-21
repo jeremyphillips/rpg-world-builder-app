@@ -22,4 +22,10 @@ export const EQUIPMENT_PICKER_ITEM_HEADER_KIND_CLASSES = 'text-muted-foreground 
 export const EQUIPMENT_PICKER_COMMERCE_PRICE_CLASSES =
   'shrink-0 text-xs tabular-nums text-muted-foreground'
 
+export const EQUIPMENT_PICKER_ITEM_HEADER_SUMMARY_TRAILING_CLASSES = {
+  default: EQUIPMENT_PICKER_COMMERCE_PRICE_CLASSES,
+  muted: EQUIPMENT_PICKER_COMMERCE_PRICE_CLASSES,
+  blocked: 'shrink-0 text-xs text-muted-foreground',
+} as const satisfies Record<'default' | 'muted' | 'blocked', string>
+
 export const equipmentPickerItemHeaderDisabledClasses = 'opacity-60'

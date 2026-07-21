@@ -3,6 +3,8 @@
 import { Button, Heading } from '@rpg/ui'
 import type { Equipment } from '@rpg/contracts'
 
+import { EquipmentInventorySourceActionButton } from './equipment-inventory-source-action-button.client'
+
 import { EQUIPMENT_PICKER_CHARACTER_PREVIEW_SECTION_LABEL } from './equipment-picker-character-preview.lib'
 import {
   EQUIPMENT_PICKER_PURCHASE_INVENTORY_LABEL,
@@ -19,7 +21,6 @@ import {
 import {
   equipmentPickerPurchaseInsetPanelClasses,
   equipmentPickerPurchaseInsetPanelContentClasses,
-  equipmentPickerPurchaseRemoveActionClasses,
   equipmentPickerPurchaseRemoveActionsClasses,
 } from './equipment-picker-purchase.variants'
 
@@ -63,14 +64,9 @@ function InventoryRemoveTextButton({
   disabled?: boolean
 }) {
   return (
-    <button
-      type="button"
-      className={equipmentPickerPurchaseRemoveActionClasses}
-      disabled={disabled}
-      onClick={onClick}
-    >
+    <EquipmentInventorySourceActionButton disabled={disabled} onClick={onClick}>
       {label}
-    </button>
+    </EquipmentInventorySourceActionButton>
   )
 }
 

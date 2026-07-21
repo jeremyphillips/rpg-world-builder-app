@@ -154,7 +154,7 @@ describe('EquipmentPickerItemDetails', () => {
     expect(screen.getByText(/Quantity to add/)).toBeInTheDocument()
     expect(
       screen.getByRole('button', { name: EQUIPMENT_PICKER_PURCHASE_REMOVE_ONE_LABEL }),
-    ).toBeInTheDocument()
+    ).toHaveClass('h-6')
 
     await user.click(
       screen.getByRole('button', { name: EQUIPMENT_PICKER_PURCHASE_ADD_ANOTHER_LABEL }),

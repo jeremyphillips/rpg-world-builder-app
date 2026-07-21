@@ -4,23 +4,40 @@ import type { ButtonProps } from '@rpg/ui'
 import { Badge } from '@rpg/ui'
 
 import { CatalogPickerActionButton } from '../picker/catalog-picker-action-button.client'
+import { resolveAcquisitionCommitButtonLabel } from './equipment-acquisition-commit-labels.lib'
 import { EQUIPMENT_PICKER_ITEM_HEADER_TITLE_ACTIONS_CLASSES } from './equipment-picker-item-header.variants'
 
 const EQUIPMENT_PICKER_ADD_LABEL = 'Add'
 
 export type EquipmentPickerCommerceProps = {
   ownedQuantity: number
+  showAdd?: boolean
   disabled?: boolean
+  buttonLabel?: string
+  isPending?: boolean
+  successQuantity?: number
   onAdd: () => void
   buttonVariant?: ButtonProps['variant']
 }
 
 export function EquipmentPickerCommerce({
   ownedQuantity,
+  showAdd = true,
   disabled = false,
+  buttonLabel,
+  isPending = false,
+  successQuantity,
   onAdd,
   buttonVariant,
 }: EquipmentPickerCommerceProps) {
+  const label =
+    buttonLabel ??
+    resolveAcquisitionCommitButtonLabel({
+      isPending,
+      successQuantity,
+      primaryActionLabel: EQUIPMENT_PICKER_ADD_LABEL,
+    })
+
   return (
     <div className={EQUIPMENT_PICKER_ITEM_HEADER_TITLE_ACTIONS_CLASSES}>
       {ownedQuantity > 0 ? (
@@ -28,9 +45,15 @@ export function EquipmentPickerCommerce({
           {ownedQuantity}
         </Badge>
       ) : null}
-      <CatalogPickerActionButton variant={buttonVariant} disabled={disabled} onClick={onAdd}>
-        {EQUIPMENT_PICKER_ADD_LABEL}
-      </CatalogPickerActionButton>
+      {showAdd ? (
+        <CatalogPickerActionButton
+          variant={buttonVariant}
+          disabled={disabled || isPending}
+          onClick={onAdd}
+        >
+          {label}
+        </CatalogPickerActionButton>
+      ) : null}
     </div>
   )
 }

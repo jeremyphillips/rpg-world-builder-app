@@ -35,7 +35,7 @@ import {
   hasEquipmentPickerClearableCriteria,
   hasEquipmentPickerResetViewCriteria,
   resolveEquipmentKindFilterOptions,
-  resolveEquipmentPickerDrawerItemHeaderProps,
+  resolveEquipmentPickerDrawerItemHeaderPresentation,
 } from './equipment-picker-drawer.lib'
 import type { EquipmentPickerRowActionViewModel } from './equipment-picker-action.lib'
 import {
@@ -63,12 +63,15 @@ import {
 } from './equipment-picker-drawer.types'
 import { EquipmentBudgetHeader } from './equipment-budget-header.client'
 import { EquipmentPickerItemDetails } from './equipment-picker-item-details.client'
-import { EquipmentPickerItemHeader } from './equipment-picker-item-header.client'
+import { EquipmentPickerItemHeaderRail } from './equipment-picker-item-header-rail.client'
 import {
   clampEquipmentStepQuantity,
   resolveEquipmentStepPurchaseMaxQuantity,
 } from '../../lib/equipment-quantity.lib'
-import type { EquipmentPickerWorkflowMode } from '../../lib/equipment-step.lib'
+import {
+  resolveEquipmentOwnedQuantity,
+  type EquipmentPickerWorkflowMode,
+} from '../../lib/equipment-step.lib'
 
 export type { EquipmentPickerDrawerProps } from './equipment-picker-drawer.types'
 
@@ -313,11 +316,40 @@ export function EquipmentPickerDrawer({
 
   const showCategoryFilter = kindOptions.length > 1
 
-  const handleQuickAdd = React.useCallback(
-    (item: EquipmentPickerItem) => {
-      onAddItem(item, 1)
+  const handleHeaderCommit = React.useCallback(
+    (item: EquipmentPickerItem): boolean => {
+      const itemKey = item.equipment.id
+
+      if (isMagicItemsWorkflow && onApplyMagicItemAcquisition) {
+        return onApplyMagicItemAcquisition({ equipmentId: itemKey, requestedQuantity: 1 })
+      }
+
+      if (!isMagicItemsWorkflow && onApplyPurchase) {
+        onApplyPurchase({ equipmentId: itemKey, requestedQuantity: 1 })
+        return true
+      }
+
+      const ownedQuantity = draft
+        ? resolveEquipmentOwnedQuantity({ equipmentId: itemKey, draft })
+        : (ownedPurchaseQuantities[itemKey] ?? 0)
+      const maxQuantity = resolveEquipmentStepPurchaseMaxQuantity({
+        equipment: item.equipment,
+        budget: effectiveBudget,
+        currentQuantity: ownedQuantity,
+      })
+      const cappedQuantity = clampEquipmentStepQuantity(1, maxQuantity)
+      onAddItem(item, cappedQuantity)
+      return true
     },
-    [onAddItem],
+    [
+      draft,
+      effectiveBudget,
+      isMagicItemsWorkflow,
+      onAddItem,
+      onApplyMagicItemAcquisition,
+      onApplyPurchase,
+      ownedPurchaseQuantities,
+    ],
   )
 
   const handleCommitAdd = React.useCallback(
@@ -341,7 +373,9 @@ export function EquipmentPickerDrawer({
         return
       }
 
-      const ownedQuantity = ownedPurchaseQuantities[itemKey] ?? 0
+      const ownedQuantity = draft
+        ? resolveEquipmentOwnedQuantity({ equipmentId: itemKey, draft })
+        : (ownedPurchaseQuantities[itemKey] ?? 0)
       const maxQuantity = resolveEquipmentStepPurchaseMaxQuantity({
         equipment: item.equipment,
         budget: effectiveBudget,
@@ -355,6 +389,7 @@ export function EquipmentPickerDrawer({
     },
     [
       addQuantities,
+      draft,
       effectiveBudget,
       isMagicItemsWorkflow,
       onAddItem,
@@ -495,19 +530,31 @@ export function EquipmentPickerDrawer({
           />
         ),
       }}
-      renderItemHeader={(item) => (
-        <EquipmentPickerItemHeader
-          {...resolveEquipmentPickerDrawerItemHeaderProps({
-            item,
-            isGoldShoppingPath,
-            isMagicItemsWorkflow,
-            ownedGrantQuantities,
-            ownedPurchaseQuantities,
-            rowActionVm: resolveRowVm(item, addQuantities[item.equipment.id] ?? 1),
-            onQuickAdd: handleQuickAdd,
-          })}
-        />
-      )}
+      renderItemHeader={(item) => {
+        const rowActionVm = resolveRowVm(item, 1)
+        const presentation = resolveEquipmentPickerDrawerItemHeaderPresentation({
+          item,
+          workflowMode,
+          draft,
+          rowActionVm,
+        })
+        const ownedQuantity = draft
+          ? resolveEquipmentOwnedQuantity({ equipmentId: item.equipment.id, draft })
+          : isMagicItemsWorkflow
+            ? (ownedGrantQuantities[item.equipment.id] ?? 0)
+            : (ownedPurchaseQuantities[item.equipment.id] ?? 0)
+        const canQuickAdd = presentation.action.kind === 'add' && !presentation.action.disabled
+
+        return (
+          <EquipmentPickerItemHeaderRail
+            item={item}
+            presentation={presentation}
+            ownedQuantity={ownedQuantity}
+            isGoldShoppingPath={isGoldShoppingPath}
+            onCommit={canQuickAdd ? () => handleHeaderCommit(item) : undefined}
+          />
+        )
+      }}
       renderItemSummary={(item) =>
         isMagicItemsWorkflow ? null : (
           <EquipmentPickerRowSummary item={item} budget={effectiveBudget} />
@@ -527,9 +574,11 @@ export function EquipmentPickerDrawer({
             itemState={item.state}
             budget={effectiveBudget}
             ownedQuantity={
-              isMagicItemsWorkflow
-                ? (ownedGrantQuantities[item.equipment.id] ?? 0)
-                : (ownedPurchaseQuantities[item.equipment.id] ?? 0)
+              draft
+                ? resolveEquipmentOwnedQuantity({ equipmentId: item.equipment.id, draft })
+                : isMagicItemsWorkflow
+                  ? (ownedGrantQuantities[item.equipment.id] ?? 0)
+                  : (ownedPurchaseQuantities[item.equipment.id] ?? 0)
             }
             addQuantity={addQuantity}
             onAddQuantityChange={(quantity) => handleAddQuantityChange(item.equipment.id, quantity)}

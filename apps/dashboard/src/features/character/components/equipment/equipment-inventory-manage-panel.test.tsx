@@ -66,7 +66,9 @@ describe('EquipmentInventoryManagePanel', () => {
     )
 
     await user.click(screen.getByRole('button', { name: 'Manage' }))
-    await user.click(screen.getByRole('button', { name: 'Release one' }))
+    const releaseButton = screen.getByRole('button', { name: 'Release one' })
+    expect(releaseButton).toHaveClass('h-6')
+    await user.click(releaseButton)
 
     expect(onReleaseGrant).toHaveBeenCalledWith({
       allowanceId: 'allowance-common',

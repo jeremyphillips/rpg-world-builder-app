@@ -10,7 +10,9 @@ import type {
   CharacterBuilderDraft,
   EquipmentBudgetSummary,
 } from '@rpg/contracts'
-import { Button, Collapsible, CollapsibleContent, CollapsibleTrigger, Text } from '@rpg/ui'
+import { Collapsible, CollapsibleContent, CollapsibleTrigger, Text } from '@rpg/ui'
+
+import { EquipmentInventorySourceActionButton } from './equipment-inventory-source-action-button.client'
 
 import {
   EQUIPMENT_INVENTORY_DONE_LABEL,
@@ -100,10 +102,7 @@ function GrantOnlySingleReleaseRow({
           </Text>
         </div>
         <div className={equipmentInventoryRowActionsClasses}>
-          <Button
-            type="button"
-            size="sm"
-            variant="ghost"
+          <EquipmentInventorySourceActionButton
             onClick={() =>
               onReleaseGrant({
                 allowanceId: removeTarget.allowanceId,
@@ -113,7 +112,7 @@ function GrantOnlySingleReleaseRow({
             }
           >
             {EQUIPMENT_INVENTORY_RELEASE_LABEL}
-          </Button>
+          </EquipmentInventorySourceActionButton>
         </div>
       </div>
       <InventoryRowDetailLine label={entry.provenanceLabel} />

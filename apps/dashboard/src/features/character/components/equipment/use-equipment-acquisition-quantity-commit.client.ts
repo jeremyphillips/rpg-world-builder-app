@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react'
 
-const COMMIT_SUCCESS_DISPLAY_MS = 2000
+export const COMMIT_SUCCESS_DISPLAY_MS = 2000
 
 export function useEquipmentAcquisitionQuantityCommit(args: {
   commit: (requestedQuantity: number) => boolean

@@ -3,8 +3,6 @@
 import { useId, useMemo } from 'react'
 
 import { Badge, Button, Heading, NumberStepper, Text } from '@rpg/ui'
-
-import { EQUIPMENT_ACQUISITION_ADDING_LABEL } from '../../lib/equipment-step.lib'
 import {
   clampEquipmentStepQuantity,
   EQUIPMENT_STEP_QUANTITY_INPUT_DIGITS,
@@ -12,10 +10,10 @@ import {
 import {
   buildEquipmentAcquisitionPanelViewModel,
   formatAcquisitionCommitSuccessAnnouncement,
-  formatAcquisitionCommitSuccessButtonLabel,
   type EquipmentOwnedSourceAction,
   type EquipmentOwnedSourceViewModel,
 } from './equipment-acquisition-panel.lib'
+import { resolveAcquisitionCommitButtonLabel } from './equipment-acquisition-commit-labels.lib'
 import {
   equipmentAcquisitionPanelBlockerClasses,
   equipmentAcquisitionPanelBodyClasses,
@@ -43,6 +41,7 @@ import {
   equipmentAcquisitionPanelSourceRowClasses,
   equipmentAcquisitionPanelSourceSpendSuffixClasses,
 } from './equipment-acquisition-panel.variants'
+import { EquipmentInventorySourceActionButton } from './equipment-inventory-source-action-button.client'
 import type { EquipmentAcquisitionPanelBodyProps } from './equipment-acquisition-panel-body.types'
 
 function OwnedSourceQuantity({ source }: { source: EquipmentOwnedSourceViewModel }) {
@@ -85,15 +84,12 @@ function OwnedSourceRow({
         <OwnedSourceQuantity source={source} />
       </div>
       <div className={equipmentAcquisitionPanelSourceActionsClasses}>
-        <Button
-          type="button"
-          size="sm"
-          variant="ghost"
+        <EquipmentInventorySourceActionButton
           disabled={disabled}
           onClick={() => onSourceAction(source.action)}
         >
           {source.action.label}
-        </Button>
+        </EquipmentInventorySourceActionButton>
       </div>
     </div>
   )
@@ -104,11 +100,7 @@ function resolveCommitButtonLabel(args: {
   successQuantity?: number
   primaryActionLabel: string
 }): string {
-  if (args.isPending) return EQUIPMENT_ACQUISITION_ADDING_LABEL
-  if (args.successQuantity !== undefined) {
-    return formatAcquisitionCommitSuccessButtonLabel(args.successQuantity)
-  }
-  return args.primaryActionLabel
+  return resolveAcquisitionCommitButtonLabel(args)
 }
 
 export function EquipmentAcquisitionPanelBody({

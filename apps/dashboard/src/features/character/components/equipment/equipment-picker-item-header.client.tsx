@@ -2,7 +2,7 @@
 
 import { Check, TriangleAlert } from 'lucide-react'
 
-import { Badge, Text, cn } from '@rpg/ui'
+import { Badge, Text } from '@rpg/ui'
 
 import type { EquipmentPickerRowViewModel } from '@/features/content'
 
@@ -13,33 +13,39 @@ import {
 import { getEquipmentCalloutPresentation } from './equipment-picker-callout-presentation.lib'
 import type { EquipmentPickerCallout } from './equipment-picker-drawer.types'
 import { EquipmentPickerCommerce } from './equipment-picker-commerce.client'
+import type { EquipmentPickerHeaderAction } from './equipment-picker-item-header.lib'
 import {
-  EQUIPMENT_PICKER_COMMERCE_PRICE_CLASSES,
   EQUIPMENT_PICKER_ITEM_HEADER_FOOTER_META_CLASSES,
   EQUIPMENT_PICKER_ITEM_HEADER_KIND_CLASSES,
   EQUIPMENT_PICKER_ITEM_HEADER_NAME_CLASSES,
   EQUIPMENT_PICKER_ITEM_HEADER_ROOT_CLASSES,
   EQUIPMENT_PICKER_ITEM_HEADER_SUMMARY_METADATA_CLASSES,
   EQUIPMENT_PICKER_ITEM_HEADER_SUMMARY_ROW_CLASSES,
+  EQUIPMENT_PICKER_ITEM_HEADER_SUMMARY_TRAILING_CLASSES,
   EQUIPMENT_PICKER_ITEM_HEADER_TITLE_ROW_CLASSES,
-  equipmentPickerItemHeaderDisabledClasses,
 } from './equipment-picker-item-header.variants'
 
 export type EquipmentPickerItemHeaderProps = {
   item: EquipmentPickerRowViewModel
   callout?: EquipmentPickerCallout
-  disabled?: boolean
-  priceLabel?: string
+  summaryTrailingLabel?: string
+  summaryTrailingTone?: 'default' | 'muted' | 'blocked'
+  action: EquipmentPickerHeaderAction
   ownedQuantity?: number
+  addButtonLabel?: string
+  isPending?: boolean
   onAdd?: () => void
 }
 
 export function EquipmentPickerItemHeader({
   item,
   callout,
-  disabled = false,
-  priceLabel,
+  summaryTrailingLabel,
+  summaryTrailingTone = 'default',
+  action,
   ownedQuantity = 0,
+  addButtonLabel = 'Add',
+  isPending = false,
   onAdd,
 }: EquipmentPickerItemHeaderProps) {
   const metadataLines = mapEquipmentCompactSummaryToMetadataLines({
@@ -47,24 +53,24 @@ export function EquipmentPickerItemHeader({
     comparisonGroups: item.comparisonGroups,
   })
   const hasMetadata = metadataLines.length > 0
-  const showSummaryRow = hasMetadata || Boolean(priceLabel)
+  const showSummaryRow = hasMetadata || Boolean(summaryTrailingLabel)
+  const showCommerce = action.kind === 'add' || (action.kind === 'manage_only' && ownedQuantity > 0)
+  const addDisabled = action.kind === 'add' ? action.disabled : false
 
   return (
-    <div
-      className={cn(
-        EQUIPMENT_PICKER_ITEM_HEADER_ROOT_CLASSES,
-        disabled ? equipmentPickerItemHeaderDisabledClasses : undefined,
-      )}
-    >
+    <div className={EQUIPMENT_PICKER_ITEM_HEADER_ROOT_CLASSES}>
       <div className={EQUIPMENT_PICKER_ITEM_HEADER_TITLE_ROW_CLASSES}>
         <Text as="span" className={EQUIPMENT_PICKER_ITEM_HEADER_NAME_CLASSES}>
           {item.name}
         </Text>
-        {onAdd ? (
+        {showCommerce ? (
           <EquipmentPickerCommerce
             ownedQuantity={ownedQuantity}
-            disabled={disabled}
-            onAdd={onAdd}
+            showAdd={action.kind === 'add'}
+            disabled={addDisabled}
+            buttonLabel={addButtonLabel}
+            isPending={isPending}
+            onAdd={onAdd ?? (() => undefined)}
           />
         ) : null}
       </div>
@@ -77,9 +83,12 @@ export function EquipmentPickerItemHeader({
           ) : (
             <span aria-hidden className={EQUIPMENT_PICKER_ITEM_HEADER_SUMMARY_METADATA_CLASSES} />
           )}
-          {priceLabel ? (
-            <Text as="span" className={EQUIPMENT_PICKER_COMMERCE_PRICE_CLASSES}>
-              {priceLabel}
+          {summaryTrailingLabel ? (
+            <Text
+              as="span"
+              className={EQUIPMENT_PICKER_ITEM_HEADER_SUMMARY_TRAILING_CLASSES[summaryTrailingTone]}
+            >
+              {summaryTrailingLabel}
             </Text>
           ) : null}
         </div>

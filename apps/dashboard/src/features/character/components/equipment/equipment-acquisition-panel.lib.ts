@@ -139,7 +139,7 @@ export function formatAcquisitionCommitLabel(args: {
   return 'Add to inventory'
 }
 
-function formatGrantPreviewLine(grantQuantity: number, rarity: MagicItemRarity): string {
+export function formatGrantPreviewLine(grantQuantity: number, rarity: MagicItemRarity): string {
   const rarityLabel = getMagicItemRarityLabel(rarity)
   return grantQuantity === 1 ? `${rarityLabel} choice` : `${grantQuantity} ${rarityLabel} choices`
 }

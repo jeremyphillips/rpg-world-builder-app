@@ -1088,6 +1088,18 @@ export function formatMagicItemGrantProgressLabel(
   return parts.join(' · ')
 }
 
+export function resolveEquipmentOwnedQuantity(args: {
+  equipmentId: string
+  draft: CharacterBuilderDraft
+}): number {
+  const grantQuantity = readMagicItemGrantQuantity(args.draft, args.equipmentId)
+  const purchaseQuantity = (args.draft.equipment?.purchases ?? [])
+    .filter((row) => row.equipmentId === args.equipmentId)
+    .reduce((sum, row) => sum + row.quantity, 0)
+
+  return grantQuantity + purchaseQuantity
+}
+
 export function isMagicItemPickerItemVisible(args: {
   equipment: Equipment
   draft: CharacterBuilderDraft
@@ -1097,13 +1109,12 @@ export function isMagicItemPickerItemVisible(args: {
   const { equipment, draft, context, focusedAllowanceId } = args
   if (equipment.kind !== 'magic_item' || !equipment.rarity) return false
 
-  const grantQuantity = totalSelectedForEquipment(readMagicItemSelections(draft), equipment.id)
-  if (grantQuantity > 0) return true
+  if (resolveEquipmentOwnedQuantity({ equipmentId: equipment.id, draft }) > 0) return true
 
-  const purchaseQuantity = (draft.equipment?.purchases ?? [])
-    .filter((row) => row.equipmentId === equipment.id)
-    .reduce((sum, row) => sum + row.quantity, 0)
-  if (purchaseQuantity > 0) return true
+  if (!focusedAllowanceId) return true
+
+  const focusedRarity = focusedAllowanceId.split(':').at(-1)
+  if (focusedRarity && equipment.rarity !== focusedRarity) return false
 
   const eligibility = resolveMagicItemGrantEligibility({
     equipment,
@@ -1112,7 +1123,10 @@ export function isMagicItemPickerItemVisible(args: {
     focusedAllowanceId,
   })
 
-  return eligibility.eligible
+  if (eligibility.eligible) return true
+  if (eligibility.reason === 'allowance_full') return true
+
+  return false
 }
 
 export function buildMagicItemAcquisitionPatch(args: {
