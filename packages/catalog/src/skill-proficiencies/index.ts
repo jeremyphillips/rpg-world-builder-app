@@ -1,6 +1,6 @@
 import { z } from 'zod'
 import { skillProficiencySchema } from '@rpg/contracts'
-import type { SkillProficiency, SystemRulesetId } from '@rpg/contracts'
+import { getContentTypeTerm, type SkillProficiency, type SystemRulesetId } from '@rpg/contracts'
 
 import { getBySlug } from '../lib/get-by-slug'
 import skillProficienciesRaw from './data/srd-cc-5.2.1/skill-proficiencies.json'
@@ -28,5 +28,10 @@ export function getSkillProficiencyBySlug(
   rulesetId: SystemRulesetId,
   slug: string,
 ): SkillProficiency {
-  return getBySlug(loadSeedSkillProficiencies, rulesetId, slug, 'Skill proficiency')
+  return getBySlug(
+    loadSeedSkillProficiencies,
+    rulesetId,
+    slug,
+    getContentTypeTerm('skill-proficiencies').label,
+  )
 }

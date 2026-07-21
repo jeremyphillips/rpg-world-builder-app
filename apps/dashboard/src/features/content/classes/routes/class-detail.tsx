@@ -2,6 +2,10 @@ import { useParams } from 'react-router-dom'
 import { Heading, RichTextContent, Text } from '@rpg/ui'
 import { type CharacterClass, type SkillProficiency, type Subclass } from '@rpg/contracts'
 
+import {
+  formatContentNotFoundMessage,
+  formatContentListLoadErrorMessage,
+} from '@/features/content/lib/content-type-labels'
 import { WidePage } from '@/components/layout/wide-page'
 import { useCampaignRules } from '@/features/campaign'
 import { useSetBreadcrumbLabel } from '@/components/layout/use-breadcrumb-label'
@@ -208,8 +212,8 @@ export function ClassDetail() {
       isError={isError}
       items={classes}
       itemId={classId}
-      loadErrorLabel="Could not load class."
-      notFoundLabel="Class not found."
+      loadErrorLabel={formatContentListLoadErrorMessage('classes')}
+      notFoundLabel={formatContentNotFoundMessage('classes')}
     >
       {(characterClass) => (
         <ClassDetailContent

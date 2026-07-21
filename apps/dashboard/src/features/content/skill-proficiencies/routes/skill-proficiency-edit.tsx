@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom'
 import { ROUTES } from '@/app/routes'
 import {
   formatContentNotFoundMessage,
-  getContentTypeMidSentenceLabel,
+  formatContentListLoadErrorMessage,
 } from '@/features/content/lib/content-type-labels'
 import { ContentEditShell } from '../../lib/forms/shells/content-edit-shell'
 import { useSkillProficiencies } from '../hooks/use-skill-proficiencies'
@@ -24,7 +24,7 @@ export function SkillProficiencyEdit() {
       entityId={skillId}
       isPending={isPending}
       isError={isError}
-      loadErrorLabel={`Could not load ${getContentTypeMidSentenceLabel('skill-proficiencies', { plural: true })}.`}
+      loadErrorLabel={formatContentListLoadErrorMessage('skill-proficiencies')}
       notFoundLabel={formatContentNotFoundMessage('skill-proficiencies')}
       backHref={ROUTES.content.skillProficiencies.detail(campaignId, skillId)}
     />

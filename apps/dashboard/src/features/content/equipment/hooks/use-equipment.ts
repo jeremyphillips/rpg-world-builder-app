@@ -1,12 +1,13 @@
 import { createContentQueryHook } from '../../lib/list/create-content-list'
 import { createContentMutationHooks } from '../../lib/list/use-content-mutations'
+import { formatContentListLoadErrorMessage } from '../../lib/content-type-labels'
 import { listEquipment } from '../api/equipment-api'
 
 const equipmentContentList = createContentQueryHook(
   {
     routeKey: 'equipment',
     responseKey: 'equipment',
-    errorMessage: 'Could not load equipment.',
+    errorMessage: formatContentListLoadErrorMessage('equipment'),
   },
   listEquipment,
 )

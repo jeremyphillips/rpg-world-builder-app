@@ -1,3 +1,15 @@
+import {
+  getProficiencyDomainCompactLabel,
+  getProficiencyPoolAnyScopePhrase,
+  getProficiencyPoolSelectedPhrase,
+} from '@rpg/contracts'
+
+const skillCompactLabel = getProficiencyDomainCompactLabel('skill').toLowerCase()
+
+function titleCasePhrase(phrase: string): string {
+  return `${phrase.charAt(0).toUpperCase()}${phrase.slice(1)}`
+}
+
 /** Top-level proficiency authoring mode — what the character receives. */
 export const WEAPON_PROFICIENCY_SOURCE_LABELS = {
   specific: 'Specific weapons',
@@ -12,7 +24,7 @@ export const TOOL_PROFICIENCY_SOURCE_LABELS = {
 } as const
 
 export const SKILL_PROFICIENCY_SOURCE_LABELS = {
-  specific: 'Specific skills',
+  specific: `Specific ${skillCompactLabel}`,
   pool: 'Choice from skill pool',
 } as const
 
@@ -35,8 +47,8 @@ export const TOOL_PROFICIENCY_POOL_KIND_LABELS = {
 } as const
 
 export const SKILL_PROFICIENCY_POOL_KIND_LABELS = {
-  explicit: 'Selected skills',
-  any: 'Any skills',
+  explicit: titleCasePhrase(getProficiencyPoolSelectedPhrase('skill')),
+  any: titleCasePhrase(getProficiencyPoolAnyScopePhrase('skill')),
 } as const
 
 export const ARMOR_TRAINING_POOL_KIND_LABELS = {

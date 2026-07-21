@@ -1,5 +1,8 @@
 import type { ChoiceSet, ProficiencyPickerItem } from '@rpg/contracts'
-import { compareProficiencyPickerItemsByRecommendation } from '@rpg/contracts'
+import {
+  compareProficiencyPickerItemsByRecommendation,
+  getProficiencyDomainCompactLabel,
+} from '@rpg/contracts'
 
 import { normalizeSearchQuery, scoreItem } from '@rpg/ui'
 
@@ -54,7 +57,7 @@ export function formatProficiencyPickerDrawerDescription(
 export function formatProficiencyPickerSearchPlaceholder(choiceSet: ChoiceSet): string {
   switch (choiceSet.choiceType) {
     case 'skillProficiency':
-      return 'Search skills'
+      return `Search ${getProficiencyDomainCompactLabel('skill').toLowerCase()}`
     case 'language':
       return 'Search languages'
     case 'toolProficiency':

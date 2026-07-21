@@ -11,7 +11,10 @@ type ChoiceSetDrawerLabelPair = {
 const CHOICE_SET_DRAWER_LABELS: Partial<Record<ChoiceType, ChoiceSetDrawerLabelPair>> = {
   cantrip: { add: 'Add cantrip', manage: 'Manage cantrips' },
   spell: { add: 'Add spell', manage: 'Manage spells' },
-  skillProficiency: { add: getProficiencyGrantAddLabel('skill'), manage: 'Manage skill choices' },
+  skillProficiency: {
+    add: getProficiencyGrantAddLabel('skill'),
+    manage: 'Manage skill choices',
+  },
   language: { add: 'Add language', manage: 'Manage language choices' },
   toolProficiency: { add: getProficiencyGrantAddLabel('tool'), manage: 'Manage tool choices' },
   weaponProficiency: {

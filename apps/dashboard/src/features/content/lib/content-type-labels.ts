@@ -46,6 +46,24 @@ export function formatContentNotFoundMessage(key: ContentTypeKey): string {
   return `${getContentTypeSentenceLabel(key)} not found.`
 }
 
+export type ContentTypeLoadErrorOptions = {
+  /** Use plural sentence form — e.g. list/query failures (`skill proficiencies`). */
+  plural?: boolean
+}
+
+/** Load failure for a catalog item or collection — e.g. "Could not load species." */
+export function formatContentLoadErrorMessage(
+  key: ContentTypeKey,
+  options: ContentTypeLoadErrorOptions = {},
+): string {
+  return `Could not load ${getContentTypeMidSentenceLabel(key, options)}.`
+}
+
+/** Load failure when a content list query fails — plural sentence form. */
+export function formatContentListLoadErrorMessage(key: ContentTypeKey): string {
+  return formatContentLoadErrorMessage(key, { plural: true })
+}
+
 /** Mid-sentence lowercase noun phrase for row actions and aria labels. */
 export function getContentTypeMidSentenceLabel(
   key: ContentTypeKey,

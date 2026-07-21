@@ -1,5 +1,6 @@
 import { defineMessage } from '../../../validation/define-message'
 import { getContentTypeSentenceForm } from '../../content/lib/content-type-terms'
+import { getProficiencyDomainCompactLabel } from '../../vocab/proficiency'
 
 // ---------------------------------------------------------------------------
 // Character builder validation messages (surface catalog).
@@ -195,7 +196,7 @@ export const characterBuilderProficiencyChoiceEmptyMessages = {
   ),
   skillProficiency: defineMessage(
     'validation.characterBuilder.proficiencyChoiceEmpty.skillProficiency',
-    () => 'No skills chosen yet.',
+    () => `No ${getProficiencyDomainCompactLabel('skill').toLowerCase()} chosen yet.`,
   ),
   toolProficiency: defineMessage(
     'validation.characterBuilder.proficiencyChoiceEmpty.toolProficiency',

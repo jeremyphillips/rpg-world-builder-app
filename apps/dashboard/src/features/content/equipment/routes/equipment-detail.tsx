@@ -2,6 +2,10 @@ import { useParams } from 'react-router-dom'
 import { RichTextContent } from '@rpg/ui'
 import type { Equipment } from '@rpg/contracts'
 
+import {
+  formatContentNotFoundMessage,
+  formatContentListLoadErrorMessage,
+} from '@/features/content/lib/content-type-labels'
 import { useSetBreadcrumbLabel } from '@/components/layout/use-breadcrumb-label'
 import { WidePage } from '@/components/layout/wide-page'
 import { useEquipment } from '../hooks/use-equipment'
@@ -65,8 +69,8 @@ export function EquipmentDetail({ family }: EquipmentDetailProps) {
       isError={isError}
       items={equipment}
       itemId={equipmentId}
-      loadErrorLabel="Could not load equipment."
-      notFoundLabel="Equipment not found."
+      loadErrorLabel={formatContentListLoadErrorMessage('equipment')}
+      notFoundLabel={formatContentNotFoundMessage('equipment')}
     >
       {(item) =>
         shouldShowEquipmentFamilyMismatch(item, expectedKind, false, false) ? (

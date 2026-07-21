@@ -1,12 +1,13 @@
 import { createContentQueryHook } from '../../lib/list/create-content-list'
 import { createContentMutationHooks } from '../../lib/list/use-content-mutations'
+import { formatContentListLoadErrorMessage } from '../../lib/content-type-labels'
 import { listSpells } from '../api/spells-api'
 
 const spellsContentList = createContentQueryHook(
   {
     routeKey: 'spells',
     responseKey: 'spells',
-    errorMessage: 'Could not load spells.',
+    errorMessage: formatContentListLoadErrorMessage('spells'),
   },
   listSpells,
 )

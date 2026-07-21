@@ -1,6 +1,10 @@
 import { useParams } from 'react-router-dom'
 
 import { ROUTES } from '@/app/routes'
+import {
+  formatContentNotFoundMessage,
+  formatContentListLoadErrorMessage,
+} from '@/features/content/lib/content-type-labels'
 import { ContentEditShell } from '../../lib/forms/shells/content-edit-shell'
 import { useClasses } from '../hooks/use-classes'
 // Registers the class form def into the content form registry on module load.
@@ -20,8 +24,8 @@ export function ClassEdit() {
       entityId={classId}
       isPending={isPending}
       isError={isError}
-      loadErrorLabel="Could not load classes."
-      notFoundLabel="Class not found."
+      loadErrorLabel={formatContentListLoadErrorMessage('classes')}
+      notFoundLabel={formatContentNotFoundMessage('classes')}
       backHref={ROUTES.content.classes.detail(campaignId, classId)}
     />
   )

@@ -6,7 +6,7 @@ import { useSetBreadcrumbLabel } from '@/components/layout/use-breadcrumb-label'
 import { WidePage } from '@/components/layout/wide-page'
 import {
   formatContentNotFoundMessage,
-  getContentTypeMidSentenceLabel,
+  formatContentListLoadErrorMessage,
 } from '@/features/content/lib/content-type-labels'
 import {
   useCreatureTypeVocabulary,
@@ -156,7 +156,7 @@ export function SpeciesDetail() {
       isError={isError}
       items={species}
       itemId={speciesId}
-      loadErrorLabel={`Could not load ${getContentTypeMidSentenceLabel('species')}.`}
+      loadErrorLabel={formatContentListLoadErrorMessage('species')}
       notFoundLabel={formatContentNotFoundMessage('species')}
     >
       {(item) => <SpeciesDetailContent species={item} campaignId={campaignId} />}

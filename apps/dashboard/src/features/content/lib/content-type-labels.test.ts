@@ -3,6 +3,8 @@ import { describe, expect, it } from 'vitest'
 
 import {
   formatContentCreateHeading,
+  formatContentListLoadErrorMessage,
+  formatContentLoadErrorMessage,
   formatContentNotFoundMessage,
   formatContentOverviewCaption,
   getContentTypeCollectionLabel,
@@ -42,6 +44,19 @@ describe('content type labels', () => {
     expect(formatContentNotFoundMessage('species')).toBe('Species not found.')
     expect(formatContentCreateHeading('skill-proficiencies')).toBe('New Skill Proficiency')
     expect(formatContentNotFoundMessage('skill-proficiencies')).toBe('Skill proficiency not found.')
+  })
+
+  it('formats load error messages in singular and plural', () => {
+    expect(formatContentLoadErrorMessage('species')).toBe('Could not load species.')
+    expect(formatContentListLoadErrorMessage('species')).toBe('Could not load species.')
+    expect(formatContentLoadErrorMessage('skill-proficiencies')).toBe(
+      'Could not load skill proficiency.',
+    )
+    expect(formatContentListLoadErrorMessage('skill-proficiencies')).toBe(
+      'Could not load skill proficiencies.',
+    )
+    expect(formatContentLoadErrorMessage('classes')).toBe('Could not load class.')
+    expect(formatContentListLoadErrorMessage('classes')).toBe('Could not load classes.')
   })
 
   it('formats overview captions from plural sentence forms', () => {
