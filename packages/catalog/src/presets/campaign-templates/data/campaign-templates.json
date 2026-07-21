@@ -1,0 +1,23 @@
+[
+  {
+    "metadata": {
+      "id": "classic-adventure",
+      "slug": "classic-adventure",
+      "version": "1.0.0",
+      "name": "Classic Adventure",
+      "description": "<p>A flexible heroic-fantasy starting point with familiar magic and room to explore.</p>"
+    },
+    "rulesetId": "srd-cc-5.2.1",
+    "defaults": {
+      "configuration": {
+        "flavor": {
+          "playStyle": ["exploration", "roleplay_driven"],
+          "mood": ["heroic", "hopeful"],
+          "magicLevel": "standard_fantasy",
+          "difficulty": "dangerous"
+        }
+      }
+    },
+    "worldSeedPackIds": []
+  }
+]

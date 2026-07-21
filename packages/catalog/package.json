@@ -47,6 +47,18 @@
     "./seed-schemas": {
       "types": "./src/seed-schemas.ts",
       "default": "./src/seed-schemas.ts"
+    },
+    "./presets": {
+      "types": "./src/presets/index.ts",
+      "default": "./src/presets/index.ts"
+    },
+    "./presets/campaign-templates": {
+      "types": "./src/presets/campaign-templates/index.ts",
+      "default": "./src/presets/campaign-templates/index.ts"
+    },
+    "./presets/world-seed-packs": {
+      "types": "./src/presets/world-seed-packs/index.ts",
+      "default": "./src/presets/world-seed-packs/index.ts"
     }
   },
   "scripts": {

@@ -76,6 +76,14 @@ export const CATALOG_SCHEMA_MANIFEST = [
     file: 'catalog-xp-progression-seed.schema.json',
     fileMatch: ['packages/catalog/src/xp-progressions/data/**/xp-progressions.json'],
   },
+  {
+    file: 'catalog-campaign-template-list.schema.json',
+    fileMatch: ['packages/catalog/src/presets/campaign-templates/data/campaign-templates.json'],
+  },
+  {
+    file: 'catalog-world-seed-pack-list.schema.json',
+    fileMatch: ['packages/catalog/src/presets/world-seed-packs/data/world-seed-packs.json'],
+  },
 ] as const satisfies readonly CatalogSchemaManifestEntry[]
 
 export type CatalogSchemaManifest = typeof CATALOG_SCHEMA_MANIFEST

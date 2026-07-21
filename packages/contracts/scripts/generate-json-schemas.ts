@@ -19,6 +19,10 @@ import { spellSchema } from '../src/rpg/content/spell/body.ts'
 import { speciesSchema } from '../src/rpg/content/species.ts'
 import { xpProgressionSchema } from '../src/rpg/content/xp-progression.ts'
 import { startingWealthRulesSchema } from '../src/rpg/campaign/rules/starting-wealth.ts'
+import {
+  campaignTemplateSchema,
+  worldSeedPackSchema,
+} from '../src/rpg/campaign/campaign-template.ts'
 import { languageSeedOptionSchema } from '../src/rpg/vocab/language.ts'
 import { vocabularySeedOptionSchema } from '../src/rpg/vocab/vocabulary.ts'
 import { CATALOG_SCHEMA_MANIFEST, catalogSchemaVsCodeEntries } from './catalog-schema-manifest.ts'
@@ -93,6 +97,14 @@ const SCHEMAS: GeneratedSchema[] = [
   {
     file: 'catalog-xp-progression-seed.schema.json',
     schema: xpProgressionSeedFileSchema,
+  },
+  {
+    file: 'catalog-campaign-template-list.schema.json',
+    schema: z.array(campaignTemplateSchema),
+  },
+  {
+    file: 'catalog-world-seed-pack-list.schema.json',
+    schema: z.array(worldSeedPackSchema),
   },
 ]
 

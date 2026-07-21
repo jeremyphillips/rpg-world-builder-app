@@ -29,7 +29,7 @@ packages/contracts/src/
     runtime/            # stored character sheets + builder runtime (not catalog content)
       character/        # sheet schema, provenance, proficiencies, inventory
       character-builder/ # builder draft, context, choice/step vocabulary
-    campaign/           # campaign identity, rules, selection, patches/
+    campaign/           # campaign identity, templates, rules, selection, patches/
   platform/             # backward-compat shim → shared + rpg/campaign
   public/               # scaffold (marketing/CMS — future)
   dev-bench/            # Dev Bench tickets, epics (isolated)
@@ -70,21 +70,21 @@ flowchart BT
 
 ## Where to put new modules
 
-| You are adding…                                         | Layer                   | Example path                                                                                                                 |
-| ------------------------------------------------------- | ----------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
-| A shared validation message or message primitive        | `validation/`           | `validation/messages.ts` (see [validation-messages.md](validation-messages.md))                                              |
-| A closed id set with labels (and optional SRD text)     | `rpg/vocab/`            | `rpg/vocab/sense.ts`, `rpg/vocab/weapon/property.ts`                                                                         |
-| A reusable value type used across content types         | `rpg/primitives/`       | `rpg/primitives/dice.ts`, `rpg/primitives/units.ts`, `rpg/primitives/authored-content.ts`                                    |
-| A catalog content type or its DTOs/patches              | `rpg/content/`          | `rpg/content/species.ts`, `rpg/content/classes/class.ts`                                                                     |
-| Shared content helpers (grants, envelope, keys)         | `rpg/content/lib/`      | `rpg/content/lib/grants.ts`                                                                                                  |
-| Creature-like runtime primitives (PC, NPC, monster)     | `rpg/runtime/creature/` | `languages.ts`, `equipment.ts`, `spellcasting.ts` — see [runtime-resolution-boundaries.md](runtime-resolution-boundaries.md) |
-| A stored character sheet or builder runtime contract    | `rpg/runtime/`          | `rpg/runtime/character/sheet.ts` — see [runtime-resolution-boundaries.md](runtime-resolution-boundaries.md)                  |
-| Campaign identity, rules, membership, ruleset patches   | `rpg/campaign/`         | `rpg/campaign/campaign.ts`, `rpg/campaign/patches/`                                                                          |
-| Campaign rule bodies (not catalog content types)        | `rpg/campaign/rules/`   | `rpg/campaign/rules/starting-wealth.ts`                                                                                      |
-| Auth, session, upload, or API error shapes              | `shared/`               | `shared/auth.ts`, `shared/errors.ts`                                                                                         |
-| Dev Bench ticket/epic schemas and input DTOs            | `dev-bench/`            | `dev-bench/ticket.ts`                                                                                                        |
-| Name generator conventions, collections, and generation | `name-generator/`       | `name-generator/naming-convention.ts`                                                                                        |
-| Public marketing or CMS schemas                         | `public/`               | (scaffold — add when needed)                                                                                                 |
+| You are adding…                                           | Layer                   | Example path                                                                                                                 |
+| --------------------------------------------------------- | ----------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| A shared validation message or message primitive          | `validation/`           | `validation/messages.ts` (see [validation-messages.md](validation-messages.md))                                              |
+| A closed id set with labels (and optional SRD text)       | `rpg/vocab/`            | `rpg/vocab/sense.ts`, `rpg/vocab/weapon/property.ts`                                                                         |
+| A reusable value type used across content types           | `rpg/primitives/`       | `rpg/primitives/dice.ts`, `rpg/primitives/units.ts`, `rpg/primitives/authored-content.ts`                                    |
+| A catalog content type or its DTOs/patches                | `rpg/content/`          | `rpg/content/species.ts`, `rpg/content/classes/class.ts`                                                                     |
+| Shared content helpers (grants, envelope, keys)           | `rpg/content/lib/`      | `rpg/content/lib/grants.ts`                                                                                                  |
+| Creature-like runtime primitives (PC, NPC, monster)       | `rpg/runtime/creature/` | `languages.ts`, `equipment.ts`, `spellcasting.ts` — see [runtime-resolution-boundaries.md](runtime-resolution-boundaries.md) |
+| A stored character sheet or builder runtime contract      | `rpg/runtime/`          | `rpg/runtime/character/sheet.ts` — see [runtime-resolution-boundaries.md](runtime-resolution-boundaries.md)                  |
+| Campaign identity, templates, membership, ruleset patches | `rpg/campaign/`         | `rpg/campaign/campaign.ts`, `rpg/campaign/campaign-template.ts`, `rpg/campaign/patches/`                                     |
+| Campaign rule bodies (not catalog content types)          | `rpg/campaign/rules/`   | `rpg/campaign/rules/starting-wealth.ts`                                                                                      |
+| Auth, session, upload, or API error shapes                | `shared/`               | `shared/auth.ts`, `shared/errors.ts`                                                                                         |
+| Dev Bench ticket/epic schemas and input DTOs              | `dev-bench/`            | `dev-bench/ticket.ts`                                                                                                        |
+| Name generator conventions, collections, and generation   | `name-generator/`       | `name-generator/naming-convention.ts`                                                                                        |
+| Public marketing or CMS schemas                           | `public/`               | (scaffold — add when needed)                                                                                                 |
 
 Nested folders are fine when a domain splits cleanly (e.g. `rpg/content/classes/`
 for spellcasting + class body, `rpg/vocab/weapon/` for weapon term maps).
