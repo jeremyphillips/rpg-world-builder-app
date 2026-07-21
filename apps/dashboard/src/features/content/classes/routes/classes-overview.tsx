@@ -3,6 +3,12 @@ import { DataTable } from '@rpg/ui'
 import type { CharacterClass } from '@rpg/contracts'
 
 import { ROUTES } from '@/app/routes'
+import {
+  formatContentCreateHeading,
+  formatContentOverviewCaption,
+  getContentTypeCollectionLabel,
+  getContentTypeMidSentenceLabel,
+} from '@/features/content/lib/content-type-labels'
 import { useClasses } from '../hooks/use-classes'
 import { classColumns, classFilters } from '../lib/classes-overview-columns'
 import { ContentOverviewShell } from '../../lib/overview/content-overview-shell'
@@ -15,7 +21,7 @@ function ClassRowActions({ row, campaignId }: { row: CharacterClass; campaignId:
       editHref={ROUTES.content.classes.edit(campaignId, row.id)}
       enabled={true}
       onToggleEnabled={() => {}}
-      itemLabel="class"
+      itemLabel={getContentTypeMidSentenceLabel('classes')}
     />
   )
 }
@@ -26,19 +32,19 @@ export function ClassesOverview() {
 
   return (
     <ContentOverviewShell
-      heading="Classes"
+      heading={getContentTypeCollectionLabel('classes')}
       campaignId={campaignId}
       isPending={isPending}
       isError={isError}
       newHref={ROUTES.content.classes.create(campaignId)}
-      newLabel="New Class"
+      newLabel={formatContentCreateHeading('classes')}
     >
       <DataTable
         columns={classColumns(campaignId)}
         data={classes}
         filters={classFilters}
         rowActions={(row) => <ClassRowActions row={row} campaignId={campaignId} />}
-        caption="Character classes available in this campaign"
+        caption={formatContentOverviewCaption('classes', 'Character')}
       />
     </ContentOverviewShell>
   )

@@ -39,3 +39,19 @@ enforcement.
 Analyzer tests run with this package. Repository-wide literal budgets are
 intentionally deferred until the Phase 7 baseline-stability spike documented in
 [`docs/content-types.md`](../../../docs/content-types.md).
+
+## Baselines
+
+Pre-migration snapshots live in [`baselines/pre-migration/`](./baselines/pre-migration/).
+Current post-rollout reports are in [`baselines/`](./baselines/). Regenerate the
+current set from the repository root:
+
+```sh
+cd tools/vocab/term-audit
+for target in classes spells feats equipment; do
+  pnpm exec node --import tsx/esm src/cli.ts --content-type "$target" --format json \
+    > "baselines/${target}.json"
+done
+pnpm exec node --import tsx/esm src/cli.ts --vocab-set creature-types --format json \
+  > baselines/creature-types.json
+```

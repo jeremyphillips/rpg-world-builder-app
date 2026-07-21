@@ -13,6 +13,12 @@ describe('RichTextLinkPreviewCard', () => {
     expect(screen.getByText('Homebrew')).toBeInTheDocument()
   })
 
+  it('uses a resolved eyebrow label when provided', () => {
+    render(<RichTextLinkPreviewCard contentType="spell" eyebrowLabel="Cantrip" title="Fireball" />)
+    expect(screen.getByText('Cantrip')).toBeInTheDocument()
+    expect(screen.queryByText('Spell')).not.toBeInTheDocument()
+  })
+
   it('uses title for overview rows and keeps eyebrow as content type', () => {
     render(<RichTextLinkPreviewCard contentType="feat" title="Feat Overview" />)
     expect(screen.getByText('Feat')).toBeInTheDocument()

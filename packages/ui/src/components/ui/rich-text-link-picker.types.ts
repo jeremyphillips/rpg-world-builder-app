@@ -9,6 +9,8 @@ export interface RichTextLinkPickerInternalOption {
   href: string
   contentType: string
   kind: Exclude<RichTextLinkKind, 'external'>
+  /** Resolved display label for the content-type eyebrow; avoids catalog imports in @rpg/ui. */
+  eyebrowLabel?: string
   sourceLabel?: string
 }
 

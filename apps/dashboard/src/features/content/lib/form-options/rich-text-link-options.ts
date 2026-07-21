@@ -1,13 +1,20 @@
 import { useMemo } from 'react'
-import type { Feat, Spell } from '@rpg/contracts'
+import type { ContentTypeKey, Feat, Spell } from '@rpg/contracts'
 import type { RichTextLinkPickerContentTypeOption, RichTextLinkPickerInternalOption } from '@rpg/ui'
 
 import { CONTENT_ROUTES } from '@/app/content-routes'
+import {
+  formatContentOverviewLinkTitle,
+  getContentTypeCollectionLabel,
+  getContentTypeItemLabel,
+} from '@/features/content/lib/content-type-labels'
 
 import { useFeats } from '../../feats/hooks/use-feats'
 import { useSpells } from '../../spells/hooks/use-spells'
 
 export type LinkableContentType = 'spell' | 'feat'
+
+type LinkableContentTypeKey = Extract<ContentTypeKey, 'spells' | 'feats'>
 
 type LinkableEntityByType = {
   spell: Pick<Spell, 'slug' | 'name' | 'source'>
@@ -20,8 +27,7 @@ type LinkableEntitiesByType = Partial<{
 }>
 
 interface LinkableTypeConfig {
-  label: string
-  overviewTitle: string
+  contentTypeKey: LinkableContentTypeKey
   overviewId: string
   overviewHref: (campaignId: string) => string
   detailHref: (campaignId: string, slug: string) => string
@@ -34,25 +40,35 @@ const LINKABLE_CONTENT_TYPE_ORDER = [
 
 const LINKABLE_CONTENT_TYPE_CONFIG: Record<LinkableContentType, LinkableTypeConfig> = {
   spell: {
-    label: 'Spells',
-    overviewTitle: 'Spell Overview',
+    contentTypeKey: 'spells',
     overviewId: '__spell_overview__',
     overviewHref: CONTENT_ROUTES.spells.overview,
     detailHref: CONTENT_ROUTES.spells.detail,
   },
   feat: {
-    label: 'Feats',
-    overviewTitle: 'Feat Overview',
+    contentTypeKey: 'feats',
     overviewId: '__feat_overview__',
     overviewHref: CONTENT_ROUTES.feats.overview,
     detailHref: CONTENT_ROUTES.feats.detail,
   },
 }
 
+function linkableTypeLabel(contentType: LinkableContentType): string {
+  return getContentTypeCollectionLabel(LINKABLE_CONTENT_TYPE_CONFIG[contentType].contentTypeKey)
+}
+
+function linkableOverviewTitle(contentType: LinkableContentType): string {
+  return formatContentOverviewLinkTitle(LINKABLE_CONTENT_TYPE_CONFIG[contentType].contentTypeKey)
+}
+
+function linkableEyebrowLabel(contentType: LinkableContentType): string {
+  return getContentTypeItemLabel(LINKABLE_CONTENT_TYPE_CONFIG[contentType].contentTypeKey)
+}
+
 export const RICH_TEXT_LINK_CONTENT_TYPE_OPTIONS = LINKABLE_CONTENT_TYPE_ORDER.map(
   (contentType) => ({
     value: contentType,
-    label: LINKABLE_CONTENT_TYPE_CONFIG[contentType].label,
+    label: linkableTypeLabel(contentType),
   }),
 ) satisfies RichTextLinkPickerContentTypeOption[]
 
@@ -88,6 +104,7 @@ function buildDetailLinkOptions<T extends LinkableContentType>(
         href: config.detailHref(campaignId, entity.slug),
         contentType,
         kind: 'detail' as const,
+        eyebrowLabel: linkableEyebrowLabel(contentType),
         sourceLabel: sourceLabel(entity.source),
       }))
       .sort(compareByTitle) ?? []
@@ -103,10 +120,11 @@ function buildLinkOptionsForType<T extends LinkableContentType>(
   return [
     {
       id: config.overviewId,
-      title: config.overviewTitle,
+      title: linkableOverviewTitle(contentType),
       href: config.overviewHref(campaignId),
       contentType,
       kind: 'overview',
+      eyebrowLabel: linkableEyebrowLabel(contentType),
     },
     ...buildDetailLinkOptions(contentType, campaignId, entities),
   ]

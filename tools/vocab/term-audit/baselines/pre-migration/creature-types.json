@@ -1,0 +1,1945 @@
+{
+  "schemaVersion": 1,
+  "target": {
+    "kind": "vocabulary_set",
+    "id": "creature-types",
+    "term": {
+      "label": "Creature Type",
+      "description": "Taxonomic classification shared by species and monsters.",
+      "sentence": {
+        "singular": "creature type",
+        "plural": "creature types"
+      }
+    }
+  },
+  "variants": [
+    {
+      "form": "label",
+      "value": "Creature Type"
+    },
+    {
+      "form": "plural",
+      "value": "creature types"
+    },
+    {
+      "form": "singular",
+      "value": "creature type"
+    }
+  ],
+  "usages": [
+    {
+      "path": "apps/api/src/features/content/lib/content-write.service.test.ts",
+      "line": 491,
+      "column": 6,
+      "context": "test_expectation",
+      "disposition": "unknown",
+      "value": "creates homebrew species with an active creature type",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "apps/api/src/features/content/lib/content-write.service.test.ts",
+      "line": 503,
+      "column": 6,
+      "context": "test_expectation",
+      "disposition": "unknown",
+      "value": "rejects a disabled creature type",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "apps/api/src/features/ruleset/ruleset.service.ts",
+      "line": 21,
+      "column": 18,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeConfig(type)",
+      "variantForms": []
+    },
+    {
+      "path": "apps/api/src/features/vocabulary/lib/assert-campaign-creature-types.test.ts",
+      "line": 16,
+      "column": 6,
+      "context": "test_expectation",
+      "disposition": "unknown",
+      "value": "accepts active seed creature types",
+      "variantForms": ["plural"]
+    },
+    {
+      "path": "apps/api/src/features/vocabulary/lib/assert-campaign-creature-types.test.ts",
+      "line": 27,
+      "column": 6,
+      "context": "test_expectation",
+      "disposition": "unknown",
+      "value": "rejects disabled creature types",
+      "variantForms": ["plural"]
+    },
+    {
+      "path": "apps/api/src/features/vocabulary/lib/assert-campaign-creature-types.ts",
+      "line": 6,
+      "column": 1,
+      "context": "comment",
+      "disposition": "unknown",
+      "value": "/** Active creature type ids for a campaign's resolved vocabulary set. */",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "apps/api/src/features/vocabulary/lib/assert-campaign-creature-types.ts",
+      "line": 27,
+      "column": 7,
+      "context": "unknown",
+      "disposition": "unknown",
+      "value": "Unknown or disabled creature type:",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "apps/api/src/features/vocabulary/ruleset-patch/ruleset-patch.service.test.ts",
+      "line": 114,
+      "column": 6,
+      "context": "test_expectation",
+      "disposition": "unknown",
+      "value": "persists creature type policy on the ruleset patch",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "apps/api/src/features/vocabulary/ruleset-patch/ruleset-patch.service.test.ts",
+      "line": 129,
+      "column": 6,
+      "context": "test_expectation",
+      "disposition": "unknown",
+      "value": "rejects disabled creature types in the creature type policy",
+      "variantForms": ["plural", "singular"]
+    },
+    {
+      "path": "apps/dashboard/src/app/router.tsx",
+      "line": 189,
+      "column": 30,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeCollectionLabel('classes')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/app/router.tsx",
+      "line": 224,
+      "column": 30,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeCollectionLabel('species')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/app/router.tsx",
+      "line": 259,
+      "column": 30,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeCollectionLabel('feats')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/app/router.tsx",
+      "line": 294,
+      "column": 30,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeCollectionLabel('spells')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/app/router.tsx",
+      "line": 329,
+      "column": 30,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeCollectionLabel('equipment')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/app/router.tsx",
+      "line": 383,
+      "column": 30,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeCollectionLabel('skill-proficiencies')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/campaign/lib/campaign-settings-form-values.test.ts",
+      "line": 152,
+      "column": 6,
+      "context": "test_expectation",
+      "disposition": "unknown",
+      "value": "includes creature type policy when not default",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "apps/dashboard/src/features/campaign/lib/campaign-settings-form-values.test.ts",
+      "line": 167,
+      "column": 6,
+      "context": "test_expectation",
+      "disposition": "unknown",
+      "value": "omits creature type policy when default",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "apps/dashboard/src/features/campaign/lib/rules/character-configuration/character-configuration-form-fields.ts",
+      "line": 414,
+      "column": 19,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeTerm('species')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/campaign/lib/rules/character-configuration/character-configuration-form-fields.ts",
+      "line": 415,
+      "column": 27,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeSentenceForm('species')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/campaign/lib/rules/character-configuration/character-configuration-form-fields.ts",
+      "line": 423,
+      "column": 19,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeTerm('species')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/campaign/lib/rules/character-configuration/character-configuration-form-fields.ts",
+      "line": 424,
+      "column": 27,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeSentenceForm('species')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/character-import/model/character-import-preview.lib.ts",
+      "line": 38,
+      "column": 12,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeItemLabel('species')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/character/components/steps/review-step-summary.client.tsx",
+      "line": 36,
+      "column": 27,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeItemLabel('species')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/character/lib/builder-option-display.lib.test.ts",
+      "line": 43,
+      "column": 6,
+      "context": "test_expectation",
+      "disposition": "unknown",
+      "value": "formats species card rows with creature type label and trait names",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "apps/dashboard/src/features/character/lib/builder-review-advisories.lib.ts",
+      "line": 8,
+      "column": 77,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeMidSentenceLabel('species')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/character/lib/builder-species-option-display.lib.ts",
+      "line": 23,
+      "column": 40,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeItemLabel('species')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/character/lib/character-display.ts",
+      "line": 218,
+      "column": 7,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "formatContentReferenceLabel(heritageId)",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/character/lib/character-display.ts",
+      "line": 222,
+      "column": 53,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "formatContentReferenceLabel(classId)",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/character/lib/character-display.ts",
+      "line": 227,
+      "column": 10,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "formatContentReferenceLabel(subclassId)",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/character/lib/character-display.ts",
+      "line": 254,
+      "column": 40,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "formatContentReferenceLabel(character.species.id)",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/character/lib/character-display.ts",
+      "line": 395,
+      "column": 13,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "formatContentReferenceLabel(weapon.weaponId)",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/character/lib/character-display.ts",
+      "line": 397,
+      "column": 15,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "formatContentReferenceLabel(weapon.weaponCategory)",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/character/lib/character-display.ts",
+      "line": 408,
+      "column": 13,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "formatContentReferenceLabel(tool.toolId)",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/character/lib/character-display.ts",
+      "line": 410,
+      "column": 15,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "formatContentReferenceLabel(tool.toolCategory)",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/character/lib/character-display.ts",
+      "line": 419,
+      "column": 16,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "formatContentReferenceLabel(armor.armorCategory)",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/character/lib/character-display.ts",
+      "line": 496,
+      "column": 12,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "formatContentReferenceLabel(entry.featId)",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/character/lib/detail/character-sheet-catalog.ts",
+      "line": 137,
+      "column": 49,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "formatContentReferenceLabel(entry.equipmentId)",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/character/lib/detail/character-sheet-catalog.ts",
+      "line": 193,
+      "column": 40,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "formatContentReferenceLabel(entry.spellId)",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/character/lib/format-content-reference-label.test.ts",
+      "line": 7,
+      "column": 12,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "formatContentReferenceLabel('magic-missile')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/character/lib/format-content-reference-label.test.ts",
+      "line": 11,
+      "column": 12,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "formatContentReferenceLabel('chain_mail')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/character/lib/format-content-reference-label.test.ts",
+      "line": 15,
+      "column": 12,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "formatContentReferenceLabel('srd-cc-5.2.1:fire-bolt')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/classes/api/classes-api.ts",
+      "line": 10,
+      "column": 17,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "formatContentListLoadErrorMessage('classes')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/classes/hooks/use-classes.ts",
+      "line": 10,
+      "column": 19,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "formatContentListLoadErrorMessage('classes')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/classes/routes/class-detail.tsx",
+      "line": 215,
+      "column": 23,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "formatContentListLoadErrorMessage('classes')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/classes/routes/class-detail.tsx",
+      "line": 216,
+      "column": 22,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "formatContentNotFoundMessage('classes')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/classes/routes/class-edit.tsx",
+      "line": 27,
+      "column": 23,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "formatContentListLoadErrorMessage('classes')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/classes/routes/class-edit.tsx",
+      "line": 28,
+      "column": 22,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "formatContentNotFoundMessage('classes')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/equipment/api/equipment-api.ts",
+      "line": 10,
+      "column": 17,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "formatContentListLoadErrorMessage('equipment')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/equipment/hooks/use-equipment.ts",
+      "line": 10,
+      "column": 19,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "formatContentListLoadErrorMessage('equipment')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/equipment/routes/equipment-detail.tsx",
+      "line": 72,
+      "column": 23,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "formatContentListLoadErrorMessage('equipment')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/equipment/routes/equipment-detail.tsx",
+      "line": 73,
+      "column": 22,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "formatContentNotFoundMessage('equipment')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/equipment/routes/equipment-edit.tsx",
+      "line": 43,
+      "column": 23,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "formatContentListLoadErrorMessage('equipment')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/equipment/routes/equipment-edit.tsx",
+      "line": 44,
+      "column": 22,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "formatContentNotFoundMessage('equipment')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/feats/api/feats-api.ts",
+      "line": 9,
+      "column": 17,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "formatContentListLoadErrorMessage('feats')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/feats/hooks/use-feats.ts",
+      "line": 10,
+      "column": 19,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "formatContentListLoadErrorMessage('feats')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/feats/routes/feat-detail.tsx",
+      "line": 65,
+      "column": 23,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "formatContentListLoadErrorMessage('feats')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/feats/routes/feat-detail.tsx",
+      "line": 66,
+      "column": 22,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "formatContentNotFoundMessage('feats')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/feats/routes/feat-edit.tsx",
+      "line": 27,
+      "column": 23,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "formatContentListLoadErrorMessage('feats')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/feats/routes/feat-edit.tsx",
+      "line": 28,
+      "column": 22,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "formatContentNotFoundMessage('feats')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/lib/content-type-labels.test.ts",
+      "line": 18,
+      "column": 12,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeCollectionLabel('species')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/lib/content-type-labels.test.ts",
+      "line": 19,
+      "column": 12,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeCollectionLabel('classes')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/lib/content-type-labels.test.ts",
+      "line": 20,
+      "column": 12,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeCollectionLabel('skill-proficiencies')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/lib/content-type-labels.test.ts",
+      "line": 24,
+      "column": 12,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeItemLabel('species')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/lib/content-type-labels.test.ts",
+      "line": 25,
+      "column": 12,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeItemLabel('classes')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/lib/content-type-labels.test.ts",
+      "line": 26,
+      "column": 12,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeItemLabel('skill-proficiencies')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/lib/content-type-labels.test.ts",
+      "line": 30,
+      "column": 12,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeSentenceLabel('species')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/lib/content-type-labels.test.ts",
+      "line": 31,
+      "column": 12,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeSentenceLabel('skill-proficiencies')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/lib/content-type-labels.test.ts",
+      "line": 32,
+      "column": 12,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeSentenceLabel('skill-proficiencies', { plural: true })",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/lib/content-type-labels.test.ts",
+      "line": 38,
+      "column": 12,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeMidSentenceLabel('species')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/lib/content-type-labels.test.ts",
+      "line": 39,
+      "column": 12,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeMidSentenceLabel('skill-proficiencies')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/lib/content-type-labels.test.ts",
+      "line": 43,
+      "column": 12,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "formatContentCreateHeading('species')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/lib/content-type-labels.test.ts",
+      "line": 44,
+      "column": 12,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "formatContentNotFoundMessage('species')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/lib/content-type-labels.test.ts",
+      "line": 45,
+      "column": 12,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "formatContentCreateHeading('skill-proficiencies')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/lib/content-type-labels.test.ts",
+      "line": 46,
+      "column": 12,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "formatContentNotFoundMessage('skill-proficiencies')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/lib/content-type-labels.test.ts",
+      "line": 50,
+      "column": 12,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "formatContentLoadErrorMessage('species')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/lib/content-type-labels.test.ts",
+      "line": 51,
+      "column": 12,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "formatContentListLoadErrorMessage('species')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/lib/content-type-labels.test.ts",
+      "line": 52,
+      "column": 12,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "formatContentLoadErrorMessage('skill-proficiencies')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/lib/content-type-labels.test.ts",
+      "line": 55,
+      "column": 12,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "formatContentListLoadErrorMessage('skill-proficiencies')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/lib/content-type-labels.test.ts",
+      "line": 58,
+      "column": 12,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "formatContentLoadErrorMessage('classes')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/lib/content-type-labels.test.ts",
+      "line": 59,
+      "column": 12,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "formatContentListLoadErrorMessage('classes')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/lib/content-type-labels.test.ts",
+      "line": 63,
+      "column": 12,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "formatContentOverviewCaption('species', 'Playable')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/lib/content-type-labels.test.ts",
+      "line": 66,
+      "column": 12,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "formatContentOverviewCaption('classes', 'Character')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/lib/content-type-labels.test.ts",
+      "line": 72,
+      "column": 12,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "SPECIES_CONTENT_TYPE_TERM.label",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/lib/content-type-labels.test.ts",
+      "line": 72,
+      "column": 50,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeItemLabel('species')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/lib/content-type-labels.test.ts",
+      "line": 73,
+      "column": 12,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "SPELL_CONTENT_TYPE_TERM.label",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/lib/content-type-labels.test.ts",
+      "line": 73,
+      "column": 48,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeItemLabel('spells')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/lib/content-type-labels.ts",
+      "line": 10,
+      "column": 38,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeTerm(key)",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/lib/content-type-labels.ts",
+      "line": 19,
+      "column": 10,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeTerm(key)",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/lib/content-type-labels.ts",
+      "line": 27,
+      "column": 38,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeTerm(key)",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/lib/content-type-labels.ts",
+      "line": 36,
+      "column": 10,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeTerm(key)",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/lib/content-type-labels.ts",
+      "line": 41,
+      "column": 17,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeItemLabel(key)",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/lib/content-type-labels.ts",
+      "line": 46,
+      "column": 13,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeSentenceLabel(key)",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/lib/content-type-labels.ts",
+      "line": 59,
+      "column": 28,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeMidSentenceLabel(key, options)",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/lib/content-type-labels.ts",
+      "line": 64,
+      "column": 10,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "formatContentLoadErrorMessage(key, { plural: true })",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/lib/content-type-labels.ts",
+      "line": 72,
+      "column": 30,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeTerm(key)",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/lib/content-type-labels.ts",
+      "line": 80,
+      "column": 38,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeTerm(key)",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/lib/forms/content-form-registry.ts",
+      "line": 37,
+      "column": 3,
+      "context": "comment",
+      "disposition": "unknown",
+      "value": "/** Campaign-resolved creature type labels and active ids. */",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "apps/dashboard/src/features/content/lib/list/create-content-list.test.tsx",
+      "line": 29,
+      "column": 21,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "formatContentListLoadErrorMessage('equipment')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/lib/list/create-content-list.test.tsx",
+      "line": 37,
+      "column": 7,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "formatContentListLoadErrorMessage('equipment')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/lib/list/create-content-list.test.tsx",
+      "line": 47,
+      "column": 19,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "formatContentListLoadErrorMessage('skill-proficiencies')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/skill-proficiencies/api/skill-proficiencies-api.ts",
+      "line": 10,
+      "column": 17,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "formatContentListLoadErrorMessage('skill-proficiencies')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/skill-proficiencies/hooks/use-skill-proficiencies.ts",
+      "line": 10,
+      "column": 19,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "formatContentListLoadErrorMessage('skill-proficiencies')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/skill-proficiencies/routes/skill-proficiencies-overview.tsx",
+      "line": 27,
+      "column": 18,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeMidSentenceLabel('skill-proficiencies')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/skill-proficiencies/routes/skill-proficiencies-overview.tsx",
+      "line": 38,
+      "column": 16,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeCollectionLabel('skill-proficiencies')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/skill-proficiencies/routes/skill-proficiencies-overview.tsx",
+      "line": 43,
+      "column": 17,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "formatContentCreateHeading('skill-proficiencies')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/skill-proficiencies/routes/skill-proficiencies-overview.tsx",
+      "line": 50,
+      "column": 21,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeSentenceLabel('skill-proficiencies', { plural: true })",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/skill-proficiencies/routes/skill-proficiency-create.tsx",
+      "line": 15,
+      "column": 16,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "formatContentCreateHeading('skill-proficiencies')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/skill-proficiencies/routes/skill-proficiency-detail.tsx",
+      "line": 126,
+      "column": 23,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "formatContentListLoadErrorMessage('skill-proficiencies')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/skill-proficiencies/routes/skill-proficiency-detail.tsx",
+      "line": 127,
+      "column": 22,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "formatContentNotFoundMessage('skill-proficiencies')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/skill-proficiencies/routes/skill-proficiency-edit.tsx",
+      "line": 27,
+      "column": 23,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "formatContentListLoadErrorMessage('skill-proficiencies')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/skill-proficiencies/routes/skill-proficiency-edit.tsx",
+      "line": 28,
+      "column": 22,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "formatContentNotFoundMessage('skill-proficiencies')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/species/api/species-api.ts",
+      "line": 10,
+      "column": 17,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "formatContentListLoadErrorMessage('species')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/species/components/species-rules-tab.client.tsx",
+      "line": 94,
+      "column": 22,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeMidSentenceLabel('species')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/species/components/species-rules-tab.client.tsx",
+      "line": 94,
+      "column": 88,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeMidSentenceLabel('species')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/species/components/species-rules-tab.client.tsx",
+      "line": 94,
+      "column": 174,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeMidSentenceLabel('species')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/species/hooks/use-species.ts",
+      "line": 10,
+      "column": 19,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "formatContentListLoadErrorMessage('species')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/species/lib/creature-type-field-options.ts",
+      "line": 19,
+      "column": 1,
+      "context": "comment",
+      "disposition": "unknown",
+      "value": "/** Select options for species creature type — filtered to campaign-allowed character types. */",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "apps/dashboard/src/features/content/species/lib/creature-type-field-options.ts",
+      "line": 33,
+      "column": 1,
+      "context": "comment",
+      "disposition": "unknown",
+      "value": "/** Campaign-aware creature type label; falls back to seed labels when vocabulary is absent. */",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "apps/dashboard/src/features/content/species/lib/species-culture-form-fields.ts",
+      "line": 99,
+      "column": 68,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeMidSentenceLabel('species')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/species/lib/species-display.test.ts",
+      "line": 66,
+      "column": 6,
+      "context": "test_expectation",
+      "disposition": "unknown",
+      "value": "builds card view model with resolved creature type and trait names",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "apps/dashboard/src/features/content/species/lib/species-rules-form-fields.ts",
+      "line": 112,
+      "column": 17,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeItemLabel('species')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/species/lib/species-rules-form-fields.ts",
+      "line": 119,
+      "column": 52,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeMidSentenceLabel('species')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/species/lib/species-rules-form-fields.ts",
+      "line": 133,
+      "column": 44,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeMidSentenceLabel('species')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/species/lib/species-rules-form-fields.ts",
+      "line": 187,
+      "column": 23,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeMidSentenceLabel('species')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/species/lib/species-rules-form-fields.ts",
+      "line": 188,
+      "column": 75,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeMidSentenceLabel('species')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/species/lib/species-rules-form-fields.ts",
+      "line": 215,
+      "column": 48,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeMidSentenceLabel('species')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/species/lib/species-rules-form-labels.ts",
+      "line": 27,
+      "column": 28,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeMidSentenceLabel('species')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/species/routes/species-create.tsx",
+      "line": 15,
+      "column": 16,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "formatContentCreateHeading('species')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/species/routes/species-detail.tsx",
+      "line": 159,
+      "column": 23,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "formatContentListLoadErrorMessage('species')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/species/routes/species-detail.tsx",
+      "line": 160,
+      "column": 22,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "formatContentNotFoundMessage('species')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/species/routes/species-edit.tsx",
+      "line": 27,
+      "column": 23,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "formatContentListLoadErrorMessage('species')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/species/routes/species-edit.tsx",
+      "line": 28,
+      "column": 22,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "formatContentNotFoundMessage('species')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/species/routes/species-overview.tsx",
+      "line": 25,
+      "column": 18,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeMidSentenceLabel('species')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/species/routes/species-overview.tsx",
+      "line": 41,
+      "column": 16,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeCollectionLabel('species')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/species/routes/species-overview.tsx",
+      "line": 46,
+      "column": 17,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "formatContentCreateHeading('species')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/species/routes/species-overview.tsx",
+      "line": 53,
+      "column": 18,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "formatContentOverviewCaption('species', 'Playable')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/spells/api/spells-api.ts",
+      "line": 10,
+      "column": 17,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "formatContentListLoadErrorMessage('spells')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/spells/hooks/use-spells.ts",
+      "line": 10,
+      "column": 19,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "formatContentListLoadErrorMessage('spells')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/spells/routes/spell-edit.tsx",
+      "line": 27,
+      "column": 23,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "formatContentListLoadErrorMessage('spells')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/spells/routes/spell-edit.tsx",
+      "line": 28,
+      "column": 22,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "formatContentNotFoundMessage('spells')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/spells/routes/spells-detail.tsx",
+      "line": 236,
+      "column": 23,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "formatContentListLoadErrorMessage('spells')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/spells/routes/spells-detail.tsx",
+      "line": 237,
+      "column": 22,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "formatContentNotFoundMessage('spells')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/homebrew/hooks/use-creature-type-vocabulary.ts",
+      "line": 7,
+      "column": 1,
+      "context": "comment",
+      "disposition": "unknown",
+      "value": "/** Campaign-resolved creature type labels and active ids for forms and tables. */",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "apps/dashboard/src/features/homebrew/lib/hub/content-registry.ts",
+      "line": 23,
+      "column": 12,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeCollectionLabel('classes')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/homebrew/lib/hub/content-registry.ts",
+      "line": 29,
+      "column": 12,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeCollectionLabel('spells')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/homebrew/lib/hub/content-registry.ts",
+      "line": 35,
+      "column": 12,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeCollectionLabel('species')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/homebrew/lib/hub/content-registry.ts",
+      "line": 41,
+      "column": 12,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeCollectionLabel('feats')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/homebrew/lib/hub/content-registry.ts",
+      "line": 47,
+      "column": 12,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeCollectionLabel('equipment')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/homebrew/lib/hub/content-registry.ts",
+      "line": 52,
+      "column": 12,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeCollectionLabel('skill-proficiencies')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/homebrew/lib/hub/vocabulary-set-registry.test.ts",
+      "line": 20,
+      "column": 6,
+      "context": "test_expectation",
+      "disposition": "unknown",
+      "value": "enables only creature types in this phase",
+      "variantForms": ["plural"]
+    },
+    {
+      "path": "apps/dashboard/src/features/homebrew/lib/vocabulary/field-factories.test.ts",
+      "line": 41,
+      "column": 16,
+      "context": "test_expectation",
+      "disposition": "unknown",
+      "value": "Allowed creature types",
+      "variantForms": ["plural"]
+    },
+    {
+      "path": "apps/dashboard/src/features/homebrew/lib/vocabulary/field-factories.test.ts",
+      "line": 49,
+      "column": 14,
+      "context": "test_expectation",
+      "disposition": "unknown",
+      "value": "Allowed creature types",
+      "variantForms": ["plural"]
+    },
+    {
+      "path": "apps/dashboard/src/features/homebrew/lib/vocabulary/field-factories.test.ts",
+      "line": 80,
+      "column": 20,
+      "context": "test_expectation",
+      "disposition": "unknown",
+      "value": "Choose a creature type…",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "apps/dashboard/src/features/homebrew/lib/vocabulary/field-factories.test.ts",
+      "line": 99,
+      "column": 20,
+      "context": "test_expectation",
+      "disposition": "unknown",
+      "value": "Choose creature types…",
+      "variantForms": ["plural"]
+    },
+    {
+      "path": "apps/dashboard/src/features/homebrew/lib/vocabulary/sets/creature-types.test.ts",
+      "line": 10,
+      "column": 6,
+      "context": "test_expectation",
+      "disposition": "unknown",
+      "value": "marks every seed creature type as active",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "apps/dashboard/src/features/homebrew/routes/homebrew-hub.tsx",
+      "line": 57,
+      "column": 34,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "formatContentCount(totalCount)",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/name-generator/model/name-generator-filter-fields.ts",
+      "line": 35,
+      "column": 14,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeItemLabel('species')",
+      "variantForms": []
+    },
+    {
+      "path": "packages/catalog/src/skill-proficiencies/index.ts",
+      "line": 35,
+      "column": 5,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeTerm('skill-proficiencies')",
+      "variantForms": []
+    },
+    {
+      "path": "packages/catalog/src/vocabulary/index.test.ts",
+      "line": 62,
+      "column": 10,
+      "context": "test_expectation",
+      "disposition": "unknown",
+      "value": "SRD 5.2.1 creature type vocabulary seed",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "packages/contracts/src/character-import/dnd-beyond/adapt-dnd-beyond-character.ts",
+      "line": 188,
+      "column": 10,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeTerm('species')",
+      "variantForms": []
+    },
+    {
+      "path": "packages/contracts/src/name-generator/naming-association.ts",
+      "line": 9,
+      "column": 1,
+      "context": "comment",
+      "disposition": "unknown",
+      "value": "// languages, cultures, species, creature types, regions, and settings.",
+      "variantForms": ["plural"]
+    },
+    {
+      "path": "packages/contracts/src/rpg/campaign/campaign-rules.test.ts",
+      "line": 145,
+      "column": 6,
+      "context": "test_expectation",
+      "disposition": "unknown",
+      "value": "returns creature type policy ids when set",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "packages/contracts/src/rpg/campaign/campaign-rules.ts",
+      "line": 27,
+      "column": 1,
+      "context": "comment",
+      "disposition": "unknown",
+      "value": "/** Default creature types allowed on character sheets (PC and NPC). */",
+      "variantForms": ["plural"]
+    },
+    {
+      "path": "packages/contracts/src/rpg/campaign/campaign-rules.ts",
+      "line": 57,
+      "column": 1,
+      "context": "comment",
+      "disposition": "unknown",
+      "value": "/** Resolves allowed creature type ids from a species creature-type policy. */",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "packages/contracts/src/rpg/content/lib/content-type-term-coverage.test.ts",
+      "line": 20,
+      "column": 20,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeTerm(key)",
+      "variantForms": []
+    },
+    {
+      "path": "packages/contracts/src/rpg/content/lib/content-type-term-coverage.test.ts",
+      "line": 42,
+      "column": 12,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeSentenceForm('species')",
+      "variantForms": []
+    },
+    {
+      "path": "packages/contracts/src/rpg/content/lib/content-type-term-coverage.test.ts",
+      "line": 43,
+      "column": 12,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeSentenceForm('classes', 2)",
+      "variantForms": []
+    },
+    {
+      "path": "packages/contracts/src/rpg/content/lib/content-type-terms.ts",
+      "line": 60,
+      "column": 30,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeTerm(key)",
+      "variantForms": []
+    },
+    {
+      "path": "packages/contracts/src/rpg/content/lib/multiclassing-validation.ts",
+      "line": 121,
+      "column": 26,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeSentenceForm('species')",
+      "variantForms": []
+    },
+    {
+      "path": "packages/contracts/src/rpg/content/lib/multiclassing-validation.ts",
+      "line": 142,
+      "column": 24,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeSentenceForm('species')",
+      "variantForms": []
+    },
+    {
+      "path": "packages/contracts/src/rpg/content/lib/multiclassing-validation.ts",
+      "line": 162,
+      "column": 24,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeSentenceForm('species')",
+      "variantForms": []
+    },
+    {
+      "path": "packages/contracts/src/rpg/content/lib/multiclassing-validation.ts",
+      "line": 175,
+      "column": 24,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeSentenceForm('species')",
+      "variantForms": []
+    },
+    {
+      "path": "packages/contracts/src/rpg/content/species.test.ts",
+      "line": 151,
+      "column": 6,
+      "context": "test_expectation",
+      "disposition": "unknown",
+      "value": "rejects invalid creature type slug shapes",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "packages/contracts/src/rpg/content/species.test.ts",
+      "line": 156,
+      "column": 6,
+      "context": "test_expectation",
+      "disposition": "unknown",
+      "value": "accepts slug-shaped creature types before catalog membership validation",
+      "variantForms": ["plural"]
+    },
+    {
+      "path": "packages/contracts/src/rpg/runtime/character-builder/character-builder-messages.ts",
+      "line": 105,
+      "column": 19,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeSentenceForm('species')",
+      "variantForms": []
+    },
+    {
+      "path": "packages/contracts/src/rpg/runtime/character-builder/resolve-review-blocking-summary.ts",
+      "line": 41,
+      "column": 12,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeTerm('species')",
+      "variantForms": []
+    },
+    {
+      "path": "packages/contracts/src/rpg/runtime/character-builder/steps.ts",
+      "line": 59,
+      "column": 12,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeTerm('species')",
+      "variantForms": []
+    },
+    {
+      "path": "packages/contracts/src/rpg/runtime/character-builder/steps.ts",
+      "line": 60,
+      "column": 45,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeSentenceForm('species')",
+      "variantForms": []
+    },
+    {
+      "path": "packages/contracts/src/rpg/vocab/creature-type.test.ts",
+      "line": 17,
+      "column": 10,
+      "context": "test_expectation",
+      "disposition": "unknown",
+      "value": "creature type vocabulary",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "packages/contracts/src/rpg/vocab/creature-type.test.ts",
+      "line": 18,
+      "column": 6,
+      "context": "test_expectation",
+      "disposition": "unknown",
+      "value": "registers the creature type option set id",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "packages/contracts/src/rpg/vocab/creature-type.ts",
+      "line": 13,
+      "column": 10,
+      "context": "label",
+      "disposition": "unknown",
+      "value": "Creature Type",
+      "variantForms": ["label"]
+    },
+    {
+      "path": "packages/contracts/src/rpg/vocab/creature-type.ts",
+      "line": 16,
+      "column": 15,
+      "context": "unknown",
+      "disposition": "unknown",
+      "value": "creature type",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "packages/contracts/src/rpg/vocab/creature-type.ts",
+      "line": 17,
+      "column": 13,
+      "context": "unknown",
+      "disposition": "unknown",
+      "value": "creature types",
+      "variantForms": ["plural"]
+    },
+    {
+      "path": "packages/contracts/src/rpg/vocab/creature-type.ts",
+      "line": 23,
+      "column": 1,
+      "context": "comment",
+      "disposition": "unknown",
+      "value": "/**\n * Primitive shape for stored creature type ids. Catalog membership is validated\n * against the campaign-resolved vocabulary, not the system seed list alone.\n */",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "packages/contracts/src/rpg/vocab/types.test.ts",
+      "line": 55,
+      "column": 58,
+      "context": "test_expectation",
+      "disposition": "unknown",
+      "value": "Creature Type",
+      "variantForms": ["label"]
+    },
+    {
+      "path": "packages/contracts/src/rpg/vocab/types.test.ts",
+      "line": 62,
+      "column": 12,
+      "context": "test_expectation",
+      "disposition": "unknown",
+      "value": "creature type",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "packages/contracts/src/rpg/vocab/types.test.ts",
+      "line": 64,
+      "column": 7,
+      "context": "test_expectation",
+      "disposition": "unknown",
+      "value": "creature types",
+      "variantForms": ["plural"]
+    },
+    {
+      "path": "packages/contracts/src/rpg/vocab/types.test.ts",
+      "line": 73,
+      "column": 7,
+      "context": "test_expectation",
+      "disposition": "unknown",
+      "value": "creature types",
+      "variantForms": ["plural"]
+    },
+    {
+      "path": "packages/contracts/src/rpg/vocab/types.test.ts",
+      "line": 82,
+      "column": 20,
+      "context": "test_expectation",
+      "disposition": "unknown",
+      "value": "Choose a creature type…",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "packages/contracts/src/rpg/vocab/vocabulary-option-set-terms.test.ts",
+      "line": 25,
+      "column": 6,
+      "context": "test_expectation",
+      "disposition": "unknown",
+      "value": "resolves creature types through the registry",
+      "variantForms": ["plural"]
+    },
+    {
+      "path": "packages/contracts/src/rpg/vocab/vocabulary-option-set-terms.test.ts",
+      "line": 26,
+      "column": 69,
+      "context": "test_expectation",
+      "disposition": "unknown",
+      "value": "Creature Type",
+      "variantForms": ["label"]
+    },
+    {
+      "path": "packages/contracts/src/rpg/vocab/vocabulary.ts",
+      "line": 6,
+      "column": 1,
+      "context": "comment",
+      "disposition": "unknown",
+      "value": "// Campaign vocabulary — reusable option sets (creature types, damage types, …)",
+      "variantForms": ["plural"]
+    },
+    {
+      "path": "packages/ui/src/components/ui/builder-option-details-sheet.stories.tsx",
+      "line": 13,
+      "column": 14,
+      "context": "story_fixture",
+      "disposition": "unknown",
+      "value": "Creature Type",
+      "variantForms": ["label"]
+    },
+    {
+      "path": "packages/ui/src/components/ui/builder-option-details-sheet.test.tsx",
+      "line": 16,
+      "column": 14,
+      "context": "test_expectation",
+      "disposition": "unknown",
+      "value": "Creature Type",
+      "variantForms": ["label"]
+    },
+    {
+      "path": "packages/ui/src/components/ui/builder-option-details-sheet.test.tsx",
+      "line": 40,
+      "column": 29,
+      "context": "test_expectation",
+      "disposition": "unknown",
+      "value": "Creature Type",
+      "variantForms": ["label"]
+    },
+    {
+      "path": "packages/ui/src/components/ui/builder-option-details-sheet.test.tsx",
+      "line": 48,
+      "column": 29,
+      "context": "test_expectation",
+      "disposition": "unknown",
+      "value": "Creature Type",
+      "variantForms": ["label"]
+    },
+    {
+      "path": "packages/ui/src/components/ui/sheet.stories.tsx",
+      "line": 24,
+      "column": 20,
+      "context": "story_fixture",
+      "disposition": "unknown",
+      "value": "Add creature type",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "tools/vocab/term-audit/src/resolve-term-target.test.ts",
+      "line": 21,
+      "column": 22,
+      "context": "test_expectation",
+      "disposition": "unknown",
+      "value": "Creature Type",
+      "variantForms": ["label"]
+    },
+    {
+      "path": "tools/vocab/term-audit/src/resolve-term-target.ts",
+      "line": 32,
+      "column": 44,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeTerm(id)",
+      "variantForms": []
+    },
+    {
+      "path": "tools/vocab/term-audit/test/fixtures/species-usage.tsx",
+      "line": 10,
+      "column": 16,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeTerm('species')",
+      "variantForms": []
+    }
+  ],
+  "skippedFiles": [
+    {
+      "path": ".git",
+      "reason": "ignored directory"
+    },
+    {
+      "path": "apps/api/dist",
+      "reason": "ignored directory"
+    },
+    {
+      "path": "apps/api/node_modules",
+      "reason": "ignored directory"
+    },
+    {
+      "path": "apps/bench/dist",
+      "reason": "ignored directory"
+    },
+    {
+      "path": "apps/bench/node_modules",
+      "reason": "ignored directory"
+    },
+    {
+      "path": "apps/dashboard/coverage",
+      "reason": "ignored directory"
+    },
+    {
+      "path": "apps/dashboard/dist",
+      "reason": "ignored directory"
+    },
+    {
+      "path": "apps/dashboard/node_modules",
+      "reason": "ignored directory"
+    },
+    {
+      "path": "apps/public/node_modules",
+      "reason": "ignored directory"
+    },
+    {
+      "path": "coverage",
+      "reason": "ignored directory"
+    },
+    {
+      "path": "node_modules",
+      "reason": "ignored directory"
+    },
+    {
+      "path": "packages/api-client/node_modules",
+      "reason": "ignored directory"
+    },
+    {
+      "path": "packages/catalog/node_modules",
+      "reason": "ignored directory"
+    },
+    {
+      "path": "packages/config/node_modules",
+      "reason": "ignored directory"
+    },
+    {
+      "path": "packages/contracts/dist",
+      "reason": "ignored directory"
+    },
+    {
+      "path": "packages/contracts/generated",
+      "reason": "ignored directory"
+    },
+    {
+      "path": "packages/contracts/node_modules",
+      "reason": "ignored directory"
+    },
+    {
+      "path": "packages/dev-bench-core/node_modules",
+      "reason": "ignored directory"
+    },
+    {
+      "path": "packages/name-generator-core/node_modules",
+      "reason": "ignored directory"
+    },
+    {
+      "path": "packages/name-generator-data/node_modules",
+      "reason": "ignored directory"
+    },
+    {
+      "path": "packages/name-generator-integrations/node_modules",
+      "reason": "ignored directory"
+    },
+    {
+      "path": "packages/ui/coverage",
+      "reason": "ignored directory"
+    },
+    {
+      "path": "packages/ui/dist",
+      "reason": "ignored directory"
+    },
+    {
+      "path": "packages/ui/node_modules",
+      "reason": "ignored directory"
+    },
+    {
+      "path": "tools/bench/node_modules",
+      "reason": "ignored directory"
+    },
+    {
+      "path": "tools/vocab/term-audit/node_modules",
+      "reason": "ignored directory"
+    }
+  ],
+  "parseFailures": [],
+  "summary": {
+    "canonical": 151,
+    "replaceable": 0,
+    "contextual": 0,
+    "ignored": 0,
+    "unknown": 49
+  }
+}

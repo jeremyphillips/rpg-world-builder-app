@@ -3,6 +3,7 @@ import { DataTable } from '@rpg/ui'
 import type { Equipment } from '@rpg/contracts'
 
 import { ROUTES } from '@/app/routes'
+import { getContentTypeMidSentenceLabel } from '@/features/content/lib/content-type-labels'
 import { useEquipmentFamilyOverview } from '../hooks/use-equipment-family-overview'
 import type { FamilyTableConfig } from '../lib/shared/equipment-family-overview-columns'
 import { ContentOverviewShell } from '../../lib/overview/content-overview-shell'
@@ -24,7 +25,7 @@ function EquipmentRowActions({
       editHref={ROUTES.content.equipment.edit(campaignId, family, row.id)}
       enabled={true}
       onToggleEnabled={() => {}}
-      itemLabel="equipment"
+      itemLabel={getContentTypeMidSentenceLabel('equipment')}
     />
   )
 }

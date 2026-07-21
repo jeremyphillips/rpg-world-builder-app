@@ -4,6 +4,7 @@ import { Card, CardHeader, CardTitle } from '@rpg/ui'
 import { PageHeader } from '@/components/layout/page-header'
 import { WidePage } from '@/components/layout/wide-page'
 import { ROUTES } from '@/app/routes'
+import { getContentTypeCollectionLabel } from '@/features/content/lib/content-type-labels'
 
 import {
   EQUIPMENT_FAMILY_PATHS,
@@ -18,7 +19,7 @@ type EquipmentHubContentProps = {
 export function EquipmentHubContent({ campaignId }: EquipmentHubContentProps) {
   return (
     <WidePage spacing="relaxed">
-      <PageHeader heading="Equipment" />
+      <PageHeader heading={getContentTypeCollectionLabel('equipment')} />
       <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {EQUIPMENT_FAMILY_PATHS.map((family) => (
           <li key={family}>

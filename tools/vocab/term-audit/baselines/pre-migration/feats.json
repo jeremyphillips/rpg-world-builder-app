@@ -1,0 +1,4263 @@
+{
+  "schemaVersion": 1,
+  "target": {
+    "kind": "content_type",
+    "id": "feats",
+    "term": {
+      "label": "Feat",
+      "description": "Optional character ability or training.",
+      "sentence": {
+        "singular": "feat",
+        "plural": "feats"
+      }
+    }
+  },
+  "variants": [
+    {
+      "form": "derived_collection_label",
+      "value": "Feats"
+    },
+    {
+      "form": "label",
+      "value": "Feat"
+    },
+    {
+      "form": "plural",
+      "value": "feats"
+    },
+    {
+      "form": "singular",
+      "value": "feat"
+    }
+  ],
+  "usages": [
+    {
+      "path": "apps/api/src/features/content/content-types.ts",
+      "line": 12,
+      "column": 34,
+      "context": "unknown",
+      "disposition": "unknown",
+      "value": "./feats/feats.config",
+      "variantForms": ["plural"]
+    },
+    {
+      "path": "apps/api/src/features/content/feats/feats.config.ts",
+      "line": 12,
+      "column": 46,
+      "context": "unknown",
+      "disposition": "unknown",
+      "value": "@rpg/catalog/feats",
+      "variantForms": ["plural"]
+    },
+    {
+      "path": "apps/api/src/features/content/feats/feats.config.ts",
+      "line": 13,
+      "column": 64,
+      "context": "unknown",
+      "disposition": "unknown",
+      "value": "./homebrew-feat.model",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "apps/api/src/features/content/feats/feats.config.ts",
+      "line": 14,
+      "column": 32,
+      "context": "unknown",
+      "disposition": "unknown",
+      "value": "./feat-patch.model",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "apps/api/src/features/content/feats/feats.config.ts",
+      "line": 54,
+      "column": 9,
+      "context": "unknown",
+      "disposition": "unknown",
+      "value": "feats",
+      "variantForms": ["plural"]
+    },
+    {
+      "path": "apps/api/src/features/content/feats/feats.config.ts",
+      "line": 70,
+      "column": 13,
+      "context": "unknown",
+      "disposition": "unknown",
+      "value": "feats",
+      "variantForms": ["plural"]
+    },
+    {
+      "path": "apps/api/src/features/content/feats/feats.config.ts",
+      "line": 72,
+      "column": 16,
+      "context": "unknown",
+      "disposition": "unknown",
+      "value": "feats",
+      "variantForms": ["plural"]
+    },
+    {
+      "path": "apps/api/src/features/content/lib/content-write.service.test.ts",
+      "line": 13,
+      "column": 33,
+      "context": "test_expectation",
+      "disposition": "unknown",
+      "value": "../feats/feats.config",
+      "variantForms": ["plural"]
+    },
+    {
+      "path": "apps/api/src/features/content/lib/content-write.service.test.ts",
+      "line": 445,
+      "column": 10,
+      "context": "test_expectation",
+      "disposition": "unknown",
+      "value": "createHomebrewContent (feats)",
+      "variantForms": ["plural"]
+    },
+    {
+      "path": "apps/api/src/features/content/lib/content-write.service.test.ts",
+      "line": 447,
+      "column": 11,
+      "context": "test_expectation",
+      "disposition": "unknown",
+      "value": "custom-feat",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "apps/api/src/features/content/lib/content-write.service.test.ts",
+      "line": 448,
+      "column": 11,
+      "context": "test_expectation",
+      "disposition": "unknown",
+      "value": "Custom Feat",
+      "variantForms": ["label"]
+    },
+    {
+      "path": "apps/api/src/features/content/lib/content-write.service.test.ts",
+      "line": 449,
+      "column": 18,
+      "context": "test_expectation",
+      "disposition": "unknown",
+      "value": "<p>A custom origin feat benefit.</p>",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "apps/api/src/features/content/lib/content-write.service.test.ts",
+      "line": 454,
+      "column": 6,
+      "context": "test_expectation",
+      "disposition": "unknown",
+      "value": "creates homebrew feat and returns it in the resolved catalog",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "apps/api/src/features/content/lib/content-write.service.test.ts",
+      "line": 459,
+      "column": 31,
+      "context": "test_expectation",
+      "disposition": "unknown",
+      "value": "custom-feat",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "apps/api/src/features/content/lib/content-write.service.test.ts",
+      "line": 463,
+      "column": 41,
+      "context": "test_expectation",
+      "disposition": "unknown",
+      "value": "custom-feat",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "apps/api/src/features/content/lib/content-write.service.test.ts",
+      "line": 466,
+      "column": 6,
+      "context": "test_expectation",
+      "disposition": "unknown",
+      "value": "patches a system feat record",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "apps/api/src/features/ruleset/ruleset.service.ts",
+      "line": 21,
+      "column": 18,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeConfig(type)",
+      "variantForms": []
+    },
+    {
+      "path": "apps/bench/src/features/tickets/components/ticket-card.test.tsx",
+      "line": 30,
+      "column": 29,
+      "context": "test_expectation",
+      "disposition": "unknown",
+      "value": "Feat",
+      "variantForms": ["label"]
+    },
+    {
+      "path": "apps/dashboard/src/app/content-routes.ts",
+      "line": 43,
+      "column": 63,
+      "context": "unknown",
+      "disposition": "unknown",
+      "value": "/feats",
+      "variantForms": ["plural"]
+    },
+    {
+      "path": "apps/dashboard/src/app/content-routes.ts",
+      "line": 44,
+      "column": 77,
+      "context": "unknown",
+      "disposition": "unknown",
+      "value": "/feats/",
+      "variantForms": ["plural"]
+    },
+    {
+      "path": "apps/dashboard/src/app/content-routes.ts",
+      "line": 45,
+      "column": 75,
+      "context": "unknown",
+      "disposition": "unknown",
+      "value": "/feats/",
+      "variantForms": ["plural"]
+    },
+    {
+      "path": "apps/dashboard/src/app/content-routes.ts",
+      "line": 46,
+      "column": 61,
+      "context": "unknown",
+      "disposition": "unknown",
+      "value": "/feats/new",
+      "variantForms": ["plural"]
+    },
+    {
+      "path": "apps/dashboard/src/app/lazy-routes.ts",
+      "line": 102,
+      "column": 26,
+      "context": "unknown",
+      "disposition": "unknown",
+      "value": "@/features/content/feats/routes/feats-overview",
+      "variantForms": ["plural"]
+    },
+    {
+      "path": "apps/dashboard/src/app/lazy-routes.ts",
+      "line": 105,
+      "column": 26,
+      "context": "unknown",
+      "disposition": "unknown",
+      "value": "@/features/content/feats/routes/feat-detail",
+      "variantForms": ["plural", "singular"]
+    },
+    {
+      "path": "apps/dashboard/src/app/lazy-routes.ts",
+      "line": 108,
+      "column": 26,
+      "context": "unknown",
+      "disposition": "unknown",
+      "value": "@/features/content/feats/routes/feat-create",
+      "variantForms": ["plural", "singular"]
+    },
+    {
+      "path": "apps/dashboard/src/app/lazy-routes.ts",
+      "line": 111,
+      "column": 26,
+      "context": "unknown",
+      "disposition": "unknown",
+      "value": "@/features/content/feats/routes/feat-edit",
+      "variantForms": ["plural", "singular"]
+    },
+    {
+      "path": "apps/dashboard/src/app/router.tsx",
+      "line": 189,
+      "column": 30,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeCollectionLabel('classes')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/app/router.tsx",
+      "line": 224,
+      "column": 30,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeCollectionLabel('species')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/app/router.tsx",
+      "line": 255,
+      "column": 25,
+      "context": "unknown",
+      "disposition": "unknown",
+      "value": "feats",
+      "variantForms": ["plural"]
+    },
+    {
+      "path": "apps/dashboard/src/app/router.tsx",
+      "line": 259,
+      "column": 30,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeCollectionLabel('feats')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/app/router.tsx",
+      "line": 259,
+      "column": 60,
+      "context": "unknown",
+      "disposition": "unknown",
+      "value": "feats",
+      "variantForms": ["plural"]
+    },
+    {
+      "path": "apps/dashboard/src/app/router.tsx",
+      "line": 294,
+      "column": 30,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeCollectionLabel('spells')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/app/router.tsx",
+      "line": 329,
+      "column": 30,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeCollectionLabel('equipment')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/app/router.tsx",
+      "line": 383,
+      "column": 30,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeCollectionLabel('skill-proficiencies')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/campaign/lib/rules/character-configuration/character-configuration-form-fields.ts",
+      "line": 414,
+      "column": 19,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeTerm('species')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/campaign/lib/rules/character-configuration/character-configuration-form-fields.ts",
+      "line": 415,
+      "column": 27,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeSentenceForm('species')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/campaign/lib/rules/character-configuration/character-configuration-form-fields.ts",
+      "line": 423,
+      "column": 19,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeTerm('species')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/campaign/lib/rules/character-configuration/character-configuration-form-fields.ts",
+      "line": 424,
+      "column": 27,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeSentenceForm('species')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/character-import/model/character-import-preview.lib.test.ts",
+      "line": 118,
+      "column": 21,
+      "context": "test_expectation",
+      "disposition": "unknown",
+      "value": "data.modifiers.feat[0]",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "apps/dashboard/src/features/character-import/model/character-import-preview.lib.ts",
+      "line": 38,
+      "column": 12,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeItemLabel('species')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/character-import/model/character-import-preview.lib.ts",
+      "line": 89,
+      "column": 7,
+      "context": "unknown",
+      "disposition": "unknown",
+      "value": "feats",
+      "variantForms": ["plural"]
+    },
+    {
+      "path": "apps/dashboard/src/features/character/components/steps/review-step-summary.client.tsx",
+      "line": 36,
+      "column": 27,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeItemLabel('species')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/character/lib/builder-review-advisories.lib.ts",
+      "line": 6,
+      "column": 3,
+      "context": "sentence",
+      "disposition": "unknown",
+      "value": "Higher-level ability score improvements and feat choices are not yet modeled. This character uses its initial ability scores.",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "apps/dashboard/src/features/character/lib/builder-review-advisories.lib.ts",
+      "line": 8,
+      "column": 77,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeMidSentenceLabel('species')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/character/lib/builder-species-option-display.lib.ts",
+      "line": 23,
+      "column": 40,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeItemLabel('species')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/character/lib/character-display.ts",
+      "line": 67,
+      "column": 10,
+      "context": "unknown",
+      "disposition": "unknown",
+      "value": "Feats",
+      "variantForms": ["derived_collection_label"]
+    },
+    {
+      "path": "apps/dashboard/src/features/character/lib/character-display.ts",
+      "line": 79,
+      "column": 10,
+      "context": "sentence",
+      "disposition": "unknown",
+      "value": "No feats.",
+      "variantForms": ["plural"]
+    },
+    {
+      "path": "apps/dashboard/src/features/character/lib/character-display.ts",
+      "line": 80,
+      "column": 22,
+      "context": "sentence",
+      "disposition": "unknown",
+      "value": "No features, traits, or feats.",
+      "variantForms": ["plural"]
+    },
+    {
+      "path": "apps/dashboard/src/features/character/lib/character-display.ts",
+      "line": 218,
+      "column": 7,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "formatContentReferenceLabel(heritageId)",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/character/lib/character-display.ts",
+      "line": 222,
+      "column": 53,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "formatContentReferenceLabel(classId)",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/character/lib/character-display.ts",
+      "line": 227,
+      "column": 10,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "formatContentReferenceLabel(subclassId)",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/character/lib/character-display.ts",
+      "line": 254,
+      "column": 40,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "formatContentReferenceLabel(character.species.id)",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/character/lib/character-display.ts",
+      "line": 395,
+      "column": 13,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "formatContentReferenceLabel(weapon.weaponId)",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/character/lib/character-display.ts",
+      "line": 397,
+      "column": 15,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "formatContentReferenceLabel(weapon.weaponCategory)",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/character/lib/character-display.ts",
+      "line": 408,
+      "column": 13,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "formatContentReferenceLabel(tool.toolId)",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/character/lib/character-display.ts",
+      "line": 410,
+      "column": 15,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "formatContentReferenceLabel(tool.toolCategory)",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/character/lib/character-display.ts",
+      "line": 419,
+      "column": 16,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "formatContentReferenceLabel(armor.armorCategory)",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/character/lib/character-display.ts",
+      "line": 496,
+      "column": 12,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "formatContentReferenceLabel(entry.featId)",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/character/lib/detail/character-sheet-catalog.ts",
+      "line": 137,
+      "column": 49,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "formatContentReferenceLabel(entry.equipmentId)",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/character/lib/detail/character-sheet-catalog.ts",
+      "line": 193,
+      "column": 40,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "formatContentReferenceLabel(entry.spellId)",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/character/lib/format-content-reference-label.test.ts",
+      "line": 7,
+      "column": 12,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "formatContentReferenceLabel('magic-missile')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/character/lib/format-content-reference-label.test.ts",
+      "line": 11,
+      "column": 12,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "formatContentReferenceLabel('chain_mail')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/character/lib/format-content-reference-label.test.ts",
+      "line": 15,
+      "column": 12,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "formatContentReferenceLabel('srd-cc-5.2.1:fire-bolt')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/character/lib/selection-counter.lib.ts",
+      "line": 25,
+      "column": 16,
+      "context": "unknown",
+      "disposition": "unknown",
+      "value": "Add feat",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "apps/dashboard/src/features/character/lib/selection-counter.lib.ts",
+      "line": 25,
+      "column": 36,
+      "context": "unknown",
+      "disposition": "unknown",
+      "value": "Manage feat choices",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "apps/dashboard/src/features/content/classes/api/classes-api.ts",
+      "line": 10,
+      "column": 17,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "formatContentListLoadErrorMessage('classes')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/classes/hooks/use-classes.ts",
+      "line": 10,
+      "column": 19,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "formatContentListLoadErrorMessage('classes')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/classes/lib/class-asi-features.ts",
+      "line": 8,
+      "column": 3,
+      "context": "unknown",
+      "disposition": "unknown",
+      "value": "<p>You gain the Ability Score Improvement feat or another feat of your choice for which you qualify.</p>",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "apps/dashboard/src/features/content/classes/lib/feature-item.test.tsx",
+      "line": 35,
+      "column": 9,
+      "context": "test_expectation",
+      "disposition": "unknown",
+      "value": "<p>You gain a Fighting Style feat of your choice (see \"Feats\").</p><p><strong>Druidic Warrior.</strong> You learn two Druid cantrips of your choice.</p>",
+      "variantForms": ["derived_collection_label", "singular"]
+    },
+    {
+      "path": "apps/dashboard/src/features/content/classes/routes/class-detail.tsx",
+      "line": 215,
+      "column": 23,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "formatContentListLoadErrorMessage('classes')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/classes/routes/class-detail.tsx",
+      "line": 216,
+      "column": 22,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "formatContentNotFoundMessage('classes')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/classes/routes/class-edit.tsx",
+      "line": 27,
+      "column": 23,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "formatContentListLoadErrorMessage('classes')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/classes/routes/class-edit.tsx",
+      "line": 28,
+      "column": 22,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "formatContentNotFoundMessage('classes')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/equipment/api/equipment-api.ts",
+      "line": 10,
+      "column": 17,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "formatContentListLoadErrorMessage('equipment')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/equipment/hooks/use-equipment.ts",
+      "line": 10,
+      "column": 19,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "formatContentListLoadErrorMessage('equipment')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/equipment/routes/equipment-detail.tsx",
+      "line": 72,
+      "column": 23,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "formatContentListLoadErrorMessage('equipment')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/equipment/routes/equipment-detail.tsx",
+      "line": 73,
+      "column": 22,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "formatContentNotFoundMessage('equipment')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/equipment/routes/equipment-edit.tsx",
+      "line": 43,
+      "column": 23,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "formatContentListLoadErrorMessage('equipment')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/equipment/routes/equipment-edit.tsx",
+      "line": 44,
+      "column": 22,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "formatContentNotFoundMessage('equipment')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/feats/api/feats-api.ts",
+      "line": 5,
+      "column": 1,
+      "context": "comment",
+      "disposition": "unknown",
+      "value": "/** List all feats (system + homebrew) available in a campaign's ruleset. */",
+      "variantForms": ["plural"]
+    },
+    {
+      "path": "apps/dashboard/src/features/content/feats/api/feats-api.ts",
+      "line": 7,
+      "column": 13,
+      "context": "unknown",
+      "disposition": "unknown",
+      "value": "feats",
+      "variantForms": ["plural"]
+    },
+    {
+      "path": "apps/dashboard/src/features/content/feats/api/feats-api.ts",
+      "line": 8,
+      "column": 16,
+      "context": "unknown",
+      "disposition": "unknown",
+      "value": "feats",
+      "variantForms": ["plural"]
+    },
+    {
+      "path": "apps/dashboard/src/features/content/feats/api/feats-api.ts",
+      "line": 9,
+      "column": 17,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "formatContentListLoadErrorMessage('feats')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/feats/api/feats-api.ts",
+      "line": 9,
+      "column": 51,
+      "context": "unknown",
+      "disposition": "unknown",
+      "value": "feats",
+      "variantForms": ["plural"]
+    },
+    {
+      "path": "apps/dashboard/src/features/content/feats/components/requirement-editor.client.tsx",
+      "line": 427,
+      "column": 1,
+      "context": "comment",
+      "disposition": "unknown",
+      "value": "/**\n * Sentence-builder editor for feat (and future content) prerequisites.\n * Binds to `prerequisiteEditor.groups` on the parent form via nested field arrays.\n */",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "apps/dashboard/src/features/content/feats/hooks/use-feats.ts",
+      "line": 4,
+      "column": 27,
+      "context": "unknown",
+      "disposition": "unknown",
+      "value": "../api/feats-api",
+      "variantForms": ["plural"]
+    },
+    {
+      "path": "apps/dashboard/src/features/content/feats/hooks/use-feats.ts",
+      "line": 8,
+      "column": 15,
+      "context": "unknown",
+      "disposition": "unknown",
+      "value": "feats",
+      "variantForms": ["plural"]
+    },
+    {
+      "path": "apps/dashboard/src/features/content/feats/hooks/use-feats.ts",
+      "line": 9,
+      "column": 18,
+      "context": "unknown",
+      "disposition": "unknown",
+      "value": "feats",
+      "variantForms": ["plural"]
+    },
+    {
+      "path": "apps/dashboard/src/features/content/feats/hooks/use-feats.ts",
+      "line": 10,
+      "column": 19,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "formatContentListLoadErrorMessage('feats')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/feats/hooks/use-feats.ts",
+      "line": 10,
+      "column": 53,
+      "context": "unknown",
+      "disposition": "unknown",
+      "value": "feats",
+      "variantForms": ["plural"]
+    },
+    {
+      "path": "apps/dashboard/src/features/content/feats/hooks/use-feats.ts",
+      "line": 17,
+      "column": 1,
+      "context": "comment",
+      "disposition": "unknown",
+      "value": "/** Load all feats available in the given campaign (system seed + homebrew). */",
+      "variantForms": ["plural"]
+    },
+    {
+      "path": "apps/dashboard/src/features/content/feats/hooks/use-feats.ts",
+      "line": 21,
+      "column": 30,
+      "context": "unknown",
+      "disposition": "unknown",
+      "value": "feats",
+      "variantForms": ["plural"]
+    },
+    {
+      "path": "apps/dashboard/src/features/content/feats/index.ts",
+      "line": 1,
+      "column": 31,
+      "context": "unknown",
+      "disposition": "unknown",
+      "value": "./routes/feats-overview",
+      "variantForms": ["plural"]
+    },
+    {
+      "path": "apps/dashboard/src/features/content/feats/index.ts",
+      "line": 2,
+      "column": 28,
+      "context": "unknown",
+      "disposition": "unknown",
+      "value": "./routes/feat-detail",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "apps/dashboard/src/features/content/feats/index.ts",
+      "line": 3,
+      "column": 28,
+      "context": "unknown",
+      "disposition": "unknown",
+      "value": "./routes/feat-create",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "apps/dashboard/src/features/content/feats/index.ts",
+      "line": 4,
+      "column": 26,
+      "context": "unknown",
+      "disposition": "unknown",
+      "value": "./routes/feat-edit",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "apps/dashboard/src/features/content/feats/index.ts",
+      "line": 5,
+      "column": 41,
+      "context": "unknown",
+      "disposition": "unknown",
+      "value": "./hooks/use-feats",
+      "variantForms": ["plural"]
+    },
+    {
+      "path": "apps/dashboard/src/features/content/feats/lib/feat-form-def.test.ts",
+      "line": 2,
+      "column": 31,
+      "context": "test_expectation",
+      "disposition": "unknown",
+      "value": "@rpg/catalog/feats",
+      "variantForms": ["plural"]
+    },
+    {
+      "path": "apps/dashboard/src/features/content/feats/lib/feat-form-def.test.ts",
+      "line": 14,
+      "column": 50,
+      "context": "test_expectation",
+      "disposition": "unknown",
+      "value": "./feat-form-def",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "apps/dashboard/src/features/content/feats/lib/feat-form-def.test.ts",
+      "line": 66,
+      "column": 13,
+      "context": "test_expectation",
+      "disposition": "unknown",
+      "value": "Custom Feat",
+      "variantForms": ["label"]
+    },
+    {
+      "path": "apps/dashboard/src/features/content/feats/lib/feat-form-def.test.ts",
+      "line": 72,
+      "column": 46,
+      "context": "test_expectation",
+      "disposition": "unknown",
+      "value": "Custom Feat",
+      "variantForms": ["label"]
+    },
+    {
+      "path": "apps/dashboard/src/features/content/feats/lib/feat-form-def.test.ts",
+      "line": 79,
+      "column": 23,
+      "context": "test_expectation",
+      "disposition": "unknown",
+      "value": "Renamed Feat",
+      "variantForms": ["label"]
+    },
+    {
+      "path": "apps/dashboard/src/features/content/feats/lib/feat-form-def.test.ts",
+      "line": 82,
+      "column": 29,
+      "context": "test_expectation",
+      "disposition": "unknown",
+      "value": "Renamed Feat",
+      "variantForms": ["label"]
+    },
+    {
+      "path": "apps/dashboard/src/features/content/feats/lib/feat-form-def.ts",
+      "line": 4,
+      "column": 41,
+      "context": "unknown",
+      "disposition": "unknown",
+      "value": "../hooks/use-feats",
+      "variantForms": ["plural"]
+    },
+    {
+      "path": "apps/dashboard/src/features/content/feats/lib/feat-form-def.ts",
+      "line": 10,
+      "column": 8,
+      "context": "unknown",
+      "disposition": "unknown",
+      "value": "./feat-form-fields",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "apps/dashboard/src/features/content/feats/lib/feat-form-def.ts",
+      "line": 11,
+      "column": 81,
+      "context": "unknown",
+      "disposition": "unknown",
+      "value": "./feat-form-values",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "apps/dashboard/src/features/content/feats/lib/feat-form-def.ts",
+      "line": 14,
+      "column": 13,
+      "context": "unknown",
+      "disposition": "unknown",
+      "value": "feats",
+      "variantForms": ["plural"]
+    },
+    {
+      "path": "apps/dashboard/src/features/content/feats/lib/feat-form-def.ts",
+      "line": 27,
+      "column": 21,
+      "context": "unknown",
+      "disposition": "unknown",
+      "value": "feats",
+      "variantForms": ["plural"]
+    },
+    {
+      "path": "apps/dashboard/src/features/content/feats/lib/feat-form-values.ts",
+      "line": 15,
+      "column": 37,
+      "context": "unknown",
+      "disposition": "unknown",
+      "value": "./feat-form-fields",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "apps/dashboard/src/features/content/feats/lib/feat-stat-rows.test.ts",
+      "line": 3,
+      "column": 31,
+      "context": "test_expectation",
+      "disposition": "unknown",
+      "value": "@rpg/catalog/feats",
+      "variantForms": ["plural"]
+    },
+    {
+      "path": "apps/dashboard/src/features/content/feats/lib/feat-stat-rows.test.ts",
+      "line": 9,
+      "column": 8,
+      "context": "test_expectation",
+      "disposition": "unknown",
+      "value": "./feat-stat-rows",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "apps/dashboard/src/features/content/feats/lib/feat-stat-rows.test.ts",
+      "line": 29,
+      "column": 6,
+      "context": "test_expectation",
+      "disposition": "unknown",
+      "value": "strips the trailing \" Feat\" suffix from category labels",
+      "variantForms": ["label"]
+    },
+    {
+      "path": "apps/dashboard/src/features/content/feats/lib/feat-stat-rows.test.ts",
+      "line": 34,
+      "column": 6,
+      "context": "test_expectation",
+      "disposition": "unknown",
+      "value": "returns the full label when it does not end with \" Feat\"",
+      "variantForms": ["label"]
+    },
+    {
+      "path": "apps/dashboard/src/features/content/feats/lib/feat-stat-rows.ts",
+      "line": 11,
+      "column": 1,
+      "context": "comment",
+      "disposition": "unknown",
+      "value": "/** Builds label/value pairs for the feat detail stat section. */",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "apps/dashboard/src/features/content/feats/lib/feat-stat-rows.ts",
+      "line": 39,
+      "column": 1,
+      "context": "comment",
+      "disposition": "unknown",
+      "value": "/** Suffix stripped from category labels in overview tables (e.g. \"Origin Feat\" → \"Origin\"). */",
+      "variantForms": ["label"]
+    },
+    {
+      "path": "apps/dashboard/src/features/content/feats/lib/feat-stat-rows.ts",
+      "line": 40,
+      "column": 36,
+      "context": "unknown",
+      "disposition": "unknown",
+      "value": "Feat",
+      "variantForms": ["label"]
+    },
+    {
+      "path": "apps/dashboard/src/features/content/feats/lib/feat-stat-rows.ts",
+      "line": 42,
+      "column": 1,
+      "context": "comment",
+      "disposition": "unknown",
+      "value": "/** Category label for feat overview tables — omits the trailing \" Feat\" suffix. */",
+      "variantForms": ["label", "singular"]
+    },
+    {
+      "path": "apps/dashboard/src/features/content/feats/lib/feats-overview-columns.stories.tsx",
+      "line": 6,
+      "column": 44,
+      "context": "story_fixture",
+      "disposition": "unknown",
+      "value": "./feats-overview-columns",
+      "variantForms": ["plural"]
+    },
+    {
+      "path": "apps/dashboard/src/features/content/feats/lib/feats-overview-columns.stories.tsx",
+      "line": 9,
+      "column": 10,
+      "context": "story_fixture",
+      "disposition": "unknown",
+      "value": "Content/Feats/FeatsOverviewColumns",
+      "variantForms": ["derived_collection_label"]
+    },
+    {
+      "path": "apps/dashboard/src/features/content/feats/lib/feats-overview-columns.stories.tsx",
+      "line": 23,
+      "column": 15,
+      "context": "story_fixture",
+      "disposition": "unknown",
+      "value": "Feats available in this campaign",
+      "variantForms": ["derived_collection_label"]
+    },
+    {
+      "path": "apps/dashboard/src/features/content/feats/lib/feats-overview-columns.tsx",
+      "line": 8,
+      "column": 77,
+      "context": "unknown",
+      "disposition": "unknown",
+      "value": "../lib/feat-stat-rows",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "apps/dashboard/src/features/content/feats/lib/feats-overview-columns.tsx",
+      "line": 48,
+      "column": 1,
+      "context": "comment",
+      "disposition": "unknown",
+      "value": "/** Feat column definitions with the name cell linked to the detail page. */",
+      "variantForms": ["label"]
+    },
+    {
+      "path": "apps/dashboard/src/features/content/feats/lib/requirement-editor-form.test.ts",
+      "line": 2,
+      "column": 31,
+      "context": "test_expectation",
+      "disposition": "unknown",
+      "value": "@rpg/catalog/feats",
+      "variantForms": ["plural"]
+    },
+    {
+      "path": "apps/dashboard/src/features/content/feats/lib/requirement-editor-form.test.ts",
+      "line": 164,
+      "column": 10,
+      "context": "test_expectation",
+      "disposition": "unknown",
+      "value": "SRD feat prerequisite round-trips",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "apps/dashboard/src/features/content/feats/routes/feat-create.tsx",
+      "line": 5,
+      "column": 1,
+      "context": "comment",
+      "disposition": "unknown",
+      "value": "// Registers the feat form def into the content form registry on module load.",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "apps/dashboard/src/features/content/feats/routes/feat-create.tsx",
+      "line": 6,
+      "column": 8,
+      "context": "unknown",
+      "disposition": "unknown",
+      "value": "../lib/feat-form-def",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "apps/dashboard/src/features/content/feats/routes/feat-create.tsx",
+      "line": 12,
+      "column": 19,
+      "context": "unknown",
+      "disposition": "unknown",
+      "value": "feats",
+      "variantForms": ["plural"]
+    },
+    {
+      "path": "apps/dashboard/src/features/content/feats/routes/feat-create.tsx",
+      "line": 14,
+      "column": 15,
+      "context": "heading",
+      "disposition": "replaceable",
+      "value": "New Feat",
+      "variantForms": ["label"],
+      "suggestion": "getContentTypeCollectionLabel('feats')"
+    },
+    {
+      "path": "apps/dashboard/src/features/content/feats/routes/feat-detail.stories.tsx",
+      "line": 5,
+      "column": 35,
+      "context": "story_fixture",
+      "disposition": "unknown",
+      "value": "./feat-detail",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "apps/dashboard/src/features/content/feats/routes/feat-detail.stories.tsx",
+      "line": 8,
+      "column": 10,
+      "context": "story_fixture",
+      "disposition": "unknown",
+      "value": "Content/Feats/FeatDetail",
+      "variantForms": ["derived_collection_label"]
+    },
+    {
+      "path": "apps/dashboard/src/features/content/feats/routes/feat-detail.tsx",
+      "line": 11,
+      "column": 26,
+      "context": "unknown",
+      "disposition": "unknown",
+      "value": "../hooks/use-feats",
+      "variantForms": ["plural"]
+    },
+    {
+      "path": "apps/dashboard/src/features/content/feats/routes/feat-detail.tsx",
+      "line": 16,
+      "column": 35,
+      "context": "unknown",
+      "disposition": "unknown",
+      "value": "../lib/feat-stat-rows",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "apps/dashboard/src/features/content/feats/routes/feat-detail.tsx",
+      "line": 34,
+      "column": 35,
+      "context": "unknown",
+      "disposition": "unknown",
+      "value": "feats",
+      "variantForms": ["plural"]
+    },
+    {
+      "path": "apps/dashboard/src/features/content/feats/routes/feat-detail.tsx",
+      "line": 43,
+      "column": 36,
+      "context": "unknown",
+      "disposition": "unknown",
+      "value": "feat-repeatable-notes-heading",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "apps/dashboard/src/features/content/feats/routes/feat-detail.tsx",
+      "line": 44,
+      "column": 51,
+      "context": "unknown",
+      "disposition": "unknown",
+      "value": "feat-repeatable-notes-heading",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "apps/dashboard/src/features/content/feats/routes/feat-detail.tsx",
+      "line": 65,
+      "column": 23,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "formatContentListLoadErrorMessage('feats')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/feats/routes/feat-detail.tsx",
+      "line": 65,
+      "column": 57,
+      "context": "unknown",
+      "disposition": "unknown",
+      "value": "feats",
+      "variantForms": ["plural"]
+    },
+    {
+      "path": "apps/dashboard/src/features/content/feats/routes/feat-detail.tsx",
+      "line": 66,
+      "column": 22,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "formatContentNotFoundMessage('feats')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/feats/routes/feat-detail.tsx",
+      "line": 66,
+      "column": 51,
+      "context": "unknown",
+      "disposition": "unknown",
+      "value": "feats",
+      "variantForms": ["plural"]
+    },
+    {
+      "path": "apps/dashboard/src/features/content/feats/routes/feat-edit.tsx",
+      "line": 9,
+      "column": 26,
+      "context": "unknown",
+      "disposition": "unknown",
+      "value": "../hooks/use-feats",
+      "variantForms": ["plural"]
+    },
+    {
+      "path": "apps/dashboard/src/features/content/feats/routes/feat-edit.tsx",
+      "line": 10,
+      "column": 1,
+      "context": "comment",
+      "disposition": "unknown",
+      "value": "// Registers the feat form def into the content form registry on module load.",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "apps/dashboard/src/features/content/feats/routes/feat-edit.tsx",
+      "line": 11,
+      "column": 8,
+      "context": "unknown",
+      "disposition": "unknown",
+      "value": "../lib/feat-form-def",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "apps/dashboard/src/features/content/feats/routes/feat-edit.tsx",
+      "line": 22,
+      "column": 19,
+      "context": "unknown",
+      "disposition": "unknown",
+      "value": "feats",
+      "variantForms": ["plural"]
+    },
+    {
+      "path": "apps/dashboard/src/features/content/feats/routes/feat-edit.tsx",
+      "line": 27,
+      "column": 23,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "formatContentListLoadErrorMessage('feats')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/feats/routes/feat-edit.tsx",
+      "line": 27,
+      "column": 57,
+      "context": "unknown",
+      "disposition": "unknown",
+      "value": "feats",
+      "variantForms": ["plural"]
+    },
+    {
+      "path": "apps/dashboard/src/features/content/feats/routes/feat-edit.tsx",
+      "line": 28,
+      "column": 22,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "formatContentNotFoundMessage('feats')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/feats/routes/feat-edit.tsx",
+      "line": 28,
+      "column": 51,
+      "context": "unknown",
+      "disposition": "unknown",
+      "value": "feats",
+      "variantForms": ["plural"]
+    },
+    {
+      "path": "apps/dashboard/src/features/content/feats/routes/feats-overview.tsx",
+      "line": 6,
+      "column": 26,
+      "context": "unknown",
+      "disposition": "unknown",
+      "value": "../hooks/use-feats",
+      "variantForms": ["plural"]
+    },
+    {
+      "path": "apps/dashboard/src/features/content/feats/routes/feats-overview.tsx",
+      "line": 7,
+      "column": 44,
+      "context": "unknown",
+      "disposition": "unknown",
+      "value": "../lib/feats-overview-columns",
+      "variantForms": ["plural"]
+    },
+    {
+      "path": "apps/dashboard/src/features/content/feats/routes/feats-overview.tsx",
+      "line": 18,
+      "column": 17,
+      "context": "unknown",
+      "disposition": "unknown",
+      "value": "feat",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "apps/dashboard/src/features/content/feats/routes/feats-overview.tsx",
+      "line": 29,
+      "column": 15,
+      "context": "heading",
+      "disposition": "replaceable",
+      "value": "Feats",
+      "variantForms": ["derived_collection_label"],
+      "suggestion": "getContentTypeCollectionLabel('feats')"
+    },
+    {
+      "path": "apps/dashboard/src/features/content/feats/routes/feats-overview.tsx",
+      "line": 34,
+      "column": 16,
+      "context": "unknown",
+      "disposition": "unknown",
+      "value": "New Feat",
+      "variantForms": ["label"]
+    },
+    {
+      "path": "apps/dashboard/src/features/content/feats/routes/feats-overview.tsx",
+      "line": 41,
+      "column": 17,
+      "context": "unknown",
+      "disposition": "unknown",
+      "value": "Feats available in this campaign",
+      "variantForms": ["derived_collection_label"]
+    },
+    {
+      "path": "apps/dashboard/src/features/content/index.ts",
+      "line": 66,
+      "column": 90,
+      "context": "unknown",
+      "disposition": "unknown",
+      "value": "./feats",
+      "variantForms": ["plural"]
+    },
+    {
+      "path": "apps/dashboard/src/features/content/lib/content-type-labels.test.ts",
+      "line": 18,
+      "column": 12,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeCollectionLabel('species')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/lib/content-type-labels.test.ts",
+      "line": 19,
+      "column": 12,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeCollectionLabel('classes')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/lib/content-type-labels.test.ts",
+      "line": 20,
+      "column": 12,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeCollectionLabel('skill-proficiencies')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/lib/content-type-labels.test.ts",
+      "line": 24,
+      "column": 12,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeItemLabel('species')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/lib/content-type-labels.test.ts",
+      "line": 25,
+      "column": 12,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeItemLabel('classes')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/lib/content-type-labels.test.ts",
+      "line": 26,
+      "column": 12,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeItemLabel('skill-proficiencies')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/lib/content-type-labels.test.ts",
+      "line": 30,
+      "column": 12,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeSentenceLabel('species')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/lib/content-type-labels.test.ts",
+      "line": 31,
+      "column": 12,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeSentenceLabel('skill-proficiencies')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/lib/content-type-labels.test.ts",
+      "line": 32,
+      "column": 12,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeSentenceLabel('skill-proficiencies', { plural: true })",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/lib/content-type-labels.test.ts",
+      "line": 38,
+      "column": 12,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeMidSentenceLabel('species')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/lib/content-type-labels.test.ts",
+      "line": 39,
+      "column": 12,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeMidSentenceLabel('skill-proficiencies')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/lib/content-type-labels.test.ts",
+      "line": 43,
+      "column": 12,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "formatContentCreateHeading('species')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/lib/content-type-labels.test.ts",
+      "line": 44,
+      "column": 12,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "formatContentNotFoundMessage('species')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/lib/content-type-labels.test.ts",
+      "line": 45,
+      "column": 12,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "formatContentCreateHeading('skill-proficiencies')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/lib/content-type-labels.test.ts",
+      "line": 46,
+      "column": 12,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "formatContentNotFoundMessage('skill-proficiencies')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/lib/content-type-labels.test.ts",
+      "line": 50,
+      "column": 12,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "formatContentLoadErrorMessage('species')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/lib/content-type-labels.test.ts",
+      "line": 51,
+      "column": 12,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "formatContentListLoadErrorMessage('species')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/lib/content-type-labels.test.ts",
+      "line": 52,
+      "column": 12,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "formatContentLoadErrorMessage('skill-proficiencies')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/lib/content-type-labels.test.ts",
+      "line": 55,
+      "column": 12,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "formatContentListLoadErrorMessage('skill-proficiencies')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/lib/content-type-labels.test.ts",
+      "line": 58,
+      "column": 12,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "formatContentLoadErrorMessage('classes')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/lib/content-type-labels.test.ts",
+      "line": 59,
+      "column": 12,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "formatContentListLoadErrorMessage('classes')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/lib/content-type-labels.test.ts",
+      "line": 63,
+      "column": 12,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "formatContentOverviewCaption('species', 'Playable')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/lib/content-type-labels.test.ts",
+      "line": 66,
+      "column": 12,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "formatContentOverviewCaption('classes', 'Character')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/lib/content-type-labels.test.ts",
+      "line": 72,
+      "column": 12,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "SPECIES_CONTENT_TYPE_TERM.label",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/lib/content-type-labels.test.ts",
+      "line": 72,
+      "column": 50,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeItemLabel('species')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/lib/content-type-labels.test.ts",
+      "line": 73,
+      "column": 12,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "SPELL_CONTENT_TYPE_TERM.label",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/lib/content-type-labels.test.ts",
+      "line": 73,
+      "column": 48,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeItemLabel('spells')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/lib/content-type-labels.ts",
+      "line": 10,
+      "column": 38,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeTerm(key)",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/lib/content-type-labels.ts",
+      "line": 19,
+      "column": 10,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeTerm(key)",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/lib/content-type-labels.ts",
+      "line": 27,
+      "column": 38,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeTerm(key)",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/lib/content-type-labels.ts",
+      "line": 36,
+      "column": 10,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeTerm(key)",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/lib/content-type-labels.ts",
+      "line": 41,
+      "column": 17,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeItemLabel(key)",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/lib/content-type-labels.ts",
+      "line": 46,
+      "column": 13,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeSentenceLabel(key)",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/lib/content-type-labels.ts",
+      "line": 59,
+      "column": 28,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeMidSentenceLabel(key, options)",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/lib/content-type-labels.ts",
+      "line": 64,
+      "column": 10,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "formatContentLoadErrorMessage(key, { plural: true })",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/lib/content-type-labels.ts",
+      "line": 72,
+      "column": 30,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeTerm(key)",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/lib/content-type-labels.ts",
+      "line": 80,
+      "column": 38,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeTerm(key)",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/lib/fixtures/pick.ts",
+      "line": 3,
+      "column": 31,
+      "context": "unknown",
+      "disposition": "unknown",
+      "value": "@rpg/catalog/feats",
+      "variantForms": ["plural"]
+    },
+    {
+      "path": "apps/dashboard/src/features/content/lib/form-options/content-form-options.ts",
+      "line": 29,
+      "column": 26,
+      "context": "unknown",
+      "disposition": "unknown",
+      "value": "../../feats/hooks/use-feats",
+      "variantForms": ["plural"]
+    },
+    {
+      "path": "apps/dashboard/src/features/content/lib/form-options/rich-text-link-options.test.ts",
+      "line": 10,
+      "column": 6,
+      "context": "test_expectation",
+      "disposition": "unknown",
+      "value": "includes the supported spell and feat content types",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "apps/dashboard/src/features/content/lib/form-options/rich-text-link-options.test.ts",
+      "line": 13,
+      "column": 16,
+      "context": "test_expectation",
+      "disposition": "unknown",
+      "value": "feat",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "apps/dashboard/src/features/content/lib/form-options/rich-text-link-options.test.ts",
+      "line": 13,
+      "column": 31,
+      "context": "test_expectation",
+      "disposition": "unknown",
+      "value": "Feats",
+      "variantForms": ["derived_collection_label"]
+    },
+    {
+      "path": "apps/dashboard/src/features/content/lib/form-options/rich-text-link-options.test.ts",
+      "line": 41,
+      "column": 14,
+      "context": "test_expectation",
+      "disposition": "unknown",
+      "value": "Feat Overview",
+      "variantForms": ["label"]
+    },
+    {
+      "path": "apps/dashboard/src/features/content/lib/form-options/rich-text-link-options.test.ts",
+      "line": 42,
+      "column": 37,
+      "context": "test_expectation",
+      "disposition": "unknown",
+      "value": "/feats",
+      "variantForms": ["plural"]
+    },
+    {
+      "path": "apps/dashboard/src/features/content/lib/form-options/rich-text-link-options.test.ts",
+      "line": 43,
+      "column": 20,
+      "context": "test_expectation",
+      "disposition": "unknown",
+      "value": "feat",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "apps/dashboard/src/features/content/lib/form-options/rich-text-link-options.test.ts",
+      "line": 56,
+      "column": 37,
+      "context": "test_expectation",
+      "disposition": "unknown",
+      "value": "/feats/",
+      "variantForms": ["plural"]
+    },
+    {
+      "path": "apps/dashboard/src/features/content/lib/form-options/rich-text-link-options.test.ts",
+      "line": 57,
+      "column": 20,
+      "context": "test_expectation",
+      "disposition": "unknown",
+      "value": "feat",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "apps/dashboard/src/features/content/lib/form-options/rich-text-link-options.test.ts",
+      "line": 80,
+      "column": 55,
+      "context": "test_expectation",
+      "disposition": "unknown",
+      "value": "feat",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "apps/dashboard/src/features/content/lib/form-options/rich-text-link-options.ts",
+      "line": 7,
+      "column": 26,
+      "context": "unknown",
+      "disposition": "unknown",
+      "value": "../../feats/hooks/use-feats",
+      "variantForms": ["plural"]
+    },
+    {
+      "path": "apps/dashboard/src/features/content/lib/form-options/rich-text-link-options.ts",
+      "line": 10,
+      "column": 45,
+      "context": "unknown",
+      "disposition": "unknown",
+      "value": "feat",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "apps/dashboard/src/features/content/lib/form-options/rich-text-link-options.ts",
+      "line": 32,
+      "column": 3,
+      "context": "unknown",
+      "disposition": "unknown",
+      "value": "feat",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "apps/dashboard/src/features/content/lib/form-options/rich-text-link-options.ts",
+      "line": 44,
+      "column": 12,
+      "context": "label",
+      "disposition": "replaceable",
+      "value": "Feats",
+      "variantForms": ["derived_collection_label"],
+      "suggestion": "getContentTypeItemLabel('feats')"
+    },
+    {
+      "path": "apps/dashboard/src/features/content/lib/form-options/rich-text-link-options.ts",
+      "line": 45,
+      "column": 20,
+      "context": "unknown",
+      "disposition": "unknown",
+      "value": "Feat Overview",
+      "variantForms": ["label"]
+    },
+    {
+      "path": "apps/dashboard/src/features/content/lib/forms/content-form-registry.test.ts",
+      "line": 33,
+      "column": 8,
+      "context": "test_expectation",
+      "disposition": "unknown",
+      "value": "../../feats/lib/feat-form-def",
+      "variantForms": ["plural", "singular"]
+    },
+    {
+      "path": "apps/dashboard/src/features/content/lib/forms/content-form-validation.test.ts",
+      "line": 25,
+      "column": 8,
+      "context": "test_expectation",
+      "disposition": "unknown",
+      "value": "../../feats/lib/feat-form-def",
+      "variantForms": ["plural", "singular"]
+    },
+    {
+      "path": "apps/dashboard/src/features/content/lib/forms/content-form-validation.test.ts",
+      "line": 50,
+      "column": 38,
+      "context": "test_expectation",
+      "disposition": "unknown",
+      "value": "../../feats/lib/feat-form-fields",
+      "variantForms": ["plural", "singular"]
+    },
+    {
+      "path": "apps/dashboard/src/features/content/lib/forms/content-form-validation.test.ts",
+      "line": 281,
+      "column": 10,
+      "context": "test_expectation",
+      "disposition": "unknown",
+      "value": "feats",
+      "variantForms": ["plural"]
+    },
+    {
+      "path": "apps/dashboard/src/features/content/lib/forms/content-form-validation.test.ts",
+      "line": 414,
+      "column": 6,
+      "context": "test_expectation",
+      "disposition": "unknown",
+      "value": "feat schema with prerequisite slot",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "apps/dashboard/src/features/content/lib/forms/content-form-validation.test.ts",
+      "line": 418,
+      "column": 37,
+      "context": "test_expectation",
+      "disposition": "unknown",
+      "value": "feats",
+      "variantForms": ["plural"]
+    },
+    {
+      "path": "apps/dashboard/src/features/content/lib/forms/grants/grant-form-fields.ts",
+      "line": 369,
+      "column": 20,
+      "context": "unknown",
+      "disposition": "unknown",
+      "value": "Feat category",
+      "variantForms": ["label"]
+    },
+    {
+      "path": "apps/dashboard/src/features/content/lib/forms/grants/grant-form-fields.ts",
+      "line": 699,
+      "column": 5,
+      "context": "comment",
+      "disposition": "unknown",
+      "value": "// --- Feat choice fields ---",
+      "variantForms": ["label"]
+    },
+    {
+      "path": "apps/dashboard/src/features/content/lib/forms/grants/grant-form-fields.ts",
+      "line": 706,
+      "column": 14,
+      "context": "label",
+      "disposition": "replaceable",
+      "value": "Allow any qualifying feat (Epic Boon or another feat the character qualifies for)",
+      "variantForms": ["singular"],
+      "suggestion": "getContentTypeItemLabel('feats')"
+    },
+    {
+      "path": "apps/dashboard/src/features/content/lib/forms/grants/grant-form-fields.ts",
+      "line": 717,
+      "column": 14,
+      "context": "label",
+      "disposition": "replaceable",
+      "value": "Recommended feats",
+      "variantForms": ["plural"],
+      "suggestion": "getContentTypeItemLabel('feats')"
+    },
+    {
+      "path": "apps/dashboard/src/features/content/lib/forms/grants/grant-form-fields.ts",
+      "line": 720,
+      "column": 20,
+      "context": "placeholder",
+      "disposition": "replaceable",
+      "value": "Choose feats…",
+      "variantForms": ["plural"],
+      "suggestion": "getContentTypeSentenceLabel('feats')"
+    },
+    {
+      "path": "apps/dashboard/src/features/content/lib/forms/grants/grant-form-helpers.test.ts",
+      "line": 368,
+      "column": 6,
+      "context": "test_expectation",
+      "disposition": "unknown",
+      "value": "formats damage, sense, language, and feat rows with shared sentence helpers",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "apps/dashboard/src/features/content/lib/forms/grants/grant-form-helpers.test.ts",
+      "line": 379,
+      "column": 59,
+      "context": "test_expectation",
+      "disposition": "unknown",
+      "value": "Character chooses 2 general feats.",
+      "variantForms": ["plural"]
+    },
+    {
+      "path": "apps/dashboard/src/features/content/lib/forms/grants/grant-form-helpers.test.ts",
+      "line": 420,
+      "column": 12,
+      "context": "test_expectation",
+      "disposition": "unknown",
+      "value": "Character chooses 2 general feats.",
+      "variantForms": ["plural"]
+    },
+    {
+      "path": "apps/dashboard/src/features/content/lib/forms/grants/grant-form-schema.ts",
+      "line": 73,
+      "column": 15,
+      "context": "unknown",
+      "disposition": "unknown",
+      "value": "Feat choice",
+      "variantForms": ["label"]
+    },
+    {
+      "path": "apps/dashboard/src/features/content/lib/forms/grants/grant-template-registry.ts",
+      "line": 179,
+      "column": 9,
+      "context": "unknown",
+      "disposition": "unknown",
+      "value": "feat-choice",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "apps/dashboard/src/features/content/lib/forms/grants/grant-template-registry.ts",
+      "line": 181,
+      "column": 18,
+      "context": "sentence",
+      "disposition": "unknown",
+      "value": "Let the player choose from a feat category, with optional recommended feats.",
+      "variantForms": ["plural", "singular"]
+    },
+    {
+      "path": "apps/dashboard/src/features/content/lib/forms/grants/grant-template-registry.ts",
+      "line": 191,
+      "column": 17,
+      "context": "unknown",
+      "disposition": "unknown",
+      "value": "feat",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "apps/dashboard/src/features/content/lib/list/create-content-list.test.tsx",
+      "line": 29,
+      "column": 21,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "formatContentListLoadErrorMessage('equipment')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/lib/list/create-content-list.test.tsx",
+      "line": 37,
+      "column": 7,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "formatContentListLoadErrorMessage('equipment')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/lib/list/create-content-list.test.tsx",
+      "line": 47,
+      "column": 19,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "formatContentListLoadErrorMessage('skill-proficiencies')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/lib/list/use-content-mutations.test.tsx",
+      "line": 66,
+      "column": 69,
+      "context": "test_expectation",
+      "disposition": "unknown",
+      "value": "feats",
+      "variantForms": ["plural"]
+    },
+    {
+      "path": "apps/dashboard/src/features/content/lib/list/use-content-mutations.test.tsx",
+      "line": 67,
+      "column": 61,
+      "context": "test_expectation",
+      "disposition": "unknown",
+      "value": "feats",
+      "variantForms": ["plural"]
+    },
+    {
+      "path": "apps/dashboard/src/features/content/lib/list/use-content-mutations.test.tsx",
+      "line": 70,
+      "column": 68,
+      "context": "test_expectation",
+      "disposition": "unknown",
+      "value": "feat-9",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "apps/dashboard/src/features/content/lib/list/use-content-mutations.test.tsx",
+      "line": 73,
+      "column": 62,
+      "context": "test_expectation",
+      "disposition": "unknown",
+      "value": "feats",
+      "variantForms": ["plural"]
+    },
+    {
+      "path": "apps/dashboard/src/features/content/lib/list/use-content-mutations.test.tsx",
+      "line": 73,
+      "column": 71,
+      "context": "test_expectation",
+      "disposition": "unknown",
+      "value": "feat-9",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "apps/dashboard/src/features/content/skill-proficiencies/api/skill-proficiencies-api.ts",
+      "line": 10,
+      "column": 17,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "formatContentListLoadErrorMessage('skill-proficiencies')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/skill-proficiencies/hooks/use-skill-proficiencies.ts",
+      "line": 10,
+      "column": 19,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "formatContentListLoadErrorMessage('skill-proficiencies')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/skill-proficiencies/routes/skill-proficiencies-overview.tsx",
+      "line": 27,
+      "column": 18,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeMidSentenceLabel('skill-proficiencies')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/skill-proficiencies/routes/skill-proficiencies-overview.tsx",
+      "line": 38,
+      "column": 16,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeCollectionLabel('skill-proficiencies')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/skill-proficiencies/routes/skill-proficiencies-overview.tsx",
+      "line": 43,
+      "column": 17,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "formatContentCreateHeading('skill-proficiencies')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/skill-proficiencies/routes/skill-proficiencies-overview.tsx",
+      "line": 50,
+      "column": 21,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeSentenceLabel('skill-proficiencies', { plural: true })",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/skill-proficiencies/routes/skill-proficiency-create.tsx",
+      "line": 15,
+      "column": 16,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "formatContentCreateHeading('skill-proficiencies')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/skill-proficiencies/routes/skill-proficiency-detail.tsx",
+      "line": 126,
+      "column": 23,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "formatContentListLoadErrorMessage('skill-proficiencies')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/skill-proficiencies/routes/skill-proficiency-detail.tsx",
+      "line": 127,
+      "column": 22,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "formatContentNotFoundMessage('skill-proficiencies')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/skill-proficiencies/routes/skill-proficiency-edit.tsx",
+      "line": 27,
+      "column": 23,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "formatContentListLoadErrorMessage('skill-proficiencies')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/skill-proficiencies/routes/skill-proficiency-edit.tsx",
+      "line": 28,
+      "column": 22,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "formatContentNotFoundMessage('skill-proficiencies')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/species/api/species-api.ts",
+      "line": 10,
+      "column": 17,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "formatContentListLoadErrorMessage('species')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/species/components/species-rules-tab.client.tsx",
+      "line": 94,
+      "column": 22,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeMidSentenceLabel('species')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/species/components/species-rules-tab.client.tsx",
+      "line": 94,
+      "column": 88,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeMidSentenceLabel('species')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/species/components/species-rules-tab.client.tsx",
+      "line": 94,
+      "column": 174,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeMidSentenceLabel('species')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/species/hooks/use-species.ts",
+      "line": 10,
+      "column": 19,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "formatContentListLoadErrorMessage('species')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/species/lib/species-culture-form-fields.ts",
+      "line": 99,
+      "column": 68,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeMidSentenceLabel('species')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/species/lib/species-rules-form-fields.ts",
+      "line": 112,
+      "column": 17,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeItemLabel('species')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/species/lib/species-rules-form-fields.ts",
+      "line": 119,
+      "column": 52,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeMidSentenceLabel('species')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/species/lib/species-rules-form-fields.ts",
+      "line": 133,
+      "column": 44,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeMidSentenceLabel('species')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/species/lib/species-rules-form-fields.ts",
+      "line": 187,
+      "column": 23,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeMidSentenceLabel('species')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/species/lib/species-rules-form-fields.ts",
+      "line": 188,
+      "column": 75,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeMidSentenceLabel('species')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/species/lib/species-rules-form-fields.ts",
+      "line": 215,
+      "column": 48,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeMidSentenceLabel('species')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/species/lib/species-rules-form-labels.ts",
+      "line": 27,
+      "column": 28,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeMidSentenceLabel('species')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/species/routes/species-create.tsx",
+      "line": 15,
+      "column": 16,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "formatContentCreateHeading('species')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/species/routes/species-detail.tsx",
+      "line": 159,
+      "column": 23,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "formatContentListLoadErrorMessage('species')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/species/routes/species-detail.tsx",
+      "line": 160,
+      "column": 22,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "formatContentNotFoundMessage('species')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/species/routes/species-edit.tsx",
+      "line": 27,
+      "column": 23,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "formatContentListLoadErrorMessage('species')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/species/routes/species-edit.tsx",
+      "line": 28,
+      "column": 22,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "formatContentNotFoundMessage('species')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/species/routes/species-overview.tsx",
+      "line": 25,
+      "column": 18,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeMidSentenceLabel('species')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/species/routes/species-overview.tsx",
+      "line": 41,
+      "column": 16,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeCollectionLabel('species')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/species/routes/species-overview.tsx",
+      "line": 46,
+      "column": 17,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "formatContentCreateHeading('species')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/species/routes/species-overview.tsx",
+      "line": 53,
+      "column": 18,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "formatContentOverviewCaption('species', 'Playable')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/spells/api/spells-api.ts",
+      "line": 10,
+      "column": 17,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "formatContentListLoadErrorMessage('spells')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/spells/hooks/use-spells.ts",
+      "line": 10,
+      "column": 19,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "formatContentListLoadErrorMessage('spells')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/spells/routes/spell-edit.tsx",
+      "line": 27,
+      "column": 23,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "formatContentListLoadErrorMessage('spells')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/spells/routes/spell-edit.tsx",
+      "line": 28,
+      "column": 22,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "formatContentNotFoundMessage('spells')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/spells/routes/spells-detail.tsx",
+      "line": 236,
+      "column": 23,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "formatContentListLoadErrorMessage('spells')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/content/spells/routes/spells-detail.tsx",
+      "line": 237,
+      "column": 22,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "formatContentNotFoundMessage('spells')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/homebrew/lib/hub/content-registry.ts",
+      "line": 23,
+      "column": 12,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeCollectionLabel('classes')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/homebrew/lib/hub/content-registry.ts",
+      "line": 29,
+      "column": 12,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeCollectionLabel('spells')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/homebrew/lib/hub/content-registry.ts",
+      "line": 35,
+      "column": 12,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeCollectionLabel('species')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/homebrew/lib/hub/content-registry.ts",
+      "line": 40,
+      "column": 18,
+      "context": "unknown",
+      "disposition": "unknown",
+      "value": "feats",
+      "variantForms": ["plural"]
+    },
+    {
+      "path": "apps/dashboard/src/features/homebrew/lib/hub/content-registry.ts",
+      "line": 41,
+      "column": 12,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeCollectionLabel('feats')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/homebrew/lib/hub/content-registry.ts",
+      "line": 41,
+      "column": 42,
+      "context": "unknown",
+      "disposition": "unknown",
+      "value": "feats",
+      "variantForms": ["plural"]
+    },
+    {
+      "path": "apps/dashboard/src/features/homebrew/lib/hub/content-registry.ts",
+      "line": 47,
+      "column": 12,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeCollectionLabel('equipment')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/homebrew/lib/hub/content-registry.ts",
+      "line": 52,
+      "column": 12,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeCollectionLabel('skill-proficiencies')",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/homebrew/routes/homebrew-hub.stories.tsx",
+      "line": 16,
+      "column": 20,
+      "context": "story_fixture",
+      "disposition": "unknown",
+      "value": "feats",
+      "variantForms": ["plural"]
+    },
+    {
+      "path": "apps/dashboard/src/features/homebrew/routes/homebrew-hub.test.tsx",
+      "line": 24,
+      "column": 22,
+      "context": "test_expectation",
+      "disposition": "unknown",
+      "value": "feats",
+      "variantForms": ["plural"]
+    },
+    {
+      "path": "apps/dashboard/src/features/homebrew/routes/homebrew-hub.tsx",
+      "line": 57,
+      "column": 34,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "formatContentCount(totalCount)",
+      "variantForms": []
+    },
+    {
+      "path": "apps/dashboard/src/features/name-generator/model/name-generator-filter-fields.ts",
+      "line": 35,
+      "column": 14,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeItemLabel('species')",
+      "variantForms": []
+    },
+    {
+      "path": "packages/catalog/src/feats/index.test.ts",
+      "line": 10,
+      "column": 30,
+      "context": "test_expectation",
+      "disposition": "unknown",
+      "value": "Expected feat not found:",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "packages/catalog/src/feats/index.test.ts",
+      "line": 14,
+      "column": 10,
+      "context": "test_expectation",
+      "disposition": "unknown",
+      "value": "SRD 5.2.1 feat seed",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "packages/catalog/src/feats/index.test.ts",
+      "line": 17,
+      "column": 6,
+      "context": "test_expectation",
+      "disposition": "unknown",
+      "value": "ships all 17 SRD feats (validated against the schema at load)",
+      "variantForms": ["plural"]
+    },
+    {
+      "path": "packages/catalog/src/feats/index.test.ts",
+      "line": 36,
+      "column": 6,
+      "context": "test_expectation",
+      "disposition": "unknown",
+      "value": "covers all four feat categories",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "packages/catalog/src/feats/index.test.ts",
+      "line": 41,
+      "column": 6,
+      "context": "test_expectation",
+      "disposition": "unknown",
+      "value": "marks exactly three feats as repeatable",
+      "variantForms": ["plural"]
+    },
+    {
+      "path": "packages/catalog/src/feats/index.test.ts",
+      "line": 51,
+      "column": 8,
+      "context": "test_expectation",
+      "disposition": "unknown",
+      "value": "omits prerequisites on origin feats without requirements",
+      "variantForms": ["plural"]
+    },
+    {
+      "path": "packages/catalog/src/feats/index.test.ts",
+      "line": 71,
+      "column": 8,
+      "context": "test_expectation",
+      "disposition": "unknown",
+      "value": "omits prerequisites on fighting-style feats (eligibility from featChoice grants)",
+      "variantForms": ["plural"]
+    },
+    {
+      "path": "packages/catalog/src/feats/index.ts",
+      "line": 6,
+      "column": 22,
+      "context": "unknown",
+      "disposition": "unknown",
+      "value": "./data/srd-cc-5.2.1/feats.json",
+      "variantForms": ["plural"]
+    },
+    {
+      "path": "packages/catalog/src/feats/index.ts",
+      "line": 20,
+      "column": 1,
+      "context": "comment",
+      "disposition": "unknown",
+      "value": "/** System feat slugs for a ruleset — used by the homebrew slug guard. */",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "packages/catalog/src/feats/index.ts",
+      "line": 26,
+      "column": 52,
+      "context": "unknown",
+      "disposition": "unknown",
+      "value": "Feat",
+      "variantForms": ["label"]
+    },
+    {
+      "path": "packages/catalog/src/grants/resolve-available-choices-inventory.test.ts",
+      "line": 52,
+      "column": 34,
+      "context": "test_expectation",
+      "disposition": "unknown",
+      "value": "feat",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "packages/catalog/src/skill-proficiencies/index.ts",
+      "line": 35,
+      "column": 5,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeTerm('skill-proficiencies')",
+      "variantForms": []
+    },
+    {
+      "path": "packages/contracts/scripts/catalog-schema-manifest.ts",
+      "line": 54,
+      "column": 11,
+      "context": "unknown",
+      "disposition": "unknown",
+      "value": "catalog-feat-list.schema.json",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "packages/contracts/scripts/catalog-schema-manifest.ts",
+      "line": 55,
+      "column": 17,
+      "context": "unknown",
+      "disposition": "unknown",
+      "value": "packages/catalog/src/feats/data/**/feats.json",
+      "variantForms": ["plural"]
+    },
+    {
+      "path": "packages/contracts/scripts/generate-json-schemas.ts",
+      "line": 15,
+      "column": 28,
+      "context": "unknown",
+      "disposition": "unknown",
+      "value": "../src/rpg/content/feat.ts",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "packages/contracts/scripts/generate-json-schemas.ts",
+      "line": 74,
+      "column": 11,
+      "context": "unknown",
+      "disposition": "unknown",
+      "value": "catalog-feat-list.schema.json",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "packages/contracts/src/character-import/adapter/character-import-coverage-manifest.ts",
+      "line": 327,
+      "column": 17,
+      "context": "unknown",
+      "disposition": "unknown",
+      "value": "feats",
+      "variantForms": ["plural"]
+    },
+    {
+      "path": "packages/contracts/src/character-import/adapter/character-import-coverage-manifest.ts",
+      "line": 330,
+      "column": 9,
+      "context": "sentence",
+      "disposition": "unknown",
+      "value": "Feats are present in the source but require local catalog matching.",
+      "variantForms": ["derived_collection_label"]
+    },
+    {
+      "path": "packages/contracts/src/character-import/adapter/character-import-coverage-manifest.ts",
+      "line": 331,
+      "column": 9,
+      "context": "sentence",
+      "disposition": "unknown",
+      "value": "Feat import is deferred in the experimental preview.",
+      "variantForms": ["label"]
+    },
+    {
+      "path": "packages/contracts/src/character-import/adapter/character-import-coverage-manifest.ts",
+      "line": 332,
+      "column": 30,
+      "context": "unknown",
+      "disposition": "unknown",
+      "value": "data.feats",
+      "variantForms": ["plural"]
+    },
+    {
+      "path": "packages/contracts/src/character-import/dnd-beyond/adapt-dnd-beyond-character.test.ts",
+      "line": 63,
+      "column": 6,
+      "context": "test_expectation",
+      "disposition": "unknown",
+      "value": "maps fixture name and ability scores with feat bonuses applied",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "packages/contracts/src/character-import/dnd-beyond/adapt-dnd-beyond-character.test.ts",
+      "line": 119,
+      "column": 6,
+      "context": "test_expectation",
+      "disposition": "unknown",
+      "value": "classifies proficiencies across race, class, background, and feat sources",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "packages/contracts/src/character-import/dnd-beyond/adapt-dnd-beyond-character.test.ts",
+      "line": 129,
+      "column": 83,
+      "context": "test_expectation",
+      "disposition": "unknown",
+      "value": "feat",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "packages/contracts/src/character-import/dnd-beyond/adapt-dnd-beyond-character.ts",
+      "line": 103,
+      "column": 3,
+      "context": "unknown",
+      "disposition": "unknown",
+      "value": "feat",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "packages/contracts/src/character-import/dnd-beyond/adapt-dnd-beyond-character.ts",
+      "line": 188,
+      "column": 10,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeTerm('species')",
+      "variantForms": []
+    },
+    {
+      "path": "packages/contracts/src/dev-bench/ticket.ts",
+      "line": 28,
+      "column": 12,
+      "context": "unknown",
+      "disposition": "unknown",
+      "value": "Feat",
+      "variantForms": ["label"]
+    },
+    {
+      "path": "packages/contracts/src/rpg/content/feat-messages.ts",
+      "line": 4,
+      "column": 1,
+      "context": "comment",
+      "disposition": "unknown",
+      "value": "// Feat validation messages (tier 2).",
+      "variantForms": ["label"]
+    },
+    {
+      "path": "packages/contracts/src/rpg/content/feat-messages.ts",
+      "line": 9,
+      "column": 5,
+      "context": "message",
+      "disposition": "unknown",
+      "value": "validation.feat.repeatableNotesOnlyWhenAllowed",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "packages/contracts/src/rpg/content/feat-messages.ts",
+      "line": 10,
+      "column": 11,
+      "context": "message",
+      "disposition": "unknown",
+      "value": "Repeat notes are only available when the feat can be taken more than once.",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "packages/contracts/src/rpg/content/feat.test.ts",
+      "line": 9,
+      "column": 8,
+      "context": "test_expectation",
+      "disposition": "unknown",
+      "value": "./feat",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "packages/contracts/src/rpg/content/feat.test.ts",
+      "line": 48,
+      "column": 6,
+      "context": "test_expectation",
+      "disposition": "unknown",
+      "value": "parses a well-formed system feat",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "packages/contracts/src/rpg/content/feat.test.ts",
+      "line": 52,
+      "column": 6,
+      "context": "test_expectation",
+      "disposition": "unknown",
+      "value": "parses a homebrew feat with a campaignId",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "packages/contracts/src/rpg/content/feat.test.ts",
+      "line": 66,
+      "column": 6,
+      "context": "test_expectation",
+      "disposition": "unknown",
+      "value": "accepts repeatable feats with notes",
+      "variantForms": ["plural"]
+    },
+    {
+      "path": "packages/contracts/src/rpg/content/feat.test.ts",
+      "line": 76,
+      "column": 11,
+      "context": "test_expectation",
+      "disposition": "unknown",
+      "value": "<p>You can take this feat more than once, but you must choose a different spell list each time.</p>",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "packages/contracts/src/rpg/content/feat.ts",
+      "line": 3,
+      "column": 36,
+      "context": "unknown",
+      "disposition": "unknown",
+      "value": "../vocab/feat",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "packages/contracts/src/rpg/content/feat.ts",
+      "line": 11,
+      "column": 40,
+      "context": "unknown",
+      "disposition": "unknown",
+      "value": "./feat-messages",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "packages/contracts/src/rpg/content/feat.ts",
+      "line": 14,
+      "column": 1,
+      "context": "comment",
+      "disposition": "unknown",
+      "value": "// Feat — prose-first catalog content. Benefit prose lives in `description` for",
+      "variantForms": ["label"]
+    },
+    {
+      "path": "packages/contracts/src/rpg/content/index.ts",
+      "line": 11,
+      "column": 15,
+      "context": "unknown",
+      "disposition": "unknown",
+      "value": "./feat-messages",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "packages/contracts/src/rpg/content/index.ts",
+      "line": 12,
+      "column": 15,
+      "context": "unknown",
+      "disposition": "unknown",
+      "value": "./feat",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "packages/contracts/src/rpg/content/lib/content-type-keys.ts",
+      "line": 12,
+      "column": 3,
+      "context": "unknown",
+      "disposition": "unknown",
+      "value": "feats",
+      "variantForms": ["plural"]
+    },
+    {
+      "path": "packages/contracts/src/rpg/content/lib/content-type-term-coverage.test.ts",
+      "line": 20,
+      "column": 20,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeTerm(key)",
+      "variantForms": []
+    },
+    {
+      "path": "packages/contracts/src/rpg/content/lib/content-type-term-coverage.test.ts",
+      "line": 42,
+      "column": 12,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeSentenceForm('species')",
+      "variantForms": []
+    },
+    {
+      "path": "packages/contracts/src/rpg/content/lib/content-type-term-coverage.test.ts",
+      "line": 43,
+      "column": 12,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeSentenceForm('classes', 2)",
+      "variantForms": []
+    },
+    {
+      "path": "packages/contracts/src/rpg/content/lib/content-type-terms.ts",
+      "line": 31,
+      "column": 12,
+      "context": "label",
+      "disposition": "replaceable",
+      "value": "Feat",
+      "variantForms": ["label"],
+      "suggestion": "getContentTypeItemLabel('feats')"
+    },
+    {
+      "path": "packages/contracts/src/rpg/content/lib/content-type-terms.ts",
+      "line": 34,
+      "column": 17,
+      "context": "unknown",
+      "disposition": "unknown",
+      "value": "feat",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "packages/contracts/src/rpg/content/lib/content-type-terms.ts",
+      "line": 35,
+      "column": 15,
+      "context": "unknown",
+      "disposition": "unknown",
+      "value": "feats",
+      "variantForms": ["plural"]
+    },
+    {
+      "path": "packages/contracts/src/rpg/content/lib/content-type-terms.ts",
+      "line": 60,
+      "column": 30,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeTerm(key)",
+      "variantForms": []
+    },
+    {
+      "path": "packages/contracts/src/rpg/content/lib/grant-messages.ts",
+      "line": 23,
+      "column": 11,
+      "context": "message",
+      "disposition": "unknown",
+      "value": "Allow any qualifying feat only applies to Epic Boon and General categories.",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "packages/contracts/src/rpg/content/lib/grants.test.ts",
+      "line": 32,
+      "column": 6,
+      "context": "test_expectation",
+      "disposition": "unknown",
+      "value": "parses a fighting-style feat choice",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "packages/contracts/src/rpg/content/lib/grants.test.ts",
+      "line": 152,
+      "column": 6,
+      "context": "test_expectation",
+      "disposition": "unknown",
+      "value": "formats language and feat choices with counted forms",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "packages/contracts/src/rpg/content/lib/grants.test.ts",
+      "line": 157,
+      "column": 7,
+      "context": "test_expectation",
+      "disposition": "unknown",
+      "value": "Character chooses 2 general feats.",
+      "variantForms": ["plural"]
+    },
+    {
+      "path": "packages/contracts/src/rpg/content/lib/grants.test.ts",
+      "line": 454,
+      "column": 6,
+      "context": "test_expectation",
+      "disposition": "unknown",
+      "value": "parses a feat choice grant",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "packages/contracts/src/rpg/content/lib/grants.ts",
+      "line": 20,
+      "column": 65,
+      "context": "unknown",
+      "disposition": "unknown",
+      "value": "../../vocab/feat",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "packages/contracts/src/rpg/content/lib/grants.ts",
+      "line": 44,
+      "column": 1,
+      "context": "comment",
+      "disposition": "unknown",
+      "value": "// subclass features, and feat-choice features. Optional fields only; no rules engine.",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "packages/contracts/src/rpg/content/lib/grants.ts",
+      "line": 102,
+      "column": 1,
+      "context": "comment",
+      "disposition": "unknown",
+      "value": "// --- Feat choices -----------------------------------------------------------",
+      "variantForms": ["label"]
+    },
+    {
+      "path": "packages/contracts/src/rpg/content/lib/grants.ts",
+      "line": 104,
+      "column": 1,
+      "context": "comment",
+      "disposition": "unknown",
+      "value": "/**\n * A feat pick granted by a class feature, subclass feature, or species trait.\n * Pool is filtered by `category`; Epic Boon features may expand via `allowAnyQualifying`.\n */",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "packages/contracts/src/rpg/content/lib/grants.ts",
+      "line": 112,
+      "column": 5,
+      "context": "comment",
+      "disposition": "unknown",
+      "value": "/** Epic Boon / ASI: category default **or** any feat the character qualifies for. */",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "packages/contracts/src/rpg/content/lib/grants.ts",
+      "line": 116,
+      "column": 5,
+      "context": "comment",
+      "disposition": "unknown",
+      "value": "/** Feat slugs surfaced as recommendations in the character builder (not prose). */",
+      "variantForms": ["label"]
+    },
+    {
+      "path": "packages/contracts/src/rpg/content/lib/grants.ts",
+      "line": 244,
+      "column": 1,
+      "context": "comment",
+      "disposition": "unknown",
+      "value": "/** Feat pick from a filtered pool. */",
+      "variantForms": ["label"]
+    },
+    {
+      "path": "packages/contracts/src/rpg/content/lib/multiclassing-validation.ts",
+      "line": 121,
+      "column": 26,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeSentenceForm('species')",
+      "variantForms": []
+    },
+    {
+      "path": "packages/contracts/src/rpg/content/lib/multiclassing-validation.ts",
+      "line": 142,
+      "column": 24,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeSentenceForm('species')",
+      "variantForms": []
+    },
+    {
+      "path": "packages/contracts/src/rpg/content/lib/multiclassing-validation.ts",
+      "line": 162,
+      "column": 24,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeSentenceForm('species')",
+      "variantForms": []
+    },
+    {
+      "path": "packages/contracts/src/rpg/content/lib/multiclassing-validation.ts",
+      "line": 175,
+      "column": 24,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeSentenceForm('species')",
+      "variantForms": []
+    },
+    {
+      "path": "packages/contracts/src/rpg/content/lib/requirement-expression.ts",
+      "line": 16,
+      "column": 1,
+      "context": "comment",
+      "disposition": "unknown",
+      "value": "// RequirementExpression — composable AND/OR eligibility trees shared by feats,",
+      "variantForms": ["plural"]
+    },
+    {
+      "path": "packages/contracts/src/rpg/content/lib/requirement-expression.ts",
+      "line": 25,
+      "column": 1,
+      "context": "comment",
+      "disposition": "unknown",
+      "value": "// Feat eligibility tied to class features uses grants.featChoice on the source.",
+      "variantForms": ["label"]
+    },
+    {
+      "path": "packages/contracts/src/rpg/runtime/character-builder/character-builder-messages.ts",
+      "line": 105,
+      "column": 19,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeSentenceForm('species')",
+      "variantForms": []
+    },
+    {
+      "path": "packages/contracts/src/rpg/runtime/character-builder/choice-set.ts",
+      "line": 31,
+      "column": 3,
+      "context": "unknown",
+      "disposition": "unknown",
+      "value": "feat",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "packages/contracts/src/rpg/runtime/character-builder/resolve-review-blocking-summary.ts",
+      "line": 41,
+      "column": 12,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeTerm('species')",
+      "variantForms": []
+    },
+    {
+      "path": "packages/contracts/src/rpg/runtime/character-builder/resolvers/grants/grant-choice-sets.ts",
+      "line": 2,
+      "column": 38,
+      "context": "unknown",
+      "disposition": "unknown",
+      "value": "../../../../vocab/feat",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "packages/contracts/src/rpg/runtime/character-builder/resolvers/grants/grant-choice-sets.ts",
+      "line": 91,
+      "column": 5,
+      "context": "unknown",
+      "disposition": "unknown",
+      "value": "feat",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "packages/contracts/src/rpg/runtime/character-builder/resolvers/grants/grant-choice-sets.ts",
+      "line": 96,
+      "column": 28,
+      "context": "unknown",
+      "disposition": "unknown",
+      "value": "Feat",
+      "variantForms": ["label"]
+    },
+    {
+      "path": "packages/contracts/src/rpg/runtime/character-builder/resolvers/registry/choice-sources.ts",
+      "line": 11,
+      "column": 1,
+      "context": "comment",
+      "disposition": "unknown",
+      "value": "/**\n * Ordered registry of choice-source resolvers. `resolveAvailableChoices` iterates\n * this list and concatenates results. Future sources (starting equipment, spellcasting,\n * feats, subclass, background) add a single entry each.\n */",
+      "variantForms": ["plural"]
+    },
+    {
+      "path": "packages/contracts/src/rpg/runtime/character-builder/resolvers/registry/resolve-choices.test.ts",
+      "line": 96,
+      "column": 6,
+      "context": "test_expectation",
+      "disposition": "unknown",
+      "value": "emits deferred feat ChoiceSets as optional advisory picks",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "packages/contracts/src/rpg/runtime/character-builder/resolvers/registry/resolve-choices.test.ts",
+      "line": 139,
+      "column": 19,
+      "context": "test_expectation",
+      "disposition": "unknown",
+      "value": "feat",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "packages/contracts/src/rpg/runtime/character-builder/steps.ts",
+      "line": 59,
+      "column": 12,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeTerm('species')",
+      "variantForms": []
+    },
+    {
+      "path": "packages/contracts/src/rpg/runtime/character-builder/steps.ts",
+      "line": 60,
+      "column": 45,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeSentenceForm('species')",
+      "variantForms": []
+    },
+    {
+      "path": "packages/contracts/src/rpg/runtime/character-builder/validate/validate-choice-sets.ts",
+      "line": 20,
+      "column": 3,
+      "context": "unknown",
+      "disposition": "unknown",
+      "value": "feat",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "packages/contracts/src/rpg/runtime/character/equipment-inventory.ts",
+      "line": 12,
+      "column": 1,
+      "context": "comment",
+      "disposition": "unknown",
+      "value": "// Equipment, wealth, and feats",
+      "variantForms": ["plural"]
+    },
+    {
+      "path": "packages/contracts/src/rpg/runtime/character/format-selection-source-label.ts",
+      "line": 21,
+      "column": 9,
+      "context": "unknown",
+      "disposition": "unknown",
+      "value": "Granted by Feat",
+      "variantForms": ["label"]
+    },
+    {
+      "path": "packages/contracts/src/rpg/runtime/character/selection-sources.ts",
+      "line": 14,
+      "column": 3,
+      "context": "unknown",
+      "disposition": "unknown",
+      "value": "feat",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "packages/contracts/src/rpg/runtime/character/sheet.test.ts",
+      "line": 58,
+      "column": 19,
+      "context": "test_expectation",
+      "disposition": "unknown",
+      "value": "feat",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "packages/contracts/src/rpg/runtime/character/sheet.test.ts",
+      "line": 281,
+      "column": 69,
+      "context": "test_expectation",
+      "disposition": "unknown",
+      "value": "feat",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "packages/contracts/src/rpg/runtime/character/sheet.ts",
+      "line": 22,
+      "column": 1,
+      "context": "comment",
+      "disposition": "unknown",
+      "value": "// services/builders from class, species, feat, spell, and equipment content.",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "packages/contracts/src/rpg/vocab/feat.test.ts",
+      "line": 12,
+      "column": 8,
+      "context": "test_expectation",
+      "disposition": "unknown",
+      "value": "./feat",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "packages/contracts/src/rpg/vocab/feat.test.ts",
+      "line": 15,
+      "column": 6,
+      "context": "test_expectation",
+      "disposition": "unknown",
+      "value": "accepts every known feat category",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "packages/contracts/src/rpg/vocab/feat.test.ts",
+      "line": 26,
+      "column": 10,
+      "context": "test_expectation",
+      "disposition": "unknown",
+      "value": "feat category vocabulary",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "packages/contracts/src/rpg/vocab/feat.test.ts",
+      "line": 40,
+      "column": 6,
+      "context": "test_expectation",
+      "disposition": "unknown",
+      "value": "returns counted feat sentence forms",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "packages/contracts/src/rpg/vocab/feat.test.ts",
+      "line": 41,
+      "column": 60,
+      "context": "test_expectation",
+      "disposition": "unknown",
+      "value": "general feat",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "packages/contracts/src/rpg/vocab/feat.test.ts",
+      "line": 42,
+      "column": 60,
+      "context": "test_expectation",
+      "disposition": "unknown",
+      "value": "general feats",
+      "variantForms": ["plural"]
+    },
+    {
+      "path": "packages/contracts/src/rpg/vocab/feat.test.ts",
+      "line": 43,
+      "column": 67,
+      "context": "test_expectation",
+      "disposition": "unknown",
+      "value": "fighting style feat",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "packages/contracts/src/rpg/vocab/feat.test.ts",
+      "line": 47,
+      "column": 10,
+      "context": "test_expectation",
+      "disposition": "unknown",
+      "value": "feat part vocabulary",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "packages/contracts/src/rpg/vocab/feat.ts",
+      "line": 6,
+      "column": 1,
+      "context": "comment",
+      "disposition": "unknown",
+      "value": "// Feat categories — closed SRD 5.2.1 set (v1). Homebrew-only categories may",
+      "variantForms": ["label"]
+    },
+    {
+      "path": "packages/contracts/src/rpg/vocab/feat.ts",
+      "line": 11,
+      "column": 10,
+      "context": "label",
+      "disposition": "replaceable",
+      "value": "Feat Category",
+      "variantForms": ["label"],
+      "suggestion": "getContentTypeItemLabel('feats')"
+    },
+    {
+      "path": "packages/contracts/src/rpg/vocab/feat.ts",
+      "line": 12,
+      "column": 16,
+      "context": "sentence",
+      "disposition": "unknown",
+      "value": "When or how a feat may be selected during character building.",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "packages/contracts/src/rpg/vocab/feat.ts",
+      "line": 14,
+      "column": 15,
+      "context": "unknown",
+      "disposition": "unknown",
+      "value": "feat category",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "packages/contracts/src/rpg/vocab/feat.ts",
+      "line": 15,
+      "column": 13,
+      "context": "unknown",
+      "disposition": "unknown",
+      "value": "feat categories",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "packages/contracts/src/rpg/vocab/feat.ts",
+      "line": 23,
+      "column": 7,
+      "context": "sentence",
+      "disposition": "unknown",
+      "value": "A feat taken at character creation or when a feature grants an Origin feat choice.",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "packages/contracts/src/rpg/vocab/feat.ts",
+      "line": 25,
+      "column": 17,
+      "context": "unknown",
+      "disposition": "unknown",
+      "value": "origin feat",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "packages/contracts/src/rpg/vocab/feat.ts",
+      "line": 26,
+      "column": 15,
+      "context": "unknown",
+      "disposition": "unknown",
+      "value": "origin feats",
+      "variantForms": ["plural"]
+    },
+    {
+      "path": "packages/contracts/src/rpg/vocab/feat.ts",
+      "line": 31,
+      "column": 18,
+      "context": "sentence",
+      "disposition": "unknown",
+      "value": "A feat typically taken at level 4+ when a class grants a General feat choice.",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "packages/contracts/src/rpg/vocab/feat.ts",
+      "line": 33,
+      "column": 17,
+      "context": "unknown",
+      "disposition": "unknown",
+      "value": "general feat",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "packages/contracts/src/rpg/vocab/feat.ts",
+      "line": 34,
+      "column": 15,
+      "context": "unknown",
+      "disposition": "unknown",
+      "value": "general feats",
+      "variantForms": ["plural"]
+    },
+    {
+      "path": "packages/contracts/src/rpg/vocab/feat.ts",
+      "line": 39,
+      "column": 18,
+      "context": "sentence",
+      "disposition": "unknown",
+      "value": "A feat granted by the Fighting Style feature or similar class features.",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "packages/contracts/src/rpg/vocab/feat.ts",
+      "line": 41,
+      "column": 17,
+      "context": "unknown",
+      "disposition": "unknown",
+      "value": "fighting style feat",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "packages/contracts/src/rpg/vocab/feat.ts",
+      "line": 42,
+      "column": 15,
+      "context": "unknown",
+      "disposition": "unknown",
+      "value": "fighting style feats",
+      "variantForms": ["plural"]
+    },
+    {
+      "path": "packages/contracts/src/rpg/vocab/feat.ts",
+      "line": 47,
+      "column": 18,
+      "context": "sentence",
+      "disposition": "unknown",
+      "value": "A high-level feat typically taken at level 19+.",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "packages/contracts/src/rpg/vocab/feat.ts",
+      "line": 49,
+      "column": 17,
+      "context": "unknown",
+      "disposition": "unknown",
+      "value": "epic boon feat",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "packages/contracts/src/rpg/vocab/feat.ts",
+      "line": 50,
+      "column": 15,
+      "context": "unknown",
+      "disposition": "unknown",
+      "value": "epic boon feats",
+      "variantForms": ["plural"]
+    },
+    {
+      "path": "packages/contracts/src/rpg/vocab/feat.ts",
+      "line": 61,
+      "column": 1,
+      "context": "comment",
+      "disposition": "unknown",
+      "value": "/** Returns the reference entry for a feat category id, if known. */",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "packages/contracts/src/rpg/vocab/feat.ts",
+      "line": 66,
+      "column": 1,
+      "context": "comment",
+      "disposition": "unknown",
+      "value": "/** Returns the display label for a feat category. Falls back to the raw id. */",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "packages/contracts/src/rpg/vocab/feat.ts",
+      "line": 71,
+      "column": 1,
+      "context": "comment",
+      "disposition": "unknown",
+      "value": "/** Counted noun phrase for generated feat-choice prose. */",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "packages/contracts/src/rpg/vocab/feat.ts",
+      "line": 79,
+      "column": 1,
+      "context": "comment",
+      "disposition": "unknown",
+      "value": "// Parts of a Feat — SRD rules prose for contextual help (tooltips, authoring).",
+      "variantForms": ["label"]
+    },
+    {
+      "path": "packages/contracts/src/rpg/vocab/feat.ts",
+      "line": 80,
+      "column": 1,
+      "context": "comment",
+      "disposition": "unknown",
+      "value": "// Not stored on individual feat records.",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "packages/contracts/src/rpg/vocab/feat.ts",
+      "line": 84,
+      "column": 10,
+      "context": "label",
+      "disposition": "replaceable",
+      "value": "Feat Section",
+      "variantForms": ["label"],
+      "suggestion": "getContentTypeItemLabel('feats')"
+    },
+    {
+      "path": "packages/contracts/src/rpg/vocab/feat.ts",
+      "line": 85,
+      "column": 16,
+      "context": "sentence",
+      "disposition": "unknown",
+      "value": "A labeled subsection of feat rules text.",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "packages/contracts/src/rpg/vocab/feat.ts",
+      "line": 87,
+      "column": 15,
+      "context": "unknown",
+      "disposition": "unknown",
+      "value": "feat section",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "packages/contracts/src/rpg/vocab/feat.ts",
+      "line": 88,
+      "column": 13,
+      "context": "unknown",
+      "disposition": "unknown",
+      "value": "feat sections",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "packages/contracts/src/rpg/vocab/feat.ts",
+      "line": 96,
+      "column": 7,
+      "context": "sentence",
+      "disposition": "unknown",
+      "value": "The benefits of a feat are detailed after any prerequisites are listed. If you have a feat, you gain its benefits.",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "packages/contracts/src/rpg/vocab/feat.ts",
+      "line": 101,
+      "column": 7,
+      "context": "sentence",
+      "disposition": "unknown",
+      "value": "A feat can be taken only once unless its description states otherwise in a “Repeatable” subsection.",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "packages/contracts/src/rpg/vocab/feat.ts",
+      "line": 109,
+      "column": 1,
+      "context": "comment",
+      "disposition": "unknown",
+      "value": "/** Returns the reference entry for a feat part id, if known. */",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "packages/contracts/src/rpg/vocab/feat.ts",
+      "line": 114,
+      "column": 1,
+      "context": "comment",
+      "disposition": "unknown",
+      "value": "/** Returns the display label for a feat part id. Falls back to the raw id. */",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "packages/contracts/src/rpg/vocab/index.ts",
+      "line": 22,
+      "column": 15,
+      "context": "unknown",
+      "disposition": "unknown",
+      "value": "./feat",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "packages/contracts/src/rpg/vocab/mechanics/edition-preset.ts",
+      "line": 58,
+      "column": 7,
+      "context": "sentence",
+      "disposition": "unknown",
+      "value": "A detailed d20 framework with ascending armor class, attack bonuses, Fortitude/Reflex/Will saves, skill ranks, feats, and more granular character customization.",
+      "variantForms": ["plural"]
+    },
+    {
+      "path": "packages/contracts/src/rpg/vocab/mechanics/edition-preset.ts",
+      "line": 59,
+      "column": 63,
+      "context": "unknown",
+      "disposition": "unknown",
+      "value": "Skills & feats",
+      "variantForms": ["plural"]
+    },
+    {
+      "path": "packages/contracts/src/rpg/vocab/types.test.ts",
+      "line": 12,
+      "column": 39,
+      "context": "test_expectation",
+      "disposition": "unknown",
+      "value": "./feat",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "packages/contracts/src/rpg/vocab/usage-frequency.ts",
+      "line": 7,
+      "column": 1,
+      "context": "comment",
+      "disposition": "unknown",
+      "value": "// (innate spells, racial features, feat-granted abilities, etc.). Spell-agnostic:",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "packages/contracts/src/rpg/vocab/vocab-term-coverage.test.ts",
+      "line": 32,
+      "column": 52,
+      "context": "test_expectation",
+      "disposition": "unknown",
+      "value": "./feat",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "packages/dev-bench-core/src/formatting/ticket-for-agent.test.ts",
+      "line": 46,
+      "column": 30,
+      "context": "test_expectation",
+      "disposition": "unknown",
+      "value": "**Type:** Feat",
+      "variantForms": ["label"]
+    },
+    {
+      "path": "packages/ui/src/components/ui/builder-option-details-sheet.stories.tsx",
+      "line": 192,
+      "column": 19,
+      "context": "story_fixture",
+      "disposition": "unknown",
+      "value": "<p>You gain a Fighting Style feat of your choice.</p>",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "packages/ui/src/components/ui/preview-card.stories.tsx",
+      "line": 81,
+      "column": 12,
+      "context": "story_fixture",
+      "disposition": "unknown",
+      "value": "Feat choice",
+      "variantForms": ["label"]
+    },
+    {
+      "path": "packages/ui/src/components/ui/preview-card.stories.tsx",
+      "line": 82,
+      "column": 18,
+      "context": "story_fixture",
+      "disposition": "unknown",
+      "value": "Let the player choose from a feat category.",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "packages/ui/src/components/ui/preview-card.stories.tsx",
+      "line": 102,
+      "column": 14,
+      "context": "story_fixture",
+      "disposition": "unknown",
+      "value": "Feat",
+      "variantForms": ["label"]
+    },
+    {
+      "path": "packages/ui/src/components/ui/preview-card.stories.tsx",
+      "line": 103,
+      "column": 12,
+      "context": "story_fixture",
+      "disposition": "unknown",
+      "value": "Feat Overview",
+      "variantForms": ["label"]
+    },
+    {
+      "path": "packages/ui/src/components/ui/radio-card-field.stories.tsx",
+      "line": 17,
+      "column": 7,
+      "context": "story_fixture",
+      "disposition": "unknown",
+      "value": "A detailed d20 framework with ascending armor class, attack bonuses, Fortitude/Reflex/Will saves, skill ranks, feats, and more granular character customization.",
+      "variantForms": ["plural"]
+    },
+    {
+      "path": "packages/ui/src/components/ui/radio-card-field.stories.tsx",
+      "line": 18,
+      "column": 63,
+      "context": "story_fixture",
+      "disposition": "unknown",
+      "value": "Skills & feats",
+      "variantForms": ["plural"]
+    },
+    {
+      "path": "packages/ui/src/components/ui/radio-card.stories.tsx",
+      "line": 19,
+      "column": 7,
+      "context": "story_fixture",
+      "disposition": "unknown",
+      "value": "A detailed d20 framework with ascending armor class, attack bonuses, Fortitude/Reflex/Will saves, skill ranks, feats, and more granular character customization.",
+      "variantForms": ["plural"]
+    },
+    {
+      "path": "packages/ui/src/components/ui/radio-card.stories.tsx",
+      "line": 20,
+      "column": 63,
+      "context": "story_fixture",
+      "disposition": "unknown",
+      "value": "Skills & feats",
+      "variantForms": ["plural"]
+    },
+    {
+      "path": "packages/ui/src/components/ui/radio-card.stories.tsx",
+      "line": 75,
+      "column": 18,
+      "context": "story_fixture",
+      "disposition": "unknown",
+      "value": "Detailed d20 framework with skills, feats, and granular customization.",
+      "variantForms": ["plural"]
+    },
+    {
+      "path": "packages/ui/src/components/ui/radio-card.stories.tsx",
+      "line": 76,
+      "column": 29,
+      "context": "story_fixture",
+      "disposition": "unknown",
+      "value": "Skills & feats",
+      "variantForms": ["plural"]
+    },
+    {
+      "path": "packages/ui/src/components/ui/radio-card.stories.tsx",
+      "line": 81,
+      "column": 18,
+      "context": "story_fixture",
+      "disposition": "unknown",
+      "value": "Tactical three-action combat with degrees of success and modular feats.",
+      "variantForms": ["plural"]
+    },
+    {
+      "path": "packages/ui/src/components/ui/rich-text-editor.stories.tsx",
+      "line": 27,
+      "column": 11,
+      "context": "story_fixture",
+      "disposition": "unknown",
+      "value": "/campaigns/demo/content/feats/sharpshooter",
+      "variantForms": ["plural"]
+    },
+    {
+      "path": "packages/ui/src/components/ui/rich-text-editor.stories.tsx",
+      "line": 28,
+      "column": 18,
+      "context": "story_fixture",
+      "disposition": "unknown",
+      "value": "feat",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "packages/ui/src/components/ui/rich-text-editor.stories.tsx",
+      "line": 54,
+      "column": 1,
+      "context": "comment",
+      "disposition": "unknown",
+      "value": "/** Link picker with searchable internal spell/feat targets (dashboard supplies options). */",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "packages/ui/src/components/ui/rich-text-link-picker.client.tsx",
+      "line": 38,
+      "column": 12,
+      "context": "unknown",
+      "disposition": "unknown",
+      "value": "feat",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "packages/ui/src/components/ui/rich-text-link-picker.client.tsx",
+      "line": 38,
+      "column": 27,
+      "context": "label",
+      "disposition": "replaceable",
+      "value": "Feats",
+      "variantForms": ["derived_collection_label"],
+      "suggestion": "getContentTypeItemLabel('feats')"
+    },
+    {
+      "path": "packages/ui/src/components/ui/rich-text-link-picker.lib.test.ts",
+      "line": 33,
+      "column": 11,
+      "context": "test_expectation",
+      "disposition": "unknown",
+      "value": "/campaigns/demo/content/feats/sharpshooter",
+      "variantForms": ["plural"]
+    },
+    {
+      "path": "packages/ui/src/components/ui/rich-text-link-picker.lib.test.ts",
+      "line": 34,
+      "column": 18,
+      "context": "test_expectation",
+      "disposition": "unknown",
+      "value": "feat",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "packages/ui/src/components/ui/rich-text-link-picker.lib.test.ts",
+      "line": 105,
+      "column": 55,
+      "context": "test_expectation",
+      "disposition": "unknown",
+      "value": "feat",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "packages/ui/src/components/ui/rich-text-link-picker.stories.tsx",
+      "line": 25,
+      "column": 9,
+      "context": "story_fixture",
+      "disposition": "unknown",
+      "value": "feat-overview",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "packages/ui/src/components/ui/rich-text-link-picker.stories.tsx",
+      "line": 26,
+      "column": 12,
+      "context": "story_fixture",
+      "disposition": "unknown",
+      "value": "Feat Overview",
+      "variantForms": ["label"]
+    },
+    {
+      "path": "packages/ui/src/components/ui/rich-text-link-picker.stories.tsx",
+      "line": 27,
+      "column": 11,
+      "context": "story_fixture",
+      "disposition": "unknown",
+      "value": "/campaigns/demo/content/feats",
+      "variantForms": ["plural"]
+    },
+    {
+      "path": "packages/ui/src/components/ui/rich-text-link-picker.stories.tsx",
+      "line": 28,
+      "column": 18,
+      "context": "story_fixture",
+      "disposition": "unknown",
+      "value": "feat",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "packages/ui/src/components/ui/rich-text-link-picker.stories.tsx",
+      "line": 34,
+      "column": 11,
+      "context": "story_fixture",
+      "disposition": "unknown",
+      "value": "/campaigns/demo/content/feats/sharpshooter",
+      "variantForms": ["plural"]
+    },
+    {
+      "path": "packages/ui/src/components/ui/rich-text-link-picker.stories.tsx",
+      "line": 35,
+      "column": 18,
+      "context": "story_fixture",
+      "disposition": "unknown",
+      "value": "feat",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "packages/ui/src/components/ui/rich-text-link-picker.test.tsx",
+      "line": 30,
+      "column": 11,
+      "context": "test_expectation",
+      "disposition": "unknown",
+      "value": "/campaigns/demo/content/feats/sharpshooter",
+      "variantForms": ["plural"]
+    },
+    {
+      "path": "packages/ui/src/components/ui/rich-text-link-picker.test.tsx",
+      "line": 31,
+      "column": 18,
+      "context": "test_expectation",
+      "disposition": "unknown",
+      "value": "feat",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "packages/ui/src/components/ui/rich-text-link-preview-card.client.tsx",
+      "line": 11,
+      "column": 37,
+      "context": "unknown",
+      "disposition": "unknown",
+      "value": "feat",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "packages/ui/src/components/ui/rich-text-link-preview-card.client.tsx",
+      "line": 11,
+      "column": 52,
+      "context": "unknown",
+      "disposition": "unknown",
+      "value": "Feat",
+      "variantForms": ["label"]
+    },
+    {
+      "path": "packages/ui/src/components/ui/rich-text-link-preview-card.stories.tsx",
+      "line": 28,
+      "column": 18,
+      "context": "story_fixture",
+      "disposition": "unknown",
+      "value": "feat",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "packages/ui/src/components/ui/rich-text-link-preview-card.stories.tsx",
+      "line": 29,
+      "column": 12,
+      "context": "story_fixture",
+      "disposition": "unknown",
+      "value": "Feat Overview",
+      "variantForms": ["label"]
+    },
+    {
+      "path": "packages/ui/src/components/ui/rich-text-link-preview-card.stories.tsx",
+      "line": 36,
+      "column": 18,
+      "context": "story_fixture",
+      "disposition": "unknown",
+      "value": "feat",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "packages/ui/src/components/ui/rich-text-link-preview-card.test.tsx",
+      "line": 17,
+      "column": 49,
+      "context": "test_expectation",
+      "disposition": "unknown",
+      "value": "feat",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "packages/ui/src/components/ui/rich-text-link-preview-card.test.tsx",
+      "line": 17,
+      "column": 62,
+      "context": "test_expectation",
+      "disposition": "unknown",
+      "value": "Feat Overview",
+      "variantForms": ["label"]
+    },
+    {
+      "path": "packages/ui/src/components/ui/rich-text-link-preview-card.test.tsx",
+      "line": 18,
+      "column": 29,
+      "context": "test_expectation",
+      "disposition": "unknown",
+      "value": "Feat",
+      "variantForms": ["label"]
+    },
+    {
+      "path": "packages/ui/src/components/ui/rich-text-link-preview-card.test.tsx",
+      "line": 19,
+      "column": 29,
+      "context": "test_expectation",
+      "disposition": "unknown",
+      "value": "Feat Overview",
+      "variantForms": ["label"]
+    },
+    {
+      "path": "packages/ui/src/form/field-config-conditional.test.ts",
+      "line": 48,
+      "column": 46,
+      "context": "test_expectation",
+      "disposition": "unknown",
+      "value": "feat",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "packages/ui/src/lib/search.test.ts",
+      "line": 35,
+      "column": 11,
+      "context": "test_expectation",
+      "disposition": "unknown",
+      "value": "/campaigns/demo/content/feats/sharpshooter",
+      "variantForms": ["plural"]
+    },
+    {
+      "path": "packages/ui/src/lib/search.test.ts",
+      "line": 36,
+      "column": 18,
+      "context": "test_expectation",
+      "disposition": "unknown",
+      "value": "feat",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "packages/ui/src/lib/search.test.ts",
+      "line": 139,
+      "column": 51,
+      "context": "test_expectation",
+      "disposition": "unknown",
+      "value": "feat",
+      "variantForms": ["singular"]
+    },
+    {
+      "path": "packages/ui/src/lib/search.test.ts",
+      "line": 153,
+      "column": 86,
+      "context": "test_expectation",
+      "disposition": "unknown",
+      "value": "/feats/",
+      "variantForms": ["plural"]
+    },
+    {
+      "path": "tools/vocab/term-audit/src/resolve-term-target.ts",
+      "line": 32,
+      "column": 44,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeTerm(id)",
+      "variantForms": []
+    },
+    {
+      "path": "tools/vocab/term-audit/test/fixtures/species-usage.tsx",
+      "line": 10,
+      "column": 16,
+      "context": "canonical_usage",
+      "disposition": "ignored",
+      "value": "getContentTypeTerm('species')",
+      "variantForms": []
+    }
+  ],
+  "skippedFiles": [
+    {
+      "path": ".git",
+      "reason": "ignored directory"
+    },
+    {
+      "path": "apps/api/dist",
+      "reason": "ignored directory"
+    },
+    {
+      "path": "apps/api/node_modules",
+      "reason": "ignored directory"
+    },
+    {
+      "path": "apps/bench/dist",
+      "reason": "ignored directory"
+    },
+    {
+      "path": "apps/bench/node_modules",
+      "reason": "ignored directory"
+    },
+    {
+      "path": "apps/dashboard/coverage",
+      "reason": "ignored directory"
+    },
+    {
+      "path": "apps/dashboard/dist",
+      "reason": "ignored directory"
+    },
+    {
+      "path": "apps/dashboard/node_modules",
+      "reason": "ignored directory"
+    },
+    {
+      "path": "apps/public/node_modules",
+      "reason": "ignored directory"
+    },
+    {
+      "path": "coverage",
+      "reason": "ignored directory"
+    },
+    {
+      "path": "node_modules",
+      "reason": "ignored directory"
+    },
+    {
+      "path": "packages/api-client/node_modules",
+      "reason": "ignored directory"
+    },
+    {
+      "path": "packages/catalog/node_modules",
+      "reason": "ignored directory"
+    },
+    {
+      "path": "packages/config/node_modules",
+      "reason": "ignored directory"
+    },
+    {
+      "path": "packages/contracts/dist",
+      "reason": "ignored directory"
+    },
+    {
+      "path": "packages/contracts/generated",
+      "reason": "ignored directory"
+    },
+    {
+      "path": "packages/contracts/node_modules",
+      "reason": "ignored directory"
+    },
+    {
+      "path": "packages/dev-bench-core/node_modules",
+      "reason": "ignored directory"
+    },
+    {
+      "path": "packages/name-generator-core/node_modules",
+      "reason": "ignored directory"
+    },
+    {
+      "path": "packages/name-generator-data/node_modules",
+      "reason": "ignored directory"
+    },
+    {
+      "path": "packages/name-generator-integrations/node_modules",
+      "reason": "ignored directory"
+    },
+    {
+      "path": "packages/ui/coverage",
+      "reason": "ignored directory"
+    },
+    {
+      "path": "packages/ui/dist",
+      "reason": "ignored directory"
+    },
+    {
+      "path": "packages/ui/node_modules",
+      "reason": "ignored directory"
+    },
+    {
+      "path": "tools/bench/node_modules",
+      "reason": "ignored directory"
+    },
+    {
+      "path": "tools/vocab/term-audit/node_modules",
+      "reason": "ignored directory"
+    }
+  ],
+  "parseFailures": [],
+  "summary": {
+    "canonical": 151,
+    "replaceable": 10,
+    "contextual": 0,
+    "ignored": 0,
+    "unknown": 295
+  }
+}

@@ -211,6 +211,7 @@ function RichTextLinkPickerForm({
               layout="card"
               title={selectedInternalOption.title}
               contentType={selectedInternalOption.contentType}
+              eyebrowLabel={selectedInternalOption.eyebrowLabel}
               sourceLabel={selectedInternalOption.sourceLabel}
               onClear={() => setSelectedOptionId(null)}
             />
@@ -224,6 +225,7 @@ function RichTextLinkPickerForm({
                     key={option.id}
                     title={option.title}
                     contentType={option.contentType}
+                    eyebrowLabel={option.eyebrowLabel}
                     sourceLabel={option.sourceLabel}
                     interactive
                     tone={selectedOptionId === option.id ? 'selected' : 'default'}

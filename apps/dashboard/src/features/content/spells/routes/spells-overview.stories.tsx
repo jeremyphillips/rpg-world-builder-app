@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 import { DataTable } from '@rpg/ui'
 
 import { buildSeedSpellSchoolVocabulary } from '@/features/homebrew'
+import { formatContentCollectionAvailabilityCaption } from '@/features/content/lib/content-type-labels'
 import { STORY_CAMPAIGN_ID } from '../../lib/fixtures/constants'
 import { SPELL_LIST } from '../fixtures'
 import { spellsColumns, spellsFilters } from '../lib/spells-overview-columns'
@@ -23,7 +24,7 @@ export const Table: Story = {
       columns={spellsColumns(STORY_CAMPAIGN_ID, STORY_SPELL_SCHOOL_VOCABULARY)}
       data={[...SPELL_LIST]}
       filters={spellsFilters(STORY_SPELL_SCHOOL_VOCABULARY)}
-      caption="Spells available in this campaign"
+      caption={formatContentCollectionAvailabilityCaption('spells')}
     />
   ),
 }
