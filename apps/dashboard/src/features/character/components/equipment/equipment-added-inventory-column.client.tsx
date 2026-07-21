@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 
 import type {
   CharacterBuildCatalogIndex,
@@ -14,7 +14,7 @@ import {
   type EquipmentInventoryQuantityTarget,
   type EquipmentInventoryRemoveTarget,
 } from '../../lib/equipment-step.lib'
-import { equipmentAddedInventoryPanelClasses } from './equipment-acquisition-panel.variants'
+import { equipmentAddedInventoryPanelFilledClasses } from './equipment-acquisition-panel.variants'
 import { EquipmentAddedInventorySection } from './equipment-added-inventory-section.client'
 import { EquipmentInventoryColumn } from './equipment-inventory-column.client'
 import type { AddedEquipmentCategoryGroup } from './equipment-inventory-summary.lib'
@@ -25,6 +25,7 @@ export type EquipmentAddedInventoryColumnProps = {
   context: CharacterBuildContext
   catalogIndex: CharacterBuildCatalogIndex
   budget?: EquipmentBudgetSummary
+  reserveToolbarRow?: boolean
   onRemoveItem?: (target: EquipmentInventoryRemoveTarget) => void
   onSetPurchaseQuantity?: (target: EquipmentInventoryQuantityTarget, quantity: number) => void
   onReleaseGrant: (args: { allowanceId: string; equipmentId: string; quantity: number }) => void
@@ -38,6 +39,7 @@ export function EquipmentAddedInventoryColumn({
   context,
   catalogIndex,
   budget,
+  reserveToolbarRow = false,
   onRemoveItem,
   onSetPurchaseQuantity,
   onReleaseGrant,
@@ -46,24 +48,43 @@ export function EquipmentAddedInventoryColumn({
 }: EquipmentAddedInventoryColumnProps) {
   const [openEquipmentId, setOpenEquipmentId] = useState<string | null>(null)
 
+  const addedInventoryCount = useMemo(
+    () =>
+      addedEquipment
+        .flatMap((group) => group.entries)
+        .reduce((sum, entry) => sum + entry.totalQuantity, 0),
+    [addedEquipment],
+  )
+  const hasEntries = addedInventoryCount > 0
+
+  const section = (
+    <EquipmentAddedInventorySection
+      addedEquipment={addedEquipment}
+      draft={draft}
+      context={context}
+      catalogIndex={catalogIndex}
+      budget={budget}
+      onRemoveItem={onRemoveItem}
+      onSetPurchaseQuantity={onSetPurchaseQuantity}
+      onReleaseGrant={onReleaseGrant}
+      onRemovePurchase={onRemovePurchase}
+      onApplyMagicItemAcquisition={onApplyMagicItemAcquisition}
+      openEquipmentId={openEquipmentId}
+      onOpenEquipmentChange={setOpenEquipmentId}
+    />
+  )
+
   return (
-    <EquipmentInventoryColumn title={EQUIPMENT_ADDED_INVENTORY_SECTION_LABEL}>
-      <div className={equipmentAddedInventoryPanelClasses}>
-        <EquipmentAddedInventorySection
-          addedEquipment={addedEquipment}
-          draft={draft}
-          context={context}
-          catalogIndex={catalogIndex}
-          budget={budget}
-          onRemoveItem={onRemoveItem}
-          onSetPurchaseQuantity={onSetPurchaseQuantity}
-          onReleaseGrant={onReleaseGrant}
-          onRemovePurchase={onRemovePurchase}
-          onApplyMagicItemAcquisition={onApplyMagicItemAcquisition}
-          openEquipmentId={openEquipmentId}
-          onOpenEquipmentChange={setOpenEquipmentId}
-        />
-      </div>
+    <EquipmentInventoryColumn
+      title={EQUIPMENT_ADDED_INVENTORY_SECTION_LABEL}
+      titleBadgeCount={addedInventoryCount > 0 ? addedInventoryCount : undefined}
+      reserveToolbarRow={reserveToolbarRow}
+    >
+      {hasEntries ? (
+        <div className={equipmentAddedInventoryPanelFilledClasses}>{section}</div>
+      ) : (
+        section
+      )}
     </EquipmentInventoryColumn>
   )
 }

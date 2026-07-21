@@ -5,6 +5,7 @@ import {
   resolveEquipmentAcquisitionActionState,
   resolveMagicItemAcquisitionState,
   copperToWealth,
+  formatEquipmentPurchaseTotalPriceLabel,
   type CharacterBuildCatalogIndex,
   type CharacterBuildContext,
   type CharacterBuilderDraft,
@@ -142,6 +143,46 @@ function formatGrantPreviewLine(grantQuantity: number, rarity: MagicItemRarity):
   return grantQuantity === 1 ? `${rarityLabel} choice` : `${grantQuantity} ${rarityLabel} choices`
 }
 
+function formatUsesGrantPreviewLine(grantQuantity: number, rarity: MagicItemRarity): string {
+  const rarityLabel = getMagicItemRarityLabel(rarity)
+  return grantQuantity === 1
+    ? `Uses 1 ${rarityLabel} choice`
+    : `Uses ${grantQuantity} ${rarityLabel} choices`
+}
+
+function formatMixedAcquisitionPreviewLine(args: {
+  grantQuantity: number
+  rarity: MagicItemRarity
+  purchaseQuantity: number
+  totalPurchasePrice: string
+}): string {
+  const grantPart = formatGrantPreviewLine(args.grantQuantity, args.rarity)
+  const purchasePart =
+    args.purchaseQuantity === 1
+      ? `1 copy for ${args.totalPurchasePrice}`
+      : `${args.purchaseQuantity} copies for ${args.totalPurchasePrice}`
+
+  return `${grantPart} · ${purchasePart}`
+}
+
+function resolvePurchaseTotalPriceLabel(args: {
+  purchaseQuantity: number
+  unitCostCp?: number
+  equipment: Equipment
+}): string | undefined {
+  if (args.purchaseQuantity <= 0) return undefined
+
+  if (args.unitCostCp !== undefined) {
+    return formatWealthAsGold(copperToWealth(args.unitCostCp * args.purchaseQuantity))
+  }
+
+  if (args.equipment.cost) {
+    return formatEquipmentPurchaseTotalPriceLabel(args.equipment, args.purchaseQuantity)
+  }
+
+  return undefined
+}
+
 function resolveAllowanceRarity(args: {
   allowanceId: string
   draft: CharacterBuilderDraft
@@ -157,6 +198,76 @@ function resolveAllowanceRarity(args: {
   return acquisition.allowances.find((allowance) => allowance.id === args.allowanceId)?.rarity
 }
 
+function resolvePlanGrantContext(args: {
+  plan: EquipmentAcquisitionPlan
+  draft: CharacterBuilderDraft
+  context: CharacterBuildContext
+  catalogIndex: CharacterBuildCatalogIndex
+}): { grantQuantity: number; rarity?: MagicItemRarity } {
+  const grantQuantity = args.plan.grantAllocations.reduce((sum, row) => sum + row.quantity, 0)
+  const allowanceId = args.plan.grantAllocations[0]?.allowanceId
+  const rarity =
+    allowanceId !== undefined
+      ? resolveAllowanceRarity({
+          allowanceId,
+          draft: args.draft,
+          context: args.context,
+          catalogIndex: args.catalogIndex,
+        })
+      : undefined
+
+  return { grantQuantity, rarity }
+}
+
+function buildMixedPreviewLinesIfApplicable(args: {
+  grantQuantity: number
+  rarity?: MagicItemRarity
+  plan: EquipmentAcquisitionPlan
+  equipment: Equipment
+}): string[] | undefined {
+  if (args.grantQuantity <= 0 || args.plan.purchaseQuantity <= 0 || !args.rarity) {
+    return undefined
+  }
+
+  const totalPurchasePrice = resolvePurchaseTotalPriceLabel({
+    purchaseQuantity: args.plan.purchaseQuantity,
+    unitCostCp: args.plan.unitCostCp,
+    equipment: args.equipment,
+  })
+
+  if (!totalPurchasePrice) return undefined
+
+  return [
+    formatMixedAcquisitionPreviewLine({
+      grantQuantity: args.grantQuantity,
+      rarity: args.rarity,
+      purchaseQuantity: args.plan.purchaseQuantity,
+      totalPurchasePrice,
+    }),
+  ]
+}
+
+function formatPurchasePreviewLine(args: {
+  purchaseQuantity: number
+  unitCostCp?: number
+  equipment: Equipment
+}): string | undefined {
+  if (args.purchaseQuantity <= 0) return undefined
+
+  const unitLabel =
+    args.unitCostCp !== undefined
+      ? formatWealthAsGold(copperToWealth(args.unitCostCp))
+      : args.equipment.cost
+        ? formatMoney(args.equipment.cost)
+        : undefined
+
+  if (!unitLabel) return undefined
+
+  return args.purchaseQuantity === 1
+    ? `Purchased · ${unitLabel}`
+    : `${args.purchaseQuantity} purchased · ${unitLabel} each`
+}
+
 function buildNextActionPreviewLines(args: {
   actionState: Extract<EquipmentAcquisitionActionState, { kind: 'magic_item_grant' }>
   equipment: Equipment
@@ -166,37 +277,33 @@ function buildNextActionPreviewLines(args: {
 }): string[] {
   const { actionState, equipment, draft, context, catalogIndex } = args
   const { plan } = actionState
+  const { grantQuantity, rarity } = resolvePlanGrantContext({
+    plan,
+    draft,
+    context,
+    catalogIndex,
+  })
+
+  const mixedLines = buildMixedPreviewLinesIfApplicable({
+    grantQuantity,
+    rarity,
+    plan,
+    equipment,
+  })
+  if (mixedLines) return mixedLines
+
   const lines: string[] = []
 
-  const grantQuantity = plan.grantAllocations.reduce((sum, row) => sum + row.quantity, 0)
-  if (grantQuantity > 0) {
-    const allowanceId = plan.grantAllocations[0]?.allowanceId
-    const rarity =
-      allowanceId !== undefined
-        ? resolveAllowanceRarity({ allowanceId, draft, context, catalogIndex })
-        : undefined
-
-    if (rarity) {
-      lines.push(formatGrantPreviewLine(grantQuantity, rarity))
-    }
+  if (grantQuantity > 0 && rarity) {
+    lines.push(formatUsesGrantPreviewLine(grantQuantity, rarity))
   }
 
-  if (plan.purchaseQuantity > 0) {
-    const unitLabel =
-      plan.unitCostCp !== undefined
-        ? formatWealthAsGold(copperToWealth(plan.unitCostCp))
-        : equipment.cost
-          ? formatMoney(equipment.cost)
-          : undefined
-
-    if (unitLabel) {
-      lines.push(
-        plan.purchaseQuantity === 1
-          ? `Purchased · ${unitLabel}`
-          : `${plan.purchaseQuantity} purchased · ${unitLabel} each`,
-      )
-    }
-  }
+  const purchaseLine = formatPurchasePreviewLine({
+    purchaseQuantity: plan.purchaseQuantity,
+    unitCostCp: plan.unitCostCp,
+    equipment,
+  })
+  if (purchaseLine) lines.push(purchaseLine)
 
   return lines
 }

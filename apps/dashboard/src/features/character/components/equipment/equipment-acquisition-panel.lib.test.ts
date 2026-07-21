@@ -1,12 +1,25 @@
 import { describe, expect, it } from 'vitest'
 
 import {
+  buildEquipmentAcquisitionPanelViewModel,
   formatAcquisitionCommitLabel,
   formatAcquisitionCommitSuccessAnnouncement,
   formatAcquisitionCommitSuccessButtonLabel,
   formatOwnedPurchaseQuantityLabel,
   formatTotalPurchaseSpendFromSnapshots,
 } from './equipment-acquisition-panel.lib'
+import {
+  createEquipmentStepContextWithMagicItemGrantsFixture,
+  equipmentStepCatalogIndexFixture,
+  equipmentStepMonkClassFixture,
+  equipmentStepPotionOfHealingFixture,
+} from '../../lib/equipment-step.fixtures'
+import {
+  createEmptyCharacterBuilderDraft,
+  startingEquipmentChoiceSetId,
+  buildMagicItemAllowanceId,
+  standardStartingWealthTableId,
+} from '@rpg/contracts'
 
 describe('equipment-acquisition-panel.lib', () => {
   it('formats commit labels for grant-only and multi-quantity adds', () => {
@@ -83,5 +96,69 @@ describe('equipment-acquisition-panel.lib', () => {
   it('formats commit success button and announcement labels', () => {
     expect(formatAcquisitionCommitSuccessButtonLabel(3)).toBe('Added 3 ✓')
     expect(formatAcquisitionCommitSuccessAnnouncement(3)).toBe('Added 3 to inventory')
+  })
+
+  it('formats next-action preview lines for grant, mixed, and purchase paths', () => {
+    const draft = {
+      ...createEmptyCharacterBuilderDraft(),
+      class: { classId: equipmentStepMonkClassFixture.id, level: 1 as const },
+      choiceSelections: {
+        [startingEquipmentChoiceSetId(equipmentStepMonkClassFixture.id)]: ['standard-equipment'],
+      },
+      equipment: {
+        mode: 'package' as const,
+        purchases: [],
+        removedPackageItemKeys: [],
+        customized: false,
+      },
+    }
+    const context = createEquipmentStepContextWithMagicItemGrantsFixture()
+
+    const grantOnlyViewModel = buildEquipmentAcquisitionPanelViewModel({
+      draft,
+      context,
+      catalogIndex: equipmentStepCatalogIndexFixture,
+      equipment: equipmentStepPotionOfHealingFixture,
+      rows: [],
+      requestedQuantity: 1,
+    })
+
+    expect(grantOnlyViewModel.nextAction.previewLines).toEqual(['Uses 1 Common choice'])
+
+    const goldOptionDraft = {
+      ...createEmptyCharacterBuilderDraft(),
+      class: { classId: equipmentStepMonkClassFixture.id, level: 1 as const },
+      choiceSelections: {
+        [startingEquipmentChoiceSetId(equipmentStepMonkClassFixture.id)]: ['starting-gold'],
+      },
+      equipment: {
+        mode: 'gold' as const,
+        purchases: [],
+        magicItemSelections: [
+          {
+            allowanceId: buildMagicItemAllowanceId({
+              startingWealthTableId: standardStartingWealthTableId('srd-cc-5.2.1'),
+              tierId: 'hero',
+              rarity: 'common',
+            }),
+            equipmentId: equipmentStepPotionOfHealingFixture.id,
+            quantity: 1,
+          },
+        ],
+        removedPackageItemKeys: [],
+        customized: false,
+      },
+    }
+
+    const mixedViewModel = buildEquipmentAcquisitionPanelViewModel({
+      draft: goldOptionDraft,
+      context,
+      catalogIndex: equipmentStepCatalogIndexFixture,
+      equipment: equipmentStepPotionOfHealingFixture,
+      rows: [],
+      requestedQuantity: 2,
+    })
+
+    expect(mixedViewModel.nextAction.previewLines).toEqual(['Common choice · 1 copy for 50 GP'])
   })
 })

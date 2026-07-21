@@ -89,10 +89,23 @@ export const EQUIPMENT_ADDED_INVENTORY_SECTION_LABEL = 'Added Equipment'
 
 export const EQUIPMENT_PURCHASED_INVENTORY_SECTION_LABEL = 'Purchased Equipment'
 
-export const EQUIPMENT_GOLD_OPTION_STARTING_MESSAGE = 'Starting gold selected'
+export const EQUIPMENT_GOLD_OPTION_STARTING_MESSAGE = 'No package gear in this option'
 
-export const EQUIPMENT_GOLD_OPTION_STARTING_DESCRIPTION =
-  'Use the guidance above to purchase gear with your starting gold.'
+export const EQUIPMENT_GOLD_OPTION_STARTING_DESCRIPTION_BASE =
+  'This character is using the gold option, so all equipment is added through purchases'
+
+export const EQUIPMENT_GOLD_OPTION_STARTING_DESCRIPTION_MAGIC_ITEM_SUFFIX =
+  ' or magic item choices.'
+
+export function formatEquipmentGoldOptionStartingDescription(
+  includeMagicItemChoices: boolean,
+): string {
+  if (includeMagicItemChoices) {
+    return `${EQUIPMENT_GOLD_OPTION_STARTING_DESCRIPTION_BASE}${EQUIPMENT_GOLD_OPTION_STARTING_DESCRIPTION_MAGIC_ITEM_SUFFIX}`
+  }
+
+  return `${EQUIPMENT_GOLD_OPTION_STARTING_DESCRIPTION_BASE}.`
+}
 
 export const EQUIPMENT_MAGIC_ITEMS_SECTION_LABEL = 'Magic Items'
 

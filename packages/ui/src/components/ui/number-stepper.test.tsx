@@ -51,6 +51,16 @@ describe('NumberStepper', () => {
     expect(root).toHaveClass('border-input')
   })
 
+  it('uses transparent stepper buttons with primary hover text', () => {
+    render(<Harness />)
+
+    const decreaseButton = screen.getByLabelText('Decrease Quantity')
+    expect(decreaseButton).toHaveClass('bg-transparent')
+    expect(decreaseButton).toHaveClass('hover:bg-transparent')
+    expect(decreaseButton).toHaveClass('hover:text-primary')
+    expect(decreaseButton).toHaveClass('active:text-primary')
+  })
+
   it('omits border classes when borderless', () => {
     const { container } = render(
       <NumberStepper aria-label="Quantity" value={3} bordered={false} onChange={() => undefined} />,

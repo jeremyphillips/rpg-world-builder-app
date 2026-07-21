@@ -20,7 +20,7 @@ export const numberStepperRootVariants = cva('inline-flex items-center', {
 })
 
 export const numberStepperButtonVariants = cva(
-  'inline-flex shrink-0 cursor-pointer items-center justify-center text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset disabled:pointer-events-none disabled:opacity-40',
+  'inline-flex shrink-0 cursor-pointer items-center justify-center bg-transparent text-muted-foreground transition-colors hover:bg-transparent hover:text-primary active:bg-transparent active:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset disabled:pointer-events-none disabled:opacity-40',
   {
     variants: {
       size: {

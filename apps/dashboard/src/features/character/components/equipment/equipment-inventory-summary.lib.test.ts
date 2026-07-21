@@ -227,10 +227,42 @@ describe('equipment-inventory-summary.lib', () => {
     expect(buildEquipmentInventoryViewModel(draft, equipmentStepCatalogIndexFixture)).toEqual({
       startingEquipment: {
         kind: 'gold_option',
-        message: 'Starting gold selected',
-        description: 'Use the guidance above to purchase gear with your starting gold.',
+        message: 'No package gear in this option',
+        description:
+          'This character is using the gold option, so all equipment is added through purchases.',
       },
       addedEquipment: [],
+    })
+  })
+
+  it('appends the magic-item clause to gold-option copy when grants are available', () => {
+    const draft = {
+      ...createEmptyCharacterBuilderDraft(),
+      class: { classId: equipmentStepBardClassFixture.id, level: 1 as const },
+      choiceSelections: {
+        [startingEquipmentChoiceSetId(equipmentStepBardClassFixture.id)]: ['starting-gold'],
+      },
+      equipment: {
+        mode: 'gold' as const,
+        purchases: [],
+        removedPackageItemKeys: [],
+        customized: false,
+      },
+    }
+
+    const viewModel = buildEquipmentInventoryViewModel(
+      draft,
+      equipmentStepCatalogIndexFixture,
+      undefined,
+      'included',
+      createEquipmentStepContextWithMagicItemGrantsFixture(),
+    )
+
+    expect(viewModel?.startingEquipment).toEqual({
+      kind: 'gold_option',
+      message: 'No package gear in this option',
+      description:
+        'This character is using the gold option, so all equipment is added through purchases or magic item choices.',
     })
   })
 

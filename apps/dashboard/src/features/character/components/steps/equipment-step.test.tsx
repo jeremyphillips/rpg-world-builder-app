@@ -493,6 +493,7 @@ describe('EquipmentStep', () => {
     await user.click(screen.getByRole('button', { name: EQUIPMENT_PACKAGE_CUSTOMIZE_LABEL }))
 
     expect(screen.getByRole('heading', { name: /Customize Starting Gold/i })).toBeInTheDocument()
+    expect(document.querySelector('.bg-card')).toBeInTheDocument()
   })
 
   it('shows the gold-option empty state in inventory while guidance handles shopping', () => {

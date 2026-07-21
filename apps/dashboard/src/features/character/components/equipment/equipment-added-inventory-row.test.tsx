@@ -77,7 +77,9 @@ describe('EquipmentAddedInventoryRowItem', () => {
       />,
     )
 
-    await user.click(screen.getByRole('button', { name: 'Release' }))
+    const releaseButton = screen.getByRole('button', { name: 'Release' })
+    expect(releaseButton).not.toHaveClass('bg-secondary')
+    await user.click(releaseButton)
     expect(onReleaseGrant).toHaveBeenCalledWith({
       allowanceId: 'allowance-common',
       equipmentId: 'srd-cc-5.2.1:potion-of-healing',

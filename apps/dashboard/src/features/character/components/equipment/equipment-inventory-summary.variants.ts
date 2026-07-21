@@ -18,6 +18,9 @@ export const equipmentInventoryColumnToolbarClasses = 'flex min-h-5 flex-wrap it
 
 export const equipmentInventoryColumnToolbarSpacerClasses = 'min-h-5'
 
+export const equipmentGoldOptionPanelClasses =
+  'space-y-2 rounded-lg border border-border px-4 py-12 text-center'
+
 export const equipmentInventoryColumnToolbarLinkClasses = 'h-auto px-0 text-xs'
 
 export const equipmentInventoryColumnToolbarSeparatorClasses = 'text-muted-foreground'

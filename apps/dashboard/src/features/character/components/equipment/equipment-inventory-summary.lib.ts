@@ -6,6 +6,7 @@ import {
   isStartingGoldOption,
   readSelectedStartingEquipmentOptionId,
   resolveGoldStartingEquipmentAlternative,
+  resolveMagicItemAcquisitionState,
   type CharacterBuildCatalogIndex,
   type CharacterBuildContext,
   type CharacterBuilderDraft,
@@ -18,9 +19,10 @@ import {
 
 import {
   EQUIPMENT_CLASS_OPTIONS_REPLACED_MESSAGE,
-  EQUIPMENT_GOLD_OPTION_STARTING_DESCRIPTION,
   EQUIPMENT_GOLD_OPTION_STARTING_MESSAGE,
+  formatEquipmentGoldOptionStartingDescription,
   listEquipmentInventoryRowsFromDraft,
+  shouldShowMagicItemGrants,
   type EquipmentInventoryRow,
   type PackageCustomizeAffordance,
   type StartingPackageCategoryGroup,
@@ -443,7 +445,13 @@ export function buildEquipmentInventoryViewModel(
     ? {
         kind: 'gold_option' as const,
         message: EQUIPMENT_GOLD_OPTION_STARTING_MESSAGE,
-        description: EQUIPMENT_GOLD_OPTION_STARTING_DESCRIPTION,
+        description: formatEquipmentGoldOptionStartingDescription(
+          context
+            ? shouldShowMagicItemGrants(
+                resolveMagicItemAcquisitionState({ draft, context, catalogIndex }),
+              )
+            : false,
+        ),
       }
     : {
         kind: 'package' as const,

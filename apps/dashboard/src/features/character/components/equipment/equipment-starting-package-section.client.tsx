@@ -76,7 +76,10 @@ export function EquipmentStartingPackageSection({
         </Text>
       ) : null}
 
-      <EquipmentStartingPackageCard optionLabel={packageGroup.optionLabel}>
+      <EquipmentStartingPackageCard
+        optionLabel={packageGroup.optionLabel}
+        surface={conversionEditorOpen ? 'card' : 'subtle'}
+      >
         {conversionEditorOpen && goldOptionFunding ? (
           <EquipmentPackageConversionEditor
             embedded

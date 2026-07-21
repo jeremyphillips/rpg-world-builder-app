@@ -10,7 +10,7 @@ import type {
   EquipmentBudgetSummary,
   ResolvedStartingEquipmentFunding,
 } from '@rpg/contracts'
-import { InsetPanel, Text } from '@rpg/ui'
+import { Heading, Text } from '@rpg/ui'
 
 import {
   EQUIPMENT_STARTING_PACKAGE_SECTION_LABEL,
@@ -21,7 +21,10 @@ import { EquipmentAddedInventoryColumn } from './equipment-added-inventory-colum
 import { EquipmentInventoryColumn } from './equipment-inventory-column.client'
 import { EquipmentStartingPackageSection } from './equipment-starting-package-section.client'
 import { buildEquipmentInventoryViewModel } from './equipment-inventory-summary.lib'
-import { equipmentInventorySummaryGridClasses } from './equipment-inventory-summary.variants'
+import {
+  equipmentGoldOptionPanelClasses,
+  equipmentInventorySummaryGridClasses,
+} from './equipment-inventory-summary.variants'
 
 export type EquipmentInventorySummaryProps = {
   draft: CharacterBuilderDraft
@@ -97,12 +100,14 @@ export function EquipmentInventorySummary({
         />
       ) : (
         <EquipmentInventoryColumn title={EQUIPMENT_STARTING_PACKAGE_SECTION_LABEL}>
-          <InsetPanel size="sm" align="center" className="rounded-lg">
-            <InsetPanel.Text>{viewModel.startingEquipment.message}</InsetPanel.Text>
-            <InsetPanel.Text variant="muted">
+          <div className={equipmentGoldOptionPanelClasses}>
+            <Heading variant="group" as="h4">
+              {viewModel.startingEquipment.message}
+            </Heading>
+            <Text as="p" className="text-sm text-muted-foreground">
               {viewModel.startingEquipment.description}
-            </InsetPanel.Text>
-          </InsetPanel>
+            </Text>
+          </div>
         </EquipmentInventoryColumn>
       )}
 
@@ -112,6 +117,7 @@ export function EquipmentInventorySummary({
         context={context}
         catalogIndex={catalogIndex}
         budget={budget}
+        reserveToolbarRow={viewModel.startingEquipment.kind === 'package'}
         onRemoveItem={onRemoveItem}
         onSetPurchaseQuantity={onSetPurchaseQuantity}
         onReleaseGrant={onReleaseGrant ?? (() => undefined)}

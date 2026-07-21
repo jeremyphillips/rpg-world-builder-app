@@ -96,7 +96,7 @@ function GrantOnlySingleReleaseRow({
           <Button
             type="button"
             size="sm"
-            variant="secondary"
+            variant="ghost"
             onClick={() =>
               onReleaseGrant({
                 allowanceId: removeTarget.allowanceId,

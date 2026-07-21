@@ -18,7 +18,11 @@ import {
   equipmentStepLeatherArmorFixture,
   equipmentStepMonkClassFixture,
 } from '../../lib/equipment-step.fixtures'
-import { EQUIPMENT_STEP_BROWSE_LABEL } from '../../lib/equipment-step.lib'
+import {
+  EQUIPMENT_GOLD_OPTION_STARTING_MESSAGE,
+  EQUIPMENT_STEP_BROWSE_LABEL,
+  formatEquipmentGoldOptionStartingDescription,
+} from '../../lib/equipment-step.lib'
 import { EquipmentInventorySummary } from './equipment-inventory-summary.client'
 import { EquipmentInventoryRowItem } from './equipment-inventory-row.client'
 import type { EquipmentInventoryRow } from '../../lib/equipment-step.lib'
@@ -304,6 +308,119 @@ describe('EquipmentInventorySummary', () => {
       { kind: 'purchase', purchaseId: 'purchase-test-0' },
       13,
     )
+  })
+
+  it('renders the gold-option panel copy with outline-only chrome', () => {
+    const draft = {
+      ...createEmptyCharacterBuilderDraft(),
+      class: { classId: equipmentStepBardClassFixture.id, level: 1 as const },
+      choiceSelections: {
+        [startingEquipmentChoiceSetId(equipmentStepBardClassFixture.id)]: ['starting-gold'],
+      },
+      equipment: {
+        mode: 'gold' as const,
+        purchases: [],
+        removedPackageItemKeys: [],
+        customized: false,
+      },
+    }
+
+    render(
+      <EquipmentInventorySummary
+        draft={draft}
+        catalogIndex={equipmentStepCatalogIndexFixture}
+        {...inventoryManagementProps}
+      />,
+    )
+
+    expect(
+      screen.getByRole('heading', { name: EQUIPMENT_GOLD_OPTION_STARTING_MESSAGE }),
+    ).toHaveClass('heading-style-group')
+    expect(
+      screen.getByText(formatEquipmentGoldOptionStartingDescription(false)),
+    ).toBeInTheDocument()
+
+    const startingColumn = screen
+      .getByRole('heading', { name: EQUIPMENT_GOLD_OPTION_STARTING_MESSAGE })
+      .closest('section')
+    expect(startingColumn?.querySelector('.border-border')).toBeInTheDocument()
+    expect(startingColumn?.querySelector('.bg-sunken')).not.toBeInTheDocument()
+  })
+
+  it('reserves the toolbar row on the added column for package-path alignment', () => {
+    const draft = {
+      ...createEmptyCharacterBuilderDraft(),
+      class: { classId: equipmentStepBardClassFixture.id, level: 1 as const },
+      choiceSelections: {
+        [startingEquipmentChoiceSetId(equipmentStepBardClassFixture.id)]: ['standard-equipment'],
+        [nestedStartingEquipmentChoiceSetId(
+          equipmentStepBardClassFixture.id,
+          'standard-equipment',
+          1,
+        )]: ['srd-cc-5.2.1:lute'],
+      },
+      equipment: {
+        mode: 'package' as const,
+        purchases: [],
+        removedPackageItemKeys: [],
+        customized: false,
+      },
+    }
+
+    const { container } = render(
+      <EquipmentInventorySummary
+        draft={draft}
+        catalogIndex={equipmentStepCatalogIndexFixture}
+        {...inventoryManagementProps}
+      />,
+    )
+
+    const addedColumn = screen.getByRole('heading', { name: 'Added Equipment' }).closest('section')
+    expect(addedColumn?.querySelector('[aria-hidden="true"]')).toBeInTheDocument()
+    expect(container.querySelector('.bg-card')).not.toBeInTheDocument()
+  })
+
+  it('renders a title badge and outline panel when added inventory has entries', () => {
+    const draft = {
+      ...createEmptyCharacterBuilderDraft(),
+      class: { classId: equipmentStepMonkClassFixture.id, level: 1 as const },
+      choiceSelections: {
+        [startingEquipmentChoiceSetId(equipmentStepMonkClassFixture.id)]: ['standard-equipment'],
+      },
+      equipment: {
+        mode: 'package' as const,
+        purchases: [
+          {
+            equipmentId: equipmentStepBattleaxeFixture.id,
+            quantity: 1,
+            sourceMode: 'startingGold' as const,
+            origin: 'picker' as const,
+          },
+        ],
+        removedPackageItemKeys: [],
+        customized: false,
+      },
+    }
+
+    const catalogIndex = {
+      ...equipmentStepCatalogIndexFixture,
+      equipment: new Map([
+        ...equipmentStepCatalogIndexFixture.equipment,
+        [equipmentStepBattleaxeFixture.id, equipmentStepBattleaxeFixture],
+      ]),
+    }
+
+    const { container } = render(
+      <EquipmentInventorySummary
+        draft={draft}
+        catalogIndex={catalogIndex}
+        {...inventoryManagementProps}
+      />,
+    )
+
+    expect(screen.getByText('1')).toBeInTheDocument()
+    expect(screen.getByText('Battleaxe')).toBeInTheDocument()
+    expect(container.querySelector('.bg-card')).not.toBeInTheDocument()
   })
 
   it('has no axe accessibility violations', async () => {
