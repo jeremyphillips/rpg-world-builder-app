@@ -1,6 +1,7 @@
 import {
   canPurchaseEquipment,
   compareEquipmentPickerItemsByRecommendation,
+  compareMagicItemBestMatch,
   EQUIPMENT_PICKER_SUPPORTED_KINDS,
   formatMoney,
   formatWealthAsGold,
@@ -21,6 +22,7 @@ import {
   resolveEquipmentOwnedQuantity,
   type EquipmentPickerWorkflowMode,
 } from '../../lib/equipment-step.lib'
+import { compareName, scoreAndFilterPickerItems } from '../picker/catalog-picker-sort.lib'
 import type { EquipmentPickerRowActionViewModel } from './equipment-picker-action.lib'
 import {
   resolveEquipmentPickerItemHeaderPresentation,
@@ -221,27 +223,53 @@ function compareScoredItemsByNameMode(
   hasQuery: boolean,
   browseSortContext?: EquipmentPickerBrowseSortContext,
 ): number {
-  const nameCmp =
-    direction === 'asc'
-      ? equipmentNameCollator.compare(left.item.equipment.name, right.item.equipment.name)
-      : equipmentNameCollator.compare(right.item.equipment.name, left.item.equipment.name)
+  const nameCmp = compareName(
+    equipmentNameCollator,
+    left.item.equipment.name,
+    right.item.equipment.name,
+    direction,
+  )
 
   return compareScoredItemsAfterPrimary(left, right, nameCmp, hasQuery, browseSortContext)
 }
 
-function compareEquipmentPickerItemsByBestMatch(
+export function compareEquipmentBestMatch(
   left: EquipmentPickerScoredItem,
   right: EquipmentPickerScoredItem,
-  searchQuery: string,
-  browseSortContext?: EquipmentPickerBrowseSortContext,
+  options: {
+    searchQuery: string
+    browseSortContext?: EquipmentPickerBrowseSortContext
+    workflowMode?: EquipmentPickerWorkflowMode
+  },
 ): number {
-  const hasQuery = normalizeSearchQuery(searchQuery).length > 0
+  const hasQuery = normalizeSearchQuery(options.searchQuery).length > 0
   if (hasQuery) {
     const scoreDiff = right.searchScore - left.searchScore
     if (scoreDiff !== 0) return scoreDiff
   }
 
-  return compareEquipmentPickerItemsByRecommendation(left.item, right.item, browseSortContext)
+  if (options.workflowMode === 'magic_items') {
+    const actionDiff = compareMagicItemBestMatch(left.item, right.item)
+    if (actionDiff !== 0) return actionDiff
+  }
+
+  return compareEquipmentPickerItemsByRecommendation(
+    left.item,
+    right.item,
+    options.browseSortContext,
+  )
+}
+
+function compareEquipmentPickerItemsByBestMatch(
+  left: EquipmentPickerScoredItem,
+  right: EquipmentPickerScoredItem,
+  options: {
+    searchQuery: string
+    browseSortContext?: EquipmentPickerBrowseSortContext
+    workflowMode?: EquipmentPickerWorkflowMode
+  },
+): number {
+  return compareEquipmentBestMatch(left, right, options)
 }
 
 function compareEquipmentPickerScoredItems(
@@ -251,14 +279,19 @@ function compareEquipmentPickerScoredItems(
     searchQuery: string
     sortMode: EquipmentPickerSortMode
     browseSortContext?: EquipmentPickerBrowseSortContext
+    workflowMode?: EquipmentPickerWorkflowMode
   },
 ): number {
-  const { searchQuery, sortMode, browseSortContext } = options
+  const { searchQuery, sortMode, browseSortContext, workflowMode } = options
   const hasQuery = normalizeSearchQuery(searchQuery).length > 0
 
   switch (sortMode) {
     case EQUIPMENT_PICKER_SORT_BEST_MATCH:
-      return compareEquipmentPickerItemsByBestMatch(left, right, searchQuery, browseSortContext)
+      return compareEquipmentPickerItemsByBestMatch(left, right, {
+        searchQuery,
+        browseSortContext,
+        workflowMode,
+      })
     case EQUIPMENT_PICKER_SORT_PRICE_ASC:
       return compareScoredItemsByPriceMode(left, right, 'asc', hasQuery, browseSortContext)
     case EQUIPMENT_PICKER_SORT_PRICE_DESC:
@@ -277,15 +310,13 @@ export function filterAndSortEquipmentPickerItems(
     searchQuery: string
     sortMode: EquipmentPickerSortMode
     browseSortContext?: EquipmentPickerBrowseSortContext
+    workflowMode?: EquipmentPickerWorkflowMode
   },
 ): EquipmentPickerItem[] {
-  const normalizedQuery = normalizeSearchQuery(options.searchQuery)
-  const scored = items.map((item) => ({
-    item,
-    searchScore: scoreEquipmentPickerItem(item, options.searchQuery),
-  }))
-
-  const filtered = normalizedQuery ? scored.filter((row) => row.searchScore > 0) : scored
+  const filtered = scoreAndFilterPickerItems(items, {
+    searchQuery: options.searchQuery,
+    scoreItem: scoreEquipmentPickerItem,
+  })
 
   return [...filtered]
     .sort((left, right) => compareEquipmentPickerScoredItems(left, right, options))

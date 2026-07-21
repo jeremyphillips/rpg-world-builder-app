@@ -1,8 +1,10 @@
 import type { ChoiceSet, ProficiencyPickerItem } from '@rpg/contracts'
+import { compareProficiencyPickerItemsByRecommendation } from '@rpg/contracts'
 
 import { normalizeSearchQuery, scoreItem } from '@rpg/ui'
 
 import { formatChoiceSetDrawerTriggerLabel } from '../../lib/selection-counter.lib'
+import { compareName, scoreAndFilterPickerItems } from '../picker/catalog-picker-sort.lib'
 import {
   PROFICIENCY_PICKER_NO_OPTIONS_MESSAGE,
   PROFICIENCY_PICKER_SELECTION_FULL_MESSAGE,
@@ -120,8 +122,11 @@ function compareProficiencyPickerScoredItems(
 
   const compareAfterPrimary = (primaryCmp: number): number => {
     if (primaryCmp !== 0) return primaryCmp
-    if (hasQuery) return right.searchScore - left.searchScore
-    return proficiencyNameCollator.compare(left.item.label, right.item.label)
+    if (hasQuery) {
+      const scoreDiff = right.searchScore - left.searchScore
+      if (scoreDiff !== 0) return scoreDiff
+    }
+    return compareProficiencyPickerItemsByRecommendation(left.item, right.item)
   }
 
   switch (options.sortMode) {
@@ -130,11 +135,15 @@ function compareProficiencyPickerScoredItems(
         const scoreDiff = right.searchScore - left.searchScore
         if (scoreDiff !== 0) return scoreDiff
       }
-      return proficiencyNameCollator.compare(left.item.label, right.item.label)
+      return compareProficiencyPickerItemsByRecommendation(left.item, right.item)
     case PROFICIENCY_PICKER_SORT_NAME_ASC:
-      return compareAfterPrimary(proficiencyNameCollator.compare(left.item.label, right.item.label))
+      return compareAfterPrimary(
+        compareName(proficiencyNameCollator, left.item.label, right.item.label, 'asc'),
+      )
     case PROFICIENCY_PICKER_SORT_NAME_DESC:
-      return compareAfterPrimary(proficiencyNameCollator.compare(right.item.label, left.item.label))
+      return compareAfterPrimary(
+        compareName(proficiencyNameCollator, left.item.label, right.item.label, 'desc'),
+      )
   }
 }
 
@@ -145,12 +154,10 @@ export function filterAndSortProficiencyPickerItems(
     sortMode: ProficiencyPickerSortMode
   },
 ): ProficiencyPickerItem[] {
-  const normalizedQuery = normalizeSearchQuery(options.searchQuery)
-  const scored = items.map((item) => ({
-    item,
-    searchScore: scoreProficiencyPickerItem(item, options.searchQuery),
-  }))
-  const filtered = normalizedQuery ? scored.filter((row) => row.searchScore > 0) : scored
+  const filtered = scoreAndFilterPickerItems(items, {
+    searchQuery: options.searchQuery,
+    scoreItem: scoreProficiencyPickerItem,
+  })
 
   return [...filtered]
     .sort((left, right) => compareProficiencyPickerScoredItems(left, right, options))

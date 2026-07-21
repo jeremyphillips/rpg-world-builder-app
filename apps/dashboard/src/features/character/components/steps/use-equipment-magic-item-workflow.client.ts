@@ -18,6 +18,7 @@ import {
   shouldShowMagicItemGrants,
   type EquipmentPickerWorkflowMode,
 } from '../../lib/equipment-step.lib'
+import { enrichEquipmentPickerItemsWithMagicItemAction } from '../../lib/enrich-equipment-picker-magic-item-action.lib'
 import type { CharacterBuildCatalogIndex } from '@rpg/contracts'
 
 export function useEquipmentMagicItemWorkflow(args: {
@@ -55,7 +56,7 @@ export function useEquipmentMagicItemWorkflow(args: {
   const filteredPickerItems = useMemo(() => {
     if (args.pickerWorkflowMode !== 'magic_items') return args.pickerItems
 
-    return args.pickerItems.filter((item) =>
+    const visibleItems = args.pickerItems.filter((item) =>
       isMagicItemPickerItemVisible({
         equipment: item.equipment,
         draft: args.draft,
@@ -66,7 +67,21 @@ export function useEquipmentMagicItemWorkflow(args: {
         focusedAllowanceId: args.focusedAllowanceId,
       }),
     )
-  }, [acquisition, args.draft, args.focusedAllowanceId, args.pickerItems, args.pickerWorkflowMode])
+
+    return enrichEquipmentPickerItemsWithMagicItemAction(visibleItems, {
+      draft: args.draft,
+      context: args.context,
+      catalogIndex: args.catalogIndex,
+      focusedAllowanceId: args.focusedAllowanceId,
+    })
+  }, [
+    args.catalogIndex,
+    args.context,
+    args.draft,
+    args.focusedAllowanceId,
+    args.pickerItems,
+    args.pickerWorkflowMode,
+  ])
 
   const ownedGrantQuantities = useMemo(() => {
     const quantities: Record<string, number> = {}

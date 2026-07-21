@@ -4,6 +4,7 @@ import {
   equipmentPickerBudgetFixture,
   equipmentPickerDefaultPathItemsFixture,
   equipmentPickerItemsFixture,
+  equipmentPickerPotionFixture,
   equipmentPickerRopeFixture,
   equipmentPickerRowboatFixture,
   equipmentPickerSkilledHirelingFixture,
@@ -27,6 +28,7 @@ import {
 import {
   EQUIPMENT_PICKER_KIND_ALL,
   EQUIPMENT_PICKER_SORT_BEST_MATCH,
+  EQUIPMENT_PICKER_SORT_NAME_ASC,
   EQUIPMENT_PICKER_SORT_PRICE_ASC,
   type EquipmentPickerItem,
 } from './equipment-picker-drawer.types'
@@ -304,6 +306,147 @@ describe('equipment-picker-drawer.lib', () => {
         equipmentPickerBudgetFixture,
       ),
     ).toBeUndefined()
+  })
+
+  it('keeps strong, neutral, and blocked magic rows in one unified best_match list', () => {
+    const longsword = equipmentPickerItemsFixture[0]!
+    const rope = equipmentPickerItemsFixture[2]!
+    const blockedMagic: EquipmentPickerItem = {
+      equipment: {
+        ...equipmentPickerPotionFixture,
+        id: 'srd-cc-5.2.1:bead-of-force',
+        slug: 'bead-of-force',
+        name: 'Bead of Force',
+      },
+      searchText: 'bead of force magic item',
+      state: pickerState({
+        isAvailable: true,
+        isRecommended: false,
+        isProficient: true,
+        isAffordable: true,
+        isWithinRemainingBudget: true,
+        recommendation: {
+          tier: 'notRecommended',
+          reasons: ['notProficient'],
+          specificity: 'exact',
+        },
+        disabledReasons: ['Unavailable'],
+        magicItemAction: { rank: 3, reason: 'unavailable' },
+      }),
+    }
+
+    const shuffled = [blockedMagic, rope, longsword]
+
+    expect(
+      filterAndSortEquipmentPickerItems(shuffled, {
+        searchQuery: '',
+        sortMode: EQUIPMENT_PICKER_SORT_BEST_MATCH,
+      }).map((item) => item.equipment.name),
+    ).toEqual(['Longsword', 'Rope', 'Bead of Force'])
+
+    expect(
+      filterAndSortEquipmentPickerItems(shuffled, {
+        searchQuery: '',
+        sortMode: EQUIPMENT_PICKER_SORT_NAME_ASC,
+      }).map((item) => item.equipment.name),
+    ).toEqual(['Bead of Force', 'Longsword', 'Rope'])
+  })
+
+  it('lets search beat magic-item action rank for blocked rows in magic-items workflow', () => {
+    const bead: EquipmentPickerItem = {
+      equipment: {
+        ...equipmentPickerPotionFixture,
+        id: 'srd-cc-5.2.1:bead-of-force',
+        slug: 'bead-of-force',
+        name: 'Bead of Force',
+      },
+      searchText: 'bead of force magic item',
+      state: pickerState({
+        isAvailable: true,
+        isRecommended: false,
+        isProficient: true,
+        isAffordable: true,
+        isWithinRemainingBudget: true,
+        recommendation: { tier: 'neutral', reasons: [], specificity: 'broad_pool' },
+        disabledReasons: [],
+        magicItemAction: { rank: 3, reason: 'unavailable' },
+      }),
+    }
+    const otherMagic: EquipmentPickerItem = {
+      equipment: {
+        ...equipmentPickerPotionFixture,
+        id: 'srd-cc-5.2.1:other-relic',
+        slug: 'other-relic',
+        name: 'Other Relic',
+      },
+      searchText: 'other relic magic item',
+      state: pickerState({
+        isAvailable: true,
+        isRecommended: false,
+        isProficient: true,
+        isAffordable: true,
+        isWithinRemainingBudget: true,
+        recommendation: { tier: 'neutral', reasons: [], specificity: 'broad_pool' },
+        disabledReasons: [],
+        magicItemAction: { rank: 0, reason: 'grant_available' },
+      }),
+    }
+
+    expect(
+      filterAndSortEquipmentPickerItems([otherMagic, bead], {
+        searchQuery: 'bead',
+        sortMode: EQUIPMENT_PICKER_SORT_BEST_MATCH,
+        workflowMode: 'magic_items',
+      }).map((item) => item.equipment.name),
+    ).toEqual(['Bead of Force'])
+  })
+
+  it('orders magic-items workflow by action rank before recommendation', () => {
+    const grantAvailable: EquipmentPickerItem = {
+      equipment: equipmentPickerPotionFixture,
+      searchText: 'potion of healing magic item',
+      state: pickerState({
+        isAvailable: true,
+        isRecommended: false,
+        isProficient: true,
+        isAffordable: true,
+        isWithinRemainingBudget: true,
+        recommendation: { tier: 'neutral', reasons: [], specificity: 'broad_pool' },
+        disabledReasons: [],
+        magicItemAction: { rank: 0, reason: 'grant_available' },
+      }),
+    }
+    const unavailableStrong: EquipmentPickerItem = {
+      equipment: {
+        ...equipmentPickerPotionFixture,
+        id: 'srd-cc-5.2.1:strong-relic',
+        slug: 'strong-relic',
+        name: 'Strong Relic',
+      },
+      searchText: 'strong relic magic item',
+      state: pickerState({
+        isAvailable: true,
+        isRecommended: true,
+        isProficient: true,
+        isAffordable: true,
+        isWithinRemainingBudget: true,
+        recommendation: {
+          tier: 'strong',
+          reasons: ['startingEquipment'],
+          specificity: 'exact',
+        },
+        disabledReasons: [],
+        magicItemAction: { rank: 3, reason: 'unavailable' },
+      }),
+    }
+
+    expect(
+      filterAndSortEquipmentPickerItems([unavailableStrong, grantAvailable], {
+        searchQuery: '',
+        sortMode: EQUIPMENT_PICKER_SORT_BEST_MATCH,
+        workflowMode: 'magic_items',
+      }).map((item) => item.equipment.name),
+    ).toEqual(['Potion of Healing', 'Strong Relic'])
   })
 
   it('matches recommendation order for empty-query best_match', () => {

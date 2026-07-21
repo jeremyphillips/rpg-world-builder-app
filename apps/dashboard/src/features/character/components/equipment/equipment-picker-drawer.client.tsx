@@ -290,8 +290,9 @@ export function EquipmentPickerDrawer({
         searchQuery: context.searchQuery,
         sortMode,
         browseSortContext,
+        workflowMode,
       }),
-    [browseSortContext, sortMode],
+    [browseSortContext, sortMode, workflowMode],
   )
 
   const handleSelectedKindChange = React.useCallback((kind: EquipmentPickerKindFilter) => {
