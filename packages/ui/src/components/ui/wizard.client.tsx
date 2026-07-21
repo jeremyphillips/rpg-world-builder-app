@@ -203,6 +203,8 @@ export interface WizardProps {
    * is submitted.
    */
   onComplete: (values: Record<string, unknown>) => void | Promise<void>
+  /** Values available to every step before the user makes edits. */
+  initialValues?: Record<string, unknown>
   /**
    * Optional hint rendered beneath the step nav, e.g.
    * "You can change these settings later from Campaign Settings."
@@ -229,9 +231,17 @@ export interface WizardProps {
  * </Wizard>
  * ```
  */
-export function Wizard({ steps, onComplete, hint, className, children }: WizardProps) {
+export function Wizard({
+  steps,
+  onComplete,
+  initialValues = {},
+  hint,
+  className,
+  children,
+}: WizardProps) {
   const [currentStepIndex, setCurrentStepIndex] = React.useState(0)
-  const [accumulatedValues, setAccumulatedValues] = React.useState<Record<string, unknown>>({})
+  const [accumulatedValues, setAccumulatedValues] =
+    React.useState<Record<string, unknown>>(initialValues)
   const [isCompleting, setIsCompleting] = React.useState(false)
 
   const isFirstStep = currentStepIndex === 0

@@ -19,9 +19,17 @@ defaults, and returns referenced seed-pack descriptors. Explicit create input
 wins over template defaults; nested character-creation objects merge while
 arrays replace defaults wholesale.
 
+Created campaigns retain release provenance (template id/version and applied
+pack id/version pairs), while the materialized defaults remain ordinary
+campaign state. Updating a shipped preset therefore affects only later campaign
+creation and never rewrites existing campaigns.
+
 The API currently fails closed if a template references a world seed pack. When
 the first typed contents field lands, replace that guard with the corresponding
 idempotent content writer rather than silently skipping a pack.
+
+Until that first typed content model exists, keep the pack collection empty. Do
+not add generic seed payloads or activate partial materialization.
 
 ## Versioning
 

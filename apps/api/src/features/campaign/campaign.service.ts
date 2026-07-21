@@ -54,6 +54,18 @@ export async function createCampaign(
     },
     // Omit when undefined so the model default (DEFAULT_SYSTEM_RULESET_ID) applies.
     ...(materializedInput.rulesetId !== undefined && { rulesetId: materializedInput.rulesetId }),
+    ...(presetResolution.template && {
+      presetProvenance: {
+        campaignTemplate: {
+          id: presetResolution.template.metadata.id,
+          version: presetResolution.template.metadata.version,
+        },
+        worldSeedPacks: presetResolution.worldSeedPacks.map((pack) => ({
+          id: pack.metadata.id,
+          version: pack.metadata.version,
+        })),
+      },
+    }),
     createdBy,
   })
 

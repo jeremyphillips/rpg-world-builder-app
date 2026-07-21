@@ -138,6 +138,25 @@ describe('Wizard navigation', () => {
 // ---------------------------------------------------------------------------
 
 describe('Wizard value accumulation', () => {
+  it('starts with provided values and preserves them through completion', async () => {
+    const user = userEvent.setup()
+    const onComplete = vi.fn()
+
+    render(
+      <Wizard steps={THREE_STEPS} onComplete={onComplete} initialValues={{ mood: 'heroic' }}>
+        <SimpleStep heading="Step one" values={{ name: 'Alice' }} />
+        <SimpleStep heading="Step two" values={{ role: 'wizard' }} />
+        <ReviewStep />
+      </Wizard>,
+    )
+
+    await user.click(screen.getByRole('button', { name: /next/i }))
+    await user.click(screen.getByRole('button', { name: /next/i }))
+    await user.click(screen.getByRole('button', { name: /finish/i }))
+
+    expect(onComplete).toHaveBeenCalledWith({ mood: 'heroic', name: 'Alice', role: 'wizard' })
+  })
+
   it('accumulates values from each step and passes them to onComplete', async () => {
     const user = userEvent.setup()
     const onComplete = vi.fn()

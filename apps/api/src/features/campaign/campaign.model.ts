@@ -39,6 +39,23 @@ const campaignSchema = new Schema(
       required: true,
       default: DEFAULT_SYSTEM_RULESET_ID,
     },
+    presetProvenance: {
+      type: {
+        campaignTemplate: {
+          id: { type: String, required: true },
+          version: { type: String, required: true },
+        },
+        worldSeedPacks: [
+          {
+            _id: false,
+            id: { type: String, required: true },
+            version: { type: String, required: true },
+          },
+        ],
+      },
+      required: false,
+      _id: false,
+    },
     /** userId of the creator. Immutable after creation; distinct from the current owner. */
     createdBy: { type: String, required: true, index: true },
   },

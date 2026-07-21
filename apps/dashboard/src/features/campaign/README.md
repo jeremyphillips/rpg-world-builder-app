@@ -23,12 +23,15 @@ acquisition model (axes, ownership, build/import finalization).
 ## Campaign template pipeline
 
 - `GET /api/campaigns/templates` exposes the shipped, validated templates.
-- `listCampaignTemplates()` and `useCampaignTemplates()` provide the dashboard
-  data boundary for a future creation-step chooser.
+- `listCampaignTemplates()` and `useCampaignTemplates()` feed the creation
+  chooser. Selecting a template remounts the wizard with its editable defaults;
+  switching back to blank clears those defaults.
 - `POST /api/campaigns` accepts optional `campaignTemplateId`; the API resolves
   defaults before persistence, with explicit request values taking precedence.
-- No chooser is rendered yet. The existing wizard remains unchanged until the
-  template-selection and template-default form hydration UX is designed.
+- The campaign snapshots the selected template id/version in
+  `presetProvenance`. This is informational: later catalog releases never
+  mutate an existing campaign.
+- Template discovery failure does not block blank campaign creation.
 
 ## NPC authoring
 

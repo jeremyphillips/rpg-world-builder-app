@@ -32,11 +32,13 @@ export type CampaignCreateValues = z.infer<typeof campaignCreateSchema>
 export function buildCreateCampaignInput(
   values: CampaignCreateValues,
   imageKey?: string,
+  campaignTemplateId?: string,
 ): CreateCampaignInput {
   return {
     name: values.name,
     description: values.description,
     ...(imageKey !== undefined && { imageKey }),
+    ...(campaignTemplateId !== undefined && { campaignTemplateId }),
     characterCreation: buildCharacterCreationPatchInputFromCreateWizard(values),
     flavor: {
       playStyle: values.playStyle,

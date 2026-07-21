@@ -1,6 +1,9 @@
 import { describe, expect, it } from 'vitest'
 
-import { versionedTemplateMetadataSchema } from './versioned-template'
+import {
+  versionedTemplateMetadataSchema,
+  versionedTemplateReferenceSchema,
+} from './versioned-template'
 
 describe('versionedTemplateMetadataSchema', () => {
   it('accepts authored discovery metadata with a semantic release version', () => {
@@ -24,5 +27,13 @@ describe('versionedTemplateMetadataSchema', () => {
         name: 'Classic Adventure',
       }),
     ).toThrow()
+  })
+})
+
+describe('versionedTemplateReferenceSchema', () => {
+  it('captures the stable id and exact release used by a consumer', () => {
+    expect(
+      versionedTemplateReferenceSchema.parse({ id: 'classic-adventure', version: '1.0.0' }),
+    ).toEqual({ id: 'classic-adventure', version: '1.0.0' })
   })
 })

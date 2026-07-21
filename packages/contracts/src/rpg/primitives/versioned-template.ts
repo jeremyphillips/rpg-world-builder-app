@@ -7,6 +7,14 @@ export const templateVersionSchema = z.string().regex(/^\d+\.\d+\.\d+$/)
 
 export type TemplateVersion = z.infer<typeof templateVersionSchema>
 
+/** Immutable reference recorded by consumers of a shipped template release. */
+export const versionedTemplateReferenceSchema = z.object({
+  id: z.string().min(1),
+  version: templateVersionSchema,
+})
+
+export type VersionedTemplateReference = z.infer<typeof versionedTemplateReferenceSchema>
+
 /**
  * Shared discovery and release metadata for immutable, shipped templates.
  *

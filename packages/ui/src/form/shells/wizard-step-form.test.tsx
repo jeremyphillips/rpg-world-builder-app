@@ -22,9 +22,9 @@ const stepTwoFields: FormItem[] = [{ type: 'text', name: 'color', label: 'Color'
 type StepOneValues = z.infer<typeof stepOneSchema>
 type StepTwoValues = z.infer<typeof stepTwoSchema>
 
-function renderWizard() {
+function renderWizard(initialValues?: Record<string, unknown>) {
   return render(
-    <Wizard steps={steps} onComplete={vi.fn()}>
+    <Wizard steps={steps} onComplete={vi.fn()} initialValues={initialValues}>
       <WizardStepForm<StepOneValues> schema={stepOneSchema} fields={stepOneFields} />
       <WizardStepForm<StepTwoValues> schema={stepTwoSchema} fields={stepTwoFields} />
     </Wizard>,
@@ -32,6 +32,12 @@ function renderWizard() {
 }
 
 describe('WizardStepForm', () => {
+  it('hydrates fields from wizard initial values', async () => {
+    renderWizard({ name: 'Prefilled campaign' })
+
+    await waitFor(() => expect(screen.getByLabelText('Name')).toHaveValue('Prefilled campaign'))
+  })
+
   it('disables Next until the step is valid, then advances on submit', async () => {
     const user = userEvent.setup()
     renderWizard()

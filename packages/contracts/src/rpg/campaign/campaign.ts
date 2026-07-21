@@ -1,6 +1,7 @@
 import { z } from 'zod'
 import { campaignRoleSchema } from '../../shared/roles'
 import { systemRulesetIdSchema } from '../primitives/ruleset'
+import { versionedTemplateReferenceSchema } from '../primitives/versioned-template'
 import { updateCampaignCharacterCreationInputSchema } from './patches/campaign-character-creation-patch'
 
 export {
@@ -111,6 +112,14 @@ export const campaignVisibilitySchema = z.enum(CAMPAIGN_VISIBILITY)
 
 export type CampaignVisibility = z.infer<typeof campaignVisibilitySchema>
 
+/** Release references used to create a campaign; defaults are still snapshotted into campaign state. */
+export const campaignPresetProvenanceSchema = z.object({
+  campaignTemplate: versionedTemplateReferenceSchema,
+  worldSeedPacks: z.array(versionedTemplateReferenceSchema),
+})
+
+export type CampaignPresetProvenance = z.infer<typeof campaignPresetProvenanceSchema>
+
 // ---------------------------------------------------------------------------
 // Campaign
 // ---------------------------------------------------------------------------
@@ -127,6 +136,8 @@ export const campaignSchema = z.object({
    * to it, so changing it would orphan that content.
    */
   rulesetId: systemRulesetIdSchema,
+  /** Informational source releases. Updating shipped presets never mutates this campaign. */
+  presetProvenance: campaignPresetProvenanceSchema.optional(),
   /** The userId who created this campaign. Immutable — distinct from the current owner, which is transferable. */
   createdBy: z.string().min(1),
   createdAt: z.iso.datetime(),
@@ -156,7 +167,7 @@ export type CampaignListItem = z.infer<typeof campaignListItemSchema>
  * defaults for any omitted configuration.
  */
 export const createCampaignInputSchema = campaignIdentitySchema.extend({
-  /** Stable shipped template id. Resolved server-side and never stored as campaign state. */
+  /** Stable shipped template id. Resolved server-side; its release reference is stored as provenance. */
   campaignTemplateId: z.string().min(1).optional(),
   /** Written to CampaignRulesetPatch on create — not stored on the campaign document. */
   characterCreation: updateCampaignCharacterCreationInputSchema.optional(),

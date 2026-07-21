@@ -62,6 +62,10 @@ describe('createCampaign', () => {
     expect(campaign).toMatchObject({
       identity: { name: 'The Argent Road' },
       rulesetId: 'srd-cc-5.2.1',
+      presetProvenance: {
+        campaignTemplate: { id: 'classic-adventure', version: '1.0.0' },
+        worldSeedPacks: [],
+      },
       configuration: {
         flavor: {
           playStyle: ['exploration', 'roleplay_driven'],
@@ -71,6 +75,13 @@ describe('createCampaign', () => {
         },
       },
     })
+  })
+
+  it('does not attach preset provenance to a blank campaign', async () => {
+    const owner = await makeTestUser({ email: 'blank-owner@example.com' })
+    const campaign = await createCampaign({ name: 'Blank', createdBy: owner.id })
+
+    expect(campaign).not.toHaveProperty('presetProvenance')
   })
 
   it('rejects an unknown campaign template before persistence', async () => {

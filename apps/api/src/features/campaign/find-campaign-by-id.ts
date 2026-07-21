@@ -5,6 +5,7 @@ import type {
   Campaign,
   CampaignConfiguration,
   CampaignIdentity,
+  CampaignPresetProvenance,
   CampaignStatus,
   CampaignVisibility,
   SystemRulesetId,
@@ -27,6 +28,9 @@ export function toCampaign(doc: CampaignRecord): Campaign {
     status: doc.status as CampaignStatus,
     visibility: doc.visibility as CampaignVisibility,
     rulesetId: (doc.rulesetId ?? DEFAULT_SYSTEM_RULESET_ID) as SystemRulesetId,
+    ...(doc.presetProvenance && {
+      presetProvenance: doc.presetProvenance as CampaignPresetProvenance,
+    }),
     createdBy: doc.createdBy,
     createdAt: doc.createdAt.toISOString(),
     updatedAt: doc.updatedAt.toISOString(),
