@@ -6,7 +6,9 @@ import {
   getDamageTypeLabel,
   getDamageTypeSentenceForm,
   damageTypeIdSchema,
+  DAMAGE_TYPE_TERM,
 } from '../../vocab/damage/vocabulary'
+import { getTermSentenceForm } from '../../vocab/types'
 import { absoluteLevelSchema } from '../../primitives/level'
 import {
   movementGrantIncreaseSchema,
@@ -144,7 +146,8 @@ export function formatDamageTypeGrantSentence(damageTypes: readonly string[]): s
 /** Compact summary label: "Acid damage type", "Fire and Cold damage types", etc. */
 export function formatDamageTypeGrantCompact(damageTypes: readonly string[]): string {
   const labels = joinNaturalList(damageTypes.map((id) => getDamageTypeLabel(id)))
-  return damageTypes.length === 1 ? `${labels} damage type` : `${labels} damage types`
+  const concept = getTermSentenceForm(DAMAGE_TYPE_TERM, damageTypes.length)
+  return `${labels} ${concept}`
 }
 
 export function formatResistanceGrantSentence(damageTypes: readonly string[]): string {

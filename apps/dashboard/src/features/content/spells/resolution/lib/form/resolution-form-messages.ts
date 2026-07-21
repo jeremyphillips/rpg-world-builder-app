@@ -1,4 +1,4 @@
-import { defineMessage } from '@rpg/contracts'
+import { DAMAGE_TYPE_TERM, defineMessage, getTermSentenceForm, withArticle } from '@rpg/contracts'
 
 // ---------------------------------------------------------------------------
 // Resolution form validation messages (dashboard tier 3).
@@ -32,7 +32,7 @@ export const resolutionFormValidationMessages = {
   ),
   damageTypeRequired: defineMessage(
     'validation.spellResolutionForm.damageTypeRequired',
-    () => 'Select a damage type.',
+    () => `Select ${withArticle(getTermSentenceForm(DAMAGE_TYPE_TERM, 1))}.`,
   ),
   projectileCountRequired: defineMessage(
     'validation.spellResolutionForm.projectileCountRequired',

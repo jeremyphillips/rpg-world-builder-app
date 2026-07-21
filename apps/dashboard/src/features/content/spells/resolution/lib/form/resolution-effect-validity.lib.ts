@@ -1,5 +1,8 @@
 import {
   supportsPartialApplicationForEffectKind,
+  DAMAGE_TYPE_TERM,
+  getTermSentenceForm,
+  withArticle,
   type SpellResolutionApplicationAmount,
   type SpellResolutionOutcomeResult,
 } from '@rpg/contracts'
@@ -51,7 +54,7 @@ export function formatResolutionEffectCompletenessMessage(
       return 'Complete the damage roll.'
     }
     if (missing.includes('damageType')) {
-      return 'Select a damage type.'
+      return `Select ${withArticle(getTermSentenceForm(DAMAGE_TYPE_TERM, 1))}.`
     }
   }
 

@@ -325,6 +325,27 @@ Dashboard surfaces call `buildEquipmentCompactSummary()` through
 [`buildEquipmentPickerRowViewModel`](../apps/dashboard/src/features/content/equipment/lib/equipment-display.ts);
 the picker UI joins segments with `EQUIPMENT_COMPACT_SEPARATOR`.
 
+### Dashboard consumption examples
+
+```ts
+// Hub / nav — plural taxonomy names with product casing
+vocabularyHubLabel(getVocabularyOptionSetTerm('creature-types')) // → "Creature Types"
+
+// Form field chrome — sentence-case singular or plural
+vocabularyFieldLabel(CREATURE_TYPE_TERM) // → "Creature type"
+vocabularySelectFieldForTerm(CREATURE_TYPE_TERM, { name: 'creatureType', options })
+
+// Validation — embed noun phrases inside defineMessage formatters
+defineMessage(
+  'validation.species.creatureTypeUnavailable',
+  () =>
+    `This ${getTermSentenceForm(CREATURE_TYPE_TERM, 1)} is not available in this campaign vocabulary.`,
+)
+
+// Detail rows — title-case taxonomy concept label
+getVocabularyTermLabel(MAGIC_ITEM_RARITY_TERM) // → "Magic Item Rarity"
+```
+
 ---
 
 ## Related docs

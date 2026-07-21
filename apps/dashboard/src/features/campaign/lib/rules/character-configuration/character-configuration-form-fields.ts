@@ -3,6 +3,7 @@ import { z } from 'zod'
 import {
   ABSOLUTE_MAX_CHARACTER_LEVEL,
   CHARACTER_ABILITY_SCORE_MAX,
+  CREATURE_TYPE_TERM,
   DEFAULT_CHARACTER_ALLOWED_CREATURE_TYPES,
   DEFAULT_MULTICLASSING_ENABLED,
   DEFAULT_PRIMARY_ABILITY_MINIMUM,
@@ -12,6 +13,7 @@ import {
   DEFAULT_SUBCLASS_CHOICES_ENABLED,
   defineMessage,
   EXTENDED_PROGRESSION_TIER_NAME_MAX,
+  getTermSentenceForm,
   isMeaningfulLanguageProficiencyChoice,
   levelValidationMessages,
   MAX_CHARACTER_LEVEL,
@@ -29,7 +31,7 @@ import {
   type GroupFieldItem,
 } from '@rpg/ui/form'
 
-import { vocabularyComboboxField } from '@/features/homebrew'
+import { vocabularyComboboxFieldForTerm, vocabularyFieldLabel } from '@/features/homebrew'
 
 import { ExtendedProgressionEffects } from '../../../components/extended-progression-effects.client'
 import {
@@ -55,7 +57,8 @@ import { languageProficiencyRulesDefaultValues } from './language-proficiency-fo
 export const characterConfigurationValidationMessages = {
   creatureTypeUnavailable: defineMessage(
     'validation.characterConfiguration.creatureTypeUnavailable',
-    () => 'Creature type is not available in this campaign vocabulary.',
+    () =>
+      `This ${getTermSentenceForm(CREATURE_TYPE_TERM, 1)} is not available in this campaign vocabulary.`,
   ),
   languageUnavailable: defineMessage(
     'validation.characterConfiguration.languageUnavailable',
@@ -290,14 +293,12 @@ function standardLevelRangeSummarySlot(): FormItem {
 }
 
 function allowedCharacterCreatureTypesField(creatureTypeOptions: FieldOption[]): FormItem {
-  return vocabularyComboboxField({
+  return vocabularyComboboxFieldForTerm(CREATURE_TYPE_TERM, {
     name: 'allowedCharacterCreatureTypes',
-    label: 'Allowed creature types',
     multiple: true,
     required: true,
-    hint: 'Creature types allowed for player and NPC character sheets.',
+    hint: `${vocabularyFieldLabel(CREATURE_TYPE_TERM, { plural: true })} allowed for player and NPC character sheets.`,
     options: creatureTypeOptions,
-    placeholder: 'Choose creature types…',
   })
 }
 
@@ -588,7 +589,10 @@ const CHARACTER_RULE_FIELD_REGISTRY: CharacterRuleFieldDef[] = [
   {
     id: 'allowedCharacterCreatureTypes',
     surfaces: ['config'],
-    configSection: { id: 'creature-type-policy', label: 'Creature types' },
+    configSection: {
+      id: 'creature-type-policy',
+      label: vocabularyFieldLabel(CREATURE_TYPE_TERM, { plural: true }),
+    },
     buildFormItems: ({ creatureTypeOptions }) => [
       allowedCharacterCreatureTypesField(creatureTypeOptions),
     ],

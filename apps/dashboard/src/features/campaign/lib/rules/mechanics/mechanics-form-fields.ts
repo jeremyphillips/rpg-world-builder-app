@@ -4,12 +4,16 @@ import { Text } from '@rpg/ui'
 import {
   ARMOR_CLASS_BASES,
   ARMOR_CLASS_MODES,
+  ATTACK_RESOLUTION_MODE_TERM,
   DEFAULT_EDITION_PRESET_ID,
+  EDITION_PRESET_TERM,
   attackResolutionModeIdSchema,
   editionPresetIdSchema,
   armorClassModeSchema,
 } from '@rpg/contracts'
 import { toOptions, type FieldOption, type FormItem } from '@rpg/ui/form'
+
+import { vocabularyFieldLabel } from '@/features/homebrew'
 
 import { EditionPresetEffects } from '../../../components/edition-preset-effects.client'
 import { ARMOR_CLASS_BASE_LABELS, ARMOR_CLASS_MODE_LABELS } from './mechanics-form-labels'
@@ -24,7 +28,7 @@ export const mechanicsValuesSchema = z.object({
 export type MechanicsValues = z.infer<typeof mechanicsValuesSchema>
 
 export const MECHANICS_CONFIGURATION_SECTIONS = [
-  { id: 'edition-preset', label: 'Edition preset' },
+  { id: 'edition-preset', label: vocabularyFieldLabel(EDITION_PRESET_TERM) },
   { id: 'mechanics-knobs', label: 'Mechanics knobs' },
 ] as const
 
@@ -50,14 +54,14 @@ function editionPresetOptionsWithRecommendedBadge(options: FieldOption[]): Field
 function editionPresetGroup(editionPresetOptions: FieldOption[]): FormItem {
   return {
     kind: 'group',
-    legend: 'Edition preset',
+    legend: vocabularyFieldLabel(EDITION_PRESET_TERM),
     id: 'edition-preset',
     className: SCROLL_SECTION_ANCHOR_CLASS,
     fields: [
       {
         type: 'radioCard',
         name: 'editionPresetId',
-        label: 'Edition preset',
+        label: vocabularyFieldLabel(EDITION_PRESET_TERM),
         labelHidden: true,
         required: true,
         options: editionPresetOptionsWithRecommendedBadge(editionPresetOptions),
@@ -103,7 +107,7 @@ function mechanicsKnobsGroup(attackResolutionModeOptions: FieldOption[]): FormIt
       {
         type: 'select',
         name: 'attackResolutionMode',
-        label: 'Attack resolution',
+        label: vocabularyFieldLabel(ATTACK_RESOLUTION_MODE_TERM),
         required: true,
         options: attackResolutionModeOptions,
         placeholder: 'Choose attack resolution…',

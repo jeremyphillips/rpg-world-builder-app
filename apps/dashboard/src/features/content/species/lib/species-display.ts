@@ -1,7 +1,10 @@
 import {
   flattenGrantGroups,
   formatMovementDisplay,
+  CREATURE_SIZE_TERM,
+  CREATURE_TYPE_TERM,
   getCreatureSizeLabel,
+  getVocabularyTermLabel,
   resolveCreatureMovement,
   resolveGrantGroupsFromContent,
   resolveTraitDisplay,
@@ -18,8 +21,8 @@ import {
 import type { ContentStatRowData } from '../../lib/detail/content-stat-rows'
 
 export const SPECIES_STAT_LABELS = {
-  creatureType: 'Creature Type',
-  size: 'Size',
+  creatureType: getVocabularyTermLabel(CREATURE_TYPE_TERM),
+  size: getVocabularyTermLabel(CREATURE_SIZE_TERM),
   movement: 'Movement',
   senses: 'Senses',
   languageAffinities: 'Language affinities',

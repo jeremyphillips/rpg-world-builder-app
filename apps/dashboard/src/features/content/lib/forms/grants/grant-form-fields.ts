@@ -1,6 +1,7 @@
 import {
   FEAT_CATEGORY_IDS,
   FEAT_CATEGORY_ENTRIES,
+  DAMAGE_TYPE_TERM,
   formatDamageTypeGrantSentence,
   formatFeatChoiceGrantSentence,
   formatLanguageGrantSentence,
@@ -41,6 +42,7 @@ import {
   buildActiveDamageTypeFieldOptions,
   buildActiveLanguageFieldOptions,
   buildActiveSenseFieldOptions,
+  vocabularyFieldLabel,
 } from '@/features/homebrew'
 
 import type { ContentFormCtx } from '../content-form-registry'
@@ -591,14 +593,14 @@ export function grantItemFields<T extends string>(
     {
       type: 'chips',
       name: 'resistances',
-      label: 'Damage types',
+      label: vocabularyFieldLabel(DAMAGE_TYPE_TERM, { plural: true }),
       options: damageTypeOptions,
       visibility: visibleFor('resistances'),
     },
     {
       type: 'chips',
       name: 'damageType',
-      label: 'Damage types',
+      label: vocabularyFieldLabel(DAMAGE_TYPE_TERM, { plural: true }),
       options: damageTypeOptions,
       visibility: visibleFor('damageType'),
     },
