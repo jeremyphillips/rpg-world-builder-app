@@ -599,6 +599,7 @@ export function useEquipmentStep(args: {
     pickerWorkflowMode,
     pickerWorkflowModes: magicItemWorkflow.pickerWorkflowModes,
     focusedAllowanceId,
+    setFocusedAllowanceId,
     budget,
     pickerItems: magicItemWorkflow.filteredPickerItems,
     allPickerItems: pickerItems,

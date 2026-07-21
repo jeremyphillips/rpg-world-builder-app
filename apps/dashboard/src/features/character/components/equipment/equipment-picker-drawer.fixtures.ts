@@ -306,3 +306,22 @@ export const equipmentPickerMagicItemsFixture: EquipmentPickerItem[] = [
     }),
   },
 ]
+
+export const equipmentPickerMagicItemProgressFixture = [
+  {
+    allowanceId: 'startingWealthTier:srd-cc-5.2.1-standard:hero:common',
+    rarity: 'common' as const,
+    capacity: 2,
+    selected: 0,
+    remainingCapacity: 2,
+    isFilled: false,
+  },
+  {
+    allowanceId: 'startingWealthTier:srd-cc-5.2.1-standard:hero:uncommon',
+    rarity: 'uncommon' as const,
+    capacity: 1,
+    selected: 0,
+    remainingCapacity: 1,
+    isFilled: false,
+  },
+]

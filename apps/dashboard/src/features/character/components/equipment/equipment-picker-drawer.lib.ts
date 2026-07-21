@@ -94,11 +94,17 @@ export function formatEquipmentUnaffordableReason(
   return `${need} needed · ${have} remaining`
 }
 
-/** Structured filters only — category + affordable toggle. Excludes search. */
+/** Structured filters only — category, affordable toggle, or magic-item rarity. Excludes search. */
 export function countEquipmentPickerStructuredFilters(args: {
   selectedKind: EquipmentPickerKindFilter
   showAffordableOnly: boolean
+  focusedAllowanceId?: string
+  workflowMode?: EquipmentPickerWorkflowMode
 }): number {
+  if (args.workflowMode === 'magic_items') {
+    return args.focusedAllowanceId ? 1 : 0
+  }
+
   let count = 0
   if (args.selectedKind !== EQUIPMENT_PICKER_KIND_ALL) count += 1
   if (args.showAffordableOnly) count += 1
@@ -110,6 +116,8 @@ export function countEquipmentPickerClearableCriteria(args: {
   selectedKind: EquipmentPickerKindFilter
   showAffordableOnly: boolean
   searchQuery: string
+  focusedAllowanceId?: string
+  workflowMode?: EquipmentPickerWorkflowMode
 }): number {
   return countEquipmentPickerStructuredFilters(args) + Number(args.searchQuery.trim().length > 0)
 }
@@ -123,6 +131,8 @@ export function hasEquipmentPickerResetViewCriteria(args: {
   showAffordableOnly: boolean
   searchQuery: string
   sortMode: EquipmentPickerSortMode
+  focusedAllowanceId?: string
+  workflowMode?: EquipmentPickerWorkflowMode
 }): boolean {
   if (args.searchQuery.trim().length > 0) return true
   if (countEquipmentPickerStructuredFilters(args) > 0) return true

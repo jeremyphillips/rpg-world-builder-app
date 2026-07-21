@@ -6,6 +6,7 @@ import type {
   EquipmentPickerBrowseSortContext,
   EquipmentPickerItem,
   EquipmentPickerSupportedKind,
+  MagicItemGrantProgress,
 } from '@rpg/contracts'
 
 import type { EquipmentPickerWorkflowMode } from '../../lib/equipment-step.lib'
@@ -81,7 +82,11 @@ export type EquipmentPickerCalloutContext = {
 /** Sentinel for “all kinds” in the category filter (Radix Select rejects `''`). */
 export const EQUIPMENT_PICKER_KIND_ALL = '__all__' as const
 
+/** Sentinel for “all rarities” in the magic-items rarity filter. */
+export const EQUIPMENT_PICKER_RARITY_ALL = '__all_rarities__' as const
+
 export const EQUIPMENT_PICKER_CATEGORY_LABEL = 'Category'
+export const EQUIPMENT_PICKER_RARITY_LABEL = 'Rarity'
 export const EQUIPMENT_PICKER_AFFORDABLE_NOW_LABEL = 'Affordable now'
 export const EQUIPMENT_PICKER_SORT_LABEL = 'Sort'
 export const EQUIPMENT_PICKER_CLEAR_FILTERS_LABEL = 'Clear filters'
@@ -149,6 +154,11 @@ export type EquipmentPickerDrawerProps = {
   /** Available workflows; segmented control renders only when length is 2. */
   workflowModes?: readonly EquipmentPickerWorkflowMode[]
   onWorkflowModeChange?: (mode: EquipmentPickerWorkflowMode) => void
+  /** Magic-item grant allowances for rarity chip filtering in magic-items workflow. */
+  magicItemGrantProgress?: readonly MagicItemGrantProgress[]
+  /** Focused allowance id — scopes magic-item browse to one rarity slot. */
+  focusedAllowanceId?: string
+  onFocusedAllowanceIdChange?: (allowanceId: string | undefined) => void
   /** Mutually exclusive toolbar action — default resets full view including sort. */
   toolbarResetMode?: EquipmentPickerToolbarResetMode
   /** When true, `availableInStartingOption` rows show the Standard gear badge. */

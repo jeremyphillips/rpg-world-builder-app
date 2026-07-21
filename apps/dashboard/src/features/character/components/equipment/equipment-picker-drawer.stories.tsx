@@ -10,6 +10,7 @@ import {
   equipmentPickerDefaultPathItemsFixture,
   equipmentPickerItemsFixture,
   equipmentPickerLowRemainingBudgetFixture,
+  equipmentPickerMagicItemProgressFixture,
   equipmentPickerMagicItemsFixture,
   equipmentPickerRopeFixture,
 } from './equipment-picker-drawer.fixtures'
@@ -158,7 +159,9 @@ export const MagicItemsWorkflow: Story = {
     items: equipmentPickerMagicItemsFixture,
     workflowMode: 'magic_items',
     workflowModes: ['purchase', 'magic_items'],
+    magicItemGrantProgress: equipmentPickerMagicItemProgressFixture,
     onWorkflowModeChange: () => undefined,
+    onFocusedAllowanceIdChange: () => undefined,
     onAddItem: () => undefined,
   },
 }

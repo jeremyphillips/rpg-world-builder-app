@@ -9,6 +9,8 @@ import {
   equipmentPickerDefaultPathItemsFixture,
   equipmentPickerItemsFixture,
   equipmentPickerLowRemainingBudgetFixture,
+  equipmentPickerMagicItemProgressFixture,
+  equipmentPickerMagicItemsFixture,
   equipmentPickerRowboatFixture,
   equipmentPickerSkilledHirelingFixture,
   pickerState,
@@ -640,6 +642,33 @@ describe('EquipmentPickerDrawer', () => {
     expect(within(list).queryByText('Skilled Hireling')).not.toBeInTheDocument()
     expect(screen.queryByRole('option', { name: 'Vehicle' })).not.toBeInTheDocument()
     expect(screen.queryByRole('option', { name: 'Service' })).not.toBeInTheDocument()
+  })
+
+  it('renders rarity chips in magic-items workflow when multiple allowances exist', async () => {
+    const user = userEvent.setup()
+    const onFocusedAllowanceIdChange = vi.fn()
+
+    render(
+      <EquipmentPickerDrawer
+        open
+        onOpenChange={vi.fn()}
+        items={equipmentPickerMagicItemsFixture}
+        workflowMode="magic_items"
+        magicItemGrantProgress={equipmentPickerMagicItemProgressFixture}
+        onFocusedAllowanceIdChange={onFocusedAllowanceIdChange}
+        onAddItem={vi.fn()}
+      />,
+    )
+
+    expect(screen.getByRole('radio', { name: 'All' })).toBeInTheDocument()
+    expect(screen.getByRole('radio', { name: 'Common' })).toBeInTheDocument()
+    expect(screen.getByRole('radio', { name: 'Uncommon' })).toBeInTheDocument()
+
+    await user.click(screen.getByRole('radio', { name: 'Uncommon' }))
+
+    expect(onFocusedAllowanceIdChange).toHaveBeenCalledWith(
+      equipmentPickerMagicItemProgressFixture[1]!.allowanceId,
+    )
   })
 
   it('has no axe accessibility violations', async () => {

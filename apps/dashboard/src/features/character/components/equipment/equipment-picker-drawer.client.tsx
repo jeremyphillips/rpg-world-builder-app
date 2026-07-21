@@ -14,6 +14,7 @@ import {
   formatMoney,
   formatWealthAsGold,
   getEquipmentKindLabel,
+  getMagicItemRarityLabel,
   isEquipmentPickerSupportedKind,
   isEquipmentStackable,
 } from '@rpg/contracts'
@@ -45,6 +46,8 @@ import {
   EQUIPMENT_PICKER_MODE_LABELS,
   EQUIPMENT_PICKER_MODE_MAGIC_ITEMS,
   EQUIPMENT_PICKER_MODE_PURCHASE,
+  EQUIPMENT_PICKER_RARITY_ALL,
+  EQUIPMENT_PICKER_RARITY_LABEL,
   EQUIPMENT_PICKER_RESET_VIEW_LABEL,
   EQUIPMENT_PICKER_SORT_LABEL,
   EQUIPMENT_PICKER_SORT_LABELS,
@@ -77,6 +80,8 @@ function EquipmentPickerToolbarActions({
   showAffordableOnly,
   sortMode,
   searchQuery,
+  focusedAllowanceId,
+  workflowMode,
   onClearStructuredFilters,
   onResetView,
 }: {
@@ -85,12 +90,19 @@ function EquipmentPickerToolbarActions({
   showAffordableOnly: boolean
   sortMode: EquipmentPickerSortMode
   searchQuery: string
+  focusedAllowanceId?: string
+  workflowMode: EquipmentPickerWorkflowMode
   onClearStructuredFilters: () => void
   onResetView: () => void
 }) {
-  const clearableCriteriaCount = countEquipmentPickerClearableCriteria({
+  const structuredFilterArgs = {
     selectedKind,
     showAffordableOnly,
+    focusedAllowanceId,
+    workflowMode,
+  }
+  const clearableCriteriaCount = countEquipmentPickerClearableCriteria({
+    ...structuredFilterArgs,
     searchQuery,
   })
   const showClearFilters =
@@ -99,8 +111,7 @@ function EquipmentPickerToolbarActions({
   const showResetView =
     toolbarResetMode === 'reset_view' &&
     hasEquipmentPickerResetViewCriteria({
-      selectedKind,
-      showAffordableOnly,
+      ...structuredFilterArgs,
       searchQuery,
       sortMode,
     })
@@ -204,6 +215,9 @@ export function EquipmentPickerDrawer({
   workflowMode = EQUIPMENT_PICKER_MODE_PURCHASE,
   workflowModes = [EQUIPMENT_PICKER_MODE_PURCHASE],
   onWorkflowModeChange,
+  magicItemGrantProgress,
+  focusedAllowanceId,
+  onFocusedAllowanceIdChange,
   toolbarResetMode = 'reset_view',
   isGoldShoppingPath = false,
   resolveRowActionViewModel,
@@ -265,7 +279,22 @@ export function EquipmentPickerDrawer({
   const structuredFilterCount = countEquipmentPickerStructuredFilters({
     selectedKind,
     showAffordableOnly,
+    focusedAllowanceId,
+    workflowMode,
   })
+
+  const showRarityFilter =
+    isMagicItemsWorkflow &&
+    magicItemGrantProgress !== undefined &&
+    magicItemGrantProgress.length > 1
+  const selectedRarityFilter = focusedAllowanceId ?? EQUIPMENT_PICKER_RARITY_ALL
+
+  const handleSelectedRarityFilterChange = React.useCallback(
+    (value: string) => {
+      onFocusedAllowanceIdChange?.(value === EQUIPMENT_PICKER_RARITY_ALL ? undefined : value)
+    },
+    [onFocusedAllowanceIdChange],
+  )
 
   const filteredItems = React.useMemo(
     () =>
@@ -302,7 +331,8 @@ export function EquipmentPickerDrawer({
   const handleClearStructuredFilters = React.useCallback(() => {
     setSelectedKind(EQUIPMENT_PICKER_VIEW_DEFAULTS.selectedKind)
     setShowAffordableOnly(EQUIPMENT_PICKER_VIEW_DEFAULTS.showAffordableOnly)
-  }, [])
+    onFocusedAllowanceIdChange?.(undefined)
+  }, [onFocusedAllowanceIdChange])
 
   const showCategoryFilter = kindOptions.length > 1
 
@@ -438,7 +468,22 @@ export function EquipmentPickerDrawer({
       }
       transformVisibleItems={transformVisibleItems}
       primaryControls={
-        showCategoryFilter ? (
+        showRarityFilter ? (
+          <CatalogFilterChips
+            id="equipment-picker-rarity"
+            label={EQUIPMENT_PICKER_RARITY_LABEL}
+            selectionMode="single-required"
+            value={selectedRarityFilter}
+            onValueChange={handleSelectedRarityFilterChange}
+            options={[
+              { value: EQUIPMENT_PICKER_RARITY_ALL, label: 'All' },
+              ...magicItemGrantProgress.map((entry) => ({
+                value: entry.allowanceId,
+                label: getMagicItemRarityLabel(entry.rarity),
+              })),
+            ]}
+          />
+        ) : showCategoryFilter ? (
           <CatalogFilterChips
             id="equipment-picker-category"
             label={EQUIPMENT_PICKER_CATEGORY_LABEL}
@@ -460,6 +505,7 @@ export function EquipmentPickerDrawer({
           setSelectedKind(EQUIPMENT_PICKER_VIEW_DEFAULTS.selectedKind)
           setShowAffordableOnly(EQUIPMENT_PICKER_VIEW_DEFAULTS.showAffordableOnly)
           setSortMode(EQUIPMENT_PICKER_VIEW_DEFAULTS.sortMode)
+          onFocusedAllowanceIdChange?.(undefined)
           resetSearchQuery()
         }
 
@@ -475,6 +521,8 @@ export function EquipmentPickerDrawer({
             showAffordableOnly={showAffordableOnly}
             sortMode={sortMode}
             searchQuery={searchQuery}
+            focusedAllowanceId={focusedAllowanceId}
+            workflowMode={workflowMode}
             onClearStructuredFilters={handleClearFilters}
             onResetView={handleResetView}
           />

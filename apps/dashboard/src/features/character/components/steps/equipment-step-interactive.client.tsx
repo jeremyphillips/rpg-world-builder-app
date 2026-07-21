@@ -170,6 +170,9 @@ export function EquipmentStepInteractive({
         workflowMode={step.pickerWorkflowMode}
         workflowModes={step.pickerWorkflowModes}
         onWorkflowModeChange={step.setPickerWorkflowMode}
+        magicItemGrantProgress={step.showMagicItemGrants ? step.acquisition.progress : undefined}
+        focusedAllowanceId={step.focusedAllowanceId}
+        onFocusedAllowanceIdChange={step.setFocusedAllowanceId}
         isGoldShoppingPath={showShopping}
         resolveRowActionViewModel={pickerAcquisition.resolveRowActionViewModel}
         resolveGrantManageSources={pickerAcquisition.resolveGrantManageSources}

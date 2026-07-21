@@ -293,6 +293,34 @@ describe('equipment-picker-drawer.lib', () => {
     expect(hasEquipmentPickerClearableCriteria(1)).toBe(true)
   })
 
+  it('counts magic-item rarity focus as a structured filter in magic-items workflow', () => {
+    expect(
+      countEquipmentPickerStructuredFilters({
+        selectedKind: 'weapon',
+        showAffordableOnly: true,
+        workflowMode: 'magic_items',
+      }),
+    ).toBe(0)
+    expect(
+      countEquipmentPickerStructuredFilters({
+        selectedKind: 'weapon',
+        showAffordableOnly: true,
+        workflowMode: 'magic_items',
+        focusedAllowanceId: 'startingWealthTier:hero:common',
+      }),
+    ).toBe(1)
+    expect(
+      hasEquipmentPickerResetViewCriteria({
+        selectedKind: EQUIPMENT_PICKER_KIND_ALL,
+        showAffordableOnly: false,
+        searchQuery: '',
+        sortMode: EQUIPMENT_PICKER_SORT_BEST_MATCH,
+        workflowMode: 'magic_items',
+        focusedAllowanceId: 'startingWealthTier:hero:common',
+      }),
+    ).toBe(true)
+  })
+
   it('returns domain amounts for remaining-budget failures', () => {
     const chainMail = equipmentPickerItemsFixture[1]!
     expect(getEquipmentUnaffordableAmounts(chainMail, equipmentPickerBudgetFixture)).toEqual({
