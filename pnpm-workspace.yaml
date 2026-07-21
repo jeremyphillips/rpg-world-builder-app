@@ -2,6 +2,7 @@ packages:
   - 'apps/*'
   - 'packages/*'
   - 'tools/bench'
+  - 'tools/vocab/term-audit'
 
 allowBuilds:
   '@swc/core': true

@@ -372,6 +372,16 @@ Dashboard derives surface labels from key-based helpers in
 directly. Sidebar and router crumbs derive collection labels from the same
 helpers — do not hand-roll display strings.
 
+Keep this registry centralized while its entries share ownership and dependencies.
+Split it into domain modules only when those conditions change or the file becomes
+hard to navigate; preserve the existing content barrel and aliases if it is split.
+
+`pnpm vocab:audit` audits direct term usage across the workspace. Its repository-wide
+usage-budget regression gate is intentionally deferred pending a baseline-stability
+spike; see the audit package README. Vocabulary option-set
+audits share the tool, so [vocabulary.md](./vocabulary.md) links here rather than
+duplicating its policy.
+
 #### Reference vocabulary (`GameTermEntry`)
 
 Use this when a closed id set needs both a display label and SRD rule text

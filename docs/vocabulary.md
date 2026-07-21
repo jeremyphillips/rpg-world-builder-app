@@ -310,7 +310,8 @@ apply product casing conventions.
 | **Closed reference vocab** (`*_ENTRIES`, `GameTermEntry`) | Weapon properties, armor categories, magic item rarity | Import label helpers from `rpg/vocab/*`; no campaign patch merge                                                                                        |
 
 Catalog **content types** (classes, species, equipment, …) are separate — see
-[content-types.md](./content-types.md).
+[content-types.md](./content-types.md). The shared `pnpm vocab:audit` policy and
+the deferred usage-budget regression-gate TODO also live there.
 
 ### Compact display pattern
 

@@ -20,6 +20,16 @@ describe('content type terms', () => {
       const term = getContentTypeTerm(key)
       expect(getVocabularyTermLabel(term)).not.toBe('')
       expect(term.description).not.toBe('')
+      expect(term.sentence).toBeDefined()
+      if (!term.sentence) throw new Error(`${key} needs sentence forms`)
+      if (!term.sentence.singular || !term.sentence.plural) {
+        throw new Error(`${key} needs singular and plural sentence forms`)
+      }
+      expect(term.sentence.singular.trim()).not.toBe('')
+      expect(term.sentence.plural.trim()).not.toBe('')
+      if (term.compactLabel) {
+        expect(term.compactLabel).not.toBe(term.label)
+      }
     }
   })
 
