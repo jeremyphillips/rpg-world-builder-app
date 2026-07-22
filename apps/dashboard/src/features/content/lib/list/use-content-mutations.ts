@@ -1,7 +1,13 @@
 import { useMutation, useQueryClient, type QueryClient } from '@tanstack/react-query'
 
 import type { AnyContentFormDef } from '../forms/content-form-registry'
-import { createContent, updateContent } from './content-client'
+import {
+  createContent,
+  deleteContent,
+  getContentDeletionAvailability,
+  updateContent,
+} from './content-client'
+import { homebrewSummaryQueryKey } from '../../../homebrew/hooks/use-homebrew-summary'
 
 export type ContentMutationHooksOptions = {
   /** Additional query keys to invalidate after a successful write. */
@@ -101,6 +107,30 @@ export function useContentWriteMutation(
         : createContent(campaignId, def.routeKey, input),
     onSuccess: () => {
       invalidateContentFormDefQueries(queryClient, campaignId, def)
+    },
+  })
+}
+
+export function fetchContentDeletionAvailability(
+  campaignId: string,
+  routeKey: string,
+  entityId: string,
+) {
+  return getContentDeletionAvailability(campaignId, routeKey, entityId)
+}
+
+export function useDeleteContent(
+  def: Pick<AnyContentFormDef, 'routeKey' | 'queryKey' | 'invalidateQueryKeys'>,
+  campaignId: string,
+) {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (entityId: string) => deleteContent(campaignId, def.routeKey, entityId),
+    onSuccess: (result) => {
+      if (result.status !== 'deleted') return
+      invalidateContentFormDefQueries(queryClient, campaignId, def)
+      void queryClient.invalidateQueries({ queryKey: homebrewSummaryQueryKey(campaignId) })
     },
   })
 }

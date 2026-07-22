@@ -5,6 +5,7 @@ import type { ArmorEquipment, Equipment } from '../../content/equipment'
 import { isArmorEquipment } from '../../content/equipment'
 import type { CharacterWealthGrant } from '../../content/lib/wealth-grant'
 import { equipmentModifierSchema } from '../../content/equipment/modifier'
+import type { EquipmentKind } from '../../vocab/equipment/kind'
 import type { CreatureEquipmentCatalog } from '../creature/equipment'
 import { characterSelectionSourcesSchema } from './selection-sources'
 
@@ -49,9 +50,22 @@ export const EMPTY_CHARACTER_EQUIPMENT: CharacterEquipment = {
   mounts: [],
 }
 
-type EquipmentInventoryBucket = keyof CharacterEquipment
+/** Keys on `character.equipment` where inventory entries are stored. */
+export type CharacterEquipmentInventoryBucket = keyof CharacterEquipment
 
-const EQUIPMENT_KIND_TO_BUCKET = {
+/** Iterable inventory bucket keys — keep in sync with `characterEquipmentSchema`. */
+export const CHARACTER_EQUIPMENT_INVENTORY_BUCKETS = [
+  'weapons',
+  'armor',
+  'tools',
+  'gear',
+  'magicItems',
+  'vehicles',
+  'mounts',
+] as const satisfies readonly CharacterEquipmentInventoryBucket[]
+
+/** Maps catalog equipment kind to the persisted character inventory bucket. */
+export const EQUIPMENT_KIND_TO_INVENTORY_BUCKET = {
   weapon: 'weapons',
   armor: 'armor',
   tool: 'tools',
@@ -60,7 +74,28 @@ const EQUIPMENT_KIND_TO_BUCKET = {
   vehicle: 'vehicles',
   mount: 'mounts',
   service: 'gear',
-} as const satisfies Record<Equipment['kind'], EquipmentInventoryBucket>
+} as const satisfies Record<EquipmentKind, CharacterEquipmentInventoryBucket>
+
+/** Returns the inventory bucket for a catalog equipment kind. */
+export function inventoryBucketForEquipmentKind(
+  kind: EquipmentKind,
+): CharacterEquipmentInventoryBucket {
+  return EQUIPMENT_KIND_TO_INVENTORY_BUCKET[kind]
+}
+
+/** Returns the inventory bucket for a resolved catalog equipment row. */
+export function inventoryBucketForEquipment(
+  equipment: Equipment,
+): CharacterEquipmentInventoryBucket {
+  return inventoryBucketForEquipmentKind(equipment.kind)
+}
+
+/** Mongo `$or` branches for character docs referencing an equipment catalog id. */
+export function equipmentInventoryUsageMongoOrClauses(contentId: string): Record<string, string>[] {
+  return CHARACTER_EQUIPMENT_INVENTORY_BUCKETS.map((bucket) => ({
+    [`equipment.${bucket}.equipmentId`]: contentId,
+  }))
+}
 
 /** Appends an equipment entry to the inventory bucket matching the catalog row kind. */
 export function appendEquipmentEntry(
@@ -68,7 +103,7 @@ export function appendEquipmentEntry(
   equipment: Equipment,
   entry: CharacterEquipmentEntry,
 ): CharacterEquipment {
-  const bucket = EQUIPMENT_KIND_TO_BUCKET[equipment.kind]
+  const bucket = inventoryBucketForEquipment(equipment)
   return {
     ...inventory,
     [bucket]: [...inventory[bucket], entry],

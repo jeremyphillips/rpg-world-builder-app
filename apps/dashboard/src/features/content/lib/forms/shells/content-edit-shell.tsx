@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom'
-import { Heading, Spinner, Text } from '@rpg/ui'
+import type { ContentSource, ContentTypeKey } from '@rpg/contracts'
+import { Button, Heading, Spinner, Text } from '@rpg/ui'
 import type { DefaultValues, FieldValues, UseFormReturn } from 'react-hook-form'
 import type { ZodType } from 'zod'
 
@@ -18,6 +19,9 @@ import {
   ContentFormLayout,
 } from './content-form-shell-layout'
 import { ContentAuthoringGate } from './content-authoring-gate'
+import { ContentDeletionBlockedDialog } from '../../delete/content-deletion-blocked-dialog.client'
+import { ContentDeletionConfirmDialog } from '../../delete/content-deletion-confirm-dialog.client'
+import { useContentDeleteFlow } from '../../delete/use-content-delete-flow.client'
 
 export interface ContentEditShellProps {
   /** Route key identifying the content type (e.g. `'species'`). */
@@ -33,6 +37,10 @@ export interface ContentEditShellProps {
   heading?: (name: string) => string
   /** Href for "Cancel" and post-submit navigation (typically the detail page). */
   backHref: string
+  /** Href for post-delete navigation (typically the type overview). */
+  overviewHref: string
+  /** Content type key for delete copy and API routing. */
+  contentTypeKey: ContentTypeKey
   /** Merged into the form layout context (e.g. family-scoped equipment kind). */
   formCtx?: Partial<ContentFormCtx>
 }
@@ -44,6 +52,8 @@ interface ContentEditFormProps {
   notFoundLabel?: string
   heading?: (name: string) => string
   backHref: string
+  overviewHref: string
+  contentTypeKey: ContentTypeKey
   formCtx?: Partial<ContentFormCtx>
 }
 
@@ -51,11 +61,15 @@ interface ContentEditFormReadyProps extends ContentEditFormProps {
   ctx: ContentFormCtx
 }
 
-interface ContentEditEntityFormProps<TEntity extends { id: string; name: string }> {
+interface ContentEditEntityFormProps<
+  TEntity extends { id: string; name: string; source: ContentSource },
+> {
   def: AnyContentFormDef
   entity: TEntity
   campaignId: string
   backHref: string
+  overviewHref: string
+  contentTypeKey: ContentTypeKey
   headingFn: (name: string) => string
   layoutCtx: ContentFormCtx
   schema: ZodType<FieldValues>
@@ -65,10 +79,14 @@ interface ContentEditEntityFormProps<TEntity extends { id: string; name: string 
   onSubmit: (values: FieldValues, form: UseFormReturn<FieldValues>) => Promise<void>
 }
 
-function ContentEditEntityForm<TEntity extends { id: string; name: string }>({
+function ContentEditEntityForm<
+  TEntity extends { id: string; name: string; source: ContentSource },
+>({
   entity,
   campaignId,
   backHref,
+  overviewHref,
+  contentTypeKey,
   headingFn,
   def,
   layoutCtx,
@@ -79,13 +97,37 @@ function ContentEditEntityForm<TEntity extends { id: string; name: string }>({
   onSubmit,
 }: ContentEditEntityFormProps<TEntity>) {
   useSetBreadcrumbLabel(entity.name)
+  const deleteFlow = useContentDeleteFlow({
+    def,
+    campaignId,
+    entityId: entity.id,
+    entityName: entity.name,
+    entitySource: entity.source,
+    contentTypeKey,
+    overviewHref,
+  })
+
+  const headerError = deleteFlow.deleteError ?? formError
 
   return (
     <ContentAuthoringGate campaignId={campaignId}>
       <NarrowPage spacing="relaxed" className="pb-10">
-        <Heading variant="page" as="h1">
-          {headingFn(entity.name)}
-        </Heading>
+        <div className="flex items-start justify-between gap-4">
+          <Heading variant="page" as="h1">
+            {headingFn(entity.name)}
+          </Heading>
+          {deleteFlow.canDelete ? (
+            <Button
+              type="button"
+              variant="destructive"
+              size="sm"
+              disabled={deleteFlow.deletePending}
+              onClick={() => void deleteFlow.handleDeleteClick()}
+            >
+              {deleteFlow.checkingAvailability ? 'Checking…' : 'Delete'}
+            </Button>
+          ) : null}
+        </div>
 
         <ContentFormLayout
           def={def}
@@ -96,10 +138,25 @@ function ContentEditEntityForm<TEntity extends { id: string; name: string }>({
           backHref={backHref}
           submitLabel="Save changes"
           submitPending={submitPending}
-          formError={formError}
+          formError={headerError}
           onSubmit={onSubmit}
         />
       </NarrowPage>
+
+      <ContentDeletionConfirmDialog
+        open={deleteFlow.confirmOpen}
+        onOpenChange={deleteFlow.setConfirmOpen}
+        contentTypeKey={contentTypeKey}
+        entityName={entity.name}
+        onConfirm={() => void deleteFlow.handleConfirmDelete()}
+      />
+
+      <ContentDeletionBlockedDialog
+        open={deleteFlow.blockedOpen}
+        onOpenChange={deleteFlow.setBlockedOpen}
+        entityName={entity.name}
+        blockers={deleteFlow.blockers}
+      />
     </ContentAuthoringGate>
   )
 }
@@ -111,6 +168,8 @@ function ContentEditFormReady({
   notFoundLabel = 'Item not found.',
   heading: headingFn = (name) => `Edit ${name}`,
   backHref,
+  overviewHref,
+  contentTypeKey,
   formCtx,
   ctx,
 }: ContentEditFormReadyProps) {
@@ -141,6 +200,8 @@ function ContentEditFormReady({
       entity={entity}
       campaignId={campaignId}
       backHref={backHref}
+      overviewHref={overviewHref}
+      contentTypeKey={contentTypeKey}
       headingFn={headingFn}
       layoutCtx={layoutCtx}
       schema={schema}
@@ -190,6 +251,8 @@ export function ContentEditShell({
   notFoundLabel,
   heading,
   backHref,
+  overviewHref,
+  contentTypeKey,
   formCtx,
 }: ContentEditShellProps) {
   if (isPending) {
@@ -222,6 +285,8 @@ export function ContentEditShell({
       notFoundLabel={notFoundLabel}
       heading={heading}
       backHref={backHref}
+      overviewHref={overviewHref}
+      contentTypeKey={contentTypeKey}
       formCtx={formCtx}
     />
   )

@@ -43,6 +43,8 @@ export function EquipmentEdit({ family }: EquipmentEditProps) {
       loadErrorLabel={formatContentListLoadErrorMessage('equipment')}
       notFoundLabel={formatContentNotFoundMessage('equipment')}
       backHref={ROUTES.content.equipment.detail(campaignId, family, equipmentId)}
+      overviewHref={ROUTES.content.equipment.family(campaignId, family)}
+      contentTypeKey="equipment"
       formCtx={expectedKind ? { equipmentKind: expectedKind, equipmentFamily: family } : undefined}
     />
   )

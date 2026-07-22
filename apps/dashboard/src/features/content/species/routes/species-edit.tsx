@@ -27,6 +27,8 @@ export function SpeciesEdit() {
       loadErrorLabel={formatContentListLoadErrorMessage('species')}
       notFoundLabel={formatContentNotFoundMessage('species')}
       backHref={ROUTES.content.species.detail(campaignId, speciesId)}
+      overviewHref={ROUTES.content.species.overview(campaignId)}
+      contentTypeKey="species"
     />
   )
 }

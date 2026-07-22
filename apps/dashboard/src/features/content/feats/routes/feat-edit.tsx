@@ -27,6 +27,8 @@ export function FeatEdit() {
       loadErrorLabel={formatContentListLoadErrorMessage('feats')}
       notFoundLabel={formatContentNotFoundMessage('feats')}
       backHref={ROUTES.content.feats.detail(campaignId, featId)}
+      overviewHref={ROUTES.content.feats.overview(campaignId)}
+      contentTypeKey="feats"
     />
   )
 }

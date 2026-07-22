@@ -1,6 +1,13 @@
 import type { UseQueryResult } from '@tanstack/react-query'
 
-import { patchJson, postJson } from '@/lib/api-client'
+import {
+  ApiError,
+  contentDeletionAvailabilitySchema,
+  contentDeletionResultSchema,
+  fetchCsrfToken,
+} from '@rpg/contracts'
+
+import { CSRF_HEADER, patchJson, postJson } from '@/lib/api-client'
 
 /**
  * POST to `/api/campaigns/:campaignId/content/:routeKey`.
@@ -43,6 +50,64 @@ export async function updateContent<T>(
   )
   const [entity] = Object.values(body)
   return entity as T
+}
+
+/** GET `/api/campaigns/:campaignId/content/:routeKey/:entityId/deletion-availability`. */
+export async function getContentDeletionAvailability(
+  campaignId: string,
+  routeKey: string,
+  entityId: string,
+  fallbackMessage?: string,
+): Promise<ReturnType<typeof contentDeletionAvailabilitySchema.parse>> {
+  const csrfToken = await fetchCsrfToken()
+  const res = await fetch(
+    `/api/campaigns/${campaignId}/content/${routeKey}/${entityId}/deletion-availability`,
+    {
+      credentials: 'include',
+      headers: { [CSRF_HEADER]: csrfToken },
+    },
+  )
+  const body = (await res.json().catch(() => null)) as {
+    availability?: unknown
+    error?: { code?: string; message?: string }
+  } | null
+  if (!res.ok) {
+    throw new ApiError(
+      res.status,
+      body?.error?.code ?? 'request_error',
+      body?.error?.message ?? fallbackMessage ?? 'Could not check deletion availability.',
+    )
+  }
+  return contentDeletionAvailabilitySchema.parse(body?.availability)
+}
+
+/** DELETE `/api/campaigns/:campaignId/content/:routeKey/:entityId`. Parses blocked 409 bodies. */
+export async function deleteContent(
+  campaignId: string,
+  routeKey: string,
+  entityId: string,
+  fallbackMessage?: string,
+): Promise<ReturnType<typeof contentDeletionResultSchema.parse>> {
+  const csrfToken = await fetchCsrfToken()
+  const res = await fetch(`/api/campaigns/${campaignId}/content/${routeKey}/${entityId}`, {
+    method: 'DELETE',
+    credentials: 'include',
+    headers: { [CSRF_HEADER]: csrfToken },
+  })
+  const body = (await res.json().catch(() => null)) as {
+    result?: unknown
+    error?: { code?: string; message?: string }
+  } | null
+
+  if (res.status === 200 || res.status === 409) {
+    return contentDeletionResultSchema.parse(body?.result)
+  }
+
+  throw new ApiError(
+    res.status,
+    body?.error?.code ?? 'request_error',
+    body?.error?.message ?? fallbackMessage ?? `Could not delete ${routeKey}.`,
+  )
 }
 
 /** Placeholder type so ContentFormDef can reference the list query shape generically. */
