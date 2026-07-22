@@ -4,6 +4,7 @@ import { describe, expect, it } from 'vitest'
 import { CHILL_TOUCH_RESOLUTION, ELDRITCH_BLAST_RESOLUTION } from '@rpg/contracts'
 
 import { CSRF_HEADER } from '../../lib/cookies'
+import { CampaignMembershipModel } from '../campaign/campaign-membership.model'
 import { createTestCampaign, registerAndLoginTestUser } from '../../test/auth-agent'
 import { minimalNpcRequestInput } from '../../test/fixtures/npcs'
 import { useIntegrationApp } from '../../test/setup/integration-app'
@@ -81,6 +82,89 @@ describe('content list routes', () => {
     await request(getApp())
       .get('/api/campaigns/000000000000000000000000/content/classes')
       .expect(401)
+  })
+})
+
+describe('content draft visibility', () => {
+  const minimalFeatInput = {
+    slug: 'draft-visibility-feat',
+    name: 'Draft Visibility Feat',
+    category: 'origin' as const,
+    repeatable: { allowed: false },
+  }
+
+  async function addCampaignMember(
+    campaignId: string,
+    email: string,
+    campaignRole: 'pc' | 'observer',
+  ) {
+    const member = await registerAndLoginTestUser(getApp(), {
+      email,
+      password: 'supersecret',
+      displayName: 'Campaign Member',
+    })
+    const meRes = await member.agent
+      .get('/api/auth/me')
+      .set(CSRF_HEADER, member.csrfToken)
+      .expect(200)
+    await CampaignMembershipModel.create({
+      campaignId,
+      userId: meRes.body.user.id as string,
+      campaignRole,
+      characterIds: [],
+      invitedAt: new Date(),
+      joinedAt: new Date(),
+    })
+    return member
+  }
+
+  it('includes drafts in list responses for campaign managers', async () => {
+    const { agent, csrfToken } = await registerAndLoginTestUser(getApp(), {
+      email: 'draft-owner@example.com',
+      password: 'supersecret',
+      displayName: 'Owner',
+    })
+    const campaignId = await createTestCampaign(agent, csrfToken)
+
+    const createRes = await agent
+      .post(`/api/campaigns/${campaignId}/content/feats`)
+      .set(CSRF_HEADER, csrfToken)
+      .send({ ...minimalFeatInput, status: 'draft' })
+      .expect(201)
+
+    const draftId = createRes.body.feats.id as string
+
+    const listRes = await agent
+      .get(`/api/campaigns/${campaignId}/content/feats`)
+      .set(CSRF_HEADER, csrfToken)
+      .expect(200)
+
+    expect(listRes.body.feats.some((feat: { id: string }) => feat.id === draftId)).toBe(true)
+  })
+
+  it('excludes drafts from list responses for non-manager campaign members', async () => {
+    const owner = await registerAndLoginTestUser(getApp(), {
+      email: 'draft-owner-2@example.com',
+      password: 'supersecret',
+      displayName: 'Owner',
+    })
+    const campaignId = await createTestCampaign(owner.agent, owner.csrfToken)
+
+    const createRes = await owner.agent
+      .post(`/api/campaigns/${campaignId}/content/feats`)
+      .set(CSRF_HEADER, owner.csrfToken)
+      .send({ ...minimalFeatInput, slug: 'draft-hidden-feat', status: 'draft' })
+      .expect(201)
+
+    const draftId = createRes.body.feats.id as string
+    const member = await addCampaignMember(campaignId, 'draft-pc@example.com', 'pc')
+
+    const listRes = await member.agent
+      .get(`/api/campaigns/${campaignId}/content/feats`)
+      .set(CSRF_HEADER, member.csrfToken)
+      .expect(200)
+
+    expect(listRes.body.feats.some((feat: { id: string }) => feat.id === draftId)).toBe(false)
   })
 })
 

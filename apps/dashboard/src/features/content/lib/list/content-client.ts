@@ -2,6 +2,8 @@ import type { UseQueryResult } from '@tanstack/react-query'
 
 import {
   ApiError,
+  contentDemotionAvailabilitySchema,
+  contentDemotionResultSchema,
   contentDeletionAvailabilitySchema,
   contentDeletionResultSchema,
   fetchCsrfToken,
@@ -107,6 +109,91 @@ export async function deleteContent(
     res.status,
     body?.error?.code ?? 'request_error',
     body?.error?.message ?? fallbackMessage ?? `Could not delete ${routeKey}.`,
+  )
+}
+
+/** POST `/api/campaigns/:campaignId/content/:routeKey/:entityId/publish`. */
+export async function publishContent<T>(
+  campaignId: string,
+  routeKey: string,
+  entityId: string,
+  fallbackMessage?: string,
+): Promise<T> {
+  const csrfToken = await fetchCsrfToken()
+  const res = await fetch(`/api/campaigns/${campaignId}/content/${routeKey}/${entityId}/publish`, {
+    method: 'POST',
+    credentials: 'include',
+    headers: { [CSRF_HEADER]: csrfToken },
+  })
+  const body = (await res.json().catch(() => null)) as Record<string, T> & {
+    error?: { code?: string; message?: string }
+  }
+  if (!res.ok) {
+    throw new ApiError(
+      res.status,
+      body?.error?.code ?? 'request_error',
+      body?.error?.message ?? fallbackMessage ?? `Could not publish ${routeKey}.`,
+    )
+  }
+  const [entity] = Object.values(body).filter((value) => value != null && typeof value === 'object')
+  return entity as T
+}
+
+/** GET `/api/campaigns/:campaignId/content/:routeKey/:entityId/demotion-availability`. */
+export async function getContentDemotionAvailability(
+  campaignId: string,
+  routeKey: string,
+  entityId: string,
+  fallbackMessage?: string,
+): Promise<ReturnType<typeof contentDemotionAvailabilitySchema.parse>> {
+  const csrfToken = await fetchCsrfToken()
+  const res = await fetch(
+    `/api/campaigns/${campaignId}/content/${routeKey}/${entityId}/demotion-availability`,
+    {
+      credentials: 'include',
+      headers: { [CSRF_HEADER]: csrfToken },
+    },
+  )
+  const body = (await res.json().catch(() => null)) as {
+    availability?: unknown
+    error?: { code?: string; message?: string }
+  } | null
+  if (!res.ok) {
+    throw new ApiError(
+      res.status,
+      body?.error?.code ?? 'request_error',
+      body?.error?.message ?? fallbackMessage ?? 'Could not check demotion availability.',
+    )
+  }
+  return contentDemotionAvailabilitySchema.parse(body?.availability)
+}
+
+/** POST `/api/campaigns/:campaignId/content/:routeKey/:entityId/demote`. */
+export async function demoteContent(
+  campaignId: string,
+  routeKey: string,
+  entityId: string,
+  fallbackMessage?: string,
+): Promise<ReturnType<typeof contentDemotionResultSchema.parse>> {
+  const csrfToken = await fetchCsrfToken()
+  const res = await fetch(`/api/campaigns/${campaignId}/content/${routeKey}/${entityId}/demote`, {
+    method: 'POST',
+    credentials: 'include',
+    headers: { [CSRF_HEADER]: csrfToken },
+  })
+  const body = (await res.json().catch(() => null)) as {
+    result?: unknown
+    error?: { code?: string; message?: string }
+  } | null
+
+  if (res.status === 200 || res.status === 409) {
+    return contentDemotionResultSchema.parse(body?.result)
+  }
+
+  throw new ApiError(
+    res.status,
+    body?.error?.code ?? 'request_error',
+    body?.error?.message ?? fallbackMessage ?? `Could not demote ${routeKey}.`,
   )
 }
 

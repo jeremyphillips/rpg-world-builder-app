@@ -1,4 +1,9 @@
-import { formatEquipmentCostLabel, moneyToCp, type EquipmentCost } from '@rpg/contracts'
+import {
+  formatEquipmentCostLabel,
+  moneyToCp,
+  type ContentStatus,
+  type EquipmentCost,
+} from '@rpg/contracts'
 import { dataTableColumnMeta, dataTableWidthMeta, SortableHeader } from '@rpg/ui'
 import type { ColumnDef, FilterDef } from '@rpg/ui'
 
@@ -10,6 +15,7 @@ import {
 
 import { getContentImageUrl } from '../detail/content-image-url'
 import { CONTENT_SOURCE_BADGE, type ContentSource } from './content-source-badge'
+import { ContentStatusNameBadge } from './content-status-name-badge.client'
 
 /**
  * Minimum shape every content type shares. Used to constrain the generic
@@ -19,6 +25,7 @@ export type ContentBase = {
   imageKey?: string
   name: string
   source: ContentSource
+  status: ContentStatus
 }
 
 const BASE_NAME_FILTER: FilterDef = {
@@ -35,6 +42,17 @@ const BASE_SOURCE_FILTER: FilterDef = {
   options: [
     { label: 'System', value: 'system' },
     { label: 'Homebrew', value: 'homebrew' },
+  ],
+  group: 'secondary',
+}
+
+const BASE_STATUS_FILTER: FilterDef = {
+  type: 'select',
+  id: 'status',
+  label: 'Status',
+  options: [
+    { label: 'Draft', value: 'draft' },
+    { label: 'Published', value: 'published' },
   ],
   group: 'secondary',
 }
@@ -104,6 +122,8 @@ export function buildContentColumns<T extends ContentBase>(
     accessorKey: 'name',
     locked: true,
     nameHref,
+    nameSuffix: (row) =>
+      row.status === 'draft' ? <ContentStatusNameBadge status="draft" /> : null,
   })
 
   const sourceColumn = buildSourceColumn<T, ContentSource>({
@@ -122,5 +142,5 @@ export function buildContentColumns<T extends ContentBase>(
  * const filters = buildContentFilters([hitDieFilter, spellcastingFilter])
  */
 export function buildContentFilters(contentFilters: FilterDef[]): FilterDef[] {
-  return [BASE_NAME_FILTER, ...contentFilters, BASE_SOURCE_FILTER]
+  return [BASE_NAME_FILTER, ...contentFilters, BASE_SOURCE_FILTER, BASE_STATUS_FILTER]
 }

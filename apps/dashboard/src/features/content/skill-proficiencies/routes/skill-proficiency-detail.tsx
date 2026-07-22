@@ -13,6 +13,7 @@ import { WidePage } from '@/components/layout/wide-page'
 import { useClasses } from '../../classes/hooks/use-classes'
 import { useSkillProficiencies } from '../hooks/use-skill-proficiencies'
 import { ContentDetailLayout } from '../../lib/detail/content-detail-layout'
+import { ContentStatusNameBadge } from '../../lib/overview/content-status-name-badge.client'
 import { ContentDetailResolver } from '../../lib/detail/content-detail-resolver'
 import { contentEditHref } from '../../lib/detail/content-edit-href'
 import { ContentStatRow } from '../../lib/detail/content-stat-row.client'
@@ -91,6 +92,7 @@ export function SkillDetailContent({ skill, campaignId, skillId }: SkillDetailCo
     <WidePage>
       <ContentDetailLayout
         name={skill.name}
+        nameBadge={<ContentStatusNameBadge status={skill.status} />}
         imageUrl={getContentImageUrl(skill.imageKey)}
         imageName={skill.name}
         campaignId={campaignId}

@@ -1,6 +1,6 @@
 import type { Request, Response } from 'express'
 
-import { contentStatusSchema } from '@rpg/contracts'
+import { CAMPAIGN_MANAGE_ROLES, contentStatusSchema, type CampaignManageRole } from '@rpg/contracts'
 
 import { HttpError } from '../../lib/http-error'
 import {
@@ -137,7 +137,11 @@ export async function listContent(req: Request, res: Response): Promise<void> {
   }
   const writeConfig = getContentWriteConfig(contentType)!
   const items = await resolveContentForCampaign(contentType, campaignId)
-  res.status(200).json({ [writeConfig.responseKey]: items })
+  const role = req.campaignMembership!.campaignRole
+  const visible = CAMPAIGN_MANAGE_ROLES.includes(role as CampaignManageRole)
+    ? items
+    : items.filter((item) => item.status !== 'draft')
+  res.status(200).json({ [writeConfig.responseKey]: visible })
 }
 
 export async function getHomebrewSummary(req: Request, res: Response): Promise<void> {

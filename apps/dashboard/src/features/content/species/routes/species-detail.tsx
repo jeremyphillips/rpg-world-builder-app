@@ -23,6 +23,7 @@ import {
 } from '../lib/species-display'
 import { useSpecies } from '../hooks/use-species'
 import { ContentDetailLayout } from '../../lib/detail/content-detail-layout'
+import { ContentStatusNameBadge } from '../../lib/overview/content-status-name-badge.client'
 import { ContentDetailResolver } from '../../lib/detail/content-detail-resolver'
 import { contentEditHref } from '../../lib/detail/content-edit-href'
 import { getContentImageUrl } from '../../lib/detail/content-image-url'
@@ -126,6 +127,7 @@ export function SpeciesDetailContent({ species, campaignId }: SpeciesDetailConte
     <WidePage>
       <ContentDetailLayout
         name={species.name}
+        nameBadge={<ContentStatusNameBadge status={species.status} />}
         imageUrl={getContentImageUrl(species.imageKey)}
         imageName={species.name}
         campaignId={campaignId}

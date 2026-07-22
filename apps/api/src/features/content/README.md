@@ -62,15 +62,25 @@ Each content type contributes only a body schema (in `@rpg/contracts`) + a
 `*.config.ts` exporting a `*Registration` (`read` + `write`, optional
 `resolveForCampaign`), registered once in `content-types.ts`.
 
-- `POST /api/campaigns/:campaignId/content/:contentType` — create homebrew
+- `POST /api/campaigns/:campaignId/content/:contentType` — create homebrew (`status` in request body; defaults to `published`)
 - `PATCH /api/campaigns/:campaignId/content/:contentType/:entityId` — update
   homebrew or upsert a system overlay patch (owner/co-owner only)
+- `POST /api/campaigns/:campaignId/content/:contentType/:entityId/publish` —
+  promote a homebrew draft to published (owner/co-owner only)
+- `GET /api/campaigns/:campaignId/content/:contentType/:entityId/demotion-availability` —
+  advisory demote preflight (owner/co-owner only)
+- `POST /api/campaigns/:campaignId/content/:contentType/:entityId/demote` —
+  demote published homebrew to draft (owner/co-owner only; `409` when blocked)
 - `GET /api/campaigns/:campaignId/content/:contentType/:entityId/deletion-availability` —
   advisory delete preflight (owner/co-owner only)
 - `DELETE /api/campaigns/:campaignId/content/:contentType/:entityId` — delete homebrew
   (owner/co-owner only; `409` when blocked by character usage)
 
-See `lib/content-write.service.ts` and each type's `*Registration.write` in `*.config.ts`.
+`GET /api/campaigns/:campaignId/content/:contentType` filters `status: 'draft'` records
+for campaign members who are not `owner`/`co-owner`.
+
+See `lib/content-write.service.ts`, `lib/content-status.service.ts`, and each type's
+`*Registration.write` in `*.config.ts`.
 
 ### Write baseline regression (all six types)
 

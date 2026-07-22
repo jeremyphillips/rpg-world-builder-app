@@ -3,6 +3,10 @@
 
 export { Form, type FormProps } from './shells/form.client'
 export {
+  useSchemaFormSubmit,
+  type SchemaFormSubmitHandler,
+} from './shells/schema-form-shell.client'
+export {
   FormItems,
   type FormItemsProps,
   SlotFieldRenderer,

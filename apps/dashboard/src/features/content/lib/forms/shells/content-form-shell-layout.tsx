@@ -43,17 +43,20 @@ export function ContentFormNotRegistered({ heading = 'Edit' }: { heading?: strin
   )
 }
 
-interface ContentFormFooterShellProps {
+interface ContentFormFooterShellProps<TFormValues extends FieldValues = FieldValues> {
   formMode: 'create' | 'edit'
   backHref?: string
   submitLabel: string
   submitPending: boolean
   submitSuccess?: boolean
+  onSaveDraft?: (values: TFormValues, form: UseFormReturn<TFormValues>) => void | Promise<void>
+  saveDraftPending?: boolean
+  publishSuccess?: boolean
 }
 
 interface ContentSchemaFormProps<
   TFormValues extends FieldValues,
-> extends ContentFormFooterShellProps {
+> extends ContentFormFooterShellProps<TFormValues> {
   schema: ZodType<TFormValues>
   fields: FormItem[]
   defaultValues?: DefaultValues<TFormValues>
@@ -83,6 +86,9 @@ function ContentSchemaForm<TFormValues extends FieldValues>({
   valueSyncs,
   beforeSubmit,
   submitConfirmDialog,
+  onSaveDraft,
+  saveDraftPending,
+  publishSuccess,
 }: ContentSchemaFormProps<TFormValues>) {
   const handleSubmit = React.useCallback(
     async (values: TFormValues, form: UseFormReturn<TFormValues>) => {
@@ -115,6 +121,9 @@ function ContentSchemaForm<TFormValues extends FieldValues>({
             submitLabel={submitLabel}
             pending={submitPending || form.formState.isSubmitting}
             isSuccess={submitSuccess}
+            onSaveDraft={onSaveDraft}
+            saveDraftPending={saveDraftPending}
+            publishSuccess={publishSuccess}
           />
         )}
       />
@@ -125,7 +134,7 @@ function ContentSchemaForm<TFormValues extends FieldValues>({
 
 interface ContentTabbedSchemaFormProps<
   TFormValues extends FieldValues,
-> extends ContentFormFooterShellProps {
+> extends ContentFormFooterShellProps<TFormValues> {
   schema: ZodType<TFormValues>
   tabs: TabbedFormTab[]
   defaultValues?: DefaultValues<TFormValues>
@@ -155,6 +164,9 @@ function ContentTabbedSchemaForm<TFormValues extends FieldValues>({
   valueSyncs,
   beforeSubmit,
   submitConfirmDialog,
+  onSaveDraft,
+  saveDraftPending,
+  publishSuccess,
 }: ContentTabbedSchemaFormProps<TFormValues>) {
   const handleSubmit = React.useCallback(
     async (values: TFormValues, form: UseFormReturn<TFormValues>) => {
@@ -186,6 +198,9 @@ function ContentTabbedSchemaForm<TFormValues extends FieldValues>({
             submitLabel={submitLabel}
             pending={submitPending || form.formState.isSubmitting}
             isSuccess={submitSuccess}
+            onSaveDraft={onSaveDraft}
+            saveDraftPending={saveDraftPending}
+            publishSuccess={publishSuccess}
           />
         )}
       />
@@ -208,6 +223,9 @@ interface ContentFormLayoutProps<TFormValues extends FieldValues> {
   submitSuccess?: boolean
   formError: string | null
   onSubmit: (values: TFormValues, form: UseFormReturn<TFormValues>) => Promise<void>
+  onSaveDraft?: (values: TFormValues, form: UseFormReturn<TFormValues>) => Promise<void>
+  saveDraftPending?: boolean
+  publishSuccess?: boolean
 }
 
 export function ContentFormLayout<TFormValues extends FieldValues>({
@@ -224,6 +242,9 @@ export function ContentFormLayout<TFormValues extends FieldValues>({
   submitSuccess,
   formError,
   onSubmit,
+  onSaveDraft,
+  saveDraftPending,
+  publishSuccess,
 }: ContentFormLayoutProps<TFormValues>) {
   const isWeaponEquipmentForm = def.routeKey === 'equipment' && ctx.equipmentKind === 'weapon'
   const isSpellForm = def.routeKey === 'spells'
@@ -257,6 +278,9 @@ export function ContentFormLayout<TFormValues extends FieldValues>({
     submitSuccess,
     formError,
     onSubmit: resolvedOnSubmit,
+    onSaveDraft,
+    saveDraftPending,
+    publishSuccess,
     valueSyncs,
     submitConfirmDialog: isWeaponEquipmentForm ? confirmDialog : undefined,
   }

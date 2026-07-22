@@ -13,6 +13,7 @@ import { useClasses } from '../hooks/use-classes'
 import { useSubclasses } from '../hooks/use-subclasses'
 import { useSkillProficiencies } from '../../skill-proficiencies/hooks/use-skill-proficiencies'
 import { ContentDetailLayout } from '../../lib/detail/content-detail-layout'
+import { ContentStatusNameBadge } from '../../lib/overview/content-status-name-badge.client'
 import { ContentDetailResolver } from '../../lib/detail/content-detail-resolver'
 import { contentEditHref } from '../../lib/detail/content-edit-href'
 import { getContentImageUrl } from '../../lib/detail/content-image-url'
@@ -172,6 +173,7 @@ export function ClassDetailContent({
     <WidePage spacing="relaxed">
       <ContentDetailLayout
         name={characterClass.name}
+        nameBadge={<ContentStatusNameBadge status={characterClass.status} />}
         imageUrl={getContentImageUrl(characterClass.imageKey)}
         imageName={characterClass.name}
         campaignId={campaignId}

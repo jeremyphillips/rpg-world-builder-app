@@ -28,6 +28,11 @@ describe('findContentEditEntity', () => {
     expect(findContentEditEntity(entities, 'b')).toEqual({ id: 'b', name: 'Beta' })
   })
 
+  it('returns undefined when a draft is absent from the cached list', () => {
+    const entities = [{ id: 'pub-1', name: 'Published only', status: 'published' as const }]
+    expect(findContentEditEntity(entities, 'draft-1')).toBeUndefined()
+  })
+
   it('returns undefined when the list is missing or empty', () => {
     expect(findContentEditEntity(undefined, 'a')).toBeUndefined()
     expect(findContentEditEntity([], 'a')).toBeUndefined()
