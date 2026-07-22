@@ -1,6 +1,7 @@
 import type {
   Campaign,
   CampaignListItem,
+  CampaignTemplate,
   CreateCampaignInput,
   UpdateCampaignInput,
   SessionUser,
@@ -16,6 +17,16 @@ export async function createCampaign(input: CreateCampaignInput): Promise<Campai
     'Could not create campaign.',
   )
   return campaign
+}
+
+/** List shipped templates available to campaign creation. */
+export async function listCampaignTemplates(): Promise<CampaignTemplate[]> {
+  const { campaignTemplates } = await request<{ campaignTemplates: CampaignTemplate[] }>(
+    '/api/campaigns/templates',
+    undefined,
+    'Could not load campaign templates.',
+  )
+  return campaignTemplates
 }
 
 /** Update a campaign's identity, settings, or flavor, or throw `ApiError` on failure. */

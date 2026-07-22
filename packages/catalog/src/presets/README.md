@@ -1,0 +1,43 @@
+# Campaign presets
+
+Campaign presets are product-owned starting points, not rules content. They stay
+under this tree even when their `rulesetId` targets the shipped SRD catalog.
+
+## Collections
+
+- `campaign-templates/` contains discoverable campaign-creation defaults.
+- `world-seed-packs/` reserves the pipeline for independently versioned world
+  content. Its data file is empty and its contract is descriptor-only for now.
+
+Each collection has a validated JSON file and a narrow package export. The
+aggregate `@rpg/catalog/presets` export validates collection uniqueness and
+template-to-pack references at module load.
+
+`resolveCampaignCreationPreset()` is the write-free materialization boundary. It
+resolves the selected template, rejects incompatible rulesets, applies sparse
+defaults, and returns referenced seed-pack descriptors. Explicit create input
+wins over template defaults; nested character-creation objects merge while
+arrays replace defaults wholesale.
+
+Created campaigns retain release provenance (template id/version and applied
+pack id/version pairs), while the materialized defaults remain ordinary
+campaign state. Updating a shipped preset therefore affects only later campaign
+creation and never rewrites existing campaigns.
+
+The API currently fails closed if a template references a world seed pack. When
+the first typed contents field lands, replace that guard with the corresponding
+idempotent content writer rather than silently skipping a pack.
+
+Until that first typed content model exists, keep the pack collection empty. Do
+not add generic seed payloads or activate partial materialization.
+
+## Versioning
+
+Every record has stable `metadata.id` and a semantic `metadata.version`. Increment
+the version when shipped authored data or defaults change. Schema changes follow
+the repository contracts directly; do not add per-file schema-version transforms
+while the project remains dev-only.
+
+When organizations land, extend `worldSeedPackSchema` with a typed contents field
+and keep references between seeded records explicit. Do not use an untyped data
+bag as an interim format.

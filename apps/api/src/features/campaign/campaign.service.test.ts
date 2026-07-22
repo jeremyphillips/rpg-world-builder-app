@@ -6,6 +6,7 @@ import { CampaignMembershipModel } from './campaign-membership.model'
 import {
   createCampaign,
   isCampaignMember,
+  listCampaignTemplates,
   listCampaignsForUser,
   updateCampaign,
 } from './campaign.service'
@@ -46,6 +47,62 @@ describe('createCampaign', () => {
       startingLevel: 3,
       importedCharacters: { policy: 'approval_required' },
     })
+  })
+
+  it('materializes a selected campaign template before persistence', async () => {
+    const owner = await makeTestUser({ email: 'template-owner@example.com' })
+
+    const campaign = await createCampaign({
+      name: 'The Argent Road',
+      createdBy: owner.id,
+      campaignTemplateId: 'classic-adventure',
+      flavor: { mood: ['gritty'] },
+    })
+
+    expect(campaign).toMatchObject({
+      identity: { name: 'The Argent Road' },
+      rulesetId: 'srd-cc-5.2.1',
+      presetProvenance: {
+        campaignTemplate: { id: 'classic-adventure', version: '1.0.0' },
+        worldSeedPacks: [],
+      },
+      configuration: {
+        flavor: {
+          playStyle: ['exploration', 'roleplay_driven'],
+          mood: ['gritty'],
+          magicLevel: 'standard_fantasy',
+          difficulty: 'dangerous',
+        },
+      },
+    })
+  })
+
+  it('does not attach preset provenance to a blank campaign', async () => {
+    const owner = await makeTestUser({ email: 'blank-owner@example.com' })
+    const campaign = await createCampaign({ name: 'Blank', createdBy: owner.id })
+
+    expect(campaign).not.toHaveProperty('presetProvenance')
+  })
+
+  it('rejects an unknown campaign template before persistence', async () => {
+    await expect(
+      createCampaign({
+        name: 'Unknown Template',
+        createdBy: 'user-id',
+        campaignTemplateId: 'missing',
+      }),
+    ).rejects.toMatchObject({ status: 400, code: 'bad_request' })
+  })
+})
+
+describe('listCampaignTemplates', () => {
+  it('returns the validated shipped template descriptors and defaults', () => {
+    expect(listCampaignTemplates()).toMatchObject([
+      {
+        metadata: { id: 'classic-adventure', version: '1.0.0' },
+        rulesetId: 'srd-cc-5.2.1',
+      },
+    ])
   })
 })
 

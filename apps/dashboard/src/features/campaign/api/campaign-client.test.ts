@@ -1,7 +1,12 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { ApiError } from '@rpg/contracts'
 
-import { createCampaign, listCampaigns, rememberSelectedCampaign } from './campaign-client'
+import {
+  createCampaign,
+  listCampaigns,
+  listCampaignTemplates,
+  rememberSelectedCampaign,
+} from './campaign-client'
 
 function fakeResponse(ok: boolean, status: number, body: unknown) {
   return { ok, status, json: async () => body } as unknown as Response
@@ -58,6 +63,26 @@ describe('listCampaigns', () => {
     const err = await listCampaigns().catch((e: unknown) => e)
     expect(err).toBeInstanceOf(ApiError)
     expect(err).toMatchObject({ status: 401, message: 'Nope.' })
+  })
+})
+
+describe('listCampaignTemplates', () => {
+  it('unwraps the shipped template collection', async () => {
+    stubFetch(
+      fakeResponse(true, 200, {
+        campaignTemplates: [{ metadata: { id: 'classic-adventure' } }],
+      }),
+    )
+
+    await expect(listCampaignTemplates()).resolves.toEqual([
+      { metadata: { id: 'classic-adventure' } },
+    ])
+  })
+
+  it('uses a template-specific fallback message', async () => {
+    stubFetch(fakeResponse(false, 500, null))
+
+    await expect(listCampaignTemplates()).rejects.toThrow('Could not load campaign templates.')
   })
 })
 

@@ -20,6 +20,19 @@ Player-owned PCs live under `/characters/*`, not under the campaign shell. See
 [character-acquisition.md](../../../docs/character-acquisition.md) for the
 acquisition model (axes, ownership, build/import finalization).
 
+## Campaign template pipeline
+
+- `GET /api/campaigns/templates` exposes the shipped, validated templates.
+- `listCampaignTemplates()` and `useCampaignTemplates()` feed the creation
+  chooser. Selecting a template remounts the wizard with its editable defaults;
+  switching back to blank clears those defaults.
+- `POST /api/campaigns` accepts optional `campaignTemplateId`; the API resolves
+  defaults before persistence, with explicit request values taking precedence.
+- The campaign snapshots the selected template id/version in
+  `presetProvenance`. This is informational: later catalog releases never
+  mutate an existing campaign.
+- Template discovery failure does not block blank campaign creation.
+
 ## NPC authoring
 
 - **Who:** `owner` and `co-owner` only (`useCanManageCampaign`, API

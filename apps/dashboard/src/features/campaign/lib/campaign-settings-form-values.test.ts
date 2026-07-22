@@ -309,10 +309,11 @@ describe('buildCreateCampaignInput', () => {
       importedCharactersPolicy: 'approval_required',
     }
 
-    expect(buildCreateCampaignInput(values, 'banner.webp')).toEqual({
+    expect(buildCreateCampaignInput(values, 'banner.webp', 'classic-adventure')).toEqual({
       name: 'Sunless Citadel',
       description: 'A classic dungeon delve.',
       imageKey: 'banner.webp',
+      campaignTemplateId: 'classic-adventure',
       characterCreation: {
         startingLevel: 3,
         importedCharacters: { policy: 'approval_required' },

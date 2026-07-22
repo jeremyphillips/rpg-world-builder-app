@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest'
+import { authoredContentBodySchema } from '../../primitives/authored-content'
 import {
   CONTENT_SOURCES,
+  contentBodyBaseSchema,
   contentMetaSchema,
   contentPatchBaseSchema,
   contentSourceSchema,
@@ -16,6 +18,12 @@ const systemMeta = {
   createdAt: '2026-01-01T00:00:00.000Z',
   updatedAt: '2026-01-01T00:00:00.000Z',
 } as const
+
+describe('contentBodyBaseSchema', () => {
+  it('aliases the neutral authored-content primitive', () => {
+    expect(contentBodyBaseSchema).toBe(authoredContentBodySchema)
+  })
+})
 
 describe('contentSourceSchema', () => {
   it('accepts every known source', () => {

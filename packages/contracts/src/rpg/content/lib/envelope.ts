@@ -1,4 +1,8 @@
 import { z } from 'zod'
+import {
+  authoredContentBodySchema,
+  type AuthoredContentBody,
+} from '../../primitives/authored-content'
 import { systemRulesetIdSchema } from '../../primitives/ruleset'
 
 // ---------------------------------------------------------------------------
@@ -63,23 +67,14 @@ export type ContentMeta = z.infer<typeof contentMetaSchema>
  * patch per record per campaign) is enforced at the Mongo/service layer.
  */
 /**
- * Shared editable base for every content type body. Each content type's body
- * schema extends this so that fields like `imageKey` are uniformly available
- * across classes, spells, monsters, etc. without being part of the ownership
- * envelope (`contentMetaSchema`).
- *
- * Add new cross-type body fields here — they propagate automatically to every
- * content type's patch schema via `<typeBodySchema>.partial()`.
+ * Catalog-facing alias for the neutral authored-content primitive. Catalog
+ * content types retain this name while campaign-owned world content and seed
+ * contracts can consume `authoredContentBodySchema` directly without adopting
+ * the catalog ownership envelope.
  */
-export const contentBodyBaseSchema = z.object({
-  /** Storage key for the content item's artwork. Resolve to a URL with `getAssetUrl`. */
-  imageKey: z.string().optional(),
-  name: z.string().min(1),
-  /** Rich-text HTML (TipTap / SRD prose). Render with `RichTextContent`. */
-  description: z.string().optional(),
-})
+export const contentBodyBaseSchema = authoredContentBodySchema
 
-export type ContentBodyBase = z.infer<typeof contentBodyBaseSchema>
+export type ContentBodyBase = AuthoredContentBody
 
 export const contentPatchBaseSchema = z.object({
   id: z.string().min(1),

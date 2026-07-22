@@ -323,6 +323,8 @@ export const <type>PatchSchema = contentPatchBaseSchema.extend({ patch: <type>Bo
 Rules:
 
 - Always extend `contentBodyBaseSchema` — never redefine `name`, `description`, `imageKey`.
+  It is the catalog-facing alias of the neutral `authoredContentBodySchema`; world
+  content and seed contracts use that primitive without adopting catalog ownership semantics.
 - `description` stores sanitized HTML; render catalog copy with `RichTextContent`.
 - Avoid `z.enum` for open lists (items, feature names). Use `z.string()` unless the engine branches on the value.
 - Name the stored type to avoid reserved words or collisions (e.g. `CharacterClass` not `Class`).

@@ -14,6 +14,7 @@ import * as controller from './campaign.controller'
 export const campaignRouter: Router = Router()
 
 campaignRouter.get('/', requireAuth, controller.list)
+campaignRouter.get('/templates', requireAuth, controller.listTemplates)
 campaignRouter.post('/', requireAuth, validate(createCampaignInputSchema), controller.create)
 campaignRouter.put(
   '/selection',

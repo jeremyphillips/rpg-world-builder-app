@@ -52,6 +52,14 @@
     {
       "fileMatch": ["packages/catalog/src/xp-progressions/data/**/xp-progressions.json"],
       "url": "./packages/contracts/generated/catalog-xp-progression-seed.schema.json"
+    },
+    {
+      "fileMatch": ["packages/catalog/src/presets/campaign-templates/data/campaign-templates.json"],
+      "url": "./packages/contracts/generated/catalog-campaign-template-list.schema.json"
+    },
+    {
+      "fileMatch": ["packages/catalog/src/presets/world-seed-packs/data/world-seed-packs.json"],
+      "url": "./packages/contracts/generated/catalog-world-seed-pack-list.schema.json"
     }
   ]
 }

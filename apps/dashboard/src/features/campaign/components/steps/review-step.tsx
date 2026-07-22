@@ -11,9 +11,10 @@ import {
 interface ReviewStepProps {
   /** Error message from the create-campaign mutation, if any. */
   error?: string | null
+  templateName?: string
 }
 
-export function ReviewStep({ error }: ReviewStepProps) {
+export function ReviewStep({ error, templateName }: ReviewStepProps) {
   const { accumulatedValues, complete } = useWizard()
   const values = accumulatedValues as Partial<CampaignCreateValues>
 
@@ -25,6 +26,13 @@ export function ReviewStep({ error }: ReviewStepProps) {
       }}
     >
       <div className="space-y-6">
+        {templateName ? (
+          <ReviewSection
+            id="review-starting-point"
+            heading="Starting point"
+            rows={[{ label: 'Template', value: templateName }]}
+          />
+        ) : null}
         <ReviewSection id="review-identity" heading="Identity" rows={buildIdentityRows(values)} />
         <ReviewSection id="review-rules" heading="Rules" rows={buildRulesRows(values)} />
         <ReviewSection id="review-flavor" heading="Flavor" rows={buildFlavorRows(values)} />

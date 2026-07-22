@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { getErrorMessage } from '@rpg/contracts'
 import { Heading, Wizard, type WizardStepDef } from '@rpg/ui'
 import { WizardStepForm } from '@rpg/ui/form'
@@ -25,6 +25,12 @@ import {
   type CampaignCreateValues,
 } from '../lib/campaign-settings-form-values'
 import { ReviewStep } from '../components/steps/review-step'
+import {
+  BLANK_CAMPAIGN_TEMPLATE_VALUE,
+  CampaignTemplateChooser,
+} from '../components/campaign-template-chooser.client'
+import { useCampaignTemplates } from '../hooks/use-campaign-templates'
+import { mapCampaignTemplateToCreateValues } from '../lib/campaign-template-form-values'
 
 const STEPS: WizardStepDef[] = [
   { id: 'identity', label: 'Identity' },
@@ -36,7 +42,18 @@ const STEPS: WizardStepDef[] = [
 export function CampaignCreate() {
   const { mutateAsync } = useCreateCampaign()
   const selectCampaign = useSelectCampaign()
+  const templatesQuery = useCampaignTemplates()
   const [createError, setCreateError] = useState<string | null>(null)
+  const [selectedTemplateId, setSelectedTemplateId] = useState(BLANK_CAMPAIGN_TEMPLATE_VALUE)
+
+  const selectedTemplate = useMemo(
+    () => templatesQuery.data?.find((template) => template.metadata.id === selectedTemplateId),
+    [selectedTemplateId, templatesQuery.data],
+  )
+  const initialValues = useMemo(
+    () => (selectedTemplate ? mapCampaignTemplateToCreateValues(selectedTemplate) : {}),
+    [selectedTemplate],
+  )
 
   const onComplete = async (values: Record<string, unknown>) => {
     setCreateError(null)
@@ -48,7 +65,9 @@ export function CampaignCreate() {
         imageKey = await uploadFile(createValues.banner[0], 'Could not upload campaign image.')
       }
 
-      const campaign = await mutateAsync(buildCreateCampaignInput(createValues, imageKey))
+      const campaign = await mutateAsync(
+        buildCreateCampaignInput(createValues, imageKey, selectedTemplate?.metadata.id),
+      )
 
       selectCampaign(campaign.id)
     } catch (err) {
@@ -61,15 +80,30 @@ export function CampaignCreate() {
       <Heading variant="page" as="h1">
         New campaign
       </Heading>
+      <CampaignTemplateChooser
+        templates={templatesQuery.data ?? []}
+        value={selectedTemplateId}
+        onValueChange={(value) => {
+          setCreateError(null)
+          setSelectedTemplateId(value)
+        }}
+        isPending={templatesQuery.isPending}
+        isError={templatesQuery.isError}
+      />
       <Wizard
+        key={selectedTemplateId}
         steps={STEPS}
         onComplete={onComplete}
+        initialValues={initialValues}
         hint="Configure rules later from Homebrew → Rules Configuration."
       >
         <WizardStepForm<IdentityValues> schema={identitySchema} fields={identityFields} />
         <WizardStepForm<CreateRulesValues> schema={createRulesSchema} fields={createRulesFields} />
         <WizardStepForm<FlavorValues> schema={flavorSchema} fields={flavorFields} />
-        <ReviewStep error={createError} />
+        <ReviewStep
+          error={createError}
+          templateName={selectedTemplate?.metadata.name ?? 'Blank campaign'}
+        />
       </Wizard>
     </NarrowPage>
   )
