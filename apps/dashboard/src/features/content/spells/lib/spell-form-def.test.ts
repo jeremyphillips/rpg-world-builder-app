@@ -245,13 +245,13 @@ describe('spellFormDef duration fields', () => {
 })
 
 describe('spellFormDef resolution tab', () => {
-  it('includes persistence banner, preview slot, empty state, and resolution sections', () => {
+  it('includes preview slot, empty state, and resolution sections', () => {
     const resolutionTab = spellFormDef.buildTabs!({}).find((tab) => tab.id === 'resolution')
     expect(resolutionTab).toBeDefined()
     expect(resolutionTab?.label).toBe('Resolution')
 
     const names = collectFieldNames(resolutionTab?.fields ?? [])
-    expect(names).toContain('_resolutionPersistenceNotice')
+    expect(names).not.toContain('_resolutionPersistenceNotice')
     expect(names).toContain('_resolutionPreview')
     expect(names).toContain('_resolutionEmptyState')
     expect(names).toContain('_resolutionSelectionModeSelect')
@@ -309,12 +309,12 @@ describe('spellFormDef resolution integration', () => {
     expect(formValues.resolution).toEqual(RESOLUTION_FORM_FIXTURES.eldritchBlast)
   })
 
-  it('toInput omits resolution until persistence ships', () => {
+  it('toInput maps resolution for persistence', () => {
     const formValues = spellFormDef.toFormValues(spellWithResolution) as SpellFormValues
     expect(formValues.resolution).toBeDefined()
 
     const input = spellFormDef.toInput(formValues)
-    expect(input).not.toHaveProperty('resolution')
+    expect(input.resolution).toEqual(ELDRITCH_BLAST_RESOLUTION)
     expect(() => createSpellInputSchema.parse(input)).not.toThrow()
   })
 })
@@ -339,5 +339,21 @@ describe('spellFormDef create vs update modes', () => {
     const input = spellFormDef.toInput(formValues, { entity: spell })
     expect(input).not.toHaveProperty('slug')
     expect(input.name).toBe('Renamed Spell')
+  })
+
+  it('update: sends null when a stored resolution is cleared in the form', () => {
+    const spellWithResolution: Spell = {
+      ...SRD_SPELLS[0]!,
+      resolution: ELDRITCH_BLAST_RESOLUTION,
+      modeling: {
+        reviewedAt: '2026-07-15T00:00:00.000Z',
+        status: 'meaningful-partial',
+      },
+    }
+    const formValues = spellFormDef.toFormValues(spellWithResolution) as SpellFormValues
+    delete formValues.resolution
+
+    const input = spellFormDef.toInput(formValues, { entity: spellWithResolution })
+    expect(input.resolution).toBeNull()
   })
 })

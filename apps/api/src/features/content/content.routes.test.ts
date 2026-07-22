@@ -1,6 +1,8 @@
 import request, { type Agent } from 'supertest'
 import { describe, expect, it } from 'vitest'
 
+import { CHILL_TOUCH_RESOLUTION, ELDRITCH_BLAST_RESOLUTION } from '@rpg/contracts'
+
 import { CSRF_HEADER } from '../../lib/cookies'
 import { createTestCampaign, registerAndLoginTestUser } from '../../test/auth-agent'
 import { minimalNpcRequestInput } from '../../test/fixtures/npcs'
@@ -162,6 +164,67 @@ describe('content write routes', () => {
       .expect(200)
 
     expect(patchRes.body.skillProficiencies.name).toBe('Updated Route Write Skill')
+  })
+
+  const minimalSpellInput = {
+    slug: 'route-write-spell',
+    name: 'Route Write Spell',
+    school: 'evocation',
+    level: 0,
+    classIds: ['wizard'],
+    castingTime: { normal: { value: 1, unit: 'action' }, canBeCastAsRitual: false },
+    range: { kind: 'distance', value: { value: 60, unit: 'ft' } },
+    duration: { kind: 'instantaneous' },
+    components: { verbal: true, somatic: true },
+  }
+
+  it('creates homebrew spell with resolution, round-trips on reload, and clears via null', async () => {
+    const { agent, csrfToken } = await registerAndLogin()
+    const campaignId = await createTestCampaign(agent, csrfToken)
+
+    const createRes = await agent
+      .post(`/api/campaigns/${campaignId}/content/spells`)
+      .set(CSRF_HEADER, csrfToken)
+      .send({ ...minimalSpellInput, resolution: ELDRITCH_BLAST_RESOLUTION })
+      .expect(201)
+
+    const entityId = createRes.body.spells.id as string
+    expect(createRes.body.spells.resolution).toEqual(ELDRITCH_BLAST_RESOLUTION)
+
+    const patchRes = await agent
+      .patch(`/api/campaigns/${campaignId}/content/spells/${entityId}`)
+      .set(CSRF_HEADER, csrfToken)
+      .send({ resolution: CHILL_TOUCH_RESOLUTION })
+      .expect(200)
+
+    expect(patchRes.body.spells.resolution).toEqual(CHILL_TOUCH_RESOLUTION)
+
+    const reloadRes = await agent
+      .get(`/api/campaigns/${campaignId}/content/spells`)
+      .set(CSRF_HEADER, csrfToken)
+      .expect(200)
+
+    expect(
+      reloadRes.body.spells.find((spell: { id: string }) => spell.id === entityId)?.resolution,
+    ).toEqual(CHILL_TOUCH_RESOLUTION)
+
+    const clearRes = await agent
+      .patch(`/api/campaigns/${campaignId}/content/spells/${entityId}`)
+      .set(CSRF_HEADER, csrfToken)
+      .send({ resolution: null })
+      .expect(200)
+
+    expect(clearRes.body.spells.resolution).toBeUndefined()
+
+    const reloadAfterClear = await agent
+      .get(`/api/campaigns/${campaignId}/content/spells`)
+      .set(CSRF_HEADER, csrfToken)
+      .expect(200)
+
+    expect(
+      reloadAfterClear.body.spells.find((spell: { id: string }) => spell.id === entityId)
+        ?.resolution,
+    ).toBeUndefined()
   })
 })
 

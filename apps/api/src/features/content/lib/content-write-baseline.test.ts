@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { isArmorEquipment } from '@rpg/contracts'
+import { ELDRITCH_BLAST_RESOLUTION, isArmorEquipment } from '@rpg/contracts'
 
 import { makeTestCampaign } from '../../../test/fixtures/campaigns'
 import { useIntegrationDb } from '../../../test/setup/integration-db'
@@ -84,6 +84,7 @@ const baselineCases: BaselineCase[] = [
       range: { kind: 'distance', value: { value: 60, unit: 'ft' } },
       duration: { kind: 'instantaneous' },
       components: { verbal: true, somatic: true },
+      resolution: ELDRITCH_BLAST_RESOLUTION,
     },
     homebrewUpdate: { name: 'Updated Baseline Bolt' },
     expectedHomebrewName: 'Updated Baseline Bolt',

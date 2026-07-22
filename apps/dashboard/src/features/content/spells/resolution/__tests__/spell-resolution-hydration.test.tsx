@@ -219,7 +219,7 @@ describe('spell resolution tab hydration', () => {
     const formValues = spellToFormValues(editorEligibleSpell)
     const input = spellFormDef.toInput(formValues)
 
-    expect(input).not.toHaveProperty('resolution')
+    expect(input.resolution).toEqual(editorEligibleSpell.resolution)
     expect(resolutionToStored(formValues.resolution)).toEqual(editorEligibleSpell.resolution)
     expect(formValues.resolution).toEqual(resolutionToForm(editorEligibleSpell.resolution!))
   })

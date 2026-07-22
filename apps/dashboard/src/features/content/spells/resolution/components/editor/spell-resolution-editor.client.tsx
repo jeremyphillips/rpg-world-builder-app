@@ -5,10 +5,7 @@ import { Form } from '@rpg/ui/form'
 
 import type { ContentFormCtx } from '../../../../lib/forms/content-form-registry'
 import { resolutionFields } from '../../lib/form/resolution-form-fields'
-import { RESOLUTION_SECTION_LABELS } from '../../lib/form/resolution-form-labels'
 import { optionalResolutionFormSchema } from '../../lib/form/resolution-form-schema'
-
-export const RESOLUTION_NOT_SAVED_BANNER = RESOLUTION_SECTION_LABELS.notSavedBanner
 
 const spellResolutionEditorSchema = z.object({
   resolution: optionalResolutionFormSchema,

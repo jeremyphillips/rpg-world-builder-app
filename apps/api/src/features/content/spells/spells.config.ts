@@ -2,6 +2,7 @@ import type { Spell } from '@rpg/contracts'
 import {
   createSpellInputSchema,
   spellBodySchema,
+  spellResolutionSchema,
   spellSchema,
   updateSpellInputSchema,
 } from '@rpg/contracts'
@@ -11,6 +12,7 @@ import type { ContentWriteConfig, HomebrewDoc } from '../lib/content-write-confi
 import type { OverlayPatch } from '../lib/resolve-catalog'
 import { loadSeedSpells, seedSpellSlugs } from '@rpg/catalog/spells'
 import { spellValidateBeforeWrite } from './spell-write-hooks'
+import { stripNullDeep } from '../lib/strip-null-deep'
 import { HomebrewSpellModel, type HomebrewSpellSchemaType } from './homebrew-spell.model'
 import { SpellPatchModel } from './spell-patch.model'
 
@@ -43,6 +45,16 @@ function toHomebrewSpell(doc: HomebrewDoc): Spell {
     duration: record.duration as Spell['duration'],
     components: record.components as Spell['components'],
     ...(record.deliveryMethod !== undefined && { deliveryMethod: record.deliveryMethod }),
+    ...(record.areaOfEffect !== undefined && {
+      areaOfEffect: record.areaOfEffect as Spell['areaOfEffect'],
+    }),
+    ...(record.cantripScaling !== undefined && { cantripScaling: record.cantripScaling }),
+    ...(record.higherLevelSlotEffect !== undefined && {
+      higherLevelSlotEffect: record.higherLevelSlotEffect,
+    }),
+    ...(record.resolution != null && {
+      resolution: spellResolutionSchema.parse(stripNullDeep(record.resolution)),
+    }),
   } as Spell
 }
 
@@ -53,6 +65,7 @@ function bodyFromCreateInput(input: Record<string, unknown>): Record<string, unk
 
 export const spellContentConfig: ContentTypeConfig<Spell> = {
   type: 'spells',
+  patchReplaceKeys: ['resolution'],
   loadSystem: loadSeedSpells,
   systemSlugs: seedSpellSlugs,
   loadPatches: async (campaignId) => {

@@ -24,4 +24,31 @@ describe('deepMerge', () => {
     deepMerge(base, { nested: { x: 99 } })
     expect(base.nested.x).toBe(1)
   })
+
+  it('removes keys when the patch value is null', () => {
+    const base = { a: 1, resolution: { method: { kind: 'attack' } } }
+    expect(deepMerge(base, { resolution: null })).toEqual({ a: 1 })
+  })
+
+  it('replaces listed keys wholesale instead of deep-merging objects', () => {
+    const base = {
+      resolution: {
+        selectionMode: 'targets',
+        method: { kind: 'attack', attackType: 'ranged-spell' },
+        effects: [{ id: 'damage', kind: 'damage' }],
+      },
+    }
+    const patch = {
+      resolution: {
+        selectionMode: 'self',
+        method: { kind: 'automatic' },
+        effects: [{ id: 'healing', kind: 'healing' }],
+        outcomes: [{ result: 'applied', applications: [] }],
+      },
+    }
+
+    expect(deepMerge(base, patch, { replaceKeys: ['resolution'] }).resolution).toEqual(
+      patch.resolution,
+    )
+  })
 })

@@ -11,8 +11,8 @@ Spell catalog: overview table, detail pages, and create/edit authoring for syste
 - **Form:** tabbed shell (Basics / Casting / Resolution / Tags); class availability via
   combobox (spellcasting classes only — see below); tag vocabularies via chips.
 - **Resolution (authoring only):** flattened target / method / range / damage /
-  outcome preset editor; live preview via contract formatters; **not persisted**
-  until `spell.resolution.persistence` lands.
+  outcome preset editor; live preview via contract formatters; **persisted** via
+  the shared content write endpoints.
 
 ### Class options
 
@@ -47,7 +47,7 @@ parallel boolean flag.
 | Effects editor   | Searchable 3-template add menu (`damage`, `healing`, `temporary-hit-points`) in the Resolution tab                |
 | Automatic method | Tier D healing/temp-HP seeds use `method: automatic` with `applied` outcomes                                      |
 | Outcomes         | Interactive method-derived outcome groups (`SpellResolutionOutcomes`)                                             |
-| Save             | **Disabled** — banner: "Resolution is not saved yet."                                                             |
+| Save             | Included in spell create/update payload via `resolutionToPatchInput`                                              |
 | Target proximity | `resolution.target.proximity` (touch / reach / distance) — separate from Check method                             |
 
 Modules live under [`resolution/`](resolution/) (`lib/form/resolution-form-*.ts`,
@@ -64,22 +64,21 @@ Shared roll/damage form atoms live under
 [`content/lib/forms/mechanics/`](../../lib/forms/mechanics/) (`roll-value-fields`,
 `damage-type-field`).
 
-#### Persistence boundary (`spell.resolution.persistence`)
+#### PATCH semantics (`resolution`)
 
-Create/update API input **omits** `resolution` today. `buildSpellCreateInput` strips
-the field with a `TODO(spell.resolution.persistence)` comment.
+| Input on PATCH      | Meaning                              |
+| ------------------- | ------------------------------------ |
+| Key omitted         | Leave stored `resolution` unchanged  |
+| `resolution: null`  | Remove stored `resolution`           |
+| `resolution: { … }` | Replace stored `resolution` entirely |
 
-When persistence ships, touch these files:
+Dashboard `resolutionToPatchInput` (`lib/spell-form-values.ts`) maps form state:
+omit when absent/empty, `null` when the author clears a previously stored envelope,
+full object when present. API overlay merge replaces `resolution` at the key level
+(not deep-merged). Contract tests live in
+`packages/contracts/src/rpg/content/spell/body.test.ts`.
 
-| Layer       | File                                                                                        |
-| ----------- | ------------------------------------------------------------------------------------------- |
-| Contracts   | `packages/contracts/src/rpg/content/spell.ts` — merge `resolution` into create/update input |
-| Form values | `lib/spell-form-values.ts` — remove omission; map `resolutionToStored`                      |
-| Mongo model | `apps/api/.../homebrew-spell.model.ts` — `resolution: Mixed`                                |
-| API mapper  | `apps/api/.../spells.config.ts` — `toHomebrewSpell`                                         |
-| Patch merge | `apps/api/.../lib/deep-merge.ts` — object replace for `resolution`                          |
-
-### Resolution authoring
+#### Resolution authoring
 
 The Resolution tab hydrates from `spell.resolution` when `modeling.status` is at
 least `meaningful-partial`. Projectile scaling uses `resolution.applicationPattern`

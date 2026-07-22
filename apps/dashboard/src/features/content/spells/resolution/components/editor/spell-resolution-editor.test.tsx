@@ -9,10 +9,7 @@ import { makeContentFormCtx } from '../../../../lib/fixtures/content-form-ctx'
 import { RESOLUTION_FORM_FIXTURES } from '../../fixtures'
 import * as resolutionChangeConfirm from '../../hooks/use-resolution-change-confirm.client'
 import { RESOLUTION_SECTION_LABELS } from '../../lib/form/resolution-form-labels'
-import {
-  RESOLUTION_NOT_SAVED_BANNER,
-  SpellResolutionEditor,
-} from './spell-resolution-editor.client'
+import { SpellResolutionEditor } from './spell-resolution-editor.client'
 
 const formCtx = makeContentFormCtx({
   damageTypeVocabulary: buildSeedDamageTypeVocabulary(),
@@ -23,10 +20,9 @@ describe('SpellResolutionEditor', () => {
     vi.restoreAllMocks()
   })
 
-  it('shows persistence banner and add-resolution control when empty', async () => {
+  it('shows add-resolution control when empty', async () => {
     render(<SpellResolutionEditor formCtx={formCtx} />)
 
-    expect(screen.getByText(RESOLUTION_NOT_SAVED_BANNER)).toBeInTheDocument()
     await waitFor(() => {
       expect(screen.getByRole('button', { name: /add resolution/i })).toBeInTheDocument()
     })
