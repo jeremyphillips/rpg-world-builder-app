@@ -27,6 +27,8 @@ export function SpellEdit() {
       loadErrorLabel={formatContentListLoadErrorMessage('spells')}
       notFoundLabel={formatContentNotFoundMessage('spells')}
       backHref={ROUTES.content.spells.detail(campaignId, spellId)}
+      overviewHref={ROUTES.content.spells.overview(campaignId)}
+      contentTypeKey="spells"
     />
   )
 }

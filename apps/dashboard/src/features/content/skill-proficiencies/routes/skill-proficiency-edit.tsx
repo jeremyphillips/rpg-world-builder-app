@@ -27,6 +27,8 @@ export function SkillProficiencyEdit() {
       loadErrorLabel={formatContentListLoadErrorMessage('skill-proficiencies')}
       notFoundLabel={formatContentNotFoundMessage('skill-proficiencies')}
       backHref={ROUTES.content.skillProficiencies.detail(campaignId, skillId)}
+      overviewHref={ROUTES.content.skillProficiencies.overview(campaignId)}
+      contentTypeKey="skill-proficiencies"
     />
   )
 }

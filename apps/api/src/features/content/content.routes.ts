@@ -41,3 +41,17 @@ contentRouter.patch(
   requireCampaignRole('owner', 'co-owner'),
   controller.updateContentItem,
 )
+
+contentRouter.get(
+  '/:contentType/:entityId/deletion-availability',
+  requireAuth,
+  requireCampaignRole('owner', 'co-owner'),
+  controller.getContentDeletionAvailabilityHandler,
+)
+
+contentRouter.delete(
+  '/:contentType/:entityId',
+  requireAuth,
+  requireCampaignRole('owner', 'co-owner'),
+  controller.deleteContentItem,
+)

@@ -106,3 +106,29 @@ export function formatChooseContentTypePlaceholder(
 export function formatAddContentTypeLabel(key: ContentTypeKey): string {
   return `Add ${getContentTypeMidSentenceLabel(key)}`
 }
+
+/** Destructive delete confirm headline — e.g. "Delete Custom Folk?". */
+export function formatContentDeleteConfirmHeadline(name: string): string {
+  return `Delete ${name}?`
+}
+
+/** Permanent homebrew delete warning for confirm dialogs. */
+export function formatContentDeleteConfirmDescription(key: ContentTypeKey): string {
+  return `Permanently delete this homebrew ${getContentTypeMidSentenceLabel(key)}? This cannot be undone.`
+}
+
+/** Destructive confirm action label — e.g. "Delete species". */
+export function formatContentDeleteConfirmAction(key: ContentTypeKey): string {
+  return `Delete ${getContentTypeMidSentenceLabel(key)}`
+}
+
+/** Blocked delete dialog headline — e.g. "Cannot delete Custom Folk". */
+export function formatContentDeletionBlockedHeadline(name: string): string {
+  return `Cannot delete ${name}`
+}
+
+/** Blocked delete dialog body when characters still reference the content. */
+export function formatContentDeletionBlockedDescription(count: number): string {
+  const noun = count === 1 ? 'character' : 'characters'
+  return `This content is used by ${count} campaign ${noun}. Remove the references before deleting.`
+}

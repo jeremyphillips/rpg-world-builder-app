@@ -259,6 +259,55 @@ Shared helpers: `packages/contracts/src/rpg/content/lib/content-key.ts` (`derive
 
 ---
 
+## Delete homebrew content
+
+Homebrew-only deletion is wired for all six registered catalog types. System SRD rows return `403 forbidden` on both the advisory availability check and `DELETE`; edit views hide the delete control when `entity.source !== 'homebrew'`.
+
+### Advisory GET vs authoritative DELETE
+
+- `GET …/deletion-availability` exists **only for UX preflight**. It is not a lock or permission grant.
+- `DELETE` always re-runs the full guarded validation path before mutating data.
+- Callers must not delete homebrew documents by calling `homebrewModel.deleteOne` directly — all deletion goes through `deleteContentEntity` in `apps/api/src/features/content/lib/content-deletion.service.ts`.
+
+### Contract shapes (`@rpg/contracts`)
+
+| Shape                         | Role                                                                                                           |
+| ----------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| `ContentDeletionAvailability` | Advisory preflight — `{ status: 'allowed' }` or `{ status: 'blocked', blockers }`                              |
+| `ContentDeletionResult`       | Authoritative delete outcome — `{ status: 'deleted' }` or `{ status: 'blocked', blockers }` on `409`           |
+| `ContentDeletionBlocker`      | Discriminated union — `kind: 'usage'` (with `ContentUsageReference`) or `kind: 'rule'` (future business rules) |
+| `ContentUsageReference`       | Domain identity for a blocking character — **no API hrefs**; dashboard resolves links locally                  |
+
+### Campaign participant usage query
+
+Character usage blockers consider only characters participating in the campaign that owns the homebrew entity:
+
+1. **NPCs** — all character docs with `{ characterType: 'npc', campaignId }`.
+2. **PCs** — union of all `CampaignMembership.characterIds` for `{ campaignId }`, deduped, then sanitized to ids that still exist in MongoDB (stale membership references are dropped silently).
+
+The resolver runs one composed Mongo query per branch (NPC path and PC `$in` path), merges hits deduped by character id, and maps to `ContentDeletionBlocker` rows. Per-type matcher fragments live in `content-character-usage-matchers.ts` (skill proficiencies match on **slug**, not envelope id).
+
+### Authorization and entity resolution
+
+Delete reuses the same entity resolution path as update (`resolveContentEntityForWrite` in `content-write.service.ts`): campaign scope, registry lookup, resolved catalog entity by id, homebrew collection selection keyed by `{ _id, campaignId }`, identical not-found behavior for unknown or cross-campaign ids.
+
+Optional per-type hook on `ContentWriteConfig`:
+
+```typescript
+resolveDeleteBlockers?: (ctx: ContentDeleteContext) => Promise<ContentDeletionBlocker[]>
+```
+
+Default: `[]`. Character usage blockers are always resolved by the shared service; the hook adds additional blockers only.
+
+### Dashboard UX
+
+Shared lib under `apps/dashboard/src/features/content/lib/delete/`:
+
+- `useContentDeleteFlow` — availability check on click (button pending, no empty modal), confirm dialog, race handling (`409` → blocked dialog), navigate to overview on success.
+- `ContentDeletionBlockedDialog` / `ContentDeletionConfirmDialog` — unified edit-view dialogs wired from `ContentEditShell`.
+
+---
+
 ## Layer overview
 
 ```

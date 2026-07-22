@@ -65,6 +65,10 @@ Each content type contributes only a body schema (in `@rpg/contracts`) + a
 - `POST /api/campaigns/:campaignId/content/:contentType` — create homebrew
 - `PATCH /api/campaigns/:campaignId/content/:contentType/:entityId` — update
   homebrew or upsert a system overlay patch (owner/co-owner only)
+- `GET /api/campaigns/:campaignId/content/:contentType/:entityId/deletion-availability` —
+  advisory delete preflight (owner/co-owner only)
+- `DELETE /api/campaigns/:campaignId/content/:contentType/:entityId` — delete homebrew
+  (owner/co-owner only; `409` when blocked by character usage)
 
 See `lib/content-write.service.ts` and each type's `*Registration.write` in `*.config.ts`.
 

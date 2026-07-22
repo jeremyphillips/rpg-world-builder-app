@@ -1,7 +1,7 @@
 import type { Model } from 'mongoose'
 import type { ZodType } from 'zod'
 
-import type { ContentSource, SystemRulesetId } from '@rpg/contracts'
+import type { ContentSource, SystemRulesetId, ContentDeletionBlocker } from '@rpg/contracts'
 
 import type { ContentTypeConfig } from './content-type-config'
 import type { ContentPatchSchemaType } from './content-patch-model'
@@ -43,6 +43,11 @@ export interface ContentWriteAfterContext extends ContentWriteContext {
   entity: WriteEntityBase
 }
 
+export interface ContentDeleteContext {
+  campaignId: string
+  entity: WriteEntityBase
+}
+
 /**
  * Per-type wiring for create/update authoring endpoints. Pairs with the
  * read-side `ContentTypeConfig` in each `*.config.ts`.
@@ -74,4 +79,6 @@ export interface ContentWriteConfig<T extends WriteEntityBase> {
   validateBeforeWrite?: (ctx: ContentWriteContext) => Promise<void>
   /** Runs after a successful write; may return a parsed/enriched entity for the API response. */
   afterWrite?: (ctx: ContentWriteAfterContext) => Promise<T>
+  /** Adds blockers beyond shared character usage resolution (future cross-refs, rule-only blockers). */
+  resolveDeleteBlockers?: (ctx: ContentDeleteContext) => Promise<ContentDeletionBlocker[]>
 }

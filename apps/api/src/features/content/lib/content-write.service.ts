@@ -224,13 +224,12 @@ export async function createHomebrewContent<T extends StoredEntity>(
   return finalizeWriteResult(config, writeCtx, parsed)
 }
 
-/** Update a homebrew record or upsert a system overlay patch. */
-export async function updateContentEntity<T extends StoredEntity>(
+/** Resolve a catalog entity for write/delete guards — shared by update and deletion. */
+export async function resolveContentEntityForWrite<T extends StoredEntity>(
   config: ContentWriteConfig<T>,
   campaignId: string,
   entityId: string,
-  rawInput: unknown,
-): Promise<T> {
+): Promise<{ campaign: NonNullable<Awaited<ReturnType<typeof findCampaignById>>>; entity: T }> {
   const campaign = await findCampaignById(campaignId)
   if (!campaign) {
     throw new HttpError(404, 'not_found', 'Campaign not found.')
@@ -241,6 +240,26 @@ export async function updateContentEntity<T extends StoredEntity>(
   if (!existing) {
     throw new HttpError(404, 'not_found', 'Content record not found.')
   }
+
+  if (existing.source === 'homebrew' && existing.campaignId !== campaignId) {
+    throw new HttpError(403, 'forbidden', 'Cannot edit homebrew from another campaign.')
+  }
+
+  return { campaign, entity: existing }
+}
+
+/** Update a homebrew record or upsert a system overlay patch. */
+export async function updateContentEntity<T extends StoredEntity>(
+  config: ContentWriteConfig<T>,
+  campaignId: string,
+  entityId: string,
+  rawInput: unknown,
+): Promise<T> {
+  const { campaign, entity: existing } = await resolveContentEntityForWrite(
+    config,
+    campaignId,
+    entityId,
+  )
 
   const existingBody = entityBody(existing as unknown as Record<string, unknown>)
   const normalized = normalizeWriteInput(rawInput, existingBody, 'update')
@@ -256,9 +275,6 @@ export async function updateContentEntity<T extends StoredEntity>(
   await runValidateBeforeWrite(config, writeCtx)
 
   if (existing.source === 'homebrew') {
-    if (existing.campaignId !== campaignId) {
-      throw new HttpError(403, 'forbidden', 'Cannot edit homebrew from another campaign.')
-    }
     const updated = await updateHomebrewRecord(
       config,
       campaignId,

@@ -27,6 +27,8 @@ export function ClassEdit() {
       loadErrorLabel={formatContentListLoadErrorMessage('classes')}
       notFoundLabel={formatContentNotFoundMessage('classes')}
       backHref={ROUTES.content.classes.detail(campaignId, classId)}
+      overviewHref={ROUTES.content.classes.overview(campaignId)}
+      contentTypeKey="classes"
     />
   )
 }
