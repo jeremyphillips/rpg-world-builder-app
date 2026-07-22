@@ -9,7 +9,9 @@ import { equipmentModifierSchema } from './equipment/modifier'
 import { equipmentRecommendationsSchema } from './equipment-recommendation'
 import { characterWealthGrantSchema } from './lib/wealth-grant'
 import {
+  skillProficiencyChoiceGroupDraftSchema,
   skillProficiencyChoiceGroupSchema,
+  toolProficiencyChoiceGroupDraftSchema,
   toolProficiencyChoiceGroupSchema,
 } from './lib/proficiency-grant-set'
 
@@ -174,6 +176,24 @@ export const characterCreationProficienciesSchema = z.object({
 })
 
 export type CharacterCreationProficiencies = z.infer<typeof characterCreationProficienciesSchema>
+
+/** Draft character-creation proficiencies — skill/tool choice groups may be empty. */
+export const characterCreationProficienciesDraftSchema = z.object({
+  skills: skillProficiencyChoiceGroupDraftSchema.optional(),
+  tools: toolProficiencyChoiceGroupDraftSchema.optional(),
+})
+
+export type CharacterCreationProficienciesDraft = z.infer<
+  typeof characterCreationProficienciesDraftSchema
+>
+
+export const classCharacterCreationDraftSchema = z.object({
+  startingEquipment: startingEquipmentChoiceSchema.optional(),
+  proficiencies: characterCreationProficienciesDraftSchema.optional(),
+  equipmentRecommendations: equipmentRecommendationsSchema.optional(),
+})
+
+export type ClassCharacterCreationDraft = z.infer<typeof classCharacterCreationDraftSchema>
 
 export const classCharacterCreationSchema = z
   .object({

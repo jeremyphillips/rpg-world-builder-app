@@ -48,4 +48,15 @@ describe('costToForm', () => {
       cost: { amount: 2, currency: 'gp' },
     })
   })
+
+  it('uses kind-aware create defaults when draft cost is omitted', () => {
+    expect(costToForm(undefined, 'weapon')).toEqual({
+      hasMarketPrice: true,
+      cost: { currency: 'gp' },
+    })
+    expect(costToForm(undefined, 'magic_item')).toEqual({
+      hasMarketPrice: false,
+      cost: null,
+    })
+  })
 })

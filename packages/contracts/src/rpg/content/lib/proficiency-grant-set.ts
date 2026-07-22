@@ -110,6 +110,15 @@ export const skillProficiencyChoiceGroupSchema = z
 
 export type SkillProficiencyChoiceGroup = z.infer<typeof skillProficiencyChoiceGroupSchema>
 
+/** Draft skill choice group — choices may be empty while authoring. */
+export const skillProficiencyChoiceGroupDraftSchema = z.object({
+  choices: z.array(skillProficiencyChoiceSchema).default([]),
+})
+
+export type SkillProficiencyChoiceGroupDraft = z.infer<
+  typeof skillProficiencyChoiceGroupDraftSchema
+>
+
 const toolProficiencyChoiceObjectSchema = proficiencyChoiceSchema.omit({ from: true }).extend({
   pool: toolProficiencyPoolSchema.optional(),
   from: z.array(z.string()).optional(),
@@ -176,6 +185,13 @@ export const toolProficiencyChoiceGroupSchema = z
   })
 
 export type ToolProficiencyChoiceGroup = z.infer<typeof toolProficiencyChoiceGroupSchema>
+
+/** Draft tool choice group — choices may be empty while authoring. */
+export const toolProficiencyChoiceGroupDraftSchema = z.object({
+  choices: z.array(toolProficiencyChoiceSchema).default([]),
+})
+
+export type ToolProficiencyChoiceGroupDraft = z.infer<typeof toolProficiencyChoiceGroupDraftSchema>
 
 export const languageProficiencyGrantSetSchema = proficiencyGrantSetSchema.extend({
   categories: z.array(languageCategorySchema).default([]),

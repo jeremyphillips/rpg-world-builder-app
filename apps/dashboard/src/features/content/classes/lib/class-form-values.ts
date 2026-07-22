@@ -1,13 +1,18 @@
 import {
+  classFeatureSchema,
+  createClassDraftInputSchema,
+  createClassInputSchema,
   MAX_CHARACTER_LEVEL,
   type CharacterClass,
+  type ClassFeature,
   type ClassProficiencies,
   type ClassResource,
+  type ContentValidationIntent,
   type CreateClassInput,
   type Spellcasting,
 } from '@rpg/contracts'
 
-import { envelopeSlugFields } from '../../lib/forms/content-form-key-helpers'
+import { finalizeContentInput, slugForInputParse } from '../../lib/forms/content-form-key-helpers'
 import type { ContentFormInputCtx } from '../../lib/forms/content-form-registry'
 import type { ClassFormValues } from './class-form-fields'
 import { createAsiFeature } from './class-asi-features'
@@ -78,6 +83,18 @@ function proficienciesFromFormValues(
   }
 }
 
+function proficienciesForInput(
+  proficiencies: ClassFormValues['proficiencies'],
+  hasSpecificWeapons: boolean,
+  validationIntent: ContentValidationIntent,
+): ClassProficiencies | undefined {
+  const parsed = proficienciesFromFormValues(proficiencies, hasSpecificWeapons)
+  if (validationIntent === 'draft' && parsed.savingThrows.length === 0) {
+    return undefined
+  }
+  return parsed
+}
+
 function classCharacterCreationInputFromForm(
   values: ClassFormValues,
   entity?: CharacterClass,
@@ -114,30 +131,110 @@ function resourceFromFormRow(row: ResourceRowForm): ClassResource {
 function classResourcesInputFromForm(
   resources: ClassFormValues['resources'],
 ): ClassResource[] | undefined {
-  return resources?.length ? resources.map(resourceFromFormRow) : undefined
+  const rows =
+    resources
+      ?.filter((row) => row.name.trim().length > 0)
+      .map(resourceFromFormRow)
+      .filter((resource) => resource.entries.length > 0) ?? []
+  return rows.length ? rows : undefined
+}
+
+function featuresForInput(
+  rows: ClassFormValues['features'],
+  existing: readonly ClassFeature[] | undefined,
+  validationIntent: ContentValidationIntent,
+): ClassFeature[] {
+  const features = featuresFromFormValues(rows, existing)
+  if (validationIntent === 'publish') return features
+  return features.filter((feature) => classFeatureSchema.safeParse(feature).success)
+}
+
+type ClassWirePayloadParts = {
+  characterCreation: ReturnType<typeof classCharacterCreationInputFromForm>
+  proficiencies: ClassProficiencies | undefined
+  resources: ClassResource[] | undefined
+  features: ClassFeature[]
+}
+
+function classWirePayloadBase(
+  values: ClassFormValues,
+  ctx: ContentFormInputCtx<CharacterClass> | undefined,
+  parts: ClassWirePayloadParts,
+) {
+  return {
+    slug: slugForInputParse(values.name, ctx),
+    name: values.name,
+    description: values.description || undefined,
+    spellcasting: spellcastingFromFormValues(values.hasSpellcasting, values.spellcasting),
+    features: parts.features,
+    ...(parts.characterCreation ? { characterCreation: parts.characterCreation } : {}),
+  }
+}
+
+function classDraftWirePayload(
+  values: ClassFormValues,
+  ctx: ContentFormInputCtx<CharacterClass> | undefined,
+  parts: ClassWirePayloadParts,
+) {
+  return {
+    ...classWirePayloadBase(values, ctx, parts),
+    ...(values.primaryAbilities?.length ? { primaryAbilities: values.primaryAbilities } : {}),
+    ...(values.hitDie !== undefined ? { hitDie: values.hitDie } : {}),
+    ...(parts.proficiencies ? { proficiencies: parts.proficiencies } : {}),
+    ...(parts.resources ? { resources: parts.resources } : {}),
+  }
+}
+
+function classPublishWirePayload(
+  values: ClassFormValues,
+  ctx: ContentFormInputCtx<CharacterClass> | undefined,
+  parts: ClassWirePayloadParts,
+) {
+  return {
+    ...classWirePayloadBase(values, ctx, parts),
+    primaryAbilities: values.primaryAbilities,
+    hitDie: values.hitDie,
+    proficiencies: parts.proficiencies!,
+    ...(parts.resources ? { resources: parts.resources } : {}),
+  }
+}
+
+function classWirePayloadParts(
+  values: ClassFormValues,
+  ctx: ContentFormInputCtx<CharacterClass> | undefined,
+  validationIntent: ContentValidationIntent,
+): ClassWirePayloadParts {
+  return {
+    characterCreation: classCharacterCreationInputFromForm(values, ctx?.entity),
+    proficiencies: proficienciesForInput(
+      values.proficiencies,
+      values.weaponProficiencyMode === 'individual',
+      validationIntent,
+    ),
+    resources: classResourcesInputFromForm(values.resources),
+    features: featuresForInput(values.features, ctx?.entity?.features, validationIntent),
+  }
+}
+
+function classWirePayload(
+  values: ClassFormValues,
+  ctx: ContentFormInputCtx<CharacterClass> | undefined,
+  validationIntent: ContentValidationIntent,
+) {
+  const parts = classWirePayloadParts(values, ctx, validationIntent)
+  return validationIntent === 'draft'
+    ? classDraftWirePayload(values, ctx, parts)
+    : classPublishWirePayload(values, ctx, parts)
 }
 
 export function buildClassCreateInput(
   values: ClassFormValues,
   ctx: ContentFormInputCtx<CharacterClass> | undefined,
+  validationIntent: ContentValidationIntent = 'publish',
 ) {
-  const characterCreation = classCharacterCreationInputFromForm(values, ctx?.entity)
-
-  return {
-    ...envelopeSlugFields(values.name, ctx),
-    name: values.name,
-    description: values.description || undefined,
-    primaryAbilities: values.primaryAbilities,
-    hitDie: values.hitDie,
-    spellcasting: spellcastingFromFormValues(values.hasSpellcasting, values.spellcasting),
-    proficiencies: proficienciesFromFormValues(
-      values.proficiencies,
-      values.weaponProficiencyMode === 'individual',
-    ),
-    features: featuresFromFormValues(values.features, ctx?.entity?.features),
-    resources: classResourcesInputFromForm(values.resources),
-    ...(characterCreation ? { characterCreation } : {}),
-  }
+  const schema = validationIntent === 'draft' ? createClassDraftInputSchema : createClassInputSchema
+  const input = schema.parse(classWirePayload(values, ctx, validationIntent))
+  return finalizeContentInput(input, ctx) as CreateClassInput
 }
 
 function progressionRowCount(spellcasting?: Spellcasting): number {

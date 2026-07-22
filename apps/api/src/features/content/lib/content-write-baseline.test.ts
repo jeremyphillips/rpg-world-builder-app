@@ -281,6 +281,23 @@ describe('content write baseline — draft status', () => {
     const catalog = await resolveCatalogForCampaign(speciesWriteConfig.readConfig, campaign.id)
     expect(catalog.find((record) => record.id === created.id)?.name).toBe('Untitled Species')
   })
+
+  it('creates an incomplete class draft and round-trips via catalog', async () => {
+    const campaign = await makeTestCampaign()
+    const created = await createHomebrewContent(
+      classWriteConfig,
+      campaign.id,
+      { slug: 'draft-class', name: '', hitDie: 8 },
+      'draft',
+    )
+
+    expect(created.status).toBe('draft')
+    expect(created.name).toBe('Untitled Class')
+    expect(created.hitDie).toBe(8)
+
+    const catalog = await resolveCatalogForCampaign(classWriteConfig.readConfig, campaign.id)
+    expect(catalog.find((record) => record.id === created.id)?.name).toBe('Untitled Class')
+  })
 })
 
 describe('content write baseline — equipment kind guard', () => {

@@ -46,7 +46,7 @@ function sharedFormValues(entity: Equipment): Pick<
     slug: entity.slug,
     description: entity.description,
     kind: entity.kind,
-    ...costToForm(entity.cost),
+    ...costToForm(entity.cost, entity.kind),
     weight: sharedWeightToForm(entity),
   }
 }

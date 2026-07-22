@@ -9,7 +9,9 @@ import { finalizeContentInput } from '../../lib/forms/content-form-key-helpers'
 import { classesQueryKey, useClasses } from '../hooks/use-classes'
 import {
   buildClassTabs,
+  classDraftFormSchema,
   classFormSchema,
+  createClassDraftFormSchema,
   createClassFormSchema,
   maxLevelFromCtx,
   type ClassFormValues,
@@ -29,7 +31,11 @@ const classFormDef: ContentFormDef<CharacterClass, ClassFormValues, CreateClassI
   routeKey: 'classes',
 
   schema: classFormSchema,
-  resolveSchema: (ctx) => createClassFormSchema(maxLevelFromCtx(ctx), ctx),
+  draftSchema: classDraftFormSchema,
+  resolveSchema: (ctx, intent = 'publish') =>
+    intent === 'draft'
+      ? createClassDraftFormSchema(maxLevelFromCtx(ctx), ctx)
+      : createClassFormSchema(maxLevelFromCtx(ctx), ctx),
   createDefaultValues: classCreateDefaultValues,
 
   buildTabs: buildClassTabs,
@@ -39,13 +45,17 @@ const classFormDef: ContentFormDef<CharacterClass, ClassFormValues, CreateClassI
     name: entity.name,
     slug: entity.slug,
     description: entity.description,
-    primaryAbilities: entity.primaryAbilities,
-    hitDie: entity.hitDie,
+    primaryAbilities: entity.primaryAbilities ?? classCreateDefaultValues.primaryAbilities!,
+    hitDie: entity.hitDie ?? classCreateDefaultValues.hitDie!,
     hasSpellcasting: entity.spellcasting !== undefined,
     weaponProficiencyMode:
-      (entity.proficiencies.weapons.items?.length ?? 0) > 0 ? 'individual' : 'categories',
+      entity.proficiencies && (entity.proficiencies.weapons.items?.length ?? 0) > 0
+        ? 'individual'
+        : 'categories',
     spellcasting: spellcastingToFormValues(entity.spellcasting),
-    proficiencies: proficienciesToFormValues(entity.proficiencies),
+    proficiencies: entity.proficiencies
+      ? proficienciesToFormValues(entity.proficiencies)
+      : classCreateDefaultValues.proficiencies!,
     features: entity.features.map(featureToFormRow),
     resources: entity.resources?.map(resourceToFormRow) ?? [],
     characterCreation: {
@@ -60,8 +70,11 @@ const classFormDef: ContentFormDef<CharacterClass, ClassFormValues, CreateClassI
     },
   }),
 
-  toInput: (values, ctx) =>
-    finalizeContentInput(buildClassCreateInput(values, ctx), ctx) as CreateClassInput,
+  toInput: (values, ctx, validationIntent = 'publish') =>
+    finalizeContentInput(
+      buildClassCreateInput(values, ctx, validationIntent),
+      ctx,
+    ) as CreateClassInput,
 
   useListQuery: useClasses,
   queryKey: classesQueryKey,
@@ -75,5 +88,5 @@ const classFormDef: ContentFormDef<CharacterClass, ClassFormValues, CreateClassI
 
 contentFormRegistry['classes'] = classFormDef
 
-export { classFormDef, createClassFormSchema }
+export { classFormDef, createClassFormSchema, createClassDraftFormSchema, classDraftFormSchema }
 export type { ClassFormValues }

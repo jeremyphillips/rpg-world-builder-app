@@ -1,8 +1,11 @@
 import type { CharacterClass, ClassStored } from '@rpg/contracts'
 import {
+  classDraftStoredSchema,
   classStoredBodySchema,
   classStoredSchema,
+  createClassDraftInputSchema,
   createClassInputSchema,
+  updateClassDraftInputSchema,
   updateClassInputSchema,
 } from '@rpg/contracts'
 
@@ -33,10 +36,12 @@ function toHomebrewClass(doc: HomebrewDoc | HomebrewClassRecord): CharacterClass
     name: doc.name,
     ...(doc.imageKey !== undefined && { imageKey: doc.imageKey }),
     ...(doc.description !== undefined && { description: doc.description }),
-    primaryAbilities: doc.primaryAbilities,
-    hitDie: doc.hitDie,
+    ...(doc.primaryAbilities != null && { primaryAbilities: doc.primaryAbilities }),
+    ...(doc.hitDie != null && { hitDie: doc.hitDie }),
     ...(doc.spellcasting != null && { spellcasting: doc.spellcasting }),
-    proficiencies: doc.proficiencies as CharacterClass['proficiencies'],
+    ...(doc.proficiencies != null && {
+      proficiencies: doc.proficiencies as CharacterClass['proficiencies'],
+    }),
     ...(doc.characterCreation != null && { characterCreation: doc.characterCreation }),
     features: doc.features ?? [],
   } as CharacterClass
@@ -76,7 +81,10 @@ export const classWriteConfig: ContentWriteConfig<CharacterClass> = {
   responseKey: 'classes',
   createInputSchema: createClassInputSchema,
   updateInputSchema: updateClassInputSchema,
+  createDraftInputSchema: createClassDraftInputSchema,
+  updateDraftInputSchema: updateClassDraftInputSchema,
   storedSchema: classStoredSchema as unknown as ZodType<CharacterClass>,
+  draftStoredSchema: classDraftStoredSchema,
   bodySchema: classStoredBodySchema,
   homebrewModel: HomebrewClassModel,
   patchModel: ClassPatchModel,

@@ -17,8 +17,14 @@ import {
   toolProficiencyGrantSetSchema,
   weaponProficiencyGrantSetSchema,
 } from '../lib/proficiency-grant-set'
+import { CLASS_CONTENT_TYPE_TERM } from '../lib/content-type-terms'
+import { createDraftInputSchema, draftStoredSchema } from '../lib/content-input-schemas'
+import { draftAuthoredContentBodySchema } from '../lib/draft-authored-content'
 
-import { classCharacterCreationSchema } from '../starting-equipment'
+import {
+  classCharacterCreationDraftSchema,
+  classCharacterCreationSchema,
+} from '../starting-equipment'
 import { spellcastingSchema } from './spellcasting'
 import { classValidationMessages } from './class-messages'
 
@@ -82,6 +88,17 @@ export const classProficienciesSchema = z.object({
 
 export type ClassProficiencies = z.infer<typeof classProficienciesSchema>
 
+/** Draft class proficiencies — saving throws and nested buckets may be empty while authoring. */
+export const classProficienciesDraftSchema = z.object({
+  savingThrows: z.array(abilitySchema).max(3).default([]),
+  armor: armorProficiencyGrantSetSchema,
+  weapons: weaponProficiencyGrantSetSchema,
+  tools: toolProficiencyGrantSetSchema.optional(),
+  skills: skillProficiencyGrantSetSchema,
+})
+
+export type ClassProficienciesDraft = z.infer<typeof classProficienciesDraftSchema>
+
 // ---------------------------------------------------------------------------
 // Class resources — generic per-level numeric progression
 // (Sorcery Points, Rage count, Ki Points, Channel Divinity uses, etc.)
@@ -117,6 +134,21 @@ export const classStoredBodySchema = contentBodyBaseSchema.extend({
 
 export type ClassStoredBody = z.infer<typeof classStoredBodySchema>
 
+/** Draft save body — untitled name fallback; core progression fields optional. */
+export const classBodyDraftSchema = draftAuthoredContentBodySchema(
+  CLASS_CONTENT_TYPE_TERM.label,
+).extend({
+  primaryAbilities: z.array(abilitySchema).max(2).optional(),
+  hitDie: hitDieSchema.optional(),
+  spellcasting: spellcastingSchema.optional(),
+  proficiencies: classProficienciesDraftSchema.optional(),
+  features: z.array(classFeatureSchema).default([]),
+  resources: z.array(classResourceSchema).optional(),
+  characterCreation: classCharacterCreationDraftSchema.optional(),
+})
+
+export type ClassBodyDraft = z.infer<typeof classBodyDraftSchema>
+
 /** Read body — same shape as stored (class-owned proficiency choices). */
 export const classBodySchema = classStoredBodySchema
 
@@ -135,6 +167,10 @@ export function subclassChoiceFeatureId(classSlug: string): string {
 /** Stored record = envelope + persisted body (seed JSON, Mongo, patch merge target). */
 export const classStoredSchema = contentMetaSchema.extend(classStoredBodySchema.shape)
 export type ClassStored = z.infer<typeof classStoredSchema>
+
+/** Stored draft shape — relaxed body fields for in-progress homebrew. */
+export const classDraftStoredSchema = draftStoredSchema(classBodyDraftSchema)
+export type ClassDraft = z.infer<typeof classDraftStoredSchema>
 
 /** Read record = envelope + body. */
 export const classSchema = contentMetaSchema.extend(classBodySchema.shape)
@@ -163,8 +199,14 @@ export function subclassChoiceFeatureLevel(
 export const createClassInputSchema = classStoredBodySchema.extend({ slug: slugSchema })
 export type CreateClassInput = z.infer<typeof createClassInputSchema>
 
+export const createClassDraftInputSchema = createDraftInputSchema(classBodyDraftSchema)
+export type CreateClassDraftInput = z.infer<typeof createClassDraftInputSchema>
+
 export const updateClassInputSchema = createClassInputSchema.partial()
 export type UpdateClassInput = z.infer<typeof updateClassInputSchema>
+
+export const updateClassDraftInputSchema = createClassDraftInputSchema.partial()
+export type UpdateClassDraftInput = z.infer<typeof updateClassDraftInputSchema>
 
 /**
  * System-patch overlay. Reuses the generic envelope; only the type-specific

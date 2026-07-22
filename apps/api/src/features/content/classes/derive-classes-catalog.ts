@@ -1,10 +1,18 @@
-import { classSchema, type CharacterClass, type ClassStored } from '@rpg/contracts'
+import {
+  classDraftStoredSchema,
+  classSchema,
+  type CharacterClass,
+  type ClassStored,
+} from '@rpg/contracts'
 
 import { resolveCatalogForCampaign } from '../content.service'
 import { classContentConfig } from './classes.config'
 
 /** Parse a single stored class record for API responses. */
 export function parseClassReadModel(stored: ClassStored): CharacterClass {
+  if (stored.status === 'draft') {
+    return classDraftStoredSchema.parse(stored) as CharacterClass
+  }
   return classSchema.parse(stored)
 }
 

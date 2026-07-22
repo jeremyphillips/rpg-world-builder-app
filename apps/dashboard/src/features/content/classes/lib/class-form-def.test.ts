@@ -45,6 +45,30 @@ it('type: toInput validates as CreateClassInput', () => {
   expect(createClassInputSchema.safeParse(input).success).toBe(true)
 })
 
+it('draft: accepts incomplete publish fields', () => {
+  const input = classFormDef.toInput(
+    {
+      name: '',
+      hitDie: 8,
+      hasSpellcasting: false,
+      weaponProficiencyMode: 'categories',
+      proficiencies: {
+        savingThrows: [],
+        armor: [],
+        weapons: { categories: [], items: [] },
+        tools: { categories: [], items: [] },
+        skills: { items: [] },
+      },
+      features: [],
+    } as unknown as ClassFormValues,
+    undefined,
+    'draft',
+  )
+  expect(input.name).toBe('Untitled Class')
+  expect(input.hitDie).toBe(8)
+  expect(input).not.toHaveProperty('proficiencies')
+})
+
 describe('classFormDef round-trips', () => {
   for (const characterClass of SRD_CLASSES) {
     it(`${characterClass.slug}: toFormValues → toInput → schema.parse`, () => {

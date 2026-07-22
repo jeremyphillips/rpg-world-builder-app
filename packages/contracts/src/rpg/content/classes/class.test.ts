@@ -7,6 +7,7 @@ import {
   classSchema,
   classStoredBodySchema,
   classStoredSchema,
+  createClassDraftInputSchema,
   createClassInputSchema,
   subclassChoiceFeature,
   subclassChoiceFeatureId,
@@ -170,6 +171,39 @@ describe('createClassInputSchema', () => {
         },
       }).success,
     ).toBe(false)
+  })
+})
+
+describe('createClassDraftInputSchema', () => {
+  it('accepts minimal draft payloads and applies untitled name fallback', () => {
+    const parsed = createClassDraftInputSchema.parse({
+      slug: 'draft-class',
+      name: '',
+      hitDie: 8,
+    })
+    expect(parsed.name).toBe('Untitled Class')
+    expect(parsed.hitDie).toBe(8)
+    expect(parsed.features).toEqual([])
+  })
+
+  it('allows empty saving throws and skill choice groups on draft', () => {
+    expect(
+      createClassDraftInputSchema.safeParse({
+        slug: 'draft-class',
+        name: 'Draft Class',
+        proficiencies: {
+          savingThrows: [],
+          armor: { categories: [], items: [] },
+          weapons: { categories: [], items: [] },
+          skills: { categories: [], items: [] },
+        },
+        characterCreation: {
+          proficiencies: {
+            skills: { choices: [] },
+          },
+        },
+      }).success,
+    ).toBe(true)
   })
 })
 
