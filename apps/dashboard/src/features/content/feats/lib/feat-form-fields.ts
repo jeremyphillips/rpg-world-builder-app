@@ -46,7 +46,30 @@ export function createFeatFormSchema(maxLevel: number = MAX_CHARACTER_LEVEL) {
     })
 }
 
+export function createFeatDraftFormSchema() {
+  return z
+    .object({
+      name: z.string(),
+      slug: slugSchema.optional(),
+      description: z.string().optional(),
+      category: z.enum(FEAT_CATEGORY_IDS).optional(),
+      prerequisiteEditor: prerequisiteEditorSchema,
+      repeatableAllowed: z.boolean(),
+      repeatableNotes: z.string().optional(),
+    })
+    .superRefine((values, ctx) => {
+      if (!values.repeatableAllowed && values.repeatableNotes?.trim()) {
+        ctx.addIssue({
+          code: 'custom',
+          message: featValidationMessages.repeatableNotesOnlyWhenAllowed(),
+          path: ['repeatableNotes'],
+        })
+      }
+    })
+}
+
 export const featFormSchema = createFeatFormSchema()
+export const featDraftFormSchema = createFeatDraftFormSchema()
 
 export type FeatFormValues = z.infer<typeof featFormSchema>
 

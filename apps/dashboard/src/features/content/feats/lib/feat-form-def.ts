@@ -4,7 +4,9 @@ import { contentFormRegistry, type ContentFormDef } from '../../lib/forms/conten
 import { useFeats, featsQueryKey } from '../hooks/use-feats'
 import {
   buildFeatFields,
+  createFeatDraftFormSchema,
   createFeatFormSchema,
+  featDraftFormSchema,
   featFormSchema,
   type FeatFormValues,
 } from './feat-form-fields'
@@ -13,8 +15,11 @@ import { buildFeatCreateInput, featCreateDefaultValues, featToFormValues } from 
 const featFormDef: ContentFormDef<Feat, FeatFormValues, CreateFeatInput> = {
   routeKey: 'feats',
   schema: featFormSchema,
-  resolveSchema: (ctx) =>
-    createFeatFormSchema(ctx.campaignRules?.maxCharacterLevel ?? MAX_CHARACTER_LEVEL),
+  draftSchema: featDraftFormSchema,
+  resolveSchema: (ctx, intent = 'publish') => {
+    const maxLevel = ctx.campaignRules?.maxCharacterLevel ?? MAX_CHARACTER_LEVEL
+    return intent === 'draft' ? createFeatDraftFormSchema() : createFeatFormSchema(maxLevel)
+  },
   coverage: 'structural',
   createDefaultValues: featCreateDefaultValues,
   buildFields: buildFeatFields,
@@ -26,5 +31,11 @@ const featFormDef: ContentFormDef<Feat, FeatFormValues, CreateFeatInput> = {
 
 contentFormRegistry['feats'] = featFormDef
 
-export { featFormDef, featFormSchema, createFeatFormSchema }
+export {
+  featFormDef,
+  featFormSchema,
+  featDraftFormSchema,
+  createFeatFormSchema,
+  createFeatDraftFormSchema,
+}
 export type { FeatFormValues }

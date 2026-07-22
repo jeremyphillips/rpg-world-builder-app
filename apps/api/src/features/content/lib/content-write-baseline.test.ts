@@ -210,6 +210,43 @@ describe('content write baseline — draft status', () => {
     )
     expect(created.status).toBe('draft')
   })
+
+  it('creates an incomplete skill proficiency draft and round-trips via catalog', async () => {
+    const campaign = await makeTestCampaign()
+    const created = await createHomebrewContent(
+      skillProficiencyWriteConfig,
+      campaign.id,
+      { slug: 'draft-skill', name: '' },
+      'draft',
+    )
+
+    expect(created.status).toBe('draft')
+    expect(created.name).toBe('Untitled Skill Proficiency')
+
+    const catalog = await resolveCatalogForCampaign(
+      skillProficiencyWriteConfig.readConfig,
+      campaign.id,
+    )
+    expect(catalog.find((record) => record.id === created.id)?.name).toBe(
+      'Untitled Skill Proficiency',
+    )
+  })
+
+  it('creates an incomplete feat draft and round-trips via catalog', async () => {
+    const campaign = await makeTestCampaign()
+    const created = await createHomebrewContent(
+      featWriteConfig,
+      campaign.id,
+      { slug: 'draft-feat', name: '', repeatable: { allowed: false } },
+      'draft',
+    )
+
+    expect(created.status).toBe('draft')
+    expect(created.name).toBe('Untitled Feat')
+
+    const catalog = await resolveCatalogForCampaign(featWriteConfig.readConfig, campaign.id)
+    expect(catalog.find((record) => record.id === created.id)?.name).toBe('Untitled Feat')
+  })
 })
 
 describe('content write baseline — equipment kind guard', () => {

@@ -1,8 +1,11 @@
 import type { Feat } from '@rpg/contracts'
 import {
+  createFeatDraftInputSchema,
   createFeatInputSchema,
   featBodySchema,
+  featDraftStoredSchema,
   featSchema,
+  updateFeatDraftInputSchema,
   updateFeatInputSchema,
 } from '@rpg/contracts'
 
@@ -28,7 +31,7 @@ function toHomebrewFeat(doc: HomebrewDoc): Feat {
     name: record.name,
     ...(record.imageKey !== undefined && { imageKey: record.imageKey }),
     ...(record.description !== undefined && { description: record.description }),
-    category: record.category,
+    ...(record.category !== undefined && { category: record.category }),
     ...(record.prerequisite !== undefined && {
       prerequisite: record.prerequisite as Feat['prerequisite'],
     }),
@@ -67,7 +70,10 @@ export const featWriteConfig: ContentWriteConfig<Feat> = {
   responseKey: 'feats',
   createInputSchema: createFeatInputSchema,
   updateInputSchema: updateFeatInputSchema,
+  createDraftInputSchema: createFeatDraftInputSchema,
+  updateDraftInputSchema: updateFeatDraftInputSchema,
   storedSchema: featSchema,
+  draftStoredSchema: featDraftStoredSchema,
   bodySchema: featBodySchema,
   homebrewModel: HomebrewFeatModel,
   patchModel: FeatPatchModel,

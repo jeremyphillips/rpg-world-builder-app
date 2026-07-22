@@ -263,7 +263,7 @@ function ContentEditFormBody({
 }: ContentEditFormBodyProps) {
   const mutation = useContentWriteMutation(def, campaignId, entityId)
 
-  const { layoutCtx, schema, defaultValues } = loadContentEditFormState({
+  const { layoutCtx, schema, validationIntent, defaultValues } = loadContentEditFormState({
     def,
     entity,
     optionsCtx: ctx,
@@ -274,12 +274,16 @@ function ContentEditFormBody({
 
   const { onSubmit, formError } = useSubmitHandler(async (values, form) => {
     const saved = await mutation.mutateAsync(
-      def.toInput(values, {
-        entity,
-        weaponCategoryBySlug: ctx.options?.weaponCategoryBySlug,
-        campaignRules: layoutCtx.campaignRules,
-        equipmentKind: layoutCtx.equipmentKind,
-      }),
+      def.toInput(
+        values,
+        {
+          entity,
+          weaponCategoryBySlug: ctx.options?.weaponCategoryBySlug,
+          campaignRules: layoutCtx.campaignRules,
+          equipmentKind: layoutCtx.equipmentKind,
+        },
+        validationIntent,
+      ),
     )
     const baseline = stripEditEnvelopeFromFormDefaults(def.toFormValues(saved), {
       stripKind: layoutCtx.equipmentKind != null,

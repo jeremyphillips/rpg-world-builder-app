@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom'
-import type { ContentTypeKey } from '@rpg/contracts'
+import type { ContentTypeKey, ContentValidationIntent } from '@rpg/contracts'
 import { Heading } from '@rpg/ui'
 import { useState } from 'react'
 
@@ -61,13 +61,21 @@ function ContentCreateFormBody({
   const mutation = useContentWriteMutation(def, campaignId)
   const [saveDraftPending, setSaveDraftPending] = useState(false)
 
-  const createEntity = async (values: Record<string, unknown>, status: 'draft' | 'published') => {
+  const createEntity = async (
+    values: Record<string, unknown>,
+    status: 'draft' | 'published',
+    validationIntent: ContentValidationIntent,
+  ) => {
     const saved = (await mutation.mutateAsync({
-      ...def.toInput(values, {
-        weaponCategoryBySlug: ctx.options?.weaponCategoryBySlug,
-        campaignRules: ctx.campaignRules,
-        equipmentKind: ctx.equipmentKind,
-      }),
+      ...def.toInput(
+        values,
+        {
+          weaponCategoryBySlug: ctx.options?.weaponCategoryBySlug,
+          campaignRules: ctx.campaignRules,
+          equipmentKind: ctx.equipmentKind,
+        },
+        validationIntent,
+      ),
       status,
     })) as { id: string; kind?: unknown }
     const editHref = resolveContentPostCreateEditHref(def, campaignId, saved, formCtx)
@@ -77,14 +85,15 @@ function ContentCreateFormBody({
   }
 
   const { onSubmit: onPublish, formError: publishFormError } = useSubmitHandler(async (values) => {
-    await createEntity(values, intentToStatus('publish'))
+    resolveContentFormSchema(def, ctx, 'publish').parse(values)
+    await createEntity(values, intentToStatus('publish'), 'publish')
   }, `Could not create ${def.routeKey}.`)
 
   const { onSubmit: onSaveDraft, formError: saveDraftFormError } = useSubmitHandler(
     async (values) => {
       setSaveDraftPending(true)
       try {
-        await createEntity(values, intentToStatus('save_draft'))
+        await createEntity(values, intentToStatus('save_draft'), 'draft')
       } finally {
         setSaveDraftPending(false)
       }
@@ -96,7 +105,7 @@ function ContentCreateFormBody({
     <ContentFormLayout
       def={def}
       ctx={ctx}
-      schema={resolveContentFormSchema(def, ctx)}
+      schema={resolveContentFormSchema(def, ctx, 'draft')}
       defaultValues={{ ...def.createDefaultValues, ...initialValues }}
       formMode="create"
       contentTypeKey={contentTypeKey}

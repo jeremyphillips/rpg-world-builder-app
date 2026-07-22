@@ -4,6 +4,7 @@ import { contentFormRegistry, type ContentFormDef } from '../../lib/forms/conten
 import { useSkillProficiencies, skillProficienciesQueryKey } from '../hooks/use-skill-proficiencies'
 import {
   buildSkillProficiencyFields,
+  skillProficiencyDraftFormSchema,
   skillProficiencyFormSchema,
   type SkillProficiencyFormValues,
 } from './skill-proficiency-form-fields'
@@ -20,6 +21,7 @@ const skillProficiencyFormDef: ContentFormDef<
 > = {
   routeKey: 'skill-proficiencies',
   schema: skillProficiencyFormSchema,
+  draftSchema: skillProficiencyDraftFormSchema,
   coverage: 'structural',
   createDefaultValues: skillProficiencyCreateDefaultValues,
   buildFields: buildSkillProficiencyFields,

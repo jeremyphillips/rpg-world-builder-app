@@ -1,6 +1,8 @@
 import {
+  createFeatDraftInputSchema,
   createFeatInputSchema,
   MAX_CHARACTER_LEVEL,
+  type ContentValidationIntent,
   type CreateFeatInput,
   type Feat,
 } from '@rpg/contracts'
@@ -35,6 +37,7 @@ export function featToFormValues(entity: Feat): FeatFormValues {
 export function buildFeatCreateInput(
   values: FeatFormValues,
   ctx?: ContentFormInputCtx<Feat>,
+  validationIntent: ContentValidationIntent = 'publish',
 ): CreateFeatInput {
   const maxLevel = ctx?.campaignRules?.maxCharacterLevel ?? MAX_CHARACTER_LEVEL
   const prerequisite = requirementEditorToExpression(values.prerequisiteEditor, maxLevel)
@@ -45,11 +48,13 @@ export function buildFeatCreateInput(
       }
     : { allowed: false as const }
 
-  const input = createFeatInputSchema.parse({
+  const schema = validationIntent === 'draft' ? createFeatDraftInputSchema : createFeatInputSchema
+
+  const input = schema.parse({
     slug: slugForInputParse(values.name, ctx),
     name: values.name,
     description: values.description || undefined,
-    category: values.category,
+    ...(values.category !== undefined ? { category: values.category } : {}),
     prerequisite,
     repeatable,
   })

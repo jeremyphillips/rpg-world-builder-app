@@ -4,8 +4,10 @@ import {
   getSkillSentenceForm,
   skillSchema,
   skillProficiencyBodySchema,
+  skillProficiencyBodyDraftSchema,
   skillProficiencyPatchSchema,
   skillProficiencySchema,
+  createSkillProficiencyDraftInputSchema,
   createSkillProficiencyInputSchema,
   updateSkillProficiencyInputSchema,
 } from './skill-proficiency'
@@ -165,5 +167,33 @@ describe('skillProficiencyBodySchema', () => {
   it('is the editable surface (no envelope fields)', () => {
     expect(skillProficiencyBodySchema.safeParse(athleticsBody).success).toBe(true)
     expect('id' in skillProficiencyBodySchema.shape).toBe(false)
+  })
+})
+
+describe('skillProficiencyBodyDraftSchema', () => {
+  it('accepts minimal draft payloads and applies untitled name fallback', () => {
+    const parsed = skillProficiencyBodyDraftSchema.parse({ name: '' })
+    expect(parsed.name).toBe('Untitled Skill Proficiency')
+    expect(parsed.examples).toEqual([])
+  })
+
+  it('rejects publish-incomplete payloads on the publish input schema', () => {
+    expect(
+      createSkillProficiencyInputSchema.safeParse({
+        slug: 'custom-skill',
+        name: '',
+        ability: 'dex',
+        examples: [],
+      }).success,
+    ).toBe(false)
+  })
+
+  it('accepts the same minimal payload on the draft input schema', () => {
+    expect(
+      createSkillProficiencyDraftInputSchema.safeParse({
+        slug: 'custom-skill',
+        name: '',
+      }).success,
+    ).toBe(true)
   })
 })

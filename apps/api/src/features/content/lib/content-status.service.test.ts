@@ -5,7 +5,9 @@ import { makeTestUser } from '../../../test/fixtures/users'
 import { minimalNpcRequestInput } from '../../../test/fixtures/npcs'
 import { useIntegrationDb } from '../../../test/setup/integration-db'
 import { classWriteConfig } from '../classes/classes.config'
+import { featWriteConfig } from '../feats/feats.config'
 import { HomebrewClassModel } from '../classes/homebrew-class.model'
+import { skillProficiencyWriteConfig } from '../skill-proficiencies/skill-proficiencies.config'
 import { createHomebrewContent } from './content-write.service'
 import {
   demoteContentToDraft,
@@ -55,6 +57,39 @@ describe('content status service', () => {
 
     const doc = await HomebrewClassModel.findById(created.id).lean()
     expect(doc?.status).toBe('published')
+  })
+
+  it('rejects promote when draft body is publish-incomplete', async () => {
+    const campaign = await makeTestCampaign()
+    const created = await createHomebrewContent(
+      skillProficiencyWriteConfig,
+      campaign.id,
+      { slug: 'incomplete-skill', name: '' },
+      'draft',
+    )
+    expect(created.status).toBe('draft')
+
+    await expect(
+      promoteContentToPublished(skillProficiencyWriteConfig, campaign.id, created.id),
+    ).rejects.toMatchObject({ status: 400, code: 'validation_error' })
+  })
+
+  it('promotes a complete draft feat to published', async () => {
+    const campaign = await makeTestCampaign()
+    const created = await createHomebrewContent(
+      featWriteConfig,
+      campaign.id,
+      {
+        slug: 'draft-feat',
+        name: 'Draft Feat',
+        category: 'general',
+        repeatable: { allowed: false },
+      },
+      'draft',
+    )
+
+    const promoted = await promoteContentToPublished(featWriteConfig, campaign.id, created.id)
+    expect(promoted.status).toBe('published')
   })
 
   it('demotes published homebrew when no characters reference it', async () => {

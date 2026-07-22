@@ -3,6 +3,7 @@ import type {
   ContentDemotionResult,
   ContentUsageBlocker,
 } from '@rpg/contracts'
+import { ZodError } from 'zod'
 
 import { HttpError } from '../../../lib/http-error'
 import type { HomebrewDoc } from './content-write-config'
@@ -45,6 +46,30 @@ export async function getContentDemotionAvailability<T extends WriteEntityBase>(
   return { status: 'allowed' }
 }
 
+function assertPublishReady<T extends WriteEntityBase>(
+  config: ContentWriteConfig<T>,
+  entity: T,
+): void {
+  try {
+    config.storedSchema.parse({ ...entity, status: 'published' })
+  } catch (err) {
+    if (err instanceof ZodError) {
+      throw new HttpError(
+        400,
+        'validation_error',
+        'Content is incomplete and cannot be published.',
+        {
+          issues: err.issues.map((issue) => ({
+            path: issue.path.join('.'),
+            message: issue.message,
+          })),
+        },
+      )
+    }
+    throw err
+  }
+}
+
 /** Promote a homebrew draft to published — no blocker evaluation. */
 export async function promoteContentToPublished<T extends WriteEntityBase>(
   config: ContentWriteConfig<T>,
@@ -56,6 +81,8 @@ export async function promoteContentToPublished<T extends WriteEntityBase>(
   if (entity.source !== 'homebrew') {
     throw new HttpError(403, 'forbidden', 'System content is always published.')
   }
+
+  assertPublishReady(config, entity)
 
   const updated = await config.homebrewModel
     .findOneAndUpdate(

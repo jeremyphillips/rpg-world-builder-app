@@ -20,7 +20,7 @@ const featRepeatableSubSchema = new Schema(
 const homebrewFeatSchema = new Schema(
   {
     ...homebrewContentIdentityFields,
-    category: { type: String, enum: [...FEAT_CATEGORY_IDS], required: true },
+    category: { type: String, enum: [...FEAT_CATEGORY_IDS] },
     prerequisite: { type: Schema.Types.Mixed },
     repeatable: {
       type: featRepeatableSubSchema,

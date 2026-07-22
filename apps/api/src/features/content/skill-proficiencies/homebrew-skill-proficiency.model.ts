@@ -12,15 +12,8 @@ const { model, models, Schema } = mongoose
 const homebrewSkillProficiencySchema = new Schema(
   {
     ...homebrewContentIdentityFields,
-    ability: { type: String, enum: [...ABILITY_IDS], required: true },
-    examples: {
-      type: [String],
-      required: true,
-      validate: {
-        validator: (value: string[]) => Array.isArray(value) && value.length >= 1,
-        message: 'At least one example is required.',
-      },
-    },
+    ability: { type: String, enum: [...ABILITY_IDS] },
+    examples: { type: [String], default: [] },
   },
   { timestamps: true },
 )

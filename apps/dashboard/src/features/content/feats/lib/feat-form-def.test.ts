@@ -81,4 +81,18 @@ describe('featFormDef create vs update modes', () => {
     expect(input).not.toHaveProperty('slug')
     expect(input.name).toBe('Renamed Feat')
   })
+
+  it('draft: accepts incomplete publish fields', () => {
+    const input = featFormDef.toInput(
+      {
+        name: '',
+        prerequisiteEditor: requirementExpressionToEditor(undefined),
+        repeatableAllowed: false,
+      } as FeatFormValues,
+      undefined,
+      'draft',
+    )
+    expect(input.name).toBe('Untitled Feat')
+    expect(input).not.toHaveProperty('category')
+  })
 })

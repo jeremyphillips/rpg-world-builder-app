@@ -2,7 +2,12 @@ import type { FieldValues } from 'react-hook-form'
 import type { ZodType } from 'zod'
 import type { FormItem, TabbedFormTab } from '@rpg/ui/form'
 
-import type { ContentSource, EquipmentKind, WeaponCategory } from '@rpg/contracts'
+import type {
+  ContentSource,
+  EquipmentKind,
+  WeaponCategory,
+  ContentValidationIntent,
+} from '@rpg/contracts'
 import type { ResolvedCampaignRules } from '@rpg/contracts'
 
 import type {
@@ -84,8 +89,13 @@ export interface ContentFormDef<
   routeKey: string
   /** Zod schema validated on submit. Must match `TFormValues`. */
   schema: ZodType<TFormValues>
+  /** Relaxed schema for draft saves — falls back to `schema` when omitted. */
+  draftSchema?: ZodType<FieldValues>
   /** Campaign-aware schema when the default `schema` is not sufficient. */
-  resolveSchema?: (ctx: ContentFormCtx) => ZodType<TFormValues>
+  resolveSchema?: (
+    ctx: ContentFormCtx,
+    validationIntent?: ContentValidationIntent,
+  ) => ZodType<FieldValues>
   /** Returns the ordered `FormItem[]` for this type. */
   buildFields: (ctx: ContentFormCtx) => FormItem[]
   /**
@@ -109,7 +119,11 @@ export interface ContentFormDef<
    * Pass `{ entity }` on edit so slug and nested ids stay locked after create.
    * The type-level drift test asserts this matches the contract DTO.
    */
-  toInput: (formValues: TFormValues, ctx?: ContentFormInputCtx<TEntity>) => TCreateInput
+  toInput: (
+    formValues: TFormValues,
+    ctx?: ContentFormInputCtx<TEntity>,
+    validationIntent?: ContentValidationIntent,
+  ) => TCreateInput
   /** List query hook; the edit shell uses it to seed the form from cache. */
   useListQuery: (campaignId: string | undefined) => ContentListQueryResult<TEntity>
   /** Query key factory; used to invalidate the list after a successful mutation. */

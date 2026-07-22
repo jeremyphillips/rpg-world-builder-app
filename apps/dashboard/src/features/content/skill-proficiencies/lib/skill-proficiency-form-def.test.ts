@@ -58,4 +58,15 @@ describe('skillProficiencyFormDef create vs update modes', () => {
     expect(input).not.toHaveProperty('slug')
     expect(input.name).toBe('Renamed Skill')
   })
+
+  it('draft: accepts incomplete publish fields', () => {
+    const input = skillProficiencyFormDef.toInput(
+      { name: '', examples: [{ value: '' }] } as SkillProficiencyFormValues,
+      undefined,
+      'draft',
+    )
+    expect(input.name).toBe('Untitled Skill Proficiency')
+    expect(input).not.toHaveProperty('ability')
+    expect(input.examples).toEqual([])
+  })
 })

@@ -1,7 +1,9 @@
 import { describe, expect, it } from 'vitest'
 
 import {
+  createFeatDraftInputSchema,
   createFeatInputSchema,
+  featBodyDraftSchema,
   featBodySchema,
   featPatchSchema,
   featSchema,
@@ -166,5 +168,32 @@ describe('featBodySchema', () => {
   it('is the editable surface (no envelope fields)', () => {
     expect(featBodySchema.safeParse(grapplerBody).success).toBe(true)
     expect('id' in featBodySchema.shape).toBe(false)
+  })
+})
+
+describe('featBodyDraftSchema', () => {
+  it('accepts minimal draft payloads and applies untitled name fallback', () => {
+    const parsed = featBodyDraftSchema.parse({ name: '' })
+    expect(parsed.name).toBe('Untitled Feat')
+    expect(parsed.repeatable).toEqual({ allowed: false })
+  })
+
+  it('rejects publish-incomplete payloads on the publish input schema', () => {
+    expect(
+      createFeatInputSchema.safeParse({
+        slug: 'custom-feat',
+        name: '',
+        repeatable: { allowed: false },
+      }).success,
+    ).toBe(false)
+  })
+
+  it('accepts the same minimal payload on the draft input schema', () => {
+    expect(
+      createFeatDraftInputSchema.safeParse({
+        slug: 'custom-feat',
+        name: '',
+      }).success,
+    ).toBe(true)
   })
 })

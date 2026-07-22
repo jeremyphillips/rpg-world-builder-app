@@ -1,4 +1,10 @@
-import type { ContentSource, ContentStatus, SystemRulesetId } from '@rpg/contracts'
+import {
+  contentStatusToValidationIntent,
+  type ContentSource,
+  type ContentStatus,
+  type ContentValidationIntent,
+  type SystemRulesetId,
+} from '@rpg/contracts'
 import { ContentKeyError } from '@rpg/contracts'
 
 import { HttpError } from '../../../lib/http-error'
@@ -8,6 +14,7 @@ import { normalizeHomebrewWriteInput } from './apply-content-keys'
 import { assertSlugAvailable } from './assert-slug-available'
 import { deepMerge } from './deep-merge'
 import type { ContentWriteConfig, ContentWriteContext, HomebrewDoc } from './content-write-config'
+import { resolveStoredSchema, resolveWriteInputSchema } from './content-write-config'
 import { stripNullDeep, stripNullDeepFields } from './strip-null-deep'
 
 type StoredEntity = {
@@ -93,8 +100,9 @@ function parsePersistedWriteInput<T extends StoredEntity>(
   config: ContentWriteConfig<T>,
   normalized: Record<string, unknown>,
   mode: 'create' | 'update',
+  validationIntent: ContentValidationIntent,
 ): Record<string, unknown> {
-  const schema = mode === 'create' ? config.createInputSchema : config.updateInputSchema
+  const schema = resolveWriteInputSchema(config, mode, validationIntent)
   return schema.parse(normalized) as Record<string, unknown>
 }
 
@@ -102,17 +110,19 @@ function buildWriteContext(
   campaignId: string,
   rulesetId: SystemRulesetId,
   mode: 'create' | 'update',
+  validationIntent: ContentValidationIntent,
   input: Record<string, unknown>,
   normalized: Record<string, unknown>,
   existing?: StoredEntity,
 ): ContentWriteContext {
-  return { campaignId, rulesetId, mode, input, normalized, existing }
+  return { campaignId, rulesetId, mode, validationIntent, input, normalized, existing }
 }
 
 async function runValidateBeforeWrite<T extends StoredEntity>(
   config: ContentWriteConfig<T>,
   ctx: ContentWriteContext,
 ): Promise<void> {
+  if (ctx.validationIntent === 'draft') return
   await config.validateBeforeWrite?.(ctx)
 }
 
@@ -174,7 +184,10 @@ async function updateHomebrewRecord<T extends StoredEntity>(
   }
 
   const entity = config.toHomebrewEntity(updated)
-  return config.storedSchema.parse(entity)
+  const validationIntent = contentStatusToValidationIntent(
+    (entity.status ?? 'published') as ContentStatus,
+  )
+  return resolveStoredSchema(config, validationIntent).parse(entity)
 }
 
 async function updateSystemPatch<T extends StoredEntity>(
@@ -234,15 +247,23 @@ export async function createHomebrewContent<T extends StoredEntity>(
   rawInput: unknown,
   status: ContentStatus = 'published',
 ): Promise<T> {
+  const validationIntent = contentStatusToValidationIntent(status)
   const normalized = normalizeWriteInput(rawInput, undefined, 'create')
-  const input = parsePersistedWriteInput(config, normalized, 'create')
+  const input = parsePersistedWriteInput(config, normalized, 'create', validationIntent)
   const campaign = await findCampaignById(campaignId)
   if (!campaign) {
     throw new HttpError(404, 'not_found', 'Campaign not found.')
   }
 
   const { rulesetId } = campaign
-  const writeCtx = buildWriteContext(campaignId, rulesetId, 'create', input, normalized)
+  const writeCtx = buildWriteContext(
+    campaignId,
+    rulesetId,
+    'create',
+    validationIntent,
+    input,
+    normalized,
+  )
   await runValidateBeforeWrite(config, writeCtx)
 
   const slug = input.slug as string
@@ -263,7 +284,7 @@ export async function createHomebrewContent<T extends StoredEntity>(
   })
 
   const entity = config.toHomebrewEntity(created.toObject() as unknown as HomebrewDoc)
-  const parsed = config.storedSchema.parse(entity)
+  const parsed = resolveStoredSchema(config, validationIntent).parse(entity)
   return finalizeWriteResult(config, writeCtx, parsed)
 }
 
@@ -306,11 +327,13 @@ export async function updateContentEntity<T extends StoredEntity>(
 
   const existingBody = entityBody(existing as unknown as Record<string, unknown>)
   const normalized = normalizeWriteInput(rawInput, existingBody, 'update')
-  const update = parsePersistedWriteInput(config, normalized, 'update')
+  const validationIntent = contentStatusToValidationIntent(existing.status)
+  const update = parsePersistedWriteInput(config, normalized, 'update', validationIntent)
   const writeCtx = buildWriteContext(
     campaignId,
     campaign.rulesetId,
     'update',
+    validationIntent,
     update,
     normalized,
     existing,

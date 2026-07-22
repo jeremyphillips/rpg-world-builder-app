@@ -24,7 +24,16 @@ export const skillProficiencyFormSchema = z.object({
   examples: z.array(exampleFormItemSchema).min(1),
 })
 
+export const skillProficiencyDraftFormSchema = z.object({
+  name: z.string(),
+  slug: slugSchema.optional(),
+  description: z.string().optional(),
+  ability: abilitySchema.optional(),
+  examples: z.array(exampleFormItemSchema),
+})
+
 export type SkillProficiencyFormValues = z.infer<typeof skillProficiencyFormSchema>
+export type SkillProficiencyDraftFormValues = z.infer<typeof skillProficiencyDraftFormSchema>
 
 export function buildSkillProficiencyFields(_ctx: ContentFormCtx): FormItem[] {
   return [

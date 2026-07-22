@@ -1,8 +1,11 @@
 import type { SkillProficiency } from '@rpg/contracts'
 import {
+  createSkillProficiencyDraftInputSchema,
   createSkillProficiencyInputSchema,
   skillProficiencyBodySchema,
+  skillProficiencyDraftStoredSchema,
   skillProficiencySchema,
+  updateSkillProficiencyDraftInputSchema,
   updateSkillProficiencyInputSchema,
 } from '@rpg/contracts'
 
@@ -34,8 +37,8 @@ function toHomebrewSkillProficiency(doc: HomebrewDoc): SkillProficiency {
     name: record.name,
     ...(record.imageKey !== undefined && { imageKey: record.imageKey }),
     ...(record.description !== undefined && { description: record.description }),
-    ability: record.ability,
-    examples: record.examples,
+    ...(record.ability !== undefined && { ability: record.ability }),
+    examples: record.examples ?? [],
   } as SkillProficiency
 }
 
@@ -68,7 +71,10 @@ export const skillProficiencyWriteConfig: ContentWriteConfig<SkillProficiency> =
   responseKey: 'skillProficiencies',
   createInputSchema: createSkillProficiencyInputSchema,
   updateInputSchema: updateSkillProficiencyInputSchema,
+  createDraftInputSchema: createSkillProficiencyDraftInputSchema,
+  updateDraftInputSchema: updateSkillProficiencyDraftInputSchema,
   storedSchema: skillProficiencySchema,
+  draftStoredSchema: skillProficiencyDraftStoredSchema,
   bodySchema: skillProficiencyBodySchema,
   homebrewModel: HomebrewSkillProficiencyModel,
   patchModel: SkillProficiencyPatchModel,

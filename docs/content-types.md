@@ -248,6 +248,8 @@ Shared helpers: `packages/contracts/src/rpg/content/lib/content-key.ts` (`derive
 
 **Today:** homebrew records carry `status: 'draft' | 'published'` on the content envelope. Campaign managers (`owner`/`co-owner`) create with **Save draft** or **Publish**, promote drafts from the edit shell, and demote published homebrew when no active characters reference it. Non-managers receive only published records from list endpoints; slug assignment still happens on first POST (draft included).
 
+**Validation intent:** authoring uses a wire-level `ContentValidationIntent` (`draft` | `publish`) that is distinct from persisted `ContentStatus`. Save Draft and edit-save on draft entities validate against relaxed `*Draft*` schema families in `@rpg/contracts`; Publish, edit-save on published entities, and promote re-validate against the publish-complete schemas. Types without registered draft schemas fall back to today's publish schemas for both intents until their phase lands. Shared helpers live in `packages/contracts/src/rpg/content/lib/content-validation-intent.ts`, `draft-authored-content.ts`, and `content-input-schemas.ts`; the API selects input/stored schemas via `resolveWriteInputSchema` / `resolveStoredSchema` in `content-write-config.ts`.
+
 ### Known gaps (revisit later)
 
 - **Cross-catalog slug references** — Some fields still store class **slugs**, not opaque ids (e.g. `spell.classIds`, skill slugs in `characterCreation.proficiencies.skills.choices[].from`). Locking a target’s slug does not break these while the slug stays unchanged; deleting and re-creating content under a new slug **will** break slug-based refs. No cascade migration exists.

@@ -2,6 +2,9 @@ import { z } from 'zod'
 import { abilitySchema } from '../vocab/ability'
 import { formatVocabularySlugLabel } from '../vocab/format-slug-label'
 import { getTermSentenceForm } from '../vocab/types'
+import { SKILL_PROFICIENCY_CONTENT_TYPE_TERM } from './lib/content-type-terms'
+import { createDraftInputSchema, createPublishInputSchema } from './lib/content-input-schemas'
+import { draftAuthoredContentBodySchema } from './lib/draft-authored-content'
 import {
   contentBodyBaseSchema,
   contentMetaSchema,
@@ -50,18 +53,47 @@ export const skillProficiencyBodySchema = contentBodyBaseSchema.extend({
 
 export type SkillProficiencyBody = z.infer<typeof skillProficiencyBodySchema>
 
+/** Draft save body — untitled name fallback; ability and examples optional. */
+export const skillProficiencyBodyDraftSchema = draftAuthoredContentBodySchema(
+  SKILL_PROFICIENCY_CONTENT_TYPE_TERM.label,
+).extend({
+  ability: abilitySchema.optional(),
+  examples: z.array(z.string().min(1)).default([]),
+})
+
+export type SkillProficiencyBodyDraft = z.infer<typeof skillProficiencyBodyDraftSchema>
+
 /** Stored shape = ownership envelope + body. */
 export const skillProficiencySchema = contentMetaSchema.extend(skillProficiencyBodySchema.shape)
 export type SkillProficiency = z.infer<typeof skillProficiencySchema>
 
+/** Stored draft shape — relaxed body fields for in-progress homebrew. */
+export const skillProficiencyDraftStoredSchema = contentMetaSchema.extend(
+  skillProficiencyBodyDraftSchema.shape,
+)
+export type SkillProficiencyDraft = z.infer<typeof skillProficiencyDraftStoredSchema>
+
 // Homebrew authoring DTOs (forms). Server sets id/source/campaignId/timestamps.
-export const createSkillProficiencyInputSchema = skillProficiencyBodySchema.extend({
-  slug: slugSchema,
-})
+export const createSkillProficiencyInputSchema = createPublishInputSchema(
+  skillProficiencyBodySchema,
+)
 export type CreateSkillProficiencyInput = z.infer<typeof createSkillProficiencyInputSchema>
+
+export const createSkillProficiencyDraftInputSchema = createDraftInputSchema(
+  skillProficiencyBodyDraftSchema,
+)
+export type CreateSkillProficiencyDraftInput = z.infer<
+  typeof createSkillProficiencyDraftInputSchema
+>
 
 export const updateSkillProficiencyInputSchema = createSkillProficiencyInputSchema.partial()
 export type UpdateSkillProficiencyInput = z.infer<typeof updateSkillProficiencyInputSchema>
+
+export const updateSkillProficiencyDraftInputSchema =
+  createSkillProficiencyDraftInputSchema.partial()
+export type UpdateSkillProficiencyDraftInput = z.infer<
+  typeof updateSkillProficiencyDraftInputSchema
+>
 
 /**
  * System-patch overlay. Reuses the generic envelope; only the type-specific

@@ -1,12 +1,10 @@
 import { z } from 'zod'
 
 import { featCategorySchema } from '../vocab/feat'
-import {
-  contentBodyBaseSchema,
-  contentMetaSchema,
-  contentPatchBaseSchema,
-  slugSchema,
-} from './lib/envelope'
+import { FEAT_CONTENT_TYPE_TERM } from './lib/content-type-terms'
+import { createDraftInputSchema, createPublishInputSchema } from './lib/content-input-schemas'
+import { draftAuthoredContentBodySchema } from './lib/draft-authored-content'
+import { contentBodyBaseSchema, contentMetaSchema, contentPatchBaseSchema } from './lib/envelope'
 import { requirementExpressionSchema } from './lib/requirement-expression'
 import { featValidationMessages } from './feat-messages'
 
@@ -58,15 +56,37 @@ export const featBodySchema = contentBodyBaseSchema.extend({
 
 export type FeatBody = z.infer<typeof featBodySchema>
 
+/** Draft save body — untitled name fallback; category optional. */
+export const featBodyDraftSchema = draftAuthoredContentBodySchema(
+  FEAT_CONTENT_TYPE_TERM.label,
+).extend({
+  category: featCategorySchema.optional(),
+  prerequisite: requirementExpressionSchema.optional(),
+  repeatable: featRepeatableSchema.default({ allowed: false }),
+  benefit: featBenefitSchema.optional(),
+})
+
+export type FeatBodyDraft = z.infer<typeof featBodyDraftSchema>
+
 /** Stored shape = ownership envelope + body. */
 export const featSchema = contentMetaSchema.extend(featBodySchema.shape)
 export type Feat = z.infer<typeof featSchema>
 
-export const createFeatInputSchema = featBodySchema.extend({ slug: slugSchema })
+/** Stored draft shape — relaxed body fields for in-progress homebrew. */
+export const featDraftStoredSchema = contentMetaSchema.extend(featBodyDraftSchema.shape)
+export type FeatDraft = z.infer<typeof featDraftStoredSchema>
+
+export const createFeatInputSchema = createPublishInputSchema(featBodySchema)
 export type CreateFeatInput = z.infer<typeof createFeatInputSchema>
+
+export const createFeatDraftInputSchema = createDraftInputSchema(featBodyDraftSchema)
+export type CreateFeatDraftInput = z.infer<typeof createFeatDraftInputSchema>
 
 export const updateFeatInputSchema = createFeatInputSchema.partial()
 export type UpdateFeatInput = z.infer<typeof updateFeatInputSchema>
+
+export const updateFeatDraftInputSchema = createFeatDraftInputSchema.partial()
+export type UpdateFeatDraftInput = z.infer<typeof updateFeatDraftInputSchema>
 
 export const featPatchSchema = contentPatchBaseSchema.extend({
   patch: featBodySchema.partial(),

@@ -52,6 +52,23 @@ Tests assert through the definition, never a literal:
 expect(result.error.issues[0]?.message).toBe(levelValidationMessages.rangeGap({ level: 5 }))
 ```
 
+## Draft vs publish contract families
+
+Catalog content types expose parallel Zod schema families keyed by
+`ContentValidationIntent` (`draft` | `publish`):
+
+| Family           | Suffix / helper                                                 | When used                                            |
+| ---------------- | --------------------------------------------------------------- | ---------------------------------------------------- |
+| Draft body       | `*BodyDraftSchema`, `draftAuthoredContentBodySchema(typeLabel)` | Save Draft, edit-save on `status: 'draft'`           |
+| Publish body     | `*BodySchema` (existing)                                        | Publish, edit-save on `status: 'published'`, promote |
+| Draft wire DTO   | `create*DraftInputSchema` via `createDraftInputSchema`          | API/dashboard draft saves                            |
+| Publish wire DTO | `create*InputSchema` via `createPublishInputSchema`             | API/dashboard publish saves                          |
+| Draft stored     | `*DraftStoredSchema` via `draftStoredSchema`                    | Post-write parse for draft entities                  |
+
+Draft bodies apply `formatUntitledContentName` when `name` is blank. Publish-only
+`superRefine` hooks and `validateBeforeWrite` run only on the publish path. Types
+without draft siblings fall back to publish schemas until their rollout phase.
+
 ## Naming conventions
 
 | Thing          | Convention                                                                                          | Example                            |
