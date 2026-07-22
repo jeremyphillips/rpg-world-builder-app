@@ -1,4 +1,3 @@
-import { useNavigate } from 'react-router-dom'
 import type { ContentSource, ContentTypeKey } from '@rpg/contracts'
 import { Button, Heading, Spinner, Text } from '@rpg/ui'
 import type { DefaultValues, FieldValues, UseFormReturn } from 'react-hook-form'
@@ -6,8 +5,9 @@ import type { ZodType } from 'zod'
 
 import { NarrowPage } from '@/components/layout/narrow-page'
 import { useSetBreadcrumbLabel } from '@/components/layout/use-breadcrumb-label'
-import { allowFormNavigationOnce } from '@/lib/form-unsaved-changes-guard'
+import { useSubmitHandler } from '@/lib/use-submit-handler'
 import { SubclassUnsavedEditsProvider } from '@/features/content/classes/hooks/subclass-unsaved-edits-context.client'
+import { stripEditEnvelopeFromFormDefaults } from '../content-form-key-helpers'
 import { useContentWriteMutation } from '../../list/use-content-mutations'
 import {
   contentFormRegistry,
@@ -37,7 +37,7 @@ export interface ContentEditShellProps {
   notFoundLabel?: string
   /** Page heading factory — receives the entity name once resolved. */
   heading?: (name: string) => string
-  /** Href for "Cancel" and post-submit navigation (typically the detail page). */
+  /** Href for detail/breadcrumb links (not used for post-save navigation). */
   backHref: string
   /** Href for post-delete navigation (typically the type overview). */
   overviewHref: string
@@ -69,7 +69,6 @@ interface ContentEditEntityFormProps<
   def: AnyContentFormDef
   entity: TEntity
   campaignId: string
-  backHref: string
   overviewHref: string
   contentTypeKey: ContentTypeKey
   headingFn: (name: string) => string
@@ -77,6 +76,7 @@ interface ContentEditEntityFormProps<
   schema: ZodType<FieldValues>
   defaultValues: DefaultValues<FieldValues>
   submitPending: boolean
+  submitSuccess: boolean
   formError: string | null
   onSubmit: (values: FieldValues, form: UseFormReturn<FieldValues>) => Promise<void>
 }
@@ -86,7 +86,6 @@ function ContentEditEntityForm<
 >({
   entity,
   campaignId,
-  backHref,
   overviewHref,
   contentTypeKey,
   headingFn,
@@ -95,6 +94,7 @@ function ContentEditEntityForm<
   schema,
   defaultValues,
   submitPending,
+  submitSuccess,
   formError,
   onSubmit,
 }: ContentEditEntityFormProps<TEntity>) {
@@ -137,9 +137,11 @@ function ContentEditEntityForm<
           formKey={entity.id}
           schema={schema}
           defaultValues={defaultValues}
-          backHref={backHref}
+          formMode="edit"
+          contentTypeKey={contentTypeKey}
           submitLabel="Save changes"
           submitPending={submitPending}
+          submitSuccess={submitSuccess}
           formError={headerError}
           onSubmit={onSubmit}
         />
@@ -175,15 +177,12 @@ function ContentEditFormReady({
   entityId,
   notFoundLabel = 'Item not found.',
   heading: headingFn = (name) => `Edit ${name}`,
-  backHref,
   overviewHref,
   contentTypeKey,
   formCtx,
   ctx,
-}: ContentEditFormReadyProps) {
-  const navigate = useNavigate()
+}: Omit<ContentEditFormReadyProps, 'backHref'>) {
   const entity = findContentEditEntity(def.useListQuery(campaignId).data, entityId)
-  const mutation = useContentWriteMutation(def, campaignId, entityId)
 
   if (!entity) {
     return (
@@ -192,6 +191,46 @@ function ContentEditFormReady({
       </Text>
     )
   }
+
+  return (
+    <ContentEditFormBody
+      def={def}
+      entity={entity}
+      campaignId={campaignId}
+      entityId={entityId}
+      headingFn={headingFn}
+      overviewHref={overviewHref}
+      contentTypeKey={contentTypeKey}
+      formCtx={formCtx}
+      ctx={ctx}
+    />
+  )
+}
+
+interface ContentEditFormBodyProps {
+  def: AnyContentFormDef
+  entity: { id: string; name: string; source: ContentSource }
+  campaignId: string
+  entityId: string
+  headingFn: (name: string) => string
+  overviewHref: string
+  contentTypeKey: ContentTypeKey
+  formCtx?: Partial<ContentFormCtx>
+  ctx: ContentFormCtx
+}
+
+function ContentEditFormBody({
+  def,
+  entity,
+  campaignId,
+  entityId,
+  headingFn,
+  overviewHref,
+  contentTypeKey,
+  formCtx,
+  ctx,
+}: ContentEditFormBodyProps) {
+  const mutation = useContentWriteMutation(def, campaignId, entityId)
 
   const { layoutCtx, schema, defaultValues } = loadContentEditFormState({
     def,
@@ -202,12 +241,27 @@ function ContentEditFormReady({
     entityId,
   })
 
+  const { onSubmit, formError } = useSubmitHandler(async (values, form) => {
+    const saved = await mutation.mutateAsync(
+      def.toInput(values, {
+        entity,
+        weaponCategoryBySlug: ctx.options?.weaponCategoryBySlug,
+        campaignRules: layoutCtx.campaignRules,
+        equipmentKind: layoutCtx.equipmentKind,
+      }),
+    )
+    const baseline = stripEditEnvelopeFromFormDefaults(def.toFormValues(saved), {
+      stripKind: layoutCtx.equipmentKind != null,
+    })
+    form.reset(baseline)
+    // TODO(toast): optionally supplement inline "Changes saved." with toast feedback
+  }, `Could not update ${def.routeKey}.`)
+
   return (
     <ContentEditEntityForm
       def={def}
       entity={entity}
       campaignId={campaignId}
-      backHref={backHref}
       overviewHref={overviewHref}
       contentTypeKey={contentTypeKey}
       headingFn={headingFn}
@@ -215,20 +269,9 @@ function ContentEditFormReady({
       schema={schema}
       defaultValues={defaultValues}
       submitPending={mutation.isPending}
-      formError={mutation.isError ? String(mutation.error) : null}
-      onSubmit={async (values, form) => {
-        await mutation.mutateAsync(
-          def.toInput(values, {
-            entity,
-            weaponCategoryBySlug: ctx.options?.weaponCategoryBySlug,
-            campaignRules: layoutCtx.campaignRules,
-            equipmentKind: layoutCtx.equipmentKind,
-          }),
-        )
-        form.reset(values)
-        allowFormNavigationOnce()
-        navigate(backHref)
-      }}
+      submitSuccess={mutation.isSuccess}
+      formError={formError ?? null}
+      onSubmit={onSubmit}
     />
   )
 }

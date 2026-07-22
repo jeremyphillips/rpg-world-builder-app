@@ -40,6 +40,43 @@ describe('FormFooterActions', () => {
     expect(screen.getByRole('status')).toHaveTextContent('Profile saved.')
   })
 
+  it('disables submit when submitDisabled is true', () => {
+    render(<FormFooterActions submitLabel="Save changes" submitDisabled />)
+    expect(screen.getByRole('button', { name: 'Save changes' })).toBeDisabled()
+  })
+
+  it('disables secondary actions while pending', () => {
+    render(
+      <FormFooterActions
+        pending
+        secondary={
+          <Button type="button" variant="outline">
+            Cancel
+          </Button>
+        }
+        submitLabel="Save changes"
+      />,
+    )
+
+    expect(screen.getByRole('button', { name: 'Cancel' })).toBeDisabled()
+  })
+
+  it('disables secondary when secondaryDisabled is true without pending', () => {
+    render(
+      <FormFooterActions
+        secondary={
+          <Button type="button" variant="outline">
+            Discard changes
+          </Button>
+        }
+        secondaryDisabled
+        submitLabel="Save changes"
+      />,
+    )
+
+    expect(screen.getByRole('button', { name: 'Discard changes' })).toBeDisabled()
+  })
+
   it('has no axe violations', async () => {
     const { container } = render(
       <FormFooterActions

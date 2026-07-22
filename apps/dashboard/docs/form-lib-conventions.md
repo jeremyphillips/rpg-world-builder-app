@@ -185,6 +185,20 @@ These modules support many content types but are **not** per-type form splits:
 | Content form registry     | `content/lib/forms/content-form-registry.ts`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
 | Create/edit shells        | `content/lib/forms/shells/` (create/edit shells, layout, load, authoring gate)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
 
+### Create vs edit action state
+
+Top-level content shells share `ContentFormFooter` (`content-form-footer.tsx`) wired through
+`ContentFormLayout`:
+
+| Mode       | Footer                               | Submit enabled when                                    | Success                                                                                      |
+| ---------- | ------------------------------------ | ------------------------------------------------------ | -------------------------------------------------------------------------------------------- |
+| **Create** | `[Cancel]` `[Create {type}]`         | Form is valid (`mode="onChange"`) — dirty not required | Navigate to `…/:id/edit` after POST; `TODO(toast)` for create copy                           |
+| **Edit**   | `[Discard changes]` `[Save changes]` | Dirty **and** valid                                    | Stay on edit route; reset baseline from `def.toFormValues(saved)`; inline `"Changes saved."` |
+
+Create handoff URL: `resolveContentPostCreateEditHref` in `content-form-navigation.ts`.
+Submit/error wiring: `useSubmitHandler` in create/edit shells. Nested subclass editor remains
+separate until aligned in a follow-up.
+
 Feat- and species-specific helpers (not cross-type shared infra):
 
 | Module             | Path                                                                                                                                                |
