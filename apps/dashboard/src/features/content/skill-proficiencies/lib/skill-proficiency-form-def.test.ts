@@ -8,6 +8,7 @@ import {
 
 import {
   skillProficiencyFormDef,
+  skillProficiencyDraftFormSchema,
   type SkillProficiencyFormValues,
 } from './skill-proficiency-form-def'
 
@@ -68,5 +69,14 @@ describe('skillProficiencyFormDef create vs update modes', () => {
     expect(input.name).toBe('Untitled Skill Proficiency')
     expect(input).not.toHaveProperty('ability')
     expect(input.examples).toEqual([])
+  })
+
+  it('draft form schema: allows a name with the default empty example row', () => {
+    expect(() =>
+      skillProficiencyDraftFormSchema.parse({
+        name: 'Custom Skill',
+        examples: [{ value: '' }],
+      }),
+    ).not.toThrow()
   })
 })

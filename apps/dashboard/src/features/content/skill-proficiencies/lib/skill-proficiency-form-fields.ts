@@ -16,6 +16,10 @@ const exampleFormItemSchema = z.object({
   value: z.string().min(1),
 })
 
+const exampleDraftFormItemSchema = z.object({
+  value: z.string(),
+})
+
 export const skillProficiencyFormSchema = z.object({
   name: z.string().min(1),
   slug: slugSchema.optional(),
@@ -29,7 +33,7 @@ export const skillProficiencyDraftFormSchema = z.object({
   slug: slugSchema.optional(),
   description: z.string().optional(),
   ability: abilitySchema.optional(),
-  examples: z.array(exampleFormItemSchema),
+  examples: z.array(exampleDraftFormItemSchema),
 })
 
 export type SkillProficiencyFormValues = z.infer<typeof skillProficiencyFormSchema>

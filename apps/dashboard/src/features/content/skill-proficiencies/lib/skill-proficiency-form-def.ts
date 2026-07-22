@@ -33,5 +33,5 @@ const skillProficiencyFormDef: ContentFormDef<
 
 contentFormRegistry['skill-proficiencies'] = skillProficiencyFormDef
 
-export { skillProficiencyFormDef, skillProficiencyFormSchema }
+export { skillProficiencyFormDef, skillProficiencyFormSchema, skillProficiencyDraftFormSchema }
 export type { SkillProficiencyFormValues }
