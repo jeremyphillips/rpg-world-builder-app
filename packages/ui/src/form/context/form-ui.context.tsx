@@ -1,12 +1,16 @@
 'use client'
 
 import * as React from 'react'
+import type { FieldValues } from 'react-hook-form'
 
 import type { FormItem } from '../field-config'
+import type { SilentValidationResult } from '../config/form-resolver'
 
 export type FormValidationPresentation = 'progressive' | 'always'
 
 export type ValidationSessionExpandKey = `${string}:${string}`
+
+export type ValidateSilently = (values: FieldValues) => Promise<SilentValidationResult>
 
 export interface FormUiContextValue {
   /** Scopes persisted form UI state (e.g. array collapse overrides) to a stable form instance. */
@@ -22,6 +26,11 @@ export interface FormUiContextValue {
   validationSessionExpandKeys: ReadonlySet<ValidationSessionExpandKey>
   addValidationSessionExpandKeys: (keys: readonly ValidationSessionExpandKey[]) => void
   removeValidationSessionExpandKeys: (keys: readonly ValidationSessionExpandKey[]) => void
+  /**
+   * Checks values with the same resolver used at submit without writing RHF errors.
+   * Provided by `<Form>` / `<TabbedForm>`; absent outside schema-driven shells.
+   */
+  validateSilently?: ValidateSilently
 }
 
 const defaultContext: FormUiContextValue = {
@@ -48,6 +57,7 @@ export interface FormUiProviderProps {
   hasAttemptedSubmit?: boolean
   /** Called when a failed submit marks the form as attempted (external state mode). */
   onMarkSubmitAttempted?: () => void
+  validateSilently?: ValidateSilently
   children: React.ReactNode
 }
 
@@ -58,6 +68,7 @@ export function FormUiProvider({
   validationPresentation = 'progressive',
   hasAttemptedSubmit: externalHasAttemptedSubmit,
   onMarkSubmitAttempted,
+  validateSilently,
   children,
 }: FormUiProviderProps) {
   const [localHasAttemptedSubmit, setLocalHasAttemptedSubmit] = React.useState(false)
@@ -109,6 +120,7 @@ export function FormUiProvider({
       validationSessionExpandKeys,
       addValidationSessionExpandKeys,
       removeValidationSessionExpandKeys,
+      validateSilently,
     }),
     [
       uiStateKey,
@@ -119,6 +131,7 @@ export function FormUiProvider({
       validationSessionExpandKeys,
       addValidationSessionExpandKeys,
       removeValidationSessionExpandKeys,
+      validateSilently,
     ],
   )
 

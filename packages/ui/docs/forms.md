@@ -80,6 +80,17 @@ Dashboard helpers: `prefixFormItems`, `embeddedArrayResolverField`, and
 Dev-only warnings fire when header-only tabs omit wiring; set
 `skipHeaderOnlyValidationWiring` on non-form chrome tabs.
 
+### Silent validity (`validateSilently`)
+
+`<Form>` and `<TabbedForm>` expose `validateSilently(values)` on `FormUiContext`. It runs
+the **same** `makeResolver` instance used at submit (including hidden-field omission and tab
+`resolverFields`) without calling `form.trigger()` or populating RHF `errors`.
+
+Use `useSilentFormValidity()` for optional **secondary UI** (e.g. "Ready to create" status) —
+not as the Create submit gate. Edit-mode footers use `dirtyFields` / `hasDirtyFields`. Tabbed
+forms: resolver items include `collectTabbedFormResolverItems(tabs)` — not the visible `fields`
+tree used for issue grouping.
+
 ## Field anatomy & the a11y contract
 
 Every field resolves to the same structure ([field.client.tsx](../src/components/ui/field.client.tsx)):

@@ -11,7 +11,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '../../components/ui/ta
 import { FormItems } from '../containers/form-items.client'
 import { ArrayItemPresentationContext } from '../context/array-item-presentation.context'
 import { useFormSectionContext } from '../context/form-section.context'
-import { makeResolver } from '../config/form-resolver'
+import { createValidateSilently, makeResolver } from '../config/form-resolver'
 import { buildDefaultValues, type FormItem } from '../field-config'
 import { useTabbedFormTabValidationState } from '../hooks/use-tabbed-form-tab-validation-state.client'
 import { FormActionsBar } from '../chrome/form-actions-bar'
@@ -104,7 +104,9 @@ export function useTabbedFormSetup<TFieldValues extends FieldValues>({
     warnHeaderOnlyTabValidationWiring(tabs)
   }, [tabs])
 
-  return { form }
+  const validateSilently = React.useMemo(() => createValidateSilently(resolver), [resolver])
+
+  return { form, validateSilently }
 }
 
 interface TabbedFormPanelsProps {

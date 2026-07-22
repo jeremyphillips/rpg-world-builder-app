@@ -1,4 +1,4 @@
-import type { FieldValues, Resolver } from 'react-hook-form'
+import type { FieldValues, Resolver, ResolverOptions } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import type { ZodType } from 'zod'
 
@@ -69,5 +69,31 @@ export function makeResolver<TFieldValues extends FieldValues>(
       error: errorMap,
     }) as unknown as Resolver<TFieldValues>
     return resolver(values, context, options)
+  }
+}
+
+export interface SilentValidationResult {
+  valid: boolean
+}
+
+const SILENT_RESOLVER_OPTIONS: ResolverOptions<FieldValues> = {
+  fields: {},
+  shouldUseNativeValidation: false,
+}
+
+/**
+ * Wraps the same resolver RHF uses at submit so footer gating can check validity
+ * without calling `form.trigger()` or populating RHF `errors`.
+ */
+export function createValidateSilently<TFieldValues extends FieldValues>(
+  resolver: Resolver<TFieldValues>,
+): (values: TFieldValues) => Promise<SilentValidationResult> {
+  return async (values) => {
+    const result = await resolver(
+      values,
+      undefined,
+      SILENT_RESOLVER_OPTIONS as ResolverOptions<TFieldValues>,
+    )
+    return { valid: Object.keys(result.errors).length === 0 }
   }
 }

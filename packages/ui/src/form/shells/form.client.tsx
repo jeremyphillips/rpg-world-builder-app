@@ -10,7 +10,8 @@ import type { FieldStackRhythm } from '../../components/ui/field.variants'
 import { FormItems } from '../containers/form-items.client'
 import { FormRhythmStack } from '../context/form-section.context'
 import { resolveSchemaFormFooter, SchemaFormShell } from './schema-form-shell.client'
-import { makeResolver } from '../config/form-resolver'
+import { createValidateSilently, makeResolver } from '../config/form-resolver'
+import type { ValidateSilently } from '../context/form-ui.context'
 import {
   buildDefaultValues,
   flattenFields,
@@ -117,6 +118,10 @@ export function Form<TFieldValues extends FieldValues>({
   const formId = id ?? generatedId
 
   const resolver = React.useMemo(() => makeResolver<TFieldValues>(schema, fields), [schema, fields])
+  const validateSilently = React.useMemo(
+    () => createValidateSilently(resolver) as ValidateSilently,
+    [resolver],
+  )
 
   // Capture defaults once at mount. RHF v7.52+ auto-resets when `defaultValues`
   // changes reference; callers use the `key` prop to remount when defaults change.
@@ -147,6 +152,7 @@ export function Form<TFieldValues extends FieldValues>({
       rhythm={rhythm}
       size={size}
       validationPresentation={validationPresentation}
+      validateSilently={validateSilently}
       onSubmit={onSubmit}
       className={className}
     >

@@ -5,6 +5,8 @@ import { ConfirmDialog } from '@rpg/ui'
 
 import { useSubclassUnsavedEditsBlocking } from '@/features/content/classes/hooks/subclass-unsaved-edits-context.client'
 
+import { hasDirtyFields } from './form-dirty-state'
+
 const DISCARD_CHANGES_HEADLINE = 'Discard changes?'
 const DISCARD_CHANGES_DESCRIPTION = 'You have unsaved changes. Leaving now will lose them.'
 const DISCARD_CHANGES_CONFIRM_LABEL = 'Discard'
@@ -16,17 +18,6 @@ const allowNavigationOnceRef = { current: false }
 /** Skip the next blocked navigation — call after `form.reset` when leaving post-save. */
 export function allowFormNavigationOnce() {
   allowNavigationOnceRef.current = true
-}
-
-/** True when the user has edited at least one registered field. */
-function hasDirtyFields(dirtyFields: Record<string, unknown>): boolean {
-  return Object.values(dirtyFields).some((value) => {
-    if (value === true) return true
-    if (value && typeof value === 'object') {
-      return hasDirtyFields(value as Record<string, unknown>)
-    }
-    return false
-  })
 }
 
 /** Blocks in-app navigation while the surrounding form is dirty; shows ConfirmDialog. */

@@ -1,12 +1,13 @@
 'use client'
 
-import * as React from 'react'
 import { useNavigate } from 'react-router-dom'
 import type { UseFormReturn, FieldValues } from 'react-hook-form'
 import { Button } from '@rpg/ui'
 import { FormFooterActions } from '@rpg/ui/form'
 
 import { FormUnsavedChangesGuard } from '@/lib/form-unsaved-changes-guard'
+
+import { useContentFormActionState } from './use-content-form-action-state'
 
 const DISCARD_CHANGES_LABEL = 'Discard changes'
 const CANCEL_LABEL = 'Cancel'
@@ -43,22 +44,14 @@ export interface ContentFormFooterProps<TFieldValues extends FieldValues> {
 
 export function ContentFormFooter<TFieldValues extends FieldValues>({
   mode,
-  form,
+  form: _form,
   backHref,
   submitLabel,
   pendingLabel = mode === 'create' ? 'Creating…' : SAVING_LABEL,
   pending,
   isSuccess = false,
 }: ContentFormFooterProps<TFieldValues>) {
-  const { isDirty, isValid } = form.formState
-
-  React.useEffect(() => {
-    if (mode === 'create') {
-      void form.trigger()
-    }
-  }, [form, mode])
-
-  const submitDisabled = mode === 'create' ? !isValid : !isDirty || !isValid
+  const { submitDisabled, discardDisabled } = useContentFormActionState({ mode, pending })
 
   const secondary =
     mode === 'create' ? (
@@ -67,8 +60,8 @@ export function ContentFormFooter<TFieldValues extends FieldValues>({
       <Button
         type="button"
         variant="outline"
-        disabled={!isDirty || pending}
-        onClick={() => form.reset()}
+        disabled={discardDisabled}
+        onClick={() => _form.reset()}
       >
         {DISCARD_CHANGES_LABEL}
       </Button>

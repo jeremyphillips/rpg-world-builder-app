@@ -38,6 +38,7 @@ export {
   useFormUiContext,
   type FormUiContextValue,
   type FormValidationPresentation,
+  type ValidateSilently,
   type ValidationSessionExpandKey,
 } from './context/form-ui.context'
 export {
@@ -178,7 +179,11 @@ export {
 } from '../components/ui/dice-formula-field.lib'
 export type { FieldSize } from '../components/ui/field.client'
 export { makeFieldErrorMap, type RawZodIssueLike } from './config/field-error-map'
-export { makeResolver } from './config/form-resolver'
+export {
+  makeResolver,
+  createValidateSilently,
+  type SilentValidationResult,
+} from './config/form-resolver'
 export { navigateInvalidSubmit } from './config/navigate-invalid-submit.client'
 export { performInvalidSubmitFocus } from './config/navigate-invalid-submit-focus.lib'
 export {
@@ -206,6 +211,11 @@ export {
   useDebouncedArrayItemValidationTrigger,
   useDebouncedArrayValidationTrigger,
 } from './hooks/use-form-validation-presentation.client'
+export {
+  useSilentFormValidity,
+  type UseSilentFormValidityOptions,
+  type UseSilentFormValidityResult,
+} from './hooks/use-silent-form-validity.client'
 export {
   ARRAY_ITEM_HEADER_DIVIDER,
   ARRAY_ITEM_TEXT_SEPARATOR,

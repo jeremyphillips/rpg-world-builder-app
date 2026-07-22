@@ -188,16 +188,28 @@ These modules support many content types but are **not** per-type form splits:
 ### Create vs edit action state
 
 Top-level content shells share `ContentFormFooter` (`content-form-footer.tsx`) wired through
-`ContentFormLayout`:
+`ContentFormLayout` and `useContentFormActionState`:
 
-| Mode       | Footer                               | Submit enabled when                                    | Success                                                                                      |
-| ---------- | ------------------------------------ | ------------------------------------------------------ | -------------------------------------------------------------------------------------------- |
-| **Create** | `[Cancel]` `[Create {type}]`         | Form is valid (`mode="onChange"`) — dirty not required | Navigate to `…/:id/edit` after POST; `TODO(toast)` for create copy                           |
-| **Edit**   | `[Discard changes]` `[Save changes]` | Dirty **and** valid                                    | Stay on edit route; reset baseline from `def.toFormValues(saved)`; inline `"Changes saved."` |
+| Mode       | Footer                               | Submit enabled when                                                          | Success                                                                                      |
+| ---------- | ------------------------------------ | ---------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
+| **Create** | `[Cancel]` `[Create {type}]`         | Always (click validates) — disabled only while `pending` or read-only        | Navigate to `…/:id/edit` after POST; `TODO(toast)` for create copy                           |
+| **Edit**   | `[Discard changes]` `[Save changes]` | `hasDirtyFields(dirtyFields)` — disabled when clean, `pending`, or read-only | Stay on edit route; reset baseline from `def.toFormValues(saved)`; inline `"Changes saved."` |
 
 Create handoff URL: `resolveContentPostCreateEditHref` in `content-form-navigation.ts`.
 Submit/error wiring: `useSubmitHandler` in create/edit shells. Nested subclass editor remains
 separate until aligned in a follow-up.
+
+**Why not `formState.isDirty`?** RHF `isDirty` compares current values to `defaultValues` and
+can read `true` after hydration when value-sync, rich-text init, or conditional `shouldUnregister`
+paths mutate values without user intent. `dirtyFields` records which registered fields the user
+actually touched — the same signal as `FormUnsavedChangesGuard`. After a successful edit save,
+always `form.reset(def.toFormValues(saved))` (not the pre-save client payload) so server
+normalization does not immediately re-dirty the form.
+
+Validation **display** stays progressive (`mode` default `onSubmit`) until the user submits or
+touches a field. Invalid Create/Save clicks run RHF validation, show progressive errors, and
+navigate/focus the first invalid field or tab. Optional `validateSilently` / `useSilentFormValidity`
+may drive secondary UI (e.g. "Ready to create") — not the primary submit gate.
 
 Feat- and species-specific helpers (not cross-type shared infra):
 

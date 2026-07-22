@@ -106,7 +106,6 @@ function ContentSchemaForm<TFormValues extends FieldValues>({
         onSubmit={handleSubmit}
         formError={formError}
         valueSyncs={valueSyncs}
-        mode="onChange"
         stickyFooter
         footer={(form) => (
           <ContentFormFooter
@@ -177,7 +176,6 @@ function ContentTabbedSchemaForm<TFormValues extends FieldValues>({
         tabs={tabs}
         defaultValues={defaultValues}
         valueSyncs={valueSyncs}
-        mode="onChange"
         onSubmit={(values, form) => handleSubmit(values, form)}
         formError={formError}
         footer={(form) => (
