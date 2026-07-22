@@ -81,8 +81,6 @@ export async function listContent(req: Request, res: Response): Promise<void> {
   res.status(200).json({ [writeConfig.responseKey]: items })
 }
 
-export { listSubclasses } from './subclasses/list-subclasses'
-
 export async function getHomebrewSummary(req: Request, res: Response): Promise<void> {
   const { campaignId } = req.params as { campaignId: string }
   const summary = await getHomebrewContentSummary(campaignId)

@@ -5,17 +5,53 @@ import { CAMPAIGN_ROLES } from '@rpg/contracts'
 import { requireAuth } from '../../middleware/require-auth'
 import { requireCampaignRole } from '../../middleware/require-role'
 import * as controller from './content.controller'
+import * as subclassController from './subclasses/subclass-write.handlers'
 
 // `mergeParams` so the `:campaignId` from the mount path reaches the membership
 // guard and handlers. Mounted at `/api/campaigns/:campaignId/content`.
 export const contentRouter: Router = Router({ mergeParams: true })
 
-// Bespoke nested read — catalog seed subclasses (Phase 8 may extend with homebrew).
+// Nested subclass routes — register before `/:contentType`.
 contentRouter.get(
   '/classes/:classId/subclasses',
   requireAuth,
   requireCampaignRole(...CAMPAIGN_ROLES),
-  controller.listSubclasses,
+  subclassController.listSubclasses,
+)
+
+contentRouter.post(
+  '/classes/:classId/subclasses',
+  requireAuth,
+  requireCampaignRole('owner', 'co-owner'),
+  subclassController.createSubclassItem,
+)
+
+contentRouter.patch(
+  '/classes/:classId/subclasses/:subclassId',
+  requireAuth,
+  requireCampaignRole('owner', 'co-owner'),
+  subclassController.updateSubclassItem,
+)
+
+contentRouter.patch(
+  '/classes/:classId/subclasses/:subclassId/availability',
+  requireAuth,
+  requireCampaignRole('owner', 'co-owner'),
+  subclassController.updateSubclassAvailability,
+)
+
+contentRouter.get(
+  '/classes/:classId/subclasses/:subclassId/deletion-availability',
+  requireAuth,
+  requireCampaignRole('owner', 'co-owner'),
+  subclassController.getSubclassDeletionAvailabilityHandler,
+)
+
+contentRouter.delete(
+  '/classes/:classId/subclasses/:subclassId',
+  requireAuth,
+  requireCampaignRole('owner', 'co-owner'),
+  subclassController.deleteSubclassItem,
 )
 
 // Any campaign member may read the resolved catalog (characters consume it).

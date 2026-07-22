@@ -199,6 +199,15 @@ describe('content write routes', () => {
 
     expect(patchRes.body.spells.resolution).toEqual(CHILL_TOUCH_RESOLUTION)
 
+    const omitRes = await agent
+      .patch(`/api/campaigns/${campaignId}/content/spells/${entityId}`)
+      .set(CSRF_HEADER, csrfToken)
+      .send({ name: 'Resolution Unchanged Spell' })
+      .expect(200)
+
+    expect(omitRes.body.spells.name).toBe('Resolution Unchanged Spell')
+    expect(omitRes.body.spells.resolution).toEqual(CHILL_TOUCH_RESOLUTION)
+
     const reloadRes = await agent
       .get(`/api/campaigns/${campaignId}/content/spells`)
       .set(CSRF_HEADER, csrfToken)
@@ -225,6 +234,49 @@ describe('content write routes', () => {
       reloadAfterClear.body.spells.find((spell: { id: string }) => spell.id === entityId)
         ?.resolution,
     ).toBeUndefined()
+  })
+
+  it('replaces resolution on a system spell via overlay patch', async () => {
+    const { agent, csrfToken } = await registerAndLogin()
+    const campaignId = await createTestCampaign(agent, csrfToken)
+
+    const listRes = await agent
+      .get(`/api/campaigns/${campaignId}/content/spells`)
+      .set(CSRF_HEADER, csrfToken)
+      .expect(200)
+
+    const eldritchBlast = listRes.body.spells.find(
+      (spell: { slug: string }) => spell.slug === 'eldritch-blast',
+    )
+    expect(eldritchBlast?.resolution).toBeDefined()
+
+    const patchedResolution = {
+      ...eldritchBlast.resolution,
+      effects: [
+        {
+          ...eldritchBlast.resolution.effects[0],
+          roll: { dice: { count: 2, faces: 10 } },
+        },
+      ],
+    }
+
+    const patchRes = await agent
+      .patch(`/api/campaigns/${campaignId}/content/spells/${eldritchBlast.id}`)
+      .set(CSRF_HEADER, csrfToken)
+      .send({ resolution: patchedResolution })
+      .expect(200)
+
+    expect(patchRes.body.spells.resolution).toEqual(patchedResolution)
+
+    const reloadRes = await agent
+      .get(`/api/campaigns/${campaignId}/content/spells`)
+      .set(CSRF_HEADER, csrfToken)
+      .expect(200)
+
+    expect(
+      reloadRes.body.spells.find((spell: { id: string }) => spell.id === eldritchBlast.id)
+        ?.resolution,
+    ).toEqual(patchedResolution)
   })
 })
 

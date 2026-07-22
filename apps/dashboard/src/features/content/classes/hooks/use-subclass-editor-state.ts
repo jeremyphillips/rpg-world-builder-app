@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 
-import type { Subclass } from '@rpg/contracts'
+import type { ResolvedSubclass, Subclass } from '@rpg/contracts'
 
 import { applySubclassFormEdits } from '../lib/subclasses/apply-subclass-form-edits'
 import {
@@ -13,6 +13,7 @@ import {
   type SubclassListItem,
 } from '../lib/subclasses/subclass-editor-state'
 import type { SubclassFormValues } from '../lib/subclasses/subclass-form-fields'
+import { isDraftSubclassId } from '../lib/subclasses/subclass-editor-constants'
 
 function collectModifiedSubclassIds(
   listItems: SubclassListItem[],
@@ -43,12 +44,36 @@ function syncSubclassSelection(
   }
 }
 
-export function useSubclassEditorState(classId: string | undefined, subclasses: Subclass[]) {
+function initialActiveById(subclasses: ResolvedSubclass[]): Record<string, boolean> {
+  return Object.fromEntries(subclasses.map((subclass) => [subclass.id, subclass.activeInCampaign]))
+}
+
+export function useSubclassEditorState(
+  classId: string | undefined,
+  subclasses: ResolvedSubclass[],
+) {
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [drafts, setDrafts] = useState<SubclassDraft[]>([])
   const [edits, setEdits] = useState<Record<string, Partial<SubclassFormValues>>>({})
-  const [activeById, setActiveById] = useState<Record<string, boolean>>({})
+  const [activeById, setActiveById] = useState<Record<string, boolean>>(() =>
+    initialActiveById(subclasses),
+  )
   const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null)
+  const [savePending, setSavePending] = useState(false)
+
+  useEffect(() => {
+    setActiveById((current) => {
+      let changed = false
+      const next = { ...current }
+      for (const subclass of subclasses) {
+        if (next[subclass.id] === undefined) {
+          next[subclass.id] = subclass.activeInCampaign
+          changed = true
+        }
+      }
+      return changed ? next : current
+    })
+  }, [subclasses])
 
   const listItems = useMemo(
     () => buildSubclassListItems(subclasses, drafts, edits),
@@ -83,6 +108,44 @@ export function useSubclassEditorState(classId: string | undefined, subclasses: 
     setActiveById((current) => ({ ...current, [id]: active }))
   }, [])
 
+  const clearEditsFor = useCallback((id: string) => {
+    setEdits((current) => {
+      if (!(id in current)) return current
+      const next = { ...current }
+      delete next[id]
+      return next
+    })
+  }, [])
+
+  const removeDraft = useCallback((draftId: string) => {
+    setDrafts((current) => current.filter((draft) => draft.id !== draftId))
+  }, [])
+
+  const commitDraftHandoff = useCallback(
+    (draftId: string, saved: Subclass) => {
+      setDrafts((current) => current.filter((draft) => draft.id !== draftId))
+      clearEditsFor(draftId)
+      setSelectedId(saved.id)
+    },
+    [clearEditsFor],
+  )
+
+  const removeLocalRow = useCallback(
+    (id: string) => {
+      if (isDraftSubclassId(id)) {
+        removeDraft(id)
+      }
+      clearEditsFor(id)
+      setActiveById((current) => {
+        const next = { ...current }
+        delete next[id]
+        return next
+      })
+      setSelectedId((current) => selectNextSubclassId(listItems, id, current))
+    },
+    [clearEditsFor, listItems, removeDraft],
+  )
+
   const handleDeleteRequest = useCallback((id: string) => {
     setDeleteTargetId(id)
   }, [])
@@ -91,23 +154,11 @@ export function useSubclassEditorState(classId: string | undefined, subclasses: 
     setDeleteTargetId(null)
   }, [])
 
-  const handleDeleteConfirm = useCallback(() => {
+  const handleDeleteConfirmLocal = useCallback(() => {
     if (!deleteTargetId) return
-
-    setDrafts((current) => current.filter((draft) => draft.id !== deleteTargetId))
-    setEdits((current) => {
-      const next = { ...current }
-      delete next[deleteTargetId]
-      return next
-    })
-    setActiveById((current) => {
-      const next = { ...current }
-      delete next[deleteTargetId]
-      return next
-    })
-    setSelectedId((current) => selectNextSubclassId(listItems, deleteTargetId, current))
+    removeLocalRow(deleteTargetId)
     setDeleteTargetId(null)
-  }, [deleteTargetId, listItems])
+  }, [deleteTargetId, removeLocalRow])
 
   const deleteTargetItem = deleteTargetId
     ? listItems.find((item) => item.id === deleteTargetId)
@@ -120,6 +171,8 @@ export function useSubclassEditorState(classId: string | undefined, subclasses: 
   const selectedValues =
     selectedId !== null ? getMergedSubclassFormValues(selectedId, subclasses, drafts, edits) : null
 
+  const hasUnsavedEdits = drafts.length > 0 || modifiedIds.size > 0
+
   return {
     listItems,
     modifiedIds,
@@ -130,11 +183,19 @@ export function useSubclassEditorState(classId: string | undefined, subclasses: 
     deleteTargetItem,
     selectedEntity,
     selectedValues,
+    savePending,
+    setSavePending,
+    hasUnsavedEdits,
     handleAdd,
     handleValuesChange,
     handleActiveChange,
     handleDeleteRequest,
     handleDeleteDismiss,
-    handleDeleteConfirm,
+    handleDeleteConfirmLocal,
+    clearEditsFor,
+    commitDraftHandoff,
+    removeLocalRow,
   }
 }
+
+export type SubclassEditorState = ReturnType<typeof useSubclassEditorState>

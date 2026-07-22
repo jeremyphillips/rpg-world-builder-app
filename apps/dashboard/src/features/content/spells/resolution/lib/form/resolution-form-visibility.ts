@@ -1,6 +1,6 @@
 import type { FieldVisibility } from '@rpg/ui/form'
 
-import { RESOLUTION_FIELD_NAME } from './resolution-form-values'
+import { RESOLUTION_FIELD_NAME } from './resolution-form-constants'
 
 const RESOLUTION_METHOD_KIND_PATH = `${RESOLUTION_FIELD_NAME}.methodKind` as const
 const RESOLUTION_SELECTION_MODE_PATH = `${RESOLUTION_FIELD_NAME}.selectionMode` as const

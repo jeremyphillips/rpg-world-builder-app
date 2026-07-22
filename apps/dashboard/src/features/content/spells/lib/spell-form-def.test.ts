@@ -341,6 +341,18 @@ describe('spellFormDef create vs update modes', () => {
     expect(input.name).toBe('Renamed Spell')
   })
 
+  it('update: omits resolution when the spell never had one', () => {
+    const spell = SRD_SPELLS.find((entry) => entry.slug === 'power-word-heal')!
+    expect(spell.resolution).toBeUndefined()
+
+    const formValues = spellFormDef.toFormValues(spell) as SpellFormValues
+    formValues.name = 'Renamed Without Resolution'
+
+    const input = spellFormDef.toInput(formValues, { entity: spell })
+    expect(input).not.toHaveProperty('resolution')
+    expect(input.name).toBe('Renamed Without Resolution')
+  })
+
   it('update: sends null when a stored resolution is cleared in the form', () => {
     const spellWithResolution: Spell = {
       ...SRD_SPELLS[0]!,

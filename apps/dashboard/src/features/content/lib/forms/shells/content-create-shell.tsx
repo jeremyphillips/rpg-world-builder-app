@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom'
 import { Heading } from '@rpg/ui'
 
 import { NarrowPage } from '@/components/layout/narrow-page'
+import { allowFormNavigationOnce } from '@/lib/form-unsaved-changes-guard'
 import { useContentWriteMutation } from '../../list/use-content-mutations'
 import { ContentAuthoringGate } from './content-authoring-gate'
 import {
@@ -78,6 +79,7 @@ function ContentCreateForm({
                 }),
               )
               form.reset(values)
+              allowFormNavigationOnce()
               navigate(backHref)
             }}
           />

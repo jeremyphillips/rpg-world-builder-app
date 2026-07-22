@@ -18,3 +18,18 @@ export function stripNullDeep<T>(value: T): T {
   }
   return result as T
 }
+
+/** Strips null leaves from selected top-level entity fields (preserves valid null envelope values). */
+export function stripNullDeepFields(
+  entity: Record<string, unknown>,
+  keys: readonly string[],
+): Record<string, unknown> {
+  const result = { ...entity }
+  for (const key of keys) {
+    const value = result[key]
+    if (value !== null && value !== undefined && typeof value === 'object') {
+      result[key] = stripNullDeep(value)
+    }
+  }
+  return result
+}

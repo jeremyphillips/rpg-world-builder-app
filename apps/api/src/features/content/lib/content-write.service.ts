@@ -8,6 +8,7 @@ import { normalizeHomebrewWriteInput } from './apply-content-keys'
 import { assertSlugAvailable } from './assert-slug-available'
 import { deepMerge } from './deep-merge'
 import type { ContentWriteConfig, ContentWriteContext, HomebrewDoc } from './content-write-config'
+import { stripNullDeep, stripNullDeepFields } from './strip-null-deep'
 
 type StoredEntity = {
   id: string
@@ -196,11 +197,16 @@ async function updateSystemPatch<T extends StoredEntity>(
     existingPatchDoc?.patch,
     update,
   )
-  config.bodySchema.parse(mergedBody)
+  const mergedBodyForParse = config.readConfig.patchReplaceKeys?.length
+    ? stripNullDeepFields(mergedBody, config.readConfig.patchReplaceKeys)
+    : mergedBody
+  config.bodySchema.parse(mergedBodyForParse)
+
+  const sanitizedPatch = stripNullDeep(cumulativePatch) as Record<string, unknown>
 
   await config.patchModel.findOneAndUpdate(
     { campaignId, targetId: entityId },
-    { $set: { patch: cumulativePatch } },
+    { $set: { patch: sanitizedPatch } },
     { upsert: true, new: true },
   )
 
@@ -209,7 +215,14 @@ async function updateSystemPatch<T extends StoredEntity>(
   if (!entity) {
     throw new HttpError(404, 'not_found', 'Patched record not found after update.')
   }
-  return config.storedSchema.parse(entity)
+
+  const sanitizeKeys = config.readConfig.patchReplaceKeys
+  const entityForParse =
+    sanitizeKeys?.length && entity
+      ? stripNullDeepFields(entity as Record<string, unknown>, sanitizeKeys)
+      : entity
+
+  return config.storedSchema.parse(entityForParse as T)
 }
 
 /** Create a campaign-owned homebrew record for a content type. */

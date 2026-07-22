@@ -9,6 +9,29 @@ import { makeQueryWrapper } from '@/test/make-wrapper'
 import { SUBCLASSES_FOR_FIGHTER } from '../fixtures'
 import { ClassSubclassesTab } from './class-subclasses-tab.client'
 
+vi.mock('../hooks/use-subclass-mutations', () => ({
+  useCreateSubclass: () => ({
+    mutateAsync: vi.fn().mockResolvedValue({ id: 'sub_new', name: 'Untitled subclass' }),
+    isPending: false,
+  }),
+  useUpdateSubclass: () => ({
+    mutateAsync: vi.fn().mockResolvedValue({ id: 'sub_existing', name: 'Updated' }),
+    isPending: false,
+  }),
+  useUpdateSubclassAvailability: () => ({
+    mutateAsync: vi.fn().mockResolvedValue({
+      campaignId: 'camp_1',
+      targetId: 'sub_existing',
+      activeInCampaign: false,
+    }),
+    isPending: false,
+  }),
+  useDeleteSubclass: () => ({
+    mutateAsync: vi.fn().mockResolvedValue({ status: 'deleted' }),
+    isPending: false,
+  }),
+}))
+
 vi.mock('./subclass-editor-panel.client', () => ({
   SubclassEditorPanel: ({
     onActiveChange,

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { isArmorEquipment, isWeaponEquipment } from '@rpg/contracts'
+import { isArmorEquipment, isWeaponEquipment, updateSpellInputSchema } from '@rpg/contracts'
 
 import { makeTestCampaign } from '../../../test/fixtures/campaigns'
 import { useIntegrationDb } from '../../../test/setup/integration-db'
@@ -439,6 +439,43 @@ describe('createHomebrewContent (spells)', () => {
 
     expect(updated.name).toBe('Enhanced Fire Bolt')
     expect(updated.source).toBe('system')
+  })
+
+  it('replaces resolution on a system spell via overlay patch', async () => {
+    const campaign = await makeTestCampaign()
+    const eldritchBlast = (
+      await resolveCatalogForCampaign(spellWriteConfig.readConfig, campaign.id)
+    ).find((spell) => spell.slug === 'eldritch-blast')!
+
+    expect(eldritchBlast.resolution).toBeDefined()
+    expect(eldritchBlast.resolution?.origin).toBeUndefined()
+    expect(eldritchBlast.resolution?.areaOfEffect).toBeUndefined()
+
+    const patchedResolution = {
+      ...eldritchBlast.resolution!,
+      effects: [
+        {
+          ...eldritchBlast.resolution!.effects[0]!,
+          roll: { dice: { count: 2, faces: 10 } },
+        },
+      ],
+    }
+
+    const parsedUpdate = updateSpellInputSchema.parse({ resolution: patchedResolution })
+    expect(parsedUpdate.resolution?.origin).toBeUndefined()
+    expect(parsedUpdate.resolution?.areaOfEffect).toBeUndefined()
+
+    const updated = await updateContentEntity(spellWriteConfig, campaign.id, eldritchBlast.id, {
+      resolution: patchedResolution,
+    })
+
+    expect(updated.resolution).toEqual(patchedResolution)
+    expect(updated.source).toBe('system')
+
+    const reloaded = (
+      await resolveCatalogForCampaign(spellWriteConfig.readConfig, campaign.id)
+    ).find((spell) => spell.id === eldritchBlast.id)!
+    expect(reloaded.resolution).toEqual(patchedResolution)
   })
 })
 

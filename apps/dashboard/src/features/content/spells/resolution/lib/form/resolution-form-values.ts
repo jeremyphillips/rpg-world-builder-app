@@ -20,7 +20,7 @@ import { buildOutcomes } from './resolution-outcome-values'
 import { progressionFromForm, progressionToForm } from './resolution-progression-values'
 import { buildTargetProximity } from './resolution-target-values'
 
-export const RESOLUTION_FIELD_NAME = 'resolution' as const
+export { RESOLUTION_FIELD_NAME } from './resolution-form-constants'
 
 /** Maps stored resolution to flattened authoring form values. */
 export function resolutionToForm(

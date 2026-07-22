@@ -81,4 +81,6 @@ export interface ContentWriteConfig<T extends WriteEntityBase> {
   afterWrite?: (ctx: ContentWriteAfterContext) => Promise<T>
   /** Adds blockers beyond shared character usage resolution (future cross-refs, rule-only blockers). */
   resolveDeleteBlockers?: (ctx: ContentDeleteContext) => Promise<ContentDeletionBlocker[]>
+  /** When set, replaces default character usage resolution for delete guards. */
+  resolveCharacterUsageBlockers?: (ctx: ContentDeleteContext) => Promise<ContentDeletionBlocker[]>
 }

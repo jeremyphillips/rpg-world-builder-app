@@ -70,7 +70,10 @@ export const spellContentConfig: ContentTypeConfig<Spell> = {
   systemSlugs: seedSpellSlugs,
   loadPatches: async (campaignId) => {
     const docs = await SpellPatchModel.find({ campaignId }).lean<SpellPatchRecord[]>()
-    return docs.map<OverlayPatch>((d) => ({ targetId: d.targetId, patch: d.patch }))
+    return docs.map<OverlayPatch>((d) => ({
+      targetId: d.targetId,
+      patch: stripNullDeep(d.patch),
+    }))
   },
   loadHomebrew: async (campaignId, rulesetId) => {
     const docs = await HomebrewSpellModel.find({ campaignId, rulesetId }).lean<

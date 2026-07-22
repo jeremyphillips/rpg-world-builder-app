@@ -6,6 +6,8 @@ import type { ZodType } from 'zod'
 
 import { NarrowPage } from '@/components/layout/narrow-page'
 import { useSetBreadcrumbLabel } from '@/components/layout/use-breadcrumb-label'
+import { allowFormNavigationOnce } from '@/lib/form-unsaved-changes-guard'
+import { SubclassUnsavedEditsProvider } from '@/features/content/classes/hooks/subclass-unsaved-edits-context.client'
 import { useContentWriteMutation } from '../../list/use-content-mutations'
 import {
   contentFormRegistry,
@@ -109,7 +111,7 @@ function ContentEditEntityForm<
 
   const headerError = deleteFlow.deleteError ?? formError
 
-  return (
+  const formBody = (
     <ContentAuthoringGate campaignId={campaignId}>
       <NarrowPage spacing="relaxed" className="pb-10">
         <div className="flex items-start justify-between gap-4">
@@ -158,6 +160,12 @@ function ContentEditEntityForm<
         blockers={deleteFlow.blockers}
       />
     </ContentAuthoringGate>
+  )
+
+  return contentTypeKey === 'classes' ? (
+    <SubclassUnsavedEditsProvider>{formBody}</SubclassUnsavedEditsProvider>
+  ) : (
+    formBody
   )
 }
 
@@ -218,6 +226,7 @@ function ContentEditFormReady({
           }),
         )
         form.reset(values)
+        allowFormNavigationOnce()
         navigate(backHref)
       }}
     />

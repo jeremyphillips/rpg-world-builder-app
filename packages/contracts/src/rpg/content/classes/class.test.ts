@@ -14,6 +14,7 @@ import {
   subclassChoiceFeatureLevel,
   subclassPatchSchema,
   subclassCampaignAvailabilitySchema,
+  resolvedSubclassSchema,
   subclassSchema,
   updateClassInputSchema,
 } from './class'
@@ -264,6 +265,24 @@ describe('subclassSchema', () => {
         ...timestamps,
         name: 'Champion',
       }).success,
+    ).toBe(false)
+  })
+})
+
+describe('resolvedSubclassSchema', () => {
+  it('extends subclass with activeInCampaign list metadata', () => {
+    expect(
+      resolvedSubclassSchema.parse({
+        id: 'srd-cc-5.2.1:champion',
+        slug: 'champion',
+        rulesetId: 'srd-cc-5.2.1',
+        source: 'system',
+        campaignId: null,
+        ...timestamps,
+        classId: fighter.id,
+        name: 'Champion',
+        activeInCampaign: false,
+      }).activeInCampaign,
     ).toBe(false)
   })
 })
