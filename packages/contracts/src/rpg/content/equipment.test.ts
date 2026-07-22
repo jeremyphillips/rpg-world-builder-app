@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import {
   averageWeaponDamage,
+  createEquipmentDraftInputSchema,
   createEquipmentInputSchema,
   equipmentPatchSchema,
   equipmentSchema,
@@ -432,6 +433,28 @@ describe('createEquipmentInputSchema', () => {
         slug: 'skilled-hireling',
         ...SAMPLE_BODIES.service,
         weight: { value: 1, unit: 'lb' },
+      }).success,
+    ).toBe(false)
+  })
+})
+
+describe('createEquipmentDraftInputSchema', () => {
+  it('accepts minimal armor draft payloads and applies untitled name fallback', () => {
+    const parsed = createEquipmentDraftInputSchema.parse({
+      slug: 'draft-armor',
+      kind: 'armor',
+      name: '',
+    })
+    expect(parsed.name).toBe('Untitled Equipment')
+    expect(parsed.kind).toBe('armor')
+  })
+
+  it('rejects publish-incomplete armor on the publish input schema', () => {
+    expect(
+      createEquipmentInputSchema.safeParse({
+        slug: 'draft-armor',
+        kind: 'armor',
+        name: 'Draft Armor',
       }).success,
     ).toBe(false)
   })

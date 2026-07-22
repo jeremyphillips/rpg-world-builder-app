@@ -1,8 +1,4 @@
-import {
-  createEquipmentInputSchema,
-  type CreateEquipmentInput,
-  type VehicleEquipment,
-} from '@rpg/contracts'
+import { type CreateEquipmentInput, type VehicleEquipment } from '@rpg/contracts'
 
 import {
   massFromForm,
@@ -11,6 +7,7 @@ import {
 } from '../../../lib/forms/fields/content-speed-form-fields'
 import {
   equipmentInputBase,
+  parseEquipmentCreateInput,
   type EquipmentInputBuildCtx,
 } from '../../lib/equipment-form-values-base'
 import type { VehicleEquipmentFormValues } from '../../lib/equipment-form-fields'
@@ -63,12 +60,22 @@ export function buildVehicleInput({
   values,
   ctx,
   weight,
+  validationIntent = 'publish',
 }: EquipmentInputBuildCtx<'vehicle'>): CreateEquipmentInput {
-  return createEquipmentInputSchema.parse({
-    ...equipmentInputBase(values, ctx),
-    kind: 'vehicle',
-    vehicleCategory: values.vehicleCategory ?? 'other',
-    ...(weight && { weight }),
-    ...optionalVehicleFields(values),
-  })
+  const isDraft = validationIntent === 'draft'
+
+  return parseEquipmentCreateInput(
+    {
+      ...equipmentInputBase(values, ctx, validationIntent),
+      kind: 'vehicle',
+      ...(values.vehicleCategory
+        ? { vehicleCategory: values.vehicleCategory }
+        : isDraft
+          ? {}
+          : { vehicleCategory: 'other' as const }),
+      ...(weight && { weight }),
+      ...optionalVehicleFields(values),
+    },
+    validationIntent,
+  )
 }

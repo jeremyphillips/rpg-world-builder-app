@@ -247,6 +247,23 @@ describe('content write baseline — draft status', () => {
     const catalog = await resolveCatalogForCampaign(featWriteConfig.readConfig, campaign.id)
     expect(catalog.find((record) => record.id === created.id)?.name).toBe('Untitled Feat')
   })
+
+  it('creates an incomplete armor draft and round-trips via catalog', async () => {
+    const campaign = await makeTestCampaign()
+    const created = await createHomebrewContent(
+      equipmentWriteConfig,
+      campaign.id,
+      { slug: 'draft-armor', kind: 'armor', name: '' },
+      'draft',
+    )
+
+    expect(created.status).toBe('draft')
+    expect(created.name).toBe('Untitled Equipment')
+    expect(created.kind).toBe('armor')
+
+    const catalog = await resolveCatalogForCampaign(equipmentWriteConfig.readConfig, campaign.id)
+    expect(catalog.find((record) => record.id === created.id)?.name).toBe('Untitled Equipment')
+  })
 })
 
 describe('content write baseline — equipment kind guard', () => {

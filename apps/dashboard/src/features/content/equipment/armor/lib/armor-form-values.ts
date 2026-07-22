@@ -1,11 +1,8 @@
-import {
-  createEquipmentInputSchema,
-  type ArmorEquipment,
-  type CreateEquipmentInput,
-} from '@rpg/contracts'
+import { type CreateEquipmentInput, type ArmorEquipment } from '@rpg/contracts'
 
 import {
   equipmentInputBase,
+  parseEquipmentCreateInput,
   type EquipmentInputBuildCtx,
 } from '../../lib/equipment-form-values-base'
 import type { ArmorEquipmentFormValues } from '../../lib/equipment-form-fields'
@@ -49,19 +46,34 @@ export function buildArmorInput({
   values,
   ctx,
   weight,
+  validationIntent = 'publish',
 }: EquipmentInputBuildCtx<'armor'>): CreateEquipmentInput {
-  return createEquipmentInputSchema.parse({
-    ...equipmentInputBase(values, ctx),
-    kind: 'armor',
-    category: values.armorCategory,
-    addDexModifier: values.addDexModifier ?? false,
-    stealthDisadvantage: values.stealthDisadvantage ?? false,
-    ...(weight && { weight }),
-    ...(values.material && { material: values.material }),
-    ...optionalArmorAc(values),
-    ...(values.maxDexBonus !== undefined && { maxDexBonus: values.maxDexBonus }),
-    ...(values.strengthRequirement !== undefined && {
-      strengthRequirement: values.strengthRequirement,
-    }),
-  })
+  const isDraft = validationIntent === 'draft'
+
+  return parseEquipmentCreateInput(
+    {
+      ...equipmentInputBase(values, ctx, validationIntent),
+      kind: 'armor',
+      ...(values.armorCategory && { category: values.armorCategory }),
+      ...(isDraft
+        ? {
+            ...(values.addDexModifier !== undefined && { addDexModifier: values.addDexModifier }),
+            ...(values.stealthDisadvantage !== undefined && {
+              stealthDisadvantage: values.stealthDisadvantage,
+            }),
+          }
+        : {
+            addDexModifier: values.addDexModifier ?? false,
+            stealthDisadvantage: values.stealthDisadvantage ?? false,
+          }),
+      ...(weight && { weight }),
+      ...(values.material && { material: values.material }),
+      ...optionalArmorAc(values),
+      ...(values.maxDexBonus !== undefined && { maxDexBonus: values.maxDexBonus }),
+      ...(values.strengthRequirement !== undefined && {
+        strengthRequirement: values.strengthRequirement,
+      }),
+    },
+    validationIntent,
+  )
 }

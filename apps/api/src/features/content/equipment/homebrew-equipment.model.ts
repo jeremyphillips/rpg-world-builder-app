@@ -28,7 +28,7 @@ const homebrewEquipmentSchema = new Schema(
   {
     ...homebrewContentIdentityFields,
     kind: { type: String, enum: [...EQUIPMENT_KINDS], required: true },
-    cost: { type: Schema.Types.Mixed, required: true },
+    cost: { type: Schema.Types.Mixed },
     weight: { type: Schema.Types.Mixed },
     tags: [{ type: String }],
     // weapon + armor share `category`; only one applies per record.

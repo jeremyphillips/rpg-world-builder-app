@@ -1,8 +1,11 @@
 import type { Equipment } from '@rpg/contracts'
 import {
+  createEquipmentDraftInputSchema,
   createEquipmentInputSchema,
   equipmentBodySchema,
+  equipmentDraftStoredSchema,
   equipmentSchema,
+  updateEquipmentDraftInputSchema,
   updateEquipmentInputSchema,
 } from '@rpg/contracts'
 
@@ -73,7 +76,10 @@ export const equipmentWriteConfig: ContentWriteConfig<Equipment> = {
   responseKey: 'equipment',
   createInputSchema: createEquipmentInputSchema,
   updateInputSchema: updateEquipmentInputSchema,
+  createDraftInputSchema: createEquipmentDraftInputSchema,
+  updateDraftInputSchema: updateEquipmentDraftInputSchema,
   storedSchema: equipmentSchema,
+  draftStoredSchema: equipmentDraftStoredSchema,
   bodySchema: equipmentBodySchema,
   homebrewModel: HomebrewEquipmentModel,
   patchModel: EquipmentPatchModel,

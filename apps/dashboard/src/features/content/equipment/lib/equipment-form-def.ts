@@ -6,6 +6,7 @@ import { useEquipment, equipmentQueryKey } from '../hooks/use-equipment'
 import { equipmentEconomyFormDefaults } from './equipment-economy-form-values'
 import {
   buildEquipmentFields,
+  equipmentFormDraftSchema,
   equipmentFormSchema,
   resolveEquipmentFormSchema,
   type EquipmentFormValues,
@@ -15,6 +16,7 @@ import { equipmentFormToInput, equipmentToFormValues } from './equipment-form-va
 const equipmentFormDef: ContentFormDef<Equipment, EquipmentFormValues, CreateEquipmentInput> = {
   routeKey: 'equipment',
   schema: equipmentFormSchema as ZodType<EquipmentFormValues>,
+  draftSchema: equipmentFormDraftSchema as ZodType<EquipmentFormValues>,
   resolveSchema: resolveEquipmentFormSchema,
   coverage: 'roundtrip-only',
   createDefaultValues: {
@@ -31,5 +33,5 @@ const equipmentFormDef: ContentFormDef<Equipment, EquipmentFormValues, CreateEqu
 
 contentFormRegistry['equipment'] = equipmentFormDef
 
-export { equipmentFormDef, equipmentFormSchema }
+export { equipmentFormDef, equipmentFormSchema, equipmentFormDraftSchema }
 export type { EquipmentFormValues }
