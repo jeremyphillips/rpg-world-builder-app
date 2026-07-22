@@ -96,17 +96,26 @@ function visibleWhenReactionCastingTime(): FieldVisibility {
   }
 }
 
+function spellFormLevelValue(level: unknown): number | undefined {
+  if (level === '' || level == null) return undefined
+  const numeric = typeof level === 'number' ? level : Number(level)
+  return Number.isFinite(numeric) ? numeric : undefined
+}
+
 function visibleWhenCantripLevel(): FieldVisibility {
   return {
     dependsOn: ['level'],
-    visibleWhen: (v) => v.level === 0,
+    visibleWhen: (v) => spellFormLevelValue(v.level) === 0,
   }
 }
 
 function visibleWhenLeveledSpell(): FieldVisibility {
   return {
     dependsOn: ['level'],
-    visibleWhen: (v) => typeof v.level === 'number' && v.level > 0,
+    visibleWhen: (v) => {
+      const level = spellFormLevelValue(v.level)
+      return level !== undefined && level > 0
+    },
   }
 }
 
@@ -130,7 +139,7 @@ export const spellFormSchema = z
     cantripScaling: z.string().optional(),
     higherLevelSlotEffect: z.string().optional(),
     school: spellSchoolIdSchema,
-    level: spellContentLevelSchema,
+    level: z.coerce.number().pipe(spellContentLevelSchema),
     classIds: z.array(z.string()).min(1),
     tags: z
       .object({

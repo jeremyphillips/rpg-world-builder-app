@@ -292,6 +292,17 @@ describe('spellFormDef resolution integration', () => {
     expect(spellFormDef.createDefaultValues).not.toHaveProperty('resolution')
   })
 
+  it('spellFormSchema coerces string level values from select fields', () => {
+    const parsed = spellFormSchema.parse({
+      ...spellFormDef.createDefaultValues,
+      name: 'Test',
+      school: 'evocation',
+      level: '1',
+      classIds: ['wizard'],
+    })
+    expect(parsed.level).toBe(1)
+  })
+
   it('spellFormSchema accepts optional resolution', () => {
     const parsed = spellFormSchema.parse({
       ...spellFormDef.createDefaultValues,
