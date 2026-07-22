@@ -264,11 +264,10 @@ function basicsFields(ctx: ContentFormCtx): FormItem[] {
           width: 'xl',
         },
         {
-          type: 'select',
+          type: 'chips',
           name: 'level',
           label: 'Level',
           options: spellLevelOptions,
-          placeholder: 'Choose level…',
           required: true,
           width: 'md',
         },
