@@ -1,9 +1,12 @@
 import type { Spell } from '@rpg/contracts'
 import {
+  createSpellDraftInputSchema,
   createSpellInputSchema,
   spellBodySchema,
+  spellDraftStoredSchema,
   spellResolutionSchema,
   spellSchema,
+  updateSpellDraftInputSchema,
   updateSpellInputSchema,
 } from '@rpg/contracts'
 
@@ -32,13 +35,13 @@ function toHomebrewSpell(doc: HomebrewDoc): Spell {
     ...(record.imageKey !== undefined && { imageKey: record.imageKey }),
     ...(record.description !== undefined && { description: record.description }),
     school: record.school,
-    level: record.level,
-    classIds: record.classIds as Spell['classIds'],
+    ...(record.level != null && { level: record.level }),
+    ...(record.classIds != null && { classIds: record.classIds as Spell['classIds'] }),
     ...(record.tags !== undefined && { tags: record.tags as Spell['tags'] }),
-    castingTime: record.castingTime as Spell['castingTime'],
-    range: record.range as Spell['range'],
-    duration: record.duration as Spell['duration'],
-    components: record.components as Spell['components'],
+    ...(record.castingTime != null && { castingTime: record.castingTime as Spell['castingTime'] }),
+    ...(record.range != null && { range: record.range as Spell['range'] }),
+    ...(record.duration != null && { duration: record.duration as Spell['duration'] }),
+    ...(record.components != null && { components: record.components as Spell['components'] }),
     ...(record.deliveryMethod !== undefined && { deliveryMethod: record.deliveryMethod }),
     ...(record.areaOfEffect !== undefined && {
       areaOfEffect: record.areaOfEffect as Spell['areaOfEffect'],
@@ -84,7 +87,10 @@ export const spellWriteConfig: ContentWriteConfig<Spell> = {
   responseKey: 'spells',
   createInputSchema: createSpellInputSchema,
   updateInputSchema: updateSpellInputSchema,
+  createDraftInputSchema: createSpellDraftInputSchema,
+  updateDraftInputSchema: updateSpellDraftInputSchema,
   storedSchema: spellSchema,
+  draftStoredSchema: spellDraftStoredSchema,
   bodySchema: spellBodySchema,
   homebrewModel: HomebrewSpellModel,
   patchModel: SpellPatchModel,

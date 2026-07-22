@@ -6,7 +6,12 @@ import {
   type ContentFormDef,
 } from '../../lib/forms/content-form-registry'
 import { useSpells, spellsQueryKey } from '../hooks/use-spells'
-import { buildSpellTabs, spellFormSchema, type SpellFormValues } from './spell-form-fields'
+import {
+  buildSpellTabs,
+  spellDraftFormSchema,
+  spellFormSchema,
+  type SpellFormValues,
+} from './spell-form-fields'
 import {
   buildSpellCreateInput,
   spellCreateDefaultValues,
@@ -16,17 +21,19 @@ import {
 const spellFormDef: ContentFormDef<Spell, SpellFormValues, CreateSpellInput> = {
   routeKey: 'spells',
   schema: spellFormSchema,
+  draftSchema: spellDraftFormSchema,
   coverage: 'roundtrip-only',
   createDefaultValues: spellCreateDefaultValues,
   buildTabs: buildSpellTabs,
   buildFields: (ctx) => contentFormFields(spellFormDef, ctx),
   toFormValues: spellToFormValues,
-  toInput: buildSpellCreateInput,
+  toInput: (values, ctx, validationIntent = 'publish') =>
+    buildSpellCreateInput(values, ctx, validationIntent),
   useListQuery: useSpells,
   queryKey: spellsQueryKey,
 }
 
 contentFormRegistry['spells'] = spellFormDef
 
-export { spellFormDef, spellFormSchema }
+export { spellFormDef, spellFormSchema, spellDraftFormSchema }
 export type { SpellFormValues }

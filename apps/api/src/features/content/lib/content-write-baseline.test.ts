@@ -298,6 +298,23 @@ describe('content write baseline — draft status', () => {
     const catalog = await resolveCatalogForCampaign(classWriteConfig.readConfig, campaign.id)
     expect(catalog.find((record) => record.id === created.id)?.name).toBe('Untitled Class')
   })
+
+  it('creates an incomplete spell draft and round-trips via catalog', async () => {
+    const campaign = await makeTestCampaign()
+    const created = await createHomebrewContent(
+      spellWriteConfig,
+      campaign.id,
+      { slug: 'draft-spell', name: '', school: 'evocation' },
+      'draft',
+    )
+
+    expect(created.status).toBe('draft')
+    expect(created.name).toBe('Untitled Spell')
+    expect(created.school).toBe('evocation')
+
+    const catalog = await resolveCatalogForCampaign(spellWriteConfig.readConfig, campaign.id)
+    expect(catalog.find((record) => record.id === created.id)?.name).toBe('Untitled Spell')
+  })
 })
 
 describe('content write baseline — equipment kind guard', () => {
