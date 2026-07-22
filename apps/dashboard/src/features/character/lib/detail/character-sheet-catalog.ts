@@ -1,11 +1,13 @@
 import {
   buildEquipmentCompactSummary,
+  CHARACTER_EQUIPMENT_INVENTORY_BUCKETS,
   formatSelectionSourceLabel,
   formatSpellConcentrationMarker,
   formatSpellRitualMarker,
   getSpellSchoolLabel,
   type CharacterBuildCatalogIndex,
   type CharacterEquipmentEntry,
+  type CharacterEquipmentInventoryBucket,
   type CharacterSelectionSource,
   type CharacterSpellEntry,
   type Equipment,
@@ -48,20 +50,8 @@ import {
  */
 export type { CharacterSheetItemSource }
 
-export const EQUIPMENT_COLLECTION_BUCKETS = [
-  'weapons',
-  'armor',
-  'tools',
-  'gear',
-  'magicItems',
-  'vehicles',
-  'mounts',
-] as const
-
-export type EquipmentCollectionBucket = (typeof EQUIPMENT_COLLECTION_BUCKETS)[number]
-
 type CharacterSheetEquipmentCardExtra = {
-  bucket: EquipmentCollectionBucket
+  bucket: CharacterEquipmentInventoryBucket
   quantity: number
   equipped: boolean
 }
@@ -139,7 +129,7 @@ function resolveEquipmentDisplayName(
 
 function resolveEquipmentOccurrenceId(
   entry: CharacterEquipmentEntry,
-  bucket: EquipmentCollectionBucket,
+  bucket: CharacterEquipmentInventoryBucket,
   occurrenceIndex: number,
 ): string {
   if (entry.entryId) return entry.entryId
@@ -154,7 +144,7 @@ function buildEquipmentCards(
   const occurrenceCounts = new Map<string, number>()
   const cards: CharacterSheetEquipmentCard[] = []
 
-  for (const bucket of EQUIPMENT_COLLECTION_BUCKETS) {
+  for (const bucket of CHARACTER_EQUIPMENT_INVENTORY_BUCKETS) {
     for (const entry of character.equipment[bucket]) {
       const signature = `${entry.equipmentId}:${bucket}:${buildSourceSignature(entry.sources)}`
       const occurrenceIndex = occurrenceCounts.get(signature) ?? 0

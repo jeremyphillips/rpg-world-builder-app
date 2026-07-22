@@ -1,14 +1,4 @@
-import type { ContentTypeKey } from '@rpg/contracts'
-
-const EQUIPMENT_INVENTORY_BUCKETS = [
-  'weapons',
-  'armor',
-  'tools',
-  'gear',
-  'magicItems',
-  'vehicles',
-  'mounts',
-] as const
+import { equipmentInventoryUsageMongoOrClauses, type ContentTypeKey } from '@rpg/contracts'
 
 /**
  * Returns a Mongo filter fragment merged into campaign participant character queries.
@@ -30,9 +20,7 @@ export function getContentCharacterUsageMatcher(
       return { 'feats.featId': contentId }
     case 'equipment':
       return {
-        $or: EQUIPMENT_INVENTORY_BUCKETS.map((bucket) => ({
-          [`equipment.${bucket}.equipmentId`]: contentId,
-        })),
+        $or: equipmentInventoryUsageMongoOrClauses(contentId),
       }
     case 'skill-proficiencies':
       return { 'proficiencies.skills.skill': contentSlug }

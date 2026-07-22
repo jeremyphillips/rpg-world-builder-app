@@ -22,6 +22,8 @@ import type { CharacterBuildCatalogIndex } from '../../context'
 import type { CharacterBuilderDraft } from '../../draft'
 import {
   characterWealthFromGrant,
+  inventoryBucketForEquipment,
+  inventoryBucketForEquipmentKind,
   type CharacterWealth,
 } from '../../../character/equipment-inventory'
 import { equipmentPoolSummaryLabel } from './equipment-pool-choice-options'
@@ -121,19 +123,8 @@ const EMPTY_ITEMS_BY_GROUP = (): Record<
   mounts: [],
 })
 
-const EQUIPMENT_KIND_TO_INVENTORY_GROUP = {
-  weapon: 'weapons',
-  armor: 'armor',
-  tool: 'tools',
-  adventuring_gear: 'gear',
-  magic_item: 'magicItems',
-  vehicle: 'vehicles',
-  mount: 'mounts',
-  service: 'gear',
-} as const satisfies Record<Equipment['kind'], StartingEquipmentInventoryGroup>
-
 function inventoryGroupForEquipment(equipment: Equipment): StartingEquipmentInventoryGroup {
-  return EQUIPMENT_KIND_TO_INVENTORY_GROUP[equipment.kind]
+  return inventoryBucketForEquipment(equipment)
 }
 
 function summarizeGrantItem(
@@ -306,7 +297,7 @@ function summarizeChoiceItem(
 
 function inventoryGroupForChoice(pool: EquipmentPool): StartingEquipmentInventoryGroup {
   if (pool.source === 'filtered') {
-    return EQUIPMENT_KIND_TO_INVENTORY_GROUP[pool.equipmentKind]
+    return inventoryBucketForEquipmentKind(pool.equipmentKind)
   }
   return 'gear'
 }
