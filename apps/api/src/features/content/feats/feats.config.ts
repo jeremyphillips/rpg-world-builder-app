@@ -9,6 +9,7 @@ import {
 import type { ContentTypeConfig } from '../lib/content-type-config'
 import type { ContentWriteConfig, HomebrewDoc } from '../lib/content-write-config'
 import type { OverlayPatch } from '../lib/resolve-catalog'
+import { homebrewContentEnvelope } from '../lib/homebrew-envelope'
 import { loadSeedFeats, seedFeatSlugs } from '@rpg/catalog/feats'
 import { HomebrewFeatModel, type HomebrewFeatSchemaType } from './homebrew-feat.model'
 import { FeatPatchModel } from './feat-patch.model'
@@ -23,13 +24,7 @@ interface FeatPatchRecord {
 function toHomebrewFeat(doc: HomebrewDoc): Feat {
   const record = doc as HomebrewFeatRecord
   return {
-    id: String(record._id),
-    slug: record.slug,
-    rulesetId: record.rulesetId,
-    source: 'homebrew',
-    campaignId: record.campaignId,
-    createdAt: record.createdAt.toISOString(),
-    updatedAt: record.updatedAt.toISOString(),
+    ...homebrewContentEnvelope(record),
     name: record.name,
     ...(record.imageKey !== undefined && { imageKey: record.imageKey }),
     ...(record.description !== undefined && { description: record.description }),

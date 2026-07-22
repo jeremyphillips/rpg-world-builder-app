@@ -9,6 +9,7 @@ import {
 const baseSpellMeta = {
   rulesetId: DEFAULT_SYSTEM_RULESET_ID,
   source: 'system' as const,
+  status: 'published',
   campaignId: null,
   createdAt: '2026-01-01T00:00:00.000Z',
   updatedAt: '2026-01-01T00:00:00.000Z',

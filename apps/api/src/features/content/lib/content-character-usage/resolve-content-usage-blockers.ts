@@ -1,4 +1,4 @@
-import type { ContentDeletionBlocker, ContentTypeKey } from '@rpg/contracts'
+import type { ContentTypeKey, ContentUsageBlocker } from '@rpg/contracts'
 
 import { CampaignMembershipModel } from '../../../campaign/campaign-membership.model'
 import { CharacterModel } from '../../../character/character.model'
@@ -15,12 +15,12 @@ type CharacterUsageHit = {
  * Finds characters participating in the campaign that reference homebrew content.
  * NPCs are scoped by `campaignId`; PCs come from membership `characterIds` only.
  */
-export async function resolveContentCharacterUsageBlockers(
+export async function resolveContentUsageBlockers(
   campaignId: string,
   contentType: ContentTypeKey,
   contentId: string,
   contentSlug: string,
-): Promise<ContentDeletionBlocker[]> {
+): Promise<ContentUsageBlocker[]> {
   const usageMatcher = getContentCharacterUsageMatcher(contentType, contentId, contentSlug)
 
   const memberships = await CampaignMembershipModel.find({ campaignId })

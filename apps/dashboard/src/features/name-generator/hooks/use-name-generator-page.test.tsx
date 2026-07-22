@@ -22,6 +22,7 @@ vi.mock('@/features/content/species/hooks/use-species', () => ({
         slug: 'elf',
         name: 'Elf',
         source: 'system',
+        status: 'published',
         languageAffinities: ['elvish'],
         culture: {
           id: 'elven',

@@ -64,6 +64,7 @@ describe('loadContentEditFormState', () => {
     id: 'sp-1',
     name: 'Elf',
     source: 'homebrew' as const,
+    status: 'published',
     slug: 'elf',
     kind: 'service',
   }

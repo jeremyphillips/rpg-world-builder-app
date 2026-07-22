@@ -7,6 +7,7 @@ export const homebrewContentIdentityFields = {
   slug: { type: String, required: true, trim: true },
   rulesetId: { type: String, enum: [...SYSTEM_RULESET_IDS], required: true },
   campaignId: { type: String, required: true, index: true },
+  status: { type: String, enum: ['draft', 'published'], default: 'published' },
   name: { type: String, required: true, trim: true },
   imageKey: { type: String },
   description: { type: String },

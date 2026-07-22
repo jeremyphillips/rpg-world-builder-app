@@ -44,6 +44,7 @@ describe('use-subclass-mutations', () => {
       slug: 'test-subclass',
       name: 'Test Subclass',
       source: 'homebrew',
+      status: 'published',
       features: [],
     })
     mockUpdateSubclass.mockResolvedValue({
@@ -51,6 +52,7 @@ describe('use-subclass-mutations', () => {
       id: 'sub_existing',
       name: 'Champion (edited)',
       source: 'homebrew',
+      status: 'published',
     })
     mockUpdateSubclassAvailability.mockResolvedValue({
       campaignId: 'camp_1',

@@ -1,5 +1,7 @@
 import type { Request, Response } from 'express'
 
+import { contentStatusSchema } from '@rpg/contracts'
+
 import { HttpError } from '../../lib/http-error'
 import {
   getContentWriteConfig,
@@ -9,6 +11,11 @@ import {
 } from './content-types'
 import { createHomebrewContent, updateContentEntity } from './lib/content-write.service'
 import { deleteContentEntity, getContentDeletionAvailability } from './lib/content-deletion.service'
+import {
+  demoteContentToDraft,
+  getContentDemotionAvailability,
+  promoteContentToPublished,
+} from './lib/content-status.service'
 import { getHomebrewContentSummary } from './lib/homebrew-summary.service'
 
 export async function createContentItem(req: Request, res: Response): Promise<void> {
@@ -17,7 +24,10 @@ export async function createContentItem(req: Request, res: Response): Promise<vo
     throw new HttpError(404, 'not_found', `Unknown content type "${contentType}".`)
   }
   const writeConfig = getContentWriteConfig(contentType)!
-  const entity = await createHomebrewContent(writeConfig, campaignId, req.body)
+  const rawBody = req.body as Record<string, unknown>
+  const { status: rawStatus, ...createBody } = rawBody
+  const status = contentStatusSchema.parse(rawStatus ?? 'published')
+  const entity = await createHomebrewContent(writeConfig, campaignId, createBody, status)
   res.status(201).json({ [writeConfig.responseKey]: entity })
 }
 
@@ -63,6 +73,55 @@ export async function deleteContentItem(req: Request, res: Response): Promise<vo
   }
   const writeConfig = getContentWriteConfig(contentType)!
   const result = await deleteContentEntity(writeConfig, campaignId, entityId)
+  if (result.status === 'blocked') {
+    res.status(409).json({ result })
+    return
+  }
+  res.status(200).json({ result })
+}
+
+export async function publishContentItem(req: Request, res: Response): Promise<void> {
+  const { campaignId, contentType, entityId } = req.params as {
+    campaignId: string
+    contentType: string
+    entityId: string
+  }
+  if (!isContentWriteType(contentType)) {
+    throw new HttpError(404, 'not_found', `Unknown content type "${contentType}".`)
+  }
+  const writeConfig = getContentWriteConfig(contentType)!
+  const entity = await promoteContentToPublished(writeConfig, campaignId, entityId)
+  res.status(200).json({ [writeConfig.responseKey]: entity })
+}
+
+export async function getContentDemotionAvailabilityHandler(
+  req: Request,
+  res: Response,
+): Promise<void> {
+  const { campaignId, contentType, entityId } = req.params as {
+    campaignId: string
+    contentType: string
+    entityId: string
+  }
+  if (!isContentWriteType(contentType)) {
+    throw new HttpError(404, 'not_found', `Unknown content type "${contentType}".`)
+  }
+  const writeConfig = getContentWriteConfig(contentType)!
+  const availability = await getContentDemotionAvailability(writeConfig, campaignId, entityId)
+  res.status(200).json({ availability })
+}
+
+export async function demoteContentItem(req: Request, res: Response): Promise<void> {
+  const { campaignId, contentType, entityId } = req.params as {
+    campaignId: string
+    contentType: string
+    entityId: string
+  }
+  if (!isContentWriteType(contentType)) {
+    throw new HttpError(404, 'not_found', `Unknown content type "${contentType}".`)
+  }
+  const writeConfig = getContentWriteConfig(contentType)!
+  const result = await demoteContentToDraft(writeConfig, campaignId, entityId)
   if (result.status === 'blocked') {
     res.status(409).json({ result })
     return

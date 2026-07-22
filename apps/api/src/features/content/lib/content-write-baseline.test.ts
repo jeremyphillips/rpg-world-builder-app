@@ -152,6 +152,7 @@ describe.each(baselineCases)('content write baseline — $label', (baselineCase)
     )
     expect(created.source).toBe('homebrew')
     expect(created.campaignId).toBe(campaign.id)
+    expect(created.status).toBe('published')
 
     const updatedHomebrew = await updateContentEntity(
       baselineCase.config,
@@ -176,6 +177,7 @@ describe.each(baselineCases)('content write baseline — $label', (baselineCase)
     )
     expect(systemRecord).toBeDefined()
     if (!systemRecord) throw new Error(`expected system seed ${baselineCase.systemTargetSlug}`)
+    expect(systemRecord.status).toBe('published')
 
     const patchedSystem = await updateContentEntity(
       baselineCase.config,
@@ -185,6 +187,7 @@ describe.each(baselineCases)('content write baseline — $label', (baselineCase)
     )
     expect(patchedSystem.source).toBe('system')
     expect(patchedSystem.name).toBe(baselineCase.expectedPatchedSystemName)
+    expect(patchedSystem.status).toBe('published')
 
     const catalogAfterPatch = await resolveCatalogForCampaign(
       baselineCase.config.readConfig,
@@ -193,6 +196,19 @@ describe.each(baselineCases)('content write baseline — $label', (baselineCase)
     expect(catalogAfterPatch.find((record) => record.id === systemRecord.id)?.name).toBe(
       baselineCase.expectedPatchedSystemName,
     )
+  })
+})
+
+describe('content write baseline — draft status', () => {
+  it('creates homebrew with explicit draft status', async () => {
+    const campaign = await makeTestCampaign()
+    const created = await createHomebrewContent(
+      classWriteConfig,
+      campaign.id,
+      baselineCases.find((entry) => entry.label === 'classes')!.createInput,
+      'draft',
+    )
+    expect(created.status).toBe('draft')
   })
 })
 

@@ -23,6 +23,13 @@ export const contentSourceSchema = z.enum(CONTENT_SOURCES)
 
 export type ContentSource = z.infer<typeof contentSourceSchema>
 
+/** Homebrew lifecycle — draft records are visible only to campaign managers. */
+export const CONTENT_STATUSES = ['draft', 'published'] as const
+
+export const contentStatusSchema = z.enum(CONTENT_STATUSES)
+
+export type ContentStatus = z.infer<typeof contentStatusSchema>
+
 /**
  * Content key — lowercase, hyphen-separated (e.g. `fighter`, `sleight-of-hand`).
  * Unique within a scope: system content is unique per `rulesetId`; homebrew is
@@ -49,6 +56,7 @@ export const contentMetaSchema = z.object({
   slug: slugSchema,
   rulesetId: systemRulesetIdSchema,
   source: contentSourceSchema,
+  status: contentStatusSchema.default('published'),
   campaignId: z.string().min(1).nullable(),
   createdAt: z.iso.datetime(),
   updatedAt: z.iso.datetime(),

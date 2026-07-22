@@ -13,6 +13,7 @@ import type {
   HomebrewDoc,
 } from '../lib/content-write-config'
 import type { OverlayPatch } from '../lib/resolve-catalog'
+import { homebrewContentEnvelope } from '../lib/homebrew-envelope'
 import { loadSeedSubclasses, seedSubclassSlugs } from '@rpg/catalog/classes'
 import {
   assertSubclassParentClassExists,
@@ -32,13 +33,7 @@ interface SubclassPatchRecord {
 function toHomebrewSubclass(doc: HomebrewDoc): Subclass {
   const record = doc as HomebrewSubclassRecord
   return {
-    id: String(record._id),
-    slug: record.slug,
-    rulesetId: record.rulesetId,
-    source: 'homebrew',
-    campaignId: record.campaignId,
-    createdAt: record.createdAt.toISOString(),
-    updatedAt: record.updatedAt.toISOString(),
+    ...homebrewContentEnvelope(record),
     name: record.name,
     classId: record.classId,
     ...(record.imageKey !== undefined && { imageKey: record.imageKey }),

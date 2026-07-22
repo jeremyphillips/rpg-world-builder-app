@@ -10,6 +10,7 @@ import {
 import type { ContentTypeConfig } from '../lib/content-type-config'
 import type { ContentWriteConfig, HomebrewDoc } from '../lib/content-write-config'
 import type { OverlayPatch } from '../lib/resolve-catalog'
+import { homebrewContentEnvelope } from '../lib/homebrew-envelope'
 import { loadSeedSpells, seedSpellSlugs } from '@rpg/catalog/spells'
 import { spellValidateBeforeWrite } from './spell-write-hooks'
 import { stripNullDeep } from '../lib/strip-null-deep'
@@ -26,13 +27,7 @@ interface SpellPatchRecord {
 function toHomebrewSpell(doc: HomebrewDoc): Spell {
   const record = doc as HomebrewSpellRecord
   return {
-    id: String(record._id),
-    slug: record.slug,
-    rulesetId: record.rulesetId,
-    source: 'homebrew',
-    campaignId: record.campaignId,
-    createdAt: record.createdAt.toISOString(),
-    updatedAt: record.updatedAt.toISOString(),
+    ...homebrewContentEnvelope(record),
     name: record.name,
     ...(record.imageKey !== undefined && { imageKey: record.imageKey }),
     ...(record.description !== undefined && { description: record.description }),

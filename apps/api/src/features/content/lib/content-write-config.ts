@@ -1,7 +1,12 @@
 import type { Model } from 'mongoose'
 import type { ZodType } from 'zod'
 
-import type { ContentSource, SystemRulesetId, ContentDeletionBlocker } from '@rpg/contracts'
+import type {
+  ContentSource,
+  SystemRulesetId,
+  ContentStatus,
+  ContentUsageBlocker,
+} from '@rpg/contracts'
 
 import type { ContentTypeConfig } from './content-type-config'
 import type { ContentPatchSchemaType } from './content-patch-model'
@@ -13,6 +18,7 @@ export interface HomebrewDoc {
   campaignId: string
   rulesetId: string
   slug: string
+  status?: string
   createdAt: Date
   updatedAt: Date
   [key: string]: unknown
@@ -23,6 +29,7 @@ export type WriteEntityBase = {
   id: string
   slug: string
   source: ContentSource
+  status: ContentStatus
   campaignId: string | null
 }
 
@@ -80,7 +87,9 @@ export interface ContentWriteConfig<T extends WriteEntityBase> {
   /** Runs after a successful write; may return a parsed/enriched entity for the API response. */
   afterWrite?: (ctx: ContentWriteAfterContext) => Promise<T>
   /** Adds blockers beyond shared character usage resolution (future cross-refs, rule-only blockers). */
-  resolveDeleteBlockers?: (ctx: ContentDeleteContext) => Promise<ContentDeletionBlocker[]>
+  resolveDeleteBlockers?: (ctx: ContentDeleteContext) => Promise<ContentUsageBlocker[]>
+  /** Adds blockers beyond shared character usage resolution for demote guards. */
+  resolveDemoteBlockers?: (ctx: ContentDeleteContext) => Promise<ContentUsageBlocker[]>
   /** When set, replaces default character usage resolution for delete guards. */
-  resolveCharacterUsageBlockers?: (ctx: ContentDeleteContext) => Promise<ContentDeletionBlocker[]>
+  resolveCharacterUsageBlockers?: (ctx: ContentDeleteContext) => Promise<ContentUsageBlocker[]>
 }

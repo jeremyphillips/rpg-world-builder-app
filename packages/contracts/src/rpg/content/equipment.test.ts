@@ -22,6 +22,7 @@ import type { ArmorBody, EquipmentKind } from './equipment'
 const meta = {
   rulesetId: 'srd-cc-5.2.1',
   source: 'system',
+  status: 'published',
   campaignId: null,
   createdAt: '2024-05-21T00:00:00.000Z',
   updatedAt: '2024-05-21T00:00:00.000Z',
@@ -237,6 +238,7 @@ describe('equipmentSchema', () => {
       ...systemRecord('lucky-charm', SAMPLE_BODIES.magic_item),
       id: 'abc123',
       source: 'homebrew',
+      status: 'published',
       campaignId: 'camp_1',
     })
     expect(result.success).toBe(true)

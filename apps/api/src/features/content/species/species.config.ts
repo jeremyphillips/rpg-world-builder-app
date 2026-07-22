@@ -9,6 +9,7 @@ import {
 import type { ContentTypeConfig } from '../lib/content-type-config'
 import type { ContentWriteConfig, HomebrewDoc } from '../lib/content-write-config'
 import type { OverlayPatch } from '../lib/resolve-catalog'
+import { homebrewContentEnvelope } from '../lib/homebrew-envelope'
 import { loadSeedSpecies, seedSpeciesSlugs } from '@rpg/catalog/species'
 import { speciesValidateBeforeWrite } from './species-write-hooks'
 import { HomebrewSpeciesModel, type HomebrewSpeciesSchemaType } from './homebrew-species.model'
@@ -24,13 +25,7 @@ interface SpeciesPatchRecord {
 function toHomebrewSpecies(doc: HomebrewDoc): Species {
   const record = doc as HomebrewSpeciesRecord
   return {
-    id: String(record._id),
-    slug: record.slug,
-    rulesetId: record.rulesetId,
-    source: 'homebrew',
-    campaignId: record.campaignId,
-    createdAt: record.createdAt.toISOString(),
-    updatedAt: record.updatedAt.toISOString(),
+    ...homebrewContentEnvelope(record),
     name: record.name,
     ...(record.imageKey !== undefined && { imageKey: record.imageKey }),
     ...(record.description !== undefined && { description: record.description }),

@@ -1,4 +1,4 @@
-import type { ContentDeletionBlocker } from '@rpg/contracts'
+import type { ContentUsageBlocker } from '@rpg/contracts'
 import { Button, Modal, Text } from '@rpg/ui'
 import { Link } from 'react-router-dom'
 
@@ -12,7 +12,7 @@ export interface ContentDeletionBlockedDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   entityName: string
-  blockers: ContentDeletionBlocker[]
+  blockers: ContentUsageBlocker[]
 }
 
 export function ContentDeletionBlockedDialog({

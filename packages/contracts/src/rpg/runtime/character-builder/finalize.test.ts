@@ -237,6 +237,7 @@ describe('finalizeCharacterBuild', () => {
       slug: 'rope',
       rulesetId: 'srd-cc-5.2.1' as const,
       source: 'system' as const,
+      status: 'published' as const,
       campaignId: null,
       createdAt: '2026-01-01T00:00:00.000Z',
       updatedAt: '2026-01-01T00:00:00.000Z',

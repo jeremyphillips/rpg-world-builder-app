@@ -11,6 +11,7 @@ import type { ZodType } from 'zod'
 import type { ContentTypeConfig } from '../lib/content-type-config'
 import type { ContentWriteConfig, HomebrewDoc } from '../lib/content-write-config'
 import type { OverlayPatch } from '../lib/resolve-catalog'
+import { homebrewContentEnvelope } from '../lib/homebrew-envelope'
 import { parseClassReadModel } from './derive-classes-catalog'
 import { ClassPatchModel } from './class-patch.model'
 import { HomebrewClassModel, type HomebrewClassSchemaType } from './homebrew-class.model'
@@ -28,13 +29,7 @@ interface ClassPatchRecord {
 
 function toHomebrewClass(doc: HomebrewDoc | HomebrewClassRecord): CharacterClass {
   return {
-    id: String(doc._id),
-    slug: doc.slug,
-    rulesetId: doc.rulesetId,
-    source: 'homebrew',
-    campaignId: doc.campaignId,
-    createdAt: doc.createdAt.toISOString(),
-    updatedAt: doc.updatedAt.toISOString(),
+    ...homebrewContentEnvelope(doc),
     name: doc.name,
     ...(doc.imageKey !== undefined && { imageKey: doc.imageKey }),
     ...(doc.description !== undefined && { description: doc.description }),

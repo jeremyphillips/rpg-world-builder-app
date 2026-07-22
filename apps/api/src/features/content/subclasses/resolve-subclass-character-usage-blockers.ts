@@ -1,4 +1,4 @@
-import type { ContentDeletionBlocker } from '@rpg/contracts'
+import type { ContentUsageBlocker } from '@rpg/contracts'
 
 import { CampaignMembershipModel } from '../../campaign/campaign-membership.model'
 import { CharacterModel } from '../../character/character.model'
@@ -14,7 +14,7 @@ type CharacterUsageHit = {
 /** Characters referencing this subclass id via `classes[].subclassId`. */
 export async function resolveSubclassCharacterUsageBlockers(
   ctx: ContentDeleteContext,
-): Promise<ContentDeletionBlocker[]> {
+): Promise<ContentUsageBlocker[]> {
   const { campaignId, entity } = ctx
   const usageMatcher = { 'classes.subclassId': entity.id }
 

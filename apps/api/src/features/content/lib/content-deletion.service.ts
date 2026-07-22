@@ -1,19 +1,19 @@
 import type {
   ContentDeletionAvailability,
-  ContentDeletionBlocker,
   ContentDeletionResult,
+  ContentUsageBlocker,
 } from '@rpg/contracts'
 
 import { HttpError } from '../../../lib/http-error'
-import { resolveContentCharacterUsageBlockers } from './content-character-usage/resolve-content-character-usage-blockers'
+import { resolveContentUsageBlockers } from './content-character-usage/resolve-content-usage-blockers'
 import type { ContentWriteConfig, WriteEntityBase } from './content-write-config'
 import { resolveContentEntityForWrite } from './content-write.service'
 
-async function evaluateContentDeletion<T extends WriteEntityBase>(
+async function evaluateContentDeletionBlockers<T extends WriteEntityBase>(
   config: ContentWriteConfig<T>,
   campaignId: string,
   entityId: string,
-): Promise<ContentDeletionBlocker[]> {
+): Promise<ContentUsageBlocker[]> {
   const { entity } = await resolveContentEntityForWrite(config, campaignId, entityId)
 
   if (entity.source !== 'homebrew') {
@@ -22,7 +22,7 @@ async function evaluateContentDeletion<T extends WriteEntityBase>(
 
   const characterBlockers = config.resolveCharacterUsageBlockers
     ? await config.resolveCharacterUsageBlockers({ campaignId, entity })
-    : await resolveContentCharacterUsageBlockers(campaignId, config.typeName, entityId, entity.slug)
+    : await resolveContentUsageBlockers(campaignId, config.typeName, entityId, entity.slug)
 
   const hookBlockers = config.resolveDeleteBlockers
     ? await config.resolveDeleteBlockers({ campaignId, entity })
@@ -37,7 +37,7 @@ export async function getContentDeletionAvailability<T extends WriteEntityBase>(
   campaignId: string,
   entityId: string,
 ): Promise<ContentDeletionAvailability> {
-  const blockers = await evaluateContentDeletion(config, campaignId, entityId)
+  const blockers = await evaluateContentDeletionBlockers(config, campaignId, entityId)
   if (blockers.length > 0) {
     return { status: 'blocked', blockers }
   }
@@ -50,7 +50,7 @@ export async function deleteContentEntity<T extends WriteEntityBase>(
   campaignId: string,
   entityId: string,
 ): Promise<ContentDeletionResult> {
-  const blockers = await evaluateContentDeletion(config, campaignId, entityId)
+  const blockers = await evaluateContentDeletionBlockers(config, campaignId, entityId)
   if (blockers.length > 0) {
     return { status: 'blocked', blockers }
   }

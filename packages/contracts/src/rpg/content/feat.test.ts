@@ -39,6 +39,7 @@ const grappler = {
   slug: 'grappler',
   rulesetId: 'srd-cc-5.2.1',
   source: 'system',
+  status: 'published',
   campaignId: null,
   ...timestamps,
   ...grapplerBody,

@@ -1,4 +1,4 @@
-import type { ContentSource, SystemRulesetId } from '@rpg/contracts'
+import type { ContentSource, ContentStatus, SystemRulesetId } from '@rpg/contracts'
 import { ContentKeyError } from '@rpg/contracts'
 
 import { HttpError } from '../../../lib/http-error'
@@ -14,6 +14,7 @@ type StoredEntity = {
   id: string
   slug: string
   source: ContentSource
+  status: ContentStatus
   campaignId: string | null
 }
 
@@ -27,6 +28,7 @@ function entityBody(entity: Record<string, unknown>): Record<string, unknown> {
     slug: _slug,
     rulesetId: _rulesetId,
     source: _source,
+    status: _status,
     campaignId: _campaignId,
     createdAt: _createdAt,
     updatedAt: _updatedAt,
@@ -230,6 +232,7 @@ export async function createHomebrewContent<T extends StoredEntity>(
   config: ContentWriteConfig<T>,
   campaignId: string,
   rawInput: unknown,
+  status: ContentStatus = 'published',
 ): Promise<T> {
   const normalized = normalizeWriteInput(rawInput, undefined, 'create')
   const input = parsePersistedWriteInput(config, normalized, 'create')
@@ -255,6 +258,7 @@ export async function createHomebrewContent<T extends StoredEntity>(
     campaignId,
     rulesetId,
     slug,
+    status,
     ...body,
   })
 

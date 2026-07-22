@@ -62,6 +62,7 @@ const athletics = {
   slug: 'athletics',
   rulesetId: 'srd-cc-5.2.1',
   source: 'system',
+  status: 'published',
   campaignId: null,
   ...timestamps,
   ...athleticsBody,

@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import type { ContentDeletionBlocker, ContentSource, ContentTypeKey } from '@rpg/contracts'
+import type { ContentUsageBlocker, ContentSource, ContentTypeKey } from '@rpg/contracts'
 import { getErrorMessage } from '@rpg/contracts'
 
 import type { AnyContentFormDef } from '../forms/content-form-registry'
@@ -32,7 +32,7 @@ export function useContentDeleteFlow({
   const [checkingAvailability, setCheckingAvailability] = useState(false)
   const [confirmOpen, setConfirmOpen] = useState(false)
   const [blockedOpen, setBlockedOpen] = useState(false)
-  const [blockers, setBlockers] = useState<ContentDeletionBlocker[]>([])
+  const [blockers, setBlockers] = useState<ContentUsageBlocker[]>([])
   const [deleteError, setDeleteError] = useState<string | null>(null)
 
   useEffect(() => {
