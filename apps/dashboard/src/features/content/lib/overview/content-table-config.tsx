@@ -15,6 +15,7 @@ import {
 
 import { getContentImageUrl } from '../detail/content-image-url'
 import { CONTENT_SOURCE_BADGE, type ContentSource } from './content-source-badge'
+import { CONTENT_STATUS_BADGE } from './content-status-badge'
 import { ContentStatusNameBadge } from './content-status-name-badge.client'
 
 /**
@@ -130,7 +131,13 @@ export function buildContentColumns<T extends ContentBase>(
     badgeMap: CONTENT_SOURCE_BADGE,
   })
 
-  return [imageColumn, nameColumn, ...stampDataColumns(middleColumns), sourceColumn]
+  const statusColumn = buildSourceColumn<T, ContentStatus>({
+    badgeMap: CONTENT_STATUS_BADGE,
+    accessorKey: 'status',
+    label: 'Status',
+  })
+
+  return [imageColumn, nameColumn, ...stampDataColumns(middleColumns), statusColumn, sourceColumn]
 }
 
 /**
