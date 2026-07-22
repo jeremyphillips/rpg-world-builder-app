@@ -82,6 +82,89 @@ describe('content list routes', () => {
   })
 })
 
+describe('content write routes', () => {
+  const minimalFeatInput = {
+    slug: 'route-write-feat',
+    name: 'Route Write Feat',
+    category: 'origin' as const,
+    repeatable: { allowed: false },
+  }
+
+  const minimalSkillInput = {
+    slug: 'route-write-skill',
+    name: 'Route Write Skill',
+    ability: 'wis' as const,
+    examples: ['Inspect a clue'],
+  }
+
+  it('creates homebrew content via POST', async () => {
+    const { agent, csrfToken } = await registerAndLogin()
+    const campaignId = await createTestCampaign(agent, csrfToken)
+
+    const res = await agent
+      .post(`/api/campaigns/${campaignId}/content/feats`)
+      .set(CSRF_HEADER, csrfToken)
+      .send(minimalFeatInput)
+      .expect(201)
+
+    expect(res.body.feats.source).toBe('homebrew')
+    expect(res.body.feats.slug).toBe('route-write-feat')
+  })
+
+  it('patches a system record via PATCH and returns merged catalog row', async () => {
+    const { agent, csrfToken } = await registerAndLogin()
+    const campaignId = await createTestCampaign(agent, csrfToken)
+
+    const listRes = await agent
+      .get(`/api/campaigns/${campaignId}/content/feats`)
+      .set(CSRF_HEADER, csrfToken)
+      .expect(200)
+
+    const alert = listRes.body.feats.find((feat: { slug: string }) => feat.slug === 'alert')
+    expect(alert).toBeDefined()
+
+    const patchRes = await agent
+      .patch(`/api/campaigns/${campaignId}/content/feats/${alert.id}`)
+      .set(CSRF_HEADER, csrfToken)
+      .send({ name: 'Route Patched Alert' })
+      .expect(200)
+
+    expect(patchRes.body.feats.source).toBe('system')
+    expect(patchRes.body.feats.name).toBe('Route Patched Alert')
+
+    const reloadRes = await agent
+      .get(`/api/campaigns/${campaignId}/content/feats`)
+      .set(CSRF_HEADER, csrfToken)
+      .expect(200)
+
+    expect(reloadRes.body.feats.find((feat: { id: string }) => feat.id === alert.id)?.name).toBe(
+      'Route Patched Alert',
+    )
+  })
+
+  it('creates and updates homebrew skill proficiencies via POST and PATCH', async () => {
+    const { agent, csrfToken } = await registerAndLogin()
+    const campaignId = await createTestCampaign(agent, csrfToken)
+
+    const createRes = await agent
+      .post(`/api/campaigns/${campaignId}/content/skill-proficiencies`)
+      .set(CSRF_HEADER, csrfToken)
+      .send(minimalSkillInput)
+      .expect(201)
+
+    const entityId = createRes.body.skillProficiencies.id as string
+    expect(createRes.body.skillProficiencies.source).toBe('homebrew')
+
+    const patchRes = await agent
+      .patch(`/api/campaigns/${campaignId}/content/skill-proficiencies/${entityId}`)
+      .set(CSRF_HEADER, csrfToken)
+      .send({ name: 'Updated Route Write Skill' })
+      .expect(200)
+
+    expect(patchRes.body.skillProficiencies.name).toBe('Updated Route Write Skill')
+  })
+})
+
 describe('content delete routes', () => {
   const minimalSpeciesInput = {
     slug: 'route-delete-folk',
