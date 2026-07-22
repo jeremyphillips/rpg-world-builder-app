@@ -303,6 +303,27 @@ describe('spellFormDef resolution integration', () => {
     expect(parsed.level).toBe(1)
   })
 
+  it('spellFormSchema rejects empty level select sentinel', () => {
+    const result = spellFormSchema.safeParse({
+      ...spellFormDef.createDefaultValues,
+      name: 'Test',
+      school: 'evocation',
+      level: '',
+      classIds: ['wizard'],
+    })
+    expect(result.success).toBe(false)
+  })
+
+  it('spellFormSchema rejects missing level on create defaults', () => {
+    const result = spellFormSchema.safeParse({
+      ...spellFormDef.createDefaultValues,
+      name: 'Test',
+      school: 'evocation',
+      classIds: ['wizard'],
+    })
+    expect(result.success).toBe(false)
+  })
+
   it('spellFormSchema accepts optional resolution', () => {
     const parsed = spellFormSchema.parse({
       ...spellFormDef.createDefaultValues,

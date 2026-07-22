@@ -1,5 +1,6 @@
 import { z } from 'zod'
 
+import { coercedSelectNumberSchema } from '../../primitives/level'
 import { areaGeometrySchema } from '../../primitives/area-geometry'
 import {
   spellCastingTimeSchema,
@@ -35,6 +36,9 @@ export const spellContentLevelSchema = z
   .max(MAX_SPELL_CONTENT_LEVEL)
 
 export type SpellContentLevel = z.infer<typeof spellContentLevelSchema>
+
+/** Spell level `<select>` input — blank fails; `"0"`/`"1"` coerce to cantrip/leveled slots. */
+export const spellFormLevelSchema = coercedSelectNumberSchema(spellContentLevelSchema)
 
 // ---------------------------------------------------------------------------
 // Spell — prose-first catalog content. Structured fields are reference metadata

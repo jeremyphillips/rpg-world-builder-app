@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 import {
   createSpellInputSchema,
   spellBodySchema,
+  spellFormLevelSchema,
   spellPatchSchema,
   spellSchema,
   updateSpellInputSchema,
@@ -269,6 +270,18 @@ describe('spellContentLevelSchema', () => {
   it('rejects levels outside 0–9', () => {
     expect(spellSchema.safeParse({ ...fireBolt, level: 10 }).success).toBe(false)
     expect(spellSchema.safeParse({ ...fireBolt, level: -1 }).success).toBe(false)
+  })
+})
+
+describe('spellFormLevelSchema', () => {
+  it('coerces string select values', () => {
+    expect(spellFormLevelSchema.parse('0')).toBe(0)
+    expect(spellFormLevelSchema.parse('9')).toBe(9)
+  })
+
+  it('rejects blank select sentinels instead of coercing to cantrip', () => {
+    expect(spellFormLevelSchema.safeParse('').success).toBe(false)
+    expect(spellFormLevelSchema.safeParse(undefined).success).toBe(false)
   })
 })
 

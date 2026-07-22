@@ -7,7 +7,8 @@ import {
   durationUnitSchema,
   effectConditionSchema,
   slugSchema,
-  spellContentLevelSchema,
+  parseSelectNumberInput,
+  spellFormLevelSchema,
   spellFunctionTagSchema,
   spellRangeKindSchema,
   spellRoleTagSchema,
@@ -97,9 +98,7 @@ function visibleWhenReactionCastingTime(): FieldVisibility {
 }
 
 function spellFormLevelValue(level: unknown): number | undefined {
-  if (level === '' || level == null) return undefined
-  const numeric = typeof level === 'number' ? level : Number(level)
-  return Number.isFinite(numeric) ? numeric : undefined
+  return parseSelectNumberInput(level)
 }
 
 function visibleWhenCantripLevel(): FieldVisibility {
@@ -139,7 +138,7 @@ export const spellFormSchema = z
     cantripScaling: z.string().optional(),
     higherLevelSlotEffect: z.string().optional(),
     school: spellSchoolIdSchema,
-    level: z.coerce.number().pipe(spellContentLevelSchema),
+    level: spellFormLevelSchema,
     classIds: z.array(z.string()).min(1),
     tags: z
       .object({
@@ -262,6 +261,7 @@ function basicsFields(ctx: ContentFormCtx): FormItem[] {
           label: 'School',
           options: schoolOptions,
           required: true,
+          width: 'xl',
         },
         {
           type: 'select',
@@ -270,6 +270,7 @@ function basicsFields(ctx: ContentFormCtx): FormItem[] {
           options: spellLevelOptions,
           placeholder: 'Choose level…',
           required: true,
+          width: 'md',
         },
       ],
     },

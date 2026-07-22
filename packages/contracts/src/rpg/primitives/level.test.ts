@@ -1,10 +1,14 @@
 import { describe, expect, it } from 'vitest'
 import {
   absoluteLevelSchema,
+  campaignLevelSchema,
+  campaignLevelSelectSchema,
+  coercedSelectNumberSchema,
   formatCharacterLevelLabel,
   formatLevelRangeLabel,
   levelSchema,
   MAX_CHARACTER_LEVEL,
+  parseSelectNumberInput,
 } from './level'
 
 describe('levelSchema', () => {
@@ -40,5 +44,39 @@ describe('formatCharacterLevelLabel', () => {
   it('formats a single level', () => {
     expect(formatCharacterLevelLabel(1)).toBe('Level 1')
     expect(formatCharacterLevelLabel(12)).toBe('Level 12')
+  })
+})
+
+describe('parseSelectNumberInput', () => {
+  it('returns undefined for blank select sentinels', () => {
+    expect(parseSelectNumberInput('')).toBeUndefined()
+    expect(parseSelectNumberInput(null)).toBeUndefined()
+    expect(parseSelectNumberInput(undefined)).toBeUndefined()
+  })
+
+  it('parses string and numeric option values', () => {
+    expect(parseSelectNumberInput('3')).toBe(3)
+    expect(parseSelectNumberInput(0)).toBe(0)
+  })
+})
+
+describe('coercedSelectNumberSchema', () => {
+  const schema = coercedSelectNumberSchema(campaignLevelSchema(20))
+
+  it('coerces string select values', () => {
+    expect(schema.parse('5')).toBe(5)
+  })
+
+  it('rejects blank select sentinels', () => {
+    expect(schema.safeParse('').success).toBe(false)
+    expect(schema.safeParse(undefined).success).toBe(false)
+  })
+})
+
+describe('campaignLevelSelectSchema', () => {
+  it('matches coercedSelectNumberSchema for campaign bounds', () => {
+    const schema = campaignLevelSelectSchema(20)
+    expect(schema.parse('1')).toBe(1)
+    expect(schema.safeParse('').success).toBe(false)
   })
 })
