@@ -79,4 +79,14 @@ describe('skillProficiencyFormDef create vs update modes', () => {
       }),
     ).not.toThrow()
   })
+
+  it('draft form schema: accepts empty chips sentinel for governing ability', () => {
+    expect(() =>
+      skillProficiencyDraftFormSchema.parse({
+        name: 'Custom Skill',
+        ability: '',
+        examples: [{ value: '' }],
+      }),
+    ).not.toThrow()
+  })
 })

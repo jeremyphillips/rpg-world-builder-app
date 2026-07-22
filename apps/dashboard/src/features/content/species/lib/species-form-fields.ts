@@ -40,7 +40,7 @@ import {
   MULTICLASSING_FIELD_PREFIX,
   speciesLevelLimitsFields,
 } from './species-rules-form-fields'
-import { heritageFormSchema } from './species-heritage-form-fields'
+import { heritageDraftFormSchema, heritageFormSchema } from './species-heritage-form-fields'
 import { speciesCharacterCreationFormSchema } from './species-rules-form-fields'
 import { refineSpeciesCharacterCreationForm } from './species-rules-form-values'
 import {
@@ -48,7 +48,11 @@ import {
   movementRowFormSchema,
   refineSpeciesMovementRows,
 } from './species-movement-form-fields'
-import { traitItemFields, traitRowFormSchema } from './species-trait-form-fields'
+import {
+  traitItemFields,
+  traitRowDraftFormSchema,
+  traitRowFormSchema,
+} from './species-trait-form-fields'
 
 const creatureSizeOptions = toOptions(
   CREATURE_SIZES,
@@ -120,7 +124,24 @@ export function createSpeciesFormSchema(
     })
 }
 
+export function createSpeciesDraftFormSchema() {
+  return z.object({
+    name: z.string(),
+    slug: slugSchema.optional(),
+    description: z.string().optional(),
+    creatureType: creatureTypeSchema,
+    sizes: z.array(creatureSizeSchema).default([]),
+    movement: z.array(movementRowFormSchema).default([]),
+    languageAffinities: z.array(z.string()).optional(),
+    traits: z.array(traitRowDraftFormSchema).default([]),
+    heritage: heritageDraftFormSchema.optional(),
+    characterCreation: speciesCharacterCreationFormSchema.optional(),
+    culture: speciesCultureFormSchema.optional(),
+  })
+}
+
 export const speciesFormSchema = createSpeciesFormSchema(['humanoid'])
+export const speciesDraftFormSchema = createSpeciesDraftFormSchema()
 export type SpeciesFormValues = z.infer<typeof speciesFormSchema>
 
 function attributesFields(ctx: ContentFormCtx): FormItem[] {

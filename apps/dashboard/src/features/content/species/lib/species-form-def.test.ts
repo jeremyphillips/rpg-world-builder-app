@@ -17,7 +17,7 @@ import {
   type CreateSpeciesInput,
 } from '@rpg/contracts'
 
-import { speciesFormDef, type SpeciesFormValues } from './species-form-def'
+import { speciesFormDef, speciesDraftFormSchema, type SpeciesFormValues } from './species-form-def'
 
 const SRD_SPECIES = loadSeedSpecies('srd-cc-5.2.1')
 
@@ -189,6 +189,42 @@ describe('speciesFormDef create vs update modes', () => {
     expect(trait?.kind === 'grant' && trait.descriptionOverride).toBe(
       '<p>Custom homebrew wording.</p>',
     )
+  })
+
+  it('draft: accepts name and creature type only', () => {
+    const input = speciesFormDef.toInput(
+      {
+        name: '',
+        creatureType: 'humanoid',
+        sizes: [],
+        movement: [],
+        traits: [],
+      } as SpeciesFormValues,
+      undefined,
+      'draft',
+    )
+    expect(input.name).toBe('Untitled Species')
+    expect(input.creatureType).toBe('humanoid')
+    expect(input.sizes).toEqual([])
+    expect(input.movement).toEqual({})
+    expect(input.traits).toEqual([])
+  })
+
+  it('draft form schema: allows heritage options with empty grant rows', () => {
+    expect(() =>
+      speciesDraftFormSchema.parse({
+        name: 'Custom Species',
+        creatureType: 'humanoid',
+        sizes: [],
+        movement: [],
+        traits: [],
+        heritage: {
+          name: 'Lineage',
+          choose: 1,
+          options: [{ kind: 'grant', overrideDisplay: false, grants: [] }],
+        },
+      }),
+    ).not.toThrow()
   })
 })
 

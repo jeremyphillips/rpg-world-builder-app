@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import {
+  createSpeciesDraftInputSchema,
   createSpeciesInputSchema,
   speciesPatchSchema,
   speciesSchema,
@@ -165,6 +166,47 @@ describe('createSpeciesInputSchema', () => {
     expect(createSpeciesInputSchema.safeParse({ ...ELF_BODY, slug: 'Bad Slug' }).success).toBe(
       false,
     )
+  })
+
+  it('rejects publish-incomplete bodies missing movement or sizes', () => {
+    expect(
+      createSpeciesInputSchema.safeParse({
+        slug: 'draft-species',
+        name: 'Draft Species',
+        creatureType: 'humanoid',
+      }).success,
+    ).toBe(false)
+  })
+})
+
+describe('createSpeciesDraftInputSchema', () => {
+  it('accepts minimal draft payloads and applies untitled name fallback', () => {
+    const parsed = createSpeciesDraftInputSchema.parse({
+      slug: 'draft-species',
+      name: '',
+      creatureType: 'humanoid',
+    })
+    expect(parsed.name).toBe('Untitled Species')
+    expect(parsed.creatureType).toBe('humanoid')
+    expect(parsed.sizes).toEqual([])
+    expect(parsed.movement).toEqual({})
+    expect(parsed.traits).toEqual([])
+  })
+
+  it('allows heritage options with empty trait lists on draft', () => {
+    expect(
+      createSpeciesDraftInputSchema.safeParse({
+        slug: 'draft-species',
+        name: 'Draft Species',
+        creatureType: 'humanoid',
+        heritage: {
+          id: 'lineage',
+          name: 'Lineage',
+          choose: 1,
+          options: [],
+        },
+      }).success,
+    ).toBe(true)
   })
 })
 

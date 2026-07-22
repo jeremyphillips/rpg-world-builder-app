@@ -3,6 +3,7 @@ import { abilitySchema, ABILITY_ENTRIES, ABILITY_IDS, slugSchema } from '@rpg/co
 import { toOptions, type FormItem } from '@rpg/ui/form'
 
 import type { ContentFormCtx } from '../../lib/forms/content-form-registry'
+import { draftOptionalSelect } from '../../lib/forms/draft-form-schema-helpers'
 
 const abilityOptions = toOptions(
   ABILITY_IDS,
@@ -32,7 +33,7 @@ export const skillProficiencyDraftFormSchema = z.object({
   name: z.string(),
   slug: slugSchema.optional(),
   description: z.string().optional(),
-  ability: abilitySchema.optional(),
+  ability: draftOptionalSelect(abilitySchema),
   examples: z.array(exampleDraftFormItemSchema),
 })
 

@@ -9,6 +9,7 @@ import {
   equipmentFormDraftSchema,
   type EquipmentFormValues,
 } from './equipment-form-def'
+import { armorEquipmentDraftFormSchema } from './equipment-form-fields'
 import {
   collectGroupLegends,
   expectSeedRoundTrip,
@@ -174,6 +175,20 @@ describe('equipmentFormDef create vs update modes', () => {
         hasMarketPrice: true,
         cost: { currency: 'gp' },
         weight: { value: undefined, unit: 'lb' },
+      }),
+    ).not.toThrow()
+  })
+
+  it('draft form schema: accepts empty select sentinels for armor category and material', () => {
+    expect(() =>
+      armorEquipmentDraftFormSchema.parse({
+        name: 'Custom Armor',
+        kind: 'armor',
+        hasMarketPrice: true,
+        cost: { currency: 'gp' },
+        weight: { value: undefined, unit: 'lb' },
+        armorCategory: '',
+        material: '',
       }),
     ).not.toThrow()
   })

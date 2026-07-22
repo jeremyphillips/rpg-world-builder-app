@@ -13,6 +13,7 @@ import { toOptions, type FieldVisibility, type FormItem } from '@rpg/ui/form'
 import { RequirementEditor } from '../components/requirement-editor.client'
 import { descriptionField, nameField } from '../../lib/forms/fields/content-identity-form-fields'
 import type { ContentFormCtx } from '../../lib/forms/content-form-registry'
+import { draftOptionalSelect } from '../../lib/forms/draft-form-schema-helpers'
 import { refineRequirementEditor } from './requirement-editor-form'
 import { prerequisiteEditorSchema } from './requirement-editor-form-schema'
 
@@ -52,7 +53,7 @@ export function createFeatDraftFormSchema() {
       name: z.string(),
       slug: slugSchema.optional(),
       description: z.string().optional(),
-      category: z.enum(FEAT_CATEGORY_IDS).optional(),
+      category: draftOptionalSelect(z.enum(FEAT_CATEGORY_IDS)),
       prerequisiteEditor: prerequisiteEditorSchema,
       repeatableAllowed: z.boolean(),
       repeatableNotes: z.string().optional(),

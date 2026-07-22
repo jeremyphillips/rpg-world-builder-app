@@ -1,8 +1,11 @@
 import type { Species } from '@rpg/contracts'
 import {
+  createSpeciesDraftInputSchema,
   createSpeciesInputSchema,
   speciesBodySchema,
+  speciesDraftStoredSchema,
   speciesSchema,
+  updateSpeciesDraftInputSchema,
   updateSpeciesInputSchema,
 } from '@rpg/contracts'
 
@@ -69,7 +72,10 @@ export const speciesWriteConfig: ContentWriteConfig<Species> = {
   responseKey: 'species',
   createInputSchema: createSpeciesInputSchema,
   updateInputSchema: updateSpeciesInputSchema,
+  createDraftInputSchema: createSpeciesDraftInputSchema,
+  updateDraftInputSchema: updateSpeciesDraftInputSchema,
   storedSchema: speciesSchema,
+  draftStoredSchema: speciesDraftStoredSchema,
   bodySchema: speciesBodySchema,
   homebrewModel: HomebrewSpeciesModel,
   patchModel: SpeciesPatchModel,

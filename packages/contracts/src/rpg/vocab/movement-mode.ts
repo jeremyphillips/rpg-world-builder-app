@@ -144,6 +144,22 @@ export const movementSpeedsSchema: z.ZodType<MovementSpeeds> = z
     }
   })
 
+/** Draft movement map — allows an empty object; still validates mode keys when present. */
+export const movementSpeedsDraftSchema: z.ZodType<MovementSpeeds> = z
+  .record(z.string(), speedFeetSchema)
+  .superRefine((movement, ctx) => {
+    for (const key of Object.keys(movement)) {
+      if (!movementModeSchema.safeParse(key).success) {
+        ctx.addIssue({
+          code: 'custom',
+          message: `Invalid movement mode: ${key}`,
+          path: [key],
+        })
+      }
+    }
+  })
+  .default({})
+
 export type CreatureLikeMovement = {
   movement: MovementSpeeds
 }

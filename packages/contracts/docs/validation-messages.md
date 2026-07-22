@@ -69,6 +69,12 @@ Draft bodies apply `formatUntitledContentName` when `name` is blank. Publish-onl
 `superRefine` hooks and `validateBeforeWrite` run only on the publish path. Types
 without draft siblings fall back to publish schemas until their rollout phase.
 
+**Dashboard form layer:** optional vocab fields on draft form schemas must use
+`draftOptionalSelect` (see
+[`apps/dashboard/docs/form-lib-conventions.md`](../../../apps/dashboard/docs/form-lib-conventions.md#draft-form-schemas-and-select-fields))
+because `select` / single `chips` controls submit `''` before `toInput` runs.
+Contract/API draft schemas do not need this — they never see the UI sentinel.
+
 ## Naming conventions
 
 | Thing          | Convention                                                                                          | Example                            |

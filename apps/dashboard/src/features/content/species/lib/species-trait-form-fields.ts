@@ -76,6 +76,18 @@ export const traitRowFormSchema = z
     }
   })
 
+/** Draft trait row — skips publish completeness checks (empty grants, blank names). */
+export const traitRowDraftFormSchema = z.object({
+  id: z.string().min(1).optional(),
+  kind: contentTraitKindSchema.default('custom'),
+  overrideDisplay: z.boolean().default(false),
+  name: z.string().optional(),
+  description: z.string().optional(),
+  nameOverride: z.string().optional(),
+  descriptionOverride: z.string().optional(),
+  grants: z.array(grantRowFormSchema),
+})
+
 export type TraitRowForm = z.infer<typeof traitRowFormSchema>
 
 export function traitItemFields(ctx: ContentFormCtx): FormItem[] {
