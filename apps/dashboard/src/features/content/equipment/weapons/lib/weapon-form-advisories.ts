@@ -2,11 +2,23 @@ import {
   formatWeaponMasteryModeHint,
   getWeaponPropertyModeAdvisories,
   isWeaponMasteryCompatibleWithMode,
+  type EquipmentKind,
   type WeaponPropertyModeAdvisory,
 } from '@rpg/contracts'
 
 import type { AdvisoryFormSubmitOptions } from '../../../lib/forms/shells/use-advisory-form-submit'
 import type { EquipmentFormValues } from '../../lib/equipment-form-fields'
+
+/** Merges route-scoped kind when the Kind field is omitted from family equipment forms. */
+export function equipmentFormValuesWithRouteKind(
+  values: EquipmentFormValues,
+  equipmentKind?: EquipmentKind,
+): EquipmentFormValues {
+  if (equipmentKind && values.kind == null) {
+    return Object.assign({}, values, { kind: equipmentKind }) as EquipmentFormValues
+  }
+  return values
+}
 
 /** Minimal RHF surface used by mastery save blocking (union or weapon-only forms). */
 export type WeaponMasteryBlockForm = {
@@ -60,10 +72,24 @@ export function formatWeaponPropertyAdvisoryConfirmMessage(
 }
 
 /** Advisory submit options for weapon equipment create/edit forms. */
-export function weaponAdvisorySubmitOptions(): AdvisoryFormSubmitOptions<EquipmentFormValues> {
+export function weaponAdvisorySubmitOptions(
+  equipmentKind?: EquipmentKind,
+): AdvisoryFormSubmitOptions<EquipmentFormValues> {
   return {
-    blockSubmit: (form) => blockWeaponSaveForInvalidMastery(form),
-    getAdvisories: getWeaponFormPropertyAdvisories,
+    blockSubmit: (form) => {
+      const values = equipmentFormValuesWithRouteKind(form.getValues(), equipmentKind)
+      if (values.kind !== 'weapon' || !weaponFormHasInvalidMastery(values)) return false
+
+      form.setError('mastery', {
+        type: 'manual',
+        message:
+          formatWeaponMasteryModeHint(values.mode) ??
+          'Selected mastery is not available for this weapon mode.',
+      })
+      return true
+    },
+    getAdvisories: (values) =>
+      getWeaponFormPropertyAdvisories(equipmentFormValuesWithRouteKind(values, equipmentKind)),
     formatConfirmDescription: formatWeaponPropertyAdvisoryConfirmMessage,
     confirmHeadline: 'Incompatible weapon properties',
     confirmLabel: 'Save anyway',

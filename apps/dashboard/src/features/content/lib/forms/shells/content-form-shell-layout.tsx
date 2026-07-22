@@ -235,8 +235,10 @@ export function ContentFormLayout<TFormValues extends FieldValues>({
     if (!isWeaponEquipmentForm) return { enabled: false }
     // Weapon advisories are authored for EquipmentFormValues; this layout only
     // enables them on the weapon equipment route where TFormValues matches.
-    return weaponAdvisorySubmitOptions() as unknown as AdvisoryFormSubmitOptions<TFormValues>
-  }, [isWeaponEquipmentForm])
+    return weaponAdvisorySubmitOptions(
+      ctx.equipmentKind,
+    ) as unknown as AdvisoryFormSubmitOptions<TFormValues>
+  }, [isWeaponEquipmentForm, ctx.equipmentKind])
   const { onSubmit: advisoryOnSubmit, confirmDialog } = useAdvisoryFormSubmit(
     onSubmit,
     weaponAdvisoryOptions,

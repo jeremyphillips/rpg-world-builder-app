@@ -1,13 +1,18 @@
 import { describe, expect, it, vi } from 'vitest'
 import type { WeaponPropertyModeAdvisory } from '@rpg/contracts'
-import { useForm } from 'react-hook-form'
+import { useForm, type UseFormReturn } from 'react-hook-form'
 import { renderHook, act } from '@testing-library/react'
 
-import type { WeaponEquipmentFormValues } from '../../lib/equipment-form-fields'
+import type {
+  EquipmentFormValues,
+  WeaponEquipmentFormValues,
+} from '../../lib/equipment-form-fields'
 import {
   blockWeaponSaveForInvalidMastery,
+  equipmentFormValuesWithRouteKind,
   formatWeaponPropertyAdvisoryConfirmMessage,
   getWeaponFormPropertyAdvisories,
+  weaponAdvisorySubmitOptions,
   weaponFormHasInvalidMastery,
 } from './weapon-form-advisories'
 
@@ -31,6 +36,25 @@ describe('getWeaponFormPropertyAdvisories', () => {
         message: "Reach isn't compatible with ranged weapons.",
       },
     ])
+  })
+
+  it('uses route-scoped kind when the form omits kind', () => {
+    expect(
+      getWeaponFormPropertyAdvisories(
+        equipmentFormValuesWithRouteKind(
+          {
+            name: 'Test',
+            hasMarketPrice: true,
+            cost: { amount: 1, currency: 'gp' },
+            category: 'simple',
+            mode: 'ranged',
+            mastery: 'vex',
+            properties: ['reach'],
+          } as WeaponEquipmentFormValues,
+          'weapon',
+        ),
+      ),
+    ).toHaveLength(1)
   })
 })
 
@@ -118,6 +142,38 @@ describe('blockWeaponSaveForInvalidMastery', () => {
 
     expect(blocked).toBe(false)
     expect(setError).not.toHaveBeenCalled()
+  })
+})
+
+describe('weaponAdvisorySubmitOptions', () => {
+  it('blocks invalid mastery when kind comes from the route', () => {
+    const { result } = renderHook(() =>
+      useForm<WeaponEquipmentFormValues>({
+        defaultValues: {
+          name: 'Test',
+          hasMarketPrice: true,
+          cost: { amount: 1, currency: 'gp' },
+          category: 'simple',
+          mode: 'ranged',
+          mastery: 'cleave',
+        },
+      }),
+    )
+
+    const setError = vi.spyOn(result.current, 'setError')
+    const options = weaponAdvisorySubmitOptions('weapon')
+
+    let blocked = false
+    act(() => {
+      blocked =
+        options.blockSubmit?.(
+          result.current as UseFormReturn<EquipmentFormValues>,
+          result.current.getValues() as EquipmentFormValues,
+        ) ?? false
+    })
+
+    expect(blocked).toBe(true)
+    expect(setError).toHaveBeenCalled()
   })
 })
 
