@@ -168,6 +168,101 @@ describe('content draft visibility', () => {
   })
 })
 
+describe('content draft write routes', () => {
+  const draftCreateCases = [
+    {
+      routeKey: 'classes',
+      responseKey: 'classes',
+      input: { slug: 'route-draft-class', name: '', hitDie: 8, status: 'draft' as const },
+    },
+    {
+      routeKey: 'equipment',
+      responseKey: 'equipment',
+      input: {
+        slug: 'route-draft-armor',
+        kind: 'armor' as const,
+        name: '',
+        status: 'draft' as const,
+      },
+    },
+    {
+      routeKey: 'feats',
+      responseKey: 'feats',
+      input: {
+        slug: 'route-draft-feat',
+        name: '',
+        repeatable: { allowed: false },
+        status: 'draft' as const,
+      },
+    },
+    {
+      routeKey: 'skill-proficiencies',
+      responseKey: 'skillProficiencies',
+      input: { slug: 'route-draft-skill', name: '', status: 'draft' as const },
+    },
+    {
+      routeKey: 'species',
+      responseKey: 'species',
+      input: {
+        slug: 'route-draft-species',
+        name: '',
+        creatureType: 'humanoid',
+        status: 'draft' as const,
+      },
+    },
+    {
+      routeKey: 'spells',
+      responseKey: 'spells',
+      input: {
+        slug: 'route-draft-spell',
+        name: '',
+        school: 'evocation',
+        status: 'draft' as const,
+      },
+    },
+  ] as const
+
+  it.each(draftCreateCases)(
+    'creates an incomplete $routeKey draft via POST',
+    async ({ routeKey, responseKey, input }) => {
+      const { agent, csrfToken } = await registerAndLogin()
+      const campaignId = await createTestCampaign(agent, csrfToken)
+
+      const res = await agent
+        .post(`/api/campaigns/${campaignId}/content/${routeKey}`)
+        .set(CSRF_HEADER, csrfToken)
+        .send(input)
+        .expect(201)
+
+      const entity = res.body[responseKey] as { id: string; status: string; source: string }
+      expect(entity.source).toBe('homebrew')
+      expect(entity.status).toBe('draft')
+      expect(entity.id).toBeTruthy()
+    },
+  )
+
+  it('rejects promote when a draft body is publish-incomplete', async () => {
+    const { agent, csrfToken } = await registerAndLogin()
+    const campaignId = await createTestCampaign(agent, csrfToken)
+
+    const createRes = await agent
+      .post(`/api/campaigns/${campaignId}/content/skill-proficiencies`)
+      .set(CSRF_HEADER, csrfToken)
+      .send({ slug: 'route-promote-skill', name: '', status: 'draft' })
+      .expect(201)
+
+    const entityId = createRes.body.skillProficiencies.id as string
+
+    const promoteRes = await agent
+      .post(`/api/campaigns/${campaignId}/content/skill-proficiencies/${entityId}/publish`)
+      .set(CSRF_HEADER, csrfToken)
+      .expect(400)
+
+    expect(promoteRes.body.error.code).toBe('validation_error')
+    expect(promoteRes.body.error.details?.issues?.length).toBeGreaterThan(0)
+  })
+})
+
 describe('content write routes', () => {
   const minimalFeatInput = {
     slug: 'route-write-feat',

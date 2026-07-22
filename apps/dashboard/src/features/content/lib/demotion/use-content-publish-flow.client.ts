@@ -6,6 +6,7 @@ import { getErrorMessage } from '@rpg/contracts'
 
 import type { AnyContentFormDef } from '../forms/content-form-registry'
 import { usePublishContent } from '../list/use-content-mutations'
+import { useContentEditPublishRequest } from '../forms/shells/content-edit-publish-context.client'
 
 type UseContentPublishFlowOptions = {
   def: Pick<AnyContentFormDef, 'routeKey' | 'queryKey' | 'invalidateQueryKeys'>
@@ -23,6 +24,7 @@ export function useContentPublishFlow({
   entityStatus,
 }: UseContentPublishFlowOptions) {
   const publishMutation = usePublishContent(def, campaignId)
+  const publishRequest = useContentEditPublishRequest()
   const [publishError, setPublishError] = useState<string | null>(null)
   const [publishSuccess, setPublishSuccess] = useState(false)
 
@@ -31,6 +33,11 @@ export function useContentPublishFlow({
     setPublishSuccess(false)
   }, [entityId])
 
+  const runPublishMutation = useCallback(async () => {
+    await publishMutation.mutateAsync(entityId)
+    setPublishSuccess(true)
+  }, [entityId, publishMutation])
+
   const handlePublishClick = useCallback(async () => {
     if (entitySource !== 'homebrew' || entityStatus !== 'draft' || publishMutation.isPending) {
       return
@@ -38,13 +45,18 @@ export function useContentPublishFlow({
 
     setPublishError(null)
     setPublishSuccess(false)
+
+    if (publishRequest) {
+      publishRequest.requestPublish()
+      return
+    }
+
     try {
-      await publishMutation.mutateAsync(entityId)
-      setPublishSuccess(true)
+      await runPublishMutation()
     } catch (err) {
       setPublishError(getErrorMessage(err, 'Could not publish this item.'))
     }
-  }, [entityId, entitySource, entityStatus, publishMutation])
+  }, [entitySource, entityStatus, publishMutation.isPending, publishRequest, runPublishMutation])
 
   const canPublish = entitySource === 'homebrew' && entityStatus === 'draft'
 
@@ -54,5 +66,7 @@ export function useContentPublishFlow({
     publishError,
     publishSuccess,
     handlePublishClick,
+    runPublishMutation,
+    setPublishError,
   }
 }

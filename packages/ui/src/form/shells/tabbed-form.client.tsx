@@ -11,6 +11,7 @@ import type { FieldStackRhythm } from '../../components/ui/field.variants'
 import { FormValueSyncEffects } from '../chrome/form-value-sync-effects.client'
 import type { FormUiContextValue, FormValidationPresentation } from '../context/form-ui.context'
 import { navigateTabbedFormInvalidSubmit } from './navigate-tabbed-form-invalid-submit.client'
+import { TabbedFormChromeContext } from './tabbed-form-chrome.context'
 import type { ValidateSilently } from '../context/form-ui.context'
 import { TabbedFormErrorSummary } from './tabbed-form-error-summary.client'
 import {
@@ -127,6 +128,10 @@ export function TabbedForm<TFieldValues extends FieldValues>({
   }, [])
   const { form, validateSilently } = useTabbedFormSetup({ schema, tabs, defaultValues, mode })
   const allFields = React.useMemo(() => tabs.flatMap((tab) => tab.fields), [tabs])
+  const tabbedChrome = React.useMemo(
+    () => ({ formId, tabs, setActiveTabId }),
+    [formId, tabs, setActiveTabId],
+  )
   const resolvedFooter = resolveSchemaFormFooter(footer, form)
   const hasFooterRegion = Boolean(formError || resolvedFooter)
   const handleInvalidSubmit = React.useCallback(
@@ -172,35 +177,37 @@ export function TabbedForm<TFieldValues extends FieldValues>({
   )
 
   return (
-    <SchemaFormShell
-      form={form}
-      formId={formId}
-      fields={allFields}
-      fileFieldProps={fileFieldProps}
-      uiStateKey={uiStateKey}
-      rhythm={rhythm}
-      size={size}
-      validationPresentation={validationPresentation}
-      hasAttemptedSubmit={hasAttemptedSubmit}
-      onMarkSubmitAttempted={markSubmitAttempted}
-      validateSilently={validateSilently as ValidateSilently}
-      onInvalidSubmit={handleInvalidSubmit}
-      onSubmit={onSubmit}
-      className={resolveTabbedFormShellClassName(className, stickyChrome, footerWrapper)}
-    >
-      {valueSyncs && valueSyncs.length > 0 ? (
-        <FormValueSyncEffects valueSyncs={valueSyncs} />
-      ) : null}
-      {contentWrapper ? contentWrapper(panels) : panels}
-      <TabbedFormFooterRegion
-        footerWrapper={footerWrapper}
-        hasFooterRegion={hasFooterRegion}
-        stickyChrome={stickyChrome}
-        stickyActionsBarClassName={stickyActionsBarClassName}
-        formError={formError}
-        validationSummary={validationSummary}
-        resolvedFooter={resolvedFooter}
-      />
-    </SchemaFormShell>
+    <TabbedFormChromeContext.Provider value={tabbedChrome}>
+      <SchemaFormShell
+        form={form}
+        formId={formId}
+        fields={allFields}
+        fileFieldProps={fileFieldProps}
+        uiStateKey={uiStateKey}
+        rhythm={rhythm}
+        size={size}
+        validationPresentation={validationPresentation}
+        hasAttemptedSubmit={hasAttemptedSubmit}
+        onMarkSubmitAttempted={markSubmitAttempted}
+        validateSilently={validateSilently as ValidateSilently}
+        onInvalidSubmit={handleInvalidSubmit}
+        onSubmit={onSubmit}
+        className={resolveTabbedFormShellClassName(className, stickyChrome, footerWrapper)}
+      >
+        {valueSyncs && valueSyncs.length > 0 ? (
+          <FormValueSyncEffects valueSyncs={valueSyncs} />
+        ) : null}
+        {contentWrapper ? contentWrapper(panels) : panels}
+        <TabbedFormFooterRegion
+          footerWrapper={footerWrapper}
+          hasFooterRegion={hasFooterRegion}
+          stickyChrome={stickyChrome}
+          stickyActionsBarClassName={stickyActionsBarClassName}
+          formError={formError}
+          validationSummary={validationSummary}
+          resolvedFooter={resolvedFooter}
+        />
+      </SchemaFormShell>
+    </TabbedFormChromeContext.Provider>
   )
 }

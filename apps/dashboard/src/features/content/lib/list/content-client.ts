@@ -126,13 +126,14 @@ export async function publishContent<T>(
     headers: { [CSRF_HEADER]: csrfToken },
   })
   const body = (await res.json().catch(() => null)) as Record<string, T> & {
-    error?: { code?: string; message?: string }
+    error?: { code?: string; message?: string; details?: unknown }
   }
   if (!res.ok) {
     throw new ApiError(
       res.status,
       body?.error?.code ?? 'request_error',
       body?.error?.message ?? fallbackMessage ?? `Could not publish ${routeKey}.`,
+      body?.error?.details,
     )
   }
   const [entity] = Object.values(body).filter((value) => value != null && typeof value === 'object')

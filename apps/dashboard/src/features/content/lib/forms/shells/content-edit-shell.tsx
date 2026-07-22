@@ -1,5 +1,7 @@
 import type { ContentSource, ContentStatus, ContentTypeKey } from '@rpg/contracts'
+import { getErrorMessage } from '@rpg/contracts'
 import { Heading, Spinner, Text } from '@rpg/ui'
+import { useCallback } from 'react'
 import type { DefaultValues, FieldValues, UseFormReturn } from 'react-hook-form'
 import type { ZodType } from 'zod'
 
@@ -29,6 +31,8 @@ import { ContentDemotionConfirmDialog } from '../../demotion/content-demotion-co
 import { useContentDemoteFlow } from '../../demotion/use-content-demote-flow.client'
 import { useContentPublishFlow } from '../../demotion/use-content-publish-flow.client'
 import { ContentEditLifecycleActions } from './content-edit-lifecycle-actions.client'
+import { ContentEditPublishProvider } from './content-edit-publish-context.client'
+import { resolveContentFormSchema } from './content-edit-load'
 
 export interface ContentEditShellProps {
   /** Route key identifying the content type (e.g. `'species'`). */
@@ -88,6 +92,16 @@ interface ContentEditEntityFormProps<
 
 function ContentEditEntityForm<
   TEntity extends { id: string; name: string; source: ContentSource; status: ContentStatus },
+>(props: ContentEditEntityFormProps<TEntity>) {
+  return (
+    <ContentEditPublishProvider>
+      <ContentEditEntityFormBody {...props} />
+    </ContentEditPublishProvider>
+  )
+}
+
+function ContentEditEntityFormBody<
+  TEntity extends { id: string; name: string; source: ContentSource; status: ContentStatus },
 >({
   entity,
   campaignId,
@@ -104,6 +118,7 @@ function ContentEditEntityForm<
   onSubmit,
 }: ContentEditEntityFormProps<TEntity>) {
   useSetBreadcrumbLabel(entity.name)
+  const publishSchema = resolveContentFormSchema(def, layoutCtx, 'publish')
   const deleteFlow = useContentDeleteFlow({
     def,
     campaignId,
@@ -128,6 +143,14 @@ function ContentEditEntityForm<
     entitySource: entity.source,
     entityStatus: entity.status,
   })
+
+  const handlePublish = useCallback(async () => {
+    try {
+      await publishFlow.runPublishMutation()
+    } catch (err) {
+      publishFlow.setPublishError(getErrorMessage(err, 'Could not publish this item.'))
+    }
+  }, [publishFlow.runPublishMutation, publishFlow.setPublishError])
 
   const headerError =
     deleteFlow.deleteError ?? publishFlow.publishError ?? demoteFlow.demoteError ?? formError
@@ -162,6 +185,9 @@ function ContentEditEntityForm<
           submitSuccess={submitSuccess}
           formError={headerError}
           onSubmit={onSubmit}
+          publishSchema={entity.status === 'draft' ? publishSchema : undefined}
+          onPublish={entity.status === 'draft' ? handlePublish : undefined}
+          publishSuccess={publishFlow.publishSuccess}
         />
       </NarrowPage>
 

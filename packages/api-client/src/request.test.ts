@@ -36,6 +36,28 @@ describe('request', () => {
     expect(err).toBeInstanceOf(ApiError)
     expect(err).toMatchObject({ status: 401, message: 'Nope.' })
   })
+
+  it('preserves validation details on failure', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () =>
+        fakeResponse(false, 400, {
+          error: {
+            code: 'validation_error',
+            message: 'Incomplete',
+            details: { issues: [{ path: 'name', message: 'Required' }] },
+          },
+        }),
+      ),
+    )
+
+    const err = await request('/api/example').catch((e: unknown) => e)
+    expect(err).toMatchObject({
+      status: 400,
+      code: 'validation_error',
+      details: { issues: [{ path: 'name', message: 'Required' }] },
+    })
+  })
 })
 
 describe('postJson', () => {
