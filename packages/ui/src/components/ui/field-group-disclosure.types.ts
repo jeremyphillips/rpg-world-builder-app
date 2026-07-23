@@ -1,6 +1,23 @@
+export type FieldGroupSummaryStatusTone = 'neutral' | 'positive'
+
+export type FieldGroupSummaryStatus = {
+  label: string
+  tone?: FieldGroupSummaryStatusTone
+  /** Leading indicator on the status line */
+  indicator?: 'dot' | 'inactive'
+}
+
+export type FieldGroupSummarySurface = 'default' | 'inactive'
+
 export type FieldGroupSummary = {
-  primary: string
+  /** Plain-text fallback for consumers that don't use structured status rows */
+  primary?: string
   secondary?: string
+  /** Supporting detail on the status line (e.g. "DM only") — muted, not disabled-looking */
+  detail?: string
+  status?: FieldGroupSummaryStatus
+  /** Collapsed container treatment — read by disclosure wrapper only */
+  surface?: FieldGroupSummarySurface
 }
 
 /** Legend-triggered collapse — fields stay registered when collapsed. */

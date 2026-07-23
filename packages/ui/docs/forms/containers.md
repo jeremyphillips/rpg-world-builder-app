@@ -86,6 +86,16 @@ Optional open/collapse and summary behavior. Composes with `chrome`.
 | `legend`  | Legend becomes a disclosure trigger; fields stay registered when collapsed. `defaultOpen` (default `true`); optional `collapseKey` for `uiStateKey` persistence.                                                                                                                       |
 | `summary` | Compact collapsed summary + **Change** / expanded **Done** for settings sections. `resolveSummary`, optional `summaryDependsOn`, `showDirtySuffix`, `panelDivider` (default `true`), `openLabel` / `closeLabel`. Fields stay mounted (hidden) when collapsed. Requires `FormProvider`. |
 
+`resolveSummary` returns a `FieldGroupSummary`:
+
+| Field       | Use                                                                                                                                                               |
+| ----------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `primary`   | Plain-text fallback when `status` is omitted — existing `primary` + `secondary` layout                                                                            |
+| `secondary` | Muted explanatory line below the status row                                                                                                                       |
+| `status`    | Structured status row — `label`, optional `tone` (`neutral` \| `positive`), optional `indicator` (`dot` \| `inactive`)                                            |
+| `detail`    | Supporting detail on the status line (e.g. player access mode) — muted, middle-dot separated from `status.label`                                                  |
+| `surface`   | Collapsed container treatment — `inactive` applies a muted shell (`data-summary-surface="inactive"`) around the collapsed block; expanded state ignores `surface` |
+
 ```ts
 {
   kind: 'group',
@@ -96,7 +106,18 @@ Optional open/collapse and summary behavior. Composes with `chrome`.
     defaultOpen: false,
     summaryDependsOn: ['available', 'visibilityMode'],
     showDirtySuffix: true,
-    resolveSummary: (values) => ({ primary: 'Available · All players' }),
+    resolveSummary: (values) =>
+      values.available
+        ? {
+            status: { label: 'Available', tone: 'positive', indicator: 'dot' },
+            detail: 'All players',
+          }
+        : {
+            status: { label: 'Unavailable', tone: 'neutral', indicator: 'inactive' },
+            detail: 'DM only',
+            secondary: 'Hidden from discovery and selection in this campaign.',
+            surface: 'inactive',
+          },
   },
   fields: [/* settings rows */],
 }

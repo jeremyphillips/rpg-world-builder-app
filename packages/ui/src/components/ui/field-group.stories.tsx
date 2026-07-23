@@ -223,11 +223,23 @@ function SummaryDisclosureDemo() {
           defaultOpen: false,
           summaryDependsOn: ['available', 'visibilityMode'],
           showDirtySuffix: true,
-          resolveSummary: (values) => ({
-            primary: values.available
-              ? `Available · ${String(values.visibilityMode).replaceAll('_', ' ')}`
-              : 'Unavailable',
-          }),
+          resolveSummary: (values) => {
+            const detail = values.visibilityMode === 'all_players' ? 'All players' : 'DM only'
+
+            if (!values.available) {
+              return {
+                status: { label: 'Unavailable', tone: 'neutral', indicator: 'inactive' },
+                detail,
+                secondary: 'Hidden from discovery and selection in this campaign.',
+                surface: 'inactive',
+              }
+            }
+
+            return {
+              status: { label: 'Available', tone: 'positive', indicator: 'dot' },
+              detail,
+            }
+          },
         }}
       >
         <TextField id="demo-available" label="Available in this campaign" />

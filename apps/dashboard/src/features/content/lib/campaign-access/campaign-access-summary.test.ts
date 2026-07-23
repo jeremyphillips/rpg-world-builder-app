@@ -10,7 +10,10 @@ describe('resolveCampaignAccessSummary', () => {
         visibilityMode: 'all_players',
         participantIds: [],
       }),
-    ).toEqual({ primary: 'Available · All players' })
+    ).toEqual({
+      status: { label: 'Available', tone: 'positive', indicator: 'dot' },
+      detail: 'All players',
+    })
   })
 
   it('summarizes available dm-only access', () => {
@@ -20,7 +23,10 @@ describe('resolveCampaignAccessSummary', () => {
         visibilityMode: 'dm_only',
         participantIds: [],
       }),
-    ).toEqual({ primary: 'Available · DM only' })
+    ).toEqual({
+      status: { label: 'Available', tone: 'positive', indicator: 'dot' },
+      detail: 'DM only',
+    })
   })
 
   it('summarizes available specific-players access with participant count', () => {
@@ -30,7 +36,10 @@ describe('resolveCampaignAccessSummary', () => {
         visibilityMode: 'specific_players',
         participantIds: ['p-1', 'p-2', 'p-3'],
       }),
-    ).toEqual({ primary: 'Available · 3 specific players' })
+    ).toEqual({
+      status: { label: 'Available', tone: 'positive', indicator: 'dot' },
+      detail: '3 specific players',
+    })
   })
 
   it('uses singular copy for one specific player', () => {
@@ -40,10 +49,13 @@ describe('resolveCampaignAccessSummary', () => {
         visibilityMode: 'specific_players',
         participantIds: ['p-1'],
       }),
-    ).toEqual({ primary: 'Available · 1 specific player' })
+    ).toEqual({
+      status: { label: 'Available', tone: 'positive', indicator: 'dot' },
+      detail: '1 specific player',
+    })
   })
 
-  it('summarizes unavailable access without effective visibility in primary', () => {
+  it('summarizes unavailable access with preserved detail and inactive surface', () => {
     expect(
       resolveCampaignAccessSummary({
         available: false,
@@ -51,8 +63,10 @@ describe('resolveCampaignAccessSummary', () => {
         participantIds: [],
       }),
     ).toEqual({
-      primary: 'Unavailable',
-      secondary: 'This content cannot be discovered or selected in this campaign.',
+      status: { label: 'Unavailable', tone: 'neutral', indicator: 'inactive' },
+      detail: 'DM only',
+      secondary: 'Hidden from discovery and selection in this campaign.',
+      surface: 'inactive',
     })
   })
 })

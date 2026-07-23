@@ -34,7 +34,9 @@ describe('CampaignAccessSection', () => {
     )
 
     expect(screen.getByText('Campaign availability')).toBeInTheDocument()
-    expect(screen.getByText('Available · All players')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /Available/ })).toHaveAccessibleName(
+      'Available. All players',
+    )
     expect(screen.getByRole('group', { name: /Campaign availability/ })).toHaveClass('mb-0')
     expect(screen.getByRole('group', { name: /Campaign availability/ })).not.toHaveClass('mb-8')
 
@@ -128,10 +130,12 @@ describe('CampaignAccessSection', () => {
       />,
     )
 
-    expect(screen.getByText('Unavailable')).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /Unavailable/ })).toHaveTextContent(
-      'This content cannot be discovered or selected in this campaign.',
+    expect(screen.getByRole('button', { name: /Unavailable/ })).toHaveAccessibleName(
+      'Unavailable. DM only. Hidden from discovery and selection in this campaign.',
     )
+    expect(
+      screen.getByText('Hidden from discovery and selection in this campaign.'),
+    ).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Change' })).toBeInTheDocument()
   })
 

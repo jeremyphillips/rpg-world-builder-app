@@ -43,6 +43,47 @@ function SummaryDisclosureHarness({
   )
 }
 
+function StructuredStatusDisclosureHarness({
+  defaultValues = { available: true, visibilityMode: 'dm_only' },
+}: {
+  defaultValues?: Values
+}) {
+  const form = useForm<Values>({ defaultValues })
+
+  return (
+    <FormProvider {...form}>
+      <FieldGroup
+        id="access-status"
+        legend="Campaign availability"
+        legendSize="array"
+        formControl={form.control as unknown as Control<FieldValues>}
+        disclosure={{
+          variant: 'summary',
+          defaultOpen: false,
+          resolveSummary: (values) => {
+            if (!values.available) {
+              return {
+                status: { label: 'Unavailable', tone: 'neutral', indicator: 'inactive' },
+                detail: 'DM only',
+                secondary: 'Hidden from discovery and selection in this campaign.',
+                surface: 'inactive',
+              }
+            }
+
+            return {
+              status: { label: 'Available', tone: 'positive', indicator: 'dot' },
+              detail: 'DM only',
+            }
+          },
+          summaryDependsOn: ['available', 'visibilityMode'],
+        }}
+      >
+        <div>Expanded fields</div>
+      </FieldGroup>
+    </FormProvider>
+  )
+}
+
 function SummaryDisclosureNoPanelDividerHarness() {
   const form = useForm<Values>({
     defaultValues: { available: true, visibilityMode: 'all_players' },
@@ -91,6 +132,38 @@ describe('FieldGroup summary disclosure', () => {
     ).toBeInTheDocument()
   })
 
+  it('renders structured status row with indicator and detail', () => {
+    const { container } = render(<StructuredStatusDisclosureHarness />)
+
+    expect(screen.getByText('Available')).toBeInTheDocument()
+    expect(screen.getByText('DM only')).toBeInTheDocument()
+    expect(container.querySelector('[aria-hidden].rounded-full')).toBeInTheDocument()
+  })
+
+  it('applies inactive shell for unavailable structured status', () => {
+    const { container } = render(
+      <StructuredStatusDisclosureHarness
+        defaultValues={{ available: false, visibilityMode: 'dm_only' }}
+      />,
+    )
+
+    expect(container.querySelector('[data-summary-surface="inactive"]')).toBeInTheDocument()
+    expect(screen.getByText('Unavailable')).toBeInTheDocument()
+    expect(screen.getByText('DM only')).toBeInTheDocument()
+    expect(
+      screen.getByText('Hidden from discovery and selection in this campaign.'),
+    ).toBeInTheDocument()
+    expect(container.querySelector('[aria-hidden].lucide-circle-slash')).toBeInTheDocument()
+  })
+
+  it('marks decorative status indicators as aria-hidden', () => {
+    const { container } = render(<StructuredStatusDisclosureHarness />)
+
+    const dot = container.querySelector('[aria-hidden].rounded-full')
+    expect(dot).toBeInTheDocument()
+    expect(dot).toHaveAttribute('aria-hidden', 'true')
+  })
+
   it('closes from Done', async () => {
     const user = userEvent.setup()
     render(<SummaryDisclosureHarness />)
@@ -128,6 +201,11 @@ describe('FieldGroup summary disclosure', () => {
     const user = userEvent.setup()
     const { container } = render(<SummaryDisclosureHarness />)
     await user.click(screen.getByRole('button', { name: 'Change' }))
+    await expectNoAxeViolations(container)
+  })
+
+  it('has no accessibility violations for structured status row', async () => {
+    const { container } = render(<StructuredStatusDisclosureHarness />)
     await expectNoAxeViolations(container)
   })
 })

@@ -13,7 +13,10 @@ import { Collapsible, CollapsibleContent } from './collapsible.client'
 import type { FieldGroupSummaryDisclosure } from './field-group-disclosure.types'
 import { FieldGroupSummaryDisclosureCollapsed } from './field-group-summary-disclosure-collapsed.client'
 import { FieldGroupSummaryDisclosureExpandedHeader } from './field-group-summary-disclosure-expanded-header.client'
-import { resolveFieldGroupSummaryDisclosurePanelClasses } from './field-group-summary-disclosure.variants'
+import {
+  fieldGroupSummaryDisclosureInactiveShellClasses,
+  resolveFieldGroupSummaryDisclosurePanelClasses,
+} from './field-group-summary-disclosure.variants'
 
 const DEFAULT_OPEN_LABEL = 'Change'
 const DEFAULT_CLOSE_LABEL = 'Done'
@@ -114,6 +117,23 @@ export function FieldGroupSummaryDisclosure<TFieldValues extends FieldValues = F
           disabled={disabled}
           onClose={() => onOpenChange(false)}
         />
+      ) : summary.surface === 'inactive' ? (
+        <div
+          className={fieldGroupSummaryDisclosureInactiveShellClasses}
+          data-summary-surface="inactive"
+        >
+          <FieldGroupSummaryDisclosureCollapsed
+            legend={legend}
+            legendId={legendId}
+            panelId={panelId}
+            summary={summary}
+            openLabel={openLabel}
+            unsavedSuffix={unsavedSuffix}
+            showDirtySuffix={showDirtySuffix}
+            disabled={disabled}
+            onOpen={() => onOpenChange(true)}
+          />
+        </div>
       ) : (
         <FieldGroupSummaryDisclosureCollapsed
           legend={legend}

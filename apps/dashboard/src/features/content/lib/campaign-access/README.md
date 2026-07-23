@@ -13,6 +13,13 @@ Campaign availability is a **separate form surface** from content body fields. I
 
 Collapsed summary comes from `resolveCampaignAccessSummary`. The group uses `disclosure: { variant: 'summary' }` on `buildCampaignAccessFields`. While dirty, the summary appends ` · Unsaved` and the panel stays open until **Done**.
 
+The collapsed disclosure renders as a **status row**:
+
+- **Available** — success dot, `Available` label, and configured player-access `detail` (e.g. `DM only`) on one line; no tinted wrapper.
+- **Unavailable** — muted inactive shell, `Unavailable` label with inactive icon, preserved `detail` (configured access mode), and a secondary consequence line (`CAMPAIGN_ACCESS_UNAVAILABLE_SUMMARY_SECONDARY`).
+
+`detail` reflects the **configured** player-access mode even when availability is off — it is preserved, not erased. The secondary line explains that the setting is not currently effective.
+
 ## Participant context
 
 `CampaignAccessFormProvider` owns reactive participant state (`isDirty`, `isPending`, `save`, `reset`). `CampaignAccessSection` registers bindings via `useCampaignAccessParticipantUpdater`. Shells and guards consume `useCampaignAccessForm()`.

@@ -33,6 +33,7 @@ export const SectionUnavailable: Story = {
         initialAccess={{
           ...DEFAULT_CONTENT_CAMPAIGN_ACCESS,
           available: false,
+          visibilityMode: 'dm_only',
           effectiveAudience: 'none',
         }}
       />

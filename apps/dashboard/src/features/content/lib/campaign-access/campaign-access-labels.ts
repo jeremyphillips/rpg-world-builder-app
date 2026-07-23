@@ -12,6 +12,10 @@ export const CAMPAIGN_ACCESS_AVAILABLE_HINT =
 export const CAMPAIGN_ACCESS_UNAVAILABLE_HINT =
   'This content cannot be discovered or selected in this campaign.'
 
+/** Collapsed disclosure secondary line when availability is off. */
+export const CAMPAIGN_ACCESS_UNAVAILABLE_SUMMARY_SECONDARY =
+  'Hidden from discovery and selection in this campaign.'
+
 /** Label-level tooltip for the availability switch. */
 export const CAMPAIGN_ACCESS_AVAILABLE_TOOLTIP =
   'Unavailable content is removed from campaign discovery and new-selection surfaces. Existing character references remain readable, and turning availability off may be blocked while active characters depend on the content.'

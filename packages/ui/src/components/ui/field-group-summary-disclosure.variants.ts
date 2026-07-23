@@ -26,3 +26,8 @@ export function resolveFieldGroupSummaryDisclosurePanelClasses(panelDivider = tr
     fieldGroupSummaryDisclosurePanelPaddingClasses,
   )
 }
+
+/** Muted inactive shell wrapping collapsed summary when `summary.surface === 'inactive'`. */
+export const fieldGroupSummaryDisclosureInactiveShellClasses = cn(
+  'flex flex-col gap-2 rounded-md border border-border-subtle border-l-2 border-l-border bg-surface-muted p-3',
+)
