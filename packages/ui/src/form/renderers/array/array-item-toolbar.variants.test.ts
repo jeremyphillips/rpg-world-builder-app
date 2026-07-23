@@ -81,8 +81,10 @@ describe('array item shell variants', () => {
 
   it('applies shared surface classes for array item chrome', () => {
     expect(arrayItemShellVariants()).not.toContain('bg-surface-muted')
-    expect(resolveFieldContainerChromeClasses({ surface: 'subtle' })).toContain('bg-surface-subtle')
-    const raised = resolveFieldContainerChromeClasses({ surface: 'raised' })
+    expect(resolveFieldContainerChromeClasses({ surface: { emphasis: 'subtle' } })).toContain(
+      'bg-surface-subtle',
+    )
+    const raised = resolveFieldContainerChromeClasses({ surface: { elevation: 'raised' } })
     expect(raised).toContain('bg-card')
     expect(raised).toContain('shadow-surface-raised')
   })

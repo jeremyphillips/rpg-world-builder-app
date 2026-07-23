@@ -59,7 +59,26 @@ before:rounded-full`. Never `border-l-2` on `rounded-md` accent shells.
 Namespace: `bg-warning-faint` (wash) vs `text-semantic-warning` (label) vs
 `semantic-warning-accent-faint` (rail).
 
-## Migration map
+## Phase 2 — surface and chrome migration
+
+`SurfaceConfig` replaces `FieldSurfaceVariant` / `InsetPanelSurface` string literals:
+
+| Legacy               | `SurfaceConfig`                              |
+| -------------------- | -------------------------------------------- |
+| `base` / flat canvas | `{ elevation: 'flat' }` or `{}`              |
+| `raised`             | `{ elevation: 'raised' }`                    |
+| `subtle`             | `{ emphasis: 'subtle', elevation: 'flat' }`  |
+| `muted`              | `{ emphasis: 'default', elevation: 'flat' }` |
+| `strong`             | `{ emphasis: 'strong', elevation: 'flat' }`  |
+| `sunken` (inset)     | `{ elevation: 'sunken' }`                    |
+
+`resolveSurfaceClasses` in [`surface.variants.ts`](../src/components/ui/surface.variants.ts) resolves neutral and semantic washes.
+
+Group `chrome` panel / outline / callout variants use `ChromeConfig` (`tone`, `emphasis`, `elevation`, `borderAccent`) and delegate to [`chrome.variants.ts`](../src/components/ui/chrome.variants.ts). Inset, divider, and legend-rail accent remain field-group-specific.
+
+Container chrome uses `surface?: SurfaceConfig` and `tone?: SemanticSurfaceTone` (replaces `status`).
+
+## Migration map (Phase 1 + 2)
 
 | Current                                 | Intent               | Target                                                                        |
 | --------------------------------------- | -------------------- | ----------------------------------------------------------------------------- |

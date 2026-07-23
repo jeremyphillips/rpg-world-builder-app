@@ -5,8 +5,9 @@ import * as React from 'react'
 import type { FieldSize } from '../../components/ui/field.client'
 import type {
   FieldStatusTone,
-  FieldSurfaceVariant,
+  SemanticSurfaceTone,
 } from '../../components/ui/field-dependent.variants'
+import type { SurfaceConfig } from '../../components/ui/visual-vocabulary.types'
 import {
   DEFAULT_FORM_FIELD_SIZE,
   DEFAULT_FORM_RHYTHM,
@@ -23,9 +24,11 @@ export interface FormSectionContextValue {
   rhythm: FieldStackRhythm
   /** Control + label scale for leaf fields in this section. */
   size: FieldSize
-  /** Surface variant for array item shells — defaults to `raised` when unset. */
-  arrayItemSurface?: FieldSurfaceVariant
+  /** Surface config for array item shells — defaults to raised when unset. */
+  arrayItemSurface?: SurfaceConfig
   /** Optional semantic status wash for array item shells. */
+  arrayItemTone?: SemanticSurfaceTone
+  /** @deprecated Use `arrayItemTone` */
   arrayItemStatus?: FieldStatusTone
   /** True when the current section is nested inside a group fieldset. */
   inGroup?: boolean
@@ -46,7 +49,9 @@ export function useFormSectionContext(): FormSectionContextValue {
 export interface FormSectionContextOverrides {
   rhythm?: FieldStackRhythm
   size?: FieldSize
-  arrayItemSurface?: FieldSurfaceVariant
+  arrayItemSurface?: SurfaceConfig
+  arrayItemTone?: SemanticSurfaceTone
+  /** @deprecated Use `arrayItemTone` */
   arrayItemStatus?: FieldStatusTone
   inGroup?: boolean
   inRhythmStack?: boolean
@@ -66,6 +71,7 @@ function inheritSectionContextFields(
     rhythm: parent.rhythm,
     size: parent.size,
     arrayItemSurface: parent.arrayItemSurface,
+    arrayItemTone: parent.arrayItemTone,
     arrayItemStatus: parent.arrayItemStatus,
     inGroup: parent.inGroup,
     inRhythmStack: parent.inRhythmStack,

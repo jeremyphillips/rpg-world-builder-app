@@ -31,8 +31,9 @@ import type {
 import type {
   FieldDependentsScope,
   FieldStatusTone,
-  FieldSurfaceVariant,
+  SemanticSurfaceTone,
 } from '../components/ui/field-dependent.variants'
+import type { SurfaceConfig } from '../components/ui/visual-vocabulary.types'
 import type { FieldGroupChrome } from '../components/ui/field-group-chrome.variants'
 import type { FieldGroupDisclosure } from '../components/ui/field-group-disclosure.types'
 import type { ArrayAddMenuConfig } from './config/array/array-add-menu.lib'
@@ -49,6 +50,7 @@ export type {
   FieldGroupDisclosure,
   FieldGroupSummary,
   FieldGroupSummaryDisclosure,
+  ChromeBorderAccent,
   ChromeConfig,
   ChromeVariant,
   ContentTone,
@@ -825,7 +827,9 @@ export interface DependentDependentsConfig {
    * When omitted and the controller is a switch, defaults to "switch is true".
    */
   visibility?: FieldVisibility
-  surface?: FieldSurfaceVariant
+  surface?: SurfaceConfig
+  tone?: SemanticSurfaceTone
+  /** @deprecated Use `tone` */
   status?: FieldStatusTone
   /**
    * Where dependent chrome applies.
@@ -1011,7 +1015,9 @@ export interface ArrayAddActionConfig {
 export interface ArrayItemConfig {
   variant?: ArrayItemVariant
   /** @default raised */
-  surface?: FieldSurfaceVariant
+  surface?: SurfaceConfig
+  tone?: SemanticSurfaceTone
+  /** @deprecated Use `tone` */
   status?: FieldStatusTone
   header?: ArrayItemHeaderConfig
   collapsible?: boolean

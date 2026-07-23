@@ -78,7 +78,7 @@ export function costFields(
         width,
       },
       dependents: {
-        surface: 'subtle',
+        surface: { emphasis: 'subtle' },
         fields: [costInputField({ kind, width })],
       },
     },

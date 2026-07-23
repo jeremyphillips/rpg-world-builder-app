@@ -20,7 +20,7 @@ describe('InsetPanel', () => {
 
   it('applies dashed sunken gate chrome', () => {
     const { container } = render(
-      <InsetPanel borderStyle="dashed" surface="sunken" size="lg" align="center">
+      <InsetPanel borderStyle="dashed" surface={{ elevation: 'sunken' }} size="lg" align="center">
         <InsetPanel.Text>Gate copy</InsetPanel.Text>
       </InsetPanel>,
     )
@@ -61,7 +61,7 @@ describe('InsetPanel', () => {
 
   it('has no axe accessibility violations', async () => {
     const { container } = render(
-      <InsetPanel borderStyle="dashed" surface="sunken" size="lg" align="center">
+      <InsetPanel borderStyle="dashed" surface={{ elevation: 'sunken' }} size="lg" align="center">
         <InsetPanel.Text>Accessible gate copy</InsetPanel.Text>
       </InsetPanel>,
     )

@@ -88,6 +88,18 @@ describe('chrome.variants', () => {
     expectOnlyApprovedTokens(classes, APPROVED_CHROME_LAYOUT_TOKENS)
   })
 
+  it('resolves panel chrome with default subtle wash', () => {
+    const classes = resolveChromeClasses({ variant: 'panel' })
+    expect(classes).toContain('bg-surface-subtle')
+    expect(classes).toContain('p-4')
+  })
+
+  it('resolves callout info shell', () => {
+    const classes = resolveChromeClasses({ variant: 'callout', tone: 'info' })
+    expect(classes).toContain('bg-info-subtle')
+    expect(classes).toContain('rounded-lg')
+  })
+
   it('returns empty classes for plain or unsupported chrome', () => {
     expect(resolveChromeClasses(undefined)).toBe('')
     expect(resolveChromeClasses({ variant: 'plain' })).toBe('')

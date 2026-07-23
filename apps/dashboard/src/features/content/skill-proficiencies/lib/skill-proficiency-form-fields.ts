@@ -80,7 +80,7 @@ export function buildSkillProficiencyFields(_ctx: ContentFormCtx): FormItem[] {
           size: 'md',
           item: {
             reorder: 'dragHandle',
-            surface: 'subtle',
+            surface: { emphasis: 'subtle' },
             collapsible: true,
             collapseKey: 'example',
             variant: 'compact',

@@ -1,29 +1,32 @@
 import { cva } from 'class-variance-authority'
 
 import type { FieldSize } from './field.client'
-import { cn } from '../../lib/utils'
-import {
-  fieldShellLayoutClasses,
-  resolveFieldGroupOutlineToneClasses,
-  resolveFieldGroupPanelToneClasses,
-  type FieldGroupOutlineTone,
-  type FieldGroupPanelTone,
-} from './field-surface.variants'
+import { resolveChromeOutlineClasses, resolveChromePanelClasses } from './chrome.variants'
+import type {
+  ChromeBorderAccent,
+  SemanticTone,
+  SurfaceElevation,
+  VisualEmphasis,
+} from './visual-vocabulary.types'
 
-/** Field-level panel chrome — shares tone tokens with group `chrome.panel`. */
-export interface FieldPanelChrome {
+export type FieldPanelChrome = {
   variant: 'panel'
-  tone?: FieldGroupPanelTone
+  tone?: SemanticTone
+  emphasis?: VisualEmphasis
+  elevation?: SurfaceElevation
 }
 
-/** Field-level outline chrome — shares tone tokens with group `chrome.outline`. */
-export interface FieldOutlineChrome {
+export type FieldOutlineChrome = {
   variant: 'outline'
-  tone?: FieldGroupOutlineTone
+  tone?: SemanticTone
+  emphasis?: VisualEmphasis
+  borderAccent?: ChromeBorderAccent
 }
+
+type FieldComposableChrome = FieldPanelChrome | FieldOutlineChrome
 
 /** Visual shell around a single field's full anatomy (label + control + messages). */
-export type FieldChrome = { variant: 'plain' } | FieldPanelChrome | FieldOutlineChrome
+export type FieldChrome = { variant: 'plain' } | FieldComposableChrome
 
 export interface FieldChromeProps {
   chrome?: FieldChrome
@@ -36,7 +39,7 @@ export function pickFieldChromeProps(config: { chrome?: FieldChrome }): FieldChr
 
 export function hasActiveFieldChrome(
   chrome: FieldChrome | undefined,
-): chrome is FieldPanelChrome | FieldOutlineChrome {
+): chrome is FieldComposableChrome {
   return Boolean(chrome && chrome.variant !== 'plain')
 }
 
@@ -66,13 +69,13 @@ export function resolveFieldChromeClassNames(
 ): string {
   if (!chrome || chrome.variant === 'plain') return ''
 
-  const shell = cn(fieldShellLayoutClasses, fieldChromePaddingVariants({ size }))
+  const paddingClasses = fieldChromePaddingVariants({ size })
 
   switch (chrome.variant) {
     case 'panel':
-      return cn(shell, resolveFieldGroupPanelToneClasses(chrome.tone))
+      return resolveChromePanelClasses(chrome, 'field', paddingClasses)
     case 'outline':
-      return cn(shell, 'bg-transparent', resolveFieldGroupOutlineToneClasses(chrome.tone))
+      return resolveChromeOutlineClasses(chrome, 'field', paddingClasses)
     default:
       return ''
   }

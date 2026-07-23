@@ -7,7 +7,12 @@ import {
   emphasisDetailLineSecondaryVariants,
 } from './emphasis-detail-line.variants'
 
-export type EmphasisDetailLineSecondaryTone = 'muted' | 'subtle'
+import type { ContentTone } from './visual-vocabulary.types'
+
+export type EmphasisDetailLineSecondaryTone =
+  | Extract<ContentTone, 'secondary' | 'disabled'>
+  | 'muted'
+  | 'subtle'
 
 export type EmphasisDetailLineProps<T extends React.ElementType = 'span'> = {
   as?: T
@@ -18,7 +23,7 @@ export type EmphasisDetailLineProps<T extends React.ElementType = 'span'> = {
   primary: React.ReactNode
   /** Muted tail — supporting context */
   secondary?: React.ReactNode
-  /** `muted` on neutral surfaces; `subtle` inside tinted parents like warning text */
+  /** `secondary` on neutral surfaces; `disabled` inside tinted parents */
   secondaryTone?: EmphasisDetailLineSecondaryTone
 } & Omit<
   React.ComponentPropsWithoutRef<T>,
@@ -31,7 +36,7 @@ export function EmphasisDetailLine<T extends React.ElementType = 'span'>({
   prefix,
   primary,
   secondary,
-  secondaryTone = 'muted',
+  secondaryTone = 'secondary',
   ...props
 }: EmphasisDetailLineProps<T>) {
   const Comp = as ?? 'span'

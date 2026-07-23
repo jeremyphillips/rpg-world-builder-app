@@ -209,10 +209,11 @@ export {
   type InsetPanelTextProps,
 } from './components/ui/inset-panel.client'
 export {
+  DEFAULT_INSET_PANEL_SURFACE,
   INSET_PANEL_ALIGNS,
   INSET_PANEL_BORDER_STYLES,
   INSET_PANEL_SIZES,
-  INSET_PANEL_SURFACES,
+  insetPanelClassNames,
   insetPanelEmptyStateClasses,
   insetPanelEmptyStateVariants,
   insetPanelGateClasses,
@@ -220,11 +221,11 @@ export {
   insetPanelSunkenShadowClasses,
   insetPanelTextVariantBySize,
   insetPanelVariants,
+  resolveInsetPanelSurfaceClasses,
   resolveInsetPanelTextVariant,
   type InsetPanelAlign,
   type InsetPanelBorderStyle,
   type InsetPanelSize,
-  type InsetPanelSurface,
   type InsetPanelVariantProps,
 } from './components/ui/inset-panel.variants'
 export { RadioCardField, type RadioCardFieldProps } from './components/ui/radio-card-field'
@@ -244,11 +245,16 @@ export {
 } from './components/ui/field-group'
 export {
   resolveChromeAccentClasses,
+  resolveChromeCalloutClasses,
   resolveChromeClasses,
+  resolveChromeOutlineClasses,
+  resolveChromePanelClasses,
   resolveChromeShellClasses,
   isSupportedSemanticChrome,
 } from './components/ui/chrome.variants'
+export { resolveSurfaceClasses } from './components/ui/surface.variants'
 export type {
+  ChromeBorderAccent,
   ChromeConfig,
   ChromeVariant,
   ContentTone,

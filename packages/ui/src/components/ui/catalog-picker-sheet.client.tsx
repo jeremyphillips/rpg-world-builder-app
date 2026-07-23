@@ -67,7 +67,7 @@ function CatalogPickerSheetEmpty({
   return (
     <InsetPanel
       borderStyle="dashed"
-      surface="none"
+      surface={{}}
       size="md"
       align="center"
       className="py-8"

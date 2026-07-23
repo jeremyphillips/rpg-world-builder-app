@@ -319,7 +319,7 @@ function extendedProgressionGroup(): FormItem {
           defaultValue: false,
         },
         dependents: {
-          surface: 'muted',
+          surface: { emphasis: 'default' },
           fields: [
             {
               kind: 'row',
@@ -390,7 +390,7 @@ function multiclassingGroup(): FormItem {
           defaultValue: DEFAULT_PRIMARY_ABILITY_MINIMUM_ENABLED,
         },
         dependents: {
-          surface: 'muted',
+          surface: { emphasis: 'default' },
           fields: [
             {
               type: 'number',
@@ -532,7 +532,7 @@ function creationSectionItems(): FormItem[] {
               ...(buildStartingWealthTiersField() as ArrayConfig),
               name: `${prefix}.tiers`,
               id: 'starting-wealth',
-              item: { surface: 'raised' },
+              item: { surface: { elevation: 'raised' } },
               className: SCROLL_SECTION_ANCHOR_CLASS,
             },
           ],

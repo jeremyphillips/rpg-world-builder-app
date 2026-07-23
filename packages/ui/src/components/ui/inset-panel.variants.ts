@@ -1,16 +1,14 @@
 import { cva, type VariantProps } from 'class-variance-authority'
 
 import { cn } from '../../lib/utils'
+import { resolveSurfaceClasses } from './surface.variants'
 import type { TextVariantProps } from './text.variants'
+import type { SurfaceConfig } from './visual-vocabulary.types'
 
 /** Recessed panel sizes — padding/radius plus default copy scale via `InsetPanel.Text`. */
 export const INSET_PANEL_SIZES = ['sm', 'md', 'lg'] as const
 
 export type InsetPanelSize = (typeof INSET_PANEL_SIZES)[number]
-
-export const INSET_PANEL_SURFACES = ['none', 'muted', 'subtle', 'sunken'] as const
-
-export type InsetPanelSurface = (typeof INSET_PANEL_SURFACES)[number]
 
 export const INSET_PANEL_BORDER_STYLES = ['solid', 'dashed'] as const
 
@@ -20,15 +18,8 @@ export const INSET_PANEL_ALIGNS = ['start', 'center'] as const
 
 export type InsetPanelAlign = (typeof INSET_PANEL_ALIGNS)[number]
 
-/** Subtle recess emboss for sunken inset panels — inner shadow + edge shade. */
-export const insetPanelSunkenShadowClasses = 'shadow-surface-sunken'
-
-const insetPanelSurfaceClasses = {
-  none: '',
-  muted: 'bg-surface-muted',
-  subtle: 'bg-surface-subtle',
-  sunken: cn('bg-sunken', insetPanelSunkenShadowClasses),
-} satisfies Record<InsetPanelSurface, string>
+/** Default recessed inset panel surface. */
+export const DEFAULT_INSET_PANEL_SURFACE: SurfaceConfig = { elevation: 'sunken' }
 
 const insetPanelSizeClasses = {
   sm: 'rounded-md p-3',
@@ -50,9 +41,24 @@ export function resolveInsetPanelTextVariant(
   return variant ?? insetPanelTextVariantBySize[size]
 }
 
+export function resolveInsetPanelSurfaceClasses(surface?: SurfaceConfig): string {
+  if (!surface) {
+    return resolveSurfaceClasses(DEFAULT_INSET_PANEL_SURFACE)
+  }
+
+  if (
+    surface.emphasis === undefined &&
+    surface.elevation === undefined &&
+    Object.keys(surface).length === 0
+  ) {
+    return ''
+  }
+
+  return resolveSurfaceClasses(surface)
+}
+
 export const insetPanelVariants = cva('min-w-0 border border-border', {
   variants: {
-    surface: insetPanelSurfaceClasses,
     borderStyle: {
       solid: '',
       dashed: 'border-dashed',
@@ -64,27 +70,42 @@ export const insetPanelVariants = cva('min-w-0 border border-border', {
     },
   },
   defaultVariants: {
-    surface: 'sunken',
     borderStyle: 'solid',
     size: 'md',
     align: 'start',
   },
 })
 
-export type InsetPanelVariantProps = VariantProps<typeof insetPanelVariants>
+export type InsetPanelVariantProps = VariantProps<typeof insetPanelVariants> & {
+  surface?: SurfaceConfig
+}
+
+export function insetPanelClassNames({
+  surface,
+  borderStyle,
+  size = 'md',
+  align,
+  className,
+}: InsetPanelVariantProps & { className?: string }): string {
+  return cn(
+    insetPanelVariants({ borderStyle, size, align }),
+    resolveInsetPanelSurfaceClasses(surface),
+    className,
+  )
+}
 
 /** Dashed placeholder chrome shared by catalog pickers and similar empty views. */
-export const insetPanelEmptyStateClasses = insetPanelVariants({
+export const insetPanelEmptyStateClasses = insetPanelClassNames({
   borderStyle: 'dashed',
-  surface: 'none',
+  surface: {},
   size: 'md',
   align: 'center',
 })
 
 /** Dashed recessed gate chrome for authoring blockers. */
-export const insetPanelGateClasses = insetPanelVariants({
+export const insetPanelGateClasses = insetPanelClassNames({
   borderStyle: 'dashed',
-  surface: 'sunken',
+  surface: DEFAULT_INSET_PANEL_SURFACE,
   size: 'lg',
   align: 'center',
 })
@@ -94,3 +115,5 @@ export const insetPanelEmptyStateVariants = () => insetPanelEmptyStateClasses
 
 /** @deprecated Use `insetPanelGateClasses`. */
 export const insetPanelGateVariants = () => insetPanelGateClasses
+
+export { insetPanelSunkenShadowClasses } from './field-surface.lib'

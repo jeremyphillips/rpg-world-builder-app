@@ -55,7 +55,7 @@ function narrativeArrayField(
     ],
     item: {
       variant: 'compact',
-      surface: 'subtle',
+      surface: { emphasis: 'subtle' },
       reorder: false,
       header: {
         fallback: (index) => `${legend} ${index + 1}`,

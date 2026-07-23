@@ -27,7 +27,10 @@ describe('resolveFieldChromeClassNames', () => {
   })
 
   it('applies outline chrome without background wash', () => {
-    const classes = resolveFieldChromeClassNames({ variant: 'outline', tone: 'primary' }, 'md')
+    const classes = resolveFieldChromeClassNames(
+      { variant: 'outline', borderAccent: 'primary' },
+      'md',
+    )
     expect(classes).toContain('bg-transparent')
     expect(classes).toContain('border-primary')
   })
@@ -40,8 +43,8 @@ describe('resolveFieldChromeClassNames', () => {
     expect(tokens).not.toContain('border-border')
   })
 
-  it('maps outline ladder tones to separator border utilities', () => {
-    const faint = resolveFieldChromeClassNames({ variant: 'outline', tone: 'faint' }, 'md')
+  it('maps outline emphasis to separator border utilities', () => {
+    const faint = resolveFieldChromeClassNames({ variant: 'outline', emphasis: 'faint' }, 'md')
     expect(faint).toContain('border-border-faint')
   })
 })

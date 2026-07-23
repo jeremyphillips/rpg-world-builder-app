@@ -32,7 +32,7 @@ import type { ContentCampaignAccessPatch } from '@rpg/contracts'
 
 export function ContentFormComingSoon() {
   return (
-    <InsetPanel borderStyle="dashed" surface="none" size="lg" align="center">
+    <InsetPanel borderStyle="dashed" surface={{}} size="lg" align="center">
       <InsetPanel.Text>Form coming soon.</InsetPanel.Text>
     </InsetPanel>
   )

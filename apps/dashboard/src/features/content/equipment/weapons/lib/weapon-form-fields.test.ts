@@ -45,7 +45,7 @@ describe('weapon kindFieldGroups', () => {
     })
     const damageGroup = damageGroupFromWeaponGroup(weaponGroup)
     expect(damageGroup).toMatchObject({
-      chrome: { variant: 'panel', tone: 'raised' },
+      chrome: { variant: 'panel', elevation: 'raised' },
     })
   })
 

@@ -1,21 +1,21 @@
 import { cva } from 'class-variance-authority'
 
-import { type AlertVariant, ALERT_VARIANTS } from './alert.variants'
-import { compactLabelAppearanceToneClasses, type CompactLabelTone } from './compact-label.lib'
 import { cn } from '../../lib/utils'
-import {
-  fieldGroupBodyShellLayoutClasses,
-  isCompactLabelTone,
-  resolveFieldGroupOutlineToneClasses,
-  resolveFieldGroupPanelToneClasses,
-  type FieldGroupOutlineTone,
-  type FieldGroupPanelTone,
-} from './field-surface.variants'
+import type { CompactLabelTone } from './compact-label.lib'
+import { resolveChromeClasses } from './chrome.variants'
+import { isCompactLabelTone } from './field-surface.variants'
 import {
   DEFAULT_FORM_RHYTHM,
   resolveFieldGroupInsetPaddingClasses,
   type FieldRhythm,
 } from './field.variants'
+import type {
+  ChromeBorderAccent,
+  ChromeConfig,
+  SemanticTone,
+  SurfaceElevation,
+  VisualEmphasis,
+} from './visual-vocabulary.types'
 
 /** Left rail tone for group inset chrome. */
 export type FieldGroupInsetTone = 'border' | 'primary'
@@ -29,33 +29,40 @@ export type FieldGroupAccentEdge = 'top' | 'legendRail'
 
 export type FieldGroupAccentTone = 'border' | 'primary' | CompactLabelTone
 
-/** Callout surfaces reuse alert tokens plus compact-label semantic tones. */
-export type FieldGroupCalloutTone = AlertVariant | CompactLabelTone
+export type FieldGroupPanelChrome = {
+  variant: 'panel'
+  tone?: SemanticTone
+  emphasis?: VisualEmphasis
+  elevation?: SurfaceElevation
+}
+
+export type FieldGroupOutlineChrome = {
+  variant: 'outline'
+  tone?: SemanticTone
+  emphasis?: VisualEmphasis
+  borderAccent?: ChromeBorderAccent
+}
+
+export type FieldGroupCalloutChrome = {
+  variant: 'callout'
+  tone?: SemanticTone
+  emphasis?: VisualEmphasis
+}
+
+type FieldGroupComposableChrome =
+  | FieldGroupPanelChrome
+  | FieldGroupOutlineChrome
+  | FieldGroupCalloutChrome
 
 export interface FieldGroupInsetChrome {
   variant: 'inset'
   tone?: FieldGroupInsetTone
 }
 
-export interface FieldGroupPanelChrome {
-  variant: 'panel'
-  tone?: FieldGroupPanelTone
-}
-
-export interface FieldGroupOutlineChrome {
-  variant: 'outline'
-  tone?: FieldGroupOutlineTone
-}
-
 export interface FieldGroupDividerChrome {
   variant: 'divider'
   edge?: FieldGroupDividerEdge
   tone?: FieldGroupDividerTone
-}
-
-export interface FieldGroupCalloutChrome {
-  variant: 'callout'
-  tone?: FieldGroupCalloutTone
 }
 
 export interface FieldGroupAccentChrome {
@@ -68,11 +75,9 @@ export interface FieldGroupAccentChrome {
 export type FieldGroupChrome =
   | { variant: 'plain' }
   | FieldGroupInsetChrome
-  | FieldGroupPanelChrome
-  | FieldGroupOutlineChrome
   | FieldGroupDividerChrome
-  | FieldGroupCalloutChrome
   | FieldGroupAccentChrome
+  | FieldGroupComposableChrome
 
 /** Spacing above a top divider — 28px (`pt-7`). */
 export const fieldGroupDividerTopPaddingClasses = 'pt-7'
@@ -164,30 +169,6 @@ export function resolveFieldGroupAccentLegendRailClasses(
   )
 }
 
-function isAlertVariant(value: string): value is AlertVariant {
-  return (ALERT_VARIANTS as readonly string[]).includes(value)
-}
-
-function resolveCalloutBodyClasses(tone: FieldGroupCalloutTone = 'info'): string {
-  if (isAlertVariant(tone)) {
-    const calloutSurface: Record<AlertVariant, string> = {
-      default: 'border-border bg-surface-muted text-foreground',
-      info: 'border-info-muted bg-info-subtle text-foreground',
-      success: 'border-success-muted bg-success-subtle text-foreground',
-      warning: 'border-warning-muted bg-warning-subtle text-foreground',
-      destructive: 'border-destructive-muted bg-destructive-subtle text-foreground',
-    }
-
-    return cn('rounded-lg border p-4', calloutSurface[tone])
-  }
-
-  if (isCompactLabelTone(tone)) {
-    return cn('rounded-lg border p-4', compactLabelAppearanceToneClasses('soft', tone))
-  }
-
-  return cn('rounded-lg border p-4', 'border-border bg-surface-muted text-foreground')
-}
-
 function resolveAccentTone(
   tone: FieldGroupAccentTone | undefined,
 ): NonNullable<Parameters<typeof fieldGroupAccentContainerVariants>[0]>['tone'] {
@@ -232,19 +213,9 @@ function resolveInsetChrome(
   })
 }
 
-function resolvePanelChrome(chrome: FieldGroupPanelChrome): FieldGroupChromeClassNames {
+function resolveComposableChrome(chrome: FieldGroupComposableChrome): FieldGroupChromeClassNames {
   return withFieldGroupChrome({
-    body: cn(fieldGroupBodyShellLayoutClasses, resolveFieldGroupPanelToneClasses(chrome.tone)),
-  })
-}
-
-function resolveOutlineChrome(chrome: FieldGroupOutlineChrome): FieldGroupChromeClassNames {
-  return withFieldGroupChrome({
-    body: cn(
-      fieldGroupBodyShellLayoutClasses,
-      'bg-transparent',
-      resolveFieldGroupOutlineToneClasses(chrome.tone),
-    ),
+    body: resolveChromeClasses(chrome as ChromeConfig),
   })
 }
 
@@ -254,12 +225,6 @@ function resolveDividerChrome(chrome: FieldGroupDividerChrome): FieldGroupChrome
       edge: chrome.edge ?? 'top',
       tone: chrome.tone ?? 'border',
     }),
-  })
-}
-
-function resolveCalloutChrome(chrome: FieldGroupCalloutChrome): FieldGroupChromeClassNames {
-  return withFieldGroupChrome({
-    body: resolveCalloutBodyClasses(chrome.tone),
   })
 }
 
@@ -291,13 +256,11 @@ export function resolveFieldGroupChromeClassNames(
     case 'inset':
       return resolveInsetChrome(resolved, rhythm)
     case 'panel':
-      return resolvePanelChrome(resolved)
     case 'outline':
-      return resolveOutlineChrome(resolved)
+    case 'callout':
+      return resolveComposableChrome(resolved)
     case 'divider':
       return resolveDividerChrome(resolved)
-    case 'callout':
-      return resolveCalloutChrome(resolved)
     case 'accent':
       return resolveAccentChrome(resolved)
     default:

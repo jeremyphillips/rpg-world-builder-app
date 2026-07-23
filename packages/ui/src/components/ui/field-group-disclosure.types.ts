@@ -1,6 +1,7 @@
 import type { ChromeConfig } from './visual-vocabulary.types'
 
 export type {
+  ChromeBorderAccent,
   ChromeConfig,
   ChromeVariant,
   ContentTone,

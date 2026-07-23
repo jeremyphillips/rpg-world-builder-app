@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react'
 
 import type { CollapsibleListItemShellPreset } from './collapsible-list-item/collapsible-list-item-shell.client'
-import type { FieldSurfaceVariant } from './field-surface.variants'
+import type { SurfaceConfig } from './visual-vocabulary.types'
 import type { CatalogToolbarTab, CatalogToolbarTabs } from './catalog-toolbar.types'
 
 export type CatalogPickerTab = CatalogToolbarTab
@@ -65,8 +65,8 @@ export type CatalogPickerSheetProps<TItem> = {
   noItemsMessage?: string
   /** Collapsible row shell preset — equipment picker uses `catalog`. */
   rowPreset?: CollapsibleListItemShellPreset
-  /** Collapsible row surface variant — defaults to `base`. */
-  rowSurface?: FieldSurfaceVariant
+  /** Collapsible row surface config — defaults to flat canvas. */
+  rowSurface?: SurfaceConfig
   /** Top-align caret/grip with the first header line for multi-line headers. */
   toolbarCompact?: boolean
   /** Optional class merged onto the sheet content panel. */

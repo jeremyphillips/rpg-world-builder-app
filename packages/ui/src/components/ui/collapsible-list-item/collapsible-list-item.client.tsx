@@ -9,7 +9,8 @@ import {
   type CollapsibleListItemActionsAlign,
   type CollapsibleListItemShellPreset,
 } from './collapsible-list-item-shell.client'
-import type { FieldStatusTone, FieldSurfaceVariant } from '../field-surface.variants'
+import type { FieldStatusTone, SemanticSurfaceTone } from '../field-surface.variants'
+import type { SurfaceConfig } from '../visual-vocabulary.types'
 import {
   CollapsibleListItemCollapseButton,
   CollapsibleListItemDragHandle,
@@ -42,7 +43,8 @@ export interface CollapsibleListItemProps {
   showDragHandle?: boolean
   dragHandleProps?: CollapsibleListItemDragHandleConfig
   preset?: CollapsibleListItemShellPreset
-  surface?: FieldSurfaceVariant
+  surface?: SurfaceConfig
+  tone?: SemanticSurfaceTone
   status?: FieldStatusTone
   layout?: 'default' | 'compactRow'
   actionsAlign?: CollapsibleListItemActionsAlign
@@ -70,7 +72,8 @@ interface CollapsibleListItemContextValue {
   gripVisible: boolean
   dragHandleProps?: CollapsibleListItemDragHandleProps
   preset: CollapsibleListItemShellPreset
-  surface?: FieldSurfaceVariant
+  surface?: SurfaceConfig
+  tone?: SemanticSurfaceTone
   status?: FieldStatusTone
   layout: 'default' | 'compactRow'
   dragging: boolean

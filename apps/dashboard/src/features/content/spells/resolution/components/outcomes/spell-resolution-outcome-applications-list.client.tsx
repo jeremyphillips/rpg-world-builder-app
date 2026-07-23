@@ -41,7 +41,7 @@ export function SpellResolutionOutcomeApplicationsList({
   const listContext = React.useMemo(
     () =>
       buildFormSectionChildContext(parentContext, parentContext.depth, {
-        arrayItemSurface: 'subtle',
+        arrayItemSurface: { emphasis: 'subtle' },
         size: 'sm',
       }),
     [parentContext],

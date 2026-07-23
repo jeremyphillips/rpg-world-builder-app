@@ -185,7 +185,7 @@ describe('ArrayFieldRenderer', () => {
         kind: 'array',
         name: 'traits',
         legend: 'Traits',
-        item: { surface: 'subtle' },
+        item: { surface: { emphasis: 'subtle' } },
         fields: traitFields,
         addAction: { label: 'Add trait' },
       },

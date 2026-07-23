@@ -1,7 +1,7 @@
 import { describe, expect, expectTypeOf, it } from 'vitest'
 
 import {
-  FIELD_SURFACE_VARIANTS,
+  DEFAULT_DEPENDENT_SURFACE,
   resolveFieldContainerChromeClasses,
 } from '../components/ui/field-surface.variants'
 import {
@@ -22,10 +22,10 @@ describe('form field vocabulary parity', () => {
     expectTypeOf<FieldWidth>().toEqualTypeOf<(typeof FIELD_WIDTHS)[number]>()
   })
 
-  it('FIELD_SURFACE_VARIANTS entries are accepted by resolveFieldContainerChromeClasses', () => {
-    for (const surface of FIELD_SURFACE_VARIANTS) {
-      expect(resolveFieldContainerChromeClasses({ surface })).toBeTypeOf('string')
-    }
+  it('DEFAULT_DEPENDENT_SURFACE resolves through container chrome helper', () => {
+    expect(resolveFieldContainerChromeClasses({ surface: DEFAULT_DEPENDENT_SURFACE })).toBeTypeOf(
+      'string',
+    )
   })
 
   it('DICE_FORMULA_TAIL_OPERATORS is a non-empty closed set', () => {

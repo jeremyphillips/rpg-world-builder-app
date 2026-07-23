@@ -50,7 +50,7 @@ export function movementArrayField(): FormItem {
     item: {
       variant: 'compact',
       inlineAlign: 'center',
-      surface: 'subtle',
+      surface: { emphasis: 'subtle' },
       reorder: 'dragHandle',
       header: {
         fallback: (index) => `Movement ${index + 1}`,

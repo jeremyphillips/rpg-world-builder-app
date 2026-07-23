@@ -4,10 +4,12 @@ import * as React from 'react'
 
 import { cn } from '../../../lib/utils'
 import {
+  DEFAULT_ARRAY_ITEM_SURFACE,
   resolveFieldContainerChromeClasses,
   type FieldStatusTone,
-  type FieldSurfaceVariant,
+  type SemanticSurfaceTone,
 } from '../field-surface.variants'
+import type { SurfaceConfig } from '../visual-vocabulary.types'
 import { buildCollapsibleListItemLeadingChromeStyle } from './collapsible-list-item-leading-chrome.lib'
 import { CollapsibleListItemActions } from './collapsible-list-item-actions.client'
 import {
@@ -32,7 +34,9 @@ export interface CollapsibleListItemShellProps extends CollapsibleListItemLeadin
   actionsAlign?: CollapsibleListItemActionsAlign
   /** Non-form shell presets — bypass surface/status axes. */
   preset?: CollapsibleListItemShellPreset
-  surface?: FieldSurfaceVariant
+  surface?: SurfaceConfig
+  tone?: SemanticSurfaceTone
+  /** @deprecated Use `tone` */
   status?: FieldStatusTone
   className?: string
   toolbar?: React.ReactNode
@@ -45,17 +49,19 @@ export interface CollapsibleListItemShellProps extends CollapsibleListItemLeadin
 function resolveShellChromeClasses({
   preset = 'default',
   surface,
+  tone,
   status,
-}: Pick<CollapsibleListItemShellProps, 'preset' | 'surface' | 'status'>): string {
+}: Pick<CollapsibleListItemShellProps, 'preset' | 'surface' | 'tone' | 'status'>): string {
   if (preset === 'catalog') {
     return ''
   }
-  if (preset === 'default' && surface === undefined && status === undefined) {
+  const resolvedTone = tone ?? status
+  if (preset === 'default' && surface === undefined && resolvedTone === undefined) {
     return 'border-border'
   }
   return resolveFieldContainerChromeClasses(
-    { surface: surface ?? 'raised', status },
-    { surface: 'raised' },
+    { surface: surface ?? DEFAULT_ARRAY_ITEM_SURFACE, tone: resolvedTone },
+    { surface: DEFAULT_ARRAY_ITEM_SURFACE },
   )
 }
 
@@ -70,6 +76,7 @@ export function CollapsibleListItemShell({
   actionsAlign = 'start',
   preset = 'default',
   surface,
+  tone,
   status,
   className,
   toolbar,
@@ -95,7 +102,7 @@ export function CollapsibleListItemShell({
     ) : (
       actions
     )
-  const chromeClasses = resolveShellChromeClasses({ preset, surface, status })
+  const chromeClasses = resolveShellChromeClasses({ preset, surface, tone, status })
 
   return (
     <div

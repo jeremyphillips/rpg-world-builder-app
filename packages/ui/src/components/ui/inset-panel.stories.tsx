@@ -20,7 +20,7 @@ type Story = StoryObj<typeof meta>
 
 export const SolidMuted: Story = {
   args: {
-    surface: 'muted',
+    surface: { emphasis: 'default' },
     borderStyle: 'solid',
     size: 'sm',
   },
@@ -55,7 +55,7 @@ export const DashedEmpty: Story = {
 export const ScorePool: Story = {
   args: {
     borderStyle: 'dashed',
-    surface: 'subtle',
+    surface: { emphasis: 'subtle' },
     size: 'md',
     children: (
       <>
@@ -71,7 +71,7 @@ export const ScorePool: Story = {
 function insetPanelGateStoryProps() {
   return {
     borderStyle: 'dashed' as const,
-    surface: 'sunken' as const,
+    surface: { elevation: 'sunken' } as const,
     size: 'lg' as const,
     align: 'center' as const,
   }
@@ -80,7 +80,7 @@ function insetPanelGateStoryProps() {
 function insetPanelEmptyStoryProps() {
   return {
     borderStyle: 'dashed' as const,
-    surface: 'none' as const,
+    surface: {} as const,
     size: 'md' as const,
     align: 'center' as const,
   }

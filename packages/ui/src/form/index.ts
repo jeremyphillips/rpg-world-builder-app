@@ -189,13 +189,14 @@ export {
 export { isRowSlotItem } from './field-config'
 export { FIELD_WIDTHS, type FieldWidth } from '../components/ui/field-control.variants'
 export {
-  FIELD_SURFACE_VARIANTS,
+  DEFAULT_ARRAY_ITEM_SURFACE,
+  DEFAULT_DEPENDENT_SURFACE,
+  DEFAULT_PANEL_SURFACE,
   FIELD_STATUS_TONES,
-  type FieldSurfaceVariant,
   type FieldStatusTone,
-} from '../components/ui/field-surface.variants'
-export {
+  type SemanticSurfaceTone,
   resolveFieldDependentsChromeClasses,
+  resolveSurfaceClasses,
   type FieldDependentsScope,
 } from '../components/ui/field-dependent.variants'
 export {

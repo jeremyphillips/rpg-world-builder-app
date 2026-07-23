@@ -8,7 +8,10 @@ import {
   fieldToggleDependentIndentClasses,
   type FieldRhythm,
 } from '../../components/ui/field.variants'
-import { resolveFieldDependentsChromeClasses } from '../../components/ui/field-dependent.variants'
+import {
+  DEFAULT_DEPENDENT_SURFACE,
+  resolveFieldDependentsChromeClasses,
+} from '../../components/ui/field-dependent.variants'
 import {
   FormSectionContext,
   buildFormSectionChildContext,
@@ -82,6 +85,7 @@ export function DependentSection({
         <DependentFieldsRegion
           dependentsVisibility={dependentsVisibility}
           surface={item.dependents.surface}
+          tone={item.dependents.tone ?? item.dependents.status}
           status={item.dependents.status}
           scope={item.dependents.scope}
           rhythm={rhythm}
@@ -102,6 +106,7 @@ export function DependentSection({
 interface DependentFieldsRegionProps {
   dependentsVisibility: FieldVisibility | null
   surface?: DependentConfig['dependents']['surface']
+  tone?: DependentConfig['dependents']['tone']
   status?: DependentConfig['dependents']['status']
   scope?: DependentConfig['dependents']['scope']
   rhythm: FieldRhythm
@@ -137,6 +142,7 @@ function GatedDependentFieldsRegion({
 
 function DependentFieldsRegionContent({
   surface,
+  tone,
   status,
   scope = 'wrapper',
   rhythm,
@@ -147,18 +153,19 @@ function DependentFieldsRegionContent({
   depth,
   renderNestedItems,
 }: Omit<DependentFieldsRegionProps, 'dependentsVisibility'>) {
-  const hasChrome = surface !== undefined || status !== undefined
+  const resolvedTone = tone ?? status
+  const hasChrome = surface !== undefined || resolvedTone !== undefined
   const useArrayItemScope = hasChrome && scope === 'arrayItems'
   const arrayItemContext = React.useMemo(
     () =>
       useArrayItemScope
         ? {
             ...parentContext,
-            arrayItemSurface: surface ?? 'subtle',
-            arrayItemStatus: status,
+            arrayItemSurface: surface ?? DEFAULT_DEPENDENT_SURFACE,
+            arrayItemTone: resolvedTone,
           }
         : null,
-    [useArrayItemScope, parentContext, surface, status],
+    [useArrayItemScope, parentContext, resolvedTone, surface],
   )
 
   const dependentsContent = renderNestedItems({
@@ -178,7 +185,7 @@ function DependentFieldsRegionContent({
         <div
           className={cn(
             fieldStackRhythmVariants({ rhythm }),
-            resolveFieldDependentsChromeClasses({ surface, status }),
+            resolveFieldDependentsChromeClasses({ surface, tone: resolvedTone }),
           )}
         >
           {dependentsContent}

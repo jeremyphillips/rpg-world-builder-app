@@ -6,11 +6,17 @@ export type ContentTone = 'default' | 'secondary' | 'disabled'
 
 export type ChromeVariant = 'plain' | 'outline' | 'panel' | 'accent' | 'callout'
 
-/** Phase 1 — no elevation on chrome (avoids incoherent accent+sunken combos). */
+/** Brand border accent for outline chrome — not a semantic tone. */
+export type ChromeBorderAccent = 'primary'
+
+/** Phase 1 — elevation on panel chrome only; accent variant omits elevation. */
 export type ChromeConfig = {
   variant: ChromeVariant
   tone?: SemanticTone
   emphasis?: VisualEmphasis
+  elevation?: SurfaceElevation
+  /** Outline variant only — brand-primary perimeter. */
+  borderAccent?: ChromeBorderAccent
 }
 
 /** Documented + exported for future subsystem migrations; not on ChromeConfig yet. */

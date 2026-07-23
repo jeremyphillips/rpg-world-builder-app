@@ -316,7 +316,7 @@ function ScorePoolSection({
       <InsetPanel
         ref={setNodeRef}
         borderStyle="dashed"
-        surface="subtle"
+        surface={{ emphasis: 'subtle' }}
         size="md"
         className={cn(
           'flex flex-col gap-2 transition-colors',

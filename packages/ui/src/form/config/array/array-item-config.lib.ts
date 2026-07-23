@@ -10,10 +10,12 @@ import type {
   FormItem,
   RowConfig,
 } from '../../field-config'
-import type {
-  FieldStatusTone,
-  FieldSurfaceVariant,
+import {
+  DEFAULT_ARRAY_ITEM_SURFACE,
+  type FieldStatusTone,
+  type SemanticSurfaceTone,
 } from '../../../components/ui/field-dependent.variants'
+import type { SurfaceConfig } from '../../../components/ui/visual-vocabulary.types'
 
 const NESTED_ARRAY_SECTION_DEPTH = 2
 
@@ -48,7 +50,7 @@ export function resolveArrayItemConfig(
   return {
     ...item,
     variant: item.variant ?? 'auto',
-    surface: item.surface ?? 'raised',
+    surface: item.surface ?? DEFAULT_ARRAY_ITEM_SURFACE,
     collapsible: item.collapsible ?? false,
     reorder: item.reorder ?? 'dragHandle',
     removable: item.removable ?? true,
@@ -56,12 +58,14 @@ export function resolveArrayItemConfig(
 }
 
 export function resolveArrayItemChrome(config: ArrayConfig): {
-  surface?: FieldSurfaceVariant
+  surface?: SurfaceConfig
+  tone?: SemanticSurfaceTone
   status?: FieldStatusTone
 } {
   const item = config.item ?? {}
   return {
     surface: item.surface,
+    tone: item.tone ?? item.status,
     status: item.status,
   }
 }

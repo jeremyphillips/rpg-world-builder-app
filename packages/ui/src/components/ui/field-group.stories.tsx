@@ -104,16 +104,16 @@ export const PanelTones: Story = {
       <FieldGroup legend="Subtle (default)" chrome={{ variant: 'panel' }}>
         <TextField id="panel-subtle" label="Field" />
       </FieldGroup>
-      <FieldGroup legend="Muted" chrome={{ variant: 'panel', tone: 'muted' }}>
+      <FieldGroup legend="Muted" chrome={{ variant: 'panel', emphasis: 'default' }}>
         <TextField id="panel-muted" label="Field" />
       </FieldGroup>
-      <FieldGroup legend="Solid" chrome={{ variant: 'panel', tone: 'base' }}>
+      <FieldGroup legend="Solid" chrome={{ variant: 'panel', elevation: 'flat' }}>
         <TextField id="panel-solid" label="Field" />
       </FieldGroup>
-      <FieldGroup legend="Elevated" chrome={{ variant: 'panel', tone: 'raised' }}>
+      <FieldGroup legend="Elevated" chrome={{ variant: 'panel', elevation: 'raised' }}>
         <TextField id="panel-elevated" label="Field" />
       </FieldGroup>
-      <FieldGroup legend="Emphasis" chrome={{ variant: 'panel', tone: 'strong' }}>
+      <FieldGroup legend="Emphasis" chrome={{ variant: 'panel', emphasis: 'strong' }}>
         <TextField id="panel-emphasis" label="Field" />
       </FieldGroup>
       <FieldGroup legend="Informative" chrome={{ variant: 'panel', tone: 'info' }}>
@@ -133,7 +133,7 @@ export const OutlineTones: Story = {
       <FieldGroup legend="Border (default)" chrome={{ variant: 'outline' }}>
         <TextField id="outline-border" label="Field" />
       </FieldGroup>
-      <FieldGroup legend="Primary" chrome={{ variant: 'outline', tone: 'primary' }}>
+      <FieldGroup legend="Primary" chrome={{ variant: 'outline', borderAccent: 'primary' }}>
         <TextField id="outline-primary" label="Field" />
       </FieldGroup>
       <FieldGroup legend="Warning" chrome={{ variant: 'outline', tone: 'warning' }}>

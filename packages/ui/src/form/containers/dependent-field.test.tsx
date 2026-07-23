@@ -10,6 +10,7 @@ import {
 } from '../../components/ui/field.variants'
 import { Form } from '../shells/form.client'
 import type { FormItem } from '../field-config'
+import type { SurfaceConfig } from '../../components/ui/visual-vocabulary.types'
 
 const schema = z.object({
   featureEnabled: z.boolean(),
@@ -21,7 +22,8 @@ type Values = z.infer<typeof schema>
 
 const dependentField = (
   options: {
-    surface?: 'subtle'
+    surface?: SurfaceConfig
+    tone?: 'destructive'
     status?: 'destructive'
     scope?: 'wrapper' | 'arrayItems'
     rhythm?: 'compact' | 'comfortable'
@@ -38,6 +40,7 @@ const dependentField = (
   },
   dependents: {
     ...(options.surface ? { surface: options.surface } : {}),
+    ...(options.tone ? { tone: options.tone } : {}),
     ...(options.status ? { status: options.status } : {}),
     ...(options.scope ? { scope: options.scope } : {}),
     fields: [
@@ -70,7 +73,7 @@ const dependentField = (
 })
 
 function renderDependentForm(
-  fields: FormItem[] = [dependentField({ surface: 'subtle' })],
+  fields: FormItem[] = [dependentField({ surface: { emphasis: 'subtle' } })],
   defaultValues: Partial<Values> = { featureEnabled: false },
 ) {
   return render(
@@ -162,7 +165,7 @@ describe('dependent field', () => {
   it('applies comfortable rhythm inside dependents chrome', async () => {
     const user = userEvent.setup()
     const { container } = renderDependentForm([
-      dependentField({ surface: 'subtle', rhythm: 'comfortable' }),
+      dependentField({ surface: { emphasis: 'subtle' }, rhythm: 'comfortable' }),
     ])
 
     await user.click(screen.getByRole('switch', { name: 'Enable feature' }))
@@ -232,7 +235,7 @@ describe('dependent field', () => {
           defaultValue: false,
         },
         dependents: {
-          surface: 'subtle',
+          surface: { emphasis: 'subtle' },
           scope: 'arrayItems',
           fields: [
             {
@@ -294,7 +297,7 @@ describe('dependent field', () => {
             dependsOn: ['mode'],
             visibleWhen: (values) => values.mode !== 'all',
           },
-          surface: 'subtle',
+          surface: { emphasis: 'subtle' },
           fields: [
             {
               type: 'combobox',
@@ -367,7 +370,7 @@ describe('dependent field', () => {
             dependsOn: ['mode'],
             visibleWhen: (values) => values.mode !== 'all',
           },
-          surface: 'subtle',
+          surface: { emphasis: 'subtle' },
           fields: [
             {
               type: 'combobox',

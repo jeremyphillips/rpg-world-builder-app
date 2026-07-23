@@ -42,12 +42,12 @@ describe('resolveFieldGroupChromeClassNames', () => {
   })
 
   it('applies muted panel tone', () => {
-    const classes = resolveFieldGroupChromeClassNames({ variant: 'panel', tone: 'muted' })
+    const classes = resolveFieldGroupChromeClassNames({ variant: 'panel', emphasis: 'default' })
     expect(classes.body).toContain('bg-surface-muted')
   })
 
   it('applies elevated panel tone', () => {
-    const classes = resolveFieldGroupChromeClassNames({ variant: 'panel', tone: 'raised' })
+    const classes = resolveFieldGroupChromeClassNames({ variant: 'panel', elevation: 'raised' })
     expect(classes.body).toContain('bg-card')
     expect(classes.body).toContain('shadow-surface-raised')
   })
