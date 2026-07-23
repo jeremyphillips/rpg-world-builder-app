@@ -9,6 +9,7 @@ import { FormField } from './form-field'
 import type { FieldWidth } from './field-control.variants'
 import type { FieldHintPosition, FieldLabelPosition } from './field.variants'
 import type { FieldDigits } from './field-digit-metrics'
+import type { FieldChromeProps } from './field-chrome.variants'
 import type { FieldValidationProps } from './field-validation-props'
 import { fieldReadOnlyValueClassName } from './field-read-only-value.variants'
 
@@ -49,7 +50,7 @@ export function FieldReadOnlyValue({
   )
 }
 
-export interface FieldReadOnlyValueFieldProps extends FieldValidationProps {
+export interface FieldReadOnlyValueFieldProps extends FieldValidationProps, FieldChromeProps {
   id: string
   label: string
   displayValue: string
@@ -81,6 +82,7 @@ export function FieldReadOnlyValueField({
   digits,
   labelPosition,
   className,
+  chrome,
 }: FieldReadOnlyValueFieldProps) {
   const labelId = `${id}-label`
   const valueNode = (
@@ -110,6 +112,7 @@ export function FieldReadOnlyValueField({
         width={width}
         size={size}
         labelPosition="settings"
+        chrome={chrome}
       >
         {valueNode}
       </FormField>
@@ -137,6 +140,8 @@ export function FieldReadOnlyValueField({
             </Field.Label>
           }
           control={<Field.Control>{valueNode}</Field.Control>}
+          chrome={chrome}
+          size={size}
         />
       ) : (
         valueNode

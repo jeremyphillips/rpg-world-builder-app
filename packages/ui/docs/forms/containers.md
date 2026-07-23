@@ -40,6 +40,9 @@ Nested groups inside another group default to `legendSize: 'subsection'` (overri
 needed). Nested groups omit `mb-8` — parent group rhythm (`gap-6` / `gap-2`) owns sibling
 spacing, matching nested array sections. Top-level groups and arrays inside `<Form>` omit
 `mb-8` as well — the form's `FormRhythmStack` (`gap-6` / `gap-2`) owns sibling spacing.
+Standalone `FormItems` outside `<Form>` get the same contract when wrapped in
+`FormSectionProvider` with `inRhythmStack` (e.g. header-embedded sections whose parent
+shell already spaces siblings).
 
 ```ts
 {
@@ -52,32 +55,71 @@ spacing, matching nested array sections. Top-level groups and arrays inside `<Fo
 }
 ```
 
-`FieldGroup` (standalone) accepts the same `legendSize`, `size`, and `fieldsChrome`.
+`FieldGroup` (standalone) accepts the same `legendSize`, `size`, `chrome`, and `disclosure`.
 Groups may declare `visibility` — hidden groups unmount and clear nested values.
 
 `rhythm` overrides inherited form rhythm.
 
-### Group `fieldsChrome`
+### Group `chrome`
 
 Optional visual treatment for the legend + field stack. Variants are **mutually
 exclusive** — omit for plain fieldset behavior.
 
-| `variant`     | Use                                                                                                                                                                                                                                                                                                  |
-| ------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `inset`       | Left rail + indent on the **field stack** only — legend stays outside. Tones: `border` (default), `primary`.                                                                                                                                                                                         |
-| `panel`       | Rounded border box around the **field stack** only. Tones: surface (`subtle` default, `medium`, `strong`, `base`, `raised`), status (`info`, `success`, `warning`, `destructive`), or compact-label tones (`neutral`, `info`, …). Surface tiers use centralized `field-surface.variants.ts` recipes. |
-| `outline`     | Border-only box around the **field stack** — no background wash. Tones: `border` (default), `primary`, `info`, `success`, `warning`, `destructive`.                                                                                                                                                  |
-| `divider`     | Section separator on the fieldset. `edge`: `top` (default) or `bottom`; adds `pt-7` / `pb-7` (28px) with `border-t` / `border-b`.                                                                                                                                                                    |
-| `callout`     | Alert-shaped surface on the **field stack** only. Tones: alert variants (`default`, `info`, `success`, `warning`, `destructive`) or compact-label `neutral` for semantic soft wash.                                                                                                                  |
-| `accent`      | Light emphasis — `edge: 'top'` (`border-t-2 pt-4`) or `edge: 'legendRail'` (primary/semantic rail on legend only).                                                                                                                                                                                   |
-| `collapsible` | Legend becomes a disclosure trigger; fields stay registered when collapsed. `defaultOpen`; optional `collapseKey` for `uiStateKey` persistence.                                                                                                                                                      |
+| `variant` | Use                                                                                                                                                                                                                                                                           |
+| --------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `inset`   | Left rail + indent on the **field stack** only — legend stays outside. Padding follows group `rhythm` (`compact`: 16px / 20px; `comfortable`: 16px / 32px; mobile / `sm+`). Tones: `border` (default), `primary`.                                                             |
+| `panel`   | Rounded border box around the **field stack** only. Default: `{ variant: 'panel' }` → subtle wash. `emphasis`: `subtle` (default), `default` (muted), `strong`. `elevation`: `flat` (default), `raised`. `tone`: semantic wash (`info`, `success`, `warning`, `destructive`). |
+| `outline` | Border-only box around the **field stack** — no background wash. `emphasis` maps to border ladder (`faint`, `subtle`, `default`, `strong`). `tone`: semantic border. `borderAccent`: `primary` for brand perimeter.                                                           |
+| `divider` | Section separator on the fieldset. `edge`: `top` (default) or `bottom`; adds `pt-7` / `pb-7` (28px) with `border-t` / `border-b`.                                                                                                                                             |
+| `callout` | Alert-shaped surface on the **field stack** only. `tone`: `info` (default), `success`, `warning`, `destructive`, `neutral`, or `default`.                                                                                                                                     |
+| `accent`  | Light emphasis — `edge: 'top'` (`border-t-2 pt-4`) or `edge: 'legendRail'` (primary/semantic rail on legend only).                                                                                                                                                            |
+
+`chrome` composes with `disclosure` — e.g. `outline` surface on the field stack inside a
+summary-disclosure group.
+
+### Group `disclosure`
+
+Optional open/collapse and summary behavior. Composes with `chrome`.
+
+| `variant` | Use                                                                                                                                                                                                                                                                                    |
+| --------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `legend`  | Legend becomes a disclosure trigger; fields stay registered when collapsed. `defaultOpen` (default `true`); optional `collapseKey` for `uiStateKey` persistence.                                                                                                                       |
+| `summary` | Compact collapsed summary + **Change** / expanded **Done** for settings sections. `resolveSummary`, optional `summaryDependsOn`, `showDirtySuffix`, `panelDivider` (default `true`), `openLabel` / `closeLabel`. Fields stay mounted (hidden) when collapsed. Requires `FormProvider`. |
+
+`resolveSummary` returns a `FieldGroupSummary`:
+
+| Field       | Use                                                                                                                                                       |
+| ----------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `primary`   | Plain-text fallback when `status` is omitted — existing `primary` + `secondary` layout                                                                    |
+| `secondary` | Muted explanatory line below the status row                                                                                                               |
+| `status`    | Structured status row — `label`, optional `tone` (`neutral` \| `success` \| `warning`), optional `indicator` (`dot` \| `inactive`)                        |
+| `detail`    | Supporting detail on the status line (e.g. player access mode) — muted, middle-dot separated from `status.label`                                          |
+| `chrome`    | Collapsed container treatment — e.g. `{ variant: 'accent', tone: 'warning', emphasis: 'faint' }` (`data-summary-chrome`); expanded state ignores `chrome` |
 
 ```ts
 {
   kind: 'group',
-  legend: 'Target',
-  fieldsChrome: { variant: 'panel' },
-  fields: [/* … */],
+  legend: 'Campaign availability',
+  legendSize: 'array',
+  disclosure: {
+    variant: 'summary',
+    defaultOpen: false,
+    summaryDependsOn: ['available', 'visibilityMode'],
+    showDirtySuffix: true,
+    resolveSummary: (values) =>
+      values.available
+        ? {
+            status: { label: 'Available', tone: 'success', indicator: 'dot' },
+            detail: 'All players',
+          }
+        : {
+            status: { label: 'Unavailable', tone: 'warning', indicator: 'inactive' },
+            detail: 'DM only',
+            secondary: 'Hidden from discovery and selection in this campaign.',
+            chrome: { variant: 'accent', tone: 'warning', emphasis: 'faint' },
+          },
+  },
+  fields: [/* settings rows */],
 }
 ```
 
@@ -87,7 +129,7 @@ apply to the `<fieldset>`. Token source: `field-group-chrome.variants.ts`.
 
 ## Rows
 
-Side-by-side leaf fields in a wrapping flex row. Row-level `visibility`, `separator`,
+Side-by-side leaf fields and slots in a wrapping flex row. Row-level `visibility`, `separator`,
 and `className`. Layout detail: [sizing-and-spacing.md](./sizing-and-spacing.md).
 
 ## Stacks
@@ -101,10 +143,10 @@ controller field gates indented dependents:
 - `dependentsVisibility` gates fields `[1..]`. When omitted and `[0]` is a switch, defaults
   to "switch is true". For select/other controllers, pass an explicit predicate for hide
   behavior; omit for indent/chrome only (dependents always shown).
-- Optional `dependentsChrome`: `main` | `elevated` | `subtle` | `medium` | `warning` | `error`.
-- Optional `dependentsChromeScope`: `wrapper` (default) | `arrayItems`.
-  - `wrapper` — tone on the dependents container; use for scalar dependents (selects, numbers).
-  - `arrayItems` — tone on array item shells only; avoids double borders when dependents include arrays.
+- Optional `dependents.surface` / `dependents.tone` — neutral wash or semantic callout on dependents.
+- Optional `dependents.scope`: `wrapper` (default) | `arrayItems`.
+  - `wrapper` — chrome on the dependents container; use for scalar dependents (selects, numbers).
+  - `arrayItems` — chrome on array item shells only; avoids double borders when dependents include arrays.
   - Mixed dependents: only array item shells receive tone; scalars render without wash.
 - `rhythm`: `compact` (default) or `comfortable` for multi-field blocks.
 
@@ -114,7 +156,6 @@ Pair dependent scalars with `labelPosition: 'settings'`.
 {
   kind: 'stack',
   layout: 'dependent',
-  dependentsChrome: 'subtle',
   fields: [
     { type: 'switch', name: 'enabled', label: 'Primary ability minimum', hint: '…' },
     {
@@ -124,6 +165,8 @@ Pair dependent scalars with `labelPosition: 'settings'`.
       labelPosition: 'settings',
     },
   ],
+  // on `kind: 'dependent'` — same keys under `dependents`:
+  // dependents: { surface: { emphasis: 'subtle' }, fields: [...] }
 }
 ```
 
@@ -131,24 +174,24 @@ Select controller with explicit gate (species class-policy pattern):
 
 ```ts
 {
-  kind: 'stack',
-  layout: 'dependent',
-  separator: 'subtle',
-  dependentsVisibility: visibleWhenClassPolicyNeedsIds(),
-  dependentsChrome: 'subtle',
-  fields: [
-    {
-      type: 'select',
-      name: 'classPolicy.mode',
-      label: 'Class restrictions',
-      labelPosition: 'settings',
-    },
-    {
-      type: 'combobox',
-      name: 'classPolicy.classIds',
-      label: 'Classes',
-    },
-  ],
+  kind: 'dependent',
+  controller: {
+    type: 'select',
+    name: 'classPolicy.mode',
+    label: 'Class restrictions',
+    labelPosition: 'settings',
+  },
+  dependents: {
+    visibility: visibleWhenClassPolicyNeedsIds(),
+    surface: { emphasis: 'subtle' },
+    fields: [
+      {
+        type: 'combobox',
+        name: 'classPolicy.classIds',
+        label: 'Classes',
+      },
+    ],
+  },
 }
 ```
 
@@ -156,26 +199,30 @@ Dependent stack with an array dependent — use `arrayItems` scope:
 
 ```ts
 {
-  kind: 'stack',
-  layout: 'dependent',
-  dependentsChrome: 'subtle',
-  dependentsChromeScope: 'arrayItems',
-  fields: [
-    { type: 'switch', name: 'enabled', label: 'Class-specific limits', hint: '…' },
-    {
-      kind: 'array',
-      name: 'caps',
-      legend: '',
-      addActionLabel: 'Add class limit',
-      fields: [/* … */],
-    },
-  ],
+  kind: 'dependent',
+  controller: { type: 'switch', name: 'enabled', label: 'Class-specific limits', hint: '…' },
+  dependents: {
+    surface: { emphasis: 'subtle' },
+    scope: 'arrayItems',
+    fields: [
+      {
+        kind: 'array',
+        name: 'caps',
+        legend: '',
+        addActionLabel: 'Add class limit',
+        fields: [/* … */],
+      },
+    ],
+  },
 }
 ```
 
 ## Field separators
 
-`separator: 'subtle'` on a leaf or row → trailing `border-b` + `pb-7` (28px) before the next sibling.
+`separator` on a leaf, row, or slot → trailing `border-b` before the next sibling.
+Tones follow the border ladder: `faint` (`border-border-faint`), `subtle` (`border-border-subtle`,
+default), `default` (`border-border`), `strong` (`border-border-strong`). Padding follows inherited
+stack rhythm: `pb-2` (8px) when `rhythm: 'compact'`, `pb-7` (28px) when `rhythm: 'comfortable'`.
 On a `stack` → trailing divider after the whole stack (controller + dependents region).
 Prefer stack-level `separator` for `layout: 'dependent'` blocks instead of putting it on the
 controller field.
@@ -185,7 +232,7 @@ Token: `fieldSeparatorVariants`. Do not use row `className` for recurring divide
 
 Repeatable section via `useFieldArray`. Item field names are **relative** (renderer prefixes
 `arrayName.index`). Item shells default to the **elevated** surface (`bg-card` + raised shadow);
-use `itemChrome` or stack `dependentsChrome` + `dependentsChromeScope: 'arrayItems'` to override.
+use `item.surface` / `item.tone` or stack `dependents.surface` + `dependents.scope: 'arrayItems'` to override.
 
 **Authoring guide:** [array-field-authoring.md](./array-field-authoring.md) — headers, chrome
 decision table, add menus, nested arrays, and common mistakes.
@@ -292,7 +339,7 @@ Optional hooks:
 inside a `FieldRow` within the grip/actions grid — leaf `width` tokens (`full`, `auto`, fractions,
 `digits`, …) compose the same way as schema `kind: 'row'` fields.
 
-| `itemChrome` | Item shell surface tone — defaults to `elevated` (`bg-card`); override with `subtle`, `medium`, etc. |
+| `item.surface` / `item.tone` | Item shell — defaults to `{ elevation: 'raised' }`; override with subtle wash or semantic tone |
 | `itemHeader` | Primary/fallback labels; optional `summary` on a second row below the title (detailed). |
 | `itemHeader.showFallbackInHeader` | When true, appends ` · {fallback}` after the primary title (default `false`). |
 | `itemCollapsible` | Detailed items only — collapse body into header row. |
@@ -427,4 +474,5 @@ Custom UI inside `FormProvider`. `name` aligns with a form value; defaults from 
 `rhythm` and `size` mirror arrays (compact + `sm` at boundary). Slot components should
 call `useFormSectionContext()` and thread `size` / `rhythm` into hand-built controls.
 
-Optional `label` + `hint` wrap content in `FieldGroup`.
+Optional `label` + `hint` wrap content in `FieldGroup`. `separator` adds a trailing
+divider after the slot (same as leaf fields and rows).

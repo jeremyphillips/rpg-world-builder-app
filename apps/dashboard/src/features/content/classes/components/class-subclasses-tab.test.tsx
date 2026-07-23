@@ -18,14 +18,6 @@ vi.mock('../hooks/use-subclass-mutations', () => ({
     mutateAsync: vi.fn().mockResolvedValue({ id: 'sub_existing', name: 'Updated' }),
     isPending: false,
   }),
-  useUpdateSubclassAvailability: () => ({
-    mutateAsync: vi.fn().mockResolvedValue({
-      campaignId: 'camp_1',
-      targetId: 'sub_existing',
-      activeInCampaign: false,
-    }),
-    isPending: false,
-  }),
   useDeleteSubclass: () => ({
     mutateAsync: vi.fn().mockResolvedValue({ status: 'deleted' }),
     isPending: false,
@@ -33,17 +25,8 @@ vi.mock('../hooks/use-subclass-mutations', () => ({
 }))
 
 vi.mock('./subclass-editor-panel.client', () => ({
-  SubclassEditorPanel: ({
-    onActiveChange,
-    onDeleteRequest,
-  }: {
-    onActiveChange: (active: boolean) => void
-    onDeleteRequest: () => void
-  }) => (
+  SubclassEditorPanel: ({ onDeleteRequest }: { onDeleteRequest: () => void }) => (
     <div>
-      <button type="button" onClick={() => onActiveChange(false)}>
-        Mock deactivate
-      </button>
       <button type="button" onClick={onDeleteRequest}>
         Mock delete subclass
       </button>
@@ -108,17 +91,7 @@ describe('ClassSubclassesTab', () => {
 
     expect(screen.getByText('Untitled subclass')).toBeInTheDocument()
     expect(screen.getByText('Unsaved')).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /Mock deactivate/i })).toBeInTheDocument()
-  })
-
-  it('marks a subclass inactive from the editor toggle', async () => {
-    const user = userEvent.setup()
-    render(<ClassFormShell />)
-
-    await user.click(screen.getByRole('button', { name: /Champion/i }))
-    await user.click(screen.getByRole('button', { name: /Mock deactivate/i }))
-
-    expect(screen.getByText('Inactive')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /Mock delete subclass/i })).toBeInTheDocument()
   })
 
   it('opens ConfirmDialog and removes a draft on confirm', async () => {

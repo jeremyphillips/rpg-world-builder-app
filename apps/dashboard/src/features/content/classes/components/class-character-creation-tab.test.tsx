@@ -124,7 +124,6 @@ describe('ClassCharacterCreationTab', () => {
 
     await user.click(screen.getByRole('button', { name: /^(?!Remove|Drag).*Standard Equipment/ }))
     expect(screen.queryByRole('textbox', { name: /Option id/i })).not.toBeInTheDocument()
-    expect(screen.getByRole('switch', { name: /Active in campaign/i })).toBeInTheDocument()
     expect(screen.getByRole('group', { name: /Items/i })).toBeInTheDocument()
   })
 
@@ -149,9 +148,7 @@ describe('ClassCharacterCreationTab', () => {
     ).not.toBeInTheDocument()
 
     await user.click(screen.getByRole('button', { name: /^(?!Remove|Drag).*Starting Gold/ }))
-    await user.click(screen.getByRole('switch', { name: /Active in campaign/i }))
-
-    expect(screen.getByText('Inactive')).toBeInTheDocument()
+    expect(screen.getByRole('group', { name: /Items/i })).toBeInTheDocument()
   })
 
   it('renders bard tool proficiency choices when pre-filled', () => {

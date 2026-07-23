@@ -42,7 +42,7 @@ export function adventuringGearFormFieldGroup(): FormItem {
   return {
     kind: 'group',
     legend: '',
-    fieldsChrome: { variant: 'panel' },
+    chrome: { variant: 'panel' },
     fields: [
       {
         type: 'select',

@@ -30,7 +30,7 @@ describe('EmphasisDetailLine', () => {
       <EmphasisDetailLine
         primary="50 GP needed"
         secondary="5 GP remaining"
-        secondaryTone="subtle"
+        secondaryTone="disabled"
       />,
     )
 

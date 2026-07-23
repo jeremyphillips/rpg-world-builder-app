@@ -5,6 +5,7 @@ import { Trash2 } from 'lucide-react'
 
 import { cn } from '../../../lib/utils'
 import { CollapsibleListItemShell } from '../../../components/ui/collapsible-list-item/collapsible-list-item-shell.client'
+import { DEFAULT_ARRAY_ITEM_SURFACE } from '../../../components/ui/field-dependent.variants'
 import { useFormSectionContext } from '../../context/form-section.context'
 import {
   arrayItemActionsRailClasses,
@@ -120,7 +121,7 @@ export function ArrayItemShell({
   main,
   actions,
 }: ArrayItemShellProps) {
-  const { arrayItemSurface, arrayItemStatus } = useFormSectionContext()
+  const { arrayItemSurface, arrayItemTone } = useFormSectionContext()
 
   return (
     <CollapsibleListItemShell
@@ -130,8 +131,8 @@ export function ArrayItemShell({
       collapsible={collapsible}
       dragging={dragging}
       layout={layout}
-      surface={arrayItemSurface ?? 'raised'}
-      status={arrayItemStatus}
+      surface={arrayItemSurface ?? DEFAULT_ARRAY_ITEM_SURFACE}
+      tone={arrayItemTone}
       className={className}
       main={main}
       actions={actions}

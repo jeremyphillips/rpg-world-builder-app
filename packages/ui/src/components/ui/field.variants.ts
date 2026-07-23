@@ -1,7 +1,10 @@
 import { cva, type VariantProps } from 'class-variance-authority'
 
 import { cn } from '../../lib/utils'
-import { fieldGroupDividerBottomPaddingClasses } from './field-group-chrome.variants'
+import {
+  fieldBorderLadderToneClasses,
+  type FieldBorderLadderTone,
+} from './field-border-ladder.variants'
 import { fieldSizeTypographyClasses, type FieldSizeToken } from './field-sizing.variants'
 
 /**
@@ -30,6 +33,7 @@ import { fieldSizeTypographyClasses, type FieldSizeToken } from './field-sizing.
  * - `fieldLabelVariants` `placement` — inline switch/checkbox label first-line height (typography unchanged)
  * - `fieldSettingsRowClasses` — dense settings rows (label + hint | control)
  * - `fieldStackRhythmVariants` — vertical gap between stack siblings (`compact` | `comfortable`)
+ * - `fieldGroupInsetPaddingVariants` — group inset chrome left padding by rhythm (mobile / desktop)
  * - `fieldArrayItemListClasses` — gap between sibling array items (rhythm + section size)
  * - `fieldToggleDependentStackClasses` — compact stack rhythm alias (backward compatible)
  * - `fieldToggleDependentIndentClasses` — indent for dependents region under inline switch
@@ -185,6 +189,32 @@ export const fieldStackRhythmVariants = cva('flex flex-col', {
 export type FieldStackRhythmVariantProps = VariantProps<typeof fieldStackRhythmVariants>
 
 /**
+ * Group inset chrome left padding — mobile-first (`base` = mobile, `sm+` = desktop).
+ *
+ * | rhythm      | mobile | desktop |
+ * | ----------- | ------ | ------- |
+ * | comfortable | 16px   | 32px    |
+ * | compact     | 16px   | 20px    |
+ */
+export const fieldGroupInsetPaddingVariants = cva('', {
+  variants: {
+    rhythm: {
+      compact: 'pl-4 sm:pl-5',
+      comfortable: 'pl-4 sm:pl-8',
+    },
+  },
+  defaultVariants: {
+    rhythm: 'comfortable',
+  },
+})
+
+export function resolveFieldGroupInsetPaddingClasses(
+  rhythm: FieldStackRhythm = DEFAULT_FORM_RHYTHM,
+): string {
+  return fieldGroupInsetPaddingVariants({ rhythm })
+}
+
+/**
  * Vertical gap between sibling array items (list + Add button).
  * Item body field stacks use {@link fieldStackRhythmVariants} instead.
  */
@@ -205,22 +235,22 @@ export const fieldToggleDependentStackClasses = fieldStackRhythmVariants({ rhyth
 export const fieldToggleDependentIndentClasses = 'pl-11'
 export const chooseFromChipsSentenceClasses = fieldInlineSentenceClasses
 
-/** Trailing divider tone for leaf fields and rows within a group/stack rhythm. */
-export type FieldSeparator = 'subtle'
+/** Trailing divider tone — maps to the global border ladder in design-tokens.md. */
+export type FieldSeparator = FieldBorderLadderTone
 
-export const fieldSeparatorVariants = cva(
-  cn('border-b border-border', fieldGroupDividerBottomPaddingClasses),
-  {
-    variants: {
-      tone: {
-        subtle: '',
-      },
-    },
-    defaultVariants: {
-      tone: 'subtle',
+export const fieldSeparatorVariants = cva('border-b', {
+  variants: {
+    tone: fieldBorderLadderToneClasses,
+    rhythm: {
+      compact: 'pb-2',
+      comfortable: 'pb-7',
     },
   },
-)
+  defaultVariants: {
+    tone: 'subtle',
+    rhythm: 'comfortable',
+  },
+})
 
 export type FieldSeparatorVariantProps = VariantProps<typeof fieldSeparatorVariants>
 

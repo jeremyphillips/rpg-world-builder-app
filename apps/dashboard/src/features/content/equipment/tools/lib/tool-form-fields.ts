@@ -62,7 +62,7 @@ export function toolFormFieldGroup(): FormItem[] {
       min: 1,
       item: {
         collapsible: true,
-        surface: 'subtle',
+        surface: { emphasis: 'subtle' },
         header: {
           fallback: (index) => `Action ${index + 1}`,
           primaryField: 'description',

@@ -55,6 +55,11 @@
   --palette-surface-sunken: oklch(0.12 0.004 var(--palette-neutral-hue));
 
   /* Derived generic borders — canvas hierarchy */
+  --palette-border-faint: color-mix(
+    in oklch,
+    var(--palette-fg-default) 2%,
+    var(--palette-surface-base)
+  );
   --palette-border-subtle: color-mix(
     in oklch,
     var(--palette-fg-default) 8%,
@@ -137,12 +142,14 @@
   --palette-warning: oklch(0.78 0.13 75);
   --palette-warning-muted: oklch(0.78 0.13 75 / 70%);
   --palette-warning-subtle: oklch(0.78 0.13 75 / 14%);
+  --palette-warning-faint: oklch(0.78 0.13 75 / 8%);
 
   --palette-semantic-neutral: oklch(0.715 0.01 var(--palette-neutral-hue));
   --palette-semantic-info: oklch(0.62 0.08 250);
   --palette-semantic-info-muted: oklch(0.55 0.05 250);
   --palette-semantic-success: oklch(0.72 0.11 145);
   --palette-semantic-warning: oklch(0.78 0.12 75);
+  --palette-semantic-warning-accent-faint: oklch(0.78 0.1 75 / 60%);
   --palette-semantic-destructive: oklch(0.72 0.16 22);
   --palette-semantic-destructive-on-subtle: var(--palette-fg-default);
 }

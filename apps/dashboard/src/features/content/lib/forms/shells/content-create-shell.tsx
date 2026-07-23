@@ -1,7 +1,11 @@
 import { useNavigate } from 'react-router-dom'
-import type { ContentTypeKey, ContentValidationIntent } from '@rpg/contracts'
-import { Heading } from '@rpg/ui'
-import { useState } from 'react'
+import type {
+  ContentCampaignAccessPatch,
+  ContentTypeKey,
+  ContentValidationIntent,
+} from '@rpg/contracts'
+import { Heading, Text } from '@rpg/ui'
+import { useRef, useState } from 'react'
 
 import { NarrowPage } from '@/components/layout/narrow-page'
 import { allowFormNavigationOnce } from '@/lib/form-unsaved-changes-guard'
@@ -23,6 +27,9 @@ import { resolveContentPostCreateEditHref } from './content-form-navigation'
 
 import { resolveContentFormSchema } from './content-edit-load'
 import { intentToStatus } from './content-create-intent'
+import { updateRouteContentCampaignAccess } from '../../campaign-access/campaign-access-api'
+import { CAMPAIGN_ACCESS_CREATE_DEFERRED_ERROR } from '../../campaign-access/campaign-access-labels'
+import { isDefaultCampaignAccessPatch } from '../../campaign-access/campaign-access-state'
 
 export interface ContentCreateShellProps {
   /** Route key identifying the content type (e.g. `'species'`). */
@@ -60,6 +67,10 @@ function ContentCreateFormBody({
   const navigate = useNavigate()
   const mutation = useContentWriteMutation(def, campaignId)
   const [saveDraftPending, setSaveDraftPending] = useState(false)
+  const [campaignAccessDeferredError, setCampaignAccessDeferredError] = useState<string | null>(
+    null,
+  )
+  const campaignAccessDraftRef = useRef<ContentCampaignAccessPatch | null>(null)
 
   const createEntity = async (
     values: Record<string, unknown>,
@@ -78,6 +89,16 @@ function ContentCreateFormBody({
       ),
       status,
     })) as { id: string; kind?: unknown }
+
+    const pendingAccess = campaignAccessDraftRef.current
+    if (pendingAccess && !isDefaultCampaignAccessPatch(pendingAccess)) {
+      try {
+        await updateRouteContentCampaignAccess(campaignId, def.routeKey, saved.id, pendingAccess)
+      } catch {
+        setCampaignAccessDeferredError(CAMPAIGN_ACCESS_CREATE_DEFERRED_ERROR)
+      }
+    }
+
     const editHref = resolveContentPostCreateEditHref(def, campaignId, saved, formCtx)
     // TODO(toast): show success feedback — formatContentCreatedMessage(contentTypeKey)
     allowFormNavigationOnce()
@@ -102,21 +123,32 @@ function ContentCreateFormBody({
   )
 
   return (
-    <ContentFormLayout
-      def={def}
-      ctx={ctx}
-      schema={resolveContentFormSchema(def, ctx, 'draft')}
-      defaultValues={{ ...def.createDefaultValues, ...initialValues }}
-      formMode="create"
-      contentTypeKey={contentTypeKey}
-      backHref={backHref}
-      submitLabel={formatContentCreateActionLabel(contentTypeKey)}
-      submitPending={mutation.isPending}
-      formError={publishFormError ?? saveDraftFormError ?? null}
-      onSubmit={onPublish}
-      onSaveDraft={onSaveDraft}
-      saveDraftPending={saveDraftPending}
-    />
+    <>
+      {campaignAccessDeferredError ? (
+        <Text variant="warning" role="status" className="mb-4">
+          {campaignAccessDeferredError}
+        </Text>
+      ) : null}
+      <ContentFormLayout
+        def={def}
+        ctx={ctx}
+        schema={resolveContentFormSchema(def, ctx, 'draft')}
+        defaultValues={{ ...def.createDefaultValues, ...initialValues }}
+        formMode="create"
+        contentTypeKey={contentTypeKey}
+        campaignId={campaignId}
+        onCampaignAccessDraftChange={(patch) => {
+          campaignAccessDraftRef.current = patch
+        }}
+        backHref={backHref}
+        submitLabel={formatContentCreateActionLabel(contentTypeKey)}
+        submitPending={mutation.isPending}
+        formError={publishFormError ?? saveDraftFormError ?? null}
+        onSubmit={onPublish}
+        onSaveDraft={onSaveDraft}
+        saveDraftPending={saveDraftPending}
+      />
+    </>
   )
 }
 

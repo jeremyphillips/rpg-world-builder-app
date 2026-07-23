@@ -6,6 +6,7 @@ import {
   contentFormFields,
   type ContentFormDef,
 } from '../../lib/forms/content-form-registry'
+import { nameField } from '../../lib/forms/fields/content-identity-form-fields'
 import { finalizeContentInput } from '../../lib/forms/content-form-key-helpers'
 import { useSpecies, speciesQueryKey } from '../hooks/use-species'
 import {
@@ -36,6 +37,7 @@ const speciesFormDef: ContentFormDef<Species, SpeciesFormValues, CreateSpeciesIn
           ctx,
         ),
   createDefaultValues: speciesCreateDefaultValues,
+  nameField,
 
   buildTabs: buildSpeciesTabs,
   buildFields: (ctx) => contentFormFields(speciesFormDef, ctx),

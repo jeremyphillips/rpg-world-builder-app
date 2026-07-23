@@ -2,9 +2,14 @@
 
 import * as React from 'react'
 
-import { fieldSeparatorVariants, type FieldSeparator } from '../../components/ui/field.variants'
+import {
+  fieldSeparatorVariants,
+  type FieldSeparator,
+  type FieldStackRhythm,
+} from '../../components/ui/field.variants'
 import { useDependsOnValues } from '../config/form-depends-on.client'
 import type { FieldConfig, FieldVisibility } from '../field-config'
+import { useFormSectionContext } from '../context/form-section.context'
 import { FieldRenderer } from '../renderers/field-renderer.client'
 
 /** Watches `dependsOn` fields and returns a map keyed by relative field names. */
@@ -15,15 +20,25 @@ export function useVisibilityValues(
   return useDependsOnValues(visibility.dependsOn, namePrefix)
 }
 
-/** Applies an optional trailing divider wrapper around a leaf field or row. */
-export function withFieldSeparator(
-  separator: FieldSeparator | undefined,
-  content: React.ReactNode,
-) {
-  if (!separator) return content
+export interface FieldSeparatorWrapperProps {
+  separator?: FieldSeparator
+  /** Overrides inherited section rhythm — use when slot child context differs from the sibling stack. */
+  rhythm?: FieldStackRhythm
+  children: React.ReactNode
+}
+
+/** Applies an optional trailing divider wrapper, inheriting stack rhythm from section context. */
+export function FieldSeparatorWrapper({
+  separator,
+  rhythm: rhythmOverride,
+  children,
+}: FieldSeparatorWrapperProps) {
+  const { rhythm: contextRhythm } = useFormSectionContext()
+  const rhythm = rhythmOverride ?? contextRhythm
+  if (!separator) return children
   return (
-    <div data-field-separator="" className={fieldSeparatorVariants({ tone: separator })}>
-      {content}
+    <div data-field-separator="" className={fieldSeparatorVariants({ tone: separator, rhythm })}>
+      {children}
     </div>
   )
 }
@@ -55,9 +70,10 @@ interface FieldNodeProps {
 export function ConditionalField({ config, idPrefix, namePrefix }: FieldNodeProps) {
   const values = useVisibilityValues(config.visibility!, namePrefix)
   if (!config.visibility!.visibleWhen(values)) return null
-  return withFieldSeparator(
-    config.separator,
-    <FieldRenderer config={config} idPrefix={idPrefix} namePrefix={namePrefix} />,
+  return (
+    <FieldSeparatorWrapper separator={config.separator}>
+      <FieldRenderer config={config} idPrefix={idPrefix} namePrefix={namePrefix} />
+    </FieldSeparatorWrapper>
   )
 }
 
@@ -66,8 +82,9 @@ export function FieldNode({ config, idPrefix, namePrefix }: FieldNodeProps) {
   if (config.visibility) {
     return <ConditionalField config={config} idPrefix={idPrefix} namePrefix={namePrefix} />
   }
-  return withFieldSeparator(
-    config.separator,
-    <FieldRenderer config={config} idPrefix={idPrefix} namePrefix={namePrefix} />,
+  return (
+    <FieldSeparatorWrapper separator={config.separator}>
+      <FieldRenderer config={config} idPrefix={idPrefix} namePrefix={namePrefix} />
+    </FieldSeparatorWrapper>
   )
 }

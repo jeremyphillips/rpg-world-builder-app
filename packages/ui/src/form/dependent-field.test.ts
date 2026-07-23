@@ -13,7 +13,7 @@ describe('DependentConfig helpers', () => {
     kind: 'dependent',
     controller: { type: 'switch', name: 'enabled', label: 'Enabled', defaultValue: false },
     dependents: {
-      surface: 'subtle',
+      surface: { emphasis: 'subtle' },
       scope: 'arrayItems',
       fields: [
         {

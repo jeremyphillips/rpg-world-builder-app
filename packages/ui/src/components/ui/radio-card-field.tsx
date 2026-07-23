@@ -33,6 +33,7 @@ export function RadioCardField({
   onValueChange,
   onBlur,
   labelHidden,
+  chrome,
 }: RadioCardFieldProps) {
   return (
     <RadioFieldShell
@@ -45,6 +46,7 @@ export function RadioCardField({
       required={required}
       width={width}
       labelHidden={labelHidden}
+      chrome={chrome}
     >
       {(labelId) => (
         <RadioCard

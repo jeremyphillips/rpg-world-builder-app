@@ -26,7 +26,6 @@ import {
 import {
   descriptionField,
   feetInputUnitField,
-  nameField,
   SPELL_RANGE_DISTANCE_INLINE_COUNT_DIGITS,
 } from '../../lib/forms/fields/content-identity-form-fields'
 import {
@@ -267,7 +266,6 @@ function basicsFields(ctx: ContentFormCtx): FormItem[] {
   const schoolOptions = buildActiveSpellSchoolFieldOptions(ctx.spellSchoolVocabulary)
 
   return [
-    nameField(),
     {
       kind: 'row',
       fields: [
@@ -331,7 +329,7 @@ function castingFields(): FormItem[] {
     {
       kind: 'group',
       legend: 'Casting time',
-      fieldsChrome: { variant: 'panel' },
+      chrome: { variant: 'panel' },
       fields: [
         {
           kind: 'row',
@@ -372,7 +370,7 @@ function castingFields(): FormItem[] {
     {
       kind: 'group',
       legend: 'Range',
-      fieldsChrome: { variant: 'panel' },
+      chrome: { variant: 'panel' },
       fields: [
         {
           kind: 'row',
@@ -405,7 +403,7 @@ function castingFields(): FormItem[] {
     {
       kind: 'group',
       legend: 'Duration',
-      fieldsChrome: { variant: 'outline' },
+      chrome: { variant: 'outline' },
       fields: [
         {
           kind: 'row',
@@ -461,7 +459,7 @@ function castingFields(): FormItem[] {
     {
       kind: 'group',
       legend: 'Components',
-      fieldsChrome: { variant: 'outline' },
+      chrome: { variant: 'outline' },
       fields: [
         {
           kind: 'row',
@@ -499,7 +497,7 @@ function castingFields(): FormItem[] {
     {
       kind: 'group',
       legend: 'Area of effect',
-      fieldsChrome: { variant: 'outline' },
+      chrome: { variant: 'outline' },
       fields: [
         {
           kind: 'row',

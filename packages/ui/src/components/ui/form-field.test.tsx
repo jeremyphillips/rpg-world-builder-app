@@ -94,6 +94,39 @@ describe('FormField', () => {
     expect(screen.queryByText('Your display name.')).not.toBeInTheDocument()
   })
 
+  it('wraps label, hint, and control in panel chrome when configured', () => {
+    render(
+      <FormField id="name" label="Name" hint="Your display name." chrome={{ variant: 'panel' }}>
+        <input id="name" data-testid="control" />
+      </FormField>,
+    )
+    const control = screen.getByTestId('control')
+    const chromeShell = control.closest('.rounded-md.border.bg-surface-subtle')
+    expect(chromeShell).toBeTruthy()
+    expect(chromeShell?.contains(screen.getByText('Name'))).toBe(true)
+    expect(chromeShell?.contains(screen.getByText('Your display name.'))).toBe(true)
+  })
+
+  it('wraps the settings row in panel chrome when configured', () => {
+    render(
+      <FormField
+        id="score"
+        label="Minimum ability score"
+        hint="Applied to every primary ability."
+        labelPosition="settings"
+        chrome={{ variant: 'panel' }}
+      >
+        <input id="score" data-testid="control" />
+      </FormField>,
+    )
+    const chromeShell = screen
+      .getByTestId('control')
+      .closest('.rounded-md.border.bg-surface-subtle')
+    expect(chromeShell).toBeTruthy()
+    expect(chromeShell?.contains(screen.getByText('Minimum ability score'))).toBe(true)
+    expect(chromeShell?.contains(screen.getByText('Applied to every primary ability.'))).toBe(true)
+  })
+
   it('has no axe accessibility violations', async () => {
     const { container } = render(
       <FormField id="name" label="Name">

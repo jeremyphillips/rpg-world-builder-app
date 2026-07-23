@@ -34,7 +34,6 @@ export {
 export {
   EmphasisDetailLine,
   type EmphasisDetailLineProps,
-  type EmphasisDetailLineSecondaryTone,
 } from './components/ui/emphasis-detail-line'
 export { Alert, type AlertProps, type AlertVariant } from './components/ui/alert'
 export {
@@ -209,10 +208,11 @@ export {
   type InsetPanelTextProps,
 } from './components/ui/inset-panel.client'
 export {
+  DEFAULT_INSET_PANEL_SURFACE,
   INSET_PANEL_ALIGNS,
   INSET_PANEL_BORDER_STYLES,
   INSET_PANEL_SIZES,
-  INSET_PANEL_SURFACES,
+  insetPanelClassNames,
   insetPanelEmptyStateClasses,
   insetPanelEmptyStateVariants,
   insetPanelGateClasses,
@@ -220,11 +220,11 @@ export {
   insetPanelSunkenShadowClasses,
   insetPanelTextVariantBySize,
   insetPanelVariants,
+  resolveInsetPanelSurfaceClasses,
   resolveInsetPanelTextVariant,
   type InsetPanelAlign,
   type InsetPanelBorderStyle,
   type InsetPanelSize,
-  type InsetPanelSurface,
   type InsetPanelVariantProps,
 } from './components/ui/inset-panel.variants'
 export { RadioCardField, type RadioCardFieldProps } from './components/ui/radio-card-field'
@@ -234,10 +234,35 @@ export { MarkdownField, type MarkdownFieldProps } from './components/ui/markdown
 
 export {
   FieldGroup,
-  type FieldGroupFieldsChrome,
+  type FieldGroupChrome,
+  type FieldGroupDisclosure,
+  type FieldGroupLegendDisclosure,
+  type FieldGroupSummary,
+  type FieldGroupSummaryDisclosure,
   type FieldGroupLegendSize,
   type FieldGroupProps,
 } from './components/ui/field-group'
+export {
+  resolveChromeAccentClasses,
+  resolveChromeCalloutClasses,
+  resolveChromeClasses,
+  resolveChromeOutlineClasses,
+  resolveChromePanelClasses,
+  resolveChromeShellClasses,
+  isSupportedSemanticChrome,
+} from './components/ui/chrome.variants'
+export { resolveSurfaceClasses } from './components/ui/surface.variants'
+export type {
+  ChromeBorderAccent,
+  ChromeConfig,
+  ChromeVariant,
+  ContentTone,
+  SemanticTone,
+  SurfaceConfig,
+  SurfaceElevation,
+  SupportedSemanticChrome,
+  VisualEmphasis,
+} from './components/ui/visual-vocabulary.types'
 export type { FieldChrome } from './components/ui/field-chrome.variants'
 export {
   fieldArrayItemClasses,
@@ -556,6 +581,7 @@ export {
   BooleanCell,
   DataTable,
   NameCell,
+  DataTableImageCell,
   RowActionsMenu,
   SortableHeader,
   TableBadgeCell,
@@ -563,6 +589,7 @@ export {
 export type {
   BooleanCellProps,
   NameCellProps,
+  DataTableImageCellProps,
   RowActionsMenuLinkProps,
   RowActionsMenuProps,
   TableBadgeCellProps,
@@ -577,6 +604,7 @@ export {
 export type { DataTableCellTypography, DataTableColumnWidth } from './components/ui/data-table-meta'
 export type {
   ColumnChangeState,
+  DataTableEmptyStateContext,
   DataTableProps,
   FilterDef,
   TextFilterDef,
@@ -601,11 +629,15 @@ export {
   dataTableEmptyPanelVariants,
   dataTableEmptyStateVariants,
   dataTableFilterChipVariants,
+  dataTableFilterNoticeVariants,
   dataTableLockedColumnVariants,
   dataTableResetColumnVariants,
   dataTableCellTextVariants,
+  dataTableImageVariants,
   dataTableNameCellVariants,
   dataTableNameLinkCellVariants,
+  dataTableRowUnavailableVariants,
+  dataTableRowUnavailableRailVariants,
   dataTableRowVariants,
   dataTableBodyCellPaddingVariants,
   dataTableBodyCellVariants,

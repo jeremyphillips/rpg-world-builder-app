@@ -1,11 +1,12 @@
 import * as React from 'react'
 import type { DefaultValues, FieldValues, UseFormReturn } from 'react-hook-form'
 import type { ZodType } from 'zod'
-import type { ContentTypeKey } from '@rpg/contracts'
+import type { ContentTypeKey, ResolvedContentCampaignAccess } from '@rpg/contracts'
 import { Heading, InsetPanel } from '@rpg/ui'
 import {
   Form,
   TabbedForm,
+  FormItems,
   type FormItem,
   type FormValueSync,
   type TabbedFormTab,
@@ -24,10 +25,14 @@ import {
 import { ContentFormFooter } from './content-form-footer'
 import { useAdvisoryFormSubmit, type AdvisoryFormSubmitOptions } from './use-advisory-form-submit'
 import { ContentEditPublishBridge } from './content-edit-publish-bridge.client'
+import { CampaignAccessSection } from '../../campaign-access/campaign-access-section.client'
+import { CampaignAccessFormProvider } from '../../campaign-access/campaign-access-form-context.client'
+import { useContentSaveSession } from './use-content-save-session'
+import type { ContentCampaignAccessPatch } from '@rpg/contracts'
 
 export function ContentFormComingSoon() {
   return (
-    <InsetPanel borderStyle="dashed" surface="none" size="lg" align="center">
+    <InsetPanel borderStyle="dashed" surface={{}} size="lg" align="center">
       <InsetPanel.Text>Form coming soon.</InsetPanel.Text>
     </InsetPanel>
   )
@@ -44,6 +49,46 @@ export function ContentFormNotRegistered({ heading = 'Edit' }: { heading?: strin
   )
 }
 
+interface ContentFormCampaignAccessProps {
+  def: AnyContentFormDef
+  ctx: ContentFormCtx
+  formKey?: string
+  campaignId?: string
+  entityId?: string
+  campaignAccess?: ResolvedContentCampaignAccess
+  onCampaignAccessDraftChange?: (patch: ContentCampaignAccessPatch) => void
+  onCampaignAccessPersisted?: (access: ResolvedContentCampaignAccess) => void
+}
+
+function ContentFormHeader({
+  def,
+  ctx,
+  formKey,
+  campaignId,
+  entityId,
+  campaignAccess,
+  onCampaignAccessDraftChange,
+  onCampaignAccessPersisted,
+}: ContentFormCampaignAccessProps) {
+  const idPrefix = formKey ?? 'content-form'
+
+  return (
+    <div className="flex flex-col gap-6">
+      <FormItems items={[def.nameField(ctx)]} idPrefix={idPrefix} />
+      {campaignId ? (
+        <CampaignAccessSection
+          campaignId={campaignId}
+          targetType={def.routeKey as ContentTypeKey}
+          entityId={entityId}
+          initialAccess={campaignAccess}
+          onDraftChange={onCampaignAccessDraftChange}
+          onPersistedChange={onCampaignAccessPersisted}
+        />
+      ) : null}
+    </div>
+  )
+}
+
 interface ContentFormFooterShellProps<TFormValues extends FieldValues = FieldValues> {
   formMode: 'create' | 'edit'
   backHref?: string
@@ -53,6 +98,43 @@ interface ContentFormFooterShellProps<TFormValues extends FieldValues = FieldVal
   onSaveDraft?: (values: TFormValues, form: UseFormReturn<TFormValues>) => void | Promise<void>
   saveDraftPending?: boolean
   publishSuccess?: boolean
+  onSubmit: (values: TFormValues, form: UseFormReturn<TFormValues>) => Promise<void>
+}
+
+function ContentFormSaveFooter<TFormValues extends FieldValues>({
+  form,
+  formMode,
+  backHref,
+  submitLabel,
+  submitPending,
+  submitSuccess = false,
+  onSaveDraft,
+  saveDraftPending,
+  publishSuccess,
+  onSubmit,
+}: ContentFormFooterShellProps<TFormValues> & { form: UseFormReturn<TFormValues> }) {
+  const actionState = useContentSaveSession({
+    mode: formMode,
+    pending: submitPending,
+    form,
+    onSubmit,
+  })
+
+  return (
+    <ContentFormFooter
+      mode={formMode}
+      form={form}
+      backHref={backHref}
+      submitLabel={submitLabel}
+      pending={submitPending || form.formState.isSubmitting}
+      isSuccess={submitSuccess}
+      onSaveDraft={onSaveDraft}
+      saveDraftPending={saveDraftPending}
+      publishSuccess={publishSuccess}
+      actionState={formMode === 'edit' ? actionState : undefined}
+      guardHasUnsavedEdits={formMode === 'create' ? actionState.hasUnsavedEdits : false}
+    />
+  )
 }
 
 interface ContentSchemaFormProps<
@@ -72,6 +154,7 @@ interface ContentSchemaFormProps<
   submitConfirmDialog?: React.ReactNode
   publishSchema?: ZodType<TFormValues>
   onPublish?: () => Promise<void>
+  headerProps: ContentFormCampaignAccessProps
 }
 
 function ContentSchemaForm<TFormValues extends FieldValues>({
@@ -94,6 +177,7 @@ function ContentSchemaForm<TFormValues extends FieldValues>({
   publishSuccess,
   publishSchema,
   onPublish,
+  headerProps,
 }: ContentSchemaFormProps<TFormValues>) {
   const handleSubmit = React.useCallback(
     async (values: TFormValues, form: UseFormReturn<TFormValues>) => {
@@ -107,7 +191,7 @@ function ContentSchemaForm<TFormValues extends FieldValues>({
   )
 
   return (
-    <>
+    <CampaignAccessFormProvider>
       <Form<TFormValues>
         key={formKey}
         id={formKey}
@@ -119,6 +203,7 @@ function ContentSchemaForm<TFormValues extends FieldValues>({
         formError={formError}
         valueSyncs={valueSyncs}
         stickyFooter
+        header={() => <ContentFormHeader {...headerProps} formKey={formKey} />}
         footer={(form) => (
           <>
             {publishSchema && onPublish && formKey ? (
@@ -129,22 +214,23 @@ function ContentSchemaForm<TFormValues extends FieldValues>({
                 onPublish={onPublish}
               />
             ) : null}
-            <ContentFormFooter
-              mode={formMode}
+            <ContentFormSaveFooter
               form={form}
+              formMode={formMode}
               backHref={backHref}
               submitLabel={submitLabel}
-              pending={submitPending || form.formState.isSubmitting}
-              isSuccess={submitSuccess}
+              submitPending={submitPending}
+              submitSuccess={submitSuccess}
               onSaveDraft={onSaveDraft}
               saveDraftPending={saveDraftPending}
               publishSuccess={publishSuccess}
+              onSubmit={onSubmit}
             />
           </>
         )}
       />
       {submitConfirmDialog}
-    </>
+    </CampaignAccessFormProvider>
   )
 }
 
@@ -165,6 +251,7 @@ interface ContentTabbedSchemaFormProps<
   submitConfirmDialog?: React.ReactNode
   publishSchema?: ZodType<TFormValues>
   onPublish?: () => Promise<void>
+  headerProps: ContentFormCampaignAccessProps
 }
 
 function ContentTabbedSchemaForm<TFormValues extends FieldValues>({
@@ -187,6 +274,7 @@ function ContentTabbedSchemaForm<TFormValues extends FieldValues>({
   publishSuccess,
   publishSchema,
   onPublish,
+  headerProps,
 }: ContentTabbedSchemaFormProps<TFormValues>) {
   const handleSubmit = React.useCallback(
     async (values: TFormValues, form: UseFormReturn<TFormValues>) => {
@@ -202,7 +290,7 @@ function ContentTabbedSchemaForm<TFormValues extends FieldValues>({
   const tabFields = React.useMemo(() => tabs.flatMap((tab) => tab.fields), [tabs])
 
   return (
-    <>
+    <CampaignAccessFormProvider>
       <TabbedForm<TFormValues>
         key={formKey}
         id={formKey}
@@ -213,6 +301,7 @@ function ContentTabbedSchemaForm<TFormValues extends FieldValues>({
         valueSyncs={valueSyncs}
         onSubmit={(values, form) => handleSubmit(values, form)}
         formError={formError}
+        header={() => <ContentFormHeader {...headerProps} formKey={formKey} />}
         footer={(form) => (
           <>
             {publishSchema && onPublish && formKey ? (
@@ -223,22 +312,23 @@ function ContentTabbedSchemaForm<TFormValues extends FieldValues>({
                 onPublish={onPublish}
               />
             ) : null}
-            <ContentFormFooter
-              mode={formMode}
+            <ContentFormSaveFooter
               form={form}
+              formMode={formMode}
               backHref={backHref}
               submitLabel={submitLabel}
-              pending={submitPending || form.formState.isSubmitting}
-              isSuccess={submitSuccess}
+              submitPending={submitPending}
+              submitSuccess={submitSuccess}
               onSaveDraft={onSaveDraft}
               saveDraftPending={saveDraftPending}
               publishSuccess={publishSuccess}
+              onSubmit={onSubmit}
             />
           </>
         )}
       />
       {submitConfirmDialog}
-    </>
+    </CampaignAccessFormProvider>
   )
 }
 
@@ -261,6 +351,11 @@ interface ContentFormLayoutProps<TFormValues extends FieldValues> {
   publishSuccess?: boolean
   publishSchema?: ZodType<TFormValues>
   onPublish?: () => Promise<void>
+  campaignId: string
+  entityId?: string
+  campaignAccess?: ResolvedContentCampaignAccess
+  onCampaignAccessDraftChange?: (patch: ContentCampaignAccessPatch) => void
+  onCampaignAccessPersisted?: (access: ResolvedContentCampaignAccess) => void
 }
 
 export function ContentFormLayout<TFormValues extends FieldValues>({
@@ -282,6 +377,11 @@ export function ContentFormLayout<TFormValues extends FieldValues>({
   publishSuccess,
   publishSchema,
   onPublish,
+  campaignId,
+  entityId,
+  campaignAccess,
+  onCampaignAccessDraftChange,
+  onCampaignAccessPersisted,
 }: ContentFormLayoutProps<TFormValues>) {
   const isWeaponEquipmentForm = def.routeKey === 'equipment' && ctx.equipmentKind === 'weapon'
   const isSpellForm = def.routeKey === 'spells'
@@ -322,6 +422,16 @@ export function ContentFormLayout<TFormValues extends FieldValues>({
     onPublish,
     valueSyncs,
     submitConfirmDialog: isWeaponEquipmentForm ? confirmDialog : undefined,
+    headerProps: {
+      def,
+      ctx,
+      formKey,
+      campaignId,
+      entityId,
+      campaignAccess,
+      onCampaignAccessDraftChange,
+      onCampaignAccessPersisted,
+    },
   }
 
   if (def.buildTabs) {

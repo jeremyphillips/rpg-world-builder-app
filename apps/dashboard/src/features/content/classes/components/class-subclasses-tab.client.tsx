@@ -4,17 +4,13 @@ import { useState } from 'react'
 import { useWatch } from 'react-hook-form'
 import { ConfirmDialog } from '@rpg/ui'
 
-import type { ResolvedSubclass } from '@rpg/contracts'
+import type { ContentCampaignAccessPatch, ResolvedSubclass } from '@rpg/contracts'
 import { getErrorMessage } from '@rpg/contracts'
 
 import { AvailabilityAlert, resolveAvailability } from '@/lib/availability'
 import type { ContentFormCtx } from '../../lib/forms/content-form-registry'
 import { campaignRulesFromCtx } from '../../lib/form-options/content-campaign-rules'
-import {
-  useCreateSubclass,
-  useUpdateSubclass,
-  useUpdateSubclassAvailability,
-} from '../hooks/use-subclass-mutations'
+import { useCreateSubclass, useUpdateSubclass } from '../hooks/use-subclass-mutations'
 import { useReportSubclassUnsavedEdits } from '../hooks/subclass-unsaved-edits-context.client'
 import { useSubclassDeleteFlow } from '../hooks/use-subclass-delete-flow.client'
 import { useSubclassEditorState } from '../hooks/use-subclass-editor-state'
@@ -24,6 +20,9 @@ import { useSubclasses } from '../hooks/use-subclasses'
 import { isDraftSubclassId } from '../lib/subclasses/subclass-editor-constants'
 import { subclassFormDef } from '../lib/subclasses/subclass-form-values'
 import type { SubclassFormValues } from '../lib/subclasses/subclass-form-fields'
+import { updateContentCampaignAccess } from '../../lib/campaign-access/campaign-access-api'
+import { CAMPAIGN_ACCESS_CREATE_DEFERRED_ERROR } from '../../lib/campaign-access/campaign-access-labels'
+import { isDefaultCampaignAccessPatch } from '../../lib/campaign-access/campaign-access-state'
 import {
   SubclassChoiceLevelGate,
   SubclassCreateGate,
@@ -105,8 +104,10 @@ function ClassSubclassesTabBody({
 }) {
   const createMutation = useCreateSubclass(campaignId, classId)
   const updateMutation = useUpdateSubclass(campaignId, classId)
-  const availabilityMutation = useUpdateSubclassAvailability(campaignId, classId)
   const [saveError, setSaveError] = useState<string | null>(null)
+  const [campaignAccessDeferredError, setCampaignAccessDeferredError] = useState<string | null>(
+    null,
+  )
   const [switchTargetId, setSwitchTargetId] = useState<string | null>(null)
 
   useReportSubclassUnsavedEdits(editor.hasUnsavedEdits)
@@ -145,10 +146,14 @@ function ClassSubclassesTabBody({
     editor.setSelectedId(id)
   }
 
-  const handleSave = async (values: SubclassFormValues) => {
+  const handleSave = async (
+    values: SubclassFormValues,
+    options?: { campaignAccessDraft?: ContentCampaignAccessPatch | null },
+  ) => {
     if (!editor.selectedId) return
 
     setSaveError(null)
+    setCampaignAccessDeferredError(null)
     editor.setSavePending(true)
     try {
       const input = subclassFormDef.toInput(
@@ -159,6 +164,16 @@ function ClassSubclassesTabBody({
 
       if (isDraftSubclassId(editor.selectedId)) {
         const saved = await createMutation.mutateAsync(input)
+        const pendingAccess = options?.campaignAccessDraft
+        if (pendingAccess && !isDefaultCampaignAccessPatch(pendingAccess)) {
+          try {
+            await updateContentCampaignAccess(campaignId, 'subclasses', saved.id, pendingAccess, {
+              classId,
+            })
+          } catch {
+            setCampaignAccessDeferredError(CAMPAIGN_ACCESS_CREATE_DEFERRED_ERROR)
+          }
+        }
         editor.commitDraftHandoff(editor.selectedId, saved)
         return
       }
@@ -175,19 +190,6 @@ function ClassSubclassesTabBody({
     }
   }
 
-  const handleActiveChange = async (subclassId: string, active: boolean) => {
-    editor.handleActiveChange(subclassId, active)
-
-    if (isDraftSubclassId(subclassId)) return
-
-    try {
-      await availabilityMutation.mutateAsync({ subclassId, activeInCampaign: active })
-    } catch (err) {
-      editor.handleActiveChange(subclassId, !active)
-      setSaveError(getErrorMessage(err, 'Could not update subclass availability.'))
-    }
-  }
-
   const savePending = editor.savePending || createMutation.isPending || updateMutation.isPending
 
   return (
@@ -199,11 +201,15 @@ function ClassSubclassesTabBody({
             {saveError}
           </p>
         ) : null}
+        {campaignAccessDeferredError ? (
+          <p className="text-sm text-warning" role="status">
+            {campaignAccessDeferredError}
+          </p>
+        ) : null}
         <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
           <SubclassListPanel
             items={editor.listItems}
             selectedId={editor.selectedId}
-            activeById={editor.activeById}
             modifiedIds={editor.modifiedIds}
             onSelect={handleSelect}
             onAdd={editor.handleAdd}
@@ -216,13 +222,12 @@ function ClassSubclassesTabBody({
                 key={editor.selectedId}
                 subclassId={editor.selectedId}
                 classId={classId}
+                campaignId={campaignId}
                 entity={editor.selectedEntity}
                 defaultValues={editor.selectedValues}
-                activeInCampaign={editor.activeById[editor.selectedId] !== false}
                 defaultFeatureLevel={defaultFeatureLevel}
                 formCtx={formCtx}
                 savePending={savePending}
-                onActiveChange={(active) => handleActiveChange(editor.selectedId!, active)}
                 onValuesChange={editor.handleValuesChange}
                 onSave={handleSave}
                 onDeleteRequest={() => handleDeleteRequest(editor.selectedId!)}

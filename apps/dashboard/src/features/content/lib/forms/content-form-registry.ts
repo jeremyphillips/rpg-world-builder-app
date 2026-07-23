@@ -98,6 +98,8 @@ export interface ContentFormDef<
   ) => ZodType<FieldValues>
   /** Returns the ordered `FormItem[]` for this type. */
   buildFields: (ctx: ContentFormCtx) => FormItem[]
+  /** Name field hoisted above tabs / the rest of the form in create/edit shells. */
+  nameField: (ctx: ContentFormCtx) => FormItem
   /**
    * When set, create/edit shells render a `<TabbedForm>` instead of `<Form>`.
    * Tab field lists are the source of truth; `buildFields` should delegate to
@@ -159,7 +161,15 @@ export type AnyContentFormDef = ContentFormDef<any, any, any>
  */
 export const contentFormRegistry: Record<string, AnyContentFormDef> = {}
 
-/** Flat field list for drift tests — tabs when present, else `buildFields`. */
+/** Flat field list for drift tests — name field, then tabs or `buildFields`. */
+export function contentFormAllFields(
+  def: Pick<AnyContentFormDef, 'buildFields' | 'buildTabs' | 'nameField'>,
+  ctx: ContentFormCtx,
+): FormItem[] {
+  return [def.nameField(ctx), ...contentFormFields(def, ctx)]
+}
+
+/** Body field list — tabs when present, else `buildFields` (excludes hoisted name). */
 export function contentFormFields(
   def: Pick<AnyContentFormDef, 'buildFields' | 'buildTabs'>,
   ctx: ContentFormCtx,

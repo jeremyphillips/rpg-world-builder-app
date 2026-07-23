@@ -95,17 +95,6 @@ describe('FormEmbeddedMasterDetailEditor', () => {
     expect(screen.queryByRole('button', { name: /Remove Darkvision/i })).not.toBeInTheDocument()
   })
 
-  it('shows the active in campaign toggle on the detail panel', () => {
-    render(
-      <EditorShell
-        entitySource="homebrew"
-        traits={[{ kind: 'custom', name: 'Darkvision', grants: [] }]}
-      />,
-    )
-
-    expect(screen.getByRole('switch', { name: /Active in campaign/i })).toBeInTheDocument()
-  })
-
   it('renders leadingContent above the editor grid', () => {
     function LeadingContentShell() {
       return (

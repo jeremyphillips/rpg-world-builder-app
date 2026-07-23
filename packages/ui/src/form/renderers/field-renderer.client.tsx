@@ -23,6 +23,7 @@ import { useFieldErrorPresentation } from '../context/array-item-presentation.co
 import { resolveNestedFieldErrorMessage } from '../errors/resolve-field-error-message'
 import { DiceFormulaFieldRenderer } from './fields/dice-formula-field-renderer.client'
 import { buildFieldRendererIds, resolveFieldRenderConfig } from './field-renderer-config.lib'
+import { pickFieldChromeProps } from '../../components/ui/field-chrome.variants'
 import { normalizeFieldHint } from '../field-config'
 import { renderSpecializedField } from './fields/field-renderer-specialized.client'
 import { OptionalDisclosureTextareaFieldRenderer } from './fields/optional-disclosure-field-renderer.client'
@@ -117,6 +118,7 @@ const fieldRenderers: {
   text: ({ config, field, id, hint, hintPosition, ...validation }) => (
     <TextField
       id={id}
+      {...pickFieldChromeProps(config)}
       label={config.label}
       {...fieldValidationProps(validation)}
       hint={hint}
@@ -138,6 +140,7 @@ const fieldRenderers: {
   number: ({ config, field, id, hint, hintPosition, ...validation }) => (
     <NumberField
       id={id}
+      {...pickFieldChromeProps(config)}
       label={config.label}
       {...fieldValidationProps(validation)}
       hint={hint}
@@ -163,6 +166,7 @@ const fieldRenderers: {
   textarea: ({ config, field, id, hint, hintPosition, ...validation }) => (
     <TextareaField
       id={id}
+      {...pickFieldChromeProps(config)}
       label={config.label}
       {...fieldValidationProps(validation)}
       hint={hint}
@@ -183,6 +187,7 @@ const fieldRenderers: {
   radio: ({ config, field, id, hint, hintPosition, ...validation }) => (
     <RadioGroupField
       id={id}
+      {...pickFieldChromeProps(config)}
       label={config.label}
       options={config.options}
       {...fieldValidationProps(validation)}
@@ -202,6 +207,7 @@ const fieldRenderers: {
   radioCard: ({ config, field, id, hint, hintPosition, ...validation }) => (
     <RadioCardField
       id={id}
+      {...pickFieldChromeProps(config)}
       label={config.label}
       options={config.options}
       {...fieldValidationProps(validation)}
@@ -220,6 +226,7 @@ const fieldRenderers: {
   checkbox: ({ config, field, id, hint, hintPosition, ...validation }) => (
     <CheckboxField
       id={id}
+      {...pickFieldChromeProps(config)}
       label={config.label}
       {...fieldValidationProps(validation)}
       hint={hint}
@@ -236,6 +243,7 @@ const fieldRenderers: {
   switch: ({ config, field, id, hint, hintPosition, ...validation }) => (
     <SwitchField
       id={id}
+      {...pickFieldChromeProps(config)}
       label={config.label}
       labelPosition={config.labelPosition}
       {...fieldValidationProps(validation)}
@@ -255,6 +263,7 @@ const fieldRenderers: {
     <LazyFieldSuspense>
       <LazyJsonField
         id={id}
+        {...pickFieldChromeProps(config)}
         label={config.label}
         {...fieldValidationProps(validation)}
         hint={hint}
@@ -276,6 +285,7 @@ const fieldRenderers: {
     <LazyFieldSuspense>
       <LazyRichTextField
         id={id}
+        {...pickFieldChromeProps(config)}
         label={config.label}
         {...fieldValidationProps(validation)}
         hint={hint}
@@ -298,6 +308,7 @@ const fieldRenderers: {
   markdown: ({ config, field, id, hint, hintPosition, ...validation }) => (
     <MarkdownField
       id={id}
+      {...pickFieldChromeProps(config)}
       label={config.label}
       {...fieldValidationProps(validation)}
       hint={hint}
@@ -318,6 +329,7 @@ const fieldRenderers: {
     <LazyFieldSuspense>
       <LazyFileField
         id={id}
+        {...pickFieldChromeProps(config)}
         label={config.label}
         {...fieldValidationProps(validation)}
         hint={hint}
@@ -341,6 +353,7 @@ const fieldRenderers: {
   chips: ({ config, field, id, hint, hintPosition, ...validation }) => (
     <ChipsField
       id={id}
+      {...pickFieldChromeProps(config)}
       label={config.label}
       options={config.options}
       multiple={config.multiple}
@@ -353,7 +366,6 @@ const fieldRenderers: {
       size={config.size}
       chipSize={config.chipSize}
       width={config.width}
-      chrome={config.chrome}
       disabled={config.disabled}
       value={field.value ?? fieldDefaultValue(config)}
       onChange={field.onChange}
@@ -363,6 +375,7 @@ const fieldRenderers: {
   combobox: ({ config, field, id, hint, hintPosition, ...validation }) => (
     <ComboboxField
       id={id}
+      {...pickFieldChromeProps(config)}
       label={config.label}
       options={config.options}
       multiple={config.multiple}

@@ -87,14 +87,13 @@ list + detail editor instead of a tall stack, via shared, type-agnostic pieces:
 | ------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | [`useMasterDetailArray`](./lib/master-detail/use-master-detail-array.ts)                                     | Binds to a parent-form field array (`useFieldArray`); tracks selection (derived/clamped), delete-confirm flow, row reorder, and validation surfacing.                                   |
 | [`MasterDetailListPanel`](./components/master-detail/master-detail-list-panel.client.tsx)                    | Sidebar: add button + selectable rows with optional eyebrow, status badge, per-row delete, and drag-to-reorder (keyboard-accessible handle).                                            |
-| [`MasterDetailEditorPanel`](./components/master-detail/master-detail-editor-panel.client.tsx)                | Detail column: validation banner, **Active in campaign** toggle, selected row `FormItems`, or empty-selection hint.                                                                     |
+| [`MasterDetailEditorPanel`](./components/master-detail/master-detail-editor-panel.client.tsx)                | Detail column: validation banner, selected row `FormItems`, or empty-selection hint.                                                                                                    |
 | [`MasterDetailDeleteDialog`](./components/master-detail/master-detail-delete-dialog.client.tsx)              | Shared `ConfirmDialog` wrapper for row removal.                                                                                                                                         |
 | [`MasterDetailValidationBanner`](./components/master-detail/master-detail-validation-banner.client.tsx)      | Post-submit alert when unselected list rows have validation errors.                                                                                                                     |
-| [`MasterDetailActiveToggle`](./components/master-detail/master-detail-active-toggle.client.tsx)              | Shared campaign availability switch for detail panels.                                                                                                                                  |
-| [`buildEmbeddedMasterDetailListItem`](./lib/master-detail/build-embedded-master-detail-list-item.ts)         | Builds a list row with source badges, `deletable`, and inactive styling.                                                                                                                |
+| [`buildEmbeddedMasterDetailListItem`](./lib/master-detail/build-embedded-master-detail-list-item.ts)         | Builds a list row with source badges and `deletable`.                                                                                                                                   |
 | [`resolveEmbeddedRowMeta`](./lib/master-detail/resolve-embedded-row-meta.ts)                                 | Derives system/homebrew source, delete-lock, and badge set for embedded rows.                                                                                                           |
 | [`isEmbeddedRowSystemLocked`](./lib/master-detail/is-embedded-row-system-locked.ts)                          | Shared delete-lock policy when embedded rows have no per-row `source`.                                                                                                                  |
-| [`content-campaign-availability`](./lib/master-detail/content-campaign-availability.ts)                      | Shared active-in-campaign labels and row-key helpers (also used by subclasses).                                                                                                         |
+| [`content-campaign-availability`](./lib/master-detail/content-campaign-availability.ts)                      | Shared row-key helpers for master-detail lists.                                                                                                                                         |
 | [`FormEmbeddedMasterDetailEditor`](./components/master-detail/form-embedded-master-detail-editor.client.tsx) | Composite wiring for form-embedded arrays: list + detail + delete dialog over the parent form. Optional `leadingContent` for fields above the grid (uses `fieldGroupFlexStackClasses`). |
 
 It is presentation-only over the parent form, so global save and validation are
@@ -105,24 +104,23 @@ Compose the lower-level pieces directly only when you need layout that does not
 fit this composite.
 
 `useMasterDetailArray` resolves validation errors for nested dot paths (e.g.
-`heritage.options`) so error badges and auto-select work on inner lists. It also
-tracks local **Active in campaign** state (`activeById`) — not persisted until a
-contract lands for embedded rows.
+`heritage.options`) so error badges and auto-select work on inner lists.
 
-`FormEmbeddedMasterDetailEditor` defaults: sortable list, delete controls,
-System/Homebrew/Inactive badges, and the active toggle. Pass
+`FormEmbeddedMasterDetailEditor` defaults: sortable list, delete controls, and
+System/Homebrew badges. Pass
 `ContentFormCtx.embeddedSeedRowIds` (populated on edit via
 `ContentFormDef.extractEmbeddedSeedRowIds`) so only seed rows lock on system
 entities; newly added rows show Homebrew and remain deletable.
 
 Scope notes:
 
-- The existing classes **Subclasses** tab predates this abstraction and is
-  **not** migrated yet (it manages a separate API resource with its own
-  drafts/active state). Migrating it is a follow-up.
-- **Active in campaign** toggle state is local-only for embedded rows (same as
-  subclasses today). Persistence is a follow-up once embedded rows have a
-  contract target.
+- Embedded array rows (class features, species traits/heritage) inherit campaign
+  access from their parent content type — no per-row campaign access UI yet.
+- Subclass campaign access is persisted via the shared `ContentCampaignAccessModel`
+  and edited in the subclass panel through `CampaignAccessSection` (availability +
+  visibility, with availability-off blocker preflight). Top-level edit shells coordinate
+  body + access dirty state through a unified save session — see
+  [campaign-access/README.md](lib/campaign-access/README.md).
 
 `ContentFormCtx.entitySource` (set by the create/edit shells) plus
 `embeddedSeedRowIds` lets the editor derive per-row delete-locking when the

@@ -59,6 +59,15 @@ describe.each(entries)('ContentFormDef[%s] — registration contract', (_key, de
     expect(def.schema.parse).toBeTypeOf('function')
   })
 
+  it('nameField is a function returning a leaf field config', () => {
+    expect(def.nameField).toBeTypeOf('function')
+    const nameItem = def.nameField({})
+    expect(nameItem).toBeDefined()
+    if ('name' in nameItem && typeof nameItem.name === 'string') {
+      expect(nameItem.name).toBe('name')
+    }
+  })
+
   it('buildFields({}) returns a non-empty FormItem array', () => {
     const fields = contentFormFields(def, {})
     expect(Array.isArray(fields)).toBe(true)

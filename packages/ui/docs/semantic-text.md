@@ -4,7 +4,7 @@
 values. It always renders a `<span>`.
 
 For bordered pill surfaces use [`Badge`](./compact-labels.md). For full alert/callout panels use
-`Alert` or group `fieldsChrome: { variant: 'callout' }`.
+`Alert` or group `chrome: { variant: 'callout' }`.
 
 ## Tone
 

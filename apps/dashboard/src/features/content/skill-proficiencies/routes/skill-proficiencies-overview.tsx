@@ -1,12 +1,11 @@
 import { useParams } from 'react-router-dom'
-import { DataTable } from '@rpg/ui'
-import type { SkillProficiency } from '@rpg/contracts'
+import type { SkillProficiency, WithCampaignAccess } from '@rpg/contracts'
+import type { ColumnDef } from '@rpg/ui'
 
 import { ROUTES } from '@/app/routes'
 import {
   formatContentCreateHeading,
   getContentTypeCollectionLabel,
-  getContentTypeMidSentenceLabel,
   getContentTypeSentenceLabel,
 } from '@/features/content/lib/content-type-labels'
 import { useSkillProficiencies } from '../hooks/use-skill-proficiencies'
@@ -15,19 +14,7 @@ import {
   skillProficienciesFilters,
 } from '../lib/skill-proficiencies-overview-columns'
 import { ContentOverviewShell } from '../../lib/overview/content-overview-shell'
-import { ContentOverviewRowActions } from '../../lib/overview/content-overview-row-actions'
-
-function SkillRowActions({ row, campaignId }: { row: SkillProficiency; campaignId: string }) {
-  return (
-    <ContentOverviewRowActions
-      campaignId={campaignId}
-      editHref={ROUTES.content.skillProficiencies.edit(campaignId, row.id)}
-      enabled={true}
-      onToggleEnabled={() => {}}
-      itemLabel={getContentTypeMidSentenceLabel('skill-proficiencies')}
-    />
-  )
-}
+import { ContentOverviewTable } from '../../lib/overview/content-overview-table.client'
 
 export function SkillProficienciesOverview() {
   const { campaignId = '' } = useParams<{ campaignId: string }>()
@@ -42,12 +29,19 @@ export function SkillProficienciesOverview() {
       newHref={ROUTES.content.skillProficiencies.create(campaignId)}
       newLabel={formatContentCreateHeading('skill-proficiencies')}
     >
-      <DataTable
-        columns={skillProficienciesColumns(campaignId)}
-        data={skillProficiencies}
+      <ContentOverviewTable<WithCampaignAccess<SkillProficiency>>
+        contentTypeKey="skill-proficiencies"
+        campaignId={campaignId}
+        columns={
+          skillProficienciesColumns(campaignId) as ColumnDef<
+            WithCampaignAccess<SkillProficiency>,
+            unknown
+          >[]
+        }
         filters={skillProficienciesFilters}
-        rowActions={(row) => <SkillRowActions row={row} campaignId={campaignId} />}
+        data={skillProficiencies as WithCampaignAccess<SkillProficiency>[]}
         caption={`${getContentTypeSentenceLabel('skill-proficiencies', { plural: true })} available in this campaign`}
+        getEditHref={(row) => ROUTES.content.skillProficiencies.edit(campaignId, row.id)}
       />
     </ContentOverviewShell>
   )

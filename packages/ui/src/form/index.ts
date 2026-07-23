@@ -15,11 +15,13 @@ export {
 export { FieldNode, buildFieldControlId } from './containers/form-conditional.client'
 export {
   FormSectionProvider,
+  FormRhythmStack,
   FormSectionContext,
   buildFormSectionChildContext,
   useFormSectionContext,
   type FormSectionContextOverrides,
   type FormSectionContextValue,
+  type FormRhythmStackProps,
   type FormSectionProviderProps,
 } from './context/form-section.context'
 export {
@@ -131,9 +133,21 @@ export {
   type InputUnitFieldConfig,
   type FieldConfig,
   type RowConfig,
+  type RowFieldItem,
   type GroupConfig,
   type GroupFieldItem,
-  type FieldGroupFieldsChrome,
+  type FieldGroupChrome,
+  type FieldGroupDisclosure,
+  type FieldGroupSummary,
+  type FieldGroupSummaryDisclosure,
+  type ChromeConfig,
+  type ChromeVariant,
+  type ContentTone,
+  type SemanticTone,
+  type SurfaceConfig,
+  type SurfaceElevation,
+  type SupportedSemanticChrome,
+  type VisualEmphasis,
   type FieldChrome,
   type FieldHintConfig,
   type DependentConfig,
@@ -156,6 +170,12 @@ export {
   type ArrayErrorFocusContext,
 } from './field-config'
 export {
+  resolveChromeAccentClasses,
+  resolveChromeClasses,
+  resolveChromeShellClasses,
+  isSupportedSemanticChrome,
+} from '../components/ui/chrome.variants'
+export {
   defineArrayField,
   defineComboboxField,
   defineDiceFormulaField,
@@ -166,15 +186,16 @@ export {
   defineSelectField,
   defineDependentField,
 } from './form-authoring'
+export { isRowSlotItem } from './field-config'
 export { FIELD_WIDTHS, type FieldWidth } from '../components/ui/field-control.variants'
 export {
-  FIELD_SURFACE_VARIANTS,
-  FIELD_STATUS_TONES,
-  type FieldSurfaceVariant,
-  type FieldStatusTone,
-} from '../components/ui/field-surface.variants'
-export {
+  DEFAULT_ARRAY_ITEM_SURFACE,
+  DEFAULT_DEPENDENT_SURFACE,
+  DEFAULT_PANEL_SURFACE,
+  SEMANTIC_SURFACE_TONES,
+  type SemanticSurfaceTone,
   resolveFieldDependentsChromeClasses,
+  resolveSurfaceClasses,
   type FieldDependentsScope,
 } from '../components/ui/field-dependent.variants'
 export {

@@ -98,7 +98,7 @@ describe('FieldGroup', () => {
 
   it('applies panel chrome on the field body', () => {
     render(
-      <FieldGroup legend="Target" fieldsChrome={{ variant: 'panel' }}>
+      <FieldGroup legend="Target" chrome={{ variant: 'panel' }}>
         <TextField id="target-kind" label="Kind" />
       </FieldGroup>,
     )
@@ -110,17 +110,17 @@ describe('FieldGroup', () => {
 
   it('applies inset chrome on the field stack', () => {
     render(
-      <FieldGroup legend="Effects" fieldsChrome={{ variant: 'inset' }}>
+      <FieldGroup legend="Effects" chrome={{ variant: 'inset' }}>
         <TextField id="effect-name" label="Effect" />
       </FieldGroup>,
     )
     const stack = fieldStack(screen.getByRole('group', { name: /Effects/ }))
-    expect(stack).toHaveClass('border-l-2', 'pl-6', 'sm:pl-8', 'border-border')
+    expect(stack).toHaveClass('border-l-2', 'pl-4', 'sm:pl-8', 'border-border')
   })
 
   it('applies divider top chrome on the fieldset', () => {
     render(
-      <FieldGroup legend="Weapons" fieldsChrome={{ variant: 'divider', edge: 'top' }}>
+      <FieldGroup legend="Weapons" chrome={{ variant: 'divider', edge: 'top' }}>
         <TextField id="weapon-mode" label="Mode" />
       </FieldGroup>,
     )
@@ -130,7 +130,7 @@ describe('FieldGroup', () => {
   it('toggles collapsible groups', async () => {
     const user = userEvent.setup()
     render(
-      <FieldGroup legend="Advanced" fieldsChrome={{ variant: 'collapsible', defaultOpen: true }}>
+      <FieldGroup legend="Advanced" disclosure={{ variant: 'legend', defaultOpen: true }}>
         <TextField id="advanced-field" label="Detail" />
       </FieldGroup>,
     )
@@ -152,7 +152,7 @@ describe('FieldGroup', () => {
 
   it('has no axe accessibility violations for panel chrome', async () => {
     const { container } = render(
-      <FieldGroup legend="Target" fieldsChrome={{ variant: 'panel' }}>
+      <FieldGroup legend="Target" chrome={{ variant: 'panel' }}>
         <TextField id="target-field" label="Kind" />
       </FieldGroup>,
     )

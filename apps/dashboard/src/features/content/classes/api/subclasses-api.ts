@@ -4,7 +4,6 @@ import type {
   CreateSubclassInput,
   ResolvedSubclass,
   Subclass,
-  SubclassCampaignAvailability,
   UpdateSubclassInput,
 } from '@rpg/contracts'
 import {
@@ -12,7 +11,6 @@ import {
   contentDeletionAvailabilitySchema,
   contentDeletionResultSchema,
   fetchCsrfToken,
-  subclassCampaignAvailabilitySchema,
 } from '@rpg/contracts'
 
 import { CSRF_HEADER, patchJson, postJson, request } from '@/lib/api-client'
@@ -54,20 +52,6 @@ export async function updateSubclass(
     'Could not update subclass.',
   )
   return body.subclasses
-}
-
-export async function updateSubclassAvailability(
-  campaignId: string,
-  classId: string,
-  subclassId: string,
-  activeInCampaign: boolean,
-): Promise<SubclassCampaignAvailability> {
-  const body = await patchJson<{ availability: unknown }>(
-    `/api/campaigns/${campaignId}/content/classes/${classId}/subclasses/${subclassId}/availability`,
-    { activeInCampaign },
-    'Could not update subclass availability.',
-  )
-  return subclassCampaignAvailabilitySchema.parse(body.availability)
 }
 
 export async function fetchSubclassDeletionAvailability(

@@ -4,6 +4,8 @@ import { Field, type FieldSize } from './field.client'
 import { FieldLayout } from './field-layout'
 import { FieldLabelContent } from './field-label-content'
 import { FormField } from './form-field'
+import { FieldChromeShell } from './field-chrome-shell'
+import { hasActiveFieldChrome, type FieldChromeProps } from './field-chrome.variants'
 import {
   Select,
   SelectContent,
@@ -34,7 +36,7 @@ import type { FieldValidationProps } from './field-validation-props'
 
 export type SelectLabelPosition = FieldLabelPosition | 'inline'
 
-export interface SelectFieldProps extends FieldValidationProps {
+export interface SelectFieldProps extends FieldValidationProps, FieldChromeProps {
   id: string
   label: string
   options: SelectFieldOptionListItem[]
@@ -115,6 +117,7 @@ export function SelectField({
   defaultValue,
   onValueChange,
   onBlur,
+  chrome,
 }: SelectFieldProps) {
   const resolvedPlaceholder = resolveSelectPlaceholder(label, placeholder)
   const resolvedHintPosition = hintPosition ?? 'below-label'
@@ -145,6 +148,14 @@ export function SelectField({
     </Select>
   )
 
+  const chromedSelect = hasActiveFieldChrome(chrome) ? (
+    <FieldChromeShell chrome={chrome} size={size}>
+      {select}
+    </FieldChromeShell>
+  ) : (
+    select
+  )
+
   if (labelPosition === 'settings') {
     return (
       <FormField
@@ -160,6 +171,7 @@ export function SelectField({
         width={width}
         size={size}
         labelPosition="settings"
+        chrome={chrome}
       >
         {select}
       </FormField>
@@ -191,7 +203,7 @@ export function SelectField({
               <FieldLabelContent label={label} info={info} />
             </Field.Label>
           )}
-          {select}
+          {chromedSelect}
         </div>
         {resolvedHintPosition === 'below-control' ? <Field.Hint /> : null}
         <Field.Error />
@@ -219,6 +231,8 @@ export function SelectField({
           </Field.Label>
         }
         control={select}
+        chrome={chrome}
+        size={size}
       />
     </Field.Root>
   )

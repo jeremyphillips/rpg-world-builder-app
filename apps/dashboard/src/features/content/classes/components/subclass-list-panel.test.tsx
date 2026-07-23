@@ -21,7 +21,6 @@ describe('SubclassListPanel', () => {
       <SubclassListPanel
         items={items}
         selectedId={items[0]?.id ?? null}
-        activeById={{}}
         modifiedIds={new Set()}
         onSelect={vi.fn()}
         onAdd={onAdd}
@@ -38,7 +37,6 @@ describe('SubclassListPanel', () => {
       <SubclassListPanel
         items={items}
         selectedId={items[0]?.id ?? null}
-        activeById={{ [items[0]!.id]: false }}
         modifiedIds={new Set([items[0]!.id])}
         onSelect={vi.fn()}
         onAdd={vi.fn()}

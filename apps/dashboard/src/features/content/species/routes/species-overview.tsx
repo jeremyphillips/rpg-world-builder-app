@@ -1,6 +1,6 @@
 import { useParams } from 'react-router-dom'
-import { DataTable } from '@rpg/ui'
-import type { Species } from '@rpg/contracts'
+import type { Species, WithCampaignAccess } from '@rpg/contracts'
+import type { ColumnDef } from '@rpg/ui'
 
 import { ROUTES } from '@/app/routes'
 import { useCreatureTypeVocabulary } from '@/features/homebrew'
@@ -8,24 +8,11 @@ import {
   formatContentCreateHeading,
   formatContentOverviewCaption,
   getContentTypeCollectionLabel,
-  getContentTypeMidSentenceLabel,
 } from '@/features/content/lib/content-type-labels'
 import { useSpecies } from '../hooks/use-species'
 import { speciesColumns, speciesFilters } from '../lib/species-overview-columns'
 import { ContentOverviewShell } from '../../lib/overview/content-overview-shell'
-import { ContentOverviewRowActions } from '../../lib/overview/content-overview-row-actions'
-
-function SpeciesRowActions({ row, campaignId }: { row: Species; campaignId: string }) {
-  return (
-    <ContentOverviewRowActions
-      campaignId={campaignId}
-      editHref={ROUTES.content.species.edit(campaignId, row.id)}
-      enabled={true}
-      onToggleEnabled={() => {}}
-      itemLabel={getContentTypeMidSentenceLabel('species')}
-    />
-  )
-}
+import { ContentOverviewTable } from '../../lib/overview/content-overview-table.client'
 
 export function SpeciesOverview() {
   const { campaignId = '' } = useParams<{ campaignId: string }>()
@@ -45,12 +32,19 @@ export function SpeciesOverview() {
       newHref={ROUTES.content.species.create(campaignId)}
       newLabel={formatContentCreateHeading('species')}
     >
-      <DataTable
-        columns={speciesColumns(campaignId, vocabulary)}
-        data={species}
+      <ContentOverviewTable<WithCampaignAccess<Species>>
+        contentTypeKey="species"
+        campaignId={campaignId}
+        columns={
+          speciesColumns(campaignId, vocabulary) as ColumnDef<
+            WithCampaignAccess<Species>,
+            unknown
+          >[]
+        }
         filters={speciesFilters(vocabulary)}
-        rowActions={(row) => <SpeciesRowActions row={row} campaignId={campaignId} />}
+        data={species as WithCampaignAccess<Species>[]}
         caption={formatContentOverviewCaption('species', 'Playable')}
+        getEditHref={(row) => ROUTES.content.species.edit(campaignId, row.id)}
       />
     </ContentOverviewShell>
   )

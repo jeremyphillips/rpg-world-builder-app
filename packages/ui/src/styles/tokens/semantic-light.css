@@ -48,9 +48,11 @@
   --warning-foreground: var(--palette-fg-on-status);
   --warning-muted: var(--palette-warning-muted);
   --warning-subtle: var(--palette-warning-subtle);
+  --warning-faint: var(--palette-warning-faint);
 
   /* Chrome — generic borders, selection, overlay, sidebar (`border-border`, `bg-overlay`, `bg-sidebar`, …) */
   --border-default: var(--palette-border-default);
+  --border-faint: var(--palette-border-faint);
   --border-subtle: var(--palette-border-subtle);
   --border-strong: var(--palette-border-strong);
   --border: var(--border-default);
@@ -114,6 +116,7 @@
   --semantic-success-subtle: var(--success-subtle);
   --semantic-warning-border: var(--warning-muted);
   --semantic-warning-subtle: var(--warning-subtle);
+  --semantic-warning-accent-faint: var(--palette-semantic-warning-accent-faint);
   --semantic-destructive-border: var(--destructive-muted);
   --semantic-destructive-subtle: var(--destructive-subtle);
 

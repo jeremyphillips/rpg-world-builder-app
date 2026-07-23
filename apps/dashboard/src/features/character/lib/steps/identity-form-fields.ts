@@ -55,7 +55,7 @@ function narrativeArrayField(
     ],
     item: {
       variant: 'compact',
-      surface: 'subtle',
+      surface: { emphasis: 'subtle' },
       reorder: false,
       header: {
         fallback: (index) => `${legend} ${index + 1}`,
@@ -96,7 +96,7 @@ export const identityFormFields: FormItem[] = [
   {
     kind: 'group',
     legend: 'Narrative',
-    fieldsChrome: { variant: 'inset' },
+    chrome: { variant: 'inset' },
     fields: [
       narrativeArrayField(
         'personalityTraits',

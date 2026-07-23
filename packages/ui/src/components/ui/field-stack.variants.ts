@@ -1,7 +1,8 @@
-export type { FieldStatusTone, FieldSurfaceVariant } from './field-surface.variants'
+export type { SemanticSurfaceTone } from './field-surface.variants'
 export type { FieldDependentsScope } from './field-dependent.variants'
 export {
-  FIELD_STATUS_TONES,
-  FIELD_SURFACE_VARIANTS,
+  DEFAULT_ARRAY_ITEM_SURFACE,
+  DEFAULT_DEPENDENT_SURFACE,
+  SEMANTIC_SURFACE_TONES,
   resolveFieldDependentsChromeClasses,
 } from './field-dependent.variants'

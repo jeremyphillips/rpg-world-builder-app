@@ -1,4 +1,8 @@
-import { dataTableCellTextVariants } from './data-table.variants'
+import {
+  dataTableActionsCellVariants,
+  dataTableActionsHeaderVariants,
+  dataTableCellTextVariants,
+} from './data-table.variants'
 
 /** Shared `ColumnMeta.columnTone` values for DataTable body cell styling. */
 export const dataTableColumnMeta = {
@@ -11,8 +15,14 @@ export const dataTableColumnMeta = {
 
 /** Fixed-width presets for `ColumnMeta.headerClassName` / `cellClassName`. */
 export const dataTableColumnWidths = {
-  /** Thumbnail column (~64px) — fixed at all breakpoints. */
-  image: 'w-16 max-w-16',
+  /**
+   * Thumbnail column — fixed to `dataTableImageVariants` (+ horizontal padding).
+   * 24px image + 16px padding at default; 32px image + 16px padding at lg+.
+   */
+  image: 'w-10 max-w-10 shrink-0 px-2 lg:w-12 lg:max-w-12',
+
+  /** Primary title/name column — fluid; no fixed width cap. */
+  title: 'min-w-0',
 
   tiny: 'whitespace-nowrap lg:w-20 lg:max-w-20',
   tinyCenter: 'whitespace-nowrap text-center lg:w-20 lg:max-w-20',
@@ -31,8 +41,8 @@ export const dataTableColumnWidths = {
   /** Badge/status columns — source, visibility, status. */
   badge: 'whitespace-nowrap lg:w-28 lg:max-w-28',
 
-  /** Actions/menu column. */
-  actions: 'w-12 max-w-12',
+  /** Actions/menu column — width only; pair with `dataTableWidthMeta('actions')` for sticky chrome. */
+  actions: 'w-12 max-w-12 shrink-0',
 
   /** Shrink-to-fit checkbox column. */
   minimal: 'w-px',
@@ -46,6 +56,18 @@ const dataTableCenteredBodyCellLayout = 'text-center [&>svg]:mx-auto [&>svg]:blo
 /** Applies a width preset to both header and body cells. */
 export function dataTableWidthMeta(width: DataTableColumnWidth) {
   const className = dataTableColumnWidths[width]
+  if (width === 'image') {
+    return {
+      headerClassName: className,
+      cellClassName: `${className} overflow-visible`,
+    } as const
+  }
+  if (width === 'actions') {
+    return {
+      headerClassName: dataTableActionsHeaderVariants(),
+      cellClassName: dataTableActionsCellVariants(),
+    } as const
+  }
   if (width === 'compactCenter' || width === 'tinyCenter') {
     return {
       headerClassName: className,

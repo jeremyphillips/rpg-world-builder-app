@@ -1,7 +1,8 @@
-import { SidebarTrigger } from '@rpg/ui'
+import { SidebarTrigger, cn } from '@rpg/ui'
 
 import { useSession } from '@/features/auth'
 
+import { appShellHorizontalPaddingClasses } from './app-shell.variants'
 import { TopbarUserMenu } from './topbar-user-menu'
 
 interface TopbarProps {
@@ -14,7 +15,12 @@ export function Topbar({ sidebarOpen, onToggleSidebar }: TopbarProps) {
   const user = session?.user
 
   return (
-    <header className="flex h-12 items-center justify-between border-b border-border px-6">
+    <header
+      className={cn(
+        'flex h-12 items-center justify-between border-b border-border',
+        appShellHorizontalPaddingClasses,
+      )}
+    >
       <div className="flex items-center gap-2">
         <SidebarTrigger isOpen={sidebarOpen} onClick={onToggleSidebar} className="md:hidden" />
       </div>

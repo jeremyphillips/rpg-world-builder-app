@@ -11,6 +11,7 @@ import {
 } from '@rpg/ui/form/test-utils'
 
 import {
+  contentFormAllFields,
   contentFormFields,
   contentFormRegistry,
   type ContentFormDef,
@@ -107,11 +108,11 @@ describe.each(registryEntries)('ContentFormDef[%s] validation', (routeKey, def) 
   const ctx = routeKey === 'equipment' ? { equipmentKind: 'weapon' as const } : {}
 
   it('registers every configured form field path', () => {
-    assertFieldPathsRegistered(contentFormFields(def, ctx))
+    assertFieldPathsRegistered(contentFormAllFields(def, ctx))
   })
 
   it('registers schema leaf paths in the field error map', () => {
-    const fields = contentFormFields(def, ctx)
+    const fields = contentFormAllFields(def, ctx)
     const schema = def.resolveSchema?.(ctx) ?? def.schema
     const exempt =
       routeKey === 'equipment'
@@ -124,7 +125,7 @@ describe.each(registryEntries)('ContentFormDef[%s] validation', (routeKey, def) 
   })
 
   it('rejects invalid submit without Zod default messages', () => {
-    const fields = contentFormFields(def, ctx)
+    const fields = contentFormAllFields(def, ctx)
     const schema = def.resolveSchema?.(ctx) ?? def.schema
 
     assertInvalidSubmitUsesRefinedMessages(schema, fields, {
@@ -136,7 +137,7 @@ describe.each(registryEntries)('ContentFormDef[%s] validation', (routeKey, def) 
 
 describe.each(EQUIPMENT_KINDS)('equipment form validation — %s', (kind) => {
   const ctx = { equipmentKind: kind }
-  const fields = contentFormFields(equipmentFormDef, ctx)
+  const fields = contentFormAllFields(equipmentFormDef, ctx)
   const schema = resolveEquipmentFormSchema(ctx)
 
   it('registers every configured form field path', () => {
@@ -408,13 +409,13 @@ describe('content form schema factories', () => {
   })
 
   it('species and class campaign-aware schemas reject basics without Zod defaults', () => {
-    const speciesFields = contentFormFields(contentFormRegistry.species!, {})
+    const speciesFields = contentFormAllFields(contentFormRegistry.species!, {})
     const speciesSchema = createSpeciesFormSchema(['humanoid'])
     assertInvalidSubmitUsesRefinedMessages(speciesSchema, speciesFields, {
       invalidValue: invalidValueFor('species'),
     })
 
-    const classFields = contentFormFields(contentFormRegistry.classes!, {})
+    const classFields = contentFormAllFields(contentFormRegistry.classes!, {})
     const classSchema = createClassFormSchema(MAX_CHARACTER_LEVEL)
     assertInvalidSubmitUsesRefinedMessages(classSchema, classFields, {
       invalidValue: invalidValueFor('classes'),
@@ -423,7 +424,7 @@ describe('content form schema factories', () => {
   })
 
   it('feat schema with prerequisite slot', () => {
-    const fields = contentFormFields(contentFormRegistry.feats!, {})
+    const fields = contentFormAllFields(contentFormRegistry.feats!, {})
     const schema = createFeatFormSchema(MAX_CHARACTER_LEVEL)
     assertInvalidSubmitUsesRefinedMessages(schema, fields, {
       invalidValue: invalidValueFor('feats'),

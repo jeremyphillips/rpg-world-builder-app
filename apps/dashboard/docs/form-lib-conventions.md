@@ -194,6 +194,27 @@ this table when completing a form-lib alignment phase.
 | Equipment families       | `equipment/*/lib/*-form-fields.ts`, `*-form-values.ts`                                                                                                                                                     | aligned |
 | Feats                    | `feats/lib/feat-form-def.ts`, `feat-form-fields.ts`, `feat-form-values.ts`                                                                                                                                 | aligned |
 | Skill proficiencies      | `skill-proficiencies/lib/skill-proficiency-form-def.ts`, `*-form-fields.ts`, `*-form-values.ts`                                                                                                            | aligned |
+| Campaign access          | `content/lib/campaign-access/` — see [campaign-access README](../src/features/content/lib/campaign-access/README.md) for unified save session, disclosure, and participant context                         | aligned |
+
+### Form config first (no parallel layout paths)
+
+**Rule:** Do not hand-build form section chrome (legends, disclosure headers, settings rows,
+panel/outline stacks) in feature components when `FormItem[]` can express it.
+
+- **Fields** — `type` / `kind: 'slot'` entries in `*-form-fields.ts`; labels, hints, `info`,
+  `labelPosition`, `separator`, and disabled state live in config.
+- **Containers** — `kind: 'group' | 'row' | 'stack' | 'dependent'` with `chrome` for
+  visual treatment and `disclosure` for compact settings sections (campaign access is
+  the reference implementation).
+- **Persistence** — may stay in a section shell (`CampaignAccessSection`, create/edit
+  shells) when it uses a separate API or RHF form — but the **rendered UI** must still flow
+  through `FormProvider` + `FormItems` over the field builder.
+- **Escape hatch** — `kind: 'slot'` for behavior that truly cannot be config-shaped (e.g.
+  availability preflight switch). Extend `@rpg/ui/form` when the same pattern appears twice
+  instead of adding a second layout system.
+
+Detail: [packages/ui/docs/forms.md](../../../../packages/ui/docs/forms.md),
+[packages/ui/docs/forms/containers.md](../../../../packages/ui/docs/forms/containers.md).
 
 **Legacy rename:** equipment formerly used `*-form-input.ts`; target suffix is
 `*-form-values.ts` (completed).

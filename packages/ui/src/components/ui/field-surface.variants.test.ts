@@ -1,10 +1,8 @@
 import { describe, expect, it } from 'vitest'
 
-import {
-  FIELD_STATUS_TONES,
-  FIELD_SURFACE_VARIANTS,
-  resolveFieldContainerChromeClasses,
-} from './field-surface.variants'
+import { SEMANTIC_SURFACE_TONES } from './surface.variants'
+import { resolveFieldContainerChromeClasses } from './field-surface.variants'
+import { DEFAULT_DEPENDENT_SURFACE } from './surface.variants'
 
 const APPROVED_SURFACE_TOKENS = [
   'border-border',
@@ -35,31 +33,37 @@ function expectOnlyApprovedTokens(classes: string, approved: string[]) {
 }
 
 describe('resolveFieldContainerChromeClasses', () => {
-  it.each(FIELD_SURFACE_VARIANTS)('uses approved tokens for surface %s', (surface) => {
-    const classes = resolveFieldContainerChromeClasses({ surface })
+  it('uses approved tokens for default dependent surface', () => {
+    const classes = resolveFieldContainerChromeClasses({ surface: DEFAULT_DEPENDENT_SURFACE })
     expectOnlyApprovedTokens(classes, APPROVED_SURFACE_TOKENS)
   })
 
-  it.each(FIELD_STATUS_TONES)('uses approved tokens for status %s', (status) => {
-    const classes = resolveFieldContainerChromeClasses({ status })
+  it.each(SEMANTIC_SURFACE_TONES)('uses approved tokens for tone %s', (tone) => {
+    const classes = resolveFieldContainerChromeClasses({ tone })
     expectOnlyApprovedTokens(classes, APPROVED_STATUS_TOKENS)
   })
 
-  it('composes surface and status without neutral wash underneath', () => {
-    const classes = resolveFieldContainerChromeClasses({ surface: 'subtle', status: 'warning' })
+  it('composes surface and tone without neutral wash underneath', () => {
+    const classes = resolveFieldContainerChromeClasses({
+      surface: DEFAULT_DEPENDENT_SURFACE,
+      tone: 'warning',
+    })
     expect(classes).toContain('border-warning-muted')
     expect(classes).toContain('bg-warning-subtle')
     expect(classes).not.toContain('bg-surface-subtle')
   })
 
-  it('defaults surface behavior to subtle when only status is set', () => {
-    const classes = resolveFieldContainerChromeClasses({ status: 'warning' })
+  it('defaults surface behavior to subtle when only tone is set', () => {
+    const classes = resolveFieldContainerChromeClasses({ tone: 'warning' })
     expect(classes).toContain('border-warning-muted')
     expect(classes).toContain('bg-warning-subtle')
   })
 
-  it('keeps raised shadow when surface is raised and status is present', () => {
-    const classes = resolveFieldContainerChromeClasses({ surface: 'raised', status: 'warning' })
+  it('keeps raised shadow when elevation is raised and tone is present', () => {
+    const classes = resolveFieldContainerChromeClasses({
+      surface: { elevation: 'raised' },
+      tone: 'warning',
+    })
     expect(classes).toContain('shadow-surface-raised')
     expect(classes).toContain('bg-warning-subtle')
     expect(classes).not.toContain('bg-card')

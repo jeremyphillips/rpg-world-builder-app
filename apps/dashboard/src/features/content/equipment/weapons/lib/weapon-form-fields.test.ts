@@ -41,11 +41,11 @@ describe('weapon kindFieldGroups', () => {
   it('uses panel chrome on the weapon group and raised panel on Damage', () => {
     const weaponGroup = assertWeaponGroup(weaponFormFieldGroup(FORM_CTX))
     expect(weaponGroup).toMatchObject({
-      fieldsChrome: { variant: 'panel' },
+      chrome: { variant: 'panel' },
     })
     const damageGroup = damageGroupFromWeaponGroup(weaponGroup)
     expect(damageGroup).toMatchObject({
-      fieldsChrome: { variant: 'panel', tone: 'raised' },
+      chrome: { variant: 'panel', elevation: 'raised' },
     })
   })
 

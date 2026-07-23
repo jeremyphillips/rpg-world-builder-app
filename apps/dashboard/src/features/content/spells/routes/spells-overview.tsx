@@ -1,6 +1,6 @@
 import { useParams } from 'react-router-dom'
-import { DataTable } from '@rpg/ui'
-import type { Spell } from '@rpg/contracts'
+import type { Spell, WithCampaignAccess } from '@rpg/contracts'
+import type { ColumnDef } from '@rpg/ui'
 
 import { ROUTES } from '@/app/routes'
 import { useSpellSchoolVocabulary } from '@/features/homebrew'
@@ -8,24 +8,11 @@ import {
   formatContentCollectionAvailabilityCaption,
   formatContentCreateHeading,
   getContentTypeCollectionLabel,
-  getContentTypeMidSentenceLabel,
 } from '@/features/content/lib/content-type-labels'
 import { useSpells } from '../hooks/use-spells'
 import { spellsColumns, spellsFilters } from '../lib/spells-overview-columns'
 import { ContentOverviewShell } from '../../lib/overview/content-overview-shell'
-import { ContentOverviewRowActions } from '../../lib/overview/content-overview-row-actions'
-
-function SpellRowActions({ row, campaignId }: { row: Spell; campaignId: string }) {
-  return (
-    <ContentOverviewRowActions
-      campaignId={campaignId}
-      editHref={ROUTES.content.spells.edit(campaignId, row.id)}
-      enabled={true}
-      onToggleEnabled={() => {}}
-      itemLabel={getContentTypeMidSentenceLabel('spells')}
-    />
-  )
-}
+import { ContentOverviewTable } from '../../lib/overview/content-overview-table.client'
 
 export function SpellsOverview() {
   const { campaignId = '' } = useParams<{ campaignId: string }>()
@@ -41,12 +28,19 @@ export function SpellsOverview() {
       newHref={ROUTES.content.spells.create(campaignId)}
       newLabel={formatContentCreateHeading('spells')}
     >
-      <DataTable
-        columns={spellsColumns(campaignId, spellSchoolVocabulary)}
-        data={spells}
+      <ContentOverviewTable<WithCampaignAccess<Spell>>
+        contentTypeKey="spells"
+        campaignId={campaignId}
+        columns={
+          spellsColumns(campaignId, spellSchoolVocabulary) as ColumnDef<
+            WithCampaignAccess<Spell>,
+            unknown
+          >[]
+        }
         filters={spellsFilters(spellSchoolVocabulary)}
-        rowActions={(row) => <SpellRowActions row={row} campaignId={campaignId} />}
+        data={spells as WithCampaignAccess<Spell>[]}
         caption={formatContentCollectionAvailabilityCaption('spells')}
+        getEditHref={(row) => ROUTES.content.spells.edit(campaignId, row.id)}
       />
     </ContentOverviewShell>
   )

@@ -1,7 +1,7 @@
 import type { ContentSource } from '@rpg/contracts'
 
 import {
-  combineAvailabilityReasons,
+  resolveAvailability,
   resolveAvailabilityBadge,
   type Availability,
   type AvailabilityReason,
@@ -10,7 +10,6 @@ import type { ContentFormCtx } from '../forms/content-form-registry'
 import type { BadgeAppearance, BadgeTone } from '@rpg/ui'
 
 import type { MasterDetailListBadge } from '../../components/master-detail/master-detail-list-panel.client'
-import { isContentRowActive } from './content-campaign-availability'
 
 export type EmbeddedRowSource = 'system' | 'homebrew'
 
@@ -26,8 +25,6 @@ export interface ResolveEmbeddedRowMetaParams {
   row: { id?: string } | undefined
   entitySource: ContentFormCtx['entitySource']
   seedRowIds?: ReadonlySet<string>
-  activeById: Record<string, boolean>
-  rowKey: string
   extraReasons?: readonly AvailabilityReason[]
 }
 
@@ -35,7 +32,6 @@ export interface EmbeddedRowMeta {
   source: EmbeddedRowSource
   deletable: boolean
   badges: MasterDetailListBadge[]
-  active: boolean
   availability: Availability
 }
 
@@ -56,14 +52,10 @@ export function resolveEmbeddedRowMeta({
   row,
   entitySource,
   seedRowIds,
-  activeById,
-  rowKey,
   extraReasons = [],
 }: ResolveEmbeddedRowMetaParams): EmbeddedRowMeta {
   const source = resolveEmbeddedRowSource(row, entitySource, seedRowIds)
-  const activeByToggle = isContentRowActive(activeById, rowKey)
-  const availability = combineAvailabilityReasons(activeByToggle, extraReasons)
-  const active = availability.status === 'active'
+  const availability = resolveAvailability(extraReasons)
   const badges: MasterDetailListBadge[] = [SOURCE_BADGE[source]]
 
   const availabilityBadge = resolveAvailabilityBadge(availability)
@@ -75,7 +67,6 @@ export function resolveEmbeddedRowMeta({
     source,
     deletable: source !== 'system',
     badges,
-    active,
     availability,
   }
 }

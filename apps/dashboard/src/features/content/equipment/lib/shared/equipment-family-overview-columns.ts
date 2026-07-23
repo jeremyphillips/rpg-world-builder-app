@@ -5,7 +5,7 @@ import type { EquipmentFamilyPath } from './equipment-family-paths'
 
 export type FamilyTableConfig = {
   columns: ColumnDef<Equipment>[]
-  filters: FilterDef[]
+  filters: FilterDef<Equipment>[]
 }
 
 async function loadGenericFamilyTableConfig(campaignId: string): Promise<FamilyTableConfig> {

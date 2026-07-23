@@ -6,23 +6,17 @@ import { QueryClientProvider } from '@tanstack/react-query'
 vi.mock('../api/subclasses-api', () => ({
   createSubclass: vi.fn(),
   updateSubclass: vi.fn(),
-  updateSubclassAvailability: vi.fn(),
   deleteSubclass: vi.fn(),
 }))
 
 import { makeTestQueryClient } from '@/test/render'
 import { pickSubclass } from '../../lib/fixtures/pick'
-import { createSubclass, updateSubclass, updateSubclassAvailability } from '../api/subclasses-api'
-import {
-  useCreateSubclass,
-  useUpdateSubclass,
-  useUpdateSubclassAvailability,
-} from './use-subclass-mutations'
+import { createSubclass, updateSubclass } from '../api/subclasses-api'
+import { useCreateSubclass, useUpdateSubclass } from './use-subclass-mutations'
 import { subclassesQueryKey } from './use-subclasses'
 
 const mockCreateSubclass = vi.mocked(createSubclass)
 const mockUpdateSubclass = vi.mocked(updateSubclass)
-const mockUpdateSubclassAvailability = vi.mocked(updateSubclassAvailability)
 
 function makeTestWrapper() {
   const queryClient = makeTestQueryClient()
@@ -37,7 +31,6 @@ describe('use-subclass-mutations', () => {
   beforeEach(() => {
     mockCreateSubclass.mockReset()
     mockUpdateSubclass.mockReset()
-    mockUpdateSubclassAvailability.mockReset()
     mockCreateSubclass.mockResolvedValue({
       ...pickSubclass('champion'),
       id: 'sub_new',
@@ -53,11 +46,6 @@ describe('use-subclass-mutations', () => {
       name: 'Champion (edited)',
       source: 'homebrew',
       status: 'published',
-    })
-    mockUpdateSubclassAvailability.mockResolvedValue({
-      campaignId: 'camp_1',
-      targetId: 'sub_existing',
-      activeInCampaign: false,
     })
   })
 
@@ -101,29 +89,6 @@ describe('use-subclass-mutations', () => {
       'srd-cc-5.2.1:fighter',
       'sub_existing',
       { name: 'Champion (edited)' },
-    )
-    expect(invalidateSpy).toHaveBeenCalledWith({
-      queryKey: subclassesQueryKey('camp_1', 'srd-cc-5.2.1:fighter'),
-    })
-  })
-
-  it('updates availability via the dedicated route', async () => {
-    const { Wrapper, invalidateSpy } = makeTestWrapper()
-    const { result } = renderHook(
-      () => useUpdateSubclassAvailability('camp_1', 'srd-cc-5.2.1:fighter'),
-      { wrapper: Wrapper },
-    )
-
-    await result.current.mutateAsync({
-      subclassId: 'sub_existing',
-      activeInCampaign: false,
-    })
-
-    expect(mockUpdateSubclassAvailability).toHaveBeenCalledWith(
-      'camp_1',
-      'srd-cc-5.2.1:fighter',
-      'sub_existing',
-      false,
     )
     expect(invalidateSpy).toHaveBeenCalledWith({
       queryKey: subclassesQueryKey('camp_1', 'srd-cc-5.2.1:fighter'),

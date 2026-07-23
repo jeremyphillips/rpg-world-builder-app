@@ -6,21 +6,19 @@ import {
 
 export type {
   FieldContainerChromeOptions,
-  FieldGroupOutlineTone,
-  FieldGroupPanelTone,
-  FieldStatusTone,
-  FieldSurfaceVariant,
+  SemanticSurfaceTone,
+  SurfaceChromeConfig,
 } from './field-surface.variants'
 export {
-  FIELD_STATUS_TONES,
-  FIELD_SURFACE_VARIANTS,
+  DEFAULT_ARRAY_ITEM_SURFACE,
+  DEFAULT_DEPENDENT_SURFACE,
+  DEFAULT_PANEL_SURFACE,
   fieldGroupBodyShellLayoutClasses,
   isCompactLabelTone,
-  isFieldStatusTone,
-  isFieldSurfaceVariant,
   resolveFieldContainerChromeClasses,
-  resolveFieldGroupOutlineToneClasses,
-  resolveFieldGroupPanelToneClasses,
+  resolveOutlineBorderClasses,
+  resolveSurfaceClasses,
+  SEMANTIC_SURFACE_TONES,
 } from './field-surface.variants'
 
 /** Where dependent chrome applies on toggle-dependent sections. */

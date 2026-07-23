@@ -6,6 +6,7 @@ import {
   buildSkillProficiencyFields,
   skillProficiencyDraftFormSchema,
   skillProficiencyFormSchema,
+  skillProficiencyNameField,
   type SkillProficiencyFormValues,
 } from './skill-proficiency-form-fields'
 import {
@@ -23,6 +24,7 @@ const skillProficiencyFormDef: ContentFormDef<
   schema: skillProficiencyFormSchema,
   draftSchema: skillProficiencyDraftFormSchema,
   coverage: 'structural',
+  nameField: skillProficiencyNameField,
   createDefaultValues: skillProficiencyCreateDefaultValues,
   buildFields: buildSkillProficiencyFields,
   toFormValues: skillProficiencyToFormValues,

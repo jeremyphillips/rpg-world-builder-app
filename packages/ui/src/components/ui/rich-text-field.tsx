@@ -11,9 +11,10 @@ import type {
   RichTextLinkPickerInternalOption,
 } from './rich-text-link-picker.client'
 
+import type { FieldChromeProps } from './field-chrome.variants'
 import type { FieldValidationProps } from './field-validation-props'
 
-export interface RichTextFieldProps extends FieldValidationProps {
+export interface RichTextFieldProps extends FieldValidationProps, FieldChromeProps {
   id: string
   label: string
   hint?: string
@@ -58,6 +59,7 @@ export function RichTextField({
   value,
   onChange,
   onBlur,
+  chrome,
 }: RichTextFieldProps) {
   return (
     <Field.Root
@@ -91,6 +93,8 @@ export function RichTextField({
             onBlur={onBlur}
           />
         }
+        chrome={chrome}
+        size={size}
       />
     </Field.Root>
   )

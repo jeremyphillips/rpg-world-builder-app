@@ -72,7 +72,7 @@ const dependentFields: FormItem[] = [
       hint: 'Enable to configure the threshold below.',
     },
     dependents: {
-      surface: 'subtle',
+      surface: { emphasis: 'subtle' },
       fields: dependentFieldItems,
     },
   },
@@ -89,7 +89,7 @@ const dependentErrorToneFields: FormItem[] = [
       defaultValue: true,
     },
     dependents: {
-      status: 'destructive',
+      tone: 'destructive',
       fields: [
         {
           type: 'number',
@@ -130,7 +130,7 @@ const selectDependentFields: FormItem[] = [
         dependsOn: ['classPolicyMode'],
         visibleWhen: (values) => values.classPolicyMode !== 'all',
       },
-      surface: 'subtle',
+      surface: { emphasis: 'subtle' },
       fields: [
         {
           type: 'combobox',
@@ -195,7 +195,7 @@ export const DependentFieldComfortable: Story = {
           defaultValue: true,
         },
         dependents: {
-          surface: 'subtle',
+          surface: { emphasis: 'subtle' },
           fields: dependentFieldItems,
         },
       },
@@ -239,7 +239,7 @@ export const DependentFieldArrayItemsScope: Story = {
             defaultValue: true,
           },
           dependents: {
-            surface: 'subtle',
+            surface: { emphasis: 'subtle' },
             scope: 'arrayItems',
             fields: [
               {

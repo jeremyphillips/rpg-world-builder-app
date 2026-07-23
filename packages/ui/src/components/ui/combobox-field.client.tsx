@@ -20,6 +20,7 @@ import type {
   ComboboxRenderSelectedItem,
 } from './combobox-field.types'
 import type { SelectFieldValueProps } from './select-field-value-props'
+import type { FieldChromeProps } from './field-chrome.variants'
 import { resolveSelectPlaceholder } from '../../form/config/field-placeholder.lib'
 import { useComboboxControl } from './use-combobox-control.client'
 
@@ -29,7 +30,7 @@ export type {
   ComboboxSelectedItemRenderContext,
 } from './combobox-field.types'
 
-export interface ComboboxFieldProps extends SelectFieldValueProps {
+export interface ComboboxFieldProps extends SelectFieldValueProps, FieldChromeProps {
   id: string
   label: string
   options: ComboboxFieldOption[]
@@ -142,6 +143,7 @@ export function ComboboxField({
   enableSearch = true,
   renderSelectedItem,
   hintPosition,
+  chrome,
 }: ComboboxFieldProps) {
   const selected = React.useMemo(() => normalizeSelected(multiple, value), [multiple, value])
   const resolvedPlaceholder = resolveSelectPlaceholder(label, placeholder)
@@ -183,6 +185,8 @@ export function ComboboxField({
             renderSelectedItem={renderSelectedItem}
           />
         }
+        chrome={chrome}
+        size={size}
       />
     </Field.Root>
   )

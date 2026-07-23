@@ -14,7 +14,6 @@ import {
   subclassChoiceFeatureLabel,
   subclassChoiceFeatureLevel,
   subclassPatchSchema,
-  subclassCampaignAvailabilitySchema,
   resolvedSubclassSchema,
   subclassSchema,
   updateClassInputSchema,
@@ -308,7 +307,7 @@ describe('subclassSchema', () => {
 })
 
 describe('resolvedSubclassSchema', () => {
-  it('extends subclass with activeInCampaign list metadata', () => {
+  it('extends subclass with campaignAccess list metadata', () => {
     expect(
       resolvedSubclassSchema.parse({
         id: 'srd-cc-5.2.1:champion',
@@ -320,9 +319,15 @@ describe('resolvedSubclassSchema', () => {
         ...timestamps,
         classId: fighter.id,
         name: 'Champion',
-        activeInCampaign: false,
-      }).activeInCampaign,
-    ).toBe(false)
+        campaignAccess: {
+          available: false,
+          visibilityMode: 'all_players',
+          participantIds: [],
+          unavailableParticipantIds: [],
+          effectiveAudience: 'none',
+        },
+      }).campaignAccess.effectiveAudience,
+    ).toBe('none')
   })
 })
 
@@ -384,17 +389,6 @@ describe('subclassPatchSchema', () => {
     }
     expect(subclassPatchSchema.safeParse(patch).success).toBe(true)
     expect(subclassPatchSchema.parse(patch).patch).toEqual({ name: 'Champion (Custom)' })
-  })
-})
-
-describe('subclassCampaignAvailabilitySchema', () => {
-  it('parses campaign-scoped active flag', () => {
-    const availability = {
-      campaignId: 'camp_1',
-      targetId: 'srd-cc-5.2.1:champion',
-      activeInCampaign: false,
-    }
-    expect(subclassCampaignAvailabilitySchema.parse(availability)).toEqual(availability)
   })
 })
 

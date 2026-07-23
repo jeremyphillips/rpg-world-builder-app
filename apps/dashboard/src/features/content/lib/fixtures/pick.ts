@@ -1,5 +1,6 @@
 import { getClassBySlug, getSubclassBySlug, loadSubclassesByClassId } from '@rpg/catalog/classes'
 import type { ResolvedSubclass } from '@rpg/contracts'
+import { DEFAULT_CONTENT_CAMPAIGN_ACCESS } from '@rpg/contracts'
 import { getEquipmentBySlug } from '@rpg/catalog/equipment'
 import { getFeatBySlug } from '@rpg/catalog/feats'
 import { getSkillProficiencyBySlug } from '@rpg/catalog/skill-proficiencies'
@@ -32,7 +33,7 @@ export function pickSubclassesForClass(classSlug: string): ResolvedSubclass[] {
   const classId = `${STORY_RULESET_ID}:${classSlug}`
   return loadSubclassesByClassId(STORY_RULESET_ID, classId).map((subclass) => ({
     ...subclass,
-    activeInCampaign: true,
+    campaignAccess: DEFAULT_CONTENT_CAMPAIGN_ACCESS,
   }))
 }
 

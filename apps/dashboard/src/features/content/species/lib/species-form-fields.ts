@@ -18,7 +18,7 @@ import { toOptions, type FormItem, type TabbedFormTab } from '@rpg/ui/form'
 import { vocabularyFieldLabel, vocabularySelectFieldForTerm } from '@/features/homebrew'
 
 import { getCharacterCreatureTypeFieldOptions } from './creature-type-field-options'
-import { descriptionField, nameField } from '../../lib/forms/fields/content-identity-form-fields'
+import { descriptionField } from '../../lib/forms/fields/content-identity-form-fields'
 import type { ContentFormCtx } from '../../lib/forms/content-form-registry'
 import {
   embeddedArrayResolverField,
@@ -174,7 +174,7 @@ export function buildSpeciesTabs(ctx: ContentFormCtx): TabbedFormTab[] {
     {
       id: 'basics',
       label: 'Basics',
-      fields: [nameField(), ...attributesFields(ctx), cultureFields(ctx), descriptionField(ctx)],
+      fields: [...attributesFields(ctx), cultureFields(ctx), descriptionField(ctx)],
     },
     {
       id: 'traits',

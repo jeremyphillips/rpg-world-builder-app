@@ -1,8 +1,8 @@
 import type { MasterDetailListBadge } from '@/features/content/components/master-detail/master-detail-list-panel.client'
-import { INACTIVE_ROW_BADGE_LABEL } from '@/features/content/lib/master-detail/content-campaign-availability'
 
 import {
   AVAILABILITY_REASON_CODES,
+  INACTIVE_ROW_BADGE_LABEL,
   getAvailabilityReasonDefinition,
   severityRank,
   type AvailabilityReasonCode,

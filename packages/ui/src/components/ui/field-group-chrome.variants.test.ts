@@ -8,16 +8,22 @@ describe('resolveFieldGroupChromeClassNames', () => {
       fieldset: '',
       body: '',
       legend: '',
-      isCollapsible: false,
     })
   })
 
   it('applies inset body classes', () => {
     const classes = resolveFieldGroupChromeClassNames({ variant: 'inset' })
     expect(classes.body).toContain('border-l-2')
-    expect(classes.body).toContain('pl-6')
+    expect(classes.body).toContain('pl-4')
     expect(classes.body).toContain('sm:pl-8')
     expect(classes.body).toContain('border-border')
+  })
+
+  it('applies compact inset padding when rhythm is compact', () => {
+    const classes = resolveFieldGroupChromeClassNames({ variant: 'inset' }, { rhythm: 'compact' })
+    expect(classes.body).toContain('pl-4')
+    expect(classes.body).toContain('sm:pl-5')
+    expect(classes.body).not.toContain('sm:pl-8')
   })
 
   it('applies primary inset tone', () => {
@@ -36,12 +42,12 @@ describe('resolveFieldGroupChromeClassNames', () => {
   })
 
   it('applies muted panel tone', () => {
-    const classes = resolveFieldGroupChromeClassNames({ variant: 'panel', tone: 'muted' })
+    const classes = resolveFieldGroupChromeClassNames({ variant: 'panel', emphasis: 'default' })
     expect(classes.body).toContain('bg-surface-muted')
   })
 
   it('applies elevated panel tone', () => {
-    const classes = resolveFieldGroupChromeClassNames({ variant: 'panel', tone: 'raised' })
+    const classes = resolveFieldGroupChromeClassNames({ variant: 'panel', elevation: 'raised' })
     expect(classes.body).toContain('bg-card')
     expect(classes.body).toContain('shadow-surface-raised')
   })
@@ -50,7 +56,7 @@ describe('resolveFieldGroupChromeClassNames', () => {
     const classes = resolveFieldGroupChromeClassNames({ variant: 'outline' })
     expect(classes.fieldset).toBe('')
     expect(classes.body).toContain('rounded-md')
-    expect(classes.body).toContain('border-border')
+    expect(classes.body).toContain('border-border-subtle')
     expect(classes.body).toContain('bg-transparent')
   })
 
@@ -100,16 +106,5 @@ describe('resolveFieldGroupChromeClassNames', () => {
     })
     expect(classes.legend).toContain('before:bg-primary')
     expect(classes.legend).toContain('w-full')
-  })
-
-  it('marks collapsible chrome', () => {
-    const classes = resolveFieldGroupChromeClassNames({
-      variant: 'collapsible',
-      defaultOpen: false,
-      collapseKey: 'advanced',
-    })
-    expect(classes.isCollapsible).toBe(true)
-    expect(classes.defaultOpen).toBe(false)
-    expect(classes.collapseKey).toBe('advanced')
   })
 })

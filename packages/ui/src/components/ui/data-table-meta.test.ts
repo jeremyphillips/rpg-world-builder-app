@@ -20,9 +20,27 @@ describe('dataTableWidthMeta', () => {
     expect(dataTableColumnWidths.compact).not.toMatch(/^w-24/)
   })
 
-  it('keeps image and minimal fixed at all breakpoints', () => {
-    expect(dataTableColumnWidths.image).toBe('w-16 max-w-16')
+  it('sizes image column to thumbnail dimensions (+ padding)', () => {
+    expect(dataTableColumnWidths.image).toContain('w-10')
+    expect(dataTableColumnWidths.image).toContain('lg:w-12')
+    expect(dataTableWidthMeta('image').cellClassName).toContain('overflow-visible')
+  })
+
+  it('keeps title columns fluid without fixed caps', () => {
+    expect(dataTableColumnWidths.title).toBe('min-w-0')
+    expect(dataTableWidthMeta('title').cellClassName).toBe('min-w-0')
+  })
+
+  it('keeps minimal column shrink-to-fit', () => {
     expect(dataTableColumnWidths.minimal).toBe('w-px')
+  })
+
+  it('pins actions column with sticky trailing chrome', () => {
+    const meta = dataTableWidthMeta('actions')
+    expect(meta.headerClassName).toContain('sticky')
+    expect(meta.headerClassName).toContain('bg-surface-strong')
+    expect(meta.cellClassName).toContain('sticky')
+    expect(meta.cellClassName).toContain('bg-surface-muted')
   })
 
   it('includes compact center alignment preset', () => {

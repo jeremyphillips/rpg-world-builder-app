@@ -10,7 +10,7 @@ const SKILL_MIDDLE_COLUMNS: ColumnDef<SkillProficiency>[] = [
   {
     accessorKey: 'ability',
     header: ({ column }) => <SortableHeader column={column}>Ability</SortableHeader>,
-    cell: ({ row }) => row.getValue<SkillProficiency['ability']>('ability').toUpperCase(),
+    cell: ({ row }) => row.getValue<SkillProficiency['ability']>('ability')?.toUpperCase() ?? '—',
     filterFn: 'equalsString',
     meta: { label: 'Ability', ...dataTableWidthMeta('tiny'), ...dataTableTypographyMeta('stat') },
   },

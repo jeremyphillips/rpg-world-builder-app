@@ -117,7 +117,7 @@ export function buildStartingWealthTiersField(): LevelRangeArrayConfig {
     max: STARTING_WEALTH_TIER_COUNT,
     rhythm: 'comfortable',
     itemVariant: 'detailed',
-    itemSurface: 'subtle',
+    itemSurface: { emphasis: 'subtle' },
     itemCollapsible: true,
     itemHeader: {
       primaryField: 'label',
@@ -150,7 +150,7 @@ export function buildStartingWealthTiersField(): LevelRangeArrayConfig {
           defaultValue: false,
         },
         dependents: {
-          surface: 'muted',
+          surface: { emphasis: 'default' },
           fields: [
             {
               type: 'inputSelect',
@@ -194,7 +194,7 @@ export function buildStartingWealthTiersField(): LevelRangeArrayConfig {
         min: 0,
         item: {
           variant: 'compact',
-          surface: 'strong',
+          surface: { emphasis: 'strong' },
           header: {
             fallback: (index) => `Grant #${index + 1}`,
             srOnly: true,

@@ -53,7 +53,9 @@ export const dataTableTableWrapVariants = cva(
  * instead of crushing fixed-width columns (e.g. thumbnails). At `lg+`, allow the
  * table to shrink to the container when there is enough room.
  */
-export const dataTableTableVariants = cva('min-w-max text-table-body lg:min-w-0')
+export const dataTableTableVariants = cva(
+  'w-full min-w-max text-table-body lg:min-w-0 lg:table-fixed',
+)
 
 /** Header row — recessed band; hover matches fill so sort controls stay stable. */
 export const dataTableHeaderRowVariants = cva(
@@ -62,12 +64,41 @@ export const dataTableHeaderRowVariants = cva(
 
 /** Body row — uniform fill with row-level hover and selection. */
 export const dataTableRowVariants = cva(
-  'group/row h-14 border-b border-border-subtle hover:bg-row-hover data-[state=selected]:bg-row-selected',
+  'group/row min-h-14 border-b border-border-subtle hover:bg-row-hover data-[state=selected]:bg-row-selected',
+)
+
+/** Catalog thumbnail sizing — 24px default, 32px at lg+. Pair with `dataTableWidthMeta('image')`. */
+export const dataTableImageVariants = cva('size-6 shrink-0 rounded-md object-cover lg:size-8')
+
+/** Unavailable / inactive row — faint warning wash (table-safe — no pseudo-elements on `<tr>`). */
+export const dataTableRowUnavailableVariants = cva('bg-warning-faint')
+
+/**
+ * Leading-cell accent rail for unavailable rows — inset shadow is table-safe unlike `::before` on `<tr>`.
+ * Apply to the first visible cell in an unavailable row.
+ */
+export const dataTableRowUnavailableRailVariants = cva(
+  'shadow-[inset_2px_0_0_var(--color-semantic-warning-accent-faint)]',
+)
+
+/** Toolbar notice row below primary filters — hidden counts, filter actions. */
+export const dataTableFilterNoticeVariants = cva(
+  'flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted-foreground',
 )
 
 /** Header cell — group context for sort icon hover/focus affordance. */
 export const dataTableHeaderCellVariants = cva(
   'group/header h-10 bg-transparent text-xs font-semibold tracking-wide text-muted-foreground',
+)
+
+/** Sticky trailing actions header — stays visible during horizontal scroll. */
+export const dataTableActionsHeaderVariants = cva(
+  'sticky right-0 z-20 w-12 max-w-12 shrink-0 border-l border-border bg-surface-strong px-1 text-center',
+)
+
+/** Sticky trailing actions body cell — matches row hover, selection, and unavailable tones. */
+export const dataTableActionsCellVariants = cva(
+  'sticky right-0 z-10 w-12 max-w-12 shrink-0 border-l border-border bg-surface-muted px-1 text-center group-hover/row:bg-row-hover group-data-[state=selected]/row:bg-row-selected [.group\\/row.bg-warning-faint_&]:bg-warning-faint',
 )
 
 /** Tighter body cell padding than the base TableCell default. */

@@ -72,6 +72,7 @@ export function buildNameColumn<T>({
     enableHiding: locked ? false : undefined,
     meta: {
       ...dataTableColumnMeta.identity,
+      ...dataTableWidthMeta('title'),
       label,
       ...(locked ? { locked: true as const } : {}),
     },

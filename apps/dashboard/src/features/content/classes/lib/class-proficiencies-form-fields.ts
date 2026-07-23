@@ -106,7 +106,7 @@ export function proficienciesFields(ctx: ContentFormCtx): FormItem[] {
     {
       kind: 'group',
       legend: 'Defenses',
-      fieldsChrome: { variant: 'outline' },
+      chrome: { variant: 'outline' },
       fields: [
         {
           type: 'chips',
@@ -131,7 +131,7 @@ export function proficienciesFields(ctx: ContentFormCtx): FormItem[] {
     {
       kind: 'group',
       legend: 'Weapons',
-      fieldsChrome: { variant: 'outline' },
+      chrome: { variant: 'outline' },
       fields: [
         {
           type: 'radio',
@@ -167,7 +167,7 @@ export function proficienciesFields(ctx: ContentFormCtx): FormItem[] {
     {
       kind: 'group',
       legend: `Granted ${getProficiencyDomainCompactLabel('skill').toLowerCase()} & tools`,
-      fieldsChrome: { variant: 'outline' },
+      chrome: { variant: 'outline' },
       fields: [
         {
           type: 'chips',
@@ -179,7 +179,7 @@ export function proficienciesFields(ctx: ContentFormCtx): FormItem[] {
         {
           kind: 'group',
           legend: 'Tools',
-          fieldsChrome: { variant: 'panel' },
+          chrome: { variant: 'panel' },
           fields: [
             {
               type: 'chips',

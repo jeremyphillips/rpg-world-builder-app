@@ -5,6 +5,8 @@ Color system for `@rpg/ui`. SSOT for Layer 1 inventory and parity rules:
 
 Storybook catalog: **Design tokens → Color palette** (`color-palette.stories.tsx`).
 
+Visual vocabulary (tone, emphasis, chrome): [visual-vocabulary.md](./visual-vocabulary.md).
+
 ## Three layers
 
 ```text
@@ -66,11 +68,12 @@ Recipes are the public contract; ladder steps are implementation details recipes
 
 ## Border ladder
 
-| Role    | Utility                | Meaning                               |
-| ------- | ---------------------- | ------------------------------------- |
-| Subtle  | `border-border-subtle` | Quiet separators, low-emphasis shells |
-| Default | `border-border`        | Normal component structure            |
-| Strong  | `border-border-strong` | Selected or emphasized structure      |
+| Role    | Utility                | Meaning                                                                                 |
+| ------- | ---------------------- | --------------------------------------------------------------------------------------- |
+| Faint   | `border-border-faint`  | Extra-quiet separators and decorative shells                                            |
+| Subtle  | `border-border-subtle` | Quiet separators, low-emphasis shells (default for field separators and outline chrome) |
+| Default | `border-border`        | Normal component structure                                                              |
+| Strong  | `border-border-strong` | Selected or emphasized structure                                                        |
 
 Status borders stay status-specific (`border-destructive-muted`, …). Recipe borders (e.g.
 `border-row-selected-border`) may alias `--border-strong` or a brand/status role.

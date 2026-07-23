@@ -25,3 +25,17 @@ export function FieldChromeShell({
 
   return <div className={cn(chromeClasses, className)}>{children}</div>
 }
+
+/** Wraps inline checkbox/switch rows when `chrome` is panel or outline. */
+export function wrapFieldInlineControl({
+  chrome,
+  size = 'md',
+  className,
+  children,
+}: FieldChromeShellProps): ReactNode {
+  return (
+    <FieldChromeShell chrome={chrome} size={size} className={className}>
+      {children}
+    </FieldChromeShell>
+  )
+}

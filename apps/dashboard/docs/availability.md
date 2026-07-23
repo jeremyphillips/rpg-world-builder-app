@@ -16,8 +16,9 @@ type Availability = { status: 'active' | 'inactive'; reasons?: AvailabilityReaso
 
 - **`resolveAvailability(reasons)`** — empty reasons → `{ status: 'active' }`.
 - **`combineAvailabilityReasons(activeByCampaignToggle, extraReasons?)`** — merges
-  the manual **Active in campaign** toggle (`not-available-in-campaign` when off)
-  with feature-supplied `extraReasons`.
+  optional extra reasons from feature producers. (Legacy per-row **Active in
+  campaign** toggles were removed; persisted campaign access lives on
+  `campaignAccess` — see content README.)
 - **`resolveAvailabilityBadge(availability)`** — rail-card `Inactive` badge data
   (`MasterDetailListBadge`-compatible).
 - **`resolveAvailabilityAlertVariant(availability)`** — maps primary reason

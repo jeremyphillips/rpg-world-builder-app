@@ -5,6 +5,7 @@ import {
   contentFormFields,
   type ContentFormDef,
 } from '../../lib/forms/content-form-registry'
+import { nameField } from '../../lib/forms/fields/content-identity-form-fields'
 import { useSpells, spellsQueryKey } from '../hooks/use-spells'
 import {
   buildSpellTabs,
@@ -22,6 +23,7 @@ const spellFormDef: ContentFormDef<Spell, SpellFormValues, CreateSpellInput> = {
   routeKey: 'spells',
   schema: spellFormSchema,
   draftSchema: spellDraftFormSchema,
+  nameField,
   coverage: 'roundtrip-only',
   createDefaultValues: spellCreateDefaultValues,
   buildTabs: buildSpellTabs,

@@ -9,6 +9,7 @@ import { FormUnsavedChangesGuard } from '@/lib/form-unsaved-changes-guard'
 
 import { resolveContentFormFooterPresentation } from './content-form-footer.lib'
 import { useContentFormActionState } from './use-content-form-action-state'
+import type { ContentSaveActionState } from './use-content-save-session'
 
 const DISCARD_CHANGES_LABEL = 'Discard changes'
 const CANCEL_LABEL = 'Cancel'
@@ -76,6 +77,10 @@ export interface ContentFormFooterProps<TFieldValues extends FieldValues> {
   onSaveDraft?: (values: TFieldValues, form: UseFormReturn<TFieldValues>) => void | Promise<void>
   saveDraftPending?: boolean
   publishSuccess?: boolean
+  /** Unified save session for edit mode — body + campaign access. */
+  actionState?: ContentSaveActionState
+  /** Create-mode guard: campaign access draft differs from default. */
+  guardHasUnsavedEdits?: boolean
 }
 
 export function ContentFormFooter<TFieldValues extends FieldValues>({
@@ -89,8 +94,11 @@ export function ContentFormFooter<TFieldValues extends FieldValues>({
   onSaveDraft,
   saveDraftPending = false,
   publishSuccess = false,
+  actionState,
+  guardHasUnsavedEdits = false,
 }: ContentFormFooterProps<TFieldValues>) {
-  const { submitDisabled, discardDisabled } = useContentFormActionState({ mode, pending })
+  const fallbackActionState = useContentFormActionState({ mode, pending })
+  const resolvedActionState = actionState ?? fallbackActionState
   const createPending = pending || saveDraftPending
   const presentation = resolveContentFormFooterPresentation({
     mode,
@@ -105,7 +113,7 @@ export function ContentFormFooter<TFieldValues extends FieldValues>({
       <ContentCreateFooterSecondary
         backHref={backHref}
         createPending={createPending}
-        submitDisabled={submitDisabled}
+        submitDisabled={resolvedActionState.submitDisabled}
         saveDraftPending={saveDraftPending}
         onSaveDraft={onSaveDraft}
       />
@@ -113,25 +121,45 @@ export function ContentFormFooter<TFieldValues extends FieldValues>({
       <Button
         type="button"
         variant="outline"
-        disabled={discardDisabled}
-        onClick={() => form.reset()}
+        disabled={resolvedActionState.discardDisabled}
+        onClick={() => {
+          if (actionState) {
+            actionState.discard()
+            return
+          }
+          form.reset()
+        }}
       >
         {DISCARD_CHANGES_LABEL}
       </Button>
     )
 
+  const submitButton =
+    mode === 'edit' && actionState ? (
+      <Button
+        type="button"
+        disabled={resolvedActionState.submitDisabled || pending}
+        onClick={() => void actionState.save()}
+      >
+        {pending ? pendingLabel : submitLabel}
+      </Button>
+    ) : undefined
+
   return (
     <>
-      <FormUnsavedChangesGuard />
+      <FormUnsavedChangesGuard
+        hasUnsavedEdits={resolvedActionState.hasUnsavedEdits || guardHasUnsavedEdits}
+      />
       <FormFooterActions
         secondary={secondary}
         pending={pending}
-        submitDisabled={submitDisabled}
+        submitDisabled={resolvedActionState.submitDisabled}
         secondaryDisabled={createPending}
         isSuccess={presentation.isSuccess}
         submitLabel={presentation.submitLabel}
         pendingLabel={presentation.pendingLabel}
         successMessage={presentation.successMessage}
+        submitButton={submitButton}
       />
     </>
   )

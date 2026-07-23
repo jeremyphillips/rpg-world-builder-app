@@ -10,10 +10,12 @@ import {
 } from './field.variants'
 import type { FieldWidth } from './field-control.variants'
 
+import { FieldChromeShell } from './field-chrome-shell'
+import type { FieldChromeProps } from './field-chrome.variants'
 import type { FieldValidationProps } from './field-validation-props'
 
 export interface CheckboxFieldProps
-  extends Omit<ComponentProps<typeof Checkbox>, 'id'>, FieldValidationProps {
+  extends Omit<ComponentProps<typeof Checkbox>, 'id'>, FieldValidationProps, FieldChromeProps {
   id: string
   label: string
   hint?: string
@@ -35,6 +37,7 @@ export function CheckboxField({
   required,
   width,
   size = 'md',
+  chrome,
   ...checkboxProps
 }: CheckboxFieldProps) {
   const labelNode = (
@@ -54,17 +57,19 @@ export function CheckboxField({
       width={width}
       size={size}
     >
-      <div className={fieldInlineToggleRowClasses}>
-        <div className={fieldInlineCheckboxControlColumnClasses}>
-          <Field.Control>
-            <Checkbox {...checkboxProps} />
-          </Field.Control>
+      <FieldChromeShell chrome={chrome} size={size}>
+        <div className={fieldInlineToggleRowClasses}>
+          <div className={fieldInlineCheckboxControlColumnClasses}>
+            <Field.Control>
+              <Checkbox {...checkboxProps} />
+            </Field.Control>
+          </div>
+          <div className={fieldLabelHintStackClasses}>
+            {labelNode}
+            <Field.Hint />
+          </div>
         </div>
-        <div className={fieldLabelHintStackClasses}>
-          {labelNode}
-          <Field.Hint />
-        </div>
-      </div>
+      </FieldChromeShell>
       <Field.Error />
     </Field.Root>
   )

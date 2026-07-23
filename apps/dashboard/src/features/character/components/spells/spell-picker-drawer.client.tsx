@@ -336,7 +336,7 @@ export function SpellPickerDrawer({
         emptyStateMessage ? (
           <InsetPanel
             borderStyle="dashed"
-            surface="none"
+            surface={{}}
             size="md"
             align="center"
             className="py-8"

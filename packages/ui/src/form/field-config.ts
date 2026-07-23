@@ -30,10 +30,11 @@ import type {
 } from '../components/ui/inline-sentence-field.types'
 import type {
   FieldDependentsScope,
-  FieldStatusTone,
-  FieldSurfaceVariant,
+  SemanticSurfaceTone,
 } from '../components/ui/field-dependent.variants'
-import type { FieldGroupFieldsChrome } from '../components/ui/field-group-chrome.variants'
+import type { SurfaceConfig } from '../components/ui/visual-vocabulary.types'
+import type { FieldGroupChrome } from '../components/ui/field-group-chrome.variants'
+import type { FieldGroupDisclosure } from '../components/ui/field-group-disclosure.types'
 import type { ArrayAddMenuConfig } from './config/array/array-add-menu.lib'
 import type {
   FieldHintPosition,
@@ -43,7 +44,21 @@ import type {
   FieldRhythm,
 } from '../components/ui/field.variants'
 
-export type { FieldGroupFieldsChrome } from '../components/ui/field-group-chrome.variants'
+export type { FieldGroupChrome } from '../components/ui/field-group-chrome.variants'
+export type {
+  FieldGroupDisclosure,
+  FieldGroupSummary,
+  FieldGroupSummaryDisclosure,
+  ChromeBorderAccent,
+  ChromeConfig,
+  ChromeVariant,
+  ContentTone,
+  SemanticTone,
+  SurfaceConfig,
+  SurfaceElevation,
+  SupportedSemanticChrome,
+  VisualEmphasis,
+} from '../components/ui/field-group-disclosure.types'
 export type { FieldChrome } from '../components/ui/field-chrome.variants'
 
 /** The set of control types the schema-driven `<Form>` renderer can render. */
@@ -227,7 +242,7 @@ interface BaseFieldConfig {
    * narrowly via `useWatch`.
    */
   visibility?: FieldVisibility
-  /** Trailing divider after this field within a group/stack rhythm. */
+  /** Trailing divider after this field — `faint` | `subtle` | `default` | `strong` (border ladder). */
   separator?: FieldSeparator
   /**
    * Visual shell around the full field anatomy (label + control + messages).
@@ -235,9 +250,9 @@ interface BaseFieldConfig {
    *
    * - `{ variant: 'plain' }` — default, no extra shell
    * - `{ variant: 'panel', tone? }` — filled panel wash
-   * - `{ variant: 'outline', tone? }` — border-only inset
+   * - `{ variant: 'outline', tone? }` — border-only inset (`faint` | `subtle` | `default` | `strong`, or semantic tones)
    *
-   * Distinct from container `surface` / `status` chrome on arrays and dependents.
+   * Distinct from container `surface` / `tone` chrome on arrays and dependents.
    */
   chrome?: FieldChrome
   /**
@@ -772,9 +787,17 @@ export type FieldConfig =
   | RollValueFieldConfig
   | InputSelectFieldConfig
   | InputUnitFieldConfig
+
+/** Leaf fields and slots allowed inside a horizontal `kind: 'row'`. */
+export type RowFieldItem = FieldConfig | SlotConfig
+
+export function isRowSlotItem(item: RowFieldItem): item is SlotConfig {
+  return 'kind' in item && item.kind === 'slot'
+}
+
 export interface RowConfig {
   kind: 'row'
-  fields: FieldConfig[]
+  fields: RowFieldItem[]
   className?: string
   /** Trailing divider after this row within a group/stack rhythm. */
   separator?: FieldSeparator
@@ -803,8 +826,8 @@ export interface DependentDependentsConfig {
    * When omitted and the controller is a switch, defaults to "switch is true".
    */
   visibility?: FieldVisibility
-  surface?: FieldSurfaceVariant
-  status?: FieldStatusTone
+  surface?: SurfaceConfig
+  tone?: SemanticSurfaceTone
   /**
    * Where dependent chrome applies.
    *
@@ -850,7 +873,7 @@ export interface DependentConfig {
 /**
  * Named fieldset subsection (`kind: 'group'`).
  *
- * Common options: `legend`, `fields`, `legendSize`, `rhythm`, `fieldsChrome`,
+ * Common options: `legend`, `fields`, `legendSize`, `rhythm`, `chrome`, `disclosure`,
  * `description`, `visibility`.
  *
  * Nested groups inside another group often use `legendSize: 'subsection'`.
@@ -885,10 +908,15 @@ export interface GroupConfig {
   visibility?: FieldVisibility
   /**
    * Visual treatment for the legend + field stack — variants are mutually exclusive.
-   * Shapes: `inset`, `panel`, `outline`, `divider`, `callout`, `accent`, `collapsible`.
-   * Tones vary by variant — see [containers.md](../../docs/forms/containers.md#group-fieldschrome).
+   * Shapes: `inset`, `panel`, `outline`, `divider`, `callout`, `accent`.
+   * Tones vary by variant — see [containers.md](../../docs/forms/containers.md#group-chrome).
    */
-  fieldsChrome?: FieldGroupFieldsChrome
+  chrome?: FieldGroupChrome
+  /**
+   * Open/collapse and summary behavior for the group container.
+   * `legend` — collapsible fieldset; `summary` — collapsed summary + Change/Done chrome.
+   */
+  disclosure?: FieldGroupDisclosure
 }
 
 /** Layout profile for repeatable array item chrome. */
@@ -984,8 +1012,8 @@ export interface ArrayAddActionConfig {
 export interface ArrayItemConfig {
   variant?: ArrayItemVariant
   /** @default raised */
-  surface?: FieldSurfaceVariant
-  status?: FieldStatusTone
+  surface?: SurfaceConfig
+  tone?: SemanticSurfaceTone
   header?: ArrayItemHeaderConfig
   collapsible?: boolean
   collapseKey?: string
@@ -1072,6 +1100,10 @@ export interface SlotConfig {
    * Control + label scale for slot content. Defaults to `sm` (array section default).
    */
   size?: FieldSize
+  /** Trailing divider after this slot within a group/stack rhythm. */
+  separator?: FieldSeparator
+  /** Panel or outline shell around slot content. */
+  chrome?: FieldChrome
 }
 
 /**
@@ -1297,6 +1329,7 @@ export function buildDefaultValues(items: FormItem[]): Record<string, unknown> {
       assignFieldDefaultValues(item, values)
     } else if (item.kind === 'row') {
       for (const field of item.fields) {
+        if (isRowSlotItem(field)) continue
         assignFieldDefaultValues(field, values)
       }
     } else if (item.kind === 'group') {

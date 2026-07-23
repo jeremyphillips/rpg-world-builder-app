@@ -2,10 +2,9 @@
 
 import * as React from 'react'
 
-import { cn } from '../../lib/utils'
 import { Text, type TextProps } from './text'
 import {
-  insetPanelVariants,
+  insetPanelClassNames,
   resolveInsetPanelTextVariant,
   type InsetPanelSize,
   type InsetPanelVariantProps,
@@ -35,10 +34,13 @@ const InsetPanelRoot = React.forwardRef<HTMLDivElement, InsetPanelProps>(
       <InsetPanelContext.Provider value={{ size: resolvedSize }}>
         <div
           ref={ref}
-          className={cn(
-            insetPanelVariants({ surface, borderStyle, size: resolvedSize, align }),
+          className={insetPanelClassNames({
+            surface,
+            borderStyle,
+            size: resolvedSize,
+            align,
             className,
-          )}
+          })}
           {...props}
         >
           {children}

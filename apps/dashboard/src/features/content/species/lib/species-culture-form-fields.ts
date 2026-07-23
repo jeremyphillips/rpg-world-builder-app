@@ -90,7 +90,7 @@ export function cultureFields(ctx: ContentFormCtx): FormItem {
     kind: 'group',
     legend: 'Culture',
     legendSize: 'subsection',
-    fieldsChrome: { variant: 'panel', tone: 'subtle' },
+    chrome: { variant: 'panel', emphasis: 'subtle' },
     fields: [
       {
         type: 'switch',

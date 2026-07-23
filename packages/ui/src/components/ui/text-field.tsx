@@ -6,10 +6,11 @@ import type { FieldSize } from './field.client'
 import type { FieldWidth } from './field-control.variants'
 import type { FieldHintPosition } from './field.variants'
 
+import type { FieldChromeProps } from './field-chrome.variants'
 import type { FieldValidationProps } from './field-validation-props'
 
 export interface TextFieldProps
-  extends Omit<React.ComponentProps<typeof Input>, 'id'>, FieldValidationProps {
+  extends Omit<React.ComponentProps<typeof Input>, 'id'>, FieldValidationProps, FieldChromeProps {
   id: string
   label: string
   hint?: string
@@ -40,6 +41,7 @@ export const TextField = React.forwardRef<HTMLInputElement, TextFieldProps>(
       required,
       width,
       size = 'md',
+      chrome,
       ...inputProps
     },
     ref,
@@ -57,6 +59,7 @@ export const TextField = React.forwardRef<HTMLInputElement, TextFieldProps>(
         required={required}
         width={width}
         size={size}
+        chrome={chrome}
       >
         <Input ref={ref} size={size} {...inputProps} />
       </FormField>

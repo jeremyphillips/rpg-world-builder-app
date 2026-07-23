@@ -6,6 +6,7 @@ import type {
 
 import { HttpError } from '../../../lib/http-error'
 import { resolveContentUsageBlockers } from './content-character-usage/resolve-content-usage-blockers'
+import { deleteContentCampaignAccess } from './content-campaign-access.service'
 import type { ContentWriteConfig, WriteEntityBase } from './content-write-config'
 import { resolveContentEntityForWrite } from './content-write.service'
 
@@ -59,6 +60,9 @@ export async function deleteContentEntity<T extends WriteEntityBase>(
   if (result.deletedCount !== 1) {
     throw new HttpError(404, 'not_found', 'Homebrew record not found.')
   }
+
+  const targetType = config.campaignAccessTargetType ?? config.typeName
+  await deleteContentCampaignAccess(campaignId, targetType, entityId)
 
   return { status: 'deleted' }
 }

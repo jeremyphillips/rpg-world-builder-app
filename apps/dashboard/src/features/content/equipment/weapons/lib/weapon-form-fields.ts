@@ -100,7 +100,7 @@ export function weaponFormFieldGroup(ctx: ContentFormCtx): FormItem {
   return {
     kind: 'group',
     legend: '',
-    fieldsChrome: { variant: 'panel' },
+    chrome: { variant: 'panel' },
     fields: [
       {
         kind: 'row',
@@ -147,7 +147,7 @@ export function weaponFormFieldGroup(ctx: ContentFormCtx): FormItem {
       {
         kind: 'group',
         legend: 'Damage',
-        fieldsChrome: { variant: 'panel', tone: 'raised' },
+        chrome: { variant: 'panel', elevation: 'raised' },
         legendSize: 'subsection',
         fields: [
           ...weaponDamageFields({ ctx }),

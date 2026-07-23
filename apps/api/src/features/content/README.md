@@ -75,6 +75,18 @@ Each content type contributes only a body schema (in `@rpg/contracts`) + a
   advisory delete preflight (owner/co-owner only)
 - `DELETE /api/campaigns/:campaignId/content/:contentType/:entityId` — delete homebrew
   (owner/co-owner only; `409` when blocked by character usage)
+- `GET /api/campaigns/:campaignId/content/:contentType/:entityId/campaign-access-availability` —
+  advisory availability-off preflight (owner/co-owner only)
+- `PATCH /api/campaigns/:campaignId/content/:contentType/:entityId/campaign-access` —
+  persist campaign access (`available`, `visibilityMode`, `participantIds`; `409` when
+  turning off is blocked by character usage)
+- Nested subclasses: `GET/PATCH …/classes/:classId/subclasses/:subclassId/campaign-access*`
+  (same semantics; `targetType: 'subclasses'` in `ContentCampaignAccessModel`)
+
+List responses attach resolved `campaignAccess` on every row (default available /
+`all_players`). Availability-off hides future discovery only — it does not remove
+existing character references. See
+[`lib/content-campaign-access-policy.test.ts`](lib/content-campaign-access-policy.test.ts).
 
 `GET /api/campaigns/:campaignId/content/:contentType` filters `status: 'draft'` records
 for campaign members who are not `owner`/`co-owner`.

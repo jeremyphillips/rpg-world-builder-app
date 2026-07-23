@@ -5,7 +5,7 @@ import * as React from 'react'
 import { CollapsibleListItem } from './collapsible-list-item'
 import type { CatalogPickerSheetProps } from './catalog-picker-sheet.types'
 import type { CollapsibleListItemShellPreset } from './collapsible-list-item/collapsible-list-item-shell.client'
-import type { FieldSurfaceVariant } from './field-surface.variants'
+import type { SurfaceConfig } from './visual-vocabulary.types'
 import { catalogPickerSheetListVariants } from './catalog-picker-sheet.variants'
 import { resolveCollapsibleListItemDomIds } from './collapsible-list-item/collapsible-list-item.variants'
 
@@ -18,7 +18,7 @@ function CatalogPickerCollapsibleItemRow<TItem>({
   renderItemActions,
   renderItemDetails,
   rowPreset,
-  rowSurface = 'base',
+  rowSurface = { elevation: 'flat' },
   toolbarCompact = false,
 }: {
   item: TItem
@@ -29,7 +29,7 @@ function CatalogPickerCollapsibleItemRow<TItem>({
   renderItemActions?: (item: TItem) => React.ReactNode
   renderItemDetails?: (item: TItem) => React.ReactNode
   rowPreset?: CollapsibleListItemShellPreset
-  rowSurface?: FieldSurfaceVariant
+  rowSurface?: SurfaceConfig
   toolbarCompact?: boolean
 }) {
   const domIds = resolveCollapsibleListItemDomIds(itemKey)

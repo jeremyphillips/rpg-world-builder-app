@@ -44,7 +44,7 @@ describe('form-authoring helpers', () => {
       addAction: { label: 'Add trait' },
       min: 1,
       item: {
-        surface: 'subtle',
+        surface: { emphasis: 'subtle' },
         collapsible: true,
         header: {
           fallback: (index) => `Trait ${index + 1}`,
@@ -56,7 +56,7 @@ describe('form-authoring helpers', () => {
 
     expectTypeOf(field).toEqualTypeOf<typeof field>()
     expectTypeOf(field.kind).toEqualTypeOf<'array'>()
-    expect(field.item?.surface).toBe('subtle')
+    expect(field.item?.surface).toEqual({ emphasis: 'subtle' })
     expectTypeOf(field).toMatchTypeOf<ArrayConfig>()
   })
 

@@ -6,16 +6,9 @@ import { useFormContext, useWatch } from 'react-hook-form'
 import { fieldGroupFlexStackClasses } from '@rpg/ui'
 import { buildItemDefaultValues, type FormItem } from '@rpg/ui/form'
 
-import {
-  combineAvailabilityReasons,
-  type Availability,
-  type AvailabilityReason,
-} from '@/lib/availability'
+import type { Availability, AvailabilityReason } from '@/lib/availability'
 import type { ContentFormCtx } from '../../lib/forms/content-form-registry'
-import {
-  isContentRowActive,
-  resolveMasterDetailRowKey,
-} from '../../lib/master-detail/content-campaign-availability'
+import { resolveMasterDetailRowKey } from '../../lib/master-detail/content-campaign-availability'
 import { buildEmbeddedMasterDetailListItem } from '../../lib/master-detail/build-embedded-master-detail-list-item'
 import { masterDetailEmptySelectionLabel } from '../../lib/master-detail/master-detail-constants'
 import { showMasterDetailUnselectedRowErrors } from '../../lib/master-detail/master-detail-validation'
@@ -60,8 +53,6 @@ export interface FormEmbeddedMasterDetailEditorProps {
   sortable?: boolean
   /** When false, hides row delete controls entirely. Defaults to `true`. */
   showDelete?: boolean
-  /** When false, hides the campaign availability toggle. Defaults to `true`. */
-  showActiveToggle?: boolean
   /**
    * Optional fields or chrome rendered above the list/detail grid with standard
    * field-group spacing (`fieldGroupFlexStackClasses`).
@@ -91,7 +82,6 @@ function FormEmbeddedMasterDetailEditorBody({
   editor,
   sortable = true,
   showDelete = true,
-  showActiveToggle = true,
   leadingContent,
   resolveRowReasons,
 }: FormEmbeddedMasterDetailEditorBodyProps) {
@@ -121,7 +111,6 @@ function FormEmbeddedMasterDetailEditorBody({
       row: row as { id?: string } | undefined,
       entitySource: formCtx.entitySource,
       seedRowIds,
-      activeById: editor.activeById,
       hasRowError: editor.hasRowError,
       title: listDisplay.title,
       eyebrow: listDisplay.eyebrow,
@@ -138,11 +127,12 @@ function FormEmbeddedMasterDetailEditorBody({
     if (editor.selectedIndex === null) return undefined
     const field = editor.fields[editor.selectedIndex]
     if (!field) return undefined
-    const row = watched?.[editor.selectedIndex] as { id?: string } | undefined
-    const rowKey = resolveMasterDetailRowKey(field.id, row)
+    const row = watched?.[editor.selectedIndex]
+    const rowKey = resolveMasterDetailRowKey(field.id, row as { id?: string } | undefined)
     const extraReasons = resolveRowReasons?.({ row, rowKey, index: editor.selectedIndex }) ?? []
-    return combineAvailabilityReasons(isContentRowActive(editor.activeById, rowKey), extraReasons)
-  }, [editor.activeById, editor.fields, editor.selectedIndex, resolveRowReasons, watched])
+    if (extraReasons.length === 0) return undefined
+    return { status: 'inactive', reasons: [...extraReasons] }
+  }, [editor.fields, editor.selectedIndex, resolveRowReasons, watched])
 
   const showValidationBanner = showMasterDetailUnselectedRowErrors(editor, submitCount)
 
@@ -156,11 +146,6 @@ function FormEmbeddedMasterDetailEditorBody({
           hasRowError: editor.hasRowError,
         }).title
       : ''
-
-  const selectedRow =
-    editor.selectedIndex !== null
-      ? (watched?.[editor.selectedIndex] as { id?: string } | undefined)
-      : undefined
 
   const masterDetailGrid = (
     <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
@@ -183,8 +168,6 @@ function FormEmbeddedMasterDetailEditorBody({
         idPrefix={idPrefix}
         showValidationBanner={showValidationBanner}
         emptySelectionLabel={masterDetailEmptySelectionLabel(itemNoun)}
-        showActiveToggle={showActiveToggle}
-        selectedRow={selectedRow}
         campaignId={formCtx.campaignId}
         rowAvailability={selectedRowAvailability}
       />

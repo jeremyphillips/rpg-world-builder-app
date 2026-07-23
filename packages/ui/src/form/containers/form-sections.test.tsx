@@ -1,7 +1,11 @@
 import { describe, expect, it, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
+import { FormProvider, useForm } from 'react-hook-form'
 import { z } from 'zod'
 
+import { FormItems } from './form-items.client'
+import { FormSectionProvider } from '../context/form-section.context'
+import { FormUiProvider } from '../context/form-ui.context'
 import { Form } from '../shells/form.client'
 import type { FormItem } from '../field-config'
 
@@ -74,5 +78,42 @@ describe('Form section rendering', () => {
     render(<Form schema={schema} fields={fields} onSubmit={vi.fn()} />)
 
     expect(screen.getByRole('group', { name: /Tags/ })).not.toHaveClass('mb-8')
+  })
+
+  it('omits section bottom margin on summary disclosure groups in a rhythm stack', () => {
+    const summaryFields: FormItem[] = [
+      {
+        kind: 'group',
+        id: 'summary-group',
+        legend: 'Campaign availability',
+        disclosure: {
+          variant: 'summary',
+          defaultOpen: false,
+          openLabel: 'Change',
+          closeLabel: 'Done',
+          resolveSummary: () => ({ primary: 'Available' }),
+        },
+        fields: [{ type: 'text', name: 'title', label: 'Title' }],
+      },
+    ]
+
+    function Harness() {
+      const form = useForm({ defaultValues: { title: '' } })
+      return (
+        <FormProvider {...form}>
+          <FormUiProvider fields={summaryFields}>
+            <FormSectionProvider inRhythmStack>
+              <FormItems items={summaryFields} idPrefix="test" />
+            </FormSectionProvider>
+          </FormUiProvider>
+        </FormProvider>
+      )
+    }
+
+    render(<Harness />)
+
+    const group = screen.getByRole('group', { name: /Campaign availability/ })
+    expect(group).not.toHaveClass('mb-8')
+    expect(group).toHaveClass('mb-0')
   })
 })
