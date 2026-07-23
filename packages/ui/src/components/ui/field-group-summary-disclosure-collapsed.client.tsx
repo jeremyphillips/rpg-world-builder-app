@@ -8,7 +8,6 @@ import {
   fieldGroupSummaryStatusLabelVariants,
   fieldGroupSummaryStatusLineClasses,
   fieldGroupSummaryStatusSecondaryClasses,
-  fieldGroupSummaryStatusWarningSecondaryClasses,
 } from './field-group-summary-disclosure-collapsed.variants'
 import { fieldGroupSummaryDisclosureActionButtonClasses } from './field-group-summary-disclosure.variants'
 import { Text } from './text'
@@ -125,18 +124,13 @@ export function FieldGroupSummaryDisclosureCollapsed({
             </Text>
           ) : null}
           {summary.secondary ? (
-            usesStatusRow && summary.surface === 'inactive' ? (
-              <Text as="span" className={fieldGroupSummaryStatusWarningSecondaryClasses}>
-                {summary.secondary}
-              </Text>
-            ) : (
-              <Text
-                variant="muted"
-                className={usesStatusRow ? fieldGroupSummaryStatusSecondaryClasses : 'mt-1 text-sm'}
-              >
-                {summary.secondary}
-              </Text>
-            )
+            <Text
+              as="span"
+              variant={usesStatusRow ? undefined : 'muted'}
+              className={usesStatusRow ? fieldGroupSummaryStatusSecondaryClasses : 'mt-1 text-sm'}
+            >
+              {summary.secondary}
+            </Text>
           ) : null}
         </button>
         <Button

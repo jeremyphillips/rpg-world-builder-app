@@ -142,12 +142,14 @@
   --palette-warning: oklch(0.62 0.14 55);
   --palette-warning-muted: oklch(0.62 0.14 55 / 70%);
   --palette-warning-subtle: oklch(0.62 0.14 55 / 14%);
+  --palette-warning-faint: oklch(0.62 0.14 55 / 8%);
 
   --palette-semantic-neutral: var(--palette-fg-muted);
   --palette-semantic-info: oklch(0.48 0.13 250);
   --palette-semantic-info-muted: oklch(0.42 0.07 250);
   --palette-semantic-success: oklch(0.48 0.13 145);
   --palette-semantic-warning: oklch(0.55 0.13 55);
+  --palette-semantic-warning-accent-faint: oklch(0.55 0.1 55 / 55%);
   --palette-semantic-destructive: oklch(0.52 0.2 27);
   --palette-semantic-destructive-on-subtle: oklch(0.42 0.19 27);
 }

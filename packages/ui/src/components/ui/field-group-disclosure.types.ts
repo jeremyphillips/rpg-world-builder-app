@@ -1,4 +1,17 @@
-export type FieldGroupSummaryStatusTone = 'neutral' | 'positive' | 'warning'
+import type { ChromeConfig } from './visual-vocabulary.types'
+
+export type {
+  ChromeConfig,
+  ChromeVariant,
+  ContentTone,
+  SemanticTone,
+  SurfaceConfig,
+  SurfaceElevation,
+  SupportedSemanticChrome,
+  VisualEmphasis,
+} from './visual-vocabulary.types'
+
+export type FieldGroupSummaryStatusTone = 'neutral' | 'success' | 'warning'
 
 export type FieldGroupSummaryStatus = {
   label: string
@@ -6,8 +19,6 @@ export type FieldGroupSummaryStatus = {
   /** Leading indicator on the status line */
   indicator?: 'dot' | 'inactive'
 }
-
-export type FieldGroupSummarySurface = 'default' | 'inactive'
 
 export type FieldGroupSummary = {
   /** Plain-text fallback for consumers that don't use structured status rows */
@@ -17,7 +28,7 @@ export type FieldGroupSummary = {
   detail?: string
   status?: FieldGroupSummaryStatus
   /** Collapsed container treatment — read by disclosure wrapper only */
-  surface?: FieldGroupSummarySurface
+  chrome?: ChromeConfig
 }
 
 /** Legend-triggered collapse — fields stay registered when collapsed. */

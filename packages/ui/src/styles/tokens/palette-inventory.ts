@@ -69,6 +69,7 @@ export const PALETTE_STATUS_STEPS = [
   'warning',
   'warning-muted',
   'warning-subtle',
+  'warning-faint',
 ] as const
 
 export const PALETTE_SEMANTIC_TEXT_STEPS = [
@@ -77,6 +78,7 @@ export const PALETTE_SEMANTIC_TEXT_STEPS = [
   'semantic-info-muted',
   'semantic-success',
   'semantic-warning',
+  'semantic-warning-accent-faint',
   'semantic-destructive',
   'semantic-destructive-on-subtle',
 ] as const

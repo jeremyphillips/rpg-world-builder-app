@@ -48,6 +48,15 @@ export type { FieldGroupChrome } from '../components/ui/field-group-chrome.varia
 export type {
   FieldGroupDisclosure,
   FieldGroupSummary,
+  FieldGroupSummaryDisclosure,
+  ChromeConfig,
+  ChromeVariant,
+  ContentTone,
+  SemanticTone,
+  SurfaceConfig,
+  SurfaceElevation,
+  SupportedSemanticChrome,
+  VisualEmphasis,
 } from '../components/ui/field-group-disclosure.types'
 export type { FieldChrome } from '../components/ui/field-chrome.variants'
 

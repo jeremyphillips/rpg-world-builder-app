@@ -85,6 +85,7 @@
   --color-warning-foreground: var(--warning-foreground);
   --color-warning-muted: var(--warning-muted);
   --color-warning-subtle: var(--warning-subtle);
+  --color-warning-faint: var(--warning-faint);
   --color-border: var(--border);
   --color-border-faint: var(--border-faint);
   --color-border-subtle: var(--border-subtle);
@@ -114,6 +115,7 @@
   --color-semantic-success-subtle: var(--semantic-success-subtle);
   --color-semantic-warning-border: var(--semantic-warning-border);
   --color-semantic-warning-subtle: var(--semantic-warning-subtle);
+  --color-semantic-warning-accent-faint: var(--semantic-warning-accent-faint);
   --color-semantic-destructive-border: var(--semantic-destructive-border);
   --color-semantic-destructive-subtle: var(--semantic-destructive-subtle);
   --color-selected-control: var(--selected-control);

@@ -231,12 +231,12 @@ function SummaryDisclosureDemo() {
                 status: { label: 'Unavailable', tone: 'warning', indicator: 'inactive' },
                 detail,
                 secondary: 'Hidden from discovery and selection in this campaign.',
-                surface: 'inactive',
+                chrome: { variant: 'accent', tone: 'warning', emphasis: 'faint' },
               }
             }
 
             return {
-              status: { label: 'Available', tone: 'positive', indicator: 'dot' },
+              status: { label: 'Available', tone: 'success', indicator: 'dot' },
               detail,
             }
           },

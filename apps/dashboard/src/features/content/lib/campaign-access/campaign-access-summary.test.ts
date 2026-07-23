@@ -11,7 +11,7 @@ describe('resolveCampaignAccessSummary', () => {
         participantIds: [],
       }),
     ).toEqual({
-      status: { label: 'Available', tone: 'positive', indicator: 'dot' },
+      status: { label: 'Available', tone: 'success', indicator: 'dot' },
       detail: 'All players',
     })
   })
@@ -24,7 +24,7 @@ describe('resolveCampaignAccessSummary', () => {
         participantIds: [],
       }),
     ).toEqual({
-      status: { label: 'Available', tone: 'positive', indicator: 'dot' },
+      status: { label: 'Available', tone: 'success', indicator: 'dot' },
       detail: 'DM only',
     })
   })
@@ -37,7 +37,7 @@ describe('resolveCampaignAccessSummary', () => {
         participantIds: ['p-1', 'p-2', 'p-3'],
       }),
     ).toEqual({
-      status: { label: 'Available', tone: 'positive', indicator: 'dot' },
+      status: { label: 'Available', tone: 'success', indicator: 'dot' },
       detail: '3 specific players',
     })
   })
@@ -50,12 +50,12 @@ describe('resolveCampaignAccessSummary', () => {
         participantIds: ['p-1'],
       }),
     ).toEqual({
-      status: { label: 'Available', tone: 'positive', indicator: 'dot' },
+      status: { label: 'Available', tone: 'success', indicator: 'dot' },
       detail: '1 specific player',
     })
   })
 
-  it('summarizes unavailable access with preserved detail and inactive surface', () => {
+  it('summarizes unavailable access with preserved detail and faint warning accent chrome', () => {
     expect(
       resolveCampaignAccessSummary({
         available: false,
@@ -66,7 +66,7 @@ describe('resolveCampaignAccessSummary', () => {
       status: { label: 'Unavailable', tone: 'warning', indicator: 'inactive' },
       detail: 'DM only',
       secondary: 'Hidden from discovery and selection in this campaign.',
-      surface: 'inactive',
+      chrome: { variant: 'accent', tone: 'warning', emphasis: 'faint' },
     })
   })
 })

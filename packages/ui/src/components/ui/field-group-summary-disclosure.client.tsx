@@ -9,14 +9,12 @@ import {
   writeGroupCollapseOpen,
 } from '../../form/config/group-collapse-storage.lib'
 import { accordionContentVariants } from './accordion.variants'
+import { resolveChromeClasses } from './chrome.variants'
 import { Collapsible, CollapsibleContent } from './collapsible.client'
 import type { FieldGroupSummaryDisclosure } from './field-group-disclosure.types'
 import { FieldGroupSummaryDisclosureCollapsed } from './field-group-summary-disclosure-collapsed.client'
 import { FieldGroupSummaryDisclosureExpandedHeader } from './field-group-summary-disclosure-expanded-header.client'
-import {
-  fieldGroupSummaryDisclosureInactiveShellClasses,
-  resolveFieldGroupSummaryDisclosurePanelClasses,
-} from './field-group-summary-disclosure.variants'
+import { resolveFieldGroupSummaryDisclosurePanelClasses } from './field-group-summary-disclosure.variants'
 
 const DEFAULT_OPEN_LABEL = 'Change'
 const DEFAULT_CLOSE_LABEL = 'Done'
@@ -105,6 +103,7 @@ export function FieldGroupSummaryDisclosure<TFieldValues extends FieldValues = F
   const panelClasses = open
     ? resolveFieldGroupSummaryDisclosurePanelClasses(disclosure.panelDivider ?? true)
     : undefined
+  const collapsedChromeClasses = !open ? resolveChromeClasses(summary.chrome) : undefined
 
   return (
     <Collapsible open={open} onOpenChange={onOpenChange} className="flex min-w-0 flex-col gap-1">
@@ -117,11 +116,8 @@ export function FieldGroupSummaryDisclosure<TFieldValues extends FieldValues = F
           disabled={disabled}
           onClose={() => onOpenChange(false)}
         />
-      ) : summary.surface === 'inactive' ? (
-        <div
-          className={fieldGroupSummaryDisclosureInactiveShellClasses}
-          data-summary-surface="inactive"
-        >
+      ) : collapsedChromeClasses ? (
+        <div className={collapsedChromeClasses} data-summary-chrome>
           <FieldGroupSummaryDisclosureCollapsed
             legend={legend}
             legendId={legendId}

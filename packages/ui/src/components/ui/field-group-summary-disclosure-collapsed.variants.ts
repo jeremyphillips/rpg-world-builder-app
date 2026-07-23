@@ -7,13 +7,13 @@ export const fieldGroupSummaryStatusLineClasses = 'flex min-w-0 items-center gap
 export const fieldGroupSummaryStatusDetailSeparatorClasses = 'text-muted-foreground'
 
 /** Explanatory line below the status row. */
-export const fieldGroupSummaryStatusSecondaryClasses = 'mt-1 text-xs'
+export const fieldGroupSummaryStatusSecondaryClasses = 'mt-1 text-xs text-muted-foreground'
 
 export const fieldGroupSummaryStatusLabelVariants = cva('font-medium', {
   variants: {
     tone: {
       neutral: 'text-foreground',
-      positive: 'text-foreground',
+      success: 'text-foreground',
       warning: 'text-semantic-warning',
     },
   },
@@ -30,7 +30,7 @@ export const fieldGroupSummaryStatusIndicatorVariants = cva('shrink-0', {
     },
     tone: {
       neutral: '',
-      positive: '',
+      success: '',
       warning: '',
     },
   },
@@ -42,6 +42,3 @@ export const fieldGroupSummaryStatusIndicatorVariants = cva('shrink-0', {
     tone: 'neutral',
   },
 })
-
-/** Secondary consequence copy inside a warning-themed inactive shell. */
-export const fieldGroupSummaryStatusWarningSecondaryClasses = 'mt-1 text-xs text-semantic-warning'

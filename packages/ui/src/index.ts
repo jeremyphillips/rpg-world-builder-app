@@ -242,6 +242,22 @@ export {
   type FieldGroupLegendSize,
   type FieldGroupProps,
 } from './components/ui/field-group'
+export {
+  resolveChromeAccentClasses,
+  resolveChromeClasses,
+  resolveChromeShellClasses,
+  isSupportedSemanticChrome,
+} from './components/ui/chrome.variants'
+export type {
+  ChromeConfig,
+  ChromeVariant,
+  ContentTone,
+  SemanticTone,
+  SurfaceConfig,
+  SurfaceElevation,
+  SupportedSemanticChrome,
+  VisualEmphasis,
+} from './components/ui/visual-vocabulary.types'
 export type { FieldChrome } from './components/ui/field-chrome.variants'
 export {
   fieldArrayItemClasses,

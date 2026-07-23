@@ -6,4 +6,12 @@ export type {
   FieldGroupLegendDisclosure,
   FieldGroupSummary,
   FieldGroupSummaryDisclosure,
+  ChromeConfig,
+  ChromeVariant,
+  ContentTone,
+  SemanticTone,
+  SurfaceConfig,
+  SurfaceElevation,
+  SupportedSemanticChrome,
+  VisualEmphasis,
 } from './field-group-disclosure.types'

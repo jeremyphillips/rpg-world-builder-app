@@ -1,5 +1,3 @@
-import { cva } from 'class-variance-authority'
-
 import { cn } from '../../lib/utils'
 import { compactLabelAppearanceToneClasses, type CompactLabelTone } from './compact-label.lib'
 import {
@@ -135,20 +133,3 @@ export function resolveFieldGroupPanelToneClasses(tone: FieldGroupPanelTone = 's
 
   return resolveFieldContainerChromeClasses({ surface: tone })
 }
-
-/** @deprecated Use `resolveFieldContainerChromeClasses` with `surface` / `status`. */
-export const fieldSurfaceToneVariants = cva('', {
-  variants: {
-    tone: {
-      main: fieldSurfaceVariantClasses.base,
-      elevated: fieldSurfaceVariantClasses.raised,
-      subtle: fieldSurfaceVariantClasses.subtle,
-      muted: fieldSurfaceVariantClasses.muted,
-      warning: fieldStatusToneClasses.warning,
-      error: fieldStatusToneClasses.destructive,
-    },
-  },
-  defaultVariants: {
-    tone: 'subtle',
-  },
-})

@@ -363,6 +363,12 @@ export const COLOR_TOKEN_GROUPS: ColorTokenGroup[] = [
         tailwind: 'bg-warning-subtle',
         usage: 'background',
       },
+      {
+        name: 'warning-faint',
+        cssVar: '--warning-faint',
+        tailwind: 'bg-warning-faint',
+        usage: 'background',
+      },
     ],
   },
   {
@@ -538,6 +544,12 @@ export const COLOR_TOKEN_GROUPS: ColorTokenGroup[] = [
         name: 'semantic-warning-subtle',
         cssVar: '--semantic-warning-subtle',
         tailwind: 'bg-semantic-warning-subtle',
+        usage: 'background',
+      },
+      {
+        name: 'semantic-warning-accent-faint',
+        cssVar: '--semantic-warning-accent-faint',
+        tailwind: 'bg-semantic-warning-accent-faint',
         usage: 'background',
       },
       {

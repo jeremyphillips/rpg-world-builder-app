@@ -139,6 +139,15 @@ export {
   type FieldGroupChrome,
   type FieldGroupDisclosure,
   type FieldGroupSummary,
+  type FieldGroupSummaryDisclosure,
+  type ChromeConfig,
+  type ChromeVariant,
+  type ContentTone,
+  type SemanticTone,
+  type SurfaceConfig,
+  type SurfaceElevation,
+  type SupportedSemanticChrome,
+  type VisualEmphasis,
   type FieldChrome,
   type FieldHintConfig,
   type DependentConfig,
@@ -160,6 +169,12 @@ export {
   type ArrayPatternConfig,
   type ArrayErrorFocusContext,
 } from './field-config'
+export {
+  resolveChromeAccentClasses,
+  resolveChromeClasses,
+  resolveChromeShellClasses,
+  isSupportedSemanticChrome,
+} from '../components/ui/chrome.variants'
 export {
   defineArrayField,
   defineComboboxField,

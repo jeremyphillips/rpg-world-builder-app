@@ -66,12 +66,12 @@ function StructuredStatusDisclosureHarness({
                 status: { label: 'Unavailable', tone: 'warning', indicator: 'inactive' },
                 detail: 'DM only',
                 secondary: 'Hidden from discovery and selection in this campaign.',
-                surface: 'inactive',
+                chrome: { variant: 'accent', tone: 'warning', emphasis: 'faint' },
               }
             }
 
             return {
-              status: { label: 'Available', tone: 'positive', indicator: 'dot' },
+              status: { label: 'Available', tone: 'success', indicator: 'dot' },
               detail: 'DM only',
             }
           },
@@ -140,19 +140,26 @@ describe('FieldGroup summary disclosure', () => {
     expect(container.querySelector('[aria-hidden].rounded-full')).toBeInTheDocument()
   })
 
-  it('applies inactive shell for unavailable structured status', () => {
+  it('applies accent chrome for unavailable structured status', () => {
     const { container } = render(
       <StructuredStatusDisclosureHarness
         defaultValues={{ available: false, visibilityMode: 'dm_only' }}
       />,
     )
 
-    expect(container.querySelector('[data-summary-surface="inactive"]')).toBeInTheDocument()
-    expect(screen.getByText('Unavailable')).toBeInTheDocument()
+    const chromeShell = container.querySelector('[data-summary-chrome]')
+    expect(chromeShell).toBeInTheDocument()
+    expect(chromeShell).toHaveClass('bg-warning-faint')
+    expect(chromeShell).not.toHaveClass('bg-warning-subtle')
+
+    const unavailableLabel = screen.getByText('Unavailable')
+    expect(unavailableLabel).toHaveClass('text-semantic-warning')
+
+    const secondary = screen.getByText('Hidden from discovery and selection in this campaign.')
+    expect(secondary).toHaveClass('text-muted-foreground')
+    expect(secondary).not.toHaveClass('text-semantic-warning')
+
     expect(screen.getByText('DM only')).toBeInTheDocument()
-    expect(
-      screen.getByText('Hidden from discovery and selection in this campaign.'),
-    ).toBeInTheDocument()
     expect(container.querySelector('[aria-hidden].lucide-circle-slash')).toBeInTheDocument()
   })
 

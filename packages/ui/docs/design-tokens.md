@@ -5,6 +5,8 @@ Color system for `@rpg/ui`. SSOT for Layer 1 inventory and parity rules:
 
 Storybook catalog: **Design tokens → Color palette** (`color-palette.stories.tsx`).
 
+Visual vocabulary (tone, emphasis, chrome): [visual-vocabulary.md](./visual-vocabulary.md).
+
 ## Three layers
 
 ```text
