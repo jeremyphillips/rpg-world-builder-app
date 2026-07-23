@@ -18,7 +18,7 @@ export type ChromeBodyLayout = 'group' | 'field' | 'summary-accent' | 'callout'
 type SupportedChromeKey = 'warning:faint' | 'warning:subtle' | 'neutral:subtle'
 
 const CHROME_ACCENT_RAIL_LAYOUT_CLASSES =
-  'relative before:absolute before:inset-y-2 before:left-0 before:w-0.5 before:rounded-full before:content-[""]'
+  'relative before:absolute before:inset-y-0 before:left-0 before:w-0.5 before:rounded-full before:content-[""]'
 
 const CHROME_SHELL_RECIPE: Record<SupportedChromeKey, string> = {
   'warning:faint': 'border border-border-subtle bg-warning-faint',
@@ -72,7 +72,7 @@ function resolveChromeBodyLayoutClasses(layout: ChromeBodyLayout, paddingClasses
     case 'field':
       return cn(fieldShellLayoutClasses, paddingClasses)
     case 'summary-accent':
-      return 'flex flex-col gap-2 rounded-md p-3'
+      return 'flex flex-col gap-2 rounded-tr-md rounded-br-md rounded-tl-none rounded-bl-none p-3'
     case 'callout':
       return 'rounded-lg border p-4'
     case 'group':

@@ -12,7 +12,6 @@ import type {
 } from '../../field-config'
 import {
   DEFAULT_ARRAY_ITEM_SURFACE,
-  type FieldStatusTone,
   type SemanticSurfaceTone,
 } from '../../../components/ui/field-dependent.variants'
 import type { SurfaceConfig } from '../../../components/ui/visual-vocabulary.types'
@@ -60,13 +59,11 @@ export function resolveArrayItemConfig(
 export function resolveArrayItemChrome(config: ArrayConfig): {
   surface?: SurfaceConfig
   tone?: SemanticSurfaceTone
-  status?: FieldStatusTone
 } {
   const item = config.item ?? {}
   return {
     surface: item.surface,
-    tone: item.tone ?? item.status,
-    status: item.status,
+    tone: item.tone,
   }
 }
 

@@ -1,7 +1,5 @@
 import { cn } from '../../lib/utils'
 import {
-  DEFAULT_FIELD_BORDER_LADDER_TONE,
-  isFieldBorderLadderTone,
   resolveFieldBorderLadderToneClasses,
   type FieldBorderLadderTone,
 } from './field-border-ladder.variants'
@@ -18,6 +16,7 @@ export {
   DEFAULT_DEPENDENT_SURFACE,
   DEFAULT_PANEL_SURFACE,
   resolveSurfaceClasses,
+  SEMANTIC_SURFACE_TONES,
   type SemanticSurfaceTone,
   type SurfaceChromeConfig,
 } from './surface.variants'
@@ -34,22 +33,9 @@ export const fieldGroupBodyShellLayoutClasses = cn(
   fieldGroupBodyPaddingClasses,
 )
 
-/** @deprecated Phase 2 — use `SemanticSurfaceTone` */
-export type FieldStatusTone = SemanticSurfaceTone
-
-/** @deprecated Phase 2 — use `SemanticSurfaceTone` */
-export const FIELD_STATUS_TONES = ['info', 'success', 'warning', 'destructive'] as const
-
-export function isFieldStatusTone(value: string): value is FieldStatusTone {
-  return (FIELD_STATUS_TONES as readonly string[]).includes(value)
-}
-
 export interface FieldContainerChromeOptions {
   surface?: SurfaceConfig
-  /** Semantic wash — replaces legacy `status`. */
   tone?: SemanticSurfaceTone
-  /** @deprecated Use `tone` */
-  status?: FieldStatusTone
 }
 
 /**
@@ -61,7 +47,7 @@ export function resolveFieldContainerChromeClasses(
   options: FieldContainerChromeOptions,
   defaults: { surface: SurfaceConfig } = { surface: DEFAULT_DEPENDENT_SURFACE },
 ): string {
-  const tone = options.tone ?? options.status
+  const { tone } = options
   const surface = options.surface ?? (tone ? DEFAULT_DEPENDENT_SURFACE : defaults.surface)
 
   return resolveSurfaceClasses({ ...surface, tone })
@@ -79,29 +65,11 @@ export function isCompactLabelTone(
   )
 }
 
-/** @deprecated Phase 2 — use `ChromeConfig` with `variant: 'outline'`. */
-export type FieldGroupOutlineTone = FieldBorderLadderTone | 'primary' | FieldStatusTone
-
-const OUTLINE_STATUS_TONE_CLASS: Record<FieldStatusTone, string> = {
+const OUTLINE_SEMANTIC_TONE_CLASS: Record<SemanticSurfaceTone, string> = {
   info: 'border-info-muted',
   success: 'border-success-muted',
   warning: 'border-warning-muted',
   destructive: 'border-destructive',
-}
-
-/** @deprecated Phase 2 — use `resolveChromeOutlineClasses`. */
-export function resolveFieldGroupOutlineToneClasses(
-  tone: FieldGroupOutlineTone = DEFAULT_FIELD_BORDER_LADDER_TONE,
-): string {
-  if (isFieldBorderLadderTone(tone)) {
-    return resolveFieldBorderLadderToneClasses(tone)
-  }
-
-  if (tone === 'primary') {
-    return 'border-primary'
-  }
-
-  return OUTLINE_STATUS_TONE_CLASS[tone]
 }
 
 /** Maps visual emphasis to border-ladder utilities for outline chrome. */
@@ -115,7 +83,7 @@ export function resolveOutlineBorderClasses(
   }
 
   if (tone && tone !== 'neutral') {
-    return OUTLINE_STATUS_TONE_CLASS[tone as FieldStatusTone]
+    return OUTLINE_SEMANTIC_TONE_CLASS[tone as SemanticSurfaceTone]
   }
 
   const ladderTone: FieldBorderLadderTone =

@@ -30,7 +30,6 @@ import type {
 } from '../components/ui/inline-sentence-field.types'
 import type {
   FieldDependentsScope,
-  FieldStatusTone,
   SemanticSurfaceTone,
 } from '../components/ui/field-dependent.variants'
 import type { SurfaceConfig } from '../components/ui/visual-vocabulary.types'
@@ -253,7 +252,7 @@ interface BaseFieldConfig {
    * - `{ variant: 'panel', tone? }` — filled panel wash
    * - `{ variant: 'outline', tone? }` — border-only inset (`faint` | `subtle` | `default` | `strong`, or semantic tones)
    *
-   * Distinct from container `surface` / `status` chrome on arrays and dependents.
+   * Distinct from container `surface` / `tone` chrome on arrays and dependents.
    */
   chrome?: FieldChrome
   /**
@@ -829,8 +828,6 @@ export interface DependentDependentsConfig {
   visibility?: FieldVisibility
   surface?: SurfaceConfig
   tone?: SemanticSurfaceTone
-  /** @deprecated Use `tone` */
-  status?: FieldStatusTone
   /**
    * Where dependent chrome applies.
    *
@@ -1017,8 +1014,6 @@ export interface ArrayItemConfig {
   /** @default raised */
   surface?: SurfaceConfig
   tone?: SemanticSurfaceTone
-  /** @deprecated Use `tone` */
-  status?: FieldStatusTone
   header?: ArrayItemHeaderConfig
   collapsible?: boolean
   collapseKey?: string

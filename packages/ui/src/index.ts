@@ -34,7 +34,6 @@ export {
 export {
   EmphasisDetailLine,
   type EmphasisDetailLineProps,
-  type EmphasisDetailLineSecondaryTone,
 } from './components/ui/emphasis-detail-line'
 export { Alert, type AlertProps, type AlertVariant } from './components/ui/alert'
 export {

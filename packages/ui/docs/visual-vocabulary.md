@@ -46,8 +46,14 @@ Shell and accent are structurally separate; compose at `resolveChromeClasses`.
 | `warning × subtle` | `bg-warning-subtle` + `border-warning-muted` | `before:bg-semantic-warning-border`       |
 | `neutral × subtle` | `bg-surface-muted` + `border-border-subtle`  | (none)                                    |
 
-Pseudo-rail geometry: `before:absolute before:inset-y-2 before:left-0 before:w-0.5
+Pseudo-rail geometry: `before:absolute before:inset-y-0 before:left-0 before:w-0.5
 before:rounded-full`. Never `border-l-2` on `rounded-md` accent shells.
+
+**Accent shell left edge:** when a pseudo-rail spans the shell height, the shell uses square
+left corners (`rounded-tl-none rounded-bl-none`) and keeps right-side radius
+(`rounded-tr-md rounded-br-md`). A full `rounded-md` perimeter would draw corner arcs the rail
+cannot reach — producing a visible gap between the wash border and the accent stroke.
+Centralized in `resolveChromeBodyLayoutClasses('summary-accent')`.
 
 ## Tokens (Phase 1)
 
@@ -87,7 +93,7 @@ Container chrome uses `surface?: SurfaceConfig` and `tone?: SemanticSurfaceTone`
 | `...subtle`                             | light wash           | `emphasis: 'subtle'`, `elevation: 'flat'`                                     |
 | `...muted`                              | secondary panel      | `emphasis: 'subtle'` on `bg-surface-muted` recipe                             |
 | `...strong`                             | dense chrome         | `emphasis: 'strong'`                                                          |
-| `FieldStatusTone` + container           | semantic callout     | `{ tone, emphasis: 'subtle' }`                                                |
+| `SemanticSurfaceTone` + container       | semantic callout     | `{ tone, emphasis: 'subtle' }`                                                |
 | `FieldBorderLadderTone`                 | border intensity     | maps to `VisualEmphasis` on border channel                                    |
 | `FieldGroupSummary.surface: 'inactive'` | warning accent shell | `chrome: { variant: 'accent', tone: 'warning', emphasis: 'faint' }`           |
 | `status.indicator: 'inactive'`          | icon shape           | keep as **indicator**, not state vocabulary                                   |

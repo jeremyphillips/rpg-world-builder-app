@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
-import { FIELD_STATUS_TONES, resolveFieldContainerChromeClasses } from './field-surface.variants'
+import { SEMANTIC_SURFACE_TONES } from './surface.variants'
+import { resolveFieldContainerChromeClasses } from './field-surface.variants'
 import { DEFAULT_DEPENDENT_SURFACE } from './surface.variants'
 
 const APPROVED_SURFACE_TOKENS = [
@@ -37,7 +38,7 @@ describe('resolveFieldContainerChromeClasses', () => {
     expectOnlyApprovedTokens(classes, APPROVED_SURFACE_TOKENS)
   })
 
-  it.each(FIELD_STATUS_TONES)('uses approved tokens for tone %s', (tone) => {
+  it.each(SEMANTIC_SURFACE_TONES)('uses approved tokens for tone %s', (tone) => {
     const classes = resolveFieldContainerChromeClasses({ tone })
     expectOnlyApprovedTokens(classes, APPROVED_STATUS_TOKENS)
   })

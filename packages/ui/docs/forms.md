@@ -161,10 +161,10 @@ Simple leaf types (`text`, `number`, `checkbox`, …) do not need helpers.
 
 **VS Code snippets** (`.vscode/form.code-snippets`): `form-def`, `form-items`, `form-array`,
 `form-group`, `form-stack`. Snippet comments reference inventory const names (`FIELD_WIDTHS`,
-`FIELD_SURFACE_TONES`) — import from `@rpg/ui/form` when using those tokens in code.
+`SEMANTIC_SURFACE_TONES`) — import from `@rpg/ui/form` when using those tokens in code.
 
 JSDoc on complex configs in [field-config.ts](../src/form/field-config.ts) documents
-common options, defaults, and allowed values — especially `ArrayConfig.itemChrome`.
+common options, defaults, and allowed values — especially `ArrayConfig.item.surface`.
 
 ### Vocabularies and hover documentation
 
@@ -173,7 +173,7 @@ Closed token sets are exported as const inventories from `@rpg/ui/form`:
 | Export                        | Use                                        |
 | ----------------------------- | ------------------------------------------ |
 | `FIELD_WIDTHS`                | `BaseFieldConfig.width`                    |
-| `FIELD_SURFACE_TONES`         | `itemChrome`, `dependentsChrome`           |
+| `SEMANTIC_SURFACE_TONES`      | `item.tone`, `dependents.tone`             |
 | `DICE_FORMULA_TAIL_OPERATORS` | `DiceFormulaFieldConfig.modifierOperators` |
 
 Types derive from inventories; CVA class maps use `satisfies Record<…>` for compile-time

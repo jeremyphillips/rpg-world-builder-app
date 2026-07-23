@@ -22,7 +22,7 @@ const APPROVED_CHROME_SHELL_TOKENS = [
 const APPROVED_CHROME_ACCENT_TOKENS = [
   'relative',
   'before:absolute',
-  'before:inset-y-2',
+  'before:inset-y-0',
   'before:left-0',
   'before:w-0.5',
   'before:rounded-full',
@@ -35,7 +35,10 @@ const APPROVED_CHROME_LAYOUT_TOKENS = [
   'flex',
   'flex-col',
   'gap-2',
-  'rounded-md',
+  'rounded-tr-md',
+  'rounded-br-md',
+  'rounded-tl-none',
+  'rounded-bl-none',
   'p-3',
   ...APPROVED_CHROME_SHELL_TOKENS,
   ...APPROVED_CHROME_ACCENT_TOKENS,
@@ -73,6 +76,7 @@ describe('chrome.variants', () => {
   it('resolves warning faint accent pseudo-rail', () => {
     const classes = resolveChromeAccentClasses({ tone: 'warning', emphasis: 'faint' })
     expect(classes).toContain('before:bg-semantic-warning-accent-faint')
+    expect(classes).toContain('before:inset-y-0')
     expect(classes).not.toContain('border-l-2')
     expectOnlyApprovedTokens(classes, APPROVED_CHROME_ACCENT_TOKENS)
   })
@@ -85,6 +89,11 @@ describe('chrome.variants', () => {
     })
     expect(classes).toContain('bg-warning-faint')
     expect(classes).toContain('before:bg-semantic-warning-accent-faint')
+    expect(classes).toContain('rounded-tl-none')
+    expect(classes).toContain('rounded-bl-none')
+    expect(classes).toContain('rounded-tr-md')
+    expect(classes).toContain('rounded-br-md')
+    expect(classes).not.toContain('rounded-md')
     expectOnlyApprovedTokens(classes, APPROVED_CHROME_LAYOUT_TOKENS)
   })
 

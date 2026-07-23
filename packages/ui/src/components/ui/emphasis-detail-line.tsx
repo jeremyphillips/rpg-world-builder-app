@@ -9,11 +9,6 @@ import {
 
 import type { ContentTone } from './visual-vocabulary.types'
 
-export type EmphasisDetailLineSecondaryTone =
-  | Extract<ContentTone, 'secondary' | 'disabled'>
-  | 'muted'
-  | 'subtle'
-
 export type EmphasisDetailLineProps<T extends React.ElementType = 'span'> = {
   as?: T
   className?: string
@@ -24,7 +19,7 @@ export type EmphasisDetailLineProps<T extends React.ElementType = 'span'> = {
   /** Muted tail — supporting context */
   secondary?: React.ReactNode
   /** `secondary` on neutral surfaces; `disabled` inside tinted parents */
-  secondaryTone?: EmphasisDetailLineSecondaryTone
+  secondaryTone?: Extract<ContentTone, 'secondary' | 'disabled'>
 } & Omit<
   React.ComponentPropsWithoutRef<T>,
   'as' | 'className' | 'prefix' | 'primary' | 'secondary' | 'secondaryTone'

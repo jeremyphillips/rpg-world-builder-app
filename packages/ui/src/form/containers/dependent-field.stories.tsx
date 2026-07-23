@@ -89,7 +89,7 @@ const dependentErrorToneFields: FormItem[] = [
       defaultValue: true,
     },
     dependents: {
-      status: 'destructive',
+      tone: 'destructive',
       fields: [
         {
           type: 'number',

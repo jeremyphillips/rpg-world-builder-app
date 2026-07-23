@@ -178,7 +178,7 @@ describe('ArrayFieldRenderer', () => {
     expect(dependentsRegion?.querySelector('.bg-card')).toBe(itemShell)
   })
 
-  it('applies itemChrome override on array item shells', async () => {
+  it('applies item surface override on array item shells', async () => {
     const user = userEvent.setup()
     const subtleFields: FormItem[] = [
       {

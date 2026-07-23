@@ -143,10 +143,10 @@ controller field gates indented dependents:
 - `dependentsVisibility` gates fields `[1..]`. When omitted and `[0]` is a switch, defaults
   to "switch is true". For select/other controllers, pass an explicit predicate for hide
   behavior; omit for indent/chrome only (dependents always shown).
-- Optional `dependentsChrome`: `main` | `elevated` | `subtle` | `medium` | `warning` | `error`.
-- Optional `dependentsChromeScope`: `wrapper` (default) | `arrayItems`.
-  - `wrapper` — tone on the dependents container; use for scalar dependents (selects, numbers).
-  - `arrayItems` — tone on array item shells only; avoids double borders when dependents include arrays.
+- Optional `dependents.surface` / `dependents.tone` — neutral wash or semantic callout on dependents.
+- Optional `dependents.scope`: `wrapper` (default) | `arrayItems`.
+  - `wrapper` — chrome on the dependents container; use for scalar dependents (selects, numbers).
+  - `arrayItems` — chrome on array item shells only; avoids double borders when dependents include arrays.
   - Mixed dependents: only array item shells receive tone; scalars render without wash.
 - `rhythm`: `compact` (default) or `comfortable` for multi-field blocks.
 
@@ -156,7 +156,6 @@ Pair dependent scalars with `labelPosition: 'settings'`.
 {
   kind: 'stack',
   layout: 'dependent',
-  dependentsChrome: 'subtle',
   fields: [
     { type: 'switch', name: 'enabled', label: 'Primary ability minimum', hint: '…' },
     {
@@ -166,6 +165,8 @@ Pair dependent scalars with `labelPosition: 'settings'`.
       labelPosition: 'settings',
     },
   ],
+  // on `kind: 'dependent'` — same keys under `dependents`:
+  // dependents: { surface: { emphasis: 'subtle' }, fields: [...] }
 }
 ```
 
@@ -173,24 +174,24 @@ Select controller with explicit gate (species class-policy pattern):
 
 ```ts
 {
-  kind: 'stack',
-  layout: 'dependent',
-  separator: 'subtle',
-  dependentsVisibility: visibleWhenClassPolicyNeedsIds(),
-  dependentsChrome: 'subtle',
-  fields: [
-    {
-      type: 'select',
-      name: 'classPolicy.mode',
-      label: 'Class restrictions',
-      labelPosition: 'settings',
-    },
-    {
-      type: 'combobox',
-      name: 'classPolicy.classIds',
-      label: 'Classes',
-    },
-  ],
+  kind: 'dependent',
+  controller: {
+    type: 'select',
+    name: 'classPolicy.mode',
+    label: 'Class restrictions',
+    labelPosition: 'settings',
+  },
+  dependents: {
+    visibility: visibleWhenClassPolicyNeedsIds(),
+    surface: { emphasis: 'subtle' },
+    fields: [
+      {
+        type: 'combobox',
+        name: 'classPolicy.classIds',
+        label: 'Classes',
+      },
+    ],
+  },
 }
 ```
 
@@ -198,20 +199,21 @@ Dependent stack with an array dependent — use `arrayItems` scope:
 
 ```ts
 {
-  kind: 'stack',
-  layout: 'dependent',
-  dependentsChrome: 'subtle',
-  dependentsChromeScope: 'arrayItems',
-  fields: [
-    { type: 'switch', name: 'enabled', label: 'Class-specific limits', hint: '…' },
-    {
-      kind: 'array',
-      name: 'caps',
-      legend: '',
-      addActionLabel: 'Add class limit',
-      fields: [/* … */],
-    },
-  ],
+  kind: 'dependent',
+  controller: { type: 'switch', name: 'enabled', label: 'Class-specific limits', hint: '…' },
+  dependents: {
+    surface: { emphasis: 'subtle' },
+    scope: 'arrayItems',
+    fields: [
+      {
+        kind: 'array',
+        name: 'caps',
+        legend: '',
+        addActionLabel: 'Add class limit',
+        fields: [/* … */],
+      },
+    ],
+  },
 }
 ```
 
@@ -230,7 +232,7 @@ Token: `fieldSeparatorVariants`. Do not use row `className` for recurring divide
 
 Repeatable section via `useFieldArray`. Item field names are **relative** (renderer prefixes
 `arrayName.index`). Item shells default to the **elevated** surface (`bg-card` + raised shadow);
-use `itemChrome` or stack `dependentsChrome` + `dependentsChromeScope: 'arrayItems'` to override.
+use `item.surface` / `item.tone` or stack `dependents.surface` + `dependents.scope: 'arrayItems'` to override.
 
 **Authoring guide:** [array-field-authoring.md](./array-field-authoring.md) — headers, chrome
 decision table, add menus, nested arrays, and common mistakes.
@@ -337,7 +339,7 @@ Optional hooks:
 inside a `FieldRow` within the grip/actions grid — leaf `width` tokens (`full`, `auto`, fractions,
 `digits`, …) compose the same way as schema `kind: 'row'` fields.
 
-| `itemChrome` | Item shell surface tone — defaults to `elevated` (`bg-card`); override with `subtle`, `medium`, etc. |
+| `item.surface` / `item.tone` | Item shell — defaults to `{ elevation: 'raised' }`; override with subtle wash or semantic tone |
 | `itemHeader` | Primary/fallback labels; optional `summary` on a second row below the title (detailed). |
 | `itemHeader.showFallbackInHeader` | When true, appends ` · {fallback}` after the primary title (default `false`). |
 | `itemCollapsible` | Detailed items only — collapse body into header row. |

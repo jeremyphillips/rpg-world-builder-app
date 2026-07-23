@@ -150,6 +150,7 @@ describe('FieldGroup summary disclosure', () => {
     const chromeShell = container.querySelector('[data-summary-chrome]')
     expect(chromeShell).toBeInTheDocument()
     expect(chromeShell).toHaveClass('bg-warning-faint')
+    expect(chromeShell).toHaveClass('rounded-tl-none', 'rounded-bl-none')
     expect(chromeShell).not.toHaveClass('bg-warning-subtle')
 
     const unavailableLabel = screen.getByText('Unavailable')

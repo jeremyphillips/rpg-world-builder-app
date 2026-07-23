@@ -26,7 +26,7 @@ export const WarningNote: Story = {
   args: {
     primary: '75 GP needed',
     secondary: '40 GP remaining',
-    secondaryTone: 'subtle',
+    secondaryTone: 'disabled',
   },
   render: (args) => (
     <Text as="p" variant="warning" className="flex items-start gap-1.5 text-xs">

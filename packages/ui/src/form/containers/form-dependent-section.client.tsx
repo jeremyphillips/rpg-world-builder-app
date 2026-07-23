@@ -85,8 +85,7 @@ export function DependentSection({
         <DependentFieldsRegion
           dependentsVisibility={dependentsVisibility}
           surface={item.dependents.surface}
-          tone={item.dependents.tone ?? item.dependents.status}
-          status={item.dependents.status}
+          tone={item.dependents.tone}
           scope={item.dependents.scope}
           rhythm={rhythm}
           parentContext={childContext}
@@ -107,7 +106,6 @@ interface DependentFieldsRegionProps {
   dependentsVisibility: FieldVisibility | null
   surface?: DependentConfig['dependents']['surface']
   tone?: DependentConfig['dependents']['tone']
-  status?: DependentConfig['dependents']['status']
   scope?: DependentConfig['dependents']['scope']
   rhythm: FieldRhythm
   parentContext: FormSectionContextValue
@@ -143,7 +141,6 @@ function GatedDependentFieldsRegion({
 function DependentFieldsRegionContent({
   surface,
   tone,
-  status,
   scope = 'wrapper',
   rhythm,
   parentContext,
@@ -153,7 +150,7 @@ function DependentFieldsRegionContent({
   depth,
   renderNestedItems,
 }: Omit<DependentFieldsRegionProps, 'dependentsVisibility'>) {
-  const resolvedTone = tone ?? status
+  const resolvedTone = tone
   const hasChrome = surface !== undefined || resolvedTone !== undefined
   const useArrayItemScope = hasChrome && scope === 'arrayItems'
   const arrayItemContext = React.useMemo(

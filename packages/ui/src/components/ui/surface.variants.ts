@@ -4,6 +4,13 @@ import type { SemanticTone, SurfaceConfig, VisualEmphasis } from './visual-vocab
 
 export type SemanticSurfaceTone = Exclude<SemanticTone, 'neutral'>
 
+export const SEMANTIC_SURFACE_TONES = [
+  'info',
+  'success',
+  'warning',
+  'destructive',
+] as const satisfies readonly SemanticSurfaceTone[]
+
 export type SurfaceChromeConfig = SurfaceConfig & {
   tone?: SemanticSurfaceTone
 }

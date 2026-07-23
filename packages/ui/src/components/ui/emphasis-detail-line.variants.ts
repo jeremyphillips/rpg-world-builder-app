@@ -16,14 +16,7 @@ const CONTENT_TONE_SECONDARY_CLASSES: Record<
 
 export const emphasisDetailLineSecondaryVariants = cva('', {
   variants: {
-    tone: {
-      secondary: CONTENT_TONE_SECONDARY_CLASSES.secondary,
-      disabled: CONTENT_TONE_SECONDARY_CLASSES.disabled,
-      /** @deprecated Use `secondary` */
-      muted: CONTENT_TONE_SECONDARY_CLASSES.secondary,
-      /** @deprecated Use `disabled` inside tinted parents */
-      subtle: CONTENT_TONE_SECONDARY_CLASSES.disabled,
-    },
+    tone: CONTENT_TONE_SECONDARY_CLASSES,
   },
   defaultVariants: {
     tone: 'secondary',

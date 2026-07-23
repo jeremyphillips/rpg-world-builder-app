@@ -24,7 +24,6 @@ const dependentField = (
   options: {
     surface?: SurfaceConfig
     tone?: 'destructive'
-    status?: 'destructive'
     scope?: 'wrapper' | 'arrayItems'
     rhythm?: 'compact' | 'comfortable'
   } = {},
@@ -41,7 +40,6 @@ const dependentField = (
   dependents: {
     ...(options.surface ? { surface: options.surface } : {}),
     ...(options.tone ? { tone: options.tone } : {}),
-    ...(options.status ? { status: options.status } : {}),
     ...(options.scope ? { scope: options.scope } : {}),
     fields: [
       {

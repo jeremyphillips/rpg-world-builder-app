@@ -77,20 +77,21 @@ defineArrayField({
 })
 ```
 
-## `itemVariant` / `itemChrome` / `itemCollapsible`
+## `itemVariant` / `item.surface` / `itemCollapsible`
 
-| Goal                                              | `itemVariant`       | `itemChrome`                      | `itemCollapsible`     |
-| ------------------------------------------------- | ------------------- | --------------------------------- | --------------------- |
-| Single inline control per row (tags, simple refs) | `auto` or `compact` | `elevated` (default) or `subtle`  | omit / `false`        |
-| Multi-field block with header toolbar             | `detailed`          | `elevated`, `subtle`, `medium`, … | `true` for long forms |
-| Nested array inside another item                  | `auto` → compact    | match parent or `subtle`          | usually `false`       |
-| Grant-style picker rows                           | `detailed`          | `elevated`                        | `true`                |
+| Goal                                              | `itemVariant`       | `item.surface` / `item.tone`                                    | `itemCollapsible`     |
+| ------------------------------------------------- | ------------------- | --------------------------------------------------------------- | --------------------- |
+| Single inline control per row (tags, simple refs) | `auto` or `compact` | `{ elevation: 'raised' }` (default) or `{ emphasis: 'subtle' }` | omit / `false`        |
+| Multi-field block with header toolbar             | `detailed`          | raised, subtle, or semantic `tone`                              | `true` for long forms |
+| Nested array inside another item                  | `auto` → compact    | match parent or subtle wash                                     | usually `false`       |
+| Grant-style picker rows                           | `detailed`          | `{ elevation: 'raised' }`                                       | `true`                |
 
 `itemCollapsible` applies to **detailed** items only — ignored for compact/nested
 auto-compact rows.
 
-`itemChrome` values come from `FIELD_SURFACE_TONES` (`main`, `elevated`,
-`subtle`, `medium`, `warning`, `error`). Default: `elevated`.
+`item.surface` uses `SurfaceConfig` (`emphasis`, `elevation`). Optional `item.tone`
+applies a semantic wash (`info` | `success` | `warning` | `destructive`). Default surface:
+`{ elevation: 'raised' }`.
 
 ## `itemHeader` patterns
 

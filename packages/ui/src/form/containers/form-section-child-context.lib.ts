@@ -29,7 +29,7 @@ export function buildArraySectionChildContext(
       sectionDefault: DEFAULT_ARRAY_SECTION_SIZE,
     }),
     arrayItemSurface: chrome.surface ?? parent.arrayItemSurface,
-    arrayItemStatus: chrome.status ?? parent.arrayItemStatus,
+    arrayItemTone: chrome.tone ?? parent.arrayItemTone,
   })
 }
 

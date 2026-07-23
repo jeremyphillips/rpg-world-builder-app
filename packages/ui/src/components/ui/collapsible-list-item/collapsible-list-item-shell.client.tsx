@@ -6,7 +6,6 @@ import { cn } from '../../../lib/utils'
 import {
   DEFAULT_ARRAY_ITEM_SURFACE,
   resolveFieldContainerChromeClasses,
-  type FieldStatusTone,
   type SemanticSurfaceTone,
 } from '../field-surface.variants'
 import type { SurfaceConfig } from '../visual-vocabulary.types'
@@ -32,12 +31,10 @@ export interface CollapsibleListItemShellProps extends CollapsibleListItemLeadin
   dragging?: boolean
   layout?: 'default' | 'compactRow'
   actionsAlign?: CollapsibleListItemActionsAlign
-  /** Non-form shell presets — bypass surface/status axes. */
+  /** Non-form shell presets — bypass surface/tone axes. */
   preset?: CollapsibleListItemShellPreset
   surface?: SurfaceConfig
   tone?: SemanticSurfaceTone
-  /** @deprecated Use `tone` */
-  status?: FieldStatusTone
   className?: string
   toolbar?: React.ReactNode
   body?: React.ReactNode
@@ -50,17 +47,15 @@ function resolveShellChromeClasses({
   preset = 'default',
   surface,
   tone,
-  status,
-}: Pick<CollapsibleListItemShellProps, 'preset' | 'surface' | 'tone' | 'status'>): string {
+}: Pick<CollapsibleListItemShellProps, 'preset' | 'surface' | 'tone'>): string {
   if (preset === 'catalog') {
     return ''
   }
-  const resolvedTone = tone ?? status
-  if (preset === 'default' && surface === undefined && resolvedTone === undefined) {
+  if (preset === 'default' && surface === undefined && tone === undefined) {
     return 'border-border'
   }
   return resolveFieldContainerChromeClasses(
-    { surface: surface ?? DEFAULT_ARRAY_ITEM_SURFACE, tone: resolvedTone },
+    { surface: surface ?? DEFAULT_ARRAY_ITEM_SURFACE, tone },
     { surface: DEFAULT_ARRAY_ITEM_SURFACE },
   )
 }
@@ -77,7 +72,6 @@ export function CollapsibleListItemShell({
   preset = 'default',
   surface,
   tone,
-  status,
   className,
   toolbar,
   body,
@@ -102,7 +96,7 @@ export function CollapsibleListItemShell({
     ) : (
       actions
     )
-  const chromeClasses = resolveShellChromeClasses({ preset, surface, tone, status })
+  const chromeClasses = resolveShellChromeClasses({ preset, surface, tone })
 
   return (
     <div

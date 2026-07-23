@@ -6,8 +6,6 @@ import {
 
 export type {
   FieldContainerChromeOptions,
-  FieldGroupOutlineTone,
-  FieldStatusTone,
   SemanticSurfaceTone,
   SurfaceChromeConfig,
 } from './field-surface.variants'
@@ -15,14 +13,12 @@ export {
   DEFAULT_ARRAY_ITEM_SURFACE,
   DEFAULT_DEPENDENT_SURFACE,
   DEFAULT_PANEL_SURFACE,
-  FIELD_STATUS_TONES,
   fieldGroupBodyShellLayoutClasses,
   isCompactLabelTone,
-  isFieldStatusTone,
   resolveFieldContainerChromeClasses,
-  resolveFieldGroupOutlineToneClasses,
   resolveOutlineBorderClasses,
   resolveSurfaceClasses,
+  SEMANTIC_SURFACE_TONES,
 } from './field-surface.variants'
 
 /** Where dependent chrome applies on toggle-dependent sections. */

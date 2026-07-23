@@ -196,7 +196,7 @@ function EquipmentPickerRowSummary({
       <EmphasisDetailLine
         primary={`${need} needed`}
         secondary={`${have} remaining`}
-        secondaryTone="subtle"
+        secondaryTone="disabled"
       />
     </Text>
   )
