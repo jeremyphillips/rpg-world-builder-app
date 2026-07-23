@@ -87,7 +87,7 @@ apply to the `<fieldset>`. Token source: `field-group-chrome.variants.ts`.
 
 ## Rows
 
-Side-by-side leaf fields in a wrapping flex row. Row-level `visibility`, `separator`,
+Side-by-side leaf fields and slots in a wrapping flex row. Row-level `visibility`, `separator`,
 and `className`. Layout detail: [sizing-and-spacing.md](./sizing-and-spacing.md).
 
 ## Stacks
@@ -175,7 +175,10 @@ Dependent stack with an array dependent — use `arrayItems` scope:
 
 ## Field separators
 
-`separator: 'subtle'` on a leaf or row → trailing `border-b` + `pb-7` (28px) before the next sibling.
+`separator` on a leaf, row, or slot → trailing `border-b` before the next sibling.
+Tones follow the border ladder: `subtle` (`border-border-subtle`), `default` (`border-border`),
+`strong` (`border-border-strong`). Padding follows inherited stack rhythm: `pb-2` (8px) when
+`rhythm: 'compact'`, `pb-7` (28px) when `rhythm: 'comfortable'`.
 On a `stack` → trailing divider after the whole stack (controller + dependents region).
 Prefer stack-level `separator` for `layout: 'dependent'` blocks instead of putting it on the
 controller field.
@@ -427,4 +430,5 @@ Custom UI inside `FormProvider`. `name` aligns with a form value; defaults from 
 `rhythm` and `size` mirror arrays (compact + `sm` at boundary). Slot components should
 call `useFormSectionContext()` and thread `size` / `rhythm` into hand-built controls.
 
-Optional `label` + `hint` wrap content in `FieldGroup`.
+Optional `label` + `hint` wrap content in `FieldGroup`. `separator` adds a trailing
+divider after the slot (same as leaf fields and rows).

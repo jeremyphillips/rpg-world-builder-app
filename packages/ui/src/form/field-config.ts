@@ -227,7 +227,7 @@ interface BaseFieldConfig {
    * narrowly via `useWatch`.
    */
   visibility?: FieldVisibility
-  /** Trailing divider after this field within a group/stack rhythm. */
+  /** Trailing divider after this field — `subtle` | `default` | `strong` (border ladder). */
   separator?: FieldSeparator
   /**
    * Visual shell around the full field anatomy (label + control + messages).
@@ -772,9 +772,17 @@ export type FieldConfig =
   | RollValueFieldConfig
   | InputSelectFieldConfig
   | InputUnitFieldConfig
+
+/** Leaf fields and slots allowed inside a horizontal `kind: 'row'`. */
+export type RowFieldItem = FieldConfig | SlotConfig
+
+export function isRowSlotItem(item: RowFieldItem): item is SlotConfig {
+  return 'kind' in item && item.kind === 'slot'
+}
+
 export interface RowConfig {
   kind: 'row'
-  fields: FieldConfig[]
+  fields: RowFieldItem[]
   className?: string
   /** Trailing divider after this row within a group/stack rhythm. */
   separator?: FieldSeparator
@@ -1072,6 +1080,10 @@ export interface SlotConfig {
    * Control + label scale for slot content. Defaults to `sm` (array section default).
    */
   size?: FieldSize
+  /** Trailing divider after this slot within a group/stack rhythm. */
+  separator?: FieldSeparator
+  /** Panel or outline shell around slot content. */
+  chrome?: FieldChrome
 }
 
 /**
@@ -1297,6 +1309,7 @@ export function buildDefaultValues(items: FormItem[]): Record<string, unknown> {
       assignFieldDefaultValues(item, values)
     } else if (item.kind === 'row') {
       for (const field of item.fields) {
+        if (isRowSlotItem(field)) continue
         assignFieldDefaultValues(field, values)
       }
     } else if (item.kind === 'group') {

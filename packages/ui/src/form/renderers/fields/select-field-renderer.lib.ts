@@ -20,6 +20,7 @@ export type SelectFieldChromeProps = {
   size?: SelectFieldConfig['size']
   digits?: SelectFieldConfig['digits']
   labelPosition?: SelectFieldConfig['labelPosition']
+  chrome?: SelectFieldConfig['chrome']
 }
 
 export function pickSelectFieldChromeProps(
@@ -36,6 +37,7 @@ export function pickSelectFieldChromeProps(
     size: config.size,
     digits: config.digits,
     labelPosition: config.labelPosition,
+    chrome: config.chrome,
   }
 }
 

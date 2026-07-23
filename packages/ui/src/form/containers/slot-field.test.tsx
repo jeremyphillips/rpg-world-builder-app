@@ -179,6 +179,98 @@ describe('SlotFieldRenderer', () => {
     expect(screen.getByLabelText('Name')).toBeInTheDocument()
   })
 
+  it('wraps a slot with a trailing separator when configured', () => {
+    const separatorFields: FormItem[] = [
+      {
+        kind: 'slot',
+        name: 'notes',
+        label: 'Notes',
+        separator: 'subtle',
+        render: () => <NotesSlot />,
+      },
+      { type: 'text', name: 'name', label: 'Name', required: true },
+    ]
+
+    const { container } = render(
+      <Form<Values>
+        schema={schema}
+        fields={separatorFields}
+        defaultValues={{ notes: '' }}
+        onSubmit={vi.fn()}
+        footer={<button type="submit">Save</button>}
+      />,
+    )
+
+    const separator = container.querySelector('[data-field-separator]')
+    expect(separator).toBeInTheDocument()
+    expect(separator).toHaveClass('border-b', 'border-border-subtle', 'pb-7')
+    expect(separator).toContainElement(screen.getByRole('textbox', { name: 'Notes' }))
+    expect(separator).not.toContainElement(screen.getByLabelText('Name'))
+  })
+
+  it('uses compact separator padding when the parent group rhythm is compact', () => {
+    const compactGroupFields: FormItem[] = [
+      {
+        kind: 'group',
+        legend: 'Campaign access',
+        rhythm: 'compact',
+        fields: [
+          {
+            kind: 'slot',
+            name: 'notes',
+            label: 'Notes',
+            separator: 'subtle',
+            render: () => <NotesSlot />,
+          },
+          { type: 'text', name: 'name', label: 'Name', required: true },
+        ],
+      },
+    ]
+
+    const { container } = render(
+      <Form<Values>
+        schema={schema}
+        fields={compactGroupFields}
+        defaultValues={{ notes: '' }}
+        onSubmit={vi.fn()}
+        footer={<button type="submit">Save</button>}
+      />,
+    )
+
+    const separator = container.querySelector('[data-field-separator]')
+    expect(separator).toBeInTheDocument()
+    expect(separator).toHaveClass('border-b', 'border-border-subtle', 'pb-2')
+    expect(separator).not.toHaveClass('pb-7')
+  })
+
+  it('wraps slot content in panel chrome when configured', () => {
+    const chromedFields: FormItem[] = [
+      {
+        kind: 'slot',
+        name: 'notes',
+        hint: 'Optional author notes.',
+        chrome: { variant: 'panel' },
+        render: () => <NotesSlot />,
+      },
+      { type: 'text', name: 'name', label: 'Name', required: true },
+    ]
+
+    const { container } = render(
+      <Form<Values>
+        schema={schema}
+        fields={chromedFields}
+        defaultValues={{ notes: '' }}
+        onSubmit={vi.fn()}
+        footer={<button type="submit">Save</button>}
+      />,
+    )
+
+    const chromeShell = container.querySelector('.rounded-md.border.bg-surface-subtle')
+    expect(chromeShell).toBeTruthy()
+    expect(chromeShell).toContainElement(screen.getByRole('textbox', { name: 'Notes' }))
+    expect(chromeShell).toContainElement(screen.getByText('Optional author notes.'))
+  })
+
   it('hides a slot when its visibility predicate is false', () => {
     const conditionalFields: FormItem[] = [
       {

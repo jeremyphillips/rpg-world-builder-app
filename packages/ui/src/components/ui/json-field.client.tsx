@@ -13,9 +13,10 @@ import type { FieldHintPosition } from './field.variants'
 
 const INVALID_JSON_MESSAGE = 'Invalid JSON'
 
+import type { FieldChromeProps } from './field-chrome.variants'
 import type { FieldValidationProps } from './field-validation-props'
 
-export interface JsonFieldProps extends FieldValidationProps {
+export interface JsonFieldProps extends FieldValidationProps, FieldChromeProps {
   id: string
   label: string
   hint?: string
@@ -65,6 +66,7 @@ export function JsonField({
   onChange,
   onBlur,
   example,
+  chrome,
 }: JsonFieldProps) {
   const isControlled = value !== undefined
   const [internalValue, setInternalValue] = React.useState(defaultValue ?? '')
@@ -145,6 +147,8 @@ export function JsonField({
             }}
           />
         }
+        chrome={chrome}
+        size={size}
       />
     </Field.Root>
   )

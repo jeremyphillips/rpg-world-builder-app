@@ -3,6 +3,8 @@
 import * as React from 'react'
 
 import { FieldGroup } from '../../../components/ui/field-group'
+import { FieldChromeShell } from '../../../components/ui/field-chrome-shell'
+import { hasActiveFieldChrome } from '../../../components/ui/field-chrome.variants'
 import { fieldGroupDescriptionClasses } from '../../../components/ui/field.variants'
 import { Text } from '../../../components/ui/text'
 import {
@@ -12,20 +14,30 @@ import {
   type FormSectionContextValue,
 } from '../../context/form-section.context'
 import type { SlotConfig } from '../../field-config'
-import { useVisibilityValues } from '../../containers/form-conditional.client'
+import {
+  useVisibilityValues,
+  FieldSeparatorWrapper,
+} from '../../containers/form-conditional.client'
 import { buildSlotSectionChildContext } from '../../containers/form-section-child-context.lib'
 
 export interface SlotFieldRendererProps {
   config: SlotConfig
+  /** Sibling-stack rhythm for trailing separators — slots default child context to compact. */
+  stackRhythm?: FormSectionContextValue['rhythm']
+  /** Sibling-stack size for field chrome padding — slots default child context to `sm`. */
+  stackSize?: FormSectionContextValue['size']
 }
 
 /** Renders custom form UI supplied by the field config inside `FormProvider`. */
-export function SlotFieldRenderer({ config }: SlotFieldRendererProps) {
+export function SlotFieldRenderer({ config, stackRhythm, stackSize }: SlotFieldRendererProps) {
   const { rhythm, size } = useFormSectionContext()
   const content = config.render()
+  const chromeSize = stackSize ?? size
+
+  let body: React.ReactNode
 
   if (config.label) {
-    return (
+    body = (
       <FieldGroup
         legend={config.label}
         description={config.hint}
@@ -36,22 +48,33 @@ export function SlotFieldRenderer({ config }: SlotFieldRendererProps) {
         {content}
       </FieldGroup>
     )
+  } else if (content == null && !config.hint) {
+    return null
+  } else if (!config.hint) {
+    body = config.className ? <div className={config.className}>{content}</div> : content
+  } else {
+    body = (
+      <FormRhythmStack className={config.className}>
+        <Text variant="small" className={fieldGroupDescriptionClasses}>
+          {config.hint}
+        </Text>
+        {content}
+      </FormRhythmStack>
+    )
   }
 
-  if (content == null && !config.hint) return null
-
-  if (!config.hint) {
-    if (!config.className) return content
-    return <div className={config.className}>{content}</div>
+  if (hasActiveFieldChrome(config.chrome)) {
+    body = (
+      <FieldChromeShell chrome={config.chrome} size={chromeSize}>
+        {body}
+      </FieldChromeShell>
+    )
   }
 
   return (
-    <FormRhythmStack className={config.className}>
-      <Text variant="small" className={fieldGroupDescriptionClasses}>
-        {config.hint}
-      </Text>
-      {content}
-    </FormRhythmStack>
+    <FieldSeparatorWrapper separator={config.separator} rhythm={stackRhythm}>
+      {body}
+    </FieldSeparatorWrapper>
   )
 }
 
@@ -70,7 +93,11 @@ function SlotFormItemSectionInner({ item, parentContext, depth }: SlotFormItemSe
 
   return (
     <FormSectionContext.Provider value={slotChildContext}>
-      <SlotFieldRenderer config={item} />
+      <SlotFieldRenderer
+        config={item}
+        stackRhythm={parentContext.rhythm}
+        stackSize={parentContext.size}
+      />
     </FormSectionContext.Provider>
   )
 }

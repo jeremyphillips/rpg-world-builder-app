@@ -8,9 +8,10 @@ import type { FieldSize } from './field.client'
 import type { FieldWidth } from './field-control.variants'
 import type { FieldHintPosition } from './field.variants'
 
+import type { FieldChromeProps } from './field-chrome.variants'
 import type { FieldValidationProps } from './field-validation-props'
 
-export interface FileFieldProps extends FileDropzoneProps, FieldValidationProps {
+export interface FileFieldProps extends FileDropzoneProps, FieldValidationProps, FieldChromeProps {
   id: string
   label: string
   hint?: string
@@ -42,6 +43,7 @@ export function FileField({
   required,
   width,
   size = 'md',
+  chrome,
   ...dropzoneProps
 }: FileFieldProps) {
   return (
@@ -57,6 +59,7 @@ export function FileField({
       required={required}
       width={width}
       size={size}
+      chrome={chrome}
     >
       <FileDropzone {...dropzoneProps} />
     </FormField>

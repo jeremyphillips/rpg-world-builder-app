@@ -1,7 +1,6 @@
 import { cva, type VariantProps } from 'class-variance-authority'
 
 import { cn } from '../../lib/utils'
-import { fieldGroupDividerBottomPaddingClasses } from './field-group-chrome.variants'
 import { fieldSizeTypographyClasses, type FieldSizeToken } from './field-sizing.variants'
 
 /**
@@ -205,22 +204,26 @@ export const fieldToggleDependentStackClasses = fieldStackRhythmVariants({ rhyth
 export const fieldToggleDependentIndentClasses = 'pl-11'
 export const chooseFromChipsSentenceClasses = fieldInlineSentenceClasses
 
-/** Trailing divider tone for leaf fields and rows within a group/stack rhythm. */
-export type FieldSeparator = 'subtle'
+/** Trailing divider tone — maps to the global border ladder in design-tokens.md. */
+export type FieldSeparator = 'subtle' | 'default' | 'strong'
 
-export const fieldSeparatorVariants = cva(
-  cn('border-b border-border', fieldGroupDividerBottomPaddingClasses),
-  {
-    variants: {
-      tone: {
-        subtle: '',
-      },
+export const fieldSeparatorVariants = cva('border-b', {
+  variants: {
+    tone: {
+      subtle: 'border-border-subtle',
+      default: 'border-border',
+      strong: 'border-border-strong',
     },
-    defaultVariants: {
-      tone: 'subtle',
+    rhythm: {
+      compact: 'pb-2',
+      comfortable: 'pb-7',
     },
   },
-)
+  defaultVariants: {
+    tone: 'subtle',
+    rhythm: 'comfortable',
+  },
+})
 
 export type FieldSeparatorVariantProps = VariantProps<typeof fieldSeparatorVariants>
 

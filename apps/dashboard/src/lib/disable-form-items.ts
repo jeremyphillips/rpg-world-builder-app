@@ -1,7 +1,13 @@
-import type { FieldConfig, FormItem, GroupFieldItem, RowConfig } from '@rpg/ui/form'
+import type { FieldConfig, FormItem, GroupFieldItem, RowConfig, RowFieldItem } from '@rpg/ui/form'
+import { isRowSlotItem } from '@rpg/ui/form'
 
 function disableFieldConfig<T extends FieldConfig>(field: T, disabled: boolean): T {
   return disabled ? { ...field, disabled: true } : field
+}
+
+function disableRowField(field: RowFieldItem, disabled: boolean): RowFieldItem {
+  if (isRowSlotItem(field)) return field
+  return disableFieldConfig(field, disabled)
 }
 
 function disableGroupField(item: GroupFieldItem, disabled: boolean): GroupFieldItem {
@@ -9,7 +15,7 @@ function disableGroupField(item: GroupFieldItem, disabled: boolean): GroupFieldI
   if (item.kind === 'row') {
     return {
       ...item,
-      fields: item.fields.map((field) => disableFieldConfig(field, disabled)),
+      fields: item.fields.map((field) => disableRowField(field, disabled)),
     } satisfies RowConfig
   }
   if (item.kind === 'group') {
@@ -30,7 +36,7 @@ export function disableFormItems(items: FormItem[], disabled: boolean): FormItem
     if (item.kind === 'row') {
       return {
         ...item,
-        fields: item.fields.map((field) => disableFieldConfig(field, true)),
+        fields: item.fields.map((field) => disableRowField(field, true)),
       }
     }
     if (item.kind === 'group') {

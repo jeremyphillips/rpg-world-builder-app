@@ -19,9 +19,10 @@ const MARKDOWN_FIELD_TAB_WRITE = 'write'
 const MARKDOWN_FIELD_TAB_PREVIEW = 'preview'
 const MARKDOWN_PREVIEW_EMPTY = 'Nothing to preview'
 
+import type { FieldChromeProps } from './field-chrome.variants'
 import type { FieldValidationProps } from './field-validation-props'
 
-export interface MarkdownFieldProps extends FieldValidationProps {
+export interface MarkdownFieldProps extends FieldValidationProps, FieldChromeProps {
   id: string
   label: string
   hint?: string
@@ -73,6 +74,7 @@ export function MarkdownField({
   value = '',
   onChange,
   onBlur,
+  chrome,
 }: MarkdownFieldProps) {
   const [tab, setTab] = React.useState(MARKDOWN_FIELD_TAB_WRITE)
   const previewId = `${id}-preview`
@@ -122,6 +124,8 @@ export function MarkdownField({
             </TabsContent>
           </Tabs>
         }
+        chrome={chrome}
+        size={size}
       />
     </Field.Root>
   )

@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 import {
   fieldChromePaddingMdClasses,
   fieldChromePaddingSmClasses,
+  pickFieldChromeProps,
   resolveFieldChromeClassNames,
 } from './field-chrome.variants'
 import { fieldShellLayoutClasses } from './field-surface.variants'
@@ -29,5 +30,13 @@ describe('resolveFieldChromeClassNames', () => {
     const classes = resolveFieldChromeClassNames({ variant: 'outline', tone: 'primary' }, 'md')
     expect(classes).toContain('bg-transparent')
     expect(classes).toContain('border-primary')
+  })
+})
+
+describe('pickFieldChromeProps', () => {
+  it('maps config chrome onto field props', () => {
+    const chrome = { variant: 'panel' as const }
+    expect(pickFieldChromeProps({ chrome })).toEqual({ chrome })
+    expect(pickFieldChromeProps({})).toEqual({ chrome: undefined })
   })
 })

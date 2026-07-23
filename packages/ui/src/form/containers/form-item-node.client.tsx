@@ -61,10 +61,24 @@ export function FormItemNode({ item, index, idPrefix, namePrefix, depth }: FormI
   if (item.kind === 'row') {
     if (item.visibility) {
       return (
-        <ConditionalRow item={item} index={index} idPrefix={idPrefix} namePrefix={namePrefix} />
+        <ConditionalRow
+          item={item}
+          index={index}
+          idPrefix={idPrefix}
+          namePrefix={namePrefix}
+          depth={depth}
+        />
       )
     }
-    return <RowFieldSection item={item} index={index} idPrefix={idPrefix} namePrefix={namePrefix} />
+    return (
+      <RowFieldSection
+        item={item}
+        index={index}
+        idPrefix={idPrefix}
+        namePrefix={namePrefix}
+        depth={depth}
+      />
+    )
   }
 
   if (item.kind === 'group') {

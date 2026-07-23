@@ -1,3 +1,6 @@
+/** Subgroup legend for the campaign access field group. */
+export const CAMPAIGN_ACCESS_SECTION_LEGEND = 'Campaign access'
+
 /** Switch label for the campaign access section. */
 export const CAMPAIGN_ACCESS_AVAILABLE_LABEL = 'Available in this campaign'
 

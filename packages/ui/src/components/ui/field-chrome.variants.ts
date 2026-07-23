@@ -25,6 +25,15 @@ export interface FieldOutlineChrome {
 /** Visual shell around a single field's full anatomy (label + control + messages). */
 export type FieldChrome = { variant: 'plain' } | FieldPanelChrome | FieldOutlineChrome
 
+export interface FieldChromeProps {
+  chrome?: FieldChrome
+}
+
+/** Maps declarative field config chrome onto primitive field props. */
+export function pickFieldChromeProps(config: { chrome?: FieldChrome }): FieldChromeProps {
+  return { chrome: config.chrome }
+}
+
 export function hasActiveFieldChrome(
   chrome: FieldChrome | undefined,
 ): chrome is FieldPanelChrome | FieldOutlineChrome {

@@ -4,6 +4,8 @@ import { Field, type FieldSize } from './field.client'
 import { FieldLayout } from './field-layout'
 import { FieldLabelContent } from './field-label-content'
 import { FormField } from './form-field'
+import { FieldChromeShell } from './field-chrome-shell'
+import type { FieldChromeProps } from './field-chrome.variants'
 import { Switch } from './switch.client'
 import {
   fieldInlineSwitchControlColumnClasses,
@@ -19,7 +21,7 @@ export type SwitchLabelPosition = FieldLabelPosition | 'inline'
 import type { FieldValidationProps } from './field-validation-props'
 
 export interface SwitchFieldProps
-  extends Omit<ComponentProps<typeof Switch>, 'id'>, FieldValidationProps {
+  extends Omit<ComponentProps<typeof Switch>, 'id'>, FieldValidationProps, FieldChromeProps {
   id: string
   label: string
   hint?: string
@@ -50,6 +52,7 @@ export function SwitchField({
   width,
   size = 'md',
   labelPosition = 'inline',
+  chrome,
   ...switchProps
 }: SwitchFieldProps) {
   const resolvedHintPosition = hintPosition ?? 'below-label'
@@ -75,6 +78,7 @@ export function SwitchField({
         width={width}
         size={size}
         labelPosition="settings"
+        chrome={chrome}
       >
         <Switch {...switchProps} />
       </FormField>
@@ -97,6 +101,8 @@ export function SwitchField({
           hintPosition={resolvedHintPosition}
           label={labelNode}
           control={<Switch {...switchProps} />}
+          chrome={chrome}
+          size={size}
         />
       </Field.Root>
     )
@@ -113,17 +119,19 @@ export function SwitchField({
       width={width}
       size={size}
     >
-      <div className={fieldInlineToggleRowClasses}>
-        <div className={fieldInlineSwitchControlColumnClasses}>
-          <Field.Control>
-            <Switch {...switchProps} />
-          </Field.Control>
+      <FieldChromeShell chrome={chrome} size={size}>
+        <div className={fieldInlineToggleRowClasses}>
+          <div className={fieldInlineSwitchControlColumnClasses}>
+            <Field.Control>
+              <Switch {...switchProps} />
+            </Field.Control>
+          </div>
+          <div className={fieldLabelHintStackClasses}>
+            {labelNode}
+            <Field.Hint />
+          </div>
         </div>
-        <div className={fieldLabelHintStackClasses}>
-          {labelNode}
-          <Field.Hint />
-        </div>
-      </div>
+      </FieldChromeShell>
       <Field.Error />
     </Field.Root>
   )

@@ -1,32 +1,27 @@
 'use client'
 
 import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react'
+import { FormProvider, useForm, useWatch } from 'react-hook-form'
 import {
   CONTENT_ACCESS_CAPABILITIES,
-  CONTENT_ACCESS_SPECIFIC_PLAYERS_ENABLED,
-  CONTENT_VISIBILITY_MODE_ENTRIES,
-  CONTENT_VISIBILITY_MODE_TERM,
-  CONTENT_VISIBILITY_SELECT_HINT,
-  DEFAULT_CONTENT_CAMPAIGN_ACCESS,
   getErrorMessage,
   type ContentAccessTargetType,
   type ContentCampaignAccessPatch,
   type ContentUsageBlocker,
-  type ContentVisibilityMode,
   type ResolvedContentCampaignAccess,
+  contentCampaignAccessPatchSchema,
+  DEFAULT_CONTENT_CAMPAIGN_ACCESS,
 } from '@rpg/contracts'
-import { SelectField, SwitchField, Text } from '@rpg/ui'
+import { Text } from '@rpg/ui'
+import { FormItems, FormSectionProvider, FormUiProvider, makeResolver } from '@rpg/ui/form'
 
 import {
   fetchContentCampaignAccessAvailability,
   updateContentCampaignAccess,
 } from './campaign-access-api'
 import { CampaignAccessBlockedDialog } from './campaign-access-blocked-dialog.client'
-import {
-  CAMPAIGN_ACCESS_AVAILABLE_HINT,
-  CAMPAIGN_ACCESS_AVAILABLE_LABEL,
-  CAMPAIGN_ACCESS_SPECIFIC_PLAYERS_DISABLED_HINT,
-} from './campaign-access-labels'
+import { CampaignAccessFormProvider } from './campaign-access-form-context.client'
+import { buildCampaignAccessFields } from './campaign-access-form-fields'
 import { resolvedToCampaignAccessPatch } from './campaign-access-state'
 
 export interface CampaignAccessSectionProps {
@@ -44,30 +39,6 @@ export interface CampaignAccessSectionProps {
   onPersistedChange?: (access: ResolvedContentCampaignAccess) => void
 }
 
-function buildVisibilityOptions(
-  targetType: ContentAccessTargetType,
-  available: boolean,
-): Array<{ value: ContentVisibilityMode; label: string; disabled?: boolean; hint?: string }> {
-  const capability = CONTENT_ACCESS_CAPABILITIES[targetType]
-  if (capability.mode !== 'owned') return []
-
-  return capability.visibilityModes.map((mode) => {
-    const entry = CONTENT_VISIBILITY_MODE_ENTRIES[mode]
-    const disabledByAvailability = !available
-    const disabledByGate = mode === 'specific_players' && !CONTENT_ACCESS_SPECIFIC_PLAYERS_ENABLED
-
-    return {
-      value: mode,
-      label: entry.label,
-      disabled: disabledByAvailability || disabledByGate,
-      hint:
-        mode === 'specific_players' && disabledByGate
-          ? CAMPAIGN_ACCESS_SPECIFIC_PLAYERS_DISABLED_HINT
-          : undefined,
-    }
-  })
-}
-
 export function CampaignAccessSection({
   campaignId,
   targetType,
@@ -79,12 +50,7 @@ export function CampaignAccessSection({
 }: CampaignAccessSectionProps) {
   const capability = CONTENT_ACCESS_CAPABILITIES[targetType]
   const sectionId = useId()
-  const availableId = `${sectionId}-available`
-  const visibilityId = `${sectionId}-visibility`
 
-  const [access, setAccess] = useState<ContentCampaignAccessPatch>(() =>
-    resolvedToCampaignAccessPatch(initialAccess),
-  )
   const [persistError, setPersistError] = useState<string | null>(null)
   const [pending, setPending] = useState(false)
   const [blockedOpen, setBlockedOpen] = useState(false)
@@ -93,30 +59,52 @@ export function CampaignAccessSection({
   const entityIdRef = useRef(entityId)
   entityIdRef.current = entityId
 
+  const initialPatch = useMemo(() => resolvedToCampaignAccessPatch(initialAccess), [initialAccess])
+
+  const resolverFields = useMemo(
+    () => buildCampaignAccessFields({ targetType, available: true, pending: false }),
+    [targetType],
+  )
+
+  const resolver = useMemo(
+    () =>
+      makeResolver<ContentCampaignAccessPatch>(contentCampaignAccessPatchSchema, resolverFields),
+    [resolverFields],
+  )
+
+  const form = useForm<ContentCampaignAccessPatch>({
+    resolver,
+    defaultValues: initialPatch,
+    mode: 'onSubmit',
+  })
+
+  const available = useWatch({ control: form.control, name: 'available' })
+
+  const renderedFields = useMemo(
+    () =>
+      buildCampaignAccessFields({
+        targetType,
+        available: available ?? initialPatch.available,
+        pending,
+      }),
+    [available, initialPatch.available, pending, targetType],
+  )
+
   useEffect(() => {
-    setAccess(resolvedToCampaignAccessPatch(initialAccess))
+    form.reset(initialPatch)
     setPersistError(null)
     setBlockedOpen(false)
     setBlockers([])
-  }, [entityId, initialAccess])
-
-  const visibilityOptions = useMemo(
-    () => buildVisibilityOptions(targetType, access.available),
-    [access.available, targetType],
-  )
-
-  const visibilityHint = !CONTENT_ACCESS_SPECIFIC_PLAYERS_ENABLED
-    ? CAMPAIGN_ACCESS_SPECIFIC_PLAYERS_DISABLED_HINT
-    : CONTENT_VISIBILITY_SELECT_HINT
+  }, [entityId, form, initialPatch])
 
   const applyLocalChange = useCallback(
     (next: ContentCampaignAccessPatch) => {
-      setAccess(next)
+      form.reset(next)
       if (!entityIdRef.current) {
         onDraftChange?.(next)
       }
     },
-    [onDraftChange],
+    [form, onDraftChange],
   )
 
   const persistPatch = useCallback(
@@ -140,25 +128,27 @@ export function CampaignAccessSection({
         if (result.status === 'blocked') {
           setBlockers(result.blockers)
           setBlockedOpen(true)
-          setAccess(resolvedToCampaignAccessPatch(initialAccess))
+          form.reset(initialPatch)
           return
         }
 
-        setAccess(resolvedToCampaignAccessPatch(result.campaignAccess))
+        const nextPatch = resolvedToCampaignAccessPatch(result.campaignAccess)
+        form.reset(nextPatch)
         onPersistedChange?.(result.campaignAccess)
       } catch (err) {
         setPersistError(getErrorMessage(err, 'Could not update campaign access.'))
-        setAccess(resolvedToCampaignAccessPatch(initialAccess))
+        form.reset(initialPatch)
       } finally {
         setPending(false)
       }
     },
-    [applyLocalChange, campaignId, classId, initialAccess, onPersistedChange, targetType],
+    [applyLocalChange, campaignId, classId, form, initialPatch, onPersistedChange, targetType],
   )
 
   const handleAvailableChange = useCallback(
     async (checked: boolean) => {
-      const next = { ...access, available: checked }
+      const current = form.getValues()
+      const next = { ...current, available: checked }
 
       if (!checked && entityIdRef.current) {
         setPending(true)
@@ -183,68 +173,44 @@ export function CampaignAccessSection({
         }
       }
 
+      form.setValue('available', checked, { shouldDirty: true })
       await persistPatch(next)
     },
-    [access, campaignId, classId, persistPatch, targetType],
+    [campaignId, classId, form, persistPatch, targetType],
   )
 
-  const handleVisibilityChange = useCallback(
-    (value: string) => {
-      const visibilityMode = value as ContentVisibilityMode
-      void persistPatch({ ...access, visibilityMode })
-    },
-    [access, persistPatch],
-  )
+  useEffect(() => {
+    const subscription = form.watch((values, { name, type }) => {
+      if (type !== 'change' || name !== 'visibilityMode') return
+      void persistPatch(values as ContentCampaignAccessPatch)
+    })
+    return () => subscription.unsubscribe()
+  }, [form, persistPatch])
 
   if (capability.mode === 'unsupported') {
     return null
   }
 
   return (
-    <section
-      aria-labelledby={`${sectionId}-legend`}
-      className="space-y-4 rounded-lg border border-border bg-card p-4"
-    >
-      <div>
-        <h2 id={`${sectionId}-legend`} className="text-sm font-medium text-foreground">
-          Campaign access
-        </h2>
-      </div>
-
-      {persistError ? (
-        <Text variant="destructive" role="alert">
-          {persistError}
-        </Text>
-      ) : null}
-
-      <SwitchField
-        id={availableId}
-        label={CAMPAIGN_ACCESS_AVAILABLE_LABEL}
-        hint={CAMPAIGN_ACCESS_AVAILABLE_HINT}
-        checked={access.available}
-        disabled={pending}
-        onCheckedChange={(checked) => void handleAvailableChange(checked)}
-      />
-
-      <SelectField
-        id={visibilityId}
-        label={CONTENT_VISIBILITY_MODE_TERM.label}
-        hint={visibilityHint}
-        options={visibilityOptions.map((option) => ({
-          value: option.value,
-          label: option.label,
-          disabled: option.disabled,
-        }))}
-        value={access.visibilityMode}
-        disabled={pending || !access.available}
-        onValueChange={handleVisibilityChange}
-      />
+    <CampaignAccessFormProvider value={{ pending, onAvailableChange: handleAvailableChange }}>
+      <FormProvider {...form}>
+        <FormUiProvider fields={renderedFields}>
+          <FormSectionProvider size="md" rhythm="comfortable">
+            {persistError ? (
+              <Text variant="destructive" role="alert" className="mb-4">
+                {persistError}
+              </Text>
+            ) : null}
+            <FormItems items={renderedFields} idPrefix={sectionId} />
+          </FormSectionProvider>
+        </FormUiProvider>
+      </FormProvider>
 
       <CampaignAccessBlockedDialog
         open={blockedOpen}
         onOpenChange={setBlockedOpen}
         blockers={blockers}
       />
-    </section>
+    </CampaignAccessFormProvider>
   )
 }

@@ -6,10 +6,11 @@ import type { FieldSize } from './field.client'
 import type { FieldWidth } from './field-control.variants'
 import type { FieldHintPosition } from './field.variants'
 
+import type { FieldChromeProps } from './field-chrome.variants'
 import type { FieldValidationProps } from './field-validation-props'
 
 export interface TextareaFieldProps
-  extends React.ComponentProps<typeof Textarea>, FieldValidationProps {
+  extends React.ComponentProps<typeof Textarea>, FieldValidationProps, FieldChromeProps {
   id: string
   label: string
   hint?: string
@@ -35,6 +36,7 @@ export const TextareaField = React.forwardRef<HTMLTextAreaElement, TextareaField
       required,
       width,
       size = 'md',
+      chrome,
       ...textareaProps
     },
     ref,
@@ -52,6 +54,7 @@ export const TextareaField = React.forwardRef<HTMLTextAreaElement, TextareaField
         required={required}
         width={width}
         size={size}
+        chrome={chrome}
       >
         <Textarea ref={ref} size={size} {...textareaProps} />
       </FormField>

@@ -26,8 +26,8 @@ import {
 import {
   buildFieldControlId,
   FieldNode,
+  FieldSeparatorWrapper,
   useVisibilityValues,
-  withFieldSeparator,
 } from './form-conditional.client'
 import { isLeafController } from './form-group-section.client'
 
@@ -96,7 +96,7 @@ export function DependentSection({
     </div>
   )
 
-  return withFieldSeparator(item.separator, stackBody)
+  return <FieldSeparatorWrapper separator={item.separator}>{stackBody}</FieldSeparatorWrapper>
 }
 
 interface DependentFieldsRegionProps {

@@ -94,6 +94,18 @@ describe('FormField', () => {
     expect(screen.queryByText('Your display name.')).not.toBeInTheDocument()
   })
 
+  it('wraps the control in panel chrome when configured', () => {
+    render(
+      <FormField id="name" label="Name" chrome={{ variant: 'panel' }}>
+        <input id="name" data-testid="control" />
+      </FormField>,
+    )
+    const control = screen.getByTestId('control')
+    const chromeShell = control.closest('.rounded-md.border.bg-surface-subtle')
+    expect(chromeShell).toBeTruthy()
+    expect(chromeShell?.contains(screen.getByText('Name'))).toBe(false)
+  })
+
   it('has no axe accessibility violations', async () => {
     const { container } = render(
       <FormField id="name" label="Name">

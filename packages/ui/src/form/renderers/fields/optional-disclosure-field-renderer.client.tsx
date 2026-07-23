@@ -4,6 +4,7 @@ import { useState } from 'react'
 import type { ControllerRenderProps } from 'react-hook-form'
 
 import { OptionalFieldDisclosure } from '../../../components/ui/optional-field-disclosure.client'
+import { pickFieldChromeProps } from '../../../components/ui/field-chrome.variants'
 import { TextareaField } from '../../../components/ui/textarea-field'
 import type { FieldHintPosition } from '../../../components/ui/field.variants'
 import type { OptionalDisclosureConfig, TextareaFieldConfig } from '../../field-config'
@@ -54,6 +55,7 @@ export function OptionalDisclosureTextareaFieldRenderer({
     >
       <TextareaField
         id={id}
+        {...pickFieldChromeProps(config)}
         label=""
         aria-label={config.label}
         error={error}

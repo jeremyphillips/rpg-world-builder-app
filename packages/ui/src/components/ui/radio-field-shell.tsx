@@ -7,6 +7,7 @@ import type { FieldSize } from './field.client'
 import type { FieldWidth } from './field-control.variants'
 import type { FieldHintPosition } from './field.variants'
 
+import type { FieldChrome } from './field-chrome.variants'
 import type { FieldValidationProps } from './field-validation-props'
 
 export interface BaseRadioFieldProps extends FieldValidationProps {
@@ -19,6 +20,7 @@ export interface BaseRadioFieldProps extends FieldValidationProps {
   size?: FieldSize
   width?: FieldWidth
   labelHidden?: boolean
+  chrome?: FieldChrome
 }
 
 export interface RadioFieldShellProps extends BaseRadioFieldProps {
@@ -39,6 +41,7 @@ export function RadioFieldShell({
   size,
   width,
   labelHidden,
+  chrome,
   children,
 }: RadioFieldShellProps) {
   const labelId = `${id}-label`
@@ -67,6 +70,8 @@ export function RadioFieldShell({
           />
         }
         control={children(labelId)}
+        chrome={chrome}
+        size={size}
       />
     </Field.Root>
   )

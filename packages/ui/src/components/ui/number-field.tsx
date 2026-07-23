@@ -8,9 +8,11 @@ import type { FieldSize } from './field.client'
 import type { FieldWidth } from './field-control.variants'
 import type { FieldHintPosition, FieldLabelPosition } from './field.variants'
 
+import type { FieldChromeProps } from './field-chrome.variants'
 import type { FieldValidationProps } from './field-validation-props'
 
-export interface NumberFieldProps extends Omit<NumberInputProps, 'id'>, FieldValidationProps {
+export interface NumberFieldProps
+  extends Omit<NumberInputProps, 'id'>, FieldValidationProps, FieldChromeProps {
   id: string
   label: string
   hint?: string
@@ -46,6 +48,7 @@ export const NumberField = React.forwardRef<HTMLInputElement, NumberFieldProps>(
       inputWidth,
       size = 'md',
       labelPosition,
+      chrome,
       className,
       ...inputProps
     },
@@ -65,6 +68,7 @@ export const NumberField = React.forwardRef<HTMLInputElement, NumberFieldProps>(
         width={width}
         size={size}
         labelPosition={labelPosition}
+        chrome={chrome}
       >
         <NumberInput
           ref={ref}

@@ -13,8 +13,11 @@ import {
   type ResolvedArrayItemHeader,
 } from '../../config/array/array-item-config.lib'
 import type { ArrayConfig, ArrayItemConfig, RowConfig } from '../../field-config'
+import { isRowSlotItem } from '../../field-config'
+import { useFormSectionContext } from '../../context/form-section.context'
 import { NestedFormItems } from '../../containers/form-item-node.client'
 import { FieldNode } from '../../containers/form-conditional.client'
+import { SlotFormItemSection } from '../fields/slot-field-renderer.client'
 import { resolveIssueProminence } from '../../errors/resolve-issue-prominence'
 import { FieldRow } from '../../../components/ui/field-row'
 import { ArrayItemToolbar, ArrayItemDragHandle } from './array-item-header.client'
@@ -134,6 +137,7 @@ function CompactInlineArrayFieldItem({
   actionsRail,
   issueSummary,
 }: CompactInlineArrayFieldItemProps) {
+  const parentContext = useFormSectionContext()
   const rowPresentation = React.useContext(ArrayItemPresentationContext)
   const suppressRowFieldErrorText = resolveErrorPlacement(
     compactInlineRow.errorPlacement,
@@ -173,14 +177,24 @@ function CompactInlineArrayFieldItem({
               fields={
                 <ArrayItemPresentationContext.Provider value={rowPresentationValue}>
                   <FieldRow className={compactInlineRow.className}>
-                    {compactInlineRow.fields.map((field) => (
-                      <FieldNode
-                        key={field.name}
-                        config={field}
-                        idPrefix={idPrefix}
-                        namePrefix={namePrefix}
-                      />
-                    ))}
+                    {compactInlineRow.fields.map((field) =>
+                      isRowSlotItem(field) ? (
+                        <SlotFormItemSection
+                          key={field.name}
+                          item={field}
+                          parentContext={parentContext}
+                          depth={1}
+                          namePrefix={namePrefix}
+                        />
+                      ) : (
+                        <FieldNode
+                          key={field.name}
+                          config={field}
+                          idPrefix={idPrefix}
+                          namePrefix={namePrefix}
+                        />
+                      ),
+                    )}
                   </FieldRow>
                 </ArrayItemPresentationContext.Provider>
               }

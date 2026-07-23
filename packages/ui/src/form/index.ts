@@ -131,6 +131,7 @@ export {
   type InputUnitFieldConfig,
   type FieldConfig,
   type RowConfig,
+  type RowFieldItem,
   type GroupConfig,
   type GroupFieldItem,
   type FieldGroupFieldsChrome,
@@ -166,6 +167,7 @@ export {
   defineSelectField,
   defineDependentField,
 } from './form-authoring'
+export { isRowSlotItem } from './field-config'
 export { FIELD_WIDTHS, type FieldWidth } from '../components/ui/field-control.variants'
 export {
   FIELD_SURFACE_VARIANTS,

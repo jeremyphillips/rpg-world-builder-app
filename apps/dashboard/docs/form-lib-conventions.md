@@ -194,6 +194,7 @@ this table when completing a form-lib alignment phase.
 | Equipment families       | `equipment/*/lib/*-form-fields.ts`, `*-form-values.ts`                                                                                                                                                     | aligned |
 | Feats                    | `feats/lib/feat-form-def.ts`, `feat-form-fields.ts`, `feat-form-values.ts`                                                                                                                                 | aligned |
 | Skill proficiencies      | `skill-proficiencies/lib/skill-proficiency-form-def.ts`, `*-form-fields.ts`, `*-form-values.ts`                                                                                                            | aligned |
+| Campaign access          | `content/lib/campaign-access/campaign-access-form-fields.ts`, `campaign-access-form-visibility.ts`, `campaign-access-labels.ts`                                                                            | aligned |
 
 **Legacy rename:** equipment formerly used `*-form-input.ts`; target suffix is
 `*-form-values.ts` (completed).
