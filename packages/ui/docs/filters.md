@@ -312,6 +312,18 @@ Unicode normalization only if a concrete need appears.
 
 ---
 
+## Renderers (Milestone 1)
+
+Import from `@rpg/ui/filters`:
+
+- `useFilterState` — local filter state with `setValue` and `reset` (clear filters)
+- `FilterBar` — `placement: 'primary'` fields, optional advanced toggle, clear button
+- `FilterAdvancedPanel` — collapsible `placement: 'advanced'` fields with modified badge support via `FilterBar`
+
+Select fields use an internal `__all__` sentinel for “show all”; it never leaves the renderer.
+
+---
+
 ## Composition (overview shells)
 
 ```tsx
