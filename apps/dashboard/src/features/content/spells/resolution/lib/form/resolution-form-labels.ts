@@ -46,7 +46,6 @@ export const RESOLUTION_SECTION_LABELS = {
   preview: 'Preview',
   addResolution: 'Add resolution',
   emptyState: 'No structured resolution configured.',
-  notSavedBanner: 'Resolution is not saved yet.',
   outcomesIncomplete: 'Complete target, method, and effects to preview generated outcomes.',
   outcomesHint:
     'Choose which authored effects apply in each branch and whether each applies fully or partially.',

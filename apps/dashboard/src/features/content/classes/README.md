@@ -4,7 +4,7 @@ Character classes — overview, detail (with read-only progression table), and s
 
 Part of the [`content`](../README.md) feature; see [feature-conventions](../../../../docs/feature-conventions.md) for layout.
 
-Create/edit forms use [`TabbedForm`](../../../../../packages/ui/docs/forms.md) with tabs: **Basics**, **Proficiencies**, **Spellcasting**, **Features**, **Subclasses** (master-detail editor for per-subclass authoring — local state only until persistence is wired), and **Character creation** (**Class starting options** — always editable, including on system classes).
+Create/edit forms use [`TabbedForm`](../../../../../packages/ui/docs/forms.md) with tabs: **Basics**, **Proficiencies**, **Spellcasting**, **Features**, **Subclasses** (master-detail editor with separate **Save subclass** per row), and **Character creation** (**Class starting options** — always editable, including on system classes).
 
 The **Features** tab is a master-detail editor over the class's embedded `features` array, built on the shared content master-detail abstraction (see [`content` README](../README.md#master-detail-abstraction)): a selectable list on the left (each row shows a **Level** eyebrow), the selected feature's form on the right. It binds to the parent form via `useFieldArray`, so global save and validation are unchanged from the previous inline array. Resources remain inline below.
 
@@ -12,7 +12,7 @@ Delete-locking is **derived** because class features have no per-feature `source
 
 The **Character creation** tab edits optional `characterCreation.startingEquipment`: master-detail packages (`standard`, `gold`, `heavy`, etc.) with **granted** items (`kind: 'grant'` — specific gear received automatically), **choice** items (`kind: 'choice'` — player picks from a pool), wealth grants, and spellcasting focus modifiers. See `grantedEquipmentItemSchema` in `@rpg/contracts` for the discriminant vocabulary. Packages stay fully editable on system classes (no delete lock). An empty state offers **Add starting equipment**; defaults seed standard + gold packages.
 
-The **Subclasses** tab uses a list + editor layout: seed subclasses load from the API, edits and drafts are kept in local state, each row has an **Active in campaign** toggle, and homebrew/unsaved drafts can be deleted via `ConfirmDialog`. Authoring is gated until the class is saved and until the **Features** tab includes the explicit subclass-choice feature.
+The **Subclasses** tab uses a list + editor layout: subclasses load from the nested API (system + homebrew + patches), each row has an **Active in campaign** toggle (dedicated availability PATCH), and **Save subclass** persists the full body via nested POST/PATCH. Homebrew rows delete through the shared deletion flow (`409` when characters reference the subclass). Authoring is gated until the class is saved and until the **Features** tab includes the explicit subclass-choice feature.
 
 ## Key files
 

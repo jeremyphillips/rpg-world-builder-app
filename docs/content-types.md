@@ -930,17 +930,18 @@ do not hardcode the display string:
 
 ## Subclass ownership (nested under classes)
 
-Subclasses are **not** registered in `content-types.ts`. They use a nested read route and a dedicated API folder (`apps/api/src/features/content/subclasses/`).
+Subclasses are **not** registered in `content-types.ts`. They use nested routes and a dedicated API folder (`apps/api/src/features/content/subclasses/`).
 
-| Layer             | Source                                     | Persistence / API                                    |
-| ----------------- | ------------------------------------------ | ---------------------------------------------------- |
-| **System**        | `@rpg/catalog/classes` (`subclasses.json`) | Read-only seed; `GET …/classes/:classId/subclasses`  |
-| **Homebrew**      | _Planned_                                  | Future: campaign-owned Mongo + nested POST/PATCH     |
-| **Overlay patch** | _Planned_                                  | Future: per-campaign partial edits on system records |
+| Layer             | Source                                     | Persistence / API                                                               |
+| ----------------- | ------------------------------------------ | ------------------------------------------------------------------------------- |
+| **System**        | `@rpg/catalog/classes` (`subclasses.json`) | Read-only seed; listed via `GET …/classes/:classId/subclasses`                  |
+| **Homebrew**      | `HomebrewSubclassModel`                    | `POST/PATCH/DELETE …/classes/:classId/subclasses/:subclassId`                   |
+| **Overlay patch** | `SubclassPatchModel`                       | Partial edits on system ids via nested PATCH                                    |
+| **Availability**  | `SubclassCampaignAvailabilityModel`        | `PATCH …/subclasses/:subclassId/availability` (`activeInCampaign` on list rows) |
 
-**Dashboard today:** the class editor Subclasses tab keeps drafts and edits in **local React state** only — no save to the API. Contracts already define `Subclass`, `createSubclassInputSchema`, and patch shapes for when persistence lands.
+List responses include **all** subclasses for the class (including inactive) with `activeInCampaign` per row (default `true`). Dashboard **Save subclass** sends the full body; availability toggles use the dedicated route.
 
-**Follow-on milestone:** `subclasses.config.ts` registration, Mongo models, write hooks, and `POST/PATCH …/classes/:classId/subclasses/:id`. Catalog read behavior must stay unchanged.
+Delete is blocked with `409` when campaign characters reference the subclass (`classes[].subclassId`).
 
 ---
 

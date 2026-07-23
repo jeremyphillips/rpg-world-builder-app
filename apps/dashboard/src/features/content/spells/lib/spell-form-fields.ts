@@ -7,7 +7,8 @@ import {
   durationUnitSchema,
   effectConditionSchema,
   slugSchema,
-  spellContentLevelSchema,
+  parseSelectNumberInput,
+  spellFormLevelSchema,
   spellFunctionTagSchema,
   spellRangeKindSchema,
   spellRoleTagSchema,
@@ -96,17 +97,24 @@ function visibleWhenReactionCastingTime(): FieldVisibility {
   }
 }
 
+function spellFormLevelValue(level: unknown): number | undefined {
+  return parseSelectNumberInput(level)
+}
+
 function visibleWhenCantripLevel(): FieldVisibility {
   return {
     dependsOn: ['level'],
-    visibleWhen: (v) => v.level === 0,
+    visibleWhen: (v) => spellFormLevelValue(v.level) === 0,
   }
 }
 
 function visibleWhenLeveledSpell(): FieldVisibility {
   return {
     dependsOn: ['level'],
-    visibleWhen: (v) => typeof v.level === 'number' && v.level > 0,
+    visibleWhen: (v) => {
+      const level = spellFormLevelValue(v.level)
+      return level !== undefined && level > 0
+    },
   }
 }
 
@@ -130,7 +138,7 @@ export const spellFormSchema = z
     cantripScaling: z.string().optional(),
     higherLevelSlotEffect: z.string().optional(),
     school: spellSchoolIdSchema,
-    level: spellContentLevelSchema,
+    level: spellFormLevelSchema,
     classIds: z.array(z.string()).min(1),
     tags: z
       .object({
@@ -253,14 +261,15 @@ function basicsFields(ctx: ContentFormCtx): FormItem[] {
           label: 'School',
           options: schoolOptions,
           required: true,
+          width: 'xl',
         },
         {
-          type: 'select',
+          type: 'chips',
           name: 'level',
           label: 'Level',
           options: spellLevelOptions,
-          placeholder: 'Choose level…',
           required: true,
+          width: 'md',
         },
       ],
     },

@@ -24,6 +24,33 @@ export function campaignLevelSchema(maxLevel: number) {
   return z.number().int().min(1).max(maxLevel)
 }
 
+/** Maps blank required-select sentinels to `undefined` before numeric coercion. */
+export function normalizeSelectNumberInput(value: unknown): unknown {
+  if (value === '' || value == null) return undefined
+  return value
+}
+
+/** Parses a select-backed numeric field value for visibility and display helpers. */
+export function parseSelectNumberInput(value: unknown): number | undefined {
+  const normalized = normalizeSelectNumberInput(value)
+  if (normalized === undefined) return undefined
+  const numeric = typeof normalized === 'number' ? normalized : Number(normalized)
+  return Number.isFinite(numeric) ? numeric : undefined
+}
+
+/**
+ * Required numeric `<select>` schema: string option values coerce to numbers; blank
+ * sentinels fail validation instead of coercing to `0`.
+ */
+export function coercedSelectNumberSchema(schema: z.ZodNumber) {
+  return z.preprocess(normalizeSelectNumberInput, z.coerce.number().pipe(schema))
+}
+
+/** Campaign level selects — blank fails; `"3"` coerces to `3`. */
+export function campaignLevelSelectSchema(maxLevel: number) {
+  return coercedSelectNumberSchema(campaignLevelSchema(maxLevel))
+}
+
 /** A number bounded by Zod (1–20); not a TS literal union. */
 export type Level = z.infer<typeof levelSchema>
 

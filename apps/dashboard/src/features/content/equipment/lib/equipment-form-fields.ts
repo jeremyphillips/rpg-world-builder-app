@@ -242,7 +242,13 @@ const kindSchemas: Record<EquipmentKind, z.ZodTypeAny> = {
 /** Kind-specific schema for family create/edit routes; falls back to the unscoped hub schema. */
 export function resolveEquipmentFormSchema(ctx: ContentFormCtx): z.ZodType<EquipmentFormValues> {
   if (!ctx.equipmentKind) return equipmentFormSchema as z.ZodType<EquipmentFormValues>
-  return kindSchemas[ctx.equipmentKind] as z.ZodType<EquipmentFormValues>
+
+  const kindSchema = kindSchemas[ctx.equipmentKind]
+  const equipmentKind = ctx.equipmentKind
+  return z.preprocess((value) => {
+    if (typeof value !== 'object' || value === null) return value
+    return { ...value, kind: equipmentKind }
+  }, kindSchema) as z.ZodType<EquipmentFormValues>
 }
 
 /**

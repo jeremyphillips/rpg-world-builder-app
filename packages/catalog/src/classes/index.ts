@@ -105,6 +105,11 @@ export function seedClassSlugs(rulesetId: SystemRulesetId): ReadonlySet<string> 
   return new Set(loadSeedClasses(rulesetId).map((c) => c.slug))
 }
 
+/** System subclass slugs for a ruleset — used by the homebrew slug guard. */
+export function seedSubclassSlugs(rulesetId: SystemRulesetId): ReadonlySet<string> {
+  return new Set(loadSeedSubclasses(rulesetId).map((subclass) => subclass.slug))
+}
+
 export function getClassBySlug(rulesetId: SystemRulesetId, slug: string): CharacterClass {
   return getBySlug(loadSeedClasses, rulesetId, slug, getContentTypeTerm('classes').label)
 }

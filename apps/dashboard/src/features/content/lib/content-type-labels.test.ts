@@ -5,7 +5,9 @@ import {
   formatAddContentTypeLabel,
   formatChooseContentTypePlaceholder,
   formatContentCollectionAvailabilityCaption,
+  formatContentCreateActionLabel,
   formatContentCreateHeading,
+  formatContentCreatedMessage,
   formatContentListLoadErrorMessage,
   formatContentLoadErrorMessage,
   formatContentNotFoundMessage,
@@ -48,6 +50,13 @@ describe('content type labels', () => {
     expect(formatContentNotFoundMessage('species')).toBe('Species not found.')
     expect(formatContentCreateHeading('skill-proficiencies')).toBe('New Skill Proficiency')
     expect(formatContentNotFoundMessage('skill-proficiencies')).toBe('Skill proficiency not found.')
+  })
+
+  it('formats create action and success messages', () => {
+    expect(formatContentCreateActionLabel('spells')).toBe('Create spell')
+    expect(formatContentCreateActionLabel('species')).toBe('Create species')
+    expect(formatContentCreatedMessage('spells')).toBe('Spell created.')
+    expect(formatContentCreatedMessage('skill-proficiencies')).toBe('Skill proficiency created.')
   })
 
   it('formats load error messages in singular and plural', () => {

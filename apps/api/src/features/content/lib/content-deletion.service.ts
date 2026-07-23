@@ -20,12 +20,9 @@ async function evaluateContentDeletion<T extends WriteEntityBase>(
     throw new HttpError(403, 'forbidden', 'System content cannot be deleted.')
   }
 
-  const characterBlockers = await resolveContentCharacterUsageBlockers(
-    campaignId,
-    config.typeName,
-    entityId,
-    entity.slug,
-  )
+  const characterBlockers = config.resolveCharacterUsageBlockers
+    ? await config.resolveCharacterUsageBlockers({ campaignId, entity })
+    : await resolveContentCharacterUsageBlockers(campaignId, config.typeName, entityId, entity.slug)
 
   const hookBlockers = config.resolveDeleteBlockers
     ? await config.resolveDeleteBlockers({ campaignId, entity })

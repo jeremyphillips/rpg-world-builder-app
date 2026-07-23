@@ -1,7 +1,12 @@
 'use client'
 
 import * as React from 'react'
-import { FormProvider, type FieldErrors, type FieldValues, type UseFormReturn } from 'react-hook-form'
+import {
+  FormProvider,
+  type FieldErrors,
+  type FieldValues,
+  type UseFormReturn,
+} from 'react-hook-form'
 
 import { FileFieldPropsProvider } from '../context/file-field-props.context'
 import {
@@ -16,6 +21,7 @@ import {
   FormUiProvider,
   type FormUiContextValue,
   type FormValidationPresentation,
+  type ValidateSilently,
 } from '../context/form-ui.context'
 import type { FileFieldPropsMap, FormItem } from '../field-config'
 import { navigateInvalidSubmit } from '../config/navigate-invalid-submit.client'
@@ -38,6 +44,7 @@ interface SchemaFormShellProps<TFieldValues extends FieldValues> {
   /** Shared submit-attempt flag for tabbed layouts; see `FormUiProvider`. */
   hasAttemptedSubmit?: boolean
   onMarkSubmitAttempted?: () => void
+  validateSilently?: ValidateSilently
   onSubmit: (values: TFieldValues, form: UseFormReturn<TFieldValues>) => void
   /** Overrides default failed-submit navigation (expand keys + focus). */
   onInvalidSubmit?: (
@@ -98,6 +105,7 @@ export function SchemaFormShell<TFieldValues extends FieldValues>({
   validationPresentation = 'progressive',
   hasAttemptedSubmit,
   onMarkSubmitAttempted,
+  validateSilently,
   onSubmit,
   onInvalidSubmit,
   className,
@@ -118,6 +126,7 @@ export function SchemaFormShell<TFieldValues extends FieldValues>({
           validationPresentation={validationPresentation}
           hasAttemptedSubmit={hasAttemptedSubmit}
           onMarkSubmitAttempted={onMarkSubmitAttempted}
+          validateSilently={validateSilently}
         >
           <SchemaFormElement
             form={form}

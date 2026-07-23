@@ -1,5 +1,6 @@
 import { z } from 'zod'
 
+import { coercedSelectNumberSchema } from '../../primitives/level'
 import { areaGeometrySchema } from '../../primitives/area-geometry'
 import {
   spellCastingTimeSchema,
@@ -36,6 +37,9 @@ export const spellContentLevelSchema = z
 
 export type SpellContentLevel = z.infer<typeof spellContentLevelSchema>
 
+/** Spell level `<select>` input — blank fails; `"0"`/`"1"` coerce to cantrip/leveled slots. */
+export const spellFormLevelSchema = coercedSelectNumberSchema(spellContentLevelSchema)
+
 // ---------------------------------------------------------------------------
 // Spell — prose-first catalog content. Structured fields are reference metadata
 // for display and filtering; all mechanical detail lives in `description` HTML.
@@ -59,7 +63,7 @@ export const spellBodySchema = contentBodyBaseSchema.extend({
   cantripScaling: z.string().optional(),
   /** Rich-text HTML (TipTap). Upcast body prose — no "Using a Higher-Level Spell Slot" heading. */
   higherLevelSlotEffect: z.string().optional(),
-  /** Structured resolution envelope; optional until resolution authoring persistence lands. */
+  /** Structured resolution envelope for spell execution modeling. */
   resolution: spellResolutionSchema.optional(),
   /** Human-reviewed modeling posture; absent until audited. */
   modeling: contentModelingSchema.optional(),
@@ -67,11 +71,8 @@ export const spellBodySchema = contentBodyBaseSchema.extend({
 
 export type SpellBody = z.infer<typeof spellBodySchema>
 
-/**
- * Spell body fields included in create/update API input today.
- * Effects and resolution are intentionally omitted until persistence lands.
- */
-export const spellPersistedBodySchema = spellBodySchema.omit({ resolution: true })
+/** Spell body fields included in create/update API input. */
+export const spellPersistedBodySchema = spellBodySchema
 
 export type SpellPersistedBody = z.infer<typeof spellPersistedBodySchema>
 
@@ -82,7 +83,15 @@ export type Spell = z.infer<typeof spellSchema>
 export const createSpellInputSchema = spellPersistedBodySchema.extend({ slug: slugSchema })
 export type CreateSpellInput = z.infer<typeof createSpellInputSchema>
 
-export const updateSpellInputSchema = createSpellInputSchema.partial()
+/**
+ * PATCH semantics for `resolution`:
+ * - omitted → leave stored resolution unchanged
+ * - `null` → remove stored resolution
+ * - object → replace stored resolution entirely
+ */
+export const updateSpellInputSchema = createSpellInputSchema.partial().extend({
+  resolution: spellResolutionSchema.nullable().optional(),
+})
 export type UpdateSpellInput = z.infer<typeof updateSpellInputSchema>
 
 export const spellPatchSchema = contentPatchBaseSchema.extend({

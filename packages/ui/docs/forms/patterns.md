@@ -33,8 +33,26 @@ footer={(form) => (
 )}
 ```
 
-`FormFooterActions` for multi-button footers. `<Form stickyFooter>` and `<TabbedForm>` wrap
-footers in `FormActionsBar`.
+`FormFooterActions` for multi-button footers — pass `submitDisabled` when validity or dirty
+state should block submit, and `secondaryDisabled` to disable Cancel/Discard (defaults to
+`pending` so secondaries disable during submit):
+
+```tsx
+footer={(form) => (
+  <FormFooterActions
+    pending={mutation.isPending || form.formState.isSubmitting}
+    submitDisabled={!form.formState.isDirty || !form.formState.isValid}
+    secondary={
+      <Button type="button" variant="outline" onClick={() => form.reset()}>
+        Discard changes
+      </Button>
+    }
+    submitLabel="Save changes"
+  />
+)}
+```
+
+`<Form stickyFooter>` and `<TabbedForm>` wrap footers in `FormActionsBar`.
 
 ## Wizard steps
 

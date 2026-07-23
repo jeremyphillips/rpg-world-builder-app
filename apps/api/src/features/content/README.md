@@ -72,6 +72,15 @@ Each content type contributes only a body schema (in `@rpg/contracts`) + a
 
 See `lib/content-write.service.ts` and each type's `*Registration.write` in `*.config.ts`.
 
+### Write baseline regression (all six types)
+
+Service-level homebrew create, homebrew update, and system overlay patch for
+every registered catalog type are covered in
+[`lib/content-write-baseline.test.ts`](lib/content-write-baseline.test.ts).
+HTTP POST/PATCH smoke tests live in
+[`content.routes.test.ts`](content.routes.test.ts) (`content write routes`).
+Run these before landing spell-resolution or subclass persistence work.
+
 ## Homebrew hub summary
 
 Mounted under `/api/campaigns/:campaignId/homebrew`.

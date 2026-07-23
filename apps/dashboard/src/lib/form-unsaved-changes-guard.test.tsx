@@ -13,7 +13,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { z, type ZodType } from 'zod'
 import { Form, type FormItem } from '@rpg/ui/form'
 
-import { FormUnsavedChangesGuard } from './form-unsaved-changes-guard'
+import { FormUnsavedChangesGuard, allowFormNavigationOnce } from './form-unsaved-changes-guard'
 import { renderWithDataRouter } from './test-router'
 
 interface TestValues {
@@ -77,6 +77,30 @@ function BackNavigationForm() {
       <input id="name" aria-label="Name" {...form.register('name')} />
       <button type="button" onClick={() => navigate(-1)}>
         Back
+      </button>
+    </FormProvider>
+  )
+}
+
+function PostSaveNavigationForm() {
+  const navigate = useNavigate()
+  const form = useForm<TestValues>({ defaultValues: { name: 'Original' } })
+
+  return (
+    <FormProvider {...form}>
+      <FormUnsavedChangesGuard />
+      <label htmlFor="name">Name</label>
+      <input id="name" aria-label="Name" {...form.register('name')} />
+      <button
+        type="button"
+        onClick={() => {
+          const values = form.getValues()
+          form.reset(values)
+          allowFormNavigationOnce()
+          navigate('/away')
+        }}
+      >
+        Save and leave
       </button>
     </FormProvider>
   )
@@ -221,6 +245,17 @@ describe('FormUnsavedChangesGuard', () => {
     await awaitGuardedRichTextFormReady()
 
     await leaveAndExpectAwayWithoutPrompt(user)
+  })
+
+  it('allows programmatic navigation immediately after reset when save bypass is set', async () => {
+    const user = userEvent.setup()
+    renderFormRoute(<PostSaveNavigationForm />)
+
+    await editNameToChanged(user)
+    await user.click(screen.getByRole('button', { name: 'Save and leave' }))
+
+    expect(await screen.findByText('Away page')).toBeInTheDocument()
+    expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument()
   })
 
   it('continues POP back navigation when the user confirms discard', async () => {

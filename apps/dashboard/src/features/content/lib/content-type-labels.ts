@@ -41,6 +41,17 @@ export function formatContentCreateHeading(key: ContentTypeKey): string {
   return `New ${getContentTypeItemLabel(key)}`
 }
 
+/** Create submit label — e.g. "Create spell". */
+export function formatContentCreateActionLabel(key: ContentTypeKey): string {
+  return `Create ${getContentTypeMidSentenceLabel(key)}`
+}
+
+/** Create success message for future toast — e.g. "Spell created." */
+export function formatContentCreatedMessage(key: ContentTypeKey): string {
+  const label = getContentTypeSentenceLabel(key)
+  return `${label} created.`
+}
+
 /** Generic not-found sentence when no message catalog entry exists. */
 export function formatContentNotFoundMessage(key: ContentTypeKey): string {
   return `${getContentTypeSentenceLabel(key)} not found.`

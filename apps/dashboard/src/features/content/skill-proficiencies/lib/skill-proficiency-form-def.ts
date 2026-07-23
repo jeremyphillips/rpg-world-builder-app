@@ -9,6 +9,7 @@ import {
 } from './skill-proficiency-form-fields'
 import {
   buildSkillProficiencyCreateInput,
+  skillProficiencyCreateDefaultValues,
   skillProficiencyToFormValues,
 } from './skill-proficiency-form-values'
 
@@ -20,6 +21,7 @@ const skillProficiencyFormDef: ContentFormDef<
   routeKey: 'skill-proficiencies',
   schema: skillProficiencyFormSchema,
   coverage: 'structural',
+  createDefaultValues: skillProficiencyCreateDefaultValues,
   buildFields: buildSkillProficiencyFields,
   toFormValues: skillProficiencyToFormValues,
   toInput: buildSkillProficiencyCreateInput,

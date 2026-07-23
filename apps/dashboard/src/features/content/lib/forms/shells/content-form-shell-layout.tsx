@@ -1,11 +1,10 @@
-import { useNavigate } from 'react-router-dom'
 import * as React from 'react'
 import type { DefaultValues, FieldValues, UseFormReturn } from 'react-hook-form'
 import type { ZodType } from 'zod'
-import { Heading, InsetPanel, Button } from '@rpg/ui'
+import type { ContentTypeKey } from '@rpg/contracts'
+import { Heading, InsetPanel } from '@rpg/ui'
 import {
   Form,
-  FormFooterActions,
   TabbedForm,
   type FormItem,
   type FormValueSync,
@@ -13,7 +12,6 @@ import {
 } from '@rpg/ui/form'
 
 import { NarrowPage } from '@/components/layout/narrow-page'
-import { FormUnsavedChangesGuard } from '@/lib/form-unsaved-changes-guard'
 import { weaponAdvisorySubmitOptions, weaponFormValueSyncs } from '../../../equipment/weapons'
 import { resolutionFormValueSyncs } from '../../../spells/resolution/lib/form/resolution-form-sync'
 import { useContentFormOptions } from '../../form-options/content-form-options'
@@ -23,6 +21,7 @@ import {
   CONTENT_CATALOG_OPTIONS_ERROR,
   ContentFormShellResolver,
 } from './content-form-shell-resolver'
+import { ContentFormFooter } from './content-form-footer'
 import { useAdvisoryFormSubmit, type AdvisoryFormSubmitOptions } from './use-advisory-form-submit'
 
 export function ContentFormComingSoon() {
@@ -44,39 +43,21 @@ export function ContentFormNotRegistered({ heading = 'Edit' }: { heading?: strin
   )
 }
 
-interface ContentFormCancelFooterProps {
-  backHref: string
+interface ContentFormFooterShellProps {
+  formMode: 'create' | 'edit'
+  backHref?: string
   submitLabel: string
-  pending: boolean
+  submitPending: boolean
+  submitSuccess?: boolean
 }
 
-function ContentFormCancelFooter({ backHref, submitLabel, pending }: ContentFormCancelFooterProps) {
-  const navigate = useNavigate()
-
-  return (
-    <>
-      <FormUnsavedChangesGuard />
-      <FormFooterActions
-        pending={pending}
-        submitLabel={submitLabel}
-        secondary={
-          <Button type="button" variant="outline" onClick={() => navigate(backHref)}>
-            Cancel
-          </Button>
-        }
-      />
-    </>
-  )
-}
-
-interface ContentSchemaFormProps<TFormValues extends FieldValues> {
+interface ContentSchemaFormProps<
+  TFormValues extends FieldValues,
+> extends ContentFormFooterShellProps {
   schema: ZodType<TFormValues>
   fields: FormItem[]
   defaultValues?: DefaultValues<TFormValues>
   formKey?: string
-  backHref: string
-  submitLabel: string
-  submitPending: boolean
   formError: string | null
   onSubmit: (values: TFormValues, form: UseFormReturn<TFormValues>) => Promise<void>
   valueSyncs?: FormValueSync[]
@@ -92,9 +73,11 @@ function ContentSchemaForm<TFormValues extends FieldValues>({
   fields,
   defaultValues,
   formKey,
+  formMode,
   backHref,
   submitLabel,
   submitPending,
+  submitSuccess = false,
   formError,
   onSubmit,
   valueSyncs,
@@ -125,10 +108,13 @@ function ContentSchemaForm<TFormValues extends FieldValues>({
         valueSyncs={valueSyncs}
         stickyFooter
         footer={(form) => (
-          <ContentFormCancelFooter
+          <ContentFormFooter
+            mode={formMode}
+            form={form}
             backHref={backHref}
             submitLabel={submitLabel}
             pending={submitPending || form.formState.isSubmitting}
+            isSuccess={submitSuccess}
           />
         )}
       />
@@ -137,14 +123,13 @@ function ContentSchemaForm<TFormValues extends FieldValues>({
   )
 }
 
-interface ContentTabbedSchemaFormProps<TFormValues extends FieldValues> {
+interface ContentTabbedSchemaFormProps<
+  TFormValues extends FieldValues,
+> extends ContentFormFooterShellProps {
   schema: ZodType<TFormValues>
   tabs: TabbedFormTab[]
   defaultValues?: DefaultValues<TFormValues>
   formKey?: string
-  backHref: string
-  submitLabel: string
-  submitPending: boolean
   formError: string | null
   onSubmit: (values: TFormValues, form: UseFormReturn<TFormValues>) => Promise<void>
   valueSyncs?: FormValueSync[]
@@ -160,9 +145,11 @@ function ContentTabbedSchemaForm<TFormValues extends FieldValues>({
   tabs,
   defaultValues,
   formKey,
+  formMode,
   backHref,
   submitLabel,
   submitPending,
+  submitSuccess = false,
   formError,
   onSubmit,
   valueSyncs,
@@ -192,10 +179,13 @@ function ContentTabbedSchemaForm<TFormValues extends FieldValues>({
         onSubmit={(values, form) => handleSubmit(values, form)}
         formError={formError}
         footer={(form) => (
-          <ContentFormCancelFooter
+          <ContentFormFooter
+            mode={formMode}
+            form={form}
             backHref={backHref}
             submitLabel={submitLabel}
             pending={submitPending || form.formState.isSubmitting}
+            isSuccess={submitSuccess}
           />
         )}
       />
@@ -210,9 +200,12 @@ interface ContentFormLayoutProps<TFormValues extends FieldValues> {
   schema: ZodType<TFormValues>
   defaultValues?: DefaultValues<TFormValues>
   formKey?: string
-  backHref: string
+  formMode: 'create' | 'edit'
+  contentTypeKey: ContentTypeKey
+  backHref?: string
   submitLabel: string
   submitPending: boolean
+  submitSuccess?: boolean
   formError: string | null
   onSubmit: (values: TFormValues, form: UseFormReturn<TFormValues>) => Promise<void>
 }
@@ -223,9 +216,12 @@ export function ContentFormLayout<TFormValues extends FieldValues>({
   schema,
   defaultValues,
   formKey,
+  formMode,
+  contentTypeKey: _contentTypeKey,
   backHref,
   submitLabel,
   submitPending,
+  submitSuccess,
   formError,
   onSubmit,
 }: ContentFormLayoutProps<TFormValues>) {
@@ -235,8 +231,10 @@ export function ContentFormLayout<TFormValues extends FieldValues>({
     if (!isWeaponEquipmentForm) return { enabled: false }
     // Weapon advisories are authored for EquipmentFormValues; this layout only
     // enables them on the weapon equipment route where TFormValues matches.
-    return weaponAdvisorySubmitOptions() as unknown as AdvisoryFormSubmitOptions<TFormValues>
-  }, [isWeaponEquipmentForm])
+    return weaponAdvisorySubmitOptions(
+      ctx.equipmentKind,
+    ) as unknown as AdvisoryFormSubmitOptions<TFormValues>
+  }, [isWeaponEquipmentForm, ctx.equipmentKind])
   const { onSubmit: advisoryOnSubmit, confirmDialog } = useAdvisoryFormSubmit(
     onSubmit,
     weaponAdvisoryOptions,
@@ -252,9 +250,11 @@ export function ContentFormLayout<TFormValues extends FieldValues>({
     schema,
     defaultValues,
     formKey,
+    formMode,
     backHref,
     submitLabel,
     submitPending,
+    submitSuccess,
     formError,
     onSubmit: resolvedOnSubmit,
     valueSyncs,

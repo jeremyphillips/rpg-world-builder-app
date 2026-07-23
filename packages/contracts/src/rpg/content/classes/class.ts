@@ -201,6 +201,12 @@ export type SubclassBody = z.infer<typeof subclassBodySchema>
 export const subclassSchema = contentMetaSchema.extend(subclassBodySchema.shape)
 export type Subclass = z.infer<typeof subclassSchema>
 
+/** Resolved list row — body fields plus campaign availability metadata. */
+export const resolvedSubclassSchema = subclassSchema.extend({
+  activeInCampaign: z.boolean(),
+})
+export type ResolvedSubclass = z.infer<typeof resolvedSubclassSchema>
+
 export const createSubclassInputSchema = subclassBodySchema.extend({ slug: slugSchema })
 export type CreateSubclassInput = z.infer<typeof createSubclassInputSchema>
 

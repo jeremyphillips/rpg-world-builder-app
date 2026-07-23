@@ -8,6 +8,7 @@ import { normalizeHomebrewWriteInput } from './apply-content-keys'
 import { assertSlugAvailable } from './assert-slug-available'
 import { deepMerge } from './deep-merge'
 import type { ContentWriteConfig, ContentWriteContext, HomebrewDoc } from './content-write-config'
+import { stripNullDeep, stripNullDeepFields } from './strip-null-deep'
 
 type StoredEntity = {
   id: string
@@ -63,20 +64,26 @@ function normalizeWriteInput(
 }
 
 function prepareSystemPatchMerge<T extends StoredEntity>(
-  _config: ContentWriteConfig<T>,
+  config: ContentWriteConfig<T>,
   existing: T,
   existingPatch: Record<string, unknown> | undefined,
   update: Record<string, unknown>,
 ): { mergedBody: Record<string, unknown>; cumulativePatch: Record<string, unknown> } {
+  const mergeOptions = { replaceKeys: config.readConfig.patchReplaceKeys }
   const patchBody = stripUndefined(update)
   const existingPatchStripped = existingPatch ?? {}
   const mergedBodyRaw = deepMerge(
-    deepMerge(entityBody(existing as unknown as Record<string, unknown>), existingPatchStripped),
+    deepMerge(
+      entityBody(existing as unknown as Record<string, unknown>),
+      existingPatchStripped,
+      mergeOptions,
+    ),
     patchBody,
+    mergeOptions,
   )
   return {
     mergedBody: mergedBodyRaw,
-    cumulativePatch: deepMerge(existingPatchStripped, patchBody),
+    cumulativePatch: deepMerge(existingPatchStripped, patchBody, mergeOptions),
   }
 }
 
@@ -118,6 +125,21 @@ async function finalizeWriteResult<T extends StoredEntity>(
   return entity
 }
 
+function splitMongoUpdate(update: Record<string, unknown>): {
+  set: Record<string, unknown>
+  unset: Record<string, 1>
+} {
+  const set: Record<string, unknown> = {}
+  const unset: Record<string, 1> = {}
+
+  for (const [key, value] of Object.entries(update)) {
+    if (value === null) unset[key] = 1
+    else if (value !== undefined) set[key] = value
+  }
+
+  return { set, unset }
+}
+
 async function updateHomebrewRecord<T extends StoredEntity>(
   config: ContentWriteConfig<T>,
   campaignId: string,
@@ -137,8 +159,13 @@ async function updateHomebrewRecord<T extends StoredEntity>(
     ? config.prepareHomebrewUpdate(doc, update)
     : stripUndefined(update)
 
+  const { set, unset } = splitMongoUpdate(patch)
+  const mongoUpdate: { $set?: Record<string, unknown>; $unset?: Record<string, 1> } = {}
+  if (Object.keys(set).length > 0) mongoUpdate.$set = set
+  if (Object.keys(unset).length > 0) mongoUpdate.$unset = unset
+
   const updated = await config.homebrewModel
-    .findOneAndUpdate({ _id: entityId, campaignId }, { $set: patch }, { new: true })
+    .findOneAndUpdate({ _id: entityId, campaignId }, mongoUpdate, { new: true })
     .lean<HomebrewDoc>()
   if (!updated) {
     throw new HttpError(404, 'not_found', 'Homebrew record not found.')
@@ -170,11 +197,16 @@ async function updateSystemPatch<T extends StoredEntity>(
     existingPatchDoc?.patch,
     update,
   )
-  config.bodySchema.parse(mergedBody)
+  const mergedBodyForParse = config.readConfig.patchReplaceKeys?.length
+    ? stripNullDeepFields(mergedBody, config.readConfig.patchReplaceKeys)
+    : mergedBody
+  config.bodySchema.parse(mergedBodyForParse)
+
+  const sanitizedPatch = stripNullDeep(cumulativePatch) as Record<string, unknown>
 
   await config.patchModel.findOneAndUpdate(
     { campaignId, targetId: entityId },
-    { $set: { patch: cumulativePatch } },
+    { $set: { patch: sanitizedPatch } },
     { upsert: true, new: true },
   )
 
@@ -183,7 +215,14 @@ async function updateSystemPatch<T extends StoredEntity>(
   if (!entity) {
     throw new HttpError(404, 'not_found', 'Patched record not found after update.')
   }
-  return config.storedSchema.parse(entity)
+
+  const sanitizeKeys = config.readConfig.patchReplaceKeys
+  const entityForParse =
+    sanitizeKeys?.length && entity
+      ? stripNullDeepFields(entity as Record<string, unknown>, sanitizeKeys)
+      : entity
+
+  return config.storedSchema.parse(entityForParse as T)
 }
 
 /** Create a campaign-owned homebrew record for a content type. */

@@ -10,6 +10,7 @@ import {
   spellTagsSchema,
   createSpellInputSchema,
   spellDeliveryMethodSchema,
+  updateSpellInputSchema,
   type CreateSpellInput,
   type Distance,
   type Spell,
@@ -24,8 +25,10 @@ import { finalizeContentInput, slugForInputParse } from '../../lib/forms/content
 import type { ContentFormInputCtx } from '../../lib/forms/content-form-registry'
 import { SPELL_AREA_GEOMETRY_NONE, SPELL_DELIVERY_METHOD_NONE } from './spell-form-labels'
 import type { SpellFormValues } from './spell-form-fields'
-import { resolutionToForm } from '../resolution/lib/form/resolution-form-values'
+import { resolutionToForm, resolutionToStored } from '../resolution/lib/form/resolution-form-values'
+import { isResolutionFormConfigured } from '../resolution/lib/form/resolution-form-visibility'
 import { isSpellResolutionEditorEligible } from './spell-display'
+import type { ResolutionFormValues } from '../resolution/lib/form/resolution-form-schema'
 
 export type SpellFormCastingTime = {
   normal: {
@@ -390,6 +393,21 @@ export function spellAreaOfEffectFromFormValues(
   return AREA_GEOMETRY_FROM_FORM_VALUES[shape](areaOfEffect)
 }
 
+/** Maps resolution form state to create/update payload semantics. */
+export function resolutionToPatchInput(
+  values: SpellFormValues,
+  ctx?: ContentFormInputCtx<Spell>,
+): Spell['resolution'] | null | undefined {
+  const hadStoredResolution = ctx?.entity?.resolution != null
+  const configured = isResolutionFormConfigured(values as Record<string, unknown>)
+
+  if (!configured) {
+    return hadStoredResolution ? null : undefined
+  }
+
+  return resolutionToStored(values.resolution as ResolutionFormValues | undefined)
+}
+
 export function spellToFormValues(entity: Spell): SpellFormValues {
   return {
     name: entity.name,
@@ -420,7 +438,7 @@ export function buildSpellCreateInput(
   values: SpellFormValues,
   ctx?: ContentFormInputCtx<Spell>,
 ): CreateSpellInput {
-  const { effects: _effects, resolution: _resolution, ...persistedValues } = values
+  const { effects: _effects, ...persistedValues } = values
 
   const rawDelivery = persistedValues.deliveryMethod?.trim()
   const deliveryMethod =
@@ -432,7 +450,9 @@ export function buildSpellCreateInput(
     persistedValues.areaOfEffect as SpellFormAreaOfEffect | undefined,
   )
 
-  const input = createSpellInputSchema.parse({
+  const resolution = resolutionToPatchInput(values, ctx)
+
+  const payload = {
     slug: slugForInputParse(persistedValues.name, ctx),
     name: persistedValues.name,
     description: persistedValues.description || undefined,
@@ -450,7 +470,11 @@ export function buildSpellCreateInput(
     tags: spellTagsFromFormValues(persistedValues.tags),
     ...(areaOfEffect !== undefined && { areaOfEffect }),
     ...(deliveryMethod !== undefined && { deliveryMethod }),
-  })
+    ...(resolution !== undefined && { resolution }),
+  }
+
+  const schema = ctx?.entity ? updateSpellInputSchema : createSpellInputSchema
+  const input = schema.parse(payload)
 
   return finalizeContentInput(input, ctx) as CreateSpellInput
 }

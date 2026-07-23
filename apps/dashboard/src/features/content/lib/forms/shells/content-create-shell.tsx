@@ -1,7 +1,11 @@
 import { useNavigate } from 'react-router-dom'
+import type { ContentTypeKey } from '@rpg/contracts'
 import { Heading } from '@rpg/ui'
 
 import { NarrowPage } from '@/components/layout/narrow-page'
+import { allowFormNavigationOnce } from '@/lib/form-unsaved-changes-guard'
+import { useSubmitHandler } from '@/lib/use-submit-handler'
+import { formatContentCreateActionLabel } from '../../content-type-labels'
 import { useContentWriteMutation } from '../../list/use-content-mutations'
 import { ContentAuthoringGate } from './content-authoring-gate'
 import {
@@ -14,6 +18,7 @@ import {
   type AnyContentFormDef,
   type ContentFormCtx,
 } from '../content-form-registry'
+import { resolveContentPostCreateEditHref } from './content-form-navigation'
 
 import { resolveContentFormSchema } from './content-edit-load'
 
@@ -23,7 +28,7 @@ export interface ContentCreateShellProps {
   campaignId: string
   /** Page heading (e.g. `"New Species"`). */
   heading: string
-  /** Href for the "Cancel" link and post-submit navigation (typically the overview). */
+  /** Href for the "Cancel" link (typically the overview). */
   backHref: string
   /** Merged on top of the form def's `createDefaultValues` (e.g. preset `kind`). */
   initialValues?: Record<string, unknown>
@@ -31,8 +36,62 @@ export interface ContentCreateShellProps {
   formCtx?: Partial<ContentFormCtx>
 }
 
+interface ContentCreateFormBodyProps {
+  def: AnyContentFormDef
+  contentTypeKey: ContentTypeKey
+  campaignId: string
+  backHref: string
+  ctx: ContentFormCtx
+  initialValues?: Record<string, unknown>
+  formCtx?: Partial<ContentFormCtx>
+}
+
+function ContentCreateFormBody({
+  def,
+  contentTypeKey,
+  campaignId,
+  backHref,
+  ctx,
+  initialValues,
+  formCtx,
+}: ContentCreateFormBodyProps) {
+  const navigate = useNavigate()
+  const mutation = useContentWriteMutation(def, campaignId)
+
+  const { onSubmit, formError } = useSubmitHandler(async (values) => {
+    const saved = (await mutation.mutateAsync(
+      def.toInput(values, {
+        weaponCategoryBySlug: ctx.options?.weaponCategoryBySlug,
+        campaignRules: ctx.campaignRules,
+        equipmentKind: ctx.equipmentKind,
+      }),
+    )) as { id: string; kind?: unknown }
+    const editHref = resolveContentPostCreateEditHref(def, campaignId, saved, formCtx)
+    // TODO(toast): show success feedback — formatContentCreatedMessage(contentTypeKey)
+    allowFormNavigationOnce()
+    navigate(editHref)
+  }, `Could not create ${def.routeKey}.`)
+
+  return (
+    <ContentFormLayout
+      def={def}
+      ctx={ctx}
+      schema={resolveContentFormSchema(def, ctx)}
+      defaultValues={{ ...def.createDefaultValues, ...initialValues }}
+      formMode="create"
+      contentTypeKey={contentTypeKey}
+      backHref={backHref}
+      submitLabel={formatContentCreateActionLabel(contentTypeKey)}
+      submitPending={mutation.isPending}
+      formError={formError ?? null}
+      onSubmit={onSubmit}
+    />
+  )
+}
+
 interface ContentCreateFormProps {
   def: AnyContentFormDef
+  contentTypeKey: ContentTypeKey
   campaignId: string
   backHref: string
   initialValues?: Record<string, unknown>
@@ -41,48 +100,31 @@ interface ContentCreateFormProps {
 
 function ContentCreateForm({
   def,
+  contentTypeKey,
   campaignId,
   backHref,
   initialValues,
   formCtx,
 }: ContentCreateFormProps) {
-  const navigate = useNavigate()
-  const mutation = useContentWriteMutation(def, campaignId)
-
   return (
     <ContentFormOptionsGate campaignId={campaignId}>
-      {(optionsCtx) => {
-        const ctx = {
-          ...optionsCtx,
-          ...formCtx,
-          campaignId,
-          mode: 'create' as const,
-          entitySource: 'homebrew' as const,
-        }
-        return (
-          <ContentFormLayout
-            def={def}
-            ctx={ctx}
-            schema={resolveContentFormSchema(def, ctx)}
-            defaultValues={{ ...def.createDefaultValues, ...initialValues }}
-            backHref={backHref}
-            submitLabel="Create"
-            submitPending={mutation.isPending}
-            formError={mutation.isError ? String(mutation.error) : null}
-            onSubmit={async (values, form) => {
-              await mutation.mutateAsync(
-                def.toInput(values, {
-                  weaponCategoryBySlug: ctx.options?.weaponCategoryBySlug,
-                  campaignRules: ctx.campaignRules,
-                  equipmentKind: ctx.equipmentKind,
-                }),
-              )
-              form.reset(values)
-              navigate(backHref)
-            }}
-          />
-        )
-      }}
+      {(optionsCtx) => (
+        <ContentCreateFormBody
+          def={def}
+          contentTypeKey={contentTypeKey}
+          campaignId={campaignId}
+          backHref={backHref}
+          ctx={{
+            ...optionsCtx,
+            ...formCtx,
+            campaignId,
+            mode: 'create',
+            entitySource: 'homebrew',
+          }}
+          initialValues={initialValues}
+          formCtx={formCtx}
+        />
+      )}
     </ContentFormOptionsGate>
   )
 }
@@ -115,6 +157,7 @@ export function ContentCreateShell({
         <ContentAuthoringGate campaignId={campaignId}>
           <ContentCreateForm
             def={def}
+            contentTypeKey={contentType as ContentTypeKey}
             campaignId={campaignId}
             backHref={backHref}
             initialValues={initialValues}

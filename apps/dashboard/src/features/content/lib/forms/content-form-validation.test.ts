@@ -169,6 +169,17 @@ describe('resolveEquipmentFormSchema dispatcher', () => {
     expect(result.success).toBe(true)
     if (result.success) expect(result.data.kind).toBe(kind)
   })
+
+  it.each(EQUIPMENT_KINDS)(
+    '%s family route injects kind when omitted from submit values',
+    (kind) => {
+      const schema = resolveEquipmentFormSchema({ equipmentKind: kind })
+      const { kind: _kind, ...withoutKind } = minimalValidEquipmentFor(kind)
+      const result = schema.safeParse(withoutKind)
+      expect(result.success).toBe(true)
+      if (result.success) expect(result.data.kind).toBe(kind)
+    },
+  )
 })
 
 function minimalValidEquipmentFor(kind: (typeof EQUIPMENT_KINDS)[number]): Record<string, unknown> {

@@ -18,4 +18,6 @@ export interface ContentTypeConfig<T extends { id: string } = { id: string }> {
   loadPatches: (campaignId: string) => Promise<OverlayPatch[]>
   /** A campaign's homebrew records for this type + ruleset. */
   loadHomebrew: (campaignId: string, rulesetId: SystemRulesetId) => Promise<T[]>
+  /** Patch keys replaced at the top level during overlay merge (not deep-merged). */
+  patchReplaceKeys?: readonly string[]
 }

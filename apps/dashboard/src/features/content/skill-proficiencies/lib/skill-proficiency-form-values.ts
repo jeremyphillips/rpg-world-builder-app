@@ -8,6 +8,10 @@ import { finalizeContentInput, slugForInputParse } from '../../lib/forms/content
 import type { ContentFormInputCtx } from '../../lib/forms/content-form-registry'
 import type { SkillProficiencyFormValues } from './skill-proficiency-form-fields'
 
+export const skillProficiencyCreateDefaultValues: Partial<SkillProficiencyFormValues> = {
+  examples: [{ value: '' }],
+}
+
 export function skillProficiencyToFormValues(entity: SkillProficiency): SkillProficiencyFormValues {
   return {
     name: entity.name,

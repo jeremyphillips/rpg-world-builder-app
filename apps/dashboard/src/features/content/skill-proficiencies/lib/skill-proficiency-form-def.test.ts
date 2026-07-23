@@ -36,6 +36,10 @@ describe('skillProficiencyFormDef round-trips', () => {
 })
 
 describe('skillProficiencyFormDef create vs update modes', () => {
+  it('create: seeds one example row', () => {
+    expect(skillProficiencyFormDef.createDefaultValues?.examples).toEqual([{ value: '' }])
+  })
+
   it('create: derives slug from name when slug is omitted', () => {
     const formValues: SkillProficiencyFormValues = {
       name: 'Custom Skill',

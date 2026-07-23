@@ -1,17 +1,29 @@
 'use client'
 
+import { useState } from 'react'
 import { useWatch } from 'react-hook-form'
+import { ConfirmDialog } from '@rpg/ui'
 
-import type { Subclass } from '@rpg/contracts'
+import type { ResolvedSubclass } from '@rpg/contracts'
+import { getErrorMessage } from '@rpg/contracts'
 
 import { AvailabilityAlert, resolveAvailability } from '@/lib/availability'
 import type { ContentFormCtx } from '../../lib/forms/content-form-registry'
 import { campaignRulesFromCtx } from '../../lib/form-options/content-campaign-rules'
+import {
+  useCreateSubclass,
+  useUpdateSubclass,
+  useUpdateSubclassAvailability,
+} from '../hooks/use-subclass-mutations'
+import { useReportSubclassUnsavedEdits } from '../hooks/subclass-unsaved-edits-context.client'
+import { useSubclassDeleteFlow } from '../hooks/use-subclass-delete-flow.client'
 import { useSubclassEditorState } from '../hooks/use-subclass-editor-state'
 import type { FeatureRowForm } from '../lib/class-feature-form-fields'
 import { isSubclassChoiceFeatureRow } from '../lib/class-subclass-choice-features'
 import { useSubclasses } from '../hooks/use-subclasses'
-import { SubclassDeleteDialog } from './subclass-delete-dialog.client'
+import { isDraftSubclassId } from '../lib/subclasses/subclass-editor-constants'
+import { subclassFormDef } from '../lib/subclasses/subclass-form-values'
+import type { SubclassFormValues } from '../lib/subclasses/subclass-form-fields'
 import {
   SubclassChoiceLevelGate,
   SubclassCreateGate,
@@ -20,6 +32,7 @@ import {
 } from './class-subclasses-tab-gates'
 import { SubclassEditorPanel } from './subclass-editor-panel.client'
 import { SubclassListPanel } from './subclass-list-panel.client'
+import { SubclassDeleteDialog } from './subclass-delete-dialog.client'
 
 export interface ClassSubclassesTabProps {
   campaignId?: string
@@ -27,14 +40,16 @@ export interface ClassSubclassesTabProps {
   mode?: 'create' | 'edit'
   formCtx?: ContentFormCtx
   /** Test/story override — skips the subclasses query when provided. */
-  subclassesOverride?: Subclass[]
+  subclassesOverride?: ResolvedSubclass[]
 }
+
+const EMPTY_SUBCLASSES: ResolvedSubclass[] = []
 
 function useSubclassTabData(
   mode: ClassSubclassesTabProps['mode'],
   campaignId: string | undefined,
   classId: string | undefined,
-  subclassesOverride: Subclass[] | undefined,
+  subclassesOverride: ResolvedSubclass[] | undefined,
 ) {
   const queryEnabled =
     mode === 'edit' && Boolean(campaignId) && Boolean(classId) && subclassesOverride === undefined
@@ -45,7 +60,7 @@ function useSubclassTabData(
   )
 
   return {
-    subclasses: subclassesOverride ?? query.data ?? [],
+    subclasses: subclassesOverride ?? query.data ?? EMPTY_SUBCLASSES,
     isPending: subclassesOverride ? false : query.isPending,
   }
 }
@@ -88,19 +103,111 @@ function ClassSubclassesTabBody({
   editor: SubclassEditorState
   defaultFeatureLevel: number
 }) {
+  const createMutation = useCreateSubclass(campaignId, classId)
+  const updateMutation = useUpdateSubclass(campaignId, classId)
+  const availabilityMutation = useUpdateSubclassAvailability(campaignId, classId)
+  const [saveError, setSaveError] = useState<string | null>(null)
+  const [switchTargetId, setSwitchTargetId] = useState<string | null>(null)
+
+  useReportSubclassUnsavedEdits(editor.hasUnsavedEdits)
+
+  const deleteFlow = useSubclassDeleteFlow({
+    campaignId,
+    classId,
+    onDeleted: (subclassId) => {
+      editor.removeLocalRow(subclassId)
+    },
+  })
+
+  const handleDeleteRequest = (id: string) => {
+    const item = editor.listItems.find((entry) => entry.id === id)
+    if (!item) return
+
+    if (item.source === 'unsaved' || isDraftSubclassId(id)) {
+      editor.handleDeleteRequest(id)
+      return
+    }
+
+    if (item.source === 'homebrew') {
+      void deleteFlow.handleDeleteClick(id, item.name, item.source)
+    }
+  }
+
+  const handleSelect = (id: string) => {
+    if (
+      editor.selectedId &&
+      editor.selectedId !== id &&
+      editor.modifiedIds.has(editor.selectedId)
+    ) {
+      setSwitchTargetId(id)
+      return
+    }
+    editor.setSelectedId(id)
+  }
+
+  const handleSave = async (values: SubclassFormValues) => {
+    if (!editor.selectedId) return
+
+    setSaveError(null)
+    editor.setSavePending(true)
+    try {
+      const input = subclassFormDef.toInput(
+        values,
+        classId,
+        editor.selectedEntity ? { entity: editor.selectedEntity } : undefined,
+      )
+
+      if (isDraftSubclassId(editor.selectedId)) {
+        const saved = await createMutation.mutateAsync(input)
+        editor.commitDraftHandoff(editor.selectedId, saved)
+        return
+      }
+
+      const saved = await updateMutation.mutateAsync({
+        subclassId: editor.selectedId,
+        input,
+      })
+      editor.clearEditsFor(saved.id)
+    } catch (err) {
+      setSaveError(getErrorMessage(err, 'Could not save subclass.'))
+    } finally {
+      editor.setSavePending(false)
+    }
+  }
+
+  const handleActiveChange = async (subclassId: string, active: boolean) => {
+    editor.handleActiveChange(subclassId, active)
+
+    if (isDraftSubclassId(subclassId)) return
+
+    try {
+      await availabilityMutation.mutateAsync({ subclassId, activeInCampaign: active })
+    } catch (err) {
+      editor.handleActiveChange(subclassId, !active)
+      setSaveError(getErrorMessage(err, 'Could not update subclass availability.'))
+    }
+  }
+
+  const savePending = editor.savePending || createMutation.isPending || updateMutation.isPending
+
   return (
     <>
       <div className="space-y-6">
         <SubclassesDisabledAlert campaignId={campaignId} formCtx={formCtx} />
+        {saveError ? (
+          <p className="text-sm text-destructive" role="alert">
+            {saveError}
+          </p>
+        ) : null}
         <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
           <SubclassListPanel
             items={editor.listItems}
             selectedId={editor.selectedId}
             activeById={editor.activeById}
             modifiedIds={editor.modifiedIds}
-            onSelect={editor.setSelectedId}
+            onSelect={handleSelect}
             onAdd={editor.handleAdd}
-            onDeleteRequest={editor.handleDeleteRequest}
+            onDeleteRequest={handleDeleteRequest}
           />
 
           <div className="md:col-span-2">
@@ -114,9 +221,11 @@ function ClassSubclassesTabBody({
                 activeInCampaign={editor.activeById[editor.selectedId] !== false}
                 defaultFeatureLevel={defaultFeatureLevel}
                 formCtx={formCtx}
-                onActiveChange={(active) => editor.handleActiveChange(editor.selectedId!, active)}
+                savePending={savePending}
+                onActiveChange={(active) => handleActiveChange(editor.selectedId!, active)}
                 onValuesChange={editor.handleValuesChange}
-                onDeleteRequest={() => editor.handleDeleteRequest(editor.selectedId!)}
+                onSave={handleSave}
+                onDeleteRequest={() => handleDeleteRequest(editor.selectedId!)}
               />
             ) : (
               <SubclassEmptySelectionGate />
@@ -125,14 +234,38 @@ function ClassSubclassesTabBody({
         </div>
       </div>
 
+      <ConfirmDialog
+        open={switchTargetId !== null}
+        onOpenChange={(open) => {
+          if (!open) setSwitchTargetId(null)
+        }}
+        headline="Discard subclass changes?"
+        description="This subclass has unsaved changes. Switching rows will lose them."
+        confirmLabel="Discard"
+        cancelLabel="Keep editing"
+        confirmVariant="destructive"
+        onConfirm={() => {
+          if (editor.selectedId) editor.clearEditsFor(editor.selectedId)
+          if (switchTargetId) editor.setSelectedId(switchTargetId)
+          setSwitchTargetId(null)
+        }}
+        onCancel={() => setSwitchTargetId(null)}
+      />
+
       <SubclassDeleteDialog
-        open={editor.deleteTargetId !== null}
+        open={
+          editor.deleteTargetId !== null &&
+          (editor.deleteTargetItem?.source === 'unsaved' ||
+            isDraftSubclassId(editor.deleteTargetId))
+        }
         subclassName={editor.deleteTargetItem?.name ?? 'Untitled subclass'}
         onOpenChange={(open) => {
           if (!open) editor.handleDeleteDismiss()
         }}
-        onConfirm={editor.handleDeleteConfirm}
+        onConfirm={editor.handleDeleteConfirmLocal}
       />
+
+      {deleteFlow.dialogs}
     </>
   )
 }

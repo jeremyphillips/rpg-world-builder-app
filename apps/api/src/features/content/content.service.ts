@@ -23,5 +23,7 @@ export async function resolveCatalogForCampaign<T extends { id: string }>(
     config.loadHomebrew(campaignId, rulesetId),
   ])
 
-  return resolveCatalog(config.loadSystem(rulesetId), patches, homebrew)
+  return resolveCatalog(config.loadSystem(rulesetId), patches, homebrew, {
+    replaceKeys: config.patchReplaceKeys,
+  })
 }

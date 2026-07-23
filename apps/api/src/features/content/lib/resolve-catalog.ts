@@ -1,4 +1,5 @@
 import { deepMerge } from './deep-merge'
+import type { DeepMergeOptions } from './deep-merge'
 
 /** Any stored content record is referenced by its opaque `id`. */
 interface Identified {
@@ -24,12 +25,13 @@ export function resolveCatalog<T extends Identified>(
   system: readonly T[],
   patches: readonly OverlayPatch[],
   homebrew: readonly T[],
+  options?: Pick<DeepMergeOptions, 'replaceKeys'>,
 ): T[] {
   const patchByTarget = new Map(patches.map((p) => [p.targetId, p]))
 
   const resolvedSystem = system.map((record) => {
     const overlay = patchByTarget.get(record.id)
-    return overlay ? deepMerge(record, overlay.patch) : record
+    return overlay ? deepMerge(record, overlay.patch, options) : record
   })
 
   return [...resolvedSystem, ...homebrew]

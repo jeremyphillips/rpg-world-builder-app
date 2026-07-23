@@ -1,6 +1,8 @@
 import request, { type Agent } from 'supertest'
 import { describe, expect, it } from 'vitest'
 
+import { CHILL_TOUCH_RESOLUTION, ELDRITCH_BLAST_RESOLUTION } from '@rpg/contracts'
+
 import { CSRF_HEADER } from '../../lib/cookies'
 import { createTestCampaign, registerAndLoginTestUser } from '../../test/auth-agent'
 import { minimalNpcRequestInput } from '../../test/fixtures/npcs'
@@ -79,6 +81,202 @@ describe('content list routes', () => {
     await request(getApp())
       .get('/api/campaigns/000000000000000000000000/content/classes')
       .expect(401)
+  })
+})
+
+describe('content write routes', () => {
+  const minimalFeatInput = {
+    slug: 'route-write-feat',
+    name: 'Route Write Feat',
+    category: 'origin' as const,
+    repeatable: { allowed: false },
+  }
+
+  const minimalSkillInput = {
+    slug: 'route-write-skill',
+    name: 'Route Write Skill',
+    ability: 'wis' as const,
+    examples: ['Inspect a clue'],
+  }
+
+  it('creates homebrew content via POST', async () => {
+    const { agent, csrfToken } = await registerAndLogin()
+    const campaignId = await createTestCampaign(agent, csrfToken)
+
+    const res = await agent
+      .post(`/api/campaigns/${campaignId}/content/feats`)
+      .set(CSRF_HEADER, csrfToken)
+      .send(minimalFeatInput)
+      .expect(201)
+
+    expect(res.body.feats.source).toBe('homebrew')
+    expect(res.body.feats.slug).toBe('route-write-feat')
+  })
+
+  it('patches a system record via PATCH and returns merged catalog row', async () => {
+    const { agent, csrfToken } = await registerAndLogin()
+    const campaignId = await createTestCampaign(agent, csrfToken)
+
+    const listRes = await agent
+      .get(`/api/campaigns/${campaignId}/content/feats`)
+      .set(CSRF_HEADER, csrfToken)
+      .expect(200)
+
+    const alert = listRes.body.feats.find((feat: { slug: string }) => feat.slug === 'alert')
+    expect(alert).toBeDefined()
+
+    const patchRes = await agent
+      .patch(`/api/campaigns/${campaignId}/content/feats/${alert.id}`)
+      .set(CSRF_HEADER, csrfToken)
+      .send({ name: 'Route Patched Alert' })
+      .expect(200)
+
+    expect(patchRes.body.feats.source).toBe('system')
+    expect(patchRes.body.feats.name).toBe('Route Patched Alert')
+
+    const reloadRes = await agent
+      .get(`/api/campaigns/${campaignId}/content/feats`)
+      .set(CSRF_HEADER, csrfToken)
+      .expect(200)
+
+    expect(reloadRes.body.feats.find((feat: { id: string }) => feat.id === alert.id)?.name).toBe(
+      'Route Patched Alert',
+    )
+  })
+
+  it('creates and updates homebrew skill proficiencies via POST and PATCH', async () => {
+    const { agent, csrfToken } = await registerAndLogin()
+    const campaignId = await createTestCampaign(agent, csrfToken)
+
+    const createRes = await agent
+      .post(`/api/campaigns/${campaignId}/content/skill-proficiencies`)
+      .set(CSRF_HEADER, csrfToken)
+      .send(minimalSkillInput)
+      .expect(201)
+
+    const entityId = createRes.body.skillProficiencies.id as string
+    expect(createRes.body.skillProficiencies.source).toBe('homebrew')
+
+    const patchRes = await agent
+      .patch(`/api/campaigns/${campaignId}/content/skill-proficiencies/${entityId}`)
+      .set(CSRF_HEADER, csrfToken)
+      .send({ name: 'Updated Route Write Skill' })
+      .expect(200)
+
+    expect(patchRes.body.skillProficiencies.name).toBe('Updated Route Write Skill')
+  })
+
+  const minimalSpellInput = {
+    slug: 'route-write-spell',
+    name: 'Route Write Spell',
+    school: 'evocation',
+    level: 0,
+    classIds: ['wizard'],
+    castingTime: { normal: { value: 1, unit: 'action' }, canBeCastAsRitual: false },
+    range: { kind: 'distance', value: { value: 60, unit: 'ft' } },
+    duration: { kind: 'instantaneous' },
+    components: { verbal: true, somatic: true },
+  }
+
+  it('creates homebrew spell with resolution, round-trips on reload, and clears via null', async () => {
+    const { agent, csrfToken } = await registerAndLogin()
+    const campaignId = await createTestCampaign(agent, csrfToken)
+
+    const createRes = await agent
+      .post(`/api/campaigns/${campaignId}/content/spells`)
+      .set(CSRF_HEADER, csrfToken)
+      .send({ ...minimalSpellInput, resolution: ELDRITCH_BLAST_RESOLUTION })
+      .expect(201)
+
+    const entityId = createRes.body.spells.id as string
+    expect(createRes.body.spells.resolution).toEqual(ELDRITCH_BLAST_RESOLUTION)
+
+    const patchRes = await agent
+      .patch(`/api/campaigns/${campaignId}/content/spells/${entityId}`)
+      .set(CSRF_HEADER, csrfToken)
+      .send({ resolution: CHILL_TOUCH_RESOLUTION })
+      .expect(200)
+
+    expect(patchRes.body.spells.resolution).toEqual(CHILL_TOUCH_RESOLUTION)
+
+    const omitRes = await agent
+      .patch(`/api/campaigns/${campaignId}/content/spells/${entityId}`)
+      .set(CSRF_HEADER, csrfToken)
+      .send({ name: 'Resolution Unchanged Spell' })
+      .expect(200)
+
+    expect(omitRes.body.spells.name).toBe('Resolution Unchanged Spell')
+    expect(omitRes.body.spells.resolution).toEqual(CHILL_TOUCH_RESOLUTION)
+
+    const reloadRes = await agent
+      .get(`/api/campaigns/${campaignId}/content/spells`)
+      .set(CSRF_HEADER, csrfToken)
+      .expect(200)
+
+    expect(
+      reloadRes.body.spells.find((spell: { id: string }) => spell.id === entityId)?.resolution,
+    ).toEqual(CHILL_TOUCH_RESOLUTION)
+
+    const clearRes = await agent
+      .patch(`/api/campaigns/${campaignId}/content/spells/${entityId}`)
+      .set(CSRF_HEADER, csrfToken)
+      .send({ resolution: null })
+      .expect(200)
+
+    expect(clearRes.body.spells.resolution).toBeUndefined()
+
+    const reloadAfterClear = await agent
+      .get(`/api/campaigns/${campaignId}/content/spells`)
+      .set(CSRF_HEADER, csrfToken)
+      .expect(200)
+
+    expect(
+      reloadAfterClear.body.spells.find((spell: { id: string }) => spell.id === entityId)
+        ?.resolution,
+    ).toBeUndefined()
+  })
+
+  it('replaces resolution on a system spell via overlay patch', async () => {
+    const { agent, csrfToken } = await registerAndLogin()
+    const campaignId = await createTestCampaign(agent, csrfToken)
+
+    const listRes = await agent
+      .get(`/api/campaigns/${campaignId}/content/spells`)
+      .set(CSRF_HEADER, csrfToken)
+      .expect(200)
+
+    const eldritchBlast = listRes.body.spells.find(
+      (spell: { slug: string }) => spell.slug === 'eldritch-blast',
+    )
+    expect(eldritchBlast?.resolution).toBeDefined()
+
+    const patchedResolution = {
+      ...eldritchBlast.resolution,
+      effects: [
+        {
+          ...eldritchBlast.resolution.effects[0],
+          roll: { dice: { count: 2, faces: 10 } },
+        },
+      ],
+    }
+
+    const patchRes = await agent
+      .patch(`/api/campaigns/${campaignId}/content/spells/${eldritchBlast.id}`)
+      .set(CSRF_HEADER, csrfToken)
+      .send({ resolution: patchedResolution })
+      .expect(200)
+
+    expect(patchRes.body.spells.resolution).toEqual(patchedResolution)
+
+    const reloadRes = await agent
+      .get(`/api/campaigns/${campaignId}/content/spells`)
+      .set(CSRF_HEADER, csrfToken)
+      .expect(200)
+
+    expect(
+      reloadRes.body.spells.find((spell: { id: string }) => spell.id === eldritchBlast.id)
+        ?.resolution,
+    ).toEqual(patchedResolution)
   })
 })
 

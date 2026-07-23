@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 import {
   createSpellInputSchema,
   spellBodySchema,
+  spellFormLevelSchema,
   spellPatchSchema,
   spellSchema,
   updateSpellInputSchema,
@@ -272,6 +273,18 @@ describe('spellContentLevelSchema', () => {
   })
 })
 
+describe('spellFormLevelSchema', () => {
+  it('coerces string select values', () => {
+    expect(spellFormLevelSchema.parse('0')).toBe(0)
+    expect(spellFormLevelSchema.parse('9')).toBe(9)
+  })
+
+  it('rejects blank select sentinels instead of coercing to cantrip', () => {
+    expect(spellFormLevelSchema.safeParse('').success).toBe(false)
+    expect(spellFormLevelSchema.safeParse(undefined).success).toBe(false)
+  })
+})
+
 describe('spell modeling schema', () => {
   it('accepts optional modeling metadata on the stored spell shape', () => {
     expect(
@@ -288,9 +301,14 @@ describe('spell modeling schema', () => {
     })
   })
 
-  it('omits resolution from create/update input schemas until persistence lands', () => {
-    expect('resolution' in createSpellInputSchema.shape).toBe(false)
-    expect('resolution' in updateSpellInputSchema.shape).toBe(false)
+  it('accepts optional resolution on create input', () => {
+    expect(
+      createSpellInputSchema.parse({
+        slug: 'fire-bolt',
+        ...fireBoltBody,
+        resolution: ELDRITCH_BLAST_RESOLUTION,
+      }).resolution,
+    ).toEqual(ELDRITCH_BLAST_RESOLUTION)
   })
 
   it('allows modeling in patch bodies', () => {
@@ -311,28 +329,38 @@ describe('spell modeling schema', () => {
   })
 })
 
-describe('spell resolution schema', () => {
+describe('spell resolution PATCH semantics', () => {
   it('accepts optional resolution on the stored spell shape', () => {
     expect(
       spellSchema.parse({ ...fireBolt, resolution: ELDRITCH_BLAST_RESOLUTION }).resolution,
     ).toEqual(ELDRITCH_BLAST_RESOLUTION)
   })
 
-  it('omits resolution from create/update input schemas until persistence lands', () => {
-    expect('resolution' in createSpellInputSchema.shape).toBe(false)
-    expect('resolution' in updateSpellInputSchema.shape).toBe(false)
-
-    const parsed = createSpellInputSchema.parse({
-      slug: 'fire-bolt',
-      ...fireBoltBody,
-      resolution: ELDRITCH_BLAST_RESOLUTION,
-    } as Parameters<typeof createSpellInputSchema.parse>[0] & {
-      resolution: typeof ELDRITCH_BLAST_RESOLUTION
-    })
-    expect('resolution' in parsed).toBe(false)
+  it('accepts resolution on create input', () => {
+    expect(
+      createSpellInputSchema.parse({
+        slug: 'fire-bolt',
+        ...fireBoltBody,
+        resolution: ELDRITCH_BLAST_RESOLUTION,
+      }).resolution,
+    ).toEqual(ELDRITCH_BLAST_RESOLUTION)
   })
 
-  it('allows resolution in patch bodies for future overlay authoring', () => {
+  it('allows omitting resolution on update (unchanged semantics)', () => {
+    expect(updateSpellInputSchema.parse({ name: 'Renamed' }).resolution).toBeUndefined()
+  })
+
+  it('allows null resolution on update (explicit clear)', () => {
+    expect(updateSpellInputSchema.parse({ resolution: null }).resolution).toBeNull()
+  })
+
+  it('replaces resolution on update when an object is provided', () => {
+    expect(updateSpellInputSchema.parse({ resolution: CHILL_TOUCH_RESOLUTION }).resolution).toEqual(
+      CHILL_TOUCH_RESOLUTION,
+    )
+  })
+
+  it('allows resolution in patch bodies for overlay authoring', () => {
     expect(
       spellPatchSchema.parse({
         id: 'patch_2',
