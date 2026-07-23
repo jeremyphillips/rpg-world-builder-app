@@ -1,11 +1,12 @@
 import * as React from 'react'
 import type { DefaultValues, FieldValues, UseFormReturn } from 'react-hook-form'
 import type { ZodType } from 'zod'
-import type { ContentTypeKey } from '@rpg/contracts'
+import type { ContentTypeKey, ResolvedContentCampaignAccess } from '@rpg/contracts'
 import { Heading, InsetPanel } from '@rpg/ui'
 import {
   Form,
   TabbedForm,
+  FormItems,
   type FormItem,
   type FormValueSync,
   type TabbedFormTab,
@@ -24,6 +25,8 @@ import {
 import { ContentFormFooter } from './content-form-footer'
 import { useAdvisoryFormSubmit, type AdvisoryFormSubmitOptions } from './use-advisory-form-submit'
 import { ContentEditPublishBridge } from './content-edit-publish-bridge.client'
+import { CampaignAccessSection } from '../../campaign-access/campaign-access-section.client'
+import type { ContentCampaignAccessPatch } from '@rpg/contracts'
 
 export function ContentFormComingSoon() {
   return (
@@ -41,6 +44,46 @@ export function ContentFormNotRegistered({ heading = 'Edit' }: { heading?: strin
       </Heading>
       <ContentFormComingSoon />
     </NarrowPage>
+  )
+}
+
+interface ContentFormCampaignAccessProps {
+  def: AnyContentFormDef
+  ctx: ContentFormCtx
+  formKey?: string
+  campaignId?: string
+  entityId?: string
+  campaignAccess?: ResolvedContentCampaignAccess
+  onCampaignAccessDraftChange?: (patch: ContentCampaignAccessPatch) => void
+  onCampaignAccessPersisted?: (access: ResolvedContentCampaignAccess) => void
+}
+
+function ContentFormHeader({
+  def,
+  ctx,
+  formKey,
+  campaignId,
+  entityId,
+  campaignAccess,
+  onCampaignAccessDraftChange,
+  onCampaignAccessPersisted,
+}: ContentFormCampaignAccessProps) {
+  const idPrefix = formKey ?? 'content-form'
+
+  return (
+    <div className="flex flex-col gap-6">
+      <FormItems items={[def.nameField(ctx)]} idPrefix={idPrefix} />
+      {campaignId ? (
+        <CampaignAccessSection
+          campaignId={campaignId}
+          targetType={def.routeKey as ContentTypeKey}
+          entityId={entityId}
+          initialAccess={campaignAccess}
+          onDraftChange={onCampaignAccessDraftChange}
+          onPersistedChange={onCampaignAccessPersisted}
+        />
+      ) : null}
+    </div>
   )
 }
 
@@ -72,6 +115,7 @@ interface ContentSchemaFormProps<
   submitConfirmDialog?: React.ReactNode
   publishSchema?: ZodType<TFormValues>
   onPublish?: () => Promise<void>
+  headerProps: ContentFormCampaignAccessProps
 }
 
 function ContentSchemaForm<TFormValues extends FieldValues>({
@@ -94,6 +138,7 @@ function ContentSchemaForm<TFormValues extends FieldValues>({
   publishSuccess,
   publishSchema,
   onPublish,
+  headerProps,
 }: ContentSchemaFormProps<TFormValues>) {
   const handleSubmit = React.useCallback(
     async (values: TFormValues, form: UseFormReturn<TFormValues>) => {
@@ -119,6 +164,7 @@ function ContentSchemaForm<TFormValues extends FieldValues>({
         formError={formError}
         valueSyncs={valueSyncs}
         stickyFooter
+        header={() => <ContentFormHeader {...headerProps} formKey={formKey} />}
         footer={(form) => (
           <>
             {publishSchema && onPublish && formKey ? (
@@ -165,6 +211,7 @@ interface ContentTabbedSchemaFormProps<
   submitConfirmDialog?: React.ReactNode
   publishSchema?: ZodType<TFormValues>
   onPublish?: () => Promise<void>
+  headerProps: ContentFormCampaignAccessProps
 }
 
 function ContentTabbedSchemaForm<TFormValues extends FieldValues>({
@@ -187,6 +234,7 @@ function ContentTabbedSchemaForm<TFormValues extends FieldValues>({
   publishSuccess,
   publishSchema,
   onPublish,
+  headerProps,
 }: ContentTabbedSchemaFormProps<TFormValues>) {
   const handleSubmit = React.useCallback(
     async (values: TFormValues, form: UseFormReturn<TFormValues>) => {
@@ -213,6 +261,7 @@ function ContentTabbedSchemaForm<TFormValues extends FieldValues>({
         valueSyncs={valueSyncs}
         onSubmit={(values, form) => handleSubmit(values, form)}
         formError={formError}
+        header={() => <ContentFormHeader {...headerProps} formKey={formKey} />}
         footer={(form) => (
           <>
             {publishSchema && onPublish && formKey ? (
@@ -261,6 +310,11 @@ interface ContentFormLayoutProps<TFormValues extends FieldValues> {
   publishSuccess?: boolean
   publishSchema?: ZodType<TFormValues>
   onPublish?: () => Promise<void>
+  campaignId: string
+  entityId?: string
+  campaignAccess?: ResolvedContentCampaignAccess
+  onCampaignAccessDraftChange?: (patch: ContentCampaignAccessPatch) => void
+  onCampaignAccessPersisted?: (access: ResolvedContentCampaignAccess) => void
 }
 
 export function ContentFormLayout<TFormValues extends FieldValues>({
@@ -282,6 +336,11 @@ export function ContentFormLayout<TFormValues extends FieldValues>({
   publishSuccess,
   publishSchema,
   onPublish,
+  campaignId,
+  entityId,
+  campaignAccess,
+  onCampaignAccessDraftChange,
+  onCampaignAccessPersisted,
 }: ContentFormLayoutProps<TFormValues>) {
   const isWeaponEquipmentForm = def.routeKey === 'equipment' && ctx.equipmentKind === 'weapon'
   const isSpellForm = def.routeKey === 'spells'
@@ -322,6 +381,16 @@ export function ContentFormLayout<TFormValues extends FieldValues>({
     onPublish,
     valueSyncs,
     submitConfirmDialog: isWeaponEquipmentForm ? confirmDialog : undefined,
+    headerProps: {
+      def,
+      ctx,
+      formKey,
+      campaignId,
+      entityId,
+      campaignAccess,
+      onCampaignAccessDraftChange,
+      onCampaignAccessPersisted,
+    },
   }
 
   if (def.buildTabs) {

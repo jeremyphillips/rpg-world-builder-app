@@ -26,7 +26,6 @@ import {
 import {
   descriptionField,
   feetInputUnitField,
-  nameField,
   SPELL_RANGE_DISTANCE_INLINE_COUNT_DIGITS,
 } from '../../lib/forms/fields/content-identity-form-fields'
 import {
@@ -267,7 +266,6 @@ function basicsFields(ctx: ContentFormCtx): FormItem[] {
   const schoolOptions = buildActiveSpellSchoolFieldOptions(ctx.spellSchoolVocabulary)
 
   return [
-    nameField(),
     {
       kind: 'row',
       fields: [

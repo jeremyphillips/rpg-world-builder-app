@@ -2,6 +2,7 @@ import type { ZodType } from 'zod'
 import { type CreateEquipmentInput, type Equipment } from '@rpg/contracts'
 
 import { contentFormRegistry, type ContentFormDef } from '../../lib/forms/content-form-registry'
+import { nameField } from '../../lib/forms/fields/content-identity-form-fields'
 import { useEquipment, equipmentQueryKey } from '../hooks/use-equipment'
 import { equipmentEconomyFormDefaults } from './equipment-economy-form-values'
 import {
@@ -18,6 +19,7 @@ const equipmentFormDef: ContentFormDef<Equipment, EquipmentFormValues, CreateEqu
   schema: equipmentFormSchema as ZodType<EquipmentFormValues>,
   draftSchema: equipmentFormDraftSchema as ZodType<EquipmentFormValues>,
   resolveSchema: resolveEquipmentFormSchema,
+  nameField,
   coverage: 'roundtrip-only',
   createDefaultValues: {
     kind: 'adventuring_gear',

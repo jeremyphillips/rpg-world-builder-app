@@ -124,9 +124,9 @@ describe('equipmentFormDef kind-scoped fields', () => {
     ])
   })
 
-  it('kind-scoped routes place name first and description last', () => {
+  it('kind-scoped routes place description last', () => {
     const fields = equipmentFormDef.buildFields({ equipmentKind: 'weapon' })
-    expect(fields[0]).toMatchObject({ name: 'name' })
+    expect(equipmentFormDef.nameField({ equipmentKind: 'weapon' })).toMatchObject({ name: 'name' })
     expect(fields.at(-1)).toMatchObject({ name: 'description' })
   })
 })

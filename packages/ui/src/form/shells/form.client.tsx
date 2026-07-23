@@ -46,6 +46,11 @@ export interface FormProps<TFieldValues extends FieldValues> {
    * button — useful now that `<Form>` owns `useForm` internally.
    */
   footer?: React.ReactNode | ((form: UseFormReturn<TFieldValues>) => React.ReactNode)
+  /**
+   * Content rendered inside the form before the fields. Pass a function to read
+   * form state (e.g. for hoisted identity fields above a tab strip).
+   */
+  header?: React.ReactNode | ((form: UseFormReturn<TFieldValues>) => React.ReactNode)
   className?: string
   /** Classes for the fields wrapper; e.g. `formCardContentClass` inside a `FormCard`. */
   contentClassName?: string
@@ -102,6 +107,7 @@ export function Form<TFieldValues extends FieldValues>({
   defaultValues,
   formError,
   footer,
+  header,
   className,
   contentClassName,
   id,
@@ -141,6 +147,7 @@ export function Form<TFieldValues extends FieldValues>({
   })
 
   const resolvedFooter = resolveSchemaFormFooter(footer, form)
+  const resolvedHeader = resolveSchemaFormFooter(header, form)
 
   return (
     <SchemaFormShell
@@ -165,6 +172,7 @@ export function Form<TFieldValues extends FieldValues>({
         {valueSyncs && valueSyncs.length > 0 ? (
           <FormValueSyncEffects valueSyncs={valueSyncs} />
         ) : null}
+        {resolvedHeader}
         <FormItems items={fields} idPrefix={formId} />
       </FormRhythmStack>
       {stickyFooter ? (

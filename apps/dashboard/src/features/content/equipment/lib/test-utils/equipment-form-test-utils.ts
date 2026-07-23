@@ -20,9 +20,9 @@ export function collectGroupLegends(fields: readonly FormItem[]): string[] {
 }
 
 /**
- * Asserts `buildFields` for a kind places name first, the registered kind group,
- * Economy, then description last. Returns the built fields so callers can layer
- * per-family assertions on top.
+ * Asserts `buildFields` for a kind places the registered kind group, Economy, then
+ * description last. Name is hoisted above the form body via `nameField`.
+ * Returns the built fields so callers can layer per-family assertions on top.
  */
 export function expectComposedKindGroups(
   equipmentKind: EquipmentKind,
@@ -31,7 +31,7 @@ export function expectComposedKindGroups(
 ): FormItem[] {
   const fields = equipmentFormDef.buildFields({ equipmentKind })
   expect(collectGroupLegends(fields)).toEqual(expectedLegends)
-  expect(fields[0]).toMatchObject({ name: 'name' })
+  expect(equipmentFormDef.nameField({ equipmentKind })).toMatchObject({ name: 'name' })
   expect(fields.at(-1)).toMatchObject({ name: 'description' })
   const kindGroup = fields.find(
     (field): field is GroupConfig =>

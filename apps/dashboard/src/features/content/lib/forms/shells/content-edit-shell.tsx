@@ -1,7 +1,12 @@
-import type { ContentSource, ContentStatus, ContentTypeKey } from '@rpg/contracts'
-import { getErrorMessage } from '@rpg/contracts'
+import type {
+  ContentSource,
+  ContentStatus,
+  ContentTypeKey,
+  ResolvedContentCampaignAccess,
+} from '@rpg/contracts'
+import { DEFAULT_CONTENT_CAMPAIGN_ACCESS, getErrorMessage } from '@rpg/contracts'
 import { Heading, Spinner, Text } from '@rpg/ui'
-import { useCallback } from 'react'
+import { useCallback, useState } from 'react'
 import type { DefaultValues, FieldValues, UseFormReturn } from 'react-hook-form'
 import type { ZodType } from 'zod'
 
@@ -33,6 +38,7 @@ import { useContentPublishFlow } from '../../demotion/use-content-publish-flow.c
 import { ContentEditLifecycleActions } from './content-edit-lifecycle-actions.client'
 import { ContentEditPublishProvider } from './content-edit-publish-context.client'
 import { resolveContentFormSchema } from './content-edit-load'
+import { ContentEditHeadingBadges } from '../../campaign-access/content-edit-heading-badges.client'
 
 export interface ContentEditShellProps {
   /** Route key identifying the content type (e.g. `'species'`). */
@@ -73,7 +79,13 @@ interface ContentEditFormReadyProps extends ContentEditFormProps {
 }
 
 interface ContentEditEntityFormProps<
-  TEntity extends { id: string; name: string; source: ContentSource; status: ContentStatus },
+  TEntity extends {
+    id: string
+    name: string
+    source: ContentSource
+    status: ContentStatus
+    campaignAccess?: ResolvedContentCampaignAccess
+  },
 > {
   def: AnyContentFormDef
   entity: TEntity
@@ -91,7 +103,13 @@ interface ContentEditEntityFormProps<
 }
 
 function ContentEditEntityForm<
-  TEntity extends { id: string; name: string; source: ContentSource; status: ContentStatus },
+  TEntity extends {
+    id: string
+    name: string
+    source: ContentSource
+    status: ContentStatus
+    campaignAccess?: ResolvedContentCampaignAccess
+  },
 >(props: ContentEditEntityFormProps<TEntity>) {
   return (
     <ContentEditPublishProvider>
@@ -101,7 +119,13 @@ function ContentEditEntityForm<
 }
 
 function ContentEditEntityFormBody<
-  TEntity extends { id: string; name: string; source: ContentSource; status: ContentStatus },
+  TEntity extends {
+    id: string
+    name: string
+    source: ContentSource
+    status: ContentStatus
+    campaignAccess?: ResolvedContentCampaignAccess
+  },
 >({
   entity,
   campaignId,
@@ -118,6 +142,9 @@ function ContentEditEntityFormBody<
   onSubmit,
 }: ContentEditEntityFormProps<TEntity>) {
   useSetBreadcrumbLabel(entity.name)
+  const [campaignAccess, setCampaignAccess] = useState(
+    () => entity.campaignAccess ?? DEFAULT_CONTENT_CAMPAIGN_ACCESS,
+  )
   const publishSchema = resolveContentFormSchema(def, layoutCtx, 'publish')
   const deleteFlow = useContentDeleteFlow({
     def,
@@ -160,9 +187,16 @@ function ContentEditEntityFormBody<
     <ContentAuthoringGate campaignId={campaignId}>
       <NarrowPage spacing="relaxed" className="pb-10">
         <div className="flex items-start justify-between gap-4">
-          <Heading variant="page" as="h1">
-            {headingFn(entity.name)}
-          </Heading>
+          <div className="space-y-2">
+            <Heading variant="page" as="h1">
+              {headingFn(entity.name)}
+            </Heading>
+            <ContentEditHeadingBadges
+              source={entity.source}
+              status={entity.status}
+              campaignAccess={campaignAccess}
+            />
+          </div>
           {showLifecycleActions ? (
             <ContentEditLifecycleActions
               publishFlow={publishFlow}
@@ -180,6 +214,10 @@ function ContentEditEntityFormBody<
           defaultValues={defaultValues}
           formMode="edit"
           contentTypeKey={contentTypeKey}
+          campaignId={campaignId}
+          entityId={entity.id}
+          campaignAccess={campaignAccess}
+          onCampaignAccessPersisted={setCampaignAccess}
           submitLabel="Save changes"
           submitPending={submitPending}
           submitSuccess={submitSuccess}
@@ -266,7 +304,13 @@ function ContentEditFormReady({
 
 interface ContentEditFormBodyProps {
   def: AnyContentFormDef
-  entity: { id: string; name: string; source: ContentSource; status: ContentStatus }
+  entity: {
+    id: string
+    name: string
+    source: ContentSource
+    status: ContentStatus
+    campaignAccess?: ResolvedContentCampaignAccess
+  }
   campaignId: string
   entityId: string
   headingFn: (name: string) => string

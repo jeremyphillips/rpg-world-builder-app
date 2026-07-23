@@ -117,7 +117,8 @@ Scope notes:
 - Embedded array rows (class features, species traits/heritage) inherit campaign
   access from their parent content type — no per-row campaign access UI yet.
 - Subclass campaign access is persisted via the shared `ContentCampaignAccessModel`
-  (dashboard UI lands in Phase 4).
+  and edited in the subclass panel through `CampaignAccessSection` (availability +
+  visibility, with availability-off blocker preflight).
 
 `ContentFormCtx.entitySource` (set by the create/edit shells) plus
 `embeddedSeedRowIds` lets the editor derive per-row delete-locking when the

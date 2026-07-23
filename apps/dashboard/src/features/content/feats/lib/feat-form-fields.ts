@@ -11,7 +11,7 @@ import {
 import { toOptions, type FieldVisibility, type FormItem } from '@rpg/ui/form'
 
 import { RequirementEditor } from '../components/requirement-editor.client'
-import { descriptionField, nameField } from '../../lib/forms/fields/content-identity-form-fields'
+import { descriptionField } from '../../lib/forms/fields/content-identity-form-fields'
 import type { ContentFormCtx } from '../../lib/forms/content-form-registry'
 import { draftOptionalSelect } from '../../lib/forms/draft-form-schema-helpers'
 import { refineRequirementEditor } from './requirement-editor-form'
@@ -83,7 +83,6 @@ function visibleWhenRepeatableNotes(): FieldVisibility {
 
 export function buildFeatFields(ctx: ContentFormCtx): FormItem[] {
   return [
-    nameField(),
     {
       type: 'chips',
       name: 'category',

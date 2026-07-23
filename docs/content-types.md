@@ -941,7 +941,7 @@ Subclasses are **not** registered in `content-types.ts`. They use nested routes 
 | **Overlay patch**   | `SubclassPatchModel`                                      | Partial edits on system ids via nested PATCH                                         |
 | **Campaign access** | `ContentCampaignAccessModel` (`targetType: 'subclasses'`) | `GET/PATCH …/subclasses/:subclassId/campaign-access` (`campaignAccess` on list rows) |
 
-List responses include **all** subclasses for the class with `campaignAccess` per row (default available / `all_players`). Dashboard **Save subclass** sends the full body; campaign access uses the dedicated route (UI in Phase 4).
+List responses include **all** subclasses for the class with `campaignAccess` per row (default available / `all_players`). Dashboard **Save subclass** sends the full body; campaign access is edited in the subclass panel via `PATCH .../campaign-access`.
 
 Delete is blocked with `409` when campaign characters reference the subclass (`classes[].subclassId`).
 

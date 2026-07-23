@@ -45,6 +45,11 @@ export interface TabbedFormProps<TFieldValues extends FieldValues> {
    * to read live form state (e.g. `formState.isSubmitting`).
    */
   footer?: React.ReactNode | ((form: UseFormReturn<TFieldValues>) => React.ReactNode)
+  /**
+   * Content rendered inside the form before the tab strip. Pass a function to
+   * read form state (e.g. for hoisted identity fields above tabs).
+   */
+  header?: React.ReactNode | ((form: UseFormReturn<TFieldValues>) => React.ReactNode)
   /** Optional id for the `<form>` element. */
   id?: string
   /**
@@ -104,6 +109,7 @@ export function TabbedForm<TFieldValues extends FieldValues>({
   defaultValues,
   formError,
   footer,
+  header,
   id,
   uiStateKey,
   fileFieldProps,
@@ -133,6 +139,7 @@ export function TabbedForm<TFieldValues extends FieldValues>({
     [formId, tabs, setActiveTabId],
   )
   const resolvedFooter = resolveSchemaFormFooter(footer, form)
+  const resolvedHeader = resolveSchemaFormFooter(header, form)
   const hasFooterRegion = Boolean(formError || resolvedFooter)
   const handleInvalidSubmit = React.useCallback(
     (
@@ -197,6 +204,7 @@ export function TabbedForm<TFieldValues extends FieldValues>({
         {valueSyncs && valueSyncs.length > 0 ? (
           <FormValueSyncEffects valueSyncs={valueSyncs} />
         ) : null}
+        {resolvedHeader}
         {contentWrapper ? contentWrapper(panels) : panels}
         <TabbedFormFooterRegion
           footerWrapper={footerWrapper}

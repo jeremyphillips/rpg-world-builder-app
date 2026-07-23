@@ -6,6 +6,7 @@ import {
   type ContentFormDef,
 } from '../../lib/forms/content-form-registry'
 import { finalizeContentInput } from '../../lib/forms/content-form-key-helpers'
+import { nameField } from '../../lib/forms/fields/content-identity-form-fields'
 import { classesQueryKey, useClasses } from '../hooks/use-classes'
 import {
   buildClassTabs,
@@ -37,6 +38,7 @@ const classFormDef: ContentFormDef<CharacterClass, ClassFormValues, CreateClassI
       ? createClassDraftFormSchema(maxLevelFromCtx(ctx), ctx)
       : createClassFormSchema(maxLevelFromCtx(ctx), ctx),
   createDefaultValues: classCreateDefaultValues,
+  nameField,
 
   buildTabs: buildClassTabs,
   buildFields: (ctx) => contentFormFields(classFormDef, ctx),

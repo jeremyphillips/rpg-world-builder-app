@@ -3,6 +3,7 @@ import { abilitySchema, ABILITY_ENTRIES, ABILITY_IDS, slugSchema } from '@rpg/co
 import { toOptions, type FormItem } from '@rpg/ui/form'
 
 import type { ContentFormCtx } from '../../lib/forms/content-form-registry'
+import { nameField } from '../../lib/forms/fields/content-identity-form-fields'
 import { draftOptionalSelect } from '../../lib/forms/draft-form-schema-helpers'
 
 const abilityOptions = toOptions(
@@ -40,13 +41,14 @@ export const skillProficiencyDraftFormSchema = z.object({
 export type SkillProficiencyFormValues = z.infer<typeof skillProficiencyFormSchema>
 export type SkillProficiencyDraftFormValues = z.infer<typeof skillProficiencyDraftFormSchema>
 
+export { nameField as skillProficiencyNameField }
+
 export function buildSkillProficiencyFields(_ctx: ContentFormCtx): FormItem[] {
   return [
     {
       kind: 'group',
       legend: 'Identity',
       fields: [
-        { type: 'text', name: 'name', label: 'Name', required: true },
         {
           type: 'textarea',
           name: 'description',

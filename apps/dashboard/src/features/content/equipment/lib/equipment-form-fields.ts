@@ -33,7 +33,7 @@ import {
 import { toOptions, type FormItem } from '@rpg/ui/form'
 
 import { economyFields } from '../../lib/forms/fields/content-economy-form-fields'
-import { descriptionField, nameField } from '../../lib/forms/fields/content-identity-form-fields'
+import { descriptionField } from '../../lib/forms/fields/content-identity-form-fields'
 import type { ContentFormCtx } from '../../lib/forms/content-form-registry'
 import { draftOptionalSelect } from '../../lib/forms/draft-form-schema-helpers'
 import { rollFormObjectSchema } from '../../lib/forms/mechanics/roll-form-values'
@@ -584,7 +584,6 @@ function economyGroup(ctx?: ContentFormCtx): FormItem {
 
 function buildUnscopedEquipmentFields(): FormItem[] {
   return [
-    nameField(),
     {
       type: 'select',
       name: 'kind',
@@ -602,5 +601,5 @@ export function buildEquipmentFields(ctx: ContentFormCtx): FormItem[] {
   if (!ctx.equipmentKind) return buildUnscopedEquipmentFields()
 
   const registered = fieldGroupsForEquipmentKind(ctx.equipmentKind, ctx)
-  return [nameField(), ...(registered ?? []), economyGroup(ctx), descriptionField(ctx)]
+  return [...(registered ?? []), economyGroup(ctx), descriptionField(ctx)]
 }
