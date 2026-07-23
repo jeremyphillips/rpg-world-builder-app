@@ -10,11 +10,7 @@ import { getErrorMessage } from '@rpg/contracts'
 import { AvailabilityAlert, resolveAvailability } from '@/lib/availability'
 import type { ContentFormCtx } from '../../lib/forms/content-form-registry'
 import { campaignRulesFromCtx } from '../../lib/form-options/content-campaign-rules'
-import {
-  useCreateSubclass,
-  useUpdateSubclass,
-  useUpdateSubclassAvailability,
-} from '../hooks/use-subclass-mutations'
+import { useCreateSubclass, useUpdateSubclass } from '../hooks/use-subclass-mutations'
 import { useReportSubclassUnsavedEdits } from '../hooks/subclass-unsaved-edits-context.client'
 import { useSubclassDeleteFlow } from '../hooks/use-subclass-delete-flow.client'
 import { useSubclassEditorState } from '../hooks/use-subclass-editor-state'
@@ -105,7 +101,6 @@ function ClassSubclassesTabBody({
 }) {
   const createMutation = useCreateSubclass(campaignId, classId)
   const updateMutation = useUpdateSubclass(campaignId, classId)
-  const availabilityMutation = useUpdateSubclassAvailability(campaignId, classId)
   const [saveError, setSaveError] = useState<string | null>(null)
   const [switchTargetId, setSwitchTargetId] = useState<string | null>(null)
 
@@ -175,19 +170,6 @@ function ClassSubclassesTabBody({
     }
   }
 
-  const handleActiveChange = async (subclassId: string, active: boolean) => {
-    editor.handleActiveChange(subclassId, active)
-
-    if (isDraftSubclassId(subclassId)) return
-
-    try {
-      await availabilityMutation.mutateAsync({ subclassId, activeInCampaign: active })
-    } catch (err) {
-      editor.handleActiveChange(subclassId, !active)
-      setSaveError(getErrorMessage(err, 'Could not update subclass availability.'))
-    }
-  }
-
   const savePending = editor.savePending || createMutation.isPending || updateMutation.isPending
 
   return (
@@ -203,7 +185,6 @@ function ClassSubclassesTabBody({
           <SubclassListPanel
             items={editor.listItems}
             selectedId={editor.selectedId}
-            activeById={editor.activeById}
             modifiedIds={editor.modifiedIds}
             onSelect={handleSelect}
             onAdd={editor.handleAdd}
@@ -218,11 +199,9 @@ function ClassSubclassesTabBody({
                 classId={classId}
                 entity={editor.selectedEntity}
                 defaultValues={editor.selectedValues}
-                activeInCampaign={editor.activeById[editor.selectedId] !== false}
                 defaultFeatureLevel={defaultFeatureLevel}
                 formCtx={formCtx}
                 savePending={savePending}
-                onActiveChange={(active) => handleActiveChange(editor.selectedId!, active)}
                 onValuesChange={editor.handleValuesChange}
                 onSave={handleSave}
                 onDeleteRequest={() => handleDeleteRequest(editor.selectedId!)}

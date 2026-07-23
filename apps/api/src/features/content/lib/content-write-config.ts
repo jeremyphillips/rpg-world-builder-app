@@ -2,6 +2,7 @@ import type { Model } from 'mongoose'
 import type { ZodType } from 'zod'
 
 import type {
+  ContentAccessTargetType,
   ContentSource,
   SystemRulesetId,
   ContentStatus,
@@ -64,6 +65,8 @@ export interface ContentDeleteContext {
  */
 export interface ContentWriteConfig<T extends WriteEntityBase> {
   typeName: ContentTypeName
+  /** Campaign access target type when it differs from `typeName` (e.g. subclasses). */
+  campaignAccessTargetType?: ContentAccessTargetType
   readConfig: ContentTypeConfig<T>
   /** JSON response key (e.g. `'armor'`, `'skillProficiencies'`). */
   responseKey: string

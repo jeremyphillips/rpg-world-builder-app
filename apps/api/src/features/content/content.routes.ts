@@ -33,11 +33,18 @@ contentRouter.patch(
   subclassController.updateSubclassItem,
 )
 
-contentRouter.patch(
-  '/classes/:classId/subclasses/:subclassId/availability',
+contentRouter.get(
+  '/classes/:classId/subclasses/:subclassId/campaign-access-availability',
   requireAuth,
   requireCampaignRole('owner', 'co-owner'),
-  subclassController.updateSubclassAvailability,
+  subclassController.getSubclassCampaignAccessAvailabilityHandler,
+)
+
+contentRouter.patch(
+  '/classes/:classId/subclasses/:subclassId/campaign-access',
+  requireAuth,
+  requireCampaignRole('owner', 'co-owner'),
+  subclassController.updateSubclassCampaignAccessHandler,
 )
 
 contentRouter.get(
@@ -111,4 +118,18 @@ contentRouter.post(
   requireAuth,
   requireCampaignRole('owner', 'co-owner'),
   controller.demoteContentItem,
+)
+
+contentRouter.get(
+  '/:contentType/:entityId/campaign-access-availability',
+  requireAuth,
+  requireCampaignRole('owner', 'co-owner'),
+  controller.getContentCampaignAccessAvailabilityHandler,
+)
+
+contentRouter.patch(
+  '/:contentType/:entityId/campaign-access',
+  requireAuth,
+  requireCampaignRole('owner', 'co-owner'),
+  controller.updateContentCampaignAccessHandler,
 )

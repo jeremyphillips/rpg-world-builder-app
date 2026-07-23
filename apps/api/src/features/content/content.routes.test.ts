@@ -27,6 +27,11 @@ describe('content list routes', () => {
 
     expect(Array.isArray(res.body.classes)).toBe(true)
     expect(res.body.classes.length).toBeGreaterThan(0)
+    expect(res.body.classes[0].campaignAccess).toMatchObject({
+      available: true,
+      visibilityMode: 'all_players',
+      effectiveAudience: 'all_players',
+    })
   })
 
   it('returns resolved spells with the registry response key', async () => {
@@ -538,5 +543,72 @@ describe('content delete routes', () => {
 
     expect(res.body.result.status).toBe('blocked')
     expect(Array.isArray(res.body.result.blockers)).toBe(true)
+  })
+})
+
+describe('content campaign access routes', () => {
+  const minimalFeatInput = {
+    slug: 'route-campaign-access-feat',
+    name: 'Campaign Access Feat',
+    category: 'origin' as const,
+    repeatable: { allowed: false },
+  }
+
+  it('attaches default campaignAccess on list rows and supports create-then-patch sequencing', async () => {
+    const { agent, csrfToken } = await registerAndLogin()
+    const campaignId = await createTestCampaign(agent, csrfToken)
+
+    const createRes = await agent
+      .post(`/api/campaigns/${campaignId}/content/feats`)
+      .set(CSRF_HEADER, csrfToken)
+      .send(minimalFeatInput)
+      .expect(201)
+
+    const entityId = createRes.body.feats.id as string
+
+    const patchRes = await agent
+      .patch(`/api/campaigns/${campaignId}/content/feats/${entityId}/campaign-access`)
+      .set(CSRF_HEADER, csrfToken)
+      .send({ available: false, visibilityMode: 'dm_only', participantIds: [] })
+      .expect(200)
+
+    expect(patchRes.body.result.campaignAccess).toMatchObject({
+      available: false,
+      visibilityMode: 'dm_only',
+      effectiveAudience: 'none',
+    })
+
+    const listRes = await agent
+      .get(`/api/campaigns/${campaignId}/content/feats`)
+      .set(CSRF_HEADER, csrfToken)
+      .expect(200)
+
+    expect(
+      listRes.body.feats.find((feat: { id: string }) => feat.id === entityId)?.campaignAccess,
+    ).toMatchObject({
+      available: false,
+      visibilityMode: 'dm_only',
+      effectiveAudience: 'none',
+    })
+  })
+
+  it('returns campaign-access-availability preflight for system content', async () => {
+    const { agent, csrfToken } = await registerAndLogin()
+    const campaignId = await createTestCampaign(agent, csrfToken)
+
+    const listRes = await agent
+      .get(`/api/campaigns/${campaignId}/content/feats`)
+      .set(CSRF_HEADER, csrfToken)
+      .expect(200)
+
+    const alert = listRes.body.feats.find((feat: { slug: string }) => feat.slug === 'alert')
+    expect(alert).toBeDefined()
+
+    const res = await agent
+      .get(`/api/campaigns/${campaignId}/content/feats/${alert.id}/campaign-access-availability`)
+      .set(CSRF_HEADER, csrfToken)
+      .expect(200)
+
+    expect(res.body.availability).toEqual({ status: 'allowed' })
   })
 })

@@ -3,7 +3,6 @@ import { expectNoAxeViolations } from '@rpg/ui/test-utils'
 import type { ComponentProps } from 'react'
 import { describe, expect, it, vi } from 'vitest'
 
-import { resolveAvailability } from '@/lib/availability'
 import { TestFormShell } from '@/test/form-shell'
 import { masterDetailEmptySelectionLabel } from '../../lib/master-detail/master-detail-constants'
 import type { UseMasterDetailArrayResult } from '../../lib/master-detail/use-master-detail-array'
@@ -31,9 +30,6 @@ function makeEditor(
     move: vi.fn(),
     moveUp: vi.fn(),
     moveDown: vi.fn(),
-    activeById: {},
-    isRowActive: vi.fn(() => true),
-    setRowActive: vi.fn(),
     ...overrides,
   }
 }
@@ -94,25 +90,6 @@ describe('MasterDetailEditorPanel', () => {
 
     expect(screen.getByRole('alert')).toBeInTheDocument()
     expect(screen.queryByText(masterDetailEmptySelectionLabel('trait'))).not.toBeInTheDocument()
-  })
-
-  it('renders an availability alert when the selected row is inactive', () => {
-    render(
-      <PanelShell
-        editor={makeEditor()}
-        itemFields={itemFields}
-        fieldName="traits"
-        idPrefix="species-trait"
-        showValidationBanner={false}
-        emptySelectionLabel={masterDetailEmptySelectionLabel('trait')}
-        campaignId="camp_1"
-        rowAvailability={resolveAvailability([
-          { code: 'subclasses-disabled', settingId: 'characterCreation.subclasses.enabled' },
-        ])}
-      />,
-    )
-
-    expect(screen.getByText(/Subclass choices are disabled/i)).toBeInTheDocument()
   })
 
   it('has no axe accessibility violations when a row is selected', async () => {

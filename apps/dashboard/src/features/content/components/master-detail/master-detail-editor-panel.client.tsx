@@ -5,8 +5,6 @@ import { FormItems, type FormItem } from '@rpg/ui/form'
 
 import { AvailabilityAlert, type Availability } from '@/lib/availability'
 import type { UseMasterDetailArrayResult } from '../../lib/master-detail/use-master-detail-array'
-import { resolveMasterDetailRowKey } from '../../lib/master-detail/content-campaign-availability'
-import { MasterDetailActiveToggle } from './master-detail-active-toggle.client'
 import { MasterDetailValidationBanner } from './master-detail-validation-banner.client'
 
 export interface MasterDetailEditorPanelProps {
@@ -18,50 +16,31 @@ export interface MasterDetailEditorPanelProps {
   idPrefix: string
   showValidationBanner: boolean
   emptySelectionLabel: string
-  /** When true (default), renders the campaign availability toggle above the form. */
-  showActiveToggle?: boolean
-  /** Selected row values used to resolve the stable row key for the toggle. */
-  selectedRow?: { id?: string }
   campaignId?: string
   rowAvailability?: Availability
 }
 
 interface MasterDetailSelectedRowEditorProps {
-  editor: UseMasterDetailArrayResult
   itemFields: FormItem[]
   fieldName: string
   idPrefix: string
   selectedFieldId: string
   selectedIndex: number
-  showActiveToggle: boolean
-  rowKey?: string
-  selectedRow?: { id?: string }
   campaignId?: string
   rowAvailability?: Availability
 }
 
 function MasterDetailSelectedRowEditor({
-  editor,
   itemFields,
   fieldName,
   idPrefix,
   selectedFieldId,
   selectedIndex,
-  showActiveToggle,
-  rowKey,
-  selectedRow,
   campaignId,
   rowAvailability,
 }: MasterDetailSelectedRowEditorProps) {
   return (
     <>
-      {showActiveToggle && rowKey ? (
-        <MasterDetailActiveToggle
-          controlId={`${idPrefix}-${selectedFieldId}-active`}
-          activeInCampaign={editor.isRowActive(selectedIndex, selectedRow)}
-          onActiveChange={(active) => editor.setRowActive(rowKey, active)}
-        />
-      ) : null}
       {rowAvailability?.status === 'inactive' && campaignId ? (
         <AvailabilityAlert availability={rowAvailability} context={{ campaignId }} />
       ) : null}
@@ -87,7 +66,7 @@ function MasterDetailEmptySelectionHint({ visible, label }: { visible: boolean; 
 
 /**
  * Detail column for a form-embedded master-detail editor: validation banner,
- * optional active toggle, selected row form, or empty-selection hint.
+ * selected row form, or empty-selection hint.
  */
 export function MasterDetailEditorPanel({
   editor,
@@ -96,17 +75,11 @@ export function MasterDetailEditorPanel({
   idPrefix,
   showValidationBanner,
   emptySelectionLabel,
-  showActiveToggle = true,
-  selectedRow,
   campaignId,
   rowAvailability,
 }: MasterDetailEditorPanelProps) {
   const selectedIndex = editor.selectedIndex
   const selectedFieldId = selectedIndex !== null ? editor.fields[selectedIndex]?.id : undefined
-  const rowKey =
-    selectedFieldId !== undefined
-      ? resolveMasterDetailRowKey(selectedFieldId, selectedRow)
-      : undefined
   const hasSelectedRow = selectedIndex !== null && Boolean(selectedFieldId)
 
   return (
@@ -114,15 +87,11 @@ export function MasterDetailEditorPanel({
       <MasterDetailValidationBanner visible={showValidationBanner} />
       {hasSelectedRow && selectedFieldId ? (
         <MasterDetailSelectedRowEditor
-          editor={editor}
           itemFields={itemFields}
           fieldName={fieldName}
           idPrefix={idPrefix}
           selectedFieldId={selectedFieldId}
           selectedIndex={selectedIndex}
-          showActiveToggle={showActiveToggle}
-          rowKey={rowKey}
-          selectedRow={selectedRow}
           campaignId={campaignId}
           rowAvailability={rowAvailability}
         />

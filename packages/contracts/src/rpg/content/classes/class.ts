@@ -243,10 +243,10 @@ export type SubclassBody = z.infer<typeof subclassBodySchema>
 export const subclassSchema = contentMetaSchema.extend(subclassBodySchema.shape)
 export type Subclass = z.infer<typeof subclassSchema>
 
-/** Resolved list row — body fields plus campaign availability metadata. */
-export const resolvedSubclassSchema = subclassSchema.extend({
-  activeInCampaign: z.boolean(),
-})
+import { resolvedCampaignAccessFields } from '../lib/campaign-access'
+
+/** Resolved list row — body fields plus campaign access metadata. */
+export const resolvedSubclassSchema = subclassSchema.extend(resolvedCampaignAccessFields)
 export type ResolvedSubclass = z.infer<typeof resolvedSubclassSchema>
 
 export const createSubclassInputSchema = subclassBodySchema.extend({ slug: slugSchema })
@@ -265,17 +265,6 @@ export const subclassPatchSchema = contentPatchBaseSchema.extend({
   patch: subclassPatchableBodySchema.partial(),
 })
 export type SubclassPatch = z.infer<typeof subclassPatchSchema>
-
-/**
- * Campaign-scoped availability for a subclass record. Separate from body patches:
- * deactivating hides the subclass in one campaign without deleting the record.
- */
-export const subclassCampaignAvailabilitySchema = z.object({
-  campaignId: z.string().min(1),
-  targetId: z.string().min(1),
-  activeInCampaign: z.boolean(),
-})
-export type SubclassCampaignAvailability = z.infer<typeof subclassCampaignAvailabilitySchema>
 
 /** Opaque class slug — resolve display names from resolved catalog `name` at read/UI time. */
 export const classSlugSchema = z.string().min(1)

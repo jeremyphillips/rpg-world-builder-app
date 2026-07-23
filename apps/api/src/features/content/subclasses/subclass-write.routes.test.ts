@@ -46,7 +46,7 @@ describe('subclass write routes', () => {
     ).toBe('Route Write Subclass')
     expect(
       listAfterCreate.body.subclasses.find((row: { id: string }) => row.id === entityId)
-        ?.activeInCampaign,
+        ?.campaignAccess?.available,
     ).toBe(true)
 
     const patchRes = await agent
@@ -81,13 +81,14 @@ describe('subclass write routes', () => {
 
     const availabilityRes = await agent
       .patch(
-        `/api/campaigns/${campaignId}/content/classes/${FIGHTER_CLASS_ID}/subclasses/${champion.id}/availability`,
+        `/api/campaigns/${campaignId}/content/classes/${FIGHTER_CLASS_ID}/subclasses/${champion.id}/campaign-access`,
       )
       .set(CSRF_HEADER, csrfToken)
-      .send({ activeInCampaign: false })
+      .send({ available: false, visibilityMode: 'all_players', participantIds: [] })
       .expect(200)
 
-    expect(availabilityRes.body.availability.activeInCampaign).toBe(false)
+    expect(availabilityRes.body.result.campaignAccess.available).toBe(false)
+    expect(availabilityRes.body.result.campaignAccess.effectiveAudience).toBe('none')
 
     const reloadRes = await agent
       .get(`/api/campaigns/${campaignId}/content/classes/${FIGHTER_CLASS_ID}/subclasses`)
@@ -97,7 +98,8 @@ describe('subclass write routes', () => {
     const reloadedChampion = reloadRes.body.subclasses.find(
       (row: { id: string }) => row.id === champion.id,
     )
-    expect(reloadedChampion.activeInCampaign).toBe(false)
+    expect(reloadedChampion.campaignAccess.available).toBe(false)
+    expect(reloadedChampion.campaignAccess.effectiveAudience).toBe('none')
     expect(reloadedChampion.tagline).toBe('Patched Champion Tagline')
   })
 

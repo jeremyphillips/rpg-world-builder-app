@@ -1,3 +1,5 @@
+export * from './campaign-access'
+export * from './content-access-capabilities'
 export * from './content-deletion'
 export * from './content-validation-intent'
 export * from './draft-authored-content'

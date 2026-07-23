@@ -2,17 +2,12 @@
 
 import { useEffect, useRef } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
-import { Badge, Button, InfoTooltip, Switch } from '@rpg/ui'
+import { Badge, Button } from '@rpg/ui'
 import { FormItems, makeResolver } from '@rpg/ui/form'
 import type { Subclass } from '@rpg/contracts'
 
 import type { ContentFormCtx } from '../../lib/forms/content-form-registry'
-import {
-  ACTIVE_IN_CAMPAIGN_LABEL,
-  ACTIVE_IN_CAMPAIGN_TOOLTIP,
-  isDraftSubclassId,
-  isSubclassDeletable,
-} from '../lib/subclasses/subclass-editor-constants'
+import { isDraftSubclassId, isSubclassDeletable } from '../lib/subclasses/subclass-editor-constants'
 import {
   buildSubclassFields,
   type SubclassFormValues,
@@ -25,11 +20,9 @@ export interface SubclassEditorPanelProps {
   classId: string
   entity?: Subclass
   defaultValues: SubclassFormValues
-  activeInCampaign: boolean
   defaultFeatureLevel?: number
   formCtx: ContentFormCtx
   savePending?: boolean
-  onActiveChange: (active: boolean) => void
   onValuesChange: (values: SubclassFormValues) => void
   onSave: (values: SubclassFormValues) => Promise<void>
   onDeleteRequest: () => void
@@ -39,11 +32,9 @@ export function SubclassEditorPanel({
   subclassId,
   entity,
   defaultValues,
-  activeInCampaign,
   defaultFeatureLevel,
   formCtx,
   savePending = false,
-  onActiveChange,
   onValuesChange,
   onSave,
   onDeleteRequest,
@@ -85,28 +76,13 @@ export function SubclassEditorPanel({
   return (
     <FormProvider {...form}>
       <div className="space-y-6">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div className="flex items-center gap-2">
-            <label htmlFor={`subclass-active-${subclassId}`} className="text-sm font-medium">
-              {ACTIVE_IN_CAMPAIGN_LABEL}
-            </label>
-            <InfoTooltip aria-label={`About: ${ACTIVE_IN_CAMPAIGN_LABEL}`}>
-              {ACTIVE_IN_CAMPAIGN_TOOLTIP}
-            </InfoTooltip>
-            <Switch
-              id={`subclass-active-${subclassId}`}
-              checked={activeInCampaign}
-              disabled={savePending}
-              onCheckedChange={onActiveChange}
-              aria-label={ACTIVE_IN_CAMPAIGN_LABEL}
-            />
-          </div>
-          {entity?.source === 'system' ? (
+        {entity?.source === 'system' ? (
+          <div className="flex justify-end">
             <Badge appearance="neutral" tone="neutral">
               System
             </Badge>
-          ) : null}
-        </div>
+          </div>
+        ) : null}
 
         <FormItems items={fields} idPrefix={`subclass-editor-${subclassId}`} />
 

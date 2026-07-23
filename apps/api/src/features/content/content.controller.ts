@@ -16,6 +16,11 @@ import {
   getContentDemotionAvailability,
   promoteContentToPublished,
 } from './lib/content-status.service'
+import {
+  getContentCampaignAccessAvailability,
+  updateContentCampaignAccess,
+  attachCampaignAccessForTargetType,
+} from './lib/content-campaign-access.service'
 import { getHomebrewContentSummary } from './lib/homebrew-summary.service'
 
 export async function createContentItem(req: Request, res: Response): Promise<void> {
@@ -137,11 +142,50 @@ export async function listContent(req: Request, res: Response): Promise<void> {
   }
   const writeConfig = getContentWriteConfig(contentType)!
   const items = await resolveContentForCampaign(contentType, campaignId)
+  const withCampaignAccess = await attachCampaignAccessForTargetType(campaignId, contentType, items)
   const role = req.campaignMembership!.campaignRole
   const visible = CAMPAIGN_MANAGE_ROLES.includes(role as CampaignManageRole)
-    ? items
-    : items.filter((item) => item.status !== 'draft')
+    ? withCampaignAccess
+    : withCampaignAccess.filter((item) => item.status !== 'draft')
   res.status(200).json({ [writeConfig.responseKey]: visible })
+}
+
+export async function getContentCampaignAccessAvailabilityHandler(
+  req: Request,
+  res: Response,
+): Promise<void> {
+  const { campaignId, contentType, entityId } = req.params as {
+    campaignId: string
+    contentType: string
+    entityId: string
+  }
+  if (!isContentWriteType(contentType)) {
+    throw new HttpError(404, 'not_found', `Unknown content type "${contentType}".`)
+  }
+  const writeConfig = getContentWriteConfig(contentType)!
+  const availability = await getContentCampaignAccessAvailability(writeConfig, campaignId, entityId)
+  res.status(200).json({ availability })
+}
+
+export async function updateContentCampaignAccessHandler(
+  req: Request,
+  res: Response,
+): Promise<void> {
+  const { campaignId, contentType, entityId } = req.params as {
+    campaignId: string
+    contentType: string
+    entityId: string
+  }
+  if (!isContentWriteType(contentType)) {
+    throw new HttpError(404, 'not_found', `Unknown content type "${contentType}".`)
+  }
+  const writeConfig = getContentWriteConfig(contentType)!
+  const result = await updateContentCampaignAccess(writeConfig, campaignId, entityId, req.body)
+  if (result.status === 'blocked') {
+    res.status(409).json({ result })
+    return
+  }
+  res.status(200).json({ result })
 }
 
 export async function getHomebrewSummary(req: Request, res: Response): Promise<void> {

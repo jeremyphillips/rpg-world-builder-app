@@ -13,7 +13,6 @@ describe('buildEmbeddedMasterDetailListItem', () => {
       row: { id: 'rage' },
       entitySource: 'system',
       seedRowIds: new Set(['rage']),
-      activeById: {},
       hasRowError,
       title: 'Rage',
       eyebrow: 'Level 1',
@@ -37,7 +36,6 @@ describe('buildEmbeddedMasterDetailListItem', () => {
       row: { id: 'custom-feature' },
       entitySource: 'system',
       seedRowIds: new Set(['rage']),
-      activeById: {},
       hasRowError,
       title: 'Custom Feature',
     })
@@ -51,7 +49,7 @@ describe('buildEmbeddedMasterDetailListItem', () => {
     })
   })
 
-  it('surfaces row validation errors and inactive badge from hasRowError/activeById', () => {
+  it('surfaces row validation errors from hasRowError', () => {
     hasRowError.mockReturnValueOnce(true)
 
     const item = buildEmbeddedMasterDetailListItem({
@@ -59,17 +57,13 @@ describe('buildEmbeddedMasterDetailListItem', () => {
       index: 0,
       row: {},
       entitySource: 'homebrew',
-      activeById: { 'rhf-1': false },
       hasRowError,
       title: 'Untitled',
     })
 
     expect(item.hasError).toBe(true)
-    expect(item.active).toBe(false)
-    expect(item.badges).toEqual([
-      { label: 'Homebrew', appearance: 'outline', tone: 'neutral' },
-      { label: 'Inactive', appearance: 'outline', tone: 'warning' },
-    ])
+    expect(item.active).toBe(true)
+    expect(item.badges).toEqual([{ label: 'Homebrew', appearance: 'outline', tone: 'neutral' }])
     expect(hasRowError).toHaveBeenCalledWith(0)
   })
 })

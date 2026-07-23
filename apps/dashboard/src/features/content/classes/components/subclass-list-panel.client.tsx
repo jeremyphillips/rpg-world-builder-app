@@ -2,7 +2,6 @@ import { cn, Badge, Button, Text } from '@rpg/ui'
 import { Trash2 } from 'lucide-react'
 
 import {
-  isSubclassActive,
   isSubclassDeletable,
   UNTITLED_SUBCLASS_LABEL,
 } from '../lib/subclasses/subclass-editor-constants'
@@ -11,7 +10,6 @@ import type { SubclassListItem } from '../lib/subclasses/subclass-editor-state'
 export interface SubclassListPanelProps {
   items: SubclassListItem[]
   selectedId: string | null
-  activeById: Record<string, boolean>
   modifiedIds: ReadonlySet<string>
   onSelect: (id: string) => void
   onAdd: () => void
@@ -27,26 +25,19 @@ const SOURCE_BADGE = {
   { appearance: 'neutral' | 'outline'; tone: 'neutral'; label: string }
 >
 
-function subclassRowShellClass(isSelected: boolean, active: boolean) {
+function subclassRowShellClass(isSelected: boolean) {
   return cn(
     'flex items-center gap-1 rounded-md border border-transparent',
-    !active && 'border-dashed border-border-subtle',
     isSelected && 'border-row-selected-border bg-row-selected',
   )
-}
-
-function subclassRowTitleClass(active: boolean) {
-  return cn('block truncate font-medium', !active && 'text-muted-foreground')
 }
 
 function SubclassListRowBadges({
   source,
   isModified,
-  active,
 }: {
   source: SubclassListItem['source']
   isModified: boolean
-  active: boolean
 }) {
   const { appearance, tone, label } = SOURCE_BADGE[source]
 
@@ -58,11 +49,6 @@ function SubclassListRowBadges({
       {isModified ? (
         <Badge appearance="outline" tone="neutral" size="sm">
           Modified
-        </Badge>
-      ) : null}
-      {!active ? (
-        <Badge appearance="outline" tone="warning" size="sm">
-          Inactive
         </Badge>
       ) : null}
     </span>
@@ -99,7 +85,6 @@ function SubclassListRowDeleteControl({
 interface SubclassListRowProps {
   item: SubclassListItem
   isSelected: boolean
-  active: boolean
   isModified: boolean
   onSelect: (id: string) => void
   onDeleteRequest: (id: string) => void
@@ -108,24 +93,21 @@ interface SubclassListRowProps {
 function SubclassListRow({
   item,
   isSelected,
-  active,
   isModified,
   onSelect,
   onDeleteRequest,
 }: SubclassListRowProps) {
   return (
     <li>
-      <div className={subclassRowShellClass(isSelected, active)}>
+      <div className={subclassRowShellClass(isSelected)}>
         <button
           type="button"
           aria-current={isSelected ? 'true' : undefined}
           onClick={() => onSelect(item.id)}
           className="min-w-0 flex-1 rounded-md px-3 py-2 text-left text-sm hover:bg-row-hover"
         >
-          <span className={subclassRowTitleClass(active)}>
-            {item.name || UNTITLED_SUBCLASS_LABEL}
-          </span>
-          <SubclassListRowBadges source={item.source} isModified={isModified} active={active} />
+          <span className="block truncate font-medium">{item.name || UNTITLED_SUBCLASS_LABEL}</span>
+          <SubclassListRowBadges source={item.source} isModified={isModified} />
         </button>
         <SubclassListRowDeleteControl item={item} onDeleteRequest={onDeleteRequest} />
       </div>
@@ -136,7 +118,6 @@ function SubclassListRow({
 export function SubclassListPanel({
   items,
   selectedId,
-  activeById,
   modifiedIds,
   onSelect,
   onAdd,
@@ -159,7 +140,6 @@ export function SubclassListPanel({
               key={item.id}
               item={item}
               isSelected={item.id === selectedId}
-              active={isSubclassActive(activeById, item.id)}
               isModified={modifiedIds.has(item.id)}
               onSelect={onSelect}
               onDeleteRequest={onDeleteRequest}

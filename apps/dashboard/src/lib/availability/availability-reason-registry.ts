@@ -1,7 +1,7 @@
-import { INACTIVE_ROW_BADGE_LABEL } from '@/features/content/lib/master-detail/content-campaign-availability'
-
 import type { CampaignSettingId } from './availability'
 import { campaignSettingHref } from './campaign-settings-registry'
+
+export const INACTIVE_ROW_BADGE_LABEL = 'Inactive'
 
 export const AVAILABILITY_REASON_CODES = [
   'subclasses-disabled',

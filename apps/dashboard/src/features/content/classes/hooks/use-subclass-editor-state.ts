@@ -44,10 +44,6 @@ function syncSubclassSelection(
   }
 }
 
-function initialActiveById(subclasses: ResolvedSubclass[]): Record<string, boolean> {
-  return Object.fromEntries(subclasses.map((subclass) => [subclass.id, subclass.activeInCampaign]))
-}
-
 export function useSubclassEditorState(
   classId: string | undefined,
   subclasses: ResolvedSubclass[],
@@ -55,25 +51,8 @@ export function useSubclassEditorState(
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [drafts, setDrafts] = useState<SubclassDraft[]>([])
   const [edits, setEdits] = useState<Record<string, Partial<SubclassFormValues>>>({})
-  const [activeById, setActiveById] = useState<Record<string, boolean>>(() =>
-    initialActiveById(subclasses),
-  )
   const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null)
   const [savePending, setSavePending] = useState(false)
-
-  useEffect(() => {
-    setActiveById((current) => {
-      let changed = false
-      const next = { ...current }
-      for (const subclass of subclasses) {
-        if (next[subclass.id] === undefined) {
-          next[subclass.id] = subclass.activeInCampaign
-          changed = true
-        }
-      }
-      return changed ? next : current
-    })
-  }, [subclasses])
 
   const listItems = useMemo(
     () => buildSubclassListItems(subclasses, drafts, edits),
@@ -104,10 +83,6 @@ export function useSubclassEditorState(
     [selectedId, subclasses, drafts],
   )
 
-  const handleActiveChange = useCallback((id: string, active: boolean) => {
-    setActiveById((current) => ({ ...current, [id]: active }))
-  }, [])
-
   const clearEditsFor = useCallback((id: string) => {
     setEdits((current) => {
       if (!(id in current)) return current
@@ -136,11 +111,6 @@ export function useSubclassEditorState(
         removeDraft(id)
       }
       clearEditsFor(id)
-      setActiveById((current) => {
-        const next = { ...current }
-        delete next[id]
-        return next
-      })
       setSelectedId((current) => selectNextSubclassId(listItems, id, current))
     },
     [clearEditsFor, listItems, removeDraft],
@@ -178,7 +148,6 @@ export function useSubclassEditorState(
     modifiedIds,
     selectedId,
     setSelectedId,
-    activeById,
     deleteTargetId,
     deleteTargetItem,
     selectedEntity,
@@ -188,7 +157,6 @@ export function useSubclassEditorState(
     hasUnsavedEdits,
     handleAdd,
     handleValuesChange,
-    handleActiveChange,
     handleDeleteRequest,
     handleDeleteDismiss,
     handleDeleteConfirmLocal,

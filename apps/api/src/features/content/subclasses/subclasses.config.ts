@@ -78,6 +78,7 @@ export const subclassContentConfig: ContentTypeConfig<Subclass> = {
 
 export const subclassWriteConfig: ContentWriteConfig<Subclass> = {
   typeName: 'classes',
+  campaignAccessTargetType: 'subclasses',
   readConfig: subclassContentConfig,
   responseKey: 'subclasses',
   createInputSchema: createSubclassInputSchema,

@@ -21,9 +21,6 @@ const selectedEditor: UseMasterDetailArrayResult = {
   move: () => {},
   moveUp: () => {},
   moveDown: () => {},
-  activeById: {},
-  isRowActive: () => true,
-  setRowActive: () => {},
 }
 
 const unselectedEditor: UseMasterDetailArrayResult = {

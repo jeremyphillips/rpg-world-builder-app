@@ -23,7 +23,6 @@ export const Default: Story = {
   args: {
     items,
     selectedId: items[0]?.id ?? null,
-    activeById: {},
     modifiedIds: new Set<string>(),
     onSelect: () => {},
     onAdd: () => {},
@@ -31,11 +30,10 @@ export const Default: Story = {
   },
 }
 
-export const WithInactiveAndModified: Story = {
+export const WithModified: Story = {
   args: {
     items,
     selectedId: items[0]?.id ?? null,
-    activeById: { [items[0]!.id]: false },
     modifiedIds: new Set([items[0]!.id]),
     onSelect: () => {},
     onAdd: () => {},
