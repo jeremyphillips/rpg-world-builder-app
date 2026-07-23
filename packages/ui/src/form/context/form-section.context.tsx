@@ -119,6 +119,11 @@ export interface FormSectionProviderProps {
    */
   size?: FieldSize
   depth?: number
+  /**
+   * When true, top-level groups/arrays omit standalone bottom margin — a parent
+   * rhythm stack (e.g. `<Form>` or a header shell) owns sibling spacing.
+   */
+  inRhythmStack?: boolean
 }
 
 /** Supplies rhythm/size context for `FormItems` outside the schema-driven `<Form>`. */
@@ -127,11 +132,12 @@ export function FormSectionProvider({
   rhythm = DEFAULT_FORM_RHYTHM,
   size,
   depth = 0,
+  inRhythmStack,
 }: FormSectionProviderProps) {
   const resolvedSize = resolveFormFieldSize({ explicit: size, rhythm })
   const value = React.useMemo(
-    () => ({ depth, rhythm, size: resolvedSize }),
-    [depth, rhythm, resolvedSize],
+    () => ({ depth, rhythm, size: resolvedSize, inRhythmStack }),
+    [depth, inRhythmStack, rhythm, resolvedSize],
   )
   return <FormSectionContext.Provider value={value}>{children}</FormSectionContext.Provider>
 }

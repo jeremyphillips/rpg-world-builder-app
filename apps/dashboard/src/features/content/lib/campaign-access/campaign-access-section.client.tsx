@@ -203,7 +203,7 @@ export function CampaignAccessSection({
     <CampaignAccessFormProvider value={{ pending, onAvailableChange: handleAvailableChange }}>
       <FormProvider {...form}>
         <FormUiProvider fields={renderedFields}>
-          <FormSectionProvider size="md" rhythm="comfortable">
+          <FormSectionProvider size="md" rhythm="comfortable" inRhythmStack>
             {persistError ? (
               <Text variant="destructive" role="alert" className="mb-4">
                 {persistError}

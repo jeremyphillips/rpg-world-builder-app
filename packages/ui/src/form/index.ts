@@ -15,11 +15,13 @@ export {
 export { FieldNode, buildFieldControlId } from './containers/form-conditional.client'
 export {
   FormSectionProvider,
+  FormRhythmStack,
   FormSectionContext,
   buildFormSectionChildContext,
   useFormSectionContext,
   type FormSectionContextOverrides,
   type FormSectionContextValue,
+  type FormRhythmStackProps,
   type FormSectionProviderProps,
 } from './context/form-section.context'
 export {

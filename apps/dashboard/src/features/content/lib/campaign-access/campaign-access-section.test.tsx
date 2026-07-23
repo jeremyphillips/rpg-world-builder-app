@@ -27,6 +27,8 @@ describe('CampaignAccessSection', () => {
 
     expect(screen.getByText('Campaign availability')).toBeInTheDocument()
     expect(screen.getByText('Available · All players')).toBeInTheDocument()
+    expect(screen.getByRole('group', { name: /Campaign availability/ })).toHaveClass('mb-0')
+    expect(screen.getByRole('group', { name: /Campaign availability/ })).not.toHaveClass('mb-8')
 
     await expandCampaignAccess(user)
 

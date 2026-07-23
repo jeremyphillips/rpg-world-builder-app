@@ -40,6 +40,9 @@ Nested groups inside another group default to `legendSize: 'subsection'` (overri
 needed). Nested groups omit `mb-8` — parent group rhythm (`gap-6` / `gap-2`) owns sibling
 spacing, matching nested array sections. Top-level groups and arrays inside `<Form>` omit
 `mb-8` as well — the form's `FormRhythmStack` (`gap-6` / `gap-2`) owns sibling spacing.
+Standalone `FormItems` outside `<Form>` get the same contract when wrapped in
+`FormSectionProvider` with `inRhythmStack` (e.g. header-embedded sections whose parent
+shell already spaces siblings).
 
 ```ts
 {
