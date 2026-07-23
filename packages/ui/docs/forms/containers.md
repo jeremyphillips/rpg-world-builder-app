@@ -88,13 +88,13 @@ Optional open/collapse and summary behavior. Composes with `chrome`.
 
 `resolveSummary` returns a `FieldGroupSummary`:
 
-| Field       | Use                                                                                                                                                               |
-| ----------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `primary`   | Plain-text fallback when `status` is omitted — existing `primary` + `secondary` layout                                                                            |
-| `secondary` | Muted explanatory line below the status row                                                                                                                       |
-| `status`    | Structured status row — `label`, optional `tone` (`neutral` \| `positive`), optional `indicator` (`dot` \| `inactive`)                                            |
-| `detail`    | Supporting detail on the status line (e.g. player access mode) — muted, middle-dot separated from `status.label`                                                  |
-| `surface`   | Collapsed container treatment — `inactive` applies a muted shell (`data-summary-surface="inactive"`) around the collapsed block; expanded state ignores `surface` |
+| Field       | Use                                                                                                                                                                        |
+| ----------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `primary`   | Plain-text fallback when `status` is omitted — existing `primary` + `secondary` layout                                                                                     |
+| `secondary` | Muted explanatory line below the status row                                                                                                                                |
+| `status`    | Structured status row — `label`, optional `tone` (`neutral` \| `positive`), optional `indicator` (`dot` \| `inactive`)                                                     |
+| `detail`    | Supporting detail on the status line (e.g. player access mode) — muted, middle-dot separated from `status.label`                                                           |
+| `surface`   | Collapsed container treatment — `inactive` applies a warning-themed shell (`data-summary-surface="inactive"`) around the collapsed block; expanded state ignores `surface` |
 
 ```ts
 {
@@ -113,7 +113,7 @@ Optional open/collapse and summary behavior. Composes with `chrome`.
             detail: 'All players',
           }
         : {
-            status: { label: 'Unavailable', tone: 'neutral', indicator: 'inactive' },
+            status: { label: 'Unavailable', tone: 'warning', indicator: 'inactive' },
             detail: 'DM only',
             secondary: 'Hidden from discovery and selection in this campaign.',
             surface: 'inactive',

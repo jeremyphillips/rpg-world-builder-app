@@ -5,9 +5,10 @@ import type { FieldGroupSummary } from './field-group-disclosure.types'
 import {
   fieldGroupSummaryStatusDetailSeparatorClasses,
   fieldGroupSummaryStatusIndicatorVariants,
-  fieldGroupSummaryStatusLabelClasses,
+  fieldGroupSummaryStatusLabelVariants,
   fieldGroupSummaryStatusLineClasses,
   fieldGroupSummaryStatusSecondaryClasses,
+  fieldGroupSummaryStatusWarningSecondaryClasses,
 } from './field-group-summary-disclosure-collapsed.variants'
 import { fieldGroupSummaryDisclosureActionButtonClasses } from './field-group-summary-disclosure.variants'
 import { Text } from './text'
@@ -51,21 +52,23 @@ function FieldGroupSummaryStatusRow({ summary }: { summary: FieldGroupSummary })
   const status = summary.status
   if (!status) return null
 
+  const tone = status.tone ?? 'neutral'
+
   return (
     <span className={fieldGroupSummaryStatusLineClasses}>
       {status.indicator === 'dot' ? (
         <span
           aria-hidden
-          className={fieldGroupSummaryStatusIndicatorVariants({ indicator: 'dot' })}
+          className={fieldGroupSummaryStatusIndicatorVariants({ indicator: 'dot', tone })}
         />
       ) : null}
       {status.indicator === 'inactive' ? (
         <CircleSlash
           aria-hidden
-          className={fieldGroupSummaryStatusIndicatorVariants({ indicator: 'inactive' })}
+          className={fieldGroupSummaryStatusIndicatorVariants({ indicator: 'inactive', tone })}
         />
       ) : null}
-      <span className={fieldGroupSummaryStatusLabelClasses}>{status.label}</span>
+      <span className={fieldGroupSummaryStatusLabelVariants({ tone })}>{status.label}</span>
       {summary.detail ? (
         <>
           <span aria-hidden className={fieldGroupSummaryStatusDetailSeparatorClasses}>
@@ -122,12 +125,18 @@ export function FieldGroupSummaryDisclosureCollapsed({
             </Text>
           ) : null}
           {summary.secondary ? (
-            <Text
-              variant="muted"
-              className={usesStatusRow ? fieldGroupSummaryStatusSecondaryClasses : 'mt-1 text-sm'}
-            >
-              {summary.secondary}
-            </Text>
+            usesStatusRow && summary.surface === 'inactive' ? (
+              <Text as="span" className={fieldGroupSummaryStatusWarningSecondaryClasses}>
+                {summary.secondary}
+              </Text>
+            ) : (
+              <Text
+                variant="muted"
+                className={usesStatusRow ? fieldGroupSummaryStatusSecondaryClasses : 'mt-1 text-sm'}
+              >
+                {summary.secondary}
+              </Text>
+            )
           ) : null}
         </button>
         <Button

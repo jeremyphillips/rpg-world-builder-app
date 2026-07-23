@@ -25,7 +25,7 @@ export function resolveCampaignAccessSummary(
 
   if (!access.available) {
     return {
-      status: { label: 'Unavailable', tone: 'neutral', indicator: 'inactive' },
+      status: { label: 'Unavailable', tone: 'warning', indicator: 'inactive' },
       detail,
       secondary: CAMPAIGN_ACCESS_UNAVAILABLE_SUMMARY_SECONDARY,
       surface: 'inactive',

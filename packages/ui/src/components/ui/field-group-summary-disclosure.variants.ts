@@ -1,5 +1,6 @@
 import { cn } from '../../lib/utils'
 import { optionalFieldDisclosureActionButtonClasses } from './optional-field-disclosure.variants'
+import { resolveFieldContainerChromeClasses } from './field-surface.variants'
 
 /** Compact text action buttons (Change / Done) — matches optional field disclosure. */
 export const fieldGroupSummaryDisclosureActionButtonClasses =
@@ -27,7 +28,8 @@ export function resolveFieldGroupSummaryDisclosurePanelClasses(panelDivider = tr
   )
 }
 
-/** Muted inactive shell wrapping collapsed summary when `summary.surface === 'inactive'`. */
+/** Warning-themed shell wrapping collapsed summary when `summary.surface === 'inactive'`. */
 export const fieldGroupSummaryDisclosureInactiveShellClasses = cn(
-  'flex flex-col gap-2 rounded-md border border-border-subtle border-l-2 border-l-border bg-surface-muted p-3',
+  'flex flex-col gap-2 rounded-md border-l-2 border-l-semantic-warning-border p-3',
+  resolveFieldContainerChromeClasses({ status: 'warning' }),
 )

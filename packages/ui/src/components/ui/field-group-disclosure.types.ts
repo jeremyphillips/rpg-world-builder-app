@@ -1,4 +1,4 @@
-export type FieldGroupSummaryStatusTone = 'neutral' | 'positive'
+export type FieldGroupSummaryStatusTone = 'neutral' | 'positive' | 'warning'
 
 export type FieldGroupSummaryStatus = {
   label: string

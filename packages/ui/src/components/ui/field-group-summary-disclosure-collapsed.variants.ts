@@ -3,20 +3,45 @@ import { cva } from 'class-variance-authority'
 /** Status line row — indicator, label, and detail separator. */
 export const fieldGroupSummaryStatusLineClasses = 'flex min-w-0 items-center gap-1.5 text-sm'
 
-/** Status label — strong foreground for both positive and neutral tones. */
-export const fieldGroupSummaryStatusLabelClasses = 'font-medium text-foreground'
-
 /** Middle-dot separator before detail text. */
 export const fieldGroupSummaryStatusDetailSeparatorClasses = 'text-muted-foreground'
 
 /** Explanatory line below the status row. */
 export const fieldGroupSummaryStatusSecondaryClasses = 'mt-1 text-xs'
 
+export const fieldGroupSummaryStatusLabelVariants = cva('font-medium', {
+  variants: {
+    tone: {
+      neutral: 'text-foreground',
+      positive: 'text-foreground',
+      warning: 'text-semantic-warning',
+    },
+  },
+  defaultVariants: {
+    tone: 'neutral',
+  },
+})
+
 export const fieldGroupSummaryStatusIndicatorVariants = cva('shrink-0', {
   variants: {
     indicator: {
       dot: 'size-1.5 rounded-full bg-semantic-success',
-      inactive: 'size-3.5 text-muted-foreground',
+      inactive: 'size-3.5',
+    },
+    tone: {
+      neutral: '',
+      positive: '',
+      warning: '',
     },
   },
+  compoundVariants: [
+    { indicator: 'inactive', tone: 'neutral', class: 'text-muted-foreground' },
+    { indicator: 'inactive', tone: 'warning', class: 'text-semantic-warning' },
+  ],
+  defaultVariants: {
+    tone: 'neutral',
+  },
 })
+
+/** Secondary consequence copy inside a warning-themed inactive shell. */
+export const fieldGroupSummaryStatusWarningSecondaryClasses = 'mt-1 text-xs text-semantic-warning'

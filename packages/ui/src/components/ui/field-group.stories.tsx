@@ -228,7 +228,7 @@ function SummaryDisclosureDemo() {
 
             if (!values.available) {
               return {
-                status: { label: 'Unavailable', tone: 'neutral', indicator: 'inactive' },
+                status: { label: 'Unavailable', tone: 'warning', indicator: 'inactive' },
                 detail,
                 secondary: 'Hidden from discovery and selection in this campaign.',
                 surface: 'inactive',
