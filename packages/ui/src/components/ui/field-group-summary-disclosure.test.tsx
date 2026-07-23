@@ -25,8 +25,8 @@ function SummaryDisclosureHarness({
         legend="Campaign availability"
         legendSize="array"
         formControl={form.control as unknown as Control<FieldValues>}
-        fieldsChrome={{
-          variant: 'summaryDisclosure',
+        disclosure={{
+          variant: 'summary',
           defaultOpen: false,
           resolveSummary: (values) => ({
             primary: values.available ? `Available · ${values.visibilityMode}` : 'Unavailable',
@@ -43,7 +43,31 @@ function SummaryDisclosureHarness({
   )
 }
 
-describe('FieldGroup summaryDisclosure chrome', () => {
+function SummaryDisclosureNoPanelDividerHarness() {
+  const form = useForm<Values>({
+    defaultValues: { available: true, visibilityMode: 'all_players' },
+  })
+
+  return (
+    <FormProvider {...form}>
+      <FieldGroup
+        id="access-plain"
+        legend="Campaign availability"
+        formControl={form.control as unknown as Control<FieldValues>}
+        disclosure={{
+          variant: 'summary',
+          defaultOpen: true,
+          panelDivider: false,
+          resolveSummary: () => ({ primary: 'Available' }),
+        }}
+      >
+        <div>Expanded fields</div>
+      </FieldGroup>
+    </FormProvider>
+  )
+}
+
+describe('FieldGroup summary disclosure', () => {
   it('renders collapsed summary and opens from Change', async () => {
     const user = userEvent.setup()
     render(<SummaryDisclosureHarness />)
@@ -75,6 +99,24 @@ describe('FieldGroup summaryDisclosure chrome', () => {
     await user.click(screen.getByRole('button', { name: 'Done' }))
 
     expect(screen.getByText('Expanded fields')).not.toBeVisible()
+  })
+
+  it('renders panel top divider by default when expanded', async () => {
+    const user = userEvent.setup()
+    const { container } = render(<SummaryDisclosureHarness />)
+
+    await user.click(screen.getByRole('button', { name: 'Change' }))
+
+    const panel = container.querySelector('#access-panel')
+    expect(panel).toHaveClass('border-t', 'border-border', 'pt-3')
+  })
+
+  it('omits panel top divider when panelDivider is false', () => {
+    const { container } = render(<SummaryDisclosureNoPanelDividerHarness />)
+
+    const panel = container.querySelector('#access-plain-panel')
+    expect(panel).not.toHaveClass('border-t')
+    expect(panel).toHaveClass('pt-3')
   })
 
   it('has no accessibility violations when collapsed', async () => {

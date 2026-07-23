@@ -64,7 +64,7 @@ export const InsetBorder: Story = {
   args: {
     legend: 'Effects & outcomes',
     description: 'Define what the spell does, then choose when each effect applies.',
-    fieldsChrome: { variant: 'inset' },
+    chrome: { variant: 'inset' },
     children: (
       <>
         <FieldGroup legend="Authored effects" legendSize="subsection">
@@ -81,7 +81,7 @@ export const InsetBorder: Story = {
 export const InsetPrimary: Story = {
   args: {
     legend: 'Effects',
-    fieldsChrome: { variant: 'inset', tone: 'primary' },
+    chrome: { variant: 'inset', tone: 'primary' },
     children: <TextField id="inset-primary" label="Effect" />,
   },
 }
@@ -89,7 +89,7 @@ export const InsetPrimary: Story = {
 export const PanelMuted: Story = {
   args: {
     legend: 'Target',
-    fieldsChrome: { variant: 'panel' },
+    chrome: { variant: 'panel' },
     children: sampleFields,
   },
 }
@@ -101,22 +101,22 @@ export const PanelTones: Story = {
   },
   render: () => (
     <div className="flex max-w-lg flex-col gap-8">
-      <FieldGroup legend="Subtle (default)" fieldsChrome={{ variant: 'panel' }}>
+      <FieldGroup legend="Subtle (default)" chrome={{ variant: 'panel' }}>
         <TextField id="panel-subtle" label="Field" />
       </FieldGroup>
-      <FieldGroup legend="Muted" fieldsChrome={{ variant: 'panel', tone: 'muted' }}>
+      <FieldGroup legend="Muted" chrome={{ variant: 'panel', tone: 'muted' }}>
         <TextField id="panel-muted" label="Field" />
       </FieldGroup>
-      <FieldGroup legend="Solid" fieldsChrome={{ variant: 'panel', tone: 'base' }}>
+      <FieldGroup legend="Solid" chrome={{ variant: 'panel', tone: 'base' }}>
         <TextField id="panel-solid" label="Field" />
       </FieldGroup>
-      <FieldGroup legend="Elevated" fieldsChrome={{ variant: 'panel', tone: 'raised' }}>
+      <FieldGroup legend="Elevated" chrome={{ variant: 'panel', tone: 'raised' }}>
         <TextField id="panel-elevated" label="Field" />
       </FieldGroup>
-      <FieldGroup legend="Emphasis" fieldsChrome={{ variant: 'panel', tone: 'strong' }}>
+      <FieldGroup legend="Emphasis" chrome={{ variant: 'panel', tone: 'strong' }}>
         <TextField id="panel-emphasis" label="Field" />
       </FieldGroup>
-      <FieldGroup legend="Informative" fieldsChrome={{ variant: 'panel', tone: 'info' }}>
+      <FieldGroup legend="Informative" chrome={{ variant: 'panel', tone: 'info' }}>
         <TextField id="panel-informative" label="Field" />
       </FieldGroup>
     </div>
@@ -130,16 +130,16 @@ export const OutlineTones: Story = {
   },
   render: () => (
     <div className="flex max-w-lg flex-col gap-8">
-      <FieldGroup legend="Border (default)" fieldsChrome={{ variant: 'outline' }}>
+      <FieldGroup legend="Border (default)" chrome={{ variant: 'outline' }}>
         <TextField id="outline-border" label="Field" />
       </FieldGroup>
-      <FieldGroup legend="Primary" fieldsChrome={{ variant: 'outline', tone: 'primary' }}>
+      <FieldGroup legend="Primary" chrome={{ variant: 'outline', tone: 'primary' }}>
         <TextField id="outline-primary" label="Field" />
       </FieldGroup>
-      <FieldGroup legend="Warning" fieldsChrome={{ variant: 'outline', tone: 'warning' }}>
+      <FieldGroup legend="Warning" chrome={{ variant: 'outline', tone: 'warning' }}>
         <TextField id="outline-warning" label="Field" />
       </FieldGroup>
-      <FieldGroup legend="Destructive" fieldsChrome={{ variant: 'outline', tone: 'destructive' }}>
+      <FieldGroup legend="Destructive" chrome={{ variant: 'outline', tone: 'destructive' }}>
         <TextField id="outline-destructive" label="Field" />
       </FieldGroup>
     </div>
@@ -149,7 +149,7 @@ export const OutlineTones: Story = {
 export const DividerTop: Story = {
   args: {
     legend: 'Weapons',
-    fieldsChrome: { variant: 'divider', edge: 'top' },
+    chrome: { variant: 'divider', edge: 'top' },
     children: sampleFields,
   },
 }
@@ -157,7 +157,7 @@ export const DividerTop: Story = {
 export const DividerBottom: Story = {
   args: {
     legend: 'Defenses',
-    fieldsChrome: { variant: 'divider', edge: 'bottom' },
+    chrome: { variant: 'divider', edge: 'bottom' },
     children: sampleFields,
   },
 }
@@ -166,7 +166,7 @@ export const CalloutInfo: Story = {
   args: {
     legend: 'Hybrid spell',
     description: 'Resolution progression is authored on the resolution envelope.',
-    fieldsChrome: { variant: 'callout', tone: 'info' },
+    chrome: { variant: 'callout', tone: 'info' },
     children: <TextField id="callout-field" label="Workaround note" />,
   },
 }
@@ -174,7 +174,7 @@ export const CalloutInfo: Story = {
 export const CalloutWarning: Story = {
   args: {
     legend: 'Incomplete configuration',
-    fieldsChrome: { variant: 'callout', tone: 'warning' },
+    chrome: { variant: 'callout', tone: 'warning' },
     children: <TextField id="warning-field" label="Missing field" />,
   },
 }
@@ -182,7 +182,7 @@ export const CalloutWarning: Story = {
 export const AccentTop: Story = {
   args: {
     legend: 'How it resolves',
-    fieldsChrome: { variant: 'accent', edge: 'top', tone: 'primary' },
+    chrome: { variant: 'accent', edge: 'top', tone: 'primary' },
     children: <TextField id="accent-top" label="Method" />,
   },
 }
@@ -191,7 +191,7 @@ export const AccentLegendRail: Story = {
   args: {
     legend: 'Authored effects',
     legendSize: 'subsection',
-    fieldsChrome: { variant: 'accent', edge: 'legendRail', tone: 'primary' },
+    chrome: { variant: 'accent', edge: 'legendRail', tone: 'primary' },
     children: <TextField id="accent-rail" label="Effect" />,
   },
 }
@@ -200,7 +200,7 @@ export const Collapsible: Story = {
   args: {
     legend: 'Advanced options',
     description: 'Optional tuning for power users.',
-    fieldsChrome: { variant: 'collapsible', defaultOpen: false },
+    disclosure: { variant: 'legend', defaultOpen: false },
     children: sampleFields,
   },
 }
@@ -218,8 +218,8 @@ function SummaryDisclosureDemo() {
         legendSize="array"
         rhythm="compact"
         formControl={form.control as unknown as Control<FieldValues>}
-        fieldsChrome={{
-          variant: 'summaryDisclosure',
+        disclosure={{
+          variant: 'summary',
           defaultOpen: false,
           summaryDependsOn: ['available', 'visibilityMode'],
           showDirtySuffix: true,
@@ -260,17 +260,17 @@ export const ResolutionLayout: Story = {
   },
   render: () => (
     <div className="flex max-w-xl flex-col gap-6">
-      <FieldGroup legend="Target" fieldsChrome={{ variant: 'panel' }}>
+      <FieldGroup legend="Target" chrome={{ variant: 'panel' }}>
         <TextField id="resolution-target" label="Target kind" />
         <TextField id="resolution-count" label="Target count" />
       </FieldGroup>
-      <FieldGroup legend="How it resolves" fieldsChrome={{ variant: 'panel' }}>
+      <FieldGroup legend="How it resolves" chrome={{ variant: 'panel' }}>
         <TextField id="resolution-method" label="Method" />
       </FieldGroup>
       <FieldGroup
         legend="Effects & outcomes"
         description="Define what the spell does, then choose when each effect applies."
-        fieldsChrome={{ variant: 'inset' }}
+        chrome={{ variant: 'inset' }}
       >
         <FieldGroup legend="Authored effects" legendSize="subsection">
           <TextField id="resolution-effect" label="Effect" />
@@ -296,13 +296,10 @@ export const LongFormDividers: Story = {
   render: () => (
     <div className="flex max-w-lg flex-col gap-2">
       <FieldGroup legend="Defenses">{sampleFields}</FieldGroup>
-      <FieldGroup legend="Weapons" fieldsChrome={{ variant: 'divider', edge: 'top' }}>
+      <FieldGroup legend="Weapons" chrome={{ variant: 'divider', edge: 'top' }}>
         {sampleFields}
       </FieldGroup>
-      <FieldGroup
-        legend="Granted skills & tools"
-        fieldsChrome={{ variant: 'divider', edge: 'top' }}
-      >
+      <FieldGroup legend="Granted skills & tools" chrome={{ variant: 'divider', edge: 'top' }}>
         {sampleFields}
       </FieldGroup>
     </div>

@@ -10,6 +10,8 @@ import {
 import { accordionContentVariants } from './accordion.variants'
 import { Collapsible, CollapsibleContent } from './collapsible.client'
 import type { FieldGroupChromeClassNames } from './field-group-chrome.variants'
+import type { FieldGroupDisclosure } from './field-group-disclosure.types'
+import { isLegendDisclosure, resolveDisclosureDefaultOpen } from './field-group-disclosure.types'
 import { FieldGroupLegend } from './field-group-legend.client'
 import {
   fieldGroupBottomMarginClasses,
@@ -56,10 +58,11 @@ export type StandardFieldGroupBodyProps = {
   uiStateKey?: string
   collapseKey: string
   chromeClasses: FieldGroupChromeClassNames
+  disclosure?: FieldGroupDisclosure
   children: React.ReactNode
 }
 
-/** Default fieldset layout with optional collapsible body. */
+/** Default fieldset layout with optional legend disclosure. */
 export function StandardFieldGroupBody({
   id,
   legend,
@@ -71,11 +74,13 @@ export function StandardFieldGroupBody({
   uiStateKey,
   collapseKey,
   chromeClasses,
+  disclosure,
   children,
 }: StandardFieldGroupBodyProps) {
+  const collapsible = disclosure ? isLegendDisclosure(disclosure) : false
   const [open, onOpenChange] = useGroupCollapseState({
     collapseKey,
-    defaultOpen: chromeClasses.defaultOpen,
+    defaultOpen: resolveDisclosureDefaultOpen(disclosure),
     uiStateKey,
   })
 
@@ -102,12 +107,12 @@ export function StandardFieldGroupBody({
           legendSize={legendSize}
           legendTypography={legendTypography}
           legendChromeClassName={chromeClasses.legend}
-          collapsible={chromeClasses.isCollapsible}
+          collapsible={collapsible}
           open={open}
           onToggle={() => onOpenChange(!open)}
         />
       ) : null}
-      {chromeClasses.isCollapsible ? (
+      {collapsible ? (
         <Collapsible open={open} onOpenChange={onOpenChange} className="min-w-0">
           <CollapsibleContent forceMount className={accordionContentVariants()}>
             {body}

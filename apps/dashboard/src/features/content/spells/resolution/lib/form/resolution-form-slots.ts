@@ -147,7 +147,7 @@ function resolutionEffectsAndOutcomesGroup(ctx: ContentFormCtx): FormItem {
     kind: 'group',
     legend: RESOLUTION_SECTION_LABELS.effectsAndOutcomes,
     description: RESOLUTION_SECTION_LABELS.effectsAndOutcomesHint,
-    fieldsChrome: { variant: 'inset' },
+    chrome: { variant: 'inset' },
     visibility: visibleWhenResolutionConfigured(),
     fields: [
       {
@@ -206,7 +206,7 @@ export function configuredResolutionFields(ctx: ContentFormCtx): FormItem[] {
     {
       kind: 'group',
       legend: RESOLUTION_SECTION_LABELS.selection,
-      fieldsChrome: { variant: 'panel' },
+      chrome: { variant: 'panel' },
       visibility: configured,
       fields: [
         {
@@ -231,7 +231,7 @@ export function configuredResolutionFields(ctx: ContentFormCtx): FormItem[] {
     {
       kind: 'group',
       legend: RESOLUTION_SECTION_LABELS.check,
-      fieldsChrome: { variant: 'panel' },
+      chrome: { variant: 'panel' },
       visibility: configured,
       fields: [
         {
@@ -247,7 +247,7 @@ export function configuredResolutionFields(ctx: ContentFormCtx): FormItem[] {
     {
       kind: 'group',
       legend: RESOLUTION_SECTION_LABELS.progression,
-      fieldsChrome: { variant: 'panel' },
+      chrome: { variant: 'panel' },
       visibility: configured,
       fields: [
         {

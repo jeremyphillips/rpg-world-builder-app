@@ -52,34 +52,44 @@ spacing, matching nested array sections. Top-level groups and arrays inside `<Fo
 }
 ```
 
-`FieldGroup` (standalone) accepts the same `legendSize`, `size`, and `fieldsChrome`.
+`FieldGroup` (standalone) accepts the same `legendSize`, `size`, `chrome`, and `disclosure`.
 Groups may declare `visibility` — hidden groups unmount and clear nested values.
 
 `rhythm` overrides inherited form rhythm.
 
-### Group `fieldsChrome`
+### Group `chrome`
 
 Optional visual treatment for the legend + field stack. Variants are **mutually
 exclusive** — omit for plain fieldset behavior.
 
-| `variant`           | Use                                                                                                                                                                                                                                                                                                  |
-| ------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `inset`             | Left rail + indent on the **field stack** only — legend stays outside. Tones: `border` (default), `primary`.                                                                                                                                                                                         |
-| `panel`             | Rounded border box around the **field stack** only. Tones: surface (`subtle` default, `medium`, `strong`, `base`, `raised`), status (`info`, `success`, `warning`, `destructive`), or compact-label tones (`neutral`, `info`, …). Surface tiers use centralized `field-surface.variants.ts` recipes. |
-| `outline`           | Border-only box around the **field stack** — no background wash. Ladder tones: `faint`, `subtle` (default), `default`, `strong`. Semantic tones: `primary`, `info`, `success`, `warning`, `destructive`.                                                                                             |
-| `divider`           | Section separator on the fieldset. `edge`: `top` (default) or `bottom`; adds `pt-7` / `pb-7` (28px) with `border-t` / `border-b`.                                                                                                                                                                    |
-| `callout`           | Alert-shaped surface on the **field stack** only. Tones: alert variants (`default`, `info`, `success`, `warning`, `destructive`) or compact-label `neutral` for semantic soft wash.                                                                                                                  |
-| `accent`            | Light emphasis — `edge: 'top'` (`border-t-2 pt-4`) or `edge: 'legendRail'` (primary/semantic rail on legend only).                                                                                                                                                                                   |
-| `collapsible`       | Legend becomes a disclosure trigger; fields stay registered when collapsed. `defaultOpen`; optional `collapseKey` for `uiStateKey` persistence.                                                                                                                                                      |
-| `summaryDisclosure` | Compact collapsed summary + **Change** / expanded **Done** chrome for settings sections. `resolveSummary`, optional `summaryDependsOn`, `showDirtySuffix`, `openLabel` / `closeLabel`. Fields stay mounted (hidden) when collapsed. Requires `FormProvider`.                                         |
+| `variant` | Use                                                                                                                                                                                                                                                                                                  |
+| --------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `inset`   | Left rail + indent on the **field stack** only — legend stays outside. Padding follows group `rhythm` (`compact`: 16px / 20px; `comfortable`: 16px / 32px; mobile / `sm+`). Tones: `border` (default), `primary`.                                                                                    |
+| `panel`   | Rounded border box around the **field stack** only. Tones: surface (`subtle` default, `medium`, `strong`, `base`, `raised`), status (`info`, `success`, `warning`, `destructive`), or compact-label tones (`neutral`, `info`, …). Surface tiers use centralized `field-surface.variants.ts` recipes. |
+| `outline` | Border-only box around the **field stack** — no background wash. Ladder tones: `faint`, `subtle` (default), `default`, `strong`. Semantic tones: `primary`, `info`, `success`, `warning`, `destructive`.                                                                                             |
+| `divider` | Section separator on the fieldset. `edge`: `top` (default) or `bottom`; adds `pt-7` / `pb-7` (28px) with `border-t` / `border-b`.                                                                                                                                                                    |
+| `callout` | Alert-shaped surface on the **field stack** only. Tones: alert variants (`default`, `info`, `success`, `warning`, `destructive`) or compact-label `neutral` for semantic soft wash.                                                                                                                  |
+| `accent`  | Light emphasis — `edge: 'top'` (`border-t-2 pt-4`) or `edge: 'legendRail'` (primary/semantic rail on legend only).                                                                                                                                                                                   |
+
+`chrome` composes with `disclosure` — e.g. `outline` surface on the field stack inside a
+summary-disclosure group.
+
+### Group `disclosure`
+
+Optional open/collapse and summary behavior. Composes with `chrome`.
+
+| `variant` | Use                                                                                                                                                                                                                                                                                    |
+| --------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `legend`  | Legend becomes a disclosure trigger; fields stay registered when collapsed. `defaultOpen` (default `true`); optional `collapseKey` for `uiStateKey` persistence.                                                                                                                       |
+| `summary` | Compact collapsed summary + **Change** / expanded **Done** for settings sections. `resolveSummary`, optional `summaryDependsOn`, `showDirtySuffix`, `panelDivider` (default `true`), `openLabel` / `closeLabel`. Fields stay mounted (hidden) when collapsed. Requires `FormProvider`. |
 
 ```ts
 {
   kind: 'group',
   legend: 'Campaign availability',
   legendSize: 'array',
-  fieldsChrome: {
-    variant: 'summaryDisclosure',
+  disclosure: {
+    variant: 'summary',
     defaultOpen: false,
     summaryDependsOn: ['available', 'visibilityMode'],
     showDirtySuffix: true,

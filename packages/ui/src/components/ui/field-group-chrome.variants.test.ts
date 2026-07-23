@@ -8,16 +8,22 @@ describe('resolveFieldGroupChromeClassNames', () => {
       fieldset: '',
       body: '',
       legend: '',
-      isCollapsible: false,
     })
   })
 
   it('applies inset body classes', () => {
     const classes = resolveFieldGroupChromeClassNames({ variant: 'inset' })
     expect(classes.body).toContain('border-l-2')
-    expect(classes.body).toContain('pl-6')
+    expect(classes.body).toContain('pl-4')
     expect(classes.body).toContain('sm:pl-8')
     expect(classes.body).toContain('border-border')
+  })
+
+  it('applies compact inset padding when rhythm is compact', () => {
+    const classes = resolveFieldGroupChromeClassNames({ variant: 'inset' }, { rhythm: 'compact' })
+    expect(classes.body).toContain('pl-4')
+    expect(classes.body).toContain('sm:pl-5')
+    expect(classes.body).not.toContain('sm:pl-8')
   })
 
   it('applies primary inset tone', () => {
@@ -100,27 +106,5 @@ describe('resolveFieldGroupChromeClassNames', () => {
     })
     expect(classes.legend).toContain('before:bg-primary')
     expect(classes.legend).toContain('w-full')
-  })
-
-  it('marks collapsible chrome', () => {
-    const classes = resolveFieldGroupChromeClassNames({
-      variant: 'collapsible',
-      defaultOpen: false,
-      collapseKey: 'advanced',
-    })
-    expect(classes.isCollapsible).toBe(true)
-    expect(classes.defaultOpen).toBe(false)
-    expect(classes.collapseKey).toBe('advanced')
-  })
-
-  it('marks summary disclosure chrome', () => {
-    const chrome = {
-      variant: 'summaryDisclosure' as const,
-      resolveSummary: () => ({ primary: 'Available' }),
-    }
-    const classes = resolveFieldGroupChromeClassNames(chrome)
-    expect(classes.isSummaryDisclosure).toBe(true)
-    expect(classes.summaryDisclosure).toBe(chrome)
-    expect(classes.defaultOpen).toBe(false)
   })
 })

@@ -43,7 +43,7 @@ describe('kindFieldGroups', () => {
     expect(groups?.[0]).toMatchObject({
       kind: 'group',
       legend: '',
-      fieldsChrome: { variant: 'panel' },
+      chrome: { variant: 'panel' },
     })
   })
 
@@ -59,7 +59,7 @@ describe('kindFieldGroups', () => {
     expect(groups?.[0]).toMatchObject({
       kind: 'group',
       legend: '',
-      fieldsChrome: { variant: 'panel' },
+      chrome: { variant: 'panel' },
     })
   })
 
@@ -69,7 +69,7 @@ describe('kindFieldGroups', () => {
     expect(groups?.[0]).toMatchObject({
       kind: 'group',
       legend: '',
-      fieldsChrome: { variant: 'panel' },
+      chrome: { variant: 'panel' },
     })
   })
 

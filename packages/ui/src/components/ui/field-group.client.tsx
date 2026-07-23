@@ -2,12 +2,14 @@
 
 import type { Control, FieldValues } from 'react-hook-form'
 
-import { slugifyGroupCollapseKey } from '../../form/config/group-collapse-storage.lib'
 import type { FieldSize } from './field.client'
-import type { FieldGroupFieldsChrome } from './field-group-chrome.variants'
+import type { FieldGroupChrome } from './field-group-chrome.variants'
 import { resolveFieldGroupChromeClassNames } from './field-group-chrome.variants'
+import { resolveFieldGroupCollapseKey } from './field-group-collapse.lib'
+import type { FieldGroupDisclosure } from './field-group-disclosure.types'
+import { isSummaryDisclosure } from './field-group-disclosure.types'
+import { FieldGroupSummaryRoute } from './field-group-summary-route.client'
 import { StandardFieldGroupBody } from './field-group-standard-body.client'
-import { SummaryDisclosureFieldGroupShell } from './field-group-summary-disclosure-shell.client'
 import {
   DEFAULT_ARRAY_SECTION_SIZE,
   DEFAULT_FORM_RHYTHM,
@@ -35,8 +37,10 @@ export interface FieldGroupProps {
   className?: string
   /** Optional DOM id on the fieldset — for in-page scroll anchors. */
   id?: string
-  /** Visual treatment for legend + field stack — variants are mutually exclusive. */
-  fieldsChrome?: FieldGroupFieldsChrome
+  /** Visual treatment for the legend + field stack — variants are mutually exclusive. */
+  chrome?: FieldGroupChrome
+  /** Open/collapse and summary behavior for the group container. */
+  disclosure?: FieldGroupDisclosure
   /**
    * Scopes persisted collapsible state to a stable form instance.
    * When omitted, collapse state is session-only.
@@ -46,7 +50,7 @@ export interface FieldGroupProps {
    * Stable key for collapsible persistence — defaults to `id` or a slug of `legend`.
    */
   collapseKey?: string
-  /** Required for `fieldsChrome.variant: 'summaryDisclosure'`. */
+  /** Required for `disclosure.variant: 'summary'`. */
   formControl?: Control<FieldValues>
   children: React.ReactNode
 }
@@ -63,7 +67,8 @@ export function FieldGroup({
   description,
   className,
   id,
-  fieldsChrome,
+  chrome,
+  disclosure,
   uiStateKey,
   collapseKey,
   formControl,
@@ -72,22 +77,17 @@ export function FieldGroup({
   const legendScale =
     legendSize === 'array' ? resolveArrayLegendScale(size ?? DEFAULT_ARRAY_SECTION_SIZE) : 'default'
   const legendTypography = fieldGroupLegendVariants({ size: legendSize, scale: legendScale })
-  const chromeClasses = resolveFieldGroupChromeClassNames(fieldsChrome)
-  const resolvedCollapseKey =
-    collapseKey ??
-    id ??
-    (legend ? slugifyGroupCollapseKey(legend) || 'group-section' : 'group-section')
+  const chromeClasses = resolveFieldGroupChromeClassNames(chrome, { rhythm })
+  const resolvedCollapseKey = resolveFieldGroupCollapseKey({
+    disclosure,
+    collapseKey,
+    id,
+    legend,
+  })
 
-  if (chromeClasses.isSummaryDisclosure) {
-    if (!legend) {
-      throw new Error('FieldGroup summaryDisclosure chrome requires a legend.')
-    }
-    if (!formControl) {
-      throw new Error('FieldGroup summaryDisclosure chrome requires formControl from FormProvider.')
-    }
-
+  if (disclosure && isSummaryDisclosure(disclosure)) {
     return (
-      <SummaryDisclosureFieldGroupShell
+      <FieldGroupSummaryRoute
         id={id}
         legend={legend}
         rhythm={rhythm}
@@ -95,10 +95,11 @@ export function FieldGroup({
         uiStateKey={uiStateKey}
         collapseKey={resolvedCollapseKey}
         chromeClasses={chromeClasses}
+        disclosure={disclosure}
         formControl={formControl}
       >
         {children}
-      </SummaryDisclosureFieldGroupShell>
+      </FieldGroupSummaryRoute>
     )
   }
 
@@ -114,6 +115,7 @@ export function FieldGroup({
       uiStateKey={uiStateKey}
       collapseKey={resolvedCollapseKey}
       chromeClasses={chromeClasses}
+      disclosure={disclosure}
     >
       {children}
     </StandardFieldGroupBody>

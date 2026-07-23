@@ -10,13 +10,13 @@ import {
   type FieldGroupPanelTone,
 } from './field-surface.variants'
 
-/** Field-level panel chrome — shares tone tokens with group `fieldsChrome.panel`. */
+/** Field-level panel chrome — shares tone tokens with group `chrome.panel`. */
 export interface FieldPanelChrome {
   variant: 'panel'
   tone?: FieldGroupPanelTone
 }
 
-/** Field-level outline chrome — shares tone tokens with group `fieldsChrome.outline`. */
+/** Field-level outline chrome — shares tone tokens with group `chrome.outline`. */
 export interface FieldOutlineChrome {
   variant: 'outline'
   tone?: FieldGroupOutlineTone

@@ -62,11 +62,13 @@ export function buildCampaignAccessFields(ctx: CampaignAccessFormCtx): FormItem[
       kind: 'group',
       id: ctx.groupId,
       legend: CAMPAIGN_ACCESS_SECTION_LEGEND,
-      // legendSize: 'array',
+      legendSize: 'array',
+      chrome: { variant: 'inset' },
       rhythm: 'compact',
-      fieldsChrome: {
-        variant: 'summaryDisclosure',
+      disclosure: {
+        variant: 'summary',
         defaultOpen: false,
+        panelDivider: false,
         openLabel: CAMPAIGN_ACCESS_CHANGE_LABEL,
         closeLabel: CAMPAIGN_ACCESS_DONE_LABEL,
         unsavedSuffix: CAMPAIGN_ACCESS_UNSAVED_SUFFIX,
@@ -79,6 +81,7 @@ export function buildCampaignAccessFields(ctx: CampaignAccessFormCtx): FormItem[
         {
           kind: 'slot',
           name: 'available',
+          separator: 'faint',
           render: () =>
             createElement(CampaignAccessAvailableSwitch, {
               label: CAMPAIGN_ACCESS_AVAILABLE_LABEL,
@@ -95,7 +98,6 @@ export function buildCampaignAccessFields(ctx: CampaignAccessFormCtx): FormItem[
           info: CAMPAIGN_ACCESS_PLAYER_ACCESS_TOOLTIP,
           width: 'full',
           size: 'sm',
-          separator: 'faint',
           disabled: !ctx.available || ctx.pending,
           options: buildVisibilityModeOptions(ctx.targetType),
           optionAvailability: campaignAccessVisibilityOptionAvailability(),

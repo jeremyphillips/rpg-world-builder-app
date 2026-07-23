@@ -14,33 +14,34 @@ Do not sprinkle ad-hoc `space-y-*` on field wrappers in apps — adjust shared t
 
 ## Spacing tokens
 
-| Token                                | Class                          | Use                                                                                                           |
-| ------------------------------------ | ------------------------------ | ------------------------------------------------------------------------------------------------------------- |
-| `fieldAnatomyStackClasses`           | `space-y-2`                    | Label, control, hint/error inside one field                                                                   |
-| `fieldLabelHintStackClasses`         | `gap-1`                        | Label + hint when `hintPosition="below-label"`                                                                |
-| `fieldGroupStackClasses`             | `flex flex-col gap-6`          | Alias for `comfortable` — prefer `fieldStackRhythmVariants` in new code                                       |
-| `fieldStackRhythmVariants`           | `gap-2` / `gap-6`              | Form columns, groups, stacks, array item **bodies** — `compact` or `comfortable`                              |
-| `fieldArrayItemListClasses`          | `gap-2` / `gap-3` / `gap-6`    | Gap between sibling **array items** — combines rhythm + section `size`                                        |
-| `fieldGroupBottomMarginClasses`      | `mb-8`                         | Space below standalone `FieldGroup` fieldsets; omitted inside rhythm stacks (form root, nested groups/arrays) |
-| `fieldGroupFlexStackClasses`         | `flex flex-col gap-8`          | Stacking fieldsets or collapse-prone siblings                                                                 |
-| `formSectionStackClasses`            | `flex flex-col gap-7`          | Top-level accordion sections on `<Form>`                                                                      |
-| `fieldRowGapClasses`                 | `gap-6`                        | Gap between fields in a `FieldRow`                                                                            |
-| `fieldRowLayoutClasses`              | `flex flex-wrap gap-6`         | `FieldRow` / `RowConfig` — compose sibling widths via leaf `width` tokens                                     |
-| `fieldInlineSentenceClasses`         | `gap-x-2 gap-y-2`              | Inline sentence rows (`ChooseFromChipsField`, …)                                                              |
-| `inlineSentenceConnectorVariants`    | —                              | Connector type scale (`tone: prose \| mono`) via `fieldSizeTypographyClasses`                                 |
-| `fieldInlineControlRowClasses`       | `gap-3`                        | Inline label + control rows (e.g. `DiceFormulaField`)                                                         |
-| `fieldSettingsRowClasses`            | —                              | Dense settings — label + hint left, control right                                                             |
-| `fieldChipWrapGapClasses`            | `gap-2 pt-1`                   | Chip pill row inside `ChipsField`                                                                             |
-| `fieldGroupDescriptionClasses`       | muted hint typography          | Group / accordion description (spacing on legend header)                                                      |
-| `fieldGroupLegendHeaderStackClasses` | `gap-2` (8px)                  | Between group legend and hint inside the legend header                                                        |
-| `fieldGroupLegendSpacingClasses`     | `mb-5` (20px)                  | Below section legend header (legend alone on `<legend>`, or legend + hint stack container)                    |
-| `fieldSubgroupLegendSpacingClasses`  | `mb-4` (16px)                  | Below subgroup legend header (legend alone on `<legend>`, or legend + hint stack container)                   |
-| `fieldArrayItemClasses`              | `p-4 border`                   | Chrome around one array item                                                                                  |
-| `fieldArrayItemActionsClasses`       | `mt-3`                         | Above array item move/remove controls                                                                         |
-| `fieldSetResetClasses`               | `m-0 border-0 p-0`             | Strip UA fieldset chrome                                                                                      |
-| `fieldSurfaceToneVariants`           | border + bg wash               | Shared tone for stack dependents wrapper and array item shells (`main` \| `subtle` \| `warning` \| `error`)   |
-| `fieldGroupBodyShellLayoutClasses`   | `rounded-md border p-4`        | Panel and outline `fieldsChrome` body shell (16px padding)                                                    |
-| `fieldStackDependentsChromeVariants` | `rounded-md border p-3` + tone | Wrapper chrome for toggle-dependent stack dependents (`dependentsChromeScope: 'wrapper'`)                     |
+| Token                                | Class                           | Use                                                                                                                   |
+| ------------------------------------ | ------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| `fieldAnatomyStackClasses`           | `space-y-2`                     | Label, control, hint/error inside one field                                                                           |
+| `fieldLabelHintStackClasses`         | `gap-1`                         | Label + hint when `hintPosition="below-label"`                                                                        |
+| `fieldGroupStackClasses`             | `flex flex-col gap-6`           | Alias for `comfortable` — prefer `fieldStackRhythmVariants` in new code                                               |
+| `fieldStackRhythmVariants`           | `gap-2` / `gap-6`               | Form columns, groups, stacks, array item **bodies** — `compact` or `comfortable`                                      |
+| `fieldGroupInsetPaddingVariants`     | `pl-4 sm:pl-5` / `pl-4 sm:pl-8` | Group `chrome: { variant: 'inset' }` left padding — follows group `rhythm` (`compact` 16/20px, `comfortable` 16/32px) |
+| `fieldArrayItemListClasses`          | `gap-2` / `gap-3` / `gap-6`     | Gap between sibling **array items** — combines rhythm + section `size`                                                |
+| `fieldGroupBottomMarginClasses`      | `mb-8`                          | Space below standalone `FieldGroup` fieldsets; omitted inside rhythm stacks (form root, nested groups/arrays)         |
+| `fieldGroupFlexStackClasses`         | `flex flex-col gap-8`           | Stacking fieldsets or collapse-prone siblings                                                                         |
+| `formSectionStackClasses`            | `flex flex-col gap-7`           | Top-level accordion sections on `<Form>`                                                                              |
+| `fieldRowGapClasses`                 | `gap-6`                         | Gap between fields in a `FieldRow`                                                                                    |
+| `fieldRowLayoutClasses`              | `flex flex-wrap gap-6`          | `FieldRow` / `RowConfig` — compose sibling widths via leaf `width` tokens                                             |
+| `fieldInlineSentenceClasses`         | `gap-x-2 gap-y-2`               | Inline sentence rows (`ChooseFromChipsField`, …)                                                                      |
+| `inlineSentenceConnectorVariants`    | —                               | Connector type scale (`tone: prose \| mono`) via `fieldSizeTypographyClasses`                                         |
+| `fieldInlineControlRowClasses`       | `gap-3`                         | Inline label + control rows (e.g. `DiceFormulaField`)                                                                 |
+| `fieldSettingsRowClasses`            | —                               | Dense settings — label + hint left, control right                                                                     |
+| `fieldChipWrapGapClasses`            | `gap-2 pt-1`                    | Chip pill row inside `ChipsField`                                                                                     |
+| `fieldGroupDescriptionClasses`       | muted hint typography           | Group / accordion description (spacing on legend header)                                                              |
+| `fieldGroupLegendHeaderStackClasses` | `gap-2` (8px)                   | Between group legend and hint inside the legend header                                                                |
+| `fieldGroupLegendSpacingClasses`     | `mb-5` (20px)                   | Below section legend header (legend alone on `<legend>`, or legend + hint stack container)                            |
+| `fieldSubgroupLegendSpacingClasses`  | `mb-4` (16px)                   | Below subgroup legend header (legend alone on `<legend>`, or legend + hint stack container)                           |
+| `fieldArrayItemClasses`              | `p-4 border`                    | Chrome around one array item                                                                                          |
+| `fieldArrayItemActionsClasses`       | `mt-3`                          | Above array item move/remove controls                                                                                 |
+| `fieldSetResetClasses`               | `m-0 border-0 p-0`              | Strip UA fieldset chrome                                                                                              |
+| `fieldSurfaceToneVariants`           | border + bg wash                | Shared tone for stack dependents wrapper and array item shells (`main` \| `subtle` \| `warning` \| `error`)           |
+| `fieldGroupBodyShellLayoutClasses`   | `rounded-md border p-4`         | Panel and outline group `chrome` body shell (16px padding)                                                            |
+| `fieldStackDependentsChromeVariants` | `rounded-md border p-3` + tone  | Wrapper chrome for toggle-dependent stack dependents (`dependentsChromeScope: 'wrapper'`)                             |
 
 ## Sizing maps
 

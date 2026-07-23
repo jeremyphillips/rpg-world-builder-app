@@ -11,6 +11,11 @@ import {
   type FieldGroupOutlineTone,
   type FieldGroupPanelTone,
 } from './field-surface.variants'
+import {
+  DEFAULT_FORM_RHYTHM,
+  resolveFieldGroupInsetPaddingClasses,
+  type FieldRhythm,
+} from './field.variants'
 
 /** Left rail tone for group inset chrome. */
 export type FieldGroupInsetTone = 'border' | 'primary'
@@ -59,37 +64,8 @@ export interface FieldGroupAccentChrome {
   tone?: FieldGroupAccentTone
 }
 
-export interface FieldGroupCollapsibleChrome {
-  variant: 'collapsible'
-  defaultOpen?: boolean
-  /** Stable key for uiStateKey persistence; falls back to group `id` or legend slug. */
-  collapseKey?: string
-}
-
-export type FieldGroupSummary = {
-  primary: string
-  secondary?: string
-}
-
-export interface FieldGroupSummaryDisclosureChrome {
-  variant: 'summaryDisclosure'
-  defaultOpen?: boolean
-  /** Stable key for uiStateKey persistence; falls back to group `id` or legend slug. */
-  collapseKey?: string
-  openLabel?: string
-  closeLabel?: string
-  unsavedSuffix?: string
-  /** Appends `unsavedSuffix` while the surrounding form is dirty. Requires `FormProvider`. */
-  showDirtySuffix?: boolean
-  /** Disables disclosure actions while a save/preflight is in flight. */
-  disabled?: boolean
-  resolveSummary: (values: Record<string, unknown>) => FieldGroupSummary
-  /** Root-relative paths watched for summary resolution — omit to watch all values. */
-  summaryDependsOn?: string[]
-}
-
 /** Visual treatment for the field stack inside a group — variants are mutually exclusive. */
-export type FieldGroupFieldsChrome =
+export type FieldGroupChrome =
   | { variant: 'plain' }
   | FieldGroupInsetChrome
   | FieldGroupPanelChrome
@@ -97,15 +73,13 @@ export type FieldGroupFieldsChrome =
   | FieldGroupDividerChrome
   | FieldGroupCalloutChrome
   | FieldGroupAccentChrome
-  | FieldGroupCollapsibleChrome
-  | FieldGroupSummaryDisclosureChrome
 
 /** Spacing above a top divider — 28px (`pt-7`). */
 export const fieldGroupDividerTopPaddingClasses = 'pt-7'
 /** Spacing below a bottom divider — 28px (`pb-7`). */
 export const fieldGroupDividerBottomPaddingClasses = 'pb-7'
 
-const fieldGroupInsetBodyVariants = cva('border-l-2 pl-6 sm:pl-8', {
+const fieldGroupInsetBodyVariants = cva('border-l-2', {
   variants: {
     tone: {
       border: 'border-border',
@@ -232,20 +206,12 @@ export interface FieldGroupChromeClassNames {
   fieldset: string
   body: string
   legend: string
-  isCollapsible: boolean
-  isSummaryDisclosure: boolean
-  defaultOpen: boolean
-  collapseKey?: string
-  summaryDisclosure?: FieldGroupSummaryDisclosureChrome
 }
 
 const PLAIN_FIELD_GROUP_CHROME: FieldGroupChromeClassNames = {
   fieldset: '',
   body: '',
   legend: '',
-  isCollapsible: false,
-  isSummaryDisclosure: false,
-  defaultOpen: true,
 }
 
 function withFieldGroupChrome(
@@ -254,9 +220,15 @@ function withFieldGroupChrome(
   return { ...PLAIN_FIELD_GROUP_CHROME, ...overrides }
 }
 
-function resolveInsetChrome(chrome: FieldGroupInsetChrome): FieldGroupChromeClassNames {
+function resolveInsetChrome(
+  chrome: FieldGroupInsetChrome,
+  rhythm: FieldRhythm,
+): FieldGroupChromeClassNames {
   return withFieldGroupChrome({
-    body: fieldGroupInsetBodyVariants({ tone: chrome.tone ?? 'border' }),
+    body: cn(
+      fieldGroupInsetBodyVariants({ tone: chrome.tone ?? 'border' }),
+      resolveFieldGroupInsetPaddingClasses(rhythm),
+    ),
   })
 }
 
@@ -300,36 +272,24 @@ function resolveAccentChrome(chrome: FieldGroupAccentChrome): FieldGroupChromeCl
   })
 }
 
-function resolveCollapsibleChrome(chrome: FieldGroupCollapsibleChrome): FieldGroupChromeClassNames {
-  return withFieldGroupChrome({
-    isCollapsible: true,
-    defaultOpen: chrome.defaultOpen ?? true,
-    collapseKey: chrome.collapseKey,
-  })
+export type ResolveFieldGroupChromeOptions = {
+  /** Inset left padding density — follows group `rhythm` when omitted. */
+  rhythm?: FieldRhythm
 }
 
-function resolveSummaryDisclosureChrome(
-  chrome: FieldGroupSummaryDisclosureChrome,
-): FieldGroupChromeClassNames {
-  return withFieldGroupChrome({
-    isSummaryDisclosure: true,
-    defaultOpen: chrome.defaultOpen ?? false,
-    collapseKey: chrome.collapseKey,
-    summaryDisclosure: chrome,
-  })
-}
-
-/** Resolves fieldset, legend, and body classes for a group fieldsChrome config. */
+/** Resolves fieldset, legend, and body classes for a group chrome config. */
 export function resolveFieldGroupChromeClassNames(
-  chrome: FieldGroupFieldsChrome | undefined,
+  chrome: FieldGroupChrome | undefined,
+  options?: ResolveFieldGroupChromeOptions,
 ): FieldGroupChromeClassNames {
+  const rhythm = options?.rhythm ?? DEFAULT_FORM_RHYTHM
   const resolved = chrome ?? { variant: 'plain' as const }
 
   switch (resolved.variant) {
     case 'plain':
       return PLAIN_FIELD_GROUP_CHROME
     case 'inset':
-      return resolveInsetChrome(resolved)
+      return resolveInsetChrome(resolved, rhythm)
     case 'panel':
       return resolvePanelChrome(resolved)
     case 'outline':
@@ -340,10 +300,6 @@ export function resolveFieldGroupChromeClassNames(
       return resolveCalloutChrome(resolved)
     case 'accent':
       return resolveAccentChrome(resolved)
-    case 'collapsible':
-      return resolveCollapsibleChrome(resolved)
-    case 'summaryDisclosure':
-      return resolveSummaryDisclosureChrome(resolved)
     default:
       return PLAIN_FIELD_GROUP_CHROME
   }

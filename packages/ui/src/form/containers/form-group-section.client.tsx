@@ -61,7 +61,8 @@ export function GroupFieldSection({
         item.className,
         (parentContext.inGroup || parentContext.inRhythmStack) && 'mb-0',
       )}
-      fieldsChrome={item.fieldsChrome}
+      chrome={item.chrome}
+      disclosure={item.disclosure}
       uiStateKey={uiStateKey}
       collapseKey={item.id}
       formControl={control}

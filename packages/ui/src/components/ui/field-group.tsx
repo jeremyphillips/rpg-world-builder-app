@@ -1,7 +1,9 @@
 export { FieldGroup, type FieldGroupLegendSize, type FieldGroupProps } from './field-group.client'
 
+export type { FieldGroupChrome } from './field-group-chrome.variants'
 export type {
-  FieldGroupFieldsChrome,
+  FieldGroupDisclosure,
+  FieldGroupLegendDisclosure,
   FieldGroupSummary,
-  FieldGroupSummaryDisclosureChrome,
-} from './field-group-chrome.variants'
+  FieldGroupSummaryDisclosure,
+} from './field-group-disclosure.types'

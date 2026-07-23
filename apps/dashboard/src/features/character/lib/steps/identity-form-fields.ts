@@ -96,7 +96,7 @@ export const identityFormFields: FormItem[] = [
   {
     kind: 'group',
     legend: 'Narrative',
-    fieldsChrome: { variant: 'inset' },
+    chrome: { variant: 'inset' },
     fields: [
       narrativeArrayField(
         'personalityTraits',

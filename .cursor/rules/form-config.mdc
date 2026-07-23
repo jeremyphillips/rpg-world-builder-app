@@ -12,17 +12,17 @@ Do **not** hand-build form section chrome in feature components when `FormItem[]
 
 1. **Field definitions** — `*-form-fields.ts` returns `FormItem[]` with labels, hints, `info`,
    `labelPosition`, `width`, `size`, `separator`, `disabled`, and `optionAvailability`.
-2. **Containers** — use `kind: 'group' | 'row' | 'stack' | 'dependent'` and `fieldsChrome`
-   for visual treatment. Prefer existing variants (`panel`, `outline`, `collapsible`,
-   `summaryDisclosure`) before custom markup.
+2. **Containers** — use `kind: 'group' | 'row' | 'stack' | 'dependent'` with `chrome` for
+   visual treatment and `disclosure` for open/collapse/summary behavior. Prefer existing
+   variants before custom markup.
 3. **Rendering** — `FormProvider` + `FormItems` (or `<Form>` / `<TabbedForm>`). Section shells
    may own separate persistence (e.g. campaign access PATCH) but must not duplicate field
    layout or disclosure chrome.
 4. **Slots** — `kind: 'slot'` only for behavior config cannot model yet; if the pattern repeats,
-   extend `@rpg/ui/form` (e.g. new `fieldsChrome` variant) instead of a dashboard-only component.
+   extend `@rpg/ui/form` (e.g. new `disclosure` variant) instead of a dashboard-only component.
 
 ## Reference
 
-- Campaign availability: `campaign-access-form-fields.ts` — `summaryDisclosure` group chrome
+- Campaign availability: `campaign-access-form-fields.ts` — `disclosure: { variant: 'summary' }` on the group
 - Containers: [packages/ui/docs/forms/containers.md](../../packages/ui/docs/forms/containers.md)
 - Dashboard conventions: [apps/dashboard/docs/form-lib-conventions.md](../../apps/dashboard/docs/form-lib-conventions.md)

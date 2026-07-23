@@ -9,15 +9,11 @@ import {
   writeGroupCollapseOpen,
 } from '../../form/config/group-collapse-storage.lib'
 import { accordionContentVariants } from './accordion.variants'
-import { Button } from './button.client'
 import { Collapsible, CollapsibleContent } from './collapsible.client'
-import type { FieldGroupSummaryDisclosureChrome } from './field-group-chrome.variants'
-import {
-  fieldGroupSummaryDisclosureActionButtonClasses,
-  fieldGroupSummaryDisclosureHeaderClasses,
-  fieldGroupSummaryDisclosurePanelClasses,
-} from './field-group-summary-disclosure.variants'
-import { Text } from './text'
+import type { FieldGroupSummaryDisclosure } from './field-group-disclosure.types'
+import { FieldGroupSummaryDisclosureCollapsed } from './field-group-summary-disclosure-collapsed.client'
+import { FieldGroupSummaryDisclosureExpandedHeader } from './field-group-summary-disclosure-expanded-header.client'
+import { resolveFieldGroupSummaryDisclosurePanelClasses } from './field-group-summary-disclosure.variants'
 
 const DEFAULT_OPEN_LABEL = 'Change'
 const DEFAULT_CLOSE_LABEL = 'Done'
@@ -49,11 +45,25 @@ function useSummaryDisclosureOpenState(options: {
   return [open, onOpenChange]
 }
 
+function useSummaryDisclosureWatchedValues<TFieldValues extends FieldValues>(
+  control: Control<TFieldValues>,
+  summaryDependsOn: readonly string[] | undefined,
+): Record<string, unknown> {
+  const allValues = useWatch({ control }) as Record<string, unknown>
+  return React.useMemo(() => {
+    if (!summaryDependsOn?.length) return allValues
+    return summaryDependsOn.reduce<Record<string, unknown>>((acc, path) => {
+      acc[path] = allValues[path]
+      return acc
+    }, {})
+  }, [allValues, summaryDependsOn])
+}
+
 export type FieldGroupSummaryDisclosureProps<TFieldValues extends FieldValues = FieldValues> = {
   legend: string
   panelId: string
   legendId: string
-  chrome: FieldGroupSummaryDisclosureChrome
+  disclosure: FieldGroupSummaryDisclosure
   uiStateKey?: string
   collapseKey: string
   control: Control<TFieldValues>
@@ -65,106 +75,61 @@ export function FieldGroupSummaryDisclosure<TFieldValues extends FieldValues = F
   legend,
   panelId,
   legendId,
-  chrome,
+  disclosure,
   uiStateKey,
   collapseKey,
   control,
   children,
 }: FieldGroupSummaryDisclosureProps<TFieldValues>) {
-  const allValues = useWatch({ control }) as Record<string, unknown>
-  const watchedValues = React.useMemo(() => {
-    if (!chrome.summaryDependsOn?.length) return allValues
-    return chrome.summaryDependsOn.reduce<Record<string, unknown>>((acc, path) => {
-      acc[path] = allValues[path]
-      return acc
-    }, {})
-  }, [allValues, chrome.summaryDependsOn])
+  const watchedValues = useSummaryDisclosureWatchedValues(control, disclosure.summaryDependsOn)
   const { isDirty } = useFormState({ control })
-
   const [open, onOpenChange] = useSummaryDisclosureOpenState({
     collapseKey,
-    defaultOpen: chrome.defaultOpen ?? false,
+    defaultOpen: disclosure.defaultOpen ?? false,
     uiStateKey,
   })
 
-  const summary = React.useMemo(() => chrome.resolveSummary(watchedValues), [chrome, watchedValues])
+  const summary = React.useMemo(
+    () => disclosure.resolveSummary(watchedValues),
+    [disclosure, watchedValues],
+  )
 
-  const openLabel = chrome.openLabel ?? DEFAULT_OPEN_LABEL
-  const closeLabel = chrome.closeLabel ?? DEFAULT_CLOSE_LABEL
-  const unsavedSuffix = chrome.unsavedSuffix ?? DEFAULT_UNSAVED_SUFFIX
-  const showDirtySuffix = chrome.showDirtySuffix && isDirty
-  const disabled = chrome.disabled ?? false
+  const openLabel = disclosure.openLabel ?? DEFAULT_OPEN_LABEL
+  const closeLabel = disclosure.closeLabel ?? DEFAULT_CLOSE_LABEL
+  const unsavedSuffix = disclosure.unsavedSuffix ?? DEFAULT_UNSAVED_SUFFIX
+  const showDirtySuffix = Boolean(disclosure.showDirtySuffix && isDirty)
+  const disabled = disclosure.disabled ?? false
+  const panelClasses = open
+    ? resolveFieldGroupSummaryDisclosurePanelClasses(disclosure.panelDivider ?? true)
+    : undefined
 
   return (
     <Collapsible open={open} onOpenChange={onOpenChange} className="flex min-w-0 flex-col gap-1">
-      {!open ? (
-        <>
-          <Text id={legendId} variant="muted" className="text-sm">
-            {legend}
-          </Text>
-          <div className="flex items-start justify-between gap-3">
-            <button
-              type="button"
-              className="min-w-0 flex-1 text-left"
-              aria-expanded={false}
-              aria-controls={panelId}
-              disabled={disabled}
-              onClick={() => onOpenChange(true)}
-            >
-              <Text as="span" className="text-sm">
-                {summary.primary}
-                {showDirtySuffix ? (
-                  <Text as="span" variant="muted">
-                    {unsavedSuffix}
-                  </Text>
-                ) : null}
-              </Text>
-              {summary.secondary ? (
-                <Text variant="muted" className="mt-1 text-sm">
-                  {summary.secondary}
-                </Text>
-              ) : null}
-            </button>
-            <Button
-              type="button"
-              variant="text"
-              size="sm"
-              className={fieldGroupSummaryDisclosureActionButtonClasses}
-              aria-expanded={false}
-              aria-controls={panelId}
-              disabled={disabled}
-              onClick={() => onOpenChange(true)}
-            >
-              {openLabel}
-            </Button>
-          </div>
-        </>
+      {open ? (
+        <FieldGroupSummaryDisclosureExpandedHeader
+          legend={legend}
+          legendId={legendId}
+          panelId={panelId}
+          closeLabel={closeLabel}
+          disabled={disabled}
+          onClose={() => onOpenChange(false)}
+        />
       ) : (
-        <div className={fieldGroupSummaryDisclosureHeaderClasses}>
-          <Text id={legendId} className="text-sm font-medium">
-            {legend}
-          </Text>
-          <Button
-            type="button"
-            variant="text"
-            size="sm"
-            className={fieldGroupSummaryDisclosureActionButtonClasses}
-            aria-expanded
-            aria-controls={panelId}
-            disabled={disabled}
-            onClick={() => onOpenChange(false)}
-          >
-            {closeLabel}
-          </Button>
-        </div>
+        <FieldGroupSummaryDisclosureCollapsed
+          legend={legend}
+          legendId={legendId}
+          panelId={panelId}
+          summary={summary}
+          openLabel={openLabel}
+          unsavedSuffix={unsavedSuffix}
+          showDirtySuffix={showDirtySuffix}
+          disabled={disabled}
+          onOpen={() => onOpenChange(true)}
+        />
       )}
 
       <CollapsibleContent forceMount className={accordionContentVariants()}>
-        <div
-          id={panelId}
-          hidden={!open}
-          className={open ? fieldGroupSummaryDisclosurePanelClasses : undefined}
-        >
+        <div id={panelId} hidden={!open} className={panelClasses}>
           {children}
         </div>
       </CollapsibleContent>

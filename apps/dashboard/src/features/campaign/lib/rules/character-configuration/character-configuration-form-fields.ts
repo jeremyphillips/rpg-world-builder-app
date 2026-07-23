@@ -513,7 +513,7 @@ function creationSectionItems(): FormItem[] {
           kind: 'group',
           legend: 'Starting wealth by level',
           hint: 'Adds or replaces the class’s baseline starting equipment for characters created at higher levels.',
-          fieldsChrome: { variant: 'inset' },
+          chrome: { variant: 'inset' },
           fields: [
             {
               type: 'text',

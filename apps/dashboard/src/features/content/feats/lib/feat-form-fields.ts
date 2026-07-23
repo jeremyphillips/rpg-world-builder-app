@@ -96,7 +96,7 @@ export function buildFeatFields(ctx: ContentFormCtx): FormItem[] {
     {
       kind: 'group',
       legend: 'Prerequisites',
-      fieldsChrome: { variant: 'panel' },
+      chrome: { variant: 'panel' },
       fields: [
         {
           kind: 'slot',

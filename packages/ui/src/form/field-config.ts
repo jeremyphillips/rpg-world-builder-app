@@ -33,7 +33,8 @@ import type {
   FieldStatusTone,
   FieldSurfaceVariant,
 } from '../components/ui/field-dependent.variants'
-import type { FieldGroupFieldsChrome } from '../components/ui/field-group-chrome.variants'
+import type { FieldGroupChrome } from '../components/ui/field-group-chrome.variants'
+import type { FieldGroupDisclosure } from '../components/ui/field-group-disclosure.types'
 import type { ArrayAddMenuConfig } from './config/array/array-add-menu.lib'
 import type {
   FieldHintPosition,
@@ -43,7 +44,11 @@ import type {
   FieldRhythm,
 } from '../components/ui/field.variants'
 
-export type { FieldGroupFieldsChrome } from '../components/ui/field-group-chrome.variants'
+export type { FieldGroupChrome } from '../components/ui/field-group-chrome.variants'
+export type {
+  FieldGroupDisclosure,
+  FieldGroupSummary,
+} from '../components/ui/field-group-disclosure.types'
 export type { FieldChrome } from '../components/ui/field-chrome.variants'
 
 /** The set of control types the schema-driven `<Form>` renderer can render. */
@@ -858,7 +863,7 @@ export interface DependentConfig {
 /**
  * Named fieldset subsection (`kind: 'group'`).
  *
- * Common options: `legend`, `fields`, `legendSize`, `rhythm`, `fieldsChrome`,
+ * Common options: `legend`, `fields`, `legendSize`, `rhythm`, `chrome`, `disclosure`,
  * `description`, `visibility`.
  *
  * Nested groups inside another group often use `legendSize: 'subsection'`.
@@ -893,10 +898,15 @@ export interface GroupConfig {
   visibility?: FieldVisibility
   /**
    * Visual treatment for the legend + field stack — variants are mutually exclusive.
-   * Shapes: `inset`, `panel`, `outline`, `divider`, `callout`, `accent`, `collapsible`, `summaryDisclosure`.
-   * Tones vary by variant — see [containers.md](../../docs/forms/containers.md#group-fieldschrome).
+   * Shapes: `inset`, `panel`, `outline`, `divider`, `callout`, `accent`.
+   * Tones vary by variant — see [containers.md](../../docs/forms/containers.md#group-chrome).
    */
-  fieldsChrome?: FieldGroupFieldsChrome
+  chrome?: FieldGroupChrome
+  /**
+   * Open/collapse and summary behavior for the group container.
+   * `legend` — collapsible fieldset; `summary` — collapsed summary + Change/Done chrome.
+   */
+  disclosure?: FieldGroupDisclosure
 }
 
 /** Layout profile for repeatable array item chrome. */

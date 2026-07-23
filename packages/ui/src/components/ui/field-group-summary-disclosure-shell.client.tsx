@@ -5,7 +5,8 @@ import type { Control, FieldValues } from 'react-hook-form'
 
 import { cn } from '../../lib/utils'
 import type { FieldGroupChromeClassNames } from './field-group-chrome.variants'
-import { FieldGroupSummaryDisclosure } from './field-group-summary-disclosure.client'
+import type { FieldGroupSummaryDisclosure } from './field-group-disclosure.types'
+import { FieldGroupSummaryDisclosure as FieldGroupSummaryDisclosureView } from './field-group-summary-disclosure.client'
 import {
   fieldGroupBottomMarginClasses,
   fieldSetResetClasses,
@@ -21,11 +22,12 @@ export type SummaryDisclosureFieldGroupShellProps = {
   uiStateKey?: string
   collapseKey: string
   chromeClasses: FieldGroupChromeClassNames
+  disclosure: FieldGroupSummaryDisclosure
   formControl: Control<FieldValues>
   children: ReactNode
 }
 
-/** Fieldset wrapper for groups using summaryDisclosure chrome. */
+/** Fieldset wrapper for groups using summary disclosure. */
 export function SummaryDisclosureFieldGroupShell({
   id,
   legend,
@@ -34,16 +36,12 @@ export function SummaryDisclosureFieldGroupShell({
   uiStateKey,
   collapseKey,
   chromeClasses,
+  disclosure,
   formControl,
   children,
 }: SummaryDisclosureFieldGroupShellProps) {
   const legendId = `${id ?? collapseKey}-legend`
   const panelId = `${id ?? collapseKey}-panel`
-  const summaryDisclosure = chromeClasses.summaryDisclosure
-
-  if (!summaryDisclosure) {
-    throw new Error('FieldGroup summaryDisclosure chrome is missing.')
-  }
 
   return (
     <fieldset
@@ -57,11 +55,11 @@ export function SummaryDisclosureFieldGroupShell({
         className,
       )}
     >
-      <FieldGroupSummaryDisclosure
+      <FieldGroupSummaryDisclosureView
         legend={legend}
         legendId={legendId}
         panelId={panelId}
-        chrome={summaryDisclosure}
+        disclosure={disclosure}
         uiStateKey={uiStateKey}
         collapseKey={collapseKey}
         control={formControl}
@@ -69,7 +67,7 @@ export function SummaryDisclosureFieldGroupShell({
         <div className={cn(fieldStackRhythmVariants({ rhythm }), chromeClasses.body)}>
           {children}
         </div>
-      </FieldGroupSummaryDisclosure>
+      </FieldGroupSummaryDisclosureView>
     </fieldset>
   )
 }

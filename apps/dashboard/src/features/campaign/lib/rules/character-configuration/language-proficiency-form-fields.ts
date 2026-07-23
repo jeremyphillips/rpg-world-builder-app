@@ -45,7 +45,7 @@ export function languageProficiencyFields(
           kind: 'group',
           legend: 'Languages',
           legendSize: 'subsection',
-          fieldsChrome: { variant: 'panel' },
+          chrome: { variant: 'panel' },
           fields: [
             {
               type: 'inlineSentence',

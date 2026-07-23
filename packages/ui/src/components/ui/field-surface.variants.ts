@@ -85,10 +85,10 @@ export function resolveFieldContainerChromeClasses(
   return fieldSurfaceVariantClasses[surface]
 }
 
-/** Filled panel wash tones for group `fieldsChrome: { variant: 'panel' }`. */
+/** Filled panel wash tones for group `chrome: { variant: 'panel' }`. */
 export type FieldGroupPanelTone = FieldSurfaceVariant | FieldStatusTone | CompactLabelTone
 
-/** Border-only outline tones for group `fieldsChrome: { variant: 'outline' }`. */
+/** Border-only outline tones for group `chrome: { variant: 'outline' }`. */
 export type FieldGroupOutlineTone = FieldBorderLadderTone | 'primary' | FieldStatusTone
 
 const OUTLINE_STATUS_TONE_CLASS: Record<FieldStatusTone, string> = {
