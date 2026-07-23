@@ -8,18 +8,19 @@ import type { GameTermEntry, VocabularyTerm } from './types'
 // ---------------------------------------------------------------------------
 
 export const CONTENT_VISIBILITY_MODE_TERM = {
-  label: 'Visibility',
-  description: 'Controls which players can discover and select this content.',
+  label: 'Player access',
+  description: 'Controls which players can discover and select this content while it is available.',
   sentence: {
-    singular: 'visibility mode',
-    plural: 'visibility modes',
+    singular: 'player access',
+    plural: 'player access settings',
   },
 } as const satisfies VocabularyTerm
 
 export const CONTENT_VISIBILITY_MODE_ENTRIES = {
   all_players: {
     label: 'All players',
-    description: 'Every player in the campaign can discover and select this content.',
+    description:
+      'Every player in the campaign can discover and select this content while it is available.',
     sentence: {
       singular: 'all players visibility',
       plural: 'all players visibility modes',
@@ -27,7 +28,8 @@ export const CONTENT_VISIBILITY_MODE_ENTRIES = {
   },
   dm_only: {
     label: 'DM only',
-    description: 'Only campaign managers can discover and select this content.',
+    description:
+      'Only campaign managers can discover and select this content while it is available.',
     sentence: {
       singular: 'DM only visibility',
       plural: 'DM only visibility modes',
@@ -35,7 +37,8 @@ export const CONTENT_VISIBILITY_MODE_ENTRIES = {
   },
   specific_players: {
     label: 'Specific players',
-    description: 'Only selected campaign participants can discover and select this content.',
+    description:
+      'Only selected campaign participants can discover and select this content while it is available.',
     sentence: {
       singular: 'specific players visibility',
       plural: 'specific players visibility modes',
@@ -53,6 +56,8 @@ export const CONTENT_VISIBILITY_MODE_OPTIONS = termOptionsFromEntries(
   CONTENT_VISIBILITY_MODE_ENTRIES,
 )
 
-/** Hint copy for the visibility select in campaign access UI. */
-export const CONTENT_VISIBILITY_SELECT_HINT =
-  'Controls which players can discover and select this content.'
+/**
+ * @deprecated Prefer dashboard `CAMPAIGN_ACCESS_PLAYER_ACCESS_HINT` or
+ * `resolveCampaignAccessPlayerAccessHint` — kept for legacy imports.
+ */
+export const CONTENT_VISIBILITY_SELECT_HINT = CONTENT_VISIBILITY_MODE_TERM.description

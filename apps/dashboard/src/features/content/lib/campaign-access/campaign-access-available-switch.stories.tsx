@@ -6,11 +6,21 @@ import { FormSectionProvider, FormUiProvider } from '@rpg/ui/form'
 
 import { CampaignAccessAvailableSwitch } from './campaign-access-available-switch.client'
 import { CampaignAccessFormProvider } from './campaign-access-form-context.client'
+import {
+  CAMPAIGN_ACCESS_AVAILABLE_HINT,
+  CAMPAIGN_ACCESS_AVAILABLE_LABEL,
+  CAMPAIGN_ACCESS_AVAILABLE_TOOLTIP,
+} from './campaign-access-labels'
 
 const meta = {
   title: 'Content/Campaign Access/Available Switch',
   component: CampaignAccessAvailableSwitch,
   parameters: { layout: 'padded' },
+  args: {
+    label: CAMPAIGN_ACCESS_AVAILABLE_LABEL,
+    hint: CAMPAIGN_ACCESS_AVAILABLE_HINT,
+    info: CAMPAIGN_ACCESS_AVAILABLE_TOOLTIP,
+  },
 } satisfies Meta<typeof CampaignAccessAvailableSwitch>
 
 export default meta
@@ -44,7 +54,11 @@ function AvailableSwitchHarness({
       <FormProvider {...form}>
         <FormUiProvider>
           <FormSectionProvider size="md" rhythm="comfortable">
-            <CampaignAccessAvailableSwitch />
+            <CampaignAccessAvailableSwitch
+              label={CAMPAIGN_ACCESS_AVAILABLE_LABEL}
+              hint={CAMPAIGN_ACCESS_AVAILABLE_HINT}
+              info={CAMPAIGN_ACCESS_AVAILABLE_TOOLTIP}
+            />
           </FormSectionProvider>
         </FormUiProvider>
       </FormProvider>

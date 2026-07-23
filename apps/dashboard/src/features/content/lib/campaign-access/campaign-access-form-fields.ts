@@ -1,19 +1,23 @@
 import { createElement } from 'react'
 import {
   CONTENT_ACCESS_CAPABILITIES,
-  CONTENT_ACCESS_SPECIFIC_PLAYERS_ENABLED,
   CONTENT_VISIBILITY_MODE_ENTRIES,
-  CONTENT_VISIBILITY_MODE_TERM,
-  CONTENT_VISIBILITY_SELECT_HINT,
   type ContentAccessTargetType,
 } from '@rpg/contracts'
 import type { FormItem } from '@rpg/ui/form'
 
 import { CampaignAccessAvailableSwitch } from './campaign-access-available-switch.client'
-import { campaignAccessVisibilityOptionAvailability } from './campaign-access-form-visibility'
 import {
-  CAMPAIGN_ACCESS_SECTION_LEGEND,
-  CAMPAIGN_ACCESS_SPECIFIC_PLAYERS_DISABLED_HINT,
+  campaignAccessVisibilityOptionAvailability,
+  resolveCampaignAccessPlayerAccessHint,
+} from './campaign-access-form-visibility'
+import {
+  CAMPAIGN_ACCESS_AVAILABLE_HINT,
+  CAMPAIGN_ACCESS_AVAILABLE_LABEL,
+  CAMPAIGN_ACCESS_AVAILABLE_TOOLTIP,
+  CAMPAIGN_ACCESS_PLAYER_ACCESS_LABEL,
+  CAMPAIGN_ACCESS_PLAYER_ACCESS_TOOLTIP,
+  CAMPAIGN_ACCESS_UNAVAILABLE_HINT,
 } from './campaign-access-labels'
 
 export type CampaignAccessFormCtx = {
@@ -32,48 +36,35 @@ function buildVisibilityModeOptions(targetType: ContentAccessTargetType) {
   }))
 }
 
-function visibilitySelectHint(): string {
-  return !CONTENT_ACCESS_SPECIFIC_PLAYERS_ENABLED
-    ? CAMPAIGN_ACCESS_SPECIFIC_PLAYERS_DISABLED_HINT
-    : CONTENT_VISIBILITY_SELECT_HINT
-}
-
 export function buildCampaignAccessFields(ctx: CampaignAccessFormCtx): FormItem[] {
+  const availableHint = ctx.available
+    ? CAMPAIGN_ACCESS_AVAILABLE_HINT
+    : CAMPAIGN_ACCESS_UNAVAILABLE_HINT
+
   return [
     {
-      kind: 'group',
-      legend: CAMPAIGN_ACCESS_SECTION_LEGEND,
-      legendSize: 'array',
-      rhythm: 'compact',
-      // fieldsChrome: { variant: 'outline' },
-      // fieldsChrome: { variant: 'panel', tone: 'strong' },
-      fields: [
-        {
-          kind: 'row',
-          fields: [
-            {
-              kind: 'slot',
-              name: 'available',
-              chrome: { variant: 'outline', tone: 'faint' },
-              className: 'min-w-0 flex-1',
-              render: () => createElement(CampaignAccessAvailableSwitch),
-            },
-            {
-              type: 'select',
-              name: 'visibilityMode',
-              label: CONTENT_VISIBILITY_MODE_TERM.label,
-              labelPosition: 'settings',
-              hint: visibilitySelectHint(),
-              width: '1/2',
-              size: 'sm',
-              chrome: { variant: 'outline', tone: 'faint' },
-              disabled: !ctx.available || ctx.pending,
-              options: buildVisibilityModeOptions(ctx.targetType),
-              optionAvailability: campaignAccessVisibilityOptionAvailability(),
-            },
-          ],
-        },
-      ],
+      kind: 'slot',
+      name: 'available',
+      render: () =>
+        createElement(CampaignAccessAvailableSwitch, {
+          label: CAMPAIGN_ACCESS_AVAILABLE_LABEL,
+          hint: availableHint,
+          info: CAMPAIGN_ACCESS_AVAILABLE_TOOLTIP,
+        }),
+    },
+    {
+      type: 'select',
+      name: 'visibilityMode',
+      label: CAMPAIGN_ACCESS_PLAYER_ACCESS_LABEL,
+      labelPosition: 'settings',
+      hint: resolveCampaignAccessPlayerAccessHint(ctx),
+      info: CAMPAIGN_ACCESS_PLAYER_ACCESS_TOOLTIP,
+      width: 'full',
+      size: 'sm',
+      separator: 'faint',
+      disabled: !ctx.available || ctx.pending,
+      options: buildVisibilityModeOptions(ctx.targetType),
+      optionAvailability: campaignAccessVisibilityOptionAvailability(),
     },
   ]
 }

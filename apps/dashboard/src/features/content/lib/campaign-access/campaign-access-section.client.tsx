@@ -1,7 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react'
-import { FormProvider, useForm, useWatch } from 'react-hook-form'
+import { FormProvider, useForm, useFormState, useWatch } from 'react-hook-form'
 import {
   CONTENT_ACCESS_CAPABILITIES,
   getErrorMessage,
@@ -20,9 +20,11 @@ import {
   updateContentCampaignAccess,
 } from './campaign-access-api'
 import { CampaignAccessBlockedDialog } from './campaign-access-blocked-dialog.client'
+import { CampaignAccessDisclosure } from './campaign-access-disclosure.client'
 import { CampaignAccessFormProvider } from './campaign-access-form-context.client'
 import { buildCampaignAccessFields } from './campaign-access-form-fields'
 import { resolvedToCampaignAccessPatch } from './campaign-access-state'
+import { resolveCampaignAccessSummary } from './campaign-access-summary'
 
 export interface CampaignAccessSectionProps {
   campaignId: string
@@ -50,6 +52,7 @@ export function CampaignAccessSection({
 }: CampaignAccessSectionProps) {
   const capability = CONTENT_ACCESS_CAPABILITIES[targetType]
   const sectionId = useId()
+  const [expanded, setExpanded] = useState(false)
 
   const [persistError, setPersistError] = useState<string | null>(null)
   const [pending, setPending] = useState(false)
@@ -78,7 +81,19 @@ export function CampaignAccessSection({
     mode: 'onSubmit',
   })
 
-  const available = useWatch({ control: form.control, name: 'available' })
+  const { isDirty } = useFormState({ control: form.control })
+  const watchedAccess = useWatch({ control: form.control })
+  const available = watchedAccess?.available
+
+  const summary = useMemo(
+    () =>
+      resolveCampaignAccessSummary({
+        available: watchedAccess?.available ?? initialPatch.available,
+        visibilityMode: watchedAccess?.visibilityMode ?? initialPatch.visibilityMode,
+        participantIds: watchedAccess?.participantIds ?? initialPatch.participantIds,
+      }),
+    [initialPatch, watchedAccess],
+  )
 
   const renderedFields = useMemo(
     () =>
@@ -95,6 +110,7 @@ export function CampaignAccessSection({
     setPersistError(null)
     setBlockedOpen(false)
     setBlockers([])
+    setExpanded(false)
   }, [entityId, form, initialPatch])
 
   const applyLocalChange = useCallback(
@@ -193,18 +209,27 @@ export function CampaignAccessSection({
 
   return (
     <CampaignAccessFormProvider value={{ pending, onAvailableChange: handleAvailableChange }}>
-      <FormProvider {...form}>
-        <FormUiProvider fields={renderedFields}>
-          <FormSectionProvider size="md" rhythm="comfortable">
-            {persistError ? (
-              <Text variant="destructive" role="alert" className="mb-4">
-                {persistError}
-              </Text>
-            ) : null}
-            <FormItems items={renderedFields} idPrefix={sectionId} />
-          </FormSectionProvider>
-        </FormUiProvider>
-      </FormProvider>
+      <CampaignAccessDisclosure
+        summary={summary}
+        isDirty={isDirty}
+        open={expanded}
+        onOpenChange={setExpanded}
+        idPrefix={sectionId}
+        pending={pending}
+      >
+        <FormProvider {...form}>
+          <FormUiProvider fields={renderedFields}>
+            <FormSectionProvider size="md" rhythm="comfortable">
+              {persistError ? (
+                <Text variant="destructive" role="alert" className="mb-4">
+                  {persistError}
+                </Text>
+              ) : null}
+              <FormItems items={renderedFields} idPrefix={sectionId} />
+            </FormSectionProvider>
+          </FormUiProvider>
+        </FormProvider>
+      </CampaignAccessDisclosure>
 
       <CampaignAccessBlockedDialog
         open={blockedOpen}

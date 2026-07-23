@@ -11,22 +11,35 @@ vi.mock('./campaign-access-api', () => ({
   updateContentCampaignAccess: vi.fn(),
 }))
 
+async function expandCampaignAccess(user: ReturnType<typeof userEvent.setup>) {
+  await user.click(screen.getByRole('button', { name: 'Change' }))
+}
+
 describe('CampaignAccessSection', () => {
   beforeEach(() => {
     vi.mocked(campaignAccessApi.fetchContentCampaignAccessAvailability).mockReset()
     vi.mocked(campaignAccessApi.updateContentCampaignAccess).mockReset()
   })
 
-  it('renders availability switch and visibility select', () => {
+  it('renders collapsed summary and expanded availability controls', async () => {
+    const user = userEvent.setup()
     render(<CampaignAccessSection campaignId="campaign-1" targetType="feats" entityId="feat-1" />)
 
-    expect(screen.getByLabelText('Available in this campaign')).toBeInTheDocument()
-    expect(screen.getByLabelText('Visibility')).toBeInTheDocument()
+    expect(screen.getByText('Campaign availability')).toBeInTheDocument()
+    expect(screen.getByText('Available · All players')).toBeInTheDocument()
+
+    await expandCampaignAccess(user)
+
+    expect(screen.getByRole('switch', { name: 'Available in this campaign' })).toBeInTheDocument()
+    expect(screen.getByRole('combobox', { name: 'Player access' })).toBeInTheDocument()
     expect(screen.getByText('All players')).toBeInTheDocument()
   })
 
-  it('disables specific players with explanatory hint', () => {
+  it('disables specific players with explanatory hint', async () => {
+    const user = userEvent.setup()
     render(<CampaignAccessSection campaignId="campaign-1" targetType="feats" entityId="feat-1" />)
+
+    await expandCampaignAccess(user)
 
     expect(
       screen.getByText('Set up campaign players before choosing specific players.'),
@@ -64,7 +77,8 @@ describe('CampaignAccessSection', () => {
       />,
     )
 
-    await user.click(screen.getByLabelText('Available in this campaign'))
+    await expandCampaignAccess(user)
+    await user.click(screen.getByRole('switch', { name: 'Available in this campaign' }))
 
     await waitFor(() => {
       expect(campaignAccessApi.updateContentCampaignAccess).toHaveBeenCalledWith(
@@ -76,7 +90,7 @@ describe('CampaignAccessSection', () => {
       )
     })
 
-    expect(screen.getByLabelText('Visibility')).toBeDisabled()
+    expect(screen.getByRole('combobox', { name: 'Player access' })).toBeDisabled()
   })
 
   it('tracks create-time draft changes without calling the API', async () => {
@@ -91,12 +105,36 @@ describe('CampaignAccessSection', () => {
       />,
     )
 
-    await user.click(screen.getByLabelText('Available in this campaign'))
+    await expandCampaignAccess(user)
+    await user.click(screen.getByRole('switch', { name: 'Available in this campaign' }))
 
     expect(campaignAccessApi.updateContentCampaignAccess).not.toHaveBeenCalled()
     expect(onDraftChange).toHaveBeenCalledWith(
       expect.objectContaining({ available: false, visibilityMode: 'all_players' }),
     )
+  })
+
+  it('shows unavailable summary without opening the disclosure', () => {
+    render(
+      <CampaignAccessSection
+        campaignId="campaign-1"
+        targetType="feats"
+        entityId="feat-1"
+        initialAccess={{
+          available: false,
+          visibilityMode: 'dm_only',
+          participantIds: [],
+          unavailableParticipantIds: [],
+          effectiveAudience: 'none',
+        }}
+      />,
+    )
+
+    expect(screen.getByText('Unavailable')).toBeInTheDocument()
+    expect(
+      screen.getByText('This content cannot be discovered or selected in this campaign.'),
+    ).toBeInTheDocument()
+    expect(screen.queryByRole('combobox', { name: 'Player access' })).not.toBeInTheDocument()
   })
 
   it('has no axe violations', async () => {
