@@ -32,6 +32,8 @@ export interface FormFooterActionsProps {
   pendingLabel?: string
   /** Confirmation text announced (role="status") after a successful save. */
   successMessage?: string
+  /** When set, replaces the default `SubmitButton` (e.g. coordinated multi-surface save). */
+  submitButton?: ReactNode
   className?: string
 }
 
@@ -61,6 +63,7 @@ export function FormFooterActions({
   submitLabel,
   pendingLabel = 'Saving…',
   successMessage,
+  submitButton,
   className,
 }: FormFooterActionsProps) {
   const resolvedSecondaryDisabled = secondaryDisabled ?? pending
@@ -76,9 +79,11 @@ export function FormFooterActions({
             {successMessage}
           </Text>
         ) : null}
-        <SubmitButton pending={pending} pendingLabel={pendingLabel} disabled={submitDisabled}>
-          {submitLabel}
-        </SubmitButton>
+        {submitButton ?? (
+          <SubmitButton pending={pending} pendingLabel={pendingLabel} disabled={submitDisabled}>
+            {submitLabel}
+          </SubmitButton>
+        )}
       </div>
     </div>
   )

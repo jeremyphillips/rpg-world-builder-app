@@ -26,6 +26,8 @@ import { ContentFormFooter } from './content-form-footer'
 import { useAdvisoryFormSubmit, type AdvisoryFormSubmitOptions } from './use-advisory-form-submit'
 import { ContentEditPublishBridge } from './content-edit-publish-bridge.client'
 import { CampaignAccessSection } from '../../campaign-access/campaign-access-section.client'
+import { CampaignAccessFormProvider } from '../../campaign-access/campaign-access-form-context.client'
+import { useContentSaveSession } from './use-content-save-session'
 import type { ContentCampaignAccessPatch } from '@rpg/contracts'
 
 export function ContentFormComingSoon() {
@@ -96,6 +98,43 @@ interface ContentFormFooterShellProps<TFormValues extends FieldValues = FieldVal
   onSaveDraft?: (values: TFormValues, form: UseFormReturn<TFormValues>) => void | Promise<void>
   saveDraftPending?: boolean
   publishSuccess?: boolean
+  onSubmit: (values: TFormValues, form: UseFormReturn<TFormValues>) => Promise<void>
+}
+
+function ContentFormSaveFooter<TFormValues extends FieldValues>({
+  form,
+  formMode,
+  backHref,
+  submitLabel,
+  submitPending,
+  submitSuccess = false,
+  onSaveDraft,
+  saveDraftPending,
+  publishSuccess,
+  onSubmit,
+}: ContentFormFooterShellProps<TFormValues> & { form: UseFormReturn<TFormValues> }) {
+  const actionState = useContentSaveSession({
+    mode: formMode,
+    pending: submitPending,
+    form,
+    onSubmit,
+  })
+
+  return (
+    <ContentFormFooter
+      mode={formMode}
+      form={form}
+      backHref={backHref}
+      submitLabel={submitLabel}
+      pending={submitPending || form.formState.isSubmitting}
+      isSuccess={submitSuccess}
+      onSaveDraft={onSaveDraft}
+      saveDraftPending={saveDraftPending}
+      publishSuccess={publishSuccess}
+      actionState={formMode === 'edit' ? actionState : undefined}
+      guardHasUnsavedEdits={formMode === 'create' ? actionState.hasUnsavedEdits : false}
+    />
+  )
 }
 
 interface ContentSchemaFormProps<
@@ -152,7 +191,7 @@ function ContentSchemaForm<TFormValues extends FieldValues>({
   )
 
   return (
-    <>
+    <CampaignAccessFormProvider>
       <Form<TFormValues>
         key={formKey}
         id={formKey}
@@ -175,22 +214,23 @@ function ContentSchemaForm<TFormValues extends FieldValues>({
                 onPublish={onPublish}
               />
             ) : null}
-            <ContentFormFooter
-              mode={formMode}
+            <ContentFormSaveFooter
               form={form}
+              formMode={formMode}
               backHref={backHref}
               submitLabel={submitLabel}
-              pending={submitPending || form.formState.isSubmitting}
-              isSuccess={submitSuccess}
+              submitPending={submitPending}
+              submitSuccess={submitSuccess}
               onSaveDraft={onSaveDraft}
               saveDraftPending={saveDraftPending}
               publishSuccess={publishSuccess}
+              onSubmit={onSubmit}
             />
           </>
         )}
       />
       {submitConfirmDialog}
-    </>
+    </CampaignAccessFormProvider>
   )
 }
 
@@ -250,7 +290,7 @@ function ContentTabbedSchemaForm<TFormValues extends FieldValues>({
   const tabFields = React.useMemo(() => tabs.flatMap((tab) => tab.fields), [tabs])
 
   return (
-    <>
+    <CampaignAccessFormProvider>
       <TabbedForm<TFormValues>
         key={formKey}
         id={formKey}
@@ -272,22 +312,23 @@ function ContentTabbedSchemaForm<TFormValues extends FieldValues>({
                 onPublish={onPublish}
               />
             ) : null}
-            <ContentFormFooter
-              mode={formMode}
+            <ContentFormSaveFooter
               form={form}
+              formMode={formMode}
               backHref={backHref}
               submitLabel={submitLabel}
-              pending={submitPending || form.formState.isSubmitting}
-              isSuccess={submitSuccess}
+              submitPending={submitPending}
+              submitSuccess={submitSuccess}
               onSaveDraft={onSaveDraft}
               saveDraftPending={saveDraftPending}
               publishSuccess={publishSuccess}
+              onSubmit={onSubmit}
             />
           </>
         )}
       />
       {submitConfirmDialog}
-    </>
+    </CampaignAccessFormProvider>
   )
 }
 

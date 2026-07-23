@@ -1,7 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react'
-import { FormProvider, useForm, useWatch } from 'react-hook-form'
+import { FormProvider, useForm, useFormState, useWatch } from 'react-hook-form'
 import {
   CONTENT_ACCESS_CAPABILITIES,
   getErrorMessage,
@@ -15,14 +15,23 @@ import {
 import { Text } from '@rpg/ui'
 import { FormItems, FormSectionProvider, FormUiProvider, makeResolver } from '@rpg/ui/form'
 
+import { hasDirtyFields } from '@/lib/form-dirty-state'
+
 import {
   fetchContentCampaignAccessAvailability,
   updateContentCampaignAccess,
 } from './campaign-access-api'
 import { CampaignAccessBlockedDialog } from './campaign-access-blocked-dialog.client'
-import { CampaignAccessFormProvider } from './campaign-access-form-context.client'
+import {
+  CampaignAccessAvailabilityProvider,
+  useCampaignAccessParticipantUpdater,
+  type CampaignAccessSaveResult,
+} from './campaign-access-form-context.client'
 import { buildCampaignAccessFields } from './campaign-access-form-fields'
-import { resolvedToCampaignAccessPatch } from './campaign-access-state'
+import {
+  isDefaultCampaignAccessPatch,
+  resolvedToCampaignAccessPatch,
+} from './campaign-access-state'
 
 export interface CampaignAccessSectionProps {
   campaignId: string
@@ -52,6 +61,9 @@ export function CampaignAccessSection({
   const sectionId = useId()
   const groupId = `campaign-access-${entityId ?? 'create'}`
 
+  const [persistedBaseline, setPersistedBaseline] = useState<ContentCampaignAccessPatch>(() =>
+    resolvedToCampaignAccessPatch(initialAccess),
+  )
   const [persistError, setPersistError] = useState<string | null>(null)
   const [pending, setPending] = useState(false)
   const [blockedOpen, setBlockedOpen] = useState(false)
@@ -86,6 +98,8 @@ export function CampaignAccessSection({
   })
 
   const available = useWatch({ control: form.control, name: 'available' })
+  const watchedValues = useWatch({ control: form.control })
+  const { dirtyFields } = useFormState({ control: form.control })
 
   const renderedFields = useMemo(
     () =>
@@ -99,11 +113,20 @@ export function CampaignAccessSection({
   )
 
   useEffect(() => {
-    form.reset(initialPatch)
+    const baseline = resolvedToCampaignAccessPatch(initialAccess)
+    setPersistedBaseline(baseline)
+    form.reset(baseline)
     setPersistError(null)
     setBlockedOpen(false)
     setBlockers([])
-  }, [entityId, form, initialPatch])
+  }, [entityId, form, initialAccess, initialPatch])
+
+  const isEditMode = Boolean(entityId)
+  const isDirty = isEditMode
+    ? hasDirtyFields(dirtyFields)
+    : !isDefaultCampaignAccessPatch(
+        (watchedValues ?? form.getValues()) as ContentCampaignAccessPatch,
+      )
 
   const applyLocalChange = useCallback(
     (next: ContentCampaignAccessPatch) => {
@@ -115,49 +138,83 @@ export function CampaignAccessSection({
     [form, onDraftChange],
   )
 
-  const persistPatch = useCallback(
-    async (patch: ContentCampaignAccessPatch) => {
-      const resolvedEntityId = entityIdRef.current
-      if (!resolvedEntityId) {
-        applyLocalChange(patch)
-        return
+  const reset = useCallback(() => {
+    form.reset(persistedBaseline)
+    setPersistError(null)
+  }, [form, persistedBaseline])
+
+  const save = useCallback(async (): Promise<CampaignAccessSaveResult> => {
+    if (!isDirty) {
+      return { status: 'skipped' }
+    }
+
+    const values = form.getValues()
+    const parsed = contentCampaignAccessPatchSchema.safeParse(values)
+    if (!parsed.success) {
+      return { status: 'invalid', message: 'Campaign access values are invalid.' }
+    }
+
+    const resolvedEntityId = entityIdRef.current
+    if (!resolvedEntityId) {
+      applyLocalChange(parsed.data)
+      return { status: 'skipped' }
+    }
+
+    setPersistError(null)
+    setPending(true)
+    try {
+      const result = await updateContentCampaignAccess(
+        campaignId,
+        targetType,
+        resolvedEntityId,
+        parsed.data,
+        { classId },
+      )
+
+      if (result.status === 'blocked') {
+        setBlockers(result.blockers)
+        setBlockedOpen(true)
+        form.setValue('available', persistedBaseline.available, { shouldDirty: true })
+        return { status: 'blocked', blockers: result.blockers }
       }
 
-      setPersistError(null)
-      setPending(true)
-      try {
-        const result = await updateContentCampaignAccess(
-          campaignId,
-          targetType,
-          resolvedEntityId,
-          patch,
-          { classId },
-        )
-        if (result.status === 'blocked') {
-          setBlockers(result.blockers)
-          setBlockedOpen(true)
-          form.reset(initialPatch)
-          return
-        }
+      const nextPatch = resolvedToCampaignAccessPatch(result.campaignAccess)
+      setPersistedBaseline(nextPatch)
+      form.reset(nextPatch)
+      onPersistedChange?.(result.campaignAccess)
+      return { status: 'updated', campaignAccess: result.campaignAccess }
+    } catch (err) {
+      const message = getErrorMessage(err, 'Could not update campaign access.')
+      setPersistError(message)
+      return { status: 'invalid', message }
+    } finally {
+      setPending(false)
+    }
+  }, [
+    applyLocalChange,
+    campaignId,
+    classId,
+    form,
+    isDirty,
+    onPersistedChange,
+    persistedBaseline.available,
+    targetType,
+  ])
 
-        const nextPatch = resolvedToCampaignAccessPatch(result.campaignAccess)
-        form.reset(nextPatch)
-        onPersistedChange?.(result.campaignAccess)
-      } catch (err) {
-        setPersistError(getErrorMessage(err, 'Could not update campaign access.'))
-        form.reset(initialPatch)
-      } finally {
-        setPending(false)
-      }
-    },
-    [applyLocalChange, campaignId, classId, form, initialPatch, onPersistedChange, targetType],
+  useCampaignAccessParticipantUpdater(
+    useMemo(
+      () => ({
+        isDirty,
+        isPending: pending,
+        save,
+        reset,
+      }),
+      [isDirty, pending, reset, save],
+    ),
   )
 
   const handleAvailableChange = useCallback(
     async (checked: boolean) => {
-      const current = form.getValues()
-      const next = { ...current, available: checked }
-
       if (!checked && entityIdRef.current) {
         setPending(true)
         setPersistError(null)
@@ -182,25 +239,34 @@ export function CampaignAccessSection({
       }
 
       form.setValue('available', checked, { shouldDirty: true })
-      await persistPatch(next)
+
+      if (!entityIdRef.current) {
+        onDraftChange?.(form.getValues())
+      }
     },
-    [campaignId, classId, form, persistPatch, targetType],
+    [campaignId, classId, form, onDraftChange, targetType],
   )
 
   useEffect(() => {
-    const subscription = form.watch((values, { name, type }) => {
-      if (type !== 'change' || name !== 'visibilityMode') return
-      void persistPatch(values as ContentCampaignAccessPatch)
+    if (entityIdRef.current) {
+      return
+    }
+
+    const subscription = form.watch((values, { type }) => {
+      if (type !== 'change') return
+      onDraftChange?.(values as ContentCampaignAccessPatch)
     })
     return () => subscription.unsubscribe()
-  }, [form, persistPatch])
+  }, [form, onDraftChange])
 
   if (capability.mode === 'unsupported') {
     return null
   }
 
   return (
-    <CampaignAccessFormProvider value={{ pending, onAvailableChange: handleAvailableChange }}>
+    <CampaignAccessAvailabilityProvider
+      value={{ pending, onAvailableChange: handleAvailableChange }}
+    >
       <FormProvider {...form}>
         <FormUiProvider fields={renderedFields}>
           <FormSectionProvider size="md" rhythm="comfortable" inRhythmStack>
@@ -219,6 +285,6 @@ export function CampaignAccessSection({
         onOpenChange={setBlockedOpen}
         blockers={blockers}
       />
-    </CampaignAccessFormProvider>
+    </CampaignAccessAvailabilityProvider>
   )
 }

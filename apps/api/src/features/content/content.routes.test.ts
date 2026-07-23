@@ -611,4 +611,84 @@ describe('content campaign access routes', () => {
 
     expect(res.body.availability).toEqual({ status: 'allowed' })
   })
+
+  it('returns normalized campaignAccess from PATCH for client baseline', async () => {
+    const { agent, csrfToken } = await registerAndLogin()
+    const campaignId = await createTestCampaign(agent, csrfToken)
+
+    const createRes = await agent
+      .post(`/api/campaigns/${campaignId}/content/feats`)
+      .set(CSRF_HEADER, csrfToken)
+      .send({ ...minimalFeatInput, slug: 'normalized-access-feat', name: 'Normalized Access Feat' })
+      .expect(201)
+
+    const entityId = createRes.body.feats.id as string
+
+    const patchRes = await agent
+      .patch(`/api/campaigns/${campaignId}/content/feats/${entityId}/campaign-access`)
+      .set(CSRF_HEADER, csrfToken)
+      .send({ available: false, visibilityMode: 'all_players', participantIds: [] })
+      .expect(200)
+
+    expect(patchRes.body.result).toMatchObject({
+      status: 'updated',
+      campaignAccess: {
+        available: false,
+        visibilityMode: 'all_players',
+        participantIds: [],
+        effectiveAudience: 'none',
+      },
+    })
+  })
+
+  it('returns structured blockers when turning access off for referenced homebrew content', async () => {
+    const { agent, csrfToken } = await registerAndLogin()
+    const campaignId = await createTestCampaign(agent, csrfToken)
+
+    const createRes = await agent
+      .post(`/api/campaigns/${campaignId}/content/feats`)
+      .set(CSRF_HEADER, csrfToken)
+      .send({ ...minimalFeatInput, slug: 'blocked-access-feat', name: 'Blocked Access Feat' })
+      .expect(201)
+
+    const entityId = createRes.body.feats.id as string
+
+    await agent
+      .post(`/api/campaigns/${campaignId}/npcs`)
+      .set(CSRF_HEADER, csrfToken)
+      .send({
+        ...minimalNpcRequestInput,
+        name: 'Feat Holder',
+        feats: [{ featId: entityId }],
+      })
+      .expect(201)
+
+    const patchRes = await agent
+      .patch(`/api/campaigns/${campaignId}/content/feats/${entityId}/campaign-access`)
+      .set(CSRF_HEADER, csrfToken)
+      .send({ available: false, visibilityMode: 'all_players', participantIds: [] })
+      .expect(409)
+
+    expect(patchRes.body.result.status).toBe('blocked')
+    expect(Array.isArray(patchRes.body.result.blockers)).toBe(true)
+  })
+
+  it('rejects malformed campaign access payloads', async () => {
+    const { agent, csrfToken } = await registerAndLogin()
+    const campaignId = await createTestCampaign(agent, csrfToken)
+
+    const createRes = await agent
+      .post(`/api/campaigns/${campaignId}/content/feats`)
+      .set(CSRF_HEADER, csrfToken)
+      .send({ ...minimalFeatInput, slug: 'malformed-access-feat', name: 'Malformed Access Feat' })
+      .expect(201)
+
+    const entityId = createRes.body.feats.id as string
+
+    await agent
+      .patch(`/api/campaigns/${campaignId}/content/feats/${entityId}/campaign-access`)
+      .set(CSRF_HEADER, csrfToken)
+      .send({ available: 'nope' })
+      .expect(400)
+  })
 })

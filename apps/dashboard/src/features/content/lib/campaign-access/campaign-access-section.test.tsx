@@ -1,15 +1,21 @@
 import { describe, expect, it, vi, beforeEach } from 'vitest'
+import type { ReactElement } from 'react'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { expectNoAxeViolations } from '@rpg/ui/test-utils'
 
 import { CampaignAccessSection } from './campaign-access-section.client'
+import { CampaignAccessFormProvider } from './campaign-access-form-context.client'
 import * as campaignAccessApi from './campaign-access-api'
 
 vi.mock('./campaign-access-api', () => ({
   fetchContentCampaignAccessAvailability: vi.fn(),
   updateContentCampaignAccess: vi.fn(),
 }))
+
+function renderSection(ui: ReactElement) {
+  return render(<CampaignAccessFormProvider>{ui}</CampaignAccessFormProvider>)
+}
 
 async function expandCampaignAccess(user: ReturnType<typeof userEvent.setup>) {
   await user.click(screen.getByRole('button', { name: 'Change' }))
@@ -23,7 +29,9 @@ describe('CampaignAccessSection', () => {
 
   it('renders collapsed summary and expanded availability controls', async () => {
     const user = userEvent.setup()
-    render(<CampaignAccessSection campaignId="campaign-1" targetType="feats" entityId="feat-1" />)
+    renderSection(
+      <CampaignAccessSection campaignId="campaign-1" targetType="feats" entityId="feat-1" />,
+    )
 
     expect(screen.getByText('Campaign availability')).toBeInTheDocument()
     expect(screen.getByText('Available · All players')).toBeInTheDocument()
@@ -39,7 +47,9 @@ describe('CampaignAccessSection', () => {
 
   it('disables specific players with explanatory hint', async () => {
     const user = userEvent.setup()
-    render(<CampaignAccessSection campaignId="campaign-1" targetType="feats" entityId="feat-1" />)
+    renderSection(
+      <CampaignAccessSection campaignId="campaign-1" targetType="feats" entityId="feat-1" />,
+    )
 
     await expandCampaignAccess(user)
 
@@ -48,23 +58,13 @@ describe('CampaignAccessSection', () => {
     ).toBeInTheDocument()
   })
 
-  it('disables visibility when unavailable but keeps the selected value', async () => {
+  it('marks availability dirty without PATCH on edit toggle', async () => {
     const user = userEvent.setup()
     vi.mocked(campaignAccessApi.fetchContentCampaignAccessAvailability).mockResolvedValue({
       status: 'allowed',
     })
-    vi.mocked(campaignAccessApi.updateContentCampaignAccess).mockResolvedValue({
-      status: 'updated',
-      campaignAccess: {
-        available: false,
-        visibilityMode: 'dm_only',
-        participantIds: [],
-        unavailableParticipantIds: [],
-        effectiveAudience: 'none',
-      },
-    })
 
-    render(
+    renderSection(
       <CampaignAccessSection
         campaignId="campaign-1"
         targetType="feats"
@@ -80,26 +80,22 @@ describe('CampaignAccessSection', () => {
     )
 
     await expandCampaignAccess(user)
-    await user.click(screen.getByRole('switch', { name: 'Available in this campaign' }))
+    await user.click(screen.getByRole('switch', { name: /Available in this campaign/ }))
 
     await waitFor(() => {
-      expect(campaignAccessApi.updateContentCampaignAccess).toHaveBeenCalledWith(
-        'campaign-1',
-        'feats',
-        'feat-1',
-        expect.objectContaining({ available: false, visibilityMode: 'dm_only' }),
-        expect.anything(),
-      )
+      expect(campaignAccessApi.fetchContentCampaignAccessAvailability).toHaveBeenCalled()
     })
+    expect(campaignAccessApi.updateContentCampaignAccess).not.toHaveBeenCalled()
 
-    expect(screen.getByRole('combobox', { name: 'Player access' })).toBeDisabled()
+    await user.click(screen.getByRole('button', { name: 'Done' }))
+    expect(screen.getByText(/Unsaved/)).toBeInTheDocument()
   })
 
   it('tracks create-time draft changes without calling the API', async () => {
     const user = userEvent.setup()
     const onDraftChange = vi.fn()
 
-    render(
+    renderSection(
       <CampaignAccessSection
         campaignId="campaign-1"
         targetType="feats"
@@ -117,7 +113,7 @@ describe('CampaignAccessSection', () => {
   })
 
   it('shows unavailable summary without opening the disclosure', () => {
-    render(
+    renderSection(
       <CampaignAccessSection
         campaignId="campaign-1"
         targetType="feats"
@@ -139,8 +135,39 @@ describe('CampaignAccessSection', () => {
     expect(screen.getByRole('button', { name: 'Change' })).toBeInTheDocument()
   })
 
+  it('restores availability toggle when preflight is blocked', async () => {
+    const user = userEvent.setup()
+    vi.mocked(campaignAccessApi.fetchContentCampaignAccessAvailability).mockResolvedValue({
+      status: 'blocked',
+      blockers: [{ kind: 'rule', code: 'npc_reference', message: 'Referenced by an NPC.' }],
+    })
+
+    renderSection(
+      <CampaignAccessSection
+        campaignId="campaign-1"
+        targetType="feats"
+        entityId="feat-1"
+        initialAccess={{
+          available: true,
+          visibilityMode: 'all_players',
+          participantIds: [],
+          unavailableParticipantIds: [],
+          effectiveAudience: 'all_players',
+        }}
+      />,
+    )
+
+    await expandCampaignAccess(user)
+    await user.click(screen.getByRole('switch', { name: /Available in this campaign/ }))
+
+    await waitFor(() => {
+      expect(screen.getByRole('dialog')).toBeInTheDocument()
+    })
+    expect(campaignAccessApi.updateContentCampaignAccess).not.toHaveBeenCalled()
+  })
+
   it('has no axe violations', async () => {
-    const { container } = render(
+    const { container } = renderSection(
       <CampaignAccessSection campaignId="campaign-1" targetType="feats" entityId="feat-1" />,
     )
     await expectNoAxeViolations(container)

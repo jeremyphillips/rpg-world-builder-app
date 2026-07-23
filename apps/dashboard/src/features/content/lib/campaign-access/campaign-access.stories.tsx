@@ -3,6 +3,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 import { DEFAULT_CONTENT_CAMPAIGN_ACCESS } from '@rpg/contracts'
 
 import { CampaignAccessSection } from './campaign-access-section.client'
+import { CampaignAccessFormProvider } from './campaign-access-form-context.client'
 import { ContentEditHeadingBadges } from './content-edit-heading-badges.client'
 
 const meta = {
@@ -16,22 +17,26 @@ type Story = StoryObj<typeof meta>
 
 export const SectionDefault: Story = {
   render: () => (
-    <CampaignAccessSection campaignId="story-campaign" targetType="feats" entityId="story-feat" />
+    <CampaignAccessFormProvider>
+      <CampaignAccessSection campaignId="story-campaign" targetType="feats" entityId="story-feat" />
+    </CampaignAccessFormProvider>
   ),
 }
 
 export const SectionUnavailable: Story = {
   render: () => (
-    <CampaignAccessSection
-      campaignId="story-campaign"
-      targetType="feats"
-      entityId="story-feat"
-      initialAccess={{
-        ...DEFAULT_CONTENT_CAMPAIGN_ACCESS,
-        available: false,
-        effectiveAudience: 'none',
-      }}
-    />
+    <CampaignAccessFormProvider>
+      <CampaignAccessSection
+        campaignId="story-campaign"
+        targetType="feats"
+        entityId="story-feat"
+        initialAccess={{
+          ...DEFAULT_CONTENT_CAMPAIGN_ACCESS,
+          available: false,
+          effectiveAudience: 'none',
+        }}
+      />
+    </CampaignAccessFormProvider>
   ),
 }
 

@@ -1,0 +1,66 @@
+# Campaign access (dashboard)
+
+Campaign availability is a **separate form surface** from content body fields. It uses its own RHF instance, `contentCampaignAccessPatchSchema`, and `PATCH …/campaign-access` — not the entity PATCH payload.
+
+## Surfaces
+
+| Surface         | Persistence                   | Dirty source                                                                   |
+| --------------- | ----------------------------- | ------------------------------------------------------------------------------ |
+| Body form       | Entity create/update mutation | RHF `dirtyFields`                                                              |
+| Campaign access | `PATCH …/campaign-access`     | RHF `dirtyFields` (edit) or diff vs `DEFAULT_CONTENT_CAMPAIGN_ACCESS` (create) |
+
+## Disclosure UX
+
+Collapsed summary comes from `resolveCampaignAccessSummary`. The group uses `disclosure: { variant: 'summary' }` on `buildCampaignAccessFields`. While dirty, the summary appends ` · Unsaved` and the panel stays open until **Done**.
+
+## Participant context
+
+`CampaignAccessFormProvider` owns reactive participant state (`isDirty`, `isPending`, `save`, `reset`). `CampaignAccessSection` registers bindings via `useCampaignAccessParticipantUpdater`. Shells and guards consume `useCampaignAccessForm()`.
+
+Availability toggle preflight uses a narrow `CampaignAccessAvailabilityProvider` inside the section — separate from participant state.
+
+## Save session (edit)
+
+`useContentSaveSession` combines body + campaign access dirty state into one `ContentSaveActionState` for the footer.
+
+**Order:** campaign access first, then body.
+
+| Access result         | Body runs?         |
+| --------------------- | ------------------ |
+| `blocked` / `invalid` | No                 |
+| `updated` / `skipped` | Yes, if body dirty |
+
+`skipped` means the access form was clean at save time — not an error.
+
+Pure orchestration lives in `content-save-session.lib.ts` (`runContentSaveSession`).
+
+## Discard invariant
+
+Each surface resets to its own **latest persisted baseline**. A successful access save advances that baseline immediately; if body save then fails, **Discard** resets only the still-dirty body — it does not roll back access.
+
+## Preflight
+
+| When              | Mechanism                                     | Purpose                                       |
+| ----------------- | --------------------------------------------- | --------------------------------------------- |
+| Toggle off (edit) | Advisory `GET …/campaign-access-availability` | Immediate UX; revert toggle if blocked        |
+| Save (edit)       | Authoritative `PATCH`                         | Persists or returns structured `409` blockers |
+
+Save does **not** run a separate availability GET when PATCH already returns blockers.
+
+On authoritative block, only `available` is restored to the persisted baseline; other dirty player-access edits are kept.
+
+## Create
+
+No unified Save — Publish / Save draft stay pending-only. Campaign access uses deferred persistence after entity creation. Dirty baseline is `DEFAULT_CONTENT_CAMPAIGN_ACCESS` via `isDefaultCampaignAccessPatch`. Navigation guard includes access-only draft changes.
+
+## Testing
+
+- Coordinator matrix: `content-save-session.test.ts`
+- Section behavior: `campaign-access-section.test.tsx`
+- Shell wiring: `content-save-session.integration.test.tsx`
+- Participant contract: `campaign-access-form-context.test.tsx`
+
+## Follow-ups
+
+- Subclass editor panel parity (reuse `CampaignAccessFormProvider` in subclass save orchestration)
+- Runtime enforcement for `specific_players`

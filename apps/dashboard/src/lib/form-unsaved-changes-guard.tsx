@@ -21,10 +21,15 @@ export function allowFormNavigationOnce() {
 }
 
 /** Blocks in-app navigation while the surrounding form is dirty; shows ConfirmDialog. */
-export function FormUnsavedChangesGuard() {
+export function FormUnsavedChangesGuard({
+  hasUnsavedEdits: hasUnsavedEditsOverride,
+}: {
+  hasUnsavedEdits?: boolean
+} = {}) {
   const { dirtyFields } = useFormState()
   const subclassEdits = useSubclassUnsavedEditsBlocking()
-  const hasUnsavedChanges = hasDirtyFields(dirtyFields) || subclassEdits
+  const hasUnsavedChanges =
+    hasUnsavedEditsOverride ?? (hasDirtyFields(dirtyFields) || subclassEdits)
   const unsavedRef = useRef(hasUnsavedChanges)
   unsavedRef.current = hasUnsavedChanges
 

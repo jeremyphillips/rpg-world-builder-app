@@ -5,7 +5,7 @@ import { useFormContext, useWatch } from 'react-hook-form'
 import type { ContentCampaignAccessPatch } from '@rpg/contracts'
 import { SwitchField } from '@rpg/ui'
 
-import { useCampaignAccessFormContext } from './campaign-access-form-context.client'
+import { useCampaignAccessAvailabilityContext } from './campaign-access-form-context.client'
 
 export type CampaignAccessAvailableSwitchProps = {
   label: string
@@ -20,7 +20,7 @@ export function CampaignAccessAvailableSwitch({
   info,
 }: CampaignAccessAvailableSwitchProps) {
   const id = useId()
-  const { pending, onAvailableChange } = useCampaignAccessFormContext()
+  const { pending, onAvailableChange } = useCampaignAccessAvailabilityContext()
   const { control } = useFormContext<ContentCampaignAccessPatch>()
   const available = useWatch({ control, name: 'available' })
 

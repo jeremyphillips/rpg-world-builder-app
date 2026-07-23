@@ -118,7 +118,9 @@ Scope notes:
   access from their parent content type — no per-row campaign access UI yet.
 - Subclass campaign access is persisted via the shared `ContentCampaignAccessModel`
   and edited in the subclass panel through `CampaignAccessSection` (availability +
-  visibility, with availability-off blocker preflight).
+  visibility, with availability-off blocker preflight). Top-level edit shells coordinate
+  body + access dirty state through a unified save session — see
+  [campaign-access/README.md](lib/campaign-access/README.md).
 
 `ContentFormCtx.entitySource` (set by the create/edit shells) plus
 `embeddedSeedRowIds` lets the editor derive per-row delete-locking when the

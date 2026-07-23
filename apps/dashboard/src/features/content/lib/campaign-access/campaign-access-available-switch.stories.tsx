@@ -5,7 +5,10 @@ import { DEFAULT_CONTENT_CAMPAIGN_ACCESS } from '@rpg/contracts'
 import { FormSectionProvider, FormUiProvider } from '@rpg/ui/form'
 
 import { CampaignAccessAvailableSwitch } from './campaign-access-available-switch.client'
-import { CampaignAccessFormProvider } from './campaign-access-form-context.client'
+import {
+  CampaignAccessAvailabilityProvider,
+  CampaignAccessFormProvider,
+} from './campaign-access-form-context.client'
 import {
   CAMPAIGN_ACCESS_AVAILABLE_HINT,
   CAMPAIGN_ACCESS_AVAILABLE_LABEL,
@@ -43,25 +46,27 @@ function AvailableSwitchHarness({
   })
 
   return (
-    <CampaignAccessFormProvider
-      value={{
-        pending,
-        onAvailableChange: (checked) => {
-          form.setValue('available', checked)
-        },
-      }}
-    >
-      <FormProvider {...form}>
-        <FormUiProvider>
-          <FormSectionProvider size="md" rhythm="comfortable">
-            <CampaignAccessAvailableSwitch
-              label={CAMPAIGN_ACCESS_AVAILABLE_LABEL}
-              hint={CAMPAIGN_ACCESS_AVAILABLE_HINT}
-              info={CAMPAIGN_ACCESS_AVAILABLE_TOOLTIP}
-            />
-          </FormSectionProvider>
-        </FormUiProvider>
-      </FormProvider>
+    <CampaignAccessFormProvider>
+      <CampaignAccessAvailabilityProvider
+        value={{
+          pending,
+          onAvailableChange: (checked) => {
+            form.setValue('available', checked)
+          },
+        }}
+      >
+        <FormProvider {...form}>
+          <FormUiProvider>
+            <FormSectionProvider size="md" rhythm="comfortable">
+              <CampaignAccessAvailableSwitch
+                label={CAMPAIGN_ACCESS_AVAILABLE_LABEL}
+                hint={CAMPAIGN_ACCESS_AVAILABLE_HINT}
+                info={CAMPAIGN_ACCESS_AVAILABLE_TOOLTIP}
+              />
+            </FormSectionProvider>
+          </FormUiProvider>
+        </FormProvider>
+      </CampaignAccessAvailabilityProvider>
     </CampaignAccessFormProvider>
   )
 }
