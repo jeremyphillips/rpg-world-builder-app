@@ -23,7 +23,7 @@ FilterSchema  →  filter-engine.ts (pure)  →  apply / constraining / modified
 - Share option vocab with form field builders where practical; filter authoring is
   `FilterSchema`, not `FormItem[]`.
 
-Implementation lives under [`src/filters/`](../src/filters/) (added with the engine).
+Implementation lives under [`src/filters/`](../src/filters/). Import from `@rpg/ui/filters`.
 
 ---
 
