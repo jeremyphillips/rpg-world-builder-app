@@ -34,12 +34,19 @@ export function costFromForm(
 }
 
 /** Hydrates economy form fields from a stored equipment cost. */
-export function costToForm(cost: EquipmentCost): {
+export function costToForm(
+  cost: EquipmentCost | undefined,
+  kind: EquipmentKind = 'adventuring_gear',
+): {
   hasMarketPrice: boolean
   cost: EquipmentCostFormValue
 } {
   if (cost === null) {
     return { hasMarketPrice: false, cost: null }
+  }
+
+  if (cost === undefined) {
+    return equipmentEconomyFormDefaults(kind)
   }
 
   return {

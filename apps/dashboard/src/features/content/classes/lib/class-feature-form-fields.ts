@@ -41,6 +41,19 @@ export function createFeatureRowFormSchema(maxLevel: number = MAX_CHARACTER_LEVE
   })
 }
 
+/** Draft feature row — name may be empty while authoring. */
+export function createFeatureRowDraftFormSchema(maxLevel: number = MAX_CHARACTER_LEVEL) {
+  const levelField = z.coerce.number().pipe(campaignLevelSchema(maxLevel))
+  return z.object({
+    id: z.string().min(1).optional(),
+    kind: z.enum(CLASS_FEATURE_KINDS).optional(),
+    name: z.string(),
+    description: z.string().optional(),
+    level: levelField,
+    grants: z.array(createGrantRowFormSchema(maxLevel)),
+  })
+}
+
 export const featureRowFormSchema = createFeatureRowFormSchema()
 
 export type FeatureRowForm = z.infer<typeof featureRowFormSchema>

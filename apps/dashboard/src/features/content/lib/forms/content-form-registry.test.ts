@@ -24,6 +24,7 @@ import {
   contentFormFields,
   type ContentFormDef,
 } from './content-form-registry'
+import { resolveContentFormSchema } from './shells/content-edit-load'
 // Populate the registry — each import registers its def as a side effect.
 import '../../species/lib/species-form-def'
 import '../../classes/lib/class-form-def'
@@ -84,6 +85,26 @@ describe.each(entries)('ContentFormDef[%s] — registration contract', (_key, de
 
   it('toInput accepts an optional edit context', () => {
     expect(def.toInput.length).toBeGreaterThanOrEqual(1)
+  })
+
+  it('registers distinct draft and publish schemas', () => {
+    const ctx =
+      def.routeKey === 'equipment'
+        ? { equipmentKind: 'armor' as const }
+        : def.routeKey === 'spells' || def.routeKey === 'classes'
+          ? {
+              campaignId: 'test-campaign',
+              mode: 'create' as const,
+              entitySource: 'homebrew' as const,
+            }
+          : {}
+
+    const draftSchema = resolveContentFormSchema(def, ctx, 'draft')
+    const publishSchema = resolveContentFormSchema(def, ctx, 'publish')
+
+    expect(draftSchema).toBeDefined()
+    expect(publishSchema).toBeDefined()
+    expect(draftSchema).not.toBe(publishSchema)
   })
 
   it('useListQuery is a function', () => {

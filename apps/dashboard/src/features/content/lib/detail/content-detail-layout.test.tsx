@@ -98,4 +98,20 @@ describe('ContentDetailLayout', () => {
     expect(screen.getByText('Custom metadata')).toBeInTheDocument()
     expect(screen.queryByText('Ignored')).not.toBeInTheDocument()
   })
+
+  it('renders an optional name badge beside the hero heading', () => {
+    useCanManageCampaignMock.mockReturnValue(false)
+
+    render(
+      <MemoryRouter>
+        <ContentDetailLayout
+          {...defaultProps}
+          editHref={undefined}
+          nameBadge={<span>Draft badge</span>}
+        />
+      </MemoryRouter>,
+    )
+
+    expect(screen.getByText('Draft badge')).toBeInTheDocument()
+  })
 })

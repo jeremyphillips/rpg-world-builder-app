@@ -1,6 +1,20 @@
 import { z } from 'zod'
 
-import { massSchema, speedRateSchema } from '../primitives/units'
+import { massSchema, speedRateSchema, weightSchema } from '../primitives/units'
+import { diceSchema } from '../primitives/dice'
+import { abilitySchema, abilityScoreSchema } from '../vocab/ability'
+import { armorCategorySchema } from '../vocab/armor/category'
+import { armorMaterialSchema } from '../vocab/armor/material'
+import { gearKindSchema } from '../vocab/equipment/gear-kind'
+import { holySymbolUsageSchema } from '../vocab/equipment/holy-symbol-usage'
+import { spellcastingGearKindSchema } from '../vocab/equipment/spellcasting-gear-kind'
+import { toolCategorySchema } from '../vocab/equipment/tool-category'
+import {
+  weaponCategorySchema,
+  weaponMasterySchema,
+  weaponModeSchema,
+  weaponPropertySchema,
+} from '../vocab/weapon'
 import { EQUIPMENT_KINDS } from '../vocab/equipment/kind'
 import { formatUnionBranchDescription } from '../vocab/enum-schema'
 import { serviceCategorySchema } from '../vocab/equipment/service-category'
@@ -9,14 +23,23 @@ import { vehicleCategorySchema } from '../vocab/equipment/vehicle-category'
 import { magicItemCategorySchema } from '../vocab/magic-item/category'
 import { magicItemRaritySchema } from '../vocab/magic-item/rarity'
 import { contentMetaSchema, contentPatchBaseSchema, slugSchema } from './lib/envelope'
+import { EQUIPMENT_CONTENT_TYPE_TERM } from './lib/content-type-terms'
+import { draftAuthoredContentBodySchema } from './lib/draft-authored-content'
+import { createDraftInputSchema } from './lib/content-input-schemas'
 import { equipmentBaseSchema } from './equipment/base'
 import {
   adventuringGearEquipmentKindFields,
   refineAdventuringGearEquipment,
 } from './equipment/adventuring-gear-variant'
 import { armorEquipmentKindFields, refineArmorEquipment } from './equipment/armor-variant'
-import { toolEquipmentKindFields } from './equipment/tool-variant'
-import { refineWeaponEquipment, weaponEquipmentKindFields } from './equipment/weapon-variant'
+import { toolEquipmentKindFields, toolUtilizeActionSchema } from './equipment/tool-variant'
+import {
+  refineWeaponEquipment,
+  weaponDamageSchema,
+  weaponDamageTypeSchema,
+  weaponEquipmentKindFields,
+  weaponRangeSchema,
+} from './equipment/weapon-variant'
 
 // Re-export weapon/armor helpers and damage schemas for consumers.
 export {
@@ -237,6 +260,191 @@ export const createEquipmentInputSchema = z.discriminatedUnion('kind', [
 ])
 
 export type CreateEquipmentInput = z.infer<typeof createEquipmentInputSchema>
+
+// ---------------------------------------------------------------------------
+// Draft body variants — relaxed fields, no publish-only superRefine hooks
+// ---------------------------------------------------------------------------
+
+const equipmentBaseDraftSchema = draftAuthoredContentBodySchema(
+  EQUIPMENT_CONTENT_TYPE_TERM.label,
+).extend({
+  cost: equipmentBaseSchema.shape.cost.optional(),
+  weight: weightSchema.optional(),
+  tags: z.array(z.string()).optional(),
+})
+
+const weaponEquipmentBodyDraftFields = equipmentBaseDraftSchema.extend({
+  kind: z.literal('weapon'),
+  category: weaponCategorySchema.optional(),
+  mode: weaponModeSchema.optional(),
+  damage: weaponDamageSchema.optional(),
+  damageType: weaponDamageTypeSchema.optional(),
+  versatileDamage: diceSchema.optional(),
+  properties: z.array(weaponPropertySchema).optional(),
+  mastery: weaponMasterySchema.optional(),
+  range: weaponRangeSchema.optional(),
+  specialRules: z.string().optional(),
+})
+
+const armorEquipmentBodyDraftFields = equipmentBaseDraftSchema.extend({
+  kind: z.literal('armor'),
+  category: armorCategorySchema.optional(),
+  material: armorMaterialSchema.optional(),
+  baseAc: z.number().int().optional(),
+  acBonus: z.number().int().optional(),
+  addDexModifier: z.boolean().optional(),
+  maxDexBonus: z.number().int().optional(),
+  stealthDisadvantage: z.boolean().optional(),
+  strengthRequirement: abilityScoreSchema.optional(),
+})
+
+const adventuringGearEquipmentBodyDraftFields = equipmentBaseDraftSchema.extend({
+  kind: z.literal('adventuring_gear'),
+  gearKind: gearKindSchema.optional(),
+  spellcastingGearKind: spellcastingGearKindSchema.optional(),
+  bundleSize: z.number().int().min(1).optional(),
+  storage: z.string().optional(),
+  properties: z.array(z.string()).optional(),
+  capacity: z.string().optional(),
+  holySymbolUsage: z.array(holySymbolUsageSchema).min(1).optional(),
+  alsoWeaponSlug: slugSchema.optional(),
+})
+
+const toolEquipmentBodyDraftFields = equipmentBaseDraftSchema.extend({
+  kind: z.literal('tool'),
+  toolCategory: toolCategorySchema.optional(),
+  ability: abilitySchema.optional(),
+  utilizes: z.array(toolUtilizeActionSchema).optional(),
+  crafts: z.array(z.string().min(1)).optional(),
+})
+
+const mountEquipmentBodyDraftFields = equipmentBaseDraftSchema.extend({
+  kind: z.literal('mount'),
+  carryingCapacity: massSchema.optional(),
+  speed: speedRateSchema.optional(),
+})
+
+const vehicleEquipmentBodyDraftFields = equipmentBaseDraftSchema.extend({
+  kind: z.literal('vehicle'),
+  vehicleCategory: vehicleCategorySchema.optional(),
+  speed: speedRateSchema.optional(),
+  cargoCapacity: massSchema.optional(),
+  crew: z.number().int().min(0).optional(),
+  passengers: z.number().int().min(0).optional(),
+  ac: z.number().int().min(0).optional(),
+  hp: z.number().int().min(0).optional(),
+  damageThreshold: z.number().int().min(0).optional(),
+})
+
+const serviceEquipmentBodyDraftFields = equipmentBaseDraftSchema
+  .omit({ weight: true })
+  .extend({
+    kind: z.literal('service'),
+    serviceCategory: serviceCategorySchema.optional(),
+    duration: serviceDurationSchema.optional(),
+    notes: z.string().optional(),
+  })
+  .strict()
+
+const magicItemEquipmentBodyDraftFields = equipmentBaseDraftSchema.extend({
+  kind: z.literal('magic_item'),
+  rarity: magicItemRaritySchema.optional(),
+  requiresAttunement: z.boolean().optional(),
+  attunementRequirement: z.string().optional(),
+  magicItemCategory: magicItemCategorySchema.optional(),
+  baseEquipmentId: z.string().optional(),
+})
+
+export const weaponBodyDraftSchema = weaponEquipmentBodyDraftFields
+export const armorBodyDraftSchema = armorEquipmentBodyDraftFields
+export const adventuringGearBodyDraftSchema = adventuringGearEquipmentBodyDraftFields
+export const toolBodyDraftSchema = toolEquipmentBodyDraftFields
+export const mountBodyDraftSchema = mountEquipmentBodyDraftFields
+export const vehicleBodyDraftSchema = vehicleEquipmentBodyDraftFields
+export const serviceBodyDraftSchema = serviceEquipmentBodyDraftFields
+export const magicItemBodyDraftSchema = magicItemEquipmentBodyDraftFields
+
+const equipmentBodyDraftVariants = [
+  weaponBodyDraftSchema,
+  armorBodyDraftSchema,
+  adventuringGearBodyDraftSchema,
+  toolBodyDraftSchema,
+  mountBodyDraftSchema,
+  vehicleBodyDraftSchema,
+  serviceBodyDraftSchema,
+  magicItemBodyDraftSchema,
+] as const
+
+export const equipmentBodyDraftSchema = z
+  .discriminatedUnion('kind', [...equipmentBodyDraftVariants])
+  .describe(formatUnionBranchDescription('kind', [...EQUIPMENT_KINDS]))
+
+export type EquipmentBodyDraft = z.infer<typeof equipmentBodyDraftSchema>
+
+export const equipmentDraftStoredSchema = z
+  .discriminatedUnion('kind', [
+    contentMetaSchema.extend(weaponEquipmentBodyDraftFields.shape),
+    contentMetaSchema.extend(armorEquipmentBodyDraftFields.shape),
+    contentMetaSchema.extend(adventuringGearEquipmentBodyDraftFields.shape),
+    contentMetaSchema.extend(toolEquipmentBodyDraftFields.shape),
+    contentMetaSchema.extend(mountEquipmentBodyDraftFields.shape),
+    contentMetaSchema.extend(vehicleEquipmentBodyDraftFields.shape),
+    contentMetaSchema.extend(serviceEquipmentBodyDraftFields.shape),
+    contentMetaSchema.extend(magicItemEquipmentBodyDraftFields.shape),
+  ])
+  .describe(formatUnionBranchDescription('kind', [...EQUIPMENT_KINDS]))
+
+export type EquipmentDraft = z.infer<typeof equipmentDraftStoredSchema>
+
+export const createEquipmentDraftInputSchema = z.discriminatedUnion('kind', [
+  createDraftInputSchema(weaponEquipmentBodyDraftFields),
+  createDraftInputSchema(armorEquipmentBodyDraftFields),
+  createDraftInputSchema(adventuringGearEquipmentBodyDraftFields),
+  createDraftInputSchema(toolEquipmentBodyDraftFields),
+  createDraftInputSchema(mountEquipmentBodyDraftFields),
+  createDraftInputSchema(vehicleEquipmentBodyDraftFields),
+  createDraftInputSchema(serviceEquipmentBodyDraftFields),
+  createDraftInputSchema(magicItemEquipmentBodyDraftFields),
+])
+
+export type CreateEquipmentDraftInput = z.infer<typeof createEquipmentDraftInputSchema>
+
+export const updateEquipmentDraftInputSchema = z.discriminatedUnion('kind', [
+  weaponEquipmentBodyDraftFields
+    .extend({ slug: slugSchema })
+    .partial()
+    .extend({ kind: weaponEquipmentKindFields.kind }),
+  armorEquipmentBodyDraftFields
+    .extend({ slug: slugSchema })
+    .partial()
+    .extend({ kind: armorEquipmentKindFields.kind }),
+  adventuringGearEquipmentBodyDraftFields
+    .extend({ slug: slugSchema })
+    .partial()
+    .extend({ kind: adventuringGearEquipmentKindFields.kind }),
+  toolEquipmentBodyDraftFields
+    .extend({ slug: slugSchema })
+    .partial()
+    .extend({ kind: toolBodySchema.shape.kind }),
+  mountEquipmentBodyDraftFields
+    .extend({ slug: slugSchema })
+    .partial()
+    .extend({ kind: mountBodySchema.shape.kind }),
+  vehicleEquipmentBodyDraftFields
+    .extend({ slug: slugSchema })
+    .partial()
+    .extend({ kind: vehicleBodySchema.shape.kind }),
+  serviceEquipmentBodyDraftFields
+    .extend({ slug: slugSchema })
+    .partial()
+    .extend({ kind: serviceBodySchema.shape.kind }),
+  magicItemEquipmentBodyDraftFields
+    .extend({ slug: slugSchema })
+    .partial()
+    .extend({ kind: magicItemBodySchema.shape.kind }),
+])
+
+export type UpdateEquipmentDraftInput = z.infer<typeof updateEquipmentDraftInputSchema>
 
 export const updateEquipmentInputSchema = z.discriminatedUnion('kind', [
   weaponEquipmentBodyFields

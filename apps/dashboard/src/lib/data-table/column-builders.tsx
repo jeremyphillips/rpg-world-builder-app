@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import type { ReactNode } from 'react'
 import type { BadgeAppearance, BadgeTone, ColumnDef, DataTableColumnWidth } from '@rpg/ui'
 import {
   dataTableColumnMeta,
@@ -39,6 +40,7 @@ export type BuildNameColumnOptions<T> = {
   label?: string
   locked?: boolean
   nameHref?: (row: T) => string
+  nameSuffix?: (row: T) => ReactNode
 }
 
 /** Shared sortable identity (name/label) column for catalog tables. */
@@ -47,17 +49,26 @@ export function buildNameColumn<T>({
   label = 'Name',
   locked = false,
   nameHref,
+  nameSuffix,
 }: BuildNameColumnOptions<T>): ColumnDef<T> {
   return {
     accessorKey,
     header: ({ column }) => <SortableHeader column={column}>{label}</SortableHeader>,
     cell: nameHref
       ? ({ row }) => (
-          <Link to={nameHref(row.original)} className={dataTableNameLinkCellVariants()}>
-            {row.getValue<string>(accessorKey)}
-          </Link>
+          <span className="inline-flex items-center gap-2">
+            <Link to={nameHref(row.original)} className={dataTableNameLinkCellVariants()}>
+              {row.getValue<string>(accessorKey)}
+            </Link>
+            {nameSuffix?.(row.original)}
+          </span>
         )
-      : ({ row }) => <NameCell>{row.getValue<string>(accessorKey)}</NameCell>,
+      : ({ row }) => (
+          <span className="inline-flex items-center gap-2">
+            <NameCell>{row.getValue<string>(accessorKey)}</NameCell>
+            {nameSuffix?.(row.original)}
+          </span>
+        ),
     enableHiding: locked ? false : undefined,
     meta: {
       ...dataTableColumnMeta.identity,

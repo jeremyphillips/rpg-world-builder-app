@@ -28,6 +28,11 @@ describe('findContentEditEntity', () => {
     expect(findContentEditEntity(entities, 'b')).toEqual({ id: 'b', name: 'Beta' })
   })
 
+  it('returns undefined when a draft is absent from the cached list', () => {
+    const entities = [{ id: 'pub-1', name: 'Published only', status: 'published' as const }]
+    expect(findContentEditEntity(entities, 'draft-1')).toBeUndefined()
+  })
+
   it('returns undefined when the list is missing or empty', () => {
     expect(findContentEditEntity(undefined, 'a')).toBeUndefined()
     expect(findContentEditEntity([], 'a')).toBeUndefined()
@@ -57,6 +62,28 @@ describe('resolveContentFormSchema', () => {
 
     expect(resolveContentFormSchema(def, baseOptionsCtx)).toBe(schema)
   })
+
+  it('falls back to publish schema when draftSchema is absent', () => {
+    const schema = z.object({ name: z.string().min(1) })
+    const def = { schema } as Pick<
+      ContentFormDef<{ id: string; name: string }, { name: string }, unknown>,
+      'schema' | 'draftSchema'
+    >
+
+    expect(resolveContentFormSchema(def, baseOptionsCtx, 'draft')).toBe(schema)
+  })
+
+  it('uses draftSchema when intent is draft and draftSchema is registered', () => {
+    const schema = z.object({ name: z.string().min(1) })
+    const draftSchema = z.object({ name: z.string() })
+    const def = { schema, draftSchema } as Pick<
+      ContentFormDef<{ id: string; name: string }, { name: string }, unknown>,
+      'schema' | 'draftSchema'
+    >
+
+    expect(resolveContentFormSchema(def, baseOptionsCtx, 'draft')).toBe(draftSchema)
+    expect(resolveContentFormSchema(def, baseOptionsCtx, 'publish')).toBe(schema)
+  })
 })
 
 describe('loadContentEditFormState', () => {
@@ -64,6 +91,7 @@ describe('loadContentEditFormState', () => {
     id: 'sp-1',
     name: 'Elf',
     source: 'homebrew' as const,
+    status: 'published' as const,
     slug: 'elf',
     kind: 'service',
   }

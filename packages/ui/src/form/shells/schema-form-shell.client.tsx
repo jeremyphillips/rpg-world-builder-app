@@ -26,6 +26,27 @@ import {
 import type { FileFieldPropsMap, FormItem } from '../field-config'
 import { navigateInvalidSubmit } from '../config/navigate-invalid-submit.client'
 
+export type SchemaFormSubmitHandler<TFieldValues extends FieldValues> = (
+  values: TFieldValues,
+  form: UseFormReturn<TFieldValues>,
+) => void | Promise<void>
+
+type SchemaFormSubmitContextValue<TFieldValues extends FieldValues> = {
+  requestSubmit: (handler: SchemaFormSubmitHandler<TFieldValues>) => void
+}
+
+const SchemaFormSubmitContext =
+  React.createContext<SchemaFormSubmitContextValue<FieldValues> | null>(null)
+
+/** Imperative submit with the same invalid-submit navigation as the primary form submit. */
+export function useSchemaFormSubmit<
+  TFieldValues extends FieldValues = FieldValues,
+>(): SchemaFormSubmitContextValue<TFieldValues> | null {
+  return React.useContext(
+    SchemaFormSubmitContext,
+  ) as SchemaFormSubmitContextValue<TFieldValues> | null
+}
+
 interface SchemaFormShellProps<TFieldValues extends FieldValues> {
   form: UseFormReturn<TFieldValues>
   formId: string
@@ -72,12 +93,10 @@ function SchemaFormElement<TFieldValues extends FieldValues>({
 >) {
   const ui = React.useContext(FormUiContext)
 
-  return (
-    <form
-      id={formId}
-      noValidate
-      onSubmit={form.handleSubmit(
-        (values) => onSubmit(values, form),
+  const requestSubmit = React.useCallback(
+    (handler: SchemaFormSubmitHandler<TFieldValues>) => {
+      void form.handleSubmit(
+        (values) => handler(values, form),
         (errors) => {
           if (onInvalidSubmit) {
             onInvalidSubmit(form, fields, formId, ui, errors)
@@ -85,11 +104,35 @@ function SchemaFormElement<TFieldValues extends FieldValues>({
           }
           navigateInvalidSubmit(form, fields, formId, ui, errors)
         },
-      )}
-      className={className}
+      )()
+    },
+    [fields, form, formId, onInvalidSubmit, ui],
+  )
+
+  const submitContext = React.useMemo(() => ({ requestSubmit }), [requestSubmit])
+
+  return (
+    <SchemaFormSubmitContext.Provider
+      value={submitContext as SchemaFormSubmitContextValue<FieldValues>}
     >
-      {children}
-    </form>
+      <form
+        id={formId}
+        noValidate
+        onSubmit={form.handleSubmit(
+          (values) => onSubmit(values, form),
+          (errors) => {
+            if (onInvalidSubmit) {
+              onInvalidSubmit(form, fields, formId, ui, errors)
+              return
+            }
+            navigateInvalidSubmit(form, fields, formId, ui, errors)
+          },
+        )}
+        className={className}
+      >
+        {children}
+      </form>
+    </SchemaFormSubmitContext.Provider>
   )
 }
 

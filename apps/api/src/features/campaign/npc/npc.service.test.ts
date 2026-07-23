@@ -1,12 +1,16 @@
 import { describe, expect, it } from 'vitest'
 
 import { makeTestCampaign } from '../../../test/fixtures/campaigns'
+import { makeTestUser } from '../../../test/fixtures/users'
 import { minimalNpcRequestInput } from '../../../test/fixtures/npcs'
 import { createCampaignNpc, listCampaignNpcs } from './npc.service'
 
 describe('createCampaignNpc', () => {
   it('persists an NPC scoped to the campaign', async () => {
-    const { id: campaignId } = await makeTestCampaign({ name: 'NPC Service Campaign' })
+    const { id: campaignId } = await makeTestCampaign({
+      name: 'NPC Service Campaign',
+      owner: await makeTestUser({ email: 'npc-service-owner@example.com' }),
+    })
 
     const npc = await createCampaignNpc(campaignId, minimalNpcRequestInput)
 

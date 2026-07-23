@@ -19,9 +19,9 @@ const homebrewClassSchema = new Schema(
   {
     ...homebrewContentIdentityFields,
     primaryAbilities: [{ type: String, enum: [...ABILITY_IDS] }],
-    hitDie: { type: Number, enum: [...CLASS_HIT_DICE], required: true },
+    hitDie: { type: Number, enum: [...CLASS_HIT_DICE] },
     spellcasting: { type: Schema.Types.Mixed },
-    proficiencies: { type: Schema.Types.Mixed, required: true },
+    proficiencies: { type: Schema.Types.Mixed },
     characterCreation: { type: Schema.Types.Mixed },
     features: { type: [Schema.Types.Mixed], default: [] },
   },

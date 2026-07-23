@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import {
+  createSpellDraftInputSchema,
   createSpellInputSchema,
   spellBodySchema,
   spellFormLevelSchema,
@@ -63,6 +64,7 @@ const fireball = {
   slug: 'fireball',
   rulesetId: 'srd-cc-5.2.1',
   source: 'system',
+  status: 'published',
   campaignId: null,
   ...timestamps,
   ...fireballBody,
@@ -73,6 +75,7 @@ const fireBolt = {
   slug: 'fire-bolt',
   rulesetId: 'srd-cc-5.2.1',
   source: 'system',
+  status: 'published',
   campaignId: null,
   ...timestamps,
   ...fireBoltBody,
@@ -103,6 +106,7 @@ describe('spellSchema', () => {
       slug: 'detect-magic',
       rulesetId: 'srd-cc-5.2.1',
       source: 'system',
+      status: 'published',
       campaignId: null,
       ...timestamps,
       name: 'Detect Magic',
@@ -233,6 +237,41 @@ describe('createSpellInputSchema', () => {
       slug: 'fire-bolt',
       ...fireBoltBody,
     })
+  })
+})
+
+describe('createSpellDraftInputSchema', () => {
+  it('accepts minimal draft payloads and applies untitled name fallback', () => {
+    const parsed = createSpellDraftInputSchema.parse({
+      slug: 'draft-spell',
+      name: '',
+      school: 'evocation',
+    })
+    expect(parsed.name).toBe('Untitled Spell')
+    expect(parsed.school).toBe('evocation')
+    expect(parsed.classIds).toEqual([])
+  })
+
+  it('allows empty classIds on draft', () => {
+    expect(
+      createSpellDraftInputSchema.safeParse({
+        slug: 'draft-spell',
+        name: 'Draft Spell',
+        school: 'evocation',
+        classIds: [],
+      }).success,
+    ).toBe(true)
+  })
+
+  it('rejects malformed resolution when present on draft', () => {
+    expect(
+      createSpellDraftInputSchema.safeParse({
+        slug: 'draft-spell',
+        name: 'Draft Spell',
+        school: 'evocation',
+        resolution: { invalid: true },
+      }).success,
+    ).toBe(false)
   })
 })
 

@@ -10,6 +10,7 @@ import { useSetBreadcrumbLabel } from '@/components/layout/use-breadcrumb-label'
 import { WidePage } from '@/components/layout/wide-page'
 import { useEquipment } from '../hooks/use-equipment'
 import { ContentDetailLayout } from '../../lib/detail/content-detail-layout'
+import { ContentStatusNameBadge } from '../../lib/overview/content-status-name-badge.client'
 import { ContentDetailResolver } from '../../lib/detail/content-detail-resolver'
 import { contentEditHref } from '../../lib/detail/content-edit-href'
 import { getContentImageUrl } from '../../lib/detail/content-image-url'
@@ -36,6 +37,7 @@ export function EquipmentDetailContent({ item, campaignId, family }: EquipmentDe
     <WidePage>
       <ContentDetailLayout
         name={item.name}
+        nameBadge={<ContentStatusNameBadge status={item.status} />}
         imageUrl={getContentImageUrl(item.imageKey)}
         imageName={item.name}
         campaignId={campaignId}

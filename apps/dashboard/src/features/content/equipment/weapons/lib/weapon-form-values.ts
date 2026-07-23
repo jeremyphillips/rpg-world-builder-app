@@ -1,5 +1,4 @@
 import {
-  createEquipmentInputSchema,
   dieFaceSchema,
   type CreateEquipmentInput,
   type WeaponDamage,
@@ -8,6 +7,7 @@ import {
 
 import {
   equipmentInputBase,
+  parseEquipmentCreateInput,
   type EquipmentInputBuildCtx,
 } from '../../lib/equipment-form-values-base'
 import type { WeaponEquipmentFormValues } from '../../lib/equipment-form-fields'
@@ -106,18 +106,26 @@ export function buildWeaponInput({
   values,
   ctx,
   weight,
+  validationIntent = 'publish',
 }: EquipmentInputBuildCtx<'weapon'>): CreateEquipmentInput {
-  return createEquipmentInputSchema.parse({
-    ...equipmentInputBase(values, ctx),
-    kind: 'weapon',
-    category: values.category,
-    mode: values.mode,
-    properties: values.properties ?? [],
-    mastery: values.mastery,
-    ...(weight && { weight }),
-    ...optionalWeaponDamage(values),
-    ...optionalVersatileDamage(values),
-    ...optionalWeaponRange(values),
-    ...(values.specialRules && { specialRules: values.specialRules }),
-  })
+  const isDraft = validationIntent === 'draft'
+
+  return parseEquipmentCreateInput(
+    {
+      ...equipmentInputBase(values, ctx, validationIntent),
+      kind: 'weapon',
+      ...(values.category && { category: values.category }),
+      ...(values.mode && { mode: values.mode }),
+      ...(values.mastery && { mastery: values.mastery }),
+      ...(isDraft
+        ? values.properties && { properties: values.properties }
+        : { properties: values.properties ?? [] }),
+      ...(weight && { weight }),
+      ...optionalWeaponDamage(values),
+      ...optionalVersatileDamage(values),
+      ...optionalWeaponRange(values),
+      ...(values.specialRules && { specialRules: values.specialRules }),
+    },
+    validationIntent,
+  )
 }

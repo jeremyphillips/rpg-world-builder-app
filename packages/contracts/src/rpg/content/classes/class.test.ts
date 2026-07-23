@@ -7,6 +7,7 @@ import {
   classSchema,
   classStoredBodySchema,
   classStoredSchema,
+  createClassDraftInputSchema,
   createClassInputSchema,
   subclassChoiceFeature,
   subclassChoiceFeatureId,
@@ -60,6 +61,7 @@ const fighter = {
   slug: 'fighter',
   rulesetId: 'srd-cc-5.2.1',
   source: 'system',
+  status: 'published',
   campaignId: null,
   ...timestamps,
   ...fighterStoredBody,
@@ -172,6 +174,39 @@ describe('createClassInputSchema', () => {
   })
 })
 
+describe('createClassDraftInputSchema', () => {
+  it('accepts minimal draft payloads and applies untitled name fallback', () => {
+    const parsed = createClassDraftInputSchema.parse({
+      slug: 'draft-class',
+      name: '',
+      hitDie: 8,
+    })
+    expect(parsed.name).toBe('Untitled Class')
+    expect(parsed.hitDie).toBe(8)
+    expect(parsed.features).toEqual([])
+  })
+
+  it('allows empty saving throws and skill choice groups on draft', () => {
+    expect(
+      createClassDraftInputSchema.safeParse({
+        slug: 'draft-class',
+        name: 'Draft Class',
+        proficiencies: {
+          savingThrows: [],
+          armor: { categories: [], items: [] },
+          weapons: { categories: [], items: [] },
+          skills: { categories: [], items: [] },
+        },
+        characterCreation: {
+          proficiencies: {
+            skills: { choices: [] },
+          },
+        },
+      }).success,
+    ).toBe(true)
+  })
+})
+
 describe('updateClassInputSchema', () => {
   it('allows a partial body (including empty)', () => {
     expect(updateClassInputSchema.safeParse({}).success).toBe(true)
@@ -220,6 +255,7 @@ describe('subclassSchema', () => {
       slug: 'champion',
       rulesetId: 'srd-cc-5.2.1',
       source: 'system',
+      status: 'published',
       campaignId: null,
       ...timestamps,
       classId: fighter.id,
@@ -236,6 +272,7 @@ describe('subclassSchema', () => {
       slug: 'college-of-lore',
       rulesetId: 'srd-cc-5.2.1',
       source: 'system',
+      status: 'published',
       campaignId: null,
       ...timestamps,
       classId: 'srd-cc-5.2.1:bard',
@@ -261,6 +298,7 @@ describe('subclassSchema', () => {
         slug: 'champion',
         rulesetId: 'srd-cc-5.2.1',
         source: 'system',
+        status: 'published',
         campaignId: null,
         ...timestamps,
         name: 'Champion',
@@ -277,6 +315,7 @@ describe('resolvedSubclassSchema', () => {
         slug: 'champion',
         rulesetId: 'srd-cc-5.2.1',
         source: 'system',
+        status: 'published',
         campaignId: null,
         ...timestamps,
         classId: fighter.id,
@@ -407,6 +446,7 @@ describe('classStoredSchema', () => {
         slug: 'fighter',
         rulesetId: 'srd-cc-5.2.1',
         source: 'system',
+        status: 'published',
         campaignId: null,
         ...timestamps,
         ...fighterStoredBody,

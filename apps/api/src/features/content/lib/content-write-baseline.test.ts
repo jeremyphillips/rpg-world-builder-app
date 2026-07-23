@@ -152,6 +152,7 @@ describe.each(baselineCases)('content write baseline — $label', (baselineCase)
     )
     expect(created.source).toBe('homebrew')
     expect(created.campaignId).toBe(campaign.id)
+    expect(created.status).toBe('published')
 
     const updatedHomebrew = await updateContentEntity(
       baselineCase.config,
@@ -176,6 +177,7 @@ describe.each(baselineCases)('content write baseline — $label', (baselineCase)
     )
     expect(systemRecord).toBeDefined()
     if (!systemRecord) throw new Error(`expected system seed ${baselineCase.systemTargetSlug}`)
+    expect(systemRecord.status).toBe('published')
 
     const patchedSystem = await updateContentEntity(
       baselineCase.config,
@@ -185,6 +187,7 @@ describe.each(baselineCases)('content write baseline — $label', (baselineCase)
     )
     expect(patchedSystem.source).toBe('system')
     expect(patchedSystem.name).toBe(baselineCase.expectedPatchedSystemName)
+    expect(patchedSystem.status).toBe('published')
 
     const catalogAfterPatch = await resolveCatalogForCampaign(
       baselineCase.config.readConfig,
@@ -193,6 +196,124 @@ describe.each(baselineCases)('content write baseline — $label', (baselineCase)
     expect(catalogAfterPatch.find((record) => record.id === systemRecord.id)?.name).toBe(
       baselineCase.expectedPatchedSystemName,
     )
+  })
+})
+
+describe('content write baseline — draft status', () => {
+  it('creates homebrew with explicit draft status', async () => {
+    const campaign = await makeTestCampaign()
+    const created = await createHomebrewContent(
+      classWriteConfig,
+      campaign.id,
+      baselineCases.find((entry) => entry.label === 'classes')!.createInput,
+      'draft',
+    )
+    expect(created.status).toBe('draft')
+  })
+
+  it('creates an incomplete skill proficiency draft and round-trips via catalog', async () => {
+    const campaign = await makeTestCampaign()
+    const created = await createHomebrewContent(
+      skillProficiencyWriteConfig,
+      campaign.id,
+      { slug: 'draft-skill', name: '' },
+      'draft',
+    )
+
+    expect(created.status).toBe('draft')
+    expect(created.name).toBe('Untitled Skill Proficiency')
+
+    const catalog = await resolveCatalogForCampaign(
+      skillProficiencyWriteConfig.readConfig,
+      campaign.id,
+    )
+    expect(catalog.find((record) => record.id === created.id)?.name).toBe(
+      'Untitled Skill Proficiency',
+    )
+  })
+
+  it('creates an incomplete feat draft and round-trips via catalog', async () => {
+    const campaign = await makeTestCampaign()
+    const created = await createHomebrewContent(
+      featWriteConfig,
+      campaign.id,
+      { slug: 'draft-feat', name: '', repeatable: { allowed: false } },
+      'draft',
+    )
+
+    expect(created.status).toBe('draft')
+    expect(created.name).toBe('Untitled Feat')
+
+    const catalog = await resolveCatalogForCampaign(featWriteConfig.readConfig, campaign.id)
+    expect(catalog.find((record) => record.id === created.id)?.name).toBe('Untitled Feat')
+  })
+
+  it('creates an incomplete armor draft and round-trips via catalog', async () => {
+    const campaign = await makeTestCampaign()
+    const created = await createHomebrewContent(
+      equipmentWriteConfig,
+      campaign.id,
+      { slug: 'draft-armor', kind: 'armor', name: '' },
+      'draft',
+    )
+
+    expect(created.status).toBe('draft')
+    expect(created.name).toBe('Untitled Equipment')
+    expect(created.kind).toBe('armor')
+
+    const catalog = await resolveCatalogForCampaign(equipmentWriteConfig.readConfig, campaign.id)
+    expect(catalog.find((record) => record.id === created.id)?.name).toBe('Untitled Equipment')
+  })
+
+  it('creates an incomplete species draft and round-trips via catalog', async () => {
+    const campaign = await makeTestCampaign()
+    const created = await createHomebrewContent(
+      speciesWriteConfig,
+      campaign.id,
+      { slug: 'draft-species', name: '', creatureType: 'humanoid' },
+      'draft',
+    )
+
+    expect(created.status).toBe('draft')
+    expect(created.name).toBe('Untitled Species')
+    expect(created.creatureType).toBe('humanoid')
+
+    const catalog = await resolveCatalogForCampaign(speciesWriteConfig.readConfig, campaign.id)
+    expect(catalog.find((record) => record.id === created.id)?.name).toBe('Untitled Species')
+  })
+
+  it('creates an incomplete class draft and round-trips via catalog', async () => {
+    const campaign = await makeTestCampaign()
+    const created = await createHomebrewContent(
+      classWriteConfig,
+      campaign.id,
+      { slug: 'draft-class', name: '', hitDie: 8 },
+      'draft',
+    )
+
+    expect(created.status).toBe('draft')
+    expect(created.name).toBe('Untitled Class')
+    expect(created.hitDie).toBe(8)
+
+    const catalog = await resolveCatalogForCampaign(classWriteConfig.readConfig, campaign.id)
+    expect(catalog.find((record) => record.id === created.id)?.name).toBe('Untitled Class')
+  })
+
+  it('creates an incomplete spell draft and round-trips via catalog', async () => {
+    const campaign = await makeTestCampaign()
+    const created = await createHomebrewContent(
+      spellWriteConfig,
+      campaign.id,
+      { slug: 'draft-spell', name: '', school: 'evocation' },
+      'draft',
+    )
+
+    expect(created.status).toBe('draft')
+    expect(created.name).toBe('Untitled Spell')
+    expect(created.school).toBe('evocation')
+
+    const catalog = await resolveCatalogForCampaign(spellWriteConfig.readConfig, campaign.id)
+    expect(catalog.find((record) => record.id === created.id)?.name).toBe('Untitled Spell')
   })
 })
 

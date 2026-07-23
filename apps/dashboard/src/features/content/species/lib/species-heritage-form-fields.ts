@@ -3,7 +3,7 @@ import { type FormItem } from '@rpg/ui/form'
 
 import type { ContentFormCtx } from '../../lib/forms/content-form-registry'
 import { HERITAGE_NAME_HINT } from './species-heritage-form-labels'
-import { traitRowFormSchema } from './species-trait-form-fields'
+import { traitRowDraftFormSchema, traitRowFormSchema } from './species-trait-form-fields'
 
 export const heritageFormSchema = z.object({
   id: z.string().min(1).optional(),
@@ -11,6 +11,15 @@ export const heritageFormSchema = z.object({
   description: z.string().optional(),
   choose: z.coerce.number().int().min(1).default(1),
   options: z.array(traitRowFormSchema).min(1),
+})
+
+/** Draft heritage form — options and grants may be incomplete while authoring. */
+export const heritageDraftFormSchema = z.object({
+  id: z.string().min(1).optional(),
+  name: z.string(),
+  description: z.string().optional(),
+  choose: z.coerce.number().int().min(1).default(1),
+  options: z.array(traitRowDraftFormSchema).default([]),
 })
 
 export type HeritageForm = z.infer<typeof heritageFormSchema>

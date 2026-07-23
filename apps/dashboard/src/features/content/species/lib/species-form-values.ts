@@ -1,9 +1,19 @@
-import { type CreateSpeciesInput, type Species, type SpeciesCultureConfig } from '@rpg/contracts'
+import {
+  contentTraitSchema,
+  createSpeciesDraftInputSchema,
+  createSpeciesInputSchema,
+  type ContentTrait,
+  type ContentValidationIntent,
+  type CreateSpeciesInput,
+  type Species,
+  type SpeciesCultureConfig,
+  type SpeciesHeritage,
+} from '@rpg/contracts'
 
 import {
   deriveSlugForCreate,
-  envelopeSlugFields,
   finalizeContentInput,
+  slugForInputParse,
 } from '../../lib/forms/content-form-key-helpers'
 import type { ContentFormInputCtx } from '../../lib/forms/content-form-registry'
 import { cultureToFormValues } from './species-culture-form-fields'
@@ -58,32 +68,78 @@ function optionalCulture(
   return culture === undefined ? undefined : { culture }
 }
 
-export function buildSpeciesCreateInput(
+function parsableTraits(traits: ContentTrait[]): ContentTrait[] {
+  return traits.filter((trait) => contentTraitSchema.safeParse(trait).success)
+}
+
+function heritageForInput(
+  heritage: SpeciesHeritage | undefined,
+  validationIntent: ContentValidationIntent,
+): SpeciesHeritage | undefined {
+  if (!heritage) return undefined
+  if (validationIntent === 'publish') return heritage
+
+  return {
+    ...heritage,
+    options: parsableTraits(heritage.options),
+  }
+}
+
+function traitsForInput(
   values: SpeciesFormValues,
-  ctx?: ContentFormInputCtx<Species>,
-): CreateSpeciesInput {
-  const characterCreation = characterCreationFromFormValues(values.characterCreation)
+  ctx: ContentFormInputCtx<Species> | undefined,
+  validationIntent: ContentValidationIntent,
+): ContentTrait[] {
+  const traits = traitsFromFormValues(values.traits, ctx?.entity?.traits)
+  return validationIntent === 'draft' ? parsableTraits(traits) : traits
+}
+
+function cultureForInput(
+  values: SpeciesFormValues,
+  ctx: ContentFormInputCtx<Species> | undefined,
+): SpeciesCultureConfig | undefined {
   const slug = ctx?.entity?.slug ?? deriveSlugForCreate(values.name)
-  const culture = cultureFromFormValues(values.culture, {
+  return cultureFromFormValues(values.culture, {
     slug,
     existingCultureId: ctx?.entity?.culture?.id,
     entitySource: ctx?.entity?.source ?? 'homebrew',
   })
+}
 
-  return finalizeContentInput(
-    {
-      ...envelopeSlugFields(values.name, ctx),
-      name: values.name,
-      description: values.description || undefined,
-      creatureType: values.creatureType,
-      sizes: values.sizes,
-      movement: movementRowsToRecord(values.movement),
-      ...optionalLanguageAffinities(values.languageAffinities),
-      ...optionalCulture(culture),
-      traits: traitsFromFormValues(values.traits, ctx?.entity?.traits),
-      heritage: heritageFromFormValues(values.heritage, ctx?.entity?.heritage),
-      ...(characterCreation ? { characterCreation } : {}),
-    },
-    ctx,
-  ) as CreateSpeciesInput
+function speciesWirePayload(
+  values: SpeciesFormValues,
+  ctx: ContentFormInputCtx<Species> | undefined,
+  validationIntent: ContentValidationIntent,
+) {
+  const characterCreation = characterCreationFromFormValues(values.characterCreation)
+  const culture = cultureForInput(values, ctx)
+  const heritage = heritageForInput(
+    heritageFromFormValues(values.heritage, ctx?.entity?.heritage),
+    validationIntent,
+  )
+
+  return {
+    slug: slugForInputParse(values.name, ctx),
+    name: values.name,
+    description: values.description || undefined,
+    creatureType: values.creatureType,
+    sizes: values.sizes,
+    movement: movementRowsToRecord(values.movement),
+    ...optionalLanguageAffinities(values.languageAffinities),
+    ...optionalCulture(culture),
+    traits: traitsForInput(values, ctx, validationIntent),
+    ...(heritage ? { heritage } : {}),
+    ...(characterCreation ? { characterCreation } : {}),
+  }
+}
+
+export function buildSpeciesCreateInput(
+  values: SpeciesFormValues,
+  ctx?: ContentFormInputCtx<Species>,
+  validationIntent: ContentValidationIntent = 'publish',
+): CreateSpeciesInput {
+  const schema =
+    validationIntent === 'draft' ? createSpeciesDraftInputSchema : createSpeciesInputSchema
+  const input = schema.parse(speciesWirePayload(values, ctx, validationIntent))
+  return finalizeContentInput(input, ctx) as CreateSpeciesInput
 }

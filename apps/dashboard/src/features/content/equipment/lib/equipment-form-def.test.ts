@@ -4,7 +4,12 @@ import { loadSeedEquipment } from '@rpg/catalog/equipment'
 import { deriveContentKey, type CreateEquipmentInput } from '@rpg/contracts'
 
 import { STORY_RULESET_ID } from '../../lib/fixtures/constants'
-import { equipmentFormDef, type EquipmentFormValues } from './equipment-form-def'
+import {
+  equipmentFormDef,
+  equipmentFormDraftSchema,
+  type EquipmentFormValues,
+} from './equipment-form-def'
+import { armorEquipmentDraftFormSchema } from './equipment-form-fields'
 import {
   collectGroupLegends,
   expectSeedRoundTrip,
@@ -144,5 +149,47 @@ describe('equipmentFormDef create vs update modes', () => {
     const input = equipmentFormDef.toInput(formValues, { entity: item })
     expect(input).not.toHaveProperty('slug')
     expect(input.name).toBe('Renamed Equipment')
+  })
+
+  it('draft: accepts incomplete armor publish fields', () => {
+    const input = equipmentFormDef.toInput(
+      {
+        ...equipmentFormDef.createDefaultValues,
+        kind: 'armor',
+        name: '',
+      } as EquipmentFormValues,
+      { equipmentKind: 'armor' },
+      'draft',
+    )
+    expect(input.name).toBe('Untitled Equipment')
+    expect(input.kind).toBe('armor')
+    expect(input).not.toHaveProperty('baseAc')
+    expect(input).not.toHaveProperty('cost')
+  })
+
+  it('draft form schema: allows armor with only name and economy defaults', () => {
+    expect(() =>
+      equipmentFormDraftSchema.parse({
+        name: 'Custom Armor',
+        kind: 'armor',
+        hasMarketPrice: true,
+        cost: { currency: 'gp' },
+        weight: { value: undefined, unit: 'lb' },
+      }),
+    ).not.toThrow()
+  })
+
+  it('draft form schema: accepts empty select sentinels for armor category and material', () => {
+    expect(() =>
+      armorEquipmentDraftFormSchema.parse({
+        name: 'Custom Armor',
+        kind: 'armor',
+        hasMarketPrice: true,
+        cost: { currency: 'gp' },
+        weight: { value: undefined, unit: 'lb' },
+        armorCategory: '',
+        material: '',
+      }),
+    ).not.toThrow()
   })
 })

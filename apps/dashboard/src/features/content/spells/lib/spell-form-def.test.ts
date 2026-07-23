@@ -75,6 +75,22 @@ it('type: toInput return type matches CreateSpellInput', () => {
   expectTypeOf(spellFormDef.toInput).returns.toEqualTypeOf<CreateSpellInput>()
 })
 
+it('draft: accepts incomplete publish fields', () => {
+  const input = spellFormDef.toInput(
+    {
+      name: '',
+      school: 'evocation',
+      classIds: [],
+    } as unknown as SpellFormValues,
+    undefined,
+    'draft',
+  )
+  expect(input.name).toBe('Untitled Spell')
+  expect(input.school).toBe('evocation')
+  expect(input.classIds).toEqual([])
+  expect(input).not.toHaveProperty('castingTime')
+})
+
 describe('spellFormDef round-trips', () => {
   for (const spell of SRD_SPELLS) {
     it(`${spell.slug}: toFormValues → toInput → schema.parse`, () => {

@@ -13,6 +13,7 @@ import { toOptions, type FieldVisibility, type FormItem } from '@rpg/ui/form'
 import { RequirementEditor } from '../components/requirement-editor.client'
 import { descriptionField, nameField } from '../../lib/forms/fields/content-identity-form-fields'
 import type { ContentFormCtx } from '../../lib/forms/content-form-registry'
+import { draftOptionalSelect } from '../../lib/forms/draft-form-schema-helpers'
 import { refineRequirementEditor } from './requirement-editor-form'
 import { prerequisiteEditorSchema } from './requirement-editor-form-schema'
 
@@ -46,7 +47,30 @@ export function createFeatFormSchema(maxLevel: number = MAX_CHARACTER_LEVEL) {
     })
 }
 
+export function createFeatDraftFormSchema() {
+  return z
+    .object({
+      name: z.string(),
+      slug: slugSchema.optional(),
+      description: z.string().optional(),
+      category: draftOptionalSelect(z.enum(FEAT_CATEGORY_IDS)),
+      prerequisiteEditor: prerequisiteEditorSchema,
+      repeatableAllowed: z.boolean(),
+      repeatableNotes: z.string().optional(),
+    })
+    .superRefine((values, ctx) => {
+      if (!values.repeatableAllowed && values.repeatableNotes?.trim()) {
+        ctx.addIssue({
+          code: 'custom',
+          message: featValidationMessages.repeatableNotesOnlyWhenAllowed(),
+          path: ['repeatableNotes'],
+        })
+      }
+    })
+}
+
 export const featFormSchema = createFeatFormSchema()
+export const featDraftFormSchema = createFeatDraftFormSchema()
 
 export type FeatFormValues = z.infer<typeof featFormSchema>
 

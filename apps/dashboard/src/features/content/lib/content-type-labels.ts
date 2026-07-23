@@ -143,3 +143,24 @@ export function formatContentDeletionBlockedDescription(count: number): string {
   const noun = count === 1 ? 'character' : 'characters'
   return `This content is used by ${count} campaign ${noun}. Remove the references before deleting.`
 }
+
+/** Blocked demote dialog headline. */
+export function formatContentDemotionBlockedHeadline(): string {
+  return 'Cannot move to draft'
+}
+
+/** Blocked demote dialog body when characters still reference the content. */
+export function formatContentDemotionBlockedDescription(count: number): string {
+  const noun = count === 1 ? 'character' : 'characters'
+  return `This content is currently used by ${count} active ${noun}.`
+}
+
+/** Demote confirm headline — e.g. "Move Custom Folk to draft?". */
+export function formatContentDemoteConfirmHeadline(name: string): string {
+  return `Move ${name} to draft?`
+}
+
+/** Demote confirm description — reversible, not delete language. */
+export function formatContentDemoteConfirmDescription(): string {
+  return 'Campaign members without manage access will no longer be able to see it.'
+}

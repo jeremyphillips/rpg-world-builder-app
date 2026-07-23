@@ -4,7 +4,10 @@ import type { AnyContentFormDef } from '../forms/content-form-registry'
 import {
   createContent,
   deleteContent,
+  demoteContent,
   getContentDeletionAvailability,
+  getContentDemotionAvailability,
+  publishContent,
   updateContent,
 } from './content-client'
 import { homebrewSummaryQueryKey } from '../../../homebrew/hooks/use-homebrew-summary'
@@ -117,6 +120,43 @@ export function fetchContentDeletionAvailability(
   entityId: string,
 ) {
   return getContentDeletionAvailability(campaignId, routeKey, entityId)
+}
+
+export function fetchContentDemotionAvailability(
+  campaignId: string,
+  routeKey: string,
+  entityId: string,
+) {
+  return getContentDemotionAvailability(campaignId, routeKey, entityId)
+}
+
+export function usePublishContent(
+  def: Pick<AnyContentFormDef, 'routeKey' | 'queryKey' | 'invalidateQueryKeys'>,
+  campaignId: string,
+) {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (entityId: string) => publishContent(campaignId, def.routeKey, entityId),
+    onSuccess: () => {
+      invalidateContentFormDefQueries(queryClient, campaignId, def)
+    },
+  })
+}
+
+export function useDemoteContent(
+  def: Pick<AnyContentFormDef, 'routeKey' | 'queryKey' | 'invalidateQueryKeys'>,
+  campaignId: string,
+) {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (entityId: string) => demoteContent(campaignId, def.routeKey, entityId),
+    onSuccess: (result) => {
+      if (result.status !== 'demoted') return
+      invalidateContentFormDefQueries(queryClient, campaignId, def)
+    },
+  })
 }
 
 export function useDeleteContent(

@@ -35,6 +35,7 @@ import {
 } from '../../lib/content-type-labels'
 import { distanceInputSelectField } from '../../lib/forms/fields/content-speed-form-fields'
 import type { ContentFormCtx } from '../../lib/forms/content-form-registry'
+import { draftOptionalSelect } from '../../lib/forms/draft-form-schema-helpers'
 import {
   castingTimeUnitOptions,
   conditionTagOptions,
@@ -130,120 +131,135 @@ function visibleWhenAreaShape(shapes: (typeof AREA_GEOMETRY_SHAPES)[number][]): 
   }
 }
 
-export const spellFormSchema = z
-  .object({
-    name: z.string().min(1),
-    slug: slugSchema.optional(),
+const spellFormObjectSchema = z.object({
+  name: z.string().min(1),
+  slug: slugSchema.optional(),
+  description: z.string().optional(),
+  cantripScaling: z.string().optional(),
+  higherLevelSlotEffect: z.string().optional(),
+  school: spellSchoolIdSchema,
+  level: spellFormLevelSchema,
+  classIds: z.array(z.string()).min(1),
+  tags: z
+    .object({
+      roles: z.array(spellRoleTagSchema).optional(),
+      functions: z.array(spellFunctionTagSchema).optional(),
+      damageTypes: z.array(damageTypeIdSchema).optional(),
+      conditions: z.array(effectConditionSchema).optional(),
+    })
+    .optional(),
+  castingTime: z.object({
+    normal: z.object({
+      value: z.coerce.number().int().min(1),
+      unit: castingTimeUnitSchema,
+      trigger: z.string().optional(),
+    }),
+    canBeCastAsRitual: z.boolean(),
+  }),
+  range: z.object({
+    kind: spellRangeKindSchema,
+    value: z.object({ value: z.coerce.number().min(0) }).optional(),
     description: z.string().optional(),
-    cantripScaling: z.string().optional(),
-    higherLevelSlotEffect: z.string().optional(),
-    school: spellSchoolIdSchema,
-    level: spellFormLevelSchema,
-    classIds: z.array(z.string()).min(1),
-    tags: z
+  }),
+  duration: z.object({
+    kind: z.enum(SPELL_DURATION_KINDS),
+    value: z.coerce.number().int().min(1).optional(),
+    unit: durationUnitSchema.optional(),
+    concentration: z.boolean().optional(),
+    upTo: z.boolean().optional(),
+    description: z.string().optional(),
+  }),
+  components: z.object({
+    verbal: z.boolean().optional(),
+    somatic: z.boolean().optional(),
+    material: z
       .object({
-        roles: z.array(spellRoleTagSchema).optional(),
-        functions: z.array(spellFunctionTagSchema).optional(),
-        damageTypes: z.array(damageTypeIdSchema).optional(),
-        conditions: z.array(effectConditionSchema).optional(),
+        enabled: z.boolean().optional(),
+        description: z.string().optional(),
       })
       .optional(),
-    castingTime: z.object({
-      normal: z.object({
-        value: z.coerce.number().int().min(1),
-        unit: castingTimeUnitSchema,
-        trigger: z.string().optional(),
-      }),
-      canBeCastAsRitual: z.boolean(),
-    }),
-    range: z.object({
-      kind: spellRangeKindSchema,
-      value: z.object({ value: z.coerce.number().min(0) }).optional(),
-      description: z.string().optional(),
-    }),
-    duration: z.object({
-      kind: z.enum(SPELL_DURATION_KINDS),
-      value: z.coerce.number().int().min(1).optional(),
-      unit: durationUnitSchema.optional(),
-      concentration: z.boolean().optional(),
-      upTo: z.boolean().optional(),
-      description: z.string().optional(),
-    }),
-    components: z.object({
-      verbal: z.boolean().optional(),
-      somatic: z.boolean().optional(),
-      material: z
-        .object({
-          enabled: z.boolean().optional(),
-          description: z.string().optional(),
-        })
-        .optional(),
-    }),
-    areaOfEffect: z.object({
-      shape: z.string(),
-      radius: z
-        .object({
-          value: z.coerce.number(),
-          unit: z.literal('ft').optional(),
-        })
-        .optional(),
-      length: z
-        .object({
-          value: z.coerce.number(),
-          unit: z.literal('ft').optional(),
-        })
-        .optional(),
-      width: z
-        .object({
-          value: z.coerce.number(),
-          unit: z.literal('ft').optional(),
-        })
-        .optional(),
-      size: z
-        .object({
-          value: z.coerce.number(),
-          unit: z.literal('ft').optional(),
-        })
-        .optional(),
-      height: z
-        .object({
-          value: z.coerce.number(),
-          unit: z.literal('ft').optional(),
-        })
-        .optional(),
-      description: z.string().optional(),
-    }),
-    deliveryMethod: z.string().optional(),
-    effects: spellEffectsFormSchema,
-    resolution: optionalResolutionFormSchema,
-  })
-  .superRefine((values, ctx) => {
-    const hasMaterial =
-      values.components.material?.enabled === true &&
-      Boolean(values.components.material?.description?.trim())
-
-    const hasComponent =
-      values.components.verbal === true || values.components.somatic === true || hasMaterial
-
-    if (!hasComponent) {
-      ctx.addIssue({
-        code: 'custom',
-        message: spellValidationMessages.componentRequired(),
-        path: ['components'],
+  }),
+  areaOfEffect: z.object({
+    shape: z.string(),
+    radius: z
+      .object({
+        value: z.coerce.number(),
+        unit: z.literal('ft').optional(),
       })
-    }
-
-    if (
-      values.components.material?.enabled === true &&
-      !values.components.material?.description?.trim()
-    ) {
-      ctx.addIssue({
-        code: 'custom',
-        message: spellValidationMessages.materialDescriptionRequired(),
-        path: ['components', 'material', 'description'],
+      .optional(),
+    length: z
+      .object({
+        value: z.coerce.number(),
+        unit: z.literal('ft').optional(),
       })
-    }
-  })
+      .optional(),
+    width: z
+      .object({
+        value: z.coerce.number(),
+        unit: z.literal('ft').optional(),
+      })
+      .optional(),
+    size: z
+      .object({
+        value: z.coerce.number(),
+        unit: z.literal('ft').optional(),
+      })
+      .optional(),
+    height: z
+      .object({
+        value: z.coerce.number(),
+        unit: z.literal('ft').optional(),
+      })
+      .optional(),
+    description: z.string().optional(),
+  }),
+  deliveryMethod: z.string().optional(),
+  effects: spellEffectsFormSchema,
+  resolution: optionalResolutionFormSchema,
+})
+
+function refineSpellComponents(
+  values: z.infer<typeof spellFormObjectSchema>,
+  ctx: z.RefinementCtx,
+) {
+  const hasMaterial =
+    values.components.material?.enabled === true &&
+    Boolean(values.components.material?.description?.trim())
+
+  const hasComponent =
+    values.components.verbal === true || values.components.somatic === true || hasMaterial
+
+  if (!hasComponent) {
+    ctx.addIssue({
+      code: 'custom',
+      message: spellValidationMessages.componentRequired(),
+      path: ['components'],
+    })
+  }
+
+  if (
+    values.components.material?.enabled === true &&
+    !values.components.material?.description?.trim()
+  ) {
+    ctx.addIssue({
+      code: 'custom',
+      message: spellValidationMessages.materialDescriptionRequired(),
+      path: ['components', 'material', 'description'],
+    })
+  }
+}
+
+export const spellFormSchema = spellFormObjectSchema.superRefine(refineSpellComponents)
+
+export const spellDraftFormSchema = spellFormObjectSchema.extend({
+  name: z.string(),
+  level: draftOptionalSelect(spellFormLevelSchema),
+  classIds: z.array(z.string()).default([]),
+  castingTime: spellFormObjectSchema.shape.castingTime.optional(),
+  range: spellFormObjectSchema.shape.range.optional(),
+  duration: spellFormObjectSchema.shape.duration.optional(),
+  components: spellFormObjectSchema.shape.components.optional(),
+})
 
 export type SpellFormValues = z.infer<typeof spellFormSchema>
 

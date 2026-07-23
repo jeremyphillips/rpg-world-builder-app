@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom'
-import type { ContentTypeKey } from '@rpg/contracts'
+import type { ContentTypeKey, ContentValidationIntent } from '@rpg/contracts'
 import { Heading } from '@rpg/ui'
+import { useState } from 'react'
 
 import { NarrowPage } from '@/components/layout/narrow-page'
 import { allowFormNavigationOnce } from '@/lib/form-unsaved-changes-guard'
@@ -21,6 +22,7 @@ import {
 import { resolveContentPostCreateEditHref } from './content-form-navigation'
 
 import { resolveContentFormSchema } from './content-edit-load'
+import { intentToStatus } from './content-create-intent'
 
 export interface ContentCreateShellProps {
   /** Route key identifying the content type (e.g. `'species'`). */
@@ -57,34 +59,63 @@ function ContentCreateFormBody({
 }: ContentCreateFormBodyProps) {
   const navigate = useNavigate()
   const mutation = useContentWriteMutation(def, campaignId)
+  const [saveDraftPending, setSaveDraftPending] = useState(false)
 
-  const { onSubmit, formError } = useSubmitHandler(async (values) => {
-    const saved = (await mutation.mutateAsync(
-      def.toInput(values, {
-        weaponCategoryBySlug: ctx.options?.weaponCategoryBySlug,
-        campaignRules: ctx.campaignRules,
-        equipmentKind: ctx.equipmentKind,
-      }),
-    )) as { id: string; kind?: unknown }
+  const createEntity = async (
+    values: Record<string, unknown>,
+    status: 'draft' | 'published',
+    validationIntent: ContentValidationIntent,
+  ) => {
+    const saved = (await mutation.mutateAsync({
+      ...def.toInput(
+        values,
+        {
+          weaponCategoryBySlug: ctx.options?.weaponCategoryBySlug,
+          campaignRules: ctx.campaignRules,
+          equipmentKind: ctx.equipmentKind,
+        },
+        validationIntent,
+      ),
+      status,
+    })) as { id: string; kind?: unknown }
     const editHref = resolveContentPostCreateEditHref(def, campaignId, saved, formCtx)
     // TODO(toast): show success feedback — formatContentCreatedMessage(contentTypeKey)
     allowFormNavigationOnce()
     navigate(editHref)
+  }
+
+  const { onSubmit: onPublish, formError: publishFormError } = useSubmitHandler(async (values) => {
+    resolveContentFormSchema(def, ctx, 'publish').parse(values)
+    await createEntity(values, intentToStatus('publish'), 'publish')
   }, `Could not create ${def.routeKey}.`)
+
+  const { onSubmit: onSaveDraft, formError: saveDraftFormError } = useSubmitHandler(
+    async (values) => {
+      setSaveDraftPending(true)
+      try {
+        await createEntity(values, intentToStatus('save_draft'), 'draft')
+      } finally {
+        setSaveDraftPending(false)
+      }
+    },
+    `Could not save ${def.routeKey} draft.`,
+  )
 
   return (
     <ContentFormLayout
       def={def}
       ctx={ctx}
-      schema={resolveContentFormSchema(def, ctx)}
+      schema={resolveContentFormSchema(def, ctx, 'draft')}
       defaultValues={{ ...def.createDefaultValues, ...initialValues }}
       formMode="create"
       contentTypeKey={contentTypeKey}
       backHref={backHref}
       submitLabel={formatContentCreateActionLabel(contentTypeKey)}
       submitPending={mutation.isPending}
-      formError={formError ?? null}
-      onSubmit={onSubmit}
+      formError={publishFormError ?? saveDraftFormError ?? null}
+      onSubmit={onPublish}
+      onSaveDraft={onSaveDraft}
+      saveDraftPending={saveDraftPending}
     />
   )
 }

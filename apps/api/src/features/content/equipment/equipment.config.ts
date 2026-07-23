@@ -1,14 +1,18 @@
 import type { Equipment } from '@rpg/contracts'
 import {
+  createEquipmentDraftInputSchema,
   createEquipmentInputSchema,
   equipmentBodySchema,
+  equipmentDraftStoredSchema,
   equipmentSchema,
+  updateEquipmentDraftInputSchema,
   updateEquipmentInputSchema,
 } from '@rpg/contracts'
 
 import type { ContentTypeConfig } from '../lib/content-type-config'
 import type { ContentWriteConfig, HomebrewDoc } from '../lib/content-write-config'
 import type { OverlayPatch } from '../lib/resolve-catalog'
+import { homebrewContentEnvelope } from '../lib/homebrew-envelope'
 import { loadSeedEquipment, seedEquipmentSlugs } from '@rpg/catalog/equipment'
 import { EquipmentPatchModel } from './equipment-patch.model'
 import {
@@ -28,6 +32,7 @@ const HOMEBREW_DOC_ENVELOPE_KEYS = new Set([
   'campaignId',
   'rulesetId',
   'slug',
+  'status',
   'createdAt',
   'updatedAt',
   '__v',
@@ -39,13 +44,7 @@ function toHomebrewEquipment(doc: HomebrewDoc): Equipment {
     Object.entries(record).filter(([key]) => !HOMEBREW_DOC_ENVELOPE_KEYS.has(key)),
   )
   return {
-    id: String(record._id),
-    slug: record.slug,
-    rulesetId: record.rulesetId,
-    source: 'homebrew',
-    campaignId: record.campaignId,
-    createdAt: record.createdAt.toISOString(),
-    updatedAt: record.updatedAt.toISOString(),
+    ...homebrewContentEnvelope(record),
     ...body,
   } as Equipment
 }
@@ -77,7 +76,10 @@ export const equipmentWriteConfig: ContentWriteConfig<Equipment> = {
   responseKey: 'equipment',
   createInputSchema: createEquipmentInputSchema,
   updateInputSchema: updateEquipmentInputSchema,
+  createDraftInputSchema: createEquipmentDraftInputSchema,
+  updateDraftInputSchema: updateEquipmentDraftInputSchema,
   storedSchema: equipmentSchema,
+  draftStoredSchema: equipmentDraftStoredSchema,
   bodySchema: equipmentBodySchema,
   homebrewModel: HomebrewEquipmentModel,
   patchModel: EquipmentPatchModel,

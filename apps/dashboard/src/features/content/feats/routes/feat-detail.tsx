@@ -10,6 +10,7 @@ import { useSetBreadcrumbLabel } from '@/components/layout/use-breadcrumb-label'
 import { WidePage } from '@/components/layout/wide-page'
 import { useFeats } from '../hooks/use-feats'
 import { ContentDetailLayout } from '../../lib/detail/content-detail-layout'
+import { ContentStatusNameBadge } from '../../lib/overview/content-status-name-badge.client'
 import { ContentDetailResolver } from '../../lib/detail/content-detail-resolver'
 import { contentEditHref } from '../../lib/detail/content-edit-href'
 import { getContentImageUrl } from '../../lib/detail/content-image-url'
@@ -28,6 +29,7 @@ export function FeatDetailContent({ feat, campaignId }: FeatDetailContentProps) 
     <WidePage>
       <ContentDetailLayout
         name={feat.name}
+        nameBadge={<ContentStatusNameBadge status={feat.status} />}
         imageUrl={getContentImageUrl(feat.imageKey)}
         imageName={feat.name}
         campaignId={campaignId}

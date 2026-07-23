@@ -14,6 +14,7 @@ export const RULESET = 'srd-cc-5.2.1' as const
 const baseMeta = {
   rulesetId: RULESET,
   source: 'system' as const,
+  status: 'published' as const,
   campaignId: null,
   createdAt: '2026-01-01T00:00:00.000Z',
   updatedAt: '2026-01-01T00:00:00.000Z',
@@ -184,6 +185,7 @@ export const athleticsSkill = {
   slug: 'athletics',
   rulesetId: RULESET,
   source: 'system',
+  status: 'published',
   campaignId: null,
   createdAt: '2026-01-01T00:00:00.000Z',
   updatedAt: '2026-01-01T00:00:00.000Z',

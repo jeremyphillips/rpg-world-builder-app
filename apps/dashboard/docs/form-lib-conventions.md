@@ -30,6 +30,34 @@ Do not duplicate those checks on row schemas or in `FormItem` config.
 Row schemas keep only field-local refines (bonus-gold operator, required
 sub-fields).
 
+### Draft form schemas and select fields
+
+Dashboard draft form schemas (`*DraftFormSchema`, `draftSchema` on
+`ContentFormDef`) run through the same RHF + Zod resolver as publish. **`select`**
+and single **`chips`** controls seed unselected values as `''` (see
+`fieldDefaultValue` in `@rpg/ui/form`). Plain `someVocabSchema.optional()` still
+validates that sentinel against the enum and blocks Save Draft.
+
+Use **`draftOptionalSelect(schema)`** from
+[`lib/forms/draft-form-schema-helpers.ts`](../src/features/content/lib/forms/draft-form-schema-helpers.ts)
+for every optional closed-vocab field on draft paths — including nested `unit`
+keys inside optional `inputSelect` / `inputUnit` objects.
+
+```ts
+import { draftOptionalSelect } from '../../lib/forms/draft-form-schema-helpers'
+
+export const armorEquipmentDraftFormSchema = z.object({
+  armorCategory: draftOptionalSelect(armorCategorySchema),
+  material: draftOptionalSelect(armorMaterialSchema),
+})
+```
+
+Regression tests should parse realistic form payloads with `''` sentinels, not
+only omit keys. Publish schemas keep required enums unchanged; strip empty values
+in `*-form-values.ts` `toInput` when building API payloads.
+
+See also [validation-messages.md § Draft vs publish](../../../packages/contracts/docs/validation-messages.md#draft-vs-publish-contract-families).
+
 ### Validation messages
 
 Three tiers — see

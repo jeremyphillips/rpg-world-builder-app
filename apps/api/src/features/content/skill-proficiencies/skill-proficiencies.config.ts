@@ -1,14 +1,18 @@
 import type { SkillProficiency } from '@rpg/contracts'
 import {
+  createSkillProficiencyDraftInputSchema,
   createSkillProficiencyInputSchema,
   skillProficiencyBodySchema,
+  skillProficiencyDraftStoredSchema,
   skillProficiencySchema,
+  updateSkillProficiencyDraftInputSchema,
   updateSkillProficiencyInputSchema,
 } from '@rpg/contracts'
 
 import type { ContentTypeConfig } from '../lib/content-type-config'
 import type { ContentWriteConfig, HomebrewDoc } from '../lib/content-write-config'
 import type { OverlayPatch } from '../lib/resolve-catalog'
+import { homebrewContentEnvelope } from '../lib/homebrew-envelope'
 import {
   loadSeedSkillProficiencies,
   seedSkillProficiencySlugs,
@@ -29,18 +33,12 @@ interface SkillProficiencyPatchRecord {
 function toHomebrewSkillProficiency(doc: HomebrewDoc): SkillProficiency {
   const record = doc as HomebrewSkillProficiencyRecord
   return {
-    id: String(record._id),
-    slug: record.slug,
-    rulesetId: record.rulesetId,
-    source: 'homebrew',
-    campaignId: record.campaignId,
-    createdAt: record.createdAt.toISOString(),
-    updatedAt: record.updatedAt.toISOString(),
+    ...homebrewContentEnvelope(record),
     name: record.name,
     ...(record.imageKey !== undefined && { imageKey: record.imageKey }),
     ...(record.description !== undefined && { description: record.description }),
-    ability: record.ability,
-    examples: record.examples,
+    ...(record.ability !== undefined && { ability: record.ability }),
+    examples: record.examples ?? [],
   } as SkillProficiency
 }
 
@@ -73,7 +71,10 @@ export const skillProficiencyWriteConfig: ContentWriteConfig<SkillProficiency> =
   responseKey: 'skillProficiencies',
   createInputSchema: createSkillProficiencyInputSchema,
   updateInputSchema: updateSkillProficiencyInputSchema,
+  createDraftInputSchema: createSkillProficiencyDraftInputSchema,
+  updateDraftInputSchema: updateSkillProficiencyDraftInputSchema,
   storedSchema: skillProficiencySchema,
+  draftStoredSchema: skillProficiencyDraftStoredSchema,
   bodySchema: skillProficiencyBodySchema,
   homebrewModel: HomebrewSkillProficiencyModel,
   patchModel: SkillProficiencyPatchModel,

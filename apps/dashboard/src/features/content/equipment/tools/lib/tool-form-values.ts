@@ -1,11 +1,8 @@
-import {
-  createEquipmentInputSchema,
-  type CreateEquipmentInput,
-  type ToolEquipment,
-} from '@rpg/contracts'
+import { type CreateEquipmentInput, type ToolEquipment } from '@rpg/contracts'
 
 import {
   equipmentInputBase,
+  parseEquipmentCreateInput,
   type EquipmentInputBuildCtx,
 } from '../../lib/equipment-form-values-base'
 import { parseNewlineList } from '../../lib/parse-newline-list'
@@ -32,16 +29,31 @@ export function buildToolInput({
   values,
   ctx,
   weight,
+  validationIntent = 'publish',
 }: EquipmentInputBuildCtx<'tool'>): CreateEquipmentInput {
   const crafts = parseNewlineList(values.craftsText)
+  const isDraft = validationIntent === 'draft'
 
-  return createEquipmentInputSchema.parse({
-    ...equipmentInputBase(values, ctx),
-    kind: 'tool',
-    toolCategory: values.toolCategory ?? 'other',
-    ability: values.ability ?? 'int',
-    utilizes: values.utilizes ?? [],
-    ...(weight && { weight }),
-    ...(crafts && { crafts }),
-  })
+  return parseEquipmentCreateInput(
+    {
+      ...equipmentInputBase(values, ctx, validationIntent),
+      kind: 'tool',
+      ...(values.toolCategory
+        ? { toolCategory: values.toolCategory }
+        : isDraft
+          ? {}
+          : { toolCategory: 'other' as const }),
+      ...(values.ability
+        ? { ability: values.ability }
+        : isDraft
+          ? {}
+          : { ability: 'int' as const }),
+      ...(isDraft
+        ? values.utilizes && { utilizes: values.utilizes }
+        : { utilizes: values.utilizes ?? [] }),
+      ...(weight && { weight }),
+      ...(crafts && { crafts }),
+    },
+    validationIntent,
+  )
 }

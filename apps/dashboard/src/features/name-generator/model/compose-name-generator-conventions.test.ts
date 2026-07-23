@@ -15,6 +15,7 @@ const ELF_SPECIES = {
   slug: 'elf',
   name: 'Elf',
   source: 'system',
+  status: 'published',
   campaignId: null,
   rulesetId: 'srd-cc-5.2.1',
   createdAt: '2024-05-21T00:00:00.000Z',

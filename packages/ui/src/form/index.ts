@@ -3,6 +3,10 @@
 
 export { Form, type FormProps } from './shells/form.client'
 export {
+  useSchemaFormSubmit,
+  type SchemaFormSubmitHandler,
+} from './shells/schema-form-shell.client'
+export {
   FormItems,
   type FormItemsProps,
   SlotFieldRenderer,
@@ -48,6 +52,7 @@ export {
   type TabbedFormProps,
   type TabbedFormTab,
 } from './shells/tabbed-form.client'
+export { useTabbedFormChrome } from './shells/tabbed-form-chrome.context'
 export { FormSaveFooter, type FormSaveFooterProps } from './chrome/form-save-footer'
 export { FormFooterActions, type FormFooterActionsProps } from './chrome/form-footer-actions'
 export { FormActionsBar, type FormActionsBarProps } from './chrome/form-actions-bar'
@@ -185,6 +190,7 @@ export {
   type SilentValidationResult,
 } from './config/form-resolver'
 export { navigateInvalidSubmit } from './config/navigate-invalid-submit.client'
+export { navigateTabbedFormInvalidSubmit } from './shells/navigate-tabbed-form-invalid-submit.client'
 export { performInvalidSubmitFocus } from './config/navigate-invalid-submit-focus.lib'
 export {
   flattenFormIssues,

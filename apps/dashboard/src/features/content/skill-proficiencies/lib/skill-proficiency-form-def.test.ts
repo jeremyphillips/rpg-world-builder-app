@@ -8,6 +8,7 @@ import {
 
 import {
   skillProficiencyFormDef,
+  skillProficiencyDraftFormSchema,
   type SkillProficiencyFormValues,
 } from './skill-proficiency-form-def'
 
@@ -57,5 +58,35 @@ describe('skillProficiencyFormDef create vs update modes', () => {
     const input = skillProficiencyFormDef.toInput(formValues, { entity: skill })
     expect(input).not.toHaveProperty('slug')
     expect(input.name).toBe('Renamed Skill')
+  })
+
+  it('draft: accepts incomplete publish fields', () => {
+    const input = skillProficiencyFormDef.toInput(
+      { name: '', examples: [{ value: '' }] } as SkillProficiencyFormValues,
+      undefined,
+      'draft',
+    )
+    expect(input.name).toBe('Untitled Skill Proficiency')
+    expect(input).not.toHaveProperty('ability')
+    expect(input.examples).toEqual([])
+  })
+
+  it('draft form schema: allows a name with the default empty example row', () => {
+    expect(() =>
+      skillProficiencyDraftFormSchema.parse({
+        name: 'Custom Skill',
+        examples: [{ value: '' }],
+      }),
+    ).not.toThrow()
+  })
+
+  it('draft form schema: accepts empty chips sentinel for governing ability', () => {
+    expect(() =>
+      skillProficiencyDraftFormSchema.parse({
+        name: 'Custom Skill',
+        ability: '',
+        examples: [{ value: '' }],
+      }),
+    ).not.toThrow()
   })
 })

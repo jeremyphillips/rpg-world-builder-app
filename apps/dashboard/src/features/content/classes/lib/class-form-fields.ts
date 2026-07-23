@@ -12,6 +12,7 @@ import { type TabbedFormTab } from '@rpg/ui/form'
 import { effectiveMaxFromCtx } from '../../lib/form-options/content-campaign-rules'
 import { identityFields } from '../../lib/forms/fields/content-identity-form-fields'
 import type { ContentFormCtx } from '../../lib/forms/content-form-registry'
+import { draftOptionalSelect } from '../../lib/forms/draft-form-schema-helpers'
 import {
   embeddedArrayResolverField,
   embeddedMasterDetailTabValidation,
@@ -20,9 +21,17 @@ import { ClassFeaturesTab } from '../components/class-features-tab.client'
 import { ClassCharacterCreationTab } from '../components/class-character-creation-tab.client'
 import { ClassSubclassesTab } from '../components/class-subclasses-tab.client'
 import { coreAttributesFields } from './class-basics-form-fields'
-import { classFeatureItemFields, createFeatureRowFormSchema } from './class-feature-form-fields'
+import {
+  classFeatureItemFields,
+  createFeatureRowDraftFormSchema,
+  createFeatureRowFormSchema,
+} from './class-feature-form-fields'
 import { WEAPON_PROFICIENCY_MODES } from './class-form-constants'
-import { proficienciesFields, proficienciesFormSchema } from './class-proficiencies-form-fields'
+import {
+  proficienciesDraftFormSchema,
+  proficienciesFields,
+  proficienciesFormSchema,
+} from './class-proficiencies-form-fields'
 import { resourcesArrayField } from './class-resources-form-fields'
 import { createSpellcastingFormSchema, spellcastingFields } from './class-spellcasting-form-fields'
 import { startingEquipmentFormSchema } from './character-creation/class-starting-equipment-form-fields'
@@ -83,7 +92,43 @@ export function createClassFormSchema(
   })
 }
 
+export function createClassDraftFormSchema(
+  maxLevel: number = MAX_CHARACTER_LEVEL,
+  _formCtx?: Pick<ContentFormCtx, 'options' | 'entityId'>,
+) {
+  const levelField = campaignLevelField(maxLevel)
+  const resourceEntryFormSchema = z.object({
+    level: levelField,
+    value: z.coerce.number().int().min(0),
+  })
+  const resourceRowDraftFormSchema = z.object({
+    name: z.string(),
+    entries: z.array(resourceEntryFormSchema).default([]),
+  })
+
+  return z.object({
+    name: z.string(),
+    slug: slugSchema.optional(),
+    description: z.string().optional(),
+    primaryAbilities: z.array(abilitySchema).max(2).default([]),
+    hitDie: draftOptionalSelect(z.coerce.number().pipe(hitDieSchema)),
+    hasSpellcasting: z.boolean(),
+    weaponProficiencyMode: z.enum(WEAPON_PROFICIENCY_MODES),
+    spellcasting: createSpellcastingFormSchema(maxLevel).optional(),
+    proficiencies: proficienciesDraftFormSchema,
+    features: z.array(createFeatureRowDraftFormSchema(maxLevel)).default([]),
+    resources: z.array(resourceRowDraftFormSchema).optional(),
+    characterCreation: z
+      .object({
+        startingEquipment: startingEquipmentFormSchema.optional(),
+        proficiencies: characterCreationProficienciesFormSchema.optional(),
+      })
+      .optional(),
+  })
+}
+
 export const classFormSchema = createClassFormSchema()
+export const classDraftFormSchema = createClassDraftFormSchema()
 
 export type ClassFormValues = z.infer<typeof classFormSchema>
 

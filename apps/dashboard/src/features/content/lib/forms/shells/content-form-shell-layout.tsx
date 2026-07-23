@@ -23,6 +23,7 @@ import {
 } from './content-form-shell-resolver'
 import { ContentFormFooter } from './content-form-footer'
 import { useAdvisoryFormSubmit, type AdvisoryFormSubmitOptions } from './use-advisory-form-submit'
+import { ContentEditPublishBridge } from './content-edit-publish-bridge.client'
 
 export function ContentFormComingSoon() {
   return (
@@ -43,17 +44,20 @@ export function ContentFormNotRegistered({ heading = 'Edit' }: { heading?: strin
   )
 }
 
-interface ContentFormFooterShellProps {
+interface ContentFormFooterShellProps<TFormValues extends FieldValues = FieldValues> {
   formMode: 'create' | 'edit'
   backHref?: string
   submitLabel: string
   submitPending: boolean
   submitSuccess?: boolean
+  onSaveDraft?: (values: TFormValues, form: UseFormReturn<TFormValues>) => void | Promise<void>
+  saveDraftPending?: boolean
+  publishSuccess?: boolean
 }
 
 interface ContentSchemaFormProps<
   TFormValues extends FieldValues,
-> extends ContentFormFooterShellProps {
+> extends ContentFormFooterShellProps<TFormValues> {
   schema: ZodType<TFormValues>
   fields: FormItem[]
   defaultValues?: DefaultValues<TFormValues>
@@ -66,6 +70,8 @@ interface ContentSchemaFormProps<
     form: UseFormReturn<TFormValues>,
   ) => boolean | Promise<boolean>
   submitConfirmDialog?: React.ReactNode
+  publishSchema?: ZodType<TFormValues>
+  onPublish?: () => Promise<void>
 }
 
 function ContentSchemaForm<TFormValues extends FieldValues>({
@@ -83,6 +89,11 @@ function ContentSchemaForm<TFormValues extends FieldValues>({
   valueSyncs,
   beforeSubmit,
   submitConfirmDialog,
+  onSaveDraft,
+  saveDraftPending,
+  publishSuccess,
+  publishSchema,
+  onPublish,
 }: ContentSchemaFormProps<TFormValues>) {
   const handleSubmit = React.useCallback(
     async (values: TFormValues, form: UseFormReturn<TFormValues>) => {
@@ -99,6 +110,7 @@ function ContentSchemaForm<TFormValues extends FieldValues>({
     <>
       <Form<TFormValues>
         key={formKey}
+        id={formKey}
         uiStateKey={formKey}
         schema={schema}
         fields={fields}
@@ -108,14 +120,27 @@ function ContentSchemaForm<TFormValues extends FieldValues>({
         valueSyncs={valueSyncs}
         stickyFooter
         footer={(form) => (
-          <ContentFormFooter
-            mode={formMode}
-            form={form}
-            backHref={backHref}
-            submitLabel={submitLabel}
-            pending={submitPending || form.formState.isSubmitting}
-            isSuccess={submitSuccess}
-          />
+          <>
+            {publishSchema && onPublish && formKey ? (
+              <ContentEditPublishBridge
+                publishSchema={publishSchema}
+                fields={fields}
+                formId={formKey}
+                onPublish={onPublish}
+              />
+            ) : null}
+            <ContentFormFooter
+              mode={formMode}
+              form={form}
+              backHref={backHref}
+              submitLabel={submitLabel}
+              pending={submitPending || form.formState.isSubmitting}
+              isSuccess={submitSuccess}
+              onSaveDraft={onSaveDraft}
+              saveDraftPending={saveDraftPending}
+              publishSuccess={publishSuccess}
+            />
+          </>
         )}
       />
       {submitConfirmDialog}
@@ -125,7 +150,7 @@ function ContentSchemaForm<TFormValues extends FieldValues>({
 
 interface ContentTabbedSchemaFormProps<
   TFormValues extends FieldValues,
-> extends ContentFormFooterShellProps {
+> extends ContentFormFooterShellProps<TFormValues> {
   schema: ZodType<TFormValues>
   tabs: TabbedFormTab[]
   defaultValues?: DefaultValues<TFormValues>
@@ -138,6 +163,8 @@ interface ContentTabbedSchemaFormProps<
     form: UseFormReturn<TFormValues>,
   ) => boolean | Promise<boolean>
   submitConfirmDialog?: React.ReactNode
+  publishSchema?: ZodType<TFormValues>
+  onPublish?: () => Promise<void>
 }
 
 function ContentTabbedSchemaForm<TFormValues extends FieldValues>({
@@ -155,6 +182,11 @@ function ContentTabbedSchemaForm<TFormValues extends FieldValues>({
   valueSyncs,
   beforeSubmit,
   submitConfirmDialog,
+  onSaveDraft,
+  saveDraftPending,
+  publishSuccess,
+  publishSchema,
+  onPublish,
 }: ContentTabbedSchemaFormProps<TFormValues>) {
   const handleSubmit = React.useCallback(
     async (values: TFormValues, form: UseFormReturn<TFormValues>) => {
@@ -167,10 +199,13 @@ function ContentTabbedSchemaForm<TFormValues extends FieldValues>({
     [beforeSubmit, onSubmit],
   )
 
+  const tabFields = React.useMemo(() => tabs.flatMap((tab) => tab.fields), [tabs])
+
   return (
     <>
       <TabbedForm<TFormValues>
         key={formKey}
+        id={formKey}
         uiStateKey={formKey}
         schema={schema}
         tabs={tabs}
@@ -179,14 +214,27 @@ function ContentTabbedSchemaForm<TFormValues extends FieldValues>({
         onSubmit={(values, form) => handleSubmit(values, form)}
         formError={formError}
         footer={(form) => (
-          <ContentFormFooter
-            mode={formMode}
-            form={form}
-            backHref={backHref}
-            submitLabel={submitLabel}
-            pending={submitPending || form.formState.isSubmitting}
-            isSuccess={submitSuccess}
-          />
+          <>
+            {publishSchema && onPublish && formKey ? (
+              <ContentEditPublishBridge
+                publishSchema={publishSchema}
+                fields={tabFields}
+                formId={formKey}
+                onPublish={onPublish}
+              />
+            ) : null}
+            <ContentFormFooter
+              mode={formMode}
+              form={form}
+              backHref={backHref}
+              submitLabel={submitLabel}
+              pending={submitPending || form.formState.isSubmitting}
+              isSuccess={submitSuccess}
+              onSaveDraft={onSaveDraft}
+              saveDraftPending={saveDraftPending}
+              publishSuccess={publishSuccess}
+            />
+          </>
         )}
       />
       {submitConfirmDialog}
@@ -208,6 +256,11 @@ interface ContentFormLayoutProps<TFormValues extends FieldValues> {
   submitSuccess?: boolean
   formError: string | null
   onSubmit: (values: TFormValues, form: UseFormReturn<TFormValues>) => Promise<void>
+  onSaveDraft?: (values: TFormValues, form: UseFormReturn<TFormValues>) => Promise<void>
+  saveDraftPending?: boolean
+  publishSuccess?: boolean
+  publishSchema?: ZodType<TFormValues>
+  onPublish?: () => Promise<void>
 }
 
 export function ContentFormLayout<TFormValues extends FieldValues>({
@@ -224,6 +277,11 @@ export function ContentFormLayout<TFormValues extends FieldValues>({
   submitSuccess,
   formError,
   onSubmit,
+  onSaveDraft,
+  saveDraftPending,
+  publishSuccess,
+  publishSchema,
+  onPublish,
 }: ContentFormLayoutProps<TFormValues>) {
   const isWeaponEquipmentForm = def.routeKey === 'equipment' && ctx.equipmentKind === 'weapon'
   const isSpellForm = def.routeKey === 'spells'
@@ -257,6 +315,11 @@ export function ContentFormLayout<TFormValues extends FieldValues>({
     submitSuccess,
     formError,
     onSubmit: resolvedOnSubmit,
+    onSaveDraft,
+    saveDraftPending,
+    publishSuccess,
+    publishSchema,
+    onPublish,
     valueSyncs,
     submitConfirmDialog: isWeaponEquipmentForm ? confirmDialog : undefined,
   }

@@ -1,5 +1,7 @@
-import type { ContentSource, ContentTypeKey } from '@rpg/contracts'
-import { Button, Heading, Spinner, Text } from '@rpg/ui'
+import type { ContentSource, ContentStatus, ContentTypeKey } from '@rpg/contracts'
+import { getErrorMessage } from '@rpg/contracts'
+import { Heading, Spinner, Text } from '@rpg/ui'
+import { useCallback } from 'react'
 import type { DefaultValues, FieldValues, UseFormReturn } from 'react-hook-form'
 import type { ZodType } from 'zod'
 
@@ -24,6 +26,13 @@ import { ContentAuthoringGate } from './content-authoring-gate'
 import { ContentDeletionBlockedDialog } from '../../delete/content-deletion-blocked-dialog.client'
 import { ContentDeletionConfirmDialog } from '../../delete/content-deletion-confirm-dialog.client'
 import { useContentDeleteFlow } from '../../delete/use-content-delete-flow.client'
+import { ContentDemotionBlockedDialog } from '../../demotion/content-demotion-blocked-dialog.client'
+import { ContentDemotionConfirmDialog } from '../../demotion/content-demotion-confirm-dialog.client'
+import { useContentDemoteFlow } from '../../demotion/use-content-demote-flow.client'
+import { useContentPublishFlow } from '../../demotion/use-content-publish-flow.client'
+import { ContentEditLifecycleActions } from './content-edit-lifecycle-actions.client'
+import { ContentEditPublishProvider } from './content-edit-publish-context.client'
+import { resolveContentFormSchema } from './content-edit-load'
 
 export interface ContentEditShellProps {
   /** Route key identifying the content type (e.g. `'species'`). */
@@ -64,7 +73,7 @@ interface ContentEditFormReadyProps extends ContentEditFormProps {
 }
 
 interface ContentEditEntityFormProps<
-  TEntity extends { id: string; name: string; source: ContentSource },
+  TEntity extends { id: string; name: string; source: ContentSource; status: ContentStatus },
 > {
   def: AnyContentFormDef
   entity: TEntity
@@ -82,7 +91,17 @@ interface ContentEditEntityFormProps<
 }
 
 function ContentEditEntityForm<
-  TEntity extends { id: string; name: string; source: ContentSource },
+  TEntity extends { id: string; name: string; source: ContentSource; status: ContentStatus },
+>(props: ContentEditEntityFormProps<TEntity>) {
+  return (
+    <ContentEditPublishProvider>
+      <ContentEditEntityFormBody {...props} />
+    </ContentEditPublishProvider>
+  )
+}
+
+function ContentEditEntityFormBody<
+  TEntity extends { id: string; name: string; source: ContentSource; status: ContentStatus },
 >({
   entity,
   campaignId,
@@ -99,6 +118,7 @@ function ContentEditEntityForm<
   onSubmit,
 }: ContentEditEntityFormProps<TEntity>) {
   useSetBreadcrumbLabel(entity.name)
+  const publishSchema = resolveContentFormSchema(def, layoutCtx, 'publish')
   const deleteFlow = useContentDeleteFlow({
     def,
     campaignId,
@@ -108,8 +128,33 @@ function ContentEditEntityForm<
     contentTypeKey,
     overviewHref,
   })
+  const publishFlow = useContentPublishFlow({
+    def,
+    campaignId,
+    entityId: entity.id,
+    entitySource: entity.source,
+    entityStatus: entity.status,
+  })
+  const demoteFlow = useContentDemoteFlow({
+    def,
+    campaignId,
+    entityId: entity.id,
+    entityName: entity.name,
+    entitySource: entity.source,
+    entityStatus: entity.status,
+  })
 
-  const headerError = deleteFlow.deleteError ?? formError
+  const handlePublish = useCallback(async () => {
+    try {
+      await publishFlow.runPublishMutation()
+    } catch (err) {
+      publishFlow.setPublishError(getErrorMessage(err, 'Could not publish this item.'))
+    }
+  }, [publishFlow.runPublishMutation, publishFlow.setPublishError])
+
+  const headerError =
+    deleteFlow.deleteError ?? publishFlow.publishError ?? demoteFlow.demoteError ?? formError
+  const showLifecycleActions = entity.source === 'homebrew'
 
   const formBody = (
     <ContentAuthoringGate campaignId={campaignId}>
@@ -118,16 +163,12 @@ function ContentEditEntityForm<
           <Heading variant="page" as="h1">
             {headingFn(entity.name)}
           </Heading>
-          {deleteFlow.canDelete ? (
-            <Button
-              type="button"
-              variant="destructive"
-              size="sm"
-              disabled={deleteFlow.deletePending}
-              onClick={() => void deleteFlow.handleDeleteClick()}
-            >
-              {deleteFlow.checkingAvailability ? 'Checking…' : 'Delete'}
-            </Button>
+          {showLifecycleActions ? (
+            <ContentEditLifecycleActions
+              publishFlow={publishFlow}
+              demoteFlow={demoteFlow}
+              deleteFlow={deleteFlow}
+            />
           ) : null}
         </div>
 
@@ -144,6 +185,9 @@ function ContentEditEntityForm<
           submitSuccess={submitSuccess}
           formError={headerError}
           onSubmit={onSubmit}
+          publishSchema={entity.status === 'draft' ? publishSchema : undefined}
+          onPublish={entity.status === 'draft' ? handlePublish : undefined}
+          publishSuccess={publishFlow.publishSuccess}
         />
       </NarrowPage>
 
@@ -160,6 +204,19 @@ function ContentEditEntityForm<
         onOpenChange={deleteFlow.setBlockedOpen}
         entityName={entity.name}
         blockers={deleteFlow.blockers}
+      />
+
+      <ContentDemotionConfirmDialog
+        open={demoteFlow.confirmOpen}
+        onOpenChange={demoteFlow.setConfirmOpen}
+        entityName={entity.name}
+        onConfirm={() => void demoteFlow.handleConfirmDemote()}
+      />
+
+      <ContentDemotionBlockedDialog
+        open={demoteFlow.blockedOpen}
+        onOpenChange={demoteFlow.setBlockedOpen}
+        blockers={demoteFlow.blockers}
       />
     </ContentAuthoringGate>
   )
@@ -209,7 +266,7 @@ function ContentEditFormReady({
 
 interface ContentEditFormBodyProps {
   def: AnyContentFormDef
-  entity: { id: string; name: string; source: ContentSource }
+  entity: { id: string; name: string; source: ContentSource; status: ContentStatus }
   campaignId: string
   entityId: string
   headingFn: (name: string) => string
@@ -232,7 +289,7 @@ function ContentEditFormBody({
 }: ContentEditFormBodyProps) {
   const mutation = useContentWriteMutation(def, campaignId, entityId)
 
-  const { layoutCtx, schema, defaultValues } = loadContentEditFormState({
+  const { layoutCtx, schema, validationIntent, defaultValues } = loadContentEditFormState({
     def,
     entity,
     optionsCtx: ctx,
@@ -243,12 +300,16 @@ function ContentEditFormBody({
 
   const { onSubmit, formError } = useSubmitHandler(async (values, form) => {
     const saved = await mutation.mutateAsync(
-      def.toInput(values, {
-        entity,
-        weaponCategoryBySlug: ctx.options?.weaponCategoryBySlug,
-        campaignRules: layoutCtx.campaignRules,
-        equipmentKind: layoutCtx.equipmentKind,
-      }),
+      def.toInput(
+        values,
+        {
+          entity,
+          weaponCategoryBySlug: ctx.options?.weaponCategoryBySlug,
+          campaignRules: layoutCtx.campaignRules,
+          equipmentKind: layoutCtx.equipmentKind,
+        },
+        validationIntent,
+      ),
     )
     const baseline = stripEditEnvelopeFromFormDefaults(def.toFormValues(saved), {
       stripKind: layoutCtx.equipmentKind != null,

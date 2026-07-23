@@ -1,7 +1,13 @@
 import type { Model } from 'mongoose'
 import type { ZodType } from 'zod'
 
-import type { ContentSource, SystemRulesetId, ContentDeletionBlocker } from '@rpg/contracts'
+import type {
+  ContentSource,
+  SystemRulesetId,
+  ContentStatus,
+  ContentUsageBlocker,
+  ContentValidationIntent,
+} from '@rpg/contracts'
 
 import type { ContentTypeConfig } from './content-type-config'
 import type { ContentPatchSchemaType } from './content-patch-model'
@@ -13,6 +19,7 @@ export interface HomebrewDoc {
   campaignId: string
   rulesetId: string
   slug: string
+  status?: string
   createdAt: Date
   updatedAt: Date
   [key: string]: unknown
@@ -23,6 +30,7 @@ export type WriteEntityBase = {
   id: string
   slug: string
   source: ContentSource
+  status: ContentStatus
   campaignId: string | null
 }
 
@@ -31,6 +39,8 @@ export interface ContentWriteContext {
   campaignId: string
   rulesetId: SystemRulesetId
   mode: 'create' | 'update'
+  /** Draft vs publish validation family for this write. */
+  validationIntent: ContentValidationIntent
   /** Parsed create/update DTO fields. */
   input: Record<string, unknown>
   /** Normalized payload before schema parse. */
@@ -59,8 +69,14 @@ export interface ContentWriteConfig<T extends WriteEntityBase> {
   responseKey: string
   createInputSchema: ZodType
   updateInputSchema: ZodType
+  /** Draft create input — falls back to `createInputSchema` when omitted. */
+  createDraftInputSchema?: ZodType
+  /** Draft update input — falls back to `updateInputSchema` when omitted. */
+  updateDraftInputSchema?: ZodType
   /** Full stored record schema — validates homebrew entities after write. */
   storedSchema: ZodType<T>
+  /** Draft stored record — falls back to `storedSchema` when omitted. */
+  draftStoredSchema?: ZodType
   /** Body-only schema — validates merged system patches before upsert. */
   bodySchema: ZodType
   homebrewModel: Model<unknown>
@@ -80,7 +96,36 @@ export interface ContentWriteConfig<T extends WriteEntityBase> {
   /** Runs after a successful write; may return a parsed/enriched entity for the API response. */
   afterWrite?: (ctx: ContentWriteAfterContext) => Promise<T>
   /** Adds blockers beyond shared character usage resolution (future cross-refs, rule-only blockers). */
-  resolveDeleteBlockers?: (ctx: ContentDeleteContext) => Promise<ContentDeletionBlocker[]>
+  resolveDeleteBlockers?: (ctx: ContentDeleteContext) => Promise<ContentUsageBlocker[]>
+  /** Adds blockers beyond shared character usage resolution for demote guards. */
+  resolveDemoteBlockers?: (ctx: ContentDeleteContext) => Promise<ContentUsageBlocker[]>
   /** When set, replaces default character usage resolution for delete guards. */
-  resolveCharacterUsageBlockers?: (ctx: ContentDeleteContext) => Promise<ContentDeletionBlocker[]>
+  resolveCharacterUsageBlockers?: (ctx: ContentDeleteContext) => Promise<ContentUsageBlocker[]>
+}
+
+/** Selects the create/update input schema for a validation intent. */
+export function resolveWriteInputSchema<T extends WriteEntityBase>(
+  config: ContentWriteConfig<T>,
+  mode: 'create' | 'update',
+  validationIntent: ContentValidationIntent,
+): ZodType {
+  if (validationIntent === 'draft') {
+    if (mode === 'create') {
+      return config.createDraftInputSchema ?? config.createInputSchema
+    }
+    return config.updateDraftInputSchema ?? config.updateInputSchema
+  }
+
+  return mode === 'create' ? config.createInputSchema : config.updateInputSchema
+}
+
+/** Selects the stored record schema for a validation intent. */
+export function resolveStoredSchema<T extends WriteEntityBase>(
+  config: ContentWriteConfig<T>,
+  validationIntent: ContentValidationIntent,
+): ZodType<T> {
+  if (validationIntent === 'draft' && config.draftStoredSchema) {
+    return config.draftStoredSchema as ZodType<T>
+  }
+  return config.storedSchema
 }

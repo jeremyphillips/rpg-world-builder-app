@@ -1,15 +1,19 @@
 import type { Spell } from '@rpg/contracts'
 import {
+  createSpellDraftInputSchema,
   createSpellInputSchema,
   spellBodySchema,
+  spellDraftStoredSchema,
   spellResolutionSchema,
   spellSchema,
+  updateSpellDraftInputSchema,
   updateSpellInputSchema,
 } from '@rpg/contracts'
 
 import type { ContentTypeConfig } from '../lib/content-type-config'
 import type { ContentWriteConfig, HomebrewDoc } from '../lib/content-write-config'
 import type { OverlayPatch } from '../lib/resolve-catalog'
+import { homebrewContentEnvelope } from '../lib/homebrew-envelope'
 import { loadSeedSpells, seedSpellSlugs } from '@rpg/catalog/spells'
 import { spellValidateBeforeWrite } from './spell-write-hooks'
 import { stripNullDeep } from '../lib/strip-null-deep'
@@ -26,24 +30,18 @@ interface SpellPatchRecord {
 function toHomebrewSpell(doc: HomebrewDoc): Spell {
   const record = doc as HomebrewSpellRecord
   return {
-    id: String(record._id),
-    slug: record.slug,
-    rulesetId: record.rulesetId,
-    source: 'homebrew',
-    campaignId: record.campaignId,
-    createdAt: record.createdAt.toISOString(),
-    updatedAt: record.updatedAt.toISOString(),
+    ...homebrewContentEnvelope(record),
     name: record.name,
     ...(record.imageKey !== undefined && { imageKey: record.imageKey }),
     ...(record.description !== undefined && { description: record.description }),
     school: record.school,
-    level: record.level,
-    classIds: record.classIds as Spell['classIds'],
+    ...(record.level != null && { level: record.level }),
+    ...(record.classIds != null && { classIds: record.classIds as Spell['classIds'] }),
     ...(record.tags !== undefined && { tags: record.tags as Spell['tags'] }),
-    castingTime: record.castingTime as Spell['castingTime'],
-    range: record.range as Spell['range'],
-    duration: record.duration as Spell['duration'],
-    components: record.components as Spell['components'],
+    ...(record.castingTime != null && { castingTime: record.castingTime as Spell['castingTime'] }),
+    ...(record.range != null && { range: record.range as Spell['range'] }),
+    ...(record.duration != null && { duration: record.duration as Spell['duration'] }),
+    ...(record.components != null && { components: record.components as Spell['components'] }),
     ...(record.deliveryMethod !== undefined && { deliveryMethod: record.deliveryMethod }),
     ...(record.areaOfEffect !== undefined && {
       areaOfEffect: record.areaOfEffect as Spell['areaOfEffect'],
@@ -89,7 +87,10 @@ export const spellWriteConfig: ContentWriteConfig<Spell> = {
   responseKey: 'spells',
   createInputSchema: createSpellInputSchema,
   updateInputSchema: updateSpellInputSchema,
+  createDraftInputSchema: createSpellDraftInputSchema,
+  updateDraftInputSchema: updateSpellDraftInputSchema,
   storedSchema: spellSchema,
+  draftStoredSchema: spellDraftStoredSchema,
   bodySchema: spellBodySchema,
   homebrewModel: HomebrewSpellModel,
   patchModel: SpellPatchModel,

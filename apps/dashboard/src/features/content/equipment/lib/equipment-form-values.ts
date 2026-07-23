@@ -1,5 +1,6 @@
 import {
   parseSpeedRateString,
+  type ContentValidationIntent,
   type CreateEquipmentInput,
   type Equipment,
   type EquipmentKind,
@@ -45,7 +46,7 @@ function sharedFormValues(entity: Equipment): Pick<
     slug: entity.slug,
     description: entity.description,
     kind: entity.kind,
-    ...costToForm(entity.cost),
+    ...costToForm(entity.cost, entity.kind),
     weight: sharedWeightToForm(entity),
   }
 }
@@ -167,12 +168,14 @@ const kindInputBuilders: Record<EquipmentKind, KindInputBuilder> = {
 export function equipmentFormToInput(
   values: EquipmentFormValues,
   ctx?: ContentFormInputCtx<Equipment>,
+  validationIntent: ContentValidationIntent = 'publish',
 ): CreateEquipmentInput {
   const kind = ctx?.equipmentKind ?? values.kind
   const buildCtx = {
     values: values as EquipmentFormValuesFor<typeof kind>,
     ctx,
     weight: equipmentInputWeight(kind, values),
+    validationIntent,
   } as EquipmentInputBuildCtx<typeof kind>
 
   const input = kindInputBuilders[kind](buildCtx)

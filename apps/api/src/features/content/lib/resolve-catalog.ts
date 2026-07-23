@@ -31,7 +31,8 @@ export function resolveCatalog<T extends Identified>(
 
   const resolvedSystem = system.map((record) => {
     const overlay = patchByTarget.get(record.id)
-    return overlay ? deepMerge(record, overlay.patch, options) : record
+    const merged = overlay ? deepMerge(record, overlay.patch, options) : record
+    return { ...merged, status: 'published' as const }
   })
 
   return [...resolvedSystem, ...homebrew]

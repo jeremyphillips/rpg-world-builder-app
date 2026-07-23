@@ -10,7 +10,9 @@ import { finalizeContentInput } from '../../lib/forms/content-form-key-helpers'
 import { useSpecies, speciesQueryKey } from '../hooks/use-species'
 import {
   buildSpeciesTabs,
+  createSpeciesDraftFormSchema,
   createSpeciesFormSchema,
+  speciesDraftFormSchema,
   speciesFormSchema,
   type SpeciesFormValues,
 } from './species-form-fields'
@@ -24,12 +26,15 @@ const speciesFormDef: ContentFormDef<Species, SpeciesFormValues, CreateSpeciesIn
   routeKey: 'species',
 
   schema: speciesFormSchema,
-  resolveSchema: (ctx) =>
-    createSpeciesFormSchema(
-      allowedCharacterCreatureTypesFromCtx(ctx),
-      ctx.creatureTypeVocabulary?.activeIds,
-      ctx,
-    ),
+  draftSchema: speciesDraftFormSchema,
+  resolveSchema: (ctx, intent = 'publish') =>
+    intent === 'draft'
+      ? createSpeciesDraftFormSchema()
+      : createSpeciesFormSchema(
+          allowedCharacterCreatureTypesFromCtx(ctx),
+          ctx.creatureTypeVocabulary?.activeIds,
+          ctx,
+        ),
   createDefaultValues: speciesCreateDefaultValues,
 
   buildTabs: buildSpeciesTabs,
@@ -37,8 +42,11 @@ const speciesFormDef: ContentFormDef<Species, SpeciesFormValues, CreateSpeciesIn
 
   toFormValues: speciesToFormValues,
 
-  toInput: (values, ctx) =>
-    finalizeContentInput(buildSpeciesCreateInput(values, ctx), ctx) as CreateSpeciesInput,
+  toInput: (values, ctx, validationIntent = 'publish') =>
+    finalizeContentInput(
+      buildSpeciesCreateInput(values, ctx, validationIntent),
+      ctx,
+    ) as CreateSpeciesInput,
 
   useListQuery: useSpecies,
   queryKey: speciesQueryKey,
@@ -51,5 +59,10 @@ const speciesFormDef: ContentFormDef<Species, SpeciesFormValues, CreateSpeciesIn
 
 contentFormRegistry['species'] = speciesFormDef
 
-export { speciesFormDef, createSpeciesFormSchema }
+export {
+  speciesFormDef,
+  createSpeciesFormSchema,
+  createSpeciesDraftFormSchema,
+  speciesDraftFormSchema,
+}
 export type { SpeciesFormValues }

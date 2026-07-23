@@ -12,7 +12,7 @@ export const contentUsageReferenceSchema = z.object({
 
 export type ContentUsageReference = z.infer<typeof contentUsageReferenceSchema>
 
-export const contentDeletionBlockerSchema = z.discriminatedUnion('kind', [
+export const contentUsageBlockerSchema = z.discriminatedUnion('kind', [
   z.object({
     kind: z.literal('usage'),
     usage: contentUsageReferenceSchema,
@@ -24,14 +24,14 @@ export const contentDeletionBlockerSchema = z.discriminatedUnion('kind', [
   }),
 ])
 
-export type ContentDeletionBlocker = z.infer<typeof contentDeletionBlockerSchema>
+export type ContentUsageBlocker = z.infer<typeof contentUsageBlockerSchema>
 
 /** Advisory preflight — GET only; not a lock or permission grant. */
 export const contentDeletionAvailabilitySchema = z.discriminatedUnion('status', [
   z.object({ status: z.literal('allowed') }),
   z.object({
     status: z.literal('blocked'),
-    blockers: z.array(contentDeletionBlockerSchema),
+    blockers: z.array(contentUsageBlockerSchema),
   }),
 ])
 
@@ -42,8 +42,30 @@ export const contentDeletionResultSchema = z.discriminatedUnion('status', [
   z.object({ status: z.literal('deleted') }),
   z.object({
     status: z.literal('blocked'),
-    blockers: z.array(contentDeletionBlockerSchema),
+    blockers: z.array(contentUsageBlockerSchema),
   }),
 ])
 
 export type ContentDeletionResult = z.infer<typeof contentDeletionResultSchema>
+
+/** Advisory preflight for demote UX — always re-validated on POST demote. */
+export const contentDemotionAvailabilitySchema = z.discriminatedUnion('status', [
+  z.object({ status: z.literal('allowed') }),
+  z.object({
+    status: z.literal('blocked'),
+    blockers: z.array(contentUsageBlockerSchema),
+  }),
+])
+
+export type ContentDemotionAvailability = z.infer<typeof contentDemotionAvailabilitySchema>
+
+/** Authoritative demote outcome — returned on success (200) or blocked race (409). */
+export const contentDemotionResultSchema = z.discriminatedUnion('status', [
+  z.object({ status: z.literal('demoted') }),
+  z.object({
+    status: z.literal('blocked'),
+    blockers: z.array(contentUsageBlockerSchema),
+  }),
+])
+
+export type ContentDemotionResult = z.infer<typeof contentDemotionResultSchema>

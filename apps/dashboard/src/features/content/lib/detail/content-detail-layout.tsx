@@ -37,6 +37,8 @@ function ContentDetailStatRows({ statRows }: { statRows: ContentStatRowData[] })
 export type ContentDetailLayoutProps = {
   /** Content item display name — rendered as the hero heading. */
   name: string
+  /** Optional badge rendered beside the hero heading (e.g. draft status). */
+  nameBadge?: ReactNode
   /** Resolved artwork URL for the content item. */
   imageUrl: string
   /** Accessible name for the image (e.g. the content item's name). */
@@ -66,6 +68,7 @@ export type ContentDetailLayoutProps = {
  */
 export function ContentDetailLayout({
   name,
+  nameBadge,
   imageUrl,
   imageName,
   campaignId,
@@ -97,9 +100,12 @@ export function ContentDetailLayout({
         <CardContent className={contentDetailHeroCardContentClasses}>
           <div className={contentDetailHeroGridClasses}>
             <div className={contentDetailHeroMainClasses}>
-              <Heading variant="display" as="h1">
-                {name}
-              </Heading>
+              <div className="flex flex-wrap items-center gap-3">
+                <Heading variant="display" as="h1">
+                  {name}
+                </Heading>
+                {nameBadge}
+              </div>
               {heroMetadata}
             </div>
             <div>

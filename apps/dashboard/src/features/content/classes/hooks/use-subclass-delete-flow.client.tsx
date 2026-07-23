@@ -2,7 +2,7 @@
 
 import { useCallback, useState } from 'react'
 import { ConfirmDialog } from '@rpg/ui'
-import type { ContentDeletionBlocker } from '@rpg/contracts'
+import type { ContentUsageBlocker } from '@rpg/contracts'
 import { getErrorMessage } from '@rpg/contracts'
 
 import { ContentDeletionBlockedDialog } from '../../lib/delete/content-deletion-blocked-dialog.client'
@@ -25,7 +25,7 @@ export function useSubclassDeleteFlow({
   const [checkingAvailability, setCheckingAvailability] = useState(false)
   const [confirmOpen, setConfirmOpen] = useState(false)
   const [blockedOpen, setBlockedOpen] = useState(false)
-  const [blockers, setBlockers] = useState<ContentDeletionBlocker[]>([])
+  const [blockers, setBlockers] = useState<ContentUsageBlocker[]>([])
   const [deleteError, setDeleteError] = useState<string | null>(null)
   const [pendingDelete, setPendingDelete] = useState<{ id: string; name: string } | null>(null)
 

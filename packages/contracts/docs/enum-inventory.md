@@ -111,6 +111,7 @@ Spell resolution closed sets (`content/spell/resolution/vocab.ts`) also define
 | `contentTraitKindSchema` (`custom`, `grant`)     | `content/lib/grants.ts`                 | yes          | no                | local-exempt |
 | `contentGrantSchema` `kind` literals             | `content/lib/grants.ts`                 | yes          | no                | local-exempt |
 | `contentSourceSchema` (`system`, `homebrew`)     | `content/lib/envelope.ts`               | yes          | no                | local-exempt |
+| `contentStatusSchema` (`draft`, `published`)     | `content/lib/envelope.ts`               | yes          | no                | local-exempt |
 | `equipmentModifierKindSchema`                    | `content/equipment/modifier.ts`         | yes          | no                | local-exempt |
 | `speciesMulticlassPolicySchema`                  | `content/species-character-creation.ts` | yes          | no                | local-exempt |
 | `speciesClassPolicyModeSchema`                   | `content/species-character-creation.ts` | yes          | no                | local-exempt |

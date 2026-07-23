@@ -3,7 +3,7 @@ import { ApiError, fetchCsrfToken } from '@rpg/contracts'
 export const CSRF_HEADER = 'x-csrf-token'
 
 interface ErrorBody {
-  error?: { code?: string; message?: string }
+  error?: { code?: string; message?: string; details?: unknown }
 }
 
 const DEFAULT_ERROR_MESSAGE = 'Something went wrong. Please try again.'
@@ -25,6 +25,7 @@ export async function request<T>(
       res.status,
       data?.error?.code ?? 'request_error',
       data?.error?.message ?? fallbackMessage,
+      data?.error?.details,
     )
   }
   return data as T

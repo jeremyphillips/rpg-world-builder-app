@@ -20,6 +20,7 @@ import {
 } from '@/features/homebrew'
 import { useSpells } from '../hooks/use-spells'
 import { ContentDetailLayout } from '../../lib/detail/content-detail-layout'
+import { ContentStatusNameBadge } from '../../lib/overview/content-status-name-badge.client'
 import { ContentDetailResolver } from '../../lib/detail/content-detail-resolver'
 import { contentEditHref } from '../../lib/detail/content-edit-href'
 import { getContentImageUrl } from '../../lib/detail/content-image-url'
@@ -194,6 +195,7 @@ export function SpellDetailContent({ spell, campaignId }: SpellDetailContentProp
     <WidePage>
       <ContentDetailLayout
         name={spell.name}
+        nameBadge={<ContentStatusNameBadge status={spell.status} />}
         imageUrl={getContentImageUrl(spell.imageKey)}
         imageName={spell.name}
         campaignId={campaignId}

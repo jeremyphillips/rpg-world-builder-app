@@ -1,15 +1,14 @@
-import {
-  createEquipmentInputSchema,
-  type AdventuringGearEquipment,
-  type CreateEquipmentInput,
-} from '@rpg/contracts'
+import { type AdventuringGearEquipment, type CreateEquipmentInput } from '@rpg/contracts'
 
 import {
   equipmentInputBase,
+  parseEquipmentCreateInput,
   type EquipmentInputBuildCtx,
 } from '../../lib/equipment-form-values-base'
 import { parseNewlineList } from '../../lib/parse-newline-list'
 import type { AdventuringGearEquipmentFormValues } from '../../lib/equipment-form-fields'
+
+type AdventuringGearInput = Extract<CreateEquipmentInput, { kind: 'adventuring_gear' }>
 
 /** Joins mechanical property lines for the unified equipment form textarea. */
 export function formatPropertiesText(items: string[] | undefined): string | undefined {
@@ -41,25 +40,47 @@ export function adventuringGearFormValuesFromEntity(
   }
 }
 
+function optionalGearKind(
+  values: EquipmentInputBuildCtx<'adventuring_gear'>['values'],
+  isDraft: boolean,
+): Partial<AdventuringGearInput> {
+  if (values.gearKind) return { gearKind: values.gearKind }
+  if (isDraft) return {}
+  return { gearKind: 'general' }
+}
+
+function optionalAdventuringGearFields(
+  values: EquipmentInputBuildCtx<'adventuring_gear'>['values'],
+): Partial<AdventuringGearInput> {
+  const properties = parseNewlineList(values.propertiesText)
+  return {
+    ...(values.spellcastingGearKind && { spellcastingGearKind: values.spellcastingGearKind }),
+    ...(values.bundleSize !== undefined && { bundleSize: values.bundleSize }),
+    ...(values.storage && { storage: values.storage }),
+    ...(properties && { properties }),
+    ...(values.capacity && { capacity: values.capacity }),
+    ...(values.holySymbolUsage?.length && { holySymbolUsage: values.holySymbolUsage }),
+    ...(values.alsoWeaponSlug && { alsoWeaponSlug: values.alsoWeaponSlug }),
+  }
+}
+
 /** Maps adventuring gear form values to a create/update API input fragment. */
 export function buildAdventuringGearInput({
   values,
   ctx,
   weight,
+  validationIntent = 'publish',
 }: EquipmentInputBuildCtx<'adventuring_gear'>): CreateEquipmentInput {
-  return createEquipmentInputSchema.parse({
-    ...equipmentInputBase(values, ctx),
-    kind: 'adventuring_gear',
-    gearKind: values.gearKind ?? 'general',
-    ...(values.spellcastingGearKind && { spellcastingGearKind: values.spellcastingGearKind }),
-    ...(weight && { weight }),
-    ...(values.bundleSize !== undefined && { bundleSize: values.bundleSize }),
-    ...(values.storage && { storage: values.storage }),
-    ...(parseNewlineList(values.propertiesText) && {
-      properties: parseNewlineList(values.propertiesText),
-    }),
-    ...(values.capacity && { capacity: values.capacity }),
-    ...(values.holySymbolUsage?.length && { holySymbolUsage: values.holySymbolUsage }),
-    ...(values.alsoWeaponSlug && { alsoWeaponSlug: values.alsoWeaponSlug }),
-  })
+  const isDraft = validationIntent === 'draft'
+
+  return parseEquipmentCreateInput(
+    {
+      ...equipmentInputBase(values, ctx, validationIntent),
+      kind: 'adventuring_gear',
+      ...optionalGearKind(values, isDraft),
+      ...(weight && { weight }),
+      ...optionalAdventuringGearFields(values),
+    },
+    validationIntent,
+  )
 }

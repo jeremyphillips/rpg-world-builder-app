@@ -1,5 +1,4 @@
 import {
-  createEquipmentInputSchema,
   type CreateEquipmentInput,
   type ServiceDuration,
   type ServiceDurationUnit,
@@ -8,6 +7,7 @@ import {
 
 import {
   equipmentInputBase,
+  parseEquipmentCreateInput,
   type EquipmentInputBuildCtx,
 } from '../../lib/equipment-form-values-base'
 import type { ServiceEquipmentFormValues } from '../../lib/equipment-form-fields'
@@ -41,14 +41,23 @@ export function serviceFormValuesFromEntity(
 export function buildServiceInput({
   values,
   ctx,
+  validationIntent = 'publish',
 }: EquipmentInputBuildCtx<'service'>): CreateEquipmentInput {
   const duration = durationFromForm(values.duration)
+  const isDraft = validationIntent === 'draft'
 
-  return createEquipmentInputSchema.parse({
-    ...equipmentInputBase(values, ctx),
-    kind: 'service',
-    serviceCategory: values.serviceCategory ?? 'other',
-    ...(duration && { duration }),
-    ...(values.notes && { notes: values.notes }),
-  })
+  return parseEquipmentCreateInput(
+    {
+      ...equipmentInputBase(values, ctx, validationIntent),
+      kind: 'service',
+      ...(values.serviceCategory
+        ? { serviceCategory: values.serviceCategory }
+        : isDraft
+          ? {}
+          : { serviceCategory: 'other' as const }),
+      ...(duration && { duration }),
+      ...(values.notes && { notes: values.notes }),
+    },
+    validationIntent,
+  )
 }

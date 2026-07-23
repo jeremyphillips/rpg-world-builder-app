@@ -80,6 +80,11 @@ export const proficienciesFormSchema = z.object({
   }),
 })
 
+/** Draft proficiencies form schema — saving throws may be empty while authoring. */
+export const proficienciesDraftFormSchema = proficienciesFormSchema.extend({
+  savingThrows: z.array(abilitySchema).max(2).default([]),
+})
+
 function visibleWhenWeaponCategories(): FieldVisibility {
   return {
     dependsOn: ['weaponProficiencyMode'],

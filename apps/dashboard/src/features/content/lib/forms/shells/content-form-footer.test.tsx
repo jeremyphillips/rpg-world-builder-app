@@ -84,8 +84,37 @@ describe('ContentFormFooter', () => {
 
     expect(screen.getByRole('button', { name: 'Cancel' })).toBeInTheDocument()
     await waitFor(() => {
-      expect(screen.getByRole('button', { name: 'Create spell' })).toBeEnabled()
+      expect(screen.getByRole('button', { name: 'Publish' })).toBeEnabled()
     })
+  })
+
+  it('renders Save draft when onSaveDraft is provided', async () => {
+    renderWithDataRouter([
+      {
+        path: '/',
+        element: (
+          <Form<CreateValues>
+            schema={createSchema}
+            fields={createFields}
+            defaultValues={{ name: 'Fireball' }}
+            onSubmit={vi.fn()}
+            stickyFooter
+            footer={(form) => (
+              <ContentFormFooter
+                mode="create"
+                form={form}
+                backHref="/overview"
+                submitLabel="Create spell"
+                pending={false}
+                onSaveDraft={vi.fn()}
+              />
+            )}
+          />
+        ),
+      },
+    ])
+
+    expect(screen.getByRole('button', { name: 'Save draft' })).toBeInTheDocument()
   })
 
   it('does not call form.trigger on create mount', async () => {
@@ -117,7 +146,7 @@ describe('ContentFormFooter', () => {
     ])
 
     await waitFor(() => {
-      expect(screen.getByRole('button', { name: 'Create spell' })).toBeEnabled()
+      expect(screen.getByRole('button', { name: 'Publish' })).toBeEnabled()
     })
     expect(triggerSpy).not.toHaveBeenCalled()
   })
@@ -126,7 +155,7 @@ describe('ContentFormFooter', () => {
     renderCreateFooter({ defaultValues: { name: '' } })
 
     await waitFor(() => {
-      expect(screen.getByRole('button', { name: 'Create spell' })).toBeEnabled()
+      expect(screen.getByRole('button', { name: 'Publish' })).toBeEnabled()
     })
   })
 
@@ -134,7 +163,7 @@ describe('ContentFormFooter', () => {
     renderCreateFooter({ pending: true })
 
     expect(screen.getByRole('button', { name: 'Cancel' })).toBeDisabled()
-    expect(screen.getByRole('button', { name: 'Creating…' })).toBeDisabled()
+    expect(screen.getByRole('button', { name: 'Publishing…' })).toBeDisabled()
   })
 
   it('renders Discard changes disabled until the form is dirty', async () => {

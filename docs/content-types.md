@@ -246,14 +246,16 @@ Catalog records carry three distinct identifier layers. Authors edit **display n
 
 Shared helpers: `packages/contracts/src/rpg/content/lib/content-key.ts` (`deriveContentKey`, `assignStableContentIds`, `assertStableContentIds`). Dashboard forms use `apps/dashboard/src/features/content/lib/forms/content-form-key-helpers.ts`; the API normalizes writes in `apps/api/src/features/content/lib/apply-content-keys.ts` before Zod validation.
 
-**Today:** “publish” means the first successful homebrew **POST**. There is no draft workflow yet; records created under this rule remain locked.
+**Today:** homebrew records carry `status: 'draft' | 'published'` on the content envelope. Campaign managers (`owner`/`co-owner`) create with **Save draft** or **Publish**, promote drafts from the edit shell, and demote published homebrew when no active characters reference it. Non-managers receive only published records from list endpoints; slug assignment still happens on first POST (draft included).
+
+**Validation intent:** authoring uses a wire-level `ContentValidationIntent` (`draft` | `publish`) that is distinct from persisted `ContentStatus`. Save Draft and edit-save on draft entities validate against relaxed `*Draft*` schema families in `@rpg/contracts`; Publish, edit-save on published entities, and promote re-validate against the publish-complete schemas. Types without registered draft schemas fall back to today's publish schemas for both intents until their phase lands. Shared helpers live in `packages/contracts/src/rpg/content/lib/content-validation-intent.ts`, `draft-authored-content.ts`, and `content-input-schemas.ts`; the API selects input/stored schemas via `resolveWriteInputSchema` / `resolveStoredSchema` in `content-write-config.ts`.
 
 ### Known gaps (revisit later)
 
 - **Cross-catalog slug references** — Some fields still store class **slugs**, not opaque ids (e.g. `spell.classIds`, skill slugs in `characterCreation.proficiencies.skills.choices[].from`). Locking a target’s slug does not break these while the slug stays unchanged; deleting and re-creating content under a new slug **will** break slug-based refs. No cascade migration exists.
 - **Character model** — Not built yet. When added, characters should reference catalog records by envelope **`id`**, not slug or nested trait id, unless tracking per-feature state requires `(classId, featureId)`.
 - **Delete + re-add** — Removing a nested trait/feature and adding a “new” row with the same display name gets a fresh derived id. Any future character state keyed by nested ids would not carry over.
-- **Draft → publish** — A future draft state may defer slug assignment until publish. Existing homebrew created today is already published/locked; migration should not be required.
+- **Subclass lifecycle** — Subclasses inherit the envelope field structurally but promote/demote, draft list filtering, and lifecycle UI are deferred until the nested class editor save flow stabilizes.
 - **Sibling uniqueness errors** — Duplicate derived slugs within a campaign surface as API `409 slug_conflict`. Nested id collisions within a parent are deduped (`darkvision-2`); friendly form validation is not yet surfaced.
 - **Manual slug override** — Intentionally unsupported. Re-enabling would need an explicit admin/rename flow with reference counts, not silent PATCH.
 

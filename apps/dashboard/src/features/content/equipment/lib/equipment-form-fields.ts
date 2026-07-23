@@ -27,6 +27,7 @@ import {
   weaponMasterySchema,
   weaponModeSchema,
   weaponPropertySchema,
+  type ContentValidationIntent,
   type EquipmentKind,
 } from '@rpg/contracts'
 import { toOptions, type FormItem } from '@rpg/ui/form'
@@ -34,6 +35,7 @@ import { toOptions, type FormItem } from '@rpg/ui/form'
 import { economyFields } from '../../lib/forms/fields/content-economy-form-fields'
 import { descriptionField, nameField } from '../../lib/forms/fields/content-identity-form-fields'
 import type { ContentFormCtx } from '../../lib/forms/content-form-registry'
+import { draftOptionalSelect } from '../../lib/forms/draft-form-schema-helpers'
 import { rollFormObjectSchema } from '../../lib/forms/mechanics/roll-form-values'
 import {
   allRegisteredKindFieldGroups,
@@ -201,6 +203,135 @@ export const magicItemEquipmentFormSchema = physicalEquipmentBaseFormSchema.exte
   baseEquipmentId: z.string().optional(),
 })
 
+/** Identity + economy fields only — no weight, no kind discriminant. */
+const equipmentIdentityEconomyDraftFormSchema = z.object({
+  name: z.string(),
+  slug: slugSchema.optional(),
+  description: z.string().optional(),
+  hasMarketPrice: z.boolean(),
+  cost: equipmentCostFormValueSchema,
+})
+
+/** Physical kinds share optional weight on top of identity/economy. */
+const physicalEquipmentBaseDraftFormSchema = equipmentIdentityEconomyDraftFormSchema.extend({
+  weight: equipmentWeightFormSchema,
+})
+
+/** Weapon draft form schema — relaxed fields for Save Draft. */
+export const weaponEquipmentDraftFormSchema = physicalEquipmentBaseDraftFormSchema.extend({
+  kind: z.literal('weapon'),
+  category: draftOptionalSelect(weaponCategorySchema),
+  mode: draftOptionalSelect(weaponModeSchema),
+  mastery: draftOptionalSelect(weaponMasterySchema),
+  properties: z.array(weaponPropertySchema).optional(),
+  hasDamage: z.boolean().optional(),
+  damage: rollFormObjectSchema.optional(),
+  damageType: draftOptionalSelect(weaponDamageTypeSchema),
+  versatileDamage: diceSchema.optional(),
+  rangeNormal: z.coerce.number().int().min(0).optional(),
+  rangeLong: z.coerce.number().int().min(0).optional(),
+  specialRules: z.string().optional(),
+})
+
+/** Armor draft form schema — relaxed fields for Save Draft. */
+export const armorEquipmentDraftFormSchema = physicalEquipmentBaseDraftFormSchema.extend({
+  kind: z.literal('armor'),
+  armorCategory: draftOptionalSelect(armorCategorySchema),
+  material: draftOptionalSelect(armorMaterialSchema),
+  baseAc: z.coerce.number().int().optional(),
+  acBonus: z.coerce.number().int().optional(),
+  addDexModifier: z.boolean().optional(),
+  maxDexBonus: z.coerce.number().int().optional(),
+  stealthDisadvantage: z.boolean().optional(),
+  strengthRequirement: z.coerce
+    .number()
+    .int()
+    .min(ABILITY_SCORE_MIN)
+    .max(ABILITY_SCORE_MAX)
+    .optional(),
+})
+
+/** Adventuring gear draft form schema. */
+export const adventuringGearEquipmentDraftFormSchema = physicalEquipmentBaseDraftFormSchema.extend({
+  kind: z.literal('adventuring_gear'),
+  gearKind: draftOptionalSelect(gearKindSchema),
+  spellcastingGearKind: draftOptionalSelect(spellcastingGearKindSchema),
+  bundleSize: z.coerce.number().int().min(1).optional(),
+  storage: z.string().optional(),
+  propertiesText: z.string().optional(),
+  capacity: z.string().optional(),
+  holySymbolUsage: z.array(holySymbolUsageSchema).optional(),
+  alsoWeaponSlug: slugSchema.optional(),
+})
+
+/** Tool draft form schema. */
+export const toolEquipmentDraftFormSchema = physicalEquipmentBaseDraftFormSchema.extend({
+  kind: z.literal('tool'),
+  toolCategory: draftOptionalSelect(toolCategorySchema),
+  ability: draftOptionalSelect(abilitySchema),
+  utilizes: z.array(toolUtilizeActionSchema).optional(),
+  craftsText: z.string().optional(),
+})
+
+/** Mount draft form schema. */
+export const mountEquipmentDraftFormSchema = physicalEquipmentBaseDraftFormSchema.extend({
+  kind: z.literal('mount'),
+  carryingCapacity: equipmentMountCarryingCapacityFormSchema.optional(),
+  speed: equipmentSpeedFormSchema.optional(),
+})
+
+/** Vehicle draft form schema. */
+export const vehicleEquipmentDraftFormSchema = physicalEquipmentBaseDraftFormSchema.extend({
+  kind: z.literal('vehicle'),
+  vehicleCategory: draftOptionalSelect(vehicleCategorySchema),
+  cargoCapacity: z
+    .object({
+      value: z.coerce.number().min(0).optional(),
+      unit: draftOptionalSelect(massUnitSchema),
+    })
+    .optional(),
+  crew: z.coerce.number().int().min(0).optional(),
+  passengers: z.coerce.number().int().min(0).optional(),
+  ac: z.coerce.number().int().min(0).optional(),
+  hp: z.coerce.number().int().min(0).optional(),
+  damageThreshold: z.coerce.number().int().min(0).optional(),
+  speed: equipmentSpeedFormSchema.optional(),
+})
+
+/** Service draft form schema. */
+export const serviceEquipmentDraftFormSchema = equipmentIdentityEconomyDraftFormSchema.extend({
+  kind: z.literal('service'),
+  serviceCategory: draftOptionalSelect(serviceCategorySchema),
+  duration: z
+    .object({
+      value: z.coerce.number().int().min(1).optional(),
+      unit: draftOptionalSelect(serviceDurationUnitSchema),
+    })
+    .optional(),
+  notes: z.string().optional(),
+})
+
+/** Magic item draft form schema. */
+export const magicItemEquipmentDraftFormSchema = physicalEquipmentBaseDraftFormSchema.extend({
+  kind: z.literal('magic_item'),
+  rarity: draftOptionalSelect(magicItemRaritySchema),
+  requiresAttunement: z.boolean().optional(),
+  attunementRequirement: z.string().optional(),
+  magicItemCategory: draftOptionalSelect(magicItemCategorySchema),
+  baseEquipmentId: z.string().optional(),
+})
+
+export const equipmentKindScopedDraftFormSchema = z.discriminatedUnion('kind', [
+  weaponEquipmentDraftFormSchema,
+  armorEquipmentDraftFormSchema,
+  adventuringGearEquipmentDraftFormSchema,
+  toolEquipmentDraftFormSchema,
+  mountEquipmentDraftFormSchema,
+  vehicleEquipmentDraftFormSchema,
+  serviceEquipmentDraftFormSchema,
+  magicItemEquipmentDraftFormSchema,
+])
+
 export const equipmentKindScopedFormSchema = z.discriminatedUnion('kind', [
   weaponEquipmentFormSchema,
   armorEquipmentFormSchema,
@@ -239,11 +370,30 @@ const kindSchemas: Record<EquipmentKind, z.ZodTypeAny> = {
   magic_item: magicItemEquipmentFormSchema,
 }
 
-/** Kind-specific schema for family create/edit routes; falls back to the unscoped hub schema. */
-export function resolveEquipmentFormSchema(ctx: ContentFormCtx): z.ZodType<EquipmentFormValues> {
-  if (!ctx.equipmentKind) return equipmentFormSchema as z.ZodType<EquipmentFormValues>
+const kindDraftSchemas: Record<EquipmentKind, z.ZodTypeAny> = {
+  weapon: weaponEquipmentDraftFormSchema,
+  armor: armorEquipmentDraftFormSchema,
+  adventuring_gear: adventuringGearEquipmentDraftFormSchema,
+  tool: toolEquipmentDraftFormSchema,
+  mount: mountEquipmentDraftFormSchema,
+  vehicle: vehicleEquipmentDraftFormSchema,
+  service: serviceEquipmentDraftFormSchema,
+  magic_item: magicItemEquipmentDraftFormSchema,
+}
 
-  const kindSchema = kindSchemas[ctx.equipmentKind]
+/** Kind-specific schema for family create/edit routes; falls back to the unscoped hub schema. */
+export function resolveEquipmentFormSchema(
+  ctx: ContentFormCtx,
+  validationIntent: ContentValidationIntent = 'publish',
+): z.ZodType<EquipmentFormValues> {
+  if (!ctx.equipmentKind) {
+    return (
+      validationIntent === 'draft' ? equipmentFormDraftSchema : equipmentFormSchema
+    ) as z.ZodType<EquipmentFormValues>
+  }
+
+  const schemas = validationIntent === 'draft' ? kindDraftSchemas : kindSchemas
+  const kindSchema = schemas[ctx.equipmentKind]
   const equipmentKind = ctx.equipmentKind
   return z.preprocess((value) => {
     if (typeof value !== 'object' || value === null) return value
@@ -346,6 +496,82 @@ export const equipmentFormSchema = z
       .optional(),
   })
   .superRefine(refineEquipmentEconomyForm)
+
+/**
+ * Unscoped hub draft schema — relaxed identity/economy for Save Draft on the equipment hub.
+ */
+export const equipmentFormDraftSchema = z.object({
+  name: z.string(),
+  slug: slugSchema.optional(),
+  description: z.string().optional(),
+  kind: equipmentKindSchema,
+  hasMarketPrice: z.boolean(),
+  cost: equipmentCostFormValueSchema,
+  weight: equipmentWeightFormSchema,
+  gearKind: draftOptionalSelect(gearKindSchema),
+  spellcastingGearKind: draftOptionalSelect(spellcastingGearKindSchema),
+  bundleSize: z.coerce.number().int().min(1).optional(),
+  storage: z.string().optional(),
+  propertiesText: z.string().optional(),
+  capacity: z.string().optional(),
+  holySymbolUsage: z.array(holySymbolUsageSchema).optional(),
+  alsoWeaponSlug: slugSchema.optional(),
+  toolCategory: draftOptionalSelect(toolCategorySchema),
+  ability: draftOptionalSelect(abilitySchema),
+  utilizes: z.array(toolUtilizeActionSchema).optional(),
+  craftsText: z.string().optional(),
+  carryingCapacity: equipmentMountCarryingCapacityFormSchema.optional(),
+  speed: equipmentSpeedFormSchema.optional(),
+  vehicleCategory: draftOptionalSelect(vehicleCategorySchema),
+  cargoCapacity: z
+    .object({
+      value: z.coerce.number().min(0).optional(),
+      unit: draftOptionalSelect(massUnitSchema),
+    })
+    .optional(),
+  crew: z.coerce.number().int().min(0).optional(),
+  passengers: z.coerce.number().int().min(0).optional(),
+  ac: z.coerce.number().int().min(0).optional(),
+  hp: z.coerce.number().int().min(0).optional(),
+  damageThreshold: z.coerce.number().int().min(0).optional(),
+  serviceCategory: draftOptionalSelect(serviceCategorySchema),
+  duration: z
+    .object({
+      value: z.coerce.number().int().min(1).optional(),
+      unit: draftOptionalSelect(serviceDurationUnitSchema),
+    })
+    .optional(),
+  notes: z.string().optional(),
+  rarity: draftOptionalSelect(magicItemRaritySchema),
+  requiresAttunement: z.boolean().optional(),
+  attunementRequirement: z.string().optional(),
+  magicItemCategory: draftOptionalSelect(magicItemCategorySchema),
+  baseEquipmentId: z.string().optional(),
+  category: draftOptionalSelect(weaponCategorySchema),
+  mode: draftOptionalSelect(weaponModeSchema),
+  hasDamage: z.boolean().optional(),
+  damage: rollFormObjectSchema.optional(),
+  damageType: draftOptionalSelect(weaponDamageTypeSchema),
+  versatileDamage: diceSchema.optional(),
+  properties: z.array(weaponPropertySchema).optional(),
+  mastery: draftOptionalSelect(weaponMasterySchema),
+  rangeNormal: z.coerce.number().int().min(0).optional(),
+  rangeLong: z.coerce.number().int().min(0).optional(),
+  specialRules: z.string().optional(),
+  armorCategory: draftOptionalSelect(armorCategorySchema),
+  material: draftOptionalSelect(armorMaterialSchema),
+  baseAc: z.coerce.number().int().optional(),
+  acBonus: z.coerce.number().int().optional(),
+  addDexModifier: z.boolean().optional(),
+  maxDexBonus: z.coerce.number().int().optional(),
+  stealthDisadvantage: z.boolean().optional(),
+  strengthRequirement: z.coerce
+    .number()
+    .int()
+    .min(ABILITY_SCORE_MIN)
+    .max(ABILITY_SCORE_MAX)
+    .optional(),
+})
 
 function economyGroup(ctx?: ContentFormCtx): FormItem {
   return {

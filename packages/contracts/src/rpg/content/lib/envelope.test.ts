@@ -2,10 +2,12 @@ import { describe, expect, it } from 'vitest'
 import { authoredContentBodySchema } from '../../primitives/authored-content'
 import {
   CONTENT_SOURCES,
+  CONTENT_STATUSES,
   contentBodyBaseSchema,
   contentMetaSchema,
   contentPatchBaseSchema,
   contentSourceSchema,
+  contentStatusSchema,
   slugSchema,
 } from './envelope'
 
@@ -14,6 +16,7 @@ const systemMeta = {
   slug: 'fighter',
   rulesetId: 'srd-cc-5.2.1',
   source: 'system',
+  status: 'published',
   campaignId: null,
   createdAt: '2026-01-01T00:00:00.000Z',
   updatedAt: '2026-01-01T00:00:00.000Z',
@@ -52,14 +55,30 @@ describe('slugSchema', () => {
   })
 })
 
+describe('contentStatusSchema', () => {
+  it('accepts every known status', () => {
+    for (const status of CONTENT_STATUSES) {
+      expect(contentStatusSchema.parse(status)).toBe(status)
+    }
+  })
+
+  it('rejects unknown statuses', () => {
+    expect(contentStatusSchema.safeParse('archived').success).toBe(false)
+  })
+})
+
 describe('contentMetaSchema', () => {
   it('accepts a system record with a null campaignId', () => {
-    expect(contentMetaSchema.parse(systemMeta)).toEqual(systemMeta)
+    expect(contentMetaSchema.parse(systemMeta)).toEqual({ ...systemMeta, status: 'published' })
   })
 
   it('accepts a homebrew record with a campaignId', () => {
     const homebrew = { ...systemMeta, source: 'homebrew', campaignId: 'camp_123' }
-    expect(contentMetaSchema.parse(homebrew)).toEqual(homebrew)
+    expect(contentMetaSchema.parse(homebrew)).toEqual({ ...homebrew, status: 'published' })
+  })
+
+  it('defaults status to published when omitted', () => {
+    expect(contentMetaSchema.parse(systemMeta).status).toBe('published')
   })
 
   it('rejects an invalid slug or ruleset', () => {

@@ -14,6 +14,7 @@ import {
   getMovementOperationAuthoringLabel,
   movementGrantPayloadSchema,
   movementModeSchema,
+  movementSpeedsDraftSchema,
   movementSpeedsSchema,
   resolveCreatureMovement,
 } from './movement-mode'
@@ -56,6 +57,17 @@ describe('movementSpeedsSchema', () => {
 
   it('rejects unknown mode keys', () => {
     expect(movementSpeedsSchema.safeParse({ teleport: 30 }).success).toBe(false)
+  })
+})
+
+describe('movementSpeedsDraftSchema', () => {
+  it('accepts an empty movement map', () => {
+    expect(movementSpeedsDraftSchema.parse({})).toEqual({})
+  })
+
+  it('still validates mode keys when present', () => {
+    expect(movementSpeedsDraftSchema.parse({ walk: 30 })).toEqual({ walk: 30 })
+    expect(movementSpeedsDraftSchema.safeParse({ teleport: 30 }).success).toBe(false)
   })
 })
 

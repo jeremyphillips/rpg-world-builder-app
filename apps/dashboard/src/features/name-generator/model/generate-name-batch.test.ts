@@ -15,6 +15,7 @@ const ELF_SPECIES = {
   slug: 'elf',
   name: 'Elf',
   source: 'system' as const,
+  status: 'published',
   culture: {
     id: 'elven',
     name: 'Elven',
@@ -28,6 +29,7 @@ const ORC_SPECIES = {
   slug: 'orc',
   name: 'Orc',
   source: 'system' as const,
+  status: 'published',
   culture: {
     naming: { supported: true },
   },

@@ -47,6 +47,7 @@ describe('applySubclassFormEdits', () => {
       id: 'sub-1',
       classId: 'class-1',
       source: 'homebrew' as const,
+      status: 'published',
       name: 'Champion',
       slug: 'champion',
       features: [],

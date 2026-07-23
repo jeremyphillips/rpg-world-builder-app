@@ -8,9 +8,12 @@ import {
   spellDurationSchema,
   spellRangeSchema,
   spellTagsSchema,
+  createSpellDraftInputSchema,
   createSpellInputSchema,
   spellDeliveryMethodSchema,
+  updateSpellDraftInputSchema,
   updateSpellInputSchema,
+  type ContentValidationIntent,
   type CreateSpellInput,
   type Distance,
   type Spell,
@@ -416,12 +419,20 @@ export function spellToFormValues(entity: Spell): SpellFormValues {
     cantripScaling: entity.cantripScaling,
     higherLevelSlotEffect: entity.higherLevelSlotEffect,
     school: entity.school,
-    level: entity.level,
-    classIds: entity.classIds,
-    castingTime: spellCastingTimeToFormValues(entity.castingTime),
-    range: spellRangeToFormValues(entity.range),
-    duration: spellDurationToFormValues(entity.duration),
-    components: spellComponentsToFormValues(entity.components),
+    ...(entity.level !== undefined ? { level: entity.level } : {}),
+    classIds: entity.classIds ?? [],
+    ...(entity.castingTime
+      ? { castingTime: spellCastingTimeToFormValues(entity.castingTime) }
+      : { castingTime: spellCreateDefaultValues.castingTime! }),
+    ...(entity.range
+      ? { range: spellRangeToFormValues(entity.range) }
+      : { range: spellCreateDefaultValues.range! }),
+    ...(entity.duration
+      ? { duration: spellDurationToFormValues(entity.duration) }
+      : { duration: spellCreateDefaultValues.duration! }),
+    ...(entity.components
+      ? { components: spellComponentsToFormValues(entity.components) }
+      : { components: spellCreateDefaultValues.components! }),
     tags: spellTagsToFormValues(entity.tags),
     areaOfEffect: spellAreaOfEffectToFormValues(entity.areaOfEffect),
     deliveryMethod: entity.deliveryMethod ?? SPELL_DELIVERY_METHOD_NONE,
@@ -431,34 +442,75 @@ export function spellToFormValues(entity: Spell): SpellFormValues {
           return resolution ? { resolution } : {}
         })()
       : {}),
-  }
+  } as SpellFormValues
 }
 
-export function buildSpellCreateInput(
-  values: SpellFormValues,
+function spellDeliveryMethodFromForm(deliveryMethod: string | undefined) {
+  const rawDelivery = deliveryMethod?.trim()
+  return rawDelivery && rawDelivery !== SPELL_DELIVERY_METHOD_NONE
+    ? spellDeliveryMethodSchema.parse(rawDelivery)
+    : undefined
+}
+
+function spellIdentityWireFields(
+  persistedValues: Omit<SpellFormValues, 'effects'>,
   ctx?: ContentFormInputCtx<Spell>,
-): CreateSpellInput {
-  const { effects: _effects, ...persistedValues } = values
-
-  const rawDelivery = persistedValues.deliveryMethod?.trim()
-  const deliveryMethod =
-    rawDelivery && rawDelivery !== SPELL_DELIVERY_METHOD_NONE
-      ? spellDeliveryMethodSchema.parse(rawDelivery)
-      : undefined
-
-  const areaOfEffect = spellAreaOfEffectFromFormValues(
-    persistedValues.areaOfEffect as SpellFormAreaOfEffect | undefined,
-  )
-
-  const resolution = resolutionToPatchInput(values, ctx)
-
-  const payload = {
+) {
+  return {
     slug: slugForInputParse(persistedValues.name, ctx),
     name: persistedValues.name,
     description: persistedValues.description || undefined,
     cantripScaling: persistedValues.cantripScaling || undefined,
     higherLevelSlotEffect: persistedValues.higherLevelSlotEffect || undefined,
     school: persistedValues.school,
+  }
+}
+
+function spellOptionalAreaAndDelivery(persistedValues: Omit<SpellFormValues, 'effects'>) {
+  const areaOfEffect = spellAreaOfEffectFromFormValues(
+    persistedValues.areaOfEffect as SpellFormAreaOfEffect | undefined,
+  )
+  const deliveryMethod = spellDeliveryMethodFromForm(persistedValues.deliveryMethod)
+
+  return {
+    ...(areaOfEffect !== undefined && { areaOfEffect }),
+    ...(deliveryMethod !== undefined && { deliveryMethod }),
+  }
+}
+
+function spellDraftOptionalCastingBlock(persistedValues: Omit<SpellFormValues, 'effects'>) {
+  const components = persistedValues.components
+    ? spellComponentsSchema.safeParse(
+        spellComponentsFromFormValues(persistedValues.components as SpellFormComponents),
+      )
+    : undefined
+
+  return {
+    ...(persistedValues.level !== undefined ? { level: persistedValues.level } : {}),
+    ...(persistedValues.classIds.length ? { classIds: persistedValues.classIds } : {}),
+    ...(persistedValues.castingTime
+      ? {
+          castingTime: spellCastingTimeFromFormValues(
+            persistedValues.castingTime as SpellFormCastingTime,
+          ),
+        }
+      : {}),
+    ...(persistedValues.range
+      ? { range: spellRangeFromFormValues(persistedValues.range as SpellFormRange) }
+      : {}),
+    ...(persistedValues.duration
+      ? { duration: spellDurationFromFormValues(persistedValues.duration as SpellFormDuration) }
+      : {}),
+    ...(components?.success ? { components: components.data } : {}),
+  }
+}
+
+function spellPublishWirePayload(values: SpellFormValues, ctx?: ContentFormInputCtx<Spell>) {
+  const { effects: _effects, ...persistedValues } = values
+  const resolution = resolutionToPatchInput(values, ctx)
+
+  return {
+    ...spellIdentityWireFields(persistedValues, ctx),
     level: persistedValues.level,
     classIds: persistedValues.classIds,
     castingTime: spellCastingTimeFromFormValues(
@@ -468,12 +520,43 @@ export function buildSpellCreateInput(
     duration: spellDurationFromFormValues(persistedValues.duration as SpellFormDuration),
     components: spellComponentsFromFormValues(persistedValues.components as SpellFormComponents),
     tags: spellTagsFromFormValues(persistedValues.tags),
-    ...(areaOfEffect !== undefined && { areaOfEffect }),
-    ...(deliveryMethod !== undefined && { deliveryMethod }),
+    ...spellOptionalAreaAndDelivery(persistedValues),
     ...(resolution !== undefined && { resolution }),
   }
+}
 
-  const schema = ctx?.entity ? updateSpellInputSchema : createSpellInputSchema
+function spellDraftWirePayload(values: SpellFormValues, ctx?: ContentFormInputCtx<Spell>) {
+  const { effects: _effects, ...persistedValues } = values
+  const resolution = resolutionToPatchInput(values, ctx)
+  const tags = spellTagsFromFormValues(persistedValues.tags)
+
+  return {
+    ...spellIdentityWireFields(persistedValues, ctx),
+    ...spellDraftOptionalCastingBlock(persistedValues),
+    ...(tags ? { tags } : {}),
+    ...spellOptionalAreaAndDelivery(persistedValues),
+    ...(resolution !== undefined && { resolution }),
+  }
+}
+
+export function buildSpellCreateInput(
+  values: SpellFormValues,
+  ctx?: ContentFormInputCtx<Spell>,
+  validationIntent: ContentValidationIntent = 'publish',
+): CreateSpellInput {
+  const isUpdate = Boolean(ctx?.entity)
+  const payload =
+    validationIntent === 'draft'
+      ? spellDraftWirePayload(values, ctx)
+      : spellPublishWirePayload(values, ctx)
+  const schema =
+    validationIntent === 'draft'
+      ? isUpdate
+        ? updateSpellDraftInputSchema
+        : createSpellDraftInputSchema
+      : isUpdate
+        ? updateSpellInputSchema
+        : createSpellInputSchema
   const input = schema.parse(payload)
 
   return finalizeContentInput(input, ctx) as CreateSpellInput

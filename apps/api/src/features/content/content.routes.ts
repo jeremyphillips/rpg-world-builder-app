@@ -91,3 +91,24 @@ contentRouter.delete(
   requireCampaignRole('owner', 'co-owner'),
   controller.deleteContentItem,
 )
+
+contentRouter.post(
+  '/:contentType/:entityId/publish',
+  requireAuth,
+  requireCampaignRole('owner', 'co-owner'),
+  controller.publishContentItem,
+)
+
+contentRouter.get(
+  '/:contentType/:entityId/demotion-availability',
+  requireAuth,
+  requireCampaignRole('owner', 'co-owner'),
+  controller.getContentDemotionAvailabilityHandler,
+)
+
+contentRouter.post(
+  '/:contentType/:entityId/demote',
+  requireAuth,
+  requireCampaignRole('owner', 'co-owner'),
+  controller.demoteContentItem,
+)
