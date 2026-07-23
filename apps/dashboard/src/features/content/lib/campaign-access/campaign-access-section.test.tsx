@@ -131,10 +131,10 @@ describe('CampaignAccessSection', () => {
     )
 
     expect(screen.getByText('Unavailable')).toBeInTheDocument()
-    expect(
-      screen.getByText('This content cannot be discovered or selected in this campaign.'),
-    ).toBeInTheDocument()
-    expect(screen.queryByRole('combobox', { name: 'Player access' })).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /Unavailable/ })).toHaveTextContent(
+      'This content cannot be discovered or selected in this campaign.',
+    )
+    expect(screen.getByRole('button', { name: 'Change' })).toBeInTheDocument()
   })
 
   it('has no axe violations', async () => {

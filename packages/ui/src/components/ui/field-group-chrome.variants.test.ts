@@ -112,4 +112,15 @@ describe('resolveFieldGroupChromeClassNames', () => {
     expect(classes.defaultOpen).toBe(false)
     expect(classes.collapseKey).toBe('advanced')
   })
+
+  it('marks summary disclosure chrome', () => {
+    const chrome = {
+      variant: 'summaryDisclosure' as const,
+      resolveSummary: () => ({ primary: 'Available' }),
+    }
+    const classes = resolveFieldGroupChromeClassNames(chrome)
+    expect(classes.isSummaryDisclosure).toBe(true)
+    expect(classes.summaryDisclosure).toBe(chrome)
+    expect(classes.defaultOpen).toBe(false)
+  })
 })

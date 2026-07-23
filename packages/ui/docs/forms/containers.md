@@ -62,22 +62,30 @@ Groups may declare `visibility` — hidden groups unmount and clear nested value
 Optional visual treatment for the legend + field stack. Variants are **mutually
 exclusive** — omit for plain fieldset behavior.
 
-| `variant`     | Use                                                                                                                                                                                                                                                                                                  |
-| ------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `inset`       | Left rail + indent on the **field stack** only — legend stays outside. Tones: `border` (default), `primary`.                                                                                                                                                                                         |
-| `panel`       | Rounded border box around the **field stack** only. Tones: surface (`subtle` default, `medium`, `strong`, `base`, `raised`), status (`info`, `success`, `warning`, `destructive`), or compact-label tones (`neutral`, `info`, …). Surface tiers use centralized `field-surface.variants.ts` recipes. |
-| `outline`     | Border-only box around the **field stack** — no background wash. Ladder tones: `faint`, `subtle` (default), `default`, `strong`. Semantic tones: `primary`, `info`, `success`, `warning`, `destructive`.                                                                                             |
-| `divider`     | Section separator on the fieldset. `edge`: `top` (default) or `bottom`; adds `pt-7` / `pb-7` (28px) with `border-t` / `border-b`.                                                                                                                                                                    |
-| `callout`     | Alert-shaped surface on the **field stack** only. Tones: alert variants (`default`, `info`, `success`, `warning`, `destructive`) or compact-label `neutral` for semantic soft wash.                                                                                                                  |
-| `accent`      | Light emphasis — `edge: 'top'` (`border-t-2 pt-4`) or `edge: 'legendRail'` (primary/semantic rail on legend only).                                                                                                                                                                                   |
-| `collapsible` | Legend becomes a disclosure trigger; fields stay registered when collapsed. `defaultOpen`; optional `collapseKey` for `uiStateKey` persistence.                                                                                                                                                      |
+| `variant`           | Use                                                                                                                                                                                                                                                                                                  |
+| ------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `inset`             | Left rail + indent on the **field stack** only — legend stays outside. Tones: `border` (default), `primary`.                                                                                                                                                                                         |
+| `panel`             | Rounded border box around the **field stack** only. Tones: surface (`subtle` default, `medium`, `strong`, `base`, `raised`), status (`info`, `success`, `warning`, `destructive`), or compact-label tones (`neutral`, `info`, …). Surface tiers use centralized `field-surface.variants.ts` recipes. |
+| `outline`           | Border-only box around the **field stack** — no background wash. Ladder tones: `faint`, `subtle` (default), `default`, `strong`. Semantic tones: `primary`, `info`, `success`, `warning`, `destructive`.                                                                                             |
+| `divider`           | Section separator on the fieldset. `edge`: `top` (default) or `bottom`; adds `pt-7` / `pb-7` (28px) with `border-t` / `border-b`.                                                                                                                                                                    |
+| `callout`           | Alert-shaped surface on the **field stack** only. Tones: alert variants (`default`, `info`, `success`, `warning`, `destructive`) or compact-label `neutral` for semantic soft wash.                                                                                                                  |
+| `accent`            | Light emphasis — `edge: 'top'` (`border-t-2 pt-4`) or `edge: 'legendRail'` (primary/semantic rail on legend only).                                                                                                                                                                                   |
+| `collapsible`       | Legend becomes a disclosure trigger; fields stay registered when collapsed. `defaultOpen`; optional `collapseKey` for `uiStateKey` persistence.                                                                                                                                                      |
+| `summaryDisclosure` | Compact collapsed summary + **Change** / expanded **Done** chrome for settings sections. `resolveSummary`, optional `summaryDependsOn`, `showDirtySuffix`, `openLabel` / `closeLabel`. Fields stay mounted (hidden) when collapsed. Requires `FormProvider`.                                         |
 
 ```ts
 {
   kind: 'group',
-  legend: 'Target',
-  fieldsChrome: { variant: 'panel' },
-  fields: [/* … */],
+  legend: 'Campaign availability',
+  legendSize: 'array',
+  fieldsChrome: {
+    variant: 'summaryDisclosure',
+    defaultOpen: false,
+    summaryDependsOn: ['available', 'visibilityMode'],
+    showDirtySuffix: true,
+    resolveSummary: (values) => ({ primary: 'Available · All players' }),
+  },
+  fields: [/* settings rows */],
 }
 ```
 

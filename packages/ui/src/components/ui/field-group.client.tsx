@@ -1,34 +1,21 @@
 'use client'
 
-import * as React from 'react'
-import { ChevronDown } from 'lucide-react'
+import type { Control, FieldValues } from 'react-hook-form'
 
-import { cn } from '../../lib/utils'
-import {
-  readGroupCollapseOpen,
-  slugifyGroupCollapseKey,
-  writeGroupCollapseOpen,
-} from '../../form/config/group-collapse-storage.lib'
-import { accordionContentVariants, accordionTriggerVariants } from './accordion.variants'
-import { Collapsible, CollapsibleContent } from './collapsible.client'
+import { slugifyGroupCollapseKey } from '../../form/config/group-collapse-storage.lib'
 import type { FieldSize } from './field.client'
 import type { FieldGroupFieldsChrome } from './field-group-chrome.variants'
 import { resolveFieldGroupChromeClassNames } from './field-group-chrome.variants'
+import { StandardFieldGroupBody } from './field-group-standard-body.client'
+import { SummaryDisclosureFieldGroupShell } from './field-group-summary-disclosure-shell.client'
 import {
   DEFAULT_ARRAY_SECTION_SIZE,
   DEFAULT_FORM_RHYTHM,
-  fieldGroupBottomMarginClasses,
-  fieldGroupDescriptionTypographyClasses,
-  fieldGroupLegendHeaderMarginVariants,
-  fieldGroupLegendHeaderStackClasses,
   fieldGroupLegendVariants,
-  fieldSetResetClasses,
-  fieldStackRhythmVariants,
   resolveArrayLegendScale,
   type FieldGroupLegendSize,
   type FieldStackRhythm,
 } from './field.variants'
-import { Text } from './text'
 
 export type { FieldGroupLegendSize }
 
@@ -59,102 +46,9 @@ export interface FieldGroupProps {
    * Stable key for collapsible persistence — defaults to `id` or a slug of `legend`.
    */
   collapseKey?: string
+  /** Required for `fieldsChrome.variant: 'summaryDisclosure'`. */
+  formControl?: Control<FieldValues>
   children: React.ReactNode
-}
-
-function useGroupCollapseState(options: {
-  collapseKey: string
-  defaultOpen: boolean
-  uiStateKey?: string
-}): [boolean, (open: boolean) => void] {
-  const [open, setOpen] = React.useState(() => {
-    if (options.uiStateKey) {
-      const stored = readGroupCollapseOpen(options.uiStateKey, options.collapseKey)
-      if (stored !== undefined) return stored
-    }
-    return options.defaultOpen
-  })
-
-  const onOpenChange = React.useCallback(
-    (next: boolean) => {
-      setOpen(next)
-      if (options.uiStateKey) {
-        writeGroupCollapseOpen(options.uiStateKey, options.collapseKey, next)
-      }
-    },
-    [options.collapseKey, options.uiStateKey],
-  )
-
-  return [open, onOpenChange]
-}
-
-interface FieldGroupLegendProps {
-  legend: string
-  description?: string
-  legendSize: FieldGroupLegendSize
-  legendTypography: string
-  legendChromeClassName: string
-  collapsible: boolean
-  open?: boolean
-  onToggle?: () => void
-}
-
-function FieldGroupLegend({
-  legend,
-  description,
-  legendSize,
-  legendTypography,
-  legendChromeClassName,
-  collapsible,
-  open,
-  onToggle,
-}: FieldGroupLegendProps) {
-  const headerMargin = fieldGroupLegendHeaderMarginVariants({ size: legendSize })
-  const legendContent = description ? (
-    <span className={cn(fieldGroupLegendHeaderStackClasses, headerMargin)}>
-      <span>{legend}</span>
-      <Text as="span" variant="small" className={fieldGroupDescriptionTypographyClasses}>
-        {description}
-      </Text>
-    </span>
-  ) : (
-    legend
-  )
-
-  if (!collapsible) {
-    return (
-      <legend
-        className={cn(
-          legendTypography,
-          'w-full min-w-0',
-          legendChromeClassName,
-          !description && headerMargin,
-        )}
-      >
-        {legendContent}
-      </legend>
-    )
-  }
-
-  return (
-    <legend className={cn(legendTypography, 'w-full min-w-0', legendChromeClassName)}>
-      <button
-        type="button"
-        aria-expanded={open}
-        onClick={onToggle}
-        className={cn(
-          accordionTriggerVariants({ variant: 'section' }),
-          !description && headerMargin,
-        )}
-      >
-        {legendContent}
-        <ChevronDown
-          className={cn('size-4 shrink-0 text-muted-foreground', open && 'rotate-180')}
-          aria-hidden
-        />
-      </button>
-    </legend>
-  )
 }
 
 /**
@@ -172,6 +66,7 @@ export function FieldGroup({
   fieldsChrome,
   uiStateKey,
   collapseKey,
+  formControl,
   children,
 }: FieldGroupProps) {
   const legendScale =
@@ -182,51 +77,45 @@ export function FieldGroup({
     collapseKey ??
     id ??
     (legend ? slugifyGroupCollapseKey(legend) || 'group-section' : 'group-section')
-  const [open, onOpenChange] = useGroupCollapseState({
-    collapseKey: resolvedCollapseKey,
-    defaultOpen: chromeClasses.defaultOpen,
-    uiStateKey,
-  })
 
-  const fieldsetClassName = cn(
-    fieldSetResetClasses,
-    fieldGroupBottomMarginClasses,
-    'min-w-0',
-    chromeClasses.fieldset,
-    className,
-  )
+  if (chromeClasses.isSummaryDisclosure) {
+    if (!legend) {
+      throw new Error('FieldGroup summaryDisclosure chrome requires a legend.')
+    }
+    if (!formControl) {
+      throw new Error('FieldGroup summaryDisclosure chrome requires formControl from FormProvider.')
+    }
 
-  const body = (
-    <div className={cn(fieldStackRhythmVariants({ rhythm }), chromeClasses.body)}>{children}</div>
-  )
+    return (
+      <SummaryDisclosureFieldGroupShell
+        id={id}
+        legend={legend}
+        rhythm={rhythm}
+        className={className}
+        uiStateKey={uiStateKey}
+        collapseKey={resolvedCollapseKey}
+        chromeClasses={chromeClasses}
+        formControl={formControl}
+      >
+        {children}
+      </SummaryDisclosureFieldGroupShell>
+    )
+  }
 
-  const legendNode = legend ? (
-    <FieldGroupLegend
+  return (
+    <StandardFieldGroupBody
+      id={id}
       legend={legend}
       description={description}
       legendSize={legendSize}
       legendTypography={legendTypography}
-      legendChromeClassName={chromeClasses.legend}
-      collapsible={chromeClasses.isCollapsible}
-      open={open}
-      onToggle={() => onOpenChange(!open)}
-    />
-  ) : null
-
-  const Wrapper = legend ? 'fieldset' : 'div'
-
-  return (
-    <Wrapper id={id} className={fieldsetClassName}>
-      {legendNode}
-      {chromeClasses.isCollapsible ? (
-        <Collapsible open={open} onOpenChange={onOpenChange} className="min-w-0">
-          <CollapsibleContent forceMount className={accordionContentVariants()}>
-            {body}
-          </CollapsibleContent>
-        </Collapsible>
-      ) : (
-        body
-      )}
-    </Wrapper>
+      rhythm={rhythm}
+      className={className}
+      uiStateKey={uiStateKey}
+      collapseKey={resolvedCollapseKey}
+      chromeClasses={chromeClasses}
+    >
+      {children}
+    </StandardFieldGroupBody>
   )
 }

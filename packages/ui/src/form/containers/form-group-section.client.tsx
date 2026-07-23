@@ -1,6 +1,7 @@
 'use client'
 
 import * as React from 'react'
+import { useFormContext } from 'react-hook-form'
 
 import { FieldGroup } from '../../components/ui/field-group'
 import { resolveFieldStackRhythm } from '../../components/ui/field.variants'
@@ -37,6 +38,7 @@ export function GroupFieldSection({
 }: GroupFieldSectionProps) {
   const parentContext = useFormSectionContext()
   const { uiStateKey } = useFormUiContext()
+  const { control } = useFormContext()
   const legendSize = item.legendSize ?? (parentContext.inGroup ? 'subsection' : 'section')
   const groupRhythm = resolveFieldStackRhythm({
     explicit: item.rhythm,
@@ -62,6 +64,7 @@ export function GroupFieldSection({
       fieldsChrome={item.fieldsChrome}
       uiStateKey={uiStateKey}
       collapseKey={item.id}
+      formControl={control}
     >
       <FormSectionContext.Provider value={childContext}>
         {renderNestedItems({

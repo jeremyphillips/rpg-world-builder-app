@@ -9,6 +9,7 @@ describe('campaign-access-form-fields', () => {
     targetType: 'feats',
     available: true,
     pending: false,
+    groupId: 'campaign-access-test',
   })
 
   it('registers field paths for validation messaging', () => {

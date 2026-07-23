@@ -178,23 +178,43 @@ Route modules side-effect-import `*-form-def.ts` inside the route chunk — see
 Status of schema-driven form modules under `src/features/content/`. Refresh
 this table when completing a form-lib alignment phase.
 
-| Module / area            | Primary path                                                                                                                                                                                               | Status  |
-| ------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------- |
-| Classes (hub)            | `classes/lib/class-form-fields.ts` (schema + tabs); tab modules `class-basics-form-fields.ts`, `class-proficiencies-form-fields.ts`, `class-spellcasting-form-fields.ts`, `class-resources-form-fields.ts` | aligned |
-| Class features           | `classes/lib/class-feature-form-fields.ts`                                                                                                                                                                 | aligned |
-| Class starting equipment | `classes/lib/character-creation/class-starting-equipment-form-*.ts`                                                                                                                                        | aligned |
-| Subclasses               | `classes/lib/subclasses/subclass-form-*.ts`                                                                                                                                                                | aligned |
-| Species traits           | `species/lib/species-trait-form-*.ts`                                                                                                                                                                      | aligned |
-| Species (hub)            | `species/lib/species-form-def.ts`, `species-form-fields.ts`, `species-form-values.ts`                                                                                                                      | aligned |
-| Species heritage         | `species/lib/species-heritage-form-*.ts`                                                                                                                                                                   | aligned |
-| Species rules            | `species/lib/species-rules-form-*.ts`                                                                                                                                                                      | aligned |
-| Spells                   | `spells/lib/spell-form-*.ts`                                                                                                                                                                               | aligned |
-| Spell resolution         | `spells/resolution/lib/form/*`, `resolution/docs/authoring.md` — see [effect-resolution base](../../../../packages/contracts/docs/effect-resolution/base.md)                                               | aligned |
-| Equipment (hub)          | `equipment/lib/equipment-form-def.ts`, `equipment-form-fields.ts`, `equipment-form-values.ts`                                                                                                              | aligned |
-| Equipment families       | `equipment/*/lib/*-form-fields.ts`, `*-form-values.ts`                                                                                                                                                     | aligned |
-| Feats                    | `feats/lib/feat-form-def.ts`, `feat-form-fields.ts`, `feat-form-values.ts`                                                                                                                                 | aligned |
-| Skill proficiencies      | `skill-proficiencies/lib/skill-proficiency-form-def.ts`, `*-form-fields.ts`, `*-form-values.ts`                                                                                                            | aligned |
-| Campaign access          | `content/lib/campaign-access/campaign-access-form-fields.ts`, `campaign-access-form-visibility.ts`, `campaign-access-labels.ts`                                                                            | aligned |
+| Module / area            | Primary path                                                                                                                                                                                                                                                                                              | Status  |
+| ------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------- |
+| Classes (hub)            | `classes/lib/class-form-fields.ts` (schema + tabs); tab modules `class-basics-form-fields.ts`, `class-proficiencies-form-fields.ts`, `class-spellcasting-form-fields.ts`, `class-resources-form-fields.ts`                                                                                                | aligned |
+| Class features           | `classes/lib/class-feature-form-fields.ts`                                                                                                                                                                                                                                                                | aligned |
+| Class starting equipment | `classes/lib/character-creation/class-starting-equipment-form-*.ts`                                                                                                                                                                                                                                       | aligned |
+| Subclasses               | `classes/lib/subclasses/subclass-form-*.ts`                                                                                                                                                                                                                                                               | aligned |
+| Species traits           | `species/lib/species-trait-form-*.ts`                                                                                                                                                                                                                                                                     | aligned |
+| Species (hub)            | `species/lib/species-form-def.ts`, `species-form-fields.ts`, `species-form-values.ts`                                                                                                                                                                                                                     | aligned |
+| Species heritage         | `species/lib/species-heritage-form-*.ts`                                                                                                                                                                                                                                                                  | aligned |
+| Species rules            | `species/lib/species-rules-form-*.ts`                                                                                                                                                                                                                                                                     | aligned |
+| Spells                   | `spells/lib/spell-form-*.ts`                                                                                                                                                                                                                                                                              | aligned |
+| Spell resolution         | `spells/resolution/lib/form/*`, `resolution/docs/authoring.md` — see [effect-resolution base](../../../../packages/contracts/docs/effect-resolution/base.md)                                                                                                                                              | aligned |
+| Equipment (hub)          | `equipment/lib/equipment-form-def.ts`, `equipment-form-fields.ts`, `equipment-form-values.ts`                                                                                                                                                                                                             | aligned |
+| Equipment families       | `equipment/*/lib/*-form-fields.ts`, `*-form-values.ts`                                                                                                                                                                                                                                                    | aligned |
+| Feats                    | `feats/lib/feat-form-def.ts`, `feat-form-fields.ts`, `feat-form-values.ts`                                                                                                                                                                                                                                | aligned |
+| Skill proficiencies      | `skill-proficiencies/lib/skill-proficiency-form-def.ts`, `*-form-fields.ts`, `*-form-values.ts`                                                                                                                                                                                                           | aligned |
+| Campaign access          | `content/lib/campaign-access/campaign-access-form-fields.ts`, `campaign-access-form-visibility.ts`, `campaign-access-labels.ts` — disclosure via `fieldsChrome: { variant: 'summaryDisclosure' }` on the group (see [containers.md](../../../../packages/ui/docs/forms/containers.md#group-fieldschrome)) | aligned |
+
+### Form config first (no parallel layout paths)
+
+**Rule:** Do not hand-build form section chrome (legends, disclosure headers, settings rows,
+panel/outline stacks) in feature components when `FormItem[]` can express it.
+
+- **Fields** — `type` / `kind: 'slot'` entries in `*-form-fields.ts`; labels, hints, `info`,
+  `labelPosition`, `separator`, and disabled state live in config.
+- **Containers** — `kind: 'group' | 'row' | 'stack' | 'dependent'` with `fieldsChrome` for
+  visual treatment. Use `summaryDisclosure` for compact settings sections (campaign access is
+  the reference implementation).
+- **Persistence** — may stay in a section shell (`CampaignAccessSection`, create/edit
+  shells) when it uses a separate API or RHF form — but the **rendered UI** must still flow
+  through `FormProvider` + `FormItems` over the field builder.
+- **Escape hatch** — `kind: 'slot'` for behavior that truly cannot be config-shaped (e.g.
+  availability preflight switch). Extend `@rpg/ui/form` when the same pattern appears twice
+  instead of adding a second layout system.
+
+Detail: [packages/ui/docs/forms.md](../../../../packages/ui/docs/forms.md),
+[packages/ui/docs/forms/containers.md](../../../../packages/ui/docs/forms/containers.md).
 
 **Legacy rename:** equipment formerly used `*-form-input.ts`; target suffix is
 `*-form-values.ts` (completed).

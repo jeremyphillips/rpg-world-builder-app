@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
+import { FormProvider, useForm, type Control, type FieldValues } from 'react-hook-form'
 
 import { FieldGroup } from './field-group'
 import { SelectField } from './select-field'
@@ -202,6 +203,53 @@ export const Collapsible: Story = {
     fieldsChrome: { variant: 'collapsible', defaultOpen: false },
     children: sampleFields,
   },
+}
+
+function SummaryDisclosureDemo() {
+  const form = useForm({
+    defaultValues: { available: true, visibilityMode: 'all_players' },
+  })
+
+  return (
+    <FormProvider {...form}>
+      <FieldGroup
+        id="campaign-access"
+        legend="Campaign availability"
+        legendSize="array"
+        rhythm="compact"
+        formControl={form.control as unknown as Control<FieldValues>}
+        fieldsChrome={{
+          variant: 'summaryDisclosure',
+          defaultOpen: false,
+          summaryDependsOn: ['available', 'visibilityMode'],
+          showDirtySuffix: true,
+          resolveSummary: (values) => ({
+            primary: values.available
+              ? `Available · ${String(values.visibilityMode).replaceAll('_', ' ')}`
+              : 'Unavailable',
+          }),
+        }}
+      >
+        <TextField id="demo-available" label="Available in this campaign" />
+        <SelectField
+          id="demo-visibility"
+          label="Player access"
+          options={[
+            { label: 'All players', value: 'all_players' },
+            { label: 'DM only', value: 'dm_only' },
+          ]}
+        />
+      </FieldGroup>
+    </FormProvider>
+  )
+}
+
+export const SummaryDisclosure: Story = {
+  args: {
+    legend: 'Campaign availability',
+    children: null,
+  },
+  render: () => <SummaryDisclosureDemo />,
 }
 
 /** Mirrors resolution form Target + How it resolves panels and Effects inset. */

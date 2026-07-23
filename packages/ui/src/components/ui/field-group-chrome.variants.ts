@@ -66,6 +66,28 @@ export interface FieldGroupCollapsibleChrome {
   collapseKey?: string
 }
 
+export type FieldGroupSummary = {
+  primary: string
+  secondary?: string
+}
+
+export interface FieldGroupSummaryDisclosureChrome {
+  variant: 'summaryDisclosure'
+  defaultOpen?: boolean
+  /** Stable key for uiStateKey persistence; falls back to group `id` or legend slug. */
+  collapseKey?: string
+  openLabel?: string
+  closeLabel?: string
+  unsavedSuffix?: string
+  /** Appends `unsavedSuffix` while the surrounding form is dirty. Requires `FormProvider`. */
+  showDirtySuffix?: boolean
+  /** Disables disclosure actions while a save/preflight is in flight. */
+  disabled?: boolean
+  resolveSummary: (values: Record<string, unknown>) => FieldGroupSummary
+  /** Root-relative paths watched for summary resolution — omit to watch all values. */
+  summaryDependsOn?: string[]
+}
+
 /** Visual treatment for the field stack inside a group — variants are mutually exclusive. */
 export type FieldGroupFieldsChrome =
   | { variant: 'plain' }
@@ -76,6 +98,7 @@ export type FieldGroupFieldsChrome =
   | FieldGroupCalloutChrome
   | FieldGroupAccentChrome
   | FieldGroupCollapsibleChrome
+  | FieldGroupSummaryDisclosureChrome
 
 /** Spacing above a top divider — 28px (`pt-7`). */
 export const fieldGroupDividerTopPaddingClasses = 'pt-7'
@@ -210,8 +233,10 @@ export interface FieldGroupChromeClassNames {
   body: string
   legend: string
   isCollapsible: boolean
+  isSummaryDisclosure: boolean
   defaultOpen: boolean
   collapseKey?: string
+  summaryDisclosure?: FieldGroupSummaryDisclosureChrome
 }
 
 const PLAIN_FIELD_GROUP_CHROME: FieldGroupChromeClassNames = {
@@ -219,6 +244,7 @@ const PLAIN_FIELD_GROUP_CHROME: FieldGroupChromeClassNames = {
   body: '',
   legend: '',
   isCollapsible: false,
+  isSummaryDisclosure: false,
   defaultOpen: true,
 }
 
@@ -282,6 +308,17 @@ function resolveCollapsibleChrome(chrome: FieldGroupCollapsibleChrome): FieldGro
   })
 }
 
+function resolveSummaryDisclosureChrome(
+  chrome: FieldGroupSummaryDisclosureChrome,
+): FieldGroupChromeClassNames {
+  return withFieldGroupChrome({
+    isSummaryDisclosure: true,
+    defaultOpen: chrome.defaultOpen ?? false,
+    collapseKey: chrome.collapseKey,
+    summaryDisclosure: chrome,
+  })
+}
+
 /** Resolves fieldset, legend, and body classes for a group fieldsChrome config. */
 export function resolveFieldGroupChromeClassNames(
   chrome: FieldGroupFieldsChrome | undefined,
@@ -305,6 +342,8 @@ export function resolveFieldGroupChromeClassNames(
       return resolveAccentChrome(resolved)
     case 'collapsible':
       return resolveCollapsibleChrome(resolved)
+    case 'summaryDisclosure':
+      return resolveSummaryDisclosureChrome(resolved)
     default:
       return PLAIN_FIELD_GROUP_CHROME
   }

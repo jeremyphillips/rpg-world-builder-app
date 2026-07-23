@@ -893,7 +893,7 @@ export interface GroupConfig {
   visibility?: FieldVisibility
   /**
    * Visual treatment for the legend + field stack — variants are mutually exclusive.
-   * Shapes: `inset`, `panel`, `outline`, `divider`, `callout`, `accent`, `collapsible`.
+   * Shapes: `inset`, `panel`, `outline`, `divider`, `callout`, `accent`, `collapsible`, `summaryDisclosure`.
    * Tones vary by variant — see [containers.md](../../docs/forms/containers.md#group-fieldschrome).
    */
   fieldsChrome?: FieldGroupFieldsChrome

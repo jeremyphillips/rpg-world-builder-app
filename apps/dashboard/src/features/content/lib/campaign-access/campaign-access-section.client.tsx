@@ -1,7 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react'
-import { FormProvider, useForm, useFormState, useWatch } from 'react-hook-form'
+import { FormProvider, useForm, useWatch } from 'react-hook-form'
 import {
   CONTENT_ACCESS_CAPABILITIES,
   getErrorMessage,
@@ -20,11 +20,9 @@ import {
   updateContentCampaignAccess,
 } from './campaign-access-api'
 import { CampaignAccessBlockedDialog } from './campaign-access-blocked-dialog.client'
-import { CampaignAccessDisclosure } from './campaign-access-disclosure.client'
 import { CampaignAccessFormProvider } from './campaign-access-form-context.client'
 import { buildCampaignAccessFields } from './campaign-access-form-fields'
 import { resolvedToCampaignAccessPatch } from './campaign-access-state'
-import { resolveCampaignAccessSummary } from './campaign-access-summary'
 
 export interface CampaignAccessSectionProps {
   campaignId: string
@@ -52,7 +50,7 @@ export function CampaignAccessSection({
 }: CampaignAccessSectionProps) {
   const capability = CONTENT_ACCESS_CAPABILITIES[targetType]
   const sectionId = useId()
-  const [expanded, setExpanded] = useState(false)
+  const groupId = `campaign-access-${entityId ?? 'create'}`
 
   const [persistError, setPersistError] = useState<string | null>(null)
   const [pending, setPending] = useState(false)
@@ -65,8 +63,14 @@ export function CampaignAccessSection({
   const initialPatch = useMemo(() => resolvedToCampaignAccessPatch(initialAccess), [initialAccess])
 
   const resolverFields = useMemo(
-    () => buildCampaignAccessFields({ targetType, available: true, pending: false }),
-    [targetType],
+    () =>
+      buildCampaignAccessFields({
+        targetType,
+        available: true,
+        pending: false,
+        groupId,
+      }),
+    [groupId, targetType],
   )
 
   const resolver = useMemo(
@@ -81,19 +85,7 @@ export function CampaignAccessSection({
     mode: 'onSubmit',
   })
 
-  const { isDirty } = useFormState({ control: form.control })
-  const watchedAccess = useWatch({ control: form.control })
-  const available = watchedAccess?.available
-
-  const summary = useMemo(
-    () =>
-      resolveCampaignAccessSummary({
-        available: watchedAccess?.available ?? initialPatch.available,
-        visibilityMode: watchedAccess?.visibilityMode ?? initialPatch.visibilityMode,
-        participantIds: watchedAccess?.participantIds ?? initialPatch.participantIds,
-      }),
-    [initialPatch, watchedAccess],
-  )
+  const available = useWatch({ control: form.control, name: 'available' })
 
   const renderedFields = useMemo(
     () =>
@@ -101,8 +93,9 @@ export function CampaignAccessSection({
         targetType,
         available: available ?? initialPatch.available,
         pending,
+        groupId,
       }),
-    [available, initialPatch.available, pending, targetType],
+    [available, groupId, initialPatch.available, pending, targetType],
   )
 
   useEffect(() => {
@@ -110,7 +103,6 @@ export function CampaignAccessSection({
     setPersistError(null)
     setBlockedOpen(false)
     setBlockers([])
-    setExpanded(false)
   }, [entityId, form, initialPatch])
 
   const applyLocalChange = useCallback(
@@ -209,27 +201,18 @@ export function CampaignAccessSection({
 
   return (
     <CampaignAccessFormProvider value={{ pending, onAvailableChange: handleAvailableChange }}>
-      <CampaignAccessDisclosure
-        summary={summary}
-        isDirty={isDirty}
-        open={expanded}
-        onOpenChange={setExpanded}
-        idPrefix={sectionId}
-        pending={pending}
-      >
-        <FormProvider {...form}>
-          <FormUiProvider fields={renderedFields}>
-            <FormSectionProvider size="md" rhythm="comfortable">
-              {persistError ? (
-                <Text variant="destructive" role="alert" className="mb-4">
-                  {persistError}
-                </Text>
-              ) : null}
-              <FormItems items={renderedFields} idPrefix={sectionId} />
-            </FormSectionProvider>
-          </FormUiProvider>
-        </FormProvider>
-      </CampaignAccessDisclosure>
+      <FormProvider {...form}>
+        <FormUiProvider fields={renderedFields}>
+          <FormSectionProvider size="md" rhythm="comfortable">
+            {persistError ? (
+              <Text variant="destructive" role="alert" className="mb-4">
+                {persistError}
+              </Text>
+            ) : null}
+            <FormItems key={groupId} items={renderedFields} idPrefix={sectionId} />
+          </FormSectionProvider>
+        </FormUiProvider>
+      </FormProvider>
 
       <CampaignAccessBlockedDialog
         open={blockedOpen}
