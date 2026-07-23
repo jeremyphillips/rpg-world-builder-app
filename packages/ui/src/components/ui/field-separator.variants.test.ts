@@ -3,6 +3,12 @@ import { describe, expect, it } from 'vitest'
 import { fieldSeparatorVariants } from './field.variants'
 
 describe('fieldSeparatorVariants', () => {
+  it('maps faint tone to the quietest border ladder token', () => {
+    expect(fieldSeparatorVariants({ tone: 'faint', rhythm: 'comfortable' })).toContain(
+      'border-border-faint',
+    )
+  })
+
   it('maps subtle tone to the quiet border ladder token', () => {
     expect(fieldSeparatorVariants({ tone: 'subtle', rhythm: 'comfortable' })).toContain('border-b')
     expect(fieldSeparatorVariants({ tone: 'subtle', rhythm: 'comfortable' })).toContain(

@@ -371,6 +371,12 @@ export const COLOR_TOKEN_GROUPS: ColorTokenGroup[] = [
     tokens: [
       { name: 'border', cssVar: '--border', tailwind: 'border-border', usage: 'border' },
       {
+        name: 'border-faint',
+        cssVar: '--border-faint',
+        tailwind: 'border-border-faint',
+        usage: 'border',
+      },
+      {
         name: 'border-subtle',
         cssVar: '--border-subtle',
         tailwind: 'border-border-subtle',

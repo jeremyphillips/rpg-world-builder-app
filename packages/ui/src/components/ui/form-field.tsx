@@ -65,13 +65,21 @@ export function FormField({
   children,
 }: FormFieldProps) {
   if (labelPosition === 'settings') {
-    const controlNode = <Field.Control>{children}</Field.Control>
-    const chromedControl = hasActiveFieldChrome(chrome) ? (
+    const settingsRow = (
+      <div className={fieldSettingsRowClasses}>
+        <div className={fieldLabelHintStackClasses}>
+          {labelNode(label, info)}
+          <Field.Hint />
+        </div>
+        <Field.Control>{children}</Field.Control>
+      </div>
+    )
+    const chromedRow = hasActiveFieldChrome(chrome) ? (
       <FieldChromeShell chrome={chrome} size={size}>
-        {controlNode}
+        {settingsRow}
       </FieldChromeShell>
     ) : (
-      controlNode
+      settingsRow
     )
 
     return (
@@ -85,13 +93,7 @@ export function FormField({
         size={size}
         width={width}
       >
-        <div className={fieldSettingsRowClasses}>
-          <div className={fieldLabelHintStackClasses}>
-            {labelNode(label, info)}
-            <Field.Hint />
-          </div>
-          {chromedControl}
-        </div>
+        {chromedRow}
         <Field.Error />
       </Field.Root>
     )

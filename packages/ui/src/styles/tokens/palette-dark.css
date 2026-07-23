@@ -55,6 +55,11 @@
   --palette-surface-sunken: oklch(0.12 0.004 var(--palette-neutral-hue));
 
   /* Derived generic borders — canvas hierarchy */
+  --palette-border-faint: color-mix(
+    in oklch,
+    var(--palette-fg-default) 2%,
+    var(--palette-surface-base)
+  );
   --palette-border-subtle: color-mix(
     in oklch,
     var(--palette-fg-default) 8%,

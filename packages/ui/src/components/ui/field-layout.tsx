@@ -37,16 +37,8 @@ export function FieldLayout({
     control
   )
 
-  const chromedControl = hasActiveFieldChrome(chrome) ? (
-    <FieldChromeShell chrome={chrome} size={size}>
-      {controlNode}
-    </FieldChromeShell>
-  ) : (
-    controlNode
-  )
-
-  if (hintPosition === 'below-label') {
-    return (
+  const fieldBody =
+    hintPosition === 'below-label' ? (
       <>
         {label ? (
           <div className={fieldLabelHintStackClasses}>
@@ -56,17 +48,27 @@ export function FieldLayout({
         ) : (
           <Field.Hint />
         )}
-        {chromedControl}
-        <Field.Error />
+        {controlNode}
+      </>
+    ) : (
+      <>
+        {label}
+        {controlNode}
+        <Field.Hint />
       </>
     )
-  }
+
+  const chromedBody = hasActiveFieldChrome(chrome) ? (
+    <FieldChromeShell chrome={chrome} size={size}>
+      {fieldBody}
+    </FieldChromeShell>
+  ) : (
+    fieldBody
+  )
 
   return (
     <>
-      {label}
-      {chromedControl}
-      <Field.Hint />
+      {chromedBody}
       <Field.Error />
     </>
   )

@@ -2,13 +2,7 @@
 
 import * as React from 'react'
 
-import { FieldGroup } from '../../../components/ui/field-group'
-import { FieldChromeShell } from '../../../components/ui/field-chrome-shell'
-import { hasActiveFieldChrome } from '../../../components/ui/field-chrome.variants'
-import { fieldGroupDescriptionClasses } from '../../../components/ui/field.variants'
-import { Text } from '../../../components/ui/text'
 import {
-  FormRhythmStack,
   FormSectionContext,
   useFormSectionContext,
   type FormSectionContextValue,
@@ -19,6 +13,7 @@ import {
   FieldSeparatorWrapper,
 } from '../../containers/form-conditional.client'
 import { buildSlotSectionChildContext } from '../../containers/form-section-child-context.lib'
+import { buildSlotFieldBody, wrapSlotFieldBody } from './slot-field-renderer.lib'
 
 export interface SlotFieldRendererProps {
   config: SlotConfig
@@ -34,46 +29,12 @@ export function SlotFieldRenderer({ config, stackRhythm, stackSize }: SlotFieldR
   const content = config.render()
   const chromeSize = stackSize ?? size
 
-  let body: React.ReactNode
-
-  if (config.label) {
-    body = (
-      <FieldGroup
-        legend={config.label}
-        description={config.hint}
-        rhythm={rhythm}
-        size={size}
-        className={config.className}
-      >
-        {content}
-      </FieldGroup>
-    )
-  } else if (content == null && !config.hint) {
-    return null
-  } else if (!config.hint) {
-    body = config.className ? <div className={config.className}>{content}</div> : content
-  } else {
-    body = (
-      <FormRhythmStack className={config.className}>
-        <Text variant="small" className={fieldGroupDescriptionClasses}>
-          {config.hint}
-        </Text>
-        {content}
-      </FormRhythmStack>
-    )
-  }
-
-  if (hasActiveFieldChrome(config.chrome)) {
-    body = (
-      <FieldChromeShell chrome={config.chrome} size={chromeSize}>
-        {body}
-      </FieldChromeShell>
-    )
-  }
+  const body = buildSlotFieldBody(config, content, rhythm, size)
+  if (body == null) return null
 
   return (
     <FieldSeparatorWrapper separator={config.separator} rhythm={stackRhythm}>
-      {body}
+      {wrapSlotFieldBody(body, config, chromeSize)}
     </FieldSeparatorWrapper>
   )
 }

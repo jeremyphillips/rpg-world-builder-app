@@ -24,6 +24,7 @@ export function CampaignAccessAvailableSwitch() {
       label={CAMPAIGN_ACCESS_AVAILABLE_LABEL}
       hint={CAMPAIGN_ACCESS_AVAILABLE_HINT}
       labelPosition="settings"
+      width="full"
       checked={available ?? false}
       disabled={pending}
       onCheckedChange={(checked) => void onAvailableChange(checked)}

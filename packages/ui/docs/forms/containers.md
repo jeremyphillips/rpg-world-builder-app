@@ -66,7 +66,7 @@ exclusive** — omit for plain fieldset behavior.
 | ------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `inset`       | Left rail + indent on the **field stack** only — legend stays outside. Tones: `border` (default), `primary`.                                                                                                                                                                                         |
 | `panel`       | Rounded border box around the **field stack** only. Tones: surface (`subtle` default, `medium`, `strong`, `base`, `raised`), status (`info`, `success`, `warning`, `destructive`), or compact-label tones (`neutral`, `info`, …). Surface tiers use centralized `field-surface.variants.ts` recipes. |
-| `outline`     | Border-only box around the **field stack** — no background wash. Tones: `border` (default), `primary`, `info`, `success`, `warning`, `destructive`.                                                                                                                                                  |
+| `outline`     | Border-only box around the **field stack** — no background wash. Ladder tones: `faint`, `subtle` (default), `default`, `strong`. Semantic tones: `primary`, `info`, `success`, `warning`, `destructive`.                                                                                             |
 | `divider`     | Section separator on the fieldset. `edge`: `top` (default) or `bottom`; adds `pt-7` / `pb-7` (28px) with `border-t` / `border-b`.                                                                                                                                                                    |
 | `callout`     | Alert-shaped surface on the **field stack** only. Tones: alert variants (`default`, `info`, `success`, `warning`, `destructive`) or compact-label `neutral` for semantic soft wash.                                                                                                                  |
 | `accent`      | Light emphasis — `edge: 'top'` (`border-t-2 pt-4`) or `edge: 'legendRail'` (primary/semantic rail on legend only).                                                                                                                                                                                   |
@@ -176,9 +176,9 @@ Dependent stack with an array dependent — use `arrayItems` scope:
 ## Field separators
 
 `separator` on a leaf, row, or slot → trailing `border-b` before the next sibling.
-Tones follow the border ladder: `subtle` (`border-border-subtle`), `default` (`border-border`),
-`strong` (`border-border-strong`). Padding follows inherited stack rhythm: `pb-2` (8px) when
-`rhythm: 'compact'`, `pb-7` (28px) when `rhythm: 'comfortable'`.
+Tones follow the border ladder: `faint` (`border-border-faint`), `subtle` (`border-border-subtle`,
+default), `default` (`border-border`), `strong` (`border-border-strong`). Padding follows inherited
+stack rhythm: `pb-2` (8px) when `rhythm: 'compact'`, `pb-7` (28px) when `rhythm: 'comfortable'`.
 On a `stack` → trailing divider after the whole stack (controller + dependents region).
 Prefer stack-level `separator` for `layout: 'dependent'` blocks instead of putting it on the
 controller field.

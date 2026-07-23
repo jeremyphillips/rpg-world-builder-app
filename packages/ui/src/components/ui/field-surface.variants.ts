@@ -2,6 +2,12 @@ import { cva } from 'class-variance-authority'
 
 import { cn } from '../../lib/utils'
 import { compactLabelAppearanceToneClasses, type CompactLabelTone } from './compact-label.lib'
+import {
+  DEFAULT_FIELD_BORDER_LADDER_TONE,
+  isFieldBorderLadderTone,
+  resolveFieldBorderLadderToneClasses,
+  type FieldBorderLadderTone,
+} from './field-border-ladder.variants'
 
 /** Shared rounded border shell — padding is applied separately per surface kind. */
 export const fieldShellLayoutClasses = 'min-w-0 rounded-md border'
@@ -83,15 +89,28 @@ export function resolveFieldContainerChromeClasses(
 export type FieldGroupPanelTone = FieldSurfaceVariant | FieldStatusTone | CompactLabelTone
 
 /** Border-only outline tones for group `fieldsChrome: { variant: 'outline' }`. */
-export type FieldGroupOutlineTone = 'border' | 'primary' | FieldStatusTone
+export type FieldGroupOutlineTone = FieldBorderLadderTone | 'primary' | FieldStatusTone
 
-const OUTLINE_TONE_CLASS: Record<FieldGroupOutlineTone, string> = {
-  border: 'border-border',
-  primary: 'border-primary',
+const OUTLINE_STATUS_TONE_CLASS: Record<FieldStatusTone, string> = {
   info: 'border-info-muted',
   success: 'border-success-muted',
   warning: 'border-warning-muted',
   destructive: 'border-destructive',
+}
+
+/** Resolves outline border classes (no background wash). */
+export function resolveFieldGroupOutlineToneClasses(
+  tone: FieldGroupOutlineTone = DEFAULT_FIELD_BORDER_LADDER_TONE,
+): string {
+  if (isFieldBorderLadderTone(tone)) {
+    return resolveFieldBorderLadderToneClasses(tone)
+  }
+
+  if (tone === 'primary') {
+    return 'border-primary'
+  }
+
+  return OUTLINE_STATUS_TONE_CLASS[tone]
 }
 
 export function isCompactLabelTone(value: string): value is CompactLabelTone {
@@ -115,13 +134,6 @@ export function resolveFieldGroupPanelToneClasses(tone: FieldGroupPanelTone = 's
   }
 
   return resolveFieldContainerChromeClasses({ surface: tone })
-}
-
-/** Resolves outline border classes (no background wash). */
-export function resolveFieldGroupOutlineToneClasses(
-  tone: FieldGroupOutlineTone = 'border',
-): string {
-  return OUTLINE_TONE_CLASS[tone]
 }
 
 /** @deprecated Use `resolveFieldContainerChromeClasses` with `surface` / `status`. */

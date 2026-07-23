@@ -31,6 +31,19 @@ describe('resolveFieldChromeClassNames', () => {
     expect(classes).toContain('bg-transparent')
     expect(classes).toContain('border-primary')
   })
+
+  it('uses the subtle border ladder for the default outline tone', () => {
+    const classes = resolveFieldChromeClassNames({ variant: 'outline' }, 'md')
+    const tokens = classes.split(/\s+/).filter(Boolean)
+    expect(tokens).toContain('border-border-subtle')
+    expect(tokens).not.toContain('border-border-faint')
+    expect(tokens).not.toContain('border-border')
+  })
+
+  it('maps outline ladder tones to separator border utilities', () => {
+    const faint = resolveFieldChromeClassNames({ variant: 'outline', tone: 'faint' }, 'md')
+    expect(faint).toContain('border-border-faint')
+  })
 })
 
 describe('pickFieldChromeProps', () => {

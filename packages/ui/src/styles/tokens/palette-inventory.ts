@@ -46,6 +46,7 @@ export const PALETTE_FG_STEPS = [
 ] as const
 
 export const PALETTE_CHROME_STEPS = [
+  'border-faint',
   'border-default',
   'border-subtle',
   'border-strong',

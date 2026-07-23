@@ -1,6 +1,10 @@
 import { cva, type VariantProps } from 'class-variance-authority'
 
 import { cn } from '../../lib/utils'
+import {
+  fieldBorderLadderToneClasses,
+  type FieldBorderLadderTone,
+} from './field-border-ladder.variants'
 import { fieldSizeTypographyClasses, type FieldSizeToken } from './field-sizing.variants'
 
 /**
@@ -205,15 +209,11 @@ export const fieldToggleDependentIndentClasses = 'pl-11'
 export const chooseFromChipsSentenceClasses = fieldInlineSentenceClasses
 
 /** Trailing divider tone — maps to the global border ladder in design-tokens.md. */
-export type FieldSeparator = 'subtle' | 'default' | 'strong'
+export type FieldSeparator = FieldBorderLadderTone
 
 export const fieldSeparatorVariants = cva('border-b', {
   variants: {
-    tone: {
-      subtle: 'border-border-subtle',
-      default: 'border-border',
-      strong: 'border-border-strong',
-    },
+    tone: fieldBorderLadderToneClasses,
     rhythm: {
       compact: 'pb-2',
       comfortable: 'pb-7',

@@ -51,6 +51,7 @@
 
   /* Chrome — generic borders, selection, overlay, sidebar (`border-border`, `bg-overlay`, `bg-sidebar`, …) */
   --border-default: var(--palette-border-default);
+  --border-faint: var(--palette-border-faint);
   --border-subtle: var(--palette-border-subtle);
   --border-strong: var(--palette-border-strong);
   --border: var(--border-default);

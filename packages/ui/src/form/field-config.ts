@@ -227,7 +227,7 @@ interface BaseFieldConfig {
    * narrowly via `useWatch`.
    */
   visibility?: FieldVisibility
-  /** Trailing divider after this field — `subtle` | `default` | `strong` (border ladder). */
+  /** Trailing divider after this field — `faint` | `subtle` | `default` | `strong` (border ladder). */
   separator?: FieldSeparator
   /**
    * Visual shell around the full field anatomy (label + control + messages).
@@ -235,7 +235,7 @@ interface BaseFieldConfig {
    *
    * - `{ variant: 'plain' }` — default, no extra shell
    * - `{ variant: 'panel', tone? }` — filled panel wash
-   * - `{ variant: 'outline', tone? }` — border-only inset
+   * - `{ variant: 'outline', tone? }` — border-only inset (`faint` | `subtle` | `default` | `strong`, or semantic tones)
    *
    * Distinct from container `surface` / `status` chrome on arrays and dependents.
    */

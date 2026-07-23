@@ -50,7 +50,7 @@ describe('resolveFieldGroupChromeClassNames', () => {
     const classes = resolveFieldGroupChromeClassNames({ variant: 'outline' })
     expect(classes.fieldset).toBe('')
     expect(classes.body).toContain('rounded-md')
-    expect(classes.body).toContain('border-border')
+    expect(classes.body).toContain('border-border-subtle')
     expect(classes.body).toContain('bg-transparent')
   })
 

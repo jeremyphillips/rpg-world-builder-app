@@ -55,6 +55,11 @@
   );
 
   /* Derived generic borders — canvas hierarchy */
+  --palette-border-faint: color-mix(
+    in oklch,
+    var(--palette-fg-default) 5%,
+    var(--palette-surface-base)
+  );
   --palette-border-subtle: color-mix(
     in oklch,
     var(--palette-fg-default) 14%,

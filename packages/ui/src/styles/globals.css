@@ -86,6 +86,7 @@
   --color-warning-muted: var(--warning-muted);
   --color-warning-subtle: var(--warning-subtle);
   --color-border: var(--border);
+  --color-border-faint: var(--border-faint);
   --color-border-subtle: var(--border-subtle);
   --color-border-strong: var(--border-strong);
   --color-card-selected-border: var(--card-selected-border);
