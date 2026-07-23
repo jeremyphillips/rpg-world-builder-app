@@ -1159,7 +1159,12 @@ export function DataTable<TData>({
     cell: ({ row }) => rowActions?.(row.original) ?? null,
     enableSorting: false,
     enableHiding: false,
-    meta: { ...dataTableWidthMeta('minimal'), columnTone: 'actions' },
+    meta: {
+      ...dataTableWidthMeta('actions'),
+      columnTone: 'actions',
+      label: 'Actions',
+      locked: true,
+    },
   }
 
   const resolvedColumns: ColumnDef<TData>[] = [

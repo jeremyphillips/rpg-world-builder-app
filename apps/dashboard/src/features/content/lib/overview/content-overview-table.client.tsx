@@ -148,7 +148,7 @@ export function ContentOverviewTable<T extends WithCampaignAccess<ContentBase> &
             type="button"
             variant="link"
             size="sm"
-            className="h-auto px-0 text-sm"
+            className="h-auto px-0 text-xs"
             aria-label={formatShowAllCampaignAvailabilityAriaLabel()}
             onClick={() =>
               setColumnFilters((current) => setCampaignAvailabilityFilter(current, 'all'))
@@ -168,7 +168,7 @@ export function ContentOverviewTable<T extends WithCampaignAccess<ContentBase> &
             type="button"
             variant="link"
             size="sm"
-            className="h-auto px-0 text-sm"
+            className="h-auto px-0 text-xs"
             aria-label={formatHideUnavailableAriaLabel()}
             onClick={() =>
               setColumnFilters((current) => setCampaignAvailabilityFilter(current, 'available'))
@@ -198,7 +198,7 @@ export function ContentOverviewTable<T extends WithCampaignAccess<ContentBase> &
               type="button"
               variant="link"
               size="sm"
-              className="h-auto px-0 text-sm"
+              className="h-auto px-0 text-xs"
               aria-label={formatShowUnavailableAriaLabel(pluralNoun)}
               onClick={() =>
                 setColumnFilters((current) => setCampaignAvailabilityFilter(current, 'unavailable'))

@@ -1,4 +1,8 @@
-import { dataTableCellTextVariants } from './data-table.variants'
+import {
+  dataTableActionsCellVariants,
+  dataTableActionsHeaderVariants,
+  dataTableCellTextVariants,
+} from './data-table.variants'
 
 /** Shared `ColumnMeta.columnTone` values for DataTable body cell styling. */
 export const dataTableColumnMeta = {
@@ -37,8 +41,8 @@ export const dataTableColumnWidths = {
   /** Badge/status columns — source, visibility, status. */
   badge: 'whitespace-nowrap lg:w-28 lg:max-w-28',
 
-  /** Actions/menu column. */
-  actions: 'w-12 max-w-12',
+  /** Actions/menu column — width only; pair with `dataTableWidthMeta('actions')` for sticky chrome. */
+  actions: 'w-12 max-w-12 shrink-0',
 
   /** Shrink-to-fit checkbox column. */
   minimal: 'w-px',
@@ -56,6 +60,12 @@ export function dataTableWidthMeta(width: DataTableColumnWidth) {
     return {
       headerClassName: className,
       cellClassName: `${className} overflow-visible`,
+    } as const
+  }
+  if (width === 'actions') {
+    return {
+      headerClassName: dataTableActionsHeaderVariants(),
+      cellClassName: dataTableActionsCellVariants(),
     } as const
   }
   if (width === 'compactCenter' || width === 'tinyCenter') {

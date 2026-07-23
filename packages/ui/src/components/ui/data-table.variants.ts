@@ -83,12 +83,22 @@ export const dataTableRowUnavailableRailVariants = cva(
 
 /** Toolbar notice row below primary filters — hidden counts, filter actions. */
 export const dataTableFilterNoticeVariants = cva(
-  'flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-muted-foreground',
+  'flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted-foreground',
 )
 
 /** Header cell — group context for sort icon hover/focus affordance. */
 export const dataTableHeaderCellVariants = cva(
   'group/header h-10 bg-transparent text-xs font-semibold tracking-wide text-muted-foreground',
+)
+
+/** Sticky trailing actions header — stays visible during horizontal scroll. */
+export const dataTableActionsHeaderVariants = cva(
+  'sticky right-0 z-20 w-12 max-w-12 shrink-0 border-l border-border bg-surface-strong px-1 text-center',
+)
+
+/** Sticky trailing actions body cell — matches row hover, selection, and unavailable tones. */
+export const dataTableActionsCellVariants = cva(
+  'sticky right-0 z-10 w-12 max-w-12 shrink-0 border-l border-border bg-surface-muted px-1 text-center group-hover/row:bg-row-hover group-data-[state=selected]/row:bg-row-selected [.group\\/row.bg-warning-faint_&]:bg-warning-faint',
 )
 
 /** Tighter body cell padding than the base TableCell default. */

@@ -35,6 +35,14 @@ describe('dataTableWidthMeta', () => {
     expect(dataTableColumnWidths.minimal).toBe('w-px')
   })
 
+  it('pins actions column with sticky trailing chrome', () => {
+    const meta = dataTableWidthMeta('actions')
+    expect(meta.headerClassName).toContain('sticky')
+    expect(meta.headerClassName).toContain('bg-surface-strong')
+    expect(meta.cellClassName).toContain('sticky')
+    expect(meta.cellClassName).toContain('bg-surface-muted')
+  })
+
   it('includes compact center alignment preset', () => {
     expect(dataTableWidthMeta('compactCenter').headerClassName).toContain('text-center')
     expect(dataTableWidthMeta('compactCenter').cellClassName).toContain('[&>svg]:mx-auto')
