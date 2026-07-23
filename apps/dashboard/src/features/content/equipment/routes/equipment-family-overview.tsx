@@ -1,34 +1,13 @@
 import { useParams } from 'react-router-dom'
-import { DataTable } from '@rpg/ui'
-import type { Equipment } from '@rpg/contracts'
+import type { Equipment, WithCampaignAccess } from '@rpg/contracts'
+import type { ColumnDef } from '@rpg/ui'
 
 import { ROUTES } from '@/app/routes'
-import { getContentTypeMidSentenceLabel } from '@/features/content/lib/content-type-labels'
 import { useEquipmentFamilyOverview } from '../hooks/use-equipment-family-overview'
 import type { FamilyTableConfig } from '../lib/shared/equipment-family-overview-columns'
 import { ContentOverviewShell } from '../../lib/overview/content-overview-shell'
-import { ContentOverviewRowActions } from '../../lib/overview/content-overview-row-actions'
+import { ContentOverviewTable } from '../../lib/overview/content-overview-table.client'
 import type { EquipmentFamilyPath } from '../lib/shared/equipment-family-paths'
-
-function EquipmentRowActions({
-  row,
-  campaignId,
-  family,
-}: {
-  row: Equipment
-  campaignId: string
-  family: EquipmentFamilyPath
-}) {
-  return (
-    <ContentOverviewRowActions
-      campaignId={campaignId}
-      editHref={ROUTES.content.equipment.edit(campaignId, family, row.id)}
-      enabled={true}
-      onToggleEnabled={() => {}}
-      itemLabel={getContentTypeMidSentenceLabel('equipment')}
-    />
-  )
-}
 
 type EquipmentFamilyOverviewContentProps = {
   campaignId: string
@@ -77,14 +56,14 @@ function EquipmentFamilyTable({
   family: EquipmentFamilyPath
 }) {
   return (
-    <DataTable
-      columns={tableConfig.columns}
-      data={data}
+    <ContentOverviewTable<WithCampaignAccess<Equipment>>
+      contentTypeKey="equipment"
+      campaignId={campaignId}
+      columns={tableConfig.columns as ColumnDef<WithCampaignAccess<Equipment>, unknown>[]}
       filters={tableConfig.filters}
-      rowActions={(row) => (
-        <EquipmentRowActions row={row} campaignId={campaignId} family={family} />
-      )}
+      data={data as WithCampaignAccess<Equipment>[]}
       caption={`${heading} available in this campaign`}
+      getEditHref={(row) => ROUTES.content.equipment.edit(campaignId, family, row.id)}
     />
   )
 }

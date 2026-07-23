@@ -2,9 +2,12 @@ import { describe, expect, it } from 'vitest'
 
 import { CONTENT_ACCESS_SPECIFIC_PLAYERS_ENABLED } from './content-access-capabilities'
 import {
+  CAMPAIGN_AVAILABILITY_FILTER_DEFAULT,
+  CAMPAIGN_AVAILABILITY_FILTER_VALUES,
   DEFAULT_CONTENT_CAMPAIGN_ACCESS,
   resolveContentCampaignAccess,
   resolvedContentCampaignAccessSchema,
+  type WithCampaignAccess,
 } from './campaign-access'
 
 describe('resolveContentCampaignAccess', () => {
@@ -48,6 +51,26 @@ describe('resolveContentCampaignAccess', () => {
     expect(resolvedContentCampaignAccessSchema.parse(DEFAULT_CONTENT_CAMPAIGN_ACCESS)).toEqual(
       DEFAULT_CONTENT_CAMPAIGN_ACCESS,
     )
+  })
+})
+
+describe('CampaignAvailabilityFilter', () => {
+  it('defines canonical filter values with available as default', () => {
+    expect(CAMPAIGN_AVAILABILITY_FILTER_VALUES).toEqual(['available', 'unavailable', 'all'])
+    expect(CAMPAIGN_AVAILABILITY_FILTER_DEFAULT).toBe('available')
+  })
+})
+
+describe('WithCampaignAccess', () => {
+  it('composes campaign access onto a base row type', () => {
+    type BaseRow = { id: string; name: string }
+    const row: WithCampaignAccess<BaseRow> = {
+      id: 'class-1',
+      name: 'Wizard',
+      campaignAccess: DEFAULT_CONTENT_CAMPAIGN_ACCESS,
+    }
+
+    expect(row.campaignAccess.available).toBe(true)
   })
 })
 

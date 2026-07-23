@@ -132,7 +132,11 @@ const BASE_COLUMNS: ColumnDef<CharacterClass>[] = [
     accessorKey: 'imageKey',
     header: () => <span className="sr-only">Image</span>,
     cell: () => (
-      <div className="size-8 shrink-0 rounded-md bg-muted" aria-hidden="true" role="presentation" />
+      <div
+        className="size-6 shrink-0 rounded-md bg-muted lg:size-8"
+        aria-hidden="true"
+        role="presentation"
+      />
     ),
     enableSorting: false,
     meta: {
@@ -145,7 +149,7 @@ const BASE_COLUMNS: ColumnDef<CharacterClass>[] = [
     accessorKey: 'name',
     header: ({ column }) => <SortableHeader column={column}>Name</SortableHeader>,
     cell: ({ row }) => <NameCell>{row.getValue<string>('name')}</NameCell>,
-    meta: { ...dataTableColumnMeta.identity, label: 'Name' },
+    meta: { ...dataTableColumnMeta.identity, ...dataTableWidthMeta('title'), label: 'Name' },
   },
   {
     accessorKey: 'hitDie',

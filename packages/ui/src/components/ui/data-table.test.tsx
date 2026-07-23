@@ -623,6 +623,119 @@ describe('RowActionsMenu', () => {
     expect(editLink).toHaveAttribute('href', '/campaigns/c1/spells/fire-bolt/edit')
     expect(editLink).toHaveTextContent('Edit')
   })
+
+  it('renders a footer section instead of the legacy toggle', async () => {
+    const user = userEvent.setup()
+    render(
+      <RowActionsMenu
+        editHref="/edit/1"
+        editLabel="Edit details"
+        footer={<div>Campaign footer</div>}
+      />,
+    )
+
+    await user.click(screen.getByRole('button', { name: /open actions/i }))
+
+    expect(screen.getByText('Edit details')).toBeInTheDocument()
+    expect(screen.getByText('Campaign footer')).toBeInTheDocument()
+    expect(screen.queryByRole('switch')).not.toBeInTheDocument()
+  })
+})
+
+// ---------------------------------------------------------------------------
+// Extended table behavior
+// ---------------------------------------------------------------------------
+
+describe('DataTable — extended behavior', () => {
+  it('renders filterNotice below the toolbar', () => {
+    renderTable({ filterNotice: <span>3 unavailable items hidden</span> })
+    expect(screen.getByText('3 unavailable items hidden')).toBeInTheDocument()
+  })
+
+  it('renders a custom empty state', () => {
+    renderTable({
+      data: [],
+      emptyState: () => <span>No available classes match these filters.</span>,
+    })
+    expect(screen.getByText('No available classes match these filters.')).toBeInTheDocument()
+    expect(screen.queryByText('No results.')).not.toBeInTheDocument()
+  })
+
+  it('applies getRowClassName to body rows', () => {
+    renderTable({
+      getRowClassName: (row) => (row.original.active ? undefined : 'unavailable-row'),
+    })
+
+    const bodyRows = screen.getAllByRole('row').slice(1)
+    expect(bodyRows.some((row) => row.classList.contains('unavailable-row'))).toBe(true)
+  })
+
+  it('applies getCellClassName to body cells', () => {
+    renderTable({
+      getCellClassName: (cell) => (cell.row.original.active ? undefined : `cell-${cell.column.id}`),
+    })
+
+    const inactiveCell = document.querySelector('td.cell-name')
+    expect(inactiveCell).toBeTruthy()
+  })
+
+  it('supports external matches filters without a backing column', () => {
+    const externalFilters: FilterDef<Item>[] = [
+      {
+        type: 'select',
+        id: 'visibility',
+        label: 'Visibility',
+        showAllOption: false,
+        defaultValue: 'active',
+        options: [
+          { label: 'Active', value: 'active' },
+          { label: 'Inactive', value: 'inactive' },
+        ],
+        matches: (row, value) =>
+          value === 'active' ? row.active : value === 'inactive' ? !row.active : true,
+      },
+    ]
+
+    const { rerender } = render(
+      <DataTable
+        columns={COLUMNS}
+        data={DATA}
+        filters={externalFilters}
+        defaultColumnFilters={[{ id: 'visibility', value: 'active' }]}
+        defaultPageSize={10}
+      />,
+    )
+
+    expect(screen.getAllByRole('row')).toHaveLength(4)
+    expect(screen.queryByText('Beta')).not.toBeInTheDocument()
+
+    rerender(
+      <DataTable
+        columns={COLUMNS}
+        data={DATA}
+        filters={externalFilters}
+        columnFilters={[{ id: 'visibility', value: 'inactive' }]}
+        defaultPageSize={10}
+      />,
+    )
+
+    expect(screen.getAllByRole('row')).toHaveLength(3)
+    expect(screen.getByText('Beta')).toBeInTheDocument()
+  })
+
+  it('calls onColumnFiltersChange when controlled', async () => {
+    const user = userEvent.setup()
+    const onColumnFiltersChange = vi.fn()
+
+    renderTable({
+      columnFilters: [],
+      onColumnFiltersChange,
+    })
+
+    await user.type(screen.getByRole('textbox', { name: 'Name' }), 'Alpha')
+
+    expect(onColumnFiltersChange).toHaveBeenCalled()
+  })
 })
 
 // ---------------------------------------------------------------------------

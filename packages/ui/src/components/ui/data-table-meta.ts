@@ -11,8 +11,14 @@ export const dataTableColumnMeta = {
 
 /** Fixed-width presets for `ColumnMeta.headerClassName` / `cellClassName`. */
 export const dataTableColumnWidths = {
-  /** Thumbnail column (~64px) — fixed at all breakpoints. */
-  image: 'w-16 max-w-16',
+  /**
+   * Thumbnail column — fixed to `dataTableImageVariants` (+ horizontal padding).
+   * 24px image + 16px padding at default; 32px image + 16px padding at lg+.
+   */
+  image: 'w-10 max-w-10 shrink-0 px-2 lg:w-12 lg:max-w-12',
+
+  /** Primary title/name column — fluid; no fixed width cap. */
+  title: 'min-w-0',
 
   tiny: 'whitespace-nowrap lg:w-20 lg:max-w-20',
   tinyCenter: 'whitespace-nowrap text-center lg:w-20 lg:max-w-20',
@@ -46,6 +52,12 @@ const dataTableCenteredBodyCellLayout = 'text-center [&>svg]:mx-auto [&>svg]:blo
 /** Applies a width preset to both header and body cells. */
 export function dataTableWidthMeta(width: DataTableColumnWidth) {
   const className = dataTableColumnWidths[width]
+  if (width === 'image') {
+    return {
+      headerClassName: className,
+      cellClassName: `${className} overflow-visible`,
+    } as const
+  }
   if (width === 'compactCenter' || width === 'tinyCenter') {
     return {
       headerClassName: className,

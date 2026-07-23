@@ -7,7 +7,7 @@ function formatSpecificPlayersCount(count: number): string {
   return count === 1 ? '1 specific player' : `${count} specific players`
 }
 
-function resolveCampaignAccessDetail(
+export function resolveCampaignAccessDetail(
   access: Pick<ContentCampaignAccessPatch, 'visibilityMode' | 'participantIds'>,
 ): string {
   if (access.visibilityMode === 'specific_players') {

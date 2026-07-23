@@ -24,6 +24,18 @@ export const resolvedContentCampaignAccessSchema = contentCampaignAccessSchema.e
 
 export type ResolvedContentCampaignAccess = z.infer<typeof resolvedContentCampaignAccessSchema>
 
+/** Campaign availability filter values shared by overview tables and future list APIs. */
+export const CAMPAIGN_AVAILABILITY_FILTER_VALUES = ['available', 'unavailable', 'all'] as const
+
+export type CampaignAvailabilityFilter = (typeof CAMPAIGN_AVAILABILITY_FILTER_VALUES)[number]
+
+export const CAMPAIGN_AVAILABILITY_FILTER_DEFAULT: CampaignAvailabilityFilter = 'available'
+
+/** Composable list-row typing — prefer over per-entity Resolved* aliases. */
+export type WithCampaignAccess<T> = T & {
+  campaignAccess: ResolvedContentCampaignAccess
+}
+
 export const DEFAULT_CONTENT_CAMPAIGN_ACCESS: ResolvedContentCampaignAccess = {
   available: true,
   visibilityMode: 'all_players',
@@ -88,3 +100,6 @@ export const resolvedCampaignAccessFields = {
 export function withCampaignAccess<T extends z.ZodRawShape>(schema: z.ZodObject<T>) {
   return schema.extend(resolvedCampaignAccessFields)
 }
+
+/** Alias for schema composition at API validation boundaries. */
+export const withCampaignAccessSchema = withCampaignAccess

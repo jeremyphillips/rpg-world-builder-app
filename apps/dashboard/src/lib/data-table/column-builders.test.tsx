@@ -37,7 +37,12 @@ describe('stampDataColumns', () => {
 describe('buildNameColumn', () => {
   it('uses identity tone and NameCell', () => {
     const col = buildNameColumn<Row>({ accessorKey: 'name', locked: true })
-    expect(col.meta).toMatchObject({ ...dataTableColumnMeta.identity, label: 'Name', locked: true })
+    expect(col.meta).toMatchObject({
+      ...dataTableColumnMeta.identity,
+      ...dataTableWidthMeta('title'),
+      label: 'Name',
+      locked: true,
+    })
 
     render(<NameCell>Barbarian</NameCell>)
     expect(screen.getByText('Barbarian')).toBeInTheDocument()

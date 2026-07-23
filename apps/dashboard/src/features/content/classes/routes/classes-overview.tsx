@@ -1,30 +1,17 @@
 import { useParams } from 'react-router-dom'
-import { DataTable } from '@rpg/ui'
-import type { CharacterClass } from '@rpg/contracts'
+import type { CharacterClass, WithCampaignAccess } from '@rpg/contracts'
+import type { ColumnDef } from '@rpg/ui'
 
 import { ROUTES } from '@/app/routes'
 import {
   formatContentCreateHeading,
   formatContentOverviewCaption,
   getContentTypeCollectionLabel,
-  getContentTypeMidSentenceLabel,
 } from '@/features/content/lib/content-type-labels'
 import { useClasses } from '../hooks/use-classes'
 import { classColumns, classFilters } from '../lib/classes-overview-columns'
 import { ContentOverviewShell } from '../../lib/overview/content-overview-shell'
-import { ContentOverviewRowActions } from '../../lib/overview/content-overview-row-actions'
-
-function ClassRowActions({ row, campaignId }: { row: CharacterClass; campaignId: string }) {
-  return (
-    <ContentOverviewRowActions
-      campaignId={campaignId}
-      editHref={ROUTES.content.classes.edit(campaignId, row.id)}
-      enabled={true}
-      onToggleEnabled={() => {}}
-      itemLabel={getContentTypeMidSentenceLabel('classes')}
-    />
-  )
-}
+import { ContentOverviewTable } from '../../lib/overview/content-overview-table.client'
 
 export function ClassesOverview() {
   const { campaignId = '' } = useParams<{ campaignId: string }>()
@@ -39,12 +26,16 @@ export function ClassesOverview() {
       newHref={ROUTES.content.classes.create(campaignId)}
       newLabel={formatContentCreateHeading('classes')}
     >
-      <DataTable
-        columns={classColumns(campaignId)}
-        data={classes}
+      <ContentOverviewTable<WithCampaignAccess<CharacterClass>>
+        contentTypeKey="classes"
+        campaignId={campaignId}
+        columns={
+          classColumns(campaignId) as ColumnDef<WithCampaignAccess<CharacterClass>, unknown>[]
+        }
         filters={classFilters}
-        rowActions={(row) => <ClassRowActions row={row} campaignId={campaignId} />}
+        data={classes as WithCampaignAccess<CharacterClass>[]}
         caption={formatContentOverviewCaption('classes', 'Character')}
+        getEditHref={(row) => ROUTES.content.classes.edit(campaignId, row.id)}
       />
     </ContentOverviewShell>
   )
