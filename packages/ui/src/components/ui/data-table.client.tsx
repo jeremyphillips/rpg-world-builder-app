@@ -933,7 +933,7 @@ export function DataTable<TData>({
       },
       enableSorting: false,
       enableHiding: false,
-      meta: { ...dataTableWidthMeta('minimal'), columnTone: 'neutral' },
+      meta: { ...dataTableWidthMeta('select'), columnTone: 'neutral' },
     }),
     [resolveSelectAllLabel, rowSelectionDescribedBy],
   )

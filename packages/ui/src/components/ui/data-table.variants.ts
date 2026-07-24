@@ -106,6 +106,14 @@ export const dataTableActionsCellVariants = cva(
   'sticky right-0 z-10 w-12 max-w-12 shrink-0 border-l border-border bg-surface-muted px-1 text-center group-hover/row:bg-row-hover group-data-[state=selected]/row:bg-row-selected group-[.bg-warning-faint]/row:bg-warning-faint',
 )
 
+/** Row-selection header — fixed to `Checkbox` (size-4) + horizontal padding. */
+export const dataTableSelectHeaderVariants = cva('w-10 max-w-10 shrink-0 px-3 text-center')
+
+/** Row-selection body cell — centers the checkbox control in the fixed-width column. */
+export const dataTableSelectCellVariants = cva(
+  'w-10 max-w-10 shrink-0 px-3 text-center [&_[role=checkbox]]:mx-auto [&_[role=checkbox]]:block',
+)
+
 /** Tighter body cell padding than the base TableCell default. */
 export const dataTableBodyCellPaddingVariants = cva('px-3 py-2')
 

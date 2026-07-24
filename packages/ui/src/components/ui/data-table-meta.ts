@@ -2,6 +2,8 @@ import {
   dataTableActionsCellVariants,
   dataTableActionsHeaderVariants,
   dataTableCellTextVariants,
+  dataTableSelectCellVariants,
+  dataTableSelectHeaderVariants,
 } from './data-table.variants'
 
 /** Shared `ColumnMeta.columnTone` values for DataTable body cell styling. */
@@ -44,7 +46,10 @@ export const dataTableColumnWidths = {
   /** Actions/menu column — width only; pair with `dataTableWidthMeta('actions')` for sticky chrome. */
   actions: 'w-12 max-w-12 shrink-0',
 
-  /** Shrink-to-fit checkbox column. */
+  /** Row selection checkbox column — pair with `dataTableWidthMeta('select')` for centered chrome. */
+  select: 'w-10 max-w-10 shrink-0',
+
+  /** Shrink-to-fit placeholder — prefer `select` for checkbox columns under `table-fixed`. */
   minimal: 'w-px',
 } as const
 
@@ -66,6 +71,12 @@ export function dataTableWidthMeta(width: DataTableColumnWidth) {
     return {
       headerClassName: dataTableActionsHeaderVariants(),
       cellClassName: dataTableActionsCellVariants(),
+    } as const
+  }
+  if (width === 'select') {
+    return {
+      headerClassName: dataTableSelectHeaderVariants(),
+      cellClassName: dataTableSelectCellVariants(),
     } as const
   }
   if (width === 'compactCenter' || width === 'tinyCenter') {
