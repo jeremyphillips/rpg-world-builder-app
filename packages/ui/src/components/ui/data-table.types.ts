@@ -115,6 +115,12 @@ export interface DataTableProps<TData> {
   onRowSelectionChange?: (rows: TData[]) => void
   /** Number of rows per page. Supported values: 10, 20, 50, 100. Default: 20. */
   defaultPageSize?: number
+  /** When false, omits inline filter controls from the toolbar (external filter UI). Default: true. */
+  showFilterControls?: boolean
+  /** Initial column visibility restored from persisted preferences. */
+  initialColumnVisibility?: VisibilityState
+  /** Initial column order restored from persisted preferences. */
+  initialColumnOrder?: string[]
   /** Accessible caption rendered below the table. */
   caption?: string
   /**

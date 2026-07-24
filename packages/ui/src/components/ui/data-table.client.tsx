@@ -601,6 +601,7 @@ interface DataTableToolbarProps<TData> {
   filterNotice?: React.ReactNode
   columnFilters: ColumnFiltersState
   onFilterValueChange: (filterId: string, value: unknown, filter: FilterDef<TData>) => void
+  showFilterControls?: boolean
 }
 
 function DataTableToolbar<TData>({
@@ -614,26 +615,31 @@ function DataTableToolbar<TData>({
   filterNotice,
   columnFilters,
   onFilterValueChange,
+  showFilterControls = true,
 }: DataTableToolbarProps<TData>) {
   return (
     <div className="flex flex-col gap-2">
       <div className={dataTableToolbarVariants()}>
         {/* Primary filters */}
-        <div className={dataTableFilterGroupVariants()}>
-          {primaryFilters.map((filter) => (
-            <FilterControl
-              key={filter.id}
-              filter={filter}
-              value={getEffectiveFilterValue(filter, columnFilters)}
-              onValueChange={(value) => onFilterValueChange(filter.id, value, filter)}
-            />
-          ))}
-        </div>
+        {showFilterControls ? (
+          <div className={dataTableFilterGroupVariants()}>
+            {primaryFilters.map((filter) => (
+              <FilterControl
+                key={filter.id}
+                filter={filter}
+                value={getEffectiveFilterValue(filter, columnFilters)}
+                onValueChange={(value) => onFilterValueChange(filter.id, value, filter)}
+              />
+            ))}
+          </div>
+        ) : (
+          <div className="flex-1" />
+        )}
 
         {/* Right-side controls */}
         <div className="flex items-center gap-2">
           {/* Advanced filters toggle */}
-          {secondaryFilterCount > 0 && (
+          {showFilterControls && secondaryFilterCount > 0 && (
             <Button
               variant="outline"
               size="sm"
@@ -1050,6 +1056,9 @@ export function DataTable<TData>({
   enableRowSelection = false,
   onRowSelectionChange,
   defaultPageSize = 20,
+  showFilterControls = true,
+  initialColumnVisibility,
+  initialColumnOrder,
   caption,
   onColumnChange,
   filterNotice,
@@ -1062,8 +1071,10 @@ export function DataTable<TData>({
     React.useState<ColumnFiltersState>(
       defaultColumnFilters ?? buildDefaultColumnFilters<TData>(filters),
     )
-  const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({})
-  const [columnOrder, setColumnOrder] = React.useState<ColumnOrderState>([])
+  const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>(
+    initialColumnVisibility ?? {},
+  )
+  const [columnOrder, setColumnOrder] = React.useState<ColumnOrderState>(initialColumnOrder ?? [])
   const [rowSelection, setRowSelection] = React.useState<RowSelectionState>({})
   const [pagination, setPagination] = React.useState<PaginationState>({
     pageIndex: 0,
@@ -1256,17 +1267,20 @@ export function DataTable<TData>({
         filterNotice={filterNotice}
         columnFilters={columnFilters}
         onFilterValueChange={handleFilterValueChange}
+        showFilterControls={showFilterControls}
       />
 
       {/* Advanced filters panel */}
-      <DataTableAdvancedFilters
-        secondaryFilters={secondaryFilters}
-        open={advancedOpen}
-        hasActiveFilters={hasAnyActiveFilter}
-        onClearAll={clearAllFilters}
-        columnFilters={columnFilters}
-        onFilterValueChange={handleFilterValueChange}
-      />
+      {showFilterControls ? (
+        <DataTableAdvancedFilters
+          secondaryFilters={secondaryFilters}
+          open={advancedOpen}
+          hasActiveFilters={hasAnyActiveFilter}
+          onClearAll={clearAllFilters}
+          columnFilters={columnFilters}
+          onFilterValueChange={handleFilterValueChange}
+        />
+      ) : null}
 
       {/* Table */}
       <div className={dataTableTableWrapVariants()}>
