@@ -258,6 +258,17 @@ describe('DataTable — row selection', () => {
     expect(screen.getByRole('checkbox', { name: 'Select Alpha' })).toBeInTheDocument()
   })
 
+  it('renders the selection column with a persisted user column order', () => {
+    renderTable({
+      enableRowSelection: true,
+      initialColumnOrder: ['name', 'category', 'active'],
+    })
+
+    expect(screen.getAllByRole('checkbox', { name: 'Select row' })).toHaveLength(DATA.length)
+    const [headerRow] = screen.getAllByRole('row')
+    expect(within(headerRow!).getAllByRole('columnheader')[0]).toHaveTextContent('')
+  })
+
   it('supports controlled row selection state', async () => {
     const user = userEvent.setup()
     const onStateChange = vi.fn()

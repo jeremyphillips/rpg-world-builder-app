@@ -104,6 +104,7 @@ import {
   areVisibilityStatesEqual,
   createColumnChangeSnapshot,
   createPersistedColumnChangeState,
+  resolveDataTableColumnOrder,
 } from './data-table-column-change.lib'
 import type {
   ColumnChangeState,
@@ -964,6 +965,16 @@ export function DataTable<TData>({
     [actionsColumn, columns, enableRowSelection, rowActions, selectionColumn],
   )
 
+  const effectiveColumnOrder = React.useMemo(
+    () =>
+      resolveDataTableColumnOrder({
+        order: columnOrder,
+        enableRowSelection: Boolean(enableRowSelection),
+        hasActions: Boolean(rowActions),
+      }),
+    [columnOrder, enableRowSelection, rowActions],
+  )
+
   // TanStack Table returns unstable function references; intentional here.
   // eslint-disable-next-line react-hooks/incompatible-library -- useReactTable
   const table = useReactTable({
@@ -973,7 +984,7 @@ export function DataTable<TData>({
     state: {
       sorting,
       columnVisibility,
-      ...(columnOrder.length > 0 ? { columnOrder } : {}),
+      ...(effectiveColumnOrder.length > 0 ? { columnOrder: effectiveColumnOrder } : {}),
       rowSelection,
       pagination,
     },

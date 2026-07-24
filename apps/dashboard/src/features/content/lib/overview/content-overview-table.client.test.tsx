@@ -236,4 +236,16 @@ describe('ContentOverviewTable interactions', () => {
     await user.click(screen.getByRole('button', { name: 'Select' }))
     expect(screen.getByRole('checkbox', { name: 'Select Class 0' })).toBeInTheDocument()
   })
+
+  it('renders selection checkboxes when column order preferences are persisted', async () => {
+    const user = userEvent.setup()
+    persistContentOverviewPreferences('classes', {
+      version: 2,
+      columnOrder: ['hitDie', 'name'],
+    })
+    renderOverview()
+
+    await user.click(screen.getByRole('button', { name: 'Select' }))
+    expect(screen.getByRole('checkbox', { name: 'Select Class 0' })).toBeInTheDocument()
+  })
 })
