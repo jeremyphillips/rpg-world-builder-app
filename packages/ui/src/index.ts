@@ -601,6 +601,7 @@ export {
 export {
   BooleanCell,
   DataTable,
+  DataTableColumnVisibilityTrigger,
   NameCell,
   DataTableImageCell,
   RowActionsMenu,
@@ -625,13 +626,17 @@ export {
 export type { DataTableCellTypography, DataTableColumnWidth } from './components/ui/data-table-meta'
 export type {
   ColumnChangeState,
+  DataTableColumnVisibilityTriggerProps,
   DataTableEmptyStateContext,
   DataTableProps,
+  DataTableSelectionLabels,
+  DataTableUtilityControls,
 } from './components/ui/data-table.types'
 export type { ColumnDef } from '@tanstack/react-table'
 export {
   dataTableRootVariants,
   dataTableToolbarVariants,
+  dataTableUtilityStripVariants,
   dataTableFilterGroupVariants,
   dataTableFilterControlVariants,
   dataTableAdvancedPanelVariants,

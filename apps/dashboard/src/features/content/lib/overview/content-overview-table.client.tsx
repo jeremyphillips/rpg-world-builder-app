@@ -16,6 +16,7 @@ import {
   dataTableRowUnavailableVariants,
   type ColumnDef,
   type ColumnChangeState,
+  type DataTableUtilityControls,
 } from '@rpg/ui'
 import {
   FilterAdvancedPanel,
@@ -57,6 +58,8 @@ import {
   type ContentOverviewPreferences,
 } from './content-overview-preferences'
 import { ContentOverviewRowActions } from './content-overview-row-actions'
+import { ContentTableUtilityStrip } from './content-table-utility-strip.client'
+import { formatOverviewResultCount } from './format-overview-result-count.lib'
 import {
   CAMPAIGN_AVAILABILITY_FILTER_ID,
   deriveCampaignAvailabilityScope,
@@ -79,6 +82,9 @@ type ContentOverviewDataTableProps<T extends WithCampaignAccess<ContentBase> & {
   contentTypeKey: ContentTypeKey
   itemLabel: string
   campaignAvailability: CampaignAvailabilityFilter
+  filteredCount: number
+  availabilityScopedCount: number
+  totalCount: number
   getEditHref: (row: T) => string
   onColumnChange: (state: ColumnChangeState) => void
   caption?: string
@@ -100,6 +106,9 @@ const ContentOverviewDataTable = memo(function ContentOverviewDataTable<
   contentTypeKey,
   itemLabel,
   campaignAvailability,
+  filteredCount,
+  availabilityScopedCount,
+  totalCount,
   getEditHref,
   onColumnChange,
   caption,
@@ -148,6 +157,22 @@ const ContentOverviewDataTable = memo(function ContentOverviewDataTable<
     [emptyState],
   )
 
+  const resultCountLabel = useMemo(
+    () => formatOverviewResultCount({ filteredCount, availabilityScopedCount, totalCount }),
+    [availabilityScopedCount, filteredCount, totalCount],
+  )
+
+  const renderUtilityStrip = useCallback(
+    (controls: DataTableUtilityControls<T>) => (
+      <ContentTableUtilityStrip
+        resultCountLabel={resultCountLabel}
+        canManage={canManage}
+        ColumnVisibilityTrigger={controls.ColumnVisibilityTrigger}
+      />
+    ),
+    [canManage, resultCountLabel],
+  )
+
   return (
     <DataTable
       columns={columns}
@@ -161,6 +186,7 @@ const ContentOverviewDataTable = memo(function ContentOverviewDataTable<
       emptyState={resolvedEmptyState}
       getRowClassName={getRowClassName}
       getCellClassName={getCellClassName}
+      utilityStrip={renderUtilityStrip}
     />
   )
 }) as <T extends WithCampaignAccess<ContentBase> & { id: string }>(
@@ -470,6 +496,9 @@ export function ContentOverviewTable<
         contentTypeKey={contentTypeKey}
         itemLabel={itemLabel}
         campaignAvailability={campaignAvailability}
+        filteredCount={visibleRows.length}
+        availabilityScopedCount={scopedRows.length}
+        totalCount={discoveryFilteredData.length}
         getEditHref={getEditHref}
         onColumnChange={handleColumnChange}
         caption={caption}

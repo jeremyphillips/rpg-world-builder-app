@@ -1,4 +1,34 @@
-import type { ColumnDef, Row, Cell, VisibilityState } from '@tanstack/react-table'
+import type {
+  ColumnDef,
+  Row,
+  Cell,
+  RowSelectionState,
+  VisibilityState,
+} from '@tanstack/react-table'
+
+export type DataTableColumnVisibilityTriggerProps = {
+  /** Accessible name for the trigger. Defaults to "Choose visible columns". */
+  'aria-label'?: string
+  /** When true, renders the outlined "Columns" label trigger used by the default toolbar. */
+  showLabel?: boolean
+}
+
+/** Narrow control surface passed to `utilityStrip` — no imperative table ref. */
+export type DataTableUtilityControls<TData> = {
+  ColumnVisibilityTrigger: React.ComponentType<DataTableColumnVisibilityTriggerProps>
+  pageRowCount: number
+  isAllPageRowsSelected: boolean
+  isSomePageRowsSelected: boolean
+  toggleAllPageRowsSelected: (value?: boolean) => void
+  selectedRowCount: number
+  selectedRows: TData[]
+  clearRowSelection: () => void
+}
+
+export type DataTableSelectionLabels<TData> = {
+  selectAll: string | ((pageRowCount: number) => string)
+  selectRow?: (row: TData) => string
+}
 
 /**
  * Emitted by `onColumnChange` whenever column visibility or order changes.
@@ -31,11 +61,22 @@ export interface DataTableProps<TData> {
   rowActions?: (row: TData) => React.ReactNode
   /** Prepend a checkbox column for multi-row selection. Default: false. */
   enableRowSelection?: boolean
+  /** Controlled row selection state keyed by row id. */
+  rowSelection?: RowSelectionState
   /**
    * Called with the selected row originals whenever selection changes.
    * Only fired when `enableRowSelection` is true.
    */
   onRowSelectionChange?: (rows: TData[]) => void
+  /** Called when row selection state changes — use with `rowSelection` for controlled mode. */
+  onRowSelectionStateChange?: (state: RowSelectionState) => void
+  /** Contextual labels for selection checkboxes. */
+  selectionLabels?: DataTableSelectionLabels<TData>
+  /**
+   * Replaces the default toolbar with a tinted utility strip above the table header.
+   * Receives page-selection helpers and the column visibility trigger.
+   */
+  utilityStrip?: (controls: DataTableUtilityControls<TData>) => React.ReactNode
   /** Number of rows per page. Supported values: 10, 20, 50, 100. Default: 20. */
   defaultPageSize?: number
   /** Initial column visibility restored from persisted preferences. */

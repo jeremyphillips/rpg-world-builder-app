@@ -145,7 +145,7 @@ describe('ContentOverviewTable interactions', () => {
 
     const callsAfterMount = persistPreferencesMock.mock.calls.length
 
-    await user.click(screen.getByRole('button', { name: /^Columns$/ }))
+    await user.click(screen.getByRole('button', { name: /^Choose visible columns$/ }))
 
     expect(persistPreferencesMock.mock.calls.length - callsAfterMount).toBe(0)
   })
@@ -154,7 +154,7 @@ describe('ContentOverviewTable interactions', () => {
     const user = userEvent.setup()
     renderOverview()
 
-    await user.click(screen.getByRole('button', { name: /^Columns$/ }))
+    await user.click(screen.getByRole('button', { name: /^Choose visible columns$/ }))
     const callsAfterOpen = persistPreferencesMock.mock.calls.length
 
     await user.click(screen.getByRole('button', { name: /Hide Hit Die column/i }))
@@ -208,5 +208,12 @@ describe('ContentOverviewTable interactions', () => {
     await user.click(screen.getByRole('button', { name: /^Filters/ }))
 
     expect(dataTableRenderCount - rendersAfterMount).toBe(0)
+  })
+
+  it('renders the utility strip with result count and columns control', () => {
+    renderOverview()
+    expect(screen.getByText('8 results')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Choose visible columns' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Select' })).toBeDisabled()
   })
 })
