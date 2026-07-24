@@ -152,7 +152,6 @@ const ContentOverviewDataTable = memo(function ContentOverviewDataTable<
     <DataTable
       columns={columns}
       data={data}
-      showFilterControls={false}
       defaultPageSize={pageSize}
       initialColumnVisibility={columnVisibility}
       initialColumnOrder={columnOrder}

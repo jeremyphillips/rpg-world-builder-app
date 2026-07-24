@@ -616,11 +616,6 @@ export type {
   ColumnChangeState,
   DataTableEmptyStateContext,
   DataTableProps,
-  FilterDef,
-  TextFilterDef,
-  SelectFilterDef,
-  BooleanFilterDef,
-  FilterGroup,
 } from './components/ui/data-table.types'
 export type { ColumnDef } from '@tanstack/react-table'
 export {

@@ -1,15 +1,12 @@
 'use client'
 
-// Augment TanStack Table to recognise the custom filter function names used
-// by this module so that `filterFn: 'boolean'` and `filterFn: 'equalsString'`
-// are valid string literals on ColumnDef.
-import type { FilterFn } from '@tanstack/react-table'
+// Allow column defs to pass className overrides through meta, and recognise
+// legacy filter function names on column definitions.
 declare module '@tanstack/react-table' {
   interface FilterFns {
     boolean: FilterFn<unknown>
     equalsString: FilterFn<unknown>
   }
-  // Allow column defs to pass className overrides through meta
   interface ColumnMeta<TData, TValue> {
     headerClassName?: string
     cellClassName?: string
@@ -32,14 +29,13 @@ import * as React from 'react'
 import {
   flexRender,
   getCoreRowModel,
-  getFilteredRowModel,
   getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
   type Column,
   type ColumnDef,
-  type ColumnFiltersState,
   type ColumnOrderState,
+  type FilterFn,
   type PaginationState,
   type RowSelectionState,
   type SortingState,
@@ -52,7 +48,6 @@ import {
   ChevronUp,
   Columns3,
   Ellipsis,
-  Filter,
   GripVertical,
   Lock,
   Pencil,
@@ -83,7 +78,6 @@ import * as PopoverPrimitive from '@radix-ui/react-popover'
 import { cn } from '../../lib/utils'
 import { Button } from './button.client'
 import { Checkbox } from './checkbox.client'
-import { Collapsible, CollapsibleContent } from './collapsible.client'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -91,7 +85,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from './dropdown-menu.client'
-import { Input } from './input.client'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './select.client'
 import { Switch } from './switch.client'
 import { InfoTooltip } from './tooltip.client'
@@ -113,17 +106,11 @@ import {
   createPersistedColumnChangeState,
 } from './data-table-column-change.lib'
 import type {
-  BooleanFilterDef,
   ColumnChangeState,
   DataTableEmptyStateContext,
   DataTableProps,
-  FilterDef,
-  SelectFilterDef,
-  TextFilterDef,
 } from './data-table.types'
 import {
-  dataTableAdvancedInnerVariants,
-  dataTableAdvancedPanelVariants,
   dataTableBodyCellPaddingVariants,
   dataTableBodyCellVariants,
   dataTableCaptionVariants,
@@ -132,10 +119,6 @@ import {
   dataTableColumnPanelVariants,
   dataTableEmptyPanelVariants,
   dataTableEmptyStateVariants,
-  dataTableFilterChipVariants,
-  dataTableFilterControlVariants,
-  dataTableFilterGroupVariants,
-  dataTableFilterNoticeVariants,
   dataTablePaginationVariants,
   dataTableResetColumnVariants,
   dataTableRowVariants,
@@ -152,223 +135,15 @@ import {
 } from './data-table.variants'
 
 // ---------------------------------------------------------------------------
-// Custom filter functions
+// Legacy column filter functions (column defs may still declare filterFn)
 // ---------------------------------------------------------------------------
 
-/**
- * Boolean presence filter. Only rows where the column value is truthy pass.
- * Register on a column via `filterFn: 'boolean'`.
- */
-const booleanFilterFn: FilterFn<unknown> = (row, columnId) => {
-  return Boolean(row.getValue(columnId))
-}
+const booleanFilterFn: FilterFn<unknown> = (row, columnId) => Boolean(row.getValue(columnId))
 booleanFilterFn.autoRemove = (val: unknown) => !val
 
-/**
- * String-coerced equality filter. Use on numeric or other non-string columns
- * paired with a `SelectFilterDef`, e.g. `filterFn: 'equalsString'` on the
- * column definition. Compares `String(cellValue) === String(filterValue)`.
- */
-const equalsStringFilterFn: FilterFn<unknown> = (row, columnId, filterValue) => {
-  return String(row.getValue(columnId)) === String(filterValue)
-}
+const equalsStringFilterFn: FilterFn<unknown> = (row, columnId, filterValue) =>
+  String(row.getValue(columnId)) === String(filterValue)
 equalsStringFilterFn.autoRemove = (val: unknown) => val == null || val === ''
-
-// ---------------------------------------------------------------------------
-// Helpers
-// ---------------------------------------------------------------------------
-
-function getDefaultGroup<TData>(filter: FilterDef<TData>): 'primary' | 'secondary' {
-  if (filter.group) return filter.group
-  return filter.type === 'boolean' ? 'secondary' : 'primary'
-}
-
-function getEffectiveFilterValue<TData>(
-  filter: FilterDef<TData>,
-  columnFilters: ColumnFiltersState,
-): unknown {
-  const entry = columnFilters.find((f) => f.id === filter.id)
-  if (entry !== undefined) return entry.value
-  if (filter.type === 'select' && filter.defaultValue !== undefined) return filter.defaultValue
-  return undefined
-}
-
-function isFilterActive<TData>(
-  filter: FilterDef<TData>,
-  columnFilters: ColumnFiltersState,
-): boolean {
-  const value = getEffectiveFilterValue(filter, columnFilters)
-  if (filter.type === 'select') {
-    if (filter.defaultValue !== undefined) {
-      const effective = (value ?? filter.defaultValue) as string
-      return effective !== filter.defaultValue
-    }
-    return value !== undefined && value !== ''
-  }
-  if (filter.type === 'boolean') return Boolean(value)
-  return value !== undefined && value !== ''
-}
-
-function buildDefaultColumnFilters<TData>(filters: FilterDef<TData>[]): ColumnFiltersState {
-  return filters
-    .filter(
-      (filter): filter is SelectFilterDef<TData> =>
-        filter.type === 'select' && filter.defaultValue !== undefined,
-    )
-    .map((filter) => ({ id: filter.id, value: filter.defaultValue! }))
-}
-
-function applyExternalFilters<TData>(
-  data: TData[],
-  filters: FilterDef<TData>[],
-  columnFilters: ColumnFiltersState,
-): TData[] {
-  const externalFilters = filters.filter(
-    (filter): filter is FilterDef<TData> & { matches: (row: TData, value: unknown) => boolean } =>
-      typeof filter.matches === 'function',
-  )
-
-  if (externalFilters.length === 0) return data
-
-  return data.filter((row) =>
-    externalFilters.every((filter) => {
-      const value = getEffectiveFilterValue(filter, columnFilters)
-      if (value === undefined) return true
-      return filter.matches(row, value)
-    }),
-  )
-}
-
-function setFilterValueInState<TData>(
-  columnFilters: ColumnFiltersState,
-  filterId: string,
-  value: unknown,
-  filter?: FilterDef<TData>,
-): ColumnFiltersState {
-  const next = columnFilters.filter((entry) => entry.id !== filterId)
-  if (value === undefined) return next
-  if (
-    filter?.type === 'select' &&
-    filter.defaultValue !== undefined &&
-    value === filter.defaultValue
-  ) {
-    return next
-  }
-  return [...next, { id: filterId, value }]
-}
-
-// ---------------------------------------------------------------------------
-// Toolbar filter renderers
-// ---------------------------------------------------------------------------
-
-interface FilterControlProps<TData> {
-  filter: FilterDef<TData>
-  value: unknown
-  onValueChange: (value: unknown) => void
-}
-
-function TextFilterControl<TData>({
-  filter,
-  value,
-  onValueChange,
-}: {
-  filter: TextFilterDef<TData>
-  value: unknown
-  onValueChange: (value: unknown) => void
-}) {
-  const textValue = (value as string | undefined) ?? ''
-  return (
-    <div className={dataTableFilterControlVariants({ type: 'text' })}>
-      <Input
-        placeholder={filter.placeholder ?? `Filter ${filter.label}…`}
-        value={textValue}
-        onChange={(e) => onValueChange(e.target.value || undefined)}
-        aria-label={filter.label}
-        size="sm"
-      />
-    </div>
-  )
-}
-
-function SelectFilterControl<TData>({
-  filter,
-  value,
-  onValueChange,
-}: {
-  filter: SelectFilterDef<TData>
-  value: unknown
-  onValueChange: (value: unknown) => void
-}) {
-  const showAllOption = filter.showAllOption ?? true
-  const defaultValue = filter.defaultValue ?? ''
-  const effectiveValue = (value as string | undefined) ?? defaultValue
-
-  return (
-    <div className={dataTableFilterControlVariants({ type: 'select' })}>
-      <Select
-        value={effectiveValue}
-        onValueChange={(nextValue) => {
-          if (showAllOption && nextValue === '__all__') {
-            if (value === undefined || value === '') return
-            onValueChange(undefined)
-            return
-          }
-          if (Object.is(nextValue, effectiveValue)) return
-          onValueChange(nextValue)
-        }}
-      >
-        <SelectTrigger aria-label={filter.label} size="sm">
-          <SelectValue placeholder={filter.label} />
-        </SelectTrigger>
-        <SelectContent>
-          {showAllOption ? <SelectItem value="__all__">All {filter.label}</SelectItem> : null}
-          {filter.options.map((opt) => (
-            <SelectItem key={opt.value} value={opt.value}>
-              {opt.label}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-    </div>
-  )
-}
-
-function BooleanFilterControl<TData>({
-  filter,
-  value,
-  onValueChange,
-}: {
-  filter: BooleanFilterDef<TData>
-  value: unknown
-  onValueChange: (value: unknown) => void
-}) {
-  const isChecked = Boolean(value)
-  return (
-    <div className={dataTableFilterControlVariants({ type: 'boolean' })}>
-      <Checkbox
-        id={`filter-${filter.id}`}
-        checked={isChecked}
-        onCheckedChange={(checked) => onValueChange(checked ? true : undefined)}
-      />
-      <label
-        htmlFor={`filter-${filter.id}`}
-        className="cursor-pointer text-sm font-medium leading-none"
-      >
-        {filter.label}
-      </label>
-    </div>
-  )
-}
-
-function FilterControl<TData>({ filter, value, onValueChange }: FilterControlProps<TData>) {
-  if (filter.type === 'text') {
-    return <TextFilterControl filter={filter} value={value} onValueChange={onValueChange} />
-  }
-  if (filter.type === 'select') {
-    return <SelectFilterControl filter={filter} value={value} onValueChange={onValueChange} />
-  }
-  return <BooleanFilterControl filter={filter} value={value} onValueChange={onValueChange} />
-}
 
 // ---------------------------------------------------------------------------
 // DataTableColumnPanel — DnD-sortable column visibility + order editor
@@ -606,137 +381,15 @@ function DataTableColumnPanel<TData>({ table, onColumnChange }: DataTableColumnP
 
 interface DataTableToolbarProps<TData> {
   table: ReturnType<typeof useReactTable<TData>>
-  primaryFilters: FilterDef<TData>[]
-  secondaryFilterCount: number
-  activeSecondaryCount: number
-  advancedOpen: boolean
-  onToggleAdvanced: () => void
   onColumnChange?: (state: ColumnChangeState) => void
-  filterNotice?: React.ReactNode
-  columnFilters: ColumnFiltersState
-  onFilterValueChange: (filterId: string, value: unknown, filter: FilterDef<TData>) => void
-  showFilterControls?: boolean
 }
 
-function DataTableToolbar<TData>({
-  table,
-  primaryFilters,
-  secondaryFilterCount,
-  activeSecondaryCount,
-  advancedOpen,
-  onToggleAdvanced,
-  onColumnChange,
-  filterNotice,
-  columnFilters,
-  onFilterValueChange,
-  showFilterControls = true,
-}: DataTableToolbarProps<TData>) {
+function DataTableToolbar<TData>({ table, onColumnChange }: DataTableToolbarProps<TData>) {
   return (
-    <div className="flex flex-col gap-2">
-      <div className={dataTableToolbarVariants()}>
-        {/* Primary filters */}
-        {showFilterControls ? (
-          <div className={dataTableFilterGroupVariants()}>
-            {primaryFilters.map((filter) => (
-              <FilterControl
-                key={filter.id}
-                filter={filter}
-                value={getEffectiveFilterValue(filter, columnFilters)}
-                onValueChange={(value) => onFilterValueChange(filter.id, value, filter)}
-              />
-            ))}
-          </div>
-        ) : (
-          <div className="flex-1" />
-        )}
-
-        {/* Right-side controls */}
-        <div className="flex items-center gap-2">
-          {/* Advanced filters toggle */}
-          {showFilterControls && secondaryFilterCount > 0 && (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={onToggleAdvanced}
-              aria-expanded={advancedOpen}
-              className="gap-1.5"
-            >
-              <Filter className="size-3.5" />
-              Filters
-              {activeSecondaryCount > 0 && (
-                <Badge appearance="neutral" tone="neutral" size="sm" className="ml-0.5">
-                  {activeSecondaryCount}
-                </Badge>
-              )}
-              {advancedOpen ? (
-                <ChevronUp className="size-3.5 opacity-60" />
-              ) : (
-                <ChevronDown className="size-3.5 opacity-60" />
-              )}
-            </Button>
-          )}
-
-          {/* Column panel */}
-          <DataTableColumnPanel table={table} onColumnChange={onColumnChange} />
-        </div>
-      </div>
-
-      {filterNotice ? <div className={dataTableFilterNoticeVariants()}>{filterNotice}</div> : null}
+    <div className={dataTableToolbarVariants()}>
+      <div className="flex-1" />
+      <DataTableColumnPanel table={table} onColumnChange={onColumnChange} />
     </div>
-  )
-}
-
-// ---------------------------------------------------------------------------
-// DataTableAdvancedFilters
-// ---------------------------------------------------------------------------
-
-interface DataTableAdvancedFiltersProps<TData> {
-  secondaryFilters: FilterDef<TData>[]
-  open: boolean
-  hasActiveFilters: boolean
-  onClearAll: () => void
-  columnFilters: ColumnFiltersState
-  onFilterValueChange: (filterId: string, value: unknown, filter: FilterDef<TData>) => void
-}
-
-function DataTableAdvancedFilters<TData>({
-  secondaryFilters,
-  open,
-  hasActiveFilters,
-  onClearAll,
-  columnFilters,
-  onFilterValueChange,
-}: DataTableAdvancedFiltersProps<TData>) {
-  if (secondaryFilters.length === 0) return null
-
-  const cols = Math.min(secondaryFilters.length, 3) as 1 | 2 | 3
-  const colValue = cols <= 1 ? 1 : cols <= 2 ? 2 : 3
-
-  return (
-    <Collapsible open={open}>
-      <CollapsibleContent>
-        <div className={dataTableAdvancedPanelVariants()}>
-          <div className={dataTableAdvancedInnerVariants({ cols: colValue })}>
-            {secondaryFilters.map((filter) => (
-              <FilterControl
-                key={filter.id}
-                filter={filter}
-                value={getEffectiveFilterValue(filter, columnFilters)}
-                onValueChange={(value) => onFilterValueChange(filter.id, value, filter)}
-              />
-            ))}
-          </div>
-          {hasActiveFilters && (
-            <div className="flex items-center justify-end border-t border-border px-4 py-2">
-              <button type="button" onClick={onClearAll} className={dataTableFilterChipVariants()}>
-                <X className="size-3" />
-                Clear all filters
-              </button>
-            </div>
-          )}
-        </div>
-      </CollapsibleContent>
-    </Collapsible>
   )
 }
 
@@ -1063,29 +716,19 @@ export function RowActionsMenu({
 export function DataTable<TData>({
   columns,
   data,
-  filters = [],
-  columnFilters: columnFiltersProp,
-  onColumnFiltersChange,
-  defaultColumnFilters,
   rowActions,
   enableRowSelection = false,
   onRowSelectionChange,
   defaultPageSize = 20,
-  showFilterControls = true,
   initialColumnVisibility,
   initialColumnOrder,
   caption,
   onColumnChange,
-  filterNotice,
   emptyState,
   getRowClassName,
   getCellClassName,
 }: DataTableProps<TData>) {
   const [sorting, setSorting] = React.useState<SortingState>([])
-  const [uncontrolledColumnFilters, setUncontrolledColumnFilters] =
-    React.useState<ColumnFiltersState>(
-      defaultColumnFilters ?? buildDefaultColumnFilters<TData>(filters),
-    )
   const [columnVisibility, setColumnVisibilityState] = React.useState<VisibilityState>(
     initialColumnVisibility ?? {},
   )
@@ -1107,52 +750,6 @@ export function DataTable<TData>({
     },
     [],
   )
-
-  const [advancedOpen, setAdvancedOpen] = React.useState(false)
-
-  const isColumnFiltersControlled = columnFiltersProp !== undefined
-  const columnFilters = isColumnFiltersControlled ? columnFiltersProp : uncontrolledColumnFilters
-
-  const setColumnFilters = React.useCallback(
-    (updater: ColumnFiltersState | ((prev: ColumnFiltersState) => ColumnFiltersState)) => {
-      const next = typeof updater === 'function' ? updater(columnFilters) : updater
-      onColumnFiltersChange?.(next)
-      if (!isColumnFiltersControlled) {
-        setUncontrolledColumnFilters(next)
-      }
-    },
-    [columnFilters, isColumnFiltersControlled, onColumnFiltersChange],
-  )
-
-  const externallyFilteredData = React.useMemo(
-    () => applyExternalFilters(data, filters, columnFilters),
-    [columnFilters, data, filters],
-  )
-
-  const columnBackedFilters = React.useMemo(
-    () =>
-      columnFilters.filter((entry) => {
-        const filter = filters.find((candidate) => candidate.id === entry.id)
-        return filter === undefined || filter.matches === undefined
-      }),
-    [columnFilters, filters],
-  )
-
-  // Warn in dev when a filter id doesn't match any column accessorKey
-  React.useEffect(() => {
-    if (process.env.NODE_ENV !== 'development') return
-    const columnIds = new Set(columns.map((c) => (c as { accessorKey?: string }).accessorKey ?? ''))
-    for (const f of filters) {
-      if (f.matches) continue
-      if (!columnIds.has(f.id)) {
-        console.warn(
-          `[DataTable] filter id "${f.id}" does not match any column accessorKey. Filtering will be silently skipped.`,
-        )
-      }
-    }
-    // Only run on mount — columns/filters are treated as stable config
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
 
   // Notify parent when column visibility/order changes — explicit writes only.
   const onColumnChangeRef = React.useRef(onColumnChange)
@@ -1263,34 +860,22 @@ export function DataTable<TData>({
   // TanStack Table returns unstable function references; intentional here.
   // eslint-disable-next-line react-hooks/incompatible-library -- useReactTable
   const table = useReactTable({
-    data: externallyFilteredData,
+    data,
     columns: resolvedColumns,
     state: {
       sorting,
-      columnFilters: columnBackedFilters,
       columnVisibility,
       ...(columnOrder.length > 0 ? { columnOrder } : {}),
       rowSelection,
       pagination,
     },
     onSortingChange: setSorting,
-    onColumnFiltersChange: (updater) => {
-      setPagination((prev) => ({ ...prev, pageIndex: 0 }))
-      const next = typeof updater === 'function' ? updater(columnBackedFilters) : updater
-      setColumnFilters((prev) => {
-        const externalEntries = prev.filter((entry) =>
-          filters.some((filter) => filter.id === entry.id && filter.matches),
-        )
-        return [...externalEntries, ...next]
-      })
-    },
     onColumnVisibilityChange: setColumnVisibility,
     onColumnOrderChange: setColumnOrder,
     onRowSelectionChange: setRowSelection,
     onPaginationChange: setPagination,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     filterFns: { boolean: booleanFilterFn, equalsString: equalsStringFilterFn },
     enableRowSelection,
@@ -1315,62 +900,16 @@ export function DataTable<TData>({
     )
   }, [rowSelection])
 
-  const primaryFilters = filters.filter((f) => getDefaultGroup(f) === 'primary')
-  const secondaryFilters = filters.filter((f) => getDefaultGroup(f) === 'secondary')
-
-  const activeSecondaryCount = secondaryFilters.filter((filter) =>
-    isFilterActive(filter, columnFilters),
-  ).length
-
-  const hasAnyActiveFilter = filters.some((filter) => isFilterActive(filter, columnFilters))
-
-  function clearAllFilters() {
-    setPagination((prev) => ({ ...prev, pageIndex: 0 }))
-    setColumnFilters(buildDefaultColumnFilters(filters))
-    table.resetColumnFilters()
-  }
-
-  function handleFilterValueChange(filterId: string, value: unknown, filter: FilterDef<TData>) {
-    setPagination((prev) => ({ ...prev, pageIndex: 0 }))
-    setColumnFilters((prev) => setFilterValueInState(prev, filterId, value, filter))
-  }
-
   const rows = table.getRowModel().rows
   const emptyStateContext: DataTableEmptyStateContext<TData> = {
-    columnFilters,
     filteredRowCount: rows.length,
-    totalRowCount: externallyFilteredData.length,
-    data: externallyFilteredData,
+    totalRowCount: data.length,
+    data,
   }
 
   return (
     <div className={dataTableRootVariants()}>
-      {/* Toolbar */}
-      <DataTableToolbar
-        table={table}
-        primaryFilters={primaryFilters}
-        secondaryFilterCount={secondaryFilters.length}
-        activeSecondaryCount={activeSecondaryCount}
-        advancedOpen={advancedOpen}
-        onToggleAdvanced={() => setAdvancedOpen((o) => !o)}
-        onColumnChange={onColumnChange}
-        filterNotice={filterNotice}
-        columnFilters={columnFilters}
-        onFilterValueChange={handleFilterValueChange}
-        showFilterControls={showFilterControls}
-      />
-
-      {/* Advanced filters panel */}
-      {showFilterControls ? (
-        <DataTableAdvancedFilters
-          secondaryFilters={secondaryFilters}
-          open={advancedOpen}
-          hasActiveFilters={hasAnyActiveFilter}
-          onClearAll={clearAllFilters}
-          columnFilters={columnFilters}
-          onFilterValueChange={handleFilterValueChange}
-        />
-      ) : null}
+      <DataTableToolbar table={table} onColumnChange={onColumnChange} />
 
       {/* Table */}
       <div className={dataTableTableWrapVariants()}>

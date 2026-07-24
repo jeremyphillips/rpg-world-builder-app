@@ -11,7 +11,16 @@ import {
   TableBadgeCell,
 } from './data-table.client'
 import { dataTableColumnMeta, dataTableWidthMeta } from './data-table-meta'
-import type { DataTableProps, FilterDef } from './data-table.types'
+import type { DataTableProps } from './data-table.types'
+import {
+  createEqualsFilter,
+  createTextFilter,
+  createFilterSchema,
+  FilterAdvancedPanel,
+  FilterBar,
+  applyFilterSchema,
+  useFilterState,
+} from '../../filters'
 
 // ---------------------------------------------------------------------------
 // Shared fixture data + types
@@ -155,7 +164,6 @@ const BASE_COLUMNS: ColumnDef<CharacterClass>[] = [
     accessorKey: 'hitDie',
     header: ({ column }) => <SortableHeader column={column}>Hit Die</SortableHeader>,
     cell: ({ row }) => `d${row.getValue('hitDie')}`,
-    filterFn: 'equalsString',
     meta: { ...dataTableColumnMeta.data, ...dataTableWidthMeta('compact'), label: 'Hit Die' },
   },
   {
@@ -167,7 +175,6 @@ const BASE_COLUMNS: ColumnDef<CharacterClass>[] = [
     accessorKey: 'spellcasting',
     header: 'Spellcasting',
     cell: ({ row }) => <BooleanCell value={row.getValue('spellcasting')} />,
-    filterFn: 'boolean',
     meta: {
       ...dataTableColumnMeta.data,
       ...dataTableWidthMeta('compactCenter'),
@@ -189,10 +196,20 @@ const BASE_COLUMNS: ColumnDef<CharacterClass>[] = [
   },
 ]
 
-const ALL_FILTERS: FilterDef[] = [
-  { type: 'text', id: 'name', label: 'Name', placeholder: 'Search classes…' },
-  {
-    type: 'select',
+type ClassFilterState = {
+  name?: string
+  hitDie?: string
+  source?: 'system' | 'homebrew'
+}
+
+const classFilterSchema = createFilterSchema<CharacterClass, ClassFilterState>([
+  createTextFilter({
+    id: 'name',
+    label: 'Name',
+    placeholder: 'Search classes…',
+    getSearchText: (row) => row.name,
+  }),
+  createEqualsFilter({
     id: 'hitDie',
     label: 'Hit Die',
     options: [
@@ -201,19 +218,19 @@ const ALL_FILTERS: FilterDef[] = [
       { label: 'd10', value: '10' },
       { label: 'd12', value: '12' },
     ],
-  },
-  {
-    type: 'select',
+    getValue: (row) => String(row.hitDie),
+  }),
+  createEqualsFilter({
     id: 'source',
     label: 'Source',
+    placement: 'advanced',
     options: [
       { label: 'System', value: 'system' },
       { label: 'Homebrew', value: 'homebrew' },
     ],
-    group: 'secondary',
-  },
-  { type: 'boolean', id: 'spellcasting', label: 'Has Spellcasting' },
-]
+    getValue: (row) => row.source,
+  }),
+])
 
 // ---------------------------------------------------------------------------
 // Typed wrapper — gives Storybook a concrete non-generic component type so
@@ -222,6 +239,36 @@ const ALL_FILTERS: FilterDef[] = [
 
 function ClassDataTable(props: DataTableProps<CharacterClass>) {
   return <DataTable {...props} />
+}
+
+function ClassDataTableWithFilters() {
+  const { state, setValue, reset } = useFilterState(classFilterSchema)
+  const [advancedOpen, setAdvancedOpen] = React.useState(false)
+  const filteredRows = React.useMemo(
+    () => applyFilterSchema(classFilterSchema, state, CLASSES),
+    [state],
+  )
+
+  return (
+    <div className="flex flex-col gap-3">
+      <FilterBar
+        schema={classFilterSchema}
+        state={state}
+        onValueChange={setValue}
+        onReset={reset}
+        advancedOpen={advancedOpen}
+        onAdvancedOpenChange={setAdvancedOpen}
+      />
+      <FilterAdvancedPanel
+        schema={classFilterSchema}
+        state={state}
+        open={advancedOpen}
+        onValueChange={setValue}
+        onClearAll={reset}
+      />
+      <DataTable columns={BASE_COLUMNS} data={filteredRows} defaultPageSize={10} />
+    </div>
+  )
 }
 
 // ---------------------------------------------------------------------------
@@ -251,44 +298,19 @@ export const Basic: Story = {
   },
 }
 
-export const WithFilters: Story = {
-  name: 'With Filters (primary)',
+export const WithExternalFilters: Story = {
+  name: 'With External Filters',
   args: {
     columns: BASE_COLUMNS,
     data: CLASSES,
-    filters: [
-      { type: 'text', id: 'name', label: 'Name', placeholder: 'Search classes…' },
-      {
-        type: 'select',
-        id: 'hitDie',
-        label: 'Hit Die',
-        options: [
-          { label: 'd6', value: '6' },
-          { label: 'd8', value: '8' },
-          { label: 'd10', value: '10' },
-          { label: 'd12', value: '12' },
-        ],
-      },
-    ],
-    defaultPageSize: 10,
   },
-}
-
-export const WithAdvancedFilters: Story = {
-  name: 'With Advanced Filters (primary + secondary)',
-  args: {
-    columns: BASE_COLUMNS,
-    data: CLASSES,
-    filters: ALL_FILTERS,
-    defaultPageSize: 10,
-  },
+  render: () => <ClassDataTableWithFilters />,
 }
 
 export const WithRowSelection: Story = {
   args: {
     columns: BASE_COLUMNS,
     data: CLASSES,
-    filters: [{ type: 'text', id: 'name', label: 'Name', placeholder: 'Search…' }],
     enableRowSelection: true,
     onRowSelectionChange: (rows) => console.log('Selected:', rows),
     defaultPageSize: 10,
@@ -313,7 +335,6 @@ export const WithRowActions: Story = {
   args: {
     columns: BASE_COLUMNS,
     data: CLASSES,
-    filters: [{ type: 'text', id: 'name', label: 'Name', placeholder: 'Search…' }],
     enableRowSelection: true,
     rowActions: (row) => <ClassRowActions row={row} />,
     defaultPageSize: 10,
@@ -324,7 +345,6 @@ export const EmptyState: Story = {
   args: {
     columns: BASE_COLUMNS,
     data: [],
-    filters: [{ type: 'text', id: 'name', label: 'Name', placeholder: 'Search…' }],
   },
 }
 
