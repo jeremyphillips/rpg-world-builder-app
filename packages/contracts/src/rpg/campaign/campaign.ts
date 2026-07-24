@@ -152,6 +152,8 @@ export type Campaign = z.infer<typeof campaignSchema>
  */
 export const campaignListItemSchema = campaignSchema.extend({
   campaignRole: campaignRoleSchema,
+  /** IDs of characters this user has submitted to this campaign. */
+  characterIds: z.array(z.string()),
 })
 
 export type CampaignListItem = z.infer<typeof campaignListItemSchema>

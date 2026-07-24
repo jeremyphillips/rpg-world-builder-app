@@ -1,6 +1,10 @@
 import { describe, expect, it } from 'vitest'
 
-import { applyStableNestedContentKeys, deriveEnvelopeSlugFromInput } from './apply-content-keys'
+import {
+  applyStableNestedContentKeys,
+  deriveEnvelopeSlugFromInput,
+  regenerateNestedContentKeysForDuplicate,
+} from './apply-content-keys'
 import { ContentKeyError } from '@rpg/contracts'
 
 describe('deriveEnvelopeSlugFromInput', () => {
@@ -86,5 +90,25 @@ describe('applyStableNestedContentKeys', () => {
       name: 'Draconic Legacy',
       options: [{ id: 'black-dragon', name: 'Black Dragon' }],
     })
+  })
+})
+
+describe('regenerateNestedContentKeysForDuplicate', () => {
+  it('forces new feature ids even when source ids are present', () => {
+    const body = regenerateNestedContentKeysForDuplicate(
+      {
+        features: [{ id: 'rage', name: 'Rage', level: 1 }],
+      },
+      {
+        destinationSlug: 'berserker-copy',
+        nestedIdRegeneration: { paths: ['features'] },
+      },
+    )
+
+    expect((body.features as Array<{ id: string; name: string }>)[0]).toMatchObject({
+      name: 'Rage',
+      level: 1,
+    })
+    expect((body.features as Array<{ id: string }>)[0]?.id).not.toBe('rage')
   })
 })

@@ -4,10 +4,14 @@ import type { Equipment } from '../../content/equipment'
 import type { Species } from '../../content/species'
 import type { Spell } from '../../content/spell'
 import type { CharacterBuildContext } from './context'
+import type { ResolvedContentCampaignAccess } from '../../content/lib/campaign-access'
+import { DEFAULT_CONTENT_CAMPAIGN_ACCESS } from '../../content/lib/campaign-access'
+import type { ContentViewer } from '../../content/lib/content-viewer-access'
+import { isContentDiscoverableForViewer } from '../../content/lib/content-viewer-access'
 
 // ---------------------------------------------------------------------------
 // resolveAvailableContent — availability seam for the builder UI. Campaign
-// allow/deny, visibility, and DM-bypass plug in here later without UI changes.
+// allow/deny plugs in via optional `catalogViewer` on CharacterBuildContext.
 // ---------------------------------------------------------------------------
 
 export type AvailableContent = {
@@ -36,17 +40,48 @@ function filterSpellsByClassSlugs(
   return spells.filter((spell) => spell.classIds.some((slug) => classSlugs.has(slug)))
 }
 
+type DiscoverableCatalogRow = {
+  status?: string
+  campaignAccess?: ResolvedContentCampaignAccess
+}
+
+function filterDiscoverableCatalogItems<T extends DiscoverableCatalogRow>(
+  items: readonly T[],
+  viewer: ContentViewer,
+): T[] {
+  return items.filter((row) => {
+    if (viewer.kind !== 'manage' && row.status === 'draft') {
+      return false
+    }
+
+    const campaignAccess = row.campaignAccess ?? DEFAULT_CONTENT_CAMPAIGN_ACCESS
+    return isContentDiscoverableForViewer(campaignAccess, viewer)
+  })
+}
+
 /** Returns catalog options filtered by resolved character-creation rules. */
 export function resolveAvailableContent(context: CharacterBuildContext): AvailableContent {
-  const species = filterSpeciesByCreatureTypePolicy(context.catalog.species, context)
-  const classes = [...context.catalog.classes]
+  const viewer = context.catalogViewer
+  let species = filterSpeciesByCreatureTypePolicy(context.catalog.species, context)
+  let classes = [...context.catalog.classes]
+  let equipment = [...context.catalog.equipment]
+
+  if (viewer) {
+    species = filterDiscoverableCatalogItems(species, viewer)
+    classes = filterDiscoverableCatalogItems(classes, viewer)
+    equipment = filterDiscoverableCatalogItems(equipment, viewer)
+  }
+
   const classSlugs = new Set(classes.map((entry) => entry.slug))
-  const spells = filterSpellsByClassSlugs(context.catalog.spells, classSlugs)
+  let spells = filterSpellsByClassSlugs(context.catalog.spells, classSlugs)
+  if (viewer) {
+    spells = filterDiscoverableCatalogItems(spells, viewer)
+  }
 
   return {
     species,
     classes,
     spells,
-    equipment: [...context.catalog.equipment],
+    equipment,
   }
 }

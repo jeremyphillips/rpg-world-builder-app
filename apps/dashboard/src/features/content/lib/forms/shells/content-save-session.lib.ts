@@ -1,9 +1,24 @@
+import type { CampaignAccessSaveResult } from '../../campaign-access/campaign-access-form-context.client'
+
 export type SaveResult =
   | { status: 'saved' }
   | { status: 'blocked' }
   | { status: 'invalid' }
   | { status: 'failed'; error: Error }
   | { status: 'skipped' }
+
+export function mapCampaignAccessSaveResult(result: CampaignAccessSaveResult): SaveResult {
+  switch (result.status) {
+    case 'skipped':
+      return { status: 'skipped' }
+    case 'updated':
+      return { status: 'saved' }
+    case 'blocked':
+      return { status: 'blocked' }
+    case 'invalid':
+      return { status: 'invalid' }
+  }
+}
 
 export type SaveSurface = {
   dirty: boolean

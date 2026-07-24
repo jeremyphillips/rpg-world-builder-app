@@ -28,10 +28,12 @@ import {
   type CampaignAccessSaveResult,
 } from './campaign-access-form-context.client'
 import { buildCampaignAccessFields } from './campaign-access-form-fields'
+import { formatCampaignAccessParticipantOptionLabel } from './campaign-access-labels'
 import {
   isDefaultCampaignAccessPatch,
   resolvedToCampaignAccessPatch,
 } from './campaign-access-state'
+import { useCampaignAccessParticipantRoster } from './use-campaign-access-participant-roster'
 
 export interface CampaignAccessSectionProps {
   campaignId: string
@@ -72,6 +74,19 @@ export function CampaignAccessSection({
   const entityIdRef = useRef(entityId)
   entityIdRef.current = entityId
 
+  const { data: participantRoster = [] } = useCampaignAccessParticipantRoster(campaignId)
+  const participantOptions = useMemo(
+    () =>
+      participantRoster.map((participant) => ({
+        value: participant.id,
+        label: formatCampaignAccessParticipantOptionLabel(
+          participant.name,
+          participant.playerDisplayName,
+        ),
+      })),
+    [participantRoster],
+  )
+
   const initialPatch = useMemo(() => resolvedToCampaignAccessPatch(initialAccess), [initialAccess])
 
   const resolverFields = useMemo(
@@ -81,8 +96,9 @@ export function CampaignAccessSection({
         available: true,
         pending: false,
         groupId,
+        participantOptions,
       }),
-    [groupId, targetType],
+    [groupId, participantOptions, targetType],
   )
 
   const resolver = useMemo(
@@ -108,8 +124,9 @@ export function CampaignAccessSection({
         available: available ?? initialPatch.available,
         pending,
         groupId,
+        participantOptions,
       }),
-    [available, groupId, initialPatch.available, pending, targetType],
+    [available, groupId, initialPatch.available, participantOptions, pending, targetType],
   )
 
   useEffect(() => {

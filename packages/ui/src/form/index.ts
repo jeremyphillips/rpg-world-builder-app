@@ -244,6 +244,12 @@ export {
   type UseSilentFormValidityResult,
 } from './hooks/use-silent-form-validity.client'
 export {
+  useSubmitHandler,
+  type FormSubmitHandler,
+  type UseSubmitHandlerOptions,
+  type UseSubmitHandlerResult,
+} from './hooks/use-submit-handler.client'
+export {
   ARRAY_ITEM_HEADER_DIVIDER,
   ARRAY_ITEM_TEXT_SEPARATOR,
   joinArrayItemSummaryParts,

@@ -67,7 +67,11 @@ No unified Save — Publish / Save draft stay pending-only. Campaign access uses
 - Shell wiring: `content-save-session.integration.test.tsx`
 - Participant contract: `campaign-access-form-context.test.tsx`
 
-## Follow-ups
+## Participant picker
 
-- Subclass editor panel parity (reuse `CampaignAccessFormProvider` in subclass save orchestration)
-- Runtime enforcement for `specific_players`
+`useCampaignAccessParticipantRoster` loads `GET …/content/access-participants`.
+`buildCampaignAccessFields` renders a conditional `participantIds` combobox when
+`visibilityMode === 'specific_players'`.
+
+Subclass editor save orchestration reuses `CampaignAccessFormProvider` and
+`runContentSaveSession` (access first, then body) for persisted subclasses.

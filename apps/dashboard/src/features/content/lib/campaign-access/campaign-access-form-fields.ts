@@ -18,6 +18,9 @@ import {
   CAMPAIGN_ACCESS_AVAILABLE_TOOLTIP,
   CAMPAIGN_ACCESS_CHANGE_LABEL,
   CAMPAIGN_ACCESS_DONE_LABEL,
+  CAMPAIGN_ACCESS_PARTICIPANTS_HINT,
+  CAMPAIGN_ACCESS_PARTICIPANTS_LABEL,
+  CAMPAIGN_ACCESS_PARTICIPANTS_TOOLTIP,
   CAMPAIGN_ACCESS_PLAYER_ACCESS_LABEL,
   CAMPAIGN_ACCESS_PLAYER_ACCESS_TOOLTIP,
   CAMPAIGN_ACCESS_SECTION_LEGEND,
@@ -32,6 +35,7 @@ export type CampaignAccessFormCtx = {
   pending: boolean
   /** Stable group id — include entity id so disclosure state resets per record. */
   groupId: string
+  participantOptions?: ReadonlyArray<{ value: string; label: string }>
 }
 
 function buildVisibilityModeOptions(targetType: ContentAccessTargetType) {
@@ -50,6 +54,32 @@ function toCampaignAccessPatch(values: Record<string, unknown>): ContentCampaign
     visibilityMode: values.visibilityMode as ContentCampaignAccessPatch['visibilityMode'],
     participantIds: (values.participantIds as string[] | undefined) ?? [],
   }
+}
+
+function buildParticipantField(ctx: CampaignAccessFormCtx): FormItem[] {
+  if (!ctx.participantOptions) {
+    return []
+  }
+
+  return [
+    {
+      type: 'combobox',
+      name: 'participantIds',
+      label: CAMPAIGN_ACCESS_PARTICIPANTS_LABEL,
+      hint: CAMPAIGN_ACCESS_PARTICIPANTS_HINT,
+      info: CAMPAIGN_ACCESS_PARTICIPANTS_TOOLTIP,
+      multiple: true,
+      options: [...ctx.participantOptions],
+      placeholder: 'Choose players…',
+      required: true,
+      disabled: !ctx.available || ctx.pending,
+      visibility: {
+        dependsOn: ['available', 'visibilityMode'],
+        visibleWhen: (values) =>
+          Boolean(values.available) && values.visibilityMode === 'specific_players',
+      },
+    },
+  ]
 }
 
 export function buildCampaignAccessFields(ctx: CampaignAccessFormCtx): FormItem[] {
@@ -102,6 +132,7 @@ export function buildCampaignAccessFields(ctx: CampaignAccessFormCtx): FormItem[
           options: buildVisibilityModeOptions(ctx.targetType),
           optionAvailability: campaignAccessVisibilityOptionAvailability(),
         },
+        ...buildParticipantField(ctx),
       ],
     },
   ]

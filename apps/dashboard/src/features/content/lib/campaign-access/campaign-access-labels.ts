@@ -35,9 +35,24 @@ export const CAMPAIGN_ACCESS_PLAYER_ACCESS_PRESERVED_HINT =
 export const CAMPAIGN_ACCESS_PLAYER_ACCESS_TOOLTIP =
   'Player access narrows who can discover and newly select this content while it is available. It does not remove content already assigned to a character.'
 
-/** Shown when specific_players is disabled until the participant system ships. */
-export const CAMPAIGN_ACCESS_SPECIFIC_PLAYERS_DISABLED_HINT =
-  'Set up campaign players before choosing specific players.'
+/** Multi-select label for specific player grants. */
+export const CAMPAIGN_ACCESS_PARTICIPANTS_LABEL = 'Selected players'
+
+/** Multi-select hint when limiting discovery to specific players. */
+export const CAMPAIGN_ACCESS_PARTICIPANTS_HINT =
+  'Choose which submitted campaign characters can discover and select this content.'
+
+/** Label-level tooltip for the participant multi-select. */
+export const CAMPAIGN_ACCESS_PARTICIPANTS_TOOLTIP =
+  'Only characters submitted to this campaign appear here. Players without a submitted character cannot be granted access.'
+
+/** Formats a roster entry for combobox options. */
+export function formatCampaignAccessParticipantOptionLabel(
+  name: string,
+  playerDisplayName: string,
+): string {
+  return `${name} · ${playerDisplayName}`
+}
 
 /** Non-blocking create-time failure when the deferred campaign-access PATCH fails. */
 export const CAMPAIGN_ACCESS_CREATE_DEFERRED_ERROR =

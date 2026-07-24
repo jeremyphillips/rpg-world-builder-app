@@ -252,6 +252,16 @@ Do not hand-wire `font-semibold`, `Badge size="sm"`, `columnTone`, or raw
 `w-[…]` width classes in feature column files; use the builders, cell helpers,
 and width presets so tables stay visually in sync.
 
+### Content feature tracks (ownership)
+
+| Track           | Scope                                                    | Primary locations                                                     |
+| --------------- | -------------------------------------------------------- | --------------------------------------------------------------------- |
+| Campaign access | Discovery policy, participant roster, overview filtering | `@rpg/contracts` viewer-access, API list handlers, `campaign-access/` |
+| Overview rows   | Two-line name cell, utility actions, metadata            | `content/lib/overview/`                                               |
+| Duplication     | API transform + dashboard dialog                         | `apps/api/docs/content-duplication.md`, `content/lib/duplication/`    |
+
+Duplication does **not** own campaign-access enforcement — it consumes shared create/slug infrastructure only.
+
 Use `pickClass()` / `pickSubclassesForClass()` from `lib/fixtures/pick` for
 one-off catalog slugs not worth a named fixture export.
 

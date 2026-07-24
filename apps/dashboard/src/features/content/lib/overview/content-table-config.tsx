@@ -10,20 +10,17 @@ import {
 import {
   DataTableImageCell,
   dataTableColumnMeta,
-  dataTableNameLinkCellVariants,
   dataTableWidthMeta,
   SortableHeader,
 } from '@rpg/ui'
 import type { ColumnDef } from '@rpg/ui'
-import { Link } from 'react-router-dom'
 
 import { buildSourceColumn, stampDataColumns } from '@/lib/data-table/column-builders'
 
 import { getContentImageUrl } from '../detail/content-image-url'
 import { CONTENT_SOURCE_BADGE, type ContentSource } from './content-source-badge'
 import { CONTENT_STATUS_BADGE } from './content-status-badge'
-import { ContentStatusNameBadge } from './content-status-name-badge.client'
-import { ContentNameCellMetadata } from './content-name-cell-metadata.client'
+import { ContentOverviewNameCell } from './content-overview-name-cell.client'
 
 /**
  * Minimum shape every content type shares. Used to constrain the generic
@@ -40,9 +37,19 @@ function readCampaignAccess(row: ContentBase): ResolvedContentCampaignAccess {
   return (row as WithCampaignAccess<ContentBase>).campaignAccess ?? DEFAULT_CONTENT_CAMPAIGN_ACCESS
 }
 
+export { readCampaignAccess as readContentRowCampaignAccess }
+
 export type ContentTableOptions<T> = {
   /** When provided, the name cell renders as a link to this href. */
   nameHref?: (row: T) => string
+  /** When provided with `canManage`, renders the line-2 Edit utility action. */
+  editHref?: (row: T) => string
+  /** Whether the viewer can manage campaign content (overview utility row). */
+  canManage?: boolean
+}
+
+export type ContentOverviewNameColumnMeta<T> = {
+  overviewNameHref?: (row: T) => string
 }
 
 type WithCost = { cost: EquipmentCost }
@@ -75,7 +82,7 @@ export function buildContentColumns<T extends ContentBase>(
   middleColumns: ColumnDef<T>[],
   options?: ContentTableOptions<T>,
 ): ColumnDef<T>[] {
-  const { nameHref } = options ?? {}
+  const { nameHref, editHref, canManage = false } = options ?? {}
 
   const imageColumn: ColumnDef<T> = {
     accessorKey: 'imageKey',
@@ -97,34 +104,24 @@ export function buildContentColumns<T extends ContentBase>(
   const nameColumn: ColumnDef<T> = {
     accessorKey: 'name',
     header: ({ column }) => <SortableHeader column={column}>Name</SortableHeader>,
-    cell: ({ row }) => {
-      const name = row.getValue<string>('name')
-      const draftBadge =
-        row.original.status === 'draft' ? <ContentStatusNameBadge status="draft" /> : null
-
-      return (
-        <div className="flex min-w-0 flex-col gap-0.5">
-          <span className="inline-flex items-center gap-2">
-            {nameHref ? (
-              <Link to={nameHref(row.original)} className={dataTableNameLinkCellVariants()}>
-                {name}
-              </Link>
-            ) : (
-              <span className="font-medium text-foreground">{name}</span>
-            )}
-            {draftBadge}
-          </span>
-          <ContentNameCellMetadata campaignAccess={readCampaignAccess(row.original)} />
-        </div>
-      )
-    },
+    cell: ({ row }) => (
+      <ContentOverviewNameCell
+        name={row.getValue<string>('name')}
+        status={row.original.status}
+        campaignAccess={readCampaignAccess(row.original)}
+        nameHref={nameHref?.(row.original)}
+        editHref={canManage ? editHref?.(row.original) : undefined}
+        canManage={canManage}
+      />
+    ),
     enableHiding: false,
     meta: {
       ...dataTableColumnMeta.identity,
       ...dataTableWidthMeta('title'),
       label: 'Name',
       locked: true,
-    },
+      overviewNameHref: nameHref,
+    } as ColumnDef<T>['meta'] & ContentOverviewNameColumnMeta<T>,
   }
 
   const sourceColumn = buildSourceColumn<T, ContentSource>({

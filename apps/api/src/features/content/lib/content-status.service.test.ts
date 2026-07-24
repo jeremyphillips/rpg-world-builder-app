@@ -44,12 +44,9 @@ const minimalClassInput = {
 describe('content status service', () => {
   it('promotes a draft homebrew record to published', async () => {
     const campaign = await makeTestCampaign()
-    const created = await createHomebrewContent(
-      classWriteConfig,
-      campaign.id,
-      minimalClassInput,
-      'draft',
-    )
+    const created = await createHomebrewContent(classWriteConfig, campaign.id, minimalClassInput, {
+      status: 'draft',
+    })
     expect(created.status).toBe('draft')
 
     const promoted = await promoteContentToPublished(classWriteConfig, campaign.id, created.id)
@@ -65,7 +62,7 @@ describe('content status service', () => {
       skillProficiencyWriteConfig,
       campaign.id,
       { slug: 'incomplete-skill', name: '' },
-      'draft',
+      { status: 'draft' },
     )
     expect(created.status).toBe('draft')
 
@@ -85,7 +82,7 @@ describe('content status service', () => {
         category: 'general',
         repeatable: { allowed: false },
       },
-      'draft',
+      { status: 'draft' },
     )
 
     const promoted = await promoteContentToPublished(featWriteConfig, campaign.id, created.id)

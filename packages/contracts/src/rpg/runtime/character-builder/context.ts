@@ -1,6 +1,7 @@
 import type { z } from 'zod'
 
 import type { SystemRulesetId } from '../../primitives/ruleset'
+import type { ContentViewer } from '../../content/lib/content-viewer-access'
 import type { CharacterClass } from '../../content/classes/class'
 import type { Equipment } from '../../content/equipment'
 import type { SkillProficiency } from '../../content/skill-proficiency'
@@ -107,6 +108,11 @@ export type CharacterBuildContext = {
   catalog: CharacterBuildCatalog
   characterCreationRules: ResolvedCharacterCreationRules
   permissions: CharacterBuilderPermissions
+  /**
+   * Optional defense-in-depth catalog filter — mirrors API discovery policy when
+   * the builder receives a pre-resolved viewer (e.g. campaign PC context).
+   */
+  catalogViewer?: ContentViewer
 }
 
 /** MVP instantiation — no campaign patch/membership context. */

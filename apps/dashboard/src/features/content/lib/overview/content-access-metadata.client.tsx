@@ -1,7 +1,7 @@
 'use client'
 
 import { CircleSlash, Lock, Users } from 'lucide-react'
-import type { ResolvedContentCampaignAccess } from '@rpg/contracts'
+import { type PlayerContentVisibility, type ResolvedContentCampaignAccess } from '@rpg/contracts'
 import { InfoTooltip } from '@rpg/ui'
 
 import { resolveCampaignAccessDetail } from '../campaign-access/campaign-access-summary'
@@ -10,6 +10,12 @@ import {
   CAMPAIGN_ACCESS_TABLE_SELECTED_PLAYERS_TOOLTIP,
   CAMPAIGN_ACCESS_TABLE_UNAVAILABLE_TOOLTIP,
 } from '../campaign-access/campaign-access-table-labels'
+import {
+  formatPlayerLimitedVisibilityLabel,
+  PLAYER_LIMITED_VISIBILITY_TOOLTIP,
+  PLAYER_VISIBLE_ONLY_TO_YOU_LABEL,
+  PLAYER_VISIBLE_ONLY_TO_YOU_TOOLTIP,
+} from './content-access-metadata-player-labels'
 
 function formatSelectedPlayersCount(count: number): string {
   return count === 1 ? '1 selected player' : `${count} selected players`
@@ -23,7 +29,7 @@ type MetadataContent = {
   tooltipLabel: string
 }
 
-function resolveNameCellMetadata(
+function resolveManagerAccessMetadata(
   campaignAccess: ResolvedContentCampaignAccess,
 ): MetadataContent | null {
   if (!campaignAccess.available) {
@@ -58,17 +64,51 @@ function resolveNameCellMetadata(
   return null
 }
 
-/** Compact second-line metadata for exceptional campaign-access states in overview name cells. */
-export function ContentNameCellMetadata({
-  campaignAccess,
-}: {
+export type ContentAccessMetadataProps = {
   campaignAccess: ResolvedContentCampaignAccess
-}) {
-  const content = resolveNameCellMetadata(campaignAccess)
-  if (!content) return null
+  canManage: boolean
+  playerVisibility?: PlayerContentVisibility
+}
+
+function resolvePlayerAccessMetadata(
+  playerVisibility: PlayerContentVisibility,
+): MetadataContent | null {
+  if (playerVisibility.kind !== 'specific') {
+    return null
+  }
+
+  if (playerVisibility.otherParticipantCount === 0) {
+    return {
+      icon: <Users aria-hidden className="size-3 shrink-0" />,
+      primary: PLAYER_VISIBLE_ONLY_TO_YOU_LABEL,
+      tooltip: PLAYER_VISIBLE_ONLY_TO_YOU_TOOLTIP,
+      tooltipLabel: 'About limited visibility',
+    }
+  }
+
+  return {
+    icon: <Users aria-hidden className="size-3 shrink-0" />,
+    primary: formatPlayerLimitedVisibilityLabel(playerVisibility.otherParticipantCount),
+    tooltip: PLAYER_LIMITED_VISIBILITY_TOOLTIP,
+    tooltipLabel: 'About limited visibility',
+  }
+}
+
+/** Line-2 campaign access metadata for managers and granted player viewers. */
+export function ContentAccessMetadata({
+  campaignAccess,
+  canManage,
+  playerVisibility = { kind: 'ordinary' },
+}: ContentAccessMetadataProps) {
+  const content = canManage
+    ? resolveManagerAccessMetadata(campaignAccess)
+    : resolvePlayerAccessMetadata(playerVisibility)
+  if (!content) {
+    return null
+  }
 
   return (
-    <div className="flex items-center gap-1 text-xs text-muted-foreground">
+    <div className="ml-auto flex items-center gap-1 text-muted-foreground">
       {content.icon}
       <span className="inline-flex items-center gap-1">
         <span>{content.primary}</span>

@@ -1,10 +1,10 @@
 import { describe, expect, it } from 'vitest'
 
-import { CONTENT_ACCESS_SPECIFIC_PLAYERS_ENABLED } from './content-access-capabilities'
 import {
   CAMPAIGN_AVAILABILITY_FILTER_DEFAULT,
   CAMPAIGN_AVAILABILITY_FILTER_VALUES,
   DEFAULT_CONTENT_CAMPAIGN_ACCESS,
+  contentCampaignAccessPatchSchema,
   resolveContentCampaignAccess,
   resolvedContentCampaignAccessSchema,
   type WithCampaignAccess,
@@ -47,10 +47,50 @@ describe('resolveContentCampaignAccess', () => {
     expect(resolved.unavailableParticipantIds).toEqual([])
   })
 
+  it('splits stale participant ids when valid roster ids are provided', () => {
+    const resolved = resolveContentCampaignAccess(
+      {
+        available: true,
+        visibilityMode: 'specific_players',
+        participantIds: ['pc-1', 'stale-pc'],
+      },
+      { validParticipantIds: ['pc-1'] },
+    )
+
+    expect(resolved.participantIds).toEqual(['pc-1'])
+    expect(resolved.unavailableParticipantIds).toEqual(['stale-pc'])
+  })
+
   it('parses resolved schema shape', () => {
     expect(resolvedContentCampaignAccessSchema.parse(DEFAULT_CONTENT_CAMPAIGN_ACCESS)).toEqual(
       DEFAULT_CONTENT_CAMPAIGN_ACCESS,
     )
+  })
+})
+
+describe('contentCampaignAccessPatchSchema', () => {
+  it('requires at least one participant for specific_players', () => {
+    const result = contentCampaignAccessPatchSchema.safeParse({
+      available: true,
+      visibilityMode: 'specific_players',
+      participantIds: [],
+    })
+
+    expect(result.success).toBe(false)
+  })
+
+  it('normalizes participantIds to an empty array for non-specific modes', () => {
+    expect(
+      contentCampaignAccessPatchSchema.parse({
+        available: true,
+        visibilityMode: 'all_players',
+        participantIds: ['pc-1'],
+      }),
+    ).toEqual({
+      available: true,
+      visibilityMode: 'all_players',
+      participantIds: [],
+    })
   })
 })
 
@@ -71,11 +111,5 @@ describe('WithCampaignAccess', () => {
     }
 
     expect(row.campaignAccess.available).toBe(true)
-  })
-})
-
-describe('CONTENT_ACCESS_SPECIFIC_PLAYERS_ENABLED', () => {
-  it('is disabled until the participant system ships', () => {
-    expect(CONTENT_ACCESS_SPECIFIC_PLAYERS_ENABLED).toBe(false)
   })
 })

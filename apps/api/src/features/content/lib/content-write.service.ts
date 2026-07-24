@@ -16,6 +16,27 @@ import { deepMerge } from './deep-merge'
 import type { ContentWriteConfig, ContentWriteContext, HomebrewDoc } from './content-write-config'
 import { resolveStoredSchema, resolveWriteInputSchema } from './content-write-config'
 import { stripNullDeep, stripNullDeepFields } from './strip-null-deep'
+import type { ApiContentTypeKey } from '@rpg/contracts'
+import type {
+  ContentSlugCollisionPolicy,
+  ResolvedContentSlug,
+} from './slug/resolve-unique-content-slug'
+import {
+  asResolvedContentSlug,
+  isSlugDuplicateKeyError,
+  resolveNextSlugCandidate,
+} from './slug/resolve-unique-content-slug'
+
+const MAX_SLUG_ATTEMPTS = 5
+
+export interface CreateHomebrewContentOptions {
+  status?: ContentStatus
+  source?: ContentSource
+  slugCollisionPolicy?: ContentSlugCollisionPolicy
+  resolvedSlug?: ResolvedContentSlug
+  /** Skip nested id assignment — duplicate transform already regenerated authored ids. */
+  preserveNestedIds?: boolean
+}
 
 type StoredEntity = {
   id: string
@@ -63,7 +84,7 @@ function wrapContentKeyError(err: unknown): never {
 function normalizeWriteInput(
   raw: unknown,
   existingBody?: Record<string, unknown>,
-  mode: 'create' | 'update' = 'create',
+  mode: 'create' | 'update' | 'duplicate' = 'create',
 ): Record<string, unknown> {
   try {
     return normalizeHomebrewWriteInput(raw, existingBody, mode) as Record<string, unknown>
@@ -245,10 +266,13 @@ export async function createHomebrewContent<T extends StoredEntity>(
   config: ContentWriteConfig<T>,
   campaignId: string,
   rawInput: unknown,
-  status: ContentStatus = 'published',
+  options: CreateHomebrewContentOptions = {},
 ): Promise<T> {
+  const status = options.status ?? 'published'
+  const slugCollisionPolicy = options.slugCollisionPolicy ?? 'reject'
   const validationIntent = contentStatusToValidationIntent(status)
-  const normalized = normalizeWriteInput(rawInput, undefined, 'create')
+  const writeMode = options.preserveNestedIds ? 'duplicate' : 'create'
+  const normalized = normalizeWriteInput(rawInput, undefined, writeMode)
   const input = parsePersistedWriteInput(config, normalized, 'create', validationIntent)
   const campaign = await findCampaignById(campaignId)
   if (!campaign) {
@@ -266,26 +290,109 @@ export async function createHomebrewContent<T extends StoredEntity>(
   )
   await runValidateBeforeWrite(config, writeCtx)
 
-  const slug = input.slug as string
+  const requestedName = typeof input.name === 'string' ? input.name : ''
+  const body = config.bodyFromCreateInput(input)
+
+  for (let attempt = 0; attempt < MAX_SLUG_ATTEMPTS; attempt++) {
+    const slug = await resolveSlugForCreateAttempt({
+      attempt,
+      resolvedSlug: options.resolvedSlug,
+      slugCollisionPolicy,
+      contentType: config.typeName as ApiContentTypeKey,
+      campaignId,
+      name: requestedName,
+      rulesetId,
+      config,
+    })
+
+    const slugCheckedInput = { ...input, slug }
+    const writeCtxWithSlug = buildWriteContext(
+      campaignId,
+      rulesetId,
+      'create',
+      validationIntent,
+      slugCheckedInput,
+      { ...normalized, slug },
+    )
+
+    try {
+      const created = await config.homebrewModel.create({
+        campaignId,
+        rulesetId,
+        slug,
+        status,
+        ...body,
+      })
+
+      const entity = config.toHomebrewEntity(created.toObject() as unknown as HomebrewDoc)
+      const parsed = resolveStoredSchema(config, validationIntent).parse(entity)
+      return finalizeWriteResult(config, writeCtxWithSlug, parsed)
+    } catch (error) {
+      if (!isSlugDuplicateKeyError(error) || slugCollisionPolicy !== 'suffix') {
+        throw error
+      }
+    }
+  }
+
+  throw new HttpError(409, 'slug_conflict', 'Could not allocate a unique slug for this content.')
+}
+
+async function resolveSlugForCreateAttempt<T extends StoredEntity>({
+  attempt,
+  resolvedSlug,
+  slugCollisionPolicy,
+  contentType,
+  campaignId,
+  name,
+  rulesetId,
+  config,
+}: {
+  attempt: number
+  resolvedSlug?: ResolvedContentSlug
+  slugCollisionPolicy: ContentSlugCollisionPolicy
+  contentType: ApiContentTypeKey
+  campaignId: string
+  name: string
+  rulesetId: SystemRulesetId
+  config: ContentWriteConfig<T>
+}): Promise<string> {
+  if (attempt === 0 && resolvedSlug) {
+    const campaignSlugs = await loadCampaignSlugs(config, campaignId, rulesetId)
+    if (slugCollisionPolicy === 'reject') {
+      assertSlugAvailable({
+        slug: resolvedSlug,
+        systemSlugs: config.readConfig.systemSlugs(rulesetId),
+        campaignSlugs,
+      })
+    }
+    return resolvedSlug
+  }
+
+  if (slugCollisionPolicy === 'suffix') {
+    const next = await resolveNextSlugCandidate({ contentType, campaignId, name })
+    return next
+  }
+
+  const slug = asResolvedContentSlug(deriveSlugFromInputName(name))
   const campaignSlugs = await loadCampaignSlugs(config, campaignId, rulesetId)
   assertSlugAvailable({
     slug,
     systemSlugs: config.readConfig.systemSlugs(rulesetId),
     campaignSlugs,
   })
+  return slug
+}
 
-  const body = config.bodyFromCreateInput(input)
-  const created = await config.homebrewModel.create({
-    campaignId,
-    rulesetId,
-    slug,
-    status,
-    ...body,
-  })
-
-  const entity = config.toHomebrewEntity(created.toObject() as unknown as HomebrewDoc)
-  const parsed = resolveStoredSchema(config, validationIntent).parse(entity)
-  return finalizeWriteResult(config, writeCtx, parsed)
+function deriveSlugFromInputName(name: string): string {
+  const normalized = normalizeHomebrewWriteInput({ name }, undefined, 'create') as Record<
+    string,
+    unknown
+  >
+  const slug = normalized.slug
+  if (typeof slug !== 'string') {
+    throw new HttpError(400, 'bad_request', 'Create input must include a non-empty name.')
+  }
+  return slug
 }
 
 /** Resolve a catalog entity for write/delete guards — shared by update and deletion. */

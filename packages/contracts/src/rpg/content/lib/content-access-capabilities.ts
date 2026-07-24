@@ -23,9 +23,3 @@ export const CONTENT_ACCESS_CAPABILITIES: Record<ContentAccessTargetType, Conten
     'skill-proficiencies': { mode: 'owned', visibilityModes: CONTENT_VISIBILITY_MODES },
     subclasses: { mode: 'owned', visibilityModes: CONTENT_VISIBILITY_MODES },
   }
-
-/**
- * Flip to `true` when the campaign participant system ships (follow-up phase).
- * Dashboard reads this to gate the `specific_players` option app-wide.
- */
-export const CONTENT_ACCESS_SPECIFIC_PLAYERS_ENABLED = false

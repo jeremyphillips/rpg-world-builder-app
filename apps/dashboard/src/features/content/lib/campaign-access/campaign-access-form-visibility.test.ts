@@ -9,9 +9,9 @@ describe('resolveCampaignAccessPlayerAccessHint', () => {
     )
   })
 
-  it('returns specific-players disabled hint when targeting is unavailable', () => {
+  it('returns player-access hint when availability is on', () => {
     expect(resolveCampaignAccessPlayerAccessHint({ available: true })).toBe(
-      'Set up campaign players before choosing specific players.',
+      'Controls which players can discover and select this content while it is available.',
     )
   })
 })

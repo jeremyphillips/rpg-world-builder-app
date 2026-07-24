@@ -114,11 +114,11 @@ export function listCampaignTemplates(): CampaignTemplate[] {
  */
 export async function listCampaignsForUser(userId: string): Promise<CampaignListItem[]> {
   const memberships = await CampaignMembershipModel.find({ userId })
-    .select('campaignId campaignRole')
-    .lean<{ campaignId: string; campaignRole: string }[]>()
+    .select('campaignId campaignRole characterIds')
+    .lean<{ campaignId: string; campaignRole: string; characterIds?: string[] }[]>()
 
-  const roleByCampaignId = new Map(
-    memberships.map((membership) => [membership.campaignId, membership.campaignRole]),
+  const membershipByCampaignId = new Map(
+    memberships.map((membership) => [membership.campaignId, membership]),
   )
 
   const campaignIds = memberships.map((m) => m.campaignId).filter((id) => isValidObjectId(id))
@@ -128,9 +128,11 @@ export async function listCampaignsForUser(userId: string): Promise<CampaignList
   return docs
     .map((doc) => {
       const campaign = toCampaign(doc)
+      const membership = membershipByCampaignId.get(campaign.id)
       return {
         ...campaign,
-        campaignRole: roleByCampaignId.get(campaign.id) as CampaignRole,
+        campaignRole: membership?.campaignRole as CampaignRole,
+        characterIds: membership?.characterIds ?? [],
       }
     })
     .sort((a, b) => a.identity.name.localeCompare(b.identity.name))

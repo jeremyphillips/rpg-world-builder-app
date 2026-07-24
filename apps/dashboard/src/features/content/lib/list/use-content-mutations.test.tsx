@@ -8,8 +8,13 @@ vi.mock('./content-client', () => ({
   updateContent: vi.fn(),
 }))
 
+vi.mock('../duplication/duplicate-content-api', () => ({
+  duplicateContent: vi.fn(),
+}))
+
 import { makeTestQueryClient } from '@/test/render'
 import { createContent, updateContent } from './content-client'
+import { duplicateContent } from '../duplication/duplicate-content-api'
 import {
   createContentMutationHooks,
   invalidateContentWriteQueries,
@@ -18,6 +23,7 @@ import {
 
 const mockCreateContent = vi.mocked(createContent)
 const mockUpdateContent = vi.mocked(updateContent)
+const mockDuplicateContent = vi.mocked(duplicateContent)
 
 function makeTestWrapper() {
   const queryClient = makeTestQueryClient()
@@ -46,8 +52,10 @@ describe('createContentMutationHooks', () => {
   beforeEach(() => {
     mockCreateContent.mockReset()
     mockUpdateContent.mockReset()
+    mockDuplicateContent.mockReset()
     mockCreateContent.mockResolvedValue({ id: 'new-1' })
     mockUpdateContent.mockResolvedValue({ id: 'existing-1' })
+    mockDuplicateContent.mockResolvedValue({ id: 'dup-1' })
   })
 
   it('invalidates the list query on create success', async () => {
@@ -89,6 +97,24 @@ describe('createContentMutationHooks', () => {
 
     expect(invalidateSpy).toHaveBeenCalledWith({ queryKey: classesKey('camp-1') })
     expect(invalidateSpy).toHaveBeenCalledWith({ queryKey: skillsKey('camp-1') })
+  })
+
+  it('invalidates the list query on duplicate success', async () => {
+    const queryKeyFn = (id: string) => ['campaigns', id, 'content', 'feats'] as const
+    const { useDuplicateContent } = createContentMutationHooks('feats', queryKeyFn)
+    const { Wrapper, invalidateSpy } = makeTestWrapper()
+
+    const { result } = renderHook(() => useDuplicateContent('camp-1'), { wrapper: Wrapper })
+    await result.current.mutateAsync({ entityId: 'feat-1', name: 'Grappler Copy' })
+
+    expect(mockDuplicateContent).toHaveBeenCalledWith(
+      'camp-1',
+      'feats',
+      'feat-1',
+      { name: 'Grappler Copy' },
+      expect.any(String),
+    )
+    expect(invalidateSpy).toHaveBeenCalledWith({ queryKey: queryKeyFn('camp-1') })
   })
 })
 

@@ -586,8 +586,8 @@ export interface RowActionsMenuLinkProps {
 }
 
 export interface RowActionsMenuProps {
-  /** Target path for the edit route. */
-  editHref: string
+  /** Target path for the edit route — omit when edit lives on the utility row. */
+  editHref?: string
   /**
    * Router-aware link component for in-app navigation (e.g. React Router `Link`).
    * Receives `href` as the navigation target. Defaults to a plain `<a>`.
@@ -625,8 +625,8 @@ export interface RowActionsMenuProps {
  * Pre-built row actions dropdown for the `rowActions` prop.
  *
  * Renders an ellipsis (⋯) trigger that opens a menu containing:
- * - An **Edit** link (navigates to `editHref`)
- * - An **Active in campaign** toggle (Switch + InfoTooltip)
+ * - An optional **Edit** link when `editHref` is provided
+ * - An **Active in campaign** toggle (Switch + InfoTooltip) when legacy props are set
  *
  * The dropdown stays open when the switch is clicked so the user can see
  * the state change before dismissing. A future warning modal should be
@@ -669,13 +669,15 @@ export function RowActionsMenu({
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-72">
-        <DropdownMenuItem asChild className="text-xs [&_svg]:size-3">
-          {EditLinkComponent ? (
-            <EditLinkComponent href={editHref}>{editAction}</EditLinkComponent>
-          ) : (
-            <a href={editHref}>{editAction}</a>
-          )}
-        </DropdownMenuItem>
+        {editHref ? (
+          <DropdownMenuItem asChild className="text-xs [&_svg]:size-3">
+            {EditLinkComponent ? (
+              <EditLinkComponent href={editHref}>{editAction}</EditLinkComponent>
+            ) : (
+              <a href={editHref}>{editAction}</a>
+            )}
+          </DropdownMenuItem>
+        ) : null}
         {footer ? (
           <>
             <DropdownMenuSeparator />

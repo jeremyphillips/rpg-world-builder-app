@@ -20,6 +20,8 @@ When sub-choices are small, fixed sets owned by one catalog record (lineages, an
 
 **Not a content type:** starting wealth (higher-level character creation tier tables) lives in `rpg/campaign/rules/starting-wealth.ts` and is patched via `CampaignRulesetPatch.characterCreation.startingWealth` — not the content API registry. SRD defaults ship from `@rpg/catalog/starting-wealth`.
 
+**Duplication:** manager-only copy workflow for registered API content types — see [apps/api/docs/content-duplication.md](../apps/api/docs/content-duplication.md). Declare `canDuplicate` and `nestedIdRegeneration` in `CONTENT_TYPE_CAPABILITIES`.
+
 ---
 
 ## Content traits (`custom` vs `grant`)

@@ -10,6 +10,7 @@ import { contentCampaignAccessPatchSchema, resolveContentCampaignAccess } from '
 
 import { HttpError } from '../../../lib/http-error'
 import { resolveContentUsageBlockers } from './content-character-usage/resolve-content-usage-blockers'
+import { loadValidCampaignParticipantIds } from './campaign-access-participants.service'
 import { ContentCampaignAccessModel } from './content-campaign-access.model'
 import type { ContentWriteConfig, WriteEntityBase } from './content-write-config'
 import { resolveContentEntityForWrite } from './content-write.service'
@@ -21,12 +22,32 @@ type StoredCampaignAccessRow = {
   participantIds: string[]
 }
 
+function assertParticipantIdsInRoster(
+  participantIds: readonly string[],
+  validParticipantIds: ReadonlySet<string>,
+): void {
+  const unknownIds = participantIds.filter((id) => !validParticipantIds.has(id))
+  if (unknownIds.length > 0) {
+    throw HttpError.badRequest('One or more selected players are not in this campaign.')
+  }
+}
+
+async function resolveStoredCampaignAccess(
+  campaignId: string,
+  stored: ContentCampaignAccess | null,
+): Promise<ResolvedContentCampaignAccess> {
+  const validParticipantIds = await loadValidCampaignParticipantIds(campaignId)
+  return resolveContentCampaignAccess(stored, { validParticipantIds })
+}
+
 export async function loadCampaignAccessByTargetIds(
   campaignId: string,
   targetType: ContentAccessTargetType,
   targetIds: readonly string[],
 ): Promise<Map<string, ResolvedContentCampaignAccess>> {
   if (targetIds.length === 0) return new Map()
+
+  const validParticipantIds = await loadValidCampaignParticipantIds(campaignId)
 
   const rows = await ContentCampaignAccessModel.find({
     campaignId,
@@ -39,7 +60,7 @@ export async function loadCampaignAccessByTargetIds(
   return new Map(
     targetIds.map((targetId) => [
       targetId,
-      resolveContentCampaignAccess(byTargetId.get(targetId) ?? null),
+      resolveContentCampaignAccess(byTargetId.get(targetId) ?? null, { validParticipantIds }),
     ]),
   )
 }
@@ -122,6 +143,12 @@ export async function updateContentCampaignAccess<T extends WriteEntityBase>(
   input: unknown,
 ): Promise<ContentCampaignAccessUpdateResult> {
   const parsed = contentCampaignAccessPatchSchema.parse(input)
+  const validParticipantIds = new Set(await loadValidCampaignParticipantIds(campaignId))
+
+  if (parsed.visibilityMode === 'specific_players') {
+    assertParticipantIdsInRoster(parsed.participantIds, validParticipantIds)
+  }
+
   const targetType = config.campaignAccessTargetType ?? (config.typeName as ContentAccessTargetType)
 
   if (parsed.available === false) {
@@ -148,7 +175,7 @@ export async function updateContentCampaignAccess<T extends WriteEntityBase>(
 
     return {
       status: 'updated',
-      campaignAccess: resolveContentCampaignAccess({
+      campaignAccess: await resolveStoredCampaignAccess(campaignId, {
         available: doc.available,
         visibilityMode: doc.visibilityMode,
         participantIds: doc.participantIds ?? [],
@@ -174,7 +201,7 @@ export async function updateContentCampaignAccess<T extends WriteEntityBase>(
 
   return {
     status: 'updated',
-    campaignAccess: resolveContentCampaignAccess({
+    campaignAccess: await resolveStoredCampaignAccess(campaignId, {
       available: doc.available,
       visibilityMode: doc.visibilityMode,
       participantIds: doc.participantIds ?? [],
@@ -197,5 +224,5 @@ export async function resolveContentCampaignAccessForEntity<T extends WriteEntit
 ): Promise<ResolvedContentCampaignAccess> {
   const targetType = config.campaignAccessTargetType ?? (config.typeName as ContentAccessTargetType)
   const stored = await loadStoredCampaignAccess(campaignId, targetType, entityId)
-  return resolveContentCampaignAccess(stored)
+  return resolveStoredCampaignAccess(campaignId, stored)
 }

@@ -6,6 +6,7 @@ import { HttpError } from '../../../lib/http-error'
 import { findCampaignById } from '../../campaign'
 import { resolveCatalog } from '../lib/resolve-catalog'
 import { attachCampaignAccessForTargetType } from '../lib/content-campaign-access.service'
+import { filterCatalogForMembership } from '../lib/filter-catalog-for-viewer'
 import { subclassContentConfig } from './subclasses.config'
 
 /** Resolved subclasses for one class: system + patches + homebrew, with campaign access metadata. */
@@ -36,5 +37,6 @@ export async function resolveSubclassesForCampaign(
 export async function listSubclasses(req: Request, res: Response): Promise<void> {
   const { campaignId, classId } = req.params as { campaignId: string; classId: string }
   const subclasses = await resolveSubclassesForCampaign(campaignId, classId)
-  res.status(200).json({ subclasses })
+  const visible = filterCatalogForMembership(subclasses, req.campaignMembership)
+  res.status(200).json({ subclasses: visible })
 }

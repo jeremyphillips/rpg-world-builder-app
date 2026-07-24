@@ -13,6 +13,7 @@
     "build": "turbo run build --filter='!@rpg/bench'",
     "build:bench": "turbo run build --filter='@rpg/bench'",
     "build:ci": "turbo run build --filter='...[origin/main]' --filter='!@rpg/bench'",
+    "clean": "turbo run clean",
     "lint": "turbo run lint",
     "lint:ci": "turbo run lint --filter='...[origin/main]'",
     "test": "turbo run test",

@@ -1,6 +1,6 @@
 import type { Request, Response } from 'express'
 
-import { CAMPAIGN_MANAGE_ROLES, contentStatusSchema, type CampaignManageRole } from '@rpg/contracts'
+import { contentStatusSchema } from '@rpg/contracts'
 
 import { HttpError } from '../../lib/http-error'
 import {
@@ -22,6 +22,12 @@ import {
   attachCampaignAccessForTargetType,
 } from './lib/content-campaign-access.service'
 import { getHomebrewContentSummary } from './lib/homebrew-summary.service'
+import { filterCatalogForMembership } from './lib/filter-catalog-for-viewer'
+import { duplicateContentEntity } from './lib/duplication/duplicate-content.service'
+import { duplicateContentRequestSchema } from './lib/duplication/duplicate-content.types'
+import { assertDuplicateContentType } from './lib/duplication/duplicate-content-policy'
+import { CONTENT_DUPLICATION_IDEMPOTENCY_HEADER } from '@rpg/contracts'
+import { listCampaignAccessParticipants } from './lib/campaign-access-participants.service'
 
 export async function createContentItem(req: Request, res: Response): Promise<void> {
   const { campaignId, contentType } = req.params as { campaignId: string; contentType: string }
@@ -32,7 +38,26 @@ export async function createContentItem(req: Request, res: Response): Promise<vo
   const rawBody = req.body as Record<string, unknown>
   const { status: rawStatus, ...createBody } = rawBody
   const status = contentStatusSchema.parse(rawStatus ?? 'published')
-  const entity = await createHomebrewContent(writeConfig, campaignId, createBody, status)
+  const entity = await createHomebrewContent(writeConfig, campaignId, createBody, { status })
+  res.status(201).json({ [writeConfig.responseKey]: entity })
+}
+
+export async function duplicateContentItem(req: Request, res: Response): Promise<void> {
+  const { campaignId, contentType, entityId } = req.params as {
+    campaignId: string
+    contentType: string
+    entityId: string
+  }
+  assertDuplicateContentType(contentType)
+  const { name } = duplicateContentRequestSchema.parse(req.body)
+  const idempotencyKey = req.get(CONTENT_DUPLICATION_IDEMPOTENCY_HEADER)?.trim() || undefined
+  const { writeConfig, entity } = await duplicateContentEntity({
+    campaignId,
+    contentType,
+    entityId,
+    requestedName: name,
+    idempotencyKey,
+  })
   res.status(201).json({ [writeConfig.responseKey]: entity })
 }
 
@@ -143,10 +168,7 @@ export async function listContent(req: Request, res: Response): Promise<void> {
   const writeConfig = getContentWriteConfig(contentType)!
   const items = await resolveContentForCampaign(contentType, campaignId)
   const withCampaignAccess = await attachCampaignAccessForTargetType(campaignId, contentType, items)
-  const role = req.campaignMembership!.campaignRole
-  const visible = CAMPAIGN_MANAGE_ROLES.includes(role as CampaignManageRole)
-    ? withCampaignAccess
-    : withCampaignAccess.filter((item) => item.status !== 'draft')
+  const visible = filterCatalogForMembership(withCampaignAccess, req.campaignMembership)
   res.status(200).json({ [writeConfig.responseKey]: visible })
 }
 
@@ -192,4 +214,10 @@ export async function getHomebrewSummary(req: Request, res: Response): Promise<v
   const { campaignId } = req.params as { campaignId: string }
   const summary = await getHomebrewContentSummary(campaignId)
   res.status(200).json({ summary })
+}
+
+export async function getCampaignAccessParticipants(req: Request, res: Response): Promise<void> {
+  const { campaignId } = req.params as { campaignId: string }
+  const participants = await listCampaignAccessParticipants(campaignId)
+  res.status(200).json({ participants })
 }

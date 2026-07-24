@@ -10,6 +10,8 @@ import {
   publishContent,
   updateContent,
 } from './content-client'
+import { duplicateContent } from '../duplication/duplicate-content-api'
+import { DUPLICATE_CONTENT_FALLBACK_ERROR } from '../duplication/duplicate-content-labels'
 import { homebrewSummaryQueryKey } from '../../../homebrew/hooks/use-homebrew-summary'
 
 export type ContentMutationHooksOptions = {
@@ -88,7 +90,29 @@ export function createContentMutationHooks(
     })
   }
 
-  return { useCreateContent, useUpdateContent }
+  function useDuplicateContent(campaignId: string) {
+    const queryClient = useQueryClient()
+    return useMutation({
+      mutationFn: ({ entityId, name }: { entityId: string; name: string }) =>
+        duplicateContent(
+          campaignId,
+          routeKey,
+          entityId,
+          { name },
+          DUPLICATE_CONTENT_FALLBACK_ERROR,
+        ),
+      onSuccess: () => {
+        invalidateContentWriteQueries(
+          queryClient,
+          campaignId,
+          queryKeyFn,
+          options?.invalidateQueryKeys,
+        )
+      },
+    })
+  }
+
+  return { useCreateContent, useUpdateContent, useDuplicateContent }
 }
 
 /**

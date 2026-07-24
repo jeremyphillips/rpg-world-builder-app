@@ -13,6 +13,13 @@ export const contentRouter: Router = Router({ mergeParams: true })
 
 // Nested subclass routes — register before `/:contentType`.
 contentRouter.get(
+  '/access-participants',
+  requireAuth,
+  requireCampaignRole('owner', 'co-owner'),
+  controller.getCampaignAccessParticipants,
+)
+
+contentRouter.get(
   '/classes/:classId/subclasses',
   requireAuth,
   requireCampaignRole(...CAMPAIGN_ROLES),
@@ -76,6 +83,13 @@ contentRouter.post(
   requireAuth,
   requireCampaignRole('owner', 'co-owner'),
   controller.createContentItem,
+)
+
+contentRouter.post(
+  '/:contentType/:entityId/duplicate',
+  requireAuth,
+  requireCampaignRole('owner', 'co-owner'),
+  controller.duplicateContentItem,
 )
 
 contentRouter.patch(

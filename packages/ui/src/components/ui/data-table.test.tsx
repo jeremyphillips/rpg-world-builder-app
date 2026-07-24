@@ -426,6 +426,16 @@ describe('RowActionsMenu', () => {
     expect(screen.getByRole('button', { name: /open actions/i })).toBeInTheDocument()
   })
 
+  it('omits Edit menu item when editHref is not provided', async () => {
+    const user = userEvent.setup()
+    render(<RowActionsMenu enabled={true} onToggleEnabled={vi.fn()} />)
+
+    await user.click(screen.getByRole('button', { name: /open actions/i }))
+
+    expect(screen.queryByRole('menuitem', { name: /edit/i })).not.toBeInTheDocument()
+    expect(screen.getByRole('switch', { name: /active in campaign/i })).toBeInTheDocument()
+  })
+
   it('shows Edit menu item and active toggle switch when opened', async () => {
     const user = userEvent.setup()
     render(<RowActionsMenu editHref="/edit/1" enabled={true} onToggleEnabled={vi.fn()} />)

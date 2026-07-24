@@ -283,6 +283,56 @@ import { toOptions } from '@rpg/ui/form'
 Array item conditionals use **relative** `dependsOn` names — see
 [containers.md](./forms/containers.md#conditional-fields-in-items).
 
+## `useSubmitHandler` — form-level error adapter
+
+`useSubmitHandler` lives in `@rpg/ui/form` and is the shared wrapper for async submit
+callbacks. It clears stale root errors, awaits the callback (preserving RHF `isSubmitting`),
+and maps thrown errors to the `formError` string passed to `<Form>`.
+
+```tsx
+const { mutateAsync, isPending, isSuccess } = useCreateDomainThing()
+const { onSubmit, formError } = useSubmitHandler({
+  submit: async (values, form) => {
+    const result = await mutateAsync(buildInput(values))
+    form.reset(defaultValues)
+    setOpen(false)
+    navigate(detailPath(result.id))
+  },
+  fallbackMessage: 'Could not create …',
+  mapError: (error) => (isApiError(error) ? error.message : undefined),
+})
+```
+
+**Owns:** clear-on-submit, await callback, `formError` mapping.
+
+**Does not own:** mutation hooks, toasts, navigation, query invalidation, or field-level
+`form.setError` (the submit callback may call those directly).
+
+### Create-in-dialog recipe
+
+```tsx
+<Form
+  onSubmit={onSubmit}
+  formError={formError}
+  footer={(form) => (
+    <FormSaveFooter
+      pending={isPending || form.formState.isSubmitting}
+      isSuccess={isSuccess}
+      submitLabel="Create …"
+    />
+  )}
+/>
+```
+
+Canonical pending expression: `mutation.isPending || form.formState.isSubmitting`. Do not
+add a helper unless additional pending sources appear (uploads, transition locks, etc.).
+
+### Client submit vs API idempotency
+
+`FormSaveFooter` + `isSubmitting` + `mutation.isPending` prevent double-submit through the
+supported UI path. Network retries, duplicate tabs, or timeout retries after a successful
+request are **not** guaranteed — API idempotency keys remain a separate safeguard.
+
 ## Submit & server errors
 
 `onSubmit(values, form)`:

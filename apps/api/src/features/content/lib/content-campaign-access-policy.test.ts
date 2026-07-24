@@ -3,9 +3,11 @@ import { describe, expect, it } from 'vitest'
 import { resolveContentCampaignAccess } from '@rpg/contracts'
 
 import { makeTestCampaign } from '../../../test/fixtures/campaigns'
+import { minimalStandalonePcInput } from '../../../test/fixtures/characters'
 import { minimalNpcRequestInput } from '../../../test/fixtures/npcs'
 import { useIntegrationDb } from '../../../test/setup/integration-db'
-import { createNpcRecord } from '../../character/character.repository'
+import { CampaignMembershipModel } from '../../campaign/campaign-membership.model'
+import { createNpcRecord, createPcRecord } from '../../character/character.repository'
 import { CharacterModel } from '../../character/character.model'
 import { resolveCatalogForCampaign } from '../content.service'
 import { featWriteConfig } from '../feats/feats.config'
@@ -165,5 +167,37 @@ describe('content campaign access policy', () => {
     const [listed] = await attachCampaignAccessForTargetType(campaign.id, 'feats', [unreferenced])
     expect(listed).toBeDefined()
     expect(listed!.campaignAccess.effectiveAudience).toBe('none')
+  })
+
+  it('marks stale participant ids as unavailable when resolving campaign access', async () => {
+    const campaign = await makeTestCampaign()
+    const created = await createHomebrewContent(featWriteConfig, campaign.id, {
+      ...minimalFeatInput,
+      slug: 'policy-stale-participant-feat',
+    })
+
+    const pc = await createPcRecord(
+      { ...minimalStandalonePcInput, name: 'Valid PC' },
+      campaign.owner.id,
+    )
+
+    await CampaignMembershipModel.updateOne(
+      { campaignId: campaign.id, userId: campaign.owner.id },
+      { $set: { characterIds: [pc.id] } },
+    )
+
+    await ContentCampaignAccessModel.create({
+      campaignId: campaign.id,
+      targetType: 'feats',
+      targetId: created.id,
+      available: true,
+      visibilityMode: 'specific_players',
+      participantIds: [pc.id, 'stale-pc'],
+    })
+
+    const [listed] = await attachCampaignAccessForTargetType(campaign.id, 'feats', [created])
+    expect(listed).toBeDefined()
+    expect(listed!.campaignAccess.participantIds).toEqual([pc.id])
+    expect(listed!.campaignAccess.unavailableParticipantIds).toEqual(['stale-pc'])
   })
 })
