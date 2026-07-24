@@ -8,7 +8,12 @@ import { Badge } from '../components/ui/badge'
 import { Button } from '../components/ui/button.client'
 import { countModifiedFilters } from './filter-engine'
 import { getSchemaFieldsByPlacement } from './filter-bar.lib'
-import { filterBarFieldGroupVariants, filterBarResetButtonClasses, filterBarVariants } from './filter-bar.variants'
+import {
+  filterBarFieldGroupVariants,
+  filterBarResetButtonClasses,
+  filterBarVariants,
+} from './filter-bar.variants'
+import { FilterChromeProvider } from './filter-chrome.context'
 import { FilterFieldList } from './filter-fields.client'
 import type { FilterFieldId, FilterSchema } from './filter-schema.types'
 
@@ -51,16 +56,18 @@ export function FilterBar<TData, TState extends Record<string, unknown>>({
 
   return (
     <div className={cn(filterBarVariants(), className)}>
-      <div className={filterBarFieldGroupVariants()}>
-        <FilterFieldList
-          schema={schema}
-          fields={primaryFields}
-          state={state}
-          disabled={disabled}
-          idPrefix={idPrefix}
-          onValueChange={onValueChange}
-        />
-      </div>
+      <FilterChromeProvider>
+        <div className={filterBarFieldGroupVariants()}>
+          <FilterFieldList
+            schema={schema}
+            fields={primaryFields}
+            state={state}
+            disabled={disabled}
+            idPrefix={idPrefix}
+            onValueChange={onValueChange}
+          />
+        </div>
+      </FilterChromeProvider>
 
       <div className="flex items-center gap-2">
         {advancedFields.length > 0 && onAdvancedOpenChange ? (

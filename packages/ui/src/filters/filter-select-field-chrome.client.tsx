@@ -2,68 +2,54 @@
 
 import type { ReactNode } from 'react'
 
-import { fieldWidthVariants } from '../components/ui/field-control.variants'
 import { cn } from '../lib/utils'
-import {
-  filterBarControlVariants,
-  filterFieldLabelVariants,
-  filterInlineFieldGroupVariants,
-  filterStackedFieldGroupVariants,
-} from './filter-bar.variants'
-import type { FilterDensity, FilterFieldWidth } from './filter-schema.types'
+import type { FilterFieldPresentation } from './filter-presentation.lib'
+import type { FilterFieldWidth } from './filter-schema.types'
 
 export type FilterSelectFieldLayout = 'inline' | 'stacked' | 'default'
 
 type FilterSelectFieldChromeProps = {
   layout: FilterSelectFieldLayout
-  density: FilterDensity
+  presentation: Extract<FilterFieldPresentation, { type: 'select' }>
   controlId: string
   label: string
   ariaLabel?: string
-  width?: FilterFieldWidth
+  widthClassName?: string
   children: ReactNode
 }
 
 export function FilterSelectFieldChrome({
   layout,
-  density,
+  presentation,
   controlId,
   label,
   ariaLabel,
-  width = 'md',
+  widthClassName,
   children,
 }: FilterSelectFieldChromeProps) {
   const groupLabel = ariaLabel ?? label
 
   if (layout === 'inline') {
     return (
-      <div
-        className={filterInlineFieldGroupVariants({ density })}
-        role="group"
-        aria-label={groupLabel}
-      >
-        <span className={filterFieldLabelVariants({ density })}>{label}</span>
-        <div className={cn('min-w-0', fieldWidthVariants({ width }))}>{children}</div>
+      <div className={presentation.groupClassName} role="group" aria-label={groupLabel}>
+        <span className={presentation.labelClassName}>{label}</span>
+        <div className={cn('min-w-0', widthClassName)}>{children}</div>
       </div>
     )
   }
 
   if (layout === 'stacked') {
     return (
-      <div
-        className={filterStackedFieldGroupVariants({ density })}
-        role="group"
-        aria-label={groupLabel}
-      >
-        <label htmlFor={controlId} className={filterFieldLabelVariants({ density })}>
+      <div className={presentation.groupClassName} role="group" aria-label={groupLabel}>
+        <label htmlFor={controlId} className={presentation.labelClassName}>
           {label}
         </label>
-        <div className={cn('min-w-0', fieldWidthVariants({ width }))}>{children}</div>
+        <div className={cn('min-w-0', widthClassName)}>{children}</div>
       </div>
     )
   }
 
-  return <div className={filterBarControlVariants({ type: 'select' })}>{children}</div>
+  return <div className={presentation.groupClassName}>{children}</div>
 }
 
 export function resolveFilterSelectFieldLayout(field: {

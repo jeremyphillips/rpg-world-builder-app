@@ -379,6 +379,25 @@ Import from `@rpg/ui/filters`:
 
 Select fields use an internal `__all__` sentinel for “show all”; it never leaves the renderer.
 
+### Filter chrome
+
+**Filter chrome** is inherited section-level presentation configuration (density, and
+potentially rhythm/control treatment later). It does not include filter values, schema,
+or behavior.
+
+- `FilterChromeProvider` wraps filter sections. Omitted `density` inherits the parent
+  provider; explicit `density` overrides.
+- `useFilterChrome()` — strict hook for schema-owned components; defaults to compact
+  outside a provider.
+- `useOptionalFilterChrome()` — optional hook for general primitives (e.g.
+  `CatalogFilterChips`); returns `undefined` outside filter chrome.
+- Field `layout` and `width` control per-field structure; section `density` controls
+  typography and control sizing via `resolveFilterFieldPresentation`.
+- `FilterFieldRenderer` is the sole presentation owner on the schema-rendered path.
+  Leaves receive resolved `presentation` props — they do not call `useFilterChrome()`.
+- `resolveFilterFieldWidthClasses` is separate from density — width is layout
+  allocation only.
+
 ---
 
 ## Composition (overview shells)
@@ -403,4 +422,5 @@ Select fields use an internal `__all__` sentinel for “show all”; it never le
 Import catalog renderers from `@rpg/ui/filters`:
 
 - `CatalogFilterControls` — `Primary` / `FilterRow` slot components
-- `CatalogFilterField` / `CatalogFilterFieldList` — lower-level catalog field renderers
+- `FilterFieldRenderer` / `FilterFieldList` — unified schema field renderers
+- `CatalogFilterField` / `CatalogFilterFieldList` — deprecated aliases; prefer `FilterFieldRenderer`

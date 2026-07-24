@@ -2,327 +2,19 @@
 
 import { useId } from 'react'
 
-import { CatalogFilterChips } from '../components/ui/catalog-filter-chips.client'
-import { Checkbox } from '../components/ui/checkbox.client'
-import { FilterPopover } from '../components/ui/filter-popover.client'
-import { Text } from '../components/ui/text'
-import {
-  getFilterFieldById,
-  resolveChipsFieldOptions,
-  resolvePopoverFieldGroups,
-} from './filter-field-options.lib'
-import { isFilterFieldDisabled, isFilterFieldVisible } from './filter-bar.lib'
-import { cn } from '../lib/utils'
-import {
-  FILTER_SELECT_ALL_VALUE,
-  filterBarControlVariants,
-  filterFieldLabelVariants,
-  FILTER_DENSITY_DEFAULT,
-} from './filter-bar.variants'
-import { FilterSelectControl } from './filter-select-control.client'
-import type {
-  BooleanFilterFieldDef,
-  ChipsFilterFieldDef,
-  FilterDensity,
-  FilterFieldDef,
-  FilterFieldId,
-  FilterFieldOptionsContext,
-  FilterSchema,
-  PopoverFilterFieldDef,
-  SelectFilterFieldDef,
-} from './filter-schema.types'
+import { getFilterFieldById } from './filter-field-options.lib'
+import { FilterFieldList } from './filter-fields.client'
+import type { FilterFieldId, FilterSchema } from './filter-schema.types'
+import type { FilterRenderContext } from './filter-field-renderer.client'
 
-type CatalogFilterFieldRendererProps<TData, TState extends Record<string, unknown>> = {
-  field: FilterFieldDef<TData, TState>
-  controlId: string
+type CatalogFilterFieldListProps<TData, TState extends Record<string, unknown>> = {
   schema: FilterSchema<TData, TState>
+  fieldIds: FilterFieldId<TState>[]
   state: TState
-  optionsContext: FilterFieldOptionsContext<TData, TState>
-  density?: FilterDensity
+  data?: readonly TData[]
   disabled?: boolean
-  onValueChange: (
-    id: FilterFieldId<TState>,
-    value: TState[FilterFieldId<TState>] | undefined,
-  ) => void
-}
-
-function CatalogFilterInlineSelectField<TData, TState extends Record<string, unknown>>({
-  field,
-  controlId,
-  schema,
-  state,
-  optionsContext,
-  density = FILTER_DENSITY_DEFAULT,
-  disabled,
-  onValueChange,
-}: {
-  field: SelectFilterFieldDef<TData, TState, FilterFieldId<TState>>
-  controlId: string
-  schema: FilterSchema<TData, TState>
-  state: TState
-  optionsContext: FilterFieldOptionsContext<TData, TState>
-  density?: FilterDensity
-  disabled?: boolean
-  onValueChange: CatalogFilterFieldRendererProps<TData, TState>['onValueChange']
-}) {
-  return (
-    <FilterSelectControl
-      field={field}
-      controlId={controlId}
-      schema={schema}
-      state={state}
-      optionsContext={optionsContext}
-      density={density}
-      disabled={disabled}
-      onValueChange={onValueChange}
-    />
-  )
-}
-
-function CatalogFilterChipsField<TData, TState extends Record<string, unknown>>({
-  field,
-  controlId,
-  state,
-  optionsContext,
-  onValueChange,
-}: {
-  field: ChipsFilterFieldDef<TData, TState, FilterFieldId<TState>>
-  controlId: string
-  state: TState
-  optionsContext: FilterFieldOptionsContext<TData, TState>
-  disabled?: boolean
-  onValueChange: CatalogFilterFieldRendererProps<TData, TState>['onValueChange']
-}) {
-  const chipsField = field
-  const rawValue = state[chipsField.id]
-  const options = resolveChipsFieldOptions(chipsField, optionsContext)
-  const allValue = chipsField.allValue ?? FILTER_SELECT_ALL_VALUE
-
-  if (chipsField.selectionMode === 'single-required') {
-    const chipValue =
-      rawValue !== undefined && rawValue !== ''
-        ? String(rawValue)
-        : String(chipsField.defaultValue ?? allValue)
-
-    return (
-      <div className={filterBarControlVariants({ type: 'chips' })}>
-        <CatalogFilterChips
-          id={controlId}
-          label={chipsField.label}
-          selectionMode="single-required"
-          value={chipValue}
-          options={options}
-          onValueChange={(value) => {
-            onValueChange(chipsField.id, value as TState[typeof chipsField.id])
-          }}
-        />
-      </div>
-    )
-  }
-
-  const chipValues = chipsField.toChipValues
-    ? chipsField.toChipValues(rawValue)
-    : Array.isArray(rawValue)
-      ? rawValue.map(String)
-      : []
-
-  return (
-    <div className={filterBarControlVariants({ type: 'chips' })}>
-      <CatalogFilterChips
-        id={controlId}
-        label={chipsField.label}
-        selectionMode="multiple"
-        selectedValues={chipValues}
-        options={options}
-        onSelectedValuesChange={(nextValues) => {
-          const nextValue = chipsField.fromChipValues
-            ? chipsField.fromChipValues(rawValue, nextValues, optionsContext)
-            : (nextValues as TState[typeof chipsField.id])
-          onValueChange(chipsField.id, nextValue)
-        }}
-      />
-    </div>
-  )
-}
-
-function countPopoverActiveFilters(value: unknown): number {
-  if (!value || typeof value !== 'object') return 0
-  return Object.values(value).reduce<number>((count, entry) => {
-    if (Array.isArray(entry)) return count + entry.length
-    return count
-  }, 0)
-}
-
-function CatalogFilterPopoverField<TData, TState extends Record<string, unknown>>({
-  field,
-  controlId,
-  state,
-  optionsContext,
-  disabled,
-  onValueChange,
-}: {
-  field: PopoverFilterFieldDef<TData, TState, FilterFieldId<TState>>
-  controlId: string
-  state: TState
-  optionsContext: FilterFieldOptionsContext<TData, TState>
-  disabled?: boolean
-  onValueChange: CatalogFilterFieldRendererProps<TData, TState>['onValueChange']
-}) {
-  const popoverField = field
-  const rawValue = state[popoverField.id]
-  const groups = resolvePopoverFieldGroups(popoverField, optionsContext)
-  const recordValue =
-    rawValue && typeof rawValue === 'object'
-      ? (rawValue as Record<string, string[]>)
-      : ((popoverField.defaultValue as Record<string, string[]> | undefined) ?? {})
-
-  if (groups.length === 0 || disabled) {
-    return null
-  }
-
-  const activeCount = countPopoverActiveFilters(recordValue)
-
-  return (
-    <div className={filterBarControlVariants({ type: 'popover' })}>
-      <FilterPopover
-        triggerLabel={popoverField.triggerLabel(activeCount)}
-        triggerAriaLabel={popoverField.triggerAriaLabel ?? popoverField.label}
-        groups={groups.map((group) => ({
-          id: group.id,
-          label: group.label,
-          options: group.options,
-          selectedValues: recordValue[group.id] ?? [],
-          onSelectedValuesChange: (selectedValues) => {
-            onValueChange(popoverField.id, {
-              ...recordValue,
-              [group.id]: selectedValues,
-            } as TState[typeof popoverField.id])
-          },
-        }))}
-      />
-      <span id={controlId} className="sr-only">
-        {popoverField.label}
-      </span>
-    </div>
-  )
-}
-
-function CatalogFilterBooleanField<TData, TState extends Record<string, unknown>>({
-  field,
-  controlId,
-  state,
-  optionsContext,
-  density = FILTER_DENSITY_DEFAULT,
-  disabled,
-  onValueChange,
-}: {
-  field: BooleanFilterFieldDef<TData, TState, FilterFieldId<TState>>
-  controlId: string
-  state: TState
-  optionsContext: FilterFieldOptionsContext<TData, TState>
-  density?: FilterDensity
-  disabled?: boolean
-  onValueChange: CatalogFilterFieldRendererProps<TData, TState>['onValueChange']
-}) {
-  const booleanField = field
-  const isChecked = state[booleanField.id] === true
-  const hiddenCount = booleanField.hiddenCount?.(state, optionsContext)
-
-  return (
-    <div className={filterBarControlVariants({ type: 'boolean' })}>
-      <Checkbox
-        id={controlId}
-        checked={isChecked}
-        disabled={disabled}
-        onCheckedChange={(checked) => {
-          onValueChange(
-            booleanField.id,
-            (checked === true ? true : undefined) as TState[typeof booleanField.id] | undefined,
-          )
-        }}
-      />
-      <label
-        htmlFor={controlId}
-        className={cn(
-          filterFieldLabelVariants({ density }),
-          'cursor-pointer font-medium leading-none',
-        )}
-      >
-        {booleanField.label}
-      </label>
-      {isChecked && hiddenCount !== undefined && hiddenCount > 0 ? (
-        <Text as="span" variant="muted" className="text-xs tabular-nums">
-          {hiddenCount} hidden
-        </Text>
-      ) : null}
-    </div>
-  )
-}
-
-export function CatalogFilterField<TData, TState extends Record<string, unknown>>({
-  field,
-  controlId,
-  schema,
-  state,
-  optionsContext,
-  density = FILTER_DENSITY_DEFAULT,
-  disabled,
-  onValueChange,
-}: CatalogFilterFieldRendererProps<TData, TState>) {
-  if (field.type === 'select') {
-    return (
-      <CatalogFilterInlineSelectField
-        field={field}
-        controlId={controlId}
-        schema={schema}
-        state={state}
-        optionsContext={optionsContext}
-        density={density}
-        onValueChange={onValueChange}
-      />
-    )
-  }
-
-  if (field.type === 'chips') {
-    return (
-      <CatalogFilterChipsField
-        field={field}
-        controlId={controlId}
-        state={state}
-        optionsContext={optionsContext}
-        onValueChange={onValueChange}
-      />
-    )
-  }
-
-  if (field.type === 'popover') {
-    return (
-      <CatalogFilterPopoverField
-        field={field}
-        controlId={controlId}
-        state={state}
-        optionsContext={optionsContext}
-        disabled={disabled}
-        onValueChange={onValueChange}
-      />
-    )
-  }
-
-  if (field.type === 'boolean') {
-    return (
-      <CatalogFilterBooleanField
-        field={field}
-        controlId={controlId}
-        state={state}
-        optionsContext={optionsContext}
-        density={density}
-        disabled={disabled}
-        onValueChange={onValueChange}
-      />
-    )
-  }
-
-  return null
+  idPrefix: string
+  onValueChange: FilterRenderContext<TData, TState>['onValueChange']
 }
 
 export function CatalogFilterFieldList<TData, TState extends Record<string, unknown>>({
@@ -331,45 +23,29 @@ export function CatalogFilterFieldList<TData, TState extends Record<string, unkn
   state,
   data,
   disabled,
-  density = FILTER_DENSITY_DEFAULT,
   idPrefix,
   onValueChange,
-}: {
-  schema: FilterSchema<TData, TState>
-  fieldIds: FilterFieldId<TState>[]
-  state: TState
-  data?: readonly TData[]
-  disabled?: boolean
-  density?: FilterDensity
-  idPrefix: string
-  onValueChange: CatalogFilterFieldRendererProps<TData, TState>['onValueChange']
-}) {
+}: CatalogFilterFieldListProps<TData, TState>) {
   const reactId = useId()
   const resolvedIdPrefix = idPrefix || reactId.replace(/:/g, '')
-  const optionsContext: FilterFieldOptionsContext<TData, TState> = { data, state }
+  const fields = fieldIds
+    .map((fieldId) => getFilterFieldById(schema.fields, fieldId))
+    .filter((field): field is NonNullable<typeof field> => field != null)
 
   return (
-    <>
-      {fieldIds.map((fieldId) => {
-        const field = getFilterFieldById(schema.fields, fieldId)
-        if (!field || !isFilterFieldVisible(field, state)) {
-          return null
-        }
-
-        return (
-          <CatalogFilterField
-            key={field.id}
-            field={field}
-            controlId={`${resolvedIdPrefix}-${field.id}`}
-            schema={schema}
-            state={state}
-            optionsContext={optionsContext}
-            density={density}
-            disabled={isFilterFieldDisabled(field, state, disabled)}
-            onValueChange={onValueChange}
-          />
-        )
-      })}
-    </>
+    <FilterFieldList
+      schema={schema}
+      fields={fields}
+      state={state}
+      data={data}
+      disabled={disabled}
+      idPrefix={resolvedIdPrefix}
+      onValueChange={onValueChange}
+    />
   )
 }
+
+/**
+ * @deprecated Use `FilterFieldRenderer` with a `FilterRenderContext` instead.
+ */
+export { FilterFieldRenderer as CatalogFilterField } from './filter-field-renderer.client'

@@ -11,6 +11,7 @@ import type {
   FilterSchema,
 } from './filter-schema.types'
 import { catalogFilterControlsVariants } from './catalog-filter-controls.variants'
+import { FilterChromeProvider, useOptionalFilterChrome } from './filter-chrome.context'
 import { FILTER_DENSITY_DEFAULT } from './filter-bar.variants'
 
 export type CatalogFilterControlsProps<TData, TState extends Record<string, unknown>> = {
@@ -34,7 +35,7 @@ function CatalogFilterControlsGroup<TData, TState extends Record<string, unknown
   state,
   data,
   disabled,
-  density = FILTER_DENSITY_DEFAULT,
+  density,
   idPrefix,
   className,
   onValueChange,
@@ -43,24 +44,27 @@ function CatalogFilterControlsGroup<TData, TState extends Record<string, unknown
 }) {
   const reactId = useId()
   const resolvedIdPrefix = idPrefix || reactId.replace(/:/g, '')
+  const parentChrome = useOptionalFilterChrome()
+  const resolvedDensity = density ?? parentChrome?.density ?? FILTER_DENSITY_DEFAULT
 
   if (!fieldIds || fieldIds.length === 0) {
     return null
   }
 
   return (
-    <div className={cn(catalogFilterControlsVariants(), className)}>
-      <CatalogFilterFieldList
-        schema={schema}
-        fieldIds={fieldIds}
-        state={state}
-        data={data}
-        density={density}
-        disabled={disabled}
-        idPrefix={resolvedIdPrefix}
-        onValueChange={onValueChange}
-      />
-    </div>
+    <FilterChromeProvider density={resolvedDensity}>
+      <div className={cn(catalogFilterControlsVariants(), className)}>
+        <CatalogFilterFieldList
+          schema={schema}
+          fieldIds={fieldIds}
+          state={state}
+          data={data}
+          disabled={disabled}
+          idPrefix={resolvedIdPrefix}
+          onValueChange={onValueChange}
+        />
+      </div>
+    </FilterChromeProvider>
   )
 }
 

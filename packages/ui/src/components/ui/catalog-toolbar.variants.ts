@@ -21,5 +21,3 @@ export const catalogToolbarFilterActionsVariants = cva(
 )
 
 export const catalogToolbarStandaloneActionsVariants = cva('flex justify-end')
-
-export const catalogFilterChipsLabelVariants = cva('text-sm text-muted-foreground')

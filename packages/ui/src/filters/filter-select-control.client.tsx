@@ -10,18 +10,17 @@ import {
 import { getEffectiveFilterValue } from './filter-engine'
 import {
   normalizeFilterSelectChange,
-  resolveFilterControlSize,
   resolveFilterSelectValue,
+  resolveSelectCurrentValue,
   resolveSelectFieldOptions,
-  shouldSkipFilterSelectChange,
 } from './filter-bar.lib'
-import { FILTER_SELECT_ALL_VALUE, FILTER_DENSITY_DEFAULT } from './filter-bar.variants'
+import { FILTER_SELECT_ALL_VALUE } from './filter-bar.variants'
 import {
   FilterSelectFieldChrome,
   resolveFilterSelectFieldLayout,
 } from './filter-select-field-chrome.client'
+import type { FilterFieldPresentation } from './filter-presentation.lib'
 import type {
-  FilterDensity,
   FilterFieldId,
   FilterFieldOptionsContext,
   FilterSchema,
@@ -34,14 +33,13 @@ type FilterSelectControlProps<TData, TState extends Record<string, unknown>> = {
   schema: FilterSchema<TData, TState>
   state: TState
   optionsContext?: FilterFieldOptionsContext<TData, TState>
-  density?: FilterDensity
+  presentation: Extract<FilterFieldPresentation, { type: 'select' }>
+  widthClassName?: string
   disabled?: boolean
   onValueChange: (
     id: FilterFieldId<TState>,
     value: TState[FilterFieldId<TState>] | undefined,
   ) => void
-  /** Skips redundant onValueChange when normalized value is unchanged (overview filters). */
-  guardDuplicateChanges?: boolean
 }
 
 export function FilterSelectControl<TData, TState extends Record<string, unknown>>({
@@ -50,10 +48,10 @@ export function FilterSelectControl<TData, TState extends Record<string, unknown
   schema,
   state,
   optionsContext,
-  density = FILTER_DENSITY_DEFAULT,
+  presentation,
+  widthClassName,
   disabled,
   onValueChange,
-  guardDuplicateChanges = false,
 }: FilterSelectControlProps<TData, TState>) {
   const rawValue = state[selectField.id]
   const effectiveValue = getEffectiveFilterValue(schema, state, selectField.id)
@@ -62,17 +60,15 @@ export function FilterSelectControl<TData, TState extends Record<string, unknown
   const fieldWithOptions = { ...selectField, options }
   const showAllOption = selectField.showAllOption ?? true
   const triggerAriaLabel = selectField.triggerAriaLabel ?? selectField.label
-  const controlSize = resolveFilterControlSize(density)
+  const layout = resolveFilterSelectFieldLayout(selectField)
 
   const handleValueChange = (nextValue: string) => {
     const normalized = normalizeFilterSelectChange(fieldWithOptions, nextValue) as
       | TState[typeof selectField.id]
       | undefined
 
-    if (
-      guardDuplicateChanges &&
-      shouldSkipFilterSelectChange(normalized, rawValue, effectiveValue)
-    ) {
+    const currentValue = resolveSelectCurrentValue(rawValue, effectiveValue)
+    if (Object.is(normalized, currentValue)) {
       return
     }
 
@@ -81,12 +77,12 @@ export function FilterSelectControl<TData, TState extends Record<string, unknown
 
   return (
     <FilterSelectFieldChrome
-      layout={resolveFilterSelectFieldLayout(selectField)}
-      density={density}
+      layout={layout}
+      presentation={presentation}
       controlId={controlId}
       label={selectField.label}
       ariaLabel={selectField.ariaLabel}
-      width={selectField.width}
+      widthClassName={widthClassName}
     >
       <Select
         value={resolveFilterSelectValue(fieldWithOptions, rawValue, effectiveValue)}
@@ -96,7 +92,7 @@ export function FilterSelectControl<TData, TState extends Record<string, unknown
         <SelectTrigger
           id={controlId}
           aria-label={triggerAriaLabel}
-          size={controlSize}
+          size={presentation.controlSize}
           className="w-full"
         >
           <SelectValue placeholder={selectField.label} />

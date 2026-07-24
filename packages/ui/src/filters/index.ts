@@ -56,12 +56,24 @@ export {
   isFilterFieldDisabled,
   isFilterFieldVisible,
   normalizeFilterSelectChange,
-  resolveFilterControlSize,
   resolveFilterSelectValue,
 } from './filter-bar.lib'
+export {
+  resolveFilterControlSize,
+  resolveFilterFieldPresentation,
+  resolveFilterFieldWidthClasses,
+  type FilterFieldPresentation,
+} from './filter-presentation.lib'
 
+export {
+  FilterChromeProvider,
+  useFilterChrome,
+  useOptionalFilterChrome,
+  type FilterChromeContextValue,
+} from './filter-chrome.context'
 export { FilterBar, type FilterBarProps } from './filter-bar.client'
 export { FilterAdvancedPanel, type FilterAdvancedPanelProps } from './filter-advanced-panel.client'
+export { FilterFieldRenderer, type FilterRenderContext } from './filter-field-renderer.client'
 export { FilterField, FilterFieldList } from './filter-fields.client'
 export {
   CatalogFilterControls,
