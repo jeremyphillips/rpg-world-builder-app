@@ -1,4 +1,6 @@
 import { fieldWidthVariants } from '../components/ui/field-control.variants'
+import type { FieldLabelLayout } from '../components/ui/field-row-presentation.lib'
+import { resolveFieldPresentation } from '../components/ui/field-row-presentation.lib'
 import { cn } from '../lib/utils'
 import type { FilterChromeContextValue } from './filter-chrome.context'
 import {
@@ -27,44 +29,60 @@ export function resolveFilterChromePresentation(
   }
 }
 
+type FilterPresentationShared = {
+  labelClassName: string
+  groupClassName: string
+  controlBandClassName: string
+  alignmentAnchorClassName: string
+}
+
 export type FilterFieldPresentation =
-  | {
+  | (FilterPresentationShared & {
       type: 'text'
-      labelClassName: string
-      groupClassName: string
       controlSize: 'sm' | 'md'
-    }
-  | {
+    })
+  | (FilterPresentationShared & {
       type: 'select'
-      labelClassName: string
-      groupClassName: string
       controlSize: 'sm' | 'md'
-    }
-  | {
+    })
+  | (FilterPresentationShared & {
       type: 'boolean'
-      labelClassName: string
-      groupClassName: string
-    }
-  | {
+    })
+  | (FilterPresentationShared & {
       type: 'chips'
-      labelClassName: string
-      groupClassName: string
       chipSize: 'sm' | 'md'
       shellClassName: string
-    }
-  | {
+    })
+  | (FilterPresentationShared & {
       type: 'popover'
-      labelClassName: string
-      groupClassName: string
       triggerSize: 'sm' | 'md'
-    }
+    })
 
 type FilterPresentationField = Pick<FilterFieldDef<unknown, Record<string, unknown>>, 'type'> & {
   layout?: 'stacked' | 'inline'
   width?: FilterFieldWidth
 }
 
-function resolveGroupClassName(field: FilterPresentationField, density: FilterDensity): string {
+/**
+ * Maps filter field `layout` to shared {@link FieldLabelLayout}.
+ * Schema API stays `stacked` | `inline` | default (omitted → hidden for non-selects;
+ * selects resolve via {@link resolveFilterSelectFieldLayout}).
+ */
+export function mapFilterLayoutToLabelLayout(field: FilterPresentationField): FieldLabelLayout {
+  if (field.type === 'boolean') return 'inline'
+  if (field.type === 'select') {
+    const layout = resolveFilterSelectFieldLayout(field)
+    if (layout === 'inline') return 'inline'
+    if (layout === 'stacked') return 'stacked'
+    return 'hidden'
+  }
+  if (field.type === 'text' || field.type === 'chips' || field.type === 'popover') {
+    return 'hidden'
+  }
+  return 'hidden'
+}
+
+function resolveFilterGroupExtras(field: FilterPresentationField, density: FilterDensity): string {
   if (field.type === 'select') {
     const layout = resolveFilterSelectFieldLayout(field)
     if (layout === 'inline') {
@@ -108,40 +126,54 @@ export function resolveFilterFieldPresentation(
   chrome: FilterChromeContextValue,
 ): FilterFieldPresentation {
   const { density } = chrome
+  const controlSize = resolveFilterControlSize(density)
+  const labelLayout = mapFilterLayoutToLabelLayout(field)
+  const controlBand =
+    field.type === 'chips' || field.type === 'popover' ? 'content-sized' : 'single-line'
+
+  const base = resolveFieldPresentation({
+    size: controlSize,
+    labelLayout,
+    controlBand,
+  })
+
   const labelClassName = filterFieldLabelVariants({ density })
-  const groupClassName = resolveGroupClassName(field, density)
+  // Filter density variants own group layout; shared presentation owns band + anchor.
+  const groupClassName = resolveFilterGroupExtras(field, density)
+  const shared: FilterPresentationShared = {
+    labelClassName,
+    groupClassName,
+    controlBandClassName: base.controlBandClassName,
+    alignmentAnchorClassName: base.alignmentAnchorClassName,
+  }
 
   if (field.type === 'text') {
     return {
       type: 'text',
-      labelClassName,
-      groupClassName,
-      controlSize: resolveFilterControlSize(density),
+      ...shared,
+      controlSize,
     }
   }
 
   if (field.type === 'select') {
     return {
       type: 'select',
-      labelClassName,
-      groupClassName,
-      controlSize: resolveFilterControlSize(density),
+      ...shared,
+      controlSize,
     }
   }
 
   if (field.type === 'boolean') {
     return {
       type: 'boolean',
-      labelClassName,
-      groupClassName,
+      ...shared,
     }
   }
 
   if (field.type === 'chips') {
     return {
       type: 'chips',
-      labelClassName,
-      groupClassName,
+      ...shared,
       chipSize: resolveFilterChipSize(density),
       shellClassName: density === 'compact' ? 'gap-1' : 'gap-2',
     }
@@ -149,9 +181,8 @@ export function resolveFilterFieldPresentation(
 
   return {
     type: 'popover',
-    labelClassName,
-    groupClassName,
-    triggerSize: resolveFilterControlSize(density),
+    ...shared,
+    triggerSize: controlSize,
   }
 }
 

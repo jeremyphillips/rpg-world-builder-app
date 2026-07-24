@@ -61,6 +61,7 @@ export {
   resolveFilterSelectValue,
 } from './filter-bar.lib'
 export {
+  mapFilterLayoutToLabelLayout,
   resolveFilterChromePresentation,
   resolveFilterControlSize,
   resolveFilterFieldPresentation,

@@ -6,11 +6,11 @@ export const FILTER_SELECT_ALL_VALUE = '__all__'
 
 export const FILTER_DENSITY_DEFAULT: FilterDensity = 'compact'
 
-/** Primary filter bar row — inline controls and trailing actions. */
-export const filterBarVariants = cva('flex flex-wrap items-center gap-2')
+/** Primary filter bar row — control-edge alignment with trailing actions. */
+export const filterBarVariants = cva('flex flex-wrap items-end gap-2')
 
-/** Group of primary filter controls. */
-export const filterBarFieldGroupVariants = cva('flex flex-1 flex-wrap items-center gap-2')
+/** Group of primary filter controls — control-edge baseline. */
+export const filterBarFieldGroupVariants = cva('flex flex-1 flex-wrap items-end gap-2')
 
 /** Single filter control width constraints. */
 export const filterBarControlVariants = cva('', {

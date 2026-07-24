@@ -8,6 +8,7 @@ import {
 } from './filter-engine.helpers'
 import { createFilterSchema } from './filter-schema.types'
 import {
+  mapFilterLayoutToLabelLayout,
   resolveFilterControlSize,
   resolveFilterFieldPresentation,
   resolveFilterFieldWidthClasses,
@@ -132,5 +133,28 @@ describe('filter-presentation.lib', () => {
   it('exposes resolveFilterControlSize for compact and comfortable', () => {
     expect(resolveFilterControlSize('compact')).toBe('sm')
     expect(resolveFilterControlSize('comfortable')).toBe('md')
+  })
+
+  it('delegates band sizing to shared field presentation', () => {
+    const textField = fieldAt(0)
+    const presentation = resolveFilterFieldPresentation(textField, compactChrome)
+
+    expect(presentation.controlBandClassName).toContain('min-h-8')
+    expect(mapFilterLayoutToLabelLayout(textField)).toBe('hidden')
+  })
+
+  it('maps select layouts to shared label layouts', () => {
+    expect(mapFilterLayoutToLabelLayout(fieldAt(1))).toBe('stacked')
+    expect(mapFilterLayoutToLabelLayout(fieldAt(2))).toBe('inline')
+    expect(mapFilterLayoutToLabelLayout(fieldAt(3))).toBe('inline')
+  })
+
+  it('uses content-sized band for chips', () => {
+    const chipsField = fieldAt(4)
+    const presentation = resolveFilterFieldPresentation(chipsField, compactChrome)
+    expect(presentation.type).toBe('chips')
+    if (presentation.type === 'chips') {
+      expect(presentation.controlBandClassName).toContain('min-h-0')
+    }
   })
 })

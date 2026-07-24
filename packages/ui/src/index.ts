@@ -292,6 +292,25 @@ export {
   type FieldStackRhythm,
 } from './components/ui/field.variants'
 export {
+  fieldControlBandVariants,
+  fieldRowVariants,
+  type FieldControlBand,
+  type FieldControlBandVariantProps,
+  type FieldRowAlignment,
+  type FieldRowLayout,
+  type FieldRowVariantProps,
+} from './components/ui/field-control-band.variants'
+export {
+  mapFormLabelPositionToLayout,
+  resolveFieldActionBandClassName,
+  resolveFieldPresentation,
+  resolveFieldRowClasses,
+  type FieldLabelLayout,
+  type FieldPresentationConfig,
+  type FieldRowConfig,
+  type FieldRowPresentation,
+} from './components/ui/field-row-presentation.lib'
+export {
   resolveFieldDependentsChromeClasses,
   type FieldDependentsScope,
 } from './components/ui/field-dependent.variants'

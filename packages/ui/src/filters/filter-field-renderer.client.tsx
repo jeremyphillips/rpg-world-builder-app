@@ -74,7 +74,10 @@ function FilterTextField<TData, TState extends Record<string, unknown>>({
   const textValue = typeof rawValue === 'string' ? rawValue : ''
 
   return (
-    <div className={presentation.groupClassName}>
+    <div
+      data-field-align=""
+      className={cn(presentation.controlBandClassName, presentation.groupClassName)}
+    >
       <Input
         id={controlId}
         placeholder={textField.placeholder ?? `Filter ${textField.label}…`}
@@ -260,7 +263,10 @@ function FilterBooleanField<TData, TState extends Record<string, unknown>>({
   const hiddenCount = booleanField.hiddenCount?.(state, optionsContext)
 
   return (
-    <div className={presentation.groupClassName}>
+    <div
+      data-field-align=""
+      className={cn(presentation.controlBandClassName, presentation.groupClassName)}
+    >
       <Checkbox
         id={controlId}
         checked={isChecked}

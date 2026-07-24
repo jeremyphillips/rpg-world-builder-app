@@ -49,6 +49,38 @@ const schema = createFilterSchema<DemoRow, TestFilterState>([
   }),
 ])
 
+type MixedPrimaryState = {
+  search?: string
+  hitDie?: string
+  spellcasting?: boolean
+}
+
+const mixedPrimarySchema = createFilterSchema<DemoRow, MixedPrimaryState>([
+  createTextFilter<DemoRow, MixedPrimaryState, 'search'>({
+    id: 'search',
+    label: 'Search',
+    placeholder: 'Search…',
+    getSearchText: (row) => row.name,
+  }),
+  createEqualsFilter<DemoRow, MixedPrimaryState, 'hitDie', string>({
+    id: 'hitDie',
+    label: 'Hit Die',
+    layout: 'stacked',
+    width: 'md',
+    options: [
+      { value: '6', label: 'd6' },
+      { value: '8', label: 'd8' },
+    ],
+    getValue: () => '8',
+  }),
+  createBooleanFilter<DemoRow, MixedPrimaryState, 'spellcasting'>({
+    id: 'spellcasting',
+    label: 'Has Spellcasting',
+    placement: 'primary',
+    getValue: () => false,
+  }),
+])
+
 function FilterSystemHarness({
   initialState = {},
   onReset = vi.fn(),
@@ -138,5 +170,32 @@ describe('FilterBar', () => {
     )
 
     await expectNoAxeViolations(container)
+  })
+
+  it('aligns a mixed primary row on shared control-band anchors', () => {
+    const { container } = render(
+      <FilterBar
+        schema={mixedPrimarySchema}
+        state={{}}
+        onValueChange={() => undefined}
+        onAdvancedOpenChange={() => undefined}
+        advancedOpen={false}
+      />,
+    )
+
+    expect(container.firstChild).toHaveClass('items-end')
+    const anchors = container.querySelectorAll('[data-field-align]')
+    expect(anchors.length).toBeGreaterThanOrEqual(3)
+
+    const hitDieLabel = screen.getByText('Hit Die')
+    expect(hitDieLabel.tagName).toBe('LABEL')
+    expect(hitDieLabel).toHaveAttribute('for', expect.stringContaining('hitDie'))
+    expect(screen.getByRole('combobox', { name: 'Hit Die' })).toHaveAttribute(
+      'id',
+      hitDieLabel.getAttribute('for') ?? '',
+    )
+
+    expect(screen.getByLabelText('Search')).toBeInTheDocument()
+    expect(screen.getByLabelText('Has Spellcasting')).toBeInTheDocument()
   })
 })

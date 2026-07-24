@@ -65,7 +65,7 @@ describe('SwitchField', () => {
   })
 
   it('stacks inline label and hint in the same column beside the switch', () => {
-    render(
+    const { container } = render(
       <SwitchField
         id="multiclass"
         label="Allow multiclassing"
@@ -85,6 +85,7 @@ describe('SwitchField', () => {
     const row = label.parentElement?.parentElement
     expect(row).toHaveClass('flex', 'gap-2')
     expect(row?.firstElementChild).toHaveClass('flex', 'h-5', 'shrink-0', 'items-center')
+    expect(container.querySelector('[data-field-align]')).not.toBeNull()
   })
 
   it('renders label and hint in the left column when labelPosition is settings', () => {

@@ -210,6 +210,8 @@ describe('CatalogFilterChips standalone fallback', () => {
             type: 'chips',
             labelClassName: 'text-xs',
             groupClassName: '',
+            controlBandClassName: 'flex items-start min-h-0 h-auto',
+            alignmentAnchorClassName: '',
             chipSize: 'sm',
             shellClassName: 'gap-1',
           }}
@@ -233,6 +235,8 @@ describe('CatalogFilterChips standalone fallback', () => {
           type: 'chips',
           labelClassName: 'text-xs text-muted-foreground',
           groupClassName: '',
+          controlBandClassName: 'flex items-start min-h-0 h-auto',
+          alignmentAnchorClassName: '',
           chipSize: 'sm',
           shellClassName: 'gap-1',
         }}

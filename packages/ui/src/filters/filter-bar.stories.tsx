@@ -111,3 +111,80 @@ export const Disabled: Story = {
 export const AdvancedOpen: Story = {
   render: () => <FilterSystemDemo initialValues={{ hiddenOnly: true }} />,
 }
+
+type ClassesLikeState = {
+  search?: string
+  hitDie?: string
+  spellcasting?: boolean
+  status?: 'draft' | 'published'
+}
+
+const classesLikeSchema = createFilterSchema<DemoRow, ClassesLikeState>([
+  createTextFilter<DemoRow, ClassesLikeState, 'search'>({
+    id: 'search',
+    label: 'Search',
+    placeholder: 'Search…',
+    getSearchText: (row) => row.name,
+  }),
+  createEqualsFilter<DemoRow, ClassesLikeState, 'hitDie', string>({
+    id: 'hitDie',
+    label: 'Hit Die',
+    layout: 'stacked',
+    width: 'md',
+    options: [
+      { value: '6', label: 'd6' },
+      { value: '8', label: 'd8' },
+      { value: '10', label: 'd10' },
+      { value: '12', label: 'd12' },
+    ],
+    getValue: () => '8',
+  }),
+  createBooleanFilter<DemoRow, ClassesLikeState, 'spellcasting'>({
+    id: 'spellcasting',
+    label: 'Has Spellcasting',
+    placement: 'primary',
+    getValue: () => false,
+  }),
+  createEqualsFilter<DemoRow, ClassesLikeState, 'status', 'draft' | 'published'>({
+    id: 'status',
+    label: 'Status',
+    placement: 'advanced',
+    layout: 'stacked',
+    width: 'md',
+    options: [
+      { value: 'draft', label: 'Draft' },
+      { value: 'published', label: 'Published' },
+    ],
+    getValue: (row) => row.status as 'draft' | 'published',
+  }),
+])
+
+function ClassesLikePrimaryRowDemo() {
+  const { state, setValue, reset } = useFilterState(classesLikeSchema)
+  const [advancedOpen, setAdvancedOpen] = useState(false)
+
+  return (
+    <div className="flex max-w-4xl flex-col gap-2">
+      <FilterBar
+        schema={classesLikeSchema}
+        state={state}
+        advancedOpen={advancedOpen}
+        onAdvancedOpenChange={setAdvancedOpen}
+        onValueChange={setValue}
+        onReset={reset}
+      />
+      <FilterAdvancedPanel
+        schema={classesLikeSchema}
+        state={state}
+        open={advancedOpen}
+        onValueChange={setValue}
+        onClearAll={reset}
+      />
+    </div>
+  )
+}
+
+/** Classes-like primary row: search + stacked select + boolean + Filters action. */
+export const ClassesLikePrimaryRow: Story = {
+  render: () => <ClassesLikePrimaryRowDemo />,
+}

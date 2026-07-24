@@ -420,6 +420,24 @@ or behavior.
 - `resolveFilterFieldWidthClasses` is separate from density — width is layout
   allocation only.
 
+### Shared field-row SSOT
+
+Filter bars share control-band + control-edge alignment with forms. Ownership lives in
+`@rpg/ui` field-layout modules — not under `filters/`. See
+[sizing-and-spacing.md](./forms/sizing-and-spacing.md#control-band--row-alignment-ssot).
+
+| Default               | Value                                                                                      |
+| --------------------- | ------------------------------------------------------------------------------------------ |
+| Density → size        | `compact` → `sm`, `comfortable` → `md` (`resolveFilterControlSize`)                        |
+| Primary bar alignment | `items-end` (control-edge) on `FilterBar`, field group, catalog controls, trailing actions |
+| Common primary labels | Hidden (text search, default select chrome)                                                |
+| Stacked labels        | Advanced panel selects and primary selects with `layout: 'stacked'` (e.g. Hit Die)         |
+| Booleans              | Checkbox + label inside a single-line control band — **not** switches                      |
+
+`resolveFilterFieldPresentation` delegates band/size to `resolveFieldPresentation` and
+maps filter `layout` (`default` → hidden, `stacked` → stacked, `inline` → inline).
+Stacked selects always wire `label htmlFor` ↔ control `id`, including when `width` is set.
+
 ---
 
 ## Composition (overview shells)

@@ -6,6 +6,7 @@ import type { ReactNode } from 'react'
 import { cn } from '../lib/utils'
 import { Badge } from '../components/ui/badge'
 import { Button } from '../components/ui/button.client'
+import { resolveFieldActionBandClassName } from '../components/ui/field-row-presentation.lib'
 import { countModifiedFilters } from './filter-engine'
 import { getSchemaFieldsByPlacement } from './filter-bar.lib'
 import {
@@ -13,6 +14,7 @@ import {
   filterBarResetButtonClasses,
   filterBarVariants,
 } from './filter-bar.variants'
+import { resolveFilterControlSize } from './filter-presentation.lib'
 import { FilterChromeProvider, useOptionalFilterChrome } from './filter-chrome.context'
 import { FilterFieldList } from './filter-fields.client'
 import type { FilterFieldId, FilterSchema } from './filter-schema.types'
@@ -50,6 +52,8 @@ export function FilterBar<TData, TState extends Record<string, unknown>>({
   trailing,
 }: FilterBarProps<TData, TState>) {
   const parentChrome = useOptionalFilterChrome()
+  const density = parentChrome?.density
+  const actionBandClassName = resolveFieldActionBandClassName(resolveFilterControlSize(density))
   const primaryFields = getSchemaFieldsByPlacement(schema, 'primary')
   const advancedFields = getSchemaFieldsByPlacement(schema, 'advanced')
   const modifiedCount = countModifiedFilters(schema, state)
@@ -76,7 +80,7 @@ export function FilterBar<TData, TState extends Record<string, unknown>>({
         <FilterChromeProvider>{primaryFilters}</FilterChromeProvider>
       )}
 
-      <div className="flex items-center gap-2">
+      <div className={cn(actionBandClassName, 'gap-2')}>
         {advancedFields.length > 0 && onAdvancedOpenChange ? (
           <Button
             type="button"

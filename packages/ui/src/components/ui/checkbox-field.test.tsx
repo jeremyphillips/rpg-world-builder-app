@@ -45,4 +45,20 @@ describe('CheckboxField', () => {
     expect(textColumn).toHaveClass('flex', 'flex-col', 'gap-1')
     expect(textColumn).toContainElement(hint)
   })
+
+  it('keeps first-line checkbox column alignment inside the content-sized band', () => {
+    const { container } = render(
+      <CheckboxField
+        id="homebrew"
+        label="Allow homebrew"
+        hint="Includes third-party content in search results."
+      />,
+    )
+
+    const anchor = container.querySelector('[data-field-align]')
+    expect(anchor).not.toBeNull()
+    const row = screen.getByText('Allow homebrew').parentElement?.parentElement
+    expect(row).toHaveClass('flex', 'gap-2')
+    expect(row?.firstElementChild).toHaveClass('flex', 'h-4', 'shrink-0', 'items-center')
+  })
 })

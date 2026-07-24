@@ -1,3 +1,4 @@
 import { cva } from 'class-variance-authority'
 
-export const catalogFilterControlsVariants = cva('flex flex-wrap items-center gap-2')
+/** Catalog filter control row — control-edge baseline (shared with FilterBar). */
+export const catalogFilterControlsVariants = cva('flex flex-wrap items-end gap-2')
