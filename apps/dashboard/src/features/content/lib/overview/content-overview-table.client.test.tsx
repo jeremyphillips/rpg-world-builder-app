@@ -34,6 +34,12 @@ vi.mock('@/features/campaign', () => ({
   useCanManageCampaign: vi.fn(() => true),
 }))
 
+const manageViewer = { kind: 'manage' as const }
+
+vi.mock('./use-content-viewer', () => ({
+  useContentViewer: vi.fn(() => manageViewer),
+}))
+
 vi.mock('./content-overview-preferences', async (importOriginal) => {
   const actual = await importOriginal<typeof import('./content-overview-preferences')>()
   return {

@@ -47,6 +47,8 @@ import {
   getContentOverviewSortableColumnIds,
 } from './content-overview-columns.lib'
 import { useOverviewColumnsWithNameContext } from './content-overview-columns.client'
+import { filterCatalogRowsForViewer } from './filter-catalog-rows-for-viewer'
+import { useContentViewer } from './use-content-viewer'
 import {
   CONTENT_OVERVIEW_PREFERENCES_DEFAULTS,
   hydrateContentOverviewPreferences,
@@ -196,13 +198,20 @@ export function ContentOverviewTable<
   const tableRootRef = useRef<HTMLDivElement>(null)
   const actionTriggerRefs = useRef(new Map<string, HTMLButtonElement>())
   const canManage = useCanManageCampaign(campaignId)
+  const viewer = useContentViewer(campaignId)
   const getEditHrefRef = useRef(getEditHref)
   getEditHrefRef.current = getEditHref
+
+  const discoveryFilteredData = useMemo(
+    () => filterCatalogRowsForViewer(data, viewer),
+    [data, viewer],
+  )
 
   const overviewColumns = useOverviewColumnsWithNameContext(columns, {
     canManage,
     campaignId,
     contentTypeKey,
+    viewer,
     getEditHref: (row) => getEditHrefRef.current(row),
   })
   const columnSchema = useMemo(
@@ -237,10 +246,10 @@ export function ContentOverviewTable<
 
   const scopedRows = useMemo(
     () =>
-      applyFilterSchema(filterSchema, filterState, data, {
+      applyFilterSchema(filterSchema, filterState, discoveryFilteredData, {
         excludeFieldIds: [campaignAvailabilityFilterId],
       }),
-    [campaignAvailabilityFilterId, data, filterSchema, filterState],
+    [campaignAvailabilityFilterId, discoveryFilteredData, filterSchema, filterState],
   )
 
   const scope = useMemo(
@@ -249,8 +258,8 @@ export function ContentOverviewTable<
   )
 
   const visibleRows = useMemo(
-    () => applyFilterSchema(filterSchema, filterState, data),
-    [data, filterSchema, filterState],
+    () => applyFilterSchema(filterSchema, filterState, discoveryFilteredData),
+    [discoveryFilteredData, filterSchema, filterState],
   )
 
   const pluralNoun = getContentTypeMidSentenceLabel(contentTypeKey, { plural: true })

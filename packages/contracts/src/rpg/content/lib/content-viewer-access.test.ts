@@ -2,8 +2,10 @@ import { describe, expect, it } from 'vitest'
 
 import { DEFAULT_CONTENT_CAMPAIGN_ACCESS } from './campaign-access'
 import {
+  buildContentViewerFromMembership,
   canResolveSavedContentReference,
   isContentDiscoverableForViewer,
+  toPlayerContentVisibility,
   type ContentViewer,
 } from './content-viewer-access'
 
@@ -81,6 +83,53 @@ describe('isContentDiscoverableForViewer', () => {
     ).toBe(false)
     expect(isContentDiscoverableForViewer(restricted, noneViewer)).toBe(false)
     expect(isContentDiscoverableForViewer(restricted, { kind: 'pc', characterIds: [] })).toBe(false)
+  })
+})
+
+describe('buildContentViewerFromMembership', () => {
+  it('maps campaign roles to viewer kinds', () => {
+    expect(buildContentViewerFromMembership({ campaignRole: 'owner', characterIds: [] })).toEqual({
+      kind: 'manage',
+    })
+    expect(
+      buildContentViewerFromMembership({ campaignRole: 'pc', characterIds: ['pc-1', 'pc-2'] }),
+    ).toEqual({ kind: 'pc', characterIds: ['pc-1', 'pc-2'] })
+    expect(
+      buildContentViewerFromMembership({ campaignRole: 'observer', characterIds: [] }),
+    ).toEqual({ kind: 'none' })
+  })
+})
+
+describe('toPlayerContentVisibility', () => {
+  it('returns ordinary for non-specific access and non-pc viewers', () => {
+    expect(toPlayerContentVisibility(access(), { kind: 'none' })).toEqual({ kind: 'ordinary' })
+    expect(toPlayerContentVisibility(access({ visibilityMode: 'dm_only' }), pcViewer)).toEqual({
+      kind: 'ordinary',
+    })
+  })
+
+  it('returns specific visibility with other participant count for granted PCs', () => {
+    expect(
+      toPlayerContentVisibility(
+        access({
+          visibilityMode: 'specific_players',
+          participantIds: ['char-a', 'char-c'],
+        }),
+        pcViewer,
+      ),
+    ).toEqual({ kind: 'specific', otherParticipantCount: 1 })
+  })
+
+  it('returns ordinary when the viewer is not granted specific access', () => {
+    expect(
+      toPlayerContentVisibility(
+        access({
+          visibilityMode: 'specific_players',
+          participantIds: ['char-x'],
+        }),
+        pcViewer,
+      ),
+    ).toEqual({ kind: 'ordinary' })
   })
 })
 

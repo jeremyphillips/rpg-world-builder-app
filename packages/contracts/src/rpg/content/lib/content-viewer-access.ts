@@ -1,4 +1,5 @@
 import type { ResolvedContentCampaignAccess } from './campaign-access'
+import { CAMPAIGN_MANAGE_ROLES, type CampaignManageRole } from '../../../shared/roles'
 
 /**
  * Viewer context for campaign content discovery and saved-reference reads.
@@ -15,6 +16,59 @@ export type ContentViewer =
 /** Saved-character reference scope — grants read independent of discovery policy. */
 export type SavedContentReferenceContext = {
   characterId: string
+}
+
+export type CampaignMembershipViewerContext = {
+  campaignRole: string
+  characterIds: readonly string[]
+}
+
+/** Maps campaign membership to the contracts `ContentViewer` model. */
+export function buildContentViewerFromMembership(
+  membership: CampaignMembershipViewerContext | undefined,
+): ContentViewer {
+  if (!membership) {
+    return { kind: 'none' }
+  }
+
+  if (CAMPAIGN_MANAGE_ROLES.includes(membership.campaignRole as CampaignManageRole)) {
+    return { kind: 'manage' }
+  }
+
+  if (membership.campaignRole === 'pc' && membership.characterIds.length > 0) {
+    return { kind: 'pc', characterIds: membership.characterIds }
+  }
+
+  return { kind: 'none' }
+}
+
+/** Structured player-facing visibility facts for overview metadata. */
+export type PlayerContentVisibility =
+  | { kind: 'ordinary' }
+  | { kind: 'specific'; otherParticipantCount: number }
+
+/** Resolves player line-2 metadata from campaign access and viewer context. */
+export function toPlayerContentVisibility(
+  campaignAccess: ResolvedContentCampaignAccess,
+  viewer: ContentViewer,
+): PlayerContentVisibility {
+  if (viewer.kind !== 'pc' || campaignAccess.visibilityMode !== 'specific_players') {
+    return { kind: 'ordinary' }
+  }
+
+  const isGranted = viewer.characterIds.some((characterId) =>
+    campaignAccess.participantIds.includes(characterId),
+  )
+  if (!isGranted) {
+    return { kind: 'ordinary' }
+  }
+
+  const viewerCharacterIds = new Set(viewer.characterIds)
+  const otherParticipantCount = campaignAccess.participantIds.filter(
+    (participantId) => !viewerCharacterIds.has(participantId),
+  ).length
+
+  return { kind: 'specific', otherParticipantCount }
 }
 
 /**

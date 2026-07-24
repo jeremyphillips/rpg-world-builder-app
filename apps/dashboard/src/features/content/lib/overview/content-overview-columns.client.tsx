@@ -3,6 +3,7 @@
 import { useMemo, useRef } from 'react'
 
 import type { ContentTypeKey } from '@rpg/contracts'
+import { toPlayerContentVisibility, type ContentViewer } from '@rpg/contracts'
 import type { ColumnDef } from '@rpg/ui'
 
 import { ContentOverviewNameCell } from './content-overview-name-cell.client'
@@ -45,11 +46,13 @@ export function patchOverviewNameColumn<T extends OverviewNameRow>(
     canManage: boolean
     campaignId: string
     contentTypeKey: ContentTypeKey
+    viewer: ContentViewer
     getEditHref: (row: T) => string
   },
 ): ColumnDef<T, unknown>[] {
   const queryKeyFn = (campaignId: string) =>
     contentOverviewListQueryKey(campaignId, context.contentTypeKey)
+  const campaignAccessForRow = (row: T) => readContentRowCampaignAccess(row)
 
   return columns.map((column) => {
     const accessorKey = (column as { accessorKey?: string }).accessorKey
@@ -66,7 +69,11 @@ export function patchOverviewNameColumn<T extends OverviewNameRow>(
         <ContentOverviewNameCell
           name={row.getValue<string>('name')}
           status={row.original.status}
-          campaignAccess={readContentRowCampaignAccess(row.original)}
+          campaignAccess={campaignAccessForRow(row.original)}
+          playerVisibility={toPlayerContentVisibility(
+            campaignAccessForRow(row.original),
+            context.viewer,
+          )}
           nameHref={overviewNameHref?.(row.original)}
           editHref={context.canManage ? context.getEditHref(row.original) : undefined}
           canManage={context.canManage}
@@ -91,6 +98,7 @@ export function useOverviewColumnsWithNameContext<T extends OverviewNameRow>(
     canManage: boolean
     campaignId: string
     contentTypeKey: ContentTypeKey
+    viewer: ContentViewer
     getEditHref: (row: T) => string
   },
 ): ColumnDef<T, unknown>[] {
@@ -104,8 +112,9 @@ export function useOverviewColumnsWithNameContext<T extends OverviewNameRow>(
         canManage: context.canManage,
         campaignId: context.campaignId,
         contentTypeKey: context.contentTypeKey,
+        viewer: context.viewer,
         getEditHref: (row) => getEditHrefRef.current(row),
       }),
-    [stableColumns, context.canManage, context.campaignId, context.contentTypeKey],
+    [stableColumns, context.canManage, context.campaignId, context.contentTypeKey, context.viewer],
   )
 }

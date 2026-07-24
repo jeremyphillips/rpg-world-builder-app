@@ -1,6 +1,11 @@
 'use client'
 
-import type { ContentStatus, ContentTypeKey, ResolvedContentCampaignAccess } from '@rpg/contracts'
+import type {
+  ContentStatus,
+  ContentTypeKey,
+  PlayerContentVisibility,
+  ResolvedContentCampaignAccess,
+} from '@rpg/contracts'
 import { dataTableNameLinkCellVariants } from '@rpg/ui'
 import { Link } from 'react-router-dom'
 
@@ -16,6 +21,7 @@ export type ContentOverviewNameCellProps = {
   nameHref?: string
   editHref?: string
   canManage?: boolean
+  playerVisibility?: PlayerContentVisibility
   campaignId?: string
   contentTypeKey?: ContentTypeKey
   queryKeyFn?: (campaignId: string) => readonly unknown[]
@@ -30,12 +36,15 @@ export function ContentOverviewNameCell({
   nameHref,
   editHref,
   canManage = false,
+  playerVisibility = { kind: 'ordinary' },
   campaignId,
   contentTypeKey,
   queryKeyFn,
   duplicateSource,
 }: ContentOverviewNameCellProps) {
   const draftBadge = status === 'draft' ? <ContentStatusNameBadge status="draft" /> : null
+  const showManagerLine = canManage
+  const showPlayerLine = !canManage && playerVisibility.kind !== 'ordinary'
 
   return (
     <div className="flex min-w-0 flex-col gap-0.5">
@@ -50,16 +59,22 @@ export function ContentOverviewNameCell({
         {draftBadge}
       </span>
 
-      {canManage && campaignId && contentTypeKey && queryKeyFn && duplicateSource ? (
+      {showManagerLine || showPlayerLine ? (
         <div className="flex min-h-4 flex-wrap items-center justify-between gap-x-3 gap-y-1 text-xs leading-4">
-          <ContentOverviewUtilityActions
-            campaignId={campaignId}
-            contentTypeKey={contentTypeKey}
-            queryKeyFn={queryKeyFn}
-            editHref={editHref}
-            source={duplicateSource}
+          {showManagerLine && campaignId && contentTypeKey && queryKeyFn && duplicateSource ? (
+            <ContentOverviewUtilityActions
+              campaignId={campaignId}
+              contentTypeKey={contentTypeKey}
+              queryKeyFn={queryKeyFn}
+              editHref={editHref}
+              source={duplicateSource}
+            />
+          ) : null}
+          <ContentAccessMetadata
+            campaignAccess={campaignAccess}
+            canManage={canManage}
+            playerVisibility={playerVisibility}
           />
-          <ContentAccessMetadata campaignAccess={campaignAccess} canManage={canManage} />
         </div>
       ) : null}
     </div>
