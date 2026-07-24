@@ -27,6 +27,8 @@ describe('resolveFieldPresentation', () => {
 
     expect(presentation.controlSize).toBe(size)
     expect(presentation.controlBandClassName).toContain('flex')
+    expect(presentation.controlBandClassName).toContain('w-full')
+    expect(presentation.controlBandClassName).toContain('min-w-0')
     expect(presentation.labelClassName).toBeTruthy()
 
     if (controlBand === 'single-line') {

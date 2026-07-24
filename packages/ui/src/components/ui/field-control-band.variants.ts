@@ -16,7 +16,7 @@ export type FieldControlBand = 'single-line' | 'content-sized'
 /** `grid` is settings-style only in v1 — no multi-column label grid yet. */
 export type FieldRowLayout = 'flow' | 'grid'
 
-export const fieldControlBandVariants = cva('flex items-center', {
+export const fieldControlBandVariants = cva('flex w-full min-w-0 items-center', {
   variants: {
     size: {
       sm: 'min-h-8',

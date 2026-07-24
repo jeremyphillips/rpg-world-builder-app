@@ -55,6 +55,7 @@ export const TextareaField = React.forwardRef<HTMLTextAreaElement, TextareaField
         width={width}
         size={size}
         chrome={chrome}
+        controlBand="content-sized"
       >
         <Textarea ref={ref} size={size} {...textareaProps} />
       </FormField>

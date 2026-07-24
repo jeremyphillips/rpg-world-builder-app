@@ -161,7 +161,7 @@ export function RichTextEditor({
     <div
       ref={rootRef}
       className={cn(
-        'relative',
+        'relative w-full min-w-0',
         fieldInputShellClasses,
         fieldInputFocusWithinClasses,
         ariaInvalid && fieldInputInvalidClasses,
