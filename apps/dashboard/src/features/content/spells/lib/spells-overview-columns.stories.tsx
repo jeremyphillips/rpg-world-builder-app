@@ -4,7 +4,7 @@ import { DataTable } from '@rpg/ui'
 import { buildSeedSpellSchoolVocabulary } from '@/features/homebrew'
 import { STORY_CAMPAIGN_ID } from '../../lib/fixtures/constants'
 import { SPELL_LIST } from '../fixtures'
-import { spellsColumns, spellsFilters } from './spells-overview-columns'
+import { spellsColumns } from './spells-overview-columns'
 
 const STORY_SPELL_SCHOOL_VOCABULARY = buildSeedSpellSchoolVocabulary()
 
@@ -22,7 +22,6 @@ export const Default: Story = {
     <DataTable
       columns={spellsColumns(STORY_CAMPAIGN_ID, STORY_SPELL_SCHOOL_VOCABULARY)}
       data={[...SPELL_LIST]}
-      filters={spellsFilters(STORY_SPELL_SCHOOL_VOCABULARY)}
       caption="Spells available in this campaign"
     />
   ),

@@ -1,4 +1,4 @@
-import type { AdventuringGearEquipment } from '@rpg/contracts'
+import type { AdventuringGearEquipment, WithCampaignAccess } from '@rpg/contracts'
 import {
   GEAR_KINDS,
   formatWeight,
@@ -6,20 +6,30 @@ import {
   getSpellcastingGearKindLabel,
 } from '@rpg/contracts'
 import { SortableHeader } from '@rpg/ui'
-import type { ColumnDef, FilterDef } from '@rpg/ui'
+import type { ColumnDef } from '@rpg/ui'
+import { createEqualsFilter } from '@rpg/ui/filters'
 
 import { ROUTES } from '@/app/routes'
 import {
   buildContentColumns,
-  buildContentFilters,
   costColumn,
 } from '../../../lib/overview/content-table-config'
+import {
+  buildContentFilterSchema,
+  type ContentOverviewBaseFilterState,
+} from '../../../lib/overview/content-overview-filter-schema'
 
 function formatAdventuringGearKindLabel(item: AdventuringGearEquipment): string {
   if (item.gearKind === 'spellcasting' && item.spellcastingGearKind) {
     return getSpellcastingGearKindLabel(item.spellcastingGearKind)
   }
   return getGearKindLabel(item.gearKind)
+}
+
+type AdventuringGearRow = WithCampaignAccess<AdventuringGearEquipment>
+
+export type AdventuringGearOverviewFilterState = ContentOverviewBaseFilterState & {
+  gearKind?: string
 }
 
 const ADVENTURING_GEAR_MIDDLE_COLUMNS: ColumnDef<AdventuringGearEquipment>[] = [
@@ -40,17 +50,20 @@ const ADVENTURING_GEAR_MIDDLE_COLUMNS: ColumnDef<AdventuringGearEquipment>[] = [
   costColumn<AdventuringGearEquipment>(),
 ]
 
-const ADVENTURING_GEAR_SPECIFIC_FILTERS: FilterDef[] = [
-  {
-    type: 'select',
+export const adventuringGearFilterSchema = buildContentFilterSchema<
+  AdventuringGearRow,
+  AdventuringGearOverviewFilterState
+>([
+  createEqualsFilter<AdventuringGearRow, AdventuringGearOverviewFilterState, 'gearKind', string>({
     id: 'gearKind',
     label: 'Gear kind',
     options: GEAR_KINDS.map((gearKind) => ({
       label: getGearKindLabel(gearKind),
       value: gearKind,
     })),
-  },
-]
+    getValue: (row) => row.gearKind,
+  }),
+])
 
 /** Adventuring gear column definitions with the name cell linked to the detail page. */
 export function adventuringGearColumns(campaignId: string) {
@@ -58,5 +71,3 @@ export function adventuringGearColumns(campaignId: string) {
     nameHref: (row) => ROUTES.content.equipment.detail(campaignId, 'adventuring-gear', row.id),
   })
 }
-
-export const adventuringGearFilters = buildContentFilters(ADVENTURING_GEAR_SPECIFIC_FILTERS)

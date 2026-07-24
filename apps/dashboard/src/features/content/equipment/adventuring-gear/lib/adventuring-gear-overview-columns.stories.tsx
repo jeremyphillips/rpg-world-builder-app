@@ -3,7 +3,7 @@ import { DataTable } from '@rpg/ui'
 
 import { STORY_CAMPAIGN_ID } from '../../../lib/fixtures/constants'
 import { ADVENTURING_GEAR_LIST } from '../fixtures'
-import { adventuringGearColumns, adventuringGearFilters } from './adventuring-gear-overview-columns'
+import { adventuringGearColumns } from './adventuring-gear-overview-columns'
 
 const meta = {
   title: 'Content/Equipment/Adventuring Gear/AdventuringGearOverviewColumns',
@@ -19,7 +19,6 @@ export const Default: Story = {
     <DataTable
       columns={adventuringGearColumns(STORY_CAMPAIGN_ID)}
       data={[...ADVENTURING_GEAR_LIST]}
-      filters={adventuringGearFilters}
       caption="Adventuring gear available in this campaign"
     />
   ),

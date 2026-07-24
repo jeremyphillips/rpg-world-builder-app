@@ -3,7 +3,7 @@ import { DataTable } from '@rpg/ui'
 
 import { STORY_CAMPAIGN_ID } from '../../../lib/fixtures/constants'
 import { VEHICLE_LIST } from '../fixtures'
-import { vehicleColumns, vehicleFilters } from './vehicle-overview-columns'
+import { vehicleColumns } from './vehicle-overview-columns'
 
 const meta = {
   title: 'Content/Equipment/Vehicles/VehicleOverviewColumns',
@@ -19,7 +19,6 @@ export const Default: Story = {
     <DataTable
       columns={vehicleColumns(STORY_CAMPAIGN_ID)}
       data={[...VEHICLE_LIST]}
-      filters={vehicleFilters}
       caption="Vehicles available in this campaign"
     />
   ),

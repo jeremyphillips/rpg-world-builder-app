@@ -3,7 +3,7 @@ import { DataTable } from '@rpg/ui'
 
 import { STORY_CAMPAIGN_ID } from '../../../lib/fixtures/constants'
 import { MAGIC_ITEM_LIST } from '../fixtures'
-import { magicItemColumns, magicItemFilters } from './magic-item-overview-columns'
+import { magicItemColumns } from './magic-item-overview-columns'
 
 const meta = {
   title: 'Content/Equipment/Magic Items/MagicItemOverviewColumns',
@@ -19,7 +19,6 @@ export const Default: Story = {
     <DataTable
       columns={magicItemColumns(STORY_CAMPAIGN_ID)}
       data={[...MAGIC_ITEM_LIST]}
-      filters={magicItemFilters}
       caption="Magic items available in this campaign"
     />
   ),

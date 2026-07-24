@@ -1,13 +1,28 @@
-import { VEHICLE_CATEGORIES, getVehicleCategoryLabel, type VehicleEquipment } from '@rpg/contracts'
-import { SortableHeader, type ColumnDef, type FilterDef } from '@rpg/ui'
+import {
+  VEHICLE_CATEGORIES,
+  getVehicleCategoryLabel,
+  type VehicleEquipment,
+  type WithCampaignAccess,
+} from '@rpg/contracts'
+import { SortableHeader, type ColumnDef } from '@rpg/ui'
+import { createEqualsFilter } from '@rpg/ui/filters'
 
 import { ROUTES } from '@/app/routes'
 import {
   buildContentColumns,
-  buildContentFilters,
   costColumn,
 } from '../../../lib/overview/content-table-config'
+import {
+  buildContentFilterSchema,
+  type ContentOverviewBaseFilterState,
+} from '../../../lib/overview/content-overview-filter-schema'
 import { equipmentSpeedColumn } from '../../lib/equipment-form-field-helpers'
+
+type VehicleRow = WithCampaignAccess<VehicleEquipment>
+
+export type VehicleOverviewFilterState = ContentOverviewBaseFilterState & {
+  vehicleCategory?: string
+}
 
 const VEHICLE_MIDDLE_COLUMNS: ColumnDef<VehicleEquipment>[] = [
   {
@@ -21,17 +36,20 @@ const VEHICLE_MIDDLE_COLUMNS: ColumnDef<VehicleEquipment>[] = [
   costColumn<VehicleEquipment>(),
 ]
 
-const VEHICLE_SPECIFIC_FILTERS: FilterDef[] = [
-  {
-    type: 'select',
+export const vehicleFilterSchema = buildContentFilterSchema<
+  VehicleRow,
+  VehicleOverviewFilterState
+>([
+  createEqualsFilter<VehicleRow, VehicleOverviewFilterState, 'vehicleCategory', string>({
     id: 'vehicleCategory',
     label: 'Category',
     options: VEHICLE_CATEGORIES.map((category) => ({
       label: getVehicleCategoryLabel(category),
       value: category,
     })),
-  },
-]
+    getValue: (row) => row.vehicleCategory,
+  }),
+])
 
 /** Vehicle column definitions with the name cell linked to the detail page. */
 export function vehicleColumns(campaignId: string) {
@@ -39,5 +57,3 @@ export function vehicleColumns(campaignId: string) {
     nameHref: (row) => ROUTES.content.equipment.detail(campaignId, 'vehicles', row.id),
   })
 }
-
-export const vehicleFilters = buildContentFilters(VEHICLE_SPECIFIC_FILTERS)

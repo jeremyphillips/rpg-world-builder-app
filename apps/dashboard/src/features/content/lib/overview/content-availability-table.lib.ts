@@ -8,7 +8,7 @@ import {
 import type { ContentBase } from './content-table-config'
 
 /** Column filter id for campaign availability — shared across overview tables. */
-export const CAMPAIGN_AVAILABILITY_FILTER_ID = 'campaignAvailability'
+export const CAMPAIGN_AVAILABILITY_FILTER_ID = 'campaignAvailability' as const
 
 export type ContentOverviewFilterState = {
   name?: string

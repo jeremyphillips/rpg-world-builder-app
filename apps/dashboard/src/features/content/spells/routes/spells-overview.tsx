@@ -10,7 +10,7 @@ import {
   getContentTypeCollectionLabel,
 } from '@/features/content/lib/content-type-labels'
 import { useSpells } from '../hooks/use-spells'
-import { spellsColumns, spellsFilters } from '../lib/spells-overview-columns'
+import { spellsColumns, spellsFilterSchema } from '../lib/spells-overview-columns'
 import { ContentOverviewShell } from '../../lib/overview/content-overview-shell'
 import { ContentOverviewTable } from '../../lib/overview/content-overview-table.client'
 
@@ -37,7 +37,7 @@ export function SpellsOverview() {
             unknown
           >[]
         }
-        filters={spellsFilters(spellSchoolVocabulary)}
+        filterSchema={spellsFilterSchema(spellSchoolVocabulary)}
         data={spells as WithCampaignAccess<Spell>[]}
         caption={formatContentCollectionAvailabilityCaption('spells')}
         getEditHref={(row) => ROUTES.content.spells.edit(campaignId, row.id)}

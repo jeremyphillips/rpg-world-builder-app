@@ -11,7 +11,7 @@ import {
 import { useSkillProficiencies } from '../hooks/use-skill-proficiencies'
 import {
   skillProficienciesColumns,
-  skillProficienciesFilters,
+  skillProficienciesFilterSchema,
 } from '../lib/skill-proficiencies-overview-columns'
 import { ContentOverviewShell } from '../../lib/overview/content-overview-shell'
 import { ContentOverviewTable } from '../../lib/overview/content-overview-table.client'
@@ -38,7 +38,7 @@ export function SkillProficienciesOverview() {
             unknown
           >[]
         }
-        filters={skillProficienciesFilters}
+        filterSchema={skillProficienciesFilterSchema}
         data={skillProficiencies as WithCampaignAccess<SkillProficiency>[]}
         caption={`${getContentTypeSentenceLabel('skill-proficiencies', { plural: true })} available in this campaign`}
         getEditHref={(row) => ROUTES.content.skillProficiencies.edit(campaignId, row.id)}

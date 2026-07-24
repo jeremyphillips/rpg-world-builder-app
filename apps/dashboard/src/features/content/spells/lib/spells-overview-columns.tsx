@@ -1,4 +1,4 @@
-import type { ModelingStatus, Spell } from '@rpg/contracts'
+import type { ModelingStatus, Spell, WithCampaignAccess } from '@rpg/contracts'
 import {
   effectiveSpellModelingStatus,
   getModelingStatusLabel,
@@ -7,11 +7,16 @@ import {
   MODELING_STATUS_LADDER,
 } from '@rpg/contracts'
 import { BooleanCell, dataTableWidthMeta, SortableHeader } from '@rpg/ui'
-import type { ColumnDef, FilterDef } from '@rpg/ui'
+import type { ColumnDef } from '@rpg/ui'
+import { createEqualsFilter } from '@rpg/ui/filters'
 
 import { ROUTES } from '@/app/routes'
 import { getSpellSchoolLabelFromVocabulary, type SpellSchoolVocabulary } from '@/features/homebrew'
-import { buildContentColumns, buildContentFilters } from '../../lib/overview/content-table-config'
+import { buildContentColumns } from '../../lib/overview/content-table-config'
+import {
+  buildContentFilterSchema,
+  type ContentOverviewBaseFilterState,
+} from '../../lib/overview/content-overview-filter-schema'
 import { formatCastingTime, formatSpellLevelLabel } from '../lib/format-spell-metadata'
 
 const SPELL_LEVEL_FILTER_OPTIONS = Array.from(
@@ -26,6 +31,14 @@ const MODELING_STATUS_FILTER_OPTIONS = MODELING_STATUS_LADDER.map((status) => ({
   label: getModelingStatusLabel(status),
   value: status,
 }))
+
+type SpellRow = WithCampaignAccess<Spell>
+
+export type SpellsOverviewFilterState = ContentOverviewBaseFilterState & {
+  level?: string
+  school?: string
+  modelingStatus?: ModelingStatus
+}
 
 function buildSpellsMiddleColumns(
   spellSchoolVocabulary: SpellSchoolVocabulary | undefined,
@@ -73,9 +86,7 @@ function buildSpellsMiddleColumns(
   ]
 }
 
-function buildSpellsSpecificFilters(
-  spellSchoolVocabulary: SpellSchoolVocabulary | undefined,
-): FilterDef[] {
+function buildSpellsFilterSchema(spellSchoolVocabulary: SpellSchoolVocabulary | undefined) {
   const schoolOptions = spellSchoolVocabulary
     ? [...spellSchoolVocabulary.activeIds].sort().map((school) => ({
         label: getSpellSchoolLabelFromVocabulary(spellSchoolVocabulary, school),
@@ -83,27 +94,27 @@ function buildSpellsSpecificFilters(
       }))
     : []
 
-  return [
-    {
-      type: 'select',
+  return buildContentFilterSchema<SpellRow, SpellsOverviewFilterState>([
+    createEqualsFilter<SpellRow, SpellsOverviewFilterState, 'level', string>({
       id: 'level',
       label: 'Level',
       options: SPELL_LEVEL_FILTER_OPTIONS,
-    },
-    {
-      type: 'select',
+      getValue: (row) => String(row.level),
+    }),
+    createEqualsFilter<SpellRow, SpellsOverviewFilterState, 'school', string>({
       id: 'school',
       label: 'School',
       options: schoolOptions,
-    },
-    {
-      type: 'select',
+      getValue: (row) => row.school,
+    }),
+    createEqualsFilter<SpellRow, SpellsOverviewFilterState, 'modelingStatus', ModelingStatus>({
       id: 'modelingStatus',
       label: 'Modeling',
+      placement: 'advanced',
       options: MODELING_STATUS_FILTER_OPTIONS,
-      group: 'secondary',
-    },
-  ]
+      getValue: (row) => effectiveSpellModelingStatus(row),
+    }),
+  ])
 }
 
 /** Spell column definitions with the name cell linked to the detail page. */
@@ -113,6 +124,6 @@ export function spellsColumns(campaignId: string, spellSchoolVocabulary?: SpellS
   })
 }
 
-export function spellsFilters(spellSchoolVocabulary?: SpellSchoolVocabulary) {
-  return buildContentFilters(buildSpellsSpecificFilters(spellSchoolVocabulary))
+export function spellsFilterSchema(spellSchoolVocabulary?: SpellSchoolVocabulary) {
+  return buildSpellsFilterSchema(spellSchoolVocabulary)
 }

@@ -3,7 +3,7 @@ import { DataTable } from '@rpg/ui'
 
 import { STORY_CAMPAIGN_ID } from '../../lib/fixtures/constants'
 import { CLASS_LIST } from '../fixtures'
-import { classColumns, classFilters } from './classes-overview-columns'
+import { classColumns } from './classes-overview-columns'
 
 const meta = {
   title: 'Content/Classes/ClassesOverviewColumns',
@@ -19,7 +19,6 @@ export const Default: Story = {
     <DataTable
       columns={classColumns(STORY_CAMPAIGN_ID)}
       data={[...CLASS_LIST]}
-      filters={classFilters}
       caption="Character classes available in this campaign"
     />
   ),

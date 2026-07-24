@@ -5,7 +5,7 @@ import { buildSeedSpellSchoolVocabulary } from '@/features/homebrew'
 import { formatContentCollectionAvailabilityCaption } from '@/features/content/lib/content-type-labels'
 import { STORY_CAMPAIGN_ID } from '../../lib/fixtures/constants'
 import { SPELL_LIST } from '../fixtures'
-import { spellsColumns, spellsFilters } from '../lib/spells-overview-columns'
+import { spellsColumns } from '../lib/spells-overview-columns'
 
 const STORY_SPELL_SCHOOL_VOCABULARY = buildSeedSpellSchoolVocabulary()
 
@@ -23,7 +23,6 @@ export const Table: Story = {
     <DataTable
       columns={spellsColumns(STORY_CAMPAIGN_ID, STORY_SPELL_SCHOOL_VOCABULARY)}
       data={[...SPELL_LIST]}
-      filters={spellsFilters(STORY_SPELL_SCHOOL_VOCABULARY)}
       caption={formatContentCollectionAvailabilityCaption('spells')}
     />
   ),

@@ -60,7 +60,7 @@ function EquipmentFamilyTable({
       contentTypeKey="equipment"
       campaignId={campaignId}
       columns={tableConfig.columns as ColumnDef<WithCampaignAccess<Equipment>, unknown>[]}
-      filters={tableConfig.filters}
+      filterSchema={tableConfig.filterSchema}
       data={data as WithCampaignAccess<Equipment>[]}
       caption={`${heading} available in this campaign`}
       getEditHref={(row) => ROUTES.content.equipment.edit(campaignId, family, row.id)}

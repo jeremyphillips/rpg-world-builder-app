@@ -1,4 +1,4 @@
-import type { WeaponEquipment } from '@rpg/contracts'
+import type { WeaponEquipment, WithCampaignAccess } from '@rpg/contracts'
 import {
   WEAPON_CATEGORIES,
   WEAPON_MASTERIES,
@@ -7,17 +7,28 @@ import {
   getWeaponMasteryLabel,
 } from '@rpg/contracts'
 import { SortableHeader } from '@rpg/ui'
-import type { ColumnDef, FilterDef } from '@rpg/ui'
+import type { ColumnDef } from '@rpg/ui'
+import { createEqualsFilter } from '@rpg/ui/filters'
 
 import { ROUTES } from '@/app/routes'
 import {
   buildContentColumns,
-  buildContentFilters,
   costColumn,
 } from '../../../lib/overview/content-table-config'
+import {
+  buildContentFilterSchema,
+  type ContentOverviewBaseFilterState,
+} from '../../../lib/overview/content-overview-filter-schema'
 
 function capitalize(value: string): string {
   return value.charAt(0).toUpperCase() + value.slice(1)
+}
+
+type WeaponRow = WithCampaignAccess<WeaponEquipment>
+
+export type WeaponOverviewFilterState = ContentOverviewBaseFilterState & {
+  category?: string
+  mastery?: string
 }
 
 const WEAPON_MIDDLE_COLUMNS: ColumnDef<WeaponEquipment>[] = [
@@ -49,26 +60,26 @@ const WEAPON_MIDDLE_COLUMNS: ColumnDef<WeaponEquipment>[] = [
   costColumn<WeaponEquipment>(),
 ]
 
-const WEAPON_SPECIFIC_FILTERS: FilterDef[] = [
-  {
-    type: 'select',
+export const weaponFilterSchema = buildContentFilterSchema<WeaponRow, WeaponOverviewFilterState>([
+  createEqualsFilter<WeaponRow, WeaponOverviewFilterState, 'category', string>({
     id: 'category',
     label: 'Category',
     options: WEAPON_CATEGORIES.map((category) => ({
       label: capitalize(category),
       value: category,
     })),
-  },
-  {
-    type: 'select',
+    getValue: (row) => row.category,
+  }),
+  createEqualsFilter<WeaponRow, WeaponOverviewFilterState, 'mastery', string>({
     id: 'mastery',
     label: 'Mastery',
     options: WEAPON_MASTERIES.map((mastery) => ({
       label: getWeaponMasteryLabel(mastery),
       value: mastery,
     })),
-  },
-]
+    getValue: (row) => row.mastery,
+  }),
+])
 
 /** Weapon column definitions with the name cell linked to the detail page. */
 export function weaponColumns(campaignId: string) {
@@ -76,5 +87,3 @@ export function weaponColumns(campaignId: string) {
     nameHref: (row) => ROUTES.content.equipment.detail(campaignId, 'weapons', row.id),
   })
 }
-
-export const weaponFilters = buildContentFilters(WEAPON_SPECIFIC_FILTERS)

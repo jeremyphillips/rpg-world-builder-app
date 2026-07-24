@@ -1,9 +1,21 @@
-import type { CharacterClass, Spellcasting } from '@rpg/contracts'
+import type { CharacterClass, Spellcasting, WithCampaignAccess } from '@rpg/contracts'
 import { BooleanCell, dataTableTypographyMeta, dataTableWidthMeta, SortableHeader } from '@rpg/ui'
-import type { ColumnDef, FilterDef } from '@rpg/ui'
+import type { ColumnDef } from '@rpg/ui'
+import { createBooleanFilter, createEqualsFilter } from '@rpg/ui/filters'
 
 import { ROUTES } from '@/app/routes'
-import { buildContentColumns, buildContentFilters } from '../../lib/overview/content-table-config'
+import { buildContentColumns } from '../../lib/overview/content-table-config'
+import {
+  buildContentFilterSchema,
+  type ContentOverviewBaseFilterState,
+} from '../../lib/overview/content-overview-filter-schema'
+
+type ClassRow = WithCampaignAccess<CharacterClass>
+
+export type ClassesOverviewFilterState = ContentOverviewBaseFilterState & {
+  hitDie?: string
+  spellcasting?: boolean
+}
 
 const CLASS_MIDDLE_COLUMNS: ColumnDef<CharacterClass>[] = [
   {
@@ -37,9 +49,8 @@ const CLASS_MIDDLE_COLUMNS: ColumnDef<CharacterClass>[] = [
   },
 ]
 
-const CLASS_SPECIFIC_FILTERS: FilterDef[] = [
-  {
-    type: 'select',
+export const classFilterSchema = buildContentFilterSchema<ClassRow, ClassesOverviewFilterState>([
+  createEqualsFilter<ClassRow, ClassesOverviewFilterState, 'hitDie', string>({
     id: 'hitDie',
     label: 'Hit Die',
     options: [
@@ -48,14 +59,15 @@ const CLASS_SPECIFIC_FILTERS: FilterDef[] = [
       { label: 'd10', value: '10' },
       { label: 'd12', value: '12' },
     ],
-  },
-  {
-    type: 'boolean',
+    getValue: (row) => String(row.hitDie),
+  }),
+  createBooleanFilter<ClassRow, ClassesOverviewFilterState, 'spellcasting'>({
     id: 'spellcasting',
     label: 'Has Spellcasting',
-    group: 'primary',
-  },
-]
+    placement: 'primary',
+    getValue: (row) => row.spellcasting !== undefined,
+  }),
+])
 
 /** Class column definitions with the name cell linked to the class detail page. */
 export function classColumns(campaignId: string) {
@@ -63,5 +75,3 @@ export function classColumns(campaignId: string) {
     nameHref: (row) => ROUTES.content.classes.detail(campaignId, row.id),
   })
 }
-
-export const classFilters = buildContentFilters(CLASS_SPECIFIC_FILTERS)

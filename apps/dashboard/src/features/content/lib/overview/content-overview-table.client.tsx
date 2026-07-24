@@ -15,7 +15,6 @@ import {
   dataTableRowUnavailableVariants,
   type ColumnDef,
   type ColumnChangeState,
-  type FilterDef,
 } from '@rpg/ui'
 import {
   FilterAdvancedPanel,
@@ -24,6 +23,7 @@ import {
   getEffectiveFilterValue,
   getSchemaFieldsByPlacement,
   type FilterFieldId,
+  type FilterSchema,
 } from '@rpg/ui/filters'
 
 import { getContentTypeMidSentenceLabel } from '../content-type-labels'
@@ -54,26 +54,30 @@ import {
   deriveCampaignAvailabilityScope,
 } from './content-availability-table.lib'
 import type { ContentBase } from './content-table-config'
-import {
-  createFilterSchemaFromFilterDefs,
-  type ContentOverviewFilterState,
-} from './filter-def-schema.adapter'
+import type { ContentOverviewBaseFilterState } from './content-overview-filter-schema'
 import { useContentOverviewQueryState } from './use-content-overview-query-state.client'
 
 const EDIT_DETAILS_LABEL = 'Edit details'
 const DEFAULT_OVERVIEW_SORT = { id: 'name' } as const
 
-function applyFilterSchemaExcluding<T extends WithCampaignAccess<ContentBase>>(
-  schema: ReturnType<typeof createFilterSchemaFromFilterDefs<T>>,
-  state: ContentOverviewFilterState,
+function applyFilterSchemaExcluding<
+  T extends WithCampaignAccess<ContentBase>,
+  TFilters extends ContentOverviewBaseFilterState,
+>(
+  schema: FilterSchema<T, TFilters>,
+  state: TFilters,
   rows: T[],
-  excludedFieldIds: string[],
+  excludedFieldIds: ReadonlyArray<FilterFieldId<TFilters>>,
 ): T[] {
   return rows.filter((row) =>
     schema.fields.every((field) => {
-      if (excludedFieldIds.includes(field.id)) return true
+      if (excludedFieldIds.includes(field.id as FilterFieldId<TFilters>)) return true
 
-      const effective = getEffectiveFilterValue(schema, state, field.id)
+      const effective = getEffectiveFilterValue(
+        schema,
+        state,
+        field.id as FilterFieldId<TFilters>,
+      )
       if (effective === undefined) return true
 
       const isValueConstraining =
@@ -85,26 +89,31 @@ function applyFilterSchemaExcluding<T extends WithCampaignAccess<ContentBase>>(
   )
 }
 
-export type ContentOverviewTableProps<T extends WithCampaignAccess<ContentBase> & { id: string }> =
-  {
-    contentTypeKey: ContentTypeKey
-    campaignId: string
-    columns: ColumnDef<T, unknown>[]
-    filters: FilterDef<T>[]
-    data: T[]
-    caption?: string
-    getEditHref: (row: T) => string
-  }
+export type ContentOverviewTableProps<
+  T extends WithCampaignAccess<ContentBase> & { id: string },
+  TFilters extends ContentOverviewBaseFilterState = ContentOverviewBaseFilterState,
+> = {
+  contentTypeKey: ContentTypeKey
+  campaignId: string
+  columns: ColumnDef<T, unknown>[]
+  filterSchema: FilterSchema<T, TFilters>
+  data: T[]
+  caption?: string
+  getEditHref: (row: T) => string
+}
 
-export function ContentOverviewTable<T extends WithCampaignAccess<ContentBase> & { id: string }>({
+export function ContentOverviewTable<
+  T extends WithCampaignAccess<ContentBase> & { id: string },
+  TFilters extends ContentOverviewBaseFilterState = ContentOverviewBaseFilterState,
+>({
   contentTypeKey,
   campaignId,
   columns,
-  filters,
+  filterSchema,
   data,
   caption,
   getEditHref,
-}: ContentOverviewTableProps<T>) {
+}: ContentOverviewTableProps<T, TFilters>) {
   const tableRootRef = useRef<HTMLDivElement>(null)
   const actionTriggerRefs = useRef(new Map<string, HTMLButtonElement>())
   const columnSchema = useMemo(
@@ -115,7 +124,6 @@ export function ContentOverviewTable<T extends WithCampaignAccess<ContentBase> &
     hydrateContentOverviewPreferences(contentTypeKey, columnSchema),
   )
   const [advancedOpen, setAdvancedOpen] = useState(preferences.advancedOpen ?? false)
-  const filterSchema = useMemo(() => createFilterSchemaFromFilterDefs(filters), [filters])
   const allowedSortIds = useMemo(
     () => getContentOverviewSortableColumnIds(columns as ColumnDef<unknown>[]),
     [columns],
@@ -124,24 +132,27 @@ export function ContentOverviewTable<T extends WithCampaignAccess<ContentBase> &
     () => getSchemaFieldsByPlacement(filterSchema, 'advanced').length > 0,
     [filterSchema],
   )
-  const { query, actions } = useContentOverviewQueryState<T, ContentOverviewFilterState>({
+  const { query, actions } = useContentOverviewQueryState<T, TFilters>({
     schema: filterSchema,
     allowedSortIds,
     defaultSort: DEFAULT_OVERVIEW_SORT,
   })
+
+  const campaignAvailabilityFilterId =
+    CAMPAIGN_AVAILABILITY_FILTER_ID as FilterFieldId<TFilters>
 
   const filterState = query.filters
   const campaignAvailability =
     (getEffectiveFilterValue(
       filterSchema,
       filterState,
-      CAMPAIGN_AVAILABILITY_FILTER_ID,
+      campaignAvailabilityFilterId,
     ) as CampaignAvailabilityFilter | undefined) ?? CAMPAIGN_AVAILABILITY_FILTER_DEFAULT
 
   const scopedRows = useMemo(
     () =>
       applyFilterSchemaExcluding(filterSchema, filterState, data, [
-        CAMPAIGN_AVAILABILITY_FILTER_ID,
+        campaignAvailabilityFilterId,
       ]),
     [data, filterSchema, filterState],
   )
@@ -187,11 +198,8 @@ export function ContentOverviewTable<T extends WithCampaignAccess<ContentBase> &
   )
 
   const handleFilterValueChange = useCallback(
-    (id: FilterFieldId<ContentOverviewFilterState>, value: unknown) => {
-      actions.setFilterValue(
-        id,
-        value as ContentOverviewFilterState[typeof id],
-      )
+    (id: FilterFieldId<TFilters>, value: unknown) => {
+      actions.setFilterValue(id, value as TFilters[typeof id])
     },
     [actions],
   )
@@ -232,7 +240,11 @@ export function ContentOverviewTable<T extends WithCampaignAccess<ContentBase> &
             className="h-auto px-0 text-xs"
             aria-label={formatShowAllCampaignAvailabilityAriaLabel()}
             onClick={() =>
-              actions.setFilterValue(CAMPAIGN_AVAILABILITY_FILTER_ID, 'all', { history: 'push' })
+              actions.setFilterValue(
+                campaignAvailabilityFilterId,
+                'all' as TFilters[FilterFieldId<TFilters>],
+                { history: 'push' },
+              )
             }
           >
             {CAMPAIGN_ACCESS_TABLE_SHOW_ALL_LABEL}
@@ -252,9 +264,11 @@ export function ContentOverviewTable<T extends WithCampaignAccess<ContentBase> &
             className="h-auto px-0 text-xs"
             aria-label={formatHideUnavailableAriaLabel()}
             onClick={() =>
-              actions.setFilterValue(CAMPAIGN_AVAILABILITY_FILTER_ID, 'available', {
-                history: 'push',
-              })
+              actions.setFilterValue(
+                campaignAvailabilityFilterId,
+                'available' as TFilters[FilterFieldId<TFilters>],
+                { history: 'push' },
+              )
             }
           >
             {CAMPAIGN_ACCESS_TABLE_HIDE_UNAVAILABLE_LABEL}
@@ -284,9 +298,11 @@ export function ContentOverviewTable<T extends WithCampaignAccess<ContentBase> &
               className="h-auto px-0 text-xs"
               aria-label={formatShowUnavailableAriaLabel(pluralNoun)}
               onClick={() =>
-                actions.setFilterValue(CAMPAIGN_AVAILABILITY_FILTER_ID, 'unavailable', {
-                  history: 'push',
-                })
+                actions.setFilterValue(
+                  campaignAvailabilityFilterId,
+                  'unavailable' as TFilters[FilterFieldId<TFilters>],
+                  { history: 'push' },
+                )
               }
             >
               {CAMPAIGN_ACCESS_TABLE_SHOW_UNAVAILABLE_LABEL}

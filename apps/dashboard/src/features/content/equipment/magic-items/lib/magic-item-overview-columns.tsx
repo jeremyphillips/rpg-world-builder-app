@@ -1,4 +1,4 @@
-import type { MagicItemEquipment } from '@rpg/contracts'
+import type { MagicItemEquipment, WithCampaignAccess } from '@rpg/contracts'
 import {
   MAGIC_ITEM_CATEGORIES,
   MAGIC_ITEM_RARITIES,
@@ -6,18 +6,29 @@ import {
   getMagicItemRarityLabel,
 } from '@rpg/contracts'
 import { SortableHeader } from '@rpg/ui'
-import type { ColumnDef, FilterDef } from '@rpg/ui'
+import type { ColumnDef } from '@rpg/ui'
+import { createEqualsFilter } from '@rpg/ui/filters'
 
 import { ROUTES } from '@/app/routes'
 import {
   buildContentColumns,
-  buildContentFilters,
   costColumn,
 } from '../../../lib/overview/content-table-config'
+import {
+  buildContentFilterSchema,
+  type ContentOverviewBaseFilterState,
+} from '../../../lib/overview/content-overview-filter-schema'
 
 function formatAttunement(requiresAttunement: boolean | undefined): string {
   if (requiresAttunement === undefined) return '—'
   return requiresAttunement ? 'Required' : 'None'
+}
+
+type MagicItemRow = WithCampaignAccess<MagicItemEquipment>
+
+export type MagicItemOverviewFilterState = ContentOverviewBaseFilterState & {
+  rarity?: string
+  magicItemCategory?: string
 }
 
 const MAGIC_ITEM_MIDDLE_COLUMNS: ColumnDef<MagicItemEquipment>[] = [
@@ -50,26 +61,29 @@ const MAGIC_ITEM_MIDDLE_COLUMNS: ColumnDef<MagicItemEquipment>[] = [
   costColumn<MagicItemEquipment>(),
 ]
 
-const MAGIC_ITEM_SPECIFIC_FILTERS: FilterDef[] = [
-  {
-    type: 'select',
+export const magicItemFilterSchema = buildContentFilterSchema<
+  MagicItemRow,
+  MagicItemOverviewFilterState
+>([
+  createEqualsFilter<MagicItemRow, MagicItemOverviewFilterState, 'rarity', string>({
     id: 'rarity',
     label: 'Rarity',
     options: MAGIC_ITEM_RARITIES.map((rarity) => ({
       label: getMagicItemRarityLabel(rarity),
       value: rarity,
     })),
-  },
-  {
-    type: 'select',
+    getValue: (row) => row.rarity ?? '',
+  }),
+  createEqualsFilter<MagicItemRow, MagicItemOverviewFilterState, 'magicItemCategory', string>({
     id: 'magicItemCategory',
     label: 'Category',
     options: MAGIC_ITEM_CATEGORIES.map((category) => ({
       label: getMagicItemCategoryLabel(category),
       value: category,
     })),
-  },
-]
+    getValue: (row) => row.magicItemCategory ?? '',
+  }),
+])
 
 /** Magic item column definitions with the name cell linked to the detail page. */
 export function magicItemColumns(campaignId: string) {
@@ -77,5 +91,3 @@ export function magicItemColumns(campaignId: string) {
     nameHref: (row) => ROUTES.content.equipment.detail(campaignId, 'magic-items', row.id),
   })
 }
-
-export const magicItemFilters = buildContentFilters(MAGIC_ITEM_SPECIFIC_FILTERS)
