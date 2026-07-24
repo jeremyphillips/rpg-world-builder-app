@@ -310,6 +310,65 @@ Unicode normalization only if a concrete need appears.
 
 ---
 
+## Milestone 2 — catalog composition
+
+Milestone 2 extends the same `FilterSchema` runtime for catalog pickers via separate
+layout config — not extra `placement` values.
+
+### Field types
+
+- `chips` — `selectionMode: 'multiple' | 'single-required'`; optional `toChipValues` /
+  `fromChipValues` for renderer/state mapping (e.g. level chips with `number[]` state).
+- `popover` — one field id owns a record of group → `string[]`; composes `FilterPopover`.
+
+Helpers: `createChipsFilter`, `createPopoverFilter`, `shallowArrayEqual`,
+`popoverFiltersEqual`, `isPopoverFiltersConstraining`.
+
+### Dependency hooks
+
+```ts
+sanitizeState?: (state: Partial<TState>, context?) => Partial<TState>
+normalizeChange?: (next: TState, context: { changedId; previous }) => TState
+```
+
+**Lifecycle**
+
+1. `setValue` → `normalizeChange` (once, non-recursive)
+2. Mode/data hydrate → `sanitizeState` via `sanitizeFilterState`
+3. Never `normalizeChange` on URL hydrate
+
+### Catalog layout
+
+```ts
+type FilterCatalogLayoutConfig<TState> = {
+  primaryFieldIds?: FilterFieldId<TState>[]
+  filterRowFieldIds?: FilterFieldId<TState>[]
+}
+```
+
+`CatalogFilterControls` composes onto `CatalogToolbar` slots (`Primary`, `FilterRow`).
+Sort, tabs, mode/workflow segmentation, and search scoring stay **outside** the schema.
+
+### Out of scope for catalog filters
+
+- Sort modes (`CatalogSortControl`)
+- Search / relevance scoring (`CatalogPickerSheet`)
+- Recommendation tabs (`activeTabId`)
+- Mode / workflow segmentation (`SegmentedControl`)
+- URL persistence for pickers
+- Per-mode browse buckets
+
+### Array / sentinel semantics
+
+| Pattern              | State                   | `isValueConstraining` |
+| -------------------- | ----------------------- | --------------------- |
+| Multi level chips    | `number[]`, `[]` = all  | `length > 0`          |
+| Single-required chip | `'__all__' \| value`    | `v !== '__all__'`     |
+| Popover mechanics    | `{ groupId: string[] }` | any group non-empty   |
+| School select        | `'__all__' \| school`   | `v !== '__all__'`     |
+
+---
+
 ## Renderers (Milestone 1)
 
 Import from `@rpg/ui/filters`:
@@ -341,16 +400,7 @@ Select fields use an internal `__all__` sentinel for “show all”; it never le
 - DataTable receives only filtered rows.
 - Advanced panel badge = `countModifiedFilters` (optionally scoped by `placement`).
 
----
+Import catalog renderers from `@rpg/ui/filters`:
 
-## Milestone 2 (deferred)
-
-Do not extend Milestone 1 APIs for these until picker migration proves the shape:
-
-- `chips` / popover group field types
-- `sanitizeState` / `normalizeChange`
-- `FilterCatalogLayoutConfig` + `CatalogFilterControls`
-- declarative `visibleWhen` / `resetWhen`
-
-Catalog surfaces compose the same schema via a **separate** layout config, not extra
-`placement` values.
+- `CatalogFilterControls` — `Primary` / `FilterRow` slot components
+- `CatalogFilterField` / `CatalogFilterFieldList` — lower-level catalog field renderers

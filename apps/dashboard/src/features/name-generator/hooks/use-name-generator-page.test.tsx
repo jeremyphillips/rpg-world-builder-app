@@ -7,6 +7,8 @@ import * as composeModule from '../model/compose-name-generator-conventions'
 import type { ComposedNameGeneratorConventions } from '../model/compose-name-generator-conventions'
 import * as generateNameBatchModule from '../model/generate-name-batch'
 import type { SpeciesNamingOption } from '@rpg/name-generator-integrations'
+import { setFilterValue } from '@rpg/ui/filters'
+
 import { useNameGeneratorPage } from './use-name-generator-page'
 
 vi.mock('@/features/campaign/store/campaign-store', () => ({
@@ -59,7 +61,7 @@ describe('useNameGeneratorPage', () => {
     const { result } = renderHook(() => useNameGeneratorPage())
 
     act(() => {
-      result.current.setFilter('subjectKind', 'ship')
+      result.current.setFilters({ subjectKind: 'ship' })
     })
 
     expect(result.current.matchCount).toBe(0)
@@ -70,7 +72,9 @@ describe('useNameGeneratorPage', () => {
     const { result } = renderHook(() => useNameGeneratorPage())
 
     act(() => {
-      result.current.setFilter('languageId', 'elvish')
+      result.current.setFilters(
+        setFilterValue(result.current.filterSchema, result.current.filters, 'languageId', 'elvish'),
+      )
       result.current.resetFilters()
     })
 
@@ -94,7 +98,9 @@ describe('useNameGeneratorPage', () => {
     const { result } = renderHook(() => useNameGeneratorPage())
 
     act(() => {
-      result.current.setFilter('cultureId', 'elven')
+      result.current.setFilters(
+        setFilterValue(result.current.filterSchema, result.current.filters, 'cultureId', 'elven'),
+      )
     })
 
     await waitFor(() => {

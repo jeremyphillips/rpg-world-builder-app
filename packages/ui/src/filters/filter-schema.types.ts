@@ -17,6 +17,21 @@ export type FilterValuePredicate = (value: unknown) => boolean
 
 export type FilterValueEquality = (left: unknown, right: unknown) => boolean
 
+export type FilterFieldOptionsContext<TData, TState extends Record<string, unknown>> = {
+  data?: readonly TData[]
+  state: TState
+}
+
+export type FilterChangeContext<TState extends Record<string, unknown>> = {
+  changedId: FilterFieldId<TState>
+  previous: TState
+}
+
+export type FilterSanitizeContext<TData, TState extends Record<string, unknown>> = {
+  data?: readonly TData[]
+  state: TState
+}
+
 type BaseFilterFieldDef<
   TData,
   TState extends Record<string, unknown>,
@@ -45,6 +60,8 @@ type BaseFilterFieldDef<
   }
 }
 
+export type SelectFilterLayout = 'stacked' | 'inline'
+
 export type TextFilterFieldDef<
   TData,
   TState extends Record<string, unknown>,
@@ -60,8 +77,13 @@ export type SelectFilterFieldDef<
   TId extends FilterFieldId<TState>,
 > = BaseFilterFieldDef<TData, TState, TId> & {
   type: 'select'
-  options: FilterOption<Extract<NonNullable<TState[TId]>, string>>[]
+  options:
+    | FilterOption<Extract<NonNullable<TState[TId]>, string>>[]
+    | ((ctx: FilterFieldOptionsContext<TData, TState>) => FilterOption<string>[])
   showAllOption?: boolean
+  layout?: SelectFilterLayout
+  ariaLabel?: string
+  triggerAriaLabel?: string
 }
 
 export type BooleanFilterFieldDef<
@@ -70,20 +92,82 @@ export type BooleanFilterFieldDef<
   TId extends FilterFieldId<TState>,
 > = BaseFilterFieldDef<TData, TState, TId> & {
   type: 'boolean'
+  hiddenCount?: (state: TState, ctx: FilterFieldOptionsContext<TData, TState>) => number | undefined
+}
+
+export type ChipsSelectionMode = 'multiple' | 'single-required'
+
+export type ChipsFilterFieldDef<
+  TData,
+  TState extends Record<string, unknown>,
+  TId extends FilterFieldId<TState>,
+> = BaseFilterFieldDef<TData, TState, TId> & {
+  type: 'chips'
+  selectionMode: ChipsSelectionMode
+  options:
+    | FilterOption<string>[]
+    | ((ctx: FilterFieldOptionsContext<TData, TState>) => FilterOption<string>[])
+  /** Renderer-only sentinel for "All" chip in multiple mode — never stored in state. */
+  allValue?: string
+  toChipValues?: (value: TState[TId] | undefined) => string[]
+  fromChipValues?: (
+    current: TState[TId] | undefined,
+    next: string[],
+    ctx: FilterFieldOptionsContext<TData, TState>,
+  ) => TState[TId] | undefined
+}
+
+export type PopoverGroupDef<TGroupId extends string = string> = {
+  id: TGroupId
+  label: string
+  options: FilterOption<string>[]
+}
+
+export type PopoverFilterFieldDef<
+  TData,
+  TState extends Record<string, unknown>,
+  TId extends FilterFieldId<TState>,
+> = BaseFilterFieldDef<TData, TState, TId> & {
+  type: 'popover'
+  triggerLabel: (activeCount: number) => string
+  triggerAriaLabel?: string
+  groups: PopoverGroupDef[] | ((ctx: FilterFieldOptionsContext<TData, TState>) => PopoverGroupDef[])
 }
 
 export type FilterFieldDef<TData, TState extends Record<string, unknown>> =
   | TextFilterFieldDef<TData, TState, FilterFieldId<TState>>
   | SelectFilterFieldDef<TData, TState, FilterFieldId<TState>>
   | BooleanFilterFieldDef<TData, TState, FilterFieldId<TState>>
+  | ChipsFilterFieldDef<TData, TState, FilterFieldId<TState>>
+  | PopoverFilterFieldDef<TData, TState, FilterFieldId<TState>>
 
 export type FilterSchema<TData, TState extends Record<string, unknown>> = {
   fields: ReadonlyArray<FilterFieldDef<TData, TState>>
+  sanitizeState?: (
+    state: Partial<TState>,
+    context?: FilterSanitizeContext<TData, TState>,
+  ) => Partial<TState>
+  normalizeChange?: (next: TState, context: FilterChangeContext<TState>) => TState
+}
+
+export type FilterCatalogLayoutConfig<TState extends Record<string, unknown>> = {
+  primaryFieldIds?: FilterFieldId<TState>[]
+  filterRowFieldIds?: FilterFieldId<TState>[]
+}
+
+type CreateFilterSchemaOptions<TData, TState extends Record<string, unknown>> = {
+  sanitizeState?: FilterSchema<TData, TState>['sanitizeState']
+  normalizeChange?: FilterSchema<TData, TState>['normalizeChange']
 }
 
 /** Builds a filter schema from field definitions. */
 export function createFilterSchema<TData, TState extends Record<string, unknown>>(
   fields: ReadonlyArray<FilterFieldDef<TData, TState>>,
+  options?: CreateFilterSchemaOptions<TData, TState>,
 ): FilterSchema<TData, TState> {
-  return { fields }
+  return {
+    fields,
+    sanitizeState: options?.sanitizeState,
+    normalizeChange: options?.normalizeChange,
+  }
 }

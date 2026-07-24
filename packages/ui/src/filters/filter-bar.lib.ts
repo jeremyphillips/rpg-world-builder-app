@@ -1,6 +1,8 @@
 import { resolveFilterFieldPlacement } from './filter-engine'
+import { resolveFilterFieldOptions } from './filter-field-options.lib'
 import type {
   FilterFieldDef,
+  FilterFieldOptionsContext,
   FilterPlacement,
   FilterSchema,
 } from './filter-schema.types'
@@ -10,6 +12,13 @@ type SelectFieldLike = {
   showAllOption?: boolean
   defaultValue?: unknown
   options: ReadonlyArray<{ value: string; label: string }>
+}
+
+export function resolveSelectFieldOptions<TData, TState extends Record<string, unknown>>(
+  field: Extract<FilterFieldDef<TData, TState>, { type: 'select' }>,
+  ctx: FilterFieldOptionsContext<TData, TState>,
+): ReadonlyArray<{ value: string; label: string }> {
+  return resolveFilterFieldOptions(field, ctx)
 }
 
 export function getSchemaFieldsByPlacement<TData, TState extends Record<string, unknown>>(

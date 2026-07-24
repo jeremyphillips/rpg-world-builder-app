@@ -15,11 +15,19 @@ export const filterBarControlVariants = cva('', {
       text: 'min-w-[180px] max-w-[260px] flex-1',
       select: 'min-w-[140px] max-w-[200px]',
       boolean: 'flex items-center gap-1.5',
+      inlineSelect: 'min-w-[140px] max-w-[200px]',
+      chips: '',
+      popover: '',
     },
   },
 })
 
 export const filterBarResetButtonClasses = 'gap-1 text-xs [&_svg]:size-3'
+
+export const filterBarInlineFieldGroupClasses =
+  'flex flex-col gap-1 sm:flex-row sm:items-center sm:gap-2'
+
+export const filterBarInlineFieldLabelClasses = 'text-sm text-muted-foreground'
 
 /** Collapsible advanced-filters panel shell. */
 export const filterAdvancedPanelVariants = cva(

@@ -62,10 +62,17 @@ function parseFieldValueFromUrl<TData, TState extends Record<string, unknown>>(
   }
 
   if (field.type === 'select') {
-    return parseSelectFieldValue(field, raw)
+    if (typeof field.options === 'function') {
+      return INVALID
+    }
+    return parseSelectFieldValue({ options: field.options }, raw)
   }
 
-  return parseBooleanFieldValue(raw)
+  if (field.type === 'boolean') {
+    return parseBooleanFieldValue(raw)
+  }
+
+  return INVALID
 }
 
 function serializeTextFieldValue(value: unknown): string | undefined {
@@ -97,10 +104,17 @@ function serializeFieldValueToUrl<TData, TState extends Record<string, unknown>>
   }
 
   if (field.type === 'select') {
-    return serializeSelectFieldValue(field, value)
+    if (typeof field.options === 'function') {
+      return undefined
+    }
+    return serializeSelectFieldValue({ options: field.options }, value)
   }
 
-  return serializeBooleanFieldValue(value)
+  if (field.type === 'boolean') {
+    return serializeBooleanFieldValue(value)
+  }
+
+  return undefined
 }
 
 function shouldOmitDefault<TData, TState extends Record<string, unknown>>(

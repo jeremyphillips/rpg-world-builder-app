@@ -2,11 +2,9 @@
 
 import * as React from 'react'
 
-import { getSpellSchoolLabel } from '@rpg/contracts'
 import { CatalogPickerSheet, InsetPanel, SegmentedControl, Text } from '@rpg/ui'
 
 import { hasCatalogPickerResetViewCriteria } from '../picker/catalog-picker-filter-state.lib'
-import { catalogPickerInlineSelectFilter } from '../picker/catalog-picker-select-filter.lib'
 import {
   createBrowseStateByMode,
   resolveModeBrowseState,
@@ -20,10 +18,8 @@ import { CatalogPickerSelectionSummary } from '../picker/catalog-picker-selectio
 import { CatalogToolbarResetSlot } from '../picker/catalog-toolbar-reset-action.client'
 import {
   choiceSetForSpellPickerMode,
-  countSpellPickerStructuredFilters,
   createDefaultSpellPickerBrowseState,
   filterAndSortSpellPickerItems,
-  filterSpellPickerItems,
   formatSpellPickerDrawerTitle,
   formatSpellPickerSelectionCountText,
   formatSpellPickerSelectionMetadata,
@@ -32,46 +28,39 @@ import {
   isSpellPickerRowDimmed,
   resolveActivePreparedLevelSuffix,
   resolveInitialSpellPickerMode,
-  resolveSpellPickerCastingTimeFilterOptions,
   resolveSpellPickerEmptyStateKind,
   resolveSpellPickerEmptyStateMessage,
-  resolveSpellPickerLevelFilterOptions,
-  resolveSpellPickerMethodFilterOptions,
-  resolveSpellPickerModes,
-  resolveSpellPickerSchoolFilterOptions,
-  resolveSpellPickerTraitFilterOptions,
   resolveValidSpellPickerSortModes,
-  resolveSpellPickerLevelChipChange,
+  resolveSpellPickerModes,
   sanitizeSpellPickerBrowseState,
   selectedIdsForSpellPickerMode,
   collectSpellPickerMarkers,
 } from './spell-picker-drawer.lib'
 import {
-  SPELL_PICKER_LEVELS_ALL,
+  applySpellPickerFilterSchema,
+  countSpellPickerStructuredFilters,
+  createSpellPickerFilterSchema,
+  extractSpellPickerFilterState,
+  resolveSpellPickerFilterOptions,
+} from './spell-picker-filter-schema'
+import {
   SPELL_PICKER_MODE_CANTRIPS,
   SPELL_PICKER_MODE_PREPARED_SPELLS,
   SPELL_PICKER_NO_OPTIONS_MESSAGE,
   SPELL_PICKER_NO_RESULTS_MESSAGE,
   SPELL_PICKER_RESET_VIEW_LABEL,
-  SPELL_PICKER_SCHOOL_ALL,
-  SPELL_PICKER_SCHOOL_LABEL,
   type SpellPickerBrowseState,
   type SpellPickerDrawerProps,
   type SpellPickerMode,
 } from './spell-picker-drawer.types'
 import { SpellPickerItemDetails } from './spell-picker-item-details.client'
 import {
-  SpellPickerFilterControls,
-  SpellPickerLevelControls,
+  SpellPickerFilterRowControls,
+  SpellPickerPrimaryFilterControls,
   SpellPickerSortControl,
 } from './spell-picker-toolbar.client'
 
 export type { SpellPickerDrawerProps } from './spell-picker-drawer.types'
-
-function spellPickerLevelChipValues(selectedLevels: readonly number[]): string[] {
-  if (selectedLevels.length === 0) return [SPELL_PICKER_LEVELS_ALL]
-  return selectedLevels.map(String)
-}
 
 export function SpellPickerDrawer({
   open,
@@ -134,43 +123,43 @@ export function SpellPickerDrawer({
     preparedSelectedIds,
   )
   const activeItems = itemsForSpellPickerMode(mode, cantripItems, preparedItems)
-  const levelOptions = React.useMemo(
-    () => resolveSpellPickerLevelFilterOptions(activeItems),
+  const filterOptions = React.useMemo(
+    () => resolveSpellPickerFilterOptions(activeItems),
     [activeItems],
   )
-  const schoolOptions = React.useMemo(
-    () => resolveSpellPickerSchoolFilterOptions(activeItems),
-    [activeItems],
+
+  const showLevelChips =
+    mode === SPELL_PICKER_MODE_PREPARED_SPELLS && filterOptions.levelOptions.length > 1
+  const showSchoolFilter = filterOptions.schoolOptions.length > 1
+
+  const schemaArgs = React.useMemo(
+    () => ({
+      mode,
+      items: activeItems,
+      displayVocabulary,
+      showLevelChips,
+      showSchoolFilter,
+      levelOptions: filterOptions.levelOptions,
+      castingTimeOptions: filterOptions.castingTimeOptions,
+      traitOptions: filterOptions.traitOptions,
+      methodOptions: filterOptions.methodOptions,
+    }),
+    [activeItems, displayVocabulary, filterOptions, mode, showLevelChips, showSchoolFilter],
   )
-  const castingTimeOptions = React.useMemo(
-    () => resolveSpellPickerCastingTimeFilterOptions(activeItems),
-    [activeItems],
-  )
-  const traitOptions = React.useMemo(
-    () => resolveSpellPickerTraitFilterOptions(activeItems),
-    [activeItems],
-  )
-  const methodOptions = React.useMemo(
-    () => resolveSpellPickerMethodFilterOptions(activeItems),
-    [activeItems],
-  )
+
+  const filterSchema = React.useMemo(() => createSpellPickerFilterSchema(schemaArgs), [schemaArgs])
+  const filterState = React.useMemo(() => extractSpellPickerFilterState(browseState), [browseState])
 
   const validSortModes = React.useMemo(
     () => resolveValidSpellPickerSortModes(mode, recommendationsEnabled),
     [mode, recommendationsEnabled],
   )
 
-  const structuredFilterCount = countSpellPickerStructuredFilters(browseState)
+  const structuredFilterCount = countSpellPickerStructuredFilters(filterSchema, filterState)
 
   const filteredItems = React.useMemo(
-    () =>
-      filterSpellPickerItems(activeItems, {
-        mode,
-        selectedLevels: browseState.selectedLevels,
-        selectedSchool: browseState.selectedSchool,
-        mechanicsFilters: browseState.mechanicsFilters,
-      }),
-    [activeItems, browseState, mode],
+    () => applySpellPickerFilterSchema(filterSchema, filterState, activeItems, mode),
+    [activeItems, filterSchema, filterState, mode],
   )
 
   const transformVisibleItems = React.useCallback(
@@ -189,32 +178,7 @@ export function SpellPickerDrawer({
   )
   const emptyStateMessage = resolveSpellPickerEmptyStateMessage(emptyStateKind)
 
-  const showLevelChips = mode === SPELL_PICKER_MODE_PREPARED_SPELLS && levelOptions.length > 1
-  const showSchoolFilter = schoolOptions.length > 1
   const showSegmentedControl = modes.length > 1
-
-  const schoolFilterFields = React.useMemo(
-    () => [
-      catalogPickerInlineSelectFilter<
-        { selectedSchool: SpellPickerBrowseState['selectedSchool'] },
-        'selectedSchool'
-      >({
-        key: 'selectedSchool',
-        label: SPELL_PICKER_SCHOOL_LABEL,
-        ariaLabel: 'Filter by school',
-        triggerAriaLabel: 'Spell school',
-        options: [
-          { value: SPELL_PICKER_SCHOOL_ALL, label: 'All' },
-          ...schoolOptions.map((school) => ({
-            value: school,
-            label:
-              displayVocabulary?.resolveSpellSchoolLabel?.(school) ?? getSpellSchoolLabel(school),
-          })),
-        ],
-      }),
-    ],
-    [displayVocabulary, schoolOptions],
-  )
 
   const selectionLimit = activeChoiceSet?.max ?? 0
   const selectionComplete = activeSelectedIds.length >= selectionLimit && selectionLimit > 0
@@ -227,6 +191,19 @@ export function SpellPickerDrawer({
       setBrowseBuckets((current) => updateModeBrowseState(current, mode, sanitized))
     },
     [mode, recommendationsEnabled],
+  )
+
+  const persistFilterState = React.useCallback(
+    (nextFilterState: typeof filterState) => {
+      persistBrowseState({
+        ...browseState,
+        ...nextFilterState,
+        selectedLevels: nextFilterState.selectedLevels ?? [],
+        selectedSchool: nextFilterState.selectedSchool ?? browseState.selectedSchool,
+        mechanicsFilters: nextFilterState.mechanicsFilters ?? browseState.mechanicsFilters,
+      })
+    },
+    [browseState, persistBrowseState, filterState],
   )
 
   const handleModeChange = (nextMode: SpellPickerMode) => {
@@ -316,20 +293,10 @@ export function SpellPickerDrawer({
       defaultTabId={browseState.activeTabId}
       transformVisibleItems={transformVisibleItems}
       primaryControls={
-        <SpellPickerLevelControls
-          showLevelChips={showLevelChips}
-          levelOptions={levelOptions}
-          selectedLevelValues={spellPickerLevelChipValues(browseState.selectedLevels)}
-          onSelectedLevelsChange={(values) => {
-            persistBrowseState({
-              ...browseState,
-              selectedLevels: resolveSpellPickerLevelChipChange(
-                browseState.selectedLevels,
-                values,
-                levelOptions,
-              ),
-            })
-          }}
+        <SpellPickerPrimaryFilterControls
+          schemaArgs={schemaArgs}
+          filterState={filterState}
+          onFilterStateChange={persistFilterState}
         />
       }
       emptyState={
@@ -379,14 +346,10 @@ export function SpellPickerDrawer({
       }}
       filterRow={{
         controls: (
-          <SpellPickerFilterControls
-            showSchoolFilter={showSchoolFilter}
-            schoolFilterFields={schoolFilterFields}
-            browseState={browseState}
-            onBrowseStateChange={persistBrowseState}
-            castingTimeOptions={castingTimeOptions}
-            traitOptions={traitOptions}
-            methodOptions={methodOptions}
+          <SpellPickerFilterRowControls
+            schemaArgs={schemaArgs}
+            filterState={filterState}
+            onFilterStateChange={persistFilterState}
           />
         ),
         actions: (

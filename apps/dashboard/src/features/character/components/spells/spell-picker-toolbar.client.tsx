@@ -1,172 +1,73 @@
 'use client'
 
-import { CatalogFilterChips, FilterToolbar, type FilterFieldConfig } from '@rpg/ui'
+import { CatalogFilterControls, setFilterValue } from '@rpg/ui/filters'
 
-import { CatalogFilterPopover } from '../picker/catalog-filter-popover.client'
 import { CatalogSortControl } from '../picker/catalog-sort-control.client'
+import { useMemo } from 'react'
+
 import { pickerSortOption } from '../picker/catalog-picker-sort-labels.lib'
 import {
-  formatSpellPickerLevelChipLabel,
-  formatSpellPickerMechanicsTriggerLabel,
-  getSpellPickerCastingTimeFilterLabel,
-  getSpellPickerMethodFilterLabel,
-  getSpellPickerTraitFilterLabel,
-} from './spell-picker-drawer.lib'
-import {
-  SPELL_PICKER_LEVELS_ALL,
   SPELL_PICKER_SORT_LABEL,
   SPELL_PICKER_SORT_LABELS,
-  type SpellPickerBrowseState,
-  type SpellPickerCastingTimeFilter,
-  type SpellPickerMethodFilter,
   type SpellPickerSortMode,
-  type SpellPickerTraitFilter,
 } from './spell-picker-drawer.types'
+import {
+  createSpellPickerFilterSchema,
+  SPELL_PICKER_FILTER_LAYOUT,
+  type SpellPickerFilterState,
+} from './spell-picker-filter-schema'
+import type { CreateSpellPickerFilterSchemaArgs } from './spell-picker-filter-schema'
 
-type SpellPickerLevelControlsProps = {
-  showLevelChips: boolean
-  levelOptions: readonly number[]
-  selectedLevelValues: string[]
-  onSelectedLevelsChange: (values: string[]) => void
+type SpellPickerFilterControlsBaseProps = {
+  schemaArgs: CreateSpellPickerFilterSchemaArgs
+  filterState: SpellPickerFilterState
+  onFilterStateChange: (next: SpellPickerFilterState) => void
 }
 
-export function SpellPickerLevelControls({
-  showLevelChips,
-  levelOptions,
-  selectedLevelValues,
-  onSelectedLevelsChange,
-}: SpellPickerLevelControlsProps) {
-  if (!showLevelChips) return null
+function useSpellPickerFilterControls({
+  schemaArgs,
+  filterState,
+  onFilterStateChange,
+}: SpellPickerFilterControlsBaseProps) {
+  const schema = useMemo(() => createSpellPickerFilterSchema(schemaArgs), [schemaArgs])
+
+  const handleValueChange = (
+    id: keyof SpellPickerFilterState,
+    value: SpellPickerFilterState[keyof SpellPickerFilterState] | undefined,
+  ) => {
+    onFilterStateChange(setFilterValue(schema, filterState, id, value))
+  }
+
+  return { schema, handleValueChange }
+}
+
+export function SpellPickerPrimaryFilterControls(props: SpellPickerFilterControlsBaseProps) {
+  const { schema, handleValueChange } = useSpellPickerFilterControls(props)
 
   return (
-    <CatalogFilterChips
-      id="spell-picker-levels"
-      label="Levels"
-      selectionMode="multiple"
-      options={[
-        { value: SPELL_PICKER_LEVELS_ALL, label: 'All' },
-        ...levelOptions.map((level) => ({
-          value: String(level),
-          label: formatSpellPickerLevelChipLabel(level),
-        })),
-      ]}
-      selectedValues={selectedLevelValues}
-      onSelectedValuesChange={onSelectedLevelsChange}
+    <CatalogFilterControls.Primary
+      schema={schema}
+      layout={SPELL_PICKER_FILTER_LAYOUT}
+      state={props.filterState}
+      data={props.schemaArgs.items}
+      idPrefix="spell-picker"
+      onValueChange={handleValueChange}
     />
   )
 }
 
-type SpellPickerFilterControlsProps = {
-  showSchoolFilter: boolean
-  schoolFilterFields: FilterFieldConfig<{
-    selectedSchool: SpellPickerBrowseState['selectedSchool']
-  }>[]
-  browseState: SpellPickerBrowseState
-  onBrowseStateChange: (next: SpellPickerBrowseState) => void
-  castingTimeOptions: readonly SpellPickerCastingTimeFilter[]
-  traitOptions: readonly SpellPickerTraitFilter[]
-  methodOptions: readonly SpellPickerMethodFilter[]
-}
+export function SpellPickerFilterRowControls(props: SpellPickerFilterControlsBaseProps) {
+  const { schema, handleValueChange } = useSpellPickerFilterControls(props)
 
-export function SpellPickerFilterControls({
-  showSchoolFilter,
-  schoolFilterFields,
-  browseState,
-  onBrowseStateChange,
-  castingTimeOptions,
-  traitOptions,
-  methodOptions,
-}: SpellPickerFilterControlsProps) {
   return (
-    <>
-      {showSchoolFilter ? (
-        <FilterToolbar
-          idPrefix="spell-picker-school"
-          fields={schoolFilterFields}
-          values={{ selectedSchool: browseState.selectedSchool }}
-          className="flex-row flex-nowrap items-center gap-0"
-          onValueChange={(_key, value) => {
-            if (value !== undefined) {
-              onBrowseStateChange({
-                ...browseState,
-                selectedSchool: value as typeof browseState.selectedSchool,
-              })
-            }
-          }}
-        />
-      ) : null}
-
-      {castingTimeOptions.length > 0 || traitOptions.length > 0 || methodOptions.length > 0 ? (
-        <CatalogFilterPopover
-          triggerLabel={formatSpellPickerMechanicsTriggerLabel(
-            browseState.mechanicsFilters.castingTimes.length +
-              browseState.mechanicsFilters.traits.length +
-              browseState.mechanicsFilters.methods.length,
-          )}
-          triggerAriaLabel="Casting and mechanics filters"
-          groups={[
-            castingTimeOptions.length > 0
-              ? {
-                  id: 'casting-time',
-                  label: 'Casting time',
-                  options: castingTimeOptions.map((filter) => ({
-                    value: filter,
-                    label: getSpellPickerCastingTimeFilterLabel(filter),
-                  })),
-                  selectedValues: browseState.mechanicsFilters.castingTimes,
-                  onSelectedValuesChange: (castingTimes: string[]) =>
-                    onBrowseStateChange({
-                      ...browseState,
-                      mechanicsFilters: {
-                        ...browseState.mechanicsFilters,
-                        castingTimes:
-                          castingTimes as typeof browseState.mechanicsFilters.castingTimes,
-                      },
-                    }),
-                }
-              : null,
-            traitOptions.length > 0
-              ? {
-                  id: 'traits',
-                  label: 'Traits',
-                  options: traitOptions.map((filter) => ({
-                    value: filter,
-                    label: getSpellPickerTraitFilterLabel(filter),
-                  })),
-                  selectedValues: browseState.mechanicsFilters.traits,
-                  onSelectedValuesChange: (traits: string[]) =>
-                    onBrowseStateChange({
-                      ...browseState,
-                      mechanicsFilters: {
-                        ...browseState.mechanicsFilters,
-                        traits: traits as typeof browseState.mechanicsFilters.traits,
-                      },
-                    }),
-                }
-              : null,
-            methodOptions.length > 0
-              ? {
-                  id: 'method',
-                  label: 'Method',
-                  options: methodOptions.map((filter) => ({
-                    value: filter,
-                    label: getSpellPickerMethodFilterLabel(filter),
-                  })),
-                  selectedValues: browseState.mechanicsFilters.methods,
-                  onSelectedValuesChange: (methods: string[]) =>
-                    onBrowseStateChange({
-                      ...browseState,
-                      mechanicsFilters: {
-                        ...browseState.mechanicsFilters,
-                        methods: methods as typeof browseState.mechanicsFilters.methods,
-                      },
-                    }),
-                }
-              : null,
-          ].filter((group): group is NonNullable<typeof group> => group !== null)}
-        />
-      ) : null}
-    </>
+    <CatalogFilterControls.FilterRow
+      schema={schema}
+      layout={SPELL_PICKER_FILTER_LAYOUT}
+      state={props.filterState}
+      data={props.schemaArgs.items}
+      idPrefix="spell-picker"
+      onValueChange={handleValueChange}
+    />
   )
 }
 

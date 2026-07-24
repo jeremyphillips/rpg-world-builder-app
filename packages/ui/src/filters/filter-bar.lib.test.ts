@@ -28,19 +28,23 @@ const schema = createFilterSchema([
 
 describe('filter-bar.lib', () => {
   const field = schema.fields[0] as Extract<(typeof schema.fields)[number], { type: 'select' }>
+  const selectLike = {
+    ...field,
+    options: field.options as { value: string; label: string }[],
+  }
 
   it('uses the all sentinel when no value is set and showAllOption is enabled', () => {
-    expect(resolveFilterSelectValue(field, undefined, undefined)).toBe(FILTER_SELECT_ALL_VALUE)
+    expect(resolveFilterSelectValue(selectLike, undefined, undefined)).toBe(FILTER_SELECT_ALL_VALUE)
   })
 
   it('prefers raw and effective values over the all sentinel', () => {
-    expect(resolveFilterSelectValue(field, 'draft', undefined)).toBe('draft')
-    expect(resolveFilterSelectValue(field, undefined, 'published')).toBe('published')
+    expect(resolveFilterSelectValue(selectLike, 'draft', undefined)).toBe('draft')
+    expect(resolveFilterSelectValue(selectLike, undefined, 'published')).toBe('published')
   })
 
   it('normalizes the all sentinel to undefined', () => {
-    expect(normalizeFilterSelectChange(field, FILTER_SELECT_ALL_VALUE)).toBeUndefined()
-    expect(normalizeFilterSelectChange(field, 'draft')).toBe('draft')
+    expect(normalizeFilterSelectChange(selectLike, FILTER_SELECT_ALL_VALUE)).toBeUndefined()
+    expect(normalizeFilterSelectChange(selectLike, 'draft')).toBe('draft')
   })
 
   it('resolves advanced panel column counts', () => {

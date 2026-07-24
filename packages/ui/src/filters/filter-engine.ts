@@ -2,6 +2,7 @@ import type {
   FilterFieldDef,
   FilterFieldId,
   FilterPlacement,
+  FilterSanitizeContext,
   FilterSchema,
 } from './filter-schema.types'
 
@@ -54,13 +55,43 @@ export function setFilterValue<TData, TState extends Record<string, unknown>>(
   value: TState[FilterFieldId<TState>] | undefined,
 ): TState {
   getFieldDef(schema, id)
+  const previous = state
 
+  let next: TState
   if (value === undefined) {
     const { [id]: _removed, ...rest } = state
-    return rest as TState
+    next = rest as TState
+  } else {
+    next = { ...state, [id]: value }
   }
 
-  return { ...state, [id]: value }
+  if (schema.normalizeChange) {
+    return schema.normalizeChange(next, { changedId: id, previous })
+  }
+
+  return next
+}
+
+export function sanitizeFilterState<TData, TState extends Record<string, unknown>>(
+  schema: FilterSchema<TData, TState>,
+  partial: Partial<TState>,
+  context?: Omit<FilterSanitizeContext<TData, TState>, 'state'>,
+): TState {
+  const base = {
+    ...createInitialFilterState(schema),
+    ...partial,
+  }
+
+  if (!schema.sanitizeState) {
+    return base
+  }
+
+  const sanitized = schema.sanitizeState(base, {
+    ...context,
+    state: base,
+  })
+
+  return { ...base, ...sanitized }
 }
 
 /** Restores schema defaults ("Clear filters"). */

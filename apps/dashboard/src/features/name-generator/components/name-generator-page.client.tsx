@@ -3,16 +3,15 @@
 import { Button } from '@rpg/ui'
 
 import type { GeneratedName } from '@rpg/contracts/name-generator'
+import type { FilterSchema } from '@rpg/ui/filters'
 
 import { GENERATE_COUNT } from '../model/name-generator.constants'
 import { useNameGeneratorPage } from '../hooks/use-name-generator-page'
 import type {
-  NameGeneratorFilterOptions,
   NameGeneratorFilters,
   NameGeneratorPageError,
   NameGeneratorResultsSummary,
   NameGeneratorStatus,
-  NameGeneratorVisibleFilters,
 } from '../model/name-generator-filters'
 import { NameGeneratorFilters as NameGeneratorFiltersPanel } from './name-generator-filters.client'
 import { NameGeneratorMatchSummary } from './name-generator-match-summary.client'
@@ -21,8 +20,7 @@ import { nameGeneratorActionRowClasses } from './name-generator-toolbar.variants
 
 export type NameGeneratorPageViewProps = {
   filters: NameGeneratorFilters
-  filterOptions: NameGeneratorFilterOptions
-  visibleFilters: NameGeneratorVisibleFilters
+  filterSchema: FilterSchema<GeneratedName, NameGeneratorFilters>
   matchCount: number
   matchCountLabel: string
   results: GeneratedName[]
@@ -31,7 +29,7 @@ export type NameGeneratorPageViewProps = {
   error?: NameGeneratorPageError
   resultsSummary?: NameGeneratorResultsSummary
   isGenerateDisabled: boolean
-  onFilterChange: (key: keyof NameGeneratorFilters, value: string | undefined) => void
+  onFilterChange: (filters: NameGeneratorFilters) => void
   onResetFilters: () => void
   onGenerate: () => void
   onRegenerate: () => void
@@ -39,8 +37,7 @@ export type NameGeneratorPageViewProps = {
 
 export function NameGeneratorPageView({
   filters,
-  filterOptions,
-  visibleFilters,
+  filterSchema,
   matchCount,
   matchCountLabel,
   results,
@@ -57,9 +54,8 @@ export function NameGeneratorPageView({
   return (
     <div className="flex flex-col gap-6">
       <NameGeneratorFiltersPanel
+        schema={filterSchema}
         filters={filters}
-        filterOptions={filterOptions}
-        visibleFilters={visibleFilters}
         onFilterChange={onFilterChange}
         onResetFilters={onResetFilters}
       />
@@ -86,8 +82,7 @@ export function NameGeneratorPageView({
 export function NameGeneratorPage() {
   const {
     filters,
-    filterOptions,
-    visibleFilters,
+    filterSchema,
     matchCount,
     matchCountLabel,
     results,
@@ -96,7 +91,7 @@ export function NameGeneratorPage() {
     error,
     resultsSummary,
     isGenerateDisabled,
-    setFilter,
+    setFilters,
     resetFilters,
     generate,
     regenerate,
@@ -105,8 +100,7 @@ export function NameGeneratorPage() {
   return (
     <NameGeneratorPageView
       filters={filters}
-      filterOptions={filterOptions}
-      visibleFilters={visibleFilters}
+      filterSchema={filterSchema}
       matchCount={matchCount}
       matchCountLabel={matchCountLabel}
       results={results}
@@ -115,7 +109,7 @@ export function NameGeneratorPage() {
       error={error}
       resultsSummary={resultsSummary}
       isGenerateDisabled={isGenerateDisabled}
-      onFilterChange={setFilter}
+      onFilterChange={setFilters}
       onResetFilters={resetFilters}
       onGenerate={() => {
         void generate()

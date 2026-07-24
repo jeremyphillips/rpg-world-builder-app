@@ -17,6 +17,7 @@ import {
   isFilterFieldVisible,
   normalizeFilterSelectChange,
   resolveFilterSelectValue,
+  resolveSelectFieldOptions,
 } from './filter-bar.lib'
 import { FILTER_SELECT_ALL_VALUE, filterBarControlVariants } from './filter-bar.variants'
 import type {
@@ -98,13 +99,14 @@ function FilterSelectField<TData, TState extends Record<string, unknown>>({
   const rawValue = state[selectField.id]
   const effectiveValue = getEffectiveFilterValue(schema, state, selectField.id)
   const showAllOption = selectField.showAllOption ?? true
+  const options = resolveSelectFieldOptions(selectField, { state })
 
   return (
     <div className={filterBarControlVariants({ type: 'select' })}>
       <Select
-        value={resolveFilterSelectValue(selectField, rawValue, effectiveValue)}
+        value={resolveFilterSelectValue({ ...selectField, options }, rawValue, effectiveValue)}
         onValueChange={(nextValue) => {
-          const normalized = normalizeFilterSelectChange(selectField, nextValue) as
+          const normalized = normalizeFilterSelectChange({ ...selectField, options }, nextValue) as
             | TState[typeof selectField.id]
             | undefined
           const currentValue =
@@ -126,7 +128,7 @@ function FilterSelectField<TData, TState extends Record<string, unknown>>({
           {showAllOption ? (
             <SelectItem value={FILTER_SELECT_ALL_VALUE}>All {selectField.label}</SelectItem>
           ) : null}
-          {selectField.options.map((option) => (
+          {options.map((option) => (
             <SelectItem key={option.value} value={option.value}>
               {option.label}
             </SelectItem>
@@ -206,15 +208,19 @@ export function FilterField<TData, TState extends Record<string, unknown>>({
     )
   }
 
-  return (
-    <FilterBooleanField
-      field={field}
-      controlId={controlId}
-      state={state}
-      disabled={disabled}
-      onValueChange={onValueChange}
-    />
-  )
+  if (field.type === 'boolean') {
+    return (
+      <FilterBooleanField
+        field={field}
+        controlId={controlId}
+        state={state}
+        disabled={disabled}
+        onValueChange={onValueChange}
+      />
+    )
+  }
+
+  return null
 }
 
 export function FilterFieldList<TData, TState extends Record<string, unknown>>({

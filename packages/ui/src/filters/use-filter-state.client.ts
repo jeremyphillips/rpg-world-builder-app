@@ -2,25 +2,21 @@
 
 import * as React from 'react'
 
-import {
-  createInitialFilterState,
-  resetFilterState,
-  setFilterValue,
-} from './filter-engine'
+import { resetFilterState, sanitizeFilterState, setFilterValue } from './filter-engine'
 import type { FilterFieldId, FilterSchema } from './filter-schema.types'
 
-export type UseFilterStateOptions<TState extends Record<string, unknown>> = {
+export type UseFilterStateOptions<TData, TState extends Record<string, unknown>> = {
   initialValues?: Partial<TState>
+  data?: readonly TData[]
 }
 
 export function useFilterState<TData, TState extends Record<string, unknown>>(
   schema: FilterSchema<TData, TState>,
-  options?: UseFilterStateOptions<TState>,
+  options?: UseFilterStateOptions<TData, TState>,
 ) {
-  const [state, setState] = React.useState<TState>(() => ({
-    ...createInitialFilterState(schema),
-    ...options?.initialValues,
-  }))
+  const [state, setState] = React.useState<TState>(() =>
+    sanitizeFilterState(schema, options?.initialValues ?? {}, { data: options?.data }),
+  )
 
   const setValue = React.useCallback(
     (id: FilterFieldId<TState>, value: TState[FilterFieldId<TState>] | undefined) => {
@@ -33,5 +29,12 @@ export function useFilterState<TData, TState extends Record<string, unknown>>(
     setState(resetFilterState(schema))
   }, [schema])
 
-  return { state, setValue, reset }
+  const sanitize = React.useCallback(
+    (partial: Partial<TState>) => {
+      setState(sanitizeFilterState(schema, partial, { data: options?.data }))
+    },
+    [options?.data, schema],
+  )
+
+  return { state, setValue, reset, sanitize }
 }
