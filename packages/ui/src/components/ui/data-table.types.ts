@@ -72,6 +72,12 @@ export interface DataTableProps<TData> {
   onRowSelectionStateChange?: (state: RowSelectionState) => void
   /** Contextual labels for selection checkboxes. */
   selectionLabels?: DataTableSelectionLabels<TData>
+  /** Stable row id for selection state — defaults to `row.id` when present. */
+  getRowId?: (row: TData) => string
+  /** When provided, unchecked rows returning false cannot be selected. */
+  getRowCanSelect?: (row: TData) => boolean
+  /** Element id referenced by disabled row checkboxes via aria-describedby. */
+  rowSelectionDescribedBy?: string
   /**
    * Replaces the default toolbar with a tinted utility strip above the table header.
    * Receives page-selection helpers and the column visibility trigger.

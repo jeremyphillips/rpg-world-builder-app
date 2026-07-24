@@ -66,6 +66,19 @@ No unified Save — Publish / Save draft stay pending-only. Campaign access uses
 - Section behavior: `campaign-access-section.test.tsx`
 - Shell wiring: `content-save-session.integration.test.tsx`
 - Participant contract: `campaign-access-form-context.test.tsx`
+- Bulk preview: `campaign-access/bulk/resolve-bulk-campaign-access-preview.test.ts`
+
+## Shared vs bulk builders
+
+| Concern     | Detail (`buildCampaignAccessFields`) | Bulk (`buildBulkCampaignAccessFields`)                      |
+| ----------- | ------------------------------------ | ----------------------------------------------------------- |
+| Value model | Direct booleans / enums              | `BulkFieldOperation<T>` tri-state selects                   |
+| Chrome      | Disclosure summary group             | Modal form rows                                             |
+| Options     | `campaign-access-options.lib.ts`     | Same lib with `includeLeaveUnchanged`                       |
+| Patch merge | N/A (per-entity form)                | `applyBulkCampaignAccessOperations` in `@rpg/contracts`     |
+| Persistence | `PATCH …/campaign-access`            | Same endpoint, orchestrated per row (cap 50, concurrency 5) |
+
+Do not share `FormItem[]` builders between detail and bulk — share options, labels, and contracts only.
 
 ## Participant picker
 

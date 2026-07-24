@@ -1,10 +1,5 @@
 import { createElement } from 'react'
-import {
-  CONTENT_ACCESS_CAPABILITIES,
-  CONTENT_VISIBILITY_MODE_ENTRIES,
-  type ContentAccessTargetType,
-  type ContentCampaignAccessPatch,
-} from '@rpg/contracts'
+import type { ContentAccessTargetType, ContentCampaignAccessPatch } from '@rpg/contracts'
 import type { FormItem } from '@rpg/ui/form'
 
 import { CampaignAccessAvailableSwitch } from './campaign-access-available-switch.client'
@@ -27,6 +22,8 @@ import {
   CAMPAIGN_ACCESS_UNAVAILABLE_HINT,
   CAMPAIGN_ACCESS_UNSAVED_SUFFIX,
 } from './campaign-access-labels'
+import { buildCampaignAccessVisibilityOptions } from './campaign-access-options.lib'
+import { toCampaignAccessPatch } from './campaign-access-state'
 import { resolveCampaignAccessSummary } from './campaign-access-summary'
 
 export type CampaignAccessFormCtx = {
@@ -36,24 +33,6 @@ export type CampaignAccessFormCtx = {
   /** Stable group id — include entity id so disclosure state resets per record. */
   groupId: string
   participantOptions?: ReadonlyArray<{ value: string; label: string }>
-}
-
-function buildVisibilityModeOptions(targetType: ContentAccessTargetType) {
-  const capability = CONTENT_ACCESS_CAPABILITIES[targetType]
-  if (capability.mode !== 'owned') return []
-
-  return capability.visibilityModes.map((mode) => ({
-    value: mode,
-    label: CONTENT_VISIBILITY_MODE_ENTRIES[mode].label,
-  }))
-}
-
-function toCampaignAccessPatch(values: Record<string, unknown>): ContentCampaignAccessPatch {
-  return {
-    available: values.available as boolean,
-    visibilityMode: values.visibilityMode as ContentCampaignAccessPatch['visibilityMode'],
-    participantIds: (values.participantIds as string[] | undefined) ?? [],
-  }
 }
 
 function buildParticipantField(ctx: CampaignAccessFormCtx): FormItem[] {
@@ -105,7 +84,14 @@ export function buildCampaignAccessFields(ctx: CampaignAccessFormCtx): FormItem[
         showDirtySuffix: true,
         disabled: ctx.pending,
         summaryDependsOn: ['available', 'visibilityMode', 'participantIds'],
-        resolveSummary: (values) => resolveCampaignAccessSummary(toCampaignAccessPatch(values)),
+        resolveSummary: (values) =>
+          resolveCampaignAccessSummary(
+            toCampaignAccessPatch({
+              available: values.available as boolean,
+              visibilityMode: values.visibilityMode as ContentCampaignAccessPatch['visibilityMode'],
+              participantIds: (values.participantIds as string[] | undefined) ?? [],
+            }),
+          ),
       },
       fields: [
         {
@@ -129,7 +115,9 @@ export function buildCampaignAccessFields(ctx: CampaignAccessFormCtx): FormItem[
           width: 'full',
           size: 'sm',
           disabled: !ctx.available || ctx.pending,
-          options: buildVisibilityModeOptions(ctx.targetType),
+          options: buildCampaignAccessVisibilityOptions(ctx.targetType, {
+            includeSpecificPlayers: true,
+          }),
           optionAvailability: campaignAccessVisibilityOptionAvailability(),
         },
         ...buildParticipantField(ctx),

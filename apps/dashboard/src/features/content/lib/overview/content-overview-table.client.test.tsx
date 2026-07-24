@@ -214,6 +214,26 @@ describe('ContentOverviewTable interactions', () => {
     renderOverview()
     expect(screen.getByText('8 results')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Choose visible columns' })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Select' })).toBeDisabled()
+    expect(screen.getByRole('button', { name: 'Select' })).toBeEnabled()
+  })
+
+  it('enters selection mode and announces the live region', async () => {
+    const user = userEvent.setup()
+    renderOverview()
+
+    await user.click(screen.getByRole('button', { name: 'Select' }))
+
+    expect(screen.getByText('0 selected')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Select all page' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Exit selection mode' })).toBeInTheDocument()
+    expect(screen.getByText('Selection mode. 0 items selected.')).toBeInTheDocument()
+  })
+
+  it('uses contextual row checkbox labels in selection mode', async () => {
+    const user = userEvent.setup()
+    renderOverview()
+
+    await user.click(screen.getByRole('button', { name: 'Select' }))
+    expect(screen.getByRole('checkbox', { name: 'Select Class 0' })).toBeInTheDocument()
   })
 })

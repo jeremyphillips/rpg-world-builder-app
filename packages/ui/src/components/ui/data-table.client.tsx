@@ -768,6 +768,9 @@ export function DataTable<TData>({
   onRowSelectionChange,
   onRowSelectionStateChange,
   selectionLabels,
+  getRowId: getRowIdProp,
+  getRowCanSelect,
+  rowSelectionDescribedBy,
   utilityStrip,
   defaultPageSize = 20,
   initialColumnVisibility,
@@ -878,6 +881,26 @@ export function DataTable<TData>({
     return 'Select all rows on this page'
   }, [])
 
+  const getRowCanSelectRef = React.useRef(getRowCanSelect)
+  getRowCanSelectRef.current = getRowCanSelect
+
+  const resolveRowSelectionEnabled = React.useCallback(
+    (row: { original: TData; getCanSelect: () => boolean }) => {
+      if (!getRowCanSelectRef.current) return true
+      return getRowCanSelectRef.current(row.original)
+    },
+    [],
+  )
+
+  const getRowId = React.useCallback(
+    (row: TData, index: number) => {
+      if (getRowIdProp) return getRowIdProp(row)
+      const candidate = (row as { id?: string }).id
+      return candidate ?? String(index)
+    },
+    [getRowIdProp],
+  )
+
   // Inject selection column
   const selectionColumn = React.useMemo<ColumnDef<TData>>(
     () => ({
@@ -895,18 +918,23 @@ export function DataTable<TData>({
           />
         )
       },
-      cell: ({ row }) => (
-        <Checkbox
-          checked={row.getIsSelected()}
-          onCheckedChange={(v) => row.toggleSelected(!!v)}
-          aria-label={selectionLabelsRef.current?.selectRow?.(row.original) ?? 'Select row'}
-        />
-      ),
+      cell: ({ row }) => {
+        const canSelect = row.getCanSelect()
+        return (
+          <Checkbox
+            checked={row.getIsSelected()}
+            disabled={!canSelect}
+            onCheckedChange={(v) => row.toggleSelected(!!v)}
+            aria-label={selectionLabelsRef.current?.selectRow?.(row.original) ?? 'Select row'}
+            aria-describedby={!canSelect ? rowSelectionDescribedBy : undefined}
+          />
+        )
+      },
       enableSorting: false,
       enableHiding: false,
       meta: { ...dataTableWidthMeta('minimal'), columnTone: 'neutral' },
     }),
-    [resolveSelectAllLabel],
+    [resolveSelectAllLabel, rowSelectionDescribedBy],
   )
 
   // Inject actions column
@@ -941,6 +969,7 @@ export function DataTable<TData>({
   const table = useReactTable({
     data,
     columns: resolvedColumns,
+    getRowId,
     state: {
       sorting,
       columnVisibility,
@@ -957,7 +986,7 @@ export function DataTable<TData>({
     getSortedRowModel: getSortedRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     filterFns: { boolean: booleanFilterFn, equalsString: equalsStringFilterFn },
-    enableRowSelection,
+    enableRowSelection: enableRowSelection ? (row) => resolveRowSelectionEnabled(row) : false,
   })
 
   const tableRef = React.useRef(table)
