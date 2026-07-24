@@ -3,7 +3,7 @@ import { DataTable } from '@rpg/ui'
 
 import { STORY_CAMPAIGN_ID } from '../../lib/fixtures/constants'
 import { FEAT_LIST } from '../fixtures'
-import { featsColumns, featsFilters } from './feats-overview-columns'
+import { featsColumns } from './feats-overview-columns'
 
 const meta = {
   title: 'Content/Feats/FeatsOverviewColumns',
@@ -19,7 +19,6 @@ export const Default: Story = {
     <DataTable
       columns={featsColumns(STORY_CAMPAIGN_ID)}
       data={[...FEAT_LIST]}
-      filters={featsFilters}
       caption="Feats available in this campaign"
     />
   ),

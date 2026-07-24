@@ -6,7 +6,6 @@ import type { GeneratedName } from '@rpg/contracts/name-generator'
 import { useCampaignStore } from '@/features/campaign/store/campaign-store'
 import { useSpecies } from '@/features/content/species/hooks/use-species'
 
-import { applyNameGeneratorFilterChange } from '../model/apply-name-generator-filter-change'
 import {
   buildCultureFilterContexts,
   composeNameGeneratorConventions,
@@ -15,25 +14,20 @@ import {
 import { buildNamingContext } from '../model/build-naming-context'
 import {
   deriveFilterOptions,
-  deriveVisibleFilters,
   type NameGeneratorFilterContext,
 } from '../model/derive-filter-options'
+import { createNameGeneratorFilterSchema } from '../model/name-generator-filter-schema'
 import { formatMatchCountLabel, formatResultsSummary } from '../model/format-results-summary'
 import { generateNameBatch, mapNameGeneratorError } from '../model/generate-name-batch'
 import type {
-  NameGeneratorFilterOptions,
   NameGeneratorFilters,
   NameGeneratorPageError,
   NameGeneratorResultsSummary,
   NameGeneratorStatus,
-  NameGeneratorVisibleFilters,
 } from '../model/name-generator-filters'
 import { GENERATE_COUNT } from '../model/name-generator.constants'
 import { recommendNameGeneratorMatches } from '../model/recommend-name-generator-matches'
-import {
-  resetNameGeneratorFilters,
-  sanitizeFiltersOnChange,
-} from '../model/sanitize-filters-on-change'
+import { resetNameGeneratorFilters } from '../model/sanitize-filters-on-change'
 
 function isNameGeneratorPageError(error: unknown): error is NameGeneratorPageError {
   return (
@@ -85,13 +79,19 @@ export function useNameGeneratorPage() {
     () => recommendNameGeneratorMatches(namingContext, conventions, filters),
     [namingContext, conventions, filters],
   )
-  const filterOptions: NameGeneratorFilterOptions = useMemo(
+  const filterOptions = useMemo(
     () => deriveFilterOptions(filters, conventions, filterContext),
     [filters, conventions, filterContext],
   )
-  const visibleFilters: NameGeneratorVisibleFilters = useMemo(
-    () => deriveVisibleFilters(filters, conventions, filterContext),
-    [filters, conventions, filterContext],
+  const filterSchema = useMemo(
+    () =>
+      createNameGeneratorFilterSchema({
+        conventions,
+        filterContext,
+        cultureContexts,
+        filterOptions,
+      }),
+    [conventions, cultureContexts, filterContext, filterOptions],
   )
   const matchCountLabel = useMemo(() => formatMatchCountLabel(matches.length), [matches.length])
   const resultsSummary: NameGeneratorResultsSummary | undefined = useMemo(() => {
@@ -102,21 +102,9 @@ export function useNameGeneratorPage() {
     return formatResultsSummary(filters, activeMatches, partialCount, getConvention)
   }, [activeMatches, filters, getConvention, partialCount, status])
 
-  const setFilter = useCallback(
-    (key: keyof NameGeneratorFilters, value: string | undefined) => {
-      const next = applyNameGeneratorFilterChange({
-        filters,
-        key,
-        value,
-        speciesNamingOptions,
-        conventions,
-        cultureContexts,
-      })
-
-      setFiltersState(sanitizeFiltersOnChange(filters, next, conventions, filterContext))
-    },
-    [conventions, cultureContexts, filterContext, filters, speciesNamingOptions],
-  )
+  const setFilters = useCallback((next: NameGeneratorFilters) => {
+    setFiltersState(next)
+  }, [])
 
   const resetFilters = useCallback(() => {
     setFiltersState(resetNameGeneratorFilters())
@@ -172,8 +160,7 @@ export function useNameGeneratorPage() {
 
   return {
     filters,
-    filterOptions,
-    visibleFilters,
+    filterSchema,
     matches,
     matchCount: matches.length,
     matchCountLabel,
@@ -184,7 +171,7 @@ export function useNameGeneratorPage() {
     partialCount,
     resultsSummary,
     isGenerateDisabled: matches.length === 0 || status === 'loading',
-    setFilter,
+    setFilters,
     resetFilters,
     generate,
     regenerate,

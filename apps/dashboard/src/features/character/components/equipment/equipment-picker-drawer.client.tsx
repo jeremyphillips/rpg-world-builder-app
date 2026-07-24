@@ -3,18 +3,11 @@
 import * as React from 'react'
 import { CircleAlert } from 'lucide-react'
 
-import {
-  CatalogFilterChips,
-  CatalogPickerSheet,
-  EmphasisDetailLine,
-  SegmentedControl,
-  Text,
-} from '@rpg/ui'
+import { CatalogPickerSheet, EmphasisDetailLine, SegmentedControl, Text } from '@rpg/ui'
+import { useSanitizedFilterState } from '@rpg/ui/filters'
 import {
   formatMoney,
   formatWealthAsGold,
-  getEquipmentKindLabel,
-  getMagicItemRarityLabel,
   isEquipmentPickerSupportedKind,
   isEquipmentStackable,
 } from '@rpg/contracts'
@@ -23,15 +16,12 @@ import {
   formatAddContentTypeLabel,
   getContentTypeItemLabel,
 } from '@/features/content/lib/content-type-labels'
-import { CatalogPickerFilterCheckbox } from '../picker/catalog-picker-filter-checkbox.client'
 import { catalogPickerShellProps } from '../picker/catalog-picker-shell.lib'
 import { CatalogSortControl } from '../picker/catalog-sort-control.client'
 import { pickerSortOption } from '../picker/catalog-picker-sort-labels.lib'
 import { CatalogToolbarResetSlot } from '../picker/catalog-toolbar-reset-action.client'
 import {
-  countEquipmentPickerAffordableHiddenImpact,
   countEquipmentPickerClearableCriteria,
-  countEquipmentPickerStructuredFilters,
   EQUIPMENT_PICKER_VIEW_DEFAULTS,
   filterAndSortEquipmentPickerItems,
   filterEquipmentPickerItems,
@@ -41,17 +31,22 @@ import {
   resolveEquipmentKindFilterOptions,
   resolveEquipmentPickerDrawerItemHeaderPresentation,
 } from './equipment-picker-drawer.lib'
+import {
+  countEquipmentPickerStructuredFilters,
+  createEquipmentPickerFilterSchema,
+  toEquipmentPickerFilterState,
+} from './equipment-picker-filter-schema'
+import {
+  EquipmentPickerFilterRowControls,
+  EquipmentPickerPrimaryFilterControls,
+} from './equipment-picker-filter-controls.client'
 import type { EquipmentPickerRowActionViewModel } from './equipment-picker-action.lib'
 import {
-  EQUIPMENT_PICKER_AFFORDABLE_NOW_LABEL,
-  EQUIPMENT_PICKER_CATEGORY_LABEL,
   EQUIPMENT_PICKER_CLEAR_FILTERS_LABEL,
-  EQUIPMENT_PICKER_KIND_ALL,
   EQUIPMENT_PICKER_MODE_LABELS,
   EQUIPMENT_PICKER_MODE_MAGIC_ITEMS,
   EQUIPMENT_PICKER_MODE_PURCHASE,
   EQUIPMENT_PICKER_RARITY_ALL,
-  EQUIPMENT_PICKER_RARITY_LABEL,
   EQUIPMENT_PICKER_RESET_VIEW_LABEL,
   EQUIPMENT_PICKER_SORT_LABEL,
   EQUIPMENT_PICKER_SORT_LABELS,
@@ -153,30 +148,6 @@ function EquipmentPickerToolbarActions({
   )
 }
 
-function EquipmentPickerAffordableFilter({
-  showAffordableOnly,
-  onShowAffordableOnlyChange,
-  showAffordableFilter,
-  affordableHiddenCount,
-}: {
-  showAffordableOnly: boolean
-  onShowAffordableOnlyChange: (checked: boolean) => void
-  showAffordableFilter: boolean
-  affordableHiddenCount: number
-}) {
-  if (!showAffordableFilter) return null
-
-  return (
-    <CatalogPickerFilterCheckbox
-      id="equipment-picker-affordable-now"
-      label={EQUIPMENT_PICKER_AFFORDABLE_NOW_LABEL}
-      checked={showAffordableOnly}
-      onCheckedChange={onShowAffordableOnlyChange}
-      hiddenCount={showAffordableOnly ? affordableHiddenCount : undefined}
-    />
-  )
-}
-
 function EquipmentPickerRowSummary({
   item,
   budget,
@@ -273,32 +244,79 @@ export function EquipmentPickerDrawer({
     }
   }, [open])
 
-  React.useEffect(() => {
-    setSelectedKind((current) => {
-      if (current === EQUIPMENT_PICKER_KIND_ALL) return current
-      return kindOptions.includes(current) ? current : EQUIPMENT_PICKER_KIND_ALL
-    })
-  }, [kindOptions])
-
-  const structuredFilterCount = countEquipmentPickerStructuredFilters({
-    selectedKind,
-    showAffordableOnly,
-    focusedAllowanceId,
-    workflowMode,
-  })
-
   const showRarityFilter =
     isMagicItemsWorkflow &&
     magicItemGrantProgress !== undefined &&
     magicItemGrantProgress.length > 1
   const selectedRarityFilter = focusedAllowanceId ?? EQUIPMENT_PICKER_RARITY_ALL
 
-  const handleSelectedRarityFilterChange = React.useCallback(
-    (value: string) => {
-      onFocusedAllowanceIdChange?.(value === EQUIPMENT_PICKER_RARITY_ALL ? undefined : value)
+  const showCategoryFilter = kindOptions.length > 1
+  const showAffordableFilter = Boolean(effectiveBudget)
+
+  const filterState = React.useMemo(
+    () =>
+      toEquipmentPickerFilterState({
+        selectedKind,
+        selectedRarity: selectedRarityFilter,
+        showAffordableOnly,
+      }),
+    [selectedKind, selectedRarityFilter, showAffordableOnly],
+  )
+
+  const schemaArgs = React.useMemo(
+    () => ({
+      workflowMode,
+      items: supportedItems,
+      kindOptions,
+      showCategoryFilter,
+      showRarityFilter,
+      showAffordableFilter,
+      magicItemGrantProgress,
+      filterOutUnaffordable,
+      filterOutNonProficient,
+      searchQuery: '',
+    }),
+    [
+      effectiveBudget,
+      filterOutNonProficient,
+      filterOutUnaffordable,
+      kindOptions,
+      magicItemGrantProgress,
+      showAffordableFilter,
+      showCategoryFilter,
+      showRarityFilter,
+      supportedItems,
+      workflowMode,
+    ],
+  )
+
+  const filterSchema = React.useMemo(
+    () => createEquipmentPickerFilterSchema(schemaArgs),
+    [schemaArgs],
+  )
+
+  const structuredFilterCount = countEquipmentPickerStructuredFilters(filterSchema, filterState)
+
+  const handleFilterStateChange = React.useCallback(
+    (next: typeof filterState) => {
+      if (next.selectedKind !== undefined) {
+        setSelectedKind(next.selectedKind)
+      }
+      if (next.selectedRarity !== undefined) {
+        onFocusedAllowanceIdChange?.(
+          next.selectedRarity === EQUIPMENT_PICKER_RARITY_ALL ? undefined : next.selectedRarity,
+        )
+      }
+      setShowAffordableOnly(next.showAffordableOnly === true)
     },
     [onFocusedAllowanceIdChange],
   )
+
+  useSanitizedFilterState({
+    schema: filterSchema,
+    state: filterState,
+    onStateChange: handleFilterStateChange,
+  })
 
   const filteredItems = React.useMemo(
     () =>
@@ -328,17 +346,11 @@ export function EquipmentPickerDrawer({
     [browseSortContext, sortMode, workflowMode],
   )
 
-  const handleSelectedKindChange = React.useCallback((kind: EquipmentPickerKindFilter) => {
-    setSelectedKind(kind)
-  }, [])
-
   const handleClearStructuredFilters = React.useCallback(() => {
     setSelectedKind(EQUIPMENT_PICKER_VIEW_DEFAULTS.selectedKind)
     setShowAffordableOnly(EQUIPMENT_PICKER_VIEW_DEFAULTS.showAffordableOnly)
     onFocusedAllowanceIdChange?.(undefined)
   }, [onFocusedAllowanceIdChange])
-
-  const showCategoryFilter = kindOptions.length > 1
 
   const handleHeaderCommit = React.useCallback(
     (item: EquipmentPickerItem): boolean => {
@@ -472,37 +484,11 @@ export function EquipmentPickerDrawer({
       }
       transformVisibleItems={transformVisibleItems}
       primaryControls={
-        showRarityFilter ? (
-          <CatalogFilterChips
-            id="equipment-picker-rarity"
-            label={EQUIPMENT_PICKER_RARITY_LABEL}
-            selectionMode="single-required"
-            value={selectedRarityFilter}
-            onValueChange={handleSelectedRarityFilterChange}
-            options={[
-              { value: EQUIPMENT_PICKER_RARITY_ALL, label: 'All' },
-              ...magicItemGrantProgress.map((entry) => ({
-                value: entry.allowanceId,
-                label: getMagicItemRarityLabel(entry.rarity),
-              })),
-            ]}
-          />
-        ) : showCategoryFilter ? (
-          <CatalogFilterChips
-            id="equipment-picker-category"
-            label={EQUIPMENT_PICKER_CATEGORY_LABEL}
-            selectionMode="single-required"
-            value={selectedKind}
-            onValueChange={(value) => handleSelectedKindChange(value as EquipmentPickerKindFilter)}
-            options={[
-              { value: EQUIPMENT_PICKER_KIND_ALL, label: 'All' },
-              ...kindOptions.map((kind) => ({
-                value: kind,
-                label: getEquipmentKindLabel(kind),
-              })),
-            ]}
-          />
-        ) : undefined
+        <EquipmentPickerPrimaryFilterControls
+          schemaArgs={schemaArgs}
+          filterState={filterState}
+          onFilterStateChange={handleFilterStateChange}
+        />
       }
       actions={({ searchQuery, resetSearchQuery }) => {
         const handleResetView = () => {
@@ -534,17 +520,10 @@ export function EquipmentPickerDrawer({
       }}
       filterRow={{
         controls: ({ searchQuery }) => (
-          <EquipmentPickerAffordableFilter
-            showAffordableOnly={showAffordableOnly}
-            onShowAffordableOnlyChange={setShowAffordableOnly}
-            showAffordableFilter={Boolean(effectiveBudget)}
-            affordableHiddenCount={countEquipmentPickerAffordableHiddenImpact(supportedItems, {
-              searchQuery,
-              filterOutUnaffordable,
-              filterOutNonProficient,
-              selectedKind,
-              showAffordableOnly,
-            })}
+          <EquipmentPickerFilterRowControls
+            schemaArgs={{ ...schemaArgs, searchQuery }}
+            filterState={filterState}
+            onFilterStateChange={handleFilterStateChange}
           />
         ),
         actions: (

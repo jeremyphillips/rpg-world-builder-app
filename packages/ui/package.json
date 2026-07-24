@@ -19,6 +19,10 @@
       "types": "./src/form/index.ts",
       "default": "./src/form/index.ts"
     },
+    "./filters": {
+      "types": "./src/filters/index.ts",
+      "default": "./src/filters/index.ts"
+    },
     "./form/test-utils": {
       "types": "./src/form/test-utils/index.ts",
       "default": "./src/form/test-utils/index.ts"

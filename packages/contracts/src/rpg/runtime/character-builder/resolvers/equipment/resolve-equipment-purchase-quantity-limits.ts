@@ -106,38 +106,34 @@ export function formatEquipmentPurchaseUnitPriceLabel(equipment: Equipment): str
   return `${formatMoney(equipment.cost)} each`
 }
 
-/** Single-line price copy for inventory rows. */
-export function formatEquipmentInventoryPriceLine(args: {
-  equipment: Equipment
-  quantity: number
-  /** Package grants use a "value" suffix; starting-gold purchases do not. */
-  priceContext: 'package' | 'startingGold'
-}): string {
-  const { equipment, quantity, priceContext } = args
-  if (!canPurchaseEquipment(equipment)) return ''
-  const stackable = isEquipmentStackable(equipment)
-  const bundled = isBundledEquipment(equipment)
-  const unitPrice = formatMoney(equipment.cost)
+function formatBundledInventoryPriceLine(
+  equipment: Equipment,
+  quantity: number,
+  unitPrice: string,
+): string {
   const bundleLabel = formatEquipmentBundleLabel(equipment)
-  const useValueSuffix = priceContext === 'package'
+  const unitCopy = `${unitPrice} per bundle`
 
-  if (bundled) {
-    const unitCopy = `${unitPrice} per bundle`
-
-    if (quantity <= 1) {
-      return bundleLabel ? `${unitCopy} · ${bundleLabel}` : unitCopy
-    }
-
-    const parts = [unitCopy, `${formatEquipmentPurchaseTotalPriceLabel(equipment, quantity)} total`]
-    if (bundleLabel) parts.push(bundleLabel)
-    return parts.join(' · ')
+  if (quantity <= 1) {
+    return bundleLabel ? `${unitCopy} · ${bundleLabel}` : unitCopy
   }
 
-  if (stackable && !useValueSuffix) {
-    if (quantity <= 1) {
-      return unitPrice
-    }
+  const parts = [unitCopy, `${formatEquipmentPurchaseTotalPriceLabel(equipment, quantity)} total`]
+  if (bundleLabel) parts.push(bundleLabel)
+  return parts.join(' · ')
+}
 
+function formatNonBundledInventoryPriceLine(args: {
+  equipment: Equipment
+  quantity: number
+  unitPrice: string
+  stackable: boolean
+  useValueSuffix: boolean
+}): string {
+  const { equipment, quantity, unitPrice, stackable, useValueSuffix } = args
+
+  if (stackable && !useValueSuffix) {
+    if (quantity <= 1) return unitPrice
     return `${unitPrice} each · ${formatEquipmentPurchaseTotalPriceLabel(equipment, quantity)} total`
   }
 
@@ -149,6 +145,30 @@ export function formatEquipmentInventoryPriceLine(args: {
   return useValueSuffix
     ? `${unitPrice} value · ${total} total value`
     : `${unitPrice} · ${total} total`
+}
+
+/** Single-line price copy for inventory rows. */
+export function formatEquipmentInventoryPriceLine(args: {
+  equipment: Equipment
+  quantity: number
+  /** Package grants use a "value" suffix; starting-gold purchases do not. */
+  priceContext: 'package' | 'startingGold'
+}): string {
+  const { equipment, quantity, priceContext } = args
+  if (!canPurchaseEquipment(equipment)) return ''
+
+  const unitPrice = formatMoney(equipment.cost)
+  if (isBundledEquipment(equipment)) {
+    return formatBundledInventoryPriceLine(equipment, quantity, unitPrice)
+  }
+
+  return formatNonBundledInventoryPriceLine({
+    equipment,
+    quantity,
+    unitPrice,
+    stackable: isEquipmentStackable(equipment),
+    useValueSuffix: priceContext === 'package',
+  })
 }
 
 /** Muted bundle copy for inventory/picker surfaces (purchase units, not item units). */

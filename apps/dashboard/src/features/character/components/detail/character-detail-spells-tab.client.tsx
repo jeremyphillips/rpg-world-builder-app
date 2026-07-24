@@ -2,7 +2,8 @@
 
 import * as React from 'react'
 
-import { CatalogFilterChips, CatalogToolbar, CollapsibleListItem, Text } from '@rpg/ui'
+import { CatalogToolbar, CollapsibleListItem, Text } from '@rpg/ui'
+import { useSanitizedFilterState } from '@rpg/ui/filters'
 
 import {
   buildCatalogDisclosureLabel,
@@ -15,15 +16,17 @@ import {
 } from '@/features/content'
 import { CHARACTER_EMPTY_SECTION_TEXT } from '../../lib/character-display'
 import {
-  CHARACTER_DETAIL_SPELL_LEVEL_LABEL,
+  createCharacterDetailSpellFilterSchema,
+  countCharacterDetailSpellStructuredFilters,
+  type CharacterDetailSpellFilterState,
+} from '../../lib/detail/character-detail-spell-filter-schema'
+import {
   CHARACTER_DETAIL_SPELL_RESET_VIEW_LABEL,
   CHARACTER_DETAIL_SPELL_SEARCH_MIN_ITEMS,
   CHARACTER_DETAIL_SPELL_SEARCH_PLACEHOLDER,
   CHARACTER_DETAIL_SPELL_VIEW_DEFAULTS,
-  countCharacterDetailSpellStructuredFilters,
   filterCharacterDetailSpellCards,
   resolveCharacterDetailSpellLevelChipOptions,
-  type CharacterDetailSpellLevelFilter,
 } from '../../lib/detail/character-detail-spell-filters.lib'
 import {
   toSpellCatalogHeaderModel,
@@ -31,6 +34,7 @@ import {
 } from '../../lib/detail/character-sheet-catalog'
 import { hasCatalogPickerResetViewCriteria } from '../picker/catalog-picker-filter-state.lib'
 import { CatalogToolbarResetAction } from '../picker/catalog-toolbar-reset-action.client'
+import { CharacterDetailSpellFilterControls } from './character-detail-spell-filter-controls.client'
 
 export type CharacterDetailSpellsTabProps = {
   cards: readonly CharacterSheetSpellCard[]
@@ -81,39 +85,41 @@ function SpellCatalogRow({ card }: { card: CharacterSheetSpellCard }) {
 }
 
 export function CharacterDetailSpellsTab({ cards }: CharacterDetailSpellsTabProps) {
-  const [selectedLevel, setSelectedLevel] = React.useState<CharacterDetailSpellLevelFilter>(
-    CHARACTER_DETAIL_SPELL_VIEW_DEFAULTS.selectedLevel,
-  )
+  const [filterState, setFilterState] = React.useState<CharacterDetailSpellFilterState>({
+    selectedLevel: CHARACTER_DETAIL_SPELL_VIEW_DEFAULTS.selectedLevel,
+  })
   const [searchQuery, setSearchQuery] = React.useState<string>(
     CHARACTER_DETAIL_SPELL_VIEW_DEFAULTS.searchQuery,
   )
 
-  const levelOptions = React.useMemo(
-    () => resolveCharacterDetailSpellLevelChipOptions(cards),
-    [cards],
+  const showLevelFilter = resolveCharacterDetailSpellLevelChipOptions(cards).length > 1
+  const schemaArgs = React.useMemo(() => ({ cards, showLevelFilter }), [cards, showLevelFilter])
+  const filterSchema = React.useMemo(
+    () => createCharacterDetailSpellFilterSchema(schemaArgs),
+    [schemaArgs],
   )
 
-  React.useEffect(() => {
-    setSelectedLevel((current) => {
-      if (current === CHARACTER_DETAIL_SPELL_VIEW_DEFAULTS.selectedLevel) return current
-      return levelOptions.some((option) => option.value === current)
-        ? current
-        : CHARACTER_DETAIL_SPELL_VIEW_DEFAULTS.selectedLevel
-    })
-  }, [levelOptions])
+  useSanitizedFilterState({
+    schema: filterSchema,
+    state: filterState,
+    onStateChange: setFilterState,
+  })
 
   const visibleCards = React.useMemo(
     () =>
       filterCharacterDetailSpellCards(cards, {
-        selectedLevel,
+        schema: filterSchema,
+        filterState,
         searchQuery,
       }),
-    [cards, searchQuery, selectedLevel],
+    [cards, filterSchema, filterState, searchQuery],
   )
 
-  const showLevelFilter = levelOptions.length > 1
   const showSearch = cards.length >= CHARACTER_DETAIL_SPELL_SEARCH_MIN_ITEMS
-  const structuredFilterCount = countCharacterDetailSpellStructuredFilters(selectedLevel)
+  const structuredFilterCount = countCharacterDetailSpellStructuredFilters(
+    filterSchema,
+    filterState,
+  )
   const showResetView = hasCatalogPickerResetViewCriteria({
     structuredFilterCount,
     searchQuery,
@@ -122,7 +128,7 @@ export function CharacterDetailSpellsTab({ cards }: CharacterDetailSpellsTabProp
   })
 
   const handleResetView = () => {
-    setSelectedLevel(CHARACTER_DETAIL_SPELL_VIEW_DEFAULTS.selectedLevel)
+    setFilterState({ selectedLevel: CHARACTER_DETAIL_SPELL_VIEW_DEFAULTS.selectedLevel })
     setSearchQuery(CHARACTER_DETAIL_SPELL_VIEW_DEFAULTS.searchQuery)
   }
 
@@ -145,13 +151,10 @@ export function CharacterDetailSpellsTab({ cards }: CharacterDetailSpellsTabProp
         }
         primaryControls={
           showLevelFilter ? (
-            <CatalogFilterChips
-              id="character-detail-spell-levels"
-              label={CHARACTER_DETAIL_SPELL_LEVEL_LABEL}
-              selectionMode="single-required"
-              value={selectedLevel}
-              onValueChange={setSelectedLevel}
-              options={levelOptions}
+            <CharacterDetailSpellFilterControls
+              schemaArgs={schemaArgs}
+              filterState={filterState}
+              onFilterStateChange={setFilterState}
             />
           ) : undefined
         }

@@ -11,6 +11,15 @@ describe('RichTextField', () => {
     expect(screen.getByRole('button', { name: 'Bold' })).toBeInTheDocument()
   })
 
+  it('keeps the editor shell full width inside the control band', () => {
+    const { container } = render(<RichTextField id="bio" label="Biography" />)
+    const band = container.querySelector('[data-field-align] > .flex.w-full')
+    const editor = screen.getByRole('textbox', { name: 'Biography' }).closest('.relative')
+
+    expect(band).toHaveClass('w-full', 'min-w-0')
+    expect(editor).toHaveClass('w-full', 'min-w-0')
+  })
+
   it('applies field size to the label and matching prose scale', () => {
     render(<RichTextField id="bio" label="Biography" size="sm" />)
     expect(screen.getByText('Biography')).toHaveClass('text-xs')

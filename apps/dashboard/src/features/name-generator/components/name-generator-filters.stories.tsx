@@ -1,12 +1,15 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
+import { useMemo, useState } from 'react'
 
 import {
   composeNameGeneratorConventions,
   type SpeciesCultureInput,
 } from '../model/compose-name-generator-conventions'
-import { deriveFilterOptions, deriveVisibleFilters } from '../model/derive-filter-options'
+import { deriveFilterOptions } from '../model/derive-filter-options'
+import { createNameGeneratorFilterSchema } from '../model/name-generator-filter-schema'
 import { resetNameGeneratorFilters } from '../model/sanitize-filters-on-change'
-import { NameGeneratorFilters } from './name-generator-filters.client'
+import type { NameGeneratorFilters } from '../model/name-generator-filters'
+import { NameGeneratorFilters as NameGeneratorFiltersPanel } from './name-generator-filters.client'
 
 const STORY_ELF_SPECIES: SpeciesCultureInput = {
   id: 'srd-cc-5.2.1:elf',
@@ -32,64 +35,62 @@ const filterContext = {
     },
   ],
 }
-const defaultFilters = resetNameGeneratorFilters()
+const cultureContexts = filterContext.cultures
+
+function NameGeneratorFiltersStory({ initialFilters }: { initialFilters: NameGeneratorFilters }) {
+  const [filters, setFilters] = useState(initialFilters)
+  const filterOptions = deriveFilterOptions(filters, conventions, filterContext)
+  const schema = useMemo(
+    () =>
+      createNameGeneratorFilterSchema({
+        conventions,
+        filterContext,
+        cultureContexts,
+        filterOptions,
+      }),
+    [filterOptions, filters],
+  )
+
+  return (
+    <NameGeneratorFiltersPanel
+      schema={schema}
+      filters={filters}
+      onFilterChange={setFilters}
+      onResetFilters={() => setFilters(resetNameGeneratorFilters())}
+    />
+  )
+}
 
 const meta = {
   title: 'Dashboard/Name Generator/Filters',
-  component: NameGeneratorFilters,
-  args: {
-    filters: defaultFilters,
-    filterOptions: deriveFilterOptions(defaultFilters, conventions, filterContext),
-    visibleFilters: deriveVisibleFilters(defaultFilters, conventions, filterContext),
-    onFilterChange: () => undefined,
-    onResetFilters: () => undefined,
-  },
-} satisfies Meta<typeof NameGeneratorFilters>
+  component: NameGeneratorFiltersStory,
+} satisfies Meta<typeof NameGeneratorFiltersStory>
 
 export default meta
 
 type Story = StoryObj<typeof meta>
 
-export const PersonDefaults: Story = {}
+export const PersonDefaults: Story = {
+  args: { initialFilters: resetNameGeneratorFilters() },
+  render: (args) => <NameGeneratorFiltersStory initialFilters={args.initialFilters} />,
+}
 
 export const ElvishContext: Story = {
   args: {
-    filters: {
+    initialFilters: {
       subjectKind: 'person',
       languageId: 'elvish',
       cultureId: 'elven',
       speciesId: 'srd-cc-5.2.1:elf',
       genderStyle: 'feminine',
     },
-    filterOptions: deriveFilterOptions(
-      {
-        subjectKind: 'person',
-        languageId: 'elvish',
-        cultureId: 'elven',
-        speciesId: 'srd-cc-5.2.1:elf',
-        genderStyle: 'feminine',
-      },
-      conventions,
-      filterContext,
-    ),
-    visibleFilters: deriveVisibleFilters(
-      {
-        subjectKind: 'person',
-        languageId: 'elvish',
-        cultureId: 'elven',
-        speciesId: 'srd-cc-5.2.1:elf',
-        genderStyle: 'feminine',
-      },
-      conventions,
-      filterContext,
-    ),
   },
+  render: (args) => <NameGeneratorFiltersStory initialFilters={args.initialFilters} />,
 }
 
 export const SettlementSubject: Story = {
   args: {
-    filters: { subjectKind: 'settlement' },
-    filterOptions: deriveFilterOptions({ subjectKind: 'settlement' }, conventions, filterContext),
-    visibleFilters: deriveVisibleFilters({ subjectKind: 'settlement' }, conventions, filterContext),
+    initialFilters: { subjectKind: 'settlement' },
   },
+  render: (args) => <NameGeneratorFiltersStory initialFilters={args.initialFilters} />,
 }

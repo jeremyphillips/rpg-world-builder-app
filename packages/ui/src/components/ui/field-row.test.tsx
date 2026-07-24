@@ -37,7 +37,7 @@ describe('FieldRow', () => {
     expect(fieldRoot).toHaveClass('in-data-[field-row]:w-64')
   })
 
-  it('renders its child fields side by side', () => {
+  it('renders its child fields side by side with control-edge alignment', () => {
     const { container } = render(
       <FieldRow>
         <TextField id="first" label="First name" />
@@ -47,7 +47,21 @@ describe('FieldRow', () => {
     expect(screen.getByLabelText('First name')).toBeInTheDocument()
     expect(screen.getByLabelText('Last name')).toBeInTheDocument()
     expect(container.firstChild).toHaveClass('flex')
+    expect(container.firstChild).toHaveClass('items-end')
     expect(container.firstChild).not.toHaveClass('grid')
+  })
+
+  it('wraps each field’s label + control band in a data-field-align anchor', () => {
+    const { container } = render(
+      <FieldRow>
+        <TextField id="first" label="First name" />
+      </FieldRow>,
+    )
+
+    const anchor = container.querySelector('[data-field-align]')
+    expect(anchor).not.toBeNull()
+    expect(anchor).toContainElement(screen.getByText('First name'))
+    expect(anchor).toContainElement(screen.getByLabelText('First name'))
   })
 
   it('has no axe accessibility violations', async () => {

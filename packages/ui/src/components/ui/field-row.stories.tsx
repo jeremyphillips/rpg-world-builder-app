@@ -8,6 +8,7 @@ import { TextField } from './text-field'
 import { NumberField } from './number-field'
 import { SelectField } from './select-field'
 import { InputSelectField, InputUnitField } from './input-select-field.client'
+import { CheckboxField } from './checkbox-field'
 import { SwitchField } from './switch-field'
 import { DiceFormulaField } from './dice-formula-field.client'
 
@@ -194,4 +195,29 @@ function RangeRowHarness() {
 /** Select + inputUnit + inputUnit — label baselines should align (weapon range row). */
 export const LabeledRowWithInputUnit: Story = {
   render: () => <RangeRowHarness />,
+}
+
+function MixedStackedInlineWithErrorHarness() {
+  return (
+    <FieldRow>
+      <SelectField
+        id="hit-die"
+        label="Hit Die"
+        width="md"
+        defaultValue="8"
+        options={[
+          { label: 'd6', value: '6' },
+          { label: 'd8', value: '8' },
+          { label: 'd10', value: '10' },
+        ]}
+      />
+      <CheckboxField id="spellcasting" label="Has Spellcasting" />
+      <TextField id="name" label="Name" width="full" error="Name is required." />
+    </FieldRow>
+  )
+}
+
+/** Stacked select + inline checkbox + sibling error — control bands share the baseline. */
+export const MixedStackedInlineWithError: Story = {
+  render: () => <MixedStackedInlineWithErrorHarness />,
 }

@@ -1,6 +1,6 @@
 export {
   adventuringGearColumns,
-  adventuringGearFilters,
+  adventuringGearFilterSchema,
 } from './lib/adventuring-gear-overview-columns'
 export { ADVENTURING_GEAR_LIST, ARROWS, TORCH } from './fixtures'
 export { adventuringGearFormFieldGroup } from './lib/adventuring-gear-form-fields'

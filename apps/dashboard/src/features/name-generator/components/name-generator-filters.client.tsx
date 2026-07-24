@@ -1,44 +1,46 @@
 'use client'
 
-import { FilterToolbar } from '@rpg/ui'
+import { FilterBar, setFilterValue, type FilterSchema } from '@rpg/ui/filters'
 import { useMemo } from 'react'
 
-import { buildNameGeneratorFilterFields } from '../model/name-generator-filter-fields'
-import type {
-  NameGeneratorFilterOptions,
-  NameGeneratorFilters,
-  NameGeneratorVisibleFilters,
-} from '../model/name-generator-filters'
+import type { GeneratedName } from '@rpg/contracts/name-generator'
+
+import type { NameGeneratorFilters } from '../model/name-generator-filters'
 
 export type NameGeneratorFiltersProps = {
+  schema: FilterSchema<GeneratedName, NameGeneratorFilters>
   filters: NameGeneratorFilters
-  filterOptions: NameGeneratorFilterOptions
-  visibleFilters: NameGeneratorVisibleFilters
   disabled?: boolean
-  onFilterChange: (key: keyof NameGeneratorFilters, value: string | undefined) => void
+  onFilterChange: (filters: NameGeneratorFilters) => void
   onResetFilters: () => void
 }
 
 export function NameGeneratorFilters({
+  schema,
   filters,
-  filterOptions,
-  visibleFilters,
   disabled = false,
   onFilterChange,
   onResetFilters,
 }: NameGeneratorFiltersProps) {
-  const fields = useMemo(
-    () => buildNameGeneratorFilterFields({ filterOptions, visibleFilters }),
-    [filterOptions, visibleFilters],
+  const handleValueChange = useMemo(
+    () =>
+      (
+        id: keyof NameGeneratorFilters,
+        value: NameGeneratorFilters[keyof NameGeneratorFilters] | undefined,
+      ) => {
+        onFilterChange(setFilterValue(schema, filters, id, value))
+      },
+    [filters, onFilterChange, schema],
   )
 
   return (
-    <FilterToolbar
-      idPrefix="name-generator"
-      fields={fields}
-      values={filters}
+    <FilterBar
+      schema={schema}
+      state={filters}
       disabled={disabled}
-      onValueChange={onFilterChange}
+      idPrefix="name-generator"
+      resetLabel="Reset filters"
+      onValueChange={handleValueChange}
       onReset={onResetFilters}
     />
   )

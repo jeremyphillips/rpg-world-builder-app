@@ -17,7 +17,7 @@ const { loadFamilyTableConfig } = equipmentFamilyColumns
 
 const mockConfig: FamilyTableConfig = {
   columns: [{ accessorKey: 'name', header: 'Name' }],
-  filters: [],
+  filterSchema: { fields: [] },
 }
 
 describe('useFamilyTableConfig', () => {

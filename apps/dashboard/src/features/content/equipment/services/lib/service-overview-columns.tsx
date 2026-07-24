@@ -1,14 +1,24 @@
-import type { ServiceEquipment } from '@rpg/contracts'
+import type { ServiceEquipment, WithCampaignAccess } from '@rpg/contracts'
 import { SERVICE_CATEGORIES, formatServiceDuration, getServiceCategoryLabel } from '@rpg/contracts'
 import { SortableHeader } from '@rpg/ui'
-import type { ColumnDef, FilterDef } from '@rpg/ui'
+import type { ColumnDef } from '@rpg/ui'
+import { createEqualsFilter } from '@rpg/ui/filters'
 
 import { ROUTES } from '@/app/routes'
 import {
   buildContentColumns,
-  buildContentFilters,
   costColumn,
 } from '../../../lib/overview/content-table-config'
+import {
+  buildContentFilterSchema,
+  type ContentOverviewBaseFilterState,
+} from '../../../lib/overview/content-overview-filter-schema'
+
+type ServiceRow = WithCampaignAccess<ServiceEquipment>
+
+export type ServiceOverviewFilterState = ContentOverviewBaseFilterState & {
+  serviceCategory?: string
+}
 
 const SERVICE_MIDDLE_COLUMNS: ColumnDef<ServiceEquipment>[] = [
   {
@@ -30,17 +40,20 @@ const SERVICE_MIDDLE_COLUMNS: ColumnDef<ServiceEquipment>[] = [
   costColumn<ServiceEquipment>(),
 ]
 
-const SERVICE_SPECIFIC_FILTERS: FilterDef[] = [
-  {
-    type: 'select',
+export const serviceFilterSchema = buildContentFilterSchema<
+  ServiceRow,
+  ServiceOverviewFilterState
+>([
+  createEqualsFilter<ServiceRow, ServiceOverviewFilterState, 'serviceCategory', string>({
     id: 'serviceCategory',
     label: 'Category',
     options: SERVICE_CATEGORIES.map((category) => ({
       label: getServiceCategoryLabel(category),
       value: category,
     })),
-  },
-]
+    getValue: (row) => row.serviceCategory,
+  }),
+])
 
 /** Service column definitions with the name cell linked to the detail page. */
 export function serviceColumns(campaignId: string) {
@@ -48,5 +61,3 @@ export function serviceColumns(campaignId: string) {
     nameHref: (row) => ROUTES.content.equipment.detail(campaignId, 'services', row.id),
   })
 }
-
-export const serviceFilters = buildContentFilters(SERVICE_SPECIFIC_FILTERS)

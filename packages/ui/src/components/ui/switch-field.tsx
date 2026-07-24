@@ -15,6 +15,7 @@ import {
   type FieldLabelPosition,
 } from './field.variants'
 import type { FieldWidth } from './field-control.variants'
+import { resolveFieldPresentation } from './field-row-presentation.lib'
 
 export type SwitchLabelPosition = FieldLabelPosition | 'inline'
 
@@ -108,6 +109,13 @@ export function SwitchField({
     )
   }
 
+  const presentation = resolveFieldPresentation({
+    size,
+    labelLayout: 'inline',
+    // Hint-bearing toggles keep first-line alignment — not a fixed single-line band.
+    controlBand: 'content-sized',
+  })
+
   return (
     <Field.Root
       id={id}
@@ -120,15 +128,19 @@ export function SwitchField({
       size={size}
     >
       <FieldChromeShell chrome={chrome} size={size}>
-        <div className={fieldInlineToggleRowClasses}>
-          <div className={fieldInlineSwitchControlColumnClasses}>
-            <Field.Control>
-              <Switch {...switchProps} />
-            </Field.Control>
-          </div>
-          <div className={fieldLabelHintStackClasses}>
-            {labelNode}
-            <Field.Hint />
+        <div data-field-align="" className={presentation.alignmentAnchorClassName}>
+          <div className={presentation.controlBandClassName}>
+            <div className={fieldInlineToggleRowClasses}>
+              <div className={fieldInlineSwitchControlColumnClasses}>
+                <Field.Control>
+                  <Switch {...switchProps} />
+                </Field.Control>
+              </div>
+              <div className={fieldLabelHintStackClasses}>
+                {labelNode}
+                <Field.Hint />
+              </div>
+            </div>
           </div>
         </div>
       </FieldChromeShell>

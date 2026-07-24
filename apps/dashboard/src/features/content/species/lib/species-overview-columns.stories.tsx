@@ -5,7 +5,7 @@ import { buildSeedCreatureTypeVocabulary } from '@/features/homebrew'
 
 import { STORY_CAMPAIGN_ID } from '../../lib/fixtures/constants'
 import { SPECIES_LIST } from '../fixtures'
-import { speciesColumns, speciesFilters } from './species-overview-columns'
+import { speciesColumns } from './species-overview-columns'
 
 const storyVocabulary = buildSeedCreatureTypeVocabulary()
 
@@ -23,7 +23,6 @@ export const Default: Story = {
     <DataTable
       columns={speciesColumns(STORY_CAMPAIGN_ID, storyVocabulary)}
       data={[...SPECIES_LIST]}
-      filters={speciesFilters(storyVocabulary)}
       caption="Playable species available in this campaign"
     />
   ),

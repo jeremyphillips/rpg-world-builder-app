@@ -26,7 +26,11 @@ export interface FieldReadOnlyValueProps {
   ariaLabel?: string
 }
 
-/** Compact read-only value segment — use inside custom layouts or `FieldReadOnlyValueField`. */
+/**
+ * Compact read-only value segment — use inside custom layouts or `FieldReadOnlyValueField`.
+ * When used in a `FieldRow` via `FieldReadOnlyValueField`, the shared control band comes from
+ * `FieldLayout` / `FormField` — do not wrap this span in a second band.
+ */
 export function FieldReadOnlyValue({
   id,
   displayValue,

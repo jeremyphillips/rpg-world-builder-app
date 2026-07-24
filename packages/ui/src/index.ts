@@ -292,6 +292,25 @@ export {
   type FieldStackRhythm,
 } from './components/ui/field.variants'
 export {
+  fieldControlBandVariants,
+  fieldRowVariants,
+  type FieldControlBand,
+  type FieldControlBandVariantProps,
+  type FieldRowAlignment,
+  type FieldRowLayout,
+  type FieldRowVariantProps,
+} from './components/ui/field-control-band.variants'
+export {
+  mapFormLabelPositionToLayout,
+  resolveFieldActionBandClassName,
+  resolveFieldPresentation,
+  resolveFieldRowClasses,
+  type FieldLabelLayout,
+  type FieldPresentationConfig,
+  type FieldRowConfig,
+  type FieldRowPresentation,
+} from './components/ui/field-row-presentation.lib'
+export {
   resolveFieldDependentsChromeClasses,
   type FieldDependentsScope,
 } from './components/ui/field-dependent.variants'
@@ -447,14 +466,6 @@ export {
   type FilterPopoverProps,
 } from './components/ui/filter-popover.client'
 export {
-  FilterToolbar,
-  type FilterFieldConfig,
-  type FilterToolbarLabelLayout,
-  type FilterToolbarOption,
-  type FilterToolbarProps,
-  type SelectFilterFieldConfig,
-} from './components/ui/filter-toolbar.client'
-export {
   SegmentedControl,
   type SegmentedControlOption,
   type SegmentedControlProps,
@@ -578,6 +589,16 @@ export {
 } from './components/ui/breadcrumb.client'
 
 export {
+  areColumnChangeStatesEqual,
+  areColumnOrdersEqual,
+  areVisibilityStatesEqual,
+  createColumnChangeSnapshot,
+  createPersistedColumnChangeState,
+  isInternalDataTableColumnId,
+  normalizeColumnOrderForPersist,
+  normalizeColumnVisibilityForPersist,
+} from './components/ui/data-table-column-change.lib'
+export {
   BooleanCell,
   DataTable,
   NameCell,
@@ -606,11 +627,6 @@ export type {
   ColumnChangeState,
   DataTableEmptyStateContext,
   DataTableProps,
-  FilterDef,
-  TextFilterDef,
-  SelectFilterDef,
-  BooleanFilterDef,
-  FilterGroup,
 } from './components/ui/data-table.types'
 export type { ColumnDef } from '@tanstack/react-table'
 export {

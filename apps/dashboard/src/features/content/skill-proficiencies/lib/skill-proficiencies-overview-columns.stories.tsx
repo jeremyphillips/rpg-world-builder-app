@@ -3,10 +3,7 @@ import { DataTable } from '@rpg/ui'
 
 import { STORY_CAMPAIGN_ID } from '../../lib/fixtures/constants'
 import { SKILLS_LIST } from '../fixtures'
-import {
-  skillProficienciesColumns,
-  skillProficienciesFilters,
-} from './skill-proficiencies-overview-columns'
+import { skillProficienciesColumns } from './skill-proficiencies-overview-columns'
 
 const meta = {
   title: 'Content/SkillProficiencies/SkillProficienciesOverviewColumns',
@@ -22,7 +19,6 @@ export const Default: Story = {
     <DataTable
       columns={skillProficienciesColumns(STORY_CAMPAIGN_ID)}
       data={[...SKILLS_LIST]}
-      filters={skillProficienciesFilters}
       caption="Skill proficiencies available in this campaign"
     />
   ),

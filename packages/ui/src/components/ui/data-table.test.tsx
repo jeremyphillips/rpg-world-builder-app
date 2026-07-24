@@ -2,16 +2,7 @@ import { describe, expect, it, vi } from 'vitest'
 import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { expectNoAxeViolations } from '@rpg/ui/test-utils'
-import type { ColumnDef, FilterFn } from '@tanstack/react-table'
-
-// Pull in the FilterFns augmentation from the component module so that
-// `filterFn: 'boolean'` is a valid string literal in test column defs.
-declare module '@tanstack/react-table' {
-  interface FilterFns {
-    boolean: FilterFn<unknown>
-    equalsString: FilterFn<unknown>
-  }
-}
+import type { ColumnDef } from '@tanstack/react-table'
 
 import {
   BooleanCell,
@@ -21,7 +12,6 @@ import {
   SortableHeader,
   TableBadgeCell,
 } from './data-table.client'
-import type { FilterDef } from './data-table.types'
 
 // ---------------------------------------------------------------------------
 // Fixtures
@@ -55,35 +45,11 @@ const COLUMNS: ColumnDef<Item>[] = [
     accessorKey: 'active',
     header: 'Active',
     cell: ({ row }) => <BooleanCell value={row.getValue('active')} />,
-    filterFn: 'boolean',
   },
-]
-
-const FILTERS: FilterDef[] = [
-  { type: 'text', id: 'name', label: 'Name', placeholder: 'Search name…' },
-  {
-    type: 'select',
-    id: 'category',
-    label: 'Category',
-    options: [
-      { label: 'Warrior', value: 'warrior' },
-      { label: 'Caster', value: 'caster' },
-      { label: 'Rogue', value: 'rogue' },
-    ],
-  },
-  { type: 'boolean', id: 'active', label: 'Active only' },
 ]
 
 function renderTable(overrides: Partial<Parameters<typeof DataTable<Item>>[0]> = {}) {
-  return render(
-    <DataTable
-      columns={COLUMNS}
-      data={DATA}
-      filters={FILTERS}
-      defaultPageSize={10}
-      {...overrides}
-    />,
-  )
+  return render(<DataTable columns={COLUMNS} data={DATA} defaultPageSize={10} {...overrides} />)
 }
 
 // ---------------------------------------------------------------------------
@@ -122,17 +88,8 @@ describe('DataTable — rendering', () => {
     expect(caption).toHaveClass('text-sm-meta', 'italic', 'text-muted-foreground')
   })
 
-  it('renders the primary filter controls', () => {
+  it('renders the Columns button', () => {
     renderTable()
-    // Text filter input
-    expect(screen.getByRole('textbox', { name: 'Name' })).toBeInTheDocument()
-    // Select trigger (Radix renders as combobox)
-    expect(screen.getByRole('combobox', { name: 'Category' })).toBeInTheDocument()
-  })
-
-  it('renders the Filters and Columns buttons', () => {
-    renderTable()
-    expect(screen.getByRole('button', { name: /^Filters/ })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /columns/i })).toBeInTheDocument()
   })
 })
@@ -211,7 +168,7 @@ describe('DataTable — sorting', () => {
       },
     ]
 
-    renderTable({ columns: tonedColumns, filters: [] })
+    renderTable({ columns: tonedColumns })
 
     const rows = screen.getAllByRole('row').slice(1)
     const firstRowCells = within(rows[0]!).getAllByRole('cell')
@@ -226,142 +183,12 @@ describe('DataTable — sorting', () => {
 })
 
 // ---------------------------------------------------------------------------
-// Text filter
-// ---------------------------------------------------------------------------
-
-describe('DataTable — text filter', () => {
-  it('narrows rows as the user types', async () => {
-    const user = userEvent.setup()
-    renderTable()
-
-    const input = screen.getByRole('textbox', { name: 'Name' })
-    await user.type(input, 'al')
-
-    // "Alpha" matches (case-insensitive includesString); others vanish
-    expect(screen.getByText('Alpha')).toBeInTheDocument()
-    expect(screen.queryByText('Beta')).not.toBeInTheDocument()
-  })
-
-  it('shows all rows when the text filter is cleared', async () => {
-    const user = userEvent.setup()
-    renderTable()
-
-    const input = screen.getByRole('textbox', { name: 'Name' })
-    await user.type(input, 'al')
-    expect(screen.queryByText('Beta')).not.toBeInTheDocument()
-
-    await user.clear(input)
-    expect(screen.getByText('Beta')).toBeInTheDocument()
-  })
-
-  it('resets pagination to page 1 when a filter is applied', async () => {
-    const user = userEvent.setup()
-    // Use a small page size so there's a second page
-    renderTable({ defaultPageSize: 2 })
-
-    // Go to page 2
-    await user.click(screen.getByRole('button', { name: 'Go to next page' }))
-    expect(screen.getByText(/3–4 of 5/)).toBeInTheDocument()
-
-    // Applying a filter should jump back to page 1
-    await user.type(screen.getByRole('textbox', { name: 'Name' }), 'al')
-    expect(screen.getByText(/1–/)).toBeInTheDocument()
-  })
-})
-
-// ---------------------------------------------------------------------------
-// Boolean filter (secondary group — collapsible panel, no portal)
-// ---------------------------------------------------------------------------
-
-describe('DataTable — boolean filter', () => {
-  it('opens the advanced panel and shows secondary filters', async () => {
-    const user = userEvent.setup()
-    renderTable()
-
-    // Panel is closed initially — boolean filter label should not be visible
-    expect(screen.queryByRole('checkbox', { name: 'Active only' })).not.toBeInTheDocument()
-
-    await user.click(screen.getByRole('button', { name: /^Filters/ }))
-    expect(screen.getByRole('checkbox', { name: 'Active only' })).toBeInTheDocument()
-  })
-
-  it('shows only active rows when the boolean filter is checked', async () => {
-    const user = userEvent.setup()
-    renderTable()
-
-    await user.click(screen.getByRole('button', { name: /^Filters/ }))
-    await user.click(screen.getByRole('checkbox', { name: 'Active only' }))
-
-    // Active items: Alpha, Gamma, Epsilon
-    expect(screen.getByText('Alpha')).toBeInTheDocument()
-    expect(screen.getByText('Gamma')).toBeInTheDocument()
-    expect(screen.getByText('Epsilon')).toBeInTheDocument()
-    // Inactive items
-    expect(screen.queryByText('Beta')).not.toBeInTheDocument()
-    expect(screen.queryByText('Delta')).not.toBeInTheDocument()
-  })
-
-  it('shows all rows again when the boolean filter is unchecked', async () => {
-    const user = userEvent.setup()
-    renderTable()
-
-    await user.click(screen.getByRole('button', { name: /^Filters/ }))
-    const checkbox = screen.getByRole('checkbox', { name: 'Active only' })
-    await user.click(checkbox)
-    expect(screen.queryByText('Beta')).not.toBeInTheDocument()
-
-    await user.click(checkbox)
-    expect(screen.getByText('Beta')).toBeInTheDocument()
-  })
-
-  it('shows active filter count badge on the Filters button', async () => {
-    const user = userEvent.setup()
-    renderTable()
-
-    // The Filters toggle button has accessible name starting with "Filters"
-    const filtersToggle = screen.getByRole('button', { name: /^Filters/ })
-    await user.click(filtersToggle)
-    await user.click(screen.getByRole('checkbox', { name: 'Active only' }))
-
-    // The badge renders inside the button and shows the active count
-    expect(
-      within(screen.getByRole('button', { name: /^Filters/ })).getByText('1'),
-    ).toBeInTheDocument()
-  })
-})
-
-// ---------------------------------------------------------------------------
-// Clear all filters
-// ---------------------------------------------------------------------------
-
-describe('DataTable — clear all', () => {
-  it('resets all filters when "Clear all filters" is clicked', async () => {
-    const user = userEvent.setup()
-    renderTable()
-
-    // Apply text filter
-    await user.type(screen.getByRole('textbox', { name: 'Name' }), 'Alpha')
-    expect(screen.getAllByRole('row')).toHaveLength(2) // header + 1 result
-
-    // Open advanced filters and apply boolean filter
-    await user.click(screen.getByRole('button', { name: /^Filters/ }))
-    await user.click(screen.getByRole('checkbox', { name: 'Active only' }))
-
-    // "Clear all filters" button appears when any filter is active
-    await user.click(screen.getByRole('button', { name: /clear all filters/i }))
-    expect(screen.getAllByRole('row')).toHaveLength(DATA.length + 1)
-  })
-})
-
-// ---------------------------------------------------------------------------
 // Row selection
 // ---------------------------------------------------------------------------
 
 describe('DataTable — row selection', () => {
   it('does not render selection checkboxes by default', () => {
     renderTable()
-    // No "Select row" checkboxes — active cells only have "Active only" in advanced panel
-    // The only checkboxes would be the boolean filter when open
     expect(screen.queryByRole('checkbox', { name: 'Select row' })).not.toBeInTheDocument()
   })
 
@@ -426,6 +253,65 @@ describe('DataTable — row actions', () => {
       rowActions: (row) => <button type="button">Edit {row.name}</button>,
     })
     expect(screen.getAllByRole('button', { name: /^Edit / })).toHaveLength(DATA.length)
+  })
+
+  it('does not notify onColumnChange on mount', () => {
+    const onChange = vi.fn()
+    render(<DataTable columns={COLUMNS} data={DATA} onColumnChange={onChange} />)
+
+    expect(onChange).not.toHaveBeenCalled()
+  })
+
+  it('does not notify onColumnChange again when the parent rerenders', () => {
+    const onChange = vi.fn()
+    const rowActions = (row: Item) => <button type="button">Edit {row.name}</button>
+
+    const { rerender } = render(
+      <DataTable columns={COLUMNS} data={DATA} onColumnChange={onChange} rowActions={rowActions} />,
+    )
+
+    const callsAfterMount = onChange.mock.calls.length
+
+    for (let index = 0; index < 5; index += 1) {
+      rerender(
+        <DataTable
+          columns={COLUMNS}
+          data={DATA}
+          onColumnChange={onChange}
+          rowActions={rowActions}
+        />,
+      )
+    }
+
+    expect(onChange.mock.calls.length).toBe(callsAfterMount)
+  })
+
+  it('does not notify onColumnChange again when rowActions is reallocated each render', () => {
+    const onChange = vi.fn()
+
+    const { rerender } = render(
+      <DataTable
+        columns={COLUMNS}
+        data={DATA}
+        onColumnChange={onChange}
+        rowActions={(row) => <button type="button">Edit {row.name}</button>}
+      />,
+    )
+
+    const callsAfterMount = onChange.mock.calls.length
+
+    for (let index = 0; index < 5; index += 1) {
+      rerender(
+        <DataTable
+          columns={COLUMNS}
+          data={DATA}
+          onColumnChange={onChange}
+          rowActions={(row) => <button type="button">Edit {row.name}</button>}
+        />,
+      )
+    }
+
+    expect(onChange.mock.calls.length).toBe(callsAfterMount)
   })
 })
 
@@ -647,11 +533,6 @@ describe('RowActionsMenu', () => {
 // ---------------------------------------------------------------------------
 
 describe('DataTable — extended behavior', () => {
-  it('renders filterNotice below the toolbar', () => {
-    renderTable({ filterNotice: <span>3 unavailable items hidden</span> })
-    expect(screen.getByText('3 unavailable items hidden')).toBeInTheDocument()
-  })
-
   it('renders a custom empty state', () => {
     renderTable({
       data: [],
@@ -678,64 +559,6 @@ describe('DataTable — extended behavior', () => {
     const inactiveCell = document.querySelector('td.cell-name')
     expect(inactiveCell).toBeTruthy()
   })
-
-  it('supports external matches filters without a backing column', () => {
-    const externalFilters: FilterDef<Item>[] = [
-      {
-        type: 'select',
-        id: 'visibility',
-        label: 'Visibility',
-        showAllOption: false,
-        defaultValue: 'active',
-        options: [
-          { label: 'Active', value: 'active' },
-          { label: 'Inactive', value: 'inactive' },
-        ],
-        matches: (row, value) =>
-          value === 'active' ? row.active : value === 'inactive' ? !row.active : true,
-      },
-    ]
-
-    const { rerender } = render(
-      <DataTable
-        columns={COLUMNS}
-        data={DATA}
-        filters={externalFilters}
-        defaultColumnFilters={[{ id: 'visibility', value: 'active' }]}
-        defaultPageSize={10}
-      />,
-    )
-
-    expect(screen.getAllByRole('row')).toHaveLength(4)
-    expect(screen.queryByText('Beta')).not.toBeInTheDocument()
-
-    rerender(
-      <DataTable
-        columns={COLUMNS}
-        data={DATA}
-        filters={externalFilters}
-        columnFilters={[{ id: 'visibility', value: 'inactive' }]}
-        defaultPageSize={10}
-      />,
-    )
-
-    expect(screen.getAllByRole('row')).toHaveLength(3)
-    expect(screen.getByText('Beta')).toBeInTheDocument()
-  })
-
-  it('calls onColumnFiltersChange when controlled', async () => {
-    const user = userEvent.setup()
-    const onColumnFiltersChange = vi.fn()
-
-    renderTable({
-      columnFilters: [],
-      onColumnFiltersChange,
-    })
-
-    await user.type(screen.getByRole('textbox', { name: 'Name' }), 'Alpha')
-
-    expect(onColumnFiltersChange).toHaveBeenCalled()
-  })
 })
 
 // ---------------------------------------------------------------------------
@@ -753,10 +576,10 @@ describe('DataTable — accessibility', () => {
     await expectNoAxeViolations(container)
   })
 
-  it('has no axe violations with the advanced panel open', async () => {
+  it('has no axe violations with the column panel open', async () => {
     const user = userEvent.setup()
     const { container } = renderTable()
-    await user.click(screen.getByRole('button', { name: /^Filters/ }))
+    await user.click(screen.getByRole('button', { name: /columns/i }))
     await expectNoAxeViolations(container)
   })
 })

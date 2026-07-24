@@ -1,4 +1,4 @@
-export { magicItemColumns, magicItemFilters } from './lib/magic-item-overview-columns'
+export { magicItemColumns, magicItemFilterSchema } from './lib/magic-item-overview-columns'
 export { BRACERS_OF_DEFENSE, MAGIC_ITEM_LIST } from './fixtures'
 export { magicItemFormFieldGroup } from './lib/magic-item-form-fields'
 export { buildMagicItemInput, magicItemFormValuesFromEntity } from './lib/magic-item-form-values'

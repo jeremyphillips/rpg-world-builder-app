@@ -95,6 +95,7 @@ export function RichTextField({
         }
         chrome={chrome}
         size={size}
+        controlBand="content-sized"
       />
     </Field.Root>
   )

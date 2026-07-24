@@ -11,7 +11,7 @@ import {
 import { accordionContentVariants } from './accordion.variants'
 import { resolveChromeClasses } from './chrome.variants'
 import { Collapsible, CollapsibleContent } from './collapsible.client'
-import type { FieldGroupSummaryDisclosure } from './field-group-disclosure.types'
+import type { FieldGroupSummary, FieldGroupSummaryDisclosure } from './field-group-disclosure.types'
 import { FieldGroupSummaryDisclosureCollapsed } from './field-group-summary-disclosure-collapsed.client'
 import { FieldGroupSummaryDisclosureExpandedHeader } from './field-group-summary-disclosure-expanded-header.client'
 import { resolveFieldGroupSummaryDisclosurePanelClasses } from './field-group-summary-disclosure.variants'
@@ -71,6 +71,69 @@ export type FieldGroupSummaryDisclosureProps<TFieldValues extends FieldValues = 
   children: React.ReactNode
 }
 
+function FieldGroupSummaryDisclosureHeader({
+  open,
+  legend,
+  legendId,
+  panelId,
+  closeLabel,
+  openLabel,
+  unsavedSuffix,
+  showDirtySuffix,
+  disabled,
+  summary,
+  collapsedChromeClasses,
+  onOpenChange,
+}: {
+  open: boolean
+  legend: string
+  legendId: string
+  panelId: string
+  closeLabel: string
+  openLabel: string
+  unsavedSuffix: string
+  showDirtySuffix: boolean
+  disabled: boolean
+  summary: FieldGroupSummary
+  collapsedChromeClasses: string | undefined
+  onOpenChange: (open: boolean) => void
+}) {
+  if (open) {
+    return (
+      <FieldGroupSummaryDisclosureExpandedHeader
+        legend={legend}
+        legendId={legendId}
+        panelId={panelId}
+        closeLabel={closeLabel}
+        disabled={disabled}
+        onClose={() => onOpenChange(false)}
+      />
+    )
+  }
+
+  const collapsed = (
+    <FieldGroupSummaryDisclosureCollapsed
+      legend={legend}
+      legendId={legendId}
+      panelId={panelId}
+      summary={summary}
+      openLabel={openLabel}
+      unsavedSuffix={unsavedSuffix}
+      showDirtySuffix={showDirtySuffix}
+      disabled={disabled}
+      onOpen={() => onOpenChange(true)}
+    />
+  )
+
+  return collapsedChromeClasses ? (
+    <div className={collapsedChromeClasses} data-summary-chrome>
+      {collapsed}
+    </div>
+  ) : (
+    collapsed
+  )
+}
+
 /** Collapsed summary + Change / expanded Done chrome for settings-style field groups. */
 export function FieldGroupSummaryDisclosure<TFieldValues extends FieldValues = FieldValues>({
   legend,
@@ -107,42 +170,20 @@ export function FieldGroupSummaryDisclosure<TFieldValues extends FieldValues = F
 
   return (
     <Collapsible open={open} onOpenChange={onOpenChange} className="flex min-w-0 flex-col gap-1">
-      {open ? (
-        <FieldGroupSummaryDisclosureExpandedHeader
-          legend={legend}
-          legendId={legendId}
-          panelId={panelId}
-          closeLabel={closeLabel}
-          disabled={disabled}
-          onClose={() => onOpenChange(false)}
-        />
-      ) : collapsedChromeClasses ? (
-        <div className={collapsedChromeClasses} data-summary-chrome>
-          <FieldGroupSummaryDisclosureCollapsed
-            legend={legend}
-            legendId={legendId}
-            panelId={panelId}
-            summary={summary}
-            openLabel={openLabel}
-            unsavedSuffix={unsavedSuffix}
-            showDirtySuffix={showDirtySuffix}
-            disabled={disabled}
-            onOpen={() => onOpenChange(true)}
-          />
-        </div>
-      ) : (
-        <FieldGroupSummaryDisclosureCollapsed
-          legend={legend}
-          legendId={legendId}
-          panelId={panelId}
-          summary={summary}
-          openLabel={openLabel}
-          unsavedSuffix={unsavedSuffix}
-          showDirtySuffix={showDirtySuffix}
-          disabled={disabled}
-          onOpen={() => onOpenChange(true)}
-        />
-      )}
+      <FieldGroupSummaryDisclosureHeader
+        open={open}
+        legend={legend}
+        legendId={legendId}
+        panelId={panelId}
+        closeLabel={closeLabel}
+        openLabel={openLabel}
+        unsavedSuffix={unsavedSuffix}
+        showDirtySuffix={showDirtySuffix}
+        disabled={disabled}
+        summary={summary}
+        collapsedChromeClasses={collapsedChromeClasses}
+        onOpenChange={onOpenChange}
+      />
 
       <CollapsibleContent forceMount className={accordionContentVariants()}>
         <div id={panelId} hidden={!open} className={panelClasses}>

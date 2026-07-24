@@ -1,14 +1,21 @@
-import { formatMass, type MountEquipment } from '@rpg/contracts'
+import { formatMass, type MountEquipment, type WithCampaignAccess } from '@rpg/contracts'
 import type { ColumnDef } from '@rpg/ui'
+import { SortableHeader } from '@rpg/ui'
 
 import { ROUTES } from '@/app/routes'
 import {
   buildContentColumns,
-  buildContentFilters,
   costColumn,
 } from '../../../lib/overview/content-table-config'
+import {
+  buildContentFilterSchema,
+  type ContentOverviewBaseFilterState,
+} from '../../../lib/overview/content-overview-filter-schema'
 import { equipmentSpeedColumn } from '../../lib/equipment-form-field-helpers'
-import { SortableHeader } from '@rpg/ui'
+
+type MountRow = WithCampaignAccess<MountEquipment>
+
+export type MountOverviewFilterState = ContentOverviewBaseFilterState
 
 const MOUNT_MIDDLE_COLUMNS: ColumnDef<MountEquipment>[] = [
   {
@@ -22,11 +29,11 @@ const MOUNT_MIDDLE_COLUMNS: ColumnDef<MountEquipment>[] = [
   costColumn<MountEquipment>(),
 ]
 
+export const mountFilterSchema = buildContentFilterSchema<MountRow, MountOverviewFilterState>([])
+
 /** Mount column definitions with the name cell linked to the detail page. */
 export function mountColumns(campaignId: string) {
   return buildContentColumns<MountEquipment>(MOUNT_MIDDLE_COLUMNS, {
     nameHref: (row) => ROUTES.content.equipment.detail(campaignId, 'mounts', row.id),
   })
 }
-
-export const mountFilters = buildContentFilters([])

@@ -1,5 +1,4 @@
 import {
-  CAMPAIGN_AVAILABILITY_FILTER_DEFAULT,
   DEFAULT_CONTENT_CAMPAIGN_ACCESS,
   formatEquipmentCostLabel,
   moneyToCp,
@@ -15,25 +14,15 @@ import {
   dataTableWidthMeta,
   SortableHeader,
 } from '@rpg/ui'
-import type { ColumnDef, FilterDef } from '@rpg/ui'
+import type { ColumnDef } from '@rpg/ui'
 import { Link } from 'react-router-dom'
 
 import { buildSourceColumn, stampDataColumns } from '@/lib/data-table/column-builders'
 
-import {
-  CAMPAIGN_ACCESS_TABLE_FILTER_ALL,
-  CAMPAIGN_ACCESS_TABLE_FILTER_AVAILABLE,
-  CAMPAIGN_ACCESS_TABLE_FILTER_LABEL,
-  CAMPAIGN_ACCESS_TABLE_FILTER_UNAVAILABLE,
-} from '../campaign-access/campaign-access-table-labels'
 import { getContentImageUrl } from '../detail/content-image-url'
 import { CONTENT_SOURCE_BADGE, type ContentSource } from './content-source-badge'
 import { CONTENT_STATUS_BADGE } from './content-status-badge'
 import { ContentStatusNameBadge } from './content-status-name-badge.client'
-import {
-  CAMPAIGN_AVAILABILITY_FILTER_ID,
-  campaignAvailabilityFilterFn,
-} from './content-availability-table.lib'
 import { ContentNameCellMetadata } from './content-name-cell-metadata.client'
 
 /**
@@ -47,58 +36,8 @@ export type ContentBase = {
   status: ContentStatus
 }
 
-const BASE_NAME_FILTER: FilterDef = {
-  type: 'text',
-  id: 'name',
-  label: 'Name',
-  placeholder: 'Search…',
-}
-
-const BASE_SOURCE_FILTER: FilterDef = {
-  type: 'select',
-  id: 'source',
-  label: 'Source',
-  options: [
-    { label: 'System', value: 'system' },
-    { label: 'Homebrew', value: 'homebrew' },
-  ],
-  group: 'secondary',
-}
-
-const BASE_STATUS_FILTER: FilterDef = {
-  type: 'select',
-  id: 'status',
-  label: 'Status',
-  options: [
-    { label: 'Draft', value: 'draft' },
-    { label: 'Published', value: 'published' },
-  ],
-  group: 'secondary',
-}
-
 function readCampaignAccess(row: ContentBase): ResolvedContentCampaignAccess {
   return (row as WithCampaignAccess<ContentBase>).campaignAccess ?? DEFAULT_CONTENT_CAMPAIGN_ACCESS
-}
-
-function buildCampaignAvailabilityFilter<T extends ContentBase>(): FilterDef<T> {
-  return {
-    type: 'select',
-    id: CAMPAIGN_AVAILABILITY_FILTER_ID,
-    label: CAMPAIGN_ACCESS_TABLE_FILTER_LABEL,
-    options: [
-      { label: CAMPAIGN_ACCESS_TABLE_FILTER_AVAILABLE, value: 'available' },
-      { label: CAMPAIGN_ACCESS_TABLE_FILTER_UNAVAILABLE, value: 'unavailable' },
-      { label: CAMPAIGN_ACCESS_TABLE_FILTER_ALL, value: 'all' },
-    ],
-    group: 'secondary',
-    defaultValue: CAMPAIGN_AVAILABILITY_FILTER_DEFAULT,
-    showAllOption: false,
-    matches: (row, value) =>
-      campaignAvailabilityFilterFn(
-        readCampaignAccess(row).available,
-        value as 'available' | 'unavailable' | 'all',
-      ),
-  }
 }
 
 export type ContentTableOptions<T> = {
@@ -199,24 +138,4 @@ export function buildContentColumns<T extends ContentBase>(
   })
 
   return [imageColumn, nameColumn, ...stampDataColumns(middleColumns), statusColumn, sourceColumn]
-}
-
-/**
- * Wraps content-specific filters with the shared name text filter (prepended,
- * primary) and source select filter (appended, secondary). Every content
- * overview uses this to stay consistent.
- *
- * @example
- * const filters = buildContentFilters([hitDieFilter, spellcastingFilter])
- */
-export function buildContentFilters<T extends ContentBase>(
-  contentFilters: FilterDef<T>[],
-): FilterDef<T>[] {
-  return [
-    BASE_NAME_FILTER,
-    ...contentFilters,
-    BASE_SOURCE_FILTER,
-    BASE_STATUS_FILTER,
-    buildCampaignAvailabilityFilter<T>(),
-  ]
 }

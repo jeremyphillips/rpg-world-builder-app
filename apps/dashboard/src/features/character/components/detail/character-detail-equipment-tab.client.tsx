@@ -2,7 +2,8 @@
 
 import * as React from 'react'
 
-import { CatalogFilterChips, CatalogToolbar, CollapsibleListItem, Text } from '@rpg/ui'
+import { CatalogToolbar, CollapsibleListItem, Text } from '@rpg/ui'
+import { useSanitizedFilterState } from '@rpg/ui/filters'
 
 import {
   buildCatalogDisclosureLabel,
@@ -15,8 +16,11 @@ import {
 } from '@/features/content/equipment'
 import { CHARACTER_EMPTY_SECTION_TEXT } from '../../lib/character-display'
 import {
-  buildCharacterDetailEquipmentKindChipOptions,
-  CHARACTER_DETAIL_EQUIPMENT_CATEGORY_LABEL,
+  createCharacterDetailEquipmentFilterSchema,
+  countCharacterDetailEquipmentStructuredFilters,
+  type CharacterDetailEquipmentFilterState,
+} from '../../lib/detail/character-detail-equipment-filter-schema'
+import {
   CHARACTER_DETAIL_EQUIPMENT_RESET_VIEW_LABEL,
   CHARACTER_DETAIL_EQUIPMENT_SEARCH_MIN_ITEMS,
   CHARACTER_DETAIL_EQUIPMENT_SEARCH_PLACEHOLDER,
@@ -24,11 +28,9 @@ import {
   CHARACTER_DETAIL_EQUIPMENT_SORT_LABELS,
   CHARACTER_DETAIL_EQUIPMENT_SORT_MODES,
   CHARACTER_DETAIL_EQUIPMENT_VIEW_DEFAULTS,
-  countCharacterDetailEquipmentStructuredFilters,
   filterCharacterDetailEquipmentCards,
   resolveCharacterDetailEquipmentKindOptions,
   sortCharacterDetailEquipmentCards,
-  type CharacterDetailEquipmentKindFilter,
   type CharacterDetailEquipmentSortMode,
 } from '../../lib/detail/character-detail-equipment-filters.lib'
 import {
@@ -41,6 +43,7 @@ import { CatalogSortControl } from '../picker/catalog-sort-control.client'
 import { pickerSortOption } from '../picker/catalog-picker-sort-labels.lib'
 import { CatalogToolbarResetAction } from '../picker/catalog-toolbar-reset-action.client'
 import { CharacterEquipmentQuantityLabel } from '../equipment/character-equipment-quantity-label.client'
+import { CharacterDetailEquipmentFilterControls } from './character-detail-equipment-filter-controls.client'
 
 export type CharacterDetailEquipmentTabProps = {
   cards: readonly CharacterSheetEquipmentCard[]
@@ -95,9 +98,9 @@ function EquipmentCatalogRow({ card }: { card: CharacterSheetEquipmentCard }) {
 }
 
 export function CharacterDetailEquipmentTab({ cards, wealth }: CharacterDetailEquipmentTabProps) {
-  const [selectedKind, setSelectedKind] = React.useState<CharacterDetailEquipmentKindFilter>(
-    CHARACTER_DETAIL_EQUIPMENT_VIEW_DEFAULTS.selectedKind,
-  )
+  const [filterState, setFilterState] = React.useState<CharacterDetailEquipmentFilterState>({
+    selectedKind: CHARACTER_DETAIL_EQUIPMENT_VIEW_DEFAULTS.selectedKind,
+  })
   const [searchQuery, setSearchQuery] = React.useState<string>(
     CHARACTER_DETAIL_EQUIPMENT_VIEW_DEFAULTS.searchQuery,
   )
@@ -109,28 +112,37 @@ export function CharacterDetailEquipmentTab({ cards, wealth }: CharacterDetailEq
     () => resolveCharacterDetailEquipmentKindOptions(cards),
     [cards],
   )
+  const showCategoryFilter = kindOptions.length > 1
+  const schemaArgs = React.useMemo(
+    () => ({ kindOptions, showCategoryFilter }),
+    [kindOptions, showCategoryFilter],
+  )
+  const filterSchema = React.useMemo(
+    () => createCharacterDetailEquipmentFilterSchema(schemaArgs),
+    [schemaArgs],
+  )
 
-  React.useEffect(() => {
-    setSelectedKind((current) => {
-      if (current === CHARACTER_DETAIL_EQUIPMENT_VIEW_DEFAULTS.selectedKind) return current
-      return kindOptions.includes(current)
-        ? current
-        : CHARACTER_DETAIL_EQUIPMENT_VIEW_DEFAULTS.selectedKind
-    })
-  }, [kindOptions])
+  useSanitizedFilterState({
+    schema: filterSchema,
+    state: filterState,
+    onStateChange: setFilterState,
+  })
 
   const visibleCards = React.useMemo(() => {
     const filtered = filterCharacterDetailEquipmentCards(cards, {
-      selectedKind,
+      schema: filterSchema,
+      filterState,
       searchQuery,
     })
     return sortCharacterDetailEquipmentCards(filtered, sortMode)
-  }, [cards, searchQuery, selectedKind, sortMode])
+  }, [cards, filterSchema, filterState, searchQuery, sortMode])
 
-  const showCategoryFilter = kindOptions.length > 1
   const showSearch = cards.length >= CHARACTER_DETAIL_EQUIPMENT_SEARCH_MIN_ITEMS
   const showSort = cards.length > 1
-  const structuredFilterCount = countCharacterDetailEquipmentStructuredFilters(selectedKind)
+  const structuredFilterCount = countCharacterDetailEquipmentStructuredFilters(
+    filterSchema,
+    filterState,
+  )
   const showResetView = hasCatalogPickerResetViewCriteria({
     structuredFilterCount,
     searchQuery,
@@ -139,7 +151,7 @@ export function CharacterDetailEquipmentTab({ cards, wealth }: CharacterDetailEq
   })
 
   const handleResetView = () => {
-    setSelectedKind(CHARACTER_DETAIL_EQUIPMENT_VIEW_DEFAULTS.selectedKind)
+    setFilterState({ selectedKind: CHARACTER_DETAIL_EQUIPMENT_VIEW_DEFAULTS.selectedKind })
     setSearchQuery(CHARACTER_DETAIL_EQUIPMENT_VIEW_DEFAULTS.searchQuery)
     setSortMode(CHARACTER_DETAIL_EQUIPMENT_VIEW_DEFAULTS.sortMode)
   }
@@ -166,15 +178,10 @@ export function CharacterDetailEquipmentTab({ cards, wealth }: CharacterDetailEq
             }
             primaryControls={
               showCategoryFilter ? (
-                <CatalogFilterChips
-                  id="character-detail-equipment-category"
-                  label={CHARACTER_DETAIL_EQUIPMENT_CATEGORY_LABEL}
-                  selectionMode="single-required"
-                  value={selectedKind}
-                  onValueChange={(value) =>
-                    setSelectedKind(value as CharacterDetailEquipmentKindFilter)
-                  }
-                  options={buildCharacterDetailEquipmentKindChipOptions(kindOptions)}
+                <CharacterDetailEquipmentFilterControls
+                  schemaArgs={schemaArgs}
+                  filterState={filterState}
+                  onFilterStateChange={setFilterState}
                 />
               ) : undefined
             }

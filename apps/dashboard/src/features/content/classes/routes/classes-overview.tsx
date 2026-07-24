@@ -9,7 +9,7 @@ import {
   getContentTypeCollectionLabel,
 } from '@/features/content/lib/content-type-labels'
 import { useClasses } from '../hooks/use-classes'
-import { classColumns, classFilters } from '../lib/classes-overview-columns'
+import { classColumns, classFilterSchema } from '../lib/classes-overview-columns'
 import { ContentOverviewShell } from '../../lib/overview/content-overview-shell'
 import { ContentOverviewTable } from '../../lib/overview/content-overview-table.client'
 
@@ -32,7 +32,7 @@ export function ClassesOverview() {
         columns={
           classColumns(campaignId) as ColumnDef<WithCampaignAccess<CharacterClass>, unknown>[]
         }
-        filters={classFilters}
+        filterSchema={classFilterSchema}
         data={classes as WithCampaignAccess<CharacterClass>[]}
         caption={formatContentOverviewCaption('classes', 'Character')}
         getEditHref={(row) => ROUTES.content.classes.edit(campaignId, row.id)}

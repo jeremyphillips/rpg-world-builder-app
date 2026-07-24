@@ -1,11 +1,22 @@
-import type { Feat } from '@rpg/contracts'
+import type { Feat, WithCampaignAccess } from '@rpg/contracts'
 import { FEAT_CATEGORY_IDS, getFeatCategoryLabel } from '@rpg/contracts'
 import { BooleanCell, dataTableTypographyMeta, SortableHeader } from '@rpg/ui'
-import type { ColumnDef, FilterDef } from '@rpg/ui'
+import type { ColumnDef } from '@rpg/ui'
+import { createEqualsFilter } from '@rpg/ui/filters'
 
 import { ROUTES } from '@/app/routes'
-import { buildContentColumns, buildContentFilters } from '../../lib/overview/content-table-config'
+import { buildContentColumns } from '../../lib/overview/content-table-config'
+import {
+  buildContentFilterSchema,
+  type ContentOverviewBaseFilterState,
+} from '../../lib/overview/content-overview-filter-schema'
 import { formatFeatCategoryTableLabel, formatFeatPrerequisiteSummary } from '../lib/feat-stat-rows'
+
+type FeatRow = WithCampaignAccess<Feat>
+
+export type FeatsOverviewFilterState = ContentOverviewBaseFilterState & {
+  category?: Feat['category']
+}
 
 const FEATS_MIDDLE_COLUMNS: ColumnDef<Feat>[] = [
   {
@@ -33,17 +44,17 @@ const FEATS_MIDDLE_COLUMNS: ColumnDef<Feat>[] = [
   },
 ]
 
-const FEATS_SPECIFIC_FILTERS: FilterDef[] = [
-  {
-    type: 'select',
+export const featsFilterSchema = buildContentFilterSchema<FeatRow, FeatsOverviewFilterState>([
+  createEqualsFilter<FeatRow, FeatsOverviewFilterState, 'category', Feat['category']>({
     id: 'category',
     label: 'Category',
     options: FEAT_CATEGORY_IDS.map((id) => ({
       label: getFeatCategoryLabel(id),
       value: id,
     })),
-  },
-]
+    getValue: (row) => row.category,
+  }),
+])
 
 /** Feat column definitions with the name cell linked to the detail page. */
 export function featsColumns(campaignId: string) {
@@ -51,5 +62,3 @@ export function featsColumns(campaignId: string) {
     nameHref: (row) => ROUTES.content.feats.detail(campaignId, row.id),
   })
 }
-
-export const featsFilters = buildContentFilters(FEATS_SPECIFIC_FILTERS)

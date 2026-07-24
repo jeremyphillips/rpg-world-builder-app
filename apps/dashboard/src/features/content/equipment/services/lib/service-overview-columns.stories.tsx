@@ -3,7 +3,7 @@ import { DataTable } from '@rpg/ui'
 
 import { STORY_CAMPAIGN_ID } from '../../../lib/fixtures/constants'
 import { SERVICE_LIST } from '../fixtures'
-import { serviceColumns, serviceFilters } from './service-overview-columns'
+import { serviceColumns } from './service-overview-columns'
 
 const meta = {
   title: 'Content/Equipment/Services/ServiceOverviewColumns',
@@ -19,7 +19,6 @@ export const Default: Story = {
     <DataTable
       columns={serviceColumns(STORY_CAMPAIGN_ID)}
       data={[...SERVICE_LIST]}
-      filters={serviceFilters}
       caption="Services available in this campaign"
     />
   ),

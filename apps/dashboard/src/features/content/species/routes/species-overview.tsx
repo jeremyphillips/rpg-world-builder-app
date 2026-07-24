@@ -10,7 +10,7 @@ import {
   getContentTypeCollectionLabel,
 } from '@/features/content/lib/content-type-labels'
 import { useSpecies } from '../hooks/use-species'
-import { speciesColumns, speciesFilters } from '../lib/species-overview-columns'
+import { speciesColumns, speciesFilterSchema } from '../lib/species-overview-columns'
 import { ContentOverviewShell } from '../../lib/overview/content-overview-shell'
 import { ContentOverviewTable } from '../../lib/overview/content-overview-table.client'
 
@@ -41,7 +41,7 @@ export function SpeciesOverview() {
             unknown
           >[]
         }
-        filters={speciesFilters(vocabulary)}
+        filterSchema={speciesFilterSchema(vocabulary)}
         data={species as WithCampaignAccess<Species>[]}
         caption={formatContentOverviewCaption('species', 'Playable')}
         getEditHref={(row) => ROUTES.content.species.edit(campaignId, row.id)}

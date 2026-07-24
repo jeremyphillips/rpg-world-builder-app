@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useState } from 'react'
+import { useCallback, useRef, useState } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import {
   type CampaignAvailabilityFilter,
@@ -42,6 +42,8 @@ export function useContentCampaignAvailabilityToggle({
   const [pending, setPending] = useState(false)
   const [blockedOpen, setBlockedOpen] = useState(false)
   const [blockers, setBlockers] = useState<ContentUsageBlocker[]>([])
+  const onRowRemovedRef = useRef(onRowRemoved)
+  onRowRemovedRef.current = onRowRemoved
 
   const updateCachedAccess = useCallback(
     (nextAccess: ResolvedContentCampaignAccess) => {
@@ -109,7 +111,7 @@ export function useContentCampaignAvailabilityToggle({
         updateCachedAccess(result.campaignAccess)
 
         if (!nextAvailable && campaignAvailabilityFilter === 'available') {
-          onRowRemoved?.()
+          onRowRemovedRef.current?.()
         }
       } catch {
         if (nextAvailable) {
@@ -125,7 +127,6 @@ export function useContentCampaignAvailabilityToggle({
       campaignId,
       contentTypeKey,
       entityId,
-      onRowRemoved,
       pending,
       updateCachedAccess,
     ],

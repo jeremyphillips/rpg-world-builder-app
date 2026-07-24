@@ -23,6 +23,10 @@ import {
   catalogToolbarTabRowVariants,
   catalogToolbarVariants,
 } from './catalog-toolbar.variants'
+import { FILTER_DENSITY_DEFAULT } from '../../filters/filter-bar.variants'
+import { FilterChromeProvider, useOptionalFilterChrome } from '../../filters/filter-chrome.context'
+import { resolveFilterChromePresentation } from '../../filters/filter-presentation.lib'
+import type { FilterDensity } from '../../filters/filter-schema.types'
 
 function CatalogToolbarTabTrigger({ tab }: { tab: CatalogToolbarTab }) {
   const count = tab.count ?? 0
@@ -58,7 +62,13 @@ function CatalogToolbarTabRow({
   )
 }
 
-function CatalogToolbarSearchField({ search }: { search: CatalogToolbarSearch }) {
+function CatalogToolbarSearchField({
+  search,
+  controlSize,
+}: {
+  search: CatalogToolbarSearch
+  controlSize: 'sm' | 'md'
+}) {
   return (
     <div className={catalogToolbarSearchRowVariants()}>
       <Search
@@ -71,6 +81,7 @@ function CatalogToolbarSearchField({ search }: { search: CatalogToolbarSearch })
         placeholder={search.placeholder}
         aria-label={search.ariaLabel ?? search.placeholder}
         className="pl-9"
+        size={controlSize}
       />
     </div>
   )
@@ -102,22 +113,27 @@ function CatalogToolbarStandaloneActions({ actions }: { actions: ReactNode }) {
   return <div className={catalogToolbarStandaloneActionsVariants()}>{actions}</div>
 }
 
-export function CatalogToolbar({
+function CatalogToolbarLayoutContent({
   className,
+  layout,
+  tabRow,
   search,
-  tabs,
+  controlSize,
   primaryControls,
   filterRow,
-  actions,
-}: CatalogToolbarProps) {
-  const layout = resolveCatalogToolbarLayout({ tabs, filterRow, actions })
-  const tabRow =
-    layout.hasTabs && tabs ? <CatalogToolbarTabRow tabs={tabs} actions={actions} /> : null
-
+}: {
+  className?: string
+  layout: ReturnType<typeof resolveCatalogToolbarLayout>
+  tabRow: ReactNode
+  search?: CatalogToolbarSearch
+  controlSize: 'sm' | 'md'
+  primaryControls?: ReactNode
+  filterRow?: CatalogToolbarProps['filterRow']
+}) {
   return (
     <div className={cn(catalogToolbarVariants(), className)}>
       {layout.tabsBeforeSearch ? tabRow : null}
-      {search ? <CatalogToolbarSearchField search={search} /> : null}
+      {search ? <CatalogToolbarSearchField search={search} controlSize={controlSize} /> : null}
       {layout.tabsAfterSearch ? tabRow : null}
       {primaryControls ? <div>{primaryControls}</div> : null}
       {layout.showFilterRow && filterRow ? (
@@ -126,5 +142,36 @@ export function CatalogToolbar({
         <CatalogToolbarStandaloneActions actions={layout.trailingActions} />
       ) : null}
     </div>
+  )
+}
+
+export function CatalogToolbar({
+  className,
+  density,
+  search,
+  tabs,
+  primaryControls,
+  filterRow,
+  actions,
+}: CatalogToolbarProps) {
+  const parentChrome = useOptionalFilterChrome()
+  const resolvedDensity: FilterDensity = density ?? parentChrome?.density ?? FILTER_DENSITY_DEFAULT
+  const presentation = resolveFilterChromePresentation({ density: resolvedDensity })
+  const layout = resolveCatalogToolbarLayout({ tabs, filterRow, actions })
+  const tabRow =
+    layout.hasTabs && tabs ? <CatalogToolbarTabRow tabs={tabs} actions={actions} /> : null
+
+  return (
+    <FilterChromeProvider density={resolvedDensity}>
+      <CatalogToolbarLayoutContent
+        className={className}
+        layout={layout}
+        tabRow={tabRow}
+        search={search}
+        controlSize={presentation.controlSize}
+        primaryControls={primaryControls}
+        filterRow={filterRow}
+      />
+    </FilterChromeProvider>
   )
 }

@@ -3,7 +3,7 @@ import { DataTable } from '@rpg/ui'
 
 import { STORY_CAMPAIGN_ID } from '../../../lib/fixtures/constants'
 import { WEAPON_LIST } from '../fixtures'
-import { weaponColumns, weaponFilters } from './weapon-overview-columns'
+import { weaponColumns } from './weapon-overview-columns'
 
 const meta = {
   title: 'Content/Equipment/Weapons/WeaponOverviewColumns',
@@ -19,7 +19,6 @@ export const Default: Story = {
     <DataTable
       columns={weaponColumns(STORY_CAMPAIGN_ID)}
       data={[...WEAPON_LIST]}
-      filters={weaponFilters}
       caption="Weapons available in this campaign"
     />
   ),

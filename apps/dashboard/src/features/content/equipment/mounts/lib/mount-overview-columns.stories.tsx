@@ -3,7 +3,7 @@ import { DataTable } from '@rpg/ui'
 
 import { STORY_CAMPAIGN_ID } from '../../../lib/fixtures/constants'
 import { MOUNT_LIST } from '../fixtures'
-import { mountColumns, mountFilters } from './mount-overview-columns'
+import { mountColumns } from './mount-overview-columns'
 
 const meta = {
   title: 'Content/Equipment/Mounts/MountOverviewColumns',
@@ -19,7 +19,6 @@ export const Default: Story = {
     <DataTable
       columns={mountColumns(STORY_CAMPAIGN_ID)}
       data={[...MOUNT_LIST]}
-      filters={mountFilters}
       caption="Mounts available in this campaign"
     />
   ),

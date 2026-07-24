@@ -3,7 +3,7 @@ import { DataTable } from '@rpg/ui'
 
 import { STORY_CAMPAIGN_ID } from '../../../lib/fixtures/constants'
 import { ARMOR_LIST } from '../fixtures'
-import { armorColumns, armorFilters } from './armor-overview-columns'
+import { armorColumns } from './armor-overview-columns'
 
 const meta = {
   title: 'Content/Equipment/Armor/ArmorOverviewColumns',
@@ -19,7 +19,6 @@ export const Default: Story = {
     <DataTable
       columns={armorColumns(STORY_CAMPAIGN_ID)}
       data={[...ARMOR_LIST]}
-      filters={armorFilters}
       caption="Armor available in this campaign"
     />
   ),

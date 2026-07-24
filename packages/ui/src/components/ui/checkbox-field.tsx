@@ -9,6 +9,7 @@ import {
   fieldLabelHintStackClasses,
 } from './field.variants'
 import type { FieldWidth } from './field-control.variants'
+import { resolveFieldPresentation } from './field-row-presentation.lib'
 
 import { FieldChromeShell } from './field-chrome-shell'
 import type { FieldChromeProps } from './field-chrome.variants'
@@ -40,6 +41,13 @@ export function CheckboxField({
   chrome,
   ...checkboxProps
 }: CheckboxFieldProps) {
+  const presentation = resolveFieldPresentation({
+    size,
+    labelLayout: 'inline',
+    // Hint-bearing toggles keep first-line alignment — not a fixed single-line band.
+    controlBand: 'content-sized',
+  })
+
   const labelNode = (
     <Field.Label placement="inlineCheckbox">
       <FieldLabelContent label={label} info={info} />
@@ -58,15 +66,19 @@ export function CheckboxField({
       size={size}
     >
       <FieldChromeShell chrome={chrome} size={size}>
-        <div className={fieldInlineToggleRowClasses}>
-          <div className={fieldInlineCheckboxControlColumnClasses}>
-            <Field.Control>
-              <Checkbox {...checkboxProps} />
-            </Field.Control>
-          </div>
-          <div className={fieldLabelHintStackClasses}>
-            {labelNode}
-            <Field.Hint />
+        <div data-field-align="" className={presentation.alignmentAnchorClassName}>
+          <div className={presentation.controlBandClassName}>
+            <div className={fieldInlineToggleRowClasses}>
+              <div className={fieldInlineCheckboxControlColumnClasses}>
+                <Field.Control>
+                  <Checkbox {...checkboxProps} />
+                </Field.Control>
+              </div>
+              <div className={fieldLabelHintStackClasses}>
+                {labelNode}
+                <Field.Hint />
+              </div>
+            </div>
           </div>
         </div>
       </FieldChromeShell>

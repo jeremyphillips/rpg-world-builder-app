@@ -3,16 +3,21 @@ import type { ReactElement, ReactNode } from 'react'
 import type { FieldChrome } from './field-chrome.variants'
 import { FieldChromeShell } from './field-chrome-shell'
 import { hasActiveFieldChrome } from './field-chrome.variants'
+import type { FieldControlBand } from './field-control-band.variants'
 import { Field, type FieldSize } from './field.client'
 import { FieldLayout } from './field-layout'
 import { FieldLabelContent } from './field-label-content'
 import {
+  mapFormLabelPositionToLayout,
+  resolveFieldPresentation,
+} from './field-row-presentation.lib'
+import {
   fieldLabelHintStackClasses,
-  fieldSettingsRowClasses,
   type FieldHintPosition,
   type FieldLabelPosition,
 } from './field.variants'
 import type { FieldWidth } from './field-control.variants'
+import { cn } from '../../lib/utils'
 
 export interface FormFieldProps {
   id: string
@@ -30,6 +35,8 @@ export interface FormFieldProps {
   /** `above` (default) — label over control. `settings` — label + hint left, control right. */
   labelPosition?: FieldLabelPosition
   chrome?: FieldChrome
+  /** Default `single-line`. Use `content-sized` for multiline / compound shells. */
+  controlBand?: FieldControlBand
   children: ReactElement
 }
 
@@ -58,20 +65,30 @@ export function FormField({
   hintPosition,
   info,
   required,
-  size,
+  size = 'md',
   width,
   labelPosition = 'above',
   chrome,
+  controlBand = 'single-line',
   children,
 }: FormFieldProps) {
   if (labelPosition === 'settings') {
+    const presentation = resolveFieldPresentation({
+      size,
+      labelLayout: mapFormLabelPositionToLayout('settings'),
+      controlBand,
+    })
     const settingsRow = (
-      <div className={fieldSettingsRowClasses}>
-        <div className={fieldLabelHintStackClasses}>
-          {labelNode(label, info)}
-          <Field.Hint />
+      <div data-field-align="" className={cn(presentation.alignmentAnchorClassName)}>
+        <div className={presentation.groupClassName}>
+          <div className={fieldLabelHintStackClasses}>
+            {labelNode(label, info)}
+            <Field.Hint />
+          </div>
+          <div className={presentation.controlBandClassName}>
+            <Field.Control>{children}</Field.Control>
+          </div>
         </div>
-        <Field.Control>{children}</Field.Control>
       </div>
     )
     const chromedRow = hasActiveFieldChrome(chrome) ? (
@@ -116,6 +133,7 @@ export function FormField({
         control={children}
         chrome={chrome}
         size={size}
+        controlBand={controlBand}
       />
     </Field.Root>
   )

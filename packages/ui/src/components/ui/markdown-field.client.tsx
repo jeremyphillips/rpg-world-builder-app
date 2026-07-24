@@ -93,6 +93,7 @@ export function MarkdownField({
       <FieldLayout
         hintPosition={hintPosition}
         wrapControl={false}
+        controlBand="content-sized"
         label={
           <Field.Label>
             <FieldLabelContent label={label} info={info} />

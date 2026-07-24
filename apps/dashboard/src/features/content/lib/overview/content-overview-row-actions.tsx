@@ -9,8 +9,6 @@ import { RowActionsMenu, type RowActionsMenuLinkProps } from '@rpg/ui'
 import { forwardRef } from 'react'
 import { Link } from 'react-router-dom'
 
-import { useCanManageCampaign } from '@/features/campaign'
-
 import { CampaignAccessBlockedDialog } from '../campaign-access/campaign-access-blocked-dialog.client'
 import { ContentCampaignAvailabilityAction } from './content-campaign-availability-action.client'
 import { useContentCampaignAvailabilityToggle } from './use-content-campaign-availability-toggle.client'
@@ -33,6 +31,7 @@ export interface ContentOverviewRowActionsProps {
   itemLabel: string
   campaignAccess: ResolvedContentCampaignAccess
   campaignAvailabilityFilter: CampaignAvailabilityFilter
+  canManage: boolean
   editLabel?: string
   onRowRemoved?: () => void
   triggerRef?: React.Ref<HTMLButtonElement>
@@ -47,12 +46,11 @@ export function ContentOverviewRowActions({
   itemLabel,
   campaignAccess,
   campaignAvailabilityFilter,
+  canManage,
   editLabel = 'Edit details',
   onRowRemoved,
   triggerRef,
 }: ContentOverviewRowActionsProps) {
-  const canManage = useCanManageCampaign(campaignId)
-
   const { pending, blockedOpen, setBlockedOpen, blockers, handleAvailableChange } =
     useContentCampaignAvailabilityToggle({
       campaignId,

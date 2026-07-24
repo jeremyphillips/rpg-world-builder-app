@@ -19,16 +19,24 @@ export type FilterPopoverProps = {
   triggerLabel: string
   triggerAriaLabel: string
   groups: readonly FilterPopoverGroup[]
+  triggerSize?: 'sm' | 'md'
+  disabled?: boolean
   contentClassName?: string
   gridClassName?: string
   primaryColumnClassName?: string
   secondaryColumnClassName?: string
 }
 
+function resolveFilterPopoverTriggerSize(triggerSize: 'sm' | 'md'): 'sm' | 'default' {
+  return triggerSize === 'md' ? 'default' : 'sm'
+}
+
 export function FilterPopover({
   triggerLabel,
   triggerAriaLabel,
   groups,
+  triggerSize = 'sm',
+  disabled = false,
   contentClassName = 'z-50 w-[min(100vw-2rem,28rem)] rounded-md border border-border bg-popover p-4 shadow-md outline-none',
   gridClassName = 'grid grid-cols-1 gap-4 sm:grid-cols-[minmax(0,1.2fr)_minmax(0,0.8fr)]',
   primaryColumnClassName = 'min-w-0',
@@ -51,7 +59,14 @@ export function FilterPopover({
   return (
     <PopoverPrimitive.Root open={open} onOpenChange={setOpen}>
       <PopoverPrimitive.Trigger asChild>
-        <Button type="button" variant="outline" size="sm" aria-label={triggerAriaLabel}>
+        <Button
+          type="button"
+          variant="outline"
+          size={resolveFilterPopoverTriggerSize(triggerSize)}
+          aria-label={triggerAriaLabel}
+          disabled={disabled}
+          aria-disabled={disabled || undefined}
+        >
           {triggerLabel}
         </Button>
       </PopoverPrimitive.Trigger>

@@ -10,6 +10,11 @@ import { fieldSizeTypographyClasses, type FieldSizeToken } from './field-sizing.
 /**
  * Form layout spacing — single source of truth.
  *
+ * Row alignment / control band SSOT:
+ * - `field-control-band.variants.ts` — `fieldControlBandVariants`, `fieldRowVariants`
+ * - `field-row-presentation.lib.ts` — `resolveFieldPresentation`, `resolveFieldRowClasses`
+ *
+ * Spacing tokens below:
  * - `fieldAnatomyStackClasses` — label / control / hint inside one field
  * - `fieldLabelHintStackClasses` — label + hint cluster when hint sits below the label
  * - `fieldGroupStackClasses` — sibling fields within a group or form column (gap-based; avoids margin collapse with fieldsets)
@@ -19,7 +24,7 @@ import { fieldSizeTypographyClasses, type FieldSizeToken } from './field-sizing.
  * - `fieldSetResetClasses` — strip UA fieldset chrome from leaf field wrappers
  * - `formSectionStackClasses` — vertical gap between top-level form sections
  * - `fieldRowGapClasses` — horizontal + wrap gap between fields in a row
- * - `fieldRowLayoutClasses` — flex wrap row for schema-driven `FieldRow` / `RowConfig`
+ * - `fieldRowLayoutClasses` — deprecated alias; prefer `resolveFieldRowClasses`
  * - `fieldChipWrapGapClasses` — chip pill row spacing inside `ChipsField`
  * - `fieldGroupDescriptionClasses` — group/section hint typography (spacing lives on the legend header)
  * - `fieldGroupLegendHeaderStackClasses` — vertical gap between a group legend and its hint
@@ -254,8 +259,13 @@ export const fieldSeparatorVariants = cva('border-b', {
 
 export type FieldSeparatorVariantProps = VariantProps<typeof fieldSeparatorVariants>
 
-/** Side-by-side fields in a wrapping flex row — compose widths via leaf `width` tokens. */
-export const fieldRowLayoutClasses = cn('flex flex-wrap items-start', fieldRowGapClasses)
+/**
+ * Side-by-side fields in a wrapping flex row — compose widths via leaf `width` tokens.
+ *
+ * @deprecated Prefer `resolveFieldRowClasses({ layout: 'flow', align: 'control-edge', gap: 'form' })`
+ * from `field-row-presentation.lib.ts`. Kept as a sync’d alias (`items-end` control-edge).
+ */
+export const fieldRowLayoutClasses = cn('flex flex-wrap items-end', fieldRowGapClasses)
 
 /** Where helper text renders relative to the label and control. */
 export type FieldHintPosition = 'below-label' | 'below-control'
