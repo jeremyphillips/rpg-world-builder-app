@@ -43,6 +43,7 @@ import {
   buildContentOverviewColumnSchema,
   getContentOverviewSortableColumnIds,
 } from './content-overview-columns.lib'
+import { useStableOverviewColumns } from './content-overview-columns.client'
 import {
   hydrateContentOverviewPreferences,
   persistContentOverviewPreferences,
@@ -73,11 +74,7 @@ function applyFilterSchemaExcluding<
     schema.fields.every((field) => {
       if (excludedFieldIds.includes(field.id as FilterFieldId<TFilters>)) return true
 
-      const effective = getEffectiveFilterValue(
-        schema,
-        state,
-        field.id as FilterFieldId<TFilters>,
-      )
+      const effective = getEffectiveFilterValue(schema, state, field.id as FilterFieldId<TFilters>)
       if (effective === undefined) return true
 
       const isValueConstraining =
@@ -116,17 +113,18 @@ export function ContentOverviewTable<
 }: ContentOverviewTableProps<T, TFilters>) {
   const tableRootRef = useRef<HTMLDivElement>(null)
   const actionTriggerRefs = useRef(new Map<string, HTMLButtonElement>())
+  const stableColumns = useStableOverviewColumns(columns)
   const columnSchema = useMemo(
-    () => buildContentOverviewColumnSchema(columns as ColumnDef<unknown>[]),
-    [columns],
+    () => buildContentOverviewColumnSchema(stableColumns as ColumnDef<unknown>[]),
+    [stableColumns],
   )
   const [preferences, setPreferences] = useState<ContentOverviewPreferences>(() =>
     hydrateContentOverviewPreferences(contentTypeKey, columnSchema),
   )
   const [advancedOpen, setAdvancedOpen] = useState(preferences.advancedOpen ?? false)
   const allowedSortIds = useMemo(
-    () => getContentOverviewSortableColumnIds(columns as ColumnDef<unknown>[]),
-    [columns],
+    () => getContentOverviewSortableColumnIds(stableColumns as ColumnDef<unknown>[]),
+    [stableColumns],
   )
   const hasAdvancedFields = useMemo(
     () => getSchemaFieldsByPlacement(filterSchema, 'advanced').length > 0,
@@ -138,22 +136,17 @@ export function ContentOverviewTable<
     defaultSort: DEFAULT_OVERVIEW_SORT,
   })
 
-  const campaignAvailabilityFilterId =
-    CAMPAIGN_AVAILABILITY_FILTER_ID as FilterFieldId<TFilters>
+  const campaignAvailabilityFilterId = CAMPAIGN_AVAILABILITY_FILTER_ID as FilterFieldId<TFilters>
 
   const filterState = query.filters
   const campaignAvailability =
-    (getEffectiveFilterValue(
-      filterSchema,
-      filterState,
-      campaignAvailabilityFilterId,
-    ) as CampaignAvailabilityFilter | undefined) ?? CAMPAIGN_AVAILABILITY_FILTER_DEFAULT
+    (getEffectiveFilterValue(filterSchema, filterState, campaignAvailabilityFilterId) as
+      | CampaignAvailabilityFilter
+      | undefined) ?? CAMPAIGN_AVAILABILITY_FILTER_DEFAULT
 
   const scopedRows = useMemo(
     () =>
-      applyFilterSchemaExcluding(filterSchema, filterState, data, [
-        campaignAvailabilityFilterId,
-      ]),
+      applyFilterSchemaExcluding(filterSchema, filterState, data, [campaignAvailabilityFilterId]),
     [data, filterSchema, filterState],
   )
 
@@ -185,10 +178,18 @@ export function ContentOverviewTable<
   const handleColumnChange = useCallback(
     (state: ColumnChangeState) => {
       setPreferences((current) => {
+        const nextVisibility = state.visibility
+        const nextOrder = state.order
+        const visibilityUnchanged =
+          JSON.stringify(current.columnVisibility ?? {}) === JSON.stringify(nextVisibility)
+        const orderUnchanged =
+          JSON.stringify(current.columnOrder ?? []) === JSON.stringify(nextOrder)
+        if (visibilityUnchanged && orderUnchanged) return current
+
         const next = {
           ...current,
-          columnVisibility: state.visibility,
-          columnOrder: state.order,
+          columnVisibility: nextVisibility,
+          columnOrder: nextOrder,
         }
         persistContentOverviewPreferences(contentTypeKey, next)
         return next
@@ -334,12 +335,10 @@ export function ContentOverviewTable<
         onClearAll={() => actions.resetFilters()}
       />
 
-      {filterNotice ? (
-        <div className={dataTableFilterNoticeVariants()}>{filterNotice}</div>
-      ) : null}
+      {filterNotice ? <div className={dataTableFilterNoticeVariants()}>{filterNotice}</div> : null}
 
       <DataTable
-        columns={columns}
+        columns={stableColumns}
         data={visibleRows}
         showFilterControls={false}
         defaultPageSize={preferences.pageSize}

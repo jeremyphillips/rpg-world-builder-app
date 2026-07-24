@@ -1,15 +1,7 @@
 import { act, renderHook, waitFor } from '@testing-library/react'
-import {
-  createMemoryRouter,
-  RouterProvider,
-  useSearchParams,
-} from 'react-router-dom'
+import { createMemoryRouter, RouterProvider, useSearchParams } from 'react-router-dom'
 import { describe, expect, it, vi } from 'vitest'
-import {
-  createEqualsFilter,
-  createFilterSchema,
-  createTextFilter,
-} from '@rpg/ui/filters'
+import { createEqualsFilter, createFilterSchema, createTextFilter } from '@rpg/ui/filters'
 
 import { useContentOverviewQueryState } from './use-content-overview-query-state.client'
 
@@ -44,8 +36,12 @@ const schema = createFilterSchema<Row, TestFilterState>([
 const allowedSortIds = ['name', 'status'] as const
 const defaultSort = { id: 'name' } as const
 
-function renderOverviewQueryState(initialEntry = '/') {
+function renderOverviewQueryState(
+  initialEntry = '/',
+  options?: { allowedSortIds?: readonly string[] },
+) {
   let router: ReturnType<typeof createMemoryRouter>
+  let sortIds = options?.allowedSortIds ?? allowedSortIds
 
   const wrapper = ({ children }: { children: React.ReactNode }) => {
     router = createMemoryRouter([{ path: '/', element: <>{children}</> }], {
@@ -58,7 +54,7 @@ function renderOverviewQueryState(initialEntry = '/') {
     () => ({
       state: useContentOverviewQueryState({
         schema,
-        allowedSortIds,
+        allowedSortIds: sortIds,
         defaultSort,
       }),
       searchParams: useSearchParams()[0],
@@ -69,6 +65,10 @@ function renderOverviewQueryState(initialEntry = '/') {
   return {
     ...view,
     getRouter: () => router,
+    setAllowedSortIds: (next: readonly string[]) => {
+      sortIds = next
+      view.rerender()
+    },
   }
 }
 
@@ -136,5 +136,43 @@ describe('useContentOverviewQueryState', () => {
     await waitFor(() => {
       expect(result.current.searchParams.get('status')).toBe('draft')
     })
+  })
+
+  it('does not rewrite the URL when allowedSortIds is reallocated with the same ids', async () => {
+    const { result, getRouter, setAllowedSortIds } = renderOverviewQueryState('/')
+
+    act(() => {
+      result.current.state.actions.setFilterValue('status', 'draft')
+    })
+
+    await waitFor(() => {
+      expect(result.current.searchParams.get('status')).toBe('draft')
+    })
+
+    const router = getRouter()
+    const navigateSpy = vi.spyOn(router, 'navigate')
+    const callsAfterFilter = navigateSpy.mock.calls.length
+
+    setAllowedSortIds(['name', 'status'])
+
+    await waitFor(() => {
+      expect(result.current.searchParams.get('status')).toBe('draft')
+    })
+
+    expect(navigateSpy.mock.calls.length).toBe(callsAfterFilter)
+  })
+
+  it('keeps query referentially stable across rerenders when the URL is unchanged', async () => {
+    const { result, rerender } = renderOverviewQueryState('/?status=draft')
+
+    await waitFor(() => {
+      expect(result.current.state.query.filters.status).toBe('draft')
+    })
+
+    const queryBefore = result.current.state.query
+    rerender()
+    rerender()
+
+    expect(result.current.state.query).toBe(queryBefore)
   })
 })

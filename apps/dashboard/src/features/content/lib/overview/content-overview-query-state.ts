@@ -33,10 +33,7 @@ export type SerializeOverviewQueryArgs<TData, TFilters extends Record<string, un
   defaultSort?: ContentSort
 }
 
-function readSearchParam(
-  searchParams: FilterSearchParamsInput,
-  key: string,
-): string | undefined {
+function readSearchParam(searchParams: FilterSearchParamsInput, key: string): string | undefined {
   if (searchParams instanceof URLSearchParams) {
     const value = searchParams.get(key)
     return value === null ? undefined : value
@@ -51,6 +48,35 @@ function isSortEqual(left: ContentSort | undefined, right: ContentSort | undefin
   if (left === undefined && right === undefined) return true
   if (left === undefined || right === undefined) return false
   return left.id === right.id && Boolean(left.desc) === Boolean(right.desc)
+}
+
+function areFilterStatesEqual<TFilters extends Record<string, unknown>>(
+  left: TFilters,
+  right: TFilters,
+): boolean {
+  const leftKeys = Object.keys(left).sort()
+  const rightKeys = Object.keys(right).sort()
+  if (leftKeys.length !== rightKeys.length) return false
+
+  return leftKeys.every((key, index) => {
+    if (key !== rightKeys[index]) return false
+    return Object.is(left[key], right[key])
+  })
+}
+
+/** Deep equality for overview query snapshots — avoids redundant state writes after URL hydration. */
+export function isOverviewQueryEqual<TFilters extends Record<string, unknown>>(
+  left: ContentOverviewQueryState<TFilters>,
+  right: ContentOverviewQueryState<TFilters>,
+): boolean {
+  if (left.page !== right.page) return false
+  if (!isSortEqual(left.sort, right.sort)) return false
+  return areFilterStatesEqual(left.filters, right.filters)
+}
+
+/** Stable memo key for sortable column id lists that may be reallocated each render. */
+export function createAllowedSortIdsKey(allowedSortIds: readonly string[]): string {
+  return allowedSortIds.join('\0')
 }
 
 /** Parses a sort query param. Invalid or unknown ids return `undefined`. */

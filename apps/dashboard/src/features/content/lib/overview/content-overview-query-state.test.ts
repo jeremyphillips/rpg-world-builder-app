@@ -1,15 +1,12 @@
 import { describe, expect, it } from 'vitest'
-import {
-  createEqualsFilter,
-  createFilterSchema,
-  createTextFilter,
-} from '@rpg/ui/filters'
+import { createEqualsFilter, createFilterSchema, createTextFilter } from '@rpg/ui/filters'
 
 import {
   CONTENT_OVERVIEW_DEFAULT_PAGE,
   CONTENT_OVERVIEW_PAGE_PARAM,
   CONTENT_OVERVIEW_SORT_PARAM,
   hydrateOverviewQuery,
+  isOverviewQueryEqual,
   parseOverviewPage,
   parseOverviewSort,
   serializeOverviewPage,
@@ -44,7 +41,12 @@ const schema = createFilterSchema<Row, TestFilterState>([
     ],
     getValue: (row) => row.status,
   }),
-  createEqualsFilter<Row, TestFilterState, 'campaignAvailability', 'available' | 'unavailable' | 'all'>({
+  createEqualsFilter<
+    Row,
+    TestFilterState,
+    'campaignAvailability',
+    'available' | 'unavailable' | 'all'
+  >({
     id: 'campaignAvailability',
     label: 'Availability',
     defaultValue: 'available',
@@ -120,6 +122,25 @@ describe('content-overview-query-state', () => {
           defaultSort,
         }).sort,
       ).toEqual(defaultSort)
+    })
+  })
+
+  describe('isOverviewQueryEqual', () => {
+    it('compares filters, sort, and page', () => {
+      const left = {
+        filters: { search: 'fire', status: 'draft' as const },
+        sort: { id: 'name' } as const,
+        page: 1,
+      }
+      const right = {
+        filters: { search: 'fire', status: 'draft' as const },
+        sort: { id: 'name' } as const,
+        page: 1,
+      }
+      const differentPage = { ...left, page: 2 }
+
+      expect(isOverviewQueryEqual(left, right)).toBe(true)
+      expect(isOverviewQueryEqual(left, differentPage)).toBe(false)
     })
   })
 

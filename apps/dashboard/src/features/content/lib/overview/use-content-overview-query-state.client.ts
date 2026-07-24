@@ -1,12 +1,13 @@
 'use client'
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useMemo } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import type { FilterFieldId, FilterSchema } from '@rpg/ui/filters'
 import { resetFilterState, setFilterValue } from '@rpg/ui/filters'
 
 import {
   CONTENT_OVERVIEW_DEFAULT_PAGE,
+  createAllowedSortIdsKey,
   hydrateOverviewQuery,
   serializeOverviewQuery,
   type ContentOverviewQueryState,
@@ -15,10 +16,7 @@ import {
 
 export type OverviewQueryHistoryMode = 'replace' | 'push'
 
-export type UseContentOverviewQueryStateOptions<
-  TData,
-  TFilters extends Record<string, unknown>,
-> = {
+export type UseContentOverviewQueryStateOptions<TData, TFilters extends Record<string, unknown>> = {
   schema: FilterSchema<TData, TFilters>
   allowedSortIds: readonly string[]
   defaultSort?: ContentSort
@@ -34,10 +32,7 @@ export type ContentOverviewQueryActions<TFilters extends Record<string, unknown>
     filters: TFilters,
     options?: { history?: OverviewQueryHistoryMode; resetPage?: boolean },
   ) => void
-  setSort: (
-    sort: ContentSort | undefined,
-    options?: { history?: OverviewQueryHistoryMode },
-  ) => void
+  setSort: (sort: ContentSort | undefined, options?: { history?: OverviewQueryHistoryMode }) => void
   setPage: (page: number, options?: { history?: OverviewQueryHistoryMode }) => void
   resetFilters: (options?: { history?: OverviewQueryHistoryMode }) => void
 }
@@ -55,10 +50,7 @@ function searchParamsEqual(left: URLSearchParams, right: URLSearchParams): boole
   })
 }
 
-export function useContentOverviewQueryState<
-  TData,
-  TFilters extends Record<string, unknown>,
->({
+export function useContentOverviewQueryState<TData, TFilters extends Record<string, unknown>>({
   schema,
   allowedSortIds,
   defaultSort,
@@ -67,11 +59,10 @@ export function useContentOverviewQueryState<
   actions: ContentOverviewQueryActions<TFilters>
 } {
   const [searchParams, setSearchParams] = useSearchParams()
-  const isInitialMountRef = useRef(true)
-  const skipUrlSyncRef = useRef(false)
-  const pendingHistoryModeRef = useRef<OverviewQueryHistoryMode>('replace')
+  const allowedSortIdsKey = createAllowedSortIdsKey(allowedSortIds)
+  const searchParamsKey = searchParams.toString()
 
-  const queryFromUrl = useMemo(
+  const query = useMemo(
     () =>
       hydrateOverviewQuery({
         schema,
@@ -79,122 +70,88 @@ export function useContentOverviewQueryState<
         allowedSortIds,
         defaultSort,
       }),
-    [allowedSortIds, defaultSort, schema, searchParams],
+    [allowedSortIdsKey, defaultSort, schema, searchParamsKey],
   )
 
-  const [query, setQuery] = useState<ContentOverviewQueryState<TFilters>>(() => queryFromUrl)
-
-  useEffect(() => {
-    skipUrlSyncRef.current = true
-    setQuery(queryFromUrl)
-  }, [queryFromUrl])
-
-  useEffect(() => {
-    if (isInitialMountRef.current) {
-      isInitialMountRef.current = false
-      skipUrlSyncRef.current = false
-      return
-    }
-
-    if (skipUrlSyncRef.current) {
-      skipUrlSyncRef.current = false
-      return
-    }
-
-    const nextParams = serializeOverviewQuery({
-      schema,
-      query,
-      defaultSort,
-    })
-
-    if (searchParamsEqual(nextParams, searchParams)) return
-
-    setSearchParams(nextParams, { replace: pendingHistoryModeRef.current === 'replace' })
-  }, [
-    allowedSortIds,
-    defaultSort,
-    query,
-    schema,
-    searchParams,
-    setSearchParams,
-  ])
-
-  const commitQuery = useCallback(
+  const writeQuery = useCallback(
     (
-      updater:
-        | ContentOverviewQueryState<TFilters>
-        | ((current: ContentOverviewQueryState<TFilters>) => ContentOverviewQueryState<TFilters>),
+      next: ContentOverviewQueryState<TFilters>,
       options?: { history?: OverviewQueryHistoryMode },
     ) => {
-      pendingHistoryModeRef.current = options?.history ?? 'replace'
-      setQuery((current) => (typeof updater === 'function' ? updater(current) : updater))
+      const nextParams = serializeOverviewQuery({
+        schema,
+        query: next,
+        defaultSort,
+      })
+
+      if (searchParamsEqual(nextParams, searchParams)) return
+
+      setSearchParams(nextParams, { replace: (options?.history ?? 'replace') === 'replace' })
     },
-    [],
+    [defaultSort, schema, searchParamsKey, setSearchParams],
   )
 
-  const setFilterValueAction = useCallback<
-    ContentOverviewQueryActions<TFilters>['setFilterValue']
-  >(
+  const setFilterValueAction = useCallback<ContentOverviewQueryActions<TFilters>['setFilterValue']>(
     (id, value, options) => {
-      commitQuery(
-        (current) => ({
-          ...current,
-          filters: setFilterValue(schema, current.filters, id, value),
+      writeQuery(
+        {
+          ...query,
+          filters: setFilterValue(schema, query.filters, id, value),
           page: CONTENT_OVERVIEW_DEFAULT_PAGE,
-        }),
+        },
         options,
       )
     },
-    [commitQuery, schema],
+    [query, schema, writeQuery],
   )
 
   const setFiltersAction = useCallback<ContentOverviewQueryActions<TFilters>['setFilters']>(
     (filters, options) => {
-      commitQuery(
-        (current) => ({
-          ...current,
+      writeQuery(
+        {
+          ...query,
           filters,
-          page: options?.resetPage === false ? current.page : CONTENT_OVERVIEW_DEFAULT_PAGE,
-        }),
+          page: options?.resetPage === false ? query.page : CONTENT_OVERVIEW_DEFAULT_PAGE,
+        },
         options,
       )
     },
-    [commitQuery],
+    [query, writeQuery],
   )
 
   const setSortAction = useCallback<ContentOverviewQueryActions<TFilters>['setSort']>(
     (sort, options) => {
-      commitQuery(
-        (current) => ({
-          ...current,
+      writeQuery(
+        {
+          ...query,
           sort,
           page: CONTENT_OVERVIEW_DEFAULT_PAGE,
-        }),
+        },
         options,
       )
     },
-    [commitQuery],
+    [query, writeQuery],
   )
 
   const setPageAction = useCallback<ContentOverviewQueryActions<TFilters>['setPage']>(
     (page, options) => {
-      commitQuery((current) => ({ ...current, page }), options)
+      writeQuery({ ...query, page }, options)
     },
-    [commitQuery],
+    [query, writeQuery],
   )
 
   const resetFiltersAction = useCallback<ContentOverviewQueryActions<TFilters>['resetFilters']>(
     (options) => {
-      commitQuery(
-        (current) => ({
-          ...current,
+      writeQuery(
+        {
+          ...query,
           filters: resetFilterState(schema),
           page: CONTENT_OVERVIEW_DEFAULT_PAGE,
-        }),
+        },
         options,
       )
     },
-    [commitQuery, schema],
+    [query, schema, writeQuery],
   )
 
   const actions = useMemo(
@@ -205,13 +162,7 @@ export function useContentOverviewQueryState<
       setPage: setPageAction,
       resetFilters: resetFiltersAction,
     }),
-    [
-      resetFiltersAction,
-      setFilterValueAction,
-      setFiltersAction,
-      setPageAction,
-      setSortAction,
-    ],
+    [resetFiltersAction, setFilterValueAction, setFiltersAction, setPageAction, setSortAction],
   )
 
   return { query, actions }
