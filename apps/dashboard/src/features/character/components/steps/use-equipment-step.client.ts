@@ -18,6 +18,7 @@ import {
   resolveStartingEquipmentOptionSummaries,
   type CharacterBuildContext,
   type CharacterBuilderDraft,
+  type CharacterClass,
   type ChoiceSet,
   type EquipmentPackageSwitchBlockingReason,
   type EquipmentPackageSwitchInventorySnapshot,
@@ -64,6 +65,59 @@ export type PendingEquipmentPackageSwitch = {
   committedInventorySnapshot: EquipmentPackageSwitchInventorySnapshot
   commitErrorReason?: EquipmentPackageSwitchBlockingReason
   staleNotice?: boolean
+}
+
+function resolveEquipmentStepSurface(args: {
+  draft: CharacterBuilderDraft
+  characterClass: CharacterClass | undefined
+  fundingByOptionId: ReadonlyMap<string, ResolvedStartingEquipmentFunding>
+  stepModel: ReturnType<typeof resolveEquipmentStepModel> | undefined
+  summaries: ReturnType<typeof resolveStartingEquipmentOptionSummaries>
+  selectedOptionId: string | undefined
+}) {
+  const { draft, characterClass, fundingByOptionId, stepModel, summaries, selectedOptionId } = args
+  const fallbackFunding = [...fundingByOptionId.values()][0]
+  const classOptionPolicy =
+    stepModel?.currentFunding?.classOptionPolicy ?? fallbackFunding?.classOptionPolicy ?? 'included'
+  const classOptionsReplaced = classOptionPolicy === 'replaced'
+
+  return {
+    classOptionPolicy,
+    classOptionsReplaced,
+    tierLabel: stepModel?.currentFunding?.tierLabel ?? fallbackFunding?.tierLabel,
+    showFallback:
+      !classOptionsReplaced &&
+      shouldShowEquipmentFallback(summaries) &&
+      !hasGoldStartingEquipmentOption(summaries),
+    showBudget: shouldShowEquipmentBudget(draft, selectedOptionId),
+    showShopping:
+      !classOptionsReplaced && shouldShowEquipmentShopping(draft, selectedOptionId, characterClass),
+  }
+}
+
+function resolveGoldOptionFundingFromClass(
+  characterClass: CharacterClass | undefined,
+  fundingByOptionId: ReadonlyMap<string, ResolvedStartingEquipmentFunding>,
+): ResolvedStartingEquipmentFunding | undefined {
+  const startingEquipment = characterClass?.characterCreation?.startingEquipment
+  if (!startingEquipment) return undefined
+  const goldOption = startingEquipment.options.find(isStartingGoldOption)
+  return goldOption ? fundingByOptionId.get(goldOption.id) : undefined
+}
+
+function collectOwnedPurchaseQuantities(
+  draft: CharacterBuilderDraft,
+  activePurchaseSourceMode: ReturnType<typeof resolvePurchaseSourceMode> | undefined,
+): Record<string, number> {
+  if (!activePurchaseSourceMode) return {}
+
+  const quantities: Record<string, number> = {}
+  for (const purchase of draft.equipment?.purchases ?? []) {
+    if (purchase.sourceMode === activePurchaseSourceMode) {
+      quantities[purchase.equipmentId] = purchase.quantity
+    }
+  }
+  return quantities
 }
 
 export function useEquipmentStep(args: {
@@ -117,13 +171,6 @@ export function useEquipmentStep(args: {
   )
   const fundingByOptionId =
     stepModel?.fundingByOptionId ?? new Map<string, ResolvedStartingEquipmentFunding>()
-  const classOptionPolicy =
-    stepModel?.currentFunding?.classOptionPolicy ??
-    [...fundingByOptionId.values()][0]?.classOptionPolicy ??
-    'included'
-  const classOptionsReplaced = classOptionPolicy === 'replaced'
-  const tierLabel =
-    stepModel?.currentFunding?.tierLabel ?? [...fundingByOptionId.values()][0]?.tierLabel
   const summaries = useMemo(
     () =>
       characterClass
@@ -134,25 +181,30 @@ export function useEquipmentStep(args: {
     [catalogIndex, characterClass, draft, fundingByOptionId],
   )
   const selectedOptionId = readSelectedStartingEquipmentOption(draft, classId)
-  const showFallback =
-    !classOptionsReplaced &&
-    shouldShowEquipmentFallback(summaries) &&
-    !hasGoldStartingEquipmentOption(summaries)
-  const showBudget = shouldShowEquipmentBudget(draft, selectedOptionId)
-  const showShopping =
-    !classOptionsReplaced && shouldShowEquipmentShopping(draft, selectedOptionId, characterClass)
+  const {
+    classOptionPolicy,
+    classOptionsReplaced,
+    tierLabel,
+    showFallback,
+    showBudget,
+    showShopping,
+  } = resolveEquipmentStepSurface({
+    draft,
+    characterClass,
+    fundingByOptionId,
+    stepModel,
+    summaries,
+    selectedOptionId,
+  })
   const budget = useMemo(
     () => (showBudget ? resolveEquipmentStepBudget(draft, catalogIndex, context) : undefined),
     [catalogIndex, context, draft, showBudget],
   )
 
-  const goldOptionFunding = useMemo(() => {
-    const startingEquipment = characterClass?.characterCreation?.startingEquipment
-    if (!startingEquipment) return undefined
-
-    const goldOption = startingEquipment.options.find(isStartingGoldOption)
-    return goldOption ? fundingByOptionId.get(goldOption.id) : undefined
-  }, [characterClass, fundingByOptionId])
+  const goldOptionFunding = useMemo(
+    () => resolveGoldOptionFundingFromClass(characterClass, fundingByOptionId),
+    [characterClass, fundingByOptionId],
+  )
 
   const resolveGoldOptionFunding = (): ResolvedStartingEquipmentFunding | undefined =>
     goldOptionFunding
@@ -196,17 +248,10 @@ export function useEquipmentStep(args: {
     [budget, catalogIndex, context.characterCreationRules, draft, showBudget],
   )
   const activePurchaseSourceMode = showBudget ? resolvePurchaseSourceMode() : undefined
-  const ownedPurchaseQuantities = useMemo(() => {
-    if (!activePurchaseSourceMode) return {}
-
-    const quantities: Record<string, number> = {}
-    for (const purchase of draft.equipment?.purchases ?? []) {
-      if (purchase.sourceMode === activePurchaseSourceMode) {
-        quantities[purchase.equipmentId] = purchase.quantity
-      }
-    }
-    return quantities
-  }, [activePurchaseSourceMode, draft.equipment?.purchases])
+  const ownedPurchaseQuantities = useMemo(
+    () => collectOwnedPurchaseQuantities(draft, activePurchaseSourceMode),
+    [activePurchaseSourceMode, draft.equipment?.purchases],
+  )
 
   const applySelection = (selection: PendingEquipmentSelection) => {
     if (!classId || !startingEquipmentChoiceSet) return

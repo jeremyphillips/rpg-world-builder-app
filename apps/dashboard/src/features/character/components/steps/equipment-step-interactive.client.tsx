@@ -30,6 +30,57 @@ type EquipmentStepInteractiveProps = Pick<EquipmentStepProps, 'draft' | 'onDraft
   readiness: BuilderStepReadinessState
 }
 
+type EquipmentStepModel = ReturnType<typeof useEquipmentStep>
+
+function EquipmentStepStartingOptions({
+  draft,
+  onDraftChange,
+  step,
+}: {
+  draft: EquipmentStepInteractiveProps['draft']
+  onDraftChange: EquipmentStepInteractiveProps['onDraftChange']
+  step: EquipmentStepModel
+}) {
+  if (step.classOptionsReplaced) {
+    return <EquipmentStepReplacedClassOptionsNotice tierLabel={step.tierLabel} />
+  }
+
+  if (step.showFallback) {
+    return (
+      <EquipmentStepFallback
+        onContinueWithout={() => onDraftChange({ equipment: buildEquipmentSkipPatch() })}
+      />
+    )
+  }
+
+  if (step.equipmentChoiceSets.length === 0 || step.summaries.length === 0) {
+    return null
+  }
+
+  return (
+    <StartingEquipmentOptionSection
+      characterClass={step.characterClass!}
+      catalogIndex={step.catalogIndex}
+      summaries={step.summaries}
+      draft={draft}
+      resolvedChoiceSets={step.resolvedChoiceSets}
+      selectedOptionId={step.selectedOptionId}
+      isPackageChooserExpanded={step.isPackageChooserExpanded}
+      onSelectOption={step.requestSelection}
+      onNestedPoolChange={step.onNestedPoolChange}
+      onChoiceSelectionChange={step.onChoiceSelectionChange}
+      onChangePackage={step.expandPackageChooser}
+      onCollapseChooser={step.collapsePackageChooser}
+    />
+  )
+}
+
+function scrollToStartingEquipmentOptions() {
+  const el = document.getElementById('starting-equipment-options')
+  el?.scrollIntoView?.({ behavior: 'smooth', block: 'start' })
+  el?.focus()
+}
+
 export function EquipmentStepInteractive({
   draft,
   onDraftChange,
@@ -38,9 +89,6 @@ export function EquipmentStepInteractive({
 }: EquipmentStepInteractiveProps) {
   const {
     catalogIndex,
-    characterClass,
-    equipmentChoiceSets,
-    summaries,
     selectedOptionId,
     showFallback,
     showBudget,
@@ -59,16 +107,12 @@ export function EquipmentStepInteractive({
     isPackageSwitchCommitting,
     pickerOpen,
     setPickerOpen,
-    requestSelection,
     handleAddItem,
     handleSetPurchaseQuantity,
     handleRemoveFromInventory,
     handleRemoveOneFromInventory,
     applySelection,
     onRemoveItem,
-    onNestedPoolChange,
-    onChoiceSelectionChange,
-    resolvedChoiceSets,
   } = step
 
   const pickerAcquisition = useEquipmentPickerAcquisition({
@@ -93,28 +137,7 @@ export function EquipmentStepInteractive({
           <BuilderStepReadinessPanel state={readiness} />
         ) : null}
 
-        {step.classOptionsReplaced ? (
-          <EquipmentStepReplacedClassOptionsNotice tierLabel={step.tierLabel} />
-        ) : showFallback ? (
-          <EquipmentStepFallback
-            onContinueWithout={() => onDraftChange({ equipment: buildEquipmentSkipPatch() })}
-          />
-        ) : equipmentChoiceSets.length > 0 && summaries.length > 0 ? (
-          <StartingEquipmentOptionSection
-            characterClass={characterClass!}
-            catalogIndex={catalogIndex}
-            summaries={summaries}
-            draft={draft}
-            resolvedChoiceSets={resolvedChoiceSets}
-            selectedOptionId={selectedOptionId}
-            isPackageChooserExpanded={step.isPackageChooserExpanded}
-            onSelectOption={requestSelection}
-            onNestedPoolChange={onNestedPoolChange}
-            onChoiceSelectionChange={onChoiceSelectionChange}
-            onChangePackage={step.expandPackageChooser}
-            onCollapseChooser={step.collapsePackageChooser}
-          />
-        ) : null}
+        <EquipmentStepStartingOptions draft={draft} onDraftChange={onDraftChange} step={step} />
 
         {showAcquisitionGuidance ? (
           <EquipmentAcquisitionGuidance
@@ -145,11 +168,7 @@ export function EquipmentStepInteractive({
           onCustomizePackage={() => step.openConversionEditor()}
           onChangeEquipmentOption={() => {
             step.expandPackageChooser()
-            document.getElementById('starting-equipment-options')?.scrollIntoView?.({
-              behavior: 'smooth',
-              block: 'start',
-            })
-            document.getElementById('starting-equipment-options')?.focus()
+            scrollToStartingEquipmentOptions()
           }}
           onSelectedPackageItemKeysChange={step.setSelectedPackageItemKeys}
           onCancelConversion={() => step.setConversionEditorOpen(false)}

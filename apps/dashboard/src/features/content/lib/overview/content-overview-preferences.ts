@@ -55,10 +55,7 @@ export function writeStoredContentOverviewPreferences(
   preferences: ContentOverviewPreferences,
 ): void {
   try {
-    localStorage.setItem(
-      contentOverviewPreferencesKey(contentTypeKey),
-      JSON.stringify(preferences),
-    )
+    localStorage.setItem(contentOverviewPreferencesKey(contentTypeKey), JSON.stringify(preferences))
   } catch {
     // Best-effort persistence — storage can fail in private mode.
   }
@@ -117,6 +114,20 @@ function sanitizeColumnOrder(
   return sanitized.length > 0 ? sanitized : undefined
 }
 
+function hasInvalidPreferenceFieldShapes(
+  raw: Record<string, unknown>,
+  parsed: {
+    pageSize: ContentOverviewPageSize | undefined
+    density: DataTableDensity | undefined
+  },
+): boolean {
+  if (raw.columnVisibility !== undefined && !isRecord(raw.columnVisibility)) return true
+  if (raw.columnOrder !== undefined && !Array.isArray(raw.columnOrder)) return true
+  if (raw.pageSize !== undefined && parsed.pageSize === undefined) return true
+  if (raw.density !== undefined && parsed.density === undefined) return true
+  return false
+}
+
 /** Validates and sanitizes stored preferences. Returns `null` when the payload is invalid. */
 export function validateContentOverviewPreferences(
   raw: unknown,
@@ -131,21 +142,7 @@ export function validateContentOverviewPreferences(
   const density = parseDensity(raw.density)
   const advancedOpen = typeof raw.advancedOpen === 'boolean' ? raw.advancedOpen : undefined
 
-  if (raw.columnVisibility !== undefined && !isRecord(raw.columnVisibility)) {
-    return null
-  }
-
-  if (raw.columnOrder !== undefined && !Array.isArray(raw.columnOrder)) {
-    return null
-  }
-
-  if (raw.pageSize !== undefined && pageSize === undefined) {
-    return null
-  }
-
-  if (raw.density !== undefined && density === undefined) {
-    return null
-  }
+  if (hasInvalidPreferenceFieldShapes(raw, { pageSize, density })) return null
 
   return {
     version: CONTENT_OVERVIEW_PREFERENCES_VERSION,

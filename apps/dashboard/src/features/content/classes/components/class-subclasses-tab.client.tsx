@@ -89,6 +89,87 @@ function SubclassesDisabledAlert({
 
 type SubclassEditorState = ReturnType<typeof useSubclassEditorState>
 
+async function persistSubclassCampaignAccess(args: {
+  campaignId: string
+  classId: string
+  subclassId: string
+  pendingAccess: ContentCampaignAccessPatch | null | undefined
+  onDeferredError: (message: string) => void
+}): Promise<void> {
+  const { campaignId, classId, subclassId, pendingAccess, onDeferredError } = args
+  if (!pendingAccess || isDefaultCampaignAccessPatch(pendingAccess)) return
+
+  try {
+    await updateContentCampaignAccess(campaignId, 'subclasses', subclassId, pendingAccess, {
+      classId,
+    })
+  } catch {
+    onDeferredError(CAMPAIGN_ACCESS_CREATE_DEFERRED_ERROR)
+  }
+}
+
+function useSubclassTabSave(args: {
+  campaignId: string
+  classId: string
+  editor: SubclassEditorState
+}) {
+  const { campaignId, classId, editor } = args
+  const createMutation = useCreateSubclass(campaignId, classId)
+  const updateMutation = useUpdateSubclass(campaignId, classId)
+  const [saveError, setSaveError] = useState<string | null>(null)
+  const [campaignAccessDeferredError, setCampaignAccessDeferredError] = useState<string | null>(
+    null,
+  )
+
+  const handleSave = async (
+    values: SubclassFormValues,
+    options?: { campaignAccessDraft?: ContentCampaignAccessPatch | null },
+  ) => {
+    if (!editor.selectedId) return
+
+    setSaveError(null)
+    setCampaignAccessDeferredError(null)
+    editor.setSavePending(true)
+    try {
+      const input = subclassFormDef.toInput(
+        values,
+        classId,
+        editor.selectedEntity ? { entity: editor.selectedEntity } : undefined,
+      )
+
+      if (isDraftSubclassId(editor.selectedId)) {
+        const saved = await createMutation.mutateAsync(input)
+        await persistSubclassCampaignAccess({
+          campaignId,
+          classId,
+          subclassId: saved.id,
+          pendingAccess: options?.campaignAccessDraft,
+          onDeferredError: setCampaignAccessDeferredError,
+        })
+        editor.commitDraftHandoff(editor.selectedId, saved)
+        return
+      }
+
+      const saved = await updateMutation.mutateAsync({
+        subclassId: editor.selectedId,
+        input,
+      })
+      editor.clearEditsFor(saved.id)
+    } catch (err) {
+      setSaveError(getErrorMessage(err, 'Could not save subclass.'))
+    } finally {
+      editor.setSavePending(false)
+    }
+  }
+
+  return {
+    handleSave,
+    saveError,
+    campaignAccessDeferredError,
+    savePending: editor.savePending || createMutation.isPending || updateMutation.isPending,
+  }
+}
+
 function ClassSubclassesTabBody({
   campaignId,
   classId,
@@ -102,12 +183,11 @@ function ClassSubclassesTabBody({
   editor: SubclassEditorState
   defaultFeatureLevel: number
 }) {
-  const createMutation = useCreateSubclass(campaignId, classId)
-  const updateMutation = useUpdateSubclass(campaignId, classId)
-  const [saveError, setSaveError] = useState<string | null>(null)
-  const [campaignAccessDeferredError, setCampaignAccessDeferredError] = useState<string | null>(
-    null,
-  )
+  const { handleSave, saveError, campaignAccessDeferredError, savePending } = useSubclassTabSave({
+    campaignId,
+    classId,
+    editor,
+  })
   const [switchTargetId, setSwitchTargetId] = useState<string | null>(null)
 
   useReportSubclassUnsavedEdits(editor.hasUnsavedEdits)
@@ -145,52 +225,6 @@ function ClassSubclassesTabBody({
     }
     editor.setSelectedId(id)
   }
-
-  const handleSave = async (
-    values: SubclassFormValues,
-    options?: { campaignAccessDraft?: ContentCampaignAccessPatch | null },
-  ) => {
-    if (!editor.selectedId) return
-
-    setSaveError(null)
-    setCampaignAccessDeferredError(null)
-    editor.setSavePending(true)
-    try {
-      const input = subclassFormDef.toInput(
-        values,
-        classId,
-        editor.selectedEntity ? { entity: editor.selectedEntity } : undefined,
-      )
-
-      if (isDraftSubclassId(editor.selectedId)) {
-        const saved = await createMutation.mutateAsync(input)
-        const pendingAccess = options?.campaignAccessDraft
-        if (pendingAccess && !isDefaultCampaignAccessPatch(pendingAccess)) {
-          try {
-            await updateContentCampaignAccess(campaignId, 'subclasses', saved.id, pendingAccess, {
-              classId,
-            })
-          } catch {
-            setCampaignAccessDeferredError(CAMPAIGN_ACCESS_CREATE_DEFERRED_ERROR)
-          }
-        }
-        editor.commitDraftHandoff(editor.selectedId, saved)
-        return
-      }
-
-      const saved = await updateMutation.mutateAsync({
-        subclassId: editor.selectedId,
-        input,
-      })
-      editor.clearEditsFor(saved.id)
-    } catch (err) {
-      setSaveError(getErrorMessage(err, 'Could not save subclass.'))
-    } finally {
-      editor.setSavePending(false)
-    }
-  }
-
-  const savePending = editor.savePending || createMutation.isPending || updateMutation.isPending
 
   return (
     <>

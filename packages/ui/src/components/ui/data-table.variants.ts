@@ -98,7 +98,7 @@ export const dataTableActionsHeaderVariants = cva(
 
 /** Sticky trailing actions body cell — matches row hover, selection, and unavailable tones. */
 export const dataTableActionsCellVariants = cva(
-  'sticky right-0 z-10 w-12 max-w-12 shrink-0 border-l border-border bg-surface-muted px-1 text-center group-hover/row:bg-row-hover group-data-[state=selected]/row:bg-row-selected [.group\\/row.bg-warning-faint_&]:bg-warning-faint',
+  'sticky right-0 z-10 w-12 max-w-12 shrink-0 border-l border-border bg-surface-muted px-1 text-center group-hover/row:bg-row-hover group-data-[state=selected]/row:bg-row-selected group-[.bg-warning-faint]/row:bg-warning-faint',
 )
 
 /** Tighter body cell padding than the base TableCell default. */
