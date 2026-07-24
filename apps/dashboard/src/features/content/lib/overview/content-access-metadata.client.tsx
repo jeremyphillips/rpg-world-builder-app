@@ -1,11 +1,7 @@
 'use client'
 
 import { CircleSlash, Lock, Users } from 'lucide-react'
-import {
-  CONTENT_ACCESS_SPECIFIC_PLAYERS_ENABLED,
-  type PlayerContentVisibility,
-  type ResolvedContentCampaignAccess,
-} from '@rpg/contracts'
+import { type PlayerContentVisibility, type ResolvedContentCampaignAccess } from '@rpg/contracts'
 import { InfoTooltip } from '@rpg/ui'
 
 import { resolveCampaignAccessDetail } from '../campaign-access/campaign-access-summary'
@@ -77,7 +73,7 @@ export type ContentAccessMetadataProps = {
 function resolvePlayerAccessMetadata(
   playerVisibility: PlayerContentVisibility,
 ): MetadataContent | null {
-  if (!CONTENT_ACCESS_SPECIFIC_PLAYERS_ENABLED || playerVisibility.kind !== 'specific') {
+  if (playerVisibility.kind !== 'specific') {
     return null
   }
 

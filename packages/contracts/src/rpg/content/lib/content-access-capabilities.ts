@@ -23,9 +23,3 @@ export const CONTENT_ACCESS_CAPABILITIES: Record<ContentAccessTargetType, Conten
     'skill-proficiencies': { mode: 'owned', visibilityModes: CONTENT_VISIBILITY_MODES },
     subclasses: { mode: 'owned', visibilityModes: CONTENT_VISIBILITY_MODES },
   }
-
-/**
- * Product gate for the campaign participant picker and player limited-visibility metadata.
- * API list enforcement for `specific_players` is independent of this flag.
- */
-export const CONTENT_ACCESS_SPECIFIC_PLAYERS_ENABLED = true

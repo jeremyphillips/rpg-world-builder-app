@@ -65,7 +65,6 @@ import type { ContentBase } from './content-table-config'
 import type { ContentOverviewBaseFilterState } from './content-overview-filter-schema'
 import { useContentOverviewQueryState } from './use-content-overview-query-state.client'
 
-const EDIT_DETAILS_LABEL = 'Edit details'
 const DEFAULT_OVERVIEW_SORT = { id: 'name' } as const
 const OVERVIEW_NAME_COLUMN_ID = 'name'
 
@@ -117,12 +116,10 @@ const ContentOverviewDataTable = memo(function ContentOverviewDataTable<
         campaignId={campaignId}
         contentTypeKey={contentTypeKey}
         entityId={row.id}
-        editHref={getEditHrefRef.current(row)}
         itemLabel={itemLabel}
         campaignAccess={row.campaignAccess}
         campaignAvailabilityFilter={campaignAvailability}
         canManage={canManage}
-        editLabel={EDIT_DETAILS_LABEL}
         onRowRemoved={() => restoreFocusRef.current(row.id)}
         triggerRef={(element) => registerActionTrigger(row.id, element)}
       />

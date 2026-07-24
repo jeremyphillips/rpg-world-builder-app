@@ -105,11 +105,6 @@ discovery must not strip content already on a saved sheet.
 | List / direct URL for `specific_players` (not granted) | Hidden                                                | Visible         |
 | Saved reference after content became unavailable       | Resolve allowed via `canResolveSavedContentReference` | Resolve allowed |
 
-## Feature flag
-
-`CONTENT_ACCESS_SPECIFIC_PLAYERS_ENABLED` is `true` after Track A A3–A4. API list
-enforcement for `specific_players` is independent of this dashboard gate.
-
 ## Related docs
 
 - Contracts: `packages/contracts/src/rpg/content/lib/content-viewer-access.ts`

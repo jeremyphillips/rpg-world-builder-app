@@ -10,7 +10,11 @@ import {
   useCampaignAccessForm,
   type CampaignAccessSaveResult,
 } from '../../campaign-access/campaign-access-form-context.client'
-import { runContentSaveSession, type SaveResult } from './content-save-session.lib'
+import {
+  mapCampaignAccessSaveResult,
+  runContentSaveSession,
+  type SaveResult,
+} from './content-save-session.lib'
 
 export type ContentSaveActionState = {
   hasUnsavedEdits: boolean
@@ -29,16 +33,7 @@ export interface UseContentSaveSessionOptions<TFieldValues extends FieldValues> 
 }
 
 function mapAccessSaveResult(result: CampaignAccessSaveResult): SaveResult {
-  switch (result.status) {
-    case 'skipped':
-      return { status: 'skipped' }
-    case 'updated':
-      return { status: 'saved' }
-    case 'blocked':
-      return { status: 'blocked' }
-    case 'invalid':
-      return { status: 'invalid' }
-  }
+  return mapCampaignAccessSaveResult(result)
 }
 
 export function useContentSaveSession<TFieldValues extends FieldValues>({

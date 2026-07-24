@@ -12,6 +12,7 @@ import { DUPLICATE_CONTENT_FALLBACK_ERROR } from './duplicate-content-labels'
 export type DuplicateContentInput = {
   entityId: string
   name: string
+  idempotencyKey?: string
 }
 
 /** TanStack mutation for content duplication — invalidates the type list query on success. */
@@ -24,12 +25,12 @@ export function useDuplicateContent(
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: ({ entityId, name }: DuplicateContentInput) =>
+    mutationFn: ({ entityId, name, idempotencyKey }: DuplicateContentInput) =>
       duplicateContent(
         campaignId,
         contentTypeKey,
         entityId,
-        { name },
+        { name, idempotencyKey },
         DUPLICATE_CONTENT_FALLBACK_ERROR,
       ),
     onSuccess: () => {

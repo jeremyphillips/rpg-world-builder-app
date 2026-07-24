@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 import { canDuplicateContentType, type ContentSource, type ContentTypeKey } from '@rpg/contracts'
@@ -48,7 +48,12 @@ export function DuplicateContentDialog({
   trigger,
 }: DuplicateContentDialogProps) {
   const [open, setOpen] = useState(false)
+  const idempotencyKeyRef = useRef(crypto.randomUUID())
   const navigate = useNavigate()
+  useEffect(() => {
+    idempotencyKeyRef.current = crypto.randomUUID()
+  }, [source.id])
+
   const { mutateAsync, isPending, isSuccess } = useDuplicateContent(
     campaignId,
     contentTypeKey,
@@ -57,7 +62,11 @@ export function DuplicateContentDialog({
 
   const { onSubmit, formError } = useSubmitHandler<DuplicateContentFormValues>({
     submit: async (values, form) => {
-      const saved = await mutateAsync({ entityId: source.id, name: values.name })
+      const saved = await mutateAsync({
+        entityId: source.id,
+        name: values.name,
+        idempotencyKey: idempotencyKeyRef.current,
+      })
       form.reset(buildDuplicateContentDefaultValues(source.name))
       setOpen(false)
       // TODO: Draft copy created toast

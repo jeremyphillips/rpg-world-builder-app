@@ -153,7 +153,7 @@ describe('duplicate content routes', () => {
     const sourceRes = await agent
       .post(`/api/campaigns/${campaignId}/content/feats`)
       .set(CSRF_HEADER, csrfToken)
-      .send(minimalFeatInput)
+      .send({ ...minimalFeatInput, slug: 'dup-source-feat-access-overlay' })
       .expect(201)
 
     const source = sourceRes.body.feats
@@ -242,6 +242,46 @@ describe('duplicate content routes', () => {
       .set(CSRF_HEADER, csrfToken)
       .send({ name: 'Missing Copy' })
       .expect(404)
+  })
+
+  it('replays duplicate responses for the same idempotency key', async () => {
+    const { agent, csrfToken } = await registerOwner()
+    const campaignId = await createTestCampaign(agent, csrfToken)
+
+    const sourceRes = await agent
+      .post(`/api/campaigns/${campaignId}/content/feats`)
+      .set(CSRF_HEADER, csrfToken)
+      .send({ ...minimalFeatInput, slug: 'dup-source-feat-idempotency' })
+      .expect(201)
+
+    const sourceId = sourceRes.body.feats.id as string
+    const idempotencyKey = 'duplicate-idempotency-test-key'
+
+    const firstRes = await agent
+      .post(`/api/campaigns/${campaignId}/content/feats/${sourceId}/duplicate`)
+      .set(CSRF_HEADER, csrfToken)
+      .set('Idempotency-Key', idempotencyKey)
+      .send({ name: 'Idempotent Feat Copy' })
+      .expect(201)
+
+    const secondRes = await agent
+      .post(`/api/campaigns/${campaignId}/content/feats/${sourceId}/duplicate`)
+      .set(CSRF_HEADER, csrfToken)
+      .set('Idempotency-Key', idempotencyKey)
+      .send({ name: 'Idempotent Feat Copy' })
+      .expect(201)
+
+    expect(secondRes.body.feats.id).toBe(firstRes.body.feats.id)
+
+    const listRes = await agent
+      .get(`/api/campaigns/${campaignId}/content/feats`)
+      .set(CSRF_HEADER, csrfToken)
+      .expect(200)
+
+    const copies = listRes.body.feats.filter(
+      (feat: { name: string }) => feat.name === 'Idempotent Feat Copy',
+    )
+    expect(copies).toHaveLength(1)
   })
 
   it('rejects empty duplicate names', async () => {

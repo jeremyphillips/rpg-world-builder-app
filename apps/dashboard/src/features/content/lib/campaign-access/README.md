@@ -71,9 +71,7 @@ No unified Save — Publish / Save draft stay pending-only. Campaign access uses
 
 `useCampaignAccessParticipantRoster` loads `GET …/content/access-participants`.
 `buildCampaignAccessFields` renders a conditional `participantIds` combobox when
-`visibilityMode === 'specific_players'` and `CONTENT_ACCESS_SPECIFIC_PLAYERS_ENABLED`
-is true.
+`visibilityMode === 'specific_players'`.
 
-## Follow-ups
-
-- Subclass editor panel parity (reuse `CampaignAccessFormProvider` in subclass save orchestration)
+Subclass editor save orchestration reuses `CampaignAccessFormProvider` and
+`runContentSaveSession` (access first, then body) for persisted subclasses.

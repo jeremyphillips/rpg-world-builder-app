@@ -70,7 +70,11 @@ describe('DuplicateContentDialog', () => {
 
     await user.click(screen.getByRole('button', { name: 'Duplicate class' }))
 
-    expect(mutateAsync).toHaveBeenCalledWith({ entityId: 'cls-1', name: 'Fighter Copy' })
+    expect(mutateAsync).toHaveBeenCalledWith({
+      entityId: 'cls-1',
+      name: 'Fighter Copy',
+      idempotencyKey: expect.any(String),
+    })
     expect(await screen.findByText('Edit destination')).toBeInTheDocument()
   })
 

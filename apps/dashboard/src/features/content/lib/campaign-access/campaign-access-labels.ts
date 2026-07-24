@@ -35,10 +35,6 @@ export const CAMPAIGN_ACCESS_PLAYER_ACCESS_PRESERVED_HINT =
 export const CAMPAIGN_ACCESS_PLAYER_ACCESS_TOOLTIP =
   'Player access narrows who can discover and newly select this content while it is available. It does not remove content already assigned to a character.'
 
-/** Shown when specific_players is disabled until the participant system ships. */
-export const CAMPAIGN_ACCESS_SPECIFIC_PLAYERS_DISABLED_HINT =
-  'Set up campaign players before choosing specific players.'
-
 /** Multi-select label for specific player grants. */
 export const CAMPAIGN_ACCESS_PARTICIPANTS_LABEL = 'Selected players'
 

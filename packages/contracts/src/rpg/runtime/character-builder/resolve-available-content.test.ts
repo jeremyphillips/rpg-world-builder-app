@@ -198,6 +198,45 @@ describe('resolveAvailableContent', () => {
     expect(result.spells.map((entry) => entry.slug).sort()).toEqual(['fire-bolt', 'true-strike'])
   })
 
+  it('filters catalog rows by catalogViewer when provided', () => {
+    const visibleClass = {
+      ...makeStoredClass('fighter', 'Fighter'),
+      campaignAccess: {
+        available: true,
+        visibilityMode: 'all_players' as const,
+        participantIds: [],
+        unavailableParticipantIds: [],
+        effectiveAudience: 'all_players' as const,
+      },
+    }
+    const hiddenClass = {
+      ...makeStoredClass('wizard', 'Wizard'),
+      campaignAccess: {
+        available: true,
+        visibilityMode: 'dm_only' as const,
+        participantIds: [],
+        unavailableParticipantIds: [],
+        effectiveAudience: 'dm_only' as const,
+      },
+    }
+
+    const context = makeContext({
+      catalogViewer: { kind: 'pc', characterIds: ['pc-1'] },
+      catalog: {
+        species: [],
+        classes: [visibleClass, hiddenClass],
+        spells: [],
+        equipment: [],
+        skillProficiencies: [],
+        languages: [],
+      },
+    })
+
+    const result = resolveAvailableContent(context)
+
+    expect(result.classes.map((entry) => entry.slug)).toEqual(['fighter'])
+  })
+
   it('passes equipment through unchanged', () => {
     const equipment = equipmentSchema.parse({
       id: 'srd-cc-5.2.1:longsword',

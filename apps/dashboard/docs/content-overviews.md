@@ -30,10 +30,9 @@ Line 2: Edit · Duplicate (managers)     [manager access metadata]
 | `content-table-config.tsx`                    | Shared `buildContentColumns` name column             |
 | `content-overview-columns.client.ts`          | Injects `canManage` + `getEditHref` into name column |
 
-## Row actions transition
+## Row actions
 
-The ellipsis overflow menu keeps **Edit** as a fallback during the utility-row rollout.
-Availability toggle, publish/demote, and delete remain in overflow.
+The ellipsis overflow menu keeps campaign availability toggle only — **Edit** lives on the name-cell utility row (line 2).
 
 ## Related
 

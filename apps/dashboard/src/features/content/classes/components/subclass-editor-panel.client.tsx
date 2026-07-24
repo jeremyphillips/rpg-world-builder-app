@@ -9,6 +9,7 @@ import { DEFAULT_CONTENT_CAMPAIGN_ACCESS } from '@rpg/contracts'
 
 import type { ContentFormCtx } from '../../lib/forms/content-form-registry'
 import { CampaignAccessSection } from '../../lib/campaign-access/campaign-access-section.client'
+import { useCampaignAccessForm } from '../../lib/campaign-access/campaign-access-form-context.client'
 import { ContentEditHeadingBadges } from '../../lib/campaign-access/content-edit-heading-badges.client'
 import { isDraftSubclassId, isSubclassDeletable } from '../lib/subclasses/subclass-editor-constants'
 import {
@@ -27,10 +28,12 @@ export interface SubclassEditorPanelProps {
   defaultFeatureLevel?: number
   formCtx: ContentFormCtx
   savePending?: boolean
+  isBodyDirty?: boolean
+  isAccessDirty?: boolean
   onValuesChange: (values: SubclassFormValues) => void
   onSave: (
     values: SubclassFormValues,
-    options?: { campaignAccessDraft?: ContentCampaignAccessPatch | null },
+    options?: { campaignAccessDraft?: ContentCampaignAccessPatch | null; accessOnly?: boolean },
   ) => Promise<void>
   onDeleteRequest: () => void
 }
@@ -44,10 +47,13 @@ export function SubclassEditorPanel({
   defaultFeatureLevel,
   formCtx,
   savePending = false,
+  isBodyDirty = false,
+  isAccessDirty = false,
   onValuesChange,
   onSave,
   onDeleteRequest,
 }: SubclassEditorPanelProps) {
+  const campaignAccessForm = useCampaignAccessForm()
   const source = entity?.source ?? (isDraftSubclassId(subclassId) ? 'homebrew' : 'system')
   const status = entity?.status ?? (isDraftSubclassId(subclassId) ? 'draft' : 'published')
   const deletable = isSubclassDeletable(source, subclassId)
@@ -93,9 +99,22 @@ export function SubclassEditorPanel({
   }, [form])
 
   const handleSave = () => {
-    void form.handleSubmit((values: SubclassFormValues) =>
-      onSaveRef.current(values, { campaignAccessDraft: campaignAccessDraftRef.current }),
-    )()
+    if (isDraftSubclassId(subclassId)) {
+      void form.handleSubmit((values: SubclassFormValues) =>
+        onSaveRef.current(values, { campaignAccessDraft: campaignAccessDraftRef.current }),
+      )()
+      return
+    }
+
+    const hasUnsavedEdits = isBodyDirty || isAccessDirty || campaignAccessForm.isDirty
+    if (!hasUnsavedEdits) return
+
+    if (isBodyDirty) {
+      void form.handleSubmit((values: SubclassFormValues) => onSaveRef.current(values))()
+      return
+    }
+
+    void onSaveRef.current(form.getValues(), { accessOnly: true })
   }
 
   return (

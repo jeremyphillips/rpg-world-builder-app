@@ -1,7 +1,6 @@
 import { createElement } from 'react'
 import {
   CONTENT_ACCESS_CAPABILITIES,
-  CONTENT_ACCESS_SPECIFIC_PLAYERS_ENABLED,
   CONTENT_VISIBILITY_MODE_ENTRIES,
   type ContentAccessTargetType,
   type ContentCampaignAccessPatch,
@@ -58,7 +57,7 @@ function toCampaignAccessPatch(values: Record<string, unknown>): ContentCampaign
 }
 
 function buildParticipantField(ctx: CampaignAccessFormCtx): FormItem[] {
-  if (!CONTENT_ACCESS_SPECIFIC_PLAYERS_ENABLED || !ctx.participantOptions) {
+  if (!ctx.participantOptions) {
     return []
   }
 

@@ -26,6 +26,7 @@ import { filterCatalogForMembership } from './lib/filter-catalog-for-viewer'
 import { duplicateContentEntity } from './lib/duplication/duplicate-content.service'
 import { duplicateContentRequestSchema } from './lib/duplication/duplicate-content.types'
 import { assertDuplicateContentType } from './lib/duplication/duplicate-content-policy'
+import { CONTENT_DUPLICATION_IDEMPOTENCY_HEADER } from '@rpg/contracts'
 import { listCampaignAccessParticipants } from './lib/campaign-access-participants.service'
 
 export async function createContentItem(req: Request, res: Response): Promise<void> {
@@ -49,11 +50,13 @@ export async function duplicateContentItem(req: Request, res: Response): Promise
   }
   assertDuplicateContentType(contentType)
   const { name } = duplicateContentRequestSchema.parse(req.body)
+  const idempotencyKey = req.get(CONTENT_DUPLICATION_IDEMPOTENCY_HEADER)?.trim() || undefined
   const { writeConfig, entity } = await duplicateContentEntity({
     campaignId,
     contentType,
     entityId,
     requestedName: name,
+    idempotencyKey,
   })
   res.status(201).json({ [writeConfig.responseKey]: entity })
 }

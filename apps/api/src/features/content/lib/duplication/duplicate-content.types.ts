@@ -14,6 +14,7 @@ export interface DuplicateContentContext {
   contentType: ApiContentTypeKey
   entityId: string
   requestedName: string
+  idempotencyKey?: string
 }
 
 export interface ContentDuplicationAdapter<T extends WriteEntityBase> {

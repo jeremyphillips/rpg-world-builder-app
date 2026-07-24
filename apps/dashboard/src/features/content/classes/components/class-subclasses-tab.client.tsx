@@ -22,7 +22,15 @@ import { subclassFormDef } from '../lib/subclasses/subclass-form-values'
 import type { SubclassFormValues } from '../lib/subclasses/subclass-form-fields'
 import { updateContentCampaignAccess } from '../../lib/campaign-access/campaign-access-api'
 import { CAMPAIGN_ACCESS_CREATE_DEFERRED_ERROR } from '../../lib/campaign-access/campaign-access-labels'
+import {
+  CampaignAccessFormProvider,
+  useCampaignAccessForm,
+} from '../../lib/campaign-access/campaign-access-form-context.client'
 import { isDefaultCampaignAccessPatch } from '../../lib/campaign-access/campaign-access-state'
+import {
+  mapCampaignAccessSaveResult,
+  runContentSaveSession,
+} from '../../lib/forms/shells/content-save-session.lib'
 import {
   SubclassChoiceLevelGate,
   SubclassCreateGate,
@@ -114,6 +122,7 @@ function useSubclassTabSave(args: {
   editor: SubclassEditorState
 }) {
   const { campaignId, classId, editor } = args
+  const campaignAccessForm = useCampaignAccessForm()
   const createMutation = useCreateSubclass(campaignId, classId)
   const updateMutation = useUpdateSubclass(campaignId, classId)
   const [saveError, setSaveError] = useState<string | null>(null)
@@ -123,21 +132,21 @@ function useSubclassTabSave(args: {
 
   const handleSave = async (
     values: SubclassFormValues,
-    options?: { campaignAccessDraft?: ContentCampaignAccessPatch | null },
+    options?: { campaignAccessDraft?: ContentCampaignAccessPatch | null; accessOnly?: boolean },
   ) => {
     if (!editor.selectedId) return
+    const selectedId = editor.selectedId
 
     setSaveError(null)
     setCampaignAccessDeferredError(null)
     editor.setSavePending(true)
     try {
-      const input = subclassFormDef.toInput(
-        values,
-        classId,
-        editor.selectedEntity ? { entity: editor.selectedEntity } : undefined,
-      )
-
-      if (isDraftSubclassId(editor.selectedId)) {
+      if (isDraftSubclassId(selectedId)) {
+        const input = subclassFormDef.toInput(
+          values,
+          classId,
+          editor.selectedEntity ? { entity: editor.selectedEntity } : undefined,
+        )
         const saved = await createMutation.mutateAsync(input)
         await persistSubclassCampaignAccess({
           campaignId,
@@ -146,15 +155,39 @@ function useSubclassTabSave(args: {
           pendingAccess: options?.campaignAccessDraft,
           onDeferredError: setCampaignAccessDeferredError,
         })
-        editor.commitDraftHandoff(editor.selectedId, saved)
+        editor.commitDraftHandoff(selectedId, saved)
         return
       }
 
-      const saved = await updateMutation.mutateAsync({
-        subclassId: editor.selectedId,
-        input,
-      })
-      editor.clearEditsFor(saved.id)
+      const bodyDirty = !options?.accessOnly && editor.modifiedIds.has(selectedId)
+      const outcome = await runContentSaveSession(
+        {
+          dirty: campaignAccessForm.isDirty,
+          save: async () => mapCampaignAccessSaveResult(await campaignAccessForm.save()),
+        },
+        {
+          dirty: bodyDirty,
+          save: async () => {
+            const input = subclassFormDef.toInput(
+              values,
+              classId,
+              editor.selectedEntity ? { entity: editor.selectedEntity } : undefined,
+            )
+            await updateMutation.mutateAsync({
+              subclassId: selectedId,
+              input,
+            })
+            editor.clearEditsFor(selectedId)
+            return { status: 'saved' as const }
+          },
+        },
+      )
+
+      if (outcome.status === 'body_failed') {
+        setSaveError(getErrorMessage(outcome.error, 'Could not save subclass.'))
+      } else if (outcome.status === 'access_invalid' || outcome.status === 'body_invalid') {
+        setSaveError('Could not save subclass campaign access.')
+      }
     } catch (err) {
       setSaveError(getErrorMessage(err, 'Could not save subclass.'))
     } finally {
@@ -166,7 +199,13 @@ function useSubclassTabSave(args: {
     handleSave,
     saveError,
     campaignAccessDeferredError,
-    savePending: editor.savePending || createMutation.isPending || updateMutation.isPending,
+    savePending:
+      editor.savePending ||
+      createMutation.isPending ||
+      updateMutation.isPending ||
+      campaignAccessForm.isPending,
+    isBodyDirty: editor.selectedId ? editor.modifiedIds.has(editor.selectedId) : false,
+    isAccessDirty: campaignAccessForm.isDirty,
   }
 }
 
@@ -183,7 +222,14 @@ function ClassSubclassesTabBody({
   editor: SubclassEditorState
   defaultFeatureLevel: number
 }) {
-  const { handleSave, saveError, campaignAccessDeferredError, savePending } = useSubclassTabSave({
+  const {
+    handleSave,
+    saveError,
+    campaignAccessDeferredError,
+    savePending,
+    isBodyDirty,
+    isAccessDirty,
+  } = useSubclassTabSave({
     campaignId,
     classId,
     editor,
@@ -262,6 +308,8 @@ function ClassSubclassesTabBody({
                 defaultFeatureLevel={defaultFeatureLevel}
                 formCtx={formCtx}
                 savePending={savePending}
+                isBodyDirty={isBodyDirty}
+                isAccessDirty={isAccessDirty}
                 onValuesChange={editor.handleValuesChange}
                 onSave={handleSave}
                 onDeleteRequest={() => handleDeleteRequest(editor.selectedId!)}
@@ -339,12 +387,14 @@ export function ClassSubclassesTab({
   }
 
   return (
-    <ClassSubclassesTabBody
-      campaignId={campaignId}
-      classId={classId}
-      formCtx={formCtx}
-      editor={editor}
-      defaultFeatureLevel={Number(subclassChoiceFeature.level)}
-    />
+    <CampaignAccessFormProvider>
+      <ClassSubclassesTabBody
+        campaignId={campaignId}
+        classId={classId}
+        formCtx={formCtx}
+        editor={editor}
+        defaultFeatureLevel={Number(subclassChoiceFeature.level)}
+      />
+    </CampaignAccessFormProvider>
   )
 }

@@ -1,6 +1,5 @@
 import { describe, expect, it } from 'vitest'
 
-import { CONTENT_ACCESS_SPECIFIC_PLAYERS_ENABLED } from './content-access-capabilities'
 import {
   CAMPAIGN_AVAILABILITY_FILTER_DEFAULT,
   CAMPAIGN_AVAILABILITY_FILTER_VALUES,
@@ -112,11 +111,5 @@ describe('WithCampaignAccess', () => {
     }
 
     expect(row.campaignAccess.available).toBe(true)
-  })
-})
-
-describe('CONTENT_ACCESS_SPECIFIC_PLAYERS_ENABLED', () => {
-  it('is enabled after the participant system ships', () => {
-    expect(CONTENT_ACCESS_SPECIFIC_PLAYERS_ENABLED).toBe(true)
   })
 })
