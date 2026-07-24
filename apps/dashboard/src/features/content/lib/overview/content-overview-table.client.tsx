@@ -20,6 +20,7 @@ import {
 import {
   FilterAdvancedPanel,
   FilterBar,
+  FilterChromeProvider,
   applyFilterSchema,
   getEffectiveFilterValue,
   getSchemaFieldsByPlacement,
@@ -167,31 +168,6 @@ const ContentOverviewDataTable = memo(function ContentOverviewDataTable<
   props: ContentOverviewDataTableProps<T>,
 ) => React.JSX.Element
 
-function applyFilterSchemaExcluding<
-  T extends WithCampaignAccess<ContentBase>,
-  TFilters extends ContentOverviewBaseFilterState,
->(
-  schema: FilterSchema<T, TFilters>,
-  state: TFilters,
-  rows: T[],
-  excludedFieldIds: ReadonlyArray<FilterFieldId<TFilters>>,
-): T[] {
-  return rows.filter((row) =>
-    schema.fields.every((field) => {
-      if (excludedFieldIds.includes(field.id as FilterFieldId<TFilters>)) return true
-
-      const effective = getEffectiveFilterValue(schema, state, field.id as FilterFieldId<TFilters>)
-      if (effective === undefined) return true
-
-      const isValueConstraining =
-        field.isValueConstraining ?? ((value: unknown) => value !== undefined)
-      if (!isValueConstraining(effective)) return true
-
-      return field.matches(row, effective, state)
-    }),
-  )
-}
-
 export type ContentOverviewTableProps<
   T extends WithCampaignAccess<ContentBase> & { id: string },
   TFilters extends ContentOverviewBaseFilterState = ContentOverviewBaseFilterState,
@@ -253,8 +229,10 @@ export function ContentOverviewTable<
 
   const scopedRows = useMemo(
     () =>
-      applyFilterSchemaExcluding(filterSchema, filterState, data, [campaignAvailabilityFilterId]),
-    [data, filterSchema, filterState],
+      applyFilterSchema(filterSchema, filterState, data, {
+        excludeFieldIds: [campaignAvailabilityFilterId],
+      }),
+    [campaignAvailabilityFilterId, data, filterSchema, filterState],
   )
 
   const scope = useMemo(
@@ -446,22 +424,24 @@ export function ContentOverviewTable<
 
   return (
     <div ref={tableRootRef} tabIndex={-1} className="flex flex-col gap-3 outline-none">
-      <FilterBar
-        schema={filterSchema}
-        state={filterState}
-        onValueChange={handleFilterValueChange}
-        onReset={() => actions.resetFilters()}
-        advancedOpen={advancedOpen}
-        onAdvancedOpenChange={hasAdvancedFields ? handleAdvancedOpenChange : undefined}
-      />
+      <FilterChromeProvider>
+        <FilterBar
+          schema={filterSchema}
+          state={filterState}
+          onValueChange={handleFilterValueChange}
+          onReset={() => actions.resetFilters()}
+          advancedOpen={advancedOpen}
+          onAdvancedOpenChange={hasAdvancedFields ? handleAdvancedOpenChange : undefined}
+        />
 
-      <FilterAdvancedPanel
-        schema={filterSchema}
-        state={filterState}
-        onValueChange={handleFilterValueChange}
-        open={advancedOpen}
-        onClearAll={() => actions.resetFilters()}
-      />
+        <FilterAdvancedPanel
+          schema={filterSchema}
+          state={filterState}
+          onValueChange={handleFilterValueChange}
+          open={advancedOpen}
+          onClearAll={() => actions.resetFilters()}
+        />
+      </FilterChromeProvider>
 
       {filterNotice ? <div className={dataTableFilterNoticeVariants()}>{filterNotice}</div> : null}
 

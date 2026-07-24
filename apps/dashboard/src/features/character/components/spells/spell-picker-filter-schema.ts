@@ -9,6 +9,7 @@ import {
   createFilterSchema,
   createPopoverFilter,
   shallowArrayEqual,
+  popoverFiltersEqual,
   type FilterCatalogLayoutConfig,
   type FilterSchema,
 } from '@rpg/ui/filters'
@@ -69,6 +70,55 @@ export type CreateSpellPickerFilterSchemaArgs = {
   traitOptions: readonly SpellPickerTraitFilter[]
   methodOptions: readonly SpellPickerMethodFilter[]
   levelOptions: readonly number[]
+}
+
+function sanitizeSpellPickerLevelSelection(
+  args: CreateSpellPickerFilterSchemaArgs,
+  state: SpellPickerFilterState,
+): Partial<SpellPickerFilterState> {
+  const selectedLevels =
+    args.mode === SPELL_PICKER_MODE_CANTRIPS ? [] : (state.selectedLevels ?? [])
+
+  if (shallowArrayEqual(selectedLevels, state.selectedLevels ?? [])) {
+    return {}
+  }
+
+  return { selectedLevels }
+}
+
+function sanitizeSpellPickerMechanicsSelection(
+  args: CreateSpellPickerFilterSchemaArgs,
+  state: SpellPickerFilterState,
+): Partial<SpellPickerFilterState> {
+  const mechanicsFilters = {
+    ...DEFAULT_MECHANICS_FILTERS,
+    ...state.mechanicsFilters,
+    castingTimes: (state.mechanicsFilters?.castingTimes ?? []).filter((entry) =>
+      args.castingTimeOptions.includes(entry),
+    ),
+    traits: (state.mechanicsFilters?.traits ?? []).filter((entry) =>
+      args.traitOptions.includes(entry),
+    ),
+    methods: (state.mechanicsFilters?.methods ?? []).filter((entry) =>
+      args.methodOptions.includes(entry),
+    ),
+  }
+
+  if (popoverFiltersEqual(mechanicsFilters, state.mechanicsFilters ?? DEFAULT_MECHANICS_FILTERS)) {
+    return {}
+  }
+
+  return { mechanicsFilters }
+}
+
+function sanitizeSpellPickerFilterState(
+  args: CreateSpellPickerFilterSchemaArgs,
+  state: SpellPickerFilterState,
+): Partial<SpellPickerFilterState> {
+  return {
+    ...sanitizeSpellPickerLevelSelection(args, state),
+    ...sanitizeSpellPickerMechanicsSelection(args, state),
+  }
 }
 
 export function createSpellPickerFilterSchema(
@@ -189,22 +239,7 @@ export function createSpellPickerFilterSchema(
   }
 
   return createFilterSchema(fields, {
-    sanitizeState: (state) => ({
-      selectedLevels: args.mode === SPELL_PICKER_MODE_CANTRIPS ? [] : (state.selectedLevels ?? []),
-      mechanicsFilters: {
-        ...DEFAULT_MECHANICS_FILTERS,
-        ...state.mechanicsFilters,
-        castingTimes: (state.mechanicsFilters?.castingTimes ?? []).filter((entry) =>
-          args.castingTimeOptions.includes(entry),
-        ),
-        traits: (state.mechanicsFilters?.traits ?? []).filter((entry) =>
-          args.traitOptions.includes(entry),
-        ),
-        methods: (state.mechanicsFilters?.methods ?? []).filter((entry) =>
-          args.methodOptions.includes(entry),
-        ),
-      },
-    }),
+    sanitizeState: (state) => sanitizeSpellPickerFilterState(args, state),
   })
 }
 

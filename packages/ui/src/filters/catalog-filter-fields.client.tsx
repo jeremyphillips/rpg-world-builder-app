@@ -44,8 +44,3 @@ export function CatalogFilterFieldList<TData, TState extends Record<string, unkn
     />
   )
 }
-
-/**
- * @deprecated Use `FilterFieldRenderer` with a `FilterRenderContext` instead.
- */
-export { FilterFieldRenderer as CatalogFilterField } from './filter-field-renderer.client'

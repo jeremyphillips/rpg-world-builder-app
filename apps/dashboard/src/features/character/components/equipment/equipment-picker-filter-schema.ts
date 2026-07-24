@@ -51,6 +51,62 @@ export type CreateEquipmentPickerFilterSchemaArgs = {
   searchQuery: string
 }
 
+function sanitizeEquipmentPickerKindSelection(
+  args: CreateEquipmentPickerFilterSchemaArgs,
+  state: EquipmentPickerFilterState,
+): Partial<EquipmentPickerFilterState> {
+  if (args.showCategoryFilter && !args.showRarityFilter) {
+    const selectedKind =
+      state.selectedKind &&
+      args.kindOptions.includes(state.selectedKind as EquipmentPickerSupportedKind)
+        ? state.selectedKind
+        : EQUIPMENT_PICKER_KIND_ALL
+
+    return { selectedKind }
+  }
+
+  return state.selectedKind !== undefined ? { selectedKind: undefined } : {}
+}
+
+function sanitizeEquipmentPickerRaritySelection(
+  args: CreateEquipmentPickerFilterSchemaArgs,
+  state: EquipmentPickerFilterState,
+): Partial<EquipmentPickerFilterState> {
+  if (args.showRarityFilter && args.magicItemGrantProgress) {
+    const validAllowanceIds = args.magicItemGrantProgress.map((entry) => entry.allowanceId)
+    const selectedRarity =
+      state.selectedRarity && validAllowanceIds.includes(state.selectedRarity)
+        ? state.selectedRarity
+        : EQUIPMENT_PICKER_RARITY_ALL
+
+    return { selectedRarity }
+  }
+
+  return state.selectedRarity !== undefined ? { selectedRarity: undefined } : {}
+}
+
+function sanitizeEquipmentPickerAffordableSelection(
+  args: CreateEquipmentPickerFilterSchemaArgs,
+  state: EquipmentPickerFilterState,
+): Partial<EquipmentPickerFilterState> {
+  if (!args.showAffordableFilter && state.showAffordableOnly) {
+    return { showAffordableOnly: undefined }
+  }
+
+  return {}
+}
+
+function sanitizeEquipmentPickerFilterState(
+  args: CreateEquipmentPickerFilterSchemaArgs,
+  state: EquipmentPickerFilterState,
+): Partial<EquipmentPickerFilterState> {
+  return {
+    ...sanitizeEquipmentPickerKindSelection(args, state),
+    ...sanitizeEquipmentPickerRaritySelection(args, state),
+    ...sanitizeEquipmentPickerAffordableSelection(args, state),
+  }
+}
+
 export function createEquipmentPickerFilterSchema(
   args: CreateEquipmentPickerFilterSchemaArgs,
 ): FilterSchema<EquipmentPickerItem, EquipmentPickerFilterState> {
@@ -117,13 +173,7 @@ export function createEquipmentPickerFilterSchema(
   }
 
   return createFilterSchema(fields, {
-    sanitizeState: (state) => ({
-      selectedKind:
-        state.selectedKind &&
-        args.kindOptions.includes(state.selectedKind as EquipmentPickerSupportedKind)
-          ? state.selectedKind
-          : EQUIPMENT_PICKER_KIND_ALL,
-    }),
+    sanitizeState: (state) => sanitizeEquipmentPickerFilterState(args, state),
   })
 }
 

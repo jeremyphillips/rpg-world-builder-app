@@ -4,6 +4,7 @@ import * as React from 'react'
 import { CircleAlert } from 'lucide-react'
 
 import { CatalogPickerSheet, EmphasisDetailLine, SegmentedControl, Text } from '@rpg/ui'
+import { useSanitizedFilterState } from '@rpg/ui/filters'
 import {
   formatMoney,
   formatWealthAsGold,
@@ -42,7 +43,6 @@ import {
 import type { EquipmentPickerRowActionViewModel } from './equipment-picker-action.lib'
 import {
   EQUIPMENT_PICKER_CLEAR_FILTERS_LABEL,
-  EQUIPMENT_PICKER_KIND_ALL,
   EQUIPMENT_PICKER_MODE_LABELS,
   EQUIPMENT_PICKER_MODE_MAGIC_ITEMS,
   EQUIPMENT_PICKER_MODE_PURCHASE,
@@ -244,13 +244,6 @@ export function EquipmentPickerDrawer({
     }
   }, [open])
 
-  React.useEffect(() => {
-    setSelectedKind((current) => {
-      if (current === EQUIPMENT_PICKER_KIND_ALL) return current
-      return kindOptions.includes(current) ? current : EQUIPMENT_PICKER_KIND_ALL
-    })
-  }, [kindOptions])
-
   const showRarityFilter =
     isMagicItemsWorkflow &&
     magicItemGrantProgress !== undefined &&
@@ -318,6 +311,12 @@ export function EquipmentPickerDrawer({
     },
     [onFocusedAllowanceIdChange],
   )
+
+  useSanitizedFilterState({
+    schema: filterSchema,
+    state: filterState,
+    onStateChange: handleFilterStateChange,
+  })
 
   const filteredItems = React.useMemo(
     () =>

@@ -1,12 +1,14 @@
 import { render, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { useState } from 'react'
-import { describe, expect, it } from 'vitest'
+import { beforeAll, describe, expect, it } from 'vitest'
 
 import { CatalogFilterChips } from '../components/ui/catalog-filter-chips.client'
 import {
   createBooleanFilter,
   createChipsFilter,
   createEqualsFilter,
+  createPopoverFilter,
   createTextFilter,
 } from './filter-engine.helpers'
 import { createFilterSchema } from './filter-schema.types'
@@ -20,6 +22,8 @@ type TestFilterState = {
   status?: 'draft' | 'published'
   hiddenOnly?: boolean
   levels?: number[]
+  mechanics?: Record<string, string[]>
+  noAllStatus?: 'draft' | 'published'
 }
 
 const schema = createFilterSchema<DemoRow, TestFilterState>([
@@ -44,6 +48,7 @@ const schema = createFilterSchema<DemoRow, TestFilterState>([
   createBooleanFilter<DemoRow, TestFilterState, 'hiddenOnly'>({
     id: 'hiddenOnly',
     label: 'Hidden only',
+    hiddenCount: () => 3,
     getValue: () => false,
   }),
   createChipsFilter<DemoRow, TestFilterState, 'levels'>({
@@ -56,7 +61,36 @@ const schema = createFilterSchema<DemoRow, TestFilterState>([
     ],
     matches: () => true,
   }),
+  createEqualsFilter<DemoRow, TestFilterState, 'noAllStatus', 'draft' | 'published'>({
+    id: 'noAllStatus',
+    label: 'No-all status',
+    showAllOption: false,
+    options: [
+      { value: 'draft', label: 'Draft' },
+      { value: 'published', label: 'Published' },
+    ],
+    getValue: (row) => row.status as 'draft' | 'published',
+  }),
+  createPopoverFilter<DemoRow, TestFilterState, 'mechanics'>({
+    id: 'mechanics',
+    label: 'Mechanics',
+    triggerLabel: (count) => `Mechanics (${count})`,
+    groups: () => [],
+    matches: () => true,
+  }),
 ])
+
+beforeAll(() => {
+  if (!HTMLElement.prototype.hasPointerCapture) {
+    HTMLElement.prototype.hasPointerCapture = () => false
+  }
+  if (!HTMLElement.prototype.releasePointerCapture) {
+    HTMLElement.prototype.releasePointerCapture = () => undefined
+  }
+  if (!Element.prototype.scrollIntoView) {
+    Element.prototype.scrollIntoView = () => undefined
+  }
+})
 
 function RendererHarness({
   fieldId,
@@ -110,6 +144,42 @@ describe('FilterFieldRenderer chrome', () => {
   it('renders catalog chips with compact label sizing under default chrome', () => {
     render(<RendererHarness fieldId="levels" />)
     expect(screen.getByText('Levels')).toHaveClass('text-xs')
+  })
+})
+
+describe('FilterFieldRenderer behavior', () => {
+  it('renders a disabled popover trigger when groups are empty', () => {
+    render(<RendererHarness fieldId="mechanics" />)
+
+    const trigger = screen.getByRole('button', { name: 'Mechanics' })
+    expect(trigger).toBeDisabled()
+    expect(trigger).toHaveAttribute('aria-disabled', 'true')
+    expect(trigger).toHaveTextContent('Mechanics (no options)')
+  })
+
+  it('shows hiddenCount suffix for checked boolean fields', () => {
+    render(<RendererHarness fieldId="hiddenOnly" initialState={{ hiddenOnly: true }} />)
+
+    expect(screen.getByText('3 hidden')).toBeInTheDocument()
+  })
+
+  it('clears text filters to undefined', async () => {
+    const user = userEvent.setup()
+    render(<RendererHarness fieldId="search" initialState={{ search: 'fire' }} />)
+
+    const input = screen.getByLabelText('Search')
+    await user.clear(input)
+
+    expect(input).toHaveValue('')
+  })
+
+  it('omits the All option when showAllOption is false', async () => {
+    const user = userEvent.setup()
+    render(<RendererHarness fieldId="noAllStatus" initialState={{ noAllStatus: 'draft' }} />)
+
+    await user.click(screen.getByRole('combobox', { name: 'No-all status' }))
+    expect(screen.queryByText('All No-all status')).not.toBeInTheDocument()
+    expect(screen.getByRole('option', { name: 'Draft' })).toBeInTheDocument()
   })
 })
 

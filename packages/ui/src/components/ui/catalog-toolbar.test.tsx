@@ -3,7 +3,43 @@ import userEvent from '@testing-library/user-event'
 import { expectNoAxeViolations } from '@rpg/ui/test-utils'
 import { describe, expect, it, vi } from 'vitest'
 
+import { CatalogFilterControls } from '../../filters/catalog-filter-controls.client'
+import { useFilterChrome } from '../../filters/filter-chrome.context'
+import { resolveFilterChromePresentation } from '../../filters/filter-presentation.lib'
+import { createEqualsFilter, createTextFilter } from '../../filters/filter-engine.helpers'
+import { createFilterSchema } from '../../filters/filter-schema.types'
+import { Text } from './text'
 import { CatalogToolbar } from './catalog-toolbar.client'
+
+type DemoRow = { name: string; status: string }
+type DemoFilterState = { search?: string; status?: string }
+
+const densitySchema = createFilterSchema<DemoRow, DemoFilterState>([
+  createTextFilter<DemoRow, DemoFilterState, 'search'>({
+    id: 'search',
+    label: 'Search',
+    getSearchText: (row) => row.name,
+  }),
+  createEqualsFilter<DemoRow, DemoFilterState, 'status', 'draft' | 'published'>({
+    id: 'status',
+    label: 'Status',
+    layout: 'inline',
+    options: [
+      { value: 'draft', label: 'Draft' },
+      { value: 'published', label: 'Published' },
+    ],
+    getValue: (row) => row.status as 'draft' | 'published',
+  }),
+])
+
+function TestSortControl() {
+  const presentation = resolveFilterChromePresentation(useFilterChrome())
+  return (
+    <Text as="span" className={presentation.labelClassName}>
+      Sort
+    </Text>
+  )
+}
 
 describe('CatalogToolbar', () => {
   it('omits search when the search prop is not provided', () => {
@@ -123,5 +159,28 @@ describe('CatalogToolbar', () => {
     )
 
     await expectNoAxeViolations(container)
+  })
+
+  it('applies compact density to search, filters, and sort under default toolbar', () => {
+    render(
+      <CatalogToolbar
+        search={{ query: '', onQueryChange: vi.fn(), placeholder: 'Search catalog' }}
+        primaryControls={
+          <CatalogFilterControls
+            schema={densitySchema}
+            layout={{ primaryFieldIds: ['status'] }}
+            state={{}}
+            onValueChange={() => undefined}
+          />
+        }
+        filterRow={{
+          actions: <TestSortControl />,
+        }}
+      />,
+    )
+
+    expect(screen.getByRole('textbox', { name: 'Search catalog' })).toHaveClass('h-8')
+    expect(screen.getByText('Status')).toHaveClass('text-xs')
+    expect(screen.getByText('Sort')).toHaveClass('text-xs')
   })
 })

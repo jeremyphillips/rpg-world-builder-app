@@ -54,6 +54,28 @@ Consumers override via hydration:
 useFilterState(schema, { initialValues: filtersFromUrl })
 ```
 
+### Schema stability
+
+Filter schemas **must** be module-stable or memoized — not recreated inline each render.
+Sanitization hooks key on schema reference; unstable per-render identity causes redundant
+sanitization passes.
+
+### Sanitization lifecycle
+
+| API                                                         | Use case                                    |
+| ----------------------------------------------------------- | ------------------------------------------- |
+| `useFilterState(schema, { sanitizeOnSchemaChange: true })`  | Uncontrolled local state                    |
+| `useSanitizedFilterState({ schema, state, onStateChange })` | Controlled consumers (pickers, detail tabs) |
+
+Rules:
+
+1. `sanitizeFilterState` returns the **same state object reference** when nothing changed.
+2. Hooks compare sanitized vs current state before dispatching.
+3. Schema-change sanitization must **not** call `onStateChange` repeatedly for equivalent state.
+4. Trigger on schema **revision** (stable memo / module constant), not unstable per-render identity.
+
+Do not add per-consumer `useEffect` sanitization — use the hooks above.
+
 ---
 
 ## Constraining vs modified vs effective
@@ -421,6 +443,6 @@ or behavior.
 
 Import catalog renderers from `@rpg/ui/filters`:
 
-- `CatalogFilterControls` — `Primary` / `FilterRow` slot components
+- `CatalogFilterControls` — root and `.Primary` render primary layout fields; `.FilterRow` renders filter-row fields
 - `FilterFieldRenderer` / `FilterFieldList` — unified schema field renderers
-- `CatalogFilterField` / `CatalogFilterFieldList` — deprecated aliases; prefer `FilterFieldRenderer`
+- `CatalogFilterFieldList` — layout-driven field list for catalog controls

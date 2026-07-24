@@ -160,6 +160,8 @@ export type FilterSchema<TData, TState extends Record<string, unknown>> = {
 export type FilterCatalogLayoutConfig<TState extends Record<string, unknown>> = {
   primaryFieldIds?: FilterFieldId<TState>[]
   filterRowFieldIds?: FilterFieldId<TState>[]
+  /** Dev-only: warn when schema fields are omitted from all layout groups */
+  exhaustive?: boolean
 }
 
 type CreateFilterSchemaOptions<TData, TState extends Record<string, unknown>> = {

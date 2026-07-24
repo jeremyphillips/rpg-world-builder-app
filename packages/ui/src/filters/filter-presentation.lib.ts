@@ -12,6 +12,21 @@ import { resolveFilterSelectFieldLayout } from './filter-select-field-chrome.cli
 import type { FilterFieldDef, FilterFieldWidth } from './filter-schema.types'
 import type { FilterDensity } from './filter-schema.types'
 
+export type FilterChromePresentation = {
+  labelClassName: string
+  controlSize: 'sm' | 'md'
+}
+
+export function resolveFilterChromePresentation(
+  chrome: FilterChromeContextValue,
+): FilterChromePresentation {
+  const { density } = chrome
+  return {
+    labelClassName: filterFieldLabelVariants({ density }),
+    controlSize: resolveFilterControlSize(density),
+  }
+}
+
 export type FilterFieldPresentation =
   | {
       type: 'text'

@@ -1,7 +1,7 @@
-import type { FilterFieldId, FilterSchema } from '@rpg/ui/filters'
+import type { FilterSchema } from '@rpg/ui/filters'
 import {
-  getEffectiveFilterValue,
   hydrateFilterState,
+  stableSerializeFilterState,
   type FilterSearchParamsInput,
   serializeFilterSearchParams,
 } from '@rpg/ui/filters'
@@ -93,16 +93,7 @@ export function createFilterStateKey<TData, TFilters extends Record<string, unkn
   schema: FilterSchema<TData, TFilters>,
   filters: TFilters,
 ): string {
-  return schema.fields
-    .map((field) => {
-      const effective = getEffectiveFilterValue(
-        schema,
-        filters,
-        field.id as FilterFieldId<TFilters>,
-      )
-      return `${String(field.id)}=${String(effective)}`
-    })
-    .join('\0')
+  return stableSerializeFilterState(schema, filters)
 }
 
 /** Parses a sort query param. Invalid or unknown ids return `undefined`. */

@@ -58,6 +58,6 @@ export function resolveFilterSelectFieldLayout(field: {
 }): FilterSelectFieldLayout {
   const layout = field.layout ?? 'stacked'
   if (layout === 'inline') return 'inline'
-  if (layout === 'stacked' && field.width) return 'stacked'
+  if (layout === 'stacked') return 'stacked'
   return 'default'
 }

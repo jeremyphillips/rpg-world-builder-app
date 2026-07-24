@@ -58,8 +58,3 @@ export function FilterFieldList<TData, TState extends Record<string, unknown>>({
     </>
   )
 }
-
-/**
- * @deprecated Use `FilterFieldRenderer` with a `FilterRenderContext` instead.
- */
-export const FilterField = FilterFieldRenderer

@@ -13,7 +13,7 @@ import {
   filterBarResetButtonClasses,
   filterBarVariants,
 } from './filter-bar.variants'
-import { FilterChromeProvider } from './filter-chrome.context'
+import { FilterChromeProvider, useOptionalFilterChrome } from './filter-chrome.context'
 import { FilterFieldList } from './filter-fields.client'
 import type { FilterFieldId, FilterSchema } from './filter-schema.types'
 
@@ -49,25 +49,32 @@ export function FilterBar<TData, TState extends Record<string, unknown>>({
   advancedToggleLabel = 'Filters',
   trailing,
 }: FilterBarProps<TData, TState>) {
+  const parentChrome = useOptionalFilterChrome()
   const primaryFields = getSchemaFieldsByPlacement(schema, 'primary')
   const advancedFields = getSchemaFieldsByPlacement(schema, 'advanced')
   const modifiedCount = countModifiedFilters(schema, state)
   const advancedModifiedCount = countModifiedFilters(schema, state, 'advanced')
 
+  const primaryFilters = (
+    <div className={filterBarFieldGroupVariants()}>
+      <FilterFieldList
+        schema={schema}
+        fields={primaryFields}
+        state={state}
+        disabled={disabled}
+        idPrefix={idPrefix}
+        onValueChange={onValueChange}
+      />
+    </div>
+  )
+
   return (
     <div className={cn(filterBarVariants(), className)}>
-      <FilterChromeProvider>
-        <div className={filterBarFieldGroupVariants()}>
-          <FilterFieldList
-            schema={schema}
-            fields={primaryFields}
-            state={state}
-            disabled={disabled}
-            idPrefix={idPrefix}
-            onValueChange={onValueChange}
-          />
-        </div>
-      </FilterChromeProvider>
+      {parentChrome ? (
+        primaryFilters
+      ) : (
+        <FilterChromeProvider>{primaryFilters}</FilterChromeProvider>
+      )}
 
       <div className="flex items-center gap-2">
         {advancedFields.length > 0 && onAdvancedOpenChange ? (

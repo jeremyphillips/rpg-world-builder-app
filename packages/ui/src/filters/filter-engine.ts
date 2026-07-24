@@ -72,6 +72,16 @@ export function setFilterValue<TData, TState extends Record<string, unknown>>(
   return next
 }
 
+export function isShallowFilterStateEqual<TState extends Record<string, unknown>>(
+  left: TState,
+  right: TState,
+): boolean {
+  const leftKeys = Object.keys(left)
+  const rightKeys = Object.keys(right)
+  if (leftKeys.length !== rightKeys.length) return false
+  return leftKeys.every((key) => Object.is(left[key as keyof TState], right[key as keyof TState]))
+}
+
 export function sanitizeFilterState<TData, TState extends Record<string, unknown>>(
   schema: FilterSchema<TData, TState>,
   partial: Partial<TState>,
@@ -80,18 +90,22 @@ export function sanitizeFilterState<TData, TState extends Record<string, unknown
   const base = {
     ...createInitialFilterState(schema),
     ...partial,
+  } as TState
+
+  let next = base
+  if (schema.sanitizeState) {
+    const sanitized = schema.sanitizeState(base, {
+      ...context,
+      state: base,
+    })
+    next = { ...base, ...sanitized }
   }
 
-  if (!schema.sanitizeState) {
-    return base
+  if (isShallowFilterStateEqual(next, partial as TState)) {
+    return partial as TState
   }
 
-  const sanitized = schema.sanitizeState(base, {
-    ...context,
-    state: base,
-  })
-
-  return { ...base, ...sanitized }
+  return next
 }
 
 /** Restores schema defaults ("Clear filters"). */
@@ -145,17 +159,44 @@ export function countModifiedFilters<TData, TState extends Record<string, unknow
   }).length
 }
 
+export type ApplyFilterSchemaOptions<TData, TState extends Record<string, unknown>> = {
+  /** Primary extension point — placement, metadata, purpose, etc. */
+  includeField?: (field: FilterFieldDef<TData, TState>, ctx: { state: TState }) => boolean
+  /** Convenience sugar — implemented via includeField internally */
+  excludeFieldIds?: readonly FilterFieldId<TState>[]
+}
+
+function resolveApplyFilterIncludeField<TData, TState extends Record<string, unknown>>(
+  options?: ApplyFilterSchemaOptions<TData, TState>,
+): (field: FilterFieldDef<TData, TState>, ctx: { state: TState }) => boolean {
+  if (options?.includeField) {
+    return options.includeField
+  }
+
+  if (options?.excludeFieldIds) {
+    const excluded = options.excludeFieldIds
+    return (field) => !excluded.includes(field.id)
+  }
+
+  return () => true
+}
+
 export function applyFilterSchema<TData, TState extends Record<string, unknown>>(
   schema: FilterSchema<TData, TState>,
   state: TState,
   rows: TData[],
+  options?: ApplyFilterSchemaOptions<TData, TState>,
 ): TData[] {
+  const includeField = resolveApplyFilterIncludeField(options)
+
   return rows.filter((row) =>
-    schema.fields.every((field) => {
-      const effective = getEffectiveFilterValue(schema, state, field.id)
-      if (effective === undefined) return true
-      if (!isFilterConstraining(schema, state, field.id)) return true
-      return field.matches(row, effective, state)
-    }),
+    schema.fields
+      .filter((field) => includeField(field, { state }))
+      .every((field) => {
+        const effective = getEffectiveFilterValue(schema, state, field.id)
+        if (effective === undefined) return true
+        if (!isFilterConstraining(schema, state, field.id)) return true
+        return field.matches(row, effective, state)
+      }),
   )
 }

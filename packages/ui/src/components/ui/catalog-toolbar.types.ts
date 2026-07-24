@@ -1,5 +1,7 @@
 import type { ReactNode } from 'react'
 
+import type { FilterDensity } from '../../filters/filter-schema.types'
+
 export type CatalogToolbarTab = {
   id: string
   label: string
@@ -24,6 +26,8 @@ export type CatalogToolbarSearch = {
 
 export type CatalogToolbarProps = {
   className?: string
+  /** Toolbar row rhythm — governs search, sort, and filter controls */
+  density?: FilterDensity
   /** Omit to hide search — supports detail tabs with filters/sort only */
   search?: CatalogToolbarSearch
 

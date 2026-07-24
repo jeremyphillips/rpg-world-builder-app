@@ -3,6 +3,7 @@
 import { useId } from 'react'
 
 import { cn } from '../lib/utils'
+import { validateCatalogFilterLayout } from './catalog-filter-layout-validation'
 import { CatalogFilterFieldList } from './catalog-filter-fields.client'
 import type {
   FilterCatalogLayoutConfig,
@@ -51,26 +52,36 @@ function CatalogFilterControlsGroup<TData, TState extends Record<string, unknown
     return null
   }
 
-  return (
-    <FilterChromeProvider density={resolvedDensity}>
-      <div className={cn(catalogFilterControlsVariants(), className)}>
-        <CatalogFilterFieldList
-          schema={schema}
-          fieldIds={fieldIds}
-          state={state}
-          data={data}
-          disabled={disabled}
-          idPrefix={resolvedIdPrefix}
-          onValueChange={onValueChange}
-        />
-      </div>
-    </FilterChromeProvider>
+  const content = (
+    <div className={cn(catalogFilterControlsVariants(), className)}>
+      <CatalogFilterFieldList
+        schema={schema}
+        fieldIds={fieldIds}
+        state={state}
+        data={data}
+        disabled={disabled}
+        idPrefix={resolvedIdPrefix}
+        onValueChange={onValueChange}
+      />
+    </div>
   )
+
+  if (parentChrome && density === undefined) {
+    return content
+  }
+
+  return <FilterChromeProvider density={resolvedDensity}>{content}</FilterChromeProvider>
 }
 
 export function CatalogFilterControls<TData, TState extends Record<string, unknown>>(
   props: CatalogFilterControlsProps<TData, TState>,
 ) {
+  validateCatalogFilterLayout({
+    componentName: 'CatalogFilterControls',
+    schema: props.schema,
+    layout: props.layout,
+  })
+
   return (
     <CatalogFilterControlsGroup
       {...props}
@@ -80,23 +91,18 @@ export function CatalogFilterControls<TData, TState extends Record<string, unkno
   )
 }
 
-CatalogFilterControls.Primary = function CatalogFilterControlsPrimary<
-  TData,
-  TState extends Record<string, unknown>,
->(props: CatalogFilterControlsProps<TData, TState>) {
-  return (
-    <CatalogFilterControlsGroup
-      {...props}
-      fieldIds={props.layout.primaryFieldIds}
-      className={props.className}
-    />
-  )
-}
+CatalogFilterControls.Primary = CatalogFilterControls
 
 CatalogFilterControls.FilterRow = function CatalogFilterControlsFilterRow<
   TData,
   TState extends Record<string, unknown>,
 >(props: CatalogFilterControlsProps<TData, TState>) {
+  validateCatalogFilterLayout({
+    componentName: 'CatalogFilterControls',
+    schema: props.schema,
+    layout: props.layout,
+  })
+
   return (
     <CatalogFilterControlsGroup
       {...props}

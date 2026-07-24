@@ -55,37 +55,37 @@ export function FilterAdvancedPanel<TData, TState extends Record<string, unknown
 
   const modifiedCount = countModifiedFilters(schema, state)
 
+  const panelContent = (
+    <div className={cn(filterAdvancedPanelVariants())}>
+      <div className={filterAdvancedPanelInnerVariants({ density: resolvedDensity })}>
+        <FilterFieldList
+          schema={schema}
+          fields={advancedFields}
+          state={state}
+          disabled={disabled}
+          idPrefix={idPrefix}
+          onValueChange={onValueChange}
+        />
+      </div>
+
+      {onClearAll && modifiedCount > 0 ? (
+        <div className={filterAdvancedPanelFooterVariants({ density: resolvedDensity })}>
+          <Button type="button" variant="ghost" size="sm" disabled={disabled} onClick={onClearAll}>
+            {clearAllLabel}
+          </Button>
+        </div>
+      ) : null}
+    </div>
+  )
+
   return (
     <Collapsible open={open} className={className}>
       <CollapsibleContent>
-        <FilterChromeProvider density={resolvedDensity}>
-          <div className={cn(filterAdvancedPanelVariants())}>
-            <div className={filterAdvancedPanelInnerVariants({ density: resolvedDensity })}>
-              <FilterFieldList
-                schema={schema}
-                fields={advancedFields}
-                state={state}
-                disabled={disabled}
-                idPrefix={idPrefix}
-                onValueChange={onValueChange}
-              />
-            </div>
-
-            {onClearAll && modifiedCount > 0 ? (
-              <div className={filterAdvancedPanelFooterVariants({ density: resolvedDensity })}>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  disabled={disabled}
-                  onClick={onClearAll}
-                >
-                  {clearAllLabel}
-                </Button>
-              </div>
-            ) : null}
-          </div>
-        </FilterChromeProvider>
+        {parentChrome ? (
+          panelContent
+        ) : (
+          <FilterChromeProvider density={resolvedDensity}>{panelContent}</FilterChromeProvider>
+        )}
       </CollapsibleContent>
     </Collapsible>
   )

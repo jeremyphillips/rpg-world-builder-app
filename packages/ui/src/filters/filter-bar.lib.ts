@@ -83,11 +83,3 @@ export function resolveSelectCurrentValue(rawValue: unknown, effectiveValue: unk
   if (effectiveValue !== undefined && effectiveValue !== '') return effectiveValue
   return undefined
 }
-
-export function shouldSkipFilterSelectChange(
-  normalized: unknown,
-  rawValue: unknown,
-  effectiveValue: unknown,
-): boolean {
-  return Object.is(normalized, resolveSelectCurrentValue(rawValue, effectiveValue))
-}

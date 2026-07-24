@@ -41,36 +41,41 @@ const rows: Row[] = [
 
 const schema = createFilterSchema<Row, TestFilterState>([
   createTextFilter<Row, TestFilterState, 'search'>({
-      id: 'search',
-      label: 'Search',
-      getSearchText: (row) => [row.name, row.sourceLabel],
-    }),
-    createEqualsFilter<Row, TestFilterState, 'status', Row['status']>({
-      id: 'status',
-      label: 'Status',
-      options: [
-        { value: 'draft', label: 'Draft' },
-        { value: 'published', label: 'Published' },
-      ],
-      getValue: (row) => row.status,
-    }),
-    createEqualsFilter<Row, TestFilterState, 'campaignAvailability', 'available' | 'unavailable' | 'all'>({
-      id: 'campaignAvailability',
-      label: 'Availability',
-      defaultValue: 'available',
-      options: [
-        { value: 'available', label: 'Available' },
-        { value: 'unavailable', label: 'Unavailable' },
-        { value: 'all', label: 'All' },
-      ],
-      getValue: () => 'available',
-      isValueConstraining: (value) => value !== 'all',
-    }),
-    createBooleanFilter<Row, TestFilterState, 'hiddenOnly'>({
-      id: 'hiddenOnly',
-      label: 'Hidden only',
-      getValue: (row) => row.hidden === true,
-    }),
+    id: 'search',
+    label: 'Search',
+    getSearchText: (row) => [row.name, row.sourceLabel],
+  }),
+  createEqualsFilter<Row, TestFilterState, 'status', Row['status']>({
+    id: 'status',
+    label: 'Status',
+    options: [
+      { value: 'draft', label: 'Draft' },
+      { value: 'published', label: 'Published' },
+    ],
+    getValue: (row) => row.status,
+  }),
+  createEqualsFilter<
+    Row,
+    TestFilterState,
+    'campaignAvailability',
+    'available' | 'unavailable' | 'all'
+  >({
+    id: 'campaignAvailability',
+    label: 'Availability',
+    defaultValue: 'available',
+    options: [
+      { value: 'available', label: 'Available' },
+      { value: 'unavailable', label: 'Unavailable' },
+      { value: 'all', label: 'All' },
+    ],
+    getValue: () => 'available',
+    isValueConstraining: (value) => value !== 'all',
+  }),
+  createBooleanFilter<Row, TestFilterState, 'hiddenOnly'>({
+    id: 'hiddenOnly',
+    label: 'Hidden only',
+    getValue: (row) => row.hidden === true,
+  }),
 ])
 
 describe('filter-engine', () => {
@@ -170,6 +175,25 @@ describe('filter-engine', () => {
 
     it('filters hidden rows with boolean advanced field', () => {
       expect(applyFilterSchema(schema, { hiddenOnly: true }, rows)).toEqual([rows[2]])
+    })
+
+    it('excludes fields via excludeFieldIds', () => {
+      const state = { campaignAvailability: 'unavailable' as const }
+
+      expect(applyFilterSchema(schema, state, rows)).toEqual([])
+      expect(
+        applyFilterSchema(schema, state, rows, { excludeFieldIds: ['campaignAvailability'] }),
+      ).toEqual(rows)
+    })
+
+    it('supports custom includeField predicates', () => {
+      const state = { search: 'homebrew', status: 'draft' as const }
+
+      expect(
+        applyFilterSchema(schema, state, rows, {
+          includeField: (field) => field.placement !== 'advanced',
+        }),
+      ).toEqual([rows[1]])
     })
   })
 

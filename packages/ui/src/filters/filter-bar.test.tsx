@@ -5,6 +5,7 @@ import { useState } from 'react'
 import { describe, expect, it, vi } from 'vitest'
 
 import { createBooleanFilter, createEqualsFilter, createTextFilter } from './filter-engine.helpers'
+import { setFilterValue } from './filter-engine'
 import { createFilterSchema } from './filter-schema.types'
 import { FilterAdvancedPanel } from './filter-advanced-panel.client'
 import { FilterBar } from './filter-bar.client'
@@ -66,7 +67,7 @@ function FilterSystemHarness({
         advancedOpen={advancedOpen}
         onAdvancedOpenChange={setAdvancedOpen}
         onValueChange={(id, value) => {
-          setState((current) => ({ ...current, [id]: value }))
+          setState((current) => setFilterValue(schema, current, id, value))
         }}
         onReset={() => {
           setState({})
@@ -78,7 +79,7 @@ function FilterSystemHarness({
         state={state}
         open={advancedOpen}
         onValueChange={(id, value) => {
-          setState((current) => ({ ...current, [id]: value }))
+          setState((current) => setFilterValue(schema, current, id, value))
         }}
         onClearAll={() => {
           setState({})

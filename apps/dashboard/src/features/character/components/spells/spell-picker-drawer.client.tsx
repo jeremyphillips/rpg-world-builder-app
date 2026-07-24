@@ -3,6 +3,7 @@
 import * as React from 'react'
 
 import { CatalogPickerSheet, InsetPanel, SegmentedControl, Text } from '@rpg/ui'
+import { useSanitizedFilterState } from '@rpg/ui/filters'
 
 import { hasCatalogPickerResetViewCriteria } from '../picker/catalog-picker-filter-state.lib'
 import {
@@ -205,6 +206,12 @@ export function SpellPickerDrawer({
     },
     [browseState, persistBrowseState, filterState],
   )
+
+  useSanitizedFilterState({
+    schema: filterSchema,
+    state: filterState,
+    onStateChange: persistFilterState,
+  })
 
   const handleModeChange = (nextMode: SpellPickerMode) => {
     const outgoingState = sanitizeSpellPickerBrowseState(

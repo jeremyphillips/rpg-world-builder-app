@@ -27,6 +27,7 @@ export { createFilterSchema } from './filter-schema.types'
 
 export {
   applyFilterSchema,
+  type ApplyFilterSchemaOptions,
   countModifiedFilters,
   createInitialFilterState,
   getEffectiveFilterValue,
@@ -35,6 +36,7 @@ export {
   resetFilterState,
   resolveFilterFieldPlacement,
   sanitizeFilterState,
+  isShallowFilterStateEqual,
   setFilterValue,
 } from './filter-engine'
 
@@ -59,9 +61,11 @@ export {
   resolveFilterSelectValue,
 } from './filter-bar.lib'
 export {
+  resolveFilterChromePresentation,
   resolveFilterControlSize,
   resolveFilterFieldPresentation,
   resolveFilterFieldWidthClasses,
+  type FilterChromePresentation,
   type FilterFieldPresentation,
 } from './filter-presentation.lib'
 
@@ -74,13 +78,17 @@ export {
 export { FilterBar, type FilterBarProps } from './filter-bar.client'
 export { FilterAdvancedPanel, type FilterAdvancedPanelProps } from './filter-advanced-panel.client'
 export { FilterFieldRenderer, type FilterRenderContext } from './filter-field-renderer.client'
-export { FilterField, FilterFieldList } from './filter-fields.client'
+export { FilterFieldList } from './filter-fields.client'
 export {
   CatalogFilterControls,
   type CatalogFilterControlsProps,
 } from './catalog-filter-controls.client'
-export { CatalogFilterField, CatalogFilterFieldList } from './catalog-filter-fields.client'
+export { CatalogFilterFieldList } from './catalog-filter-fields.client'
 export { useFilterState, type UseFilterStateOptions } from './use-filter-state.client'
+export {
+  useSanitizedFilterState,
+  type UseSanitizedFilterStateOptions,
+} from './use-sanitized-filter-state.client'
 
 export type { FilterSearchParamsInput } from './filter-persistence'
 export {
@@ -88,3 +96,4 @@ export {
   parseFilterSearchParams,
   serializeFilterSearchParams,
 } from './filter-persistence'
+export { stableSerializeFilterState } from './filter-state-serialization'

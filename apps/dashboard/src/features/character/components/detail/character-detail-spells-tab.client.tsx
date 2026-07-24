@@ -3,7 +3,7 @@
 import * as React from 'react'
 
 import { CatalogToolbar, CollapsibleListItem, Text } from '@rpg/ui'
-import { sanitizeFilterState } from '@rpg/ui/filters'
+import { useSanitizedFilterState } from '@rpg/ui/filters'
 
 import {
   buildCatalogDisclosureLabel,
@@ -99,9 +99,11 @@ export function CharacterDetailSpellsTab({ cards }: CharacterDetailSpellsTabProp
     [schemaArgs],
   )
 
-  React.useEffect(() => {
-    setFilterState((current) => sanitizeFilterState(filterSchema, current))
-  }, [filterSchema])
+  useSanitizedFilterState({
+    schema: filterSchema,
+    state: filterState,
+    onStateChange: setFilterState,
+  })
 
   const visibleCards = React.useMemo(
     () =>

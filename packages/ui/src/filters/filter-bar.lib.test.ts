@@ -7,7 +7,6 @@ import {
   resolveFilterControlSize,
   resolveFilterSelectValue,
   resolveSelectCurrentValue,
-  shouldSkipFilterSelectChange,
 } from './filter-bar.lib'
 import { FILTER_SELECT_ALL_VALUE } from './filter-bar.variants'
 
@@ -63,8 +62,23 @@ describe('filter-bar.lib', () => {
   })
 
   it('skips duplicate select changes when normalized value is unchanged', () => {
-    expect(shouldSkipFilterSelectChange('draft', 'draft', undefined)).toBe(true)
-    expect(shouldSkipFilterSelectChange(undefined, undefined, undefined)).toBe(true)
-    expect(shouldSkipFilterSelectChange('published', 'draft', undefined)).toBe(false)
+    expect(
+      Object.is(
+        normalizeFilterSelectChange(selectLike, 'draft'),
+        resolveSelectCurrentValue('draft', undefined),
+      ),
+    ).toBe(true)
+    expect(
+      Object.is(
+        normalizeFilterSelectChange(selectLike, FILTER_SELECT_ALL_VALUE),
+        resolveSelectCurrentValue(undefined, undefined),
+      ),
+    ).toBe(true)
+    expect(
+      Object.is(
+        normalizeFilterSelectChange(selectLike, 'published'),
+        resolveSelectCurrentValue('draft', undefined),
+      ),
+    ).toBe(false)
   })
 })

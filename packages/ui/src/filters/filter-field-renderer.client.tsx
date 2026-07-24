@@ -1,6 +1,7 @@
 'use client'
 
 import { CatalogFilterChips } from '../components/ui/catalog-filter-chips.client'
+import { Button } from '../components/ui/button.client'
 import { Checkbox } from '../components/ui/checkbox.client'
 import { FilterPopover } from '../components/ui/filter-popover.client'
 import { Input } from '../components/ui/input.client'
@@ -188,8 +189,24 @@ function FilterPopoverField<TData, TState extends Record<string, unknown>>({
       ? (rawValue as Record<string, string[]>)
       : ((popoverField.defaultValue as Record<string, string[]> | undefined) ?? {})
 
-  if (groups.length === 0 || disabled) {
-    return null
+  if (groups.length === 0) {
+    return (
+      <div className={presentation.groupClassName}>
+        <Button
+          type="button"
+          variant="outline"
+          size={presentation.triggerSize === 'md' ? 'default' : 'sm'}
+          disabled
+          aria-disabled="true"
+          aria-label={popoverField.triggerAriaLabel ?? popoverField.label}
+        >
+          {popoverField.label} (no options)
+        </Button>
+        <span id={controlId} className="sr-only">
+          {popoverField.label}
+        </span>
+      </div>
+    )
   }
 
   const activeCount = countPopoverActiveFilters(recordValue)
@@ -200,6 +217,7 @@ function FilterPopoverField<TData, TState extends Record<string, unknown>>({
         triggerLabel={popoverField.triggerLabel(activeCount)}
         triggerAriaLabel={popoverField.triggerAriaLabel ?? popoverField.label}
         triggerSize={presentation.triggerSize}
+        disabled={disabled}
         groups={groups.map((group) => ({
           id: group.id,
           label: group.label,
