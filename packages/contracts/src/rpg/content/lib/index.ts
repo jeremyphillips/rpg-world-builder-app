@@ -1,4 +1,5 @@
 export * from './campaign-access'
+export * from './content-viewer-access'
 export * from './content-access-capabilities'
 export * from './content-deletion'
 export * from './content-validation-intent'

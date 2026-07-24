@@ -3,7 +3,7 @@ import { z } from 'zod'
 import { contentVisibilityModeSchema } from '../../vocab/content-visibility'
 import { contentUsageBlockerSchema } from './content-deletion'
 
-/** Write shape for campaign access — participant ids, not character ids. */
+/** Write shape for campaign access — `participantIds` are PC character document ids. */
 export const contentCampaignAccessSchema = z.object({
   available: z.boolean(),
   visibilityMode: contentVisibilityModeSchema,

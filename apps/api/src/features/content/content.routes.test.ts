@@ -692,3 +692,193 @@ describe('content campaign access routes', () => {
       .expect(400)
   })
 })
+
+describe('content campaign access discovery enforcement', () => {
+  const minimalFeatInput = {
+    slug: 'discovery-feat',
+    name: 'Discovery Feat',
+    category: 'origin' as const,
+    repeatable: { allowed: false },
+  }
+
+  async function addCampaignMember(
+    campaignId: string,
+    email: string,
+    campaignRole: 'pc' | 'observer',
+    characterIds: string[] = [],
+  ) {
+    const member = await registerAndLoginTestUser(getApp(), {
+      email,
+      password: 'supersecret',
+      displayName: 'Campaign Member',
+    })
+    const meRes = await member.agent
+      .get('/api/auth/me')
+      .set(CSRF_HEADER, member.csrfToken)
+      .expect(200)
+    await CampaignMembershipModel.create({
+      campaignId,
+      userId: meRes.body.user.id as string,
+      campaignRole,
+      characterIds,
+      invitedAt: new Date(),
+      joinedAt: new Date(),
+    })
+    return member
+  }
+
+  async function createPublishedFeat(
+    campaignId: string,
+    agent: Agent,
+    csrfToken: string,
+    slug: string,
+  ) {
+    const createRes = await agent
+      .post(`/api/campaigns/${campaignId}/content/feats`)
+      .set(CSRF_HEADER, csrfToken)
+      .send({ ...minimalFeatInput, slug, name: `Feat ${slug}` })
+      .expect(201)
+    return createRes.body.feats.id as string
+  }
+
+  it('hides unavailable and dm_only content from non-manager members', async () => {
+    const owner = await registerAndLoginTestUser(getApp(), {
+      email: 'discovery-owner@example.com',
+      password: 'supersecret',
+      displayName: 'Owner',
+    })
+    const campaignId = await createTestCampaign(owner.agent, owner.csrfToken)
+
+    const unavailableId = await createPublishedFeat(
+      campaignId,
+      owner.agent,
+      owner.csrfToken,
+      'discovery-unavailable-feat',
+    )
+    const dmOnlyId = await createPublishedFeat(
+      campaignId,
+      owner.agent,
+      owner.csrfToken,
+      'discovery-dm-only-feat',
+    )
+
+    await owner.agent
+      .patch(`/api/campaigns/${campaignId}/content/feats/${unavailableId}/campaign-access`)
+      .set(CSRF_HEADER, owner.csrfToken)
+      .send({ available: false, visibilityMode: 'all_players', participantIds: [] })
+      .expect(200)
+
+    await owner.agent
+      .patch(`/api/campaigns/${campaignId}/content/feats/${dmOnlyId}/campaign-access`)
+      .set(CSRF_HEADER, owner.csrfToken)
+      .send({ available: true, visibilityMode: 'dm_only', participantIds: [] })
+      .expect(200)
+
+    const member = await addCampaignMember(campaignId, 'discovery-pc@example.com', 'pc', ['pc-1'])
+
+    const listRes = await member.agent
+      .get(`/api/campaigns/${campaignId}/content/feats`)
+      .set(CSRF_HEADER, member.csrfToken)
+      .expect(200)
+
+    const listedIds = listRes.body.feats.map((feat: { id: string }) => feat.id)
+    expect(listedIds).not.toContain(unavailableId)
+    expect(listedIds).not.toContain(dmOnlyId)
+
+    const ownerListRes = await owner.agent
+      .get(`/api/campaigns/${campaignId}/content/feats`)
+      .set(CSRF_HEADER, owner.csrfToken)
+      .expect(200)
+
+    const ownerListedIds = ownerListRes.body.feats.map((feat: { id: string }) => feat.id)
+    expect(ownerListedIds).toContain(unavailableId)
+    expect(ownerListedIds).toContain(dmOnlyId)
+  })
+
+  it('defensively hides specific_players content unless the viewer PC is granted', async () => {
+    const owner = await registerAndLoginTestUser(getApp(), {
+      email: 'discovery-specific-owner@example.com',
+      password: 'supersecret',
+      displayName: 'Owner',
+    })
+    const campaignId = await createTestCampaign(owner.agent, owner.csrfToken)
+
+    const restrictedId = await createPublishedFeat(
+      campaignId,
+      owner.agent,
+      owner.csrfToken,
+      'discovery-specific-feat',
+    )
+
+    await owner.agent
+      .patch(`/api/campaigns/${campaignId}/content/feats/${restrictedId}/campaign-access`)
+      .set(CSRF_HEADER, owner.csrfToken)
+      .send({
+        available: true,
+        visibilityMode: 'specific_players',
+        participantIds: ['granted-pc'],
+      })
+      .expect(200)
+
+    const grantedMember = await addCampaignMember(
+      campaignId,
+      'discovery-granted@example.com',
+      'pc',
+      ['granted-pc'],
+    )
+    const deniedMember = await addCampaignMember(campaignId, 'discovery-denied@example.com', 'pc', [
+      'other-pc',
+    ])
+
+    const grantedList = await grantedMember.agent
+      .get(`/api/campaigns/${campaignId}/content/feats`)
+      .set(CSRF_HEADER, grantedMember.csrfToken)
+      .expect(200)
+    expect(grantedList.body.feats.some((feat: { id: string }) => feat.id === restrictedId)).toBe(
+      true,
+    )
+
+    const deniedList = await deniedMember.agent
+      .get(`/api/campaigns/${campaignId}/content/feats`)
+      .set(CSRF_HEADER, deniedMember.csrfToken)
+      .expect(200)
+    expect(deniedList.body.feats.some((feat: { id: string }) => feat.id === restrictedId)).toBe(
+      false,
+    )
+  })
+
+  it('hides restricted content from observers', async () => {
+    const owner = await registerAndLoginTestUser(getApp(), {
+      email: 'discovery-observer-owner@example.com',
+      password: 'supersecret',
+      displayName: 'Owner',
+    })
+    const campaignId = await createTestCampaign(owner.agent, owner.csrfToken)
+
+    const dmOnlyId = await createPublishedFeat(
+      campaignId,
+      owner.agent,
+      owner.csrfToken,
+      'discovery-observer-feat',
+    )
+
+    await owner.agent
+      .patch(`/api/campaigns/${campaignId}/content/feats/${dmOnlyId}/campaign-access`)
+      .set(CSRF_HEADER, owner.csrfToken)
+      .send({ available: true, visibilityMode: 'dm_only', participantIds: [] })
+      .expect(200)
+
+    const observer = await addCampaignMember(
+      campaignId,
+      'discovery-observer@example.com',
+      'observer',
+    )
+
+    const listRes = await observer.agent
+      .get(`/api/campaigns/${campaignId}/content/feats`)
+      .set(CSRF_HEADER, observer.csrfToken)
+      .expect(200)
+
+    expect(listRes.body.feats.some((feat: { id: string }) => feat.id === dmOnlyId)).toBe(false)
+  })
+})

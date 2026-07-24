@@ -1,6 +1,6 @@
 import type { Request, Response } from 'express'
 
-import { CAMPAIGN_MANAGE_ROLES, contentStatusSchema, type CampaignManageRole } from '@rpg/contracts'
+import { contentStatusSchema } from '@rpg/contracts'
 
 import { HttpError } from '../../lib/http-error'
 import {
@@ -22,6 +22,7 @@ import {
   attachCampaignAccessForTargetType,
 } from './lib/content-campaign-access.service'
 import { getHomebrewContentSummary } from './lib/homebrew-summary.service'
+import { filterCatalogForMembership } from './lib/filter-catalog-for-viewer'
 
 export async function createContentItem(req: Request, res: Response): Promise<void> {
   const { campaignId, contentType } = req.params as { campaignId: string; contentType: string }
@@ -143,10 +144,7 @@ export async function listContent(req: Request, res: Response): Promise<void> {
   const writeConfig = getContentWriteConfig(contentType)!
   const items = await resolveContentForCampaign(contentType, campaignId)
   const withCampaignAccess = await attachCampaignAccessForTargetType(campaignId, contentType, items)
-  const role = req.campaignMembership!.campaignRole
-  const visible = CAMPAIGN_MANAGE_ROLES.includes(role as CampaignManageRole)
-    ? withCampaignAccess
-    : withCampaignAccess.filter((item) => item.status !== 'draft')
+  const visible = filterCatalogForMembership(withCampaignAccess, req.campaignMembership)
   res.status(200).json({ [writeConfig.responseKey]: visible })
 }
 
