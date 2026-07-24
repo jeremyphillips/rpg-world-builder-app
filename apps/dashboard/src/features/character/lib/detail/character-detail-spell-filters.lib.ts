@@ -1,10 +1,11 @@
 import { normalizeSearchQuery } from '@rpg/ui'
+import { applyFilterSchema, type FilterSchema } from '@rpg/ui/filters'
 
 import {
   CHARACTER_DETAIL_CATALOG_SEARCH_MIN_ITEMS,
-  countCharacterDetailStructuredFilters,
   matchesCharacterDetailCatalogSearchQuery,
 } from './character-detail-catalog-filters.lib'
+import type { CharacterDetailSpellFilterState } from './character-detail-spell-filter-schema'
 import type { CharacterSheetSpellCard } from './character-sheet-catalog'
 
 export const CHARACTER_DETAIL_SPELL_LEVEL_ALL = '__all__' as const
@@ -50,27 +51,18 @@ export function resolveCharacterDetailSpellLevelChipOptions(
   ]
 }
 
-export function countCharacterDetailSpellStructuredFilters(
-  selectedLevel: CharacterDetailSpellLevelFilter,
-): number {
-  return countCharacterDetailStructuredFilters(selectedLevel, CHARACTER_DETAIL_SPELL_LEVEL_ALL)
-}
-
 export function filterCharacterDetailSpellCards(
   cards: readonly CharacterSheetSpellCard[],
   options: {
-    selectedLevel: CharacterDetailSpellLevelFilter
+    schema: FilterSchema<CharacterSheetSpellCard, CharacterDetailSpellFilterState>
+    filterState: CharacterDetailSpellFilterState
     searchQuery: string
   },
 ): CharacterSheetSpellCard[] {
   const normalizedQuery = normalizeSearchQuery(options.searchQuery)
+  const searchFiltered = cards.filter((card) =>
+    matchesCharacterDetailCatalogSearchQuery(card, normalizedQuery),
+  )
 
-  return cards.filter((card) => {
-    if (!matchesCharacterDetailCatalogSearchQuery(card, normalizedQuery)) return false
-
-    if (options.selectedLevel === CHARACTER_DETAIL_SPELL_LEVEL_ALL) return true
-    if (card.status !== 'resolved') return false
-
-    return String(card.spell.level) === options.selectedLevel
-  })
+  return applyFilterSchema(options.schema, options.filterState, searchFiltered)
 }

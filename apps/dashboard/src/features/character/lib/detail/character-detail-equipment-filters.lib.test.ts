@@ -4,9 +4,8 @@ import {
   equipmentPickerChainMailFixture,
   equipmentPickerLongswordFixture,
 } from '../../components/equipment/equipment-picker-drawer.fixtures'
+import { createCharacterDetailEquipmentFilterSchema } from './character-detail-equipment-filter-schema'
 import {
-  buildCharacterDetailEquipmentKindChipOptions,
-  CHARACTER_DETAIL_EQUIPMENT_KIND_ALL,
   CHARACTER_DETAIL_EQUIPMENT_SORT_NAME_DESC,
   filterCharacterDetailEquipmentCards,
   resolveCharacterDetailEquipmentKindOptions,
@@ -25,17 +24,15 @@ describe('character-detail-equipment-filters.lib', () => {
     ])
   })
 
-  it('builds category chips with an All sentinel', () => {
-    expect(buildCharacterDetailEquipmentKindChipOptions(['weapon', 'armor'])).toEqual([
-      { value: CHARACTER_DETAIL_EQUIPMENT_KIND_ALL, label: 'All' },
-      { value: 'weapon', label: 'Weapon' },
-      { value: 'armor', label: 'Armor' },
-    ])
-  })
-
   it('filters cards by kind and search query', () => {
+    const schema = createCharacterDetailEquipmentFilterSchema({
+      kindOptions: ['weapon', 'armor'],
+      showCategoryFilter: true,
+    })
+
     const filtered = filterCharacterDetailEquipmentCards([weaponCard, armorCard], {
-      selectedKind: 'weapon',
+      schema,
+      filterState: { selectedKind: 'weapon' },
       searchQuery: 'long',
     })
 

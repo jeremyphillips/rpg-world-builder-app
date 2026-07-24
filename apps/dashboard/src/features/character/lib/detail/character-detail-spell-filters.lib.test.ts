@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import { pickSpell } from '@/features/content/lib/fixtures/pick'
 
+import { createCharacterDetailSpellFilterSchema } from './character-detail-spell-filter-schema'
 import {
   CHARACTER_DETAIL_SPELL_LEVEL_ALL,
   filterCharacterDetailSpellCards,
@@ -28,9 +29,15 @@ describe('character-detail-spell-filters.lib', () => {
   })
 
   it('filters cards to a single selected level', () => {
+    const schema = createCharacterDetailSpellFilterSchema({
+      cards: [cantrip, firstLevel],
+      showLevelFilter: true,
+    })
+
     expect(
       filterCharacterDetailSpellCards([cantrip, firstLevel], {
-        selectedLevel: '0',
+        schema,
+        filterState: { selectedLevel: '0' },
         searchQuery: '',
       }),
     ).toEqual([cantrip])
