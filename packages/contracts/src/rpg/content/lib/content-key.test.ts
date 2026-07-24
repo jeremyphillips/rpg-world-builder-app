@@ -4,6 +4,7 @@ import {
   assertStableContentIds,
   assignStableContentIds,
   ContentKeyError,
+  dedupeContentKey,
   deriveContentKey,
   slugifyName,
 } from './content-key'
@@ -33,6 +34,20 @@ describe('deriveContentKey', () => {
 
   it('falls back to untitled when the name has no slug characters', () => {
     expect(deriveContentKey('!!!')).toBe('untitled')
+  })
+})
+
+describe('dedupeContentKey', () => {
+  it('returns the base slug when unused', () => {
+    expect(dedupeContentKey('fighter', new Set())).toBe('fighter')
+    expect(dedupeContentKey('fighter', new Set(['barbarian']))).toBe('fighter')
+  })
+
+  it('appends numeric suffixes when the base slug is taken', () => {
+    const used = new Set(['darkvision'])
+    expect(dedupeContentKey('darkvision', used)).toBe('darkvision-2')
+    used.add('darkvision-2')
+    expect(dedupeContentKey('darkvision', used)).toBe('darkvision-3')
   })
 })
 

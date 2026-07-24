@@ -3,6 +3,7 @@ import {
   assertStableContentIds,
   ContentKeyError,
   deriveContentKey,
+  type NestedIdRegeneration,
 } from '@rpg/contracts'
 
 const STABLE_ID_ARRAY_KEYS = ['features', 'traits'] as const
@@ -48,6 +49,33 @@ function stableIdentifiedArray(
   })
 }
 
+function forceRegenerateIdentifiedArray(
+  rows: unknown[] | undefined,
+  destinationSlug: string,
+): unknown[] | undefined {
+  if (rows === undefined) return undefined
+
+  const usedIds = new Set<string>()
+  return rows.filter(hasName).map((row) => {
+    const { id: _id, name, ...rest } = row
+    let id = deriveContentKey(`${destinationSlug}-${name}`)
+    if (usedIds.has(id)) {
+      let suffix = 2
+      while (usedIds.has(`${id}-${suffix}`)) suffix += 1
+      id = `${id}-${suffix}`
+    }
+    usedIds.add(id)
+
+    const regenerated = { ...rest, name, id }
+    if (!Array.isArray(row.options)) return regenerated
+
+    return {
+      ...regenerated,
+      options: forceRegenerateIdentifiedArray(row.options, destinationSlug) ?? row.options,
+    }
+  })
+}
+
 function stableHeritageObject(incoming: unknown, existing?: unknown): unknown | undefined {
   if (incoming === undefined) return undefined
   if (!hasName(incoming)) return incoming
@@ -57,11 +85,68 @@ function stableHeritageObject(incoming: unknown, existing?: unknown): unknown | 
   return stabilized?.[0] ?? incoming
 }
 
+function forceRegenerateHeritageObject(
+  incoming: unknown,
+  destinationSlug: string,
+): unknown | undefined {
+  if (incoming === undefined) return undefined
+  if (!hasName(incoming)) return incoming
+
+  const regenerated = forceRegenerateIdentifiedArray([incoming], destinationSlug)
+  return regenerated?.[0] ?? incoming
+}
+
+type SpellResolutionEffect = { id: string; kind: string }
+type SpellResolutionApplication = { effectId: string; amount: string }
+type SpellResolutionOutcome = {
+  applications?: SpellResolutionApplication[]
+  [key: string]: unknown
+}
+type SpellResolutionBody = {
+  effects?: SpellResolutionEffect[]
+  outcomes?: SpellResolutionOutcome[]
+  [key: string]: unknown
+}
+
+function regenerateSpellResolution(
+  resolution: unknown,
+  destinationSlug: string,
+): SpellResolutionBody | undefined {
+  if (typeof resolution !== 'object' || resolution === null) return undefined
+
+  const body = resolution as SpellResolutionBody
+  const effectIdMap = new Map<string, string>()
+
+  const effects = (body.effects ?? []).map((effect, index) => {
+    const newId = deriveContentKey(`${destinationSlug}-${effect.kind}-${index + 1}`)
+    effectIdMap.set(effect.id, newId)
+    return { ...effect, id: newId }
+  })
+
+  const outcomes = (body.outcomes ?? []).map((outcome) => ({
+    ...outcome,
+    applications: (outcome.applications ?? []).map((application) => ({
+      ...application,
+      effectId: effectIdMap.get(application.effectId) ?? application.effectId,
+    })),
+  }))
+
+  return { ...body, effects, outcomes }
+}
+
 /**
  * Derives and assigns envelope slugs and nested trait/feature ids on create,
  * or preserves them on update. Only keys present in `body` are processed.
  */
 export function applyStableNestedContentKeys(
+  body: Record<string, unknown>,
+  existingBody?: Record<string, unknown>,
+): Record<string, unknown> {
+  return normalizeNestedContentKeysForCreate(body, existingBody)
+}
+
+/** Create-time nested id assignment — preserves stable ids on update. */
+export function normalizeNestedContentKeysForCreate(
   body: Record<string, unknown>,
   existingBody?: Record<string, unknown>,
 ): Record<string, unknown> {
@@ -77,6 +162,48 @@ export function applyStableNestedContentKeys(
   if ('heritage' in result) {
     const existing = existingBody?.heritage
     result.heritage = stableHeritageObject(result.heritage, existing)
+  }
+
+  return result
+}
+
+export interface RegenerateNestedContentKeysContext {
+  destinationSlug: string
+  nestedIdRegeneration: NestedIdRegeneration
+}
+
+/**
+ * Forces new nested authored ids for duplication — never preserves source ids,
+ * even when they would be valid on create.
+ */
+export function regenerateNestedContentKeysForDuplicate(
+  body: Record<string, unknown>,
+  context: RegenerateNestedContentKeysContext,
+): Record<string, unknown> {
+  if (context.nestedIdRegeneration === 'none') return { ...body }
+
+  const result = { ...body }
+
+  for (const path of context.nestedIdRegeneration.paths) {
+    if (path === 'features' || path === 'traits') {
+      if (!(path in result) || !Array.isArray(result[path])) continue
+      result[path] = forceRegenerateIdentifiedArray(
+        result[path] as unknown[],
+        context.destinationSlug,
+      )
+      continue
+    }
+
+    if (path === 'heritage') {
+      if (!('heritage' in result)) continue
+      result.heritage = forceRegenerateHeritageObject(result.heritage, context.destinationSlug)
+      continue
+    }
+
+    if (path === 'resolution') {
+      if (!('resolution' in result)) continue
+      result.resolution = regenerateSpellResolution(result.resolution, context.destinationSlug)
+    }
   }
 
   return result
@@ -98,7 +225,7 @@ export function deriveEnvelopeSlugFromInput(input: Record<string, unknown>): str
 export function normalizeHomebrewWriteInput(
   raw: unknown,
   existingBody?: Record<string, unknown>,
-  mode: 'create' | 'update' = 'create',
+  mode: 'create' | 'update' | 'duplicate' = 'create',
 ): unknown {
   if (typeof raw !== 'object' || raw === null) return raw
 
@@ -112,7 +239,11 @@ export function normalizeHomebrewWriteInput(
     delete input.slug
   }
 
-  return applyStableNestedContentKeys(input, existingBody)
+  if (mode === 'duplicate') {
+    return input
+  }
+
+  return normalizeNestedContentKeysForCreate(input, existingBody)
 }
 
 export { ContentKeyError }

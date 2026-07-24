@@ -33,7 +33,7 @@ export async function createContentItem(req: Request, res: Response): Promise<vo
   const rawBody = req.body as Record<string, unknown>
   const { status: rawStatus, ...createBody } = rawBody
   const status = contentStatusSchema.parse(rawStatus ?? 'published')
-  const entity = await createHomebrewContent(writeConfig, campaignId, createBody, status)
+  const entity = await createHomebrewContent(writeConfig, campaignId, createBody, { status })
   res.status(201).json({ [writeConfig.responseKey]: entity })
 }
 

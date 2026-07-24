@@ -206,7 +206,7 @@ describe('content write baseline — draft status', () => {
       classWriteConfig,
       campaign.id,
       baselineCases.find((entry) => entry.label === 'classes')!.createInput,
-      'draft',
+      { status: 'draft' },
     )
     expect(created.status).toBe('draft')
   })
@@ -217,7 +217,7 @@ describe('content write baseline — draft status', () => {
       skillProficiencyWriteConfig,
       campaign.id,
       { slug: 'draft-skill', name: '' },
-      'draft',
+      { status: 'draft' },
     )
 
     expect(created.status).toBe('draft')
@@ -238,7 +238,7 @@ describe('content write baseline — draft status', () => {
       featWriteConfig,
       campaign.id,
       { slug: 'draft-feat', name: '', repeatable: { allowed: false } },
-      'draft',
+      { status: 'draft' },
     )
 
     expect(created.status).toBe('draft')
@@ -254,7 +254,7 @@ describe('content write baseline — draft status', () => {
       equipmentWriteConfig,
       campaign.id,
       { slug: 'draft-armor', kind: 'armor', name: '' },
-      'draft',
+      { status: 'draft' },
     )
 
     expect(created.status).toBe('draft')
@@ -271,7 +271,7 @@ describe('content write baseline — draft status', () => {
       speciesWriteConfig,
       campaign.id,
       { slug: 'draft-species', name: '', creatureType: 'humanoid' },
-      'draft',
+      { status: 'draft' },
     )
 
     expect(created.status).toBe('draft')
@@ -288,7 +288,7 @@ describe('content write baseline — draft status', () => {
       classWriteConfig,
       campaign.id,
       { slug: 'draft-class', name: '', hitDie: 8 },
-      'draft',
+      { status: 'draft' },
     )
 
     expect(created.status).toBe('draft')
@@ -305,7 +305,7 @@ describe('content write baseline — draft status', () => {
       spellWriteConfig,
       campaign.id,
       { slug: 'draft-spell', name: '', school: 'evocation' },
-      'draft',
+      { status: 'draft' },
     )
 
     expect(created.status).toBe('draft')

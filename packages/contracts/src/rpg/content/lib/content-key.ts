@@ -26,7 +26,8 @@ export function slugifyName(name: string): string {
     .replace(/^-|-$/g, '')
 }
 
-function dedupeContentKey(base: string, used: ReadonlySet<string>): string {
+/** Returns `base` when unused, otherwise `base-2`, `base-3`, … within `used`. */
+export function dedupeContentKey(base: string, used: ReadonlySet<string>): string {
   if (!used.has(base)) return base
 
   let suffix = 2
