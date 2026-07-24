@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useMemo, useRef, useState } from 'react'
+import { memo, useCallback, useMemo, useRef, useState, type ReactNode } from 'react'
 import {
   CAMPAIGN_AVAILABILITY_FILTER_DEFAULT,
   type CampaignAvailabilityFilter,
@@ -10,6 +10,7 @@ import {
 import {
   Button,
   DataTable,
+  areColumnChangeStatesEqual,
   dataTableFilterNoticeVariants,
   dataTableRowUnavailableRailVariants,
   dataTableRowUnavailableVariants,
@@ -27,6 +28,7 @@ import {
 } from '@rpg/ui/filters'
 
 import { getContentTypeMidSentenceLabel } from '../content-type-labels'
+import { useCanManageCampaign } from '@/features/campaign'
 import {
   CAMPAIGN_ACCESS_TABLE_HIDE_UNAVAILABLE_LABEL,
   CAMPAIGN_ACCESS_TABLE_SHOW_ALL_LABEL,
@@ -45,8 +47,10 @@ import {
 } from './content-overview-columns.lib'
 import { useStableOverviewColumns } from './content-overview-columns.client'
 import {
+  CONTENT_OVERVIEW_PREFERENCES_DEFAULTS,
   hydrateContentOverviewPreferences,
   persistContentOverviewPreferences,
+  type ContentOverviewPageSize,
   type ContentOverviewPreferences,
 } from './content-overview-preferences'
 import { ContentOverviewRowActions } from './content-overview-row-actions'
@@ -60,6 +64,109 @@ import { useContentOverviewQueryState } from './use-content-overview-query-state
 
 const EDIT_DETAILS_LABEL = 'Edit details'
 const DEFAULT_OVERVIEW_SORT = { id: 'name' } as const
+const OVERVIEW_NAME_COLUMN_ID = 'name'
+
+type ContentOverviewDataTableProps<T extends WithCampaignAccess<ContentBase> & { id: string }> = {
+  columns: ColumnDef<T, unknown>[]
+  data: T[]
+  pageSize: ContentOverviewPageSize
+  columnVisibility?: ContentOverviewPreferences['columnVisibility']
+  columnOrder?: ContentOverviewPreferences['columnOrder']
+  canManage: boolean
+  campaignId: string
+  contentTypeKey: ContentTypeKey
+  itemLabel: string
+  campaignAvailability: CampaignAvailabilityFilter
+  getEditHref: (row: T) => string
+  onColumnChange: (state: ColumnChangeState) => void
+  caption?: string
+  emptyState: ReactNode | ((context: { filteredRowCount: number }) => ReactNode)
+  restoreFocusRef: React.MutableRefObject<(removedRowId: string) => void>
+  registerActionTrigger: (rowId: string, element: HTMLButtonElement | null) => void
+}
+
+const ContentOverviewDataTable = memo(function ContentOverviewDataTable<
+  T extends WithCampaignAccess<ContentBase> & { id: string },
+>({
+  columns,
+  data,
+  pageSize,
+  columnVisibility,
+  columnOrder,
+  canManage,
+  campaignId,
+  contentTypeKey,
+  itemLabel,
+  campaignAvailability,
+  getEditHref,
+  onColumnChange,
+  caption,
+  emptyState,
+  restoreFocusRef,
+  registerActionTrigger,
+}: ContentOverviewDataTableProps<T>) {
+  const getEditHrefRef = useRef(getEditHref)
+  getEditHrefRef.current = getEditHref
+
+  const rowActions = useCallback(
+    (row: T) => (
+      <ContentOverviewRowActions
+        campaignId={campaignId}
+        contentTypeKey={contentTypeKey}
+        entityId={row.id}
+        editHref={getEditHrefRef.current(row)}
+        itemLabel={itemLabel}
+        campaignAccess={row.campaignAccess}
+        campaignAvailabilityFilter={campaignAvailability}
+        canManage={canManage}
+        editLabel={EDIT_DETAILS_LABEL}
+        onRowRemoved={() => restoreFocusRef.current(row.id)}
+        triggerRef={(element) => registerActionTrigger(row.id, element)}
+      />
+    ),
+    [campaignAvailability, campaignId, canManage, contentTypeKey, itemLabel, registerActionTrigger],
+  )
+
+  const getRowClassName = useCallback(
+    (row: { original: T }) =>
+      row.original.campaignAccess.available ? undefined : dataTableRowUnavailableVariants(),
+    [],
+  )
+
+  const getCellClassName = useCallback((cell: { column: { id: string }; row: { original: T } }) => {
+    if (cell.row.original.campaignAccess.available) return undefined
+    if (cell.column.id !== OVERVIEW_NAME_COLUMN_ID) return undefined
+    return dataTableRowUnavailableRailVariants()
+  }, [])
+
+  const resolvedEmptyState = useMemo(
+    () =>
+      typeof emptyState === 'function'
+        ? (context: { filteredRowCount: number; totalRowCount: number }) =>
+            emptyState({ filteredRowCount: context.filteredRowCount })
+        : () => emptyState,
+    [emptyState],
+  )
+
+  return (
+    <DataTable
+      columns={columns}
+      data={data}
+      showFilterControls={false}
+      defaultPageSize={pageSize}
+      initialColumnVisibility={columnVisibility}
+      initialColumnOrder={columnOrder}
+      onColumnChange={onColumnChange}
+      rowActions={canManage ? rowActions : undefined}
+      caption={caption}
+      emptyState={resolvedEmptyState}
+      getRowClassName={getRowClassName}
+      getCellClassName={getCellClassName}
+    />
+  )
+}) as <T extends WithCampaignAccess<ContentBase> & { id: string }>(
+  props: ContentOverviewDataTableProps<T>,
+) => React.JSX.Element
 
 function applyFilterSchemaExcluding<
   T extends WithCampaignAccess<ContentBase>,
@@ -113,6 +220,7 @@ export function ContentOverviewTable<
 }: ContentOverviewTableProps<T, TFilters>) {
   const tableRootRef = useRef<HTMLDivElement>(null)
   const actionTriggerRefs = useRef(new Map<string, HTMLButtonElement>())
+  const canManage = useCanManageCampaign(campaignId)
   const stableColumns = useStableOverviewColumns(columns)
   const columnSchema = useMemo(
     () => buildContentOverviewColumnSchema(stableColumns as ColumnDef<unknown>[]),
@@ -121,7 +229,7 @@ export function ContentOverviewTable<
   const [preferences, setPreferences] = useState<ContentOverviewPreferences>(() =>
     hydrateContentOverviewPreferences(contentTypeKey, columnSchema),
   )
-  const [advancedOpen, setAdvancedOpen] = useState(preferences.advancedOpen ?? false)
+  const advancedOpen = preferences.advancedOpen ?? false
   const allowedSortIds = useMemo(
     () => getContentOverviewSortableColumnIds(stableColumns as ColumnDef<unknown>[]),
     [stableColumns],
@@ -165,8 +273,9 @@ export function ContentOverviewTable<
 
   const handleAdvancedOpenChange = useCallback(
     (open: boolean) => {
-      setAdvancedOpen(open)
       setPreferences((current) => {
+        if (current.advancedOpen === open) return current
+
         const next = { ...current, advancedOpen: open }
         persistContentOverviewPreferences(contentTypeKey, next)
         return next
@@ -178,19 +287,24 @@ export function ContentOverviewTable<
   const handleColumnChange = useCallback(
     (state: ColumnChangeState) => {
       setPreferences((current) => {
-        const nextVisibility = state.visibility
-        const nextOrder = state.order
-        const visibilityUnchanged =
-          JSON.stringify(current.columnVisibility ?? {}) === JSON.stringify(nextVisibility)
-        const orderUnchanged =
-          JSON.stringify(current.columnOrder ?? []) === JSON.stringify(nextOrder)
-        if (visibilityUnchanged && orderUnchanged) return current
-
         const next = {
           ...current,
-          columnVisibility: nextVisibility,
-          columnOrder: nextOrder,
+          columnVisibility: state.visibility,
+          columnOrder: state.order,
         }
+
+        if (
+          areColumnChangeStatesEqual(
+            {
+              visibility: current.columnVisibility ?? {},
+              order: current.columnOrder ?? [],
+            },
+            state,
+          )
+        ) {
+          return current
+        }
+
         persistContentOverviewPreferences(contentTypeKey, next)
         return next
       })
@@ -226,6 +340,21 @@ export function ContentOverviewTable<
     },
     [visibleRows],
   )
+
+  const restoreFocusRef = useRef(restoreFocusAfterRowRemoved)
+  restoreFocusRef.current = restoreFocusAfterRowRemoved
+
+  const registerActionTrigger = useCallback((rowId: string, element: HTMLButtonElement | null) => {
+    if (element) {
+      actionTriggerRefs.current.set(rowId, element)
+      return
+    }
+
+    actionTriggerRefs.current.delete(rowId)
+  }, [])
+
+  const tablePageSize: ContentOverviewPageSize =
+    preferences.pageSize ?? CONTENT_OVERVIEW_PREFERENCES_DEFAULTS.pageSize ?? 20
 
   const filterNotice = useMemo(() => {
     if (scope.unavailableCount === 0) return null
@@ -337,45 +466,23 @@ export function ContentOverviewTable<
 
       {filterNotice ? <div className={dataTableFilterNoticeVariants()}>{filterNotice}</div> : null}
 
-      <DataTable
+      <ContentOverviewDataTable
         columns={stableColumns}
         data={visibleRows}
-        showFilterControls={false}
-        defaultPageSize={preferences.pageSize}
-        initialColumnVisibility={preferences.columnVisibility}
-        initialColumnOrder={preferences.columnOrder}
+        pageSize={tablePageSize}
+        columnVisibility={preferences.columnVisibility}
+        columnOrder={preferences.columnOrder}
+        canManage={canManage}
+        campaignId={campaignId}
+        contentTypeKey={contentTypeKey}
+        itemLabel={itemLabel}
+        campaignAvailability={campaignAvailability}
+        getEditHref={getEditHref}
         onColumnChange={handleColumnChange}
-        rowActions={(row) => (
-          <ContentOverviewRowActions
-            campaignId={campaignId}
-            contentTypeKey={contentTypeKey}
-            entityId={row.id}
-            editHref={getEditHref(row)}
-            itemLabel={itemLabel}
-            campaignAccess={row.campaignAccess}
-            campaignAvailabilityFilter={campaignAvailability}
-            editLabel={EDIT_DETAILS_LABEL}
-            onRowRemoved={() => restoreFocusAfterRowRemoved(row.id)}
-            triggerRef={(element) => {
-              if (element) {
-                actionTriggerRefs.current.set(row.id, element)
-              } else {
-                actionTriggerRefs.current.delete(row.id)
-              }
-            }}
-          />
-        )}
         caption={caption}
         emptyState={emptyState}
-        getRowClassName={(row) =>
-          row.original.campaignAccess.available ? undefined : dataTableRowUnavailableVariants()
-        }
-        getCellClassName={(cell) => {
-          if (cell.row.original.campaignAccess.available) return undefined
-          const [firstCell] = cell.row.getVisibleCells()
-          if (cell.id !== firstCell?.id) return undefined
-          return dataTableRowUnavailableRailVariants()
-        }}
+        restoreFocusRef={restoreFocusRef}
+        registerActionTrigger={registerActionTrigger}
       />
     </div>
   )

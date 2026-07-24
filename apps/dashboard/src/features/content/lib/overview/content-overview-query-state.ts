@@ -1,5 +1,6 @@
-import type { FilterSchema } from '@rpg/ui/filters'
+import type { FilterFieldId, FilterSchema } from '@rpg/ui/filters'
 import {
+  getEffectiveFilterValue,
   hydrateFilterState,
   type FilterSearchParamsInput,
   serializeFilterSearchParams,
@@ -77,6 +78,31 @@ export function isOverviewQueryEqual<TFilters extends Record<string, unknown>>(
 /** Stable memo key for sortable column id lists that may be reallocated each render. */
 export function createAllowedSortIdsKey(allowedSortIds: readonly string[]): string {
   return allowedSortIds.join('\0')
+}
+
+/** Canonical, order-independent URL key for memo equality. */
+export function createSearchParamsKey(searchParams: URLSearchParams): string {
+  return [...searchParams.entries()]
+    .sort(([left], [right]) => left.localeCompare(right))
+    .map(([key, value]) => `${key}=${value}`)
+    .join('&')
+}
+
+/** Stable memo key for filter state snapshots that may be reallocated each hydration. */
+export function createFilterStateKey<TData, TFilters extends Record<string, unknown>>(
+  schema: FilterSchema<TData, TFilters>,
+  filters: TFilters,
+): string {
+  return schema.fields
+    .map((field) => {
+      const effective = getEffectiveFilterValue(
+        schema,
+        filters,
+        field.id as FilterFieldId<TFilters>,
+      )
+      return `${String(field.id)}=${String(effective)}`
+    })
+    .join('\0')
 }
 
 /** Parses a sort query param. Invalid or unknown ids return `undefined`. */

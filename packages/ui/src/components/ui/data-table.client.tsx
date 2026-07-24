@@ -106,6 +106,12 @@ import {
 } from './table'
 import { Badge, type BadgeAppearance, type BadgeTone } from './badge'
 import { dataTableWidthMeta } from './data-table-meta'
+import {
+  areColumnOrdersEqual,
+  areVisibilityStatesEqual,
+  createColumnChangeSnapshot,
+  createPersistedColumnChangeState,
+} from './data-table-column-change.lib'
 import type {
   BooleanFilterDef,
   ColumnChangeState,
@@ -303,9 +309,11 @@ function SelectFilterControl<TData>({
         value={effectiveValue}
         onValueChange={(nextValue) => {
           if (showAllOption && nextValue === '__all__') {
+            if (value === undefined || value === '') return
             onValueChange(undefined)
             return
           }
+          if (Object.is(nextValue, effectiveValue)) return
           onValueChange(nextValue)
         }}
       >
@@ -447,11 +455,15 @@ interface DataTableColumnPanelProps<TData> {
   onColumnChange?: (state: ColumnChangeState) => void
 }
 
+const POINTER_SENSOR_ACTIVATION_DISTANCE_PX = 8
+
 function DataTableColumnPanel<TData>({ table, onColumnChange }: DataTableColumnPanelProps<TData>) {
   const [search, setSearch] = React.useState('')
 
   const sensors = useSensors(
-    useSensor(PointerSensor),
+    useSensor(PointerSensor, {
+      activationConstraint: { distance: POINTER_SENSOR_ACTIVATION_DISTANCE_PX },
+    }),
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
   )
 
@@ -496,10 +508,12 @@ function DataTableColumnPanel<TData>({ table, onColumnChange }: DataTableColumnP
     ]
 
     table.setColumnOrder(fullOrder)
-    onColumnChange?.({
-      visibility: table.getState().columnVisibility,
-      order: newOrder,
-    })
+    onColumnChange?.(
+      createPersistedColumnChangeState(
+        table.getState().columnVisibility,
+        table.getState().columnOrder,
+      ),
+    )
   }
 
   function handleReset() {
@@ -732,11 +746,12 @@ function DataTableAdvancedFilters<TData>({
 
 interface DataTablePaginationProps<TData> {
   table: ReturnType<typeof useReactTable<TData>>
+  onPageSizeChange: (pageSize: number) => void
 }
 
 const PAGE_SIZE_OPTIONS = [10, 20, 50, 100] as const
 
-function DataTablePagination<TData>({ table }: DataTablePaginationProps<TData>) {
+function DataTablePagination<TData>({ table, onPageSizeChange }: DataTablePaginationProps<TData>) {
   const { pageIndex, pageSize } = table.getState().pagination
   const totalRows = table.getFilteredRowModel().rows.length
   const start = pageIndex * pageSize + 1
@@ -752,7 +767,7 @@ function DataTablePagination<TData>({ table }: DataTablePaginationProps<TData>) 
         <label htmlFor="page-size-select" className="sr-only">
           Rows per page
         </label>
-        <Select value={String(pageSize)} onValueChange={(v) => table.setPageSize(Number(v))}>
+        <Select value={String(pageSize)} onValueChange={(value) => onPageSizeChange(Number(value))}>
           <SelectTrigger id="page-size-select" size="sm" className="w-[90px]">
             <SelectValue />
           </SelectTrigger>
@@ -1071,15 +1086,28 @@ export function DataTable<TData>({
     React.useState<ColumnFiltersState>(
       defaultColumnFilters ?? buildDefaultColumnFilters<TData>(filters),
     )
-  const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>(
+  const [columnVisibility, setColumnVisibilityState] = React.useState<VisibilityState>(
     initialColumnVisibility ?? {},
   )
-  const [columnOrder, setColumnOrder] = React.useState<ColumnOrderState>(initialColumnOrder ?? [])
+  const [columnOrder, setColumnOrderState] = React.useState<ColumnOrderState>(
+    initialColumnOrder ?? [],
+  )
   const [rowSelection, setRowSelection] = React.useState<RowSelectionState>({})
-  const [pagination, setPagination] = React.useState<PaginationState>({
+  const [pagination, setPaginationState] = React.useState<PaginationState>({
     pageIndex: 0,
     pageSize: defaultPageSize,
   })
+  const setPagination = React.useCallback(
+    (updater: PaginationState | ((prev: PaginationState) => PaginationState)) => {
+      setPaginationState((prev) => {
+        const next = typeof updater === 'function' ? updater(prev) : updater
+        if (prev.pageIndex === next.pageIndex && prev.pageSize === next.pageSize) return prev
+        return next
+      })
+    },
+    [],
+  )
+
   const [advancedOpen, setAdvancedOpen] = React.useState(false)
 
   const isColumnFiltersControlled = columnFiltersProp !== undefined
@@ -1126,63 +1154,111 @@ export function DataTable<TData>({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  // Notify parent when column visibility changes
+  // Notify parent when column visibility/order changes — explicit writes only.
   const onColumnChangeRef = React.useRef(onColumnChange)
   React.useEffect(() => {
     onColumnChangeRef.current = onColumnChange
   })
-  React.useEffect(() => {
-    onColumnChangeRef.current?.({
-      visibility: columnVisibility,
-      order: columnOrder,
-    })
-  }, [columnVisibility, columnOrder])
+  const columnVisibilityRef = React.useRef(columnVisibility)
+  const columnOrderRef = React.useRef(columnOrder)
+  columnVisibilityRef.current = columnVisibility
+  columnOrderRef.current = columnOrder
+  const lastNotifiedColumnStateRef = React.useRef<string | null>(null)
+
+  const notifyColumnChange = React.useCallback(() => {
+    if (!onColumnChangeRef.current) return
+
+    const next = createPersistedColumnChangeState(
+      columnVisibilityRef.current,
+      columnOrderRef.current,
+    )
+    const snapshot = createColumnChangeSnapshot(next)
+    if (snapshot === lastNotifiedColumnStateRef.current) return
+
+    lastNotifiedColumnStateRef.current = snapshot
+    onColumnChangeRef.current(next)
+  }, [])
+
+  const setColumnVisibility = React.useCallback(
+    (updater: VisibilityState | ((prev: VisibilityState) => VisibilityState)) => {
+      setColumnVisibilityState((prev) => {
+        const next = typeof updater === 'function' ? updater(prev) : updater
+        if (areVisibilityStatesEqual(prev, next)) return prev
+
+        queueMicrotask(notifyColumnChange)
+        return next
+      })
+    },
+    [notifyColumnChange],
+  )
+
+  const setColumnOrder = React.useCallback(
+    (updater: ColumnOrderState | ((prev: ColumnOrderState) => ColumnOrderState)) => {
+      setColumnOrderState((prev) => {
+        const next = typeof updater === 'function' ? updater(prev) : updater
+        if (areColumnOrdersEqual(prev, next)) return prev
+
+        queueMicrotask(notifyColumnChange)
+        return next
+      })
+    },
+    [notifyColumnChange],
+  )
 
   // Inject selection column
-  const selectionColumn: ColumnDef<TData> = {
-    id: 'select',
-    header: ({ table }) => (
-      <Checkbox
-        checked={
-          table.getIsAllPageRowsSelected() ||
-          (table.getIsSomePageRowsSelected() ? 'indeterminate' : false)
-        }
-        onCheckedChange={(v) => table.toggleAllPageRowsSelected(!!v)}
-        aria-label="Select all rows on this page"
-      />
-    ),
-    cell: ({ row }) => (
-      <Checkbox
-        checked={row.getIsSelected()}
-        onCheckedChange={(v) => row.toggleSelected(!!v)}
-        aria-label="Select row"
-      />
-    ),
-    enableSorting: false,
-    enableHiding: false,
-    meta: { ...dataTableWidthMeta('minimal'), columnTone: 'neutral' },
-  }
+  const selectionColumn = React.useMemo<ColumnDef<TData>>(
+    () => ({
+      id: 'select',
+      header: ({ table }) => (
+        <Checkbox
+          checked={
+            table.getIsAllPageRowsSelected() ||
+            (table.getIsSomePageRowsSelected() ? 'indeterminate' : false)
+          }
+          onCheckedChange={(v) => table.toggleAllPageRowsSelected(!!v)}
+          aria-label="Select all rows on this page"
+        />
+      ),
+      cell: ({ row }) => (
+        <Checkbox
+          checked={row.getIsSelected()}
+          onCheckedChange={(v) => row.toggleSelected(!!v)}
+          aria-label="Select row"
+        />
+      ),
+      enableSorting: false,
+      enableHiding: false,
+      meta: { ...dataTableWidthMeta('minimal'), columnTone: 'neutral' },
+    }),
+    [],
+  )
 
   // Inject actions column
-  const actionsColumn: ColumnDef<TData> = {
-    id: 'actions',
-    header: () => <span className="sr-only">Actions</span>,
-    cell: ({ row }) => rowActions?.(row.original) ?? null,
-    enableSorting: false,
-    enableHiding: false,
-    meta: {
-      ...dataTableWidthMeta('actions'),
-      columnTone: 'actions',
-      label: 'Actions',
-      locked: true,
-    },
-  }
+  const actionsColumn = React.useMemo<ColumnDef<TData>>(
+    () => ({
+      id: 'actions',
+      header: () => <span className="sr-only">Actions</span>,
+      cell: ({ row }) => rowActions?.(row.original) ?? null,
+      enableSorting: false,
+      enableHiding: false,
+      meta: {
+        ...dataTableWidthMeta('actions'),
+        columnTone: 'actions',
+        label: 'Actions',
+        locked: true,
+      },
+    }),
+    [rowActions],
+  )
 
-  const resolvedColumns: ColumnDef<TData>[] = [
-    ...(enableRowSelection ? [selectionColumn] : []),
-    ...columns,
-    ...(rowActions ? [actionsColumn] : []),
-  ]
+  const resolvedColumns = React.useMemo<ColumnDef<TData>[]>(
+    () => [
+      ...(enableRowSelection ? [selectionColumn] : []),
+      ...columns,
+      ...(rowActions ? [actionsColumn] : []),
+    ],
+    [actionsColumn, columns, enableRowSelection, rowActions, selectionColumn],
+  )
 
   // TanStack Table returns unstable function references; intentional here.
   // eslint-disable-next-line react-hooks/incompatible-library -- useReactTable
@@ -1193,7 +1269,7 @@ export function DataTable<TData>({
       sorting,
       columnFilters: columnBackedFilters,
       columnVisibility,
-      columnOrder,
+      ...(columnOrder.length > 0 ? { columnOrder } : {}),
       rowSelection,
       pagination,
     },
@@ -1220,10 +1296,24 @@ export function DataTable<TData>({
     enableRowSelection,
   })
 
+  const tableRef = React.useRef(table)
+  tableRef.current = table
+
+  const handlePageSizeChange = React.useCallback((nextSize: number) => {
+    const currentSize = tableRef.current.getState().pagination.pageSize
+    if (nextSize === currentSize) return
+    tableRef.current.setPageSize(nextSize)
+  }, [])
+
+  const onRowSelectionChangeRef = React.useRef(onRowSelectionChange)
+  onRowSelectionChangeRef.current = onRowSelectionChange
+
   // Notify parent of selection changes
   React.useEffect(() => {
-    onRowSelectionChange?.(table.getSelectedRowModel().rows.map((r) => r.original))
-  }, [rowSelection, onRowSelectionChange, table])
+    onRowSelectionChangeRef.current?.(
+      tableRef.current.getSelectedRowModel().rows.map((r) => r.original),
+    )
+  }, [rowSelection])
 
   const primaryFilters = filters.filter((f) => getDefaultGroup(f) === 'primary')
   const secondaryFilters = filters.filter((f) => getDefaultGroup(f) === 'secondary')
@@ -1362,7 +1452,7 @@ export function DataTable<TData>({
       </div>
 
       {/* Pagination */}
-      <DataTablePagination table={table} />
+      <DataTablePagination table={table} onPageSizeChange={handlePageSizeChange} />
     </div>
   )
 }

@@ -5,6 +5,8 @@ import {
   CONTENT_OVERVIEW_DEFAULT_PAGE,
   CONTENT_OVERVIEW_PAGE_PARAM,
   CONTENT_OVERVIEW_SORT_PARAM,
+  createFilterStateKey,
+  createSearchParamsKey,
   hydrateOverviewQuery,
   isOverviewQueryEqual,
   parseOverviewPage,
@@ -122,6 +124,34 @@ describe('content-overview-query-state', () => {
           defaultSort,
         }).sort,
       ).toEqual(defaultSort)
+    })
+  })
+
+  describe('createSearchParamsKey', () => {
+    it('treats param order as equivalent', () => {
+      const left = new URLSearchParams('status=draft&q=fire')
+      const right = new URLSearchParams('q=fire&status=draft')
+
+      expect(createSearchParamsKey(left)).toBe(createSearchParamsKey(right))
+    })
+  })
+
+  describe('createFilterStateKey', () => {
+    it('stays stable for equivalent effective filter values', () => {
+      const withDefault = {
+        campaignAvailability: 'available' as const,
+        status: 'draft' as const,
+      }
+      const withoutDefaultKey = {
+        status: 'draft' as const,
+      }
+
+      expect(createFilterStateKey(schema, withDefault)).toBe(
+        createFilterStateKey(schema, {
+          ...withoutDefaultKey,
+          campaignAvailability: 'available',
+        }),
+      )
     })
   })
 

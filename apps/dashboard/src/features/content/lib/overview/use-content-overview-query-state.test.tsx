@@ -170,9 +170,95 @@ describe('useContentOverviewQueryState', () => {
     })
 
     const queryBefore = result.current.state.query
+    const actionsBefore = result.current.state.actions
     rerender()
     rerender()
 
     expect(result.current.state.query).toBe(queryBefore)
+    expect(result.current.state.actions).toBe(actionsBefore)
+  })
+
+  it('applies filter changes optimistically before the URL updates', async () => {
+    const { result } = renderOverviewQueryState('/')
+
+    act(() => {
+      result.current.state.actions.setFilterValue('status', 'draft')
+    })
+
+    expect(result.current.state.query.filters.status).toBe('draft')
+
+    await waitFor(() => {
+      expect(result.current.searchParams.get('status')).toBe('draft')
+    })
+  })
+
+  it('debounces text filter URL writes', async () => {
+    vi.useFakeTimers()
+
+    try {
+      const { result } = renderOverviewQueryState('/')
+
+      act(() => {
+        result.current.state.actions.setFilterValue('search', 'fire')
+      })
+
+      expect(result.current.state.query.filters.search).toBe('fire')
+      expect(result.current.searchParams.get('q')).toBeNull()
+
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(300)
+      })
+
+      expect(result.current.searchParams.get('q')).toBe('fire')
+    } finally {
+      vi.useRealTimers()
+    }
+  })
+
+  it('does not loop navigation when setting the same filter value repeatedly', async () => {
+    const { result, getRouter } = renderOverviewQueryState('/?status=draft')
+
+    await waitFor(() => {
+      expect(result.current.state.query.filters.status).toBe('draft')
+    })
+
+    const router = getRouter()
+    const navigateSpy = vi.spyOn(router, 'navigate')
+    const callsAfterHydration = navigateSpy.mock.calls.length
+
+    act(() => {
+      result.current.state.actions.setFilterValue('status', 'draft')
+      result.current.state.actions.setFilterValue('status', 'draft')
+      result.current.state.actions.setFilterValue('status', 'draft')
+    })
+
+    await waitFor(() => {
+      expect(result.current.searchParams.get('status')).toBe('draft')
+    })
+
+    expect(navigateSpy.mock.calls.length).toBe(callsAfterHydration)
+  })
+
+  it('ignores repeated writes of the same filter value', async () => {
+    const { result, getRouter } = renderOverviewQueryState('/?status=draft')
+
+    await waitFor(() => {
+      expect(result.current.state.query.filters.status).toBe('draft')
+    })
+
+    const router = getRouter()
+    const navigateSpy = vi.spyOn(router, 'navigate')
+    const callsAfterHydration = navigateSpy.mock.calls.length
+
+    act(() => {
+      result.current.state.actions.setFilterValue('status', 'draft')
+      result.current.state.actions.setFilterValue('status', 'draft')
+    })
+
+    await waitFor(() => {
+      expect(result.current.searchParams.get('status')).toBe('draft')
+    })
+
+    expect(navigateSpy.mock.calls.length).toBe(callsAfterHydration)
   })
 })

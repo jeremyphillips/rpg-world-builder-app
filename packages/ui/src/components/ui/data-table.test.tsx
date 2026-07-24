@@ -427,6 +427,81 @@ describe('DataTable — row actions', () => {
     })
     expect(screen.getAllByRole('button', { name: /^Edit / })).toHaveLength(DATA.length)
   })
+
+  it('does not notify onColumnChange on mount', () => {
+    const onChange = vi.fn()
+    render(
+      <DataTable
+        columns={COLUMNS}
+        data={DATA}
+        showFilterControls={false}
+        onColumnChange={onChange}
+      />,
+    )
+
+    expect(onChange).not.toHaveBeenCalled()
+  })
+
+  it('does not notify onColumnChange again when the parent rerenders', () => {
+    const onChange = vi.fn()
+    const rowActions = (row: Item) => <button type="button">Edit {row.name}</button>
+
+    const { rerender } = render(
+      <DataTable
+        columns={COLUMNS}
+        data={DATA}
+        showFilterControls={false}
+        onColumnChange={onChange}
+        rowActions={rowActions}
+      />,
+    )
+
+    const callsAfterMount = onChange.mock.calls.length
+
+    for (let index = 0; index < 5; index += 1) {
+      rerender(
+        <DataTable
+          columns={COLUMNS}
+          data={DATA}
+          showFilterControls={false}
+          onColumnChange={onChange}
+          rowActions={rowActions}
+        />,
+      )
+    }
+
+    expect(onChange.mock.calls.length).toBe(callsAfterMount)
+  })
+
+  it('does not notify onColumnChange again when rowActions is reallocated each render', () => {
+    const onChange = vi.fn()
+
+    const { rerender } = render(
+      <DataTable
+        columns={COLUMNS}
+        data={DATA}
+        showFilterControls={false}
+        onColumnChange={onChange}
+        rowActions={(row) => <button type="button">Edit {row.name}</button>}
+      />,
+    )
+
+    const callsAfterMount = onChange.mock.calls.length
+
+    for (let index = 0; index < 5; index += 1) {
+      rerender(
+        <DataTable
+          columns={COLUMNS}
+          data={DATA}
+          showFilterControls={false}
+          onColumnChange={onChange}
+          rowActions={(row) => <button type="button">Edit {row.name}</button>}
+        />,
+      )
+    }
+
+    expect(onChange.mock.calls.length).toBe(callsAfterMount)
+  })
 })
 
 // ---------------------------------------------------------------------------

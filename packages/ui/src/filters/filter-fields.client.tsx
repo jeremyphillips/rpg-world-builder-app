@@ -4,7 +4,13 @@ import { useId } from 'react'
 
 import { Checkbox } from '../components/ui/checkbox.client'
 import { Input } from '../components/ui/input.client'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select.client'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '../components/ui/select.client'
 import { getEffectiveFilterValue } from './filter-engine'
 import {
   isFilterFieldDisabled,
@@ -12,10 +18,7 @@ import {
   normalizeFilterSelectChange,
   resolveFilterSelectValue,
 } from './filter-bar.lib'
-import {
-  FILTER_SELECT_ALL_VALUE,
-  filterBarControlVariants,
-} from './filter-bar.variants'
+import { FILTER_SELECT_ALL_VALUE, filterBarControlVariants } from './filter-bar.variants'
 import type {
   BooleanFilterFieldDef,
   FilterFieldDef,
@@ -25,10 +28,7 @@ import type {
   TextFilterFieldDef,
 } from './filter-schema.types'
 
-type FilterFieldRendererProps<
-  TData,
-  TState extends Record<string, unknown>,
-> = {
+type FilterFieldRendererProps<TData, TState extends Record<string, unknown>> = {
   field: FilterFieldDef<TData, TState>
   controlId: string
   schema: FilterSchema<TData, TState>
@@ -104,10 +104,18 @@ function FilterSelectField<TData, TState extends Record<string, unknown>>({
       <Select
         value={resolveFilterSelectValue(selectField, rawValue, effectiveValue)}
         onValueChange={(nextValue) => {
-          onValueChange(
-            selectField.id,
-            normalizeFilterSelectChange(selectField, nextValue) as TState[typeof selectField.id] | undefined,
-          )
+          const normalized = normalizeFilterSelectChange(selectField, nextValue) as
+            | TState[typeof selectField.id]
+            | undefined
+          const currentValue =
+            rawValue !== undefined && rawValue !== ''
+              ? rawValue
+              : effectiveValue !== undefined && effectiveValue !== ''
+                ? effectiveValue
+                : undefined
+          if (Object.is(normalized, currentValue)) return
+
+          onValueChange(selectField.id, normalized)
         }}
         disabled={disabled}
       >

@@ -578,6 +578,16 @@ export {
 } from './components/ui/breadcrumb.client'
 
 export {
+  areColumnChangeStatesEqual,
+  areColumnOrdersEqual,
+  areVisibilityStatesEqual,
+  createColumnChangeSnapshot,
+  createPersistedColumnChangeState,
+  isInternalDataTableColumnId,
+  normalizeColumnOrderForPersist,
+  normalizeColumnVisibilityForPersist,
+} from './components/ui/data-table-column-change.lib'
+export {
   BooleanCell,
   DataTable,
   NameCell,
