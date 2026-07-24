@@ -21,7 +21,7 @@ Line 2: Edit · Duplicate (managers)     [manager access metadata]
 | Module                                        | Role                                                 |
 | --------------------------------------------- | ---------------------------------------------------- |
 | `content-overview-name-cell.client.tsx`       | Composes both lines                                  |
-| `content-overview-utility-actions.client.tsx` | Manager `Edit` link (Duplicate in Track C3)          |
+| `content-overview-utility-actions.client.tsx` | Manager `Edit · Duplicate` actions                   |
 | `content-access-metadata.client.tsx`          | Manager campaign-access metadata                     |
 | `content-table-config.tsx`                    | Shared `buildContentColumns` name column             |
 | `content-overview-columns.client.ts`          | Injects `canManage` + `getEditHref` into name column |

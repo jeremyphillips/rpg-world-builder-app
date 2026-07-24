@@ -2,9 +2,11 @@
 
 import { useMemo, useRef } from 'react'
 
+import type { ContentTypeKey } from '@rpg/contracts'
 import type { ColumnDef } from '@rpg/ui'
 
 import { ContentOverviewNameCell } from './content-overview-name-cell.client'
+import { contentOverviewListQueryKey } from './content-overview-query-keys'
 import { createOverviewColumnDefsSignature } from './content-overview-columns.lib'
 import {
   readContentRowCampaignAccess,
@@ -31,14 +33,24 @@ export function useStableOverviewColumns<T>(
   return stableColumnsRef.current
 }
 
+type OverviewNameRow = ContentBase & {
+  id: string
+  kind?: unknown
+}
+
 /** Injects manager utility-row context into the shared overview name column. */
-export function patchOverviewNameColumn<T extends ContentBase>(
+export function patchOverviewNameColumn<T extends OverviewNameRow>(
   columns: ColumnDef<T, unknown>[],
   context: {
     canManage: boolean
+    campaignId: string
+    contentTypeKey: ContentTypeKey
     getEditHref: (row: T) => string
   },
 ): ColumnDef<T, unknown>[] {
+  const queryKeyFn = (campaignId: string) =>
+    contentOverviewListQueryKey(campaignId, context.contentTypeKey)
+
   return columns.map((column) => {
     const accessorKey = (column as { accessorKey?: string }).accessorKey
     if (accessorKey !== 'name') {
@@ -58,16 +70,27 @@ export function patchOverviewNameColumn<T extends ContentBase>(
           nameHref={overviewNameHref?.(row.original)}
           editHref={context.canManage ? context.getEditHref(row.original) : undefined}
           canManage={context.canManage}
+          campaignId={context.campaignId}
+          contentTypeKey={context.contentTypeKey}
+          queryKeyFn={queryKeyFn}
+          duplicateSource={{
+            id: row.original.id,
+            name: row.original.name,
+            source: row.original.source,
+            kind: row.original.kind,
+          }}
         />
       ),
     }
   })
 }
 
-export function useOverviewColumnsWithNameContext<T extends ContentBase>(
+export function useOverviewColumnsWithNameContext<T extends OverviewNameRow>(
   columns: ColumnDef<T, unknown>[],
   context: {
     canManage: boolean
+    campaignId: string
+    contentTypeKey: ContentTypeKey
     getEditHref: (row: T) => string
   },
 ): ColumnDef<T, unknown>[] {
@@ -79,8 +102,10 @@ export function useOverviewColumnsWithNameContext<T extends ContentBase>(
     () =>
       patchOverviewNameColumn(stableColumns, {
         canManage: context.canManage,
+        campaignId: context.campaignId,
+        contentTypeKey: context.contentTypeKey,
         getEditHref: (row) => getEditHrefRef.current(row),
       }),
-    [stableColumns, context.canManage],
+    [stableColumns, context.canManage, context.campaignId, context.contentTypeKey],
   )
 }

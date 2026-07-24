@@ -1,25 +1,34 @@
 import type { ComponentProps } from 'react'
 import { render, screen } from '@testing-library/react'
 import { createMemoryRouter, RouterProvider } from 'react-router-dom'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { describe, expect, it } from 'vitest'
 
 import { DEFAULT_CONTENT_CAMPAIGN_ACCESS } from '@rpg/contracts'
 
 import { ContentOverviewNameCell } from './content-overview-name-cell.client'
+import { contentOverviewListQueryKey } from './content-overview-query-keys'
 
 function renderNameCell(props: Partial<ComponentProps<typeof ContentOverviewNameCell>> = {}) {
+  const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } })
   const router = createMemoryRouter(
     [
       {
         path: '/',
         element: (
-          <ContentOverviewNameCell
-            name="Fighter"
-            status="published"
-            campaignAccess={DEFAULT_CONTENT_CAMPAIGN_ACCESS}
-            nameHref="/classes/fighter"
-            {...props}
-          />
+          <QueryClientProvider client={queryClient}>
+            <ContentOverviewNameCell
+              name="Fighter"
+              status="published"
+              campaignAccess={DEFAULT_CONTENT_CAMPAIGN_ACCESS}
+              nameHref="/classes/fighter"
+              campaignId="camp-1"
+              contentTypeKey="classes"
+              queryKeyFn={(id) => contentOverviewListQueryKey(id, 'classes')}
+              duplicateSource={{ id: 'cls-1', name: 'Fighter', source: 'homebrew' }}
+              {...props}
+            />
+          </QueryClientProvider>
         ),
       },
     ],
@@ -50,6 +59,7 @@ describe('ContentOverviewNameCell', () => {
       'href',
       '/classes/fighter/edit',
     )
+    expect(screen.getByRole('button', { name: 'Duplicate' })).toBeInTheDocument()
     expect(screen.getByRole('link', { name: 'Edit' }).closest('.min-h-4')).toBeInTheDocument()
   })
 

@@ -201,6 +201,8 @@ export function ContentOverviewTable<
 
   const overviewColumns = useOverviewColumnsWithNameContext(columns, {
     canManage,
+    campaignId,
+    contentTypeKey,
     getEditHref: (row) => getEditHrefRef.current(row),
   })
   const columnSchema = useMemo(

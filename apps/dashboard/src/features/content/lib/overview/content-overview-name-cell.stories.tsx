@@ -3,6 +3,14 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 import { DEFAULT_CONTENT_CAMPAIGN_ACCESS } from '@rpg/contracts'
 
 import { ContentOverviewNameCell } from './content-overview-name-cell.client'
+import { contentOverviewListQueryKey } from './content-overview-query-keys'
+
+const managerContext = {
+  campaignId: 'camp-1',
+  contentTypeKey: 'classes' as const,
+  queryKeyFn: (campaignId: string) => contentOverviewListQueryKey(campaignId, 'classes'),
+  duplicateSource: { id: 'cls-1', name: 'Arcane Trickster', source: 'homebrew' as const },
+}
 
 const meta = {
   title: 'Content/Overview/ContentOverviewNameCell',
@@ -15,6 +23,7 @@ const meta = {
     nameHref: '/classes/arcane-trickster',
     editHref: '/classes/arcane-trickster/edit',
     canManage: true,
+    ...managerContext,
   },
 } satisfies Meta<typeof ContentOverviewNameCell>
 

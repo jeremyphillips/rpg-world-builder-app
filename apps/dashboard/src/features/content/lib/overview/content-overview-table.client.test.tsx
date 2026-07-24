@@ -1,5 +1,6 @@
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import type { CharacterClass, WithCampaignAccess } from '@rpg/contracts'
 import type { ColumnDef } from '@rpg/ui'
 import type { ComponentProps } from 'react'
@@ -85,19 +86,22 @@ function createRows(count: number): ClassRow[] {
 }
 
 function renderOverview() {
+  const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } })
   const router = createMemoryRouter(
     [
       {
         path: '/',
         element: (
-          <ContentOverviewTable<ClassRow, ClassesOverviewFilterState>
-            contentTypeKey="classes"
-            campaignId={CAMPAIGN_ID}
-            columns={columns}
-            filterSchema={classFilterSchema}
-            data={createRows(8)}
-            getEditHref={(row) => `/classes/${row.id}/edit`}
-          />
+          <QueryClientProvider client={queryClient}>
+            <ContentOverviewTable<ClassRow, ClassesOverviewFilterState>
+              contentTypeKey="classes"
+              campaignId={CAMPAIGN_ID}
+              columns={columns}
+              filterSchema={classFilterSchema}
+              data={createRows(8)}
+              getEditHref={(row) => `/classes/${row.id}/edit`}
+            />
+          </QueryClientProvider>
         ),
       },
     ],
@@ -167,19 +171,22 @@ describe('ContentOverviewTable interactions', () => {
 
   it('does not rerender the data table when only the Filters panel toggles', async () => {
     const user = userEvent.setup()
+    const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } })
     const router = createMemoryRouter(
       [
         {
           path: '/',
           element: (
-            <ContentOverviewTable<ClassRow, ClassesOverviewFilterState>
-              contentTypeKey="classes"
-              campaignId={CAMPAIGN_ID}
-              columns={columns}
-              filterSchema={classFilterSchema}
-              data={createRows(80)}
-              getEditHref={(row) => `/classes/${row.id}/edit`}
-            />
+            <QueryClientProvider client={queryClient}>
+              <ContentOverviewTable<ClassRow, ClassesOverviewFilterState>
+                contentTypeKey="classes"
+                campaignId={CAMPAIGN_ID}
+                columns={columns}
+                filterSchema={classFilterSchema}
+                data={createRows(80)}
+                getEditHref={(row) => `/classes/${row.id}/edit`}
+              />
+            </QueryClientProvider>
           ),
         },
       ],

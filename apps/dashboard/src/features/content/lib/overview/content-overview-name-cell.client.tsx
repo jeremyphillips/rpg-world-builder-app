@@ -1,9 +1,10 @@
 'use client'
 
-import type { ContentStatus, ResolvedContentCampaignAccess } from '@rpg/contracts'
+import type { ContentStatus, ContentTypeKey, ResolvedContentCampaignAccess } from '@rpg/contracts'
 import { dataTableNameLinkCellVariants } from '@rpg/ui'
 import { Link } from 'react-router-dom'
 
+import type { DuplicateContentSource } from '../duplication/duplicate-content-dialog.client'
 import { ContentStatusNameBadge } from './content-status-name-badge.client'
 import { ContentAccessMetadata } from './content-access-metadata.client'
 import { ContentOverviewUtilityActions } from './content-overview-utility-actions.client'
@@ -15,6 +16,10 @@ export type ContentOverviewNameCellProps = {
   nameHref?: string
   editHref?: string
   canManage?: boolean
+  campaignId?: string
+  contentTypeKey?: ContentTypeKey
+  queryKeyFn?: (campaignId: string) => readonly unknown[]
+  duplicateSource?: DuplicateContentSource
 }
 
 /** Two-line overview name cell — identity on line 1; utility row + metadata on line 2. */
@@ -25,6 +30,10 @@ export function ContentOverviewNameCell({
   nameHref,
   editHref,
   canManage = false,
+  campaignId,
+  contentTypeKey,
+  queryKeyFn,
+  duplicateSource,
 }: ContentOverviewNameCellProps) {
   const draftBadge = status === 'draft' ? <ContentStatusNameBadge status="draft" /> : null
 
@@ -41,9 +50,15 @@ export function ContentOverviewNameCell({
         {draftBadge}
       </span>
 
-      {canManage ? (
+      {canManage && campaignId && contentTypeKey && queryKeyFn && duplicateSource ? (
         <div className="flex min-h-4 flex-wrap items-center justify-between gap-x-3 gap-y-1 text-xs leading-4">
-          <ContentOverviewUtilityActions editHref={editHref} />
+          <ContentOverviewUtilityActions
+            campaignId={campaignId}
+            contentTypeKey={contentTypeKey}
+            queryKeyFn={queryKeyFn}
+            editHref={editHref}
+            source={duplicateSource}
+          />
           <ContentAccessMetadata campaignAccess={campaignAccess} canManage={canManage} />
         </div>
       ) : null}
