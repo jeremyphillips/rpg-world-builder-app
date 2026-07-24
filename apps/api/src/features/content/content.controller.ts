@@ -23,6 +23,9 @@ import {
 } from './lib/content-campaign-access.service'
 import { getHomebrewContentSummary } from './lib/homebrew-summary.service'
 import { filterCatalogForMembership } from './lib/filter-catalog-for-viewer'
+import { duplicateContentEntity } from './lib/duplication/duplicate-content.service'
+import { duplicateContentRequestSchema } from './lib/duplication/duplicate-content.types'
+import { assertDuplicateContentType } from './lib/duplication/duplicate-content-policy'
 
 export async function createContentItem(req: Request, res: Response): Promise<void> {
   const { campaignId, contentType } = req.params as { campaignId: string; contentType: string }
@@ -34,6 +37,23 @@ export async function createContentItem(req: Request, res: Response): Promise<vo
   const { status: rawStatus, ...createBody } = rawBody
   const status = contentStatusSchema.parse(rawStatus ?? 'published')
   const entity = await createHomebrewContent(writeConfig, campaignId, createBody, { status })
+  res.status(201).json({ [writeConfig.responseKey]: entity })
+}
+
+export async function duplicateContentItem(req: Request, res: Response): Promise<void> {
+  const { campaignId, contentType, entityId } = req.params as {
+    campaignId: string
+    contentType: string
+    entityId: string
+  }
+  assertDuplicateContentType(contentType)
+  const { name } = duplicateContentRequestSchema.parse(req.body)
+  const { writeConfig, entity } = await duplicateContentEntity({
+    campaignId,
+    contentType,
+    entityId,
+    requestedName: name,
+  })
   res.status(201).json({ [writeConfig.responseKey]: entity })
 }
 

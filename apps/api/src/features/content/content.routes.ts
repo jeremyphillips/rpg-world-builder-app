@@ -78,6 +78,13 @@ contentRouter.post(
   controller.createContentItem,
 )
 
+contentRouter.post(
+  '/:contentType/:entityId/duplicate',
+  requireAuth,
+  requireCampaignRole('owner', 'co-owner'),
+  controller.duplicateContentItem,
+)
+
 contentRouter.patch(
   '/:contentType/:entityId',
   requireAuth,
