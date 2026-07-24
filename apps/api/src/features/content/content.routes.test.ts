@@ -5,7 +5,9 @@ import { CHILL_TOUCH_RESOLUTION, ELDRITCH_BLAST_RESOLUTION } from '@rpg/contract
 
 import { CSRF_HEADER } from '../../lib/cookies'
 import { CampaignMembershipModel } from '../campaign/campaign-membership.model'
+import { createPcRecord } from '../character/character.repository'
 import { createTestCampaign, registerAndLoginTestUser } from '../../test/auth-agent'
+import { minimalStandalonePcInput } from '../../test/fixtures/characters'
 import { minimalNpcRequestInput } from '../../test/fixtures/npcs'
 import { useIntegrationApp } from '../../test/setup/integration-app'
 
@@ -641,6 +643,48 @@ describe('content campaign access routes', () => {
     })
   })
 
+  it('rejects specific_players patches without participants', async () => {
+    const { agent, csrfToken } = await registerAndLogin()
+    const campaignId = await createTestCampaign(agent, csrfToken)
+
+    const createRes = await agent
+      .post(`/api/campaigns/${campaignId}/content/feats`)
+      .set(CSRF_HEADER, csrfToken)
+      .send({ ...minimalFeatInput, slug: 'specific-empty-feat', name: 'Specific Empty Feat' })
+      .expect(201)
+
+    const entityId = createRes.body.feats.id as string
+
+    await agent
+      .patch(`/api/campaigns/${campaignId}/content/feats/${entityId}/campaign-access`)
+      .set(CSRF_HEADER, csrfToken)
+      .send({ available: true, visibilityMode: 'specific_players', participantIds: [] })
+      .expect(400)
+  })
+
+  it('rejects unknown participant ids on specific_players patches', async () => {
+    const { agent, csrfToken } = await registerAndLogin()
+    const campaignId = await createTestCampaign(agent, csrfToken)
+
+    const createRes = await agent
+      .post(`/api/campaigns/${campaignId}/content/feats`)
+      .set(CSRF_HEADER, csrfToken)
+      .send({ ...minimalFeatInput, slug: 'specific-unknown-feat', name: 'Specific Unknown Feat' })
+      .expect(201)
+
+    const entityId = createRes.body.feats.id as string
+
+    await agent
+      .patch(`/api/campaigns/${campaignId}/content/feats/${entityId}/campaign-access`)
+      .set(CSRF_HEADER, csrfToken)
+      .send({
+        available: true,
+        visibilityMode: 'specific_players',
+        participantIds: ['not-in-roster'],
+      })
+      .expect(400)
+  })
+
   it('returns structured blockers when turning access off for referenced homebrew content', async () => {
     const { agent, csrfToken } = await registerAndLogin()
     const campaignId = await createTestCampaign(agent, csrfToken)
@@ -810,25 +854,45 @@ describe('content campaign access discovery enforcement', () => {
       'discovery-specific-feat',
     )
 
+    const grantedMember = await addCampaignMember(campaignId, 'discovery-granted@example.com', 'pc')
+    const deniedMember = await addCampaignMember(campaignId, 'discovery-denied@example.com', 'pc')
+
+    const grantedMeRes = await grantedMember.agent
+      .get('/api/auth/me')
+      .set(CSRF_HEADER, grantedMember.csrfToken)
+      .expect(200)
+    const deniedMeRes = await deniedMember.agent
+      .get('/api/auth/me')
+      .set(CSRF_HEADER, deniedMember.csrfToken)
+      .expect(200)
+
+    const grantedPc = await createPcRecord(
+      { ...minimalStandalonePcInput, name: 'Granted PC' },
+      grantedMeRes.body.user.id as string,
+    )
+    const deniedPc = await createPcRecord(
+      { ...minimalStandalonePcInput, name: 'Denied PC' },
+      deniedMeRes.body.user.id as string,
+    )
+
+    await CampaignMembershipModel.updateOne(
+      { campaignId, userId: grantedMeRes.body.user.id as string },
+      { $set: { characterIds: [grantedPc.id] } },
+    )
+    await CampaignMembershipModel.updateOne(
+      { campaignId, userId: deniedMeRes.body.user.id as string },
+      { $set: { characterIds: [deniedPc.id] } },
+    )
+
     await owner.agent
       .patch(`/api/campaigns/${campaignId}/content/feats/${restrictedId}/campaign-access`)
       .set(CSRF_HEADER, owner.csrfToken)
       .send({
         available: true,
         visibilityMode: 'specific_players',
-        participantIds: ['granted-pc'],
+        participantIds: [grantedPc.id],
       })
       .expect(200)
-
-    const grantedMember = await addCampaignMember(
-      campaignId,
-      'discovery-granted@example.com',
-      'pc',
-      ['granted-pc'],
-    )
-    const deniedMember = await addCampaignMember(campaignId, 'discovery-denied@example.com', 'pc', [
-      'other-pc',
-    ])
 
     const grantedList = await grantedMember.agent
       .get(`/api/campaigns/${campaignId}/content/feats`)

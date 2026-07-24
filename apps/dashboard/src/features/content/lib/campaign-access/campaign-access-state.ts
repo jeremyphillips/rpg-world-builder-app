@@ -18,7 +18,11 @@ export function toCampaignAccessPatch(
 export function resolvedToCampaignAccessPatch(
   access: ResolvedContentCampaignAccess,
 ): ContentCampaignAccessPatch {
-  return toCampaignAccessPatch(access)
+  return {
+    available: access.available,
+    visibilityMode: access.visibilityMode,
+    participantIds: [...access.participantIds, ...access.unavailableParticipantIds],
+  }
 }
 
 export function isDefaultCampaignAccessPatch(patch: ContentCampaignAccessPatch): boolean {

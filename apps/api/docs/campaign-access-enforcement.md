@@ -43,8 +43,24 @@ API list handlers build a viewer from `req.campaignMembership`:
 - `observer` or `pc` with empty `characterIds` → `{ kind: 'none' }`
 
 `specific_players` grants match when **any** membership `characterId` is listed in
-`participantIds`. Track A A3 will add roster pickers and stale-id resolution; until
-then, defensive list filtering treats non-granted `specific_players` rows as hidden.
+`participantIds`. Track A A3 adds roster pickers and stale-id resolution via
+`GET /api/campaigns/:campaignId/content/access-participants` and
+`resolveContentCampaignAccess(..., { validParticipantIds })`.
+
+## A3 — Participant roster and authoring
+
+Managers load the pickable roster from:
+
+`GET /api/campaigns/:campaignId/content/access-participants` (owner/co-owner)
+
+Each entry is a campaign-submitted PC (`id`, `name`, `playerDisplayName`). The
+dashboard multi-select writes `participantIds` through `PATCH …/campaign-access`.
+The patch schema requires at least one participant for `specific_players` and
+normalizes `participantIds` to `[]` for other visibility modes.
+
+Stale grants — ids persisted on content but no longer submitted to the campaign —
+surface in `unavailableParticipantIds` on resolved reads. The edit form merges
+valid and stale ids so managers can clear stale selections on save.
 
 ## A2 — Discovery vs saved-reference policies
 
@@ -91,9 +107,8 @@ discovery must not strip content already on a saved sheet.
 
 ## Feature flag
 
-`CONTENT_ACCESS_SPECIFIC_PLAYERS_ENABLED` remains `false` until Track A A3–A4. API list
-enforcement still filters persisted `specific_players` rows defensively for non-granted
-viewers.
+`CONTENT_ACCESS_SPECIFIC_PLAYERS_ENABLED` is `true` after Track A A3–A4. API list
+enforcement for `specific_players` is independent of this dashboard gate.
 
 ## Related docs
 

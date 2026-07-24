@@ -13,6 +13,19 @@ export const contentCampaignAccessSchema = z.object({
 export type ContentCampaignAccess = z.infer<typeof contentCampaignAccessSchema>
 
 export const contentCampaignAccessPatchSchema = contentCampaignAccessSchema
+  .superRefine((data, ctx) => {
+    if (data.visibilityMode === 'specific_players' && data.participantIds.length < 1) {
+      ctx.addIssue({
+        code: 'custom',
+        message: 'Select at least one player.',
+        path: ['participantIds'],
+      })
+    }
+  })
+  .transform((data) => ({
+    ...data,
+    participantIds: data.visibilityMode === 'specific_players' ? data.participantIds : [],
+  }))
 
 export type ContentCampaignAccessPatch = z.infer<typeof contentCampaignAccessPatchSchema>
 
@@ -73,15 +86,28 @@ export type ContentCampaignAccessUpdateResult = z.infer<
   typeof contentCampaignAccessUpdateResultSchema
 >
 
+export type ResolveContentCampaignAccessOptions = {
+  /** Campaign-submitted PC ids still present in the roster — splits stale grants. */
+  validParticipantIds?: readonly string[]
+}
+
 export function resolveContentCampaignAccess(
   stored: Partial<ContentCampaignAccess> | null | undefined,
+  options?: ResolveContentCampaignAccessOptions,
 ): ResolvedContentCampaignAccess {
   const available = stored?.available ?? DEFAULT_CONTENT_CAMPAIGN_ACCESS.available
   const visibilityMode = stored?.visibilityMode ?? DEFAULT_CONTENT_CAMPAIGN_ACCESS.visibilityMode
-  const participantIds = stored?.participantIds ?? DEFAULT_CONTENT_CAMPAIGN_ACCESS.participantIds
+  const storedParticipantIds =
+    stored?.participantIds ?? DEFAULT_CONTENT_CAMPAIGN_ACCESS.participantIds
 
-  // Valid/stale split is trivial until the participant system can populate ids.
-  const unavailableParticipantIds: string[] = []
+  let participantIds = storedParticipantIds
+  let unavailableParticipantIds: string[] = []
+
+  if (options?.validParticipantIds) {
+    const validSet = new Set(options.validParticipantIds)
+    participantIds = storedParticipantIds.filter((id) => validSet.has(id))
+    unavailableParticipantIds = storedParticipantIds.filter((id) => !validSet.has(id))
+  }
 
   return {
     available,

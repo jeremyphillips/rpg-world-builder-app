@@ -10,6 +10,7 @@ describe('campaign-access-form-fields', () => {
     available: true,
     pending: false,
     groupId: 'campaign-access-test',
+    participantOptions: [{ value: 'pc-1', label: 'Aldric · Player One' }],
   })
 
   it('registers field paths for validation messaging', () => {
@@ -17,8 +18,6 @@ describe('campaign-access-form-fields', () => {
   })
 
   it('covers the campaign access patch schema', () => {
-    assertRegistryCoverage(contentCampaignAccessPatchSchema, fields, {
-      exemptPaths: ['participantIds', 'participantIds.*'],
-    })
+    assertRegistryCoverage(contentCampaignAccessPatchSchema, fields)
   })
 })

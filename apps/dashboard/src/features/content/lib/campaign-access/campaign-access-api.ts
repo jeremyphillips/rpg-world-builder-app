@@ -1,5 +1,6 @@
 import {
   ApiError,
+  campaignAccessParticipantRosterSchema,
   contentCampaignAccessAvailabilitySchema,
   contentCampaignAccessUpdateResultSchema,
   fetchCsrfToken,
@@ -56,6 +57,32 @@ function contentCampaignAccessPath(
   }
 
   return `/api/campaigns/${campaignId}/content/${targetType}/${entityId}/${suffix}`
+}
+
+export async function fetchCampaignAccessParticipantRoster(
+  campaignId: string,
+  options?: { fallbackMessage?: string },
+) {
+  const csrfToken = await fetchCsrfToken()
+  const res = await fetch(`/api/campaigns/${campaignId}/content/access-participants`, {
+    credentials: 'include',
+    headers: { [CSRF_HEADER]: csrfToken },
+  })
+
+  const body = (await res.json().catch(() => null)) as {
+    participants?: unknown
+    error?: { code?: string; message?: string }
+  } | null
+
+  if (!res.ok) {
+    throw new ApiError(
+      res.status,
+      body?.error?.code ?? 'request_error',
+      body?.error?.message ?? options?.fallbackMessage ?? 'Could not load campaign players.',
+    )
+  }
+
+  return campaignAccessParticipantRosterSchema.parse(body).participants
 }
 
 export async function fetchContentCampaignAccessAvailability(

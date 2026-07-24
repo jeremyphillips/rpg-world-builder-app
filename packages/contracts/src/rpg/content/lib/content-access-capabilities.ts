@@ -25,7 +25,7 @@ export const CONTENT_ACCESS_CAPABILITIES: Record<ContentAccessTargetType, Conten
   }
 
 /**
- * Flip to `true` when the campaign participant system ships (follow-up phase).
- * Dashboard reads this to gate the `specific_players` option app-wide.
+ * Product gate for the campaign participant picker and player limited-visibility metadata.
+ * API list enforcement for `specific_players` is independent of this flag.
  */
-export const CONTENT_ACCESS_SPECIFIC_PLAYERS_ENABLED = false
+export const CONTENT_ACCESS_SPECIFIC_PLAYERS_ENABLED = true

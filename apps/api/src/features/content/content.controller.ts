@@ -26,6 +26,7 @@ import { filterCatalogForMembership } from './lib/filter-catalog-for-viewer'
 import { duplicateContentEntity } from './lib/duplication/duplicate-content.service'
 import { duplicateContentRequestSchema } from './lib/duplication/duplicate-content.types'
 import { assertDuplicateContentType } from './lib/duplication/duplicate-content-policy'
+import { listCampaignAccessParticipants } from './lib/campaign-access-participants.service'
 
 export async function createContentItem(req: Request, res: Response): Promise<void> {
   const { campaignId, contentType } = req.params as { campaignId: string; contentType: string }
@@ -210,4 +211,10 @@ export async function getHomebrewSummary(req: Request, res: Response): Promise<v
   const { campaignId } = req.params as { campaignId: string }
   const summary = await getHomebrewContentSummary(campaignId)
   res.status(200).json({ summary })
+}
+
+export async function getCampaignAccessParticipants(req: Request, res: Response): Promise<void> {
+  const { campaignId } = req.params as { campaignId: string }
+  const participants = await listCampaignAccessParticipants(campaignId)
+  res.status(200).json({ participants })
 }

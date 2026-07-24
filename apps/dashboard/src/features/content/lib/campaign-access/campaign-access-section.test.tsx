@@ -7,10 +7,15 @@ import { expectNoAxeViolations } from '@rpg/ui/test-utils'
 import { CampaignAccessSection } from './campaign-access-section.client'
 import { CampaignAccessFormProvider } from './campaign-access-form-context.client'
 import * as campaignAccessApi from './campaign-access-api'
+import * as participantRoster from './use-campaign-access-participant-roster'
 
 vi.mock('./campaign-access-api', () => ({
   fetchContentCampaignAccessAvailability: vi.fn(),
   updateContentCampaignAccess: vi.fn(),
+}))
+
+vi.mock('./use-campaign-access-participant-roster', () => ({
+  useCampaignAccessParticipantRoster: vi.fn(() => ({ data: [] })),
 }))
 
 function renderSection(ui: ReactElement) {
@@ -25,6 +30,9 @@ describe('CampaignAccessSection', () => {
   beforeEach(() => {
     vi.mocked(campaignAccessApi.fetchContentCampaignAccessAvailability).mockReset()
     vi.mocked(campaignAccessApi.updateContentCampaignAccess).mockReset()
+    vi.mocked(participantRoster.useCampaignAccessParticipantRoster).mockReturnValue({
+      data: [],
+    } as unknown as ReturnType<typeof participantRoster.useCampaignAccessParticipantRoster>)
   })
 
   it('renders collapsed summary and expanded availability controls', async () => {
@@ -47,17 +55,29 @@ describe('CampaignAccessSection', () => {
     expect(screen.getByText('All players')).toBeInTheDocument()
   })
 
-  it('disables specific players with explanatory hint', async () => {
-    const user = userEvent.setup()
+  it('shows the participant picker when specific players is selected', async () => {
+    vi.mocked(participantRoster.useCampaignAccessParticipantRoster).mockReturnValue({
+      data: [{ id: 'pc-1', name: 'Aldric', playerDisplayName: 'Player One' }],
+    } as unknown as ReturnType<typeof participantRoster.useCampaignAccessParticipantRoster>)
+
     renderSection(
-      <CampaignAccessSection campaignId="campaign-1" targetType="feats" entityId="feat-1" />,
+      <CampaignAccessSection
+        campaignId="campaign-1"
+        targetType="feats"
+        entityId="feat-1"
+        initialAccess={{
+          available: true,
+          visibilityMode: 'specific_players',
+          participantIds: [],
+          unavailableParticipantIds: [],
+          effectiveAudience: 'specific_players',
+        }}
+      />,
     )
 
-    await expandCampaignAccess(user)
+    await userEvent.setup().click(screen.getByRole('button', { name: 'Change' }))
 
-    expect(
-      screen.getByText('Set up campaign players before choosing specific players.'),
-    ).toBeInTheDocument()
+    expect(screen.getByRole('combobox', { name: 'Selected players' })).toBeInTheDocument()
   })
 
   it('marks availability dirty without PATCH on edit toggle', async () => {

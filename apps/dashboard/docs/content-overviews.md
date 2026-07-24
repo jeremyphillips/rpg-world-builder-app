@@ -14,8 +14,7 @@ Line 2: Edit · Duplicate (managers)     [manager access metadata]
 - Managers always reserve line 2 height (`min-h-4`, `text-xs leading-4`) even when
   access metadata is empty (`all_players` + available).
 - Players render line 1 only for ordinary visibility. Limited-visibility metadata on line 2
-  appears for specifically granted content after Track A A4 enables
-  `CONTENT_ACCESS_SPECIFIC_PLAYERS_ENABLED`.
+  appears for specifically granted content when `specific_players` is enabled (Track A A4).
 - `filter-catalog-rows-for-viewer.ts` applies discovery policy defense-in-depth before
   overview filters render.
 
