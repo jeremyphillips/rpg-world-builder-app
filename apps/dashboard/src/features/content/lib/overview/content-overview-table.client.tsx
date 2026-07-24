@@ -46,7 +46,7 @@ import {
   buildContentOverviewColumnSchema,
   getContentOverviewSortableColumnIds,
 } from './content-overview-columns.lib'
-import { useStableOverviewColumns } from './content-overview-columns.client'
+import { useOverviewColumnsWithNameContext } from './content-overview-columns.client'
 import {
   CONTENT_OVERVIEW_PREFERENCES_DEFAULTS,
   hydrateContentOverviewPreferences,
@@ -196,18 +196,24 @@ export function ContentOverviewTable<
   const tableRootRef = useRef<HTMLDivElement>(null)
   const actionTriggerRefs = useRef(new Map<string, HTMLButtonElement>())
   const canManage = useCanManageCampaign(campaignId)
-  const stableColumns = useStableOverviewColumns(columns)
+  const getEditHrefRef = useRef(getEditHref)
+  getEditHrefRef.current = getEditHref
+
+  const overviewColumns = useOverviewColumnsWithNameContext(columns, {
+    canManage,
+    getEditHref: (row) => getEditHrefRef.current(row),
+  })
   const columnSchema = useMemo(
-    () => buildContentOverviewColumnSchema(stableColumns as ColumnDef<unknown>[]),
-    [stableColumns],
+    () => buildContentOverviewColumnSchema(overviewColumns as ColumnDef<unknown>[]),
+    [overviewColumns],
   )
   const [preferences, setPreferences] = useState<ContentOverviewPreferences>(() =>
     hydrateContentOverviewPreferences(contentTypeKey, columnSchema),
   )
   const advancedOpen = preferences.advancedOpen ?? false
   const allowedSortIds = useMemo(
-    () => getContentOverviewSortableColumnIds(stableColumns as ColumnDef<unknown>[]),
-    [stableColumns],
+    () => getContentOverviewSortableColumnIds(overviewColumns as ColumnDef<unknown>[]),
+    [overviewColumns],
   )
   const hasAdvancedFields = useMemo(
     () => getSchemaFieldsByPlacement(filterSchema, 'advanced').length > 0,
@@ -446,7 +452,7 @@ export function ContentOverviewTable<
       {filterNotice ? <div className={dataTableFilterNoticeVariants()}>{filterNotice}</div> : null}
 
       <ContentOverviewDataTable
-        columns={stableColumns}
+        columns={overviewColumns}
         data={visibleRows}
         pageSize={tablePageSize}
         columnVisibility={preferences.columnVisibility}

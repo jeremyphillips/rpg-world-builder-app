@@ -23,7 +23,7 @@ type MetadataContent = {
   tooltipLabel: string
 }
 
-function resolveNameCellMetadata(
+function resolveManagerAccessMetadata(
   campaignAccess: ResolvedContentCampaignAccess,
 ): MetadataContent | null {
   if (!campaignAccess.available) {
@@ -58,17 +58,24 @@ function resolveNameCellMetadata(
   return null
 }
 
-/** Compact second-line metadata for exceptional campaign-access states in overview name cells. */
-export function ContentNameCellMetadata({
-  campaignAccess,
-}: {
+export type ContentAccessMetadataProps = {
   campaignAccess: ResolvedContentCampaignAccess
-}) {
-  const content = resolveNameCellMetadata(campaignAccess)
-  if (!content) return null
+  canManage: boolean
+}
+
+/** Line-2 campaign access metadata — manager facts today; player facts ship in Track B B3. */
+export function ContentAccessMetadata({ campaignAccess, canManage }: ContentAccessMetadataProps) {
+  if (!canManage) {
+    return null
+  }
+
+  const content = resolveManagerAccessMetadata(campaignAccess)
+  if (!content) {
+    return null
+  }
 
   return (
-    <div className="flex items-center gap-1 text-xs text-muted-foreground">
+    <div className="ml-auto flex items-center gap-1 text-muted-foreground">
       {content.icon}
       <span className="inline-flex items-center gap-1">
         <span>{content.primary}</span>
