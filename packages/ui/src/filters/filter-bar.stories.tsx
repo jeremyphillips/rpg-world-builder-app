@@ -29,6 +29,9 @@ const demoSchema = createFilterSchema<DemoRow, DemoFilterState>([
   createEqualsFilter<DemoRow, DemoFilterState, 'status', 'draft' | 'published'>({
     id: 'status',
     label: 'Status',
+    placement: 'advanced',
+    layout: 'stacked',
+    width: 'md',
     options: [
       { value: 'draft', label: 'Draft' },
       { value: 'published', label: 'Published' },

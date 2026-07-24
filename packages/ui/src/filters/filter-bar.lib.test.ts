@@ -4,8 +4,10 @@ import { createEqualsFilter } from './filter-engine.helpers'
 import { createFilterSchema } from './filter-schema.types'
 import {
   normalizeFilterSelectChange,
-  resolveAdvancedPanelColumns,
+  resolveFilterControlSize,
   resolveFilterSelectValue,
+  resolveSelectCurrentValue,
+  shouldSkipFilterSelectChange,
 } from './filter-bar.lib'
 import { FILTER_SELECT_ALL_VALUE } from './filter-bar.variants'
 
@@ -47,10 +49,22 @@ describe('filter-bar.lib', () => {
     expect(normalizeFilterSelectChange(selectLike, 'draft')).toBe('draft')
   })
 
-  it('resolves advanced panel column counts', () => {
-    expect(resolveAdvancedPanelColumns(1)).toBe(1)
-    expect(resolveAdvancedPanelColumns(2)).toBe(2)
-    expect(resolveAdvancedPanelColumns(3)).toBe(3)
-    expect(resolveAdvancedPanelColumns(5)).toBe(4)
+  it('maps filter density to control size', () => {
+    expect(resolveFilterControlSize('compact')).toBe('sm')
+    expect(resolveFilterControlSize('comfortable')).toBe('md')
+    expect(resolveFilterControlSize()).toBe('sm')
+  })
+
+  it('resolves the current select value from raw and effective state', () => {
+    expect(resolveSelectCurrentValue('draft', 'published')).toBe('draft')
+    expect(resolveSelectCurrentValue(undefined, 'published')).toBe('published')
+    expect(resolveSelectCurrentValue('', 'published')).toBe('published')
+    expect(resolveSelectCurrentValue(undefined, undefined)).toBeUndefined()
+  })
+
+  it('skips duplicate select changes when normalized value is unchanged', () => {
+    expect(shouldSkipFilterSelectChange('draft', 'draft', undefined)).toBe(true)
+    expect(shouldSkipFilterSelectChange(undefined, undefined, undefined)).toBe(true)
+    expect(shouldSkipFilterSelectChange('published', 'draft', undefined)).toBe(false)
   })
 })

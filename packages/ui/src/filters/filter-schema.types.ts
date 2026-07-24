@@ -2,6 +2,12 @@ export type FilterFieldId<TState> = Extract<keyof TState, string>
 
 export type FilterPlacement = 'primary' | 'advanced'
 
+/** Intrinsic width tokens for inline filter select controls. */
+export type FilterFieldWidth = 'md' | 'lg' | 'xl'
+
+/** Filter control spacing and typography — mirrors form `rhythm`. */
+export type FilterDensity = 'compact' | 'comfortable'
+
 export type FilterOption<TValue extends string = string> = {
   value: TValue
   label: string
@@ -82,6 +88,7 @@ export type SelectFilterFieldDef<
     | ((ctx: FilterFieldOptionsContext<TData, TState>) => FilterOption<string>[])
   showAllOption?: boolean
   layout?: SelectFilterLayout
+  width?: FilterFieldWidth
   ariaLabel?: string
   triggerAriaLabel?: string
 }

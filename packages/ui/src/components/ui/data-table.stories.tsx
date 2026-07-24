@@ -224,6 +224,8 @@ const classFilterSchema = createFilterSchema<CharacterClass, ClassFilterState>([
     id: 'source',
     label: 'Source',
     placement: 'advanced',
+    layout: 'stacked',
+    width: 'md',
     options: [
       { label: 'System', value: 'system' },
       { label: 'Homebrew', value: 'homebrew' },

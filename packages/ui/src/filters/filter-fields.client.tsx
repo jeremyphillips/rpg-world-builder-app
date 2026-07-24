@@ -4,24 +4,21 @@ import { useId } from 'react'
 
 import { Checkbox } from '../components/ui/checkbox.client'
 import { Input } from '../components/ui/input.client'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '../components/ui/select.client'
-import { getEffectiveFilterValue } from './filter-engine'
+import { cn } from '../lib/utils'
 import {
   isFilterFieldDisabled,
   isFilterFieldVisible,
-  normalizeFilterSelectChange,
-  resolveFilterSelectValue,
-  resolveSelectFieldOptions,
+  resolveFilterControlSize,
 } from './filter-bar.lib'
-import { FILTER_SELECT_ALL_VALUE, filterBarControlVariants } from './filter-bar.variants'
+import {
+  filterBarControlVariants,
+  filterFieldLabelVariants,
+  FILTER_DENSITY_DEFAULT,
+} from './filter-bar.variants'
+import { FilterSelectControl } from './filter-select-control.client'
 import type {
   BooleanFilterFieldDef,
+  FilterDensity,
   FilterFieldDef,
   FilterFieldId,
   FilterSchema,
@@ -34,6 +31,7 @@ type FilterFieldRendererProps<TData, TState extends Record<string, unknown>> = {
   controlId: string
   schema: FilterSchema<TData, TState>
   state: TState
+  density?: FilterDensity
   disabled?: boolean
   onValueChange: (
     id: FilterFieldId<TState>,
@@ -45,12 +43,14 @@ function FilterTextField<TData, TState extends Record<string, unknown>>({
   field,
   controlId,
   state,
+  density = FILTER_DENSITY_DEFAULT,
   disabled,
   onValueChange,
 }: {
   field: TextFilterFieldDef<TData, TState, FilterFieldId<TState>>
   controlId: string
   state: TState
+  density?: FilterDensity
   disabled?: boolean
   onValueChange: FilterFieldRendererProps<TData, TState>['onValueChange']
 }) {
@@ -73,7 +73,7 @@ function FilterTextField<TData, TState extends Record<string, unknown>>({
           )
         }}
         aria-label={textField.label}
-        size="sm"
+        size={resolveFilterControlSize(density)}
         disabled={disabled}
       />
     </div>
@@ -85,6 +85,7 @@ function FilterSelectField<TData, TState extends Record<string, unknown>>({
   controlId,
   schema,
   state,
+  density = FILTER_DENSITY_DEFAULT,
   disabled,
   onValueChange,
 }: {
@@ -92,50 +93,21 @@ function FilterSelectField<TData, TState extends Record<string, unknown>>({
   controlId: string
   schema: FilterSchema<TData, TState>
   state: TState
+  density?: FilterDensity
   disabled?: boolean
   onValueChange: FilterFieldRendererProps<TData, TState>['onValueChange']
 }) {
-  const selectField = field
-  const rawValue = state[selectField.id]
-  const effectiveValue = getEffectiveFilterValue(schema, state, selectField.id)
-  const showAllOption = selectField.showAllOption ?? true
-  const options = resolveSelectFieldOptions(selectField, { state })
-
   return (
-    <div className={filterBarControlVariants({ type: 'select' })}>
-      <Select
-        value={resolveFilterSelectValue({ ...selectField, options }, rawValue, effectiveValue)}
-        onValueChange={(nextValue) => {
-          const normalized = normalizeFilterSelectChange({ ...selectField, options }, nextValue) as
-            | TState[typeof selectField.id]
-            | undefined
-          const currentValue =
-            rawValue !== undefined && rawValue !== ''
-              ? rawValue
-              : effectiveValue !== undefined && effectiveValue !== ''
-                ? effectiveValue
-                : undefined
-          if (Object.is(normalized, currentValue)) return
-
-          onValueChange(selectField.id, normalized)
-        }}
-        disabled={disabled}
-      >
-        <SelectTrigger id={controlId} aria-label={selectField.label} size="sm">
-          <SelectValue placeholder={selectField.label} />
-        </SelectTrigger>
-        <SelectContent>
-          {showAllOption ? (
-            <SelectItem value={FILTER_SELECT_ALL_VALUE}>All {selectField.label}</SelectItem>
-          ) : null}
-          {options.map((option) => (
-            <SelectItem key={option.value} value={option.value}>
-              {option.label}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-    </div>
+    <FilterSelectControl
+      field={field}
+      controlId={controlId}
+      schema={schema}
+      state={state}
+      density={density}
+      disabled={disabled}
+      onValueChange={onValueChange}
+      guardDuplicateChanges
+    />
   )
 }
 
@@ -143,12 +115,14 @@ function FilterBooleanField<TData, TState extends Record<string, unknown>>({
   field,
   controlId,
   state,
+  density = FILTER_DENSITY_DEFAULT,
   disabled,
   onValueChange,
 }: {
   field: BooleanFilterFieldDef<TData, TState, FilterFieldId<TState>>
   controlId: string
   state: TState
+  density?: FilterDensity
   disabled?: boolean
   onValueChange: FilterFieldRendererProps<TData, TState>['onValueChange']
 }) {
@@ -168,7 +142,13 @@ function FilterBooleanField<TData, TState extends Record<string, unknown>>({
           )
         }}
       />
-      <label htmlFor={controlId} className="cursor-pointer text-sm font-medium leading-none">
+      <label
+        htmlFor={controlId}
+        className={cn(
+          filterFieldLabelVariants({ density }),
+          'cursor-pointer font-medium leading-none',
+        )}
+      >
         {booleanField.label}
       </label>
     </div>
@@ -180,6 +160,7 @@ export function FilterField<TData, TState extends Record<string, unknown>>({
   controlId,
   schema,
   state,
+  density = FILTER_DENSITY_DEFAULT,
   disabled,
   onValueChange,
 }: FilterFieldRendererProps<TData, TState>) {
@@ -189,6 +170,7 @@ export function FilterField<TData, TState extends Record<string, unknown>>({
         field={field}
         controlId={controlId}
         state={state}
+        density={density}
         disabled={disabled}
         onValueChange={onValueChange}
       />
@@ -202,6 +184,7 @@ export function FilterField<TData, TState extends Record<string, unknown>>({
         controlId={controlId}
         schema={schema}
         state={state}
+        density={density}
         disabled={disabled}
         onValueChange={onValueChange}
       />
@@ -214,6 +197,7 @@ export function FilterField<TData, TState extends Record<string, unknown>>({
         field={field}
         controlId={controlId}
         state={state}
+        density={density}
         disabled={disabled}
         onValueChange={onValueChange}
       />
@@ -227,6 +211,7 @@ export function FilterFieldList<TData, TState extends Record<string, unknown>>({
   schema,
   fields,
   state,
+  density = FILTER_DENSITY_DEFAULT,
   disabled,
   idPrefix,
   onValueChange,
@@ -234,6 +219,7 @@ export function FilterFieldList<TData, TState extends Record<string, unknown>>({
   schema: FilterSchema<TData, TState>
   fields: FilterFieldDef<TData, TState>[]
   state: TState
+  density?: FilterDensity
   disabled?: boolean
   idPrefix: string
   onValueChange: FilterFieldRendererProps<TData, TState>['onValueChange']
@@ -255,6 +241,7 @@ export function FilterFieldList<TData, TState extends Record<string, unknown>>({
             controlId={`${resolvedIdPrefix}-${field.id}`}
             schema={schema}
             state={state}
+            density={density}
             disabled={isFilterFieldDisabled(field, state, disabled)}
             onValueChange={onValueChange}
           />

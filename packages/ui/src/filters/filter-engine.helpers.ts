@@ -120,6 +120,7 @@ type EqualsFilterConfig<
   defaultValue?: TState[TId]
   showAllOption?: boolean
   layout?: SelectFilterFieldDef<TData, TState, TId>['layout']
+  width?: SelectFilterFieldDef<TData, TState, TId>['width']
   ariaLabel?: string
   triggerAriaLabel?: string
   visible?: (state: TState) => boolean
@@ -144,6 +145,7 @@ export function createEqualsFilter<
     defaultValue: config.defaultValue,
     showAllOption: config.showAllOption,
     layout: config.layout,
+    width: config.width,
     ariaLabel: config.ariaLabel,
     triggerAriaLabel: config.triggerAriaLabel,
     visible: config.visible,

@@ -4,9 +4,11 @@ export type {
   ChipsSelectionMode,
   FilterCatalogLayoutConfig,
   FilterChangeContext,
+  FilterDensity,
   FilterFieldDef,
   FilterFieldId,
   FilterFieldOptionsContext,
+  FilterFieldWidth,
   FilterMatchFn,
   FilterOption,
   FilterPlacement,
@@ -48,13 +50,13 @@ export {
   shallowArrayEqual,
 } from './filter-engine.helpers'
 
-export { FILTER_SELECT_ALL_VALUE } from './filter-bar.variants'
+export { FILTER_DENSITY_DEFAULT, FILTER_SELECT_ALL_VALUE } from './filter-bar.variants'
 export {
   getSchemaFieldsByPlacement,
   isFilterFieldDisabled,
   isFilterFieldVisible,
   normalizeFilterSelectChange,
-  resolveAdvancedPanelColumns,
+  resolveFilterControlSize,
   resolveFilterSelectValue,
 } from './filter-bar.lib'
 

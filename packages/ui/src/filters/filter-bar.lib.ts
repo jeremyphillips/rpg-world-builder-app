@@ -6,7 +6,8 @@ import type {
   FilterPlacement,
   FilterSchema,
 } from './filter-schema.types'
-import { FILTER_SELECT_ALL_VALUE } from './filter-bar.variants'
+import type { FilterDensity } from './filter-schema.types'
+import { FILTER_DENSITY_DEFAULT, FILTER_SELECT_ALL_VALUE } from './filter-bar.variants'
 
 type SelectFieldLike = {
   showAllOption?: boolean
@@ -76,9 +77,22 @@ export function normalizeFilterSelectChange(field: SelectFieldLike, nextValue: s
   return nextValue
 }
 
-export function resolveAdvancedPanelColumns(fieldCount: number): 1 | 2 | 3 | 4 {
-  if (fieldCount <= 1) return 1
-  if (fieldCount === 2) return 2
-  if (fieldCount === 3) return 3
-  return 4
+export function resolveFilterControlSize(
+  density: FilterDensity = FILTER_DENSITY_DEFAULT,
+): 'sm' | 'md' {
+  return density === 'compact' ? 'sm' : 'md'
+}
+
+export function resolveSelectCurrentValue(rawValue: unknown, effectiveValue: unknown): unknown {
+  if (rawValue !== undefined && rawValue !== '') return rawValue
+  if (effectiveValue !== undefined && effectiveValue !== '') return effectiveValue
+  return undefined
+}
+
+export function shouldSkipFilterSelectChange(
+  normalized: unknown,
+  rawValue: unknown,
+  effectiveValue: unknown,
+): boolean {
+  return Object.is(normalized, resolveSelectCurrentValue(rawValue, effectiveValue))
 }

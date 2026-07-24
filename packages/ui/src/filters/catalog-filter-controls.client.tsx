@@ -4,8 +4,14 @@ import { useId } from 'react'
 
 import { cn } from '../lib/utils'
 import { CatalogFilterFieldList } from './catalog-filter-fields.client'
-import type { FilterCatalogLayoutConfig, FilterFieldId, FilterSchema } from './filter-schema.types'
+import type {
+  FilterCatalogLayoutConfig,
+  FilterDensity,
+  FilterFieldId,
+  FilterSchema,
+} from './filter-schema.types'
 import { catalogFilterControlsVariants } from './catalog-filter-controls.variants'
+import { FILTER_DENSITY_DEFAULT } from './filter-bar.variants'
 
 export type CatalogFilterControlsProps<TData, TState extends Record<string, unknown>> = {
   schema: FilterSchema<TData, TState>
@@ -13,6 +19,7 @@ export type CatalogFilterControlsProps<TData, TState extends Record<string, unkn
   state: TState
   data?: readonly TData[]
   disabled?: boolean
+  density?: FilterDensity
   idPrefix?: string
   className?: string
   onValueChange: (
@@ -27,6 +34,7 @@ function CatalogFilterControlsGroup<TData, TState extends Record<string, unknown
   state,
   data,
   disabled,
+  density = FILTER_DENSITY_DEFAULT,
   idPrefix,
   className,
   onValueChange,
@@ -47,6 +55,7 @@ function CatalogFilterControlsGroup<TData, TState extends Record<string, unknown
         fieldIds={fieldIds}
         state={state}
         data={data}
+        density={density}
         disabled={disabled}
         idPrefix={resolvedIdPrefix}
         onValueChange={onValueChange}

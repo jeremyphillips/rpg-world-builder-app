@@ -111,6 +111,8 @@ function buildSpellsFilterSchema(spellSchoolVocabulary: SpellSchoolVocabulary | 
       id: 'modelingStatus',
       label: 'Modeling',
       placement: 'advanced',
+      layout: 'stacked',
+      width: 'md',
       options: MODELING_STATUS_FILTER_OPTIONS,
       getValue: (row) => effectiveSpellModelingStatus(row),
     }),

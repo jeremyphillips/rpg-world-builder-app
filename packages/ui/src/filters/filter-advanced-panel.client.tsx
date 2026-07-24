@@ -4,17 +4,15 @@ import { Collapsible, CollapsibleContent } from '../components/ui/collapsible.cl
 import { Button } from '../components/ui/button.client'
 import { cn } from '../lib/utils'
 import { countModifiedFilters } from './filter-engine'
+import { getSchemaFieldsByPlacement, isFilterFieldVisible } from './filter-bar.lib'
 import {
-  getSchemaFieldsByPlacement,
-  isFilterFieldVisible,
-  resolveAdvancedPanelColumns,
-} from './filter-bar.lib'
-import {
+  filterAdvancedPanelFooterVariants,
   filterAdvancedPanelInnerVariants,
   filterAdvancedPanelVariants,
+  FILTER_DENSITY_DEFAULT,
 } from './filter-bar.variants'
 import { FilterFieldList } from './filter-fields.client'
-import type { FilterFieldId, FilterSchema } from './filter-schema.types'
+import type { FilterDensity, FilterFieldId, FilterSchema } from './filter-schema.types'
 
 export type FilterAdvancedPanelProps<TData, TState extends Record<string, unknown>> = {
   schema: FilterSchema<TData, TState>
@@ -27,6 +25,7 @@ export type FilterAdvancedPanelProps<TData, TState extends Record<string, unknow
   onClearAll?: () => void
   clearAllLabel?: string
   disabled?: boolean
+  density?: FilterDensity
   idPrefix?: string
   className?: string
 }
@@ -39,6 +38,7 @@ export function FilterAdvancedPanel<TData, TState extends Record<string, unknown
   onClearAll,
   clearAllLabel = 'Clear all filters',
   disabled = false,
+  density = FILTER_DENSITY_DEFAULT,
   idPrefix = 'filters-advanced',
   className,
 }: FilterAdvancedPanelProps<TData, TState>) {
@@ -51,17 +51,17 @@ export function FilterAdvancedPanel<TData, TState extends Record<string, unknown
   }
 
   const modifiedCount = countModifiedFilters(schema, state)
-  const columnCount = resolveAdvancedPanelColumns(advancedFields.length)
 
   return (
     <Collapsible open={open} className={className}>
       <CollapsibleContent>
         <div className={cn(filterAdvancedPanelVariants())}>
-          <div className={filterAdvancedPanelInnerVariants({ cols: columnCount })}>
+          <div className={filterAdvancedPanelInnerVariants({ density })}>
             <FilterFieldList
               schema={schema}
               fields={advancedFields}
               state={state}
+              density={density}
               disabled={disabled}
               idPrefix={idPrefix}
               onValueChange={onValueChange}
@@ -69,7 +69,7 @@ export function FilterAdvancedPanel<TData, TState extends Record<string, unknown
           </div>
 
           {onClearAll && modifiedCount > 0 ? (
-            <div className="border-t border-border px-4 py-3">
+            <div className={filterAdvancedPanelFooterVariants({ density })}>
               <Button
                 type="button"
                 variant="ghost"

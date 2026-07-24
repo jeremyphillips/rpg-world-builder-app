@@ -31,6 +31,9 @@ const schema = createFilterSchema<DemoRow, TestFilterState>([
   createEqualsFilter<DemoRow, TestFilterState, 'status', 'draft' | 'published'>({
     id: 'status',
     label: 'Status',
+    placement: 'advanced',
+    layout: 'stacked',
+    width: 'md',
     options: [
       { value: 'draft', label: 'Draft' },
       { value: 'published', label: 'Published' },
@@ -96,6 +99,7 @@ describe('FilterBar', () => {
     expect(screen.queryByLabelText('Hidden only')).not.toBeInTheDocument()
 
     await user.click(screen.getByRole('button', { name: /^Filters/ }))
+    expect(screen.getByText('Status')).toHaveClass('text-xs')
     expect(screen.getByLabelText('Hidden only')).toBeInTheDocument()
   })
 
@@ -128,7 +132,9 @@ describe('FilterBar', () => {
   })
 
   it('has no axe accessibility violations', async () => {
-    const { container } = render(<FilterSystemHarness initialState={{ search: 'fire', status: 'draft' }} />)
+    const { container } = render(
+      <FilterSystemHarness initialState={{ search: 'fire', status: 'draft' }} />,
+    )
 
     await expectNoAxeViolations(container)
   })

@@ -19,9 +19,7 @@ import {
   CAMPAIGN_ACCESS_TABLE_FILTER_LABEL,
   CAMPAIGN_ACCESS_TABLE_FILTER_UNAVAILABLE,
 } from '../campaign-access/campaign-access-table-labels'
-import {
-  campaignAvailabilityFilterFn,
-} from './content-availability-table.lib'
+import { campaignAvailabilityFilterFn } from './content-availability-table.lib'
 import type { ContentBase } from './content-table-config'
 import { CONTENT_SOURCE_BADGE, type ContentSource } from './content-source-badge'
 import { CONTENT_STATUS_BADGE } from './content-status-badge'
@@ -56,6 +54,8 @@ export function createContentSourceFilter<
     id: 'source' as FilterFieldId<TState>,
     label: 'Source',
     placement: 'advanced',
+    layout: 'stacked',
+    width: 'md',
     options: (Object.keys(CONTENT_SOURCE_BADGE) as ContentSource[]).map((value) => ({
       value,
       label: CONTENT_SOURCE_BADGE[value].label,
@@ -72,6 +72,8 @@ export function createContentStatusFilter<
     id: 'status' as FilterFieldId<TState>,
     label: 'Status',
     placement: 'advanced',
+    layout: 'stacked',
+    width: 'md',
     options: (Object.keys(CONTENT_STATUS_BADGE) as ContentStatus[]).map((value) => ({
       value,
       label: CONTENT_STATUS_BADGE[value].label,
@@ -89,6 +91,7 @@ export function createCampaignAvailabilityFilterField<
     id: 'campaignAvailability' as FilterFieldId<TState>,
     label: CAMPAIGN_ACCESS_TABLE_FILTER_LABEL,
     placement: 'advanced',
+    width: 'lg',
     defaultValue: CAMPAIGN_AVAILABILITY_FILTER_DEFAULT,
     showAllOption: false,
     isValueConstraining: (value: unknown) => value !== 'all',
@@ -110,9 +113,7 @@ export function createCampaignAvailabilityFilterField<
 export function buildContentFilterSchema<
   TData extends OverviewRow,
   TState extends ContentOverviewBaseFilterState,
->(
-  contentFields: ReadonlyArray<FilterFieldDef<TData, TState>>,
-): FilterSchema<TData, TState> {
+>(contentFields: ReadonlyArray<FilterFieldDef<TData, TState>>): FilterSchema<TData, TState> {
   return createFilterSchema([
     createContentNameFilter<TData, TState>(),
     ...contentFields,
@@ -123,9 +124,9 @@ export function buildContentFilterSchema<
 }
 
 /** Removes a field from a module-level schema constant. */
-export function omitContentFilterField<TData extends OverviewRow, TState extends ContentOverviewBaseFilterState>(
-  schema: FilterSchema<TData, TState>,
-  fieldId: string,
-): FilterSchema<TData, TState> {
+export function omitContentFilterField<
+  TData extends OverviewRow,
+  TState extends ContentOverviewBaseFilterState,
+>(schema: FilterSchema<TData, TState>, fieldId: string): FilterSchema<TData, TState> {
   return createFilterSchema(schema.fields.filter((field) => field.id !== fieldId))
 }

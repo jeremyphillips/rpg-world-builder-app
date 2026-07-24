@@ -6,29 +6,24 @@ import { CatalogFilterChips } from '../components/ui/catalog-filter-chips.client
 import { Checkbox } from '../components/ui/checkbox.client'
 import { FilterPopover } from '../components/ui/filter-popover.client'
 import { Text } from '../components/ui/text'
-import { cn } from '../lib/utils'
-import { getEffectiveFilterValue } from './filter-engine'
 import {
   getFilterFieldById,
   resolveChipsFieldOptions,
-  resolveFilterFieldOptions,
   resolvePopoverFieldGroups,
 } from './filter-field-options.lib'
-import {
-  isFilterFieldDisabled,
-  isFilterFieldVisible,
-  normalizeFilterSelectChange,
-  resolveFilterSelectValue,
-} from './filter-bar.lib'
+import { isFilterFieldDisabled, isFilterFieldVisible } from './filter-bar.lib'
+import { cn } from '../lib/utils'
 import {
   FILTER_SELECT_ALL_VALUE,
   filterBarControlVariants,
-  filterBarInlineFieldGroupClasses,
-  filterBarInlineFieldLabelClasses,
+  filterFieldLabelVariants,
+  FILTER_DENSITY_DEFAULT,
 } from './filter-bar.variants'
+import { FilterSelectControl } from './filter-select-control.client'
 import type {
   BooleanFilterFieldDef,
   ChipsFilterFieldDef,
+  FilterDensity,
   FilterFieldDef,
   FilterFieldId,
   FilterFieldOptionsContext,
@@ -36,13 +31,6 @@ import type {
   PopoverFilterFieldDef,
   SelectFilterFieldDef,
 } from './filter-schema.types'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '../components/ui/select.client'
 
 type CatalogFilterFieldRendererProps<TData, TState extends Record<string, unknown>> = {
   field: FilterFieldDef<TData, TState>
@@ -50,6 +38,7 @@ type CatalogFilterFieldRendererProps<TData, TState extends Record<string, unknow
   schema: FilterSchema<TData, TState>
   state: TState
   optionsContext: FilterFieldOptionsContext<TData, TState>
+  density?: FilterDensity
   disabled?: boolean
   onValueChange: (
     id: FilterFieldId<TState>,
@@ -63,6 +52,7 @@ function CatalogFilterInlineSelectField<TData, TState extends Record<string, unk
   schema,
   state,
   optionsContext,
+  density = FILTER_DENSITY_DEFAULT,
   disabled,
   onValueChange,
 }: {
@@ -71,60 +61,21 @@ function CatalogFilterInlineSelectField<TData, TState extends Record<string, unk
   schema: FilterSchema<TData, TState>
   state: TState
   optionsContext: FilterFieldOptionsContext<TData, TState>
+  density?: FilterDensity
   disabled?: boolean
   onValueChange: CatalogFilterFieldRendererProps<TData, TState>['onValueChange']
 }) {
-  const selectField = field
-  const rawValue = state[selectField.id]
-  const effectiveValue = getEffectiveFilterValue(schema, state, selectField.id)
-  const showAllOption = selectField.showAllOption ?? true
-  const options = resolveFilterFieldOptions(selectField, optionsContext)
-  const inline = selectField.layout === 'inline'
-  const triggerAriaLabel = selectField.triggerAriaLabel ?? selectField.label
-
-  const selectControl = (
-    <Select
-      value={resolveFilterSelectValue({ ...selectField, options }, rawValue, effectiveValue)}
-      onValueChange={(nextValue) => {
-        const normalized = normalizeFilterSelectChange({ ...selectField, options }, nextValue) as
-          | TState[typeof selectField.id]
-          | undefined
-        onValueChange(selectField.id, normalized)
-      }}
-      disabled={disabled}
-    >
-      <SelectTrigger id={controlId} aria-label={triggerAriaLabel} size="sm">
-        <SelectValue placeholder={selectField.label} />
-      </SelectTrigger>
-      <SelectContent>
-        {showAllOption ? (
-          <SelectItem value={FILTER_SELECT_ALL_VALUE}>All {selectField.label}</SelectItem>
-        ) : null}
-        {options.map((option) => (
-          <SelectItem key={option.value} value={option.value}>
-            {option.label}
-          </SelectItem>
-        ))}
-      </SelectContent>
-    </Select>
-  )
-
-  if (!inline) {
-    return <div className={filterBarControlVariants({ type: 'select' })}>{selectControl}</div>
-  }
-
   return (
-    <div
-      className={cn(
-        filterBarControlVariants({ type: 'inlineSelect' }),
-        filterBarInlineFieldGroupClasses,
-      )}
-      role="group"
-      aria-label={selectField.ariaLabel ?? selectField.label}
-    >
-      <span className={filterBarInlineFieldLabelClasses}>{selectField.label}</span>
-      {selectControl}
-    </div>
+    <FilterSelectControl
+      field={field}
+      controlId={controlId}
+      schema={schema}
+      state={state}
+      optionsContext={optionsContext}
+      density={density}
+      disabled={disabled}
+      onValueChange={onValueChange}
+    />
   )
 }
 
@@ -261,6 +212,7 @@ function CatalogFilterBooleanField<TData, TState extends Record<string, unknown>
   controlId,
   state,
   optionsContext,
+  density = FILTER_DENSITY_DEFAULT,
   disabled,
   onValueChange,
 }: {
@@ -268,6 +220,7 @@ function CatalogFilterBooleanField<TData, TState extends Record<string, unknown>
   controlId: string
   state: TState
   optionsContext: FilterFieldOptionsContext<TData, TState>
+  density?: FilterDensity
   disabled?: boolean
   onValueChange: CatalogFilterFieldRendererProps<TData, TState>['onValueChange']
 }) {
@@ -288,7 +241,13 @@ function CatalogFilterBooleanField<TData, TState extends Record<string, unknown>
           )
         }}
       />
-      <label htmlFor={controlId} className="cursor-pointer text-sm font-medium leading-none">
+      <label
+        htmlFor={controlId}
+        className={cn(
+          filterFieldLabelVariants({ density }),
+          'cursor-pointer font-medium leading-none',
+        )}
+      >
         {booleanField.label}
       </label>
       {isChecked && hiddenCount !== undefined && hiddenCount > 0 ? (
@@ -306,6 +265,7 @@ export function CatalogFilterField<TData, TState extends Record<string, unknown>
   schema,
   state,
   optionsContext,
+  density = FILTER_DENSITY_DEFAULT,
   disabled,
   onValueChange,
 }: CatalogFilterFieldRendererProps<TData, TState>) {
@@ -317,6 +277,7 @@ export function CatalogFilterField<TData, TState extends Record<string, unknown>
         schema={schema}
         state={state}
         optionsContext={optionsContext}
+        density={density}
         onValueChange={onValueChange}
       />
     )
@@ -354,6 +315,7 @@ export function CatalogFilterField<TData, TState extends Record<string, unknown>
         controlId={controlId}
         state={state}
         optionsContext={optionsContext}
+        density={density}
         disabled={disabled}
         onValueChange={onValueChange}
       />
@@ -369,6 +331,7 @@ export function CatalogFilterFieldList<TData, TState extends Record<string, unkn
   state,
   data,
   disabled,
+  density = FILTER_DENSITY_DEFAULT,
   idPrefix,
   onValueChange,
 }: {
@@ -377,6 +340,7 @@ export function CatalogFilterFieldList<TData, TState extends Record<string, unkn
   state: TState
   data?: readonly TData[]
   disabled?: boolean
+  density?: FilterDensity
   idPrefix: string
   onValueChange: CatalogFilterFieldRendererProps<TData, TState>['onValueChange']
 }) {
@@ -400,6 +364,7 @@ export function CatalogFilterFieldList<TData, TState extends Record<string, unkn
             schema={schema}
             state={state}
             optionsContext={optionsContext}
+            density={density}
             disabled={isFilterFieldDisabled(field, state, disabled)}
             onValueChange={onValueChange}
           />
