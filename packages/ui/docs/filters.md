@@ -237,22 +237,20 @@ change-oriented `normalize()` during URL parse with a fabricated `changedId`.
 
 `sanitizeState` / `normalizeChange` are Milestone 2 APIs when picker migrations need them.
 
-### URL codecs
+### Filter persistence (`filter-persistence.ts`)
 
-Built-in field-type codecs with optional per-field overrides:
-
-- `text` → string (trim; whitespace-only → unset)
-- `select` → option-value validation
-- `boolean` → `true` / `false`
+Filters only — not sort/page:
 
 ```ts
-url?: {
-  key?: string
-  omitDefault?: boolean // default true
-  parse?: (raw: string) => TState[TId] | undefined
-  serialize?: (value: TState[TId]) => string | undefined
-}
+parseFilterSearchParams(schema, searchParams): Partial<TState>
+serializeFilterSearchParams(schema, state): URLSearchParams
+hydrateFilterState(schema, searchParams): TState
 ```
+
+Built-in codecs: `text` (trim; whitespace-only → unset), `select` (option validation),
+`boolean` (`true` / `false`). Invalid explicit URL values fall back to schema
+`defaultValue` — not to “unset” when unset differs from the default. Defaults are
+omitted from serialized URLs unless `url.omitDefault: false`.
 
 ### Hydration and router sync timing
 
