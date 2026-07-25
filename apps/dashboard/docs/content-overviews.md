@@ -20,7 +20,7 @@ Line 2: Edit · Duplicate (managers)     [manager access metadata]
 
 ## Table utility strip
 
-`ContentOverviewTable` passes a `utilityStrip` render prop to `DataTable`. The tinted strip sits directly above column headers.
+`ContentOverviewTable` passes a `utilityStrip` render prop to `DataTable`. The tinted strip is the top band inside the table card shell, flush above column headers.
 
 | Region | Content                                                                                                                    |
 | ------ | -------------------------------------------------------------------------------------------------------------------------- |

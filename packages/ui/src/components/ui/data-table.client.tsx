@@ -1046,92 +1046,94 @@ export function DataTable<TData>({
     data,
   }
 
+  const tableElement = (
+    <Table className={dataTableTableVariants()}>
+      {caption && <TableCaption className={dataTableCaptionVariants()}>{caption}</TableCaption>}
+      <TableHeader>
+        {table.getHeaderGroups().map((headerGroup) => (
+          <TableRow key={headerGroup.id} className={dataTableHeaderRowVariants()}>
+            {headerGroup.headers.map((header) => {
+              const sorted = header.column.getIsSorted()
+              const canSort = header.column.getCanSort()
+              return (
+                <TableHead
+                  key={header.id}
+                  colSpan={header.colSpan}
+                  className={cn(
+                    dataTableHeaderCellVariants(),
+                    header.column.columnDef.meta?.headerClassName,
+                  )}
+                  aria-sort={
+                    sorted === 'asc'
+                      ? 'ascending'
+                      : sorted === 'desc'
+                        ? 'descending'
+                        : canSort
+                          ? 'none'
+                          : undefined
+                  }
+                >
+                  {header.isPlaceholder
+                    ? null
+                    : flexRender(header.column.columnDef.header, header.getContext())}
+                </TableHead>
+              )
+            })}
+          </TableRow>
+        ))}
+      </TableHeader>
+      <TableBody>
+        {rows.length > 0 ? (
+          rows.map((row) => (
+            <TableRow
+              key={row.id}
+              className={cn(dataTableRowVariants(), getRowClassName?.(row))}
+              data-state={row.getIsSelected() ? 'selected' : undefined}
+            >
+              {row.getVisibleCells().map((cell) => {
+                const meta = cell.column.columnDef.meta
+                return (
+                  <TableCell
+                    key={cell.id}
+                    className={cn(
+                      dataTableBodyCellVariants({
+                        tone: meta?.columnTone ?? 'neutral',
+                      }),
+                      dataTableBodyCellPaddingVariants(),
+                      meta?.cellClassName,
+                      getCellClassName?.(cell),
+                    )}
+                  >
+                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                  </TableCell>
+                )
+              })}
+            </TableRow>
+          ))
+        ) : (
+          <TableRow>
+            <TableCell colSpan={resolvedColumns.length} className={dataTableEmptyStateVariants()}>
+              {emptyState ? emptyState(emptyStateContext) : 'No results.'}
+            </TableCell>
+          </TableRow>
+        )}
+      </TableBody>
+    </Table>
+  )
+
   return (
     <div className={dataTableRootVariants()}>
       {utilityStrip ? (
-        <div className={dataTableUtilityStripVariants()}>{utilityStrip(utilityControls)}</div>
+        <div className={dataTableTableWrapVariants()}>
+          <div className={dataTableUtilityStripVariants()}>{utilityStrip(utilityControls)}</div>
+          {tableElement}
+        </div>
       ) : (
-        <DataTableToolbar table={table} onColumnChange={onColumnChange} />
+        <>
+          <DataTableToolbar table={table} onColumnChange={onColumnChange} />
+          <div className={dataTableTableWrapVariants()}>{tableElement}</div>
+        </>
       )}
-
-      {/* Table */}
-      <div className={dataTableTableWrapVariants()}>
-        <Table className={dataTableTableVariants()}>
-          {caption && <TableCaption className={dataTableCaptionVariants()}>{caption}</TableCaption>}
-          <TableHeader>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id} className={dataTableHeaderRowVariants()}>
-                {headerGroup.headers.map((header) => {
-                  const sorted = header.column.getIsSorted()
-                  const canSort = header.column.getCanSort()
-                  return (
-                    <TableHead
-                      key={header.id}
-                      colSpan={header.colSpan}
-                      className={cn(
-                        dataTableHeaderCellVariants(),
-                        header.column.columnDef.meta?.headerClassName,
-                      )}
-                      aria-sort={
-                        sorted === 'asc'
-                          ? 'ascending'
-                          : sorted === 'desc'
-                            ? 'descending'
-                            : canSort
-                              ? 'none'
-                              : undefined
-                      }
-                    >
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(header.column.columnDef.header, header.getContext())}
-                    </TableHead>
-                  )
-                })}
-              </TableRow>
-            ))}
-          </TableHeader>
-          <TableBody>
-            {rows.length > 0 ? (
-              rows.map((row) => (
-                <TableRow
-                  key={row.id}
-                  className={cn(dataTableRowVariants(), getRowClassName?.(row))}
-                  data-state={row.getIsSelected() ? 'selected' : undefined}
-                >
-                  {row.getVisibleCells().map((cell) => {
-                    const meta = cell.column.columnDef.meta
-                    return (
-                      <TableCell
-                        key={cell.id}
-                        className={cn(
-                          dataTableBodyCellVariants({
-                            tone: meta?.columnTone ?? 'neutral',
-                          }),
-                          dataTableBodyCellPaddingVariants(),
-                          meta?.cellClassName,
-                          getCellClassName?.(cell),
-                        )}
-                      >
-                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                      </TableCell>
-                    )
-                  })}
-                </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell
-                  colSpan={resolvedColumns.length}
-                  className={dataTableEmptyStateVariants()}
-                >
-                  {emptyState ? emptyState(emptyStateContext) : 'No results.'}
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
-      </div>
 
       {/* Pagination */}
       <DataTablePagination table={table} onPageSizeChange={handlePageSizeChange} />

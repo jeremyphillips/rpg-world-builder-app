@@ -345,6 +345,24 @@ describe('DataTable — utilityStrip', () => {
     const headerCheckbox = screen.getByRole('checkbox', { name: 'Select all rows on this page' })
     expect(headerCheckbox).toBeChecked()
   })
+
+  it('nests the utility strip inside the table card shell', () => {
+    renderTable({
+      utilityStrip: () => <span>Custom strip</span>,
+    })
+
+    const strip = screen.getByText('Custom strip')
+    const table = screen.getByRole('table')
+    const cardShell = strip.closest('.rounded-card')
+
+    expect(cardShell).toBeInTheDocument()
+    expect(cardShell).toContainElement(strip)
+    expect(cardShell).toContainElement(table)
+
+    const stripParent = strip.parentElement
+    expect(stripParent).toHaveClass('bg-sunken')
+    expect(stripParent?.nextElementSibling).toContainElement(table)
+  })
 })
 
 // ---------------------------------------------------------------------------

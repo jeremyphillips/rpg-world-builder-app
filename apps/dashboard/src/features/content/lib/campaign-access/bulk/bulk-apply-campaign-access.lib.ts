@@ -1,5 +1,6 @@
 import {
   applyBulkCampaignAccessOperations,
+  fetchCsrfToken,
   isBulkCampaignAccessNoOp,
   type BulkCampaignAccessFormValues,
   type ContentTypeKey,
@@ -53,6 +54,7 @@ async function applyRowsWithConcurrency(
   formValues: BulkCampaignAccessFormValues,
   campaignId: string,
   contentTypeKey: ContentTypeKey,
+  csrfToken: string,
 ) {
   const outcomes: BulkApplyOutcome[] = []
 
@@ -66,6 +68,7 @@ async function applyRowsWithConcurrency(
           contentTypeKey,
           row.id,
           patch,
+          { csrfToken },
         )
         return { rowId: row.id, result }
       }),
@@ -114,8 +117,12 @@ function aggregateBulkApplyOutcomes(outcomes: BulkApplyOutcome[]) {
   }
 
   const summary =
-    blockedIds.length > 0
-      ? formatBulkCampaignAccessPartialSuccess(updatedIds.length, blockedIds.length)
+    blockedIds.length > 0 || failedIds.length > 0
+      ? formatBulkCampaignAccessPartialSuccess(
+          updatedIds.length,
+          blockedIds.length,
+          failedIds.length,
+        )
       : updatedIds.length > 0
         ? formatBulkCampaignAccessFullSuccess(updatedIds.length)
         : null
@@ -137,11 +144,13 @@ export async function executeBulkCampaignAccessApply(
   contentTypeKey: ContentTypeKey,
 ): Promise<BulkCampaignAccessApplyResult> {
   const { applicableRows, unchangedIds } = partitionApplicableRows(rows, formValues)
+  const csrfToken = await fetchCsrfToken()
   const outcomes = await applyRowsWithConcurrency(
     applicableRows,
     formValues,
     campaignId,
     contentTypeKey,
+    csrfToken,
   )
   const aggregated = aggregateBulkApplyOutcomes(outcomes)
 

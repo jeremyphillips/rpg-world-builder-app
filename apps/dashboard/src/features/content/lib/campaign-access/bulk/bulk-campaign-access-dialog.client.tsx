@@ -4,7 +4,7 @@ import { useEffect, useId, useMemo, useRef } from 'react'
 import { FormProvider, useForm, useWatch } from 'react-hook-form'
 import type { ContentAccessTargetType, ContentTypeKey, WithCampaignAccess } from '@rpg/contracts'
 import { Button, Modal, Text } from '@rpg/ui'
-import { FormItems, FormSectionProvider, FormUiProvider } from '@rpg/ui/form'
+import { FormFieldStack } from '@rpg/ui/form'
 
 import { CampaignAccessBlockedDialog } from '../campaign-access-blocked-dialog.client'
 import {
@@ -92,10 +92,21 @@ export function BulkCampaignAccessDialog({
     }
   }
 
+  const handleOpenAutoFocus = (event: Event) => {
+    event.preventDefault()
+    const content = event.currentTarget as HTMLElement
+    const firstField = content.querySelector<HTMLElement>('[role="combobox"], select, input')
+    firstField?.focus()
+  }
+
   return (
     <>
       <Modal.Root open={open} onOpenChange={onOpenChange}>
-        <Modal.Content size="sm" aria-busy={pending || undefined}>
+        <Modal.Content
+          size="md"
+          aria-busy={pending || undefined}
+          onOpenAutoFocus={handleOpenAutoFocus}
+        >
           <Modal.Header
             headline={BULK_CAMPAIGN_ACCESS_DIALOG_HEADLINE}
             description={formatBulkCampaignAccessDialogDescription(
@@ -104,26 +115,24 @@ export function BulkCampaignAccessDialog({
             )}
           />
 
-          <FormProvider {...form}>
-            <FormUiProvider fields={fields}>
-              <FormSectionProvider size="md" rhythm="comfortable">
-                <FormItems items={fields} idPrefix={formId} />
-              </FormSectionProvider>
-            </FormUiProvider>
-          </FormProvider>
-
-          <div className="space-y-1 text-sm text-muted-foreground">
-            <p>{formatBulkCampaignAccessSelectedCount(preview.selectedCount)}</p>
-            <p>
-              {formatBulkCampaignAccessChangePreview(
-                preview.wouldChangeCount,
-                preview.unchangedCount,
-              )}
-            </p>
-            <p>{BULK_CAMPAIGN_ACCESS_DRAFT_NOTE}</p>
-            <p>{BULK_CAMPAIGN_ACCESS_BLOCKED_PREVIEW_NOTE}</p>
-            {resultSummary ? <Text variant="info">{resultSummary}</Text> : null}
-          </div>
+          <Modal.Body>
+            <FormProvider {...form}>
+              <FormFieldStack fields={fields} idPrefix={formId} size="md" rhythm="comfortable">
+                <div className="mt-6 space-y-1 text-sm text-muted-foreground">
+                  <p>{formatBulkCampaignAccessSelectedCount(preview.selectedCount)}</p>
+                  <p>
+                    {formatBulkCampaignAccessChangePreview(
+                      preview.wouldChangeCount,
+                      preview.unchangedCount,
+                    )}
+                  </p>
+                  <p>{BULK_CAMPAIGN_ACCESS_DRAFT_NOTE}</p>
+                  <p>{BULK_CAMPAIGN_ACCESS_BLOCKED_PREVIEW_NOTE}</p>
+                  {resultSummary ? <Text variant="info">{resultSummary}</Text> : null}
+                </div>
+              </FormFieldStack>
+            </FormProvider>
+          </Modal.Body>
 
           <Modal.Footer>
             <Button

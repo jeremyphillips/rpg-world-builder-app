@@ -130,14 +130,23 @@ export function formatBulkCampaignAccessFullSuccess(updatedCount: number): strin
   return `Updated ${updatedCount} item${updatedCount === 1 ? '' : 's'}.`
 }
 
-/** Post-apply summary for partial success. */
+/** Post-apply summary for partial success (blocked or failed rows). */
 export function formatBulkCampaignAccessPartialSuccess(
   updatedCount: number,
   blockedCount: number,
+  failedCount = 0,
 ): string {
-  const updatedLabel = `Updated ${updatedCount} item${updatedCount === 1 ? '' : 's'}.`
-  const blockedLabel = `${blockedCount} item${blockedCount === 1 ? '' : 's'} blocked.`
-  return `${updatedLabel} ${blockedLabel}`
+  const parts: string[] = []
+  if (updatedCount > 0) {
+    parts.push(`Updated ${updatedCount} item${updatedCount === 1 ? '' : 's'}.`)
+  }
+  if (blockedCount > 0) {
+    parts.push(`${blockedCount} item${blockedCount === 1 ? '' : 's'} blocked.`)
+  }
+  if (failedCount > 0) {
+    parts.push(`${failedCount} item${failedCount === 1 ? '' : 's'} failed.`)
+  }
+  return parts.join(' ')
 }
 
 /** Bulk actions menu trigger label. */
