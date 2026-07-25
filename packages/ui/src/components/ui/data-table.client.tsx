@@ -834,6 +834,7 @@ export function DataTable<TData>({
         />
       ),
       pageRowCount: table.getRowModel().rows.length,
+      pageSelectableRowCount: table.getRowModel().rows.filter((row) => row.getCanSelect()).length,
       isAllPageRowsSelected: table.getIsAllPageRowsSelected(),
       isSomePageRowsSelected: table.getIsSomePageRowsSelected(),
       toggleAllPageRowsSelected: (value) => table.toggleAllPageRowsSelected(value),
@@ -841,7 +842,16 @@ export function DataTable<TData>({
       selectedRows: table.getSelectedRowModel().rows.map((row) => row.original),
       clearRowSelection: () => table.resetRowSelection(),
     }),
-    [onColumnChange, rowSelection, table, pagination.pageIndex, pagination.pageSize, data.length],
+    [
+      onColumnChange,
+      rowSelection,
+      table,
+      pagination.pageIndex,
+      pagination.pageSize,
+      data.length,
+      enableRowSelection,
+      getRowCanSelect,
+    ],
   )
 
   const rows = table.getRowModel().rows

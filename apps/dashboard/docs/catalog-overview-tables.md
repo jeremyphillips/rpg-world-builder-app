@@ -6,7 +6,9 @@ lists keep `ContentOverviewTable` for discovery policy, bulk selection, and
 campaign-access chrome.
 
 Both policy shells compose the neutral `OverviewTableFrame` — shared table
-chrome with slots for toolbar, summary, utility actions, and selection controls.
+chrome with slots for `filterRegion`, `resultSummary`, `leadingActions`, and
+`trailingActions`. The frame builds `DataTableUtilityBar` and passes it through
+`DataTable.utilityStrip`.
 
 ## Layer contract
 
@@ -62,9 +64,10 @@ Page **index** is never persisted in preferences — only page **size**.
 
 `CatalogOverviewTable` composes `OverviewTableFrame` with:
 
-- Result count + column visibility utility strip
+- `DataTableFilterRegion` when `filterSchema` is provided (primary `FilterBar` + optional additional panel)
+- `OverviewResultSummary` on utility bar row 1
+- Column visibility on utility bar row 2
 - Column visibility/order prefs (`catalog-overview-preferences.ts`)
-- Optional `filterSchema` + `FilterBar` / `FilterAdvancedPanel` (no discovery or bulk logic)
 
 NPC overview is the reference consumer: class/species columns, URL-synced equals
 filters from `CharacterBuildCatalogIndex`, and no summary column.
@@ -79,8 +82,8 @@ The frame **owns**:
 - Table chrome and spacing
 - Column visibility placement (via utility slot)
 - Preference integration (passed through to `DataTable`)
-- Utility-strip layout (summary / selection / utility action slots)
-- Toolbar slot (filters live above the table)
+- Utility-bar layout (`DataTableUtilityBar` via summary / leading / trailing slots)
+- Toolbar slot (`filterRegion` above the table)
 - Table rendering (`DataTable` wiring)
 - Empty-result state presentation
 - Row/cell styling hooks

@@ -41,8 +41,6 @@ export type OverviewTableFrameProps<TData extends { id: string }> = {
   trailingActions?: (controls: DataTableUtilityControls<TData>) => ReactNode
   /** When true, inset leading actions to align with the selection checkbox column. */
   selectionModeActive?: boolean
-  /** Replaces slot-based utility chrome when policy shells need a custom strip layout. */
-  utilityStrip?: (controls: DataTableUtilityControls<TData>) => ReactNode
 } & OverviewTableFrameSelectionProps<TData>
 
 /** Neutral overview table chrome — filter region above the table, utility bar inside the card. */
@@ -63,7 +61,6 @@ export function OverviewTableFrame<TData extends { id: string }>({
   leadingActions,
   trailingActions,
   selectionModeActive = false,
-  utilityStrip: utilityStripOverride,
   enableRowSelection,
   rowSelection,
   onRowSelectionChange,
@@ -82,7 +79,7 @@ export function OverviewTableFrame<TData extends { id: string }>({
     [emptyState],
   )
 
-  const renderSlotUtilityStrip = useCallback(
+  const renderUtilityStrip = useCallback(
     (controls: DataTableUtilityControls<TData>) => {
       const resolvedLeadingActions =
         typeof leadingActions === 'function' ? leadingActions(controls) : leadingActions
@@ -99,11 +96,7 @@ export function OverviewTableFrame<TData extends { id: string }>({
     [leadingActions, resultSummary, selectionModeActive, trailingActions],
   )
 
-  const renderUtilityStrip = utilityStripOverride ?? renderSlotUtilityStrip
-
-  const hasUtilityStrip = Boolean(
-    utilityStripOverride || resultSummary || leadingActions || trailingActions,
-  )
+  const hasUtilityStrip = Boolean(resultSummary || leadingActions || trailingActions)
 
   return (
     <div className="flex flex-col gap-3">

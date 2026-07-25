@@ -31,12 +31,11 @@ export const CAMPAIGN_ACCESS_TABLE_HIDE_UNAVAILABLE_LABEL = 'Hide unavailable'
 export const CAMPAIGN_ACCESS_TABLE_SHOW_UNAVAILABLE_LABEL = 'Show unavailable'
 
 export function formatHiddenUnavailableNotice(count: number): string {
-  const noun = count === 1 ? 'item' : 'items'
-  return `${count} unavailable ${noun} hidden`
+  return count === 1 ? '1 hidden' : `${count} hidden`
 }
 
-export function formatUnavailableItemsShownNotice(): string {
-  return 'Unavailable items are shown'
+export function formatUnavailableItemsShownNotice(count: number): string {
+  return count === 1 ? '1 unavailable shown' : `${count} unavailable shown`
 }
 
 export function formatNoAvailableMatchesLabel(pluralNoun: string): string {

@@ -28,7 +28,8 @@ type FilterNoticeActions<TFilters> = {
   ) => void
 }
 
-export function buildContentOverviewFilterNotice<TFilters>({
+/** Utility-row supplemental copy for filter-scoped hidden unavailable counts. */
+export function buildContentOverviewHiddenSupplement<TFilters>({
   scope,
   campaignAvailability,
   campaignAvailabilityFilterId,
@@ -39,12 +40,17 @@ export function buildContentOverviewFilterNotice<TFilters>({
   campaignAvailabilityFilterId: FilterFieldId<TFilters>
   actions: FilterNoticeActions<TFilters>
 }) {
-  if (scope.unavailableCount === 0) return null
+  if (scope.unavailableCount === 0 || campaignAvailability === 'unavailable') return null
 
   if (campaignAvailability === 'available') {
     return (
       <>
-        <span>{formatHiddenUnavailableNotice(scope.unavailableCount)}</span>
+        <span aria-hidden className="text-muted-foreground">
+          ·
+        </span>
+        <span className="text-muted-foreground">
+          {formatHiddenUnavailableNotice(scope.unavailableCount)}
+        </span>
         <Button
           type="button"
           variant="link"
@@ -68,7 +74,12 @@ export function buildContentOverviewFilterNotice<TFilters>({
   if (campaignAvailability === 'all') {
     return (
       <>
-        <span>{formatUnavailableItemsShownNotice()}</span>
+        <span aria-hidden className="text-muted-foreground">
+          ·
+        </span>
+        <span className="text-muted-foreground">
+          {formatUnavailableItemsShownNotice(scope.unavailableCount)}
+        </span>
         <Button
           type="button"
           variant="link"

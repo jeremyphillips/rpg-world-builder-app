@@ -18,8 +18,9 @@ FilterSchema  →  filter-engine.ts (pure)  →  apply / constraining / modified
 - `@rpg/ui` owns filter URL metadata + codecs; dashboard overview layer composes
   filters with sort and page.
 - DataTable owns tabular rendering, sorting, pagination, selection, columns — **not**
-  filter orchestration. Overview shells compose `FilterBar` / notices outside the table
-  and pass **filtered rows** into DataTable.
+  filter orchestration. Overview shells compose `DataTableFilterRegion` (or `FilterBar`
+  alone when there are no additional fields) outside the table and pass **filtered rows**
+  into DataTable.
 - Share option vocab with form field builders where practical; filter authoring is
   `FilterSchema`, not `FormItem[]`.
 
@@ -396,8 +397,10 @@ Sort, tabs, mode/workflow segmentation, and search scoring stay **outside** the 
 Import from `@rpg/ui/filters`:
 
 - `useFilterState` — local filter state with `setValue` and `reset` (clear filters)
-- `FilterBar` — `placement: 'primary'` fields, optional advanced toggle, clear button
-- `FilterAdvancedPanel` — collapsible `placement: 'advanced'` fields with modified badge support via `FilterBar`
+- `FilterBar` — `placement: 'primary'` fields and optional **Clear filters** (advanced toggle owned by `DataTableFilterRegion`)
+- `FilterAdvancedPanel` — configurable header for `placement: 'advanced'` fields; overview shells pass field content only — `DataTableFilterRegion` owns trigger, panel id, reset, and collapse
+- `FilterInlineControl` — shared inline boolean shell (checkbox/switch) matching adjacent control height and focus ring
+- `DataTableFilterRegion` — primary field row, full-height **More filters** trigger rail, and region-owned additional-filters panel
 
 Select fields use an internal `__all__` sentinel for “show all”; it never leaves the renderer.
 
@@ -443,19 +446,26 @@ Stacked selects always wire `label htmlFor` ↔ control `id`, including when `wi
 ## Composition (overview shells)
 
 ```tsx
-<ContentOverviewTable>
-  <FilterBar ... />
-  <FilterAdvancedPanel ... />
-  <AvailabilityNotice ... />
-  <DataTable
-    data={filteredRows}
-    columns={columns}
-    /* sorting, pagination, selection, column prefs */
-  />
-</ContentOverviewTable>
+<OverviewTableFrame
+  filterRegion={
+    <DataTableFilterRegion
+      primaryFilters={<FilterBar ... />}
+      additionalFilterFields={<FilterFieldList ... />}
+      additionalFiltersOpen={advancedOpen}
+      onAdditionalFiltersOpenChange={setAdvancedOpen}
+      activeAdditionalFilterCount={advancedModifiedCount}
+      onResetAdditionalFilters={resetAdvanced}
+    />
+  }
+  resultSummary={<OverviewResultSummary resultCount={filteredRows.length} />}
+  leadingActions={...}
+  trailingActions={...}
+>
+  <DataTable data={filteredRows} columns={columns} ... />
+</OverviewTableFrame>
 ```
 
-- Filter notices and scoped counts stay in the overview shell (full `data` + filtered rows).
+- Hidden-unavailable counts and Show/Hide actions live in `OverviewResultSummary.supplementalContent` (content overviews).
 - DataTable receives only filtered rows.
 - Advanced panel badge = `countModifiedFilters` (optionally scoped by `placement`).
 

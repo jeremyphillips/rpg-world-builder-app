@@ -17,6 +17,8 @@ export type DataTableColumnVisibilityTriggerProps = {
 export type DataTableUtilityControls<TData> = {
   ColumnVisibilityTrigger: React.ComponentType<DataTableColumnVisibilityTriggerProps>
   pageRowCount: number
+  /** Selectable rows on the current page — respects `getRowCanSelect`. */
+  pageSelectableRowCount: number
   isAllPageRowsSelected: boolean
   isSomePageRowsSelected: boolean
   toggleAllPageRowsSelected: (value?: boolean) => void

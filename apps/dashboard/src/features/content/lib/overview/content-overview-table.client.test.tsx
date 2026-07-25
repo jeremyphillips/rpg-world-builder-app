@@ -211,7 +211,7 @@ describe('ContentOverviewTable interactions', () => {
     expect(dataTableRenderCount - rendersAfterMount).toBe(0)
   })
 
-  it('renders the utility strip with result count and columns control', () => {
+  it('renders the utility bar with result count and columns control', () => {
     renderOverview()
     expect(screen.getByText('8 results')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Choose visible columns' })).toBeInTheDocument()
@@ -225,8 +225,8 @@ describe('ContentOverviewTable interactions', () => {
     await user.click(screen.getByRole('button', { name: 'Select' }))
 
     expect(screen.getByText('0 selected')).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Select all page' })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Exit selection mode' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Select page' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Done' })).toBeInTheDocument()
     expect(screen.getByText('Selection mode. 0 items selected.')).toBeInTheDocument()
   })
 
