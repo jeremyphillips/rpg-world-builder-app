@@ -1,9 +1,7 @@
 import { Link } from 'react-router-dom'
 import { buttonVariants } from '@rpg/ui'
 
-import { PageHeader } from '@/components/layout/page-header'
-import { PageLoadState } from '@/components/layout/page-load-state'
-import { WidePage } from '@/components/layout/wide-page'
+import { OverviewPageShell } from '@/components/layout/overview-page-shell'
 import { useCanManageCampaign } from '@/features/campaign'
 
 type ContentOverviewShellProps = {
@@ -20,8 +18,8 @@ type ContentOverviewShellProps = {
 }
 
 /**
- * Managed catalog list page — composes WidePage + PageHeader + PageLoadState with
- * campaign-manager "New" action gating.
+ * Managed content catalog list page — campaign-manager "New" action gating on
+ * {@link OverviewPageShell}.
  */
 export function ContentOverviewShell({
   heading,
@@ -42,16 +40,14 @@ export function ContentOverviewShell({
   ) : undefined
 
   return (
-    <WidePage spacing="list">
-      <PageHeader heading={heading} actions={actions} />
-      <PageLoadState
-        isPending={isPending}
-        isError={isError}
-        errorLabel={errorLabel}
-        defaultErrorLabel={`Could not load ${heading.toLowerCase()}.`}
-      >
-        {children}
-      </PageLoadState>
-    </WidePage>
+    <OverviewPageShell
+      heading={heading}
+      isPending={isPending}
+      isError={isError}
+      errorLabel={errorLabel}
+      actions={actions}
+    >
+      {children}
+    </OverviewPageShell>
   )
 }

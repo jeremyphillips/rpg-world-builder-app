@@ -9,6 +9,17 @@ import {
   type DataTableUtilityControls,
 } from '@rpg/ui'
 
+type OverviewTableFrameSelectionProps<TData> = Pick<
+  DataTableProps<TData>,
+  | 'enableRowSelection'
+  | 'rowSelection'
+  | 'onRowSelectionChange'
+  | 'onRowSelectionStateChange'
+  | 'selectionLabels'
+  | 'getRowCanSelect'
+  | 'rowSelectionDescribedBy'
+>
+
 export type OverviewTableFrameProps<TData extends { id: string }> = {
   columns: ColumnDef<TData, unknown>[]
   data: TData[]
@@ -25,7 +36,9 @@ export type OverviewTableFrameProps<TData extends { id: string }> = {
   summary?: ReactNode
   utilityActions?: (controls: DataTableUtilityControls<TData>) => ReactNode
   selectionControls?: ReactNode
-}
+  /** Replaces slot-based utility chrome when policy shells need a custom strip layout. */
+  utilityStrip?: (controls: DataTableUtilityControls<TData>) => ReactNode
+} & OverviewTableFrameSelectionProps<TData>
 
 function OverviewTableUtilityStrip<TData>({
   summary,
@@ -68,6 +81,14 @@ export function OverviewTableFrame<TData extends { id: string }>({
   summary,
   utilityActions,
   selectionControls,
+  utilityStrip: utilityStripOverride,
+  enableRowSelection,
+  rowSelection,
+  onRowSelectionChange,
+  onRowSelectionStateChange,
+  selectionLabels,
+  getRowCanSelect,
+  rowSelectionDescribedBy,
 }: OverviewTableFrameProps<TData>) {
   const resolvedEmptyState = useMemo(
     () =>
@@ -79,7 +100,7 @@ export function OverviewTableFrame<TData extends { id: string }>({
     [emptyState],
   )
 
-  const renderUtilityStrip = useCallback(
+  const renderSlotUtilityStrip = useCallback(
     (controls: DataTableUtilityControls<TData>) => (
       <OverviewTableUtilityStrip
         summary={summary}
@@ -91,7 +112,11 @@ export function OverviewTableFrame<TData extends { id: string }>({
     [selectionControls, summary, utilityActions],
   )
 
-  const hasUtilityStrip = Boolean(summary || utilityActions || selectionControls)
+  const renderUtilityStrip = utilityStripOverride ?? renderSlotUtilityStrip
+
+  const hasUtilityStrip = Boolean(
+    utilityStripOverride || summary || utilityActions || selectionControls,
+  )
 
   return (
     <div className="flex flex-col gap-3">
@@ -109,6 +134,13 @@ export function OverviewTableFrame<TData extends { id: string }>({
         getRowClassName={getRowClassName}
         getCellClassName={getCellClassName}
         utilityStrip={hasUtilityStrip ? renderUtilityStrip : undefined}
+        enableRowSelection={enableRowSelection}
+        rowSelection={rowSelection}
+        onRowSelectionChange={onRowSelectionChange}
+        onRowSelectionStateChange={onRowSelectionStateChange}
+        selectionLabels={selectionLabels}
+        getRowCanSelect={getRowCanSelect}
+        rowSelectionDescribedBy={rowSelectionDescribedBy}
         getRowId={(row) => row.id}
       />
     </div>

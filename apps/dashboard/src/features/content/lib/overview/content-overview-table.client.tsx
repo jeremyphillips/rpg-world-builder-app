@@ -8,7 +8,6 @@ import {
   type WithCampaignAccess,
 } from '@rpg/contracts'
 import {
-  DataTable,
   areColumnChangeStatesEqual,
   dataTableFilterNoticeVariants,
   dataTableRowUnavailableRailVariants,
@@ -60,6 +59,7 @@ import {
 import type { ContentBase } from './content-table-config'
 import type { ContentOverviewBaseFilterState } from './content-overview-filter-schema'
 import { useContentOverviewQueryState } from './use-content-overview-query-state.client'
+import { OverviewTableFrame } from '@/lib/data-table/overview-table-frame.client'
 
 const DEFAULT_OVERVIEW_SORT = { id: 'name' } as const
 const OVERVIEW_NAME_COLUMN_ID = 'name'
@@ -223,7 +223,7 @@ const ContentOverviewDataTable = memo(function ContentOverviewDataTable<
   )
 
   return (
-    <DataTable
+    <OverviewTableFrame
       columns={columns}
       data={data}
       defaultPageSize={pageSize}
@@ -241,7 +241,6 @@ const ContentOverviewDataTable = memo(function ContentOverviewDataTable<
       onRowSelectionChange={onRowSelectionChange}
       onRowSelectionStateChange={onRowSelectionStateChange}
       selectionLabels={selectionLabels}
-      getRowId={(row) => row.id}
       getRowCanSelect={getRowCanSelect}
       rowSelectionDescribedBy={selectionCapDescriptionId}
     />
