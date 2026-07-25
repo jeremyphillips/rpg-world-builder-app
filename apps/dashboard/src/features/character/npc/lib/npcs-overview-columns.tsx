@@ -1,10 +1,12 @@
 import { Link } from 'react-router-dom'
 import type { CharacterBuildCatalogIndex, NpcCharacter } from '@rpg/contracts'
-import { SortableHeader } from '@rpg/ui'
+import { dataTableWidthMeta, SortableHeader } from '@rpg/ui'
 import type { ColumnDef } from '@rpg/ui'
 
 import { ROUTES } from '@/app/routes'
-import { formatCharacterSummary } from '../../lib/character-display'
+
+import { resolveNpcOverviewClassName, resolveNpcOverviewSpeciesName } from './npc-overview-display'
+import { NPC_OVERVIEW_LABELS } from './npc-overview-labels'
 
 export function npcsOverviewColumns(
   campaignId: string,
@@ -13,7 +15,9 @@ export function npcsOverviewColumns(
   return [
     {
       accessorKey: 'name',
-      header: ({ column }) => <SortableHeader column={column}>Name</SortableHeader>,
+      header: ({ column }) => (
+        <SortableHeader column={column}>{NPC_OVERVIEW_LABELS.name}</SortableHeader>
+      ),
       cell: ({ row }) => (
         <Link
           to={ROUTES.campaign.npcs.detail(campaignId, row.original.id)}
@@ -22,14 +26,25 @@ export function npcsOverviewColumns(
           {row.original.name}
         </Link>
       ),
-      meta: { label: 'Name' },
+      meta: { label: NPC_OVERVIEW_LABELS.name, locked: true },
     },
     {
-      id: 'summary',
-      accessorFn: (row) => formatCharacterSummary(row, catalogIndex),
-      header: 'Summary',
-      cell: ({ row }) => row.getValue<string>('summary'),
-      meta: { label: 'Summary' },
+      id: 'class',
+      accessorFn: (row) => resolveNpcOverviewClassName(row, catalogIndex),
+      header: ({ column }) => (
+        <SortableHeader column={column}>{NPC_OVERVIEW_LABELS.class}</SortableHeader>
+      ),
+      cell: ({ row }) => row.getValue<string>('class'),
+      meta: { label: NPC_OVERVIEW_LABELS.class, ...dataTableWidthMeta('medium') },
+    },
+    {
+      id: 'species',
+      accessorFn: (row) => resolveNpcOverviewSpeciesName(row, catalogIndex),
+      header: ({ column }) => (
+        <SortableHeader column={column}>{NPC_OVERVIEW_LABELS.species}</SortableHeader>
+      ),
+      cell: ({ row }) => row.getValue<string>('species'),
+      meta: { label: NPC_OVERVIEW_LABELS.species, ...dataTableWidthMeta('medium') },
     },
   ]
 }

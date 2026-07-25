@@ -42,6 +42,17 @@ async function parseCampaignAccessUpdateResponse(res: Response, fallbackMessage:
   )
 }
 
+export type CampaignAccessRequestOptions = {
+  classId?: string
+  fallbackMessage?: string
+  /** When set, skips `fetchCsrfToken()` — use for batched mutations sharing one token. */
+  csrfToken?: string
+}
+
+async function resolveCsrfToken(provided?: string): Promise<string> {
+  return provided ?? fetchCsrfToken()
+}
+
 function contentCampaignAccessPath(
   campaignId: string,
   targetType: ContentAccessTargetType,
@@ -61,9 +72,9 @@ function contentCampaignAccessPath(
 
 export async function fetchCampaignAccessParticipantRoster(
   campaignId: string,
-  options?: { fallbackMessage?: string },
+  options?: { fallbackMessage?: string; csrfToken?: string },
 ) {
-  const csrfToken = await fetchCsrfToken()
+  const csrfToken = await resolveCsrfToken(options?.csrfToken)
   const res = await fetch(`/api/campaigns/${campaignId}/content/access-participants`, {
     credentials: 'include',
     headers: { [CSRF_HEADER]: csrfToken },
@@ -89,9 +100,9 @@ export async function fetchContentCampaignAccessAvailability(
   campaignId: string,
   targetType: ContentAccessTargetType,
   entityId: string,
-  options?: { classId?: string; fallbackMessage?: string },
+  options?: CampaignAccessRequestOptions,
 ) {
-  const csrfToken = await fetchCsrfToken()
+  const csrfToken = await resolveCsrfToken(options?.csrfToken)
   const res = await fetch(
     contentCampaignAccessPath(
       campaignId,
@@ -117,9 +128,9 @@ export async function updateContentCampaignAccess(
   targetType: ContentAccessTargetType,
   entityId: string,
   input: ContentCampaignAccessPatch,
-  options?: { classId?: string; fallbackMessage?: string },
+  options?: CampaignAccessRequestOptions,
 ) {
-  const csrfToken = await fetchCsrfToken()
+  const csrfToken = await resolveCsrfToken(options?.csrfToken)
   const res = await fetch(
     contentCampaignAccessPath(
       campaignId,
@@ -151,13 +162,13 @@ export async function updateRouteContentCampaignAccess(
   routeKey: string,
   entityId: string,
   input: ContentCampaignAccessPatch,
-  fallbackMessage?: string,
+  options?: { fallbackMessage?: string; csrfToken?: string },
 ) {
   return updateContentCampaignAccess(
     campaignId,
     routeKey as ContentAccessTargetType,
     entityId,
     input,
-    { fallbackMessage },
+    options,
   )
 }

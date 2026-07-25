@@ -43,6 +43,13 @@ describe('dataTableWidthMeta', () => {
     expect(meta.cellClassName).toContain('bg-surface-muted')
   })
 
+  it('sizes select column for checkbox control and centers it', () => {
+    const meta = dataTableWidthMeta('select')
+    expect(dataTableColumnWidths.select).toContain('w-10')
+    expect(meta.headerClassName).toContain('text-center')
+    expect(meta.cellClassName).toContain('[&_[role=checkbox]]:mx-auto')
+  })
+
   it('includes compact center alignment preset', () => {
     expect(dataTableWidthMeta('compactCenter').headerClassName).toContain('text-center')
     expect(dataTableWidthMeta('compactCenter').cellClassName).toContain('[&>svg]:mx-auto')
@@ -50,6 +57,11 @@ describe('dataTableWidthMeta', () => {
 
   it('includes medium preset pinned at lg', () => {
     expect(dataTableWidthMeta('medium').cellClassName).toContain('lg:w-36')
+  })
+
+  it('centers collection count columns', () => {
+    expect(dataTableWidthMeta('collectionCount').headerClassName).toContain('text-center')
+    expect(dataTableWidthMeta('collectionCount').cellClassName).toContain('lg:w-[5.5rem]')
   })
 })
 

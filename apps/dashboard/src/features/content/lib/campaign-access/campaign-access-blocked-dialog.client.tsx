@@ -29,7 +29,9 @@ export function CampaignAccessBlockedDialog({
           description={formatCampaignAccessBlockedDescription(usageCount)}
         />
 
-        <ContentUsageBlockedList blockers={blockers} />
+        <Modal.Body>
+          <ContentUsageBlockedList blockers={blockers} />
+        </Modal.Body>
 
         <Modal.Footer>
           <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>

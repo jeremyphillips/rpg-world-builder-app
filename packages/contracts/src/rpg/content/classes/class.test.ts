@@ -3,6 +3,7 @@ import {
   classBodySchema,
   classFeatureSchema,
   classHasSpellcasting,
+  classListItemSchema,
   classPatchSchema,
   classSchema,
   classStoredBodySchema,
@@ -85,6 +86,20 @@ describe('classHasSpellcasting', () => {
         }),
       ),
     ).toBe(true)
+  })
+})
+
+describe('classListItemSchema', () => {
+  it('extends class rows with subclass summaries', () => {
+    expect(
+      classListItemSchema.parse({
+        ...fighter,
+        subclasses: [{ id: 'champion', name: 'Champion' }],
+      }),
+    ).toEqual({
+      ...fighter,
+      subclasses: [{ id: 'champion', name: 'Champion' }],
+    })
   })
 })
 

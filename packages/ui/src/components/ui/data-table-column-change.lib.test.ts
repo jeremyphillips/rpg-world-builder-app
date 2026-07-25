@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 import {
   areColumnChangeStatesEqual,
   createPersistedColumnChangeState,
+  resolveDataTableColumnOrder,
 } from './data-table-column-change.lib'
 
 describe('data-table-column-change.lib', () => {
@@ -26,5 +27,15 @@ describe('data-table-column-change.lib', () => {
         { visibility: { hitDie: false, name: true }, order: ['name', 'hitDie'] },
       ),
     ).toBe(true)
+  })
+
+  it('prepends select and appends actions to a persisted user order', () => {
+    expect(
+      resolveDataTableColumnOrder({
+        order: ['name', 'hitDie'],
+        enableRowSelection: true,
+        hasActions: true,
+      }),
+    ).toEqual(['select', 'name', 'hitDie', 'actions'])
   })
 })

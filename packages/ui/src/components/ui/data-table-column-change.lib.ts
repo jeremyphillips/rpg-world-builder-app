@@ -68,3 +68,24 @@ export function areColumnOrdersEqual(left: readonly string[], right: readonly st
   if (normalizedLeft.length !== normalizedRight.length) return false
   return normalizedLeft.every((id, index) => id === normalizedRight[index])
 }
+
+export type ResolveDataTableColumnOrderOptions = {
+  order: readonly string[]
+  enableRowSelection: boolean
+  hasActions: boolean
+}
+
+/** Injects `select` / `actions` into a persisted user order when those columns mount. */
+export function resolveDataTableColumnOrder({
+  order,
+  enableRowSelection,
+  hasActions,
+}: ResolveDataTableColumnOrderOptions): string[] {
+  if (order.length === 0) return []
+
+  const userOrder = order.filter((id) => !isInternalDataTableColumnId(id))
+  const prefix = enableRowSelection ? ['select'] : []
+  const suffix = hasActions ? ['actions'] : []
+
+  return [...prefix, ...userOrder, ...suffix]
+}

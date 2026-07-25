@@ -6,6 +6,11 @@ export const dataTableRootVariants = cva('flex flex-col gap-3 w-full')
 /** Toolbar row — primary filter strip + column toggle. */
 export const dataTableToolbarVariants = cva('flex flex-wrap items-center gap-2')
 
+/** Tinted utility strip rendered above table headers when `utilityStrip` is provided. */
+export const dataTableUtilityStripVariants = cva(
+  'flex min-h-10 items-center border-b border-border bg-surface-subtle px-3 shadow-[0_1px_2px_0_color-mix(in_oklab,var(--foreground)_6%,transparent)]',
+)
+
 /** Container for the group of inline filter controls on the left of the toolbar. */
 export const dataTableFilterGroupVariants = cva('flex flex-1 flex-wrap items-center gap-2')
 
@@ -99,6 +104,16 @@ export const dataTableActionsHeaderVariants = cva(
 /** Sticky trailing actions body cell — matches row hover, selection, and unavailable tones. */
 export const dataTableActionsCellVariants = cva(
   'sticky right-0 z-10 w-12 max-w-12 shrink-0 border-l border-border bg-surface-muted px-1 text-center group-hover/row:bg-row-hover group-data-[state=selected]/row:bg-row-selected group-[.bg-warning-faint]/row:bg-warning-faint',
+)
+
+/** Row-selection header — fixed to `Checkbox` (size-4) + horizontal padding. */
+export const dataTableSelectHeaderVariants = cva(
+  'w-10 max-w-10 shrink-0 border-r border-border bg-surface-strong pl-3 text-center [&:has([role=checkbox])]:!pr-3',
+)
+
+/** Row-selection body cell — centers the checkbox control in the fixed-width column. */
+export const dataTableSelectCellVariants = cva(
+  'w-10 max-w-10 shrink-0 border-r border-border pl-3 text-center [&:has([role=checkbox])]:!pr-3 [&_[role=checkbox]]:mx-auto [&_[role=checkbox]]:block',
 )
 
 /** Tighter body cell padding than the base TableCell default. */

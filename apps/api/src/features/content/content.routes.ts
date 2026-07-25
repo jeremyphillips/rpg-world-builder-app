@@ -6,6 +6,7 @@ import { requireAuth } from '../../middleware/require-auth'
 import { requireCampaignRole } from '../../middleware/require-role'
 import * as controller from './content.controller'
 import * as subclassController from './subclasses/subclass-write.handlers'
+import { listClasses } from './classes/list-classes'
 
 // `mergeParams` so the `:campaignId` from the mount path reaches the membership
 // guard and handlers. Mounted at `/api/campaigns/:campaignId/content`.
@@ -69,6 +70,8 @@ contentRouter.delete(
 )
 
 // Any campaign member may read the resolved catalog (characters consume it).
+contentRouter.get('/classes', requireAuth, requireCampaignRole(...CAMPAIGN_ROLES), listClasses)
+
 contentRouter.get(
   '/:contentType',
   requireAuth,

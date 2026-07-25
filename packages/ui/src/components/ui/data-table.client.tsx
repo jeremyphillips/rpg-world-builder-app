@@ -104,11 +104,15 @@ import {
   areVisibilityStatesEqual,
   createColumnChangeSnapshot,
   createPersistedColumnChangeState,
+  resolveDataTableColumnOrder,
 } from './data-table-column-change.lib'
 import type {
   ColumnChangeState,
+  DataTableColumnVisibilityTriggerProps,
   DataTableEmptyStateContext,
   DataTableProps,
+  DataTableSelectionLabels,
+  DataTableUtilityControls,
 } from './data-table.types'
 import {
   dataTableBodyCellPaddingVariants,
@@ -132,6 +136,7 @@ import {
   dataTableTableVariants,
   dataTableTableWrapVariants,
   dataTableToolbarVariants,
+  dataTableUtilityStripVariants,
 } from './data-table.variants'
 
 // ---------------------------------------------------------------------------
@@ -225,14 +230,17 @@ function LockedColumnItem<TData>({ colName }: Pick<ColumnPanelItemProps<TData>, 
   )
 }
 
-interface DataTableColumnPanelProps<TData> {
+interface DataTableColumnVisibilityPanelProps<TData> {
   table: ReturnType<typeof useReactTable<TData>>
   onColumnChange?: (state: ColumnChangeState) => void
 }
 
 const POINTER_SENSOR_ACTIVATION_DISTANCE_PX = 8
 
-function DataTableColumnPanel<TData>({ table, onColumnChange }: DataTableColumnPanelProps<TData>) {
+function DataTableColumnVisibilityPanelContent<TData>({
+  table,
+  onColumnChange,
+}: DataTableColumnVisibilityPanelProps<TData>) {
   const [search, setSearch] = React.useState('')
 
   const sensors = useSensors(
@@ -300,13 +308,90 @@ function DataTableColumnPanel<TData>({ table, onColumnChange }: DataTableColumnP
   const colIds = filteredHideableCols.map((c) => c.id)
 
   return (
+    <>
+      {/* Search */}
+      <div className="flex items-center gap-2 border-b border-border px-3 py-2">
+        <Search className="size-3.5 shrink-0 text-muted-foreground" aria-hidden />
+        <input
+          type="search"
+          placeholder="Search columns..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground"
+          aria-label="Search columns"
+        />
+      </div>
+
+      {/* Column list: locked (non-interactive) + sortable (DnD) */}
+      <div className="max-h-[320px] overflow-y-auto">
+        {/* Locked columns — always visible, cannot be hidden or reordered */}
+        {filteredLockedCols.length > 0 && (
+          <div className="py-1">
+            {filteredLockedCols.map((col) => (
+              <LockedColumnItem key={col.id} colName={getColName(col)} />
+            ))}
+          </div>
+        )}
+        {filteredLockedCols.length > 0 && filteredHideableCols.length > 0 && (
+          <div className="border-t border-border" />
+        )}
+
+        {/* Sortable columns */}
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          modifiers={[restrictToVerticalAxis]}
+          onDragEnd={handleDragEnd}
+        >
+          <SortableContext items={colIds} strategy={verticalListSortingStrategy}>
+            <div className="py-1">
+              {filteredHideableCols.length > 0 ? (
+                filteredHideableCols.map((col) => (
+                  <ColumnPanelItem key={col.id} col={col} colName={getColName(col)} />
+                ))
+              ) : filteredLockedCols.length === 0 ? (
+                <p className={dataTableEmptyPanelVariants()}>No columns found.</p>
+              ) : null}
+            </div>
+          </SortableContext>
+        </DndContext>
+      </div>
+
+      {/* Reset */}
+      <div className="border-t border-border px-1 py-1.5">
+        <button type="button" onClick={handleReset} className={dataTableResetColumnVariants()}>
+          <RotateCcw className="size-3.5" />
+          Reset Column Order
+        </button>
+      </div>
+    </>
+  )
+}
+
+type DataTableColumnVisibilityTriggerInternalProps<TData> = DataTableColumnVisibilityTriggerProps &
+  DataTableColumnVisibilityPanelProps<TData>
+
+/** Column visibility popover trigger — icon-only or labeled outline button. */
+export function DataTableColumnVisibilityTrigger<TData>({
+  table,
+  onColumnChange,
+  'aria-label': ariaLabel = 'Choose visible columns',
+  showLabel = false,
+}: DataTableColumnVisibilityTriggerInternalProps<TData>) {
+  const trigger = showLabel ? (
+    <Button variant="outline" size="sm" className="gap-1.5" aria-label={ariaLabel}>
+      <Columns3 className="size-3.5" aria-hidden />
+      Columns
+    </Button>
+  ) : (
+    <Button variant="ghost" size="sm" className="size-8 p-0" aria-label={ariaLabel} title="Columns">
+      <Columns3 className="size-4" aria-hidden />
+    </Button>
+  )
+
+  return (
     <PopoverPrimitive.Root>
-      <PopoverPrimitive.Trigger asChild>
-        <Button variant="outline" size="sm" className="gap-1.5">
-          <Columns3 className="size-3.5" />
-          Columns
-        </Button>
-      </PopoverPrimitive.Trigger>
+      <PopoverPrimitive.Trigger asChild>{trigger}</PopoverPrimitive.Trigger>
       <PopoverPrimitive.Portal>
         <PopoverPrimitive.Content
           align="end"
@@ -314,64 +399,24 @@ function DataTableColumnPanel<TData>({ table, onColumnChange }: DataTableColumnP
           className={dataTableColumnPanelVariants()}
           onOpenAutoFocus={(e) => e.preventDefault()}
         >
-          {/* Search */}
-          <div className="flex items-center gap-2 border-b border-border px-3 py-2">
-            <Search className="size-3.5 shrink-0 text-muted-foreground" aria-hidden />
-            <input
-              type="search"
-              placeholder="Search columns..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground"
-              aria-label="Search columns"
-            />
-          </div>
-
-          {/* Column list: locked (non-interactive) + sortable (DnD) */}
-          <div className="max-h-[320px] overflow-y-auto">
-            {/* Locked columns — always visible, cannot be hidden or reordered */}
-            {filteredLockedCols.length > 0 && (
-              <div className="py-1">
-                {filteredLockedCols.map((col) => (
-                  <LockedColumnItem key={col.id} colName={getColName(col)} />
-                ))}
-              </div>
-            )}
-            {filteredLockedCols.length > 0 && filteredHideableCols.length > 0 && (
-              <div className="border-t border-border" />
-            )}
-
-            {/* Sortable columns */}
-            <DndContext
-              sensors={sensors}
-              collisionDetection={closestCenter}
-              modifiers={[restrictToVerticalAxis]}
-              onDragEnd={handleDragEnd}
-            >
-              <SortableContext items={colIds} strategy={verticalListSortingStrategy}>
-                <div className="py-1">
-                  {filteredHideableCols.length > 0 ? (
-                    filteredHideableCols.map((col) => (
-                      <ColumnPanelItem key={col.id} col={col} colName={getColName(col)} />
-                    ))
-                  ) : filteredLockedCols.length === 0 ? (
-                    <p className={dataTableEmptyPanelVariants()}>No columns found.</p>
-                  ) : null}
-                </div>
-              </SortableContext>
-            </DndContext>
-          </div>
-
-          {/* Reset */}
-          <div className="border-t border-border px-1 py-1.5">
-            <button type="button" onClick={handleReset} className={dataTableResetColumnVariants()}>
-              <RotateCcw className="size-3.5" />
-              Reset Column Order
-            </button>
-          </div>
+          <DataTableColumnVisibilityPanelContent table={table} onColumnChange={onColumnChange} />
         </PopoverPrimitive.Content>
       </PopoverPrimitive.Portal>
     </PopoverPrimitive.Root>
+  )
+}
+
+function DataTableColumnPanel<TData>({
+  table,
+  onColumnChange,
+}: DataTableColumnVisibilityPanelProps<TData>) {
+  return (
+    <DataTableColumnVisibilityTrigger
+      table={table}
+      onColumnChange={onColumnChange}
+      showLabel
+      aria-label="Columns"
+    />
   )
 }
 
@@ -601,8 +646,8 @@ export interface RowActionsMenuProps {
   onToggleEnabled?: (enabled: boolean) => void
   /**
    * Label for the campaign toggle.
-   * Should be scoped to the context: "Active in campaign", not just "Enabled".
-   * Defaults to "Active in campaign".
+   * Pass a context-specific label (e.g. "Active in campaign") when the default
+   * is too generic for the surface.
    */
   enabledLabel?: string
   /**
@@ -639,7 +684,7 @@ export function RowActionsMenu({
   editLabel = 'Edit',
   enabled,
   onToggleEnabled,
-  enabledLabel = 'Active in campaign',
+  enabledLabel = 'Enabled',
   enabledTooltip = 'Hides this item from players in the current campaign. The item remains available globally.',
   itemLabel = 'item',
   footer,
@@ -720,7 +765,14 @@ export function DataTable<TData>({
   data,
   rowActions,
   enableRowSelection = false,
+  rowSelection: rowSelectionProp,
   onRowSelectionChange,
+  onRowSelectionStateChange,
+  selectionLabels,
+  getRowId: getRowIdProp,
+  getRowCanSelect,
+  rowSelectionDescribedBy,
+  utilityStrip,
   defaultPageSize = 20,
   initialColumnVisibility,
   initialColumnOrder,
@@ -737,7 +789,10 @@ export function DataTable<TData>({
   const [columnOrder, setColumnOrderState] = React.useState<ColumnOrderState>(
     initialColumnOrder ?? [],
   )
-  const [rowSelection, setRowSelection] = React.useState<RowSelectionState>({})
+  const [uncontrolledRowSelection, setUncontrolledRowSelection] = React.useState<RowSelectionState>(
+    {},
+  )
+  const rowSelection = rowSelectionProp ?? uncontrolledRowSelection
   const [pagination, setPaginationState] = React.useState<PaginationState>({
     pageIndex: 0,
     pageSize: defaultPageSize,
@@ -804,32 +859,83 @@ export function DataTable<TData>({
     [notifyColumnChange],
   )
 
+  const handleRowSelectionChange = React.useCallback(
+    (updater: RowSelectionState | ((prev: RowSelectionState) => RowSelectionState)) => {
+      const next = typeof updater === 'function' ? updater(rowSelection) : updater
+      if (rowSelectionProp === undefined) {
+        setUncontrolledRowSelection(next)
+      }
+      onRowSelectionStateChange?.(next)
+    },
+    [onRowSelectionStateChange, rowSelection, rowSelectionProp],
+  )
+
+  const selectionLabelsRef = React.useRef<DataTableSelectionLabels<TData> | undefined>(
+    selectionLabels,
+  )
+  selectionLabelsRef.current = selectionLabels
+
+  const resolveSelectAllLabel = React.useCallback((pageRowCount: number) => {
+    const label = selectionLabelsRef.current?.selectAll
+    if (typeof label === 'function') return label(pageRowCount)
+    if (typeof label === 'string') return label
+    return 'Select all rows on this page'
+  }, [])
+
+  const getRowCanSelectRef = React.useRef(getRowCanSelect)
+  getRowCanSelectRef.current = getRowCanSelect
+
+  const resolveRowSelectionEnabled = React.useCallback(
+    (row: { original: TData; getCanSelect: () => boolean }) => {
+      if (!getRowCanSelectRef.current) return true
+      return getRowCanSelectRef.current(row.original)
+    },
+    [],
+  )
+
+  const getRowId = React.useCallback(
+    (row: TData, index: number) => {
+      if (getRowIdProp) return getRowIdProp(row)
+      const candidate = (row as { id?: string }).id
+      return candidate ?? String(index)
+    },
+    [getRowIdProp],
+  )
+
   // Inject selection column
   const selectionColumn = React.useMemo<ColumnDef<TData>>(
     () => ({
       id: 'select',
-      header: ({ table }) => (
-        <Checkbox
-          checked={
-            table.getIsAllPageRowsSelected() ||
-            (table.getIsSomePageRowsSelected() ? 'indeterminate' : false)
-          }
-          onCheckedChange={(v) => table.toggleAllPageRowsSelected(!!v)}
-          aria-label="Select all rows on this page"
-        />
-      ),
-      cell: ({ row }) => (
-        <Checkbox
-          checked={row.getIsSelected()}
-          onCheckedChange={(v) => row.toggleSelected(!!v)}
-          aria-label="Select row"
-        />
-      ),
+      header: ({ table: headerTable }) => {
+        const pageRowCount = headerTable.getRowModel().rows.length
+        return (
+          <Checkbox
+            checked={
+              headerTable.getIsAllPageRowsSelected() ||
+              (headerTable.getIsSomePageRowsSelected() ? 'indeterminate' : false)
+            }
+            onCheckedChange={(v) => headerTable.toggleAllPageRowsSelected(!!v)}
+            aria-label={resolveSelectAllLabel(pageRowCount)}
+          />
+        )
+      },
+      cell: ({ row }) => {
+        const canSelect = row.getCanSelect()
+        return (
+          <Checkbox
+            checked={row.getIsSelected()}
+            disabled={!canSelect}
+            onCheckedChange={(v) => row.toggleSelected(!!v)}
+            aria-label={selectionLabelsRef.current?.selectRow?.(row.original) ?? 'Select row'}
+            aria-describedby={!canSelect ? rowSelectionDescribedBy : undefined}
+          />
+        )
+      },
       enableSorting: false,
       enableHiding: false,
-      meta: { ...dataTableWidthMeta('minimal'), columnTone: 'neutral' },
+      meta: { ...dataTableWidthMeta('select'), columnTone: 'neutral' },
     }),
-    [],
+    [resolveSelectAllLabel, rowSelectionDescribedBy],
   )
 
   // Inject actions column
@@ -859,28 +965,39 @@ export function DataTable<TData>({
     [actionsColumn, columns, enableRowSelection, rowActions, selectionColumn],
   )
 
+  const effectiveColumnOrder = React.useMemo(
+    () =>
+      resolveDataTableColumnOrder({
+        order: columnOrder,
+        enableRowSelection: Boolean(enableRowSelection),
+        hasActions: Boolean(rowActions),
+      }),
+    [columnOrder, enableRowSelection, rowActions],
+  )
+
   // TanStack Table returns unstable function references; intentional here.
   // eslint-disable-next-line react-hooks/incompatible-library -- useReactTable
   const table = useReactTable({
     data,
     columns: resolvedColumns,
+    getRowId,
     state: {
       sorting,
       columnVisibility,
-      ...(columnOrder.length > 0 ? { columnOrder } : {}),
+      ...(effectiveColumnOrder.length > 0 ? { columnOrder: effectiveColumnOrder } : {}),
       rowSelection,
       pagination,
     },
     onSortingChange: setSorting,
     onColumnVisibilityChange: setColumnVisibility,
     onColumnOrderChange: setColumnOrder,
-    onRowSelectionChange: setRowSelection,
+    onRowSelectionChange: handleRowSelectionChange,
     onPaginationChange: setPagination,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     filterFns: { boolean: booleanFilterFn, equalsString: equalsStringFilterFn },
-    enableRowSelection,
+    enableRowSelection: enableRowSelection ? (row) => resolveRowSelectionEnabled(row) : false,
   })
 
   const tableRef = React.useRef(table)
@@ -902,6 +1019,26 @@ export function DataTable<TData>({
     )
   }, [rowSelection])
 
+  const utilityControls = React.useMemo<DataTableUtilityControls<TData>>(
+    () => ({
+      ColumnVisibilityTrigger: (triggerProps) => (
+        <DataTableColumnVisibilityTrigger
+          table={tableRef.current}
+          onColumnChange={onColumnChange}
+          {...triggerProps}
+        />
+      ),
+      pageRowCount: table.getRowModel().rows.length,
+      isAllPageRowsSelected: table.getIsAllPageRowsSelected(),
+      isSomePageRowsSelected: table.getIsSomePageRowsSelected(),
+      toggleAllPageRowsSelected: (value) => table.toggleAllPageRowsSelected(value),
+      selectedRowCount: table.getSelectedRowModel().rows.length,
+      selectedRows: table.getSelectedRowModel().rows.map((row) => row.original),
+      clearRowSelection: () => table.resetRowSelection(),
+    }),
+    [onColumnChange, rowSelection, table, pagination.pageIndex, pagination.pageSize, data.length],
+  )
+
   const rows = table.getRowModel().rows
   const emptyStateContext: DataTableEmptyStateContext<TData> = {
     filteredRowCount: rows.length,
@@ -909,88 +1046,94 @@ export function DataTable<TData>({
     data,
   }
 
+  const tableElement = (
+    <Table className={dataTableTableVariants()}>
+      {caption && <TableCaption className={dataTableCaptionVariants()}>{caption}</TableCaption>}
+      <TableHeader>
+        {table.getHeaderGroups().map((headerGroup) => (
+          <TableRow key={headerGroup.id} className={dataTableHeaderRowVariants()}>
+            {headerGroup.headers.map((header) => {
+              const sorted = header.column.getIsSorted()
+              const canSort = header.column.getCanSort()
+              return (
+                <TableHead
+                  key={header.id}
+                  colSpan={header.colSpan}
+                  className={cn(
+                    dataTableHeaderCellVariants(),
+                    header.column.columnDef.meta?.headerClassName,
+                  )}
+                  aria-sort={
+                    sorted === 'asc'
+                      ? 'ascending'
+                      : sorted === 'desc'
+                        ? 'descending'
+                        : canSort
+                          ? 'none'
+                          : undefined
+                  }
+                >
+                  {header.isPlaceholder
+                    ? null
+                    : flexRender(header.column.columnDef.header, header.getContext())}
+                </TableHead>
+              )
+            })}
+          </TableRow>
+        ))}
+      </TableHeader>
+      <TableBody>
+        {rows.length > 0 ? (
+          rows.map((row) => (
+            <TableRow
+              key={row.id}
+              className={cn(dataTableRowVariants(), getRowClassName?.(row))}
+              data-state={row.getIsSelected() ? 'selected' : undefined}
+            >
+              {row.getVisibleCells().map((cell) => {
+                const meta = cell.column.columnDef.meta
+                return (
+                  <TableCell
+                    key={cell.id}
+                    className={cn(
+                      dataTableBodyCellVariants({
+                        tone: meta?.columnTone ?? 'neutral',
+                      }),
+                      dataTableBodyCellPaddingVariants(),
+                      meta?.cellClassName,
+                      getCellClassName?.(cell),
+                    )}
+                  >
+                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                  </TableCell>
+                )
+              })}
+            </TableRow>
+          ))
+        ) : (
+          <TableRow>
+            <TableCell colSpan={resolvedColumns.length} className={dataTableEmptyStateVariants()}>
+              {emptyState ? emptyState(emptyStateContext) : 'No results.'}
+            </TableCell>
+          </TableRow>
+        )}
+      </TableBody>
+    </Table>
+  )
+
   return (
     <div className={dataTableRootVariants()}>
-      <DataTableToolbar table={table} onColumnChange={onColumnChange} />
-
-      {/* Table */}
-      <div className={dataTableTableWrapVariants()}>
-        <Table className={dataTableTableVariants()}>
-          {caption && <TableCaption className={dataTableCaptionVariants()}>{caption}</TableCaption>}
-          <TableHeader>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id} className={dataTableHeaderRowVariants()}>
-                {headerGroup.headers.map((header) => {
-                  const sorted = header.column.getIsSorted()
-                  const canSort = header.column.getCanSort()
-                  return (
-                    <TableHead
-                      key={header.id}
-                      colSpan={header.colSpan}
-                      className={cn(
-                        dataTableHeaderCellVariants(),
-                        header.column.columnDef.meta?.headerClassName,
-                      )}
-                      aria-sort={
-                        sorted === 'asc'
-                          ? 'ascending'
-                          : sorted === 'desc'
-                            ? 'descending'
-                            : canSort
-                              ? 'none'
-                              : undefined
-                      }
-                    >
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(header.column.columnDef.header, header.getContext())}
-                    </TableHead>
-                  )
-                })}
-              </TableRow>
-            ))}
-          </TableHeader>
-          <TableBody>
-            {rows.length > 0 ? (
-              rows.map((row) => (
-                <TableRow
-                  key={row.id}
-                  className={cn(dataTableRowVariants(), getRowClassName?.(row))}
-                  data-state={row.getIsSelected() ? 'selected' : undefined}
-                >
-                  {row.getVisibleCells().map((cell) => {
-                    const meta = cell.column.columnDef.meta
-                    return (
-                      <TableCell
-                        key={cell.id}
-                        className={cn(
-                          dataTableBodyCellVariants({
-                            tone: meta?.columnTone ?? 'neutral',
-                          }),
-                          dataTableBodyCellPaddingVariants(),
-                          meta?.cellClassName,
-                          getCellClassName?.(cell),
-                        )}
-                      >
-                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                      </TableCell>
-                    )
-                  })}
-                </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell
-                  colSpan={resolvedColumns.length}
-                  className={dataTableEmptyStateVariants()}
-                >
-                  {emptyState ? emptyState(emptyStateContext) : 'No results.'}
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
-      </div>
+      {utilityStrip ? (
+        <div className={dataTableTableWrapVariants()}>
+          <div className={dataTableUtilityStripVariants()}>{utilityStrip(utilityControls)}</div>
+          {tableElement}
+        </div>
+      ) : (
+        <>
+          <DataTableToolbar table={table} onColumnChange={onColumnChange} />
+          <div className={dataTableTableWrapVariants()}>{tableElement}</div>
+        </>
+      )}
 
       {/* Pagination */}
       <DataTablePagination table={table} onPageSizeChange={handlePageSizeChange} />

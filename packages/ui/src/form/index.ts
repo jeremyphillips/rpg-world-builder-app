@@ -12,6 +12,7 @@ export {
   SlotFieldRenderer,
   type SlotFieldRendererProps,
 } from './containers/form-items.client'
+export { FormFieldStack, type FormFieldStackProps } from './containers/form-field-stack.client'
 export { FieldNode, buildFieldControlId } from './containers/form-conditional.client'
 export {
   FormSectionProvider,

@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { DataTable } from '@rpg/ui'
 import type { VocabularyOptionWithUsage } from '@rpg/contracts'
+
+import { CatalogOverviewTable } from '@/lib/data-table/catalog-overview-table.client'
 
 import { vocabularyColumns } from './vocabulary-overview-columns'
 
@@ -38,16 +39,17 @@ const STORY_VOCABULARY_OPTIONS: VocabularyOptionWithUsage[] = [
 
 const meta = {
   title: 'Homebrew/Vocabulary/VocabularyOverviewColumns',
-  component: DataTable,
+  component: CatalogOverviewTable,
   parameters: { layout: 'padded' },
-} satisfies Meta<typeof DataTable>
+} satisfies Meta<typeof CatalogOverviewTable>
 
 export default meta
 type Story = StoryObj
 
 export const Default: Story = {
   render: () => (
-    <DataTable
+    <CatalogOverviewTable
+      tableKey="vocabulary-creature-types"
       columns={vocabularyColumns()}
       data={STORY_VOCABULARY_OPTIONS}
       caption="Creature type vocabulary options"

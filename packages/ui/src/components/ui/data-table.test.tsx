@@ -1,4 +1,5 @@
 import { describe, expect, it, vi } from 'vitest'
+import * as React from 'react'
 import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { expectNoAxeViolations } from '@rpg/ui/test-utils'
@@ -200,6 +201,18 @@ describe('DataTable — row selection', () => {
     ).toBeInTheDocument()
   })
 
+  it('applies 12px right padding to the select column header and body cells', () => {
+    renderTable({ enableRowSelection: true })
+    const [headerRow, firstDataRow] = screen.getAllByRole('row')
+    const headerCheckbox = within(headerRow!).getByRole('checkbox', {
+      name: 'Select all rows on this page',
+    })
+    const rowCheckbox = within(firstDataRow!).getByRole('checkbox', { name: 'Select row' })
+
+    expect(headerCheckbox.closest('th')).toHaveClass('[&:has([role=checkbox])]:!pr-3')
+    expect(rowCheckbox.closest('td')).toHaveClass('[&:has([role=checkbox])]:!pr-3')
+  })
+
   it('renders per-row checkboxes when enableRowSelection is true', () => {
     renderTable({ enableRowSelection: true })
     expect(screen.getAllByRole('checkbox', { name: 'Select row' })).toHaveLength(DATA.length)
@@ -240,6 +253,127 @@ describe('DataTable — row selection', () => {
     await user.click(within(firstDataRow!).getByRole('checkbox', { name: 'Select row' }))
 
     expect(firstDataRow).toHaveAttribute('data-state', 'selected')
+  })
+
+  it('uses contextual selectRow labels when provided', () => {
+    renderTable({
+      enableRowSelection: true,
+      selectionLabels: {
+        selectAll: (count) => `Select all ${count} rows on this page`,
+        selectRow: (row) => `Select ${row.name}`,
+      },
+    })
+
+    expect(
+      screen.getByRole('checkbox', { name: 'Select all 5 rows on this page' }),
+    ).toBeInTheDocument()
+    expect(screen.getByRole('checkbox', { name: 'Select Alpha' })).toBeInTheDocument()
+  })
+
+  it('renders the selection column with a persisted user column order', () => {
+    renderTable({
+      enableRowSelection: true,
+      initialColumnOrder: ['name', 'category', 'active'],
+    })
+
+    expect(screen.getAllByRole('checkbox', { name: 'Select row' })).toHaveLength(DATA.length)
+    const [headerRow] = screen.getAllByRole('row')
+    expect(within(headerRow!).getAllByRole('columnheader')[0]).toHaveTextContent('')
+  })
+
+  it('supports controlled row selection state', async () => {
+    const user = userEvent.setup()
+    const onStateChange = vi.fn()
+
+    function ControlledTable() {
+      const [rowSelection, setRowSelection] = React.useState<Record<string, boolean>>({})
+      return (
+        <DataTable
+          columns={COLUMNS}
+          data={DATA}
+          defaultPageSize={10}
+          enableRowSelection
+          rowSelection={rowSelection}
+          onRowSelectionStateChange={(next) => {
+            onStateChange(next)
+            setRowSelection(next)
+          }}
+        />
+      )
+    }
+
+    render(<ControlledTable />)
+
+    const [, firstDataRow] = screen.getAllByRole('row')
+    await user.click(within(firstDataRow!).getByRole('checkbox', { name: 'Select row' }))
+
+    expect(onStateChange).toHaveBeenCalled()
+    expect(firstDataRow).toHaveAttribute('data-state', 'selected')
+  })
+})
+
+// ---------------------------------------------------------------------------
+// Utility strip
+// ---------------------------------------------------------------------------
+
+describe('DataTable — utilityStrip', () => {
+  it('renders the default Columns toolbar when utilityStrip is omitted', () => {
+    renderTable()
+    expect(screen.getByRole('button', { name: /columns/i })).toBeInTheDocument()
+  })
+
+  it('replaces the default toolbar when utilityStrip is provided', () => {
+    renderTable({
+      utilityStrip: (controls) => {
+        const { ColumnVisibilityTrigger } = controls
+        return (
+          <div>
+            <span>Custom strip</span>
+            <ColumnVisibilityTrigger aria-label="Choose visible columns" />
+          </div>
+        )
+      },
+    })
+
+    expect(screen.getByText('Custom strip')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Choose visible columns' })).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /^Columns$/ })).not.toBeInTheDocument()
+  })
+
+  it('exposes page selection helpers on utility controls', async () => {
+    const user = userEvent.setup()
+
+    renderTable({
+      enableRowSelection: true,
+      utilityStrip: (controls) => (
+        <button type="button" onClick={() => controls.toggleAllPageRowsSelected(true)}>
+          Select all page ({controls.pageRowCount})
+        </button>
+      ),
+    })
+
+    await user.click(screen.getByRole('button', { name: 'Select all page (5)' }))
+
+    const headerCheckbox = screen.getByRole('checkbox', { name: 'Select all rows on this page' })
+    expect(headerCheckbox).toBeChecked()
+  })
+
+  it('nests the utility strip inside the table card shell', () => {
+    renderTable({
+      utilityStrip: () => <span>Custom strip</span>,
+    })
+
+    const strip = screen.getByText('Custom strip')
+    const table = screen.getByRole('table')
+    const cardShell = strip.closest('.rounded-card')
+
+    expect(cardShell).toBeInTheDocument()
+    expect(cardShell).toContainElement(strip)
+    expect(cardShell).toContainElement(table)
+
+    const stripParent = strip.parentElement
+    expect(stripParent).toHaveClass('bg-surface-subtle')
+    expect(stripParent?.nextElementSibling).toContainElement(table)
   })
 })
 
@@ -433,7 +567,7 @@ describe('RowActionsMenu', () => {
     await user.click(screen.getByRole('button', { name: /open actions/i }))
 
     expect(screen.queryByRole('menuitem', { name: /edit/i })).not.toBeInTheDocument()
-    expect(screen.getByRole('switch', { name: /active in campaign/i })).toBeInTheDocument()
+    expect(screen.getByRole('switch', { name: /enabled/i })).toBeInTheDocument()
   })
 
   it('shows Edit menu item and active toggle switch when opened', async () => {
@@ -446,7 +580,7 @@ describe('RowActionsMenu', () => {
     const editItem = screen.getByRole('menuitem', { name: /edit/i })
     expect(editItem).toBeInTheDocument()
     expect(editItem).toHaveAttribute('href', '/edit/1')
-    expect(screen.getByRole('switch', { name: /active in campaign/i })).toBeInTheDocument()
+    expect(screen.getByRole('switch', { name: /enabled/i })).toBeInTheDocument()
   })
 
   it('reflects the enabled prop on the switch', async () => {
@@ -455,7 +589,7 @@ describe('RowActionsMenu', () => {
 
     await user.click(screen.getByRole('button', { name: /open actions/i }))
 
-    expect(screen.getByRole('switch', { name: /active in campaign/i })).toHaveAttribute(
+    expect(screen.getByRole('switch', { name: /enabled/i })).toHaveAttribute(
       'data-state',
       'unchecked',
     )
@@ -467,7 +601,7 @@ describe('RowActionsMenu', () => {
     render(<RowActionsMenu editHref="/edit/1" enabled={true} onToggleEnabled={onToggle} />)
 
     await user.click(screen.getByRole('button', { name: /open actions/i }))
-    await user.click(screen.getByRole('switch', { name: /active in campaign/i }))
+    await user.click(screen.getByRole('switch', { name: /enabled/i }))
 
     expect(onToggle).toHaveBeenCalledWith(false)
   })
@@ -493,9 +627,9 @@ describe('RowActionsMenu', () => {
     render(<RowActionsMenu editHref="/edit/1" enabled={true} onToggleEnabled={vi.fn()} />)
 
     await user.click(screen.getByRole('button', { name: /open actions/i }))
-    await user.click(screen.getByRole('switch', { name: /active in campaign/i }))
+    await user.click(screen.getByRole('switch', { name: /enabled/i }))
 
-    expect(screen.getByRole('switch', { name: /active in campaign/i })).toBeInTheDocument()
+    expect(screen.getByRole('switch', { name: /enabled/i })).toBeInTheDocument()
   })
 
   it('renders a custom EditLink component when provided', async () => {

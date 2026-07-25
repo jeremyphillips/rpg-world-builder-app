@@ -1,9 +1,18 @@
+import type { ClassListItem } from '@rpg/contracts'
+
 import { pickClass, pickSubclass, pickSubclassesForClass } from '../lib/fixtures/pick'
 
-export const FIGHTER = pickClass('fighter')
-export const ROGUE = pickClass('rogue')
-export const WIZARD = pickClass('wizard')
-export const CLERIC = pickClass('cleric')
+function toClassListItem(classItem: ReturnType<typeof pickClass>): ClassListItem {
+  return {
+    ...classItem,
+    subclasses: pickSubclassesForClass(classItem.slug).map(({ id, name }) => ({ id, name })),
+  }
+}
+
+export const FIGHTER = toClassListItem(pickClass('fighter'))
+export const ROGUE = toClassListItem(pickClass('rogue'))
+export const WIZARD = toClassListItem(pickClass('wizard'))
+export const CLERIC = toClassListItem(pickClass('cleric'))
 export const CHAMPION = pickSubclass('champion')
 
 export const CLASS_LIST = [FIGHTER, WIZARD, CLERIC] as const

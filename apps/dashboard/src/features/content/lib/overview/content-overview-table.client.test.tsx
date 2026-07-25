@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import type { CharacterClass, WithCampaignAccess } from '@rpg/contracts'
+import type { ClassListItem, WithCampaignAccess } from '@rpg/contracts'
 import type { ColumnDef } from '@rpg/ui'
 import type { ComponentProps } from 'react'
 import { createMemoryRouter, RouterProvider } from 'react-router-dom'
@@ -58,11 +58,11 @@ vi.mock('./use-content-campaign-availability-toggle.client', () => ({
   })),
 }))
 
-type ClassRow = WithCampaignAccess<CharacterClass>
+type ClassRow = WithCampaignAccess<ClassListItem>
 
 const CAMPAIGN_ID = 'campaign-1'
 
-const columns = buildContentColumns<CharacterClass>(
+const columns = buildContentColumns<ClassListItem>(
   [
     {
       accessorKey: 'hitDie',
@@ -83,6 +83,7 @@ function createRows(count: number): ClassRow[] {
     source: 'system',
     status: 'published',
     primaryAbilities: ['str'],
+    subclasses: [],
     campaignAccess: {
       available: true,
       visibilityMode: 'player',
@@ -145,7 +146,7 @@ describe('ContentOverviewTable interactions', () => {
 
     const callsAfterMount = persistPreferencesMock.mock.calls.length
 
-    await user.click(screen.getByRole('button', { name: /^Columns$/ }))
+    await user.click(screen.getByRole('button', { name: /^Choose visible columns$/ }))
 
     expect(persistPreferencesMock.mock.calls.length - callsAfterMount).toBe(0)
   })
@@ -154,7 +155,7 @@ describe('ContentOverviewTable interactions', () => {
     const user = userEvent.setup()
     renderOverview()
 
-    await user.click(screen.getByRole('button', { name: /^Columns$/ }))
+    await user.click(screen.getByRole('button', { name: /^Choose visible columns$/ }))
     const callsAfterOpen = persistPreferencesMock.mock.calls.length
 
     await user.click(screen.getByRole('button', { name: /Hide Hit Die column/i }))
@@ -208,5 +209,44 @@ describe('ContentOverviewTable interactions', () => {
     await user.click(screen.getByRole('button', { name: /^Filters/ }))
 
     expect(dataTableRenderCount - rendersAfterMount).toBe(0)
+  })
+
+  it('renders the utility strip with result count and columns control', () => {
+    renderOverview()
+    expect(screen.getByText('8 results')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Choose visible columns' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Select' })).toBeEnabled()
+  })
+
+  it('enters selection mode and announces the live region', async () => {
+    const user = userEvent.setup()
+    renderOverview()
+
+    await user.click(screen.getByRole('button', { name: 'Select' }))
+
+    expect(screen.getByText('0 selected')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Select all page' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Exit selection mode' })).toBeInTheDocument()
+    expect(screen.getByText('Selection mode. 0 items selected.')).toBeInTheDocument()
+  })
+
+  it('uses contextual row checkbox labels in selection mode', async () => {
+    const user = userEvent.setup()
+    renderOverview()
+
+    await user.click(screen.getByRole('button', { name: 'Select' }))
+    expect(screen.getByRole('checkbox', { name: 'Select Class 0' })).toBeInTheDocument()
+  })
+
+  it('renders selection checkboxes when column order preferences are persisted', async () => {
+    const user = userEvent.setup()
+    persistContentOverviewPreferences('classes', {
+      version: 2,
+      columnOrder: ['hitDie', 'name'],
+    })
+    renderOverview()
+
+    await user.click(screen.getByRole('button', { name: 'Select' }))
+    expect(screen.getByRole('checkbox', { name: 'Select Class 0' })).toBeInTheDocument()
   })
 })

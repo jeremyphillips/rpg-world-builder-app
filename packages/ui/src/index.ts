@@ -598,9 +598,15 @@ export {
   normalizeColumnOrderForPersist,
   normalizeColumnVisibilityForPersist,
 } from './components/ui/data-table-column-change.lib'
+export { CollectionSummaryCell } from './components/ui/collection-summary-cell.client'
+export type {
+  CollectionSummaryCellProps,
+  CollectionSummaryItem,
+} from './components/ui/collection-summary.types'
 export {
   BooleanCell,
   DataTable,
+  DataTableColumnVisibilityTrigger,
   NameCell,
   DataTableImageCell,
   RowActionsMenu,
@@ -625,13 +631,17 @@ export {
 export type { DataTableCellTypography, DataTableColumnWidth } from './components/ui/data-table-meta'
 export type {
   ColumnChangeState,
+  DataTableColumnVisibilityTriggerProps,
   DataTableEmptyStateContext,
   DataTableProps,
+  DataTableSelectionLabels,
+  DataTableUtilityControls,
 } from './components/ui/data-table.types'
 export type { ColumnDef } from '@tanstack/react-table'
 export {
   dataTableRootVariants,
   dataTableToolbarVariants,
+  dataTableUtilityStripVariants,
   dataTableFilterGroupVariants,
   dataTableFilterControlVariants,
   dataTableAdvancedPanelVariants,

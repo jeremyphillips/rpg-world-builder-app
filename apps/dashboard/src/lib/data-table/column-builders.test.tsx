@@ -2,9 +2,16 @@ import { describe, expect, it } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import type { ColumnDef } from '@rpg/ui'
 
-import { dataTableColumnMeta, dataTableWidthMeta, NameCell, TableBadgeCell } from '@rpg/ui'
+import {
+  CollectionSummaryCell,
+  dataTableColumnMeta,
+  dataTableWidthMeta,
+  NameCell,
+  TableBadgeCell,
+} from '@rpg/ui'
 
 import {
+  buildCollectionCountColumn,
   buildNameColumn,
   buildSourceColumn,
   stampDataColumns,
@@ -70,5 +77,36 @@ describe('withColumnWidth', () => {
   it('merges width preset into column meta', () => {
     const col = withColumnWidth<Row>({ accessorKey: 'name', header: 'Name' }, 'compact')
     expect(col.meta).toMatchObject(dataTableWidthMeta('compact'))
+  })
+})
+
+describe('buildCollectionCountColumn', () => {
+  it('sorts by numeric count and renders CollectionSummaryCell', () => {
+    const col = buildCollectionCountColumn<Row & { traits: { id: string; label: string }[] }>({
+      id: 'traits',
+      label: 'Traits',
+      getItems: (row) => row.traits,
+      getCount: (row) => row.traits.length,
+      singularLabel: 'trait',
+      pluralLabel: 'traits',
+    })
+
+    expect(col.meta).toMatchObject({
+      ...dataTableColumnMeta.data,
+      ...dataTableWidthMeta('collectionCount'),
+      label: 'Traits',
+    })
+
+    render(
+      <CollectionSummaryCell
+        items={[
+          { id: 'darkvision', label: 'Darkvision' },
+          { id: 'dwarven-resilience', label: 'Dwarven Resilience' },
+        ]}
+        singularLabel="trait"
+        pluralLabel="traits"
+      />,
+    )
+    expect(screen.getByRole('button', { name: /2 traits/i })).toBeInTheDocument()
   })
 })

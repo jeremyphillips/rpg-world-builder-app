@@ -1,5 +1,5 @@
 import { useParams } from 'react-router-dom'
-import type { CharacterClass, WithCampaignAccess } from '@rpg/contracts'
+import type { ClassListItem, WithCampaignAccess } from '@rpg/contracts'
 import type { ColumnDef } from '@rpg/ui'
 
 import { ROUTES } from '@/app/routes'
@@ -26,14 +26,14 @@ export function ClassesOverview() {
       newHref={ROUTES.content.classes.create(campaignId)}
       newLabel={formatContentCreateHeading('classes')}
     >
-      <ContentOverviewTable<WithCampaignAccess<CharacterClass>>
+      <ContentOverviewTable<WithCampaignAccess<ClassListItem>>
         contentTypeKey="classes"
         campaignId={campaignId}
         columns={
-          classColumns(campaignId) as ColumnDef<WithCampaignAccess<CharacterClass>, unknown>[]
+          classColumns(campaignId) as ColumnDef<WithCampaignAccess<ClassListItem>, unknown>[]
         }
         filterSchema={classFilterSchema}
-        data={classes as WithCampaignAccess<CharacterClass>[]}
+        data={classes as WithCampaignAccess<ClassListItem>[]}
         caption={formatContentOverviewCaption('classes', 'Character')}
         getEditHref={(row) => ROUTES.content.classes.edit(campaignId, row.id)}
       />

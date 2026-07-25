@@ -8,14 +8,13 @@ import {
   type WithCampaignAccess,
 } from '@rpg/contracts'
 import {
-  Button,
-  DataTable,
   areColumnChangeStatesEqual,
   dataTableFilterNoticeVariants,
   dataTableRowUnavailableRailVariants,
   dataTableRowUnavailableVariants,
   type ColumnDef,
   type ColumnChangeState,
+  type DataTableUtilityControls,
 } from '@rpg/ui'
 import {
   FilterAdvancedPanel,
@@ -31,18 +30,6 @@ import {
 import { getContentTypeMidSentenceLabel } from '../content-type-labels'
 import { useCanManageCampaign } from '@/features/campaign'
 import {
-  CAMPAIGN_ACCESS_TABLE_HIDE_UNAVAILABLE_LABEL,
-  CAMPAIGN_ACCESS_TABLE_SHOW_ALL_LABEL,
-  CAMPAIGN_ACCESS_TABLE_SHOW_UNAVAILABLE_LABEL,
-  formatHiddenUnavailableNotice,
-  formatHideUnavailableAriaLabel,
-  formatNoAvailableMatchesLabel,
-  formatShowAllCampaignAvailabilityAriaLabel,
-  formatShowUnavailableAriaLabel,
-  formatUnavailableItemsShownNotice,
-  formatUnavailableMatchesLine,
-} from '../campaign-access/campaign-access-table-labels'
-import {
   buildContentOverviewColumnSchema,
   getContentOverviewSortableColumnIds,
 } from './content-overview-columns.lib'
@@ -57,6 +44,14 @@ import {
   type ContentOverviewPreferences,
 } from './content-overview-preferences'
 import { ContentOverviewRowActions } from './content-overview-row-actions'
+import { ContentTableUtilityStrip } from './content-table-utility-strip.client'
+import { BulkCampaignAccessDialog } from '../campaign-access/bulk/bulk-campaign-access-dialog.client'
+import {
+  buildContentOverviewEmptyState,
+  buildContentOverviewFilterNotice,
+} from './content-overview-availability-ui.lib'
+import { formatOverviewResultCount } from './format-overview-result-count.lib'
+import { useContentOverviewBulkAccess } from './use-content-overview-bulk-access.client'
 import {
   CAMPAIGN_AVAILABILITY_FILTER_ID,
   deriveCampaignAvailabilityScope,
@@ -64,6 +59,7 @@ import {
 import type { ContentBase } from './content-table-config'
 import type { ContentOverviewBaseFilterState } from './content-overview-filter-schema'
 import { useContentOverviewQueryState } from './use-content-overview-query-state.client'
+import { OverviewTableFrame } from '@/lib/data-table/overview-table-frame.client'
 
 const DEFAULT_OVERVIEW_SORT = { id: 'name' } as const
 const OVERVIEW_NAME_COLUMN_ID = 'name'
@@ -79,6 +75,21 @@ type ContentOverviewDataTableProps<T extends WithCampaignAccess<ContentBase> & {
   contentTypeKey: ContentTypeKey
   itemLabel: string
   campaignAvailability: CampaignAvailabilityFilter
+  filteredCount: number
+  availabilityScopedCount: number
+  totalCount: number
+  selectionMode: boolean
+  rowSelection: Record<string, boolean>
+  selectionLimit: number
+  selectionLiveRegionId: string
+  selectionLiveRegionMessage: string
+  selectionCapDescriptionId: string
+  onEnterSelectionMode: () => void
+  onExitSelectionMode: () => void
+  onRowSelectionChange: (rows: T[]) => void
+  onRowSelectionStateChange: (state: Record<string, boolean>) => void
+  getRowCanSelect: (row: T) => boolean
+  onEditCampaignAccess?: () => void
   getEditHref: (row: T) => string
   onColumnChange: (state: ColumnChangeState) => void
   caption?: string
@@ -100,6 +111,21 @@ const ContentOverviewDataTable = memo(function ContentOverviewDataTable<
   contentTypeKey,
   itemLabel,
   campaignAvailability,
+  filteredCount,
+  availabilityScopedCount,
+  totalCount,
+  selectionMode,
+  rowSelection,
+  selectionLimit,
+  selectionLiveRegionId,
+  selectionLiveRegionMessage,
+  selectionCapDescriptionId,
+  onEnterSelectionMode,
+  onExitSelectionMode,
+  onRowSelectionChange,
+  onRowSelectionStateChange,
+  getRowCanSelect,
+  onEditCampaignAccess,
   getEditHref,
   onColumnChange,
   caption,
@@ -148,8 +174,56 @@ const ContentOverviewDataTable = memo(function ContentOverviewDataTable<
     [emptyState],
   )
 
+  const resultCountLabel = useMemo(
+    () => formatOverviewResultCount({ filteredCount, availabilityScopedCount, totalCount }),
+    [availabilityScopedCount, filteredCount, totalCount],
+  )
+
+  const renderUtilityStrip = useCallback(
+    (controls: DataTableUtilityControls<T>) => (
+      <ContentTableUtilityStrip
+        resultCountLabel={resultCountLabel}
+        canManage={canManage}
+        selectionMode={selectionMode}
+        selectedRowCount={controls.selectedRowCount}
+        selectionLimit={selectionLimit}
+        selectionLiveRegionId={selectionLiveRegionId}
+        selectionLiveRegionMessage={selectionLiveRegionMessage}
+        selectionCapDescriptionId={selectionCapDescriptionId}
+        ColumnVisibilityTrigger={controls.ColumnVisibilityTrigger}
+        controls={controls}
+        onEnterSelectionMode={onEnterSelectionMode}
+        onExitSelectionMode={onExitSelectionMode}
+        onEditCampaignAccess={onEditCampaignAccess}
+      />
+    ),
+    [
+      canManage,
+      onEditCampaignAccess,
+      onEnterSelectionMode,
+      onExitSelectionMode,
+      resultCountLabel,
+      selectionCapDescriptionId,
+      selectionLimit,
+      selectionLiveRegionId,
+      selectionLiveRegionMessage,
+      selectionMode,
+    ],
+  )
+
+  const selectionLabels = useMemo(
+    () =>
+      selectionMode
+        ? {
+            selectAll: (pageRowCount: number) => `Select all ${pageRowCount} rows on this page`,
+            selectRow: (row: T) => `Select ${row.name}`,
+          }
+        : undefined,
+    [selectionMode],
+  )
+
   return (
-    <DataTable
+    <OverviewTableFrame
       columns={columns}
       data={data}
       defaultPageSize={pageSize}
@@ -161,6 +235,14 @@ const ContentOverviewDataTable = memo(function ContentOverviewDataTable<
       emptyState={resolvedEmptyState}
       getRowClassName={getRowClassName}
       getCellClassName={getCellClassName}
+      utilityStrip={renderUtilityStrip}
+      enableRowSelection={selectionMode && canManage}
+      rowSelection={rowSelection}
+      onRowSelectionChange={onRowSelectionChange}
+      onRowSelectionStateChange={onRowSelectionStateChange}
+      selectionLabels={selectionLabels}
+      getRowCanSelect={getRowCanSelect}
+      rowSelectionDescribedBy={selectionCapDescriptionId}
     />
   )
 }) as <T extends WithCampaignAccess<ContentBase> & { id: string }>(
@@ -262,6 +344,9 @@ export function ContentOverviewTable<
   const pluralNoun = getContentTypeMidSentenceLabel(contentTypeKey, { plural: true })
   const itemLabel = getContentTypeMidSentenceLabel(contentTypeKey)
 
+  const visibleRowIds = useMemo(() => new Set(visibleRows.map((row) => row.id)), [visibleRows])
+  const bulkAccess = useContentOverviewBulkAccess<T>(visibleRowIds)
+
   const handleAdvancedOpenChange = useCallback(
     (open: boolean) => {
       setPreferences((current) => {
@@ -347,94 +432,28 @@ export function ContentOverviewTable<
   const tablePageSize: ContentOverviewPageSize =
     preferences.pageSize ?? CONTENT_OVERVIEW_PREFERENCES_DEFAULTS.pageSize ?? 20
 
-  const filterNotice = useMemo(() => {
-    if (scope.unavailableCount === 0) return null
+  const filterNotice = useMemo(
+    () =>
+      buildContentOverviewFilterNotice({
+        scope,
+        campaignAvailability,
+        campaignAvailabilityFilterId,
+        actions,
+      }),
+    [actions, campaignAvailability, campaignAvailabilityFilterId, scope],
+  )
 
-    if (campaignAvailability === 'available') {
-      return (
-        <>
-          <span>{formatHiddenUnavailableNotice(scope.unavailableCount)}</span>
-          <Button
-            type="button"
-            variant="link"
-            size="sm"
-            className="h-auto px-0 text-xs"
-            aria-label={formatShowAllCampaignAvailabilityAriaLabel()}
-            onClick={() =>
-              actions.setFilterValue(
-                campaignAvailabilityFilterId,
-                'all' as TFilters[FilterFieldId<TFilters>],
-                { history: 'push' },
-              )
-            }
-          >
-            {CAMPAIGN_ACCESS_TABLE_SHOW_ALL_LABEL}
-          </Button>
-        </>
-      )
-    }
-
-    if (campaignAvailability === 'all') {
-      return (
-        <>
-          <span>{formatUnavailableItemsShownNotice()}</span>
-          <Button
-            type="button"
-            variant="link"
-            size="sm"
-            className="h-auto px-0 text-xs"
-            aria-label={formatHideUnavailableAriaLabel()}
-            onClick={() =>
-              actions.setFilterValue(
-                campaignAvailabilityFilterId,
-                'available' as TFilters[FilterFieldId<TFilters>],
-                { history: 'push' },
-              )
-            }
-          >
-            {CAMPAIGN_ACCESS_TABLE_HIDE_UNAVAILABLE_LABEL}
-          </Button>
-        </>
-      )
-    }
-
-    return null
-  }, [actions, campaignAvailability, scope.unavailableCount])
-
-  const emptyState = useCallback(() => {
-    if (
-      campaignAvailability === 'available' &&
-      scope.unavailableCount > 0 &&
-      scope.visibleCount === 0
-    ) {
-      return (
-        <div className="space-y-1 text-center">
-          <p>{formatNoAvailableMatchesLabel(pluralNoun)}</p>
-          <p className="text-muted-foreground">
-            {formatUnavailableMatchesLine(scope.unavailableCount, pluralNoun)}{' '}
-            <Button
-              type="button"
-              variant="link"
-              size="sm"
-              className="h-auto px-0 text-xs"
-              aria-label={formatShowUnavailableAriaLabel(pluralNoun)}
-              onClick={() =>
-                actions.setFilterValue(
-                  campaignAvailabilityFilterId,
-                  'unavailable' as TFilters[FilterFieldId<TFilters>],
-                  { history: 'push' },
-                )
-              }
-            >
-              {CAMPAIGN_ACCESS_TABLE_SHOW_UNAVAILABLE_LABEL}
-            </Button>
-          </p>
-        </div>
-      )
-    }
-
-    return <p>No results.</p>
-  }, [actions, campaignAvailability, pluralNoun, scope.unavailableCount, scope.visibleCount])
+  const emptyState = useCallback(
+    () =>
+      buildContentOverviewEmptyState({
+        campaignAvailability,
+        scope,
+        pluralNoun,
+        campaignAvailabilityFilterId,
+        actions,
+      }),
+    [actions, campaignAvailability, campaignAvailabilityFilterId, pluralNoun, scope],
+  )
 
   return (
     <div ref={tableRootRef} tabIndex={-1} className="flex flex-col gap-3 outline-none">
@@ -470,6 +489,23 @@ export function ContentOverviewTable<
         contentTypeKey={contentTypeKey}
         itemLabel={itemLabel}
         campaignAvailability={campaignAvailability}
+        filteredCount={visibleRows.length}
+        availabilityScopedCount={scopedRows.length}
+        totalCount={discoveryFilteredData.length}
+        selectionMode={bulkAccess.selectionMode}
+        rowSelection={bulkAccess.rowSelection}
+        selectionLimit={bulkAccess.selectionLimit}
+        selectionLiveRegionId={bulkAccess.selectionLiveRegionId}
+        selectionLiveRegionMessage={bulkAccess.selectionLiveRegionMessage}
+        selectionCapDescriptionId={bulkAccess.selectionCapDescriptionId}
+        onEnterSelectionMode={bulkAccess.enterSelectionMode}
+        onExitSelectionMode={bulkAccess.handleExitSelectionMode}
+        onRowSelectionChange={bulkAccess.onRowSelectionChange}
+        onRowSelectionStateChange={bulkAccess.onRowSelectionStateChange}
+        getRowCanSelect={bulkAccess.getRowCanSelect}
+        onEditCampaignAccess={
+          canManage && bulkAccess.selectedCount > 0 ? bulkAccess.openBulkAccessDialog : undefined
+        }
         getEditHref={getEditHref}
         onColumnChange={handleColumnChange}
         caption={caption}
@@ -477,6 +513,19 @@ export function ContentOverviewTable<
         restoreFocusRef={restoreFocusRef}
         registerActionTrigger={registerActionTrigger}
       />
+
+      {canManage ? (
+        <BulkCampaignAccessDialog
+          open={bulkAccess.bulkAccessOpen}
+          onOpenChange={bulkAccess.setBulkAccessOpen}
+          campaignId={campaignId}
+          targetType={contentTypeKey}
+          contentTypeKey={contentTypeKey}
+          itemLabelPlural={pluralNoun}
+          selectedRows={bulkAccess.selectedRows}
+          onApplyComplete={bulkAccess.handleBulkApplyComplete}
+        />
+      ) : null}
     </div>
   )
 }

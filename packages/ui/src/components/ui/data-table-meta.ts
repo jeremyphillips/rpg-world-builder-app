@@ -2,6 +2,8 @@ import {
   dataTableActionsCellVariants,
   dataTableActionsHeaderVariants,
   dataTableCellTextVariants,
+  dataTableSelectCellVariants,
+  dataTableSelectHeaderVariants,
 } from './data-table.variants'
 
 /** Shared `ColumnMeta.columnTone` values for DataTable body cell styling. */
@@ -41,10 +43,16 @@ export const dataTableColumnWidths = {
   /** Badge/status columns — source, visibility, status. */
   badge: 'whitespace-nowrap lg:w-28 lg:max-w-28',
 
+  /** Collection count columns — compact centered `[ n ]` counters. */
+  collectionCount: 'whitespace-nowrap text-center lg:w-[5.5rem] lg:max-w-[5.5rem]',
+
   /** Actions/menu column — width only; pair with `dataTableWidthMeta('actions')` for sticky chrome. */
   actions: 'w-12 max-w-12 shrink-0',
 
-  /** Shrink-to-fit checkbox column. */
+  /** Row selection checkbox column — pair with `dataTableWidthMeta('select')` for centered chrome. */
+  select: 'w-10 max-w-10 shrink-0',
+
+  /** Shrink-to-fit placeholder — prefer `select` for checkbox columns under `table-fixed`. */
   minimal: 'w-px',
 } as const
 
@@ -68,7 +76,13 @@ export function dataTableWidthMeta(width: DataTableColumnWidth) {
       cellClassName: dataTableActionsCellVariants(),
     } as const
   }
-  if (width === 'compactCenter' || width === 'tinyCenter') {
+  if (width === 'select') {
+    return {
+      headerClassName: dataTableSelectHeaderVariants(),
+      cellClassName: dataTableSelectCellVariants(),
+    } as const
+  }
+  if (width === 'collectionCount' || width === 'compactCenter' || width === 'tinyCenter') {
     return {
       headerClassName: className,
       cellClassName: `${className} ${dataTableCenteredBodyCellLayout}`,

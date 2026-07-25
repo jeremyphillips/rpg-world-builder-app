@@ -27,6 +27,7 @@ import {
 } from '../starting-equipment'
 import { spellcastingSchema } from './spellcasting'
 import { classValidationMessages } from './class-messages'
+import { contentSummaryRefSchema } from '../lib/content-summary-ref'
 
 // ---------------------------------------------------------------------------
 // Class — SRD-faithful prose lives in rich-text HTML on `description` and
@@ -175,6 +176,12 @@ export type ClassDraft = z.infer<typeof classDraftStoredSchema>
 /** Read record = envelope + body. */
 export const classSchema = contentMetaSchema.extend(classBodySchema.shape)
 export type CharacterClass = z.infer<typeof classSchema>
+
+/** Class list row enriched with subclass summaries for overview tables. */
+export const classListItemSchema = classSchema.extend({
+  subclasses: z.array(contentSummaryRefSchema),
+})
+export type ClassListItem = z.infer<typeof classListItemSchema>
 
 type ClassSubclassChoiceFeatureSource = {
   slug: string

@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { buttonVariants, DataTable, Heading, Text } from '@rpg/ui'
+import { buttonVariants, Heading, Text } from '@rpg/ui'
 import {
   vocabularyOptionSetIdSchema,
   type VocabularyOptionSetId,
@@ -14,6 +14,7 @@ import { PageLoadState } from '@/components/layout/page-load-state'
 import { WidePage } from '@/components/layout/wide-page'
 import { ROUTES } from '@/app/routes'
 import { useCanManageCampaign } from '@/features/campaign'
+import { CatalogOverviewTable } from '@/lib/data-table/catalog-overview-table.client'
 
 import { vocabularyColumns } from '../lib/vocabulary/vocabulary-overview-columns'
 import {
@@ -92,7 +93,8 @@ function VocabularySetManager({ campaignId, setId, setLabel }: VocabularySetMana
         isError={isError}
         defaultErrorLabel={`Could not load ${setLabel.toLowerCase()}.`}
       >
-        <DataTable
+        <CatalogOverviewTable
+          tableKey={`vocabulary-${setId}`}
           columns={vocabularyColumns()}
           data={vocabularySet?.options ?? []}
           caption={`${setLabel} available in this campaign`}

@@ -235,13 +235,20 @@ Catalog and homebrew overview tables share styling via `@rpg/ui` cell helpers
 (`NameCell`, `TableBadgeCell`, `dataTableColumnMeta`) and dashboard builders in
 [`src/lib/data-table/column-builders.tsx`](../src/lib/data-table/column-builders.tsx).
 
-| Helper                | Use                                                  |
-| --------------------- | ---------------------------------------------------- |
-| `buildNameColumn`     | Sortable identity column (name/label)                |
-| `buildSourceColumn`   | Source badge column — pass a domain `SourceBadgeMap` |
-| `stampDataColumns`    | Apply `columnTone: 'data'` to middle columns         |
-| `withColumnWidth`     | Pin column width via `dataTableWidthMeta` preset     |
-| `buildContentColumns` | Content overviews — image + name + middle + source   |
+Non-content list routes compose
+[`CatalogOverviewTable`](../src/lib/data-table/catalog-overview-table.client.tsx)
+(utility strip, column prefs, optional filters). Content lists use
+`ContentOverviewTable` — layer boundaries and collection-summary columns are
+documented in [catalog-overview-tables.md](./catalog-overview-tables.md).
+
+| Helper                       | Use                                                  |
+| ---------------------------- | ---------------------------------------------------- |
+| `buildNameColumn`            | Sortable identity column (name/label)                |
+| `buildSourceColumn`          | Source badge column — pass a domain `SourceBadgeMap` |
+| `buildCollectionCountColumn` | Array-backed count + `CollectionSummaryCell` tooltip |
+| `stampDataColumns`           | Apply `columnTone: 'data'` to middle columns         |
+| `withColumnWidth`            | Pin column width via `dataTableWidthMeta` preset     |
+| `buildContentColumns`        | Content overviews — image + name + middle + source   |
 
 Use `dataTableWidthMeta('compact')` (from `@rpg/ui`) for narrow fixed columns
 (hit die, spellcasting, source). Presets: `image`, `compact`, `compactCenter`,
