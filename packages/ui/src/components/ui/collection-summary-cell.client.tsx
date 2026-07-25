@@ -39,10 +39,10 @@ function buildAccessibleSummary(
 }
 
 /**
- * Compact collection count for catalog tables. The trigger shows `[ n ]`; hover
- * and keyboard focus reveal a bounded read-only name list. Promote to a popover
- * when entries need links, grouping, scrolling, or rich metadata (`secondary`,
- * `href`).
+ * Compact collection count for catalog tables. The trigger shows the numeric
+ * count; hover and keyboard focus reveal a bounded read-only name list. Promote
+ * to a popover when entries need links, grouping, scrolling, or rich metadata
+ * (`secondary`, `href`).
  */
 export function CollectionSummaryCell({
   items,
@@ -69,7 +69,7 @@ export function CollectionSummaryCell({
             aria-label={ariaLabel}
             className={cn(collectionSummaryCounterVariants())}
           >
-            [ {items.length} ]
+            {items.length}
           </button>
         </TooltipTrigger>
         <TooltipContent className="max-w-xs space-y-1 px-3 py-2">

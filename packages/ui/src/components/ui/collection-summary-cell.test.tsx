@@ -24,6 +24,20 @@ describe('CollectionSummaryCell', () => {
     expect(screen.queryByRole('button')).not.toBeInTheDocument()
   })
 
+  it('renders the count without bracket characters', () => {
+    render(
+      <CollectionSummaryCell
+        items={ITEMS.slice(0, 3)}
+        singularLabel="subclass"
+        pluralLabel="subclasses"
+      />,
+    )
+
+    expect(screen.getByRole('button', { name: /3 subclasses/i })).toHaveTextContent('3')
+    expect(screen.queryByText('[')).not.toBeInTheDocument()
+    expect(screen.queryByText(']')).not.toBeInTheDocument()
+  })
+
   it('uses singular tooltip heading copy for one item', async () => {
     const user = userEvent.setup()
     render(

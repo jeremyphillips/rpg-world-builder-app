@@ -3,7 +3,6 @@
 import { useCallback, useMemo, useState, type ReactNode } from 'react'
 import {
   areColumnChangeStatesEqual,
-  DataTable,
   type ColumnChangeState,
   type ColumnDef,
   type DataTableEmptyStateContext,
@@ -29,8 +28,8 @@ import {
   type CatalogOverviewPageSize,
   type CatalogOverviewPreferences,
 } from './catalog-overview-preferences'
-import { CatalogTableUtilityStrip } from './catalog-table-utility-strip.client'
 import { formatCatalogResultCount } from './format-catalog-result-count.lib'
+import { OverviewTableFrame } from './overview-table-frame.client'
 
 type CatalogOverviewTableCoreProps<T extends { id: string }> = {
   tableKey: string
@@ -89,7 +88,10 @@ type CatalogOverviewTableBodyProps<T extends { id: string }> = {
   rowActions?: (row: T) => ReactNode
   getRowClassName?: DataTableProps<T>['getRowClassName']
   getCellClassName?: DataTableProps<T>['getCellClassName']
+  toolbar?: ReactNode
 }
+
+const COLUMNS_ARIA_LABEL = 'Choose visible columns'
 
 function CatalogOverviewTableBody<T extends { id: string }>({
   tableKey,
@@ -101,6 +103,7 @@ function CatalogOverviewTableBody<T extends { id: string }>({
   rowActions,
   getRowClassName,
   getCellClassName,
+  toolbar,
 }: CatalogOverviewTableBodyProps<T>) {
   const columnSchema = useMemo(
     () => buildCatalogOverviewColumnSchema(columns as ColumnDef<unknown>[]),
@@ -140,44 +143,32 @@ function CatalogOverviewTableBody<T extends { id: string }>({
 
   const resolvedResultCountLabel = resultCountLabel ?? formatCatalogResultCount(visibleRows.length)
 
-  const resolvedEmptyState = useMemo(
-    () =>
-      typeof emptyState === 'function'
-        ? (context: DataTableEmptyStateContext<T>) => emptyState(context)
-        : emptyState
-          ? () => emptyState
-          : undefined,
-    [emptyState],
-  )
-
-  const renderUtilityStrip = useCallback(
-    (controls: DataTableUtilityControls<T>) => (
-      <CatalogTableUtilityStrip
-        resultCountLabel={resolvedResultCountLabel}
-        ColumnVisibilityTrigger={controls.ColumnVisibilityTrigger}
-      />
-    ),
-    [resolvedResultCountLabel],
-  )
-
   const tablePageSize: CatalogOverviewPageSize =
     preferences.pageSize ?? CATALOG_OVERVIEW_PREFERENCES_DEFAULTS.pageSize ?? 20
 
+  const renderUtilityActions = useCallback(
+    (controls: DataTableUtilityControls<T>) => (
+      <controls.ColumnVisibilityTrigger aria-label={COLUMNS_ARIA_LABEL} showLabel={false} />
+    ),
+    [],
+  )
+
   return (
-    <DataTable
+    <OverviewTableFrame
       columns={columns}
       data={visibleRows}
+      caption={caption}
+      emptyState={emptyState}
+      rowActions={rowActions}
+      getRowClassName={getRowClassName}
+      getCellClassName={getCellClassName}
       defaultPageSize={tablePageSize}
       initialColumnVisibility={preferences.columnVisibility}
       initialColumnOrder={preferences.columnOrder}
       onColumnChange={handleColumnChange}
-      rowActions={rowActions}
-      caption={caption}
-      emptyState={resolvedEmptyState}
-      getRowClassName={getRowClassName}
-      getCellClassName={getCellClassName}
-      utilityStrip={renderUtilityStrip}
-      getRowId={(row) => row.id}
+      toolbar={toolbar}
+      summary={<span className="text-sm text-muted-foreground">{resolvedResultCountLabel}</span>}
+      utilityActions={renderUtilityActions}
     />
   )
 }
@@ -268,26 +259,25 @@ function CatalogOverviewTableWithInternalFilters<
     [tableKey],
   )
 
-  return (
-    <div className="flex flex-col gap-3">
-      {filters ?? (
-        <CatalogOverviewFilterChrome
-          filterSchema={filterSchema}
-          filterState={state}
-          onFilterChange={setValue}
-          onResetFilters={reset}
-          advancedOpen={advancedOpen}
-          onAdvancedOpenChange={handleAdvancedOpenChange}
-        />
-      )}
+  const filterChrome = filters ?? (
+    <CatalogOverviewFilterChrome
+      filterSchema={filterSchema}
+      filterState={state}
+      onFilterChange={setValue}
+      onResetFilters={reset}
+      advancedOpen={advancedOpen}
+      onAdvancedOpenChange={handleAdvancedOpenChange}
+    />
+  )
 
-      <CatalogOverviewTableBody
-        tableKey={tableKey}
-        columns={columns}
-        visibleRows={visibleRows}
-        {...bodyProps}
-      />
-    </div>
+  return (
+    <CatalogOverviewTableBody
+      tableKey={tableKey}
+      columns={columns}
+      visibleRows={visibleRows}
+      toolbar={filterChrome}
+      {...bodyProps}
+    />
   )
 }
 
@@ -332,26 +322,25 @@ function CatalogOverviewTableWithControlledFilters<
     [tableKey],
   )
 
-  return (
-    <div className="flex flex-col gap-3">
-      {filters ?? (
-        <CatalogOverviewFilterChrome
-          filterSchema={filterSchema}
-          filterState={filterState}
-          onFilterChange={onFilterChange}
-          onResetFilters={onResetFilters}
-          advancedOpen={advancedOpen}
-          onAdvancedOpenChange={handleAdvancedOpenChange}
-        />
-      )}
+  const filterChrome = filters ?? (
+    <CatalogOverviewFilterChrome
+      filterSchema={filterSchema}
+      filterState={filterState}
+      onFilterChange={onFilterChange}
+      onResetFilters={onResetFilters}
+      advancedOpen={advancedOpen}
+      onAdvancedOpenChange={handleAdvancedOpenChange}
+    />
+  )
 
-      <CatalogOverviewTableBody
-        tableKey={tableKey}
-        columns={columns}
-        visibleRows={visibleRows}
-        {...bodyProps}
-      />
-    </div>
+  return (
+    <CatalogOverviewTableBody
+      tableKey={tableKey}
+      columns={columns}
+      visibleRows={visibleRows}
+      toolbar={filterChrome}
+      {...bodyProps}
+    />
   )
 }
 
@@ -402,14 +391,12 @@ export function CatalogOverviewTable<
   }
 
   return (
-    <div className="flex flex-col gap-3">
-      {filters}
-      <CatalogOverviewTableBody
-        tableKey={tableKey}
-        columns={columns}
-        visibleRows={data}
-        {...bodyProps}
-      />
-    </div>
+    <CatalogOverviewTableBody
+      tableKey={tableKey}
+      columns={columns}
+      visibleRows={data}
+      toolbar={filters}
+      {...bodyProps}
+    />
   )
 }

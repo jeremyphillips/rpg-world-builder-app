@@ -39,7 +39,7 @@ from `CharacterBuildCatalogIndex`, and no summary column.
 Array-backed overview columns use `buildCollectionCountColumn` in
 `column-builders.tsx`:
 
-- **Trigger** — compact sortable count (`CollectionSummaryCell` `[ n ]` chrome)
+- **Trigger** — compact sortable count (`CollectionSummaryCell` quiet counter chrome)
 - **Tooltip** — bounded name list on hover/focus; `+N more` when truncated
 - **Empty** — non-interactive `—` (no tooltip)
 - **Sort** — numeric count via `getCount`; preserve authored order in tooltip
