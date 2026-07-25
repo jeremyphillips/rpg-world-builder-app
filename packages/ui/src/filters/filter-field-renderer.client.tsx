@@ -10,6 +10,7 @@ import { cn } from '../lib/utils'
 import { useFilterChrome } from './filter-chrome.context'
 import { isFilterFieldDisabled } from './filter-bar.lib'
 import { resolveChipsFieldOptions, resolvePopoverFieldGroups } from './filter-field-options.lib'
+import { FilterInlineControl } from './filter-inline-control.client'
 import {
   resolveFilterFieldPresentation,
   resolveFilterFieldWidthClasses,
@@ -263,10 +264,7 @@ function FilterBooleanField<TData, TState extends Record<string, unknown>>({
   const hiddenCount = booleanField.hiddenCount?.(state, optionsContext)
 
   return (
-    <div
-      data-field-align=""
-      className={cn(presentation.controlBandClassName, presentation.groupClassName)}
-    >
+    <FilterInlineControl className={presentation.groupClassName}>
       <Checkbox
         id={controlId}
         checked={isChecked}
@@ -280,7 +278,7 @@ function FilterBooleanField<TData, TState extends Record<string, unknown>>({
       />
       <label
         htmlFor={controlId}
-        className={cn(presentation.labelClassName, 'cursor-pointer font-medium leading-none')}
+        className={cn(presentation.labelClassName, 'cursor-pointer font-medium leading-snug')}
       >
         {booleanField.label}
       </label>
@@ -289,7 +287,7 @@ function FilterBooleanField<TData, TState extends Record<string, unknown>>({
           {hiddenCount} hidden
         </Text>
       ) : null}
-    </div>
+    </FilterInlineControl>
   )
 }
 

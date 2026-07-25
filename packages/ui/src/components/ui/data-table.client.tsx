@@ -41,39 +41,7 @@ import {
   type SortingState,
   type VisibilityState,
 } from '@tanstack/react-table'
-import {
-  ArrowUpDown,
-  Check,
-  ChevronDown,
-  ChevronUp,
-  Columns3,
-  Ellipsis,
-  GripVertical,
-  Lock,
-  Pencil,
-  RotateCcw,
-  Search,
-  X,
-} from 'lucide-react'
-import {
-  DndContext,
-  KeyboardSensor,
-  PointerSensor,
-  closestCenter,
-  useSensor,
-  useSensors,
-  type DragEndEvent,
-} from '@dnd-kit/core'
-import {
-  SortableContext,
-  arrayMove,
-  sortableKeyboardCoordinates,
-  useSortable,
-  verticalListSortingStrategy,
-} from '@dnd-kit/sortable'
-import { restrictToVerticalAxis } from '@dnd-kit/modifiers'
-import { CSS } from '@dnd-kit/utilities'
-import * as PopoverPrimitive from '@radix-ui/react-popover'
+import { ArrowUpDown, Check, ChevronDown, ChevronUp, Ellipsis, Pencil, X } from 'lucide-react'
 
 import { cn } from '../../lib/utils'
 import { Button } from './button.client'
@@ -106,6 +74,10 @@ import {
   createPersistedColumnChangeState,
   resolveDataTableColumnOrder,
 } from './data-table-column-change.lib'
+import {
+  DataTableColumnsMenu,
+  type DataTableColumnsMenuItem,
+} from './data-table-columns-menu.client'
 import type {
   ColumnChangeState,
   DataTableColumnVisibilityTriggerProps,
@@ -118,19 +90,13 @@ import {
   dataTableBodyCellPaddingVariants,
   dataTableBodyCellVariants,
   dataTableCaptionVariants,
-  dataTableColumnDragHandleVariants,
-  dataTableColumnItemVariants,
-  dataTableColumnPanelVariants,
-  dataTableEmptyPanelVariants,
   dataTableEmptyStateVariants,
   dataTablePaginationVariants,
-  dataTableResetColumnVariants,
   dataTableRowVariants,
   dataTableSortIconVariants,
   dataTableHeaderCellVariants,
   dataTableHeaderRowVariants,
   dataTableImageVariants,
-  dataTableLockedColumnVariants,
   dataTableNameCellVariants,
   dataTableRootVariants,
   dataTableTableVariants,
@@ -138,6 +104,7 @@ import {
   dataTableToolbarVariants,
   dataTableUtilityStripVariants,
 } from './data-table.variants'
+import { arrayMove } from '@dnd-kit/sortable'
 
 // ---------------------------------------------------------------------------
 // Legacy column filter functions (column defs may still declare filterFn)
@@ -151,138 +118,65 @@ const equalsStringFilterFn: FilterFn<unknown> = (row, columnId, filterValue) =>
 equalsStringFilterFn.autoRemove = (val: unknown) => val == null || val === ''
 
 // ---------------------------------------------------------------------------
-// DataTableColumnPanel — DnD-sortable column visibility + order editor
+// DataTableColumnVisibilityTrigger — adapts TanStack table state to ColumnsMenu
 // ---------------------------------------------------------------------------
-
-interface ColumnPanelItemProps<TData> {
-  col: Column<TData>
-  colName: string
-}
-
-function ColumnPanelItem<TData>({ col, colName }: ColumnPanelItemProps<TData>) {
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
-    id: col.id,
-  })
-
-  const style: React.CSSProperties = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-    opacity: isDragging ? 0.5 : 1,
-    position: 'relative',
-    zIndex: isDragging ? 1 : 'auto',
-  }
-
-  const isVisible = col.getIsVisible()
-
-  return (
-    <div ref={setNodeRef} style={style}>
-      <div
-        className={dataTableColumnItemVariants()}
-        onClick={() => col.toggleVisibility()}
-        role="button"
-        tabIndex={0}
-        aria-pressed={isVisible}
-        aria-label={`${isVisible ? 'Hide' : 'Show'} ${colName} column`}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault()
-            col.toggleVisibility()
-          }
-        }}
-      >
-        {/* Drag handle — separate from the visibility click target */}
-        <button
-          type="button"
-          className={dataTableColumnDragHandleVariants()}
-          aria-label={`Drag to reorder ${colName}`}
-          onClick={(e) => e.stopPropagation()}
-          {...attributes}
-          {...listeners}
-        >
-          <GripVertical className="size-3.5" />
-        </button>
-
-        <span className="flex-1 select-none text-sm">{colName}</span>
-
-        {isVisible && <Check className="size-3.5 shrink-0 text-foreground" aria-hidden />}
-      </div>
-    </div>
-  )
-}
-
-/**
- * A non-interactive panel row for columns that are always visible (locked).
- * Shows a lock icon in place of the drag handle and a muted check to signal
- * the column is permanently on. No toggle, no drag.
- */
-function LockedColumnItem<TData>({ colName }: Pick<ColumnPanelItemProps<TData>, 'colName'>) {
-  return (
-    <div
-      className={dataTableLockedColumnVariants()}
-      aria-label={`${colName} column (always visible)`}
-    >
-      <span className="flex shrink-0 items-center justify-center rounded p-0.5">
-        <Lock className="size-3.5" aria-hidden />
-      </span>
-      <span className="flex-1 select-none">{colName}</span>
-      <Check className="size-3.5 shrink-0" aria-hidden />
-    </div>
-  )
-}
 
 interface DataTableColumnVisibilityPanelProps<TData> {
   table: ReturnType<typeof useReactTable<TData>>
   onColumnChange?: (state: ColumnChangeState) => void
 }
 
-const POINTER_SENSOR_ACTIVATION_DISTANCE_PX = 8
+function getColumnDisplayName<TData>(col: Column<TData>): string {
+  return (
+    col.columnDef.meta?.label ??
+    (typeof col.columnDef.header === 'string' ? col.columnDef.header : col.id)
+  )
+}
 
-function DataTableColumnVisibilityPanelContent<TData>({
+function buildColumnsMenuItems<TData>(
+  table: ReturnType<typeof useReactTable<TData>>,
+): DataTableColumnsMenuItem[] {
+  return table.getAllColumns().map((col) => ({
+    id: col.id,
+    label: getColumnDisplayName(col),
+    visible: col.getIsVisible(),
+    canHide: col.getCanHide(),
+    canReorder: col.getCanHide(),
+    lockedReason: col.columnDef.meta?.locked ? 'This column is always visible' : undefined,
+  }))
+}
+
+type DataTableColumnVisibilityTriggerInternalProps<TData> = DataTableColumnVisibilityTriggerProps &
+  DataTableColumnVisibilityPanelProps<TData>
+
+/** Column visibility popover trigger — icon-only or labeled outline button. */
+export function DataTableColumnVisibilityTrigger<TData>({
   table,
   onColumnChange,
-}: DataTableColumnVisibilityPanelProps<TData>) {
-  const [search, setSearch] = React.useState('')
-
-  const sensors = useSensors(
-    useSensor(PointerSensor, {
-      activationConstraint: { distance: POINTER_SENSOR_ACTIVATION_DISTANCE_PX },
-    }),
-    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
-  )
-
-  // Locked cols (meta.locked + enableHiding:false) appear in the panel but
-  // cannot be hidden or dragged. Regular hideable cols participate in DnD.
+  'aria-label': ariaLabel = 'Choose visible columns',
+  showLabel = false,
+}: DataTableColumnVisibilityTriggerInternalProps<TData>) {
+  const items = buildColumnsMenuItems(table)
   const allCols = table.getAllColumns()
-  const lockedCols = allCols.filter((col) => Boolean(col.columnDef.meta?.locked))
   const hideableCols = allCols.filter((col) => col.getCanHide())
 
-  function getColName(col: (typeof allCols)[number]): string {
-    return (
-      col.columnDef.meta?.label ??
-      (typeof col.columnDef.header === 'string' ? col.columnDef.header : col.id)
+  function handleVisibilityChange(id: string, visible: boolean) {
+    table.getColumn(id)?.toggleVisibility(visible)
+    onColumnChange?.(
+      createPersistedColumnChangeState(
+        table.getState().columnVisibility,
+        table.getState().columnOrder,
+      ),
     )
   }
 
-  const query = search.trim().toLowerCase()
-  const filteredLockedCols = query
-    ? lockedCols.filter((col) => getColName(col).toLowerCase().includes(query))
-    : lockedCols
-  const filteredHideableCols = query
-    ? hideableCols.filter((col) => getColName(col).toLowerCase().includes(query))
-    : hideableCols
-
-  function handleDragEnd(event: DragEndEvent) {
-    const { active, over } = event
-    if (!over || active.id === over.id) return
-
-    const oldIds = hideableCols.map((c) => c.id)
-    const oldIndex = oldIds.indexOf(String(active.id))
-    const newIndex = oldIds.indexOf(String(over.id))
+  function handleReorder(activeId: string, overId: string) {
+    const oldIds = hideableCols.map((col) => col.id)
+    const oldIndex = oldIds.indexOf(activeId)
+    const newIndex = oldIds.indexOf(overId)
     const newOrder = arrayMove(oldIds, oldIndex, newIndex)
 
-    // Build the full column order: select → locked/pinned → reordered → actions.
-    // Non-hideable covers select, locked cols (image, name), and actions.
-    const nonHideable = allCols.filter((c) => !c.getCanHide()).map((c) => c.id)
+    const nonHideable = allCols.filter((col) => !col.getCanHide()).map((col) => col.id)
     const fullOrder = [
       ...nonHideable.filter((id) => id === 'select'),
       ...nonHideable.filter((id) => id !== 'select' && id !== 'actions'),
@@ -305,104 +199,15 @@ function DataTableColumnVisibilityPanelContent<TData>({
     onColumnChange?.({ visibility: {}, order: [] })
   }
 
-  const colIds = filteredHideableCols.map((c) => c.id)
-
   return (
-    <>
-      {/* Search */}
-      <div className="flex items-center gap-2 border-b border-border px-3 py-2">
-        <Search className="size-3.5 shrink-0 text-muted-foreground" aria-hidden />
-        <input
-          type="search"
-          placeholder="Search columns..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground"
-          aria-label="Search columns"
-        />
-      </div>
-
-      {/* Column list: locked (non-interactive) + sortable (DnD) */}
-      <div className="max-h-[320px] overflow-y-auto">
-        {/* Locked columns — always visible, cannot be hidden or reordered */}
-        {filteredLockedCols.length > 0 && (
-          <div className="py-1">
-            {filteredLockedCols.map((col) => (
-              <LockedColumnItem key={col.id} colName={getColName(col)} />
-            ))}
-          </div>
-        )}
-        {filteredLockedCols.length > 0 && filteredHideableCols.length > 0 && (
-          <div className="border-t border-border" />
-        )}
-
-        {/* Sortable columns */}
-        <DndContext
-          sensors={sensors}
-          collisionDetection={closestCenter}
-          modifiers={[restrictToVerticalAxis]}
-          onDragEnd={handleDragEnd}
-        >
-          <SortableContext items={colIds} strategy={verticalListSortingStrategy}>
-            <div className="py-1">
-              {filteredHideableCols.length > 0 ? (
-                filteredHideableCols.map((col) => (
-                  <ColumnPanelItem key={col.id} col={col} colName={getColName(col)} />
-                ))
-              ) : filteredLockedCols.length === 0 ? (
-                <p className={dataTableEmptyPanelVariants()}>No columns found.</p>
-              ) : null}
-            </div>
-          </SortableContext>
-        </DndContext>
-      </div>
-
-      {/* Reset */}
-      <div className="border-t border-border px-1 py-1.5">
-        <button type="button" onClick={handleReset} className={dataTableResetColumnVariants()}>
-          <RotateCcw className="size-3.5" />
-          Reset Column Order
-        </button>
-      </div>
-    </>
-  )
-}
-
-type DataTableColumnVisibilityTriggerInternalProps<TData> = DataTableColumnVisibilityTriggerProps &
-  DataTableColumnVisibilityPanelProps<TData>
-
-/** Column visibility popover trigger — icon-only or labeled outline button. */
-export function DataTableColumnVisibilityTrigger<TData>({
-  table,
-  onColumnChange,
-  'aria-label': ariaLabel = 'Choose visible columns',
-  showLabel = false,
-}: DataTableColumnVisibilityTriggerInternalProps<TData>) {
-  const trigger = showLabel ? (
-    <Button variant="outline" size="sm" className="gap-1.5" aria-label={ariaLabel}>
-      <Columns3 className="size-3.5" aria-hidden />
-      Columns
-    </Button>
-  ) : (
-    <Button variant="ghost" size="sm" className="size-8 p-0" aria-label={ariaLabel} title="Columns">
-      <Columns3 className="size-4" aria-hidden />
-    </Button>
-  )
-
-  return (
-    <PopoverPrimitive.Root>
-      <PopoverPrimitive.Trigger asChild>{trigger}</PopoverPrimitive.Trigger>
-      <PopoverPrimitive.Portal>
-        <PopoverPrimitive.Content
-          align="end"
-          sideOffset={4}
-          className={dataTableColumnPanelVariants()}
-          onOpenAutoFocus={(e) => e.preventDefault()}
-        >
-          <DataTableColumnVisibilityPanelContent table={table} onColumnChange={onColumnChange} />
-        </PopoverPrimitive.Content>
-      </PopoverPrimitive.Portal>
-    </PopoverPrimitive.Root>
+    <DataTableColumnsMenu
+      items={items}
+      onVisibilityChange={handleVisibilityChange}
+      onReorder={handleReorder}
+      onReset={handleReset}
+      triggerVariant={showLabel ? 'labeled' : 'compact'}
+      labels={{ chooseColumns: ariaLabel }}
+    />
   )
 }
 

@@ -9,6 +9,7 @@ import {
 } from '@rpg/contracts'
 import {
   areColumnChangeStatesEqual,
+  DataTableFilterRegion,
   dataTableFilterNoticeVariants,
   dataTableRowUnavailableRailVariants,
   dataTableRowUnavailableVariants,
@@ -17,9 +18,11 @@ import {
   type DataTableUtilityControls,
 } from '@rpg/ui'
 import {
-  FilterAdvancedPanel,
+  countModifiedFilters,
+  createInitialFilterState,
   FilterBar,
   FilterChromeProvider,
+  FilterFieldList,
   applyFilterSchema,
   getEffectiveFilterValue,
   getSchemaFieldsByPlacement,
@@ -309,6 +312,10 @@ export function ContentOverviewTable<
     () => getSchemaFieldsByPlacement(filterSchema, 'advanced').length > 0,
     [filterSchema],
   )
+  const advancedFields = useMemo(
+    () => getSchemaFieldsByPlacement(filterSchema, 'advanced'),
+    [filterSchema],
+  )
   const { query, actions } = useContentOverviewQueryState<T, TFilters>({
     schema: filterSchema,
     allowedSortIds,
@@ -395,6 +402,15 @@ export function ContentOverviewTable<
     [actions],
   )
 
+  const advancedModifiedCount = countModifiedFilters(filterSchema, filterState, 'advanced')
+
+  const handleResetAdvancedFilters = useCallback(() => {
+    const defaults = createInitialFilterState(filterSchema)
+    for (const field of advancedFields) {
+      handleFilterValueChange(field.id, defaults[field.id])
+    }
+  }, [advancedFields, filterSchema, handleFilterValueChange])
+
   const restoreFocusAfterRowRemoved = useCallback(
     (removedRowId: string) => {
       const orderedIds = visibleRows.map((row) => row.id)
@@ -458,21 +474,32 @@ export function ContentOverviewTable<
   return (
     <div ref={tableRootRef} tabIndex={-1} className="flex flex-col gap-3 outline-none">
       <FilterChromeProvider>
-        <FilterBar
-          schema={filterSchema}
-          state={filterState}
-          onValueChange={handleFilterValueChange}
-          onReset={() => actions.resetFilters()}
-          advancedOpen={advancedOpen}
-          onAdvancedOpenChange={hasAdvancedFields ? handleAdvancedOpenChange : undefined}
-        />
-
-        <FilterAdvancedPanel
-          schema={filterSchema}
-          state={filterState}
-          onValueChange={handleFilterValueChange}
-          open={advancedOpen}
-          onClearAll={() => actions.resetFilters()}
+        <DataTableFilterRegion
+          primaryFilters={
+            <FilterBar
+              schema={filterSchema}
+              state={filterState}
+              onValueChange={handleFilterValueChange}
+              onReset={() => actions.resetFilters()}
+            />
+          }
+          additionalFilterFields={
+            hasAdvancedFields ? (
+              <FilterFieldList
+                schema={filterSchema}
+                fields={advancedFields}
+                state={filterState}
+                idPrefix="filters-advanced"
+                onValueChange={handleFilterValueChange}
+              />
+            ) : undefined
+          }
+          additionalFiltersOpen={advancedOpen}
+          onAdditionalFiltersOpenChange={
+            hasAdvancedFields ? handleAdvancedOpenChange : () => undefined
+          }
+          activeAdditionalFilterCount={advancedModifiedCount}
+          onResetAdditionalFilters={handleResetAdvancedFilters}
         />
       </FilterChromeProvider>
 

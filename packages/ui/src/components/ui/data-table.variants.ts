@@ -6,10 +6,8 @@ export const dataTableRootVariants = cva('flex flex-col gap-3 w-full')
 /** Toolbar row — primary filter strip + column toggle. */
 export const dataTableToolbarVariants = cva('flex flex-wrap items-center gap-2')
 
-/** Tinted utility strip rendered above table headers when `utilityStrip` is provided. */
-export const dataTableUtilityStripVariants = cva(
-  'flex min-h-10 items-center border-b border-border bg-surface-subtle px-3 shadow-[0_1px_2px_0_color-mix(in_oklab,var(--foreground)_6%,transparent)]',
-)
+/** Neutral slot wrapper above table headers — chrome owned by injected content (e.g. DataTableUtilityBar). */
+export const dataTableUtilityStripVariants = cva('w-full')
 
 /** Container for the group of inline filter controls on the left of the toolbar. */
 export const dataTableFilterGroupVariants = cva('flex flex-1 flex-wrap items-center gap-2')

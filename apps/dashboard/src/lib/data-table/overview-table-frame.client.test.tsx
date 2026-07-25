@@ -4,9 +4,10 @@
 import { render, screen } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 import { expectNoAxeViolations } from '@rpg/ui/test-utils'
-import type { ColumnDef } from '@rpg/ui'
 
 import { OverviewTableFrame } from './overview-table-frame.client'
+import { OverviewResultSummary } from './overview-result-summary.client'
+import type { ColumnDef } from '@rpg/ui'
 
 type Row = {
   id: string
@@ -44,13 +45,13 @@ describe('OverviewTableFrame', () => {
     await expectNoAxeViolations(container)
   })
 
-  it('renders summary and utility action slots', () => {
+  it('renders result summary and trailing action slots', () => {
     render(
       <OverviewTableFrame
         columns={COLUMNS}
         data={ROWS}
-        summary={<span>2 results</span>}
-        utilityActions={(controls) => (
+        resultSummary={<OverviewResultSummary resultCount={2} />}
+        trailingActions={(controls) => (
           <controls.ColumnVisibilityTrigger aria-label="Choose visible columns" showLabel={false} />
         )}
       />,

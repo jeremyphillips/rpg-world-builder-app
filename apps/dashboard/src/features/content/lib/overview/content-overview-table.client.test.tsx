@@ -135,7 +135,7 @@ describe('ContentOverviewTable interactions', () => {
 
     const callsAfterMount = persistPreferencesMock.mock.calls.length
 
-    await user.click(screen.getByRole('button', { name: /^Filters/ }))
+    await user.click(screen.getByRole('button', { name: /Show more filters|Hide more filters/ }))
 
     expect(persistPreferencesMock.mock.calls.length - callsAfterMount).toBeLessThanOrEqual(1)
   })
@@ -158,7 +158,7 @@ describe('ContentOverviewTable interactions', () => {
     await user.click(screen.getByRole('button', { name: /^Choose visible columns$/ }))
     const callsAfterOpen = persistPreferencesMock.mock.calls.length
 
-    await user.click(screen.getByRole('button', { name: /Hide Hit Die column/i }))
+    await user.click(screen.getByRole('checkbox', { name: /Hit Die/i }))
 
     expect(persistPreferencesMock.mock.calls.length - callsAfterOpen).toBeLessThanOrEqual(1)
   })
@@ -169,9 +169,9 @@ describe('ContentOverviewTable interactions', () => {
 
     const callsAfterMount = persistPreferencesMock.mock.calls.length
 
-    await user.click(screen.getByRole('button', { name: /^Filters/ }))
-    await user.click(screen.getByRole('button', { name: /^Filters/ }))
-    await user.click(screen.getByRole('button', { name: /^Filters/ }))
+    await user.click(screen.getByRole('button', { name: /Show more filters|Hide more filters/ }))
+    await user.click(screen.getByRole('button', { name: /Show more filters|Hide more filters/ }))
+    await user.click(screen.getByRole('button', { name: /Show more filters|Hide more filters/ }))
 
     expect(persistPreferencesMock.mock.calls.length - callsAfterMount).toBeLessThanOrEqual(3)
   })
@@ -204,9 +204,9 @@ describe('ContentOverviewTable interactions', () => {
 
     const rendersAfterMount = dataTableRenderCount
 
-    await user.click(screen.getByRole('button', { name: /^Filters/ }))
-    await user.click(screen.getByRole('button', { name: /^Filters/ }))
-    await user.click(screen.getByRole('button', { name: /^Filters/ }))
+    await user.click(screen.getByRole('button', { name: /Show more filters|Hide more filters/ }))
+    await user.click(screen.getByRole('button', { name: /Show more filters|Hide more filters/ }))
+    await user.click(screen.getByRole('button', { name: /Show more filters|Hide more filters/ }))
 
     expect(dataTableRenderCount - rendersAfterMount).toBe(0)
   })
