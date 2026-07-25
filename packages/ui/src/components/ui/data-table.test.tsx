@@ -201,6 +201,18 @@ describe('DataTable — row selection', () => {
     ).toBeInTheDocument()
   })
 
+  it('applies 12px right padding to the select column header and body cells', () => {
+    renderTable({ enableRowSelection: true })
+    const [headerRow, firstDataRow] = screen.getAllByRole('row')
+    const headerCheckbox = within(headerRow!).getByRole('checkbox', {
+      name: 'Select all rows on this page',
+    })
+    const rowCheckbox = within(firstDataRow!).getByRole('checkbox', { name: 'Select row' })
+
+    expect(headerCheckbox.closest('th')).toHaveClass('[&:has([role=checkbox])]:!pr-3')
+    expect(rowCheckbox.closest('td')).toHaveClass('[&:has([role=checkbox])]:!pr-3')
+  })
+
   it('renders per-row checkboxes when enableRowSelection is true', () => {
     renderTable({ enableRowSelection: true })
     expect(screen.getAllByRole('checkbox', { name: 'Select row' })).toHaveLength(DATA.length)
@@ -360,7 +372,7 @@ describe('DataTable — utilityStrip', () => {
     expect(cardShell).toContainElement(table)
 
     const stripParent = strip.parentElement
-    expect(stripParent).toHaveClass('bg-sunken')
+    expect(stripParent).toHaveClass('bg-surface-subtle')
     expect(stripParent?.nextElementSibling).toContainElement(table)
   })
 })
