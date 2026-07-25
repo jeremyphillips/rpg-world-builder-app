@@ -646,8 +646,8 @@ export interface RowActionsMenuProps {
   onToggleEnabled?: (enabled: boolean) => void
   /**
    * Label for the campaign toggle.
-   * Should be scoped to the context: "Active in campaign", not just "Enabled".
-   * Defaults to "Active in campaign".
+   * Pass a context-specific label (e.g. "Active in campaign") when the default
+   * is too generic for the surface.
    */
   enabledLabel?: string
   /**
@@ -684,7 +684,7 @@ export function RowActionsMenu({
   editLabel = 'Edit',
   enabled,
   onToggleEnabled,
-  enabledLabel = 'Active in campaign',
+  enabledLabel = 'Enabled',
   enabledTooltip = 'Hides this item from players in the current campaign. The item remains available globally.',
   itemLabel = 'item',
   footer,

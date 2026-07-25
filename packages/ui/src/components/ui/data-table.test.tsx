@@ -567,7 +567,7 @@ describe('RowActionsMenu', () => {
     await user.click(screen.getByRole('button', { name: /open actions/i }))
 
     expect(screen.queryByRole('menuitem', { name: /edit/i })).not.toBeInTheDocument()
-    expect(screen.getByRole('switch', { name: /active in campaign/i })).toBeInTheDocument()
+    expect(screen.getByRole('switch', { name: /enabled/i })).toBeInTheDocument()
   })
 
   it('shows Edit menu item and active toggle switch when opened', async () => {
@@ -580,7 +580,7 @@ describe('RowActionsMenu', () => {
     const editItem = screen.getByRole('menuitem', { name: /edit/i })
     expect(editItem).toBeInTheDocument()
     expect(editItem).toHaveAttribute('href', '/edit/1')
-    expect(screen.getByRole('switch', { name: /active in campaign/i })).toBeInTheDocument()
+    expect(screen.getByRole('switch', { name: /enabled/i })).toBeInTheDocument()
   })
 
   it('reflects the enabled prop on the switch', async () => {
@@ -589,7 +589,7 @@ describe('RowActionsMenu', () => {
 
     await user.click(screen.getByRole('button', { name: /open actions/i }))
 
-    expect(screen.getByRole('switch', { name: /active in campaign/i })).toHaveAttribute(
+    expect(screen.getByRole('switch', { name: /enabled/i })).toHaveAttribute(
       'data-state',
       'unchecked',
     )
@@ -601,7 +601,7 @@ describe('RowActionsMenu', () => {
     render(<RowActionsMenu editHref="/edit/1" enabled={true} onToggleEnabled={onToggle} />)
 
     await user.click(screen.getByRole('button', { name: /open actions/i }))
-    await user.click(screen.getByRole('switch', { name: /active in campaign/i }))
+    await user.click(screen.getByRole('switch', { name: /enabled/i }))
 
     expect(onToggle).toHaveBeenCalledWith(false)
   })
@@ -627,9 +627,9 @@ describe('RowActionsMenu', () => {
     render(<RowActionsMenu editHref="/edit/1" enabled={true} onToggleEnabled={vi.fn()} />)
 
     await user.click(screen.getByRole('button', { name: /open actions/i }))
-    await user.click(screen.getByRole('switch', { name: /active in campaign/i }))
+    await user.click(screen.getByRole('switch', { name: /enabled/i }))
 
-    expect(screen.getByRole('switch', { name: /active in campaign/i })).toBeInTheDocument()
+    expect(screen.getByRole('switch', { name: /enabled/i })).toBeInTheDocument()
   })
 
   it('renders a custom EditLink component when provided', async () => {

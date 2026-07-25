@@ -74,5 +74,7 @@ The ellipsis overflow menu keeps campaign availability toggle only — **Edit** 
 
 ## Related
 
+- Non-content catalog lists (`CatalogOverviewTable`, collection summary cells):
+  [catalog-overview-tables.md](./catalog-overview-tables.md)
 - Campaign access enforcement ADR: `apps/api/docs/campaign-access-enforcement.md`
 - Campaign access form UX: `lib/campaign-access/README.md`
