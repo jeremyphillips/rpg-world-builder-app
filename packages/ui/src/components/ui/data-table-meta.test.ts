@@ -58,6 +58,11 @@ describe('dataTableWidthMeta', () => {
   it('includes medium preset pinned at lg', () => {
     expect(dataTableWidthMeta('medium').cellClassName).toContain('lg:w-36')
   })
+
+  it('centers collection count columns', () => {
+    expect(dataTableWidthMeta('collectionCount').headerClassName).toContain('text-center')
+    expect(dataTableWidthMeta('collectionCount').cellClassName).toContain('lg:w-[5.5rem]')
+  })
 })
 
 describe('dataTableTypographyMeta', () => {

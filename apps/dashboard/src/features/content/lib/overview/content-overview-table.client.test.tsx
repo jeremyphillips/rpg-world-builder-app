@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import type { CharacterClass, WithCampaignAccess } from '@rpg/contracts'
+import type { ClassListItem, WithCampaignAccess } from '@rpg/contracts'
 import type { ColumnDef } from '@rpg/ui'
 import type { ComponentProps } from 'react'
 import { createMemoryRouter, RouterProvider } from 'react-router-dom'
@@ -58,11 +58,11 @@ vi.mock('./use-content-campaign-availability-toggle.client', () => ({
   })),
 }))
 
-type ClassRow = WithCampaignAccess<CharacterClass>
+type ClassRow = WithCampaignAccess<ClassListItem>
 
 const CAMPAIGN_ID = 'campaign-1'
 
-const columns = buildContentColumns<CharacterClass>(
+const columns = buildContentColumns<ClassListItem>(
   [
     {
       accessorKey: 'hitDie',
@@ -83,6 +83,7 @@ function createRows(count: number): ClassRow[] {
     source: 'system',
     status: 'published',
     primaryAbilities: ['str'],
+    subclasses: [],
     campaignAccess: {
       available: true,
       visibilityMode: 'player',

@@ -598,6 +598,11 @@ export {
   normalizeColumnOrderForPersist,
   normalizeColumnVisibilityForPersist,
 } from './components/ui/data-table-column-change.lib'
+export { CollectionSummaryCell } from './components/ui/collection-summary-cell.client'
+export type {
+  CollectionSummaryCellProps,
+  CollectionSummaryItem,
+} from './components/ui/collection-summary.types'
 export {
   BooleanCell,
   DataTable,

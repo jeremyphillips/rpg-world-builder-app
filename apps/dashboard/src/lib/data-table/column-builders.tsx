@@ -1,7 +1,14 @@
 import { Link } from 'react-router-dom'
 import type { ReactNode } from 'react'
-import type { BadgeAppearance, BadgeTone, ColumnDef, DataTableColumnWidth } from '@rpg/ui'
+import type {
+  BadgeAppearance,
+  BadgeTone,
+  CollectionSummaryItem,
+  ColumnDef,
+  DataTableColumnWidth,
+} from '@rpg/ui'
 import {
+  CollectionSummaryCell,
   dataTableColumnMeta,
   dataTableNameLinkCellVariants,
   dataTableWidthMeta,
@@ -107,5 +114,49 @@ export function buildSourceColumn<T, S extends string>({
     },
     enableSorting: false,
     meta: { ...dataTableColumnMeta.source, ...dataTableWidthMeta(width), label },
+  }
+}
+
+export type BuildCollectionCountColumnOptions<T> = {
+  id: string
+  label: string
+  getItems: (row: T) => CollectionSummaryItem[]
+  getCount: (row: T) => number
+  singularLabel: string
+  pluralLabel: string
+  sortItems?: boolean
+  maxVisibleItems?: number
+}
+
+/** Sortable collection count column with bounded tooltip summaries. */
+export function buildCollectionCountColumn<T>({
+  id,
+  label,
+  getItems,
+  getCount,
+  singularLabel,
+  pluralLabel,
+  sortItems,
+  maxVisibleItems,
+}: BuildCollectionCountColumnOptions<T>): ColumnDef<T> {
+  return {
+    id,
+    accessorFn: (row) => getCount(row),
+    header: ({ column }) => <SortableHeader column={column}>{label}</SortableHeader>,
+    cell: ({ row }) => (
+      <CollectionSummaryCell
+        items={getItems(row.original)}
+        singularLabel={singularLabel}
+        pluralLabel={pluralLabel}
+        sortItems={sortItems}
+        maxVisibleItems={maxVisibleItems}
+      />
+    ),
+    sortingFn: 'basic',
+    meta: {
+      label,
+      ...dataTableColumnMeta.data,
+      ...dataTableWidthMeta('collectionCount'),
+    },
   }
 }

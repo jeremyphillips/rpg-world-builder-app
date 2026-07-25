@@ -43,6 +43,9 @@ export const dataTableColumnWidths = {
   /** Badge/status columns — source, visibility, status. */
   badge: 'whitespace-nowrap lg:w-28 lg:max-w-28',
 
+  /** Collection count columns — compact centered `[ n ]` counters. */
+  collectionCount: 'whitespace-nowrap text-center lg:w-[5.5rem] lg:max-w-[5.5rem]',
+
   /** Actions/menu column — width only; pair with `dataTableWidthMeta('actions')` for sticky chrome. */
   actions: 'w-12 max-w-12 shrink-0',
 
@@ -79,7 +82,7 @@ export function dataTableWidthMeta(width: DataTableColumnWidth) {
       cellClassName: dataTableSelectCellVariants(),
     } as const
   }
-  if (width === 'compactCenter' || width === 'tinyCenter') {
+  if (width === 'collectionCount' || width === 'compactCenter' || width === 'tinyCenter') {
     return {
       headerClassName: className,
       cellClassName: `${className} ${dataTableCenteredBodyCellLayout}`,

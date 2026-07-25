@@ -1,23 +1,33 @@
-import type { CharacterClass, Spellcasting, WithCampaignAccess } from '@rpg/contracts'
+import type { ClassListItem, Spellcasting, WithCampaignAccess } from '@rpg/contracts'
 import { BooleanCell, dataTableTypographyMeta, dataTableWidthMeta, SortableHeader } from '@rpg/ui'
 import type { ColumnDef } from '@rpg/ui'
 import { createBooleanFilter, createEqualsFilter } from '@rpg/ui/filters'
 
 import { ROUTES } from '@/app/routes'
+import { buildCollectionCountColumn } from '@/lib/data-table/column-builders'
 import { buildContentColumns } from '../../lib/overview/content-table-config'
 import {
   buildContentFilterSchema,
   type ContentOverviewBaseFilterState,
 } from '../../lib/overview/content-overview-filter-schema'
+import {
+  resolveClassFeatureSummaryItems,
+  resolveSubclassSummaryItems,
+} from './class-overview-summary-items'
 
-type ClassRow = WithCampaignAccess<CharacterClass>
+type ClassRow = WithCampaignAccess<ClassListItem>
 
 export type ClassesOverviewFilterState = ContentOverviewBaseFilterState & {
   hitDie?: string
   spellcasting?: boolean
 }
 
-const CLASS_MIDDLE_COLUMNS: ColumnDef<CharacterClass>[] = [
+const CLASS_COLLECTION_LABELS = {
+  subclasses: { singular: 'subclass', plural: 'subclasses', column: 'Subclasses' },
+  features: { singular: 'feature', plural: 'features', column: 'Features' },
+} as const
+
+const CLASS_MIDDLE_COLUMNS: ColumnDef<ClassListItem>[] = [
   {
     accessorKey: 'hitDie',
     header: ({ column }) => <SortableHeader column={column}>Hit Die</SortableHeader>,
@@ -29,7 +39,7 @@ const CLASS_MIDDLE_COLUMNS: ColumnDef<CharacterClass>[] = [
     accessorKey: 'primaryAbilities',
     header: 'Primary Abilities',
     cell: ({ row }) =>
-      row.getValue<CharacterClass['primaryAbilities']>('primaryAbilities').join(', ').toUpperCase(),
+      row.getValue<ClassListItem['primaryAbilities']>('primaryAbilities').join(', ').toUpperCase(),
     enableSorting: false,
     meta: {
       label: 'Primary Abilities',
@@ -37,6 +47,22 @@ const CLASS_MIDDLE_COLUMNS: ColumnDef<CharacterClass>[] = [
       ...dataTableTypographyMeta('stat'),
     },
   },
+  buildCollectionCountColumn<ClassListItem>({
+    id: 'subclasses',
+    label: CLASS_COLLECTION_LABELS.subclasses.column,
+    getItems: resolveSubclassSummaryItems,
+    getCount: (row) => row.subclasses.length,
+    singularLabel: CLASS_COLLECTION_LABELS.subclasses.singular,
+    pluralLabel: CLASS_COLLECTION_LABELS.subclasses.plural,
+  }),
+  buildCollectionCountColumn<ClassListItem>({
+    id: 'features',
+    label: CLASS_COLLECTION_LABELS.features.column,
+    getItems: resolveClassFeatureSummaryItems,
+    getCount: (row) => row.features.length,
+    singularLabel: CLASS_COLLECTION_LABELS.features.singular,
+    pluralLabel: CLASS_COLLECTION_LABELS.features.plural,
+  }),
   {
     accessorKey: 'spellcasting',
     header: 'Spellcasting',
@@ -71,7 +97,7 @@ export const classFilterSchema = buildContentFilterSchema<ClassRow, ClassesOverv
 
 /** Class column definitions with the name cell linked to the class detail page. */
 export function classColumns(campaignId: string) {
-  return buildContentColumns<CharacterClass>(CLASS_MIDDLE_COLUMNS, {
+  return buildContentColumns<ClassListItem>(CLASS_MIDDLE_COLUMNS, {
     nameHref: (row) => ROUTES.content.classes.detail(campaignId, row.id),
   })
 }

@@ -2,41 +2,36 @@ import type { Species, WithCampaignAccess } from '@rpg/contracts'
 import { formatMovementDisplay, getCreatureSizeLabel } from '@rpg/contracts'
 import { dataTableWidthMeta, SortableHeader } from '@rpg/ui'
 import type { ColumnDef } from '@rpg/ui'
-import { createEqualsFilter } from '@rpg/ui/filters'
 
 import { ROUTES } from '@/app/routes'
-import type { CreatureTypeVocabulary } from '@/features/homebrew'
-import {
-  buildActiveCreatureTypeFieldOptions,
-  getCreatureTypeLabel as getVocabularyCreatureTypeLabel,
-} from '@/features/homebrew'
+import { buildCollectionCountColumn } from '@/lib/data-table/column-builders'
 
 import { buildContentColumns } from '../../lib/overview/content-table-config'
 import {
   buildContentFilterSchema,
   type ContentOverviewBaseFilterState,
 } from '../../lib/overview/content-overview-filter-schema'
-import { getCreatureTypeLabel } from './creature-type-field-options'
-import { SPECIES_STAT_LABELS } from './species-display'
+import { SPECIES_SECTION_LABELS } from './species-display'
+import { resolveSpeciesTraitSummaryItems } from './species-overview-summary-items'
 
 type SpeciesRow = WithCampaignAccess<Species>
 
-export type SpeciesOverviewFilterState = ContentOverviewBaseFilterState & {
-  creatureType?: string
-}
+export type SpeciesOverviewFilterState = ContentOverviewBaseFilterState
 
-function speciesMiddleColumns(vocabulary?: CreatureTypeVocabulary): ColumnDef<Species>[] {
+const SPECIES_COLLECTION_LABELS = {
+  traits: { singular: 'trait', plural: 'traits', column: SPECIES_SECTION_LABELS.traits },
+} as const
+
+function speciesMiddleColumns(): ColumnDef<Species>[] {
   return [
-    {
-      accessorKey: 'creatureType',
-      header: ({ column }) => <SortableHeader column={column}>Type</SortableHeader>,
-      cell: ({ row }) =>
-        vocabulary
-          ? getVocabularyCreatureTypeLabel(vocabulary, row.getValue<string>('creatureType'))
-          : getCreatureTypeLabel(row.getValue<string>('creatureType')),
-      filterFn: 'equalsString',
-      meta: { label: 'Type', ...dataTableWidthMeta('medium') },
-    },
+    buildCollectionCountColumn<Species>({
+      id: 'traits',
+      label: SPECIES_COLLECTION_LABELS.traits.column,
+      getItems: resolveSpeciesTraitSummaryItems,
+      getCount: (row) => row.traits.length,
+      singularLabel: SPECIES_COLLECTION_LABELS.traits.singular,
+      pluralLabel: SPECIES_COLLECTION_LABELS.traits.plural,
+    }),
     {
       id: 'sizes',
       accessorFn: (row) => row.sizes.map(getCreatureSizeLabel).join(' / '),
@@ -54,28 +49,17 @@ function speciesMiddleColumns(vocabulary?: CreatureTypeVocabulary): ColumnDef<Sp
   ]
 }
 
-function buildSpeciesFilterSchema(vocabulary?: CreatureTypeVocabulary) {
-  const options = vocabulary
-    ? buildActiveCreatureTypeFieldOptions(vocabulary)
-    : [{ label: 'Humanoid', value: 'humanoid' }]
-
-  return buildContentFilterSchema<SpeciesRow, SpeciesOverviewFilterState>([
-    createEqualsFilter<SpeciesRow, SpeciesOverviewFilterState, 'creatureType', string>({
-      id: 'creatureType',
-      label: SPECIES_STAT_LABELS.creatureType,
-      options,
-      getValue: (row) => row.creatureType,
-    }),
-  ])
-}
+const emptySpeciesFilterSchema = buildContentFilterSchema<SpeciesRow, SpeciesOverviewFilterState>(
+  [],
+)
 
 /** Species column definitions with the name cell linked to the species detail page. */
-export function speciesColumns(campaignId: string, vocabulary?: CreatureTypeVocabulary) {
-  return buildContentColumns<Species>(speciesMiddleColumns(vocabulary), {
+export function speciesColumns(campaignId: string) {
+  return buildContentColumns<Species>(speciesMiddleColumns(), {
     nameHref: (row) => ROUTES.content.species.detail(campaignId, row.id),
   })
 }
 
-export function speciesFilterSchema(vocabulary?: CreatureTypeVocabulary) {
-  return buildSpeciesFilterSchema(vocabulary)
+export function speciesFilterSchema() {
+  return emptySpeciesFilterSchema
 }

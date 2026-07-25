@@ -34,6 +34,27 @@ describe('content list routes', () => {
       visibilityMode: 'all_players',
       effectiveAudience: 'all_players',
     })
+    expect(Array.isArray(res.body.classes[0].subclasses)).toBe(true)
+  })
+
+  it('includes subclass summaries on fighter list rows', async () => {
+    const { agent, csrfToken } = await registerAndLogin()
+    const campaignId = await createTestCampaign(agent, csrfToken)
+
+    const res = await agent
+      .get(`/api/campaigns/${campaignId}/content/classes`)
+      .set(CSRF_HEADER, csrfToken)
+      .expect(200)
+
+    const fighter = res.body.classes.find(
+      (characterClass: { slug: string }) => characterClass.slug === 'fighter',
+    )
+    expect(fighter).toBeDefined()
+    expect(fighter.subclasses.length).toBeGreaterThan(0)
+    expect(fighter.subclasses[0]).toMatchObject({
+      id: expect.any(String),
+      name: expect.any(String),
+    })
   })
 
   it('returns resolved spells with the registry response key', async () => {

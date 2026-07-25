@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
-import type { CharacterClass } from '@rpg/contracts'
+import type { ClassListItem } from '@rpg/contracts'
 
 import { ROUTES } from '@/app/routes'
 
@@ -22,7 +22,7 @@ import { SkillDetailContent } from './skill-proficiency-detail'
 const useClasses = vi.mocked(useClassesFn)
 
 function mockClassesQuery(
-  overrides: Partial<ReturnType<typeof useClassesFn>> & { data?: CharacterClass[] },
+  overrides: Partial<ReturnType<typeof useClassesFn>> & { data?: ClassListItem[] },
 ) {
   useClasses.mockReturnValue({
     data: overrides.data ?? [],
@@ -103,11 +103,12 @@ describe('SkillDetailContent class skill choices', () => {
   })
 
   it('links homebrew classes by catalog id', () => {
-    const homebrewFighter: CharacterClass = {
+    const homebrewFighter: ClassListItem = {
       ...FIGHTER,
       id: 'abc123',
       slug: 'custom-fighter',
       name: 'My Fighter',
+      subclasses: [],
     }
     mockClassesQuery({ data: [homebrewFighter] })
 
