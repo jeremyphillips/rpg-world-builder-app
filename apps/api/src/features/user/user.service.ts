@@ -52,6 +52,12 @@ export async function createUser(input: CreateUserInput): Promise<User> {
   return toUser(doc.toObject() as UserRecord)
 }
 
+export async function findUserByEmail(email: string): Promise<User | null> {
+  const doc = await UserModel.findOne({ email: email.toLowerCase() }).lean<UserRecord | null>()
+  if (!doc) return null
+  return toUser(doc)
+}
+
 export async function findUserByEmailWithSecret(email: string): Promise<UserWithSecret | null> {
   const doc = await UserModel.findOne({ email: email.toLowerCase() }).lean<UserRecord | null>()
   if (!doc) return null

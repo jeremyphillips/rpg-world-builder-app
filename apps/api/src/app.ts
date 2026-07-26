@@ -14,6 +14,10 @@ import { rulesetPatchRouter, vocabularyRouter } from './features/vocabulary'
 import { rulesetRouter } from './features/ruleset'
 import { uploadsRouter, ensureUploadDir } from './features/uploads'
 import { characterImportRouter } from './features/character-import'
+import {
+  campaignInviteCampaignRouter,
+  campaignInvitePublicRouter,
+} from './features/campaign-invite'
 import { userRouter } from './features/user'
 
 /**
@@ -42,7 +46,9 @@ export function createApp(): Express {
   })
   api.use('/auth', authRouter)
   api.use('/campaigns', campaignRouter)
+  api.use('/campaigns/:campaignId/invites', campaignInviteCampaignRouter)
   api.use('/campaigns/:campaignId/npcs', campaignNpcRouter)
+  api.use('/campaign-invites', campaignInvitePublicRouter)
   api.use('/characters', characterRouter)
   api.use('/rulesets', rulesetRouter)
   api.use('/campaigns/:campaignId/content', contentRouter)
