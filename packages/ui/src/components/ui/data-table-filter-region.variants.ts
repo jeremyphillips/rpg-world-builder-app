@@ -3,7 +3,7 @@ import { cva } from 'class-variance-authority'
 /** Filter region layout — primary panel row and optional additional panel row. */
 export const dataTableFilterRegionVariants = cva('grid w-full gap-y-3')
 
-/** Primary filter panel shell — faint background wrapping fields and optional trigger. */
+/** Primary filter panel shell — subtle background wrapping fields and optional trigger. */
 export const dataTableFilterRegionPrimaryVariants = cva(
   'min-w-0 rounded-md border border-border bg-surface-subtle p-3',
 )

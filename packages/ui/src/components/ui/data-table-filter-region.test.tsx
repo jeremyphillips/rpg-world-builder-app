@@ -22,6 +22,33 @@ describe('DataTableFilterRegion', () => {
     expect(screen.queryByRole('button', { name: /more filters/i })).not.toBeInTheDocument()
   })
 
+  it('scopes field-control fills on primary and additional panel shells', () => {
+    const { container } = render(
+      <DataTableFilterRegion
+        primaryFilters={<input aria-label="Search" data-testid="primary-field" />}
+        additionalFilterFields={<input aria-label="Advanced field" data-testid="advanced-field" />}
+        additionalFiltersOpen
+        onAdditionalFiltersOpenChange={() => undefined}
+      />,
+    )
+
+    const primaryPanel = screen.getByTestId('primary-field').closest('.bg-surface-subtle')
+    expect(primaryPanel).toBeTruthy()
+
+    const advancedField = screen.getByTestId('advanced-field')
+    const advancedPanel = advancedField.closest('.bg-surface-muted')
+    expect(advancedPanel).toHaveClass('[--field-control-bg:var(--field-control-bg-on-muted)]')
+
+    expect(container.querySelector('.contents')).toBeNull()
+    expect(screen.getByRole('button', { name: /more filters/i })).toHaveAttribute(
+      'aria-expanded',
+      'true',
+    )
+    expect(screen.getByRole('button', { name: /more filters/i })).toHaveClass(
+      'aria-expanded:border-border',
+    )
+  })
+
   it('toggles the additional filters panel', async () => {
     const user = userEvent.setup()
 
@@ -42,6 +69,7 @@ describe('DataTableFilterRegion', () => {
 
     await user.click(screen.getByRole('button', { name: /Show more filters, 2 active/i }))
     expect(screen.getByText('Additional filters')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Collapse' })).toHaveClass('h-6')
   })
 
   it('has no axe accessibility violations', async () => {

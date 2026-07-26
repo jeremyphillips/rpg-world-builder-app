@@ -11,6 +11,7 @@
   --popover-foreground: var(--foreground);
   --secondary: var(--palette-surface-secondary);
   --secondary-foreground: var(--foreground);
+  --surface-faint: var(--palette-surface-faint);
   --surface-subtle: var(--palette-surface-subtle);
   --surface-muted: var(--palette-surface-muted);
   --surface-strong: var(--palette-surface-strong);
@@ -62,6 +63,8 @@
    * Public utilities: `border-input`, `bg-input`, and state variants in globals.css.
    */
   --field-control-bg: var(--palette-field-bg);
+  --field-control-bg-default: var(--palette-field-bg);
+  --field-control-bg-on-muted: var(--surface-subtle);
   --field-control-fg: var(--foreground);
   --field-control-border: var(--palette-field-border);
   --field-control-placeholder: var(--palette-field-placeholder);
@@ -122,9 +125,10 @@
   --choice-control-border: color-mix(in oklch, var(--foreground) 32%, var(--card));
 
   /*
-   * Outline button — full ink border, neutral hover wash (not accent fill).
+   * Outline control — quiet border ladder stroke, transparent fill, neutral hover wash.
    */
-  --outline-button-border: var(--foreground);
+  --outline-control-border: var(--border-subtle);
+  --outline-button-border: var(--outline-control-border);
   --outline-button-hover-bg: var(--surface-subtle);
   --outline-button-active-bg: var(--surface-muted);
 

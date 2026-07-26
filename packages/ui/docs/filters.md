@@ -399,7 +399,7 @@ Import from `@rpg/ui/filters`:
 - `useFilterState` — local filter state with `setValue` and `reset` (clear filters)
 - `FilterBar` — `placement: 'primary'` fields and optional **Clear filters** (advanced toggle owned by `DataTableFilterRegion`)
 - `FilterAdvancedPanel` — configurable header for `placement: 'advanced'` fields; overview shells pass field content only — `DataTableFilterRegion` owns trigger, panel id, reset, and collapse
-- `FilterInlineControl` — shared inline boolean shell (checkbox/switch) matching adjacent control height and focus ring
+- `FilterInlineControl` — shared inline boolean shell (checkbox/switch) using outline row chrome to match adjacent selects and More filters
 - `DataTableFilterRegion` — primary field row, full-height **More filters** trigger rail, and region-owned additional-filters panel
 
 Select fields use an internal `__all__` sentinel for “show all”; it never leaves the renderer.

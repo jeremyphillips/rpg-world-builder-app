@@ -37,6 +37,11 @@
   );
 
   /* Derived wash ladder */
+  --palette-surface-faint: color-mix(
+    in oklch,
+    var(--palette-neutral-contrast) 2%,
+    var(--palette-surface-base)
+  );
   --palette-surface-subtle: color-mix(
     in oklch,
     var(--palette-neutral-contrast) 4%,

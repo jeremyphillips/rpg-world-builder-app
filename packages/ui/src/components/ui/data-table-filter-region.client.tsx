@@ -13,7 +13,6 @@ import { resolveFilterControlSize } from '../../filters/filter-presentation.lib'
 import {
   dataTableFilterRegionLabelSpacerVariants,
   dataTableFilterRegionPanelRowVariants,
-  dataTableFilterRegionPrimaryFieldsVariants,
   dataTableFilterRegionPrimaryInnerVariants,
   dataTableFilterRegionPrimaryVariants,
   dataTableFilterRegionRailStackVariants,
@@ -25,7 +24,6 @@ import {
 export type DataTableFilterRegionLabels = {
   moreFilters?: string
   additionalFilters?: string
-  description?: string
   reset?: string
   collapse?: string
 }
@@ -33,7 +31,6 @@ export type DataTableFilterRegionLabels = {
 const DEFAULT_LABELS: Required<DataTableFilterRegionLabels> = {
   moreFilters: 'More filters',
   additionalFilters: 'Additional filters',
-  description: 'Refine results with optional filters.',
   reset: 'Reset',
   collapse: 'Collapse',
 }
@@ -92,7 +89,7 @@ export function DataTableFilterRegion({
             hasTrigger: hasAdditionalFilters,
           })}
         >
-          <div className={dataTableFilterRegionPrimaryFieldsVariants()}>{primaryFilters}</div>
+          {primaryFilters}
           {hasAdditionalFilters ? (
             <div className={dataTableFilterRegionTriggerWrapVariants()}>
               <div className={dataTableFilterRegionRailStackVariants({ density })}>
@@ -142,7 +139,6 @@ export function DataTableFilterRegion({
             headerVariant="eyebrow"
             heading={labels.additionalFilters}
             headingElement={panelHeadingElement}
-            description={labels.description}
             resetLabel={labels.reset}
             collapseLabel={labels.collapse}
             onReset={onResetAdditionalFilters}

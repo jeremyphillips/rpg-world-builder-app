@@ -6,20 +6,20 @@ export const FILTER_SELECT_ALL_VALUE = '__all__'
 
 export const FILTER_DENSITY_DEFAULT: FilterDensity = 'compact'
 
-/** Primary filter bar row — control-edge alignment with trailing actions. */
-export const filterBarVariants = cva('flex flex-wrap items-end gap-3')
+/** Primary filter bar row — single flex row; `min-w-0 w-full` for grid column shrink. */
+export const filterBarVariants = cva('flex min-w-0 w-full flex-wrap items-end gap-3')
 
-/** Group of primary filter controls — control-edge baseline. */
-export const filterBarFieldGroupVariants = cva('flex flex-1 flex-wrap items-end gap-3')
+/** @deprecated Merged into {@link filterBarVariants} — kept for callers that still reference it. */
+export const filterBarFieldGroupVariants = cva('contents')
 
 /** Single filter control width constraints. */
 export const filterBarControlVariants = cva('', {
   variants: {
     type: {
-      text: 'min-w-0 flex-[1_1_14rem] max-w-[20rem]',
+      text: 'min-w-0 flex-[0_1_14rem] max-w-[20rem]',
       select: 'min-w-0 flex-[0_1_10rem] max-w-[10rem]',
       selectLong: 'min-w-0 flex-[0_1_14rem] max-w-[14rem]',
-      boolean: 'inline-flex w-auto min-w-0 max-w-[14rem] items-center',
+      boolean: 'inline-flex w-auto min-w-0 max-w-[14rem] shrink-0 items-center',
       inlineSelect: 'min-w-0 flex-[0_1_10rem] max-w-[10rem]',
       chips: '',
       popover: '',
@@ -62,22 +62,19 @@ export const filterStackedFieldGroupVariants = cva('flex flex-col', {
 
 /** Collapsible advanced-filters panel shell. */
 export const filterAdvancedPanelVariants = cva(
-  'overflow-hidden rounded-md border border-border bg-surface-subtle',
+  'overflow-hidden rounded-md border border-border bg-surface-muted [--field-control-bg:var(--field-control-bg-on-muted)]',
 )
 
 /** Optional eyebrow header row inside the advanced panel. */
-export const filterAdvancedPanelHeaderVariants = cva(
-  'flex items-start justify-between gap-3 border-b border-border',
-  {
-    variants: {
-      density: {
-        compact: 'px-4 py-3',
-        comfortable: 'px-5 py-4',
-      },
+export const filterAdvancedPanelHeaderVariants = cva('flex items-start justify-between gap-3', {
+  variants: {
+    density: {
+      compact: 'px-4 pt-3 pb-0',
+      comfortable: 'px-5 pt-4 pb-0',
     },
-    defaultVariants: { density: FILTER_DENSITY_DEFAULT },
   },
-)
+  defaultVariants: { density: FILTER_DENSITY_DEFAULT },
+})
 
 /** Inline row for advanced filter controls. */
 export const filterAdvancedPanelInnerVariants = cva('flex flex-wrap items-end', {

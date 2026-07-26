@@ -63,6 +63,7 @@
   --color-secondary-foreground: var(--secondary-foreground);
   --color-muted: var(--muted);
   --color-sunken: var(--sunken);
+  --color-surface-faint: var(--surface-faint);
   --color-surface-subtle: var(--surface-subtle);
   --color-surface-muted: var(--surface-muted);
   --color-surface-strong: var(--surface-strong);
@@ -131,6 +132,7 @@
   --color-drop-target: var(--drop-target-bg);
   --color-drop-target-border: var(--drop-target-border);
   --color-segmented-track: var(--segmented-track-bg);
+  --color-outline-control-border: var(--outline-control-border);
   --color-outline-button-border: var(--outline-button-border);
   --color-outline-button-hover: var(--outline-button-hover-bg);
   --color-outline-button-active: var(--outline-button-active-bg);

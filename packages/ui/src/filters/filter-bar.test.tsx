@@ -210,4 +210,26 @@ describe('FilterBar', () => {
     expect(screen.getByLabelText('Search')).toBeInTheDocument()
     expect(screen.getByLabelText('Has Spellcasting')).toBeInTheDocument()
   })
+
+  it('uses outline chrome on boolean shells to match row select and action controls', () => {
+    render(
+      <DataTableFilterRegion
+        primaryFilters={
+          <FilterBar schema={mixedPrimarySchema} state={{}} onValueChange={() => undefined} />
+        }
+        additionalFilterFields={<input aria-label="Advanced field" />}
+        additionalFiltersOpen={false}
+        onAdditionalFiltersOpenChange={() => undefined}
+      />,
+    )
+
+    const combobox = screen.getByRole('combobox', { name: 'Hit Die' })
+    const checkbox = screen.getByLabelText('Has Spellcasting')
+    const checkboxShell = checkbox.closest('[data-field-align]')
+
+    expect(combobox).toHaveClass('bg-input')
+    expect(checkboxShell).toBeTruthy()
+    expect(checkboxShell).toHaveClass('bg-transparent', 'border-outline-button-border')
+    expect(checkboxShell).not.toHaveClass('bg-input')
+  })
 })

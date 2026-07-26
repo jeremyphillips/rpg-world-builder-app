@@ -102,4 +102,15 @@ describe('token contrast smoke checks', () => {
       expect(raw).toContain('var(--palette-surface-base)')
     }
   })
+
+  it('aliases on-muted field fill to surface-subtle in both semantic themes', () => {
+    const semanticLight = readFileSync(join(tokensDir, 'semantic-light.css'), 'utf8')
+    const semanticDark = readFileSync(join(tokensDir, 'semantic-dark.css'), 'utf8')
+
+    for (const css of [semanticLight, semanticDark]) {
+      expect(readPaletteVar(css, '--field-control-bg-on-muted')).toBe('var(--surface-subtle)')
+      expect(readPaletteVar(css, '--field-control-bg-default')).toBe('var(--palette-field-bg)')
+      expect(readPaletteVar(css, '--outline-control-border')).toBe('var(--border-subtle)')
+    }
+  })
 })

@@ -51,7 +51,8 @@ Recipes are the public contract; ladder steps are implementation details recipes
 | ----------- | ----------------------- | ------------------------------------------------------------------- |
 | Base        | `bg-background`         | Page canvas                                                         |
 | Panel       | `bg-card`, `bg-popover` | Warm elevated panels / overlays                                     |
-| Subtle wash | `bg-surface-subtle`     | Barely visible grouping                                             |
+| Subtle wash | `bg-surface-subtle`     | Barely visible grouping; primary filter chrome, utility bar         |
+| Faint wash  | `bg-surface-faint`      | Lightest panel wash                                                 |
 | Muted wash  | `bg-surface-muted`      | Standard secondary panel / chrome                                   |
 | Strong wash | `bg-surface-strong`     | Dense neutral chrome (not brand/selected meaning)                   |
 | Sunken      | `bg-sunken`             | Recessed / inset fill — pair with `shadow-surface-sunken` for wells |
@@ -83,19 +84,21 @@ Status borders stay status-specific (`border-destructive-muted`, …). Recipe bo
 Shared recipes (Layer 2 → Tailwind). Tinted washes mix toward `--background` (or another
 concrete surface), not `transparent`:
 
-| CSS role                     | Utility                           | Composition (light/dark)         |
-| ---------------------------- | --------------------------------- | -------------------------------- |
-| `--control-hover-bg`         | `bg-control-hover`                | `color-mix(accent → background)` |
-| `--control-selected-bg`      | `bg-control-selected`             | `color-mix(accent → background)` |
-| `--row-hover-bg`             | `hover:bg-row-hover`              | `--surface-subtle`               |
-| `--row-selected-bg`          | `bg-row-selected`                 | `--surface-strong`               |
-| `--row-selected-border`      | `border-row-selected-border`      | `--border-strong`                |
-| `--drop-target-bg`           | `bg-drop-target`                  | `color-mix(accent → background)` |
-| `--drop-target-border`       | `border-drop-target-border`       | `--primary`                      |
-| `--segmented-track-bg`       | `bg-segmented-track`              | `--surface-strong`               |
-| `--outline-button-border`    | `border-outline-button-border`    | `--foreground`                   |
-| `--outline-button-hover-bg`  | `hover:bg-outline-button-hover`   | `--surface-subtle`               |
-| `--outline-button-active-bg` | `active:bg-outline-button-active` | `--surface-muted`                |
+| CSS role                      | Utility                           | Composition (light/dark)                           |
+| ----------------------------- | --------------------------------- | -------------------------------------------------- |
+| `--control-hover-bg`          | `bg-control-hover`                | `color-mix(accent → background)`                   |
+| `--control-selected-bg`       | `bg-control-selected`             | `color-mix(accent → background)`                   |
+| `--row-hover-bg`              | `hover:bg-row-hover`              | `--surface-subtle`                                 |
+| `--row-selected-bg`           | `bg-row-selected`                 | `--surface-strong`                                 |
+| `--row-selected-border`       | `border-row-selected-border`      | `--border-strong`                                  |
+| `--drop-target-bg`            | `bg-drop-target`                  | `color-mix(accent → background)`                   |
+| `--drop-target-border`        | `border-drop-target-border`       | `--primary`                                        |
+| `--segmented-track-bg`        | `bg-segmented-track`              | `--surface-strong`                                 |
+| `--outline-button-border`     | `border-outline-button-border`    | `--border-subtle` (via `--outline-control-border`) |
+| `--outline-button-hover-bg`   | `hover:bg-outline-button-hover`   | `--surface-subtle`                                 |
+| `--outline-button-active-bg`  | `active:bg-outline-button-active` | `--surface-muted`                                  |
+| `--field-control-bg-default`  | inherited default field fill      | `--palette-field-bg`                               |
+| `--field-control-bg-on-muted` | fill on `bg-surface-muted` panels | `--surface-subtle` (one-step lift)                 |
 
 Add a new recipe only when the state is reused, owned by a shared primitive, or must stay
 independently tunable across light/dark. One-offs stay in local CVA using the ladder or status
@@ -131,7 +134,9 @@ Do not merge text-tuned values onto solid status hues.
 - **Global fill:** `--field-control-bg` → `--palette-surface-field` everywhere. No
   parent-scoped re-scoping in `globals.css` under `.bg-card` / `.bg-surface-*`.
 - **Rare overrides:** set `--field-control-bg` locally in the component that creates an
-  unusual shell context.
+  unusual shell context — e.g. `resolveFieldControlSurfaceClasses('default' | 'onMuted')`
+  on a region wrapper (`field-control-surface.variants.ts`). Do not add globals.css parent
+  cascade rules under `.bg-surface-*`.
 - **Single recipe owner:** [`field-input-chrome.variants.ts`](../src/components/ui/field-input-chrome.variants.ts).
 - Individual controls import that recipe; do not reconstruct field chrome with ad-hoc opacity stacks.
 
@@ -147,6 +152,7 @@ Review in Storybook (both modes) without pixel-matching:
 
 - Page → panel → field
 - Page → subtle wash → field
+- Muted panel → field with `--field-control-bg-on-muted` wrapper
 - Panel → read-only field
 - Panel → disabled field (disabled quieter than readonly and default)
 - Muted text on page and on panel

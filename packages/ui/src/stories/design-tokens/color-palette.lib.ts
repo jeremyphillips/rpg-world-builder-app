@@ -215,6 +215,12 @@ export const COLOR_TOKEN_GROUPS: ColorTokenGroup[] = [
         foregroundTailwind: 'text-muted-foreground',
       },
       {
+        name: 'surface-faint',
+        cssVar: '--surface-faint',
+        tailwind: 'bg-surface-faint',
+        usage: 'background',
+      },
+      {
         name: 'surface-subtle',
         cssVar: '--surface-subtle',
         tailwind: 'bg-surface-subtle',

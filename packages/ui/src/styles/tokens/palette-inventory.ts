@@ -7,6 +7,7 @@ export const PALETTE_WARMTH_STEPS = ['neutral-hue', 'neutral-contrast'] as const
 
 export const PALETTE_SURFACE_ELEVATION_STEPS = [
   'surface-base',
+  'surface-faint',
   'surface-subtle',
   'surface-muted',
   'surface-strong',
@@ -188,6 +189,7 @@ export const PALETTE_PRIMITIVE_GROUPS: PalettePrimitiveGroup[] = [
 /** Elevation ladder order for Storybook stacked previews (base → panel). */
 export const PALETTE_ELEVATION_LADDER: readonly string[] = [
   'surface-base',
+  'surface-faint',
   'surface-subtle',
   'surface-muted',
   'surface-strong',
@@ -198,6 +200,8 @@ export const PALETTE_ELEVATION_LADDER: readonly string[] = [
 /** Required Layer 2 field-control role names (both themes). */
 export const FIELD_CONTROL_SEMANTIC_ROLES = [
   '--field-control-bg',
+  '--field-control-bg-default',
+  '--field-control-bg-on-muted',
   '--field-control-fg',
   '--field-control-border',
   '--field-control-placeholder',
@@ -222,6 +226,7 @@ export const CHOICE_CONTROL_SEMANTIC_ROLES = ['--choice-control-border'] as cons
 
 /** Layer 2 outline button recipe roles composed in semantic-*.css. */
 export const OUTLINE_BUTTON_SEMANTIC_ROLES = [
+  '--outline-control-border',
   '--outline-button-border',
   '--outline-button-hover-bg',
   '--outline-button-active-bg',

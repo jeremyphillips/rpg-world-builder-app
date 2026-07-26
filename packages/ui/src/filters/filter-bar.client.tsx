@@ -7,11 +7,7 @@ import { cn } from '../lib/utils'
 import { Button } from '../components/ui/button.client'
 import { countModifiedFilters } from './filter-engine'
 import { getSchemaFieldsByPlacement } from './filter-bar.lib'
-import {
-  filterBarFieldGroupVariants,
-  filterBarResetButtonClasses,
-  filterBarVariants,
-} from './filter-bar.variants'
+import { filterBarResetButtonClasses, filterBarVariants } from './filter-bar.variants'
 import { FilterChromeProvider, useOptionalFilterChrome } from './filter-chrome.context'
 import { FilterFieldList } from './filter-fields.client'
 import type { FilterFieldId, FilterSchema } from './filter-schema.types'
@@ -46,8 +42,8 @@ export function FilterBar<TData, TState extends Record<string, unknown>>({
   const primaryFields = getSchemaFieldsByPlacement(schema, 'primary')
   const modifiedCount = countModifiedFilters(schema, state)
 
-  const primaryFilters = (
-    <div className={filterBarFieldGroupVariants()}>
+  const bar = (
+    <div className={cn(filterBarVariants(), className)}>
       <FilterFieldList
         schema={schema}
         fields={primaryFields}
@@ -73,13 +69,5 @@ export function FilterBar<TData, TState extends Record<string, unknown>>({
     </div>
   )
 
-  return (
-    <div className={cn(filterBarVariants(), className)}>
-      {parentChrome ? (
-        primaryFilters
-      ) : (
-        <FilterChromeProvider>{primaryFilters}</FilterChromeProvider>
-      )}
-    </div>
-  )
+  return parentChrome ? bar : <FilterChromeProvider>{bar}</FilterChromeProvider>
 }

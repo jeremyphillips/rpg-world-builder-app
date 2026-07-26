@@ -42,6 +42,8 @@ export function FilterAdvancedPanelHeader({
 }: FilterAdvancedPanelHeaderComponentProps) {
   if (headerVariant === 'none') return null
 
+  const buttonDensity = density === 'compact' ? 'compact' : 'default'
+
   return (
     <div className={filterAdvancedPanelHeaderVariants({ density })}>
       <div className="min-w-0 flex-1">
@@ -61,6 +63,7 @@ export function FilterAdvancedPanelHeader({
             type="button"
             variant="ghost"
             size="sm"
+            density={buttonDensity}
             disabled={disabled}
             onClick={onReset}
             aria-label="Reset additional filters"
@@ -69,7 +72,14 @@ export function FilterAdvancedPanelHeader({
           </Button>
         ) : null}
         {onCollapse ? (
-          <Button type="button" variant="ghost" size="sm" disabled={disabled} onClick={onCollapse}>
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            density={buttonDensity}
+            disabled={disabled}
+            onClick={onCollapse}
+          >
             {collapseLabel}
           </Button>
         ) : null}

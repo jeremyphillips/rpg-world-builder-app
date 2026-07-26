@@ -61,6 +61,17 @@ describe('Button', () => {
     expect(button).not.toHaveClass('border-input')
   })
 
+  it('applies expanded outline treatment when aria-expanded is true', () => {
+    render(
+      <Button variant="outline" aria-expanded>
+        More filters
+      </Button>,
+    )
+    const button = screen.getByRole('button', { name: 'More filters' })
+    expect(button).toHaveClass('aria-expanded:border-border')
+    expect(button).toHaveClass('aria-expanded:bg-outline-button-active')
+  })
+
   it('fires onClick when pressed', async () => {
     const onClick = vi.fn()
     render(<Button onClick={onClick}>Click</Button>)

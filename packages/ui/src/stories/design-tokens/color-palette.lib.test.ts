@@ -31,6 +31,7 @@ describe('color-palette.lib', () => {
   it('defines an elevation ladder for palette surface roles', () => {
     expect(PALETTE_ELEVATION_LADDER_TOKENS.map((token) => token.name)).toEqual([
       'surface-base',
+      'surface-faint',
       'surface-subtle',
       'surface-muted',
       'surface-strong',
