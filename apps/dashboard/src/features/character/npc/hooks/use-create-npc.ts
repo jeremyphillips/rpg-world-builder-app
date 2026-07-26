@@ -14,9 +14,9 @@ export function useCreateNpc() {
 
   return useMutation({
     mutationFn: ({ campaignId, input }: CreateNpcVariables) => createNpc(campaignId, input),
-    onSuccess: (npc, { campaignId }) => {
+    onSuccess: (npcDetail, { campaignId }) => {
       void queryClient.invalidateQueries({ queryKey: npcsQueryKey(campaignId) })
-      void queryClient.setQueryData(npcQueryKey(campaignId, npc.id), npc)
+      queryClient.setQueryData(npcQueryKey(campaignId, npcDetail.character.id), npcDetail)
     },
   })
 }

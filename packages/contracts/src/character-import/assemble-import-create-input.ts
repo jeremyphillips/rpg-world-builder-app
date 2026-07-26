@@ -220,7 +220,6 @@ function buildImportCreateCharacterInput(
 
   return {
     characterType: 'pc',
-    campaignId: null,
     name: required.name.trim(),
     rulesetId: options.rulesetId,
     classes: assembleImportedClasses(extraction.classes.value ?? []),

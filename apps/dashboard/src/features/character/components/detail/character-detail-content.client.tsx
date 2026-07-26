@@ -2,7 +2,7 @@
 
 import { useState, type ReactNode } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Button, ConfirmDialog, Heading, Text } from '@rpg/ui'
+import { ConfirmDialog } from '@rpg/ui'
 
 import { ROUTES } from '@/app/routes'
 import { useSetBreadcrumbLabel } from '@/components/layout/use-breadcrumb-label'
@@ -11,6 +11,7 @@ import { useDeleteCharacter } from '../../hooks/use-delete-character'
 import type { CharacterDetailViewModel } from '../../lib/character-display'
 import { CharacterDetailAbilitiesRow } from './character-detail-abilities-row.client'
 import { CharacterDetailCombatRow } from './character-detail-combat-row.client'
+import { CharacterDetailHeader } from './character-detail-header.client'
 import {
   characterDetailAbilitiesStatsSectionClasses,
   characterDetailBodyGridClasses,
@@ -31,6 +32,8 @@ export type CharacterDetailContentProps = {
   viewModel: CharacterDetailViewModel
   showDelete?: boolean
   deleteConfig?: CharacterDetailDeleteConfig
+  statusSummary?: ReactNode
+  statusActions?: ReactNode
 }
 
 /**
@@ -53,6 +56,8 @@ export function CharacterDetailContent({
   viewModel,
   showDelete = true,
   deleteConfig,
+  statusSummary,
+  statusActions,
 }: CharacterDetailContentProps) {
   useSetBreadcrumbLabel(viewModel.identity.name)
   const navigate = useNavigate()
@@ -78,27 +83,15 @@ export function CharacterDetailContent({
 
   return (
     <div className="space-y-6">
-      <header className="flex items-start justify-between gap-4">
-        <div className="space-y-1">
-          <Heading variant="page" as="h1">
-            {viewModel.identity.name}
-          </Heading>
-          <Text variant="muted">{viewModel.identity.summary}</Text>
-          {viewModel.identity.xp !== null ? (
-            <Text variant="muted">{viewModel.identity.xp} XP</Text>
-          ) : null}
-        </div>
-        {showDelete ? (
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={() => setDeleteDialogOpen(true)}
-          >
-            Delete
-          </Button>
-        ) : null}
-      </header>
+      <CharacterDetailHeader
+        name={viewModel.identity.name}
+        summary={viewModel.identity.summary}
+        xp={viewModel.identity.xp}
+        statusSummary={statusSummary}
+        statusActions={statusActions}
+        showDelete={showDelete}
+        onDeleteClick={() => setDeleteDialogOpen(true)}
+      />
 
       <div className={characterDetailAbilitiesStatsSectionClasses}>
         <CharacterDetailAbilitiesRow abilities={viewModel.abilities} />

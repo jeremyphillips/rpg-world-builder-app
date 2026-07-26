@@ -1,6 +1,10 @@
 import { Router } from 'express'
 
-import { CAMPAIGN_ROLES, createNpcRequestInputSchema } from '@rpg/contracts'
+import {
+  CAMPAIGN_ROLES,
+  campaignNpcStatusPatchSchema,
+  createNpcRequestInputSchema,
+} from '@rpg/contracts'
 
 import { requireAuth } from '../../../middleware/require-auth'
 import { requireCampaignRole } from '../../../middleware/require-role'
@@ -23,4 +27,11 @@ campaignNpcRouter.post(
   controller.create,
 )
 campaignNpcRouter.get('/:npcId', requireAuth, requireCampaignMember, controller.getById)
+campaignNpcRouter.patch(
+  '/:npcId',
+  requireAuth,
+  requireNpcAuthor,
+  validate(campaignNpcStatusPatchSchema),
+  controller.patch,
+)
 campaignNpcRouter.delete('/:npcId', requireAuth, requireNpcAuthor, controller.remove)

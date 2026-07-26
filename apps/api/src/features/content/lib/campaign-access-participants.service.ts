@@ -1,13 +1,9 @@
 import type { CampaignAccessParticipantEntry } from '@rpg/contracts'
 import { isValidObjectId } from 'mongoose'
 
-import { CampaignMembershipModel } from '../../campaign/campaign-membership.model'
+import { listOpenParticipationsForCampaign } from '../../campaign/participation/campaign-character-participation.repository'
 import { CharacterModel } from '../../character/character.model'
 import { UserModel } from '../../user/user.model'
-
-type MembershipRow = {
-  characterIds?: string[]
-}
 
 type CharacterRow = {
   _id: unknown
@@ -20,21 +16,15 @@ type UserRow = {
   displayName: string
 }
 
-/** Lists campaign-submitted PCs available for `specific_players` grants. */
+/** Lists campaign-participating PCs available for `specific_players` grants. */
 export async function listCampaignAccessParticipants(
   campaignId: string,
 ): Promise<CampaignAccessParticipantEntry[]> {
-  const memberships = await CampaignMembershipModel.find({ campaignId })
-    .select('characterIds')
-    .lean<MembershipRow[]>()
+  const participations = await listOpenParticipationsForCampaign(campaignId)
+  const rawPcIds = participations
+    .map((participation) => participation.characterId)
+    .filter((characterId) => isValidObjectId(characterId))
 
-  const rawPcIds = [
-    ...new Set(
-      memberships
-        .flatMap((membership) => membership.characterIds ?? [])
-        .filter((characterId) => isValidObjectId(characterId)),
-    ),
-  ]
   if (rawPcIds.length === 0) {
     return []
   }

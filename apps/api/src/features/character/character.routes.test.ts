@@ -40,10 +40,10 @@ describe('character routes', () => {
       characterType: 'pc',
       name: 'Verna',
       rulesetId: 'srd-cc-5.2.1',
-      campaignId: null,
     })
     expect(res.body.character.userId).toBeTruthy()
     expect(res.body.character.createdAt).toMatch(/^\d{4}-/)
+    expect(res.body.character.vital).toEqual({ status: 'alive' })
   })
 
   it('lists only the session user characters', async () => {
@@ -145,5 +145,16 @@ describe('character routes', () => {
 
   it('requires authentication for delete', async () => {
     await request(getApp()).delete('/api/characters/000000000000000000000000').expect(403)
+  })
+
+  it('does not expose a public PC lifecycle PATCH route', async () => {
+    const { agent, csrfToken } = await registerAndLogin('patch@example.com')
+    const characterId = await createCharacter(agent, csrfToken)
+
+    await agent
+      .patch(`/api/characters/${characterId}`)
+      .set(CSRF_HEADER, csrfToken)
+      .send({ roster: { status: 'inactive' } })
+      .expect(404)
   })
 })

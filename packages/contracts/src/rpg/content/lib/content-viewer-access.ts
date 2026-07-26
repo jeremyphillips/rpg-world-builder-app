@@ -4,9 +4,9 @@ import { CAMPAIGN_MANAGE_ROLES, type CampaignManageRole } from '../../../shared/
 /**
  * Viewer context for campaign content discovery and saved-reference reads.
  *
- * `pc.characterIds` holds every campaign-submitted PC id for the membership
- * (see campaign-access-enforcement ADR). Per-character surfaces (builder,
- * saved-reference resolution) pass a single id via `SavedContentReferenceContext`.
+ * `pc.characterIds` holds pre-resolved viewer PC ids (controlledCharacterIds ∩
+ * open participations). Per-character surfaces pass a single id via
+ * `SavedContentReferenceContext`.
  */
 export type ContentViewer =
   | { kind: 'manage' }
@@ -18,12 +18,37 @@ export type SavedContentReferenceContext = {
   characterId: string
 }
 
-export type CampaignMembershipViewerContext = {
+export type CampaignContextViewerInput = {
   campaignRole: string
-  characterIds: readonly string[]
+  pcCharacterIds: readonly string[]
 }
 
-/** Maps campaign membership to the contracts `ContentViewer` model. */
+/** Maps campaign role + pre-resolved PC ids to the contracts `ContentViewer` model. */
+export function buildContentViewerFromCampaignContext(
+  context: CampaignContextViewerInput | undefined,
+): ContentViewer {
+  if (!context) {
+    return { kind: 'none' }
+  }
+
+  if (CAMPAIGN_MANAGE_ROLES.includes(context.campaignRole as CampaignManageRole)) {
+    return { kind: 'manage' }
+  }
+
+  if (context.campaignRole === 'pc' && context.pcCharacterIds.length > 0) {
+    return { kind: 'pc', characterIds: context.pcCharacterIds }
+  }
+
+  return { kind: 'none' }
+}
+
+/** @deprecated Use buildContentViewerFromCampaignContext with pre-resolved pcCharacterIds. */
+export type CampaignMembershipViewerContext = {
+  campaignRole: string
+  controlledCharacterIds: readonly string[]
+}
+
+/** @deprecated Use buildContentViewerFromCampaignContext. */
 export function buildContentViewerFromMembership(
   membership: CampaignMembershipViewerContext | undefined,
 ): ContentViewer {
@@ -31,15 +56,10 @@ export function buildContentViewerFromMembership(
     return { kind: 'none' }
   }
 
-  if (CAMPAIGN_MANAGE_ROLES.includes(membership.campaignRole as CampaignManageRole)) {
-    return { kind: 'manage' }
-  }
-
-  if (membership.campaignRole === 'pc' && membership.characterIds.length > 0) {
-    return { kind: 'pc', characterIds: membership.characterIds }
-  }
-
-  return { kind: 'none' }
+  return buildContentViewerFromCampaignContext({
+    campaignRole: membership.campaignRole,
+    pcCharacterIds: membership.controlledCharacterIds,
+  })
 }
 
 /** Structured player-facing visibility facts for overview metadata. */

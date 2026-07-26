@@ -1,11 +1,19 @@
-import type { CreateCharacterInput, PcCharacter } from '@rpg/contracts'
+import type {
+  CharacterVitalPatch,
+  CharacterVitalState,
+  CreateCharacterInput,
+  PcCharacter,
+} from '@rpg/contracts'
+import { applyCharacterVitalTransitionMetadata } from '@rpg/contracts'
 
 import { assertStandalonePcCreateRestrictions } from './assert-standalone-pc-create'
 import {
   createPcRecord,
   deletePcForUser,
+  findCharacterVital,
   findPcForUser,
   listPcsForUser,
+  updateCharacterVitalRecord,
 } from './character.repository'
 
 export async function createCharacter(
@@ -32,4 +40,26 @@ export async function deleteCharacterForUser(
   userId: string,
 ): Promise<boolean> {
   return deletePcForUser(characterId, userId)
+}
+
+type UpdateCharacterVitalOptions = {
+  timestamp: string
+}
+
+export async function updateCharacterVital(
+  characterId: string,
+  patch: CharacterVitalPatch,
+  { timestamp }: UpdateCharacterVitalOptions,
+): Promise<CharacterVitalState | null> {
+  const current = await findCharacterVital(characterId)
+  if (!current) return null
+
+  const nextVital = applyCharacterVitalTransitionMetadata({
+    current,
+    patch,
+    timestamp,
+  })
+
+  const updated = await updateCharacterVitalRecord(characterId, nextVital)
+  return updated ? nextVital : null
 }

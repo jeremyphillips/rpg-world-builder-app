@@ -88,14 +88,19 @@ describe('isContentDiscoverableForViewer', () => {
 
 describe('buildContentViewerFromMembership', () => {
   it('maps campaign roles to viewer kinds', () => {
-    expect(buildContentViewerFromMembership({ campaignRole: 'owner', characterIds: [] })).toEqual({
+    expect(
+      buildContentViewerFromMembership({ campaignRole: 'owner', controlledCharacterIds: [] }),
+    ).toEqual({
       kind: 'manage',
     })
     expect(
-      buildContentViewerFromMembership({ campaignRole: 'pc', characterIds: ['pc-1', 'pc-2'] }),
+      buildContentViewerFromMembership({
+        campaignRole: 'pc',
+        controlledCharacterIds: ['pc-1', 'pc-2'],
+      }),
     ).toEqual({ kind: 'pc', characterIds: ['pc-1', 'pc-2'] })
     expect(
-      buildContentViewerFromMembership({ campaignRole: 'observer', characterIds: [] }),
+      buildContentViewerFromMembership({ campaignRole: 'observer', controlledCharacterIds: [] }),
     ).toEqual({ kind: 'none' })
   })
 })

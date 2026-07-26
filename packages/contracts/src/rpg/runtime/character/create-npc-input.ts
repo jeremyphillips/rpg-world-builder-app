@@ -11,7 +11,7 @@ export const createNpcRequestInputSchema = npcCharacterSchema.omit({
   id: true,
   userId: true,
   characterType: true,
-  campaignId: true,
+  vital: true,
   createdAt: true,
   updatedAt: true,
 })
@@ -20,5 +20,4 @@ export type CreateNpcRequestInput = z.infer<typeof createNpcRequestInputSchema>
 
 export type CreateNpcServiceInput = CreateNpcRequestInput & {
   characterType: 'npc'
-  campaignId: string
 }

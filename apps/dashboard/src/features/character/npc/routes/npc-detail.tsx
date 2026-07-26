@@ -8,9 +8,11 @@ import { PageLoadState } from '@/components/layout/page-load-state'
 import { WidePage } from '@/components/layout/wide-page'
 import { useCanManageCampaign } from '@/features/campaign'
 
+import { CampaignCharacterStatusSummary } from '../../components/detail/campaign-character-status-summary.client'
 import { CharacterDetailContent } from '../../components/detail/character-detail-content.client'
 import { useCampaignBuildContext } from '../../hooks/use-campaign-build-context'
 import { buildCharacterDetailViewModel } from '../../lib/character-display'
+import { NpcStatusEditAction } from '../components/npc-status-edit-action.client'
 import { useDeleteNpc } from '../hooks/use-delete-npc'
 import { useNpc } from '../hooks/use-npcs'
 
@@ -22,7 +24,7 @@ export function NpcDetail() {
   const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false)
   const deleteNpc = useDeleteNpc()
   const {
-    data: npc,
+    data: npcDetail,
     isPending: isNpcPending,
     isError: isNpcError,
     error: npcError,
@@ -36,17 +38,17 @@ export function NpcDetail() {
   } = useCampaignBuildContext(campaignId)
 
   const viewModel = useMemo(() => {
-    if (!npc || !catalogIndex || !context) return null
+    if (!npcDetail || !catalogIndex || !context) return null
 
     return buildCharacterDetailViewModel({
-      character: npc,
+      character: npcDetail.character,
       catalogIndex,
       rules: context.characterCreationRules,
-      xpProgression: getStandardXpProgression(npc.rulesetId as SystemRulesetId),
+      xpProgression: getStandardXpProgression(npcDetail.character.rulesetId as SystemRulesetId),
     })
-  }, [catalogIndex, context, npc])
+  }, [catalogIndex, context, npcDetail])
 
-  const isPending = isNpcPending || Boolean(npc && isContextPending)
+  const isPending = isNpcPending || Boolean(npcDetail && isContextPending)
   const isError = isNpcError || isContextError
   const errorLabel = npcError?.message ?? contextError?.message
 
@@ -72,9 +74,25 @@ export function NpcDetail() {
         errorLabel={errorLabel}
         defaultErrorLabel="Could not load NPC."
       >
-        {viewModel ? (
+        {viewModel && npcDetail ? (
           <CharacterDetailContent
             viewModel={viewModel}
+            statusSummary={
+              <CampaignCharacterStatusSummary
+                vital={npcDetail.character.vital}
+                roster={npcDetail.participation.roster}
+              />
+            }
+            statusActions={
+              canManage ? (
+                <NpcStatusEditAction
+                  campaignId={campaignId}
+                  npcId={npcDetail.character.id}
+                  vital={npcDetail.character.vital}
+                  roster={npcDetail.participation.roster}
+                />
+              ) : undefined
+            }
             showDelete={canManage}
             deleteConfig={
               canManage

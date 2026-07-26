@@ -80,7 +80,7 @@ export async function createCampaign(
       campaignId,
       userId: createdBy,
       campaignRole: 'owner',
-      characterIds: [],
+      controlledCharacterIds: [],
       invitedAt: new Date(),
       joinedAt: new Date(),
     })
@@ -114,8 +114,8 @@ export function listCampaignTemplates(): CampaignTemplate[] {
  */
 export async function listCampaignsForUser(userId: string): Promise<CampaignListItem[]> {
   const memberships = await CampaignMembershipModel.find({ userId })
-    .select('campaignId campaignRole characterIds')
-    .lean<{ campaignId: string; campaignRole: string; characterIds?: string[] }[]>()
+    .select('campaignId campaignRole controlledCharacterIds')
+    .lean<{ campaignId: string; campaignRole: string; controlledCharacterIds?: string[] }[]>()
 
   const membershipByCampaignId = new Map(
     memberships.map((membership) => [membership.campaignId, membership]),
@@ -132,7 +132,7 @@ export async function listCampaignsForUser(userId: string): Promise<CampaignList
       return {
         ...campaign,
         campaignRole: membership?.campaignRole as CampaignRole,
-        characterIds: membership?.characterIds ?? [],
+        controlledCharacterIds: membership?.controlledCharacterIds ?? [],
       }
     })
     .sort((a, b) => a.identity.name.localeCompare(b.identity.name))

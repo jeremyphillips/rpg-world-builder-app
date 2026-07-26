@@ -6,8 +6,9 @@ import { makeTestCampaign } from '../../../test/fixtures/campaigns'
 import { minimalStandalonePcInput } from '../../../test/fixtures/characters'
 import { minimalNpcRequestInput } from '../../../test/fixtures/npcs'
 import { useIntegrationDb } from '../../../test/setup/integration-db'
-import { CampaignMembershipModel } from '../../campaign/campaign-membership.model'
-import { createNpcRecord, createPcRecord } from '../../character/character.repository'
+import { createCampaignNpc } from '../../campaign/npc/npc.service'
+import { attachCharacterToCampaign } from '../../campaign/participation/campaign-character-participation.repository'
+import { createPcRecord } from '../../character/character.repository'
 import { CharacterModel } from '../../character/character.model'
 import { resolveCatalogForCampaign } from '../content.service'
 import { featWriteConfig } from '../feats/feats.config'
@@ -57,11 +58,9 @@ describe('content campaign access policy', () => {
       slug: 'policy-referenced-feat',
     })
 
-    const npc = await createNpcRecord({
+    const { character: npc } = await createCampaignNpc(campaign.id, {
       ...minimalNpcRequestInput,
-      characterType: 'npc',
       name: 'Feat NPC',
-      campaignId: campaign.id,
       feats: [{ featId: created.id }],
     })
 
@@ -97,11 +96,9 @@ describe('content campaign access policy', () => {
 
     await promoteContentToPublished(featWriteConfig, campaign.id, created.id)
 
-    await createNpcRecord({
+    await createCampaignNpc(campaign.id, {
       ...minimalNpcRequestInput,
-      characterType: 'npc',
       name: 'Blocking Feat NPC',
-      campaignId: campaign.id,
       feats: [{ featId: created.id }],
     })
 
@@ -181,10 +178,11 @@ describe('content campaign access policy', () => {
       campaign.owner.id,
     )
 
-    await CampaignMembershipModel.updateOne(
-      { campaignId: campaign.id, userId: campaign.owner.id },
-      { $set: { characterIds: [pc.id] } },
-    )
+    await attachCharacterToCampaign({
+      campaignId: campaign.id,
+      characterId: pc.id,
+      joinedAt: new Date().toISOString(),
+    })
 
     await ContentCampaignAccessModel.create({
       campaignId: campaign.id,

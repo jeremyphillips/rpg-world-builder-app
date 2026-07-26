@@ -14,7 +14,7 @@ import {
   getContentDemotionAvailability,
   promoteContentToPublished,
 } from './content-status.service'
-import { createNpcRecord } from '../../character/character.repository'
+import { createCampaignNpc } from '../../campaign/npc/npc.service'
 import { HttpError } from '../../../lib/http-error'
 import { resolveCatalogForCampaign } from '../content.service'
 
@@ -111,11 +111,9 @@ describe('content status service', () => {
     const campaign = await makeTestCampaign()
     const created = await createHomebrewContent(classWriteConfig, campaign.id, minimalClassInput)
 
-    await createNpcRecord({
+    await createCampaignNpc(campaign.id, {
       ...minimalNpcRequestInput,
-      characterType: 'npc',
       name: 'Blocking NPC',
-      campaignId: campaign.id,
       classes: [{ classId: created.id, level: 1 }],
     })
 
@@ -139,11 +137,9 @@ describe('content status service', () => {
     const campaign = await makeTestCampaign()
     const created = await createHomebrewContent(classWriteConfig, campaign.id, minimalClassInput)
 
-    await createNpcRecord({
+    await createCampaignNpc(campaign.id, {
       ...minimalNpcRequestInput,
-      characterType: 'npc',
       name: 'Race NPC',
-      campaignId: campaign.id,
       classes: [{ classId: created.id, level: 1 }],
     })
 

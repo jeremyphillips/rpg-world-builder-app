@@ -28,14 +28,19 @@ describe('campaign NPC routes', () => {
       .send(minimalNpcRequestInput)
       .expect(201)
 
-    const npcId = createRes.body.npc.id as string
+    const npcId = createRes.body.npc.character.id as string
     expect(createRes.body.npc).toMatchObject({
-      characterType: 'npc',
-      name: 'Goblin Scout',
-      campaignId,
-      rulesetId: 'srd-cc-5.2.1',
+      character: {
+        characterType: 'npc',
+        name: 'Goblin Scout',
+        rulesetId: 'srd-cc-5.2.1',
+        vital: { status: 'alive' },
+      },
+      participation: {
+        roster: { status: 'active' },
+      },
     })
-    expect(createRes.body.npc.userId).toBeUndefined()
+    expect(createRes.body.npc.character.userId).toBeUndefined()
 
     const listRes = await agent
       .get(`/api/campaigns/${campaignId}/npcs`)
@@ -43,7 +48,7 @@ describe('campaign NPC routes', () => {
       .expect(200)
 
     expect(listRes.body.npcs).toHaveLength(1)
-    expect(listRes.body.npcs[0]?.id).toBe(npcId)
+    expect(listRes.body.npcs[0]?.character.id).toBe(npcId)
 
     await agent
       .get(`/api/campaigns/${campaignId}/npcs/${npcId}`)
@@ -113,7 +118,7 @@ describe('campaign NPC routes', () => {
       campaignId: owner.campaignId,
       userId: meRes.body.user.id as string,
       campaignRole: 'pc',
-      characterIds: [],
+      controlledCharacterIds: [],
       invitedAt: new Date(),
       joinedAt: new Date(),
     })
@@ -124,7 +129,7 @@ describe('campaign NPC routes', () => {
       .send(minimalNpcRequestInput)
       .expect(201)
 
-    const npcId = createRes.body.npc.id as string
+    const npcId = createRes.body.npc.character.id as string
 
     await member.agent
       .get(`/api/campaigns/${owner.campaignId}/npcs`)
@@ -146,5 +151,63 @@ describe('campaign NPC routes', () => {
       .delete(`/api/campaigns/${owner.campaignId}/npcs/${npcId}`)
       .set(CSRF_HEADER, member.csrfToken)
       .expect(403)
+  })
+
+  it('patches NPC status for owner/co-owner with transition metadata', async () => {
+    const { agent, csrfToken, campaignId } = await authedOwnerCampaign('npc-patch@example.com')
+
+    const createRes = await agent
+      .post(`/api/campaigns/${campaignId}/npcs`)
+      .set(CSRF_HEADER, csrfToken)
+      .send(minimalNpcRequestInput)
+      .expect(201)
+
+    const npcId = createRes.body.npc.character.id as string
+
+    const patchRes = await agent
+      .patch(`/api/campaigns/${campaignId}/npcs/${npcId}`)
+      .set(CSRF_HEADER, csrfToken)
+      .send({ roster: { status: 'inactive', note: 'Away from town.' } })
+      .expect(200)
+
+    expect(patchRes.body.npc.participation.roster).toMatchObject({
+      status: 'inactive',
+      note: 'Away from town.',
+    })
+    expect(patchRes.body.npc.participation.roster.changedAt).toEqual(expect.any(String))
+
+    const noteOnlyRes = await agent
+      .patch(`/api/campaigns/${campaignId}/npcs/${npcId}`)
+      .set(CSRF_HEADER, csrfToken)
+      .send({ roster: { status: 'inactive', note: 'Still away.' } })
+      .expect(200)
+
+    expect(noteOnlyRes.body.npc.participation.roster.changedAt).toBe(
+      patchRes.body.npc.participation.roster.changedAt,
+    )
+    expect(noteOnlyRes.body.npc.participation.roster.note).toBe('Still away.')
+  })
+
+  it('normalizes legacy NPC documents without vital on read', async () => {
+    const { agent, csrfToken, campaignId } = await authedOwnerCampaign('npc-legacy@example.com')
+
+    const createRes = await agent
+      .post(`/api/campaigns/${campaignId}/npcs`)
+      .set(CSRF_HEADER, csrfToken)
+      .send(minimalNpcRequestInput)
+      .expect(201)
+
+    const npcId = createRes.body.npc.character.id as string
+
+    const { CharacterModel } = await import('../../character/character.model')
+    await CharacterModel.updateOne({ _id: npcId }, { $unset: { vital: '' } })
+
+    const readRes = await agent
+      .get(`/api/campaigns/${campaignId}/npcs/${npcId}`)
+      .set(CSRF_HEADER, csrfToken)
+      .expect(200)
+
+    expect(readRes.body.npc.character.vital).toEqual({ status: 'alive' })
+    expect(readRes.body.npc.participation.roster).toMatchObject({ status: 'active' })
   })
 })

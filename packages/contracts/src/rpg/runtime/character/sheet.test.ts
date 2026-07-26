@@ -175,6 +175,7 @@ const baseCharacter = {
       },
     },
   ],
+  vital: { status: 'alive' },
   ...timestamps,
 } as const
 
@@ -184,7 +185,6 @@ describe('characterSchema', () => {
       ...baseCharacter,
       characterType: 'pc',
       userId: 'user_1',
-      campaignId: 'camp_1',
     })
 
     expect(parsed.characterType).toBe('pc')
@@ -202,11 +202,9 @@ describe('characterSchema', () => {
       ...baseCharacter,
       id: 'npc_1',
       characterType: 'npc',
-      campaignId: 'camp_1',
     })
 
     expect(parsed.characterType).toBe('npc')
-    expect(parsed.campaignId).toBe('camp_1')
   })
 
   it('rejects a player character without a userId', () => {
@@ -214,16 +212,6 @@ describe('characterSchema', () => {
       characterSchema.safeParse({
         ...baseCharacter,
         characterType: 'pc',
-        campaignId: 'camp_1',
-      }).success,
-    ).toBe(false)
-  })
-
-  it('rejects an NPC without a campaignId', () => {
-    expect(
-      characterSchema.safeParse({
-        ...baseCharacter,
-        characterType: 'npc',
       }).success,
     ).toBe(false)
   })
@@ -233,7 +221,6 @@ describe('characterSchema', () => {
       characterSchema.safeParse({
         ...baseCharacter,
         characterType: 'npc',
-        campaignId: 'camp_1',
         userId: 'user_1',
       }).success,
     ).toBe(false)

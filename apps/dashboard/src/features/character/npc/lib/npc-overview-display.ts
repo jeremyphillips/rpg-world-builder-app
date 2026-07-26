@@ -1,22 +1,24 @@
-import type { CharacterBuildCatalogIndex, NpcCharacter } from '@rpg/contracts'
+import type { NpcListCharacterSummary } from '@rpg/contracts'
+import type { CharacterBuildCatalogIndex } from '@rpg/contracts'
 
 import { formatContentReferenceLabel } from '../../lib/format-content-reference-label'
 
 export function resolveNpcOverviewClassName(
-  npc: Pick<NpcCharacter, 'classes'>,
+  character: Pick<NpcListCharacterSummary, 'classes'>,
   catalogIndex: CharacterBuildCatalogIndex,
 ): string {
-  const entry = npc.classes[0]
+  const entry = character.classes[0]
   if (!entry) return '—'
 
   return catalogIndex.classes.get(entry.classId)?.name ?? formatContentReferenceLabel(entry.classId)
 }
 
 export function resolveNpcOverviewSpeciesName(
-  npc: Pick<NpcCharacter, 'species'>,
+  character: Pick<NpcListCharacterSummary, 'species'>,
   catalogIndex: CharacterBuildCatalogIndex,
 ): string {
   return (
-    catalogIndex.species.get(npc.species.id)?.name ?? formatContentReferenceLabel(npc.species.id)
+    catalogIndex.species.get(character.species.id)?.name ??
+    formatContentReferenceLabel(character.species.id)
   )
 }

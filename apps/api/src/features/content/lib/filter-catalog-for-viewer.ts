@@ -2,14 +2,13 @@ import {
   CAMPAIGN_MANAGE_ROLES,
   type CampaignManageRole,
   type ResolvedContentCampaignAccess,
+  buildContentViewerFromCampaignContext,
   isContentDiscoverableForViewer,
 } from '@rpg/contracts'
 
-import { buildContentViewerFromMembership } from './build-content-viewer'
-
 type CampaignMembershipContext = {
   campaignRole: string
-  characterIds: string[]
+  pcCharacterIds: string[]
 }
 
 type CatalogListRow = {
@@ -22,7 +21,11 @@ export function filterCatalogForMembership<T extends CatalogListRow>(
   items: T[],
   membership: CampaignMembershipContext | undefined,
 ): T[] {
-  const viewer = buildContentViewerFromMembership(membership)
+  const viewer = buildContentViewerFromCampaignContext(
+    membership
+      ? { campaignRole: membership.campaignRole, pcCharacterIds: membership.pcCharacterIds }
+      : undefined,
+  )
   const isManager =
     membership !== undefined &&
     CAMPAIGN_MANAGE_ROLES.includes(membership.campaignRole as CampaignManageRole)

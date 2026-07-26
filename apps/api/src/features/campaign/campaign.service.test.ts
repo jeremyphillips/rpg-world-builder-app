@@ -129,7 +129,7 @@ describe('listCampaignsForUser', () => {
       campaignId: campaign.id,
       userId: member.id,
       campaignRole: 'pc',
-      characterIds: [],
+      controlledCharacterIds: [],
       invitedAt: new Date(),
       joinedAt: new Date(),
     })
@@ -148,7 +148,7 @@ describe('listCampaignsForUser', () => {
       campaignId: campaign.id,
       userId: coOwner.id,
       campaignRole: 'co-owner',
-      characterIds: [],
+      controlledCharacterIds: [],
       invitedAt: new Date(),
       joinedAt: new Date(),
     })

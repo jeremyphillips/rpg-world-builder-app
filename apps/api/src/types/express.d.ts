@@ -13,7 +13,9 @@ declare global {
         campaignId: string
         userId: string
         campaignRole: CampaignRole
-        characterIds: string[]
+        controlledCharacterIds: string[]
+        /** Pre-resolved viewer PC ids: controlledCharacterIds ∩ open participations. */
+        pcCharacterIds: string[]
       }
     }
   }

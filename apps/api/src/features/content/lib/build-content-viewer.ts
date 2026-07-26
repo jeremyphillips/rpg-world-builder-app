@@ -1,3 +1,6 @@
-import { buildContentViewerFromMembership } from '@rpg/contracts'
+import {
+  buildContentViewerFromCampaignContext,
+  buildContentViewerFromMembership,
+} from '@rpg/contracts'
 
-export { buildContentViewerFromMembership }
+export { buildContentViewerFromCampaignContext, buildContentViewerFromMembership }

@@ -102,7 +102,6 @@ export function finalizeCharacterBuild(
 
   const input: CreateCharacterInput = {
     characterType: 'pc',
-    campaignId: null,
     name: draft.identity.name!.trim(),
     imageKey: draft.identity.imageKey,
     rulesetId: context.rulesetId,

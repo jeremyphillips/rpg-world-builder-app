@@ -152,8 +152,8 @@ export type Campaign = z.infer<typeof campaignSchema>
  */
 export const campaignListItemSchema = campaignSchema.extend({
   campaignRole: campaignRoleSchema,
-  /** IDs of characters this user has submitted to this campaign. */
-  characterIds: z.array(z.string()),
+  /** IDs of PCs this member controls in this campaign. */
+  controlledCharacterIds: z.array(z.string()),
 })
 
 export type CampaignListItem = z.infer<typeof campaignListItemSchema>
@@ -238,8 +238,9 @@ export type ContentVisibility = z.infer<typeof contentVisibilitySchema>
  * Represents a user's membership in a specific campaign.
  *
  * Invariants enforced at the service layer (not schema):
- * - Only characters owned by this user may appear in `characterIds`
- * - A character may belong to at most one campaign at a time
+ * - Only PCs owned by this user may appear in `controlledCharacterIds`
+ * - `controlledCharacterIds` ⊆ open PC participations in `campaignId`
+ * - A PC may appear on at most one membership's `controlledCharacterIds` per campaign
  * - The `owner` campaignRole is created when the campaign is created and
  *   cannot be self-removed
  */
@@ -248,8 +249,8 @@ export const campaignMembershipSchema = z.object({
   campaignId: z.string().min(1),
   userId: z.string().min(1),
   campaignRole: campaignRoleSchema,
-  /** IDs of characters this user has submitted to this campaign. */
-  characterIds: z.array(z.string()),
+  /** IDs of PCs this member controls in this campaign. */
+  controlledCharacterIds: z.array(z.string()),
   invitedAt: z.iso.datetime(),
   joinedAt: z.iso.datetime().nullable(),
 })

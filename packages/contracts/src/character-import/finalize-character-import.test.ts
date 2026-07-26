@@ -90,7 +90,7 @@ describe('finalizeCharacterImport', () => {
     })
 
     expect(input.characterType).toBe('pc')
-    expect(input.campaignId).toBeNull()
+    expect(input).not.toHaveProperty('campaignId')
     expect(input.name).toBe('Presto')
     expect(input.classes).toEqual([
       expect.objectContaining({ classId: 'srd-cc-5.2.1:wizard', level: 1 }),

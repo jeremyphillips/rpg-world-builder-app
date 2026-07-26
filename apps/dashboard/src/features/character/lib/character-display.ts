@@ -4,6 +4,7 @@ import type {
   CharacterBuildCatalogIndex,
   CharacterClassEntry,
   CharacterNarrative,
+  CharacterVitalState,
   CharacterProficiencies,
   Equipment,
   MovementMode,
@@ -33,6 +34,7 @@ import {
 
 import { resolveLanguagePreviewLabel } from './language-preview-label'
 import { formatContentReferenceLabel } from './format-content-reference-label'
+import { resolveCharacterVitalStatusPresentation } from './character-vital-presentation'
 import {
   buildCharacterSheetEquipmentCards,
   buildCharacterSheetSpellCards,
@@ -181,6 +183,8 @@ export type CharacterDetailViewModel = {
     name: string
     summary: string
     xp: string | null
+    vital: CharacterVitalState
+    vitalLabel: string
   }
   stats: CharacterDetailStatTile[]
   abilities: CharacterAbilityTile[]
@@ -626,6 +630,8 @@ export function buildCharacterDetailViewModel({
       name: character.name,
       summary: formatCharacterSummary(character, catalogIndex),
       xp: buildIdentityXp(character, xpProgression),
+      vital: character.vital,
+      vitalLabel: resolveCharacterVitalStatusPresentation(character.vital.status).label,
     },
     stats: buildStats(character, catalogIndex, rules),
     abilities: buildAbilities(character, catalogIndex, rules),

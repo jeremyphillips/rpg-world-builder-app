@@ -8,7 +8,8 @@ import { useIntegrationDb } from '../../../test/setup/integration-db'
 import { CampaignMembershipModel } from '../../campaign/campaign-membership.model'
 import { CharacterModel } from '../../character/character.model'
 import { createPcRecord } from '../../character/character.repository'
-import { createNpcRecord } from '../../character/character.repository'
+import { createCampaignNpc } from '../../campaign/npc/npc.service'
+import { attachCharacterToCampaign } from '../../campaign/participation/campaign-character-participation.repository'
 import { classWriteConfig } from '../classes/classes.config'
 import { HomebrewClassModel } from '../classes/homebrew-class.model'
 import { resolveCatalogForCampaign } from '../content.service'
@@ -78,11 +79,9 @@ describe('content deletion service', () => {
     const campaign = await makeTestCampaign()
     const created = await createHomebrewContent(classWriteConfig, campaign.id, minimalClassInput)
 
-    await createNpcRecord({
+    await createCampaignNpc(campaign.id, {
       ...minimalNpcRequestInput,
-      characterType: 'npc',
       name: 'Blocked NPC',
-      campaignId: campaign.id,
       classes: [{ classId: created.id, level: 1 }],
     })
 
@@ -115,11 +114,9 @@ describe('content deletion service', () => {
     )
     expect(availabilityBefore).toEqual({ status: 'allowed' })
 
-    await createNpcRecord({
+    await createCampaignNpc(campaign.id, {
       ...minimalNpcRequestInput,
-      characterType: 'npc',
       name: 'Species NPC',
-      campaignId: campaign.id,
       species: { id: created.id },
     })
 
@@ -131,11 +128,9 @@ describe('content deletion service', () => {
     const campaign = await makeTestCampaign()
     const created = await createHomebrewContent(classWriteConfig, campaign.id, minimalClassInput)
 
-    const npc = await createNpcRecord({
+    const { character: npc } = await createCampaignNpc(campaign.id, {
       ...minimalNpcRequestInput,
-      characterType: 'npc',
       name: 'Temporary NPC',
-      campaignId: campaign.id,
       classes: [{ classId: created.id, level: 1 }],
     })
 
@@ -166,15 +161,16 @@ describe('content deletion service', () => {
     ).rejects.toMatchObject({ status: 404 })
   })
 
-  it('dedupes duplicate membership characterIds into one usage blocker', async () => {
+  it('dedupes duplicate participation references into one usage blocker', async () => {
     const campaign = await makeTestCampaign()
     const created = await createHomebrewContent(classWriteConfig, campaign.id, minimalClassInput)
     const pc = await createPcRecord(minimalStandalonePcInput, campaign.owner.id)
 
-    await CampaignMembershipModel.updateOne(
-      { campaignId: campaign.id, userId: campaign.owner.id },
-      { $set: { characterIds: [pc.id, pc.id] } },
-    )
+    await attachCharacterToCampaign({
+      campaignId: campaign.id,
+      characterId: pc.id,
+      joinedAt: new Date().toISOString(),
+    })
 
     await CharacterModel.updateOne(
       { _id: pc.id },
@@ -195,13 +191,13 @@ describe('content deletion service', () => {
     expect(blocker.usage.id).toBe(pc.id)
   })
 
-  it('ignores stale membership characterIds without crashing', async () => {
+  it('ignores control-only membership references without open participation', async () => {
     const campaign = await makeTestCampaign()
     const created = await createHomebrewContent(classWriteConfig, campaign.id, minimalClassInput)
 
     await CampaignMembershipModel.updateOne(
       { campaignId: campaign.id, userId: campaign.owner.id },
-      { $set: { characterIds: ['000000000000000000000099'] } },
+      { $set: { controlledCharacterIds: ['000000000000000000000099'] } },
     )
 
     const availability = await getContentDeletionAvailability(

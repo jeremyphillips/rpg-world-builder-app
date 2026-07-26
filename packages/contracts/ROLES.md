@@ -61,6 +61,30 @@ Govern what a user can do within a specific campaign. Always scoped to a single
 
 ---
 
+## Campaign character association
+
+Character↔campaign links use **three separate concepts**. Do not collapse them.
+
+| Concept           | Record                                      | Answers                                              |
+| ----------------- | ------------------------------------------- | ---------------------------------------------------- |
+| **Membership**    | `CampaignMembership`                        | Which users belong to the campaign and in what role? |
+| **Participation** | `CampaignCharacterParticipation`            | Which characters are in the campaign roster?         |
+| **Control**       | `CampaignMembership.controlledCharacterIds` | Which PCs does this member play?                     |
+
+**Participation** is the canonical character↔campaign association. It carries
+campaign-relative **roster** state (`active` / `inactive` / `retired`). A character
+has at most one **open** participation at a time (`leftAt` omitted).
+
+**Control** is membership-scoped: which PC sheet ids a player member may act as.
+It does not, by itself, place a character in the campaign — control assignments
+must reference PCs with an open participation in that campaign.
+
+**Vital** state (`alive` / `deceased` / `unknown`) is intrinsic to the character
+record (`Character.vital`), not participation. See
+[character-vital-and-campaign-participation.md](../../apps/dashboard/docs/character-vital-and-campaign-participation.md).
+
+---
+
 ## Character Ownership
 
 Stored characters are discriminated by `characterType`: `pc` or `npc`. Ownership
@@ -72,26 +96,27 @@ acquisition detail: [character-acquisition.md](../../apps/dashboard/docs/charact
 User-owned at the platform level, independent of campaigns.
 
 - Every PC has a required `userId` (the creating user).
-- `campaignId` is nullable at create time; ordinary PC create never sets it.
-- A PC can be associated with at most one campaign at a time
-  (`Character.campaignId` is either `null` or a single campaign ID).
-- Campaign association for PCs is designed to go through an owner-approved
-  **submission workflow** (not yet implemented). Until then, `campaignId` stays
-  `null` on user-created PCs.
+- PCs have **no** `campaignId` field — campaign association goes through
+  `CampaignCharacterParticipation`.
+- A PC may have at most one open participation at a time (across all campaigns).
 - Only PCs owned by the `userId` on a `CampaignMembership` may appear on that
-  membership's `characterIds`.
-- When a user leaves a campaign, their PCs are removed from the campaign;
-  ownership remains with the user.
+  membership's `controlledCharacterIds`.
+- Assigning control may create participation when none exists yet; see
+  `assignControlledPcToCampaignMember` in the API.
+- When a user leaves a campaign, their PCs are removed from control assignments;
+  ownership remains with the user. Participation close/transfer workflows are
+  deferred (`leftAt` is schema-only in MVP).
 
 ### Campaign NPCs (`characterType: 'npc'`)
 
-Campaign-owned sheet records — not tied to a user account.
+Campaign sheet records — not tied to a user account.
 
-- Every NPC has a required `campaignId` (set by the API from the route param).
-- NPCs have no `userId`; they are not player characters and do not use
-  `CampaignMembership.characterIds`.
+- NPCs have no `userId` and never appear on `controlledCharacterIds`.
+- An NPC is in a campaign only when it has an **open** `CampaignCharacterParticipation`
+  for that campaign. NPC create attaches participation atomically; list, read,
+  patch, and delete all resolve through open participation.
 - Created by campaign `owner` or `co-owner` via `POST /api/campaigns/:campaignId/npcs`.
-- Deleted when removed from the campaign roster; there is no separate user roster.
+- Deleted when removed from the campaign (participation + character record).
 
 ---
 
@@ -101,10 +126,10 @@ Enforced in the service layer (not at the schema level):
 
 1. `(campaignId, userId)` is unique — a user has at most one membership per campaign.
 2. Membership `owner` role cannot be removed; only transferred.
-3. `characterIds` on a membership may only reference **PC** characters owned by
+3. `controlledCharacterIds` on a membership may only reference **PC** characters owned by
    that membership's `userId` (not NPCs).
-4. A PC's `Character.campaignId` may only point to a campaign where the character
-   owner has an active membership.
+4. `controlledCharacterIds` ⊆ open PC participations in the same `campaignId`.
+5. A PC may appear on at most one membership's `controlledCharacterIds` per campaign.
 
 ---
 

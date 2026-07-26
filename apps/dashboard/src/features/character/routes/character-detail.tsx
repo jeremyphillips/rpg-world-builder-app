@@ -7,6 +7,7 @@ import { PageLoadState } from '@/components/layout/page-load-state'
 import { WidePage } from '@/components/layout/wide-page'
 
 import { CharacterDetailContent } from '../components/detail/character-detail-content.client'
+import { CharacterVitalSummary } from '../components/detail/character-vital-summary.client'
 import { useBuildContext } from '../hooks/use-build-context'
 import { useCharacter } from '../hooks/use-character'
 import { buildCharacterDetailViewModel } from '../lib/character-display'
@@ -50,7 +51,12 @@ export function CharacterDetail() {
         errorLabel={errorLabel}
         defaultErrorLabel="Could not load character."
       >
-        {viewModel ? <CharacterDetailContent viewModel={viewModel} /> : null}
+        {viewModel ? (
+          <CharacterDetailContent
+            viewModel={viewModel}
+            statusSummary={<CharacterVitalSummary vital={viewModel.identity.vital} />}
+          />
+        ) : null}
       </PageLoadState>
     </WidePage>
   )
