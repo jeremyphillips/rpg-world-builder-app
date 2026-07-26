@@ -7,7 +7,7 @@ export const dataTableRootVariants = cva('flex flex-col gap-3 w-full')
 export const dataTableToolbarVariants = cva('flex flex-wrap items-center gap-2')
 
 /** Neutral slot wrapper above table headers — chrome owned by injected content (e.g. DataTableUtilityBar). */
-export const dataTableUtilityStripVariants = cva('w-full')
+export const dataTableUtilityStripVariants = cva('w-full pt-3')
 
 /** Container for the group of inline filter controls on the left of the toolbar. */
 export const dataTableFilterGroupVariants = cva('flex flex-1 flex-wrap items-center gap-2')
@@ -48,7 +48,7 @@ export const dataTablePaginationVariants = cva(
 
 /** Table container — elevated card plane on the page canvas. */
 export const dataTableTableWrapVariants = cva(
-  'overflow-hidden rounded-card border border-border bg-surface-muted text-foreground shadow-surface-raised',
+  'overflow-hidden rounded-card border border-border bg-background text-foreground shadow-surface-raised',
 )
 
 /**
@@ -101,7 +101,7 @@ export const dataTableActionsHeaderVariants = cva(
 
 /** Sticky trailing actions body cell — matches row hover, selection, and unavailable tones. */
 export const dataTableActionsCellVariants = cva(
-  'sticky right-0 z-10 w-12 max-w-12 shrink-0 border-l border-border bg-surface-muted px-1 text-center group-hover/row:bg-row-hover group-data-[state=selected]/row:bg-row-selected group-[.bg-warning-faint]/row:bg-warning-faint',
+  'sticky right-0 z-10 w-12 max-w-12 shrink-0 border-l border-border bg-background px-1 text-center group-hover/row:bg-row-hover group-data-[state=selected]/row:bg-row-selected group-[.bg-warning-faint]/row:bg-warning-faint',
 )
 
 /** Row-selection header — fixed to `Checkbox` (size-4) + horizontal padding. */

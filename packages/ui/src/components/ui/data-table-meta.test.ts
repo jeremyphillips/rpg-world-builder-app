@@ -40,7 +40,7 @@ describe('dataTableWidthMeta', () => {
     expect(meta.headerClassName).toContain('sticky')
     expect(meta.headerClassName).toContain('bg-surface-strong')
     expect(meta.cellClassName).toContain('sticky')
-    expect(meta.cellClassName).toContain('bg-surface-muted')
+    expect(meta.cellClassName).toContain('bg-background')
   })
 
   it('sizes select column for checkbox control and centers it', () => {
