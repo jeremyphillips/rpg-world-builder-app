@@ -104,3 +104,17 @@ export type DataTableCellTypography = keyof typeof dataTableCellTypography
 export function dataTableTypographyMeta(role: DataTableCellTypography) {
   return { cellClassName: dataTableCellTypography[role] } as const
 }
+
+/** Merges width and typography presets without one overwriting the other's cell classes. */
+export function dataTableColumnChromeMeta(
+  width: DataTableColumnWidth,
+  typography?: DataTableCellTypography,
+) {
+  const widthMeta = dataTableWidthMeta(width)
+  if (!typography) return widthMeta
+
+  return {
+    headerClassName: widthMeta.headerClassName,
+    cellClassName: `${widthMeta.cellClassName} ${dataTableCellTypography[typography]}`,
+  } as const
+}

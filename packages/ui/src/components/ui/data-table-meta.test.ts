@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import {
   dataTableCellTypography,
+  dataTableColumnChromeMeta,
   dataTableColumnWidths,
   dataTableTypographyMeta,
   dataTableWidthMeta,
@@ -62,6 +63,19 @@ describe('dataTableWidthMeta', () => {
   it('centers collection count columns', () => {
     expect(dataTableWidthMeta('collectionCount').headerClassName).toContain('text-center')
     expect(dataTableWidthMeta('collectionCount').cellClassName).toContain('lg:w-[5.5rem]')
+  })
+})
+
+describe('dataTableColumnChromeMeta', () => {
+  it('merges width and typography cell classes', () => {
+    const meta = dataTableColumnChromeMeta('medium', 'stat')
+    expect(meta.headerClassName).toBe(dataTableWidthMeta('medium').headerClassName)
+    expect(meta.cellClassName).toContain('lg:w-36')
+    expect(meta.cellClassName).toContain(dataTableCellTypography.stat)
+  })
+
+  it('returns width meta when typography is omitted', () => {
+    expect(dataTableColumnChromeMeta('tiny')).toEqual(dataTableWidthMeta('tiny'))
   })
 })
 

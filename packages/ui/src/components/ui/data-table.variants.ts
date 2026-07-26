@@ -7,7 +7,7 @@ export const dataTableRootVariants = cva('flex flex-col gap-3 w-full')
 export const dataTableToolbarVariants = cva('flex flex-wrap items-center gap-2')
 
 /** Neutral slot wrapper above table headers — chrome owned by injected content (e.g. DataTableUtilityBar). */
-export const dataTableUtilityStripVariants = cva('w-full pt-3')
+export const dataTableUtilityStripVariants = cva('w-full')
 
 /** Container for the group of inline filter controls on the left of the toolbar. */
 export const dataTableFilterGroupVariants = cva('flex flex-1 flex-wrap items-center gap-2')
@@ -52,13 +52,10 @@ export const dataTableTableWrapVariants = cva(
 )
 
 /**
- * Table element — below `lg`, keep natural column widths and scroll horizontally
- * instead of crushing fixed-width columns (e.g. thumbnails). At `lg+`, allow the
- * table to shrink to the container when there is enough room.
+ * Table element — natural column widths at all breakpoints; the Table wrapper
+ * scrolls horizontally when columns exceed the card width.
  */
-export const dataTableTableVariants = cva(
-  'w-full min-w-max text-table-body lg:min-w-0 lg:table-fixed',
-)
+export const dataTableTableVariants = cva('w-full min-w-max text-table-body')
 
 /** Header row — recessed band; hover matches fill so sort controls stay stable. */
 export const dataTableHeaderRowVariants = cva(

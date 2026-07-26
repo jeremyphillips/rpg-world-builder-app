@@ -638,6 +638,7 @@ export type {
 } from './components/ui/data-table.client'
 export {
   dataTableCellTypography,
+  dataTableColumnChromeMeta,
   dataTableColumnMeta,
   dataTableColumnWidths,
   dataTableTypographyMeta,

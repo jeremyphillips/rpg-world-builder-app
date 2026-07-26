@@ -1,6 +1,6 @@
 import type { SkillProficiency, WithCampaignAccess } from '@rpg/contracts'
 import { ABILITY_ENTRIES, ABILITY_IDS } from '@rpg/contracts'
-import { dataTableTypographyMeta, dataTableWidthMeta, SortableHeader } from '@rpg/ui'
+import { dataTableColumnChromeMeta, SortableHeader } from '@rpg/ui'
 import type { ColumnDef } from '@rpg/ui'
 import { createEqualsFilter } from '@rpg/ui/filters'
 
@@ -23,7 +23,7 @@ const SKILL_MIDDLE_COLUMNS: ColumnDef<SkillProficiency>[] = [
     header: ({ column }) => <SortableHeader column={column}>Ability</SortableHeader>,
     cell: ({ row }) => row.getValue<SkillProficiency['ability']>('ability')?.toUpperCase() ?? '—',
     filterFn: 'equalsString',
-    meta: { label: 'Ability', ...dataTableWidthMeta('tiny'), ...dataTableTypographyMeta('stat') },
+    meta: { label: 'Ability', ...dataTableColumnChromeMeta('tiny', 'stat') },
   },
 ]
 

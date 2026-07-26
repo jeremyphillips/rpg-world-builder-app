@@ -5,7 +5,7 @@ export const dataTableUtilityBarVariants = cva('flex flex-col')
 
 /** Row 1 — result context summary. */
 export const dataTableUtilityBarSummaryRowVariants = cva(
-  'flex items-center bg-surface-subtle px-3 py-1.5 text-sm text-muted-foreground',
+  'flex items-center bg-surface-subtle px-3 pt-2.5 pb-1.5 text-sm text-muted-foreground',
 )
 
 /** Row 2 — leading actions, flexible space, trailing actions. */
