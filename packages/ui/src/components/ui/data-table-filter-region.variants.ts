@@ -43,20 +43,17 @@ export const dataTableFilterRegionRailStackVariants = cva('flex flex-col max-sm:
 })
 
 /** Invisible label row reserving space above the More filters control band. */
-export const dataTableFilterRegionLabelSpacerVariants = cva(
-  'invisible block leading-none max-sm:hidden',
-  {
-    variants: {
-      density: {
-        compact: 'text-xs',
-        comfortable: 'text-sm',
-      },
-    },
-    defaultVariants: {
-      density: 'compact',
+export const dataTableFilterRegionLabelSpacerVariants = cva('invisible block max-sm:hidden', {
+  variants: {
+    density: {
+      compact: 'text-xs',
+      comfortable: 'text-sm',
     },
   },
-)
+  defaultVariants: {
+    density: 'compact',
+  },
+})
 
 /** Additional filters panel row below the primary panel. */
 export const dataTableFilterRegionPanelRowVariants = cva('min-w-0')

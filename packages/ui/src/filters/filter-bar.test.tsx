@@ -229,7 +229,11 @@ describe('FilterBar', () => {
 
     expect(combobox).toHaveClass('bg-input')
     expect(checkboxShell).toBeTruthy()
-    expect(checkboxShell).toHaveClass('bg-transparent', 'border-outline-button-border')
+    expect(checkboxShell).toHaveClass(
+      'bg-transparent',
+      'border-outline-button-border',
+      'rounded-md',
+    )
     expect(checkboxShell).not.toHaveClass('bg-input')
   })
 })

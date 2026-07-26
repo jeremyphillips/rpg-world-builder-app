@@ -72,6 +72,23 @@ describe('DataTableFilterRegion', () => {
     expect(screen.getByRole('button', { name: 'Collapse' })).toHaveClass('h-6')
   })
 
+  it('reserves stacked label height for the More filters rail', () => {
+    render(
+      <DataTableFilterRegion
+        primaryFilters={<input aria-label="Search" />}
+        additionalFilterFields={<input aria-label="Advanced field" />}
+        additionalFiltersOpen={false}
+        onAdditionalFiltersOpenChange={() => undefined}
+      />,
+    )
+
+    const trigger = screen.getByRole('button', { name: /more filters/i })
+    const spacer = trigger.parentElement?.previousElementSibling
+
+    expect(spacer).toHaveClass('invisible', 'text-xs')
+    expect(spacer).not.toHaveClass('leading-none')
+  })
+
   it('has no axe accessibility violations', async () => {
     const { container } = render(
       <DataTableFilterRegion
