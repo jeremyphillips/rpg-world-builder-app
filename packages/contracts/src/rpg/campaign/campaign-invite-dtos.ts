@@ -11,6 +11,8 @@ import { campaignRoleSchema } from '../../shared/roles'
 export const campaignInvitePublicResolutionSchema = z.object({
   campaignName: z.string().min(1),
   inviterDisplayName: z.string().min(1),
+  /** Full invited address — only returned to callers that already hold the invite token. */
+  invitedEmail: z.string().email(),
   invitedEmailMasked: z.string().min(1).optional(),
   status: campaignInviteStatusSchema,
   expiresAt: z.iso.datetime(),

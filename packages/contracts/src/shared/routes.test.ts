@@ -1,6 +1,10 @@
 import { describe, expect, it } from 'vitest'
 
-import { CROSS_APP_PATHS, crossAppCampaignDetailPath } from './routes'
+import {
+  CROSS_APP_PATHS,
+  crossAppCampaignDetailPath,
+  crossAppCampaignOnboardingPath,
+} from './routes'
 
 describe('CROSS_APP_PATHS', () => {
   it('uses a trailing slash on the dashboard base (Vite base: /app/)', () => {
@@ -20,5 +24,8 @@ describe('CROSS_APP_PATHS', () => {
 
   it('builds campaign detail paths under the dashboard SPA', () => {
     expect(crossAppCampaignDetailPath('c_abc')).toBe('/app/campaigns/c_abc')
+    expect(crossAppCampaignOnboardingPath('c_abc', 'invite_1')).toBe(
+      '/app/campaigns/c_abc/onboarding?inviteId=invite_1',
+    )
   })
 })

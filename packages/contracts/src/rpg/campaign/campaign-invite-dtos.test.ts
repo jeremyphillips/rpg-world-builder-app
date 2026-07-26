@@ -38,11 +38,13 @@ describe('campaignInvitePublicResolutionSchema', () => {
     const parsed = campaignInvitePublicResolutionSchema.parse({
       campaignName: 'The Shattered Vale',
       inviterDisplayName: 'A campaign owner',
+      invitedEmail: 'player@example.com',
       invitedEmailMasked: 'p***@example.com',
       status: 'pending',
       expiresAt: '2026-01-08T00:00:00.000Z',
     })
 
+    expect(parsed.invitedEmail).toBe('player@example.com')
     expect(parsed.invitedEmailMasked).toBe('p***@example.com')
   })
 })

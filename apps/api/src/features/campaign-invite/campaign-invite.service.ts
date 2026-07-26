@@ -233,6 +233,7 @@ export async function resolveCampaignInviteByToken(
   return {
     campaignName,
     inviterDisplayName: inviterName,
+    invitedEmail: currentInvite.email,
     invitedEmailMasked: maskInvitedEmail(currentInvite.email),
     status: currentInvite.status,
     expiresAt: currentInvite.expiresAt,

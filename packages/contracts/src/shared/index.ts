@@ -1,4 +1,5 @@
 export * from './auth-messages'
+export * from './auth-continuation'
 export * from './auth'
 export * from './app-config'
 export * from './user'

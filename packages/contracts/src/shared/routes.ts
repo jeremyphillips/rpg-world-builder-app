@@ -17,3 +17,17 @@ export type CrossAppPath = (typeof CROSS_APP_PATHS)[keyof typeof CROSS_APP_PATHS
 export function crossAppCampaignDetailPath(campaignId: string): string {
   return `/app/campaigns/${campaignId}`
 }
+
+/** Dashboard SPA campaign invite onboarding — invite id only, never the raw token. */
+export function crossAppCampaignOnboardingPath(campaignId: string, inviteId: string): string {
+  const params = new URLSearchParams({ inviteId })
+  return `/app/campaigns/${campaignId}/onboarding?${params.toString()}`
+}
+
+/** Dashboard SPA campaign-scoped PC detail. */
+export function crossAppCampaignCharacterDetailPath(
+  campaignId: string,
+  characterId: string,
+): string {
+  return `/app/campaigns/${campaignId}/characters/${characterId}`
+}

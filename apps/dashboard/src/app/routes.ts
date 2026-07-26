@@ -17,6 +17,12 @@ export const ROUTES = {
     detail: (id: string) => `/campaigns/${id}`,
     sessions: (id: string) => `/campaigns/${id}/sessions`,
     settings: (id: string) => `/campaigns/${id}/settings`,
+    onboarding: (id: string, inviteId: string) =>
+      `/campaigns/${id}/onboarding?inviteId=${encodeURIComponent(inviteId)}`,
+    characters: {
+      detail: (campaignId: string, characterId: string) =>
+        `/campaigns/${campaignId}/characters/${characterId}`,
+    },
     npcs: {
       list: (id: string) => `/campaigns/${id}/npcs`,
       new: (id: string) => `/campaigns/${id}/npcs/new`,

@@ -6,6 +6,10 @@ import { expectFieldsInvalid, fillSignupFields } from './auth-test-utils'
 
 const { register, login } = vi.hoisted(() => ({ register: vi.fn(), login: vi.fn() }))
 
+vi.mock('next/navigation', () => ({
+  useSearchParams: () => new URLSearchParams(),
+}))
+
 vi.mock('../api/auth-client', () => ({
   register,
   login,

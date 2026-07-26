@@ -213,6 +213,7 @@ describe('campaign invite service', () => {
     expect(resolution).toMatchObject({
       campaignName: 'Onboarding Campaign',
       status: 'pending',
+      invitedEmail: 'player@example.com',
       invitedEmailMasked: 'p***@example.com',
     })
 
