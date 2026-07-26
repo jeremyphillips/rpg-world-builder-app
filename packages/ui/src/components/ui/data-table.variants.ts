@@ -6,10 +6,8 @@ export const dataTableRootVariants = cva('flex flex-col gap-3 w-full')
 /** Toolbar row — primary filter strip + column toggle. */
 export const dataTableToolbarVariants = cva('flex flex-wrap items-center gap-2')
 
-/** Tinted utility strip rendered above table headers when `utilityStrip` is provided. */
-export const dataTableUtilityStripVariants = cva(
-  'flex min-h-10 items-center border-b border-border bg-surface-subtle px-3 shadow-[0_1px_2px_0_color-mix(in_oklab,var(--foreground)_6%,transparent)]',
-)
+/** Neutral slot wrapper above table headers — chrome owned by injected content (e.g. DataTableUtilityBar). */
+export const dataTableUtilityStripVariants = cva('w-full')
 
 /** Container for the group of inline filter controls on the left of the toolbar. */
 export const dataTableFilterGroupVariants = cva('flex flex-1 flex-wrap items-center gap-2')
@@ -50,17 +48,14 @@ export const dataTablePaginationVariants = cva(
 
 /** Table container — elevated card plane on the page canvas. */
 export const dataTableTableWrapVariants = cva(
-  'overflow-hidden rounded-card border border-border bg-surface-muted text-foreground shadow-surface-raised',
+  'overflow-hidden rounded-card border border-border bg-background text-foreground shadow-surface-raised',
 )
 
 /**
- * Table element — below `lg`, keep natural column widths and scroll horizontally
- * instead of crushing fixed-width columns (e.g. thumbnails). At `lg+`, allow the
- * table to shrink to the container when there is enough room.
+ * Table element — natural column widths at all breakpoints; the Table wrapper
+ * scrolls horizontally when columns exceed the card width.
  */
-export const dataTableTableVariants = cva(
-  'w-full min-w-max text-table-body lg:min-w-0 lg:table-fixed',
-)
+export const dataTableTableVariants = cva('w-full min-w-max text-table-body')
 
 /** Header row — recessed band; hover matches fill so sort controls stay stable. */
 export const dataTableHeaderRowVariants = cva(
@@ -103,7 +98,7 @@ export const dataTableActionsHeaderVariants = cva(
 
 /** Sticky trailing actions body cell — matches row hover, selection, and unavailable tones. */
 export const dataTableActionsCellVariants = cva(
-  'sticky right-0 z-10 w-12 max-w-12 shrink-0 border-l border-border bg-surface-muted px-1 text-center group-hover/row:bg-row-hover group-data-[state=selected]/row:bg-row-selected group-[.bg-warning-faint]/row:bg-warning-faint',
+  'sticky right-0 z-10 w-12 max-w-12 shrink-0 border-l border-border bg-background px-1 text-center group-hover/row:bg-row-hover group-data-[state=selected]/row:bg-row-selected group-[.bg-warning-faint]/row:bg-warning-faint',
 )
 
 /** Row-selection header — fixed to `Checkbox` (size-4) + horizontal padding. */

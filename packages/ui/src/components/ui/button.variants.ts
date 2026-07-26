@@ -1,5 +1,10 @@
 import { cva, type VariantProps } from 'class-variance-authority'
 
+import {
+  outlineControlExpandedClasses,
+  outlineControlShellClasses,
+} from './outline-control.variants'
+
 /**
  * Button class variants. Kept in a non-client module so server components (e.g.
  * styling a Next.js `<Link>`) can call `buttonVariants()` without pulling in the
@@ -15,8 +20,7 @@ export const buttonVariants = cva(
           'bg-primary text-primary-foreground shadow-sm hover:bg-primary/90 active:bg-primary/80',
         destructive:
           'bg-destructive text-destructive-foreground shadow-sm hover:bg-destructive/90 active:bg-destructive/80',
-        outline:
-          'border border-outline-button-border bg-transparent hover:bg-outline-button-hover active:bg-outline-button-active',
+        outline: `${outlineControlShellClasses} ${outlineControlExpandedClasses}`,
         secondary:
           'bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/80 active:bg-secondary/60',
         ghost: 'hover:bg-accent hover:text-accent-foreground active:bg-accent/80',

@@ -1,14 +1,19 @@
-import { fireEvent, render, screen } from '@testing-library/react'
+/**
+ * @vitest-environment jsdom
+ */
+import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { expectNoAxeViolations } from '@rpg/ui/test-utils'
 import { useState } from 'react'
 import { describe, expect, it, vi } from 'vitest'
 
+import { DataTableFilterRegion } from '../components/ui/data-table-filter-region.client'
 import { createBooleanFilter, createEqualsFilter, createTextFilter } from './filter-engine.helpers'
 import { setFilterValue } from './filter-engine'
 import { createFilterSchema } from './filter-schema.types'
-import { FilterAdvancedPanel } from './filter-advanced-panel.client'
 import { FilterBar } from './filter-bar.client'
+import { FilterFieldList } from './filter-fields.client'
+import { countModifiedFilters } from './filter-engine'
 
 type DemoRow = {
   name: string
@@ -84,41 +89,50 @@ const mixedPrimarySchema = createFilterSchema<DemoRow, MixedPrimaryState>([
 function FilterSystemHarness({
   initialState = {},
   onReset = vi.fn(),
+  onResetAdvanced = vi.fn(),
 }: {
   initialState?: TestFilterState
   onReset?: () => void
+  onResetAdvanced?: () => void
 }) {
   const [state, setState] = useState<TestFilterState>(initialState)
   const [advancedOpen, setAdvancedOpen] = useState(false)
+  const advancedFields = schema.fields.filter((field) => field.placement === 'advanced')
+  const advancedModifiedCount = countModifiedFilters(schema, state, 'advanced')
 
   return (
-    <>
-      <FilterBar
-        schema={schema}
-        state={state}
-        advancedOpen={advancedOpen}
-        onAdvancedOpenChange={setAdvancedOpen}
-        onValueChange={(id, value) => {
-          setState((current) => setFilterValue(schema, current, id, value))
-        }}
-        onReset={() => {
-          setState({})
-          onReset()
-        }}
-      />
-      <FilterAdvancedPanel
-        schema={schema}
-        state={state}
-        open={advancedOpen}
-        onValueChange={(id, value) => {
-          setState((current) => setFilterValue(schema, current, id, value))
-        }}
-        onClearAll={() => {
-          setState({})
-          onReset()
-        }}
-      />
-    </>
+    <DataTableFilterRegion
+      primaryFilters={
+        <FilterBar
+          schema={schema}
+          state={state}
+          onValueChange={(id, value) => {
+            setState((current) => setFilterValue(schema, current, id, value))
+          }}
+          onReset={() => {
+            setState({})
+            onReset()
+          }}
+        />
+      }
+      additionalFilterFields={
+        <FilterFieldList
+          schema={schema}
+          fields={advancedFields}
+          state={state}
+          idPrefix="filters-advanced"
+          onValueChange={(id, value) => {
+            setState((current) => setFilterValue(schema, current, id, value))
+          }}
+        />
+      }
+      additionalFiltersOpen={advancedOpen}
+      onAdditionalFiltersOpenChange={setAdvancedOpen}
+      activeAdditionalFilterCount={advancedModifiedCount}
+      onResetAdditionalFilters={() => {
+        onResetAdvanced()
+      }}
+    />
   )
 }
 
@@ -131,24 +145,28 @@ describe('FilterBar', () => {
     expect(screen.getByLabelText('Search')).toBeInTheDocument()
     expect(screen.queryByLabelText('Hidden only')).not.toBeInTheDocument()
 
-    await user.click(screen.getByRole('button', { name: /^Filters/ }))
+    await user.click(screen.getByRole('button', { name: /More filters/i }))
     expect(screen.getByText('Status')).toHaveClass('text-xs')
     expect(screen.getByLabelText('Hidden only')).toBeInTheDocument()
   })
 
-  it('shows clear actions when filters are modified', async () => {
+  it('shows reset additional filters when advanced filters are modified', async () => {
     const user = userEvent.setup()
-    const onReset = vi.fn()
+    const onResetAdvanced = vi.fn()
 
-    render(<FilterSystemHarness initialState={{ search: 'fire' }} onReset={onReset} />)
+    render(
+      <FilterSystemHarness initialState={{ hiddenOnly: true }} onResetAdvanced={onResetAdvanced} />,
+    )
 
-    expect(screen.getByRole('button', { name: 'Clear filters' })).toBeInTheDocument()
-
-    await user.click(screen.getByRole('button', { name: /^Filters/ }))
-    await user.click(screen.getByRole('button', { name: 'Clear all filters' }))
-    expect(onReset).toHaveBeenCalled()
+    await user.click(screen.getByRole('button', { name: /More filters/i }))
+    await user.click(screen.getByRole('button', { name: 'Reset additional filters' }))
+    expect(onResetAdvanced).toHaveBeenCalled()
   })
 
+  it('shows clear filters when primary filters are modified', () => {
+    render(<FilterSystemHarness initialState={{ search: 'fire' }} />)
+    expect(screen.getByRole('button', { name: 'Clear filters' })).toBeInTheDocument()
+  })
   it('shows an advanced modified count badge when collapsed', () => {
     render(<FilterSystemHarness initialState={{ hiddenOnly: true }} />)
 
@@ -160,7 +178,7 @@ describe('FilterBar', () => {
 
     render(<FilterSystemHarness initialState={{ search: 'spell' }} onReset={onReset} />)
 
-    fireEvent.click(screen.getByRole('button', { name: 'Clear filters' }))
+    screen.getByRole('button', { name: 'Clear filters' }).click()
     expect(onReset).toHaveBeenCalledTimes(1)
   })
 
@@ -174,18 +192,12 @@ describe('FilterBar', () => {
 
   it('aligns a mixed primary row on shared control-band anchors', () => {
     const { container } = render(
-      <FilterBar
-        schema={mixedPrimarySchema}
-        state={{}}
-        onValueChange={() => undefined}
-        onAdvancedOpenChange={() => undefined}
-        advancedOpen={false}
-      />,
+      <FilterBar schema={mixedPrimarySchema} state={{}} onValueChange={() => undefined} />,
     )
 
     expect(container.firstChild).toHaveClass('items-end')
     const anchors = container.querySelectorAll('[data-field-align]')
-    expect(anchors.length).toBeGreaterThanOrEqual(3)
+    expect(anchors.length).toBeGreaterThanOrEqual(2)
 
     const hitDieLabel = screen.getByText('Hit Die')
     expect(hitDieLabel.tagName).toBe('LABEL')
@@ -197,5 +209,31 @@ describe('FilterBar', () => {
 
     expect(screen.getByLabelText('Search')).toBeInTheDocument()
     expect(screen.getByLabelText('Has Spellcasting')).toBeInTheDocument()
+  })
+
+  it('uses outline chrome on boolean shells to match row select and action controls', () => {
+    render(
+      <DataTableFilterRegion
+        primaryFilters={
+          <FilterBar schema={mixedPrimarySchema} state={{}} onValueChange={() => undefined} />
+        }
+        additionalFilterFields={<input aria-label="Advanced field" />}
+        additionalFiltersOpen={false}
+        onAdditionalFiltersOpenChange={() => undefined}
+      />,
+    )
+
+    const combobox = screen.getByRole('combobox', { name: 'Hit Die' })
+    const checkbox = screen.getByLabelText('Has Spellcasting')
+    const checkboxShell = checkbox.closest('[data-field-align]')
+
+    expect(combobox).toHaveClass('bg-input')
+    expect(checkboxShell).toBeTruthy()
+    expect(checkboxShell).toHaveClass(
+      'bg-transparent',
+      'border-outline-button-border',
+      'rounded-md',
+    )
+    expect(checkboxShell).not.toHaveClass('bg-input')
   })
 })

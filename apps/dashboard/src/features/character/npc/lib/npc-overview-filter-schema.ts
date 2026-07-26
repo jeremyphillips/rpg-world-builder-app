@@ -1,9 +1,15 @@
 import type { CharacterBuildCatalogIndex, NpcCharacter } from '@rpg/contracts'
-import { createEqualsFilter, createFilterSchema, type FilterSchema } from '@rpg/ui/filters'
+import {
+  createEqualsFilter,
+  createFilterSchema,
+  createTextFilter,
+  type FilterSchema,
+} from '@rpg/ui/filters'
 
 import { NPC_OVERVIEW_LABELS } from './npc-overview-labels'
 
 export type NpcOverviewFilterState = {
+  name?: string
   classId?: string
   speciesId?: string
 }
@@ -20,6 +26,13 @@ export function npcOverviewFilterSchema(
   catalogIndex: CharacterBuildCatalogIndex,
 ): FilterSchema<NpcCharacter, NpcOverviewFilterState> {
   return createFilterSchema([
+    createTextFilter<NpcCharacter, NpcOverviewFilterState, 'name'>({
+      id: 'name',
+      label: NPC_OVERVIEW_LABELS.name,
+      placeholder: 'Search…',
+      url: { key: 'q' },
+      getSearchText: (row) => row.name,
+    }),
     createEqualsFilter<NpcCharacter, NpcOverviewFilterState, 'classId', string>({
       id: 'classId',
       label: NPC_OVERVIEW_LABELS.class,

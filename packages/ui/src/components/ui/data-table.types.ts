@@ -9,7 +9,7 @@ import type {
 export type DataTableColumnVisibilityTriggerProps = {
   /** Accessible name for the trigger. Defaults to "Choose visible columns". */
   'aria-label'?: string
-  /** When true, renders the outlined "Columns" label trigger used by the default toolbar. */
+  /** When true, renders the outline icon + chevron trigger used by overview utility bars. */
   showLabel?: boolean
 }
 
@@ -17,6 +17,8 @@ export type DataTableColumnVisibilityTriggerProps = {
 export type DataTableUtilityControls<TData> = {
   ColumnVisibilityTrigger: React.ComponentType<DataTableColumnVisibilityTriggerProps>
   pageRowCount: number
+  /** Selectable rows on the current page — respects `getRowCanSelect`. */
+  pageSelectableRowCount: number
   isAllPageRowsSelected: boolean
   isSomePageRowsSelected: boolean
   toggleAllPageRowsSelected: (value?: boolean) => void

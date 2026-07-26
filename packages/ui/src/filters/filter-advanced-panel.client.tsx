@@ -1,27 +1,30 @@
 'use client'
 
+import type { ReactNode } from 'react'
+
 import { Collapsible, CollapsibleContent } from '../components/ui/collapsible.client'
-import { Button } from '../components/ui/button.client'
-import { cn } from '../lib/utils'
-import { countModifiedFilters } from './filter-engine'
-import { getSchemaFieldsByPlacement, isFilterFieldVisible } from './filter-bar.lib'
+import { FILTER_DENSITY_DEFAULT } from './filter-bar.variants'
 import {
-  filterAdvancedPanelFooterVariants,
-  filterAdvancedPanelInnerVariants,
-  filterAdvancedPanelVariants,
-  FILTER_DENSITY_DEFAULT,
-} from './filter-bar.variants'
+  FilterAdvancedPanelBody,
+  hasFilterAdvancedPanelContent,
+} from './filter-advanced-panel-body.client'
+import type { FilterAdvancedPanelHeaderProps } from './filter-advanced-panel-header.client'
 import { FilterChromeProvider, useOptionalFilterChrome } from './filter-chrome.context'
-import { FilterFieldList } from './filter-fields.client'
 import type { FilterDensity, FilterFieldId, FilterSchema } from './filter-schema.types'
 
-export type FilterAdvancedPanelProps<TData, TState extends Record<string, unknown>> = {
-  schema: FilterSchema<TData, TState>
-  state: TState
-  onValueChange: (
+export type { FilterAdvancedPanelHeaderProps } from './filter-advanced-panel-header.client'
+
+export type FilterAdvancedPanelProps<
+  TData,
+  TState extends Record<string, unknown>,
+> = FilterAdvancedPanelHeaderProps & {
+  schema?: FilterSchema<TData, TState>
+  state?: TState
+  onValueChange?: (
     id: FilterFieldId<TState>,
     value: TState[FilterFieldId<TState>] | undefined,
   ) => void
+  children?: ReactNode
   open: boolean
   onClearAll?: () => void
   clearAllLabel?: string
@@ -34,48 +37,27 @@ export type FilterAdvancedPanelProps<TData, TState extends Record<string, unknow
 export function FilterAdvancedPanel<TData, TState extends Record<string, unknown>>({
   schema,
   state,
-  onValueChange,
+  children,
   open,
-  onClearAll,
-  clearAllLabel = 'Clear all filters',
-  disabled = false,
-  density,
-  idPrefix = 'filters-advanced',
   className,
+  density,
+  ...bodyProps
 }: FilterAdvancedPanelProps<TData, TState>) {
   const parentChrome = useOptionalFilterChrome()
   const resolvedDensity = density ?? parentChrome?.density ?? FILTER_DENSITY_DEFAULT
-  const advancedFields = getSchemaFieldsByPlacement(schema, 'advanced').filter((field) =>
-    isFilterFieldVisible(field, state),
-  )
 
-  if (advancedFields.length === 0) {
+  if (!hasFilterAdvancedPanelContent({ schema, state, children })) {
     return null
   }
 
-  const modifiedCount = countModifiedFilters(schema, state)
-
   const panelContent = (
-    <div className={cn(filterAdvancedPanelVariants())}>
-      <div className={filterAdvancedPanelInnerVariants({ density: resolvedDensity })}>
-        <FilterFieldList
-          schema={schema}
-          fields={advancedFields}
-          state={state}
-          disabled={disabled}
-          idPrefix={idPrefix}
-          onValueChange={onValueChange}
-        />
-      </div>
-
-      {onClearAll && modifiedCount > 0 ? (
-        <div className={filterAdvancedPanelFooterVariants({ density: resolvedDensity })}>
-          <Button type="button" variant="ghost" size="sm" disabled={disabled} onClick={onClearAll}>
-            {clearAllLabel}
-          </Button>
-        </div>
-      ) : null}
-    </div>
+    <FilterAdvancedPanelBody
+      {...bodyProps}
+      schema={schema}
+      state={state}
+      children={children}
+      density={resolvedDensity}
+    />
   )
 
   return (

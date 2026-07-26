@@ -1,10 +1,13 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 
+import { DataTableFilterRegion } from '../components/ui/data-table-filter-region.client'
+import { countModifiedFilters } from './filter-engine'
 import { createBooleanFilter, createEqualsFilter, createTextFilter } from './filter-engine.helpers'
 import { createFilterSchema } from './filter-schema.types'
-import { FilterAdvancedPanel } from './filter-advanced-panel.client'
 import { FilterBar } from './filter-bar.client'
+import { FilterFieldList } from './filter-fields.client'
+import { getSchemaFieldsByPlacement } from './filter-bar.lib'
 import { useFilterState } from './use-filter-state.client'
 
 type DemoRow = {
@@ -55,25 +58,36 @@ function FilterSystemDemo({
 }) {
   const { state, setValue, reset } = useFilterState(demoSchema, { initialValues })
   const [advancedOpen, setAdvancedOpen] = useState(false)
+  const advancedFields = useMemo(() => getSchemaFieldsByPlacement(demoSchema, 'advanced'), [])
+  const advancedModifiedCount = countModifiedFilters(demoSchema, state, 'advanced')
 
   return (
     <div className="flex max-w-4xl flex-col gap-2">
-      <FilterBar
-        schema={demoSchema}
-        state={state}
+      <DataTableFilterRegion
+        primaryFilters={
+          <FilterBar
+            schema={demoSchema}
+            state={state}
+            disabled={disabled}
+            onValueChange={setValue}
+            onReset={reset}
+          />
+        }
+        additionalFilterFields={
+          <FilterFieldList
+            schema={demoSchema}
+            fields={advancedFields}
+            state={state}
+            disabled={disabled}
+            idPrefix="filters-advanced"
+            onValueChange={setValue}
+          />
+        }
+        additionalFiltersOpen={advancedOpen}
+        onAdditionalFiltersOpenChange={setAdvancedOpen}
+        activeAdditionalFilterCount={advancedModifiedCount}
+        onResetAdditionalFilters={reset}
         disabled={disabled}
-        advancedOpen={advancedOpen}
-        onAdvancedOpenChange={setAdvancedOpen}
-        onValueChange={setValue}
-        onReset={reset}
-      />
-      <FilterAdvancedPanel
-        schema={demoSchema}
-        state={state}
-        open={advancedOpen}
-        disabled={disabled}
-        onValueChange={setValue}
-        onClearAll={reset}
       />
       <pre className="rounded-md border border-border bg-sunken p-3 text-xs text-muted-foreground">
         {JSON.stringify(state, null, 2)}
@@ -162,29 +176,42 @@ const classesLikeSchema = createFilterSchema<DemoRow, ClassesLikeState>([
 function ClassesLikePrimaryRowDemo() {
   const { state, setValue, reset } = useFilterState(classesLikeSchema)
   const [advancedOpen, setAdvancedOpen] = useState(false)
+  const advancedFields = useMemo(
+    () => getSchemaFieldsByPlacement(classesLikeSchema, 'advanced'),
+    [],
+  )
+  const advancedModifiedCount = countModifiedFilters(classesLikeSchema, state, 'advanced')
 
   return (
     <div className="flex max-w-4xl flex-col gap-2">
-      <FilterBar
-        schema={classesLikeSchema}
-        state={state}
-        advancedOpen={advancedOpen}
-        onAdvancedOpenChange={setAdvancedOpen}
-        onValueChange={setValue}
-        onReset={reset}
-      />
-      <FilterAdvancedPanel
-        schema={classesLikeSchema}
-        state={state}
-        open={advancedOpen}
-        onValueChange={setValue}
-        onClearAll={reset}
+      <DataTableFilterRegion
+        primaryFilters={
+          <FilterBar
+            schema={classesLikeSchema}
+            state={state}
+            onValueChange={setValue}
+            onReset={reset}
+          />
+        }
+        additionalFilterFields={
+          <FilterFieldList
+            schema={classesLikeSchema}
+            fields={advancedFields}
+            state={state}
+            idPrefix="filters-advanced"
+            onValueChange={setValue}
+          />
+        }
+        additionalFiltersOpen={advancedOpen}
+        onAdditionalFiltersOpenChange={setAdvancedOpen}
+        activeAdditionalFilterCount={advancedModifiedCount}
+        onResetAdditionalFilters={reset}
       />
     </div>
   )
 }
 
-/** Classes-like primary row: search + stacked select + boolean + Filters action. */
+/** Classes-like primary row: search + stacked select + boolean + More filters action. */
 export const ClassesLikePrimaryRow: Story = {
   render: () => <ClassesLikePrimaryRowDemo />,
 }

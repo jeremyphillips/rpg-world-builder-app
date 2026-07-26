@@ -3,11 +3,14 @@
 import { useCallback, useMemo, type ReactNode } from 'react'
 import {
   DataTable,
+  DataTableUtilityBar,
   type ColumnDef,
   type DataTableEmptyStateContext,
   type DataTableProps,
   type DataTableUtilityControls,
 } from '@rpg/ui'
+
+import { OVERVIEW_SELECTION_COLUMN_INSET } from './overview-selection-cluster.client'
 
 type OverviewTableFrameSelectionProps<TData> = Pick<
   DataTableProps<TData>,
@@ -32,39 +35,15 @@ export type OverviewTableFrameProps<TData extends { id: string }> = {
   initialColumnVisibility?: DataTableProps<TData>['initialColumnVisibility']
   initialColumnOrder?: DataTableProps<TData>['initialColumnOrder']
   onColumnChange?: DataTableProps<TData>['onColumnChange']
-  toolbar?: ReactNode
-  summary?: ReactNode
-  utilityActions?: (controls: DataTableUtilityControls<TData>) => ReactNode
-  selectionControls?: ReactNode
-  /** Replaces slot-based utility chrome when policy shells need a custom strip layout. */
-  utilityStrip?: (controls: DataTableUtilityControls<TData>) => ReactNode
+  filterRegion?: ReactNode
+  resultSummary?: ReactNode
+  leadingActions?: ReactNode | ((controls: DataTableUtilityControls<TData>) => ReactNode)
+  trailingActions?: (controls: DataTableUtilityControls<TData>) => ReactNode
+  /** When true, inset leading actions to align with the selection checkbox column. */
+  selectionModeActive?: boolean
 } & OverviewTableFrameSelectionProps<TData>
 
-function OverviewTableUtilityStrip<TData>({
-  summary,
-  utilityActions,
-  selectionControls,
-  controls,
-}: {
-  summary?: ReactNode
-  utilityActions?: (controls: DataTableUtilityControls<TData>) => ReactNode
-  selectionControls?: ReactNode
-  controls: DataTableUtilityControls<TData>
-}) {
-  if (!summary && !utilityActions && !selectionControls) return null
-
-  return (
-    <div className="flex w-full items-center justify-between gap-3">
-      <div className="flex min-w-0 items-center gap-3">
-        {summary}
-        {selectionControls}
-      </div>
-      {utilityActions ? utilityActions(controls) : null}
-    </div>
-  )
-}
-
-/** Neutral overview table chrome — slots for toolbar, summary, utility actions, and selection. */
+/** Neutral overview table chrome — filter region above the table, utility bar inside the card. */
 export function OverviewTableFrame<TData extends { id: string }>({
   columns,
   data,
@@ -77,11 +56,11 @@ export function OverviewTableFrame<TData extends { id: string }>({
   initialColumnVisibility,
   initialColumnOrder,
   onColumnChange,
-  toolbar,
-  summary,
-  utilityActions,
-  selectionControls,
-  utilityStrip: utilityStripOverride,
+  filterRegion,
+  resultSummary,
+  leadingActions,
+  trailingActions,
+  selectionModeActive = false,
   enableRowSelection,
   rowSelection,
   onRowSelectionChange,
@@ -100,27 +79,28 @@ export function OverviewTableFrame<TData extends { id: string }>({
     [emptyState],
   )
 
-  const renderSlotUtilityStrip = useCallback(
-    (controls: DataTableUtilityControls<TData>) => (
-      <OverviewTableUtilityStrip
-        summary={summary}
-        utilityActions={utilityActions}
-        selectionControls={selectionControls}
-        controls={controls}
-      />
-    ),
-    [selectionControls, summary, utilityActions],
+  const renderUtilityStrip = useCallback(
+    (controls: DataTableUtilityControls<TData>) => {
+      const resolvedLeadingActions =
+        typeof leadingActions === 'function' ? leadingActions(controls) : leadingActions
+
+      return (
+        <DataTableUtilityBar
+          summary={resultSummary}
+          leadingActions={resolvedLeadingActions}
+          trailingActions={trailingActions?.(controls)}
+          leadingInset={selectionModeActive ? OVERVIEW_SELECTION_COLUMN_INSET : undefined}
+        />
+      )
+    },
+    [leadingActions, resultSummary, selectionModeActive, trailingActions],
   )
 
-  const renderUtilityStrip = utilityStripOverride ?? renderSlotUtilityStrip
-
-  const hasUtilityStrip = Boolean(
-    utilityStripOverride || summary || utilityActions || selectionControls,
-  )
+  const hasUtilityStrip = Boolean(resultSummary || leadingActions || trailingActions)
 
   return (
     <div className="flex flex-col gap-3">
-      {toolbar}
+      {filterRegion}
       <DataTable
         columns={columns}
         data={data}

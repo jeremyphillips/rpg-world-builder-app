@@ -15,6 +15,7 @@ const filterSchema = npcOverviewFilterSchema(catalogIndex)
 const fighterNpc = {
   ...SAMPLE_PC,
   id: 'npc-fighter',
+  name: 'Captain Aldric',
   characterType: 'npc' as const,
   campaignId: 'campaign-1',
   userId: undefined,
@@ -23,11 +24,23 @@ const fighterNpc = {
 const warlockNpc = {
   ...fighterNpc,
   id: 'npc-warlock',
+  name: 'Mira Thornwick',
   classes: [{ classId: 'srd-cc-5.2.1:warlock', level: 3 }],
   species: { id: 'srd-cc-5.2.1:elf' },
 }
 
 describe('npcOverviewFilterSchema', () => {
+  it('keeps class and species filters in the primary strip', () => {
+    expect(filterSchema.fields.map((field) => field.id)).toEqual(['name', 'classId', 'speciesId'])
+    expect(filterSchema.fields.every((field) => field.placement !== 'advanced')).toBe(true)
+  })
+
+  it('filters NPCs by name', () => {
+    const rows = applyFilterSchema(filterSchema, { name: 'mira' }, [fighterNpc, warlockNpc])
+
+    expect(rows).toEqual([warlockNpc])
+  })
+
   it('filters NPCs by primary class id', () => {
     const rows = applyFilterSchema(filterSchema, { classId: 'srd-cc-5.2.1:fighter' }, [
       fighterNpc,

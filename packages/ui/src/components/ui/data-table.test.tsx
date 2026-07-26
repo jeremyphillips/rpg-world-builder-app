@@ -372,7 +372,7 @@ describe('DataTable — utilityStrip', () => {
     expect(cardShell).toContainElement(table)
 
     const stripParent = strip.parentElement
-    expect(stripParent).toHaveClass('bg-surface-subtle')
+    expect(stripParent).toHaveClass('w-full')
     expect(stripParent?.nextElementSibling).toContainElement(table)
   })
 })
@@ -526,11 +526,11 @@ describe('DataTable — column panel', () => {
     expect(screen.getByRole('searchbox', { name: /search columns/i })).toBeInTheDocument()
   })
 
-  it('shows a Reset Column Order button in the column panel', async () => {
+  it('shows a Reset columns button in the column panel', async () => {
     const user = userEvent.setup()
     renderTable()
     await user.click(screen.getByRole('button', { name: /columns/i }))
-    expect(screen.getByRole('button', { name: /reset column order/i })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /reset columns/i })).toBeInTheDocument()
   })
 
   it('calls onColumnChange when a column is hidden', async () => {
@@ -539,8 +539,7 @@ describe('DataTable — column panel', () => {
     renderTable({ onColumnChange: onChange })
 
     await user.click(screen.getByRole('button', { name: /columns/i }))
-    // Toggle the "Category" column off
-    await user.click(screen.getByRole('button', { name: /hide category column/i }))
+    await user.click(screen.getByRole('checkbox', { name: /category/i }))
 
     expect(onChange).toHaveBeenCalledWith(
       expect.objectContaining({

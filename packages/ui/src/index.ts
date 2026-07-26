@@ -613,6 +613,21 @@ export {
   SortableHeader,
   TableBadgeCell,
 } from './components/ui/data-table.client'
+export {
+  DataTableColumnsMenu,
+  type DataTableColumnsMenuItem,
+  type DataTableColumnsMenuLabels,
+  type DataTableColumnsMenuProps,
+} from './components/ui/data-table-columns-menu.client'
+export {
+  DataTableFilterRegion,
+  type DataTableFilterRegionLabels,
+  type DataTableFilterRegionProps,
+} from './components/ui/data-table-filter-region.client'
+export {
+  DataTableUtilityBar,
+  type DataTableUtilityBarProps,
+} from './components/ui/data-table-utility-bar.client'
 export type {
   BooleanCellProps,
   NameCellProps,
@@ -623,6 +638,7 @@ export type {
 } from './components/ui/data-table.client'
 export {
   dataTableCellTypography,
+  dataTableColumnChromeMeta,
   dataTableColumnMeta,
   dataTableColumnWidths,
   dataTableTypographyMeta,

@@ -77,9 +77,14 @@ export {
   type FilterChromeContextValue,
 } from './filter-chrome.context'
 export { FilterBar, type FilterBarProps } from './filter-bar.client'
-export { FilterAdvancedPanel, type FilterAdvancedPanelProps } from './filter-advanced-panel.client'
+export {
+  FilterAdvancedPanel,
+  type FilterAdvancedPanelHeaderProps,
+  type FilterAdvancedPanelProps,
+} from './filter-advanced-panel.client'
 export { FilterFieldRenderer, type FilterRenderContext } from './filter-field-renderer.client'
 export { FilterFieldList } from './filter-fields.client'
+export { FilterInlineControl, type FilterInlineControlProps } from './filter-inline-control.client'
 export {
   CatalogFilterControls,
   type CatalogFilterControlsProps,

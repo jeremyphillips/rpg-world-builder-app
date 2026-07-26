@@ -9,7 +9,7 @@ import {
 } from '@rpg/contracts'
 import {
   areColumnChangeStatesEqual,
-  dataTableFilterNoticeVariants,
+  DataTableFilterRegion,
   dataTableRowUnavailableRailVariants,
   dataTableRowUnavailableVariants,
   type ColumnDef,
@@ -17,9 +17,11 @@ import {
   type DataTableUtilityControls,
 } from '@rpg/ui'
 import {
-  FilterAdvancedPanel,
+  countModifiedFilters,
+  createInitialFilterState,
   FilterBar,
   FilterChromeProvider,
+  FilterFieldList,
   applyFilterSchema,
   getEffectiveFilterValue,
   getSchemaFieldsByPlacement,
@@ -44,13 +46,11 @@ import {
   type ContentOverviewPreferences,
 } from './content-overview-preferences'
 import { ContentOverviewRowActions } from './content-overview-row-actions'
-import { ContentTableUtilityStrip } from './content-table-utility-strip.client'
 import { BulkCampaignAccessDialog } from '../campaign-access/bulk/bulk-campaign-access-dialog.client'
 import {
   buildContentOverviewEmptyState,
-  buildContentOverviewFilterNotice,
+  buildContentOverviewHiddenSupplement,
 } from './content-overview-availability-ui.lib'
-import { formatOverviewResultCount } from './format-overview-result-count.lib'
 import { useContentOverviewBulkAccess } from './use-content-overview-bulk-access.client'
 import {
   CAMPAIGN_AVAILABILITY_FILTER_ID,
@@ -59,10 +59,14 @@ import {
 import type { ContentBase } from './content-table-config'
 import type { ContentOverviewBaseFilterState } from './content-overview-filter-schema'
 import { useContentOverviewQueryState } from './use-content-overview-query-state.client'
+import { ContentBulkActionsMenu } from './content-bulk-actions-menu.client'
+import { OverviewResultSummary } from '@/lib/data-table/overview-result-summary.client'
+import { OverviewSelectionCluster } from '@/lib/data-table/overview-selection-cluster.client'
 import { OverviewTableFrame } from '@/lib/data-table/overview-table-frame.client'
 
 const DEFAULT_OVERVIEW_SORT = { id: 'name' } as const
 const OVERVIEW_NAME_COLUMN_ID = 'name'
+const COLUMNS_ARIA_LABEL = 'Choose visible columns'
 
 type ContentOverviewDataTableProps<T extends WithCampaignAccess<ContentBase> & { id: string }> = {
   columns: ColumnDef<T, unknown>[]
@@ -75,9 +79,7 @@ type ContentOverviewDataTableProps<T extends WithCampaignAccess<ContentBase> & {
   contentTypeKey: ContentTypeKey
   itemLabel: string
   campaignAvailability: CampaignAvailabilityFilter
-  filteredCount: number
-  availabilityScopedCount: number
-  totalCount: number
+  resultSupplement?: ReactNode
   selectionMode: boolean
   rowSelection: Record<string, boolean>
   selectionLimit: number
@@ -96,6 +98,7 @@ type ContentOverviewDataTableProps<T extends WithCampaignAccess<ContentBase> & {
   emptyState: ReactNode | ((context: { filteredRowCount: number }) => ReactNode)
   restoreFocusRef: React.MutableRefObject<(removedRowId: string) => void>
   registerActionTrigger: (rowId: string, element: HTMLButtonElement | null) => void
+  selectTriggerRef: React.RefObject<HTMLButtonElement | null>
 }
 
 const ContentOverviewDataTable = memo(function ContentOverviewDataTable<
@@ -111,9 +114,7 @@ const ContentOverviewDataTable = memo(function ContentOverviewDataTable<
   contentTypeKey,
   itemLabel,
   campaignAvailability,
-  filteredCount,
-  availabilityScopedCount,
-  totalCount,
+  resultSupplement,
   selectionMode,
   rowSelection,
   selectionLimit,
@@ -132,6 +133,7 @@ const ContentOverviewDataTable = memo(function ContentOverviewDataTable<
   emptyState,
   restoreFocusRef,
   registerActionTrigger,
+  selectTriggerRef,
 }: ContentOverviewDataTableProps<T>) {
   const getEditHrefRef = useRef(getEditHref)
   getEditHrefRef.current = getEditHref
@@ -174,41 +176,48 @@ const ContentOverviewDataTable = memo(function ContentOverviewDataTable<
     [emptyState],
   )
 
-  const resultCountLabel = useMemo(
-    () => formatOverviewResultCount({ filteredCount, availabilityScopedCount, totalCount }),
-    [availabilityScopedCount, filteredCount, totalCount],
-  )
-
-  const renderUtilityStrip = useCallback(
-    (controls: DataTableUtilityControls<T>) => (
-      <ContentTableUtilityStrip
-        resultCountLabel={resultCountLabel}
-        canManage={canManage}
-        selectionMode={selectionMode}
-        selectedRowCount={controls.selectedRowCount}
-        selectionLimit={selectionLimit}
-        selectionLiveRegionId={selectionLiveRegionId}
-        selectionLiveRegionMessage={selectionLiveRegionMessage}
-        selectionCapDescriptionId={selectionCapDescriptionId}
-        ColumnVisibilityTrigger={controls.ColumnVisibilityTrigger}
-        controls={controls}
-        onEnterSelectionMode={onEnterSelectionMode}
-        onExitSelectionMode={onExitSelectionMode}
-        onEditCampaignAccess={onEditCampaignAccess}
-      />
-    ),
+  const renderLeadingActions = useCallback(
+    (controls: DataTableUtilityControls<T>) =>
+      canManage ? (
+        <OverviewSelectionCluster
+          mode={selectionMode ? 'selection' : 'browse'}
+          selectedCount={controls.selectedRowCount}
+          selectionLiveRegionId={selectionLiveRegionId}
+          selectionLiveRegionMessage={selectionLiveRegionMessage}
+          selectionCapDescriptionId={selectionCapDescriptionId}
+          selectionLimit={selectionLimit}
+          pageSelectableCount={controls.pageSelectableRowCount}
+          isAllPageRowsSelected={controls.isAllPageRowsSelected}
+          onToggleAllPageRowsSelected={controls.toggleAllPageRowsSelected}
+          onEnterSelectionMode={onEnterSelectionMode}
+          onExitSelectionMode={onExitSelectionMode}
+          bulkActionsMenu={
+            controls.selectedRowCount > 0 && onEditCampaignAccess ? (
+              <ContentBulkActionsMenu onEditCampaignAccess={onEditCampaignAccess} />
+            ) : undefined
+          }
+          selectTriggerRef={selectTriggerRef}
+        />
+      ) : null,
     [
       canManage,
       onEditCampaignAccess,
       onEnterSelectionMode,
       onExitSelectionMode,
-      resultCountLabel,
+      selectTriggerRef,
       selectionCapDescriptionId,
       selectionLimit,
       selectionLiveRegionId,
       selectionLiveRegionMessage,
       selectionMode,
     ],
+  )
+
+  const renderTrailingActions = useCallback(
+    (controls: DataTableUtilityControls<T>) => (
+      <controls.ColumnVisibilityTrigger aria-label={COLUMNS_ARIA_LABEL} showLabel />
+    ),
+    [],
   )
 
   const selectionLabels = useMemo(
@@ -235,7 +244,12 @@ const ContentOverviewDataTable = memo(function ContentOverviewDataTable<
       emptyState={resolvedEmptyState}
       getRowClassName={getRowClassName}
       getCellClassName={getCellClassName}
-      utilityStrip={renderUtilityStrip}
+      resultSummary={
+        <OverviewResultSummary resultCount={data.length} supplementalContent={resultSupplement} />
+      }
+      leadingActions={canManage ? renderLeadingActions : undefined}
+      trailingActions={renderTrailingActions}
+      selectionModeActive={selectionMode && canManage}
       enableRowSelection={selectionMode && canManage}
       rowSelection={rowSelection}
       onRowSelectionChange={onRowSelectionChange}
@@ -275,6 +289,7 @@ export function ContentOverviewTable<
   getEditHref,
 }: ContentOverviewTableProps<T, TFilters>) {
   const tableRootRef = useRef<HTMLDivElement>(null)
+  const selectTriggerRef = useRef<HTMLButtonElement>(null)
   const actionTriggerRefs = useRef(new Map<string, HTMLButtonElement>())
   const canManage = useCanManageCampaign(campaignId)
   const viewer = useContentViewer(campaignId)
@@ -307,6 +322,10 @@ export function ContentOverviewTable<
   )
   const hasAdvancedFields = useMemo(
     () => getSchemaFieldsByPlacement(filterSchema, 'advanced').length > 0,
+    [filterSchema],
+  )
+  const advancedFields = useMemo(
+    () => getSchemaFieldsByPlacement(filterSchema, 'advanced'),
     [filterSchema],
   )
   const { query, actions } = useContentOverviewQueryState<T, TFilters>({
@@ -395,6 +414,15 @@ export function ContentOverviewTable<
     [actions],
   )
 
+  const advancedModifiedCount = countModifiedFilters(filterSchema, filterState, 'advanced')
+
+  const handleResetAdvancedFilters = useCallback(() => {
+    const defaults = createInitialFilterState(filterSchema)
+    for (const field of advancedFields) {
+      handleFilterValueChange(field.id, defaults[field.id])
+    }
+  }, [advancedFields, filterSchema, handleFilterValueChange])
+
   const restoreFocusAfterRowRemoved = useCallback(
     (removedRowId: string) => {
       const orderedIds = visibleRows.map((row) => row.id)
@@ -432,9 +460,9 @@ export function ContentOverviewTable<
   const tablePageSize: ContentOverviewPageSize =
     preferences.pageSize ?? CONTENT_OVERVIEW_PREFERENCES_DEFAULTS.pageSize ?? 20
 
-  const filterNotice = useMemo(
+  const resultSupplement = useMemo(
     () =>
-      buildContentOverviewFilterNotice({
+      buildContentOverviewHiddenSupplement({
         scope,
         campaignAvailability,
         campaignAvailabilityFilterId,
@@ -458,25 +486,34 @@ export function ContentOverviewTable<
   return (
     <div ref={tableRootRef} tabIndex={-1} className="flex flex-col gap-3 outline-none">
       <FilterChromeProvider>
-        <FilterBar
-          schema={filterSchema}
-          state={filterState}
-          onValueChange={handleFilterValueChange}
-          onReset={() => actions.resetFilters()}
-          advancedOpen={advancedOpen}
-          onAdvancedOpenChange={hasAdvancedFields ? handleAdvancedOpenChange : undefined}
-        />
-
-        <FilterAdvancedPanel
-          schema={filterSchema}
-          state={filterState}
-          onValueChange={handleFilterValueChange}
-          open={advancedOpen}
-          onClearAll={() => actions.resetFilters()}
+        <DataTableFilterRegion
+          primaryFilters={
+            <FilterBar
+              schema={filterSchema}
+              state={filterState}
+              onValueChange={handleFilterValueChange}
+              onReset={() => actions.resetFilters()}
+            />
+          }
+          additionalFilterFields={
+            hasAdvancedFields ? (
+              <FilterFieldList
+                schema={filterSchema}
+                fields={advancedFields}
+                state={filterState}
+                idPrefix="filters-advanced"
+                onValueChange={handleFilterValueChange}
+              />
+            ) : undefined
+          }
+          additionalFiltersOpen={advancedOpen}
+          onAdditionalFiltersOpenChange={
+            hasAdvancedFields ? handleAdvancedOpenChange : () => undefined
+          }
+          activeAdditionalFilterCount={advancedModifiedCount}
+          onResetAdditionalFilters={handleResetAdvancedFilters}
         />
       </FilterChromeProvider>
-
-      {filterNotice ? <div className={dataTableFilterNoticeVariants()}>{filterNotice}</div> : null}
 
       <ContentOverviewDataTable
         columns={overviewColumns}
@@ -489,9 +526,7 @@ export function ContentOverviewTable<
         contentTypeKey={contentTypeKey}
         itemLabel={itemLabel}
         campaignAvailability={campaignAvailability}
-        filteredCount={visibleRows.length}
-        availabilityScopedCount={scopedRows.length}
-        totalCount={discoveryFilteredData.length}
+        resultSupplement={resultSupplement}
         selectionMode={bulkAccess.selectionMode}
         rowSelection={bulkAccess.rowSelection}
         selectionLimit={bulkAccess.selectionLimit}
@@ -512,6 +547,7 @@ export function ContentOverviewTable<
         emptyState={emptyState}
         restoreFocusRef={restoreFocusRef}
         registerActionTrigger={registerActionTrigger}
+        selectTriggerRef={selectTriggerRef}
       />
 
       {canManage ? (

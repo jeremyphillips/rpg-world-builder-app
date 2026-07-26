@@ -91,7 +91,8 @@ function resolveFilterGroupExtras(field: FilterPresentationField, density: Filte
     if (layout === 'stacked') {
       return filterStackedFieldGroupVariants({ density })
     }
-    return filterBarControlVariants({ type: 'select' })
+    const selectWidth = field.width === 'lg' || field.width === 'xl' ? 'selectLong' : 'select'
+    return filterBarControlVariants({ type: selectWidth })
   }
 
   if (field.type === 'text') {

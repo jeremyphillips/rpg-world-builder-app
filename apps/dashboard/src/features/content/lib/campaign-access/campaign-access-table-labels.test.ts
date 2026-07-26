@@ -8,8 +8,8 @@ import {
 
 describe('campaign-access-table-labels', () => {
   it('formats hidden unavailable notices with singular and plural copy', () => {
-    expect(formatHiddenUnavailableNotice(1)).toBe('1 unavailable item hidden')
-    expect(formatHiddenUnavailableNotice(3)).toBe('3 unavailable items hidden')
+    expect(formatHiddenUnavailableNotice(1)).toBe('1 hidden')
+    expect(formatHiddenUnavailableNotice(3)).toBe('3 hidden')
   })
 
   it('formats empty-state copy from content nouns', () => {

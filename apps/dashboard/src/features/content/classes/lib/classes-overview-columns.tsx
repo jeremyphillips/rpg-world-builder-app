@@ -1,5 +1,5 @@
 import type { ClassListItem, Spellcasting, WithCampaignAccess } from '@rpg/contracts'
-import { BooleanCell, dataTableTypographyMeta, dataTableWidthMeta, SortableHeader } from '@rpg/ui'
+import { BooleanCell, dataTableColumnChromeMeta, dataTableWidthMeta, SortableHeader } from '@rpg/ui'
 import type { ColumnDef } from '@rpg/ui'
 import { createBooleanFilter, createEqualsFilter } from '@rpg/ui/filters'
 
@@ -43,8 +43,7 @@ const CLASS_MIDDLE_COLUMNS: ColumnDef<ClassListItem>[] = [
     enableSorting: false,
     meta: {
       label: 'Primary Abilities',
-      ...dataTableWidthMeta('medium'),
-      ...dataTableTypographyMeta('stat'),
+      ...dataTableColumnChromeMeta('medium', 'stat'),
     },
   },
   buildCollectionCountColumn<ClassListItem>({

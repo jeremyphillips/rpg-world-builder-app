@@ -3,6 +3,7 @@
 import { useCallback, useMemo, useState, type ReactNode } from 'react'
 import {
   areColumnChangeStatesEqual,
+  DataTableFilterRegion,
   type ColumnChangeState,
   type ColumnDef,
   type DataTableEmptyStateContext,
@@ -10,10 +11,12 @@ import {
   type DataTableUtilityControls,
 } from '@rpg/ui'
 import {
-  FilterAdvancedPanel,
+  applyFilterSchema,
+  countModifiedFilters,
+  createInitialFilterState,
   FilterBar,
   FilterChromeProvider,
-  applyFilterSchema,
+  FilterFieldList,
   getSchemaFieldsByPlacement,
   useFilterState,
   type FilterFieldId,
@@ -29,6 +32,7 @@ import {
   type CatalogOverviewPreferences,
 } from './catalog-overview-preferences'
 import { formatCatalogResultCount } from './format-catalog-result-count.lib'
+import { OverviewResultSummary } from './overview-result-summary.client'
 import { OverviewTableFrame } from './overview-table-frame.client'
 
 type CatalogOverviewTableCoreProps<T extends { id: string }> = {
@@ -88,7 +92,7 @@ type CatalogOverviewTableBodyProps<T extends { id: string }> = {
   rowActions?: (row: T) => ReactNode
   getRowClassName?: DataTableProps<T>['getRowClassName']
   getCellClassName?: DataTableProps<T>['getCellClassName']
-  toolbar?: ReactNode
+  filterRegion?: ReactNode
 }
 
 const COLUMNS_ARIA_LABEL = 'Choose visible columns'
@@ -103,7 +107,7 @@ function CatalogOverviewTableBody<T extends { id: string }>({
   rowActions,
   getRowClassName,
   getCellClassName,
-  toolbar,
+  filterRegion,
 }: CatalogOverviewTableBodyProps<T>) {
   const columnSchema = useMemo(
     () => buildCatalogOverviewColumnSchema(columns as ColumnDef<unknown>[]),
@@ -148,7 +152,7 @@ function CatalogOverviewTableBody<T extends { id: string }>({
 
   const renderUtilityActions = useCallback(
     (controls: DataTableUtilityControls<T>) => (
-      <controls.ColumnVisibilityTrigger aria-label={COLUMNS_ARIA_LABEL} showLabel={false} />
+      <controls.ColumnVisibilityTrigger aria-label={COLUMNS_ARIA_LABEL} showLabel />
     ),
     [],
   )
@@ -166,9 +170,14 @@ function CatalogOverviewTableBody<T extends { id: string }>({
       initialColumnVisibility={preferences.columnVisibility}
       initialColumnOrder={preferences.columnOrder}
       onColumnChange={handleColumnChange}
-      toolbar={toolbar}
-      summary={<span className="text-sm text-muted-foreground">{resolvedResultCountLabel}</span>}
-      utilityActions={renderUtilityActions}
+      filterRegion={filterRegion}
+      resultSummary={
+        <OverviewResultSummary
+          resultCount={visibleRows.length}
+          resultLabel={resolvedResultCountLabel}
+        />
+      }
+      trailingActions={renderUtilityActions}
     />
   )
 }
@@ -193,27 +202,45 @@ function CatalogOverviewFilterChrome<T, TFilters extends Record<string, unknown>
   advancedOpen,
   onAdvancedOpenChange,
 }: CatalogOverviewFilterChromeProps<T, TFilters>) {
-  const hasAdvancedFields = useMemo(
-    () => getSchemaFieldsByPlacement(filterSchema, 'advanced').length > 0,
+  const advancedFields = useMemo(
+    () => getSchemaFieldsByPlacement(filterSchema, 'advanced'),
     [filterSchema],
   )
+  const advancedModifiedCount = countModifiedFilters(filterSchema, filterState, 'advanced')
+
+  const handleResetAdvancedFilters = useCallback(() => {
+    const defaults = createInitialFilterState(filterSchema)
+    for (const field of advancedFields) {
+      onFilterChange(field.id, defaults[field.id])
+    }
+  }, [advancedFields, filterSchema, onFilterChange])
 
   return (
     <FilterChromeProvider>
-      <FilterBar
-        schema={filterSchema}
-        state={filterState}
-        onValueChange={onFilterChange}
-        onReset={onResetFilters}
-        advancedOpen={advancedOpen}
-        onAdvancedOpenChange={hasAdvancedFields ? onAdvancedOpenChange : undefined}
-      />
-      <FilterAdvancedPanel
-        schema={filterSchema}
-        state={filterState}
-        onValueChange={onFilterChange}
-        open={advancedOpen}
-        onClearAll={onResetFilters}
+      <DataTableFilterRegion
+        primaryFilters={
+          <FilterBar
+            schema={filterSchema}
+            state={filterState}
+            onValueChange={onFilterChange}
+            onReset={onResetFilters}
+          />
+        }
+        additionalFilterFields={
+          advancedFields.length > 0 ? (
+            <FilterFieldList
+              schema={filterSchema}
+              fields={advancedFields}
+              state={filterState}
+              idPrefix="filters-advanced"
+              onValueChange={onFilterChange}
+            />
+          ) : undefined
+        }
+        additionalFiltersOpen={advancedOpen}
+        onAdditionalFiltersOpenChange={onAdvancedOpenChange}
+        activeAdditionalFilterCount={advancedModifiedCount}
+        onResetAdditionalFilters={handleResetAdvancedFilters}
       />
     </FilterChromeProvider>
   )
@@ -275,7 +302,7 @@ function CatalogOverviewTableWithInternalFilters<
       tableKey={tableKey}
       columns={columns}
       visibleRows={visibleRows}
-      toolbar={filterChrome}
+      filterRegion={filterChrome}
       {...bodyProps}
     />
   )
@@ -338,7 +365,7 @@ function CatalogOverviewTableWithControlledFilters<
       tableKey={tableKey}
       columns={columns}
       visibleRows={visibleRows}
-      toolbar={filterChrome}
+      filterRegion={filterChrome}
       {...bodyProps}
     />
   )
@@ -395,7 +422,7 @@ export function CatalogOverviewTable<
       tableKey={tableKey}
       columns={columns}
       visibleRows={data}
-      toolbar={filters}
+      filterRegion={filters}
       {...bodyProps}
     />
   )

@@ -14,6 +14,7 @@ import {
   formatUnavailableItemsShownNotice,
   formatUnavailableMatchesLine,
 } from '../campaign-access/campaign-access-table-labels'
+import { OverviewResultSummaryDotSeparator } from '@/lib/data-table/overview-result-summary.client'
 
 type AvailabilityScope = {
   unavailableCount: number
@@ -28,7 +29,8 @@ type FilterNoticeActions<TFilters> = {
   ) => void
 }
 
-export function buildContentOverviewFilterNotice<TFilters>({
+/** Utility-row supplemental copy for filter-scoped hidden unavailable counts. */
+export function buildContentOverviewHiddenSupplement<TFilters>({
   scope,
   campaignAvailability,
   campaignAvailabilityFilterId,
@@ -39,12 +41,13 @@ export function buildContentOverviewFilterNotice<TFilters>({
   campaignAvailabilityFilterId: FilterFieldId<TFilters>
   actions: FilterNoticeActions<TFilters>
 }) {
-  if (scope.unavailableCount === 0) return null
+  if (scope.unavailableCount === 0 || campaignAvailability === 'unavailable') return null
 
   if (campaignAvailability === 'available') {
     return (
       <>
         <span>{formatHiddenUnavailableNotice(scope.unavailableCount)}</span>
+        <OverviewResultSummaryDotSeparator />
         <Button
           type="button"
           variant="link"
@@ -68,7 +71,8 @@ export function buildContentOverviewFilterNotice<TFilters>({
   if (campaignAvailability === 'all') {
     return (
       <>
-        <span>{formatUnavailableItemsShownNotice()}</span>
+        <span>{formatUnavailableItemsShownNotice(scope.unavailableCount)}</span>
+        <OverviewResultSummaryDotSeparator />
         <Button
           type="button"
           variant="link"

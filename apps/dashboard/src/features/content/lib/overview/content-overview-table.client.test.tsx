@@ -135,7 +135,7 @@ describe('ContentOverviewTable interactions', () => {
 
     const callsAfterMount = persistPreferencesMock.mock.calls.length
 
-    await user.click(screen.getByRole('button', { name: /^Filters/ }))
+    await user.click(screen.getByRole('button', { name: /Show more filters|Hide more filters/ }))
 
     expect(persistPreferencesMock.mock.calls.length - callsAfterMount).toBeLessThanOrEqual(1)
   })
@@ -158,7 +158,7 @@ describe('ContentOverviewTable interactions', () => {
     await user.click(screen.getByRole('button', { name: /^Choose visible columns$/ }))
     const callsAfterOpen = persistPreferencesMock.mock.calls.length
 
-    await user.click(screen.getByRole('button', { name: /Hide Hit Die column/i }))
+    await user.click(screen.getByRole('checkbox', { name: /Hit Die/i }))
 
     expect(persistPreferencesMock.mock.calls.length - callsAfterOpen).toBeLessThanOrEqual(1)
   })
@@ -169,9 +169,9 @@ describe('ContentOverviewTable interactions', () => {
 
     const callsAfterMount = persistPreferencesMock.mock.calls.length
 
-    await user.click(screen.getByRole('button', { name: /^Filters/ }))
-    await user.click(screen.getByRole('button', { name: /^Filters/ }))
-    await user.click(screen.getByRole('button', { name: /^Filters/ }))
+    await user.click(screen.getByRole('button', { name: /Show more filters|Hide more filters/ }))
+    await user.click(screen.getByRole('button', { name: /Show more filters|Hide more filters/ }))
+    await user.click(screen.getByRole('button', { name: /Show more filters|Hide more filters/ }))
 
     expect(persistPreferencesMock.mock.calls.length - callsAfterMount).toBeLessThanOrEqual(3)
   })
@@ -204,14 +204,14 @@ describe('ContentOverviewTable interactions', () => {
 
     const rendersAfterMount = dataTableRenderCount
 
-    await user.click(screen.getByRole('button', { name: /^Filters/ }))
-    await user.click(screen.getByRole('button', { name: /^Filters/ }))
-    await user.click(screen.getByRole('button', { name: /^Filters/ }))
+    await user.click(screen.getByRole('button', { name: /Show more filters|Hide more filters/ }))
+    await user.click(screen.getByRole('button', { name: /Show more filters|Hide more filters/ }))
+    await user.click(screen.getByRole('button', { name: /Show more filters|Hide more filters/ }))
 
     expect(dataTableRenderCount - rendersAfterMount).toBe(0)
   })
 
-  it('renders the utility strip with result count and columns control', () => {
+  it('renders the utility bar with result count and columns control', () => {
     renderOverview()
     expect(screen.getByText('8 results')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Choose visible columns' })).toBeInTheDocument()
@@ -225,8 +225,8 @@ describe('ContentOverviewTable interactions', () => {
     await user.click(screen.getByRole('button', { name: 'Select' }))
 
     expect(screen.getByText('0 selected')).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Select all page' })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Exit selection mode' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Select page' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Done' })).toBeInTheDocument()
     expect(screen.getByText('Selection mode. 0 items selected.')).toBeInTheDocument()
   })
 

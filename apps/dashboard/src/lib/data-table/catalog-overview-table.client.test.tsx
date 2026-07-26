@@ -99,7 +99,7 @@ describe('CatalogOverviewTable', () => {
     render(<CatalogOverviewTable tableKey="roster-prefs" columns={COLUMNS} data={ROSTER} />)
 
     await user.click(screen.getByRole('button', { name: 'Choose visible columns' }))
-    await user.click(screen.getByRole('button', { name: 'Hide Role column' }))
+    await user.click(screen.getByRole('checkbox', { name: /Role/i }))
 
     const stored = JSON.parse(
       localStorage.getItem(catalogOverviewPreferencesKey('roster-prefs')) ?? '{}',
