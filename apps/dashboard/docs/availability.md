@@ -32,6 +32,17 @@ alert variant: `destructive` > `warning` > `info`. Ties break on
 
 ## Registries
 
+### Member onboarding (campaign overview)
+
+Campaign overview derives PC onboarding state from membership — **not** a persisted
+field:
+
+- `onboarding_incomplete` — `pc` role with empty `controlledCharacterIds`
+  (accepted invite, character not yet assigned)
+- `character_added` — `pc` role with at least one controlled character
+
+See `apps/api/docs/campaign-invites.md` and `campaign-overview.service.ts`.
+
 ### Settings (`campaign-settings-registry.ts`)
 
 Maps `CampaignSettingId` → rules-config location, built on the routes SSOT:

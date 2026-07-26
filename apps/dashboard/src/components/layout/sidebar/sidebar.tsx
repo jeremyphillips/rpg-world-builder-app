@@ -1,3 +1,4 @@
+import { APP_NAME } from '@rpg/contracts'
 import { cn, Heading } from '@rpg/ui'
 
 import { SidebarNav } from './sidebar-nav'
@@ -27,7 +28,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
       >
         <div className="flex h-16 items-center px-6">
           <Heading variant="brand" as="span">
-            RPG World Builder
+            {APP_NAME}
           </Heading>
         </div>
         <SidebarNav />

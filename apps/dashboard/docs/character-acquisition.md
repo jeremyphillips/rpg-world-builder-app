@@ -15,8 +15,22 @@ dashboard entry surfaces through NPC import (phase 6).
 | `ownershipTarget` | **derived**           | `user` for PC; `campaign` for NPC — use `resolveCharacterOwnershipTarget()` |
 
 **Rules scope ≠ campaign membership.** Campaign rules during PC build/import do
-not set `Character.campaignId`. PC campaign association requires an approved
-submission workflow (**not implemented** — see [ROLES.md](../../../packages/contracts/ROLES.md)).
+not set `Character.campaignId`. PC campaign association goes through
+`CampaignCharacterParticipation` and `controlledCharacterIds` on membership —
+including invite onboarding completion via `assignControlledPcToCampaignMember`.
+
+## `CharacterBuildAcquisition`
+
+Builder finalization branches on `context.acquisition.kind`:
+
+| Kind              | When used                              | Finalize path                            |
+| ----------------- | -------------------------------------- | ---------------------------------------- |
+| `standalone`      | Sidebar PC build/import                | `POST /api/characters`                   |
+| `campaign_npc`    | Campaign NPC build/import              | `POST /api/campaigns/:id/npcs`           |
+| `campaign_invite` | Invite onboarding new-character branch | `completeCampaignInviteWithNewCharacter` |
+
+The acquisition discriminator prevents inferring the wrong mutation path from
+`characterKind` alone.
 
 ## Contracts layout
 
@@ -28,17 +42,26 @@ packages/contracts/src/character-import/                   # adapt + finalize im
 
 ## Dashboard entry surfaces
 
-| Entry             | URL                          | channel | kind | rulesScope | ownership |
-| ----------------- | ---------------------------- | ------- | ---- | ---------- | --------- |
-| Sidebar PC build  | `/characters/new`            | build   | pc   | ruleset    | user      |
-| Sidebar PC import | `/characters/import`         | import  | pc   | ruleset    | user      |
-| NPC build         | `/campaigns/:id/npcs/new`    | build   | npc  | campaign   | campaign  |
-| NPC import        | `/campaigns/:id/npcs/import` | import  | npc  | campaign   | campaign  |
-| PC detail         | `/characters/:characterId`   | —       | pc   | —          | user      |
-| NPC detail        | `/campaigns/:id/npcs/:npcId` | —       | npc  | —          | campaign  |
+| Entry              | URL                                              | channel | kind | rulesScope | ownership |
+| ------------------ | ------------------------------------------------ | ------- | ---- | ---------- | --------- |
+| Sidebar PC build   | `/characters/new`                                | build   | pc   | ruleset    | user      |
+| Sidebar PC import  | `/characters/import`                             | import  | pc   | ruleset    | user      |
+| NPC build          | `/campaigns/:id/npcs/new`                        | build   | npc  | campaign   | campaign  |
+| NPC import         | `/campaigns/:id/npcs/import`                     | import  | npc  | campaign   | campaign  |
+| Invite onboarding  | `/campaigns/:id/onboarding?inviteId=…`           | build   | pc   | campaign   | user      |
+| PC detail          | `/characters/:characterId`                       | —       | pc   | —          | user      |
+| Campaign PC detail | `/campaigns/:campaignId/characters/:characterId` | —       | pc   | —          | user      |
+| NPC detail         | `/campaigns/:id/npcs/:npcId`                     | —       | npc  | —          | campaign  |
 
 NPC authoring routes require campaign `owner` or `co-owner` (see campaign feature
 README). Default `/characters/*` never carries campaign id in the URL.
+
+### Campaign-scoped PC detail
+
+`/campaigns/:campaignId/characters/:characterId` is a thin campaign-context
+wrapper around the shared `CharacterDetailContent` sheet. It adds a campaign
+breadcrumb and reuses the standalone PC detail view model — no duplicate sheet
+layout. See `campaign-character-detail.tsx`.
 
 ## API boundaries
 

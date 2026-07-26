@@ -1,10 +1,11 @@
 import type { Metadata } from 'next'
+import { APP_NAME } from '@rpg/contracts'
 
 import { SiteHeader } from '@/components/site-header'
 import { CampaignInvitePage } from '@/features/campaign-invite'
 
 export const metadata: Metadata = {
-  title: 'Campaign invitation - RPG World Builder',
+  title: `Campaign invitation - ${APP_NAME}`,
 }
 
 type CampaignInviteRouteProps = {

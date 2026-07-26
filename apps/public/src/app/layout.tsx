@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
+import { APP_NAME } from '@rpg/contracts'
 
 import { AppProviders } from './providers.client'
 import './globals.css'
@@ -8,7 +9,7 @@ import './globals.css'
 const inter = Inter({ subsets: ['latin'], variable: '--font-body' })
 
 export const metadata: Metadata = {
-  title: 'RPG World Builder',
+  title: APP_NAME,
   description: 'Campaign tooling for tabletop RPGs - author worlds and run sessions.',
 }
 

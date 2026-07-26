@@ -18,6 +18,12 @@ Line 2: Edit · Duplicate (managers)     [manager access metadata]
 - `filter-catalog-rows-for-viewer.ts` applies discovery policy defense-in-depth before
   overview filters render.
 
+**Accepted member, no controlled PC yet:** `buildContentViewerFromCampaignContext`
+resolves such members to `{ kind: 'none' }`. They see `all_players` content but
+not `dm_only` or `specific_players` grants until onboarding completes and a
+character id enters `participantIds`. See
+`apps/api/docs/campaign-access-enforcement.md`.
+
 ## Table utility bar
 
 `ContentOverviewTable` composes `OverviewTableFrame` with `DataTableUtilityBar` inside the

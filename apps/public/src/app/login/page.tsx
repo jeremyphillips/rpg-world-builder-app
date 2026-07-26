@@ -1,9 +1,10 @@
 import type { Metadata } from 'next'
+import { APP_NAME } from '@rpg/contracts'
 
 import { LoginPageClient } from '@/features/auth/components/login-page.client'
 
 export const metadata: Metadata = {
-  title: 'Log in - RPG World Builder',
+  title: `Log in - ${APP_NAME}`,
 }
 
 export default function LoginPage() {
