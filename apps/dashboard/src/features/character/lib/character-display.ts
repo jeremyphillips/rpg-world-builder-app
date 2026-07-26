@@ -96,6 +96,8 @@ export const CHARACTER_DETAIL_TAB_LABELS = {
   narrative: 'Narrative',
 } as const
 
+export const CHARACTER_CARD_CAMPAIGN_LABEL = 'Campaign'
+
 export const CHARACTER_PROFICIENCY_GROUP_LABELS = {
   skills: getProficiencyDomainCompactLabel('skill'),
   languages: 'Languages',
@@ -108,6 +110,10 @@ export type CharacterCardViewModel = {
   id: string
   name: string
   summary: string
+  campaign?: {
+    id: string
+    name: string
+  }
 }
 
 export type CharacterDetailStatTileFooterKind = 'meta' | 'label'
@@ -269,13 +275,16 @@ export function formatCharacterSummary(
 }
 
 export function buildCharacterCardViewModel(
-  character: Pick<Character, 'id' | 'name' | 'classes' | 'species'>,
+  character: Pick<Character, 'id' | 'name' | 'classes' | 'species'> & {
+    campaign?: { id: string; name: string }
+  },
   catalogIndex: CharacterBuildCatalogIndex,
 ): CharacterCardViewModel {
   return {
     id: character.id,
     name: character.name,
     summary: formatCharacterSummary(character, catalogIndex),
+    ...(character.campaign ? { campaign: character.campaign } : {}),
   }
 }
 

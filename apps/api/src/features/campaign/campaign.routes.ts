@@ -4,6 +4,7 @@ import {
   createCampaignInputSchema,
   selectCampaignInputSchema,
   updateCampaignInputSchema,
+  CAMPAIGN_ROLES,
 } from '@rpg/contracts'
 
 import { requireAuth } from '../../middleware/require-auth'
@@ -28,4 +29,16 @@ campaignRouter.patch(
   requireCampaignRole('owner', 'co-owner'),
   validate(updateCampaignInputSchema),
   controller.patch,
+)
+campaignRouter.get(
+  '/:campaignId/members',
+  requireAuth,
+  requireCampaignRole(...CAMPAIGN_ROLES),
+  controller.listMembers,
+)
+campaignRouter.get(
+  '/:campaignId/party',
+  requireAuth,
+  requireCampaignRole(...CAMPAIGN_ROLES),
+  controller.listParty,
 )

@@ -5,6 +5,7 @@ import { campaignInviteStatusSchema } from '../vocab/campaign-invite-status'
 import { campaignRoleSchema } from '../../shared/roles'
 import { createCharacterInputSchema } from '../runtime/character/create-input'
 import { characterCampaignEligibilitySchema } from './eligibility/character-campaign-eligibility'
+import { characterCardViewModelSchema } from './campaign-overview-dtos'
 
 // ---------------------------------------------------------------------------
 // Campaign invite DTOs — client-facing shapes; never expose persistence fields.
@@ -71,17 +72,7 @@ export const campaignInviteOnboardingContextSchema = z.discriminatedUnion('statu
 export type CampaignInviteOnboardingContext = z.infer<typeof campaignInviteOnboardingContextSchema>
 
 export const campaignPartyPcListItemSchema = z.object({
-  character: z.object({
-    id: z.string().min(1),
-    name: z.string().min(1),
-    summary: z.string(),
-    campaign: z
-      .object({
-        id: z.string().min(1),
-        name: z.string().min(1),
-      })
-      .optional(),
-  }),
+  character: characterCardViewModelSchema,
   member: z.object({
     id: z.string().min(1),
     displayName: z.string().min(1),

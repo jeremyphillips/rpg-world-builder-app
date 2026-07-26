@@ -90,6 +90,18 @@ export async function findNpcsByIds(npcIds: readonly string[]): Promise<NpcChara
   return docs.map(toNpcCharacter)
 }
 
+export async function findPcsByIds(pcIds: readonly string[]): Promise<PcCharacter[]> {
+  const validIds = pcIds.filter((id) => isValidObjectId(id))
+  if (validIds.length === 0) return []
+
+  const docs = await CharacterModel.find({
+    _id: { $in: validIds },
+    characterType: 'pc',
+  }).lean<CharacterRecord[]>()
+
+  return docs.map(toCharacter)
+}
+
 export async function deletePcForUser(characterId: string, userId: string): Promise<boolean> {
   if (!isValidObjectId(characterId)) return false
 

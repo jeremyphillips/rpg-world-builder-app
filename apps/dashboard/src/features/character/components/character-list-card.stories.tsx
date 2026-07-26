@@ -26,3 +26,12 @@ export const Default: Story = {
     card: buildCharacterCardViewModel(SAMPLE_PC, catalogIndex),
   },
 }
+
+export const WithCampaign: Story = {
+  args: {
+    card: {
+      ...buildCharacterCardViewModel(SAMPLE_PC, catalogIndex),
+      campaign: { id: 'camp_1', name: 'The Argent Road' },
+    },
+  },
+}

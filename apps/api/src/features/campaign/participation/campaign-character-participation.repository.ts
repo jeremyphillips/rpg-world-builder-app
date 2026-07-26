@@ -95,6 +95,20 @@ export async function listOpenParticipationsForCampaign(
   return docs.map(toParticipation)
 }
 
+export async function listOpenParticipationsForCharacters(
+  characterIds: readonly string[],
+): Promise<CampaignCharacterParticipation[]> {
+  const validIds = characterIds.filter((id) => isValidObjectId(id))
+  if (validIds.length === 0) return []
+
+  const docs = await CampaignCharacterParticipationModel.find({
+    characterId: { $in: validIds },
+    ...OPEN_PARTICIPATION_FILTER,
+  }).lean<ParticipationRecord[]>()
+
+  return docs.map(toParticipation)
+}
+
 export async function listOpenPcParticipationCharacterIdsForCampaign(
   campaignId: string,
 ): Promise<string[]> {

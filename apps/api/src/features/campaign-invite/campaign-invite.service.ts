@@ -583,8 +583,6 @@ export async function completeCampaignInviteWithExistingCharacter({
     throw new HttpError(500, 'internal_error', 'Failed to complete invitation.')
   }
 
-  // TODO(campaign-overview): invalidate party/membership queries after invite completion.
-  // TODO(campaign-overview): surface the new party PC in campaign overview once phase 8 ships.
   // TODO(notifications): notify campaign owners when onboarding completes.
 
   return { campaignId: invite.campaignId, characterId }
@@ -657,8 +655,6 @@ export async function completeCampaignInviteWithNewCharacter({
     throw err
   }
 
-  // TODO(campaign-overview): invalidate party/membership queries after invite completion.
-  // TODO(campaign-overview): surface the new party PC in campaign overview once phase 8 ships.
   // TODO(notifications): notify campaign owners when onboarding completes.
 
   return { campaignId: acceptedInvite.campaignId, characterId: character.id }

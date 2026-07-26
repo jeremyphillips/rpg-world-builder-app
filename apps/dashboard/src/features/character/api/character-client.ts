@@ -1,4 +1,9 @@
-import type { PcCharacter, CreateCharacterInput, SystemRulesetId } from '@rpg/contracts'
+import type {
+  PcCharacter,
+  PcCharacterListItem,
+  CreateCharacterInput,
+  SystemRulesetId,
+} from '@rpg/contracts'
 
 import { deleteJson, postJson, request } from '@/lib/api-client'
 
@@ -16,8 +21,8 @@ export async function createCharacter(input: CreateCharacterInput): Promise<PcCh
   return character
 }
 
-export async function listCharacters(): Promise<PcCharacter[]> {
-  const { characters } = await request<{ characters: PcCharacter[] }>(
+export async function listCharacters(): Promise<PcCharacterListItem[]> {
+  const { characters } = await request<{ characters: PcCharacterListItem[] }>(
     '/api/characters',
     undefined,
     LIST_CHARACTERS_ERROR,

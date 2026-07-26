@@ -71,6 +71,14 @@ export async function findSessionUserById(id: string): Promise<SessionUser | nul
   return toSessionUser(toUser(doc))
 }
 
+export async function findUsersByIds(ids: readonly string[]): Promise<User[]> {
+  const validIds = ids.filter((id) => isValidObjectId(id))
+  if (validIds.length === 0) return []
+
+  const docs = await UserModel.find({ _id: { $in: validIds } }).lean<UserRecord[]>()
+  return docs.map(toUser)
+}
+
 /**
  * Persist the user's most recently selected campaign. Membership is validated
  * by the caller; this only writes the preference and returns the updated user.

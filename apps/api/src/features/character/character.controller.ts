@@ -9,6 +9,7 @@ import {
   findCharacterForUser,
   listCharactersForUser,
 } from './character.service'
+import { enrichPcsWithOpenCampaign } from './enrich-pcs-with-open-campaign.lib'
 
 export async function create(req: Request, res: Response): Promise<void> {
   const character = await createCharacter(req.body as CreateCharacterInput, req.user!.id)
@@ -17,7 +18,8 @@ export async function create(req: Request, res: Response): Promise<void> {
 
 export async function list(req: Request, res: Response): Promise<void> {
   const characters = await listCharactersForUser(req.user!.id)
-  res.status(200).json({ characters })
+  const enriched = await enrichPcsWithOpenCampaign(characters)
+  res.status(200).json({ characters: enriched })
 }
 
 export async function getById(req: Request, res: Response): Promise<void> {

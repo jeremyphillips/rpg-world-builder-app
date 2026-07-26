@@ -10,6 +10,10 @@ import {
   listCampaignsForUser,
   updateCampaign,
 } from './campaign.service'
+import {
+  listCampaignMembersForOverview,
+  listCampaignPartyForOverview,
+} from './campaign-overview.service'
 
 export async function create(req: Request, res: Response): Promise<void> {
   // `req.body` is validated by `validate(createCampaignInputSchema)`; `req.user`
@@ -56,4 +60,16 @@ export async function selectCampaign(req: Request, res: Response): Promise<void>
     throw HttpError.unauthorized()
   }
   res.status(200).json({ user })
+}
+
+export async function listMembers(req: Request, res: Response): Promise<void> {
+  const { campaignId } = req.params as { campaignId: string }
+  const members = await listCampaignMembersForOverview(campaignId)
+  res.status(200).json({ members })
+}
+
+export async function listParty(req: Request, res: Response): Promise<void> {
+  const { campaignId } = req.params as { campaignId: string }
+  const party = await listCampaignPartyForOverview(campaignId)
+  res.status(200).json({ party })
 }
