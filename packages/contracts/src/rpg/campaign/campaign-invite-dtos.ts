@@ -3,6 +3,7 @@ import { z } from 'zod'
 import { campaignInviteDeliveryStatusSchema } from '../vocab/campaign-invite-delivery-status'
 import { campaignInviteStatusSchema } from '../vocab/campaign-invite-status'
 import { campaignRoleSchema } from '../../shared/roles'
+import { createCharacterInputSchema } from '../runtime/character/create-input'
 import { characterCampaignEligibilitySchema } from './eligibility/character-campaign-eligibility'
 
 // ---------------------------------------------------------------------------
@@ -116,6 +117,14 @@ export const completeCampaignInviteWithExistingCharacterInputSchema = z.object({
 
 export type CompleteCampaignInviteWithExistingCharacterInput = z.infer<
   typeof completeCampaignInviteWithExistingCharacterInputSchema
+>
+
+export const completeCampaignInviteWithNewCharacterInputSchema = z.object({
+  characterCreateInput: createCharacterInputSchema,
+})
+
+export type CompleteCampaignInviteWithNewCharacterInput = z.infer<
+  typeof completeCampaignInviteWithNewCharacterInputSchema
 >
 
 export const completeCampaignInviteResultSchema = z.object({

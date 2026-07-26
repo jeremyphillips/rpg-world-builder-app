@@ -2,6 +2,7 @@ import type {
   CampaignInviteEligibleCharacter,
   CampaignInviteOnboardingContext,
   CompleteCampaignInviteResult,
+  CreateCharacterInput,
 } from '@rpg/contracts'
 
 import { postJson, request } from '@/lib/api-client'
@@ -42,6 +43,20 @@ export async function completeCampaignInviteWithExistingCharacter({
   return postJson<CompleteCampaignInviteResult>(
     `/api/campaign-invites/${encodeURIComponent(inviteId)}/complete-with-existing-character`,
     { characterId },
+    COMPLETE_INVITE_ERROR,
+  )
+}
+
+export async function completeCampaignInviteWithNewCharacter({
+  inviteId,
+  characterCreateInput,
+}: {
+  inviteId: string
+  characterCreateInput: CreateCharacterInput
+}): Promise<CompleteCampaignInviteResult> {
+  return postJson<CompleteCampaignInviteResult>(
+    `/api/campaign-invites/${encodeURIComponent(inviteId)}/complete-with-new-character`,
+    { characterCreateInput },
     COMPLETE_INVITE_ERROR,
   )
 }

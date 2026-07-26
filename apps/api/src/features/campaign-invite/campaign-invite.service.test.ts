@@ -15,6 +15,7 @@ import { setEmailProviderForTests } from '../../services/email/email.service'
 import {
   acceptCampaignInvite,
   completeCampaignInviteWithExistingCharacter,
+  completeCampaignInviteWithNewCharacter,
   getCampaignInviteOnboardingContext,
   listCampaignInvitesForOverview,
   listEligibleCharactersForInvite,
@@ -371,5 +372,51 @@ describe('campaign invite service', () => {
       characterId: character.id,
     })
     expect(idempotent).toEqual({ campaignId, characterId: character.id })
+  })
+
+  it('completes onboarding by creating a new campaign PC', async () => {
+    const { id: campaignId, owner } = await makeTestCampaign({ name: 'New PC Campaign' })
+    const player = await makeTestUser({ email: 'newpc@example.com', displayName: 'New PC Player' })
+    const rawToken = generateInviteToken()
+
+    const invite = await createInviteRecord({
+      campaignId,
+      email: 'newpc@example.com',
+      normalizedEmail: 'newpc@example.com',
+      tokenHash: hashInviteToken(rawToken),
+      expiresAt: computeInviteExpiresAt(),
+      invitedByUserId: owner.id,
+    })
+
+    await acceptCampaignInvite({
+      rawToken,
+      userId: player.id,
+      userEmail: player.email,
+    })
+
+    const completed = await completeCampaignInviteWithNewCharacter({
+      inviteId: invite.id,
+      userId: player.id,
+      characterCreateInput: minimalStandalonePcInput,
+    })
+
+    expect(completed.campaignId).toBe(campaignId)
+    expect(completed.characterId).toBeTruthy()
+
+    const membership = await CampaignMembershipModel.findOne({ campaignId, userId: player.id })
+    expect(membership?.controlledCharacterIds).toContain(completed.characterId)
+
+    const refreshedInvite = await CampaignInviteModel.findById(invite.id).lean()
+    expect(refreshedInvite).toMatchObject({
+      status: 'completed',
+      completedCharacterId: completed.characterId,
+    })
+
+    const idempotent = await completeCampaignInviteWithNewCharacter({
+      inviteId: invite.id,
+      userId: player.id,
+      characterCreateInput: minimalStandalonePcInput,
+    })
+    expect(idempotent).toEqual(completed)
   })
 })

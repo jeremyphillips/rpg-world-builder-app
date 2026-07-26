@@ -5,14 +5,20 @@ import type {
   CampaignInviteOnboardingContext,
   CampaignInvitePublicResolution,
   CompleteCampaignInviteResult,
+  CreateCharacterInput,
 } from '@rpg/contracts'
 import { CAMPAIGN_INVITE_EXPIRY_DAYS, resolveCharacterCampaignEligibility } from '@rpg/contracts'
 
 import { HttpError } from '../../lib/http-error'
 import type { EmailProvider } from '../../services/email/email.types'
 import { findCampaignById } from '../campaign/find-campaign-by-id'
+import { CampaignMembershipModel } from '../campaign/campaign-membership.model'
 import { assignControlledPcToCampaignMember } from '../campaign/participation/assign-controlled-pc.service'
-import { findOpenParticipationForCharacter } from '../campaign/participation/campaign-character-participation.repository'
+import {
+  deleteAllParticipationsForCharacter,
+  findOpenParticipationForCharacter,
+} from '../campaign/participation/campaign-character-participation.repository'
+import { createPcRecord, deletePcForUser } from '../character/character.repository'
 import { listCharactersForUser, findCharacterForUser } from '../character/character.service'
 import { findUserByEmail, findSessionUserById } from '../user/user.service'
 import { getRulesetPatchRead } from '../vocabulary'
@@ -45,6 +51,10 @@ import {
   buildCampaignContentEligibilityMap,
   formatInviteCharacterSummary,
 } from './campaign-invite-eligibility.lib'
+import {
+  resolveCompletedInviteForNewCharacter,
+  validateNewCharacterInviteInput,
+} from './complete-campaign-invite-new-character.lib'
 
 export type SendCampaignInviteInput = {
   campaignId: string
@@ -578,6 +588,80 @@ export async function completeCampaignInviteWithExistingCharacter({
   // TODO(notifications): notify campaign owners when onboarding completes.
 
   return { campaignId: invite.campaignId, characterId }
+}
+
+async function compensateInviteNewCharacterCompletion({
+  characterId,
+  userId,
+  membershipId,
+}: {
+  characterId: string
+  userId: string
+  membershipId: string
+}): Promise<void> {
+  await CampaignMembershipModel.updateOne(
+    { _id: membershipId },
+    { $pull: { controlledCharacterIds: characterId } },
+  )
+  await deleteAllParticipationsForCharacter(characterId)
+  await deletePcForUser(characterId, userId)
+}
+
+export async function completeCampaignInviteWithNewCharacter({
+  inviteId,
+  userId,
+  characterCreateInput,
+}: {
+  inviteId: string
+  userId: string
+  characterCreateInput: CreateCharacterInput
+}): Promise<CompleteCampaignInviteResult> {
+  const invite = await findInviteById(inviteId)
+  if (!invite) {
+    throw new HttpError(404, 'not_found', 'Invitation not found.')
+  }
+
+  const currentInvite = await expireInviteIfNeeded(invite)
+  const completedResult = await resolveCompletedInviteForNewCharacter({
+    invite: currentInvite,
+    userId,
+  })
+  if (completedResult) return completedResult
+
+  const acceptedInvite = await loadAcceptedInviteForUser({ inviteId, userId })
+  const { parsedInput, membershipId } = await validateNewCharacterInviteInput({
+    acceptedInvite,
+    userId,
+    characterCreateInput,
+  })
+
+  const character = await createPcRecord(parsedInput, userId)
+
+  try {
+    await assignControlledPcToCampaignMember({
+      campaignId: acceptedInvite.campaignId,
+      membershipId,
+      characterId: character.id,
+    })
+
+    const completed = await markInviteCompleted(invite.id, character.id, new Date())
+    if (!completed) {
+      throw new HttpError(500, 'internal_error', 'Failed to complete invitation.')
+    }
+  } catch (err) {
+    await compensateInviteNewCharacterCompletion({
+      characterId: character.id,
+      userId,
+      membershipId,
+    })
+    throw err
+  }
+
+  // TODO(campaign-overview): invalidate party/membership queries after invite completion.
+  // TODO(campaign-overview): surface the new party PC in campaign overview once phase 8 ships.
+  // TODO(notifications): notify campaign owners when onboarding completes.
+
+  return { campaignId: acceptedInvite.campaignId, characterId: character.id }
 }
 
 export { CAMPAIGN_INVITE_EXPIRY_DAYS }

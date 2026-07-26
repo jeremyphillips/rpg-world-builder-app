@@ -5,10 +5,10 @@ import { Link, useNavigate } from 'react-router-dom'
 
 import {
   CharacterBuildFinalizationError,
-  finalizeCharacterBuild,
-  finalizeNpcCharacterBuild,
   getErrorMessage,
   resolveBuilderLevelConstraints,
+  type CampaignBuildContext,
+  type CharacterBuildAcquisition,
   type CharacterBuildCatalogIndex,
   type CharacterBuildContext,
   type CharacterBuilderDraft,
@@ -16,19 +16,17 @@ import {
   type CharacterBuildValidationIssue,
   type EquipmentPickerFocusIntent,
 } from '@rpg/contracts'
-import { buttonVariants, Heading, Spinner, Text } from '@rpg/ui'
+import { buttonVariants, Button, Heading, Spinner, Text } from '@rpg/ui'
 
-import { ROUTES } from '@/app/routes'
+import { useCompleteCampaignInviteWithNewCharacter } from '@/features/campaign'
 
 import { useResolvedChoiceSets } from '../hooks/use-resolved-choice-sets'
 import { useCharacterPreview } from '../hooks/use-character-preview'
 import { useCharacterBuilderStore } from '../hooks/use-character-builder-store'
 import { useCreateCharacter } from '../hooks/use-create-character'
 import { useCreateNpc } from '../npc/hooks/use-create-npc'
-import {
-  getBuilderChromeCopyForContext,
-  resolveCampaignIdFromContext,
-} from '../lib/builder-chrome-copy'
+import { getBuilderChromeCopyForContext } from '../lib/builder-chrome-copy'
+import { finalizeBuilderCharacter } from '../lib/character-builder-finalize.lib'
 import {
   mergeValidationVisibleStepIds,
   pruneValidationVisibleStepIds,
@@ -68,19 +66,43 @@ import {
 import { CharacterBuilderStepContent } from './character-builder-step-content.client'
 import { CharacterBuilderStepRail } from './character-builder-step-rail.client'
 
+function resolveBuildAcquisition(context: CharacterBuildContext): CharacterBuildAcquisition {
+  if (isCampaignBuildContext(context)) {
+    return context.acquisition
+  }
+
+  return { kind: 'standalone' }
+}
+
+function isCampaignBuildContext(context: CharacterBuildContext): context is CampaignBuildContext {
+  return 'acquisition' in context
+}
+
 export type CharacterBuilderShellProps = {
   context: CharacterBuildContext
   catalogIndex: CharacterBuildCatalogIndex
+  /** When set, renders the exit control as a button instead of a navigation link. */
+  onExitClick?: () => void
 }
 
 /** Full-viewport builder chrome: step rail, step panel, live preview, footer nav. */
-export function CharacterBuilderShell({ context, catalogIndex }: CharacterBuilderShellProps) {
+// fallow-ignore-next-line complexity
+export function CharacterBuilderShell({
+  context,
+  catalogIndex,
+  onExitClick,
+}: CharacterBuilderShellProps) {
   const navigate = useNavigate()
   const chrome = getBuilderChromeCopyForContext(context)
-  const campaignId = resolveCampaignIdFromContext(context)
   const { mutateAsync: createCharacterMutation, isPending: isCreatingPc } = useCreateCharacter()
   const { mutateAsync: createNpcMutation, isPending: isCreatingNpc } = useCreateNpc()
-  const isCreating = isCreatingPc || isCreatingNpc
+  const inviteId =
+    isCampaignBuildContext(context) && context.acquisition.kind === 'campaign_invite'
+      ? context.acquisition.inviteId
+      : undefined
+  const { mutateAsync: completeInviteWithNewCharacter, isPending: isCompletingInvite } =
+    useCompleteCampaignInviteWithNewCharacter(inviteId)
+  const isCreating = isCreatingPc || isCreatingNpc || isCompletingInvite
   const hasHydrated = useCharacterBuilderStore(context, (state) => state._hasHydrated)
   const hasPendingRestore = useCharacterBuilderStore(context, (state) => state.hasPendingRestore)
   const draft = useCharacterBuilderStore(context, (state) => state.draft)
@@ -319,23 +341,17 @@ export function CharacterBuilderShell({ context, catalogIndex }: CharacterBuilde
     }
 
     try {
-      if (context.characterKind === 'npc') {
-        if (!campaignId) {
-          setCreateError(chrome.createErrorDefault)
-          return
-        }
-
-        const input = finalizeNpcCharacterBuild(draft, context, { resolvedChoiceSets })
-        const npc = await createNpcMutation({ campaignId, input })
-        await clearPersistedDraft()
-        navigate(ROUTES.campaign.npcs.detail(campaignId, npc.character.id))
-        return
-      }
-
-      const input = finalizeCharacterBuild(draft, context, { resolvedChoiceSets })
-      const character = await createCharacterMutation(input)
+      const destination = await finalizeBuilderCharacter({
+        acquisition: resolveBuildAcquisition(context),
+        context,
+        draft,
+        resolvedChoiceSets,
+        createNpc: createNpcMutation,
+        createStandalonePc: createCharacterMutation,
+        completeInviteWithNewCharacter: completeInviteWithNewCharacter,
+      })
       await clearPersistedDraft()
-      navigate(ROUTES.characters.detail(character.id))
+      navigate(destination)
     } catch (error) {
       if (error instanceof CharacterBuildFinalizationError) {
         const issueStepIds = error.validationIssues.flatMap((issue) =>
@@ -375,9 +391,15 @@ export function CharacterBuilderShell({ context, catalogIndex }: CharacterBuilde
                 {chrome.importLabel}
               </Link>
             ) : null}
-            <Link to={chrome.exitHref} className={buttonVariants({ variant: 'outline' })}>
-              {chrome.exitLabel}
-            </Link>
+            {onExitClick ? (
+              <Button type="button" variant="outline" onClick={onExitClick}>
+                {chrome.exitLabel}
+              </Button>
+            ) : (
+              <Link to={chrome.exitHref} className={buttonVariants({ variant: 'outline' })}>
+                {chrome.exitLabel}
+              </Link>
+            )}
           </div>
         </header>
 

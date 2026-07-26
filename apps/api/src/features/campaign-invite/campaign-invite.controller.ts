@@ -2,11 +2,13 @@ import type { Request, Response } from 'express'
 import type {
   CampaignInviteRecipientInput,
   CompleteCampaignInviteWithExistingCharacterInput,
+  CompleteCampaignInviteWithNewCharacterInput,
 } from '@rpg/contracts'
 
 import {
   acceptCampaignInvite,
   completeCampaignInviteWithExistingCharacter,
+  completeCampaignInviteWithNewCharacter,
   getCampaignInviteOnboardingContext,
   listCampaignInvitesForOverview,
   listEligibleCharactersForInvite,
@@ -72,6 +74,17 @@ export async function completeWithExistingCharacter(req: Request, res: Response)
     inviteId,
     userId: req.user!.id,
     characterId,
+  })
+  res.status(200).json(result)
+}
+
+export async function completeWithNewCharacter(req: Request, res: Response): Promise<void> {
+  const { inviteId } = req.params as { inviteId: string }
+  const { characterCreateInput } = req.body as CompleteCampaignInviteWithNewCharacterInput
+  const result = await completeCampaignInviteWithNewCharacter({
+    inviteId,
+    userId: req.user!.id,
+    characterCreateInput,
   })
   res.status(200).json(result)
 }

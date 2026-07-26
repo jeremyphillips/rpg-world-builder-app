@@ -16,6 +16,9 @@ export { CharacterBuilderDraftRestore } from './components/character-builder-dra
 export { useBuildContext, type BuildContextResult } from './hooks/use-build-context'
 export {
   useCampaignBuildContext,
+  useCampaignCharacterBuildContext,
+  useCampaignInvitePcBuildContext,
+  useCampaignNpcBuildContext,
   type CampaignBuildContextResult,
 } from './hooks/use-campaign-build-context'
 export {

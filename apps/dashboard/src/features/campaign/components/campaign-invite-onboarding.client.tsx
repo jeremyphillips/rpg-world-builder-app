@@ -3,7 +3,9 @@
 import { useState } from 'react'
 
 import type { CampaignInviteOnboardingAcceptedContext } from '@rpg/contracts'
-import { Button, Heading, RadioCard, Text } from '@rpg/ui'
+import { Heading, RadioCard, Text } from '@rpg/ui'
+
+import { NarrowPage } from '@/components/layout/narrow-page'
 
 import {
   ONBOARDING_CHOICE_EXISTING,
@@ -11,23 +13,7 @@ import {
   type OnboardingBranch,
 } from '../lib/campaign-invite-onboarding.lib'
 import { ExistingCharacterPanel } from './campaign-invite-existing-character-panel.client'
-
-function NewCharacterPlaceholder({ onBack }: { onBack: () => void }) {
-  return (
-    <div className="flex flex-col gap-4">
-      <Heading variant="section" as="h2">
-        Create a new character
-      </Heading>
-      <Text variant="muted">
-        Building a new campaign character from this campaign&apos;s rules is coming in the next
-        onboarding phase.
-      </Text>
-      <Button type="button" variant="outline" onClick={onBack}>
-        Back
-      </Button>
-    </div>
-  )
-}
+import { NewCharacterPanel } from './campaign-invite-new-character-panel.client'
 
 function OnboardingChoicePanel({
   context,
@@ -81,12 +67,22 @@ export function CampaignInviteOnboardingClient({
   const [branch, setBranch] = useState<OnboardingBranch>('choice')
 
   if (branch === 'existing') {
-    return <ExistingCharacterPanel inviteId={inviteId} onBack={() => setBranch('choice')} />
+    return (
+      <NarrowPage>
+        <ExistingCharacterPanel inviteId={inviteId} onBack={() => setBranch('choice')} />
+      </NarrowPage>
+    )
   }
 
   if (branch === 'new') {
-    return <NewCharacterPlaceholder onBack={() => setBranch('choice')} />
+    return (
+      <NewCharacterPanel context={context} inviteId={inviteId} onBack={() => setBranch('choice')} />
+    )
   }
 
-  return <OnboardingChoicePanel context={context} onSelect={setBranch} />
+  return (
+    <NarrowPage>
+      <OnboardingChoicePanel context={context} onSelect={setBranch} />
+    </NarrowPage>
+  )
 }

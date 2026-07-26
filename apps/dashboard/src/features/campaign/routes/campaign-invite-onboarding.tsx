@@ -36,21 +36,19 @@ export function CampaignInviteOnboarding() {
   }
 
   return (
-    <NarrowPage>
-      <PageLoadState
-        isPending={isPending}
-        isError={isError}
-        errorLabel={error?.message}
-        defaultErrorLabel="Could not load campaign onboarding."
-      >
-        {context ? (
-          <CampaignInviteOnboardingBody
-            context={context}
-            campaignId={campaignId}
-            inviteId={inviteId}
-          />
-        ) : null}
-      </PageLoadState>
-    </NarrowPage>
+    <PageLoadState
+      isPending={isPending}
+      isError={isError}
+      errorLabel={error?.message}
+      defaultErrorLabel="Could not load campaign onboarding."
+    >
+      {context ? (
+        <CampaignInviteOnboardingBody
+          context={context}
+          campaignId={campaignId}
+          inviteId={inviteId}
+        />
+      ) : null}
+    </PageLoadState>
   )
 }

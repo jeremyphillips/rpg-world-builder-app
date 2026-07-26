@@ -1,4 +1,9 @@
-import type { CharacterBuildContext, CharacterBuilderStepId, CharacterKind } from '@rpg/contracts'
+import type {
+  CampaignBuildContext,
+  CharacterBuildContext,
+  CharacterBuilderStepId,
+  CharacterKind,
+} from '@rpg/contracts'
 
 import { ROUTES } from '@/app/routes'
 
@@ -28,10 +33,38 @@ export function resolveCampaignIdFromContext(
   return context.rulesScope.type === 'campaign' ? context.rulesScope.campaignId : undefined
 }
 
+function getCampaignInvitePcChrome(): BuilderChromeCopy {
+  return {
+    pageHeading: 'Create your campaign character',
+    createLabel: 'Create campaign character',
+    creatingLabel: 'Creating…',
+    createErrorDefault: 'Could not create campaign character.',
+    exitHref: '#',
+    exitLabel: 'Back to character choice',
+    importHref: null,
+    importLabel: null,
+    reviewValidationHeading: 'Fix the following before creating your campaign character:',
+    reviewReadyMessage: 'Your campaign character is ready to create.',
+    reviewBlockedMessage: 'Resolve the issues above before creating your campaign character.',
+    reviewFooterHint: 'Resolve the issues above before creating your campaign character.',
+    reviewStepDescription: 'Review and create your campaign character',
+    draftRestoreHeadline: 'Continue your campaign character draft?',
+    draftRestoreDescription:
+      'A previous campaign character draft was saved in this browser session. Continue where you left off or start over.',
+    draftRestoreConfirmLabel: 'Continue previous draft',
+    draftRestoreCancelLabel: 'Start over',
+  }
+}
+
 export function getBuilderChromeCopy(
   characterKind: CharacterKind,
   campaignId?: string,
+  acquisitionKind?: 'standalone' | 'campaign_npc' | 'campaign_invite',
 ): BuilderChromeCopy {
+  if (acquisitionKind === 'campaign_invite') {
+    return getCampaignInvitePcChrome()
+  }
+
   if (characterKind === 'npc') {
     if (!campaignId) {
       throw new Error('NPC builder chrome requires a campaign id')
@@ -82,7 +115,19 @@ export function getBuilderChromeCopy(
 }
 
 export function getBuilderChromeCopyForContext(context: CharacterBuildContext): BuilderChromeCopy {
-  return getBuilderChromeCopy(context.characterKind, resolveCampaignIdFromContext(context))
+  const acquisitionKind = isCampaignBuildContext(context)
+    ? context.acquisition.kind
+    : ('standalone' as const)
+
+  return getBuilderChromeCopy(
+    context.characterKind,
+    resolveCampaignIdFromContext(context),
+    acquisitionKind,
+  )
+}
+
+function isCampaignBuildContext(context: CharacterBuildContext): context is CampaignBuildContext {
+  return 'acquisition' in context
 }
 
 export function resolveBuilderStepDescription(

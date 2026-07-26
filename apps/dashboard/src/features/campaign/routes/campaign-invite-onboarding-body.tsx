@@ -1,6 +1,8 @@
 import type { CampaignInviteOnboardingContext } from '@rpg/contracts'
 import { Text } from '@rpg/ui'
 
+import { NarrowPage } from '@/components/layout/narrow-page'
+
 import { CampaignInviteOnboardingClient } from '../components/campaign-invite-onboarding.client'
 
 export function CampaignInviteOnboardingBody({
@@ -16,9 +18,11 @@ export function CampaignInviteOnboardingBody({
 
   if (context.campaign.id !== campaignId) {
     return (
-      <Text variant="destructive" role="alert">
-        This invitation does not match the campaign in the URL.
-      </Text>
+      <NarrowPage>
+        <Text variant="destructive" role="alert">
+          This invitation does not match the campaign in the URL.
+        </Text>
+      </NarrowPage>
     )
   }
 

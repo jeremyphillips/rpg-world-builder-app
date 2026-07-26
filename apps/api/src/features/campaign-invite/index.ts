@@ -2,6 +2,7 @@ export { campaignInviteCampaignRouter, campaignInvitePublicRouter } from './camp
 export {
   acceptCampaignInvite,
   completeCampaignInviteWithExistingCharacter,
+  completeCampaignInviteWithNewCharacter,
   getCampaignInviteOnboardingContext,
   listCampaignInvitesForOverview,
   listEligibleCharactersForInvite,
