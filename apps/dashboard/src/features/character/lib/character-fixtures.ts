@@ -27,6 +27,10 @@ export const SAMPLE_PC: PcCharacter = {
   },
   wealth: { cp: 0, sp: 0, gp: 0, pp: 0 },
   feats: [],
+  lifecycle: {
+    roster: { status: 'active' },
+    vital: { status: 'alive' },
+  },
   narrative: { backstory: 'A hardy dwarf fighter from the northern holds.' },
   createdAt: '2026-01-01T00:00:00.000Z',
   updatedAt: '2026-01-01T00:00:00.000Z',

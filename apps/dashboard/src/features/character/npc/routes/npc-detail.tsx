@@ -9,8 +9,10 @@ import { WidePage } from '@/components/layout/wide-page'
 import { useCanManageCampaign } from '@/features/campaign'
 
 import { CharacterDetailContent } from '../../components/detail/character-detail-content.client'
+import { CharacterIdentityLifecycleSummary } from '../../components/detail/character-identity-lifecycle-summary.client'
 import { useCampaignBuildContext } from '../../hooks/use-campaign-build-context'
 import { buildCharacterDetailViewModel } from '../../lib/character-display'
+import { NpcLifecycleEditAction } from '../components/npc-lifecycle-edit-action.client'
 import { useDeleteNpc } from '../hooks/use-delete-npc'
 import { useNpc } from '../hooks/use-npcs'
 
@@ -75,6 +77,18 @@ export function NpcDetail() {
         {viewModel ? (
           <CharacterDetailContent
             viewModel={viewModel}
+            lifecycle={
+              <CharacterIdentityLifecycleSummary lifecycle={viewModel.identity.lifecycle} />
+            }
+            lifecycleActions={
+              canManage && npc ? (
+                <NpcLifecycleEditAction
+                  campaignId={campaignId}
+                  npcId={npc.id}
+                  lifecycle={npc.lifecycle}
+                />
+              ) : undefined
+            }
             showDelete={canManage}
             deleteConfig={
               canManage

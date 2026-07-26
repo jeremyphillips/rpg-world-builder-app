@@ -12,6 +12,7 @@ export const createNpcRequestInputSchema = npcCharacterSchema.omit({
   userId: true,
   characterType: true,
   campaignId: true,
+  lifecycle: true,
   createdAt: true,
   updatedAt: true,
 })

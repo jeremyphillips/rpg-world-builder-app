@@ -1,3 +1,4 @@
+import type { BulkFieldOperation } from '../../../lib/bulk-field-operation'
 import type { ContentVisibilityMode } from '../../vocab/content-visibility'
 
 import {
@@ -7,10 +8,7 @@ import {
   type ResolvedContentCampaignAccess,
 } from './campaign-access'
 
-export type BulkFieldOperation<T> =
-  | { kind: 'unchanged' }
-  | { kind: 'set'; value: T }
-  | { kind: 'reset' }
+export type { BulkFieldOperation } from '../../../lib/bulk-field-operation'
 
 export type BulkCampaignAccessFormValues = {
   available: BulkFieldOperation<boolean>

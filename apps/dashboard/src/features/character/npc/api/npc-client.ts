@@ -1,11 +1,12 @@
-import type { CreateNpcRequestInput, NpcCharacter } from '@rpg/contracts'
+import type { CharacterLifecyclePatch, CreateNpcRequestInput, NpcCharacter } from '@rpg/contracts'
 
-import { deleteJson, postJson, request } from '@/lib/api-client'
+import { deleteJson, patchJson, postJson, request } from '@/lib/api-client'
 
 const LIST_NPCS_ERROR = 'Could not load NPCs.'
 const GET_NPC_ERROR = 'Could not load NPC.'
 const CREATE_NPC_ERROR = 'Could not create NPC.'
 const DELETE_NPC_ERROR = 'Could not delete NPC.'
+const PATCH_NPC_LIFECYCLE_ERROR = 'Could not update NPC lifecycle.'
 
 function npcCollectionPath(campaignId: string) {
   return `/api/campaigns/${campaignId}/npcs`
@@ -45,4 +46,17 @@ export async function deleteNpc(campaignId: string, npcId: string): Promise<void
   await deleteJson(`${npcCollectionPath(campaignId)}/${npcId}`, DELETE_NPC_ERROR)
 }
 
-export type { CreateNpcRequestInput, NpcCharacter }
+export async function patchNpcLifecycle(
+  campaignId: string,
+  npcId: string,
+  patch: CharacterLifecyclePatch,
+): Promise<NpcCharacter> {
+  const { npc } = await patchJson<{ npc: NpcCharacter }>(
+    `${npcCollectionPath(campaignId)}/${npcId}`,
+    patch,
+    PATCH_NPC_LIFECYCLE_ERROR,
+  )
+  return npc
+}
+
+export type { CreateNpcRequestInput, NpcCharacter, CharacterLifecyclePatch }

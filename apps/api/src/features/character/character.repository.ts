@@ -1,12 +1,14 @@
 import { isValidObjectId } from 'mongoose'
 
 import type {
+  CharacterLifecycle,
   CreateNpcServiceInput,
   CreateCharacterInput,
   NpcCharacter,
   PcCharacter,
   SystemRulesetId,
 } from '@rpg/contracts'
+import { createDefaultCharacterLifecycle, normalizeCharacterLifecycle } from '@rpg/contracts'
 
 import { CharacterModel } from './character.model'
 import { toNpcCharacter } from './to-npc-character'
@@ -24,6 +26,7 @@ export async function createPcRecord(
     userId,
     campaignId: input.campaignId ?? null,
     rulesetId: input.rulesetId as SystemRulesetId,
+    lifecycle: createDefaultCharacterLifecycle(),
   })
 
   return toCharacter(doc.toObject() as CharacterRecord)
@@ -35,6 +38,7 @@ export async function createNpcRecord(input: CreateNpcServiceInput): Promise<Npc
     characterType: 'npc',
     campaignId: input.campaignId,
     rulesetId: input.rulesetId as SystemRulesetId,
+    lifecycle: createDefaultCharacterLifecycle(),
   })
 
   return toNpcCharacter(doc.toObject() as CharacterRecord)
@@ -110,4 +114,31 @@ export async function deleteNpcForCampaign(npcId: string, campaignId: string): P
   })
 
   return result.deletedCount === 1
+}
+
+export async function updateCharacterLifecycleRecord(
+  characterId: string,
+  nextLifecycle: CharacterLifecycle,
+): Promise<boolean> {
+  if (!isValidObjectId(characterId)) return false
+
+  const result = await CharacterModel.updateOne(
+    { _id: characterId },
+    { $set: { lifecycle: nextLifecycle } },
+  )
+
+  return result.matchedCount === 1
+}
+
+export async function findCharacterLifecycle(
+  characterId: string,
+): Promise<CharacterLifecycle | null> {
+  if (!isValidObjectId(characterId)) return null
+
+  const doc = await CharacterModel.findById(characterId)
+    .select('lifecycle')
+    .lean<{ lifecycle?: unknown }>()
+  if (!doc) return null
+
+  return normalizeCharacterLifecycle(doc.lifecycle)
 }

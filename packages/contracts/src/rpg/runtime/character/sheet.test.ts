@@ -175,6 +175,10 @@ const baseCharacter = {
       },
     },
   ],
+  lifecycle: {
+    roster: { status: 'active' },
+    vital: { status: 'alive' },
+  },
   ...timestamps,
 } as const
 

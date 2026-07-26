@@ -34,6 +34,10 @@ describe('campaign NPC routes', () => {
       name: 'Goblin Scout',
       campaignId,
       rulesetId: 'srd-cc-5.2.1',
+      lifecycle: {
+        roster: { status: 'active' },
+        vital: { status: 'alive' },
+      },
     })
     expect(createRes.body.npc.userId).toBeUndefined()
 
@@ -146,5 +150,65 @@ describe('campaign NPC routes', () => {
       .delete(`/api/campaigns/${owner.campaignId}/npcs/${npcId}`)
       .set(CSRF_HEADER, member.csrfToken)
       .expect(403)
+  })
+
+  it('patches NPC lifecycle for owner/co-owner with transition metadata', async () => {
+    const { agent, csrfToken, campaignId } = await authedOwnerCampaign('npc-patch@example.com')
+
+    const createRes = await agent
+      .post(`/api/campaigns/${campaignId}/npcs`)
+      .set(CSRF_HEADER, csrfToken)
+      .send(minimalNpcRequestInput)
+      .expect(201)
+
+    const npcId = createRes.body.npc.id as string
+
+    const patchRes = await agent
+      .patch(`/api/campaigns/${campaignId}/npcs/${npcId}`)
+      .set(CSRF_HEADER, csrfToken)
+      .send({ roster: { status: 'inactive', note: 'Away from town.' } })
+      .expect(200)
+
+    expect(patchRes.body.npc.lifecycle.roster).toMatchObject({
+      status: 'inactive',
+      note: 'Away from town.',
+    })
+    expect(patchRes.body.npc.lifecycle.roster.changedAt).toEqual(expect.any(String))
+
+    const noteOnlyRes = await agent
+      .patch(`/api/campaigns/${campaignId}/npcs/${npcId}`)
+      .set(CSRF_HEADER, csrfToken)
+      .send({ roster: { status: 'inactive', note: 'Still away.' } })
+      .expect(200)
+
+    expect(noteOnlyRes.body.npc.lifecycle.roster.changedAt).toBe(
+      patchRes.body.npc.lifecycle.roster.changedAt,
+    )
+    expect(noteOnlyRes.body.npc.lifecycle.roster.note).toBe('Still away.')
+  })
+
+  it('normalizes legacy NPC documents without lifecycle on read', async () => {
+    const { agent, csrfToken, campaignId } = await authedOwnerCampaign('npc-legacy@example.com')
+
+    const createRes = await agent
+      .post(`/api/campaigns/${campaignId}/npcs`)
+      .set(CSRF_HEADER, csrfToken)
+      .send(minimalNpcRequestInput)
+      .expect(201)
+
+    const npcId = createRes.body.npc.id as string
+
+    const { CharacterModel } = await import('../../character/character.model')
+    await CharacterModel.updateOne({ _id: npcId }, { $unset: { lifecycle: '' } })
+
+    const readRes = await agent
+      .get(`/api/campaigns/${campaignId}/npcs/${npcId}`)
+      .set(CSRF_HEADER, csrfToken)
+      .expect(200)
+
+    expect(readRes.body.npc.lifecycle).toEqual({
+      roster: { status: 'active' },
+      vital: { status: 'alive' },
+    })
   })
 })

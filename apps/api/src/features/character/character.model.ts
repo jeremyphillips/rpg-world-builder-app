@@ -24,6 +24,7 @@ const characterSchema = new Schema(
     wealth: { type: Schema.Types.Mixed, required: true },
     narrative: { type: Schema.Types.Mixed },
     feats: { type: [Schema.Types.Mixed], default: [] },
+    lifecycle: { type: Schema.Types.Mixed },
   },
   { timestamps: true },
 )

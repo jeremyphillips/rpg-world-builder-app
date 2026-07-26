@@ -1,4 +1,9 @@
-import type { CreateNpcRequestInput, CreateNpcServiceInput, NpcCharacter } from '@rpg/contracts'
+import type {
+  CharacterLifecyclePatch,
+  CreateNpcRequestInput,
+  CreateNpcServiceInput,
+  NpcCharacter,
+} from '@rpg/contracts'
 
 import { findCampaignById } from '../find-campaign-by-id'
 import {
@@ -7,6 +12,7 @@ import {
   findNpcForCampaign,
   listNpcsForCampaign,
 } from '../../character/character.repository'
+import { updateCharacterLifecycle } from '../../character/character.service'
 import { HttpError } from '../../../lib/http-error'
 import { assertNpcCreateRequestRestrictions } from './assert-npc-create'
 
@@ -62,4 +68,25 @@ export async function deleteCampaignNpc(campaignId: string, npcId: string): Prom
   }
 
   return deleteNpcForCampaign(npcId, campaignId)
+}
+
+export async function patchCampaignNpcLifecycle(
+  campaignId: string,
+  npcId: string,
+  patch: CharacterLifecyclePatch,
+): Promise<NpcCharacter | null> {
+  const campaign = await findCampaignById(campaignId)
+  if (!campaign) {
+    throw new HttpError(404, 'not_found', 'Campaign not found.')
+  }
+
+  const existing = await findNpcForCampaign(npcId, campaignId)
+  if (!existing) return null
+
+  const updated = await updateCharacterLifecycle(npcId, patch, {
+    timestamp: new Date().toISOString(),
+  })
+  if (!updated) return null
+
+  return findNpcForCampaign(npcId, campaignId)
 }

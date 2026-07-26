@@ -24,7 +24,7 @@ export function useNpcOverviewQueryState({ schema }: UseNpcOverviewQueryStateOpt
 } {
   return useOverviewQueryState({
     schema,
-    allowedSortIds: [],
+    allowedSortIds: ['name', 'class', 'species', 'roster', 'vital'],
     mode: 'url',
   })
 }

@@ -32,8 +32,14 @@ import {
   type CatalogOverviewPreferences,
 } from './catalog-overview-preferences'
 import { formatCatalogResultCount } from './format-catalog-result-count.lib'
+import {
+  buildCatalogOverviewSelectionFrameProps,
+  type CatalogOverviewSelectionConfig,
+} from './catalog-overview-selection.client'
 import { OverviewResultSummary } from './overview-result-summary.client'
 import { OverviewTableFrame } from './overview-table-frame.client'
+
+export type { CatalogOverviewSelectionConfig } from './catalog-overview-selection.client'
 
 type CatalogOverviewTableCoreProps<T extends { id: string }> = {
   tableKey: string
@@ -46,6 +52,7 @@ type CatalogOverviewTableCoreProps<T extends { id: string }> = {
   getRowClassName?: DataTableProps<T>['getRowClassName']
   getCellClassName?: DataTableProps<T>['getCellClassName']
   filters?: ReactNode
+  selection?: CatalogOverviewSelectionConfig<T>
 }
 
 type CatalogOverviewControlledFilterProps<T, TFilters extends Record<string, unknown>> = {
@@ -93,6 +100,7 @@ type CatalogOverviewTableBodyProps<T extends { id: string }> = {
   getRowClassName?: DataTableProps<T>['getRowClassName']
   getCellClassName?: DataTableProps<T>['getCellClassName']
   filterRegion?: ReactNode
+  selection?: CatalogOverviewSelectionConfig<T>
 }
 
 const COLUMNS_ARIA_LABEL = 'Choose visible columns'
@@ -108,6 +116,7 @@ function CatalogOverviewTableBody<T extends { id: string }>({
   getRowClassName,
   getCellClassName,
   filterRegion,
+  selection,
 }: CatalogOverviewTableBodyProps<T>) {
   const columnSchema = useMemo(
     () => buildCatalogOverviewColumnSchema(columns as ColumnDef<unknown>[]),
@@ -150,6 +159,8 @@ function CatalogOverviewTableBody<T extends { id: string }>({
   const tablePageSize: CatalogOverviewPageSize =
     preferences.pageSize ?? CATALOG_OVERVIEW_PREFERENCES_DEFAULTS.pageSize ?? 20
 
+  const selectionFrame = buildCatalogOverviewSelectionFrameProps(selection)
+
   const renderUtilityActions = useCallback(
     (controls: DataTableUtilityControls<T>) => (
       <controls.ColumnVisibilityTrigger aria-label={COLUMNS_ARIA_LABEL} showLabel />
@@ -177,7 +188,16 @@ function CatalogOverviewTableBody<T extends { id: string }>({
           resultLabel={resolvedResultCountLabel}
         />
       }
+      leadingActions={selectionFrame.renderLeadingActions}
       trailingActions={renderUtilityActions}
+      selectionModeActive={selectionFrame.selectionModeActive}
+      enableRowSelection={selectionFrame.enableRowSelection}
+      rowSelection={selectionFrame.rowSelection}
+      onRowSelectionChange={selectionFrame.onRowSelectionChange}
+      onRowSelectionStateChange={selectionFrame.onRowSelectionStateChange}
+      selectionLabels={selectionFrame.selectionLabels}
+      getRowCanSelect={selectionFrame.getRowCanSelect}
+      rowSelectionDescribedBy={selectionFrame.rowSelectionDescribedBy}
     />
   )
 }
@@ -255,6 +275,7 @@ function CatalogOverviewTableWithInternalFilters<
   data,
   filterSchema,
   filters,
+  selection,
   ...bodyProps
 }: CatalogOverviewTableCoreProps<T> &
   CatalogOverviewInternalFilterProps<T, TFilters> & { filterSchema: FilterSchema<T, TFilters> }) {
@@ -303,6 +324,7 @@ function CatalogOverviewTableWithInternalFilters<
       columns={columns}
       visibleRows={visibleRows}
       filterRegion={filterChrome}
+      selection={selection}
       {...bodyProps}
     />
   )
@@ -320,6 +342,7 @@ function CatalogOverviewTableWithControlledFilters<
   onFilterChange,
   onResetFilters,
   filters,
+  selection,
   ...bodyProps
 }: CatalogOverviewTableCoreProps<T> & CatalogOverviewControlledFilterProps<T, TFilters>) {
   const columnSchema = useMemo(
@@ -366,6 +389,7 @@ function CatalogOverviewTableWithControlledFilters<
       columns={columns}
       visibleRows={visibleRows}
       filterRegion={filterChrome}
+      selection={selection}
       {...bodyProps}
     />
   )
@@ -385,6 +409,7 @@ export function CatalogOverviewTable<
     onFilterChange,
     onResetFilters,
     filters,
+    selection,
     ...bodyProps
   } = props
 
@@ -400,6 +425,7 @@ export function CatalogOverviewTable<
           onFilterChange={onFilterChange}
           onResetFilters={onResetFilters}
           filters={filters}
+          selection={selection}
           {...bodyProps}
         />
       )
@@ -412,6 +438,7 @@ export function CatalogOverviewTable<
         data={data}
         filterSchema={filterSchema}
         filters={filters}
+        selection={selection}
         {...bodyProps}
       />
     )
@@ -423,6 +450,7 @@ export function CatalogOverviewTable<
       columns={columns}
       visibleRows={data}
       filterRegion={filters}
+      selection={selection}
       {...bodyProps}
     />
   )

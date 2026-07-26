@@ -1,4 +1,4 @@
-import { npcCharacterSchema, type NpcCharacter } from '@rpg/contracts'
+import { npcCharacterSchema, normalizeCharacterLifecycle, type NpcCharacter } from '@rpg/contracts'
 
 import type { CharacterSchemaType } from './character.model'
 
@@ -29,6 +29,7 @@ export function toNpcCharacter(doc: CharacterRecord): NpcCharacter {
     wealth: doc.wealth,
     narrative: doc.narrative ?? undefined,
     feats: doc.feats ?? [],
+    lifecycle: normalizeCharacterLifecycle(doc.lifecycle),
     createdAt: doc.createdAt.toISOString(),
     updatedAt: doc.updatedAt.toISOString(),
   })

@@ -15,6 +15,7 @@ import {
 import { characterNarrativeSchema } from './narrative'
 import { characterSpellEntrySchema } from './spells'
 import { characterProficienciesSchema } from './proficiencies'
+import { characterLifecycleSchema } from './lifecycle'
 
 // ---------------------------------------------------------------------------
 // Character — player characters and campaign-owned NPCs. This is a stored sheet
@@ -39,6 +40,7 @@ const characterBaseSchema = z.object({
   wealth: characterWealthSchema,
   narrative: characterNarrativeSchema.optional(),
   feats: z.array(characterFeatEntrySchema).default([]),
+  lifecycle: characterLifecycleSchema,
   createdAt: z.iso.datetime(),
   updatedAt: z.iso.datetime(),
 })

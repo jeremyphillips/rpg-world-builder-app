@@ -42,15 +42,17 @@ README). Default `/characters/*` never carries campaign id in the URL.
 
 ## API boundaries
 
-| Endpoint                                            | Purpose                  |
-| --------------------------------------------------- | ------------------------ |
-| `POST /api/characters`                              | User-owned PC create     |
-| `GET/DELETE /api/characters/:id`                    | PC read/delete           |
-| `GET/POST /api/campaigns/:campaignId/npcs`          | Campaign NPC list/create |
-| `GET/DELETE /api/campaigns/:campaignId/npcs/:npcId` | NPC read/delete          |
+| Endpoint                                                  | Purpose                         |
+| --------------------------------------------------------- | ------------------------------- |
+| `POST /api/characters`                                    | User-owned PC create            |
+| `GET/DELETE /api/characters/:id`                          | PC read/delete                  |
+| `GET/POST /api/campaigns/:campaignId/npcs`                | Campaign NPC list/create        |
+| `GET/PATCH/DELETE /api/campaigns/:campaignId/npcs/:npcId` | NPC read/lifecycle patch/delete |
 
-NPC create body: `CreateNpcRequestInput` — no client `campaignId` or `characterType`
-(route assigns both). PATCH edit is **out of scope** for NPC v1.
+NPC create body: `CreateNpcRequestInput` — no client `campaignId`, `characterType`, or
+`lifecycle` (route/service assigns defaults). NPC lifecycle PATCH accepts
+`characterLifecyclePatchSchema` (status + note per dimension). PC lifecycle PATCH is
+deferred — see [character-lifecycle.md](./character-lifecycle.md).
 
 ## Build finalization
 
