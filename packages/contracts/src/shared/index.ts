@@ -1,5 +1,6 @@
 export * from './auth-messages'
 export * from './auth'
+export * from './app-config'
 export * from './user'
 export * from './roles'
 export * from './routes'

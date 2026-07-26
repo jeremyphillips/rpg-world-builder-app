@@ -96,6 +96,7 @@ describe('useCampaignBuildContext', () => {
         rulesetId: 'srd-cc-5.2.1',
       },
       ownershipTarget: { type: 'campaign', campaignId: 'camp-1' },
+      acquisition: { kind: 'campaign_npc', campaignId: 'camp-1' },
       rulesetId: 'srd-cc-5.2.1',
       catalog: emptyCatalog,
       permissions: { canCreateCharacter: true },

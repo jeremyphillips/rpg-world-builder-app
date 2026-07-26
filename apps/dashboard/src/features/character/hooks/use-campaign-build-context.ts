@@ -46,6 +46,7 @@ export function useCampaignBuildContext(campaignId: string | undefined) {
       scope: { type: 'campaign', campaignId, rulesetId },
       rulesScope,
       ownershipTarget: { type: 'campaign', campaignId },
+      acquisition: { kind: 'campaign_npc', campaignId },
       rulesetId,
       catalog: catalogQuery.data,
       characterCreationRules: {

@@ -25,6 +25,7 @@ import type {
   StandaloneCharacterBuilderMode,
   StandaloneCharacterBuildScope,
 } from './mode-scope'
+import type { CharacterBuildAcquisition } from './acquisition'
 
 // ---------------------------------------------------------------------------
 // CharacterBuildContext — the normalized input the builder UI and resolvers
@@ -125,10 +126,24 @@ export type StandaloneBuildContext = CharacterBuildContext & {
 }
 
 /** Campaign-scoped NPC authoring — rules and catalog from campaign patch + content. */
-export type CampaignBuildContext = CharacterBuildContext & {
+export type CampaignNpcBuildContext = CharacterBuildContext & {
   mode: 'dashboard'
   scope: CampaignCharacterBuildScope
   rulesScope: Extract<CharacterRulesScope, { type: 'campaign' }>
   ownershipTarget: { type: 'campaign'; campaignId: string }
   characterKind: 'npc'
+  acquisition: Extract<CharacterBuildAcquisition, { kind: 'campaign_npc' }>
 }
+
+/** Campaign-scoped PC authoring — owned by the inviting user, rules from campaign. */
+export type CampaignPcBuildContext = CharacterBuildContext & {
+  mode: 'dashboard'
+  scope: CampaignCharacterBuildScope
+  rulesScope: Extract<CharacterRulesScope, { type: 'campaign' }>
+  ownershipTarget: { type: 'user'; userId: string }
+  characterKind: 'pc'
+  acquisition: Extract<CharacterBuildAcquisition, { kind: 'campaign_invite' }>
+}
+
+/** Discriminated union — only legal campaign build combinations compile. */
+export type CampaignBuildContext = CampaignNpcBuildContext | CampaignPcBuildContext

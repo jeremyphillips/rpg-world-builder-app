@@ -4,8 +4,14 @@ import { resolveCharacterCreationPatch } from '../../campaign/patches/campaign-c
 import { defaultCampaignMechanicsPatch } from '../../campaign/patches/campaign-mechanics-patch'
 import type { StartingWealthRules } from '../../campaign/rules/starting-wealth'
 import { DEFAULT_ABILITY_GENERATION_RULES } from './ability-generation'
-import { indexCharacterBuildCatalog, resolvedCharacterCreationRulesSchema } from './context'
-import type { CharacterBuildCatalog } from './context'
+import {
+  indexCharacterBuildCatalog,
+  resolvedCharacterCreationRulesSchema,
+  type CampaignNpcBuildContext,
+  type CampaignPcBuildContext,
+  type CharacterBuildCatalog,
+} from './context'
+import { builderTestCatalog, builderTestRules } from './test-fixtures'
 
 const emptyCatalog: CharacterBuildCatalog = {
   species: [],
@@ -14,6 +20,47 @@ const emptyCatalog: CharacterBuildCatalog = {
   equipment: [],
   skillProficiencies: [],
   languages: [],
+}
+
+const TEST_CAMPAIGN_ID = 'camp_1'
+const TEST_RULESET_ID = 'srd-cc-5.2.1'
+
+function createCampaignNpcContext(): CampaignNpcBuildContext {
+  return {
+    channel: 'build',
+    surface: 'dashboard',
+    characterKind: 'npc',
+    mode: 'dashboard',
+    scope: { type: 'campaign', campaignId: TEST_CAMPAIGN_ID, rulesetId: TEST_RULESET_ID },
+    rulesScope: { type: 'campaign', campaignId: TEST_CAMPAIGN_ID, rulesetId: TEST_RULESET_ID },
+    ownershipTarget: { type: 'campaign', campaignId: TEST_CAMPAIGN_ID },
+    acquisition: { kind: 'campaign_npc', campaignId: TEST_CAMPAIGN_ID },
+    rulesetId: TEST_RULESET_ID,
+    catalog: builderTestCatalog,
+    characterCreationRules: builderTestRules,
+    permissions: { canCreateCharacter: true },
+  }
+}
+
+function createCampaignPcContext(): CampaignPcBuildContext {
+  return {
+    channel: 'build',
+    surface: 'dashboard',
+    characterKind: 'pc',
+    mode: 'dashboard',
+    scope: { type: 'campaign', campaignId: TEST_CAMPAIGN_ID, rulesetId: TEST_RULESET_ID },
+    rulesScope: { type: 'campaign', campaignId: TEST_CAMPAIGN_ID, rulesetId: TEST_RULESET_ID },
+    ownershipTarget: { type: 'user', userId: 'user_1' },
+    acquisition: {
+      kind: 'campaign_invite',
+      campaignId: TEST_CAMPAIGN_ID,
+      inviteId: 'invite_1',
+    },
+    rulesetId: TEST_RULESET_ID,
+    catalog: builderTestCatalog,
+    characterCreationRules: { ...builderTestRules, startingLevel: 3 },
+    permissions: { canCreateCharacter: true },
+  }
 }
 
 describe('indexCharacterBuildCatalog', () => {
@@ -69,5 +116,19 @@ describe('resolvedCharacterCreationRulesSchema', () => {
       expect(result.data.abilityGeneration.standardArray).toEqual([15, 14, 13, 12, 10, 8])
       expect(result.data.armorClass).toEqual({ mode: 'ascending', base: 10 })
     }
+  })
+})
+
+describe('CampaignBuildContext discriminated union', () => {
+  it('accepts campaign NPC context with campaign ownership', () => {
+    const context = createCampaignNpcContext()
+    expect(context.ownershipTarget.type).toBe('campaign')
+    expect(context.acquisition.kind).toBe('campaign_npc')
+  })
+
+  it('accepts campaign PC context with user ownership and invite acquisition', () => {
+    const context = createCampaignPcContext()
+    expect(context.ownershipTarget).toEqual({ type: 'user', userId: 'user_1' })
+    expect(context.acquisition.kind).toBe('campaign_invite')
   })
 })
