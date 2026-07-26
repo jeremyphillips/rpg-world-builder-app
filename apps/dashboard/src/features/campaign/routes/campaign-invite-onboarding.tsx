@@ -1,25 +1,37 @@
-import { useParams, useSearchParams } from 'react-router-dom'
-import { Heading, Text } from '@rpg/ui'
+import { Navigate, useParams, useSearchParams } from 'react-router-dom'
 
+import { Text } from '@rpg/ui'
+
+import { ROUTES } from '@/app/routes'
 import { PageLoadState } from '@/components/layout/page-load-state'
 import { NarrowPage } from '@/components/layout/narrow-page'
-import { useCampaignInviteOnboardingContext } from '../hooks/use-campaign-invite-onboarding-context'
 
-/** Loads invite onboarding context after public acceptance handoff. */
+import { useCampaignInviteOnboardingContext } from '../hooks/use-campaign-invite-onboarding-context'
+import { CampaignInviteOnboardingBody } from './campaign-invite-onboarding-body'
+
 export function CampaignInviteOnboarding() {
-  const { campaignId: _campaignId } = useParams<{ campaignId: string }>()
+  const { campaignId } = useParams<{ campaignId: string }>()
   const [searchParams] = useSearchParams()
   const inviteId = searchParams.get('inviteId') ?? undefined
 
   const { data: context, isPending, isError, error } = useCampaignInviteOnboardingContext(inviteId)
 
-  if (!inviteId) {
+  if (!inviteId || !campaignId) {
     return (
       <NarrowPage>
         <Text variant="destructive" role="alert">
-          This onboarding link is missing an invitation id.
+          This onboarding link is missing required parameters.
         </Text>
       </NarrowPage>
+    )
+  }
+
+  if (context?.status === 'completed') {
+    return (
+      <Navigate
+        to={ROUTES.campaign.characters.detail(context.campaignId, context.characterId)}
+        replace
+      />
     )
   }
 
@@ -31,15 +43,12 @@ export function CampaignInviteOnboarding() {
         errorLabel={error?.message}
         defaultErrorLabel="Could not load campaign onboarding."
       >
-        {context?.status === 'accepted' ? (
-          <div className="flex flex-col gap-3">
-            <Heading variant="page" as="h1">
-              Join {context.campaign.name}
-            </Heading>
-            <Text variant="muted">
-              You have joined this campaign. Character setup continues on the next step.
-            </Text>
-          </div>
+        {context ? (
+          <CampaignInviteOnboardingBody
+            context={context}
+            campaignId={campaignId}
+            inviteId={inviteId}
+          />
         ) : null}
       </PageLoadState>
     </NarrowPage>

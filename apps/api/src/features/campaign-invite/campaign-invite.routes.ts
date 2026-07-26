@@ -1,6 +1,9 @@
 import { Router } from 'express'
 
-import { campaignInviteRecipientInputSchema } from '@rpg/contracts'
+import {
+  campaignInviteRecipientInputSchema,
+  completeCampaignInviteWithExistingCharacterInputSchema,
+} from '@rpg/contracts'
 
 import { requireAuth } from '../../middleware/require-auth'
 import { requireCampaignRole } from '../../middleware/require-role'
@@ -26,6 +29,17 @@ campaignInvitePublicRouter.get(
   '/:inviteId/onboarding-context',
   requireAuth,
   controller.getOnboardingContext,
+)
+campaignInvitePublicRouter.get(
+  '/:inviteId/eligible-characters',
+  requireAuth,
+  controller.listEligibleCharacters,
+)
+campaignInvitePublicRouter.post(
+  '/:inviteId/complete-with-existing-character',
+  requireAuth,
+  validate(completeCampaignInviteWithExistingCharacterInputSchema),
+  controller.completeWithExistingCharacter,
 )
 campaignInvitePublicRouter.post('/:token/accept', requireAuth, controller.acceptByToken)
 campaignInvitePublicRouter.get('/:token', controller.resolveByToken)

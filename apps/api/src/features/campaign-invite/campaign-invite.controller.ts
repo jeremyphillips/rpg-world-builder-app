@@ -1,10 +1,15 @@
 import type { Request, Response } from 'express'
-import type { CampaignInviteRecipientInput } from '@rpg/contracts'
+import type {
+  CampaignInviteRecipientInput,
+  CompleteCampaignInviteWithExistingCharacterInput,
+} from '@rpg/contracts'
 
 import {
   acceptCampaignInvite,
+  completeCampaignInviteWithExistingCharacter,
   getCampaignInviteOnboardingContext,
   listCampaignInvitesForOverview,
+  listEligibleCharactersForInvite,
   resolveCampaignInviteByToken,
   sendCampaignInvite,
 } from './campaign-invite.service'
@@ -49,4 +54,24 @@ export async function getOnboardingContext(req: Request, res: Response): Promise
     userId: req.user!.id,
   })
   res.status(200).json({ context })
+}
+
+export async function listEligibleCharacters(req: Request, res: Response): Promise<void> {
+  const { inviteId } = req.params as { inviteId: string }
+  const characters = await listEligibleCharactersForInvite({
+    inviteId,
+    userId: req.user!.id,
+  })
+  res.status(200).json({ characters })
+}
+
+export async function completeWithExistingCharacter(req: Request, res: Response): Promise<void> {
+  const { inviteId } = req.params as { inviteId: string }
+  const { characterId } = req.body as CompleteCampaignInviteWithExistingCharacterInput
+  const result = await completeCampaignInviteWithExistingCharacter({
+    inviteId,
+    userId: req.user!.id,
+    characterId,
+  })
+  res.status(200).json(result)
 }

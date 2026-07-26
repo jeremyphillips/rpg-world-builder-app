@@ -128,4 +128,39 @@ describe('campaign invite routes', () => {
       membership: { role: 'pc' },
     })
   })
+
+  it('lists eligible characters for an accepted invite', async () => {
+    const { agent, csrfToken } = await registerOwner('invite-eligible-owner@example.com')
+    const campaignId = await createTestCampaign(agent, csrfToken, 'Eligible Characters Campaign')
+    const rawToken = generateInviteToken()
+
+    const ownerSession = await agent.get('/api/auth/me')
+    const ownerId = ownerSession.body.user.id as string
+
+    await createInviteRecord({
+      campaignId,
+      email: 'invite-eligible-player@example.com',
+      normalizedEmail: 'invite-eligible-player@example.com',
+      tokenHash: hashInviteToken(rawToken),
+      expiresAt: computeInviteExpiresAt(),
+      invitedByUserId: ownerId,
+    })
+
+    const player = await registerAndLoginTestUser(getApp(), {
+      email: 'invite-eligible-player@example.com',
+      password: TEST_PASSWORD,
+      displayName: 'Eligible Player',
+    })
+
+    const acceptResponse = await player.agent
+      .post(`/api/campaign-invites/${rawToken}/accept`)
+      .set(CSRF_HEADER, player.csrfToken)
+      .expect(200)
+
+    const eligibleResponse = await player.agent
+      .get(`/api/campaign-invites/${acceptResponse.body.inviteId}/eligible-characters`)
+      .expect(200)
+
+    expect(Array.isArray(eligibleResponse.body.characters)).toBe(true)
+  })
 })

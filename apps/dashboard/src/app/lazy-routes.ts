@@ -58,6 +58,12 @@ export const CampaignInviteOnboardingRoute = withRouteSuspense(
     'CampaignInviteOnboarding',
   ),
 )
+export const CampaignCharacterDetailRoute = withRouteSuspense(
+  lazyNamed(
+    () => import('@/features/campaign/routes/campaign-character-detail'),
+    'CampaignCharacterDetail',
+  ),
+)
 export const CampaignSessionsRoute = withRouteSuspense(
   lazyNamed(() => import('@/features/campaign/routes/campaign-sessions'), 'CampaignSessions'),
 )

@@ -3,6 +3,7 @@ import { z } from 'zod'
 import { campaignInviteDeliveryStatusSchema } from '../vocab/campaign-invite-delivery-status'
 import { campaignInviteStatusSchema } from '../vocab/campaign-invite-status'
 import { campaignRoleSchema } from '../../shared/roles'
+import { characterCampaignEligibilitySchema } from './eligibility/character-campaign-eligibility'
 
 // ---------------------------------------------------------------------------
 // Campaign invite DTOs — client-facing shapes; never expose persistence fields.
@@ -91,6 +92,38 @@ export const campaignPartyPcListItemSchema = z.object({
 })
 
 export type CampaignPartyPcListItem = z.infer<typeof campaignPartyPcListItemSchema>
+
+export const campaignInviteEligibleCharacterSchema = z.object({
+  characterId: z.string().min(1),
+  name: z.string().min(1),
+  summary: z.string(),
+  eligibility: characterCampaignEligibilitySchema,
+})
+
+export type CampaignInviteEligibleCharacter = z.infer<typeof campaignInviteEligibleCharacterSchema>
+
+export const campaignInviteEligibleCharactersResponseSchema = z.object({
+  characters: z.array(campaignInviteEligibleCharacterSchema),
+})
+
+export type CampaignInviteEligibleCharactersResponse = z.infer<
+  typeof campaignInviteEligibleCharactersResponseSchema
+>
+
+export const completeCampaignInviteWithExistingCharacterInputSchema = z.object({
+  characterId: z.string().min(1),
+})
+
+export type CompleteCampaignInviteWithExistingCharacterInput = z.infer<
+  typeof completeCampaignInviteWithExistingCharacterInputSchema
+>
+
+export const completeCampaignInviteResultSchema = z.object({
+  campaignId: z.string().min(1),
+  characterId: z.string().min(1),
+})
+
+export type CompleteCampaignInviteResult = z.infer<typeof completeCampaignInviteResultSchema>
 
 /** Onboarding membership role is always `pc` for campaign invites. */
 export const CAMPAIGN_INVITE_MEMBERSHIP_ROLE = 'pc' as const satisfies z.infer<

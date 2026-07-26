@@ -1,14 +1,19 @@
 import type {
   CampaignInvite,
   CampaignInviteAdminListItem,
+  CampaignInviteEligibleCharacter,
   CampaignInviteOnboardingContext,
   CampaignInvitePublicResolution,
+  CompleteCampaignInviteResult,
 } from '@rpg/contracts'
-import { CAMPAIGN_INVITE_EXPIRY_DAYS } from '@rpg/contracts'
+import { CAMPAIGN_INVITE_EXPIRY_DAYS, resolveCharacterCampaignEligibility } from '@rpg/contracts'
 
 import { HttpError } from '../../lib/http-error'
 import type { EmailProvider } from '../../services/email/email.types'
 import { findCampaignById } from '../campaign/find-campaign-by-id'
+import { assignControlledPcToCampaignMember } from '../campaign/participation/assign-controlled-pc.service'
+import { findOpenParticipationForCharacter } from '../campaign/participation/campaign-character-participation.repository'
+import { listCharactersForUser, findCharacterForUser } from '../character/character.service'
 import { findUserByEmail, findSessionUserById } from '../user/user.service'
 import { getRulesetPatchRead } from '../vocabulary'
 import { deliverCampaignInviteEmail } from './campaign-invite-delivery'
@@ -27,6 +32,7 @@ import {
   findInviteByTokenHash,
   listPendingInvitesByCampaign,
   markInviteAccepted,
+  markInviteCompleted,
   markInviteExpired,
   rotateInviteToken,
 } from './campaign-invite.repository'
@@ -35,6 +41,10 @@ import {
   createOrConfirmPlayerMembership,
   findCampaignMembershipByCampaignAndUser,
 } from './create-or-confirm-player-membership'
+import {
+  buildCampaignContentEligibilityMap,
+  formatInviteCharacterSummary,
+} from './campaign-invite-eligibility.lib'
 
 export type SendCampaignInviteInput = {
   campaignId: string
@@ -385,6 +395,189 @@ export async function listCampaignInvitesForOverview(
 ): Promise<CampaignInviteAdminListItem[]> {
   const invites = await listPendingInvitesByCampaign(campaignId)
   return invites.map(toAdminListItem)
+}
+
+async function loadAcceptedInviteForUser({
+  inviteId,
+  userId,
+}: {
+  inviteId: string
+  userId: string
+}): Promise<CampaignInvite> {
+  const invite = await findInviteById(inviteId)
+  if (!invite) {
+    throw new HttpError(404, 'not_found', 'Invitation not found.')
+  }
+
+  const currentInvite = await expireInviteIfNeeded(invite)
+
+  if (currentInvite.status === 'completed') {
+    throw new HttpError(409, 'conflict', 'Invitation is already completed.')
+  }
+
+  if (currentInvite.status !== 'accepted') {
+    throw new HttpError(409, 'conflict', 'Invitation is not ready for onboarding.')
+  }
+  if (isInvitePastExpiry(currentInvite.expiresAt)) {
+    throw new HttpError(410, 'expired', 'This invitation has expired.')
+  }
+  if (currentInvite.acceptedByUserId !== userId) {
+    throw new HttpError(403, 'forbidden', 'This invitation belongs to another user.')
+  }
+
+  return currentInvite
+}
+
+async function loadInviteStartingLevel(campaignId: string): Promise<number> {
+  const patch = await getRulesetPatchRead(campaignId)
+  return patch?.characterCreation.startingLevel ?? 1
+}
+
+export async function listEligibleCharactersForInvite({
+  inviteId,
+  userId,
+}: {
+  inviteId: string
+  userId: string
+}): Promise<CampaignInviteEligibleCharacter[]> {
+  const invite = await loadAcceptedInviteForUser({ inviteId, userId })
+  const [characters, campaignContentById, startingLevel] = await Promise.all([
+    listCharactersForUser(userId),
+    buildCampaignContentEligibilityMap(invite.campaignId),
+    loadInviteStartingLevel(invite.campaignId),
+  ])
+
+  const results: CampaignInviteEligibleCharacter[] = []
+
+  for (const character of characters) {
+    const existingOpenParticipation = await findOpenParticipationForCharacter(character.id)
+    let conflictingCampaignName: string | undefined
+    if (existingOpenParticipation && existingOpenParticipation.campaignId !== invite.campaignId) {
+      const conflictingCampaign = await findCampaignById(existingOpenParticipation.campaignId)
+      conflictingCampaignName = conflictingCampaign?.identity.name
+    }
+
+    const eligibility = resolveCharacterCampaignEligibility({
+      character,
+      userId,
+      campaignId: invite.campaignId,
+      startingLevel,
+      existingOpenParticipation,
+      conflictingCampaignName,
+      campaignContentById,
+      viewer: { kind: 'pc', characterIds: [character.id] },
+    })
+
+    results.push({
+      characterId: character.id,
+      name: character.name,
+      summary: formatInviteCharacterSummary(character, campaignContentById),
+      eligibility,
+    })
+  }
+
+  return results
+}
+
+export async function completeCampaignInviteWithExistingCharacter({
+  inviteId,
+  userId,
+  characterId,
+}: {
+  inviteId: string
+  userId: string
+  characterId: string
+}): Promise<CompleteCampaignInviteResult> {
+  const invite = await findInviteById(inviteId)
+  if (!invite) {
+    throw new HttpError(404, 'not_found', 'Invitation not found.')
+  }
+
+  const currentInvite = await expireInviteIfNeeded(invite)
+
+  if (currentInvite.status === 'completed') {
+    if (currentInvite.acceptedByUserId !== userId) {
+      throw new HttpError(403, 'forbidden', 'This invitation belongs to another user.')
+    }
+    if (currentInvite.completedCharacterId === characterId) {
+      return { campaignId: currentInvite.campaignId, characterId }
+    }
+    throw new HttpError(
+      409,
+      'conflict',
+      'This invitation was already completed with a different character.',
+    )
+  }
+
+  const acceptedInvite = await loadAcceptedInviteForUser({ inviteId, userId })
+
+  const character = await findCharacterForUser(characterId, userId)
+  if (!character) {
+    throw new HttpError(404, 'not_found', 'Character not found.')
+  }
+
+  const [campaignContentById, startingLevel, membership] = await Promise.all([
+    buildCampaignContentEligibilityMap(acceptedInvite.campaignId),
+    loadInviteStartingLevel(acceptedInvite.campaignId),
+    findCampaignMembershipByCampaignAndUser(acceptedInvite.campaignId, userId),
+  ])
+
+  if (!membership) {
+    throw new HttpError(
+      500,
+      'integrity_error',
+      'Accepted invitation is missing the expected campaign membership.',
+    )
+  }
+
+  const existingOpenParticipation = await findOpenParticipationForCharacter(characterId)
+  let conflictingCampaignName: string | undefined
+  if (
+    existingOpenParticipation &&
+    existingOpenParticipation.campaignId !== acceptedInvite.campaignId
+  ) {
+    const conflictingCampaign = await findCampaignById(existingOpenParticipation.campaignId)
+    conflictingCampaignName = conflictingCampaign?.identity.name
+  }
+
+  const eligibility = resolveCharacterCampaignEligibility({
+    character,
+    userId,
+    campaignId: acceptedInvite.campaignId,
+    startingLevel,
+    existingOpenParticipation,
+    conflictingCampaignName,
+    campaignContentById,
+    viewer: { kind: 'pc', characterIds: [character.id] },
+  })
+
+  if (!eligibility.eligible) {
+    throw new HttpError(
+      422,
+      'ineligible_character',
+      'Character is not eligible for this campaign.',
+      {
+        blockingIssues: eligibility.blockingIssues,
+      },
+    )
+  }
+
+  await assignControlledPcToCampaignMember({
+    campaignId: acceptedInvite.campaignId,
+    membershipId: String(membership._id),
+    characterId,
+  })
+
+  const completed = await markInviteCompleted(invite.id, characterId, new Date())
+  if (!completed) {
+    throw new HttpError(500, 'internal_error', 'Failed to complete invitation.')
+  }
+
+  // TODO(campaign-overview): invalidate party/membership queries after invite completion.
+  // TODO(campaign-overview): surface the new party PC in campaign overview once phase 8 ships.
+  // TODO(notifications): notify campaign owners when onboarding completes.
+
+  return { campaignId: invite.campaignId, characterId }
 }
 
 export { CAMPAIGN_INVITE_EXPIRY_DAYS }

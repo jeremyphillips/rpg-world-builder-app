@@ -2,6 +2,8 @@ import { afterEach, describe, expect, it } from 'vitest'
 
 import { CampaignInviteModel } from './campaign-invite.model'
 import { CampaignMembershipModel } from '../campaign/campaign-membership.model'
+import { createPcRecord } from '../character/character.repository'
+import { minimalStandalonePcInput } from '../../test/fixtures/characters'
 import { makeTestCampaign } from '../../test/fixtures/campaigns'
 import { makeTestUser } from '../../test/fixtures/users'
 import { useIntegrationDb } from '../../test/setup/integration-db'
@@ -12,8 +14,10 @@ import {
 import { setEmailProviderForTests } from '../../services/email/email.service'
 import {
   acceptCampaignInvite,
+  completeCampaignInviteWithExistingCharacter,
   getCampaignInviteOnboardingContext,
   listCampaignInvitesForOverview,
+  listEligibleCharactersForInvite,
   resolveCampaignInviteByToken,
   sendCampaignInvite,
 } from './campaign-invite.service'
@@ -298,5 +302,74 @@ describe('campaign invite service', () => {
       email: 'player@example.com',
       status: 'pending',
     })
+  })
+
+  it('lists eligible characters and completes onboarding with an existing PC', async () => {
+    const { id: campaignId, owner } = await makeTestCampaign({ name: 'Completion Campaign' })
+    const player = await makeTestUser({ email: 'player@example.com', displayName: 'Player One' })
+    const rawToken = generateInviteToken()
+
+    const invite = await createInviteRecord({
+      campaignId,
+      email: 'player@example.com',
+      normalizedEmail: 'player@example.com',
+      tokenHash: hashInviteToken(rawToken),
+      expiresAt: computeInviteExpiresAt(),
+      invitedByUserId: owner.id,
+    })
+
+    await acceptCampaignInvite({
+      rawToken,
+      userId: player.id,
+      userEmail: player.email,
+    })
+
+    const character = await createPcRecord(minimalStandalonePcInput, player.id)
+
+    const eligible = await listEligibleCharactersForInvite({
+      inviteId: invite.id,
+      userId: player.id,
+    })
+
+    expect(eligible).toHaveLength(1)
+    expect(eligible[0]).toMatchObject({
+      characterId: character.id,
+      name: character.name,
+      eligibility: { eligible: true, blockingIssues: [], warnings: [] },
+    })
+
+    const completed = await completeCampaignInviteWithExistingCharacter({
+      inviteId: invite.id,
+      userId: player.id,
+      characterId: character.id,
+    })
+
+    expect(completed).toEqual({ campaignId, characterId: character.id })
+
+    const membership = await CampaignMembershipModel.findOne({ campaignId, userId: player.id })
+    expect(membership?.controlledCharacterIds).toContain(character.id)
+
+    const refreshedInvite = await CampaignInviteModel.findById(invite.id).lean()
+    expect(refreshedInvite).toMatchObject({
+      status: 'completed',
+      completedCharacterId: character.id,
+    })
+
+    const onboardingContext = await getCampaignInviteOnboardingContext({
+      inviteId: invite.id,
+      userId: player.id,
+    })
+    expect(onboardingContext).toMatchObject({
+      status: 'completed',
+      campaignId,
+      characterId: character.id,
+    })
+
+    const idempotent = await completeCampaignInviteWithExistingCharacter({
+      inviteId: invite.id,
+      userId: player.id,
+      characterId: character.id,
+    })
+    expect(idempotent).toEqual({ campaignId, characterId: character.id })
   })
 })
