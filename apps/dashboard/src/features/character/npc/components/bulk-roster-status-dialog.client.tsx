@@ -2,7 +2,7 @@
 
 import { useEffect, useId, useMemo } from 'react'
 import { FormProvider, useForm, useWatch } from 'react-hook-form'
-import type { NpcCharacter } from '@rpg/contracts'
+import type { CampaignNpcListItem } from '@rpg/contracts'
 import { Button, Modal, Text } from '@rpg/ui'
 import { FormFieldStack } from '@rpg/ui/form'
 
@@ -21,7 +21,7 @@ export type BulkRosterStatusDialogProps = {
   open: boolean
   onOpenChange: (open: boolean) => void
   campaignId: string
-  selectedRows: NpcCharacter[]
+  selectedRows: CampaignNpcListItem[]
   onApplyComplete: (result: { updatedIds: string[]; fullSuccess: boolean }) => void
 }
 

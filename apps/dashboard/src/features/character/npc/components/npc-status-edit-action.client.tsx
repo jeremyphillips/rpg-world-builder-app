@@ -1,22 +1,24 @@
 'use client'
 
 import { useState } from 'react'
-import type { CharacterLifecycle } from '@rpg/contracts'
+import type { CharacterRosterState, CharacterVitalState } from '@rpg/contracts'
 import { Button } from '@rpg/ui'
 
-import { NpcLifecycleEditor } from './npc-lifecycle-editor.client'
+import { NpcStatusEditor } from './npc-status-editor.client'
 
-export type NpcLifecycleEditActionProps = {
+export type NpcStatusEditActionProps = {
   campaignId: string
   npcId: string
-  lifecycle: CharacterLifecycle
+  vital: CharacterVitalState
+  roster: CharacterRosterState
 }
 
-export function NpcLifecycleEditAction({
+export function NpcStatusEditAction({
   campaignId,
   npcId,
-  lifecycle,
-}: NpcLifecycleEditActionProps) {
+  vital,
+  roster,
+}: NpcStatusEditActionProps) {
   const [open, setOpen] = useState(false)
 
   return (
@@ -24,12 +26,13 @@ export function NpcLifecycleEditAction({
       <Button type="button" variant="outline" size="sm" onClick={() => setOpen(true)}>
         Edit
       </Button>
-      <NpcLifecycleEditor
+      <NpcStatusEditor
         open={open}
         onOpenChange={setOpen}
         campaignId={campaignId}
         npcId={npcId}
-        lifecycle={lifecycle}
+        vital={vital}
+        roster={roster}
       />
     </>
   )

@@ -12,7 +12,6 @@ const samplePc = {
   id: 'char_1',
   characterType: 'pc',
   userId: 'user_1',
-  campaignId: null,
   name: 'Verna',
   rulesetId: 'srd-cc-5.2.1',
   classes: [{ classId: 'srd-cc-5.2.1:fighter', level: 1 }],
@@ -34,10 +33,7 @@ const samplePc = {
   },
   wealth: { cp: 0, sp: 0, gp: 0, pp: 0 },
   feats: [],
-  lifecycle: {
-    roster: { status: 'active' },
-    vital: { status: 'alive' },
-  },
+  vital: { status: 'alive' },
   createdAt: '2026-01-01T00:00:00.000Z',
   updatedAt: '2026-01-01T00:00:00.000Z',
 } as const satisfies PcCharacter

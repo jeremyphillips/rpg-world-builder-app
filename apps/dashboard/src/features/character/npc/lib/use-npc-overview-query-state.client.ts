@@ -1,6 +1,5 @@
 'use client'
 
-import type { NpcCharacter } from '@rpg/contracts'
 import type { FilterFieldId, FilterSchema } from '@rpg/ui/filters'
 
 import {
@@ -10,9 +9,10 @@ import {
 } from '@/lib/overview-query-state'
 
 import type { NpcOverviewFilterState } from './npc-overview-filter-schema'
+import type { NpcOverviewTableRow } from './npc-overview-row'
 
 export type UseNpcOverviewQueryStateOptions = {
-  schema: FilterSchema<NpcCharacter, NpcOverviewFilterState>
+  schema: FilterSchema<NpcOverviewTableRow, NpcOverviewFilterState>
 }
 
 export type NpcOverviewQueryActions = OverviewQueryActions<NpcOverviewFilterState>

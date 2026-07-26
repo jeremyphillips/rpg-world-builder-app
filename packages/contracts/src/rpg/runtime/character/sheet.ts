@@ -15,7 +15,7 @@ import {
 import { characterNarrativeSchema } from './narrative'
 import { characterSpellEntrySchema } from './spells'
 import { characterProficienciesSchema } from './proficiencies'
-import { characterLifecycleSchema } from './lifecycle'
+import { characterVitalStateSchema } from './character-vital'
 
 // ---------------------------------------------------------------------------
 // Character — player characters and campaign-owned NPCs. This is a stored sheet
@@ -40,7 +40,7 @@ const characterBaseSchema = z.object({
   wealth: characterWealthSchema,
   narrative: characterNarrativeSchema.optional(),
   feats: z.array(characterFeatEntrySchema).default([]),
-  lifecycle: characterLifecycleSchema,
+  vital: characterVitalStateSchema,
   createdAt: z.iso.datetime(),
   updatedAt: z.iso.datetime(),
 })
@@ -48,14 +48,12 @@ const characterBaseSchema = z.object({
 export const pcCharacterSchema = characterBaseSchema.extend({
   characterType: z.literal('pc'),
   userId: z.string().min(1),
-  campaignId: z.string().min(1).nullable().optional(),
 })
 
 export type PcCharacter = z.infer<typeof pcCharacterSchema>
 
 export const npcCharacterSchema = characterBaseSchema.extend({
   characterType: z.literal('npc'),
-  campaignId: z.string().min(1),
   userId: z.never().optional(),
 })
 

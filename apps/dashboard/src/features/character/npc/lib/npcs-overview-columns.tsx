@@ -1,44 +1,44 @@
-import { Link } from 'react-router-dom'
-import type { CharacterBuildCatalogIndex, NpcCharacter } from '@rpg/contracts'
+import type { CharacterBuildCatalogIndex } from '@rpg/contracts'
 import { dataTableWidthMeta, SortableHeader, TableBadgeCell } from '@rpg/ui'
 import type { ColumnDef } from '@rpg/ui'
+import { Link } from 'react-router-dom'
 
 import { ROUTES } from '@/app/routes'
 
-import {
-  resolveCharacterRosterStatusPresentation,
-  resolveCharacterVitalStatusPresentation,
-} from '../../lib/character-lifecycle-presentation'
+import { resolveCharacterRosterStatusPresentation } from '../../lib/campaign-roster-presentation'
+import { resolveCharacterVitalStatusPresentation } from '../../lib/character-vital-presentation'
 import { resolveNpcOverviewClassName, resolveNpcOverviewSpeciesName } from './npc-overview-display'
 import {
   NPC_OVERVIEW_LABELS,
   NPC_ROSTER_COLUMN_LABEL,
   NPC_VITAL_COLUMN_LABEL,
 } from './npc-overview-labels'
+import type { NpcOverviewTableRow } from './npc-overview-row'
 
 export function npcsOverviewColumns(
   campaignId: string,
   catalogIndex: CharacterBuildCatalogIndex,
-): ColumnDef<NpcCharacter>[] {
+): ColumnDef<NpcOverviewTableRow>[] {
   return [
     {
-      accessorKey: 'name',
+      accessorKey: 'character.name',
+      id: 'name',
       header: ({ column }) => (
         <SortableHeader column={column}>{NPC_OVERVIEW_LABELS.name}</SortableHeader>
       ),
       cell: ({ row }) => (
         <Link
-          to={ROUTES.campaign.npcs.detail(campaignId, row.original.id)}
+          to={ROUTES.campaign.npcs.detail(campaignId, row.original.character.id)}
           className="font-medium text-foreground hover:underline"
         >
-          {row.original.name}
+          {row.original.character.name}
         </Link>
       ),
       meta: { label: NPC_OVERVIEW_LABELS.name, locked: true },
     },
     {
       id: 'class',
-      accessorFn: (row) => resolveNpcOverviewClassName(row, catalogIndex),
+      accessorFn: (row) => resolveNpcOverviewClassName(row.character, catalogIndex),
       header: ({ column }) => (
         <SortableHeader column={column}>{NPC_OVERVIEW_LABELS.class}</SortableHeader>
       ),
@@ -47,7 +47,7 @@ export function npcsOverviewColumns(
     },
     {
       id: 'species',
-      accessorFn: (row) => resolveNpcOverviewSpeciesName(row, catalogIndex),
+      accessorFn: (row) => resolveNpcOverviewSpeciesName(row.character, catalogIndex),
       header: ({ column }) => (
         <SortableHeader column={column}>{NPC_OVERVIEW_LABELS.species}</SortableHeader>
       ),
@@ -57,13 +57,13 @@ export function npcsOverviewColumns(
     {
       id: 'roster',
       accessorFn: (row) =>
-        resolveCharacterRosterStatusPresentation(row.lifecycle.roster.status).label,
+        resolveCharacterRosterStatusPresentation(row.participation.roster.status).label,
       header: ({ column }) => (
         <SortableHeader column={column}>{NPC_ROSTER_COLUMN_LABEL}</SortableHeader>
       ),
       cell: ({ row }) => {
         const presentation = resolveCharacterRosterStatusPresentation(
-          row.original.lifecycle.roster.status,
+          row.original.participation.roster.status,
         )
         return (
           <TableBadgeCell appearance={presentation.appearance} tone={presentation.tone}>
@@ -76,13 +76,13 @@ export function npcsOverviewColumns(
     {
       id: 'vital',
       accessorFn: (row) =>
-        resolveCharacterVitalStatusPresentation(row.lifecycle.vital.status).label,
+        resolveCharacterVitalStatusPresentation(row.character.vital.status).label,
       header: ({ column }) => (
         <SortableHeader column={column}>{NPC_VITAL_COLUMN_LABEL}</SortableHeader>
       ),
       cell: ({ row }) => {
         const presentation = resolveCharacterVitalStatusPresentation(
-          row.original.lifecycle.vital.status,
+          row.original.character.vital.status,
         )
         return (
           <TableBadgeCell appearance={presentation.appearance} tone={presentation.tone}>

@@ -16,7 +16,7 @@ import { pcCharacterSchema } from './sheet'
 export const createCharacterInputSchema = pcCharacterSchema.omit({
   id: true,
   userId: true,
-  lifecycle: true,
+  vital: true,
   createdAt: true,
   updatedAt: true,
 })

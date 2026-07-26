@@ -17,6 +17,6 @@ export function useContentViewer(campaignId: string | undefined) {
 
   return buildContentViewerFromMembership({
     campaignRole: campaign.campaignRole,
-    characterIds: campaign.characterIds,
+    controlledCharacterIds: campaign.controlledCharacterIds,
   })
 }

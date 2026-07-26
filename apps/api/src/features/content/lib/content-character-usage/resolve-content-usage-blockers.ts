@@ -1,6 +1,6 @@
 import type { ContentTypeKey, ContentUsageBlocker } from '@rpg/contracts'
 
-import { CampaignMembershipModel } from '../../../campaign/campaign-membership.model'
+import { listOpenParticipationsForCampaign } from '../../../campaign/participation/campaign-character-participation.repository'
 import { CharacterModel } from '../../../character/character.model'
 import { getContentCharacterUsageMatcher } from './content-character-usage-matchers'
 
@@ -8,12 +8,11 @@ type CharacterUsageHit = {
   _id: unknown
   name: string
   characterType: 'pc' | 'npc'
-  campaignId?: string | null
 }
 
 /**
  * Finds characters participating in the campaign that reference homebrew content.
- * NPCs are scoped by `campaignId`; PCs come from membership `characterIds` only.
+ * Both PCs and NPCs are resolved via open campaign participations.
  */
 export async function resolveContentUsageBlockers(
   campaignId: string,
@@ -23,46 +22,24 @@ export async function resolveContentUsageBlockers(
 ): Promise<ContentUsageBlocker[]> {
   const usageMatcher = getContentCharacterUsageMatcher(contentType, contentId, contentSlug)
 
-  const memberships = await CampaignMembershipModel.find({ campaignId })
-    .select('characterIds')
-    .lean<{ characterIds?: string[] }[]>()
+  const participations = await listOpenParticipationsForCampaign(campaignId)
+  const participantIds = participations.map((participation) => participation.characterId)
 
-  const rawPcIds = [...new Set(memberships.flatMap((membership) => membership.characterIds ?? []))]
-
-  let sanitizedPcIds: string[] = []
-  if (rawPcIds.length > 0) {
-    const existingPcs = await CharacterModel.find({
-      _id: { $in: rawPcIds },
-      characterType: 'pc',
-    })
-      .select('_id')
-      .lean<{ _id: unknown }[]>()
-    sanitizedPcIds = existingPcs.map((doc) => String(doc._id))
+  if (participantIds.length === 0) {
+    return []
   }
 
-  const projection = { _id: 1, name: 1, characterType: 1, campaignId: 1 } as const
+  const projection = { _id: 1, name: 1, characterType: 1 } as const
 
-  const npcHits = await CharacterModel.find({
-    characterType: 'npc',
-    campaignId,
+  const hits = await CharacterModel.find({
+    _id: { $in: participantIds },
     ...usageMatcher,
   })
     .select(projection)
     .lean<CharacterUsageHit[]>()
 
-  const pcHits =
-    sanitizedPcIds.length > 0
-      ? await CharacterModel.find({
-          _id: { $in: sanitizedPcIds },
-          characterType: 'pc',
-          ...usageMatcher,
-        })
-          .select(projection)
-          .lean<CharacterUsageHit[]>()
-      : []
-
   const byId = new Map<string, CharacterUsageHit>()
-  for (const hit of [...npcHits, ...pcHits]) {
+  for (const hit of hits) {
     byId.set(String(hit._id), hit)
   }
 
@@ -73,7 +50,7 @@ export async function resolveContentUsageBlockers(
       id: String(hit._id),
       label: hit.name,
       characterType: hit.characterType,
-      ...(hit.characterType === 'npc' && hit.campaignId ? { campaignId: hit.campaignId } : {}),
+      ...(hit.characterType === 'npc' ? { campaignId } : {}),
     },
   }))
 }

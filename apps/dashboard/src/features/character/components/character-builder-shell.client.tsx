@@ -328,7 +328,7 @@ export function CharacterBuilderShell({ context, catalogIndex }: CharacterBuilde
         const input = finalizeNpcCharacterBuild(draft, context, { resolvedChoiceSets })
         const npc = await createNpcMutation({ campaignId, input })
         await clearPersistedDraft()
-        navigate(ROUTES.campaign.npcs.detail(campaignId, npc.id))
+        navigate(ROUTES.campaign.npcs.detail(campaignId, npc.character.id))
         return
       }
 

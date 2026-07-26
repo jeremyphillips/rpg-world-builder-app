@@ -1,9 +1,9 @@
 'use client'
 
 import { useMemo, useRef } from 'react'
-import { applyFilterSchema } from '@rpg/ui/filters'
-import type { CharacterBuildCatalogIndex, NpcCharacter } from '@rpg/contracts'
+import type { CampaignNpcListItem, CharacterBuildCatalogIndex } from '@rpg/contracts'
 import { Text } from '@rpg/ui'
+import { applyFilterSchema } from '@rpg/ui/filters'
 
 import { CatalogOverviewTable } from '@/lib/data-table/catalog-overview-table.client'
 import { useCanManageCampaign } from '@/features/campaign'
@@ -13,6 +13,7 @@ import { NpcBulkActionsMenu } from './npc-bulk-actions-menu.client'
 import { useNpcOverviewBulkRoster } from '../hooks/use-npc-overview-bulk-roster.client'
 import { npcOverviewFilterSchema } from '../lib/npc-overview-filter-schema'
 import { NPC_OVERVIEW_TABLE_KEY } from '../lib/npc-overview-labels'
+import { toNpcOverviewTableRow, type NpcOverviewTableRow } from '../lib/npc-overview-row'
 import { npcsOverviewColumns } from '../lib/npcs-overview-columns'
 import { useNpcOverviewQueryState } from '../lib/use-npc-overview-query-state.client'
 
@@ -21,7 +22,7 @@ const NPCS_EMPTY_MESSAGE = 'No NPCs yet. Create one to populate your campaign ro
 type NpcsOverviewTableProps = {
   campaignId: string
   catalogIndex: CharacterBuildCatalogIndex
-  npcs: NpcCharacter[]
+  npcs: CampaignNpcListItem[]
 }
 
 /** NPC overview table with URL-synced filters and optional roster bulk editing. */
@@ -30,10 +31,11 @@ export function NpcsOverviewTable({ campaignId, catalogIndex, npcs }: NpcsOvervi
   const filterSchema = npcOverviewFilterSchema(catalogIndex)
   const { query, actions } = useNpcOverviewQueryState({ schema: filterSchema })
   const selectTriggerRef = useRef<HTMLButtonElement>(null)
+  const tableRows = useMemo(() => npcs.map(toNpcOverviewTableRow), [npcs])
 
   const visibleRows = useMemo(
-    () => applyFilterSchema(filterSchema, query.filters, npcs),
-    [filterSchema, npcs, query.filters],
+    () => applyFilterSchema(filterSchema, query.filters, tableRows),
+    [filterSchema, query.filters, tableRows],
   )
   const visibleRowIds = useMemo(() => new Set(visibleRows.map((row) => row.id)), [visibleRows])
 
@@ -54,14 +56,14 @@ export function NpcsOverviewTable({ campaignId, catalogIndex, npcs }: NpcsOvervi
     onRowSelectionStateChange,
     handleBulkApplyComplete,
     openBulkRosterDialog,
-  } = useNpcOverviewBulkRoster<NpcCharacter>(visibleRowIds)
+  } = useNpcOverviewBulkRoster<NpcOverviewTableRow>(visibleRowIds)
 
   return (
     <>
       <CatalogOverviewTable
         tableKey={NPC_OVERVIEW_TABLE_KEY}
         columns={npcsOverviewColumns(campaignId, catalogIndex)}
-        data={npcs}
+        data={tableRows}
         filterSchema={filterSchema}
         filterState={query.filters}
         onFilterChange={(id, value) => actions.setFilterValue(id, value)}
@@ -84,7 +86,7 @@ export function NpcsOverviewTable({ campaignId, catalogIndex, npcs }: NpcsOvervi
                 onRowSelectionStateChange,
                 getRowCanSelect,
                 selectTriggerRef,
-                getSelectRowLabel: (row) => row.name,
+                getSelectRowLabel: (row) => row.character.name,
                 bulkActionsMenu: <NpcBulkActionsMenu onEditRosterStatus={openBulkRosterDialog} />,
               }
             : undefined

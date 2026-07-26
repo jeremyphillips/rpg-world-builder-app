@@ -32,8 +32,8 @@ export type CharacterDetailContentProps = {
   viewModel: CharacterDetailViewModel
   showDelete?: boolean
   deleteConfig?: CharacterDetailDeleteConfig
-  lifecycle?: ReactNode
-  lifecycleActions?: ReactNode
+  statusSummary?: ReactNode
+  statusActions?: ReactNode
 }
 
 /**
@@ -56,8 +56,8 @@ export function CharacterDetailContent({
   viewModel,
   showDelete = true,
   deleteConfig,
-  lifecycle,
-  lifecycleActions,
+  statusSummary,
+  statusActions,
 }: CharacterDetailContentProps) {
   useSetBreadcrumbLabel(viewModel.identity.name)
   const navigate = useNavigate()
@@ -87,8 +87,8 @@ export function CharacterDetailContent({
         name={viewModel.identity.name}
         summary={viewModel.identity.summary}
         xp={viewModel.identity.xp}
-        lifecycle={lifecycle}
-        lifecycleActions={lifecycleActions}
+        statusSummary={statusSummary}
+        statusActions={statusActions}
         showDelete={showDelete}
         onDeleteClick={() => setDeleteDialogOpen(true)}
       />

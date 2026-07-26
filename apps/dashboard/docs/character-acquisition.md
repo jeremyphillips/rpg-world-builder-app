@@ -42,17 +42,18 @@ README). Default `/characters/*` never carries campaign id in the URL.
 
 ## API boundaries
 
-| Endpoint                                                  | Purpose                         |
-| --------------------------------------------------------- | ------------------------------- |
-| `POST /api/characters`                                    | User-owned PC create            |
-| `GET/DELETE /api/characters/:id`                          | PC read/delete                  |
-| `GET/POST /api/campaigns/:campaignId/npcs`                | Campaign NPC list/create        |
-| `GET/PATCH/DELETE /api/campaigns/:campaignId/npcs/:npcId` | NPC read/lifecycle patch/delete |
+| Endpoint                                                  | Purpose                      |
+| --------------------------------------------------------- | ---------------------------- |
+| `POST /api/characters`                                    | User-owned PC create         |
+| `GET/DELETE /api/characters/:id`                          | PC read/delete               |
+| `GET/POST /api/campaigns/:campaignId/npcs`                | Campaign NPC list/create     |
+| `GET/PATCH/DELETE /api/campaigns/:campaignId/npcs/:npcId` | NPC read/status patch/delete |
 
 NPC create body: `CreateNpcRequestInput` — no client `campaignId`, `characterType`, or
-`lifecycle` (route/service assigns defaults). NPC lifecycle PATCH accepts
-`characterLifecyclePatchSchema` (status + note per dimension). PC lifecycle PATCH is
-deferred — see [character-lifecycle.md](./character-lifecycle.md).
+`vital` (route/service assigns defaults and creates open participation). NPC status
+PATCH accepts `campaignNpcStatusPatchSchema` (optional `vital` and/or `roster` patches).
+PC vital PATCH is deferred — see
+[character-vital-and-campaign-participation.md](./character-vital-and-campaign-participation.md).
 
 ## Build finalization
 

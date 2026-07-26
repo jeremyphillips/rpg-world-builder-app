@@ -7,25 +7,35 @@ import { filterCatalogForMembership } from './filter-catalog-for-viewer'
 
 describe('buildContentViewerFromMembership', () => {
   it('maps manager roles to manage viewer', () => {
-    expect(buildContentViewerFromMembership({ campaignRole: 'owner', characterIds: [] })).toEqual({
+    expect(
+      buildContentViewerFromMembership({ campaignRole: 'owner', controlledCharacterIds: [] }),
+    ).toEqual({
       kind: 'manage',
     })
     expect(
-      buildContentViewerFromMembership({ campaignRole: 'co-owner', characterIds: ['pc-1'] }),
+      buildContentViewerFromMembership({
+        campaignRole: 'co-owner',
+        controlledCharacterIds: ['pc-1'],
+      }),
     ).toEqual({ kind: 'manage' })
   })
 
   it('maps pc memberships with characters to pc viewer', () => {
     expect(
-      buildContentViewerFromMembership({ campaignRole: 'pc', characterIds: ['pc-1', 'pc-2'] }),
+      buildContentViewerFromMembership({
+        campaignRole: 'pc',
+        controlledCharacterIds: ['pc-1', 'pc-2'],
+      }),
     ).toEqual({ kind: 'pc', characterIds: ['pc-1', 'pc-2'] })
   })
 
   it('maps observers and pcs without characters to none viewer', () => {
     expect(
-      buildContentViewerFromMembership({ campaignRole: 'observer', characterIds: [] }),
+      buildContentViewerFromMembership({ campaignRole: 'observer', controlledCharacterIds: [] }),
     ).toEqual({ kind: 'none' })
-    expect(buildContentViewerFromMembership({ campaignRole: 'pc', characterIds: [] })).toEqual({
+    expect(
+      buildContentViewerFromMembership({ campaignRole: 'pc', controlledCharacterIds: [] }),
+    ).toEqual({
       kind: 'none',
     })
   })
@@ -43,9 +53,9 @@ describe('filterCatalogForMembership', () => {
     const rows = [baseRow, draftRow]
 
     expect(
-      filterCatalogForMembership(rows, { campaignRole: 'pc', characterIds: ['pc-1'] }),
+      filterCatalogForMembership(rows, { campaignRole: 'pc', pcCharacterIds: ['pc-1'] }),
     ).toEqual([baseRow])
-    expect(filterCatalogForMembership(rows, { campaignRole: 'owner', characterIds: [] })).toEqual(
+    expect(filterCatalogForMembership(rows, { campaignRole: 'owner', pcCharacterIds: [] })).toEqual(
       rows,
     )
   })
@@ -61,10 +71,10 @@ describe('filterCatalogForMembership', () => {
       },
     }
     const rows = [baseRow, hiddenRow]
-    const pcMembership = { campaignRole: 'pc', characterIds: ['pc-1'] }
+    const pcMembership = { campaignRole: 'pc', pcCharacterIds: ['pc-1'] }
 
     expect(filterCatalogForMembership(rows, pcMembership)).toEqual([baseRow])
-    expect(filterCatalogForMembership(rows, { campaignRole: 'owner', characterIds: [] })).toEqual(
+    expect(filterCatalogForMembership(rows, { campaignRole: 'owner', pcCharacterIds: [] })).toEqual(
       rows,
     )
   })

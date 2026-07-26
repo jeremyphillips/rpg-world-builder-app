@@ -3,7 +3,6 @@ import type { CreateCharacterInput } from '@rpg/contracts'
 /** Minimal level-1 standalone PC input for character API integration tests. */
 export const minimalStandalonePcInput: CreateCharacterInput = {
   characterType: 'pc',
-  campaignId: null,
   name: 'Verna',
   rulesetId: 'srd-cc-5.2.1',
   classes: [{ classId: 'srd-cc-5.2.1:fighter', level: 1 }],

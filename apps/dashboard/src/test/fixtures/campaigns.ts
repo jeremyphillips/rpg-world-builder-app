@@ -10,7 +10,7 @@ export function makeCampaignListItem(overrides: Partial<CampaignListItem> = {}):
     rulesetId: 'srd-cc-5.2.1',
     createdBy: 'u1',
     campaignRole: 'owner',
-    characterIds: [],
+    controlledCharacterIds: [],
     createdAt: '2026-01-01T00:00:00.000Z',
     updatedAt: '2026-01-01T00:00:00.000Z',
     ...overrides,

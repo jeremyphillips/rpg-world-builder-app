@@ -1,8 +1,8 @@
 import {
   CHARACTER_BULK_ROSTER_FORM_DEFAULT,
   countBulkRosterStatusChanges,
+  type CampaignNpcListItem,
   type CharacterBulkRosterFormValues,
-  type NpcCharacter,
 } from '@rpg/contracts'
 
 import {
@@ -26,12 +26,12 @@ export type BulkRosterStatusPreview = {
 }
 
 export function resolveBulkRosterStatusPreview(
-  selected: ReadonlyArray<NpcCharacter>,
+  selected: ReadonlyArray<CampaignNpcListItem>,
   fieldValues: BulkRosterStatusFormFieldValues,
 ): BulkRosterStatusPreview {
   const bulk = toBulkRosterStatusFormValues(fieldValues)
   const { wouldChangeCount, unchangedCount } = countBulkRosterStatusChanges(
-    selected.map((row) => ({ lifecycle: row.lifecycle })),
+    selected.map((row) => ({ roster: row.participation.roster })),
     bulk,
   )
 

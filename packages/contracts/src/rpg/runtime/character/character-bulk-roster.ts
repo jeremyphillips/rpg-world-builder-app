@@ -1,11 +1,9 @@
 import type { BulkFieldOperation } from '../../../lib/bulk-field-operation'
 import type { CharacterRosterStatus } from '../../vocab/character-roster-status'
-import type { CharacterLifecycle } from './lifecycle'
-import { createDefaultCharacterLifecycle } from './lifecycle'
-import {
-  mergeCharacterLifecyclePatch,
-  type CharacterLifecyclePatch,
-} from './update-character-lifecycle'
+import type { CharacterRosterState } from '../../campaign/character-roster-state'
+import { createDefaultCampaignRosterState } from '../../campaign/campaign-character-participation'
+import { type CampaignRosterPatch } from '../../campaign/update-campaign-roster'
+import { mergeCampaignRosterPatch } from '../../campaign/update-campaign-roster'
 
 export type CharacterBulkRosterFormValues = {
   rosterStatus: BulkFieldOperation<CharacterRosterStatus>
@@ -25,41 +23,41 @@ function resolveBulkRosterStatus(
     case 'set':
       return operation.value
     case 'reset':
-      return createDefaultCharacterLifecycle().roster.status
+      return createDefaultCampaignRosterState().status
   }
 }
 
 export function applyBulkRosterStatusOperations(
-  current: CharacterLifecycle,
+  current: CharacterRosterState,
   bulk: CharacterBulkRosterFormValues,
-): CharacterLifecyclePatch {
-  const nextStatus = resolveBulkRosterStatus(bulk.rosterStatus, current.roster.status)
+): CampaignRosterPatch {
+  const nextStatus = resolveBulkRosterStatus(bulk.rosterStatus, current.status)
 
-  if (nextStatus === current.roster.status) {
+  if (nextStatus === current.status) {
     return {}
   }
 
-  return { roster: { status: nextStatus } }
+  return { status: nextStatus }
 }
 
 export function isBulkRosterStatusNoOp(
-  current: CharacterLifecycle,
+  current: CharacterRosterState,
   bulk: CharacterBulkRosterFormValues,
 ): boolean {
   const patch = applyBulkRosterStatusOperations(current, bulk)
-  const merged = mergeCharacterLifecyclePatch(current, patch)
-  return merged.roster.status === current.roster.status
+  const merged = mergeCampaignRosterPatch(current, patch)
+  return merged.status === current.status
 }
 
 export function countBulkRosterStatusChanges(
-  selected: ReadonlyArray<{ lifecycle: CharacterLifecycle }>,
+  selected: ReadonlyArray<{ roster: CharacterRosterState }>,
   bulk: CharacterBulkRosterFormValues,
 ): { wouldChangeCount: number; unchangedCount: number } {
   let wouldChangeCount = 0
   let unchangedCount = 0
 
   for (const row of selected) {
-    if (isBulkRosterStatusNoOp(row.lifecycle, bulk)) {
+    if (isBulkRosterStatusNoOp(row.roster, bulk)) {
       unchangedCount += 1
     } else {
       wouldChangeCount += 1

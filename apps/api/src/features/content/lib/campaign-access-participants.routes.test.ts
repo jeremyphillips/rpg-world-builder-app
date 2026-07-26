@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import { CSRF_HEADER } from '../../../lib/cookies'
 import { CampaignMembershipModel } from '../../campaign/campaign-membership.model'
+import { attachCharacterToCampaign } from '../../campaign/participation/campaign-character-participation.repository'
 import { createPcRecord } from '../../character/character.repository'
 import { minimalStandalonePcInput } from '../../../test/fixtures/characters'
 import { createTestCampaign, registerAndLoginTestUser } from '../../../test/auth-agent'
@@ -24,10 +25,11 @@ describe('campaign access participants route', () => {
         .user.id as string,
     )
 
-    await CampaignMembershipModel.updateOne(
-      { campaignId, userId: pc.userId },
-      { $set: { characterIds: [pc.id] } },
-    )
+    await attachCharacterToCampaign({
+      campaignId,
+      characterId: pc.id,
+      joinedAt: new Date().toISOString(),
+    })
 
     const res = await owner.agent
       .get(`/api/campaigns/${campaignId}/content/access-participants`)
@@ -64,7 +66,7 @@ describe('campaign access participants route', () => {
       campaignId,
       userId: meRes.body.user.id as string,
       campaignRole: 'pc',
-      characterIds: [],
+      controlledCharacterIds: [],
       invitedAt: new Date(),
       joinedAt: new Date(),
     })

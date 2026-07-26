@@ -64,10 +64,10 @@ describe('createCharacterInputSchema', () => {
     expect(result.success).toBe(true)
   })
 
-  it('accepts an optional campaignId of null (standalone)', () => {
+  it('does not accept campaignId on the wire shape', () => {
     const result = createCharacterInputSchema.safeParse({ ...baseInput, campaignId: null })
     expect(result.success).toBe(true)
-    if (result.success) expect(result.data.campaignId).toBeNull()
+    if (result.success) expect(result.data).not.toHaveProperty('campaignId')
   })
 
   it('rejects input that includes id (server-assigned)', () => {

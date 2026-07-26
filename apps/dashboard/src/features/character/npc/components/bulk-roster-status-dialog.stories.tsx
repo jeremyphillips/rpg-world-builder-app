@@ -1,8 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { useState } from 'react'
-import { createDefaultCharacterLifecycle } from '@rpg/contracts'
 
-import { SAMPLE_PC } from '../../lib/character-fixtures'
+import { makeCampaignNpcListItem } from '../../lib/character-fixtures'
 import { BulkRosterStatusDialog } from './bulk-roster-status-dialog.client'
 
 const meta = {
@@ -11,16 +10,7 @@ const meta = {
   args: {
     campaignId: 'campaign-1',
     open: true,
-    selectedRows: [
-      {
-        ...SAMPLE_PC,
-        id: 'npc-1',
-        characterType: 'npc' as const,
-        campaignId: 'campaign-1',
-        userId: undefined,
-        lifecycle: createDefaultCharacterLifecycle(),
-      },
-    ],
+    selectedRows: [makeCampaignNpcListItem({ character: { id: 'npc-1', name: 'Captain Aldric' } })],
     onApplyComplete: () => undefined,
   },
   render: (args) => {

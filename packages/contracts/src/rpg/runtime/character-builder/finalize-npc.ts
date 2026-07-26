@@ -17,6 +17,6 @@ export function finalizeNpcCharacterBuild(
   options: CharacterBuildEngineOptions = {},
 ): CreateNpcRequestInput {
   const pcInput = finalizeCharacterBuild(draft, context, options)
-  const { characterType: _characterType, campaignId: _campaignId, ...request } = pcInput
+  const { characterType: _characterType, ...request } = pcInput
   return createNpcRequestInputSchema.parse(request)
 }

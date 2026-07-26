@@ -1,6 +1,6 @@
 import type { Request, Response } from 'express'
 
-import type { CharacterLifecyclePatch, CreateNpcRequestInput } from '@rpg/contracts'
+import type { CampaignNpcStatusPatch, CreateNpcRequestInput } from '@rpg/contracts'
 
 import { HttpError } from '../../../lib/http-error'
 import {
@@ -8,7 +8,7 @@ import {
   deleteCampaignNpc,
   getCampaignNpc,
   listCampaignNpcs,
-  patchCampaignNpcLifecycle,
+  patchCampaignNpcStatus,
 } from './npc.service'
 
 export async function list(req: Request, res: Response): Promise<void> {
@@ -43,11 +43,7 @@ export async function remove(req: Request, res: Response): Promise<void> {
 
 export async function patch(req: Request, res: Response): Promise<void> {
   const { campaignId, npcId } = req.params as { campaignId: string; npcId: string }
-  const npc = await patchCampaignNpcLifecycle(
-    campaignId,
-    npcId,
-    req.body as CharacterLifecyclePatch,
-  )
+  const npc = await patchCampaignNpcStatus(campaignId, npcId, req.body as CampaignNpcStatusPatch)
   if (!npc) {
     throw new HttpError(404, 'not_found', 'NPC not found.')
   }

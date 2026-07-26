@@ -9,7 +9,7 @@ const campaignMembershipSchema = new Schema(
     campaignId: { type: String, required: true, index: true },
     userId: { type: String, required: true, index: true },
     campaignRole: { type: String, enum: CAMPAIGN_ROLES, required: true },
-    characterIds: { type: [String], default: [] },
+    controlledCharacterIds: { type: [String], default: [] },
     invitedAt: { type: Date, required: true },
     joinedAt: { type: Date, default: null },
   },

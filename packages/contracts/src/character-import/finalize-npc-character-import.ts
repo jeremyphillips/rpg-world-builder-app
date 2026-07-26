@@ -17,6 +17,6 @@ export function finalizeNpcCharacterImport(
   options: CharacterImportFinalizeOptions,
 ): CreateNpcRequestInput {
   const pcInput = assembleImportCreateCharacterInput(result, options)
-  const { characterType: _characterType, campaignId: _campaignId, ...request } = pcInput
+  const { characterType: _characterType, ...request } = pcInput
   return createNpcRequestInputSchema.parse(request)
 }

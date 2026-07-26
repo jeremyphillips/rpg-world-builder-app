@@ -47,7 +47,7 @@ export function useCharacterImportSave(
           campaignId: saveTarget.campaignId,
           input,
         })
-        onSaveSuccess(npc.id)
+        onSaveSuccess(npc.character.id)
         return
       }
 

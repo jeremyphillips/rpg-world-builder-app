@@ -7,8 +7,8 @@ type CharacterDetailHeaderProps = {
   name: string
   summary: string
   xp: string | null
-  lifecycle?: ReactNode
-  lifecycleActions?: ReactNode
+  statusSummary?: ReactNode
+  statusActions?: ReactNode
   showDelete: boolean
   onDeleteClick: () => void
 }
@@ -17,8 +17,8 @@ export function CharacterDetailHeader({
   name,
   summary,
   xp,
-  lifecycle,
-  lifecycleActions,
+  statusSummary,
+  statusActions,
   showDelete,
   onDeleteClick,
 }: CharacterDetailHeaderProps) {
@@ -30,10 +30,10 @@ export function CharacterDetailHeader({
         </Heading>
         <Text variant="muted">{summary}</Text>
         {xp !== null ? <Text variant="muted">{xp} XP</Text> : null}
-        {lifecycle ? (
+        {statusSummary ? (
           <div className="flex flex-wrap items-center gap-3 pt-1">
-            {lifecycle}
-            {lifecycleActions}
+            {statusSummary}
+            {statusActions}
           </div>
         ) : null}
       </div>

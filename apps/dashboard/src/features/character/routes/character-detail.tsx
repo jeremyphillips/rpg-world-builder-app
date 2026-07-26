@@ -7,7 +7,7 @@ import { PageLoadState } from '@/components/layout/page-load-state'
 import { WidePage } from '@/components/layout/wide-page'
 
 import { CharacterDetailContent } from '../components/detail/character-detail-content.client'
-import { CharacterIdentityLifecycleSummary } from '../components/detail/character-identity-lifecycle-summary.client'
+import { CharacterVitalSummary } from '../components/detail/character-vital-summary.client'
 import { useBuildContext } from '../hooks/use-build-context'
 import { useCharacter } from '../hooks/use-character'
 import { buildCharacterDetailViewModel } from '../lib/character-display'
@@ -54,9 +54,7 @@ export function CharacterDetail() {
         {viewModel ? (
           <CharacterDetailContent
             viewModel={viewModel}
-            lifecycle={
-              <CharacterIdentityLifecycleSummary lifecycle={viewModel.identity.lifecycle} />
-            }
+            statusSummary={<CharacterVitalSummary vital={viewModel.identity.vital} />}
           />
         ) : null}
       </PageLoadState>

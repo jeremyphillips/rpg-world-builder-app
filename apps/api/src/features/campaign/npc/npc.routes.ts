@@ -2,7 +2,7 @@ import { Router } from 'express'
 
 import {
   CAMPAIGN_ROLES,
-  characterLifecyclePatchSchema,
+  campaignNpcStatusPatchSchema,
   createNpcRequestInputSchema,
 } from '@rpg/contracts'
 
@@ -31,7 +31,7 @@ campaignNpcRouter.patch(
   '/:npcId',
   requireAuth,
   requireNpcAuthor,
-  validate(characterLifecyclePatchSchema),
+  validate(campaignNpcStatusPatchSchema),
   controller.patch,
 )
 campaignNpcRouter.delete('/:npcId', requireAuth, requireNpcAuthor, controller.remove)

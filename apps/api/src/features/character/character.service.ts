@@ -1,19 +1,19 @@
 import type {
-  CharacterLifecycle,
-  CharacterLifecyclePatch,
+  CharacterVitalPatch,
+  CharacterVitalState,
   CreateCharacterInput,
   PcCharacter,
 } from '@rpg/contracts'
-import { applyLifecycleTransitionMetadata } from '@rpg/contracts'
+import { applyCharacterVitalTransitionMetadata } from '@rpg/contracts'
 
 import { assertStandalonePcCreateRestrictions } from './assert-standalone-pc-create'
 import {
   createPcRecord,
   deletePcForUser,
-  findCharacterLifecycle,
+  findCharacterVital,
   findPcForUser,
   listPcsForUser,
-  updateCharacterLifecycleRecord,
+  updateCharacterVitalRecord,
 } from './character.repository'
 
 export async function createCharacter(
@@ -42,24 +42,24 @@ export async function deleteCharacterForUser(
   return deletePcForUser(characterId, userId)
 }
 
-type UpdateCharacterLifecycleOptions = {
+type UpdateCharacterVitalOptions = {
   timestamp: string
 }
 
-export async function updateCharacterLifecycle(
+export async function updateCharacterVital(
   characterId: string,
-  patch: CharacterLifecyclePatch,
-  { timestamp }: UpdateCharacterLifecycleOptions,
-): Promise<CharacterLifecycle | null> {
-  const current = await findCharacterLifecycle(characterId)
+  patch: CharacterVitalPatch,
+  { timestamp }: UpdateCharacterVitalOptions,
+): Promise<CharacterVitalState | null> {
+  const current = await findCharacterVital(characterId)
   if (!current) return null
 
-  const nextLifecycle = applyLifecycleTransitionMetadata({
+  const nextVital = applyCharacterVitalTransitionMetadata({
     current,
     patch,
     timestamp,
   })
 
-  const updated = await updateCharacterLifecycleRecord(characterId, nextLifecycle)
-  return updated ? nextLifecycle : null
+  const updated = await updateCharacterVitalRecord(characterId, nextVital)
+  return updated ? nextVital : null
 }

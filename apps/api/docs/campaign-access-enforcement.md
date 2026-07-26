@@ -14,16 +14,20 @@ references and direct authorized record reads follow their separate read policy.
 
 ### Decision
 
-`participantIds` on campaign access stores **PC character document IDs** — the same ids
-that appear on `CampaignMembership.characterIds` when a player submits characters to a
-campaign.
+`participantIds` on campaign access stores **PC character document IDs** drawn from
+**open** `CampaignCharacterParticipation` records in the campaign — not membership
+`controlledCharacterIds` alone.
 
-| Identity candidate           | Outcome                                                                              |
-| ---------------------------- | ------------------------------------------------------------------------------------ |
-| `CampaignMembership.id`      | Rejected — mixes PC and observer; no stable app-level id today                       |
-| `userId`                     | Rejected — not what `participantIds` semantically names                              |
-| `characterId` / PC id        | **Chosen** — aligns with membership `characterIds` and per-character builder context |
-| New `CampaignParticipant.id` | Deferred — no participant entity until Track A A3                                    |
+Viewer PC ids for content policy are the intersection of membership control and open
+participation: `controlledCharacterIds ∩ open participations`. The API resolves
+this in `requireCampaignRole` as `req.campaignMembership.pcCharacterIds`.
+
+| Identity candidate           | Outcome                                                                             |
+| ---------------------------- | ----------------------------------------------------------------------------------- |
+| `CampaignMembership.id`      | Rejected — mixes PC and observer; no stable app-level id today                      |
+| `userId`                     | Rejected — not what `participantIds` semantically names                             |
+| `characterId` / PC id        | **Chosen** — one id per participating PC; aligns with per-character builder context |
+| New `CampaignParticipant.id` | Deferred — no participant entity beyond participation records                       |
 
 ### `ContentViewer` mapping
 
@@ -32,18 +36,23 @@ Contracts export `ContentViewer` (`packages/contracts/src/rpg/content/lib/conten
 ```ts
 type ContentViewer =
   | { kind: 'manage' } // owner / co-owner
-  | { kind: 'pc'; characterIds: string[] } // pc role — all submitted campaign PCs
-  | { kind: 'none' } // observer or pc with no submitted characters
+  | { kind: 'pc'; characterIds: string[] } // pc role — pre-resolved viewer PC ids
+  | { kind: 'none' } // observer or pc with no viewer PC ids
 ```
 
-API list handlers build a viewer from `req.campaignMembership`:
+API list handlers build a viewer from `req.campaignMembership` via
+`buildContentViewerFromCampaignContext`:
 
 - `owner` / `co-owner` → `{ kind: 'manage' }`
-- `pc` with `characterIds` → `{ kind: 'pc', characterIds }`
-- `observer` or `pc` with empty `characterIds` → `{ kind: 'none' }`
+- `pc` with non-empty `pcCharacterIds` → `{ kind: 'pc', characterIds: pcCharacterIds }`
+- `observer` or `pc` with empty `pcCharacterIds` → `{ kind: 'none' }`
 
-`specific_players` grants match when **any** membership `characterId` is listed in
-`participantIds`. Track A A3 adds roster pickers and stale-id resolution via
+`pcCharacterIds` is `controlledCharacterIds` filtered to characters with an open
+participation in the route's campaign. Control without participation does not grant
+viewer access.
+
+`specific_players` grants match when **any** viewer `characterId` is listed in
+`participantIds`. Stale-id resolution uses campaign-wide open participation ids via
 `GET /api/campaigns/:campaignId/content/access-participants` and
 `resolveContentCampaignAccess(..., { validParticipantIds })`.
 
@@ -53,12 +62,12 @@ Managers load the pickable roster from:
 
 `GET /api/campaigns/:campaignId/content/access-participants` (owner/co-owner)
 
-Each entry is a campaign-submitted PC (`id`, `name`, `playerDisplayName`). The
-dashboard multi-select writes `participantIds` through `PATCH …/campaign-access`.
-The patch schema requires at least one participant for `specific_players` and
-normalizes `participantIds` to `[]` for other visibility modes.
+Each entry is a campaign-participating PC (`id`, `name`, `playerDisplayName`) sourced
+from open participations. The dashboard multi-select writes `participantIds` through
+`PATCH …/campaign-access`. The patch schema requires at least one participant for
+`specific_players` and normalizes `participantIds` to `[]` for other visibility modes.
 
-Stale grants — ids persisted on content but no longer submitted to the campaign —
+Stale grants — ids persisted on content but no longer in open campaign participation —
 surface in `unavailableParticipantIds` on resolved reads. The edit form merges
 valid and stale ids so managers can clear stale selections on save.
 
@@ -108,4 +117,5 @@ discovery must not strip content already on a saved sheet.
 ## Related docs
 
 - Contracts: `packages/contracts/src/rpg/content/lib/content-viewer-access.ts`
+- Participation model: `packages/contracts/ROLES.md`
 - Dashboard campaign access UX: `apps/dashboard/src/features/content/lib/campaign-access/README.md`

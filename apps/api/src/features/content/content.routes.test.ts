@@ -9,6 +9,7 @@ import { createPcRecord } from '../character/character.repository'
 import { createTestCampaign, registerAndLoginTestUser } from '../../test/auth-agent'
 import { minimalStandalonePcInput } from '../../test/fixtures/characters'
 import { minimalNpcRequestInput } from '../../test/fixtures/npcs'
+import { setMembershipControlledPcs } from '../../test/helpers/campaign-participation'
 import { useIntegrationApp } from '../../test/setup/integration-app'
 
 const getApp = useIntegrationApp()
@@ -139,7 +140,7 @@ describe('content draft visibility', () => {
       campaignId,
       userId: meRes.body.user.id as string,
       campaignRole,
-      characterIds: [],
+      controlledCharacterIds: [],
       invitedAt: new Date(),
       joinedAt: new Date(),
     })
@@ -770,7 +771,7 @@ describe('content campaign access discovery enforcement', () => {
     campaignId: string,
     email: string,
     campaignRole: 'pc' | 'observer',
-    characterIds: string[] = [],
+    controlledCharacterIds: string[] = [],
   ) {
     const member = await registerAndLoginTestUser(getApp(), {
       email,
@@ -785,7 +786,7 @@ describe('content campaign access discovery enforcement', () => {
       campaignId,
       userId: meRes.body.user.id as string,
       campaignRole,
-      characterIds,
+      controlledCharacterIds,
       invitedAt: new Date(),
       joinedAt: new Date(),
     })
@@ -896,14 +897,16 @@ describe('content campaign access discovery enforcement', () => {
       deniedMeRes.body.user.id as string,
     )
 
-    await CampaignMembershipModel.updateOne(
-      { campaignId, userId: grantedMeRes.body.user.id as string },
-      { $set: { characterIds: [grantedPc.id] } },
-    )
-    await CampaignMembershipModel.updateOne(
-      { campaignId, userId: deniedMeRes.body.user.id as string },
-      { $set: { characterIds: [deniedPc.id] } },
-    )
+    await setMembershipControlledPcs({
+      campaignId,
+      userId: grantedMeRes.body.user.id as string,
+      controlledCharacterIds: [grantedPc.id],
+    })
+    await setMembershipControlledPcs({
+      campaignId,
+      userId: deniedMeRes.body.user.id as string,
+      controlledCharacterIds: [deniedPc.id],
+    })
 
     await owner.agent
       .patch(`/api/campaigns/${campaignId}/content/feats/${restrictedId}/campaign-access`)

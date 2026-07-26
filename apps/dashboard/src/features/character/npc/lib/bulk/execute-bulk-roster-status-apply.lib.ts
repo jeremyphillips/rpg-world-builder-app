@@ -1,11 +1,12 @@
 import {
   applyBulkRosterStatusOperations,
   isBulkRosterStatusNoOp,
+  type CampaignNpcListItem,
   type CharacterBulkRosterFormValues,
-  type NpcCharacter,
 } from '@rpg/contracts'
 
-import { patchNpcLifecycle } from '../../api/npc-client'
+import { mapNpcDetailToListItem, patchNpcStatus } from '../../api/npc-client'
+import type { CampaignNpcDetail } from '../../api/npc-client'
 
 const BULK_UPDATE_CONCURRENCY = 5
 
@@ -15,18 +16,21 @@ export type BulkRosterStatusApplyResult = {
   unchangedIds: string[]
   summary: string | null
   fullSuccess: boolean
-  updates: Array<{ rowId: string; npc: NpcCharacter }>
+  updates: Array<{ rowId: string; npcDetail: CampaignNpcDetail }>
 }
 
 type BulkApplyOutcome =
-  | { rowId: string; status: 'updated'; npc: NpcCharacter }
+  | { rowId: string; status: 'updated'; npcDetail: CampaignNpcDetail }
   | { rowId: string; status: 'failed' }
 
-function partitionApplicableRows(rows: NpcCharacter[], formValues: CharacterBulkRosterFormValues) {
+function partitionApplicableRows(
+  rows: CampaignNpcListItem[],
+  formValues: CharacterBulkRosterFormValues,
+) {
   const unchangedIds: string[] = []
   const applicableRows = rows.filter((row) => {
-    if (isBulkRosterStatusNoOp(row.lifecycle, formValues)) {
-      unchangedIds.push(row.id)
+    if (isBulkRosterStatusNoOp(row.participation.roster, formValues)) {
+      unchangedIds.push(row.character.id)
       return false
     }
     return true
@@ -44,7 +48,7 @@ function formatBulkRosterStatusPartialSuccess(updatedCount: number, failedCount:
 }
 
 async function applyRowsWithConcurrency(
-  rows: NpcCharacter[],
+  rows: CampaignNpcListItem[],
   formValues: CharacterBulkRosterFormValues,
   campaignId: string,
 ) {
@@ -54,9 +58,11 @@ async function applyRowsWithConcurrency(
     const batch = rows.slice(index, index + BULK_UPDATE_CONCURRENCY)
     const batchResults = await Promise.allSettled(
       batch.map(async (row) => {
-        const patch = applyBulkRosterStatusOperations(row.lifecycle, formValues)
-        const npc = await patchNpcLifecycle(campaignId, row.id, patch)
-        return { rowId: row.id, npc }
+        const rosterPatch = applyBulkRosterStatusOperations(row.participation.roster, formValues)
+        const npcDetail = await patchNpcStatus(campaignId, row.character.id, {
+          roster: rosterPatch,
+        })
+        return { rowId: row.character.id, npcDetail }
       }),
     )
 
@@ -65,11 +71,15 @@ async function applyRowsWithConcurrency(
       const row = batch[batchIndex]!
 
       if (settled.status === 'rejected') {
-        outcomes.push({ rowId: row.id, status: 'failed' })
+        outcomes.push({ rowId: row.character.id, status: 'failed' })
         continue
       }
 
-      outcomes.push({ rowId: settled.value.rowId, status: 'updated', npc: settled.value.npc })
+      outcomes.push({
+        rowId: settled.value.rowId,
+        status: 'updated',
+        npcDetail: settled.value.npcDetail,
+      })
     }
   }
 
@@ -77,7 +87,7 @@ async function applyRowsWithConcurrency(
 }
 
 export async function executeBulkRosterStatusApply(
-  rows: NpcCharacter[],
+  rows: CampaignNpcListItem[],
   formValues: CharacterBulkRosterFormValues,
   campaignId: string,
 ): Promise<BulkRosterStatusApplyResult> {
@@ -112,6 +122,8 @@ export async function executeBulkRosterStatusApply(
       .filter((outcome): outcome is Extract<BulkApplyOutcome, { status: 'updated' }> => {
         return outcome.status === 'updated'
       })
-      .map((outcome) => ({ rowId: outcome.rowId, npc: outcome.npc })),
+      .map((outcome) => ({ rowId: outcome.rowId, npcDetail: outcome.npcDetail })),
   }
 }
+
+export { mapNpcDetailToListItem }

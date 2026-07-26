@@ -40,14 +40,10 @@ describe('character routes', () => {
       characterType: 'pc',
       name: 'Verna',
       rulesetId: 'srd-cc-5.2.1',
-      campaignId: null,
     })
     expect(res.body.character.userId).toBeTruthy()
     expect(res.body.character.createdAt).toMatch(/^\d{4}-/)
-    expect(res.body.character.lifecycle).toEqual({
-      roster: { status: 'active' },
-      vital: { status: 'alive' },
-    })
+    expect(res.body.character.vital).toEqual({ status: 'alive' })
   })
 
   it('lists only the session user characters', async () => {

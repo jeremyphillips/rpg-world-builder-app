@@ -7,20 +7,21 @@ import {
   CHARACTER_ROSTER_STATUSES,
   CHARACTER_VITAL_STATUS_ENTRIES,
   CHARACTER_VITAL_STATUSES,
-  type CharacterLifecycle,
+  type CharacterRosterState,
+  type CharacterVitalState,
 } from '@rpg/contracts'
 import { Button, Modal, Text } from '@rpg/ui'
 import { FormFieldStack } from '@rpg/ui/form'
 import type { FormItem } from '@rpg/ui/form'
 
 import {
-  toNpcLifecycleEditorValues,
-  toNpcLifecyclePatch,
-  useUpdateNpcLifecycle,
-  type NpcLifecycleEditorValues,
-} from '../hooks/use-update-npc-lifecycle'
+  toNpcStatusEditorValues,
+  toNpcStatusPatch,
+  useUpdateNpcStatus,
+  type NpcStatusEditorValues,
+} from '../hooks/use-update-npc-status'
 
-function buildNpcLifecycleEditorFields(): FormItem[] {
+function buildNpcStatusEditorFields(): FormItem[] {
   return [
     {
       type: 'select',
@@ -63,37 +64,39 @@ function buildNpcLifecycleEditorFields(): FormItem[] {
   ]
 }
 
-const LIFECYCLE_EDITOR_FIELDS = buildNpcLifecycleEditorFields()
+const STATUS_EDITOR_FIELDS = buildNpcStatusEditorFields()
 
-export type NpcLifecycleEditorProps = {
+export type NpcStatusEditorProps = {
   open: boolean
   onOpenChange: (open: boolean) => void
   campaignId: string
   npcId: string
-  lifecycle: CharacterLifecycle
+  vital: CharacterVitalState
+  roster: CharacterRosterState
 }
 
-export function NpcLifecycleEditor({
+export function NpcStatusEditor({
   open,
   onOpenChange,
   campaignId,
   npcId,
-  lifecycle,
-}: NpcLifecycleEditorProps) {
+  vital,
+  roster,
+}: NpcStatusEditorProps) {
   const formId = useId()
-  const form = useForm<NpcLifecycleEditorValues>({
-    defaultValues: toNpcLifecycleEditorValues(lifecycle),
+  const form = useForm<NpcStatusEditorValues>({
+    defaultValues: toNpcStatusEditorValues({ vital, roster }),
   })
-  const updateLifecycle = useUpdateNpcLifecycle(campaignId, npcId)
+  const updateStatus = useUpdateNpcStatus(campaignId, npcId)
 
   useEffect(() => {
     if (open) {
-      form.reset(toNpcLifecycleEditorValues(lifecycle))
+      form.reset(toNpcStatusEditorValues({ vital, roster }))
     }
-  }, [form, lifecycle, open])
+  }, [form, vital, roster, open])
 
   const handleSubmit = form.handleSubmit(async (values) => {
-    await updateLifecycle.mutateAsync(toNpcLifecyclePatch(values))
+    await updateStatus.mutateAsync(toNpcStatusPatch(values))
     onOpenChange(false)
   })
 
@@ -108,34 +111,34 @@ export function NpcLifecycleEditor({
     <Modal.Root open={open} onOpenChange={onOpenChange}>
       <Modal.Content
         size="md"
-        aria-busy={updateLifecycle.isPending || undefined}
+        aria-busy={updateStatus.isPending || undefined}
         onOpenAutoFocus={handleOpenAutoFocus}
       >
         <Modal.Header
-          headline="Edit lifecycle"
+          headline="Edit status"
           description="Update roster and vital status for this NPC."
         />
         <Modal.Body>
           <FormProvider {...form}>
             <form id={formId} onSubmit={(event) => void handleSubmit(event)} className="space-y-4">
               <FormFieldStack
-                fields={LIFECYCLE_EDITOR_FIELDS}
+                fields={STATUS_EDITOR_FIELDS}
                 idPrefix={formId}
                 size="md"
                 rhythm="comfortable"
               />
-              {lifecycle.roster.changedAt ? (
+              {roster.changedAt ? (
                 <Text variant="muted">
-                  Roster updated {new Date(lifecycle.roster.changedAt).toLocaleString()}
+                  Roster updated {new Date(roster.changedAt).toLocaleString()}
                 </Text>
               ) : null}
-              {lifecycle.vital.changedAt ? (
+              {vital.changedAt ? (
                 <Text variant="muted">
-                  Vital updated {new Date(lifecycle.vital.changedAt).toLocaleString()}
+                  Vital updated {new Date(vital.changedAt).toLocaleString()}
                 </Text>
               ) : null}
-              {updateLifecycle.error ? (
-                <Text variant="destructive">{updateLifecycle.error.message}</Text>
+              {updateStatus.error ? (
+                <Text variant="destructive">{updateStatus.error.message}</Text>
               ) : null}
             </form>
           </FormProvider>
@@ -144,7 +147,7 @@ export function NpcLifecycleEditor({
           <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
-          <Button type="submit" form={formId} disabled={updateLifecycle.isPending}>
+          <Button type="submit" form={formId} disabled={updateStatus.isPending}>
             Save
           </Button>
         </Modal.Footer>

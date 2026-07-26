@@ -38,7 +38,7 @@ export function parseBulkRosterStatusOption(
 }
 
 /**
- * NPC lifecycle fields plug into the shared overview bulk-editor path.
+ * NPC roster fields plug into the shared overview bulk-editor path.
  * Keep selection limits, patch construction, validation, and mutation
  * execution in the base bulk-editor infrastructure.
  */

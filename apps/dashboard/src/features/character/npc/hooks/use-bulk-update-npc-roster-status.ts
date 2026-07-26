@@ -2,13 +2,11 @@
 
 import { useCallback, useRef, useState } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
-import {
-  getErrorMessage,
-  type CharacterBulkRosterFormValues,
-  type NpcCharacter,
-} from '@rpg/contracts'
+import type { CampaignNpcDetail, CampaignNpcListItem } from '@rpg/contracts'
+import { getErrorMessage, type CharacterBulkRosterFormValues } from '@rpg/contracts'
 
-import { npcsQueryKey } from '../hooks/use-npcs'
+import { mapNpcDetailToListItem } from '../api/npc-client'
+import { npcQueryKey, npcsQueryKey } from './use-npcs'
 import {
   executeBulkRosterStatusApply,
   type BulkRosterStatusApplyResult,
@@ -18,11 +16,11 @@ export type UseBulkUpdateNpcRosterStatusOptions = {
   campaignId: string
 }
 
-function createSkippedApplyResult(rows: NpcCharacter[]): BulkRosterStatusApplyResult {
+function createSkippedApplyResult(rows: CampaignNpcListItem[]): BulkRosterStatusApplyResult {
   return {
     updatedIds: [],
     failedIds: [],
-    unchangedIds: rows.map((row) => row.id),
+    unchangedIds: rows.map((row) => row.character.id),
     summary: null,
     fullSuccess: false,
     updates: [],
@@ -36,18 +34,29 @@ export function useBulkUpdateNpcRosterStatus({ campaignId }: UseBulkUpdateNpcRos
   const pendingRef = useRef(false)
 
   const updateCachedNpc = useCallback(
-    (npc: NpcCharacter) => {
-      queryClient.setQueryData<NpcCharacter[]>(npcsQueryKey(campaignId), (current) =>
-        current?.map((row) => (row.id === npc.id ? npc : row)),
+    (listItem: CampaignNpcListItem) => {
+      queryClient.setQueryData<CampaignNpcListItem[]>(npcsQueryKey(campaignId), (current) =>
+        current?.map((entry) => (entry.character.id === listItem.character.id ? listItem : entry)),
       )
-      queryClient.setQueryData<NpcCharacter>(['campaigns', campaignId, 'npcs', npc.id], npc)
+      queryClient.setQueryData<CampaignNpcDetail | undefined>(
+        npcQueryKey(campaignId, listItem.character.id),
+        (current) => {
+          if (!current) return current
+
+          return {
+            ...current,
+            character: { ...current.character, vital: listItem.character.vital },
+            participation: { ...current.participation, roster: listItem.participation.roster },
+          }
+        },
+      )
     },
     [campaignId, queryClient],
   )
 
   const apply = useCallback(
     async (
-      rows: NpcCharacter[],
+      rows: CampaignNpcListItem[],
       formValues: CharacterBulkRosterFormValues,
     ): Promise<BulkRosterStatusApplyResult> => {
       if (pendingRef.current) {
@@ -62,7 +71,7 @@ export function useBulkUpdateNpcRosterStatus({ campaignId }: UseBulkUpdateNpcRos
         const result = await executeBulkRosterStatusApply(rows, formValues, campaignId)
 
         result.updates.forEach((update) => {
-          updateCachedNpc(update.npc)
+          updateCachedNpc(mapNpcDetailToListItem(update.npcDetail))
         })
 
         setResultSummary(result.summary)
@@ -72,7 +81,7 @@ export function useBulkUpdateNpcRosterStatus({ campaignId }: UseBulkUpdateNpcRos
         setResultSummary(message)
         return {
           ...createSkippedApplyResult(rows),
-          failedIds: rows.map((row) => row.id),
+          failedIds: rows.map((row) => row.character.id),
           summary: message,
         }
       } finally {

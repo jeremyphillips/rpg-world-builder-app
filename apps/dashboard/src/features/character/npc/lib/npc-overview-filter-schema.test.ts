@@ -1,60 +1,64 @@
 import { describe, expect, it } from 'vitest'
 import { applyFilterSchema } from '@rpg/ui/filters'
-import { createDefaultCharacterLifecycle } from '@rpg/contracts'
+import { createDefaultCharacterVitalState } from '@rpg/contracts'
 
 import {
   createPopulatedStandaloneBuilderContextFixture,
   createStandaloneBuilderCatalogIndexFixture,
 } from '../../lib/character-builder-fixtures'
-import { SAMPLE_PC } from '../../lib/character-fixtures'
+import { makeCampaignNpcListItem } from '../../lib/character-fixtures'
+import { toNpcOverviewTableRow } from './npc-overview-row'
 import { npcOverviewFilterSchema } from './npc-overview-filter-schema'
 
 const context = createPopulatedStandaloneBuilderContextFixture()
 const catalogIndex = createStandaloneBuilderCatalogIndexFixture(context)
 const filterSchema = npcOverviewFilterSchema(catalogIndex)
 
-const defaultLifecycle = createDefaultCharacterLifecycle()
+const fighterNpc = toNpcOverviewTableRow(
+  makeCampaignNpcListItem({
+    character: {
+      id: 'npc-fighter',
+      name: 'Captain Aldric',
+      vital: createDefaultCharacterVitalState(),
+    },
+  }),
+)
 
-const fighterNpc = {
-  ...SAMPLE_PC,
-  id: 'npc-fighter',
-  name: 'Captain Aldric',
-  characterType: 'npc' as const,
-  campaignId: 'campaign-1',
-  userId: undefined,
-  lifecycle: defaultLifecycle,
-}
+const warlockNpc = toNpcOverviewTableRow(
+  makeCampaignNpcListItem({
+    character: {
+      id: 'npc-warlock',
+      name: 'Mira Thornwick',
+      classes: [{ classId: 'srd-cc-5.2.1:warlock', level: 3 }],
+      species: { id: 'srd-cc-5.2.1:elf' },
+    },
+  }),
+)
 
-const warlockNpc = {
-  ...fighterNpc,
-  id: 'npc-warlock',
-  name: 'Mira Thornwick',
-  classes: [{ classId: 'srd-cc-5.2.1:warlock', level: 3 }],
-  species: { id: 'srd-cc-5.2.1:elf' },
-}
+const retiredNpc = toNpcOverviewTableRow(
+  makeCampaignNpcListItem({
+    character: {
+      id: 'npc-retired',
+      name: 'Old Guard',
+    },
+    participation: {
+      roster: { status: 'retired' },
+    },
+  }),
+)
 
-const retiredNpc = {
-  ...fighterNpc,
-  id: 'npc-retired',
-  name: 'Old Guard',
-  lifecycle: {
-    roster: { status: 'retired' as const },
-    vital: { status: 'alive' as const },
-  },
-}
-
-const deceasedNpc = {
-  ...fighterNpc,
-  id: 'npc-deceased',
-  name: 'Fallen Scout',
-  lifecycle: {
-    roster: { status: 'active' as const },
-    vital: { status: 'deceased' as const },
-  },
-}
+const deceasedNpc = toNpcOverviewTableRow(
+  makeCampaignNpcListItem({
+    character: {
+      id: 'npc-deceased',
+      name: 'Fallen Scout',
+      vital: { status: 'deceased' },
+    },
+  }),
+)
 
 describe('npcOverviewFilterSchema', () => {
-  it('keeps class and species filters in the primary strip and lifecycle filters advanced', () => {
+  it('keeps class and species filters in the primary strip and status filters advanced', () => {
     expect(filterSchema.fields.map((field) => field.id)).toEqual([
       'name',
       'classId',
@@ -74,7 +78,7 @@ describe('npcOverviewFilterSchema', () => {
     ).toBe(true)
   })
 
-  it('shows retired and deceased NPCs when lifecycle filters are unset', () => {
+  it('shows retired and deceased NPCs when status filters are unset', () => {
     const rows = applyFilterSchema(filterSchema, {}, [fighterNpc, retiredNpc, deceasedNpc])
 
     expect(rows).toHaveLength(3)
