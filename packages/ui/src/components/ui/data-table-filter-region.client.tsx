@@ -11,11 +11,14 @@ import { FilterAdvancedPanel } from '../../filters/filter-advanced-panel.client'
 import { useOptionalFilterChrome } from '../../filters/filter-chrome.context'
 import { resolveFilterControlSize } from '../../filters/filter-presentation.lib'
 import {
-  dataTableFilterRegionConnectorVariants,
+  dataTableFilterRegionLabelSpacerVariants,
   dataTableFilterRegionPanelRowVariants,
+  dataTableFilterRegionPrimaryFieldsVariants,
+  dataTableFilterRegionPrimaryInnerVariants,
   dataTableFilterRegionPrimaryVariants,
-  dataTableFilterRegionRailVariants,
+  dataTableFilterRegionRailStackVariants,
   dataTableFilterRegionTriggerVariants,
+  dataTableFilterRegionTriggerWrapVariants,
   dataTableFilterRegionVariants,
 } from './data-table-filter-region.variants'
 
@@ -76,58 +79,61 @@ export function DataTableFilterRegion({
   const labels = { ...DEFAULT_LABELS, ...labelsProp }
   const panelId = useId()
   const chrome = useOptionalFilterChrome()
-  const triggerBandClassName = resolveFieldActionBandClassName(
-    resolveFilterControlSize(chrome?.density),
-  )
+  const density = chrome?.density ?? 'compact'
+  const triggerBandClassName = resolveFieldActionBandClassName(resolveFilterControlSize(density))
 
   const hasAdditionalFilters = additionalFilterFields != null
 
   return (
-    <div
-      className={cn(
-        dataTableFilterRegionVariants({ hasTriggerRail: hasAdditionalFilters }),
-        className,
-      )}
-    >
-      <div className={dataTableFilterRegionPrimaryVariants()}>{primaryFilters}</div>
-
-      {hasAdditionalFilters ? (
-        <div className={dataTableFilterRegionRailVariants()}>
-          <div className={triggerBandClassName}>
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              disabled={disabled}
-              aria-expanded={additionalFiltersOpen}
-              aria-controls={panelId}
-              aria-label={buildTriggerAccessibleLabel(
-                additionalFiltersOpen,
-                labels.moreFilters,
-                activeAdditionalFilterCount,
-              )}
-              className={dataTableFilterRegionTriggerVariants()}
-              onClick={() => onAdditionalFiltersOpenChange(!additionalFiltersOpen)}
-            >
-              <SlidersHorizontal className="size-3.5" aria-hidden />
-              {labels.moreFilters}
-              {activeAdditionalFilterCount > 0 ? (
-                <Badge appearance="neutral" tone="neutral" size="sm" className="ml-0.5">
-                  {activeAdditionalFilterCount}
-                </Badge>
-              ) : null}
-              {additionalFiltersOpen ? (
-                <ChevronUp className="size-3.5 opacity-60" aria-hidden />
-              ) : (
-                <ChevronDown className="size-3.5 opacity-60" aria-hidden />
-              )}
-            </Button>
-          </div>
-          {additionalFiltersOpen ? (
-            <div aria-hidden className={dataTableFilterRegionConnectorVariants()} />
+    <div className={cn(dataTableFilterRegionVariants(), className)}>
+      <div className={dataTableFilterRegionPrimaryVariants()}>
+        <div
+          className={dataTableFilterRegionPrimaryInnerVariants({
+            hasTrigger: hasAdditionalFilters,
+          })}
+        >
+          <div className={dataTableFilterRegionPrimaryFieldsVariants()}>{primaryFilters}</div>
+          {hasAdditionalFilters ? (
+            <div className={dataTableFilterRegionTriggerWrapVariants()}>
+              <div className={dataTableFilterRegionRailStackVariants({ density })}>
+                <span aria-hidden className={dataTableFilterRegionLabelSpacerVariants({ density })}>
+                  &nbsp;
+                </span>
+                <div className={triggerBandClassName}>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    disabled={disabled}
+                    aria-expanded={additionalFiltersOpen}
+                    aria-controls={panelId}
+                    aria-label={buildTriggerAccessibleLabel(
+                      additionalFiltersOpen,
+                      labels.moreFilters,
+                      activeAdditionalFilterCount,
+                    )}
+                    className={dataTableFilterRegionTriggerVariants()}
+                    onClick={() => onAdditionalFiltersOpenChange(!additionalFiltersOpen)}
+                  >
+                    <SlidersHorizontal className="size-3.5" aria-hidden />
+                    {labels.moreFilters}
+                    {activeAdditionalFilterCount > 0 ? (
+                      <Badge appearance="neutral" tone="neutral" size="sm" className="ml-0.5">
+                        {activeAdditionalFilterCount}
+                      </Badge>
+                    ) : null}
+                    {additionalFiltersOpen ? (
+                      <ChevronUp className="size-3.5 opacity-60" aria-hidden />
+                    ) : (
+                      <ChevronDown className="size-3.5 opacity-60" aria-hidden />
+                    )}
+                  </Button>
+                </div>
+              </div>
+            </div>
           ) : null}
         </div>
-      ) : null}
+      </div>
 
       {hasAdditionalFilters ? (
         <div className={dataTableFilterRegionPanelRowVariants()}>

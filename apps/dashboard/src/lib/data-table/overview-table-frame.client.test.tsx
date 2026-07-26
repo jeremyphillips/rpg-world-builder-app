@@ -52,7 +52,7 @@ describe('OverviewTableFrame', () => {
         data={ROWS}
         resultSummary={<OverviewResultSummary resultCount={2} />}
         trailingActions={(controls) => (
-          <controls.ColumnVisibilityTrigger aria-label="Choose visible columns" showLabel={false} />
+          <controls.ColumnVisibilityTrigger aria-label="Choose visible columns" showLabel />
         )}
       />,
     )

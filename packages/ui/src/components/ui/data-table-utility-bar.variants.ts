@@ -5,12 +5,12 @@ export const dataTableUtilityBarVariants = cva('flex flex-col')
 
 /** Row 1 — result context summary. */
 export const dataTableUtilityBarSummaryRowVariants = cva(
-  'flex items-center px-3 py-1.5 text-sm text-muted-foreground',
+  'flex items-center bg-surface-subtle px-3 py-1.5 text-sm text-muted-foreground',
 )
 
 /** Row 2 — leading actions, flexible space, trailing actions. */
 export const dataTableUtilityBarActionsRowVariants = cva(
-  'flex flex-wrap items-center gap-2 border-b border-border px-3 py-1.5 min-h-9',
+  'flex flex-wrap items-center gap-2 border-b border-border bg-surface-subtle px-3 py-1.5 min-h-9',
 )
 
 /** Leading action cluster — optional structural inset for column alignment. */

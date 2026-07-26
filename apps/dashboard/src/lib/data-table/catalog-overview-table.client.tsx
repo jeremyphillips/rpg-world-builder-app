@@ -152,7 +152,7 @@ function CatalogOverviewTableBody<T extends { id: string }>({
 
   const renderUtilityActions = useCallback(
     (controls: DataTableUtilityControls<T>) => (
-      <controls.ColumnVisibilityTrigger aria-label={COLUMNS_ARIA_LABEL} showLabel={false} />
+      <controls.ColumnVisibilityTrigger aria-label={COLUMNS_ARIA_LABEL} showLabel />
     ),
     [],
   )

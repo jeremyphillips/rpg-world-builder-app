@@ -16,7 +16,7 @@ export const filterBarFieldGroupVariants = cva('flex flex-1 flex-wrap items-end 
 export const filterBarControlVariants = cva('', {
   variants: {
     type: {
-      text: 'min-w-0 flex-[1_1_18rem] max-w-[26rem]',
+      text: 'min-w-0 flex-[1_1_14rem] max-w-[20rem]',
       select: 'min-w-0 flex-[0_1_10rem] max-w-[10rem]',
       selectLong: 'min-w-0 flex-[0_1_14rem] max-w-[14rem]',
       boolean: 'inline-flex w-auto min-w-0 max-w-[14rem] items-center',

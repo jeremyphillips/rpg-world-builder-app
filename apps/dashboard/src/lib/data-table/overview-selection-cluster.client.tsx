@@ -53,7 +53,7 @@ export function OverviewSelectionCluster({
       <Button
         ref={selectTriggerRef}
         type="button"
-        variant="ghost"
+        variant="outline"
         size="sm"
         aria-pressed={false}
         onClick={onEnterSelectionMode}
@@ -108,7 +108,7 @@ export function OverviewSelectionCluster({
       ) : null}
 
       {showPageAction ? (
-        <Button type="button" variant="ghost" size="sm" onClick={handlePageAction}>
+        <Button type="button" variant="outline" size="sm" onClick={handlePageAction}>
           {pageActionLabel}
         </Button>
       ) : null}
@@ -116,7 +116,7 @@ export function OverviewSelectionCluster({
       {selectedCount > 0
         ? (bulkActionsMenu ??
           (onBulkActions ? (
-            <Button type="button" variant="ghost" size="sm" onClick={onBulkActions}>
+            <Button type="button" variant="outline" size="sm" onClick={onBulkActions}>
               Bulk actions
             </Button>
           ) : null))
@@ -124,7 +124,7 @@ export function OverviewSelectionCluster({
 
       <Button
         type="button"
-        variant="ghost"
+        variant="outline"
         size="sm"
         onClick={() => {
           onExitSelectionMode()

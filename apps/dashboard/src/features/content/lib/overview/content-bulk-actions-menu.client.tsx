@@ -7,7 +7,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@rpg/ui'
-import { ChevronDown } from 'lucide-react'
+import { ChevronDown, Layers } from 'lucide-react'
 
 import {
   CONTENT_BULK_ACTION_EDIT_CAMPAIGN_ACCESS_LABEL,
@@ -22,9 +22,10 @@ export function ContentBulkActionsMenu({ onEditCampaignAccess }: ContentBulkActi
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button type="button" variant="ghost" size="sm">
+        <Button type="button" variant="outline" size="sm">
+          <Layers className="size-3.5" aria-hidden />
           {CONTENT_BULK_ACTIONS_MENU_LABEL}
-          <ChevronDown className="size-4" aria-hidden />
+          <ChevronDown className="size-3.5 opacity-60" aria-hidden />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">

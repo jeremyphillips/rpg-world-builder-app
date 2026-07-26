@@ -3,11 +3,25 @@
 import type { ReactNode } from 'react'
 
 import { formatOverviewResultLabel } from './overview-selection-cluster.lib'
+import {
+  overviewResultSummaryDotVariants,
+  overviewResultSummaryPipeVariants,
+  overviewResultSummaryVariants,
+} from './overview-result-summary.variants'
 
 export type OverviewResultSummaryProps = {
   resultCount: number
   resultLabel?: string
   supplementalContent?: ReactNode
+}
+
+/** Middle-dot separator before Show/Hide actions in supplemental disclosure rows. */
+export function OverviewResultSummaryDotSeparator() {
+  return (
+    <span aria-hidden className={overviewResultSummaryDotVariants()}>
+      ·
+    </span>
+  )
 }
 
 /** Shared overview result count with optional supplemental disclosure content. */
@@ -19,11 +33,18 @@ export function OverviewResultSummary({
   const label = resultLabel ?? formatOverviewResultLabel(resultCount)
 
   return (
-    <div className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1">
+    <div className={overviewResultSummaryVariants()}>
       <span role="status" aria-live="polite" aria-atomic="true" className="tabular-nums">
         {label}
       </span>
-      {supplementalContent}
+      {supplementalContent ? (
+        <>
+          <span aria-hidden className={overviewResultSummaryPipeVariants()}>
+            |
+          </span>
+          {supplementalContent}
+        </>
+      ) : null}
     </div>
   )
 }

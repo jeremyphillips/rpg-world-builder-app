@@ -9,7 +9,7 @@ import type {
 export type DataTableColumnVisibilityTriggerProps = {
   /** Accessible name for the trigger. Defaults to "Choose visible columns". */
   'aria-label'?: string
-  /** When true, renders the outlined "Columns" label trigger used by the default toolbar. */
+  /** When true, renders the outline icon + chevron trigger used by overview utility bars. */
   showLabel?: boolean
 }
 

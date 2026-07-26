@@ -1,33 +1,65 @@
 import { cva } from 'class-variance-authority'
 
-/** Grid layout for the filter region — primary fields + optional trigger rail. */
-export const dataTableFilterRegionVariants = cva('grid w-full gap-y-3', {
+/** Filter region layout — primary panel row and optional additional panel row. */
+export const dataTableFilterRegionVariants = cva('grid w-full gap-y-3')
+
+/** Primary filter panel shell — faint background wrapping fields and optional trigger. */
+export const dataTableFilterRegionPrimaryVariants = cva(
+  'min-w-0 rounded-md border border-border bg-surface-subtle p-3',
+)
+
+/** Inner layout — grid pins More filters top-right; flex-only when no trigger. */
+export const dataTableFilterRegionPrimaryInnerVariants = cva('min-w-0', {
   variants: {
-    hasTriggerRail: {
-      true: 'grid-cols-[minmax(0,1fr)_auto] gap-x-3 max-sm:grid-cols-1',
-      false: 'grid-cols-1',
+    hasTrigger: {
+      true: 'grid grid-cols-[minmax(0,1fr)_auto] items-start gap-x-3 gap-y-3 max-sm:grid-cols-1',
+      false: 'flex flex-wrap items-end gap-3',
     },
   },
   defaultVariants: {
-    hasTriggerRail: false,
+    hasTrigger: false,
   },
 })
 
-/** Primary filter field group inside the region. */
-export const dataTableFilterRegionPrimaryVariants = cva('flex min-w-0 flex-wrap items-end gap-3')
-
-/** Full-height trigger rail column — aligns with the first control row. */
-export const dataTableFilterRegionRailVariants = cva(
-  'flex min-h-full flex-col max-sm:row-start-2 max-sm:items-end',
+/** Primary filter field group — wraps inside the left grid column. */
+export const dataTableFilterRegionPrimaryFieldsVariants = cva(
+  'flex min-w-0 flex-wrap items-end gap-3',
 )
 
-/** Decorative connector between trigger and panel — hidden on narrow screens. */
-export const dataTableFilterRegionConnectorVariants = cva(
-  'mx-auto min-h-3 flex-1 border-l border-border max-sm:hidden',
+/** More filters trigger — top-right column, aligned with the first control row. */
+export const dataTableFilterRegionTriggerWrapVariants = cva('shrink-0 max-sm:justify-self-end')
+
+/** Stacked label + control band — mirrors primary stacked filter field anatomy. */
+export const dataTableFilterRegionRailStackVariants = cva('flex flex-col max-sm:gap-0', {
+  variants: {
+    density: {
+      compact: 'gap-0.5',
+      comfortable: 'gap-1',
+    },
+  },
+  defaultVariants: {
+    density: 'compact',
+  },
+})
+
+/** Invisible label row reserving space above the More filters control band. */
+export const dataTableFilterRegionLabelSpacerVariants = cva(
+  'invisible block leading-none max-sm:hidden',
+  {
+    variants: {
+      density: {
+        compact: 'text-xs',
+        comfortable: 'text-sm',
+      },
+    },
+    defaultVariants: {
+      density: 'compact',
+    },
+  },
 )
 
-/** Panel row spanning both grid columns. */
-export const dataTableFilterRegionPanelRowVariants = cva('col-span-2 max-sm:col-span-1')
+/** Additional filters panel row below the primary panel. */
+export const dataTableFilterRegionPanelRowVariants = cva('min-w-0')
 
 /** More filters trigger button. */
 export const dataTableFilterRegionTriggerVariants = cva('gap-1.5')

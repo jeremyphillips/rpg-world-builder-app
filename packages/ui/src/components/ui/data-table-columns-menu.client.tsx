@@ -246,29 +246,17 @@ export function DataTableColumnsMenu({
   onReset,
   canReset = true,
   searchable = true,
-  triggerVariant = 'labeled',
+  triggerVariant: _triggerVariant = 'labeled',
   labels: labelsProp,
 }: DataTableColumnsMenuProps) {
   const labels = { ...DEFAULT_LABELS, ...labelsProp }
 
-  const trigger =
-    triggerVariant === 'labeled' ? (
-      <Button variant="outline" size="sm" className="gap-1.5" aria-label={labels.chooseColumns}>
-        <Columns3 className="size-3.5" aria-hidden />
-        {labels.columns}
-        <ChevronDown className="size-3.5 opacity-60" aria-hidden />
-      </Button>
-    ) : (
-      <Button
-        variant="ghost"
-        size="sm"
-        className="size-8 p-0"
-        aria-label={labels.chooseColumns}
-        title={labels.columns}
-      >
-        <Columns3 className="size-4" aria-hidden />
-      </Button>
-    )
+  const trigger = (
+    <Button variant="outline" size="sm" className="gap-1.5" aria-label={labels.chooseColumns}>
+      <Columns3 className="size-3.5" aria-hidden />
+      <ChevronDown className="size-3.5 opacity-60" aria-hidden />
+    </Button>
+  )
 
   return (
     <PopoverPrimitive.Root>
