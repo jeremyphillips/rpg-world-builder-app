@@ -2,6 +2,11 @@ import { describe, expect, it } from 'vitest'
 
 import { makeTestUser } from '../../test/fixtures/users'
 import { useIntegrationDb } from '../../test/setup/integration-db'
+import {
+  resetFakeEmailSentMessages,
+  setFakeEmailSendResult,
+} from '../../services/email/providers/fake-email.provider'
+import { setEmailProviderForTests } from '../../services/email/email.service'
 import { CampaignMembershipModel } from './campaign-membership.model'
 import {
   createCampaign,
@@ -14,11 +19,64 @@ import { getRulesetPatchRead } from '../vocabulary'
 
 useIntegrationDb()
 
+describe('createCampaign invite orchestration', () => {
+  it('returns an empty invites array when no recipients are provided', async () => {
+    const owner = await makeTestUser({ email: 'owner@example.com' })
+
+    const result = await createCampaign({
+      name: 'Solo Campaign',
+      createdBy: owner.id,
+    })
+
+    expect(result.invites).toEqual([])
+  })
+
+  it('sends optional invites after campaign creation without rolling back on delivery failure', async () => {
+    const owner = await makeTestUser({ email: 'owner@example.com' })
+    setEmailProviderForTests(setFakeEmailSendResult({ ok: false, errorCode: 'smtp_failed' }))
+    resetFakeEmailSentMessages()
+
+    const result = await createCampaign({
+      name: 'Invited Campaign',
+      createdBy: owner.id,
+      inviteEmails: [{ email: 'player@example.com' }],
+    })
+
+    expect(result.campaign.identity.name).toBe('Invited Campaign')
+    expect(result.invites).toHaveLength(1)
+    expect(result.invites[0]).toMatchObject({
+      email: 'player@example.com',
+      deliveryStatus: 'failed',
+    })
+
+    const membership = await CampaignMembershipModel.findOne({
+      campaignId: result.campaign.id,
+      userId: owner.id,
+    })
+    expect(membership?.campaignRole).toBe('owner')
+  })
+
+  it('rejects inviting the campaign creator email', async () => {
+    const owner = await makeTestUser({ email: 'owner@example.com' })
+
+    await expect(
+      createCampaign({
+        name: 'Self Invite Campaign',
+        createdBy: owner.id,
+        inviteEmails: [{ email: 'owner@example.com' }],
+      }),
+    ).rejects.toMatchObject({
+      status: 400,
+      message: 'Cannot invite your own email address.',
+    })
+  })
+})
+
 describe('createCampaign', () => {
   it('persists flavor on the campaign and character creation on the ruleset patch', async () => {
     const owner = await makeTestUser({ email: 'owner@example.com' })
 
-    const campaign = await createCampaign({
+    const { campaign } = await createCampaign({
       name: 'Flavored',
       createdBy: owner.id,
       characterCreation: {
@@ -52,7 +110,7 @@ describe('createCampaign', () => {
   it('materializes a selected campaign template before persistence', async () => {
     const owner = await makeTestUser({ email: 'template-owner@example.com' })
 
-    const campaign = await createCampaign({
+    const { campaign } = await createCampaign({
       name: 'The Argent Road',
       createdBy: owner.id,
       campaignTemplateId: 'classic-adventure',
@@ -79,7 +137,7 @@ describe('createCampaign', () => {
 
   it('does not attach preset provenance to a blank campaign', async () => {
     const owner = await makeTestUser({ email: 'blank-owner@example.com' })
-    const campaign = await createCampaign({ name: 'Blank', createdBy: owner.id })
+    const { campaign } = await createCampaign({ name: 'Blank', createdBy: owner.id })
 
     expect(campaign).not.toHaveProperty('presetProvenance')
   })
@@ -110,8 +168,8 @@ describe('listCampaignsForUser', () => {
   it('returns every campaign the user owns or belongs to, sorted by name', async () => {
     const owner = await makeTestUser({ email: 'owner@example.com' })
 
-    const zelda = await createCampaign({ name: 'Zelda', createdBy: owner.id })
-    const arden = await createCampaign({ name: 'Arden', createdBy: owner.id })
+    const { campaign: zelda } = await createCampaign({ name: 'Zelda', createdBy: owner.id })
+    const { campaign: arden } = await createCampaign({ name: 'Arden', createdBy: owner.id })
 
     const campaigns = await listCampaignsForUser(owner.id)
 
@@ -123,7 +181,7 @@ describe('listCampaignsForUser', () => {
   it('includes campaigns the user joined but did not create', async () => {
     const owner = await makeTestUser({ email: 'owner@example.com' })
     const member = await makeTestUser({ email: 'member@example.com' })
-    const campaign = await createCampaign({ name: 'Shared', createdBy: owner.id })
+    const { campaign } = await createCampaign({ name: 'Shared', createdBy: owner.id })
 
     await CampaignMembershipModel.create({
       campaignId: campaign.id,
@@ -142,7 +200,7 @@ describe('listCampaignsForUser', () => {
   it('returns co-owner role for co-owner memberships', async () => {
     const owner = await makeTestUser({ email: 'owner@example.com' })
     const coOwner = await makeTestUser({ email: 'co@example.com' })
-    const campaign = await createCampaign({ name: 'Shared', createdBy: owner.id })
+    const { campaign } = await createCampaign({ name: 'Shared', createdBy: owner.id })
 
     await CampaignMembershipModel.create({
       campaignId: campaign.id,
@@ -170,7 +228,7 @@ describe('listCampaignsForUser', () => {
 describe('updateCampaign', () => {
   it('merges identity and flavor into the existing document', async () => {
     const owner = await makeTestUser({ email: 'owner@example.com' })
-    const campaign = await createCampaign({ name: 'Original', createdBy: owner.id })
+    const { campaign } = await createCampaign({ name: 'Original', createdBy: owner.id })
 
     const updated = await updateCampaign(campaign.id, {
       name: 'Renamed',
@@ -207,7 +265,7 @@ describe('isCampaignMember', () => {
   it('is true for a member and false for a non-member', async () => {
     const owner = await makeTestUser({ email: 'owner@example.com' })
     const stranger = await makeTestUser({ email: 'stranger@example.com' })
-    const campaign = await createCampaign({ name: 'Campaign', createdBy: owner.id })
+    const { campaign } = await createCampaign({ name: 'Campaign', createdBy: owner.id })
 
     await expect(isCampaignMember(owner.id, campaign.id)).resolves.toBe(true)
     await expect(isCampaignMember(stranger.id, campaign.id)).resolves.toBe(false)

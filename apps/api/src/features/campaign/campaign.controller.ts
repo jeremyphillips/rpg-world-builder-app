@@ -15,11 +15,11 @@ export async function create(req: Request, res: Response): Promise<void> {
   // `req.body` is validated by `validate(createCampaignInputSchema)`; `req.user`
   // is guaranteed by `requireAuth` running before this handler.
   const input = req.body as CreateCampaignInput
-  const campaign = await createCampaign({
+  const result = await createCampaign({
     ...input,
     createdBy: req.user!.id,
   })
-  res.status(201).json({ campaign })
+  res.status(201).json(result)
 }
 
 export function listTemplates(_req: Request, res: Response): void {

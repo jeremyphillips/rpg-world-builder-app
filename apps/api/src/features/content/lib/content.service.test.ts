@@ -108,7 +108,7 @@ describe('resolveCatalogForCampaign (classes)', () => {
   it('scopes patches and homebrew to their own campaign', async () => {
     const a = await makeTestCampaign({ name: 'Catalog' })
     const ownerB = await makeTestUser({ email: 'b@example.com', displayName: 'B' })
-    const b = await createCampaign({ name: 'Other', createdBy: ownerB.id })
+    const { campaign: b } = await createCampaign({ name: 'Other', createdBy: ownerB.id })
 
     await ClassPatchModel.create({
       campaignId: a.id,

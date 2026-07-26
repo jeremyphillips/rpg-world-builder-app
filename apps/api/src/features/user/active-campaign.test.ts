@@ -27,7 +27,7 @@ describe('resolveActiveCampaignForUser', () => {
 
   it('resolves the sole campaign when no preference is stored', async () => {
     const owner = await makeUser('owner@example.com')
-    const campaign = await createCampaign({ name: 'Sunless Citadel', createdBy: owner.id })
+    const { campaign } = await createCampaign({ name: 'Sunless Citadel', createdBy: owner.id })
 
     const session = await resolveActiveCampaignForUser(owner.id)
 
@@ -39,7 +39,7 @@ describe('resolveActiveCampaignForUser', () => {
 
   it('returns the stored preference when it matches a reachable campaign', async () => {
     const owner = await makeUser('owner@example.com')
-    const first = await createCampaign({ name: 'Alpha', createdBy: owner.id })
+    const { campaign: first } = await createCampaign({ name: 'Alpha', createdBy: owner.id })
     await createCampaign({ name: 'Beta', createdBy: owner.id })
     await updateLastSelectedCampaign(owner.id, first.id)
 

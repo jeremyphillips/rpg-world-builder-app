@@ -28,9 +28,12 @@ afterEach(() => {
 
 describe('createCampaign', () => {
   it('unwraps and returns the created campaign on success', async () => {
-    stubFetch(fakeResponse(true, 201, { campaign: { id: 'c1' } }))
+    stubFetch(fakeResponse(true, 201, { campaign: { id: 'c1' }, invites: [] }))
 
-    await expect(createCampaign({ name: 'The Sunless Citadel' })).resolves.toEqual({ id: 'c1' })
+    await expect(createCampaign({ name: 'The Sunless Citadel' })).resolves.toEqual({
+      campaign: { id: 'c1' },
+      invites: [],
+    })
   })
 
   it('throws ApiError with the server message when the request fails', async () => {

@@ -3,6 +3,7 @@ import { campaignRoleSchema } from '../../shared/roles'
 import { systemRulesetIdSchema } from '../primitives/ruleset'
 import { versionedTemplateReferenceSchema } from '../primitives/versioned-template'
 import { updateCampaignCharacterCreationInputSchema } from './patches/campaign-character-creation-patch'
+import { campaignInviteEmailsInputSchema } from './campaign-invite'
 
 export {
   EXTENDED_PROGRESSION_TIER_NAME_MAX,
@@ -176,9 +177,28 @@ export const createCampaignInputSchema = campaignIdentitySchema.extend({
   flavor: campaignFlavorSchema.optional(),
   /** Optional at create; the server falls back to `DEFAULT_SYSTEM_RULESET_ID`. */
   rulesetId: systemRulesetIdSchema.optional(),
+  /** Optional player invitations sent after the campaign is created. */
+  inviteEmails: campaignInviteEmailsInputSchema.optional(),
 })
 
 export type CreateCampaignInput = z.infer<typeof createCampaignInputSchema>
+
+export const createCampaignInviteDeliveryResultSchema = z.object({
+  email: z.email(),
+  inviteId: z.string().min(1).optional(),
+  deliveryStatus: z.enum(['sent', 'failed']),
+})
+
+export type CreateCampaignInviteDeliveryResult = z.infer<
+  typeof createCampaignInviteDeliveryResultSchema
+>
+
+export const createCampaignResultSchema = z.object({
+  campaign: campaignSchema,
+  invites: z.array(createCampaignInviteDeliveryResultSchema),
+})
+
+export type CreateCampaignResult = z.infer<typeof createCampaignResultSchema>
 
 // ---------------------------------------------------------------------------
 // Update campaign input
