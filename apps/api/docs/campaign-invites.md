@@ -1,7 +1,7 @@
 # Campaign invites
 
 Architecture and behavior for the campaign invite and character-onboarding flow.
-Phase-0 findings live in [campaign-invites-phase-0.md](./campaign-invites-phase-0.md).
+Historical phase-0 findings: [campaign-invites-phase-0.md](./campaign-invites-phase-0.md).
 
 ## Overview
 
@@ -95,7 +95,11 @@ Idempotency via `completedCharacterId`:
 
 Mongo transactions are not used (standalone dev topology). Failures after
 partial writes use compensating deletes/`$pull` mirroring `createCampaign` and
-`createCampaignNpc`.
+`createCampaignNpc`. For existing-character completion, rollback must target
+only the participation created in that attempt — not
+`deleteAllParticipationsForCharacter`. See plan follow-up §19 for
+orchestration-owned `ClientSession` propagation when replica-set transactions
+are adopted.
 
 ## Derived onboarding state (overview)
 

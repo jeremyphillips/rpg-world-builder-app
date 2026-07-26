@@ -131,4 +131,22 @@ describe('CampaignBuildContext discriminated union', () => {
     expect(context.ownershipTarget).toEqual({ type: 'user', userId: 'user_1' })
     expect(context.acquisition.kind).toBe('campaign_invite')
   })
+
+  it('rejects impossible npc + user ownership combinations at the type level', () => {
+    type InvalidNpcUserOwnership = Extract<
+      CampaignNpcBuildContext,
+      { ownershipTarget: { type: 'user' } }
+    >
+    type InvalidPcCampaignOwnership = Extract<
+      CampaignPcBuildContext,
+      { ownershipTarget: { type: 'campaign' } }
+    >
+
+    const unionGuards = {
+      npcUser: true as InvalidNpcUserOwnership extends never ? true : false,
+      pcCampaign: true as InvalidPcCampaignOwnership extends never ? true : false,
+    }
+
+    expect(unionGuards).toEqual({ npcUser: true, pcCampaign: true })
+  })
 })

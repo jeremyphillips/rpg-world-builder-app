@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 import { makeTestUser } from '../../test/fixtures/users'
 import { useIntegrationDb } from '../../test/setup/integration-db'
 import {
+  createFakeEmailProvider,
   resetFakeEmailSentMessages,
   setFakeEmailSendResult,
 } from '../../services/email/providers/fake-email.provider'
@@ -68,6 +69,24 @@ describe('createCampaign invite orchestration', () => {
     ).rejects.toMatchObject({
       status: 400,
       message: 'Cannot invite your own email address.',
+    })
+  })
+
+  it('dedupes duplicate invite emails during campaign creation', async () => {
+    const owner = await makeTestUser({ email: 'dedup-owner@example.com' })
+    setEmailProviderForTests(createFakeEmailProvider())
+    resetFakeEmailSentMessages()
+
+    const result = await createCampaign({
+      name: 'Dedup Campaign',
+      createdBy: owner.id,
+      inviteEmails: [{ email: 'player@example.com' }, { email: '  player@example.com ' }],
+    })
+
+    expect(result.invites).toHaveLength(1)
+    expect(result.invites[0]).toMatchObject({
+      email: 'player@example.com',
+      deliveryStatus: 'sent',
     })
   })
 })
