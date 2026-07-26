@@ -12,14 +12,8 @@ import { CAMPAIGN_INVITE_EXPIRY_DAYS, resolveCharacterCampaignEligibility } from
 import { HttpError } from '../../lib/http-error'
 import type { EmailProvider } from '../../services/email/email.types'
 import { findCampaignById } from '../campaign/find-campaign-by-id'
-import { CampaignMembershipModel } from '../campaign/campaign-membership.model'
-import { assignControlledPcToCampaignMember } from '../campaign/participation/assign-controlled-pc.service'
-import {
-  deleteAllParticipationsForCharacter,
-  findOpenParticipationForCharacter,
-} from '../campaign/participation/campaign-character-participation.repository'
-import { createPcRecord, deletePcForUser } from '../character/character.repository'
-import { listCharactersForUser, findCharacterForUser } from '../character/character.service'
+import { findOpenParticipationForCharacter } from '../campaign/participation/campaign-character-participation.repository'
+import { listCharactersForUser } from '../character/character.service'
 import { findUserByEmail, findSessionUserById } from '../user/user.service'
 import { getRulesetPatchRead } from '../vocabulary'
 import { deliverCampaignInviteEmail } from './campaign-invite-delivery'
@@ -38,7 +32,6 @@ import {
   findInviteByTokenHash,
   listPendingInvitesByCampaign,
   markInviteAccepted,
-  markInviteCompleted,
   markInviteExpired,
   rotateInviteToken,
 } from './campaign-invite.repository'
@@ -51,6 +44,12 @@ import {
   buildCampaignContentEligibilityMap,
   formatInviteCharacterSummary,
 } from './campaign-invite-eligibility.lib'
+import {
+  completeExistingCharacterInviteWrites,
+  completeNewCharacterInviteWrites,
+  resolveCompletedInviteForExistingCharacter,
+  validateExistingCharacterInviteCompletion,
+} from './complete-campaign-invite-completion.lib'
 import {
   resolveCompletedInviteForNewCharacter,
   validateNewCharacterInviteInput,
@@ -504,105 +503,30 @@ export async function completeCampaignInviteWithExistingCharacter({
   }
 
   const currentInvite = await expireInviteIfNeeded(invite)
-
-  if (currentInvite.status === 'completed') {
-    if (currentInvite.acceptedByUserId !== userId) {
-      throw new HttpError(403, 'forbidden', 'This invitation belongs to another user.')
-    }
-    if (currentInvite.completedCharacterId === characterId) {
-      return { campaignId: currentInvite.campaignId, characterId }
-    }
-    throw new HttpError(
-      409,
-      'conflict',
-      'This invitation was already completed with a different character.',
-    )
-  }
+  const completedResult = await resolveCompletedInviteForExistingCharacter({
+    invite: currentInvite,
+    userId,
+    characterId,
+  })
+  if (completedResult) return completedResult
 
   const acceptedInvite = await loadAcceptedInviteForUser({ inviteId, userId })
-
-  const character = await findCharacterForUser(characterId, userId)
-  if (!character) {
-    throw new HttpError(404, 'not_found', 'Character not found.')
-  }
-
-  const [campaignContentById, startingLevel, membership] = await Promise.all([
-    buildCampaignContentEligibilityMap(acceptedInvite.campaignId),
-    loadInviteStartingLevel(acceptedInvite.campaignId),
-    findCampaignMembershipByCampaignAndUser(acceptedInvite.campaignId, userId),
-  ])
-
-  if (!membership) {
-    throw new HttpError(
-      500,
-      'integrity_error',
-      'Accepted invitation is missing the expected campaign membership.',
-    )
-  }
-
-  const existingOpenParticipation = await findOpenParticipationForCharacter(characterId)
-  let conflictingCampaignName: string | undefined
-  if (
-    existingOpenParticipation &&
-    existingOpenParticipation.campaignId !== acceptedInvite.campaignId
-  ) {
-    const conflictingCampaign = await findCampaignById(existingOpenParticipation.campaignId)
-    conflictingCampaignName = conflictingCampaign?.identity.name
-  }
-
-  const eligibility = resolveCharacterCampaignEligibility({
-    character,
+  const { membershipId } = await validateExistingCharacterInviteCompletion({
+    acceptedInvite,
     userId,
-    campaignId: acceptedInvite.campaignId,
-    startingLevel,
-    existingOpenParticipation,
-    conflictingCampaignName,
-    campaignContentById,
-    viewer: { kind: 'pc', characterIds: [character.id] },
-  })
-
-  if (!eligibility.eligible) {
-    throw new HttpError(
-      422,
-      'ineligible_character',
-      'Character is not eligible for this campaign.',
-      {
-        blockingIssues: eligibility.blockingIssues,
-      },
-    )
-  }
-
-  await assignControlledPcToCampaignMember({
-    campaignId: acceptedInvite.campaignId,
-    membershipId: String(membership._id),
     characterId,
   })
 
-  const completed = await markInviteCompleted(invite.id, characterId, new Date())
-  if (!completed) {
-    throw new HttpError(500, 'internal_error', 'Failed to complete invitation.')
-  }
+  await completeExistingCharacterInviteWrites({
+    inviteId: invite.id,
+    campaignId: acceptedInvite.campaignId,
+    membershipId,
+    characterId,
+  })
 
   // TODO(notifications): notify campaign owners when onboarding completes.
 
   return { campaignId: invite.campaignId, characterId }
-}
-
-async function compensateInviteNewCharacterCompletion({
-  characterId,
-  userId,
-  membershipId,
-}: {
-  characterId: string
-  userId: string
-  membershipId: string
-}): Promise<void> {
-  await CampaignMembershipModel.updateOne(
-    { _id: membershipId },
-    { $pull: { controlledCharacterIds: characterId } },
-  )
-  await deleteAllParticipationsForCharacter(characterId)
-  await deletePcForUser(characterId, userId)
 }
 
 export async function completeCampaignInviteWithNewCharacter({
@@ -633,31 +557,17 @@ export async function completeCampaignInviteWithNewCharacter({
     characterCreateInput,
   })
 
-  const character = await createPcRecord(parsedInput, userId)
-
-  try {
-    await assignControlledPcToCampaignMember({
-      campaignId: acceptedInvite.campaignId,
-      membershipId,
-      characterId: character.id,
-    })
-
-    const completed = await markInviteCompleted(invite.id, character.id, new Date())
-    if (!completed) {
-      throw new HttpError(500, 'internal_error', 'Failed to complete invitation.')
-    }
-  } catch (err) {
-    await compensateInviteNewCharacterCompletion({
-      characterId: character.id,
-      userId,
-      membershipId,
-    })
-    throw err
-  }
+  const result = await completeNewCharacterInviteWrites({
+    inviteId: invite.id,
+    campaignId: acceptedInvite.campaignId,
+    membershipId,
+    userId,
+    parsedInput,
+  })
 
   // TODO(notifications): notify campaign owners when onboarding completes.
 
-  return { campaignId: acceptedInvite.campaignId, characterId: character.id }
+  return result
 }
 
 export { CAMPAIGN_INVITE_EXPIRY_DAYS }

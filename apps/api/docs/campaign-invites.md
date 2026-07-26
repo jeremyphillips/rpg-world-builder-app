@@ -93,13 +93,12 @@ Idempotency via `completedCharacterId`:
 - Re-completion with the **same** `characterId` → no-op success.
 - Re-completion with a **different** `characterId` → conflict.
 
-Mongo transactions are not used (standalone dev topology). Failures after
-partial writes use compensating deletes/`$pull` mirroring `createCampaign` and
-`createCampaignNpc`. For existing-character completion, rollback must target
-only the participation created in that attempt — not
-`deleteAllParticipationsForCharacter`. See plan follow-up §19 for
-orchestration-owned `ClientSession` propagation when replica-set transactions
-are adopted.
+Mongo transactions are used when `MONGO_TRANSACTION_MODE` resolves to enabled
+at startup (replica-set topology). Otherwise failures after partial writes use
+compensating deletes/`$pull` mirroring `createCampaign` and `createCampaignNpc`.
+For existing-character completion, rollback must target only the participation
+created in that attempt — not `deleteAllParticipationsForCharacter` (use
+`detachOpenParticipation`).
 
 ## Derived onboarding state (overview)
 

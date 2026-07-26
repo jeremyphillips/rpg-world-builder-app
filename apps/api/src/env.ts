@@ -1,5 +1,7 @@
 import { z } from 'zod'
 
+import type { MongoTransactionMode } from './lib/mongo-transaction'
+
 /**
  * Validated runtime configuration. Parsed once at startup so a misconfigured
  * environment fails fast with a clear message rather than at first request.
@@ -8,6 +10,8 @@ const envSchema = z.object({
   NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
   PORT: z.coerce.number().int().positive().default(5001),
   MONGODB_URI: z.string().min(1).default('mongodb://127.0.0.1:27017/rpg'),
+  /** Mongo multi-document transaction mode. Resolved once at startup after connect. */
+  MONGO_TRANSACTION_MODE: z.enum(['auto', 'required', 'disabled']).default('auto'),
   JWT_SECRET: z.string().min(16, 'JWT_SECRET must be at least 16 characters'),
   JWT_EXPIRES_IN: z.string().default('7d'),
   /** Directory where uploaded files are stored (relative to the API process CWD). */
@@ -39,6 +43,7 @@ export type Env = z.infer<typeof envSchema> & {
   characterImportEnabled: boolean
   dndBeyondFetchTimeoutMs: number
   emailProvider: EmailProviderName
+  mongoTransactionMode: MongoTransactionMode
   appBaseUrl: string
   smtpHost: string
   smtpPort: number
@@ -148,6 +153,7 @@ export function loadEnv(source: NodeJS.ProcessEnv = process.env): Env {
     NODE_ENV: source.NODE_ENV,
     PORT: source.PORT,
     MONGODB_URI: source.MONGODB_URI,
+    MONGO_TRANSACTION_MODE: source.MONGO_TRANSACTION_MODE,
     // Tests never hit production paths, so allow a dev fallback secret outside prod.
     JWT_SECRET:
       source.JWT_SECRET ??
@@ -187,6 +193,7 @@ export function loadEnv(source: NodeJS.ProcessEnv = process.env): Env {
     ),
     dndBeyondFetchTimeoutMs: parsed.data.DND_BEYOND_FETCH_TIMEOUT_MS,
     emailProvider,
+    mongoTransactionMode: parsed.data.MONGO_TRANSACTION_MODE,
     appBaseUrl: parsed.data.APP_BASE_URL,
     ...smtpConfig,
   }

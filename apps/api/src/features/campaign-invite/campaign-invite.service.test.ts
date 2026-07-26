@@ -1,7 +1,9 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
+import * as mongoTransaction from '../../lib/mongo-transaction'
 import { CampaignInviteModel } from './campaign-invite.model'
 import { CampaignMembershipModel } from '../campaign/campaign-membership.model'
+import { CampaignCharacterParticipationModel } from '../campaign/participation/campaign-character-participation.model'
 import { CharacterModel } from '../character/character.model'
 import { createPcRecord } from '../character/character.repository'
 import { minimalStandalonePcInput } from '../../test/fixtures/characters'
@@ -42,6 +44,7 @@ function extractInviteTokenFromEmail(text: string): string {
 afterEach(() => {
   setEmailProviderForTests(undefined)
   resetFakeEmailSentMessages()
+  vi.restoreAllMocks()
 })
 
 describe('campaign invite service', () => {
@@ -613,6 +616,8 @@ describe('campaign invite service', () => {
   })
 
   it('compensates new-character completion when invite completion fails', async () => {
+    vi.spyOn(mongoTransaction, 'areMongoTransactionsEnabled').mockReturnValue(false)
+
     const { id: campaignId, owner } = await makeTestCampaign()
     const player = await makeTestUser({ email: 'compensate@example.com' })
     const rawToken = generateInviteToken()
@@ -651,6 +656,168 @@ describe('campaign invite service', () => {
 
     const membership = await CampaignMembershipModel.findOne({ campaignId, userId: player.id })
     expect(membership?.controlledCharacterIds ?? []).toEqual([])
+
+    const refreshedInvite = await CampaignInviteModel.findById(invite.id).lean()
+    expect(refreshedInvite?.status).toBe('accepted')
+    expect(refreshedInvite?.completedCharacterId).toBeNull()
+  })
+
+  it('compensates existing-character completion when invite completion fails', async () => {
+    vi.spyOn(mongoTransaction, 'areMongoTransactionsEnabled').mockReturnValue(false)
+
+    const { id: campaignId, owner } = await makeTestCampaign()
+    const player = await makeTestUser({ email: 'existing-compensate@example.com' })
+    const rawToken = generateInviteToken()
+
+    const invite = await createInviteRecord({
+      campaignId,
+      email: 'existing-compensate@example.com',
+      normalizedEmail: 'existing-compensate@example.com',
+      tokenHash: hashInviteToken(rawToken),
+      expiresAt: computeInviteExpiresAt(),
+      invitedByUserId: owner.id,
+    })
+
+    await acceptCampaignInvite({
+      rawToken,
+      userId: player.id,
+      userEmail: player.email,
+    })
+
+    const character = await createPcRecord(minimalStandalonePcInput, player.id)
+
+    const markCompletedSpy = vi
+      .spyOn(inviteRepository, 'markInviteCompleted')
+      .mockResolvedValueOnce(null)
+
+    await expect(
+      completeCampaignInviteWithExistingCharacter({
+        inviteId: invite.id,
+        userId: player.id,
+        characterId: character.id,
+      }),
+    ).rejects.toMatchObject({ status: 500, code: 'internal_error' })
+
+    markCompletedSpy.mockRestore()
+
+    const remainingCharacters = await CharacterModel.find({ userId: player.id }).lean()
+    expect(remainingCharacters).toHaveLength(1)
+
+    const membership = await CampaignMembershipModel.findOne({ campaignId, userId: player.id })
+    expect(membership?.controlledCharacterIds ?? []).toEqual([])
+
+    const participation = await CampaignCharacterParticipationModel.findOne({
+      campaignId,
+      characterId: character.id,
+    }).lean()
+    expect(participation).toBeNull()
+
+    const refreshedInvite = await CampaignInviteModel.findById(invite.id).lean()
+    expect(refreshedInvite?.status).toBe('accepted')
+    expect(refreshedInvite?.completedCharacterId).toBeNull()
+  })
+
+  it('rolls back new-character completion via transaction when invite completion fails', async () => {
+    expect(mongoTransaction.areMongoTransactionsEnabled()).toBe(true)
+
+    const { id: campaignId, owner } = await makeTestCampaign()
+    const player = await makeTestUser({ email: 'tx-new@example.com' })
+    const rawToken = generateInviteToken()
+
+    const invite = await createInviteRecord({
+      campaignId,
+      email: 'tx-new@example.com',
+      normalizedEmail: 'tx-new@example.com',
+      tokenHash: hashInviteToken(rawToken),
+      expiresAt: computeInviteExpiresAt(),
+      invitedByUserId: owner.id,
+    })
+
+    await acceptCampaignInvite({
+      rawToken,
+      userId: player.id,
+      userEmail: player.email,
+    })
+
+    const markCompletedSpy = vi
+      .spyOn(inviteRepository, 'markInviteCompleted')
+      .mockResolvedValueOnce(null)
+
+    await expect(
+      completeCampaignInviteWithNewCharacter({
+        inviteId: invite.id,
+        userId: player.id,
+        characterCreateInput: minimalStandalonePcInput,
+      }),
+    ).rejects.toMatchObject({ status: 500, code: 'internal_error' })
+
+    markCompletedSpy.mockRestore()
+
+    const remainingCharacters = await CharacterModel.find({ userId: player.id }).lean()
+    expect(remainingCharacters).toHaveLength(0)
+
+    const membership = await CampaignMembershipModel.findOne({ campaignId, userId: player.id })
+    expect(membership?.controlledCharacterIds ?? []).toEqual([])
+
+    const participations = await CampaignCharacterParticipationModel.find({
+      campaignId,
+    }).lean()
+    expect(participations).toHaveLength(0)
+
+    const refreshedInvite = await CampaignInviteModel.findById(invite.id).lean()
+    expect(refreshedInvite?.status).toBe('accepted')
+    expect(refreshedInvite?.completedCharacterId).toBeNull()
+  })
+
+  it('rolls back existing-character completion via transaction when invite completion fails', async () => {
+    expect(mongoTransaction.areMongoTransactionsEnabled()).toBe(true)
+
+    const { id: campaignId, owner } = await makeTestCampaign()
+    const player = await makeTestUser({ email: 'tx-existing@example.com' })
+    const rawToken = generateInviteToken()
+
+    const invite = await createInviteRecord({
+      campaignId,
+      email: 'tx-existing@example.com',
+      normalizedEmail: 'tx-existing@example.com',
+      tokenHash: hashInviteToken(rawToken),
+      expiresAt: computeInviteExpiresAt(),
+      invitedByUserId: owner.id,
+    })
+
+    await acceptCampaignInvite({
+      rawToken,
+      userId: player.id,
+      userEmail: player.email,
+    })
+
+    const character = await createPcRecord(minimalStandalonePcInput, player.id)
+
+    const markCompletedSpy = vi
+      .spyOn(inviteRepository, 'markInviteCompleted')
+      .mockResolvedValueOnce(null)
+
+    await expect(
+      completeCampaignInviteWithExistingCharacter({
+        inviteId: invite.id,
+        userId: player.id,
+        characterId: character.id,
+      }),
+    ).rejects.toMatchObject({ status: 500, code: 'internal_error' })
+
+    markCompletedSpy.mockRestore()
+
+    const remainingCharacters = await CharacterModel.find({ userId: player.id }).lean()
+    expect(remainingCharacters).toHaveLength(1)
+
+    const membership = await CampaignMembershipModel.findOne({ campaignId, userId: player.id })
+    expect(membership?.controlledCharacterIds ?? []).toEqual([])
+
+    const participation = await CampaignCharacterParticipationModel.findOne({
+      campaignId,
+      characterId: character.id,
+    }).lean()
+    expect(participation).toBeNull()
 
     const refreshedInvite = await CampaignInviteModel.findById(invite.id).lean()
     expect(refreshedInvite?.status).toBe('accepted')

@@ -2,6 +2,7 @@ import { isValidObjectId } from 'mongoose'
 
 import type { CampaignInvite } from '@rpg/contracts'
 
+import type { WithMongoSession } from '../../lib/mongo-session'
 import { CampaignInviteModel, type CampaignInviteSchemaType } from './campaign-invite.model'
 import { toCampaignInvite } from './to-campaign-invite'
 
@@ -37,9 +38,14 @@ export async function createInviteRecord(input: CreateInviteRecordInput): Promis
   return toCampaignInvite(doc.toObject() as CampaignInviteRecord)
 }
 
-export async function findInviteById(inviteId: string): Promise<CampaignInvite | null> {
+export async function findInviteById(
+  inviteId: string,
+  options?: WithMongoSession,
+): Promise<CampaignInvite | null> {
   if (!isValidObjectId(inviteId)) return null
-  const doc = await CampaignInviteModel.findById(inviteId).lean<CampaignInviteRecord | null>()
+  const doc = await CampaignInviteModel.findById(inviteId)
+    .session(options?.session ?? null)
+    .lean<CampaignInviteRecord | null>()
   if (!doc) return null
   return toCampaignInvite(doc)
 }
@@ -175,10 +181,11 @@ export async function markInviteCompleted(
   inviteId: string,
   completedCharacterId: string,
   completedAt: Date,
+  options?: WithMongoSession,
 ): Promise<CampaignInvite | null> {
   if (!isValidObjectId(inviteId)) return null
-  const doc = await CampaignInviteModel.findByIdAndUpdate(
-    inviteId,
+  const doc = await CampaignInviteModel.findOneAndUpdate(
+    { _id: inviteId, status: 'accepted' },
     {
       $set: {
         status: 'completed',
@@ -186,7 +193,7 @@ export async function markInviteCompleted(
         completedAt,
       },
     },
-    { new: true },
+    { new: true, session: options?.session },
   ).lean<CampaignInviteRecord | null>()
   if (!doc) return null
   return toCampaignInvite(doc)

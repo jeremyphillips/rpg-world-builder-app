@@ -10,6 +10,7 @@ import type {
 } from '@rpg/contracts'
 import { createDefaultCharacterVitalState, normalizeCharacterVital } from '@rpg/contracts'
 
+import type { WithMongoSession } from '../../lib/mongo-session'
 import { CharacterModel } from './character.model'
 import { toNpcCharacter } from './to-npc-character'
 import { toCharacter } from './to-character'
@@ -19,8 +20,9 @@ type CharacterRecord = Parameters<typeof toCharacter>[0]
 export async function createPcRecord(
   input: CreateCharacterInput,
   userId: string,
+  options?: WithMongoSession,
 ): Promise<PcCharacter> {
-  const doc = await CharacterModel.create({
+  const character = new CharacterModel({
     ...input,
     characterType: 'pc',
     userId,
@@ -28,7 +30,8 @@ export async function createPcRecord(
     vital: createDefaultCharacterVitalState(),
   })
 
-  return toCharacter(doc.toObject() as CharacterRecord)
+  await character.save({ session: options?.session })
+  return toCharacter(character.toObject() as CharacterRecord)
 }
 
 export async function createNpcRecord(input: CreateNpcServiceInput): Promise<NpcCharacter> {
@@ -53,6 +56,7 @@ export async function listPcsForUser(userId: string): Promise<PcCharacter[]> {
 export async function findPcForUser(
   characterId: string,
   userId: string,
+  options?: WithMongoSession,
 ): Promise<PcCharacter | null> {
   if (!isValidObjectId(characterId)) return null
 
@@ -60,7 +64,9 @@ export async function findPcForUser(
     _id: characterId,
     userId,
     characterType: 'pc',
-  }).lean<CharacterRecord | null>()
+  })
+    .session(options?.session ?? null)
+    .lean<CharacterRecord | null>()
   if (!doc) return null
 
   return toCharacter(doc)
@@ -102,14 +108,18 @@ export async function findPcsByIds(pcIds: readonly string[]): Promise<PcCharacte
   return docs.map(toCharacter)
 }
 
-export async function deletePcForUser(characterId: string, userId: string): Promise<boolean> {
+export async function deletePcForUser(
+  characterId: string,
+  userId: string,
+  options?: WithMongoSession,
+): Promise<boolean> {
   if (!isValidObjectId(characterId)) return false
 
   const result = await CharacterModel.deleteOne({
     _id: characterId,
     userId,
     characterType: 'pc',
-  })
+  }).session(options?.session ?? null)
 
   return result.deletedCount === 1
 }

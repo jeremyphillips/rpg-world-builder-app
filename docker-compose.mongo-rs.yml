@@ -1,0 +1,38 @@
+services:
+  mongo-rs:
+    image: mongo:7
+    command: ['mongod', '--replSet', 'rs0', '--bind_ip_all']
+    ports:
+      - '27017:27017'
+    volumes:
+      - rpg-mongo-rs-data:/data/db
+    healthcheck:
+      test: ['CMD', 'mongosh', '--eval', "db.adminCommand('ping')"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+
+  mongo-rs-init:
+    image: mongo:7
+    depends_on:
+      mongo-rs:
+        condition: service_healthy
+    restart: 'no'
+    entrypoint:
+      - mongosh
+      - --host
+      - mongo-rs:27017
+      - --eval
+      - |
+        try {
+          rs.status();
+        } catch (err) {
+          rs.initiate({
+            _id: 'rs0',
+            members: [{ _id: 0, host: 'localhost:27017' }],
+          });
+        }
+
+volumes:
+  rpg-mongo-rs-data:

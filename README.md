@@ -118,6 +118,21 @@ Verify the connection (optional, needs `mongosh`):
 mongosh "mongodb://127.0.0.1:27017/rpg" --eval "db.runCommand({ ping: 1 })"
 ```
 
+**Replica set (optional — enables multi-document transactions):**
+
+```bash
+docker compose -f docker-compose.mongo-rs.yml up -d
+# wait for mongo-rs-init to complete, then use:
+export MONGODB_URI='mongodb://127.0.0.1:27017/rpg?replicaSet=rs0'
+```
+
+Stop / remove:
+
+```bash
+docker compose -f docker-compose.mongo-rs.yml down
+docker volume rm rpg-world-builder-app_rpg-mongo-rs-data   # delete data
+```
+
 ### 3. Configure the API env
 
 ```bash

@@ -48,6 +48,22 @@ describe('loadEnv devBenchEnabled', () => {
   })
 })
 
+describe('loadEnv mongoTransactionMode', () => {
+  it('defaults to auto', () => {
+    expect(loadEnv({ NODE_ENV: 'test', JWT_SECRET: testSecret }).mongoTransactionMode).toBe('auto')
+  })
+
+  it('honors MONGO_TRANSACTION_MODE override', () => {
+    expect(
+      loadEnv({
+        NODE_ENV: 'test',
+        JWT_SECRET: testSecret,
+        MONGO_TRANSACTION_MODE: 'disabled',
+      }).mongoTransactionMode,
+    ).toBe('disabled')
+  })
+})
+
 describe('loadEnv emailProvider', () => {
   it('defaults by environment', () => {
     resetEnv()
