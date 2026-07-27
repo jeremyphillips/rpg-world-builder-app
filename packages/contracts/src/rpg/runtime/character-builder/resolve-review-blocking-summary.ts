@@ -7,7 +7,7 @@ import type { ChoiceSet } from './choice-set'
 import type { CharacterBuildContext } from './context'
 import type { CharacterBuilderDraft } from './draft'
 import type { CharacterBuilderStepId } from './step-ids'
-import { BUILDER_STEPS } from './steps'
+import { getBuilderStepLabel } from './steps'
 import type { EquipmentPickerFocusRequest } from './resolvers/equipment/equipment-picker-focus'
 import {
   isMagicItemGrantIncompleteIssueCode,
@@ -51,11 +51,6 @@ const STEP_FIELD_LABELS: Record<CharacterBuilderStepId, string> = {
 }
 
 const REVIEW_NON_ACTIONABLE_REASON = 'No destination step for this issue.' as const
-
-function resolveBuilderStepLabel(stepId: CharacterBuilderStepId): string {
-  const step = BUILDER_STEPS.find((entry) => entry.id === stepId)
-  return step?.label ?? stepId
-}
 
 function resolveAbilityScoreProgress(draft: CharacterBuilderDraft): {
   current: number
@@ -108,7 +103,7 @@ function choiceSetRequiredItems(
       label: choiceSet.label,
       message: issue.message,
       stepId: issue.stepId,
-      stepLabel: resolveBuilderStepLabel(issue.stepId),
+      stepLabel: getBuilderStepLabel(issue.stepId),
       progress: { current: selectedCount, total: choiceSet.min, max: choiceSet.max },
     })
   }
@@ -153,7 +148,7 @@ function stepFieldRequiredItems(
       label: STEP_FIELD_LABELS[issue.stepId as CharacterBuilderStepId],
       message: issue.message,
       stepId: issue.stepId,
-      stepLabel: resolveBuilderStepLabel(issue.stepId),
+      stepLabel: getBuilderStepLabel(issue.stepId),
       progress,
       equipmentPickerFocus,
     })

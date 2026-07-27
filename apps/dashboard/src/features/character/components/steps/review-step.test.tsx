@@ -11,7 +11,7 @@ import { ReviewStep } from './review-step.client'
 
 describe('ReviewStep', () => {
   const context = createStandaloneBuilderContextFixture()
-  const chrome = getBuilderChromeCopy('pc')
+  const chrome = getBuilderChromeCopy('standalone_pc')
 
   it('shows blocking issues, required items, and advisory warnings', async () => {
     const user = userEvent.setup()

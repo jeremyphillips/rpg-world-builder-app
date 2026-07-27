@@ -1,13 +1,14 @@
-import type {
-  PcCharacter,
-  PcCharacterListItem,
-  CreateCharacterInput,
-  SystemRulesetId,
+import {
+  getCharacterBuilderChromeMessages,
+  type CreateCharacterInput,
+  type PcCharacter,
+  type PcCharacterListItem,
+  type SystemRulesetId,
 } from '@rpg/contracts'
 
 import { deleteJson, postJson, request } from '@/lib/api-client'
 
-const CREATE_CHARACTER_ERROR = 'Could not create character.'
+const CREATE_CHARACTER_ERROR = getCharacterBuilderChromeMessages('standalone_pc').createErrorDefault
 const DELETE_CHARACTER_ERROR = 'Could not delete character.'
 const LIST_CHARACTERS_ERROR = 'Could not load characters.'
 const GET_CHARACTER_ERROR = 'Could not load character.'

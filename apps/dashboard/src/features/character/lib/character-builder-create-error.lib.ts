@@ -1,9 +1,8 @@
 import {
   getErrorMessage,
+  isCampaignInviteBuildContext,
   isCharacterBuildFinalizationError,
   resolveCampaignInviteCompletionError,
-  type CampaignBuildContext,
-  type CampaignPcBuildContext,
   type CampaignInviteUnavailableReason,
   type CharacterBuildContext,
   type CharacterBuilderDraft,
@@ -23,15 +22,7 @@ export type BuilderCreateFailureOutcome =
   | { kind: 'invite_unavailable'; reason: CampaignInviteUnavailableReason }
   | { kind: 'create_error'; message: string }
 
-function isCampaignBuildContext(context: CharacterBuildContext): context is CampaignBuildContext {
-  return 'acquisition' in context
-}
-
-export function isCampaignInviteBuildContext(
-  context: CharacterBuildContext,
-): context is CampaignPcBuildContext {
-  return isCampaignBuildContext(context) && context.acquisition.kind === 'campaign_invite'
-}
+export { isCampaignInviteBuildContext }
 
 export function validationIssueStepIds(
   issues: readonly CharacterBuildValidationIssue[],

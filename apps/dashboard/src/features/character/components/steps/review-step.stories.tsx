@@ -7,7 +7,7 @@ import { createStandaloneBuilderContextFixture } from '../../lib/character-build
 import { getBuilderChromeCopy } from '../../lib/builder-chrome-copy'
 import { ReviewStep } from './review-step.client'
 
-const pcChrome = getBuilderChromeCopy('pc')
+const pcChrome = getBuilderChromeCopy('standalone_pc')
 
 const meta = {
   title: 'Character Builder/ReviewStep',

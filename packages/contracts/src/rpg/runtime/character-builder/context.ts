@@ -147,3 +147,21 @@ export type CampaignPcBuildContext = CharacterBuildContext & {
 
 /** Discriminated union — only legal campaign build combinations compile. */
 export type CampaignBuildContext = CampaignNpcBuildContext | CampaignPcBuildContext
+
+export function isCampaignBuildContext(
+  context: CharacterBuildContext,
+): context is CampaignBuildContext {
+  return 'acquisition' in context
+}
+
+export function isCampaignInviteBuildContext(
+  context: CharacterBuildContext,
+): context is CampaignPcBuildContext {
+  return isCampaignBuildContext(context) && context.acquisition.kind === 'campaign_invite'
+}
+
+export function resolveCampaignIdFromContext(
+  context: Pick<CharacterBuildContext, 'rulesScope'>,
+): string | undefined {
+  return context.rulesScope.type === 'campaign' ? context.rulesScope.campaignId : undefined
+}

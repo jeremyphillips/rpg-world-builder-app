@@ -6,11 +6,15 @@ import type { StartingWealthRules } from '../../campaign/rules/starting-wealth'
 import { DEFAULT_ABILITY_GENERATION_RULES } from './ability-generation'
 import {
   indexCharacterBuildCatalog,
+  isCampaignBuildContext,
+  isCampaignInviteBuildContext,
+  resolveCampaignIdFromContext,
   resolvedCharacterCreationRulesSchema,
   type CampaignNpcBuildContext,
   type CampaignPcBuildContext,
   type CharacterBuildCatalog,
 } from './context'
+import { resolveCharacterBuilderChromeVariant } from './character-builder-chrome-variant'
 import { builderTestCatalog, builderTestRules } from './test-fixtures'
 
 const emptyCatalog: CharacterBuildCatalog = {
@@ -148,5 +152,48 @@ describe('CampaignBuildContext discriminated union', () => {
     }
 
     expect(unionGuards).toEqual({ npcUser: true, pcCampaign: true })
+  })
+})
+
+describe('character build context helpers', () => {
+  it('isCampaignBuildContext narrows campaign contexts', () => {
+    expect(isCampaignBuildContext(createCampaignNpcContext())).toBe(true)
+    expect(isCampaignBuildContext(createCampaignPcContext())).toBe(true)
+    expect(
+      isCampaignBuildContext({
+        channel: 'build',
+        surface: 'dashboard',
+        characterKind: 'pc',
+        mode: 'dashboard',
+        scope: { type: 'standalone', rulesetId: TEST_RULESET_ID },
+        rulesScope: { type: 'ruleset', rulesetId: TEST_RULESET_ID },
+        ownershipTarget: { type: 'user' },
+        rulesetId: TEST_RULESET_ID,
+        catalog: emptyCatalog,
+        characterCreationRules: builderTestRules,
+        permissions: { canCreateCharacter: true },
+      }),
+    ).toBe(false)
+  })
+
+  it('isCampaignInviteBuildContext narrows invite PC contexts only', () => {
+    expect(isCampaignInviteBuildContext(createCampaignPcContext())).toBe(true)
+    expect(isCampaignInviteBuildContext(createCampaignNpcContext())).toBe(false)
+  })
+
+  it('resolveCampaignIdFromContext returns campaign id for campaign scope', () => {
+    expect(resolveCampaignIdFromContext(createCampaignNpcContext())).toBe(TEST_CAMPAIGN_ID)
+    expect(
+      resolveCampaignIdFromContext({
+        rulesScope: { type: 'ruleset', rulesetId: TEST_RULESET_ID },
+      }),
+    ).toBeUndefined()
+  })
+
+  it('resolveCharacterBuilderChromeVariant maps legal campaign combinations', () => {
+    expect(resolveCharacterBuilderChromeVariant(createCampaignNpcContext())).toBe('campaign_npc')
+    expect(resolveCharacterBuilderChromeVariant(createCampaignPcContext())).toBe(
+      'campaign_invite_pc',
+    )
   })
 })

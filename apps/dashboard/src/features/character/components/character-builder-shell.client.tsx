@@ -5,7 +5,7 @@ import { Link, useNavigate } from 'react-router-dom'
 
 import {
   resolveBuilderLevelConstraints,
-  type CampaignBuildContext,
+  isCampaignBuildContext,
   type CharacterBuildAcquisition,
   type CharacterBuildCatalogIndex,
   type CharacterBuildContext,
@@ -81,10 +81,6 @@ function resolveBuildAcquisition(context: CharacterBuildContext): CharacterBuild
   }
 
   return { kind: 'standalone' }
-}
-
-function isCampaignBuildContext(context: CharacterBuildContext): context is CampaignBuildContext {
-  return 'acquisition' in context
 }
 
 export type CharacterBuilderShellProps = {
