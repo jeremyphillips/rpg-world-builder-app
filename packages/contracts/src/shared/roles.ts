@@ -14,6 +14,45 @@ export const platformRoleSchema = z.enum(PLATFORM_ROLES)
 
 export type PlatformRole = z.infer<typeof platformRoleSchema>
 
+export const PLATFORM_ROLE_TERM = {
+  label: 'Access',
+  description: 'Platform-wide role that governs admin and staff capabilities.',
+  sentence: {
+    singular: 'access level',
+    plural: 'access levels',
+  },
+} as const
+
+export const PLATFORM_ROLE_ENTRIES = {
+  user: {
+    label: 'User',
+    description: 'Standard account with no elevated platform permissions.',
+    sentence: {
+      singular: 'user',
+      plural: 'users',
+    },
+  },
+  admin: {
+    label: 'Admin',
+    description: 'Staff account that can access admin surfaces.',
+    sentence: {
+      singular: 'admin',
+      plural: 'admins',
+    },
+  },
+  superadmin: {
+    label: 'Superadmin',
+    description: 'Owner account with unrestricted platform permissions.',
+    sentence: {
+      singular: 'superadmin',
+      plural: 'superadmins',
+    },
+  },
+} as const satisfies Record<
+  PlatformRole,
+  { label: string; description: string; sentence: { singular: string; plural: string } }
+>
+
 // ---------------------------------------------------------------------------
 // Campaign roles — stored on CampaignMembership (scoped to a single campaign)
 // ---------------------------------------------------------------------------

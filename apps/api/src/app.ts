@@ -19,6 +19,7 @@ import {
   campaignInvitePublicRouter,
 } from './features/campaign-invite'
 import { userRouter } from './features/user'
+import { adminRouter } from './features/admin'
 
 /**
  * Build the Express application. All routes are mounted under `/api` because
@@ -57,6 +58,7 @@ export function createApp(): Express {
   api.use('/campaigns/:campaignId/homebrew', homebrewRouter)
   api.use('/uploads', uploadsRouter)
   api.use('/users', userRouter)
+  api.use('/admin', adminRouter)
   if (devBenchEnabled) {
     api.use('/bench', benchRouter)
   }

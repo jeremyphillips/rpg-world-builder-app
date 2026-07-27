@@ -3,7 +3,8 @@ import type { NextFunction, Request, Response } from 'express'
 import { SESSION_COOKIE } from '../lib/cookies'
 import { verifySessionToken } from '../lib/jwt'
 import { HttpError } from '../lib/http-error'
-import { findSessionUserById } from '../features/user'
+import { findSessionUserById, recordUserActivity } from '../features/user'
+import { shouldRecordUserActivity } from './user-activity-paths'
 
 /**
  * Require a valid session cookie. Verifies the JWT, confirms the user still
@@ -24,5 +25,12 @@ export async function requireAuth(req: Request, _res: Response, next: NextFuncti
   }
 
   req.user = user
+
+  if (shouldRecordUserActivity(req.originalUrl)) {
+    void recordUserActivity(user.id).catch(() => {
+      // Activity writes are best-effort and must not block the request.
+    })
+  }
+
   next()
 }

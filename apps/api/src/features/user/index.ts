@@ -4,9 +4,15 @@ export {
   findUserByEmail,
   findUserByEmailWithSecret,
   findSessionUserById,
+  findUserWithActivityTimestampsById,
+  countSuperadminsExcluding,
+  recordUserLoginActivity,
+  recordUserActivity,
   toSessionUser,
+  toUserWithActivityTimestamps,
   updateLastSelectedCampaign,
   updateProfile,
   changePassword,
+  type UserWithActivityTimestamps,
 } from './user.service'
 export { resolveActiveCampaignForUser } from './active-campaign'
