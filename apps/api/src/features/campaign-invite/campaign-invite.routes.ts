@@ -2,8 +2,8 @@ import { Router } from 'express'
 
 import {
   campaignInviteRecipientInputSchema,
-  completeCampaignInviteWithExistingCharacterInputSchema,
-  completeCampaignInviteWithNewCharacterInputSchema,
+  completeCampaignWithExistingCharacterInputSchema,
+  completeCampaignWithNewCharacterInputSchema,
 } from '@rpg/contracts'
 
 import { requireAuth } from '../../middleware/require-auth'
@@ -51,13 +51,13 @@ campaignInvitePublicRouter.get(
 campaignInvitePublicRouter.post(
   '/:inviteId/complete-with-existing-character',
   requireAuth,
-  validate(completeCampaignInviteWithExistingCharacterInputSchema),
+  validate(completeCampaignWithExistingCharacterInputSchema),
   controller.completeWithExistingCharacter,
 )
 campaignInvitePublicRouter.post(
   '/:inviteId/complete-with-new-character',
   requireAuth,
-  validate(completeCampaignInviteWithNewCharacterInputSchema),
+  validate(completeCampaignWithNewCharacterInputSchema),
   controller.completeWithNewCharacter,
 )
 campaignInvitePublicRouter.post('/:token/accept', requireAuth, controller.acceptByToken)

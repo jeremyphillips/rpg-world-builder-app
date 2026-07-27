@@ -1,4 +1,4 @@
-import type { CompleteCampaignInviteResult } from '@rpg/contracts'
+import type { CompleteCampaignCharacterAssignmentResult } from '@rpg/contracts'
 import type { ClientSession } from 'mongoose'
 
 import { HttpError } from '../../lib/http-error'
@@ -155,7 +155,7 @@ export async function executeNewCharacterInviteCompletion({
   membershipId: string
   userId: string
   parsedInput: Parameters<typeof createPcRecord>[0]
-}): Promise<CompleteCampaignInviteResult> {
+}): Promise<CompleteCampaignCharacterAssignmentResult> {
   if (areMongoTransactionsEnabled()) {
     return runInTransaction(async (session) => {
       const character = await createPcRecord(parsedInput, userId, { session })

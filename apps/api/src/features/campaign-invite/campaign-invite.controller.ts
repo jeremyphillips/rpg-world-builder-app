@@ -1,14 +1,14 @@
 import type { Request, Response } from 'express'
 import type {
   CampaignInviteRecipientInput,
-  CompleteCampaignInviteResult,
-  CompleteCampaignInviteWithExistingCharacterInput,
-  CompleteCampaignInviteWithNewCharacterInput,
+  CompleteCampaignCharacterAssignmentResult,
+  CompleteCampaignWithExistingCharacterInput,
+  CompleteCampaignWithNewCharacterInput,
 } from '@rpg/contracts'
 
 import {
-  isCampaignInviteCompletionFailureError,
-  mapCampaignInviteCompletionFailureToHttpError,
+  isCampaignCharacterAssignmentFailureError,
+  mapCampaignCharacterAssignmentFailureToHttpError,
 } from './campaign-invite-completion-failure.lib'
 import {
   acceptCampaignInvite,
@@ -24,13 +24,13 @@ import {
 } from './campaign-invite.service'
 
 async function runInviteCompletion(
-  action: () => Promise<CompleteCampaignInviteResult>,
-): Promise<CompleteCampaignInviteResult> {
+  action: () => Promise<CompleteCampaignCharacterAssignmentResult>,
+): Promise<CompleteCampaignCharacterAssignmentResult> {
   try {
     return await action()
   } catch (error) {
-    if (isCampaignInviteCompletionFailureError(error)) {
-      throw mapCampaignInviteCompletionFailureToHttpError(error.failure)
+    if (isCampaignCharacterAssignmentFailureError(error)) {
+      throw mapCampaignCharacterAssignmentFailureToHttpError(error.failure)
     }
     throw error
   }
@@ -89,7 +89,7 @@ export async function listEligibleCharacters(req: Request, res: Response): Promi
 
 export async function completeWithExistingCharacter(req: Request, res: Response): Promise<void> {
   const { inviteId } = req.params as { inviteId: string }
-  const { characterId } = req.body as CompleteCampaignInviteWithExistingCharacterInput
+  const { characterId } = req.body as CompleteCampaignWithExistingCharacterInput
   const result = await runInviteCompletion(() =>
     completeCampaignInviteWithExistingCharacter({
       inviteId,
@@ -102,7 +102,7 @@ export async function completeWithExistingCharacter(req: Request, res: Response)
 
 export async function completeWithNewCharacter(req: Request, res: Response): Promise<void> {
   const { inviteId } = req.params as { inviteId: string }
-  const { characterCreateInput } = req.body as CompleteCampaignInviteWithNewCharacterInput
+  const { characterCreateInput } = req.body as CompleteCampaignWithNewCharacterInput
   const result = await runInviteCompletion(() =>
     completeCampaignInviteWithNewCharacter({
       inviteId,

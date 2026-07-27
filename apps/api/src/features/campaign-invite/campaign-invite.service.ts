@@ -1,10 +1,10 @@
 import type {
   CampaignInvite,
   CampaignInviteAdminListItem,
-  CampaignInviteEligibleCharacter,
+  CampaignEligibleCharacter,
   CampaignInviteOnboardingContext,
   CampaignInvitePublicResolution,
-  CompleteCampaignInviteResult,
+  CompleteCampaignCharacterAssignmentResult,
   CreateCharacterInput,
 } from '@rpg/contracts'
 import {
@@ -514,7 +514,7 @@ export async function listEligibleCharactersForInvite({
 }: {
   inviteId: string
   userId: string
-}): Promise<CampaignInviteEligibleCharacter[]> {
+}): Promise<CampaignEligibleCharacter[]> {
   const invite = await loadAcceptedInviteForUser({ inviteId, userId })
   const [characters, contentIndex, startingLevel] = await Promise.all([
     listCharactersForUser(userId),
@@ -522,7 +522,7 @@ export async function listEligibleCharactersForInvite({
     loadInviteStartingLevel(invite.campaignId),
   ])
 
-  const results: CampaignInviteEligibleCharacter[] = []
+  const results: CampaignEligibleCharacter[] = []
 
   for (const character of characters) {
     if (character.characterType !== 'pc') continue
@@ -564,7 +564,7 @@ export async function completeCampaignInviteWithExistingCharacter({
   inviteId: string
   userId: string
   characterId: string
-}): Promise<CompleteCampaignInviteResult> {
+}): Promise<CompleteCampaignCharacterAssignmentResult> {
   const result = await completeCampaignInviteWithCharacter({
     inviteId,
     userId,
@@ -584,7 +584,7 @@ export async function completeCampaignInviteWithNewCharacter({
   inviteId: string
   userId: string
   characterCreateInput: CreateCharacterInput
-}): Promise<CompleteCampaignInviteResult> {
+}): Promise<CompleteCampaignCharacterAssignmentResult> {
   const result = await completeCampaignInviteWithCharacter({
     inviteId,
     userId,

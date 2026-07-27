@@ -22,6 +22,9 @@ export type FinalizeBuilderCharacterArgs = {
   completeInviteWithNewCharacter: (
     input: ReturnType<typeof finalizeCharacterBuild>,
   ) => Promise<{ campaignId: string; characterId: string }>
+  completeCampaignOnboarding: (
+    input: ReturnType<typeof finalizeCharacterBuild>,
+  ) => Promise<{ campaignId: string; characterId: string }>
 }
 
 export async function finalizeBuilderCharacter({
@@ -32,6 +35,7 @@ export async function finalizeBuilderCharacter({
   createNpc,
   createStandalonePc,
   completeInviteWithNewCharacter,
+  completeCampaignOnboarding,
 }: FinalizeBuilderCharacterArgs): Promise<string> {
   switch (acquisition.kind) {
     case 'campaign_npc': {
@@ -45,7 +49,9 @@ export async function finalizeBuilderCharacter({
       return ROUTES.campaign.characters.detail(result.campaignId, result.characterId)
     }
     case 'campaign_pc_onboarding': {
-      throw new Error('Campaign PC onboarding finalize is not wired yet.')
+      const input = finalizeCharacterBuild(draft, context, { resolvedChoiceSets })
+      const result = await completeCampaignOnboarding(input)
+      return ROUTES.campaign.characters.detail(result.campaignId, result.characterId)
     }
     case 'standalone': {
       const input = finalizeCharacterBuild(draft, context, { resolvedChoiceSets })

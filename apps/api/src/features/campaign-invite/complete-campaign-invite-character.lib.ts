@@ -1,6 +1,6 @@
 import type {
   CharacterEligibilitySubject,
-  CompleteCampaignInviteResult,
+  CompleteCampaignCharacterAssignmentResult,
   CreateCharacterInput,
   PcCharacter,
 } from '@rpg/contracts'
@@ -15,7 +15,7 @@ import { HttpError } from '../../lib/http-error'
 import { findCampaignById } from '../campaign/find-campaign-by-id'
 import { findOpenParticipationForCharacter } from '../campaign/participation/campaign-character-participation.repository'
 import { findCharacterForUser } from '../character/character.service'
-import { failCampaignInviteCompletion } from './campaign-invite-completion-failure.lib'
+import { failCampaignCharacterAssignment } from './campaign-invite-completion-failure.lib'
 import {
   executeExistingCharacterInviteCompletion,
   executeNewCharacterInviteCompletion,
@@ -51,7 +51,7 @@ export async function resolveNewCharacterCandidate({
 }): Promise<Extract<CompletionCandidate, { kind: 'new' }>> {
   const parsed = createCharacterInputSchema.safeParse(characterCreateInput)
   if (!parsed.success) {
-    failCampaignInviteCompletion({
+    failCampaignCharacterAssignment({
       kind: 'build_invalid',
       issues: zodIssuesToBuildValidationIssues(parsed.error),
     })
@@ -65,7 +65,7 @@ export async function resolveNewCharacterCandidate({
   }
 
   if (parsedInput.rulesetId !== campaign.rulesetId) {
-    failCampaignInviteCompletion({
+    failCampaignCharacterAssignment({
       kind: 'build_invalid',
       issues: [
         {
@@ -78,7 +78,7 @@ export async function resolveNewCharacterCandidate({
   }
 
   if (parsedInput.characterType !== 'pc') {
-    failCampaignInviteCompletion({
+    failCampaignCharacterAssignment({
       kind: 'build_invalid',
       issues: [
         {
@@ -138,7 +138,7 @@ export async function assertNewCharacterBuildEligible({
   })
 
   if (!eligibility.eligible) {
-    failCampaignInviteCompletion({
+    failCampaignCharacterAssignment({
       kind: 'campaign_ineligible',
       blockingIssues: eligibility.blockingIssues,
       warnings: eligibility.warnings,
@@ -176,7 +176,7 @@ export async function assertExistingCharacterEligible({
   })
 
   if (!eligibility.eligible) {
-    failCampaignInviteCompletion({
+    failCampaignCharacterAssignment({
       kind: 'campaign_ineligible',
       blockingIssues: eligibility.blockingIssues,
       warnings: eligibility.warnings,
@@ -190,7 +190,7 @@ export async function completeCampaignInviteWithCharacter(input: {
   characterSource:
     | { kind: 'new'; characterCreateInput: CreateCharacterInput }
     | { kind: 'existing'; characterId: string }
-}): Promise<CompleteCampaignInviteResult> {
+}): Promise<CompleteCampaignCharacterAssignmentResult> {
   const contextResult = await resolveCampaignInviteCompletionContext({
     inviteId: input.inviteId,
     userId: input.userId,

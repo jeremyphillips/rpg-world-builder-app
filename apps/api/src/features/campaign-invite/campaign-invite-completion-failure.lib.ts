@@ -31,20 +31,6 @@ export function isCampaignCharacterAssignmentFailureError(
   return error instanceof CampaignCharacterAssignmentFailureError
 }
 
-/** @deprecated Use failCampaignCharacterAssignment */
-export function failCampaignInviteCompletion(failure: CampaignCharacterAssignmentFailure): never {
-  return failCampaignCharacterAssignment(failure)
-}
-
-/** @deprecated Use CampaignCharacterAssignmentFailure */
-export type CampaignInviteCompletionFailure = CampaignCharacterAssignmentFailure
-
-/** @deprecated Use CampaignCharacterAssignmentFailureError */
-export const CampaignInviteCompletionFailureError = CampaignCharacterAssignmentFailureError
-
-/** @deprecated Use isCampaignCharacterAssignmentFailureError */
-export const isCampaignInviteCompletionFailureError = isCampaignCharacterAssignmentFailureError
-
 function resolveCampaignCharacterAssignmentFailureMessage(
   failure: CampaignCharacterAssignmentFailure,
 ): string {
@@ -113,7 +99,3 @@ export function mapCampaignCharacterAssignmentFailureToHttpError(
       )
   }
 }
-
-/** @deprecated Use mapCampaignCharacterAssignmentFailureToHttpError */
-export const mapCampaignInviteCompletionFailureToHttpError =
-  mapCampaignCharacterAssignmentFailureToHttpError

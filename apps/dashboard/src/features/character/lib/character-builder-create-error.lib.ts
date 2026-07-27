@@ -1,8 +1,9 @@
 import {
   getErrorMessage,
   isCampaignInviteBuildContext,
+  isCampaignPcOnboardingBuildContext,
   isCharacterBuildFinalizationError,
-  resolveCampaignInviteCompletionError,
+  resolveCampaignCharacterAssignmentError,
   type CampaignInviteUnavailableReason,
   type CharacterBuildContext,
   type CharacterBuilderDraft,
@@ -79,8 +80,8 @@ export function resolveBuilderCreateFailure(
     return { kind: 'validation', issues: error.validationIssues }
   }
 
-  if (isCampaignInviteBuildContext(context)) {
-    const resolved = resolveCampaignInviteCompletionError(error, defaultMessage)
+  if (isCampaignInviteBuildContext(context) || isCampaignPcOnboardingBuildContext(context)) {
+    const resolved = resolveCampaignCharacterAssignmentError(error, defaultMessage)
 
     if (resolved.kind === 'build_invalid') {
       return { kind: 'validation', issues: resolved.issues }

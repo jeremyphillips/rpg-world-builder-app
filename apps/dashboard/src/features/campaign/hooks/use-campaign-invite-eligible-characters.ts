@@ -7,7 +7,7 @@ import {
   completeCampaignInviteWithNewCharacter,
   fetchEligibleCharactersForInvite,
 } from '../api/campaign-invite-client'
-import { campaignInviteOnboardingContextQueryKey } from './use-campaign-invite-onboarding-context'
+import { campaignsQueryKey } from './use-campaigns'
 import { campaignMembersQueryKey } from './use-campaign-members'
 import { campaignPartyQueryKey } from './use-campaign-party'
 
@@ -34,11 +34,9 @@ export function useCompleteCampaignInviteWithExistingCharacter(inviteId: string 
     onSuccess: async (result) => {
       if (!inviteId) return
       await Promise.all([
-        queryClient.invalidateQueries({
-          queryKey: campaignInviteOnboardingContextQueryKey(inviteId),
-        }),
         queryClient.invalidateQueries({ queryKey: campaignMembersQueryKey(result.campaignId) }),
         queryClient.invalidateQueries({ queryKey: campaignPartyQueryKey(result.campaignId) }),
+        queryClient.invalidateQueries({ queryKey: campaignsQueryKey }),
       ])
     },
   })
@@ -56,11 +54,9 @@ export function useCompleteCampaignInviteWithNewCharacter(inviteId: string | und
     onSuccess: async (result) => {
       if (!inviteId) return
       await Promise.all([
-        queryClient.invalidateQueries({
-          queryKey: campaignInviteOnboardingContextQueryKey(inviteId),
-        }),
         queryClient.invalidateQueries({ queryKey: campaignMembersQueryKey(result.campaignId) }),
         queryClient.invalidateQueries({ queryKey: campaignPartyQueryKey(result.campaignId) }),
+        queryClient.invalidateQueries({ queryKey: campaignsQueryKey }),
       ])
     },
   })

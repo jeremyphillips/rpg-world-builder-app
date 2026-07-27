@@ -27,16 +27,40 @@ describe('resolveBuilderCreateFailure', () => {
     })
   })
 
-  it('maps invite completion ApiError payloads before any network retry handling', () => {
+  it('maps campaign assignment ApiError payloads before any network retry handling', () => {
     expect(
       resolveBuilderCreateFailure(
-        new ApiError(422, 'campaign_invite_completion_failed', 'Not eligible', {
+        new ApiError(422, 'campaign_character_assignment_failed', 'Not eligible', {
           kind: 'campaign_ineligible',
           blockingIssues: [{ code: 'content_missing', contentType: 'subclass', contentId: 'x' }],
           warnings: [],
         }),
         {
           context: inviteContext,
+          defaultMessage: 'Could not create campaign character.',
+        },
+      ),
+    ).toEqual({
+      kind: 'campaign_eligibility',
+      blockingIssues: [{ code: 'content_missing', contentType: 'subclass', contentId: 'x' }],
+      warnings: [],
+    })
+  })
+
+  it('maps campaign assignment errors for onboarding builds', () => {
+    const onboardingContext = createCampaignPcBuilderContextFixture({
+      acquisition: { kind: 'campaign_pc_onboarding', campaignId: 'camp_1' },
+    })
+
+    expect(
+      resolveBuilderCreateFailure(
+        new ApiError(422, 'campaign_character_assignment_failed', 'Not eligible', {
+          kind: 'campaign_ineligible',
+          blockingIssues: [{ code: 'content_missing', contentType: 'subclass', contentId: 'x' }],
+          warnings: [],
+        }),
+        {
+          context: onboardingContext,
           defaultMessage: 'Could not create campaign character.',
         },
       ),

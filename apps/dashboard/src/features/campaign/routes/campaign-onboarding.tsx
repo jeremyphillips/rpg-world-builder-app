@@ -47,6 +47,3 @@ export function CampaignOnboarding() {
     </PageLoadState>
   )
 }
-
-/** @deprecated Use {@link CampaignOnboarding}. */
-export { CampaignOnboarding as CampaignInviteOnboarding }

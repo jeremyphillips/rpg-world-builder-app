@@ -4,8 +4,8 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 
 import {
-  resolveBuilderLevelConstraints,
   isCampaignBuildContext,
+  resolveBuilderLevelConstraints,
   type CharacterBuildAcquisition,
   type CharacterBuildCatalogIndex,
   type CharacterBuildContext,
@@ -23,6 +23,7 @@ import {
   CampaignInviteEligibilityAlert,
   useCompleteCampaignInviteWithNewCharacter,
 } from '@/features/campaign'
+import { useCompleteCampaignOnboarding } from '@/features/campaign/hooks/use-campaign-onboarding-eligible-characters'
 
 import { useResolvedChoiceSets } from '../hooks/use-resolved-choice-sets'
 import { useCharacterPreview } from '../hooks/use-character-preview'
@@ -108,9 +109,15 @@ export function CharacterBuilderShell({
     isCampaignBuildContext(context) && context.acquisition.kind === 'campaign_invite'
       ? context.acquisition.inviteId
       : undefined
+  const onboardingCampaignId =
+    isCampaignBuildContext(context) && context.acquisition.kind === 'campaign_pc_onboarding'
+      ? context.acquisition.campaignId
+      : undefined
   const { mutateAsync: completeInviteWithNewCharacter, isPending: isCompletingInvite } =
     useCompleteCampaignInviteWithNewCharacter(inviteId)
-  const isCreating = isCreatingPc || isCreatingNpc || isCompletingInvite
+  const { mutateAsync: completeCampaignOnboarding, isPending: isCompletingOnboarding } =
+    useCompleteCampaignOnboarding(onboardingCampaignId)
+  const isCreating = isCreatingPc || isCreatingNpc || isCompletingInvite || isCompletingOnboarding
   const hasHydrated = useCharacterBuilderStore(context, (state) => state._hasHydrated)
   const hasPendingRestore = useCharacterBuilderStore(context, (state) => state.hasPendingRestore)
   const draft = useCharacterBuilderStore(context, (state) => state.draft)
@@ -362,7 +369,14 @@ export function CharacterBuilderShell({
         resolvedChoiceSets,
         createNpc: createNpcMutation,
         createStandalonePc: createCharacterMutation,
-        completeInviteWithNewCharacter: completeInviteWithNewCharacter,
+        completeInviteWithNewCharacter: async (input) => {
+          const result = await completeInviteWithNewCharacter(input)
+          return { campaignId: result.campaignId, characterId: result.characterId }
+        },
+        completeCampaignOnboarding: async (input) => {
+          const result = await completeCampaignOnboarding({ source: 'new', character: input })
+          return { campaignId: result.campaignId, characterId: result.characterId }
+        },
       })
       await clearPersistedDraft()
       navigate(destination)

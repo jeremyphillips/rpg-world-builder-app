@@ -1,4 +1,4 @@
-import type { CampaignInvite, CompleteCampaignInviteResult } from '@rpg/contracts'
+import type { CampaignInvite, CompleteCampaignCharacterAssignmentResult } from '@rpg/contracts'
 
 import { HttpError } from '../../lib/http-error'
 
@@ -10,7 +10,7 @@ export async function resolveCompletedInviteForExistingCharacter({
   invite: CampaignInvite
   userId: string
   characterId: string
-}): Promise<CompleteCampaignInviteResult | null> {
+}): Promise<CompleteCampaignCharacterAssignmentResult | null> {
   if (invite.status !== 'completed') return null
 
   if (invite.acceptedByUserId !== userId) {
@@ -34,7 +34,7 @@ export async function resolveCompletedInviteForNewCharacter({
 }: {
   invite: CampaignInvite
   userId: string
-}): Promise<CompleteCampaignInviteResult | null> {
+}): Promise<CompleteCampaignCharacterAssignmentResult | null> {
   if (invite.status !== 'completed') return null
 
   if (invite.acceptedByUserId !== userId) {

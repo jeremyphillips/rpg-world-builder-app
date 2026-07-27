@@ -20,7 +20,7 @@ import {
   CampaignCreateRoute,
   CampaignCharacterDetailRoute,
   CampaignDetailRoute,
-  CampaignInviteOnboardingRoute,
+  CampaignOnboardingRoute,
   CampaignSessionsRoute,
   CampaignSettingsRoute,
   CharacterCreateRoute,
@@ -177,7 +177,7 @@ const router = createBrowserRouter(
                 { index: true, element: <CampaignDetailRoute /> },
                 {
                   path: 'onboarding',
-                  element: <CampaignInviteOnboardingRoute />,
+                  element: <CampaignOnboardingRoute />,
                   handle: { crumb: () => ({ label: 'Onboarding' }) } satisfies CrumbHandle,
                 },
                 {

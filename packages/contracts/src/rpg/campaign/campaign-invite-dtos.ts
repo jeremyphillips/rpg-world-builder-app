@@ -4,18 +4,6 @@ import { campaignInviteDeliveryStatusSchema } from '../vocab/campaign-invite-del
 import { campaignInviteStatusSchema } from '../vocab/campaign-invite-status'
 import { campaignRoleSchema } from '../../shared/roles'
 import { characterCardViewModelSchema } from './campaign-overview-dtos'
-import {
-  campaignEligibleCharacterSchema,
-  campaignEligibleCharactersResponseSchema,
-  completeCampaignCharacterAssignmentResultSchema,
-  completeCampaignWithExistingCharacterInputSchema,
-  completeCampaignWithNewCharacterInputSchema,
-  type CampaignEligibleCharacter,
-  type CampaignEligibleCharactersResponse,
-  type CompleteCampaignCharacterAssignmentResult,
-  type CompleteCampaignWithExistingCharacterInput,
-  type CompleteCampaignWithNewCharacterInput,
-} from './campaign-character-assignment-dtos'
 
 // ---------------------------------------------------------------------------
 // Campaign invite DTOs — client-facing shapes; never expose persistence fields.
@@ -101,30 +89,6 @@ export const campaignPartyPcListItemSchema = z.object({
 })
 
 export type CampaignPartyPcListItem = z.infer<typeof campaignPartyPcListItemSchema>
-
-export const campaignInviteEligibleCharacterSchema = campaignEligibleCharacterSchema
-
-export type CampaignInviteEligibleCharacter = CampaignEligibleCharacter
-
-export const campaignInviteEligibleCharactersResponseSchema =
-  campaignEligibleCharactersResponseSchema
-
-export type CampaignInviteEligibleCharactersResponse = CampaignEligibleCharactersResponse
-
-export const completeCampaignInviteWithExistingCharacterInputSchema =
-  completeCampaignWithExistingCharacterInputSchema
-
-export type CompleteCampaignInviteWithExistingCharacterInput =
-  CompleteCampaignWithExistingCharacterInput
-
-export const completeCampaignInviteWithNewCharacterInputSchema =
-  completeCampaignWithNewCharacterInputSchema
-
-export type CompleteCampaignInviteWithNewCharacterInput = CompleteCampaignWithNewCharacterInput
-
-export const completeCampaignInviteResultSchema = completeCampaignCharacterAssignmentResultSchema
-
-export type CompleteCampaignInviteResult = CompleteCampaignCharacterAssignmentResult
 
 /** Onboarding membership role is always `pc` for campaign invites. */
 export const CAMPAIGN_INVITE_MEMBERSHIP_ROLE = 'pc' as const satisfies z.infer<

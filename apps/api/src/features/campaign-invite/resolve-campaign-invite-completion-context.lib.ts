@@ -1,8 +1,8 @@
-import type { CampaignInvite, CompleteCampaignInviteResult } from '@rpg/contracts'
+import type { CampaignInvite, CompleteCampaignCharacterAssignmentResult } from '@rpg/contracts'
 
 import { HttpError } from '../../lib/http-error'
 import { isInvitePastExpiry } from './campaign-invite.lib'
-import { failCampaignInviteCompletion } from './campaign-invite-completion-failure.lib'
+import { failCampaignCharacterAssignment } from './campaign-invite-completion-failure.lib'
 import { findInviteById, markInviteExpired } from './campaign-invite.repository'
 import { findCampaignMembershipByCampaignAndUser } from './create-or-confirm-player-membership'
 import {
@@ -21,7 +21,7 @@ export type CampaignInviteCompletionContext = {
 }
 
 export type CampaignInviteCompletionContextResult =
-  | { kind: 'idempotent'; result: CompleteCampaignInviteResult }
+  | { kind: 'idempotent'; result: CompleteCampaignCharacterAssignmentResult }
   | { kind: 'ready'; context: CampaignInviteCompletionContext }
 
 export async function expireInviteIfNeeded(invite: CampaignInvite): Promise<CampaignInvite> {
@@ -53,22 +53,22 @@ async function loadAcceptedInviteForUser({
   const currentInvite = await expireInviteIfNeeded(invite)
 
   if (currentInvite.status === 'completed') {
-    failCampaignInviteCompletion({ kind: 'invite_unavailable', reason: 'already_completed' })
+    failCampaignCharacterAssignment({ kind: 'invite_unavailable', reason: 'already_completed' })
   }
 
   if (currentInvite.status === 'revoked') {
-    failCampaignInviteCompletion({ kind: 'invite_unavailable', reason: 'revoked' })
+    failCampaignCharacterAssignment({ kind: 'invite_unavailable', reason: 'revoked' })
   }
 
   if (currentInvite.status === 'expired' || isInvitePastExpiry(currentInvite.expiresAt)) {
-    failCampaignInviteCompletion({ kind: 'invite_unavailable', reason: 'expired' })
+    failCampaignCharacterAssignment({ kind: 'invite_unavailable', reason: 'expired' })
   }
 
   if (currentInvite.status !== 'accepted') {
-    failCampaignInviteCompletion({ kind: 'invite_unavailable', reason: 'not_accepted' })
+    failCampaignCharacterAssignment({ kind: 'invite_unavailable', reason: 'not_accepted' })
   }
   if (currentInvite.acceptedByUserId !== userId) {
-    failCampaignInviteCompletion({ kind: 'invite_unavailable', reason: 'not_owned' })
+    failCampaignCharacterAssignment({ kind: 'invite_unavailable', reason: 'not_owned' })
   }
 
   return currentInvite

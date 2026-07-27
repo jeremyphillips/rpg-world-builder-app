@@ -1,31 +1,18 @@
 import type {
-  CampaignInviteEligibleCharacter,
-  CampaignInviteOnboardingContext,
-  CompleteCampaignInviteResult,
+  CampaignEligibleCharacter,
+  CompleteCampaignCharacterAssignmentResult,
   CreateCharacterInput,
 } from '@rpg/contracts'
 
 import { postJson, request } from '@/lib/api-client'
 
-const ONBOARDING_CONTEXT_ERROR = 'Could not load campaign onboarding.'
 const ELIGIBLE_CHARACTERS_ERROR = 'Could not load eligible characters.'
 const COMPLETE_INVITE_ERROR = 'Could not add this character to the campaign.'
 
-export async function fetchCampaignInviteOnboardingContext(
-  inviteId: string,
-): Promise<CampaignInviteOnboardingContext> {
-  const { context } = await request<{ context: CampaignInviteOnboardingContext }>(
-    `/api/campaign-invites/${encodeURIComponent(inviteId)}/onboarding-context`,
-    undefined,
-    ONBOARDING_CONTEXT_ERROR,
-  )
-  return context
-}
-
 export async function fetchEligibleCharactersForInvite(
   inviteId: string,
-): Promise<CampaignInviteEligibleCharacter[]> {
-  const { characters } = await request<{ characters: CampaignInviteEligibleCharacter[] }>(
+): Promise<CampaignEligibleCharacter[]> {
+  const { characters } = await request<{ characters: CampaignEligibleCharacter[] }>(
     `/api/campaign-invites/${encodeURIComponent(inviteId)}/eligible-characters`,
     undefined,
     ELIGIBLE_CHARACTERS_ERROR,
@@ -39,8 +26,8 @@ export async function completeCampaignInviteWithExistingCharacter({
 }: {
   inviteId: string
   characterId: string
-}): Promise<CompleteCampaignInviteResult> {
-  return postJson<CompleteCampaignInviteResult>(
+}): Promise<CompleteCampaignCharacterAssignmentResult> {
+  return postJson<CompleteCampaignCharacterAssignmentResult>(
     `/api/campaign-invites/${encodeURIComponent(inviteId)}/complete-with-existing-character`,
     { characterId },
     COMPLETE_INVITE_ERROR,
@@ -53,8 +40,8 @@ export async function completeCampaignInviteWithNewCharacter({
 }: {
   inviteId: string
   characterCreateInput: CreateCharacterInput
-}): Promise<CompleteCampaignInviteResult> {
-  return postJson<CompleteCampaignInviteResult>(
+}): Promise<CompleteCampaignCharacterAssignmentResult> {
+  return postJson<CompleteCampaignCharacterAssignmentResult>(
     `/api/campaign-invites/${encodeURIComponent(inviteId)}/complete-with-new-character`,
     { characterCreateInput },
     COMPLETE_INVITE_ERROR,

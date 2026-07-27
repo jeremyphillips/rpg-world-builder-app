@@ -70,9 +70,6 @@ export const CampaignDetailRoute = withRouteSuspense(
 export const CampaignOnboardingRoute = withRouteSuspense(
   lazyNamed(() => import('@/features/campaign/routes/campaign-onboarding'), 'CampaignOnboarding'),
 )
-
-/** @deprecated Use {@link CampaignOnboardingRoute}. */
-export const CampaignInviteOnboardingRoute = CampaignOnboardingRoute
 export const CampaignCharacterDetailRoute = withRouteSuspense(
   lazyNamed(
     () => import('@/features/campaign/routes/campaign-character-detail'),
