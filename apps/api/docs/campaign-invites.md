@@ -116,6 +116,22 @@ For existing-character completion, rollback must target only the participation
 created in that attempt — not `deleteAllParticipationsForCharacter` (use
 `detachOpenParticipation`).
 
+### Completion error wire format
+
+Completion failures use stable code `campaign_invite_completion_failed` with
+structured `error.details`:
+
+| `details.kind`        | HTTP            | Payload                                         |
+| --------------------- | --------------- | ----------------------------------------------- |
+| `build_invalid`       | 400             | `{ issues }` — builder-shaped validation issues |
+| `campaign_ineligible` | 422             | `{ blockingIssues, warnings }`                  |
+| `invite_unavailable`  | 403 / 409 / 410 | `{ reason }`                                    |
+
+The API service throws `CampaignInviteCompletionFailureError`; controllers map
+that to `HttpError` before the global error handler serializes the response.
+The dashboard resolves `details.kind` for review-step eligibility alerts,
+step-rail build issues, and invite terminal states.
+
 ## Derived onboarding state (overview)
 
 Do **not** persist onboarding state on membership. Derive it at read time:

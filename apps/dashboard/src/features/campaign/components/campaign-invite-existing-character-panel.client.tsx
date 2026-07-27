@@ -3,7 +3,12 @@
 import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
-import type { CharacterCampaignWarningCategory } from '@rpg/contracts'
+import type {
+  CharacterCampaignBlockingIssue,
+  CharacterCampaignWarning,
+  CharacterCampaignWarningCategory,
+} from '@rpg/contracts'
+import { resolveCampaignInviteCompletionError } from '@rpg/contracts'
 import { Button, ComboboxField, Heading, Text } from '@rpg/ui'
 
 import { ROUTES } from '@/app/routes'
@@ -13,10 +18,12 @@ import {
   summarizeEligibleCharacters,
   WARNING_CATEGORY_LABELS,
 } from '../lib/campaign-invite-onboarding.lib'
+import { formatInviteUnavailableMessage } from '../lib/campaign-invite-unavailable-display'
 import {
   useCampaignInviteEligibleCharacters,
   useCompleteCampaignInviteWithExistingCharacter,
 } from '../hooks/use-campaign-invite-eligible-characters'
+import { CampaignInviteEligibilityAlert } from './campaign-invite-eligibility-alert.client'
 
 function ExistingCharacterStatusMessages({
   isPending,
@@ -107,6 +114,11 @@ export function ExistingCharacterPanel({
   const completeInvite = useCompleteCampaignInviteWithExistingCharacter(inviteId)
   const [selectedCharacterId, setSelectedCharacterId] = useState('')
   const [formError, setFormError] = useState<string | null>(null)
+  const [inviteUnavailableMessage, setInviteUnavailableMessage] = useState<string | null>(null)
+  const [eligibilityError, setEligibilityError] = useState<{
+    blockingIssues: CharacterCampaignBlockingIssue[]
+    warnings: CharacterCampaignWarning[]
+  } | null>(null)
 
   const options = useMemo(() => buildCharacterOptions(characters ?? []), [characters])
   const selectedCharacter = characters?.find((entry) => entry.characterId === selectedCharacterId)
@@ -120,13 +132,37 @@ export function ExistingCharacterPanel({
   const handleSubmit = async () => {
     if (!selectedCharacterId) return
     setFormError(null)
+    setInviteUnavailableMessage(null)
+    setEligibilityError(null)
 
     try {
       const result = await completeInvite.mutateAsync(selectedCharacterId)
       navigate(ROUTES.campaign.characters.detail(result.campaignId, result.characterId))
     } catch (error) {
+      const resolved = resolveCampaignInviteCompletionError(
+        error,
+        'Could not add this character to the campaign.',
+      )
+
+      if (resolved.kind === 'campaign_ineligible') {
+        setEligibilityError({
+          blockingIssues: resolved.blockingIssues,
+          warnings: resolved.warnings,
+        })
+        return
+      }
+
+      if (resolved.kind === 'invite_unavailable') {
+        setInviteUnavailableMessage(formatInviteUnavailableMessage(resolved.reason))
+        return
+      }
+
       setFormError(
-        error instanceof Error ? error.message : 'Could not add this character to the campaign.',
+        resolved.kind === 'generic'
+          ? resolved.message
+          : error instanceof Error
+            ? error.message
+            : 'Could not add this character to the campaign.',
       )
     }
   }
@@ -160,6 +196,20 @@ export function ExistingCharacterPanel({
       ) : null}
 
       {selectedCharacter ? <ExistingCharacterWarningReview warningGroups={warningGroups} /> : null}
+
+      {inviteUnavailableMessage ? (
+        <Text variant="destructive" role="alert">
+          {inviteUnavailableMessage}
+        </Text>
+      ) : null}
+
+      {eligibilityError ? (
+        <CampaignInviteEligibilityAlert
+          blockingIssues={eligibilityError.blockingIssues}
+          warnings={eligibilityError.warnings}
+          heading="This character can no longer join the campaign:"
+        />
+      ) : null}
 
       {formError ? (
         <Text variant="destructive" role="alert">

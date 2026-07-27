@@ -7,6 +7,7 @@ import {
   CharacterBuildFinalizationError,
   getErrorMessage,
   resolveBuilderLevelConstraints,
+  resolveCampaignInviteCompletionError,
   type CampaignBuildContext,
   type CharacterBuildAcquisition,
   type CharacterBuildCatalogIndex,
@@ -14,11 +15,17 @@ import {
   type CharacterBuilderDraft,
   type CharacterBuilderStepId,
   type CharacterBuildValidationIssue,
+  type CharacterCampaignBlockingIssue,
+  type CharacterCampaignWarning,
+  type CampaignInviteUnavailableReason,
   type EquipmentPickerFocusIntent,
 } from '@rpg/contracts'
 import { buttonVariants, Button, Heading, Spinner, Text } from '@rpg/ui'
 
-import { useCompleteCampaignInviteWithNewCharacter } from '@/features/campaign'
+import {
+  CampaignInviteEligibilityAlert,
+  useCompleteCampaignInviteWithNewCharacter,
+} from '@/features/campaign'
 
 import { useResolvedChoiceSets } from '../hooks/use-resolved-choice-sets'
 import { useCharacterPreview } from '../hooks/use-character-preview'
@@ -83,6 +90,8 @@ export type CharacterBuilderShellProps = {
   catalogIndex: CharacterBuildCatalogIndex
   /** When set, renders the exit control as a button instead of a navigation link. */
   onExitClick?: () => void
+  /** Invite onboarding terminal failures that invalidate the current builder session. */
+  onInviteUnavailable?: (reason: CampaignInviteUnavailableReason) => void
 }
 
 /** Full-viewport builder chrome: step rail, step panel, live preview, footer nav. */
@@ -91,6 +100,7 @@ export function CharacterBuilderShell({
   context,
   catalogIndex,
   onExitClick,
+  onInviteUnavailable,
 }: CharacterBuilderShellProps) {
   const navigate = useNavigate()
   const chrome = getBuilderChromeCopyForContext(context)
@@ -117,6 +127,10 @@ export function CharacterBuilderShell({
     CharacterBuilderStepId[]
   >([])
   const [createError, setCreateError] = useState<string | null>(null)
+  const [campaignEligibilityError, setCampaignEligibilityError] = useState<{
+    blockingIssues: CharacterCampaignBlockingIssue[]
+    warnings: CharacterCampaignWarning[]
+  } | null>(null)
   const [pendingEquipmentPickerFocus, setPendingEquipmentPickerFocus] = useState<
     EquipmentPickerFocusIntent | undefined
   >()
@@ -295,6 +309,7 @@ export function CharacterBuilderShell({
     )
     setValidationIssues([])
     setCreateError(null)
+    setCampaignEligibilityError(null)
     shiftStep('forward')
   }
 
@@ -326,6 +341,7 @@ export function CharacterBuilderShell({
   const handleCreateCharacter = async () => {
     setValidationIssues([])
     setCreateError(null)
+    setCampaignEligibilityError(null)
 
     const validation = validateBuilderFinalSubmit(draft, context, resolvedChoiceSets)
     if (!validation.ok) {
@@ -362,6 +378,33 @@ export function CharacterBuilderShell({
           mergeValidationVisibleStepIds(previous, issueStepIds),
         )
         setValidationIssues(error.validationIssues)
+        return
+      }
+
+      const resolved = resolveCampaignInviteCompletionError(error, chrome.createErrorDefault)
+      if (resolved.kind === 'build_invalid') {
+        const issueStepIds = resolved.issues.flatMap((issue) =>
+          issue.stepId ? [issue.stepId] : [],
+        )
+        setAttemptedStepIds((previous) => mergeAttemptedStepIds(previous, issueStepIds))
+        setValidationVisibleStepIds((previous) =>
+          mergeValidationVisibleStepIds(previous, issueStepIds),
+        )
+        setValidationIssues(resolved.issues)
+        return
+      }
+
+      if (resolved.kind === 'campaign_ineligible') {
+        setCampaignEligibilityError({
+          blockingIssues: resolved.blockingIssues,
+          warnings: resolved.warnings,
+        })
+        patchDraft({ currentStepId: 'review' })
+        return
+      }
+
+      if (resolved.kind === 'invite_unavailable') {
+        onInviteUnavailable?.(resolved.reason)
         return
       }
 
@@ -443,6 +486,14 @@ export function CharacterBuilderShell({
             />
           </div>
         </div>
+
+        {isReviewBuilderStep(currentStepId) && campaignEligibilityError ? (
+          <CampaignInviteEligibilityAlert
+            blockingIssues={campaignEligibilityError.blockingIssues}
+            warnings={campaignEligibilityError.warnings}
+            heading={chrome.reviewValidationHeading}
+          />
+        ) : null}
 
         {isReviewBuilderStep(currentStepId) && createError ? (
           <Text variant="destructive" role="alert">

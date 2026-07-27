@@ -1,10 +1,15 @@
 import type { Request, Response } from 'express'
 import type {
   CampaignInviteRecipientInput,
+  CompleteCampaignInviteResult,
   CompleteCampaignInviteWithExistingCharacterInput,
   CompleteCampaignInviteWithNewCharacterInput,
 } from '@rpg/contracts'
 
+import {
+  isCampaignInviteCompletionFailureError,
+  mapCampaignInviteCompletionFailureToHttpError,
+} from './campaign-invite-completion-failure.lib'
 import {
   acceptCampaignInvite,
   completeCampaignInviteWithExistingCharacter,
@@ -17,6 +22,19 @@ import {
   sendCampaignInvite,
   shareCampaignInviteLink,
 } from './campaign-invite.service'
+
+async function runInviteCompletion(
+  action: () => Promise<CompleteCampaignInviteResult>,
+): Promise<CompleteCampaignInviteResult> {
+  try {
+    return await action()
+  } catch (error) {
+    if (isCampaignInviteCompletionFailureError(error)) {
+      throw mapCampaignInviteCompletionFailureToHttpError(error.failure)
+    }
+    throw error
+  }
+}
 
 export async function send(req: Request, res: Response): Promise<void> {
   const { campaignId } = req.params as { campaignId: string }
@@ -72,22 +90,26 @@ export async function listEligibleCharacters(req: Request, res: Response): Promi
 export async function completeWithExistingCharacter(req: Request, res: Response): Promise<void> {
   const { inviteId } = req.params as { inviteId: string }
   const { characterId } = req.body as CompleteCampaignInviteWithExistingCharacterInput
-  const result = await completeCampaignInviteWithExistingCharacter({
-    inviteId,
-    userId: req.user!.id,
-    characterId,
-  })
+  const result = await runInviteCompletion(() =>
+    completeCampaignInviteWithExistingCharacter({
+      inviteId,
+      userId: req.user!.id,
+      characterId,
+    }),
+  )
   res.status(200).json(result)
 }
 
 export async function completeWithNewCharacter(req: Request, res: Response): Promise<void> {
   const { inviteId } = req.params as { inviteId: string }
   const { characterCreateInput } = req.body as CompleteCampaignInviteWithNewCharacterInput
-  const result = await completeCampaignInviteWithNewCharacter({
-    inviteId,
-    userId: req.user!.id,
-    characterCreateInput,
-  })
+  const result = await runInviteCompletion(() =>
+    completeCampaignInviteWithNewCharacter({
+      inviteId,
+      userId: req.user!.id,
+      characterCreateInput,
+    }),
+  )
   res.status(200).json(result)
 }
 

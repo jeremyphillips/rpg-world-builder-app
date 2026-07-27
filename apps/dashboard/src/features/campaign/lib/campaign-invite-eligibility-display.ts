@@ -1,5 +1,21 @@
-import type { CharacterCampaignBlockingIssue } from '@rpg/contracts'
+import type {
+  CharacterCampaignBlockingIssue,
+  CharacterCampaignContentReferenceType,
+} from '@rpg/contracts'
 import { primaryBlockingIssue } from '@rpg/contracts'
+
+const CONTENT_REFERENCE_TYPE_LABELS: Record<CharacterCampaignContentReferenceType, string> = {
+  species: 'Species',
+  class: 'Class',
+  subclass: 'Subclass',
+  equipment: 'Equipment',
+  spells: 'Spells',
+  feats: 'Feats',
+  proficiencies: 'Proficiencies',
+  tools: 'Tools',
+  languages: 'Languages',
+  heritage: 'Heritage',
+}
 
 export function formatBlockingReason(issue: CharacterCampaignBlockingIssue): string {
   switch (issue.code) {
@@ -15,6 +31,8 @@ export function formatBlockingReason(issue: CharacterCampaignBlockingIssue): str
       return `${issue.label} is not available in this campaign`
     case 'subclass_unavailable':
       return `${issue.label} is not available in this campaign`
+    case 'content_missing':
+      return `${CONTENT_REFERENCE_TYPE_LABELS[issue.contentType]} is not available in this campaign`
     case 'not_owned_pc':
       return 'You can only bring characters you own'
     case 'structurally_invalid':

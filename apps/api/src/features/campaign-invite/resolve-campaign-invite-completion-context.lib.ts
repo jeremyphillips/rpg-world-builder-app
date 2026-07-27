@@ -2,6 +2,7 @@ import type { CampaignInvite, CompleteCampaignInviteResult } from '@rpg/contract
 
 import { HttpError } from '../../lib/http-error'
 import { isInvitePastExpiry } from './campaign-invite.lib'
+import { failCampaignInviteCompletion } from './campaign-invite-completion-failure.lib'
 import { findInviteById, markInviteExpired } from './campaign-invite.repository'
 import { findCampaignMembershipByCampaignAndUser } from './create-or-confirm-player-membership'
 import {
@@ -52,21 +53,22 @@ async function loadAcceptedInviteForUser({
   const currentInvite = await expireInviteIfNeeded(invite)
 
   if (currentInvite.status === 'completed') {
-    throw new HttpError(409, 'conflict', 'Invitation is already completed.')
+    failCampaignInviteCompletion({ kind: 'invite_unavailable', reason: 'already_completed' })
   }
 
   if (currentInvite.status === 'revoked') {
-    throw new HttpError(410, 'revoked', 'This invitation has been revoked.')
+    failCampaignInviteCompletion({ kind: 'invite_unavailable', reason: 'revoked' })
+  }
+
+  if (currentInvite.status === 'expired' || isInvitePastExpiry(currentInvite.expiresAt)) {
+    failCampaignInviteCompletion({ kind: 'invite_unavailable', reason: 'expired' })
   }
 
   if (currentInvite.status !== 'accepted') {
-    throw new HttpError(409, 'conflict', 'Invitation is not ready for onboarding.')
-  }
-  if (isInvitePastExpiry(currentInvite.expiresAt)) {
-    throw new HttpError(410, 'expired', 'This invitation has expired.')
+    failCampaignInviteCompletion({ kind: 'invite_unavailable', reason: 'not_accepted' })
   }
   if (currentInvite.acceptedByUserId !== userId) {
-    throw new HttpError(403, 'forbidden', 'This invitation belongs to another user.')
+    failCampaignInviteCompletion({ kind: 'invite_unavailable', reason: 'not_owned' })
   }
 
   return currentInvite

@@ -16,10 +16,12 @@ import { HttpError } from '../../lib/http-error'
 import { findCampaignById } from '../campaign/find-campaign-by-id'
 import { findOpenParticipationForCharacter } from '../campaign/participation/campaign-character-participation.repository'
 import { findCharacterForUser } from '../character/character.service'
+import { failCampaignInviteCompletion } from './campaign-invite-completion-failure.lib'
 import {
   executeExistingCharacterInviteCompletion,
   executeNewCharacterInviteCompletion,
 } from './complete-campaign-invite-completion.lib'
+import { zodIssuesToBuildValidationIssues } from './map-build-validation-issues.lib'
 import { resolveCampaignInviteCompletionContext } from './resolve-campaign-invite-completion-context.lib'
 import { resolveCampaignInviteEligibilityContext } from './resolve-campaign-invite-eligibility-context.lib'
 import type { CampaignInviteEligibilityContext } from './resolve-campaign-invite-eligibility-context.lib'
@@ -48,7 +50,15 @@ export async function resolveNewCharacterCandidate({
   userId: string
   characterCreateInput: CreateCharacterInput
 }): Promise<Extract<CompletionCandidate, { kind: 'new' }>> {
-  const parsedInput = createCharacterInputSchema.parse(characterCreateInput)
+  const parsed = createCharacterInputSchema.safeParse(characterCreateInput)
+  if (!parsed.success) {
+    failCampaignInviteCompletion({
+      kind: 'build_invalid',
+      issues: zodIssuesToBuildValidationIssues(parsed.error),
+    })
+  }
+
+  const parsedInput = parsed.data
   const campaign = await findCampaignById(acceptedInvite.campaignId)
 
   if (!campaign) {
@@ -56,11 +66,29 @@ export async function resolveNewCharacterCandidate({
   }
 
   if (parsedInput.rulesetId !== campaign.rulesetId) {
-    throw HttpError.badRequest('rulesetId must match the campaign ruleset.')
+    failCampaignInviteCompletion({
+      kind: 'build_invalid',
+      issues: [
+        {
+          code: 'ruleset_mismatch',
+          message: 'rulesetId must match the campaign ruleset.',
+          path: 'rulesetId',
+        },
+      ],
+    })
   }
 
   if (parsedInput.characterType !== 'pc') {
-    throw HttpError.badRequest('Only player characters can be created for campaign onboarding.')
+    failCampaignInviteCompletion({
+      kind: 'build_invalid',
+      issues: [
+        {
+          code: 'invalid_character_type',
+          message: 'Only player characters can be created for campaign onboarding.',
+          path: 'characterType',
+        },
+      ],
+    })
   }
 
   return {
@@ -111,14 +139,11 @@ export async function assertNewCharacterBuildEligible({
   })
 
   if (!eligibility.eligible) {
-    throw new HttpError(
-      422,
-      'ineligible_character',
-      'Character build is not eligible for this campaign.',
-      {
-        blockingIssues: eligibility.blockingIssues,
-      },
-    )
+    failCampaignInviteCompletion({
+      kind: 'campaign_ineligible',
+      blockingIssues: eligibility.blockingIssues,
+      warnings: eligibility.warnings,
+    })
   }
 }
 
@@ -155,14 +180,11 @@ export async function assertExistingCharacterEligible({
   })
 
   if (!eligibility.eligible) {
-    throw new HttpError(
-      422,
-      'ineligible_character',
-      'Character is not eligible for this campaign.',
-      {
-        blockingIssues: eligibility.blockingIssues,
-      },
-    )
+    failCampaignInviteCompletion({
+      kind: 'campaign_ineligible',
+      blockingIssues: eligibility.blockingIssues,
+      warnings: eligibility.warnings,
+    })
   }
 }
 

@@ -679,7 +679,14 @@ describe('campaign invite service', () => {
         userId: player.id,
         characterId: character.id,
       }),
-    ).rejects.toMatchObject({ status: 422, code: 'ineligible_character' })
+    ).rejects.toMatchObject({
+      failure: {
+        kind: 'campaign_ineligible',
+        blockingIssues: expect.arrayContaining([
+          expect.objectContaining({ code: 'level_mismatch' }),
+        ]),
+      },
+    })
   })
 
   it('rejects completion with a different character after onboarding is complete', async () => {
@@ -1010,7 +1017,9 @@ describe('campaign invite service', () => {
           userId: player.id,
           characterId: character.id,
         }),
-      ).rejects.toMatchObject({ status: 409, code: 'conflict' })
+      ).rejects.toMatchObject({
+        failure: { kind: 'invite_unavailable', reason: 'expired' },
+      })
 
       expect(eligibilityMapSpy).not.toHaveBeenCalled()
       eligibilityMapSpy.mockRestore()
@@ -1052,7 +1061,9 @@ describe('campaign invite service', () => {
           userId: player.id,
           characterId: character.id,
         }),
-      ).rejects.toMatchObject({ status: 410, code: 'revoked' })
+      ).rejects.toMatchObject({
+        failure: { kind: 'invite_unavailable', reason: 'revoked' },
+      })
 
       expect(eligibilityMapSpy).not.toHaveBeenCalled()
       eligibilityMapSpy.mockRestore()
@@ -1190,9 +1201,8 @@ describe('campaign invite service', () => {
           characterCreateInput: inviteCompletionMissingSubclassPcInput,
         }),
       ).rejects.toMatchObject({
-        status: 422,
-        code: 'ineligible_character',
-        details: {
+        failure: {
+          kind: 'campaign_ineligible',
           blockingIssues: expect.arrayContaining([
             {
               code: 'content_missing',

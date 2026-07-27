@@ -8,6 +8,16 @@ import {
 } from './campaign-invite-eligibility-display'
 
 describe('formatBlockingReason', () => {
+  it('formats content_missing copy', () => {
+    expect(
+      formatBlockingReason({
+        code: 'content_missing',
+        contentType: 'subclass',
+        contentId: 'srd-cc-5.2.1:missing-subclass',
+      }),
+    ).toBe('Subclass is not available in this campaign')
+  })
+
   it('formats level mismatch copy', () => {
     const issue: CharacterCampaignBlockingIssue = {
       code: 'level_mismatch',
