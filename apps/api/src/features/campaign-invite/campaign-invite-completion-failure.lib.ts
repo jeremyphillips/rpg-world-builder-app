@@ -1,47 +1,52 @@
 import type {
-  CampaignInviteCompletionErrorDetails,
-  CharacterBuildValidationIssueWire,
-  CharacterCampaignBlockingIssue,
-  CharacterCampaignWarning,
+  CampaignCharacterAssignmentErrorDetails,
+  CampaignInviteUnavailableReason,
 } from '@rpg/contracts'
-import { CAMPAIGN_INVITE_COMPLETION_ERROR_CODE } from '@rpg/contracts'
+import { CAMPAIGN_CHARACTER_ASSIGNMENT_ERROR_CODE } from '@rpg/contracts'
 
 import { HttpError } from '../../lib/http-error'
 
-export type CampaignInviteCompletionFailure =
-  | { kind: 'build_invalid'; issues: CharacterBuildValidationIssueWire[] }
-  | {
-      kind: 'campaign_ineligible'
-      blockingIssues: CharacterCampaignBlockingIssue[]
-      warnings: CharacterCampaignWarning[]
-    }
-  | {
-      kind: 'invite_unavailable'
-      reason: 'expired' | 'revoked' | 'not_owned' | 'not_accepted' | 'already_completed'
-    }
+/** Service-layer failure before HTTP mapping — same shape as wire `error.details`. */
+export type CampaignCharacterAssignmentFailure = CampaignCharacterAssignmentErrorDetails
 
-export class CampaignInviteCompletionFailureError extends Error {
-  readonly failure: CampaignInviteCompletionFailure
+export class CampaignCharacterAssignmentFailureError extends Error {
+  readonly failure: CampaignCharacterAssignmentFailure
 
-  constructor(failure: CampaignInviteCompletionFailure) {
-    super(resolveCampaignInviteCompletionFailureMessage(failure))
-    this.name = 'CampaignInviteCompletionFailureError'
+  constructor(failure: CampaignCharacterAssignmentFailure) {
+    super(resolveCampaignCharacterAssignmentFailureMessage(failure))
+    this.name = 'CampaignCharacterAssignmentFailureError'
     this.failure = failure
   }
 }
 
-export function failCampaignInviteCompletion(failure: CampaignInviteCompletionFailure): never {
-  throw new CampaignInviteCompletionFailureError(failure)
+export function failCampaignCharacterAssignment(
+  failure: CampaignCharacterAssignmentFailure,
+): never {
+  throw new CampaignCharacterAssignmentFailureError(failure)
 }
 
-export function isCampaignInviteCompletionFailureError(
+export function isCampaignCharacterAssignmentFailureError(
   error: unknown,
-): error is CampaignInviteCompletionFailureError {
-  return error instanceof CampaignInviteCompletionFailureError
+): error is CampaignCharacterAssignmentFailureError {
+  return error instanceof CampaignCharacterAssignmentFailureError
 }
 
-function resolveCampaignInviteCompletionFailureMessage(
-  failure: CampaignInviteCompletionFailure,
+/** @deprecated Use failCampaignCharacterAssignment */
+export function failCampaignInviteCompletion(failure: CampaignCharacterAssignmentFailure): never {
+  return failCampaignCharacterAssignment(failure)
+}
+
+/** @deprecated Use CampaignCharacterAssignmentFailure */
+export type CampaignInviteCompletionFailure = CampaignCharacterAssignmentFailure
+
+/** @deprecated Use CampaignCharacterAssignmentFailureError */
+export const CampaignInviteCompletionFailureError = CampaignCharacterAssignmentFailureError
+
+/** @deprecated Use isCampaignCharacterAssignmentFailureError */
+export const isCampaignInviteCompletionFailureError = isCampaignCharacterAssignmentFailureError
+
+function resolveCampaignCharacterAssignmentFailureMessage(
+  failure: CampaignCharacterAssignmentFailure,
 ): string {
   switch (failure.kind) {
     case 'build_invalid':
@@ -53,9 +58,7 @@ function resolveCampaignInviteCompletionFailureMessage(
   }
 }
 
-function resolveInviteUnavailableMessage(
-  reason: Extract<CampaignInviteCompletionFailure, { kind: 'invite_unavailable' }>['reason'],
-): string {
+function resolveInviteUnavailableMessage(reason: CampaignInviteUnavailableReason): string {
   switch (reason) {
     case 'expired':
       return 'This invitation has expired.'
@@ -70,9 +73,7 @@ function resolveInviteUnavailableMessage(
   }
 }
 
-function resolveInviteUnavailableStatus(
-  reason: Extract<CampaignInviteCompletionFailure, { kind: 'invite_unavailable' }>['reason'],
-): number {
+function resolveInviteUnavailableStatus(reason: CampaignInviteUnavailableReason): number {
   switch (reason) {
     case 'not_owned':
       return 403
@@ -85,49 +86,34 @@ function resolveInviteUnavailableStatus(
   }
 }
 
-export function toCampaignInviteCompletionErrorDetails(
-  failure: CampaignInviteCompletionFailure,
-): CampaignInviteCompletionErrorDetails {
-  switch (failure.kind) {
-    case 'build_invalid':
-      return { kind: 'build_invalid', issues: failure.issues }
-    case 'campaign_ineligible':
-      return {
-        kind: 'campaign_ineligible',
-        blockingIssues: failure.blockingIssues,
-        warnings: failure.warnings,
-      }
-    case 'invite_unavailable':
-      return { kind: 'invite_unavailable', reason: failure.reason }
-  }
-}
-
-export function mapCampaignInviteCompletionFailureToHttpError(
-  failure: CampaignInviteCompletionFailure,
+export function mapCampaignCharacterAssignmentFailureToHttpError(
+  failure: CampaignCharacterAssignmentFailure,
 ): HttpError {
-  const details = toCampaignInviteCompletionErrorDetails(failure)
-
   switch (failure.kind) {
     case 'build_invalid':
       return new HttpError(
         400,
-        CAMPAIGN_INVITE_COMPLETION_ERROR_CODE,
-        resolveCampaignInviteCompletionFailureMessage(failure),
-        details,
+        CAMPAIGN_CHARACTER_ASSIGNMENT_ERROR_CODE,
+        resolveCampaignCharacterAssignmentFailureMessage(failure),
+        failure,
       )
     case 'campaign_ineligible':
       return new HttpError(
         422,
-        CAMPAIGN_INVITE_COMPLETION_ERROR_CODE,
-        resolveCampaignInviteCompletionFailureMessage(failure),
-        details,
+        CAMPAIGN_CHARACTER_ASSIGNMENT_ERROR_CODE,
+        resolveCampaignCharacterAssignmentFailureMessage(failure),
+        failure,
       )
     case 'invite_unavailable':
       return new HttpError(
         resolveInviteUnavailableStatus(failure.reason),
-        CAMPAIGN_INVITE_COMPLETION_ERROR_CODE,
-        resolveCampaignInviteCompletionFailureMessage(failure),
-        details,
+        CAMPAIGN_CHARACTER_ASSIGNMENT_ERROR_CODE,
+        resolveCampaignCharacterAssignmentFailureMessage(failure),
+        failure,
       )
   }
 }
+
+/** @deprecated Use mapCampaignCharacterAssignmentFailureToHttpError */
+export const mapCampaignInviteCompletionFailureToHttpError =
+  mapCampaignCharacterAssignmentFailureToHttpError

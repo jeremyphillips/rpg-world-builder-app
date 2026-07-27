@@ -1,7 +1,14 @@
 import { z } from 'zod'
 
 import { createCharacterInputSchema } from '../runtime/character/create-input'
-import { characterCampaignEligibilitySchema } from './eligibility/character-campaign-eligibility'
+import {
+  campaignEligibleCharacterSchema,
+  campaignEligibleCharactersResponseSchema,
+  completeCampaignCharacterAssignmentResultSchema,
+  type CampaignEligibleCharacter,
+  type CampaignEligibleCharactersResponse,
+  type CompleteCampaignCharacterAssignmentResult,
+} from './campaign-character-assignment-dtos'
 
 // ---------------------------------------------------------------------------
 // Campaign onboarding DTOs — membership-scoped continuation (no invite coupling).
@@ -38,24 +45,14 @@ export const campaignOnboardingContextSchema = z.discriminatedUnion('status', [
 
 export type CampaignOnboardingContext = z.infer<typeof campaignOnboardingContextSchema>
 
-export const campaignOnboardingEligibleCharacterSchema = z.object({
-  characterId: z.string().min(1),
-  name: z.string().min(1),
-  summary: z.string(),
-  eligibility: characterCampaignEligibilitySchema,
-})
+export const campaignOnboardingEligibleCharacterSchema = campaignEligibleCharacterSchema
 
-export type CampaignOnboardingEligibleCharacter = z.infer<
-  typeof campaignOnboardingEligibleCharacterSchema
->
+export type CampaignOnboardingEligibleCharacter = CampaignEligibleCharacter
 
-export const campaignOnboardingEligibleCharactersResponseSchema = z.object({
-  characters: z.array(campaignOnboardingEligibleCharacterSchema),
-})
+export const campaignOnboardingEligibleCharactersResponseSchema =
+  campaignEligibleCharactersResponseSchema
 
-export type CampaignOnboardingEligibleCharactersResponse = z.infer<
-  typeof campaignOnboardingEligibleCharactersResponseSchema
->
+export type CampaignOnboardingEligibleCharactersResponse = CampaignEligibleCharactersResponse
 
 export const completeCampaignOnboardingWithExistingCharacterInputSchema = z.object({
   source: z.literal('existing'),
@@ -82,11 +79,7 @@ export const completeCampaignOnboardingInputSchema = z.discriminatedUnion('sourc
 
 export type CompleteCampaignOnboardingInput = z.infer<typeof completeCampaignOnboardingInputSchema>
 
-export const completeCampaignOnboardingResultSchema = z.object({
-  campaignId: z.string().min(1),
-  characterId: z.string().min(1),
-})
+export const completeCampaignOnboardingResultSchema =
+  completeCampaignCharacterAssignmentResultSchema
 
-export type CompleteCampaignOnboardingResult = z.infer<
-  typeof completeCampaignOnboardingResultSchema
->
+export type CompleteCampaignOnboardingResult = CompleteCampaignCharacterAssignmentResult

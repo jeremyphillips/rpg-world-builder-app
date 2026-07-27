@@ -2,8 +2,8 @@ import type { Request, Response } from 'express'
 import type { CompleteCampaignOnboardingInput } from '@rpg/contracts'
 
 import {
-  isCampaignInviteCompletionFailureError,
-  mapCampaignInviteCompletionFailureToHttpError,
+  isCampaignCharacterAssignmentFailureError,
+  mapCampaignCharacterAssignmentFailureToHttpError,
 } from '../campaign-invite/campaign-invite-completion-failure.lib'
 import {
   completeCampaignOnboardingForUser,
@@ -15,8 +15,8 @@ async function runOnboardingCompletion(action: () => Promise<unknown>): Promise<
   try {
     return await action()
   } catch (error) {
-    if (isCampaignInviteCompletionFailureError(error)) {
-      throw mapCampaignInviteCompletionFailureToHttpError(error.failure)
+    if (isCampaignCharacterAssignmentFailureError(error)) {
+      throw mapCampaignCharacterAssignmentFailureToHttpError(error.failure)
     }
     throw error
   }

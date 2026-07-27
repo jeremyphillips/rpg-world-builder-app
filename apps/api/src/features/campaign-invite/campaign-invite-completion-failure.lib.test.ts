@@ -1,22 +1,22 @@
 import { describe, expect, it } from 'vitest'
 
-import { CAMPAIGN_INVITE_COMPLETION_ERROR_CODE } from '@rpg/contracts'
+import { CAMPAIGN_CHARACTER_ASSIGNMENT_ERROR_CODE } from '@rpg/contracts'
 
 import {
-  CampaignInviteCompletionFailureError,
-  mapCampaignInviteCompletionFailureToHttpError,
+  CampaignCharacterAssignmentFailureError,
+  mapCampaignCharacterAssignmentFailureToHttpError,
 } from './campaign-invite-completion-failure.lib'
 
-describe('mapCampaignInviteCompletionFailureToHttpError', () => {
+describe('mapCampaignCharacterAssignmentFailureToHttpError', () => {
   it('maps campaign_ineligible to 422 with structured details', () => {
-    const error = mapCampaignInviteCompletionFailureToHttpError({
+    const error = mapCampaignCharacterAssignmentFailureToHttpError({
       kind: 'campaign_ineligible',
       blockingIssues: [{ code: 'not_owned_pc' }],
       warnings: [],
     })
 
     expect(error.status).toBe(422)
-    expect(error.code).toBe(CAMPAIGN_INVITE_COMPLETION_ERROR_CODE)
+    expect(error.code).toBe(CAMPAIGN_CHARACTER_ASSIGNMENT_ERROR_CODE)
     expect(error.details).toEqual({
       kind: 'campaign_ineligible',
       blockingIssues: [{ code: 'not_owned_pc' }],
@@ -26,22 +26,22 @@ describe('mapCampaignInviteCompletionFailureToHttpError', () => {
 
   it('maps invite_unavailable reasons to expected HTTP statuses', () => {
     expect(
-      mapCampaignInviteCompletionFailureToHttpError({
+      mapCampaignCharacterAssignmentFailureToHttpError({
         kind: 'invite_unavailable',
         reason: 'not_owned',
       }).status,
     ).toBe(403)
 
     expect(
-      mapCampaignInviteCompletionFailureToHttpError({
+      mapCampaignCharacterAssignmentFailureToHttpError({
         kind: 'invite_unavailable',
         reason: 'expired',
       }).status,
     ).toBe(410)
   })
 
-  it('throws CampaignInviteCompletionFailureError with the failure payload', () => {
-    const error = new CampaignInviteCompletionFailureError({
+  it('throws CampaignCharacterAssignmentFailureError with the failure payload', () => {
+    const error = new CampaignCharacterAssignmentFailureError({
       kind: 'build_invalid',
       issues: [{ code: 'invalid_field', message: 'Required' }],
     })

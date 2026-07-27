@@ -2,16 +2,17 @@ import { describe, expect, it } from 'vitest'
 
 import { ApiError, isApiError } from '../../shared/errors'
 import {
-  CAMPAIGN_INVITE_COMPLETION_ERROR_CODE,
-  isCampaignInviteCompletionErrorCode,
+  CAMPAIGN_CHARACTER_ASSIGNMENT_ERROR_CODE,
+  isCampaignCharacterAssignmentErrorCode,
+  LEGACY_CAMPAIGN_INVITE_COMPLETION_ERROR_CODE,
   LEGACY_CAMPAIGN_INVITE_INELIGIBLE_CODE,
-  parseCampaignInviteCompletionErrorDetails,
-  resolveCampaignInviteCompletionError,
-} from './campaign-invite-completion-errors'
+  parseCampaignCharacterAssignmentErrorDetails,
+  resolveCampaignCharacterAssignmentError,
+} from './campaign-character-assignment-errors'
 
-describe('parseCampaignInviteCompletionErrorDetails', () => {
+describe('parseCampaignCharacterAssignmentErrorDetails', () => {
   it('parses campaign_ineligible details', () => {
-    const parsed = parseCampaignInviteCompletionErrorDetails({
+    const parsed = parseCampaignCharacterAssignmentErrorDetails({
       kind: 'campaign_ineligible',
       blockingIssues: [
         {
@@ -30,7 +31,7 @@ describe('parseCampaignInviteCompletionErrorDetails', () => {
   })
 
   it('parses build_invalid details', () => {
-    const parsed = parseCampaignInviteCompletionErrorDetails({
+    const parsed = parseCampaignCharacterAssignmentErrorDetails({
       kind: 'build_invalid',
       issues: [{ code: 'ruleset_mismatch', message: 'Ruleset must match the campaign.' }],
     })
@@ -39,7 +40,7 @@ describe('parseCampaignInviteCompletionErrorDetails', () => {
   })
 
   it('parses invite_unavailable details', () => {
-    const parsed = parseCampaignInviteCompletionErrorDetails({
+    const parsed = parseCampaignCharacterAssignmentErrorDetails({
       kind: 'invite_unavailable',
       reason: 'expired',
     })
@@ -48,21 +49,43 @@ describe('parseCampaignInviteCompletionErrorDetails', () => {
   })
 
   it('returns undefined for unrelated details', () => {
-    expect(parseCampaignInviteCompletionErrorDetails({ blockingIssues: [] })).toBeUndefined()
+    expect(parseCampaignCharacterAssignmentErrorDetails({ blockingIssues: [] })).toBeUndefined()
   })
 })
 
-describe('isCampaignInviteCompletionErrorCode', () => {
-  it('matches the stable completion error code', () => {
-    expect(isCampaignInviteCompletionErrorCode(CAMPAIGN_INVITE_COMPLETION_ERROR_CODE)).toBe(true)
-    expect(isCampaignInviteCompletionErrorCode('ineligible_character')).toBe(false)
+describe('isCampaignCharacterAssignmentErrorCode', () => {
+  it('matches the stable assignment error code', () => {
+    expect(isCampaignCharacterAssignmentErrorCode(CAMPAIGN_CHARACTER_ASSIGNMENT_ERROR_CODE)).toBe(
+      true,
+    )
+    expect(
+      isCampaignCharacterAssignmentErrorCode(LEGACY_CAMPAIGN_INVITE_COMPLETION_ERROR_CODE),
+    ).toBe(true)
+    expect(isCampaignCharacterAssignmentErrorCode('ineligible_character')).toBe(false)
   })
 })
 
-describe('resolveCampaignInviteCompletionError', () => {
-  it('returns structured details for completion ApiError payloads', () => {
-    const resolved = resolveCampaignInviteCompletionError(
-      new ApiError(422, CAMPAIGN_INVITE_COMPLETION_ERROR_CODE, 'Not eligible', {
+describe('resolveCampaignCharacterAssignmentError', () => {
+  it('returns structured details for assignment ApiError payloads', () => {
+    const resolved = resolveCampaignCharacterAssignmentError(
+      new ApiError(422, CAMPAIGN_CHARACTER_ASSIGNMENT_ERROR_CODE, 'Not eligible', {
+        kind: 'campaign_ineligible',
+        blockingIssues: [{ code: 'not_owned_pc' }],
+        warnings: [],
+      }),
+      'Fallback',
+    )
+
+    expect(resolved).toEqual({
+      kind: 'campaign_ineligible',
+      blockingIssues: [{ code: 'not_owned_pc' }],
+      warnings: [],
+    })
+  })
+
+  it('accepts the legacy invite completion error code', () => {
+    const resolved = resolveCampaignCharacterAssignmentError(
+      new ApiError(422, LEGACY_CAMPAIGN_INVITE_COMPLETION_ERROR_CODE, 'Not eligible', {
         kind: 'campaign_ineligible',
         blockingIssues: [{ code: 'not_owned_pc' }],
         warnings: [],
@@ -78,7 +101,7 @@ describe('resolveCampaignInviteCompletionError', () => {
   })
 
   it('recognizes ApiError across duplicate module instances', () => {
-    const error = new ApiError(422, CAMPAIGN_INVITE_COMPLETION_ERROR_CODE, 'Not eligible', {
+    const error = new ApiError(422, CAMPAIGN_CHARACTER_ASSIGNMENT_ERROR_CODE, 'Not eligible', {
       kind: 'campaign_ineligible',
       blockingIssues: [{ code: 'level_mismatch', actualLevel: 3, requiredLevel: 1 }],
       warnings: [],
@@ -87,7 +110,7 @@ describe('resolveCampaignInviteCompletionError', () => {
     const foreignApiError = Object.assign(Object.create(ApiError.prototype), error)
     expect(isApiError(foreignApiError)).toBe(true)
 
-    expect(resolveCampaignInviteCompletionError(foreignApiError, 'Fallback')).toEqual({
+    expect(resolveCampaignCharacterAssignmentError(foreignApiError, 'Fallback')).toEqual({
       kind: 'campaign_ineligible',
       blockingIssues: [{ code: 'level_mismatch', actualLevel: 3, requiredLevel: 1 }],
       warnings: [],
@@ -96,7 +119,7 @@ describe('resolveCampaignInviteCompletionError', () => {
 
   it('maps legacy ineligible_character payloads to campaign_ineligible', () => {
     expect(
-      resolveCampaignInviteCompletionError(
+      resolveCampaignCharacterAssignmentError(
         new ApiError(422, LEGACY_CAMPAIGN_INVITE_INELIGIBLE_CODE, 'Not eligible', {
           blockingIssues: [
             {
@@ -123,7 +146,7 @@ describe('resolveCampaignInviteCompletionError', () => {
 
   it('falls back for unrelated errors', () => {
     expect(
-      resolveCampaignInviteCompletionError(new Error('boom'), 'Could not complete onboarding.'),
+      resolveCampaignCharacterAssignmentError(new Error('boom'), 'Could not complete onboarding.'),
     ).toEqual({
       kind: 'generic',
       message: 'Could not complete onboarding.',

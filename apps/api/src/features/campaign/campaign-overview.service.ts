@@ -3,9 +3,13 @@ import type {
   CampaignPartyPcListItem,
   CampaignRole,
 } from '@rpg/contracts'
-import { CAMPAIGN_ROLES } from '@rpg/contracts'
+import {
+  CAMPAIGN_ROLES,
+  resolveCampaignOverviewMemberOnboardingState,
+  resolveCampaignViewerParticipation,
+} from '@rpg/contracts'
 
-import { findPcsByIds } from '../character/character.repository'
+import { findPcsByIds, findPcOwnerIdsByCharacterIds } from '../character/character.repository'
 import {
   buildCampaignContentEligibilityMap,
   formatInviteCharacterSummary,
@@ -39,12 +43,22 @@ function sortMembers(
   return left.displayName.localeCompare(right.displayName)
 }
 
-function resolveMemberOnboardingState(
-  role: CampaignRole,
-  controlledCharacterIds: string[],
-): CampaignOverviewMemberListItem['onboardingState'] {
-  if (role !== 'pc') return undefined
-  return controlledCharacterIds.length > 0 ? 'character_added' : 'onboarding_incomplete'
+function resolveMemberOpenParticipatingCharacterIds({
+  userId,
+  controlledCharacterIds,
+  openParticipationCharacterIds,
+  characterOwnerById,
+}: {
+  userId: string
+  controlledCharacterIds: string[]
+  openParticipationCharacterIds: string[]
+  characterOwnerById: Map<string, string>
+}): string[] {
+  return openParticipationCharacterIds.filter(
+    (characterId) =>
+      controlledCharacterIds.includes(characterId) ||
+      characterOwnerById.get(characterId) === userId,
+  )
 }
 
 export async function listCampaignMembersForOverview(
@@ -56,14 +70,38 @@ export async function listCampaignMembersForOverview(
 
   if (memberships.length === 0) return []
 
-  const users = await findUsersByIds(memberships.map((membership) => membership.userId))
+  const [users, openParticipations] = await Promise.all([
+    findUsersByIds(memberships.map((membership) => membership.userId)),
+    listOpenParticipationsForCampaign(campaignId),
+  ])
   const displayNameByUserId = new Map(users.map((user) => [user.id, user.displayName]))
+  const openParticipationCharacterIds = openParticipations.map(
+    (participation) => participation.characterId,
+  )
+  const relevantCharacterIds = [
+    ...new Set([
+      ...openParticipationCharacterIds,
+      ...memberships.flatMap((membership) => membership.controlledCharacterIds ?? []),
+    ]),
+  ]
+  const characterOwnerById = await findPcOwnerIdsByCharacterIds(relevantCharacterIds)
 
   return memberships
     .map((membership) => {
       const role = membership.campaignRole as CampaignRole
       const controlledCharacterIds = membership.controlledCharacterIds ?? []
-      const onboardingState = resolveMemberOnboardingState(role, controlledCharacterIds)
+      const memberOpenParticipatingCharacterIds = resolveMemberOpenParticipatingCharacterIds({
+        userId: membership.userId,
+        controlledCharacterIds,
+        openParticipationCharacterIds,
+        characterOwnerById,
+      })
+      const participationState = resolveCampaignViewerParticipation({
+        role,
+        controlledCharacterIds,
+        openParticipatingCharacterIds: memberOpenParticipatingCharacterIds,
+      })
+      const onboardingState = resolveCampaignOverviewMemberOnboardingState(participationState)
 
       return {
         id: String(membership._id),

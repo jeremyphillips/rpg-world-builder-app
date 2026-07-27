@@ -5,6 +5,7 @@ import { minimalStandalonePcInput } from '../../test/fixtures/characters'
 import { makeTestCampaign } from '../../test/fixtures/campaigns'
 import { makeTestUser } from '../../test/fixtures/users'
 import { assignPcToCampaignMember } from '../../test/helpers/campaign-participation'
+import { addControlledCharacterToMembership } from './participation/assign-controlled-pc.service'
 import { CampaignMembershipModel } from './campaign-membership.model'
 import {
   listCampaignMembersForOverview,
@@ -45,6 +46,44 @@ describe('campaign overview service', () => {
         }),
       ]),
     )
+  })
+
+  it('omits character_added when a PC has control without open participation', async () => {
+    const { id: campaignId } = await makeTestCampaign({
+      name: 'Inconsistent Control Campaign',
+      owner: await makeTestUser({
+        email: 'inconsistent-owner@example.com',
+        displayName: 'Inconsistent Owner',
+      }),
+    })
+    const player = await makeTestUser({
+      email: 'inconsistent-player@example.com',
+      displayName: 'Inconsistent Player',
+    })
+    const character = await createPcRecord(minimalStandalonePcInput, player.id)
+
+    await createOrConfirmPlayerMembership({
+      campaignId,
+      userId: player.id,
+      joinedAt: new Date(),
+    })
+
+    const membership = await CampaignMembershipModel.findOne({
+      campaignId,
+      userId: player.id,
+    }).lean()
+    await addControlledCharacterToMembership({
+      membershipId: String(membership!._id),
+      characterId: character.id,
+    })
+
+    const members = await listCampaignMembersForOverview(campaignId)
+    const playerMember = members.find((member) => member.displayName === 'Inconsistent Player')
+
+    expect(playerMember).toMatchObject({
+      role: 'pc',
+      onboardingState: undefined,
+    })
   })
 
   it('lists party PCs with controlling member metadata', async () => {
