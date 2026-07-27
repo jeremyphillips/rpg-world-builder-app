@@ -32,10 +32,35 @@ export type EquipmentPickerFilterState = {
   showAffordableOnly?: boolean
 }
 
+export const EQUIPMENT_PICKER_PRIMARY_FILTER_FIELD_ORDER = [
+  'selectedKind',
+  'selectedRarity',
+] as const satisfies readonly (keyof EquipmentPickerFilterState)[]
+
+export const EQUIPMENT_PICKER_FILTER_ROW_FIELD_ORDER = [
+  'showAffordableOnly',
+] as const satisfies readonly (keyof EquipmentPickerFilterState)[]
+
+/** @deprecated Use `resolveEquipmentPickerFilterLayout` for schema-aware layout slots. */
 export const EQUIPMENT_PICKER_FILTER_LAYOUT = {
-  primaryFieldIds: ['selectedKind', 'selectedRarity'],
-  filterRowFieldIds: ['showAffordableOnly'],
+  primaryFieldIds: [...EQUIPMENT_PICKER_PRIMARY_FILTER_FIELD_ORDER],
+  filterRowFieldIds: [...EQUIPMENT_PICKER_FILTER_ROW_FIELD_ORDER],
 } as const satisfies FilterCatalogLayoutConfig<EquipmentPickerFilterState>
+
+export function resolveEquipmentPickerFilterLayout(
+  schema: FilterSchema<EquipmentPickerItem, EquipmentPickerFilterState>,
+): FilterCatalogLayoutConfig<EquipmentPickerFilterState> {
+  const schemaFieldIds = new Set(schema.fields.map((field) => field.id))
+
+  return {
+    primaryFieldIds: EQUIPMENT_PICKER_PRIMARY_FILTER_FIELD_ORDER.filter((fieldId) =>
+      schemaFieldIds.has(fieldId),
+    ),
+    filterRowFieldIds: EQUIPMENT_PICKER_FILTER_ROW_FIELD_ORDER.filter((fieldId) =>
+      schemaFieldIds.has(fieldId),
+    ),
+  }
+}
 
 export type CreateEquipmentPickerFilterSchemaArgs = {
   workflowMode: EquipmentPickerWorkflowMode
