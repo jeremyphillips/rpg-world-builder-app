@@ -42,6 +42,21 @@ export const NameGeneratorRoute = withRouteSuspense(
 export const AdminUsersRoute = withRouteSuspense(
   lazyNamed(() => import('@/features/admin/routes/admin-users'), 'AdminUsers'),
 )
+export const AdminUserLayoutRoute = withRouteSuspense(
+  lazyNamed(() => import('@/features/admin/routes/admin-user-layout'), 'AdminUserLayout'),
+)
+export const AdminUserDetailRoute = withRouteSuspense(
+  lazyNamed(() => import('@/features/admin/routes/admin-user-detail'), 'AdminUserDetail'),
+)
+export const AdminUserCampaignsRoute = withRouteSuspense(
+  lazyNamed(() => import('@/features/admin/routes/admin-user-campaigns'), 'AdminUserCampaignsPage'),
+)
+export const AdminUserCharactersRoute = withRouteSuspense(
+  lazyNamed(
+    () => import('@/features/admin/routes/admin-user-characters'),
+    'AdminUserCharactersPage',
+  ),
+)
 export const AdminSettingsRoute = withRouteSuspense(
   lazyNamed(() => import('@/features/admin/routes/admin-settings'), 'AdminSettings'),
 )

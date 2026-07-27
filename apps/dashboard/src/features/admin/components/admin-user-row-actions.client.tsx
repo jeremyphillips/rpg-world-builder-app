@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
 import type { AdminUserListItem } from '@rpg/contracts'
 import {
   Button,
@@ -13,6 +14,7 @@ import {
 import { Ellipsis, Trash2 } from 'lucide-react'
 
 import { useIsSuperadmin } from '@/features/auth/hooks/use-is-superadmin'
+import { ROUTES } from '@/app/routes'
 
 import { DeleteUserDialog } from './delete-user-dialog.client'
 import { getPrimaryDeleteBlockReasonMessage } from '../lib/admin-users-labels'
@@ -44,14 +46,14 @@ export function AdminUserRowActions({ user }: AdminUserRowActionsProps) {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-48">
-          <DropdownMenuItem className="text-xs" disabled>
-            View user
+          <DropdownMenuItem className="text-xs" asChild>
+            <Link to={ROUTES.admin.user.detail(user.id)}>View user</Link>
           </DropdownMenuItem>
-          <DropdownMenuItem className="text-xs" disabled>
-            View campaigns
+          <DropdownMenuItem className="text-xs" asChild>
+            <Link to={ROUTES.admin.user.campaigns(user.id)}>View campaigns</Link>
           </DropdownMenuItem>
-          <DropdownMenuItem className="text-xs" disabled>
-            View characters
+          <DropdownMenuItem className="text-xs" asChild>
+            <Link to={ROUTES.admin.user.characters(user.id)}>View characters</Link>
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           {deleteDisabled ? (

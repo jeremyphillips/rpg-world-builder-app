@@ -1,6 +1,7 @@
 import { z } from 'zod'
 
-import { platformRoleSchema } from './roles'
+import { characterCardViewModelSchema } from '../rpg/campaign/campaign-overview-dtos'
+import { campaignRoleSchema, platformRoleSchema } from './roles'
 
 export const ADMIN_USER_DELETE_BLOCK_REASONS = [
   'insufficient_role',
@@ -104,3 +105,101 @@ export const adminUsersListResponseSchema = z.object({
 })
 
 export type AdminUsersListResponse = z.infer<typeof adminUsersListResponseSchema>
+
+export const adminUserDetailSchema = z.object({
+  id: z.string().min(1),
+  displayName: z.string().min(1),
+  email: z.email(),
+  platformRole: platformRoleSchema,
+  createdAt: z.iso.datetime(),
+  lastSignedInAt: z.iso.datetime().nullable(),
+  lastActiveAt: z.iso.datetime().nullable(),
+  campaignCounts: adminUserCampaignCountsSchema,
+  characterCount: z.number().int().nonnegative(),
+  controlledCharacterCount: z.number().int().nonnegative(),
+  pendingInviteCount: z.number().int().nonnegative(),
+  acceptedIncompleteInviteCount: z.number().int().nonnegative(),
+  canDelete: z.boolean(),
+  deleteBlockedReasons: z.array(adminUserDeleteBlockReasonSchema),
+})
+
+export type AdminUserDetail = z.infer<typeof adminUserDetailSchema>
+
+export const adminUserDetailResponseSchema = z.object({
+  user: adminUserDetailSchema,
+})
+
+export type AdminUserDetailResponse = z.infer<typeof adminUserDetailResponseSchema>
+
+export const adminUserCampaignListItemSchema = z.object({
+  campaign: z.object({
+    id: z.string().min(1),
+    name: z.string().min(1),
+    createdAt: z.iso.datetime(),
+  }),
+  membership: z.object({
+    role: campaignRoleSchema,
+    joinedAt: z.iso.datetime(),
+    controlledCharacterCount: z.number().int().nonnegative(),
+  }),
+})
+
+export type AdminUserCampaignListItem = z.infer<typeof adminUserCampaignListItemSchema>
+
+export const adminUserCampaignListResponseSchema = z.object({
+  campaigns: z.array(adminUserCampaignListItemSchema),
+})
+
+export type AdminUserCampaignListResponse = z.infer<typeof adminUserCampaignListResponseSchema>
+
+export const ADMIN_USER_CAMPAIGN_ROLE_FILTER_VALUES = [
+  'all',
+  'owner',
+  'co-owner',
+  'pc',
+  'observer',
+] as const
+
+export const adminUserCampaignRoleFilterSchema = z.enum(ADMIN_USER_CAMPAIGN_ROLE_FILTER_VALUES)
+
+export type AdminUserCampaignRoleFilter = z.infer<typeof adminUserCampaignRoleFilterSchema>
+
+export const adminUserCampaignListQuerySchema = z.object({
+  q: z.string().optional(),
+  role: adminUserCampaignRoleFilterSchema.default('all'),
+})
+
+export type AdminUserCampaignListQuery = z.infer<typeof adminUserCampaignListQuerySchema>
+
+export const adminUserCharacterListItemSchema = z.object({
+  character: characterCardViewModelSchema,
+})
+
+export type AdminUserCharacterListItem = z.infer<typeof adminUserCharacterListItemSchema>
+
+export const adminUserCharacterListResponseSchema = z.object({
+  characters: z.array(adminUserCharacterListItemSchema),
+})
+
+export type AdminUserCharacterListResponse = z.infer<typeof adminUserCharacterListResponseSchema>
+
+export const ADMIN_USER_CHARACTER_CAMPAIGN_FILTER_VALUES = [
+  'all',
+  'in-campaign',
+  'no-campaign',
+] as const
+
+export const adminUserCharacterCampaignFilterSchema = z.enum(
+  ADMIN_USER_CHARACTER_CAMPAIGN_FILTER_VALUES,
+)
+
+export type AdminUserCharacterCampaignFilter = z.infer<
+  typeof adminUserCharacterCampaignFilterSchema
+>
+
+export const adminUserCharacterListQuerySchema = z.object({
+  q: z.string().optional(),
+  campaign: adminUserCharacterCampaignFilterSchema.default('all'),
+})
+
+export type AdminUserCharacterListQuery = z.infer<typeof adminUserCharacterListQuerySchema>

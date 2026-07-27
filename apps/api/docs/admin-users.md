@@ -8,6 +8,9 @@ hard-deleting disposable test accounts.
 | Endpoint                                        | Roles                 |
 | ----------------------------------------------- | --------------------- |
 | `GET /api/admin/users`                          | `admin`, `superadmin` |
+| `GET /api/admin/users/:userId`                  | `admin`, `superadmin` |
+| `GET /api/admin/users/:userId/campaigns`        | `admin`, `superadmin` |
+| `GET /api/admin/users/:userId/characters`       | `admin`, `superadmin` |
 | `GET /api/admin/users/:userId/deletion-preview` | `superadmin`          |
 | `DELETE /api/admin/users/:userId`               | `superadmin`          |
 
@@ -76,3 +79,9 @@ Owned campaigns are never silently cascaded.
 | joined  | `pc`, `observer` |
 
 List rows and deletion-preview dependencies share `admin-user-summary.service.ts`.
+
+## Drill-down routes (read-only)
+
+Dashboard routes under `/admin/users/:userId` are read-only drill-down surfaces:
+overview, campaigns table, and characters card list. They reuse shared delete
+semantics and do not introduce user editing or membership management.

@@ -1,13 +1,19 @@
+'use client'
+
+import { Link } from 'react-router-dom'
 import {
   SortableHeader,
   TableBadgeCell,
   Text,
   dataTableColumnMeta,
+  dataTableNameLinkCellVariants,
   dataTableWidthMeta,
 } from '@rpg/ui'
 import type { ColumnDef } from '@rpg/ui'
 import type { AdminUserListItem } from '@rpg/contracts'
 import { PLATFORM_ROLE_ENTRIES } from '@rpg/contracts'
+
+import { ROUTES } from '@/app/routes'
 
 import {
   formatAdminUserCampaignCounts,
@@ -24,9 +30,12 @@ export function adminUsersColumns(): ColumnDef<AdminUserListItem>[] {
         const user = row.original
         return (
           <div className="flex min-w-0 flex-col gap-0.5">
-            <Text as="span" variant="body" className="truncate font-medium">
+            <Link
+              to={ROUTES.admin.user.detail(user.id)}
+              className={dataTableNameLinkCellVariants({ className: 'truncate font-medium' })}
+            >
               {user.displayName}
-            </Text>
+            </Link>
             <Text as="span" variant="muted" className="truncate text-xs">
               {user.email}
             </Text>

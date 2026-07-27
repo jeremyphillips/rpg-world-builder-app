@@ -1,5 +1,10 @@
 import type {
   AdminUserDeletionPreview,
+  AdminUserDetailResponse,
+  AdminUserCampaignListResponse,
+  AdminUserCampaignListQuery,
+  AdminUserCharacterListResponse,
+  AdminUserCharacterListQuery,
   AdminUsersListQuery,
   AdminUsersListResponse,
 } from '@rpg/contracts'
@@ -38,6 +43,55 @@ export async function listAdminUsers(query: AdminUsersListQuery): Promise<AdminU
     undefined,
     'Could not load users.',
   )
+}
+
+export async function fetchAdminUser(userId: string): Promise<AdminUserDetailResponse['user']> {
+  const { user } = await request<AdminUserDetailResponse>(
+    `/api/admin/users/${userId}`,
+    undefined,
+    'Could not load user.',
+  )
+  return user
+}
+
+function buildAdminUserCampaignsQueryString(query: AdminUserCampaignListQuery): string {
+  const params = new URLSearchParams()
+  if (query.q?.trim()) params.set('q', query.q.trim())
+  if (query.role !== 'all') params.set('role', query.role)
+  const serialized = params.toString()
+  return serialized ? `?${serialized}` : ''
+}
+
+export async function listAdminUserCampaigns(
+  userId: string,
+  query: AdminUserCampaignListQuery,
+): Promise<AdminUserCampaignListResponse['campaigns']> {
+  const { campaigns } = await request<AdminUserCampaignListResponse>(
+    `/api/admin/users/${userId}/campaigns${buildAdminUserCampaignsQueryString(query)}`,
+    undefined,
+    'Could not load campaigns.',
+  )
+  return campaigns
+}
+
+function buildAdminUserCharactersQueryString(query: AdminUserCharacterListQuery): string {
+  const params = new URLSearchParams()
+  if (query.q?.trim()) params.set('q', query.q.trim())
+  if (query.campaign !== 'all') params.set('campaign', query.campaign)
+  const serialized = params.toString()
+  return serialized ? `?${serialized}` : ''
+}
+
+export async function listAdminUserCharacters(
+  userId: string,
+  query: AdminUserCharacterListQuery,
+): Promise<AdminUserCharacterListResponse['characters']> {
+  const { characters } = await request<AdminUserCharacterListResponse>(
+    `/api/admin/users/${userId}/characters${buildAdminUserCharactersQueryString(query)}`,
+    undefined,
+    'Could not load characters.',
+  )
+  return characters
 }
 
 export async function fetchAdminUserDeletionPreview(

@@ -73,6 +73,53 @@ export const campaignRoleSchema = z.enum(CAMPAIGN_ROLES)
 
 export type CampaignRole = z.infer<typeof campaignRoleSchema>
 
+export const CAMPAIGN_ROLE_TERM = {
+  label: 'Role',
+  description: 'Campaign membership role for a user within one campaign.',
+  sentence: {
+    singular: 'campaign role',
+    plural: 'campaign roles',
+  },
+} as const
+
+export const CAMPAIGN_ROLE_ENTRIES = {
+  owner: {
+    label: 'Owner',
+    description: 'Campaign creator with full control.',
+    sentence: {
+      singular: 'owner',
+      plural: 'owners',
+    },
+  },
+  'co-owner': {
+    label: 'Co-owner',
+    description: 'Invited co-DM with management access.',
+    sentence: {
+      singular: 'co-owner',
+      plural: 'co-owners',
+    },
+  },
+  pc: {
+    label: 'Player',
+    description: 'Player with a character in the party.',
+    sentence: {
+      singular: 'player',
+      plural: 'players',
+    },
+  },
+  observer: {
+    label: 'Observer',
+    description: 'Spectator with read-only campaign access.',
+    sentence: {
+      singular: 'observer',
+      plural: 'observers',
+    },
+  },
+} as const satisfies Record<
+  CampaignRole,
+  { label: string; description: string; sentence: { singular: string; plural: string } }
+>
+
 /** Roles that can manage campaign settings and author content (matches API write guards). */
 export const CAMPAIGN_MANAGE_ROLES = [
   'owner',

@@ -37,7 +37,7 @@ export function buildDeleteDependencyLines(
 }
 
 export function resolveOwnedCampaignBlockCopy(
-  user: AdminUserListItem,
+  user: Pick<AdminUserListItem, 'displayName' | 'campaignCounts'>,
   preview: AdminUserDeletionPreview | undefined,
 ): string {
   const ownedCount = preview?.dependencies.memberships.owned ?? user.campaignCounts.owned

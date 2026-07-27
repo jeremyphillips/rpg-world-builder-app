@@ -2,6 +2,7 @@ import type {
   AdminUserCampaignCounts,
   AdminUserDeleteBlockReason,
   AdminUserDeletionPreview,
+  AdminUserDetail,
   AdminUserListItem,
   PlatformRole,
 } from '@rpg/contracts'
@@ -186,6 +187,43 @@ export async function buildAdminUserListItem(
     lastActiveAt: user.lastActiveAt,
     campaignCounts,
     characterCount,
+    canDelete: canDeleteUser(deleteBlockedReasons),
+    deleteBlockedReasons,
+  }
+}
+
+export async function buildAdminUserDetail(
+  user: UserWithActivityTimestamps,
+  actor: { id: string; role: PlatformRole },
+): Promise<AdminUserDetail> {
+  const [campaignCountsMap, characterCountsMap, inviteCounts, controlledCharacterCount] =
+    await Promise.all([
+      getCampaignCountsForUsers([user.id]),
+      getCharacterCountsForUsers([user.id]),
+      getInviteDependencyCounts(user.email.toLowerCase(), user.id),
+      getControlledCharacterCount(user.id),
+    ])
+
+  const deleteBlockedReasons = await computeDeleteBlockers({
+    actorId: actor.id,
+    actorRole: actor.role,
+    targetUserId: user.id,
+    targetRole: user.role,
+  })
+
+  return {
+    id: user.id,
+    displayName: user.displayName,
+    email: user.email,
+    platformRole: user.role,
+    createdAt: user.createdAt,
+    lastSignedInAt: user.lastSignedInAt,
+    lastActiveAt: user.lastActiveAt,
+    campaignCounts: campaignCountsMap.get(user.id) ?? { ...EMPTY_CAMPAIGN_COUNTS },
+    characterCount: characterCountsMap.get(user.id) ?? 0,
+    controlledCharacterCount,
+    pendingInviteCount: inviteCounts.pendingInvites,
+    acceptedIncompleteInviteCount: inviteCounts.acceptedInvites,
     canDelete: canDeleteUser(deleteBlockedReasons),
     deleteBlockedReasons,
   }

@@ -1,19 +1,21 @@
 'use client'
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import type { AdminUserDeleteBlockReason, AdminUserListItem } from '@rpg/contracts'
+import type { AdminUserDeleteBlockReason } from '@rpg/contracts'
 import { ConfirmDialog, Text } from '@rpg/ui'
 
 import { deleteAdminUser, fetchAdminUserDeletionPreview } from '../api/admin-users-client'
+import type { AdminUserDeleteSubject } from '../lib/admin-user-delete-subject'
 import {
   buildDeleteDependencyLines,
   resolveOwnedCampaignBlockCopy,
 } from '../lib/delete-user-dialog.lib'
 
 type DeleteUserDialogProps = {
-  user: AdminUserListItem
+  user: AdminUserDeleteSubject
   open: boolean
   onOpenChange: (open: boolean) => void
+  onDeleted?: () => void
 }
 
 const BLOCKED_HEADLINES: Partial<Record<AdminUserDeleteBlockReason, string>> = {
@@ -47,7 +49,7 @@ function BlockedDeleteDialog({
 }
 
 function resolveBlockedDialog(
-  user: AdminUserListItem,
+  user: AdminUserDeleteSubject,
   blockers: readonly AdminUserDeleteBlockReason[],
   preview: Awaited<ReturnType<typeof fetchAdminUserDeletionPreview>> | undefined,
   open: boolean,
@@ -79,7 +81,7 @@ function resolveBlockedDialog(
   return null
 }
 
-export function DeleteUserDialog({ user, open, onOpenChange }: DeleteUserDialogProps) {
+export function DeleteUserDialog({ user, open, onOpenChange, onDeleted }: DeleteUserDialogProps) {
   const queryClient = useQueryClient()
   const previewQuery = useQuery({
     queryKey: ['admin', 'users', user.id, 'deletion-preview'],
@@ -92,6 +94,7 @@ export function DeleteUserDialog({ user, open, onOpenChange }: DeleteUserDialogP
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ['admin', 'users'] })
       onOpenChange(false)
+      onDeleted?.()
     },
   })
 

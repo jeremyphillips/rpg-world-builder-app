@@ -94,4 +94,46 @@ describe('admin users routes', () => {
 
     expect(response.body.error.details.blockers).toContain('owns_campaigns')
   })
+
+  it('returns user detail, campaigns, and characters for elevated roles', async () => {
+    await clearTestDb()
+
+    const admin = await createUser({
+      email: 'admin-detail@example.com',
+      passwordHash: 'x',
+      displayName: 'Admin Detail',
+      role: 'admin',
+    })
+    const target = await createUser({
+      email: 'target-detail@example.com',
+      passwordHash: 'x',
+      displayName: 'Target User',
+      role: 'user',
+    })
+
+    const detailRes = await request(getApp())
+      .get(`/api/admin/users/${target.id}`)
+      .set('Cookie', sessionCookie(admin.id, 'admin'))
+      .expect(200)
+
+    expect(detailRes.body.user).toMatchObject({
+      id: target.id,
+      displayName: 'Target User',
+      platformRole: 'user',
+    })
+
+    const campaignsRes = await request(getApp())
+      .get(`/api/admin/users/${target.id}/campaigns`)
+      .set('Cookie', sessionCookie(admin.id, 'admin'))
+      .expect(200)
+
+    expect(campaignsRes.body.campaigns).toEqual([])
+
+    const charactersRes = await request(getApp())
+      .get(`/api/admin/users/${target.id}/characters`)
+      .set('Cookie', sessionCookie(admin.id, 'admin'))
+      .expect(200)
+
+    expect(charactersRes.body.characters).toEqual([])
+  })
 })

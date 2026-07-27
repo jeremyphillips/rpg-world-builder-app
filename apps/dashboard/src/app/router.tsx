@@ -12,6 +12,10 @@ import { getContentTypeCollectionLabel } from '@/features/content/lib/content-ty
 import {
   AccountSettingsRoute,
   AdminSettingsRoute,
+  AdminUserCampaignsRoute,
+  AdminUserCharactersRoute,
+  AdminUserDetailRoute,
+  AdminUserLayoutRoute,
   AdminUsersRoute,
   CampaignCreateRoute,
   CampaignCharacterDetailRoute,
@@ -114,8 +118,38 @@ const router = createBrowserRouter(
               children: [
                 {
                   path: 'users',
-                  element: <AdminUsersRoute />,
-                  handle: { crumb: () => ({ label: 'Admin / Users' }) } satisfies CrumbHandle,
+                  element: <Outlet />,
+                  handle: {
+                    crumb: () => ({ label: 'Admin / Users', href: ROUTES.admin.users }),
+                  } satisfies CrumbHandle,
+                  children: [
+                    {
+                      index: true,
+                      element: <AdminUsersRoute />,
+                    },
+                    {
+                      path: ':userId',
+                      element: <AdminUserLayoutRoute />,
+                      handle: {
+                        crumb: (_params, { entityLabel }) => ({
+                          label: entityLabel ?? '…',
+                        }),
+                      } satisfies CrumbHandle,
+                      children: [
+                        { index: true, element: <AdminUserDetailRoute /> },
+                        {
+                          path: 'campaigns',
+                          element: <AdminUserCampaignsRoute />,
+                          handle: { crumb: () => ({ label: 'Campaigns' }) } satisfies CrumbHandle,
+                        },
+                        {
+                          path: 'characters',
+                          element: <AdminUserCharactersRoute />,
+                          handle: { crumb: () => ({ label: 'Characters' }) } satisfies CrumbHandle,
+                        },
+                      ],
+                    },
+                  ],
                 },
                 {
                   path: 'settings',

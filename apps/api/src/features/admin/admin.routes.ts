@@ -14,6 +14,27 @@ adminRouter.get(
 )
 
 adminRouter.get(
+  '/users/:userId',
+  requireAuth,
+  requirePlatformRole('admin', 'superadmin'),
+  controller.getUser,
+)
+
+adminRouter.get(
+  '/users/:userId/campaigns',
+  requireAuth,
+  requirePlatformRole('admin', 'superadmin'),
+  controller.listUserCampaigns,
+)
+
+adminRouter.get(
+  '/users/:userId/characters',
+  requireAuth,
+  requirePlatformRole('admin', 'superadmin'),
+  controller.listUserCharacters,
+)
+
+adminRouter.get(
   '/users/:userId/deletion-preview',
   requireAuth,
   requirePlatformRole('superadmin'),
