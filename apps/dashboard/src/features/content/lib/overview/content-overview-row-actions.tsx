@@ -50,8 +50,10 @@ export function ContentOverviewRowActions({
   return (
     <>
       <RowActionsMenu
-        itemLabel={itemLabel}
+        triggerLabel={`Open actions for this ${itemLabel}`}
         triggerRef={triggerRef}
+        contentClassName="w-72"
+        items={[]}
         footer={
           <ContentCampaignAvailabilityAction
             available={campaignAccess.available}

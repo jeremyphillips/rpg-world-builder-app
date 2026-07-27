@@ -1,5 +1,8 @@
+import type { CampaignInviteAdminListItem } from '@rpg/contracts'
 import type { CampaignRole } from '@rpg/contracts'
 import { ApiError } from '@rpg/contracts'
+
+import { formatRelativeOrDate, formatShortDate } from '@/lib/datetime/format-datetime'
 
 export const CAMPAIGN_OVERVIEW_SECTION_LABELS = {
   members: 'Members',
@@ -44,8 +47,25 @@ export const INVITE_MEMBER_DOMAIN_ERROR_COPY = {
 } as const
 
 export const INVITE_DELIVERY_STATUS_COPY = {
-  pending: 'Pending',
-  failed: 'Email not sent · Invitation pending',
+  failed: 'Email not sent',
+  sent: 'Sent',
+} as const
+
+export const CAMPAIGN_INVITE_ROW_ACTION_COPY = {
+  shareLink: 'Share new invite link',
+  revokePending: 'Revoke invitation',
+  revokeAccepted: 'Revoke onboarding access',
+  shareConfirmHeadline: 'Share new invite link?',
+  shareConfirmDescription:
+    'This generates a fresh invite link, sends a new email, and invalidates the previous link.',
+  shareConfirmLabel: 'Share link',
+  revokePendingConfirmHeadline: 'Revoke invitation?',
+  revokePendingConfirmDescription:
+    'The invite link stops working immediately. You can send a new invitation later.',
+  revokeAcceptedConfirmHeadline: 'Revoke onboarding access?',
+  revokeAcceptedConfirmDescription:
+    'The player keeps campaign membership, but they can no longer finish onboarding with this invite.',
+  revokeConfirmLabel: 'Revoke',
 } as const
 
 export function formatCampaignRoleLabel(role: CampaignRole): string {
@@ -53,20 +73,27 @@ export function formatCampaignRoleLabel(role: CampaignRole): string {
 }
 
 export function formatInviteExpiryLabel(expiresAt: string): string {
-  return new Intl.DateTimeFormat(undefined, { month: 'short', day: 'numeric' }).format(
-    new Date(expiresAt),
-  )
+  return formatShortDate(expiresAt)
 }
 
 export function formatInvitationStatusLine(
-  deliveryStatus: 'pending' | 'sent' | 'failed',
-  expiresAt: string,
+  invite: Pick<CampaignInviteAdminListItem, 'deliveryStatus' | 'expiresAt' | 'sentAt'>,
 ): string {
-  if (deliveryStatus === 'failed') {
-    return INVITE_DELIVERY_STATUS_COPY.failed
+  const expiryLabel = formatInviteExpiryLabel(invite.expiresAt)
+
+  if (invite.deliveryStatus === 'failed') {
+    return `${INVITE_DELIVERY_STATUS_COPY.failed} · Expires ${expiryLabel}`
   }
 
-  return `${INVITE_DELIVERY_STATUS_COPY.pending} · Expires ${formatInviteExpiryLabel(expiresAt)}`
+  if (invite.deliveryStatus === 'sent' && invite.sentAt) {
+    return `${INVITE_DELIVERY_STATUS_COPY.sent} ${formatRelativeOrDate(invite.sentAt)} · Expires ${expiryLabel}`
+  }
+
+  return `Pending · Expires ${expiryLabel}`
+}
+
+export function formatMemberInviteAcceptedLine(inviteAcceptedAt: string): string {
+  return `Accepted ${formatRelativeOrDate(inviteAcceptedAt)}`
 }
 
 export function mapInviteSendError(error: unknown): string | undefined {

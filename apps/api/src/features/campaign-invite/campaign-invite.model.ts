@@ -26,6 +26,8 @@ const campaignInviteSchema = new Schema(
     deliveryErrorCode: { type: String, default: null },
     deliveryAttempts: { type: Number, default: 0 },
     lastDeliveryAttemptAt: { type: Date, default: null },
+    revokedAt: { type: Date, default: null },
+    revokedByUserId: { type: String, default: null },
   },
   { timestamps: true },
 )

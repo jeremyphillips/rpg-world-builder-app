@@ -6,13 +6,16 @@ import {
   CAMPAIGN_OVERVIEW_SECTION_LABELS,
   formatInvitationStatusLine,
 } from '../lib/campaign-overview-labels'
+import { CampaignInviteRowActions } from './campaign-invite-row-actions.client'
 
 export type CampaignOverviewInvitationsSectionProps = {
+  campaignId: string
   invites: CampaignInviteAdminListItem[]
 }
 
 /** Pending campaign invitations with delivery status copy for managers. */
 export function CampaignOverviewInvitationsSection({
+  campaignId,
   invites,
 }: CampaignOverviewInvitationsSectionProps) {
   return (
@@ -28,12 +31,15 @@ export function CampaignOverviewInvitationsSection({
           {invites.map((invite) => (
             <li
               key={invite.id}
-              className="space-y-1 rounded-lg border border-border bg-card px-4 py-3"
+              className="flex items-start justify-between gap-3 rounded-lg border border-border bg-card px-4 py-3"
             >
-              <Text className="font-medium">{invite.email}</Text>
-              <Text variant="small" className="text-muted-foreground">
-                {formatInvitationStatusLine(invite.deliveryStatus, invite.expiresAt)}
-              </Text>
+              <div className="min-w-0 space-y-1">
+                <Text className="font-medium">{invite.email}</Text>
+                <Text variant="small" className="text-muted-foreground">
+                  {formatInvitationStatusLine(invite)}
+                </Text>
+              </div>
+              <CampaignInviteRowActions campaignId={campaignId} invite={invite} />
             </li>
           ))}
         </ul>

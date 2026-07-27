@@ -1,16 +1,8 @@
 'use client'
 
 import { useState } from 'react'
-import {
-  Button,
-  ConfirmDialog,
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@rpg/ui'
-import { Ellipsis, Pencil, Trash2 } from 'lucide-react'
+import { ConfirmDialog, RowActionsMenu } from '@rpg/ui'
+import { Pencil, Trash2 } from 'lucide-react'
 import type { VocabularyOptionWithUsage } from '@rpg/contracts'
 
 type VocabularyRowActionsProps = {
@@ -38,39 +30,38 @@ export function VocabularyRowActions({
 
   return (
     <>
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button
-            variant="ghost"
-            size="sm"
-            className="size-8 p-0"
-            aria-label={`Open actions for ${entry.label}`}
-          >
-            <Ellipsis className="size-4" aria-hidden />
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-44">
-          <DropdownMenuItem className="text-xs [&_svg]:size-3" onSelect={() => onEdit(entry)}>
-            <Pencil />
-            Edit
-          </DropdownMenuItem>
-          <DropdownMenuItem className="text-xs" onSelect={() => onToggleStatus(entry)}>
-            {isActive ? 'Disable' : 'Enable'}
-          </DropdownMenuItem>
-          {canDelete ? (
-            <>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem
-                className="text-xs text-destructive focus:text-destructive [&_svg]:size-3"
-                onSelect={() => setConfirmDeleteOpen(true)}
-              >
-                <Trash2 />
-                Delete
-              </DropdownMenuItem>
-            </>
-          ) : null}
-        </DropdownMenuContent>
-      </DropdownMenu>
+      <RowActionsMenu
+        triggerLabel={`Open actions for ${entry.label}`}
+        contentClassName="w-44"
+        items={[
+          {
+            kind: 'action',
+            id: 'edit',
+            label: 'Edit',
+            icon: <Pencil />,
+            onSelect: () => onEdit(entry),
+          },
+          {
+            kind: 'action',
+            id: 'toggle-status',
+            label: isActive ? 'Disable' : 'Enable',
+            onSelect: () => onToggleStatus(entry),
+          },
+          ...(canDelete
+            ? [
+                {
+                  kind: 'action' as const,
+                  id: 'delete',
+                  label: 'Delete',
+                  icon: <Trash2 />,
+                  destructive: true,
+                  separatorBefore: true,
+                  onSelect: () => setConfirmDeleteOpen(true),
+                },
+              ]
+            : []),
+        ]}
+      />
 
       {canDelete ? (
         <ConfirmDialog

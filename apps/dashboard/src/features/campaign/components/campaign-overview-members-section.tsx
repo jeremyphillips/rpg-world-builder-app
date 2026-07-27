@@ -6,6 +6,7 @@ import {
   CAMPAIGN_OVERVIEW_MEMBER_ONBOARDING_LABELS,
   CAMPAIGN_OVERVIEW_SECTION_LABELS,
   formatCampaignRoleLabel,
+  formatMemberInviteAcceptedLine,
 } from '../lib/campaign-overview-labels'
 
 export type CampaignOverviewMembersSectionProps = {
@@ -46,6 +47,9 @@ export function CampaignOverviewMembersSection({ members }: CampaignOverviewMemb
                 <Text className="font-medium">{member.displayName}</Text>
                 <Text variant="small" className="text-muted-foreground">
                   {formatCampaignRoleLabel(member.role)}
+                  {member.inviteAcceptedAt
+                    ? ` · ${formatMemberInviteAcceptedLine(member.inviteAcceptedAt)}`
+                    : ''}
                 </Text>
               </div>
               {memberOnboardingBadge(member.onboardingState)}

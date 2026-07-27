@@ -22,8 +22,8 @@ status, and membership server-side.
 
 ## State machine
 
-Invite `status` values: `pending` → `accepted` → `completed`, with `expired` as
-a terminal read-time transition.
+Invite `status` values: `pending` → `accepted` → `completed`, with `expired` and
+`revoked` as terminal states.
 
 | Status      | Meaning                                                           |
 | ----------- | ----------------------------------------------------------------- |
@@ -31,17 +31,25 @@ a terminal read-time transition.
 | `accepted`  | Player joined (`joinedAt` set); character onboarding not finished |
 | `completed` | `completedCharacterId` set; onboarding finished                   |
 | `expired`   | Past `expiresAt`; lazy transition on resolve/read (no cron)       |
+| `revoked`   | Cancelled by an owner/co-owner; token invalidated immediately     |
 
 Rules:
 
 - `CAMPAIGN_INVITE_EXPIRY_DAYS = 7` — computed at create/rotate; **not** extended
   on acceptance. An accepted invite past `expiresAt` transitions to `expired` on
   next read and blocks further completion.
-- Membership survives invite expiration. An expired-while-accepted member keeps
-  `pc` role and empty `controlledCharacterIds`. The owner can send a **new pending
-  invite** to the same email (incomplete-member recovery).
+- Membership survives invite expiration and revocation. An expired- or
+  revoked-while-accepted member keeps `pc` role and empty `controlledCharacterIds`.
+  The owner can send a **new pending invite** to the same email (incomplete-member
+  recovery).
 - Token rotation is restricted to `pending` invites. Rotating invalidates the
   previous token immediately (lookup is by current `tokenHash` only).
+- **Share new invite link** (`POST …/invites/:inviteId/share-link`) rotates the
+  token for a pending invite, resends email, and returns `{ inviteUrl }` for
+  clipboard copy. Subject to the same 60-second cooldown as resend.
+- **Revoke** (`POST …/invites/:inviteId/revoke`) is allowed for `pending` and
+  `accepted` invites. Membership is retained for accepted revokes; onboarding is
+  blocked. Completed, expired, and revoked invites cannot be revoked again.
 - Sending while an active `accepted` invite exists returns `invite_already_accepted`.
 - `already_member` applies only when `controlledCharacterIds.length > 0`.
 
@@ -113,12 +121,23 @@ Implemented in `campaign-overview.service.ts` (`resolveMemberOnboardingState`).
 Party list includes only PCs with open participation **and** a controlling
 member (`controlledCharacterIds`).
 
+Overview display rules:
+
+- Invitations list shows **pending** invites only.
+- Failed delivery copy: `Email not sent · Expires <date>` (no “Sent …” line).
+- Successful delivery includes `sentAt` for “Sent …” copy.
+- Members with incomplete onboarding may include `inviteAcceptedAt` (from
+  membership `joinedAt`).
+- Revoked, expired, and completed invites are hidden from the default overview.
+
 ## API surface
 
 | Method | Path                                                               | Auth                  |
 | ------ | ------------------------------------------------------------------ | --------------------- |
 | POST   | `/api/campaigns/:campaignId/invites`                               | owner/co-owner        |
 | GET    | `/api/campaigns/:campaignId/invites`                               | owner/co-owner        |
+| POST   | `/api/campaigns/:campaignId/invites/:inviteId/share-link`          | owner/co-owner        |
+| POST   | `/api/campaigns/:campaignId/invites/:inviteId/revoke`              | owner/co-owner        |
 | GET    | `/api/campaign-invites/:token`                                     | public                |
 | POST   | `/api/campaign-invites/:token/accept`                              | authenticated invitee |
 | GET    | `/api/campaign-invites/:inviteId/onboarding-context`               | authenticated invitee |

@@ -1,6 +1,7 @@
 import type {
   CampaignInviteAdminListItem,
   CampaignInviteRecipientInput,
+  CampaignInviteShareLinkResult,
   CampaignOverviewMemberListItem,
   CampaignPartyPcListItem,
 } from '@rpg/contracts'
@@ -11,6 +12,8 @@ const LIST_MEMBERS_ERROR = 'Could not load campaign members.'
 const LIST_PARTY_ERROR = 'Could not load campaign party.'
 const LIST_INVITES_ERROR = 'Could not load campaign invitations.'
 const SEND_INVITE_ERROR = 'Could not send invitation.'
+const SHARE_INVITE_LINK_ERROR = 'Could not share invite link.'
+const REVOKE_INVITE_ERROR = 'Could not revoke invitation.'
 
 export async function listCampaignMembers(
   campaignId: string,
@@ -55,5 +58,24 @@ export async function sendCampaignInvite(
     `/api/campaigns/${campaignId}/invites`,
     input,
     SEND_INVITE_ERROR,
+  )
+}
+
+export async function shareCampaignInviteLink(
+  campaignId: string,
+  inviteId: string,
+): Promise<CampaignInviteShareLinkResult> {
+  return postJson<CampaignInviteShareLinkResult>(
+    `/api/campaigns/${campaignId}/invites/${inviteId}/share-link`,
+    {},
+    SHARE_INVITE_LINK_ERROR,
+  )
+}
+
+export async function revokeCampaignInvite(campaignId: string, inviteId: string): Promise<void> {
+  await request(
+    `/api/campaigns/${campaignId}/invites/${inviteId}/revoke`,
+    { method: 'POST' },
+    REVOKE_INVITE_ERROR,
   )
 }

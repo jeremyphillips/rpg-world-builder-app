@@ -2,19 +2,9 @@
 
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import {
-  Badge,
-  Button,
-  buttonVariants,
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-  Heading,
-  Text,
-} from '@rpg/ui'
+import { Badge, buttonVariants, Heading, RowActionsMenu, Text } from '@rpg/ui'
 import { PLATFORM_ROLE_ENTRIES } from '@rpg/contracts'
-import { Ellipsis, Trash2 } from 'lucide-react'
+import { Trash2 } from 'lucide-react'
 
 import { ROUTES } from '@/app/routes'
 import { NarrowPage } from '@/components/layout/narrow-page'
@@ -48,7 +38,7 @@ export function AdminUserDetail() {
   })
 
   const deleteDisabled = !isSuperadmin || !user.canDelete
-  const deleteTooltip = !isSuperadmin
+  const deleteReason = !isSuperadmin
     ? 'Only superadmins can delete users'
     : getPrimaryDeleteBlockReasonMessage(user.deleteBlockedReasons)
 
@@ -77,33 +67,22 @@ export function AdminUserDetail() {
             </Text>
           </div>
 
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" size="sm" aria-label="User actions">
-                <Ellipsis className="size-4" aria-hidden />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-48">
-              {deleteDisabled ? (
-                <DropdownMenuItem
-                  className="text-xs text-destructive focus:text-destructive [&_svg]:size-3"
-                  disabled
-                  title={deleteTooltip}
-                >
-                  <Trash2 />
-                  Delete user
-                </DropdownMenuItem>
-              ) : (
-                <DropdownMenuItem
-                  className="text-xs text-destructive focus:text-destructive [&_svg]:size-3"
-                  onSelect={() => setDeleteOpen(true)}
-                >
-                  <Trash2 />
-                  Delete user
-                </DropdownMenuItem>
-              )}
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <RowActionsMenu
+            triggerVariant="outline-icon"
+            triggerLabel="User actions"
+            items={[
+              {
+                kind: 'action',
+                id: 'delete-user',
+                label: 'Delete user',
+                icon: <Trash2 />,
+                destructive: true,
+                disabled: deleteDisabled,
+                disabledReason: deleteReason,
+                onSelect: () => setDeleteOpen(true),
+              },
+            ]}
+          />
         </div>
       </div>
 

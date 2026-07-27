@@ -25,6 +25,7 @@ type MembershipRecord = {
   userId: string
   campaignRole: string
   controlledCharacterIds?: string[]
+  joinedAt?: Date
 }
 
 function sortMembers(
@@ -50,7 +51,7 @@ export async function listCampaignMembersForOverview(
   campaignId: string,
 ): Promise<CampaignOverviewMemberListItem[]> {
   const memberships = await CampaignMembershipModel.find({ campaignId })
-    .select('userId campaignRole controlledCharacterIds')
+    .select('userId campaignRole controlledCharacterIds joinedAt')
     .lean<MembershipRecord[]>()
 
   if (memberships.length === 0) return []
@@ -62,12 +63,16 @@ export async function listCampaignMembersForOverview(
     .map((membership) => {
       const role = membership.campaignRole as CampaignRole
       const controlledCharacterIds = membership.controlledCharacterIds ?? []
+      const onboardingState = resolveMemberOnboardingState(role, controlledCharacterIds)
 
       return {
         id: String(membership._id),
         displayName: displayNameByUserId.get(membership.userId) ?? 'Unknown member',
         role,
-        onboardingState: resolveMemberOnboardingState(role, controlledCharacterIds),
+        onboardingState,
+        ...(onboardingState === 'onboarding_incomplete' && membership.joinedAt
+          ? { inviteAcceptedAt: membership.joinedAt.toISOString() }
+          : {}),
       }
     })
     .sort(sortMembers)

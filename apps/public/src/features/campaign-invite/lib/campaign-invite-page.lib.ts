@@ -3,7 +3,7 @@ import type { CampaignInvitePublicResolution, SessionUser } from '@rpg/contracts
 export type InviteViewState =
   | { kind: 'loading' }
   | { kind: 'error'; message: string }
-  | { kind: 'terminal' }
+  | { kind: 'terminal'; reason: 'expired' | 'revoked' }
   | { kind: 'unauthenticated'; resolution: CampaignInvitePublicResolution }
   | { kind: 'email_mismatch'; resolution: CampaignInvitePublicResolution }
   | { kind: 'accepting' }
@@ -27,7 +27,11 @@ function resolveResolutionStatusState(
   sessionUser: SessionUser | undefined,
 ): InviteViewState | null {
   if (resolution.status === 'expired') {
-    return { kind: 'terminal' }
+    return { kind: 'terminal', reason: 'expired' }
+  }
+
+  if (resolution.status === 'revoked') {
+    return { kind: 'terminal', reason: 'revoked' }
   }
 
   if (resolution.status === 'completed') {

@@ -209,3 +209,25 @@ export async function markInviteExpired(inviteId: string): Promise<CampaignInvit
   if (!doc) return null
   return toCampaignInvite(doc)
 }
+
+export async function markInviteRevoked(
+  inviteId: string,
+  revokedByUserId: string,
+  invalidatedTokenHash: string,
+): Promise<CampaignInvite | null> {
+  if (!isValidObjectId(inviteId)) return null
+  const doc = await CampaignInviteModel.findOneAndUpdate(
+    { _id: inviteId, status: { $in: ['pending', 'accepted'] } },
+    {
+      $set: {
+        status: 'revoked',
+        revokedAt: new Date(),
+        revokedByUserId,
+        tokenHash: invalidatedTokenHash,
+      },
+    },
+    { new: true },
+  ).lean<CampaignInviteRecord | null>()
+  if (!doc) return null
+  return toCampaignInvite(doc)
+}

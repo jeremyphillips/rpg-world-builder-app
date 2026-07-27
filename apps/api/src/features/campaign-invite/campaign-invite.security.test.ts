@@ -1,4 +1,5 @@
 import request from 'supertest'
+import { Types } from 'mongoose'
 import { afterEach, describe, expect, it } from 'vitest'
 
 import { CSRF_HEADER } from '../../lib/cookies'
@@ -105,7 +106,7 @@ describe('campaign invite security', () => {
     expect(JSON.stringify(response.body)).not.toMatch(/"tokenHash"/)
   })
 
-  it('delivers invite links only through email, not API responses', async () => {
+  it('delivers invite links through email on send, and share-link for recovery', async () => {
     setEmailProviderForTests(createFakeEmailProvider())
     const { agent, csrfToken } = await registerAndLoginTestUser(getApp(), {
       email: 'email-only-owner@example.com',
@@ -126,5 +127,18 @@ describe('campaign invite security', () => {
     expect(sendResponse.body.invite).not.toHaveProperty('token')
     expect(JSON.stringify(sendResponse.body)).not.toContain(rawToken)
     expect(emailText).toContain(rawToken)
+
+    await CampaignInviteModel.collection.updateOne(
+      { _id: new Types.ObjectId(sendResponse.body.invite.id) },
+      { $set: { updatedAt: new Date(Date.now() - 61_000) } },
+    )
+
+    const shareResponse = await agent
+      .post(`/api/campaigns/${campaignId}/invites/${sendResponse.body.invite.id}/share-link`)
+      .set(CSRF_HEADER, csrfToken)
+      .send({})
+      .expect(200)
+
+    expect(shareResponse.body.inviteUrl).toMatch(/\/campaign-invites\/[0-9a-f]{64}$/)
   })
 })

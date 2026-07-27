@@ -1,5 +1,7 @@
 import { USER_RECENT_ACTIVITY_DAYS } from '@rpg/contracts'
 
+import { formatRelativeRecency } from '@/lib/datetime/format-datetime'
+
 function startOfDay(date: Date): Date {
   return new Date(date.getFullYear(), date.getMonth(), date.getDate())
 }
@@ -55,10 +57,8 @@ export function formatAdminUserDetailLastActive(value: string | null): string {
   const valueDay = startOfDay(date)
   const dayDiff = Math.round((today.getTime() - valueDay.getTime()) / (24 * 60 * 60 * 1000))
 
-  if (dayDiff === 0) return 'Today'
-  if (dayDiff === 1) return 'Yesterday'
-  if (dayDiff > 1 && dayDiff <= USER_RECENT_ACTIVITY_DAYS) {
-    return `${dayDiff} days ago`
+  if (dayDiff >= 0 && dayDiff <= USER_RECENT_ACTIVITY_DAYS) {
+    return formatRelativeRecency(value)
   }
 
   return formatAbsoluteDate(value)

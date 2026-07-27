@@ -41,7 +41,7 @@ import {
   type SortingState,
   type VisibilityState,
 } from '@tanstack/react-table'
-import { ArrowUpDown, Check, ChevronDown, ChevronUp, Ellipsis, Pencil, X } from 'lucide-react'
+import { ArrowUpDown, Check, ChevronDown, ChevronUp, Ellipsis, X } from 'lucide-react'
 
 import { cn } from '../../lib/utils'
 import { Button } from './button.client'
@@ -54,7 +54,6 @@ import {
   DropdownMenuTrigger,
 } from './dropdown-menu.client'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './select.client'
-import { Switch } from './switch.client'
 import { InfoTooltip } from './tooltip.client'
 import {
   Table,
@@ -435,125 +434,151 @@ export interface RowActionsMenuLinkProps {
   children: React.ReactNode
 }
 
+export type RowActionMenuItem =
+  | {
+      kind: 'link'
+      id: string
+      label: string
+      href: string
+      icon?: React.ReactNode
+      destructive?: boolean
+      disabled?: boolean
+      disabledReason?: string
+      separatorBefore?: boolean
+    }
+  | {
+      kind: 'action'
+      id: string
+      label: string
+      onSelect: () => void
+      icon?: React.ReactNode
+      destructive?: boolean
+      disabled?: boolean
+      disabledReason?: string
+      separatorBefore?: boolean
+    }
+
 export interface RowActionsMenuProps {
-  /** Target path for the edit route — omit when edit lives on the utility row. */
-  editHref?: string
-  /**
-   * Router-aware link component for in-app navigation (e.g. React Router `Link`).
-   * Receives `href` as the navigation target. Defaults to a plain `<a>`.
-   */
-  EditLink?: React.ComponentType<RowActionsMenuLinkProps>
-  /** Primary navigation action label. Defaults to "Edit". */
-  editLabel?: string
-  /** Whether this item is currently active in the campaign. */
-  enabled?: boolean
-  /** Called with the new boolean when the active-in-campaign toggle changes. */
-  onToggleEnabled?: (enabled: boolean) => void
-  /**
-   * Label for the campaign toggle.
-   * Pass a context-specific label (e.g. "Active in campaign") when the default
-   * is too generic for the surface.
-   */
-  enabledLabel?: string
-  /**
-   * Tooltip text that answers "what happens when I turn this off?".
-   * Shown via the info icon next to the toggle label.
-   */
-  enabledTooltip?: string
-  /**
-   * Human-readable noun for this row's item type, used in the trigger aria-label.
-   * Defaults to "item". Pass "class", "spell", etc. for more specific labels.
-   */
-  itemLabel?: string
+  items: RowActionMenuItem[]
+  /** Router-aware link component for `kind: 'link'` items. Defaults to a plain `<a>`. */
+  LinkComponent?: React.ComponentType<RowActionsMenuLinkProps>
   /** Optional footer section rendered below actions — e.g. campaign availability editor. */
   footer?: React.ReactNode
+  /** Accessible label for the ellipsis trigger button. */
+  triggerLabel: string
+  /** Ghost icon trigger for table rows; outline icon for page overflow menus. */
+  triggerVariant?: 'ghost-icon' | 'outline-icon'
+  /** Disables the trigger while a row action mutation is pending. */
+  disabled?: boolean
+  /** Dropdown content width utility classes. */
+  contentClassName?: string
   /** Ref for the ellipsis trigger — used by orchestrators for focus restoration. */
   triggerRef?: React.Ref<HTMLButtonElement>
 }
 
-/**
- * Pre-built row actions dropdown for the `rowActions` prop.
- *
- * Renders an ellipsis (⋯) trigger that opens a menu containing:
- * - An optional **Edit** link when `editHref` is provided
- * - An **Active in campaign** toggle (Switch + InfoTooltip) when legacy props are set
- *
- * The dropdown stays open when the switch is clicked so the user can see
- * the state change before dismissing. A future warning modal should be
- * wired in the `onToggleEnabled` handler — check whether the item is
- * in use before committing the change, then show a `<ConfirmDialog>` if so.
- */
-export function RowActionsMenu({
-  editHref,
-  EditLink: EditLinkComponent,
-  editLabel = 'Edit',
-  enabled,
-  onToggleEnabled,
-  enabledLabel = 'Enabled',
-  enabledTooltip = 'Hides this item from players in the current campaign. The item remains available globally.',
-  itemLabel = 'item',
-  footer,
-  triggerRef,
-}: RowActionsMenuProps) {
-  const editAction = (
+function rowActionItemClassName(destructive?: boolean): string {
+  return cn('text-xs [&_svg]:size-3', destructive && 'text-destructive focus:text-destructive')
+}
+
+function RowActionMenuItemContent({
+  icon,
+  label,
+  disabledReason,
+}: {
+  icon?: React.ReactNode
+  label: string
+  disabledReason?: string
+}) {
+  return (
     <>
-      <Pencil />
-      {editLabel}
+      {icon}
+      <span className="flex min-w-0 flex-1 items-center gap-1">
+        <span className="truncate">{label}</span>
+        {disabledReason ? (
+          <InfoTooltip aria-label={`Why ${label} is unavailable`}>{disabledReason}</InfoTooltip>
+        ) : null}
+      </span>
     </>
   )
+}
 
-  const showLegacyToggle =
-    footer === undefined && enabled !== undefined && onToggleEnabled !== undefined
+/**
+ * Pre-built row actions dropdown for the `rowActions` prop and card row menus.
+ *
+ * Renders an ellipsis trigger that opens a menu of link and callback actions.
+ * Feature code owns item availability, confirms, and mutations; this primitive
+ * owns trigger chrome, layout, separators, and disabled explanations.
+ */
+export function RowActionsMenu({
+  items,
+  LinkComponent,
+  footer,
+  triggerLabel,
+  triggerVariant = 'ghost-icon',
+  disabled = false,
+  contentClassName = 'w-48',
+  triggerRef,
+}: RowActionsMenuProps) {
+  const triggerClassName = triggerVariant === 'outline-icon' ? undefined : 'size-8 p-0'
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button
           ref={triggerRef}
-          variant="ghost"
+          variant={triggerVariant === 'outline-icon' ? 'outline' : 'ghost'}
           size="sm"
-          className="size-8 p-0"
-          aria-label={`Open actions for this ${itemLabel}`}
+          className={triggerClassName}
+          aria-label={triggerLabel}
+          disabled={disabled}
         >
           <Ellipsis className="size-4" aria-hidden />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-72">
-        {editHref ? (
-          <DropdownMenuItem asChild className="text-xs [&_svg]:size-3">
-            {EditLinkComponent ? (
-              <EditLinkComponent href={editHref}>{editAction}</EditLinkComponent>
-            ) : (
-              <a href={editHref}>{editAction}</a>
-            )}
-          </DropdownMenuItem>
-        ) : null}
+      <DropdownMenuContent align="end" className={contentClassName}>
+        {items.map((item) => {
+          const itemClassName = rowActionItemClassName(item.destructive)
+          const content = (
+            <RowActionMenuItemContent
+              icon={item.icon}
+              label={item.label}
+              disabledReason={item.disabled ? item.disabledReason : undefined}
+            />
+          )
+
+          return (
+            <React.Fragment key={item.id}>
+              {item.separatorBefore ? <DropdownMenuSeparator /> : null}
+              {item.kind === 'link' ? (
+                item.disabled ? (
+                  <DropdownMenuItem className={itemClassName} disabled>
+                    {content}
+                  </DropdownMenuItem>
+                ) : LinkComponent ? (
+                  <DropdownMenuItem asChild className={itemClassName}>
+                    <LinkComponent href={item.href}>{content}</LinkComponent>
+                  </DropdownMenuItem>
+                ) : (
+                  <DropdownMenuItem asChild className={itemClassName}>
+                    <a href={item.href}>{content}</a>
+                  </DropdownMenuItem>
+                )
+              ) : (
+                <DropdownMenuItem
+                  className={itemClassName}
+                  disabled={item.disabled}
+                  onSelect={() => item.onSelect()}
+                >
+                  {content}
+                </DropdownMenuItem>
+              )}
+            </React.Fragment>
+          )
+        })}
         {footer ? (
           <>
             <DropdownMenuSeparator />
             {footer}
-          </>
-        ) : null}
-        {showLegacyToggle ? (
-          <>
-            <DropdownMenuSeparator />
-            {/* onSelect preventDefault keeps the menu open after the switch is toggled */}
-            <DropdownMenuItem
-              onSelect={(e) => e.preventDefault()}
-              className="flex items-center justify-between gap-2 pr-1.5 text-xs [&_svg]:size-3"
-            >
-              <div className="flex items-center gap-1">
-                <span>{enabledLabel}</span>
-                <InfoTooltip aria-label={`About: ${enabledLabel}`}>{enabledTooltip}</InfoTooltip>
-              </div>
-              <Switch
-                checked={enabled}
-                onCheckedChange={onToggleEnabled}
-                aria-label={enabledLabel}
-                onClick={(e) => e.stopPropagation()}
-                className="h-4 w-7 [&>[data-state]]:size-3 [&>[data-state=checked]]:translate-x-3"
-              />
-            </DropdownMenuItem>
           </>
         ) : null}
       </DropdownMenuContent>

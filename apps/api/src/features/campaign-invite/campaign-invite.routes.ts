@@ -23,6 +23,18 @@ campaignInviteCampaignRouter.post(
   controller.send,
 )
 campaignInviteCampaignRouter.get('/', requireAuth, requireInviteManager, controller.list)
+campaignInviteCampaignRouter.post(
+  '/:inviteId/share-link',
+  requireAuth,
+  requireInviteManager,
+  controller.shareLink,
+)
+campaignInviteCampaignRouter.post(
+  '/:inviteId/revoke',
+  requireAuth,
+  requireInviteManager,
+  controller.revoke,
+)
 
 export const campaignInvitePublicRouter: Router = Router()
 

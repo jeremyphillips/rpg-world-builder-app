@@ -41,6 +41,7 @@ describe('campaign overview service', () => {
           displayName: 'Player',
           role: 'pc',
           onboardingState: 'onboarding_incomplete',
+          inviteAcceptedAt: expect.any(String),
         }),
       ]),
     )

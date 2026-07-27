@@ -41,7 +41,12 @@ export function CampaignDetail() {
       >
         <div className="space-y-8">
           <CampaignOverviewMembersSection members={overview.members} />
-          {canManage ? <CampaignOverviewInvitationsSection invites={overview.invites} /> : null}
+          {canManage && campaignId ? (
+            <CampaignOverviewInvitationsSection
+              campaignId={campaignId}
+              invites={overview.invites}
+            />
+          ) : null}
           {campaignId ? (
             <CampaignOverviewPartySection campaignId={campaignId} party={overview.party} />
           ) : null}

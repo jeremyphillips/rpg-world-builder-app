@@ -30,6 +30,8 @@ export function toCampaignInvite(doc: CampaignInviteRecord): CampaignInvite {
     ...(doc.lastDeliveryAttemptAt
       ? { lastDeliveryAttemptAt: doc.lastDeliveryAttemptAt.toISOString() }
       : {}),
+    ...(doc.revokedAt ? { revokedAt: doc.revokedAt.toISOString() } : {}),
+    ...(doc.revokedByUserId ? { revokedByUserId: doc.revokedByUserId } : {}),
     createdAt: doc.createdAt.toISOString(),
     updatedAt: doc.updatedAt.toISOString(),
   }

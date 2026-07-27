@@ -1,6 +1,8 @@
 import type { AdminUserCampaignCounts, AdminUserDeleteBlockReason } from '@rpg/contracts'
 import { USER_RECENT_ACTIVITY_DAYS } from '@rpg/contracts'
 
+import { formatRelativeRecency } from '@/lib/datetime/format-datetime'
+
 export const ADMIN_USERS_TABLE_KEY = 'admin-users'
 
 export const ADMIN_USERS_DEFAULT_SORT = '-createdAt' as const
@@ -61,14 +63,8 @@ export function formatAdminUserLastActive(value: string | null): {
   const valueDay = startOfDay(date)
   const dayDiff = Math.round((today.getTime() - valueDay.getTime()) / (24 * 60 * 60 * 1000))
 
-  if (dayDiff === 0) {
-    return { label: 'Today', absoluteLabel }
-  }
-  if (dayDiff === 1) {
-    return { label: 'Yesterday', absoluteLabel }
-  }
-  if (dayDiff > 1 && dayDiff <= USER_RECENT_ACTIVITY_DAYS) {
-    return { label: `${dayDiff} days ago`, absoluteLabel }
+  if (dayDiff >= 0 && dayDiff <= USER_RECENT_ACTIVITY_DAYS) {
+    return { label: formatRelativeRecency(value), absoluteLabel }
   }
 
   return { label: absoluteLabel, absoluteLabel }

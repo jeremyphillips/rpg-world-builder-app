@@ -17,6 +17,7 @@ import { listCharactersForUser } from '../character/character.service'
 import { findUserByEmail, findSessionUserById } from '../user/user.service'
 import { getRulesetPatchRead } from '../vocabulary'
 import { deliverCampaignInviteEmail } from './campaign-invite-delivery'
+import { buildCampaignInviteUrl } from '../../services/email/email.service'
 import {
   CAMPAIGN_INVITE_ROTATION_COOLDOWN_MS,
   computeInviteExpiresAt,
@@ -33,6 +34,7 @@ import {
   listPendingInvitesByCampaign,
   markInviteAccepted,
   markInviteExpired,
+  markInviteRevoked,
   rotateInviteToken,
 } from './campaign-invite.repository'
 import { generateInviteToken, hashInviteToken } from './campaign-invite-token'
@@ -84,6 +86,7 @@ function toAdminListItem(invite: CampaignInvite): CampaignInviteAdminListItem {
     status: invite.status,
     deliveryStatus: invite.deliveryStatus,
     expiresAt: invite.expiresAt,
+    ...(invite.sentAt ? { sentAt: invite.sentAt } : {}),
     ...(invite.acceptedAt ? { acceptedAt: invite.acceptedAt } : {}),
     ...(invite.completedAt ? { completedAt: invite.completedAt } : {}),
   }
@@ -263,6 +266,9 @@ function assertInviteAcceptable(currentInvite: CampaignInvite): void {
   if (currentInvite.status === 'completed') {
     throw new HttpError(409, 'conflict', 'This invitation has already been completed.')
   }
+  if (currentInvite.status === 'revoked') {
+    throw new HttpError(410, 'revoked', 'This invitation has been revoked.')
+  }
   if (currentInvite.status === 'expired') {
     throw new HttpError(410, 'expired', 'This invitation has expired.')
   }
@@ -328,6 +334,73 @@ export async function acceptCampaignInvite(
   return { inviteId: accepted.id, campaignId: accepted.campaignId }
 }
 
+function resolveCompletedOnboardingContext(
+  invite: CampaignInvite,
+  userId: string,
+): Extract<CampaignInviteOnboardingContext, { status: 'completed' }> {
+  if (invite.acceptedByUserId !== userId) {
+    throw new HttpError(403, 'forbidden', 'This invitation belongs to another user.')
+  }
+  if (!invite.completedCharacterId) {
+    throw new HttpError(500, 'integrity_error', 'Completed invite is missing character data.')
+  }
+  return {
+    status: 'completed',
+    campaignId: invite.campaignId,
+    characterId: invite.completedCharacterId,
+  }
+}
+
+async function buildAcceptedOnboardingContext(
+  invite: CampaignInvite,
+  userId: string,
+): Promise<Extract<CampaignInviteOnboardingContext, { status: 'accepted' }>> {
+  if (invite.status === 'revoked') {
+    throw new HttpError(410, 'revoked', 'This invitation has been revoked.')
+  }
+  if (invite.status !== 'accepted') {
+    throw new HttpError(409, 'conflict', 'Invitation is not ready for onboarding.')
+  }
+  if (isInvitePastExpiry(invite.expiresAt)) {
+    throw new HttpError(410, 'expired', 'This invitation has expired.')
+  }
+  if (invite.acceptedByUserId !== userId) {
+    throw new HttpError(403, 'forbidden', 'This invitation belongs to another user.')
+  }
+
+  const membership = await findCampaignMembershipByCampaignAndUser(invite.campaignId, userId)
+  if (!membership) {
+    throw new HttpError(
+      500,
+      'integrity_error',
+      'Accepted invitation is missing the expected campaign membership.',
+    )
+  }
+
+  const campaign = await findCampaignById(invite.campaignId)
+  if (!campaign) {
+    throw new HttpError(500, 'integrity_error', 'Campaign for this invitation no longer exists.')
+  }
+
+  const patch = await getRulesetPatchRead(invite.campaignId)
+  const startingLevel = patch?.characterCreation.startingLevel ?? 1
+
+  return {
+    status: 'accepted',
+    inviteId: invite.id,
+    campaign: {
+      id: campaign.id,
+      name: campaign.identity.name,
+    },
+    membership: {
+      id: String(membership._id),
+      role: 'pc',
+    },
+    startingLevel,
+    expiresAt: invite.expiresAt,
+  }
+}
+
 export async function getCampaignInviteOnboardingContext({
   inviteId,
   userId,
@@ -343,60 +416,10 @@ export async function getCampaignInviteOnboardingContext({
   const currentInvite = await expireInviteIfNeeded(invite)
 
   if (currentInvite.status === 'completed') {
-    if (currentInvite.acceptedByUserId !== userId) {
-      throw new HttpError(403, 'forbidden', 'This invitation belongs to another user.')
-    }
-    if (!currentInvite.completedCharacterId) {
-      throw new HttpError(500, 'integrity_error', 'Completed invite is missing character data.')
-    }
-    return {
-      status: 'completed',
-      campaignId: currentInvite.campaignId,
-      characterId: currentInvite.completedCharacterId,
-    }
+    return resolveCompletedOnboardingContext(currentInvite, userId)
   }
 
-  if (currentInvite.status !== 'accepted') {
-    throw new HttpError(409, 'conflict', 'Invitation is not ready for onboarding.')
-  }
-  if (isInvitePastExpiry(currentInvite.expiresAt)) {
-    throw new HttpError(410, 'expired', 'This invitation has expired.')
-  }
-  if (currentInvite.acceptedByUserId !== userId) {
-    throw new HttpError(403, 'forbidden', 'This invitation belongs to another user.')
-  }
-
-  const membership = await findCampaignMembershipByCampaignAndUser(currentInvite.campaignId, userId)
-  if (!membership) {
-    throw new HttpError(
-      500,
-      'integrity_error',
-      'Accepted invitation is missing the expected campaign membership.',
-    )
-  }
-
-  const campaign = await findCampaignById(currentInvite.campaignId)
-  if (!campaign) {
-    throw new HttpError(500, 'integrity_error', 'Campaign for this invitation no longer exists.')
-  }
-
-  const patch = await getRulesetPatchRead(currentInvite.campaignId)
-  const startingLevel = patch?.characterCreation.startingLevel ?? 1
-
-  return {
-    status: 'accepted',
-    inviteId: currentInvite.id,
-    campaign: {
-      id: campaign.id,
-      name: campaign.identity.name,
-    },
-    membership: {
-      id: String(membership._id),
-      role: 'pc',
-    },
-    startingLevel,
-    expiresAt: currentInvite.expiresAt,
-  }
+  return buildAcceptedOnboardingContext(currentInvite, userId)
 }
 
 export async function listCampaignInvitesForOverview(
@@ -404,6 +427,95 @@ export async function listCampaignInvitesForOverview(
 ): Promise<CampaignInviteAdminListItem[]> {
   const invites = await listPendingInvitesByCampaign(campaignId)
   return invites.map(toAdminListItem)
+}
+
+async function loadManagedInvite(campaignId: string, inviteId: string): Promise<CampaignInvite> {
+  const invite = await findInviteById(inviteId)
+  if (!invite || invite.campaignId !== campaignId) {
+    throw new HttpError(404, 'not_found', 'Invitation not found.')
+  }
+  return expireInviteIfNeeded(invite)
+}
+
+function assertInviteShareable(invite: CampaignInvite): void {
+  if (invite.status !== 'pending') {
+    throw new HttpError(409, 'conflict', 'Only pending invitations can share a new link.')
+  }
+}
+
+function assertInviteRevocable(invite: CampaignInvite): void {
+  if (invite.status === 'completed') {
+    throw new HttpError(409, 'conflict', 'Completed invitations cannot be revoked.')
+  }
+  if (invite.status === 'expired') {
+    throw new HttpError(409, 'conflict', 'Expired invitations cannot be revoked.')
+  }
+  if (invite.status === 'revoked') {
+    throw new HttpError(409, 'conflict', 'This invitation has already been revoked.')
+  }
+  if (invite.status !== 'pending' && invite.status !== 'accepted') {
+    throw new HttpError(409, 'conflict', 'Invitation cannot be revoked in its current state.')
+  }
+}
+
+function assertInviteRotationCooldown(invite: CampaignInvite): void {
+  const cooldownElapsed = Date.now() - new Date(invite.updatedAt).getTime()
+  if (cooldownElapsed < CAMPAIGN_INVITE_ROTATION_COOLDOWN_MS) {
+    throw new HttpError(429, 'cooldown', 'An invitation was sent recently. Try again in a minute.')
+  }
+}
+
+export type ShareCampaignInviteLinkInput = {
+  campaignId: string
+  inviteId: string
+  invitedByUserId: string
+  provider?: EmailProvider
+}
+
+export type ShareCampaignInviteLinkResult = {
+  inviteUrl: string
+}
+
+export async function shareCampaignInviteLink(
+  input: ShareCampaignInviteLinkInput,
+): Promise<ShareCampaignInviteLinkResult> {
+  const currentInvite = await loadManagedInvite(input.campaignId, input.inviteId)
+  assertInviteShareable(currentInvite)
+  assertInviteRotationCooldown(currentInvite)
+
+  const rawToken = generateInviteToken()
+  const tokenHash = hashInviteToken(rawToken)
+  const expiresAt = computeInviteExpiresAt()
+
+  const rotated = await rotateInviteToken(currentInvite.id, tokenHash, expiresAt)
+  if (!rotated) {
+    throw new HttpError(409, 'conflict', 'Only pending invitations can share a new link.')
+  }
+
+  await deliverInviteEmail(rotated, rawToken, input.invitedByUserId, input.provider)
+
+  return { inviteUrl: buildCampaignInviteUrl(rawToken) }
+}
+
+export type RevokeCampaignInviteInput = {
+  campaignId: string
+  inviteId: string
+  revokedByUserId: string
+}
+
+export async function revokeCampaignInvite(input: RevokeCampaignInviteInput): Promise<void> {
+  const currentInvite = await loadManagedInvite(input.campaignId, input.inviteId)
+  assertInviteRevocable(currentInvite)
+
+  const invalidatedTokenHash = hashInviteToken(generateInviteToken())
+  const revoked = await markInviteRevoked(
+    currentInvite.id,
+    input.revokedByUserId,
+    invalidatedTokenHash,
+  )
+  if (!revoked) {
+    throw new HttpError(409, 'conflict', 'Invitation cannot be revoked in its current state.')
+  }
 }
 
 async function loadAcceptedInviteForUser({
@@ -422,6 +534,10 @@ async function loadAcceptedInviteForUser({
 
   if (currentInvite.status === 'completed') {
     throw new HttpError(409, 'conflict', 'Invitation is already completed.')
+  }
+
+  if (currentInvite.status === 'revoked') {
+    throw new HttpError(410, 'revoked', 'This invitation has been revoked.')
   }
 
   if (currentInvite.status !== 'accepted') {

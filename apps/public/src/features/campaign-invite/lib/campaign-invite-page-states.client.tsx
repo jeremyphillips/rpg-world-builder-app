@@ -21,6 +21,20 @@ export function InviteHomeAction() {
   )
 }
 
+export function InviteRevokedState() {
+  return (
+    <InviteMessageCard
+      title="This invitation is no longer available"
+      body="The campaign owner revoked this invitation. Ask them to send a new one if you still need access."
+      action={
+        <Link href={ROUTES.home} className={buttonVariants()}>
+          Return home
+        </Link>
+      }
+    />
+  )
+}
+
 export function InviteExpiredState() {
   return (
     <InviteMessageCard

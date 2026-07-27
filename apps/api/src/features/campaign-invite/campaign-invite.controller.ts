@@ -13,7 +13,9 @@ import {
   listCampaignInvitesForOverview,
   listEligibleCharactersForInvite,
   resolveCampaignInviteByToken,
+  revokeCampaignInvite,
   sendCampaignInvite,
+  shareCampaignInviteLink,
 } from './campaign-invite.service'
 
 export async function send(req: Request, res: Response): Promise<void> {
@@ -87,4 +89,24 @@ export async function completeWithNewCharacter(req: Request, res: Response): Pro
     characterCreateInput,
   })
   res.status(200).json(result)
+}
+
+export async function shareLink(req: Request, res: Response): Promise<void> {
+  const { campaignId, inviteId } = req.params as { campaignId: string; inviteId: string }
+  const result = await shareCampaignInviteLink({
+    campaignId,
+    inviteId,
+    invitedByUserId: req.user!.id,
+  })
+  res.status(200).json(result)
+}
+
+export async function revoke(req: Request, res: Response): Promise<void> {
+  const { campaignId, inviteId } = req.params as { campaignId: string; inviteId: string }
+  await revokeCampaignInvite({
+    campaignId,
+    inviteId,
+    revokedByUserId: req.user!.id,
+  })
+  res.status(204).send()
 }

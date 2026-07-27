@@ -34,6 +34,8 @@ export const campaignInviteSchema = z.object({
   deliveryErrorCode: z.string().min(1).optional(),
   deliveryAttempts: z.number().int().min(0),
   lastDeliveryAttemptAt: z.iso.datetime().optional(),
+  revokedAt: z.iso.datetime().optional(),
+  revokedByUserId: z.string().min(1).optional(),
   createdAt: z.iso.datetime(),
   updatedAt: z.iso.datetime(),
 })

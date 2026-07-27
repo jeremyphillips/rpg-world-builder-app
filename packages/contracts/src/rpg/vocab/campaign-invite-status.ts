@@ -49,6 +49,14 @@ export const CAMPAIGN_INVITE_STATUS_ENTRIES = {
       plural: 'expired invites',
     },
   },
+  revoked: {
+    label: 'Revoked',
+    description: 'The invitation was cancelled by a campaign owner.',
+    sentence: {
+      singular: 'revoked invite',
+      plural: 'revoked invites',
+    },
+  },
 } as const satisfies Record<string, GameTermEntry>
 
 export const CAMPAIGN_INVITE_STATUSES = keysFromEntries(CAMPAIGN_INVITE_STATUS_ENTRIES)

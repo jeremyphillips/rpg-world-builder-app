@@ -21,6 +21,7 @@ export const campaignOverviewMemberListItemSchema = z.object({
   displayName: z.string().min(1),
   role: campaignRoleSchema,
   onboardingState: campaignOverviewMemberOnboardingStateSchema.optional(),
+  inviteAcceptedAt: z.iso.datetime().optional(),
 })
 
 export type CampaignOverviewMemberListItem = z.infer<typeof campaignOverviewMemberListItemSchema>

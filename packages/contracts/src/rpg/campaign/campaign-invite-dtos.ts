@@ -29,11 +29,18 @@ export const campaignInviteAdminListItemSchema = z.object({
   status: campaignInviteStatusSchema,
   deliveryStatus: campaignInviteDeliveryStatusSchema,
   expiresAt: z.iso.datetime(),
+  sentAt: z.iso.datetime().optional(),
   acceptedAt: z.iso.datetime().optional(),
   completedAt: z.iso.datetime().optional(),
 })
 
 export type CampaignInviteAdminListItem = z.infer<typeof campaignInviteAdminListItemSchema>
+
+export const campaignInviteShareLinkResultSchema = z.object({
+  inviteUrl: z.url(),
+})
+
+export type CampaignInviteShareLinkResult = z.infer<typeof campaignInviteShareLinkResultSchema>
 
 export const campaignInviteOnboardingAcceptedContextSchema = z.object({
   status: z.literal('accepted'),

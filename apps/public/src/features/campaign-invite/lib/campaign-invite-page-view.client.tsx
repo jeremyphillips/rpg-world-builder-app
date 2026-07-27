@@ -6,9 +6,33 @@ import {
   InviteEmailMismatchState,
   InviteExpiredState,
   InviteHomeAction,
+  InviteRevokedState,
   InviteUnauthenticatedState,
 } from './campaign-invite-page-states.client'
 import { InviteMessageCard } from '../components/invite-message-card.client'
+
+function renderInviteLoadingState(viewState: InviteViewState) {
+  const body =
+    viewState.kind === 'accepting' || viewState.kind === 'ready_to_accept'
+      ? 'Accepting your invitation…'
+      : 'Checking your invitation status…'
+
+  return <InviteMessageCard title="Loading invitation" body={body} />
+}
+
+function renderInviteUnavailableState(message: string) {
+  return (
+    <InviteMessageCard
+      title="Invitation unavailable"
+      body={message}
+      action={<InviteHomeAction />}
+    />
+  )
+}
+
+function renderInviteTerminalState(reason: 'expired' | 'revoked') {
+  return reason === 'revoked' ? <InviteRevokedState /> : <InviteExpiredState />
+}
 
 export function renderInviteViewState(
   viewState: InviteViewState,
@@ -25,40 +49,19 @@ export function renderInviteViewState(
     viewState.kind === 'accepting' ||
     viewState.kind === 'ready_to_accept'
   ) {
-    return (
-      <InviteMessageCard
-        title="Loading invitation"
-        body={
-          viewState.kind === 'accepting' || viewState.kind === 'ready_to_accept'
-            ? 'Accepting your invitation…'
-            : 'Checking your invitation status…'
-        }
-      />
-    )
+    return renderInviteLoadingState(viewState)
   }
 
   if (acceptError) {
-    return (
-      <InviteMessageCard
-        title="Invitation unavailable"
-        body={acceptError}
-        action={<InviteHomeAction />}
-      />
-    )
+    return renderInviteUnavailableState(acceptError)
   }
 
   if (viewState.kind === 'error') {
-    return (
-      <InviteMessageCard
-        title="Invitation unavailable"
-        body={viewState.message}
-        action={<InviteHomeAction />}
-      />
-    )
+    return renderInviteUnavailableState(viewState.message)
   }
 
   if (viewState.kind === 'terminal') {
-    return <InviteExpiredState />
+    return renderInviteTerminalState(viewState.reason)
   }
 
   if (viewState.kind === 'completed') {

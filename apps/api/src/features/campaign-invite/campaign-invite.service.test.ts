@@ -24,7 +24,9 @@ import {
   listCampaignInvitesForOverview,
   listEligibleCharactersForInvite,
   resolveCampaignInviteByToken,
+  revokeCampaignInvite,
   sendCampaignInvite,
+  shareCampaignInviteLink,
 } from './campaign-invite.service'
 import { generateInviteToken, hashInviteToken } from './campaign-invite-token'
 import { computeInviteExpiresAt } from './campaign-invite.lib'
@@ -358,7 +360,106 @@ describe('campaign invite service', () => {
     expect(invites[0]).toMatchObject({
       email: 'player@example.com',
       status: 'pending',
+      deliveryStatus: 'sent',
+      sentAt: expect.any(String),
     })
+  })
+
+  it('shares a new invite link for pending invites', async () => {
+    const provider = createFakeEmailProvider()
+    setEmailProviderForTests(provider)
+    const { id: campaignId, owner } = await makeTestCampaign()
+
+    const sent = await sendCampaignInvite({
+      campaignId,
+      email: 'player@example.com',
+      invitedByUserId: owner.id,
+      provider,
+    })
+
+    const firstToken = extractInviteTokenFromEmail(getFakeEmailSentMessages()[0]?.text ?? '')
+    vi.spyOn(Date, 'now').mockReturnValue(Date.now() + 61_000)
+    const result = await shareCampaignInviteLink({
+      campaignId,
+      inviteId: sent.invite.id,
+      invitedByUserId: owner.id,
+      provider,
+    })
+
+    const secondToken = extractInviteTokenFromEmail(getFakeEmailSentMessages()[1]?.text ?? '')
+    expect(result.inviteUrl).toContain(secondToken)
+    expect(secondToken).not.toBe(firstToken)
+
+    await expect(resolveCampaignInviteByToken(firstToken)).rejects.toMatchObject({
+      status: 404,
+    })
+    await expect(resolveCampaignInviteByToken(secondToken)).resolves.toMatchObject({
+      status: 'pending',
+    })
+  })
+
+  it('revokes pending invites and invalidates the token', async () => {
+    const provider = createFakeEmailProvider()
+    setEmailProviderForTests(provider)
+    const { id: campaignId, owner } = await makeTestCampaign()
+
+    const sent = await sendCampaignInvite({
+      campaignId,
+      email: 'player@example.com',
+      invitedByUserId: owner.id,
+      provider,
+    })
+    const rawToken = extractInviteTokenFromEmail(getFakeEmailSentMessages()[0]?.text ?? '')
+
+    await revokeCampaignInvite({
+      campaignId,
+      inviteId: sent.invite.id,
+      revokedByUserId: owner.id,
+    })
+
+    const invites = await listCampaignInvitesForOverview(campaignId)
+    expect(invites).toHaveLength(0)
+
+    const revokedInvite = await CampaignInviteModel.findById(sent.invite.id).lean()
+    expect(revokedInvite?.status).toBe('revoked')
+
+    await expect(resolveCampaignInviteByToken(rawToken)).rejects.toMatchObject({
+      status: 404,
+    })
+  })
+
+  it('rejects revoke for completed invites', async () => {
+    const { id: campaignId, owner } = await makeTestCampaign()
+    const player = await makeTestUser({ email: 'player@example.com' })
+    const rawToken = generateInviteToken()
+    const invite = await createInviteRecord({
+      campaignId,
+      email: 'player@example.com',
+      normalizedEmail: 'player@example.com',
+      tokenHash: hashInviteToken(rawToken),
+      expiresAt: computeInviteExpiresAt(),
+      invitedByUserId: owner.id,
+    })
+
+    await acceptCampaignInvite({
+      rawToken,
+      userId: player.id,
+      userEmail: player.email,
+    })
+
+    await CampaignInviteModel.findByIdAndUpdate(invite.id, {
+      status: 'completed',
+      completedCharacterId: 'char-1',
+      completedAt: new Date(),
+    })
+
+    await expect(
+      revokeCampaignInvite({
+        campaignId,
+        inviteId: invite.id,
+        revokedByUserId: owner.id,
+      }),
+    ).rejects.toMatchObject({ status: 409 })
   })
 
   it('lists eligible characters and completes onboarding with an existing PC', async () => {

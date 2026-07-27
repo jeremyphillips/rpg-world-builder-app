@@ -12,17 +12,19 @@ export default meta
 type Story = StoryObj<typeof CampaignOverviewInvitationsSection>
 
 export const Empty: Story = {
-  args: { invites: [] },
+  args: { campaignId: 'camp_1', invites: [] },
 }
 
 export const PendingInvite: Story = {
   args: {
+    campaignId: 'camp_1',
     invites: [
       {
         id: 'invite_1',
         email: 'player@example.com',
         status: 'pending',
         deliveryStatus: 'sent',
+        sentAt: '2026-07-25T12:00:00.000Z',
         expiresAt: '2026-08-02T00:00:00.000Z',
       },
     ],
@@ -31,6 +33,7 @@ export const PendingInvite: Story = {
 
 export const FailedDelivery: Story = {
   args: {
+    campaignId: 'camp_1',
     invites: [
       {
         id: 'invite_2',

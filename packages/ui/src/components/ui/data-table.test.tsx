@@ -555,119 +555,110 @@ describe('DataTable — column panel', () => {
 
 describe('RowActionsMenu', () => {
   it('renders an ellipsis trigger button', () => {
-    render(<RowActionsMenu editHref="/edit/1" enabled={true} onToggleEnabled={vi.fn()} />)
-    expect(screen.getByRole('button', { name: /open actions/i })).toBeInTheDocument()
-  })
-
-  it('omits Edit menu item when editHref is not provided', async () => {
-    const user = userEvent.setup()
-    render(<RowActionsMenu enabled={true} onToggleEnabled={vi.fn()} />)
-
-    await user.click(screen.getByRole('button', { name: /open actions/i }))
-
-    expect(screen.queryByRole('menuitem', { name: /edit/i })).not.toBeInTheDocument()
-    expect(screen.getByRole('switch', { name: /enabled/i })).toBeInTheDocument()
-  })
-
-  it('shows Edit menu item and active toggle switch when opened', async () => {
-    const user = userEvent.setup()
-    render(<RowActionsMenu editHref="/edit/1" enabled={true} onToggleEnabled={vi.fn()} />)
-
-    await user.click(screen.getByRole('button', { name: /open actions/i }))
-
-    // DropdownMenuItem with asChild renders the anchor as role="menuitem"
-    const editItem = screen.getByRole('menuitem', { name: /edit/i })
-    expect(editItem).toBeInTheDocument()
-    expect(editItem).toHaveAttribute('href', '/edit/1')
-    expect(screen.getByRole('switch', { name: /enabled/i })).toBeInTheDocument()
-  })
-
-  it('reflects the enabled prop on the switch', async () => {
-    const user = userEvent.setup()
-    render(<RowActionsMenu editHref="/edit/1" enabled={false} onToggleEnabled={vi.fn()} />)
-
-    await user.click(screen.getByRole('button', { name: /open actions/i }))
-
-    expect(screen.getByRole('switch', { name: /enabled/i })).toHaveAttribute(
-      'data-state',
-      'unchecked',
-    )
-  })
-
-  it('calls onToggleEnabled with the new value when the switch is clicked', async () => {
-    const user = userEvent.setup()
-    const onToggle = vi.fn()
-    render(<RowActionsMenu editHref="/edit/1" enabled={true} onToggleEnabled={onToggle} />)
-
-    await user.click(screen.getByRole('button', { name: /open actions/i }))
-    await user.click(screen.getByRole('switch', { name: /enabled/i }))
-
-    expect(onToggle).toHaveBeenCalledWith(false)
-  })
-
-  it('renders a custom enabledLabel', async () => {
-    const user = userEvent.setup()
     render(
       <RowActionsMenu
-        editHref="/edit/1"
-        enabled={true}
-        onToggleEnabled={vi.fn()}
-        enabledLabel="Active in world"
+        triggerLabel="Open actions for Fire Bolt"
+        items={[{ kind: 'action', id: 'edit', label: 'Edit', onSelect: vi.fn() }]}
+      />,
+    )
+    expect(screen.getByRole('button', { name: 'Open actions for Fire Bolt' })).toBeInTheDocument()
+  })
+
+  it('renders link and action items', async () => {
+    const user = userEvent.setup()
+    const onDelete = vi.fn()
+
+    render(
+      <RowActionsMenu
+        triggerLabel="Open actions"
+        items={[
+          { kind: 'link', id: 'edit', label: 'Edit', href: '/edit/1' },
+          {
+            kind: 'action',
+            id: 'delete',
+            label: 'Delete',
+            destructive: true,
+            separatorBefore: true,
+            onSelect: onDelete,
+          },
+        ]}
       />,
     )
 
-    await user.click(screen.getByRole('button', { name: /open actions/i }))
+    await user.click(screen.getByRole('button', { name: 'Open actions' }))
 
-    expect(screen.getByRole('switch', { name: 'Active in world' })).toBeInTheDocument()
+    expect(screen.getByRole('menuitem', { name: 'Edit' })).toHaveAttribute('href', '/edit/1')
+    await user.click(screen.getByRole('menuitem', { name: 'Delete' }))
+    expect(onDelete).toHaveBeenCalledTimes(1)
   })
 
-  it('keeps the menu open after the switch is toggled', async () => {
+  it('renders disabled action explanations with an info tooltip trigger', async () => {
     const user = userEvent.setup()
-    render(<RowActionsMenu editHref="/edit/1" enabled={true} onToggleEnabled={vi.fn()} />)
 
-    await user.click(screen.getByRole('button', { name: /open actions/i }))
-    await user.click(screen.getByRole('switch', { name: /enabled/i }))
-
-    expect(screen.getByRole('switch', { name: /enabled/i })).toBeInTheDocument()
-  })
-
-  it('renders a custom EditLink component when provided', async () => {
-    const user = userEvent.setup()
     render(
       <RowActionsMenu
-        editHref="/campaigns/c1/spells/fire-bolt/edit"
-        enabled={true}
-        onToggleEnabled={vi.fn()}
-        EditLink={({ href, children }) => (
+        triggerLabel="Open actions"
+        items={[
+          {
+            kind: 'action',
+            id: 'delete',
+            label: 'Delete',
+            disabled: true,
+            disabledReason: 'Only owners can delete',
+            onSelect: vi.fn(),
+          },
+        ]}
+      />,
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Open actions' }))
+
+    expect(screen.getByRole('menuitem', { name: /delete/i })).toHaveAttribute('data-disabled')
+    expect(screen.getByRole('button', { name: 'Why Delete is unavailable' })).toBeInTheDocument()
+  })
+
+  it('disables the trigger while pending', () => {
+    render(
+      <RowActionsMenu
+        triggerLabel="Open actions"
+        disabled
+        items={[{ kind: 'action', id: 'edit', label: 'Edit', onSelect: vi.fn() }]}
+      />,
+    )
+
+    expect(screen.getByRole('button', { name: 'Open actions' })).toBeDisabled()
+  })
+
+  it('renders a custom LinkComponent for link items', async () => {
+    const user = userEvent.setup()
+
+    render(
+      <RowActionsMenu
+        triggerLabel="Open actions"
+        LinkComponent={({ href, children }) => (
           <a href={href} data-testid="router-edit-link">
             {children}
           </a>
         )}
+        items={[{ kind: 'link', id: 'edit', label: 'Edit', href: '/edit/1' }]}
       />,
     )
 
-    await user.click(screen.getByRole('button', { name: /open actions/i }))
+    await user.click(screen.getByRole('button', { name: 'Open actions' }))
 
-    const editLink = screen.getByTestId('router-edit-link')
-    expect(editLink).toHaveAttribute('href', '/campaigns/c1/spells/fire-bolt/edit')
-    expect(editLink).toHaveTextContent('Edit')
+    expect(screen.getByTestId('router-edit-link')).toHaveAttribute('href', '/edit/1')
   })
 
-  it('renders a footer section instead of the legacy toggle', async () => {
+  it('renders an optional footer section', async () => {
     const user = userEvent.setup()
+
     render(
-      <RowActionsMenu
-        editHref="/edit/1"
-        editLabel="Edit details"
-        footer={<div>Campaign footer</div>}
-      />,
+      <RowActionsMenu triggerLabel="Open actions" items={[]} footer={<div>Campaign footer</div>} />,
     )
 
-    await user.click(screen.getByRole('button', { name: /open actions/i }))
+    await user.click(screen.getByRole('button', { name: 'Open actions' }))
 
-    expect(screen.getByText('Edit details')).toBeInTheDocument()
     expect(screen.getByText('Campaign footer')).toBeInTheDocument()
-    expect(screen.queryByRole('switch')).not.toBeInTheDocument()
   })
 })
 
