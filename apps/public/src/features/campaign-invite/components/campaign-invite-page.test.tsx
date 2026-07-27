@@ -105,9 +105,7 @@ describe('CampaignInvitePage', () => {
       expect(acceptCampaignInvite).toHaveBeenCalledWith('invite-token')
     })
     await waitFor(() => {
-      expect(window.location.assign).toHaveBeenCalledWith(
-        '/app/campaigns/camp_1/onboarding?inviteId=invite_1',
-      )
+      expect(window.location.assign).toHaveBeenCalledWith('/app/campaigns/camp_1/onboarding')
     })
   })
 

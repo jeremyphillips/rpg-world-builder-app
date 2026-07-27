@@ -11,7 +11,7 @@ import {
   formatBlockingReason,
   formatComboboxBlockingDescription,
 } from '../lib/campaign-invite-eligibility-display'
-import { WARNING_CATEGORY_LABELS } from '../lib/campaign-invite-onboarding.lib'
+import { WARNING_CATEGORY_LABELS } from '../lib/campaign-onboarding.lib'
 
 export type CampaignInviteEligibilityAlertProps = {
   blockingIssues: readonly CharacterCampaignBlockingIssue[]

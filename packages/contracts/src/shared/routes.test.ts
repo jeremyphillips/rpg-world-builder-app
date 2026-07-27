@@ -24,8 +24,6 @@ describe('CROSS_APP_PATHS', () => {
 
   it('builds campaign detail paths under the dashboard SPA', () => {
     expect(crossAppCampaignDetailPath('c_abc')).toBe('/app/campaigns/c_abc')
-    expect(crossAppCampaignOnboardingPath('c_abc', 'invite_1')).toBe(
-      '/app/campaigns/c_abc/onboarding?inviteId=invite_1',
-    )
+    expect(crossAppCampaignOnboardingPath('c_abc')).toBe('/app/campaigns/c_abc/onboarding')
   })
 })

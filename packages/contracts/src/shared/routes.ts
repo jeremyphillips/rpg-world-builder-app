@@ -18,10 +18,9 @@ export function crossAppCampaignDetailPath(campaignId: string): string {
   return `/app/campaigns/${campaignId}`
 }
 
-/** Dashboard SPA campaign invite onboarding — invite id only, never the raw token. */
-export function crossAppCampaignOnboardingPath(campaignId: string, inviteId: string): string {
-  const params = new URLSearchParams({ inviteId })
-  return `/app/campaigns/${campaignId}/onboarding?${params.toString()}`
+/** Dashboard SPA campaign onboarding — membership-scoped; no invite id in the URL. */
+export function crossAppCampaignOnboardingPath(campaignId: string): string {
+  return `/app/campaigns/${campaignId}/onboarding`
 }
 
 /** Dashboard SPA campaign-scoped PC detail. */

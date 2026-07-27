@@ -66,7 +66,7 @@ export function CampaignInvitePage({ token }: CampaignInvitePageProps) {
 
     void acceptCampaignInvite(token)
       .then((result) => {
-        window.location.assign(crossAppCampaignOnboardingPath(result.campaignId, result.inviteId))
+        window.location.assign(crossAppCampaignOnboardingPath(result.campaignId))
       })
       .catch((error: unknown) => {
         setIsAccepting(false)
