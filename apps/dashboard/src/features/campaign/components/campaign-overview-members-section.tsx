@@ -8,9 +8,12 @@ import {
   formatCampaignRoleLabel,
   formatMemberInviteAcceptedLine,
 } from '../lib/campaign-overview-labels'
+import { CampaignOverviewMemberRowActions } from './campaign-overview-member-row-actions.client'
 
 export type CampaignOverviewMembersSectionProps = {
   members: CampaignOverviewMemberListItem[]
+  campaignId?: string
+  canManage?: boolean
 }
 
 function memberOnboardingBadge(onboardingState: CampaignOverviewMemberListItem['onboardingState']) {
@@ -25,7 +28,11 @@ function memberOnboardingBadge(onboardingState: CampaignOverviewMemberListItem['
 }
 
 /** Campaign overview members list with derived onboarding state for players. */
-export function CampaignOverviewMembersSection({ members }: CampaignOverviewMembersSectionProps) {
+export function CampaignOverviewMembersSection({
+  members,
+  campaignId,
+  canManage = false,
+}: CampaignOverviewMembersSectionProps) {
   const hasPlayers = members.some((member) => member.role === 'pc')
 
   return (
@@ -52,7 +59,12 @@ export function CampaignOverviewMembersSection({ members }: CampaignOverviewMemb
                     : ''}
                 </Text>
               </div>
-              {memberOnboardingBadge(member.onboardingState)}
+              <div className="flex flex-wrap items-center gap-2">
+                {memberOnboardingBadge(member.onboardingState)}
+                {canManage && campaignId ? (
+                  <CampaignOverviewMemberRowActions campaignId={campaignId} member={member} />
+                ) : null}
+              </div>
             </li>
           ))}
         </ul>

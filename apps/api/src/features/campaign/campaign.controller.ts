@@ -14,6 +14,7 @@ import {
   listCampaignMembersForOverview,
   listCampaignPartyForOverview,
 } from './campaign-overview.service'
+import { removeIncompleteCampaignMember } from './remove-incomplete-campaign-member.service'
 
 export async function create(req: Request, res: Response): Promise<void> {
   // `req.body` is validated by `validate(createCampaignInputSchema)`; `req.user`
@@ -64,8 +65,25 @@ export async function selectCampaign(req: Request, res: Response): Promise<void>
 
 export async function listMembers(req: Request, res: Response): Promise<void> {
   const { campaignId } = req.params as { campaignId: string }
-  const members = await listCampaignMembersForOverview(campaignId)
+  const members = await listCampaignMembersForOverview(campaignId, {
+    excludeUserId: req.user!.id,
+  })
   res.status(200).json({ members })
+}
+
+export async function removeMember(req: Request, res: Response): Promise<void> {
+  const { campaignId, membershipId } = req.params as {
+    campaignId: string
+    membershipId: string
+  }
+
+  await removeIncompleteCampaignMember({
+    campaignId,
+    membershipId,
+    removedByUserId: req.user!.id,
+  })
+
+  res.status(204).send()
 }
 
 export async function listParty(req: Request, res: Response): Promise<void> {

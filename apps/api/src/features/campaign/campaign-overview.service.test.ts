@@ -86,6 +86,35 @@ describe('campaign overview service', () => {
     })
   })
 
+  it('excludes the requesting viewer from the members list', async () => {
+    const { id: campaignId, owner } = await makeTestCampaign({
+      name: 'Viewer Filter Campaign',
+      owner: await makeTestUser({ email: 'viewer-owner@example.com', displayName: 'Owner' }),
+    })
+    const player = await makeTestUser({
+      email: 'viewer-player@example.com',
+      displayName: 'Player',
+    })
+
+    await createOrConfirmPlayerMembership({
+      campaignId,
+      userId: player.id,
+      joinedAt: new Date(),
+    })
+
+    const membersForPlayer = await listCampaignMembersForOverview(campaignId, {
+      excludeUserId: player.id,
+    })
+
+    expect(membersForPlayer).toEqual([
+      expect.objectContaining({
+        displayName: owner.displayName,
+        role: 'owner',
+      }),
+    ])
+    expect(membersForPlayer.some((member) => member.displayName === 'Player')).toBe(false)
+  })
+
   it('lists party PCs with controlling member metadata', async () => {
     const { id: campaignId } = await makeTestCampaign({
       name: 'Party Campaign',

@@ -14,6 +14,7 @@ const LIST_INVITES_ERROR = 'Could not load campaign invitations.'
 const SEND_INVITE_ERROR = 'Could not send invitation.'
 const SHARE_INVITE_LINK_ERROR = 'Could not share invite link.'
 const REVOKE_INVITE_ERROR = 'Could not revoke invitation.'
+const REMOVE_MEMBER_ERROR = 'Could not remove this member.'
 
 export async function listCampaignMembers(
   campaignId: string,
@@ -77,5 +78,16 @@ export async function revokeCampaignInvite(campaignId: string, inviteId: string)
     `/api/campaigns/${campaignId}/invites/${inviteId}/revoke`,
     {},
     REVOKE_INVITE_ERROR,
+  )
+}
+
+export async function removeIncompleteCampaignMember(
+  campaignId: string,
+  membershipId: string,
+): Promise<void> {
+  await request<void>(
+    `/api/campaigns/${encodeURIComponent(campaignId)}/members/${encodeURIComponent(membershipId)}`,
+    { method: 'DELETE' },
+    REMOVE_MEMBER_ERROR,
   )
 }

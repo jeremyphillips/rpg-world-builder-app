@@ -23,19 +23,6 @@ export function CampaignInviteRowActions({ campaignId, invite }: CampaignInviteR
   const revokeMutation = useRevokeCampaignInvite(campaignId)
   const isPending = shareMutation.isPending || revokeMutation.isPending
 
-  const revokeCopy =
-    invite.status === 'accepted'
-      ? {
-          headline: CAMPAIGN_INVITE_ROW_ACTION_COPY.revokeAcceptedConfirmHeadline,
-          description: CAMPAIGN_INVITE_ROW_ACTION_COPY.revokeAcceptedConfirmDescription,
-          label: CAMPAIGN_INVITE_ROW_ACTION_COPY.revokeAccepted,
-        }
-      : {
-          headline: CAMPAIGN_INVITE_ROW_ACTION_COPY.revokePendingConfirmHeadline,
-          description: CAMPAIGN_INVITE_ROW_ACTION_COPY.revokePendingConfirmDescription,
-          label: CAMPAIGN_INVITE_ROW_ACTION_COPY.revokePending,
-        }
-
   async function handleShareConfirm() {
     try {
       const result = await shareMutation.mutateAsync(invite.id)
@@ -71,7 +58,7 @@ export function CampaignInviteRowActions({ campaignId, invite }: CampaignInviteR
           {
             kind: 'action',
             id: 'revoke',
-            label: revokeCopy.label,
+            label: CAMPAIGN_INVITE_ROW_ACTION_COPY.revokePending,
             icon: <Trash2 />,
             destructive: true,
             separatorBefore: true,
@@ -94,8 +81,8 @@ export function CampaignInviteRowActions({ campaignId, invite }: CampaignInviteR
       <ConfirmDialog
         open={revokeOpen}
         onOpenChange={setRevokeOpen}
-        headline={revokeCopy.headline}
-        description={revokeCopy.description}
+        headline={CAMPAIGN_INVITE_ROW_ACTION_COPY.revokePendingConfirmHeadline}
+        description={CAMPAIGN_INVITE_ROW_ACTION_COPY.revokePendingConfirmDescription}
         confirmLabel={CAMPAIGN_INVITE_ROW_ACTION_COPY.revokeConfirmLabel}
         confirmVariant="destructive"
         onConfirm={() => {

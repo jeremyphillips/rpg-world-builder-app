@@ -38,6 +38,12 @@ campaignRouter.get(
   requireCampaignRole(...CAMPAIGN_ROLES),
   controller.listMembers,
 )
+campaignRouter.delete(
+  '/:campaignId/members/:membershipId',
+  requireAuth,
+  requireCampaignRole('owner', 'co-owner'),
+  controller.removeMember,
+)
 campaignRouter.get(
   '/:campaignId/party',
   requireAuth,

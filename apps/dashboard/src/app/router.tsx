@@ -20,6 +20,7 @@ import {
   CampaignCreateRoute,
   CampaignCharacterDetailRoute,
   CampaignDetailRoute,
+  CampaignLayoutRoute,
   CampaignOnboardingRoute,
   CampaignSessionsRoute,
   CampaignSettingsRoute,
@@ -166,7 +167,7 @@ const router = createBrowserRouter(
                * Layout wrapper: provides the campaign-level breadcrumb crumb and
                * renders children via <Outlet />. The index child is CampaignDetail.
                */
-              element: <Outlet />,
+              element: <CampaignLayoutRoute />,
               handle: {
                 crumb: (params, { campaignName }) => ({
                   label: campaignName ?? 'Campaign',

@@ -63,6 +63,7 @@ function resolveMemberOpenParticipatingCharacterIds({
 
 export async function listCampaignMembersForOverview(
   campaignId: string,
+  options?: { excludeUserId?: string },
 ): Promise<CampaignOverviewMemberListItem[]> {
   const memberships = await CampaignMembershipModel.find({ campaignId })
     .select('userId campaignRole controlledCharacterIds joinedAt')
@@ -70,8 +71,14 @@ export async function listCampaignMembersForOverview(
 
   if (memberships.length === 0) return []
 
+  const visibleMemberships = options?.excludeUserId
+    ? memberships.filter((membership) => membership.userId !== options.excludeUserId)
+    : memberships
+
+  if (visibleMemberships.length === 0) return []
+
   const [users, openParticipations] = await Promise.all([
-    findUsersByIds(memberships.map((membership) => membership.userId)),
+    findUsersByIds(visibleMemberships.map((membership) => membership.userId)),
     listOpenParticipationsForCampaign(campaignId),
   ])
   const displayNameByUserId = new Map(users.map((user) => [user.id, user.displayName]))
@@ -86,7 +93,7 @@ export async function listCampaignMembersForOverview(
   ]
   const characterOwnerById = await findPcOwnerIdsByCharacterIds(relevantCharacterIds)
 
-  return memberships
+  return visibleMemberships
     .map((membership) => {
       const role = membership.campaignRole as CampaignRole
       const controlledCharacterIds = membership.controlledCharacterIds ?? []

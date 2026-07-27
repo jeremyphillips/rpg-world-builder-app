@@ -38,18 +38,19 @@ Rules:
 - `CAMPAIGN_INVITE_EXPIRY_DAYS = 7` — computed at create/rotate; **not** extended
   on acceptance. An accepted invite past `expiresAt` transitions to `expired` on
   next read and blocks further completion.
-- Membership survives invite expiration and revocation. An expired- or
-  revoked-while-accepted member keeps `pc` role and empty `controlledCharacterIds`.
-  The owner can send a **new pending invite** to the same email (incomplete-member
-  recovery).
+- Membership survives invite expiration. An expired accepted invite allows a new
+  pending invite for incomplete-member recovery. Managers can also remove an
+  accepted incomplete PC via `DELETE …/members/:membershipId`, which deletes
+  membership and revokes linked accepted invites so the email can be invited again.
 - Token rotation is restricted to `pending` invites. Rotating invalidates the
   previous token immediately (lookup is by current `tokenHash` only).
 - **Share new invite link** (`POST …/invites/:inviteId/share-link`) rotates the
   token for a pending invite, resends email, and returns `{ inviteUrl }` for
   clipboard copy. Subject to the same 60-second cooldown as resend.
-- **Revoke** (`POST …/invites/:inviteId/revoke`) is allowed for `pending` and
-  `accepted` invites. Membership is retained for accepted revokes; onboarding is
-  blocked. Completed, expired, and revoked invites cannot be revoked again.
+- **Revoke** (`POST …/invites/:inviteId/revoke`) is allowed for `pending` invites only.
+  Accepted invites cannot be revoked; managers remove incomplete members instead
+  (`DELETE …/members/:membershipId`). Completed, expired, and revoked invites
+  cannot be revoked again.
 - Sending while an active `accepted` invite exists returns `invite_already_accepted`.
 - `already_member` applies only when `controlledCharacterIds.length > 0`.
 

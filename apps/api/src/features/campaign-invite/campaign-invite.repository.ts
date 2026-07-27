@@ -232,7 +232,7 @@ export async function markInviteRevoked(
 ): Promise<CampaignInvite | null> {
   if (!isValidObjectId(inviteId)) return null
   const doc = await CampaignInviteModel.findOneAndUpdate(
-    { _id: inviteId, status: { $in: ['pending', 'accepted'] } },
+    { _id: inviteId, status: 'pending' },
     {
       $set: {
         status: 'revoked',
@@ -245,4 +245,29 @@ export async function markInviteRevoked(
   ).lean<CampaignInviteRecord | null>()
   if (!doc) return null
   return toCampaignInvite(doc)
+}
+
+export async function revokeAcceptedInvitesForMemberRemoval(
+  campaignId: string,
+  acceptedByUserId: string,
+  revokedByUserId: string,
+  invalidatedTokenHash: string,
+): Promise<number> {
+  const result = await CampaignInviteModel.updateMany(
+    {
+      campaignId,
+      acceptedByUserId,
+      status: 'accepted',
+    },
+    {
+      $set: {
+        status: 'revoked',
+        revokedAt: new Date(),
+        revokedByUserId,
+        tokenHash: invalidatedTokenHash,
+      },
+    },
+  )
+
+  return result.modifiedCount
 }

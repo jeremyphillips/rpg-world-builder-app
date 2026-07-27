@@ -40,7 +40,11 @@ export function CampaignDetail() {
         defaultErrorLabel="Could not load campaign overview."
       >
         <div className="space-y-8">
-          <CampaignOverviewMembersSection members={overview.members} />
+          <CampaignOverviewMembersSection
+            members={overview.members}
+            campaignId={campaignId}
+            canManage={canManage}
+          />
           {canManage && campaignId ? (
             <CampaignOverviewInvitationsSection
               campaignId={campaignId}

@@ -54,7 +54,6 @@ export const INVITE_DELIVERY_STATUS_COPY = {
 export const CAMPAIGN_INVITE_ROW_ACTION_COPY = {
   shareLink: 'Share new invite link',
   revokePending: 'Revoke invitation',
-  revokeAccepted: 'Revoke onboarding access',
   shareConfirmHeadline: 'Share new invite link?',
   shareConfirmDescription:
     'This generates a fresh invite link, sends a new email, and invalidates the previous link.',
@@ -62,10 +61,15 @@ export const CAMPAIGN_INVITE_ROW_ACTION_COPY = {
   revokePendingConfirmHeadline: 'Revoke invitation?',
   revokePendingConfirmDescription:
     'The invite link stops working immediately. You can send a new invitation later.',
-  revokeAcceptedConfirmHeadline: 'Revoke onboarding access?',
-  revokeAcceptedConfirmDescription:
-    'The player keeps campaign membership, but they can no longer finish onboarding with this invite.',
   revokeConfirmLabel: 'Revoke',
+} as const
+
+export const CAMPAIGN_MEMBER_ROW_ACTION_COPY = {
+  removeIncomplete: 'Remove member',
+  removeIncompleteConfirmHeadline: 'Remove member?',
+  removeIncompleteConfirmDescription:
+    'This removes their campaign membership and clears their accepted invitation so you can invite them again.',
+  removeIncompleteConfirmLabel: 'Remove member',
 } as const
 
 export function formatCampaignRoleLabel(role: CampaignRole): string {

@@ -435,6 +435,35 @@ describe('campaign invite service', () => {
     })
   })
 
+  it('rejects revoke for accepted invites', async () => {
+    const { id: campaignId, owner } = await makeTestCampaign()
+    const player = await makeTestUser({ email: 'accepted-revoke@example.com' })
+    const rawToken = generateInviteToken()
+
+    const invite = await createInviteRecord({
+      campaignId,
+      email: 'accepted-revoke@example.com',
+      normalizedEmail: 'accepted-revoke@example.com',
+      tokenHash: hashInviteToken(rawToken),
+      expiresAt: computeInviteExpiresAt(),
+      invitedByUserId: owner.id,
+    })
+
+    await acceptCampaignInvite({
+      rawToken,
+      userId: player.id,
+      userEmail: player.email,
+    })
+
+    await expect(
+      revokeCampaignInvite({
+        campaignId,
+        inviteId: invite.id,
+        revokedByUserId: owner.id,
+      }),
+    ).rejects.toMatchObject({ status: 409 })
+  })
+
   it('rejects revoke for completed invites', async () => {
     const { id: campaignId, owner } = await makeTestCampaign()
     const player = await makeTestUser({ email: 'player@example.com' })
@@ -1047,9 +1076,9 @@ describe('campaign invite service', () => {
         userEmail: player.email,
       })
 
-      await revokeCampaignInvite({
-        campaignId,
-        inviteId: invite.id,
+      await CampaignInviteModel.findByIdAndUpdate(invite.id, {
+        status: 'revoked',
+        revokedAt: new Date(),
         revokedByUserId: owner.id,
       })
 

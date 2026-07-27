@@ -438,7 +438,14 @@ function assertInviteRevocable(invite: CampaignInvite): void {
   if (invite.status === 'revoked') {
     throw new HttpError(409, 'conflict', 'This invitation has already been revoked.')
   }
-  if (invite.status !== 'pending' && invite.status !== 'accepted') {
+  if (invite.status === 'accepted') {
+    throw new HttpError(
+      409,
+      'conflict',
+      'Accepted invitations cannot be revoked. Remove the member instead.',
+    )
+  }
+  if (invite.status !== 'pending') {
     throw new HttpError(409, 'conflict', 'Invitation cannot be revoked in its current state.')
   }
 }
