@@ -1,11 +1,11 @@
-import type { CampaignContentEligibilityEntry } from '@rpg/contracts'
+import type { CampaignContentEligibilityIndex } from '@rpg/contracts'
 
 import { getRulesetPatchRead } from '../vocabulary'
-import { buildCampaignContentEligibilityMap } from './campaign-invite-eligibility.lib'
+import { buildCampaignContentEligibilityIndex } from './campaign-invite-eligibility.lib'
 
 export type CampaignInviteEligibilityContext = {
   startingLevel: number
-  campaignContentById: Map<string, CampaignContentEligibilityEntry>
+  contentIndex: CampaignContentEligibilityIndex
 }
 
 async function loadInviteStartingLevel(campaignId: string): Promise<number> {
@@ -16,10 +16,10 @@ async function loadInviteStartingLevel(campaignId: string): Promise<number> {
 export async function resolveCampaignInviteEligibilityContext(
   campaignId: string,
 ): Promise<CampaignInviteEligibilityContext> {
-  const [campaignContentById, startingLevel] = await Promise.all([
-    buildCampaignContentEligibilityMap(campaignId),
+  const [contentIndex, startingLevel] = await Promise.all([
+    buildCampaignContentEligibilityIndex(campaignId),
     loadInviteStartingLevel(campaignId),
   ])
 
-  return { startingLevel, campaignContentById }
+  return { startingLevel, contentIndex }
 }

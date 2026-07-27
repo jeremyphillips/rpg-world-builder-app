@@ -1,5 +1,7 @@
 import { z } from 'zod'
 
+import { characterCampaignContentReferenceTypeSchema } from './character-campaign-content-reference-types'
+
 // ---------------------------------------------------------------------------
 // Character campaign eligibility — discriminated issue and warning contracts.
 // Contracts own codes and payloads; the dashboard owns display copy.
@@ -29,6 +31,11 @@ export const characterCampaignBlockingIssueSchema = z.discriminatedUnion('code',
     code: z.literal('subclass_unavailable'),
     contentId: z.string().min(1),
     label: z.string().min(1),
+  }),
+  z.object({
+    code: z.literal('content_missing'),
+    contentType: characterCampaignContentReferenceTypeSchema,
+    contentId: z.string().min(1),
   }),
   z.object({
     code: z.literal('not_owned_pc'),
@@ -80,6 +87,7 @@ export const CHARACTER_CAMPAIGN_BLOCKING_ISSUE_PRIORITY: readonly CharacterCampa
     'species_unavailable',
     'class_unavailable',
     'subclass_unavailable',
+    'content_missing',
   ]
 
 export function compareBlockingIssuesByPriority(

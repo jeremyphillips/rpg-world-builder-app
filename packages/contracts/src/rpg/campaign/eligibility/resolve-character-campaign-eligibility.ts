@@ -1,39 +1,39 @@
 import type { CampaignCharacterParticipation } from '../campaign-character-participation'
-import type { Character } from '../../runtime/character/sheet'
+import type { CharacterEligibilitySubject } from './character-eligibility-subject'
 import type { ContentViewer } from '../../content/lib/content-viewer-access'
 import {
   sortBlockingIssuesByPriority,
   type CharacterCampaignEligibility,
 } from './character-campaign-eligibility'
-import type { CampaignContentEligibilityEntry } from './resolve-character-content-eligibility'
+import type { CampaignContentEligibilityIndex } from './campaign-content-eligibility-index'
 import { resolveCharacterContentEligibility } from './resolve-character-content-eligibility'
 import { resolveCharacterParticipationEligibility } from './resolve-character-participation-eligibility'
 import { resolveCharacterStartingLevelEligibility } from './resolve-character-starting-level-eligibility'
 import { resolveCharacterStructuralEligibility } from './resolve-character-structural-eligibility'
 
 export type ResolveCharacterCampaignEligibilityInput = {
-  character: Character
+  subject: CharacterEligibilitySubject
   userId: string
   campaignId: string
   startingLevel: number
   existingOpenParticipation?: Pick<CampaignCharacterParticipation, 'campaignId'> | null
   conflictingCampaignName?: string
-  campaignContentById: ReadonlyMap<string, CampaignContentEligibilityEntry>
+  contentIndex: CampaignContentEligibilityIndex
   viewer: ContentViewer
 }
 
 export function resolveCharacterCampaignEligibility({
-  character,
+  subject,
   userId,
   campaignId,
   startingLevel,
   existingOpenParticipation,
   conflictingCampaignName,
-  campaignContentById,
+  contentIndex,
   viewer,
 }: ResolveCharacterCampaignEligibilityInput): CharacterCampaignEligibility {
   const participation = resolveCharacterParticipationEligibility({
-    character,
+    subject,
     userId,
     campaignId,
     existingOpenParticipation,
@@ -48,7 +48,7 @@ export function resolveCharacterCampaignEligibility({
     }
   }
 
-  const structural = resolveCharacterStructuralEligibility({ character })
+  const structural = resolveCharacterStructuralEligibility({ subject })
   if (structural.blockingIssues.length > 0) {
     return {
       eligible: false,
@@ -57,10 +57,10 @@ export function resolveCharacterCampaignEligibility({
     }
   }
 
-  const level = resolveCharacterStartingLevelEligibility({ character, startingLevel })
+  const level = resolveCharacterStartingLevelEligibility({ subject, startingLevel })
   const content = resolveCharacterContentEligibility({
-    character,
-    campaignContentById,
+    subject,
+    contentIndex,
     viewer,
   })
 

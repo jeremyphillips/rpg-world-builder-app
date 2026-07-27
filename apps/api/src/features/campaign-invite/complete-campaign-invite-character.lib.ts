@@ -6,7 +6,6 @@ import type {
   PcCharacter,
 } from '@rpg/contracts'
 import {
-  characterForEligibilityCheck,
   createCharacterInputSchema,
   projectCharacterEligibilitySubjectFromCharacter,
   projectCharacterEligibilitySubjectFromCreateInput,
@@ -102,12 +101,12 @@ export async function assertNewCharacterBuildEligible({
   eligibilityContext: CampaignInviteEligibilityContext
 }): Promise<void> {
   const eligibility = resolveCharacterCampaignEligibility({
-    character: characterForEligibilityCheck(candidate.eligibilitySubject),
+    subject: candidate.eligibilitySubject,
     userId,
     campaignId: acceptedInvite.campaignId,
     startingLevel: eligibilityContext.startingLevel,
     existingOpenParticipation: null,
-    campaignContentById: eligibilityContext.campaignContentById,
+    contentIndex: eligibilityContext.contentIndex,
     viewer: { kind: 'none' },
   })
 
@@ -145,13 +144,13 @@ export async function assertExistingCharacterEligible({
   }
 
   const eligibility = resolveCharacterCampaignEligibility({
-    character: candidate.character,
+    subject: candidate.eligibilitySubject,
     userId,
     campaignId: acceptedInvite.campaignId,
     startingLevel: eligibilityContext.startingLevel,
     existingOpenParticipation,
     conflictingCampaignName,
-    campaignContentById: eligibilityContext.campaignContentById,
+    contentIndex: eligibilityContext.contentIndex,
     viewer: { kind: 'pc', characterIds: [candidate.character.id] },
   })
 

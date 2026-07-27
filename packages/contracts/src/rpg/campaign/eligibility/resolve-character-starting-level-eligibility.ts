@@ -1,8 +1,9 @@
-import { getCharacterTotalLevel, type Character } from '../../runtime/character/sheet'
+import { getCharacterTotalLevel } from '../../runtime/character/sheet'
+import type { CharacterEligibilitySubject } from './character-eligibility-subject'
 import type { CharacterCampaignBlockingIssue } from './character-campaign-eligibility'
 
 export type ResolveCharacterStartingLevelEligibilityInput = {
-  character: Character
+  subject: CharacterEligibilitySubject
   startingLevel: number
 }
 
@@ -11,10 +12,10 @@ export type ResolveCharacterStartingLevelEligibilityResult = {
 }
 
 export function resolveCharacterStartingLevelEligibility({
-  character,
+  subject,
   startingLevel,
 }: ResolveCharacterStartingLevelEligibilityInput): ResolveCharacterStartingLevelEligibilityResult {
-  const actualLevel = getCharacterTotalLevel(character)
+  const actualLevel = getCharacterTotalLevel(subject)
 
   if (actualLevel !== startingLevel) {
     return {

@@ -7,6 +7,10 @@ import { CampaignCharacterParticipationModel } from '../campaign/participation/c
 import { CharacterModel } from '../character/character.model'
 import { createPcRecord } from '../character/character.repository'
 import { minimalStandalonePcInput } from '../../test/fixtures/characters'
+import {
+  inviteCompletionBuilderPcInput,
+  inviteCompletionMissingSubclassPcInput,
+} from '../../test/fixtures/invite-completion-characters'
 import { makeTestCampaign } from '../../test/fixtures/campaigns'
 import { makeTestUser } from '../../test/fixtures/users'
 import { useIntegrationDb } from '../../test/setup/integration-db'
@@ -930,7 +934,7 @@ describe('campaign invite service', () => {
 
   describe('invite completion characterization', () => {
     it('returns idempotently for completed invites without loading the eligibility map', async () => {
-      const eligibilityMapSpy = vi.spyOn(eligibilityLib, 'buildCampaignContentEligibilityMap')
+      const eligibilityMapSpy = vi.spyOn(eligibilityLib, 'buildCampaignContentEligibilityIndex')
 
       const { id: campaignId, owner } = await makeTestCampaign()
       const player = await makeTestUser({ email: 'idempotent-map@example.com' })
@@ -973,7 +977,7 @@ describe('campaign invite service', () => {
     })
 
     it('fails for expired invites before loading the eligibility map', async () => {
-      const eligibilityMapSpy = vi.spyOn(eligibilityLib, 'buildCampaignContentEligibilityMap')
+      const eligibilityMapSpy = vi.spyOn(eligibilityLib, 'buildCampaignContentEligibilityIndex')
 
       const { id: campaignId, owner } = await makeTestCampaign()
       const player = await makeTestUser({ email: 'expired-completion@example.com' })
@@ -1013,7 +1017,7 @@ describe('campaign invite service', () => {
     })
 
     it('fails for revoked invites before loading the eligibility map', async () => {
-      const eligibilityMapSpy = vi.spyOn(eligibilityLib, 'buildCampaignContentEligibilityMap')
+      const eligibilityMapSpy = vi.spyOn(eligibilityLib, 'buildCampaignContentEligibilityIndex')
 
       const { id: campaignId, owner } = await makeTestCampaign()
       const player = await makeTestUser({ email: 'revoked-completion@example.com' })
@@ -1125,6 +1129,79 @@ describe('campaign invite service', () => {
         expect.objectContaining({ existingOpenParticipation: null }),
       )
       eligibilitySpy.mockRestore()
+    })
+
+    it('completes onboarding for a builder-finalized payload with skill slug proficiencies', async () => {
+      const { id: campaignId, owner } = await makeTestCampaign({ name: 'Builder Payload Campaign' })
+      const player = await makeTestUser({ email: 'builder-payload@example.com' })
+      const rawToken = generateInviteToken()
+
+      const invite = await createInviteRecord({
+        campaignId,
+        email: 'builder-payload@example.com',
+        normalizedEmail: 'builder-payload@example.com',
+        tokenHash: hashInviteToken(rawToken),
+        expiresAt: computeInviteExpiresAt(),
+        invitedByUserId: owner.id,
+      })
+
+      await acceptCampaignInvite({
+        rawToken,
+        userId: player.id,
+        userEmail: player.email,
+      })
+
+      const completed = await completeCampaignInviteWithNewCharacter({
+        inviteId: invite.id,
+        userId: player.id,
+        characterCreateInput: inviteCompletionBuilderPcInput,
+      })
+
+      expect(completed.campaignId).toBe(campaignId)
+      expect(completed.characterId).toBeTruthy()
+    })
+
+    it('rejects completion when a referenced subclass is missing from the eligibility index', async () => {
+      const { id: campaignId, owner } = await makeTestCampaign({
+        name: 'Missing Subclass Campaign',
+      })
+      const player = await makeTestUser({ email: 'missing-subclass@example.com' })
+      const rawToken = generateInviteToken()
+
+      const invite = await createInviteRecord({
+        campaignId,
+        email: 'missing-subclass@example.com',
+        normalizedEmail: 'missing-subclass@example.com',
+        tokenHash: hashInviteToken(rawToken),
+        expiresAt: computeInviteExpiresAt(),
+        invitedByUserId: owner.id,
+      })
+
+      await acceptCampaignInvite({
+        rawToken,
+        userId: player.id,
+        userEmail: player.email,
+      })
+
+      await expect(
+        completeCampaignInviteWithNewCharacter({
+          inviteId: invite.id,
+          userId: player.id,
+          characterCreateInput: inviteCompletionMissingSubclassPcInput,
+        }),
+      ).rejects.toMatchObject({
+        status: 422,
+        code: 'ineligible_character',
+        details: {
+          blockingIssues: expect.arrayContaining([
+            {
+              code: 'content_missing',
+              contentType: 'subclass',
+              contentId: 'srd-cc-5.2.1:missing-subclass',
+            },
+          ]),
+        },
+      })
     })
   })
 })

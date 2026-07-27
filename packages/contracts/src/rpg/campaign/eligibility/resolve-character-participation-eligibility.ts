@@ -1,12 +1,11 @@
-import type { CampaignCharacterParticipation } from '../campaign-character-participation'
-import type { Character } from '../../runtime/character/sheet'
+import type { CharacterEligibilitySubject } from './character-eligibility-subject'
 import type { CharacterCampaignBlockingIssue } from './character-campaign-eligibility'
 
 export type ResolveCharacterParticipationEligibilityInput = {
-  character: Character
+  subject: CharacterEligibilitySubject
   userId: string
   campaignId: string
-  existingOpenParticipation?: Pick<CampaignCharacterParticipation, 'campaignId'> | null
+  existingOpenParticipation?: Pick<{ campaignId: string }, 'campaignId'> | null
   conflictingCampaignName?: string
 }
 
@@ -15,7 +14,7 @@ export type ResolveCharacterParticipationEligibilityResult = {
 }
 
 export function resolveCharacterParticipationEligibility({
-  character,
+  subject,
   userId,
   campaignId,
   existingOpenParticipation,
@@ -23,7 +22,7 @@ export function resolveCharacterParticipationEligibility({
 }: ResolveCharacterParticipationEligibilityInput): ResolveCharacterParticipationEligibilityResult {
   const blockingIssues: CharacterCampaignBlockingIssue[] = []
 
-  if (character.characterType !== 'pc' || character.userId !== userId) {
+  if (subject.characterType !== 'pc' || subject.userId !== userId) {
     blockingIssues.push({ code: 'not_owned_pc' })
     return { blockingIssues }
   }

@@ -105,6 +105,10 @@ Idempotency via `completedCharacterId`:
 - Re-completion with the **same** `characterId` → no-op success.
 - Re-completion with a **different** `characterId` → conflict.
 
+Eligibility uses `CampaignContentEligibilityIndex` (content by id, skill/tool
+slugs, ruleset languages, species heritage options). Missing referenced content
+surfaces as a blocking `content_missing` issue instead of being silently skipped.
+
 Mongo transactions are used when `MONGO_TRANSACTION_MODE` resolves to enabled
 at startup (replica-set topology). Otherwise failures after partial writes use
 compensating deletes/`$pull` mirroring `createCampaign` and `createCampaignNpc`.

@@ -3,6 +3,11 @@ import { describe, expect, it } from 'vitest'
 import { DEFAULT_CONTENT_CAMPAIGN_ACCESS } from '../../content/lib/campaign-access'
 import type { Character } from '../../runtime/character/sheet'
 import {
+  createCampaignContentEligibilityIndex,
+  projectCharacterEligibilitySubjectFromCharacter,
+  type CampaignContentEligibilityEntry,
+} from './index'
+import {
   primaryBlockingIssue,
   sortBlockingIssuesByPriority,
 } from './character-campaign-eligibility'
@@ -60,6 +65,8 @@ const basePc: Character = {
   ...timestamps,
 }
 
+const baseSubject = projectCharacterEligibilitySubjectFromCharacter(basePc)
+
 const dmOnlyAccess = {
   ...DEFAULT_CONTENT_CAMPAIGN_ACCESS,
   visibilityMode: 'dm_only' as const,
@@ -73,11 +80,18 @@ const specificPlayersAccess = (participantIds: string[]) => ({
   effectiveAudience: 'specific_players' as const,
 })
 
+function makeContentIndex(
+  contentById: ReadonlyMap<string, CampaignContentEligibilityEntry>,
+  options: Parameters<typeof createCampaignContentEligibilityIndex>[1] = {},
+) {
+  return createCampaignContentEligibilityIndex(contentById, options)
+}
+
 describe('resolveCharacterParticipationEligibility', () => {
   it('blocks characters not owned by the user', () => {
     const result = resolveCharacterParticipationEligibility({
-      character: basePc,
-      userId: 'other_user',
+      subject: { ...baseSubject, userId: 'other_user' },
+      userId: 'user_1',
       campaignId: 'camp_1',
     })
 
@@ -86,7 +100,7 @@ describe('resolveCharacterParticipationEligibility', () => {
 
   it('blocks conflicting open participation with campaign name payload', () => {
     const result = resolveCharacterParticipationEligibility({
-      character: basePc,
+      subject: baseSubject,
       userId: 'user_1',
       campaignId: 'camp_2',
       existingOpenParticipation: { campaignId: 'camp_1' },
@@ -103,7 +117,7 @@ describe('resolveCharacterParticipationEligibility', () => {
 describe('resolveCharacterStartingLevelEligibility', () => {
   it('reports structured level mismatch data', () => {
     const result = resolveCharacterStartingLevelEligibility({
-      character: basePc,
+      subject: baseSubject,
       startingLevel: 1,
     })
 
@@ -117,33 +131,65 @@ describe('resolveCharacterStartingLevelEligibility', () => {
 
 describe('resolveCharacterContentEligibility', () => {
   it('uses prospective pc viewer for specific_players grants', () => {
-    const campaignContentById = new Map([
-      ['srd-cc-5.2.1:elf', { access: specificPlayersAccess(['char_1']), label: 'Elf' }],
-    ])
+    const defaultAccess = DEFAULT_CONTENT_CAMPAIGN_ACCESS
+    const contentIndex = makeContentIndex(
+      new Map([
+        ['srd-cc-5.2.1:elf', { access: specificPlayersAccess(['char_1']), label: 'Elf' }],
+        ['srd-cc-5.2.1:wizard', { access: defaultAccess, label: 'Wizard' }],
+        ['srd-cc-5.2.1:evoker', { access: defaultAccess, label: 'Evoker' }],
+        ['srd-cc-5.2.1:quarterstaff', { access: defaultAccess, label: 'Quarterstaff' }],
+        ['srd-cc-5.2.1:silvery-barbs', { access: defaultAccess, label: 'Silvery Barbs' }],
+      ]),
+      {
+        heritageBySpeciesId: new Map([
+          [
+            'srd-cc-5.2.1:elf',
+            new Map([['high-elf', { speciesId: 'srd-cc-5.2.1:elf', label: 'High Elf' }]]),
+          ],
+        ]),
+      },
+    )
 
     const granted = resolveCharacterContentEligibility({
-      character: basePc,
-      campaignContentById,
+      subject: baseSubject,
+      contentIndex,
       viewer: { kind: 'pc', characterIds: ['char_1'] },
     })
     expect(granted.blockingIssues).toHaveLength(0)
 
     const blocked = resolveCharacterContentEligibility({
-      character: basePc,
-      campaignContentById,
+      subject: baseSubject,
+      contentIndex,
       viewer: { kind: 'none' },
     })
     expect(blocked.blockingIssues[0]?.code).toBe('species_unavailable')
   })
 
   it('emits warnings for unavailable equipment without blocking submit', () => {
-    const campaignContentById = new Map([
-      ['srd-cc-5.2.1:quarterstaff', { access: dmOnlyAccess, label: 'Quarterstaff' }],
-    ])
+    const defaultAccess = DEFAULT_CONTENT_CAMPAIGN_ACCESS
+    const contentIndex = makeContentIndex(
+      new Map([
+        ['srd-cc-5.2.1:elf', { access: defaultAccess, label: 'Elf' }],
+        ['srd-cc-5.2.1:wizard', { access: defaultAccess, label: 'Wizard' }],
+        ['srd-cc-5.2.1:evoker', { access: defaultAccess, label: 'Evoker' }],
+        ['srd-cc-5.2.1:quarterstaff', { access: dmOnlyAccess, label: 'Quarterstaff' }],
+      ]),
+      {
+        heritageBySpeciesId: new Map([
+          [
+            'srd-cc-5.2.1:elf',
+            new Map([['high-elf', { speciesId: 'srd-cc-5.2.1:elf', label: 'High Elf' }]]),
+          ],
+        ]),
+      },
+    )
 
     const result = resolveCharacterContentEligibility({
-      character: basePc,
-      campaignContentById,
+      subject: {
+        ...baseSubject,
+        spells: [],
+      },
+      contentIndex,
       viewer: { kind: 'pc', characterIds: ['char_1'] },
     })
 
@@ -154,16 +200,96 @@ describe('resolveCharacterContentEligibility', () => {
       label: 'Quarterstaff',
     })
   })
+
+  it('emits content_missing when a blocking reference is absent from the index', () => {
+    const contentIndex = makeContentIndex(new Map())
+
+    const result = resolveCharacterContentEligibility({
+      subject: baseSubject,
+      contentIndex,
+      viewer: { kind: 'none' },
+    })
+
+    expect(result.blockingIssues).toEqual(
+      expect.arrayContaining([
+        {
+          code: 'content_missing',
+          contentType: 'species',
+          contentId: 'srd-cc-5.2.1:elf',
+        },
+        {
+          code: 'content_missing',
+          contentType: 'class',
+          contentId: 'srd-cc-5.2.1:wizard',
+        },
+        {
+          code: 'content_missing',
+          contentType: 'subclass',
+          contentId: 'srd-cc-5.2.1:evoker',
+        },
+      ]),
+    )
+  })
+
+  it('resolves skill proficiency slugs through the skillsBySlug index', () => {
+    const defaultAccess = DEFAULT_CONTENT_CAMPAIGN_ACCESS
+    const contentIndex = makeContentIndex(
+      new Map([
+        ['srd-cc-5.2.1:elf', { access: defaultAccess, label: 'Elf' }],
+        ['srd-cc-5.2.1:wizard', { access: defaultAccess, label: 'Wizard' }],
+        ['srd-cc-5.2.1:evoker', { access: defaultAccess, label: 'Evoker' }],
+      ]),
+      {
+        skillsBySlug: new Map([['athletics', { access: dmOnlyAccess, label: 'Athletics' }]]),
+        heritageBySpeciesId: new Map([
+          [
+            'srd-cc-5.2.1:elf',
+            new Map([['high-elf', { speciesId: 'srd-cc-5.2.1:elf', label: 'High Elf' }]]),
+          ],
+        ]),
+      },
+    )
+
+    const result = resolveCharacterContentEligibility({
+      subject: {
+        ...baseSubject,
+        equipment: {
+          weapons: [],
+          armor: [],
+          gear: [],
+          tools: [],
+          vehicles: [],
+          mounts: [],
+          magicItems: [],
+        },
+        spells: [],
+        proficiencies: {
+          ...baseSubject.proficiencies,
+          skills: [{ skill: 'athletics', rank: 'proficient', sources: [] }],
+        },
+      },
+      contentIndex,
+      viewer: { kind: 'none' },
+    })
+
+    expect(result.blockingIssues).toHaveLength(0)
+    expect(result.warnings[0]).toMatchObject({
+      code: 'content_unavailable',
+      category: 'proficiencies',
+      contentId: 'athletics',
+      label: 'Athletics',
+    })
+  })
 })
 
 describe('resolveCharacterCampaignEligibility', () => {
   it('aggregates blocking issues in priority order', () => {
     const result = resolveCharacterCampaignEligibility({
-      character: { ...basePc, userId: 'other_user' } as Character,
+      subject: { ...baseSubject, userId: 'other_user' },
       userId: 'user_1',
       campaignId: 'camp_1',
       startingLevel: 1,
-      campaignContentById: new Map(),
+      contentIndex: makeContentIndex(new Map()),
       viewer: { kind: 'none' },
     })
 
@@ -172,16 +298,33 @@ describe('resolveCharacterCampaignEligibility', () => {
   })
 
   it('returns eligible with warnings when only soft content mismatches exist', () => {
-    const campaignContentById = new Map([
-      ['srd-cc-5.2.1:silvery-barbs', { access: dmOnlyAccess, label: 'Silvery Barbs' }],
-    ])
+    const contentIndex = makeContentIndex(
+      new Map([
+        ['srd-cc-5.2.1:elf', { access: DEFAULT_CONTENT_CAMPAIGN_ACCESS, label: 'Elf' }],
+        ['srd-cc-5.2.1:wizard', { access: DEFAULT_CONTENT_CAMPAIGN_ACCESS, label: 'Wizard' }],
+        ['srd-cc-5.2.1:evoker', { access: DEFAULT_CONTENT_CAMPAIGN_ACCESS, label: 'Evoker' }],
+        ['srd-cc-5.2.1:silvery-barbs', { access: dmOnlyAccess, label: 'Silvery Barbs' }],
+        [
+          'srd-cc-5.2.1:quarterstaff',
+          { access: DEFAULT_CONTENT_CAMPAIGN_ACCESS, label: 'Quarterstaff' },
+        ],
+      ]),
+      {
+        heritageBySpeciesId: new Map([
+          [
+            'srd-cc-5.2.1:elf',
+            new Map([['high-elf', { speciesId: 'srd-cc-5.2.1:elf', label: 'High Elf' }]]),
+          ],
+        ]),
+      },
+    )
 
     const result = resolveCharacterCampaignEligibility({
-      character: basePc,
+      subject: baseSubject,
       userId: 'user_1',
       campaignId: 'camp_1',
       startingLevel: 3,
-      campaignContentById,
+      contentIndex,
       viewer: { kind: 'pc', characterIds: ['char_1'] },
     })
 

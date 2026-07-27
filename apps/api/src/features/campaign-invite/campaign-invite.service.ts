@@ -7,7 +7,11 @@ import type {
   CompleteCampaignInviteResult,
   CreateCharacterInput,
 } from '@rpg/contracts'
-import { CAMPAIGN_INVITE_EXPIRY_DAYS, resolveCharacterCampaignEligibility } from '@rpg/contracts'
+import {
+  CAMPAIGN_INVITE_EXPIRY_DAYS,
+  projectCharacterEligibilitySubjectFromCharacter,
+  resolveCharacterCampaignEligibility,
+} from '@rpg/contracts'
 
 import { HttpError } from '../../lib/http-error'
 import type { EmailProvider } from '../../services/email/email.types'
@@ -43,7 +47,7 @@ import {
   findCampaignMembershipByCampaignAndUser,
 } from './create-or-confirm-player-membership'
 import {
-  buildCampaignContentEligibilityMap,
+  buildCampaignContentEligibilityIndex,
   formatInviteCharacterSummary,
 } from './campaign-invite-eligibility.lib'
 import { completeCampaignInviteWithCharacter } from './complete-campaign-invite-character.lib'
@@ -512,15 +516,17 @@ export async function listEligibleCharactersForInvite({
   userId: string
 }): Promise<CampaignInviteEligibleCharacter[]> {
   const invite = await loadAcceptedInviteForUser({ inviteId, userId })
-  const [characters, campaignContentById, startingLevel] = await Promise.all([
+  const [characters, contentIndex, startingLevel] = await Promise.all([
     listCharactersForUser(userId),
-    buildCampaignContentEligibilityMap(invite.campaignId),
+    buildCampaignContentEligibilityIndex(invite.campaignId),
     loadInviteStartingLevel(invite.campaignId),
   ])
 
   const results: CampaignInviteEligibleCharacter[] = []
 
   for (const character of characters) {
+    if (character.characterType !== 'pc') continue
+
     const existingOpenParticipation = await findOpenParticipationForCharacter(character.id)
     let conflictingCampaignName: string | undefined
     if (existingOpenParticipation && existingOpenParticipation.campaignId !== invite.campaignId) {
@@ -529,20 +535,20 @@ export async function listEligibleCharactersForInvite({
     }
 
     const eligibility = resolveCharacterCampaignEligibility({
-      character,
+      subject: projectCharacterEligibilitySubjectFromCharacter(character),
       userId,
       campaignId: invite.campaignId,
       startingLevel,
       existingOpenParticipation,
       conflictingCampaignName,
-      campaignContentById,
+      contentIndex,
       viewer: { kind: 'pc', characterIds: [character.id] },
     })
 
     results.push({
       characterId: character.id,
       name: character.name,
-      summary: formatInviteCharacterSummary(character, campaignContentById),
+      summary: formatInviteCharacterSummary(character, contentIndex.contentById),
       eligibility,
     })
   }

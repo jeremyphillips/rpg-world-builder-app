@@ -1,9 +1,9 @@
-import type { Character } from '../../runtime/character/sheet'
-import { pcCharacterSchema } from '../../runtime/character/sheet'
+import { createCharacterInputSchema } from '../../runtime/character/create-input'
+import type { CharacterEligibilitySubject } from './character-eligibility-subject'
 import type { CharacterCampaignBlockingIssue } from './character-campaign-eligibility'
 
 export type ResolveCharacterStructuralEligibilityInput = {
-  character: Character
+  subject: CharacterEligibilitySubject
 }
 
 export type ResolveCharacterStructuralEligibilityResult = {
@@ -11,9 +11,10 @@ export type ResolveCharacterStructuralEligibilityResult = {
 }
 
 export function resolveCharacterStructuralEligibility({
-  character,
+  subject,
 }: ResolveCharacterStructuralEligibilityInput): ResolveCharacterStructuralEligibilityResult {
-  const parsed = pcCharacterSchema.safeParse(character)
+  const { userId: _userId, id: _id, ...createInput } = subject
+  const parsed = createCharacterInputSchema.safeParse(createInput)
 
   if (!parsed.success) {
     return { blockingIssues: [{ code: 'structurally_invalid' }] }

@@ -1,23 +1,27 @@
-import type { ResolvedContentCampaignAccess } from '../../content/lib/campaign-access'
 import {
   isContentDiscoverableForViewer,
   type ContentViewer,
 } from '../../content/lib/content-viewer-access'
-import type { Character } from '../../runtime/character/sheet'
+import type { CharacterEligibilitySubject } from './character-eligibility-subject'
 import type {
   CharacterCampaignBlockingIssue,
   CharacterCampaignWarning,
-  CharacterCampaignWarningCategory,
 } from './character-campaign-eligibility'
+import type { CampaignContentEligibilityIndex } from './campaign-content-eligibility-index'
+import {
+  lookupCampaignContentEntry,
+  lookupCampaignLanguageEntry,
+} from './campaign-content-eligibility-index'
+import {
+  collectCharacterContentReferences,
+  type ContentReference,
+} from './collect-character-content-references'
 
-export type CampaignContentEligibilityEntry = {
-  access: ResolvedContentCampaignAccess
-  label: string
-}
+export type { CampaignContentEligibilityEntry } from './campaign-content-eligibility-index'
 
 export type ResolveCharacterContentEligibilityInput = {
-  character: Character
-  campaignContentById: ReadonlyMap<string, CampaignContentEligibilityEntry>
+  subject: CharacterEligibilitySubject
+  contentIndex: CampaignContentEligibilityIndex
   /**
    * Viewer for discovery checks. For existing-character onboarding use the
    * candidate's prospective context: `{ kind: 'pc', characterIds: [character.id] }`.
@@ -31,129 +35,105 @@ export type ResolveCharacterContentEligibilityResult = {
   warnings: CharacterCampaignWarning[]
 }
 
-type ContentReference =
-  | {
-      kind: 'blocking'
-      code: 'species_unavailable' | 'class_unavailable' | 'subclass_unavailable'
-      contentId: string
-    }
-  | {
-      kind: 'warning'
-      category: CharacterCampaignWarningCategory
-      contentId: string
-    }
-
-function collectCharacterContentReferences(character: Character): ContentReference[] {
-  const references: ContentReference[] = []
-
-  references.push({
-    kind: 'blocking',
-    code: 'species_unavailable',
-    contentId: character.species.id,
-  })
-
-  for (const classEntry of character.classes) {
-    references.push({
-      kind: 'blocking',
-      code: 'class_unavailable',
-      contentId: classEntry.classId,
-    })
-
-    if (classEntry.subclassId) {
-      references.push({
-        kind: 'blocking',
-        code: 'subclass_unavailable',
-        contentId: classEntry.subclassId,
-      })
-    }
-  }
-
-  const equipmentIds = [
-    ...character.equipment.weapons.map((entry) => entry.equipmentId),
-    ...character.equipment.armor.map((entry) => entry.equipmentId),
-    ...character.equipment.gear.map((entry) => entry.equipmentId),
-    ...(character.equipment.magicItems ?? []).map((entry) => entry.equipmentId),
-  ]
-
-  for (const contentId of equipmentIds) {
-    references.push({ kind: 'warning', category: 'equipment', contentId })
-  }
-
-  for (const spell of character.spells) {
-    references.push({ kind: 'warning', category: 'spells', contentId: spell.spellId })
-  }
-
-  for (const feat of character.feats) {
-    references.push({ kind: 'warning', category: 'feats', contentId: feat.featId })
-  }
-
-  for (const skill of character.proficiencies.skills) {
-    references.push({
-      kind: 'warning',
-      category: 'proficiencies',
-      contentId: skill.skill,
-    })
-  }
-
-  for (const tool of character.proficiencies.tools) {
-    if (tool.toolId) {
-      references.push({
-        kind: 'warning',
-        category: 'proficiencies',
-        contentId: tool.toolId,
-      })
-    }
-  }
-
-  return references
+type EligibilityAccumulator = {
+  blockingIssues: CharacterCampaignBlockingIssue[]
+  warnings: CharacterCampaignWarning[]
+  seenBlocking: Set<string>
+  seenWarnings: Set<string>
 }
 
-export function resolveCharacterContentEligibility({
-  character,
-  campaignContentById,
-  viewer,
-}: ResolveCharacterContentEligibilityInput): ResolveCharacterContentEligibilityResult {
-  const blockingIssues: CharacterCampaignBlockingIssue[] = []
-  const warnings: CharacterCampaignWarning[] = []
-  const seenBlocking = new Set<string>()
-  const seenWarnings = new Set<string>()
+function pushUniqueBlockingIssue(
+  accumulator: EligibilityAccumulator,
+  key: string,
+  issue: CharacterCampaignBlockingIssue,
+): void {
+  if (accumulator.seenBlocking.has(key)) return
+  accumulator.seenBlocking.add(key)
+  accumulator.blockingIssues.push(issue)
+}
 
-  for (const reference of collectCharacterContentReferences(character)) {
-    const entry = campaignContentById.get(reference.contentId)
-    if (!entry) {
-      continue
+function processContentReference(
+  reference: ContentReference,
+  contentIndex: CampaignContentEligibilityIndex,
+  viewer: ContentViewer,
+  accumulator: EligibilityAccumulator,
+): void {
+  if (reference.contentType === 'languages') {
+    if (!lookupCampaignLanguageEntry(contentIndex, reference.contentId)) {
+      pushUniqueBlockingIssue(
+        accumulator,
+        `content_missing:${reference.contentType}:${reference.contentId}`,
+        {
+          code: 'content_missing',
+          contentType: reference.contentType,
+          contentId: reference.contentId,
+        },
+      )
     }
+    return
+  }
 
-    if (isContentDiscoverableForViewer(entry.access, viewer)) {
-      continue
-    }
-
-    if (reference.kind === 'blocking') {
-      const key = `${reference.code}:${reference.contentId}`
-      if (seenBlocking.has(key)) {
-        continue
-      }
-      seenBlocking.add(key)
-      blockingIssues.push({
-        code: reference.code,
+  const entry = lookupCampaignContentEntry(
+    contentIndex,
+    reference.contentType,
+    reference.contentId,
+    reference.speciesId,
+  )
+  if (!entry) {
+    pushUniqueBlockingIssue(
+      accumulator,
+      `content_missing:${reference.contentType}:${reference.contentId}`,
+      {
+        code: 'content_missing',
+        contentType: reference.contentType,
         contentId: reference.contentId,
-        label: entry.label,
-      })
-      continue
-    }
+      },
+    )
+    return
+  }
 
-    const warningKey = `${reference.category}:${reference.contentId}`
-    if (seenWarnings.has(warningKey)) {
-      continue
-    }
-    seenWarnings.add(warningKey)
-    warnings.push({
-      code: 'content_unavailable',
-      category: reference.category,
+  if (isContentDiscoverableForViewer(entry.access, viewer)) {
+    return
+  }
+
+  if (reference.kind === 'blocking') {
+    pushUniqueBlockingIssue(accumulator, `${reference.code}:${reference.contentId}`, {
+      code: reference.code,
       contentId: reference.contentId,
       label: entry.label,
     })
+    return
   }
 
-  return { blockingIssues, warnings }
+  const warningKey = `${reference.category}:${reference.contentId}`
+  if (accumulator.seenWarnings.has(warningKey)) return
+  accumulator.seenWarnings.add(warningKey)
+  accumulator.warnings.push({
+    code: 'content_unavailable',
+    category: reference.category,
+    contentId: reference.contentId,
+    label: entry.label,
+  })
+}
+
+export function resolveCharacterContentEligibility({
+  subject,
+  contentIndex,
+  viewer,
+}: ResolveCharacterContentEligibilityInput): ResolveCharacterContentEligibilityResult {
+  const accumulator: EligibilityAccumulator = {
+    blockingIssues: [],
+    warnings: [],
+    seenBlocking: new Set<string>(),
+    seenWarnings: new Set<string>(),
+  }
+
+  for (const reference of collectCharacterContentReferences(subject)) {
+    processContentReference(reference, contentIndex, viewer, accumulator)
+  }
+
+  return {
+    blockingIssues: accumulator.blockingIssues,
+    warnings: accumulator.warnings,
+  }
 }
