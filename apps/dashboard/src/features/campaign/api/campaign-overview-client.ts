@@ -73,9 +73,9 @@ export async function shareCampaignInviteLink(
 }
 
 export async function revokeCampaignInvite(campaignId: string, inviteId: string): Promise<void> {
-  await request(
+  await postJson<void>(
     `/api/campaigns/${campaignId}/invites/${inviteId}/revoke`,
-    { method: 'POST' },
+    {},
     REVOKE_INVITE_ERROR,
   )
 }
