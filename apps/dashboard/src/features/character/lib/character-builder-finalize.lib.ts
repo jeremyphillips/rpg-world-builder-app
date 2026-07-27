@@ -44,6 +44,9 @@ export async function finalizeBuilderCharacter({
       const result = await completeInviteWithNewCharacter(input)
       return ROUTES.campaign.characters.detail(result.campaignId, result.characterId)
     }
+    case 'campaign_pc_onboarding': {
+      throw new Error('Campaign PC onboarding finalize is not wired yet.')
+    }
     case 'standalone': {
       const input = finalizeCharacterBuild(draft, context, { resolvedChoiceSets })
       const character = await createStandalonePc(input)

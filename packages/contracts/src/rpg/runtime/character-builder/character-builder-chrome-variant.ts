@@ -13,7 +13,7 @@ export function resolveCharacterBuilderChromeVariant(
   context: CharacterBuildContext,
 ): CharacterBuilderChromeVariant {
   if (isCampaignBuildContext(context)) {
-    return context.acquisition.kind === 'campaign_invite' ? 'campaign_invite_pc' : 'campaign_npc'
+    return context.acquisition.kind === 'campaign_npc' ? 'campaign_npc' : 'campaign_invite_pc'
   }
 
   return 'standalone_pc'

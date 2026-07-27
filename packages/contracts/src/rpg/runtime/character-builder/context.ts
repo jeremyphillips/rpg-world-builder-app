@@ -142,7 +142,9 @@ export type CampaignPcBuildContext = CharacterBuildContext & {
   rulesScope: Extract<CharacterRulesScope, { type: 'campaign' }>
   ownershipTarget: { type: 'user'; userId: string }
   characterKind: 'pc'
-  acquisition: Extract<CharacterBuildAcquisition, { kind: 'campaign_invite' }>
+  acquisition:
+    | Extract<CharacterBuildAcquisition, { kind: 'campaign_invite' }>
+    | Extract<CharacterBuildAcquisition, { kind: 'campaign_pc_onboarding' }>
 }
 
 /** Discriminated union — only legal campaign build combinations compile. */
@@ -156,8 +158,18 @@ export function isCampaignBuildContext(
 
 export function isCampaignInviteBuildContext(
   context: CharacterBuildContext,
-): context is CampaignPcBuildContext {
+): context is CampaignPcBuildContext & {
+  acquisition: Extract<CharacterBuildAcquisition, { kind: 'campaign_invite' }>
+} {
   return isCampaignBuildContext(context) && context.acquisition.kind === 'campaign_invite'
+}
+
+export function isCampaignPcOnboardingBuildContext(
+  context: CharacterBuildContext,
+): context is CampaignPcBuildContext & {
+  acquisition: Extract<CharacterBuildAcquisition, { kind: 'campaign_pc_onboarding' }>
+} {
+  return isCampaignBuildContext(context) && context.acquisition.kind === 'campaign_pc_onboarding'
 }
 
 export function resolveCampaignIdFromContext(

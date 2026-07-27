@@ -26,4 +26,12 @@ describe('characterBuildAcquisitionSchema', () => {
       expect(parsed.inviteId).toBe('invite_1')
     }
   })
+
+  it('parses campaign_pc_onboarding acquisition', () => {
+    const parsed = characterBuildAcquisitionSchema.parse({
+      kind: 'campaign_pc_onboarding',
+      campaignId: 'camp_1',
+    })
+    expect(parsed).toEqual({ kind: 'campaign_pc_onboarding', campaignId: 'camp_1' })
+  })
 })
