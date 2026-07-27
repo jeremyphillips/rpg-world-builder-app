@@ -3,12 +3,14 @@ import { useQuery } from '@tanstack/react-query'
 
 import {
   DEFAULT_ABILITY_GENERATION_RULES,
-  getCharacterBuilderStorageKey,
   indexCharacterBuildCatalog,
+  resolveCharacterBuilderDraftKey,
+  resolveCharacterBuilderDraftScope,
   type CampaignBuildContext,
   type CampaignNpcBuildContext,
   type CampaignPcBuildContext,
   type CharacterBuildAcquisition,
+  type CharacterBuilderDraftScope,
   type CharacterOwnershipTarget,
   type SystemRulesetId,
 } from '@rpg/contracts'
@@ -110,9 +112,14 @@ export function useCampaignCharacterBuildContext({
     [context],
   )
 
+  const draftScope = useMemo((): CharacterBuilderDraftScope | null => {
+    if (!context) return null
+    return resolveCharacterBuilderDraftScope(context, undefined)
+  }, [context])
+
   const storageKey = useMemo(
-    () => (context ? getCharacterBuilderStorageKey(context) : null),
-    [context],
+    () => (draftScope ? resolveCharacterBuilderDraftKey(draftScope, { mode: 'dashboard' }) : null),
+    [draftScope],
   )
 
   const isPending = patchQuery.isPending || catalogQuery.isPending
@@ -122,6 +129,7 @@ export function useCampaignCharacterBuildContext({
   return {
     context,
     catalogIndex,
+    draftScope,
     storageKey,
     rulesetId,
     isPending,

@@ -1,7 +1,14 @@
+import { useMemo } from 'react'
 import { useStore } from 'zustand'
 
 import type { CharacterBuildContext } from '@rpg/contracts'
-import { getCharacterBuilderStorageKey } from '@rpg/contracts'
+import {
+  resolveCharacterBuilderDraftKey,
+  resolveCharacterBuilderDraftScope,
+  type CharacterBuilderDraftScope,
+} from '@rpg/contracts'
+
+import { useSession } from '@/features/auth'
 
 import {
   getCharacterBuilderStore,
@@ -10,20 +17,37 @@ import {
 
 type CharacterBuilderContextSlice = Pick<
   CharacterBuildContext,
-  'mode' | 'scope' | 'characterKind' | 'rulesScope'
+  'mode' | 'characterKind' | 'rulesScope'
 > | null
+
+function useCharacterBuilderDraftScope(
+  context: CharacterBuilderContextSlice,
+): CharacterBuilderDraftScope | null {
+  const { data: session } = useSession()
+
+  return useMemo(
+    () => (context ? resolveCharacterBuilderDraftScope(context, session?.user.id) : null),
+    [context, session?.user.id],
+  )
+}
 
 export function useCharacterBuilderStore<T>(
   context: CharacterBuilderContextSlice,
   selector: (state: CharacterBuilderStoreState) => T,
 ): T {
-  const storageKey = context ? getCharacterBuilderStorageKey(context) : null
-  const store = storageKey ? getCharacterBuilderStore(storageKey) : null
+  const scope = useCharacterBuilderDraftScope(context)
+  const storageKey = scope ? resolveCharacterBuilderDraftKey(scope, { mode: context?.mode }) : null
+  const store = storageKey && scope ? getCharacterBuilderStore(storageKey, scope) : null
 
   return useStore(store ?? getDisabledCharacterBuilderStore(), selector)
 }
 
-const disabledStore = getCharacterBuilderStore('character-builder:disabled')
+const disabledStore = getCharacterBuilderStore('character-builder:disabled', {
+  kind: 'standalone',
+  userId: 'disabled',
+  rulesetId: 'srd-cc-5.2.1',
+  characterKind: 'pc',
+})
 
 function getDisabledCharacterBuilderStore() {
   return disabledStore
@@ -32,5 +56,12 @@ function getDisabledCharacterBuilderStore() {
 export function useCharacterBuilderStorageKey(
   context: CharacterBuilderContextSlice,
 ): string | null {
-  return context ? getCharacterBuilderStorageKey(context) : null
+  const scope = useCharacterBuilderDraftScope(context)
+  return scope ? resolveCharacterBuilderDraftKey(scope, { mode: context?.mode }) : null
+}
+
+export function useCharacterBuilderDraftScopeFromContext(
+  context: CharacterBuilderContextSlice,
+): CharacterBuilderDraftScope | null {
+  return useCharacterBuilderDraftScope(context)
 }

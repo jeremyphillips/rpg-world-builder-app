@@ -105,6 +105,11 @@ describe('useCampaignBuildContext', () => {
       DEFAULT_ABILITY_GENERATION_RULES,
     )
     expect(result.current.catalogIndex?.species.size).toBe(0)
-    expect(result.current.storageKey).toBe('character-builder:npc:campaign:camp-1')
+    expect(result.current.storageKey).toBe('character-builder:campaign:camp-1:npc')
+    expect(result.current.draftScope).toEqual({
+      kind: 'campaign',
+      campaignId: 'camp-1',
+      characterKind: 'npc',
+    })
   })
 })

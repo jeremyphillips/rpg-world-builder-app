@@ -7,7 +7,8 @@ import { optionalAlignmentSchema } from '../../vocab/alignment'
 import { characterNarrativeSchema } from '../character/narrative'
 import { abilityGenerationMethodSchema } from './ability-generation'
 import { characterBuilderStepIdSchema } from './step-ids'
-import { normalizeCharacterBuilderDraft } from './equipment-purchase'
+import type { CharacterBuilderDraftScope } from './draft-scope'
+import { characterBuilderDraftScopeSchema } from './draft-scope'
 import { magicItemGrantSelectionSchema } from './magic-item-selection'
 
 // ---------------------------------------------------------------------------
@@ -159,10 +160,12 @@ export function createEmptyCharacterBuilderDraft(): CharacterBuilderDraft {
 // rehydration drops mismatched or unparseable state instead of migrating.
 // ---------------------------------------------------------------------------
 
-export const CHARACTER_BUILDER_DRAFT_VERSION = 3
+export const CHARACTER_BUILDER_DRAFT_VERSION = 4
 
 export const persistedCharacterBuilderStateSchema = z.object({
   version: z.literal(CHARACTER_BUILDER_DRAFT_VERSION),
+  scope: characterBuilderDraftScopeSchema,
+  updatedAt: z.iso.datetime(),
   draft: characterBuilderDraftSchema,
 })
 
@@ -170,12 +173,12 @@ export type PersistedCharacterBuilderState = z.infer<typeof persistedCharacterBu
 
 export function createPersistedCharacterBuilderState(
   draft: CharacterBuilderDraft,
+  scope: CharacterBuilderDraftScope,
 ): PersistedCharacterBuilderState {
-  return { version: CHARACTER_BUILDER_DRAFT_VERSION, draft }
-}
-
-/** Safe rehydrate: returns the draft, or null for garbage / version mismatch. */
-export function parsePersistedCharacterBuilderState(raw: unknown): CharacterBuilderDraft | null {
-  const result = persistedCharacterBuilderStateSchema.safeParse(raw)
-  return result.success ? normalizeCharacterBuilderDraft(result.data.draft) : null
+  return {
+    version: CHARACTER_BUILDER_DRAFT_VERSION,
+    scope,
+    updatedAt: new Date().toISOString(),
+    draft,
+  }
 }
