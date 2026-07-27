@@ -1,4 +1,4 @@
-import { request } from '@rpg/api-client'
+import { postJson, request } from '@rpg/api-client'
 import type { CampaignInvitePublicResolution } from '@rpg/contracts'
 
 const RESOLVE_INVITE_ERROR = 'Could not load this invitation.'
@@ -21,9 +21,9 @@ export async function resolveCampaignInvite(
 }
 
 export async function acceptCampaignInvite(token: string): Promise<AcceptCampaignInviteResult> {
-  return request<AcceptCampaignInviteResult>(
+  return postJson<AcceptCampaignInviteResult>(
     `/api/campaign-invites/${encodeURIComponent(token)}/accept`,
-    { method: 'POST' },
+    {},
     ACCEPT_INVITE_ERROR,
   )
 }

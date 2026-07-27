@@ -1,3 +1,4 @@
+import { ApiError } from '@rpg/contracts'
 import { describe, expect, it, vi, beforeEach } from 'vitest'
 import { render, screen, waitFor } from '@testing-library/react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
@@ -136,6 +137,37 @@ describe('CampaignInvitePage', () => {
     expect(await screen.findByText(/use the invited account/i)).toBeInTheDocument()
     expect(screen.getByText(/p\*\*\*@example.com/i)).toBeInTheDocument()
     expect(acceptCampaignInvite).not.toHaveBeenCalled()
+  })
+
+  it('shows an error and does not retry when acceptance fails', async () => {
+    useSession.mockReturnValue({
+      isPending: false,
+      data: {
+        user: { id: 'u1', email: 'player@example.com', displayName: 'Player', role: 'user' },
+        activeCampaign: null,
+      },
+    })
+    useCampaignInviteResolution.mockReturnValue({
+      isPending: false,
+      isError: false,
+      data: {
+        campaignName: 'The Shattered Vale',
+        inviterDisplayName: 'Avery',
+        invitedEmail: 'player@example.com',
+        status: 'pending',
+        expiresAt: '2026-01-08T00:00:00.000Z',
+      },
+    })
+    acceptCampaignInvite.mockRejectedValueOnce(
+      new ApiError(403, 'forbidden', 'Invalid or missing CSRF token'),
+    )
+
+    renderInvitePage()
+
+    expect(await screen.findByText(/invalid or missing csrf token/i)).toBeInTheDocument()
+    await waitFor(() => {
+      expect(acceptCampaignInvite).toHaveBeenCalledTimes(1)
+    })
   })
 
   it('shows the expired terminal state', async () => {

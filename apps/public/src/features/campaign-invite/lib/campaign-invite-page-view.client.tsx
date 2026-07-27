@@ -44,16 +44,16 @@ export function renderInviteViewState(
     acceptError: string | null
   },
 ) {
+  if (acceptError) {
+    return renderInviteUnavailableState(acceptError)
+  }
+
   if (
     viewState.kind === 'loading' ||
     viewState.kind === 'accepting' ||
     viewState.kind === 'ready_to_accept'
   ) {
     return renderInviteLoadingState(viewState)
-  }
-
-  if (acceptError) {
-    return renderInviteUnavailableState(acceptError)
   }
 
   if (viewState.kind === 'error') {

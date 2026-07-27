@@ -69,7 +69,6 @@ export function CampaignInvitePage({ token }: CampaignInvitePageProps) {
         window.location.assign(crossAppCampaignOnboardingPath(result.campaignId, result.inviteId))
       })
       .catch((error: unknown) => {
-        acceptStartedRef.current = false
         setIsAccepting(false)
         setAcceptError(
           error instanceof ApiError ? error.message : 'Could not accept this invitation.',
