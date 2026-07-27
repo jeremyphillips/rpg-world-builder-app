@@ -4,10 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 
 import {
-  CharacterBuildFinalizationError,
-  getErrorMessage,
   resolveBuilderLevelConstraints,
-  resolveCampaignInviteCompletionError,
   type CampaignBuildContext,
   type CharacterBuildAcquisition,
   type CharacterBuildCatalogIndex,
@@ -33,6 +30,11 @@ import { useCharacterBuilderStore } from '../hooks/use-character-builder-store'
 import { useCreateCharacter } from '../hooks/use-create-character'
 import { useCreateNpc } from '../npc/hooks/use-create-npc'
 import { getBuilderChromeCopyForContext } from '../lib/builder-chrome-copy'
+import {
+  applyBuilderCreateFailure,
+  resolveBuilderCreateFailure,
+  validationIssueStepIds,
+} from '../lib/character-builder-create-error.lib'
 import { finalizeBuilderCharacter } from '../lib/character-builder-finalize.lib'
 import {
   mergeValidationVisibleStepIds,
@@ -235,6 +237,13 @@ export function CharacterBuilderShell({
     setPendingEquipmentPickerFocus(undefined)
   }, [])
 
+  const applyValidationIssues = useCallback((issues: CharacterBuildValidationIssue[]) => {
+    const issueStepIds = validationIssueStepIds(issues)
+    setAttemptedStepIds((previous) => mergeAttemptedStepIds(previous, issueStepIds))
+    setValidationVisibleStepIds((previous) => mergeValidationVisibleStepIds(previous, issueStepIds))
+    setValidationIssues(issues)
+  }, [])
+
   if (!hasHydrated) {
     return (
       <div className="flex flex-1 items-center justify-center py-16">
@@ -345,14 +354,7 @@ export function CharacterBuilderShell({
 
     const validation = validateBuilderFinalSubmit(draft, context, resolvedChoiceSets)
     if (!validation.ok) {
-      const issueStepIds = validation.issues.flatMap((issue) =>
-        issue.stepId ? [issue.stepId] : [],
-      )
-      setAttemptedStepIds((previous) => mergeAttemptedStepIds(previous, issueStepIds))
-      setValidationVisibleStepIds((previous) =>
-        mergeValidationVisibleStepIds(previous, issueStepIds),
-      )
-      setValidationIssues(validation.issues)
+      applyValidationIssues(validation.issues)
       return
     }
 
@@ -369,46 +371,19 @@ export function CharacterBuilderShell({
       await clearPersistedDraft()
       navigate(destination)
     } catch (error) {
-      if (error instanceof CharacterBuildFinalizationError) {
-        const issueStepIds = error.validationIssues.flatMap((issue) =>
-          issue.stepId ? [issue.stepId] : [],
-        )
-        setAttemptedStepIds((previous) => mergeAttemptedStepIds(previous, issueStepIds))
-        setValidationVisibleStepIds((previous) =>
-          mergeValidationVisibleStepIds(previous, issueStepIds),
-        )
-        setValidationIssues(error.validationIssues)
-        return
-      }
-
-      const resolved = resolveCampaignInviteCompletionError(error, chrome.createErrorDefault)
-      if (resolved.kind === 'build_invalid') {
-        const issueStepIds = resolved.issues.flatMap((issue) =>
-          issue.stepId ? [issue.stepId] : [],
-        )
-        setAttemptedStepIds((previous) => mergeAttemptedStepIds(previous, issueStepIds))
-        setValidationVisibleStepIds((previous) =>
-          mergeValidationVisibleStepIds(previous, issueStepIds),
-        )
-        setValidationIssues(resolved.issues)
-        return
-      }
-
-      if (resolved.kind === 'campaign_ineligible') {
-        setCampaignEligibilityError({
-          blockingIssues: resolved.blockingIssues,
-          warnings: resolved.warnings,
-        })
-        patchDraft({ currentStepId: 'review' })
-        return
-      }
-
-      if (resolved.kind === 'invite_unavailable') {
-        onInviteUnavailable?.(resolved.reason)
-        return
-      }
-
-      setCreateError(getErrorMessage(error, chrome.createErrorDefault))
+      applyBuilderCreateFailure(
+        resolveBuilderCreateFailure(error, {
+          context,
+          defaultMessage: chrome.createErrorDefault,
+        }),
+        {
+          applyValidationIssues,
+          patchDraft,
+          setCampaignEligibilityError,
+          setCreateError,
+          onInviteUnavailable,
+        },
+      )
     }
   }
 

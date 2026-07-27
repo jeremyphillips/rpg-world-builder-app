@@ -1,9 +1,10 @@
 import { describe, expect, it } from 'vitest'
 
-import { ApiError } from '../../shared/errors'
+import { ApiError, isApiError } from '../../shared/errors'
 import {
   CAMPAIGN_INVITE_COMPLETION_ERROR_CODE,
   isCampaignInviteCompletionErrorCode,
+  LEGACY_CAMPAIGN_INVITE_INELIGIBLE_CODE,
   parseCampaignInviteCompletionErrorDetails,
   resolveCampaignInviteCompletionError,
 } from './campaign-invite-completion-errors'
@@ -72,6 +73,50 @@ describe('resolveCampaignInviteCompletionError', () => {
     expect(resolved).toEqual({
       kind: 'campaign_ineligible',
       blockingIssues: [{ code: 'not_owned_pc' }],
+      warnings: [],
+    })
+  })
+
+  it('recognizes ApiError across duplicate module instances', () => {
+    const error = new ApiError(422, CAMPAIGN_INVITE_COMPLETION_ERROR_CODE, 'Not eligible', {
+      kind: 'campaign_ineligible',
+      blockingIssues: [{ code: 'level_mismatch', actualLevel: 3, requiredLevel: 1 }],
+      warnings: [],
+    })
+
+    const foreignApiError = Object.assign(Object.create(ApiError.prototype), error)
+    expect(isApiError(foreignApiError)).toBe(true)
+
+    expect(resolveCampaignInviteCompletionError(foreignApiError, 'Fallback')).toEqual({
+      kind: 'campaign_ineligible',
+      blockingIssues: [{ code: 'level_mismatch', actualLevel: 3, requiredLevel: 1 }],
+      warnings: [],
+    })
+  })
+
+  it('maps legacy ineligible_character payloads to campaign_ineligible', () => {
+    expect(
+      resolveCampaignInviteCompletionError(
+        new ApiError(422, LEGACY_CAMPAIGN_INVITE_INELIGIBLE_CODE, 'Not eligible', {
+          blockingIssues: [
+            {
+              code: 'content_missing',
+              contentType: 'subclass',
+              contentId: 'srd-cc-5.2.1:missing-subclass',
+            },
+          ],
+        }),
+        'Fallback',
+      ),
+    ).toEqual({
+      kind: 'campaign_ineligible',
+      blockingIssues: [
+        {
+          code: 'content_missing',
+          contentType: 'subclass',
+          contentId: 'srd-cc-5.2.1:missing-subclass',
+        },
+      ],
       warnings: [],
     })
   })

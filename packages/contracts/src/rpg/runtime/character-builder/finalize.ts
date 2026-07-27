@@ -1,3 +1,5 @@
+import { ZodError } from 'zod'
+
 import { createCharacterInputSchema } from '../character/create-input'
 import type { CreateCharacterInput } from '../character/create-input'
 import { formatFieldMessage } from '../../../validation/define-message'
@@ -29,6 +31,36 @@ export class CharacterBuildFinalizationError extends Error {
     this.name = 'CharacterBuildFinalizationError'
     this.validationIssues = validationIssues
   }
+}
+
+/** Structural check — avoids `instanceof` failures across duplicate module instances in Vite. */
+export function isCharacterBuildFinalizationError(
+  error: unknown,
+): error is CharacterBuildFinalizationError {
+  if (typeof error !== 'object' || error === null) return false
+
+  const candidate = error as Partial<CharacterBuildFinalizationError>
+  return (
+    candidate.name === 'CharacterBuildFinalizationError' &&
+    Array.isArray(candidate.validationIssues)
+  )
+}
+
+function zodIssuesToFinalizationIssues(error: ZodError): CharacterBuildValidationResult['issues'] {
+  return error.issues.map((issue) => ({
+    code: 'create_input_invalid',
+    message: issue.message,
+    path: issue.path.length > 0 ? issue.path.join('.') : undefined,
+  }))
+}
+
+function parseCreateCharacterInput(input: unknown): CreateCharacterInput {
+  const parsed = createCharacterInputSchema.safeParse(input)
+  if (!parsed.success) {
+    throw new CharacterBuildFinalizationError(zodIssuesToFinalizationIssues(parsed.error))
+  }
+
+  return parsed.data
 }
 
 function requireCompleteAbilityScores(draft: CharacterBuilderDraft): Record<Ability, number> {
@@ -129,5 +161,5 @@ export function finalizeCharacterBuild(
     feats: [],
   }
 
-  return createCharacterInputSchema.parse(input)
+  return parseCreateCharacterInput(input)
 }

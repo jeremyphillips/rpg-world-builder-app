@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-import { ApiError } from '../../shared/errors'
+import { isApiError } from '../../shared/errors'
 import { characterBuilderStepIdSchema } from '../runtime/character-builder/step-ids'
 import {
   characterCampaignBlockingIssueSchema,
@@ -12,6 +12,9 @@ import {
 // ---------------------------------------------------------------------------
 
 export const CAMPAIGN_INVITE_COMPLETION_ERROR_CODE = 'campaign_invite_completion_failed' as const
+
+/** Pre-Phase-3 completion rejection code — still surfaced by stale API processes. */
+export const LEGACY_CAMPAIGN_INVITE_INELIGIBLE_CODE = 'ineligible_character' as const
 
 export const campaignInviteUnavailableReasonSchema = z.enum([
   'expired',
@@ -75,21 +78,53 @@ export function isCampaignInviteCompletionErrorCode(code: string): boolean {
   return code === CAMPAIGN_INVITE_COMPLETION_ERROR_CODE
 }
 
+function parseLegacyCampaignInviteCompletionErrorDetails(
+  details: unknown,
+): CampaignInviteCompletionErrorDetails | undefined {
+  if (!details || typeof details !== 'object') return undefined
+
+  const candidate = {
+    kind: 'campaign_ineligible' as const,
+    blockingIssues:
+      'blockingIssues' in details && Array.isArray(details.blockingIssues)
+        ? details.blockingIssues
+        : [],
+    warnings: 'warnings' in details && Array.isArray(details.warnings) ? details.warnings : [],
+  }
+
+  const parsed = campaignInviteCompletionCampaignIneligibleDetailsSchema.safeParse(candidate)
+  return parsed.success ? parsed.data : undefined
+}
+
 export function resolveCampaignInviteCompletionError(
   error: unknown,
   fallbackMessage: string,
 ): ResolvedCampaignInviteCompletionError {
-  if (!(error instanceof ApiError) || !isCampaignInviteCompletionErrorCode(error.code)) {
+  if (!isApiError(error)) {
     return {
       kind: 'generic',
-      message: error instanceof ApiError ? error.message : fallbackMessage,
+      message: fallbackMessage,
     }
   }
 
-  const details = parseCampaignInviteCompletionErrorDetails(error.details)
-  if (!details) {
+  if (isCampaignInviteCompletionErrorCode(error.code)) {
+    const details = parseCampaignInviteCompletionErrorDetails(error.details)
+    if (details) {
+      return details
+    }
+
     return { kind: 'generic', message: error.message }
   }
 
-  return details
+  if (error.code === LEGACY_CAMPAIGN_INVITE_INELIGIBLE_CODE) {
+    const legacyDetails = parseLegacyCampaignInviteCompletionErrorDetails(error.details)
+    if (legacyDetails) {
+      return legacyDetails
+    }
+  }
+
+  return {
+    kind: 'generic',
+    message: error.message,
+  }
 }
