@@ -82,6 +82,21 @@ export async function findAcceptedInviteByCampaignAndEmail(
   return toCampaignInvite(doc)
 }
 
+export async function findAcceptedInvitesByCampaignAndAcceptedUserId(
+  campaignId: string,
+  acceptedByUserId: string,
+): Promise<CampaignInvite[]> {
+  const docs = await CampaignInviteModel.find({
+    campaignId,
+    acceptedByUserId,
+    status: 'accepted',
+  })
+    .sort({ acceptedAt: -1, updatedAt: -1 })
+    .lean<CampaignInviteRecord[]>()
+
+  return docs.map(toCampaignInvite)
+}
+
 export async function listPendingInvitesByCampaign(campaignId: string): Promise<CampaignInvite[]> {
   const docs = await CampaignInviteModel.find({ campaignId, status: 'pending' })
     .sort({ createdAt: -1 })

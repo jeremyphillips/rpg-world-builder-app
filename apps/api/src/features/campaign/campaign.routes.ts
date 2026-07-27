@@ -4,6 +4,7 @@ import {
   createCampaignInputSchema,
   selectCampaignInputSchema,
   updateCampaignInputSchema,
+  completeCampaignOnboardingInputSchema,
   CAMPAIGN_ROLES,
 } from '@rpg/contracts'
 
@@ -11,6 +12,7 @@ import { requireAuth } from '../../middleware/require-auth'
 import { requireCampaignRole } from '../../middleware/require-role'
 import { validate } from '../../middleware/validate'
 import * as controller from './campaign.controller'
+import * as onboardingController from './campaign-onboarding.controller'
 
 export const campaignRouter: Router = Router()
 
@@ -41,4 +43,20 @@ campaignRouter.get(
   requireAuth,
   requireCampaignRole(...CAMPAIGN_ROLES),
   controller.listParty,
+)
+campaignRouter.get(
+  '/:campaignId/onboarding-context',
+  requireAuth,
+  onboardingController.getOnboardingContext,
+)
+campaignRouter.get(
+  '/:campaignId/onboarding/eligible-characters',
+  requireAuth,
+  onboardingController.listEligibleCharacters,
+)
+campaignRouter.post(
+  '/:campaignId/onboarding/complete',
+  requireAuth,
+  validate(completeCampaignOnboardingInputSchema),
+  onboardingController.completeOnboarding,
 )

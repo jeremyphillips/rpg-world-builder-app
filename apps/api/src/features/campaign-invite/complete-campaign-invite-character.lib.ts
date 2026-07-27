@@ -1,5 +1,4 @@
 import type {
-  CampaignInvite,
   CharacterEligibilitySubject,
   CompleteCampaignInviteResult,
   CreateCharacterInput,
@@ -42,11 +41,11 @@ export type CompletionCandidate =
     }
 
 export async function resolveNewCharacterCandidate({
-  acceptedInvite,
+  campaignId,
   userId,
   characterCreateInput,
 }: {
-  acceptedInvite: CampaignInvite
+  campaignId: string
   userId: string
   characterCreateInput: CreateCharacterInput
 }): Promise<Extract<CompletionCandidate, { kind: 'new' }>> {
@@ -59,7 +58,7 @@ export async function resolveNewCharacterCandidate({
   }
 
   const parsedInput = parsed.data
-  const campaign = await findCampaignById(acceptedInvite.campaignId)
+  const campaign = await findCampaignById(campaignId)
 
   if (!campaign) {
     throw new HttpError(500, 'integrity_error', 'Campaign for this invitation no longer exists.')
@@ -118,12 +117,12 @@ export async function resolveExistingCharacterCandidate({
 }
 
 export async function assertNewCharacterBuildEligible({
-  acceptedInvite,
+  campaignId,
   userId,
   candidate,
   eligibilityContext,
 }: {
-  acceptedInvite: CampaignInvite
+  campaignId: string
   userId: string
   candidate: Extract<CompletionCandidate, { kind: 'new' }>
   eligibilityContext: CampaignInviteEligibilityContext
@@ -131,7 +130,7 @@ export async function assertNewCharacterBuildEligible({
   const eligibility = resolveCharacterCampaignEligibility({
     subject: candidate.eligibilitySubject,
     userId,
-    campaignId: acceptedInvite.campaignId,
+    campaignId,
     startingLevel: eligibilityContext.startingLevel,
     existingOpenParticipation: null,
     contentIndex: eligibilityContext.contentIndex,
@@ -148,22 +147,19 @@ export async function assertNewCharacterBuildEligible({
 }
 
 export async function assertExistingCharacterEligible({
-  acceptedInvite,
+  campaignId,
   userId,
   candidate,
   eligibilityContext,
 }: {
-  acceptedInvite: CampaignInvite
+  campaignId: string
   userId: string
   candidate: Extract<CompletionCandidate, { kind: 'existing' }>
   eligibilityContext: CampaignInviteEligibilityContext
 }): Promise<void> {
   const existingOpenParticipation = await findOpenParticipationForCharacter(candidate.character.id)
   let conflictingCampaignName: string | undefined
-  if (
-    existingOpenParticipation &&
-    existingOpenParticipation.campaignId !== acceptedInvite.campaignId
-  ) {
+  if (existingOpenParticipation && existingOpenParticipation.campaignId !== campaignId) {
     const conflictingCampaign = await findCampaignById(existingOpenParticipation.campaignId)
     conflictingCampaignName = conflictingCampaign?.identity.name
   }
@@ -171,7 +167,7 @@ export async function assertExistingCharacterEligible({
   const eligibility = resolveCharacterCampaignEligibility({
     subject: candidate.eligibilitySubject,
     userId,
-    campaignId: acceptedInvite.campaignId,
+    campaignId,
     startingLevel: eligibilityContext.startingLevel,
     existingOpenParticipation,
     conflictingCampaignName,
@@ -212,7 +208,7 @@ export async function completeCampaignInviteWithCharacter(input: {
   const candidate =
     input.characterSource.kind === 'new'
       ? await resolveNewCharacterCandidate({
-          acceptedInvite: context.acceptedInvite,
+          campaignId: context.acceptedInvite.campaignId,
           userId: input.userId,
           characterCreateInput: input.characterSource.characterCreateInput,
         })
@@ -227,7 +223,7 @@ export async function completeCampaignInviteWithCharacter(input: {
 
   if (candidate.kind === 'new') {
     await assertNewCharacterBuildEligible({
-      acceptedInvite: context.acceptedInvite,
+      campaignId: context.acceptedInvite.campaignId,
       userId: input.userId,
       candidate,
       eligibilityContext,
@@ -243,7 +239,7 @@ export async function completeCampaignInviteWithCharacter(input: {
   }
 
   await assertExistingCharacterEligible({
-    acceptedInvite: context.acceptedInvite,
+    campaignId: context.acceptedInvite.campaignId,
     userId: input.userId,
     candidate,
     eligibilityContext,
