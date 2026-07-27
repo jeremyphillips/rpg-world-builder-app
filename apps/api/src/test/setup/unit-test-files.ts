@@ -13,4 +13,5 @@ export const unitTestFiles = [
   'src/features/vocabulary/lib/collect-content-vocabulary-ids.test.ts',
   'src/features/vocabulary/lib/resolve-vocabulary.test.ts',
   'src/features/vocabulary/lib/assert-vocabulary-id-available.test.ts',
+  'src/services/email/providers/ethereal.provider.test.ts',
 ] as const

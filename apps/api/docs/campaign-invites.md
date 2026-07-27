@@ -140,6 +140,11 @@ Invite email goes through `email.service.ts` with swappable providers
 (`fake` / `ethereal` / `smtp`). Env vars: see `docs/environment.md` and
 `apps/api/.env.example` (`EMAIL_PROVIDER`, `APP_BASE_URL`, `SMTP_*`).
 
+With `EMAIL_PROVIDER=ethereal` (the default in development), each successful
+send logs an Ethereal preview URL to the API terminal:
+`[email] Ethereal preview: <url>`. Open that link to read the invite email in
+the browser — no inbox or SMTP credentials required.
+
 ## Related docs
 
 - [campaign-access-enforcement.md](./campaign-access-enforcement.md) — viewer

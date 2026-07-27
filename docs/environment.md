@@ -17,21 +17,21 @@ misconfiguration fails fast with a clear message. Copy the example and adjust:
 cp apps/api/.env.example apps/api/.env
 ```
 
-| Variable                 | Required      | Default                                        | Purpose                                          |
-| ------------------------ | ------------- | ---------------------------------------------- | ------------------------------------------------ |
-| `NODE_ENV`               | no            | `development`                                  | `development` \| `test` \| `production`          |
-| `PORT`                   | no            | `5001`                                         | API listen port (the proxy forwards `/api` here) |
-| `MONGODB_URI`            | no            | `mongodb://127.0.0.1:27017/rpg`                | MongoDB connection string                        |
-| `MONGO_TRANSACTION_MODE` | no            | `auto`                                         | `auto` / `required` / `disabled` — see below     |
-| `JWT_SECRET`             | **prod only** | dev fallback outside production                | Session JWT signing secret (min 16 chars)        |
-| `JWT_EXPIRES_IN`         | no            | `7d`                                           | Session lifetime (ms/vercel-style duration)      |
-| `EMAIL_PROVIDER`         | no            | `fake` (test), `ethereal` (dev), `smtp` (prod) | Invite email transport selection                 |
-| `APP_BASE_URL`           | no            | `http://localhost:8080`                        | Public origin used in invite links               |
-| `SMTP_HOST`              | smtp only     | —                                              | SMTP server hostname                             |
-| `SMTP_PORT`              | smtp only     | —                                              | SMTP server port                                 |
-| `SMTP_USER`              | smtp only     | —                                              | SMTP auth username                               |
-| `SMTP_PASS`              | smtp only     | —                                              | SMTP auth password                               |
-| `SMTP_FROM_ADDRESS`      | smtp only     | `no-reply@localhost` (non-prod)                | From address for outbound invite email           |
+| Variable                 | Required      | Default                                        | Purpose                                                                     |
+| ------------------------ | ------------- | ---------------------------------------------- | --------------------------------------------------------------------------- |
+| `NODE_ENV`               | no            | `development`                                  | `development` \| `test` \| `production`                                     |
+| `PORT`                   | no            | `5001`                                         | API listen port (the proxy forwards `/api` here)                            |
+| `MONGODB_URI`            | no            | `mongodb://127.0.0.1:27017/rpg`                | MongoDB connection string                                                   |
+| `MONGO_TRANSACTION_MODE` | no            | `auto`                                         | `auto` / `required` / `disabled` — see below                                |
+| `JWT_SECRET`             | **prod only** | dev fallback outside production                | Session JWT signing secret (min 16 chars)                                   |
+| `JWT_EXPIRES_IN`         | no            | `7d`                                           | Session lifetime (ms/vercel-style duration)                                 |
+| `EMAIL_PROVIDER`         | no            | `fake` (test), `ethereal` (dev), `smtp` (prod) | Invite email transport; `ethereal` logs a browser preview URL to API stdout |
+| `APP_BASE_URL`           | no            | `http://localhost:8080`                        | Public origin used in invite links                                          |
+| `SMTP_HOST`              | smtp only     | —                                              | SMTP server hostname                                                        |
+| `SMTP_PORT`              | smtp only     | —                                              | SMTP server port                                                            |
+| `SMTP_USER`              | smtp only     | —                                              | SMTP auth username                                                          |
+| `SMTP_PASS`              | smtp only     | —                                              | SMTP auth password                                                          |
+| `SMTP_FROM_ADDRESS`      | smtp only     | `no-reply@localhost` (non-prod)                | From address for outbound invite email                                      |
 
 > Outside production a dev fallback `JWT_SECRET` is used if unset, so the API
 > boots with zero config against a local Mongo. In production `JWT_SECRET` is

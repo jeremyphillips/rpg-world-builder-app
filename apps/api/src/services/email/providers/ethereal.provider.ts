@@ -21,13 +21,18 @@ export function createEtherealEmailProvider(config: EtherealEmailProviderConfig)
           },
         })
 
-        await transport.sendMail({
+        const info = await transport.sendMail({
           from: config.fromAddress,
           to: formatAddress(message.to),
           subject: message.subject,
           text: message.text,
           html: message.html,
         })
+
+        const previewUrl = nodemailer.getTestMessageUrl(info)
+        if (previewUrl) {
+          console.info(`[email] Ethereal preview: ${previewUrl}`)
+        }
 
         return { ok: true }
       } catch {
