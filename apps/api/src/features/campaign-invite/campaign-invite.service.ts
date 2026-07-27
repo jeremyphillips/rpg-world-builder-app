@@ -46,16 +46,11 @@ import {
   buildCampaignContentEligibilityMap,
   formatInviteCharacterSummary,
 } from './campaign-invite-eligibility.lib'
+import { completeCampaignInviteWithCharacter } from './complete-campaign-invite-character.lib'
 import {
-  completeExistingCharacterInviteWrites,
-  completeNewCharacterInviteWrites,
-  resolveCompletedInviteForExistingCharacter,
-  validateExistingCharacterInviteCompletion,
-} from './complete-campaign-invite-completion.lib'
-import {
-  resolveCompletedInviteForNewCharacter,
-  validateNewCharacterInviteInput,
-} from './complete-campaign-invite-new-character.lib'
+  expireInviteIfNeeded,
+  loadAcceptedInviteForUser,
+} from './resolve-campaign-invite-completion-context.lib'
 
 export type SendCampaignInviteInput = {
   campaignId: string
@@ -131,20 +126,6 @@ async function assertCanSendInvite(campaignId: string, normalizedEmail: string):
       'This person has already accepted an invitation and still needs to finish character setup.',
     )
   }
-}
-
-async function expireInviteIfNeeded(invite: CampaignInvite): Promise<CampaignInvite> {
-  if (
-    (invite.status === 'pending' || invite.status === 'accepted') &&
-    isInvitePastExpiry(invite.expiresAt)
-  ) {
-    const expired = await markInviteExpired(invite.id)
-    if (!expired) {
-      throw new HttpError(500, 'internal_error', 'Failed to expire invite.')
-    }
-    return expired
-  }
-  return invite
 }
 
 async function deliverInviteEmail(
@@ -518,41 +499,6 @@ export async function revokeCampaignInvite(input: RevokeCampaignInviteInput): Pr
   }
 }
 
-async function loadAcceptedInviteForUser({
-  inviteId,
-  userId,
-}: {
-  inviteId: string
-  userId: string
-}): Promise<CampaignInvite> {
-  const invite = await findInviteById(inviteId)
-  if (!invite) {
-    throw new HttpError(404, 'not_found', 'Invitation not found.')
-  }
-
-  const currentInvite = await expireInviteIfNeeded(invite)
-
-  if (currentInvite.status === 'completed') {
-    throw new HttpError(409, 'conflict', 'Invitation is already completed.')
-  }
-
-  if (currentInvite.status === 'revoked') {
-    throw new HttpError(410, 'revoked', 'This invitation has been revoked.')
-  }
-
-  if (currentInvite.status !== 'accepted') {
-    throw new HttpError(409, 'conflict', 'Invitation is not ready for onboarding.')
-  }
-  if (isInvitePastExpiry(currentInvite.expiresAt)) {
-    throw new HttpError(410, 'expired', 'This invitation has expired.')
-  }
-  if (currentInvite.acceptedByUserId !== userId) {
-    throw new HttpError(403, 'forbidden', 'This invitation belongs to another user.')
-  }
-
-  return currentInvite
-}
-
 async function loadInviteStartingLevel(campaignId: string): Promise<number> {
   const patch = await getRulesetPatchRead(campaignId)
   return patch?.characterCreation.startingLevel ?? 1
@@ -613,36 +559,15 @@ export async function completeCampaignInviteWithExistingCharacter({
   userId: string
   characterId: string
 }): Promise<CompleteCampaignInviteResult> {
-  const invite = await findInviteById(inviteId)
-  if (!invite) {
-    throw new HttpError(404, 'not_found', 'Invitation not found.')
-  }
-
-  const currentInvite = await expireInviteIfNeeded(invite)
-  const completedResult = await resolveCompletedInviteForExistingCharacter({
-    invite: currentInvite,
+  const result = await completeCampaignInviteWithCharacter({
+    inviteId,
     userId,
-    characterId,
-  })
-  if (completedResult) return completedResult
-
-  const acceptedInvite = await loadAcceptedInviteForUser({ inviteId, userId })
-  const { membershipId } = await validateExistingCharacterInviteCompletion({
-    acceptedInvite,
-    userId,
-    characterId,
-  })
-
-  await completeExistingCharacterInviteWrites({
-    inviteId: invite.id,
-    campaignId: acceptedInvite.campaignId,
-    membershipId,
-    characterId,
+    characterSource: { kind: 'existing', characterId },
   })
 
   // TODO(notifications): notify campaign owners when onboarding completes.
 
-  return { campaignId: invite.campaignId, characterId }
+  return result
 }
 
 export async function completeCampaignInviteWithNewCharacter({
@@ -654,31 +579,10 @@ export async function completeCampaignInviteWithNewCharacter({
   userId: string
   characterCreateInput: CreateCharacterInput
 }): Promise<CompleteCampaignInviteResult> {
-  const invite = await findInviteById(inviteId)
-  if (!invite) {
-    throw new HttpError(404, 'not_found', 'Invitation not found.')
-  }
-
-  const currentInvite = await expireInviteIfNeeded(invite)
-  const completedResult = await resolveCompletedInviteForNewCharacter({
-    invite: currentInvite,
+  const result = await completeCampaignInviteWithCharacter({
+    inviteId,
     userId,
-  })
-  if (completedResult) return completedResult
-
-  const acceptedInvite = await loadAcceptedInviteForUser({ inviteId, userId })
-  const { parsedInput, membershipId } = await validateNewCharacterInviteInput({
-    acceptedInvite,
-    userId,
-    characterCreateInput,
-  })
-
-  const result = await completeNewCharacterInviteWrites({
-    inviteId: invite.id,
-    campaignId: acceptedInvite.campaignId,
-    membershipId,
-    userId,
-    parsedInput,
+    characterSource: { kind: 'new', characterCreateInput },
   })
 
   // TODO(notifications): notify campaign owners when onboarding completes.

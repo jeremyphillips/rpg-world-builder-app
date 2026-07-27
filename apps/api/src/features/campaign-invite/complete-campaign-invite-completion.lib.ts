@@ -1,117 +1,17 @@
-import type { CampaignInvite, CompleteCampaignInviteResult } from '@rpg/contracts'
-import { resolveCharacterCampaignEligibility } from '@rpg/contracts'
+import type { CompleteCampaignInviteResult } from '@rpg/contracts'
 import type { ClientSession } from 'mongoose'
 
 import { HttpError } from '../../lib/http-error'
 import { areMongoTransactionsEnabled, runInTransaction } from '../../lib/mongo-transaction'
 import { CampaignMembershipModel } from '../campaign/campaign-membership.model'
-import { findCampaignById } from '../campaign/find-campaign-by-id'
 import { assignControlledPcToCampaignMember } from '../campaign/participation/assign-controlled-pc.service'
 import {
   deleteAllParticipationsForCharacter,
   detachOpenParticipation,
-  findOpenParticipationForCharacter,
 } from '../campaign/participation/campaign-character-participation.repository'
 import { createPcRecord, deletePcForUser } from '../character/character.repository'
-import { findCharacterForUser } from '../character/character.service'
-import { getRulesetPatchRead } from '../vocabulary'
-import { buildCampaignContentEligibilityMap } from './campaign-invite-eligibility.lib'
 import { findInviteById, markInviteCompleted } from './campaign-invite.repository'
-import { findCampaignMembershipByCampaignAndUser } from './create-or-confirm-player-membership'
-
-async function loadInviteStartingLevel(campaignId: string): Promise<number> {
-  const patch = await getRulesetPatchRead(campaignId)
-  return patch?.characterCreation.startingLevel ?? 1
-}
-
-export async function resolveCompletedInviteForExistingCharacter({
-  invite,
-  userId,
-  characterId,
-}: {
-  invite: CampaignInvite
-  userId: string
-  characterId: string
-}): Promise<CompleteCampaignInviteResult | null> {
-  if (invite.status !== 'completed') return null
-
-  if (invite.acceptedByUserId !== userId) {
-    throw new HttpError(403, 'forbidden', 'This invitation belongs to another user.')
-  }
-
-  if (invite.completedCharacterId === characterId) {
-    return { campaignId: invite.campaignId, characterId }
-  }
-
-  throw new HttpError(
-    409,
-    'conflict',
-    'This invitation was already completed with a different character.',
-  )
-}
-
-export async function validateExistingCharacterInviteCompletion({
-  acceptedInvite,
-  userId,
-  characterId,
-}: {
-  acceptedInvite: CampaignInvite
-  userId: string
-  characterId: string
-}): Promise<{ membershipId: string }> {
-  const character = await findCharacterForUser(characterId, userId)
-  if (!character) {
-    throw new HttpError(404, 'not_found', 'Character not found.')
-  }
-
-  const [campaignContentById, startingLevel, membership] = await Promise.all([
-    buildCampaignContentEligibilityMap(acceptedInvite.campaignId),
-    loadInviteStartingLevel(acceptedInvite.campaignId),
-    findCampaignMembershipByCampaignAndUser(acceptedInvite.campaignId, userId),
-  ])
-
-  if (!membership) {
-    throw new HttpError(
-      500,
-      'integrity_error',
-      'Accepted invitation is missing the expected campaign membership.',
-    )
-  }
-
-  const existingOpenParticipation = await findOpenParticipationForCharacter(characterId)
-  let conflictingCampaignName: string | undefined
-  if (
-    existingOpenParticipation &&
-    existingOpenParticipation.campaignId !== acceptedInvite.campaignId
-  ) {
-    const conflictingCampaign = await findCampaignById(existingOpenParticipation.campaignId)
-    conflictingCampaignName = conflictingCampaign?.identity.name
-  }
-
-  const eligibility = resolveCharacterCampaignEligibility({
-    character,
-    userId,
-    campaignId: acceptedInvite.campaignId,
-    startingLevel,
-    existingOpenParticipation,
-    conflictingCampaignName,
-    campaignContentById,
-    viewer: { kind: 'pc', characterIds: [character.id] },
-  })
-
-  if (!eligibility.eligible) {
-    throw new HttpError(
-      422,
-      'ineligible_character',
-      'Character is not eligible for this campaign.',
-      {
-        blockingIssues: eligibility.blockingIssues,
-      },
-    )
-  }
-
-  return { membershipId: String(membership._id) }
-}
+import type { InviteCompletionWriteReceipt } from './complete-campaign-invite-receipt'
 
 async function executeInviteCompletionWrites({
   inviteId,
@@ -144,37 +44,33 @@ async function executeInviteCompletionWrites({
   }
 }
 
-async function compensateInviteExistingCharacterCompletion({
-  characterId,
+async function compensateInviteCompletionFromReceipt({
+  receipt,
   campaignId,
   membershipId,
+  userId,
 }: {
-  characterId: string
+  receipt: InviteCompletionWriteReceipt
   campaignId: string
   membershipId: string
+  userId?: string
 }): Promise<void> {
-  await CampaignMembershipModel.updateOne(
-    { _id: membershipId },
-    { $pull: { controlledCharacterIds: characterId } },
-  )
-  await detachOpenParticipation({ campaignId, characterId })
-}
+  if (receipt.addedControl) {
+    await CampaignMembershipModel.updateOne(
+      { _id: membershipId },
+      { $pull: { controlledCharacterIds: receipt.characterId } },
+    )
+  }
 
-async function compensateInviteNewCharacterCompletion({
-  characterId,
-  userId,
-  membershipId,
-}: {
-  characterId: string
-  userId: string
-  membershipId: string
-}): Promise<void> {
-  await CampaignMembershipModel.updateOne(
-    { _id: membershipId },
-    { $pull: { controlledCharacterIds: characterId } },
-  )
-  await deleteAllParticipationsForCharacter(characterId)
-  await deletePcForUser(characterId, userId)
+  if (receipt.createdCharacter && userId) {
+    await deleteAllParticipationsForCharacter(receipt.characterId)
+    await deletePcForUser(receipt.characterId, userId)
+    return
+  }
+
+  if (receipt.addedControl) {
+    await detachOpenParticipation({ campaignId, characterId: receipt.characterId })
+  }
 }
 
 async function runInviteCompletionAtomically({
@@ -182,14 +78,16 @@ async function runInviteCompletionAtomically({
   campaignId,
   membershipId,
   characterId,
+  receipt,
   compensate,
 }: {
   inviteId: string
   campaignId: string
   membershipId: string
   characterId: string
-  compensate?: () => Promise<void>
-}): Promise<void> {
+  receipt: InviteCompletionWriteReceipt
+  compensate?: (receipt: InviteCompletionWriteReceipt) => Promise<void>
+}): Promise<InviteCompletionWriteReceipt> {
   if (areMongoTransactionsEnabled()) {
     await runInTransaction(async (session) => {
       await executeInviteCompletionWrites({
@@ -200,18 +98,19 @@ async function runInviteCompletionAtomically({
         session,
       })
     })
-    return
+    return { ...receipt, addedControl: true, markedInviteCompleted: true }
   }
 
   try {
     await executeInviteCompletionWrites({ inviteId, campaignId, membershipId, characterId })
+    return { ...receipt, addedControl: true, markedInviteCompleted: true }
   } catch (err) {
-    await compensate?.()
+    await compensate?.({ ...receipt, addedControl: true, markedInviteCompleted: false })
     throw err
   }
 }
 
-export async function completeExistingCharacterInviteWrites({
+export async function executeExistingCharacterInviteCompletion({
   inviteId,
   campaignId,
   membershipId,
@@ -221,18 +120,30 @@ export async function completeExistingCharacterInviteWrites({
   campaignId: string
   membershipId: string
   characterId: string
-}): Promise<void> {
-  await runInviteCompletionAtomically({
+}): Promise<InviteCompletionWriteReceipt> {
+  const receipt: InviteCompletionWriteReceipt = {
+    characterId,
+    createdCharacter: false,
+    addedControl: false,
+    markedInviteCompleted: false,
+  }
+
+  return runInviteCompletionAtomically({
     inviteId,
     campaignId,
     membershipId,
     characterId,
-    compensate: () =>
-      compensateInviteExistingCharacterCompletion({ characterId, campaignId, membershipId }),
+    receipt,
+    compensate: (failedReceipt) =>
+      compensateInviteCompletionFromReceipt({
+        receipt: failedReceipt,
+        campaignId,
+        membershipId,
+      }),
   })
 }
 
-export async function completeNewCharacterInviteWrites({
+export async function executeNewCharacterInviteCompletion({
   inviteId,
   campaignId,
   membershipId,
@@ -260,6 +171,12 @@ export async function completeNewCharacterInviteWrites({
   }
 
   const character = await createPcRecord(parsedInput, userId)
+  const receipt: InviteCompletionWriteReceipt = {
+    characterId: character.id,
+    createdCharacter: true,
+    addedControl: false,
+    markedInviteCompleted: false,
+  }
 
   try {
     await executeInviteCompletionWrites({
@@ -269,13 +186,18 @@ export async function completeNewCharacterInviteWrites({
       characterId: character.id,
     })
   } catch (err) {
-    await compensateInviteNewCharacterCompletion({
-      characterId: character.id,
-      userId,
+    await compensateInviteCompletionFromReceipt({
+      receipt: { ...receipt, addedControl: true },
+      campaignId,
       membershipId,
+      userId,
     })
     throw err
   }
 
   return { campaignId, characterId: character.id }
 }
+
+// Legacy exports retained for any external callers during transition.
+export const completeExistingCharacterInviteWrites = executeExistingCharacterInviteCompletion
+export const completeNewCharacterInviteWrites = executeNewCharacterInviteCompletion

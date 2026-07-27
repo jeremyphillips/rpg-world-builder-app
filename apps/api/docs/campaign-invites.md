@@ -89,9 +89,13 @@ invite (server-side; never trust client-supplied email).
 
 ## Onboarding completion
 
-Two orchestrations, both calling `assignControlledPcToCampaignMember`:
+Two public service entry points delegate to a shared orchestrator
+(`completeCampaignInviteWithCharacter`) that resolves cheap invite context first,
+then source-specific candidates, then expensive eligibility context, before
+source-specific write adapters. Both paths call `assignControlledPcToCampaignMember`
+at the write core (`executeInviteCompletionWrites`).
 
-| Path               | Function                                      | Acquisition discriminator |
+| Path               | Service entry                                 | Acquisition discriminator |
 | ------------------ | --------------------------------------------- | ------------------------- |
 | Existing PC        | `completeCampaignInviteWithExistingCharacter` | N/A (direct assignment)   |
 | New PC via builder | `completeCampaignInviteWithNewCharacter`      | `campaign_invite`         |

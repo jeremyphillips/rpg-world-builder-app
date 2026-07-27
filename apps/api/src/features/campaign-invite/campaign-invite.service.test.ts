@@ -32,6 +32,9 @@ import { generateInviteToken, hashInviteToken } from './campaign-invite-token'
 import { computeInviteExpiresAt } from './campaign-invite.lib'
 import { createInviteRecord } from './campaign-invite.repository'
 import * as inviteRepository from './campaign-invite.repository'
+import * as eligibilityLib from './campaign-invite-eligibility.lib'
+import * as participationRepository from '../campaign/participation/campaign-character-participation.repository'
+import * as contracts from '@rpg/contracts'
 
 useIntegrationDb()
 
@@ -923,5 +926,205 @@ describe('campaign invite service', () => {
     const refreshedInvite = await CampaignInviteModel.findById(invite.id).lean()
     expect(refreshedInvite?.status).toBe('accepted')
     expect(refreshedInvite?.completedCharacterId).toBeNull()
+  })
+
+  describe('invite completion characterization', () => {
+    it('returns idempotently for completed invites without loading the eligibility map', async () => {
+      const eligibilityMapSpy = vi.spyOn(eligibilityLib, 'buildCampaignContentEligibilityMap')
+
+      const { id: campaignId, owner } = await makeTestCampaign()
+      const player = await makeTestUser({ email: 'idempotent-map@example.com' })
+      const rawToken = generateInviteToken()
+
+      const invite = await createInviteRecord({
+        campaignId,
+        email: 'idempotent-map@example.com',
+        normalizedEmail: 'idempotent-map@example.com',
+        tokenHash: hashInviteToken(rawToken),
+        expiresAt: computeInviteExpiresAt(),
+        invitedByUserId: owner.id,
+      })
+
+      await acceptCampaignInvite({
+        rawToken,
+        userId: player.id,
+        userEmail: player.email,
+      })
+
+      const character = await createPcRecord(minimalStandalonePcInput, player.id)
+
+      await completeCampaignInviteWithExistingCharacter({
+        inviteId: invite.id,
+        userId: player.id,
+        characterId: character.id,
+      })
+
+      eligibilityMapSpy.mockClear()
+
+      const idempotent = await completeCampaignInviteWithExistingCharacter({
+        inviteId: invite.id,
+        userId: player.id,
+        characterId: character.id,
+      })
+
+      expect(idempotent).toEqual({ campaignId, characterId: character.id })
+      expect(eligibilityMapSpy).not.toHaveBeenCalled()
+      eligibilityMapSpy.mockRestore()
+    })
+
+    it('fails for expired invites before loading the eligibility map', async () => {
+      const eligibilityMapSpy = vi.spyOn(eligibilityLib, 'buildCampaignContentEligibilityMap')
+
+      const { id: campaignId, owner } = await makeTestCampaign()
+      const player = await makeTestUser({ email: 'expired-completion@example.com' })
+      const rawToken = generateInviteToken()
+
+      const invite = await createInviteRecord({
+        campaignId,
+        email: 'expired-completion@example.com',
+        normalizedEmail: 'expired-completion@example.com',
+        tokenHash: hashInviteToken(rawToken),
+        expiresAt: computeInviteExpiresAt(),
+        invitedByUserId: owner.id,
+      })
+
+      await acceptCampaignInvite({
+        rawToken,
+        userId: player.id,
+        userEmail: player.email,
+      })
+
+      await CampaignInviteModel.findByIdAndUpdate(invite.id, {
+        expiresAt: new Date(Date.now() - 60_000),
+      })
+
+      const character = await createPcRecord(minimalStandalonePcInput, player.id)
+
+      await expect(
+        completeCampaignInviteWithExistingCharacter({
+          inviteId: invite.id,
+          userId: player.id,
+          characterId: character.id,
+        }),
+      ).rejects.toMatchObject({ status: 409, code: 'conflict' })
+
+      expect(eligibilityMapSpy).not.toHaveBeenCalled()
+      eligibilityMapSpy.mockRestore()
+    })
+
+    it('fails for revoked invites before loading the eligibility map', async () => {
+      const eligibilityMapSpy = vi.spyOn(eligibilityLib, 'buildCampaignContentEligibilityMap')
+
+      const { id: campaignId, owner } = await makeTestCampaign()
+      const player = await makeTestUser({ email: 'revoked-completion@example.com' })
+      const rawToken = generateInviteToken()
+
+      const invite = await createInviteRecord({
+        campaignId,
+        email: 'revoked-completion@example.com',
+        normalizedEmail: 'revoked-completion@example.com',
+        tokenHash: hashInviteToken(rawToken),
+        expiresAt: computeInviteExpiresAt(),
+        invitedByUserId: owner.id,
+      })
+
+      await acceptCampaignInvite({
+        rawToken,
+        userId: player.id,
+        userEmail: player.email,
+      })
+
+      await revokeCampaignInvite({
+        campaignId,
+        inviteId: invite.id,
+        revokedByUserId: owner.id,
+      })
+
+      const character = await createPcRecord(minimalStandalonePcInput, player.id)
+
+      await expect(
+        completeCampaignInviteWithExistingCharacter({
+          inviteId: invite.id,
+          userId: player.id,
+          characterId: character.id,
+        }),
+      ).rejects.toMatchObject({ status: 410, code: 'revoked' })
+
+      expect(eligibilityMapSpy).not.toHaveBeenCalled()
+      eligibilityMapSpy.mockRestore()
+    })
+
+    it('runs participation-conflict checks for existing-character completion', async () => {
+      const participationSpy = vi.spyOn(
+        participationRepository,
+        'findOpenParticipationForCharacter',
+      )
+
+      const { id: campaignId, owner } = await makeTestCampaign()
+      const player = await makeTestUser({ email: 'existing-participation@example.com' })
+      const rawToken = generateInviteToken()
+
+      const invite = await createInviteRecord({
+        campaignId,
+        email: 'existing-participation@example.com',
+        normalizedEmail: 'existing-participation@example.com',
+        tokenHash: hashInviteToken(rawToken),
+        expiresAt: computeInviteExpiresAt(),
+        invitedByUserId: owner.id,
+      })
+
+      await acceptCampaignInvite({
+        rawToken,
+        userId: player.id,
+        userEmail: player.email,
+      })
+
+      const character = await createPcRecord(minimalStandalonePcInput, player.id)
+
+      participationSpy.mockClear()
+
+      await completeCampaignInviteWithExistingCharacter({
+        inviteId: invite.id,
+        userId: player.id,
+        characterId: character.id,
+      })
+
+      expect(participationSpy).toHaveBeenCalled()
+      participationSpy.mockRestore()
+    })
+
+    it('does not run participation-conflict checks for new-character completion', async () => {
+      const eligibilitySpy = vi.spyOn(contracts, 'resolveCharacterCampaignEligibility')
+
+      const { id: campaignId, owner } = await makeTestCampaign()
+      const player = await makeTestUser({ email: 'new-no-participation@example.com' })
+      const rawToken = generateInviteToken()
+
+      const invite = await createInviteRecord({
+        campaignId,
+        email: 'new-no-participation@example.com',
+        normalizedEmail: 'new-no-participation@example.com',
+        tokenHash: hashInviteToken(rawToken),
+        expiresAt: computeInviteExpiresAt(),
+        invitedByUserId: owner.id,
+      })
+
+      await acceptCampaignInvite({
+        rawToken,
+        userId: player.id,
+        userEmail: player.email,
+      })
+
+      await completeCampaignInviteWithNewCharacter({
+        inviteId: invite.id,
+        userId: player.id,
+        characterCreateInput: minimalStandalonePcInput,
+      })
+
+      expect(eligibilitySpy).toHaveBeenCalledWith(
+        expect.objectContaining({ existingOpenParticipation: null }),
+      )
+      eligibilitySpy.mockRestore()
+    })
   })
 })

@@ -1,4 +1,5 @@
 export * from './character-campaign-eligibility'
+export * from './character-eligibility-subject'
 export * from './resolve-character-campaign-eligibility'
 export * from './resolve-character-content-eligibility'
 export * from './resolve-character-participation-eligibility'
