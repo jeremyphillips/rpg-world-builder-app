@@ -3,6 +3,8 @@
 import { useCallback, useMemo, useState } from 'react'
 
 import {
+  characterBuilderStepSelectionMessages,
+  formatFieldMessage,
   resolveAvailableContent,
   type CharacterBuildContext,
   type CharacterBuilderDraft,
@@ -32,9 +34,13 @@ import {
 import { BuilderDependentChoiceSection } from '../builder-dependent-choice-section.client'
 import { BuilderStepFrame } from './builder-step-frame.client'
 
-const SELECT_SPECIES_ACTION_LABEL = 'Select species'
-const SELECTED_SPECIES_LABEL = 'Selected'
 const HERITAGE_SECTION_ID_PREFIX = 'character-builder-species-heritage'
+const SELECT_SPECIES_ACTION_LABEL = formatFieldMessage(
+  characterBuilderStepSelectionMessages.selectSpecies(),
+)
+const SELECTED_SPECIES_LABEL = formatFieldMessage(
+  characterBuilderStepSelectionMessages.selectedBadge(),
+)
 
 export type SpeciesStepProps = {
   context: CharacterBuildContext

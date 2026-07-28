@@ -7,6 +7,7 @@ import {
   CHARACTER_ROSTER_STATUSES,
   CHARACTER_VITAL_STATUS_ENTRIES,
   CHARACTER_VITAL_STATUSES,
+  getErrorMessage,
   type CharacterRosterState,
   type CharacterVitalState,
 } from '@rpg/contracts'
@@ -138,7 +139,9 @@ export function NpcStatusEditor({
                 </Text>
               ) : null}
               {updateStatus.error ? (
-                <Text variant="destructive">{updateStatus.error.message}</Text>
+                <Text variant="destructive">
+                  {getErrorMessage(updateStatus.error, 'Could not update NPC status.')}
+                </Text>
               ) : null}
             </form>
           </FormProvider>

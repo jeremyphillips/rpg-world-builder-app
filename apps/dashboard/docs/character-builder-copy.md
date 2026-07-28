@@ -64,12 +64,32 @@ The `drawerLabelsForChoiceSet` fallback (`Manage ${choiceSet.label.toLowerCase()
 **legacy escape hatch only**. Add explicit map entries for new choice types instead of
 deriving manage copy from rules-facing `choiceSet.label`.
 
-### Species / class step sheet actions (interim)
+### Species / class step sheet actions
 
-`SELECT_SPECIES_ACTION_LABEL`, `SELECT_CLASS_ACTION_LABEL`, and `Selected` badge copy
-remain inline constants in step components. They are layer-3 workflow chrome and should
-migrate to a contracts message catalog when species/class/subclass affordances are
-consolidated.
+Species and class option-sheet affordances (`Select species`, `Select class`, `Selected`
+badge) live in `characterBuilderStepSelectionMessages` (`messages/character-builder-step-selection-messages.ts`).
+Dashboard step components format via `formatFieldMessage(...)` — do not reintroduce inline
+constants.
+
+### Spell picker casting-time filters
+
+Spell picker mechanics filters derive unit labels from `CASTING_TIME_UNIT_ENTRIES`
+(`getCastingTimeUnitLabel`) plus duration for minute/hour buckets — do not duplicate
+hardcoded casting-time strings in dashboard picker libs.
+
+## Chrome-variant ownership watchlist
+
+Promote strings into `characterBuilderChromeMessages` (variant-keyed) when a second
+consumer needs the same route-independent shell copy. Current variant-specific catalogs:
+
+| Variant                  | Owns                                   |
+| ------------------------ | -------------------------------------- |
+| `standalone_pc`          | PC create/review/draft-restore chrome  |
+| `campaign_npc`           | NPC create/review/draft-restore chrome |
+| `campaign_onboarding_pc` | Campaign character onboarding chrome   |
+
+Do **not** fold variant-specific copy into cross-step catalogs (`characterBuilderStepSelectionMessages`,
+`characterBuilderDependentChoiceMessages`) — those are variant-agnostic workflow strings.
 
 ## Related docs
 

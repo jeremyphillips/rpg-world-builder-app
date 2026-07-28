@@ -2,7 +2,9 @@ import {
   formatSpellConcentrationMarker,
   formatSpellRitualMarker,
   formatSpellLevel,
+  getCastingTimeUnitLabel,
   getSpellSchoolLabel,
+  type CastingTimeUnit,
   type ChoiceSet,
   type Spell,
   type SpellPickerCompactSummary,
@@ -59,13 +61,38 @@ const spellNameCollator = new Intl.Collator(undefined, {
   numeric: true,
 })
 
-const CASTING_TIME_FILTER_LABELS: Record<SpellPickerCastingTimeFilter, string> = {
-  action: 'Action',
-  'bonus-action': 'Bonus action',
-  reaction: 'Reaction',
-  '1-minute': '1 minute',
-  '10-minutes': '10 minutes',
-  '1-hour': '1 hour',
+const CASTING_TIME_FILTER_SPECS: Record<
+  SpellPickerCastingTimeFilter,
+  { unit: CastingTimeUnit; value: number }
+> = {
+  action: { unit: 'action', value: 1 },
+  'bonus-action': { unit: 'bonus-action', value: 1 },
+  reaction: { unit: 'reaction', value: 1 },
+  '1-minute': { unit: 'minute', value: 1 },
+  '10-minutes': { unit: 'minute', value: 10 },
+  '1-hour': { unit: 'hour', value: 1 },
+}
+
+function formatSpellPickerCastingTimeFilterLabel(unit: CastingTimeUnit, value: number): string {
+  if (unit === 'action' || unit === 'bonus-action' || unit === 'reaction') {
+    return getCastingTimeUnitLabel(unit)
+  }
+
+  const unitLabel = getCastingTimeUnitLabel(unit).toLowerCase()
+  const pluralUnit = value === 1 ? unitLabel : `${unitLabel}s`
+  return `${value} ${pluralUnit}`
+}
+
+const CASTING_TIME_FILTER_MATCHERS: Record<
+  SpellPickerCastingTimeFilter,
+  (value: number, unit: string) => boolean
+> = {
+  action: (value, unit) => unit === 'action' && value === 1,
+  'bonus-action': (value, unit) => unit === 'bonus-action' && value === 1,
+  reaction: (value, unit) => unit === 'reaction' && value === 1,
+  '1-minute': (value, unit) => unit === 'minute' && value === 1,
+  '10-minutes': (value, unit) => unit === 'minute' && value === 10,
+  '1-hour': (value, unit) => unit === 'hour' && value === 1,
 }
 
 const TRAIT_FILTER_LABELS = {
@@ -80,18 +107,6 @@ const METHOD_FILTER_LABELS = {
 
 function castingSummaryIncludesConcentration(castingSummary: readonly string[]): boolean {
   return castingSummary.some((entry) => entry.includes('Concentration'))
-}
-
-const CASTING_TIME_FILTER_MATCHERS: Record<
-  SpellPickerCastingTimeFilter,
-  (value: number, unit: string) => boolean
-> = {
-  action: (value, unit) => unit === 'action' && value === 1,
-  'bonus-action': (value, unit) => unit === 'bonus-action' && value === 1,
-  reaction: (value, unit) => unit === 'reaction' && value === 1,
-  '1-minute': (value, unit) => unit === 'minute' && value === 1,
-  '10-minutes': (value, unit) => unit === 'minute' && value === 10,
-  '1-hour': (value, unit) => unit === 'hour' && value === 1,
 }
 
 function resolveCastingTimeFilter(spell: Spell): SpellPickerCastingTimeFilter | undefined {
@@ -393,7 +408,8 @@ export function formatSpellPickerMechanicsTriggerLabel(activeCount: number): str
 }
 
 export function getSpellPickerCastingTimeFilterLabel(filter: SpellPickerCastingTimeFilter): string {
-  return CASTING_TIME_FILTER_LABELS[filter]
+  const spec = CASTING_TIME_FILTER_SPECS[filter]
+  return formatSpellPickerCastingTimeFilterLabel(spec.unit, spec.value)
 }
 
 export function getSpellPickerTraitFilterLabel(filter: SpellPickerTraitFilter): string {

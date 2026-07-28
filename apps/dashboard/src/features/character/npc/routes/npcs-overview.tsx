@@ -7,6 +7,7 @@ import { useCanManageCampaign } from '@/features/campaign'
 
 import { NpcsOverviewTable } from '../components/npcs-overview-table.client'
 import { useCampaignBuildContext } from '../../hooks/use-campaign-build-context'
+import { resolveQueryErrorLabel } from '../../lib/resolve-query-error-label.lib'
 import { useNpcs } from '../hooks/use-npcs'
 
 export function NpcsOverview() {
@@ -27,7 +28,10 @@ export function NpcsOverview() {
 
   const isPending = isNpcsPending || isContextPending
   const isError = isNpcsError || isContextError
-  const errorLabel = npcsError?.message ?? contextError?.message
+  const errorLabel = resolveQueryErrorLabel([
+    { isPending: isNpcsPending, isError: isNpcsError, error: npcsError },
+    { isPending: isContextPending, isError: isContextError, error: contextError },
+  ])
   const actions = canManage ? (
     <div className="flex flex-wrap gap-2">
       <Link
