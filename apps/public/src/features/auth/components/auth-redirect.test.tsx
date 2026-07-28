@@ -12,11 +12,11 @@ vi.mock('../hooks/use-session', () => ({
   useSession,
 }))
 
-function renderRedirect() {
+function renderRedirect(returnTo?: string) {
   const queryClient = new QueryClient()
   return render(
     <QueryClientProvider client={queryClient}>
-      <AuthRedirect>
+      <AuthRedirect returnTo={returnTo}>
         <p>Auth form</p>
       </AuthRedirect>
     </QueryClientProvider>,
@@ -37,7 +37,7 @@ describe('AuthRedirect', () => {
     expect(screen.queryByText('Auth form')).not.toBeInTheDocument()
   })
 
-  it('redirects authenticated users to the dashboard', () => {
+  it('redirects authenticated users to the dashboard by default', () => {
     useSession.mockReturnValue({
       isPending: false,
       data: {
@@ -50,6 +50,20 @@ describe('AuthRedirect', () => {
 
     expect(window.location.assign).toHaveBeenCalledWith('/app/')
     expect(screen.queryByText('Auth form')).not.toBeInTheDocument()
+  })
+
+  it('redirects authenticated users to a validated returnTo path', () => {
+    useSession.mockReturnValue({
+      isPending: false,
+      data: {
+        user: { id: 'u1', email: 'a@b.com', displayName: 'DM', role: 'user' },
+        activeCampaign: null,
+      },
+    })
+
+    renderRedirect('/campaign-invites/token-1')
+
+    expect(window.location.assign).toHaveBeenCalledWith('/campaign-invites/token-1')
   })
 
   it('renders children when unauthenticated', () => {

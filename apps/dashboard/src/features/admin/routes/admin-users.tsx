@@ -1,14 +1,19 @@
-import { Heading, Text } from '@rpg/ui'
+'use client'
 
-import { NarrowPage } from '@/components/layout/narrow-page'
+import { PageHeader } from '@/components/layout/page-header'
+import { WidePage } from '@/components/layout/wide-page'
+import { Text } from '@rpg/ui'
+
+import { AdminUsersOverviewTable } from '../components/admin-users-overview-table.client'
 
 export function AdminUsers() {
   return (
-    <NarrowPage>
-      <Heading variant="page" as="h1">
-        Users
-      </Heading>
-      <Text variant="muted">Coming soon.</Text>
-    </NarrowPage>
+    <WidePage>
+      <PageHeader heading="Users" />
+      <Text variant="muted" className="mb-6">
+        Browse platform accounts, review activity, and manage test users.
+      </Text>
+      <AdminUsersOverviewTable />
+    </WidePage>
   )
 }

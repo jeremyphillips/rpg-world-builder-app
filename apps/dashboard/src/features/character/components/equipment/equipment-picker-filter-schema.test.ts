@@ -5,6 +5,7 @@ import { sanitizeFilterState } from '@rpg/ui/filters'
 
 import {
   createEquipmentPickerFilterSchema,
+  resolveEquipmentPickerFilterLayout,
   type EquipmentPickerFilterState,
 } from './equipment-picker-filter-schema'
 import type { EquipmentPickerItem } from './equipment-picker-drawer.types'
@@ -92,5 +93,59 @@ describe('equipment-picker-filter-schema', () => {
 
     const kindField = schema.fields.find((field) => field.id === 'selectedKind')
     expect(kindField?.isValueConstraining?.(EQUIPMENT_PICKER_KIND_ALL)).toBe(false)
+  })
+
+  it('resolves layout slots from the active schema fields only', () => {
+    const categorySchema = createEquipmentPickerFilterSchema({
+      workflowMode: 'purchase',
+      items,
+      kindOptions: ['weapon'],
+      showCategoryFilter: true,
+      showRarityFilter: false,
+      showAffordableFilter: true,
+      filterOutUnaffordable: false,
+      filterOutNonProficient: false,
+      searchQuery: '',
+    })
+
+    expect(resolveEquipmentPickerFilterLayout(categorySchema)).toEqual({
+      primaryFieldIds: ['selectedKind'],
+      filterRowFieldIds: ['showAffordableOnly'],
+    })
+
+    const raritySchema = createEquipmentPickerFilterSchema({
+      workflowMode: 'magic_items',
+      items,
+      kindOptions: ['weapon'],
+      showCategoryFilter: false,
+      showRarityFilter: true,
+      showAffordableFilter: false,
+      magicItemGrantProgress,
+      filterOutUnaffordable: false,
+      filterOutNonProficient: false,
+      searchQuery: '',
+    })
+
+    expect(resolveEquipmentPickerFilterLayout(raritySchema)).toEqual({
+      primaryFieldIds: ['selectedRarity'],
+      filterRowFieldIds: [],
+    })
+
+    const emptySchema = createEquipmentPickerFilterSchema({
+      workflowMode: 'purchase',
+      items,
+      kindOptions: ['weapon'],
+      showCategoryFilter: false,
+      showRarityFilter: false,
+      showAffordableFilter: false,
+      filterOutUnaffordable: false,
+      filterOutNonProficient: false,
+      searchQuery: '',
+    })
+
+    expect(resolveEquipmentPickerFilterLayout(emptySchema)).toEqual({
+      primaryFieldIds: [],
+      filterRowFieldIds: [],
+    })
   })
 })

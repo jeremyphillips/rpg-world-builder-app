@@ -4,31 +4,36 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 
 import {
-  CharacterBuildFinalizationError,
-  finalizeCharacterBuild,
-  finalizeNpcCharacterBuild,
-  getErrorMessage,
+  isCampaignBuildContext,
   resolveBuilderLevelConstraints,
+  type CharacterBuildAcquisition,
   type CharacterBuildCatalogIndex,
   type CharacterBuildContext,
   type CharacterBuilderDraft,
   type CharacterBuilderStepId,
   type CharacterBuildValidationIssue,
+  type CharacterCampaignBlockingIssue,
+  type CharacterCampaignWarning,
+  type CampaignInviteUnavailableReason,
   type EquipmentPickerFocusIntent,
 } from '@rpg/contracts'
-import { buttonVariants, Heading, Spinner, Text } from '@rpg/ui'
+import { buttonVariants, Button, Heading, Spinner, Text } from '@rpg/ui'
 
-import { ROUTES } from '@/app/routes'
+import { CampaignCharacterEligibilityAlert } from '@/features/campaign'
+import { useCompleteCampaignOnboarding } from '@/features/campaign/hooks/use-campaign-onboarding-eligible-characters'
 
 import { useResolvedChoiceSets } from '../hooks/use-resolved-choice-sets'
 import { useCharacterPreview } from '../hooks/use-character-preview'
 import { useCharacterBuilderStore } from '../hooks/use-character-builder-store'
 import { useCreateCharacter } from '../hooks/use-create-character'
 import { useCreateNpc } from '../npc/hooks/use-create-npc'
+import { getBuilderChromeCopyForContext } from '../lib/builder-chrome-copy'
 import {
-  getBuilderChromeCopyForContext,
-  resolveCampaignIdFromContext,
-} from '../lib/builder-chrome-copy'
+  applyBuilderCreateFailure,
+  resolveBuilderCreateFailure,
+  validationIssueStepIds,
+} from '../lib/character-builder-create-error.lib'
+import { finalizeBuilderCharacter } from '../lib/character-builder-finalize.lib'
 import {
   mergeValidationVisibleStepIds,
   pruneValidationVisibleStepIds,
@@ -68,19 +73,42 @@ import {
 import { CharacterBuilderStepContent } from './character-builder-step-content.client'
 import { CharacterBuilderStepRail } from './character-builder-step-rail.client'
 
+function resolveBuildAcquisition(context: CharacterBuildContext): CharacterBuildAcquisition {
+  if (isCampaignBuildContext(context)) {
+    return context.acquisition
+  }
+
+  return { kind: 'standalone' }
+}
+
 export type CharacterBuilderShellProps = {
   context: CharacterBuildContext
   catalogIndex: CharacterBuildCatalogIndex
+  /** When set, renders the exit control as a button instead of a navigation link. */
+  onExitClick?: () => void
+  /** Invite onboarding terminal failures that invalidate the current builder session. */
+  onInviteUnavailable?: (reason: CampaignInviteUnavailableReason) => void
 }
 
 /** Full-viewport builder chrome: step rail, step panel, live preview, footer nav. */
-export function CharacterBuilderShell({ context, catalogIndex }: CharacterBuilderShellProps) {
+// fallow-ignore-next-line complexity
+export function CharacterBuilderShell({
+  context,
+  catalogIndex,
+  onExitClick,
+  onInviteUnavailable,
+}: CharacterBuilderShellProps) {
   const navigate = useNavigate()
   const chrome = getBuilderChromeCopyForContext(context)
-  const campaignId = resolveCampaignIdFromContext(context)
   const { mutateAsync: createCharacterMutation, isPending: isCreatingPc } = useCreateCharacter()
   const { mutateAsync: createNpcMutation, isPending: isCreatingNpc } = useCreateNpc()
-  const isCreating = isCreatingPc || isCreatingNpc
+  const onboardingCampaignId =
+    isCampaignBuildContext(context) && context.acquisition.kind === 'campaign_pc_onboarding'
+      ? context.acquisition.campaignId
+      : undefined
+  const { mutateAsync: completeCampaignOnboarding, isPending: isCompletingOnboarding } =
+    useCompleteCampaignOnboarding(onboardingCampaignId)
+  const isCreating = isCreatingPc || isCreatingNpc || isCompletingOnboarding
   const hasHydrated = useCharacterBuilderStore(context, (state) => state._hasHydrated)
   const hasPendingRestore = useCharacterBuilderStore(context, (state) => state.hasPendingRestore)
   const draft = useCharacterBuilderStore(context, (state) => state.draft)
@@ -95,6 +123,10 @@ export function CharacterBuilderShell({ context, catalogIndex }: CharacterBuilde
     CharacterBuilderStepId[]
   >([])
   const [createError, setCreateError] = useState<string | null>(null)
+  const [campaignEligibilityError, setCampaignEligibilityError] = useState<{
+    blockingIssues: CharacterCampaignBlockingIssue[]
+    warnings: CharacterCampaignWarning[]
+  } | null>(null)
   const [pendingEquipmentPickerFocus, setPendingEquipmentPickerFocus] = useState<
     EquipmentPickerFocusIntent | undefined
   >()
@@ -199,6 +231,13 @@ export function CharacterBuilderShell({ context, catalogIndex }: CharacterBuilde
     setPendingEquipmentPickerFocus(undefined)
   }, [])
 
+  const applyValidationIssues = useCallback((issues: CharacterBuildValidationIssue[]) => {
+    const issueStepIds = validationIssueStepIds(issues)
+    setAttemptedStepIds((previous) => mergeAttemptedStepIds(previous, issueStepIds))
+    setValidationVisibleStepIds((previous) => mergeValidationVisibleStepIds(previous, issueStepIds))
+    setValidationIssues(issues)
+  }, [])
+
   if (!hasHydrated) {
     return (
       <div className="flex flex-1 items-center justify-center py-16">
@@ -273,6 +312,7 @@ export function CharacterBuilderShell({ context, catalogIndex }: CharacterBuilde
     )
     setValidationIssues([])
     setCreateError(null)
+    setCampaignEligibilityError(null)
     shiftStep('forward')
   }
 
@@ -304,52 +344,43 @@ export function CharacterBuilderShell({ context, catalogIndex }: CharacterBuilde
   const handleCreateCharacter = async () => {
     setValidationIssues([])
     setCreateError(null)
+    setCampaignEligibilityError(null)
 
     const validation = validateBuilderFinalSubmit(draft, context, resolvedChoiceSets)
     if (!validation.ok) {
-      const issueStepIds = validation.issues.flatMap((issue) =>
-        issue.stepId ? [issue.stepId] : [],
-      )
-      setAttemptedStepIds((previous) => mergeAttemptedStepIds(previous, issueStepIds))
-      setValidationVisibleStepIds((previous) =>
-        mergeValidationVisibleStepIds(previous, issueStepIds),
-      )
-      setValidationIssues(validation.issues)
+      applyValidationIssues(validation.issues)
       return
     }
 
     try {
-      if (context.characterKind === 'npc') {
-        if (!campaignId) {
-          setCreateError(chrome.createErrorDefault)
-          return
-        }
-
-        const input = finalizeNpcCharacterBuild(draft, context, { resolvedChoiceSets })
-        const npc = await createNpcMutation({ campaignId, input })
-        await clearPersistedDraft()
-        navigate(ROUTES.campaign.npcs.detail(campaignId, npc.character.id))
-        return
-      }
-
-      const input = finalizeCharacterBuild(draft, context, { resolvedChoiceSets })
-      const character = await createCharacterMutation(input)
+      const destination = await finalizeBuilderCharacter({
+        acquisition: resolveBuildAcquisition(context),
+        context,
+        draft,
+        resolvedChoiceSets,
+        createNpc: createNpcMutation,
+        createStandalonePc: createCharacterMutation,
+        completeCampaignOnboarding: async (input) => {
+          const result = await completeCampaignOnboarding({ source: 'new', character: input })
+          return { campaignId: result.campaignId, characterId: result.characterId }
+        },
+      })
       await clearPersistedDraft()
-      navigate(ROUTES.characters.detail(character.id))
+      navigate(destination)
     } catch (error) {
-      if (error instanceof CharacterBuildFinalizationError) {
-        const issueStepIds = error.validationIssues.flatMap((issue) =>
-          issue.stepId ? [issue.stepId] : [],
-        )
-        setAttemptedStepIds((previous) => mergeAttemptedStepIds(previous, issueStepIds))
-        setValidationVisibleStepIds((previous) =>
-          mergeValidationVisibleStepIds(previous, issueStepIds),
-        )
-        setValidationIssues(error.validationIssues)
-        return
-      }
-
-      setCreateError(getErrorMessage(error, chrome.createErrorDefault))
+      applyBuilderCreateFailure(
+        resolveBuilderCreateFailure(error, {
+          context,
+          defaultMessage: chrome.createErrorDefault,
+        }),
+        {
+          applyValidationIssues,
+          patchDraft,
+          setCampaignEligibilityError,
+          setCreateError,
+          onInviteUnavailable,
+        },
+      )
     }
   }
 
@@ -375,9 +406,15 @@ export function CharacterBuilderShell({ context, catalogIndex }: CharacterBuilde
                 {chrome.importLabel}
               </Link>
             ) : null}
-            <Link to={chrome.exitHref} className={buttonVariants({ variant: 'outline' })}>
-              {chrome.exitLabel}
-            </Link>
+            {onExitClick ? (
+              <Button type="button" variant="outline" onClick={onExitClick}>
+                {chrome.exitLabel}
+              </Button>
+            ) : (
+              <Link to={chrome.exitHref} className={buttonVariants({ variant: 'outline' })}>
+                {chrome.exitLabel}
+              </Link>
+            )}
           </div>
         </header>
 
@@ -421,6 +458,14 @@ export function CharacterBuilderShell({ context, catalogIndex }: CharacterBuilde
             />
           </div>
         </div>
+
+        {isReviewBuilderStep(currentStepId) && campaignEligibilityError ? (
+          <CampaignCharacterEligibilityAlert
+            blockingIssues={campaignEligibilityError.blockingIssues}
+            warnings={campaignEligibilityError.warnings}
+            heading={chrome.reviewValidationHeading}
+          />
+        ) : null}
 
         {isReviewBuilderStep(currentStepId) && createError ? (
           <Text variant="destructive" role="alert">

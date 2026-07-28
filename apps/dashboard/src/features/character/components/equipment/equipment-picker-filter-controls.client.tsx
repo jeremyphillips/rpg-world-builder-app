@@ -5,7 +5,7 @@ import { useMemo } from 'react'
 
 import {
   createEquipmentPickerFilterSchema,
-  EQUIPMENT_PICKER_FILTER_LAYOUT,
+  resolveEquipmentPickerFilterLayout,
   type EquipmentPickerFilterState,
 } from './equipment-picker-filter-schema'
 import type { CreateEquipmentPickerFilterSchemaArgs } from './equipment-picker-filter-schema'
@@ -22,6 +22,7 @@ function useEquipmentPickerFilterControls({
   onFilterStateChange,
 }: EquipmentPickerFilterControlsProps) {
   const schema = useMemo(() => createEquipmentPickerFilterSchema(schemaArgs), [schemaArgs])
+  const layout = useMemo(() => resolveEquipmentPickerFilterLayout(schema), [schema])
 
   const handleValueChange = (
     id: keyof EquipmentPickerFilterState,
@@ -30,16 +31,20 @@ function useEquipmentPickerFilterControls({
     onFilterStateChange(setFilterValue(schema, filterState, id, value))
   }
 
-  return { schema, handleValueChange }
+  return { schema, layout, handleValueChange }
 }
 
 export function EquipmentPickerPrimaryFilterControls(props: EquipmentPickerFilterControlsProps) {
-  const { schema, handleValueChange } = useEquipmentPickerFilterControls(props)
+  const { schema, layout, handleValueChange } = useEquipmentPickerFilterControls(props)
+
+  if ((layout.primaryFieldIds?.length ?? 0) === 0) {
+    return null
+  }
 
   return (
     <CatalogFilterControls.Primary
       schema={schema}
-      layout={EQUIPMENT_PICKER_FILTER_LAYOUT}
+      layout={layout}
       state={props.filterState}
       data={props.schemaArgs.items}
       idPrefix="equipment-picker"
@@ -49,12 +54,16 @@ export function EquipmentPickerPrimaryFilterControls(props: EquipmentPickerFilte
 }
 
 export function EquipmentPickerFilterRowControls(props: EquipmentPickerFilterControlsProps) {
-  const { schema, handleValueChange } = useEquipmentPickerFilterControls(props)
+  const { schema, layout, handleValueChange } = useEquipmentPickerFilterControls(props)
+
+  if ((layout.filterRowFieldIds?.length ?? 0) === 0) {
+    return null
+  }
 
   return (
     <CatalogFilterControls.FilterRow
       schema={schema}
-      layout={EQUIPMENT_PICKER_FILTER_LAYOUT}
+      layout={layout}
       state={props.filterState}
       data={props.schemaArgs.items}
       idPrefix="equipment-picker"

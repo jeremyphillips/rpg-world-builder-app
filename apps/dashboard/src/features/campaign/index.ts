@@ -1,5 +1,6 @@
 export { CampaignSwitcher } from './components/campaign-switcher'
 export { CampaignPicker } from './components/campaign-picker'
+export { CampaignCharacterEligibilityAlert } from './components/campaign-character-eligibility-alert.client'
 export { ExtendedProgressionEffects } from './components/extended-progression-effects.client'
 export {
   ExtendedLevelRangeSummary,

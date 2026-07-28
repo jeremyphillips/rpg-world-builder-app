@@ -14,6 +14,45 @@ export const platformRoleSchema = z.enum(PLATFORM_ROLES)
 
 export type PlatformRole = z.infer<typeof platformRoleSchema>
 
+export const PLATFORM_ROLE_TERM = {
+  label: 'Access',
+  description: 'Platform-wide role that governs admin and staff capabilities.',
+  sentence: {
+    singular: 'access level',
+    plural: 'access levels',
+  },
+} as const
+
+export const PLATFORM_ROLE_ENTRIES = {
+  user: {
+    label: 'User',
+    description: 'Standard account with no elevated platform permissions.',
+    sentence: {
+      singular: 'user',
+      plural: 'users',
+    },
+  },
+  admin: {
+    label: 'Admin',
+    description: 'Staff account that can access admin surfaces.',
+    sentence: {
+      singular: 'admin',
+      plural: 'admins',
+    },
+  },
+  superadmin: {
+    label: 'Superadmin',
+    description: 'Owner account with unrestricted platform permissions.',
+    sentence: {
+      singular: 'superadmin',
+      plural: 'superadmins',
+    },
+  },
+} as const satisfies Record<
+  PlatformRole,
+  { label: string; description: string; sentence: { singular: string; plural: string } }
+>
+
 // ---------------------------------------------------------------------------
 // Campaign roles — stored on CampaignMembership (scoped to a single campaign)
 // ---------------------------------------------------------------------------
@@ -33,6 +72,53 @@ export const CAMPAIGN_ROLES = ['owner', 'co-owner', 'pc', 'observer'] as const
 export const campaignRoleSchema = z.enum(CAMPAIGN_ROLES)
 
 export type CampaignRole = z.infer<typeof campaignRoleSchema>
+
+export const CAMPAIGN_ROLE_TERM = {
+  label: 'Role',
+  description: 'Campaign membership role for a user within one campaign.',
+  sentence: {
+    singular: 'campaign role',
+    plural: 'campaign roles',
+  },
+} as const
+
+export const CAMPAIGN_ROLE_ENTRIES = {
+  owner: {
+    label: 'Owner',
+    description: 'Campaign creator with full control.',
+    sentence: {
+      singular: 'owner',
+      plural: 'owners',
+    },
+  },
+  'co-owner': {
+    label: 'Co-owner',
+    description: 'Invited co-DM with management access.',
+    sentence: {
+      singular: 'co-owner',
+      plural: 'co-owners',
+    },
+  },
+  pc: {
+    label: 'Player',
+    description: 'Player with a character in the party.',
+    sentence: {
+      singular: 'player',
+      plural: 'players',
+    },
+  },
+  observer: {
+    label: 'Observer',
+    description: 'Spectator with read-only campaign access.',
+    sentence: {
+      singular: 'observer',
+      plural: 'observers',
+    },
+  },
+} as const satisfies Record<
+  CampaignRole,
+  { label: string; description: string; sentence: { singular: string; plural: string } }
+>
 
 /** Roles that can manage campaign settings and author content (matches API write guards). */
 export const CAMPAIGN_MANAGE_ROLES = [

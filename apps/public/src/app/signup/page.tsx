@@ -1,23 +1,12 @@
 import type { Metadata } from 'next'
+import { APP_NAME } from '@rpg/contracts'
 
-import { SiteHeader } from '@/components/site-header'
-import { AuthRedirect, SignupForm } from '@/features/auth'
+import { SignupPageClient } from '@/features/auth/components/signup-page.client'
 
 export const metadata: Metadata = {
-  title: 'Sign up - RPG World Builder',
+  title: `Sign up - ${APP_NAME}`,
 }
 
 export default function SignupPage() {
-  return (
-    <div className="flex min-h-dvh flex-col">
-      <SiteHeader />
-      <main className="flex flex-1 flex-col">
-        <AuthRedirect>
-          <div className="flex flex-1 items-center justify-center px-6 py-12">
-            <SignupForm />
-          </div>
-        </AuthRedirect>
-      </main>
-    </div>
-  )
+  return <SignupPageClient />
 }

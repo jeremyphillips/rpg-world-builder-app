@@ -10,16 +10,21 @@ import {
   listCampaignsForUser,
   updateCampaign,
 } from './campaign.service'
+import {
+  listCampaignMembersForOverview,
+  listCampaignPartyForOverview,
+} from './campaign-overview.service'
+import { removeIncompleteCampaignMember } from './remove-incomplete-campaign-member.service'
 
 export async function create(req: Request, res: Response): Promise<void> {
   // `req.body` is validated by `validate(createCampaignInputSchema)`; `req.user`
   // is guaranteed by `requireAuth` running before this handler.
   const input = req.body as CreateCampaignInput
-  const campaign = await createCampaign({
+  const result = await createCampaign({
     ...input,
     createdBy: req.user!.id,
   })
-  res.status(201).json({ campaign })
+  res.status(201).json(result)
 }
 
 export function listTemplates(_req: Request, res: Response): void {
@@ -56,4 +61,33 @@ export async function selectCampaign(req: Request, res: Response): Promise<void>
     throw HttpError.unauthorized()
   }
   res.status(200).json({ user })
+}
+
+export async function listMembers(req: Request, res: Response): Promise<void> {
+  const { campaignId } = req.params as { campaignId: string }
+  const members = await listCampaignMembersForOverview(campaignId, {
+    excludeUserId: req.user!.id,
+  })
+  res.status(200).json({ members })
+}
+
+export async function removeMember(req: Request, res: Response): Promise<void> {
+  const { campaignId, membershipId } = req.params as {
+    campaignId: string
+    membershipId: string
+  }
+
+  await removeIncompleteCampaignMember({
+    campaignId,
+    membershipId,
+    removedByUserId: req.user!.id,
+  })
+
+  res.status(204).send()
+}
+
+export async function listParty(req: Request, res: Response): Promise<void> {
+  const { campaignId } = req.params as { campaignId: string }
+  const party = await listCampaignPartyForOverview(campaignId)
+  res.status(200).json({ party })
 }

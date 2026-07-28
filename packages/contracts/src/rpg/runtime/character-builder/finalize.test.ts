@@ -3,7 +3,11 @@ import { describe, expect, it } from 'vitest'
 import { createCharacterInputSchema } from '../character/create-input'
 import { createEmptyCharacterBuilderDraft } from './draft'
 import type { CharacterBuilderDraft } from './draft'
-import { CharacterBuildFinalizationError, finalizeCharacterBuild } from './finalize'
+import {
+  CharacterBuildFinalizationError,
+  finalizeCharacterBuild,
+  isCharacterBuildFinalizationError,
+} from './finalize'
 import { builderTestContext } from './test-fixtures'
 import {
   spellcastingTestContext,
@@ -161,6 +165,18 @@ describe('finalizeCharacterBuild', () => {
     expect(() =>
       finalizeCharacterBuild(createEmptyCharacterBuilderDraft(), builderTestContext),
     ).toThrow(CharacterBuildFinalizationError)
+  })
+
+  it('isCharacterBuildFinalizationError recognizes errors across module instances', () => {
+    try {
+      finalizeCharacterBuild(createEmptyCharacterBuilderDraft(), builderTestContext)
+    } catch (error) {
+      const foreignError = Object.assign(
+        Object.create(CharacterBuildFinalizationError.prototype),
+        error,
+      )
+      expect(isCharacterBuildFinalizationError(foreignError)).toBe(true)
+    }
   })
 
   it('assembles starting equipment and wealth when resolved choice sets are provided', () => {

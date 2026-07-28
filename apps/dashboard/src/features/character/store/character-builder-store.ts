@@ -1,9 +1,10 @@
 import {
-  characterBuilderDraftSchema,
   createEmptyCharacterBuilderDraft,
   createPersistedCharacterBuilderState,
+  loadCharacterBuilderDraftFromStorage,
   normalizeCharacterBuilderDraft,
   type CharacterBuilderDraft,
+  type CharacterBuilderDraftScope,
   type PersistedCharacterBuilderState,
 } from '@rpg/contracts'
 import { create } from 'zustand'
@@ -27,8 +28,13 @@ export type CharacterBuilderStoreState = {
 
 export type CharacterBuilderStore = ReturnType<typeof createCharacterBuilderStoreImpl>
 
-export function createCharacterBuilderStore(storageKey: string) {
-  return createCharacterBuilderStoreImpl(storageKey)
+type CharacterBuilderStoreConfig = {
+  storageKey: string
+  scope: CharacterBuilderDraftScope
+}
+
+export function createCharacterBuilderStore({ storageKey, scope }: CharacterBuilderStoreConfig) {
+  return createCharacterBuilderStoreImpl(storageKey, scope)
 }
 
 function createSuppressiblePersistStorage(): PersistStorage<PersistedCharacterBuilderState> & {
@@ -53,13 +59,51 @@ function createSuppressiblePersistStorage(): PersistStorage<PersistedCharacterBu
   }
 }
 
+function readPersistedPayloadFromRehydratedState(
+  rehydratedState: CharacterBuilderStoreState,
+  scope: CharacterBuilderDraftScope,
+): unknown {
+  const candidate = rehydratedState as CharacterBuilderStoreState &
+    Partial<PersistedCharacterBuilderState>
+
+  if (
+    typeof candidate.version === 'number' &&
+    candidate.scope &&
+    typeof candidate.updatedAt === 'string'
+  ) {
+    return {
+      version: candidate.version,
+      scope: candidate.scope,
+      updatedAt: candidate.updatedAt,
+      draft: candidate.draft,
+    }
+  }
+
+  return createPersistedCharacterBuilderState(candidate.draft, scope)
+}
+
 function finishCharacterBuilderHydration(
   store: CharacterBuilderStore,
+  scope: CharacterBuilderDraftScope,
+  storageKey: string,
+  hasCompletedInitialHydration: { completed: boolean },
   rehydratedState?: CharacterBuilderStoreState,
 ): void {
+  if (hasCompletedInitialHydration.completed) return
+  hasCompletedInitialHydration.completed = true
+
   if (rehydratedState) {
-    const parsed = characterBuilderDraftSchema.safeParse(rehydratedState.draft)
-    if (!parsed.success) {
+    const rawStorage = sessionStorage.getItem(storageKey)
+    const persistedPayload = rawStorage
+      ? (JSON.parse(rawStorage) as { state?: unknown }).state
+      : readPersistedPayloadFromRehydratedState(rehydratedState, scope)
+    const loadResult = loadCharacterBuilderDraftFromStorage(persistedPayload, scope)
+
+    if (loadResult.status === 'rejected' && loadResult.shouldClear) {
+      void store.persist.clearStorage()
+    }
+
+    if (loadResult.status !== 'restored') {
       store.setState({
         draft: createEmptyCharacterBuilderDraft(),
         hasPendingRestore: false,
@@ -69,7 +113,7 @@ function finishCharacterBuilderHydration(
       return
     }
 
-    const mergedDraft = normalizeCharacterBuilderDraft(parsed.data)
+    const mergedDraft = normalizeCharacterBuilderDraft(loadResult.draft)
     if (isNonEmptyCharacterBuilderDraft(mergedDraft)) {
       store.setState({
         draft: createEmptyCharacterBuilderDraft(),
@@ -80,7 +124,7 @@ function finishCharacterBuilderHydration(
       return
     }
 
-    if (mergedDraft !== parsed.data) {
+    if (mergedDraft !== loadResult.draft) {
       store.setState({ draft: mergedDraft, _hasHydrated: true })
       return
     }
@@ -92,8 +136,9 @@ function finishCharacterBuilderHydration(
   store.setState({ _hasHydrated: true })
 }
 
-function createCharacterBuilderStoreImpl(storageKey: string) {
+function createCharacterBuilderStoreImpl(storageKey: string, scope: CharacterBuilderDraftScope) {
   const storage = createSuppressiblePersistStorage()
+  const hydrationState = { completed: false }
 
   const store = create<CharacterBuilderStoreState>()(
     persist(
@@ -133,14 +178,14 @@ function createCharacterBuilderStoreImpl(storageKey: string) {
         name: storageKey,
         storage,
         partialize: (state): PersistedCharacterBuilderState =>
-          createPersistedCharacterBuilderState(state.draft),
+          createPersistedCharacterBuilderState(state.draft, scope),
         onRehydrateStorage: () => (state, error) => {
           queueMicrotask(() => {
             if (error || !state) {
-              finishCharacterBuilderHydration(store)
+              finishCharacterBuilderHydration(store, scope, storageKey, hydrationState)
               return
             }
-            finishCharacterBuilderHydration(store, state)
+            finishCharacterBuilderHydration(store, scope, storageKey, hydrationState, state)
           })
         },
       },
@@ -148,24 +193,23 @@ function createCharacterBuilderStoreImpl(storageKey: string) {
   )
 
   store.persist.onFinishHydration((state) => {
-    if (!state._hasHydrated) {
-      finishCharacterBuilderHydration(store, state)
+    if (!store.getState()._hasHydrated) {
+      finishCharacterBuilderHydration(store, scope, storageKey, hydrationState, state)
     }
   })
-
-  if (store.persist.hasHydrated() && !store.getState()._hasHydrated) {
-    finishCharacterBuilderHydration(store, store.getState())
-  }
 
   return store
 }
 
 const storeCache = new Map<string, CharacterBuilderStore>()
 
-export function getCharacterBuilderStore(storageKey: string): CharacterBuilderStore {
+export function getCharacterBuilderStore(
+  storageKey: string,
+  scope: CharacterBuilderDraftScope,
+): CharacterBuilderStore {
   let store = storeCache.get(storageKey)
   if (!store) {
-    store = createCharacterBuilderStore(storageKey)
+    store = createCharacterBuilderStore({ storageKey, scope })
     storeCache.set(storageKey, store)
   }
   return store

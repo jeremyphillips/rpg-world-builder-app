@@ -1,4 +1,4 @@
-import { ApiError } from './errors'
+import { isApiError } from './errors'
 
 export type ApiValidationIssue = {
   path: string
@@ -26,7 +26,7 @@ export function isApiValidationDetails(value: unknown): value is ApiValidationDe
 
 /** Returns structured field issues from a `validation_error` ApiError, if present. */
 export function getApiValidationIssues(err: unknown): ApiValidationIssue[] | undefined {
-  if (!(err instanceof ApiError) || err.code !== 'validation_error') return undefined
+  if (!isApiError(err) || err.code !== 'validation_error') return undefined
   if (!isApiValidationDetails(err.details)) return undefined
   return err.details.issues
 }

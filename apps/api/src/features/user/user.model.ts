@@ -23,6 +23,8 @@ const userSchema = new Schema(
     // The campaign this user most recently selected in the dashboard. Null until
     // they pick one; cleared lazily (never validated here) if the campaign is gone.
     lastSelectedCampaignId: { type: String, default: null },
+    lastSignedInAt: { type: Date, default: null },
+    lastActiveAt: { type: Date, default: null },
   },
   { timestamps: true },
 )

@@ -632,6 +632,7 @@ export type {
   BooleanCellProps,
   NameCellProps,
   DataTableImageCellProps,
+  RowActionMenuItem,
   RowActionsMenuLinkProps,
   RowActionsMenuProps,
   TableBadgeCellProps,

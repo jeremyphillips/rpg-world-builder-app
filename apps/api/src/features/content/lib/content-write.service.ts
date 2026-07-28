@@ -198,7 +198,7 @@ async function updateHomebrewRecord<T extends StoredEntity>(
   if (Object.keys(unset).length > 0) mongoUpdate.$unset = unset
 
   const updated = await config.homebrewModel
-    .findOneAndUpdate({ _id: entityId, campaignId }, mongoUpdate, { new: true })
+    .findOneAndUpdate({ _id: entityId, campaignId }, mongoUpdate, { returnDocument: 'after' })
     .lean<HomebrewDoc>()
   if (!updated) {
     throw new HttpError(404, 'not_found', 'Homebrew record not found.')
@@ -243,7 +243,7 @@ async function updateSystemPatch<T extends StoredEntity>(
   await config.patchModel.findOneAndUpdate(
     { campaignId, targetId: entityId },
     { $set: { patch: sanitizedPatch } },
-    { upsert: true, new: true },
+    { upsert: true, returnDocument: 'after' },
   )
 
   const resolved = await resolveCatalogForCampaign(config.readConfig, campaignId)

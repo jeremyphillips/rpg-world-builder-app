@@ -14,13 +14,27 @@
       },
       "rulesetId": {
         "type": "string",
-        "enum": ["srd-cc-5.2.1"],
+        "enum": [
+          "srd-cc-5.2.1"
+        ],
         "description": "srd-cc-5.2.1"
       },
       "source": {
         "type": "string",
-        "enum": ["system", "homebrew"],
+        "enum": [
+          "system",
+          "homebrew"
+        ],
         "description": "system | homebrew"
+      },
+      "status": {
+        "default": "published",
+        "type": "string",
+        "enum": [
+          "draft",
+          "published"
+        ],
+        "description": "draft | published"
       },
       "campaignId": {
         "anyOf": [
@@ -55,7 +69,14 @@
       },
       "ability": {
         "type": "string",
-        "enum": ["str", "dex", "con", "int", "wis", "cha"],
+        "enum": [
+          "str",
+          "dex",
+          "con",
+          "int",
+          "wis",
+          "cha"
+        ],
         "description": "str | dex | con | int | wis | cha"
       },
       "examples": {
@@ -71,6 +92,7 @@
       "slug",
       "rulesetId",
       "source",
+      "status",
       "campaignId",
       "createdAt",
       "updatedAt",

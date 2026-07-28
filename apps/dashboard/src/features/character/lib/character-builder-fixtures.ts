@@ -4,10 +4,10 @@ import {
   defaultCampaignMechanicsPatch,
   indexCharacterBuildCatalog,
   resolveCharacterCreationPatch,
-  type CampaignBuildContext,
+  type CampaignNpcBuildContext,
+  type CampaignPcBuildContext,
   type CharacterBuildCatalog,
   type CharacterBuildCatalogIndex,
-  type CharacterBuildContext,
   type ClassStored,
   type SkillProficiency,
   type Species,
@@ -138,8 +138,8 @@ export function createStandaloneBuilderCatalogIndexFixture(
 const TEST_CAMPAIGN_ID = 'campaign-test-1'
 
 export function createCampaignNpcBuilderContextFixture(
-  overrides: Partial<CampaignBuildContext> = {},
-): CampaignBuildContext {
+  overrides: Partial<CampaignNpcBuildContext> = {},
+): CampaignNpcBuildContext {
   const rulesetId = overrides.rulesetId ?? DEFAULT_SYSTEM_RULESET_ID
   const campaignId = overrides.rulesScope?.campaignId ?? TEST_CAMPAIGN_ID
 
@@ -151,6 +151,7 @@ export function createCampaignNpcBuilderContextFixture(
     scope: { type: 'campaign', campaignId, rulesetId },
     rulesScope: { type: 'campaign', campaignId, rulesetId },
     ownershipTarget: { type: 'campaign', campaignId },
+    acquisition: { kind: 'campaign_npc', campaignId },
     rulesetId,
     catalog: emptyCatalog,
     characterCreationRules: {
@@ -164,8 +165,8 @@ export function createCampaignNpcBuilderContextFixture(
 }
 
 export function createCampaignPcBuilderContextFixture(
-  overrides: Partial<CharacterBuildContext> = {},
-): CharacterBuildContext {
+  overrides: Partial<CampaignPcBuildContext> = {},
+): CampaignPcBuildContext {
   const rulesetId = overrides.rulesetId ?? DEFAULT_SYSTEM_RULESET_ID
   const campaignId =
     overrides.rulesScope?.type === 'campaign' ? overrides.rulesScope.campaignId : TEST_CAMPAIGN_ID
@@ -177,7 +178,11 @@ export function createCampaignPcBuilderContextFixture(
     mode: 'dashboard',
     scope: { type: 'campaign', campaignId, rulesetId },
     rulesScope: { type: 'campaign', campaignId, rulesetId },
-    ownershipTarget: { type: 'user' },
+    ownershipTarget: { type: 'user', userId: 'user-test-1' },
+    acquisition: {
+      kind: 'campaign_pc_onboarding',
+      campaignId,
+    },
     rulesetId,
     catalog: emptyCatalog,
     characterCreationRules: {

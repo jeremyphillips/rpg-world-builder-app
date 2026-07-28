@@ -1,4 +1,5 @@
 import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
+import type { ReactElement } from 'react'
 import { screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { expectNoAxeViolations } from '@rpg/ui/test-utils'
@@ -8,10 +9,16 @@ import {
   createEmptyCharacterBuilderDraft,
   createPersistedCharacterBuilderState,
   formatFieldMessage,
-  getCharacterBuilderStorageKey,
+  resolveCharacterBuilderDraftKey,
 } from '@rpg/contracts'
 
-import { renderWithProviders } from '@/test/render'
+import { sessionQueryKey } from '@/features/auth'
+import {
+  renderWithProviders,
+  makeTestQueryClient,
+  type RenderWithProvidersOptions,
+} from '@/test/render'
+import { makeAuthMe, makeSessionUser } from '@/test/fixtures/session'
 
 import {
   createStandaloneBuilderCatalogIndexFixture,
@@ -46,6 +53,24 @@ function installSessionStorageMock(): void {
   })
 }
 
+function renderShell(
+  ui: ReactElement,
+  options: Omit<RenderWithProvidersOptions, 'queryClient'> & {
+    userId?: string
+  } = {},
+) {
+  const queryClient = makeTestQueryClient()
+  queryClient.setQueryData(
+    sessionQueryKey,
+    makeAuthMe(makeSessionUser({ id: options.userId ?? 'u1' })),
+  )
+
+  return renderWithProviders(ui, {
+    ...options,
+    queryClient,
+  })
+}
+
 describe('CharacterBuilderShell', () => {
   beforeAll(() => {
     if (!HTMLElement.prototype.hasPointerCapture) {
@@ -68,7 +93,7 @@ describe('CharacterBuilderShell', () => {
     const context = createStandaloneBuilderContextFixture()
     const catalogIndex = createStandaloneBuilderCatalogIndexFixture(context)
 
-    renderWithProviders(<CharacterBuilderShell context={context} catalogIndex={catalogIndex} />)
+    renderShell(<CharacterBuilderShell context={context} catalogIndex={catalogIndex} />)
 
     expect(await screen.findByRole('heading', { name: 'New character' })).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: 'Identity' })).toBeInTheDocument()
@@ -82,7 +107,7 @@ describe('CharacterBuilderShell', () => {
     const context = createStandaloneBuilderContextFixture()
     const catalogIndex = createStandaloneBuilderCatalogIndexFixture(context)
 
-    const { container } = renderWithProviders(
+    const { container } = renderShell(
       <CharacterBuilderShell context={context} catalogIndex={catalogIndex} />,
     )
 
@@ -93,6 +118,12 @@ describe('CharacterBuilderShell', () => {
   it('restores identity fields after continuing a persisted draft', async () => {
     const context = createStandaloneBuilderContextFixture()
     const catalogIndex = createStandaloneBuilderCatalogIndexFixture(context)
+    const draftScope = {
+      kind: 'standalone' as const,
+      userId: 'u1',
+      rulesetId: context.rulesetId,
+      characterKind: 'pc' as const,
+    }
     const persistedDraft = {
       ...createEmptyCharacterBuilderDraft(),
       identity: { name: 'Verna', narrative: { personalityTraits: ['Steady'] } },
@@ -101,14 +132,16 @@ describe('CharacterBuilderShell', () => {
     }
 
     sessionStorage.setItem(
-      getCharacterBuilderStorageKey(context),
+      resolveCharacterBuilderDraftKey(draftScope, { mode: context.mode }),
       JSON.stringify({
-        state: createPersistedCharacterBuilderState(persistedDraft),
+        state: createPersistedCharacterBuilderState(persistedDraft, draftScope),
         version: 0,
       }),
     )
 
-    renderWithProviders(<CharacterBuilderShell context={context} catalogIndex={catalogIndex} />)
+    renderShell(<CharacterBuilderShell context={context} catalogIndex={catalogIndex} />, {
+      userId: 'u1',
+    })
 
     expect(await screen.findByText('Continue your character?')).toBeInTheDocument()
     await userEvent.click(screen.getByRole('button', { name: 'Continue previous draft' }))
@@ -121,7 +154,7 @@ describe('CharacterBuilderShell', () => {
     const context = createStandaloneBuilderContextFixture()
     const catalogIndex = createStandaloneBuilderCatalogIndexFixture(context)
 
-    renderWithProviders(<CharacterBuilderShell context={context} catalogIndex={catalogIndex} />)
+    renderShell(<CharacterBuilderShell context={context} catalogIndex={catalogIndex} />)
 
     await screen.findByRole('heading', { name: 'Identity' })
     const stepRail = screen.getByRole('navigation', { name: 'Character builder steps' })
@@ -144,7 +177,7 @@ describe('CharacterBuilderShell', () => {
     const context = createStandaloneBuilderContextFixture()
     const catalogIndex = createStandaloneBuilderCatalogIndexFixture(context)
 
-    renderWithProviders(<CharacterBuilderShell context={context} catalogIndex={catalogIndex} />)
+    renderShell(<CharacterBuilderShell context={context} catalogIndex={catalogIndex} />)
 
     await screen.findByRole('heading', { name: 'Identity' })
     const stepRail = screen.getByRole('navigation', { name: 'Character builder steps' })
@@ -169,7 +202,7 @@ describe('CharacterBuilderShell', () => {
     const context = createStandaloneBuilderContextFixture()
     const catalogIndex = createStandaloneBuilderCatalogIndexFixture(context)
 
-    renderWithProviders(<CharacterBuilderShell context={context} catalogIndex={catalogIndex} />)
+    renderShell(<CharacterBuilderShell context={context} catalogIndex={catalogIndex} />)
 
     await screen.findByRole('heading', { name: 'Identity' })
     const stepRail = screen.getByRole('navigation', { name: 'Character builder steps' })

@@ -12,11 +12,24 @@ export class ApiError extends Error {
   }
 }
 
+/** Structural check — avoids `instanceof` failures across duplicate module instances in Vite. */
+export function isApiError(err: unknown): err is ApiError {
+  if (typeof err !== 'object' || err === null) return false
+
+  const candidate = err as Partial<ApiError>
+  return (
+    candidate.name === 'ApiError' &&
+    typeof candidate.status === 'number' &&
+    typeof candidate.code === 'string' &&
+    typeof candidate.message === 'string'
+  )
+}
+
 /**
  * Extract a user-facing message from a thrown value: the `ApiError` message when
  * available, otherwise the provided fallback. Keeps error handling consistent
  * across API clients and form components.
  */
 export function getErrorMessage(err: unknown, fallback: string): string {
-  return err instanceof ApiError ? err.message : fallback
+  return isApiError(err) ? err.message : fallback
 }

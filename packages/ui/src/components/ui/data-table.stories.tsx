@@ -1,6 +1,7 @@
 import * as React from 'react'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import type { ColumnDef } from '@tanstack/react-table'
+import { Pencil } from 'lucide-react'
 
 import {
   BooleanCell,
@@ -335,16 +336,26 @@ export const WithRowSelection: Story = {
   },
 }
 
-// Per-row stateful wrapper so each row manages its own enabled state independently.
+// Per-row actions demo using the discriminated items API.
 function ClassRowActions({ row }: { row: CharacterClass }) {
-  const [enabled, setEnabled] = React.useState(true)
   return (
     <RowActionsMenu
-      editHref={`/classes/${row.id}/edit`}
-      enabled={enabled}
-      onToggleEnabled={setEnabled}
-      enabledTooltip="Hides this class from players in the current campaign. The class remains available globally."
-      itemLabel="class"
+      triggerLabel={`Open actions for ${row.name}`}
+      items={[
+        {
+          kind: 'link',
+          id: 'edit',
+          label: 'Edit',
+          href: `/classes/${row.id}/edit`,
+          icon: <Pencil />,
+        },
+        {
+          kind: 'action',
+          id: 'duplicate',
+          label: 'Duplicate',
+          onSelect: () => undefined,
+        },
+      ]}
     />
   )
 }

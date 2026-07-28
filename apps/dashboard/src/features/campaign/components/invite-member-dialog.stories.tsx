@@ -1,0 +1,30 @@
+import type { Meta, StoryObj } from '@storybook/react-vite'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+
+import { InviteMemberDialog } from './invite-member-dialog.client'
+
+const queryClient = new QueryClient({
+  defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
+})
+
+const meta = {
+  title: 'Campaign/InviteMemberDialog',
+  component: InviteMemberDialog,
+  parameters: { layout: 'padded' },
+  decorators: [
+    (Story) => (
+      <QueryClientProvider client={queryClient}>
+        <Story />
+      </QueryClientProvider>
+    ),
+  ],
+} satisfies Meta<typeof InviteMemberDialog>
+
+export default meta
+type Story = StoryObj<typeof InviteMemberDialog>
+
+export const Default: Story = {
+  args: {
+    campaignId: 'camp_1',
+  },
+}

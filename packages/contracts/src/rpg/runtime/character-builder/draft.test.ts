@@ -5,9 +5,17 @@ import {
   characterBuilderDraftSchema,
   createEmptyCharacterBuilderDraft,
   createPersistedCharacterBuilderState,
-  parsePersistedCharacterBuilderState,
 } from './draft'
+import { parsePersistedCharacterBuilderState } from './draft-storage'
 import type { CharacterBuilderDraft } from './draft'
+import type { CharacterBuilderDraftScope } from './draft-scope'
+
+const standaloneScope: CharacterBuilderDraftScope = {
+  kind: 'standalone',
+  userId: 'user-test',
+  rulesetId: 'srd-cc-5.2.1',
+  characterKind: 'pc',
+}
 
 function makeDraftInProgress(): CharacterBuilderDraft {
   return {
@@ -117,8 +125,11 @@ describe('characterBuilderDraftSchema', () => {
         customized: false,
       },
     }
-    const persisted = createPersistedCharacterBuilderState(draft)
-    const rehydrated = parsePersistedCharacterBuilderState(JSON.parse(JSON.stringify(persisted)))
+    const persisted = createPersistedCharacterBuilderState(draft, standaloneScope)
+    const rehydrated = parsePersistedCharacterBuilderState(
+      JSON.parse(JSON.stringify(persisted)),
+      standaloneScope,
+    )
 
     expect(rehydrated?.equipment?.purchases[0]).toEqual(
       expect.objectContaining({
@@ -141,35 +152,55 @@ describe('characterBuilderDraftSchema', () => {
 describe('parsePersistedCharacterBuilderState', () => {
   it('round-trips a persisted draft', () => {
     const draft = makeDraftInProgress()
-    const persisted = createPersistedCharacterBuilderState(draft)
+    const persisted = createPersistedCharacterBuilderState(draft, standaloneScope)
     expect(persisted.version).toBe(CHARACTER_BUILDER_DRAFT_VERSION)
+    expect(persisted.scope).toEqual(standaloneScope)
 
-    const rehydrated = parsePersistedCharacterBuilderState(JSON.parse(JSON.stringify(persisted)))
+    const rehydrated = parsePersistedCharacterBuilderState(
+      JSON.parse(JSON.stringify(persisted)),
+      standaloneScope,
+    )
     expect(rehydrated).toEqual(draft)
   })
 
   it('returns null on version mismatch', () => {
     const persisted = {
       version: CHARACTER_BUILDER_DRAFT_VERSION + 1,
+      scope: standaloneScope,
+      updatedAt: '2026-01-01T00:00:00.000Z',
       draft: createEmptyCharacterBuilderDraft(),
     }
-    expect(parsePersistedCharacterBuilderState(persisted)).toBeNull()
+    expect(parsePersistedCharacterBuilderState(persisted, standaloneScope)).toBeNull()
   })
 
-  it('returns null for legacy v1 persisted drafts', () => {
+  it('returns null for legacy v3 persisted drafts', () => {
     const persisted = {
-      version: 1,
+      version: 3,
       draft: {
         ...createEmptyCharacterBuilderDraft(),
         identity: { name: 'Verna', description: 'Legacy bio.' },
       },
     }
-    expect(parsePersistedCharacterBuilderState(persisted)).toBeNull()
+    expect(parsePersistedCharacterBuilderState(persisted, standaloneScope)).toBeNull()
+  })
+
+  it('returns null when stored scope does not match the requested scope', () => {
+    const persisted = createPersistedCharacterBuilderState(
+      createEmptyCharacterBuilderDraft(),
+      standaloneScope,
+    )
+    expect(
+      parsePersistedCharacterBuilderState(persisted, {
+        kind: 'campaign',
+        campaignId: 'camp_1',
+        characterKind: 'pc',
+      }),
+    ).toBeNull()
   })
 
   it('returns null for garbage input', () => {
-    expect(parsePersistedCharacterBuilderState(null)).toBeNull()
-    expect(parsePersistedCharacterBuilderState('not json state')).toBeNull()
-    expect(parsePersistedCharacterBuilderState({ draft: {} })).toBeNull()
+    expect(parsePersistedCharacterBuilderState(null, standaloneScope)).toBeNull()
+    expect(parsePersistedCharacterBuilderState('not json state', standaloneScope)).toBeNull()
+    expect(parsePersistedCharacterBuilderState({ draft: {} }, standaloneScope)).toBeNull()
   })
 })

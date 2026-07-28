@@ -42,6 +42,21 @@ export const NameGeneratorRoute = withRouteSuspense(
 export const AdminUsersRoute = withRouteSuspense(
   lazyNamed(() => import('@/features/admin/routes/admin-users'), 'AdminUsers'),
 )
+export const AdminUserLayoutRoute = withRouteSuspense(
+  lazyNamed(() => import('@/features/admin/routes/admin-user-layout'), 'AdminUserLayout'),
+)
+export const AdminUserDetailRoute = withRouteSuspense(
+  lazyNamed(() => import('@/features/admin/routes/admin-user-detail'), 'AdminUserDetail'),
+)
+export const AdminUserCampaignsRoute = withRouteSuspense(
+  lazyNamed(() => import('@/features/admin/routes/admin-user-campaigns'), 'AdminUserCampaignsPage'),
+)
+export const AdminUserCharactersRoute = withRouteSuspense(
+  lazyNamed(
+    () => import('@/features/admin/routes/admin-user-characters'),
+    'AdminUserCharactersPage',
+  ),
+)
 export const AdminSettingsRoute = withRouteSuspense(
   lazyNamed(() => import('@/features/admin/routes/admin-settings'), 'AdminSettings'),
 )
@@ -51,6 +66,18 @@ export const CampaignCreateRoute = withRouteSuspense(
 )
 export const CampaignDetailRoute = withRouteSuspense(
   lazyNamed(() => import('@/features/campaign/routes/campaign-detail'), 'CampaignDetail'),
+)
+export const CampaignOnboardingRoute = withRouteSuspense(
+  lazyNamed(() => import('@/features/campaign/routes/campaign-onboarding'), 'CampaignOnboarding'),
+)
+export const CampaignLayoutRoute = withRouteSuspense(
+  lazyNamed(() => import('@/features/campaign/routes/campaign-layout'), 'CampaignLayout'),
+)
+export const CampaignCharacterDetailRoute = withRouteSuspense(
+  lazyNamed(
+    () => import('@/features/campaign/routes/campaign-character-detail'),
+    'CampaignCharacterDetail',
+  ),
 )
 export const CampaignSessionsRoute = withRouteSuspense(
   lazyNamed(() => import('@/features/campaign/routes/campaign-sessions'), 'CampaignSessions'),

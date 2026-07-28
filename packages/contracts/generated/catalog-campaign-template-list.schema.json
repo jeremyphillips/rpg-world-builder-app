@@ -30,12 +30,19 @@
             "pattern": "^\\d+\\.\\d+\\.\\d+$"
           }
         },
-        "required": ["name", "id", "slug", "version"],
+        "required": [
+          "name",
+          "id",
+          "slug",
+          "version"
+        ],
         "additionalProperties": false
       },
       "rulesetId": {
         "type": "string",
-        "enum": ["srd-cc-5.2.1"],
+        "enum": [
+          "srd-cc-5.2.1"
+        ],
         "description": "srd-cc-5.2.1"
       },
       "defaults": {
@@ -97,12 +104,20 @@
                   },
                   "magicLevel": {
                     "type": "string",
-                    "enum": ["low_magic", "standard_fantasy", "high_magic"],
+                    "enum": [
+                      "low_magic",
+                      "standard_fantasy",
+                      "high_magic"
+                    ],
                     "description": "low_magic | standard_fantasy | high_magic"
                   },
                   "difficulty": {
                     "type": "string",
-                    "enum": ["casual", "dangerous", "brutal"],
+                    "enum": [
+                      "casual",
+                      "dangerous",
+                      "brutal"
+                    ],
                     "description": "casual | dangerous | brutal"
                   }
                 },
@@ -192,7 +207,12 @@
         }
       }
     },
-    "required": ["metadata", "rulesetId", "defaults", "worldSeedPackIds"],
+    "required": [
+      "metadata",
+      "rulesetId",
+      "defaults",
+      "worldSeedPackIds"
+    ],
     "additionalProperties": false
   },
   "definitions": {
@@ -206,11 +226,16 @@
       "properties": {
         "policy": {
           "type": "string",
-          "enum": ["disabled", "approval_required"],
+          "enum": [
+            "disabled",
+            "approval_required"
+          ],
           "description": "disabled | approval_required"
         }
       },
-      "required": ["policy"],
+      "required": [
+        "policy"
+      ],
       "additionalProperties": false
     },
     "__schema2": {
@@ -235,7 +260,10 @@
               "maximum": 100
             }
           },
-          "required": ["tierName", "maxLevel"],
+          "required": [
+            "tierName",
+            "maxLevel"
+          ],
           "additionalProperties": false
         }
       },
@@ -249,7 +277,9 @@
           "properties": {
             "mode": {
               "type": "string",
-              "enum": ["only"],
+              "enum": [
+                "only"
+              ],
               "description": "only"
             },
             "ids": {
@@ -260,7 +290,10 @@
               }
             }
           },
-          "required": ["mode", "ids"],
+          "required": [
+            "mode",
+            "ids"
+          ],
           "additionalProperties": false
         }
       },
@@ -350,7 +383,9 @@
                   "description": "standard"
                 }
               },
-              "required": ["kind"],
+              "required": [
+                "kind"
+              ],
               "additionalProperties": false
             }
           ]
@@ -401,7 +436,9 @@
                   "properties": {
                     "kind": {
                       "type": "string",
-                      "enum": ["dice"],
+                      "enum": [
+                        "dice"
+                      ],
                       "description": "dice"
                     },
                     "dice": {
@@ -445,7 +482,10 @@
                           ]
                         }
                       },
-                      "required": ["count", "faces"],
+                      "required": [
+                        "count",
+                        "faces"
+                      ],
                       "additionalProperties": false
                     },
                     "multiplier": {
@@ -455,15 +495,28 @@
                     },
                     "currency": {
                       "type": "string",
-                      "enum": ["cp", "sp", "gp", "pp"],
+                      "enum": [
+                        "cp",
+                        "sp",
+                        "gp",
+                        "pp"
+                      ],
                       "description": "cp | sp | gp | pp"
                     }
                   },
-                  "required": ["kind", "dice", "multiplier", "currency"],
+                  "required": [
+                    "kind",
+                    "dice",
+                    "multiplier",
+                    "currency"
+                  ],
                   "additionalProperties": false
                 }
               },
-              "required": ["baseGp", "formula"],
+              "required": [
+                "baseGp",
+                "formula"
+              ],
               "additionalProperties": false
             },
             {
@@ -502,7 +555,14 @@
         "properties": {
           "rarity": {
             "type": "string",
-            "enum": ["common", "uncommon", "rare", "very_rare", "legendary", "artifact"],
+            "enum": [
+              "common",
+              "uncommon",
+              "rare",
+              "very_rare",
+              "legendary",
+              "artifact"
+            ],
             "description": "common | uncommon | rare | very_rare | legendary | artifact"
           },
           "quantity": {
@@ -511,7 +571,10 @@
             "maximum": 9007199254740991
           }
         },
-        "required": ["rarity", "quantity"],
+        "required": [
+          "rarity",
+          "quantity"
+        ],
         "additionalProperties": false
       }
     },
@@ -526,7 +589,10 @@
               "type": "array",
               "items": {
                 "type": "string",
-                "enum": ["standard", "rare"],
+                "enum": [
+                  "standard",
+                  "rare"
+                ],
                 "description": "standard | rare"
               }
             },
@@ -538,7 +604,10 @@
               }
             }
           },
-          "required": ["categories", "items"],
+          "required": [
+            "categories",
+            "items"
+          ],
           "additionalProperties": false
         }
       },
@@ -546,7 +615,10 @@
     },
     "__schema12": {
       "type": "string",
-      "enum": ["standard", "rare"],
+      "enum": [
+        "standard",
+        "rare"
+      ],
       "description": "standard | rare"
     },
     "__schema13": {
@@ -581,12 +653,20 @@
                 "type": "array",
                 "items": {
                   "type": "string",
-                  "enum": ["standard", "rare"],
+                  "enum": [
+                    "standard",
+                    "rare"
+                  ],
                   "description": "standard | rare"
                 }
               }
             },
-            "required": ["id", "choose", "from", "categories"],
+            "required": [
+              "id",
+              "choose",
+              "from",
+              "categories"
+            ],
             "additionalProperties": false
           }
         }

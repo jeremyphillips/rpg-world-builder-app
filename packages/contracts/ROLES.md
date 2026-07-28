@@ -42,12 +42,12 @@ Govern access to the platform itself. Assigned globally to a user account.
 Govern what a user can do within a specific campaign. Always scoped to a single
 `CampaignMembership` record.
 
-| Role       | Assigned when                 | Description                                                                   |
-| ---------- | ----------------------------- | ----------------------------------------------------------------------------- |
-| `owner`    | Campaign created              | The DM. Full control: campaign settings, content, membership, deletion.       |
-| `co-owner` | Invited by owner              | Co-DM. Same as owner except cannot transfer ownership or delete the campaign. |
-| `pc`       | Invited + character submitted | Player. Can read party-visible content and manage their submitted characters. |
-| `observer` | Invited as spectator          | Read-only. Can see public-scoped content only. Cannot submit characters.      |
+| Role       | Assigned when        | Description                                                                   |
+| ---------- | -------------------- | ----------------------------------------------------------------------------- |
+| `owner`    | Campaign created     | The DM. Full control: campaign settings, content, membership, deletion.       |
+| `co-owner` | Invited by owner     | Co-DM. Same as owner except cannot transfer ownership or delete the campaign. |
+| `pc`       | Invite accepted      | Player. Can read party-visible content and manage controlled characters.      |
+| `observer` | Invited as spectator | Read-only. Can see public-scoped content only. Cannot submit characters.      |
 
 **Rules:**
 
@@ -133,17 +133,23 @@ Enforced in the service layer (not at the schema level):
 
 ---
 
-## Content Visibility (Phase 1)
+## Content visibility
 
-Every content item within a campaign carries a `visibility` field.
+Every content item within a campaign carries a `visibility` field using the live
+vocabulary `all_players | dm_only | specific_players` (see
+`packages/contracts/src/rpg/vocab/content-visibility.ts` and
+`apps/api/docs/campaign-access-enforcement.md`).
 
-| Value     | Visible to                                    |
-| --------- | --------------------------------------------- |
-| `dm-only` | `owner` and `co-owner` only                   |
-| `party`   | `owner`, `co-owner`, and all `pc` members     |
-| `public`  | Everyone in the campaign including `observer` |
+| Value              | Visible to                                                                   |
+| ------------------ | ---------------------------------------------------------------------------- |
+| `all_players`      | All campaign members, including `observer` and PCs with no controlled PC yet |
+| `dm_only`          | `owner` and `co-owner` only                                                  |
+| `specific_players` | `owner`, `co-owner`, and PCs whose character id appears in `participantIds`  |
 
-Content defaults to `dm-only` unless the DM explicitly changes it.
+Content defaults to `dm_only` unless the DM explicitly changes it.
+
+> **Historical note:** early Phase-1 docs used `dm-only | party | public`. That
+> vocabulary was superseded by the table above — do not reintroduce it.
 
 ---
 

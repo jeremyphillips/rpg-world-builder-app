@@ -7,6 +7,9 @@ import {
 import { isStandardArrayAssignment, STANDARD_ARRAY } from './ability-generation'
 import { areRequiredChoiceSetsSatisfied } from './choice-set'
 import type { ChoiceSet, ChoiceType } from './choice-set'
+import type { CharacterBuildContext } from './context'
+import { getCharacterBuilderChromeMessages } from './character-builder-chrome-messages'
+import { resolveCharacterBuilderChromeVariant } from './character-builder-chrome-variant'
 import type { CharacterBuilderDraft } from './draft'
 import { CHARACTER_BUILDER_STEP_IDS, type CharacterBuilderStepId } from './step-ids'
 
@@ -95,6 +98,32 @@ export const BUILDER_STEPS: readonly BuilderStep[] = CHARACTER_BUILDER_STEP_IDS.
   label: BUILDER_STEP_METADATA[id].label,
   description: BUILDER_STEP_METADATA[id].description,
 }))
+
+/** Short label for a wizard step (rail, review summaries, etc.). */
+export function getBuilderStepLabel(stepId: CharacterBuilderStepId): string {
+  return BUILDER_STEP_METADATA[stepId].label
+}
+
+/** Default step description from static metadata (context-agnostic). */
+export function getBuilderStepDescription(stepId: CharacterBuilderStepId): string {
+  return BUILDER_STEP_METADATA[stepId].description
+}
+
+/**
+ * Context-aware step description for the builder rail.
+ * Review step copy varies by chrome variant; other steps use static metadata.
+ */
+export function resolveBuilderStepDescription(
+  context: CharacterBuildContext,
+  stepId: CharacterBuilderStepId,
+): string {
+  if (stepId === 'review') {
+    const variant = resolveCharacterBuilderChromeVariant(context)
+    return getCharacterBuilderChromeMessages(variant).reviewStepDescription
+  }
+
+  return BUILDER_STEP_METADATA[stepId].description
+}
 
 // ---------------------------------------------------------------------------
 // Step → ChoiceType mapping

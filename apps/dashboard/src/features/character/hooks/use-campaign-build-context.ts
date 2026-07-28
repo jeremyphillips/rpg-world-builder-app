@@ -3,9 +3,15 @@ import { useQuery } from '@tanstack/react-query'
 
 import {
   DEFAULT_ABILITY_GENERATION_RULES,
-  getCharacterBuilderStorageKey,
   indexCharacterBuildCatalog,
+  resolveCharacterBuilderDraftKey,
+  resolveCharacterBuilderDraftScope,
   type CampaignBuildContext,
+  type CampaignNpcBuildContext,
+  type CampaignPcBuildContext,
+  type CharacterBuildAcquisition,
+  type CharacterBuilderDraftScope,
+  type CharacterOwnershipTarget,
   type SystemRulesetId,
 } from '@rpg/contracts'
 
@@ -17,7 +23,19 @@ import {
   fetchCampaignBuilderCatalog,
 } from '../api/campaign-content-client'
 
-export function useCampaignBuildContext(campaignId: string | undefined) {
+type UseCampaignCharacterBuildContextInput = {
+  campaignId: string | undefined
+  characterKind: CampaignBuildContext['characterKind']
+  ownershipTarget: CharacterOwnershipTarget | { type: 'user'; userId: string }
+  acquisition: CharacterBuildAcquisition
+}
+
+export function useCampaignCharacterBuildContext({
+  campaignId,
+  characterKind,
+  ownershipTarget,
+  acquisition,
+}: UseCampaignCharacterBuildContextInput) {
   const { data: campaigns } = useCampaigns()
   const rulesetId = campaigns?.find((campaign) => campaign.id === campaignId)?.rulesetId as
     | SystemRulesetId
@@ -37,15 +55,12 @@ export function useCampaignBuildContext(campaignId: string | undefined) {
     if (!campaignId || !rulesetId || !patchQuery.data || !catalogQuery.data) return null
 
     const rulesScope = { type: 'campaign' as const, campaignId, rulesetId }
-
-    return {
-      channel: 'build',
-      surface: 'dashboard',
-      characterKind: 'npc',
-      mode: 'dashboard',
-      scope: { type: 'campaign', campaignId, rulesetId },
+    const shared = {
+      channel: 'build' as const,
+      surface: 'dashboard' as const,
+      mode: 'dashboard' as const,
+      scope: { type: 'campaign' as const, campaignId, rulesetId },
       rulesScope,
-      ownershipTarget: { type: 'campaign', campaignId },
       rulesetId,
       catalog: catalogQuery.data,
       characterCreationRules: {
@@ -55,16 +70,56 @@ export function useCampaignBuildContext(campaignId: string | undefined) {
       },
       permissions: { canCreateCharacter: true },
     }
-  }, [campaignId, catalogQuery.data, patchQuery.data, rulesetId])
+
+    if (characterKind === 'npc' && acquisition.kind === 'campaign_npc') {
+      const npcContext: CampaignNpcBuildContext = {
+        ...shared,
+        characterKind: 'npc',
+        ownershipTarget: { type: 'campaign', campaignId },
+        acquisition,
+      }
+      return npcContext
+    }
+
+    if (
+      characterKind === 'pc' &&
+      acquisition.kind === 'campaign_pc_onboarding' &&
+      ownershipTarget.type === 'user' &&
+      'userId' in ownershipTarget
+    ) {
+      const pcContext: CampaignPcBuildContext = {
+        ...shared,
+        characterKind: 'pc',
+        ownershipTarget,
+        acquisition,
+      }
+      return pcContext
+    }
+
+    return null
+  }, [
+    acquisition,
+    campaignId,
+    catalogQuery.data,
+    characterKind,
+    ownershipTarget,
+    patchQuery.data,
+    rulesetId,
+  ])
 
   const catalogIndex = useMemo(
     () => (context ? indexCharacterBuildCatalog(context.catalog) : null),
     [context],
   )
 
+  const draftScope = useMemo((): CharacterBuilderDraftScope | null => {
+    if (!context) return null
+    return resolveCharacterBuilderDraftScope(context, undefined)
+  }, [context])
+
   const storageKey = useMemo(
-    () => (context ? getCharacterBuilderStorageKey(context) : null),
-    [context],
+    () => (draftScope ? resolveCharacterBuilderDraftKey(draftScope, { mode: 'dashboard' }) : null),
+    [draftScope],
   )
 
   const isPending = patchQuery.isPending || catalogQuery.isPending
@@ -74,6 +129,7 @@ export function useCampaignBuildContext(campaignId: string | undefined) {
   return {
     context,
     catalogIndex,
+    draftScope,
     storageKey,
     rulesetId,
     isPending,
@@ -83,6 +139,41 @@ export function useCampaignBuildContext(campaignId: string | undefined) {
   }
 }
 
-export type CampaignBuildContextResult = ReturnType<typeof useCampaignBuildContext>
+export function useCampaignNpcBuildContext(campaignId: string | undefined) {
+  return useCampaignCharacterBuildContext({
+    campaignId,
+    characterKind: 'npc',
+    ownershipTarget: campaignId
+      ? { type: 'campaign', campaignId }
+      : { type: 'campaign', campaignId: '' },
+    acquisition: campaignId
+      ? { kind: 'campaign_npc', campaignId }
+      : { kind: 'campaign_npc', campaignId: '' },
+  })
+}
+
+export function useCampaignPcOnboardingBuildContext(
+  campaignId: string | undefined,
+  userId: string | undefined,
+) {
+  const resolvedCampaignId = campaignId && userId ? campaignId : undefined
+
+  return useCampaignCharacterBuildContext({
+    campaignId: resolvedCampaignId,
+    characterKind: 'pc',
+    ownershipTarget: userId ? { type: 'user', userId } : { type: 'user' },
+    acquisition:
+      campaignId && userId
+        ? { kind: 'campaign_pc_onboarding', campaignId }
+        : { kind: 'campaign_pc_onboarding', campaignId: '' },
+  })
+}
+
+/** @deprecated Prefer `useCampaignNpcBuildContext` for campaign NPC authoring. */
+export function useCampaignBuildContext(campaignId: string | undefined) {
+  return useCampaignNpcBuildContext(campaignId)
+}
+
+export type CampaignBuildContextResult = ReturnType<typeof useCampaignCharacterBuildContext>
 
 export type { CampaignBuildContext, SystemRulesetId }

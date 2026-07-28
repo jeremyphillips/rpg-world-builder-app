@@ -1,6 +1,7 @@
 import bcrypt from 'bcryptjs'
 import { isValidObjectId } from 'mongoose'
 import type { PlatformRole, SessionUser, UpdateProfileInput, User } from '@rpg/contracts'
+import { USER_ACTIVITY_WRITE_INTERVAL_MINUTES } from '@rpg/contracts'
 
 import { BCRYPT_ROUNDS } from '../../lib/bcrypt-rounds'
 import { HttpError } from '../../lib/http-error'
@@ -10,11 +11,17 @@ type UserRecord = UserSchemaType & {
   _id: unknown
   createdAt: Date
   updatedAt: Date
+  lastSignedInAt?: Date | null
+  lastActiveAt?: Date | null
 }
 
 /** A user plus the password hash, used only by the auth login path. */
 export interface UserWithSecret extends User {
   passwordHash: string
+}
+
+function toIsoDate(value: Date | null | undefined): string | null {
+  return value ? value.toISOString() : null
 }
 
 function toUser(doc: UserRecord): User {
@@ -27,6 +34,19 @@ function toUser(doc: UserRecord): User {
     lastSelectedCampaignId: doc.lastSelectedCampaignId ?? null,
     createdAt: doc.createdAt.toISOString(),
     updatedAt: doc.updatedAt.toISOString(),
+  }
+}
+
+export type UserWithActivityTimestamps = User & {
+  lastSignedInAt: string | null
+  lastActiveAt: string | null
+}
+
+export function toUserWithActivityTimestamps(doc: UserRecord): UserWithActivityTimestamps {
+  return {
+    ...toUser(doc),
+    lastSignedInAt: toIsoDate(doc.lastSignedInAt),
+    lastActiveAt: toIsoDate(doc.lastActiveAt),
   }
 }
 
@@ -52,6 +72,12 @@ export async function createUser(input: CreateUserInput): Promise<User> {
   return toUser(doc.toObject() as UserRecord)
 }
 
+export async function findUserByEmail(email: string): Promise<User | null> {
+  const doc = await UserModel.findOne({ email: email.toLowerCase() }).lean<UserRecord | null>()
+  if (!doc) return null
+  return toUser(doc)
+}
+
 export async function findUserByEmailWithSecret(email: string): Promise<UserWithSecret | null> {
   const doc = await UserModel.findOne({ email: email.toLowerCase() }).lean<UserRecord | null>()
   if (!doc) return null
@@ -63,6 +89,59 @@ export async function findSessionUserById(id: string): Promise<SessionUser | nul
   const doc = await UserModel.findById(id).lean<UserRecord | null>()
   if (!doc) return null
   return toSessionUser(toUser(doc))
+}
+
+export async function findUsersByIds(ids: readonly string[]): Promise<User[]> {
+  const validIds = ids.filter((id) => isValidObjectId(id))
+  if (validIds.length === 0) return []
+
+  const docs = await UserModel.find({ _id: { $in: validIds } }).lean<UserRecord[]>()
+  return docs.map(toUser)
+}
+
+export async function findUserWithActivityTimestampsById(
+  id: string,
+): Promise<UserWithActivityTimestamps | null> {
+  if (!isValidObjectId(id)) return null
+  const doc = await UserModel.findById(id).lean<UserRecord | null>()
+  if (!doc) return null
+  return toUserWithActivityTimestamps(doc)
+}
+
+export async function countSuperadminsExcluding(userId?: string): Promise<number> {
+  const filter: Record<string, unknown> = { role: 'superadmin' }
+  if (userId && isValidObjectId(userId)) {
+    filter._id = { $ne: userId }
+  }
+  return UserModel.countDocuments(filter)
+}
+
+/** Sets both timestamps on successful login. */
+export async function recordUserLoginActivity(userId: string): Promise<void> {
+  if (!isValidObjectId(userId)) return
+
+  const now = new Date()
+  await UserModel.updateOne({ _id: userId }, { $set: { lastSignedInAt: now, lastActiveAt: now } })
+}
+
+/**
+ * Throttled write for meaningful authenticated API use. Skips when the stored
+ * `lastActiveAt` is within `USER_ACTIVITY_WRITE_INTERVAL_MINUTES`.
+ */
+export async function recordUserActivity(userId: string): Promise<void> {
+  if (!isValidObjectId(userId)) return
+
+  const now = new Date()
+  const throttleMs = USER_ACTIVITY_WRITE_INTERVAL_MINUTES * 60 * 1000
+  const throttleCutoff = new Date(now.getTime() - throttleMs)
+
+  await UserModel.updateOne(
+    {
+      _id: userId,
+      $or: [{ lastActiveAt: null }, { lastActiveAt: { $lt: throttleCutoff } }],
+    },
+    { $set: { lastActiveAt: now } },
+  )
 }
 
 /**
@@ -78,7 +157,7 @@ export async function updateLastSelectedCampaign(
   const doc = await UserModel.findByIdAndUpdate(
     userId,
     { lastSelectedCampaignId: campaignId },
-    { new: true },
+    { returnDocument: 'after' },
   ).lean<UserRecord | null>()
   if (!doc) return null
   return toSessionUser(toUser(doc))
@@ -108,7 +187,7 @@ export async function updateProfile(
   }
 
   const doc = await UserModel.findByIdAndUpdate(userId, patch, {
-    new: true,
+    returnDocument: 'after',
   }).lean<UserRecord | null>()
   if (!doc) return null
   return toSessionUser(toUser(doc))

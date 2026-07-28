@@ -17,6 +17,11 @@ export const ROUTES = {
     detail: (id: string) => `/campaigns/${id}`,
     sessions: (id: string) => `/campaigns/${id}/sessions`,
     settings: (id: string) => `/campaigns/${id}/settings`,
+    onboarding: (id: string) => `/campaigns/${id}/onboarding`,
+    characters: {
+      detail: (campaignId: string, characterId: string) =>
+        `/campaigns/${campaignId}/characters/${characterId}`,
+    },
     npcs: {
       list: (id: string) => `/campaigns/${id}/npcs`,
       new: (id: string) => `/campaigns/${id}/npcs/new`,

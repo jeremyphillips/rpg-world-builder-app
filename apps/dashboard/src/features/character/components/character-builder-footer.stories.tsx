@@ -4,7 +4,7 @@ import { fn } from 'storybook/test'
 import { getBuilderChromeCopy } from '../lib/builder-chrome-copy'
 import { CharacterBuilderFooter } from './character-builder-footer.client'
 
-const pcChrome = getBuilderChromeCopy('pc')
+const pcChrome = getBuilderChromeCopy('standalone_pc')
 
 const meta = {
   title: 'Character Builder/CharacterBuilderFooter',

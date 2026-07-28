@@ -12,9 +12,16 @@ import { getContentTypeCollectionLabel } from '@/features/content/lib/content-ty
 import {
   AccountSettingsRoute,
   AdminSettingsRoute,
+  AdminUserCampaignsRoute,
+  AdminUserCharactersRoute,
+  AdminUserDetailRoute,
+  AdminUserLayoutRoute,
   AdminUsersRoute,
   CampaignCreateRoute,
+  CampaignCharacterDetailRoute,
   CampaignDetailRoute,
+  CampaignLayoutRoute,
+  CampaignOnboardingRoute,
   CampaignSessionsRoute,
   CampaignSettingsRoute,
   CharacterCreateRoute,
@@ -112,8 +119,38 @@ const router = createBrowserRouter(
               children: [
                 {
                   path: 'users',
-                  element: <AdminUsersRoute />,
-                  handle: { crumb: () => ({ label: 'Admin / Users' }) } satisfies CrumbHandle,
+                  element: <Outlet />,
+                  handle: {
+                    crumb: () => ({ label: 'Admin / Users', href: ROUTES.admin.users }),
+                  } satisfies CrumbHandle,
+                  children: [
+                    {
+                      index: true,
+                      element: <AdminUsersRoute />,
+                    },
+                    {
+                      path: ':userId',
+                      element: <AdminUserLayoutRoute />,
+                      handle: {
+                        crumb: (_params, { entityLabel }) => ({
+                          label: entityLabel ?? '…',
+                        }),
+                      } satisfies CrumbHandle,
+                      children: [
+                        { index: true, element: <AdminUserDetailRoute /> },
+                        {
+                          path: 'campaigns',
+                          element: <AdminUserCampaignsRoute />,
+                          handle: { crumb: () => ({ label: 'Campaigns' }) } satisfies CrumbHandle,
+                        },
+                        {
+                          path: 'characters',
+                          element: <AdminUserCharactersRoute />,
+                          handle: { crumb: () => ({ label: 'Characters' }) } satisfies CrumbHandle,
+                        },
+                      ],
+                    },
+                  ],
                 },
                 {
                   path: 'settings',
@@ -130,7 +167,7 @@ const router = createBrowserRouter(
                * Layout wrapper: provides the campaign-level breadcrumb crumb and
                * renders children via <Outlet />. The index child is CampaignDetail.
                */
-              element: <Outlet />,
+              element: <CampaignLayoutRoute />,
               handle: {
                 crumb: (params, { campaignName }) => ({
                   label: campaignName ?? 'Campaign',
@@ -139,6 +176,20 @@ const router = createBrowserRouter(
               } satisfies CrumbHandle,
               children: [
                 { index: true, element: <CampaignDetailRoute /> },
+                {
+                  path: 'onboarding',
+                  element: <CampaignOnboardingRoute />,
+                  handle: { crumb: () => ({ label: 'Onboarding' }) } satisfies CrumbHandle,
+                },
+                {
+                  path: 'characters/:characterId',
+                  element: <CampaignCharacterDetailRoute />,
+                  handle: {
+                    crumb: (_params, { entityLabel }) => ({
+                      label: entityLabel ?? 'Character',
+                    }),
+                  } satisfies CrumbHandle,
+                },
                 {
                   path: 'sessions',
                   element: <CampaignSessionsRoute />,

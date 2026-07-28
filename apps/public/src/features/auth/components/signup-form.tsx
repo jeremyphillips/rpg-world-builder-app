@@ -1,12 +1,14 @@
 'use client'
 
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import Link from 'next/link'
+import { useSearchParams } from 'next/navigation'
 
 import {
   CROSS_APP_PATHS,
   getErrorMessage,
   registerInputSchema,
+  validateAuthContinuationPath,
   type RegisterInput,
 } from '@rpg/contracts'
 import { CardFooter, FormCard, SubmitButton, Text, formCardContentClass } from '@rpg/ui'
@@ -19,24 +21,48 @@ import { signupFields } from '../lib/auth-form-fields'
 export interface SignupFormProps {
   /** Called after a successful signup. Defaults to a same-origin redirect to the dashboard. */
   onSuccess?: () => void
+  /** When set, the email field is pre-filled and locked. */
+  lockedEmail?: string
 }
 
-const fields = signupFields
-
-export function SignupForm({ onSuccess }: SignupFormProps) {
+export function SignupForm({ onSuccess, lockedEmail }: SignupFormProps) {
+  const searchParams = useSearchParams()
   const [formError, setFormError] = useState<string | null>(null)
+  const returnTo = validateAuthContinuationPath(searchParams.get('returnTo'))
+  const emailFromQuery = searchParams.get('email') ?? undefined
+  const resolvedLockedEmail = lockedEmail ?? emailFromQuery
+
+  const fields = useMemo(() => {
+    if (!resolvedLockedEmail) return signupFields
+
+    return signupFields.map((field) => {
+      if ('name' in field && field.name === 'email') {
+        return { ...field, disabled: true }
+      }
+      return field
+    })
+  }, [resolvedLockedEmail])
 
   const onSubmit = async (values: RegisterInput) => {
     setFormError(null)
+    const payload = resolvedLockedEmail ? { ...values, email: resolvedLockedEmail } : values
+
     try {
-      await register(values)
-      // Establish a session immediately so signup lands in the dashboard.
-      await login({ email: values.email, password: values.password })
-      ;(onSuccess ?? (() => window.location.assign(CROSS_APP_PATHS.dashboard)))()
+      await register(payload)
+      await login({ email: payload.email, password: payload.password })
+      const redirect =
+        onSuccess ?? (() => window.location.assign(returnTo ?? CROSS_APP_PATHS.dashboard))
+      redirect()
     } catch (err) {
       setFormError(getErrorMessage(err, 'Unable to create your account. Please try again.'))
     }
   }
+
+  const loginHref = returnTo
+    ? `${ROUTES.login}?returnTo=${encodeURIComponent(returnTo)}${
+        resolvedLockedEmail ? `&email=${encodeURIComponent(resolvedLockedEmail)}` : ''
+      }`
+    : ROUTES.login
 
   return (
     <FormCard
@@ -47,6 +73,11 @@ export function SignupForm({ onSuccess }: SignupFormProps) {
       <Form<RegisterInput>
         schema={registerInputSchema}
         fields={fields}
+        defaultValues={
+          resolvedLockedEmail
+            ? { displayName: '', email: resolvedLockedEmail, password: '' }
+            : undefined
+        }
         onSubmit={onSubmit}
         formError={formError}
         contentClassName={formCardContentClass}
@@ -58,7 +89,7 @@ export function SignupForm({ onSuccess }: SignupFormProps) {
             <Text variant="small" className="text-center">
               Already have an account?{' '}
               <Link
-                href={ROUTES.login}
+                href={loginHref}
                 className="font-medium text-foreground underline-offset-4 hover:underline"
               >
                 Log in

@@ -25,6 +25,7 @@ import {
   type CampaignCreateValues,
 } from '../lib/campaign-settings-form-values'
 import { ReviewStep } from '../components/steps/review-step'
+import { InviteMembersStep } from '../components/steps/invite-members-step'
 import {
   BLANK_CAMPAIGN_TEMPLATE_VALUE,
   CampaignTemplateChooser,
@@ -37,6 +38,7 @@ const STEPS: WizardStepDef[] = [
   { id: 'rules', label: 'Rules' },
   { id: 'flavor', label: 'Flavor' },
   { id: 'review', label: 'Review' },
+  { id: 'invites', label: 'Invite members' },
 ]
 
 export function CampaignCreate() {
@@ -65,11 +67,11 @@ export function CampaignCreate() {
         imageKey = await uploadFile(createValues.banner[0], 'Could not upload campaign image.')
       }
 
-      const campaign = await mutateAsync(
+      const result = await mutateAsync(
         buildCreateCampaignInput(createValues, imageKey, selectedTemplate?.metadata.id),
       )
 
-      selectCampaign(campaign.id)
+      selectCampaign(result.campaign.id)
     } catch (err) {
       setCreateError(getErrorMessage(err, 'Could not create campaign.'))
     }
@@ -104,6 +106,7 @@ export function CampaignCreate() {
           error={createError}
           templateName={selectedTemplate?.metadata.name ?? 'Blank campaign'}
         />
+        <InviteMembersStep onFinish={onComplete} />
       </Wizard>
     </NarrowPage>
   )

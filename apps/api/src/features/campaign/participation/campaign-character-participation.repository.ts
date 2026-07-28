@@ -12,6 +12,7 @@ import {
   createDefaultCampaignRosterState,
 } from '@rpg/contracts'
 
+import type { WithMongoSession } from '../../../lib/mongo-session'
 import { CampaignCharacterParticipationModel } from './campaign-character-participation.model'
 
 type ParticipationRecord = {
@@ -40,15 +41,21 @@ function toParticipation(doc: ParticipationRecord): CampaignCharacterParticipati
 
 export async function createParticipation(
   input: CreateCampaignCharacterParticipationInput,
+  options?: WithMongoSession,
 ): Promise<CampaignCharacterParticipation> {
-  const doc = await CampaignCharacterParticipationModel.create({
-    campaignId: input.campaignId,
-    characterId: input.characterId,
-    roster: input.roster,
-    joinedAt: new Date(input.joinedAt),
-  })
+  const doc = await CampaignCharacterParticipationModel.create(
+    [
+      {
+        campaignId: input.campaignId,
+        characterId: input.characterId,
+        roster: input.roster,
+        joinedAt: new Date(input.joinedAt),
+      },
+    ],
+    { session: options?.session },
+  )
 
-  return toParticipation(doc.toObject() as ParticipationRecord)
+  return toParticipation(doc[0]!.toObject() as ParticipationRecord)
 }
 
 export async function findOpenParticipation({
@@ -71,13 +78,16 @@ export async function findOpenParticipation({
 
 export async function findOpenParticipationForCharacter(
   characterId: string,
+  options?: WithMongoSession,
 ): Promise<CampaignCharacterParticipation | null> {
   if (!isValidObjectId(characterId)) return null
 
   const doc = await CampaignCharacterParticipationModel.findOne({
     characterId,
     ...OPEN_PARTICIPATION_FILTER,
-  }).lean<ParticipationRecord | null>()
+  })
+    .session(options?.session ?? null)
+    .lean<ParticipationRecord | null>()
 
   return doc ? toParticipation(doc) : null
 }
@@ -91,6 +101,20 @@ export async function listOpenParticipationsForCampaign(
   })
     .sort({ joinedAt: -1 })
     .lean<ParticipationRecord[]>()
+
+  return docs.map(toParticipation)
+}
+
+export async function listOpenParticipationsForCharacters(
+  characterIds: readonly string[],
+): Promise<CampaignCharacterParticipation[]> {
+  const validIds = characterIds.filter((id) => isValidObjectId(id))
+  if (validIds.length === 0) return []
+
+  const docs = await CampaignCharacterParticipationModel.find({
+    characterId: { $in: validIds },
+    ...OPEN_PARTICIPATION_FILTER,
+  }).lean<ParticipationRecord[]>()
 
   return docs.map(toParticipation)
 }
@@ -143,9 +167,11 @@ export async function findParticipationRoster(
 export async function deleteOpenParticipation({
   campaignId,
   characterId,
+  session,
 }: {
   campaignId: string
   characterId: string
+  session?: WithMongoSession['session']
 }): Promise<boolean> {
   if (!isValidObjectId(characterId)) return false
 
@@ -153,15 +179,33 @@ export async function deleteOpenParticipation({
     campaignId,
     characterId,
     ...OPEN_PARTICIPATION_FILTER,
-  })
+  }).session(session ?? null)
 
   return result.deletedCount === 1
 }
 
-export async function deleteAllParticipationsForCharacter(characterId: string): Promise<void> {
+/** Targeted detach of open participation for one campaign (invite-completion rollback). */
+export async function detachOpenParticipation({
+  campaignId,
+  characterId,
+  session,
+}: {
+  campaignId: string
+  characterId: string
+  session?: WithMongoSession['session']
+}): Promise<boolean> {
+  return deleteOpenParticipation({ campaignId, characterId, session })
+}
+
+export async function deleteAllParticipationsForCharacter(
+  characterId: string,
+  options?: WithMongoSession,
+): Promise<void> {
   if (!isValidObjectId(characterId)) return
 
-  await CampaignCharacterParticipationModel.deleteMany({ characterId })
+  await CampaignCharacterParticipationModel.deleteMany({ characterId }).session(
+    options?.session ?? null,
+  )
 }
 
 export async function updateCampaignCharacterRoster({
@@ -192,22 +236,27 @@ export async function attachCharacterToCampaign({
   campaignId,
   characterId,
   joinedAt,
+  session,
 }: {
   campaignId: string
   characterId: string
   joinedAt: string
+  session?: WithMongoSession['session']
 }): Promise<CampaignCharacterParticipation> {
-  const existing = await findOpenParticipationForCharacter(characterId)
+  const existing = await findOpenParticipationForCharacter(characterId, { session })
   if (existing) {
     throw new Error(
       `Character ${characterId} already has open participation in campaign ${existing.campaignId}`,
     )
   }
 
-  return createParticipation({
-    campaignId,
-    characterId,
-    joinedAt,
-    roster: createDefaultCampaignRosterState(),
-  })
+  return createParticipation(
+    {
+      campaignId,
+      characterId,
+      joinedAt,
+      roster: createDefaultCampaignRosterState(),
+    },
+    { session },
+  )
 }

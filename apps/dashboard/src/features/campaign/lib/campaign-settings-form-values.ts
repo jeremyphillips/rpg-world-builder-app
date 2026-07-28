@@ -2,6 +2,7 @@ import type { z } from 'zod'
 import type { CreateCampaignInput } from '@rpg/contracts'
 
 import { flavorSchema, identitySchema } from './profile/campaign-profile-form-fields'
+import { inviteMembersSchema } from './invite-members-form-fields'
 import {
   buildUpdateCampaignInput,
   mapCampaignToSettingsValues,
@@ -24,7 +25,10 @@ export const campaignSettingsSchema = identitySchema.and(flavorSchema)
 
 export type CampaignSettingsValues = z.infer<typeof campaignSettingsSchema>
 
-export const campaignCreateSchema = identitySchema.and(createRulesSchema).and(flavorSchema)
+export const campaignCreateSchema = identitySchema
+  .and(createRulesSchema)
+  .and(flavorSchema)
+  .and(inviteMembersSchema)
 
 export type CampaignCreateValues = z.infer<typeof campaignCreateSchema>
 
@@ -34,6 +38,10 @@ export function buildCreateCampaignInput(
   imageKey?: string,
   campaignTemplateId?: string,
 ): CreateCampaignInput {
+  const inviteEmails = (values.inviteEmails ?? [])
+    .map((entry) => ({ email: entry.email.trim() }))
+    .filter((entry) => entry.email.length > 0)
+
   return {
     name: values.name,
     description: values.description,
@@ -46,5 +54,6 @@ export function buildCreateCampaignInput(
       magicLevel: values.magicLevel,
       difficulty: values.difficulty,
     },
+    ...(inviteEmails.length > 0 ? { inviteEmails } : {}),
   }
 }

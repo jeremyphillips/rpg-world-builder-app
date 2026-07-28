@@ -3,12 +3,16 @@ import { useQuery } from '@tanstack/react-query'
 
 import {
   DEFAULT_ABILITY_GENERATION_RULES,
-  getCharacterBuilderStorageKey,
   indexCharacterBuildCatalog,
+  resolveCharacterBuilderDraftKey,
+  resolveCharacterBuilderDraftScope,
   type CharacterBuildContext,
+  type CharacterBuilderDraftScope,
   type StandaloneBuildContext,
   type SystemRulesetId,
 } from '@rpg/contracts'
+
+import { useSession } from '@/features/auth'
 
 import {
   buildContextQueryKey,
@@ -17,6 +21,7 @@ import {
 } from '../api/ruleset-content-client'
 
 export function useBuildContext(rulesetId: SystemRulesetId | undefined) {
+  const { data: session } = useSession()
   const query = useQuery({
     queryKey: rulesetId ? buildContextQueryKey(rulesetId) : [],
     queryFn: async () => {
@@ -56,15 +61,21 @@ export function useBuildContext(rulesetId: SystemRulesetId | undefined) {
     [context],
   )
 
+  const draftScope = useMemo((): CharacterBuilderDraftScope | null => {
+    if (!context) return null
+    return resolveCharacterBuilderDraftScope(context, session?.user.id)
+  }, [context, session?.user.id])
+
   const storageKey = useMemo(
-    () => (context ? getCharacterBuilderStorageKey(context) : null),
-    [context],
+    () => (draftScope ? resolveCharacterBuilderDraftKey(draftScope, { mode: 'dashboard' }) : null),
+    [draftScope],
   )
 
   return {
     ...query,
     context,
     catalogIndex,
+    draftScope,
     storageKey,
   }
 }

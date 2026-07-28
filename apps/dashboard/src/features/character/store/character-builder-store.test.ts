@@ -4,12 +4,22 @@ import {
   CHARACTER_BUILDER_DRAFT_VERSION,
   createEmptyCharacterBuilderDraft,
   createPersistedCharacterBuilderState,
+  type CharacterBuilderDraftScope,
 } from '@rpg/contracts'
 
 import {
   createCharacterBuilderStore,
   resetCharacterBuilderStoreCache,
 } from './character-builder-store'
+
+const standaloneScope: CharacterBuilderDraftScope = {
+  kind: 'standalone',
+  userId: 'user-test',
+  rulesetId: 'srd-cc-5.2.1',
+  characterKind: 'pc',
+}
+
+const storageKey = 'character-builder:standalone:dashboard:user-test:srd-cc-5.2.1:pc'
 
 function installSessionStorageMock(): void {
   const storage = new Map<string, string>()
@@ -35,27 +45,40 @@ describe('character-builder-store', () => {
   })
 
   it('marks the store hydrated after automatic rehydration', async () => {
-    const store = createCharacterBuilderStore('character-builder:test:standalone:ruleset-hydrate')
+    const store = createCharacterBuilderStore({ storageKey, scope: standaloneScope })
 
     await vi.waitFor(() => {
       expect(store.getState()._hasHydrated).toBe(true)
     })
   })
 
-  it('persists only the version-wrapped draft', async () => {
-    const store = createCharacterBuilderStore('character-builder:test:standalone:ruleset-a')
+  it('persists scoped draft metadata with the draft values', async () => {
+    const store = createCharacterBuilderStore({ storageKey, scope: standaloneScope })
+
+    await vi.waitFor(() => {
+      expect(store.getState()._hasHydrated).toBe(true)
+    })
+
     store.getState().patchDraft({
       identity: { name: 'Verna' },
     })
 
     await vi.waitFor(() => {
-      expect(sessionStorage.getItem('character-builder:test:standalone:ruleset-a')).toBeTruthy()
+      const raw = sessionStorage.getItem(storageKey)
+      expect(raw).toBeTruthy()
+      const parsed = JSON.parse(raw!) as {
+        state: ReturnType<typeof createPersistedCharacterBuilderState>
+      }
+      expect(parsed.state.draft.identity.name).toBe('Verna')
     })
 
-    const raw = sessionStorage.getItem('character-builder:test:standalone:ruleset-a')
-    const parsed = JSON.parse(raw!) as { state: unknown }
+    const raw = sessionStorage.getItem(storageKey)
+    const parsed = JSON.parse(raw!) as {
+      state: ReturnType<typeof createPersistedCharacterBuilderState>
+    }
     const persisted = parsed.state as ReturnType<typeof createPersistedCharacterBuilderState>
     expect(persisted.version).toBe(CHARACTER_BUILDER_DRAFT_VERSION)
+    expect(persisted.scope).toEqual(standaloneScope)
     expect(persisted.draft.identity.name).toBe('Verna')
     expect(persisted).not.toHaveProperty('catalog')
     expect(persisted).not.toHaveProperty('context')
@@ -63,11 +86,11 @@ describe('character-builder-store', () => {
 
   it('drops corrupt persisted state without throwing', async () => {
     sessionStorage.setItem(
-      'character-builder:test:standalone:ruleset-b',
+      storageKey,
       JSON.stringify({ state: { version: 99, draft: {} }, version: 0 }),
     )
 
-    const store = createCharacterBuilderStore('character-builder:test:standalone:ruleset-b')
+    const store = createCharacterBuilderStore({ storageKey, scope: standaloneScope })
 
     await vi.waitFor(() => {
       expect(store.getState()._hasHydrated).toBe(true)
@@ -84,16 +107,14 @@ describe('character-builder-store', () => {
       touchedStepIds: ['identity' as const],
     }
     sessionStorage.setItem(
-      'character-builder:test:standalone:ruleset-rehydrate-identity',
+      storageKey,
       JSON.stringify({
-        state: createPersistedCharacterBuilderState(persistedDraft),
+        state: createPersistedCharacterBuilderState(persistedDraft, standaloneScope),
         version: 0,
       }),
     )
 
-    const store = createCharacterBuilderStore(
-      'character-builder:test:standalone:ruleset-rehydrate-identity',
-    )
+    const store = createCharacterBuilderStore({ storageKey, scope: standaloneScope })
 
     await vi.waitFor(() => {
       expect(store.getState()._hasHydrated).toBe(true)
@@ -113,14 +134,14 @@ describe('character-builder-store', () => {
       touchedStepIds: ['identity' as const],
     }
     sessionStorage.setItem(
-      'character-builder:test:standalone:ruleset-c',
+      storageKey,
       JSON.stringify({
-        state: createPersistedCharacterBuilderState(persistedDraft),
+        state: createPersistedCharacterBuilderState(persistedDraft, standaloneScope),
         version: 0,
       }),
     )
 
-    const store = createCharacterBuilderStore('character-builder:test:standalone:ruleset-c')
+    const store = createCharacterBuilderStore({ storageKey, scope: standaloneScope })
 
     await vi.waitFor(() => {
       expect(store.getState()._hasHydrated).toBe(true)
@@ -129,6 +150,34 @@ describe('character-builder-store', () => {
     expect(store.getState().hasPendingRestore).toBe(true)
     expect(store.getState().pendingRestoredDraft).toEqual(persistedDraft)
     expect(store.getState().draft).toEqual(createEmptyCharacterBuilderDraft())
+  })
+
+  it('rejects drafts with mismatched scope without clearing storage', async () => {
+    const persistedDraft = {
+      ...createEmptyCharacterBuilderDraft(),
+      identity: { name: 'Verna' },
+    }
+    const mismatchedScope: CharacterBuilderDraftScope = {
+      kind: 'campaign',
+      campaignId: 'camp_1',
+      characterKind: 'pc',
+    }
+    sessionStorage.setItem(
+      storageKey,
+      JSON.stringify({
+        state: createPersistedCharacterBuilderState(persistedDraft, mismatchedScope),
+        version: 0,
+      }),
+    )
+
+    const store = createCharacterBuilderStore({ storageKey, scope: standaloneScope })
+
+    await vi.waitFor(() => {
+      expect(store.getState()._hasHydrated).toBe(true)
+    })
+
+    expect(store.getState().hasPendingRestore).toBe(false)
+    expect(sessionStorage.getItem(storageKey)).toBeTruthy()
   })
 
   it('rehydrates legacy equipment purchases with stable ids', async () => {
@@ -152,16 +201,14 @@ describe('character-builder-store', () => {
       touchedStepIds: ['equipment' as const],
     }
     sessionStorage.setItem(
-      'character-builder:test:standalone:ruleset-legacy-purchases',
+      storageKey,
       JSON.stringify({
-        state: createPersistedCharacterBuilderState(persistedDraft),
+        state: createPersistedCharacterBuilderState(persistedDraft, standaloneScope),
         version: 0,
       }),
     )
 
-    const store = createCharacterBuilderStore(
-      'character-builder:test:standalone:ruleset-legacy-purchases',
-    )
+    const store = createCharacterBuilderStore({ storageKey, scope: standaloneScope })
 
     await vi.waitFor(() => {
       expect(store.getState()._hasHydrated).toBe(true)
@@ -180,7 +227,7 @@ describe('character-builder-store', () => {
       ...createEmptyCharacterBuilderDraft(),
       identity: { name: 'Verna' },
     }
-    const store = createCharacterBuilderStore('character-builder:test:standalone:ruleset-d')
+    const store = createCharacterBuilderStore({ storageKey, scope: standaloneScope })
     store.setState({
       hasPendingRestore: true,
       pendingRestoredDraft: persistedDraft,
@@ -192,6 +239,6 @@ describe('character-builder-store', () => {
 
     store.getState().startOver()
     expect(store.getState().draft).toEqual(createEmptyCharacterBuilderDraft())
-    expect(sessionStorage.getItem('character-builder:test:standalone:ruleset-d')).toBeNull()
+    expect(sessionStorage.getItem(storageKey)).toBeNull()
   })
 })

@@ -15,14 +15,14 @@ interface ReviewStepProps {
 }
 
 export function ReviewStep({ error, templateName }: ReviewStepProps) {
-  const { accumulatedValues, complete } = useWizard()
+  const { accumulatedValues, completeStep } = useWizard()
   const values = accumulatedValues as Partial<CampaignCreateValues>
 
   return (
     <form
       onSubmit={(event) => {
         event.preventDefault()
-        void complete()
+        completeStep({})
       }}
     >
       <div className="space-y-6">
@@ -39,7 +39,7 @@ export function ReviewStep({ error, templateName }: ReviewStepProps) {
         <ReviewErrorMessage error={error} />
       </div>
 
-      <WizardFooter submitLabel="Create Campaign" />
+      <WizardFooter submitLabel="Next" />
     </form>
   )
 }

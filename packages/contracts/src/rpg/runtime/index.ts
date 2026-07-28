@@ -1,4 +1,5 @@
 export * from './character'
 export * from './character-acquisition'
 export * from './character-builder'
+export * from './campaign-onboarding-completion-input'
 export * from './creature'

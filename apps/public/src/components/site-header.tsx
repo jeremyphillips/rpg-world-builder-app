@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { APP_NAME } from '@rpg/contracts'
 
 import { Heading } from '@rpg/ui'
 
@@ -12,7 +13,7 @@ export function SiteHeader() {
       <div className="mx-auto flex h-16 max-w-5xl items-center justify-between px-6">
         <Link href={ROUTES.home}>
           <Heading variant="brand" as="span">
-            RPG World Builder
+            {APP_NAME}
           </Heading>
         </Link>
         <nav className="flex items-center gap-2" aria-label="Account">

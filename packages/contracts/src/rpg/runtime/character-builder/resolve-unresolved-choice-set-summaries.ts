@@ -4,7 +4,7 @@ import { characterBuilderValidationMessages } from './character-builder-messages
 import { isChoiceSetSatisfied, type ChoiceSet } from './choice-set'
 import type { CharacterBuilderDraft } from './draft'
 import type { CharacterBuilderStepId } from './step-ids'
-import { BUILDER_STEPS, getChoiceSetStepId } from './steps'
+import { getBuilderStepLabel, getChoiceSetStepId } from './steps'
 
 export type UnresolvedChoiceSetSummary = {
   choiceSetId: string
@@ -15,11 +15,6 @@ export type UnresolvedChoiceSetSummary = {
   max: number
   selectedCount: number
   message: string
-}
-
-function resolveBuilderStepLabel(stepId: CharacterBuilderStepId): string {
-  const step = BUILDER_STEPS.find((entry) => entry.id === stepId)
-  return step?.label ?? stepId
 }
 
 /**
@@ -44,7 +39,7 @@ export function resolveUnresolvedChoiceSetSummaries(
         choiceSetId: choiceSet.id,
         label: choiceSet.label,
         stepId,
-        stepLabel: resolveBuilderStepLabel(stepId),
+        stepLabel: getBuilderStepLabel(stepId),
         min: choiceSet.min,
         max: choiceSet.max,
         selectedCount,

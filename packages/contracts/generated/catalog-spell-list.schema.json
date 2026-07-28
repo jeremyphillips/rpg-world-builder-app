@@ -14,13 +14,27 @@
       },
       "rulesetId": {
         "type": "string",
-        "enum": ["srd-cc-5.2.1"],
+        "enum": [
+          "srd-cc-5.2.1"
+        ],
         "description": "srd-cc-5.2.1"
       },
       "source": {
         "type": "string",
-        "enum": ["system", "homebrew"],
+        "enum": [
+          "system",
+          "homebrew"
+        ],
         "description": "system | homebrew"
+      },
+      "status": {
+        "default": "published",
+        "type": "string",
+        "enum": [
+          "draft",
+          "published"
+        ],
+        "description": "draft | published"
       },
       "campaignId": {
         "anyOf": [
@@ -154,7 +168,13 @@
               },
               "unit": {
                 "type": "string",
-                "enum": ["action", "bonus-action", "reaction", "minute", "hour"],
+                "enum": [
+                  "action",
+                  "bonus-action",
+                  "reaction",
+                  "minute",
+                  "hour"
+                ],
                 "description": "action | bonus-action | reaction | minute | hour"
               },
               "trigger": {
@@ -162,14 +182,20 @@
                 "minLength": 1
               }
             },
-            "required": ["value", "unit"],
+            "required": [
+              "value",
+              "unit"
+            ],
             "additionalProperties": false
           },
           "canBeCastAsRitual": {
             "type": "boolean"
           }
         },
-        "required": ["normal", "canBeCastAsRitual"],
+        "required": [
+          "normal",
+          "canBeCastAsRitual"
+        ],
         "additionalProperties": false
       },
       "range": {
@@ -183,7 +209,9 @@
                 "description": "self"
               }
             },
-            "required": ["kind"],
+            "required": [
+              "kind"
+            ],
             "additionalProperties": false
           },
           {
@@ -195,7 +223,9 @@
                 "description": "touch"
               }
             },
-            "required": ["kind"],
+            "required": [
+              "kind"
+            ],
             "additionalProperties": false
           },
           {
@@ -207,7 +237,9 @@
                 "description": "sight"
               }
             },
-            "required": ["kind"],
+            "required": [
+              "kind"
+            ],
             "additionalProperties": false
           },
           {
@@ -219,7 +251,9 @@
                 "description": "unlimited"
               }
             },
-            "required": ["kind"],
+            "required": [
+              "kind"
+            ],
             "additionalProperties": false
           },
           {
@@ -243,11 +277,17 @@
                     "description": "ft"
                   }
                 },
-                "required": ["value", "unit"],
+                "required": [
+                  "value",
+                  "unit"
+                ],
                 "additionalProperties": false
               }
             },
-            "required": ["kind", "value"],
+            "required": [
+              "kind",
+              "value"
+            ],
             "additionalProperties": false
           },
           {
@@ -263,7 +303,10 @@
                 "minLength": 1
               }
             },
-            "required": ["kind", "description"],
+            "required": [
+              "kind",
+              "description"
+            ],
             "additionalProperties": false
           }
         ]
@@ -286,7 +329,9 @@
                 "description": "instantaneous"
               }
             },
-            "required": ["kind"],
+            "required": [
+              "kind"
+            ],
             "additionalProperties": false
           },
           {
@@ -304,7 +349,12 @@
               },
               "unit": {
                 "type": "string",
-                "enum": ["round", "minute", "hour", "day"],
+                "enum": [
+                  "round",
+                  "minute",
+                  "hour",
+                  "day"
+                ],
                 "description": "round | minute | hour | day"
               },
               "concentration": {
@@ -316,7 +366,11 @@
                 "const": true
               }
             },
-            "required": ["kind", "value", "unit"],
+            "required": [
+              "kind",
+              "value",
+              "unit"
+            ],
             "additionalProperties": false
           },
           {
@@ -332,7 +386,10 @@
                 "minLength": 1
               }
             },
-            "required": ["kind", "description"],
+            "required": [
+              "kind",
+              "description"
+            ],
             "additionalProperties": false
           }
         ]
@@ -354,7 +411,10 @@
       },
       "deliveryMethod": {
         "type": "string",
-        "enum": ["melee-spell-attack", "ranged-spell-attack"],
+        "enum": [
+          "melee-spell-attack",
+          "ranged-spell-attack"
+        ],
         "description": "melee-spell-attack | ranged-spell-attack"
       },
       "cantripScaling": {
@@ -368,7 +428,12 @@
         "properties": {
           "selectionMode": {
             "type": "string",
-            "enum": ["self", "targets", "point", "none"],
+            "enum": [
+              "self",
+              "targets",
+              "point",
+              "none"
+            ],
             "description": "self | targets | point | none"
           },
           "target": {
@@ -396,7 +461,12 @@
             "$ref": "#/definitions/__schema25"
           }
         },
-        "required": ["selectionMode", "method", "effects", "outcomes"],
+        "required": [
+          "selectionMode",
+          "method",
+          "effects",
+          "outcomes"
+        ],
         "additionalProperties": false
       },
       "modeling": {
@@ -430,6 +500,7 @@
       "slug",
       "rulesetId",
       "source",
+      "status",
       "campaignId",
       "createdAt",
       "updatedAt",
@@ -467,7 +538,10 @@
               "$ref": "#/definitions/__schema3"
             }
           },
-          "required": ["shape", "radius"],
+          "required": [
+            "shape",
+            "radius"
+          ],
           "additionalProperties": false
         },
         {
@@ -482,7 +556,10 @@
               "$ref": "#/definitions/__schema3"
             }
           },
-          "required": ["shape", "radius"],
+          "required": [
+            "shape",
+            "radius"
+          ],
           "additionalProperties": false
         },
         {
@@ -497,7 +574,10 @@
               "$ref": "#/definitions/__schema3"
             }
           },
-          "required": ["shape", "length"],
+          "required": [
+            "shape",
+            "length"
+          ],
           "additionalProperties": false
         },
         {
@@ -512,7 +592,10 @@
               "$ref": "#/definitions/__schema3"
             }
           },
-          "required": ["shape", "size"],
+          "required": [
+            "shape",
+            "size"
+          ],
           "additionalProperties": false
         },
         {
@@ -530,7 +613,11 @@
               "$ref": "#/definitions/__schema3"
             }
           },
-          "required": ["shape", "length", "width"],
+          "required": [
+            "shape",
+            "length",
+            "width"
+          ],
           "additionalProperties": false
         },
         {
@@ -548,7 +635,11 @@
               "$ref": "#/definitions/__schema3"
             }
           },
-          "required": ["shape", "radius", "height"],
+          "required": [
+            "shape",
+            "radius",
+            "height"
+          ],
           "additionalProperties": false
         },
         {
@@ -564,7 +655,10 @@
               "minLength": 1
             }
           },
-          "required": ["shape", "description"],
+          "required": [
+            "shape",
+            "description"
+          ],
           "additionalProperties": false
         }
       ]
@@ -582,7 +676,10 @@
           "description": "ft"
         }
       },
-      "required": ["value", "unit"],
+      "required": [
+        "value",
+        "unit"
+      ],
       "additionalProperties": false
     },
     "__schema4": {
@@ -601,12 +698,19 @@
           "minLength": 1
         }
       },
-      "required": ["description"],
+      "required": [
+        "description"
+      ],
       "additionalProperties": false
     },
     "__schema7": {
       "type": "string",
-      "enum": ["self", "targets", "point", "none"],
+      "enum": [
+        "self",
+        "targets",
+        "point",
+        "none"
+      ],
       "description": "self | targets | point | none"
     },
     "__schema8": {
@@ -619,12 +723,19 @@
         },
         "countKind": {
           "type": "string",
-          "enum": ["exact", "up-to"],
+          "enum": [
+            "exact",
+            "up-to"
+          ],
           "description": "exact | up-to"
         },
         "kind": {
           "type": "string",
-          "enum": ["creature", "object", "creature-or-object"],
+          "enum": [
+            "creature",
+            "object",
+            "creature-or-object"
+          ],
           "description": "creature | object | creature-or-object"
         },
         "proximity": {
@@ -638,7 +749,9 @@
                   "description": "touch"
                 }
               },
-              "required": ["kind"],
+              "required": [
+                "kind"
+              ],
               "additionalProperties": false
             },
             {
@@ -657,7 +770,9 @@
                   ]
                 }
               },
-              "required": ["kind"],
+              "required": [
+                "kind"
+              ],
               "additionalProperties": false
             },
             {
@@ -672,13 +787,20 @@
                   "$ref": "#/definitions/__schema9"
                 }
               },
-              "required": ["kind", "distance"],
+              "required": [
+                "kind",
+                "distance"
+              ],
               "additionalProperties": false
             }
           ]
         }
       },
-      "required": ["count", "kind", "proximity"],
+      "required": [
+        "count",
+        "kind",
+        "proximity"
+      ],
       "additionalProperties": false
     },
     "__schema9": {
@@ -694,7 +816,10 @@
           "description": "ft"
         }
       },
-      "required": ["value", "unit"],
+      "required": [
+        "value",
+        "unit"
+      ],
       "additionalProperties": false
     },
     "__schema10": {
@@ -712,11 +837,16 @@
               "$ref": "#/definitions/__schema9"
             }
           },
-          "required": ["kind", "distance"],
+          "required": [
+            "kind",
+            "distance"
+          ],
           "additionalProperties": false
         }
       },
-      "required": ["proximity"],
+      "required": [
+        "proximity"
+      ],
       "additionalProperties": false
     },
     "__schema11": {
@@ -738,11 +868,17 @@
             },
             "attackType": {
               "type": "string",
-              "enum": ["melee-spell", "ranged-spell"],
+              "enum": [
+                "melee-spell",
+                "ranged-spell"
+              ],
               "description": "melee-spell | ranged-spell"
             }
           },
-          "required": ["kind", "attackType"],
+          "required": [
+            "kind",
+            "attackType"
+          ],
           "additionalProperties": false
         },
         {
@@ -755,11 +891,21 @@
             },
             "ability": {
               "type": "string",
-              "enum": ["str", "dex", "con", "int", "wis", "cha"],
+              "enum": [
+                "str",
+                "dex",
+                "con",
+                "int",
+                "wis",
+                "cha"
+              ],
               "description": "str | dex | con | int | wis | cha"
             }
           },
-          "required": ["kind", "ability"],
+          "required": [
+            "kind",
+            "ability"
+          ],
           "additionalProperties": false
         },
         {
@@ -771,7 +917,9 @@
               "description": "automatic"
             }
           },
-          "required": ["kind"],
+          "required": [
+            "kind"
+          ],
           "additionalProperties": false
         }
       ]
@@ -800,7 +948,10 @@
                   "maximum": 9007199254740991
                 }
               },
-              "required": ["type", "value"],
+              "required": [
+                "type",
+                "value"
+              ],
               "additionalProperties": false
             },
             "unitLabel": {
@@ -815,7 +966,10 @@
                   "minLength": 1
                 }
               },
-              "required": ["singular", "plural"],
+              "required": [
+                "singular",
+                "plural"
+              ],
               "additionalProperties": false
             },
             "applicationMode": {
@@ -824,7 +978,11 @@
               "description": "per-projectile"
             }
           },
-          "required": ["kind", "count", "applicationMode"],
+          "required": [
+            "kind",
+            "count",
+            "applicationMode"
+          ],
           "additionalProperties": false
         }
       ]
@@ -856,7 +1014,12 @@
               "$ref": "#/definitions/__schema0"
             }
           },
-          "required": ["id", "kind", "roll", "damageType"],
+          "required": [
+            "id",
+            "kind",
+            "roll",
+            "damageType"
+          ],
           "additionalProperties": false
         },
         {
@@ -874,7 +1037,11 @@
               "$ref": "#/definitions/__schema17"
             }
           },
-          "required": ["id", "kind", "roll"],
+          "required": [
+            "id",
+            "kind",
+            "roll"
+          ],
           "additionalProperties": false
         },
         {
@@ -892,7 +1059,11 @@
               "$ref": "#/definitions/__schema17"
             }
           },
-          "required": ["id", "kind", "roll"],
+          "required": [
+            "id",
+            "kind",
+            "roll"
+          ],
           "additionalProperties": false
         }
       ]
@@ -954,7 +1125,10 @@
           ]
         }
       },
-      "required": ["count", "faces"],
+      "required": [
+        "count",
+        "faces"
+      ],
       "additionalProperties": false
     },
     "__schema19": {
@@ -974,7 +1148,13 @@
       "properties": {
         "result": {
           "type": "string",
-          "enum": ["hit", "miss", "failed-save", "successful-save", "applied"],
+          "enum": [
+            "hit",
+            "miss",
+            "failed-save",
+            "successful-save",
+            "applied"
+          ],
           "description": "hit | miss | failed-save | successful-save | applied"
         },
         "note": {
@@ -984,12 +1164,21 @@
           "$ref": "#/definitions/__schema24"
         }
       },
-      "required": ["result", "applications"],
+      "required": [
+        "result",
+        "applications"
+      ],
       "additionalProperties": false
     },
     "__schema22": {
       "type": "string",
-      "enum": ["hit", "miss", "failed-save", "successful-save", "applied"],
+      "enum": [
+        "hit",
+        "miss",
+        "failed-save",
+        "successful-save",
+        "applied"
+      ],
       "description": "hit | miss | failed-save | successful-save | applied"
     },
     "__schema23": {
@@ -1006,11 +1195,17 @@
           },
           "amount": {
             "type": "string",
-            "enum": ["full", "half"],
+            "enum": [
+              "full",
+              "half"
+            ],
             "description": "full | half"
           }
         },
-        "required": ["effectId", "amount"],
+        "required": [
+          "effectId",
+          "amount"
+        ],
         "additionalProperties": false
       }
     },
@@ -1019,7 +1214,10 @@
       "properties": {
         "basis": {
           "type": "string",
-          "enum": ["character-level", "spell-slot-level"],
+          "enum": [
+            "character-level",
+            "spell-slot-level"
+          ],
           "description": "character-level | spell-slot-level"
         },
         "tracks": {
@@ -1030,7 +1228,10 @@
           }
         }
       },
-      "required": ["basis", "tracks"],
+      "required": [
+        "basis",
+        "tracks"
+      ],
       "additionalProperties": false
     },
     "__schema26": {
@@ -1054,7 +1255,11 @@
               }
             }
           },
-          "required": ["kind", "reference", "entries"],
+          "required": [
+            "kind",
+            "reference",
+            "entries"
+          ],
           "additionalProperties": false
         },
         {
@@ -1072,7 +1277,11 @@
               "$ref": "#/definitions/__schema29"
             }
           },
-          "required": ["kind", "reference", "increment"],
+          "required": [
+            "kind",
+            "reference",
+            "increment"
+          ],
           "additionalProperties": false
         }
       ]
@@ -1095,7 +1304,10 @@
                   "minLength": 1
                 }
               },
-              "required": ["kind", "effectId"],
+              "required": [
+                "kind",
+                "effectId"
+              ],
               "additionalProperties": false
             },
             {
@@ -1107,7 +1319,9 @@
                   "description": "application-pattern"
                 }
               },
-              "required": ["kind"],
+              "required": [
+                "kind"
+              ],
               "additionalProperties": false
             },
             {
@@ -1119,18 +1333,27 @@
                   "description": "target"
                 }
               },
-              "required": ["kind"],
+              "required": [
+                "kind"
+              ],
               "additionalProperties": false
             }
           ]
         },
         "property": {
           "type": "string",
-          "enum": ["roll", "projectile-count", "selected-target-count"],
+          "enum": [
+            "roll",
+            "projectile-count",
+            "selected-target-count"
+          ],
           "description": "roll | projectile-count | selected-target-count"
         }
       },
-      "required": ["subject", "property"],
+      "required": [
+        "subject",
+        "property"
+      ],
       "additionalProperties": false
     },
     "__schema28": {
@@ -1145,7 +1368,10 @@
           "$ref": "#/definitions/__schema29"
         }
       },
-      "required": ["threshold", "value"],
+      "required": [
+        "threshold",
+        "value"
+      ],
       "additionalProperties": false
     },
     "__schema29": {
@@ -1162,7 +1388,10 @@
               "$ref": "#/definitions/__schema17"
             }
           },
-          "required": ["kind", "roll"],
+          "required": [
+            "kind",
+            "roll"
+          ],
           "additionalProperties": false
         },
         {
@@ -1179,7 +1408,10 @@
               "maximum": 9007199254740991
             }
           },
-          "required": ["kind", "count"],
+          "required": [
+            "kind",
+            "count"
+          ],
           "additionalProperties": false
         }
       ]
@@ -1220,7 +1452,9 @@
           "type": "string"
         }
       },
-      "required": ["code"],
+      "required": [
+        "code"
+      ],
       "additionalProperties": false
     },
     "__schema34": {

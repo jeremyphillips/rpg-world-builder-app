@@ -1,15 +1,16 @@
-import type {
-  CampaignNpcDetail,
-  CampaignNpcListItem,
-  CampaignNpcStatusPatch,
-  CreateNpcRequestInput,
+import {
+  getCharacterBuilderChromeMessages,
+  type CampaignNpcDetail,
+  type CampaignNpcListItem,
+  type CampaignNpcStatusPatch,
+  type CreateNpcRequestInput,
 } from '@rpg/contracts'
 
 import { deleteJson, patchJson, postJson, request } from '@/lib/api-client'
 
 const LIST_NPCS_ERROR = 'Could not load NPCs.'
 const GET_NPC_ERROR = 'Could not load NPC.'
-const CREATE_NPC_ERROR = 'Could not create NPC.'
+const CREATE_NPC_ERROR = getCharacterBuilderChromeMessages('campaign_npc').createErrorDefault
 const DELETE_NPC_ERROR = 'Could not delete NPC.'
 const PATCH_NPC_STATUS_ERROR = 'Could not update NPC status.'
 

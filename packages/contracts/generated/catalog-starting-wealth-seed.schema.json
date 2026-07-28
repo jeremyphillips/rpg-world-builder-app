@@ -31,7 +31,9 @@
                   "description": "standard"
                 }
               },
-              "required": ["kind"],
+              "required": [
+                "kind"
+              ],
               "additionalProperties": false
             }
           ]
@@ -44,7 +46,11 @@
           }
         }
       },
-      "required": ["name", "scope", "tiers"],
+      "required": [
+        "name",
+        "scope",
+        "tiers"
+      ],
       "additionalProperties": false
     },
     "__schema1": {
@@ -83,7 +89,9 @@
                   "properties": {
                     "kind": {
                       "type": "string",
-                      "enum": ["dice"],
+                      "enum": [
+                        "dice"
+                      ],
                       "description": "dice"
                     },
                     "dice": {
@@ -127,7 +135,10 @@
                           ]
                         }
                       },
-                      "required": ["count", "faces"],
+                      "required": [
+                        "count",
+                        "faces"
+                      ],
                       "additionalProperties": false
                     },
                     "multiplier": {
@@ -137,15 +148,28 @@
                     },
                     "currency": {
                       "type": "string",
-                      "enum": ["cp", "sp", "gp", "pp"],
+                      "enum": [
+                        "cp",
+                        "sp",
+                        "gp",
+                        "pp"
+                      ],
                       "description": "cp | sp | gp | pp"
                     }
                   },
-                  "required": ["kind", "dice", "multiplier", "currency"],
+                  "required": [
+                    "kind",
+                    "dice",
+                    "multiplier",
+                    "currency"
+                  ],
                   "additionalProperties": false
                 }
               },
-              "required": ["baseGp", "formula"],
+              "required": [
+                "baseGp",
+                "formula"
+              ],
               "additionalProperties": false
             },
             {
@@ -184,7 +208,14 @@
         "properties": {
           "rarity": {
             "type": "string",
-            "enum": ["common", "uncommon", "rare", "very_rare", "legendary", "artifact"],
+            "enum": [
+              "common",
+              "uncommon",
+              "rare",
+              "very_rare",
+              "legendary",
+              "artifact"
+            ],
             "description": "common | uncommon | rare | very_rare | legendary | artifact"
           },
           "quantity": {
@@ -193,7 +224,10 @@
             "maximum": 9007199254740991
           }
         },
-        "required": ["rarity", "quantity"],
+        "required": [
+          "rarity",
+          "quantity"
+        ],
         "additionalProperties": false
       }
     }

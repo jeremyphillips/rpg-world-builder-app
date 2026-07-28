@@ -30,16 +30,26 @@
             "pattern": "^\\d+\\.\\d+\\.\\d+$"
           }
         },
-        "required": ["name", "id", "slug", "version"],
+        "required": [
+          "name",
+          "id",
+          "slug",
+          "version"
+        ],
         "additionalProperties": false
       },
       "rulesetId": {
         "type": "string",
-        "enum": ["srd-cc-5.2.1"],
+        "enum": [
+          "srd-cc-5.2.1"
+        ],
         "description": "srd-cc-5.2.1"
       }
     },
-    "required": ["metadata", "rulesetId"],
+    "required": [
+      "metadata",
+      "rulesetId"
+    ],
     "additionalProperties": false
   }
 }

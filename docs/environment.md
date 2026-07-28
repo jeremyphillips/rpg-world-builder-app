@@ -17,17 +17,46 @@ misconfiguration fails fast with a clear message. Copy the example and adjust:
 cp apps/api/.env.example apps/api/.env
 ```
 
-| Variable         | Required      | Default                         | Purpose                                          |
-| ---------------- | ------------- | ------------------------------- | ------------------------------------------------ |
-| `NODE_ENV`       | no            | `development`                   | `development` \| `test` \| `production`          |
-| `PORT`           | no            | `5001`                          | API listen port (the proxy forwards `/api` here) |
-| `MONGODB_URI`    | no            | `mongodb://127.0.0.1:27017/rpg` | MongoDB connection string                        |
-| `JWT_SECRET`     | **prod only** | dev fallback outside production | Session JWT signing secret (min 16 chars)        |
-| `JWT_EXPIRES_IN` | no            | `7d`                            | Session lifetime (ms/vercel-style duration)      |
+| Variable                 | Required      | Default                                        | Purpose                                                                     |
+| ------------------------ | ------------- | ---------------------------------------------- | --------------------------------------------------------------------------- |
+| `NODE_ENV`               | no            | `development`                                  | `development` \| `test` \| `production`                                     |
+| `PORT`                   | no            | `5001`                                         | API listen port (the proxy forwards `/api` here)                            |
+| `MONGODB_URI`            | no            | `mongodb://127.0.0.1:27017/rpg`                | MongoDB connection string                                                   |
+| `MONGO_TRANSACTION_MODE` | no            | `auto`                                         | `auto` / `required` / `disabled` — see below                                |
+| `JWT_SECRET`             | **prod only** | dev fallback outside production                | Session JWT signing secret (min 16 chars)                                   |
+| `JWT_EXPIRES_IN`         | no            | `7d`                                           | Session lifetime (ms/vercel-style duration)                                 |
+| `EMAIL_PROVIDER`         | no            | `fake` (test), `ethereal` (dev), `smtp` (prod) | Invite email transport; `ethereal` logs a browser preview URL to API stdout |
+| `APP_BASE_URL`           | no            | `http://localhost:8080`                        | Public origin used in invite links                                          |
+| `SMTP_HOST`              | smtp only     | —                                              | SMTP server hostname                                                        |
+| `SMTP_PORT`              | smtp only     | —                                              | SMTP server port                                                            |
+| `SMTP_USER`              | smtp only     | —                                              | SMTP auth username                                                          |
+| `SMTP_PASS`              | smtp only     | —                                              | SMTP auth password                                                          |
+| `SMTP_FROM_ADDRESS`      | smtp only     | `no-reply@localhost` (non-prod)                | From address for outbound invite email                                      |
 
 > Outside production a dev fallback `JWT_SECRET` is used if unset, so the API
 > boots with zero config against a local Mongo. In production `JWT_SECRET` is
 > required and must be at least 16 characters.
+
+### MongoDB transactions (`MONGO_TRANSACTION_MODE`)
+
+Invite completion and related orchestrations can run inside multi-document
+transactions when the deployment supports them. Capability is resolved **once at
+startup** after `connectDb` — not per request.
+
+| Value      | Behavior                                                                |
+| ---------- | ----------------------------------------------------------------------- |
+| `auto`     | Use transactions when supported; otherwise compensating deletes/`$pull` |
+| `required` | Fail API startup if transactions are unavailable                        |
+| `disabled` | Always use compensation (standalone Mongo, tests that assert rollback)  |
+
+**Standalone Mongo** (default Docker / Homebrew setup) does not support
+transactions — `auto` falls back to compensation. For local transaction
+development and integration tests, use the replica-set compose file:
+
+```bash
+docker compose -f docker-compose.mongo-rs.yml up -d
+# then point MONGODB_URI at the replica set (see README)
+```
 
 ## Dev proxy variables
 

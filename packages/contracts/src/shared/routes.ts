@@ -17,3 +17,16 @@ export type CrossAppPath = (typeof CROSS_APP_PATHS)[keyof typeof CROSS_APP_PATHS
 export function crossAppCampaignDetailPath(campaignId: string): string {
   return `/app/campaigns/${campaignId}`
 }
+
+/** Dashboard SPA campaign onboarding — membership-scoped; no invite id in the URL. */
+export function crossAppCampaignOnboardingPath(campaignId: string): string {
+  return `/app/campaigns/${campaignId}/onboarding`
+}
+
+/** Dashboard SPA campaign-scoped PC detail. */
+export function crossAppCampaignCharacterDetailPath(
+  campaignId: string,
+  characterId: string,
+): string {
+  return `/app/campaigns/${campaignId}/characters/${characterId}`
+}

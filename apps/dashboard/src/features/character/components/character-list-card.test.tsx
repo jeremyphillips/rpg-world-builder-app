@@ -3,7 +3,10 @@ import { render, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { expectNoAxeViolations } from '@rpg/ui/test-utils'
 
-import { buildCharacterCardViewModel } from '../lib/character-display'
+import {
+  buildCharacterCardViewModel,
+  CHARACTER_CARD_CAMPAIGN_LABEL,
+} from '../lib/character-display'
 import {
   createPopulatedStandaloneBuilderContextFixture,
   createStandaloneBuilderCatalogIndexFixture,
@@ -28,6 +31,28 @@ describe('CharacterListCard', () => {
     expect(screen.getByRole('link', { name: 'View' })).toHaveAttribute(
       'href',
       '/characters/char-sample-1',
+    )
+  })
+
+  it('renders optional campaign metadata and custom detail href', () => {
+    render(
+      <MemoryRouter>
+        <CharacterListCard
+          card={{
+            ...buildCharacterCardViewModel(SAMPLE_PC, catalogIndex),
+            campaign: { id: 'camp_1', name: 'The Argent Road' },
+          }}
+          detailHref="/campaigns/camp_1/characters/char-sample-1"
+        />
+      </MemoryRouter>,
+    )
+
+    expect(
+      screen.getByText(`${CHARACTER_CARD_CAMPAIGN_LABEL}: The Argent Road`),
+    ).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'View' })).toHaveAttribute(
+      'href',
+      '/campaigns/camp_1/characters/char-sample-1',
     )
   })
 

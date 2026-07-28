@@ -18,7 +18,9 @@ From the repo root:
 pnpm generate:json-schemas
 ```
 
-CI fails when committed output is stale (`pnpm gate:json-schemas`).
+CI fails when committed output is stale (`pnpm gate:json-schemas`). Pre-commit
+regenerates and stages output automatically when `@rpg/contracts` Zod inputs change
+(see [`tools/hooks/regenerate-json-schemas.sh`](../../../tools/hooks/regenerate-json-schemas.sh)).
 
 ## Mapped artifacts
 

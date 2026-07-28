@@ -5,7 +5,7 @@ import { setCsrfCookie, setSessionCookie, clearSessionCookie } from '../../lib/c
 import { generateCsrfToken } from '../../lib/csrf'
 import { HttpError } from '../../lib/http-error'
 import { signSessionToken } from '../../lib/jwt'
-import { toSessionUser, resolveActiveCampaignForUser } from '../user'
+import { toSessionUser, resolveActiveCampaignForUser, recordUserLoginActivity } from '../user'
 import { authenticateUser, registerUser } from './auth.service'
 
 export async function register(req: Request, res: Response): Promise<void> {
@@ -15,6 +15,7 @@ export async function register(req: Request, res: Response): Promise<void> {
 
 export async function login(req: Request, res: Response): Promise<void> {
   const user = await authenticateUser(req.body as LoginInput)
+  await recordUserLoginActivity(user.id)
   const token = signSessionToken({ sub: user.id, role: user.role })
   setSessionCookie(res, token)
 

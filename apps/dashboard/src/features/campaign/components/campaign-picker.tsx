@@ -1,9 +1,14 @@
-import type { Campaign } from '@rpg/contracts'
+import type { CampaignListItem } from '@rpg/contracts'
+import { Badge, Button, Text } from '@rpg/ui'
+import { Link } from 'react-router-dom'
 
-import { Button, Text } from '@rpg/ui'
+import { ROUTES } from '@/app/routes'
+
+import { CAMPAIGN_ONBOARDING_INCOMPLETE_COPY } from '../lib/campaign-onboarding-copy'
+import { isCampaignMembershipOnboardingIncomplete } from '../lib/campaign-membership-onboarding'
 
 interface CampaignPickerProps {
-  campaigns: Campaign[]
+  campaigns: CampaignListItem[]
   onSelect: (campaignId: string) => void
 }
 
@@ -15,17 +20,49 @@ export function CampaignPicker({ campaigns, onSelect }: CampaignPickerProps) {
         Your campaigns
       </Text>
       <ul className="flex flex-col gap-2">
-        {campaigns.map((campaign) => (
-          <li key={campaign.id}>
-            <Button
-              variant="outline"
-              className="w-full justify-start"
-              onClick={() => onSelect(campaign.id)}
-            >
-              {campaign.identity.name}
-            </Button>
-          </li>
-        ))}
+        {campaigns.map((campaign) => {
+          const incomplete = isCampaignMembershipOnboardingIncomplete(campaign)
+
+          return (
+            <li key={campaign.id} className="rounded-lg border border-border bg-card px-4 py-3">
+              <div className="flex flex-wrap items-start justify-between gap-3">
+                <div className="space-y-2">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <Text className="font-medium">{campaign.identity.name}</Text>
+                    {incomplete ? (
+                      <Badge appearance="outline" tone="warning" size="sm">
+                        {CAMPAIGN_ONBOARDING_INCOMPLETE_COPY.label}
+                      </Badge>
+                    ) : null}
+                  </div>
+                  {incomplete ? (
+                    <Text variant="small" className="text-muted-foreground">
+                      {CAMPAIGN_ONBOARDING_INCOMPLETE_COPY.message}
+                    </Text>
+                  ) : null}
+                </div>
+
+                {incomplete ? (
+                  <Link to={ROUTES.campaign.onboarding(campaign.id)} className="shrink-0">
+                    <Button type="button" size="sm">
+                      {CAMPAIGN_ONBOARDING_INCOMPLETE_COPY.action}
+                    </Button>
+                  </Link>
+                ) : (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="shrink-0"
+                    onClick={() => onSelect(campaign.id)}
+                  >
+                    Open campaign
+                  </Button>
+                )}
+              </div>
+            </li>
+          )
+        })}
       </ul>
     </section>
   )

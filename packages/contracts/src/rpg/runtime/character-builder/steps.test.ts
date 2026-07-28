@@ -9,9 +9,12 @@ import {
   getChoiceSetStepId,
   isBuilderStepComplete,
   isChoiceStep,
+  resolveBuilderStepDescription,
   STEP_CHOICE_TYPES_BY_STEP,
 } from './steps'
 import type { BuilderStep } from './steps'
+import type { CampaignNpcBuildContext, CampaignPcBuildContext } from './context'
+import { createCharacterBuildContext } from './test-fixtures'
 import { CHOICE_TYPES } from './choice-set'
 import { createEmptyCharacterBuilderDraft } from './draft'
 import type { CharacterBuilderDraft } from './draft'
@@ -439,6 +442,56 @@ describe('getBuilderStepStatus — review', () => {
     // skill ChoiceSet present but not satisfied
     expect(getBuilderStepStatus('review', makeCompleteDraft(), [makeSkillChoiceSet()])).toBe(
       'incomplete',
+    )
+  })
+})
+
+describe('resolveBuilderStepDescription', () => {
+  const TEST_CAMPAIGN_ID = 'camp_1'
+
+  it('returns static metadata for non-review steps', () => {
+    const context = createCharacterBuildContext()
+
+    expect(resolveBuilderStepDescription(context, 'identity')).toBe(
+      'Name, appearance, and alignment',
+    )
+  })
+
+  it('returns variant-specific review copy for campaign invite PCs', () => {
+    const context = {
+      ...createCharacterBuildContext(),
+      characterKind: 'pc',
+      mode: 'dashboard',
+      scope: { type: 'campaign', campaignId: TEST_CAMPAIGN_ID, rulesetId: 'srd-cc-5.2.1' },
+      rulesScope: { type: 'campaign', campaignId: TEST_CAMPAIGN_ID, rulesetId: 'srd-cc-5.2.1' },
+      ownershipTarget: { type: 'user', userId: 'user_1' },
+      acquisition: {
+        kind: 'campaign_pc_onboarding',
+        campaignId: TEST_CAMPAIGN_ID,
+      },
+    } satisfies CampaignPcBuildContext
+
+    expect(resolveBuilderStepDescription(context, 'review')).toBe(
+      'Review and create your campaign character',
+    )
+  })
+
+  it('returns variant-specific review copy for campaign NPCs', () => {
+    const context = {
+      ...createCharacterBuildContext({
+        characterKind: 'npc',
+        rulesScope: { type: 'campaign', campaignId: TEST_CAMPAIGN_ID, rulesetId: 'srd-cc-5.2.1' },
+      }),
+      characterKind: 'npc',
+      mode: 'dashboard',
+      scope: { type: 'campaign', campaignId: TEST_CAMPAIGN_ID, rulesetId: 'srd-cc-5.2.1' },
+      rulesScope: { type: 'campaign', campaignId: TEST_CAMPAIGN_ID, rulesetId: 'srd-cc-5.2.1' },
+      ownershipTarget: { type: 'campaign', campaignId: TEST_CAMPAIGN_ID },
+      acquisition: { kind: 'campaign_npc', campaignId: TEST_CAMPAIGN_ID },
+    } satisfies CampaignNpcBuildContext
+
+    expect(resolveBuilderStepDescription(context, 'review')).toBe(
+      'Review and add this NPC to your campaign',
     )
   })
 })

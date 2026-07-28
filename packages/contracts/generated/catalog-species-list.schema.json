@@ -13,13 +13,27 @@
       },
       "rulesetId": {
         "type": "string",
-        "enum": ["srd-cc-5.2.1"],
+        "enum": [
+          "srd-cc-5.2.1"
+        ],
         "description": "srd-cc-5.2.1"
       },
       "source": {
         "type": "string",
-        "enum": ["system", "homebrew"],
+        "enum": [
+          "system",
+          "homebrew"
+        ],
         "description": "system | homebrew"
+      },
+      "status": {
+        "default": "published",
+        "type": "string",
+        "enum": [
+          "draft",
+          "published"
+        ],
+        "description": "draft | published"
       },
       "campaignId": {
         "anyOf": [
@@ -60,7 +74,14 @@
         "type": "array",
         "items": {
           "type": "string",
-          "enum": ["tiny", "small", "medium", "large", "huge", "gargantuan"],
+          "enum": [
+            "tiny",
+            "small",
+            "medium",
+            "large",
+            "huge",
+            "gargantuan"
+          ],
           "description": "tiny | small | medium | large | huge | gargantuan"
         }
       },
@@ -92,7 +113,9 @@
             "$ref": "#/definitions/__schema7"
           }
         },
-        "required": ["naming"],
+        "required": [
+          "naming"
+        ],
         "additionalProperties": false
       },
       "traits": {
@@ -129,7 +152,12 @@
             "type": "string"
           }
         },
-        "required": ["choose", "options", "id", "name"],
+        "required": [
+          "choose",
+          "options",
+          "id",
+          "name"
+        ],
         "additionalProperties": false
       },
       "characterCreation": {
@@ -140,7 +168,12 @@
             "properties": {
               "policy": {
                 "type": "string",
-                "enum": ["inherit", "allowed", "forbidden", "restricted"],
+                "enum": [
+                  "inherit",
+                  "allowed",
+                  "forbidden",
+                  "restricted"
+                ],
                 "description": "inherit | allowed | forbidden | restricted"
               },
               "classPolicy": {
@@ -148,18 +181,28 @@
                 "properties": {
                   "mode": {
                     "type": "string",
-                    "enum": ["all", "only", "all_except"],
+                    "enum": [
+                      "all",
+                      "only",
+                      "all_except"
+                    ],
                     "description": "all | only | all_except"
                   },
                   "classIds": {
                     "$ref": "#/definitions/__schema91"
                   }
                 },
-                "required": ["mode", "classIds"],
+                "required": [
+                  "mode",
+                  "classIds"
+                ],
                 "additionalProperties": false
               }
             },
-            "required": ["policy", "classPolicy"],
+            "required": [
+              "policy",
+              "classPolicy"
+            ],
             "additionalProperties": false
           },
           "levelLimits": {
@@ -172,7 +215,10 @@
                 "$ref": "#/definitions/__schema94"
               }
             },
-            "required": ["maxCharacterLevel", "classLevelCaps"],
+            "required": [
+              "maxCharacterLevel",
+              "classLevelCaps"
+            ],
             "additionalProperties": false
           }
         },
@@ -184,6 +230,7 @@
       "slug",
       "rulesetId",
       "source",
+      "status",
       "campaignId",
       "createdAt",
       "updatedAt",
@@ -206,7 +253,14 @@
     },
     "__schema2": {
       "type": "string",
-      "enum": ["tiny", "small", "medium", "large", "huge", "gargantuan"],
+      "enum": [
+        "tiny",
+        "small",
+        "medium",
+        "large",
+        "huge",
+        "gargantuan"
+      ],
       "description": "tiny | small | medium | large | huge | gargantuan"
     },
     "__schema3": {
@@ -238,7 +292,9 @@
               "const": false
             }
           },
-          "required": ["supported"],
+          "required": [
+            "supported"
+          ],
           "additionalProperties": false
         },
         {
@@ -252,12 +308,21 @@
               "type": "array",
               "items": {
                 "type": "string",
-                "enum": ["family", "clan", "house", "virtue", "title", "epithet"],
+                "enum": [
+                  "family",
+                  "clan",
+                  "house",
+                  "virtue",
+                  "title",
+                  "epithet"
+                ],
                 "description": "family | clan | house | virtue | title | epithet"
               }
             }
           },
-          "required": ["supported"],
+          "required": [
+            "supported"
+          ],
           "additionalProperties": false
         }
       ]
@@ -291,7 +356,11 @@
               ]
             }
           },
-          "required": ["kind", "id", "name"],
+          "required": [
+            "kind",
+            "id",
+            "name"
+          ],
           "additionalProperties": false
         },
         {
@@ -315,7 +384,11 @@
               "$ref": "#/definitions/__schema89"
             }
           },
-          "required": ["kind", "id", "grantGroups"],
+          "required": [
+            "kind",
+            "id",
+            "grantGroups"
+          ],
           "additionalProperties": false
         }
       ]
@@ -346,7 +419,9 @@
           "description": "Atomic grants that unlock together. At least one grant is required."
         }
       },
-      "required": ["grants"],
+      "required": [
+        "grants"
+      ],
       "additionalProperties": false
     },
     "__schema11": {
@@ -356,7 +431,9 @@
           "$ref": "#/definitions/__schema12"
         }
       },
-      "required": ["level"],
+      "required": [
+        "level"
+      ],
       "additionalProperties": false
     },
     "__schema12": {
@@ -383,7 +460,11 @@
               "description": "sense"
             }
           },
-          "required": ["type", "range", "kind"],
+          "required": [
+            "type",
+            "range",
+            "kind"
+          ],
           "additionalProperties": false
         },
         {
@@ -402,7 +483,10 @@
               }
             }
           },
-          "required": ["kind", "damageTypes"],
+          "required": [
+            "kind",
+            "damageTypes"
+          ],
           "additionalProperties": false
         },
         {
@@ -421,7 +505,10 @@
               }
             }
           },
-          "required": ["kind", "damageTypes"],
+          "required": [
+            "kind",
+            "damageTypes"
+          ],
           "additionalProperties": false
         },
         {
@@ -431,7 +518,13 @@
               "properties": {
                 "mode": {
                   "type": "string",
-                  "enum": ["walk", "fly", "swim", "climb", "burrow"],
+                  "enum": [
+                    "walk",
+                    "fly",
+                    "swim",
+                    "climb",
+                    "burrow"
+                  ],
                   "description": "walk | fly | swim | climb | burrow"
                 },
                 "operation": {
@@ -548,7 +641,12 @@
                   "description": "movement"
                 }
               },
-              "required": ["mode", "operation", "feet", "kind"],
+              "required": [
+                "mode",
+                "operation",
+                "feet",
+                "kind"
+              ],
               "additionalProperties": false
             },
             {
@@ -556,7 +654,13 @@
               "properties": {
                 "mode": {
                   "type": "string",
-                  "enum": ["walk", "fly", "swim", "climb", "burrow"],
+                  "enum": [
+                    "walk",
+                    "fly",
+                    "swim",
+                    "climb",
+                    "burrow"
+                  ],
                   "description": "walk | fly | swim | climb | burrow"
                 },
                 "operation": {
@@ -601,7 +705,12 @@
                   "description": "movement"
                 }
               },
-              "required": ["mode", "operation", "feet", "kind"],
+              "required": [
+                "mode",
+                "operation",
+                "feet",
+                "kind"
+              ],
               "additionalProperties": false
             },
             {
@@ -609,7 +718,13 @@
               "properties": {
                 "mode": {
                   "type": "string",
-                  "enum": ["walk", "fly", "swim", "climb", "burrow"],
+                  "enum": [
+                    "walk",
+                    "fly",
+                    "swim",
+                    "climb",
+                    "burrow"
+                  ],
                   "description": "walk | fly | swim | climb | burrow"
                 },
                 "operation": {
@@ -619,7 +734,13 @@
                 },
                 "matchMode": {
                   "type": "string",
-                  "enum": ["walk", "fly", "swim", "climb", "burrow"],
+                  "enum": [
+                    "walk",
+                    "fly",
+                    "swim",
+                    "climb",
+                    "burrow"
+                  ],
                   "description": "walk | fly | swim | climb | burrow"
                 },
                 "condition": {
@@ -631,7 +752,12 @@
                   "description": "movement"
                 }
               },
-              "required": ["mode", "operation", "matchMode", "kind"],
+              "required": [
+                "mode",
+                "operation",
+                "matchMode",
+                "kind"
+              ],
               "additionalProperties": false
             }
           ]
@@ -656,7 +782,10 @@
               "markdownDescription": "Branch on **kind**: **fixed** | **choice**"
             }
           },
-          "required": ["kind", "grant"],
+          "required": [
+            "kind",
+            "grant"
+          ],
           "additionalProperties": false
         },
         {
@@ -679,7 +808,10 @@
               "markdownDescription": "Branch on **kind**: **fixed** | **choice**"
             }
           },
-          "required": ["kind", "grant"],
+          "required": [
+            "kind",
+            "grant"
+          ],
           "additionalProperties": false
         },
         {
@@ -702,7 +834,10 @@
               "markdownDescription": "Branch on **kind**: **fixed** | **choice**"
             }
           },
-          "required": ["kind", "grant"],
+          "required": [
+            "kind",
+            "grant"
+          ],
           "additionalProperties": false
         },
         {
@@ -725,7 +860,10 @@
               "markdownDescription": "Branch on **kind**: **fixed** | **choice**"
             }
           },
-          "required": ["kind", "grant"],
+          "required": [
+            "kind",
+            "grant"
+          ],
           "additionalProperties": false
         },
         {
@@ -744,7 +882,10 @@
               }
             }
           },
-          "required": ["kind", "languageIds"],
+          "required": [
+            "kind",
+            "languageIds"
+          ],
           "additionalProperties": false
         },
         {
@@ -765,7 +906,10 @@
               "$ref": "#/definitions/__schema56"
             }
           },
-          "required": ["kind", "choose"],
+          "required": [
+            "kind",
+            "choose"
+          ],
           "additionalProperties": false
         },
         {
@@ -778,7 +922,12 @@
             },
             "category": {
               "type": "string",
-              "enum": ["origin", "general", "fighting-style", "epic-boon"],
+              "enum": [
+                "origin",
+                "general",
+                "fighting-style",
+                "epic-boon"
+              ],
               "description": "origin | general | fighting-style | epic-boon"
             },
             "choose": {
@@ -794,7 +943,11 @@
               "$ref": "#/definitions/__schema63"
             }
           },
-          "required": ["kind", "category", "choose"],
+          "required": [
+            "kind",
+            "category",
+            "choose"
+          ],
           "additionalProperties": false
         },
         {
@@ -817,7 +970,10 @@
               "markdownDescription": "Branch on **kind**: **grant** | **choice**"
             }
           },
-          "required": ["kind", "grant"],
+          "required": [
+            "kind",
+            "grant"
+          ],
           "additionalProperties": false
         },
         {
@@ -830,7 +986,14 @@
             },
             "ability": {
               "type": "string",
-              "enum": ["str", "dex", "con", "int", "wis", "cha"],
+              "enum": [
+                "str",
+                "dex",
+                "con",
+                "int",
+                "wis",
+                "cha"
+              ],
               "description": "str | dex | con | int | wis | cha"
             },
             "spellIds": {
@@ -838,21 +1001,33 @@
             },
             "availability": {
               "type": "string",
-              "enum": ["always_prepared"],
+              "enum": [
+                "always_prepared"
+              ],
               "description": "always_prepared"
             },
             "casting": {
               "$ref": "#/definitions/__schema85"
             }
           },
-          "required": ["kind", "ability", "spellIds"],
+          "required": [
+            "kind",
+            "ability",
+            "spellIds"
+          ],
           "additionalProperties": false
         }
       ]
     },
     "__schema14": {
       "type": "string",
-      "enum": ["walk", "fly", "swim", "climb", "burrow"],
+      "enum": [
+        "walk",
+        "fly",
+        "swim",
+        "climb",
+        "burrow"
+      ],
       "description": "walk | fly | swim | climb | burrow"
     },
     "__schema15": {
@@ -874,7 +1049,9 @@
           "$ref": "#/definitions/__schema19"
         }
       },
-      "required": ["kind"],
+      "required": [
+        "kind"
+      ],
       "additionalProperties": false
     },
     "__schema17": {
@@ -893,13 +1070,19 @@
       "type": "array",
       "items": {
         "type": "string",
-        "enum": ["simple", "martial"],
+        "enum": [
+          "simple",
+          "martial"
+        ],
         "description": "simple | martial"
       }
     },
     "__schema20": {
       "type": "string",
-      "enum": ["simple", "martial"],
+      "enum": [
+        "simple",
+        "martial"
+      ],
       "description": "simple | martial"
     },
     "__schema21": {
@@ -928,7 +1111,11 @@
           "markdownDescription": "Branch on **source**: **explicit** | **filtered**"
         }
       },
-      "required": ["choose", "kind", "pool"],
+      "required": [
+        "choose",
+        "kind",
+        "pool"
+      ],
       "additionalProperties": false
     },
     "__schema22": {
@@ -956,7 +1143,10 @@
           }
         }
       },
-      "required": ["source", "weaponSlugs"],
+      "required": [
+        "source",
+        "weaponSlugs"
+      ],
       "additionalProperties": false
     },
     "__schema25": {
@@ -975,13 +1165,18 @@
           "allOf": [
             {
               "type": "string",
-              "enum": ["simple", "martial"],
+              "enum": [
+                "simple",
+                "martial"
+              ],
               "description": "simple | martial"
             }
           ]
         }
       },
-      "required": ["source"],
+      "required": [
+        "source"
+      ],
       "additionalProperties": false
     },
     "__schema27": {
@@ -999,7 +1194,9 @@
           "$ref": "#/definitions/__schema30"
         }
       },
-      "required": ["kind"],
+      "required": [
+        "kind"
+      ],
       "additionalProperties": false
     },
     "__schema28": {
@@ -1018,13 +1215,27 @@
       "type": "array",
       "items": {
         "type": "string",
-        "enum": ["artisan", "gaming_set", "musical_instrument", "navigator", "thieves", "other"],
+        "enum": [
+          "artisan",
+          "gaming_set",
+          "musical_instrument",
+          "navigator",
+          "thieves",
+          "other"
+        ],
         "description": "artisan | gaming_set | musical_instrument | navigator | thieves | other"
       }
     },
     "__schema31": {
       "type": "string",
-      "enum": ["artisan", "gaming_set", "musical_instrument", "navigator", "thieves", "other"],
+      "enum": [
+        "artisan",
+        "gaming_set",
+        "musical_instrument",
+        "navigator",
+        "thieves",
+        "other"
+      ],
       "description": "artisan | gaming_set | musical_instrument | navigator | thieves | other"
     },
     "__schema32": {
@@ -1056,7 +1267,11 @@
           "markdownDescription": "Branch on **source**: **explicit** | **filtered** | **any**"
         }
       },
-      "required": ["choose", "kind", "pool"],
+      "required": [
+        "choose",
+        "kind",
+        "pool"
+      ],
       "additionalProperties": false
     },
     "__schema33": {
@@ -1075,7 +1290,10 @@
           }
         }
       },
-      "required": ["source", "toolSlugs"],
+      "required": [
+        "source",
+        "toolSlugs"
+      ],
       "additionalProperties": false
     },
     "__schema34": {
@@ -1097,7 +1315,9 @@
           "$ref": "#/definitions/__schema38"
         }
       },
-      "required": ["source"],
+      "required": [
+        "source"
+      ],
       "additionalProperties": false
     },
     "__schema36": {
@@ -1109,7 +1329,14 @@
       "type": "array",
       "items": {
         "type": "string",
-        "enum": ["artisan", "gaming_set", "musical_instrument", "navigator", "thieves", "other"],
+        "enum": [
+          "artisan",
+          "gaming_set",
+          "musical_instrument",
+          "navigator",
+          "thieves",
+          "other"
+        ],
         "description": "artisan | gaming_set | musical_instrument | navigator | thieves | other"
       }
     },
@@ -1129,7 +1356,9 @@
           "description": "any"
         }
       },
-      "required": ["source"],
+      "required": [
+        "source"
+      ],
       "additionalProperties": false
     },
     "__schema40": {
@@ -1148,7 +1377,10 @@
           }
         }
       },
-      "required": ["kind", "skillIds"],
+      "required": [
+        "kind",
+        "skillIds"
+      ],
       "additionalProperties": false
     },
     "__schema41": {
@@ -1177,7 +1409,11 @@
           "markdownDescription": "Branch on **source**: **explicit** | **any**"
         }
       },
-      "required": ["choose", "kind", "pool"],
+      "required": [
+        "choose",
+        "kind",
+        "pool"
+      ],
       "additionalProperties": false
     },
     "__schema42": {
@@ -1196,7 +1432,10 @@
           }
         }
       },
-      "required": ["source", "skillIds"],
+      "required": [
+        "source",
+        "skillIds"
+      ],
       "additionalProperties": false
     },
     "__schema43": {
@@ -1208,7 +1447,9 @@
           "description": "any"
         }
       },
-      "required": ["source"],
+      "required": [
+        "source"
+      ],
       "additionalProperties": false
     },
     "__schema44": {
@@ -1226,7 +1467,9 @@
           "$ref": "#/definitions/__schema47"
         }
       },
-      "required": ["kind"],
+      "required": [
+        "kind"
+      ],
       "additionalProperties": false
     },
     "__schema45": {
@@ -1245,13 +1488,23 @@
       "type": "array",
       "items": {
         "type": "string",
-        "enum": ["light", "medium", "heavy", "shields"],
+        "enum": [
+          "light",
+          "medium",
+          "heavy",
+          "shields"
+        ],
         "description": "light | medium | heavy | shields"
       }
     },
     "__schema48": {
       "type": "string",
-      "enum": ["light", "medium", "heavy", "shields"],
+      "enum": [
+        "light",
+        "medium",
+        "heavy",
+        "shields"
+      ],
       "description": "light | medium | heavy | shields"
     },
     "__schema49": {
@@ -1280,7 +1533,11 @@
           "markdownDescription": "Branch on **source**: **explicit** | **filtered**"
         }
       },
-      "required": ["choose", "kind", "pool"],
+      "required": [
+        "choose",
+        "kind",
+        "pool"
+      ],
       "additionalProperties": false
     },
     "__schema50": {
@@ -1299,7 +1556,10 @@
           }
         }
       },
-      "required": ["source", "armorSlugs"],
+      "required": [
+        "source",
+        "armorSlugs"
+      ],
       "additionalProperties": false
     },
     "__schema51": {
@@ -1318,13 +1578,20 @@
           "allOf": [
             {
               "type": "string",
-              "enum": ["light", "medium", "heavy", "shields"],
+              "enum": [
+                "light",
+                "medium",
+                "heavy",
+                "shields"
+              ],
               "description": "light | medium | heavy | shields"
             }
           ]
         }
       },
-      "required": ["source"],
+      "required": [
+        "source"
+      ],
       "additionalProperties": false
     },
     "__schema53": {
@@ -1350,13 +1617,19 @@
       "type": "array",
       "items": {
         "type": "string",
-        "enum": ["standard", "rare"],
+        "enum": [
+          "standard",
+          "rare"
+        ],
         "description": "standard | rare"
       }
     },
     "__schema57": {
       "type": "string",
-      "enum": ["standard", "rare"],
+      "enum": [
+        "standard",
+        "rare"
+      ],
       "description": "standard | rare"
     },
     "__schema58": {
@@ -1366,7 +1639,12 @@
     },
     "__schema59": {
       "type": "string",
-      "enum": ["origin", "general", "fighting-style", "epic-boon"],
+      "enum": [
+        "origin",
+        "general",
+        "fighting-style",
+        "epic-boon"
+      ],
       "description": "origin | general | fighting-style | epic-boon"
     },
     "__schema60": {
@@ -1423,18 +1701,29 @@
                   },
                   "spellcastingGearKind": {
                     "type": "string",
-                    "enum": ["arcane_focus", "druidic_focus", "holy_symbol"],
+                    "enum": [
+                      "arcane_focus",
+                      "druidic_focus",
+                      "holy_symbol"
+                    ],
                     "description": "arcane_focus | druidic_focus | holy_symbol"
                   }
                 },
-                "required": ["kind", "spellcastingGearKind"],
+                "required": [
+                  "kind",
+                  "spellcastingGearKind"
+                ],
                 "additionalProperties": false
               }
             ]
           }
         }
       },
-      "required": ["kind", "equipmentSlug", "quantity"],
+      "required": [
+        "kind",
+        "equipmentSlug",
+        "quantity"
+      ],
       "additionalProperties": false
     },
     "__schema65": {
@@ -1463,7 +1752,11 @@
           "markdownDescription": "Branch on **source**: **explicit** | **filtered**"
         }
       },
-      "required": ["choose", "kind", "pool"],
+      "required": [
+        "choose",
+        "kind",
+        "pool"
+      ],
       "additionalProperties": false
     },
     "__schema66": {
@@ -1482,7 +1775,10 @@
           }
         }
       },
-      "required": ["source", "equipmentSlugs"],
+      "required": [
+        "source",
+        "equipmentSlugs"
+      ],
       "additionalProperties": false
     },
     "__schema67": {
@@ -1522,12 +1818,25 @@
         },
         "gearKind": {
           "type": "string",
-          "enum": ["general", "ammunition", "book", "spellcasting", "container", "consumable"],
+          "enum": [
+            "general",
+            "ammunition",
+            "book",
+            "spellcasting",
+            "container",
+            "consumable"
+          ],
           "description": "general | ammunition | book | spellcasting | container | consumable"
         },
         "spellcastingGearKind": {
           "type": "string",
-          "enum": ["arcane_focus", "druidic_focus", "holy_symbol", "spellbook", "component_pouch"],
+          "enum": [
+            "arcane_focus",
+            "druidic_focus",
+            "holy_symbol",
+            "spellbook",
+            "component_pouch"
+          ],
           "description": "arcane_focus | druidic_focus | holy_symbol | spellbook | component_pouch"
         },
         "magicItemCategory": {
@@ -1548,12 +1857,25 @@
         },
         "magicItemRarity": {
           "type": "string",
-          "enum": ["common", "uncommon", "rare", "very_rare", "legendary", "artifact"],
+          "enum": [
+            "common",
+            "uncommon",
+            "rare",
+            "very_rare",
+            "legendary",
+            "artifact"
+          ],
           "description": "common | uncommon | rare | very_rare | legendary | artifact"
         },
         "vehicleCategory": {
           "type": "string",
-          "enum": ["land", "water", "air", "space", "other"],
+          "enum": [
+            "land",
+            "water",
+            "air",
+            "space",
+            "other"
+          ],
           "description": "land | water | air | space | other"
         },
         "serviceCategory": {
@@ -1572,7 +1894,10 @@
           "description": "hireling | lodging | meal | travel | transport | stable | spellcasting | lifestyle | other"
         }
       },
-      "required": ["source", "equipmentKind"],
+      "required": [
+        "source",
+        "equipmentKind"
+      ],
       "additionalProperties": false
     },
     "__schema69": {
@@ -1598,7 +1923,14 @@
       "allOf": [
         {
           "type": "string",
-          "enum": ["artisan", "gaming_set", "musical_instrument", "navigator", "thieves", "other"],
+          "enum": [
+            "artisan",
+            "gaming_set",
+            "musical_instrument",
+            "navigator",
+            "thieves",
+            "other"
+          ],
           "description": "artisan | gaming_set | musical_instrument | navigator | thieves | other"
         }
       ]
@@ -1607,7 +1939,10 @@
       "allOf": [
         {
           "type": "string",
-          "enum": ["simple", "martial"],
+          "enum": [
+            "simple",
+            "martial"
+          ],
           "description": "simple | martial"
         }
       ]
@@ -1616,19 +1951,37 @@
       "allOf": [
         {
           "type": "string",
-          "enum": ["light", "medium", "heavy", "shields"],
+          "enum": [
+            "light",
+            "medium",
+            "heavy",
+            "shields"
+          ],
           "description": "light | medium | heavy | shields"
         }
       ]
     },
     "__schema74": {
       "type": "string",
-      "enum": ["general", "ammunition", "book", "spellcasting", "container", "consumable"],
+      "enum": [
+        "general",
+        "ammunition",
+        "book",
+        "spellcasting",
+        "container",
+        "consumable"
+      ],
       "description": "general | ammunition | book | spellcasting | container | consumable"
     },
     "__schema75": {
       "type": "string",
-      "enum": ["arcane_focus", "druidic_focus", "holy_symbol", "spellbook", "component_pouch"],
+      "enum": [
+        "arcane_focus",
+        "druidic_focus",
+        "holy_symbol",
+        "spellbook",
+        "component_pouch"
+      ],
       "description": "arcane_focus | druidic_focus | holy_symbol | spellbook | component_pouch"
     },
     "__schema76": {
@@ -1649,12 +2002,25 @@
     },
     "__schema77": {
       "type": "string",
-      "enum": ["common", "uncommon", "rare", "very_rare", "legendary", "artifact"],
+      "enum": [
+        "common",
+        "uncommon",
+        "rare",
+        "very_rare",
+        "legendary",
+        "artifact"
+      ],
       "description": "common | uncommon | rare | very_rare | legendary | artifact"
     },
     "__schema78": {
       "type": "string",
-      "enum": ["land", "water", "air", "space", "other"],
+      "enum": [
+        "land",
+        "water",
+        "air",
+        "space",
+        "other"
+      ],
       "description": "land | water | air | space | other"
     },
     "__schema79": {
@@ -1679,7 +2045,14 @@
     },
     "__schema81": {
       "type": "string",
-      "enum": ["str", "dex", "con", "int", "wis", "cha"],
+      "enum": [
+        "str",
+        "dex",
+        "con",
+        "int",
+        "wis",
+        "cha"
+      ],
       "description": "str | dex | con | int | wis | cha"
     },
     "__schema82": {
@@ -1695,7 +2068,9 @@
     },
     "__schema84": {
       "type": "string",
-      "enum": ["always_prepared"],
+      "enum": [
+        "always_prepared"
+      ],
       "description": "always_prepared"
     },
     "__schema85": {
@@ -1708,14 +2083,21 @@
         },
         "frequency": {
           "type": "string",
-          "enum": ["at_will", "once_per_long_rest", "prof_bonus_per_long_rest"],
+          "enum": [
+            "at_will",
+            "once_per_long_rest",
+            "prof_bonus_per_long_rest"
+          ],
           "description": "at_will | once_per_long_rest | prof_bonus_per_long_rest"
         },
         "allowsSlotCasting": {
           "type": "boolean"
         }
       },
-      "required": ["mode", "frequency"],
+      "required": [
+        "mode",
+        "frequency"
+      ],
       "additionalProperties": false
     },
     "__schema86": {
@@ -1736,7 +2118,11 @@
     },
     "__schema90": {
       "type": "string",
-      "enum": ["all", "only", "all_except"],
+      "enum": [
+        "all",
+        "only",
+        "all_except"
+      ],
       "description": "all | only | all_except"
     },
     "__schema91": {
@@ -1771,7 +2157,10 @@
             "$ref": "#/definitions/__schema12"
           }
         },
-        "required": ["classId", "maxLevel"],
+        "required": [
+          "classId",
+          "maxLevel"
+        ],
         "additionalProperties": false
       }
     }

@@ -12,7 +12,12 @@ import { useNpcs } from '../hooks/use-npcs'
 export function NpcsOverview() {
   const { campaignId = '' } = useParams<{ campaignId: string }>()
   const canManage = useCanManageCampaign(campaignId)
-  const { data: npcs = [], isPending: isNpcsPending, isError: isNpcsError } = useNpcs(campaignId)
+  const {
+    data: npcs = [],
+    isPending: isNpcsPending,
+    isError: isNpcsError,
+    error: npcsError,
+  } = useNpcs(campaignId)
   const {
     catalogIndex,
     isPending: isContextPending,
@@ -22,6 +27,7 @@ export function NpcsOverview() {
 
   const isPending = isNpcsPending || isContextPending
   const isError = isNpcsError || isContextError
+  const errorLabel = npcsError?.message ?? contextError?.message
   const actions = canManage ? (
     <div className="flex flex-wrap gap-2">
       <Link
@@ -41,7 +47,7 @@ export function NpcsOverview() {
       heading="NPCs"
       isPending={isPending}
       isError={isError}
-      errorLabel={contextError?.message}
+      errorLabel={errorLabel}
       defaultErrorLabel="Could not load NPCs."
       actions={actions}
     >

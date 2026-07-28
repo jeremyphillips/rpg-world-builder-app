@@ -2,7 +2,7 @@
 
 import { useEffect, type ReactNode } from 'react'
 
-import { CROSS_APP_PATHS } from '@rpg/contracts'
+import { CROSS_APP_PATHS, validateAuthContinuationPath } from '@rpg/contracts'
 
 import { SiteHeaderNavSkeleton } from '@/components/site-header-nav-skeleton'
 
@@ -10,17 +10,19 @@ import { useSession } from '../hooks/use-session'
 
 interface AuthRedirectProps {
   children: ReactNode
+  /** When set, authenticated visitors return here instead of the dashboard. */
+  returnTo?: string | null
 }
 
-/** Sends authenticated visitors to the dashboard; shows a skeleton while session loads. */
-export function AuthRedirect({ children }: AuthRedirectProps) {
+/** Sends authenticated visitors to the dashboard or a validated return path. */
+export function AuthRedirect({ children, returnTo }: AuthRedirectProps) {
   const { data: session, isPending } = useSession()
+  const validatedReturnTo = validateAuthContinuationPath(returnTo)
 
   useEffect(() => {
-    if (session?.user) {
-      window.location.assign(CROSS_APP_PATHS.dashboard)
-    }
-  }, [session?.user])
+    if (!session?.user) return
+    window.location.assign(validatedReturnTo ?? CROSS_APP_PATHS.dashboard)
+  }, [session?.user, validatedReturnTo])
 
   if (isPending || session?.user) {
     return (

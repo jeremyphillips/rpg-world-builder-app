@@ -166,7 +166,7 @@ export async function updateContentCampaignAccess<T extends WriteEntityBase>(
           participantIds: parsed.participantIds,
         },
       },
-      { upsert: true, new: true, returnDocument: 'after' },
+      { upsert: true, returnDocument: 'after' },
     ).lean<StoredCampaignAccessRow>()
 
     if (!doc) {
@@ -192,7 +192,7 @@ export async function updateContentCampaignAccess<T extends WriteEntityBase>(
         participantIds: parsed.participantIds,
       },
     },
-    { upsert: true, new: true, returnDocument: 'after' },
+    { upsert: true, returnDocument: 'after' },
   ).lean<StoredCampaignAccessRow>()
 
   if (!doc) {

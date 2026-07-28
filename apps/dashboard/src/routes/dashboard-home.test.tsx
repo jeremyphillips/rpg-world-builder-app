@@ -54,7 +54,35 @@ describe('DashboardHome', () => {
     renderHome()
 
     expect(await screen.findByText('Your campaigns')).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Arden' })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Baldur' })).toBeInTheDocument()
+    expect(screen.getByText('Arden')).toBeInTheDocument()
+    expect(screen.getByText('Baldur')).toBeInTheDocument()
+    expect(screen.getAllByRole('button', { name: 'Open campaign' })).toHaveLength(2)
+  })
+
+  it('shows incomplete onboarding status and continue setup CTA', async () => {
+    listCampaigns.mockResolvedValue([
+      makeCampaignListItem({
+        id: 'camp_incomplete',
+        identity: { name: 'Incomplete Campaign' },
+        campaignRole: 'pc',
+        controlledCharacterIds: [],
+      }),
+      makeCampaignListItem({
+        id: 'camp_active',
+        identity: { name: 'Active Campaign' },
+        campaignRole: 'owner',
+      }),
+    ])
+
+    renderHome()
+
+    expect(await screen.findByText('Character setup incomplete')).toBeInTheDocument()
+    expect(
+      screen.getByText('Complete your character setup to finish joining this campaign.'),
+    ).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Continue setup' })).toHaveAttribute(
+      'href',
+      '/campaigns/camp_incomplete/onboarding',
+    )
   })
 })
