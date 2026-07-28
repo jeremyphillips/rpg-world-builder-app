@@ -6,7 +6,7 @@ import {
   ORIGIN_LANGUAGES_CHOICE_ID,
   characterCreationProficiencyRulesPatchSchema,
   resolveCharacterCreationProficiencyRules,
-} from './character-creation-proficiencies'
+} from './character-creation-proficiency-rules'
 
 describe('characterCreationProficiencyRulesPatchSchema', () => {
   it('accepts automatic language grants and origin language choices', () => {

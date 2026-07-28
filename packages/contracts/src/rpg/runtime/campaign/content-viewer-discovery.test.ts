@@ -1,13 +1,11 @@
 import { describe, expect, it } from 'vitest'
 
-import { DEFAULT_CONTENT_CAMPAIGN_ACCESS } from './campaign-access'
+import { DEFAULT_CONTENT_CAMPAIGN_ACCESS } from '../../content/lib/campaign-access'
+import type { ContentViewer } from '../../campaign/lib/campaign-content-viewer'
 import {
-  buildContentViewerFromMembership,
-  canResolveSavedContentReference,
   isContentDiscoverableForViewer,
   toPlayerContentVisibility,
-  type ContentViewer,
-} from './content-viewer-access'
+} from './content-viewer-discovery'
 
 const manageViewer: ContentViewer = { kind: 'manage' }
 const pcViewer: ContentViewer = { kind: 'pc', characterIds: ['char-a', 'char-b'] }
@@ -86,25 +84,6 @@ describe('isContentDiscoverableForViewer', () => {
   })
 })
 
-describe('buildContentViewerFromMembership', () => {
-  it('maps campaign roles to viewer kinds', () => {
-    expect(
-      buildContentViewerFromMembership({ campaignRole: 'owner', controlledCharacterIds: [] }),
-    ).toEqual({
-      kind: 'manage',
-    })
-    expect(
-      buildContentViewerFromMembership({
-        campaignRole: 'pc',
-        controlledCharacterIds: ['pc-1', 'pc-2'],
-      }),
-    ).toEqual({ kind: 'pc', characterIds: ['pc-1', 'pc-2'] })
-    expect(
-      buildContentViewerFromMembership({ campaignRole: 'observer', controlledCharacterIds: [] }),
-    ).toEqual({ kind: 'none' })
-  })
-})
-
 describe('toPlayerContentVisibility', () => {
   it('returns ordinary for non-specific access and non-pc viewers', () => {
     expect(toPlayerContentVisibility(access(), { kind: 'none' })).toEqual({ kind: 'ordinary' })
@@ -135,26 +114,5 @@ describe('toPlayerContentVisibility', () => {
         pcViewer,
       ),
     ).toEqual({ kind: 'ordinary' })
-  })
-})
-
-describe('canResolveSavedContentReference', () => {
-  it('allows managers to resolve any saved reference', () => {
-    expect(canResolveSavedContentReference(manageViewer, { characterId: 'char-a' })).toBe(true)
-  })
-
-  it('allows a PC viewer when the reference character is on their membership', () => {
-    expect(canResolveSavedContentReference(pcViewer, { characterId: 'char-a' })).toBe(true)
-    expect(canResolveSavedContentReference(pcViewer, { characterId: 'char-b' })).toBe(true)
-  })
-
-  it('denies observers and PCs without the reference character', () => {
-    expect(canResolveSavedContentReference(noneViewer, { characterId: 'char-a' })).toBe(false)
-    expect(canResolveSavedContentReference(pcViewer, { characterId: 'char-other' })).toBe(false)
-  })
-
-  it('does not consult campaign access — saved references survive availability changes', () => {
-    // Discovery would hide this; reference policy is independent.
-    expect(canResolveSavedContentReference(pcViewer, { characterId: 'char-a' })).toBe(true)
   })
 })

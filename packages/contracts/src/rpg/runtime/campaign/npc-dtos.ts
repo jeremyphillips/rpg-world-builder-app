@@ -1,15 +1,15 @@
 import { z } from 'zod'
 
-import { characterClassEntrySchema, characterSpeciesSchema } from '../runtime/character/core'
-import { characterVitalStateSchema } from '../runtime/character/character-vital'
-import { campaignCharacterParticipationSchema } from './campaign-character-participation'
-import { characterRosterStateSchema } from './character-roster-state'
-import { campaignRosterPatchSchema } from './update-campaign-roster'
-import { characterVitalPatchSchema } from '../runtime/character/update-character-vital'
-import { npcCharacterSchema } from '../runtime/character/sheet'
+import { characterClassEntrySchema, characterSpeciesSchema } from '../character/core'
+import { characterVitalStateSchema } from '../character/character-vital'
+import { characterVitalPatchSchema } from '../character/update-character-vital'
+import { npcCharacterSchema } from '../character/sheet'
+import { campaignCharacterParticipationSchema } from '../../campaign/campaign-character-participation'
+import { characterRosterStateSchema } from '../../campaign/character-roster-state'
+import { campaignRosterPatchSchema } from '../../campaign/update-campaign-roster'
 
 // ---------------------------------------------------------------------------
-// Campaign NPC DTOs — locked list, detail, and patch shapes.
+// Campaign NPC DTOs — composed list, detail, and patch wire shapes.
 // ---------------------------------------------------------------------------
 
 export const npcListCharacterSummarySchema = z.object({

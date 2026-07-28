@@ -1,12 +1,10 @@
-import {
-  isContentDiscoverableForViewer,
-  type ContentViewer,
-} from '../../content/lib/content-viewer-access'
+import { isContentDiscoverableForViewer } from '../campaign/content-viewer-discovery'
+import type { ContentViewer } from '../../campaign/lib/campaign-content-viewer'
 import type { CharacterEligibilitySubject } from './character-eligibility-subject'
 import type {
   CharacterCampaignBlockingIssue,
   CharacterCampaignWarning,
-} from './character-campaign-eligibility'
+} from '../../campaign/character-eligibility-contracts'
 import type { CampaignContentEligibilityIndex } from './campaign-content-eligibility-index'
 import {
   lookupCampaignContentEntry,

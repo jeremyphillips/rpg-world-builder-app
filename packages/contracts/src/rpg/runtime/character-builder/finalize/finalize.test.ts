@@ -17,7 +17,7 @@ import {
 } from '../spellcasting-test-fixtures'
 import { resolveAvailableChoices } from '../resolvers/registry/resolve-choices'
 import { resolveLanguageChoiceSets } from '../resolvers/ruleset/resolve-language-choice-sets'
-import { ORIGIN_LANGUAGES_CHOICE_ID } from '../../../content/character-creation-proficiencies'
+import { ORIGIN_LANGUAGES_CHOICE_ID } from '../../../primitives/proficiency/character-creation-proficiency-rules'
 
 function makeCompleteDraft(overrides: Partial<CharacterBuilderDraft> = {}): CharacterBuilderDraft {
   return {

@@ -10,7 +10,7 @@ import {
   startingEquipmentGrantEquipmentSlug,
   startingEquipmentGrantProficiencyChoiceId,
 } from '../../../../content/starting-equipment'
-import { eligibleProficiencyChoiceTargetIds } from '../../../../content/lib/resolve-eligible-proficiency-choice-targets'
+import { eligibleProficiencyChoiceTargetIds } from '../../validation/resolve-eligible-proficiency-choice-targets'
 import { formatEquipmentPoolLabel } from '../../../../content/lib/equipment-grant'
 import {
   isEquipmentPoolFullyAvailable,

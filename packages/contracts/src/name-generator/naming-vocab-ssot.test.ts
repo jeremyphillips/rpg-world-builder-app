@@ -1,10 +1,10 @@
 import { describe, expect, it } from 'vitest'
 
+import { NAME_SUBJECT_KIND_ENTRIES } from './index'
 import {
-  NAME_SUBJECT_KIND_ENTRIES,
   PERSONAL_NAME_COMPONENT_ENTRIES,
   PERSONAL_NAME_COMPONENTS,
-} from './index'
+} from '../rpg/vocab/personal-name-component'
 
 describe('naming vocabulary single source of truth', () => {
   it('exports labeled personal and subject vocab entries from name-generator index', () => {

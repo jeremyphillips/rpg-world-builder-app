@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import { DEFAULT_CONTENT_CAMPAIGN_ACCESS } from '../../content/lib/campaign-access'
-import type { Character } from '../../runtime/character/sheet'
+import type { Character } from '../character/sheet'
 import {
   createCampaignContentEligibilityIndex,
   projectCharacterEligibilitySubjectFromCharacter,
@@ -10,7 +10,7 @@ import {
 import {
   primaryBlockingIssue,
   sortBlockingIssuesByPriority,
-} from './character-campaign-eligibility'
+} from '../../campaign/character-eligibility-contracts'
 import { resolveCharacterCampaignEligibility } from './resolve-character-campaign-eligibility'
 import { resolveCharacterContentEligibility } from './resolve-character-content-eligibility'
 import { resolveCharacterParticipationEligibility } from './resolve-character-participation-eligibility'

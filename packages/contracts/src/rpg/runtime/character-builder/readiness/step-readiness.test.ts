@@ -19,7 +19,7 @@ import {
   fluteTool,
   monkClass,
 } from '../proficiency-test-fixtures'
-import { ORIGIN_LANGUAGES_CHOICE_ID } from '../../../content/character-creation-proficiencies'
+import { ORIGIN_LANGUAGES_CHOICE_ID } from '../../../primitives/proficiency/character-creation-proficiency-rules'
 import {
   nonCasterClass,
   spellcastingTestContext,

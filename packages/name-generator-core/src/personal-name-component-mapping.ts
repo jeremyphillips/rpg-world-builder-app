@@ -1,5 +1,5 @@
-import type { NamePartRole, PersonalNameComponent } from '@rpg/contracts/name-generator'
-import { NAME_PART_ROLES } from '@rpg/contracts/name-generator'
+import type { PersonalNameComponent } from '@rpg/contracts/vocab'
+import { NAME_PART_ROLES, type NamePartRole } from '@rpg/contracts/name-generator'
 
 export const PERSONAL_COMPONENT_TO_PART_ROLES = {
   family: ['family'],

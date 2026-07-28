@@ -1,8 +1,8 @@
-import type { CharacterClass } from '../classes/class'
-import type { ToolProficiencyChoice } from './proficiency-grant-set'
-import { isMeaningfulToolProficiencyChoice } from './proficiency-grant-set'
-import type { CharacterBuildCatalogIndex } from '../../runtime/character-builder/context'
-import { resolveToolPoolChoiceOptions } from '../../runtime/character-builder/resolvers/proficiency/resolve-tool-pool-choice-options'
+import type { CharacterClass } from '../../../content/classes/class'
+import type { ToolProficiencyChoice } from '../../../content/lib/proficiency-grant-set'
+import { isMeaningfulToolProficiencyChoice } from '../../../content/lib/proficiency-grant-set'
+import type { CharacterBuildCatalogIndex } from '../context'
+import { resolveToolPoolChoiceOptions } from '../resolvers/proficiency/resolve-tool-pool-choice-options'
 
 export type EligibleProficiencyChoiceTarget = {
   choiceId: string

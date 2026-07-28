@@ -1,7 +1,7 @@
 import { type z } from 'zod'
 
-import { keysFromEntries, vocabEnumFromEntries } from '../rpg/vocab/enum-schema'
-import type { GameTermEntry, VocabularyTerm } from '../rpg/vocab/types'
+import { keysFromEntries, vocabEnumFromEntries } from './enum-schema'
+import type { GameTermEntry, VocabularyTerm } from './types'
 
 // ---------------------------------------------------------------------------
 // Personal name components — optional parts beyond implicit given names.

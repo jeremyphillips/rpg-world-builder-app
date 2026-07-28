@@ -1,12 +1,8 @@
 import { describe, expect, it } from 'vitest'
 
-import type { ClassStored } from '../classes/class'
-import { indexCharacterBuildCatalog } from '../../runtime/character-builder/context'
-import {
-  bardClass,
-  luteTool,
-  proficiencyTestCatalog,
-} from '../../runtime/character-builder/proficiency-test-fixtures'
+import type { ClassStored } from '../../../content/classes/class'
+import { indexCharacterBuildCatalog } from '../context'
+import { bardClass, luteTool, proficiencyTestCatalog } from '../proficiency-test-fixtures'
 import {
   findStartingEquipmentGrantsReferencingProficiencyChoice,
   validateStartingEquipmentProficiencyLinks,

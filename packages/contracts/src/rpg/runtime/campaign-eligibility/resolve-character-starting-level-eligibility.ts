@@ -1,6 +1,6 @@
-import { getCharacterTotalLevel } from '../../runtime/character/sheet'
+import { getCharacterTotalLevel } from '../character/sheet'
 import type { CharacterEligibilitySubject } from './character-eligibility-subject'
-import type { CharacterCampaignBlockingIssue } from './character-campaign-eligibility'
+import type { CharacterCampaignBlockingIssue } from '../../campaign/character-eligibility-contracts'
 
 export type ResolveCharacterStartingLevelEligibilityInput = {
   subject: CharacterEligibilitySubject

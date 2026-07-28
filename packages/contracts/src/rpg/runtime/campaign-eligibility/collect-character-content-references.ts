@@ -1,6 +1,6 @@
 import type { CharacterEligibilitySubject } from './character-eligibility-subject'
-import type { CharacterCampaignWarningCategory } from './character-campaign-eligibility'
-import type { CharacterCampaignContentReferenceType } from './character-campaign-content-reference-types'
+import type { CharacterCampaignWarningCategory } from '../../campaign/character-eligibility-contracts'
+import type { CharacterCampaignContentReferenceType } from '../../campaign/character-eligibility-contracts'
 
 export type ContentReference =
   | {

@@ -5,7 +5,7 @@ import {
   languageProficiencyGrantSetSchema,
   type LanguageProficiencyChoice,
   type LanguageProficiencyGrantSet,
-} from './lib/proficiency-grant-set'
+} from './proficiency-grant-set'
 
 // ---------------------------------------------------------------------------
 // Character-creation proficiency rules — ruleset/campaign defaults for automatic

@@ -2,29 +2,38 @@ import { z } from 'zod'
 
 import { armorCategorySchema } from '../../vocab/armor/category'
 import { toolCategorySchema } from '../../vocab/equipment/tool-category'
-import { languageCategorySchema, languageIdSchema } from '../../vocab/language'
 import { weaponCategorySchema } from '../../vocab/weapon/category'
 import { skillSchema } from '../skill-proficiency'
+import {
+  isMeaningfulProficiencyChoice,
+  proficiencyChoiceSchema,
+  proficiencyGrantSetSchema,
+  type ProficiencyChoice,
+} from '../../primitives/proficiency/proficiency-grant-set'
 import {
   isMeaningfulToolProficiencyPool,
   normalizeLegacyFilteredToolPool,
   toolProficiencyPoolSchema,
 } from './proficiency-grant'
 
+export {
+  isMeaningfulLanguageProficiencyChoice,
+  languageProficiencyChoiceSchema,
+  languageProficiencyGrantSetSchema,
+  type LanguageProficiencyChoice,
+  type LanguageProficiencyGrantSet,
+} from '../../primitives/proficiency/proficiency-grant-set'
+
+export type {
+  ProficiencyChoice,
+  ProficiencyGrantSet,
+} from '../../primitives/proficiency/proficiency-grant-set'
+export { isMeaningfulProficiencyChoice, proficiencyChoiceSchema, proficiencyGrantSetSchema }
+
 // ---------------------------------------------------------------------------
 // Proficiency grant sets — fixed grants on class.proficiencies (immediate).
 // Proficiency choices — player picks under class.characterCreation.proficiencies.
 // ---------------------------------------------------------------------------
-
-/** Fixed grant bucket: category and/or item slugs granted immediately. */
-export const proficiencyGrantSetSchema = z
-  .object({
-    categories: z.array(z.string()).default([]),
-    items: z.array(z.string()).default([]),
-  })
-  .strict()
-
-export type ProficiencyGrantSet = z.infer<typeof proficiencyGrantSetSchema>
 
 export const armorProficiencyGrantSetSchema = proficiencyGrantSetSchema.extend({
   categories: z.array(armorCategorySchema).default([]),
@@ -49,21 +58,6 @@ export const skillProficiencyGrantSetSchema = proficiencyGrantSetSchema.extend({
 })
 
 export type SkillProficiencyGrantSet = z.infer<typeof skillProficiencyGrantSetSchema>
-
-/** Domain-agnostic choice primitive — `from` holds opaque slugs; vocab validated on extensions. */
-export const proficiencyChoiceSchema = z.object({
-  id: z.string().min(1),
-  label: z.string().optional(),
-  choose: z.number().int().min(0),
-  from: z.array(z.string()).default([]),
-})
-
-export type ProficiencyChoice = z.infer<typeof proficiencyChoiceSchema>
-
-/** A choice is meaningful when the player must pick from a non-empty pool. */
-export function isMeaningfulProficiencyChoice(choice: ProficiencyChoice): boolean {
-  return choice.choose > 0 && choice.from.length > 0
-}
 
 const MEANINGFUL_CHOICE_GROUP_MESSAGE =
   'Choice group must contain at least one meaningful choice (choose > 0 and from non-empty)'
@@ -192,22 +186,3 @@ export const toolProficiencyChoiceGroupDraftSchema = z.object({
 })
 
 export type ToolProficiencyChoiceGroupDraft = z.infer<typeof toolProficiencyChoiceGroupDraftSchema>
-
-export const languageProficiencyGrantSetSchema = proficiencyGrantSetSchema.extend({
-  categories: z.array(languageCategorySchema).default([]),
-  items: z.array(languageIdSchema).default([]),
-})
-
-export type LanguageProficiencyGrantSet = z.infer<typeof languageProficiencyGrantSetSchema>
-
-export const languageProficiencyChoiceSchema = proficiencyChoiceSchema.extend({
-  from: z.array(languageIdSchema).default([]),
-  categories: z.array(languageCategorySchema).default([]),
-})
-
-export type LanguageProficiencyChoice = z.infer<typeof languageProficiencyChoiceSchema>
-
-/** A language choice is meaningful when the player must pick from items and/or categories. */
-export function isMeaningfulLanguageProficiencyChoice(choice: LanguageProficiencyChoice): boolean {
-  return choice.choose > 0 && (choice.from.length > 0 || choice.categories.length > 0)
-}

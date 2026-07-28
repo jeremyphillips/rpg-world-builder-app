@@ -4,7 +4,7 @@ import {
   PERSONAL_NAME_COMPONENT_ENTRIES,
   PERSONAL_NAME_COMPONENTS,
   type PersonalNameComponent,
-} from '@rpg/contracts/name-generator'
+} from '@rpg/contracts/vocab'
 import { ChipsField, OptionalFieldDisclosure } from '@rpg/ui'
 import type { FieldOption } from '@rpg/ui/form'
 import { useId, useState } from 'react'

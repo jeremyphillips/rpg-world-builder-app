@@ -6,8 +6,8 @@ import type { Spell } from '../../../content/spell'
 import type { CharacterBuildContext } from '../context'
 import type { ResolvedContentCampaignAccess } from '../../../content/lib/campaign-access'
 import { DEFAULT_CONTENT_CAMPAIGN_ACCESS } from '../../../content/lib/campaign-access'
-import type { ContentViewer } from '../../../content/lib/content-viewer-access'
-import { isContentDiscoverableForViewer } from '../../../content/lib/content-viewer-access'
+import type { ContentViewer } from '../../../campaign/lib/campaign-content-viewer'
+import { isContentDiscoverableForViewer } from '../../campaign/content-viewer-discovery'
 
 // ---------------------------------------------------------------------------
 // resolveAvailableContent — availability seam for the builder UI. Campaign

@@ -3,7 +3,6 @@ import { z } from 'zod'
 import { campaignInviteDeliveryStatusSchema } from '../vocab/campaign-invite-delivery-status'
 import { campaignInviteStatusSchema } from '../vocab/campaign-invite-status'
 import { type campaignRoleSchema } from '../../shared/roles'
-import { characterCardViewModelSchema } from './campaign-overview-dtos'
 
 // ---------------------------------------------------------------------------
 // Campaign invite DTOs — client-facing shapes; never expose persistence fields.
@@ -39,20 +38,6 @@ export const campaignInviteShareLinkResultSchema = z.object({
 })
 
 export type CampaignInviteShareLinkResult = z.infer<typeof campaignInviteShareLinkResultSchema>
-
-export const campaignPartyPcListItemSchema = z.object({
-  character: characterCardViewModelSchema,
-  member: z.object({
-    id: z.string().min(1),
-    displayName: z.string().min(1),
-  }),
-  roster: z.object({
-    status: z.enum(['active', 'inactive', 'retired']),
-    notes: z.string().optional(),
-  }),
-})
-
-export type CampaignPartyPcListItem = z.infer<typeof campaignPartyPcListItemSchema>
 
 /** Onboarding membership role is always `pc` for campaign invites. */
 export const CAMPAIGN_INVITE_MEMBERSHIP_ROLE = 'pc' as const satisfies z.infer<

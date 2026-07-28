@@ -1,10 +1,29 @@
 import { z } from 'zod'
 
-import { characterCampaignContentReferenceTypeSchema } from './character-campaign-content-reference-types'
+export const CHARACTER_CAMPAIGN_CONTENT_REFERENCE_TYPES = [
+  'species',
+  'class',
+  'subclass',
+  'equipment',
+  'spells',
+  'feats',
+  'proficiencies',
+  'tools',
+  'languages',
+  'heritage',
+] as const
+
+export const characterCampaignContentReferenceTypeSchema = z.enum(
+  CHARACTER_CAMPAIGN_CONTENT_REFERENCE_TYPES,
+)
+
+export type CharacterCampaignContentReferenceType = z.infer<
+  typeof characterCampaignContentReferenceTypeSchema
+>
 
 // ---------------------------------------------------------------------------
-// Character campaign eligibility — discriminated issue and warning contracts.
-// Contracts own codes and payloads; the dashboard owns display copy.
+// Character campaign eligibility — wire issue and warning contracts.
+// Resolver orchestration lives in rpg/runtime/campaign-eligibility/.
 // ---------------------------------------------------------------------------
 
 export const characterCampaignBlockingIssueSchema = z.discriminatedUnion('code', [

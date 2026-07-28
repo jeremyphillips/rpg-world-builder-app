@@ -4,7 +4,7 @@ import {
   DEFAULT_LANGUAGE_PROFICIENCY_CHOICES,
   DEFAULT_LANGUAGE_PROFICIENCY_GRANT,
   ORIGIN_LANGUAGES_CHOICE_ID,
-} from '../../content/character-creation-proficiencies'
+} from '../../primitives/proficiency/character-creation-proficiency-rules'
 import { resolveStartingWealthRules, startingWealthRulesSchema } from '../rules/starting-wealth'
 import { resolveCharacterCreationPatch } from './campaign-character-creation-patch'
 import { extendedProgressionAt } from '../../../test/fixtures/character-creation-patch'

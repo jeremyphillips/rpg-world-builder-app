@@ -1,6 +1,6 @@
-import type { CreateCharacterInput } from '../../runtime/character/create-input'
-import { createDefaultCharacterVitalState } from '../../runtime/character/character-vital'
-import type { Character, PcCharacter } from '../../runtime/character/sheet'
+import type { CreateCharacterInput } from '../character/create-input'
+import { createDefaultCharacterVitalState } from '../character/character-vital'
+import type { Character, PcCharacter } from '../character/sheet'
 
 /**
  * Narrow projection consumed by campaign eligibility resolvers. Avoids inventing

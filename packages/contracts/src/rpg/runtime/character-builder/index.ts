@@ -100,3 +100,5 @@ export {
   validateProficiencyChoiceSets,
   validateSpellChoiceSets,
 } from './validate/validate-choice-sets'
+export * from './validation/resolve-eligible-proficiency-choice-targets'
+export * from './validation/validate-starting-equipment-proficiency-links'

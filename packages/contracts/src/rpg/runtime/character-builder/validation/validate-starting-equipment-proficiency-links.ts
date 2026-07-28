@@ -1,10 +1,13 @@
-import type { CharacterClass } from '../classes/class'
-import type { StartingEquipmentGrantedItem, StartingEquipmentOption } from '../starting-equipment'
+import type { CharacterClass } from '../../../content/classes/class'
+import type {
+  StartingEquipmentGrantedItem,
+  StartingEquipmentOption,
+} from '../../../content/starting-equipment'
 import {
   isProficiencyLinkedStartingEquipmentGrant,
   startingEquipmentGrantProficiencyChoiceId,
-} from '../starting-equipment'
-import type { CharacterBuildCatalogIndex } from '../../runtime/character-builder/context'
+} from '../../../content/starting-equipment'
+import type { CharacterBuildCatalogIndex } from '../context'
 import { eligibleProficiencyChoiceTargetIds } from './resolve-eligible-proficiency-choice-targets'
 
 export const STARTING_EQUIPMENT_PROFICIENCY_LINK_ISSUE_CODES = [

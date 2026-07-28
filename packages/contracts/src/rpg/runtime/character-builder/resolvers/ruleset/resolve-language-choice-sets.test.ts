@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { ORIGIN_LANGUAGES_CHOICE_ID } from '../../../../content/character-creation-proficiencies'
+import { ORIGIN_LANGUAGES_CHOICE_ID } from '../../../../primitives/proficiency/character-creation-proficiency-rules'
 import { createEmptyCharacterBuilderDraft } from '../../draft/draft'
 import { resolveAvailableChoices } from '../registry/resolve-choices'
 import { resolveLanguageChoiceSets } from './resolve-language-choice-sets'
