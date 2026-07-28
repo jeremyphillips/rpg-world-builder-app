@@ -5,7 +5,7 @@ import type { CharacterCampaignBlockingIssue } from '@rpg/contracts'
 import {
   formatBlockingReason,
   formatComboboxBlockingDescription,
-} from './campaign-invite-eligibility-display'
+} from './campaign-character-eligibility-display'
 
 describe('formatBlockingReason', () => {
   it('formats content_missing copy', () => {

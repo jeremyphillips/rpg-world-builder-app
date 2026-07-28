@@ -19,7 +19,7 @@ import {
 } from '@rpg/contracts'
 import { buttonVariants, Button, Heading, Spinner, Text } from '@rpg/ui'
 
-import { CampaignInviteEligibilityAlert } from '@/features/campaign'
+import { CampaignCharacterEligibilityAlert } from '@/features/campaign'
 import { useCompleteCampaignOnboarding } from '@/features/campaign/hooks/use-campaign-onboarding-eligible-characters'
 
 import { useResolvedChoiceSets } from '../hooks/use-resolved-choice-sets'
@@ -460,7 +460,7 @@ export function CharacterBuilderShell({
         </div>
 
         {isReviewBuilderStep(currentStepId) && campaignEligibilityError ? (
-          <CampaignInviteEligibilityAlert
+          <CampaignCharacterEligibilityAlert
             blockingIssues={campaignEligibilityError.blockingIssues}
             warnings={campaignEligibilityError.warnings}
             heading={chrome.reviewValidationHeading}

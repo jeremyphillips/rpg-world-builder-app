@@ -1,13 +1,7 @@
 import type { CampaignEligibleCharacter } from '@rpg/contracts'
 import type { ComboboxFieldOption } from '@rpg/ui'
 
-import {
-  formatComboboxBlockingDescription,
-  groupWarningsByCategory,
-  WARNING_CATEGORY_LABELS,
-} from './campaign-invite-eligibility-display'
-
-export { groupWarningsByCategory, WARNING_CATEGORY_LABELS }
+import { formatComboboxBlockingDescription } from './campaign-character-eligibility-display'
 
 export const ONBOARDING_CHOICE_EXISTING = 'existing'
 export const ONBOARDING_CHOICE_NEW = 'new'
