@@ -7,17 +7,11 @@ import type {
   CompleteCampaignCharacterAssignmentResult,
   CreateCharacterInput,
 } from '@rpg/contracts'
-import {
-  CAMPAIGN_INVITE_EXPIRY_DAYS,
-  projectCharacterEligibilitySubjectFromCharacter,
-  resolveCharacterCampaignEligibility,
-} from '@rpg/contracts'
+import { CAMPAIGN_INVITE_EXPIRY_DAYS } from '@rpg/contracts'
 
 import { HttpError } from '../../lib/http-error'
 import type { EmailProvider } from '../../services/email/email.types'
 import { findCampaignById } from '../campaign/find-campaign-by-id'
-import { findOpenParticipationForCharacter } from '../campaign/participation/campaign-character-participation.repository'
-import { listCharactersForUser } from '../character/character.service'
 import { findUserByEmail, findSessionUserById } from '../user/user.service'
 import { getRulesetPatchRead } from '../vocabulary'
 import { deliverCampaignInviteEmail } from './campaign-invite-delivery'
@@ -46,11 +40,8 @@ import {
   createOrConfirmPlayerMembership,
   findCampaignMembershipByCampaignAndUser,
 } from './create-or-confirm-player-membership'
-import {
-  buildCampaignContentEligibilityIndex,
-  formatInviteCharacterSummary,
-} from './campaign-invite-eligibility.lib'
 import { completeCampaignInviteWithCharacter } from './complete-campaign-invite-character.lib'
+import { listEligibleCharactersForCampaign } from './list-campaign-eligible-characters.lib'
 import {
   expireInviteIfNeeded,
   loadAcceptedInviteForUser,
@@ -510,11 +501,6 @@ export async function revokeCampaignInvite(input: RevokeCampaignInviteInput): Pr
   }
 }
 
-async function loadInviteStartingLevel(campaignId: string): Promise<number> {
-  const patch = await getRulesetPatchRead(campaignId)
-  return patch?.characterCreation.startingLevel ?? 1
-}
-
 export async function listEligibleCharactersForInvite({
   inviteId,
   userId,
@@ -523,44 +509,7 @@ export async function listEligibleCharactersForInvite({
   userId: string
 }): Promise<CampaignEligibleCharacter[]> {
   const invite = await loadAcceptedInviteForUser({ inviteId, userId })
-  const [characters, contentIndex, startingLevel] = await Promise.all([
-    listCharactersForUser(userId),
-    buildCampaignContentEligibilityIndex(invite.campaignId),
-    loadInviteStartingLevel(invite.campaignId),
-  ])
-
-  const results: CampaignEligibleCharacter[] = []
-
-  for (const character of characters) {
-    if (character.characterType !== 'pc') continue
-
-    const existingOpenParticipation = await findOpenParticipationForCharacter(character.id)
-    let conflictingCampaignName: string | undefined
-    if (existingOpenParticipation && existingOpenParticipation.campaignId !== invite.campaignId) {
-      const conflictingCampaign = await findCampaignById(existingOpenParticipation.campaignId)
-      conflictingCampaignName = conflictingCampaign?.identity.name
-    }
-
-    const eligibility = resolveCharacterCampaignEligibility({
-      subject: projectCharacterEligibilitySubjectFromCharacter(character),
-      userId,
-      campaignId: invite.campaignId,
-      startingLevel,
-      existingOpenParticipation,
-      conflictingCampaignName,
-      contentIndex,
-      viewer: { kind: 'pc', characterIds: [character.id] },
-    })
-
-    results.push({
-      characterId: character.id,
-      name: character.name,
-      summary: formatInviteCharacterSummary(character, contentIndex.contentById),
-      eligibility,
-    })
-  }
-
-  return results
+  return listEligibleCharactersForCampaign({ campaignId: invite.campaignId, userId })
 }
 
 export async function completeCampaignInviteWithExistingCharacter({

@@ -4,20 +4,10 @@ import type {
   CompleteCampaignOnboardingInput,
   CompleteCampaignOnboardingResult,
 } from '@rpg/contracts'
-import {
-  projectCharacterEligibilitySubjectFromCharacter,
-  resolveCharacterCampaignEligibility,
-} from '@rpg/contracts'
 
 import { HttpError } from '../../lib/http-error'
-import {
-  buildCampaignContentEligibilityIndex,
-  formatInviteCharacterSummary,
-} from '../campaign-invite/campaign-invite-eligibility.lib'
-import { resolveCampaignInviteEligibilityContext } from '../campaign-invite/resolve-campaign-invite-eligibility-context.lib'
+import { listEligibleCharactersForCampaign } from '../campaign-invite/list-campaign-eligible-characters.lib'
 import { findCampaignById } from './find-campaign-by-id'
-import { findOpenParticipationForCharacter } from './participation/campaign-character-participation.repository'
-import { listCharactersForUser } from '../character/character.service'
 import { getRulesetPatchRead } from '../vocabulary'
 import { completeCampaignOnboarding } from './complete-campaign-onboarding-character.lib'
 import { loadCampaignViewerParticipationContext } from './resolve-campaign-viewer-participation-context.lib'
@@ -99,44 +89,7 @@ export async function listEligibleCharactersForCampaignOnboarding({
     throw new HttpError(409, 'conflict', 'Campaign onboarding is already complete.')
   }
 
-  const [characters, contentIndex, startingLevel] = await Promise.all([
-    listCharactersForUser(userId),
-    buildCampaignContentEligibilityIndex(campaignId),
-    resolveCampaignInviteEligibilityContext(campaignId).then((value) => value.startingLevel),
-  ])
-
-  const results: CampaignOnboardingEligibleCharacter[] = []
-
-  for (const character of characters) {
-    if (character.characterType !== 'pc') continue
-
-    const existingOpenParticipation = await findOpenParticipationForCharacter(character.id)
-    let conflictingCampaignName: string | undefined
-    if (existingOpenParticipation && existingOpenParticipation.campaignId !== campaignId) {
-      const conflictingCampaign = await findCampaignById(existingOpenParticipation.campaignId)
-      conflictingCampaignName = conflictingCampaign?.identity.name
-    }
-
-    const eligibility = resolveCharacterCampaignEligibility({
-      subject: projectCharacterEligibilitySubjectFromCharacter(character),
-      userId,
-      campaignId,
-      startingLevel,
-      existingOpenParticipation,
-      conflictingCampaignName,
-      contentIndex,
-      viewer: { kind: 'pc', characterIds: [character.id] },
-    })
-
-    results.push({
-      characterId: character.id,
-      name: character.name,
-      summary: formatInviteCharacterSummary(character, contentIndex.contentById),
-      eligibility,
-    })
-  }
-
-  return results
+  return listEligibleCharactersForCampaign({ campaignId, userId })
 }
 
 export async function completeCampaignOnboardingForUser(

@@ -16,13 +16,9 @@ import { findCampaignById } from '../campaign/find-campaign-by-id'
 import { findOpenParticipationForCharacter } from '../campaign/participation/campaign-character-participation.repository'
 import { findCharacterForUser } from '../character/character.service'
 import { failCampaignCharacterAssignment } from './campaign-invite-completion-failure.lib'
-import {
-  executeExistingCharacterInviteCompletion,
-  executeNewCharacterInviteCompletion,
-} from './complete-campaign-invite-completion.lib'
+import { completeCampaignCharacterAssignment } from './complete-campaign-character-assignment.lib'
 import { zodIssuesToBuildValidationIssues } from './map-build-validation-issues.lib'
 import { resolveCampaignInviteCompletionContext } from './resolve-campaign-invite-completion-context.lib'
-import { resolveCampaignInviteEligibilityContext } from './resolve-campaign-invite-eligibility-context.lib'
 import type { CampaignInviteEligibilityContext } from './resolve-campaign-invite-eligibility-context.lib'
 import type { InviteCompletionWriteReceipt } from './complete-campaign-invite-receipt'
 
@@ -205,52 +201,15 @@ export async function completeCampaignInviteWithCharacter(input: {
   }
 
   const { context } = contextResult
-  const candidate =
-    input.characterSource.kind === 'new'
-      ? await resolveNewCharacterCandidate({
-          campaignId: context.acceptedInvite.campaignId,
-          userId: input.userId,
-          characterCreateInput: input.characterSource.characterCreateInput,
-        })
-      : await resolveExistingCharacterCandidate({
-          userId: input.userId,
-          characterId: input.characterSource.characterId,
-        })
 
-  const eligibilityContext = await resolveCampaignInviteEligibilityContext(
-    context.acceptedInvite.campaignId,
-  )
-
-  if (candidate.kind === 'new') {
-    await assertNewCharacterBuildEligible({
-      campaignId: context.acceptedInvite.campaignId,
-      userId: input.userId,
-      candidate,
-      eligibilityContext,
-    })
-
-    return executeNewCharacterInviteCompletion({
-      inviteId: context.invite.id,
-      campaignId: context.acceptedInvite.campaignId,
-      membershipId: context.membershipId,
-      userId: input.userId,
-      parsedInput: candidate.parsedInput,
-    })
-  }
-
-  await assertExistingCharacterEligible({
-    campaignId: context.acceptedInvite.campaignId,
+  return completeCampaignCharacterAssignment({
     userId: input.userId,
-    candidate,
-    eligibilityContext,
-  })
-
-  await executeExistingCharacterInviteCompletion({
-    inviteId: context.invite.id,
     campaignId: context.acceptedInvite.campaignId,
     membershipId: context.membershipId,
-    characterId: candidate.character.id,
+    characterSource:
+      input.characterSource.kind === 'new'
+        ? { kind: 'new', characterInput: input.characterSource.characterCreateInput }
+        : { kind: 'existing', characterId: input.characterSource.characterId },
+    invitePolicy: { kind: 'invite', inviteId: context.invite.id },
   })
-
-  return { campaignId: context.invite.campaignId, characterId: candidate.character.id }
 }

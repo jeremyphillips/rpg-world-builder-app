@@ -10,25 +10,14 @@ import { Text } from '@rpg/ui'
 import {
   formatBlockingReason,
   formatComboboxBlockingDescription,
+  groupWarningsByCategory,
+  WARNING_CATEGORY_LABELS,
 } from '../lib/campaign-invite-eligibility-display'
-import { WARNING_CATEGORY_LABELS } from '../lib/campaign-onboarding.lib'
 
 export type CampaignInviteEligibilityAlertProps = {
   blockingIssues: readonly CharacterCampaignBlockingIssue[]
   warnings?: readonly CharacterCampaignWarning[]
   heading?: string
-}
-
-function groupWarningsByCategory(
-  warnings: readonly CharacterCampaignWarning[],
-): Partial<Record<CharacterCampaignWarningCategory, CharacterCampaignWarning[]>> {
-  return warnings.reduce<
-    Partial<Record<CharacterCampaignWarningCategory, CharacterCampaignWarning[]>>
-  >((groups, warning) => {
-    const current = groups[warning.category] ?? []
-    groups[warning.category] = [...current, warning]
-    return groups
-  }, {})
 }
 
 export function CampaignInviteEligibilityAlert({

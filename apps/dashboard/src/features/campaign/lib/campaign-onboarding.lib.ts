@@ -1,35 +1,18 @@
-import type {
-  CampaignEligibleCharacter,
-  CharacterCampaignWarning,
-  CharacterCampaignWarningCategory,
-} from '@rpg/contracts'
+import type { CampaignEligibleCharacter } from '@rpg/contracts'
 import type { ComboboxFieldOption } from '@rpg/ui'
 
-import { formatComboboxBlockingDescription } from './campaign-invite-eligibility-display'
+import {
+  formatComboboxBlockingDescription,
+  groupWarningsByCategory,
+  WARNING_CATEGORY_LABELS,
+} from './campaign-invite-eligibility-display'
+
+export { groupWarningsByCategory, WARNING_CATEGORY_LABELS }
 
 export const ONBOARDING_CHOICE_EXISTING = 'existing'
 export const ONBOARDING_CHOICE_NEW = 'new'
 
 export type OnboardingBranch = 'choice' | 'existing' | 'new'
-
-export const WARNING_CATEGORY_LABELS: Record<CharacterCampaignWarningCategory, string> = {
-  equipment: 'Equipment',
-  spells: 'Spells',
-  feats: 'Feats',
-  proficiencies: 'Proficiencies',
-}
-
-export function groupWarningsByCategory(
-  warnings: readonly CharacterCampaignWarning[],
-): Partial<Record<CharacterCampaignWarningCategory, CharacterCampaignWarning[]>> {
-  return warnings.reduce<
-    Partial<Record<CharacterCampaignWarningCategory, CharacterCampaignWarning[]>>
-  >((groups, warning) => {
-    const current = groups[warning.category] ?? []
-    groups[warning.category] = [...current, warning]
-    return groups
-  }, {})
-}
 
 export function buildCharacterOptions(
   characters: CampaignEligibleCharacter[],

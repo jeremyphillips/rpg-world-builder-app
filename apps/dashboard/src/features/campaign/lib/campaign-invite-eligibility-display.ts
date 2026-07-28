@@ -1,6 +1,8 @@
 import type {
   CharacterCampaignBlockingIssue,
   CharacterCampaignContentReferenceType,
+  CharacterCampaignWarning,
+  CharacterCampaignWarningCategory,
 } from '@rpg/contracts'
 import { primaryBlockingIssue } from '@rpg/contracts'
 
@@ -40,6 +42,25 @@ export function formatBlockingReason(issue: CharacterCampaignBlockingIssue): str
     default:
       return 'Not eligible for this campaign'
   }
+}
+
+export const WARNING_CATEGORY_LABELS: Record<CharacterCampaignWarningCategory, string> = {
+  equipment: 'Equipment',
+  spells: 'Spells',
+  feats: 'Feats',
+  proficiencies: 'Proficiencies',
+}
+
+export function groupWarningsByCategory(
+  warnings: readonly CharacterCampaignWarning[],
+): Partial<Record<CharacterCampaignWarningCategory, CharacterCampaignWarning[]>> {
+  return warnings.reduce<
+    Partial<Record<CharacterCampaignWarningCategory, CharacterCampaignWarning[]>>
+  >((groups, warning) => {
+    const current = groups[warning.category] ?? []
+    groups[warning.category] = [...current, warning]
+    return groups
+  }, {})
 }
 
 export function formatComboboxBlockingDescription(

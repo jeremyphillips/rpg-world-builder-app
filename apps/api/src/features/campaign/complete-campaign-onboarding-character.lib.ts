@@ -4,17 +4,7 @@ import type {
   CreateCharacterInput,
 } from '@rpg/contracts'
 
-import {
-  assertExistingCharacterEligible,
-  assertNewCharacterBuildEligible,
-  resolveExistingCharacterCandidate,
-  resolveNewCharacterCandidate,
-} from '../campaign-invite/complete-campaign-invite-character.lib'
-import { resolveCampaignInviteEligibilityContext } from '../campaign-invite/resolve-campaign-invite-eligibility-context.lib'
-import {
-  executeExistingCharacterOnboardingCompletion,
-  executeNewCharacterOnboardingCompletion,
-} from './complete-campaign-onboarding-completion.lib'
+import { completeCampaignCharacterAssignment } from '../campaign-invite/complete-campaign-character-assignment.lib'
 import { resolveCampaignOnboardingCompletionContext } from './resolve-campaign-onboarding-completion-context.lib'
 import { resolveLinkedAcceptedInviteForOnboardingComplete } from './resolve-linked-onboarding-invite.lib'
 
@@ -46,52 +36,16 @@ export async function completeCampaignOnboardingWithCharacter(input: {
     userEmail: input.userEmail,
   })
 
-  const candidate =
-    input.characterSource.kind === 'new'
-      ? await resolveNewCharacterCandidate({
-          campaignId: input.campaignId,
-          userId: input.userId,
-          characterCreateInput: input.characterSource.character,
-        })
-      : await resolveExistingCharacterCandidate({
-          userId: input.userId,
-          characterId: input.characterSource.characterId,
-        })
-
-  const eligibilityContext = await resolveCampaignInviteEligibilityContext(input.campaignId)
-
-  if (candidate.kind === 'new') {
-    await assertNewCharacterBuildEligible({
-      campaignId: input.campaignId,
-      userId: input.userId,
-      candidate,
-      eligibilityContext,
-    })
-
-    return executeNewCharacterOnboardingCompletion({
-      campaignId: input.campaignId,
-      membershipId: context.membershipId,
-      userId: input.userId,
-      parsedInput: candidate.parsedInput,
-      linkedInviteId: linkedInvite?.id,
-    })
-  }
-
-  await assertExistingCharacterEligible({
-    campaignId: input.campaignId,
+  return completeCampaignCharacterAssignment({
     userId: input.userId,
-    candidate,
-    eligibilityContext,
-  })
-
-  await executeExistingCharacterOnboardingCompletion({
     campaignId: input.campaignId,
     membershipId: context.membershipId,
-    characterId: candidate.character.id,
-    linkedInviteId: linkedInvite?.id,
+    characterSource:
+      input.characterSource.kind === 'new'
+        ? { kind: 'new', characterInput: input.characterSource.character }
+        : { kind: 'existing', characterId: input.characterSource.characterId },
+    invitePolicy: { kind: 'onboarding', linkedInviteId: linkedInvite?.id },
   })
-
-  return { campaignId: input.campaignId, characterId: candidate.character.id }
 }
 
 export async function completeCampaignOnboarding(
