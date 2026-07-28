@@ -1,9 +1,9 @@
 import type { CampaignAccessParticipantEntry } from '@rpg/contracts'
 import { isValidObjectId } from 'mongoose'
 
-import { listOpenParticipationsForCampaign } from '../../campaign/participation/campaign-character-participation.repository'
-import { CharacterModel } from '../../character/character.model'
-import { UserModel } from '../../user/user.model'
+import { listOpenParticipationsForCampaign } from '../../campaign'
+import { CharacterModel } from '../../character'
+import { UserModel } from '../../user'
 
 type CharacterRow = {
   _id: unknown

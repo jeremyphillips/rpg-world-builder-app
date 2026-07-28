@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { CampaignInviteModel } from './campaign-invite.model'
-import { CampaignMembershipModel } from '../campaign/campaign-membership.model'
+import { CampaignMembershipModel } from '../campaign'
 import { makeTestCampaign } from '../../test/fixtures/campaigns'
 import { makeTestUser } from '../../test/fixtures/users'
 import { useIntegrationDb } from '../../test/setup/integration-db'

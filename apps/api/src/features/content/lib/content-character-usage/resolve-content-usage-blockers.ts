@@ -1,7 +1,7 @@
 import type { ContentTypeKey, ContentUsageBlocker } from '@rpg/contracts'
 
-import { listOpenParticipationsForCampaign } from '../../../campaign/participation/campaign-character-participation.repository'
-import { CharacterModel } from '../../../character/character.model'
+import { listOpenParticipationsForCampaign } from '../../../campaign'
+import { CharacterModel } from '../../../character'
 import { getContentCharacterUsageMatcher } from './content-character-usage-matchers'
 
 type CharacterUsageHit = {

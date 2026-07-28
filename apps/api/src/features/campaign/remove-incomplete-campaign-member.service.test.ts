@@ -3,12 +3,15 @@ import { describe, expect, it } from 'vitest'
 import { makeTestCampaign } from '../../test/fixtures/campaigns'
 import { makeTestUser } from '../../test/fixtures/users'
 import { useIntegrationDb } from '../../test/setup/integration-db'
-import { acceptCampaignInvite } from '../campaign-invite/campaign-invite.service'
-import { CampaignInviteModel } from '../campaign-invite/campaign-invite.model'
-import { computeInviteExpiresAt } from '../campaign-invite/campaign-invite.lib'
-import { createInviteRecord } from '../campaign-invite/campaign-invite.repository'
-import { generateInviteToken, hashInviteToken } from '../campaign-invite/campaign-invite-token'
-import { createOrConfirmPlayerMembership } from '../campaign/participation/create-or-confirm-player-membership'
+import {
+  acceptCampaignInvite,
+  CampaignInviteModel,
+  computeInviteExpiresAt,
+  createInviteRecord,
+  generateInviteToken,
+  hashInviteToken,
+} from '../campaign-invite'
+import { createOrConfirmPlayerMembership } from './participation/create-or-confirm-player-membership'
 import { CampaignMembershipModel } from './campaign-membership.model'
 import { removeIncompleteCampaignMember } from './remove-incomplete-campaign-member.service'
 

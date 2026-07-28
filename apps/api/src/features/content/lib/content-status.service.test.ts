@@ -14,7 +14,7 @@ import {
   getContentDemotionAvailability,
   promoteContentToPublished,
 } from './content-status.service'
-import { createCampaignNpc } from '../../campaign/npc/npc.service'
+import { createCampaignNpc } from '../../campaign'
 import { HttpError } from '../../../lib/http-error'
 import { resolveCatalogForCampaign } from '../content.service'
 

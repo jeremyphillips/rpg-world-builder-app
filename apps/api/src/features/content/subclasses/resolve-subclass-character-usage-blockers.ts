@@ -1,7 +1,7 @@
 import type { ContentUsageBlocker } from '@rpg/contracts'
 
-import { listOpenParticipationsForCampaign } from '../../campaign/participation/campaign-character-participation.repository'
-import { CharacterModel } from '../../character/character.model'
+import { listOpenParticipationsForCampaign } from '../../campaign'
+import { CharacterModel } from '../../character'
 import type { ContentDeleteContext } from '../lib/content-write-config'
 
 type CharacterUsageHit = {

@@ -5,11 +5,12 @@ import { makeTestUser } from '../../../test/fixtures/users'
 import { minimalStandalonePcInput } from '../../../test/fixtures/characters'
 import { minimalNpcRequestInput } from '../../../test/fixtures/npcs'
 import { useIntegrationDb } from '../../../test/setup/integration-db'
-import { CampaignMembershipModel } from '../../campaign/campaign-membership.model'
-import { CharacterModel } from '../../character/character.model'
-import { createPcRecord } from '../../character/character.repository'
-import { createCampaignNpc } from '../../campaign/npc/npc.service'
-import { attachCharacterToCampaign } from '../../campaign/participation/campaign-character-participation.repository'
+import {
+  attachCharacterToCampaign,
+  CampaignMembershipModel,
+  createCampaignNpc,
+} from '../../campaign'
+import { CharacterModel, createPcRecord } from '../../character'
 import { classWriteConfig } from '../classes/classes.config'
 import { HomebrewClassModel } from '../classes/homebrew-class.model'
 import { resolveCatalogForCampaign } from '../content.service'

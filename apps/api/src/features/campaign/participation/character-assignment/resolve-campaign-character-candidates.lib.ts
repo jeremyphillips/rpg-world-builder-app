@@ -9,7 +9,7 @@ import {
 import { HttpError } from '../../../../lib/http-error'
 import { findCampaignById } from '../../find-campaign-by-id'
 import { findOpenParticipationForCharacter } from '../campaign-character-participation.repository'
-import { findCharacterForUser } from '../../../character/character.service'
+import { findCharacterForUser } from '../../../character'
 import { failCampaignCharacterAssignment } from './campaign-character-assignment-failure.lib'
 import { zodIssuesToBuildValidationIssues } from './map-build-validation-issues.lib'
 import type { CampaignCharacterEligibilityContext } from './resolve-campaign-character-eligibility-context.lib'

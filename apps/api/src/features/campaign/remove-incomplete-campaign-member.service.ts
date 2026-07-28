@@ -1,12 +1,15 @@
 import { isValidObjectId } from 'mongoose'
 
-import { generateInviteToken, hashInviteToken } from '../campaign-invite/campaign-invite-token'
-import { revokeAcceptedInvitesForMemberRemoval } from '../campaign-invite/campaign-invite.repository'
+import {
+  generateInviteToken,
+  hashInviteToken,
+  revokeAcceptedInvitesForMemberRemoval,
+} from '../campaign-invite'
+import { findPcOwnerIdsByCharacterIds } from '../character'
 import { HttpError } from '../../lib/http-error'
 import { CampaignMembershipModel } from './campaign-membership.model'
 import { listOpenParticipationsForCampaign } from './participation/campaign-character-participation.repository'
 import { resolveCampaignMemberOnboardingState } from './participation/resolve-member-open-participating-character-ids.lib'
-import { findPcOwnerIdsByCharacterIds } from '../character/character.repository'
 
 type MembershipRecord = {
   _id: unknown

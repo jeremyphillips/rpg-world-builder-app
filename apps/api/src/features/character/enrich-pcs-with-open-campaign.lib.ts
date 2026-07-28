@@ -1,7 +1,6 @@
 import type { PcCharacter, PcCharacterListItem } from '@rpg/contracts'
 
-import { findCampaignById } from '../campaign/find-campaign-by-id'
-import { listOpenParticipationsForCharacters } from '../campaign/participation/campaign-character-participation.repository'
+import { findCampaignById, listOpenParticipationsForCharacters } from '../campaign'
 
 /** Attach optional open-campaign metadata for standalone character list cards. */
 export async function enrichPcsWithOpenCampaign(

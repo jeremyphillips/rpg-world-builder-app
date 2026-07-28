@@ -11,11 +11,13 @@ import {
 } from '@rpg/contracts'
 
 import { HttpError } from '../../lib/http-error'
-import { findCampaignById } from '../campaign/find-campaign-by-id'
-import { resolveContentForCampaign } from '../content/content-types'
-import { attachCampaignAccessForTargetType } from '../content/lib/content-campaign-access.service'
-import { resolveSubclassesForCampaign } from '../content/subclasses/list-subclasses'
-import { listRulesetLanguageOptions } from '../ruleset/ruleset.service'
+import { findCampaignById } from '../campaign'
+import {
+  attachCampaignAccessForTargetType,
+  resolveContentForCampaign,
+  resolveSubclassesForCampaign,
+} from '../content'
+import { listRulesetLanguageOptions } from '../ruleset'
 
 type EligibilityContentRow = {
   id: string

@@ -1,19 +1,21 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import * as mongoTransaction from '../../lib/mongo-transaction'
-import { CampaignInviteModel } from '../campaign-invite/campaign-invite.model'
+import {
+  acceptCampaignInvite,
+  CampaignInviteModel,
+  computeInviteExpiresAt,
+  createInviteRecord,
+  generateInviteToken,
+  hashInviteToken,
+} from '../campaign-invite'
+import { CharacterModel, createPcRecord } from '../character'
 import { CampaignMembershipModel } from './campaign-membership.model'
 import { CampaignCharacterParticipationModel } from './participation/campaign-character-participation.model'
-import { CharacterModel } from '../character/character.model'
-import { createPcRecord } from '../character/character.repository'
 import { minimalStandalonePcInput } from '../../test/fixtures/characters'
 import { makeTestCampaign } from '../../test/fixtures/campaigns'
 import { makeTestUser } from '../../test/fixtures/users'
 import { useIntegrationDb } from '../../test/setup/integration-db'
-import { acceptCampaignInvite } from '../campaign-invite/campaign-invite.service'
-import { generateInviteToken, hashInviteToken } from '../campaign-invite/campaign-invite-token'
-import { computeInviteExpiresAt } from '../campaign-invite/campaign-invite.lib'
-import { createInviteRecord } from '../campaign-invite/campaign-invite.repository'
 import * as assignControlledPc from './participation/assign-controlled-pc.service'
 import * as onboardingObservability from './campaign-onboarding-observability.lib'
 import {

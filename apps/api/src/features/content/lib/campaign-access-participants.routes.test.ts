@@ -1,9 +1,8 @@
 import { describe, expect, it } from 'vitest'
 
 import { CSRF_HEADER } from '../../../lib/cookies'
-import { CampaignMembershipModel } from '../../campaign/campaign-membership.model'
-import { attachCharacterToCampaign } from '../../campaign/participation/campaign-character-participation.repository'
-import { createPcRecord } from '../../character/character.repository'
+import { attachCharacterToCampaign, CampaignMembershipModel } from '../../campaign'
+import { createPcRecord } from '../../character'
 import { minimalStandalonePcInput } from '../../../test/fixtures/characters'
 import { createTestCampaign, registerAndLoginTestUser } from '../../../test/auth-agent'
 import { useIntegrationApp } from '../../../test/setup/integration-app'

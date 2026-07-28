@@ -12,4 +12,6 @@ export {
 } from './content-types'
 export { resolveCatalogForCampaign } from './content.service'
 export type { ContentTypeConfig } from './lib/content-type-config'
+export { attachCampaignAccessForTargetType } from './lib/content-campaign-access.service'
 export { getHomebrewContentSummary } from './lib/homebrew-summary.service'
+export { resolveSubclassesForCampaign } from './subclasses/list-subclasses'

@@ -5,9 +5,12 @@ import { CSRF_HEADER } from '../../lib/cookies'
 import { createTestCampaign, registerAndLoginTestUser } from '../../test/auth-agent'
 import { minimalStandalonePcInput } from '../../test/fixtures/characters'
 import { useIntegrationApp } from '../../test/setup/integration-app'
-import { generateInviteToken, hashInviteToken } from '../campaign-invite/campaign-invite-token'
-import { computeInviteExpiresAt } from '../campaign-invite/campaign-invite.lib'
-import { createInviteRecord } from '../campaign-invite/campaign-invite.repository'
+import {
+  computeInviteExpiresAt,
+  createInviteRecord,
+  generateInviteToken,
+  hashInviteToken,
+} from '../campaign-invite'
 
 const getApp = useIntegrationApp()
 const TEST_PASSWORD = 'supersecret'

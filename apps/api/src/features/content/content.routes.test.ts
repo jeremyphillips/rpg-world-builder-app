@@ -4,7 +4,7 @@ import { describe, expect, it } from 'vitest'
 import { CHILL_TOUCH_RESOLUTION, ELDRITCH_BLAST_RESOLUTION } from '@rpg/contracts'
 
 import { CSRF_HEADER } from '../../lib/cookies'
-import { createPcRecord } from '../character/character.repository'
+import { createPcRecord } from '../character'
 import { createTestCampaign, registerAndLoginTestUser } from '../../test/auth-agent'
 import { registerCampaignMember } from '../../test/helpers/campaign-membership'
 import { minimalStandalonePcInput } from '../../test/fixtures/characters'
