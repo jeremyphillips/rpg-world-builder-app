@@ -19,15 +19,19 @@ export function resetMongoTransactionState(): void {
 }
 
 export async function detectMongoTransactionSupport(): Promise<boolean> {
-  const session = await mongoose.startSession()
+  const db = mongoose.connection.db
+  if (!db) return false
+
   try {
-    session.startTransaction()
-    await session.abortTransaction()
-    return true
+    const hello = (await db.admin().command({ hello: 1 })) as {
+      setName?: string
+      msg?: string
+    }
+
+    // Standalone mongod has neither a replica set name nor the mongos marker.
+    return Boolean(hello.setName) || hello.msg === 'isdbgrid'
   } catch {
     return false
-  } finally {
-    await session.endSession()
   }
 }
 
