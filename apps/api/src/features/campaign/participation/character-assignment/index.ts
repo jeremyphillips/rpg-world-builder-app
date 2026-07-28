@@ -14,6 +14,7 @@ export {
   CampaignCharacterAssignmentFailureError,
 } from './campaign-character-assignment-failure.lib'
 export type { CampaignCharacterAssignmentFailure } from './campaign-character-assignment-failure.lib'
+export { runCampaignCharacterAssignmentAction } from './run-campaign-character-assignment-action.lib'
 export { resolveCampaignCharacterEligibilityContext } from './resolve-campaign-character-eligibility-context.lib'
 export type { CampaignCharacterEligibilityContext } from './resolve-campaign-character-eligibility-context.lib'
 export {

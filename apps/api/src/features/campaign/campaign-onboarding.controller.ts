@@ -1,26 +1,12 @@
 import type { Request, Response } from 'express'
 import type { CompleteCampaignOnboardingInput } from '@rpg/contracts'
 
-import {
-  isCampaignCharacterAssignmentFailureError,
-  mapCampaignCharacterAssignmentFailureToHttpError,
-} from './participation/character-assignment/campaign-character-assignment-failure.lib'
+import { runCampaignCharacterAssignmentAction } from './participation/character-assignment/run-campaign-character-assignment-action.lib'
 import {
   completeCampaignOnboardingForUser,
   getCampaignOnboardingContext,
   listEligibleCharactersForCampaignOnboarding,
 } from './campaign-onboarding.service'
-
-async function runOnboardingCompletion(action: () => Promise<unknown>): Promise<unknown> {
-  try {
-    return await action()
-  } catch (error) {
-    if (isCampaignCharacterAssignmentFailureError(error)) {
-      throw mapCampaignCharacterAssignmentFailureToHttpError(error.failure)
-    }
-    throw error
-  }
-}
 
 export async function getOnboardingContext(req: Request, res: Response): Promise<void> {
   const { campaignId } = req.params as { campaignId: string }
@@ -43,7 +29,7 @@ export async function listEligibleCharacters(req: Request, res: Response): Promi
 export async function completeOnboarding(req: Request, res: Response): Promise<void> {
   const { campaignId } = req.params as { campaignId: string }
   const body = req.body as CompleteCampaignOnboardingInput
-  const result = await runOnboardingCompletion(() =>
+  const result = await runCampaignCharacterAssignmentAction(() =>
     completeCampaignOnboardingForUser({
       campaignId,
       userId: req.user!.id,
