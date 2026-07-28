@@ -8,8 +8,13 @@ import {
 
 import type { ContentStatRowData } from '../../lib/detail/content-stat-rows'
 
-/** Builds label/value pairs for the feat detail stat section. */
-export function buildFeatStatRows(feat: Feat): ContentStatRowData[] {
+export type FeatDetailViewModel = {
+  statRows: ContentStatRowData[]
+  description?: string
+  repeatableNotes?: string
+}
+
+function buildFeatStatRows(feat: Feat): ContentStatRowData[] {
   const rows: ContentStatRowData[] = [
     {
       label: 'Category',
@@ -34,6 +39,15 @@ export function buildFeatStatRows(feat: Feat): ContentStatRowData[] {
   })
 
   return rows
+}
+
+export function buildFeatDetailViewModel(feat: Feat): FeatDetailViewModel {
+  return {
+    statRows: buildFeatStatRows(feat),
+    description: feat.description || undefined,
+    repeatableNotes:
+      feat.repeatable.allowed && feat.repeatable.notes ? feat.repeatable.notes : undefined,
+  }
 }
 
 /** Suffix stripped from category labels in overview tables (e.g. "Origin Feat" → "Origin"). */

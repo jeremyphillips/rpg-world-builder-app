@@ -3,6 +3,7 @@ packages:
   - 'packages/*'
   - 'tools/bench'
   - 'tools/vocab/term-audit'
+  - 'tools/content-types'
 
 allowBuilds:
   '@swc/core': true

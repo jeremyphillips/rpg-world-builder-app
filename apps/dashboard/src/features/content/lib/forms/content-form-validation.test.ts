@@ -17,13 +17,7 @@ import {
   type ContentFormDef,
 } from './content-form-registry'
 
-// Populate the registry.
-import '../../species/lib/species-form-def'
-import '../../classes/lib/class-form-def'
-import '../../skill-proficiencies/lib/skill-proficiency-form-def'
-import '../../equipment/lib/equipment-form-def'
-import '../../spells/lib/spell-form-def'
-import '../../feats/lib/feat-form-def'
+import './content-form-test-registry'
 
 import { createClassFormSchema } from '../../classes/lib/class-form-fields'
 import {

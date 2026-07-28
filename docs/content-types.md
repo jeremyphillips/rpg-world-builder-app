@@ -317,12 +317,11 @@ Shared lib under `apps/dashboard/src/features/content/lib/delete/`:
 ```
 packages/contracts/src/rpg/content/<type>.ts   ← Zod schemas, TypeScript types, DTOs
 packages/contracts/src/rpg/vocab/            ← closed-set reference terms (when needed)
+packages/catalog/src/<type>/                 ← System seed JSON + loadSeed* exports
+tools/content-types/                         ← CONTENT_TYPE_INTEGRATION_MANIFEST (metadata-only drift index)
 apps/api/src/features/content/
   <type>/
-    data/srd-cc-5.2.1/<type>.json  ← System seed data
-    seed.ts                        ← Validates JSON at module load, exports loaders
-    seed.test.ts                   ← Count + structural assertions
-    <type>.config.ts               ← *Registration (read + write wiring)
+    <type>.config.ts               ← *Registration (read + write wiring; imports @rpg/catalog)
     homebrew-<type>.model.ts       ← (when homebrew is needed) Mongoose schema
     <type>-patch.model.ts          ← (when patches are needed) Mongoose schema
   content-types.ts                 ← Single-line registry entry (*Registration)
@@ -331,6 +330,7 @@ apps/api/src/features/content/
 apps/dashboard/src/features/content/<type>/          ← single-word: spells/; multi-word: skill-proficiencies/
   api/<type>-api.ts                ← fetch wrapper
   hooks/use-<type>.ts              ← TanStack Query hook + query key
+  lib/<type>-display.ts            ← Detail view model (when detail page exists)
   lib/<type>-overview-columns.tsx  ← DataTable column/filter defs + stories
   routes/<type>-overview.tsx       ← Overview (list) page
   routes/<type>-detail.tsx         ← Detail page + stories
@@ -343,6 +343,23 @@ apps/dashboard/src/
   app/router.tsx                   ← React Router tree + breadcrumb handles
   features/homebrew/lib/hub/content-registry.ts  ← VISIBLE_SIDEBAR_CONTENT (sidebar + hub)
 ```
+
+### Integration manifest (`@rpg/content-types`)
+
+Semantic registries live in `@rpg/contracts` (`CONTENT_TYPE_KEYS`,
+`CONTENT_TYPE_TERMS`, `CONTENT_TYPE_CAPABILITIES`). Repository wiring metadata
+lives in **`tools/content-types/`** as `CONTENT_TYPE_INTEGRATION_MANIFEST` —
+path strings and flags only. Runtime registries remain authoritative; the
+manifest supports drift tests and future scaffolding.
+
+The manifest covers **top-level** `ContentTypeKey` values only. Nested resources
+(e.g. subclasses) are excluded until a separate nested-resource manifest exists.
+See [`tools/content-types/README.md`](../tools/content-types/README.md).
+
+When adding a type: extend `CONTENT_TYPE_KEYS` and terms in contracts, add a
+manifest entry (`satisfies Record<ContentTypeKey, …>` enforces completeness),
+then wire catalog, API, and dashboard layers. Per-layer drift tests fail when
+any surface drifts.
 
 ---
 
@@ -594,9 +611,9 @@ Rules specific to union-shaped types:
 - Keep a `KIND_ENTRIES` map (the `GameTermEntry` pattern) or `KIND_LABELS` map +
   `getXKindLabel(kind)` helper for kind display names and filter options.
 
-### 2. API seed data (`apps/api/src/features/content/<type>/data/srd-cc-5.2.1/`)
+### 2. Catalog seed data (`packages/catalog/src/<type>/`)
 
-Create `<type>.json` with an array of objects that satisfy `<type>Schema`. Every record must include all `contentMetaSchema` fields:
+Create seed JSON under `data/srd-cc-5.2.1/` with objects that satisfy `<type>Schema`. Every record must include all `contentMetaSchema` fields:
 
 ```json
 {
@@ -611,35 +628,26 @@ Create `<type>.json` with an array of objects that satisfy `<type>Schema`. Every
 }
 ```
 
-### 3. API seed loader (`apps/api/src/features/content/<type>/seed.ts`)
+Add a co-located `index.ts` that validates JSON at module load and exports
+`loadSeed<TypeName>s` / `seed<TypeName>Slugs`. See existing packages such as
+[`packages/catalog/src/species/index.ts`](../packages/catalog/src/species/index.ts)
+and [`packages/catalog/src/species/index.test.ts`](../packages/catalog/src/species/index.test.ts).
 
-```typescript
-import { z } from 'zod'
-import { <type>Schema } from '@rpg/contracts'
-import type { <TypeName>, SystemRulesetId } from '@rpg/contracts'
-import raw from './data/srd-cc-5.2.1/<type>.json'
+Register the catalog subpath in [`packages/catalog/package.json`](../packages/catalog/package.json)
+`exports` and add a manifest entry in
+[`tools/content-types/src/content-type-integration-manifest.ts`](../tools/content-types/src/content-type-integration-manifest.ts).
 
-const SRD_521 = z.array(<type>Schema).parse(raw)  // fails fast if JSON is malformed
+### 3. Catalog seed tests (`packages/catalog/src/<type>/index.test.ts`)
 
-const SEED_BY_RULESET = {
-  'srd-cc-5.2.1': SRD_521,
-} as const satisfies Record<SystemRulesetId, <TypeName>[]>
-
-export function loadSeed<TypeName>s(rulesetId: SystemRulesetId): <TypeName>[] {
-  return SEED_BY_RULESET[rulesetId]
-}
-
-export function seed<TypeName>Slugs(rulesetId: SystemRulesetId): ReadonlySet<string> {
-  return new Set(loadSeed<TypeName>s(rulesetId).map((r) => r.slug))
-}
-```
-
-Add `seed.test.ts` asserting:
+Assert:
 
 - Correct count of seed records.
 - All records use `source: 'system'`, `campaignId: null`, `rulesetId` matching input.
 - `id === \`${rulesetId}:${slug}\`` for every record.
 - Unique slugs.
+
+The API imports loaders from `@rpg/catalog/<type>` in each type's `*.config.ts`
+— it does not co-locate seed JSON under `apps/api`.
 
 ### 4. Mongoose models (when homebrew/patches are needed)
 
@@ -668,7 +676,7 @@ See `apps/api/src/features/content/classes/homebrew-class.model.ts` for the cano
 import type { <TypeName> } from '@rpg/contracts'
 import type { ContentTypeConfig } from '../lib/content-type-config'
 import type { OverlayPatch } from '../lib/resolve-catalog'
-import { loadSeed<TypeName>s, seed<TypeName>Slugs } from './seed'
+import { loadSeed<TypeName>s, seed<TypeName>Slugs } from '@rpg/catalog/<type>'
 import { <TypeName>PatchModel } from './<type>-patch.model'
 
 interface <TypeName>PatchRecord {
