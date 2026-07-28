@@ -4,9 +4,9 @@ import { describe, expect, it } from 'vitest'
 import { CHILL_TOUCH_RESOLUTION, ELDRITCH_BLAST_RESOLUTION } from '@rpg/contracts'
 
 import { CSRF_HEADER } from '../../lib/cookies'
-import { CampaignMembershipModel } from '../campaign/campaign-membership.model'
 import { createPcRecord } from '../character/character.repository'
 import { createTestCampaign, registerAndLoginTestUser } from '../../test/auth-agent'
+import { registerCampaignMember } from '../../test/helpers/campaign-membership'
 import { minimalStandalonePcInput } from '../../test/fixtures/characters'
 import { minimalNpcRequestInput } from '../../test/fixtures/npcs'
 import { setMembershipControlledPcs } from '../../test/helpers/campaign-participation'
@@ -122,31 +122,6 @@ describe('content draft visibility', () => {
     repeatable: { allowed: false },
   }
 
-  async function addCampaignMember(
-    campaignId: string,
-    email: string,
-    campaignRole: 'pc' | 'observer',
-  ) {
-    const member = await registerAndLoginTestUser(getApp(), {
-      email,
-      password: 'supersecret',
-      displayName: 'Campaign Member',
-    })
-    const meRes = await member.agent
-      .get('/api/auth/me')
-      .set(CSRF_HEADER, member.csrfToken)
-      .expect(200)
-    await CampaignMembershipModel.create({
-      campaignId,
-      userId: meRes.body.user.id as string,
-      campaignRole,
-      controlledCharacterIds: [],
-      invitedAt: new Date(),
-      joinedAt: new Date(),
-    })
-    return member
-  }
-
   it('includes drafts in list responses for campaign managers', async () => {
     const { agent, csrfToken } = await registerAndLoginTestUser(getApp(), {
       email: 'draft-owner@example.com',
@@ -186,7 +161,11 @@ describe('content draft visibility', () => {
       .expect(201)
 
     const draftId = createRes.body.feats.id as string
-    const member = await addCampaignMember(campaignId, 'draft-pc@example.com', 'pc')
+    const member = await registerCampaignMember(getApp(), {
+      campaignId,
+      email: 'draft-pc@example.com',
+      campaignRole: 'pc',
+    })
 
     const listRes = await member.agent
       .get(`/api/campaigns/${campaignId}/content/feats`)
@@ -767,32 +746,6 @@ describe('content campaign access discovery enforcement', () => {
     repeatable: { allowed: false },
   }
 
-  async function addCampaignMember(
-    campaignId: string,
-    email: string,
-    campaignRole: 'pc' | 'observer',
-    controlledCharacterIds: string[] = [],
-  ) {
-    const member = await registerAndLoginTestUser(getApp(), {
-      email,
-      password: 'supersecret',
-      displayName: 'Campaign Member',
-    })
-    const meRes = await member.agent
-      .get('/api/auth/me')
-      .set(CSRF_HEADER, member.csrfToken)
-      .expect(200)
-    await CampaignMembershipModel.create({
-      campaignId,
-      userId: meRes.body.user.id as string,
-      campaignRole,
-      controlledCharacterIds,
-      invitedAt: new Date(),
-      joinedAt: new Date(),
-    })
-    return member
-  }
-
   async function createPublishedFeat(
     campaignId: string,
     agent: Agent,
@@ -840,7 +793,12 @@ describe('content campaign access discovery enforcement', () => {
       .send({ available: true, visibilityMode: 'dm_only', participantIds: [] })
       .expect(200)
 
-    const member = await addCampaignMember(campaignId, 'discovery-pc@example.com', 'pc', ['pc-1'])
+    const member = await registerCampaignMember(getApp(), {
+      campaignId,
+      email: 'discovery-pc@example.com',
+      campaignRole: 'pc',
+      controlledCharacterIds: ['pc-1'],
+    })
 
     const listRes = await member.agent
       .get(`/api/campaigns/${campaignId}/content/feats`)
@@ -876,35 +834,34 @@ describe('content campaign access discovery enforcement', () => {
       'discovery-specific-feat',
     )
 
-    const grantedMember = await addCampaignMember(campaignId, 'discovery-granted@example.com', 'pc')
-    const deniedMember = await addCampaignMember(campaignId, 'discovery-denied@example.com', 'pc')
-
-    const grantedMeRes = await grantedMember.agent
-      .get('/api/auth/me')
-      .set(CSRF_HEADER, grantedMember.csrfToken)
-      .expect(200)
-    const deniedMeRes = await deniedMember.agent
-      .get('/api/auth/me')
-      .set(CSRF_HEADER, deniedMember.csrfToken)
-      .expect(200)
+    const grantedMember = await registerCampaignMember(getApp(), {
+      campaignId,
+      email: 'discovery-granted@example.com',
+      campaignRole: 'pc',
+    })
+    const deniedMember = await registerCampaignMember(getApp(), {
+      campaignId,
+      email: 'discovery-denied@example.com',
+      campaignRole: 'pc',
+    })
 
     const grantedPc = await createPcRecord(
       { ...minimalStandalonePcInput, name: 'Granted PC' },
-      grantedMeRes.body.user.id as string,
+      grantedMember.userId,
     )
     const deniedPc = await createPcRecord(
       { ...minimalStandalonePcInput, name: 'Denied PC' },
-      deniedMeRes.body.user.id as string,
+      deniedMember.userId,
     )
 
     await setMembershipControlledPcs({
       campaignId,
-      userId: grantedMeRes.body.user.id as string,
+      userId: grantedMember.userId,
       controlledCharacterIds: [grantedPc.id],
     })
     await setMembershipControlledPcs({
       campaignId,
-      userId: deniedMeRes.body.user.id as string,
+      userId: deniedMember.userId,
       controlledCharacterIds: [deniedPc.id],
     })
 
@@ -956,11 +913,11 @@ describe('content campaign access discovery enforcement', () => {
       .send({ available: true, visibilityMode: 'dm_only', participantIds: [] })
       .expect(200)
 
-    const observer = await addCampaignMember(
+    const observer = await registerCampaignMember(getApp(), {
       campaignId,
-      'discovery-observer@example.com',
-      'observer',
-    )
+      email: 'discovery-observer@example.com',
+      campaignRole: 'observer',
+    })
 
     const listRes = await observer.agent
       .get(`/api/campaigns/${campaignId}/content/feats`)
