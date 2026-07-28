@@ -1,18 +1,10 @@
-import type { CharacterBuilderStepId } from '../step-ids'
+import type { CharacterBuildValidationIssue } from '../../../character-builder/validation-issue'
+
+export type { CharacterBuildValidationIssue }
 
 export const CHARACTER_BUILD_VALIDATION_PHASES = ['draft', 'stepSubmit', 'finalSubmit'] as const
 
 export type CharacterBuildValidationPhase = (typeof CHARACTER_BUILD_VALIDATION_PHASES)[number]
-
-export type CharacterBuildValidationIssue = {
-  code: string
-  message: string
-  path?: string
-  stepId?: CharacterBuilderStepId
-  choiceSetId?: string
-  /** Magic-item grant review navigation — first incomplete allowance. */
-  allowanceId?: string
-}
 
 export type CharacterBuildValidationResult = {
   ok: boolean

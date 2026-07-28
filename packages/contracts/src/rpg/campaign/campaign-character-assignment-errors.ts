@@ -1,6 +1,7 @@
 import { z } from 'zod'
 
 import { isApiError } from '../../shared/errors'
+import { characterBuildValidationIssueSchema } from '../character-builder'
 import {
   characterCampaignBlockingIssueSchema,
   characterCampaignWarningSchema,
@@ -30,28 +31,6 @@ export const campaignInviteUnavailableReasonSchema = z.enum([
 ])
 
 export type CampaignInviteUnavailableReason = z.infer<typeof campaignInviteUnavailableReasonSchema>
-
-const campaignCharacterAssignmentBuilderStepIdSchema = z.enum([
-  'identity',
-  'species',
-  'class',
-  'abilities',
-  'proficiencies',
-  'equipment',
-  'spells',
-  'review',
-])
-
-export const characterBuildValidationIssueSchema = z.object({
-  code: z.string().min(1),
-  message: z.string().min(1),
-  path: z.string().optional(),
-  stepId: campaignCharacterAssignmentBuilderStepIdSchema.optional(),
-  choiceSetId: z.string().optional(),
-  allowanceId: z.string().optional(),
-})
-
-export type CharacterBuildValidationIssueWire = z.infer<typeof characterBuildValidationIssueSchema>
 
 export const campaignCharacterAssignmentBuildInvalidDetailsSchema = z.object({
   kind: z.literal('build_invalid'),

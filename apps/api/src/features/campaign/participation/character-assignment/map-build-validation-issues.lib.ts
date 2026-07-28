@@ -1,9 +1,7 @@
-import type { CharacterBuildValidationIssueWire } from '@rpg/contracts'
+import type { CharacterBuildValidationIssue } from '@rpg/contracts'
 import type { ZodError } from 'zod'
 
-export function zodIssuesToBuildValidationIssues(
-  error: ZodError,
-): CharacterBuildValidationIssueWire[] {
+export function zodIssuesToBuildValidationIssues(error: ZodError): CharacterBuildValidationIssue[] {
   return error.issues.map((issue) => ({
     code: 'invalid_field',
     message: issue.message,

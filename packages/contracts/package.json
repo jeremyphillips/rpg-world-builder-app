@@ -54,6 +54,10 @@
       "types": "./src/rpg/campaign/index.ts",
       "default": "./src/rpg/campaign/index.ts"
     },
+    "./rpg/character-builder": {
+      "types": "./src/rpg/character-builder/index.ts",
+      "default": "./src/rpg/character-builder/index.ts"
+    },
     "./public": {
       "types": "./src/public/index.ts",
       "default": "./src/public/index.ts"
