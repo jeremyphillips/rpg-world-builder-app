@@ -1,7 +1,7 @@
 import type { CampaignInvite, CampaignInvitePublicResolution } from '@rpg/contracts'
 
 import { HttpError } from '../../lib/http-error'
-import { createOrConfirmPlayerMembership } from '../campaign/participation/create-or-confirm-player-membership'
+import { createOrConfirmPlayerMembership } from '../campaign'
 import { maskInvitedEmail, normalizeInviteEmail } from './campaign-invite.lib'
 import { markInviteAccepted } from './campaign-invite.repository'
 import {

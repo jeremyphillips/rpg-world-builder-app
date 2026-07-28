@@ -3,7 +3,7 @@ import { isValidObjectId } from 'mongoose'
 
 import { HttpError } from '../../../lib/http-error'
 import { CampaignMembershipModel } from '../campaign-membership.model'
-import { findPcForUser } from '../../character/character.repository'
+import { findPcForUser } from '../../character'
 import {
   attachCharacterToCampaign,
   findOpenParticipationForCharacter,

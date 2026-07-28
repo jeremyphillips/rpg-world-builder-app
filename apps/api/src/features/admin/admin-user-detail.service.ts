@@ -1,6 +1,6 @@
 import type { AdminUserDetail, PlatformRole } from '@rpg/contracts'
 
-import { findUserWithActivityTimestampsById } from '../user/user.service'
+import { findUserWithActivityTimestampsById } from '../user'
 import { buildAdminUserDetail } from './admin-user-summary.service'
 
 export async function getAdminUserDetail(

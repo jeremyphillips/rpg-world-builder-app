@@ -13,9 +13,9 @@ import {
   deleteNpcById,
   findNpcById,
   findNpcsByIds,
-} from '../../character/character.repository'
-import { toNpcListCharacterSummary } from '../../character/to-npc-character'
-import { updateCharacterVital } from '../../character/character.service'
+  toNpcListCharacterSummary,
+  updateCharacterVital,
+} from '../../character'
 import { HttpError } from '../../../lib/http-error'
 import { assertNpcCreateRequestRestrictions } from './assert-npc-create'
 import {
@@ -62,7 +62,7 @@ export async function createCampaignNpc(
   }
 
   const joinedAt = new Date().toISOString()
-  let character = await createNpcRecord(serviceInput)
+  const character = await createNpcRecord(serviceInput)
 
   try {
     const participation = await createParticipation({

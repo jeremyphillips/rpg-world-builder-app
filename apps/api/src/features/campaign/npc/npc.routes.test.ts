@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import { CSRF_HEADER } from '../../../lib/cookies'
-import { CampaignMembershipModel } from '../../campaign/campaign-membership.model'
+import { CampaignMembershipModel } from '..'
 import { createTestCampaign, registerAndLoginTestUser } from '../../../test/auth-agent'
 import { minimalNpcRequestInput } from '../../../test/fixtures/npcs'
 import { useIntegrationApp } from '../../../test/setup/integration-app'
@@ -199,7 +199,7 @@ describe('campaign NPC routes', () => {
 
     const npcId = createRes.body.npc.character.id as string
 
-    const { CharacterModel } = await import('../../character/character.model')
+    const { CharacterModel } = await import('../../character')
     await CharacterModel.updateOne({ _id: npcId }, { $unset: { vital: '' } })
 
     const readRes = await agent

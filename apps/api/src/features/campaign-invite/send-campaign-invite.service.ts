@@ -2,8 +2,8 @@ import type { CampaignInviteAdminListItem } from '@rpg/contracts'
 
 import { HttpError } from '../../lib/http-error'
 import type { EmailProvider } from '../../services/email/email.types'
-import { findCampaignMembershipByCampaignAndUser } from '../campaign/participation/create-or-confirm-player-membership'
-import { findUserByEmail } from '../user/user.service'
+import { findCampaignMembershipByCampaignAndUser } from '../campaign'
+import { findUserByEmail } from '../user'
 import {
   CAMPAIGN_INVITE_ROTATION_COOLDOWN_MS,
   computeInviteExpiresAt,

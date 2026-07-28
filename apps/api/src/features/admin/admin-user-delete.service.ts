@@ -1,8 +1,7 @@
-import { deleteCharacterForUser, listCharactersForUser } from '../character/character.service'
-import { CampaignMembershipModel } from '../campaign/campaign-membership.model'
-import { CampaignInviteModel } from '../campaign-invite/campaign-invite.model'
-import { UserModel } from '../user/user.model'
-import type { UserWithActivityTimestamps } from '../user/user.service'
+import { deleteCharacterForUser, listCharactersForUser } from '../character'
+import { CampaignMembershipModel } from '../campaign'
+import { CampaignInviteModel } from '../campaign-invite'
+import { UserModel, type UserWithActivityTimestamps } from '../user'
 
 import {
   buildAdminUserDeletionPreview,

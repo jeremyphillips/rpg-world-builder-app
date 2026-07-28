@@ -3,7 +3,7 @@ import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
 import { describe, expect, it, vi } from 'vitest'
 
-import { HttpError } from '../../lib/http-error'
+import type { HttpError } from '../../lib/http-error'
 import { previewDndBeyondCharacter } from './dnd-beyond-acquisition.service'
 
 const fixturePath = join(

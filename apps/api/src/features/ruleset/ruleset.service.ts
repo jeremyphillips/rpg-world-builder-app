@@ -8,7 +8,7 @@ import { listLanguageSeedOptions } from '@rpg/catalog/vocabulary'
 
 import { HttpError } from '../../lib/http-error'
 import { getContentTypeConfig, isContentTypeName, type ContentTypeName } from '../content'
-import { resolveStoredMechanicsPatch } from '../vocabulary/ruleset-patch/mechanics-patch.service'
+import { resolveStoredMechanicsPatch } from '../vocabulary'
 
 export function assertSupportedRulesetId(rulesetId: string): asserts rulesetId is SystemRulesetId {
   if (!SYSTEM_RULESET_IDS.includes(rulesetId as SystemRulesetId)) {

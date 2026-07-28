@@ -8,14 +8,13 @@ import {
 } from '@rpg/contracts'
 import { loadSeedSubclasses } from '@rpg/catalog/classes'
 
-import { enrichPcsWithOpenCampaign } from '../character/enrich-pcs-with-open-campaign.lib'
-import { listCharactersForUser } from '../character/character.service'
+import { enrichPcsWithOpenCampaign, listCharactersForUser } from '../character'
 import {
   buildCampaignContentEligibilityMap,
   formatInviteCharacterSummary,
-} from '../campaign-invite/campaign-invite-eligibility.lib'
-import { listSystemContentForRuleset } from '../ruleset/ruleset.service'
-import type { ContentTypeName } from '../content/content-types'
+} from '../campaign-invite'
+import { listSystemContentForRuleset } from '../ruleset'
+import type { ContentTypeName } from '../content'
 
 type EligibilityContentRow = {
   id: string

@@ -6,11 +6,11 @@ import {
 
 import { findCampaignById } from '../../find-campaign-by-id'
 import { findOpenParticipationForCharacter } from '../campaign-character-participation.repository'
-import { listCharactersForUser } from '../../../character/character.service'
+import { listCharactersForUser } from '../../../character'
 import {
   buildCampaignContentEligibilityIndex,
   formatInviteCharacterSummary,
-} from '../../../campaign-invite/campaign-invite-eligibility.lib'
+} from '../../../campaign-invite'
 import { resolveCampaignCharacterEligibilityContext } from './resolve-campaign-character-eligibility-context.lib'
 
 export async function listEligibleCharactersForCampaign({

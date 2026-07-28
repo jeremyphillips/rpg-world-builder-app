@@ -2,13 +2,17 @@ import type { AdminUsersListQuery } from '@rpg/contracts'
 import { USER_RECENT_ACTIVITY_DAYS } from '@rpg/contracts'
 import type { SortOrder } from 'mongoose'
 
-import { UserModel, type UserSchemaType } from '../user/user.model'
+import {
+  toUserWithActivityTimestamps,
+  UserModel,
+  type UserSchemaType,
+  type UserWithActivityTimestamps,
+} from '../user'
 import {
   buildAdminUserListItem,
   getCampaignCountsForUsers,
   getCharacterCountsForUsers,
 } from './admin-user-summary.service'
-import { toUserWithActivityTimestamps, type UserWithActivityTimestamps } from '../user/user.service'
 
 type UserRecord = UserSchemaType & {
   _id: unknown

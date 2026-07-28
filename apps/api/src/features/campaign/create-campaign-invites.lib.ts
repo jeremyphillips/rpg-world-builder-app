@@ -1,9 +1,8 @@
 import type { CampaignInviteEmailsInput, CreateCampaignInviteDeliveryResult } from '@rpg/contracts'
 
 import { HttpError } from '../../lib/http-error'
-import { findSessionUserById } from '../user/user.service'
-import { normalizeInviteEmail } from '../campaign-invite/campaign-invite.lib'
-import { sendCampaignInvite } from '../campaign-invite/campaign-invite.service'
+import { findSessionUserById } from '../user'
+import { normalizeInviteEmail, sendCampaignInvite } from '../campaign-invite'
 
 function dedupeInviteRecipients(
   inviteEmails: CampaignInviteEmailsInput,

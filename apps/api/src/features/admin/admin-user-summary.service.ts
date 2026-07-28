@@ -7,11 +7,10 @@ import type {
   PlatformRole,
 } from '@rpg/contracts'
 
-import { CampaignMembershipModel } from '../campaign/campaign-membership.model'
-import { CampaignInviteModel } from '../campaign-invite/campaign-invite.model'
-import { CharacterModel } from '../character/character.model'
-import type { UserWithActivityTimestamps } from '../user/user.service'
-import { countSuperadminsExcluding } from '../user/user.service'
+import { CampaignMembershipModel } from '../campaign'
+import { CampaignInviteModel } from '../campaign-invite'
+import { CharacterModel } from '../character'
+import { countSuperadminsExcluding, type UserWithActivityTimestamps } from '../user'
 
 const EMPTY_CAMPAIGN_COUNTS: AdminUserCampaignCounts = {
   owned: 0,

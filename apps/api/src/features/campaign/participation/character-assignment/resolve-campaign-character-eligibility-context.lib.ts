@@ -1,7 +1,7 @@
 import type { CampaignContentEligibilityIndex } from '@rpg/contracts'
 
 import { getRulesetPatchRead } from '../../../vocabulary'
-import { buildCampaignContentEligibilityIndex } from '../../../campaign-invite/campaign-invite-eligibility.lib'
+import { buildCampaignContentEligibilityIndex } from '../../../campaign-invite'
 
 export type CampaignCharacterEligibilityContext = {
   startingLevel: number

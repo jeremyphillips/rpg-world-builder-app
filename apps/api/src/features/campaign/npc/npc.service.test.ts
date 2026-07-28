@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { createPcRecord } from '../../character/character.repository'
+import { createPcRecord } from '../../character'
 import { makeTestCampaign } from '../../../test/fixtures/campaigns'
 import { minimalStandalonePcInput } from '../../../test/fixtures/characters'
 import { makeTestUser } from '../../../test/fixtures/users'

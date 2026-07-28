@@ -4,8 +4,7 @@ import type {
   CampaignRole,
 } from '@rpg/contracts'
 
-import { CampaignMembershipModel } from '../campaign/campaign-membership.model'
-import { findCampaignById } from '../campaign/find-campaign-by-id'
+import { CampaignMembershipModel, findCampaignById } from '../campaign'
 
 type MembershipRecord = {
   campaignId: string

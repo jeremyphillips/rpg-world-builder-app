@@ -5,13 +5,13 @@ import type {
 } from '@rpg/contracts'
 import { CAMPAIGN_ROLES } from '@rpg/contracts'
 
-import { findPcsByIds, findPcOwnerIdsByCharacterIds } from '../character/character.repository'
+import { findPcsByIds, findPcOwnerIdsByCharacterIds } from '../character'
 import {
   buildCampaignContentEligibilityMap,
   formatInviteCharacterSummary,
-} from '../campaign-invite/campaign-invite-eligibility.lib'
+} from '../campaign-invite'
+import { findUsersByIds } from '../user'
 import { HttpError } from '../../lib/http-error'
-import { findUsersByIds } from '../user/user.service'
 import { CampaignMembershipModel } from './campaign-membership.model'
 import { findCampaignById } from './find-campaign-by-id'
 import { listOpenParticipationsForCampaign } from './participation/campaign-character-participation.repository'

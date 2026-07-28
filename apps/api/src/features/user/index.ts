@@ -1,9 +1,11 @@
 export { userRouter } from './user.routes'
+export { UserModel, type UserSchemaType } from './user.model'
 export {
   createUser,
   findUserByEmail,
   findUserByEmailWithSecret,
   findSessionUserById,
+  findUsersByIds,
   findUserWithActivityTimestampsById,
   countSuperadminsExcluding,
   recordUserLoginActivity,

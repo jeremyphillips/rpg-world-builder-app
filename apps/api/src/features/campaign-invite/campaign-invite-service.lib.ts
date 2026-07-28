@@ -2,8 +2,8 @@ import type { CampaignInvite, CampaignInviteAdminListItem } from '@rpg/contracts
 
 import { HttpError } from '../../lib/http-error'
 import type { EmailProvider } from '../../services/email/email.types'
-import { findCampaignById } from '../campaign/find-campaign-by-id'
-import { findSessionUserById } from '../user/user.service'
+import { findCampaignById } from '../campaign'
+import { findSessionUserById } from '../user'
 import { deliverCampaignInviteEmail } from './campaign-invite-delivery'
 import { expireInviteIfNeeded } from './campaign-invite.lib'
 import { findInviteById, findInviteByTokenHash } from './campaign-invite.repository'

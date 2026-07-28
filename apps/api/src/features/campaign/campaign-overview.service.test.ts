@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { createPcRecord } from '../character/character.repository'
+import { createPcRecord } from '../character'
 import { minimalStandalonePcInput } from '../../test/fixtures/characters'
 import { makeTestCampaign } from '../../test/fixtures/campaigns'
 import { makeTestUser } from '../../test/fixtures/users'
@@ -11,7 +11,7 @@ import {
   listCampaignMembersForOverview,
   listCampaignPartyForOverview,
 } from './campaign-overview.service'
-import { createOrConfirmPlayerMembership } from '../campaign/participation/create-or-confirm-player-membership'
+import { createOrConfirmPlayerMembership } from './participation/create-or-confirm-player-membership'
 
 describe('campaign overview service', () => {
   it('lists members with onboarding state derived from controlled characters', async () => {

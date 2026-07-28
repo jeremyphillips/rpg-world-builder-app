@@ -4,13 +4,13 @@ import type { ClientSession } from 'mongoose'
 import { areMongoTransactionsEnabled, runInTransaction } from '../../../../lib/mongo-transaction'
 import { CampaignMembershipModel } from '../../campaign-membership.model'
 import { warnCampaignOnboardingInviteAuditFailed } from '../../campaign-onboarding-observability.lib'
-import { markInviteCompleted } from '../../../campaign-invite/campaign-invite.repository'
+import { markInviteCompleted } from '../../../campaign-invite'
+import { createPcRecord, deletePcForUser } from '../../../character'
 import { assignControlledPcToCampaignMember } from '../assign-controlled-pc.service'
 import {
   deleteAllParticipationsForCharacter,
   detachOpenParticipation,
 } from '../campaign-character-participation.repository'
-import { createPcRecord, deletePcForUser } from '../../../character/character.repository'
 import type { CharacterAssignmentWriteReceipt } from './character-assignment-write-receipt'
 
 export type CampaignCharacterCompletionInvitePolicy = {

@@ -1,12 +1,12 @@
 import type { CampaignInvite } from '@rpg/contracts'
 
 import { findCampaignMembershipByCampaignAndUser } from './participation/create-or-confirm-player-membership'
-import { normalizeInviteEmail } from '../campaign-invite/campaign-invite.lib'
 import {
   findAcceptedInviteByCampaignAndEmail,
   findAcceptedInvitesByCampaignAndAcceptedUserId,
   findInviteById,
-} from '../campaign-invite/campaign-invite.repository'
+  normalizeInviteEmail,
+} from '../campaign-invite'
 import { warnCampaignOnboardingDuplicateAcceptedInvites } from './campaign-onboarding-observability.lib'
 
 function sortAcceptedInvitesByRecency(invites: CampaignInvite[]): CampaignInvite[] {
