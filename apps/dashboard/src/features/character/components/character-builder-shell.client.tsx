@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 
 import {
+  formatCharacterBuilderDraftRestoreRejectionMessage,
   isCampaignBuildContext,
   resolveBuilderLevelConstraints,
   type CharacterBuildCatalogIndex,
@@ -19,7 +20,7 @@ import type {
   CharacterBuilderStepId,
   CharacterBuildValidationIssue,
 } from '@rpg/contracts/rpg/character-builder'
-import { buttonVariants, Button, Heading, Spinner, Text } from '@rpg/ui'
+import { buttonVariants, Button, Heading, Spinner, Text, Alert } from '@rpg/ui'
 
 import { CampaignCharacterEligibilityAlert } from '@/features/campaign'
 import { useCompleteCampaignOnboarding } from '@/features/campaign/hooks/use-campaign-onboarding-eligible-characters'
@@ -113,6 +114,14 @@ export function CharacterBuilderShell({
   const isCreating = isCreatingPc || isCreatingNpc || isCompletingOnboarding
   const hasHydrated = useCharacterBuilderStore(context, (state) => state._hasHydrated)
   const hasPendingRestore = useCharacterBuilderStore(context, (state) => state.hasPendingRestore)
+  const rejectedDraftRestoreReason = useCharacterBuilderStore(
+    context,
+    (state) => state.rejectedDraftRestoreReason,
+  )
+  const clearRejectedDraftRestore = useCharacterBuilderStore(
+    context,
+    (state) => state.clearRejectedDraftRestore,
+  )
   const draft = useCharacterBuilderStore(context, (state) => state.draft)
   const patchDraft = useCharacterBuilderStore(context, (state) => state.patchDraft)
   const clearPersistedDraft = useCharacterBuilderStore(
@@ -389,6 +398,22 @@ export function CharacterBuilderShell({
   return (
     <>
       <CharacterBuilderDraftRestore context={context} />
+
+      {rejectedDraftRestoreReason ? (
+        <Alert
+          variant="warning"
+          title="Saved draft could not be restored"
+          description={formatCharacterBuilderDraftRestoreRejectionMessage(
+            rejectedDraftRestoreReason,
+          )}
+          actions={
+            <Button type="button" variant="ghost" size="sm" onClick={clearRejectedDraftRestore}>
+              Dismiss
+            </Button>
+          }
+          className="mb-4"
+        />
+      ) : null}
 
       <div className={characterBuilderShellRootClasses}>
         <header className={characterBuilderShellHeaderClasses}>

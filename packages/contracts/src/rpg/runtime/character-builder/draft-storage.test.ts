@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from 'vitest'
 
 import { createEmptyCharacterBuilderDraft, createPersistedCharacterBuilderState } from './draft'
 import {
+  formatCharacterBuilderDraftRestoreRejectionMessage,
   loadCharacterBuilderDraftFromStorage,
   resolveCharacterBuilderDraftKey,
   resolveCharacterBuilderDraftScope,
@@ -137,5 +138,14 @@ describe('loadCharacterBuilderDraftFromStorage', () => {
     })
 
     warnSpy.mockRestore()
+  })
+})
+
+describe('formatCharacterBuilderDraftRestoreRejectionMessage', () => {
+  it('returns user-facing copy for each rejection reason', () => {
+    expect(formatCharacterBuilderDraftRestoreRejectionMessage('malformed')).toContain('damaged')
+    expect(formatCharacterBuilderDraftRestoreRejectionMessage('version_mismatch')).toContain(
+      'older version',
+    )
   })
 })

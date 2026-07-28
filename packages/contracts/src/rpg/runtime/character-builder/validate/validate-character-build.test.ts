@@ -51,12 +51,16 @@ describe('validateCharacterBuild', () => {
     expect(result.issues.some((issue) => issue.code === 'name_required')).toBe(true)
   })
 
-  it('stepSubmit skips choice steps when resolvedChoiceSets is null', () => {
+  it('stepSubmit blocks choice steps when resolvedChoiceSets is null', () => {
     const result = validateCharacterBuild(makeCompleteDraft(), builderTestContext, 'stepSubmit', {
       stepId: 'proficiencies',
       resolvedChoiceSets: null,
     })
-    expect(result.ok).toBe(true)
+    expect(result.ok).toBe(false)
+    expect(result.issues.some((issue) => issue.code === 'choice_sets_loading')).toBe(true)
+    expect(result.issues[0]?.message).toBe(
+      formatFieldMessage(characterBuilderValidationMessages.choiceSetsLoading()),
+    )
   })
 
   it('enforces standard-array multiset only when method is standard-array', () => {

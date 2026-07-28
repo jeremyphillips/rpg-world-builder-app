@@ -23,9 +23,32 @@ export type CharacterBuilderDraftStorageLoadResult =
   | { status: 'empty' }
   | {
       status: 'rejected'
-      reason: 'scope_mismatch' | 'obsolete_format' | 'malformed' | 'version_mismatch'
+      reason: CharacterBuilderDraftStorageRejectionReason
       shouldClear: boolean
     }
+
+export type CharacterBuilderDraftStorageRejectionReason =
+  | 'scope_mismatch'
+  | 'obsolete_format'
+  | 'malformed'
+  | 'version_mismatch'
+
+const DRAFT_STORAGE_REJECTION_MESSAGES: Record<
+  CharacterBuilderDraftStorageRejectionReason,
+  string
+> = {
+  scope_mismatch:
+    'A saved draft belongs to a different campaign or character type and could not be restored.',
+  obsolete_format: 'A saved draft uses an outdated format and could not be restored.',
+  malformed: 'A saved draft was damaged and could not be restored.',
+  version_mismatch: 'A saved draft is from an older version and could not be restored.',
+}
+
+export function formatCharacterBuilderDraftRestoreRejectionMessage(
+  reason: CharacterBuilderDraftStorageRejectionReason,
+): string {
+  return DRAFT_STORAGE_REJECTION_MESSAGES[reason]
+}
 
 export function resolveCharacterBuilderDraftScope(
   context: Pick<CharacterBuildContext, 'characterKind' | 'rulesScope'>,

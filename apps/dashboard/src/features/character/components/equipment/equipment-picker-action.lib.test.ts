@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import {
   buildEquipmentPickerRowActionViewModel,
+  formatAcquisitionBlockerNote,
   formatPartialActionLabel,
 } from './equipment-picker-action.lib'
 
@@ -70,5 +71,14 @@ describe('equipment-picker-action.lib', () => {
         totalCostCp: 0,
       }),
     ).toBe('Add 1 with grant')
+  })
+
+  it('maps each acquisition blocker code to distinct copy', () => {
+    expect(formatAcquisitionBlockerNote({ code: 'duplicate_not_allowed' })).toContain('maximum')
+    expect(formatAcquisitionBlockerNote({ code: 'no_matching_grant' })).toContain('allowance')
+    expect(formatAcquisitionBlockerNote({ code: 'no_market_price' })).toBe('Not for sale')
+    expect(formatAcquisitionBlockerNote({ code: 'cannot_afford', shortfallCp: 100 })).toBe(
+      'Cannot afford',
+    )
   })
 })

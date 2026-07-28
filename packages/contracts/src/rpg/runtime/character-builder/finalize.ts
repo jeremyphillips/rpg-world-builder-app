@@ -16,7 +16,9 @@ import {
   mergeCharacterSpellEntries,
 } from './assembly/assemble-granted-spells'
 import { assembleStartingEquipment } from './assembly/assemble-starting-equipment'
+import { mapCreateInputZodIssueMessage } from './finalize-zod-issue-messages'
 import { validateCharacterBuild } from './validate/validate-character-build'
+import { validationIssue } from './validate/issue'
 import type { CharacterBuildValidationResult } from './validate/types'
 
 // ---------------------------------------------------------------------------
@@ -47,11 +49,80 @@ export function isCharacterBuildFinalizationError(
 }
 
 function zodIssuesToFinalizationIssues(error: ZodError): CharacterBuildValidationResult['issues'] {
-  return error.issues.map((issue) => ({
-    code: 'create_input_invalid',
-    message: issue.message,
-    path: issue.path.length > 0 ? issue.path.join('.') : undefined,
-  }))
+  return error.issues.map((issue) => {
+    const path = issue.path.length > 0 ? issue.path.join('.') : undefined
+    const mappedMessage = mapCreateInputZodIssueMessage(path, issue.code)
+
+    return {
+      code: 'create_input_invalid',
+      message: mappedMessage ?? issue.message,
+      path,
+    }
+  })
+}
+
+function resolveFinalizeCatalogIssues(
+  draft: CharacterBuilderDraft,
+  catalogIndex: ReturnType<typeof indexCharacterBuildCatalog>,
+): CharacterBuildValidationResult['issues'] {
+  const issues: CharacterBuildValidationResult['issues'] = []
+
+  const classId = draft.class.classId
+  if (!classId) {
+    issues.push(
+      validationIssue('class_required', characterBuilderValidationMessages.classRequired(), {
+        path: 'class.classId',
+        stepId: 'class',
+      }),
+    )
+  } else if (!catalogIndex.classes.get(classId)) {
+    issues.push(
+      validationIssue(
+        'class_not_in_catalog',
+        characterBuilderValidationMessages.classNotInCatalog(),
+        { path: 'class.classId', stepId: 'class' },
+      ),
+    )
+  }
+
+  const speciesId = draft.species.speciesId
+  if (!speciesId) {
+    issues.push(
+      validationIssue('species_required', characterBuilderValidationMessages.speciesRequired(), {
+        path: 'species.speciesId',
+        stepId: 'species',
+      }),
+    )
+  } else if (!catalogIndex.species.get(speciesId)) {
+    issues.push(
+      validationIssue(
+        'species_not_in_catalog',
+        characterBuilderValidationMessages.speciesNotInCatalog(),
+        { path: 'species.speciesId', stepId: 'species' },
+      ),
+    )
+  }
+
+  if (!draft.identity.name?.trim()) {
+    issues.push(
+      validationIssue('name_required', characterBuilderValidationMessages.nameRequired(), {
+        path: 'identity.name',
+        stepId: 'identity',
+      }),
+    )
+  }
+
+  if (!draft.identity.alignment) {
+    issues.push(
+      validationIssue(
+        'alignment_required',
+        characterBuilderValidationMessages.alignmentRequired(),
+        { path: 'identity.alignment', stepId: 'identity' },
+      ),
+    )
+  }
+
+  return issues
 }
 
 function parseCreateCharacterInput(input: unknown): CreateCharacterInput {
@@ -113,6 +184,12 @@ export function finalizeCharacterBuild(
 
   const choiceSets = options.resolvedChoiceSets ?? []
   const catalogIndex = indexCharacterBuildCatalog(context.catalog)
+
+  const catalogIssues = resolveFinalizeCatalogIssues(draft, catalogIndex)
+  if (catalogIssues.length > 0) {
+    throw new CharacterBuildFinalizationError(catalogIssues)
+  }
+
   const classId = draft.class.classId!
   const speciesId = draft.species.speciesId!
   const characterClass = catalogIndex.classes.get(classId)!

@@ -110,7 +110,16 @@ export function validateCharacterBuild(
     }
 
     if (!shouldValidateChoiceStep(stepId, options.resolvedChoiceSets)) {
-      return { ok: true, issues: [] }
+      return {
+        ok: false,
+        issues: [
+          validationIssue(
+            'choice_sets_loading',
+            characterBuilderValidationMessages.choiceSetsLoading(),
+            { stepId },
+          ),
+        ],
+      }
     }
 
     const issues = STEP_VALIDATORS[stepId](draft, context, choiceSets)

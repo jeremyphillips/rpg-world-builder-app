@@ -22,6 +22,7 @@ import {
   type ChoiceSet,
   type EquipmentPackageSwitchBlockingReason,
   type EquipmentPackageSwitchInventorySnapshot,
+  type EquipmentStepUnavailableReason,
   type ResolvedStartingEquipmentFunding,
   type StartingPackageConversionPreview,
 } from '@rpg/contracts'
@@ -34,21 +35,18 @@ import {
   buildMagicItemAcquisitionPatch,
   choiceSetsForEquipmentStep,
   findStartingEquipmentChoiceSet,
-  hasGoldStartingEquipmentOption,
   readEquipmentPurchaseQuantity,
   readSelectedStartingEquipmentOption,
   resolveEquipmentStepBudget,
   resolveEquipmentStepPickerItems,
   resolvePurchaseSourceMode,
   resolveStartingGoldPurchaseId,
-  shouldShowEquipmentBudget,
-  shouldShowEquipmentFallback,
   shouldShowEquipmentPurchaseWorkflow,
-  shouldShowEquipmentShopping,
   type EquipmentPickerWorkflowMode,
 } from '../../lib/equipment-step.lib'
 import { useEquipmentMagicItemWorkflow } from './use-equipment-magic-item-workflow.client'
 import { withChoiceSetSelections } from '../../lib/choice-set-selections'
+import { resolveEquipmentStepSurface } from '../../lib/resolve-equipment-step-surface.lib'
 import { resolveEquipmentPickerCharacterPreviewContext } from '../equipment/equipment-picker-character-preview.lib'
 import type { EquipmentPickerDrawer } from '../equipment/equipment-picker-drawer.client'
 import type { EquipmentStepInventorySectionProps } from './equipment-step-sections.client'
@@ -65,34 +63,6 @@ export type PendingEquipmentPackageSwitch = {
   committedInventorySnapshot: EquipmentPackageSwitchInventorySnapshot
   commitErrorReason?: EquipmentPackageSwitchBlockingReason
   staleNotice?: boolean
-}
-
-function resolveEquipmentStepSurface(args: {
-  draft: CharacterBuilderDraft
-  characterClass: CharacterClass | undefined
-  fundingByOptionId: ReadonlyMap<string, ResolvedStartingEquipmentFunding>
-  stepModel: ReturnType<typeof resolveEquipmentStepModel> | undefined
-  summaries: ReturnType<typeof resolveStartingEquipmentOptionSummaries>
-  selectedOptionId: string | undefined
-}) {
-  const { draft, characterClass, fundingByOptionId, stepModel, summaries, selectedOptionId } = args
-  const fallbackFunding = [...fundingByOptionId.values()][0]
-  const classOptionPolicy =
-    stepModel?.currentFunding?.classOptionPolicy ?? fallbackFunding?.classOptionPolicy ?? 'included'
-  const classOptionsReplaced = classOptionPolicy === 'replaced'
-
-  return {
-    classOptionPolicy,
-    classOptionsReplaced,
-    tierLabel: stepModel?.currentFunding?.tierLabel ?? fallbackFunding?.tierLabel,
-    showFallback:
-      !classOptionsReplaced &&
-      shouldShowEquipmentFallback(summaries) &&
-      !hasGoldStartingEquipmentOption(summaries),
-    showBudget: shouldShowEquipmentBudget(draft, selectedOptionId),
-    showShopping:
-      !classOptionsReplaced && shouldShowEquipmentShopping(draft, selectedOptionId, characterClass),
-  }
 }
 
 function resolveGoldOptionFundingFromClass(
@@ -142,6 +112,8 @@ export function useEquipmentStep(args: {
   const [conversionCommitStatusMessage, setConversionCommitStatusMessage] = useState<
     string | undefined
   >(undefined)
+  const [blockedEquipmentActionReason, setBlockedEquipmentActionReason] =
+    useState<EquipmentStepUnavailableReason | null>(null)
   const [isPackageChooserExpanded, setIsPackageChooserExpanded] = useState(false)
 
   const classId = draft.class.classId
@@ -181,6 +153,18 @@ export function useEquipmentStep(args: {
     [catalogIndex, characterClass, draft, fundingByOptionId],
   )
   const selectedOptionId = readSelectedStartingEquipmentOption(draft, classId)
+  const equipmentStepSurfaceResult = resolveEquipmentStepSurface({
+    draft,
+    characterClass,
+    classId,
+    stepModel,
+    summaries,
+    selectedOptionId,
+  })
+  const equipmentStepUnavailableReason =
+    equipmentStepSurfaceResult.status === 'unavailable'
+      ? equipmentStepSurfaceResult.reason
+      : undefined
   const {
     classOptionPolicy,
     classOptionsReplaced,
@@ -188,14 +172,17 @@ export function useEquipmentStep(args: {
     showFallback,
     showBudget,
     showShopping,
-  } = resolveEquipmentStepSurface({
-    draft,
-    characterClass,
-    fundingByOptionId,
-    stepModel,
-    summaries,
-    selectedOptionId,
-  })
+  } =
+    equipmentStepSurfaceResult.status === 'available'
+      ? equipmentStepSurfaceResult.surface
+      : {
+          classOptionPolicy: 'included' as const,
+          classOptionsReplaced: false,
+          tierLabel: undefined,
+          showFallback: false,
+          showBudget: false,
+          showShopping: false,
+        }
   const budget = useMemo(
     () => (showBudget ? resolveEquipmentStepBudget(draft, catalogIndex, context) : undefined),
     [catalogIndex, context, draft, showBudget],
@@ -254,8 +241,14 @@ export function useEquipmentStep(args: {
   )
 
   const applySelection = (selection: PendingEquipmentSelection) => {
-    if (!classId || !startingEquipmentChoiceSet) return
+    if (!classId || !startingEquipmentChoiceSet || !characterClass) {
+      if (!characterClass && classId) {
+        setBlockedEquipmentActionReason('class_not_in_catalog')
+      }
+      return
+    }
 
+    setBlockedEquipmentActionReason(null)
     onDraftChange(
       buildEquipmentSelectionPatch({
         draft,
@@ -263,7 +256,7 @@ export function useEquipmentStep(args: {
         optionId: selection.optionId,
         choiceSetId: startingEquipmentChoiceSet.id,
         nestedSelections: selection.nestedSelections,
-        characterClass: characterClass!,
+        characterClass,
       }),
     )
     setIsPackageChooserExpanded(false)
@@ -274,7 +267,10 @@ export function useEquipmentStep(args: {
     nestedSelections: CharacterBuilderDraft['choiceSelections'],
   ) => {
     const targetFunding = resolveTargetFunding(optionId)
-    if (!targetFunding) return
+    if (!targetFunding) {
+      setBlockedEquipmentActionReason('funding_context_missing')
+      return
+    }
 
     const evaluation = evaluateEquipmentPackageSwitch({
       draft,
@@ -285,6 +281,8 @@ export function useEquipmentStep(args: {
     })
 
     if (!evaluation || evaluation.status === 'noConflict') return
+
+    setBlockedEquipmentActionReason(null)
 
     setPendingPackageSwitch({
       targetOptionId: optionId,
@@ -322,6 +320,7 @@ export function useEquipmentStep(args: {
 
     const targetFunding = resolveTargetFunding(pendingPackageSwitch.targetOptionId)
     if (!targetFunding) {
+      setBlockedEquipmentActionReason('funding_context_missing')
       dismissPackageSwitch()
       return
     }
@@ -704,5 +703,8 @@ export function useEquipmentStep(args: {
       })
     },
     readiness,
+    equipmentStepUnavailableReason,
+    blockedEquipmentActionReason,
+    clearBlockedEquipmentActionReason: () => setBlockedEquipmentActionReason(null),
   }
 }

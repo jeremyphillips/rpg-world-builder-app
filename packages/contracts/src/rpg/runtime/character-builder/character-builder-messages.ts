@@ -55,6 +55,18 @@ export const characterBuilderValidationMessages = {
         ? `Choose only one option for ${label}.`
         : `Choose at most ${max} options for ${label}.`,
   ),
+  choiceSetsLoading: defineMessage(
+    'validation.characterBuilder.choiceSetsLoading',
+    () => 'Character options are still loading. Try again in a moment.',
+  ),
+  classNotInCatalog: defineMessage(
+    'validation.characterBuilder.classNotInCatalog',
+    () => `Selected ${getContentTypeSentenceForm('classes')} is no longer available.`,
+  ),
+  speciesNotInCatalog: defineMessage(
+    'validation.characterBuilder.speciesNotInCatalog',
+    () => `Selected ${getContentTypeSentenceForm('species')} is no longer available.`,
+  ),
   chooseCantrips: defineMessage<{ count: number }>(
     'validation.characterBuilder.chooseCantrips',
     ({ count }) => (count === 1 ? 'Choose 1 more cantrip.' : `Choose ${count} more cantrips.`),

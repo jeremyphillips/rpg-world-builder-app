@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 
 import { ApiError, CharacterBuildFinalizationError } from '@rpg/contracts'
 
@@ -6,7 +6,10 @@ import {
   createCampaignPcBuilderContextFixture,
   createStandaloneBuilderContextFixture,
 } from './character-builder-fixtures'
-import { resolveBuilderCreateFailure } from './character-builder-create-error.lib'
+import {
+  applyBuilderCreateFailure,
+  resolveBuilderCreateFailure,
+} from './character-builder-create-error.lib'
 
 describe('resolveBuilderCreateFailure', () => {
   const inviteContext = createCampaignPcBuilderContextFixture()
@@ -81,5 +84,23 @@ describe('resolveBuilderCreateFailure', () => {
       kind: 'create_error',
       message: 'Save failed',
     })
+  })
+
+  it('defaults invite_unavailable to create_error when no handler is provided', () => {
+    const setCreateError = vi.fn()
+
+    applyBuilderCreateFailure(
+      { kind: 'invite_unavailable', reason: 'expired' },
+      {
+        applyValidationIssues: vi.fn(),
+        patchDraft: vi.fn(),
+        setCampaignEligibilityError: vi.fn(),
+        setCreateError,
+      },
+    )
+
+    expect(setCreateError).toHaveBeenCalledWith(
+      'This invitation has expired. Ask the campaign owner to send a new invite.',
+    )
   })
 })

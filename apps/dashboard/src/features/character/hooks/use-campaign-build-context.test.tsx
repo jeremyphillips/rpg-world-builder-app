@@ -112,4 +112,16 @@ describe('useCampaignBuildContext', () => {
       characterKind: 'npc',
     })
   })
+
+  it('distinguishes loading from invalid acquisition combos', async () => {
+    const { result } = renderHook(() => useCampaignBuildContext('camp-1'), {
+      wrapper: makeQueryWrapper(),
+    })
+
+    expect(result.current.unavailable).toEqual({ kind: 'loading' })
+
+    await waitFor(() => expect(result.current.context).not.toBeNull())
+
+    expect(result.current.unavailable).toBeNull()
+  })
 })

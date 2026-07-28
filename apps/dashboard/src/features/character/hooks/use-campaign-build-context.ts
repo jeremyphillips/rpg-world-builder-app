@@ -22,6 +22,10 @@ import {
   campaignBuildContextQueryKey,
   fetchCampaignBuilderCatalog,
 } from '../api/campaign-content-client'
+import {
+  resolveCampaignBuildContextUnavailable,
+  type CampaignBuildContextUnavailable,
+} from '../lib/resolve-campaign-build-context-unavailable.lib'
 
 type UseCampaignCharacterBuildContextInput = {
   campaignId: string | undefined
@@ -29,6 +33,8 @@ type UseCampaignCharacterBuildContextInput = {
   ownershipTarget: CharacterOwnershipTarget | { type: 'user'; userId: string }
   acquisition: CharacterBuildAcquisition
 }
+
+export type { CampaignBuildContextUnavailable }
 
 export function useCampaignCharacterBuildContext({
   campaignId,
@@ -126,12 +132,25 @@ export function useCampaignCharacterBuildContext({
   const isError = patchQuery.isError || catalogQuery.isError
   const error = patchQuery.error ?? catalogQuery.error
 
+  const unavailable = resolveCampaignBuildContextUnavailable({
+    campaignId,
+    rulesetId,
+    isPending,
+    hasPatch: Boolean(patchQuery.data),
+    hasCatalog: Boolean(catalogQuery.data),
+    characterKind,
+    ownershipTarget,
+    acquisition,
+    context,
+  })
+
   return {
     context,
     catalogIndex,
     draftScope,
     storageKey,
     rulesetId,
+    unavailable,
     isPending,
     isError,
     isFetching: patchQuery.isFetching || catalogQuery.isFetching,

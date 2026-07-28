@@ -1,4 +1,5 @@
 import {
+  formatCampaignInviteUnavailableMessage,
   getErrorMessage,
   isCampaignPcOnboardingBuildContext,
   isCharacterBuildFinalizationError,
@@ -57,7 +58,11 @@ export function applyBuilderCreateFailure(
       handlers.patchDraft({ currentStepId: 'review' })
       return
     case 'invite_unavailable':
-      handlers.onInviteUnavailable?.(outcome.reason)
+      if (handlers.onInviteUnavailable) {
+        handlers.onInviteUnavailable(outcome.reason)
+      } else {
+        handlers.setCreateError(formatCampaignInviteUnavailableMessage(outcome.reason))
+      }
       return
     case 'create_error':
       handlers.setCreateError(outcome.message)

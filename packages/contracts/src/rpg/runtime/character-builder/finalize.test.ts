@@ -167,6 +167,27 @@ describe('finalizeCharacterBuild', () => {
     ).toThrow(CharacterBuildFinalizationError)
   })
 
+  it('throws validation issues when catalog entries are missing after validation', () => {
+    const draft = makeCompleteDraft({
+      class: { classId: 'missing-class', level: 1 },
+      species: { speciesId: 'missing-species' },
+    })
+
+    try {
+      finalizeCharacterBuild(draft, builderTestContext)
+      expect.fail('expected finalization to fail')
+    } catch (error) {
+      expect(error).toBeInstanceOf(CharacterBuildFinalizationError)
+      const finalizationError = error as CharacterBuildFinalizationError
+      expect(
+        finalizationError.validationIssues.some((issue) => issue.code === 'class_not_in_catalog'),
+      ).toBe(true)
+      expect(
+        finalizationError.validationIssues.some((issue) => issue.code === 'species_not_in_catalog'),
+      ).toBe(true)
+    }
+  })
+
   it('isCharacterBuildFinalizationError recognizes errors across module instances', () => {
     try {
       finalizeCharacterBuild(createEmptyCharacterBuilderDraft(), builderTestContext)
