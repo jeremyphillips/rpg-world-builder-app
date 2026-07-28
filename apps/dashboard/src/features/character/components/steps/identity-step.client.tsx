@@ -1,7 +1,8 @@
 'use client'
 
 import { useMemo } from 'react'
-import type { CharacterBuilderDraft, CharacterBuildValidationIssue } from '@rpg/contracts'
+import type { CharacterBuilderDraft } from '@rpg/contracts'
+import type { CharacterBuildValidationIssue } from '@rpg/contracts/rpg/character-builder'
 import { Form } from '@rpg/ui/form'
 
 import { identityFormFields, identityFormSchema } from '../../lib/steps/identity-form-fields'

@@ -8,9 +8,11 @@ import {
   DEFAULT_ABILITY_GENERATION_RULES,
   indexCharacterBuildCatalog,
   resolveAvailableChoices,
-  type CharacterBuilderStepId,
-  type CharacterBuildValidationIssue,
 } from '@rpg/contracts'
+import type {
+  CharacterBuilderStepId,
+  CharacterBuildValidationIssue,
+} from '@rpg/contracts/rpg/character-builder'
 
 import { createPopulatedStandaloneBuilderContextFixture } from '../lib/character-builder-fixtures'
 import { createSpellsStepContextFixture } from '../lib/spells-step.fixtures'

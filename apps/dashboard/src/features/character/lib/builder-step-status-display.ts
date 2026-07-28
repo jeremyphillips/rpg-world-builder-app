@@ -1,4 +1,5 @@
-import type { BuilderStepStatus, CharacterBuilderStepId } from '@rpg/contracts'
+import type { BuilderStepStatus } from '@rpg/contracts'
+import type { CharacterBuilderStepId } from '@rpg/contracts/rpg/character-builder'
 
 export const BUILDER_STEP_STATUS_LABELS: Record<BuilderStepStatus, string> = {
   complete: 'Complete',

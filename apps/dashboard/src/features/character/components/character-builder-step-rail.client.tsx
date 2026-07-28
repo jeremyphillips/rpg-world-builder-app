@@ -7,10 +7,12 @@ import {
   type CharacterBuildCatalogIndex,
   type CharacterBuildContext,
   type CharacterBuilderDraft,
-  type CharacterBuilderStepId,
-  type CharacterBuildValidationIssue,
   type ChoiceSet,
 } from '@rpg/contracts'
+import type {
+  CharacterBuilderStepId,
+  CharacterBuildValidationIssue,
+} from '@rpg/contracts/rpg/character-builder'
 import { cn, Text } from '@rpg/ui'
 import { CheckCircle2, Circle, CircleAlert, CircleDot, Lock, type LucideIcon } from 'lucide-react'
 

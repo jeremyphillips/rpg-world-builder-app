@@ -6,17 +6,19 @@ import { Link, useNavigate } from 'react-router-dom'
 import {
   isCampaignBuildContext,
   resolveBuilderLevelConstraints,
-  type CharacterBuildAcquisition,
   type CharacterBuildCatalogIndex,
   type CharacterBuildContext,
   type CharacterBuilderDraft,
-  type CharacterBuilderStepId,
-  type CharacterBuildValidationIssue,
   type CharacterCampaignBlockingIssue,
   type CharacterCampaignWarning,
   type CampaignInviteUnavailableReason,
   type EquipmentPickerFocusIntent,
 } from '@rpg/contracts'
+import type {
+  CharacterBuildAcquisition,
+  CharacterBuilderStepId,
+  CharacterBuildValidationIssue,
+} from '@rpg/contracts/rpg/character-builder'
 import { buttonVariants, Button, Heading, Spinner, Text } from '@rpg/ui'
 
 import { CampaignCharacterEligibilityAlert } from '@/features/campaign'

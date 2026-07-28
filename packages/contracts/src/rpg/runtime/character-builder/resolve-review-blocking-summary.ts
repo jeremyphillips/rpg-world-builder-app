@@ -6,7 +6,7 @@ import {
 import type { ChoiceSet } from './choice-set'
 import type { CharacterBuildContext } from './context'
 import type { CharacterBuilderDraft } from './draft'
-import type { CharacterBuilderStepId } from './step-ids'
+import type { CharacterBuilderStepId } from '../../character-builder/step-ids'
 import { getBuilderStepLabel } from './steps'
 import type { EquipmentPickerFocusRequest } from './resolvers/equipment/equipment-picker-focus'
 import {

@@ -1,22 +1,7 @@
-import { z } from 'zod'
+import type { CharacterBuildAcquisition } from '../../character-builder/acquisition'
 
-// ---------------------------------------------------------------------------
-// Character build acquisition — drives finalize/orchestration behavior.
-// ---------------------------------------------------------------------------
-
-export const characterBuildAcquisitionSchema = z.discriminatedUnion('kind', [
-  z.object({ kind: z.literal('standalone') }),
-  z.object({
-    kind: z.literal('campaign_npc'),
-    campaignId: z.string().min(1),
-  }),
-  z.object({
-    kind: z.literal('campaign_pc_onboarding'),
-    campaignId: z.string().min(1),
-  }),
-])
-
-export type CharacterBuildAcquisition = z.infer<typeof characterBuildAcquisitionSchema>
+export type { CharacterBuildAcquisition } from '../../character-builder/acquisition'
+export { characterBuildAcquisitionSchema } from '../../character-builder/acquisition'
 
 export function resolveDefaultCharacterBuildAcquisition(
   context: {

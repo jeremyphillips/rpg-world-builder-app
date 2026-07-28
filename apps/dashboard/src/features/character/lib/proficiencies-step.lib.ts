@@ -1,8 +1,5 @@
-import {
-  STEP_CHOICE_TYPES_BY_STEP,
-  type ChoiceSet,
-  type CharacterBuilderStepId,
-} from '@rpg/contracts'
+import { STEP_CHOICE_TYPES_BY_STEP, type ChoiceSet } from '@rpg/contracts'
+import type { CharacterBuilderStepId } from '@rpg/contracts/rpg/character-builder'
 
 import {
   BUILDER_SELECTION_FULL_NOTICE,

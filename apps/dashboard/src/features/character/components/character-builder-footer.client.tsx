@@ -1,6 +1,6 @@
 'use client'
 
-import type { CharacterBuilderStepId } from '@rpg/contracts'
+import type { CharacterBuilderStepId } from '@rpg/contracts/rpg/character-builder'
 import { Button, Text } from '@rpg/ui'
 
 import {

@@ -1,4 +1,4 @@
-import type { CharacterBuilderStepId } from '@rpg/contracts'
+import type { CharacterBuilderStepId } from '@rpg/contracts/rpg/character-builder'
 
 export type BuilderFormContinueHandler = () => void | Promise<void>
 

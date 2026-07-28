@@ -4,9 +4,11 @@ import {
   createEmptyCharacterBuilderDraft,
   DEFAULT_ABILITY_GENERATION_RULES,
   indexCharacterBuildCatalog,
-  type CharacterBuilderStepId,
-  type CharacterBuildValidationIssue,
 } from '@rpg/contracts'
+import type {
+  CharacterBuilderStepId,
+  CharacterBuildValidationIssue,
+} from '@rpg/contracts/rpg/character-builder'
 
 import { createPopulatedStandaloneBuilderContextFixture } from '../lib/character-builder-fixtures'
 import { CharacterBuilderStepRail } from './character-builder-step-rail.client'

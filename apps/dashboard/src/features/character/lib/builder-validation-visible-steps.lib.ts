@@ -1,9 +1,5 @@
-import type {
-  CharacterBuildContext,
-  CharacterBuilderDraft,
-  CharacterBuilderStepId,
-  ChoiceSet,
-} from '@rpg/contracts'
+import type { CharacterBuildContext, CharacterBuilderDraft, ChoiceSet } from '@rpg/contracts'
+import type { CharacterBuilderStepId } from '@rpg/contracts/rpg/character-builder'
 
 import { validateBuilderStepSubmit } from './validate-builder-step'
 

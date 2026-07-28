@@ -6,11 +6,13 @@ import {
   type CampaignInviteUnavailableReason,
   type CharacterBuildContext,
   type CharacterBuilderDraft,
-  type CharacterBuilderStepId,
-  type CharacterBuildValidationIssue,
   type CharacterCampaignBlockingIssue,
   type CharacterCampaignWarning,
 } from '@rpg/contracts'
+import type {
+  CharacterBuilderStepId,
+  CharacterBuildValidationIssue,
+} from '@rpg/contracts/rpg/character-builder'
 
 export type BuilderCreateFailureOutcome =
   | { kind: 'validation'; issues: CharacterBuildValidationIssue[] }

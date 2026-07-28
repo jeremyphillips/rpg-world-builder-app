@@ -4,9 +4,9 @@ import {
   validateCharacterBuild,
   type CharacterBuildContext,
   type CharacterBuilderDraft,
-  type CharacterBuildValidationIssue,
   type ChoiceSet,
 } from '@rpg/contracts'
+import type { CharacterBuildValidationIssue } from '@rpg/contracts/rpg/character-builder'
 
 import { getBuilderChromeCopyForContext } from './builder-chrome-copy'
 

@@ -1,10 +1,10 @@
 import type {
   CharacterBuildContext,
   CharacterBuilderDraft,
-  CharacterBuildValidationIssue,
   ChoiceSet,
   EquipmentPickerFocusIntent,
 } from '@rpg/contracts'
+import type { CharacterBuildValidationIssue } from '@rpg/contracts/rpg/character-builder'
 
 export type EquipmentStepProps = {
   context: CharacterBuildContext

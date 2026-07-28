@@ -2,11 +2,13 @@ import {
   validateCharacterBuild,
   type CharacterBuildContext,
   type CharacterBuilderDraft,
-  type CharacterBuilderStepId,
-  type CharacterBuildValidationIssue,
   type CharacterBuildValidationResult,
   type ChoiceSet,
 } from '@rpg/contracts'
+import type {
+  CharacterBuilderStepId,
+  CharacterBuildValidationIssue,
+} from '@rpg/contracts/rpg/character-builder'
 
 export function validateBuilderStepSubmit(
   draft: CharacterBuilderDraft,

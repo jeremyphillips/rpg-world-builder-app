@@ -3,6 +3,7 @@ export {
   characterBuilderStepIdSchema,
   type CharacterBuilderStepId,
 } from './step-ids'
+export { characterBuildAcquisitionSchema, type CharacterBuildAcquisition } from './acquisition'
 export {
   characterBuildValidationIssueSchema,
   type CharacterBuildValidationIssue,

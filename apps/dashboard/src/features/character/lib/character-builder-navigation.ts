@@ -1,4 +1,5 @@
-import { BUILDER_STEPS, type CharacterBuilderStepId } from '@rpg/contracts'
+import { BUILDER_STEPS } from '@rpg/contracts'
+import type { CharacterBuilderStepId } from '@rpg/contracts/rpg/character-builder'
 
 export const DEFAULT_BUILDER_STEP_ID = 'identity' satisfies CharacterBuilderStepId
 

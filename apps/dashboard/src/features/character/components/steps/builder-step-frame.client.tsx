@@ -6,9 +6,11 @@ import {
   BUILDER_STEPS,
   characterBuilderValidationMessages,
   formatFieldMessage,
-  type CharacterBuilderStepId,
-  type CharacterBuildValidationIssue,
 } from '@rpg/contracts'
+import type {
+  CharacterBuilderStepId,
+  CharacterBuildValidationIssue,
+} from '@rpg/contracts/rpg/character-builder'
 import { Heading, Text } from '@rpg/ui'
 
 import { CharacterBuilderValidationAlert } from '../character-builder-validation-alert.client'

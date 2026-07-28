@@ -11,7 +11,10 @@ import type { CharacterBuildContext } from './context'
 import { getCharacterBuilderChromeMessages } from './character-builder-chrome-messages'
 import { resolveCharacterBuilderChromeVariant } from './character-builder-chrome-variant'
 import type { CharacterBuilderDraft } from './draft'
-import { CHARACTER_BUILDER_STEP_IDS, type CharacterBuilderStepId } from './step-ids'
+import {
+  CHARACTER_BUILDER_STEP_IDS,
+  type CharacterBuilderStepId,
+} from '../../character-builder/step-ids'
 
 // ---------------------------------------------------------------------------
 // BuilderStepStatus — the computed display state of a wizard step.

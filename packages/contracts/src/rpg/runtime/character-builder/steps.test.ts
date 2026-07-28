@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { CHARACTER_BUILDER_STEP_IDS } from './step-ids'
+import { CHARACTER_BUILDER_STEP_IDS } from '../../character-builder/step-ids'
 import {
   BUILDER_STEPS,
   CHOICE_STEP_IDS,

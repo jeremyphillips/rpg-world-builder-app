@@ -7,19 +7,21 @@ describe('characterBuildAcquisitionSchema', () => {
     expect(characterBuildAcquisitionSchema.parse({ kind: 'standalone' }).kind).toBe('standalone')
   })
 
-  it('parses campaign_npc acquisition', () => {
+  it('parses campaign npc acquisition', () => {
     const parsed = characterBuildAcquisitionSchema.parse({
       kind: 'campaign_npc',
-      campaignId: 'camp_1',
+      campaignId: 'campaign-1',
     })
-    expect(parsed).toEqual({ kind: 'campaign_npc', campaignId: 'camp_1' })
+
+    expect(parsed).toEqual({ kind: 'campaign_npc', campaignId: 'campaign-1' })
   })
 
-  it('parses campaign_pc_onboarding acquisition', () => {
+  it('parses campaign pc onboarding acquisition', () => {
     const parsed = characterBuildAcquisitionSchema.parse({
       kind: 'campaign_pc_onboarding',
-      campaignId: 'camp_1',
+      campaignId: 'campaign-1',
     })
-    expect(parsed).toEqual({ kind: 'campaign_pc_onboarding', campaignId: 'camp_1' })
+
+    expect(parsed).toEqual({ kind: 'campaign_pc_onboarding', campaignId: 'campaign-1' })
   })
 })

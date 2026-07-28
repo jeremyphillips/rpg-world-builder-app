@@ -6,8 +6,8 @@ import {
   resolveAbilityGenerationMethod,
   type CharacterBuildContext,
   type CharacterBuilderDraft,
-  type CharacterBuildValidationIssue,
 } from '@rpg/contracts'
+import type { CharacterBuildValidationIssue } from '@rpg/contracts/rpg/character-builder'
 import { Form } from '@rpg/ui/form'
 
 import {

@@ -1,6 +1,7 @@
 'use client'
 
-import { BUILDER_STEPS, type BuilderStepStatus, type CharacterBuilderStepId } from '@rpg/contracts'
+import { BUILDER_STEPS, type BuilderStepStatus } from '@rpg/contracts'
+import type { CharacterBuilderStepId } from '@rpg/contracts/rpg/character-builder'
 import { Heading, Text } from '@rpg/ui'
 
 import { characterBuilderStepPanelClasses } from './character-builder-shell.variants'

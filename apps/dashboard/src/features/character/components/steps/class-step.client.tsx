@@ -6,8 +6,8 @@ import {
   resolveAvailableContent,
   type CharacterBuildContext,
   type CharacterBuilderDraft,
-  type CharacterBuildValidationIssue,
 } from '@rpg/contracts'
+import type { CharacterBuildValidationIssue } from '@rpg/contracts/rpg/character-builder'
 import { Badge, BuilderOptionDetailsSheet, Button, RadioCard, Text } from '@rpg/ui'
 
 import {

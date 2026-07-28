@@ -9,11 +9,11 @@ import {
   type CampaignBuildContext,
   type CampaignNpcBuildContext,
   type CampaignPcBuildContext,
-  type CharacterBuildAcquisition,
   type CharacterBuilderDraftScope,
   type CharacterOwnershipTarget,
   type SystemRulesetId,
 } from '@rpg/contracts'
+import type { CharacterBuildAcquisition } from '@rpg/contracts/rpg/character-builder'
 
 import { useCampaigns } from '@/features/campaign'
 import { useRulesetPatch } from '@/features/homebrew'

@@ -1,11 +1,11 @@
 import {
   finalizeCharacterBuild,
   finalizeNpcCharacterBuild,
-  type CharacterBuildAcquisition,
   type CharacterBuildContext,
   type CharacterBuilderDraft,
   type ChoiceSet,
 } from '@rpg/contracts'
+import type { CharacterBuildAcquisition } from '@rpg/contracts/rpg/character-builder'
 
 import { ROUTES } from '@/app/routes'
 

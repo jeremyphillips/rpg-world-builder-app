@@ -8,9 +8,9 @@ import {
   type CharacterBuildContext,
   type CharacterBuilderDraft,
   type CharacterBuildPreview,
-  type CharacterBuildValidationIssue,
   type ChoiceSet,
 } from '@rpg/contracts'
+import type { CharacterBuildValidationIssue } from '@rpg/contracts/rpg/character-builder'
 
 import {
   isBuilderStepReadinessMessageOnly,

@@ -3,12 +3,14 @@
 import type {
   CharacterBuildContext,
   CharacterBuilderDraft,
-  CharacterBuilderStepId,
   CharacterBuildPreview,
-  CharacterBuildValidationIssue,
   ChoiceSet,
   EquipmentPickerFocusIntent,
 } from '@rpg/contracts'
+import type {
+  CharacterBuilderStepId,
+  CharacterBuildValidationIssue,
+} from '@rpg/contracts/rpg/character-builder'
 import { AbilitiesStep } from './steps/abilities-step.client'
 import { ClassStep } from './steps/class-step.client'
 import { IdentityStep } from './steps/identity-step.client'

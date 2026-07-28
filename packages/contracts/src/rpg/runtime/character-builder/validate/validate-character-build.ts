@@ -3,7 +3,7 @@ import type { ChoiceSet } from '../choice-set'
 import type { CharacterBuildContext } from '../context'
 import type { CharacterBuilderDraft } from '../draft'
 import type { CharacterBuildEngineOptions } from '../engine-options'
-import type { CharacterBuilderStepId } from '../step-ids'
+import type { CharacterBuilderStepId } from '../../../character-builder/step-ids'
 import { BUILDER_STEPS, isChoiceStep } from '../steps'
 
 import { validationIssue } from './issue'

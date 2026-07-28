@@ -1,4 +1,5 @@
-import type { CharacterBuilderStepId, EquipmentPickerFocusIntent } from '@rpg/contracts'
+import type { EquipmentPickerFocusIntent } from '@rpg/contracts'
+import type { CharacterBuilderStepId } from '@rpg/contracts/rpg/character-builder'
 
 export type CharacterBuilderNavigateToStepOptions = {
   equipmentPickerFocus?: EquipmentPickerFocusIntent
