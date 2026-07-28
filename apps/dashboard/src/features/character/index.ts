@@ -18,7 +18,6 @@ export { useBuildContext, type BuildContextResult } from './hooks/use-build-cont
 export {
   useCampaignBuildContext,
   useCampaignCharacterBuildContext,
-  useCampaignInvitePcBuildContext,
   useCampaignNpcBuildContext,
   type CampaignBuildContextResult,
 } from './hooks/use-campaign-build-context'

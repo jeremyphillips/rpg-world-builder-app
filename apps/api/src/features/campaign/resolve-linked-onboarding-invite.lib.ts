@@ -1,6 +1,6 @@
 import type { CampaignInvite } from '@rpg/contracts'
 
-import { findCampaignMembershipByCampaignAndUser } from '../campaign-invite/create-or-confirm-player-membership'
+import { findCampaignMembershipByCampaignAndUser } from './participation/create-or-confirm-player-membership'
 import { normalizeInviteEmail } from '../campaign-invite/campaign-invite.lib'
 import {
   findAcceptedInviteByCampaignAndEmail,

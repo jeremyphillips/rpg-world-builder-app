@@ -11,7 +11,7 @@ import {
   listCampaignMembersForOverview,
   listCampaignPartyForOverview,
 } from './campaign-overview.service'
-import { createOrConfirmPlayerMembership } from '../campaign-invite/create-or-confirm-player-membership'
+import { createOrConfirmPlayerMembership } from '../campaign/participation/create-or-confirm-player-membership'
 
 describe('campaign overview service', () => {
   it('lists members with onboarding state derived from controlled characters', async () => {

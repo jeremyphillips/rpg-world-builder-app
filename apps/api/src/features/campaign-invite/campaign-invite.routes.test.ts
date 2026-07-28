@@ -1,16 +1,10 @@
-import request, { type Agent } from 'supertest'
+import request from 'supertest'
 import { afterEach, describe, expect, it } from 'vitest'
 
 import { CSRF_HEADER } from '../../lib/cookies'
 import { registerAndLoginTestUser } from '../../test/auth-agent'
 import { createTestCampaign } from '../../test/auth-agent'
-import { minimalStandalonePcInput } from '../../test/fixtures/characters'
 import { useIntegrationApp } from '../../test/setup/integration-app'
-import {
-  createFakeEmailProvider,
-  getFakeEmailSentMessages,
-  resetFakeEmailSentMessages,
-} from '../../services/email/providers/fake-email.provider'
 import { setEmailProviderForTests } from '../../services/email/email.service'
 import { generateInviteToken, hashInviteToken } from './campaign-invite-token'
 import { computeInviteExpiresAt } from './campaign-invite.lib'
@@ -21,7 +15,6 @@ const TEST_PASSWORD = 'supersecret'
 
 afterEach(() => {
   setEmailProviderForTests(undefined)
-  resetFakeEmailSentMessages()
 })
 
 async function registerOwner(email: string) {
@@ -30,24 +23,6 @@ async function registerOwner(email: string) {
     password: TEST_PASSWORD,
     displayName: 'Campaign Owner',
   })
-}
-
-async function createCharacter(agent: Agent, csrfToken: string): Promise<string> {
-  const response = await agent
-    .post('/api/characters')
-    .set(CSRF_HEADER, csrfToken)
-    .send(minimalStandalonePcInput)
-    .expect(201)
-
-  return response.body.character.id as string
-}
-
-function extractInviteTokenFromEmail(text: string): string {
-  const match = text.match(/\/campaign-invites\/([0-9a-f]{64})/)
-  if (!match?.[1]) {
-    throw new Error('Invite token not found in email body.')
-  }
-  return match[1]
 }
 
 describe('campaign invite routes', () => {
@@ -147,96 +122,5 @@ describe('campaign invite routes', () => {
       .expect(200)
 
     expect(acceptResponse.body).toMatchObject({ campaignId })
-
-    const contextResponse = await player.agent
-      .get(`/api/campaign-invites/${acceptResponse.body.inviteId}/onboarding-context`)
-      .expect(200)
-
-    expect(contextResponse.body.context).toMatchObject({
-      status: 'accepted',
-      campaign: { id: campaignId, name: 'Accept Campaign' },
-      membership: { role: 'pc' },
-    })
-  })
-
-  it('lists eligible characters for an accepted invite', async () => {
-    const { agent, csrfToken } = await registerOwner('invite-eligible-owner@example.com')
-    const campaignId = await createTestCampaign(agent, csrfToken, 'Eligible Characters Campaign')
-    const rawToken = generateInviteToken()
-
-    const ownerSession = await agent.get('/api/auth/me')
-    const ownerId = ownerSession.body.user.id as string
-
-    await createInviteRecord({
-      campaignId,
-      email: 'invite-eligible-player@example.com',
-      normalizedEmail: 'invite-eligible-player@example.com',
-      tokenHash: hashInviteToken(rawToken),
-      expiresAt: computeInviteExpiresAt(),
-      invitedByUserId: ownerId,
-    })
-
-    const player = await registerAndLoginTestUser(getApp(), {
-      email: 'invite-eligible-player@example.com',
-      password: TEST_PASSWORD,
-      displayName: 'Eligible Player',
-    })
-
-    const acceptResponse = await player.agent
-      .post(`/api/campaign-invites/${rawToken}/accept`)
-      .set(CSRF_HEADER, player.csrfToken)
-      .expect(200)
-
-    const eligibleResponse = await player.agent
-      .get(`/api/campaign-invites/${acceptResponse.body.inviteId}/eligible-characters`)
-      .expect(200)
-
-    expect(Array.isArray(eligibleResponse.body.characters)).toBe(true)
-  })
-
-  it('completes invite onboarding end-to-end from send through existing character', async () => {
-    setEmailProviderForTests(createFakeEmailProvider())
-    const { agent, csrfToken } = await registerOwner('invite-e2e-owner@example.com')
-    const campaignId = await createTestCampaign(agent, csrfToken, 'E2E Invite Campaign')
-
-    await agent
-      .post(`/api/campaigns/${campaignId}/invites`)
-      .set(CSRF_HEADER, csrfToken)
-      .send({ email: 'invite-e2e-player@example.com' })
-      .expect(201)
-
-    const rawToken = extractInviteTokenFromEmail(getFakeEmailSentMessages()[0]?.text ?? '')
-
-    const player = await registerAndLoginTestUser(getApp(), {
-      email: 'invite-e2e-player@example.com',
-      password: TEST_PASSWORD,
-      displayName: 'E2E Player',
-    })
-    const characterId = await createCharacter(player.agent, player.csrfToken)
-
-    const acceptResponse = await player.agent
-      .post(`/api/campaign-invites/${rawToken}/accept`)
-      .set(CSRF_HEADER, player.csrfToken)
-      .expect(200)
-
-    const inviteId = acceptResponse.body.inviteId as string
-
-    const completeResponse = await player.agent
-      .post(`/api/campaign-invites/${inviteId}/complete-with-existing-character`)
-      .set(CSRF_HEADER, player.csrfToken)
-      .send({ characterId })
-      .expect(200)
-
-    expect(completeResponse.body).toMatchObject({ campaignId, characterId })
-
-    const contextResponse = await player.agent
-      .get(`/api/campaign-invites/${inviteId}/onboarding-context`)
-      .expect(200)
-
-    expect(contextResponse.body.context).toMatchObject({
-      status: 'completed',
-      campaignId,
-      characterId,
-    })
   })
 })

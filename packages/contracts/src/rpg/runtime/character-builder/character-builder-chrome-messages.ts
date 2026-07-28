@@ -56,7 +56,7 @@ const CHARACTER_BUILDER_CHROME_MESSAGES = {
     draftRestoreConfirmLabel: 'Continue previous draft',
     draftRestoreCancelLabel: 'Start over',
   },
-  campaign_invite_pc: {
+  campaign_onboarding_pc: {
     pageHeading: 'Create your campaign character',
     createLabel: 'Create campaign character',
     creatingLabel: 'Creating…',

@@ -12,7 +12,7 @@ Historical findings deliverable from before feature implementation. Confirmed **
 | --- | ------------------------------------ | --------------- | ---------------------------------------------------------------------------------------------------- |
 | 1   | `specific_players` / no-PC viewer    | **CONFIRMED**   | No contract change; `kind: 'none'` for accepted member with empty `controlledCharacterIds`           |
 | 2   | `CampaignBuildContext` union         | **IMPLEMENTED** | Discriminated union on `characterKind` + `ownershipTarget` (Phase 1)                                 |
-| 3   | Builder finalize + assign            | **IMPLEMENTED** | `campaign_pc_onboarding` (canonical) + legacy `campaign_invite` branch                               |
+| 3   | Builder finalize + assign            | **IMPLEMENTED** | `campaign_pc_onboarding` via membership-scoped onboarding completion                                 |
 | 4   | Explicit `userId` in create          | **IMPLEMENTED** | Invite completion calls `createPcRecord(input, userId)` directly; HTTP routes use session user       |
 | 5   | `assignControlledPcToCampaignMember` | **IMPLEMENTED** | Optional `ClientSession`; skips local `$pull` compensation when outer transaction owns rollback      |
 | 6   | Mongo topology                       | **CONFIRMED**   | Standalone Mongo in dev; compensating deletes for MVP completion flows when transactions unavailable |

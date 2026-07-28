@@ -4,7 +4,7 @@ import type {
 } from '@rpg/contracts'
 import { CAMPAIGN_CHARACTER_ASSIGNMENT_ERROR_CODE } from '@rpg/contracts'
 
-import { HttpError } from '../../lib/http-error'
+import { HttpError } from '../../../../lib/http-error'
 
 /** Service-layer failure before HTTP mapping — same shape as wire `error.details`. */
 export type CampaignCharacterAssignmentFailure = CampaignCharacterAssignmentErrorDetails

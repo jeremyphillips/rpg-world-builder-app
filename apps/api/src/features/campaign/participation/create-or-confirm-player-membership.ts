@@ -1,6 +1,6 @@
 import { CAMPAIGN_INVITE_MEMBERSHIP_ROLE } from '@rpg/contracts'
 
-import { CampaignMembershipModel } from '../campaign/campaign-membership.model'
+import { CampaignMembershipModel } from '../campaign-membership.model'
 
 export type PlayerMembershipResult = {
   id: string

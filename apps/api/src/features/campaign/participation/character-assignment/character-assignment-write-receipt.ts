@@ -1,4 +1,4 @@
-export type InviteCompletionWriteReceipt = {
+export type CharacterAssignmentWriteReceipt = {
   characterId: string
   createdCharacter: boolean
   createdParticipationId?: string

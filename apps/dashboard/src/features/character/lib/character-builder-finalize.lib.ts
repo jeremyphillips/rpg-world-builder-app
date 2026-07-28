@@ -19,9 +19,6 @@ export type FinalizeBuilderCharacterArgs = {
     input: ReturnType<typeof finalizeNpcCharacterBuild>
   }) => Promise<{ character: { id: string } }>
   createStandalonePc: (input: ReturnType<typeof finalizeCharacterBuild>) => Promise<{ id: string }>
-  completeInviteWithNewCharacter: (
-    input: ReturnType<typeof finalizeCharacterBuild>,
-  ) => Promise<{ campaignId: string; characterId: string }>
   completeCampaignOnboarding: (
     input: ReturnType<typeof finalizeCharacterBuild>,
   ) => Promise<{ campaignId: string; characterId: string }>
@@ -34,7 +31,6 @@ export async function finalizeBuilderCharacter({
   resolvedChoiceSets,
   createNpc,
   createStandalonePc,
-  completeInviteWithNewCharacter,
   completeCampaignOnboarding,
 }: FinalizeBuilderCharacterArgs): Promise<string> {
   switch (acquisition.kind) {
@@ -42,11 +38,6 @@ export async function finalizeBuilderCharacter({
       const input = finalizeNpcCharacterBuild(draft, context, { resolvedChoiceSets })
       const npc = await createNpc({ campaignId: acquisition.campaignId, input })
       return ROUTES.campaign.npcs.detail(acquisition.campaignId, npc.character.id)
-    }
-    case 'campaign_invite': {
-      const input = finalizeCharacterBuild(draft, context, { resolvedChoiceSets })
-      const result = await completeInviteWithNewCharacter(input)
-      return ROUTES.campaign.characters.detail(result.campaignId, result.characterId)
     }
     case 'campaign_pc_onboarding': {
       const input = finalizeCharacterBuild(draft, context, { resolvedChoiceSets })

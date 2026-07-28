@@ -4,7 +4,7 @@ import type {
   CreateCharacterInput,
 } from '@rpg/contracts'
 
-import { completeCampaignCharacterAssignment } from '../campaign-invite/complete-campaign-character-assignment.lib'
+import { completeCampaignCharacterAssignment } from './participation/character-assignment/complete-campaign-character-assignment.lib'
 import { resolveCampaignOnboardingCompletionContext } from './resolve-campaign-onboarding-completion-context.lib'
 import { resolveLinkedAcceptedInviteForOnboardingComplete } from './resolve-linked-onboarding-invite.lib'
 
@@ -44,7 +44,7 @@ export async function completeCampaignOnboardingWithCharacter(input: {
       input.characterSource.kind === 'new'
         ? { kind: 'new', characterInput: input.characterSource.character }
         : { kind: 'existing', characterId: input.characterSource.characterId },
-    invitePolicy: { kind: 'onboarding', linkedInviteId: linkedInvite?.id },
+    invitePolicy: { linkedInviteId: linkedInvite?.id },
   })
 }
 

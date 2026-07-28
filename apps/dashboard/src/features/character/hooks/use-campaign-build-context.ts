@@ -83,7 +83,7 @@ export function useCampaignCharacterBuildContext({
 
     if (
       characterKind === 'pc' &&
-      (acquisition.kind === 'campaign_invite' || acquisition.kind === 'campaign_pc_onboarding') &&
+      acquisition.kind === 'campaign_pc_onboarding' &&
       ownershipTarget.type === 'user' &&
       'userId' in ownershipTarget
     ) {
@@ -149,24 +149,6 @@ export function useCampaignNpcBuildContext(campaignId: string | undefined) {
     acquisition: campaignId
       ? { kind: 'campaign_npc', campaignId }
       : { kind: 'campaign_npc', campaignId: '' },
-  })
-}
-
-export function useCampaignInvitePcBuildContext(
-  campaignId: string | undefined,
-  inviteId: string | undefined,
-  userId: string | undefined,
-) {
-  const resolvedCampaignId = campaignId && inviteId && userId ? campaignId : undefined
-
-  return useCampaignCharacterBuildContext({
-    campaignId: resolvedCampaignId,
-    characterKind: 'pc',
-    ownershipTarget: userId ? { type: 'user', userId } : { type: 'user' },
-    acquisition:
-      campaignId && inviteId
-        ? { kind: 'campaign_invite', campaignId, inviteId }
-        : { kind: 'campaign_invite', campaignId: '', inviteId: '' },
   })
 }
 

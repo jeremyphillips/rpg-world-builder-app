@@ -6,7 +6,7 @@ import type {
 } from '@rpg/contracts'
 
 import { HttpError } from '../../lib/http-error'
-import { listEligibleCharactersForCampaign } from '../campaign-invite/list-campaign-eligible-characters.lib'
+import { listEligibleCharactersForCampaign } from './participation/character-assignment/list-campaign-eligible-characters.lib'
 import { findCampaignById } from './find-campaign-by-id'
 import { getRulesetPatchRead } from '../vocabulary'
 import { completeCampaignOnboarding } from './complete-campaign-onboarding-character.lib'

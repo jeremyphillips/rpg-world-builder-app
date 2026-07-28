@@ -1,6 +1,5 @@
 import { z } from 'zod'
 
-import { createCharacterInputSchema } from '../runtime/character/create-input'
 import { characterCampaignEligibilitySchema } from './eligibility/character-campaign-eligibility'
 
 // ---------------------------------------------------------------------------
@@ -31,20 +30,4 @@ export const completeCampaignCharacterAssignmentResultSchema = z.object({
 
 export type CompleteCampaignCharacterAssignmentResult = z.infer<
   typeof completeCampaignCharacterAssignmentResultSchema
->
-
-export const completeCampaignWithExistingCharacterInputSchema = z.object({
-  characterId: z.string().min(1),
-})
-
-export type CompleteCampaignWithExistingCharacterInput = z.infer<
-  typeof completeCampaignWithExistingCharacterInputSchema
->
-
-export const completeCampaignWithNewCharacterInputSchema = z.object({
-  characterCreateInput: createCharacterInputSchema,
-})
-
-export type CompleteCampaignWithNewCharacterInput = z.infer<
-  typeof completeCampaignWithNewCharacterInputSchema
 >

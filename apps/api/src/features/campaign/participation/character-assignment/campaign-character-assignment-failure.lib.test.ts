@@ -5,7 +5,7 @@ import { CAMPAIGN_CHARACTER_ASSIGNMENT_ERROR_CODE } from '@rpg/contracts'
 import {
   CampaignCharacterAssignmentFailureError,
   mapCampaignCharacterAssignmentFailureToHttpError,
-} from './campaign-invite-completion-failure.lib'
+} from './campaign-character-assignment-failure.lib'
 
 describe('mapCampaignCharacterAssignmentFailureToHttpError', () => {
   it('maps campaign_ineligible to 422 with structured details', () => {

@@ -19,10 +19,7 @@ import {
 } from '@rpg/contracts'
 import { buttonVariants, Button, Heading, Spinner, Text } from '@rpg/ui'
 
-import {
-  CampaignInviteEligibilityAlert,
-  useCompleteCampaignInviteWithNewCharacter,
-} from '@/features/campaign'
+import { CampaignInviteEligibilityAlert } from '@/features/campaign'
 import { useCompleteCampaignOnboarding } from '@/features/campaign/hooks/use-campaign-onboarding-eligible-characters'
 
 import { useResolvedChoiceSets } from '../hooks/use-resolved-choice-sets'
@@ -105,19 +102,13 @@ export function CharacterBuilderShell({
   const chrome = getBuilderChromeCopyForContext(context)
   const { mutateAsync: createCharacterMutation, isPending: isCreatingPc } = useCreateCharacter()
   const { mutateAsync: createNpcMutation, isPending: isCreatingNpc } = useCreateNpc()
-  const inviteId =
-    isCampaignBuildContext(context) && context.acquisition.kind === 'campaign_invite'
-      ? context.acquisition.inviteId
-      : undefined
   const onboardingCampaignId =
     isCampaignBuildContext(context) && context.acquisition.kind === 'campaign_pc_onboarding'
       ? context.acquisition.campaignId
       : undefined
-  const { mutateAsync: completeInviteWithNewCharacter, isPending: isCompletingInvite } =
-    useCompleteCampaignInviteWithNewCharacter(inviteId)
   const { mutateAsync: completeCampaignOnboarding, isPending: isCompletingOnboarding } =
     useCompleteCampaignOnboarding(onboardingCampaignId)
-  const isCreating = isCreatingPc || isCreatingNpc || isCompletingInvite || isCompletingOnboarding
+  const isCreating = isCreatingPc || isCreatingNpc || isCompletingOnboarding
   const hasHydrated = useCharacterBuilderStore(context, (state) => state._hasHydrated)
   const hasPendingRestore = useCharacterBuilderStore(context, (state) => state.hasPendingRestore)
   const draft = useCharacterBuilderStore(context, (state) => state.draft)
@@ -369,10 +360,6 @@ export function CharacterBuilderShell({
         resolvedChoiceSets,
         createNpc: createNpcMutation,
         createStandalonePc: createCharacterMutation,
-        completeInviteWithNewCharacter: async (input) => {
-          const result = await completeInviteWithNewCharacter(input)
-          return { campaignId: result.campaignId, characterId: result.characterId }
-        },
         completeCampaignOnboarding: async (input) => {
           const result = await completeCampaignOnboarding({ source: 'new', character: input })
           return { campaignId: result.campaignId, characterId: result.characterId }

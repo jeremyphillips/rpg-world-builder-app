@@ -34,7 +34,7 @@ describe('getBuilderChromeCopy', () => {
   })
 
   it('returns invite PC builder chrome without import routes', () => {
-    expect(getBuilderChromeCopy('campaign_invite_pc')).toMatchObject({
+    expect(getBuilderChromeCopy('campaign_onboarding_pc')).toMatchObject({
       pageHeading: 'Create your campaign character',
       createLabel: 'Create campaign character',
       exitHref: '#',

@@ -40,7 +40,6 @@ export { useCampaignTemplates, campaignTemplatesQueryKey } from './hooks/use-cam
 export { useSelectCampaign } from './hooks/use-select-campaign'
 export { useSyncActiveCampaign } from './hooks/use-sync-active-campaign'
 export { useCanManageCampaign } from './hooks/use-can-manage-campaign'
-export { useCompleteCampaignInviteWithNewCharacter } from './hooks/use-complete-campaign-invite-with-new-character'
 export { useUpdateCampaign } from './hooks/use-update-campaign'
 export { useCampaignStore } from './store/campaign-store'
 export { readStoredCampaignId } from './lib/navigation/selected-campaign-storage'

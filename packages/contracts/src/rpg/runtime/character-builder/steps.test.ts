@@ -466,9 +466,8 @@ describe('resolveBuilderStepDescription', () => {
       rulesScope: { type: 'campaign', campaignId: TEST_CAMPAIGN_ID, rulesetId: 'srd-cc-5.2.1' },
       ownershipTarget: { type: 'user', userId: 'user_1' },
       acquisition: {
-        kind: 'campaign_invite',
+        kind: 'campaign_pc_onboarding',
         campaignId: TEST_CAMPAIGN_ID,
-        inviteId: 'invite_1',
       },
     } satisfies CampaignPcBuildContext
 

@@ -8,7 +8,7 @@ import { CampaignInviteModel } from '../campaign-invite/campaign-invite.model'
 import { computeInviteExpiresAt } from '../campaign-invite/campaign-invite.lib'
 import { createInviteRecord } from '../campaign-invite/campaign-invite.repository'
 import { generateInviteToken, hashInviteToken } from '../campaign-invite/campaign-invite-token'
-import { createOrConfirmPlayerMembership } from '../campaign-invite/create-or-confirm-player-membership'
+import { createOrConfirmPlayerMembership } from '../campaign/participation/create-or-confirm-player-membership'
 import { CampaignMembershipModel } from './campaign-membership.model'
 import { removeIncompleteCampaignMember } from './remove-incomplete-campaign-member.service'
 

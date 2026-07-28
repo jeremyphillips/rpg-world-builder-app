@@ -4,7 +4,7 @@ import type { CompleteCampaignOnboardingInput } from '@rpg/contracts'
 import {
   isCampaignCharacterAssignmentFailureError,
   mapCampaignCharacterAssignmentFailureToHttpError,
-} from '../campaign-invite/campaign-invite-completion-failure.lib'
+} from './participation/character-assignment/campaign-character-assignment-failure.lib'
 import {
   completeCampaignOnboardingForUser,
   getCampaignOnboardingContext,

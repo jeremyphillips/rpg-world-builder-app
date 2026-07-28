@@ -25,16 +25,14 @@ membership is the source of truth for recoverable onboarding.
 
 Builder finalization branches on `context.acquisition.kind`:
 
-| Kind                     | When used                                      | Finalize path                                                      |
-| ------------------------ | ---------------------------------------------- | ------------------------------------------------------------------ |
-| `standalone`             | Sidebar PC build/import                        | `POST /api/characters`                                             |
-| `campaign_npc`           | Campaign NPC build/import                      | `POST /api/campaigns/:id/npcs`                                     |
-| `campaign_pc_onboarding` | Campaign membership onboarding (new character) | `POST /api/campaigns/:id/onboarding/complete`                      |
-| `campaign_invite`        | Legacy invite-scoped builder finalization      | `POST /api/campaign-invites/:inviteId/complete-with-new-character` |
+| Kind                     | When used                                      | Finalize path                                 |
+| ------------------------ | ---------------------------------------------- | --------------------------------------------- |
+| `standalone`             | Sidebar PC build/import                        | `POST /api/characters`                        |
+| `campaign_npc`           | Campaign NPC build/import                      | `POST /api/campaigns/:id/npcs`                |
+| `campaign_pc_onboarding` | Campaign membership onboarding (new character) | `POST /api/campaigns/:id/onboarding/complete` |
 
-The dashboard onboarding flow uses `campaign_pc_onboarding`. `campaign_invite`
-remains for the legacy invite-scoped API path; do not infer finalize routing from
-`characterKind` alone.
+The dashboard onboarding flow uses `campaign_pc_onboarding` exclusively for campaign
+PC builder finalization. Do not infer finalize routing from `characterKind` alone.
 
 ## Contracts layout
 

@@ -21,7 +21,7 @@ function resolveBuilderChromeRoutes(
   campaignId?: string,
 ): Pick<BuilderChromeCopy, 'exitHref' | 'importHref'> {
   switch (variant) {
-    case 'campaign_invite_pc':
+    case 'campaign_onboarding_pc':
       return { exitHref: '#', importHref: null }
     case 'campaign_npc': {
       if (!campaignId) {

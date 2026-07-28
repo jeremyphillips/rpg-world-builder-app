@@ -180,9 +180,8 @@ export function createCampaignPcBuilderContextFixture(
     rulesScope: { type: 'campaign', campaignId, rulesetId },
     ownershipTarget: { type: 'user', userId: 'user-test-1' },
     acquisition: {
-      kind: 'campaign_invite',
+      kind: 'campaign_pc_onboarding',
       campaignId,
-      inviteId: 'invite-test-1',
     },
     rulesetId,
     catalog: emptyCatalog,

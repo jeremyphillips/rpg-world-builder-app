@@ -2,7 +2,7 @@ import type { CampaignRole, CampaignViewerParticipationState } from '@rpg/contra
 import { resolveCampaignViewerParticipation } from '@rpg/contracts'
 
 import { listCharactersForUser } from '../character/character.service'
-import { findCampaignMembershipByCampaignAndUser } from '../campaign-invite/create-or-confirm-player-membership'
+import { findCampaignMembershipByCampaignAndUser } from './participation/create-or-confirm-player-membership'
 import { listOpenParticipationsForCampaign } from './participation/campaign-character-participation.repository'
 
 export type CampaignViewerParticipationContext = {

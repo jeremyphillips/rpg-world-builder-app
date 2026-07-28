@@ -8,13 +8,13 @@ import {
   assertNewCharacterBuildEligible,
   resolveExistingCharacterCandidate,
   resolveNewCharacterCandidate,
-} from './complete-campaign-invite-character.lib'
+} from './resolve-campaign-character-candidates.lib'
 import type { CampaignCharacterCompletionInvitePolicy } from './execute-campaign-character-completion.lib'
 import {
   executeExistingCharacterCompletion,
   executeNewCharacterCompletion,
 } from './execute-campaign-character-completion.lib'
-import { resolveCampaignInviteEligibilityContext } from './resolve-campaign-invite-eligibility-context.lib'
+import { resolveCampaignCharacterEligibilityContext } from './resolve-campaign-character-eligibility-context.lib'
 
 export type CampaignCharacterAssignmentCharacterSource =
   | { kind: 'new'; characterInput: CreateCharacterInput }
@@ -45,7 +45,7 @@ export async function completeCampaignCharacterAssignment({
           characterId: characterSource.characterId,
         })
 
-  const eligibilityContext = await resolveCampaignInviteEligibilityContext(campaignId)
+  const eligibilityContext = await resolveCampaignCharacterEligibilityContext(campaignId)
 
   if (candidate.kind === 'new') {
     await assertNewCharacterBuildEligible({

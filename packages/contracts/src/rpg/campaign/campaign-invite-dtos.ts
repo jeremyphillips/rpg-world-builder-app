@@ -40,42 +40,6 @@ export const campaignInviteShareLinkResultSchema = z.object({
 
 export type CampaignInviteShareLinkResult = z.infer<typeof campaignInviteShareLinkResultSchema>
 
-export const campaignInviteOnboardingAcceptedContextSchema = z.object({
-  status: z.literal('accepted'),
-  inviteId: z.string().min(1),
-  campaign: z.object({
-    id: z.string().min(1),
-    name: z.string().min(1),
-  }),
-  membership: z.object({
-    id: z.string().min(1),
-    role: z.literal('pc'),
-  }),
-  startingLevel: z.number().int().min(1),
-  expiresAt: z.iso.datetime(),
-})
-
-export type CampaignInviteOnboardingAcceptedContext = z.infer<
-  typeof campaignInviteOnboardingAcceptedContextSchema
->
-
-export const campaignInviteOnboardingCompletedContextSchema = z.object({
-  status: z.literal('completed'),
-  campaignId: z.string().min(1),
-  characterId: z.string().min(1),
-})
-
-export type CampaignInviteOnboardingCompletedContext = z.infer<
-  typeof campaignInviteOnboardingCompletedContextSchema
->
-
-export const campaignInviteOnboardingContextSchema = z.discriminatedUnion('status', [
-  campaignInviteOnboardingAcceptedContextSchema,
-  campaignInviteOnboardingCompletedContextSchema,
-])
-
-export type CampaignInviteOnboardingContext = z.infer<typeof campaignInviteOnboardingContextSchema>
-
 export const campaignPartyPcListItemSchema = z.object({
   character: characterCardViewModelSchema,
   member: z.object({

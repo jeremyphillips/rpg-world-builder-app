@@ -4,14 +4,14 @@ import {
   resolveCharacterCampaignEligibility,
 } from '@rpg/contracts'
 
-import { findCampaignById } from '../campaign/find-campaign-by-id'
-import { findOpenParticipationForCharacter } from '../campaign/participation/campaign-character-participation.repository'
-import { listCharactersForUser } from '../character/character.service'
+import { findCampaignById } from '../../find-campaign-by-id'
+import { findOpenParticipationForCharacter } from '../campaign-character-participation.repository'
+import { listCharactersForUser } from '../../../character/character.service'
 import {
   buildCampaignContentEligibilityIndex,
   formatInviteCharacterSummary,
-} from './campaign-invite-eligibility.lib'
-import { resolveCampaignInviteEligibilityContext } from './resolve-campaign-invite-eligibility-context.lib'
+} from '../../../campaign-invite/campaign-invite-eligibility.lib'
+import { resolveCampaignCharacterEligibilityContext } from './resolve-campaign-character-eligibility-context.lib'
 
 export async function listEligibleCharactersForCampaign({
   campaignId,
@@ -23,7 +23,7 @@ export async function listEligibleCharactersForCampaign({
   const [characters, contentIndex, startingLevel] = await Promise.all([
     listCharactersForUser(userId),
     buildCampaignContentEligibilityIndex(campaignId),
-    resolveCampaignInviteEligibilityContext(campaignId).then((value) => value.startingLevel),
+    resolveCampaignCharacterEligibilityContext(campaignId).then((value) => value.startingLevel),
   ])
 
   const results: CampaignEligibleCharacter[] = []

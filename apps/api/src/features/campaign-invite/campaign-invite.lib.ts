@@ -1,4 +1,8 @@
+import type { CampaignInvite } from '@rpg/contracts'
 import { CAMPAIGN_INVITE_EXPIRY_DAYS } from '@rpg/contracts'
+
+import { HttpError } from '../../lib/http-error'
+import { markInviteExpired } from './campaign-invite.repository'
 
 export const CAMPAIGN_INVITE_ROTATION_COOLDOWN_MS = 60_000
 
@@ -22,4 +26,18 @@ export function computeInviteExpiresAt(now = new Date()): Date {
 
 export function isInvitePastExpiry(expiresAt: string, now = new Date()): boolean {
   return new Date(expiresAt).getTime() <= now.getTime()
+}
+
+export async function expireInviteIfNeeded(invite: CampaignInvite): Promise<CampaignInvite> {
+  if (
+    (invite.status === 'pending' || invite.status === 'accepted') &&
+    isInvitePastExpiry(invite.expiresAt)
+  ) {
+    const expired = await markInviteExpired(invite.id)
+    if (!expired) {
+      throw new HttpError(500, 'internal_error', 'Failed to expire invite.')
+    }
+    return expired
+  }
+  return invite
 }

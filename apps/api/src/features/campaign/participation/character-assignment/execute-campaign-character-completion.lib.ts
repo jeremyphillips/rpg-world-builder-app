@@ -1,22 +1,21 @@
 import type { CompleteCampaignCharacterAssignmentResult } from '@rpg/contracts'
 import type { ClientSession } from 'mongoose'
 
-import { HttpError } from '../../lib/http-error'
-import { areMongoTransactionsEnabled, runInTransaction } from '../../lib/mongo-transaction'
-import { CampaignMembershipModel } from '../campaign/campaign-membership.model'
-import { assignControlledPcToCampaignMember } from '../campaign/participation/assign-controlled-pc.service'
+import { areMongoTransactionsEnabled, runInTransaction } from '../../../../lib/mongo-transaction'
+import { CampaignMembershipModel } from '../../campaign-membership.model'
+import { warnCampaignOnboardingInviteAuditFailed } from '../../campaign-onboarding-observability.lib'
+import { markInviteCompleted } from '../../../campaign-invite/campaign-invite.repository'
+import { assignControlledPcToCampaignMember } from '../assign-controlled-pc.service'
 import {
   deleteAllParticipationsForCharacter,
   detachOpenParticipation,
-} from '../campaign/participation/campaign-character-participation.repository'
-import { createPcRecord, deletePcForUser } from '../character/character.repository'
-import { findInviteById, markInviteCompleted } from './campaign-invite.repository'
-import type { InviteCompletionWriteReceipt } from './complete-campaign-invite-receipt'
-import { warnCampaignOnboardingInviteAuditFailed } from '../campaign/campaign-onboarding-observability.lib'
+} from '../campaign-character-participation.repository'
+import { createPcRecord, deletePcForUser } from '../../../character/character.repository'
+import type { CharacterAssignmentWriteReceipt } from './character-assignment-write-receipt'
 
-export type CampaignCharacterCompletionInvitePolicy =
-  | { kind: 'invite'; inviteId: string }
-  | { kind: 'onboarding'; linkedInviteId?: string | null }
+export type CampaignCharacterCompletionInvitePolicy = {
+  linkedInviteId?: string | null
+}
 
 export async function compensateCharacterCompletionFromReceipt({
   receipt,
@@ -24,7 +23,7 @@ export async function compensateCharacterCompletionFromReceipt({
   membershipId,
   userId,
 }: {
-  receipt: InviteCompletionWriteReceipt
+  receipt: CharacterAssignmentWriteReceipt
   campaignId: string
   membershipId: string
   userId?: string
@@ -60,29 +59,12 @@ async function executeCharacterCompletionWrites({
   invitePolicy: CampaignCharacterCompletionInvitePolicy
   session?: ClientSession
 }): Promise<void> {
-  if (invitePolicy.kind === 'invite') {
-    const inviteInTx = await findInviteById(invitePolicy.inviteId, { session })
-    if (!inviteInTx || inviteInTx.status !== 'accepted') {
-      throw new HttpError(409, 'conflict', 'Invitation is not ready for onboarding.')
-    }
-  }
-
   await assignControlledPcToCampaignMember({
     campaignId,
     membershipId,
     characterId,
     session,
   })
-
-  if (invitePolicy.kind === 'invite') {
-    const completed = await markInviteCompleted(invitePolicy.inviteId, characterId, new Date(), {
-      session,
-    })
-    if (!completed) {
-      throw new HttpError(500, 'internal_error', 'Failed to complete invitation.')
-    }
-    return
-  }
 
   if (!invitePolicy.linkedInviteId) return
 
@@ -101,13 +83,6 @@ async function executeCharacterCompletionWrites({
   }
 }
 
-function resolveMarkedInviteCompleted(
-  invitePolicy: CampaignCharacterCompletionInvitePolicy,
-): boolean {
-  if (invitePolicy.kind === 'invite') return true
-  return Boolean(invitePolicy.linkedInviteId)
-}
-
 async function runCharacterCompletionAtomically({
   campaignId,
   membershipId,
@@ -120,10 +95,10 @@ async function runCharacterCompletionAtomically({
   membershipId: string
   characterId: string
   invitePolicy: CampaignCharacterCompletionInvitePolicy
-  receipt: InviteCompletionWriteReceipt
-  compensate?: (receipt: InviteCompletionWriteReceipt) => Promise<void>
-}): Promise<InviteCompletionWriteReceipt> {
-  const markedInviteCompleted = resolveMarkedInviteCompleted(invitePolicy)
+  receipt: CharacterAssignmentWriteReceipt
+  compensate?: (receipt: CharacterAssignmentWriteReceipt) => Promise<void>
+}): Promise<CharacterAssignmentWriteReceipt> {
+  const markedInviteCompleted = Boolean(invitePolicy.linkedInviteId)
 
   if (areMongoTransactionsEnabled()) {
     await runInTransaction(async (session) => {
@@ -162,8 +137,8 @@ export async function executeExistingCharacterCompletion({
   membershipId: string
   characterId: string
   invitePolicy: CampaignCharacterCompletionInvitePolicy
-}): Promise<InviteCompletionWriteReceipt> {
-  const receipt: InviteCompletionWriteReceipt = {
+}): Promise<CharacterAssignmentWriteReceipt> {
+  const receipt: CharacterAssignmentWriteReceipt = {
     characterId,
     createdCharacter: false,
     addedControl: false,
@@ -213,7 +188,7 @@ export async function executeNewCharacterCompletion({
   }
 
   const character = await createPcRecord(parsedInput, userId)
-  const receipt: InviteCompletionWriteReceipt = {
+  const receipt: CharacterAssignmentWriteReceipt = {
     characterId: character.id,
     createdCharacter: true,
     addedControl: false,

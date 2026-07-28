@@ -1,9 +1,4 @@
-import type {
-  CharacterEligibilitySubject,
-  CompleteCampaignCharacterAssignmentResult,
-  CreateCharacterInput,
-  PcCharacter,
-} from '@rpg/contracts'
+import type { CharacterEligibilitySubject, CreateCharacterInput, PcCharacter } from '@rpg/contracts'
 import {
   createCharacterInputSchema,
   projectCharacterEligibilitySubjectFromCharacter,
@@ -11,18 +6,13 @@ import {
   resolveCharacterCampaignEligibility,
 } from '@rpg/contracts'
 
-import { HttpError } from '../../lib/http-error'
-import { findCampaignById } from '../campaign/find-campaign-by-id'
-import { findOpenParticipationForCharacter } from '../campaign/participation/campaign-character-participation.repository'
-import { findCharacterForUser } from '../character/character.service'
-import { failCampaignCharacterAssignment } from './campaign-invite-completion-failure.lib'
-import { completeCampaignCharacterAssignment } from './complete-campaign-character-assignment.lib'
+import { HttpError } from '../../../../lib/http-error'
+import { findCampaignById } from '../../find-campaign-by-id'
+import { findOpenParticipationForCharacter } from '../campaign-character-participation.repository'
+import { findCharacterForUser } from '../../../character/character.service'
+import { failCampaignCharacterAssignment } from './campaign-character-assignment-failure.lib'
 import { zodIssuesToBuildValidationIssues } from './map-build-validation-issues.lib'
-import { resolveCampaignInviteCompletionContext } from './resolve-campaign-invite-completion-context.lib'
-import type { CampaignInviteEligibilityContext } from './resolve-campaign-invite-eligibility-context.lib'
-import type { InviteCompletionWriteReceipt } from './complete-campaign-invite-receipt'
-
-export type { InviteCompletionWriteReceipt }
+import type { CampaignCharacterEligibilityContext } from './resolve-campaign-character-eligibility-context.lib'
 
 export type CompletionCandidate =
   | {
@@ -121,7 +111,7 @@ export async function assertNewCharacterBuildEligible({
   campaignId: string
   userId: string
   candidate: Extract<CompletionCandidate, { kind: 'new' }>
-  eligibilityContext: CampaignInviteEligibilityContext
+  eligibilityContext: CampaignCharacterEligibilityContext
 }): Promise<void> {
   const eligibility = resolveCharacterCampaignEligibility({
     subject: candidate.eligibilitySubject,
@@ -151,7 +141,7 @@ export async function assertExistingCharacterEligible({
   campaignId: string
   userId: string
   candidate: Extract<CompletionCandidate, { kind: 'existing' }>
-  eligibilityContext: CampaignInviteEligibilityContext
+  eligibilityContext: CampaignCharacterEligibilityContext
 }): Promise<void> {
   const existingOpenParticipation = await findOpenParticipationForCharacter(candidate.character.id)
   let conflictingCampaignName: string | undefined
@@ -178,38 +168,4 @@ export async function assertExistingCharacterEligible({
       warnings: eligibility.warnings,
     })
   }
-}
-
-export async function completeCampaignInviteWithCharacter(input: {
-  inviteId: string
-  userId: string
-  characterSource:
-    | { kind: 'new'; characterCreateInput: CreateCharacterInput }
-    | { kind: 'existing'; characterId: string }
-}): Promise<CompleteCampaignCharacterAssignmentResult> {
-  const contextResult = await resolveCampaignInviteCompletionContext({
-    inviteId: input.inviteId,
-    userId: input.userId,
-    characterSource:
-      input.characterSource.kind === 'existing'
-        ? { kind: 'existing', characterId: input.characterSource.characterId }
-        : { kind: 'new' },
-  })
-
-  if (contextResult.kind === 'idempotent') {
-    return contextResult.result
-  }
-
-  const { context } = contextResult
-
-  return completeCampaignCharacterAssignment({
-    userId: input.userId,
-    campaignId: context.acceptedInvite.campaignId,
-    membershipId: context.membershipId,
-    characterSource:
-      input.characterSource.kind === 'new'
-        ? { kind: 'new', characterInput: input.characterSource.characterCreateInput }
-        : { kind: 'existing', characterId: input.characterSource.characterId },
-    invitePolicy: { kind: 'invite', inviteId: context.invite.id },
-  })
 }
