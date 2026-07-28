@@ -1,10 +1,8 @@
 import {
   formatEquipmentPurchaseTotalPriceLabel,
   formatWealthAsGold,
-  getMagicItemRarityLabel,
   resolveEquipmentAcquisitionActionState,
   resolveEquipmentPurchaseIndex,
-  resolveMagicItemAcquisitionState,
   unitCostCpForEquipment,
   copperToWealth,
   type CharacterBuildCatalogIndex,
@@ -13,7 +11,6 @@ import {
   type Equipment,
   type EquipmentAcquisitionActionState,
   type EquipmentBudgetSummary,
-  type MagicItemRarity,
 } from '@rpg/contracts'
 
 import {
@@ -21,6 +18,10 @@ import {
   type EquipmentInventoryRow,
 } from '../../lib/equipment-step.lib'
 import { formatAcquisitionBlockerNote } from './equipment-picker-action.lib'
+import {
+  formatUsesGrantPreviewLine,
+  resolveAllowanceRarity,
+} from './equipment-acquisition-format.lib'
 
 export type EquipmentAcquisitionSourceKind = 'magicItemGrant' | 'purchase'
 
@@ -67,6 +68,8 @@ export function resolveDistinctAcquisitionSourceKinds(
 
   return ACQUISITION_SOURCE_KIND_ORDER.filter((kind) => kinds.has(kind))
 }
+
+export { formatTotalPurchaseSpendFromSnapshots } from './equipment-acquisition-format.lib'
 
 export function grantedQuantity(rows: readonly EquipmentInventoryRow[]): number {
   return rows.reduce((sum, row) => {
@@ -116,22 +119,6 @@ export function resolveEquipmentInventoryRowManagementMode(
 export function formatGrantManageSourceLabel(sourceLabel: string): string {
   const rarity = sourceLabel.replace(/\s+choice$/i, '')
   return `${rarity} choices`
-}
-
-export function formatTotalPurchaseSpendFromSnapshots(
-  purchases: readonly Pick<EquipmentInventoryManagePurchaseSource, 'quantity' | 'unitCostCp'>[],
-): string | undefined {
-  let totalCp = 0
-  let hasSnapshot = false
-
-  for (const purchase of purchases) {
-    if (purchase.unitCostCp === undefined) continue
-    hasSnapshot = true
-    totalCp += purchase.unitCostCp * purchase.quantity
-  }
-
-  if (!hasSnapshot || totalCp <= 0) return undefined
-  return `${formatWealthAsGold(copperToWealth(totalCp))} spent`
 }
 
 function resolvePurchaseUnitCostCp(args: {
@@ -208,28 +195,6 @@ export function resolveEquipmentInventoryManageSources(
   }
 }
 
-function resolveAllowanceRarity(args: {
-  allowanceId: string
-  draft: CharacterBuilderDraft
-  context: CharacterBuildContext
-  catalogIndex: CharacterBuildCatalogIndex
-}): MagicItemRarity | undefined {
-  const acquisition = resolveMagicItemAcquisitionState({
-    draft: args.draft,
-    context: args.context,
-    catalogIndex: args.catalogIndex,
-  })
-
-  return acquisition.allowances.find((allowance) => allowance.id === args.allowanceId)?.rarity
-}
-
-function formatGrantAddAnotherLabel(grantQuantity: number, rarity: MagicItemRarity): string {
-  const rarityLabel = getMagicItemRarityLabel(rarity)
-  return grantQuantity === 1
-    ? `Uses 1 ${rarityLabel} choice`
-    : `Uses ${grantQuantity} ${rarityLabel} choices`
-}
-
 function formatMagicItemGrantAddAnotherPreview(args: {
   actionState: Extract<EquipmentAcquisitionActionState, { kind: 'magic_item_grant' }>
   equipment: Equipment
@@ -261,7 +226,7 @@ function formatMagicItemGrantAddAnotherPreview(args: {
     if (rarity) {
       return {
         canAdd: plan.canApplyRequestedQuantity,
-        label: formatGrantAddAnotherLabel(grantQuantity, rarity),
+        label: formatUsesGrantPreviewLine(grantQuantity, rarity),
       }
     }
   }

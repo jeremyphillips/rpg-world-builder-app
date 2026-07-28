@@ -21,8 +21,7 @@ import {
   type EquipmentInventoryQuantityTarget,
   type EquipmentInventoryRemoveTarget,
 } from '../../lib/equipment-step.lib'
-import type { EquipmentOwnedSourceAction } from './equipment-acquisition-panel.lib'
-import { EquipmentAcquisitionPanelBody } from './equipment-acquisition-panel-body.client'
+import { EquipmentInventoryManagePanelBody } from './equipment-inventory-manage-panel.client'
 import {
   equipmentAddedInventoryManageActionsClasses,
   equipmentAddedInventoryManageDetailLineClasses,
@@ -52,7 +51,6 @@ import {
   equipmentInventoryRowQtyLabelClasses,
 } from './equipment-inventory-summary.variants'
 import { builderInventoryRowMetaClasses } from '../builder/builder-inventory-row.variants'
-import { useEquipmentAcquisitionQuantityCommit } from './use-equipment-acquisition-quantity-commit.client'
 
 export type EquipmentAddedInventoryRowItemProps = {
   entry: AddedEquipmentEntryViewModel
@@ -159,34 +157,6 @@ function ManagedInventoryRow({
     [onOpenChange],
   )
 
-  const commitAcquisition = useCallback(
-    (requestedQuantity: number) =>
-      onApplyMagicItemAcquisition({ equipmentId: equipment.id, requestedQuantity }),
-    [equipment.id, onApplyMagicItemAcquisition],
-  )
-
-  const { quantity, setQuantity, isPending, successQuantity, commitQuantity } =
-    useEquipmentAcquisitionQuantityCommit({ commit: commitAcquisition })
-
-  const handleSourceAction = useCallback(
-    (action: EquipmentOwnedSourceAction) => {
-      if (action.target.kind === 'magicItemGrant') {
-        onReleaseGrant({
-          allowanceId: action.target.allowanceId,
-          equipmentId: action.target.equipmentId,
-          quantity: action.quantity,
-        })
-        return
-      }
-
-      onRemovePurchase({
-        purchaseId: action.target.purchaseId,
-        quantity: action.quantity,
-      })
-    },
-    [onReleaseGrant, onRemovePurchase],
-  )
-
   return (
     <article className={equipmentInventoryRowClasses}>
       <Collapsible
@@ -230,20 +200,16 @@ function ManagedInventoryRow({
           id={contentId}
           className={equipmentAddedInventoryManagePanelContentClasses}
         >
-          <EquipmentAcquisitionPanelBody
+          <EquipmentInventoryManagePanelBody
+            equipment={equipment}
+            rows={entry.rows}
             draft={draft}
             context={context}
             catalogIndex={catalogIndex}
-            equipment={equipment}
-            rows={entry.rows}
             budget={budget}
-            quantity={quantity}
-            onQuantityChange={setQuantity}
-            isPending={isPending}
-            successQuantity={successQuantity}
-            onSourceAction={handleSourceAction}
-            onCommit={commitQuantity}
-            layout="disclosure"
+            onReleaseGrant={onReleaseGrant}
+            onRemovePurchase={onRemovePurchase}
+            onApplyMagicItemAcquisition={onApplyMagicItemAcquisition}
           />
         </CollapsibleContent>
       </Collapsible>
