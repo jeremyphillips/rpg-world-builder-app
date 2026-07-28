@@ -88,7 +88,7 @@ export async function promoteContentToPublished<T extends WriteEntityBase>(
     .findOneAndUpdate(
       { _id: entityId, campaignId },
       { $set: { status: 'published' } },
-      { new: true },
+      { returnDocument: 'after' },
     )
     .lean<HomebrewDoc>()
   if (!updated) {
@@ -111,7 +111,11 @@ export async function demoteContentToDraft<T extends WriteEntityBase>(
   }
 
   const updated = await config.homebrewModel
-    .findOneAndUpdate({ _id: entityId, campaignId }, { $set: { status: 'draft' } }, { new: true })
+    .findOneAndUpdate(
+      { _id: entityId, campaignId },
+      { $set: { status: 'draft' } },
+      { returnDocument: 'after' },
+    )
     .lean<HomebrewDoc>()
   if (!updated) {
     throw new HttpError(404, 'not_found', 'Homebrew record not found.')

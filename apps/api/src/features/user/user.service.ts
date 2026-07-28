@@ -157,7 +157,7 @@ export async function updateLastSelectedCampaign(
   const doc = await UserModel.findByIdAndUpdate(
     userId,
     { lastSelectedCampaignId: campaignId },
-    { new: true },
+    { returnDocument: 'after' },
   ).lean<UserRecord | null>()
   if (!doc) return null
   return toSessionUser(toUser(doc))
@@ -187,7 +187,7 @@ export async function updateProfile(
   }
 
   const doc = await UserModel.findByIdAndUpdate(userId, patch, {
-    new: true,
+    returnDocument: 'after',
   }).lean<UserRecord | null>()
   if (!doc) return null
   return toSessionUser(toUser(doc))

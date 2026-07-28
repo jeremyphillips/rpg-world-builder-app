@@ -113,7 +113,7 @@ export async function rotateInviteToken(
   const doc = await CampaignInviteModel.findOneAndUpdate(
     { _id: inviteId, status: 'pending' },
     { $set: { tokenHash, expiresAt } },
-    { new: true },
+    { returnDocument: 'after' },
   ).lean<CampaignInviteRecord | null>()
   if (!doc) return null
   return toCampaignInvite(doc)
@@ -128,7 +128,7 @@ export async function beginInviteDeliveryAttempt(inviteId: string): Promise<Camp
       $inc: { deliveryAttempts: 1 },
       $set: { lastDeliveryAttemptAt: now },
     },
-    { new: true },
+    { returnDocument: 'after' },
   ).lean<CampaignInviteRecord | null>()
   if (!doc) return null
   return toCampaignInvite(doc)
@@ -146,7 +146,7 @@ export async function markInviteSent(inviteId: string): Promise<CampaignInvite |
         deliveryErrorCode: null,
       },
     },
-    { new: true },
+    { returnDocument: 'after' },
   ).lean<CampaignInviteRecord | null>()
   if (!doc) return null
   return toCampaignInvite(doc)
@@ -165,7 +165,7 @@ export async function markInviteDeliveryFailed(
         deliveryErrorCode: errorCode,
       },
     },
-    { new: true },
+    { returnDocument: 'after' },
   ).lean<CampaignInviteRecord | null>()
   if (!doc) return null
   return toCampaignInvite(doc)
@@ -186,7 +186,7 @@ export async function markInviteAccepted(
         acceptedAt,
       },
     },
-    { new: true },
+    { returnDocument: 'after' },
   ).lean<CampaignInviteRecord | null>()
   if (!doc) return null
   return toCampaignInvite(doc)
@@ -208,7 +208,7 @@ export async function markInviteCompleted(
         completedAt,
       },
     },
-    { new: true, session: options?.session },
+    { returnDocument: 'after', session: options?.session },
   ).lean<CampaignInviteRecord | null>()
   if (!doc) return null
   return toCampaignInvite(doc)
@@ -219,7 +219,7 @@ export async function markInviteExpired(inviteId: string): Promise<CampaignInvit
   const doc = await CampaignInviteModel.findOneAndUpdate(
     { _id: inviteId, status: { $in: ['pending', 'accepted'] } },
     { $set: { status: 'expired' } },
-    { new: true },
+    { returnDocument: 'after' },
   ).lean<CampaignInviteRecord | null>()
   if (!doc) return null
   return toCampaignInvite(doc)
@@ -241,7 +241,7 @@ export async function markInviteRevoked(
         tokenHash: invalidatedTokenHash,
       },
     },
-    { new: true },
+    { returnDocument: 'after' },
   ).lean<CampaignInviteRecord | null>()
   if (!doc) return null
   return toCampaignInvite(doc)

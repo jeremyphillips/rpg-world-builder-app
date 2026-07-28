@@ -127,7 +127,7 @@ export async function updateCampaign(
   const doc = await CampaignModel.findByIdAndUpdate(
     campaignId,
     { $set },
-    { new: true },
+    { returnDocument: 'after' },
   ).lean<CampaignRecord | null>()
   if (!doc) return null
   return toCampaign(doc)

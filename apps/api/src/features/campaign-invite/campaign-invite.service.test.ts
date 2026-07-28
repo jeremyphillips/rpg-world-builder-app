@@ -168,7 +168,7 @@ describe('campaign invite service', () => {
         acceptedByUserId: player.id,
         acceptedAt: new Date(),
       },
-      { new: true },
+      { returnDocument: 'after' },
     )
 
     expect(activeAccepted).not.toBeNull()

@@ -47,7 +47,7 @@ async function nextTicketKey(): Promise<string> {
     { $inc: { seq: 1 } },
     {
       upsert: true,
-      new: true,
+      returnDocument: 'after',
       setDefaultsOnInsert: true,
       setOnInsert: { _id: TICKET_KEY_COUNTER_ID },
     },
@@ -248,7 +248,7 @@ export async function updateTicket(
   const doc = await DevBenchTicketModel.findByIdAndUpdate(
     ticketId,
     { $set: trimmed },
-    { new: true },
+    { returnDocument: 'after' },
   ).lean<TicketRecord | null>()
 
   return doc ? toTicket(doc) : null
@@ -295,7 +295,7 @@ export async function updateEpic(epicId: string, input: UpdateEpicInput): Promis
   const doc = await DevBenchEpicModel.findByIdAndUpdate(
     epicId,
     { $set: trimmed },
-    { new: true },
+    { returnDocument: 'after' },
   ).lean<EpicRecord | null>()
 
   return doc ? toEpic(doc) : null
