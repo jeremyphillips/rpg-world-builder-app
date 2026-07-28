@@ -1,11 +1,12 @@
-import { Navigate, useParams } from 'react-router-dom'
+import { Link, Navigate, useParams } from 'react-router-dom'
 
-import { Text } from '@rpg/ui'
+import { buttonVariants, Text } from '@rpg/ui'
 
 import { ROUTES } from '@/app/routes'
 import { PageLoadState } from '@/components/layout/page-load-state'
 import { NarrowPage } from '@/components/layout/narrow-page'
 
+import { CAMPAIGN_ONBOARDING_UNEXPECTED_STATUS_COPY } from '../lib/campaign-onboarding-copy'
 import { useCampaignOnboardingContext } from '../hooks/use-campaign-onboarding-context'
 import { CampaignOnboardingBody } from './campaign-onboarding-body'
 
@@ -33,7 +34,21 @@ export function CampaignOnboarding() {
       )
     }
 
-    return <Navigate to={ROUTES.campaign.detail(context.campaignId)} replace />
+    return (
+      <NarrowPage>
+        <div className="flex flex-col gap-4">
+          <Text variant="muted" role="status">
+            {CAMPAIGN_ONBOARDING_UNEXPECTED_STATUS_COPY.activeWithoutCharacter.message}
+          </Text>
+          <Link
+            to={ROUTES.campaign.detail(context.campaignId)}
+            className={buttonVariants({ variant: 'outline' })}
+          >
+            {CAMPAIGN_ONBOARDING_UNEXPECTED_STATUS_COPY.activeWithoutCharacter.action}
+          </Link>
+        </div>
+      </NarrowPage>
+    )
   }
 
   return (

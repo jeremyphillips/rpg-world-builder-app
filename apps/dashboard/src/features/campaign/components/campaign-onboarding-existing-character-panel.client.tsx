@@ -9,6 +9,7 @@ import { Button, ComboboxField, Heading, Text } from '@rpg/ui'
 
 import { ROUTES } from '@/app/routes'
 
+import { CAMPAIGN_ONBOARDING_EXISTING_CHARACTER_SUBMIT_ERROR } from '../lib/campaign-onboarding-copy'
 import { buildCharacterOptions, summarizeEligibleCharacters } from '../lib/campaign-onboarding.lib'
 import {
   useCampaignOnboardingEligibleCharacters,
@@ -17,6 +18,31 @@ import {
 import { CampaignCharacterEligibilityAlert } from './campaign-character-eligibility-alert.client'
 import { CampaignCharacterWarningReview } from './campaign-character-warning-review.client'
 import { CampaignOnboardingExistingCharacterStatusMessages } from './campaign-onboarding-existing-character-status-messages.client'
+
+function resolveExistingCharacterSubmitError(
+  resolved: ReturnType<typeof resolveCampaignCharacterAssignmentError>,
+): string {
+  if (resolved.kind === 'generic') {
+    return resolved.message
+  }
+
+  if (resolved.kind === 'invite_unavailable') {
+    switch (resolved.reason) {
+      case 'expired':
+        return 'This invitation has expired. Ask the campaign owner for a new invite.'
+      case 'revoked':
+        return 'This invitation is no longer valid. Ask the campaign owner for a new invite.'
+      case 'not_owned':
+        return 'This invitation belongs to another account.'
+      case 'not_accepted':
+        return 'This invitation is not ready for character setup yet.'
+      case 'already_completed':
+        return 'This invitation has already been completed.'
+    }
+  }
+
+  return CAMPAIGN_ONBOARDING_EXISTING_CHARACTER_SUBMIT_ERROR
+}
 
 export function CampaignOnboardingExistingCharacterPanel({
   campaignId,
@@ -30,6 +56,8 @@ export function CampaignOnboardingExistingCharacterPanel({
     data: characters,
     isPending,
     isError,
+    isRefetching,
+    refetch,
   } = useCampaignOnboardingEligibleCharacters(campaignId)
   const completeOnboarding = useCompleteCampaignOnboarding(campaignId)
   const [selectedCharacterId, setSelectedCharacterId] = useState('')
@@ -58,7 +86,7 @@ export function CampaignOnboardingExistingCharacterPanel({
     } catch (error) {
       const resolved = resolveCampaignCharacterAssignmentError(
         error,
-        'Could not add this character to the campaign.',
+        CAMPAIGN_ONBOARDING_EXISTING_CHARACTER_SUBMIT_ERROR,
       )
 
       if (resolved.kind === 'campaign_ineligible') {
@@ -69,13 +97,7 @@ export function CampaignOnboardingExistingCharacterPanel({
         return
       }
 
-      setFormError(
-        resolved.kind === 'generic'
-          ? resolved.message
-          : error instanceof Error
-            ? error.message
-            : 'Could not add this character to the campaign.',
-      )
+      setFormError(resolveExistingCharacterSubmitError(resolved))
     }
   }
 
@@ -93,6 +115,8 @@ export function CampaignOnboardingExistingCharacterPanel({
         isError={isError}
         hasCharacters={hasCharacters}
         hasEligibleCharacter={hasEligibleCharacter}
+        onRetry={() => void refetch()}
+        isRetrying={isRefetching}
       />
 
       {showCharacterPicker ? (

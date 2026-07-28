@@ -40,10 +40,14 @@ let queryState: {
   data: CampaignEligibleCharacter[] | undefined
   isPending: boolean
   isError: boolean
+  isRefetching: boolean
+  refetch: ReturnType<typeof vi.fn>
 } = {
   data: [eligibleCharacter, ineligibleCharacter],
   isPending: false,
   isError: false,
+  isRefetching: false,
+  refetch: vi.fn(),
 }
 
 vi.mock('../hooks/use-campaign-onboarding-eligible-characters', () => ({
@@ -75,15 +79,41 @@ describe('CampaignOnboardingExistingCharacterPanel', () => {
       data: [eligibleCharacter, ineligibleCharacter],
       isPending: false,
       isError: false,
+      isRefetching: false,
+      refetch: vi.fn(),
     }
   })
 
   it('shows a load error when eligible characters cannot be fetched', () => {
-    queryState = { data: undefined, isPending: false, isError: true }
+    queryState = {
+      data: undefined,
+      isPending: false,
+      isError: true,
+      isRefetching: false,
+      refetch: vi.fn(),
+    }
 
     renderPanel()
 
     expect(screen.getByText('Could not load your characters.')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Try again' })).toBeInTheDocument()
+  })
+
+  it('retries loading eligible characters when Try again is clicked', async () => {
+    const user = userEvent.setup()
+    const refetch = vi.fn()
+    queryState = {
+      data: undefined,
+      isPending: false,
+      isError: true,
+      isRefetching: false,
+      refetch,
+    }
+
+    renderPanel()
+    await user.click(screen.getByRole('button', { name: 'Try again' }))
+
+    expect(refetch).toHaveBeenCalledTimes(1)
   })
 
   it('submits the selected eligible character and navigates to campaign PC detail', async () => {
