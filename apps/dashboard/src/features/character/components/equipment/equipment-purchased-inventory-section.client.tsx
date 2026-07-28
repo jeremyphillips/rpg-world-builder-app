@@ -6,7 +6,7 @@ import {
   EQUIPMENT_PURCHASED_INVENTORY_EMPTY_MESSAGE,
   type EquipmentInventoryQuantityTarget,
   type EquipmentInventoryRemoveTarget,
-} from '../../lib/equipment-step.lib'
+} from '../../lib/equipment/equipment-step.lib'
 import { EquipmentInventoryRowItem } from './equipment-inventory-row.client'
 import {
   equipmentInventoryDisplayItemKey,

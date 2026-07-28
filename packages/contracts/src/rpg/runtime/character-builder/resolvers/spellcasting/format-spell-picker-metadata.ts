@@ -1,17 +1,15 @@
 import type { Spell } from '../../../../content/spell'
 import { formatSpellLevel } from '../../../../content/spell/levels'
 import type { SpellTags } from '../../../../vocab/spell/tags'
-import { getCastingTimeUnitLabel } from '../../../../vocab/spell/casting-time'
-import type {
-  SpellCastingTime,
-  SpellComponents,
-  SpellDuration,
-  SpellRange,
-} from '../../../../vocab/spell'
+import type { SpellCastingTime, SpellDuration } from '../../../../vocab/spell'
 import { getCompactSpellDeliveryMethodLabel } from '../../../../vocab/spell/delivery-method'
-import { getDurationUnitLabel } from '../../../../vocab/spell/duration'
-import { getSpellRangeKindLabel } from '../../../../vocab/spell/range'
 import { getSpellSchoolLabel } from '../../../../vocab/spell/school'
+import {
+  formatSpellCastingTimeLabel,
+  formatSpellComponentsLabel,
+  formatSpellDurationLabel,
+  formatSpellRangeLabel,
+} from '../../../../content/spell/format-spell-metadata-core'
 
 export const SPELL_PICKER_CANTrip_LEVEL_LABEL = 'Cantrip'
 
@@ -30,69 +28,21 @@ export function formatSpellPickerLevelLabel(level: number): string {
   return `${formatSpellLevel(level)} level`
 }
 
-const CASTING_TIME_UNIT_FORMATTERS: Record<string, (value: number) => string> = {
-  action: (value) => (value === 1 ? 'Action' : `${value} actions`),
-  'bonus-action': (value) => (value === 1 ? 'Bonus action' : `${value} bonus actions`),
-  reaction: (value) => (value === 1 ? 'Reaction' : `${value} reactions`),
-  minute: (value) => (value === 1 ? '1 minute' : `${value} minutes`),
-  hour: (value) => (value === 1 ? '1 hour' : `${value} hours`),
-}
-
 /** Compact casting time for picker rows (e.g. "Action", "1 minute"). Omits reaction triggers. */
 export function formatSpellPickerCastingTime(castingTime: SpellCastingTime): string {
-  const { value, unit } = castingTime.normal
-  const formatter = CASTING_TIME_UNIT_FORMATTERS[unit]
-  if (formatter) return formatter(value)
-  return `${value} ${getCastingTimeUnitLabel(unit).toLowerCase()}`
+  return formatSpellCastingTimeLabel(castingTime, 'picker', { includeTrigger: false })
 }
 
 /** Formats spell range for picker rows (e.g. "Self", "120 ft"). */
-export function formatSpellPickerRange(range: SpellRange): string {
-  switch (range.kind) {
-    case 'distance':
-      return `${range.value.value} ${range.value.unit}`
-    case 'special':
-      return range.description
-    default:
-      return getSpellRangeKindLabel(range.kind)
-  }
+export function formatSpellPickerRange(range: Parameters<typeof formatSpellRangeLabel>[0]): string {
+  return formatSpellRangeLabel(range, 'picker')
 }
 
 /** Formats spell duration for picker rows (e.g. "Instantaneous"). */
-export function formatSpellPickerDuration(duration: SpellDuration): string {
-  switch (duration.kind) {
-    case 'instantaneous':
-      return 'Instantaneous'
-    case 'special':
-      return duration.description
-    case 'timed': {
-      const unitLabel = getDurationUnitLabel(duration.unit).toLowerCase()
-      const durationText =
-        duration.value === 1 ? `1 ${unitLabel}` : `${duration.value} ${unitLabel}s`
-      if (duration.concentration && duration.upTo) {
-        return `Concentration, up to ${durationText}`
-      }
-      if (duration.concentration) {
-        return `Concentration, ${durationText}`
-      }
-      if (duration.upTo) {
-        return `Up to ${durationText}`
-      }
-      return durationText
-    }
-  }
-}
+export const formatSpellPickerDuration = formatSpellDurationLabel
 
 /** Formats spell components for picker detail (e.g. "V, S, M (fleece)"). */
-export function formatSpellPickerComponents(components: SpellComponents): string {
-  const parts: string[] = []
-  if (components.verbal) parts.push('V')
-  if (components.somatic) parts.push('S')
-  if (components.material) {
-    parts.push(`M (${components.material.description})`)
-  }
-  return parts.join(', ')
-}
+export const formatSpellPickerComponents = formatSpellComponentsLabel
 
 /** Returns "Concentration" when the spell requires concentration; otherwise undefined. */
 export function formatSpellConcentrationMarker(duration: SpellDuration): string | undefined {

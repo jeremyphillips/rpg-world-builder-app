@@ -17,15 +17,15 @@ import {
   equipmentStepContextFixture,
   equipmentStepLeatherArmorFixture,
   equipmentStepMonkClassFixture,
-} from '../../lib/equipment-step.fixtures'
+} from '../../lib/equipment/equipment-step.fixtures'
 import {
   EQUIPMENT_GOLD_OPTION_STARTING_MESSAGE,
   EQUIPMENT_STEP_BROWSE_LABEL,
   formatEquipmentGoldOptionStartingDescription,
-} from '../../lib/equipment-step.lib'
+} from '../../lib/equipment/equipment-step.lib'
 import { EquipmentInventorySummary } from './equipment-inventory-summary.client'
 import { EquipmentInventoryRowItem } from './equipment-inventory-row.client'
-import type { EquipmentInventoryRow } from '../../lib/equipment-step.lib'
+import type { EquipmentInventoryRow } from '../../lib/equipment/equipment-step.lib'
 
 const inventoryManagementProps = {
   context: equipmentStepContextFixture,

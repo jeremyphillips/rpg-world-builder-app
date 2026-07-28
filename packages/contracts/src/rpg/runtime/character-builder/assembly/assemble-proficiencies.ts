@@ -8,7 +8,7 @@ import { assembleSkillProficiencyEntries } from './assemble-skill-proficiencies'
 import { assembleToolProficiencyEntries } from './assemble-tool-proficiencies'
 import { assembleWeaponProficiencyEntries } from './assemble-weapon-proficiencies'
 import type { CharacterBuildCatalogIndex } from '../context'
-import type { CharacterBuilderDraft } from '../draft'
+import type { CharacterBuilderDraft } from '../draft/draft'
 
 // ---------------------------------------------------------------------------
 // Proficiency aggregate assembly — composes per-domain orchestration modules.

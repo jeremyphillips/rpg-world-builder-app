@@ -8,7 +8,7 @@ import {
 } from '@rpg/contracts'
 
 import { createPopulatedStandaloneBuilderContextFixture } from '../lib/character-builder-fixtures'
-import { CHOICE_SET_COMBOBOX_OPTION_THRESHOLD } from '../lib/choice-set-field.lib'
+import { CHOICE_SET_COMBOBOX_OPTION_THRESHOLD } from '../lib/choice-sets/choice-set-field.lib'
 import { ChoiceSetField } from './choice-set-field.client'
 
 const context = createPopulatedStandaloneBuilderContextFixture()

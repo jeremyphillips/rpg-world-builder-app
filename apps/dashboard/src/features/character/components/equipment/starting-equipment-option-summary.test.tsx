@@ -8,7 +8,7 @@ import type { StartingEquipmentOptionSummary } from '@rpg/contracts'
 import {
   EQUIPMENT_CHANGE_PACKAGE_LABEL,
   EQUIPMENT_SELECTED_PACKAGE_EYEBROW,
-} from '../../lib/equipment-step.lib'
+} from '../../lib/equipment/equipment-step.lib'
 import { StartingEquipmentOptionSummaryCard } from './starting-equipment-option-summary.client'
 
 const summary = {

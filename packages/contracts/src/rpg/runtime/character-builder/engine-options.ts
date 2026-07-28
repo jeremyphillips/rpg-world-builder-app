@@ -1,5 +1,5 @@
 import type { ChoiceSet } from './choice-set'
-import type { CharacterBuilderStepId } from './step-ids'
+import type { CharacterBuilderStepId } from '../../character-builder/step-ids'
 
 // ---------------------------------------------------------------------------
 // Shared options for preview, validation, and finalization.

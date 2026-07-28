@@ -6,7 +6,7 @@ import { expectNoAxeViolations } from '@rpg/ui/test-utils'
 import { createEmptyCharacterBuilderDraft } from '@rpg/contracts'
 
 import { createStandaloneBuilderContextFixture } from '../../lib/character-builder-fixtures'
-import { getBuilderChromeCopy } from '../../lib/builder-chrome-copy'
+import { getBuilderChromeCopy } from '../../lib/builder/builder-chrome-copy'
 import { ReviewStep } from './review-step.client'
 
 describe('ReviewStep', () => {

@@ -10,7 +10,7 @@ import {
   startingEquipmentGrantEquipmentSlug,
   startingEquipmentGrantProficiencyChoiceId,
 } from '../../../../content/starting-equipment'
-import { eligibleProficiencyChoiceTargetIds } from '../../../../content/lib/resolve-eligible-proficiency-choice-targets'
+import { eligibleProficiencyChoiceTargetIds } from '../../validation/resolve-eligible-proficiency-choice-targets'
 import { formatEquipmentPoolLabel } from '../../../../content/lib/equipment-grant'
 import {
   isEquipmentPoolFullyAvailable,
@@ -19,7 +19,7 @@ import {
 } from '../../../creature/equipment'
 import type { CharacterEquipment } from '../../../character/equipment-inventory'
 import type { CharacterBuildCatalogIndex } from '../../context'
-import type { CharacterBuilderDraft } from '../../draft'
+import type { CharacterBuilderDraft } from '../../draft/draft'
 import {
   characterWealthFromGrant,
   inventoryBucketForEquipment,

@@ -21,8 +21,13 @@ import { buildEquipmentPickerRowViewModel } from '@/features/content'
 import {
   resolveEquipmentOwnedQuantity,
   type EquipmentPickerWorkflowMode,
-} from '../../lib/equipment-step.lib'
+} from '../../lib/equipment/equipment-step.lib'
 import { compareName, scoreAndFilterPickerItems } from '../picker/catalog-picker-sort.lib'
+import {
+  countCatalogPickerClearableCriteria,
+  hasCatalogPickerClearableCriteria,
+  hasCatalogPickerResetViewCriteria,
+} from '../picker/catalog-picker-filter-state.lib'
 import type { EquipmentPickerRowActionViewModel } from './equipment-picker-action.lib'
 import {
   resolveEquipmentPickerItemHeaderPresentation,
@@ -119,11 +124,14 @@ export function countEquipmentPickerClearableCriteria(args: {
   focusedAllowanceId?: string
   workflowMode?: EquipmentPickerWorkflowMode
 }): number {
-  return countEquipmentPickerStructuredFilters(args) + Number(args.searchQuery.trim().length > 0)
+  return countCatalogPickerClearableCriteria({
+    structuredFilterCount: countEquipmentPickerStructuredFilters(args),
+    searchQuery: args.searchQuery,
+  })
 }
 
 export function hasEquipmentPickerClearableCriteria(count: number): boolean {
-  return count > 0
+  return hasCatalogPickerClearableCriteria(count)
 }
 
 export function hasEquipmentPickerResetViewCriteria(args: {
@@ -134,10 +142,12 @@ export function hasEquipmentPickerResetViewCriteria(args: {
   focusedAllowanceId?: string
   workflowMode?: EquipmentPickerWorkflowMode
 }): boolean {
-  if (args.searchQuery.trim().length > 0) return true
-  if (countEquipmentPickerStructuredFilters(args) > 0) return true
-  if (args.sortMode !== EQUIPMENT_PICKER_SORT_BEST_MATCH) return true
-  return false
+  return hasCatalogPickerResetViewCriteria({
+    structuredFilterCount: countEquipmentPickerStructuredFilters(args),
+    searchQuery: args.searchQuery,
+    sortMode: args.sortMode,
+    defaultSortMode: EQUIPMENT_PICKER_SORT_BEST_MATCH,
+  })
 }
 
 function isEquipmentPickerItemPriced(item: EquipmentPickerItem): boolean {

@@ -6,7 +6,7 @@ import { Badge, Button, Heading, NumberStepper, Text } from '@rpg/ui'
 import {
   clampEquipmentStepQuantity,
   EQUIPMENT_STEP_QUANTITY_INPUT_DIGITS,
-} from '../../lib/equipment-quantity.lib'
+} from '../../lib/equipment/equipment-quantity.lib'
 import {
   buildEquipmentAcquisitionPanelViewModel,
   formatAcquisitionCommitSuccessAnnouncement,

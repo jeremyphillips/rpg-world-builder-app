@@ -3,7 +3,6 @@ import { z } from 'zod'
 import { characterNarrativeSchema } from '../../rpg/runtime/character/narrative'
 import { characterHitPointsSchema } from '../../rpg/runtime/character/core'
 import { toolCategorySchema } from '../../rpg/vocab/equipment/tool-category'
-import { skillSchema } from '../../rpg/content/skill-proficiency'
 import {
   CHARACTER_IMPORT_FIELD_STATUSES,
   type CharacterImportFieldStatus,
@@ -50,7 +49,8 @@ export const recognizedProficiencySchema = z.object({
   sourceValue: z.string(),
   sourceLabel: z.string().optional(),
   localValue: z.string().optional(),
-  skillId: skillSchema.optional(),
+  /** Preview-only — not validated against the content catalog skill registry. */
+  skillId: z.string().min(1).optional(),
   toolId: z.string().optional(),
   toolCategory: toolCategorySchema.optional(),
   sourceGroup: z.string(),

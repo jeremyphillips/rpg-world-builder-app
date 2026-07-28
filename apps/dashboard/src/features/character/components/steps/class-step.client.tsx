@@ -3,21 +3,27 @@
 import { useMemo, useState } from 'react'
 
 import {
+  characterBuilderStepSelectionMessages,
+  formatFieldMessage,
   resolveAvailableContent,
   type CharacterBuildContext,
   type CharacterBuilderDraft,
-  type CharacterBuildValidationIssue,
 } from '@rpg/contracts'
+import type { CharacterBuildValidationIssue } from '@rpg/contracts/rpg/character-builder'
 import { Badge, BuilderOptionDetailsSheet, Button, RadioCard, Text } from '@rpg/ui'
 
 import {
   buildClassDetailsSheetContent,
   formatClassCardOption,
-} from '../../lib/builder-option-display.lib'
+} from '../../lib/builder/builder-option-display.lib'
 import { BuilderStepFrame } from './builder-step-frame.client'
 
-const SELECT_CLASS_ACTION_LABEL = 'Select class'
-const SELECTED_CLASS_LABEL = 'Selected'
+const SELECT_CLASS_ACTION_LABEL = formatFieldMessage(
+  characterBuilderStepSelectionMessages.selectClass(),
+)
+const SELECTED_CLASS_LABEL = formatFieldMessage(
+  characterBuilderStepSelectionMessages.selectedBadge(),
+)
 
 export type ClassStepProps = {
   context: CharacterBuildContext

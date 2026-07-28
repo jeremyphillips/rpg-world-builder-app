@@ -1,6 +1,5 @@
 import { z } from 'zod'
 
-import { characterCardViewModelSchema } from '../rpg/campaign/campaign-overview-dtos'
 import { campaignRoleSchema, platformRoleSchema } from './roles'
 
 export const ADMIN_USER_DELETE_BLOCK_REASONS = [
@@ -171,8 +170,27 @@ export const adminUserCampaignListQuerySchema = z.object({
 
 export type AdminUserCampaignListQuery = z.infer<typeof adminUserCampaignListQuerySchema>
 
+export const adminUserCharacterSummaryCampaignSchema = z.object({
+  id: z.string().min(1),
+  name: z.string().min(1),
+})
+
+export type AdminUserCharacterSummaryCampaign = z.infer<
+  typeof adminUserCharacterSummaryCampaignSchema
+>
+
+/** Admin-owned character summary for staff user detail — not an RPG card view model. */
+export const adminUserCharacterSummarySchema = z.object({
+  id: z.string().min(1),
+  name: z.string().min(1),
+  summary: z.string(),
+  campaign: adminUserCharacterSummaryCampaignSchema.optional(),
+})
+
+export type AdminUserCharacterSummary = z.infer<typeof adminUserCharacterSummarySchema>
+
 export const adminUserCharacterListItemSchema = z.object({
-  character: characterCardViewModelSchema,
+  character: adminUserCharacterSummarySchema,
 })
 
 export type AdminUserCharacterListItem = z.infer<typeof adminUserCharacterListItemSchema>

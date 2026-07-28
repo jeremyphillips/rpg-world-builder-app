@@ -1,6 +1,7 @@
 'use client'
 
-import { formatFieldMessage, type CharacterBuildValidationIssue } from '@rpg/contracts'
+import { formatFieldMessage } from '@rpg/contracts'
+import type { CharacterBuildValidationIssue } from '@rpg/contracts/rpg/character-builder'
 import { Text } from '@rpg/ui'
 
 export type CharacterBuilderValidationAlertProps = {

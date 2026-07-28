@@ -1,7 +1,7 @@
 import { createElement } from 'react'
 import { z } from 'zod'
 import { type SpeciesCultureConfig } from '@rpg/contracts'
-import { personalNameComponentSchema } from '@rpg/contracts/name-generator'
+import { personalNameComponentSchema } from '@rpg/contracts/vocab'
 import { type FormItem } from '@rpg/ui/form'
 
 import { buildActiveLanguageFieldOptions } from '@/features/homebrew'

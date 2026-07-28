@@ -11,7 +11,7 @@ import type {
 } from '@rpg/contracts'
 
 import { getContentTypeMidSentenceLabel } from '@/features/content/lib/content-type-labels'
-import { isSelectedStartingEquipmentReady } from '../../lib/equipment-step.lib'
+import { isSelectedStartingEquipmentReady } from '../../lib/equipment/equipment-step.lib'
 import { StartingEquipmentOptionCards } from './starting-equipment-option-cards.client'
 import { StartingEquipmentOptionSummaryCard } from './starting-equipment-option-summary.client'
 

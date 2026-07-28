@@ -20,7 +20,7 @@ import type { EquipmentCatalogItemHeaderTone } from '@/features/content/equipmen
 import type { SpellCatalogItemHeaderTone } from '@/features/content/spells/components/spell-catalog-item-header.client'
 import type { SpellMarker } from '@/features/content/spells/components/spell-catalog-item-header.client'
 
-import { formatContentReferenceLabel } from '../format-content-reference-label'
+import { formatContentReferenceLabel } from '../display/format-content-reference-label'
 import {
   buildMissingCatalogCard,
   buildResolvedCatalogCard,

@@ -1,7 +1,7 @@
 import { z } from 'zod'
 
-import { personalNameComponentSchema } from '../../name-generator/personal-name-component'
-import type { PersonalNameComponent } from '../../name-generator/personal-name-component'
+import { personalNameComponentSchema } from '../vocab/personal-name-component'
+import type { PersonalNameComponent } from '../vocab/personal-name-component'
 import type { LanguageId } from '../vocab/language'
 import { vocabularyOptionIdSchema } from '../vocab/vocabulary'
 import type { ContentTrait } from './lib/grants'

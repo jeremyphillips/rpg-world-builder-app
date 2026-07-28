@@ -5,7 +5,7 @@ import type { ArmorCategory } from '../../../vocab/armor/category'
 import type { CharacterArmorProficiencyEntry } from '../../character/proficiencies'
 import type { ChoiceSet } from '../choice-set'
 import type { CharacterBuildCatalogIndex } from '../context'
-import type { CharacterBuilderDraft } from '../draft'
+import type { CharacterBuilderDraft } from '../draft/draft'
 import { assembleGrantArmorProficiencyEntries } from './assemble-grant-proficiencies'
 import { selectionSourceFromChoiceSet } from './selection-source-from-choice-set'
 

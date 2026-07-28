@@ -1,7 +1,7 @@
 import type { NpcListCharacterSummary } from '@rpg/contracts'
 import type { CharacterBuildCatalogIndex } from '@rpg/contracts'
 
-import { formatContentReferenceLabel } from '../../lib/format-content-reference-label'
+import { formatContentReferenceLabel } from '../../lib/display/format-content-reference-label'
 
 export function resolveNpcOverviewClassName(
   character: Pick<NpcListCharacterSummary, 'classes'>,

@@ -11,7 +11,8 @@ import { useCanManageCampaign } from '@/features/campaign'
 import { CampaignCharacterStatusSummary } from '../../components/detail/campaign-character-status-summary.client'
 import { CharacterDetailContent } from '../../components/detail/character-detail-content.client'
 import { useCampaignBuildContext } from '../../hooks/use-campaign-build-context'
-import { buildCharacterDetailViewModel } from '../../lib/character-display'
+import { buildCharacterDetailViewModel } from '../../lib/display/character-display'
+import { resolveQueryErrorLabel } from '../../lib/resolve-query-error-label.lib'
 import { NpcStatusEditAction } from '../components/npc-status-edit-action.client'
 import { useDeleteNpc } from '../hooks/use-delete-npc'
 import { useNpc } from '../hooks/use-npcs'
@@ -50,7 +51,10 @@ export function NpcDetail() {
 
   const isPending = isNpcPending || Boolean(npcDetail && isContextPending)
   const isError = isNpcError || isContextError
-  const errorLabel = npcError?.message ?? contextError?.message
+  const errorLabel = resolveQueryErrorLabel([
+    { isPending: isNpcPending, isError: isNpcError, error: npcError },
+    { isPending: isContextPending, isError: isContextError, error: contextError },
+  ])
 
   const handleDelete = () => {
     if (!npcId) return

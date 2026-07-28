@@ -1,4 +1,4 @@
-import type { CharacterBuildValidationIssue } from '@rpg/contracts'
+import type { CharacterBuildValidationIssue } from '@rpg/contracts/rpg/character-builder'
 import type { ZodError } from 'zod'
 
 export function zodIssuesToBuildValidationIssues(error: ZodError): CharacterBuildValidationIssue[] {

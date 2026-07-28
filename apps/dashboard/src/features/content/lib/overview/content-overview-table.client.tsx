@@ -8,8 +8,6 @@ import {
   type WithCampaignAccess,
 } from '@rpg/contracts'
 import {
-  areColumnChangeStatesEqual,
-  DataTableFilterRegion,
   dataTableRowUnavailableRailVariants,
   dataTableRowUnavailableVariants,
   type ColumnDef,
@@ -17,11 +15,6 @@ import {
   type DataTableUtilityControls,
 } from '@rpg/ui'
 import {
-  countModifiedFilters,
-  createInitialFilterState,
-  FilterBar,
-  FilterChromeProvider,
-  FilterFieldList,
   applyFilterSchema,
   getEffectiveFilterValue,
   getSchemaFieldsByPlacement,
@@ -60,9 +53,14 @@ import type { ContentBase } from './content-table-config'
 import type { ContentOverviewBaseFilterState } from './content-overview-filter-schema'
 import { useContentOverviewQueryState } from './use-content-overview-query-state.client'
 import { ContentBulkActionsMenu } from './content-bulk-actions-menu.client'
+import { CatalogOverviewFilterChrome } from '@/lib/data-table/catalog-overview-table.client'
 import { OverviewResultSummary } from '@/lib/data-table/overview-result-summary.client'
 import { OverviewSelectionCluster } from '@/lib/data-table/overview-selection-cluster.client'
 import { OverviewTableFrame } from '@/lib/data-table/overview-table-frame.client'
+import {
+  applyOverviewAdvancedOpenPreferences,
+  applyOverviewColumnChangePreferences,
+} from '@/lib/overview-preferences'
 
 const DEFAULT_OVERVIEW_SORT = { id: 'name' } as const
 const OVERVIEW_NAME_COLUMN_ID = 'name'
@@ -320,14 +318,11 @@ export function ContentOverviewTable<
     () => getContentOverviewSortableColumnIds(overviewColumns as ColumnDef<unknown>[]),
     [overviewColumns],
   )
-  const hasAdvancedFields = useMemo(
-    () => getSchemaFieldsByPlacement(filterSchema, 'advanced').length > 0,
-    [filterSchema],
-  )
   const advancedFields = useMemo(
     () => getSchemaFieldsByPlacement(filterSchema, 'advanced'),
     [filterSchema],
   )
+  const hasAdvancedFields = advancedFields.length > 0
   const { query, actions } = useContentOverviewQueryState<T, TFilters>({
     schema: filterSchema,
     allowedSortIds,
@@ -369,9 +364,9 @@ export function ContentOverviewTable<
   const handleAdvancedOpenChange = useCallback(
     (open: boolean) => {
       setPreferences((current) => {
-        if (current.advancedOpen === open) return current
+        const { next, changed } = applyOverviewAdvancedOpenPreferences(current, open)
+        if (!changed) return current
 
-        const next = { ...current, advancedOpen: open }
         persistContentOverviewPreferences(contentTypeKey, next)
         return next
       })
@@ -382,23 +377,8 @@ export function ContentOverviewTable<
   const handleColumnChange = useCallback(
     (state: ColumnChangeState) => {
       setPreferences((current) => {
-        const next = {
-          ...current,
-          columnVisibility: state.visibility,
-          columnOrder: state.order,
-        }
-
-        if (
-          areColumnChangeStatesEqual(
-            {
-              visibility: current.columnVisibility ?? {},
-              order: current.columnOrder ?? [],
-            },
-            state,
-          )
-        ) {
-          return current
-        }
+        const { next, changed } = applyOverviewColumnChangePreferences(current, state)
+        if (!changed) return current
 
         persistContentOverviewPreferences(contentTypeKey, next)
         return next
@@ -413,15 +393,6 @@ export function ContentOverviewTable<
     },
     [actions],
   )
-
-  const advancedModifiedCount = countModifiedFilters(filterSchema, filterState, 'advanced')
-
-  const handleResetAdvancedFilters = useCallback(() => {
-    const defaults = createInitialFilterState(filterSchema)
-    for (const field of advancedFields) {
-      handleFilterValueChange(field.id, defaults[field.id])
-    }
-  }, [advancedFields, filterSchema, handleFilterValueChange])
 
   const restoreFocusAfterRowRemoved = useCallback(
     (removedRowId: string) => {
@@ -485,35 +456,14 @@ export function ContentOverviewTable<
 
   return (
     <div ref={tableRootRef} tabIndex={-1} className="flex flex-col gap-3 outline-none">
-      <FilterChromeProvider>
-        <DataTableFilterRegion
-          primaryFilters={
-            <FilterBar
-              schema={filterSchema}
-              state={filterState}
-              onValueChange={handleFilterValueChange}
-              onReset={() => actions.resetFilters()}
-            />
-          }
-          additionalFilterFields={
-            hasAdvancedFields ? (
-              <FilterFieldList
-                schema={filterSchema}
-                fields={advancedFields}
-                state={filterState}
-                idPrefix="filters-advanced"
-                onValueChange={handleFilterValueChange}
-              />
-            ) : undefined
-          }
-          additionalFiltersOpen={advancedOpen}
-          onAdditionalFiltersOpenChange={
-            hasAdvancedFields ? handleAdvancedOpenChange : () => undefined
-          }
-          activeAdditionalFilterCount={advancedModifiedCount}
-          onResetAdditionalFilters={handleResetAdvancedFilters}
-        />
-      </FilterChromeProvider>
+      <CatalogOverviewFilterChrome
+        filterSchema={filterSchema}
+        filterState={filterState}
+        onFilterChange={handleFilterValueChange}
+        onResetFilters={() => actions.resetFilters()}
+        advancedOpen={hasAdvancedFields ? advancedOpen : false}
+        onAdvancedOpenChange={hasAdvancedFields ? handleAdvancedOpenChange : () => undefined}
+      />
 
       <ContentOverviewDataTable
         columns={overviewColumns}

@@ -65,7 +65,7 @@ import {
   type FixedScoresAssignedDragData,
   type FixedScoresPoolDragData,
 } from '../../lib/steps/fixed-scores-dnd.lib'
-import { formatPreviewSignedNumber } from '../../lib/character-builder-preview-panel.lib'
+import { formatPreviewSignedNumber } from '../../lib/builder-preview/character-builder-preview-panel.lib'
 import { AbilityRecommendationPanel } from './ability-recommendation-panel.client'
 import { AbilityScoreCardBadge } from './ability-score-card-badge.client'
 import { AutoFillRemainingAction } from './auto-fill-remaining-action.client'

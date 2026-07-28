@@ -17,8 +17,11 @@ import {
   type CharacterWealth,
 } from '../../../character/equipment-inventory'
 import type { CharacterBuildCatalogIndex } from '../../context'
-import type { CharacterBuilderDraft, CharacterBuilderDraftEquipmentPurchase } from '../../draft'
-import { getBuilderSelectedStartingLevel } from '../../builder-level'
+import type {
+  CharacterBuilderDraft,
+  CharacterBuilderDraftEquipmentPurchase,
+} from '../../draft/draft'
+import { getBuilderSelectedStartingLevel } from '../../progression/builder-level'
 import { readSelectedStartingEquipmentOptionId } from './resolve-starting-equipment-choice-sets'
 import type { EquipmentBudgetSummary } from './equipment-budget'
 

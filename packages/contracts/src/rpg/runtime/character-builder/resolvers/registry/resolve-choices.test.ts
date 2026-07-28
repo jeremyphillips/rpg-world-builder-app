@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
-import { createEmptyCharacterBuilderDraft } from '../../draft'
-import type { CharacterBuilderDraft } from '../../draft'
+import { createEmptyCharacterBuilderDraft } from '../../draft/draft'
+import type { CharacterBuilderDraft } from '../../draft/draft'
 import { builderTestContext, fighterClass } from '../../test-fixtures'
 import { resolveAvailableChoices } from './resolve-choices'
 

@@ -3,7 +3,7 @@
 import type { CharacterVitalState } from '@rpg/contracts'
 import { Text } from '@rpg/ui'
 
-import { resolveCharacterVitalStatusPresentation } from '../../lib/character-vital-presentation'
+import { resolveCharacterVitalStatusPresentation } from '../../lib/display/character-vital-presentation'
 
 export type CharacterVitalSummaryProps = {
   vital: CharacterVitalState

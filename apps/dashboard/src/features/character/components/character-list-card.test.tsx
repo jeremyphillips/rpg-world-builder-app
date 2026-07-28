@@ -6,7 +6,7 @@ import { expectNoAxeViolations } from '@rpg/ui/test-utils'
 import {
   buildCharacterCardViewModel,
   CHARACTER_CARD_CAMPAIGN_LABEL,
-} from '../lib/character-display'
+} from '../lib/display/character-display'
 import {
   createPopulatedStandaloneBuilderContextFixture,
   createStandaloneBuilderCatalogIndexFixture,

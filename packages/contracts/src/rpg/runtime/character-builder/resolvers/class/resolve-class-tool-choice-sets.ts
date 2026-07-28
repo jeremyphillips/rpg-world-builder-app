@@ -1,7 +1,7 @@
 import { buildChoiceSetId, type ChoiceSet } from '../../choice-set'
 import { isMeaningfulToolProficiencyChoice } from '../../../../content/lib/proficiency-grant-set'
 import type { CharacterBuildCatalogIndex } from '../../context'
-import type { CharacterBuilderDraft } from '../../draft'
+import type { CharacterBuilderDraft } from '../../draft/draft'
 import { resolveToolPoolChoiceOptions } from '../proficiency/resolve-tool-pool-choice-options'
 
 /** Builds class tool proficiency ChoiceSets from character-creation proficiency choices. */

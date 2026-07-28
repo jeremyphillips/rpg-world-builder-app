@@ -18,7 +18,7 @@ import {
   PREVIEW_CHOOSE_ALIGNMENT,
   PREVIEW_CHOOSE_SPECIES,
   PREVIEW_UNNAMED_CHARACTER,
-} from '../lib/preview-identity-summary'
+} from '../lib/builder-preview/preview-identity-summary'
 import { CharacterBuilderPreviewPanel } from './character-builder-preview-panel.client'
 
 describe('CharacterBuilderPreviewPanel', () => {

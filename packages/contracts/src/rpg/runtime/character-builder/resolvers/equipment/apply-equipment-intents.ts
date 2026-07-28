@@ -1,9 +1,9 @@
 import type { Equipment } from '../../../../content/equipment'
-import type { CharacterBuilderDraft } from '../../draft'
+import type { CharacterBuilderDraft } from '../../draft/draft'
 import {
   mergeCompatiblePurchasedEntries,
   normalizeEquipmentPurchase,
-} from '../../equipment-purchase'
+} from '../../equipment/equipment-purchase'
 import type {
   ApplyEquipmentIntentResult,
   EquipmentAcquisitionBuilderContext,

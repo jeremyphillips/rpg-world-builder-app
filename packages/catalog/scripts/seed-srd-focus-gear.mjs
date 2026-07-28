@@ -14,13 +14,6 @@ const TS = '2024-05-21T00:00:00.000Z'
 const gp = (amount) => ({ amount, currency: 'gp' })
 const lb = (value) => ({ value, unit: 'lb' })
 
-const SPELLCASTING_SUB_KINDS = new Set([
-  'arcane_focus',
-  'druidic_focus',
-  'holy_symbol',
-  'spellbook',
-])
-
 function gear(slug, name, description, cost, spellcastingGearKind, { weight, ...extra } = {}) {
   return {
     id: `${RULESET}:${slug}`,

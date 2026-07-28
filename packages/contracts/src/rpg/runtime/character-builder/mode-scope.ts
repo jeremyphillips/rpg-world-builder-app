@@ -5,10 +5,14 @@ import { systemRulesetIdSchema } from '../../primitives/ruleset'
 // ---------------------------------------------------------------------------
 // Legacy builder mode / build scope — prefer character-acquisition axes
 // (channel, surface, characterKind, rulesScope) on CharacterBuildContext.
+// Do not promote to rpg/character-builder. Prefer CharacterBuildAcquisition
+// for new cross-feature flows.
 // ---------------------------------------------------------------------------
 
+/** @deprecated Legacy builder mode. Do not promote to `rpg/character-builder/`. */
 export const CHARACTER_BUILDER_MODES = ['public', 'dashboard', 'npc', 'import'] as const
 
+/** @deprecated Legacy builder mode. Do not promote to `rpg/character-builder/`. */
 export const characterBuilderModeSchema = z.enum(CHARACTER_BUILDER_MODES)
 
 export type CharacterBuilderMode = z.infer<typeof characterBuilderModeSchema>
@@ -37,6 +41,11 @@ export const campaignCharacterBuildScopeSchema = z.object({
 
 export type CampaignCharacterBuildScope = z.infer<typeof campaignCharacterBuildScopeSchema>
 
+/**
+ * Legacy builder scope representation.
+ * Do not promote to `rpg/character-builder/`.
+ * Prefer `CharacterBuildAcquisition` for new cross-feature flows.
+ */
 export const characterBuildScopeSchema = z.discriminatedUnion('type', [
   standaloneCharacterBuildScopeSchema,
   campaignCharacterBuildScopeSchema,

@@ -7,10 +7,12 @@ import {
   type CharacterBuildCatalogIndex,
   type CharacterBuildContext,
   type CharacterBuilderDraft,
-  type CharacterBuilderStepId,
-  type CharacterBuildValidationIssue,
   type ChoiceSet,
 } from '@rpg/contracts'
+import type {
+  CharacterBuilderStepId,
+  CharacterBuildValidationIssue,
+} from '@rpg/contracts/rpg/character-builder'
 import { cn, Text } from '@rpg/ui'
 import { CheckCircle2, Circle, CircleAlert, CircleDot, Lock, type LucideIcon } from 'lucide-react'
 
@@ -18,12 +20,12 @@ import {
   resolveStepRailIndex,
   resolveStepRailKeyboardDirection,
   resolveStepRailKeyboardTarget,
-} from '../lib/character-builder-step-rail-keyboard.lib'
+} from '../lib/builder/character-builder-step-rail-keyboard.lib'
 import {
   resolveStepVisualStatus,
   stepStatusAriaLabel,
   type StepStatus,
-} from '../lib/builder-step-visual-status'
+} from '../lib/builder/builder-step-visual-status'
 import {
   characterBuilderStepRailClasses,
   characterBuilderStepRailIconClasses,

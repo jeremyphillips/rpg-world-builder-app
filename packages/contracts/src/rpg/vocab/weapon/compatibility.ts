@@ -1,6 +1,5 @@
-import { joinNaturalList } from '../../primitives/prose'
 import { getWeaponModeLabel, type WeaponMode } from './mode'
-import { getWeaponMasteryLabel, type WeaponMastery } from './mastery'
+import { type WeaponMastery } from './mastery'
 import { getWeaponPropertyLabel, type WeaponProperty } from './property'
 
 // ---------------------------------------------------------------------------
@@ -25,21 +24,12 @@ export interface WeaponPropertyModeAdvisory {
   message: string
 }
 
-const MODE_WEAPON_PHRASE: Record<WeaponMode, string> = {
-  melee: 'melee weapons',
-  ranged: 'ranged weapons',
-}
-
 function incompatiblePropertiesForMode(mode: WeaponMode): readonly WeaponProperty[] {
   return WEAPON_PROPERTIES_INCOMPATIBLE_WITH_MODE[mode]
 }
 
 function incompatibleMasteriesForMode(mode: WeaponMode): readonly WeaponMastery[] {
   return WEAPON_MASTERIES_INCOMPATIBLE_WITH_MODE[mode]
-}
-
-function unavailableForModePhrase(mode: WeaponMode, subject: string): string {
-  return `${subject} ${subject.includes(' and ') || subject.includes(', ') ? "aren't" : "isn't"} available for ${MODE_WEAPON_PHRASE[mode]}.`
 }
 
 /** Whether a property may be selected for the given weapon mode. */
@@ -91,32 +81,4 @@ export function getWeaponPropertyModeAdvisories(values: {
       mode,
       message: `${getWeaponPropertyLabel(property)} isn't compatible with ${getWeaponModeLabel(mode).toLowerCase()} weapons.`,
     }))
-}
-
-/**
- * Helper text listing properties disabled for the current mode.
- * Returns undefined when mode is unset or there are no disabled properties.
- */
-export function formatWeaponPropertyModeHint(mode: WeaponMode | undefined): string | undefined {
-  if (!mode) return undefined
-
-  const labels = incompatiblePropertiesForMode(mode).map((property) =>
-    getWeaponPropertyLabel(property),
-  )
-  if (labels.length === 0) return undefined
-
-  return unavailableForModePhrase(mode, joinNaturalList(labels))
-}
-
-/**
- * Helper text listing masteries disabled for the current mode.
- * Returns undefined when mode is unset or there are no disabled masteries.
- */
-export function formatWeaponMasteryModeHint(mode: WeaponMode | undefined): string | undefined {
-  if (!mode) return undefined
-
-  const labels = incompatibleMasteriesForMode(mode).map((mastery) => getWeaponMasteryLabel(mastery))
-  if (labels.length === 0) return undefined
-
-  return unavailableForModePhrase(mode, joinNaturalList(labels))
 }

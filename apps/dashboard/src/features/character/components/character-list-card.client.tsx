@@ -13,8 +13,8 @@ import {
 
 import { ROUTES } from '@/app/routes'
 
-import { CHARACTER_CARD_CAMPAIGN_LABEL } from '../lib/character-display'
-import type { CharacterCardViewModel } from '../lib/character-display'
+import { CHARACTER_CARD_CAMPAIGN_LABEL } from '../lib/display/character-display'
+import type { CharacterCardViewModel } from '../lib/display/character-display'
 
 export type CharacterListCardProps = {
   card: CharacterCardViewModel

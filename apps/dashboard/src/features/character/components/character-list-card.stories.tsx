@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 
-import { buildCharacterCardViewModel } from '../lib/character-display'
+import { buildCharacterCardViewModel } from '../lib/display/character-display'
 import {
   createPopulatedStandaloneBuilderContextFixture,
   createStandaloneBuilderCatalogIndexFixture,

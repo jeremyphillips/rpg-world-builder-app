@@ -1,6 +1,5 @@
 // fallow-ignore-file complexity
 import type { CoinWealth } from '../../rpg/primitives/wealth'
-import { getContentTypeTerm } from '../../rpg/content/lib/content-type-terms'
 import type { Alignment } from '../../rpg/vocab/alignment'
 import type { CharacterAbilityScores } from '../../rpg/runtime/character/core'
 import type { DndBeyondCharacterPayload, DndBeyondModifier } from './dnd-beyond-character.schema'
@@ -185,7 +184,7 @@ function extractSpecies(
 
   if (!race) {
     return fieldResult('missing-source', sourcePaths, [
-      `${getContentTypeTerm('species').label} is not set on the source character. D&D Beyond stores species on data.race.`,
+      'Imported character is missing a species identifier. D&D Beyond stores species on data.race.',
     ])
   }
 

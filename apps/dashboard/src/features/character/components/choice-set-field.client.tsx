@@ -10,7 +10,7 @@ import {
   mapChoiceSetOptionsToRadioCardOptions,
   normalizeChoiceSetSelection,
   resolveChoiceSetFieldVariant,
-} from '../lib/choice-set-field.lib'
+} from '../lib/choice-sets/choice-set-field.lib'
 
 export type ChoiceSetFieldProps = {
   choiceSet: ChoiceSet

@@ -10,12 +10,12 @@ import {
   type CharacterDetailListItem,
   type CharacterDetailListSection,
   type CharacterWealthViewModel,
-} from '../../lib/character-display'
+} from '../../lib/display/character-display'
 import type {
   CharacterSheetEquipmentCard,
   CharacterSheetSpellCard,
 } from '../../lib/detail/character-sheet-catalog'
-import { narrativeFieldCount } from '../../lib/narrative-preview'
+import { narrativeFieldCount } from '../../lib/builder-preview/narrative-preview'
 import { CharacterDetailEquipmentTab } from './character-detail-equipment-tab.client'
 import { CharacterDetailNarrativeSection } from './character-detail-narrative-section.client'
 import { CharacterDetailSpellsTab } from './character-detail-spells-tab.client'

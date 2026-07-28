@@ -1,5 +1,6 @@
 import {
   type EquipmentAcquisitionActionState,
+  type EquipmentAcquisitionBlocker,
   type EquipmentAcquisitionPlan,
   type EquipmentBudgetSummary,
   type EquipmentPurchaseAvailability,
@@ -39,6 +40,7 @@ export const EQUIPMENT_PICKER_GRANT_MANAGE_LABEL = 'Manage choice'
 export const EQUIPMENT_PICKER_GRANT_RELEASE_LABEL = 'Release one'
 export const EQUIPMENT_PICKER_GRANT_COMMIT_LABEL = 'Use magic item choice'
 export const EQUIPMENT_PICKER_GRANT_PARTIAL_PREFIX = 'Add'
+export const EQUIPMENT_PICKER_ACTION_BLOCKED_LABEL = 'This item cannot be added right now.'
 
 export function formatPartialActionLabel(
   partialAction: NonNullable<EquipmentAcquisitionPlan['partialAction']>,
@@ -50,14 +52,7 @@ export function formatPartialActionLabel(
   return `${EQUIPMENT_PICKER_GRANT_PARTIAL_PREFIX} ${partialAction.requestedQuantity} available`
 }
 
-export function formatAcquisitionBlockerNote(
-  blocker: NonNullable<
-    Extract<
-      EquipmentAcquisitionActionState,
-      { kind: 'magic_item_grant' }
-    >['capabilities']['addBlockedReason']
-  >,
-): string {
+export function formatAcquisitionBlockerNote(blocker: EquipmentAcquisitionBlocker): string {
   switch (blocker.code) {
     case 'duplicate_not_allowed':
       return 'You already own the maximum allowed copies of this item.'
@@ -67,8 +62,10 @@ export function formatAcquisitionBlockerNote(
       return EQUIPMENT_PICKER_NOT_PURCHASABLE_LABEL
     case 'cannot_afford':
       return EQUIPMENT_PICKER_CANNOT_AFFORD_LABEL
-    default:
-      return EQUIPMENT_PICKER_CANNOT_AFFORD_LABEL
+    default: {
+      const _exhaustive: never = blocker
+      return _exhaustive
+    }
   }
 }
 

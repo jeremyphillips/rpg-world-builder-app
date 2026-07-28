@@ -4,7 +4,7 @@ import type { SkillProficiency } from '../../content/skill-proficiency'
 import { resolveCharacterCreationPatch } from '../../campaign/patches/campaign-character-creation-patch'
 import { defaultCampaignMechanicsPatch } from '../../campaign/patches/campaign-mechanics-patch'
 import { resolveCharacterOwnershipTarget } from '../character-acquisition'
-import { DEFAULT_ABILITY_GENERATION_RULES } from './ability-generation'
+import { DEFAULT_ABILITY_GENERATION_RULES } from './ability/ability-generation'
 import type { CharacterBuildCatalog, CharacterBuildContext } from './context'
 import { builderTestLanguages, dwarfSpecies, startingWealthSeed } from './test-fixtures'
 

@@ -13,7 +13,7 @@ import {
   formatSpellSaveDc,
   formatSpellSlotSummary,
   spellcastingPreviewStats,
-} from '../../lib/spells-step.lib'
+} from '../../lib/spells/spells-step.lib'
 import {
   spellcastingSummaryCardClasses,
   spellcastingSummaryCardLabelClasses,

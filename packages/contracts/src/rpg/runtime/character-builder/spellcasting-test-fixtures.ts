@@ -5,7 +5,7 @@ import { defaultCampaignMechanicsPatch } from '../../campaign/patches/campaign-m
 import type { Species } from '../../content/species'
 import type { SkillProficiency } from '../../content/skill-proficiency'
 import { resolveCharacterOwnershipTarget } from '../character-acquisition'
-import { DEFAULT_ABILITY_GENERATION_RULES } from './ability-generation'
+import { DEFAULT_ABILITY_GENERATION_RULES } from './ability/ability-generation'
 import type { CharacterBuildCatalog, CharacterBuildContext } from './context'
 import { dwarfSpecies, startingWealthSeed, storedFighter } from './test-fixtures'
 

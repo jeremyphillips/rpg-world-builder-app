@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import { expectNoAxeViolations } from '@rpg/ui/test-utils'
 
-import { getBuilderChromeCopy } from '../lib/builder-chrome-copy'
+import { getBuilderChromeCopy } from '../lib/builder/builder-chrome-copy'
 import { CharacterBuilderFooter } from './character-builder-footer.client'
 
 const pcChrome = getBuilderChromeCopy('standalone_pc')

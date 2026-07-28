@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { createEmptyCharacterBuilderDraft } from '../draft'
+import { createEmptyCharacterBuilderDraft } from '../draft/draft'
 import { indexCharacterBuildCatalog } from '../context'
 import { assembleCharacterProficiencies } from './assemble-proficiencies'
 import { resolveClassToolChoiceSets } from '../resolvers/class/resolve-class-tool-choice-sets'

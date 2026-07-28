@@ -10,7 +10,8 @@ import { CharacterDetailContent } from '../components/detail/character-detail-co
 import { CharacterVitalSummary } from '../components/detail/character-vital-summary.client'
 import { useBuildContext } from '../hooks/use-build-context'
 import { useCharacter } from '../hooks/use-character'
-import { buildCharacterDetailViewModel } from '../lib/character-display'
+import { buildCharacterDetailViewModel } from '../lib/display/character-display'
+import { resolveQueryErrorLabel } from '../lib/resolve-query-error-label.lib'
 
 export function CharacterDetail() {
   const { characterId } = useParams<{ characterId: string }>()
@@ -41,7 +42,10 @@ export function CharacterDetail() {
 
   const isPending = isCharacterPending || Boolean(character && isCatalogPending)
   const isError = isCharacterError || isCatalogError
-  const errorLabel = characterError?.message ?? catalogError?.message
+  const errorLabel = resolveQueryErrorLabel([
+    { isPending: isCharacterPending, isError: isCharacterError, error: characterError },
+    { isPending: isCatalogPending, isError: isCatalogError, error: catalogError },
+  ])
 
   return (
     <WidePage spacing="relaxed">

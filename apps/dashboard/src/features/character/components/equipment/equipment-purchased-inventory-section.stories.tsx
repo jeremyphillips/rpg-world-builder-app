@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { useState } from 'react'
 
-import type { EquipmentInventoryRow } from '../../lib/equipment-step.lib'
+import type { EquipmentInventoryRow } from '../../lib/equipment/equipment-step.lib'
 import { EquipmentPurchasedInventorySection } from './equipment-purchased-inventory-section.client'
 import type { PurchasedCategoryGroup } from './equipment-inventory-summary.lib'
 

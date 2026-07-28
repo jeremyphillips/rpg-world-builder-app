@@ -10,6 +10,7 @@ import {
   formatSpellPickerDrawerTitle,
   formatSpellPickerSelectionCountText,
   formatSpellPickerSelectionMetadata,
+  getSpellPickerCastingTimeFilterLabel,
   matchesSpellPickerMechanicsFilters,
   normalizeSpellPickerLevelSelection,
   resolveActivePreparedLevelSuffix,
@@ -99,6 +100,13 @@ describe('spell-picker-drawer.lib', () => {
         methods: [],
       }),
     ).toBe(false)
+  })
+
+  it('derives casting-time filter labels from rules vocabulary', () => {
+    expect(getSpellPickerCastingTimeFilterLabel('action')).toBe('Action')
+    expect(getSpellPickerCastingTimeFilterLabel('bonus-action')).toBe('Bonus action')
+    expect(getSpellPickerCastingTimeFilterLabel('1-minute')).toBe('1 minute')
+    expect(getSpellPickerCastingTimeFilterLabel('10-minutes')).toBe('10 minutes')
   })
 
   it('appends prepared level suffix only for a single active level', () => {

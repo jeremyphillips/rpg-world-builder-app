@@ -3,7 +3,7 @@ import {
   DEFAULT_CONTENT_CAMPAIGN_ACCESS,
   type AdminUserCharacterListQuery,
   type CampaignContentEligibilityEntry,
-  type CharacterCardViewModelDto,
+  type AdminUserCharacterSummary,
   type SystemRulesetId,
 } from '@rpg/contracts'
 import { loadSeedSubclasses } from '@rpg/catalog/classes'
@@ -81,7 +81,7 @@ async function resolveContentMapForCharacter(
 
 export async function listAdminUserCharacterCards(
   userId: string,
-): Promise<CharacterCardViewModelDto[]> {
+): Promise<AdminUserCharacterSummary[]> {
   const characters = await listCharactersForUser(userId)
   const enriched = await enrichPcsWithOpenCampaign(characters)
 
@@ -91,7 +91,7 @@ export async function listAdminUserCharacterCards(
     Map<string, CampaignContentEligibilityEntry>
   >()
 
-  const cards: CharacterCardViewModelDto[] = []
+  const cards: AdminUserCharacterSummary[] = []
 
   for (const character of enriched) {
     const contentMap = await resolveContentMapForCharacter(
@@ -114,7 +114,7 @@ export async function listAdminUserCharacterCards(
 export async function listAdminUserCharacters(
   userId: string,
   query: AdminUserCharacterListQuery,
-): Promise<CharacterCardViewModelDto[]> {
+): Promise<AdminUserCharacterSummary[]> {
   const cards = await listAdminUserCharacterCards(userId)
   const trimmedSearch = query.q?.trim().toLowerCase()
 

@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest'
 
-import { createEmptyCharacterBuilderDraft } from '../../draft'
+import { createEmptyCharacterBuilderDraft } from '../../draft/draft'
 import { indexCharacterBuildCatalog } from '../../context'
-import { buildCharacterPreview } from '../../preview'
+import { buildCharacterPreview } from '../../preview/preview'
 import { resolveAvailableChoices } from '../registry/resolve-choices'
 import { resolveClassSkillChoiceSets } from '../class/resolve-class-skill-choice-sets'
 import { resolveProficiencyStepModel } from './resolve-proficiency-step-model'

@@ -1,9 +1,11 @@
-import type { SpellCastingTime, SpellComponents, SpellDuration, SpellRange } from '@rpg/contracts'
+import type { SpellCastingTime } from '@rpg/contracts'
 import {
+  formatSpellCastingTimeLabel,
+  formatSpellComponentsLabel,
+  formatSpellDurationLabel,
   formatSpellLevel,
-  getCastingTimeUnitLabel,
-  getDurationUnitLabel,
-  getSpellRangeKindLabel,
+  formatSpellRangeLabel,
+  spellRequiresConcentration,
 } from '@rpg/contracts'
 
 export const CANTRIP_LEVEL_LABEL = 'Cantrip'
@@ -19,86 +21,23 @@ export type FormatCastingTimeOptions = {
   includeTrigger?: boolean
 }
 
-type CastingTimeUnitFormatter = (value: number) => string
-
-const CASTING_TIME_UNIT_FORMATTERS: Record<string, CastingTimeUnitFormatter> = {
-  action: (value) => (value === 1 ? '1 Action' : `${value} Actions`),
-  'bonus-action': (value) => (value === 1 ? '1 Bonus action' : `${value} Bonus actions`),
-  reaction: (value) => (value === 1 ? '1 Reaction' : `${value} Reactions`),
-  minute: (value) => (value === 1 ? '1 Minute' : `${value} Minutes`),
-  hour: (value) => (value === 1 ? '1 Hour' : `${value} Hours`),
-}
-
-function formatCastingTimeUnit(value: number, unit: string): string {
-  const formatter = CASTING_TIME_UNIT_FORMATTERS[unit]
-  return formatter ? formatter(value) : `${value} ${getCastingTimeUnitLabel(unit)}`
-}
-
 /** Formats a spell casting time for display (e.g. "1 Action", "1 Reaction (when hit)"). */
 export function formatCastingTime(
   castingTime: SpellCastingTime,
   options: FormatCastingTimeOptions = {},
 ): string {
-  const { includeTrigger = true } = options
-  const { value, unit, trigger } = castingTime.normal
-
-  let timeStr = formatCastingTimeUnit(value, unit)
-  if (includeTrigger && trigger) {
-    timeStr = `${timeStr} (${trigger})`
-  }
-
-  return timeStr
+  return formatSpellCastingTimeLabel(castingTime, 'detail', options)
 }
 
 /** Formats a spell range for display (e.g. "Self", "120 ft."). */
-export function formatSpellRange(range: SpellRange): string {
-  switch (range.kind) {
-    case 'distance':
-      return `${range.value.value} ${range.value.unit}.`
-    case 'special':
-      return range.description
-    default:
-      return getSpellRangeKindLabel(range.kind)
-  }
+export function formatSpellRange(range: Parameters<typeof formatSpellRangeLabel>[0]): string {
+  return formatSpellRangeLabel(range, 'detail')
 }
 
 /** Formats a spell duration for display (e.g. "Instantaneous", "Concentration, up to 10 minutes"). */
-export function formatSpellDuration(duration: SpellDuration): string {
-  switch (duration.kind) {
-    case 'instantaneous':
-      return 'Instantaneous'
-    case 'special':
-      return duration.description
-    case 'timed': {
-      const unitLabel = getDurationUnitLabel(duration.unit).toLowerCase()
-      const durationText =
-        duration.value === 1 ? `1 ${unitLabel}` : `${duration.value} ${unitLabel}s`
-      if (duration.concentration && duration.upTo) {
-        return `Concentration, up to ${durationText}`
-      }
-      if (duration.concentration) {
-        return `Concentration, ${durationText}`
-      }
-      if (duration.upTo) {
-        return `Up to ${durationText}`
-      }
-      return durationText
-    }
-  }
-}
+export const formatSpellDuration = formatSpellDurationLabel
 
 /** Formats spell components for display (e.g. "V, S, M (a bit of fleece)"). */
-export function formatSpellComponents(components: SpellComponents): string {
-  const parts: string[] = []
-  if (components.verbal) parts.push('V')
-  if (components.somatic) parts.push('S')
-  if (components.material) {
-    parts.push(`M (${components.material.description})`)
-  }
-  return parts.join(', ')
-}
+export const formatSpellComponents = formatSpellComponentsLabel
 
-/** Whether a spell requires concentration based on its duration metadata. */
-export function spellRequiresConcentration(duration: SpellDuration): boolean {
-  return duration.kind === 'timed' && duration.concentration === true
-}
+export { spellRequiresConcentration }

@@ -13,7 +13,7 @@ import {
   equipmentStepCatalogFixture,
   equipmentStepLuteFixture,
   equipmentStepMonkClassFixture,
-} from '../../lib/equipment-step.fixtures'
+} from '../../lib/equipment/equipment-step.fixtures'
 import { EquipmentStep } from './equipment-step.client'
 
 const context = createStandaloneBuilderContextFixture({

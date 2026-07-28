@@ -8,7 +8,7 @@ import {
   EQUIPMENT_PACKAGE_INCLUDED_WEALTH_LABEL,
   type EquipmentInventoryRow,
   type StartingPackageInventoryGroup,
-} from '../../lib/equipment-step.lib'
+} from '../../lib/equipment/equipment-step.lib'
 import { EquipmentInventoryRowItem } from './equipment-inventory-row.client'
 import { equipmentInventoryRowListClasses } from './equipment-inventory-summary.variants'
 import {

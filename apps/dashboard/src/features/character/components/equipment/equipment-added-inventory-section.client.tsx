@@ -14,7 +14,7 @@ import {
   EQUIPMENT_ADDED_INVENTORY_EMPTY_MESSAGE,
   type EquipmentInventoryQuantityTarget,
   type EquipmentInventoryRemoveTarget,
-} from '../../lib/equipment-step.lib'
+} from '../../lib/equipment/equipment-step.lib'
 import { EquipmentAddedInventoryRowItem } from './equipment-added-inventory-row.client'
 import type { AddedEquipmentCategoryGroup } from './equipment-inventory-summary.lib'
 import {

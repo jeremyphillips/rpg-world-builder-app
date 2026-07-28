@@ -4,7 +4,7 @@ import { equipmentSchema } from '../../../../content/equipment'
 import type { ClassStored } from '../../../../content/classes/class'
 import { standardStartingWealthTableId } from '../../../../campaign/rules/starting-wealth'
 import { indexCharacterBuildCatalog } from '../../context'
-import { createEmptyCharacterBuilderDraft } from '../../draft'
+import { createEmptyCharacterBuilderDraft } from '../../draft/draft'
 import {
   applyMagicItemAcquisitionIntent,
   resolveEquipmentAcquisitionBuilderContext,

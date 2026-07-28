@@ -23,7 +23,7 @@ import {
 } from '../../character/equipment-inventory'
 import type { CharacterSelectionSource } from '../../character/selection-sources'
 import type { CharacterBuildCatalogIndex } from '../context'
-import type { CharacterBuilderDraft } from '../draft'
+import type { CharacterBuilderDraft } from '../draft/draft'
 import { deriveEquipmentBudgetSummary } from '../resolvers/equipment/equipment-budget'
 import { deriveEquipmentBudgetSummaryFromFunding } from '../resolvers/equipment/resolve-starting-equipment-funding'
 import type { ResolvedStartingEquipmentFunding } from '../resolvers/equipment/resolve-starting-equipment-funding'

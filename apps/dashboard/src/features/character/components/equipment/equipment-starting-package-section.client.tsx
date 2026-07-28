@@ -13,7 +13,7 @@ import { Text } from '@rpg/ui'
 import {
   EQUIPMENT_STARTING_PACKAGE_SECTION_LABEL,
   type StartingPackageInventoryGroup,
-} from '../../lib/equipment-step.lib'
+} from '../../lib/equipment/equipment-step.lib'
 import { EquipmentInventoryColumn } from './equipment-inventory-column.client'
 import { EquipmentPackageConversionEditor } from './equipment-package-conversion-editor.client'
 import {

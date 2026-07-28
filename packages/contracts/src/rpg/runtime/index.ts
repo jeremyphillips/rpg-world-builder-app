@@ -1,3 +1,5 @@
+export * from './campaign'
+export * from './campaign-eligibility'
 export * from './character'
 export * from './character-acquisition'
 export * from './character-builder'

@@ -12,7 +12,7 @@ import { Modal } from '@rpg/ui'
 import {
   type EquipmentInventoryQuantityTarget,
   type EquipmentInventoryRemoveTarget,
-} from '../../lib/equipment-step.lib'
+} from '../../lib/equipment/equipment-step.lib'
 
 import {
   buildPackageSwitchDraftPurchasedGroups,

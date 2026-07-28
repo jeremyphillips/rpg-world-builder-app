@@ -4,7 +4,7 @@ import { fn } from 'storybook/test'
 import { createEmptyCharacterBuilderDraft } from '@rpg/contracts'
 
 import { createStandaloneBuilderContextFixture } from '../../lib/character-builder-fixtures'
-import { getBuilderChromeCopy } from '../../lib/builder-chrome-copy'
+import { getBuilderChromeCopy } from '../../lib/builder/builder-chrome-copy'
 import { ReviewStep } from './review-step.client'
 
 const pcChrome = getBuilderChromeCopy('standalone_pc')

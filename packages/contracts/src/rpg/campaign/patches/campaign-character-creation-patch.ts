@@ -22,7 +22,7 @@ import {
   characterCreationProficiencyGrantsPatchSchema,
   resolveCharacterCreationProficiencyRules,
   resolvedCharacterCreationProficiencyRulesSchema,
-} from '../../content/character-creation-proficiencies'
+} from '../../primitives/proficiency/character-creation-proficiency-rules'
 import { campaignPatchValidationMessages } from './campaign-patch-messages'
 import {
   campaignSubclassingPatchSchema,

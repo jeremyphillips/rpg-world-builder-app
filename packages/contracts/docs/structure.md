@@ -71,22 +71,29 @@ flowchart BT
 
 ## Where to put new modules
 
-| You are adding…                                                             | Layer                    | Example path                                                                                                                 |
-| --------------------------------------------------------------------------- | ------------------------ | ---------------------------------------------------------------------------------------------------------------------------- |
-| A shared validation message or message primitive                            | `validation/`            | `validation/messages.ts` (see [validation-messages.md](validation-messages.md))                                              |
-| A closed id set with labels (and optional SRD text)                         | `rpg/vocab/`             | `rpg/vocab/sense.ts`, `rpg/vocab/weapon/property.ts`                                                                         |
-| A reusable value type used across content types                             | `rpg/primitives/`        | `rpg/primitives/dice.ts`, `rpg/primitives/units.ts`, `rpg/primitives/authored-content.ts`                                    |
-| A catalog content type or its DTOs/patches                                  | `rpg/content/`           | `rpg/content/species.ts`, `rpg/content/classes/class.ts`                                                                     |
-| Shared content helpers (grants, envelope, keys)                             | `rpg/content/lib/`       | `rpg/content/lib/grants.ts`                                                                                                  |
-| Creature-like runtime primitives (PC, NPC, monster)                         | `rpg/runtime/creature/`  | `languages.ts`, `equipment.ts`, `spellcasting.ts` — see [runtime-resolution-boundaries.md](runtime-resolution-boundaries.md) |
-| A stored character sheet or builder runtime contract                        | `rpg/runtime/`           | `rpg/runtime/character/sheet.ts` — see [runtime-resolution-boundaries.md](runtime-resolution-boundaries.md)                  |
-| Serializable character-builder wire contracts (step ids, validation issues) | `rpg/character-builder/` | `rpg/character-builder/step-ids.ts` — see [character-builder-contracts.md](character-builder-contracts.md)                   |
-| Campaign identity, templates, membership, ruleset patches                   | `rpg/campaign/`          | `rpg/campaign/campaign.ts`, `rpg/campaign/campaign-template.ts`, `rpg/campaign/patches/`                                     |
-| Campaign rule bodies (not catalog content types)                            | `rpg/campaign/rules/`    | `rpg/campaign/rules/starting-wealth.ts`                                                                                      |
-| Auth, session, upload, or API error shapes                                  | `shared/`                | `shared/auth.ts`, `shared/errors.ts`                                                                                         |
-| Dev Bench ticket/epic schemas and input DTOs                                | `dev-bench/`             | `dev-bench/ticket.ts`                                                                                                        |
-| Name generator conventions, collections, and generation                     | `name-generator/`        | `name-generator/naming-convention.ts`                                                                                        |
-| Public marketing or CMS schemas                                             | `public/`                | (scaffold — add when needed)                                                                                                 |
+| You are adding…                                                                          | Layer                               | Example path                                                                                                                 |
+| ---------------------------------------------------------------------------------------- | ----------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| A shared validation message or message primitive                                         | `validation/`                       | `validation/messages.ts` (see [validation-messages.md](validation-messages.md))                                              |
+| A closed id set with labels (and optional SRD text)                                      | `rpg/vocab/`                        | `rpg/vocab/sense.ts`, `rpg/vocab/weapon/property.ts`, `rpg/vocab/personal-name-component.ts`                                 |
+| A reusable value type used across content types                                          | `rpg/primitives/`                   | `rpg/primitives/dice.ts`, `rpg/primitives/units.ts`, `rpg/primitives/authored-content.ts`                                    |
+| Shared proficiency grant/choice input schemas (content + campaign)                       | `rpg/primitives/proficiency/`       | `proficiency-grant-set.ts`, `character-creation-proficiency-rules.ts`                                                        |
+| Weapon mode presentation formatters (extracted from vocab)                               | `rpg/primitives/weapon/`            | `mode-compatibility-messages.ts`                                                                                             |
+| Catalog content type or its DTOs/patches                                                 | `rpg/content/`                      | `rpg/content/species.ts`, `rpg/content/classes/class.ts`                                                                     |
+| Shared content helpers (grants, envelope, keys)                                          | `rpg/content/lib/`                  | `rpg/content/lib/grants.ts`                                                                                                  |
+| Creature-like runtime primitives (PC, NPC, monster)                                      | `rpg/runtime/creature/`             | `languages.ts`, `equipment.ts`, `spellcasting.ts` — see [runtime-resolution-boundaries.md](runtime-resolution-boundaries.md) |
+| A stored character sheet or builder runtime contract                                     | `rpg/runtime/`                      | `rpg/runtime/character/sheet.ts` — see [runtime-resolution-boundaries.md](runtime-resolution-boundaries.md)                  |
+| Composed campaign-character wire DTOs (not campaign rules)                               | `rpg/runtime/campaign/`             | `npc-dtos.ts`, `pc-list-item-dto.ts`, `party-pc-list-item-dto.ts`                                                            |
+| Campaign eligibility resolver orchestration                                              | `rpg/runtime/campaign-eligibility/` | `resolve-character-campaign-eligibility.ts`                                                                                  |
+| RPG character list-card view models                                                      | `rpg/runtime/character/`            | `character-card-dtos.ts`                                                                                                     |
+| Campaign content viewer authorization model                                              | `rpg/campaign/lib/`                 | `campaign-content-viewer.ts`                                                                                                 |
+| Campaign eligibility wire contracts (issues/warnings only)                               | `rpg/campaign/`                     | `character-eligibility-contracts.ts`                                                                                         |
+| Serializable character-builder wire contracts (step ids, validation issues, acquisition) | `rpg/character-builder/`            | `rpg/character-builder/step-ids.ts` — import via `@rpg/contracts/rpg/character-builder`                                      |
+| Campaign identity, templates, membership, ruleset patches                                | `rpg/campaign/`                     | `rpg/campaign/campaign.ts`, `rpg/campaign/campaign-template.ts`, `rpg/campaign/patches/`                                     |
+| Campaign rule bodies (not catalog content types)                                         | `rpg/campaign/rules/`               | `rpg/campaign/rules/starting-wealth.ts`                                                                                      |
+| Auth, session, upload, or API error shapes                                               | `shared/`                           | `shared/auth.ts`, `shared/errors.ts` — product-neutral only; do not park RPG view models here                                |
+| Dev Bench ticket/epic schemas and input DTOs                                             | `dev-bench/`                        | `dev-bench/ticket.ts`                                                                                                        |
+| Name generator conventions, collections, and generation                                  | `name-generator/`                   | `name-generator/naming-convention.ts`                                                                                        |
+| Public marketing or CMS schemas                                                          | `public/`                           | (scaffold — add when needed)                                                                                                 |
 
 Nested folders are fine when a domain splits cleanly (e.g. `rpg/content/classes/`
 for spellcasting + class body, `rpg/vocab/weapon/` for weapon term maps).
@@ -99,26 +106,27 @@ primitive. Rules catalog bodies consume it through the existing
 seed-entry contracts can compose the neutral primitive with their own envelopes.
 
 Each layer has an `index.ts` barrel. Re-export new public symbols from that
-barrel (the root barrel picks up `shared/` and `rpg/*` automatically).
+barrel. The root barrel re-exports `shared/` and most `rpg/*` layers — **not**
+`rpg/character-builder/` (use the subpath export so ownership stays visible).
 
 ## Dependency rules
 
 Acyclic **downward** imports only — lower layers never import higher layers.
 
-| Layer                    | May import                                                                                                                | Must not import                                                               |
-| ------------------------ | ------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
-| `validation/`            | `validation/` only                                                                                                        | everything else                                                               |
-| `shared/`                | `validation/`, `shared/`, `rpg/primitives/`                                                                               | `rpg/vocab/`, `rpg/content/`, `rpg/runtime/`, `rpg/campaign/`                 |
-| `rpg/vocab/`             | `validation/`, `rpg/vocab/`                                                                                               | `rpg/primitives/`, `rpg/content/`, `rpg/runtime/`, `rpg/campaign/`, `shared/` |
-| `rpg/primitives/`        | `validation/`, `rpg/vocab/`, `rpg/primitives/`                                                                            | `rpg/content/`, `rpg/runtime/`, `rpg/campaign/`, `shared/`                    |
-| `rpg/content/`           | `validation/`, `rpg/vocab/`, `rpg/primitives/`, `rpg/content/`                                                            | `rpg/runtime/`, `rpg/campaign/`, `shared/`                                    |
-| `rpg/runtime/`           | `validation/`, `rpg/vocab/`, `rpg/primitives/`, `rpg/content/`, `rpg/runtime/`, `rpg/campaign/`, `rpg/character-builder/` | `shared/`                                                                     |
-| `rpg/character-builder/` | `validation/`, `rpg/character-builder/`                                                                                   | everything else                                                               |
-| `rpg/campaign/`          | `validation/`, `rpg/vocab/`, `rpg/primitives/`, `rpg/campaign/`, `shared/`, `rpg/character-builder/`                      | `rpg/content/`, `rpg/runtime/`                                                |
-| `public/`                | `public/` only                                                                                                            | everything else                                                               |
-| `dev-bench/`             | `dev-bench/` only                                                                                                         | everything else                                                               |
-| `name-generator/`        | `validation/`, `vocab/`, `name-generator/` only                                                                           | everything else                                                               |
-| `index.ts` (barrel)      | `validation/` + `shared/` + `rpg/*`                                                                                       | `dev-bench/`, `name-generator/`, `public/` (use subpath exports)              |
+| Layer                    | May import                                                                                                                | Must not import                                                                            |
+| ------------------------ | ------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
+| `validation/`            | `validation/` only                                                                                                        | everything else                                                                            |
+| `shared/`                | `validation/`, `shared/`, `rpg/primitives/`                                                                               | `rpg/vocab/`, `rpg/content/`, `rpg/runtime/`, `rpg/campaign/`                              |
+| `rpg/vocab/`             | `validation/`, `rpg/vocab/`                                                                                               | `rpg/primitives/`, `rpg/content/`, `rpg/runtime/`, `rpg/campaign/`, `shared/`              |
+| `rpg/primitives/`        | `validation/`, `rpg/vocab/`, `rpg/primitives/`                                                                            | `rpg/content/`, `rpg/runtime/`, `rpg/campaign/`, `shared/`                                 |
+| `rpg/content/`           | `validation/`, `rpg/vocab/`, `rpg/primitives/`, `rpg/content/`                                                            | `rpg/runtime/`, `rpg/campaign/`, `shared/`                                                 |
+| `rpg/runtime/`           | `validation/`, `rpg/vocab/`, `rpg/primitives/`, `rpg/content/`, `rpg/runtime/`, `rpg/campaign/`, `rpg/character-builder/` | `shared/`                                                                                  |
+| `rpg/character-builder/` | `validation/`, `rpg/character-builder/`                                                                                   | everything else                                                                            |
+| `rpg/campaign/`          | `validation/`, `rpg/vocab/`, `rpg/primitives/`, `rpg/campaign/`, `shared/`, `rpg/character-builder/`                      | `rpg/content/`, `rpg/runtime/`                                                             |
+| `public/`                | `public/` only                                                                                                            | everything else                                                                            |
+| `dev-bench/`             | `dev-bench/` only                                                                                                         | everything else                                                                            |
+| `name-generator/`        | `validation/`, `vocab/`, `name-generator/` only                                                                           | everything else                                                                            |
+| `index.ts` (barrel)      | `validation/` + `shared/` + `rpg/runtime/` + `rpg/campaign/` + `rpg/content/` + `rpg/primitives/` + `rpg/vocab/`          | `rpg/character-builder/`, `dev-bench/`, `name-generator/`, `public/` (use subpath exports) |
 
 **Not enforced:** requiring `rpg/content/` to reach `rpg/vocab/` only via
 `rpg/primitives/`. Content types legitimately import vocab schemas directly.
@@ -129,6 +137,88 @@ resolved character-creation patch). Campaign never imports runtime, so the
 graph stays acyclic.
 
 Deep relative imports and barrel imports are both valid within the allowed graph.
+
+### `rpg/character-builder/` (dependency leaf)
+
+Serializable character-builder identifiers and transport-safe shapes shared
+across feature boundaries. Orchestration, validation functions, and draft
+mutation live in `rpg/runtime/character-builder/`.
+
+**Ownership:**
+
+- **Belongs here** — stable IDs and schemas that cross API boundaries or are
+  persisted without executing builder logic. Serialization alone is not
+  sufficient; the shape must be meaningful outside runtime orchestration.
+- **Does not belong here** — UI labels, descriptions, alert text, or
+  presentation mappings.
+- **Stays in `rpg/runtime/character-builder/`** — step orchestration, draft
+  mutation, context assembly, finalize, resolvers.
+- **Stays in `rpg/campaign/`** — campaign character-assignment error union
+  (`build_invalid` composes builder validation issues).
+
+**Dependency leaf:** `rpg/character-builder/` must not import `rpg/runtime/`,
+`rpg/campaign/`, `rpg/content/`, or `shared/`. Allowed: `validation/` and
+internal `rpg/character-builder/` only.
+
+**Current modules:** `step-ids.ts`, `validation-issue.ts`, `acquisition.ts`.
+
+**Migration test** — before moving a type here, all three must be yes:
+
+1. Is it stable enough to form a contract?
+2. Is it consumed outside runtime? (at least one legitimate non-runtime consumer)
+3. Can it be understood without executing builder orchestration?
+
+**Layer admission** — new contracts in `rpg/character-builder/` must have a
+concrete consumer outside `rpg/runtime/character-builder/`. Anticipated reuse
+alone is not sufficient.
+
+**Validation issue targets** — `stepId`, `choiceSetId`, and `allowanceId` are
+mutually exclusive on the wire shape. Migrate to a structured `reference` union
+only when a [migration trigger](#future-validation-reference-migration-triggers)
+fires — not preemptively.
+
+Prefer `@rpg/contracts/rpg/character-builder` in app code — not the root barrel.
+
+#### Future validation-reference migration triggers
+
+Migrate `CharacterBuildValidationIssue` to a structured `reference?: { kind: ... }`
+when **any** of these become true:
+
+- A valid issue needs more than one target.
+- A fourth target type is introduced.
+- Consumers begin branching repeatedly on the optional target fields.
+- Wire-version compatibility work is already required.
+
+#### Draft contract promotion criteria
+
+Reassess promoting draft scope or envelope contracts only when **any** of these
+become true:
+
+- Draft data crosses an application or API boundary.
+- Server persistence is introduced.
+- More than one implementation must read or migrate the draft format.
+
+#### Chrome variant ownership watchlist
+
+`CHARACTER_BUILDER_CHROME_VARIANTS` ownership is unresolved. Leave in place until
+a concrete consumer establishes the correct owner (`rpg/character-builder/`,
+dashboard builder UI, shared UI, or acquisition presentation mapping). Reassess
+only when:
+
+- A non-runtime package imports the variant IDs.
+- Dashboard and another application must share the same variants.
+- Acquisition contracts begin exposing presentation mode.
+- The resolver no longer belongs naturally beside runtime context.
+
+#### Ongoing layer admission rules
+
+Do not bulk-migrate runtime exports. Move a type only when it passes the
+migration test **and** has a named external consumer. Do not create placeholder
+contract modules or compatibility aliases for hypothetical migrations.
+
+Legacy runtime shapes (for example `characterBuildScopeSchema` and builder mode
+enums) are not eventual contract-layer candidates — prefer
+`CharacterBuildAcquisition` for new cross-feature flows.
 
 ## ESLint enforcement
 
@@ -143,22 +233,22 @@ Layer boundaries are enforced in [`eslint.config.js`](../eslint.config.js) via
 
 ## Subpath exports
 
-Prefer the root import for app code unless you want an explicit layer boundary
-in the import path:
+Prefer the root import for most app code. Use explicit subpaths when the import
+path should document a layer boundary:
 
-| Import path                            | Resolves to                          | Typical use                                          |
-| -------------------------------------- | ------------------------------------ | ---------------------------------------------------- |
-| `@rpg/contracts`                       | `src/index.ts`                       | Default — all symbols, unchanged API                 |
-| `@rpg/contracts/shared`                | `src/shared/index.ts`                | Auth, user, roles, routes, errors                    |
-| `@rpg/contracts/vocab`                 | `src/rpg/vocab/index.ts`             | Label/format helpers, vocabulary sets                |
-| `@rpg/contracts/primitives`            | `src/rpg/primitives/index.ts`        | Dice, levels, ruleset id                             |
-| `@rpg/contracts/content`               | `src/rpg/content/index.ts`           | Content schemas and DTOs                             |
-| `@rpg/contracts/runtime`               | `src/rpg/runtime/index.ts`           | Character sheet runtime contracts                    |
-| `@rpg/contracts/rpg/character-builder` | `src/rpg/character-builder/index.ts` | Builder wire contracts (step ids, validation issues) |
-| `@rpg/contracts/rpg/campaign`          | `src/rpg/campaign/index.ts`          | Campaign + ruleset patches                           |
-| `@rpg/contracts/public`                | `src/public/index.ts`                | Public app only (scaffold)                           |
-| `@rpg/contracts/dev-bench`             | `src/dev-bench/index.ts`             | Dev Bench tickets, epics, inputs                     |
-| `@rpg/contracts/name-generator`        | `src/name-generator/index.ts`        | Naming conventions and collections                   |
+| Import path                            | Resolves to                          | Typical use                                                |
+| -------------------------------------- | ------------------------------------ | ---------------------------------------------------------- |
+| `@rpg/contracts`                       | `src/index.ts`                       | Default — runtime, campaign, content, vocab, shared        |
+| `@rpg/contracts/shared`                | `src/shared/index.ts`                | Auth, user, roles, routes, errors                          |
+| `@rpg/contracts/vocab`                 | `src/rpg/vocab/index.ts`             | Label/format helpers, vocabulary sets                      |
+| `@rpg/contracts/primitives`            | `src/rpg/primitives/index.ts`        | Dice, levels, ruleset id                                   |
+| `@rpg/contracts/content`               | `src/rpg/content/index.ts`           | Content schemas and DTOs                                   |
+| `@rpg/contracts/runtime`               | `src/rpg/runtime/index.ts`           | Character sheet runtime contracts                          |
+| `@rpg/contracts/rpg/character-builder` | `src/rpg/character-builder/index.ts` | Builder wire contracts (step ids, validation, acquisition) |
+| `@rpg/contracts/rpg/campaign`          | `src/rpg/campaign/index.ts`          | Campaign + ruleset patches                                 |
+| `@rpg/contracts/public`                | `src/public/index.ts`                | Public app only (scaffold)                                 |
+| `@rpg/contracts/dev-bench`             | `src/dev-bench/index.ts`             | Dev Bench tickets, epics, inputs                           |
+| `@rpg/contracts/name-generator`        | `src/name-generator/index.ts`        | Naming conventions and collections                         |
 
 Legacy `./vocab`, `./content`, and `./primitives` export paths remain as
 backward-compat aliases pointing at `rpg/*`. Prefer `./shared`, `./rpg/*`, and
@@ -167,8 +257,14 @@ explicit subpaths in new code.
 Examples:
 
 ```ts
-// Root barrel (recommended default)
+// Root barrel (runtime, campaign, content, …)
 import { speciesSchema, characterSchema } from '@rpg/contracts'
+
+// Character-builder wire contracts (not on root barrel)
+import {
+  characterBuilderStepIdSchema,
+  type CharacterBuilderStepId,
+} from '@rpg/contracts/rpg/character-builder'
 
 // Layer subpaths (optional — same symbols, explicit boundary)
 import { getSenseLabel } from '@rpg/contracts/vocab'

@@ -6,7 +6,7 @@ import { Text } from '@rpg/ui'
 import {
   type EquipmentInventoryQuantityTarget,
   type EquipmentInventoryRemoveTarget,
-} from '../../lib/equipment-step.lib'
+} from '../../lib/equipment/equipment-step.lib'
 
 import { EquipmentInventoryColumn } from './equipment-inventory-column.client'
 import { EquipmentPurchasedInventorySection } from './equipment-purchased-inventory-section.client'

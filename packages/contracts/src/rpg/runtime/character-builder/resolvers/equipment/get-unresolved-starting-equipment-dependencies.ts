@@ -6,7 +6,7 @@ import {
 } from '../../../../content/starting-equipment'
 import { buildChoiceSetId } from '../../choice-set'
 import type { CharacterBuildCatalogIndex } from '../../context'
-import type { CharacterBuilderDraft } from '../../draft'
+import type { CharacterBuilderDraft } from '../../draft/draft'
 import {
   PROFICIENCY_LINKED_GRANT_MISSING_CHOICE_MESSAGE,
   resolveClassToolProficiencyChoice,

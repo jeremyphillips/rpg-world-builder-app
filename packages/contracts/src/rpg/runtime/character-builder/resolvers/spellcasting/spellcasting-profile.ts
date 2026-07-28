@@ -11,7 +11,7 @@ import {
 } from '../../../creature/spellcasting'
 import { buildChoiceSetId } from '../../choice-set'
 import { indexCharacterBuildCatalog, type CharacterBuildContext } from '../../context'
-import type { CharacterBuilderDraft } from '../../draft'
+import type { CharacterBuilderDraft } from '../../draft/draft'
 
 // ---------------------------------------------------------------------------
 // Spellcasting profile — structural facts for the Spells step and choice sources.

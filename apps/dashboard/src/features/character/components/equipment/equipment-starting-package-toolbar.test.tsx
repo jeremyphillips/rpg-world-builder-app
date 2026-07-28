@@ -6,7 +6,7 @@ import { expectNoAxeViolations } from '@rpg/ui/test-utils'
 import {
   EQUIPMENT_PACKAGE_CHANGE_OPTION_LABEL,
   EQUIPMENT_PACKAGE_CUSTOMIZE_LABEL,
-} from '../../lib/equipment-step.lib'
+} from '../../lib/equipment/equipment-step.lib'
 import { EquipmentStartingPackageToolbar } from './equipment-starting-package-toolbar.client'
 
 describe('EquipmentStartingPackageToolbar', () => {

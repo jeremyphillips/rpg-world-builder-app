@@ -10,7 +10,8 @@ import { NarrowPage } from '@/components/layout/narrow-page'
 import { CharacterListCard } from '../components/character-list-card.client'
 import { useBuildContext } from '../hooks/use-build-context'
 import { useCharacters } from '../hooks/use-characters'
-import { buildCharacterCardViewModel } from '../lib/character-display'
+import { buildCharacterCardViewModel } from '../lib/display/character-display'
+import { resolveQueryErrorLabel } from '../lib/resolve-query-error-label.lib'
 
 const CHARACTERS_EMPTY_MESSAGE = 'No characters yet. Create one to get started.'
 
@@ -37,7 +38,10 @@ export function CharactersOverview() {
 
   const isPending = isCharactersPending || isCatalogPending
   const isError = isCharactersError || isCatalogError
-  const errorLabel = charactersError?.message ?? catalogError?.message
+  const errorLabel = resolveQueryErrorLabel([
+    { isPending: isCharactersPending, isError: isCharactersError, error: charactersError },
+    { isPending: isCatalogPending, isError: isCatalogError, error: catalogError },
+  ])
 
   return (
     <NarrowPage spacing="list">

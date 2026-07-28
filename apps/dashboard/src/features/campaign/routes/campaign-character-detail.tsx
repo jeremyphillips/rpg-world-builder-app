@@ -11,7 +11,8 @@ import { CharacterDetailContent } from '@/features/character/components/detail/c
 import { CharacterVitalSummary } from '@/features/character/components/detail/character-vital-summary.client'
 import { useBuildContext } from '@/features/character/hooks/use-build-context'
 import { useCharacter } from '@/features/character/hooks/use-character'
-import { buildCharacterDetailViewModel } from '@/features/character/lib/character-display'
+import { buildCharacterDetailViewModel } from '@/features/character/lib/display/character-display'
+import { resolveQueryErrorLabel } from '@/features/character/lib/resolve-query-error-label.lib'
 import { useCampaigns } from '../hooks/use-campaigns'
 
 export function CampaignCharacterDetail() {
@@ -46,7 +47,10 @@ export function CampaignCharacterDetail() {
 
   const isPending = isCharacterPending || Boolean(character && isCatalogPending)
   const isError = isCharacterError || isCatalogError
-  const errorLabel = characterError?.message ?? catalogError?.message
+  const errorLabel = resolveQueryErrorLabel([
+    { isPending: isCharacterPending, isError: isCharacterError, error: characterError },
+    { isPending: isCatalogPending, isError: isCatalogError, error: catalogError },
+  ])
 
   return (
     <WidePage spacing="relaxed">

@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import type { CharacterClass } from '../../../content/classes/class'
 import type { CharacterBuildCatalogIndex } from '../context'
-import { createEmptyCharacterBuilderDraft } from '../draft'
+import { createEmptyCharacterBuilderDraft } from '../draft/draft'
 import { assembleWeaponProficiencyEntries } from './assemble-weapon-proficiencies'
 
 const emptyCatalogIndex = {

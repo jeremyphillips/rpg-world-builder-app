@@ -91,7 +91,6 @@ export default [
                 'content',
                 'runtime',
                 'campaign',
-                'character-builder',
               ],
             },
           ],

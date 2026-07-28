@@ -6,7 +6,16 @@ import {
 
 import { normalizeSearchQuery, scoreItem } from '@rpg/ui'
 
-import { formatChoiceSetDrawerTriggerLabel } from '../../lib/selection-counter.lib'
+import { formatChoiceSetDrawerTriggerLabel } from '../../lib/choice-sets/selection-counter.lib'
+import {
+  resolveCatalogPickerEmptyStateKind,
+  resolveCatalogPickerEmptyStateMessage,
+  type CatalogPickerEmptyStateKind,
+} from '../picker/catalog-picker-empty-state.lib'
+import {
+  getCatalogPickerDisabledNote,
+  isCatalogPickerRowDimmed,
+} from '../picker/catalog-picker-row-state.lib'
 import { compareName, scoreAndFilterPickerItems } from '../picker/catalog-picker-sort.lib'
 import {
   PROFICIENCY_PICKER_NO_OPTIONS_MESSAGE,
@@ -72,37 +81,34 @@ export function formatProficiencyPickerSearchPlaceholder(choiceSet: ChoiceSet): 
 }
 
 export function isProficiencyPickerRowDimmed(item: ProficiencyPickerItem): boolean {
-  return !item.state.isAlreadySelected && !item.state.canSelect
+  return isCatalogPickerRowDimmed(item.state)
 }
 
 export function getProficiencyPickerDisabledNote(item: ProficiencyPickerItem): string | undefined {
-  if (item.state.canSelect || item.state.isAlreadySelected) return undefined
-  return item.state.disabledReasons[0]
+  return getCatalogPickerDisabledNote(item.state)
 }
 
-export type ProficiencyPickerEmptyStateKind = 'no-options' | 'selection-full'
+export type ProficiencyPickerEmptyStateKind = CatalogPickerEmptyStateKind
 
 export function resolveProficiencyPickerEmptyStateKind(
   itemsLength: number,
   choiceSet: ChoiceSet,
   selectedIds: readonly string[],
 ): ProficiencyPickerEmptyStateKind | undefined {
-  if (itemsLength > 0) return undefined
-  if (selectedIds.length >= choiceSet.max) return 'selection-full'
-  return 'no-options'
+  return resolveCatalogPickerEmptyStateKind({
+    itemsLength,
+    choiceSetMax: choiceSet.max,
+    selectedCount: selectedIds.length,
+  })
 }
 
 export function resolveProficiencyPickerEmptyStateMessage(
   kind: ProficiencyPickerEmptyStateKind | undefined,
 ): string | undefined {
-  switch (kind) {
-    case 'no-options':
-      return PROFICIENCY_PICKER_NO_OPTIONS_MESSAGE
-    case 'selection-full':
-      return PROFICIENCY_PICKER_SELECTION_FULL_MESSAGE
-    default:
-      return undefined
-  }
+  return resolveCatalogPickerEmptyStateMessage(kind, {
+    noOptions: PROFICIENCY_PICKER_NO_OPTIONS_MESSAGE,
+    selectionFull: PROFICIENCY_PICKER_SELECTION_FULL_MESSAGE,
+  })
 }
 
 export function isProficiencySelectionFull(

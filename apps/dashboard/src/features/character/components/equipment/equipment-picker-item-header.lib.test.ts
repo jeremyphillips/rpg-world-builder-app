@@ -18,8 +18,8 @@ import {
   equipmentStepHeroMagicItemWealthFixture,
   equipmentStepMonkClassFixture,
   equipmentStepPotionOfHealingFixture,
-} from '../../lib/equipment-step.fixtures'
-import { resolveEquipmentAcquisitionContext } from '../../lib/equipment-step.lib'
+} from '../../lib/equipment/equipment-step.fixtures'
+import { resolveEquipmentAcquisitionContext } from '../../lib/equipment/equipment-step.lib'
 import { buildEquipmentPickerRowActionViewModel } from './equipment-picker-action.lib'
 import { resolveEquipmentPickerItemHeaderPresentation } from './equipment-picker-item-header.lib'
 

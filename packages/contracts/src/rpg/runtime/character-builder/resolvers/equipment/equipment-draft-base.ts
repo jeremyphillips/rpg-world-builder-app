@@ -1,4 +1,4 @@
-import type { CharacterBuilderDraft } from '../../draft'
+import type { CharacterBuilderDraft } from '../../draft/draft'
 
 const EMPTY_EQUIPMENT_DRAFT = {
   mode: 'package' as const,

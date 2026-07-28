@@ -24,7 +24,7 @@ import {
   equipmentStepLuteFixture,
   equipmentStepMonkClassFixture,
   equipmentStepRationsFixture,
-} from '../../lib/equipment-step.fixtures'
+} from '../../lib/equipment/equipment-step.fixtures'
 import {
   EQUIPMENT_CHANGE_PACKAGE_LABEL,
   EQUIPMENT_INCLUDED_TOOL_RELATIONSHIP_GUIDANCE,
@@ -33,7 +33,7 @@ import {
   EQUIPMENT_SELECTED_PACKAGE_EYEBROW,
   EQUIPMENT_STEP_BROWSE_LABEL,
   EQUIPMENT_GOLD_OPTION_STARTING_MESSAGE,
-} from '../../lib/equipment-step.lib'
+} from '../../lib/equipment/equipment-step.lib'
 import { EQUIPMENT_PICKER_PROFICIENCY_AVAILABLE_LABEL } from '../equipment/equipment-picker-drawer.types'
 import { EQUIPMENT_PICKER_PURCHASE_COMMIT_LABEL } from '../equipment/equipment-picker-purchase.lib'
 import { EquipmentStep } from './equipment-step.client'

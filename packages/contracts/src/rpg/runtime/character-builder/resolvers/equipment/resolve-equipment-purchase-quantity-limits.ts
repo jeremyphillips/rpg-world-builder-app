@@ -3,12 +3,22 @@ import { canPurchaseEquipment } from '../../../../content/equipment/can-purchase
 import { isEquipmentStackable } from '../../../../content/equipment/stackable'
 import { formatMoney } from '../../../../primitives/units'
 import { copperToDisplayWealth, formatWealth } from '../../../../primitives/wealth'
-import type { CharacterBuilderDraftEquipmentPurchase } from '../../draft'
+import type { CharacterBuilderDraftEquipmentPurchase } from '../../draft/draft'
 import { moneyToCopper, wealthToCopper, type EquipmentBudgetSummary } from './equipment-budget'
 import { maxAffordablePurchaseQuantity } from './resolve-equipment-purchase-availability'
 
 /** Hard cap per purchase row (bundle units). */
 export const EQUIPMENT_PURCHASE_QUANTITY_MAX = 99
+
+/** Clamps a purchase quantity to [1, min(maxQuantity, EQUIPMENT_PURCHASE_QUANTITY_MAX)]. */
+export function clampEquipmentPurchaseQuantity(quantity: number, maxQuantity: number): number {
+  if (!Number.isFinite(quantity)) {
+    return 1
+  }
+
+  const cappedMax = Math.min(Math.max(maxQuantity, 1), EQUIPMENT_PURCHASE_QUANTITY_MAX)
+  return Math.min(Math.max(quantity, 1), cappedMax)
+}
 
 export type EquipmentPurchaseQuantityLimits = {
   editable: boolean

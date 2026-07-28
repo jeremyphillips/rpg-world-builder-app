@@ -3,8 +3,9 @@ import { describe, expect, it } from 'vitest'
 import type { ClassStored } from '../../../../content/classes/class'
 import { wealthToCopper } from '../../../../primitives/wealth'
 import { indexCharacterBuildCatalog } from '../../context'
-import { createEmptyCharacterBuilderDraft } from '../../draft'
-import { evaluateEquipmentPackageSwitch } from '../../equipment-package-switch'
+import { createEmptyCharacterBuilderDraft } from '../../draft/draft'
+import { evaluateEquipmentPackageSwitch } from '../../equipment/equipment-package-switch'
+import { createCharacterBuildContext, builderTestRules } from '../../test-fixtures'
 import { startingEquipmentChoiceSetId } from './resolve-starting-equipment-choice-sets'
 import { deriveEquipmentBudgetSummary } from './equipment-budget'
 import { resolveEquipmentStepModel } from './resolve-equipment-step-model'
@@ -81,16 +82,24 @@ const legendStartingWealth = {
   ],
 }
 
+const buildContext = createCharacterBuildContext({
+  catalog: {
+    species: [],
+    classes: [storedBarbarian],
+    spells: [],
+    equipment: [],
+    skillProficiencies: [],
+    languages: [],
+  },
+  characterCreationRules: {
+    ...builderTestRules,
+    startingWealth: legendStartingWealth,
+  },
+})
+
 describe('resolveEquipmentStepModel', () => {
   it('agrees with finalize budget starting wealth for the selected option', () => {
-    const catalogIndex = indexCharacterBuildCatalog({
-      species: [],
-      classes: [storedBarbarian],
-      spells: [],
-      equipment: [],
-      skillProficiencies: [],
-      languages: [],
-    })
+    const catalogIndex = indexCharacterBuildCatalog(buildContext.catalog)
 
     const draft = {
       ...createEmptyCharacterBuilderDraft(),
@@ -106,32 +115,30 @@ describe('resolveEquipmentStepModel', () => {
       },
     }
 
-    const stepModel = resolveEquipmentStepModel({
+    const stepModelResult = resolveEquipmentStepModel({
       draft,
       catalogIndex,
+      context: buildContext,
+      resolvedChoiceSets: [],
       startingWealth: legendStartingWealth,
       includeBudget: true,
     })
+
+    expect(stepModelResult.status).toBe('available')
+    if (stepModelResult.status !== 'available') return
 
     const finalizedBudget = deriveEquipmentBudgetSummary(draft, catalogIndex, {
       startingWealth: legendStartingWealth,
     })
 
-    expect(stepModel?.budget?.starting).toEqual(finalizedBudget?.starting)
-    expect(wealthToCopper(stepModel?.budget?.starting ?? { cp: 0, sp: 0, gp: 0, pp: 0 })).toBe(
-      2_145_000,
-    )
+    expect(stepModelResult.model.budget?.starting).toEqual(finalizedBudget?.starting)
+    expect(
+      wealthToCopper(stepModelResult.model.budget?.starting ?? { cp: 0, sp: 0, gp: 0, pp: 0 }),
+    ).toBe(2_145_000)
   })
 
   it('agrees with package-switch target allowance for the alternate option', () => {
-    const catalogIndex = indexCharacterBuildCatalog({
-      species: [],
-      classes: [storedBarbarian],
-      spells: [],
-      equipment: [],
-      skillProficiencies: [],
-      languages: [],
-    })
+    const catalogIndex = indexCharacterBuildCatalog(buildContext.catalog)
 
     const draft = {
       ...createEmptyCharacterBuilderDraft(),
@@ -147,14 +154,19 @@ describe('resolveEquipmentStepModel', () => {
       },
     }
 
-    const stepModel = resolveEquipmentStepModel({
+    const stepModelResult = resolveEquipmentStepModel({
       draft,
       catalogIndex,
+      context: buildContext,
+      resolvedChoiceSets: [],
       startingWealth: legendStartingWealth,
       includeBudget: true,
     })
 
-    const targetFunding = stepModel!.fundingByOptionId.get('starting-gold')!
+    expect(stepModelResult.status).toBe('available')
+    if (stepModelResult.status !== 'available') return
+
+    const targetFunding = stepModelResult.model.fundingByOptionId.get('starting-gold')!
     const evaluation = evaluateEquipmentPackageSwitch({
       draft,
       catalogIndex,
@@ -165,8 +177,25 @@ describe('resolveEquipmentStepModel', () => {
     expect(evaluation?.budget.targetAllowanceCp).toBe(
       wealthToCopper(targetFunding.totalStartingWealth),
     )
-    expect(stepModel?.budget?.starting).toEqual(
-      stepModel?.fundingByOptionId.get('standard-equipment')?.totalStartingWealth,
+    expect(stepModelResult.model.budget?.starting).toEqual(
+      stepModelResult.model.fundingByOptionId.get('standard-equipment')?.totalStartingWealth,
     )
+  })
+
+  it('returns choice_sets_loading when resolved choice sets are null', () => {
+    const catalogIndex = indexCharacterBuildCatalog(buildContext.catalog)
+    const draft = {
+      ...createEmptyCharacterBuilderDraft(),
+      class: { classId: storedBarbarian.id, level: 1 },
+    }
+
+    expect(
+      resolveEquipmentStepModel({
+        draft,
+        catalogIndex,
+        context: buildContext,
+        resolvedChoiceSets: null,
+      }),
+    ).toEqual({ status: 'unavailable', reason: 'choice_sets_loading' })
   })
 })

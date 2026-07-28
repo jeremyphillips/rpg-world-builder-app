@@ -110,10 +110,10 @@ Package `description` is display prose only — linkage semantics live on grant 
 
 ## Related modules
 
-| Module                                              | Role                                          |
-| --------------------------------------------------- | --------------------------------------------- |
-| `resolve-proficiency-linked-equipment-grant.ts`     | Pending / invalid / resolved grant resolution |
-| `get-unresolved-starting-equipment-dependencies.ts` | Equipment-step readiness dependencies         |
-| `resolve-eligible-proficiency-choice-targets.ts`    | Authoring eligibility                         |
-| `validate-starting-equipment-proficiency-links.ts`  | Class save validation                         |
-| `resolve-starting-equipment-choice-sets.ts`         | Nested equipment ChoiceSets (Bard path)       |
+| Module                                              | Role                                                            |
+| --------------------------------------------------- | --------------------------------------------------------------- |
+| `resolve-proficiency-linked-equipment-grant.ts`     | Pending / invalid / resolved grant resolution                   |
+| `get-unresolved-starting-equipment-dependencies.ts` | Equipment-step readiness dependencies                           |
+| `resolve-eligible-proficiency-choice-targets.ts`    | `runtime/character-builder/validation/` — authoring eligibility |
+| `validate-starting-equipment-proficiency-links.ts`  | `runtime/character-builder/validation/` — class save validation |
+| `resolve-starting-equipment-choice-sets.ts`         | Nested equipment ChoiceSets (Bard path)                         |

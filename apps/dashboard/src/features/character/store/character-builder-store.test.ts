@@ -85,6 +85,20 @@ describe('character-builder-store', () => {
   })
 
   it('drops corrupt persisted state without throwing', async () => {
+    sessionStorage.setItem(storageKey, '{not-json')
+
+    const store = createCharacterBuilderStore({ storageKey, scope: standaloneScope })
+
+    await vi.waitFor(() => {
+      expect(store.getState()._hasHydrated).toBe(true)
+    })
+
+    expect(store.getState().draft).toEqual(createEmptyCharacterBuilderDraft())
+    expect(store.getState().hasPendingRestore).toBe(false)
+    expect(store.getState().rejectedDraftRestoreReason).toBe('malformed')
+  })
+
+  it('surfaces a rejection reason when persisted draft restore fails', async () => {
     sessionStorage.setItem(
       storageKey,
       JSON.stringify({ state: { version: 99, draft: {} }, version: 0 }),
@@ -96,8 +110,7 @@ describe('character-builder-store', () => {
       expect(store.getState()._hasHydrated).toBe(true)
     })
 
-    expect(store.getState().draft).toEqual(createEmptyCharacterBuilderDraft())
-    expect(store.getState().hasPendingRestore).toBe(false)
+    expect(store.getState().rejectedDraftRestoreReason).toBe('version_mismatch')
   })
 
   it('rehydrates identity progress without alignment', async () => {

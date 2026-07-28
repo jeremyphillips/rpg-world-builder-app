@@ -1,6 +1,9 @@
 import type { StartingWealthRules } from '../../../../campaign/rules/starting-wealth'
-import type { CharacterBuildCatalogIndex } from '../../context'
-import type { CharacterBuilderDraft } from '../../draft'
+import type { ChoiceSet } from '../../choice-set'
+import type { CharacterBuildCatalogIndex, CharacterBuildContext } from '../../context'
+import type { CharacterBuilderDraft } from '../../draft/draft'
+import type { EquipmentStepUnavailableReason } from '../../equipment/equipment-step-unavailable'
+import type { BuilderStepReadinessState } from '../../readiness/step-readiness'
 import { readSelectedStartingEquipmentOptionId } from './resolve-starting-equipment-choice-sets'
 import {
   deriveEquipmentBudgetSummaryFromFunding,
@@ -8,33 +11,76 @@ import {
   type ResolvedStartingEquipmentFunding,
 } from './resolve-starting-equipment-funding'
 import type { EquipmentBudgetSummary } from './equipment-budget'
+import { resolveEquipmentStepReadiness } from './resolve-equipment-step-readiness'
 
 export type EquipmentStepModel = {
+  readiness: BuilderStepReadinessState
   fundingByOptionId: ReadonlyMap<string, ResolvedStartingEquipmentFunding>
   selectedOptionId?: string
   currentFunding?: ResolvedStartingEquipmentFunding
   budget?: EquipmentBudgetSummary
 }
 
-/** Resolves equipment-step funding snapshots and the current shopping budget once. */
+export type ResolveEquipmentStepModelResult =
+  | { status: 'available'; model: EquipmentStepModel }
+  | { status: 'unavailable'; reason: EquipmentStepUnavailableReason }
+
+function resolveEquipmentStepUnavailableReason(args: {
+  draft: CharacterBuilderDraft
+  catalogIndex: CharacterBuildCatalogIndex
+  resolvedChoiceSets: readonly ChoiceSet[] | null
+  fundingByOptionId: ReadonlyMap<string, ResolvedStartingEquipmentFunding>
+  selectedOptionId?: string
+}): EquipmentStepUnavailableReason | undefined {
+  if (args.resolvedChoiceSets === null) return 'choice_sets_loading'
+
+  const classId = args.draft.class.classId
+  if (!classId) return 'class_missing'
+
+  if (!args.catalogIndex.classes.get(classId)) return 'class_not_in_catalog'
+  if (args.fundingByOptionId.size === 0) return 'funding_context_missing'
+
+  if (args.selectedOptionId && !args.fundingByOptionId.get(args.selectedOptionId)) {
+    return 'funding_context_missing'
+  }
+
+  return undefined
+}
+
+/** Resolves equipment-step funding snapshots, readiness, and the current shopping budget once. */
 export function resolveEquipmentStepModel(args: {
   draft: CharacterBuilderDraft
   catalogIndex: CharacterBuildCatalogIndex
+  context: CharacterBuildContext
+  resolvedChoiceSets: readonly ChoiceSet[] | null
   startingWealth?: StartingWealthRules
   includeBudget?: boolean
-}): EquipmentStepModel | undefined {
+}): ResolveEquipmentStepModelResult {
   const classId = args.draft.class.classId
-  if (!classId) return undefined
+  const fundingByOptionId = classId
+    ? resolveStartingEquipmentFundingOptions({
+        draft: args.draft,
+        catalogIndex: args.catalogIndex,
+        startingWealth: args.startingWealth,
+      })
+    : new Map<string, ResolvedStartingEquipmentFunding>()
 
-  const fundingByOptionId = resolveStartingEquipmentFundingOptions({
+  const selectedOptionId = classId
+    ? readSelectedStartingEquipmentOptionId(args.draft, classId)
+    : undefined
+
+  const unavailableReason = resolveEquipmentStepUnavailableReason({
     draft: args.draft,
     catalogIndex: args.catalogIndex,
-    startingWealth: args.startingWealth,
+    resolvedChoiceSets: args.resolvedChoiceSets,
+    fundingByOptionId,
+    selectedOptionId,
   })
 
-  if (fundingByOptionId.size === 0) return undefined
+  if (unavailableReason) {
+    return { status: 'unavailable', reason: unavailableReason }
+  }
 
-  const selectedOptionId = readSelectedStartingEquipmentOptionId(args.draft, classId)
   const currentFunding = selectedOptionId ? fundingByOptionId.get(selectedOptionId) : undefined
 
   const budget =
@@ -46,10 +92,20 @@ export function resolveEquipmentStepModel(args: {
         })
       : undefined
 
+  const readiness = resolveEquipmentStepReadiness(
+    args.draft,
+    args.resolvedChoiceSets ?? [],
+    args.context,
+  )
+
   return {
-    fundingByOptionId,
-    selectedOptionId,
-    currentFunding,
-    budget,
+    status: 'available',
+    model: {
+      readiness,
+      fundingByOptionId,
+      selectedOptionId,
+      currentFunding,
+      budget,
+    },
   }
 }

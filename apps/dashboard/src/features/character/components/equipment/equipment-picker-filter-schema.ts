@@ -13,7 +13,7 @@ import {
   type FilterSchema,
 } from '@rpg/ui/filters'
 
-import type { EquipmentPickerWorkflowMode } from '../../lib/equipment-step.lib'
+import type { EquipmentPickerWorkflowMode } from '../../lib/equipment/equipment-step.lib'
 import type { EquipmentPickerItem } from './equipment-picker-drawer.types'
 import {
   EQUIPMENT_PICKER_AFFORDABLE_NOW_LABEL,

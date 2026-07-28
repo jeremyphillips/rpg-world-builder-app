@@ -1,10 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
-import {
-  NAME_PART_ROLES,
-  PERSONAL_NAME_COMPONENTS,
-  type PersonalNameComponent,
-} from '@rpg/contracts/name-generator'
+import { PERSONAL_NAME_COMPONENTS, type PersonalNameComponent } from '@rpg/contracts/vocab'
+import { NAME_PART_ROLES } from '@rpg/contracts/name-generator'
 
 import {
   getPartRolesForPersonalNameComponent,

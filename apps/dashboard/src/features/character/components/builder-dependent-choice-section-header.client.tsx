@@ -2,7 +2,7 @@
 
 import { Heading, Text, cn } from '@rpg/ui'
 
-import type { DependentChoiceSectionCopy } from '../lib/builder-dependent-choice.lib'
+import type { DependentChoiceSectionCopy } from '../lib/builder/builder-dependent-choice.lib'
 import {
   builderDependentChoiceSectionHeaderClasses,
   builderDependentChoiceSectionPanelHeadingClasses,

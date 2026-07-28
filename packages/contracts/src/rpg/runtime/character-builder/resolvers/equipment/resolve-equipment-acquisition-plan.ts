@@ -1,7 +1,7 @@
 import type { Equipment } from '../../../../content/equipment'
 import { resolveStartingWealthTierForBuilder } from '../../../../campaign/rules/starting-wealth'
-import type { CharacterBuilderDraft } from '../../draft'
-import { getBuilderSelectedStartingLevel } from '../../builder-level'
+import type { CharacterBuilderDraft } from '../../draft/draft'
+import { getBuilderSelectedStartingLevel } from '../../progression/builder-level'
 import { deriveEquipmentBudgetSummary } from './equipment-budget'
 import type {
   EquipmentAcquisitionBlocker,

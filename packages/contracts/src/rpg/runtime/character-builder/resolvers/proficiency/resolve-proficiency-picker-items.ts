@@ -4,7 +4,7 @@ import { buildSkillProficiencyCompactSummary } from '../../../../content/lib/ski
 import type { ChoiceSet } from '../../choice-set'
 import type { CharacterBuildCatalogIndex, CharacterBuildContext } from '../../context'
 import { indexCharacterBuildCatalog } from '../../context'
-import type { CharacterBuilderDraft } from '../../draft'
+import type { CharacterBuilderDraft } from '../../draft/draft'
 import { resolveToolIdFromOption } from '../../assembly/assemble-tool-proficiencies'
 import {
   PICKER_DISABLED_REASON_SELECTION_FULL,

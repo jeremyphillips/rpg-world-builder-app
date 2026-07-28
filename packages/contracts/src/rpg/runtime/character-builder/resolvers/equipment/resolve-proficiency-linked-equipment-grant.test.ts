@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import { buildChoiceSetId } from '../../choice-set'
-import { createEmptyCharacterBuilderDraft } from '../../draft'
+import { createEmptyCharacterBuilderDraft } from '../../draft/draft'
 import { indexCharacterBuildCatalog } from '../../context'
 import {
   bardClass,

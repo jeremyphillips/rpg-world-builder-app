@@ -2,7 +2,7 @@
 
 import * as React from 'react'
 
-import { CatalogPickerSheet, InsetPanel, SegmentedControl, Text } from '@rpg/ui'
+import { CatalogPickerSheet, SegmentedControl, Text } from '@rpg/ui'
 import { useSanitizedFilterState } from '@rpg/ui/filters'
 
 import { hasCatalogPickerResetViewCriteria } from '../picker/catalog-picker-filter-state.lib'
@@ -15,6 +15,7 @@ import { SpellCatalogItemHeader } from '@/features/content'
 import { mapSpellPickerCompactSummaryToMetadataLines } from '../picker/catalog-picker-metadata'
 import { CatalogPickerSelectionActions } from '../picker/catalog-picker-selection-actions.client'
 import { catalogPickerShellProps } from '../picker/catalog-picker-shell.lib'
+import { CatalogPickerResultsState } from '../picker/catalog-picker-results-state.client'
 import { CatalogPickerSelectionSummary } from '../picker/catalog-picker-selection-summary.client'
 import { CatalogToolbarResetSlot } from '../picker/catalog-toolbar-reset-action.client'
 import {
@@ -307,18 +308,7 @@ export function SpellPickerDrawer({
         />
       }
       emptyState={
-        emptyStateMessage ? (
-          <InsetPanel
-            borderStyle="dashed"
-            surface={{}}
-            size="md"
-            align="center"
-            className="py-8"
-            role="status"
-          >
-            <InsetPanel.Text>{emptyStateMessage}</InsetPanel.Text>
-          </InsetPanel>
-        ) : undefined
+        emptyStateMessage ? <CatalogPickerResultsState message={emptyStateMessage} /> : undefined
       }
       actions={({ searchQuery, activeTabId, resetSearchQuery, resetActiveTab }) => {
         sheetStateRef.current = { searchQuery, activeTabId }

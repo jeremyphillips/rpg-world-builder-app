@@ -4,7 +4,7 @@ import {
   CHARACTER_STAT_LABELS,
   type CharacterDetailStatTile as CharacterDetailStatTileModel,
   type CharacterHitPointsViewModel,
-} from '../../lib/character-display'
+} from '../../lib/display/character-display'
 import { CharacterDetailStatTile } from './character-detail-stat-tile.client'
 import { characterDetailStatsRowClasses } from './character-detail-sheet.variants'
 

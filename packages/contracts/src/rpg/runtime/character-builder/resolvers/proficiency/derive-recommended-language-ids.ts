@@ -1,5 +1,5 @@
 import type { CharacterBuildCatalogIndex } from '../../context'
-import type { CharacterBuilderDraft } from '../../draft'
+import type { CharacterBuilderDraft } from '../../draft/draft'
 
 export type DeriveRecommendedLanguageIdsArgs = {
   draft: CharacterBuilderDraft

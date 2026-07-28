@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import type { ClassStored } from '../../../../content/classes/class'
 import { buildChoiceSetId } from '../../choice-set'
-import { createEmptyCharacterBuilderDraft } from '../../draft'
+import { createEmptyCharacterBuilderDraft } from '../../draft/draft'
 import { indexCharacterBuildCatalog } from '../../context'
 import { startingEquipmentChoiceSetId } from './resolve-starting-equipment-choice-sets'
 import {

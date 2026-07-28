@@ -4,7 +4,7 @@ import type { CharacterRosterState, CharacterVitalState } from '@rpg/contracts'
 import { Text } from '@rpg/ui'
 
 import { resolveCharacterRosterStatusPresentation } from '../../lib/campaign-roster-presentation'
-import { resolveCharacterVitalStatusPresentation } from '../../lib/character-vital-presentation'
+import { resolveCharacterVitalStatusPresentation } from '../../lib/display/character-vital-presentation'
 
 export type CampaignCharacterStatusSummaryProps = {
   vital: CharacterVitalState

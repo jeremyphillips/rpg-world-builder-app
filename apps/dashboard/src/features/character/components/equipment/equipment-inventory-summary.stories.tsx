@@ -19,7 +19,7 @@ import {
   equipmentStepLuteFixture,
   equipmentStepMonkClassFixture,
   equipmentStepPotionOfHealingFixture,
-} from '../../lib/equipment-step.fixtures'
+} from '../../lib/equipment/equipment-step.fixtures'
 import { EquipmentInventorySummary } from './equipment-inventory-summary.client'
 
 const monkToolChoiceSetId = buildChoiceSetId(

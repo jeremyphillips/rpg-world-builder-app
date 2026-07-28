@@ -14,7 +14,7 @@ import type { CharacterProficiencies } from '../../character/proficiencies'
 import type { CharacterSelectionSource } from '../../character/selection-sources'
 import type { ChoiceSet } from '../choice-set'
 import type { CharacterBuildContext } from '../context'
-import type { CharacterBuilderDraft } from '../draft'
+import type { CharacterBuilderDraft } from '../draft/draft'
 
 // ---------------------------------------------------------------------------
 // Character Builder language finalization — orchestrates creature primitives,

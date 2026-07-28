@@ -4,13 +4,13 @@ import {
   isBuilderStepReadinessMessageOnly,
   showsBuilderStepReviewMessage,
   visibleProficiencySections,
-} from '../../lib/builder-step-readiness.lib'
+} from '../../lib/builder/builder-step-readiness.lib'
 import { ProficiencyPickerDrawer } from '../proficiencies/proficiency-picker-drawer.client'
 import { ProficiencySection } from '../proficiencies/proficiency-section.client'
 import { BuilderStepFrame } from './builder-step-frame.client'
 import { BuilderStepReadinessPanel } from './builder-step-readiness-panel.client'
 import type { ProficienciesStepProps } from './proficiencies-step.types'
-import type { useProficienciesStep } from './use-proficiencies-step.client'
+import type { useProficienciesStep } from '../../hooks/use-proficiencies-step.client'
 
 export function ProficienciesStepView({
   validationIssues,

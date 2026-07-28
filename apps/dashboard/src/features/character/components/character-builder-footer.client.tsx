@@ -1,13 +1,13 @@
 'use client'
 
-import type { CharacterBuilderStepId } from '@rpg/contracts'
+import type { CharacterBuilderStepId } from '@rpg/contracts/rpg/character-builder'
 import { Button, Text } from '@rpg/ui'
 
 import {
   getAdjacentBuilderStepId,
   isFirstBuilderStep,
   isReviewBuilderStep,
-} from '../lib/character-builder-navigation'
+} from '../lib/builder/character-builder-navigation'
 import { characterBuilderShellFooterClasses } from './character-builder-shell.variants'
 
 export type CharacterBuilderFooterProps = {

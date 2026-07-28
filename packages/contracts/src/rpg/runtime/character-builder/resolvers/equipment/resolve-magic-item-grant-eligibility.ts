@@ -1,9 +1,9 @@
 import { resolveStartingWealthTierForBuilder } from '../../../../campaign/rules/starting-wealth'
 import type { Equipment } from '../../../../content/equipment'
-import type { MagicItemAllowance } from '../../magic-item-selection'
-import type { MagicItemGrantProgress } from '../../magic-item-selection'
-import type { CharacterBuilderDraft } from '../../draft'
-import { getBuilderSelectedStartingLevel } from '../../builder-level'
+import type { MagicItemAllowance } from '../../equipment/magic-item-selection'
+import type { MagicItemGrantProgress } from '../../equipment/magic-item-selection'
+import type { CharacterBuilderDraft } from '../../draft/draft'
+import { getBuilderSelectedStartingLevel } from '../../progression/builder-level'
 import type {
   EquipmentAcquisitionBuilderContext,
   MagicItemGrantEligibility,

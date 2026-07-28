@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { createEmptyCharacterBuilderDraft } from '../../draft'
+import { createEmptyCharacterBuilderDraft } from '../../draft/draft'
 import { indexCharacterBuildCatalog } from '../../context'
 import { assembleCharacterProficiencies } from '../../assembly/assemble-proficiencies'
 import { PICKER_DISABLED_REASON_SELECTION_FULL } from '../picker/picker-item-state'

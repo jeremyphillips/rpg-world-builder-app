@@ -22,7 +22,7 @@ import {
   createStandaloneBuilderContextFixture,
   populatedBuilderCatalog,
 } from '../../lib/character-builder-fixtures'
-import { CHANGE_HERITAGE_LABEL } from '../../lib/builder-parent-choice-status.lib'
+import { CHANGE_HERITAGE_LABEL } from '../../lib/builder/builder-parent-choice-status.lib'
 import { SpeciesStep } from './species-step.client'
 
 const dwarfWithTraits = {

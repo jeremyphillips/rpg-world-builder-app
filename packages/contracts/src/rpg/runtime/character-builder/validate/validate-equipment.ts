@@ -1,6 +1,6 @@
-import { characterBuilderValidationMessages } from '../character-builder-messages'
+import { characterBuilderValidationMessages } from '../messages/character-builder-messages'
 import type { CharacterBuildContext } from '../context'
-import type { CharacterBuilderDraft } from '../draft'
+import type { CharacterBuilderDraft } from '../draft/draft'
 import {
   formatMagicItemGrantIncompleteLabel,
   magicItemGrantIncompleteIssueCode,

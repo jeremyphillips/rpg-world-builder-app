@@ -3,38 +3,44 @@
 import { useCallback, useMemo, useState } from 'react'
 
 import {
+  characterBuilderStepSelectionMessages,
+  formatFieldMessage,
   resolveAvailableContent,
   type CharacterBuildContext,
   type CharacterBuilderDraft,
-  type CharacterBuildValidationIssue,
   type ChoiceSet,
 } from '@rpg/contracts'
+import type { CharacterBuildValidationIssue } from '@rpg/contracts/rpg/character-builder'
 import { Badge, BuilderOptionDetailsSheet, Button, RadioCard, Text } from '@rpg/ui'
 
 import {
   findSpeciesHeritageChoiceSet,
   mapHeritageOptionsToDependentCardOptions,
   resolveDependentChoiceSectionCopy,
-} from '../../lib/builder-dependent-choice.lib'
+} from '../../lib/builder/builder-dependent-choice.lib'
 import {
   buildSpeciesDetailsSheetContent,
   formatSpeciesCardOption,
-} from '../../lib/builder-option-display.lib'
+} from '../../lib/builder/builder-option-display.lib'
 import {
   DEPENDENT_KIND_HERITAGE,
   formatParentChoiceTitleMeta,
   CHANGE_HERITAGE_LABEL,
-} from '../../lib/builder-parent-choice-status.lib'
+} from '../../lib/builder/builder-parent-choice-status.lib'
 import {
   buildHeritageSelectionPatch,
   buildSpeciesSelectionPatch,
-} from '../../lib/species-selection.lib'
+} from '../../lib/choice-sets/species-selection.lib'
 import { BuilderDependentChoiceSection } from '../builder-dependent-choice-section.client'
 import { BuilderStepFrame } from './builder-step-frame.client'
 
-const SELECT_SPECIES_ACTION_LABEL = 'Select species'
-const SELECTED_SPECIES_LABEL = 'Selected'
 const HERITAGE_SECTION_ID_PREFIX = 'character-builder-species-heritage'
+const SELECT_SPECIES_ACTION_LABEL = formatFieldMessage(
+  characterBuilderStepSelectionMessages.selectSpecies(),
+)
+const SELECTED_SPECIES_LABEL = formatFieldMessage(
+  characterBuilderStepSelectionMessages.selectedBadge(),
+)
 
 export type SpeciesStepProps = {
   context: CharacterBuildContext

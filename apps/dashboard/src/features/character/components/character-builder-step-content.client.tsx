@@ -3,12 +3,14 @@
 import type {
   CharacterBuildContext,
   CharacterBuilderDraft,
-  CharacterBuilderStepId,
   CharacterBuildPreview,
-  CharacterBuildValidationIssue,
   ChoiceSet,
   EquipmentPickerFocusIntent,
 } from '@rpg/contracts'
+import type {
+  CharacterBuilderStepId,
+  CharacterBuildValidationIssue,
+} from '@rpg/contracts/rpg/character-builder'
 import { AbilitiesStep } from './steps/abilities-step.client'
 import { ClassStep } from './steps/class-step.client'
 import { IdentityStep } from './steps/identity-step.client'
@@ -17,7 +19,7 @@ import { EquipmentStep } from './steps/equipment-step.client'
 import { ReviewStep } from './steps/review-step.client'
 import { SpeciesStep } from './steps/species-step.client'
 import { SpellsStep } from './steps/spells-step.client'
-import type { CharacterBuilderNavigateToStep } from '../lib/character-builder-navigation-options'
+import type { CharacterBuilderNavigateToStep } from '../lib/builder/character-builder-navigation-options'
 
 export type CharacterBuilderStepContentProps = {
   stepId: CharacterBuilderStepId

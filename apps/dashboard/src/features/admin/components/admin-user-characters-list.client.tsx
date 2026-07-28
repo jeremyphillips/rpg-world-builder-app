@@ -2,12 +2,13 @@
 
 import { useMemo } from 'react'
 import { useParams } from 'react-router-dom'
-import { DataTableFilterRegion, Text } from '@rpg/ui'
-import { FilterBar, FilterChromeProvider, useFilterState } from '@rpg/ui/filters'
+import { Text } from '@rpg/ui'
+import { useFilterState } from '@rpg/ui/filters'
 
 import { CharacterListCard } from '@/features/character/components/character-list-card.client'
 import { PageHeader } from '@/components/layout/page-header'
 import { NarrowPage } from '@/components/layout/narrow-page'
+import { PrimaryFilterBarRegion } from '@/lib/data-table/primary-filter-bar-region.client'
 
 import { useAdminUserRouteContext } from '../lib/admin-user-route-context'
 import { useAdminUserCharacters } from '../hooks/use-admin-user-characters'
@@ -25,20 +26,12 @@ export function AdminUserCharactersList() {
   const { data: characters = [], isPending, isError } = useAdminUserCharacters(userId!, listQuery)
 
   const filterRegion = (
-    <FilterChromeProvider>
-      <DataTableFilterRegion
-        primaryFilters={
-          <FilterBar
-            schema={filterSchema}
-            state={filterState}
-            onValueChange={setValue}
-            onReset={reset}
-          />
-        }
-        additionalFiltersOpen={false}
-        onAdditionalFiltersOpenChange={() => undefined}
-      />
-    </FilterChromeProvider>
+    <PrimaryFilterBarRegion
+      filterSchema={filterSchema}
+      filterState={filterState}
+      onValueChange={setValue}
+      onReset={reset}
+    />
   )
 
   if (isError) {

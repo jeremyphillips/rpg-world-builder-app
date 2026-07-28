@@ -10,3 +10,7 @@ export {
   type OverviewPreferencesExtras,
   type OverviewPreferencesStore,
 } from './create-overview-preferences'
+export {
+  applyOverviewAdvancedOpenPreferences,
+  applyOverviewColumnChangePreferences,
+} from './overview-preference-handlers'

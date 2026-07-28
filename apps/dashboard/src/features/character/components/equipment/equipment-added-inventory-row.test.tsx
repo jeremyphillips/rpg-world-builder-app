@@ -9,8 +9,8 @@ import {
   equipmentStepCatalogIndexFixture,
   equipmentStepContextFixture,
   equipmentStepPotionOfHealingFixture,
-} from '../../lib/equipment-step.fixtures'
-import type { EquipmentInventoryRow } from '../../lib/equipment-step.lib'
+} from '../../lib/equipment/equipment-step.fixtures'
+import type { EquipmentInventoryRow } from '../../lib/equipment/equipment-step.lib'
 import { EquipmentAddedInventoryRowItem } from './equipment-added-inventory-row.client'
 import type { AddedEquipmentEntryViewModel } from './equipment-inventory-summary.lib'
 

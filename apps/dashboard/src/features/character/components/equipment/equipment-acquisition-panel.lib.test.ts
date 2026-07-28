@@ -13,7 +13,7 @@ import {
   equipmentStepCatalogIndexFixture,
   equipmentStepMonkClassFixture,
   equipmentStepPotionOfHealingFixture,
-} from '../../lib/equipment-step.fixtures'
+} from '../../lib/equipment/equipment-step.fixtures'
 import {
   createEmptyCharacterBuilderDraft,
   startingEquipmentChoiceSetId,

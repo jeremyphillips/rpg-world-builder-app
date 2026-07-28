@@ -5,24 +5,27 @@ import {
   normalizeCharacterBuilderDraft,
   type CharacterBuilderDraft,
   type CharacterBuilderDraftScope,
+  type CharacterBuilderDraftStorageRejectionReason,
   type PersistedCharacterBuilderState,
 } from '@rpg/contracts'
 import { create } from 'zustand'
 import { createJSONStorage, persist, type PersistStorage } from 'zustand/middleware'
 
-import { isNonEmptyCharacterBuilderDraft } from '../lib/is-non-empty-character-builder-draft'
-import { mergeCharacterBuilderDraft } from '../lib/merge-character-builder-draft'
+import { isNonEmptyCharacterBuilderDraft } from '../lib/draft/is-non-empty-character-builder-draft'
+import { mergeCharacterBuilderDraft } from '../lib/draft/merge-character-builder-draft'
 
 export type CharacterBuilderStoreState = {
   draft: CharacterBuilderDraft
   hasPendingRestore: boolean
   pendingRestoredDraft: CharacterBuilderDraft | null
+  rejectedDraftRestoreReason: CharacterBuilderDraftStorageRejectionReason | null
   _hasHydrated: boolean
   setDraft: (draft: CharacterBuilderDraft) => void
   patchDraft: (patch: Partial<CharacterBuilderDraft>) => void
   continuePreviousDraft: () => void
   startOver: () => void
   clearPersistedDraft: () => Promise<void>
+  clearRejectedDraftRestore: () => void
   setHasHydrated: (value: boolean) => void
 }
 
@@ -92,44 +95,73 @@ function finishCharacterBuilderHydration(
   if (hasCompletedInitialHydration.completed) return
   hasCompletedInitialHydration.completed = true
 
-  if (rehydratedState) {
-    const rawStorage = sessionStorage.getItem(storageKey)
-    const persistedPayload = rawStorage
-      ? (JSON.parse(rawStorage) as { state?: unknown }).state
-      : readPersistedPayloadFromRehydratedState(rehydratedState, scope)
-    const loadResult = loadCharacterBuilderDraftFromStorage(persistedPayload, scope)
+  const rawStorage = sessionStorage.getItem(storageKey)
 
-    if (loadResult.status === 'rejected' && loadResult.shouldClear) {
+  if (rawStorage) {
+    let persistedPayload: unknown
+
+    try {
+      persistedPayload = (JSON.parse(rawStorage) as { state?: unknown }).state
+    } catch {
       void store.persist.clearStorage()
-    }
-
-    if (loadResult.status !== 'restored') {
       store.setState({
         draft: createEmptyCharacterBuilderDraft(),
         hasPendingRestore: false,
         pendingRestoredDraft: null,
+        rejectedDraftRestoreReason: 'malformed',
         _hasHydrated: true,
       })
       return
     }
 
-    const mergedDraft = normalizeCharacterBuilderDraft(loadResult.draft)
-    if (isNonEmptyCharacterBuilderDraft(mergedDraft)) {
-      store.setState({
-        draft: createEmptyCharacterBuilderDraft(),
-        pendingRestoredDraft: mergedDraft,
-        hasPendingRestore: true,
-        _hasHydrated: true,
-      })
-      return
-    }
+    applyLoadedPersistedPayload(store, scope, persistedPayload)
+    return
+  }
 
-    if (mergedDraft !== loadResult.draft) {
-      store.setState({ draft: mergedDraft, _hasHydrated: true })
-      return
-    }
+  if (rehydratedState) {
+    const persistedPayload = readPersistedPayloadFromRehydratedState(rehydratedState, scope)
+    applyLoadedPersistedPayload(store, scope, persistedPayload)
+    return
+  }
 
-    store.setState({ _hasHydrated: true })
+  store.setState({ _hasHydrated: true })
+}
+
+function applyLoadedPersistedPayload(
+  store: CharacterBuilderStore,
+  scope: CharacterBuilderDraftScope,
+  persistedPayload: unknown,
+): void {
+  const loadResult = loadCharacterBuilderDraftFromStorage(persistedPayload, scope)
+
+  if (loadResult.status === 'rejected' && loadResult.shouldClear) {
+    void store.persist.clearStorage()
+  }
+
+  if (loadResult.status !== 'restored') {
+    store.setState({
+      draft: createEmptyCharacterBuilderDraft(),
+      hasPendingRestore: false,
+      pendingRestoredDraft: null,
+      rejectedDraftRestoreReason: loadResult.status === 'rejected' ? loadResult.reason : null,
+      _hasHydrated: true,
+    })
+    return
+  }
+
+  const mergedDraft = normalizeCharacterBuilderDraft(loadResult.draft)
+  if (isNonEmptyCharacterBuilderDraft(mergedDraft)) {
+    store.setState({
+      draft: createEmptyCharacterBuilderDraft(),
+      pendingRestoredDraft: mergedDraft,
+      hasPendingRestore: true,
+      _hasHydrated: true,
+    })
+    return
+  }
+
+  if (mergedDraft !== loadResult.draft) {
+    store.setState({ draft: mergedDraft, _hasHydrated: true })
     return
   }
 
@@ -146,6 +178,7 @@ function createCharacterBuilderStoreImpl(storageKey: string, scope: CharacterBui
         draft: createEmptyCharacterBuilderDraft(),
         hasPendingRestore: false,
         pendingRestoredDraft: null,
+        rejectedDraftRestoreReason: null,
         _hasHydrated: false,
         setDraft: (draft) => set({ draft }),
         patchDraft: (patch) =>
@@ -157,6 +190,7 @@ function createCharacterBuilderStoreImpl(storageKey: string, scope: CharacterBui
             draft: restored,
             hasPendingRestore: false,
             pendingRestoredDraft: null,
+            rejectedDraftRestoreReason: null,
           })
         },
         startOver: () => {
@@ -166,12 +200,14 @@ function createCharacterBuilderStoreImpl(storageKey: string, scope: CharacterBui
             draft: createEmptyCharacterBuilderDraft(),
             hasPendingRestore: false,
             pendingRestoredDraft: null,
+            rejectedDraftRestoreReason: null,
           })
         },
         clearPersistedDraft: async () => {
           storage.suppressNextWrite()
           await store.persist.clearStorage()
         },
+        clearRejectedDraftRestore: () => set({ rejectedDraftRestoreReason: null }),
         setHasHydrated: (value) => set({ _hasHydrated: value }),
       }),
       {

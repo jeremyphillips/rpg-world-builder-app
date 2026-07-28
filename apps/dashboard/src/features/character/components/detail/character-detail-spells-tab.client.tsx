@@ -14,7 +14,7 @@ import {
   SpellCatalogItemHeader,
   SpellDetailMetadata,
 } from '@/features/content'
-import { CHARACTER_EMPTY_SECTION_TEXT } from '../../lib/character-display'
+import { CHARACTER_EMPTY_SECTION_TEXT } from '../../lib/display/character-display'
 import {
   createCharacterDetailSpellFilterSchema,
   countCharacterDetailSpellStructuredFilters,

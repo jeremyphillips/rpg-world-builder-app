@@ -1,4 +1,4 @@
-import type { CharacterBuilderStepId } from '@rpg/contracts'
+import type { CharacterBuilderStepId } from '@rpg/contracts/rpg/character-builder'
 
 export const BUILDER_STEP_FORM_IDS = {
   identity: 'character-builder-identity-form',

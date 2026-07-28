@@ -6,13 +6,13 @@ import {
   type ProficiencyPickerItem,
 } from '@rpg/contracts'
 
-import { createProficienciesStepOriginLanguagesFixture } from '../../lib/proficiencies-step.fixtures'
+import { createProficienciesStepOriginLanguagesFixture } from '../../lib/proficiencies/proficiencies-step.fixtures'
 import {
   createProficienciesStepRogueFixture,
   proficienciesStepAcrobaticsSkill,
   proficienciesStepPerceptionSkill,
   proficienciesStepStealthSkill,
-} from '../../lib/proficiencies-step.fixtures'
+} from '../../lib/proficiencies/proficiencies-step.fixtures'
 
 const rogueFixture = createProficienciesStepRogueFixture()
 

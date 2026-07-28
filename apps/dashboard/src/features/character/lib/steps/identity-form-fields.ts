@@ -1,5 +1,11 @@
 import { z } from 'zod'
-import { ALIGNMENTS, getAlignmentLabel, optionalAlignmentSchema } from '@rpg/contracts'
+import {
+  ALIGNMENTS,
+  characterBuilderValidationMessages,
+  formatFieldMessage,
+  getAlignmentLabel,
+  optionalAlignmentSchema,
+} from '@rpg/contracts'
 import { toOptions, type FormItem } from '@rpg/ui/form'
 
 const narrativeFormItemSchema = z.object({
@@ -15,7 +21,10 @@ const narrativeFormSchema = z.object({
 })
 
 export const identityFormSchema = z.object({
-  name: z.string().trim().min(1),
+  name: z
+    .string()
+    .trim()
+    .min(1, formatFieldMessage(characterBuilderValidationMessages.nameRequired())),
   narrative: narrativeFormSchema,
   alignment: optionalAlignmentSchema,
 })

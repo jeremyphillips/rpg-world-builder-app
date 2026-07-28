@@ -1,9 +1,9 @@
-import { characterBuilderValidationMessages } from '../character-builder-messages'
+import { characterBuilderValidationMessages } from '../messages/character-builder-messages'
 import type { ChoiceSet } from '../choice-set'
 import type { CharacterBuildContext } from '../context'
-import type { CharacterBuilderDraft } from '../draft'
+import type { CharacterBuilderDraft } from '../draft/draft'
 import type { CharacterBuildEngineOptions } from '../engine-options'
-import type { CharacterBuilderStepId } from '../step-ids'
+import type { CharacterBuilderStepId } from '../../../character-builder/step-ids'
 import { BUILDER_STEPS, isChoiceStep } from '../steps'
 
 import { validationIssue } from './issue'
@@ -110,7 +110,16 @@ export function validateCharacterBuild(
     }
 
     if (!shouldValidateChoiceStep(stepId, options.resolvedChoiceSets)) {
-      return { ok: true, issues: [] }
+      return {
+        ok: false,
+        issues: [
+          validationIssue(
+            'choice_sets_loading',
+            characterBuilderValidationMessages.choiceSetsLoading(),
+            { stepId },
+          ),
+        ],
+      }
     }
 
     const issues = STEP_VALIDATORS[stepId](draft, context, choiceSets)

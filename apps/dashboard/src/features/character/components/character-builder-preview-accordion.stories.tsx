@@ -8,7 +8,7 @@ import {
 } from '@rpg/contracts'
 
 import { createPopulatedStandaloneBuilderContextFixture } from '../lib/character-builder-fixtures'
-import { narrativeFieldCount } from '../lib/narrative-preview'
+import { narrativeFieldCount } from '../lib/builder-preview/narrative-preview'
 import { CharacterBuilderPreviewAccordion } from './character-builder-preview-accordion.client'
 
 const context = createPopulatedStandaloneBuilderContextFixture()

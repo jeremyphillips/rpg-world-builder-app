@@ -6,7 +6,7 @@ import { expectNoAxeViolations } from '@rpg/ui/test-utils'
 import {
   createProficienciesStepRogueFixture,
   proficienciesStepStealthSkill,
-} from '../../lib/proficiencies-step.fixtures'
+} from '../../lib/proficiencies/proficiencies-step.fixtures'
 import { ProficiencyChoiceSection } from './proficiency-choice-section.client'
 
 describe('ProficiencyChoiceSection', () => {

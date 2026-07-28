@@ -9,7 +9,7 @@ import {
   wealthToCopper,
 } from '../../../../primitives/wealth'
 import { indexCharacterBuildCatalog } from '../../context'
-import { createEmptyCharacterBuilderDraft } from '../../draft'
+import { createEmptyCharacterBuilderDraft } from '../../draft/draft'
 import { startingEquipmentChoiceSetId } from './resolve-starting-equipment-choice-sets'
 import { deriveEquipmentBudgetSummary, maxAffordableEquipmentQuantity } from './equipment-budget'
 import {

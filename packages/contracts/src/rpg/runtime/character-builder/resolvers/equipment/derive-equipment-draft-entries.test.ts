@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest'
 import { equipmentSchema } from '../../../../content/equipment'
 import type { ClassStored } from '../../../../content/classes/class'
 import { standardStartingWealthTableId } from '../../../../campaign/rules/starting-wealth'
-import { createEmptyCharacterBuilderDraft } from '../../draft'
+import { createEmptyCharacterBuilderDraft } from '../../draft/draft'
 import { indexCharacterBuildCatalog } from '../../context'
 import { startingEquipmentChoiceSetId } from './resolve-starting-equipment-choice-sets'
 import {

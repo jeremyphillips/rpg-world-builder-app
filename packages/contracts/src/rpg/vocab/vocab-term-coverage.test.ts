@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { PERSONAL_NAME_COMPONENT_TERM } from '../../name-generator/personal-name-component'
+import { PERSONAL_NAME_COMPONENT_TERM } from './personal-name-component'
 import { NAME_SUBJECT_KIND_TERM } from '../../name-generator/subject-kind'
 import {
   SPELL_APPLICATION_PATTERN_TERM,

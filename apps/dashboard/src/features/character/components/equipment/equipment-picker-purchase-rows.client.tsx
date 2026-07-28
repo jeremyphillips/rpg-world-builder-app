@@ -5,7 +5,7 @@ import { NumberStepper, Text } from '@rpg/ui'
 import {
   clampEquipmentStepQuantity,
   EQUIPMENT_STEP_QUANTITY_INPUT_DIGITS,
-} from '../../lib/equipment-quantity.lib'
+} from '../../lib/equipment/equipment-quantity.lib'
 import {
   EQUIPMENT_PICKER_PURCHASE_QUANTITY_LABEL,
   EQUIPMENT_PICKER_PURCHASE_REMAINING_LABEL,

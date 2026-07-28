@@ -16,7 +16,7 @@ import {
   EQUIPMENT_STARTING_PACKAGE_SECTION_LABEL,
   type EquipmentInventoryQuantityTarget,
   type EquipmentInventoryRemoveTarget,
-} from '../../lib/equipment-step.lib'
+} from '../../lib/equipment/equipment-step.lib'
 import { EquipmentAddedInventoryColumn } from './equipment-added-inventory-column.client'
 import { EquipmentInventoryColumn } from './equipment-inventory-column.client'
 import { EquipmentStartingPackageSection } from './equipment-starting-package-section.client'

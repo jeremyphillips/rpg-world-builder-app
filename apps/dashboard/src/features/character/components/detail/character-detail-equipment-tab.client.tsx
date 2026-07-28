@@ -14,7 +14,7 @@ import {
   EquipmentDetailMetadata,
   EquipmentCatalogItemHeader,
 } from '@/features/content/equipment'
-import { CHARACTER_EMPTY_SECTION_TEXT } from '../../lib/character-display'
+import { CHARACTER_EMPTY_SECTION_TEXT } from '../../lib/display/character-display'
 import {
   createCharacterDetailEquipmentFilterSchema,
   countCharacterDetailEquipmentStructuredFilters,
@@ -37,7 +37,7 @@ import {
   toEquipmentCatalogHeaderModel,
   type CharacterSheetEquipmentCard,
 } from '../../lib/detail/character-sheet-catalog'
-import type { CharacterWealthViewModel } from '../../lib/character-display'
+import type { CharacterWealthViewModel } from '../../lib/display/character-display'
 import { hasCatalogPickerResetViewCriteria } from '../picker/catalog-picker-filter-state.lib'
 import { CatalogSortControl } from '../picker/catalog-sort-control.client'
 import { pickerSortOption } from '../picker/catalog-picker-sort-labels.lib'

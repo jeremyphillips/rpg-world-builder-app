@@ -3,8 +3,8 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { expectNoAxeViolations } from '@rpg/ui/test-utils'
 
-import { equipmentStepBardClassFixture } from '../../lib/equipment-step.fixtures'
-import type { EquipmentInventoryRow } from '../../lib/equipment-step.lib'
+import { equipmentStepBardClassFixture } from '../../lib/equipment/equipment-step.fixtures'
+import type { EquipmentInventoryRow } from '../../lib/equipment/equipment-step.lib'
 import { EquipmentInventoryRowItem } from './equipment-inventory-row.client'
 
 const editableStackableRow: EquipmentInventoryRow = {

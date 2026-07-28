@@ -14,14 +14,14 @@ import {
   getBuilderDraftNarrative,
   CHARACTER_BUILDER_PREVIEW_SECTIONS,
   type CharacterBuilderPreviewSectionId,
-} from '../lib/character-builder-preview-panel.lib'
-import { narrativeFieldCount } from '../lib/narrative-preview'
+} from '../lib/builder-preview/character-builder-preview-panel.lib'
+import { narrativeFieldCount } from '../lib/builder-preview/narrative-preview'
 import {
   getPreviewAlignmentLine,
   getPreviewIdentityName,
   getPreviewLevelClassLine,
   getPreviewSpeciesLine,
-} from '../lib/preview-identity-summary'
+} from '../lib/builder-preview/preview-identity-summary'
 import { CharacterBuilderPreviewAccordion } from './character-builder-preview-accordion.client'
 import {
   characterBuilderPreviewIdentitySummaryClasses,

@@ -12,7 +12,7 @@ import {
 import {
   clampEquipmentStepQuantity,
   resolveEquipmentStepPurchaseMaxQuantity,
-} from '../../lib/equipment-quantity.lib'
+} from '../../lib/equipment/equipment-quantity.lib'
 
 export const EQUIPMENT_PICKER_PURCHASE_SECTION_LABEL = 'Add to inventory'
 export const EQUIPMENT_PICKER_PURCHASE_QUANTITY_LABEL = 'Quantity to add'

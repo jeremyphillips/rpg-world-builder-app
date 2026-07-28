@@ -3,9 +3,10 @@
 import { useEffect, useRef } from 'react'
 import { useFormContext, type FieldValues } from 'react-hook-form'
 
-import type { CharacterBuilderDraft, CharacterBuilderStepId } from '@rpg/contracts'
+import type { CharacterBuilderDraft } from '@rpg/contracts'
+import type { CharacterBuilderStepId } from '@rpg/contracts/rpg/character-builder'
 
-import { registerBuilderFormContinueHandler } from '../../lib/builder-form-continue-registry'
+import { registerBuilderFormContinueHandler } from '../../lib/builder/builder-form-continue-registry'
 
 export type BuilderFormContinueRegistrationProps<TFieldValues extends FieldValues> = {
   stepId: CharacterBuilderStepId

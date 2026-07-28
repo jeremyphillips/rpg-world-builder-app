@@ -9,7 +9,7 @@ import {
   type ChoiceSet,
 } from '@rpg/contracts'
 
-import { withChoiceSetSelections } from '../../lib/choice-set-selections'
+import { withChoiceSetSelections } from '../../lib/choice-sets/choice-set-selections'
 import { SpellPickerDrawer } from '../spells/spell-picker-drawer.client'
 import {
   SPELL_PICKER_MODE_CANTRIPS,

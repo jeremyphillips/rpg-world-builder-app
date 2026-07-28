@@ -5,7 +5,7 @@ import { characterBuildValidationIssueSchema } from '../character-builder'
 import {
   characterCampaignBlockingIssueSchema,
   characterCampaignWarningSchema,
-} from './eligibility/character-campaign-eligibility'
+} from './character-eligibility-contracts'
 
 // ---------------------------------------------------------------------------
 // Campaign character assignment error wire schema — serialized in API `error.details`.

@@ -10,11 +10,11 @@ this document tracks the full internal layout, status, and promotion path.
 
 | Export                                       | Module                                                                  | Purpose                                                                                                                                                                                                                                                                                                                                     |
 | -------------------------------------------- | ----------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `resolveAvailableContent`                    | `resolve-available-content.ts` (builder root)                           | Filters species, classes, spells, and equipment by character-creation rules.                                                                                                                                                                                                                                                                |
+| `resolveAvailableContent`                    | `preview/resolve-available-content.ts`                                  | Filters species, classes, spells, and equipment by character-creation rules.                                                                                                                                                                                                                                                                |
 | `resolveAvailableChoices`                    | `resolvers/registry/resolve-choices.ts`                                 | Derives pending `ChoiceSet[]` from draft + catalog context.                                                                                                                                                                                                                                                                                 |
 | `resolveSpellcastingProfile`                 | `resolvers/spellcasting/spellcasting-profile.ts`                        | Structural spellcasting facts for the Spells step; null for non-casters.                                                                                                                                                                                                                                                                    |
 | `resolveSpellStepApplicability`              | `resolvers/spellcasting/resolve-spell-step-applicability.ts`            | Spells-step blocked / notApplicable / applicable gate before choice checks.                                                                                                                                                                                                                                                                 |
-| `resolveBuilderStepReadiness`                | `step-readiness.ts`                                                     | Derived readiness for Equipment, Spells, and Proficiencies empty/default UI.                                                                                                                                                                                                                                                                |
+| `resolveBuilderStepReadiness`                | `readiness/step-readiness.ts`                                           | Derived readiness for Equipment, Spells, and Proficiencies empty/default UI.                                                                                                                                                                                                                                                                |
 | `resolveSpellPickerItems`                    | `resolvers/spellcasting/resolve-spell-picker-items.ts`                  | Enriches spell ChoiceSet options into picker rows (`compactSummary`, `searchText`, selection state) for the spell drawer.                                                                                                                                                                                                                   |
 | `deriveEquipmentRecommendations`             | `resolvers/equipment/derive-equipment-recommendations.ts`               | Tiered picker recommendations (essential/strong/compatible/neutral/notRecommended) with reasons; inference from `spellcasting.requiredGear` (essential, not level-gated), `focusKinds` (essential when spellcasting active, else strong), and `recommendedGear` (strong), plus authored `characterCreation.equipmentRecommendations` rules. |
 | `deriveRecommendedLanguageIds`               | `resolvers/proficiency/derive-recommended-language-ids.ts`              | Species affinity ids intersected with a language ChoiceSet option pool.                                                                                                                                                                                                                                                                     |
@@ -31,20 +31,113 @@ this document tracks the full internal layout, status, and promotion path.
 | `resolveProficiencyStepModel`                | `resolvers/proficiency/resolve-proficiency-step-model.ts`               | Sectioned grants + ChoiceSet summaries for the Proficiencies step.                                                                                                                                                                                                                                                                          |
 | `resolveProficiencyPickerItems`              | `resolvers/proficiency/resolve-proficiency-picker-items.ts`             | Proficiency picker row state (granted overlap + selection full); optional `compactSummary` for `skillProficiency` rows.                                                                                                                                                                                                                     |
 | `validateProficiencyChoiceSets`              | `validate/validate-choice-sets.ts`                                      | Stale proficiency selections (`proficiency_no_longer_available`).                                                                                                                                                                                                                                                                           |
-| `evaluateEquipmentPackageSwitch`             | `equipment-package-switch.ts`                                           | Shared evaluator for package-switch preview, draft validation, and commit readiness (`noConflict` / `resolvable` / `blocked`).                                                                                                                                                                                                              |
-| `buildEquipmentPackageSwitchPreview`         | `equipment-package-switch.ts`                                           | Thin wrapper: evaluator with committed purchase quantities.                                                                                                                                                                                                                                                                                 |
-| `canSwitchEquipmentPackage`                  | `equipment-package-switch.ts`                                           | Thin wrapper: `noConflict` or resolvable draft within target allowance.                                                                                                                                                                                                                                                                     |
-| `buildEquipmentPackageSwitchPatch`           | `equipment-package-switch.ts`                                           | Re-evaluates with `committedInventorySnapshot`; atomic selection + purchase patch or structured `commitError`.                                                                                                                                                                                                                              |
-| `buildStartingPackageConversionPreview`      | `starting-package-conversion.ts`                                        | Preview package→gold conversion rows and eligibility before commit.                                                                                                                                                                                                                                                                         |
-| `buildStartingPackageConversionPatch`        | `starting-package-conversion.ts`                                        | Atomic package→gold conversion commit.                                                                                                                                                                                                                                                                                                      |
+| `evaluateEquipmentPackageSwitch`             | `equipment/equipment-package-switch.ts`                                 | Shared evaluator for package-switch preview, draft validation, and commit readiness (`noConflict` / `resolvable` / `blocked`).                                                                                                                                                                                                              |
+| `buildEquipmentPackageSwitchPreview`         | `equipment/equipment-package-switch.ts`                                 | Thin wrapper: evaluator with committed purchase quantities.                                                                                                                                                                                                                                                                                 |
+| `canSwitchEquipmentPackage`                  | `equipment/equipment-package-switch.ts`                                 | Thin wrapper: `noConflict` or resolvable draft within target allowance.                                                                                                                                                                                                                                                                     |
+| `buildEquipmentPackageSwitchPatch`           | `equipment/equipment-package-switch.ts`                                 | Re-evaluates with `committedInventorySnapshot`; atomic selection + purchase patch or structured `commitError`.                                                                                                                                                                                                                              |
+| `buildStartingPackageConversionPreview`      | `equipment/starting-package-conversion.ts`                              | Preview package→gold conversion rows and eligibility before commit.                                                                                                                                                                                                                                                                         |
+| `resolveEquipmentStepModel`                  | `resolvers/equipment/resolve-equipment-step-model.ts`                   | Unified equipment-step read model (readiness + funding + budget).                                                                                                                                                                                                                                                                           |
+| `applyEquipmentStepAction`                   | `resolvers/equipment/apply-equipment-step-action.ts`                    | Canonical equipment-step draft mutations (Phase C complete).                                                                                                                                                                                                                                                                                |
+| `clampEquipmentPurchaseQuantity`             | `resolvers/equipment/resolve-equipment-purchase-quantity-limits.ts`     | Budget/cap clamp for purchase quantity edits.                                                                                                                                                                                                                                                                                               |
+
+## Equipment step command API (Phase B)
+
+Canonical runtime entry points for equipment-step orchestration. Dashboard should
+dispatch `EquipmentStepAction` values through `applyEquipmentStepAction` instead of
+re-implementing draft mutations in `equipment-step.lib.ts`.
+
+### Types
+
+| Type                              | Module                                                | Purpose                                                                                                       |
+| --------------------------------- | ----------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| `EquipmentStepUnavailableReason`  | `equipment/equipment-step-unavailable.ts`             | Typed missing-context surface (`class_missing`, `choice_sets_loading`, …).                                    |
+| `EquipmentStepAction`             | `equipment/equipment-step-action.ts`                  | Discriminated union of step mutations — all domain mutations dispatch here.                                   |
+| `EquipmentStepActionResult`       | `equipment/equipment-step-action.ts`                  | Structured domain output: `applied` \| `needs_resolution` \| `blocked` \| `invalid` — no user-facing strings. |
+| `EquipmentStepRemoveTarget`       | `equipment/equipment-step-action.ts`                  | Inventory row removal target (`package` \| `purchase` \| `magicItemGrant`).                                   |
+| `EquipmentStepModel`              | `resolvers/equipment/resolve-equipment-step-model.ts` | Unified read model: `readiness`, funding snapshots, optional `budget`.                                        |
+| `ResolveEquipmentStepModelResult` | `resolve-equipment-step-model.ts`                     | `{ status: 'available', model }` or `{ status: 'unavailable', reason }`.                                      |
+
+### Entry points
+
+```typescript
+resolveEquipmentStepModel({
+  draft,
+  catalogIndex,
+  context,
+  resolvedChoiceSets, // null → choice_sets_loading
+  startingWealth?,
+  includeBudget?,
+}): ResolveEquipmentStepModelResult
+
+applyEquipmentStepAction({
+  draft,
+  catalogIndex,
+  action,
+  budget?,
+  acquisitionContext?,
+}): EquipmentStepActionResult
+```
+
+Readiness is resolved inside `resolveEquipmentStepModel` — do not call
+`resolveEquipmentStepReadiness` in parallel when the model is available.
+
+### Phase C — equipment step actions
+
+All domain mutations dispatch through `applyEquipmentStepAction`:
+
+| Action kind                 | Replaces (deleted dashboard helpers)     |
+| --------------------------- | ---------------------------------------- |
+| `skip_starting_equipment`   | `buildEquipmentSkipPatch`                |
+| `select_package`            | `buildEquipmentSelectionPatch`           |
+| `add_purchase`              | `buildEquipmentAddPurchasePatch`         |
+| `remove_entry`              | `buildEquipmentRemoveEntryPatch`         |
+| `set_purchase_quantity`     | `buildEquipmentSetPurchaseQuantityPatch` |
+| `remove_purchase_quantity`  | `buildMagicItemPurchaseRemovalPatch`     |
+| `acquire_magic_item`        | `buildMagicItemAcquisitionPatch`         |
+| `apply_purchase_intent`     | `buildEquipmentPurchaseIntentPatch`      |
+| `release_magic_item_grant`  | `buildMagicItemGrantReleasePatch`        |
+| `resolve_package_switch`    | `buildEquipmentPackageSwitchPatch`       |
+| `commit_package_conversion` | `buildStartingPackageConversionPatch`    |
+
+Dashboard hooks (`use-equipment-step`, `use-equipment-picker-acquisition`) apply
+patches from `{ status: 'applied' }` results only. Conflicting `select_package`
+returns `{ status: 'needs_resolution', resolution }` to open the package-switch
+modal; commits dispatch `resolve_package_switch` or `commit_package_conversion`.
+
+### Package-switch presentation boundary
+
+`equipment-package-switch-resolution.lib.ts` (dashboard) **only adapts** contracts
+evaluator output:
+
+- Copy: titles, descriptions, blocking-reason messages, stale-inventory notice
+- View models: row grouping, budget status labels, staged-removal chrome
+
+Domain rules live in `evaluateEquipmentPackageSwitch` and
+`buildEquipmentPackageSwitchPatch` — the dashboard module does not re-evaluate switch
+eligibility independently.
 
 ## Directory layout
 
 ```text
 character-builder/
-  resolve-available-content.ts   catalog scope filter (not a ChoiceSourceResolver)
-  step-readiness.ts              derived empty/default state for advanced steps (BENCH-120)
-  step-readiness-helpers.ts      choice-set filtering + message formatting for readiness
+  context.ts, steps.ts, choice-set.ts, …   engine entry points (root)
+  draft/                                   draft shape, scope, storage, prune helpers
+  equipment/                               step ops, purchase channel, package switch
+  finalize/                                finalize orchestration + zod issue messages
+  ability/                                 ability generation + score recommendations
+  progression/                             builder level + hit points
+  preview/                                 builder preview assembly + available content
+  readiness/
+    step-readiness.ts              derived empty/default state for advanced steps (BENCH-120)
+    step-readiness-helpers.ts      choice-set filtering + message formatting for readiness
+    resolve-review-blocking-summary.ts
+    resolve-unresolved-choice-set-summaries.ts
+  messages/
+    character-builder-messages.ts  validation + step readiness message catalogs
+    character-builder-chrome-messages.ts
+    character-builder-preview-messages.ts
+    character-builder-level-messages.ts
+    character-builder-dependent-choice-messages.ts
   assembly/                      finalize orchestration (assemble-*.ts)
   validate/                      draft/step validation by phase
   resolvers/
@@ -96,14 +189,14 @@ Delegates to `resolveEquipmentStepReadiness`, `resolveSpellsStepReadiness`
 | `complete`         | Required choices satisfied, or skip/empty complete path.                                   |
 
 User-facing copy lives in `characterBuilderStepReadinessMessages`
-(`character-builder-messages.ts`) under `validation.characterBuilder.readiness.*`.
+(`messages/character-builder-messages.ts`) under `validation.characterBuilder.readiness.*`.
 Section-level proficiency choice empty copy uses
 `characterBuilderProficiencyChoiceEmptyMessages` and
 `formatProficiencyChoiceEmptyMessage(choiceType)`.
 
 ### Dashboard rail mapping
 
-Implemented in `apps/dashboard/.../builder-step-visual-status.ts` when
+Implemented in `apps/dashboard/.../lib/builder/builder-step-visual-status.ts` when
 `resolvedChoiceSets !== null`:
 
 | Readiness          | Rail `StepStatus`                               | Aria label note  |
@@ -190,23 +283,23 @@ Finalize and preview call these modules after `resolveAvailableChoices`. Each
 composes creature primitives, draft selections, and character assembly with
 `CharacterSelectionSource` provenance.
 
-| Module                                         | Domain                                                                                                                                                                                 | Called from                           |
-| ---------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------- |
-| `assembly/assemble-language-proficiencies.ts`  | Languages (ruleset grants, origin ChoiceSet picks, class-feature fixed `languages` grants)                                                                                             | `assemble-proficiencies.ts`, finalize |
-| `assembly/assemble-skill-proficiencies.ts`     | Skills (class-fixed, grant-derived, ChoiceSet picks)                                                                                                                                   | `assemble-proficiencies.ts`           |
-| `assembly/assemble-tool-proficiencies.ts`      | Tools (class-fixed, grant-derived, ChoiceSet picks)                                                                                                                                    | `assemble-proficiencies.ts`           |
-| `assembly/assemble-weapon-proficiencies.ts`    | Weapons (class-fixed, grant-derived, ChoiceSet picks)                                                                                                                                  | `assemble-proficiencies.ts`           |
-| `assembly/assemble-armor-proficiencies.ts`     | Armor (class-fixed, grant-derived, ChoiceSet picks)                                                                                                                                    | `assemble-proficiencies.ts`           |
-| `assembly/assemble-grant-proficiencies.ts`     | Fixed grant rows from species traits, heritage, and class features                                                                                                                     | domain `assemble-*-proficiencies.ts`  |
-| `assembly/collect-sourced-grants.ts`           | Unlocked grant walk with provenance                                                                                                                                                    | `assemble-grant-proficiencies.ts`     |
-| `assembly/selection-source-from-choice-set.ts` | ChoiceSet source metadata → `CharacterSelectionSource`                                                                                                                                 | domain `assemble-*-proficiencies.ts`  |
-| `mergeSkillProficiencyEntries`                 | Skills (dedupe)                                                                                                                                                                        | `assemble-skill-proficiencies.ts`     |
-| `mergeToolProficiencyEntries`                  | Tools (dedupe)                                                                                                                                                                         | `assemble-tool-proficiencies.ts`      |
-| `mergeWeaponProficiencyEntries`                | Weapons (dedupe)                                                                                                                                                                       | `assemble-weapon-proficiencies.ts`    |
-| `mergeArmorProficiencyEntries`                 | Armor (dedupe)                                                                                                                                                                         | `assemble-armor-proficiencies.ts`     |
-| `assembly/assemble-starting-equipment.ts`      | Equipment + wealth (`target.proficiency_choice` grants resolve from proficiency answers; see [equipment-proficiency-patterns.md](character-builder-equipment-proficiency-patterns.md)) | `finalize.ts`, `preview.ts`           |
-| `assembly/assemble-spellcasting.ts`            | Spells                                                                                                                                                                                 | `finalize.ts`                         |
-| `assembly/assemble-proficiencies.ts`           | Aggregate                                                                                                                                                                              | `finalize.ts`, `preview-adapter.ts`   |
+| Module                                         | Domain                                                                                                                                                                                 | Called from                                          |
+| ---------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------- |
+| `assembly/assemble-language-proficiencies.ts`  | Languages (ruleset grants, origin ChoiceSet picks, class-feature fixed `languages` grants)                                                                                             | `assemble-proficiencies.ts`, finalize                |
+| `assembly/assemble-skill-proficiencies.ts`     | Skills (class-fixed, grant-derived, ChoiceSet picks)                                                                                                                                   | `assemble-proficiencies.ts`                          |
+| `assembly/assemble-tool-proficiencies.ts`      | Tools (class-fixed, grant-derived, ChoiceSet picks)                                                                                                                                    | `assemble-proficiencies.ts`                          |
+| `assembly/assemble-weapon-proficiencies.ts`    | Weapons (class-fixed, grant-derived, ChoiceSet picks)                                                                                                                                  | `assemble-proficiencies.ts`                          |
+| `assembly/assemble-armor-proficiencies.ts`     | Armor (class-fixed, grant-derived, ChoiceSet picks)                                                                                                                                    | `assemble-proficiencies.ts`                          |
+| `assembly/assemble-grant-proficiencies.ts`     | Fixed grant rows from species traits, heritage, and class features                                                                                                                     | domain `assemble-*-proficiencies.ts`                 |
+| `assembly/collect-sourced-grants.ts`           | Unlocked grant walk with provenance                                                                                                                                                    | `assemble-grant-proficiencies.ts`                    |
+| `assembly/selection-source-from-choice-set.ts` | ChoiceSet source metadata → `CharacterSelectionSource`                                                                                                                                 | domain `assemble-*-proficiencies.ts`                 |
+| `mergeSkillProficiencyEntries`                 | Skills (dedupe)                                                                                                                                                                        | `assemble-skill-proficiencies.ts`                    |
+| `mergeToolProficiencyEntries`                  | Tools (dedupe)                                                                                                                                                                         | `assemble-tool-proficiencies.ts`                     |
+| `mergeWeaponProficiencyEntries`                | Weapons (dedupe)                                                                                                                                                                       | `assemble-weapon-proficiencies.ts`                   |
+| `mergeArmorProficiencyEntries`                 | Armor (dedupe)                                                                                                                                                                         | `assemble-armor-proficiencies.ts`                    |
+| `assembly/assemble-starting-equipment.ts`      | Equipment + wealth (`target.proficiency_choice` grants resolve from proficiency answers; see [equipment-proficiency-patterns.md](character-builder-equipment-proficiency-patterns.md)) | `finalize/finalize.ts`, `preview/preview.ts`         |
+| `assembly/assemble-spellcasting.ts`            | Spells                                                                                                                                                                                 | `finalize/finalize.ts`                               |
+| `assembly/assemble-proficiencies.ts`           | Aggregate                                                                                                                                                                              | `finalize/finalize.ts`, `preview/preview-adapter.ts` |
 
 `assemble-language-proficiencies.ts` merges three language sources at finalize:
 

@@ -6,7 +6,7 @@ import { renderHook } from '@testing-library/react'
 
 import { buildEquipmentPickerFocusIntent } from '@rpg/contracts'
 
-import { useEquipmentPickerFocusIntent } from './use-equipment-picker-focus-intent.client'
+import { useEquipmentPickerFocusIntent } from '../../hooks/use-equipment-picker-focus-intent.client'
 
 describe('useEquipmentPickerFocusIntent', () => {
   it('opens the magic-items picker once per request id', () => {

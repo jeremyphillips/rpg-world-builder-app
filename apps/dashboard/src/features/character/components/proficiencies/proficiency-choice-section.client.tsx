@@ -14,8 +14,8 @@ import {
   formatProficiencySelectionCounter,
   PROFICIENCIES_STEP_OVER_SELECTION_MESSAGE,
   PROFICIENCIES_STEP_SELECTION_FULL_REASON,
-} from '../../lib/proficiencies-step.lib'
-import { shouldShowSelectionFullNotice } from '../../lib/selection-counter.lib'
+} from '../../lib/proficiencies/proficiencies-step.lib'
+import { shouldShowSelectionFullNotice } from '../../lib/choice-sets/selection-counter.lib'
 import { ProficiencySelectedRow } from './proficiency-selected-row.client'
 import {
   proficiencyChoiceSectionClasses,
