@@ -49,6 +49,7 @@ Full checklist and file matrix → [reference.md](./reference.md). Policy depth
 4. **Catalog seed** — `packages/catalog/src/<type>/` JSON + `loadSeed*` exports + `index.test.ts`; register in `packages/catalog/package.json` exports.
 5. **API** — `*.config.ts` importing `@rpg/catalog/<type>` + one line in `content-types.ts`.
 6. **Dashboard** — sub-area folder: list/detail routes, `*-display.ts` view model, form def (if authoring), lazy routes, `CONTENT_ROUTES`, router tree.
+   - Before `*-overview-columns.tsx`: run [Overview table UX](#overview-table-ux) if the user did not specify columns or filters.
 7. **Manifest flags** — set `dashboard.formDefinitionPath`, `visibleInSidebar`, `routeSection`, `catalog.packageName` as applicable.
 8. **Form test registry** — side-effect import in [`content-form-test-registry.ts`](../../../apps/dashboard/src/features/content/lib/forms/content-form-test-registry.ts) (tests only — keep route-local production imports).
 9. **Gates** — run [drift tests](#required-gates) for every touched layer.
@@ -72,6 +73,72 @@ constraints: report-only unless user asks to fix
 
 ---
 
+## Overview table UX
+
+**Gate before step 10** (`*-overview-columns.tsx`). Do **not** invent middle
+columns or filters silently.
+
+`buildContentColumns` always adds shared chrome (name link, source badge,
+campaign access). You only choose **middle columns** (`TYPE_MIDDLE_COLUMNS`) and
+**type-specific filters** via `buildContentFilterSchema` / `createEqualsFilter`.
+Base filters (source, status, search) come from `ContentOverviewBaseFilterState`.
+
+### When to prompt
+
+Prompt the user (with recommendations) when **either** is unspecified:
+
+- middle columns for the overview table
+- type-specific filters
+
+Skip the prompt only when the user already named specific columns, filters, or
+said explicitly to use a named template (e.g. “same columns as feats”,
+“name-only like species with no filters”).
+
+### How to prompt
+
+Use a structured multiple-choice question — present **recommended options
+first**, derived from the contract schema and closest reference type. Include a
+minimal default and at least one richer alternative when the schema supports it.
+
+Example question shape:
+
+```text
+Overview table for <type> — which middle columns and filters?
+
+Recommended (flat enum field):
+- Columns: <field> (sortable)
+- Filters: <field> equals
+
+Recommended (minimal):
+- Columns: none (name + shared chrome only)
+- Filters: none (base filters only)
+
+Alternative (if schema has booleans / derived summaries):
+- Columns: …
+- Filters: …
+```
+
+Wait for an answer before implementing `*-overview-columns.tsx` and wiring the
+overview route.
+
+### Recommendation heuristics
+
+Inspect the contract body and seed records first. Prefer columns that help DMs
+**scan and narrow** the catalog — not every field belongs in the table.
+
+| Schema signal                             | Typical column                            | Typical filter                                |
+| ----------------------------------------- | ----------------------------------------- | --------------------------------------------- |
+| Closed enum / vocab id                    | Label via `*_ENTRIES` or `get*Label`      | `createEqualsFilter` on that id               |
+| Boolean flag                              | `BooleanCell`                             | Same boolean filter when useful for narrowing |
+| Derived one-liner (prerequisite, summary) | `accessorFn` + formatter from display lib | Usually omit — hard to filter fairly          |
+| Collection count (traits, features)       | `buildCollectionCountColumn`              | Usually omit                                  |
+| Kind / family discriminant                | Kind label column                         | Equals filter on kind                         |
+| No strong scan fields                     | **None** — name-only table                | **None** — base filters only                  |
+
+Reference patterns → [reference.md § Overview columns](./reference.md#overview-columns-and-filters).
+
+---
+
 ## Trigger phrases
 
 | User says                                                        | Recipe                                                                               |
@@ -81,7 +148,7 @@ constraints: report-only unless user asks to fix
 | “content type checklist”                                         | [reference.md § Checklist](./reference.md#full-checklist)                            |
 | “which type is the template for …?”                              | [reference.md § Reference implementations](./reference.md#reference-implementations) |
 
-**Ask when:** unclear whether the entity should be a content type vs embedded schema vs nested resource; URL/k naming conflicts with reserved words; union/discriminated variant needed.
+**Ask when:** unclear whether the entity should be a content type vs embedded schema vs nested resource; URL/k naming conflicts with reserved words; union/discriminated variant needed; **overview middle columns or type-specific filters not specified** (see [Overview table UX](#overview-table-ux)).
 
 **Do not** inline delete/draft-publish/duplication policy — link [`docs/content-types.md`](../../../docs/content-types.md).
 
@@ -127,6 +194,7 @@ Plus pre-commit affected scope per [`AGENTS.md`](../../../AGENTS.md).
 | Manifest compile error              | New key in `CONTENT_TYPE_KEYS` without manifest entry                          |
 | Type silently skipped in form tests | Duplicate side-effect imports removed but test registry not updated            |
 | Production bundle bloat             | Imported `content-form-test-registry.ts` from runtime code — **never**         |
+| Overview table feels wrong          | Built columns/filters without user input — should have prompted first          |
 
 **Rule:** Runtime registries are authoritative. The integration manifest is metadata for drift tests only — no schemas, loaders, or route functions in tooling.
 
@@ -139,6 +207,7 @@ Plus pre-commit affected scope per [`AGENTS.md`](../../../AGENTS.md).
 - Use the form test registry as the production registration mechanism
 - Force nested resources (subclasses) into the top-level manifest
 - Skip `CONTENT_TYPE_TERMS` or vocab audit for user-facing catalog nouns
+- Guess overview middle columns or filters when the user did not specify them
 
 ---
 
