@@ -1,6 +1,6 @@
-import { defineMessage } from '../../../validation/define-message'
-import { getContentTypeSentenceForm } from '../../content/lib/content-type-terms'
-import { getProficiencyDomainCompactLabel } from '../../vocab/proficiency'
+import { defineMessage } from '../../../../validation/define-message'
+import { getContentTypeSentenceForm } from '../../../content/lib/content-type-terms'
+import { getProficiencyDomainCompactLabel } from '../../../vocab/proficiency'
 
 // ---------------------------------------------------------------------------
 // Character builder validation messages (surface catalog).

@@ -1,15 +1,15 @@
 import { describe, expect, it } from 'vitest'
 
-import { equipmentSchema } from '../../content/equipment'
-import type { ClassStored } from '../../content/classes/class'
-import { formatFieldMessage } from '../../../validation/define-message'
-import { characterBuilderStepReadinessMessages } from './character-builder-messages'
-import { createEmptyCharacterBuilderDraft } from './draft'
-import type { CharacterBuilderDraft } from './draft'
-import { indexCharacterBuildCatalog, type CharacterBuildCatalog } from './context'
-import { resolveAvailableChoices } from './resolvers/registry/resolve-choices'
-import { buildChoiceSetId } from './choice-set'
-import { startingEquipmentChoiceSetId } from './resolvers/equipment/resolve-starting-equipment-choice-sets'
+import { equipmentSchema } from '../../../content/equipment'
+import type { ClassStored } from '../../../content/classes/class'
+import { formatFieldMessage } from '../../../../validation/define-message'
+import { characterBuilderStepReadinessMessages } from '../messages/character-builder-messages'
+import { createEmptyCharacterBuilderDraft } from '../draft'
+import type { CharacterBuilderDraft } from '../draft'
+import { indexCharacterBuildCatalog, type CharacterBuildCatalog } from '../context'
+import { resolveAvailableChoices } from '../resolvers/registry/resolve-choices'
+import { buildChoiceSetId } from '../choice-set'
+import { startingEquipmentChoiceSetId } from '../resolvers/equipment/resolve-starting-equipment-choice-sets'
 import {
   proficiencyTestContext,
   rogueClass,
@@ -18,18 +18,18 @@ import {
   luteTool,
   fluteTool,
   monkClass,
-} from './proficiency-test-fixtures'
-import { ORIGIN_LANGUAGES_CHOICE_ID } from '../../content/character-creation-proficiencies'
+} from '../proficiency-test-fixtures'
+import { ORIGIN_LANGUAGES_CHOICE_ID } from '../../../content/character-creation-proficiencies'
 import {
   nonCasterClass,
   spellcastingTestContext,
   wizardCantrips,
   wizardClass,
   wizardLevelOneSpells,
-} from './spellcasting-test-fixtures'
-import { builderTestContext, fighterClass } from './test-fixtures'
-import { minimalStartingWealthSeedCoveringStandardMax } from '../../../test/fixtures/starting-wealth-minimal'
-import { resolveCharacterCreationPatch } from '../../campaign/patches/campaign-character-creation-patch'
+} from '../spellcasting-test-fixtures'
+import { builderTestContext, fighterClass } from '../test-fixtures'
+import { minimalStartingWealthSeedCoveringStandardMax } from '../../../../test/fixtures/starting-wealth-minimal'
+import { resolveCharacterCreationPatch } from '../../../campaign/patches/campaign-character-creation-patch'
 import { resolveBuilderStepReadiness } from './step-readiness'
 import { formatStepReadinessMessage } from './step-readiness-helpers'
 

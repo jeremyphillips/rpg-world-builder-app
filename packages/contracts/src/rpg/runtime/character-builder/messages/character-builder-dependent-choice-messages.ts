@@ -1,4 +1,4 @@
-import { defineMessage } from '../../../validation/define-message'
+import { defineMessage } from '../../../../validation/define-message'
 
 /** Domain kind labels for dependent parent→child builder choices (not display synonyms). */
 export const DEPENDENT_CHOICE_KINDS = {

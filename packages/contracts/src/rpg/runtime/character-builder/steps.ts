@@ -8,7 +8,7 @@ import { isStandardArrayAssignment, STANDARD_ARRAY } from './ability-generation'
 import { areRequiredChoiceSetsSatisfied } from './choice-set'
 import type { ChoiceSet, ChoiceType } from './choice-set'
 import type { CharacterBuildContext } from './context'
-import { getCharacterBuilderChromeMessages } from './character-builder-chrome-messages'
+import { getCharacterBuilderChromeMessages } from './messages/character-builder-chrome-messages'
 import { resolveCharacterBuilderChromeVariant } from './character-builder-chrome-variant'
 import type { CharacterBuilderDraft } from './draft'
 import {

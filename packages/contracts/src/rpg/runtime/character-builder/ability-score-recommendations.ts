@@ -7,7 +7,7 @@ import {
 } from './ability-generation'
 import { pluralizeTermLabel } from '../../vocab/types'
 
-import { characterBuilderAbilityRecommendationMessages } from './ability-score-recommendation-messages'
+import { characterBuilderAbilityRecommendationMessages } from './ability/ability-score-recommendation-messages'
 
 function capitalizeLabel(label: string): string {
   if (label.length === 0) return label

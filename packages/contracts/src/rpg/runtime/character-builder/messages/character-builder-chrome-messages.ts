@@ -1,4 +1,4 @@
-import type { CharacterBuilderChromeVariant } from './character-builder-chrome-variant'
+import type { CharacterBuilderChromeVariant } from '../character-builder-chrome-variant'
 
 /** Route-independent builder shell chrome copy (layer 3 workflow strings). */
 export type CharacterBuilderChromeMessages = {

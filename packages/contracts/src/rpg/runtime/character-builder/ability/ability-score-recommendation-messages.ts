@@ -1,4 +1,4 @@
-import { defineMessage } from '../../../validation/define-message'
+import { defineMessage } from '../../../../validation/define-message'
 
 // ---------------------------------------------------------------------------
 // Ability score recommendation messages — advisory copy for the Abilities step.

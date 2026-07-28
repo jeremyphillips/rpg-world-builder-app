@@ -1,9 +1,9 @@
-import type { ChoiceSet } from './choice-set'
-import type { CharacterBuildContext } from './context'
-import type { CharacterBuilderDraft } from './draft'
-import { resolveEquipmentStepReadiness } from './resolvers/equipment/resolve-equipment-step-readiness'
-import { resolveProficienciesStepReadiness } from './resolvers/proficiency/resolve-proficiencies-step-readiness'
-import { resolveSpellsStepReadiness } from './resolvers/spellcasting/resolve-spells-step-readiness'
+import type { ChoiceSet } from '../choice-set'
+import type { CharacterBuildContext } from '../context'
+import type { CharacterBuilderDraft } from '../draft'
+import { resolveEquipmentStepReadiness } from '../resolvers/equipment/resolve-equipment-step-readiness'
+import { resolveProficienciesStepReadiness } from '../resolvers/proficiency/resolve-proficiencies-step-readiness'
+import { resolveSpellsStepReadiness } from '../resolvers/spellcasting/resolve-spells-step-readiness'
 import {
   BUILDER_STEP_READINESS_STEP_IDS,
   type BuilderStepReadinessStepId,
@@ -56,4 +56,4 @@ export function resolveBuilderStepReadiness(
   }
 }
 
-export { resolveSpellStepApplicability } from './resolvers/spellcasting/resolve-spell-step-applicability'
+export { resolveSpellStepApplicability } from '../resolvers/spellcasting/resolve-spell-step-applicability'

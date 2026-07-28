@@ -1,9 +1,9 @@
-import { formatFieldMessage } from '../../../validation/define-message'
-import type { MessageDef, MessageParams } from '../../../validation/define-message'
-import { characterBuilderProficiencyChoiceEmptyMessages } from './character-builder-messages'
-import { areRequiredChoiceSetsSatisfied, type ChoiceSet } from './choice-set'
-import type { CharacterBuilderDraft } from './draft'
-import { STEP_CHOICE_TYPES_BY_STEP } from './steps'
+import { formatFieldMessage } from '../../../../validation/define-message'
+import type { MessageDef, MessageParams } from '../../../../validation/define-message'
+import { characterBuilderProficiencyChoiceEmptyMessages } from '../messages/character-builder-messages'
+import { areRequiredChoiceSetsSatisfied, type ChoiceSet } from '../choice-set'
+import type { CharacterBuilderDraft } from '../draft'
+import { STEP_CHOICE_TYPES_BY_STEP } from '../steps'
 
 export const BUILDER_STEP_READINESS_STEP_IDS = ['proficiencies', 'equipment', 'spells'] as const
 

@@ -14,7 +14,7 @@ this document tracks the full internal layout, status, and promotion path.
 | `resolveAvailableChoices`                    | `resolvers/registry/resolve-choices.ts`                                 | Derives pending `ChoiceSet[]` from draft + catalog context.                                                                                                                                                                                                                                                                                 |
 | `resolveSpellcastingProfile`                 | `resolvers/spellcasting/spellcasting-profile.ts`                        | Structural spellcasting facts for the Spells step; null for non-casters.                                                                                                                                                                                                                                                                    |
 | `resolveSpellStepApplicability`              | `resolvers/spellcasting/resolve-spell-step-applicability.ts`            | Spells-step blocked / notApplicable / applicable gate before choice checks.                                                                                                                                                                                                                                                                 |
-| `resolveBuilderStepReadiness`                | `step-readiness.ts`                                                     | Derived readiness for Equipment, Spells, and Proficiencies empty/default UI.                                                                                                                                                                                                                                                                |
+| `resolveBuilderStepReadiness`                | `readiness/step-readiness.ts`                                           | Derived readiness for Equipment, Spells, and Proficiencies empty/default UI.                                                                                                                                                                                                                                                                |
 | `resolveSpellPickerItems`                    | `resolvers/spellcasting/resolve-spell-picker-items.ts`                  | Enriches spell ChoiceSet options into picker rows (`compactSummary`, `searchText`, selection state) for the spell drawer.                                                                                                                                                                                                                   |
 | `deriveEquipmentRecommendations`             | `resolvers/equipment/derive-equipment-recommendations.ts`               | Tiered picker recommendations (essential/strong/compatible/neutral/notRecommended) with reasons; inference from `spellcasting.requiredGear` (essential, not level-gated), `focusKinds` (essential when spellcasting active, else strong), and `recommendedGear` (strong), plus authored `characterCreation.equipmentRecommendations` rules. |
 | `deriveRecommendedLanguageIds`               | `resolvers/proficiency/derive-recommended-language-ids.ts`              | Species affinity ids intersected with a language ChoiceSet option pool.                                                                                                                                                                                                                                                                     |
@@ -121,8 +121,21 @@ eligibility independently.
 ```text
 character-builder/
   resolve-available-content.ts   catalog scope filter (not a ChoiceSourceResolver)
-  step-readiness.ts              derived empty/default state for advanced steps (BENCH-120)
-  step-readiness-helpers.ts      choice-set filtering + message formatting for readiness
+  readiness/
+    step-readiness.ts              derived empty/default state for advanced steps (BENCH-120)
+    step-readiness-helpers.ts      choice-set filtering + message formatting for readiness
+    resolve-review-blocking-summary.ts
+    resolve-unresolved-choice-set-summaries.ts
+  messages/
+    character-builder-messages.ts  validation + step readiness message catalogs
+    character-builder-chrome-messages.ts
+    character-builder-preview-messages.ts
+    character-builder-level-messages.ts
+    character-builder-dependent-choice-messages.ts
+  finalize/
+    finalize-zod-issue-messages.ts
+  ability/
+    ability-score-recommendation-messages.ts
   assembly/                      finalize orchestration (assemble-*.ts)
   validate/                      draft/step validation by phase
   resolvers/
@@ -174,7 +187,7 @@ Delegates to `resolveEquipmentStepReadiness`, `resolveSpellsStepReadiness`
 | `complete`         | Required choices satisfied, or skip/empty complete path.                                   |
 
 User-facing copy lives in `characterBuilderStepReadinessMessages`
-(`character-builder-messages.ts`) under `validation.characterBuilder.readiness.*`.
+(`messages/character-builder-messages.ts`) under `validation.characterBuilder.readiness.*`.
 Section-level proficiency choice empty copy uses
 `characterBuilderProficiencyChoiceEmptyMessages` and
 `formatProficiencyChoiceEmptyMessage(choiceType)`.

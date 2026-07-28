@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest'
 
-import { formatFieldMessage } from '../../../validation/define-message'
+import { formatFieldMessage } from '../../../../validation/define-message'
 
-import { characterBuilderValidationMessages } from './character-builder-messages'
+import { characterBuilderValidationMessages } from '../messages/character-builder-messages'
 import { mapCreateInputZodIssueMessage } from './finalize-zod-issue-messages'
 
 describe('mapCreateInputZodIssueMessage', () => {

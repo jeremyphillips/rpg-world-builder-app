@@ -1,16 +1,16 @@
 import { describe, expect, it } from 'vitest'
 
-import { resolveCharacterCreationPatch } from '../../campaign/patches/campaign-character-creation-patch'
-import { standardStartingWealthTableId } from '../../campaign/rules/starting-wealth'
+import { resolveCharacterCreationPatch } from '../../../campaign/patches/campaign-character-creation-patch'
+import { standardStartingWealthTableId } from '../../../campaign/rules/starting-wealth'
 import {
   MINIMAL_TIER_B_ID,
   minimalStartingWealthSeedCoveringStandardMax,
-} from '../../../test/fixtures/starting-wealth-minimal'
-import { createEmptyCharacterBuilderDraft } from './draft'
-import { buildMagicItemAllowanceId } from './magic-item-selection'
+} from '../../../../test/fixtures/starting-wealth-minimal'
+import { createEmptyCharacterBuilderDraft } from '../draft'
+import { buildMagicItemAllowanceId } from '../magic-item-selection'
 import { resolveReviewBlockingSummary } from './resolve-review-blocking-summary'
-import { builderTestContext } from './test-fixtures'
-import { magicItemGrantIncompleteIssueCode } from './resolvers/equipment/resolve-equipment-magic-item-grant-step-issues'
+import { builderTestContext } from '../test-fixtures'
+import { magicItemGrantIncompleteIssueCode } from '../resolvers/equipment/resolve-equipment-magic-item-grant-step-issues'
 
 describe('resolveReviewBlockingSummary', () => {
   it('maps submit-blocking field issues and unresolved choice sets to required items', () => {

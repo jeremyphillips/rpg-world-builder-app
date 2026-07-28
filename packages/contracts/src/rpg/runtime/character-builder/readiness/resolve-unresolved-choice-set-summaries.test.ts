@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
-import { createEmptyCharacterBuilderDraft } from './draft'
-import type { ChoiceSet } from './choice-set'
+import { createEmptyCharacterBuilderDraft } from '../draft'
+import type { ChoiceSet } from '../choice-set'
 import { resolveUnresolvedChoiceSetSummaries } from './resolve-unresolved-choice-set-summaries'
 
 const skillChoiceSet = {

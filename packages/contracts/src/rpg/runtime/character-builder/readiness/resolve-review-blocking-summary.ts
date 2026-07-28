@@ -1,21 +1,21 @@
-import { ABILITY_IDS } from '../../vocab/ability'
+import { ABILITY_IDS } from '../../../vocab/ability'
 import {
   getContentTypeCapitalizedSentenceLabel,
   getContentTypeTerm,
-} from '../../content/lib/content-type-terms'
-import type { ChoiceSet } from './choice-set'
-import type { CharacterBuildContext } from './context'
-import type { CharacterBuilderDraft } from './draft'
-import type { CharacterBuilderStepId } from '../../character-builder/step-ids'
-import { getBuilderStepLabel } from './steps'
-import type { EquipmentPickerFocusRequest } from './resolvers/equipment/equipment-picker-focus'
+} from '../../../content/lib/content-type-terms'
+import type { ChoiceSet } from '../choice-set'
+import type { CharacterBuildContext } from '../context'
+import type { CharacterBuilderDraft } from '../draft'
+import type { CharacterBuilderStepId } from '../../../character-builder/step-ids'
+import { getBuilderStepLabel } from '../steps'
+import type { EquipmentPickerFocusRequest } from '../resolvers/equipment/equipment-picker-focus'
 import {
   isMagicItemGrantIncompleteIssueCode,
   resolveMagicItemGrantReviewProgress,
-} from './resolvers/equipment/resolve-equipment-magic-item-grant-step-issues'
+} from '../resolvers/equipment/resolve-equipment-magic-item-grant-step-issues'
 import { resolveUnresolvedChoiceSetSummaries } from './resolve-unresolved-choice-set-summaries'
-import { validateCharacterBuild } from './validate/validate-character-build'
-import type { CharacterBuildValidationIssue } from './validate/types'
+import { validateCharacterBuild } from '../validate/validate-character-build'
+import type { CharacterBuildValidationIssue } from '../validate/types'
 
 export type ReviewRequiredItem = {
   id: string

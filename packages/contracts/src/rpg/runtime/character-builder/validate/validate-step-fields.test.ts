@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { characterBuilderValidationMessages } from '../character-builder-messages'
+import { characterBuilderValidationMessages } from '../messages/character-builder-messages'
 import { formatFieldMessage } from '../../../../validation/define-message'
 import { abilityValidationMessages } from '../../../vocab/ability-messages'
 import { createEmptyCharacterBuilderDraft } from '../draft'

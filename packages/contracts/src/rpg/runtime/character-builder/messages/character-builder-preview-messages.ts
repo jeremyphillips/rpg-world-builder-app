@@ -1,4 +1,4 @@
-import { defineMessage } from '../../../validation/define-message'
+import { defineMessage } from '../../../../validation/define-message'
 
 // ---------------------------------------------------------------------------
 // Character builder preview messages — advisory copy for the live preview

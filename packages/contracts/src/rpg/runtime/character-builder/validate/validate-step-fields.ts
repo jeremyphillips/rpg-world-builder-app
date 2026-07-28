@@ -1,7 +1,7 @@
 import { ABILITY_IDS, ABILITY_SCORE_MIN, CHARACTER_ABILITY_SCORE_MAX } from '../../../vocab/ability'
 import { abilityValidationMessages } from '../../../vocab/ability-messages'
 import { isStandardArrayAssignment } from '../ability-generation'
-import { characterBuilderValidationMessages } from '../character-builder-messages'
+import { characterBuilderValidationMessages } from '../messages/character-builder-messages'
 import { validateBuilderCharacterLevel } from '../builder-level'
 import type { CharacterBuildContext } from '../context'
 import type { CharacterBuilderDraft } from '../draft'

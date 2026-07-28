@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { formatFieldMessage } from '../../../validation/define-message'
+import { formatFieldMessage } from '../../../../validation/define-message'
 import { characterBuilderPreviewMessages } from './character-builder-preview-messages'
 
 describe('characterBuilderPreviewMessages', () => {

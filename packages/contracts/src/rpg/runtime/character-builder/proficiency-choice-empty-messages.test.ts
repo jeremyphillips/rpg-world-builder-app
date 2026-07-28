@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { formatProficiencyChoiceEmptyMessage } from './step-readiness-helpers'
+import { formatProficiencyChoiceEmptyMessage } from './readiness/step-readiness-helpers'
 
 describe('formatProficiencyChoiceEmptyMessage', () => {
   it('returns section-specific empty copy by choice type', () => {

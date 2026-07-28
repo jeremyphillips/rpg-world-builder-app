@@ -1,4 +1,4 @@
-import { characterBuilderValidationMessages } from '../character-builder-messages'
+import { characterBuilderValidationMessages } from '../messages/character-builder-messages'
 import type { ChoiceSet } from '../choice-set'
 import type { CharacterBuildContext } from '../context'
 import type { CharacterBuilderDraft } from '../draft'

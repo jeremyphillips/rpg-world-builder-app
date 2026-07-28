@@ -1,12 +1,12 @@
-import { characterBuilderStepReadinessMessages } from '../../character-builder-messages'
+import { characterBuilderStepReadinessMessages } from '../../messages/character-builder-messages'
 import type { ChoiceSet } from '../../choice-set'
 import type { CharacterBuilderDraft } from '../../draft'
-import type { BuilderStepReadinessState } from '../../step-readiness'
+import type { BuilderStepReadinessState } from '../../readiness/step-readiness'
 import {
   choiceSetsForStep,
   formatStepReadinessMessage,
   isStepChoiceWorkComplete,
-} from '../../step-readiness-helpers'
+} from '../../readiness/step-readiness-helpers'
 
 export function resolveProficienciesStepReadiness(
   draft: CharacterBuilderDraft,

@@ -1,6 +1,6 @@
-import { formatFieldMessage } from '../../../validation/define-message'
+import { formatFieldMessage } from '../../../../validation/define-message'
 
-import { characterBuilderValidationMessages } from './character-builder-messages'
+import { characterBuilderValidationMessages } from '../messages/character-builder-messages'
 
 const CREATE_INPUT_ZOD_PATH_MESSAGES: ReadonlyArray<{
   matches: (path: string | undefined) => boolean

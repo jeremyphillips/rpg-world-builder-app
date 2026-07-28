@@ -1,10 +1,10 @@
-import { formatFieldMessage } from '../../../validation/define-message'
+import { formatFieldMessage } from '../../../../validation/define-message'
 
-import { characterBuilderValidationMessages } from './character-builder-messages'
-import { isChoiceSetSatisfied, type ChoiceSet } from './choice-set'
-import type { CharacterBuilderDraft } from './draft'
-import type { CharacterBuilderStepId } from '../../character-builder/step-ids'
-import { getBuilderStepLabel, getChoiceSetStepId } from './steps'
+import { characterBuilderValidationMessages } from '../messages/character-builder-messages'
+import { isChoiceSetSatisfied, type ChoiceSet } from '../choice-set'
+import type { CharacterBuilderDraft } from '../draft'
+import type { CharacterBuilderStepId } from '../../../character-builder/step-ids'
+import { getBuilderStepLabel, getChoiceSetStepId } from '../steps'
 
 export type UnresolvedChoiceSetSummary = {
   choiceSetId: string

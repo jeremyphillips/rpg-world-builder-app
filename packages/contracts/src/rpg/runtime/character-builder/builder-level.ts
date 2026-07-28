@@ -1,7 +1,7 @@
 import type { CharacterKind } from '../character-acquisition/kind'
 import type { CharacterRulesScope } from '../character-acquisition/scope'
 import { formatFieldMessage } from '../../../validation/define-message'
-import { characterBuilderValidationMessages } from './character-builder-messages'
+import { characterBuilderValidationMessages } from './messages/character-builder-messages'
 import type { CharacterBuildContext, ResolvedCharacterCreationRules } from './context'
 import type { CharacterBuilderDraft } from './draft'
 import { validationIssue } from './validate/issue'

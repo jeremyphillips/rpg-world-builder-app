@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import { getAbilityLabel } from '../../vocab/ability'
-import { characterBuilderAbilityRecommendationMessages } from './ability-score-recommendation-messages'
+import { characterBuilderAbilityRecommendationMessages } from './ability/ability-score-recommendation-messages'
 import {
   canAutoFillEmptyAbilities,
   clearAllAbilityScores,

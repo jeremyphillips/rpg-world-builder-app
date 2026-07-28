@@ -111,7 +111,7 @@ not a specific UI surface. First consumers live under `runtime/character/`, but 
 level-up concepts.
 
 **Surface catalogs:** `characterBuilderValidationMessages` in
-`rpg/runtime/character-builder/character-builder-messages.ts` — builder workflow/state
+`rpg/runtime/character-builder/messages/character-builder-messages.ts` — builder workflow/state
 copy (incomplete steps, pending draft choices). It may reuse `characterValidationMessages`;
 the base catalog must not depend on it.
 
@@ -129,7 +129,7 @@ Spell ChoiceSet validation (BENCH-089) adds spell-specific ids alongside the gen
 | `validation.characterBuilder.speciesRequiredForLanguageRecommendations` | Language ChoiceSet visible but no species selected (affinity hint) |
 
 **Builder step readiness** (`characterBuilderStepReadinessMessages` in
-`character-builder-messages.ts`) — empty/default/blocked copy for Equipment,
+`messages/character-builder-messages.ts`) — empty/default/blocked copy for Equipment,
 Spells, and Proficiencies. Ids use `validation.characterBuilder.readiness.*`
 (e.g. `equipmentBlockedNoClass`, `spellsNotApplicableNoSpellcasting`,
 `proficienciesBlockedNoClassHelper`). Parameterized messages accept `className`
@@ -142,7 +142,7 @@ from validation issues; see
 [character-builder-resolvers.md](character-builder-resolvers.md#builder-step-readiness-bench-120).
 
 **Dependent choice** (`characterBuilderDependentChoiceMessages` in
-`character-builder-dependent-choice-messages.ts`) — inline parent→dependent workflow
+`messages/character-builder-dependent-choice-messages.ts`) — inline parent→dependent workflow
 copy for species heritage and future subclass steps. Ids use
 `validation.characterBuilder.dependentChoice.*` (e.g. `requiredStatus`, `helperText`,
 `changeHeritage`, `parentChoiceRequired`, `optionSelected`). Domain kinds live in

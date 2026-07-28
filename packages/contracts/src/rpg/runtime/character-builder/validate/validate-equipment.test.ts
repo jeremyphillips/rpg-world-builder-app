@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import { equipmentSchema } from '../../../content/equipment'
 import { formatFieldMessage } from '../../../../validation/define-message'
-import { characterBuilderValidationMessages } from '../character-builder-messages'
+import { characterBuilderValidationMessages } from '../messages/character-builder-messages'
 import { createEmptyCharacterBuilderDraft } from '../draft'
 import { builderTestContext } from '../test-fixtures'
 import { minimalStartingWealthSeedCoveringStandardMax } from '../../../../test/fixtures/starting-wealth-minimal'

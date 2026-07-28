@@ -1,4 +1,4 @@
-import { defineMessage } from '../../../validation/define-message'
+import { defineMessage } from '../../../../validation/define-message'
 
 // ---------------------------------------------------------------------------
 // Character builder level UI messages — workflow chrome for the level control

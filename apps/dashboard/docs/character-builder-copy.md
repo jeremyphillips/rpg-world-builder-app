@@ -45,7 +45,7 @@ When adding a string:
 | Panel affordance        | —                                        | `Change heritage` |
 
 Catalog: `characterBuilderDependentChoiceMessages` in
-`packages/contracts/src/rpg/runtime/character-builder/character-builder-dependent-choice-messages.ts`.
+`packages/contracts/src/rpg/runtime/character-builder/messages/character-builder-dependent-choice-messages.ts`.
 
 Dashboard formatters in `lib/builder-parent-choice-status.lib.ts` and
 `lib/builder-dependent-choice.lib.ts` assemble view models via `formatFieldMessage(...)`;
