@@ -6,6 +6,9 @@ Dashboard integration for the concentration-mode character builder at
 
 Resolver catalog: [packages/contracts/docs/character-builder-resolvers.md](../../../packages/contracts/docs/character-builder-resolvers.md).
 
+Picker chrome audit (equipment / spells / proficiencies):
+[character-builder-picker-chrome.md](./character-builder-picker-chrome.md).
+
 ## Feature layout
 
 Implementation lives in `src/features/character/` — see

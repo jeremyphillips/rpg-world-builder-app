@@ -2,16 +2,17 @@
 
 import * as React from 'react'
 
-import { CatalogPickerSheet, InsetPanel, Text } from '@rpg/ui'
+import { CatalogPickerSheet, Text } from '@rpg/ui'
 
 import { hasCatalogPickerResetViewCriteria } from '../picker/catalog-picker-filter-state.lib'
 import { CatalogPickerItemHeader } from '../picker/catalog-picker-item-header.client'
 import { mapSkillProficiencyCompactSummaryToMetadataLines } from '../picker/catalog-picker-metadata'
 import { CatalogPickerSelectionActions } from '../picker/catalog-picker-selection-actions.client'
 import { catalogPickerShellProps } from '../picker/catalog-picker-shell.lib'
+import { CatalogPickerResultsState } from '../picker/catalog-picker-results-state.client'
 import { CatalogSortControl } from '../picker/catalog-sort-control.client'
 import { pickerSortOption } from '../picker/catalog-picker-sort-labels.lib'
-import { CatalogToolbarResetAction } from '../picker/catalog-toolbar-reset-action.client'
+import { CatalogToolbarResetSlot } from '../picker/catalog-toolbar-reset-action.client'
 import {
   filterAndSortProficiencyPickerItems,
   formatProficiencyPickerDrawerDescription,
@@ -52,10 +53,22 @@ function ProficiencyPickerToolbarReset({
     defaultSortMode: PROFICIENCY_PICKER_VIEW_DEFAULTS.sortMode,
   })
 
-  if (!showResetView) return null
+  if (!showResetView) {
+    return (
+      <CatalogToolbarResetSlot
+        visible={false}
+        label={PROFICIENCY_PICKER_RESET_VIEW_LABEL}
+        onClick={() => undefined}
+      />
+    )
+  }
 
   return (
-    <CatalogToolbarResetAction label={PROFICIENCY_PICKER_RESET_VIEW_LABEL} onClick={onResetView} />
+    <CatalogToolbarResetSlot
+      visible
+      label={PROFICIENCY_PICKER_RESET_VIEW_LABEL}
+      onClick={onResetView}
+    />
   )
 }
 
@@ -107,18 +120,7 @@ export function ProficiencyPickerDrawer({
       noItemsMessage={PROFICIENCY_PICKER_NO_OPTIONS_MESSAGE}
       transformVisibleItems={transformVisibleItems}
       emptyState={
-        emptyStateMessage ? (
-          <InsetPanel
-            borderStyle="dashed"
-            surface={{}}
-            size="md"
-            align="center"
-            className="py-8"
-            role="status"
-          >
-            <InsetPanel.Text>{emptyStateMessage}</InsetPanel.Text>
-          </InsetPanel>
-        ) : undefined
+        emptyStateMessage ? <CatalogPickerResultsState message={emptyStateMessage} /> : undefined
       }
       actions={({ searchQuery, resetSearchQuery }) => {
         const handleResetView = () => {

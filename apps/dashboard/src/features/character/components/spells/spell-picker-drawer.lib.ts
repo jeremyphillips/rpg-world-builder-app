@@ -13,6 +13,15 @@ import { normalizeSearchQuery, scoreItem } from '@rpg/ui'
 
 import { sanitizeModeBrowseState } from '../picker/catalog-picker-browse-mode.lib'
 import {
+  resolveCatalogPickerEmptyStateKind,
+  resolveCatalogPickerEmptyStateMessage,
+  type CatalogPickerEmptyStateKind,
+} from '../picker/catalog-picker-empty-state.lib'
+import {
+  getCatalogPickerDisabledNote,
+  isCatalogPickerRowDimmed,
+} from '../picker/catalog-picker-row-state.lib'
+import {
   SPELL_PICKER_MECHANICS_LABEL,
   SPELL_PICKER_MODE_CANTRIPS,
   SPELL_PICKER_MODE_PREPARED_SPELLS,
@@ -228,15 +237,14 @@ export function collectSpellPickerMarkers(
 }
 
 export function isSpellPickerRowDimmed(item: SpellPickerItem): boolean {
-  return !item.state.isAlreadySelected && !item.state.canSelect
+  return isCatalogPickerRowDimmed(item.state)
 }
 
 export function getSpellPickerDisabledNote(item: SpellPickerItem): string | undefined {
-  if (item.state.canSelect || item.state.isAlreadySelected) return undefined
-  return item.state.disabledReasons[0]
+  return getCatalogPickerDisabledNote(item.state)
 }
 
-export type SpellPickerEmptyStateKind = 'no-options' | 'selection-full'
+export type SpellPickerEmptyStateKind = CatalogPickerEmptyStateKind
 
 export function resolveSpellPickerEmptyStateKind(
   itemsLength: number,
@@ -244,21 +252,20 @@ export function resolveSpellPickerEmptyStateKind(
   selectedIds: readonly string[],
 ): SpellPickerEmptyStateKind | undefined {
   if (itemsLength > 0 || !choiceSet) return undefined
-  if (selectedIds.length >= choiceSet.max) return 'selection-full'
-  return 'no-options'
+  return resolveCatalogPickerEmptyStateKind({
+    itemsLength,
+    choiceSetMax: choiceSet.max,
+    selectedCount: selectedIds.length,
+  })
 }
 
 export function resolveSpellPickerEmptyStateMessage(
   kind: SpellPickerEmptyStateKind | undefined,
 ): string | undefined {
-  switch (kind) {
-    case 'no-options':
-      return SPELL_PICKER_NO_OPTIONS_MESSAGE
-    case 'selection-full':
-      return SPELL_PICKER_SELECTION_FULL_MESSAGE
-    default:
-      return undefined
-  }
+  return resolveCatalogPickerEmptyStateMessage(kind, {
+    noOptions: SPELL_PICKER_NO_OPTIONS_MESSAGE,
+    selectionFull: SPELL_PICKER_SELECTION_FULL_MESSAGE,
+  })
 }
 
 export function countSpellPickerMechanicsFilters(filters: SpellPickerMechanicsFilters): number {
