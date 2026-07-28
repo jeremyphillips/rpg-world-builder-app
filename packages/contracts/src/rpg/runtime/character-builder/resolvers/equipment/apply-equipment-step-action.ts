@@ -1,4 +1,5 @@
 import type { Equipment } from '../../../../content/equipment'
+import type { StartingWealthRules } from '../../../../campaign/rules/starting-wealth'
 import { resolveEquipmentModeFromOption } from '../../../../content/starting-equipment'
 import type { CharacterBuildCatalogIndex } from '../../context'
 import type { CharacterBuilderDraft } from '../../draft'
@@ -13,10 +14,6 @@ import {
   normalizeEquipmentPurchase,
   resolveEquipmentPurchaseIndex,
 } from '../../equipment-purchase'
-import {
-  applyEquipmentPurchaseIntent,
-  applyMagicItemAcquisitionIntent,
-} from './apply-equipment-intents'
 import type { EquipmentAcquisitionBuilderContext } from './equipment-acquisition-types'
 import type { EquipmentBudgetSummary } from './equipment-budget'
 import {
@@ -27,7 +24,13 @@ import {
   clampEquipmentPurchaseQuantity,
   resolveEquipmentPurchaseQuantityLimits,
 } from './resolve-equipment-purchase-quantity-limits'
+import {
+  applyEquipmentPurchaseIntent,
+  applyMagicItemAcquisitionIntent,
+} from './apply-equipment-intents'
+import { dispatchEquipmentPackageSwitchAction } from './apply-equipment-package-switch-actions'
 import { readMagicItemSelections } from './resolve-magic-item-grant-progress'
+
 import { readSelectedStartingEquipmentOptionId } from './resolve-starting-equipment-choice-sets'
 
 type CharacterBuilderDraftEquipmentPurchase = NonNullable<
@@ -141,56 +144,6 @@ function applySkipStartingEquipmentAction(): EquipmentStepActionResult {
         removedPackageItemKeys: [],
         customized: false,
         skipped: true,
-      },
-    },
-  }
-}
-
-function applySelectPackageAction(args: {
-  draft: CharacterBuilderDraft
-  catalogIndex: CharacterBuildCatalogIndex
-  optionId: string
-  choiceSetId: string
-  nestedSelections: CharacterBuilderDraft['choiceSelections']
-}): EquipmentStepActionResult {
-  const { draft, catalogIndex, optionId, choiceSetId, nestedSelections } = args
-  const classId = draft.class.classId
-  if (!classId) {
-    return { status: 'invalid', issues: [{ code: 'class_not_in_catalog' }] }
-  }
-
-  const characterClass = catalogIndex.classes.get(classId)
-  if (!characterClass) {
-    return { status: 'invalid', issues: [{ code: 'class_not_in_catalog' }] }
-  }
-
-  const option = characterClass.characterCreation?.startingEquipment?.options.find(
-    (entry) => entry.id === optionId,
-  )
-  if (!option) {
-    return {
-      status: 'invalid',
-      issues: [{ code: 'option_not_in_catalog', reference: { optionId } }],
-    }
-  }
-
-  const mode = resolveEquipmentModeFromOption(option)
-
-  return {
-    status: 'applied',
-    patch: {
-      choiceSelections: {
-        ...draft.choiceSelections,
-        ...nestedSelections,
-        [choiceSetId]: [optionId],
-      },
-      equipment: {
-        mode,
-        purchases: draft.equipment?.purchases ?? [],
-        magicItemSelections: draft.equipment?.magicItemSelections ?? [],
-        removedPackageItemKeys: [],
-        customized: draft.equipment?.customized ?? false,
-        skipped: false,
       },
     },
   }
@@ -533,14 +486,33 @@ function applyRemovePurchaseQuantityAction(args: {
   })
 }
 
-function dispatchEquipmentStepAction(
+type EquipmentStepDispatchArgs = {
+  draft: CharacterBuilderDraft
+  catalogIndex: CharacterBuildCatalogIndex
+  budget?: EquipmentBudgetSummary
+  acquisitionContext?: EquipmentAcquisitionBuilderContext
+  startingWealth?: StartingWealthRules
+}
+
+function isPackageSwitchAction(
   action: EquipmentStepAction,
-  args: {
-    draft: CharacterBuilderDraft
-    catalogIndex: CharacterBuildCatalogIndex
-    budget?: EquipmentBudgetSummary
-    acquisitionContext?: EquipmentAcquisitionBuilderContext
-  },
+): action is Extract<
+  EquipmentStepAction,
+  { kind: 'select_package' | 'resolve_package_switch' | 'commit_package_conversion' }
+> {
+  return (
+    action.kind === 'select_package' ||
+    action.kind === 'resolve_package_switch' ||
+    action.kind === 'commit_package_conversion'
+  )
+}
+
+function dispatchCoreEquipmentStepAction(
+  action: Exclude<
+    EquipmentStepAction,
+    { kind: 'select_package' | 'resolve_package_switch' | 'commit_package_conversion' }
+  >,
+  args: EquipmentStepDispatchArgs,
 ): EquipmentStepActionResult {
   switch (action.kind) {
     case 'set_purchase_quantity':
@@ -551,14 +523,6 @@ function dispatchEquipmentStepAction(
       })
     case 'skip_starting_equipment':
       return applySkipStartingEquipmentAction()
-    case 'select_package':
-      return applySelectPackageAction({
-        draft: args.draft,
-        catalogIndex: args.catalogIndex,
-        optionId: action.optionId,
-        choiceSetId: action.choiceSetId,
-        nestedSelections: action.nestedSelections,
-      })
     case 'add_purchase':
       return applyAddPurchaseAction({
         ...args,
@@ -603,12 +567,28 @@ function dispatchEquipmentStepAction(
   }
 }
 
+function dispatchEquipmentStepAction(
+  action: EquipmentStepAction,
+  args: EquipmentStepDispatchArgs,
+): EquipmentStepActionResult {
+  if (isPackageSwitchAction(action)) {
+    return dispatchEquipmentPackageSwitchAction(action, {
+      draft: args.draft,
+      catalogIndex: args.catalogIndex,
+      startingWealth: args.startingWealth,
+    })
+  }
+
+  return dispatchCoreEquipmentStepAction(action, args)
+}
+
 export function applyEquipmentStepAction(args: {
   draft: CharacterBuilderDraft
   catalogIndex: CharacterBuildCatalogIndex
   action: EquipmentStepAction
   budget?: EquipmentBudgetSummary
   acquisitionContext?: EquipmentAcquisitionBuilderContext
+  startingWealth?: StartingWealthRules
 }): EquipmentStepActionResult {
   return dispatchEquipmentStepAction(args.action, args)
 }

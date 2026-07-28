@@ -2,7 +2,6 @@ import { describe, expect, it } from 'vitest'
 
 import {
   applyEquipmentStepAction,
-  buildStartingPackageConversionPatch,
   buildStartingPackageConversionPreview,
   createEmptyCharacterBuilderDraft,
   deriveEquipmentBudgetSummary,
@@ -135,13 +134,18 @@ describe('equipment package conversion integration', () => {
     })!
 
     const selectedKeys = allSelectablePackageItemKeys(preview)
-    const patch = buildStartingPackageConversionPatch({
+    const conversionResult = applyEquipmentStepAction({
       draft,
       catalogIndex,
-      departingOptionId: 'standard-equipment',
-      targetFunding: goldTargetFunding(draft),
-      selectedPackageItemKeys: selectedKeys,
-    })!
+      action: {
+        kind: 'commit_package_conversion',
+        departingOptionId: 'standard-equipment',
+        selectedPackageItemKeys: [...selectedKeys],
+      },
+    })
+    expect(conversionResult.status).toBe('applied')
+    if (conversionResult.status !== 'applied') return
+    const patch = conversionResult.patch
 
     const convertedDraft = {
       ...draft,

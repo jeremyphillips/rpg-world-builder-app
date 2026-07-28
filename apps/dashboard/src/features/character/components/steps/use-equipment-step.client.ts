@@ -4,8 +4,6 @@ import { useEffect, useMemo, useState, type ComponentProps } from 'react'
 
 import {
   applyEquipmentStepAction,
-  buildEquipmentPackageSwitchPatch,
-  buildStartingPackageConversionPatch,
   buildStartingPackageConversionPreview,
   createEquipmentPackageSwitchInventorySnapshot,
   equipmentPackageSwitchSnapshotsEqual,
@@ -24,6 +22,7 @@ import {
   type CharacterClass,
   type ChoiceSet,
   type EquipmentPackageSwitchBlockingReason,
+  type EquipmentPackageSwitchEvaluation,
   type EquipmentPackageSwitchInventorySnapshot,
   type EquipmentStepRemoveTarget,
   type EquipmentStepUnavailableReason,
@@ -47,6 +46,7 @@ import { useEquipmentMagicItemWorkflow } from './use-equipment-magic-item-workfl
 import { withChoiceSetSelections } from '../../lib/choice-set-selections'
 import { resolveEquipmentStepSurface } from '../../lib/resolve-equipment-step-surface.lib'
 import { resolveEquipmentPickerCharacterPreviewContext } from '../equipment/equipment-picker-character-preview.lib'
+import { resolvePackageSwitchCommitErrorFromIssues } from '../equipment/equipment-package-switch-resolution.lib'
 import type { EquipmentPickerDrawer } from '../equipment/equipment-picker-drawer.client'
 import type { EquipmentStepInventorySectionProps } from './equipment-step-sections.client'
 
@@ -268,10 +268,34 @@ export function useEquipmentStep(args: {
       catalogIndex,
       budget,
       acquisitionContext,
+      startingWealth: context.characterCreationRules.startingWealth,
       action,
     })
     if (result.status === 'applied') onDraftChange(result.patch)
+    if (result.status === 'needs_resolution') {
+      openPackageSwitchResolutionFromEvaluation(
+        result.resolution,
+        action.kind === 'select_package'
+          ? action.nestedSelections
+          : (pendingPackageSwitch?.nestedSelections ?? {}),
+      )
+    }
     return result
+  }
+
+  const openPackageSwitchResolutionFromEvaluation = (
+    evaluation: EquipmentPackageSwitchEvaluation,
+    nestedSelections: CharacterBuilderDraft['choiceSelections'],
+  ) => {
+    if (evaluation.status === 'noConflict') return
+
+    setBlockedEquipmentActionReason(null)
+    setPendingPackageSwitch({
+      targetOptionId: evaluation.targetOptionId,
+      nestedSelections,
+      draftQuantitiesByPurchaseId: initPackageSwitchDraftQuantities(evaluation),
+      committedInventorySnapshot: createEquipmentPackageSwitchInventorySnapshot(draft),
+    })
   }
 
   const applySelection = (selection: PendingEquipmentSelection) => {
@@ -283,43 +307,15 @@ export function useEquipmentStep(args: {
     }
 
     setBlockedEquipmentActionReason(null)
-    applyEquipmentAction({
+    const result = applyEquipmentAction({
       kind: 'select_package',
       optionId: selection.optionId,
       choiceSetId: startingEquipmentChoiceSet.id,
       nestedSelections: selection.nestedSelections,
     })
-    setIsPackageChooserExpanded(false)
-  }
-
-  const openPackageSwitchResolution = (
-    optionId: string,
-    nestedSelections: CharacterBuilderDraft['choiceSelections'],
-  ) => {
-    const targetFunding = resolveTargetFunding(optionId)
-    if (!targetFunding) {
-      setBlockedEquipmentActionReason('funding_context_missing')
-      return
+    if (result.status === 'applied') {
+      setIsPackageChooserExpanded(false)
     }
-
-    const evaluation = evaluateEquipmentPackageSwitch({
-      draft,
-      catalogIndex,
-      targetOptionId: optionId,
-      targetFunding,
-      nestedSelections,
-    })
-
-    if (!evaluation || evaluation.status === 'noConflict') return
-
-    setBlockedEquipmentActionReason(null)
-
-    setPendingPackageSwitch({
-      targetOptionId: optionId,
-      nestedSelections,
-      draftQuantitiesByPurchaseId: initPackageSwitchDraftQuantities(evaluation),
-      committedInventorySnapshot: createEquipmentPackageSwitchInventorySnapshot(draft),
-    })
   }
 
   const dismissPackageSwitch = () => {
@@ -348,26 +344,36 @@ export function useEquipmentStep(args: {
 
     setIsPackageSwitchCommitting(true)
 
-    const targetFunding = resolveTargetFunding(pendingPackageSwitch.targetOptionId)
-    if (!targetFunding) {
-      setBlockedEquipmentActionReason('funding_context_missing')
-      dismissPackageSwitch()
-      return
-    }
-
-    const result = buildEquipmentPackageSwitchPatch({
-      draft,
-      catalogIndex,
+    const result = applyEquipmentAction({
+      kind: 'resolve_package_switch',
       targetOptionId: pendingPackageSwitch.targetOptionId,
-      targetFunding,
       choiceSetId: startingEquipmentChoiceSet.id,
       nestedSelections: pendingPackageSwitch.nestedSelections,
       draftQuantitiesByPurchaseId: pendingPackageSwitch.draftQuantitiesByPurchaseId,
       committedInventorySnapshot: pendingPackageSwitch.committedInventorySnapshot,
     })
 
-    if (result.status === 'failure') {
-      if (result.commitError.kind === 'staleCommittedInventory') {
+    if (result.status === 'applied') {
+      dismissPackageSwitch()
+      setIsPackageChooserExpanded(false)
+      return
+    }
+
+    if (result.status === 'invalid') {
+      const commitError = resolvePackageSwitchCommitErrorFromIssues(result.issues)
+      if (!commitError) {
+        dismissPackageSwitch()
+        setIsPackageSwitchCommitting(false)
+        return
+      }
+
+      if (commitError.kind === 'staleCommittedInventory') {
+        const targetFunding = resolveTargetFunding(pendingPackageSwitch.targetOptionId)
+        if (!targetFunding) {
+          dismissPackageSwitch()
+          return
+        }
+
         const evaluation = evaluateEquipmentPackageSwitch({
           draft,
           catalogIndex,
@@ -388,13 +394,13 @@ export function useEquipmentStep(args: {
             previousDraftQuantities: pendingPackageSwitch.draftQuantitiesByPurchaseId,
             evaluation,
           }),
-          commitErrorReason: result.commitError,
+          commitErrorReason: commitError,
           staleNotice: true,
         })
       } else {
         setPendingPackageSwitch({
           ...pendingPackageSwitch,
-          commitErrorReason: result.commitError,
+          commitErrorReason: commitError,
         })
       }
 
@@ -402,9 +408,7 @@ export function useEquipmentStep(args: {
       return
     }
 
-    onDraftChange(result.patch)
-    dismissPackageSwitch()
-    setIsPackageChooserExpanded(false)
+    setIsPackageSwitchCommitting(false)
   }
 
   const packageSwitchEvaluation = useMemo(() => {
@@ -469,28 +473,29 @@ export function useEquipmentStep(args: {
     }
 
     const nextSelection = { optionId, nestedSelections }
-    const targetFunding = resolveTargetFunding(optionId)
-    const packageSwitchPreview =
-      targetFunding &&
-      evaluateEquipmentPackageSwitch({
-        draft,
-        catalogIndex,
-        targetOptionId: optionId,
-        targetFunding,
-        nestedSelections,
-      })
-
-    if (packageSwitchPreview && packageSwitchPreview.status !== 'noConflict') {
-      openPackageSwitchResolution(optionId, nestedSelections)
-      return
-    }
 
     if (draft.equipment?.customized) {
       setPendingSelection(nextSelection)
       return
     }
 
-    applySelection(nextSelection)
+    const result = applyEquipmentAction({
+      kind: 'select_package',
+      optionId,
+      choiceSetId: startingEquipmentChoiceSet.id,
+      nestedSelections,
+    })
+
+    if (result.status === 'invalid') {
+      if (result.issues.some((issue) => issue.code === 'package_switch_funding_missing')) {
+        setBlockedEquipmentActionReason('funding_context_missing')
+      }
+      return
+    }
+
+    if (result.status === 'applied') {
+      setIsPackageChooserExpanded(false)
+    }
   }
 
   const openPicker = (
@@ -549,22 +554,16 @@ export function useEquipmentStep(args: {
   const handleCommitConversion = (_preview: StartingPackageConversionPreview) => {
     if (!selectedOptionId) return
 
-    const targetFunding = resolveGoldOptionFunding()
-    if (!targetFunding) return
-
-    const patch = buildStartingPackageConversionPatch({
-      draft,
-      catalogIndex,
+    const result = applyEquipmentAction({
+      kind: 'commit_package_conversion',
       departingOptionId: selectedOptionId,
-      selectedPackageItemKeys,
-      targetFunding,
+      selectedPackageItemKeys: [...selectedPackageItemKeys],
     })
 
-    if (!patch) return
-
-    onDraftChange(patch)
-    setConversionEditorOpen(false)
-    setConversionCommitStatusMessage('Starting equipment converted to starting gold.')
+    if (result.status === 'applied') {
+      setConversionEditorOpen(false)
+      setConversionCommitStatusMessage('Starting equipment converted to starting gold.')
+    }
   }
 
   const handleAddItem: ComponentProps<typeof EquipmentPickerDrawer>['onAddItem'] = (

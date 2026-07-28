@@ -5,6 +5,7 @@ import {
   type CharacterBuildCatalogIndex,
   type EquipmentPackageSwitchBlockingReason,
   type EquipmentPackageSwitchEvaluation,
+  type EquipmentStepActionIssue,
 } from '@rpg/contracts'
 
 import {
@@ -58,6 +59,47 @@ export function mapBlockingReasonToMessage(
       return String(exhaustive)
     }
   }
+}
+
+export function resolvePackageSwitchCommitErrorFromIssues(
+  issues: readonly EquipmentStepActionIssue[],
+): EquipmentPackageSwitchBlockingReason | undefined {
+  for (const issue of issues) {
+    switch (issue.code) {
+      case 'package_switch_non_editable_over_budget':
+        return {
+          kind: 'nonEditableOverBudget',
+          nonEditableRetainedCostCp: issue.reference.nonEditableRetainedCostCp,
+          targetAllowanceCp: issue.reference.targetAllowanceCp,
+        }
+      case 'package_switch_stale_inventory':
+        return {
+          kind: 'staleCommittedInventory',
+          expected: { purchases: [] },
+          actual: { purchases: [] },
+        }
+      case 'package_switch_over_budget':
+        return {
+          kind: 'draftOverBudget',
+          amountOverBudgetCp: issue.reference.amountOverBudgetCp,
+        }
+      case 'package_switch_invalid_quantity':
+        return {
+          kind: 'invalidDraftQuantity',
+          purchaseId: issue.reference.purchaseId,
+          committedQuantity: issue.reference.committedQuantity,
+          draftQuantity: issue.reference.draftQuantity,
+        }
+      case 'package_switch_missing_target_option':
+        return { kind: 'missingTargetOption' }
+      case 'package_switch_missing_purchase':
+        return { kind: 'missingPurchase', purchaseId: issue.reference.purchaseId }
+      default:
+        break
+    }
+  }
+
+  return undefined
 }
 
 export function resolvePackageSwitchDescription(

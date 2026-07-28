@@ -1,5 +1,8 @@
 import type { CharacterBuilderDraft } from './draft'
-import type { EquipmentPackageSwitchEvaluation } from './equipment-package-switch'
+import type {
+  EquipmentPackageSwitchEvaluation,
+  EquipmentPackageSwitchInventorySnapshot,
+} from './equipment-package-switch'
 import type { EquipmentAcquisitionBlocker } from './resolvers/equipment/equipment-acquisition-types'
 
 // ---------------------------------------------------------------------------
@@ -37,6 +40,19 @@ export type EquipmentStepAction =
       quantity: number
     }
   | { kind: 'remove_purchase_quantity'; purchaseId: string; quantity: number }
+  | {
+      kind: 'resolve_package_switch'
+      targetOptionId: string
+      choiceSetId: string
+      nestedSelections: CharacterBuilderDraft['choiceSelections']
+      draftQuantitiesByPurchaseId: Record<string, number>
+      committedInventorySnapshot: EquipmentPackageSwitchInventorySnapshot
+    }
+  | {
+      kind: 'commit_package_conversion'
+      departingOptionId: string
+      selectedPackageItemKeys: readonly string[]
+    }
 
 export type EquipmentStepActionIssue =
   | { code: 'equipment_channel_missing' }
@@ -49,6 +65,21 @@ export type EquipmentStepActionIssue =
   | { code: 'grant_not_found'; reference: { allowanceId: string; equipmentId: string } }
   | { code: 'acquisition_context_missing' }
   | { code: 'quantity_not_allowed'; reference: { equipmentId: string } }
+  | {
+      code: 'package_switch_non_editable_over_budget'
+      reference: { nonEditableRetainedCostCp: number; targetAllowanceCp: number }
+    }
+  | { code: 'package_switch_stale_inventory' }
+  | { code: 'package_switch_over_budget'; reference: { amountOverBudgetCp: number } }
+  | {
+      code: 'package_switch_invalid_quantity'
+      reference: { purchaseId: string; committedQuantity: number; draftQuantity: number }
+    }
+  | { code: 'package_switch_missing_target_option' }
+  | { code: 'package_switch_missing_purchase'; reference: { purchaseId: string } }
+  | { code: 'package_switch_funding_missing' }
+  | { code: 'package_conversion_invalid' }
+  | { code: 'package_conversion_funding_missing' }
 
 export type EquipmentStepActionResult =
   | { status: 'applied'; patch: Partial<CharacterBuilderDraft> }

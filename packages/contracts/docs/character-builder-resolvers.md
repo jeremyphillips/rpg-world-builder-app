@@ -85,21 +85,24 @@ Readiness is resolved inside `resolveEquipmentStepModel` — do not call
 
 All domain mutations dispatch through `applyEquipmentStepAction`:
 
-| Action kind                | Replaces (deleted dashboard helpers)     |
-| -------------------------- | ---------------------------------------- |
-| `skip_starting_equipment`  | `buildEquipmentSkipPatch`                |
-| `select_package`           | `buildEquipmentSelectionPatch`           |
-| `add_purchase`             | `buildEquipmentAddPurchasePatch`         |
-| `remove_entry`             | `buildEquipmentRemoveEntryPatch`         |
-| `set_purchase_quantity`    | `buildEquipmentSetPurchaseQuantityPatch` |
-| `remove_purchase_quantity` | `buildMagicItemPurchaseRemovalPatch`     |
-| `acquire_magic_item`       | `buildMagicItemAcquisitionPatch`         |
-| `apply_purchase_intent`    | `buildEquipmentPurchaseIntentPatch`      |
-| `release_magic_item_grant` | `buildMagicItemGrantReleasePatch`        |
+| Action kind                 | Replaces (deleted dashboard helpers)     |
+| --------------------------- | ---------------------------------------- |
+| `skip_starting_equipment`   | `buildEquipmentSkipPatch`                |
+| `select_package`            | `buildEquipmentSelectionPatch`           |
+| `add_purchase`              | `buildEquipmentAddPurchasePatch`         |
+| `remove_entry`              | `buildEquipmentRemoveEntryPatch`         |
+| `set_purchase_quantity`     | `buildEquipmentSetPurchaseQuantityPatch` |
+| `remove_purchase_quantity`  | `buildMagicItemPurchaseRemovalPatch`     |
+| `acquire_magic_item`        | `buildMagicItemAcquisitionPatch`         |
+| `apply_purchase_intent`     | `buildEquipmentPurchaseIntentPatch`      |
+| `release_magic_item_grant`  | `buildMagicItemGrantReleasePatch`        |
+| `resolve_package_switch`    | `buildEquipmentPackageSwitchPatch`       |
+| `commit_package_conversion` | `buildStartingPackageConversionPatch`    |
 
 Dashboard hooks (`use-equipment-step`, `use-equipment-picker-acquisition`) apply
-patches from `{ status: 'applied' }` results only. Package-switch commits remain in
-`equipment-package-switch.ts` until folded into `resolve_package_switch`.
+patches from `{ status: 'applied' }` results only. Conflicting `select_package`
+returns `{ status: 'needs_resolution', resolution }` to open the package-switch
+modal; commits dispatch `resolve_package_switch` or `commit_package_conversion`.
 
 ### Package-switch presentation boundary
 
