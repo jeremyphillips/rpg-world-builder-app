@@ -18,11 +18,19 @@
       },
       "category": {
         "type": "string",
-        "enum": ["standard", "rare"],
+        "enum": [
+          "standard",
+          "rare"
+        ],
         "description": "standard | rare"
       }
     },
-    "required": ["id", "label", "description", "category"],
+    "required": [
+      "id",
+      "label",
+      "description",
+      "category"
+    ],
     "additionalProperties": false
   }
 }

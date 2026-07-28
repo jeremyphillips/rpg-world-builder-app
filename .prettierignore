@@ -7,5 +7,6 @@ coverage
 storybook-static
 .turbo
 .fallow
+packages/contracts/generated
 pnpm-lock.yaml
 *.tsbuildinfo

@@ -1,4 +1,5 @@
 pnpm lint-staged
+bash tools/hooks/regenerate-json-schemas.sh
 pnpm typecheck:affected
 pnpm test:affected
 pnpm gate:fallow-dupes

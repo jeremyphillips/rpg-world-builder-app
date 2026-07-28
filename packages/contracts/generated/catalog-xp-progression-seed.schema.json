@@ -20,13 +20,27 @@
         },
         "rulesetId": {
           "type": "string",
-          "enum": ["srd-cc-5.2.1"],
+          "enum": [
+            "srd-cc-5.2.1"
+          ],
           "description": "srd-cc-5.2.1"
         },
         "source": {
           "type": "string",
-          "enum": ["system", "homebrew"],
+          "enum": [
+            "system",
+            "homebrew"
+          ],
           "description": "system | homebrew"
+        },
+        "status": {
+          "default": "published",
+          "type": "string",
+          "enum": [
+            "draft",
+            "published"
+          ],
+          "description": "draft | published"
         },
         "campaignId": {
           "anyOf": [
@@ -70,7 +84,9 @@
                   "description": "standard"
                 }
               },
-              "required": ["kind"],
+              "required": [
+                "kind"
+              ],
               "additionalProperties": false
             },
             {
@@ -86,7 +102,10 @@
                   "minLength": 1
                 }
               },
-              "required": ["kind", "classId"],
+              "required": [
+                "kind",
+                "classId"
+              ],
               "additionalProperties": false
             }
           ]
@@ -104,6 +123,7 @@
         "slug",
         "rulesetId",
         "source",
+        "status",
         "campaignId",
         "createdAt",
         "updatedAt",
@@ -127,7 +147,10 @@
           "maximum": 9007199254740991
         }
       },
-      "required": ["level", "xpRequired"],
+      "required": [
+        "level",
+        "xpRequired"
+      ],
       "additionalProperties": false
     }
   }
