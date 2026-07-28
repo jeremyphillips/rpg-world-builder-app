@@ -14,7 +14,7 @@ import { ContentStatusNameBadge } from '../../lib/overview/content-status-name-b
 import { ContentDetailResolver } from '../../lib/detail/content-detail-resolver'
 import { contentEditHref } from '../../lib/detail/content-edit-href'
 import { getContentImageUrl } from '../../lib/detail/content-image-url'
-import { buildFeatStatRows } from '../lib/feat-stat-rows'
+import { buildFeatDetailViewModel } from '../lib/feat-display'
 
 type FeatDetailContentProps = {
   feat: Feat
@@ -23,7 +23,7 @@ type FeatDetailContentProps = {
 
 export function FeatDetailContent({ feat, campaignId }: FeatDetailContentProps) {
   useSetBreadcrumbLabel(feat.name)
-  const statRows = buildFeatStatRows(feat)
+  const viewModel = buildFeatDetailViewModel(feat)
 
   return (
     <WidePage>
@@ -34,19 +34,19 @@ export function FeatDetailContent({ feat, campaignId }: FeatDetailContentProps) 
         imageName={feat.name}
         campaignId={campaignId}
         editHref={contentEditHref('feats', campaignId, feat.id)}
-        statRows={statRows}
+        statRows={viewModel.statRows}
         descriptionContent={
-          feat.description ? (
-            <RichTextContent html={feat.description} size="md" tone="muted" />
+          viewModel.description ? (
+            <RichTextContent html={viewModel.description} size="md" tone="muted" />
           ) : undefined
         }
       >
-        {feat.repeatable.allowed && feat.repeatable.notes && (
+        {viewModel.repeatableNotes && (
           <section aria-labelledby="feat-repeatable-notes-heading">
             <Heading variant="section" as="h2" id="feat-repeatable-notes-heading" className="mb-3">
               Repeatable
             </Heading>
-            <RichTextContent html={feat.repeatable.notes} size="md" tone="muted" />
+            <RichTextContent html={viewModel.repeatableNotes} size="md" tone="muted" />
           </section>
         )}
       </ContentDetailLayout>

@@ -48,6 +48,16 @@ complexity thresholds live in `.fallowrc.json` `health`; CRAP uses Istanbul
 coverage from `pnpm coverage` via `--coverage ./coverage/coverage-final.json`
 (pre-push and CI — not pre-commit).
 
+## Agent skills
+
+| Skill                                                          | Use when                                                                                                       |
+| -------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| [`new-content-type`](.cursor/skills/new-content-type/SKILL.md) | Adding or auditing a top-level catalog content type (contracts, catalog, API, dashboard, integration manifest) |
+| [`spell-resolution`](.cursor/skills/spell-resolution/SKILL.md) | Spell resolution, effects, modeling, promotion, resolution UI                                                  |
+| [`dev-bench`](.cursor/skills/dev-bench/SKILL.md)               | Capturing gaps and tickets via `pnpm bench`                                                                    |
+
+Policy depth for content types → [`docs/content-types.md`](docs/content-types.md).
+
 ## Types
 
 - Domain/DTO shapes are Zod schemas in `@rpg/contracts` — the single source of

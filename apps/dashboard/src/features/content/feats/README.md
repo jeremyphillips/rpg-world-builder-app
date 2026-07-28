@@ -17,7 +17,7 @@ Create/edit forms use a single-page [`Form`](../../../../../packages/ui/docs/for
 | Requirement editor constants      | `lib/requirement-editor-constants.ts`                                                                      |
 | Requirement editor UI             | `components/requirement-editor.client.tsx`                                                                 |
 | Overview columns                  | `lib/feats-overview-columns.tsx`                                                                           |
-| Detail stat rows                  | `lib/feat-stat-rows.ts`                                                                                    |
+| Display registry (detail)         | `lib/feat-display.ts` — `buildFeatDetailViewModel` + overview table formatters                             |
 | Overview table columns (UI)       | `components/feats-columns.tsx`                                                                             |
 | Routes                            | `routes/feats-overview.tsx`, `feat-detail.tsx`, `feat-create.tsx`, `feat-edit.tsx`                         |
 | Hooks / API                       | `hooks/use-feats.ts`, `api/feats-api.ts`                                                                   |
@@ -25,4 +25,4 @@ Create/edit forms use a single-page [`Form`](../../../../../packages/ui/docs/for
 ## Related docs
 
 - [form-lib-conventions.md](../../../../docs/form-lib-conventions.md) — form module splits and inventory
-- [content-types.md](../../../../../docs/content-types.md) — feat contract reference (when documented)
+- [content-types.md](../../../../../docs/content-types.md) — end-to-end content type checklist

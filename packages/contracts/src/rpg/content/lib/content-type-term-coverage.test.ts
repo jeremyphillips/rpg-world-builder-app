@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 import { PROFICIENCY_DOMAIN_ENTRIES } from '../../vocab/proficiency'
 import { SKILL_PROFICIENCY_SENTENCE } from '../../vocab/proficiency-sentence'
 import { getVocabularyTermLabel } from '../../vocab/types'
+import { CONTENT_TYPE_CAPABILITIES } from './content-type-capabilities'
 import { CONTENT_TYPE_KEYS } from './content-type-keys'
 import {
   CONTENT_TYPE_TERMS,
@@ -16,6 +17,7 @@ describe('content type terms', () => {
   it('maps every content type key to a non-empty term', () => {
     expect(CONTENT_TYPE_TERM_KEYS).toEqual(CONTENT_TYPE_KEYS)
     expect(Object.keys(CONTENT_TYPE_TERMS).sort()).toEqual([...CONTENT_TYPE_KEYS].sort())
+    expect(Object.keys(CONTENT_TYPE_CAPABILITIES).sort()).toEqual([...CONTENT_TYPE_KEYS].sort())
 
     for (const key of CONTENT_TYPE_KEYS) {
       const term = getContentTypeTerm(key)

@@ -7,14 +7,19 @@ feature owns persistence and serving. `classes` is the first content type;
 
 ## Ownership model
 
-- **System content** ships as a versioned seed (`classes/data/<rulesetId>/`),
-  validated against the contract at module load. It is read-only and never
-  mutated. Ids are deterministic (`"<rulesetId>:<slug>"`).
+- **System content** ships from `@rpg/catalog` (versioned seed JSON validated at
+  module load). It is read-only and never mutated. Ids are deterministic
+  (`"<rulesetId>:<slug>"`).
 - **Homebrew** content is campaign-owned and stored in Mongo
   (`source: 'homebrew'`, `campaignId` set, Mongo-generated id).
 - **Overlay patches** are per-campaign partial edits to a system record
   (`ClassPatchModel`), keyed by the base record's `targetId`. The system seed is
   never edited in place.
+
+Integration wiring for each top-level type is indexed in
+[`tools/content-types`](../../../../tools/content-types/README.md)
+(`CONTENT_TYPE_INTEGRATION_MANIFEST`). Nested resources such as subclasses are
+outside that manifest.
 
 A campaign pins a `rulesetId` (see the campaign contract/model); it determines
 which seed version is loaded and which content homebrew/patches validate against.
@@ -24,15 +29,16 @@ which seed version is loaded and which content homebrew/patches validate against
 Subclasses are **not** a top-level entry in `content-types.ts`. They live under
 `subclasses/` and are nested under a parent class id.
 
-| Layer             | Source                         | API today                                                  |
-| ----------------- | ------------------------------ | ---------------------------------------------------------- |
-| **System**        | `@rpg/catalog/classes` seed    | `GET …/content/classes/:classId/subclasses` (catalog read) |
-| **Homebrew**      | _Planned_ — campaign-owned     | No write routes yet                                        |
-| **Overlay patch** | _Planned_ — per-campaign edits | No patch model yet                                         |
+| Layer               | Source                       | API today                                                     |
+| ------------------- | ---------------------------- | ------------------------------------------------------------- |
+| **System**          | `@rpg/catalog/classes` seed  | `GET …/content/classes/:classId/subclasses` (catalog read)    |
+| **Homebrew**        | `HomebrewSubclassModel`      | `POST/PATCH/DELETE …/classes/:classId/subclasses/:subclassId` |
+| **Overlay patch**   | `SubclassPatchModel`         | Partial edits on system ids via nested PATCH                  |
+| **Campaign access** | `ContentCampaignAccessModel` | `GET/PATCH …/subclasses/:subclassId/campaign-access`          |
 
-The dashboard class editor's **Subclasses** tab authors in local component state
-(drafts/edits) and does not persist to the API. Target: nested homebrew/patch
-routes mirroring the class pattern — see [`subclasses/README.md`](subclasses/README.md).
+See [`subclasses/README.md`](subclasses/README.md) and
+[`docs/content-types.md`](../../../../../docs/content-types.md) § Subclass ownership.
+Nested subclasses are **not** entries in `CONTENT_TYPE_INTEGRATION_MANIFEST`.
 
 ## Resolve / merge algorithm
 

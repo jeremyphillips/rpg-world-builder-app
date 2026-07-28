@@ -17,6 +17,7 @@
  * `species`, the registration contract check below will run automatically.
  */
 import { describe, expect, it } from 'vitest'
+import { contentTypeKeysWithFormDefinition } from '@rpg/content-types'
 import { flattenFields } from '@rpg/ui/form'
 
 import {
@@ -25,13 +26,7 @@ import {
   type ContentFormDef,
 } from './content-form-registry'
 import { resolveContentFormSchema } from './shells/content-edit-load'
-// Populate the registry — each import registers its def as a side effect.
-import '../../species/lib/species-form-def'
-import '../../classes/lib/class-form-def'
-import '../../skill-proficiencies/lib/skill-proficiency-form-def'
-import '../../equipment/lib/equipment-form-def'
-import '../../spells/lib/spell-form-def'
-import '../../feats/lib/feat-form-def'
+import './content-form-test-registry'
 
 type AnyDef = ContentFormDef<{ id: string; name: string }, Record<string, unknown>, unknown>
 
@@ -45,6 +40,10 @@ describe('contentFormRegistry', () => {
   it('has no duplicate routeKeys', () => {
     const keys = entries.map(([, def]) => def.routeKey)
     expect(new Set(keys).size).toBe(keys.length)
+  })
+
+  it('matches integration manifest form definition entries', () => {
+    expect(Object.keys(contentFormRegistry).sort()).toEqual(contentTypeKeysWithFormDefinition())
   })
 })
 

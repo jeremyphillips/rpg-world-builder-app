@@ -10,7 +10,7 @@ import {
   buildContentFilterSchema,
   type ContentOverviewBaseFilterState,
 } from '../../lib/overview/content-overview-filter-schema'
-import { formatFeatCategoryTableLabel, formatFeatPrerequisiteSummary } from '../lib/feat-stat-rows'
+import { formatFeatCategoryTableLabel, formatFeatPrerequisiteSummary } from '../lib/feat-display'
 
 type FeatRow = WithCampaignAccess<Feat>
 
