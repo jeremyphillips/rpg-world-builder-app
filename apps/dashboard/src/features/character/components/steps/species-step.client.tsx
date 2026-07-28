@@ -15,20 +15,20 @@ import {
   findSpeciesHeritageChoiceSet,
   mapHeritageOptionsToDependentCardOptions,
   resolveDependentChoiceSectionCopy,
-} from '../../lib/builder-dependent-choice.lib'
+} from '../../lib/builder/builder-dependent-choice.lib'
 import {
   buildSpeciesDetailsSheetContent,
   formatSpeciesCardOption,
-} from '../../lib/builder-option-display.lib'
+} from '../../lib/builder/builder-option-display.lib'
 import {
   DEPENDENT_KIND_HERITAGE,
   formatParentChoiceTitleMeta,
   CHANGE_HERITAGE_LABEL,
-} from '../../lib/builder-parent-choice-status.lib'
+} from '../../lib/builder/builder-parent-choice-status.lib'
 import {
   buildHeritageSelectionPatch,
   buildSpeciesSelectionPatch,
-} from '../../lib/species-selection.lib'
+} from '../../lib/choice-sets/species-selection.lib'
 import { BuilderDependentChoiceSection } from '../builder-dependent-choice-section.client'
 import { BuilderStepFrame } from './builder-step-frame.client'
 

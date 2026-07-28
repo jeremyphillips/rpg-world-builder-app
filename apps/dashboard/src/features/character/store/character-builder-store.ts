@@ -11,8 +11,8 @@ import {
 import { create } from 'zustand'
 import { createJSONStorage, persist, type PersistStorage } from 'zustand/middleware'
 
-import { isNonEmptyCharacterBuilderDraft } from '../lib/is-non-empty-character-builder-draft'
-import { mergeCharacterBuilderDraft } from '../lib/merge-character-builder-draft'
+import { isNonEmptyCharacterBuilderDraft } from '../lib/draft/is-non-empty-character-builder-draft'
+import { mergeCharacterBuilderDraft } from '../lib/draft/merge-character-builder-draft'
 
 export type CharacterBuilderStoreState = {
   draft: CharacterBuilderDraft

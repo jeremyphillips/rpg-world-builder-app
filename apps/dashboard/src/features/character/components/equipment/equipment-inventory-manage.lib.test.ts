@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
-import { equipmentStepLeatherArmorFixture } from '../../lib/equipment-step.fixtures'
-import type { EquipmentInventoryRow } from '../../lib/equipment-step.lib'
+import { equipmentStepLeatherArmorFixture } from '../../lib/equipment/equipment-step.fixtures'
+import type { EquipmentInventoryRow } from '../../lib/equipment/equipment-step.lib'
 import {
   formatGrantManageSourceLabel,
   formatTotalPurchaseSpendFromSnapshots,

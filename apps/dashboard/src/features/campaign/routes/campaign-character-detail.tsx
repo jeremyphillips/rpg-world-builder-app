@@ -11,7 +11,7 @@ import { CharacterDetailContent } from '@/features/character/components/detail/c
 import { CharacterVitalSummary } from '@/features/character/components/detail/character-vital-summary.client'
 import { useBuildContext } from '@/features/character/hooks/use-build-context'
 import { useCharacter } from '@/features/character/hooks/use-character'
-import { buildCharacterDetailViewModel } from '@/features/character/lib/character-display'
+import { buildCharacterDetailViewModel } from '@/features/character/lib/display/character-display'
 import { useCampaigns } from '../hooks/use-campaigns'
 
 export function CampaignCharacterDetail() {

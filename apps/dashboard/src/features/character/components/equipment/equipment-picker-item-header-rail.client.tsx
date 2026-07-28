@@ -1,6 +1,6 @@
 'use client'
 
-import { useEquipmentAcquisitionQuantityCommit } from './use-equipment-acquisition-quantity-commit.client'
+import { useEquipmentAcquisitionQuantityCommit } from '../../hooks/use-equipment-acquisition-quantity-commit.client'
 import { resolveAcquisitionCommitButtonLabel } from './equipment-acquisition-commit-labels.lib'
 import { getEquipmentPickerCallout } from './equipment-picker-callout.lib'
 import type { EquipmentPickerItem } from './equipment-picker-drawer.types'

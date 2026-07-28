@@ -8,7 +8,7 @@ import { ROUTES } from '@/app/routes'
 import { useSetBreadcrumbLabel } from '@/components/layout/use-breadcrumb-label'
 
 import { useDeleteCharacter } from '../../hooks/use-delete-character'
-import type { CharacterDetailViewModel } from '../../lib/character-display'
+import type { CharacterDetailViewModel } from '../../lib/display/character-display'
 import { CharacterDetailAbilitiesRow } from './character-detail-abilities-row.client'
 import { CharacterDetailCombatRow } from './character-detail-combat-row.client'
 import { CharacterDetailHeader } from './character-detail-header.client'

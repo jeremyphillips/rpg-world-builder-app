@@ -9,7 +9,7 @@ import type {
   MagicItemGrantProgress,
 } from '@rpg/contracts'
 
-import type { EquipmentPickerWorkflowMode } from '../../lib/equipment-step.lib'
+import type { EquipmentPickerWorkflowMode } from '../../lib/equipment/equipment-step.lib'
 import type { EquipmentPickerCharacterPreviewContext } from './equipment-picker-character-preview.lib'
 import type { EquipmentPickerRowActionViewModel } from './equipment-picker-action.lib'
 import type { EquipmentPickerGrantManageSource } from './equipment-picker-grant.lib'

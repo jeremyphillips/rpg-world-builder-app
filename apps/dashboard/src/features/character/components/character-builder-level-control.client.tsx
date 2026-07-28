@@ -17,7 +17,7 @@ import {
   evaluateBuilderLevelChange,
   resolveBuilderLevelHelperText,
   summarizeBuilderLevelRemovals,
-} from '../lib/builder-level-control.lib'
+} from '../lib/builder/builder-level-control.lib'
 
 export type CharacterBuilderLevelChangeConfirmationModalProps = {
   open: boolean

@@ -12,7 +12,7 @@ import {
   EQUIPMENT_INVENTORY_GROUP_LABELS,
   formatEquipmentInventoryRemoveLabel,
   type EquipmentInventoryRow,
-} from '../../lib/equipment-step.lib'
+} from '../../lib/equipment/equipment-step.lib'
 import type { PurchasedCategoryGroup } from './equipment-inventory-summary.lib'
 
 export const PACKAGE_SWITCH_RESOLUTION_TITLE = 'Resolve purchases before switching'

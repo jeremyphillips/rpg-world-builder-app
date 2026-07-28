@@ -6,11 +6,11 @@ import {
   clampEquipmentStepQuantity,
   EQUIPMENT_PURCHASE_QUANTITY_MAX,
   EQUIPMENT_STEP_QUANTITY_INPUT_DIGITS,
-} from '../../lib/equipment-quantity.lib'
+} from '../../lib/equipment/equipment-quantity.lib'
 import {
   type EquipmentInventoryQuantityTarget,
   type EquipmentInventoryRow,
-} from '../../lib/equipment-step.lib'
+} from '../../lib/equipment/equipment-step.lib'
 import { equipmentInventoryRowQuantityClasses } from './equipment-inventory-summary.variants'
 
 export type EquipmentInventoryQuantityControlProps = {

@@ -25,7 +25,7 @@ import {
 import {
   resolveCampaignBuildContextUnavailable,
   type CampaignBuildContextUnavailable,
-} from '../lib/resolve-campaign-build-context-unavailable.lib'
+} from '../lib/campaign-context/resolve-campaign-build-context-unavailable.lib'
 
 type UseCampaignCharacterBuildContextInput = {
   campaignId: string | undefined

@@ -6,12 +6,12 @@ import {
   equipmentStepCatalogIndexFixture,
   equipmentStepContextFixture,
   equipmentStepPotionOfHealingFixture,
-} from '../../lib/equipment-step.fixtures'
+} from '../../lib/equipment/equipment-step.fixtures'
 import {
   EquipmentInventoryManagePanel,
   createStorybookApplyMagicItemAcquisition,
 } from './equipment-inventory-manage-panel.client'
-import type { EquipmentInventoryRow } from '../../lib/equipment-step.lib'
+import type { EquipmentInventoryRow } from '../../lib/equipment/equipment-step.lib'
 
 const rows: EquipmentInventoryRow[] = [
   {

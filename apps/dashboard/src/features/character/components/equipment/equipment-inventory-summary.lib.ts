@@ -27,7 +27,7 @@ import {
   type PackageCustomizeAffordance,
   type StartingPackageCategoryGroup,
   type StartingPackageInventoryGroup,
-} from '../../lib/equipment-step.lib'
+} from '../../lib/equipment/equipment-step.lib'
 
 type CatalogClass = NonNullable<ReturnType<CharacterBuildCatalogIndex['classes']['get']>>
 type ClassStartingEquipment = NonNullable<

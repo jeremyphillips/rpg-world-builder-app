@@ -25,19 +25,19 @@ import {
   formatPreviewSkillsSubsection,
   formatPreviewToolsSubsection,
   type PreviewProficiencySubsection,
-} from '../lib/format-preview-proficiency-subsection.lib'
-import { getNarrativePreviewStatusLabel } from '../lib/narrative-preview'
+} from '../lib/builder-preview/format-preview-proficiency-subsection.lib'
+import { getNarrativePreviewStatusLabel } from '../lib/builder-preview/narrative-preview'
 import {
   formatPreviewAbilityCell,
   formatPreviewOptionalNumber,
   formatPreviewSpellsSubsection,
   resolveEquipmentPreviewEmptyHint,
   resolveProficienciesSectionHint,
-} from '../lib/character-builder-preview-panel.lib'
+} from '../lib/builder-preview/character-builder-preview-panel.lib'
 import {
   CHARACTER_BUILDER_PREVIEW_SECTIONS,
   type CharacterBuilderPreviewSectionId,
-} from '../lib/character-builder-preview-panel.lib'
+} from '../lib/builder-preview/character-builder-preview-panel.lib'
 import {
   CharacterBuilderPreviewSectionContent,
   CharacterBuilderPreviewSubsection,

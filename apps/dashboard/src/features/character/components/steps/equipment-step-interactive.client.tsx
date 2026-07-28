@@ -7,8 +7,8 @@ import type { BuilderStepReadinessState } from '@rpg/contracts'
 import {
   EQUIPMENT_STEP_SWITCH_CONFIRM_DESCRIPTION,
   EQUIPMENT_STEP_SWITCH_CONFIRM_HEADLINE,
-} from '../../lib/equipment-step.lib'
-import { showsBuilderStepReviewMessage } from '../../lib/builder-step-readiness.lib'
+} from '../../lib/equipment/equipment-step.lib'
+import { showsBuilderStepReviewMessage } from '../../lib/builder/builder-step-readiness.lib'
 import { EquipmentAcquisitionGuidance } from '../equipment/equipment-acquisition-guidance.client'
 import { EquipmentPackageSwitchResolutionModal } from '../equipment/equipment-package-switch-resolution-modal.client'
 import { EquipmentPickerDrawer } from '../equipment/equipment-picker-drawer.client'
@@ -21,8 +21,8 @@ import {
 } from './equipment-step-sections.client'
 import { BuilderStepReadinessPanel } from './builder-step-readiness-panel.client'
 import type { EquipmentStepProps } from './equipment-step.types'
-import type { useEquipmentStep } from './use-equipment-step.client'
-import { useEquipmentPickerAcquisition } from './use-equipment-picker-acquisition.client'
+import type { useEquipmentStep } from '../../hooks/use-equipment-step.client'
+import { useEquipmentPickerAcquisition } from '../../hooks/use-equipment-picker-acquisition.client'
 
 type EquipmentStepInteractiveProps = Pick<EquipmentStepProps, 'draft' | 'onDraftChange'> & {
   step: ReturnType<typeof useEquipmentStep>

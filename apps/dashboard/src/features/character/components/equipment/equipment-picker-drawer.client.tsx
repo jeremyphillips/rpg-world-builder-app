@@ -65,11 +65,11 @@ import { EquipmentPickerItemHeaderRail } from './equipment-picker-item-header-ra
 import {
   clampEquipmentStepQuantity,
   resolveEquipmentStepPurchaseMaxQuantity,
-} from '../../lib/equipment-quantity.lib'
+} from '../../lib/equipment/equipment-quantity.lib'
 import {
   resolveEquipmentOwnedQuantity,
   type EquipmentPickerWorkflowMode,
-} from '../../lib/equipment-step.lib'
+} from '../../lib/equipment/equipment-step.lib'
 
 export type { EquipmentPickerDrawerProps } from './equipment-picker-drawer.types'
 

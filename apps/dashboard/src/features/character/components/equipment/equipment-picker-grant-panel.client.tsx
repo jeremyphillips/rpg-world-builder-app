@@ -14,7 +14,7 @@ import {
   equipmentPickerPurchaseInsetPanelClasses,
   equipmentPickerPurchaseInsetPanelContentClasses,
 } from './equipment-picker-purchase.variants'
-import { useEquipmentAcquisitionQuantityCommit } from './use-equipment-acquisition-quantity-commit.client'
+import { useEquipmentAcquisitionQuantityCommit } from '../../hooks/use-equipment-acquisition-quantity-commit.client'
 import type { EquipmentInventoryManagePanelBodyProps } from './equipment-inventory-manage-panel.client'
 
 export type EquipmentPickerGrantPanelProps = {

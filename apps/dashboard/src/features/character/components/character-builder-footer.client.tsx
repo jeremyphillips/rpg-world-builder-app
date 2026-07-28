@@ -7,7 +7,7 @@ import {
   getAdjacentBuilderStepId,
   isFirstBuilderStep,
   isReviewBuilderStep,
-} from '../lib/character-builder-navigation'
+} from '../lib/builder/character-builder-navigation'
 import { characterBuilderShellFooterClasses } from './character-builder-shell.variants'
 
 export type CharacterBuilderFooterProps = {

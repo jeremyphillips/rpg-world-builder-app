@@ -19,7 +19,7 @@ import { Button, Collapsible, CollapsibleContent, CollapsibleTrigger } from '@rp
 import {
   EQUIPMENT_INVENTORY_MANAGE_LABEL,
   type EquipmentInventoryRow,
-} from '../../lib/equipment-step.lib'
+} from '../../lib/equipment/equipment-step.lib'
 import type { AddedEquipmentEntryViewModel } from './equipment-inventory-summary.lib'
 import type { EquipmentOwnedSourceAction } from './equipment-acquisition-panel.lib'
 import { EquipmentAcquisitionPanelBody } from './equipment-acquisition-panel-body.client'
@@ -27,7 +27,7 @@ import {
   equipmentInventoryManagePanelContentClasses,
   equipmentInventoryManagePanelRootClasses,
 } from './equipment-inventory-manage-panel.variants'
-import { useEquipmentAcquisitionQuantityCommit } from './use-equipment-acquisition-quantity-commit.client'
+import { useEquipmentAcquisitionQuantityCommit } from '../../hooks/use-equipment-acquisition-quantity-commit.client'
 
 export type EquipmentInventoryManagePanelBodyProps = {
   equipment: Equipment

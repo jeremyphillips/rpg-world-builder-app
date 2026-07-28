@@ -15,9 +15,9 @@ import type { CharacterBuildValidationIssue } from '@rpg/contracts/rpg/character
 import {
   isBuilderStepReadinessMessageOnly,
   showsBuilderStepReviewMessage,
-} from '../../lib/builder-step-readiness.lib'
-import { choiceSetsForSpellsStep } from '../../lib/spells-step.lib'
-import { withChoiceSetSelections } from '../../lib/choice-set-selections'
+} from '../../lib/builder/builder-step-readiness.lib'
+import { choiceSetsForSpellsStep } from '../../lib/spells/spells-step.lib'
+import { withChoiceSetSelections } from '../../lib/choice-sets/choice-set-selections'
 import { BuilderStepFrame } from './builder-step-frame.client'
 import { BuilderStepReadinessPanel } from './builder-step-readiness-panel.client'
 import { SpellChoiceSection } from '../spells/spell-choice-section.client'

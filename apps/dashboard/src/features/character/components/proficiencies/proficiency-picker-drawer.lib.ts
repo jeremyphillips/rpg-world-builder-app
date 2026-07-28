@@ -6,7 +6,7 @@ import {
 
 import { normalizeSearchQuery, scoreItem } from '@rpg/ui'
 
-import { formatChoiceSetDrawerTriggerLabel } from '../../lib/selection-counter.lib'
+import { formatChoiceSetDrawerTriggerLabel } from '../../lib/choice-sets/selection-counter.lib'
 import {
   resolveCatalogPickerEmptyStateKind,
   resolveCatalogPickerEmptyStateMessage,

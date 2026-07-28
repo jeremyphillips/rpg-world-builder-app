@@ -13,7 +13,7 @@ import {
   EQUIPMENT_ADDED_INVENTORY_SECTION_LABEL,
   type EquipmentInventoryQuantityTarget,
   type EquipmentInventoryRemoveTarget,
-} from '../../lib/equipment-step.lib'
+} from '../../lib/equipment/equipment-step.lib'
 import { equipmentAddedInventoryPanelFilledClasses } from './equipment-acquisition-panel.variants'
 import { EquipmentAddedInventorySection } from './equipment-added-inventory-section.client'
 import { EquipmentInventoryColumn } from './equipment-inventory-column.client'

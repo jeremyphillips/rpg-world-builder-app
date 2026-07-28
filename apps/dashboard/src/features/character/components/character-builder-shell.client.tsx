@@ -30,20 +30,20 @@ import { useCharacterPreview } from '../hooks/use-character-preview'
 import { useCharacterBuilderStore } from '../hooks/use-character-builder-store'
 import { useCreateCharacter } from '../hooks/use-create-character'
 import { useCreateNpc } from '../npc/hooks/use-create-npc'
-import { getBuilderChromeCopyForContext } from '../lib/builder-chrome-copy'
+import { getBuilderChromeCopyForContext } from '../lib/builder/builder-chrome-copy'
 import {
   applyBuilderCreateFailure,
   resolveBuilderCreateFailure,
   validationIssueStepIds,
-} from '../lib/character-builder-create-error.lib'
-import { finalizeBuilderCharacter } from '../lib/character-builder-finalize.lib'
+} from '../lib/builder/character-builder-create-error.lib'
+import { finalizeBuilderCharacter } from '../lib/builder/character-builder-finalize.lib'
 import {
   mergeValidationVisibleStepIds,
   pruneValidationVisibleStepIds,
   removeValidationVisibleStepId,
-} from '../lib/builder-validation-visible-steps.lib'
-import { runBuilderFormContinueHandler } from '../lib/builder-form-continue-registry'
-import { patchTouchesDraftContent } from '../lib/character-builder-draft-touch.lib'
+} from '../lib/builder/builder-validation-visible-steps.lib'
+import { runBuilderFormContinueHandler } from '../lib/builder/builder-form-continue-registry'
+import { patchTouchesDraftContent } from '../lib/draft/character-builder-draft-touch.lib'
 import {
   appendAttemptedStepId,
   appendTouchedStepId,
@@ -51,16 +51,16 @@ import {
   isReviewBuilderStep,
   mergeAttemptedStepIds,
   resolveCurrentStepId,
-} from '../lib/character-builder-navigation'
-import { mergeCharacterBuilderDraft } from '../lib/merge-character-builder-draft'
-import type { CharacterBuilderNavigateToStepOptions } from '../lib/character-builder-navigation-options'
+} from '../lib/builder/character-builder-navigation'
+import { mergeCharacterBuilderDraft } from '../lib/draft/merge-character-builder-draft'
+import type { CharacterBuilderNavigateToStepOptions } from '../lib/builder/character-builder-navigation-options'
 import {
   issuesForStep,
   resolveBuilderDraftValidationIssues,
   resolveStepValidationIssuesAfterDraftChange,
   validateBuilderFinalSubmit,
   validateBuilderStepSubmit,
-} from '../lib/validate-builder-step'
+} from '../lib/builder/validate-builder-step'
 import { CharacterBuilderDraftRestore } from './character-builder-draft-restore.client'
 import { CharacterBuilderFooter } from './character-builder-footer.client'
 import { CharacterBuilderLevelControl } from './character-builder-level-control.client'

@@ -8,8 +8,8 @@ import {
   formatSpellSelectionCounter,
   isSpellChoiceSetOverSelected,
   resolveSelectedSpellLabels,
-} from '../../lib/spells-step.lib'
-import { shouldShowSelectionFullNotice } from '../../lib/selection-counter.lib'
+} from '../../lib/spells/spells-step.lib'
+import { shouldShowSelectionFullNotice } from '../../lib/choice-sets/selection-counter.lib'
 import { BuilderInventoryRow } from '../builder/builder-inventory-row.client'
 import {
   spellChoiceSectionClasses,

@@ -15,7 +15,7 @@ import type {
 } from '@rpg/contracts/rpg/character-builder'
 
 import { createPopulatedStandaloneBuilderContextFixture } from '../lib/character-builder-fixtures'
-import { createSpellsStepContextFixture } from '../lib/spells-step.fixtures'
+import { createSpellsStepContextFixture } from '../lib/spells/spells-step.fixtures'
 import { CharacterBuilderStepRail } from './character-builder-step-rail.client'
 
 const context = createPopulatedStandaloneBuilderContextFixture()

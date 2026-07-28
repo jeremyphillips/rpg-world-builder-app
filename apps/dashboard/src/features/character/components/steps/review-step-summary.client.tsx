@@ -9,12 +9,12 @@ import { Alert, Text } from '@rpg/ui'
 
 import { getContentTypeItemLabel } from '@/features/content/lib/content-type-labels'
 import { characterBuilderPreviewStatGridClasses } from '../character-builder-shell.variants'
-import { resolveBuilderModelingAdvisories } from '../../lib/builder-review-advisories.lib'
+import { resolveBuilderModelingAdvisories } from '../../lib/builder-preview/builder-review-advisories.lib'
 import {
   formatAbilityMethodLabel,
   formatReviewAlignment,
   resolveCatalogEntryName,
-} from '../../lib/review-step-display'
+} from '../../lib/builder-preview/review-step-display'
 
 export type ReviewStepSummaryProps = {
   context: CharacterBuildContext

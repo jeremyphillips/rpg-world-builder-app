@@ -11,8 +11,8 @@ import {
   equipmentStepMonkClassFixture,
   equipmentStepPotionOfHealingFixture,
   createEquipmentStepContextWithMagicItemGrantsFixture,
-} from '../../lib/equipment-step.fixtures'
-import type { EquipmentInventoryRow } from '../../lib/equipment-step.lib'
+} from '../../lib/equipment/equipment-step.fixtures'
+import type { EquipmentInventoryRow } from '../../lib/equipment/equipment-step.lib'
 import {
   buildEquipmentInventoryViewModel,
   formatAddedEquipmentProvenanceLabel,

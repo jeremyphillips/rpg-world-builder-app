@@ -21,7 +21,7 @@ import { buildEquipmentPickerRowViewModel } from '@/features/content'
 import {
   resolveEquipmentOwnedQuantity,
   type EquipmentPickerWorkflowMode,
-} from '../../lib/equipment-step.lib'
+} from '../../lib/equipment/equipment-step.lib'
 import { compareName, scoreAndFilterPickerItems } from '../picker/catalog-picker-sort.lib'
 import {
   countCatalogPickerClearableCriteria,

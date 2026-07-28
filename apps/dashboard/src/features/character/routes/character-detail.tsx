@@ -10,7 +10,7 @@ import { CharacterDetailContent } from '../components/detail/character-detail-co
 import { CharacterVitalSummary } from '../components/detail/character-vital-summary.client'
 import { useBuildContext } from '../hooks/use-build-context'
 import { useCharacter } from '../hooks/use-character'
-import { buildCharacterDetailViewModel } from '../lib/character-display'
+import { buildCharacterDetailViewModel } from '../lib/display/character-display'
 
 export function CharacterDetail() {
   const { characterId } = useParams<{ characterId: string }>()

@@ -10,7 +10,7 @@ import { NarrowPage } from '@/components/layout/narrow-page'
 import { CharacterListCard } from '../components/character-list-card.client'
 import { useBuildContext } from '../hooks/use-build-context'
 import { useCharacters } from '../hooks/use-characters'
-import { buildCharacterCardViewModel } from '../lib/character-display'
+import { buildCharacterCardViewModel } from '../lib/display/character-display'
 
 const CHARACTERS_EMPTY_MESSAGE = 'No characters yet. Create one to get started.'
 

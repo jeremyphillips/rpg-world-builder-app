@@ -160,6 +160,24 @@ Example key-files table:
 | List route | `routes/classes-overview.tsx` |
 ```
 
+## Character builder co-located `*.lib.ts` modules
+
+Under `character/components/`, keep view-model helpers beside the component tree
+when the module is tightly coupled to one subtree (drawer row assembly, local
+formatting, UI state reducers). Move to `character/lib/<concern>/` only when the
+module is reused across components, imported outside the subtree, or is an
+independently testable view-model seam.
+
+| Location                            | Keep co-located when…                           |
+| ----------------------------------- | ----------------------------------------------- |
+| `components/picker/*.lib.ts`        | Shared picker chrome (search/sort/filter shell) |
+| `components/equipment/*.lib.ts`     | Drawer/inventory/modal view models              |
+| `components/spells/*.lib.ts`        | Spell drawer-only helpers                       |
+| `components/proficiencies/*.lib.ts` | Proficiency drawer-only helpers                 |
+
+Step orchestration hooks belong in `character/hooks/` (`use-*-step.client.ts`), not
+under `components/steps/`.
+
 ## Related docs
 
 | Doc                                                  | Use for                                                   |

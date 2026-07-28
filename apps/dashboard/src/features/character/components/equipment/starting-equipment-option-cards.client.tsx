@@ -26,7 +26,7 @@ import {
   resolveProficiencyLinkFieldState,
   startingEquipmentOptionFundingSummaryLines,
   type StartingEquipmentNestedPool,
-} from '../../lib/equipment-step.lib'
+} from '../../lib/equipment/equipment-step.lib'
 import {
   startingEquipmentOptionCardListClasses,
   startingEquipmentOptionCardNestedFieldsClasses,

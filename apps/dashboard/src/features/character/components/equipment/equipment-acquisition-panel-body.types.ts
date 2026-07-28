@@ -6,7 +6,7 @@ import type {
   EquipmentBudgetSummary,
 } from '@rpg/contracts'
 
-import type { EquipmentInventoryRow } from '../../lib/equipment-step.lib'
+import type { EquipmentInventoryRow } from '../../lib/equipment/equipment-step.lib'
 import type { EquipmentOwnedSourceAction } from './equipment-acquisition-panel.lib'
 
 export type EquipmentAcquisitionPanelLayout = 'default' | 'disclosure'

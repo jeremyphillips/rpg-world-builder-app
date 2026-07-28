@@ -8,7 +8,7 @@ import {
   EQUIPMENT_MAGIC_ITEMS_CHOOSE_LABEL,
   EQUIPMENT_MAGIC_ITEMS_PROGRESS_LABEL,
   EQUIPMENT_STEP_BROWSE_LABEL,
-} from '../../lib/equipment-step.lib'
+} from '../../lib/equipment/equipment-step.lib'
 import { formatEquipmentBudgetGuidanceCopy } from './equipment-acquisition-guidance.lib'
 import {
   equipmentAcquisitionGuidanceBadgeListClasses,

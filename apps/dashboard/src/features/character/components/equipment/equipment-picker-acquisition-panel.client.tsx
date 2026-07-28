@@ -9,7 +9,7 @@ import type {
   EquipmentBudgetSummary,
 } from '@rpg/contracts'
 
-import { listEquipmentInventoryRowsForEquipment } from '../../lib/equipment-step.lib'
+import { listEquipmentInventoryRowsForEquipment } from '../../lib/equipment/equipment-step.lib'
 import {
   EQUIPMENT_PICKER_GRANT_MANAGE_LABEL,
   EQUIPMENT_PICKER_GRANT_SECTION_LABEL,

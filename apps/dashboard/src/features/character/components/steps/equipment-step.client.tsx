@@ -2,8 +2,8 @@
 
 import { EquipmentStepView } from './equipment-step-view.client'
 import type { EquipmentStepProps } from './equipment-step.types'
-import { useEquipmentPickerFocusIntent } from './use-equipment-picker-focus-intent.client'
-import { useEquipmentStep } from './use-equipment-step.client'
+import { useEquipmentPickerFocusIntent } from '../../hooks/use-equipment-picker-focus-intent.client'
+import { useEquipmentStep } from '../../hooks/use-equipment-step.client'
 
 export type { EquipmentStepProps } from './equipment-step.types'
 

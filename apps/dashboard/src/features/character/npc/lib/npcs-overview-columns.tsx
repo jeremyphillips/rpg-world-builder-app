@@ -6,7 +6,7 @@ import { Link } from 'react-router-dom'
 import { ROUTES } from '@/app/routes'
 
 import { resolveCharacterRosterStatusPresentation } from '../../lib/campaign-roster-presentation'
-import { resolveCharacterVitalStatusPresentation } from '../../lib/character-vital-presentation'
+import { resolveCharacterVitalStatusPresentation } from '../../lib/display/character-vital-presentation'
 import { resolveNpcOverviewClassName, resolveNpcOverviewSpeciesName } from './npc-overview-display'
 import {
   NPC_OVERVIEW_LABELS,

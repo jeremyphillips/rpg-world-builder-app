@@ -2,7 +2,7 @@
 
 import { ProficienciesStepView } from './proficiencies-step-view.client'
 import type { ProficienciesStepProps } from './proficiencies-step.types'
-import { useProficienciesStep } from './use-proficiencies-step.client'
+import { useProficienciesStep } from '../../hooks/use-proficiencies-step.client'
 
 export type { ProficienciesStepProps } from './proficiencies-step.types'
 

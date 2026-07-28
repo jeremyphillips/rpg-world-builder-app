@@ -13,7 +13,7 @@ import { Badge, BuilderOptionDetailsSheet, Button, RadioCard, Text } from '@rpg/
 import {
   buildClassDetailsSheetContent,
   formatClassCardOption,
-} from '../../lib/builder-option-display.lib'
+} from '../../lib/builder/builder-option-display.lib'
 import { BuilderStepFrame } from './builder-step-frame.client'
 
 const SELECT_CLASS_ACTION_LABEL = 'Select class'

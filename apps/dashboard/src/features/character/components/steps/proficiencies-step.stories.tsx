@@ -8,7 +8,7 @@ import {
   createProficienciesStepRogueFixture,
   createProficienciesStepRogueWithSkillSelectionsFixture,
   createProficienciesStepRogueWithStaleSkillFixture,
-} from '../../lib/proficiencies-step.fixtures'
+} from '../../lib/proficiencies/proficiencies-step.fixtures'
 import { createStandaloneBuilderContextFixture } from '../../lib/character-builder-fixtures'
 import { ProficienciesStep } from './proficiencies-step.client'
 

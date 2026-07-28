@@ -8,7 +8,7 @@ import { createEmptyCharacterBuilderDraft } from '@rpg/contracts'
 import {
   clearBuilderFormContinueHandlersForTests,
   runBuilderFormContinueHandler,
-} from '../../lib/builder-form-continue-registry'
+} from '../../lib/builder/builder-form-continue-registry'
 import { IdentityStep } from './identity-step.client'
 
 beforeAll(() => {

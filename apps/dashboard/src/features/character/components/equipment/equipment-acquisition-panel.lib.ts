@@ -24,7 +24,7 @@ import {
   formatMagicItemUseChoicesLabel,
   resolveEquipmentAcquisitionContext,
   type EquipmentInventoryRow,
-} from '../../lib/equipment-step.lib'
+} from '../../lib/equipment/equipment-step.lib'
 import { formatAcquisitionBlockerNote } from './equipment-picker-action.lib'
 import {
   formatGrantPreviewLine,

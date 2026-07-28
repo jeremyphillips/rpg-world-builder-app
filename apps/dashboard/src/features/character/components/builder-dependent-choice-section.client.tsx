@@ -14,13 +14,13 @@ import type { Ref } from 'react'
 import type { RadioCardOption } from '@rpg/ui'
 import { Button, RadioCard, Text, cn } from '@rpg/ui'
 
-import type { DependentChoiceSectionCopy } from '../lib/builder-dependent-choice.lib'
+import type { DependentChoiceSectionCopy } from '../lib/builder/builder-dependent-choice.lib'
 import {
   resolveDependentChoiceVisibleOptions,
   useDependentChoiceExpandedState,
   useDependentChoiceValueChangeHandler,
-} from '../lib/builder-dependent-choice-section.lib'
-import { CHANGE_HERITAGE_LABEL } from '../lib/builder-parent-choice-status.lib'
+} from '../lib/builder/builder-dependent-choice-section.lib'
+import { CHANGE_HERITAGE_LABEL } from '../lib/builder/builder-parent-choice-status.lib'
 import { BuilderDependentChoiceSectionHeader } from './builder-dependent-choice-section-header.client'
 import {
   builderDependentChoiceSectionClasses,

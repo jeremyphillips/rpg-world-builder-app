@@ -7,7 +7,7 @@ import {
   EQUIPMENT_CHANGE_PACKAGE_LABEL,
   EQUIPMENT_SELECTED_PACKAGE_EYEBROW,
   startingEquipmentOptionFundingSummaryLines,
-} from '../../lib/equipment-step.lib'
+} from '../../lib/equipment/equipment-step.lib'
 import {
   startingEquipmentOptionCardSelectedShellClasses,
   startingEquipmentOptionCardShellClasses,

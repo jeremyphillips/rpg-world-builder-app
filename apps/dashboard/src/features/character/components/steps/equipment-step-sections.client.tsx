@@ -9,7 +9,7 @@ import {
   EQUIPMENT_STEP_CONTINUE_WITHOUT_LABEL,
   EQUIPMENT_STEP_NO_VALID_OPTIONS_MESSAGE,
   formatEquipmentReplacedStartingWealthTitle,
-} from '../../lib/equipment-step.lib'
+} from '../../lib/equipment/equipment-step.lib'
 import { EquipmentInventorySummary } from '../equipment/equipment-inventory-summary.client'
 
 export function EquipmentStepFallback({ onContinueWithout }: { onContinueWithout: () => void }) {

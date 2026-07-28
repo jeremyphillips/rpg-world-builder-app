@@ -20,12 +20,12 @@ import {
   resolveStepRailIndex,
   resolveStepRailKeyboardDirection,
   resolveStepRailKeyboardTarget,
-} from '../lib/character-builder-step-rail-keyboard.lib'
+} from '../lib/builder/character-builder-step-rail-keyboard.lib'
 import {
   resolveStepVisualStatus,
   stepStatusAriaLabel,
   type StepStatus,
-} from '../lib/builder-step-visual-status'
+} from '../lib/builder/builder-step-visual-status'
 import {
   characterBuilderStepRailClasses,
   characterBuilderStepRailIconClasses,

@@ -9,7 +9,7 @@ import {
   type EquipmentInventoryQuantityTarget,
   type EquipmentInventoryRemoveTarget,
   type EquipmentInventoryRow,
-} from '../../lib/equipment-step.lib'
+} from '../../lib/equipment/equipment-step.lib'
 import {
   resolveCombinedInventoryDetailLineLabel,
   type EquipmentInventoryDisplayItem,

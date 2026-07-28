@@ -8,7 +8,7 @@ import {
   createPopulatedStandaloneBuilderContextFixture,
   createStandaloneBuilderCatalogIndexFixture,
 } from '../../lib/character-builder-fixtures'
-import { buildCharacterDetailViewModel } from '../../lib/character-display'
+import { buildCharacterDetailViewModel } from '../../lib/display/character-display'
 import { SAMPLE_PC } from '../../lib/character-fixtures'
 import { CharacterDetailContent } from './character-detail-content.client'
 

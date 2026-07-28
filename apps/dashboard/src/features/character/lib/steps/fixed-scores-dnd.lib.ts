@@ -8,7 +8,7 @@ import {
   clearAbilityScore,
   replaceScoreFromPool,
   swapAssignedScores,
-} from '../../lib/steps/fixed-scores-assignment.lib'
+} from './fixed-scores-assignment.lib'
 
 export const FIXED_SCORES_DND_KINDS = {
   pool: 'pool',

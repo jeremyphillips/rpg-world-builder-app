@@ -5,7 +5,7 @@ import {
   type EquipmentAcquisitionPlan,
 } from '@rpg/contracts'
 
-import { clampEquipmentStepQuantity } from '../../lib/equipment-quantity.lib'
+import { clampEquipmentStepQuantity } from '../../lib/equipment/equipment-quantity.lib'
 import {
   EQUIPMENT_PICKER_GRANT_COMMIT_LABEL,
   formatPartialActionLabel,

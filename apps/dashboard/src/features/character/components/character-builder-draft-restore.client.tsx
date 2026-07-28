@@ -5,7 +5,7 @@ import { ConfirmDialog } from '@rpg/ui'
 import type { CharacterBuildContext } from '@rpg/contracts'
 
 import { useCharacterBuilderStore } from '../hooks/use-character-builder-store'
-import { getBuilderChromeCopyForContext } from '../lib/builder-chrome-copy'
+import { getBuilderChromeCopyForContext } from '../lib/builder/builder-chrome-copy'
 
 type CharacterBuilderDraftRestoreProps = {
   context: CharacterBuildContext

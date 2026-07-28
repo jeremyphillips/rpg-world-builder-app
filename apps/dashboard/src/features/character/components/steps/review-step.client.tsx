@@ -12,13 +12,13 @@ import {
 import type { CharacterBuildValidationIssue } from '@rpg/contracts/rpg/character-builder'
 import { Text } from '@rpg/ui'
 
-import { resolveReviewReadyMessage } from '../../lib/review-step-display'
+import { resolveReviewReadyMessage } from '../../lib/builder-preview/review-step-display'
 import { BuilderStepFrame } from './builder-step-frame.client'
 import { ReviewAdvisoryWarnings } from './review-advisory-warnings.client'
 import { ReviewRequiredItems } from './review-required-items.client'
 import { ReviewStepSummary } from './review-step-summary.client'
 
-import type { CharacterBuilderNavigateToStep } from '../../lib/character-builder-navigation-options'
+import type { CharacterBuilderNavigateToStep } from '../../lib/builder/character-builder-navigation-options'
 
 export type ReviewStepProps = {
   context: CharacterBuildContext

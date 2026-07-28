@@ -20,7 +20,7 @@ import {
   EQUIPMENT_INVENTORY_RELEASE_LABEL,
   type EquipmentInventoryQuantityTarget,
   type EquipmentInventoryRemoveTarget,
-} from '../../lib/equipment-step.lib'
+} from '../../lib/equipment/equipment-step.lib'
 import { EquipmentInventoryManagePanelBody } from './equipment-inventory-manage-panel.client'
 import {
   equipmentAddedInventoryManageActionsClasses,

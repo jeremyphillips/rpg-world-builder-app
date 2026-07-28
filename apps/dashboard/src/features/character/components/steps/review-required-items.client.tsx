@@ -8,7 +8,7 @@ import {
 } from '@rpg/contracts'
 import { Button, Text } from '@rpg/ui'
 
-import type { CharacterBuilderNavigateToStep } from '../../lib/character-builder-navigation-options'
+import type { CharacterBuilderNavigateToStep } from '../../lib/builder/character-builder-navigation-options'
 
 export type ReviewRequiredItemsProps = {
   requiredItems: readonly ReviewRequiredItem[]

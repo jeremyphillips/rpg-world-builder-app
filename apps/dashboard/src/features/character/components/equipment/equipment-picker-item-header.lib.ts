@@ -3,7 +3,7 @@ import { getMagicItemRarityLabel } from '@rpg/contracts'
 
 import type { EquipmentPickerRowViewModel } from '@/features/content'
 
-import type { EquipmentPickerWorkflowMode } from '../../lib/equipment-step.lib'
+import type { EquipmentPickerWorkflowMode } from '../../lib/equipment/equipment-step.lib'
 import type { EquipmentPickerRowActionViewModel } from './equipment-picker-action.lib'
 import { formatGrantPreviewLine } from './equipment-acquisition-panel.lib'
 import {
