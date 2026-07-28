@@ -273,6 +273,8 @@ export const campaignMembershipSchema = z.object({
   controlledCharacterIds: z.array(z.string()),
   invitedAt: z.iso.datetime(),
   joinedAt: z.iso.datetime().nullable(),
+  /** Invite that established or most recently re-established onboarding for this membership. */
+  sourceInviteId: z.string().min(1).nullable().optional(),
 })
 
 export type CampaignMembership = z.infer<typeof campaignMembershipSchema>

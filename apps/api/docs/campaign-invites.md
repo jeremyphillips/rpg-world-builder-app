@@ -10,15 +10,16 @@ via the public app, then completes character onboarding in the dashboard. The
 flow reuses existing membership, participation, and control primitives — no
 parallel invite-specific character association.
 
-| App       | Responsibility                                                        |
-| --------- | --------------------------------------------------------------------- |
-| Public    | `/campaign-invites/[token]` — resolve, auth continuation, accept      |
-| Dashboard | `/campaigns/:id/onboarding?inviteId=…` — character choice and builder |
-| API       | Invite state machine, email delivery, onboarding-context, completion  |
+| App       | Responsibility                                                         |
+| --------- | ---------------------------------------------------------------------- |
+| Public    | `/campaign-invites/[token]` — resolve, auth continuation, accept       |
+| Dashboard | `/campaigns/:id/onboarding` — character choice and builder (canonical) |
+| API       | Invite lifecycle + membership-scoped onboarding completion             |
 
-The raw invite token never crosses into the dashboard. Only the invite `id` is
-passed as `inviteId`; the onboarding-context endpoint re-validates ownership,
-status, and membership server-side.
+After accept, the public app redirects to dashboard onboarding. The raw invite
+token never crosses into the dashboard. The dashboard does **not** pass
+`inviteId` in the URL — membership-scoped onboarding endpoints gate access from
+campaign participation state.
 
 ## State machine
 
@@ -37,7 +38,12 @@ Rules:
 
 - `CAMPAIGN_INVITE_EXPIRY_DAYS = 7` — computed at create/rotate; **not** extended
   on acceptance. An accepted invite past `expiresAt` transitions to `expired` on
-  next read and blocks further completion.
+  next read.
+- **Invite-scoped completion** (`/api/campaign-invites/:inviteId/complete-*`)
+  rejects expired accepted invites before eligibility load.
+- **Membership-scoped completion** (`/api/campaigns/:campaignId/onboarding/complete`)
+  allows recoverable onboarding even when the linked invite is `expired` — membership
+  is authoritative; invite terminalization is audit-only (see below).
 - Membership survives invite expiration. An expired accepted invite allows a new
   pending invite for incomplete-member recovery. Managers can also remove an
   accepted incomplete PC via `DELETE …/members/:membershipId`, which deletes
@@ -86,20 +92,53 @@ invite (server-side; never trust client-supplied email).
 - Idempotent: re-accept by the same user is a no-op success.
 - Different user on an already-accepted invite is a domain error.
 - Creates or confirms `pc` membership via `createOrConfirmPlayerMembership`
-  with empty `controlledCharacterIds` and sets `joinedAt`.
+  with empty `controlledCharacterIds`, sets `joinedAt`, and records
+  `sourceInviteId` (the accepted invite). Re-accept on recovery updates
+  `sourceInviteId` to the newly accepted invite.
 
 ## Onboarding completion
 
-Two public service entry points delegate to a shared orchestrator
-(`completeCampaignInviteWithCharacter`) that resolves cheap invite context first,
-then source-specific candidates, then expensive eligibility context, before
-source-specific write adapters. Both paths call `assignControlledPcToCampaignMember`
-at the write core (`executeInviteCompletionWrites`).
+### Canonical path (membership-scoped)
+
+The dashboard uses campaign-scoped endpoints. `completeCampaignOnboarding` resolves
+membership context, links an accepted invite for audit, and delegates to the shared
+`completeCampaignCharacterAssignment` orchestrator.
+
+| Step         | Service / route                                                 |
+| ------------ | --------------------------------------------------------------- |
+| Context      | `GET /api/campaigns/:campaignId/onboarding-context`             |
+| Eligible PCs | `GET /api/campaigns/:campaignId/onboarding/eligible-characters` |
+| Complete     | `POST /api/campaigns/:campaignId/onboarding/complete`           |
+
+| Source             | Body shape                            | Acquisition discriminator (new only) |
+| ------------------ | ------------------------------------- | ------------------------------------ |
+| Existing PC        | `{ source: 'existing', characterId }` | N/A                                  |
+| New PC via builder | `{ source: 'new', character }`        | `campaign_pc_onboarding`             |
+
+**Linked invite selection** when multiple accepted invites exist:
+
+1. Prefer `CampaignMembership.sourceInviteId` when that invite belongs to the user.
+2. Otherwise select the newest `accepted` invite and log
+   `[campaign-onboarding-duplicate-accepted-invites]` (production observability).
+
+**Invite audit (membership-scoped only):** after `assignControlledPcToCampaignMember`
+succeeds, the service attempts `markInviteCompleted` on the linked invite. Failure
+does **not** roll back membership completion. Emit
+`[campaign-onboarding-invite-audit-failed]` for operations visibility.
+
+### Legacy path (invite-scoped)
+
+Invite-scoped routes remain for API clients that still key off `inviteId`. The
+dashboard does not use these endpoints.
 
 | Path               | Service entry                                 | Acquisition discriminator |
 | ------------------ | --------------------------------------------- | ------------------------- |
-| Existing PC        | `completeCampaignInviteWithExistingCharacter` | N/A (direct assignment)   |
+| Existing PC        | `completeCampaignInviteWithExistingCharacter` | N/A                       |
 | New PC via builder | `completeCampaignInviteWithNewCharacter`      | `campaign_invite`         |
+
+Both paths share `completeCampaignCharacterAssignment` →
+`executeCampaignCharacterCompletion` at the write core. Invite-scoped completion
+requires the invite to remain `accepted` through the transaction.
 
 Idempotency via `completedCharacterId`:
 
@@ -157,18 +196,21 @@ Overview display rules:
 
 ## API surface
 
-| Method | Path                                                               | Auth                  |
-| ------ | ------------------------------------------------------------------ | --------------------- |
-| POST   | `/api/campaigns/:campaignId/invites`                               | owner/co-owner        |
-| GET    | `/api/campaigns/:campaignId/invites`                               | owner/co-owner        |
-| POST   | `/api/campaigns/:campaignId/invites/:inviteId/share-link`          | owner/co-owner        |
-| POST   | `/api/campaigns/:campaignId/invites/:inviteId/revoke`              | owner/co-owner        |
-| GET    | `/api/campaign-invites/:token`                                     | public                |
-| POST   | `/api/campaign-invites/:token/accept`                              | authenticated invitee |
-| GET    | `/api/campaign-invites/:inviteId/onboarding-context`               | authenticated invitee |
-| GET    | `/api/campaign-invites/:inviteId/eligible-characters`              | authenticated invitee |
-| POST   | `/api/campaign-invites/:inviteId/complete-with-existing-character` | authenticated invitee |
-| POST   | `/api/campaign-invites/:inviteId/complete-with-new-character`      | authenticated invitee |
+| Method | Path                                                               | Auth                           |
+| ------ | ------------------------------------------------------------------ | ------------------------------ |
+| POST   | `/api/campaigns/:campaignId/invites`                               | owner/co-owner                 |
+| GET    | `/api/campaigns/:campaignId/invites`                               | owner/co-owner                 |
+| POST   | `/api/campaigns/:campaignId/invites/:inviteId/share-link`          | owner/co-owner                 |
+| POST   | `/api/campaigns/:campaignId/invites/:inviteId/revoke`              | owner/co-owner                 |
+| GET    | `/api/campaign-invites/:token`                                     | public                         |
+| POST   | `/api/campaign-invites/:token/accept`                              | authenticated invitee          |
+| GET    | `/api/campaigns/:campaignId/onboarding-context`                    | authenticated member           |
+| GET    | `/api/campaigns/:campaignId/onboarding/eligible-characters`        | authenticated member           |
+| POST   | `/api/campaigns/:campaignId/onboarding/complete`                   | authenticated member           |
+| GET    | `/api/campaign-invites/:inviteId/onboarding-context`               | authenticated invitee (legacy) |
+| GET    | `/api/campaign-invites/:inviteId/eligible-characters`              | authenticated invitee (legacy) |
+| POST   | `/api/campaign-invites/:inviteId/complete-with-existing-character` | authenticated invitee (legacy) |
+| POST   | `/api/campaign-invites/:inviteId/complete-with-new-character`      | authenticated invitee (legacy) |
 
 ## Indexes
 

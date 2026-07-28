@@ -28,6 +28,7 @@ describe('campaign overview service', () => {
       campaignId,
       userId: player.id,
       joinedAt: new Date(),
+      sourceInviteId: 'test-source-invite',
     })
 
     const members = await listCampaignMembersForOverview(campaignId)
@@ -66,6 +67,7 @@ describe('campaign overview service', () => {
       campaignId,
       userId: player.id,
       joinedAt: new Date(),
+      sourceInviteId: 'test-source-invite',
     })
 
     const membership = await CampaignMembershipModel.findOne({
@@ -100,6 +102,7 @@ describe('campaign overview service', () => {
       campaignId,
       userId: player.id,
       joinedAt: new Date(),
+      sourceInviteId: 'test-source-invite',
     })
 
     const membersForPlayer = await listCampaignMembersForOverview(campaignId, {
@@ -130,6 +133,7 @@ describe('campaign overview service', () => {
       campaignId,
       userId: player.id,
       joinedAt: new Date(),
+      sourceInviteId: 'test-source-invite',
     })
 
     const membership = await CampaignMembershipModel.findOne({

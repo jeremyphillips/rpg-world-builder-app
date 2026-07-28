@@ -1,7 +1,9 @@
 {
   "json.schemas": [
     {
-      "fileMatch": ["packages/catalog/src/species/data/**/species.json"],
+      "fileMatch": [
+        "packages/catalog/src/species/data/**/species.json"
+      ],
       "url": "./packages/contracts/generated/catalog-species-list.schema.json"
     },
     {
@@ -11,27 +13,39 @@
       "url": "./packages/contracts/generated/catalog-class.schema.json"
     },
     {
-      "fileMatch": ["packages/catalog/src/classes/data/**/subclasses.json"],
+      "fileMatch": [
+        "packages/catalog/src/classes/data/**/subclasses.json"
+      ],
       "url": "./packages/contracts/generated/catalog-subclass-list.schema.json"
     },
     {
-      "fileMatch": ["packages/catalog/src/spells/data/**/*.json"],
+      "fileMatch": [
+        "packages/catalog/src/spells/data/**/*.json"
+      ],
       "url": "./packages/contracts/generated/catalog-spell-list.schema.json"
     },
     {
-      "fileMatch": ["packages/catalog/src/equipment/data/**/*.json"],
+      "fileMatch": [
+        "packages/catalog/src/equipment/data/**/*.json"
+      ],
       "url": "./packages/contracts/generated/catalog-equipment-list.schema.json"
     },
     {
-      "fileMatch": ["packages/catalog/src/feats/data/**/feats.json"],
+      "fileMatch": [
+        "packages/catalog/src/feats/data/**/feats.json"
+      ],
       "url": "./packages/contracts/generated/catalog-feat-list.schema.json"
     },
     {
-      "fileMatch": ["packages/catalog/src/skill-proficiencies/data/**/skill-proficiencies.json"],
+      "fileMatch": [
+        "packages/catalog/src/skill-proficiencies/data/**/skill-proficiencies.json"
+      ],
       "url": "./packages/contracts/generated/catalog-skill-proficiency-list.schema.json"
     },
     {
-      "fileMatch": ["packages/catalog/src/vocabulary/data/**/languages.json"],
+      "fileMatch": [
+        "packages/catalog/src/vocabulary/data/**/languages.json"
+      ],
       "url": "./packages/contracts/generated/catalog-language-list.schema.json"
     },
     {
@@ -46,19 +60,27 @@
       "url": "./packages/contracts/generated/catalog-vocabulary-list.schema.json"
     },
     {
-      "fileMatch": ["packages/catalog/src/starting-wealth/data/**/starting-wealth.json"],
+      "fileMatch": [
+        "packages/catalog/src/starting-wealth/data/**/starting-wealth.json"
+      ],
       "url": "./packages/contracts/generated/catalog-starting-wealth-seed.schema.json"
     },
     {
-      "fileMatch": ["packages/catalog/src/xp-progressions/data/**/xp-progressions.json"],
+      "fileMatch": [
+        "packages/catalog/src/xp-progressions/data/**/xp-progressions.json"
+      ],
       "url": "./packages/contracts/generated/catalog-xp-progression-seed.schema.json"
     },
     {
-      "fileMatch": ["packages/catalog/src/presets/campaign-templates/data/campaign-templates.json"],
+      "fileMatch": [
+        "packages/catalog/src/presets/campaign-templates/data/campaign-templates.json"
+      ],
       "url": "./packages/contracts/generated/catalog-campaign-template-list.schema.json"
     },
     {
-      "fileMatch": ["packages/catalog/src/presets/world-seed-packs/data/world-seed-packs.json"],
+      "fileMatch": [
+        "packages/catalog/src/presets/world-seed-packs/data/world-seed-packs.json"
+      ],
       "url": "./packages/contracts/generated/catalog-world-seed-pack-list.schema.json"
     }
   ]

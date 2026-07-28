@@ -12,6 +12,7 @@ const campaignMembershipSchema = new Schema(
     controlledCharacterIds: { type: [String], default: [] },
     invitedAt: { type: Date, required: true },
     joinedAt: { type: Date, default: null },
+    sourceInviteId: { type: String, default: null },
   },
   { timestamps: true },
 )

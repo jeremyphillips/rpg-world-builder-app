@@ -12,17 +12,22 @@ export async function createOrConfirmPlayerMembership({
   campaignId,
   userId,
   joinedAt,
+  sourceInviteId,
 }: {
   campaignId: string
   userId: string
   joinedAt: Date
+  sourceInviteId: string
 }): Promise<PlayerMembershipResult> {
   const existing = await CampaignMembershipModel.findOne({ campaignId, userId }).lean()
 
   if (existing) {
+    const updates: { joinedAt?: Date; sourceInviteId: string } = { sourceInviteId }
     if (!existing.joinedAt) {
-      await CampaignMembershipModel.updateOne({ _id: existing._id }, { $set: { joinedAt } })
+      updates.joinedAt = joinedAt
     }
+
+    await CampaignMembershipModel.updateOne({ _id: existing._id }, { $set: updates })
 
     return {
       id: String(existing._id),
@@ -38,6 +43,7 @@ export async function createOrConfirmPlayerMembership({
     controlledCharacterIds: [],
     invitedAt: joinedAt,
     joinedAt,
+    sourceInviteId,
   })
 
   return {

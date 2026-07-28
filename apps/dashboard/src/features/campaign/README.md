@@ -15,10 +15,25 @@ ruleset patches, track sessions, and (for DMs) author campaign-owned NPCs.
 | `/campaigns/:campaignId/npcs/new`    | NPC builder                 |
 | `/campaigns/:campaignId/npcs/import` | NPC import (experimental)   |
 | `/campaigns/:campaignId/npcs/:npcId` | NPC detail                  |
+| `/campaigns/:campaignId/onboarding`  | Player character onboarding |
 
-Player-owned PCs live under `/characters/*`, not under the campaign shell. See
+Player-owned PCs live under `/characters/*`, not under the campaign shell.
+Incomplete PC members reach onboarding from the public invite accept redirect or
+the in-campaign recovery CTA. See
 [character-acquisition.md](../../../docs/character-acquisition.md) for the
 acquisition model (axes, ownership, build/import finalization).
+
+## Player onboarding
+
+- **Who:** `pc` members with `controlledCharacterIds.length === 0`
+  (`onboarding_incomplete` participation state).
+- **Where:** `/campaigns/:campaignId/onboarding` — choice between existing
+  character or new builder.
+- **How:** Membership-scoped API (`/api/campaigns/:id/onboarding-*`). Invite
+  accept stores `sourceInviteId` on membership; completion marks the linked
+  invite when possible (audit-only after membership is established).
+- **Recovery:** Membership survives invite expiry; players can return to
+  onboarding without an `inviteId` query param.
 
 ## Campaign template pipeline
 

@@ -12,6 +12,7 @@ import {
 import { createPcRecord, deletePcForUser } from '../character/character.repository'
 import { findInviteById, markInviteCompleted } from './campaign-invite.repository'
 import type { InviteCompletionWriteReceipt } from './complete-campaign-invite-receipt'
+import { warnCampaignOnboardingInviteAuditFailed } from '../campaign/campaign-onboarding-observability.lib'
 
 export type CampaignCharacterCompletionInvitePolicy =
   | { kind: 'invite'; inviteId: string }
@@ -91,10 +92,12 @@ async function executeCharacterCompletionWrites({
     new Date(),
     { session },
   )
-  if (!completed && process.env.NODE_ENV !== 'production') {
-    console.warn(
-      `[campaign-onboarding] Linked invite ${invitePolicy.linkedInviteId} was not marked completed during onboarding.`,
-    )
+  if (!completed) {
+    warnCampaignOnboardingInviteAuditFailed({
+      campaignId,
+      linkedInviteId: invitePolicy.linkedInviteId,
+      characterId,
+    })
   }
 }
 

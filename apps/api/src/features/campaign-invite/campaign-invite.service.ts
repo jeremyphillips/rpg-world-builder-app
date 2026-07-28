@@ -296,6 +296,7 @@ export async function acceptCampaignInvite(
     campaignId: currentInvite.campaignId,
     userId: input.userId,
     joinedAt: acceptedAt,
+    sourceInviteId: currentInvite.id,
   })
 
   if (currentInvite.status === 'accepted' && currentInvite.acceptedByUserId === input.userId) {

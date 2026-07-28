@@ -64,6 +64,7 @@ describe('removeIncompleteCampaignMember', () => {
       campaignId,
       userId: player.id,
       joinedAt: new Date(),
+      sourceInviteId: 'test-source-invite',
     })
 
     const membership = await CampaignMembershipModel.findOne({
