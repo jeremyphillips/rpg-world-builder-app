@@ -1,13 +1,10 @@
 import { z } from 'zod'
 
-import { createCharacterInputSchema } from '../runtime/character/create-input'
 import {
   campaignEligibleCharacterSchema,
   campaignEligibleCharactersResponseSchema,
-  completeCampaignCharacterAssignmentResultSchema,
   type CampaignEligibleCharacter,
   type CampaignEligibleCharactersResponse,
-  type CompleteCampaignCharacterAssignmentResult,
 } from './campaign-character-assignment-dtos'
 
 // ---------------------------------------------------------------------------
@@ -53,33 +50,3 @@ export const campaignOnboardingEligibleCharactersResponseSchema =
   campaignEligibleCharactersResponseSchema
 
 export type CampaignOnboardingEligibleCharactersResponse = CampaignEligibleCharactersResponse
-
-export const completeCampaignOnboardingWithExistingCharacterInputSchema = z.object({
-  source: z.literal('existing'),
-  characterId: z.string().min(1),
-})
-
-export type CompleteCampaignOnboardingWithExistingCharacterInput = z.infer<
-  typeof completeCampaignOnboardingWithExistingCharacterInputSchema
->
-
-export const completeCampaignOnboardingWithNewCharacterInputSchema = z.object({
-  source: z.literal('new'),
-  character: createCharacterInputSchema,
-})
-
-export type CompleteCampaignOnboardingWithNewCharacterInput = z.infer<
-  typeof completeCampaignOnboardingWithNewCharacterInputSchema
->
-
-export const completeCampaignOnboardingInputSchema = z.discriminatedUnion('source', [
-  completeCampaignOnboardingWithExistingCharacterInputSchema,
-  completeCampaignOnboardingWithNewCharacterInputSchema,
-])
-
-export type CompleteCampaignOnboardingInput = z.infer<typeof completeCampaignOnboardingInputSchema>
-
-export const completeCampaignOnboardingResultSchema =
-  completeCampaignCharacterAssignmentResultSchema
-
-export type CompleteCampaignOnboardingResult = CompleteCampaignCharacterAssignmentResult

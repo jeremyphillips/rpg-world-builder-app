@@ -12,7 +12,7 @@ import {
   unitCostCpForEquipment,
 } from './resolve-equipment-purchase-availability'
 import {
-  readMagicItemSelections,
+  type readMagicItemSelections,
   wouldViolateDuplicatePolicy,
 } from './resolve-magic-item-grant-progress'
 import type { EquipmentBudgetSummary } from './equipment-budget'

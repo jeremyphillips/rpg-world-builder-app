@@ -2,7 +2,7 @@ import { z } from 'zod'
 
 import { campaignInviteDeliveryStatusSchema } from '../vocab/campaign-invite-delivery-status'
 import { campaignInviteStatusSchema } from '../vocab/campaign-invite-status'
-import { campaignRoleSchema } from '../../shared/roles'
+import { type campaignRoleSchema } from '../../shared/roles'
 import { characterCardViewModelSchema } from './campaign-overview-dtos'
 
 // ---------------------------------------------------------------------------

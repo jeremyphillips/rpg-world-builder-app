@@ -1,4 +1,4 @@
-import { ZodError } from 'zod'
+import { type ZodError } from 'zod'
 
 import { createCharacterInputSchema } from '../character/create-input'
 import type { CreateCharacterInput } from '../character/create-input'

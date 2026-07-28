@@ -1,4 +1,4 @@
-import { DND_BEYOND_PAYLOAD_VERSION } from './dnd-beyond/dnd-beyond-version'
+import { type DND_BEYOND_PAYLOAD_VERSION } from './dnd-beyond/dnd-beyond-version'
 
 // ---------------------------------------------------------------------------
 // Character import API error codes — stable client-facing identifiers.

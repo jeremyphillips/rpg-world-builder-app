@@ -3,10 +3,8 @@ import { describe, expect, it } from 'vitest'
 import { finalizeCharacterBuild } from '../runtime/character-builder/finalize'
 import { createEmptyCharacterBuilderDraft } from '../runtime/character-builder/draft'
 import { builderTestContext } from '../runtime/character-builder/test-fixtures'
-import {
-  campaignOnboardingContextSchema,
-  completeCampaignOnboardingInputSchema,
-} from './campaign-onboarding-dtos'
+import { campaignOnboardingContextSchema } from './campaign-onboarding-dtos'
+import { completeCampaignOnboardingInputSchema } from '../runtime/campaign-onboarding-completion-input'
 
 function makeCompleteDraft() {
   return {

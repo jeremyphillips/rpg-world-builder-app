@@ -1,4 +1,4 @@
-import { z } from 'zod'
+import { type z } from 'zod'
 
 import { keysFromEntries, termOptionsFromEntries, vocabEnumFromEntries } from './enum-schema'
 import type { GameTermEntry, VocabularyTerm } from './types'
