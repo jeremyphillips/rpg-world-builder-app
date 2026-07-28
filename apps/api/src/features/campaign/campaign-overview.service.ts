@@ -3,11 +3,7 @@ import type {
   CampaignPartyPcListItem,
   CampaignRole,
 } from '@rpg/contracts'
-import {
-  CAMPAIGN_ROLES,
-  resolveCampaignOverviewMemberOnboardingState,
-  resolveCampaignViewerParticipation,
-} from '@rpg/contracts'
+import { CAMPAIGN_ROLES } from '@rpg/contracts'
 
 import { findPcsByIds, findPcOwnerIdsByCharacterIds } from '../character/character.repository'
 import {
@@ -19,6 +15,7 @@ import { findUsersByIds } from '../user/user.service'
 import { CampaignMembershipModel } from './campaign-membership.model'
 import { findCampaignById } from './find-campaign-by-id'
 import { listOpenParticipationsForCampaign } from './participation/campaign-character-participation.repository'
+import { resolveCampaignMemberOnboardingState } from './participation/resolve-member-open-participating-character-ids.lib'
 
 const ROLE_SORT_ORDER = new Map<CampaignRole, number>(
   CAMPAIGN_ROLES.map((role, index) => [role, index]),
@@ -41,24 +38,6 @@ function sortMembers(
     (ROLE_SORT_ORDER.get(right.role) ?? Number.MAX_SAFE_INTEGER)
   if (roleDelta !== 0) return roleDelta
   return left.displayName.localeCompare(right.displayName)
-}
-
-function resolveMemberOpenParticipatingCharacterIds({
-  userId,
-  controlledCharacterIds,
-  openParticipationCharacterIds,
-  characterOwnerById,
-}: {
-  userId: string
-  controlledCharacterIds: string[]
-  openParticipationCharacterIds: string[]
-  characterOwnerById: Map<string, string>
-}): string[] {
-  return openParticipationCharacterIds.filter(
-    (characterId) =>
-      controlledCharacterIds.includes(characterId) ||
-      characterOwnerById.get(characterId) === userId,
-  )
 }
 
 export async function listCampaignMembersForOverview(
@@ -97,18 +76,13 @@ export async function listCampaignMembersForOverview(
     .map((membership) => {
       const role = membership.campaignRole as CampaignRole
       const controlledCharacterIds = membership.controlledCharacterIds ?? []
-      const memberOpenParticipatingCharacterIds = resolveMemberOpenParticipatingCharacterIds({
+      const onboardingState = resolveCampaignMemberOnboardingState({
         userId: membership.userId,
+        role,
         controlledCharacterIds,
         openParticipationCharacterIds,
         characterOwnerById,
       })
-      const participationState = resolveCampaignViewerParticipation({
-        role,
-        controlledCharacterIds,
-        openParticipatingCharacterIds: memberOpenParticipatingCharacterIds,
-      })
-      const onboardingState = resolveCampaignOverviewMemberOnboardingState(participationState)
 
       return {
         id: String(membership._id),

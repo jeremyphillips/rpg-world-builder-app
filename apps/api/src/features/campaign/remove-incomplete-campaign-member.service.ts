@@ -1,39 +1,18 @@
-import {
-  resolveCampaignOverviewMemberOnboardingState,
-  resolveCampaignViewerParticipation,
-} from '@rpg/contracts'
 import { isValidObjectId } from 'mongoose'
 
-import { findPcOwnerIdsByCharacterIds } from '../character/character.repository'
 import { generateInviteToken, hashInviteToken } from '../campaign-invite/campaign-invite-token'
 import { revokeAcceptedInvitesForMemberRemoval } from '../campaign-invite/campaign-invite.repository'
 import { HttpError } from '../../lib/http-error'
 import { CampaignMembershipModel } from './campaign-membership.model'
 import { listOpenParticipationsForCampaign } from './participation/campaign-character-participation.repository'
+import { resolveCampaignMemberOnboardingState } from './participation/resolve-member-open-participating-character-ids.lib'
+import { findPcOwnerIdsByCharacterIds } from '../character/character.repository'
 
 type MembershipRecord = {
   _id: unknown
   userId: string
   campaignRole: string
   controlledCharacterIds?: string[]
-}
-
-function resolveMemberOpenParticipatingCharacterIds({
-  userId,
-  controlledCharacterIds,
-  openParticipationCharacterIds,
-  characterOwnerById,
-}: {
-  userId: string
-  controlledCharacterIds: string[]
-  openParticipationCharacterIds: string[]
-  characterOwnerById: Map<string, string>
-}): string[] {
-  return openParticipationCharacterIds.filter(
-    (characterId) =>
-      controlledCharacterIds.includes(characterId) ||
-      characterOwnerById.get(characterId) === userId,
-  )
 }
 
 export async function removeIncompleteCampaignMember(input: {
@@ -76,18 +55,13 @@ export async function removeIncompleteCampaignMember(input: {
     (participation) => participation.characterId,
   )
   const characterOwnerById = await findPcOwnerIdsByCharacterIds(openParticipationCharacterIds)
-  const memberOpenParticipatingCharacterIds = resolveMemberOpenParticipatingCharacterIds({
+  const onboardingState = resolveCampaignMemberOnboardingState({
     userId: membership.userId,
+    role: 'pc',
     controlledCharacterIds,
     openParticipationCharacterIds,
     characterOwnerById,
   })
-  const participationState = resolveCampaignViewerParticipation({
-    role: 'pc',
-    controlledCharacterIds,
-    openParticipatingCharacterIds: memberOpenParticipatingCharacterIds,
-  })
-  const onboardingState = resolveCampaignOverviewMemberOnboardingState(participationState)
 
   if (onboardingState !== 'onboarding_incomplete') {
     throw new HttpError(
