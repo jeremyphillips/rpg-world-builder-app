@@ -36,7 +36,90 @@ this document tracks the full internal layout, status, and promotion path.
 | `canSwitchEquipmentPackage`                  | `equipment-package-switch.ts`                                           | Thin wrapper: `noConflict` or resolvable draft within target allowance.                                                                                                                                                                                                                                                                     |
 | `buildEquipmentPackageSwitchPatch`           | `equipment-package-switch.ts`                                           | Re-evaluates with `committedInventorySnapshot`; atomic selection + purchase patch or structured `commitError`.                                                                                                                                                                                                                              |
 | `buildStartingPackageConversionPreview`      | `starting-package-conversion.ts`                                        | Preview package→gold conversion rows and eligibility before commit.                                                                                                                                                                                                                                                                         |
-| `buildStartingPackageConversionPatch`        | `starting-package-conversion.ts`                                        | Atomic package→gold conversion commit.                                                                                                                                                                                                                                                                                                      |
+| `resolveEquipmentStepModel`                  | `resolvers/equipment/resolve-equipment-step-model.ts`                   | Unified equipment-step read model (readiness + funding + budget).                                                                                                                                                                                                                                                                           |
+| `applyEquipmentStepAction`                   | `resolvers/equipment/apply-equipment-step-action.ts`                    | Canonical equipment-step draft mutations (Phase B: `set_purchase_quantity`).                                                                                                                                                                                                                                                                |
+| `clampEquipmentPurchaseQuantity`             | `resolvers/equipment/resolve-equipment-purchase-quantity-limits.ts`     | Budget/cap clamp for purchase quantity edits.                                                                                                                                                                                                                                                                                               |
+
+## Equipment step command API (Phase B)
+
+Canonical runtime entry points for equipment-step orchestration. Dashboard should
+dispatch `EquipmentStepAction` values through `applyEquipmentStepAction` instead of
+re-implementing draft mutations in `equipment-step.lib.ts`.
+
+### Types
+
+| Type                              | Module                                                | Purpose                                                                                                       |
+| --------------------------------- | ----------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| `EquipmentStepUnavailableReason`  | `equipment-step-unavailable.ts`                       | Typed missing-context surface (`class_missing`, `choice_sets_loading`, …).                                    |
+| `EquipmentStepAction`             | `equipment-step-action.ts`                            | Discriminated union of step mutations. Phase B ships `set_purchase_quantity`; Phase C adds remaining kinds.   |
+| `EquipmentStepActionResult`       | `equipment-step-action.ts`                            | Structured domain output: `applied` \| `needs_resolution` \| `blocked` \| `invalid` — no user-facing strings. |
+| `EquipmentStepModel`              | `resolvers/equipment/resolve-equipment-step-model.ts` | Unified read model: `readiness`, funding snapshots, optional `budget`.                                        |
+| `ResolveEquipmentStepModelResult` | `resolve-equipment-step-model.ts`                     | `{ status: 'available', model }` or `{ status: 'unavailable', reason }`.                                      |
+
+### Entry points
+
+```typescript
+resolveEquipmentStepModel({
+  draft,
+  catalogIndex,
+  context,
+  resolvedChoiceSets, // null → choice_sets_loading
+  startingWealth?,
+  includeBudget?,
+}): ResolveEquipmentStepModelResult
+
+applyEquipmentStepAction({
+  draft,
+  catalogIndex,
+  action,
+  budget?,
+}): EquipmentStepActionResult
+```
+
+Readiness is resolved inside `resolveEquipmentStepModel` — do not call
+`resolveEquipmentStepReadiness` in parallel when the model is available.
+
+### Phase B vertical slice
+
+`set_purchase_quantity` is implemented end-to-end:
+
+- Runtime: `apply-equipment-step-action.ts`
+- Dashboard hook: `use-equipment-step.client.ts` (`handleSetPurchaseQuantity`,
+  `handleRemoveOneFromInventory`)
+- Legacy shim: `buildEquipmentSetPurchaseQuantityPatch` delegates to
+  `applyEquipmentStepAction` until Phase C deletes it
+
+### `build*Patch` migration plan (`equipment-step.lib.ts`)
+
+Each helper is classified before promotion to runtime. **Only domain mutations**
+move to `applyEquipmentStepAction`; UI event translation stays in dashboard.
+
+| Helper                                   | Category         | Phase C disposition                              |
+| ---------------------------------------- | ---------------- | ------------------------------------------------ |
+| `buildEquipmentSkipPatch`                | domain mutation  | → `skip_starting_equipment` action               |
+| `buildEquipmentSelectionPatch`           | domain mutation  | → `select_package` action                        |
+| `buildMagicItemAcquisitionPatch`         | legacy duplicate | Delete — wraps `applyMagicItemAcquisitionIntent` |
+| `buildEquipmentPurchaseIntentPatch`      | legacy duplicate | Delete — wraps `applyEquipmentPurchaseIntent`    |
+| `buildMagicItemGrantReleasePatch`        | domain mutation  | → grant release action                           |
+| `buildMagicItemPurchaseRemovalPatch`     | domain mutation  | → decrement/remove purchase action               |
+| `buildEquipmentAddPurchasePatch`         | domain mutation  | → add purchase action                            |
+| `buildEquipmentSetPurchaseQuantityPatch` | domain mutation  | **Migrated (Phase B)** — delete in Phase C       |
+| `buildEquipmentRemoveEntryPatch`         | domain mutation  | → remove entry action                            |
+
+Package-switch commits remain in `equipment-package-switch.ts`
+(`buildEquipmentPackageSwitchPatch`) until folded into `resolve_package_switch`.
+
+### Package-switch presentation boundary
+
+`equipment-package-switch-resolution.lib.ts` (dashboard) **only adapts** contracts
+evaluator output:
+
+- Copy: titles, descriptions, blocking-reason messages, stale-inventory notice
+- View models: row grouping, budget status labels, staged-removal chrome
+
+Domain rules live in `evaluateEquipmentPackageSwitch` and
+`buildEquipmentPackageSwitchPatch` — the dashboard module does not re-evaluate switch
+eligibility independently.
 
 ## Directory layout
 

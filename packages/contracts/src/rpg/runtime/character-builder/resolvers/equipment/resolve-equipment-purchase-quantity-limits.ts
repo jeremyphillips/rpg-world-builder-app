@@ -10,6 +10,16 @@ import { maxAffordablePurchaseQuantity } from './resolve-equipment-purchase-avai
 /** Hard cap per purchase row (bundle units). */
 export const EQUIPMENT_PURCHASE_QUANTITY_MAX = 99
 
+/** Clamps a purchase quantity to [1, min(maxQuantity, EQUIPMENT_PURCHASE_QUANTITY_MAX)]. */
+export function clampEquipmentPurchaseQuantity(quantity: number, maxQuantity: number): number {
+  if (!Number.isFinite(quantity)) {
+    return 1
+  }
+
+  const cappedMax = Math.min(Math.max(maxQuantity, 1), EQUIPMENT_PURCHASE_QUANTITY_MAX)
+  return Math.min(Math.max(quantity, 1), cappedMax)
+}
+
 export type EquipmentPurchaseQuantityLimits = {
   editable: boolean
   min: 1

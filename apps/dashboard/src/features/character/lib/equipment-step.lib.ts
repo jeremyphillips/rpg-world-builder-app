@@ -28,6 +28,7 @@ import {
   STEP_CHOICE_TYPES_BY_STEP,
   wealthToCopper,
   applyEquipmentPurchaseIntent,
+  applyEquipmentStepAction,
   applyMagicItemAcquisitionIntent,
   formatInventorySourceSummary,
   getMagicItemRarityLabel,
@@ -58,8 +59,6 @@ import {
   type StartingEquipmentOption,
   type StartingEquipmentOptionSummary,
 } from '@rpg/contracts'
-
-import { clampEquipmentStepQuantity } from './equipment-quantity.lib'
 
 export const EQUIPMENT_STEP_NO_VALID_OPTIONS_MESSAGE =
   'No valid starting equipment options are currently available — this may be caused by missing catalog data.'
@@ -1479,43 +1478,19 @@ export function buildEquipmentSetPurchaseQuantityPatch(args: {
   /** Resolved via `resolveEquipmentStepBudget` when tier bonus or campaign wealth applies. */
   budget?: EquipmentBudgetSummary
 }): Partial<CharacterBuilderDraft> | undefined {
-  const { draft, catalogIndex, purchaseId, quantity, budget } = args
-  const current = draft.equipment
-  if (!current) return undefined
-
-  const purchaseIndex = resolveEquipmentPurchaseIndex(current.purchases, purchaseId)
-  if (purchaseIndex === undefined) return undefined
-
-  const purchase = current.purchases[purchaseIndex]
-  if (!purchase) return undefined
-
-  const equipment = catalogIndex.equipment.get(purchase.equipmentId)
-  if (!equipment) return undefined
-
-  if (quantity < 1) return undefined
-
-  const limits = resolveEquipmentPurchaseQuantityLimits({
-    equipment,
-    sourceMode: purchase.sourceMode,
-    origin: purchase.origin,
-    budget,
-    currentQuantity: purchase.quantity,
-    isPurchaseRow: true,
+  const result = applyEquipmentStepAction({
+    draft: args.draft,
+    catalogIndex: args.catalogIndex,
+    budget: args.budget,
+    action: {
+      kind: 'set_purchase_quantity',
+      purchaseId: args.purchaseId,
+      quantity: args.quantity,
+    },
   })
 
-  if (!limits.editable) return undefined
-
-  const nextQuantity = clampEquipmentStepQuantity(quantity, limits.max)
-  const purchases = current.purchases.map((entry, index) =>
-    index === purchaseIndex ? { ...entry, quantity: nextQuantity } : entry,
-  )
-
-  return {
-    equipment: {
-      ...current,
-      purchases,
-    },
-  }
+  if (result.status === 'applied') return result.patch
+  return undefined
 }
 
 export function buildEquipmentRemoveEntryPatch(args: {

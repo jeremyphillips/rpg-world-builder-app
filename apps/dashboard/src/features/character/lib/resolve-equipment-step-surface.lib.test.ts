@@ -76,6 +76,7 @@ describe('resolveEquipmentStepSurface', () => {
       characterClass: fighterClass,
       classId: fighterClass.id,
       stepModel: {
+        readiness: { readiness: 'readyWithChoices' },
         fundingByOptionId: new Map<string, ResolvedStartingEquipmentFunding>([
           [
             'pack-a',
@@ -119,6 +120,7 @@ describe('resolveEquipmentStepSurface', () => {
       characterClass: fighterClass,
       classId: fighterClass.id,
       stepModel: {
+        readiness: { readiness: 'readyWithChoices' },
         fundingByOptionId: new Map(),
         selectedOptionId: 'pack-a',
         currentFunding: undefined,

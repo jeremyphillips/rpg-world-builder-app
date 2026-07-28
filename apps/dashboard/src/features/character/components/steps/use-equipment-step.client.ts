@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState, type ComponentProps } from 'react'
 
 import {
+  applyEquipmentStepAction,
   buildEquipmentPackageSwitchPatch,
   buildStartingPackageConversionPatch,
   buildStartingPackageConversionPreview,
@@ -31,7 +32,6 @@ import {
   buildEquipmentAddPurchasePatch,
   buildEquipmentRemoveEntryPatch,
   buildEquipmentSelectionPatch,
-  buildEquipmentSetPurchaseQuantityPatch,
   buildMagicItemAcquisitionPatch,
   choiceSetsForEquipmentStep,
   findStartingEquipmentChoiceSet,
@@ -123,24 +123,36 @@ export function useEquipmentStep(args: {
     () => choiceSetsForEquipmentStep(resolvedChoiceSets),
     [resolvedChoiceSets],
   )
-  const readiness = useMemo(
-    () => resolveBuilderStepReadiness('equipment', draft, context, resolvedChoiceSets),
-    [context, draft, resolvedChoiceSets],
-  )
-  const startingEquipmentChoiceSet = classId
-    ? findStartingEquipmentChoiceSet(resolvedChoiceSets, classId)
-    : undefined
-  const stepModel = useMemo(
+  const stepModelResult = useMemo(
     () =>
       characterClass
         ? resolveEquipmentStepModel({
             draft,
             catalogIndex,
+            context,
+            resolvedChoiceSets,
             startingWealth: context.characterCreationRules.startingWealth,
           })
-        : undefined,
-    [catalogIndex, characterClass, context.characterCreationRules.startingWealth, draft],
+        : { status: 'unavailable' as const, reason: 'class_not_in_catalog' as const },
+    [
+      catalogIndex,
+      characterClass,
+      context,
+      context.characterCreationRules.startingWealth,
+      draft,
+      resolvedChoiceSets,
+    ],
   )
+  const readiness = useMemo(() => {
+    if (stepModelResult.status === 'available') {
+      return stepModelResult.model.readiness
+    }
+    return resolveBuilderStepReadiness('equipment', draft, context, resolvedChoiceSets)
+  }, [context, draft, resolvedChoiceSets, stepModelResult])
+  const startingEquipmentChoiceSet = classId
+    ? findStartingEquipmentChoiceSet(resolvedChoiceSets, classId)
+    : undefined
+  const stepModel = stepModelResult.status === 'available' ? stepModelResult.model : undefined
   const fundingByOptionId =
     stepModel?.fundingByOptionId ?? new Map<string, ResolvedStartingEquipmentFunding>()
   const summaries = useMemo(
@@ -571,14 +583,17 @@ export function useEquipmentStep(args: {
     target: Parameters<NonNullable<EquipmentStepInventorySectionProps['onSetPurchaseQuantity']>>[0],
     quantity: number,
   ) => {
-    const patch = buildEquipmentSetPurchaseQuantityPatch({
+    const result = applyEquipmentStepAction({
       draft,
       catalogIndex,
-      purchaseId: target.purchaseId,
-      quantity,
       budget,
+      action: {
+        kind: 'set_purchase_quantity',
+        purchaseId: target.purchaseId,
+        quantity,
+      },
     })
-    if (patch) onDraftChange(patch)
+    if (result.status === 'applied') onDraftChange(result.patch)
   }
 
   const handleRemoveFromInventory: ComponentProps<
@@ -610,14 +625,17 @@ export function useEquipmentStep(args: {
       return
     }
 
-    const patch = buildEquipmentSetPurchaseQuantityPatch({
+    const result = applyEquipmentStepAction({
       draft,
       catalogIndex,
-      purchaseId,
-      quantity: currentQuantity - 1,
       budget,
+      action: {
+        kind: 'set_purchase_quantity',
+        purchaseId,
+        quantity: currentQuantity - 1,
+      },
     })
-    if (patch) onDraftChange(patch)
+    if (result.status === 'applied') onDraftChange(result.patch)
   }
 
   return {
