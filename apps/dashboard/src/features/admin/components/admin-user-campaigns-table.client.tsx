@@ -2,12 +2,13 @@
 
 import { useMemo } from 'react'
 import { useParams } from 'react-router-dom'
-import { DataTableFilterRegion, Text } from '@rpg/ui'
-import { FilterBar, FilterChromeProvider, useFilterState } from '@rpg/ui/filters'
+import { Text } from '@rpg/ui'
+import { useFilterState } from '@rpg/ui/filters'
 
 import { PageHeader } from '@/components/layout/page-header'
 import { WidePage } from '@/components/layout/wide-page'
 import { CatalogOverviewTable } from '@/lib/data-table/catalog-overview-table.client'
+import { PrimaryFilterBarRegion } from '@/lib/data-table/primary-filter-bar-region.client'
 
 import { AdminUserContextLine } from '../components/admin-user-tab-nav.client'
 import { useAdminUserCampaigns } from '../hooks/use-admin-user-campaigns'
@@ -32,20 +33,12 @@ export function AdminUserCampaignsTable() {
   )
 
   const filterRegion = (
-    <FilterChromeProvider>
-      <DataTableFilterRegion
-        primaryFilters={
-          <FilterBar
-            schema={filterSchema}
-            state={filterState}
-            onValueChange={setValue}
-            onReset={reset}
-          />
-        }
-        additionalFiltersOpen={false}
-        onAdditionalFiltersOpenChange={() => undefined}
-      />
-    </FilterChromeProvider>
+    <PrimaryFilterBarRegion
+      filterSchema={filterSchema}
+      filterState={filterState}
+      onValueChange={setValue}
+      onReset={reset}
+    />
   )
 
   if (isError) {

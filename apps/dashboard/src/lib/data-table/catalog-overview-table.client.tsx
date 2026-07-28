@@ -2,9 +2,7 @@
 
 import { useCallback, useMemo, useState, type ReactNode } from 'react'
 import {
-  areColumnChangeStatesEqual,
   DataTableFilterRegion,
-  type ColumnChangeState,
   type ColumnDef,
   type DataTableEmptyStateContext,
   type DataTableProps,
@@ -32,6 +30,10 @@ import {
   type CatalogOverviewPreferences,
 } from './catalog-overview-preferences'
 import { formatCatalogResultCount } from './format-catalog-result-count.lib'
+import {
+  applyOverviewAdvancedOpenPreferences,
+  applyOverviewColumnChangePreferences,
+} from '@/lib/overview-preferences'
 import {
   buildCatalogOverviewSelectionFrameProps,
   type CatalogOverviewSelectionConfig,
@@ -127,25 +129,10 @@ function CatalogOverviewTableBody<T extends { id: string }>({
   )
 
   const handleColumnChange = useCallback(
-    (state: ColumnChangeState) => {
+    (state: Parameters<typeof applyOverviewColumnChangePreferences>[1]) => {
       setPreferences((current) => {
-        const next = {
-          ...current,
-          columnVisibility: state.visibility,
-          columnOrder: state.order,
-        }
-
-        if (
-          areColumnChangeStatesEqual(
-            {
-              visibility: current.columnVisibility ?? {},
-              order: current.columnOrder ?? [],
-            },
-            state,
-          )
-        ) {
-          return current
-        }
+        const { next, changed } = applyOverviewColumnChangePreferences(current, state)
+        if (!changed) return current
 
         persistCatalogOverviewPreferences(tableKey, next)
         return next
@@ -214,7 +201,7 @@ type CatalogOverviewFilterChromeProps<T, TFilters extends Record<string, unknown
   onAdvancedOpenChange: (open: boolean) => void
 }
 
-function CatalogOverviewFilterChrome<T, TFilters extends Record<string, unknown>>({
+export function CatalogOverviewFilterChrome<T, TFilters extends Record<string, unknown>>({
   filterSchema,
   filterState,
   onFilterChange,
@@ -297,9 +284,9 @@ function CatalogOverviewTableWithInternalFilters<
   const handleAdvancedOpenChange = useCallback(
     (open: boolean) => {
       setPreferences((current) => {
-        if (current.advancedOpen === open) return current
+        const { next, changed } = applyOverviewAdvancedOpenPreferences(current, open)
+        if (!changed) return current
 
-        const next = { ...current, advancedOpen: open }
         persistCatalogOverviewPreferences(tableKey, next)
         return next
       })
@@ -362,9 +349,9 @@ function CatalogOverviewTableWithControlledFilters<
   const handleAdvancedOpenChange = useCallback(
     (open: boolean) => {
       setPreferences((current) => {
-        if (current.advancedOpen === open) return current
+        const { next, changed } = applyOverviewAdvancedOpenPreferences(current, open)
+        if (!changed) return current
 
-        const next = { ...current, advancedOpen: open }
         persistCatalogOverviewPreferences(tableKey, next)
         return next
       })
