@@ -1,26 +1,25 @@
 import { describe, expect, it } from 'vitest'
 
 import {
+  applyEquipmentStepAction,
   createEmptyCharacterBuilderDraft,
   buildChoiceSetId,
   createDeterministicLegacyPurchaseId,
   defaultCampaignMechanicsPatch,
   DEFAULT_ABILITY_GENERATION_RULES,
   deriveEquipmentBudgetSummary,
+  indexCharacterBuildCatalog,
   resolveCharacterCreationPatch,
   resolveStartingEquipmentOptionSummaries,
   formatSelectionSourceLabel,
   startingEquipmentChoiceSetId,
   wealthToCopper,
   type CharacterBuildContext,
+  type CharacterBuilderDraft,
   type StartingWealthRules,
 } from '@rpg/contracts'
 
 import {
-  buildEquipmentAddPurchasePatch,
-  buildEquipmentRemoveEntryPatch,
-  buildEquipmentSelectionPatch,
-  buildEquipmentSetPurchaseQuantityPatch,
   formatEquipmentInventoryRemoveLabel,
   hasSelectableStartingEquipmentOption,
   isSelectedStartingEquipmentReady,
@@ -44,6 +43,13 @@ import {
   equipmentStepLuteFixture,
   equipmentStepMonkClassFixture,
 } from './equipment-step.fixtures'
+
+function applyEquipmentStepPatch(
+  args: Parameters<typeof applyEquipmentStepAction>[0],
+): Partial<CharacterBuilderDraft> | undefined {
+  const result = applyEquipmentStepAction(args)
+  return result.status === 'applied' ? result.patch : undefined
+}
 
 const tierBonusStartingWealthFixture: StartingWealthRules = {
   name: 'Tier bonus test wealth',
@@ -133,16 +139,21 @@ describe('equipment-step.lib', () => {
       },
     }
 
-    const patch = buildEquipmentSelectionPatch({
+    const patch = applyEquipmentStepPatch({
       draft: { ...draft, equipment: { ...draft.equipment, mode: 'package' } },
-      classId: homebrewClass.id,
-      optionId: 'buy-your-own-gear',
-      choiceSetId: startingEquipmentChoiceSetId(homebrewClass.id),
-      nestedSelections: {},
-      characterClass: homebrewClass,
+      catalogIndex: indexCharacterBuildCatalog({
+        ...equipmentStepCatalogFixture,
+        classes: [homebrewClass],
+      }),
+      action: {
+        kind: 'select_package',
+        optionId: 'buy-your-own-gear',
+        choiceSetId: startingEquipmentChoiceSetId(homebrewClass.id),
+        nestedSelections: {},
+      },
     })
 
-    expect(patch.equipment?.mode).toBe('gold')
+    expect(patch!.equipment?.mode).toBe('gold')
     expect(shouldShowEquipmentShopping(draft, 'buy-your-own-gear', homebrewClass)).toBe(true)
   })
 
@@ -287,11 +298,14 @@ describe('equipment-step.lib', () => {
     }
 
     expect(
-      buildEquipmentAddPurchasePatch({
+      applyEquipmentStepPatch({
         draft,
         catalogIndex: equipmentStepCatalogIndexFixture,
-        equipmentId: equipmentStepLeatherArmorFixture.id,
-        sourceMode: 'manual',
+        action: {
+          kind: 'add_purchase',
+          equipmentId: equipmentStepLeatherArmorFixture.id,
+          sourceMode: 'manual',
+        },
       }),
     ).toBeUndefined()
   })
@@ -311,16 +325,20 @@ describe('equipment-step.lib', () => {
       },
     }
 
-    const patch = buildEquipmentRemoveEntryPatch({
+    const patch = applyEquipmentStepPatch({
       draft,
-      target: {
-        kind: 'package',
-        packageItemKey: `${equipmentStepBardClassFixture.id}:standard-equipment:0`,
+      catalogIndex: equipmentStepCatalogIndexFixture,
+      action: {
+        kind: 'remove_entry',
+        target: {
+          kind: 'package',
+          packageItemKey: `${equipmentStepBardClassFixture.id}:standard-equipment:0`,
+        },
       },
     })
 
-    expect(patch.equipment?.removedPackageItemKeys).toEqual([])
-    expect(patch.equipment?.customized).toBe(false)
+    expect(patch!.equipment?.removedPackageItemKeys).toEqual([])
+    expect(patch!.equipment?.customized).toBe(false)
   })
 
   it('still hides legacy removed package items from inventory rows', () => {
@@ -344,32 +362,39 @@ describe('equipment-step.lib', () => {
   })
 
   it('builds package and gold selection patches', () => {
-    const draft = createEmptyCharacterBuilderDraft()
     const classId = equipmentStepBardClassFixture.id
+    const draft = {
+      ...createEmptyCharacterBuilderDraft(),
+      class: { classId, level: 1 as const },
+    }
     const choiceSetId = startingEquipmentChoiceSetId(classId)
 
-    const packagePatch = buildEquipmentSelectionPatch({
+    const packagePatch = applyEquipmentStepPatch({
       draft,
-      classId,
-      optionId: 'standard-equipment',
-      choiceSetId,
-      nestedSelections: {},
-      characterClass: equipmentStepBardClassFixture,
+      catalogIndex: equipmentStepCatalogIndexFixture,
+      action: {
+        kind: 'select_package',
+        optionId: 'standard-equipment',
+        choiceSetId,
+        nestedSelections: {},
+      },
     })
 
-    expect(packagePatch.choiceSelections?.[choiceSetId]).toEqual(['standard-equipment'])
-    expect(packagePatch.equipment?.mode).toBe('package')
+    expect(packagePatch?.choiceSelections?.[choiceSetId]).toEqual(['standard-equipment'])
+    expect(packagePatch?.equipment?.mode).toBe('package')
 
-    const goldPatch = buildEquipmentSelectionPatch({
+    const goldPatch = applyEquipmentStepPatch({
       draft,
-      classId,
-      optionId: 'starting-gold',
-      choiceSetId,
-      nestedSelections: {},
-      characterClass: equipmentStepBardClassFixture,
+      catalogIndex: equipmentStepCatalogIndexFixture,
+      action: {
+        kind: 'select_package',
+        optionId: 'starting-gold',
+        choiceSetId,
+        nestedSelections: {},
+      },
     })
 
-    expect(goldPatch.equipment?.mode).toBe('gold')
+    expect(goldPatch!.equipment?.mode).toBe('gold')
   })
 
   it('formats equipment source labels', () => {
@@ -406,11 +431,14 @@ describe('equipment-step.lib', () => {
       },
     }
 
-    const addPatch = buildEquipmentAddPurchasePatch({
+    const addPatch = applyEquipmentStepPatch({
       draft,
       catalogIndex: equipmentStepCatalogIndexFixture,
-      equipmentId: 'srd-cc-5.2.1:leather-armor',
-      sourceMode: resolvePurchaseSourceMode(),
+      action: {
+        kind: 'add_purchase',
+        equipmentId: 'srd-cc-5.2.1:leather-armor',
+        sourceMode: resolvePurchaseSourceMode(),
+      },
     })
 
     expect(addPatch?.equipment?.purchases).toEqual([
@@ -423,11 +451,14 @@ describe('equipment-step.lib', () => {
       }),
     ])
 
-    const duplicatePatch = buildEquipmentAddPurchasePatch({
+    const duplicatePatch = applyEquipmentStepPatch({
       draft: { ...draft, equipment: addPatch?.equipment },
       catalogIndex: equipmentStepCatalogIndexFixture,
-      equipmentId: 'srd-cc-5.2.1:leather-armor',
-      sourceMode: resolvePurchaseSourceMode(),
+      action: {
+        kind: 'add_purchase',
+        equipmentId: 'srd-cc-5.2.1:leather-armor',
+        sourceMode: resolvePurchaseSourceMode(),
+      },
     })
 
     expect(duplicatePatch?.equipment?.purchases).toEqual([
@@ -444,12 +475,13 @@ describe('equipment-step.lib', () => {
     }
     const purchaseId = withPurchase.equipment!.purchases[0]!.id!
 
-    const removePatch = buildEquipmentRemoveEntryPatch({
+    const removePatch = applyEquipmentStepPatch({
       draft: withPurchase,
-      target: { kind: 'purchase', purchaseId },
+      catalogIndex: equipmentStepCatalogIndexFixture,
+      action: { kind: 'remove_entry', target: { kind: 'purchase', purchaseId } },
     })
 
-    expect(removePatch.equipment?.purchases).toEqual([])
+    expect(removePatch!.equipment?.purchases).toEqual([])
   })
 
   it('removes the entire stackable purchase row instead of decrementing', () => {
@@ -481,12 +513,13 @@ describe('equipment-step.lib', () => {
       },
     }
 
-    const removePatch = buildEquipmentRemoveEntryPatch({
+    const removePatch = applyEquipmentStepPatch({
       draft,
-      target: { kind: 'purchase', purchaseId },
+      catalogIndex: equipmentStepCatalogIndexFixture,
+      action: { kind: 'remove_entry', target: { kind: 'purchase', purchaseId } },
     })
 
-    expect(removePatch.equipment?.purchases).toEqual([])
+    expect(removePatch!.equipment?.purchases).toEqual([])
   })
 
   it('does not remove stackable purchases when quantity drops below one', () => {
@@ -539,15 +572,18 @@ describe('equipment-step.lib', () => {
     }
 
     expect(
-      buildEquipmentSetPurchaseQuantityPatch({
+      applyEquipmentStepPatch({
         draft,
         catalogIndex,
-        purchaseId: createDeterministicLegacyPurchaseId({
-          equipmentId: rationsId,
-          sourceMode: 'startingGold',
-          occurrenceIndex: 0,
-        }),
-        quantity: 0,
+        action: {
+          kind: 'set_purchase_quantity',
+          purchaseId: createDeterministicLegacyPurchaseId({
+            equipmentId: rationsId,
+            sourceMode: 'startingGold',
+            occurrenceIndex: 0,
+          }),
+          quantity: 0,
+        },
       }),
     ).toBeUndefined()
   })
@@ -599,12 +635,15 @@ describe('equipment-step.lib', () => {
       ]),
     }
 
-    const addPatch = buildEquipmentAddPurchasePatch({
+    const addPatch = applyEquipmentStepPatch({
       draft,
       catalogIndex,
-      equipmentId: rationsId,
-      sourceMode: 'startingGold',
-      quantity: 2,
+      action: {
+        kind: 'add_purchase',
+        equipmentId: rationsId,
+        sourceMode: 'startingGold',
+        quantity: 2,
+      },
     })
 
     expect(addPatch?.equipment?.purchases).toEqual([
@@ -618,11 +657,10 @@ describe('equipment-step.lib', () => {
     ])
 
     const purchaseId = addPatch!.equipment!.purchases[0]!.id!
-    const quantityPatch = buildEquipmentSetPurchaseQuantityPatch({
+    const quantityPatch = applyEquipmentStepPatch({
       draft: { ...draft, equipment: addPatch?.equipment },
       catalogIndex,
-      purchaseId,
-      quantity: 4,
+      action: { kind: 'set_purchase_quantity', purchaseId, quantity: 4 },
     })
 
     expect(quantityPatch?.equipment?.purchases).toEqual([
@@ -913,42 +951,51 @@ describe('equipment purchase quantity regressions', () => {
       ]),
     }
 
-    const addPatch = buildEquipmentAddPurchasePatch({
+    const addPatch = applyEquipmentStepPatch({
       draft,
       catalogIndex,
-      equipmentId: rationsId,
-      sourceMode: 'startingGold',
-      quantity: 2,
+      action: {
+        kind: 'add_purchase',
+        equipmentId: rationsId,
+        sourceMode: 'startingGold',
+        quantity: 2,
+      },
     })
     const purchaseId = addPatch!.equipment!.purchases[0]!.id!
 
-    const incremented = buildEquipmentSetPurchaseQuantityPatch({
+    const incremented = applyEquipmentStepPatch({
       draft: { ...draft, equipment: addPatch?.equipment },
       catalogIndex,
-      purchaseId,
-      quantity: 3,
+      action: { kind: 'set_purchase_quantity', purchaseId, quantity: 3 },
     })
     expect(incremented?.equipment?.purchases[0]?.quantity).toBe(3)
 
-    const removed = buildEquipmentRemoveEntryPatch({
+    const removed = applyEquipmentStepPatch({
       draft: { ...draft, equipment: incremented?.equipment },
-      target: { kind: 'purchase', purchaseId },
+      catalogIndex,
+      action: { kind: 'remove_entry', target: { kind: 'purchase', purchaseId } },
     })
-    expect(removed.equipment?.purchases).toEqual([])
+    expect(removed!.equipment?.purchases).toEqual([])
 
-    const armorPatch = buildEquipmentAddPurchasePatch({
+    const armorPatch = applyEquipmentStepPatch({
       draft,
       catalogIndex,
-      equipmentId: equipmentStepLeatherArmorFixture.id,
-      sourceMode: 'startingGold',
+      action: {
+        kind: 'add_purchase',
+        equipmentId: equipmentStepLeatherArmorFixture.id,
+        sourceMode: 'startingGold',
+      },
     })
     expect(armorPatch?.equipment?.purchases).toHaveLength(1)
 
-    const duplicateArmor = buildEquipmentAddPurchasePatch({
+    const duplicateArmor = applyEquipmentStepPatch({
       draft: { ...draft, equipment: armorPatch?.equipment },
       catalogIndex,
-      equipmentId: equipmentStepLeatherArmorFixture.id,
-      sourceMode: 'startingGold',
+      action: {
+        kind: 'add_purchase',
+        equipmentId: equipmentStepLeatherArmorFixture.id,
+        sourceMode: 'startingGold',
+      },
     })
     expect(duplicateArmor?.equipment?.purchases).toEqual([
       expect.objectContaining({

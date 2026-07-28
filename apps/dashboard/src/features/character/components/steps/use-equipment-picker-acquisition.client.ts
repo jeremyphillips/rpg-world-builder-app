@@ -3,19 +3,18 @@
 import { useCallback, useMemo, type ComponentProps } from 'react'
 
 import {
+  applyEquipmentStepAction,
   readMagicItemSelections,
   resolveEquipmentAcquisitionActionState,
+  resolveEquipmentAcquisitionBuilderContext,
   resolveEquipmentPurchaseId,
+  standardStartingWealthTableId,
   type CharacterBuildContext,
   type CharacterBuilderDraft,
   type EquipmentBudgetSummary,
 } from '@rpg/contracts'
 
 import {
-  buildEquipmentPurchaseIntentPatch,
-  buildMagicItemAcquisitionPatch,
-  buildMagicItemGrantReleasePatch,
-  buildMagicItemPurchaseRemovalPatch,
   resolveEquipmentAcquisitionContext,
   type EquipmentPickerWorkflowMode,
 } from '../../lib/equipment-step.lib'
@@ -36,8 +35,28 @@ export function useEquipmentPickerAcquisition(args: {
     args
 
   const acquisitionContext = useMemo(
-    () => resolveEquipmentAcquisitionContext({ context, catalogIndex }),
+    () =>
+      resolveEquipmentAcquisitionBuilderContext({
+        context,
+        catalogIndex,
+        startingWealthTableId: standardStartingWealthTableId(context.rulesetId),
+      }),
     [catalogIndex, context],
+  )
+
+  const applyEquipmentAction = useCallback(
+    (action: Parameters<typeof applyEquipmentStepAction>[0]['action']) => {
+      const result = applyEquipmentStepAction({
+        draft,
+        catalogIndex,
+        budget,
+        acquisitionContext,
+        action,
+      })
+      if (result.status === 'applied') onDraftChange(result.patch)
+      return result
+    },
+    [acquisitionContext, budget, catalogIndex, draft, onDraftChange],
   )
 
   const resolveRowActionViewModel = useCallback(
@@ -49,7 +68,7 @@ export function useEquipmentPickerAcquisition(args: {
       buildEquipmentPickerRowActionViewModel(
         resolveEquipmentAcquisitionActionState({
           draft,
-          context: acquisitionContext,
+          context: resolveEquipmentAcquisitionContext({ context, catalogIndex }),
           equipment: pickerArgs.equipment,
           workflowMode: pickerArgs.workflowMode,
           requestedQuantity: pickerArgs.requestedQuantity,
@@ -57,7 +76,7 @@ export function useEquipmentPickerAcquisition(args: {
         }),
         { budget },
       ),
-    [acquisitionContext, budget, draft, focusedAllowanceId],
+    [budget, catalogIndex, context, draft, focusedAllowanceId],
   )
 
   const resolveGrantManageSources = useCallback(
@@ -83,18 +102,14 @@ export function useEquipmentPickerAcquisition(args: {
     ComponentProps<typeof EquipmentPickerDrawer>['onApplyMagicItemAcquisition']
   > = useCallback(
     ({ equipmentId, requestedQuantity }) => {
-      const patch = buildMagicItemAcquisitionPatch({
-        draft,
-        context,
-        catalogIndex,
+      const result = applyEquipmentAction({
+        kind: 'acquire_magic_item',
         equipmentId,
         requestedQuantity,
       })
-      if (!patch) return false
-      onDraftChange(patch)
-      return true
+      return result.status === 'applied'
     },
-    [catalogIndex, context, draft, onDraftChange],
+    [applyEquipmentAction],
   )
 
   const handleApplyPurchase: NonNullable<
@@ -103,47 +118,40 @@ export function useEquipmentPickerAcquisition(args: {
     ({ equipmentId, requestedQuantity }) => {
       if (!showBudget) return
 
-      const patch = buildEquipmentPurchaseIntentPatch({
-        draft,
-        context,
-        catalogIndex,
+      applyEquipmentAction({
+        kind: 'apply_purchase_intent',
         equipmentId,
         requestedQuantity,
       })
-      if (patch) onDraftChange(patch)
     },
-    [catalogIndex, context, draft, onDraftChange, showBudget],
+    [applyEquipmentAction, showBudget],
   )
 
   const handleReleaseGrant: NonNullable<
     ComponentProps<typeof EquipmentPickerDrawer>['onReleaseGrant']
   > = useCallback(
     ({ allowanceId, equipmentId, quantity }) => {
-      const patch = buildMagicItemGrantReleasePatch({
-        draft,
+      applyEquipmentAction({
+        kind: 'release_magic_item_grant',
         allowanceId,
         equipmentId,
         quantity,
       })
-      if (patch) onDraftChange(patch)
     },
-    [draft, onDraftChange],
+    [applyEquipmentAction],
   )
 
   const handleRemovePurchase: NonNullable<
     ComponentProps<typeof EquipmentPickerDrawer>['onRemovePurchase']
   > = useCallback(
     ({ purchaseId, quantity }) => {
-      const patch = buildMagicItemPurchaseRemovalPatch({
-        draft,
-        catalogIndex,
+      applyEquipmentAction({
+        kind: 'remove_purchase_quantity',
         purchaseId,
         quantity,
-        budget,
       })
-      if (patch) onDraftChange(patch)
     },
-    [budget, catalogIndex, draft, onDraftChange],
+    [applyEquipmentAction],
   )
 
   return {

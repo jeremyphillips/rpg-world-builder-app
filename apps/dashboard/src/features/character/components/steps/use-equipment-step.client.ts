@@ -15,24 +15,23 @@ import {
   isStartingGoldOption,
   rebuildPackageSwitchDraftQuantities,
   resolveBuilderStepReadiness,
+  resolveEquipmentAcquisitionBuilderContext,
   resolveEquipmentStepModel,
   resolveStartingEquipmentOptionSummaries,
+  standardStartingWealthTableId,
   type CharacterBuildContext,
   type CharacterBuilderDraft,
   type CharacterClass,
   type ChoiceSet,
   type EquipmentPackageSwitchBlockingReason,
   type EquipmentPackageSwitchInventorySnapshot,
+  type EquipmentStepRemoveTarget,
   type EquipmentStepUnavailableReason,
   type ResolvedStartingEquipmentFunding,
   type StartingPackageConversionPreview,
 } from '@rpg/contracts'
 
 import {
-  buildEquipmentAddPurchasePatch,
-  buildEquipmentRemoveEntryPatch,
-  buildEquipmentSelectionPatch,
-  buildMagicItemAcquisitionPatch,
   choiceSetsForEquipmentStep,
   findStartingEquipmentChoiceSet,
   readEquipmentPurchaseQuantity,
@@ -118,6 +117,15 @@ export function useEquipmentStep(args: {
 
   const classId = draft.class.classId
   const catalogIndex = useMemo(() => indexCharacterBuildCatalog(context.catalog), [context.catalog])
+  const acquisitionContext = useMemo(
+    () =>
+      resolveEquipmentAcquisitionBuilderContext({
+        context,
+        catalogIndex,
+        startingWealthTableId: standardStartingWealthTableId(context.rulesetId),
+      }),
+    [catalogIndex, context],
+  )
   const characterClass = classId ? catalogIndex.classes.get(classId) : undefined
   const equipmentChoiceSets = useMemo(
     () => choiceSetsForEquipmentStep(resolvedChoiceSets),
@@ -252,6 +260,20 @@ export function useEquipmentStep(args: {
     [activePurchaseSourceMode, draft.equipment?.purchases],
   )
 
+  const applyEquipmentAction = (
+    action: Parameters<typeof applyEquipmentStepAction>[0]['action'],
+  ) => {
+    const result = applyEquipmentStepAction({
+      draft,
+      catalogIndex,
+      budget,
+      acquisitionContext,
+      action,
+    })
+    if (result.status === 'applied') onDraftChange(result.patch)
+    return result
+  }
+
   const applySelection = (selection: PendingEquipmentSelection) => {
     if (!classId || !startingEquipmentChoiceSet || !characterClass) {
       if (!characterClass && classId) {
@@ -261,16 +283,12 @@ export function useEquipmentStep(args: {
     }
 
     setBlockedEquipmentActionReason(null)
-    onDraftChange(
-      buildEquipmentSelectionPatch({
-        draft,
-        classId,
-        optionId: selection.optionId,
-        choiceSetId: startingEquipmentChoiceSet.id,
-        nestedSelections: selection.nestedSelections,
-        characterClass,
-      }),
-    )
+    applyEquipmentAction({
+      kind: 'select_package',
+      optionId: selection.optionId,
+      choiceSetId: startingEquipmentChoiceSet.id,
+      nestedSelections: selection.nestedSelections,
+    })
     setIsPackageChooserExpanded(false)
   }
 
@@ -554,46 +572,33 @@ export function useEquipmentStep(args: {
     quantity,
   ) => {
     if (pickerWorkflowMode === 'magic_items') {
-      const patch = buildMagicItemAcquisitionPatch({
-        draft,
-        context,
-        catalogIndex,
+      applyEquipmentAction({
+        kind: 'acquire_magic_item',
         equipmentId: item.equipment.id,
         requestedQuantity: quantity,
       })
-      if (patch) onDraftChange(patch)
       return
     }
 
     if (!showBudget) return
 
-    const patch = buildEquipmentAddPurchasePatch({
-      draft,
-      catalogIndex,
+    applyEquipmentAction({
+      kind: 'add_purchase',
       equipmentId: item.equipment.id,
       sourceMode: resolvePurchaseSourceMode(),
       quantity,
-      budget,
-      context,
     })
-    if (patch) onDraftChange(patch)
   }
 
   const handleSetPurchaseQuantity = (
     target: Parameters<NonNullable<EquipmentStepInventorySectionProps['onSetPurchaseQuantity']>>[0],
     quantity: number,
   ) => {
-    const result = applyEquipmentStepAction({
-      draft,
-      catalogIndex,
-      budget,
-      action: {
-        kind: 'set_purchase_quantity',
-        purchaseId: target.purchaseId,
-        quantity,
-      },
+    applyEquipmentAction({
+      kind: 'set_purchase_quantity',
+      purchaseId: target.purchaseId,
+      quantity,
     })
-    if (result.status === 'applied') onDraftChange(result.patch)
   }
 
   const handleRemoveFromInventory: ComponentProps<
@@ -602,12 +607,10 @@ export function useEquipmentStep(args: {
     const purchaseId = resolveStartingGoldPurchaseId(draft, item.equipment.id)
     if (!purchaseId) return
 
-    onDraftChange(
-      buildEquipmentRemoveEntryPatch({
-        draft,
-        target: { kind: 'purchase', purchaseId },
-      }),
-    )
+    applyEquipmentAction({
+      kind: 'remove_entry',
+      target: { kind: 'purchase', purchaseId },
+    })
   }
 
   const handleRemoveOneFromInventory: ComponentProps<
@@ -625,17 +628,11 @@ export function useEquipmentStep(args: {
       return
     }
 
-    const result = applyEquipmentStepAction({
-      draft,
-      catalogIndex,
-      budget,
-      action: {
-        kind: 'set_purchase_quantity',
-        purchaseId,
-        quantity: currentQuantity - 1,
-      },
+    applyEquipmentAction({
+      kind: 'set_purchase_quantity',
+      purchaseId,
+      quantity: currentQuantity - 1,
     })
-    if (result.status === 'applied') onDraftChange(result.patch)
   }
 
   return {
@@ -697,8 +694,9 @@ export function useEquipmentStep(args: {
     handleRemoveFromInventory,
     handleRemoveOneFromInventory,
     applySelection,
-    onRemoveItem: (target: Parameters<typeof buildEquipmentRemoveEntryPatch>[0]['target']) =>
-      onDraftChange(buildEquipmentRemoveEntryPatch({ draft, target })),
+    skipStartingEquipment: () => applyEquipmentAction({ kind: 'skip_starting_equipment' }),
+    onRemoveItem: (target: EquipmentStepRemoveTarget) =>
+      applyEquipmentAction({ kind: 'remove_entry', target }),
     onNestedPoolChange: (
       optionId: string,
       choiceSetId: string,

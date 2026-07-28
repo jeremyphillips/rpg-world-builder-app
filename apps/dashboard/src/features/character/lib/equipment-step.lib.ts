@@ -11,35 +11,26 @@ import {
   isEquipmentStackable,
   isProficiencyLinkedStartingEquipmentGrant,
   isStartingGoldOption,
-  mergeCompatiblePurchasedEntries,
-  normalizeEquipmentPurchase,
   nestedStartingEquipmentChoiceSetId,
   readSelectedStartingEquipmentOptionId,
   resolveEquipmentPickerItems,
   resolveEquipmentPoolChoiceOptions,
-  resolveEquipmentPurchaseIndex,
   resolveEquipmentPurchaseId,
   resolveEquipmentPurchaseQuantityLimits,
-  resolveEquipmentModeFromOption,
   resolveStartingEquipmentOption,
   startingEquipmentChoiceSetId,
   startingEquipmentGrantProficiencyChoiceId,
   startingEquipmentPackageItemKey,
   STEP_CHOICE_TYPES_BY_STEP,
   wealthToCopper,
-  applyEquipmentPurchaseIntent,
-  applyEquipmentStepAction,
-  applyMagicItemAcquisitionIntent,
   formatInventorySourceSummary,
   getMagicItemRarityLabel,
-  reconcileMagicItemSelections,
   resolveEquipmentAcquisitionBuilderContext,
   resolveEquipmentAcquisitionPlan,
   resolveMagicItemAcquisitionState,
   resolveMagicItemGrantEligibility,
   resolveMagicItemGrantProgressList,
   readMagicItemSelections,
-  upsertMagicItemGrantSelection,
   standardStartingWealthTableId,
   totalSelectedForEquipment,
   type CharacterBuildCatalogIndex,
@@ -56,6 +47,7 @@ import {
   type EquipmentBudgetSummary,
   type EquipmentPickerBrowseSortContext,
   type EquipmentPickerItem,
+  type EquipmentStepRemoveTarget,
   type StartingEquipmentOption,
   type StartingEquipmentOptionSummary,
 } from '@rpg/contracts'
@@ -220,10 +212,7 @@ export function startingEquipmentOptionFundingSummaryLines(
   return lines
 }
 
-export type EquipmentInventoryRemoveTarget =
-  | { kind: 'package'; packageItemKey: string }
-  | { kind: 'purchase'; purchaseId: string }
-  | { kind: 'magicItemGrant'; allowanceId: string; equipmentId: string }
+export type EquipmentInventoryRemoveTarget = EquipmentStepRemoveTarget
 
 export type EquipmentInventoryQuantityTarget = {
   kind: 'purchase'
@@ -518,48 +507,6 @@ export function resolveStartingGoldPurchaseId(
   )
   if (purchaseIndex === -1) return undefined
   return resolveEquipmentPurchaseId(purchases, purchaseIndex)
-}
-
-export function buildEquipmentSkipPatch(): CharacterBuilderDraft['equipment'] {
-  return {
-    mode: 'package',
-    purchases: [],
-    magicItemSelections: [],
-    removedPackageItemKeys: [],
-    customized: false,
-    skipped: true,
-  }
-}
-
-export function buildEquipmentSelectionPatch(args: {
-  draft: CharacterBuilderDraft
-  classId: string
-  optionId: string
-  choiceSetId: string
-  nestedSelections: CharacterBuilderDraft['choiceSelections']
-  characterClass: CharacterClass
-}): Partial<CharacterBuilderDraft> {
-  const { draft, optionId, choiceSetId, nestedSelections, characterClass } = args
-  const option = characterClass.characterCreation?.startingEquipment?.options.find(
-    (entry) => entry.id === optionId,
-  )
-  const mode = option ? resolveEquipmentModeFromOption(option) : 'package'
-
-  return {
-    choiceSelections: {
-      ...draft.choiceSelections,
-      ...nestedSelections,
-      [choiceSetId]: [optionId],
-    },
-    equipment: {
-      mode,
-      purchases: draft.equipment?.purchases ?? [],
-      magicItemSelections: draft.equipment?.magicItemSelections ?? [],
-      removedPackageItemKeys: [],
-      customized: draft.equipment?.customized ?? false,
-      skipped: false,
-    },
-  }
 }
 
 export function shouldShowEquipmentBudget(
@@ -950,30 +897,6 @@ function listPurchaseInventoryRows(args: {
   })
 }
 
-function canIncreasePurchaseQuantity(args: {
-  equipment: Equipment
-  draft: CharacterBuilderDraft
-  equipmentId: string
-  sourceMode: CharacterBuilderDraftEquipmentPurchase['sourceMode']
-  quantity: number
-  budget?: EquipmentBudgetSummary
-}): boolean {
-  const { equipment, draft, equipmentId, sourceMode, quantity, budget } = args
-  if (sourceMode === 'manual') return false
-  if (quantity < 1) return false
-
-  const currentQuantity = readEquipmentPurchaseQuantity(draft, equipmentId, sourceMode)
-  const limits = resolveEquipmentPurchaseQuantityLimits({
-    equipment,
-    sourceMode,
-    budget,
-    currentQuantity,
-    isPurchaseRow: true,
-  })
-
-  return currentQuantity + quantity <= limits.max
-}
-
 function listMagicItemGrantInventoryRows(args: {
   draft: CharacterBuilderDraft
   catalogIndex: CharacterBuildCatalogIndex
@@ -1128,120 +1051,6 @@ export function isMagicItemPickerItemVisible(args: {
   return false
 }
 
-export function buildMagicItemAcquisitionPatch(args: {
-  draft: CharacterBuilderDraft
-  context: CharacterBuildContext
-  catalogIndex: CharacterBuildCatalogIndex
-  equipmentId: string
-  requestedQuantity: number
-}): Partial<CharacterBuilderDraft> | undefined {
-  const { draft, context, catalogIndex, equipmentId, requestedQuantity } = args
-  const equipment = catalogIndex.equipment.get(equipmentId)
-  if (!equipment) return undefined
-
-  const result = applyMagicItemAcquisitionIntent({
-    draft,
-    context: resolveEquipmentAcquisitionContext({ context, catalogIndex }),
-    equipment,
-    requestedQuantity,
-  })
-
-  if (!result.applied) return undefined
-  return { equipment: result.draft.equipment }
-}
-
-export function buildEquipmentPurchaseIntentPatch(args: {
-  draft: CharacterBuilderDraft
-  context: CharacterBuildContext
-  catalogIndex: CharacterBuildCatalogIndex
-  equipmentId: string
-  requestedQuantity: number
-}): Partial<CharacterBuilderDraft> | undefined {
-  const { draft, context, catalogIndex, equipmentId, requestedQuantity } = args
-  const equipment = catalogIndex.equipment.get(equipmentId)
-  if (!equipment) return undefined
-
-  const result = applyEquipmentPurchaseIntent({
-    draft,
-    context: resolveEquipmentAcquisitionContext({ context, catalogIndex }),
-    equipment,
-    requestedQuantity,
-  })
-
-  if (!result.applied) return undefined
-  return { equipment: result.draft.equipment }
-}
-
-export function buildMagicItemGrantReleasePatch(args: {
-  draft: CharacterBuilderDraft
-  allowanceId: string
-  equipmentId: string
-  quantity: number
-}): Partial<CharacterBuilderDraft> | undefined {
-  const { draft, allowanceId, equipmentId, quantity } = args
-  const selections = readMagicItemSelections(draft)
-  const existing = selections.find(
-    (row) => row.allowanceId === allowanceId && row.equipmentId === equipmentId,
-  )
-
-  if (!existing) return undefined
-
-  if (quantity >= existing.quantity) {
-    return buildEquipmentRemoveEntryPatch({
-      draft,
-      target: { kind: 'magicItemGrant', allowanceId, equipmentId },
-    })
-  }
-
-  const current = draft.equipment
-  if (!current) return undefined
-
-  return {
-    equipment: {
-      ...current,
-      magicItemSelections: upsertMagicItemGrantSelection({
-        selections,
-        allowanceId,
-        equipmentId,
-        quantity: existing.quantity - quantity,
-      }),
-    },
-  }
-}
-
-export function buildMagicItemPurchaseRemovalPatch(args: {
-  draft: CharacterBuilderDraft
-  catalogIndex: CharacterBuildCatalogIndex
-  purchaseId: string
-  quantity: number
-  budget?: EquipmentBudgetSummary
-}): Partial<CharacterBuilderDraft> | undefined {
-  const { draft, catalogIndex, purchaseId, quantity, budget } = args
-  const current = draft.equipment
-  if (!current) return undefined
-
-  const purchaseIndex = resolveEquipmentPurchaseIndex(current.purchases, purchaseId)
-  if (purchaseIndex === undefined) return undefined
-
-  const purchase = current.purchases[purchaseIndex]
-  if (!purchase) return undefined
-
-  if (quantity >= purchase.quantity) {
-    return buildEquipmentRemoveEntryPatch({
-      draft,
-      target: { kind: 'purchase', purchaseId },
-    })
-  }
-
-  return buildEquipmentSetPurchaseQuantityPatch({
-    draft,
-    catalogIndex,
-    purchaseId,
-    quantity: purchase.quantity - quantity,
-    budget,
-  })
-}
-
 export function readMagicItemGrantSelection(args: {
   draft: CharacterBuilderDraft
   allowanceId: string
@@ -1353,181 +1162,4 @@ export function listEquipmentInventoryRowsForEquipment(args: {
     args.budget,
     args.context,
   ).filter((row) => row.entry.equipmentId === args.equipmentId)
-}
-
-function upsertEquipmentPurchase(args: {
-  purchases: CharacterBuilderDraftEquipmentPurchase[]
-  equipment: Equipment
-  equipmentId: string
-  sourceMode: CharacterBuilderDraftEquipmentPurchase['sourceMode']
-  quantity: number
-}): CharacterBuilderDraftEquipmentPurchase[] {
-  const { purchases, equipment, equipmentId, sourceMode, quantity } = args
-
-  const normalizedPurchases = purchases.map((_, index) =>
-    normalizeEquipmentPurchase(purchases, index),
-  )
-
-  return mergeCompatiblePurchasedEntries({
-    purchases: normalizedPurchases,
-    incoming: {
-      equipmentId,
-      quantity,
-      sourceMode,
-      origin: 'picker',
-    },
-    equipment,
-  })
-}
-
-function resolveCachedEquipmentMode(
-  draft: CharacterBuilderDraft,
-  catalogIndex: CharacterBuildCatalogIndex,
-): NonNullable<CharacterBuilderDraft['equipment']>['mode'] {
-  if (draft.equipment?.mode) return draft.equipment.mode
-
-  const classId = draft.class.classId
-  if (!classId) return 'package'
-
-  const selectedOptionId = readSelectedStartingEquipmentOptionId(draft, classId)
-  const characterClass = catalogIndex.classes.get(classId)
-  const option = characterClass?.characterCreation?.startingEquipment?.options.find(
-    (entry) => entry.id === selectedOptionId,
-  )
-
-  return option ? resolveEquipmentModeFromOption(option) : 'package'
-}
-
-function buildEquipmentDraftFromPurchase(args: {
-  draft: CharacterBuilderDraft
-  catalogIndex: CharacterBuildCatalogIndex
-  purchases: CharacterBuilderDraftEquipmentPurchase[]
-  sourceMode: CharacterBuilderDraftEquipmentPurchase['sourceMode']
-}): CharacterBuilderDraft['equipment'] {
-  const { draft, catalogIndex, purchases, sourceMode } = args
-
-  return {
-    mode: resolveCachedEquipmentMode(draft, catalogIndex),
-    purchases,
-    removedPackageItemKeys: draft.equipment?.removedPackageItemKeys ?? [],
-    customized: sourceMode === 'manual' ? true : (draft.equipment?.customized ?? false),
-    skipped: false,
-  }
-}
-
-export function buildEquipmentAddPurchasePatch(args: {
-  draft: CharacterBuilderDraft
-  catalogIndex: CharacterBuildCatalogIndex
-  equipmentId: string
-  sourceMode: CharacterBuilderDraftEquipmentPurchase['sourceMode']
-  quantity?: number
-  /** Resolved via `resolveEquipmentStepBudget` when tier bonus or campaign wealth applies. */
-  budget?: EquipmentBudgetSummary
-  context?: CharacterBuildContext
-}): Partial<CharacterBuilderDraft> | undefined {
-  const { draft, catalogIndex, equipmentId, sourceMode, quantity = 1, context } = args
-
-  if (sourceMode === 'startingGold' && context) {
-    return buildEquipmentPurchaseIntentPatch({
-      draft,
-      context,
-      catalogIndex,
-      equipmentId,
-      requestedQuantity: quantity,
-    })
-  }
-
-  const { budget } = args
-  const equipment = catalogIndex.equipment.get(equipmentId)
-
-  if (
-    !equipment ||
-    !canIncreasePurchaseQuantity({
-      equipment,
-      draft,
-      equipmentId,
-      sourceMode,
-      quantity,
-      budget,
-    })
-  ) {
-    return undefined
-  }
-
-  return {
-    equipment: buildEquipmentDraftFromPurchase({
-      draft,
-      catalogIndex,
-      sourceMode,
-      purchases: upsertEquipmentPurchase({
-        purchases: [...(draft.equipment?.purchases ?? [])],
-        equipment,
-        equipmentId,
-        sourceMode,
-        quantity,
-      }),
-    }),
-  }
-}
-
-export function buildEquipmentSetPurchaseQuantityPatch(args: {
-  draft: CharacterBuilderDraft
-  catalogIndex: CharacterBuildCatalogIndex
-  purchaseId: string
-  quantity: number
-  /** Resolved via `resolveEquipmentStepBudget` when tier bonus or campaign wealth applies. */
-  budget?: EquipmentBudgetSummary
-}): Partial<CharacterBuilderDraft> | undefined {
-  const result = applyEquipmentStepAction({
-    draft: args.draft,
-    catalogIndex: args.catalogIndex,
-    budget: args.budget,
-    action: {
-      kind: 'set_purchase_quantity',
-      purchaseId: args.purchaseId,
-      quantity: args.quantity,
-    },
-  })
-
-  if (result.status === 'applied') return result.patch
-  return undefined
-}
-
-export function buildEquipmentRemoveEntryPatch(args: {
-  draft: CharacterBuilderDraft
-  target: EquipmentInventoryRemoveTarget
-}): Partial<CharacterBuilderDraft> {
-  const { draft, target } = args
-  const current = draft.equipment ?? {
-    mode: 'package' as const,
-    purchases: [],
-    removedPackageItemKeys: [],
-    customized: false,
-  }
-
-  if (target.kind === 'package') {
-    return { equipment: current }
-  }
-
-  if (target.kind === 'magicItemGrant') {
-    const next = reconcileMagicItemSelections({
-      draft,
-      remove: [{ allowanceId: target.allowanceId, equipmentId: target.equipmentId }],
-    })
-    return { equipment: next.equipment }
-  }
-
-  const purchaseIndex = resolveEquipmentPurchaseIndex(current.purchases, target.purchaseId)
-  if (purchaseIndex === undefined) {
-    return { equipment: current }
-  }
-
-  const purchases = current.purchases.filter((_, index) => index !== purchaseIndex)
-
-  return {
-    equipment: {
-      ...current,
-      purchases,
-    },
-  }
 }

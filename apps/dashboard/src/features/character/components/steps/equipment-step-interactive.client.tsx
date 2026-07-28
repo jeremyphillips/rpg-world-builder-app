@@ -7,7 +7,6 @@ import type { BuilderStepReadinessState } from '@rpg/contracts'
 import {
   EQUIPMENT_STEP_SWITCH_CONFIRM_DESCRIPTION,
   EQUIPMENT_STEP_SWITCH_CONFIRM_HEADLINE,
-  buildEquipmentSkipPatch,
 } from '../../lib/equipment-step.lib'
 import { showsBuilderStepReviewMessage } from '../../lib/builder-step-readiness.lib'
 import { EquipmentAcquisitionGuidance } from '../equipment/equipment-acquisition-guidance.client'
@@ -34,11 +33,9 @@ type EquipmentStepModel = ReturnType<typeof useEquipmentStep>
 
 function EquipmentStepStartingOptions({
   draft,
-  onDraftChange,
   step,
 }: {
   draft: EquipmentStepInteractiveProps['draft']
-  onDraftChange: EquipmentStepInteractiveProps['onDraftChange']
   step: EquipmentStepModel
 }) {
   if (step.classOptionsReplaced) {
@@ -46,11 +43,7 @@ function EquipmentStepStartingOptions({
   }
 
   if (step.showFallback) {
-    return (
-      <EquipmentStepFallback
-        onContinueWithout={() => onDraftChange({ equipment: buildEquipmentSkipPatch() })}
-      />
-    )
+    return <EquipmentStepFallback onContinueWithout={step.skipStartingEquipment} />
   }
 
   if (step.equipmentChoiceSets.length === 0 || step.summaries.length === 0) {
@@ -137,7 +130,7 @@ export function EquipmentStepInteractive({
           <BuilderStepReadinessPanel state={readiness} />
         ) : null}
 
-        <EquipmentStepStartingOptions draft={draft} onDraftChange={onDraftChange} step={step} />
+        <EquipmentStepStartingOptions draft={draft} step={step} />
 
         {showAcquisitionGuidance ? (
           <EquipmentAcquisitionGuidance

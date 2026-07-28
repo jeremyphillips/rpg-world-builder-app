@@ -9,11 +9,15 @@ import type {
   Equipment,
   EquipmentBudgetSummary,
 } from '@rpg/contracts'
+import {
+  applyEquipmentStepAction,
+  resolveEquipmentAcquisitionBuilderContext,
+  standardStartingWealthTableId,
+} from '@rpg/contracts'
 import { Button, Collapsible, CollapsibleContent, CollapsibleTrigger } from '@rpg/ui'
 
 import {
   EQUIPMENT_INVENTORY_MANAGE_LABEL,
-  buildMagicItemAcquisitionPatch,
   type EquipmentInventoryRow,
 } from '../../lib/equipment-step.lib'
 import type { AddedEquipmentEntryViewModel } from './equipment-inventory-summary.lib'
@@ -149,15 +153,18 @@ export function createStorybookApplyMagicItemAcquisition(args: {
     equipmentId: string
     requestedQuantity: number
   }) => {
-    const patch = buildMagicItemAcquisitionPatch({
+    const result = applyEquipmentStepAction({
       draft: args.draft,
-      context: args.context,
       catalogIndex: args.catalogIndex,
-      equipmentId,
-      requestedQuantity,
+      acquisitionContext: resolveEquipmentAcquisitionBuilderContext({
+        context: args.context,
+        catalogIndex: args.catalogIndex,
+        startingWealthTableId: standardStartingWealthTableId(args.context.rulesetId),
+      }),
+      action: { kind: 'acquire_magic_item', equipmentId, requestedQuantity },
     })
-    if (!patch) return false
-    args.onDraftChange?.(patch)
+    if (result.status !== 'applied') return false
+    args.onDraftChange?.(result.patch)
     return true
   }
 }

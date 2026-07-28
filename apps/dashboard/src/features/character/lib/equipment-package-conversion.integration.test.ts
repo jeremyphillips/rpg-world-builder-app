@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import {
+  applyEquipmentStepAction,
   buildStartingPackageConversionPatch,
   buildStartingPackageConversionPreview,
   createEmptyCharacterBuilderDraft,
@@ -17,7 +18,6 @@ import {
 
 import { buildEquipmentInventoryLayout } from '../components/equipment/equipment-inventory-summary.lib'
 import {
-  buildEquipmentAddPurchasePatch,
   isUniqueEquipmentOwnedInDraft,
   listEquipmentInventoryRowsFromDraft,
 } from './equipment-step.lib'
@@ -203,14 +203,17 @@ describe('equipment package conversion integration', () => {
     expect(
       isUniqueEquipmentOwnedInDraft(convertedDraft, catalogIndex, equipmentStepDaggerFixture.id),
     ).toBe(false)
-    const addMoreDaggers = buildEquipmentAddPurchasePatch({
+    const addMoreDaggers = applyEquipmentStepAction({
       draft: convertedDraft,
       catalogIndex,
-      equipmentId: equipmentStepDaggerFixture.id,
-      sourceMode: 'startingGold',
+      action: {
+        kind: 'add_purchase',
+        equipmentId: equipmentStepDaggerFixture.id,
+        sourceMode: 'startingGold',
+      },
     })
-    if (addMoreDaggers) {
-      const daggerQuantity = (addMoreDaggers.equipment?.purchases ?? [])
+    if (addMoreDaggers.status === 'applied') {
+      const daggerQuantity = (addMoreDaggers.patch.equipment?.purchases ?? [])
         .filter((purchase) => purchase.equipmentId === equipmentStepDaggerFixture.id)
         .reduce((total, purchase) => total + purchase.quantity, 0)
       expect(daggerQuantity).toBeGreaterThan(5)
