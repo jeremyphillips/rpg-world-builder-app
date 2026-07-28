@@ -1,8 +1,11 @@
 import { describe, expect, it } from 'vitest'
 
+import { createPcRecord } from '../../character/character.repository'
 import { makeTestCampaign } from '../../../test/fixtures/campaigns'
+import { minimalStandalonePcInput } from '../../../test/fixtures/characters'
 import { makeTestUser } from '../../../test/fixtures/users'
 import { minimalNpcRequestInput } from '../../../test/fixtures/npcs'
+import { seedCharacterParticipation } from '../../../test/helpers/campaign-participation'
 import { createCampaignNpc, listCampaignNpcs } from './npc.service'
 
 describe('createCampaignNpc', () => {
@@ -26,5 +29,24 @@ describe('createCampaignNpc', () => {
     const npcs = await listCampaignNpcs(campaignId)
     expect(npcs).toHaveLength(1)
     expect(npcs[0]?.character.id).toBe(detail.character.id)
+  })
+})
+
+describe('listCampaignNpcs', () => {
+  it('returns NPCs and ignores open PC participations in the same campaign', async () => {
+    const player = await makeTestUser({ email: 'npc-list-player@example.com' })
+    const { id: campaignId } = await makeTestCampaign({
+      name: 'NPC List Mixed Campaign',
+      owner: await makeTestUser({ email: 'npc-list-owner@example.com' }),
+    })
+
+    const npcDetail = await createCampaignNpc(campaignId, minimalNpcRequestInput)
+    const pc = await createPcRecord(minimalStandalonePcInput, player.id)
+    await seedCharacterParticipation({ campaignId, characterId: pc.id })
+
+    const npcs = await listCampaignNpcs(campaignId)
+
+    expect(npcs).toHaveLength(1)
+    expect(npcs[0]?.character.id).toBe(npcDetail.character.id)
   })
 })

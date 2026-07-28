@@ -89,32 +89,23 @@ export async function listCampaignNpcs(campaignId: string): Promise<CampaignNpcL
   const characters = await findNpcsByIds(participations.map((p) => p.characterId))
   const characterById = new Map(characters.map((npc) => [npc.id, npc]))
 
-  return participations.map((participation) => {
-    const character = characterById.get(participation.characterId)
-    if (!character) {
-      throw new HttpError(
-        500,
-        'integrity_error',
-        `Participation references missing character ${participation.characterId}.`,
-      )
-    }
-    if (character.characterType !== 'npc') {
-      throw new HttpError(
-        500,
-        'integrity_error',
-        `Expected NPC character ${participation.characterId}.`,
-      )
-    }
+  const npcs: CampaignNpcListItem[] = []
 
-    return {
+  for (const participation of participations) {
+    const character = characterById.get(participation.characterId)
+    if (!character) continue
+
+    npcs.push({
       character: toNpcListCharacterSummary(character),
       participation: {
         id: participation.id,
         roster: participation.roster,
         joinedAt: participation.joinedAt,
       },
-    }
-  })
+    })
+  }
+
+  return npcs
 }
 
 export async function getCampaignNpc(
