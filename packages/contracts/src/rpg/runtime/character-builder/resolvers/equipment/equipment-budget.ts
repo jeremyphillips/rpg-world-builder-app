@@ -11,7 +11,7 @@ import {
 } from '../../../../primitives/wealth'
 import type { Equipment } from '../../../../content/equipment'
 import type { CharacterBuildCatalogIndex } from '../../context'
-import type { CharacterBuilderDraft } from '../../draft'
+import type { CharacterBuilderDraft } from '../../draft/draft'
 import {
   deriveEquipmentBudgetSummaryFromFunding,
   resolveSelectedStartingEquipmentFunding,

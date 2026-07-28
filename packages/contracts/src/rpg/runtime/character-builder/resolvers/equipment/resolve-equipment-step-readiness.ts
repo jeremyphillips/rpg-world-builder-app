@@ -2,7 +2,7 @@ import { characterBuilderStepReadinessMessages } from '../../messages/character-
 import type { ChoiceSet } from '../../choice-set'
 import type { CharacterBuildCatalogIndex, CharacterBuildContext } from '../../context'
 import { indexCharacterBuildCatalog } from '../../context'
-import type { CharacterBuilderDraft } from '../../draft'
+import type { CharacterBuilderDraft } from '../../draft/draft'
 import type { BuilderStepReadinessState } from '../../readiness/step-readiness'
 import {
   choiceSetsForStep,

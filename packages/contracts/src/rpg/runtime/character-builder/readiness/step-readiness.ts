@@ -1,6 +1,6 @@
 import type { ChoiceSet } from '../choice-set'
 import type { CharacterBuildContext } from '../context'
-import type { CharacterBuilderDraft } from '../draft'
+import type { CharacterBuilderDraft } from '../draft/draft'
 import { resolveEquipmentStepReadiness } from '../resolvers/equipment/resolve-equipment-step-readiness'
 import { resolveProficienciesStepReadiness } from '../resolvers/proficiency/resolve-proficiencies-step-readiness'
 import { resolveSpellsStepReadiness } from '../resolvers/spellcasting/resolve-spells-step-readiness'

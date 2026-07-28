@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import type { Species } from '../../../content/species'
-import { createEmptyCharacterBuilderDraft } from '../draft'
+import { createEmptyCharacterBuilderDraft } from '../draft/draft'
 import { indexCharacterBuildCatalog } from '../context'
 import { assembleGrantSkillProficiencyEntries } from './assemble-grant-proficiencies'
 import { resolveSpeciesTraitGrantChoiceSets } from '../resolvers/species/resolve-species-trait-grant-choice-sets'

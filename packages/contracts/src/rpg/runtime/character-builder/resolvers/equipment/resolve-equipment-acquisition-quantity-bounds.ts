@@ -1,5 +1,5 @@
 import type { Equipment } from '../../../../content/equipment'
-import type { CharacterBuilderDraft } from '../../draft'
+import type { CharacterBuilderDraft } from '../../draft/draft'
 import type {
   EquipmentAcquisitionBuilderContext,
   EquipmentAcquisitionQuantityBounds,

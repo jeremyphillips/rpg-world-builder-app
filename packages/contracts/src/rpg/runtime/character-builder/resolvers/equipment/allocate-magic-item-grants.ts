@@ -1,4 +1,7 @@
-import type { MagicItemAllowance, MagicItemGrantProgress } from '../../magic-item-selection'
+import type {
+  MagicItemAllowance,
+  MagicItemGrantProgress,
+} from '../../equipment/magic-item-selection'
 import type { EquipmentAcquisitionGrantAllocation } from './equipment-acquisition-types'
 
 export function allocateMagicItemGrantQuantity(args: {

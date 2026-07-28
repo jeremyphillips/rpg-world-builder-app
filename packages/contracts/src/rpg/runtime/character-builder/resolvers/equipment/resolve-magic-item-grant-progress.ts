@@ -7,7 +7,7 @@ import type {
   MagicItemGrantReadiness,
   MagicItemGrantSelection,
   MagicItemSelectionIssue,
-} from '../../magic-item-selection'
+} from '../../equipment/magic-item-selection'
 import { resolveMagicItemDuplicatePolicy } from './resolve-magic-item-duplicate-policy'
 
 export function resolveMagicItemGrantProgress(args: {

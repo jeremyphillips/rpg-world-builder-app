@@ -1,8 +1,8 @@
 import { getMagicItemRarityLabel } from '../../../../vocab/magic-item/rarity'
 import type { CharacterBuildContext } from '../../context'
 import { indexCharacterBuildCatalog } from '../../context'
-import type { CharacterBuilderDraft } from '../../draft'
-import type { MagicItemGrantReadiness } from '../../magic-item-selection'
+import type { CharacterBuilderDraft } from '../../draft/draft'
+import type { MagicItemGrantReadiness } from '../../equipment/magic-item-selection'
 import { resolveMagicItemGrantReadiness } from './resolve-magic-item-grant-progress'
 import { resolveMagicItemAcquisitionState } from './resolve-magic-item-acquisition-state'
 

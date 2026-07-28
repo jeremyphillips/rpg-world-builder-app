@@ -1,7 +1,7 @@
 import type { ContentTrait } from '../../../../content/lib/grants'
 import type { ChoiceSet } from '../../choice-set'
 import type { CharacterBuildCatalogIndex } from '../../context'
-import type { CharacterBuilderDraft } from '../../draft'
+import type { CharacterBuilderDraft } from '../../draft/draft'
 import { resolveSelectedHeritageOptionId } from './resolve-species-heritage-choice-sets'
 import { unlockedGrantChoiceSets } from '../grants/unlocked-grant-choice-sets'
 

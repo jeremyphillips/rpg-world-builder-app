@@ -3,7 +3,7 @@ import { getLanguageLabel } from '../../../../vocab/language'
 import { resolveLanguagesFromChoiceSource } from '../../../creature/languages'
 import { buildChoiceSetId, type ChoiceSet } from '../../choice-set'
 import type { CharacterBuildContext } from '../../context'
-import type { CharacterBuilderDraft } from '../../draft'
+import type { CharacterBuilderDraft } from '../../draft/draft'
 
 // ---------------------------------------------------------------------------
 // Character Builder language ChoiceSets — resolves ruleset origin language

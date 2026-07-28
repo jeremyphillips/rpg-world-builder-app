@@ -2,7 +2,7 @@ import type { CharacterSpellEntry } from '../../character/spells'
 import type { CharacterSelectionSource } from '../../character/selection-sources'
 import type { ChoiceSet } from '../choice-set'
 import type { CharacterBuildContext } from '../context'
-import type { CharacterBuilderDraft } from '../draft'
+import type { CharacterBuilderDraft } from '../draft/draft'
 import { resolveSpellcastingProfile } from '../resolvers/spellcasting/spellcasting-profile'
 
 // ---------------------------------------------------------------------------

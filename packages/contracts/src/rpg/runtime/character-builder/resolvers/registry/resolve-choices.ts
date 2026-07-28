@@ -1,6 +1,6 @@
 import { indexCharacterBuildCatalog } from '../../context'
 import type { CharacterBuildContext } from '../../context'
-import type { CharacterBuilderDraft } from '../../draft'
+import type { CharacterBuilderDraft } from '../../draft/draft'
 import type { ChoiceSet } from '../../choice-set'
 import { CHOICE_SOURCE_RESOLVERS } from './choice-sources'
 

@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest'
 import type { ClassStored } from '../../../content/classes/class'
 import { ORIGIN_LANGUAGES_CHOICE_ID } from '../../../content/character-creation-proficiencies'
 import { LANGUAGE_GRANTS_SOURCE_ID } from '../../character/languages'
-import { createEmptyCharacterBuilderDraft } from '../draft'
+import { createEmptyCharacterBuilderDraft } from '../draft/draft'
 import {
   assembleLanguageProficiencyEntries,
   type CharacterLanguageAssemblyContext,

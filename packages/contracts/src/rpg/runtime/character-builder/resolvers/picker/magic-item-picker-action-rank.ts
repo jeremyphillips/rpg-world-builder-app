@@ -1,5 +1,5 @@
 import type { Equipment } from '../../../../content/equipment'
-import type { CharacterBuilderDraft } from '../../draft'
+import type { CharacterBuilderDraft } from '../../draft/draft'
 import type { EquipmentAcquisitionBuilderContext } from '../equipment/equipment-acquisition-types'
 import { resolveEquipmentAcquisitionQuantityBounds } from '../equipment/resolve-equipment-acquisition-quantity-bounds'
 import { resolveEquipmentPickerRowCapabilities } from '../equipment/resolve-equipment-picker-row-capabilities'

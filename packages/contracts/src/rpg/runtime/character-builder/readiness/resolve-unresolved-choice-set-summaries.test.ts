@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { createEmptyCharacterBuilderDraft } from '../draft'
+import { createEmptyCharacterBuilderDraft } from '../draft/draft'
 import type { ChoiceSet } from '../choice-set'
 import { resolveUnresolvedChoiceSetSummaries } from './resolve-unresolved-choice-set-summaries'
 

@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest'
 import { characterBuilderValidationMessages } from '../messages/character-builder-messages'
 import { formatFieldMessage } from '../../../../validation/define-message'
 import { abilityValidationMessages } from '../../../vocab/ability-messages'
-import { createEmptyCharacterBuilderDraft } from '../draft'
+import { createEmptyCharacterBuilderDraft } from '../draft/draft'
 import { builderTestContext } from '../test-fixtures'
 import {
   validateAbilities,

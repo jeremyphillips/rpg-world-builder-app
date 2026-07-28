@@ -1,6 +1,6 @@
-import type { CharacterBuilderDraft } from '../../draft'
-import type { MagicItemGrantSelection } from '../../magic-item-selection'
-import { magicItemGrantSelectionKey } from '../../magic-item-selection'
+import type { CharacterBuilderDraft } from '../../draft/draft'
+import type { MagicItemGrantSelection } from '../../equipment/magic-item-selection'
+import { magicItemGrantSelectionKey } from '../../equipment/magic-item-selection'
 import { cloneEquipmentDraftChannel } from './equipment-draft-base'
 
 export function reconcileMagicItemSelections(args: {

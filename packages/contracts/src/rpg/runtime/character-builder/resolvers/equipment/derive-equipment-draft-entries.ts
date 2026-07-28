@@ -8,7 +8,10 @@ import {
 } from '../../../character/equipment-inventory'
 import type { CharacterSelectionSource } from '../../../character/selection-sources'
 import type { CharacterBuildCatalogIndex } from '../../context'
-import type { CharacterBuilderDraft, CharacterBuilderDraftEquipmentPurchase } from '../../draft'
+import type {
+  CharacterBuilderDraft,
+  CharacterBuilderDraftEquipmentPurchase,
+} from '../../draft/draft'
 import {
   resolveStartingEquipmentOption,
   type ResolvedStartingEquipmentItem,
@@ -25,7 +28,7 @@ import {
   standardStartingWealthTableId,
   type StartingWealthRules,
 } from '../../../../campaign/rules/starting-wealth'
-import { getBuilderSelectedStartingLevel } from '../../builder-level'
+import { getBuilderSelectedStartingLevel } from '../../progression/builder-level'
 import type { SystemRulesetId } from '../../../../primitives/ruleset'
 
 type EquipmentDraftContext = {

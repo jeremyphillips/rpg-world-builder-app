@@ -19,7 +19,7 @@ import type {
 import { toEquipmentContentId } from '../../../creature/equipment'
 import { buildChoiceSetId } from '../../choice-set'
 import type { CharacterBuildCatalogIndex } from '../../context'
-import type { CharacterBuilderDraft } from '../../draft'
+import type { CharacterBuilderDraft } from '../../draft/draft'
 import {
   nestedStartingEquipmentChoiceSetId,
   readSelectedStartingEquipmentOptionId,

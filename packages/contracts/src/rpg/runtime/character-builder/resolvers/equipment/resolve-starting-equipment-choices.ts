@@ -1,5 +1,5 @@
 import { resolveStartingWealthTierForBuilder } from '../../../../campaign/rules/starting-wealth'
-import { getBuilderSelectedStartingLevel } from '../../builder-level'
+import { getBuilderSelectedStartingLevel } from '../../progression/builder-level'
 import type { ChoiceSourceResolver } from '../registry/choice-source-resolver'
 import { resolveStartingEquipmentChoiceSets } from './resolve-starting-equipment-choice-sets'
 

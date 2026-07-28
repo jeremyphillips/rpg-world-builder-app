@@ -1,10 +1,13 @@
 import type { CharacterBuildCatalogIndex } from '../../context'
-import type { CharacterBuilderDraft, CharacterBuilderDraftEquipmentPurchase } from '../../draft'
+import type {
+  CharacterBuilderDraft,
+  CharacterBuilderDraftEquipmentPurchase,
+} from '../../draft/draft'
 import type {
   EquipmentSourceAllocation,
   ResolvedInventoryEntryView,
 } from './equipment-acquisition-types'
-import type { MagicItemGrantSelection } from '../../magic-item-selection'
+import type { MagicItemGrantSelection } from '../../equipment/magic-item-selection'
 import { readMagicItemSelections } from './resolve-magic-item-grant-progress'
 
 function mergeSourceAllocation(

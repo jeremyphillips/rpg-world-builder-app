@@ -16,8 +16,8 @@ import type { BuilderStep } from './steps'
 import type { CampaignNpcBuildContext, CampaignPcBuildContext } from './context'
 import { createCharacterBuildContext } from './test-fixtures'
 import { CHOICE_TYPES } from './choice-set'
-import { createEmptyCharacterBuilderDraft } from './draft'
-import type { CharacterBuilderDraft } from './draft'
+import { createEmptyCharacterBuilderDraft } from './draft/draft'
+import type { CharacterBuilderDraft } from './draft/draft'
 import type { ChoiceSet } from './choice-set'
 
 // ---------------------------------------------------------------------------

@@ -2,7 +2,7 @@ import { resolveTraitName } from '../../../../content/lib/trait-display'
 import type { Species } from '../../../../content/species'
 import { buildChoiceSetId, type ChoiceSet } from '../../choice-set'
 import type { CharacterBuildCatalogIndex } from '../../context'
-import type { CharacterBuilderDraft } from '../../draft'
+import type { CharacterBuilderDraft } from '../../draft/draft'
 
 export function resolveSelectedHeritageOptionId(
   draft: CharacterBuilderDraft,

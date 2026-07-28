@@ -5,7 +5,7 @@ import { resolveCharacterCreationPatch } from '../../campaign/patches/campaign-c
 import { defaultCampaignMechanicsPatch } from '../../campaign/patches/campaign-mechanics-patch'
 import type { StartingWealthRules } from '../../campaign/rules/starting-wealth'
 import { resolveCharacterOwnershipTarget } from '../character-acquisition'
-import { DEFAULT_ABILITY_GENERATION_RULES } from './ability-generation'
+import { DEFAULT_ABILITY_GENERATION_RULES } from './ability/ability-generation'
 import type {
   CharacterBuildCatalog,
   CharacterBuildContext,

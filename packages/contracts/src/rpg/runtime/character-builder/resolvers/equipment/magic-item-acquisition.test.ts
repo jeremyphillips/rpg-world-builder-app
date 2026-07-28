@@ -5,8 +5,8 @@ import type { ClassStored } from '../../../../content/classes/class'
 import { startingWealthTierSchema } from '../../../../campaign/rules/starting-wealth'
 import { standardStartingWealthTableId } from '../../../../campaign/rules/starting-wealth'
 import { indexCharacterBuildCatalog } from '../../context'
-import { createEmptyCharacterBuilderDraft } from '../../draft'
-import { buildMagicItemAllowanceId } from '../../magic-item-selection'
+import { createEmptyCharacterBuilderDraft } from '../../draft/draft'
+import { buildMagicItemAllowanceId } from '../../equipment/magic-item-selection'
 import {
   applyEquipmentPurchaseIntent,
   applyMagicItemAcquisitionIntent,

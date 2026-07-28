@@ -2,13 +2,13 @@ import { describe, expect, it } from 'vitest'
 
 import type { ClassStored } from '../../../../content/classes/class'
 import { equipmentSchema } from '../../../../content/equipment'
-import { createEmptyCharacterBuilderDraft } from '../../draft'
+import { createEmptyCharacterBuilderDraft } from '../../draft/draft'
 import { indexCharacterBuildCatalog } from '../../context'
 import {
   createEquipmentPackageSwitchInventorySnapshot,
   initPackageSwitchDraftQuantities,
-} from '../../equipment-package-switch'
-import { evaluateEquipmentPackageSwitch } from '../../equipment-package-switch'
+} from '../../equipment/equipment-package-switch'
+import { evaluateEquipmentPackageSwitch } from '../../equipment/equipment-package-switch'
 import { resolveStartingEquipmentFundingOptions } from './resolve-starting-equipment-funding'
 import { startingEquipmentChoiceSetId } from './resolve-starting-equipment-choice-sets'
 import { applyEquipmentStepAction } from './apply-equipment-step-action'

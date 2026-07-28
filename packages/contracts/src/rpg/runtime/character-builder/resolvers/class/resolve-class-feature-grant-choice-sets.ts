@@ -1,6 +1,6 @@
 import type { ChoiceSet } from '../../choice-set'
 import type { CharacterBuildCatalogIndex } from '../../context'
-import type { CharacterBuilderDraft } from '../../draft'
+import type { CharacterBuilderDraft } from '../../draft/draft'
 import { unlockedGrantChoiceSets } from '../grants/unlocked-grant-choice-sets'
 
 /** Builds class feature grant ChoiceSets unlocked at the draft class level. */

@@ -1,9 +1,12 @@
 import type { SystemRulesetId } from '../../../../primitives/ruleset'
 import type { StartingWealthRules } from '../../../../campaign/rules/starting-wealth'
 import type { CharacterBuildCatalogIndex } from '../../context'
-import type { CharacterBuilderDraft } from '../../draft'
+import type { CharacterBuilderDraft } from '../../draft/draft'
 import type { EquipmentBudgetSummary } from './equipment-budget'
-import type { MagicItemAllowance, MagicItemGrantProgress } from '../../magic-item-selection'
+import type {
+  MagicItemAllowance,
+  MagicItemGrantProgress,
+} from '../../equipment/magic-item-selection'
 import type { EquipmentPurchaseAvailability } from './resolve-equipment-purchase-availability'
 
 // ---------------------------------------------------------------------------

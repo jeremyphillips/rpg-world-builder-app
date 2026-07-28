@@ -10,7 +10,7 @@ import type { Spell } from '../../content/spell'
 import type { LanguageSeedOption } from '../../vocab/language'
 import { resolvedCampaignCharacterCreationPatchSchema } from '../../campaign/patches/campaign-character-creation-patch'
 import { resolvedArmorClassSchema } from '../../campaign/patches/campaign-mechanics-patch'
-import { abilityGenerationRulesSchema } from './ability-generation'
+import { abilityGenerationRulesSchema } from './ability/ability-generation'
 import type {
   CharacterAcquisitionChannel,
   CharacterAuthoringSurface,

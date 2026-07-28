@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest'
 import { resolveCharacterCreationPatch } from '../../campaign/patches/campaign-character-creation-patch'
 import { defaultCampaignMechanicsPatch } from '../../campaign/patches/campaign-mechanics-patch'
 import type { StartingWealthRules } from '../../campaign/rules/starting-wealth'
-import { DEFAULT_ABILITY_GENERATION_RULES } from './ability-generation'
+import { DEFAULT_ABILITY_GENERATION_RULES } from './ability/ability-generation'
 import {
   indexCharacterBuildCatalog,
   isCampaignBuildContext,

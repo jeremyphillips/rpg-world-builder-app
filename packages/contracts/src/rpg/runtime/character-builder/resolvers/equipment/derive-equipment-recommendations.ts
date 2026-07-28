@@ -21,7 +21,7 @@ import { equipmentIdMatchesReference } from '../../../creature/equipment-id-matc
 import { listEquipmentMatchingPool, toEquipmentContentId } from '../../../creature/equipment'
 import type { CharacterProficiencies } from '../../../character/proficiencies'
 import type { CharacterBuildCatalogIndex } from '../../context'
-import type { CharacterBuilderDraft } from '../../draft'
+import type { CharacterBuilderDraft } from '../../draft/draft'
 import type { ChoiceSet } from '../../choice-set'
 import { isEquipmentProficient } from './is-equipment-proficient'
 import {

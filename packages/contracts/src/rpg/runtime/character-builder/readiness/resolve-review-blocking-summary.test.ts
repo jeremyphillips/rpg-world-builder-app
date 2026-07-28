@@ -6,8 +6,8 @@ import {
   MINIMAL_TIER_B_ID,
   minimalStartingWealthSeedCoveringStandardMax,
 } from '../../../../test/fixtures/starting-wealth-minimal'
-import { createEmptyCharacterBuilderDraft } from '../draft'
-import { buildMagicItemAllowanceId } from '../magic-item-selection'
+import { createEmptyCharacterBuilderDraft } from '../draft/draft'
+import { buildMagicItemAllowanceId } from '../equipment/magic-item-selection'
 import { resolveReviewBlockingSummary } from './resolve-review-blocking-summary'
 import { builderTestContext } from '../test-fixtures'
 import { magicItemGrantIncompleteIssueCode } from '../resolvers/equipment/resolve-equipment-magic-item-grant-step-issues'

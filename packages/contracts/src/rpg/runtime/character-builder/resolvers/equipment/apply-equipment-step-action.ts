@@ -2,18 +2,18 @@ import type { Equipment } from '../../../../content/equipment'
 import type { StartingWealthRules } from '../../../../campaign/rules/starting-wealth'
 import { resolveEquipmentModeFromOption } from '../../../../content/starting-equipment'
 import type { CharacterBuildCatalogIndex } from '../../context'
-import type { CharacterBuilderDraft } from '../../draft'
+import type { CharacterBuilderDraft } from '../../draft/draft'
 import type {
   EquipmentStepAction,
   EquipmentStepActionIssue,
   EquipmentStepActionResult,
   EquipmentStepRemoveTarget,
-} from '../../equipment-step-action'
+} from '../../equipment/equipment-step-action'
 import {
   mergeCompatiblePurchasedEntries,
   normalizeEquipmentPurchase,
   resolveEquipmentPurchaseIndex,
-} from '../../equipment-purchase'
+} from '../../equipment/equipment-purchase'
 import type { EquipmentAcquisitionBuilderContext } from './equipment-acquisition-types'
 import type { EquipmentBudgetSummary } from './equipment-budget'
 import {

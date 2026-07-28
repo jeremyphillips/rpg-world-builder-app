@@ -1,8 +1,8 @@
 import type { StartingWealthRules } from '../../../../campaign/rules/starting-wealth'
 import type { ChoiceSet } from '../../choice-set'
 import type { CharacterBuildCatalogIndex, CharacterBuildContext } from '../../context'
-import type { CharacterBuilderDraft } from '../../draft'
-import type { EquipmentStepUnavailableReason } from '../../equipment-step-unavailable'
+import type { CharacterBuilderDraft } from '../../draft/draft'
+import type { EquipmentStepUnavailableReason } from '../../equipment/equipment-step-unavailable'
 import type { BuilderStepReadinessState } from '../../readiness/step-readiness'
 import { readSelectedStartingEquipmentOptionId } from './resolve-starting-equipment-choice-sets'
 import {

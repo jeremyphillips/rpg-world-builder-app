@@ -1,6 +1,6 @@
 import type { StartingWealthTier } from '../../../../campaign/rules/starting-wealth'
-import type { MagicItemAllowance } from '../../magic-item-selection'
-import { buildMagicItemAllowanceId } from '../../magic-item-selection'
+import type { MagicItemAllowance } from '../../equipment/magic-item-selection'
+import { buildMagicItemAllowanceId } from '../../equipment/magic-item-selection'
 
 /** Resolves tier magic-item grants into globally stable allowance rows. */
 export function resolveMagicItemGrantAllowances(args: {

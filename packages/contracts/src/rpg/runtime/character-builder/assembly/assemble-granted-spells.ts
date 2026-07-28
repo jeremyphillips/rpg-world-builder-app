@@ -3,7 +3,7 @@ import type { SpellsContentGrant } from '../../../content/lib/grants'
 import type { CharacterSpellAccess, CharacterSpellEntry } from '../../character/spells'
 import type { CharacterSelectionSource } from '../../character/selection-sources'
 import type { CharacterBuildCatalogIndex } from '../context'
-import type { CharacterBuilderDraft } from '../draft'
+import type { CharacterBuilderDraft } from '../draft/draft'
 import { collectSourcedGrants } from './collect-sourced-grants'
 
 // ---------------------------------------------------------------------------

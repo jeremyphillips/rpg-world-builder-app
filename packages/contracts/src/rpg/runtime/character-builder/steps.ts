@@ -4,13 +4,13 @@ import {
   getContentTypeSentenceForm,
   getContentTypeTerm,
 } from '../../content/lib/content-type-terms'
-import { isStandardArrayAssignment, STANDARD_ARRAY } from './ability-generation'
+import { isStandardArrayAssignment, STANDARD_ARRAY } from './ability/ability-generation'
 import { areRequiredChoiceSetsSatisfied } from './choice-set'
 import type { ChoiceSet, ChoiceType } from './choice-set'
 import type { CharacterBuildContext } from './context'
 import { getCharacterBuilderChromeMessages } from './messages/character-builder-chrome-messages'
 import { resolveCharacterBuilderChromeVariant } from './character-builder-chrome-variant'
-import type { CharacterBuilderDraft } from './draft'
+import type { CharacterBuilderDraft } from './draft/draft'
 import {
   CHARACTER_BUILDER_STEP_IDS,
   type CharacterBuilderStepId,

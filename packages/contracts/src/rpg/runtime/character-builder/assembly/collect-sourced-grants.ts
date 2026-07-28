@@ -7,7 +7,7 @@ import {
 import type { Species } from '../../../content/species'
 import type { CharacterSelectionSource } from '../../character/selection-sources'
 import type { CharacterBuildCatalogIndex } from '../context'
-import type { CharacterBuilderDraft } from '../draft'
+import type { CharacterBuilderDraft } from '../draft/draft'
 import { resolveSelectedHeritageOptionId } from '../resolvers/species/resolve-species-heritage-choice-sets'
 
 // ---------------------------------------------------------------------------

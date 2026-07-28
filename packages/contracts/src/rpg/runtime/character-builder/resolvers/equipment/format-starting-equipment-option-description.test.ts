@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest'
 import type { Equipment } from '../../../../content/equipment'
 import type { ClassStored } from '../../../../content/classes/class'
 import { indexCharacterBuildCatalog } from '../../context'
-import { createEmptyCharacterBuilderDraft } from '../../draft'
+import { createEmptyCharacterBuilderDraft } from '../../draft/draft'
 import {
   DEFAULT_STANDARD_EQUIPMENT_LABEL,
   formatStartingEquipmentPackageDescription,

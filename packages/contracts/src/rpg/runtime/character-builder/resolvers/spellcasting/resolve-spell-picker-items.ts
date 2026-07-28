@@ -1,6 +1,6 @@
 import type { Spell } from '../../../../content/spell'
 import type { CharacterBuildContext } from '../../context'
-import type { CharacterBuilderDraft } from '../../draft'
+import type { CharacterBuilderDraft } from '../../draft/draft'
 import {
   PICKER_DISABLED_REASON_SELECTION_FULL,
   type PickerItemStateBase,

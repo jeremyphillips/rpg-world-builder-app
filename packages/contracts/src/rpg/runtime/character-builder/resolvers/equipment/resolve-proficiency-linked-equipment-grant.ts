@@ -3,7 +3,7 @@ import type { CharacterClass } from '../../../../content/classes/class'
 import type { ToolProficiencyChoice } from '../../../../content/lib/proficiency-grant-set'
 import { buildChoiceSetId } from '../../choice-set'
 import type { CharacterBuildCatalogIndex } from '../../context'
-import type { CharacterBuilderDraft } from '../../draft'
+import type { CharacterBuilderDraft } from '../../draft/draft'
 import { resolveToolPoolChoiceOptions } from '../proficiency/resolve-tool-pool-choice-options'
 import type { CreatureProficiencyPoolOption } from '../../../creature/proficiencies'
 

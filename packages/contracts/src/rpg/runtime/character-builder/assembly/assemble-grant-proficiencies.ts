@@ -9,7 +9,7 @@ import type {
   CharacterWeaponProficiencyEntry,
 } from '../../character/proficiencies'
 import type { CharacterBuildCatalogIndex } from '../context'
-import type { CharacterBuilderDraft } from '../draft'
+import type { CharacterBuilderDraft } from '../draft/draft'
 import { collectSourcedGrants } from './collect-sourced-grants'
 
 // ---------------------------------------------------------------------------

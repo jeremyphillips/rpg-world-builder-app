@@ -2,7 +2,7 @@ import type { CharacterClass } from '../../../content/classes/class'
 import type { CharacterToolProficiencyEntry } from '../../character/proficiencies'
 import type { ChoiceSet } from '../choice-set'
 import type { CharacterBuildCatalogIndex } from '../context'
-import type { CharacterBuilderDraft } from '../draft'
+import type { CharacterBuilderDraft } from '../draft/draft'
 import { assembleGrantToolProficiencyEntries } from './assemble-grant-proficiencies'
 import { selectionSourceFromChoiceSet } from './selection-source-from-choice-set'
 

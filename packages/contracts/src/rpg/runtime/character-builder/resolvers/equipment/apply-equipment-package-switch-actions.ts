@@ -5,19 +5,19 @@ import {
   type StartingEquipmentOption,
 } from '../../../../content/starting-equipment'
 import type { CharacterBuildCatalogIndex } from '../../context'
-import type { CharacterBuilderDraft } from '../../draft'
+import type { CharacterBuilderDraft } from '../../draft/draft'
 import type {
   EquipmentStepAction,
   EquipmentStepActionIssue,
   EquipmentStepActionResult,
-} from '../../equipment-step-action'
+} from '../../equipment/equipment-step-action'
 import {
   buildEquipmentPackageSwitchPatch,
   evaluateEquipmentPackageSwitch,
   type EquipmentPackageSwitchBlockingReason,
   type EquipmentPackageSwitchInventorySnapshot,
-} from '../../equipment-package-switch'
-import { buildStartingPackageConversionPatch } from '../../starting-package-conversion'
+} from '../../equipment/equipment-package-switch'
+import { buildStartingPackageConversionPatch } from '../../equipment/starting-package-conversion'
 import { resolveStartingEquipmentFundingOptions } from './resolve-starting-equipment-funding'
 
 type PackageSwitchActionArgs = {

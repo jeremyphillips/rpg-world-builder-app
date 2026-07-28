@@ -4,7 +4,7 @@ import { formatEquipmentPoolLabel } from '../../../../content/lib/equipment-gran
 import type { StartingEquipmentItem } from '../../../../content/starting-equipment'
 import { buildChoiceSetId, type ChoiceSet } from '../../choice-set'
 import type { CharacterBuildCatalogIndex } from '../../context'
-import type { CharacterBuilderDraft } from '../../draft'
+import type { CharacterBuilderDraft } from '../../draft/draft'
 import { resolveEquipmentPoolChoiceOptions } from './equipment-pool-choice-options'
 
 export function startingEquipmentChoiceSetId(classId: string): string {

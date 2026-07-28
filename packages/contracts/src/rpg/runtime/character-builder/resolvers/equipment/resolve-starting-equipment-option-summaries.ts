@@ -19,7 +19,7 @@ import {
 } from '../../../creature/equipment'
 import type { CharacterEquipment } from '../../../character/equipment-inventory'
 import type { CharacterBuildCatalogIndex } from '../../context'
-import type { CharacterBuilderDraft } from '../../draft'
+import type { CharacterBuilderDraft } from '../../draft/draft'
 import {
   characterWealthFromGrant,
   inventoryBucketForEquipment,

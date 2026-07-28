@@ -3,7 +3,7 @@ import { canPurchaseEquipment } from '../../../../content/equipment/can-purchase
 import { isEquipmentStackable } from '../../../../content/equipment/stackable'
 import { formatMoney } from '../../../../primitives/units'
 import { copperToDisplayWealth, formatWealth } from '../../../../primitives/wealth'
-import type { CharacterBuilderDraftEquipmentPurchase } from '../../draft'
+import type { CharacterBuilderDraftEquipmentPurchase } from '../../draft/draft'
 import { moneyToCopper, wealthToCopper, type EquipmentBudgetSummary } from './equipment-budget'
 import { maxAffordablePurchaseQuantity } from './resolve-equipment-purchase-availability'
 

@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
-import { finalizeCharacterBuild } from '../runtime/character-builder/finalize'
-import { createEmptyCharacterBuilderDraft } from '../runtime/character-builder/draft'
+import { finalizeCharacterBuild } from '../runtime/character-builder/finalize/finalize'
+import { createEmptyCharacterBuilderDraft } from '../runtime/character-builder/draft/draft'
 import { builderTestContext } from '../runtime/character-builder/test-fixtures'
 import { campaignOnboardingContextSchema } from './campaign-onboarding-dtos'
 import { completeCampaignOnboardingInputSchema } from '../runtime/campaign-onboarding-completion-input'
