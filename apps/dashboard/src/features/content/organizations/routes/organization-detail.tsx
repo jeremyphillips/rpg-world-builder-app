@@ -17,7 +17,7 @@ import { ContentStatusNameBadge } from '../../lib/overview/content-status-name-b
 import { OrganizationConnectedCharactersSection } from '../components/organization-connected-characters-section.client'
 import { useOrganizationConnectedCharacters } from '../hooks/use-organization-connected-characters'
 import { useOrganizations } from '../hooks/use-organizations'
-import { buildOrganizationMemberCards } from '../lib/build-organization-member-cards'
+import { buildOrganizationConnectedCharacterCards } from '../lib/build-organization-connected-character-cards'
 import {
   buildOrganizationDetailViewModel,
   ORGANIZATION_EMPTY_SECTION_TEXT,
@@ -34,7 +34,7 @@ export function OrganizationDetailContent({
   const connectedCharactersQuery = useOrganizationConnectedCharacters(campaignId, organization.id)
   const viewModel = useMemo(() => {
     const connectedCharacters = connectedCharactersQuery.data
-      ? buildOrganizationMemberCards(connectedCharactersQuery.data, { campaignId })
+      ? buildOrganizationConnectedCharacterCards(connectedCharactersQuery.data, { campaignId })
       : {
           previewItems: [],
           total: 0,
@@ -64,6 +64,8 @@ export function OrganizationDetailContent({
       >
         <OrganizationConnectedCharactersSection
           connectedCharacters={viewModel.connectedCharacters}
+          isPending={connectedCharactersQuery.isPending}
+          isError={connectedCharactersQuery.isError}
         />
       </ContentDetailLayout>
     </WidePage>

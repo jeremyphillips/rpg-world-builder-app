@@ -1,11 +1,11 @@
 import { describe, expect, it } from 'vitest'
 
-import { buildOrganizationMemberCards } from './build-organization-member-cards'
+import { buildOrganizationConnectedCharacterCards } from './build-organization-connected-character-cards'
 
-describe('buildOrganizationMemberCards', () => {
-  it('maps member summaries to preview items with campaign detail hrefs', () => {
+describe('buildOrganizationConnectedCharacterCards', () => {
+  it('maps connected character summaries to preview items with campaign detail hrefs', () => {
     expect(
-      buildOrganizationMemberCards(
+      buildOrganizationConnectedCharacterCards(
         {
           items: [
             {

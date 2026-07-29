@@ -11,11 +11,12 @@ import { makeTestCampaign } from '../../../test/fixtures/campaigns'
 import { useIntegrationApp } from '../../../test/setup/integration-app'
 import { useIntegrationDb } from '../../../test/setup/integration-db'
 import { attachCharacterToCampaign, createCampaignNpc } from '../../campaign'
+import { CampaignCharacterParticipationModel } from '../../campaign/participation/campaign-character-participation.model'
 import { CharacterModel, createPcRecord } from '../../character'
 import { getContentCharacterUsageMatcher } from '../lib/content-character-usage/content-character-usage-matchers'
 import { createHomebrewContent } from '../lib/content-write.service'
 import { organizationWriteConfig } from './organizations.config'
-import { resolveOrganizationMembers } from './resolve-organization-members'
+import { resolveOrganizationConnectedCharacters } from './resolve-organization-connected-characters'
 
 const getApp = useIntegrationApp()
 
@@ -26,6 +27,9 @@ const minimalOrganizationInput = {
   name: 'Iron Circle',
   organizationKind: 'military',
 } as const
+
+const connectedCharactersPath = (campaignId: string, organizationId: string) =>
+  `/api/campaigns/${campaignId}/content/organizations/${organizationId}/connected-characters?page=1&pageSize=4`
 
 async function setOrganizationConnection(characterId: string, organizationId: string) {
   await CharacterModel.collection.updateOne(
@@ -40,7 +44,7 @@ async function setOrganizationConnection(characterId: string, organizationId: st
   )
 }
 
-describe('resolveOrganizationMembers', () => {
+describe('resolveOrganizationConnectedCharacters', () => {
   it('returns PC and NPC hits with pagination totals', async () => {
     const campaign = await makeTestCampaign()
     const organization = await createHomebrewContent(
@@ -64,7 +68,7 @@ describe('resolveOrganizationMembers', () => {
       setOrganizationConnection(npc.id, organization.id),
     ])
 
-    const pageOne = await resolveOrganizationMembers({
+    const pageOne = await resolveOrganizationConnectedCharacters({
       campaignId: campaign.id,
       organizationId: organization.id,
       page: 1,
@@ -84,7 +88,7 @@ describe('resolveOrganizationMembers', () => {
       total: 2,
     })
 
-    const pageTwo = await resolveOrganizationMembers({
+    const pageTwo = await resolveOrganizationConnectedCharacters({
       campaignId: campaign.id,
       organizationId: organization.id,
       page: 2,
@@ -103,7 +107,7 @@ describe('resolveOrganizationMembers', () => {
     )
 
     await expect(
-      resolveOrganizationMembers({
+      resolveOrganizationConnectedCharacters({
         campaignId: campaign.id,
         organizationId: organization.id,
         page: 1,
@@ -116,13 +120,43 @@ describe('resolveOrganizationMembers', () => {
     const campaign = await makeTestCampaign()
 
     await expect(
-      resolveOrganizationMembers({
+      resolveOrganizationConnectedCharacters({
         campaignId: campaign.id,
         organizationId: '000000000000000000000000',
         page: 1,
         pageSize: 4,
       }),
     ).resolves.toBeNull()
+  })
+
+  it('excludes characters whose open participation has closed', async () => {
+    const campaign = await makeTestCampaign()
+    const organization = await createHomebrewContent(
+      organizationWriteConfig,
+      campaign.id,
+      minimalOrganizationInput,
+    )
+    const pc = await createPcRecord(minimalStandalonePcInput, campaign.owner.id)
+    await attachCharacterToCampaign({
+      campaignId: campaign.id,
+      characterId: pc.id,
+      joinedAt: new Date().toISOString(),
+    })
+    await setOrganizationConnection(pc.id, organization.id)
+
+    await CampaignCharacterParticipationModel.updateOne(
+      { campaignId: campaign.id, characterId: pc.id },
+      { $set: { leftAt: new Date() } },
+    )
+
+    await expect(
+      resolveOrganizationConnectedCharacters({
+        campaignId: campaign.id,
+        organizationId: organization.id,
+        page: 1,
+        pageSize: 4,
+      }),
+    ).resolves.toEqual({ items: [], total: 0 })
   })
 
   it('sorts by normalized name then id', async () => {
@@ -156,7 +190,7 @@ describe('resolveOrganizationMembers', () => {
       setOrganizationConnection(beta.id, organization.id),
     ])
 
-    const result = await resolveOrganizationMembers({
+    const result = await resolveOrganizationConnectedCharacters({
       campaignId: campaign.id,
       organizationId: organization.id,
       page: 1,
@@ -185,7 +219,7 @@ describe('resolveOrganizationMembers', () => {
     await setOrganizationConnection(npc.id, organization.id)
 
     await expect(
-      resolveOrganizationMembers({
+      resolveOrganizationConnectedCharacters({
         campaignId: campaign.id,
         organizationId: organization.id,
         page: 1,
@@ -214,12 +248,12 @@ describe('organization connected characters routes', () => {
   it('requires authentication', async () => {
     await request(getApp())
       .get(
-        '/api/campaigns/000000000000000000000000/content/organizations/000000000000000000000001/members',
+        '/api/campaigns/000000000000000000000000/content/organizations/000000000000000000000001/connected-characters',
       )
       .expect(401)
   })
 
-  it('returns connected characters for campaign members', async () => {
+  it('returns connected characters for authenticated campaign users', async () => {
     const { agent, csrfToken } = await registerAndLoginTestUser(getApp())
     const campaignId = await createTestCampaign(agent, csrfToken)
 
@@ -237,9 +271,7 @@ describe('organization connected characters routes', () => {
     await setOrganizationConnection(npc.id, organizationId)
 
     const res = await agent
-      .get(
-        `/api/campaigns/${campaignId}/content/organizations/${organizationId}/members?page=1&pageSize=4`,
-      )
+      .get(connectedCharactersPath(campaignId, organizationId))
       .set(CSRF_HEADER, csrfToken)
       .expect(200)
 
@@ -259,9 +291,7 @@ describe('organization connected characters routes', () => {
     const campaignId = await createTestCampaign(agent, csrfToken)
 
     await agent
-      .get(
-        `/api/campaigns/${campaignId}/content/organizations/000000000000000000000000/members?page=1&pageSize=4`,
-      )
+      .get(connectedCharactersPath(campaignId, '000000000000000000000000'))
       .set(CSRF_HEADER, csrfToken)
       .expect(404)
   })
@@ -289,21 +319,19 @@ describe('organization connected characters routes', () => {
     const organizationId = createRes.body.organizations.id as string
 
     await other.agent
-      .get(
-        `/api/campaigns/${otherCampaignId}/content/organizations/${organizationId}/members?page=1&pageSize=4`,
-      )
+      .get(connectedCharactersPath(otherCampaignId, organizationId))
       .set(CSRF_HEADER, other.csrfToken)
       .expect(404)
   })
 
-  it('denies unauthenticated campaign outsiders', async () => {
+  it('denies campaign outsiders', async () => {
     const owner = await registerAndLoginTestUser(getApp(), {
-      email: 'members-owner@example.com',
+      email: 'connected-owner@example.com',
       password: 'supersecret',
       displayName: 'Owner',
     })
     const outsider = await registerAndLoginTestUser(getApp(), {
-      email: 'members-outsider@example.com',
+      email: 'connected-outsider@example.com',
       password: 'supersecret',
       displayName: 'Outsider',
     })
@@ -318,14 +346,12 @@ describe('organization connected characters routes', () => {
     const organizationId = createRes.body.organizations.id as string
 
     await outsider.agent
-      .get(
-        `/api/campaigns/${campaignId}/content/organizations/${organizationId}/members?page=1&pageSize=4`,
-      )
+      .get(connectedCharactersPath(campaignId, organizationId))
       .set(CSRF_HEADER, outsider.csrfToken)
       .expect(403)
   })
 
-  it('allows observer campaign members to read connected characters', async () => {
+  it('allows observer campaign roles to read connected characters', async () => {
     const owner = await registerAndLoginTestUser(getApp(), {
       email: 'observer-owner@example.com',
       password: 'supersecret',
@@ -342,14 +368,12 @@ describe('organization connected characters routes', () => {
     const organizationId = createRes.body.organizations.id as string
     const observer = await registerCampaignMember(getApp(), {
       campaignId,
-      email: 'observer-member@example.com',
+      email: 'observer-user@example.com',
       campaignRole: 'observer',
     })
 
     await observer.agent
-      .get(
-        `/api/campaigns/${campaignId}/content/organizations/${organizationId}/members?page=1&pageSize=4`,
-      )
+      .get(connectedCharactersPath(campaignId, organizationId))
       .set(CSRF_HEADER, observer.csrfToken)
       .expect(200)
   })

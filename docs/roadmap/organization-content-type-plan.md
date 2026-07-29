@@ -407,20 +407,20 @@ pagination, and performance design.
 5. Do not add organizations to the permanent builder preview rail in V1.
    Reconsider only when connection mechanics or repeated in-builder decisions
    make persistent preview materially useful.
-6. ~~Do not query or display reverse organization membership in V1.~~ Reverse
-   connected-character display shipped in the membership UI slice (see §9).
+6. ~~Do not query or display reverse organization connected characters in V1.~~ Reverse
+   connected-character display shipped in the connected-characters UI slice (see §9).
 
-### 9. Membership relationship display — complete
+### 9. Connected-character relationship display — complete
 
 Bidirectional organization relationship display for campaign surfaces:
 
 - **Character → organization:** compact **Organizations** row below roster/vital
   on campaign PC and NPC detail routes (saved-reference aware links).
 - **Organization → characters:** **Connected characters** section on organization
-  detail with server-paginated preview (`page=1`, `pageSize=4`) and plain `+ N
-more` truncation copy.
+  detail with server-paginated preview (`page=1`, `pageSize=4`), count copy
+  (`N connected character(s)`), and plain `+ N more` truncation copy.
 
-**API:** `GET /api/campaigns/:campaignId/content/organizations/:organizationId/members`
+**API:** `GET /api/campaigns/:campaignId/content/organizations/:organizationId/connected-characters`
 
 **Participation scope (v1):** open campaign participations only — same participant
 scope as content usage blockers. Includes PCs and NPCs whose saved sheet still

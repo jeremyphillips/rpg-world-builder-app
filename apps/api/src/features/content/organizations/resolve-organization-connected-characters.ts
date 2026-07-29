@@ -5,7 +5,7 @@ import { resolveCatalogForCampaign } from '../content.service'
 import { organizationWriteConfig } from './organizations.config'
 import { resolveCharacterReferences } from '../lib/content-character-references/resolve-character-references'
 
-export async function resolveOrganizationMembers(input: {
+export async function resolveOrganizationConnectedCharacters(input: {
   campaignId: string
   organizationId: string
   page: number

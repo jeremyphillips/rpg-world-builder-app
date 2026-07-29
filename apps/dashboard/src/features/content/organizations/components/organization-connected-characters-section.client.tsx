@@ -1,20 +1,27 @@
 'use client'
 
+import { CharacterListCardPreview } from '@/features/character'
 import { Heading, Text } from '@rpg/ui'
 
-import { CharacterListCardPreview } from '@/features/character/components/character-list-card-preview.client'
-
+import { ORGANIZATION_CONNECTED_CHARACTERS_LOAD_ERROR } from '../lib/organization-connected-characters.constants'
 import {
+  formatConnectedCharactersCount,
   ORGANIZATION_SECTION_LABELS,
   type OrganizationConnectedCharactersViewModel,
 } from '../lib/organization-display'
 
 export type OrganizationConnectedCharactersSectionProps = {
   connectedCharacters: OrganizationConnectedCharactersViewModel
+  isPending?: boolean
+  isError?: boolean
+  errorText?: string
 }
 
 export function OrganizationConnectedCharactersSection({
   connectedCharacters,
+  isPending = false,
+  isError = false,
+  errorText = ORGANIZATION_CONNECTED_CHARACTERS_LOAD_ERROR,
 }: OrganizationConnectedCharactersSectionProps) {
   const { previewItems, total, emptyText } = connectedCharacters
 
@@ -24,10 +31,17 @@ export function OrganizationConnectedCharactersSection({
         {ORGANIZATION_SECTION_LABELS.connectedCharacters}
       </Heading>
 
-      {total === 0 ? (
+      {isPending ? (
+        <Text variant="muted">Loading…</Text>
+      ) : isError ? (
+        <Text variant="muted">{errorText}</Text>
+      ) : total === 0 ? (
         <Text variant="muted">{emptyText}</Text>
       ) : (
-        <CharacterListCardPreview items={previewItems} total={total} />
+        <div className="space-y-3">
+          <Text variant="muted">{formatConnectedCharactersCount(total)}</Text>
+          <CharacterListCardPreview items={previewItems} total={total} />
+        </div>
       )}
     </section>
   )

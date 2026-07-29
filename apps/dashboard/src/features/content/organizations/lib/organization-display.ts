@@ -4,8 +4,6 @@ import {
   type Organization,
 } from '@rpg/contracts'
 
-import type { CharacterListCardPreviewItem } from '@/features/character/components/character-list-card.lib'
-
 import type { ContentStatRowData } from '../../lib/detail/content-stat-rows'
 
 export const ORGANIZATION_SECTION_LABELS = {
@@ -13,11 +11,16 @@ export const ORGANIZATION_SECTION_LABELS = {
 } as const
 
 export const ORGANIZATION_EMPTY_SECTION_TEXT = {
-  connectedCharacters: 'No characters are connected to this organization.',
+  connectedCharacters: 'No connected characters yet.',
 } as const
 
+export type OrganizationConnectedCharacterPreviewItem = {
+  card: { id: string; name: string; summary: string }
+  detailHref: string
+}
+
 export type OrganizationConnectedCharactersViewModel = {
-  previewItems: CharacterListCardPreviewItem[]
+  previewItems: OrganizationConnectedCharacterPreviewItem[]
   total: number
   emptyText: string
 }
@@ -26,6 +29,10 @@ export type OrganizationDetailViewModel = {
   statRows: ContentStatRowData[]
   description?: string
   connectedCharacters: OrganizationConnectedCharactersViewModel
+}
+
+export function formatConnectedCharactersCount(total: number): string {
+  return `${total} connected character${total === 1 ? '' : 's'}`
 }
 
 export function buildOrganizationDetailViewModel(
