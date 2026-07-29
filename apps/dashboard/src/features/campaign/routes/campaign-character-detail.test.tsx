@@ -95,4 +95,29 @@ describe('CampaignCharacterDetail', () => {
 
     expect(screen.getByRole('button', { name: 'Delete' })).toBeInTheDocument()
   })
+
+  it('shows campaign permission errors from the detail hook', () => {
+    useCampaignCharacterDetail.mockReturnValue({
+      campaignCharacter: undefined,
+      viewModel: null,
+      organizationReferences: undefined,
+      isPending: false,
+      isError: true,
+      errorLabel: 'You do not have permission to view this character.',
+    })
+
+    renderWithProviders(
+      <Routes>
+        <Route
+          path="/campaigns/:campaignId/characters/:characterId"
+          element={<CampaignCharacterDetail />}
+        />
+      </Routes>,
+      { initialEntries: ['/campaigns/camp-1/characters/char-sample-1'] },
+    )
+
+    expect(screen.getByRole('alert')).toHaveTextContent(
+      'You do not have permission to view this character.',
+    )
+  })
 })

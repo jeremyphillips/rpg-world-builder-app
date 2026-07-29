@@ -11,10 +11,8 @@ import { NarrowPage } from '@/components/layout/narrow-page'
 import { useBuildContext } from '../hooks/use-build-context'
 import { useCharacters } from '../hooks/use-characters'
 import { buildCharacterCardViewModel } from '../lib/display/character-display'
-import {
-  CHARACTERS_INDEX_SECTION_LABELS,
-  resolvePersonalCharacterDetailHref,
-} from '../lib/character-list-routing'
+import { CHARACTERS_INDEX_SECTION_LABELS } from '../lib/character-list-routing'
+import { resolveCharacterDetailHref } from '@/lib/routing/resolve-character-detail-href'
 import { resolveQueryErrorLabel } from '../lib/resolve-query-error-label.lib'
 
 const CHARACTERS_EMPTY_MESSAGE = 'No characters yet. Create one to get started.'
@@ -77,7 +75,7 @@ export function CharactersOverview() {
 
     for (const character of characters) {
       const card = buildCharacterCardViewModel(character, catalogIndex)
-      const detailHref = resolvePersonalCharacterDetailHref(character)
+      const detailHref = resolveCharacterDetailHref(character)
 
       if (character.routeContext.kind === 'campaign') {
         inCampaigns.push({

@@ -2,6 +2,8 @@ import type { ReferencingCharacterSummary } from '@rpg/contracts'
 
 import { ROUTES } from '@/app/routes'
 
+import { resolveCharacterDetailHref } from './resolve-character-detail-href'
+
 /** Resolves campaign-context detail links for mixed PC/NPC character summaries. */
 export function resolveCampaignCharacterDetailHref(
   routeContext: { campaignId: string },
@@ -11,5 +13,9 @@ export function resolveCampaignCharacterDetailHref(
     return ROUTES.campaign.npcs.detail(routeContext.campaignId, member.character.id)
   }
 
-  return ROUTES.campaign.characters.detail(routeContext.campaignId, member.character.id)
+  return resolveCharacterDetailHref({
+    scope: 'campaign',
+    campaignId: routeContext.campaignId,
+    characterId: member.character.id,
+  })
 }
