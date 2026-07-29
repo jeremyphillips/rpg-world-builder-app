@@ -19,7 +19,7 @@ type TestFilterState = {
 
 describe('content-overview-filter-schema', () => {
   it('builds shared overview filters in schema order', () => {
-    const schema = buildContentFilterSchema<Row, TestFilterState>([
+    const schema = buildContentFilterSchema<Row, TestFilterState>('classes', [
       createEqualsFilter<Row, TestFilterState, 'hitDie', string>({
         id: 'hitDie',
         label: 'Hit Die',
@@ -38,28 +38,24 @@ describe('content-overview-filter-schema', () => {
   })
 
   it('filters rows through the composed schema', () => {
-    const schema = buildContentFilterSchema<Row, TestFilterState>([])
+    const schema = buildContentFilterSchema<Row, TestFilterState>('classes', [])
 
-    const filtered = applyFilterSchema(
-      schema,
-      { name: 'wiz', campaignAvailability: 'all' },
-      [
-        {
-          name: 'Wizard',
-          source: 'system',
-          status: 'published',
-          hitDie: 6,
-          campaignAccess: DEFAULT_CONTENT_CAMPAIGN_ACCESS,
-        },
-        {
-          name: 'Fighter',
-          source: 'system',
-          status: 'published',
-          hitDie: 10,
-          campaignAccess: DEFAULT_CONTENT_CAMPAIGN_ACCESS,
-        },
-      ],
-    )
+    const filtered = applyFilterSchema(schema, { name: 'wiz', campaignAvailability: 'all' }, [
+      {
+        name: 'Wizard',
+        source: 'system',
+        status: 'published',
+        hitDie: 6,
+        campaignAccess: DEFAULT_CONTENT_CAMPAIGN_ACCESS,
+      },
+      {
+        name: 'Fighter',
+        source: 'system',
+        status: 'published',
+        hitDie: 10,
+        campaignAccess: DEFAULT_CONTENT_CAMPAIGN_ACCESS,
+      },
+    ])
 
     expect(filtered.map((row) => row.name)).toEqual(['Wizard'])
   })

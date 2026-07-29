@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import type { ClassListItem, WithCampaignAccess } from '@rpg/contracts'
 import type { ColumnDef } from '@rpg/ui'
+import type * as RpgUiModule from '@rpg/ui'
 import type { ComponentProps } from 'react'
 import { createMemoryRouter, RouterProvider } from 'react-router-dom'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
@@ -14,11 +15,12 @@ import {
 import { buildContentColumns } from './content-table-config'
 import { ContentOverviewTable } from './content-overview-table.client'
 import { persistContentOverviewPreferences } from './content-overview-preferences'
+import type * as ContentOverviewPreferencesModule from './content-overview-preferences'
 
 let dataTableRenderCount = 0
 
 vi.mock('@rpg/ui', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('@rpg/ui')>()
+  const actual = await importOriginal<typeof RpgUiModule>()
   const ActualDataTable = actual.DataTable
 
   return {
@@ -41,7 +43,7 @@ vi.mock('./use-content-viewer', () => ({
 }))
 
 vi.mock('./content-overview-preferences', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('./content-overview-preferences')>()
+  const actual = await importOriginal<typeof ContentOverviewPreferencesModule>()
   return {
     ...actual,
     persistContentOverviewPreferences: vi.fn(actual.persistContentOverviewPreferences),
@@ -71,6 +73,7 @@ const columns = buildContentColumns<ClassListItem>(
     },
   ],
   {
+    contentType: 'classes',
     nameHref: (row) => `/classes/${row.id}`,
   },
 ) as ColumnDef<ClassRow, unknown>[]

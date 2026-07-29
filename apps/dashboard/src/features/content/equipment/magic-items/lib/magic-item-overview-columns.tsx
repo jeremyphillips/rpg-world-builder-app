@@ -10,10 +10,7 @@ import type { ColumnDef } from '@rpg/ui'
 import { createEqualsFilter } from '@rpg/ui/filters'
 
 import { ROUTES } from '@/app/routes'
-import {
-  buildContentColumns,
-  costColumn,
-} from '../../../lib/overview/content-table-config'
+import { buildContentColumns, costColumn } from '../../../lib/overview/content-table-config'
 import {
   buildContentFilterSchema,
   type ContentOverviewBaseFilterState,
@@ -64,7 +61,7 @@ const MAGIC_ITEM_MIDDLE_COLUMNS: ColumnDef<MagicItemEquipment>[] = [
 export const magicItemFilterSchema = buildContentFilterSchema<
   MagicItemRow,
   MagicItemOverviewFilterState
->([
+>('equipment', [
   createEqualsFilter<MagicItemRow, MagicItemOverviewFilterState, 'rarity', string>({
     id: 'rarity',
     label: 'Rarity',
@@ -88,6 +85,7 @@ export const magicItemFilterSchema = buildContentFilterSchema<
 /** Magic item column definitions with the name cell linked to the detail page. */
 export function magicItemColumns(campaignId: string) {
   return buildContentColumns<MagicItemEquipment>(MAGIC_ITEM_MIDDLE_COLUMNS, {
+    contentType: 'equipment',
     nameHref: (row) => ROUTES.content.equipment.detail(campaignId, 'magic-items', row.id),
   })
 }

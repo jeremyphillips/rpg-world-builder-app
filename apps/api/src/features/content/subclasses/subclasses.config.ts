@@ -62,11 +62,13 @@ async function validateSubclassBeforeWrite(ctx: ContentWriteContext): Promise<vo
 
 export const subclassContentConfig: ContentTypeConfig<Subclass> = {
   type: 'subclasses',
-  loadSystem: loadSeedSubclasses,
-  systemSlugs: seedSubclassSlugs,
-  loadPatches: async (campaignId) => {
-    const docs = await SubclassPatchModel.find({ campaignId }).lean<SubclassPatchRecord[]>()
-    return docs.map<OverlayPatch>((d) => ({ targetId: d.targetId, patch: d.patch }))
+  system: {
+    load: loadSeedSubclasses,
+    slugs: seedSubclassSlugs,
+    loadPatches: async (campaignId) => {
+      const docs = await SubclassPatchModel.find({ campaignId }).lean<SubclassPatchRecord[]>()
+      return docs.map<OverlayPatch>((d) => ({ targetId: d.targetId, patch: d.patch }))
+    },
   },
   loadHomebrew: async (campaignId, rulesetId) => {
     const docs = await HomebrewSubclassModel.find({ campaignId, rulesetId }).lean<

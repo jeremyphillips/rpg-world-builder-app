@@ -637,6 +637,10 @@ Register the catalog subpath in [`packages/catalog/package.json`](../packages/ca
 `exports` and add a manifest entry in
 [`tools/content-types/src/content-type-integration-manifest.ts`](../tools/content-types/src/content-type-integration-manifest.ts).
 
+When a type intentionally has no bundled system records, do not create an empty
+seed package for symmetry. Declare `catalog: { bundledContent: 'none' }` in the
+integration manifest and omit the API config's `system` capability.
+
 ### 3. Catalog seed tests (`packages/catalog/src/<type>/index.test.ts`)
 
 Assert:
@@ -686,21 +690,31 @@ interface <TypeName>PatchRecord {
 
 export const <type>ContentConfig: ContentTypeConfig<<TypeName>> = {
   type: '<kebab-plural>',
-  loadSystem: loadSeed<TypeName>s,
-  systemSlugs: seed<TypeName>Slugs,
-  loadPatches: async (campaignId) => {
-    const docs = await <TypeName>PatchModel.find({ campaignId }).lean<<TypeName>PatchRecord[]>()
-    return docs.map<OverlayPatch>((d) => ({ targetId: d.targetId, patch: d.patch }))
+  system: {
+    load: loadSeed<TypeName>s,
+    slugs: seed<TypeName>Slugs,
+    loadPatches: async (campaignId) => {
+      const docs = await <TypeName>PatchModel.find({ campaignId }).lean<<TypeName>PatchRecord[]>()
+      return docs.map<OverlayPatch>((d) => ({ targetId: d.targetId, patch: d.patch }))
+    },
   },
   loadHomebrew: async (_campaignId, _rulesetId) => [],  // replace when homebrew lands
 }
 ```
 
-If patch support isn't needed yet, use a stub for `loadPatches`:
+For a campaign-authored type with no bundled catalog, omit `system`:
 
 ```typescript
-loadPatches: async (_campaignId) => [],
+export const <type>ContentConfig: ContentTypeConfig<<TypeName>> = {
+  type: '<kebab-plural>',
+  loadHomebrew: async (campaignId, rulesetId) => {
+    // load campaign-owned records
+  },
+}
 ```
+
+Types without bundled system content omit the entire system capability and
+therefore do not need a patch loader.
 
 ### 6. Registry (`apps/api/src/features/content/content-types.ts`)
 

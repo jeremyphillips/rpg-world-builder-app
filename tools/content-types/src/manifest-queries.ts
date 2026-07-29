@@ -54,10 +54,18 @@ export function contentTypeKeysWithCatalogPackage(): Array<{
 }> {
   return integrationManifestEntries()
     .flatMap(([key, entry]) => {
-      const packageName = entry.catalog?.packageName
-      return packageName ? [{ key, packageName }] : []
+      return entry.catalog.bundledContent === 'bundled'
+        ? [{ key, packageName: entry.catalog.packageName }]
+        : []
     })
     .sort((a, b) => a.key.localeCompare(b.key))
+}
+
+export function contentTypeKeysWithoutBundledContent(): ContentTypeKey[] {
+  return integrationManifestEntries()
+    .filter(([, entry]) => entry.catalog.bundledContent === 'none')
+    .map(([key]) => key)
+    .sort()
 }
 
 /** Maps `@rpg/catalog/<segment>` to `packages/catalog/src/<segment>`. */

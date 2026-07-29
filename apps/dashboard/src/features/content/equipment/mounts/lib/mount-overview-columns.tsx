@@ -3,10 +3,7 @@ import type { ColumnDef } from '@rpg/ui'
 import { SortableHeader } from '@rpg/ui'
 
 import { ROUTES } from '@/app/routes'
-import {
-  buildContentColumns,
-  costColumn,
-} from '../../../lib/overview/content-table-config'
+import { buildContentColumns, costColumn } from '../../../lib/overview/content-table-config'
 import {
   buildContentFilterSchema,
   type ContentOverviewBaseFilterState,
@@ -29,11 +26,15 @@ const MOUNT_MIDDLE_COLUMNS: ColumnDef<MountEquipment>[] = [
   costColumn<MountEquipment>(),
 ]
 
-export const mountFilterSchema = buildContentFilterSchema<MountRow, MountOverviewFilterState>([])
+export const mountFilterSchema = buildContentFilterSchema<MountRow, MountOverviewFilterState>(
+  'equipment',
+  [],
+)
 
 /** Mount column definitions with the name cell linked to the detail page. */
 export function mountColumns(campaignId: string) {
   return buildContentColumns<MountEquipment>(MOUNT_MIDDLE_COLUMNS, {
+    contentType: 'equipment',
     nameHref: (row) => ROUTES.content.equipment.detail(campaignId, 'mounts', row.id),
   })
 }

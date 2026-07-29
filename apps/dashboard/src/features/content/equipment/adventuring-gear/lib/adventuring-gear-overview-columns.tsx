@@ -10,10 +10,7 @@ import type { ColumnDef } from '@rpg/ui'
 import { createEqualsFilter } from '@rpg/ui/filters'
 
 import { ROUTES } from '@/app/routes'
-import {
-  buildContentColumns,
-  costColumn,
-} from '../../../lib/overview/content-table-config'
+import { buildContentColumns, costColumn } from '../../../lib/overview/content-table-config'
 import {
   buildContentFilterSchema,
   type ContentOverviewBaseFilterState,
@@ -53,7 +50,7 @@ const ADVENTURING_GEAR_MIDDLE_COLUMNS: ColumnDef<AdventuringGearEquipment>[] = [
 export const adventuringGearFilterSchema = buildContentFilterSchema<
   AdventuringGearRow,
   AdventuringGearOverviewFilterState
->([
+>('equipment', [
   createEqualsFilter<AdventuringGearRow, AdventuringGearOverviewFilterState, 'gearKind', string>({
     id: 'gearKind',
     label: 'Gear kind',
@@ -68,6 +65,7 @@ export const adventuringGearFilterSchema = buildContentFilterSchema<
 /** Adventuring gear column definitions with the name cell linked to the detail page. */
 export function adventuringGearColumns(campaignId: string) {
   return buildContentColumns<AdventuringGearEquipment>(ADVENTURING_GEAR_MIDDLE_COLUMNS, {
+    contentType: 'equipment',
     nameHref: (row) => ROUTES.content.equipment.detail(campaignId, 'adventuring-gear', row.id),
   })
 }

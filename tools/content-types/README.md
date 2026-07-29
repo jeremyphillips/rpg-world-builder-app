@@ -19,6 +19,19 @@ drift tests and future scaffolding — **not** imported by runtime apps.
 Do not put schemas, loaders, route functions, or capability objects in the
 manifest. Metadata strings and booleans only.
 
+## Bundled catalog metadata
+
+Every entry declares whether it ships system records:
+
+```typescript
+catalog: { bundledContent: 'bundled', packageName: '@rpg/catalog/spells' }
+catalog: { bundledContent: 'none' }
+```
+
+`packageName` is required only for `bundledContent: 'bundled'`. Types whose
+normal records are campaign-authored do not need fake empty seed packages;
+catalog export and path drift checks skip `bundledContent: 'none'`.
+
 ## Nested resources
 
 The manifest covers registered top-level `ContentTypeKey` values only. Nested

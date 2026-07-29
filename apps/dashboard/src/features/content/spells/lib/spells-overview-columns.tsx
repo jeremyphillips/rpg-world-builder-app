@@ -94,7 +94,7 @@ function buildSpellsFilterSchema(spellSchoolVocabulary: SpellSchoolVocabulary | 
       }))
     : []
 
-  return buildContentFilterSchema<SpellRow, SpellsOverviewFilterState>([
+  return buildContentFilterSchema<SpellRow, SpellsOverviewFilterState>('spells', [
     createEqualsFilter<SpellRow, SpellsOverviewFilterState, 'level', string>({
       id: 'level',
       label: 'Level',
@@ -122,6 +122,7 @@ function buildSpellsFilterSchema(spellSchoolVocabulary: SpellSchoolVocabulary | 
 /** Spell column definitions with the name cell linked to the detail page. */
 export function spellsColumns(campaignId: string, spellSchoolVocabulary?: SpellSchoolVocabulary) {
   return buildContentColumns<Spell>(buildSpellsMiddleColumns(spellSchoolVocabulary), {
+    contentType: 'spells',
     nameHref: (row) => ROUTES.content.spells.detail(campaignId, row.id),
   })
 }

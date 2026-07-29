@@ -6,6 +6,7 @@ export {
 export {
   catalogPackageNameToSrcPath,
   contentTypeKeysWithCatalogPackage,
+  contentTypeKeysWithoutBundledContent,
   contentTypeKeysWithFormDefinition,
   contentTypeKeysWithRequiredCapabilities,
   contentTypeKeysWithRouteSection,

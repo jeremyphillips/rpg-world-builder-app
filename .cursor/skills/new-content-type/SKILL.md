@@ -46,11 +46,11 @@ Full checklist and file matrix → [reference.md](./reference.md). Policy depth
 1. **Contracts** — add `ContentTypeKey` to `CONTENT_TYPE_KEYS`, `CONTENT_TYPE_TERMS`, and `CONTENT_TYPE_CAPABILITIES` when duplication applies.
 2. **Integration manifest** — add entry in [`CONTENT_TYPE_INTEGRATION_MANIFEST`](../../../tools/content-types/src/content-type-integration-manifest.ts) (`satisfies Record<ContentTypeKey, …>` enforces completeness).
 3. **Contracts schema** — `packages/contracts/src/rpg/content/<type>.ts` + barrel export + co-located tests.
-4. **Catalog seed** — `packages/catalog/src/<type>/` JSON + `loadSeed*` exports + `index.test.ts`; register in `packages/catalog/package.json` exports.
-5. **API** — `*.config.ts` importing `@rpg/catalog/<type>` + one line in `content-types.ts`.
+4. **Catalog capability** — set manifest `catalog.bundledContent`; only bundled types add `packages/catalog/src/<type>/` JSON, loaders, tests, and package exports. Do not create empty seed packages for campaign-authored types.
+5. **API** — `*.config.ts` with an optional `system` capability for bundled content + one line in `content-types.ts`.
 6. **Dashboard** — sub-area folder: list/detail routes, `*-display.ts` view model, form def (if authoring), lazy routes, `CONTENT_ROUTES`, router tree.
    - Before `*-overview-columns.tsx`: run [Overview table UX](#overview-table-ux) if the user did not specify columns or filters.
-7. **Manifest flags** — set `dashboard.formDefinitionPath`, `visibleInSidebar`, `routeSection`, `catalog.packageName` as applicable.
+7. **Manifest flags** — set `dashboard.formDefinitionPath`, `visibleInSidebar`, `routeSection`, and `catalog.bundledContent`; add `catalog.packageName` only for bundled content.
 8. **Form test registry** — side-effect import in [`content-form-test-registry.ts`](../../../apps/dashboard/src/features/content/lib/forms/content-form-test-registry.ts) (tests only — keep route-local production imports).
 9. **Gates** — run [drift tests](#required-gates) for every touched layer.
 
@@ -187,14 +187,15 @@ Plus pre-commit affected scope per [`AGENTS.md`](../../../AGENTS.md).
 
 ## Common failure modes
 
-| Symptom                             | Likely cause                                                                   |
-| ----------------------------------- | ------------------------------------------------------------------------------ |
-| Form drift test fails               | Forgot `content-form-test-registry.ts` import or manifest `formDefinitionPath` |
-| Sidebar test fails                  | `visibleInSidebar: true` missing or `VISIBLE_SIDEBAR_CONTENT` entry omitted    |
-| Manifest compile error              | New key in `CONTENT_TYPE_KEYS` without manifest entry                          |
-| Type silently skipped in form tests | Duplicate side-effect imports removed but test registry not updated            |
-| Production bundle bloat             | Imported `content-form-test-registry.ts` from runtime code — **never**         |
-| Overview table feels wrong          | Built columns/filters without user input — should have prompted first          |
+| Symptom                               | Likely cause                                                                   |
+| ------------------------------------- | ------------------------------------------------------------------------------ |
+| Form drift test fails                 | Forgot `content-form-test-registry.ts` import or manifest `formDefinitionPath` |
+| Sidebar test fails                    | `visibleInSidebar: true` missing or `VISIBLE_SIDEBAR_CONTENT` entry omitted    |
+| Manifest compile error                | New key in `CONTENT_TYPE_KEYS` without manifest entry                          |
+| Empty catalog package with no records | Use `catalog.bundledContent: 'none'` and omit the API `system` capability      |
+| Type silently skipped in form tests   | Duplicate side-effect imports removed but test registry not updated            |
+| Production bundle bloat               | Imported `content-form-test-registry.ts` from runtime code — **never**         |
+| Overview table feels wrong            | Built columns/filters without user input — should have prompted first          |
 
 **Rule:** Runtime registries are authoritative. The integration manifest is metadata for drift tests only — no schemas, loaders, or route functions in tooling.
 

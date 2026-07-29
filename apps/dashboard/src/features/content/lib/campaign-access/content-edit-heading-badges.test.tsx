@@ -14,6 +14,7 @@ function renderBadges(options: {
 }) {
   return render(
     <ContentEditHeadingBadges
+      contentType="classes"
       source={options.source}
       status={options.status}
       campaignAccess={options.campaignAccess ?? DEFAULT_CONTENT_CAMPAIGN_ACCESS}

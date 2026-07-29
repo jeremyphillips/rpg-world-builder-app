@@ -50,12 +50,14 @@ function speciesMiddleColumns(): ColumnDef<Species>[] {
 }
 
 const emptySpeciesFilterSchema = buildContentFilterSchema<SpeciesRow, SpeciesOverviewFilterState>(
+  'species',
   [],
 )
 
 /** Species column definitions with the name cell linked to the species detail page. */
 export function speciesColumns(campaignId: string) {
   return buildContentColumns<Species>(speciesMiddleColumns(), {
+    contentType: 'species',
     nameHref: (row) => ROUTES.content.species.detail(campaignId, row.id),
   })
 }

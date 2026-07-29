@@ -49,13 +49,15 @@ function bodyFromCreateInput(input: Record<string, unknown>): Record<string, unk
 
 export const skillProficiencyContentConfig: ContentTypeConfig<SkillProficiency> = {
   type: 'skill-proficiencies',
-  loadSystem: loadSeedSkillProficiencies,
-  systemSlugs: seedSkillProficiencySlugs,
-  loadPatches: async (campaignId) => {
-    const docs = await SkillProficiencyPatchModel.find({ campaignId }).lean<
-      SkillProficiencyPatchRecord[]
-    >()
-    return docs.map<OverlayPatch>((d) => ({ targetId: d.targetId, patch: d.patch }))
+  system: {
+    load: loadSeedSkillProficiencies,
+    slugs: seedSkillProficiencySlugs,
+    loadPatches: async (campaignId) => {
+      const docs = await SkillProficiencyPatchModel.find({ campaignId }).lean<
+        SkillProficiencyPatchRecord[]
+      >()
+      return docs.map<OverlayPatch>((d) => ({ targetId: d.targetId, patch: d.patch }))
+    },
   },
   loadHomebrew: async (campaignId, rulesetId) => {
     const docs = await HomebrewSkillProficiencyModel.find({ campaignId, rulesetId }).lean<

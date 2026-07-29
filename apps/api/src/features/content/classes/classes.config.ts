@@ -61,11 +61,13 @@ function prepareHomebrewUpdate(
 
 export const classContentConfig: ContentTypeConfig<CharacterClass> = {
   type: 'classes',
-  loadSystem: (rulesetId) => loadSeedClassesStored(rulesetId) as CharacterClass[],
-  systemSlugs: seedClassSlugs,
-  loadPatches: async (campaignId) => {
-    const docs = await ClassPatchModel.find({ campaignId }).lean<ClassPatchRecord[]>()
-    return docs.map<OverlayPatch>((d) => ({ targetId: d.targetId, patch: d.patch }))
+  system: {
+    load: (rulesetId) => loadSeedClassesStored(rulesetId) as CharacterClass[],
+    slugs: seedClassSlugs,
+    loadPatches: async (campaignId) => {
+      const docs = await ClassPatchModel.find({ campaignId }).lean<ClassPatchRecord[]>()
+      return docs.map<OverlayPatch>((d) => ({ targetId: d.targetId, patch: d.patch }))
+    },
   },
   loadHomebrew: async (campaignId, rulesetId) => {
     const docs = await HomebrewClassModel.find({ campaignId, rulesetId }).lean<

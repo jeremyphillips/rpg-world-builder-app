@@ -7,6 +7,7 @@ import {
   CONTENT_TYPE_INTEGRATION_MANIFEST,
   catalogPackageNameToSrcPath,
   contentTypeKeysWithCatalogPackage,
+  contentTypeKeysWithoutBundledContent,
   contentTypeKeysWithFormDefinition,
   contentTypeKeysWithRequiredCapabilities,
   contentTypeKeysWithRouteSection,
@@ -58,6 +59,13 @@ describe('CONTENT_TYPE_INTEGRATION_MANIFEST', () => {
       const srcPath = join(repoRoot, catalogPackageNameToSrcPath(packageName))
       expect(existsSync(srcPath), `${key} catalog package missing: ${packageName}`).toBe(true)
     }
+  })
+
+  it('only requires packages for entries with bundled content', () => {
+    expect(contentTypeKeysWithoutBundledContent()).toEqual([])
+    expect(contentTypeKeysWithCatalogPackage().map(({ key }) => key)).toEqual(
+      [...CONTENT_TYPE_KEYS].sort(),
+    )
   })
 
   it('declares form definitions for every type with dashboard authoring today', () => {

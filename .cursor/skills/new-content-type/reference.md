@@ -16,8 +16,8 @@ patterns, and vocab rules → [`docs/content-types.md`](../../../docs/content-ty
 | 1    | Contracts | `<type>.ts` schema, inputs, patch DTOs, tests, barrel export                                                                                              |
 | 1b   | Contracts | `CONTENT_TYPE_TERMS` entry; vocab maps if closed sets                                                                                                     |
 | 1c   | Contracts | `CONTENT_TYPE_CAPABILITIES` when duplication applies                                                                                                      |
-| 2    | Catalog   | Seed JSON under `packages/catalog/src/<type>/data/srd-cc-5.2.1/`                                                                                          |
-| 3    | Catalog   | `index.ts` loaders + `index.test.ts`; `package.json` export                                                                                               |
+| 2    | Catalog   | Declare `catalog.bundledContent`; bundled types add seed JSON under `packages/catalog/src/<type>/data/srd-cc-5.2.1/`                                      |
+| 3    | Catalog   | Bundled types only: `index.ts` loaders + `index.test.ts`; `package.json` export. No-bundle types omit the package.                                        |
 | 4    | API       | Patch/homebrew Mongoose models when needed                                                                                                                |
 | 5    | API       | `<type>.config.ts` — imports `@rpg/catalog/<type>`                                                                                                        |
 | 6    | API       | One line in `content-types.ts`                                                                                                                            |
@@ -97,7 +97,9 @@ Source: [`content-type-integration-manifest.ts`](../../../tools/content-types/sr
 
 ```typescript
 type ContentTypeIntegrationManifestEntry = {
-  catalog?: { packageName: string } // @rpg/catalog/<segment>
+  catalog:
+    | { bundledContent: 'bundled'; packageName: string } // @rpg/catalog/<segment>
+    | { bundledContent: 'none' }
   api: { registrationPath: string } // repo-relative *.config.ts
   dashboard?: {
     folder: string // content feature subfolder

@@ -7,10 +7,15 @@ import type { ContentTypeKey } from '@rpg/contracts'
  * registries remain authoritative — do not import executable config here.
  */
 export type ContentTypeIntegrationManifestEntry = {
-  /** Present when system seed ships from @rpg/catalog. */
-  catalog?: {
-    packageName: string
-  }
+  /** Whether this type ships system records from an @rpg/catalog package. */
+  catalog:
+    | {
+        bundledContent: 'bundled'
+        packageName: string
+      }
+    | {
+        bundledContent: 'none'
+      }
   /** Always required for registered top-level types. */
   api: {
     registrationPath: string
@@ -37,7 +42,7 @@ export type ContentTypeIntegrationManifestEntry = {
  */
 export const CONTENT_TYPE_INTEGRATION_MANIFEST = {
   classes: {
-    catalog: { packageName: '@rpg/catalog/classes' },
+    catalog: { bundledContent: 'bundled', packageName: '@rpg/catalog/classes' },
     api: {
       registrationPath: 'apps/api/src/features/content/classes/classes.config.ts',
     },
@@ -50,7 +55,7 @@ export const CONTENT_TYPE_INTEGRATION_MANIFEST = {
     capabilities: { required: true },
   },
   spells: {
-    catalog: { packageName: '@rpg/catalog/spells' },
+    catalog: { bundledContent: 'bundled', packageName: '@rpg/catalog/spells' },
     api: {
       registrationPath: 'apps/api/src/features/content/spells/spells.config.ts',
     },
@@ -63,7 +68,7 @@ export const CONTENT_TYPE_INTEGRATION_MANIFEST = {
     capabilities: { required: true },
   },
   species: {
-    catalog: { packageName: '@rpg/catalog/species' },
+    catalog: { bundledContent: 'bundled', packageName: '@rpg/catalog/species' },
     api: {
       registrationPath: 'apps/api/src/features/content/species/species.config.ts',
     },
@@ -76,7 +81,7 @@ export const CONTENT_TYPE_INTEGRATION_MANIFEST = {
     capabilities: { required: true },
   },
   feats: {
-    catalog: { packageName: '@rpg/catalog/feats' },
+    catalog: { bundledContent: 'bundled', packageName: '@rpg/catalog/feats' },
     api: {
       registrationPath: 'apps/api/src/features/content/feats/feats.config.ts',
     },
@@ -89,7 +94,7 @@ export const CONTENT_TYPE_INTEGRATION_MANIFEST = {
     capabilities: { required: true },
   },
   equipment: {
-    catalog: { packageName: '@rpg/catalog/equipment' },
+    catalog: { bundledContent: 'bundled', packageName: '@rpg/catalog/equipment' },
     api: {
       registrationPath: 'apps/api/src/features/content/equipment/equipment.config.ts',
     },
@@ -102,7 +107,10 @@ export const CONTENT_TYPE_INTEGRATION_MANIFEST = {
     capabilities: { required: true },
   },
   'skill-proficiencies': {
-    catalog: { packageName: '@rpg/catalog/skill-proficiencies' },
+    catalog: {
+      bundledContent: 'bundled',
+      packageName: '@rpg/catalog/skill-proficiencies',
+    },
     api: {
       registrationPath:
         'apps/api/src/features/content/skill-proficiencies/skill-proficiencies.config.ts',

@@ -19,7 +19,7 @@ export function assertSupportedRulesetId(rulesetId: string): asserts rulesetId i
 /** System seed catalog for one content type — no campaign patches or homebrew. */
 export function listSystemContentForRuleset(type: ContentTypeName, rulesetId: SystemRulesetId) {
   const config = getContentTypeConfig(type)
-  return [...config.loadSystem(rulesetId)]
+  return [...(config.system?.load(rulesetId) ?? [])]
 }
 
 export function isRulesetContentType(type: string): type is ContentTypeName {
