@@ -120,6 +120,7 @@ export async function authorizeCampaignCharacterAccess(input: {
       capabilities: {
         canEdit: resolved.canEdit,
         canManage: resolved.canManage,
+        canDelete: resolved.canDelete,
       },
     },
   }

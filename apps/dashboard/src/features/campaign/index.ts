@@ -34,6 +34,7 @@ export {
   mapRulesetPatchToMechanicsValues,
   defaultMechanicsValues,
 } from './lib/rules/mechanics/mechanics-form-values'
+export { useCampaignCharacter, campaignCharacterQueryKey } from './hooks/use-campaign-character'
 export { useCampaignRules } from './hooks/use-campaign-rules'
 export { useCampaigns, campaignsQueryKey } from './hooks/use-campaigns'
 export { useCampaignTemplates, campaignTemplatesQueryKey } from './hooks/use-campaign-templates'

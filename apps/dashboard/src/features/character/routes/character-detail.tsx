@@ -8,12 +8,13 @@ import { WidePage } from '@/components/layout/wide-page'
 
 import { CharacterDetailContent } from '../components/detail/character-detail-content.client'
 import { CharacterVitalSummary } from '../components/detail/character-vital-summary.client'
+import { StandaloneCharacterRedirectGuard } from '../components/standalone-character-redirect-guard.client'
 import { useBuildContext } from '../hooks/use-build-context'
 import { useCharacter } from '../hooks/use-character'
 import { buildCharacterDetailViewModel } from '../lib/display/character-display'
 import { resolveQueryErrorLabel } from '../lib/resolve-query-error-label.lib'
 
-export function CharacterDetail() {
+function CharacterDetailBody() {
   const { characterId } = useParams<{ characterId: string }>()
   const {
     data: character,
@@ -59,9 +60,18 @@ export function CharacterDetail() {
           <CharacterDetailContent
             viewModel={viewModel}
             statusSummary={<CharacterVitalSummary vital={viewModel.identity.vital} />}
+            showDelete
           />
         ) : null}
       </PageLoadState>
     </WidePage>
+  )
+}
+
+export function CharacterDetail() {
+  return (
+    <StandaloneCharacterRedirectGuard>
+      <CharacterDetailBody />
+    </StandaloneCharacterRedirectGuard>
   )
 }

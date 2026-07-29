@@ -90,7 +90,11 @@ describe('GET /api/campaigns/:campaignId/characters/:characterId', () => {
       .expect(200)
 
     expect(response.body.character.id).toBe(playerCharacterId)
-    expect(response.body.capabilities).toEqual({ canEdit: true, canManage: true })
+    expect(response.body.capabilities).toEqual({
+      canEdit: true,
+      canManage: true,
+      canDelete: false,
+    })
     expect(response.body.participation.roster.status).toBe('active')
   })
 
@@ -126,7 +130,11 @@ describe('GET /api/campaigns/:campaignId/characters/:characterId', () => {
       .expect(200)
 
     expect(response.body.character.id).toBe(ownerCharacterId)
-    expect(response.body.capabilities).toEqual({ canEdit: false, canManage: false })
+    expect(response.body.capabilities).toEqual({
+      canEdit: false,
+      canManage: false,
+      canDelete: false,
+    })
   })
 
   it('returns 200 for an observer viewing an open-participating PC', async () => {
@@ -154,7 +162,11 @@ describe('GET /api/campaigns/:campaignId/characters/:characterId', () => {
       .expect(200)
 
     expect(response.body.character.id).toBe(characterId)
-    expect(response.body.capabilities).toEqual({ canEdit: false, canManage: false })
+    expect(response.body.capabilities).toEqual({
+      canEdit: false,
+      canManage: false,
+      canDelete: false,
+    })
   })
 
   it('returns 403 for a non-member', async () => {

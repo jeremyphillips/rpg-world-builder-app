@@ -2,10 +2,13 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 
 import type { CompleteCampaignOnboardingInput } from '@rpg/contracts'
 
+import { charactersQueryKey } from '@/features/character'
+
 import {
   completeCampaignOnboarding,
   fetchCampaignEligibleCharacters,
 } from '../api/campaign-onboarding-client'
+import { campaignCharacterQueryKey } from './use-campaign-character'
 import { campaignsQueryKey } from './use-campaigns'
 import { campaignMembersQueryKey } from './use-campaign-members'
 import { campaignOnboardingContextQueryKey } from './use-campaign-onboarding-context'
@@ -38,6 +41,10 @@ export function useCompleteCampaignOnboarding(campaignId: string | undefined) {
         queryClient.invalidateQueries({ queryKey: campaignMembersQueryKey(result.campaignId) }),
         queryClient.invalidateQueries({ queryKey: campaignPartyQueryKey(result.campaignId) }),
         queryClient.invalidateQueries({ queryKey: campaignsQueryKey }),
+        queryClient.invalidateQueries({ queryKey: charactersQueryKey }),
+        queryClient.invalidateQueries({
+          queryKey: campaignCharacterQueryKey(result.campaignId, result.characterId),
+        }),
       ])
     },
   })

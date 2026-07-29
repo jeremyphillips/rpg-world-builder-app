@@ -1,64 +1,21 @@
-import { useMemo } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { type SystemRulesetId } from '@rpg/contracts'
-import { getStandardXpProgression } from '@rpg/catalog/xp-progressions'
 import { Heading } from '@rpg/ui'
 
 import { ROUTES } from '@/app/routes'
 import { PageLoadState } from '@/components/layout/page-load-state'
 import { WidePage } from '@/components/layout/wide-page'
+import { CampaignCharacterStatusSummary } from '@/features/character/components/detail/campaign-character-status-summary.client'
 import { CharacterDetailContent } from '@/features/character/components/detail/character-detail-content.client'
 import { CharacterOrganizationsSummary } from '@/features/character/components/detail/character-organizations-summary.client'
-import { CharacterVitalSummary } from '@/features/character/components/detail/character-vital-summary.client'
-import { useBuildContext } from '@/features/character/hooks/use-build-context'
-import { useCharacter } from '@/features/character/hooks/use-character'
-import { useCharacterOrganizationReferences } from '@/features/character/hooks/use-character-organization-references'
-import { buildCharacterDetailViewModel } from '@/features/character/lib/display/character-display'
-import { resolveQueryErrorLabel } from '@/features/character/lib/resolve-query-error-label.lib'
+
+import { useCampaignCharacterDetail } from '../hooks/use-campaign-character-detail'
 import { useCampaigns } from '../hooks/use-campaigns'
 
 export function CampaignCharacterDetail() {
   const { campaignId, characterId } = useParams<{ campaignId: string; characterId: string }>()
   const { data: campaigns } = useCampaigns()
   const campaign = campaigns?.find((entry) => entry.id === campaignId)
-
-  const {
-    data: character,
-    isPending: isCharacterPending,
-    isError: isCharacterError,
-    error: characterError,
-  } = useCharacter(characterId)
-  const {
-    catalogIndex,
-    context,
-    isPending: isCatalogPending,
-    isError: isCatalogError,
-    error: catalogError,
-  } = useBuildContext(character?.rulesetId as SystemRulesetId | undefined)
-  const organizationReferencesQuery = useCharacterOrganizationReferences(campaignId, characterId)
-
-  const viewModel = useMemo(() => {
-    if (!character || !catalogIndex || !context) return null
-
-    return buildCharacterDetailViewModel({
-      character,
-      catalogIndex,
-      rules: context.characterCreationRules,
-      xpProgression: getStandardXpProgression(character.rulesetId as SystemRulesetId),
-      organizationReferences: organizationReferencesQuery.data,
-    })
-  }, [catalogIndex, character, context, organizationReferencesQuery.data])
-
-  const isPending =
-    isCharacterPending ||
-    organizationReferencesQuery.isPending ||
-    Boolean(character && isCatalogPending)
-  const isError = isCharacterError || isCatalogError || organizationReferencesQuery.isError
-  const errorLabel = resolveQueryErrorLabel([
-    { isPending: isCharacterPending, isError: isCharacterError, error: characterError },
-    { isPending: isCatalogPending, isError: isCatalogError, error: catalogError },
-    organizationReferencesQuery,
-  ])
+  const detail = useCampaignCharacterDetail(campaignId, characterId)
 
   return (
     <WidePage spacing="relaxed">
@@ -75,20 +32,26 @@ export function CampaignCharacterDetail() {
       </div>
 
       <PageLoadState
-        isPending={isPending}
-        isError={isError}
-        errorLabel={errorLabel}
+        isPending={detail.isPending}
+        isError={detail.isError}
+        errorLabel={detail.errorLabel}
         defaultErrorLabel="Could not load character."
       >
-        {viewModel ? (
+        {detail.viewModel && detail.campaignCharacter ? (
           <CharacterDetailContent
-            viewModel={viewModel}
-            statusSummary={<CharacterVitalSummary vital={viewModel.identity.vital} />}
+            viewModel={detail.viewModel}
+            showDelete={detail.campaignCharacter.capabilities.canDelete}
+            statusSummary={
+              <CampaignCharacterStatusSummary
+                vital={detail.viewModel.identity.vital}
+                roster={detail.campaignCharacter.participation.roster}
+              />
+            }
             identitySupplement={
-              organizationReferencesQuery.data ? (
+              detail.organizationReferences ? (
                 <CharacterOrganizationsSummary
                   campaignId={campaignId!}
-                  organizationReferences={organizationReferencesQuery.data}
+                  organizationReferences={detail.organizationReferences}
                 />
               ) : null
             }
