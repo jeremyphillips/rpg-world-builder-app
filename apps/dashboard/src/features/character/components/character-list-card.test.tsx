@@ -44,6 +44,20 @@ describe('CharacterListCard', () => {
     ).toBeInTheDocument()
   })
 
+  it('renders optional roster status badge', () => {
+    render(
+      <MemoryRouter>
+        <CharacterListCard
+          card={sampleCard}
+          detailHref="/characters/char-1"
+          rosterStatus="inactive"
+        />
+      </MemoryRouter>,
+    )
+
+    expect(screen.getByText('Inactive')).toBeInTheDocument()
+  })
+
   it('has no axe accessibility violations', async () => {
     const { container } = render(
       <MemoryRouter>

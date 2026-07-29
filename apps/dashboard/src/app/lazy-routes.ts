@@ -79,6 +79,12 @@ export const CampaignCharacterDetailRoute = withRouteSuspense(
     'CampaignCharacterDetail',
   ),
 )
+export const CampaignCharactersOverviewRoute = withRouteSuspense(
+  lazyNamed(
+    () => import('@/features/campaign/routes/campaign-characters-overview'),
+    'CampaignCharactersOverview',
+  ),
+)
 export const CampaignSessionsRoute = withRouteSuspense(
   lazyNamed(() => import('@/features/campaign/routes/campaign-sessions'), 'CampaignSessions'),
 )

@@ -2,18 +2,24 @@ import type { PcCharacter, PcCharacterListItem } from '@rpg/contracts'
 
 import { findCampaignById, listOpenParticipationsForCharacters } from '../campaign'
 
-/** Attach optional open-campaign metadata for standalone character list cards. */
+/** Attach route context and optional open-campaign label for personal character list cards. */
 export async function enrichPcsWithOpenCampaign(
   characters: PcCharacter[],
 ): Promise<PcCharacterListItem[]> {
   if (characters.length === 0) return []
 
   const participations = await listOpenParticipationsForCharacters(characters.map((c) => c.id))
-  if (participations.length === 0) return characters
-
   const participationByCharacterId = new Map(
     participations.map((participation) => [participation.characterId, participation]),
   )
+
+  if (participations.length === 0) {
+    return characters.map((character) => ({
+      ...character,
+      routeContext: { kind: 'standalone' as const },
+    }))
+  }
+
   const campaignNames = new Map<string, string>()
 
   for (const participation of participations) {
@@ -26,17 +32,30 @@ export async function enrichPcsWithOpenCampaign(
 
   return characters.map((character) => {
     const participation = participationByCharacterId.get(character.id)
-    if (!participation) return character
+    if (!participation) {
+      return {
+        ...character,
+        routeContext: { kind: 'standalone' as const },
+      }
+    }
 
     const campaignName = campaignNames.get(participation.campaignId)
-    if (!campaignName) return character
 
     return {
       ...character,
-      campaign: {
-        id: participation.campaignId,
-        name: campaignName,
+      routeContext: {
+        kind: 'campaign' as const,
+        openCampaign: { id: participation.campaignId },
+        rosterStatus: participation.roster.status,
       },
+      ...(campaignName
+        ? {
+            campaign: {
+              id: participation.campaignId,
+              name: campaignName,
+            },
+          }
+        : {}),
     }
   })
 }

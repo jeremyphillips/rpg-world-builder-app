@@ -57,6 +57,131 @@ async function seedParticipatingPc({
   return characterId
 }
 
+describe('GET /api/campaigns/:campaignId/characters', () => {
+  it('returns controlled open-participating PCs for a player', async () => {
+    const owner = await registerOwner('campaign-char-list-owner@example.com')
+    const campaignId = await createTestCampaign(
+      owner.agent,
+      owner.csrfToken,
+      'Player List Campaign',
+    )
+    await seedParticipatingPc({
+      campaignId,
+      ownerAgent: owner.agent,
+      ownerCsrfToken: owner.csrfToken,
+      ownerUserId: owner.userId,
+      characterName: 'Owner PC',
+    })
+
+    const player = await registerCampaignMember(getApp(), {
+      campaignId,
+      email: 'campaign-char-list-player@example.com',
+      campaignRole: 'pc',
+    })
+    const playerCharacterId = await createCharacter(player.agent, player.csrfToken, 'Player PC')
+    await seedCharacterParticipation({ campaignId, characterId: playerCharacterId })
+    await setMembershipControlledPcs({
+      campaignId,
+      userId: player.userId,
+      controlledCharacterIds: [playerCharacterId],
+    })
+
+    const response = await player.agent.get(`/api/campaigns/${campaignId}/characters`).expect(200)
+
+    expect(response.body.characters).toHaveLength(1)
+    expect(response.body.characters[0]?.character.id).toBe(playerCharacterId)
+    expect(response.body.characters[0]?.controller?.displayName).toBeTruthy()
+  })
+
+  it('returns all open-participating PCs with controller null when unassigned for managers', async () => {
+    const owner = await registerOwner('campaign-char-list-manager@example.com')
+    const campaignId = await createTestCampaign(
+      owner.agent,
+      owner.csrfToken,
+      'Manager List Campaign',
+    )
+    const unassignedCharacterId = await createCharacter(
+      owner.agent,
+      owner.csrfToken,
+      'Unassigned PC',
+    )
+    await seedCharacterParticipation({ campaignId, characterId: unassignedCharacterId })
+
+    const assignedCharacterId = await seedParticipatingPc({
+      campaignId,
+      ownerAgent: owner.agent,
+      ownerCsrfToken: owner.csrfToken,
+      ownerUserId: owner.userId,
+      characterName: 'Assigned PC',
+    })
+
+    const response = await owner.agent.get(`/api/campaigns/${campaignId}/characters`).expect(200)
+
+    expect(response.body.characters).toHaveLength(2)
+    const unassigned = response.body.characters.find(
+      (entry: { character: { id: string } }) => entry.character.id === unassignedCharacterId,
+    )
+    const assigned = response.body.characters.find(
+      (entry: { character: { id: string } }) => entry.character.id === assignedCharacterId,
+    )
+    expect(unassigned?.controller).toBeNull()
+    expect(assigned?.controller).not.toBeNull()
+  })
+
+  it('returns 403 for an observer', async () => {
+    const owner = await registerOwner('campaign-char-list-observer@example.com')
+    const campaignId = await createTestCampaign(
+      owner.agent,
+      owner.csrfToken,
+      'Observer List Campaign',
+    )
+    await seedParticipatingPc({
+      campaignId,
+      ownerAgent: owner.agent,
+      ownerCsrfToken: owner.csrfToken,
+      ownerUserId: owner.userId,
+    })
+
+    const observer = await registerCampaignMember(getApp(), {
+      campaignId,
+      email: 'campaign-char-list-observer-only@example.com',
+      campaignRole: 'observer',
+    })
+
+    const response = await observer.agent.get(`/api/campaigns/${campaignId}/characters`).expect(403)
+
+    expect(response.body.error.code).toBe('forbidden')
+  })
+
+  it('reflects control removal while open participation remains', async () => {
+    const owner = await registerOwner('campaign-char-list-control-removed@example.com')
+    const campaignId = await createTestCampaign(
+      owner.agent,
+      owner.csrfToken,
+      'Control Removed List Campaign',
+    )
+    const characterId = await createCharacter(
+      owner.agent,
+      owner.csrfToken,
+      'Formerly Controlled PC',
+    )
+    await seedCharacterParticipation({ campaignId, characterId })
+
+    const player = await registerCampaignMember(getApp(), {
+      campaignId,
+      email: 'campaign-char-list-control-removed-player@example.com',
+      campaignRole: 'pc',
+    })
+
+    const playerList = await player.agent.get(`/api/campaigns/${campaignId}/characters`).expect(200)
+    expect(playerList.body.characters).toHaveLength(0)
+
+    const managerList = await owner.agent.get(`/api/campaigns/${campaignId}/characters`).expect(200)
+    expect(managerList.body.characters).toHaveLength(1)
+    expect(managerList.body.characters[0]?.controller).toBeNull()
+  })
+})
+
 describe('GET /api/campaigns/:campaignId/characters/:characterId', () => {
   it('returns 200 for the campaign manager viewing a peer PC sheet', async () => {
     const owner = await registerOwner('campaign-char-owner@example.com')

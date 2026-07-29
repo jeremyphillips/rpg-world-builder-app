@@ -4,6 +4,8 @@ import { Heading, Text } from '@rpg/ui'
 import { ROUTES } from '@/app/routes'
 import { CharacterListCard } from '@/features/character'
 
+import { CAMPAIGN_CHARACTER_UNASSIGNED_LABEL } from '@/features/character/lib/character-list-routing'
+
 import {
   CAMPAIGN_OVERVIEW_EMPTY_TEXT,
   CAMPAIGN_OVERVIEW_SECTION_LABELS,
@@ -36,7 +38,9 @@ export function CampaignOverviewPartySection({
                 detailHref={ROUTES.campaign.characters.detail(campaignId, entry.character.id)}
               />
               <Text variant="small" className="text-muted-foreground">
-                Played by {entry.member.displayName}
+                {entry.member
+                  ? `Played by ${entry.member.displayName}`
+                  : CAMPAIGN_CHARACTER_UNASSIGNED_LABEL}
               </Text>
             </li>
           ))}

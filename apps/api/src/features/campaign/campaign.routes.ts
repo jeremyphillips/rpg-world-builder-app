@@ -52,6 +52,12 @@ campaignRouter.get(
   controller.listParty,
 )
 campaignRouter.get(
+  '/:campaignId/characters',
+  requireAuth,
+  requireCampaignRole(...CAMPAIGN_ROLES),
+  campaignCharacterController.listCampaignCharacters,
+)
+campaignRouter.get(
   '/:campaignId/characters/:characterId',
   requireAuth,
   requireCampaignRole(...CAMPAIGN_ROLES),

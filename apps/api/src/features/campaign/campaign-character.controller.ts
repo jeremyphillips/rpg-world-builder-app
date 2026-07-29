@@ -2,6 +2,23 @@ import type { Request, Response } from 'express'
 
 import { HttpError } from '../../lib/http-error'
 import { authorizeCampaignCharacterAccess } from './campaign-character-access.service'
+import { listCampaignCharactersForViewer } from './list-campaign-characters.service'
+
+export async function listCampaignCharacters(req: Request, res: Response): Promise<void> {
+  const { campaignId } = req.params as { campaignId: string }
+  const membership = req.campaignMembership
+  if (!membership) {
+    throw HttpError.forbidden('Not a member of this campaign')
+  }
+
+  const characters = await listCampaignCharactersForViewer({
+    campaignId,
+    viewerRole: membership.campaignRole,
+    viewerControlledCharacterIds: membership.controlledCharacterIds,
+  })
+
+  res.status(200).json({ characters })
+}
 
 export async function getCampaignCharacter(req: Request, res: Response): Promise<void> {
   const { campaignId, characterId } = req.params as {

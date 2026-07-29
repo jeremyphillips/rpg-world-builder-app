@@ -142,7 +142,6 @@ export async function listCampaignPartyForOverview(
     if (!character) continue
 
     const controller = controllerByCharacterId.get(participation.characterId)
-    if (!controller) continue
 
     party.push({
       character: {
@@ -154,10 +153,12 @@ export async function listCampaignPartyForOverview(
           name: campaign.identity.name,
         },
       },
-      member: {
-        id: controller.membershipId,
-        displayName: displayNameByUserId.get(controller.userId) ?? 'Unknown member',
-      },
+      member: controller
+        ? {
+            id: controller.membershipId,
+            displayName: displayNameByUserId.get(controller.userId) ?? 'Unknown member',
+          }
+        : null,
       roster: participation.roster,
     })
   }
