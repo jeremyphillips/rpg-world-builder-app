@@ -1,6 +1,6 @@
 # Organization Content Type and Character Connections Plan
 
-Status: Phases 1–6 complete; Phases 7–8 proposed
+Status: Phases 1–7 complete; Phase 8 proposed
 
 Scope: top-level `organizations` content type plus character connections
 
@@ -375,7 +375,7 @@ pagination, and performance design.
    - reports active-draft IDs that are no longer selectable;
    - targets recovery issues to the Connections step.
 
-### 7. Add the Connections step and organization picker drawer
+### 7. Add the Connections step and organization picker drawer — complete
 
 1. Add a Connections step that shows selected organization rows and opens a
    dedicated picker drawer.

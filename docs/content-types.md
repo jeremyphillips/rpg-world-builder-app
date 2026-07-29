@@ -643,6 +643,45 @@ When a type intentionally has no bundled system records, do not create an empty
 seed package for symmetry. Declare `catalog: { bundledContent: 'none' }` in the
 integration manifest and omit the API config's `system` capability.
 
+The manifest models that topology as a discriminated union:
+
+```ts
+type CatalogIntegration =
+  | { bundledContent: 'bundled'; packageName: string }
+  | { bundledContent: 'none' }
+```
+
+`bundledContent: 'bundled'` means the type owns an `@rpg/catalog/<type>` seed
+export and may provide an API system layer. `bundledContent: 'none'` means
+normal records come from another layer, typically campaign-authored content.
+It is a package/loader declaration—not a user-facing provenance policy.
+
+#### Homebrew UI label exceptions
+
+Campaign-authored records continue to persist `source: 'homebrew'` regardless
+of how the dashboard presents that provenance. By default, content overviews
+and headings show the Homebrew badge, source column, and source filter.
+
+A content type may suppress that UI language only through the exhaustive
+`CONTENT_TYPE_PRESENTATION` policy in
+`apps/dashboard/src/features/content/lib/content-type-presentation.ts`.
+Organizations are the initial exception because all organization records are
+campaign-authored in V1 and repeatedly labeling them Homebrew adds no useful
+distinction.
+
+Exception rules:
+
+- Never infer UI labeling from `bundledContent`; bundling may change without
+  changing the product meaning of provenance.
+- Suppression affects only source badges, labels, columns, and filters. It does
+  not change stored source, authorization, deletion rules, draft/publish state,
+  or campaign availability.
+- Add exceptions by content-type key in the exhaustive policy, consume them
+  through shared presentation helpers, and update the policy coverage tests.
+  Do not add route- or component-specific `organizations` conditionals.
+- Document the product rationale so a future bundled catalog does not silently
+  remove or restore Homebrew language.
+
 ### 3. Catalog seed tests (`packages/catalog/src/<type>/index.test.ts`)
 
 Assert:

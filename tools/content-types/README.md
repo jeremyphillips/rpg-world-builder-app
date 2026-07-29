@@ -24,13 +24,21 @@ manifest. Metadata strings and booleans only.
 Every entry declares whether it ships system records:
 
 ```typescript
-catalog: { bundledContent: 'bundled', packageName: '@rpg/catalog/spells' }
-catalog: { bundledContent: 'none' }
+type CatalogIntegration =
+  | { bundledContent: 'bundled'; packageName: string }
+  | { bundledContent: 'none' }
 ```
 
 `packageName` is required only for `bundledContent: 'bundled'`. Types whose
 normal records are campaign-authored do not need fake empty seed packages;
 catalog export and path drift checks skip `bundledContent: 'none'`.
+
+This metadata describes package and loader topology only. It must not determine
+whether the dashboard displays a Homebrew badge or source filter. User-facing
+source-label exceptions belong to the exhaustive dashboard
+`CONTENT_TYPE_PRESENTATION` policy; they do not alter persisted provenance,
+authorization, or lifecycle behavior. See
+[`docs/content-types.md`](../../docs/content-types.md#homebrew-ui-label-exceptions).
 
 ## Incremental integration metadata
 
