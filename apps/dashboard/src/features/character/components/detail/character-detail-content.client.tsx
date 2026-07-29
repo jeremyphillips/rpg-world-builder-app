@@ -34,6 +34,7 @@ export type CharacterDetailContentProps = {
   deleteConfig?: CharacterDetailDeleteConfig
   statusSummary?: ReactNode
   statusActions?: ReactNode
+  identitySupplement?: ReactNode
 }
 
 /**
@@ -58,6 +59,7 @@ export function CharacterDetailContent({
   deleteConfig,
   statusSummary,
   statusActions,
+  identitySupplement,
 }: CharacterDetailContentProps) {
   useSetBreadcrumbLabel(viewModel.identity.name)
   const navigate = useNavigate()
@@ -89,6 +91,7 @@ export function CharacterDetailContent({
         xp={viewModel.identity.xp}
         statusSummary={statusSummary}
         statusActions={statusActions}
+        identitySupplement={identitySupplement}
         showDelete={showDelete}
         onDeleteClick={() => setDeleteDialogOpen(true)}
       />

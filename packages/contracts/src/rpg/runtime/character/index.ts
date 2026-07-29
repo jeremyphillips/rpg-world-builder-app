@@ -1,4 +1,5 @@
 export * from './character-card-dtos'
+export * from './referencing-character-summary'
 export * from './character-messages'
 export * from './core'
 export * from './connections'

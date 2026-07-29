@@ -8,6 +8,7 @@ import { ROUTES } from '@/app/routes'
 import { PageLoadState } from '@/components/layout/page-load-state'
 import { WidePage } from '@/components/layout/wide-page'
 import { CharacterDetailContent } from '@/features/character/components/detail/character-detail-content.client'
+import { CharacterOrganizationsSummary } from '@/features/character/components/detail/character-organizations-summary.client'
 import { CharacterVitalSummary } from '@/features/character/components/detail/character-vital-summary.client'
 import { useBuildContext } from '@/features/character/hooks/use-build-context'
 import { useCharacter } from '@/features/character/hooks/use-character'
@@ -83,6 +84,14 @@ export function CampaignCharacterDetail() {
           <CharacterDetailContent
             viewModel={viewModel}
             statusSummary={<CharacterVitalSummary vital={viewModel.identity.vital} />}
+            identitySupplement={
+              organizationReferencesQuery.data ? (
+                <CharacterOrganizationsSummary
+                  campaignId={campaignId!}
+                  organizationReferences={organizationReferencesQuery.data}
+                />
+              ) : null
+            }
           />
         ) : null}
       </PageLoadState>

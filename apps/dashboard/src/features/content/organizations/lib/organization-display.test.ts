@@ -1,11 +1,21 @@
 import { describe, expect, it } from 'vitest'
 
 import { CITY_COUNCIL } from '../fixtures'
-import { buildOrganizationDetailViewModel } from './organization-display'
+import {
+  buildOrganizationDetailViewModel,
+  ORGANIZATION_EMPTY_SECTION_TEXT,
+  type OrganizationConnectedCharactersViewModel,
+} from './organization-display'
+
+const emptyConnectedCharacters: OrganizationConnectedCharactersViewModel = {
+  previewItems: [],
+  total: 0,
+  emptyText: ORGANIZATION_EMPTY_SECTION_TEXT.connectedCharacters,
+}
 
 describe('buildOrganizationDetailViewModel', () => {
-  it('maps kind vocabulary and authored description', () => {
-    expect(buildOrganizationDetailViewModel(CITY_COUNCIL)).toEqual({
+  it('maps kind vocabulary, authored description, and connected characters', () => {
+    expect(buildOrganizationDetailViewModel(CITY_COUNCIL, emptyConnectedCharacters)).toEqual({
       statRows: [
         {
           label: 'Type',
@@ -15,6 +25,7 @@ describe('buildOrganizationDetailViewModel', () => {
         },
       ],
       description: '<p>The elected council governing the city.</p>',
+      connectedCharacters: emptyConnectedCharacters,
     })
   })
 })

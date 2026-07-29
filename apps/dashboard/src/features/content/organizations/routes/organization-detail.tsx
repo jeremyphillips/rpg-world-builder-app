@@ -1,3 +1,4 @@
+import { useMemo } from 'react'
 import { useParams } from 'react-router-dom'
 import type { Organization } from '@rpg/contracts'
 import { RichTextContent } from '@rpg/ui'
@@ -13,8 +14,14 @@ import { ContentDetailLayout } from '../../lib/detail/content-detail-layout'
 import { ContentDetailResolver } from '../../lib/detail/content-detail-resolver'
 import { getContentImageUrl } from '../../lib/detail/content-image-url'
 import { ContentStatusNameBadge } from '../../lib/overview/content-status-name-badge.client'
+import { OrganizationConnectedCharactersSection } from '../components/organization-connected-characters-section.client'
+import { useOrganizationConnectedCharacters } from '../hooks/use-organization-connected-characters'
 import { useOrganizations } from '../hooks/use-organizations'
-import { buildOrganizationDetailViewModel } from '../lib/organization-display'
+import { buildOrganizationMemberCards } from '../lib/build-organization-member-cards'
+import {
+  buildOrganizationDetailViewModel,
+  ORGANIZATION_EMPTY_SECTION_TEXT,
+} from '../lib/organization-display'
 
 export function OrganizationDetailContent({
   organization,
@@ -24,7 +31,21 @@ export function OrganizationDetailContent({
   campaignId: string
 }) {
   useSetBreadcrumbLabel(organization.name)
-  const viewModel = buildOrganizationDetailViewModel(organization)
+  const connectedCharactersQuery = useOrganizationConnectedCharacters(campaignId, organization.id)
+  const viewModel = useMemo(() => {
+    const connectedCharacters = connectedCharactersQuery.data
+      ? buildOrganizationMemberCards(connectedCharactersQuery.data, { campaignId })
+      : {
+          previewItems: [],
+          total: 0,
+        }
+
+    return buildOrganizationDetailViewModel(organization, {
+      ...connectedCharacters,
+      emptyText: ORGANIZATION_EMPTY_SECTION_TEXT.connectedCharacters,
+    })
+  }, [campaignId, connectedCharactersQuery.data, organization])
+
   return (
     <WidePage>
       <ContentDetailLayout
@@ -40,7 +61,11 @@ export function OrganizationDetailContent({
             <RichTextContent html={viewModel.description} size="md" tone="muted" />
           ) : undefined
         }
-      />
+      >
+        <OrganizationConnectedCharactersSection
+          connectedCharacters={viewModel.connectedCharacters}
+        />
+      </ContentDetailLayout>
     </WidePage>
   )
 }

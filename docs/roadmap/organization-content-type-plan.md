@@ -407,7 +407,31 @@ pagination, and performance design.
 5. Do not add organizations to the permanent builder preview rail in V1.
    Reconsider only when connection mechanics or repeated in-builder decisions
    make persistent preview materially useful.
-6. Do not query or display reverse organization membership in V1.
+6. ~~Do not query or display reverse organization membership in V1.~~ Reverse
+   connected-character display shipped in the membership UI slice (see §9).
+
+### 9. Membership relationship display — complete
+
+Bidirectional organization relationship display for campaign surfaces:
+
+- **Character → organization:** compact **Organizations** row below roster/vital
+  on campaign PC and NPC detail routes (saved-reference aware links).
+- **Organization → characters:** **Connected characters** section on organization
+  detail with server-paginated preview (`page=1`, `pageSize=4`) and plain `+ N
+more` truncation copy.
+
+**API:** `GET /api/campaigns/:campaignId/content/organizations/:organizationId/members`
+
+**Participation scope (v1):** open campaign participations only — same participant
+scope as content usage blockers. Includes PCs and NPCs whose saved sheet still
+stores `connections.organizations.organizationId`. Excludes characters without
+open participation. Does not re-apply catalog availability filters (stale/draft org
+refs still appear).
+
+**Infrastructure:** `CharacterContentReferenceDescriptor` and
+`resolveCharacterReferences` in the API content layer; transport DTOs
+`ReferencingCharacterSummary` and generic `{ items, total }` envelope in
+`@rpg/contracts`.
 
 ## Verification
 
@@ -446,7 +470,7 @@ Required behavior coverage:
 
 - Organization hierarchy
 - Roles, ranks, reputation, disposition, and membership history
-- Leaders and reverse member directories
+- Leaders and reverse member directories (full list / expand affordance — detail preview only in v1)
 - Headquarters and controlled locations
 - Alliances, rivalries, and relationship graphs
 - Organization mechanics or grants
@@ -456,5 +480,6 @@ Required behavior coverage:
 - Permanent preview-rail organization display
 
 Update `docs/roadmap/content-types-roadmap.md` and character feature
-documentation when implementation lands. Document reverse membership as
-derivable, not as a promised V1 UI or query.
+documentation when implementation lands. Reverse connected-character preview is
+implemented; full membership roster semantics remain deferred until connection
+schema encodes membership.

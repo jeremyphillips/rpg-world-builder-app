@@ -13,6 +13,26 @@ vi.mock('@/components/layout/use-breadcrumb-label', () => ({
 vi.mock('@/features/campaign', () => ({
   useCanManageCampaign: vi.fn(() => false),
 }))
+vi.mock('../hooks/use-organization-connected-characters', () => ({
+  useOrganizationConnectedCharacters: vi.fn(() => ({
+    data: {
+      items: [
+        {
+          characterType: 'npc',
+          character: {
+            id: 'npc-1',
+            name: 'Circle Envoy',
+            summary: 'Human · Level 3 Rogue',
+          },
+        },
+      ],
+      total: 1,
+    },
+    isPending: false,
+    isError: false,
+    error: null,
+  })),
+}))
 
 function renderDetail() {
   return render(
@@ -23,10 +43,12 @@ function renderDetail() {
 }
 
 describe('OrganizationDetailContent', () => {
-  it('renders kind metadata and authored description without reverse membership', () => {
+  it('renders kind metadata, authored description, and connected characters', () => {
     renderDetail()
     expect(screen.getByText('Government')).toBeInTheDocument()
     expect(screen.getByText('The elected council governing the city.')).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Connected characters' })).toBeInTheDocument()
+    expect(screen.getByText('Circle Envoy')).toBeInTheDocument()
     expect(screen.queryByText(/members/i)).not.toBeInTheDocument()
   })
 

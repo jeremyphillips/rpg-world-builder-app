@@ -10,6 +10,7 @@ import { useCanManageCampaign } from '@/features/campaign'
 
 import { CampaignCharacterStatusSummary } from '../../components/detail/campaign-character-status-summary.client'
 import { CharacterDetailContent } from '../../components/detail/character-detail-content.client'
+import { CharacterOrganizationsSummary } from '../../components/detail/character-organizations-summary.client'
 import { useCampaignBuildContext } from '../../hooks/use-campaign-build-context'
 import { useCharacterOrganizationReferences } from '../../hooks/use-character-organization-references'
 import { buildCharacterDetailViewModel } from '../../lib/display/character-display'
@@ -105,6 +106,14 @@ export function NpcDetail() {
                   roster={npcDetail.participation.roster}
                 />
               ) : undefined
+            }
+            identitySupplement={
+              organizationReferencesQuery.data ? (
+                <CharacterOrganizationsSummary
+                  campaignId={campaignId}
+                  organizationReferences={organizationReferencesQuery.data}
+                />
+              ) : null
             }
             showDelete={canManage}
             deleteConfig={

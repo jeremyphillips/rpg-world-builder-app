@@ -1,4 +1,9 @@
-import { equipmentInventoryUsageMongoOrClauses, type ApiContentTypeKey } from '@rpg/contracts'
+import {
+  characterContentReferenceMatch,
+  equipmentInventoryUsageMongoOrClauses,
+  ORGANIZATION_CHARACTER_REFERENCE,
+  type ApiContentTypeKey,
+} from '@rpg/contracts'
 
 /**
  * Returns a Mongo filter fragment merged into campaign participant character queries.
@@ -23,7 +28,7 @@ export function getContentCharacterUsageMatcher(
         $or: equipmentInventoryUsageMongoOrClauses(contentId),
       }
     case 'organizations':
-      return { 'connections.organizations.organizationId': contentId }
+      return characterContentReferenceMatch(ORGANIZATION_CHARACTER_REFERENCE, contentId)
     case 'skill-proficiencies':
       return { 'proficiencies.skills.skill': contentSlug }
     default: {
