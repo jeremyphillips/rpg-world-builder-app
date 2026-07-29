@@ -31,6 +31,14 @@ export const CONTENT_ROUTES = {
       `/campaigns/${campaignId}/skill-proficiencies/${skillId}/edit`,
     create: (campaignId: string) => `/campaigns/${campaignId}/skill-proficiencies/new`,
   },
+  organizations: {
+    overview: (campaignId: string) => `/campaigns/${campaignId}/organizations`,
+    detail: (campaignId: string, organizationId: string) =>
+      `/campaigns/${campaignId}/organizations/${organizationId}`,
+    edit: (campaignId: string, organizationId: string) =>
+      `/campaigns/${campaignId}/organizations/${organizationId}/edit`,
+    create: (campaignId: string) => `/campaigns/${campaignId}/organizations/new`,
+  },
   species: {
     overview: (campaignId: string) => `/campaigns/${campaignId}/species`,
     detail: (campaignId: string, speciesId: string) =>

@@ -238,6 +238,7 @@ export function finalizeCharacterBuild(
     equipment,
     wealth,
     narrative: draft.identity.narrative,
+    connections: draft.connections,
     feats: [],
   }
 

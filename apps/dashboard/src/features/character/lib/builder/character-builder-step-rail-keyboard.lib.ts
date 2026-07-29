@@ -10,6 +10,7 @@ export function resolveStepRailIndex(stepId: CharacterBuilderStepId): number {
 export function resolveStepRailKeyboardTarget(
   direction: StepRailKeyboardDirection,
   currentIndex: number,
+  stepCount: number = BUILDER_STEPS.length,
 ): number | null {
   if (currentIndex < 0) return null
 
@@ -17,11 +18,11 @@ export function resolveStepRailKeyboardTarget(
     case 'up':
       return currentIndex > 0 ? currentIndex - 1 : null
     case 'down':
-      return currentIndex < BUILDER_STEPS.length - 1 ? currentIndex + 1 : null
+      return currentIndex < stepCount - 1 ? currentIndex + 1 : null
     case 'home':
       return 0
     case 'end':
-      return BUILDER_STEPS.length - 1
+      return stepCount - 1
   }
 }
 

@@ -52,6 +52,7 @@ function buildEligibleProficiencyChoiceIds(
     spells: [],
     equipment: [...equipment],
     skillProficiencies: [],
+    organizations: [],
     languages: [],
   })
 

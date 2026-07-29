@@ -40,6 +40,7 @@ const basePc: Character = {
   abilityScores: { str: 8, dex: 14, con: 12, int: 16, wis: 10, cha: 10 },
   hitPoints: { base: 18, current: 18, temporary: 0 },
   proficiencies: { skills: [], weapons: [], armor: [], tools: [], languages: [] },
+  connections: { organizations: [] },
   spells: [
     {
       spellId: 'srd-cc-5.2.1:silvery-barbs',

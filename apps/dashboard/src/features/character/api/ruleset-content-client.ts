@@ -2,6 +2,7 @@ import type {
   CharacterBuildLanguageOption,
   CharacterClass,
   Equipment,
+  Organization,
   RulesetPatchRead,
   SkillProficiency,
   Species,
@@ -25,6 +26,7 @@ const BUILDER_CATALOG_CONTENT = [
   { routeKey: 'spells', responseKey: 'spells' },
   { routeKey: 'equipment', responseKey: 'equipment' },
   { routeKey: 'skill-proficiencies', responseKey: 'skillProficiencies' },
+  { routeKey: 'organizations', responseKey: 'organizations' },
 ] as const satisfies readonly RulesetContentConfig[]
 
 export type BuilderCatalogContentKey = (typeof BUILDER_CATALOG_CONTENT)[number]['routeKey']
@@ -35,6 +37,7 @@ export type BuilderCatalogLists = {
   spells: Spell[]
   equipment: Equipment[]
   skillProficiencies: SkillProficiency[]
+  organizations: Organization[]
   languages: CharacterBuildLanguageOption[]
 }
 
@@ -72,6 +75,12 @@ export async function listRulesetSkillProficiencies(
   return listRulesetContent(rulesetId, BUILDER_CATALOG_CONTENT[4])
 }
 
+export async function listRulesetOrganizations(
+  rulesetId: SystemRulesetId,
+): Promise<Organization[]> {
+  return listRulesetContent(rulesetId, BUILDER_CATALOG_CONTENT[5])
+}
+
 export async function listRulesetLanguages(
   rulesetId: SystemRulesetId,
 ): Promise<CharacterBuildLanguageOption[]> {
@@ -86,16 +95,18 @@ export async function listRulesetLanguages(
 export async function fetchBuilderCatalog(
   rulesetId: SystemRulesetId,
 ): Promise<BuilderCatalogLists> {
-  const [species, classes, spells, equipment, skillProficiencies, languages] = await Promise.all([
-    listRulesetSpecies(rulesetId),
-    listRulesetClasses(rulesetId),
-    listRulesetSpells(rulesetId),
-    listRulesetEquipment(rulesetId),
-    listRulesetSkillProficiencies(rulesetId),
-    listRulesetLanguages(rulesetId),
-  ])
+  const [species, classes, spells, equipment, skillProficiencies, organizations, languages] =
+    await Promise.all([
+      listRulesetSpecies(rulesetId),
+      listRulesetClasses(rulesetId),
+      listRulesetSpells(rulesetId),
+      listRulesetEquipment(rulesetId),
+      listRulesetSkillProficiencies(rulesetId),
+      listRulesetOrganizations(rulesetId),
+      listRulesetLanguages(rulesetId),
+    ])
 
-  return { species, classes, spells, equipment, skillProficiencies, languages }
+  return { species, classes, spells, equipment, skillProficiencies, organizations, languages }
 }
 
 export async function fetchCharacterCreationRules(

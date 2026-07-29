@@ -32,6 +32,7 @@ function seedBuildContext(): CharacterBuildContext {
       spells: [],
       equipment: [],
       skillProficiencies: loadSeedSkillProficiencies(RULESET),
+      organizations: [],
       languages: [...listLanguageSeedOptions(RULESET)],
     },
     characterCreationRules: {

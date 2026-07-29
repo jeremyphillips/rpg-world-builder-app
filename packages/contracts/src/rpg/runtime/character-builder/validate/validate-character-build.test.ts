@@ -132,6 +132,41 @@ describe('validateCharacterBuild', () => {
     expect(complete.ok).toBe(true)
   })
 
+  it('accepts no organization connections and targets stale references to Connections', () => {
+    const empty = validateCharacterBuild(makeCompleteDraft(), builderTestContext, 'finalSubmit')
+    expect(empty.issues.some((issue) => issue.stepId === 'connections')).toBe(false)
+
+    const stale = validateCharacterBuild(
+      makeCompleteDraft({
+        connections: { organizations: [{ organizationId: 'removed-organization' }] },
+      }),
+      builderTestContext,
+      'finalSubmit',
+    )
+
+    expect(stale.issues).toContainEqual(
+      expect.objectContaining({
+        code: 'organization_connection_unavailable',
+        stepId: 'connections',
+      }),
+    )
+  })
+
+  it('rejects duplicate or malformed organization connections', () => {
+    const invalidDraft = {
+      ...makeCompleteDraft(),
+      connections: {
+        organizations: [{ organizationId: 'organization-1' }, { organizationId: 'organization-1' }],
+      },
+    } as CharacterBuilderDraft
+
+    const result = validateCharacterBuild(invalidDraft, builderTestContext, 'finalSubmit')
+
+    expect(result.issues).toContainEqual(
+      expect.objectContaining({ code: 'connections_invalid', stepId: 'connections' }),
+    )
+  })
+
   it('validates required ChoiceSet min/max on finalSubmit', () => {
     const result = validateCharacterBuild(makeCompleteDraft(), builderTestContext, 'finalSubmit', {
       resolvedChoiceSets: [

@@ -39,6 +39,7 @@ const emptyCatalog = {
   spells: [],
   equipment: [],
   skillProficiencies: [],
+  organizations: [],
   languages: [],
 }
 

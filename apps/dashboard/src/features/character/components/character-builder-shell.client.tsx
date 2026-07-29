@@ -14,6 +14,7 @@ import {
   type CharacterCampaignWarning,
   type CampaignInviteUnavailableReason,
   type EquipmentPickerFocusIntent,
+  resolveEffectiveBuilderSteps,
 } from '@rpg/contracts'
 import type {
   CharacterBuildAcquisition,
@@ -144,7 +145,14 @@ export function CharacterBuilderShell({
 
   const resolvedChoiceSets = useResolvedChoiceSets(draft, context)
 
-  const currentStepId = resolveCurrentStepId(draft.currentStepId)
+  const effectiveSteps = useMemo(
+    () => resolveEffectiveBuilderSteps(context, draft),
+    [context, draft],
+  )
+  const requestedStepId = resolveCurrentStepId(draft.currentStepId)
+  const currentStepId = effectiveSteps.some(({ id }) => id === requestedStepId)
+    ? requestedStepId
+    : effectiveSteps[0]!.id
   const levelConstraints = useMemo(() => resolveBuilderLevelConstraints(context), [context])
 
   useEffect(() => {
@@ -293,7 +301,7 @@ export function CharacterBuilderShell({
   }
 
   const shiftStep = (direction: 'back' | 'forward') => {
-    const nextStepId = getAdjacentBuilderStepId(currentStepId, direction)
+    const nextStepId = getAdjacentBuilderStepId(currentStepId, direction, effectiveSteps)
     if (!nextStepId) return
     navigateToStep(nextStepId)
   }
@@ -502,6 +510,7 @@ export function CharacterBuilderShell({
 
         <CharacterBuilderFooter
           currentStepId={currentStepId}
+          steps={effectiveSteps}
           canCreateCharacter={canCreateCharacter}
           isCreating={isCreating}
           createLabel={chrome.createLabel}

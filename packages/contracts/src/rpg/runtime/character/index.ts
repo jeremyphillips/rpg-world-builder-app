@@ -1,6 +1,7 @@
 export * from './character-card-dtos'
 export * from './character-messages'
 export * from './core'
+export * from './connections'
 export * from './create-input'
 export * from './create-npc-input'
 export * from './derive/index'

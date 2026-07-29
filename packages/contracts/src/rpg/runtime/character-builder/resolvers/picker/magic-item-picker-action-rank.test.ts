@@ -94,6 +94,7 @@ function buildMagicItemContext() {
     species: [],
     spells: [],
     skillProficiencies: [],
+    organizations: [],
     languages: [],
   })
 

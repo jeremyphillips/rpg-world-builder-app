@@ -87,6 +87,7 @@ export type SelectFilterFieldDef<
     | FilterOption<Extract<NonNullable<TState[TId]>, string>>[]
     | ((ctx: FilterFieldOptionsContext<TData, TState>) => FilterOption<string>[])
   showAllOption?: boolean
+  allOptionLabel?: string
   layout?: SelectFilterLayout
   width?: FilterFieldWidth
   ariaLabel?: string

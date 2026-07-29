@@ -32,6 +32,7 @@ export function projectCharacterEligibilitySubjectFromCharacter(
     equipment: character.equipment,
     wealth: character.wealth,
     narrative: character.narrative,
+    connections: character.connections,
     feats: character.feats,
   }
 }

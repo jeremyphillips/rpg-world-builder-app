@@ -9,6 +9,7 @@ import {
   getChoiceSetStepId,
   isBuilderStepComplete,
   isChoiceStep,
+  resolveEffectiveBuilderSteps,
   resolveBuilderStepDescription,
   STEP_CHOICE_TYPES_BY_STEP,
 } from './steps'
@@ -19,6 +20,7 @@ import { CHOICE_TYPES } from './choice-set'
 import { createEmptyCharacterBuilderDraft } from './draft/draft'
 import type { CharacterBuilderDraft } from './draft/draft'
 import type { ChoiceSet } from './choice-set'
+import type { Organization } from '../../content/organization'
 
 // ---------------------------------------------------------------------------
 // Fixtures
@@ -37,6 +39,7 @@ function makeCompleteDraft(): CharacterBuilderDraft {
       method: 'standard-array',
       scores: { str: 15, dex: 14, con: 13, int: 12, wis: 10, cha: 8 },
     },
+    connections: { organizations: [] },
     choiceSelections: {},
     touchedStepIds: ['identity', 'species', 'class', 'abilities'],
   }
@@ -110,8 +113,8 @@ describe('BUILDER_STEPS', () => {
     }
   })
 
-  it('is readonly and contains 8 steps', () => {
-    expect(BUILDER_STEPS).toHaveLength(8)
+  it('is readonly and contains 9 registered steps', () => {
+    expect(BUILDER_STEPS).toHaveLength(9)
   })
 
   it('satisfies BuilderStep shape', () => {
@@ -493,5 +496,51 @@ describe('resolveBuilderStepDescription', () => {
     expect(resolveBuilderStepDescription(context, 'review')).toBe(
       'Review and add this NPC to your campaign',
     )
+  })
+})
+
+describe('resolveEffectiveBuilderSteps', () => {
+  const organization = {
+    id: 'organization-1',
+    slug: 'lantern-guild',
+    rulesetId: 'srd-cc-5.2.1',
+    source: 'system',
+    status: 'published',
+    campaignId: null,
+    createdAt: '2026-01-01T00:00:00.000Z',
+    updatedAt: '2026-01-01T00:00:00.000Z',
+    name: 'Lantern Guild',
+    organizationKind: 'professional',
+  } satisfies Organization
+
+  it('omits Connections when no organizations are selectable or selected', () => {
+    expect(
+      resolveEffectiveBuilderSteps(createCharacterBuildContext(), makeDraft()).map(({ id }) => id),
+    ).not.toContain('connections')
+  })
+
+  it('inserts Connections after Identity when an organization is selectable', () => {
+    const context = createCharacterBuildContext({
+      catalog: {
+        ...createCharacterBuildContext().catalog,
+        organizations: [organization],
+      },
+    })
+
+    expect(
+      resolveEffectiveBuilderSteps(context, makeDraft())
+        .map(({ id }) => id)
+        .slice(0, 3),
+    ).toEqual(['identity', 'connections', 'species'])
+  })
+
+  it('keeps Connections visible for recovery when the draft contains a stale selection', () => {
+    const draft = makeDraft({
+      connections: { organizations: [{ organizationId: 'removed-organization' }] },
+    })
+
+    expect(
+      resolveEffectiveBuilderSteps(createCharacterBuildContext(), draft).map(({ id }) => id),
+    ).toContain('connections')
   })
 })

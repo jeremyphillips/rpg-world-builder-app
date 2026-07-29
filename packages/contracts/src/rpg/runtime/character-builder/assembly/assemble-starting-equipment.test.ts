@@ -138,6 +138,7 @@ describe('assembleStartingEquipment', () => {
       spells: [],
       equipment: [leatherArmor, shield],
       skillProficiencies: [],
+      organizations: [],
       languages: [],
     })
 
@@ -187,6 +188,7 @@ describe('assembleStartingEquipment', () => {
       spells: [],
       equipment: [leatherArmor, shield],
       skillProficiencies: [],
+      organizations: [],
       languages: [],
     })
 
@@ -219,6 +221,7 @@ describe('assembleStartingEquipment', () => {
       spells: [],
       equipment: [leatherArmor, shield, rope],
       skillProficiencies: [],
+      organizations: [],
       languages: [],
     })
 

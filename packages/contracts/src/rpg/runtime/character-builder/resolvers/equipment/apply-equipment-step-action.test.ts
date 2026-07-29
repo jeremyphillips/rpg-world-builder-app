@@ -98,6 +98,7 @@ function packageSwitchCatalogIndex() {
     spells: [],
     equipment: [rope, storedRations],
     skillProficiencies: [],
+    organizations: [],
     languages: [],
   })
 }
@@ -134,6 +135,7 @@ describe('applyEquipmentStepAction', () => {
       spells: [],
       equipment: [storedRations],
       skillProficiencies: [],
+      organizations: [],
       languages: [],
     })
 
@@ -184,6 +186,7 @@ describe('applyEquipmentStepAction', () => {
       spells: [],
       equipment: [storedRations],
       skillProficiencies: [],
+      organizations: [],
       languages: [],
     })
 
@@ -224,6 +227,7 @@ describe('applyEquipmentStepAction', () => {
       spells: [],
       equipment: [storedRations],
       skillProficiencies: [],
+      organizations: [],
       languages: [],
     })
 

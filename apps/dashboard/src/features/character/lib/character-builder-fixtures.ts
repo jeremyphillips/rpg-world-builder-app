@@ -22,6 +22,7 @@ const emptyCatalog: StandaloneBuildContext['catalog'] = {
   spells: [],
   equipment: [],
   skillProficiencies: [],
+  organizations: [],
   languages: [],
 }
 
@@ -92,6 +93,7 @@ export const populatedBuilderCatalog = {
   spells: [],
   equipment: [],
   skillProficiencies: [athleticsSkill],
+  organizations: [],
   languages: [...listLanguageSeedOptions(DEFAULT_SYSTEM_RULESET_ID)],
 } satisfies CharacterBuildCatalog
 

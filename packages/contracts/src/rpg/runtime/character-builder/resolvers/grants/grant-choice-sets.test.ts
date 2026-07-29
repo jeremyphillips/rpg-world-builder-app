@@ -8,6 +8,7 @@ import { acrobaticsSkill, luteTool, stealthSkill } from '../../proficiency-test-
 const catalogWithSkillsAndEquipment = {
   ...builderTestCatalog,
   skillProficiencies: [athleticsSkill, stealthSkill, acrobaticsSkill],
+  organizations: [],
   equipment: [luteTool],
 }
 

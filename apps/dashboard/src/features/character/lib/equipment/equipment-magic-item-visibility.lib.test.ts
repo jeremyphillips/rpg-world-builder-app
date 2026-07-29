@@ -89,6 +89,7 @@ function acquisitionContext(equipment: (typeof rareAmulet)[]) {
     spells: [],
     equipment,
     skillProficiencies: [],
+    organizations: [],
     languages: [],
   })
 

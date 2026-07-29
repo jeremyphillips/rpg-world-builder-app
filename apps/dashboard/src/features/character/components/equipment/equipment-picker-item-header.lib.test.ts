@@ -137,6 +137,7 @@ describe('resolveEquipmentPickerItemHeaderPresentation', () => {
     spells: [],
     equipment: [equipmentStepPotionOfHealingFixture, commonCharm],
     skillProficiencies: [],
+    organizations: [],
     languages: [],
   })
   const context = magicItemContext(catalogIndex)
@@ -204,6 +205,7 @@ describe('resolveEquipmentPickerItemHeaderPresentation', () => {
       spells: [],
       equipment: [rareAmulet],
       skillProficiencies: [],
+      organizations: [],
       languages: [],
     })
     const rareContext = resolveEquipmentAcquisitionContext({
@@ -232,6 +234,7 @@ describe('resolveEquipmentPickerItemHeaderPresentation', () => {
       spells: [],
       equipment: [rareAmulet],
       skillProficiencies: [],
+      organizations: [],
       languages: [],
     })
     const rareContext = resolveEquipmentAcquisitionContext({

@@ -1,6 +1,6 @@
 # Organization Content Type and Character Connections Plan
 
-Status: Phases 1–3 complete; Phases 4–8 proposed
+Status: Phases 1–6 complete; Phases 7–8 proposed
 
 Scope: top-level `organizations` content type plus character connections
 
@@ -48,18 +48,18 @@ queries, relationship graphs, or organization-domain lifecycle fields.
 
 Use broad primary-purpose classifications:
 
-| ID             | Label                             | Intended coverage                                       |
-| -------------- | --------------------------------- | ------------------------------------------------------- |
-| `government`   | Government                        | Kingdoms, councils, administrations, governing bodies   |
-| `political`    | Political Faction                 | Parties, movements, courts, noble blocs                 |
-| `religious`    | Religious Organization            | Churches, cults, temples, holy orders                   |
-| `military`     | Military Organization             | Armies, guards, militias, martial orders                |
-| `criminal`     | Criminal Organization             | Syndicates, gangs, smuggling rings, thieves' guilds     |
-| `commercial`   | Commercial Organization           | Companies, merchant houses, trade consortiums           |
-| `professional` | Guild or Professional Association | Guilds, trade groups, unions, occupational associations |
-| `academic`     | Academic Institution              | Schools, colleges, libraries, learned societies         |
-| `community`    | Community Organization            | Clans, mutual-aid groups, neighborhood and civic groups |
-| `other`        | Other Organization                | No useful primary-purpose match                         |
+| ID             | Label                 | Intended coverage                                       |
+| -------------- | --------------------- | ------------------------------------------------------- |
+| `government`   | Government            | Kingdoms, councils, administrations, governing bodies   |
+| `political`    | Political             | Parties, movements, courts, noble blocs                 |
+| `religious`    | Religious             | Churches, cults, temples, holy orders                   |
+| `military`     | Military              | Armies, guards, militias, martial orders                |
+| `criminal`     | Criminal              | Syndicates, gangs, smuggling rings, thieves' guilds     |
+| `commercial`   | Commercial            | Companies, merchant houses, trade consortiums           |
+| `professional` | Guild or professional | Guilds, trade groups, unions, occupational associations |
+| `academic`     | Academic              | Schools, colleges, libraries, learned societies         |
+| `community`    | Community             | Clans, mutual-aid groups, neighborhood and civic groups |
+| `other`        | Other                 | No useful primary-purpose match                         |
 
 `professional` intentionally excludes learned societies to avoid overlap with
 `academic`. `community` replaces the more ambiguous `social`.
@@ -171,8 +171,8 @@ campaign-availability displays remain independent.
 
 Organization overview:
 
-- Middle column: **Organization kind**, label-backed and sortable.
-- Type-specific filter: **Organization kind equals**.
+- Middle column: **Type**, label-backed and sortable.
+- Type-specific filter: **Type equals**, with **All types** as the default.
 - Shared status, search, and campaign-availability controls remain.
 - Source column/filter follow the source-presentation policy above.
 
@@ -311,7 +311,7 @@ must not reuse or overload publish state. Do not add that domain status in V1.
    reads. Keep it separate from list/discovery endpoints so unpublished records
    cannot be newly selected.
 
-### 4. Add dashboard organization management
+### 4. Add dashboard organization management — complete
 
 Use `skill-proficiencies` as the flat authoring template and `feats` as the
 vocabulary-aware overview template.
@@ -322,15 +322,15 @@ vocabulary-aware overview template.
 2. Form:
    - shared identity fields;
    - rich-text description;
-   - required single-select Organization kind for publish;
-   - relaxed Organization kind for draft.
+   - required single-select Type for publish;
+   - relaxed Type for draft.
 3. Detail:
-   - Organization kind metadata;
+   - Type metadata;
    - authored description;
    - no reverse member list in V1.
 4. Overview:
-   - sortable Organization kind column;
-   - Organization kind equals filter;
+   - sortable Type column;
+   - Type equals filter with an All types default;
    - no Homebrew source badge/filter under the presentation policy.
 5. Wire content routes, lazy routes, router tree, content exports,
    sidebar/Homebrew registry, `HOMEBREW_SUMMARY_CONTENT_TYPE_KEYS`, and the
@@ -343,7 +343,7 @@ Reverse membership remains derivable from character references but is not a V1
 query or organization-detail feature; adding it later requires permissions,
 pagination, and performance design.
 
-### 5. Add character connection contracts and persistence
+### 5. Add character connection contracts and persistence — complete
 
 1. Add:
    - `characterOrganizationConnectionSchema`;
@@ -358,7 +358,7 @@ pagination, and performance design.
 6. Add `connections` to the builder draft, initialize it empty, and bump
    `CHARACTER_BUILDER_DRAFT_VERSION` without migration.
 
-### 6. Add builder catalog and optional-step orchestration
+### 6. Add builder catalog and optional-step orchestration — complete
 
 1. Add `organizations` to `CharacterBuildCatalog`, its index, builder catalog
    clients, campaign catalog clients, fixtures, and context tests.
@@ -384,8 +384,8 @@ pagination, and performance design.
    and tests.
 3. Build on `CatalogPickerSheet` and shared picker primitives.
 4. Support:
-   - name and Organization kind search;
-   - Organization kind as the sole structured filter;
+   - name and organization type search;
+   - Type as the sole structured filter;
    - name and kind label in result rows;
    - add/remove multiple connections;
    - selected summary;

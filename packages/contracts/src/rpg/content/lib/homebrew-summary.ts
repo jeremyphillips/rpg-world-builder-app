@@ -10,6 +10,7 @@ export const HOMEBREW_SUMMARY_CONTENT_TYPE_KEYS = [
   'feats',
   'equipment',
   'skill-proficiencies',
+  'organizations',
 ] as const satisfies readonly ContentTypeKey[]
 
 export const homebrewSummaryContentTypeSchema = z.enum(HOMEBREW_SUMMARY_CONTENT_TYPE_KEYS)

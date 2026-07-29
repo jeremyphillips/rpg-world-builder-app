@@ -129,6 +129,13 @@ export const CONTENT_TYPE_INTEGRATION_MANIFEST = {
     api: {
       registrationPath: 'apps/api/src/features/content/organizations/organizations.config.ts',
     },
+    dashboard: {
+      folder: 'organizations',
+      routeSection: 'organizations',
+      formDefinitionPath:
+        'apps/dashboard/src/features/content/organizations/lib/organization-form-def.ts',
+      visibleInSidebar: true,
+    },
     capabilities: { required: true },
   },
 } satisfies Record<ContentTypeKey, ContentTypeIntegrationManifestEntry>

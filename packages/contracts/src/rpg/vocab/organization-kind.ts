@@ -16,39 +16,39 @@ export const ORGANIZATION_KIND_ENTRIES = {
     description: 'A kingdom, council, administration, or other governing body.',
   },
   political: {
-    label: 'Political Faction',
+    label: 'Political',
     description: 'A party, movement, court, or noble bloc pursuing political influence.',
   },
   religious: {
-    label: 'Religious Organization',
+    label: 'Religious',
     description: 'A church, cult, temple, holy order, or other faith-based organization.',
   },
   military: {
-    label: 'Military Organization',
+    label: 'Military',
     description: 'An army, guard, militia, martial order, or other armed organization.',
   },
   criminal: {
-    label: 'Criminal Organization',
+    label: 'Criminal',
     description: 'A syndicate, gang, smuggling ring, or thieves’ guild.',
   },
   commercial: {
-    label: 'Commercial Organization',
+    label: 'Commercial',
     description: 'A company, merchant house, or trade consortium organized for commerce.',
   },
   professional: {
-    label: 'Guild or Professional Association',
+    label: 'Guild or professional',
     description: 'A guild, trade group, union, or occupational association.',
   },
   academic: {
-    label: 'Academic Institution',
+    label: 'Academic',
     description: 'A school, college, library, or learned society.',
   },
   community: {
-    label: 'Community Organization',
+    label: 'Community',
     description: 'A clan, mutual-aid group, neighborhood association, or civic group.',
   },
   other: {
-    label: 'Other Organization',
+    label: 'Other',
     description: 'An organization with no useful primary-purpose match.',
   },
 } as const satisfies Record<string, GameTermEntry>

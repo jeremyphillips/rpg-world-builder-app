@@ -31,6 +31,7 @@ export function toNpcCharacter(doc: CharacterRecord): NpcCharacter {
     wealth: doc.wealth,
     narrative: doc.narrative ?? undefined,
     feats: doc.feats ?? [],
+    connections: doc.connections ?? { organizations: [] },
     vital: normalizeCharacterVital(rawVital),
     createdAt: doc.createdAt.toISOString(),
     updatedAt: doc.updatedAt.toISOString(),

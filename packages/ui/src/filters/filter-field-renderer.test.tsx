@@ -44,6 +44,7 @@ const schema = createFilterSchema<DemoRow, TestFilterState>([
     ],
     getValue: (row) => row.status as 'draft' | 'published',
     showAllOption: true,
+    allOptionLabel: 'All statuses',
   }),
   createBooleanFilter<DemoRow, TestFilterState, 'hiddenOnly'>({
     id: 'hiddenOnly',
@@ -148,6 +149,14 @@ describe('FilterFieldRenderer chrome', () => {
 })
 
 describe('FilterFieldRenderer behavior', () => {
+  it('renders a custom label for the all option', async () => {
+    const user = userEvent.setup()
+    render(<RendererHarness fieldId="status" />)
+
+    await user.click(screen.getByRole('combobox', { name: 'Status' }))
+    expect(screen.getByRole('option', { name: 'All statuses' })).toBeInTheDocument()
+  })
+
   it('renders a disabled popover trigger when groups are empty', () => {
     render(<RendererHarness fieldId="mechanics" />)
 

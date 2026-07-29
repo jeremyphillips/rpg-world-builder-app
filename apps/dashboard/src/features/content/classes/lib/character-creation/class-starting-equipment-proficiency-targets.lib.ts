@@ -42,6 +42,7 @@ export function buildProficiencyChoiceTargetOptions(args: {
     spells: [],
     equipment: [...equipment],
     skillProficiencies: [],
+    organizations: [],
     languages: [],
   })
 

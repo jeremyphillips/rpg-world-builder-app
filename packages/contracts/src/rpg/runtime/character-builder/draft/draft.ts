@@ -10,6 +10,7 @@ import { characterBuilderStepIdSchema } from '../../../character-builder/step-id
 import type { CharacterBuilderDraftScope } from './draft-scope'
 import { characterBuilderDraftScopeSchema } from './draft-scope'
 import { magicItemGrantSelectionSchema } from '../equipment/magic-item-selection'
+import { characterConnectionsSchema } from '../../character/connections'
 
 // ---------------------------------------------------------------------------
 // CharacterBuilderDraft — the temporary workflow object. Allowed to represent
@@ -131,6 +132,7 @@ export const characterBuilderDraftSchema = z.object({
   species: characterBuilderDraftSpeciesSchema,
   class: characterBuilderDraftClassSchema,
   abilities: characterBuilderDraftAbilitiesSchema,
+  connections: characterConnectionsSchema,
   /**
    * All pending-choice picks (proficiencies, equipment, spells, traits),
    * keyed by deterministic ChoiceSet id (choice-set.ts, BENCH-078).
@@ -150,6 +152,7 @@ export function createEmptyCharacterBuilderDraft(): CharacterBuilderDraft {
     species: {},
     class: { level: 1 },
     abilities: {},
+    connections: { organizations: [] },
     choiceSelections: {},
     touchedStepIds: [],
   }
@@ -160,7 +163,7 @@ export function createEmptyCharacterBuilderDraft(): CharacterBuilderDraft {
 // rehydration drops mismatched or unparseable state instead of migrating.
 // ---------------------------------------------------------------------------
 
-export const CHARACTER_BUILDER_DRAFT_VERSION = 4
+export const CHARACTER_BUILDER_DRAFT_VERSION = 5
 
 export const persistedCharacterBuilderStateSchema = z.object({
   version: z.literal(CHARACTER_BUILDER_DRAFT_VERSION),

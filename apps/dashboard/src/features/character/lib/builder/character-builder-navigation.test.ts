@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { BUILDER_STEPS } from '@rpg/contracts'
 
 import {
   appendTouchedStepId,
@@ -14,10 +15,17 @@ describe('character-builder-navigation', () => {
   })
 
   it('walks adjacent steps forward and back', () => {
-    expect(getAdjacentBuilderStepId('identity', 'forward')).toBe('species')
-    expect(getAdjacentBuilderStepId('species', 'back')).toBe('identity')
+    expect(getAdjacentBuilderStepId('identity', 'forward')).toBe('connections')
+    expect(getAdjacentBuilderStepId('connections', 'back')).toBe('identity')
     expect(getAdjacentBuilderStepId('identity', 'back')).toBeNull()
     expect(getAdjacentBuilderStepId('review', 'forward')).toBeNull()
+  })
+
+  it('walks the supplied effective steps when Connections is omitted', () => {
+    const effectiveSteps = BUILDER_STEPS.filter(({ id }) => id !== 'connections')
+
+    expect(getAdjacentBuilderStepId('identity', 'forward', effectiveSteps)).toBe('species')
+    expect(getAdjacentBuilderStepId('species', 'back', effectiveSteps)).toBe('identity')
   })
 
   it('identifies first and review steps', () => {

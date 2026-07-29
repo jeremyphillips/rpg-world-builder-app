@@ -86,6 +86,7 @@ describe('deriveEquipmentBudgetSummary', () => {
       spells: [],
       equipment: [rope],
       skillProficiencies: [],
+      organizations: [],
       languages: [],
     })
 
@@ -139,6 +140,7 @@ describe('resolveStartingEquipmentFundingOptions', () => {
       spells: [],
       equipment: [rope],
       skillProficiencies: [],
+      organizations: [],
       languages: [],
     })
 
@@ -185,6 +187,7 @@ describe('resolveStartingEquipmentFundingOptions', () => {
       spells: [],
       equipment: [rope],
       skillProficiencies: [],
+      organizations: [],
       languages: [],
     })
 
@@ -235,6 +238,7 @@ describe('resolveStartingEquipmentFundingOptions', () => {
       spells: [],
       equipment: [rope],
       skillProficiencies: [],
+      organizations: [],
       languages: [],
     })
 
@@ -290,6 +294,7 @@ describe('deriveEquipmentBudgetSummaryFromFunding', () => {
       spells: [],
       equipment: [rope],
       skillProficiencies: [],
+      organizations: [],
       languages: [],
     })
 

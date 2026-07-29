@@ -26,6 +26,7 @@ export const SAMPLE_PC: PcCharacter = {
     mounts: [],
   },
   wealth: { cp: 0, sp: 0, gp: 0, pp: 0 },
+  connections: { organizations: [] },
   feats: [],
   vital: createDefaultCharacterVitalState(),
   narrative: { backstory: 'A hardy dwarf fighter from the northern holds.' },

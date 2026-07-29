@@ -20,6 +20,8 @@ import { ReviewStep } from './steps/review-step.client'
 import { SpeciesStep } from './steps/species-step.client'
 import { SpellsStep } from './steps/spells-step.client'
 import type { CharacterBuilderNavigateToStep } from '../lib/builder/character-builder-navigation-options'
+import { BuilderStepFrame } from './steps/builder-step-frame.client'
+import { Text } from '@rpg/ui'
 
 export type CharacterBuilderStepContentProps = {
   stepId: CharacterBuilderStepId
@@ -62,6 +64,15 @@ export function CharacterBuilderStepContent({
           onStepComplete={onStepComplete}
           onFormContinueValidationFailed={onFormContinueValidationFailed}
         />
+      )
+    case 'connections':
+      return (
+        <BuilderStepFrame stepId="connections" validationIssues={validationIssues}>
+          <Text variant="muted">
+            Organization connections are optional. Continue without a selection or return after the
+            organization picker is available.
+          </Text>
+        </BuilderStepFrame>
       )
     case 'species':
       return (

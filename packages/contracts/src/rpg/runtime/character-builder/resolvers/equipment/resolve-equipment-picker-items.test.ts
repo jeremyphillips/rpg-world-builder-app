@@ -208,6 +208,7 @@ describe('resolveEquipmentPickerItems', () => {
       spells: [],
       equipment: [rope],
       skillProficiencies: [],
+      organizations: [],
       languages: [],
     })
 

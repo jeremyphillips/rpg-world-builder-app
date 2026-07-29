@@ -7,6 +7,7 @@ import { z } from 'zod'
 
 export const CHARACTER_BUILDER_STEP_IDS = [
   'identity',
+  'connections',
   'species',
   'class',
   'abilities',

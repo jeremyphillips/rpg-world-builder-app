@@ -2,7 +2,7 @@
 
 import { useCallback, useRef } from 'react'
 import {
-  BUILDER_STEPS,
+  resolveEffectiveBuilderSteps,
   resolveBuilderStepDescription,
   type CharacterBuildCatalogIndex,
   type CharacterBuildContext,
@@ -17,7 +17,6 @@ import { cn, Text } from '@rpg/ui'
 import { CheckCircle2, Circle, CircleAlert, CircleDot, Lock, type LucideIcon } from 'lucide-react'
 
 import {
-  resolveStepRailIndex,
   resolveStepRailKeyboardDirection,
   resolveStepRailKeyboardTarget,
 } from '../lib/builder/character-builder-step-rail-keyboard.lib'
@@ -77,7 +76,8 @@ export function CharacterBuilderStepRail({
   onStepSelect,
 }: CharacterBuilderStepRailProps) {
   const stepButtonRefs = useRef<Array<HTMLButtonElement | null>>([])
-  const currentStepIndex = resolveStepRailIndex(currentStepId)
+  const effectiveSteps = resolveEffectiveBuilderSteps(context, draft)
+  const currentStepIndex = effectiveSteps.findIndex((step) => step.id === currentStepId)
 
   const focusStepAtIndex = useCallback((index: number) => {
     stepButtonRefs.current[index]?.focus()
@@ -88,23 +88,27 @@ export function CharacterBuilderStepRail({
       const direction = resolveStepRailKeyboardDirection(event.key)
       if (!direction) return
 
-      const targetIndex = resolveStepRailKeyboardTarget(direction, currentStepIndex)
+      const targetIndex = resolveStepRailKeyboardTarget(
+        direction,
+        currentStepIndex,
+        effectiveSteps.length,
+      )
       if (targetIndex === null || targetIndex === currentStepIndex) return
 
       event.preventDefault()
-      const targetStep = BUILDER_STEPS[targetIndex]
+      const targetStep = effectiveSteps[targetIndex]
       if (!targetStep) return
 
       focusStepAtIndex(targetIndex)
       onStepSelect(targetStep.id)
     },
-    [currentStepIndex, focusStepAtIndex, onStepSelect],
+    [currentStepIndex, effectiveSteps, focusStepAtIndex, onStepSelect],
   )
 
   return (
     <nav aria-label="Character builder steps" onKeyDown={handleStepRailKeyDown}>
       <ol className={characterBuilderStepRailClasses}>
-        {BUILDER_STEPS.map((step, index) => {
+        {effectiveSteps.map((step, index) => {
           const visualStatus = resolveStepVisualStatus({
             stepId: step.id,
             draft,

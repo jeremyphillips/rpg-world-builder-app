@@ -38,7 +38,7 @@ describe('organization kind vocabulary', () => {
   })
 
   it('returns labels and falls back for unknown ids', () => {
-    expect(getOrganizationKindLabel('community')).toBe('Community Organization')
+    expect(getOrganizationKindLabel('community')).toBe('Community')
     expect(getOrganizationKindLabel('custom')).toBe('custom')
   })
 })

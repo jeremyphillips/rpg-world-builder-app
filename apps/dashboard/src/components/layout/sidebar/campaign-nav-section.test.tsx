@@ -21,7 +21,7 @@ vi.mock('@/features/campaign', async (importOriginal) => {
 })
 
 describe('CampaignNavSection', () => {
-  it('lists visible-sidebar content entries and Homebrew below Skill Proficiencies', () => {
+  it('lists visible-sidebar content entries and Homebrew after the final content entry', () => {
     render(
       <MemoryRouter>
         <CampaignNavSection />
@@ -42,11 +42,11 @@ describe('CampaignNavSection', () => {
     const navLinks = screen.getAllByRole('link').map((link) => link.textContent)
     const sessionsIndex = navLinks.indexOf('Sessions')
     const npcsIndex = navLinks.indexOf('NPCs')
-    const skillIndex = navLinks.indexOf('Skill Proficiencies')
+    const finalContentIndex = navLinks.indexOf(VISIBLE_SIDEBAR_CONTENT.at(-1)!.label)
     const homebrewIndex = navLinks.indexOf('Homebrew')
     expect(sessionsIndex).toBeGreaterThan(-1)
     expect(npcsIndex).toBe(sessionsIndex + 1)
-    expect(skillIndex).toBeGreaterThan(-1)
-    expect(homebrewIndex).toBe(skillIndex + 1)
+    expect(finalContentIndex).toBeGreaterThan(-1)
+    expect(homebrewIndex).toBe(finalContentIndex + 1)
   })
 })
