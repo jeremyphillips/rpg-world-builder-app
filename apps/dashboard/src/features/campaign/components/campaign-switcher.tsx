@@ -76,7 +76,7 @@ export function CampaignSwitcher({ showLabel = true }: CampaignSwitcherProps) {
     <DropdownMenu modal={false}>
       <DropdownMenuTrigger
         className={cn(
-          'flex h-14 w-full items-center justify-between gap-2 rounded-lg border border-input bg-background px-4 text-left',
+          'flex h-11 min-h-10 w-full items-center justify-between gap-2 rounded-lg border border-input bg-background px-3 text-left',
           'transition-colors hover:bg-accent hover:text-accent-foreground',
           'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background',
           'disabled:cursor-not-allowed disabled:opacity-50',
