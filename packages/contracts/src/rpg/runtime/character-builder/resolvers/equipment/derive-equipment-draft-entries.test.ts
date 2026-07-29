@@ -140,6 +140,7 @@ function makeCatalogIndex() {
     spells: [],
     equipment: [leatherArmor, shield, rope],
     skillProficiencies: [],
+    organizations: [],
     languages: [],
   })
 }

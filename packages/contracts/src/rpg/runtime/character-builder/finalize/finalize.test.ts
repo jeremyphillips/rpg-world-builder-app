@@ -54,6 +54,45 @@ describe('finalizeCharacterBuild', () => {
     expect(input.narrative).toEqual({ backstory: 'A veteran soldier.' })
   })
 
+  it('copies normalized selectable organization connections', () => {
+    const organization = {
+      id: 'organization-lantern-guild',
+      slug: 'lantern-guild',
+      rulesetId: 'srd-cc-5.2.1' as const,
+      source: 'homebrew' as const,
+      status: 'published' as const,
+      campaignId: 'campaign-1',
+      createdAt: '2026-07-28T12:00:00.000Z',
+      updatedAt: '2026-07-28T12:00:00.000Z',
+      name: 'Lantern Guild',
+      organizationKind: 'professional' as const,
+    }
+    const input = finalizeCharacterBuild(
+      makeCompleteDraft({
+        connections: { organizations: [{ organizationId: organization.id }] },
+      }),
+      {
+        ...builderTestContext,
+        catalog: { ...builderTestContext.catalog, organizations: [organization] },
+      },
+    )
+
+    expect(input.connections).toEqual({
+      organizations: [{ organizationId: organization.id }],
+    })
+  })
+
+  it('blocks finalization when an organization connection is no longer selectable', () => {
+    expect(() =>
+      finalizeCharacterBuild(
+        makeCompleteDraft({
+          connections: { organizations: [{ organizationId: 'organization-removed' }] },
+        }),
+        builderTestContext,
+      ),
+    ).toThrow(CharacterBuildFinalizationError)
+  })
+
   it('carries class proficiency sources', () => {
     const input = finalizeCharacterBuild(makeCompleteDraft(), builderTestContext)
 

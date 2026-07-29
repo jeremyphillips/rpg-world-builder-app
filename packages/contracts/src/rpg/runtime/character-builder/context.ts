@@ -7,6 +7,7 @@ import type { Equipment } from '../../content/equipment'
 import type { SkillProficiency } from '../../content/skill-proficiency'
 import type { Species } from '../../content/species'
 import type { Spell } from '../../content/spell'
+import type { Organization } from '../../content/organization'
 import type { LanguageSeedOption } from '../../vocab/language'
 import { resolvedCampaignCharacterCreationPatchSchema } from '../../campaign/patches/campaign-character-creation-patch'
 import { resolvedArmorClassSchema } from '../../campaign/patches/campaign-mechanics-patch'
@@ -47,6 +48,7 @@ export type CharacterBuildCatalog = {
   spells: Spell[]
   equipment: Equipment[]
   skillProficiencies: SkillProficiency[]
+  organizations: Organization[]
   /** Active language vocabulary rows for the ruleset (category included). */
   languages: CharacterBuildLanguageOption[]
 }
@@ -57,6 +59,7 @@ export type CharacterBuildCatalogIndex = {
   spells: ReadonlyMap<string, Spell>
   equipment: ReadonlyMap<string, Equipment>
   skillProficiencies: ReadonlyMap<string, SkillProficiency>
+  organizations: ReadonlyMap<string, Organization>
   languages: readonly CharacterBuildLanguageOption[]
 }
 
@@ -74,6 +77,7 @@ export function indexCharacterBuildCatalog(
     spells: byId(catalog.spells),
     equipment: byId(catalog.equipment),
     skillProficiencies: byId(catalog.skillProficiencies),
+    organizations: byId(catalog.organizations),
     languages: catalog.languages,
   }
 }

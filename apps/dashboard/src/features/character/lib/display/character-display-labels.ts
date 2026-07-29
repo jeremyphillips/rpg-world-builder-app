@@ -21,6 +21,7 @@ export const CHARACTER_SECTION_LABELS = {
   classFeatures: 'Class features',
   speciesTraits: 'Species traits',
   feats: 'Feats',
+  connections: 'Connections',
   narrative: 'Narrative',
 } as const
 
@@ -34,6 +35,7 @@ export const CHARACTER_EMPTY_SECTION_TEXT = {
   speciesTraits: 'No species traits.',
   feats: 'No feats.',
   featuresAndTraits: 'No features, traits, or feats.',
+  connections: 'No organization connections.',
   narrative: 'No narrative details recorded.',
 } as const
 
@@ -47,10 +49,12 @@ export const CHARACTER_DETAIL_TAB_LABELS = {
   spells: 'Spells',
   equipment: 'Equipment',
   featuresAndTraits: 'Features & Traits',
+  connections: 'Connections',
   narrative: 'Narrative',
 } as const
 
 export const CHARACTER_CARD_CAMPAIGN_LABEL = 'Campaign'
+export const UNAVAILABLE_ORGANIZATION_LABEL = 'Unavailable organization'
 
 export const CHARACTER_PROFICIENCY_GROUP_LABELS = {
   skills: getProficiencyDomainCompactLabel('skill'),

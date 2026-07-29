@@ -32,6 +32,30 @@ const viewModel = buildCharacterDetailViewModel({
   rules: context.characterCreationRules,
   xpProgression: { entries: [{ level: 1, xpRequired: 0 }] },
 })
+const connectedViewModel = buildCharacterDetailViewModel({
+  character: SAMPLE_PC,
+  catalogIndex,
+  rules: context.characterCreationRules,
+  xpProgression: { entries: [{ level: 1, xpRequired: 0 }] },
+  organizationReferences: [
+    {
+      organizationId: 'organization-lantern-guild',
+      organization: {
+        id: 'organization-lantern-guild',
+        slug: 'lantern-guild',
+        rulesetId: 'srd-cc-5.2.1',
+        source: 'homebrew',
+        status: 'published',
+        campaignId: 'campaign-1',
+        createdAt: '2026-07-28T12:00:00.000Z',
+        updatedAt: '2026-07-28T12:00:00.000Z',
+        name: 'Lantern Guild',
+        organizationKind: 'professional',
+      },
+    },
+    { organizationId: 'organization-missing', organization: null },
+  ],
+})
 
 describe('CharacterDetailContent', () => {
   it('renders the character summary from the view model', () => {
@@ -84,6 +108,23 @@ describe('CharacterDetailContent', () => {
 
     await user.click(screen.getByRole('button', { name: 'Delete' }))
     expect(screen.getByRole('alertdialog')).toHaveTextContent('Delete character?')
+  })
+
+  it('displays resolved and missing organization connections', async () => {
+    const user = userEvent.setup()
+    render(
+      <MemoryRouter>
+        <CharacterDetailContent viewModel={connectedViewModel} />
+      </MemoryRouter>,
+    )
+
+    await user.click(screen.getByRole('tab', { name: 'Connections' }))
+    expect(screen.getByText('Lantern Guild')).toBeInTheDocument()
+    expect(screen.getByText('Guild or professional')).toBeInTheDocument()
+    expect(screen.getByText('Unavailable organization')).toBeInTheDocument()
+    expect(
+      screen.getByText('This organization is missing or no longer available.'),
+    ).toBeInTheDocument()
   })
 
   it('has no axe accessibility violations', async () => {

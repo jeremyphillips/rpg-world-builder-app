@@ -22,9 +22,12 @@ async function evaluateContentDemotionBlockers<T extends WriteEntityBase>(
     throw new HttpError(403, 'forbidden', 'System content is always published.')
   }
 
-  const characterBlockers = config.resolveCharacterUsageBlockers
-    ? await config.resolveCharacterUsageBlockers({ campaignId, entity })
-    : await resolveContentUsageBlockers(campaignId, config.typeName, entityId, entity.slug)
+  const characterBlockers =
+    config.characterUsageBlocksDemotion === false
+      ? []
+      : config.resolveCharacterUsageBlockers
+        ? await config.resolveCharacterUsageBlockers({ campaignId, entity })
+        : await resolveContentUsageBlockers(campaignId, config.typeName, entityId, entity.slug)
 
   const hookBlockers = config.resolveDemoteBlockers
     ? await config.resolveDemoteBlockers({ campaignId, entity })

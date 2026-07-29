@@ -23,6 +23,7 @@ function createContext() {
       ...populatedBuilderCatalog,
       classes: [fighter],
       skillProficiencies: skillSlugs.map((slug) => pickSkillProficiency(slug)),
+      organizations: [],
     },
   })
 }

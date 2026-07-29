@@ -358,8 +358,10 @@ See [`tools/content-types/README.md`](../tools/content-types/README.md).
 
 When adding a type: extend `CONTENT_TYPE_KEYS` and terms in contracts, add a
 manifest entry (`satisfies Record<ContentTypeKey, …>` enforces completeness),
-then wire catalog, API, and dashboard layers. Per-layer drift tests fail when
-any surface drifts.
+then wire catalog, API, and dashboard layers. API and dashboard metadata are
+declared when those integrations exist, so contracts-first phases do not need
+placeholder files. Per-layer drift tests remain strict for every declared
+surface.
 
 ---
 
@@ -637,6 +639,49 @@ Register the catalog subpath in [`packages/catalog/package.json`](../packages/ca
 `exports` and add a manifest entry in
 [`tools/content-types/src/content-type-integration-manifest.ts`](../tools/content-types/src/content-type-integration-manifest.ts).
 
+When a type intentionally has no bundled system records, do not create an empty
+seed package for symmetry. Declare `catalog: { bundledContent: 'none' }` in the
+integration manifest and omit the API config's `system` capability.
+
+The manifest models that topology as a discriminated union:
+
+```ts
+type CatalogIntegration =
+  | { bundledContent: 'bundled'; packageName: string }
+  | { bundledContent: 'none' }
+```
+
+`bundledContent: 'bundled'` means the type owns an `@rpg/catalog/<type>` seed
+export and may provide an API system layer. `bundledContent: 'none'` means
+normal records come from another layer, typically campaign-authored content.
+It is a package/loader declaration—not a user-facing provenance policy.
+
+#### Homebrew UI label exceptions
+
+Campaign-authored records continue to persist `source: 'homebrew'` regardless
+of how the dashboard presents that provenance. By default, content overviews
+and headings show the Homebrew badge, source column, and source filter.
+
+A content type may suppress that UI language only through the exhaustive
+`CONTENT_TYPE_PRESENTATION` policy in
+`apps/dashboard/src/features/content/lib/content-type-presentation.ts`.
+Organizations are the initial exception because all organization records are
+campaign-authored in V1 and repeatedly labeling them Homebrew adds no useful
+distinction.
+
+Exception rules:
+
+- Never infer UI labeling from `bundledContent`; bundling may change without
+  changing the product meaning of provenance.
+- Suppression affects only source badges, labels, columns, and filters. It does
+  not change stored source, authorization, deletion rules, draft/publish state,
+  or campaign availability.
+- Add exceptions by content-type key in the exhaustive policy, consume them
+  through shared presentation helpers, and update the policy coverage tests.
+  Do not add route- or component-specific `organizations` conditionals.
+- Document the product rationale so a future bundled catalog does not silently
+  remove or restore Homebrew language.
+
 ### 3. Catalog seed tests (`packages/catalog/src/<type>/index.test.ts`)
 
 Assert:
@@ -686,21 +731,31 @@ interface <TypeName>PatchRecord {
 
 export const <type>ContentConfig: ContentTypeConfig<<TypeName>> = {
   type: '<kebab-plural>',
-  loadSystem: loadSeed<TypeName>s,
-  systemSlugs: seed<TypeName>Slugs,
-  loadPatches: async (campaignId) => {
-    const docs = await <TypeName>PatchModel.find({ campaignId }).lean<<TypeName>PatchRecord[]>()
-    return docs.map<OverlayPatch>((d) => ({ targetId: d.targetId, patch: d.patch }))
+  system: {
+    load: loadSeed<TypeName>s,
+    slugs: seed<TypeName>Slugs,
+    loadPatches: async (campaignId) => {
+      const docs = await <TypeName>PatchModel.find({ campaignId }).lean<<TypeName>PatchRecord[]>()
+      return docs.map<OverlayPatch>((d) => ({ targetId: d.targetId, patch: d.patch }))
+    },
   },
   loadHomebrew: async (_campaignId, _rulesetId) => [],  // replace when homebrew lands
 }
 ```
 
-If patch support isn't needed yet, use a stub for `loadPatches`:
+For a campaign-authored type with no bundled catalog, omit `system`:
 
 ```typescript
-loadPatches: async (_campaignId) => [],
+export const <type>ContentConfig: ContentTypeConfig<<TypeName>> = {
+  type: '<kebab-plural>',
+  loadHomebrew: async (campaignId, rulesetId) => {
+    // load campaign-owned records
+  },
+}
 ```
+
+Types without bundled system content omit the entire system capability and
+therefore do not need a patch loader.
 
 ### 6. Registry (`apps/api/src/features/content/content-types.ts`)
 
@@ -829,6 +884,13 @@ Add the new type to `CONTENT_ROUTES` (aggregated by `routes.ts` as `ROUTES.conte
 ```
 
 Note: URL segments and dashboard/API subfolders use the content type key (kebab-case when multi-word, e.g. `skill-proficiencies/`). `ROUTES.content.*` object keys and JSON response keys stay camelCase (`skillProficiencies`).
+
+For an authorable type, also map the form definition's API `routeKey` to its
+`CONTENT_ROUTES` section in
+`apps/dashboard/src/features/content/lib/forms/shells/content-form-navigation.ts`.
+The shared create shell uses this registration to navigate to the saved
+entity's edit route. Add a post-create navigation test for the new type; the
+route-manifest drift test only verifies the `CONTENT_ROUTES` entry itself.
 
 ### 16. Lazy routes (`apps/dashboard/src/app/lazy-routes.ts`)
 

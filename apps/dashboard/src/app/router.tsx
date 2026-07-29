@@ -45,6 +45,10 @@ import {
   FeatDetailRoute,
   FeatEditRoute,
   FeatsOverviewRoute,
+  OrganizationCreateRoute,
+  OrganizationDetailRoute,
+  OrganizationEditRoute,
+  OrganizationsOverviewRoute,
   SkillProficienciesOverviewRoute,
   SkillProficiencyCreateRoute,
   SkillProficiencyDetailRoute,
@@ -366,6 +370,41 @@ const router = createBrowserRouter(
                         {
                           path: 'edit',
                           element: <SpellEditRoute />,
+                          handle: { crumb: () => ({ label: 'Edit' }) } satisfies CrumbHandle,
+                        },
+                      ],
+                    },
+                  ],
+                },
+                {
+                  path: 'organizations',
+                  element: <Outlet />,
+                  handle: {
+                    crumb: (params) => ({
+                      label: getContentTypeCollectionLabel('organizations'),
+                      href: ROUTES.content.organizations.overview(params.campaignId!),
+                    }),
+                  } satisfies CrumbHandle,
+                  children: [
+                    { index: true, element: <OrganizationsOverviewRoute /> },
+                    {
+                      path: 'new',
+                      element: <OrganizationCreateRoute />,
+                      handle: { crumb: () => ({ label: 'New' }) } satisfies CrumbHandle,
+                    },
+                    {
+                      path: ':organizationId',
+                      element: <Outlet />,
+                      handle: {
+                        crumb: (_params, { entityLabel }) => ({
+                          label: entityLabel ?? '…',
+                        }),
+                      } satisfies CrumbHandle,
+                      children: [
+                        { index: true, element: <OrganizationDetailRoute /> },
+                        {
+                          path: 'edit',
+                          element: <OrganizationEditRoute />,
                           handle: { crumb: () => ({ label: 'Edit' }) } satisfies CrumbHandle,
                         },
                       ],

@@ -44,6 +44,7 @@ export const SectionUnavailable: Story = {
 export const HeadingBadgesDraftHomebrew: Story = {
   render: () => (
     <ContentEditHeadingBadges
+      contentType="feats"
       source="homebrew"
       status="draft"
       campaignAccess={DEFAULT_CONTENT_CAMPAIGN_ACCESS}
@@ -54,6 +55,7 @@ export const HeadingBadgesDraftHomebrew: Story = {
 export const HeadingBadgesInactiveSystem: Story = {
   render: () => (
     <ContentEditHeadingBadges
+      contentType="feats"
       source="system"
       status="published"
       campaignAccess={{

@@ -12,12 +12,12 @@ patterns, and vocab rules → [`docs/content-types.md`](../../../docs/content-ty
 
 | Step | Layer     | Deliverable                                                                                                                                               |
 | ---- | --------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 0    | Tooling   | Entry in `CONTENT_TYPE_INTEGRATION_MANIFEST`                                                                                                              |
+| 0    | Tooling   | Entry in `CONTENT_TYPE_INTEGRATION_MANIFEST`; add API/dashboard capability metadata with the implementing phase                                           |
 | 1    | Contracts | `<type>.ts` schema, inputs, patch DTOs, tests, barrel export                                                                                              |
 | 1b   | Contracts | `CONTENT_TYPE_TERMS` entry; vocab maps if closed sets                                                                                                     |
 | 1c   | Contracts | `CONTENT_TYPE_CAPABILITIES` when duplication applies                                                                                                      |
-| 2    | Catalog   | Seed JSON under `packages/catalog/src/<type>/data/srd-cc-5.2.1/`                                                                                          |
-| 3    | Catalog   | `index.ts` loaders + `index.test.ts`; `package.json` export                                                                                               |
+| 2    | Catalog   | Declare `catalog.bundledContent`; bundled types add seed JSON under `packages/catalog/src/<type>/data/srd-cc-5.2.1/`                                      |
+| 3    | Catalog   | Bundled types only: `index.ts` loaders + `index.test.ts`; `package.json` export. No-bundle types omit the package.                                        |
 | 4    | API       | Patch/homebrew Mongoose models when needed                                                                                                                |
 | 5    | API       | `<type>.config.ts` — imports `@rpg/catalog/<type>`                                                                                                        |
 | 6    | API       | One line in `content-types.ts`                                                                                                                            |
@@ -33,6 +33,7 @@ patterns, and vocab rules → [`docs/content-types.md`](../../../docs/content-ty
 | 16   | Dashboard | Lazy route exports in `app/lazy-routes.ts`                                                                                                                |
 | 17   | Dashboard | Router tree in `app/router.tsx`                                                                                                                           |
 | 18   | Dashboard | `VISIBLE_SIDEBAR_CONTENT` when `visibleInSidebar: true`                                                                                                   |
+| —    | Dashboard | Authorable types: API `routeKey` mapping in `content-form-navigation.ts` for post-create edit navigation                                                  |
 | —    | Tests     | `content-form-test-registry.ts` import when form def exists                                                                                               |
 | —    | Gates     | All [layer drift tests](#drift-test-map) green                                                                                                            |
 
@@ -97,8 +98,10 @@ Source: [`content-type-integration-manifest.ts`](../../../tools/content-types/sr
 
 ```typescript
 type ContentTypeIntegrationManifestEntry = {
-  catalog?: { packageName: string } // @rpg/catalog/<segment>
-  api: { registrationPath: string } // repo-relative *.config.ts
+  catalog:
+    | { bundledContent: 'bundled'; packageName: string } // @rpg/catalog/<segment>
+    | { bundledContent: 'none' }
+  api?: { registrationPath: string } // present once registered in API runtime
   dashboard?: {
     folder: string // content feature subfolder
     routeSection?: string // CONTENT_ROUTES key (camelCase)

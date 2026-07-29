@@ -7,6 +7,7 @@ import { findCampaignById } from '../../campaign'
 import { attachCampaignAccessForTargetType } from '../lib/content-campaign-access.service'
 import { filterCatalogForMembership } from '../lib/filter-catalog-for-viewer'
 import { resolveCatalog } from '../lib/resolve-catalog'
+import { loadSystemContent, loadSystemContentPatches } from '../lib/content-type-config'
 import { resolveContentForCampaign } from '../content-types'
 import { subclassContentConfig } from '../subclasses/subclasses.config'
 
@@ -22,11 +23,15 @@ export async function resolveSubclassSummariesByClassId(
 
   const { rulesetId } = campaign
   const [patches, homebrew] = await Promise.all([
-    subclassContentConfig.loadPatches(campaignId),
+    loadSystemContentPatches(subclassContentConfig, campaignId),
     subclassContentConfig.loadHomebrew(campaignId, rulesetId),
   ])
 
-  const resolved = resolveCatalog(subclassContentConfig.loadSystem(rulesetId), patches, homebrew)
+  const resolved = resolveCatalog(
+    loadSystemContent(subclassContentConfig, rulesetId),
+    patches,
+    homebrew,
+  )
   const withCampaignAccess = await attachCampaignAccessForTargetType(
     campaignId,
     'subclasses',

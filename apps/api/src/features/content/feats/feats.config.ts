@@ -50,11 +50,13 @@ function bodyFromCreateInput(input: Record<string, unknown>): Record<string, unk
 
 export const featContentConfig: ContentTypeConfig<Feat> = {
   type: 'feats',
-  loadSystem: loadSeedFeats,
-  systemSlugs: seedFeatSlugs,
-  loadPatches: async (campaignId) => {
-    const docs = await FeatPatchModel.find({ campaignId }).lean<FeatPatchRecord[]>()
-    return docs.map<OverlayPatch>((d) => ({ targetId: d.targetId, patch: d.patch }))
+  system: {
+    load: loadSeedFeats,
+    slugs: seedFeatSlugs,
+    loadPatches: async (campaignId) => {
+      const docs = await FeatPatchModel.find({ campaignId }).lean<FeatPatchRecord[]>()
+      return docs.map<OverlayPatch>((d) => ({ targetId: d.targetId, patch: d.patch }))
+    },
   },
   loadHomebrew: async (campaignId, rulesetId) => {
     const docs = await HomebrewFeatModel.find({ campaignId, rulesetId }).lean<

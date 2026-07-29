@@ -6,7 +6,7 @@ import { buildContentFormOptionSets, toContentFieldOption } from './content-form
 describe('toContentFieldOption', () => {
   it('maps slug and name for system content', () => {
     const dagger = pickEquipment('dagger')
-    expect(toContentFieldOption(dagger)).toEqual({
+    expect(toContentFieldOption(dagger, 'equipment')).toEqual({
       value: 'dagger',
       label: dagger.name,
     })
@@ -14,7 +14,7 @@ describe('toContentFieldOption', () => {
 
   it('adds a Homebrew description for homebrew content', () => {
     const entity = { ...pickEquipment('dagger'), source: 'homebrew' as const }
-    expect(toContentFieldOption(entity)).toEqual({
+    expect(toContentFieldOption(entity, 'equipment')).toEqual({
       value: 'dagger',
       label: entity.name,
       description: 'Homebrew',

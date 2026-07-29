@@ -9,6 +9,7 @@ import { HomebrewClassModel } from '../classes/homebrew-class.model'
 import { classContentConfig } from '../classes/classes.config'
 import { resolveClassesForCampaign } from '../classes/derive-classes-catalog'
 import { resolveCatalogForCampaign } from '../content.service'
+import type { ContentTypeConfig } from './content-type-config'
 
 useIntegrationDb()
 
@@ -76,6 +77,23 @@ describe('resolveCatalogForCampaign (classes)', () => {
     expect(homebrew?.characterCreation?.proficiencies?.skills?.choices?.[0]?.from).toEqual([
       'athletics',
       'stealth',
+    ])
+  })
+
+  it('resolves campaign-authored content without a bundled system capability', async () => {
+    const campaign = await makeTestCampaign()
+    const campaignAuthored = {
+      id: 'campaign:organization',
+      slug: 'organization',
+      source: 'homebrew' as const,
+    }
+    const config: ContentTypeConfig<typeof campaignAuthored> = {
+      type: 'campaign-authored',
+      loadHomebrew: async () => [campaignAuthored],
+    }
+
+    await expect(resolveCatalogForCampaign(config, campaign.id)).resolves.toEqual([
+      campaignAuthored,
     ])
   })
 

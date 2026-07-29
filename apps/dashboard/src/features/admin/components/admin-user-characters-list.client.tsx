@@ -5,7 +5,8 @@ import { useParams } from 'react-router-dom'
 import { Text } from '@rpg/ui'
 import { useFilterState } from '@rpg/ui/filters'
 
-import { CharacterListCard } from '@/features/character/components/character-list-card.client'
+import { ROUTES } from '@/app/routes'
+import { CharacterListCard } from '@/features/character'
 import { PageHeader } from '@/components/layout/page-header'
 import { NarrowPage } from '@/components/layout/narrow-page'
 import { PrimaryFilterBarRegion } from '@/lib/data-table/primary-filter-bar-region.client'
@@ -49,7 +50,10 @@ export function AdminUserCharactersList() {
         <ul className="grid gap-4 sm:grid-cols-2">
           {characters.map((entry) => (
             <li key={entry.character.id}>
-              <CharacterListCard card={entry.character} />
+              <CharacterListCard
+                card={entry.character}
+                detailHref={ROUTES.characters.detail(entry.character.id)}
+              />
             </li>
           ))}
         </ul>

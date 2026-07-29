@@ -192,6 +192,7 @@ function ContentEditEntityFormBody<
               {headingFn(entity.name)}
             </Heading>
             <ContentEditHeadingBadges
+              contentType={contentTypeKey}
               source={entity.source}
               status={entity.status}
               campaignAccess={campaignAccess}

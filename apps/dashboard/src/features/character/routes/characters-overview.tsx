@@ -4,10 +4,10 @@ import { DEFAULT_SYSTEM_RULESET_ID, type SystemRulesetId } from '@rpg/contracts'
 import { buttonVariants, Heading, Text } from '@rpg/ui'
 
 import { ROUTES } from '@/app/routes'
+import { CharacterListCard } from '@/features/character'
 import { PageLoadState } from '@/components/layout/page-load-state'
 import { NarrowPage } from '@/components/layout/narrow-page'
 
-import { CharacterListCard } from '../components/character-list-card.client'
 import { useBuildContext } from '../hooks/use-build-context'
 import { useCharacters } from '../hooks/use-characters'
 import { buildCharacterCardViewModel } from '../lib/display/character-display'
@@ -71,7 +71,7 @@ export function CharactersOverview() {
           <ul className="grid gap-4 sm:grid-cols-2">
             {cards.map((card) => (
               <li key={card.id}>
-                <CharacterListCard card={card} />
+                <CharacterListCard card={card} detailHref={ROUTES.characters.detail(card.id)} />
               </li>
             ))}
           </ul>

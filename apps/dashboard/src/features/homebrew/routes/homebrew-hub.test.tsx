@@ -24,6 +24,7 @@ function renderHub(campaignId = 'camp_1') {
       { contentType: 'feats', totalCount: 0 },
       { contentType: 'equipment', totalCount: 10 },
       { contentType: 'skill-proficiencies', totalCount: 3 },
+      { contentType: 'organizations', totalCount: 0 },
     ],
   })
 
@@ -56,7 +57,8 @@ describe('HomebrewHubContent', () => {
     useCanManageCampaignMock.mockReturnValue(true)
     renderHub()
 
-    expect(screen.getAllByRole('link', { name: 'Create' }).length).toBe(5)
+    const createRouteCount = VISIBLE_SIDEBAR_CONTENT.filter((entry) => entry.create).length
+    expect(screen.getAllByRole('link', { name: 'Create' }).length).toBe(createRouteCount)
   })
 
   it('hides Create actions for non-managers', () => {

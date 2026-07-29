@@ -164,6 +164,7 @@ export function createSpellsStepContextFixture(
       spells: [...spellsStepWizardCantrips, ...spellsStepWizardSpells],
       equipment: [],
       skillProficiencies: [spellsStepAthleticsSkill],
+      organizations: [],
       languages: [],
     },
     characterCreationRules: {

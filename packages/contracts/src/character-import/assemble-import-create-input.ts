@@ -242,6 +242,7 @@ function buildImportCreateCharacterInput(
     equipment: assembleImportedEquipment(extraction.equipment.value ?? [], options.catalogIndex),
     wealth: resolveImportedWealth(extraction),
     narrative: resolveImportedNarrative(extraction),
+    connections: { organizations: [] },
     feats: [],
   }
 }

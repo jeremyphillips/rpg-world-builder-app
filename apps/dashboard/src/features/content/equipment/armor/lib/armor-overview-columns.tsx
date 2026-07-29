@@ -5,10 +5,7 @@ import type { ColumnDef } from '@rpg/ui'
 import { createEqualsFilter } from '@rpg/ui/filters'
 
 import { ROUTES } from '@/app/routes'
-import {
-  buildContentColumns,
-  costColumn,
-} from '../../../lib/overview/content-table-config'
+import { buildContentColumns, costColumn } from '../../../lib/overview/content-table-config'
 import {
   buildContentFilterSchema,
   type ContentOverviewBaseFilterState,
@@ -49,21 +46,25 @@ const ARMOR_MIDDLE_COLUMNS: ColumnDef<ArmorEquipment>[] = [
   costColumn<ArmorEquipment>(),
 ]
 
-export const armorFilterSchema = buildContentFilterSchema<ArmorRow, ArmorOverviewFilterState>([
-  createEqualsFilter<ArmorRow, ArmorOverviewFilterState, 'category', string>({
-    id: 'category',
-    label: 'Category',
-    options: ARMOR_CATEGORIES.map((category) => ({
-      label: getArmorCategoryLabel(category),
-      value: category,
-    })),
-    getValue: (row) => row.category,
-  }),
-])
+export const armorFilterSchema = buildContentFilterSchema<ArmorRow, ArmorOverviewFilterState>(
+  'equipment',
+  [
+    createEqualsFilter<ArmorRow, ArmorOverviewFilterState, 'category', string>({
+      id: 'category',
+      label: 'Category',
+      options: ARMOR_CATEGORIES.map((category) => ({
+        label: getArmorCategoryLabel(category),
+        value: category,
+      })),
+      getValue: (row) => row.category,
+    }),
+  ],
+)
 
 /** Armor column definitions with the name cell linked to the detail page. */
 export function armorColumns(campaignId: string) {
   return buildContentColumns<ArmorEquipment>(ARMOR_MIDDLE_COLUMNS, {
+    contentType: 'equipment',
     nameHref: (row) => ROUTES.content.equipment.detail(campaignId, 'armor', row.id),
   })
 }

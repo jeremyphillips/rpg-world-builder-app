@@ -3,6 +3,7 @@ import {
   type CampaignAvailabilityFilter,
   type ContentStatus,
   type WithCampaignAccess,
+  type ContentTypeKey,
 } from '@rpg/contracts'
 import {
   createEqualsFilter,
@@ -21,6 +22,7 @@ import {
 import type { ContentBase } from './content-table-config'
 import { CONTENT_SOURCE_BADGE, type ContentSource } from './content-source-badge'
 import { CONTENT_STATUS_BADGE } from './content-status-badge'
+import { shouldPresentContentSource } from '../content-type-presentation'
 
 export type ContentOverviewBaseFilterState = {
   name?: string
@@ -111,11 +113,16 @@ export function createCampaignAvailabilityFilterField<
 export function buildContentFilterSchema<
   TData extends OverviewRow,
   TState extends ContentOverviewBaseFilterState,
->(contentFields: ReadonlyArray<FilterFieldDef<TData, TState>>): FilterSchema<TData, TState> {
+>(
+  contentType: ContentTypeKey,
+  contentFields: ReadonlyArray<FilterFieldDef<TData, TState>>,
+): FilterSchema<TData, TState> {
   return createFilterSchema([
     createContentNameFilter<TData, TState>(),
     ...contentFields,
-    createContentSourceFilter<TData, TState>(),
+    ...(shouldPresentContentSource(contentType)
+      ? [createContentSourceFilter<TData, TState>()]
+      : []),
     createContentStatusFilter<TData, TState>(),
     createCampaignAvailabilityFilterField<TData, TState>(),
   ])

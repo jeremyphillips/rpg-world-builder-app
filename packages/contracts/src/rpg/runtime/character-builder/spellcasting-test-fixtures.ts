@@ -207,6 +207,7 @@ export const spellcastingTestCatalog: CharacterBuildCatalog = {
   ],
   equipment: [],
   skillProficiencies: [athleticsSkill],
+  organizations: [],
   languages: [],
 }
 

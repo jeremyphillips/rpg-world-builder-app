@@ -9,6 +9,7 @@ type CharacterDetailHeaderProps = {
   xp: string | null
   statusSummary?: ReactNode
   statusActions?: ReactNode
+  identitySupplement?: ReactNode
   showDelete: boolean
   onDeleteClick: () => void
 }
@@ -19,6 +20,7 @@ export function CharacterDetailHeader({
   xp,
   statusSummary,
   statusActions,
+  identitySupplement,
   showDelete,
   onDeleteClick,
 }: CharacterDetailHeaderProps) {
@@ -36,6 +38,7 @@ export function CharacterDetailHeader({
             {statusActions}
           </div>
         ) : null}
+        {identitySupplement}
       </div>
       {showDelete ? (
         <Button type="button" variant="outline" size="sm" onClick={onDeleteClick}>

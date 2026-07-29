@@ -1,6 +1,7 @@
 import { HttpError } from '../../lib/http-error'
 import { findCampaignById } from '../campaign'
 import type { ContentTypeConfig } from './lib/content-type-config'
+import { loadSystemContent, loadSystemContentPatches } from './lib/content-type-config'
 import { resolveCatalog } from './lib/resolve-catalog'
 
 /**
@@ -19,11 +20,11 @@ export async function resolveCatalogForCampaign<T extends { id: string }>(
 
   const { rulesetId } = campaign
   const [patches, homebrew] = await Promise.all([
-    config.loadPatches(campaignId),
+    loadSystemContentPatches(config, campaignId),
     config.loadHomebrew(campaignId, rulesetId),
   ])
 
-  return resolveCatalog(config.loadSystem(rulesetId), patches, homebrew, {
+  return resolveCatalog(loadSystemContent(config, rulesetId), patches, homebrew, {
     replaceKeys: config.patchReplaceKeys,
   })
 }

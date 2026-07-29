@@ -28,6 +28,7 @@ export type CharacterDetailTabsProps = {
   classFeatures: CharacterDetailListSection
   speciesTraits: CharacterDetailListSection
   feats: CharacterDetailListSection
+  connections: CharacterDetailListSection
   narrative: CharacterNarrative | undefined
 }
 
@@ -39,6 +40,7 @@ export function CharacterDetailTabs({
   classFeatures,
   speciesTraits,
   feats,
+  connections,
   narrative,
 }: CharacterDetailTabsProps) {
   const featuresAndTraitsItems = [...classFeatures.items, ...speciesTraits.items, ...feats.items]
@@ -51,6 +53,9 @@ export function CharacterDetailTabs({
         <TabsTrigger value="features-and-traits">
           {CHARACTER_DETAIL_TAB_LABELS.featuresAndTraits}
         </TabsTrigger>
+        {connections.items.length > 0 ? (
+          <TabsTrigger value="connections">{CHARACTER_DETAIL_TAB_LABELS.connections}</TabsTrigger>
+        ) : null}
         <TabsTrigger value="narrative">{CHARACTER_DETAIL_TAB_LABELS.narrative}</TabsTrigger>
       </TabsList>
 
@@ -74,6 +79,14 @@ export function CharacterDetailTabs({
           />
         </CharacterDetailTabPanel>
       </TabsContent>
+
+      {connections.items.length > 0 ? (
+        <TabsContent value="connections">
+          <CharacterDetailTabPanel>
+            <CharacterDetailListItems items={connections.items} emptyText={connections.emptyText} />
+          </CharacterDetailTabPanel>
+        </TabsContent>
+      ) : null}
 
       <TabsContent value="narrative">
         <CharacterDetailTabPanel>

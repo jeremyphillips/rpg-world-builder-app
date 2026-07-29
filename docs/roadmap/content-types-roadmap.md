@@ -32,6 +32,10 @@ content once they enter product scope.
 Covers factions, guilds, governments, churches, military orders, criminal groups,
 academic institutions, and similar bodies.
 
+Organization contracts, API lifecycle support, dashboard authoring, connection
+persistence, and builder orchestration are implemented. The connection picker
+and character display remain on the organization rollout roadmap.
+
 **Promote when** organizations need any combination of:
 
 - names and descriptions

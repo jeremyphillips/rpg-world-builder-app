@@ -102,6 +102,8 @@ export interface ContentWriteConfig<T extends WriteEntityBase> {
   resolveDeleteBlockers?: (ctx: ContentDeleteContext) => Promise<ContentUsageBlocker[]>
   /** Adds blockers beyond shared character usage resolution for demote guards. */
   resolveDemoteBlockers?: (ctx: ContentDeleteContext) => Promise<ContentUsageBlocker[]>
+  /** Whether character references block demotion. Defaults to true. */
+  characterUsageBlocksDemotion?: boolean
   /** When set, replaces default character usage resolution for delete guards. */
   resolveCharacterUsageBlockers?: (ctx: ContentDeleteContext) => Promise<ContentUsageBlocker[]>
 }

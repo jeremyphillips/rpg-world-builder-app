@@ -5,6 +5,7 @@ import type { ResolvedSubclass } from '@rpg/contracts'
 import { HttpError } from '../../../lib/http-error'
 import { findCampaignById } from '../../campaign'
 import { resolveCatalog } from '../lib/resolve-catalog'
+import { loadSystemContent, loadSystemContentPatches } from '../lib/content-type-config'
 import { attachCampaignAccessForTargetType } from '../lib/content-campaign-access.service'
 import { filterCatalogForMembership } from '../lib/filter-catalog-for-viewer'
 import { subclassContentConfig } from './subclasses.config'
@@ -21,12 +22,12 @@ export async function resolveSubclassesForCampaign(
 
   const { rulesetId } = campaign
   const [patches, homebrew] = await Promise.all([
-    subclassContentConfig.loadPatches(campaignId),
+    loadSystemContentPatches(subclassContentConfig, campaignId),
     subclassContentConfig.loadHomebrew(campaignId, rulesetId),
   ])
 
   const resolved = resolveCatalog(
-    subclassContentConfig.loadSystem(rulesetId),
+    loadSystemContent(subclassContentConfig, rulesetId),
     patches,
     homebrew,
   ).filter((subclass) => subclass.classId === classId)

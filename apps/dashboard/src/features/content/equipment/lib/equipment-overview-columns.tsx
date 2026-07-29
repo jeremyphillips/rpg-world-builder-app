@@ -5,10 +5,7 @@ import type { ColumnDef } from '@rpg/ui'
 import { createEqualsFilter } from '@rpg/ui/filters'
 
 import { ROUTES } from '@/app/routes'
-import {
-  buildContentColumns,
-  costColumn,
-} from '../../lib/overview/content-table-config'
+import { buildContentColumns, costColumn } from '../../lib/overview/content-table-config'
 import {
   buildContentFilterSchema,
   type ContentOverviewBaseFilterState,
@@ -35,7 +32,7 @@ const EQUIPMENT_MIDDLE_COLUMNS: ColumnDef<Equipment>[] = [
 export const equipmentFilterSchema = buildContentFilterSchema<
   EquipmentRow,
   EquipmentOverviewFilterState
->([
+>('equipment', [
   createEqualsFilter<EquipmentRow, EquipmentOverviewFilterState, 'kind', string>({
     id: 'kind',
     label: 'Kind',
@@ -47,6 +44,7 @@ export const equipmentFilterSchema = buildContentFilterSchema<
 /** Equipment column definitions with the name cell linked to the detail page. */
 export function equipmentColumns(campaignId: string) {
   return buildContentColumns<Equipment>(EQUIPMENT_MIDDLE_COLUMNS, {
+    contentType: 'equipment',
     nameHref: (row) =>
       ROUTES.content.equipment.detail(campaignId, equipmentKindToFamilyPath(row.kind), row.id),
   })

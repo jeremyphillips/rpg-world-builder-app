@@ -11,6 +11,7 @@ import type { CharacterBuildContext } from './context'
 import { getCharacterBuilderChromeMessages } from './messages/character-builder-chrome-messages'
 import { resolveCharacterBuilderChromeVariant } from './character-builder-chrome-variant'
 import type { CharacterBuilderDraft } from './draft/draft'
+import { resolveAvailableContent } from './preview/resolve-available-content'
 import {
   CHARACTER_BUILDER_STEP_IDS,
   type CharacterBuilderStepId,
@@ -55,12 +56,20 @@ type BuilderStepMeta = {
    * Species is excluded — primary species selection is always available in the shell.
    */
   readonly deferredUntilChoiceSetsResolved?: true
+  readonly isApplicable?: (context: CharacterBuildContext, draft: CharacterBuilderDraft) => boolean
 }
 
 const BUILDER_STEP_METADATA = {
   identity: {
     label: 'Identity',
     description: 'Name, appearance, and alignment',
+  },
+  connections: {
+    label: 'Connections',
+    description: 'Choose organizations connected to your character',
+    isApplicable: (context, draft) =>
+      draft.connections.organizations.length > 0 ||
+      resolveAvailableContent(context).organizations.length > 0,
   },
   species: {
     label: getContentTypeTerm('species').label,
@@ -101,6 +110,18 @@ export const BUILDER_STEPS: readonly BuilderStep[] = CHARACTER_BUILDER_STEP_IDS.
   label: BUILDER_STEP_METADATA[id].label,
   description: BUILDER_STEP_METADATA[id].description,
 }))
+
+/** Registered steps filtered to those applicable to the current build and draft. */
+export function resolveEffectiveBuilderSteps(
+  context: CharacterBuildContext,
+  draft: CharacterBuilderDraft,
+): readonly BuilderStep[] {
+  return BUILDER_STEPS.filter((step) => {
+    const metadata = BUILDER_STEP_METADATA[step.id]
+    const applicability = 'isApplicable' in metadata ? metadata.isApplicable : undefined
+    return applicability ? applicability(context, draft) : true
+  })
+}
 
 /** Short label for a wizard step (rail, review summaries, etc.). */
 export function getBuilderStepLabel(stepId: CharacterBuilderStepId): string {
@@ -220,6 +241,11 @@ function isClassComplete(draft: CharacterBuilderDraft): boolean {
   return typeof draft.class.classId === 'string' && draft.class.classId.length > 0
 }
 
+function isConnectionsComplete(draft: CharacterBuilderDraft): boolean {
+  const selectedIds = draft.connections.organizations.map(({ organizationId }) => organizationId)
+  return new Set(selectedIds).size === selectedIds.length
+}
+
 function isAbilitiesComplete(
   draft: CharacterBuilderDraft,
   standardArray: readonly number[] = STANDARD_ARRAY,
@@ -272,6 +298,7 @@ const STEP_COMPLETION_CHECKS: Record<
   (...args: StepCompletionArgs) => boolean
 > = {
   identity: (draft) => isIdentityComplete(draft),
+  connections: (draft) => isConnectionsComplete(draft),
   species: (draft, stepChoiceSets) => isSpeciesComplete(draft, stepChoiceSets),
   class: (draft) => isClassComplete(draft),
   abilities: (draft, _stepChoiceSets, _resolvedChoiceSets, standardArray) =>

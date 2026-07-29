@@ -56,11 +56,13 @@ function bodyFromCreateInput(input: Record<string, unknown>): Record<string, unk
 
 export const equipmentContentConfig: ContentTypeConfig<Equipment> = {
   type: 'equipment',
-  loadSystem: loadSeedEquipment,
-  systemSlugs: seedEquipmentSlugs,
-  loadPatches: async (campaignId) => {
-    const docs = await EquipmentPatchModel.find({ campaignId }).lean<EquipmentPatchRecord[]>()
-    return docs.map<OverlayPatch>((d) => ({ targetId: d.targetId, patch: d.patch }))
+  system: {
+    load: loadSeedEquipment,
+    slugs: seedEquipmentSlugs,
+    loadPatches: async (campaignId) => {
+      const docs = await EquipmentPatchModel.find({ campaignId }).lean<EquipmentPatchRecord[]>()
+      return docs.map<OverlayPatch>((d) => ({ targetId: d.targetId, patch: d.patch }))
+    },
   },
   loadHomebrew: async (campaignId, rulesetId) => {
     const docs = await HomebrewEquipmentModel.find({ campaignId, rulesetId }).lean<

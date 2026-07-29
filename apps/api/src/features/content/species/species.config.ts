@@ -52,11 +52,13 @@ function bodyFromCreateInput(input: Record<string, unknown>): Record<string, unk
 
 export const speciesContentConfig: ContentTypeConfig<Species> = {
   type: 'species',
-  loadSystem: loadSeedSpecies,
-  systemSlugs: seedSpeciesSlugs,
-  loadPatches: async (campaignId) => {
-    const docs = await SpeciesPatchModel.find({ campaignId }).lean<SpeciesPatchRecord[]>()
-    return docs.map<OverlayPatch>((d) => ({ targetId: d.targetId, patch: d.patch }))
+  system: {
+    load: loadSeedSpecies,
+    slugs: seedSpeciesSlugs,
+    loadPatches: async (campaignId) => {
+      const docs = await SpeciesPatchModel.find({ campaignId }).lean<SpeciesPatchRecord[]>()
+      return docs.map<OverlayPatch>((d) => ({ targetId: d.targetId, patch: d.patch }))
+    },
   },
   loadHomebrew: async (campaignId, rulesetId) => {
     const docs = await HomebrewSpeciesModel.find({ campaignId, rulesetId }).lean<

@@ -5,10 +5,7 @@ import type { ColumnDef } from '@rpg/ui'
 import { createEqualsFilter } from '@rpg/ui/filters'
 
 import { ROUTES } from '@/app/routes'
-import {
-  buildContentColumns,
-  costColumn,
-} from '../../../lib/overview/content-table-config'
+import { buildContentColumns, costColumn } from '../../../lib/overview/content-table-config'
 import {
   buildContentFilterSchema,
   type ContentOverviewBaseFilterState,
@@ -40,21 +37,25 @@ const TOOL_MIDDLE_COLUMNS: ColumnDef<ToolEquipment>[] = [
   costColumn<ToolEquipment>(),
 ]
 
-export const toolFilterSchema = buildContentFilterSchema<ToolRow, ToolOverviewFilterState>([
-  createEqualsFilter<ToolRow, ToolOverviewFilterState, 'toolCategory', string>({
-    id: 'toolCategory',
-    label: 'Category',
-    options: TOOL_CATEGORIES.map((category) => ({
-      label: getToolCategoryLabel(category),
-      value: category,
-    })),
-    getValue: (row) => row.toolCategory,
-  }),
-])
+export const toolFilterSchema = buildContentFilterSchema<ToolRow, ToolOverviewFilterState>(
+  'equipment',
+  [
+    createEqualsFilter<ToolRow, ToolOverviewFilterState, 'toolCategory', string>({
+      id: 'toolCategory',
+      label: 'Category',
+      options: TOOL_CATEGORIES.map((category) => ({
+        label: getToolCategoryLabel(category),
+        value: category,
+      })),
+      getValue: (row) => row.toolCategory,
+    }),
+  ],
+)
 
 /** Tool column definitions with the name cell linked to the detail page. */
 export function toolColumns(campaignId: string) {
   return buildContentColumns<ToolEquipment>(TOOL_MIDDLE_COLUMNS, {
+    contentType: 'equipment',
     nameHref: (row) => ROUTES.content.equipment.detail(campaignId, 'tools', row.id),
   })
 }

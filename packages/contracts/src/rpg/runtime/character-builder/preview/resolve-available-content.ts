@@ -3,6 +3,7 @@ import type { CharacterClass } from '../../../content/classes/class'
 import type { Equipment } from '../../../content/equipment'
 import type { Species } from '../../../content/species'
 import type { Spell } from '../../../content/spell'
+import type { Organization } from '../../../content/organization'
 import type { CharacterBuildContext } from '../context'
 import type { ResolvedContentCampaignAccess } from '../../../content/lib/campaign-access'
 import { DEFAULT_CONTENT_CAMPAIGN_ACCESS } from '../../../content/lib/campaign-access'
@@ -19,6 +20,7 @@ export type AvailableContent = {
   classes: CharacterClass[]
   spells: Spell[]
   equipment: Equipment[]
+  organizations: Organization[]
 }
 
 function filterSpeciesByCreatureTypePolicy(
@@ -65,11 +67,13 @@ export function resolveAvailableContent(context: CharacterBuildContext): Availab
   let species = filterSpeciesByCreatureTypePolicy(context.catalog.species, context)
   let classes = [...context.catalog.classes]
   let equipment = [...context.catalog.equipment]
+  let organizations = [...context.catalog.organizations]
 
   if (viewer) {
     species = filterDiscoverableCatalogItems(species, viewer)
     classes = filterDiscoverableCatalogItems(classes, viewer)
     equipment = filterDiscoverableCatalogItems(equipment, viewer)
+    organizations = filterDiscoverableCatalogItems(organizations, viewer)
   }
 
   const classSlugs = new Set(classes.map((entry) => entry.slug))
@@ -83,5 +87,6 @@ export function resolveAvailableContent(context: CharacterBuildContext): Availab
     classes,
     spells,
     equipment,
+    organizations,
   }
 }

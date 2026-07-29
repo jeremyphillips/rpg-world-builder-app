@@ -376,6 +376,7 @@ export const equipmentStepCatalogFixture = {
     equipmentStepRationsFixture,
   ],
   skillProficiencies: [],
+  organizations: [],
   languages: [],
 } as const satisfies CharacterBuildCatalog
 

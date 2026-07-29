@@ -30,7 +30,7 @@ const SKILL_MIDDLE_COLUMNS: ColumnDef<SkillProficiency>[] = [
 export const skillProficienciesFilterSchema = buildContentFilterSchema<
   SkillProficiencyRow,
   SkillProficienciesOverviewFilterState
->([
+>('skill-proficiencies', [
   createEqualsFilter<
     SkillProficiencyRow,
     SkillProficienciesOverviewFilterState,
@@ -47,6 +47,7 @@ export const skillProficienciesFilterSchema = buildContentFilterSchema<
 /** Skill proficiency column definitions with the name cell linked to the detail page. */
 export function skillProficienciesColumns(campaignId: string) {
   return buildContentColumns<SkillProficiency>(SKILL_MIDDLE_COLUMNS, {
+    contentType: 'skill-proficiencies',
     nameHref: (row) => ROUTES.content.skillProficiencies.detail(campaignId, row.id),
   })
 }

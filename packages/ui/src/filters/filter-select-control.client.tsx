@@ -99,7 +99,9 @@ export function FilterSelectControl<TData, TState extends Record<string, unknown
         </SelectTrigger>
         <SelectContent>
           {showAllOption ? (
-            <SelectItem value={FILTER_SELECT_ALL_VALUE}>All {selectField.label}</SelectItem>
+            <SelectItem value={FILTER_SELECT_ALL_VALUE}>
+              {selectField.allOptionLabel ?? `All ${selectField.label}`}
+            </SelectItem>
           ) : null}
           {options.map((option) => (
             <SelectItem key={option.value} value={option.value}>

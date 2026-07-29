@@ -6,6 +6,7 @@ import {
   type EquipmentCost,
   type ResolvedContentCampaignAccess,
   type WithCampaignAccess,
+  type ContentTypeKey,
 } from '@rpg/contracts'
 import {
   DataTableImageCell,
@@ -21,6 +22,7 @@ import { getContentImageUrl } from '../detail/content-image-url'
 import { CONTENT_SOURCE_BADGE, type ContentSource } from './content-source-badge'
 import { CONTENT_STATUS_BADGE } from './content-status-badge'
 import { ContentOverviewNameCell } from './content-overview-name-cell.client'
+import { shouldPresentContentSource } from '../content-type-presentation'
 
 /**
  * Minimum shape every content type shares. Used to constrain the generic
@@ -40,6 +42,8 @@ function readCampaignAccess(row: ContentBase): ResolvedContentCampaignAccess {
 export { readCampaignAccess as readContentRowCampaignAccess }
 
 export type ContentTableOptions<T> = {
+  /** Content type used to resolve shared source-presentation policy. */
+  contentType: ContentTypeKey
   /** When provided, the name cell renders as a link to this href. */
   nameHref?: (row: T) => string
   /** When provided with `canManage`, renders the line-2 Edit utility action. */
@@ -75,14 +79,15 @@ export function costColumn<T extends WithCost>(): ColumnDef<T> {
  *
  * @example
  * const columns = buildContentColumns<CharacterClass>([hitDieCol, spellcastingCol], {
+ *   contentType: 'classes',
  *   nameHref: (row) => ROUTES.content.classes.detail(campaignId, row.id),
  * })
  */
 export function buildContentColumns<T extends ContentBase>(
   middleColumns: ColumnDef<T>[],
-  options?: ContentTableOptions<T>,
+  options: ContentTableOptions<T>,
 ): ColumnDef<T>[] {
-  const { nameHref, editHref, canManage = false } = options ?? {}
+  const { contentType, nameHref, editHref, canManage = false } = options
 
   const imageColumn: ColumnDef<T> = {
     accessorKey: 'imageKey',
@@ -134,5 +139,11 @@ export function buildContentColumns<T extends ContentBase>(
     label: 'Status',
   })
 
-  return [imageColumn, nameColumn, ...stampDataColumns(middleColumns), statusColumn, sourceColumn]
+  return [
+    imageColumn,
+    nameColumn,
+    ...stampDataColumns(middleColumns),
+    statusColumn,
+    ...(shouldPresentContentSource(contentType) ? [sourceColumn] : []),
+  ]
 }

@@ -1,4 +1,4 @@
-import { BUILDER_STEPS } from '@rpg/contracts'
+import { BUILDER_STEPS, type BuilderStep } from '@rpg/contracts'
 import type { CharacterBuilderStepId } from '@rpg/contracts/rpg/character-builder'
 
 export const DEFAULT_BUILDER_STEP_ID = 'identity' satisfies CharacterBuilderStepId
@@ -9,23 +9,30 @@ export function resolveCurrentStepId(
   return stepId ?? DEFAULT_BUILDER_STEP_ID
 }
 
-export function getBuilderStepIndex(stepId: CharacterBuilderStepId): number {
-  return BUILDER_STEPS.findIndex((step) => step.id === stepId)
+export function getBuilderStepIndex(
+  stepId: CharacterBuilderStepId,
+  steps: readonly BuilderStep[] = BUILDER_STEPS,
+): number {
+  return steps.findIndex((step) => step.id === stepId)
 }
 
 export function getAdjacentBuilderStepId(
   stepId: CharacterBuilderStepId,
   direction: 'back' | 'forward',
+  steps: readonly BuilderStep[] = BUILDER_STEPS,
 ): CharacterBuilderStepId | null {
-  const index = getBuilderStepIndex(stepId)
+  const index = getBuilderStepIndex(stepId, steps)
   if (index < 0) return null
 
   const nextIndex = direction === 'back' ? index - 1 : index + 1
-  return BUILDER_STEPS[nextIndex]?.id ?? null
+  return steps[nextIndex]?.id ?? null
 }
 
-export function isFirstBuilderStep(stepId: CharacterBuilderStepId): boolean {
-  return getBuilderStepIndex(stepId) === 0
+export function isFirstBuilderStep(
+  stepId: CharacterBuilderStepId,
+  steps: readonly BuilderStep[] = BUILDER_STEPS,
+): boolean {
+  return getBuilderStepIndex(stepId, steps) === 0
 }
 
 export function isReviewBuilderStep(stepId: CharacterBuilderStepId): boolean {

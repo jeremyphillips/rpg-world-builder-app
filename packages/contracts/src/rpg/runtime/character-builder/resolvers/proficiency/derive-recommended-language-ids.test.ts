@@ -57,6 +57,7 @@ describe('deriveRecommendedLanguageIds', () => {
     spells: [],
     equipment: [],
     skillProficiencies: [],
+    organizations: [],
     languages: [...builderTestLanguages],
   })
 

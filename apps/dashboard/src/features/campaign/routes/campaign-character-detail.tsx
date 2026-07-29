@@ -8,9 +8,11 @@ import { ROUTES } from '@/app/routes'
 import { PageLoadState } from '@/components/layout/page-load-state'
 import { WidePage } from '@/components/layout/wide-page'
 import { CharacterDetailContent } from '@/features/character/components/detail/character-detail-content.client'
+import { CharacterOrganizationsSummary } from '@/features/character/components/detail/character-organizations-summary.client'
 import { CharacterVitalSummary } from '@/features/character/components/detail/character-vital-summary.client'
 import { useBuildContext } from '@/features/character/hooks/use-build-context'
 import { useCharacter } from '@/features/character/hooks/use-character'
+import { useCharacterOrganizationReferences } from '@/features/character/hooks/use-character-organization-references'
 import { buildCharacterDetailViewModel } from '@/features/character/lib/display/character-display'
 import { resolveQueryErrorLabel } from '@/features/character/lib/resolve-query-error-label.lib'
 import { useCampaigns } from '../hooks/use-campaigns'
@@ -33,6 +35,7 @@ export function CampaignCharacterDetail() {
     isError: isCatalogError,
     error: catalogError,
   } = useBuildContext(character?.rulesetId as SystemRulesetId | undefined)
+  const organizationReferencesQuery = useCharacterOrganizationReferences(campaignId, characterId)
 
   const viewModel = useMemo(() => {
     if (!character || !catalogIndex || !context) return null
@@ -42,14 +45,19 @@ export function CampaignCharacterDetail() {
       catalogIndex,
       rules: context.characterCreationRules,
       xpProgression: getStandardXpProgression(character.rulesetId as SystemRulesetId),
+      organizationReferences: organizationReferencesQuery.data,
     })
-  }, [catalogIndex, character, context])
+  }, [catalogIndex, character, context, organizationReferencesQuery.data])
 
-  const isPending = isCharacterPending || Boolean(character && isCatalogPending)
-  const isError = isCharacterError || isCatalogError
+  const isPending =
+    isCharacterPending ||
+    organizationReferencesQuery.isPending ||
+    Boolean(character && isCatalogPending)
+  const isError = isCharacterError || isCatalogError || organizationReferencesQuery.isError
   const errorLabel = resolveQueryErrorLabel([
     { isPending: isCharacterPending, isError: isCharacterError, error: characterError },
     { isPending: isCatalogPending, isError: isCatalogError, error: catalogError },
+    organizationReferencesQuery,
   ])
 
   return (
@@ -76,6 +84,14 @@ export function CampaignCharacterDetail() {
           <CharacterDetailContent
             viewModel={viewModel}
             statusSummary={<CharacterVitalSummary vital={viewModel.identity.vital} />}
+            identitySupplement={
+              organizationReferencesQuery.data ? (
+                <CharacterOrganizationsSummary
+                  campaignId={campaignId!}
+                  organizationReferences={organizationReferencesQuery.data}
+                />
+              ) : null
+            }
           />
         ) : null}
       </PageLoadState>

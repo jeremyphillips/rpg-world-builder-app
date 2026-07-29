@@ -1,5 +1,6 @@
 'use client'
 
+import type { BuilderStep } from '@rpg/contracts'
 import type { CharacterBuilderStepId } from '@rpg/contracts/rpg/character-builder'
 import { Button, Text } from '@rpg/ui'
 
@@ -12,6 +13,7 @@ import { characterBuilderShellFooterClasses } from './character-builder-shell.va
 
 export type CharacterBuilderFooterProps = {
   currentStepId: CharacterBuilderStepId
+  steps?: readonly BuilderStep[]
   canCreateCharacter?: boolean
   createLabel: string
   creatingLabel: string
@@ -24,6 +26,7 @@ export type CharacterBuilderFooterProps = {
 
 export function CharacterBuilderFooter({
   currentStepId,
+  steps,
   canCreateCharacter = true,
   createLabel,
   creatingLabel,
@@ -33,9 +36,9 @@ export function CharacterBuilderFooter({
   onCreateCharacter,
   isCreating = false,
 }: CharacterBuilderFooterProps) {
-  const showBack = !isFirstBuilderStep(currentStepId)
+  const showBack = !isFirstBuilderStep(currentStepId, steps)
   const onReview = isReviewBuilderStep(currentStepId)
-  const canContinue = getAdjacentBuilderStepId(currentStepId, 'forward') !== null
+  const canContinue = getAdjacentBuilderStepId(currentStepId, 'forward', steps) !== null
   const createDisabled = isCreating || !canCreateCharacter
 
   return (

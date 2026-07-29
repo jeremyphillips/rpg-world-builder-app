@@ -103,5 +103,6 @@ export type CharacterDetailViewModel = {
   classFeatures: CharacterDetailListSection
   speciesTraits: CharacterDetailListSection
   feats: CharacterDetailListSection
+  connections: CharacterDetailListSection
   narrative: CharacterNarrative | undefined
 }

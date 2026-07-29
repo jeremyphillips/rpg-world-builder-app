@@ -4,6 +4,8 @@ import type { ClassStored } from '../../../content/classes/class'
 import { equipmentSchema } from '../../../content/equipment'
 import type { Species } from '../../../content/species'
 import type { Spell } from '../../../content/spell'
+import type { Organization } from '../../../content/organization'
+import type { ResolvedContentCampaignAccess } from '../../../content/lib/campaign-access'
 import { resolveCharacterCreationPatch } from '../../../campaign/patches/campaign-character-creation-patch'
 import { defaultCampaignMechanicsPatch } from '../../../campaign/patches/campaign-mechanics-patch'
 import { resolveCharacterOwnershipTarget } from '../../character-acquisition'
@@ -78,6 +80,30 @@ function makeSpell(slug: string, classIds: Spell['classIds']): Spell {
   }
 }
 
+function makeOrganization(
+  slug: string,
+  visibilityMode: 'all_players' | 'dm_only',
+): Organization & { campaignAccess: ResolvedContentCampaignAccess } {
+  return {
+    id: `srd-cc-5.2.1:${slug}`,
+    slug,
+    rulesetId: 'srd-cc-5.2.1',
+    source: 'system',
+    status: 'published',
+    campaignId: null,
+    ...timestamps,
+    name: slug,
+    organizationKind: 'professional',
+    campaignAccess: {
+      available: true,
+      visibilityMode,
+      participantIds: [],
+      unavailableParticipantIds: [],
+      effectiveAudience: visibilityMode,
+    },
+  }
+}
+
 function makeContext(
   overrides: Partial<CharacterBuildContext> & {
     creatureTypePolicy?: CharacterBuildContext['characterCreationRules']['species']['creatureTypePolicy']
@@ -108,6 +134,7 @@ function makeContext(
       spells: [],
       equipment: [],
       skillProficiencies: [],
+      organizations: [],
       languages: [],
     },
     characterCreationRules: {
@@ -130,6 +157,7 @@ describe('resolveAvailableContent', () => {
         spells: [],
         equipment: [],
         skillProficiencies: [],
+        organizations: [],
         languages: [],
       },
     })
@@ -148,6 +176,7 @@ describe('resolveAvailableContent', () => {
         spells: [],
         equipment: [],
         skillProficiencies: [],
+        organizations: [],
         languages: [],
       },
     })
@@ -167,6 +196,7 @@ describe('resolveAvailableContent', () => {
         spells: [],
         equipment: [],
         skillProficiencies: [],
+        organizations: [],
         languages: [],
       },
     })
@@ -189,6 +219,7 @@ describe('resolveAvailableContent', () => {
         ],
         equipment: [],
         skillProficiencies: [],
+        organizations: [],
         languages: [],
       },
     })
@@ -228,6 +259,10 @@ describe('resolveAvailableContent', () => {
         spells: [],
         equipment: [],
         skillProficiencies: [],
+        organizations: [
+          makeOrganization('visible-guild', 'all_players'),
+          makeOrganization('hidden-guild', 'dm_only'),
+        ],
         languages: [],
       },
     })
@@ -235,6 +270,7 @@ describe('resolveAvailableContent', () => {
     const result = resolveAvailableContent(context)
 
     expect(result.classes.map((entry) => entry.slug)).toEqual(['fighter'])
+    expect(result.organizations.map((entry) => entry.slug)).toEqual(['visible-guild'])
   })
 
   it('passes equipment through unchanged', () => {
@@ -264,6 +300,7 @@ describe('resolveAvailableContent', () => {
         spells: [],
         equipment: [equipment],
         skillProficiencies: [],
+        organizations: [],
         languages: [],
       },
     })

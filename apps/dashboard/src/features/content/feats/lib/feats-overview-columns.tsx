@@ -44,21 +44,25 @@ const FEATS_MIDDLE_COLUMNS: ColumnDef<Feat>[] = [
   },
 ]
 
-export const featsFilterSchema = buildContentFilterSchema<FeatRow, FeatsOverviewFilterState>([
-  createEqualsFilter<FeatRow, FeatsOverviewFilterState, 'category', Feat['category']>({
-    id: 'category',
-    label: 'Category',
-    options: FEAT_CATEGORY_IDS.map((id) => ({
-      label: getFeatCategoryLabel(id),
-      value: id,
-    })),
-    getValue: (row) => row.category,
-  }),
-])
+export const featsFilterSchema = buildContentFilterSchema<FeatRow, FeatsOverviewFilterState>(
+  'feats',
+  [
+    createEqualsFilter<FeatRow, FeatsOverviewFilterState, 'category', Feat['category']>({
+      id: 'category',
+      label: 'Category',
+      options: FEAT_CATEGORY_IDS.map((id) => ({
+        label: getFeatCategoryLabel(id),
+        value: id,
+      })),
+      getValue: (row) => row.category,
+    }),
+  ],
+)
 
 /** Feat column definitions with the name cell linked to the detail page. */
 export function featsColumns(campaignId: string) {
   return buildContentColumns<Feat>(FEATS_MIDDLE_COLUMNS, {
+    contentType: 'feats',
     nameHref: (row) => ROUTES.content.feats.detail(campaignId, row.id),
   })
 }

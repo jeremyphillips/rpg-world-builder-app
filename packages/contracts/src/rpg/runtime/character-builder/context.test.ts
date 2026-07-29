@@ -23,6 +23,7 @@ const emptyCatalog: CharacterBuildCatalog = {
   spells: [],
   equipment: [],
   skillProficiencies: [],
+  organizations: [],
   languages: [],
 }
 
@@ -85,6 +86,7 @@ describe('indexCharacterBuildCatalog', () => {
     expect(index.spells.size).toBe(0)
     expect(index.equipment.size).toBe(0)
     expect(index.skillProficiencies.size).toBe(0)
+    expect(index.organizations.size).toBe(0)
   })
 })
 

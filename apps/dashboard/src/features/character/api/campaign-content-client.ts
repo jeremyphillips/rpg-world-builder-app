@@ -2,6 +2,7 @@ import type {
   CharacterBuildLanguageOption,
   CharacterClass,
   Equipment,
+  Organization,
   SkillProficiency,
   Species,
   Spell,
@@ -26,6 +27,7 @@ const CAMPAIGN_CATALOG_CONTENT = [
   { routeKey: 'spells', responseKey: 'spells' },
   { routeKey: 'equipment', responseKey: 'equipment' },
   { routeKey: 'skill-proficiencies', responseKey: 'skillProficiencies' },
+  { routeKey: 'organizations', responseKey: 'organizations' },
 ] as const satisfies readonly CampaignContentConfig[]
 
 async function listCampaignContent<T>(
@@ -45,16 +47,18 @@ export async function fetchCampaignBuilderCatalog(
   campaignId: string,
   rulesetId: SystemRulesetId,
 ): Promise<BuilderCatalogLists> {
-  const [species, classes, spells, equipment, skillProficiencies, languages] = await Promise.all([
-    listCampaignContent<Species>(campaignId, CAMPAIGN_CATALOG_CONTENT[0]),
-    listCampaignContent<CharacterClass>(campaignId, CAMPAIGN_CATALOG_CONTENT[1]),
-    listCampaignContent<Spell>(campaignId, CAMPAIGN_CATALOG_CONTENT[2]),
-    listCampaignContent<Equipment>(campaignId, CAMPAIGN_CATALOG_CONTENT[3]),
-    listCampaignContent<SkillProficiency>(campaignId, CAMPAIGN_CATALOG_CONTENT[4]),
-    listRulesetLanguages(rulesetId),
-  ])
+  const [species, classes, spells, equipment, skillProficiencies, organizations, languages] =
+    await Promise.all([
+      listCampaignContent<Species>(campaignId, CAMPAIGN_CATALOG_CONTENT[0]),
+      listCampaignContent<CharacterClass>(campaignId, CAMPAIGN_CATALOG_CONTENT[1]),
+      listCampaignContent<Spell>(campaignId, CAMPAIGN_CATALOG_CONTENT[2]),
+      listCampaignContent<Equipment>(campaignId, CAMPAIGN_CATALOG_CONTENT[3]),
+      listCampaignContent<SkillProficiency>(campaignId, CAMPAIGN_CATALOG_CONTENT[4]),
+      listCampaignContent<Organization>(campaignId, CAMPAIGN_CATALOG_CONTENT[5]),
+      listRulesetLanguages(rulesetId),
+    ])
 
-  return { species, classes, spells, equipment, skillProficiencies, languages }
+  return { species, classes, spells, equipment, skillProficiencies, organizations, languages }
 }
 
 export function campaignBuildContextQueryKey(campaignId: string) {

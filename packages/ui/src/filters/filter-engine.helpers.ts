@@ -118,6 +118,7 @@ type EqualsFilterConfig<
   placement?: FilterPlacement
   defaultValue?: TState[TId]
   showAllOption?: boolean
+  allOptionLabel?: string
   layout?: SelectFilterFieldDef<TData, TState, TId>['layout']
   width?: SelectFilterFieldDef<TData, TState, TId>['width']
   ariaLabel?: string
@@ -143,6 +144,7 @@ export function createEqualsFilter<
     placement: config.placement,
     defaultValue: config.defaultValue,
     showAllOption: config.showAllOption,
+    allOptionLabel: config.allOptionLabel,
     layout: config.layout,
     width: config.width,
     ariaLabel: config.ariaLabel,

@@ -44,6 +44,7 @@ const STEP_FIELD_LABELS: Record<CharacterBuilderStepId, string> = {
   species: getContentTypeTerm('species').label,
   class: getContentTypeTerm('classes').label,
   abilities: 'Ability Scores',
+  connections: 'Connections',
   proficiencies: 'Proficiencies',
   equipment: getContentTypeTerm('equipment').label,
   spells: getContentTypeCapitalizedSentenceLabel('spells', { plural: true }),

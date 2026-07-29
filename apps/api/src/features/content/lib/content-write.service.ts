@@ -10,6 +10,7 @@ import { ContentKeyError } from '@rpg/contracts'
 import { HttpError } from '../../../lib/http-error'
 import { findCampaignById } from '../../campaign'
 import { resolveCatalogForCampaign } from '../content.service'
+import { loadSystemContentSlugs } from './content-type-config'
 import { normalizeHomebrewWriteInput } from './apply-content-keys'
 import { assertSlugAvailable } from './assert-slug-available'
 import { deepMerge } from './deep-merge'
@@ -214,7 +215,7 @@ async function updateHomebrewRecord<T extends StoredEntity>(
 async function updateSystemPatch<T extends StoredEntity>(
   config: ContentWriteConfig<T>,
   campaignId: string,
-  _rulesetId: Parameters<ContentWriteConfig<T>['readConfig']['systemSlugs']>[0],
+  _rulesetId: SystemRulesetId,
   entityId: string,
   existing: T,
   update: Record<string, unknown>,
@@ -361,7 +362,7 @@ async function resolveSlugForCreateAttempt<T extends StoredEntity>({
     if (slugCollisionPolicy === 'reject') {
       assertSlugAvailable({
         slug: resolvedSlug,
-        systemSlugs: config.readConfig.systemSlugs(rulesetId),
+        systemSlugs: loadSystemContentSlugs(config.readConfig, rulesetId),
         campaignSlugs,
       })
     }
@@ -377,7 +378,7 @@ async function resolveSlugForCreateAttempt<T extends StoredEntity>({
   const campaignSlugs = await loadCampaignSlugs(config, campaignId, rulesetId)
   assertSlugAvailable({
     slug,
-    systemSlugs: config.readConfig.systemSlugs(rulesetId),
+    systemSlugs: loadSystemContentSlugs(config.readConfig, rulesetId),
     campaignSlugs,
   })
   return slug

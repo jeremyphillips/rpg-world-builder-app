@@ -138,6 +138,31 @@ export const FeatEditRoute = withRouteSuspense(
   lazyNamed(() => import('@/features/content/feats/routes/feat-edit'), 'FeatEdit'),
 )
 
+export const OrganizationsOverviewRoute = withRouteSuspense(
+  lazyNamed(
+    () => import('@/features/content/organizations/routes/organizations-overview'),
+    'OrganizationsOverview',
+  ),
+)
+export const OrganizationDetailRoute = withRouteSuspense(
+  lazyNamed(
+    () => import('@/features/content/organizations/routes/organization-detail'),
+    'OrganizationDetail',
+  ),
+)
+export const OrganizationCreateRoute = withRouteSuspense(
+  lazyNamed(
+    () => import('@/features/content/organizations/routes/organization-create'),
+    'OrganizationCreate',
+  ),
+)
+export const OrganizationEditRoute = withRouteSuspense(
+  lazyNamed(
+    () => import('@/features/content/organizations/routes/organization-edit'),
+    'OrganizationEdit',
+  ),
+)
+
 export const SpellsOverviewRoute = withRouteSuspense(
   lazyNamed(() => import('@/features/content/spells/routes/spells-overview'), 'SpellsOverview'),
 )

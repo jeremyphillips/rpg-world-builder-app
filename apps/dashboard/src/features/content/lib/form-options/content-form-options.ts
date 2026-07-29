@@ -5,6 +5,7 @@ import {
   isMagicItemBaseEquipment,
   type CharacterClass,
   type ContentSource,
+  type ContentTypeKey,
   type Equipment,
   type Feat,
   isWeaponEquipment,
@@ -30,6 +31,7 @@ import { useFeats } from '../../feats/hooks/use-feats'
 import { useSkillProficiencies } from '../../skill-proficiencies/hooks/use-skill-proficiencies'
 import { useSpells } from '../../spells/hooks/use-spells'
 import type { ContentFormCtx } from '../forms/content-form-registry'
+import { shouldPresentContentSource } from '../content-type-presentation'
 import {
   buildRichTextInternalLinkOptions,
   RICH_TEXT_LINK_CONTENT_TYPE_OPTIONS,
@@ -125,11 +127,16 @@ interface ContentOptionEntity {
 }
 
 /** Maps a catalog entity to a combobox option (slug value, name label). */
-export function toContentFieldOption(entity: ContentOptionEntity): FieldOption {
+export function toContentFieldOption(
+  entity: ContentOptionEntity,
+  contentType: ContentTypeKey,
+): FieldOption {
   return {
     value: entity.slug,
     label: entity.name,
-    ...(entity.source === 'homebrew' ? { description: HOMEBREW_OPTION_DESCRIPTION } : {}),
+    ...(shouldPresentContentSource(contentType) && entity.source === 'homebrew'
+      ? { description: HOMEBREW_OPTION_DESCRIPTION }
+      : {}),
   }
 }
 
@@ -147,8 +154,11 @@ function buildWeaponCategoryBySlug(
 
 function toSortedContentFieldOptions<T extends ContentOptionEntity>(
   entities: T[] | undefined,
+  contentType: ContentTypeKey,
 ): FieldOption[] {
-  return sortFieldOptions(entities?.map(toContentFieldOption) ?? [])
+  return sortFieldOptions(
+    entities?.map((entity) => toContentFieldOption(entity, contentType)) ?? [],
+  )
 }
 
 function buildRichTextLinkOptionSets(input: {
@@ -182,18 +192,25 @@ export function buildContentFormOptionSets(input: {
   equipment?: Equipment[]
 }): ContentFormOptionSets {
   return {
-    classes: toSortedContentFieldOptions(input.classes),
-    spellcastingClasses: toSortedContentFieldOptions(input.classes?.filter(classHasSpellcasting)),
-    weapons: toSortedContentFieldOptions(input.equipment?.filter(isWeaponEquipment)),
-    armor: toSortedContentFieldOptions(input.equipment?.filter(isArmorEquipment)),
-    equipment: toSortedContentFieldOptions(input.equipment),
+    classes: toSortedContentFieldOptions(input.classes, 'classes'),
+    spellcastingClasses: toSortedContentFieldOptions(
+      input.classes?.filter(classHasSpellcasting),
+      'classes',
+    ),
+    weapons: toSortedContentFieldOptions(input.equipment?.filter(isWeaponEquipment), 'equipment'),
+    armor: toSortedContentFieldOptions(input.equipment?.filter(isArmorEquipment), 'equipment'),
+    equipment: toSortedContentFieldOptions(input.equipment, 'equipment'),
     equipmentEntities: input.equipment,
-    spells: toSortedContentFieldOptions(input.spells),
-    feats: toSortedContentFieldOptions(input.feats),
-    skills: toSortedContentFieldOptions(input.skills),
-    tools: toSortedContentFieldOptions(input.equipment?.filter((item) => item.kind === 'tool')),
+    spells: toSortedContentFieldOptions(input.spells, 'spells'),
+    feats: toSortedContentFieldOptions(input.feats, 'feats'),
+    skills: toSortedContentFieldOptions(input.skills, 'skill-proficiencies'),
+    tools: toSortedContentFieldOptions(
+      input.equipment?.filter((item) => item.kind === 'tool'),
+      'equipment',
+    ),
     magicItemBaseEquipment: toSortedContentFieldOptions(
       input.equipment?.filter(isMagicItemBaseEquipment),
+      'equipment',
     ),
     weaponCategoryBySlug: buildWeaponCategoryBySlug(input.equipment),
     ...buildRichTextLinkOptionSets(input),
@@ -219,7 +236,7 @@ export function useContentFormOptions(campaignId: string | undefined): {
         skills: catalog.skills,
         equipment: catalog.equipment,
       }),
-    [campaignId, catalog.classes, catalog.spells, catalog.feats, catalog.equipment],
+    [campaignId, catalog.classes, catalog.spells, catalog.feats, catalog.skills, catalog.equipment],
   )
 
   const ctx = useMemo(

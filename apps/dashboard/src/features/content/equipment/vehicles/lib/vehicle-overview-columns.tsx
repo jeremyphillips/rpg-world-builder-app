@@ -8,10 +8,7 @@ import { SortableHeader, type ColumnDef } from '@rpg/ui'
 import { createEqualsFilter } from '@rpg/ui/filters'
 
 import { ROUTES } from '@/app/routes'
-import {
-  buildContentColumns,
-  costColumn,
-} from '../../../lib/overview/content-table-config'
+import { buildContentColumns, costColumn } from '../../../lib/overview/content-table-config'
 import {
   buildContentFilterSchema,
   type ContentOverviewBaseFilterState,
@@ -36,24 +33,25 @@ const VEHICLE_MIDDLE_COLUMNS: ColumnDef<VehicleEquipment>[] = [
   costColumn<VehicleEquipment>(),
 ]
 
-export const vehicleFilterSchema = buildContentFilterSchema<
-  VehicleRow,
-  VehicleOverviewFilterState
->([
-  createEqualsFilter<VehicleRow, VehicleOverviewFilterState, 'vehicleCategory', string>({
-    id: 'vehicleCategory',
-    label: 'Category',
-    options: VEHICLE_CATEGORIES.map((category) => ({
-      label: getVehicleCategoryLabel(category),
-      value: category,
-    })),
-    getValue: (row) => row.vehicleCategory,
-  }),
-])
+export const vehicleFilterSchema = buildContentFilterSchema<VehicleRow, VehicleOverviewFilterState>(
+  'equipment',
+  [
+    createEqualsFilter<VehicleRow, VehicleOverviewFilterState, 'vehicleCategory', string>({
+      id: 'vehicleCategory',
+      label: 'Category',
+      options: VEHICLE_CATEGORIES.map((category) => ({
+        label: getVehicleCategoryLabel(category),
+        value: category,
+      })),
+      getValue: (row) => row.vehicleCategory,
+    }),
+  ],
+)
 
 /** Vehicle column definitions with the name cell linked to the detail page. */
 export function vehicleColumns(campaignId: string) {
   return buildContentColumns<VehicleEquipment>(VEHICLE_MIDDLE_COLUMNS, {
+    contentType: 'equipment',
     nameHref: (row) => ROUTES.content.equipment.detail(campaignId, 'vehicles', row.id),
   })
 }

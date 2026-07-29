@@ -89,6 +89,7 @@ const buildContext = createCharacterBuildContext({
     spells: [],
     equipment: [],
     skillProficiencies: [],
+    organizations: [],
     languages: [],
   },
   characterCreationRules: {

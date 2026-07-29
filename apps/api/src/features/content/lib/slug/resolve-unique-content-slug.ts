@@ -5,6 +5,7 @@ import { HttpError } from '../../../../lib/http-error'
 import { findCampaignById } from '../../../campaign'
 import { getContentTypeConfig } from '../../content-types'
 import { assertSlugAvailable } from '../assert-slug-available'
+import type { SystemRulesetId } from '@rpg/contracts'
 
 export type ContentSlugCollisionPolicy = 'reject' | 'suffix'
 
@@ -27,12 +28,12 @@ export interface ResolveUniqueContentSlugInput {
 async function loadSlugSets(
   contentType: ApiContentTypeKey,
   campaignId: string,
-  rulesetId: Parameters<ReturnType<typeof getContentTypeConfig>['systemSlugs']>[0],
+  rulesetId: SystemRulesetId,
 ): Promise<{ systemSlugs: ReadonlySet<string>; campaignSlugs: ReadonlySet<string> }> {
   const config = getContentTypeConfig(contentType)
   const homebrew = await config.loadHomebrew(campaignId, rulesetId)
   return {
-    systemSlugs: config.systemSlugs(rulesetId),
+    systemSlugs: config.system?.slugs(rulesetId) ?? new Set<string>(),
     campaignSlugs: new Set(homebrew.map((record) => record.slug)),
   }
 }

@@ -4,7 +4,9 @@ import type { CharacterBuildContext } from '../context'
 import type { CharacterBuilderDraft } from '../draft/draft'
 import type { CharacterBuildEngineOptions } from '../engine-options'
 import type { CharacterBuilderStepId } from '../../../character-builder/step-ids'
-import { BUILDER_STEPS, isChoiceStep } from '../steps'
+import { isChoiceStep, resolveEffectiveBuilderSteps } from '../steps'
+import { characterConnectionsSchema } from '../../character/connections'
+import { resolveAvailableContent } from '../preview/resolve-available-content'
 
 import { validationIssue } from './issue'
 import type {
@@ -30,6 +32,32 @@ const STEP_VALIDATORS: Record<
   ) => CharacterBuildValidationIssue[]
 > = {
   identity: (draft, _context, _choiceSets) => validateIdentity(draft, false),
+  connections: (draft, context) => {
+    const parsed = characterConnectionsSchema.safeParse(draft.connections)
+    if (!parsed.success) {
+      return [
+        validationIssue(
+          'connections_invalid',
+          'Remove duplicate or invalid organization connections.',
+          { path: 'connections.organizations', stepId: 'connections' },
+        ),
+      ]
+    }
+
+    const availableIds = new Set(resolveAvailableContent(context).organizations.map(({ id }) => id))
+    return parsed.data.organizations
+      .filter(({ organizationId }) => !availableIds.has(organizationId))
+      .map(({ organizationId }) =>
+        validationIssue(
+          'organization_connection_unavailable',
+          'Remove or replace an organization that is no longer available.',
+          {
+            path: `connections.organizations.${organizationId}`,
+            stepId: 'connections',
+          },
+        ),
+      )
+  },
   species: (draft, context, choiceSets) => [
     ...validateSpecies(draft),
     ...validateChoiceSetsForStep(draft, context, choiceSets, 'species'),
@@ -54,7 +82,7 @@ function validateAllSteps(
   choiceSets: readonly ChoiceSet[],
   requireAlignment: boolean,
 ): CharacterBuildValidationIssue[] {
-  const stepIssues = BUILDER_STEPS.flatMap((step) =>
+  const stepIssues = resolveEffectiveBuilderSteps(context, draft).flatMap((step) =>
     STEP_VALIDATORS[step.id](draft, context, choiceSets),
   )
 

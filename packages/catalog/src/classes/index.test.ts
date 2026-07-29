@@ -880,6 +880,7 @@ describe('SRD 5.2.1 class seed', () => {
       spells: [],
       equipment,
       skillProficiencies: [],
+      organizations: [],
       languages: [],
     })
 

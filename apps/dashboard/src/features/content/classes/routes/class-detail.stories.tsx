@@ -21,6 +21,7 @@ type Story = StoryObj
 
 const defaultSkillProps = {
   skillProficiencies: [...SRD_SKILLS],
+  organizations: [],
   skillsPending: false,
 }
 

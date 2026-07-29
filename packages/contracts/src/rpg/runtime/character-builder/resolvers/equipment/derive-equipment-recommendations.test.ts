@@ -252,6 +252,7 @@ function buildContext(
     spells: [],
     equipment,
     skillProficiencies: [],
+    organizations: [],
     languages: [],
   })
   const draft = {

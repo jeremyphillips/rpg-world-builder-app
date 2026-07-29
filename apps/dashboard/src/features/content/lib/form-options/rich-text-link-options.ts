@@ -11,6 +11,7 @@ import {
 
 import { useFeats } from '../../feats/hooks/use-feats'
 import { useSpells } from '../../spells/hooks/use-spells'
+import { shouldPresentContentSource } from '../content-type-presentation'
 
 export type LinkableContentType = 'spell' | 'feat'
 
@@ -86,8 +87,13 @@ function compareByTitle(
   return left.title.localeCompare(right.title)
 }
 
-function sourceLabel(source: LinkableEntity['source']): string | undefined {
-  return source === 'homebrew' ? HOMEBREW_SOURCE_LABEL : undefined
+function sourceLabel(
+  contentType: LinkableContentTypeKey,
+  source: LinkableEntity['source'],
+): string | undefined {
+  return shouldPresentContentSource(contentType) && source === 'homebrew'
+    ? HOMEBREW_SOURCE_LABEL
+    : undefined
 }
 
 function buildDetailLinkOptions<T extends LinkableContentType>(
@@ -105,7 +111,7 @@ function buildDetailLinkOptions<T extends LinkableContentType>(
         contentType,
         kind: 'detail' as const,
         eyebrowLabel: linkableEyebrowLabel(contentType),
-        sourceLabel: sourceLabel(entity.source),
+        sourceLabel: sourceLabel(config.contentTypeKey, entity.source),
       }))
       .sort(compareByTitle) ?? []
   return detailOptions

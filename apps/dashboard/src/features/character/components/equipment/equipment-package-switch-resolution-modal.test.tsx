@@ -103,6 +103,7 @@ const catalogIndex = indexCharacterBuildCatalog({
   spells: [],
   equipment: [rope, dagger],
   skillProficiencies: [],
+  organizations: [],
   languages: [],
 })
 
