@@ -11,10 +11,13 @@ import { setFilterValue } from '@rpg/ui/filters'
 
 import { useNameGeneratorPage } from './use-name-generator-page'
 
-vi.mock('@/features/campaign/store/campaign-store', () => ({
-  useCampaignStore: (selector: (state: { activeCampaignId: string | null }) => unknown) =>
-    selector({ activeCampaignId: 'camp_1' }),
-}))
+vi.mock('@/features/campaign', async (importOriginal) => {
+  const actual = (await importOriginal()) as Record<string, unknown>
+  return {
+    ...actual,
+    useActiveCampaignId: () => 'camp_1',
+  }
+})
 
 vi.mock('@/features/content/species/hooks/use-species', () => ({
   useSpecies: () => ({

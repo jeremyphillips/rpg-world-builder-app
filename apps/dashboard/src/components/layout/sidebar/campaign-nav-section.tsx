@@ -1,14 +1,13 @@
 import { NavSection } from '@rpg/ui'
 
 import { ROUTES } from '@/app/routes'
-import { CampaignSwitcher } from '@/features/campaign'
+import { CampaignSwitcher, useActiveCampaignId } from '@/features/campaign'
 import { VISIBLE_SIDEBAR_CONTENT } from '@/features/homebrew'
-import { useCampaignStore } from '@/features/campaign/store/campaign-store'
 
 import { NavItem } from './nav-item'
 
 export function CampaignNavSection() {
-  const activeCampaignId = useCampaignStore((s) => s.activeCampaignId)
+  const activeCampaignId = useActiveCampaignId()
 
   return (
     <NavSection label="Campaign">

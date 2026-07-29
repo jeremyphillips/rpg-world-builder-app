@@ -32,7 +32,10 @@ describe('resolveOrganizationReference', () => {
       campaignId: campaign.id,
       organizationId: organization.id,
       characterId: 'character-a',
-      viewer: { kind: 'pc', characterIds: ['character-a'] },
+      authorization: {
+        source: 'content-viewer',
+        viewer: { kind: 'pc', characterIds: ['character-a'] },
+      },
     })
 
     expect(resolved).toMatchObject({
@@ -50,7 +53,10 @@ describe('resolveOrganizationReference', () => {
         campaignId: campaign.id,
         organizationId: '000000000000000000000000',
         characterId: 'character-a',
-        viewer: { kind: 'pc', characterIds: ['character-b'] },
+        authorization: {
+          source: 'content-viewer',
+          viewer: { kind: 'pc', characterIds: ['character-b'] },
+        },
       }),
     ).rejects.toMatchObject({ status: 403 })
   })
@@ -63,7 +69,7 @@ describe('resolveOrganizationReference', () => {
         campaignId: campaign.id,
         organizationId: '000000000000000000000000',
         characterId: 'character-a',
-        viewer: { kind: 'manage' },
+        authorization: { source: 'content-viewer', viewer: { kind: 'manage' } },
       }),
     ).resolves.toBeNull()
   })
@@ -93,7 +99,7 @@ describe('resolveOrganizationReference', () => {
       resolveCharacterOrganizationReferences({
         campaignId: campaign.id,
         characterId: character.id,
-        viewer: { kind: 'manage' },
+        authorization: { source: 'content-viewer', viewer: { kind: 'manage' } },
       }),
     ).resolves.toEqual([
       {

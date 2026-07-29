@@ -72,6 +72,23 @@ export async function findPcForUser(
   return toCharacter(doc)
 }
 
+export async function findPcById(
+  characterId: string,
+  options?: WithMongoSession,
+): Promise<PcCharacter | null> {
+  if (!isValidObjectId(characterId)) return null
+
+  const doc = await CharacterModel.findOne({
+    _id: characterId,
+    characterType: 'pc',
+  })
+    .session(options?.session ?? null)
+    .lean<CharacterRecord | null>()
+  if (!doc) return null
+
+  return toCharacter(doc)
+}
+
 export async function findNpcById(npcId: string): Promise<NpcCharacter | null> {
   if (!isValidObjectId(npcId)) return null
 

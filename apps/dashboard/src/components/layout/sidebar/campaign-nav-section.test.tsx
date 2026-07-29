@@ -7,16 +7,12 @@ import { ROUTES } from '@/app/routes'
 
 import { CampaignNavSection } from './campaign-nav-section'
 
-vi.mock('@/features/campaign/store/campaign-store', () => ({
-  useCampaignStore: (selector: (state: { activeCampaignId: string }) => unknown) =>
-    selector({ activeCampaignId: 'camp_1' }),
-}))
-
 vi.mock('@/features/campaign', async (importOriginal) => {
   const actual = (await importOriginal()) as Record<string, unknown>
   return {
     ...actual,
     CampaignSwitcher: () => <div data-testid="campaign-switcher" />,
+    useActiveCampaignId: () => 'camp_1',
   }
 })
 
