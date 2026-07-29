@@ -50,4 +50,19 @@ describe('option-query.lib', () => {
       )
     }
   })
+
+  it('matches separator-insensitive queries with the forgiving profile', () => {
+    expect(optionMatchesQuery(fireBoltOption, 'firebolt')).toBe(true)
+    expect(optionMatchesQuery(fireBoltOption, 'fire ball')).toBe(false)
+  })
+
+  it('matches fire ball to fireball labels', () => {
+    const fireballOption: LabelValueDescriptionOption = {
+      value: 'fireball',
+      label: 'Fireball',
+    }
+
+    expect(optionMatchesQuery(fireballOption, 'fire ball')).toBe(true)
+    expect(optionMatchesQuery(fireballOption, 'fireball')).toBe(true)
+  })
 })

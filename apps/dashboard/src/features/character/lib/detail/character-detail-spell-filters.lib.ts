@@ -1,4 +1,3 @@
-import { normalizeSearchQuery } from '@rpg/ui'
 import { applyFilterSchema, type FilterSchema } from '@rpg/ui/filters'
 
 import {
@@ -59,7 +58,7 @@ export function filterCharacterDetailSpellCards(
     searchQuery: string
   },
 ): CharacterSheetSpellCard[] {
-  const normalizedQuery = normalizeSearchQuery(options.searchQuery)
+  const normalizedQuery = options.searchQuery.trim()
   const searchFiltered = cards.filter((card) =>
     matchesCharacterDetailCatalogSearchQuery(card, normalizedQuery),
   )

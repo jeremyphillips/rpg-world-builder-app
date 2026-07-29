@@ -1,4 +1,5 @@
-import { normalizeSearchQuery, rankItems, type SearchableItem } from '../../lib/search'
+import { rankLegacySearchItems } from '../../lib/search-document.lib'
+import type { SearchableItem } from '../../lib/search'
 
 export type CatalogPickerSearchableItem<TItem> = SearchableItem & {
   item: TItem
@@ -10,15 +11,15 @@ export function rankPickerItems<TItem>(
   query: string,
   getSearchText: (item: TItem) => string,
 ): TItem[] {
-  const normalizedQuery = normalizeSearchQuery(query)
+  const normalizedQuery = query.trim()
   if (!normalizedQuery) return [...items]
 
-  const searchable = items.map((item) => ({
+  const searchable: CatalogPickerSearchableItem<TItem>[] = items.map((item) => ({
     item,
     fields: [{ text: getSearchText(item), weight: 1, role: 'label' as const }],
   }))
 
-  return rankItems(searchable, query).map((entry) => entry.item)
+  return rankLegacySearchItems(searchable, query, 'forgiving').map((entry) => entry.item)
 }
 
 /** Keeps rows whose tab id matches the active tab when tab routing is configured. */

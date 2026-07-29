@@ -6,6 +6,7 @@ import {
 } from '@rpg/contracts'
 
 import type { ContentBase } from './content-table-config'
+import { matchesPrimaryTextQuery } from '@rpg/ui/lib/search-document'
 
 /** Column filter id for campaign availability — shared across overview tables. */
 export const CAMPAIGN_AVAILABILITY_FILTER_ID = 'campaignAvailability' as const
@@ -42,8 +43,7 @@ export function matchesContentOverviewFilters<T extends WithCampaignAccess<Conte
   options?: { excludeCampaignAvailability?: boolean },
 ): boolean {
   if (filters.name?.trim()) {
-    const query = filters.name.trim().toLowerCase()
-    if (!row.name.toLowerCase().includes(query)) return false
+    if (!matchesPrimaryTextQuery(row.name, filters.name, 'forgiving')) return false
   }
 
   if (filters.source && row.source !== filters.source) return false

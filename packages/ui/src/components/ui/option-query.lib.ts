@@ -22,5 +22,7 @@ export function assembleComboboxOptionSearchDocument(
 }
 
 export function optionMatchesQuery(option: LabelValueDescriptionOption, query: string): boolean {
-  return matchSearchDocumentQuery(assembleComboboxOptionSearchDocument(option), query).matched
+  return matchSearchDocumentQuery(assembleComboboxOptionSearchDocument(option), query, {
+    profile: 'forgiving',
+  }).matched
 }

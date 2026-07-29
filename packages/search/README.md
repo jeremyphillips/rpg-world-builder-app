@@ -29,6 +29,7 @@ field helpers), match with `@rpg/search`, then compose sort pipelines with
 - Whole-string exact / prefix / substring match per field; document score = best field.
 - Empty query: `{ matched: true }` with no tier or score.
 - Field `weight` overrides the role default multiplier when present.
+- Forgiving profile (`profile: 'forgiving'`): separator-insensitive second pass for queries like `firebolt` → `fire-bolt` and `fire ball` → `Fireball`. ComboboxField uses this profile.
 
 Detail: [docs/matching-and-ranking.md](./docs/matching-and-ranking.md).
 

@@ -1,4 +1,5 @@
-import { rankItems, type WeightedSearchField } from '../../lib/search'
+import { rankLegacySearchItems } from '../../lib/search-document.lib'
+import type { WeightedSearchField } from '../../lib/search'
 import {
   clampHighlightedIndex,
   nextHighlightedIndex,
@@ -57,7 +58,7 @@ export function rankButtonDropdownItems(
   groups: readonly ButtonDropdownGroup[],
   query: string,
 ): ButtonDropdownItem[] {
-  const normalized = query.trim().toLowerCase()
+  const normalized = query.trim()
   if (!normalized) return orderButtonDropdownItemsGrouped(items, groups)
 
   const groupLabelById = new Map(groups.map((group) => [group.id, group.label]))
@@ -65,7 +66,7 @@ export function rankButtonDropdownItems(
     ...item,
     fields: buildButtonDropdownSearchFields(item, groupLabelById),
   }))
-  return rankItems(searchable, normalized)
+  return rankLegacySearchItems(searchable, query, 'forgiving')
 }
 
 export function isButtonDropdownSearchActive(query: string): boolean {

@@ -22,6 +22,7 @@ import * as PopoverPrimitive from '@radix-ui/react-popover'
 import { ChevronDown, Columns3, GripVertical, Lock, RotateCcw, Search } from 'lucide-react'
 
 import { cn } from '../../lib/utils'
+import { matchesPrimaryTextQuery } from '../../lib/search-document.lib'
 import { Button } from './button.client'
 import { Checkbox } from './checkbox.client'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './tooltip.client'
@@ -156,15 +157,15 @@ function DataTableColumnsMenuPanel({
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
   )
 
-  const query = search.trim().toLowerCase()
+  const query = search.trim()
   const lockedItems = items.filter((item) => !item.canHide)
   const reorderableItems = items.filter((item) => item.canHide)
 
   const filteredLocked = query
-    ? lockedItems.filter((item) => item.label.toLowerCase().includes(query))
+    ? lockedItems.filter((item) => matchesPrimaryTextQuery(item.label, query, 'forgiving'))
     : lockedItems
   const filteredReorderable = query
-    ? reorderableItems.filter((item) => item.label.toLowerCase().includes(query))
+    ? reorderableItems.filter((item) => matchesPrimaryTextQuery(item.label, query, 'forgiving'))
     : reorderableItems
 
   function handleDragEnd(event: DragEndEvent) {

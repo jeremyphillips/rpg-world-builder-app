@@ -1,3 +1,4 @@
+import { matchesPrimaryTextQuery } from '../lib/search-document.lib'
 import type {
   BooleanFilterFieldDef,
   ChipsFilterFieldDef,
@@ -94,14 +95,12 @@ export function createTextFilter<
     url: config.url,
     isValueConstraining: isTextValueConstraining,
     matches: (row, value) => {
-      const query = normalizeTextFilterValue(
-        typeof value === 'string' ? value : undefined,
-      )?.toLocaleLowerCase()
+      const query = normalizeTextFilterValue(typeof value === 'string' ? value : undefined)
       if (!query) return true
 
       const searchText = config.getSearchText(row)
       const parts = Array.isArray(searchText) ? searchText : [searchText]
-      return parts.some((part) => part.toLocaleLowerCase().includes(query))
+      return parts.some((part) => matchesPrimaryTextQuery(part, query, 'forgiving'))
     },
   } satisfies FilterFieldDef<TData, TState>
 }

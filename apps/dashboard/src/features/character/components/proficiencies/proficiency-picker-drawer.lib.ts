@@ -4,7 +4,8 @@ import {
   getProficiencyDomainCompactLabel,
 } from '@rpg/contracts'
 
-import { normalizeSearchQuery, scoreItem } from '@rpg/ui'
+import { normalizeSearchQuery } from '@rpg/ui'
+import { scoreLegacySearchItem } from '@rpg/ui/lib/search-document'
 
 import { formatChoiceSetDrawerTriggerLabel } from '../../lib/choice-sets/selection-counter.lib'
 import {
@@ -119,7 +120,11 @@ export function isProficiencySelectionFull(
 }
 
 function scoreProficiencyPickerItem(item: ProficiencyPickerItem, searchQuery: string): number {
-  return scoreItem({ fields: [{ text: item.label, weight: 1, role: 'label' }] }, searchQuery)
+  return scoreLegacySearchItem(
+    { fields: [{ text: item.label, weight: 1, role: 'label' }] },
+    searchQuery,
+    'forgiving',
+  )
 }
 
 function compareProficiencyPickerScoredItems(

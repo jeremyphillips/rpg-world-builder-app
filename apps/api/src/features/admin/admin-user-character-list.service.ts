@@ -8,6 +8,8 @@ import {
 } from '@rpg/contracts'
 import { loadSeedSubclasses } from '@rpg/catalog/classes'
 
+import { matchesAnyTextSearchQuery } from '../../lib/text-search.lib'
+
 import { enrichPcsWithOpenCampaign, listCharactersForUser } from '../character'
 import {
   buildCampaignContentEligibilityMap,
@@ -115,13 +117,9 @@ export async function listAdminUserCharacters(
   query: AdminUserCharacterListQuery,
 ): Promise<AdminUserCharacterSummary[]> {
   const cards = await listAdminUserCharacterCards(userId)
-  const trimmedSearch = query.q?.trim().toLowerCase()
 
   return cards.filter((card) => {
-    if (trimmedSearch) {
-      const haystack = `${card.name} ${card.summary}`.toLowerCase()
-      if (!haystack.includes(trimmedSearch)) return false
-    }
+    if (!matchesAnyTextSearchQuery([card.name, card.summary], query.q)) return false
 
     if (query.campaign === 'in-campaign' && !card.campaign) return false
     if (query.campaign === 'no-campaign' && card.campaign) return false

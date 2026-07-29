@@ -1,4 +1,5 @@
-import { scoreItem, type WeightedSearchField } from '../../lib/search'
+import { matchesLegacySearchItem } from '../../lib/search-document.lib'
+import type { WeightedSearchField } from '../../lib/search'
 import type {
   RichTextLinkPickerInternalOption,
   RichTextLinkPickerValue,
@@ -37,7 +38,7 @@ function internalLinkOptionMatchesQuery(
   option: RichTextLinkPickerInternalOption,
   query: string,
 ): boolean {
-  return scoreItem({ fields: internalLinkSearchFields(option) }, query) > 0
+  return matchesLegacySearchItem({ fields: internalLinkSearchFields(option) }, query, 'forgiving')
 }
 
 export function filterInternalLinkOptions(
@@ -45,13 +46,11 @@ export function filterInternalLinkOptions(
   contentType: string,
   searchQuery: string,
 ): RichTextLinkPickerInternalOption[] {
-  const query = searchQuery.trim().toLowerCase()
   return internalOptions.filter((option) => {
     if (isRichTextLinkContentTypeFilterActive(contentType) && option.contentType !== contentType) {
       return false
     }
-    if (!query) return true
-    return internalLinkOptionMatchesQuery(option, query)
+    return internalLinkOptionMatchesQuery(option, searchQuery)
   })
 }
 

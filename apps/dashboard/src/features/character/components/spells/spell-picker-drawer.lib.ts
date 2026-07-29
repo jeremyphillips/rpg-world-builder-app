@@ -11,7 +11,8 @@ import {
   type SpellPickerItem,
 } from '@rpg/contracts'
 
-import { normalizeSearchQuery, scoreItem } from '@rpg/ui'
+import { normalizeSearchQuery } from '@rpg/ui'
+import { scoreLegacySearchItem } from '@rpg/ui/lib/search-document'
 
 import { sanitizeModeBrowseState } from '../picker/catalog-picker-browse-mode.lib'
 import {
@@ -459,7 +460,11 @@ type SpellPickerScoredItem = {
 }
 
 function scoreSpellPickerItem(item: SpellPickerItem, searchQuery: string): number {
-  return scoreItem({ fields: [{ text: item.searchText, weight: 1, role: 'label' }] }, searchQuery)
+  return scoreLegacySearchItem(
+    { fields: [{ text: item.searchText, weight: 1, role: 'label' }] },
+    searchQuery,
+    'forgiving',
+  )
 }
 
 function compareSpellPickerScoredItems(

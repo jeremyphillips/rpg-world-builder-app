@@ -37,9 +37,26 @@ apps share the exact same picker intent.
 ## Normalization (B1 baseline)
 
 - Query is trimmed and lower-cased.
-- No tokenization, punctuation folding, or diacritic folding in the baseline release.
+- No tokenization or diacritic folding in the baseline release.
 - The whole normalized query string is matched per field (exact → prefix → substring).
 - Document score is the best field score.
+
+### Forgiving profile (`profile: 'forgiving'`)
+
+Opt-in separator-insensitive matching for surfaces like ComboboxField:
+
+- Strips whitespace and common separators (`-`, `_`, `.`, `/`) from query and field text before a second match pass.
+- Literal matching runs first; folded matching applies only when literal score is zero.
+- Folded matches use lower tier scores so literal hits rank higher.
+- Minimum folded query length: 3 characters.
+
+Examples with forgiving profile:
+
+| Query       | Field       | Match |
+| ----------- | ----------- | ----- |
+| `firebolt`  | `fire-bolt` | yes   |
+| `fire ball` | `Fireball`  | yes   |
+| `fire ball` | `Fire Bolt` | no    |
 
 ## Empty-query semantics
 

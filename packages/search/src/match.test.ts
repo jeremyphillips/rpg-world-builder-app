@@ -11,12 +11,13 @@ function document(fields: SearchField[]): SearchDocument {
 
 describe('normalizeSearchQuery', () => {
   it('trims and lowercases query text', () => {
-    expect(normalizeSearchQuery('  Fireball  ')).toEqual({ text: 'fireball' })
+    expect(normalizeSearchQuery('  Fireball  ')).toEqual({ text: 'fireball', profile: 'literal' })
   })
 
   it('detects empty queries', () => {
     expect(isEmptySearchQuery(normalizeSearchQuery('   '))).toBe(true)
     expect(isEmptySearchQuery(normalizeSearchQuery('fire'))).toBe(false)
+    expect(isEmptySearchQuery(normalizeSearchQuery('!!!', { profile: 'alphanumeric' }))).toBe(true)
   })
 })
 
@@ -108,6 +109,68 @@ describe('matchSearchDocument', () => {
         'rope',
       ),
     ).toBe(100)
+  })
+})
+
+describe('forgiving match profile', () => {
+  const fireBoltDocument = document([
+    { key: 'label', text: 'Fire Bolt', role: 'primary' },
+    { key: 'value', text: 'fire-bolt', role: 'keyword' },
+  ])
+
+  const fireballDocument = document([{ key: 'label', text: 'Fireball', role: 'primary' }])
+
+  it('matches firebolt to fire-bolt via separator folding', () => {
+    expect(
+      matchSearchDocumentQuery(fireBoltDocument, 'firebolt', { profile: 'forgiving' }),
+    ).toEqual({
+      matched: true,
+      tier: 'exact',
+      score: 85,
+    })
+  })
+
+  it('matches fire ball to fireball via separator folding', () => {
+    expect(
+      matchSearchDocumentQuery(fireballDocument, 'fire ball', { profile: 'forgiving' }),
+    ).toEqual({
+      matched: true,
+      tier: 'exact',
+      score: 85,
+    })
+  })
+
+  it('does not conflate fire ball with fire bolt when folded forms differ', () => {
+    expect(
+      matchSearchDocumentQuery(fireBoltDocument, 'fire ball', { profile: 'forgiving' }),
+    ).toEqual({
+      matched: false,
+      tier: 'none',
+      score: 0,
+    })
+  })
+
+  it('prefers literal matches over folded matches', () => {
+    expect(
+      matchSearchDocumentQuery(fireBoltDocument, 'fire-bolt', { profile: 'forgiving' }),
+    ).toEqual({
+      matched: true,
+      tier: 'exact',
+      score: 70,
+    })
+  })
+
+  it('leaves literal profile behavior unchanged for separator variants', () => {
+    expect(matchSearchDocumentQuery(fireBoltDocument, 'firebolt')).toEqual({
+      matched: false,
+      tier: 'none',
+      score: 0,
+    })
+    expect(matchSearchDocumentQuery(fireballDocument, 'fire ball')).toEqual({
+      matched: false,
+      tier: 'none',
+      score: 0,
+    })
   })
 })
 

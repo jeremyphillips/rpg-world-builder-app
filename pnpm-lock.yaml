@@ -56,6 +56,9 @@ importers:
       '@rpg/dev-bench-core':
         specifier: workspace:*
         version: link:../../packages/dev-bench-core
+      '@rpg/search':
+        specifier: workspace:*
+        version: link:../../packages/search
       bcryptjs:
         specifier: ^3.0.3
         version: 3.0.3
