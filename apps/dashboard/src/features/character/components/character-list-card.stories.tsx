@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 
 import { buildCharacterCardViewModel } from '../lib/display/character-display'
+import { CHARACTER_CONTROLLER_DISPLAY } from '../lib/display/character-display-labels'
 import {
   createPopulatedStandaloneBuilderContextFixture,
   createStandaloneBuilderCatalogIndexFixture,
@@ -36,6 +37,39 @@ export const WithCampaign: Story = {
       campaign: { id: 'camp-1', name: 'The Argent Road' },
     },
     detailHref: '/campaigns/camp-1/characters/char-sample-1',
+  },
+}
+
+export const CampaignRoster: Story = {
+  args: {
+    card: {
+      ...buildCharacterCardViewModel(SAMPLE_PC, catalogIndex),
+      campaign: { id: 'camp-1', name: 'The Argent Road' },
+    },
+    detailHref: '/campaigns/camp-1/characters/char-sample-1',
+    showCampaign: false,
+    controllerLine: CHARACTER_CONTROLLER_DISPLAY.playedBy('Player One'),
+    rosterStatus: 'active',
+  },
+}
+
+export const Unassigned: Story = {
+  args: {
+    card: buildCharacterCardViewModel(SAMPLE_PC, catalogIndex),
+    detailHref: '/campaigns/camp-1/characters/char-sample-1',
+    showCampaign: false,
+    controllerLine: CHARACTER_CONTROLLER_DISPLAY.noPlayerAssigned,
+    rosterStatus: 'inactive',
+  },
+}
+
+export const PlayedByYou: Story = {
+  args: {
+    card: buildCharacterCardViewModel(SAMPLE_PC, catalogIndex),
+    detailHref: '/campaigns/camp-1/characters/char-sample-1',
+    showCampaign: false,
+    controllerLine: CHARACTER_CONTROLLER_DISPLAY.playedByYou,
+    rosterStatus: 'active',
   },
 }
 

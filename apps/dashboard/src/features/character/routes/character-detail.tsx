@@ -3,17 +3,16 @@ import { useParams } from 'react-router-dom'
 import { type SystemRulesetId } from '@rpg/contracts'
 import { getStandardXpProgression } from '@rpg/catalog/xp-progressions'
 
-import { PageLoadState } from '@/components/layout/page-load-state'
-import { WidePage } from '@/components/layout/wide-page'
-
 import { CharacterDetailContent } from '../components/detail/character-detail-content.client'
+import { CharacterSheetDetailShell } from '../components/detail/character-sheet-detail-shell'
 import { CharacterVitalSummary } from '../components/detail/character-vital-summary.client'
+import { StandaloneCharacterRedirectGuard } from '../components/standalone-character-redirect-guard.client'
 import { useBuildContext } from '../hooks/use-build-context'
 import { useCharacter } from '../hooks/use-character'
 import { buildCharacterDetailViewModel } from '../lib/display/character-display'
 import { resolveQueryErrorLabel } from '../lib/resolve-query-error-label.lib'
 
-export function CharacterDetail() {
+function CharacterDetailBody() {
   const { characterId } = useParams<{ characterId: string }>()
   const {
     data: character,
@@ -48,20 +47,27 @@ export function CharacterDetail() {
   ])
 
   return (
-    <WidePage spacing="relaxed">
-      <PageLoadState
-        isPending={isPending}
-        isError={isError}
-        errorLabel={errorLabel}
-        defaultErrorLabel="Could not load character."
-      >
-        {viewModel ? (
-          <CharacterDetailContent
-            viewModel={viewModel}
-            statusSummary={<CharacterVitalSummary vital={viewModel.identity.vital} />}
-          />
-        ) : null}
-      </PageLoadState>
-    </WidePage>
+    <CharacterSheetDetailShell
+      scope="standalone"
+      isPending={isPending}
+      isError={isError}
+      errorLabel={errorLabel}
+    >
+      {viewModel ? (
+        <CharacterDetailContent
+          viewModel={viewModel}
+          statusSummary={<CharacterVitalSummary vital={viewModel.identity.vital} />}
+          showDelete
+        />
+      ) : null}
+    </CharacterSheetDetailShell>
+  )
+}
+
+export function CharacterDetail() {
+  return (
+    <StandaloneCharacterRedirectGuard>
+      <CharacterDetailBody />
+    </StandaloneCharacterRedirectGuard>
   )
 }

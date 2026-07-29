@@ -2,7 +2,7 @@ import type { NextFunction, Request, Response } from 'express'
 import type { CampaignRole, PlatformRole } from '@rpg/contracts'
 
 import { CampaignMembershipModel } from '../features/campaign/campaign-membership.model'
-import { intersectControlledWithOpenParticipations } from '../features/campaign/participation/campaign-character-participation.repository'
+import { resolveOpenControlledPcCharacterIds } from '../features/campaign/participation/campaign-character-participation.repository'
 import { HttpError } from '../lib/http-error'
 
 /**
@@ -66,7 +66,7 @@ export function requireCampaignRole(...roles: CampaignRole[]) {
         (membership as { characterIds?: string[] }).characterIds ??
         []) as string[]
 
-      const pcCharacterIds = await intersectControlledWithOpenParticipations(
+      const pcCharacterIds = await resolveOpenControlledPcCharacterIds(
         String(campaignId),
         controlledCharacterIds,
       )

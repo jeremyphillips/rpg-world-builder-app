@@ -10,6 +10,7 @@ import {
   listCharactersForUser,
 } from './character.service'
 import { enrichPcsWithOpenCampaign } from './enrich-pcs-with-open-campaign.lib'
+import { resolveCharacterRoutingContext } from '../campaign/campaign-character-access.service'
 
 export async function create(req: Request, res: Response): Promise<void> {
   const character = await createCharacter(req.body as CreateCharacterInput, req.user!.id)
@@ -29,6 +30,15 @@ export async function getById(req: Request, res: Response): Promise<void> {
     throw new HttpError(404, 'not_found', 'Character not found.')
   }
   res.status(200).json({ character })
+}
+
+export async function getRoutingContext(req: Request, res: Response): Promise<void> {
+  const { characterId } = req.params as { characterId: string }
+  const routingContext = await resolveCharacterRoutingContext(characterId, req.user!.id)
+  if (routingContext === null) {
+    throw new HttpError(404, 'not_found', 'Character not found.')
+  }
+  res.status(200).json(routingContext)
 }
 
 export async function remove(req: Request, res: Response): Promise<void> {

@@ -34,9 +34,25 @@ export {
   mapRulesetPatchToMechanicsValues,
   defaultMechanicsValues,
 } from './lib/rules/mechanics/mechanics-form-values'
+export { useCampaignCharacter, campaignCharacterQueryKey } from './hooks/use-campaign-character'
+export {
+  useCampaignCharacters,
+  campaignCharactersListQueryKey,
+} from './hooks/use-campaign-characters'
+export { useCampaignCharacterNavigationContext } from './hooks/use-campaign-character-navigation-context'
+export {
+  buildCampaignCharacterNavigationContext,
+  CAMPAIGN_CHARACTER_NAV_LABELS,
+  type CampaignCharacterNavigationContext,
+  type CampaignCharacterNavModel,
+  type CampaignCharactersListContextModel,
+} from './lib/build-campaign-character-navigation-context'
+export { isCampaignCharactersNavActive } from './lib/is-campaign-characters-nav-active'
+export { invalidateCampaignCharacterControlQueries } from './lib/invalidate-campaign-character-control-queries'
 export { useCampaignRules } from './hooks/use-campaign-rules'
 export { useCampaigns, campaignsQueryKey } from './hooks/use-campaigns'
 export { useCampaignTemplates, campaignTemplatesQueryKey } from './hooks/use-campaign-templates'
+export { useActiveCampaignId } from './hooks/use-active-campaign-id'
 export { useSelectCampaign } from './hooks/use-select-campaign'
 export { useSyncActiveCampaign } from './hooks/use-sync-active-campaign'
 export { useCanManageCampaign } from './hooks/use-can-manage-campaign'
@@ -49,3 +65,4 @@ export {
   resolveLandingPath,
   resolveTargetPathOnSwitch,
 } from './lib/navigation/campaign-selection'
+export { resolveActiveCampaignId } from './lib/navigation/resolve-active-campaign-id'

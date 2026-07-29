@@ -3,6 +3,10 @@ import { Heading, Text } from '@rpg/ui'
 
 import { ROUTES } from '@/app/routes'
 import { CharacterListCard } from '@/features/character'
+import {
+  normalizePartyController,
+  resolveCharacterControllerDisplay,
+} from '@/features/character/lib/display/character-display'
 
 import {
   CAMPAIGN_OVERVIEW_EMPTY_TEXT,
@@ -12,12 +16,14 @@ import {
 export type CampaignOverviewPartySectionProps = {
   campaignId: string
   party: CampaignPartyPcListItem[]
+  openControlledCharacterIds: readonly string[]
 }
 
 /** Campaign party PCs composed server-side with controlling member metadata. */
 export function CampaignOverviewPartySection({
   campaignId,
   party,
+  openControlledCharacterIds,
 }: CampaignOverviewPartySectionProps) {
   return (
     <section aria-labelledby="campaign-overview-party-heading" className="space-y-4">
@@ -30,14 +36,17 @@ export function CampaignOverviewPartySection({
       ) : (
         <ul className="grid gap-4 sm:grid-cols-2">
           {party.map((entry) => (
-            <li key={entry.character.id} className="space-y-2">
+            <li key={entry.character.id}>
               <CharacterListCard
                 card={entry.character}
                 detailHref={ROUTES.campaign.characters.detail(campaignId, entry.character.id)}
+                showCampaign={false}
+                controllerLine={resolveCharacterControllerDisplay({
+                  controller: normalizePartyController(entry.member),
+                  viewerControlsCharacter: openControlledCharacterIds.includes(entry.character.id),
+                })}
+                rosterStatus={entry.roster.status}
               />
-              <Text variant="small" className="text-muted-foreground">
-                Played by {entry.member.displayName}
-              </Text>
             </li>
           ))}
         </ul>

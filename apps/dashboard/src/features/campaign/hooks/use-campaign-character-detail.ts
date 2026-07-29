@@ -1,0 +1,65 @@
+import { useMemo } from 'react'
+import { type SystemRulesetId } from '@rpg/contracts'
+import { getStandardXpProgression } from '@rpg/catalog/xp-progressions'
+
+import { useBuildContext } from '@/features/character/hooks/use-build-context'
+import { useCharacterOrganizationReferences } from '@/features/character/hooks/use-character-organization-references'
+import {
+  buildCharacterDetailViewModel,
+  type CharacterDetailViewModel,
+} from '@/features/character/lib/display/character-display'
+import {
+  combineQueryError,
+  combineQueryPending,
+  resolveQueryErrorLabel,
+} from '@/features/character/lib/resolve-query-error-label.lib'
+
+import { useCampaignCharacter } from './use-campaign-character'
+
+type CampaignCharacterDetailState = {
+  campaignCharacter: NonNullable<ReturnType<typeof useCampaignCharacter>['data']> | undefined
+  viewModel: CharacterDetailViewModel | null
+  organizationReferences: ReturnType<typeof useCharacterOrganizationReferences>['data']
+  isPending: boolean
+  isError: boolean
+  errorLabel: string | undefined
+}
+
+export function useCampaignCharacterDetail(
+  campaignId: string | undefined,
+  characterId: string | undefined,
+): CampaignCharacterDetailState {
+  const campaignCharacterQuery = useCampaignCharacter(campaignId, characterId)
+  const character = campaignCharacterQuery.data?.character
+  const buildContextQuery = useBuildContext(character?.rulesetId as SystemRulesetId | undefined)
+  const organizationReferencesQuery = useCharacterOrganizationReferences(campaignId, characterId)
+
+  const viewModel = useMemo(() => {
+    const { catalogIndex, context } = buildContextQuery
+    if (!character || !catalogIndex || !context) return null
+
+    return buildCharacterDetailViewModel({
+      character,
+      catalogIndex,
+      rules: context.characterCreationRules,
+      xpProgression: getStandardXpProgression(character.rulesetId as SystemRulesetId),
+      organizationReferences: organizationReferencesQuery.data,
+    })
+  }, [buildContextQuery, character, organizationReferencesQuery.data])
+
+  const querySlices = [
+    campaignCharacterQuery,
+    buildContextQuery,
+    organizationReferencesQuery,
+  ] as const
+
+  return {
+    campaignCharacter: campaignCharacterQuery.data,
+    viewModel,
+    organizationReferences: organizationReferencesQuery.data,
+    isPending:
+      combineQueryPending(querySlices) || Boolean(character && buildContextQuery.isPending),
+    isError: combineQueryError(querySlices),
+    errorLabel: resolveQueryErrorLabel(querySlices),
+  }
+}

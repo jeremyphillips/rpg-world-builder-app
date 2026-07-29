@@ -16,9 +16,9 @@ import {
 } from '@rpg/ui'
 
 import { useCampaigns } from '../hooks/use-campaigns'
+import { useActiveCampaignId } from '../hooks/use-active-campaign-id'
 import { useSelectCampaign } from '../hooks/use-select-campaign'
 import { getCampaignSwitcherLabel } from '../lib/navigation/campaign-selection'
-import { useCampaignStore } from '../store/campaign-store'
 
 interface CampaignSwitcherProps {
   showLabel?: boolean
@@ -57,12 +57,11 @@ function CampaignSwitcherList({ campaigns, activeId, onSelect }: CampaignSwitche
 }
 
 /**
- * Large campaign switcher for the sidebar. The active campaign is derived from
- * the URL (`/campaigns/:campaignId`) - selecting one simply navigates there.
- * Future per-campaign menu items will render below this control.
+ * Large campaign switcher for the sidebar. The highlighted campaign follows the
+ * current route when present, otherwise the user's stored preference.
  */
 export function CampaignSwitcher({ showLabel = true }: CampaignSwitcherProps) {
-  const activeCampaignId = useCampaignStore((s) => s.activeCampaignId)
+  const activeCampaignId = useActiveCampaignId()
   const navigate = useNavigate()
   const selectCampaign = useSelectCampaign()
   const { data: campaigns, isPending, isError } = useCampaigns()

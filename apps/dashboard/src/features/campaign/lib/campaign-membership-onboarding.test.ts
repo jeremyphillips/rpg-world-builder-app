@@ -5,23 +5,28 @@ import { makeCampaignListItem } from '@/test/fixtures/campaigns'
 import { isCampaignMembershipOnboardingIncomplete } from './campaign-membership-onboarding'
 
 describe('isCampaignMembershipOnboardingIncomplete', () => {
-  it('returns true for a PC with no controlled characters', () => {
+  it('returns true when viewerOnboardingState is incomplete', () => {
     expect(
       isCampaignMembershipOnboardingIncomplete(
-        makeCampaignListItem({ campaignRole: 'pc', controlledCharacterIds: [] }),
+        makeCampaignListItem({ viewerOnboardingState: 'incomplete' }),
       ),
     ).toBe(true)
   })
 
-  it('returns false for staff roles and active PCs', () => {
+  it('returns false for complete, invalid, and staff onboarding states', () => {
     expect(
       isCampaignMembershipOnboardingIncomplete(
-        makeCampaignListItem({ campaignRole: 'owner', controlledCharacterIds: [] }),
+        makeCampaignListItem({ viewerOnboardingState: 'complete' }),
       ),
     ).toBe(false)
     expect(
       isCampaignMembershipOnboardingIncomplete(
-        makeCampaignListItem({ campaignRole: 'pc', controlledCharacterIds: ['char_1'] }),
+        makeCampaignListItem({ viewerOnboardingState: 'invalid' }),
+      ),
+    ).toBe(false)
+    expect(
+      isCampaignMembershipOnboardingIncomplete(
+        makeCampaignListItem({ campaignRole: 'owner', viewerOnboardingState: 'complete' }),
       ),
     ).toBe(false)
   })

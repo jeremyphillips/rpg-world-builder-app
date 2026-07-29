@@ -7,10 +7,8 @@ import {
 import { findCampaignById } from '../../find-campaign-by-id'
 import { findOpenParticipationForCharacter } from '../campaign-character-participation.repository'
 import { listCharactersForUser } from '../../../character'
-import {
-  buildCampaignContentEligibilityIndex,
-  formatInviteCharacterSummary,
-} from '../../../campaign-invite'
+import { buildCharacterCardSummaryDto } from '../../../character/lib/build-character-card-summary-dto.lib'
+import { buildCampaignContentEligibilityIndex } from '../../../campaign-invite'
 import { resolveCampaignCharacterEligibilityContext } from './resolve-campaign-character-eligibility-context.lib'
 
 export async function listEligibleCharactersForCampaign({
@@ -52,7 +50,7 @@ export async function listEligibleCharactersForCampaign({
     results.push({
       characterId: character.id,
       name: character.name,
-      summary: formatInviteCharacterSummary(character, contentIndex.contentById),
+      summary: buildCharacterCardSummaryDto({ character, contentIndex }).summary,
       eligibility,
     })
   }

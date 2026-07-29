@@ -1,4 +1,4 @@
-import { buildContentViewerFromMembership } from '@rpg/contracts'
+import { buildContentViewerFromCampaignContext } from '@rpg/contracts'
 
 import { useCampaigns } from '@/features/campaign'
 
@@ -15,8 +15,8 @@ export function useContentViewer(campaignId: string | undefined) {
     return { kind: 'none' } as const
   }
 
-  return buildContentViewerFromMembership({
+  return buildContentViewerFromCampaignContext({
     campaignRole: campaign.campaignRole,
-    controlledCharacterIds: campaign.controlledCharacterIds,
+    pcCharacterIds: campaign.openControlledCharacterIds,
   })
 }

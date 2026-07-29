@@ -80,3 +80,29 @@ export function resolveCampaignOverviewMemberOnboardingState(
       return undefined
   }
 }
+
+export const CAMPAIGN_VIEWER_ONBOARDING_STATES = ['incomplete', 'complete', 'invalid'] as const
+
+export const campaignViewerOnboardingStateSchema = z.enum(CAMPAIGN_VIEWER_ONBOARDING_STATES)
+
+export type CampaignViewerOnboardingState = z.infer<typeof campaignViewerOnboardingStateSchema>
+
+/** Maps membership + open roster inputs to the three-value list-row onboarding field. */
+export function resolveCampaignViewerOnboardingState(
+  input: CampaignViewerParticipationInput,
+): CampaignViewerOnboardingState | undefined {
+  const state = resolveCampaignViewerParticipation(input)
+
+  switch (state) {
+    case 'onboarding_incomplete':
+      return 'incomplete'
+    case 'active':
+    case 'staff':
+    case 'observer':
+      return 'complete'
+    case 'invalid':
+      return 'invalid'
+    case 'none':
+      return undefined
+  }
+}

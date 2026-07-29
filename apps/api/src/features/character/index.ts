@@ -7,6 +7,7 @@ export {
   deletePcForUser,
   findNpcById,
   findNpcsByIds,
+  findPcById,
   findPcForUser,
   findPcOwnerIdsByCharacterIds,
   findPcsByIds,

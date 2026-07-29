@@ -52,7 +52,11 @@ export function CampaignDetail() {
             />
           ) : null}
           {campaignId ? (
-            <CampaignOverviewPartySection campaignId={campaignId} party={overview.party} />
+            <CampaignOverviewPartySection
+              campaignId={campaignId}
+              party={overview.party}
+              openControlledCharacterIds={campaign?.openControlledCharacterIds ?? []}
+            />
           ) : null}
         </div>
       </PageLoadState>

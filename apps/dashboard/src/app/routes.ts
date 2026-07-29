@@ -19,6 +19,7 @@ export const ROUTES = {
     settings: (id: string) => `/campaigns/${id}/settings`,
     onboarding: (id: string) => `/campaigns/${id}/onboarding`,
     characters: {
+      list: (campaignId: string) => `/campaigns/${campaignId}/characters`,
       detail: (campaignId: string, characterId: string) =>
         `/campaigns/${campaignId}/characters/${characterId}`,
     },

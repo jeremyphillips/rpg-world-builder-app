@@ -1,100 +1,57 @@
-import { useMemo } from 'react'
-import { Link, useParams } from 'react-router-dom'
-import { type SystemRulesetId } from '@rpg/contracts'
-import { getStandardXpProgression } from '@rpg/catalog/xp-progressions'
-import { Heading } from '@rpg/ui'
+import { useParams } from 'react-router-dom'
 
 import { ROUTES } from '@/app/routes'
-import { PageLoadState } from '@/components/layout/page-load-state'
-import { WidePage } from '@/components/layout/wide-page'
+import { CampaignCharacterStatusSummary } from '@/features/character/components/detail/campaign-character-status-summary.client'
 import { CharacterDetailContent } from '@/features/character/components/detail/character-detail-content.client'
 import { CharacterOrganizationsSummary } from '@/features/character/components/detail/character-organizations-summary.client'
-import { CharacterVitalSummary } from '@/features/character/components/detail/character-vital-summary.client'
-import { useBuildContext } from '@/features/character/hooks/use-build-context'
-import { useCharacter } from '@/features/character/hooks/use-character'
-import { useCharacterOrganizationReferences } from '@/features/character/hooks/use-character-organization-references'
-import { buildCharacterDetailViewModel } from '@/features/character/lib/display/character-display'
-import { resolveQueryErrorLabel } from '@/features/character/lib/resolve-query-error-label.lib'
+import { CharacterSheetDetailShell } from '@/features/character/components/detail/character-sheet-detail-shell'
+
+import { useCampaignCharacterDetail } from '../hooks/use-campaign-character-detail'
+import { useCampaignCharacterNavigationContext } from '../hooks/use-campaign-character-navigation-context'
 import { useCampaigns } from '../hooks/use-campaigns'
 
 export function CampaignCharacterDetail() {
   const { campaignId, characterId } = useParams<{ campaignId: string; characterId: string }>()
   const { data: campaigns } = useCampaigns()
   const campaign = campaigns?.find((entry) => entry.id === campaignId)
+  const { nav } = useCampaignCharacterNavigationContext(campaignId)
+  const detail = useCampaignCharacterDetail(campaignId, characterId)
 
-  const {
-    data: character,
-    isPending: isCharacterPending,
-    isError: isCharacterError,
-    error: characterError,
-  } = useCharacter(characterId)
-  const {
-    catalogIndex,
-    context,
-    isPending: isCatalogPending,
-    isError: isCatalogError,
-    error: catalogError,
-  } = useBuildContext(character?.rulesetId as SystemRulesetId | undefined)
-  const organizationReferencesQuery = useCharacterOrganizationReferences(campaignId, characterId)
-
-  const viewModel = useMemo(() => {
-    if (!character || !catalogIndex || !context) return null
-
-    return buildCharacterDetailViewModel({
-      character,
-      catalogIndex,
-      rules: context.characterCreationRules,
-      xpProgression: getStandardXpProgression(character.rulesetId as SystemRulesetId),
-      organizationReferences: organizationReferencesQuery.data,
-    })
-  }, [catalogIndex, character, context, organizationReferencesQuery.data])
-
-  const isPending =
-    isCharacterPending ||
-    organizationReferencesQuery.isPending ||
-    Boolean(character && isCatalogPending)
-  const isError = isCharacterError || isCatalogError || organizationReferencesQuery.isError
-  const errorLabel = resolveQueryErrorLabel([
-    { isPending: isCharacterPending, isError: isCharacterError, error: characterError },
-    { isPending: isCatalogPending, isError: isCatalogError, error: catalogError },
-    organizationReferencesQuery,
-  ])
+  const errorBackLink =
+    detail.isError && nav.showCharactersNav ? { href: nav.href, label: nav.label } : undefined
 
   return (
-    <WidePage spacing="relaxed">
-      <div className="mb-6 flex flex-col gap-2">
-        <Link
-          to={campaignId ? ROUTES.campaign.detail(campaignId) : ROUTES.home}
-          className="text-sm text-muted-foreground underline-offset-4 hover:underline"
-        >
-          {campaign?.identity.name ?? 'Campaign'}
-        </Link>
-        <Heading variant="page" as="h1">
-          Campaign character
-        </Heading>
-      </div>
-
-      <PageLoadState
-        isPending={isPending}
-        isError={isError}
-        errorLabel={errorLabel}
-        defaultErrorLabel="Could not load character."
-      >
-        {viewModel ? (
-          <CharacterDetailContent
-            viewModel={viewModel}
-            statusSummary={<CharacterVitalSummary vital={viewModel.identity.vital} />}
-            identitySupplement={
-              organizationReferencesQuery.data ? (
-                <CharacterOrganizationsSummary
-                  campaignId={campaignId!}
-                  organizationReferences={organizationReferencesQuery.data}
-                />
-              ) : null
-            }
-          />
-        ) : null}
-      </PageLoadState>
-    </WidePage>
+    <CharacterSheetDetailShell
+      scope="campaign"
+      campaignBreadcrumb={{
+        href: campaignId ? ROUTES.campaign.detail(campaignId) : ROUTES.home,
+        label: campaign?.identity.name ?? 'Campaign',
+      }}
+      errorBackLink={errorBackLink}
+      isPending={detail.isPending}
+      isError={detail.isError}
+      errorLabel={detail.errorLabel}
+    >
+      {detail.viewModel && detail.campaignCharacter ? (
+        <CharacterDetailContent
+          viewModel={detail.viewModel}
+          showDelete={detail.campaignCharacter.capabilities.canDelete}
+          statusSummary={
+            <CampaignCharacterStatusSummary
+              vital={detail.viewModel.identity.vital}
+              roster={detail.campaignCharacter.participation.roster}
+            />
+          }
+          identitySupplement={
+            detail.organizationReferences ? (
+              <CharacterOrganizationsSummary
+                campaignId={campaignId!}
+                organizationReferences={detail.organizationReferences}
+              />
+            ) : null
+          }
+        />
+      ) : null}
+    </CharacterSheetDetailShell>
   )
 }

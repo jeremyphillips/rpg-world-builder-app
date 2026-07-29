@@ -3,7 +3,7 @@
 import { useCallback, useMemo, useState } from 'react'
 
 import type { GeneratedName } from '@rpg/contracts/name-generator'
-import { useCampaignStore } from '@/features/campaign/store/campaign-store'
+import { useActiveCampaignId } from '@/features/campaign'
 import { useSpecies } from '@/features/content/species/hooks/use-species'
 
 import {
@@ -39,7 +39,7 @@ function isNameGeneratorPageError(error: unknown): error is NameGeneratorPageErr
 }
 
 export function useNameGeneratorPage() {
-  const activeCampaignId = useCampaignStore((state) => state.activeCampaignId)
+  const activeCampaignId = useActiveCampaignId()
   const { data: campaignSpecies = [] } = useSpecies(activeCampaignId ?? undefined)
 
   const speciesInputs = useMemo(

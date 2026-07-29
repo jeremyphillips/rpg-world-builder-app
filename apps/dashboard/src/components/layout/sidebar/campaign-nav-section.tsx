@@ -1,14 +1,19 @@
 import { NavSection } from '@rpg/ui'
 
 import { ROUTES } from '@/app/routes'
-import { CampaignSwitcher } from '@/features/campaign'
+import {
+  CampaignSwitcher,
+  useActiveCampaignId,
+  useCampaignCharacterNavigationContext,
+  isCampaignCharactersNavActive,
+} from '@/features/campaign'
 import { VISIBLE_SIDEBAR_CONTENT } from '@/features/homebrew'
-import { useCampaignStore } from '@/features/campaign/store/campaign-store'
 
 import { NavItem } from './nav-item'
 
 export function CampaignNavSection() {
-  const activeCampaignId = useCampaignStore((s) => s.activeCampaignId)
+  const activeCampaignId = useActiveCampaignId()
+  const { nav } = useCampaignCharacterNavigationContext(activeCampaignId ?? undefined)
 
   return (
     <NavSection label="Campaign">
@@ -19,6 +24,15 @@ export function CampaignNavSection() {
         <>
           <NavItem to={ROUTES.campaign.detail(activeCampaignId)} label="Overview" end />
           <NavItem to={ROUTES.campaign.sessions(activeCampaignId)} label="Sessions" />
+          {nav.showCharactersNav ? (
+            <NavItem
+              to={nav.href}
+              label={nav.label}
+              isActive={(currentPathname) =>
+                isCampaignCharactersNavActive(currentPathname, nav, activeCampaignId)
+              }
+            />
+          ) : null}
           <NavItem to={ROUTES.campaign.npcs.list(activeCampaignId)} label="NPCs" />
           {VISIBLE_SIDEBAR_CONTENT.map((entry) => (
             <NavItem

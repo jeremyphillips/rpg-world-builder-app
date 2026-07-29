@@ -9,6 +9,7 @@ import {
 } from '../../services/email/providers/fake-email.provider'
 import { setEmailProviderForTests } from '../../services/email/email.service'
 import { CampaignMembershipModel } from './campaign-membership.model'
+import { createPcRecord } from '../character/character.repository'
 import {
   createCampaign,
   isCampaignMember,
@@ -17,6 +18,9 @@ import {
   updateCampaign,
 } from './campaign.service'
 import { getRulesetPatchRead } from '../vocabulary'
+import { minimalStandalonePcInput } from '../../test/fixtures/characters'
+import { setMembershipControlledPcs } from '../../test/helpers/campaign-participation'
+import { CampaignCharacterParticipationModel } from './participation/campaign-character-participation.model'
 
 useIntegrationDb()
 
@@ -241,6 +245,120 @@ describe('listCampaignsForUser', () => {
     await createCampaign({ name: 'Private', createdBy: owner.id })
 
     await expect(listCampaignsForUser(stranger.id)).resolves.toEqual([])
+  })
+
+  it('returns deduped openControlledCharacterIds intersected with open participation', async () => {
+    const owner = await makeTestUser({ email: 'open-control-owner@example.com' })
+    const player = await makeTestUser({ email: 'open-control-player@example.com' })
+    const { campaign } = await createCampaign({ name: 'Control Campaign', createdBy: owner.id })
+
+    await CampaignMembershipModel.create({
+      campaignId: campaign.id,
+      userId: player.id,
+      campaignRole: 'pc',
+      controlledCharacterIds: [],
+      invitedAt: new Date(),
+      joinedAt: new Date(),
+    })
+
+    const character = await createPcRecord(minimalStandalonePcInput, player.id)
+
+    await setMembershipControlledPcs({
+      campaignId: campaign.id,
+      userId: player.id,
+      controlledCharacterIds: [character.id, character.id],
+    })
+
+    const campaigns = await listCampaignsForUser(player.id)
+    expect(campaigns).toHaveLength(1)
+    expect(campaigns[0]?.controlledCharacterIds).toEqual([character.id])
+    expect(campaigns[0]?.openControlledCharacterIds).toEqual([character.id])
+  })
+
+  it('excludes closed participation from openControlledCharacterIds', async () => {
+    const owner = await makeTestUser({ email: 'closed-participation-owner@example.com' })
+    const player = await makeTestUser({ email: 'closed-participation-player@example.com' })
+    const { campaign } = await createCampaign({
+      name: 'Closed Participation Campaign',
+      createdBy: owner.id,
+    })
+
+    await CampaignMembershipModel.create({
+      campaignId: campaign.id,
+      userId: player.id,
+      campaignRole: 'pc',
+      controlledCharacterIds: [],
+      invitedAt: new Date(),
+      joinedAt: new Date(),
+    })
+
+    const character = await createPcRecord(minimalStandalonePcInput, player.id)
+
+    await setMembershipControlledPcs({
+      campaignId: campaign.id,
+      userId: player.id,
+      controlledCharacterIds: [character.id],
+    })
+
+    await CampaignCharacterParticipationModel.updateOne(
+      { campaignId: campaign.id, characterId: character.id },
+      { $set: { leftAt: new Date() } },
+    )
+    await CampaignMembershipModel.updateOne(
+      { campaignId: campaign.id, userId: player.id },
+      { $set: { controlledCharacterIds: [character.id] } },
+    )
+
+    const campaigns = await listCampaignsForUser(player.id)
+    expect(campaigns[0]?.controlledCharacterIds).toEqual([character.id])
+    expect(campaigns[0]?.openControlledCharacterIds).toEqual([])
+    expect(campaigns[0]?.viewerOnboardingState).toBe('invalid')
+  })
+
+  it('derives viewerOnboardingState for PC onboarding and active control', async () => {
+    const owner = await makeTestUser({ email: 'viewer-onboarding-owner@example.com' })
+    const onboardingPlayer = await makeTestUser({ email: 'viewer-onboarding-pc@example.com' })
+    const activePlayer = await makeTestUser({ email: 'viewer-active-pc@example.com' })
+
+    const { campaign: onboardingCampaign } = await createCampaign({
+      name: 'Onboarding State Campaign',
+      createdBy: owner.id,
+    })
+    const { campaign: activeCampaign } = await createCampaign({
+      name: 'Active Control Campaign',
+      createdBy: owner.id,
+    })
+
+    await CampaignMembershipModel.create({
+      campaignId: onboardingCampaign.id,
+      userId: onboardingPlayer.id,
+      campaignRole: 'pc',
+      controlledCharacterIds: [],
+      invitedAt: new Date(),
+      joinedAt: new Date(),
+    })
+
+    await CampaignMembershipModel.create({
+      campaignId: activeCampaign.id,
+      userId: activePlayer.id,
+      campaignRole: 'pc',
+      controlledCharacterIds: [],
+      invitedAt: new Date(),
+      joinedAt: new Date(),
+    })
+
+    const character = await createPcRecord(minimalStandalonePcInput, activePlayer.id)
+    await setMembershipControlledPcs({
+      campaignId: activeCampaign.id,
+      userId: activePlayer.id,
+      controlledCharacterIds: [character.id],
+    })
+
+    const onboardingCampaigns = await listCampaignsForUser(onboardingPlayer.id)
+    expect(onboardingCampaigns[0]?.viewerOnboardingState).toBe('incomplete')
+
+    const activeCampaigns = await listCampaignsForUser(activePlayer.id)
+    expect(activeCampaigns[0]?.viewerOnboardingState).toBe('complete')
   })
 })
 

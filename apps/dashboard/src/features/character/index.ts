@@ -2,6 +2,7 @@ export {
   createCharacter,
   deleteCharacter,
   getCharacter,
+  getCharacterRoutingContext,
   listCharacters,
   type CreateCharacterInput,
   type PcCharacter,
@@ -31,6 +32,10 @@ export {
   fetchCampaignBuilderCatalog,
 } from './api/campaign-content-client'
 export { characterQueryKey, useCharacter } from './hooks/use-character'
+export {
+  characterRoutingContextQueryKey,
+  useCharacterRoutingContext,
+} from './hooks/use-character-routing-context'
 export {
   useCharacterBuilderStorageKey,
   useCharacterBuilderStore,

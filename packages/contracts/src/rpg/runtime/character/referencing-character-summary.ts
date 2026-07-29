@@ -2,19 +2,17 @@ import { z } from 'zod'
 
 import { paginatedItemsSchema, type PaginatedItems } from '../../../shared/paginated-items'
 
+import { characterCardSummarySchema } from './character-card-dtos'
+
 /** Transport summary for a character sheet row. Not a UI view model. */
-export const characterSummaryDtoSchema = z.object({
-  id: z.string().min(1),
-  name: z.string().min(1),
-  summary: z.string(),
-})
+export const characterSummaryDtoSchema = characterCardSummarySchema
 
 export type CharacterSummaryDto = z.infer<typeof characterSummaryDtoSchema>
 
 /** A character that references campaign content from its saved sheet. */
 export const referencingCharacterSummarySchema = z.object({
   characterType: z.enum(['pc', 'npc']),
-  character: characterSummaryDtoSchema,
+  character: characterCardSummarySchema,
 })
 
 export type ReferencingCharacterSummary = z.infer<typeof referencingCharacterSummarySchema>

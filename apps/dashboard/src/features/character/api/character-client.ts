@@ -1,5 +1,6 @@
 import {
   getCharacterBuilderChromeMessages,
+  type CharacterRoutingContextResponse,
   type CreateCharacterInput,
   type PcCharacter,
   type PcCharacterListItem,
@@ -38,6 +39,16 @@ export async function getCharacter(characterId: string): Promise<PcCharacter> {
     GET_CHARACTER_ERROR,
   )
   return character
+}
+
+export async function getCharacterRoutingContext(
+  characterId: string,
+): Promise<CharacterRoutingContextResponse> {
+  return request<CharacterRoutingContextResponse>(
+    `/api/characters/${encodeURIComponent(characterId)}/routing-context`,
+    undefined,
+    GET_CHARACTER_ERROR,
+  )
 }
 
 export async function deleteCharacter(characterId: string): Promise<void> {

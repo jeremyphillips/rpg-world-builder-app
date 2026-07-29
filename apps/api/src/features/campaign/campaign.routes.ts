@@ -12,6 +12,7 @@ import { requireAuth } from '../../middleware/require-auth'
 import { requireCampaignRole } from '../../middleware/require-role'
 import { validate } from '../../middleware/validate'
 import * as controller from './campaign.controller'
+import * as campaignCharacterController from './campaign-character.controller'
 import * as onboardingController from './campaign-onboarding.controller'
 
 export const campaignRouter: Router = Router()
@@ -49,6 +50,18 @@ campaignRouter.get(
   requireAuth,
   requireCampaignRole(...CAMPAIGN_ROLES),
   controller.listParty,
+)
+campaignRouter.get(
+  '/:campaignId/characters',
+  requireAuth,
+  requireCampaignRole(...CAMPAIGN_ROLES),
+  campaignCharacterController.listCampaignCharacters,
+)
+campaignRouter.get(
+  '/:campaignId/characters/:characterId',
+  requireAuth,
+  requireCampaignRole(...CAMPAIGN_ROLES),
+  campaignCharacterController.getCampaignCharacter,
 )
 campaignRouter.get(
   '/:campaignId/onboarding-context',

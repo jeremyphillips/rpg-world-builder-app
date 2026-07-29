@@ -6,10 +6,9 @@ import {
   completeCampaignOnboarding,
   fetchCampaignEligibleCharacters,
 } from '../api/campaign-onboarding-client'
-import { campaignsQueryKey } from './use-campaigns'
 import { campaignMembersQueryKey } from './use-campaign-members'
 import { campaignOnboardingContextQueryKey } from './use-campaign-onboarding-context'
-import { campaignPartyQueryKey } from './use-campaign-party'
+import { invalidateCampaignCharacterControlQueries } from '../lib/invalidate-campaign-character-control-queries'
 
 export const campaignOnboardingEligibleCharactersQueryKey = (campaignId: string) =>
   ['campaigns', campaignId, 'onboarding-eligible-characters'] as const
@@ -36,8 +35,10 @@ export function useCompleteCampaignOnboarding(campaignId: string | undefined) {
           queryKey: campaignOnboardingEligibleCharactersQueryKey(campaignId),
         }),
         queryClient.invalidateQueries({ queryKey: campaignMembersQueryKey(result.campaignId) }),
-        queryClient.invalidateQueries({ queryKey: campaignPartyQueryKey(result.campaignId) }),
-        queryClient.invalidateQueries({ queryKey: campaignsQueryKey }),
+        invalidateCampaignCharacterControlQueries(queryClient, {
+          campaignId: result.campaignId,
+          characterId: result.characterId,
+        }),
       ])
     },
   })

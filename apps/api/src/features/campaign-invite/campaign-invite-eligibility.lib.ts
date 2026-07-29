@@ -1,8 +1,7 @@
-import type { Character, Species } from '@rpg/contracts'
+import type { Species } from '@rpg/contracts'
 import {
   API_CONTENT_TYPE_KEYS,
   createCampaignContentEligibilityIndex,
-  getCharacterTotalLevel,
   type ApiContentTypeKey,
   type CampaignContentEligibilityEntry,
   type CampaignContentEligibilityIndex,
@@ -139,24 +138,4 @@ export async function buildCampaignContentEligibilityMap(
 ): Promise<Map<string, CampaignContentEligibilityEntry>> {
   const index = await buildCampaignContentEligibilityIndex(campaignId)
   return new Map(index.contentById)
-}
-
-export function formatInviteCharacterSummary(
-  character: Pick<Character, 'classes' | 'species'>,
-  campaignContentById: ReadonlyMap<string, CampaignContentEligibilityEntry>,
-): string {
-  const speciesEntry = campaignContentById.get(character.species.id)
-  const speciesName = speciesEntry?.label ?? character.species.id
-
-  const classSegments = character.classes.map((entry) => {
-    const classEntry = campaignContentById.get(entry.classId)
-    const className = classEntry?.label ?? entry.classId
-    const subclassEntry = entry.subclassId ? campaignContentById.get(entry.subclassId) : undefined
-    const subclassPart = subclassEntry ? ` (${subclassEntry.label})` : ''
-    return `${className} ${entry.level}${subclassPart}`
-  })
-
-  const classPart = character.classes.length === 1 ? classSegments[0] : classSegments.join(' / ')
-
-  return `${speciesName} · Level ${getCharacterTotalLevel(character)} ${classPart ?? ''}`.trim()
 }

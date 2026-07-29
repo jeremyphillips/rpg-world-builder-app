@@ -6,30 +6,45 @@ import {
 } from '@rpg/contracts'
 
 import { CharacterModel } from '../../character/character.model'
-import { findOpenParticipation } from '../../campaign/participation/campaign-character-participation.repository'
 import { HttpError } from '../../../lib/http-error'
 import type { HomebrewDoc } from '../lib/content-write-config'
 import { HomebrewOrganizationModel } from './homebrew-organization.model'
 import { toHomebrewOrganization } from './organizations.config'
 
+export type OrganizationReferenceAuthorization =
+  | { source: 'campaign-character-access' }
+  | { source: 'content-viewer'; viewer: ContentViewer }
+
 export type ResolveOrganizationReferenceInput = {
   campaignId: string
   organizationId: string
   characterId: string
-  viewer: ContentViewer
+  authorization: OrganizationReferenceAuthorization
+}
+
+function isOrganizationReferenceAuthorized(
+  authorization: OrganizationReferenceAuthorization,
+  characterId: string,
+): boolean {
+  if (authorization.source === 'campaign-character-access') {
+    return true
+  }
+
+  return canResolveSavedContentReference(authorization.viewer, { characterId })
 }
 
 /**
  * Resolves a saved character's organization reference independently of catalog
- * discovery. Authorized viewers retain readable draft or unavailable references.
+ * discovery. Callers must establish campaign sheet access or legacy viewer
+ * authorization before invoking.
  */
 export async function resolveOrganizationReference({
   campaignId,
   organizationId,
   characterId,
-  viewer,
+  authorization,
 }: ResolveOrganizationReferenceInput): Promise<Organization | null> {
-  if (!canResolveSavedContentReference(viewer, { characterId })) {
+  if (!isOrganizationReferenceAuthorized(authorization, characterId)) {
     throw new HttpError(403, 'forbidden', 'Not authorized to view this character reference.')
   }
 
@@ -44,16 +59,13 @@ export async function resolveOrganizationReference({
 export async function resolveCharacterOrganizationReferences({
   campaignId,
   characterId,
-  viewer,
+  authorization,
 }: Omit<ResolveOrganizationReferenceInput, 'organizationId'>): Promise<
   OrganizationReferenceResolution[] | null
 > {
-  if (!canResolveSavedContentReference(viewer, { characterId })) {
+  if (!isOrganizationReferenceAuthorized(authorization, characterId)) {
     throw new HttpError(403, 'forbidden', 'Not authorized to view this character reference.')
   }
-
-  const participation = await findOpenParticipation({ campaignId, characterId })
-  if (!participation) return null
 
   const character = await CharacterModel.findById(characterId)
     .select({ connections: 1 })

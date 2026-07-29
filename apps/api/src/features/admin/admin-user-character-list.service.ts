@@ -11,10 +11,8 @@ import { loadSeedSubclasses } from '@rpg/catalog/classes'
 import { matchesAnyTextSearchQuery } from '../../lib/text-search.lib'
 
 import { enrichPcsWithOpenCampaign, listCharactersForUser } from '../character'
-import {
-  buildCampaignContentEligibilityMap,
-  formatInviteCharacterSummary,
-} from '../campaign-invite'
+import { buildCharacterCardSummaryDto } from '../character/lib/build-character-card-summary-dto.lib'
+import { buildCampaignContentEligibilityMap } from '../campaign-invite'
 import { listSystemContentForRuleset } from '../ruleset'
 import type { ContentTypeName } from '../content'
 
@@ -102,9 +100,7 @@ export async function listAdminUserCharacterCards(
     )
 
     cards.push({
-      id: character.id,
-      name: character.name,
-      summary: formatInviteCharacterSummary(character, contentMap),
+      ...buildCharacterCardSummaryDto({ character, contentIndex: contentMap }),
       ...(character.campaign ? { campaign: character.campaign } : {}),
     })
   }

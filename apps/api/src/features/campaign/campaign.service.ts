@@ -9,6 +9,7 @@ import type {
   UpdateCampaignInput,
 } from '@rpg/contracts'
 import { loadCampaignTemplates } from '@rpg/catalog/presets'
+import { resolveCampaignViewerOnboardingState } from '@rpg/contracts'
 
 import { CampaignModel, type CampaignSchemaType } from './campaign.model'
 import { CampaignMembershipModel } from './campaign-membership.model'
@@ -18,11 +19,19 @@ import {
   assertValidInitialCampaignInviteRecipients,
 } from './create-campaign-invites.lib'
 import { findCampaignById, toCampaign } from './find-campaign-by-id'
+import {
+  listOpenPcParticipationCharacterIdsForCampaign,
+  resolveOpenControlledPcCharacterIds,
+} from './participation/campaign-character-participation.repository'
 
 type CampaignRecord = CampaignSchemaType & {
   _id: unknown
   createdAt: Date
   updatedAt: Date
+}
+
+function dedupeCharacterIds(ids: readonly string[]): string[] {
+  return [...new Set(ids)]
 }
 
 export async function createCampaign(
@@ -67,17 +76,32 @@ export async function listCampaignsForUser(userId: string): Promise<CampaignList
   if (campaignIds.length === 0) return []
 
   const docs = await CampaignModel.find({ _id: { $in: campaignIds } }).lean<CampaignRecord[]>()
-  return docs
-    .map((doc) => {
+  const campaigns = await Promise.all(
+    docs.map(async (doc) => {
       const campaign = toCampaign(doc)
       const membership = membershipByCampaignId.get(campaign.id)
+      const controlledCharacterIds = membership?.controlledCharacterIds ?? []
+      const openParticipatingCharacterIds = await listOpenPcParticipationCharacterIdsForCampaign(
+        campaign.id,
+      )
+      const openControlledCharacterIds = dedupeCharacterIds(
+        await resolveOpenControlledPcCharacterIds(campaign.id, controlledCharacterIds),
+      )
+      const campaignRole = membership?.campaignRole as CampaignRole
       return {
         ...campaign,
-        campaignRole: membership?.campaignRole as CampaignRole,
-        controlledCharacterIds: membership?.controlledCharacterIds ?? [],
+        campaignRole,
+        controlledCharacterIds,
+        openControlledCharacterIds,
+        viewerOnboardingState: resolveCampaignViewerOnboardingState({
+          role: campaignRole,
+          controlledCharacterIds,
+          openParticipatingCharacterIds,
+        }),
       }
-    })
-    .sort((a, b) => a.identity.name.localeCompare(b.identity.name))
+    }),
+  )
+  return campaigns.sort((a, b) => a.identity.name.localeCompare(b.identity.name))
 }
 
 function buildIdentityUpdateSet(input: UpdateCampaignInput): Record<string, unknown> {

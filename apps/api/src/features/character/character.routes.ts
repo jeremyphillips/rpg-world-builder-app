@@ -17,5 +17,6 @@ characterRouter.post(
   validate(createCharacterInputSchema),
   controller.create,
 )
+characterRouter.get('/:characterId/routing-context', requireAuth, controller.getRoutingContext)
 characterRouter.get('/:characterId', requireAuth, controller.getById)
 characterRouter.delete('/:characterId', requireAuth, controller.remove)

@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import { Link } from 'react-router-dom'
 
 import { Spinner, Text } from '@rpg/ui'
 
@@ -8,6 +9,10 @@ export interface PageLoadStateProps {
   /** Shown when `isError` is true. Falls back to `defaultErrorLabel`. */
   errorLabel?: string
   defaultErrorLabel?: string
+  errorBackLink?: {
+    href: string
+    label: string
+  }
   children: ReactNode
 }
 
@@ -17,6 +22,7 @@ export function PageLoadState({
   isError,
   errorLabel,
   defaultErrorLabel = 'Could not load page data.',
+  errorBackLink,
   children,
 }: PageLoadStateProps) {
   if (isPending) {
@@ -29,9 +35,19 @@ export function PageLoadState({
 
   if (isError) {
     return (
-      <Text variant="destructive" role="alert">
-        {errorLabel ?? defaultErrorLabel}
-      </Text>
+      <div className="flex flex-col gap-3">
+        <Text variant="destructive" role="alert">
+          {errorLabel ?? defaultErrorLabel}
+        </Text>
+        {errorBackLink ? (
+          <Link
+            to={errorBackLink.href}
+            className="text-sm text-muted-foreground underline-offset-4 hover:underline"
+          >
+            Back to {errorBackLink.label}
+          </Link>
+        ) : null}
+      </div>
     )
   }
 

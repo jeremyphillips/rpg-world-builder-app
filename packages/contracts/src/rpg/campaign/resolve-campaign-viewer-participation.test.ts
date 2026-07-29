@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import {
   resolveCampaignOverviewMemberOnboardingState,
+  resolveCampaignViewerOnboardingState,
   resolveCampaignViewerParticipation,
 } from './resolve-campaign-viewer-participation'
 
@@ -106,5 +107,41 @@ describe('resolveCampaignOverviewMemberOnboardingState', () => {
   it('returns undefined for non-overview states', () => {
     expect(resolveCampaignOverviewMemberOnboardingState('staff')).toBeUndefined()
     expect(resolveCampaignOverviewMemberOnboardingState('invalid')).toBeUndefined()
+  })
+})
+
+describe('resolveCampaignViewerOnboardingState', () => {
+  it('maps participation states to list-row onboarding values', () => {
+    expect(
+      resolveCampaignViewerOnboardingState({
+        role: 'pc',
+        controlledCharacterIds: [],
+        openParticipatingCharacterIds: [],
+      }),
+    ).toBe('incomplete')
+
+    expect(
+      resolveCampaignViewerOnboardingState({
+        role: 'pc',
+        controlledCharacterIds: ['char_1'],
+        openParticipatingCharacterIds: ['char_1'],
+      }),
+    ).toBe('complete')
+
+    expect(
+      resolveCampaignViewerOnboardingState({
+        role: 'pc',
+        controlledCharacterIds: ['char_1'],
+        openParticipatingCharacterIds: [],
+      }),
+    ).toBe('invalid')
+
+    expect(
+      resolveCampaignViewerOnboardingState({
+        role: 'owner',
+        controlledCharacterIds: [],
+        openParticipatingCharacterIds: [],
+      }),
+    ).toBe('complete')
   })
 })

@@ -1,7 +1,7 @@
 import type { Request, Response } from 'express'
-import { buildContentViewerFromCampaignContext } from '@rpg/contracts'
 
 import { HttpError } from '../../../lib/http-error'
+import { authorizeCampaignCharacterAccess } from '../../campaign/campaign-character-access.service'
 import { resolveCharacterOrganizationReferences } from './resolve-organization-reference'
 
 export async function listCharacterOrganizationReferences(
@@ -13,18 +13,26 @@ export async function listCharacterOrganizationReferences(
     characterId: string
   }
   const membership = req.campaignMembership
-  const viewer = buildContentViewerFromCampaignContext(
-    membership
-      ? {
-          campaignRole: membership.campaignRole,
-          pcCharacterIds: membership.pcCharacterIds,
-        }
-      : undefined,
-  )
+  if (!membership) {
+    throw HttpError.forbidden('Not a member of this campaign')
+  }
+
+  const access = await authorizeCampaignCharacterAccess({
+    campaignId,
+    characterId,
+    viewerUserId: req.user!.id,
+    viewerRole: membership.campaignRole,
+    viewerControlledCharacterIds: membership.pcCharacterIds,
+  })
+
+  if (!access.ok) {
+    throw access.error
+  }
+
   const references = await resolveCharacterOrganizationReferences({
     campaignId,
     characterId,
-    viewer,
+    authorization: { source: 'campaign-character-access' },
   })
 
   if (!references) {

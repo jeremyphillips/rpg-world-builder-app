@@ -44,7 +44,18 @@ function createSuppressiblePersistStorage(): PersistStorage<PersistedCharacterBu
   suppressNextWrite: () => void
 } {
   let suppressWrite = false
-  const base = createJSONStorage<PersistedCharacterBuilderState>(() => sessionStorage)!
+  const storage =
+    typeof sessionStorage !== 'undefined'
+      ? sessionStorage
+      : ({
+          getItem: () => null,
+          setItem: () => {},
+          removeItem: () => {},
+          clear: () => {},
+          key: () => null,
+          length: 0,
+        } as Storage)
+  const base = createJSONStorage<PersistedCharacterBuilderState>(() => storage)!
 
   return {
     getItem: (name) => base.getItem(name),
@@ -95,7 +106,8 @@ function finishCharacterBuilderHydration(
   if (hasCompletedInitialHydration.completed) return
   hasCompletedInitialHydration.completed = true
 
-  const rawStorage = sessionStorage.getItem(storageKey)
+  const rawStorage =
+    typeof sessionStorage !== 'undefined' ? sessionStorage.getItem(storageKey) : null
 
   if (rawStorage) {
     let persistedPayload: unknown

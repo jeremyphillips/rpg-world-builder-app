@@ -7,16 +7,25 @@ import { ROUTES } from '@/app/routes'
 
 import { CampaignNavSection } from './campaign-nav-section'
 
-vi.mock('@/features/campaign/store/campaign-store', () => ({
-  useCampaignStore: (selector: (state: { activeCampaignId: string }) => unknown) =>
-    selector({ activeCampaignId: 'camp_1' }),
-}))
-
 vi.mock('@/features/campaign', async (importOriginal) => {
   const actual = (await importOriginal()) as Record<string, unknown>
   return {
     ...actual,
     CampaignSwitcher: () => <div data-testid="campaign-switcher" />,
+    useActiveCampaignId: () => 'camp_1',
+    useCampaignCharacterNavigationContext: () => ({
+      nav: {
+        showCharactersNav: true,
+        label: 'Characters',
+        href: ROUTES.campaign.characters.list('camp_1'),
+        mode: 'list',
+        activeSection: 'characters',
+      },
+      list: {
+        pageTitle: 'Characters',
+        emptyState: 'no_participating_characters',
+      },
+    }),
   }
 })
 
@@ -39,13 +48,18 @@ describe('CampaignNavSection', () => {
     const npcsLink = screen.getByRole('link', { name: 'NPCs' })
     expect(npcsLink).toHaveAttribute('href', ROUTES.campaign.npcs.list('camp_1'))
 
+    const charactersLink = screen.getByRole('link', { name: 'Characters' })
+    expect(charactersLink).toHaveAttribute('href', ROUTES.campaign.characters.list('camp_1'))
+
     const navLinks = screen.getAllByRole('link').map((link) => link.textContent)
     const sessionsIndex = navLinks.indexOf('Sessions')
+    const charactersIndex = navLinks.indexOf('Characters')
     const npcsIndex = navLinks.indexOf('NPCs')
     const finalContentIndex = navLinks.indexOf(VISIBLE_SIDEBAR_CONTENT.at(-1)!.label)
     const homebrewIndex = navLinks.indexOf('Homebrew')
     expect(sessionsIndex).toBeGreaterThan(-1)
-    expect(npcsIndex).toBe(sessionsIndex + 1)
+    expect(charactersIndex).toBe(sessionsIndex + 1)
+    expect(npcsIndex).toBe(charactersIndex + 1)
     expect(finalContentIndex).toBeGreaterThan(-1)
     expect(homebrewIndex).toBe(finalContentIndex + 1)
   })

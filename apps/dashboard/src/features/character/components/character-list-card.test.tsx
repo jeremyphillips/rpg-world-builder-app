@@ -4,6 +4,7 @@ import { describe, expect, it } from 'vitest'
 import { expectNoAxeViolations } from '@rpg/ui/test-utils'
 
 import { CHARACTER_CARD_CAMPAIGN_LABEL } from '../lib/display/character-display'
+import { CHARACTER_CONTROLLER_DISPLAY } from '../lib/display/character-display-labels'
 import { CharacterListCard } from './character-list-card.client'
 import { CharacterListCardPreview } from './character-list-card-preview.client'
 
@@ -44,10 +45,62 @@ describe('CharacterListCard', () => {
     ).toBeInTheDocument()
   })
 
+  it('renders optional roster status badge', () => {
+    render(
+      <MemoryRouter>
+        <CharacterListCard
+          card={sampleCard}
+          detailHref="/characters/char-1"
+          rosterStatus="inactive"
+        />
+      </MemoryRouter>,
+    )
+
+    expect(screen.getByText('Inactive')).toBeInTheDocument()
+  })
+
+  it('hides campaign metadata when showCampaign is false', () => {
+    render(
+      <MemoryRouter>
+        <CharacterListCard
+          card={{
+            ...sampleCard,
+            campaign: { id: 'camp-1', name: 'The Argent Road' },
+          }}
+          detailHref="/campaigns/camp-1/characters/char-1"
+          showCampaign={false}
+        />
+      </MemoryRouter>,
+    )
+
+    expect(
+      screen.queryByText(`${CHARACTER_CARD_CAMPAIGN_LABEL}: The Argent Road`),
+    ).not.toBeInTheDocument()
+  })
+
+  it('renders controller line inside the card header', () => {
+    render(
+      <MemoryRouter>
+        <CharacterListCard
+          card={sampleCard}
+          detailHref="/characters/char-1"
+          controllerLine={CHARACTER_CONTROLLER_DISPLAY.playedByYou}
+        />
+      </MemoryRouter>,
+    )
+
+    expect(screen.getByText(CHARACTER_CONTROLLER_DISPLAY.playedByYou)).toBeInTheDocument()
+  })
+
   it('has no axe accessibility violations', async () => {
     const { container } = render(
       <MemoryRouter>
-        <CharacterListCard card={sampleCard} detailHref="/characters/char-1" />
+        <CharacterListCard
+          card={sampleCard}
+          detailHref="/characters/char-1"
+          controllerLine={CHARACTER_CONTROLLER_DISPLAY.noPlayerAssigned}
+          showCampaign={false}
+        />
       </MemoryRouter>,
     )
 

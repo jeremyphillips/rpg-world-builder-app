@@ -126,15 +126,24 @@ export async function listOpenPcParticipationCharacterIdsForCampaign(
   return participations.map((participation) => participation.characterId)
 }
 
-export async function intersectControlledWithOpenParticipations(
+/**
+ * Returns controlled PC ids that still have open participation in the campaign.
+ * Dedupes input. Do not use raw `controlledCharacterIds` for authorization.
+ */
+export async function resolveOpenControlledPcCharacterIds(
   campaignId: string,
   controlledCharacterIds: readonly string[],
 ): Promise<string[]> {
   if (controlledCharacterIds.length === 0) return []
 
   const openCharacterIds = new Set(await listOpenPcParticipationCharacterIdsForCampaign(campaignId))
+  const seen = new Set<string>()
 
-  return controlledCharacterIds.filter((characterId) => openCharacterIds.has(characterId))
+  return controlledCharacterIds.filter((characterId) => {
+    if (!openCharacterIds.has(characterId) || seen.has(characterId)) return false
+    seen.add(characterId)
+    return true
+  })
 }
 
 export async function updateParticipationRoster({

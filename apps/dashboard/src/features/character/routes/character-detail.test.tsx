@@ -14,6 +14,9 @@ import { CharacterDetail } from './character-detail'
 
 vi.mock('../hooks/use-character')
 vi.mock('../hooks/use-build-context')
+vi.mock('../components/standalone-character-redirect-guard.client', () => ({
+  StandaloneCharacterRedirectGuard: ({ children }: { children: React.ReactNode }) => children,
+}))
 vi.mock('@rpg/catalog/xp-progressions', () => ({
   getStandardXpProgression: () => ({ entries: [{ level: 1, xpRequired: 0 }] }),
 }))
@@ -43,6 +46,7 @@ function mockCharacterQuery(
     error: null,
     isLoading: false,
     isFetching: false,
+    isSuccess: Boolean(overrides.data),
     ...overrides,
   } as ReturnType<typeof useCharacterFn>)
 }
@@ -84,7 +88,7 @@ describe('CharacterDetail', () => {
   })
 
   it('shows a loading state while pending', () => {
-    mockCharacterQuery({ isPending: true, data: undefined })
+    mockCharacterQuery({ isPending: true, data: undefined, isSuccess: false })
 
     renderWithProviders(
       <Routes>
@@ -99,6 +103,7 @@ describe('CharacterDetail', () => {
   it('shows an error alert when the query fails', () => {
     mockCharacterQuery({
       isError: true,
+      isSuccess: false,
       error: new Error('Character not found.'),
       data: undefined,
     })

@@ -19,6 +19,7 @@ import {
   AdminUsersRoute,
   CampaignCreateRoute,
   CampaignCharacterDetailRoute,
+  CampaignCharactersOverviewRoute,
   CampaignDetailRoute,
   CampaignLayoutRoute,
   CampaignOnboardingRoute,
@@ -186,13 +187,26 @@ const router = createBrowserRouter(
                   handle: { crumb: () => ({ label: 'Onboarding' }) } satisfies CrumbHandle,
                 },
                 {
-                  path: 'characters/:characterId',
-                  element: <CampaignCharacterDetailRoute />,
+                  path: 'characters',
+                  element: <Outlet />,
                   handle: {
-                    crumb: (_params, { entityLabel }) => ({
-                      label: entityLabel ?? 'Character',
+                    crumb: (params) => ({
+                      label: 'Characters',
+                      href: ROUTES.campaign.characters.list(params.campaignId!),
                     }),
                   } satisfies CrumbHandle,
+                  children: [
+                    { index: true, element: <CampaignCharactersOverviewRoute /> },
+                    {
+                      path: ':characterId',
+                      element: <CampaignCharacterDetailRoute />,
+                      handle: {
+                        crumb: (_params, { entityLabel }) => ({
+                          label: entityLabel ?? 'Character',
+                        }),
+                      } satisfies CrumbHandle,
+                    },
+                  ],
                 },
                 {
                   path: 'sessions',
