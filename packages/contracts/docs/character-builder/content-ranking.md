@@ -102,8 +102,9 @@ pools, starting-equipment pools, fulfillment-aware gold elevation).
 
 **Empty-query best match (purchase):** recommendation comparator only — no search-score step.
 
-**Search inclusion:** when the query is non-empty, rows with `scoreItem` ≤ 0 on
-`searchText` (`role: 'label'`, `weight: 1`) are excluded before sort.
+**Search inclusion:** when the query is non-empty, rows with `@rpg/search`
+match score ≤ 0 on the assembled equipment picker `SearchDocument` (primary
+combined field during the equipment pilot) are excluded before sort.
 
 **Unknown cost:** rows without a known `equipment.cost` are not treated as zero
 or expensive. In price sorts, priced rows come first in both directions;

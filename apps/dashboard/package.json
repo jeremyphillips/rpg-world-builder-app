@@ -31,6 +31,7 @@
     "@rpg/name-generator-core": "workspace:*",
     "@rpg/name-generator-data": "workspace:*",
     "@rpg/name-generator-integrations": "workspace:*",
+    "@rpg/search": "workspace:*",
     "@rpg/ui": "workspace:*",
     "@tanstack/react-query": "^5.101.0",
     "class-variance-authority": "^0.7.1",

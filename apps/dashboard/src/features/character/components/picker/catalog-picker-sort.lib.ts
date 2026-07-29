@@ -1,4 +1,4 @@
-import { normalizeSearchQuery } from '@rpg/ui'
+import { isEmptySearchQuery, normalizeSearchQuery } from '@rpg/search'
 
 export function chainComparators<T>(
   ...fns: Array<(left: T, right: T) => number>
@@ -36,5 +36,5 @@ export function scoreAndFilterPickerItems<T>(
     searchScore: options.scoreItem(item, options.searchQuery),
   }))
 
-  return normalizedQuery ? scored.filter((row) => row.searchScore > 0) : scored
+  return isEmptySearchQuery(normalizedQuery) ? scored : scored.filter((row) => row.searchScore > 0)
 }

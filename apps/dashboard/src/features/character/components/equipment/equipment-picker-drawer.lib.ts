@@ -14,9 +14,12 @@ import {
   type Money,
 } from '@rpg/contracts'
 
-import { normalizeSearchQuery, scoreItem } from '@rpg/ui'
+import { matchSearchDocumentQuery, normalizeSearchQuery } from '@rpg/search'
+import { chainComparators, compareNumberDescending } from '@rpg/search/ranking'
 
 import { buildEquipmentPickerRowViewModel } from '@/features/content'
+
+import { assembleEquipmentPickerSearchDocument } from '../../lib/equipment/equipment-picker-search.lib'
 
 import {
   resolveEquipmentOwnedQuantity,
@@ -155,7 +158,8 @@ function isEquipmentPickerItemPriced(item: EquipmentPickerItem): boolean {
 }
 
 function scoreEquipmentPickerItem(item: EquipmentPickerItem, searchQuery: string): number {
-  return scoreItem({ fields: [{ text: item.searchText, weight: 1, role: 'label' }] }, searchQuery)
+  const document = item.searchDocument ?? assembleEquipmentPickerSearchDocument(item.equipment)
+  return matchSearchDocumentQuery(document, searchQuery).score ?? 0
 }
 
 function filterEquipmentPickerItemsBySearch(
@@ -163,7 +167,7 @@ function filterEquipmentPickerItemsBySearch(
   searchQuery: string,
 ): EquipmentPickerItem[] {
   const normalizedQuery = normalizeSearchQuery(searchQuery)
-  if (!normalizedQuery) return [...items]
+  if (normalizedQuery.text.length === 0) return [...items]
 
   return items.filter((item) => scoreEquipmentPickerItem(item, searchQuery) > 0)
 }
@@ -262,22 +266,24 @@ export function compareEquipmentBestMatch(
     workflowMode?: EquipmentPickerWorkflowMode
   },
 ): number {
-  const hasQuery = normalizeSearchQuery(options.searchQuery).length > 0
-  if (hasQuery) {
-    const scoreDiff = right.searchScore - left.searchScore
-    if (scoreDiff !== 0) return scoreDiff
-  }
+  const hasQuery = normalizeSearchQuery(options.searchQuery).text.length > 0
 
-  if (options.workflowMode === 'magic_items') {
-    const actionDiff = compareMagicItemBestMatch(left.item, right.item)
-    if (actionDiff !== 0) return actionDiff
-  }
-
-  return compareEquipmentPickerItemsByRecommendation(
-    left.item,
-    right.item,
-    options.browseSortContext,
-  )
+  return chainComparators<EquipmentPickerScoredItem>(
+    (leftRow, rightRow) => {
+      if (!hasQuery) return 0
+      return compareNumberDescending(leftRow.searchScore, rightRow.searchScore)
+    },
+    (leftRow, rightRow) => {
+      if (options.workflowMode !== 'magic_items') return 0
+      return compareMagicItemBestMatch(leftRow.item, rightRow.item)
+    },
+    (leftRow, rightRow) =>
+      compareEquipmentPickerItemsByRecommendation(
+        leftRow.item,
+        rightRow.item,
+        options.browseSortContext,
+      ),
+  )(left, right)
 }
 
 function compareEquipmentPickerItemsByBestMatch(
@@ -303,7 +309,7 @@ function compareEquipmentPickerScoredItems(
   },
 ): number {
   const { searchQuery, sortMode, browseSortContext, workflowMode } = options
-  const hasQuery = normalizeSearchQuery(searchQuery).length > 0
+  const hasQuery = normalizeSearchQuery(searchQuery).text.length > 0
 
   switch (sortMode) {
     case EQUIPMENT_PICKER_SORT_BEST_MATCH:
@@ -342,6 +348,8 @@ export function filterAndSortEquipmentPickerItems(
     .sort((left, right) => compareEquipmentPickerScoredItems(left, right, options))
     .map((row) => row.item)
 }
+
+export { getEquipmentPickerSearchText } from '../../lib/equipment/equipment-picker-search.lib'
 
 export function resolveEquipmentPickerAllowedKinds(
   allowedKinds?: readonly EquipmentPickerSupportedKind[],

@@ -52,6 +52,8 @@ import {
   type StartingEquipmentOptionSummary,
 } from '@rpg/contracts'
 
+import { enrichEquipmentPickerItemsWithSearchDocument } from './equipment-picker-search.lib'
+
 export const EQUIPMENT_STEP_NO_VALID_OPTIONS_MESSAGE =
   'No valid starting equipment options are currently available — this may be caused by missing catalog data.'
 
@@ -580,12 +582,14 @@ export function resolveEquipmentStepPickerItems(args: {
   })
 
   return {
-    items: resolveEquipmentPickerItems({
-      equipment: [...catalogIndex.equipment.values()],
-      proficiencies,
-      recommendations,
-      budget,
-    }),
+    items: enrichEquipmentPickerItemsWithSearchDocument(
+      resolveEquipmentPickerItems({
+        equipment: [...catalogIndex.equipment.values()],
+        proficiencies,
+        recommendations,
+        budget,
+      }),
+    ),
     browseSortContext: {
       preferMartialWeaponBrowseOrder: characterPrefersMartialWeaponBrowseOrder(proficiencies),
     },

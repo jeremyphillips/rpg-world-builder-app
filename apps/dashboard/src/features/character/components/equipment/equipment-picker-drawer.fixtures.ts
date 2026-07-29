@@ -1,5 +1,7 @@
 import { DEFAULT_SYSTEM_RULESET_ID, type Equipment } from '@rpg/contracts'
 
+import { assembleEquipmentPickerSearchDocument } from '../../lib/equipment/equipment-picker-search.lib'
+
 import type { EquipmentBudgetSummary, EquipmentPickerItem } from './equipment-picker-drawer.types'
 
 export const equipmentPickerLongswordFixture = {
@@ -210,11 +212,28 @@ export function pickerState(
   }
 }
 
+export function equipmentPickerItemFixture(args: {
+  equipment: Equipment
+  state: Parameters<typeof pickerState>[0]
+  searchText?: string
+}): EquipmentPickerItem {
+  return {
+    equipment: args.equipment,
+    searchDocument: args.searchText
+      ? {
+          id: args.equipment.id,
+          fields: [{ key: 'combined', text: args.searchText, role: 'primary' }],
+        }
+      : assembleEquipmentPickerSearchDocument(args.equipment),
+    state: pickerState(args.state),
+  }
+}
+
 export const equipmentPickerDefaultPathItemsFixture: EquipmentPickerItem[] = [
-  {
+  equipmentPickerItemFixture({
     equipment: equipmentPickerCheapGearFixture,
     searchText: 'cheap gear adventuring gear',
-    state: pickerState({
+    state: {
       isAvailable: true,
       isRecommended: false,
       isProficient: true,
@@ -222,12 +241,12 @@ export const equipmentPickerDefaultPathItemsFixture: EquipmentPickerItem[] = [
       isWithinRemainingBudget: true,
       recommendation: { tier: 'neutral', reasons: [], specificity: 'broad_pool' },
       disabledReasons: [],
-    }),
-  },
-  {
+    },
+  }),
+  equipmentPickerItemFixture({
     equipment: equipmentPickerMidGearFixture,
     searchText: 'mid gear adventuring gear',
-    state: pickerState({
+    state: {
       isAvailable: true,
       isRecommended: false,
       isProficient: true,
@@ -236,12 +255,12 @@ export const equipmentPickerDefaultPathItemsFixture: EquipmentPickerItem[] = [
       purchaseAvailability: purchaseAvailabilityUnaffordable,
       recommendation: { tier: 'neutral', reasons: [], specificity: 'broad_pool' },
       disabledReasons: [],
-    }),
-  },
-  {
+    },
+  }),
+  equipmentPickerItemFixture({
     equipment: equipmentPickerExpensiveGearFixture,
     searchText: 'expensive gear adventuring gear',
-    state: pickerState({
+    state: {
       isAvailable: true,
       isRecommended: false,
       isProficient: true,
@@ -250,15 +269,15 @@ export const equipmentPickerDefaultPathItemsFixture: EquipmentPickerItem[] = [
       purchaseAvailability: purchaseAvailabilityUnaffordable,
       recommendation: { tier: 'neutral', reasons: [], specificity: 'broad_pool' },
       disabledReasons: [],
-    }),
-  },
+    },
+  }),
 ]
 
 export const equipmentPickerItemsFixture: EquipmentPickerItem[] = [
-  {
+  equipmentPickerItemFixture({
     equipment: equipmentPickerLongswordFixture,
     searchText: 'longsword martial melee',
-    state: pickerState({
+    state: {
       isAvailable: true,
       isRecommended: true,
       isProficient: true,
@@ -270,12 +289,12 @@ export const equipmentPickerItemsFixture: EquipmentPickerItem[] = [
         specificity: 'exact',
       },
       disabledReasons: [],
-    }),
-  },
-  {
+    },
+  }),
+  equipmentPickerItemFixture({
     equipment: equipmentPickerChainMailFixture,
     searchText: 'chain mail heavy armor',
-    state: pickerState({
+    state: {
       isAvailable: true,
       isRecommended: false,
       isProficient: false,
@@ -284,12 +303,12 @@ export const equipmentPickerItemsFixture: EquipmentPickerItem[] = [
       purchaseAvailability: purchaseAvailabilityUnaffordable,
       recommendation: { tier: 'notRecommended', reasons: ['notProficient'], specificity: 'exact' },
       disabledReasons: [],
-    }),
-  },
-  {
+    },
+  }),
+  equipmentPickerItemFixture({
     equipment: equipmentPickerRopeFixture,
     searchText: 'rope adventuring gear',
-    state: pickerState({
+    state: {
       isAvailable: true,
       isRecommended: false,
       isProficient: true,
@@ -297,15 +316,15 @@ export const equipmentPickerItemsFixture: EquipmentPickerItem[] = [
       isWithinRemainingBudget: true,
       recommendation: { tier: 'neutral', reasons: [], specificity: 'broad_pool' },
       disabledReasons: [],
-    }),
-  },
+    },
+  }),
 ]
 
 export const equipmentPickerMagicItemsFixture: EquipmentPickerItem[] = [
-  {
+  equipmentPickerItemFixture({
     equipment: equipmentPickerPotionFixture,
     searchText: 'potion of healing magic item',
-    state: pickerState({
+    state: {
       isAvailable: true,
       isRecommended: false,
       isProficient: true,
@@ -313,8 +332,8 @@ export const equipmentPickerMagicItemsFixture: EquipmentPickerItem[] = [
       isWithinRemainingBudget: true,
       recommendation: { tier: 'neutral', reasons: [], specificity: 'broad_pool' },
       disabledReasons: [],
-    }),
-  },
+    },
+  }),
 ]
 
 export const equipmentPickerMagicItemProgressFixture = [

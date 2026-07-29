@@ -1,3 +1,5 @@
+import type { SearchDocument } from '@rpg/search'
+
 import type { Equipment } from '../../../../content/equipment'
 import {
   compareEquipmentRecommendationSpecificity,
@@ -41,7 +43,8 @@ export type EquipmentPickerItemState = PickerItemStateBase & {
 export type EquipmentPickerItem = {
   equipment: Equipment
   state: EquipmentPickerItemState
-  searchText: string
+  /** Populated by dashboard assembly before picker surfaces consume the row. */
+  searchDocument?: SearchDocument
 }
 
 /**

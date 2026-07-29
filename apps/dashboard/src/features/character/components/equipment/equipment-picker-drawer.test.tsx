@@ -591,7 +591,10 @@ describe('EquipmentPickerDrawer', () => {
     const unsupportedItems = [
       {
         equipment: equipmentPickerRowboatFixture,
-        searchText: 'rowboat water vehicle',
+        searchDocument: {
+          id: equipmentPickerRowboatFixture.id,
+          fields: [{ key: 'combined', text: 'rowboat water vehicle', role: 'primary' as const }],
+        },
         state: pickerState({
           isAvailable: true,
           isRecommended: false,
@@ -608,7 +611,10 @@ describe('EquipmentPickerDrawer', () => {
       },
       {
         equipment: equipmentPickerSkilledHirelingFixture,
-        searchText: 'skilled hireling service',
+        searchDocument: {
+          id: equipmentPickerSkilledHirelingFixture.id,
+          fields: [{ key: 'combined', text: 'skilled hireling service', role: 'primary' as const }],
+        },
         state: pickerState({
           isAvailable: true,
           isRecommended: false,
