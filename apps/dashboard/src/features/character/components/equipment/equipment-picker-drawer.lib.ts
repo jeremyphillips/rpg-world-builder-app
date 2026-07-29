@@ -15,6 +15,7 @@ import {
 } from '@rpg/contracts'
 
 import { matchSearchDocumentQuery, normalizeSearchQuery } from '@rpg/search'
+import { chainComparators, compareNumberDescending, type Comparator } from '@rpg/search/ranking'
 
 import { buildEquipmentPickerRowViewModel } from '@/features/content'
 
@@ -197,7 +198,7 @@ function compareScoredItemsBySearchScore(
   hasQuery: boolean,
 ): number {
   if (!hasQuery) return 0
-  return right.searchScore - left.searchScore
+  return compareNumberDescending(left.searchScore, right.searchScore)
 }
 
 function compareScoredItemsByRecommendationTiebreaker(
@@ -217,10 +218,10 @@ function compareScoredItemsAfterPrimary(
 ): number {
   if (primaryCmp !== 0) return primaryCmp
 
-  const scoreCmp = compareScoredItemsBySearchScore(left, right, hasQuery)
-  if (scoreCmp !== 0) return scoreCmp
-
-  return compareScoredItemsByRecommendationTiebreaker(left, right, browseSortContext)
+  return chainComparators<EquipmentPickerScoredItem>(
+    (l, r) => compareScoredItemsBySearchScore(l, r, hasQuery),
+    (l, r) => compareScoredItemsByRecommendationTiebreaker(l, r, browseSortContext),
+  )(left, right)
 }
 
 function compareScoredItemsByPriceMode(
@@ -266,21 +267,21 @@ export function compareEquipmentBestMatch(
   },
 ): number {
   const hasQuery = normalizeSearchQuery(options.searchQuery).text.length > 0
+  const comparators: Comparator<EquipmentPickerScoredItem>[] = []
+
   if (hasQuery) {
-    const scoreDiff = right.searchScore - left.searchScore
-    if (scoreDiff !== 0) return scoreDiff
+    comparators.push((l, r) => compareNumberDescending(l.searchScore, r.searchScore))
   }
 
   if (options.workflowMode === 'magic_items') {
-    const actionDiff = compareMagicItemBestMatch(left.item, right.item)
-    if (actionDiff !== 0) return actionDiff
+    comparators.push((l, r) => compareMagicItemBestMatch(l.item, r.item))
   }
 
-  return compareEquipmentPickerItemsByRecommendation(
-    left.item,
-    right.item,
-    options.browseSortContext,
+  comparators.push((l, r) =>
+    compareEquipmentPickerItemsByRecommendation(l.item, r.item, options.browseSortContext),
   )
+
+  return chainComparators(...comparators)(left, right)
 }
 
 function compareEquipmentPickerItemsByBestMatch(

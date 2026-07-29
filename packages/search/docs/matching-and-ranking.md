@@ -103,6 +103,23 @@ if (hasQuery) searchScore desc
 → compareEquipmentPickerItemsByRecommendation
 ```
 
+## Example surface pipeline (ComboboxField)
+
+ComboboxField is **filter-only** — it preserves option list order and never
+score-sorts. Selection pinning stays in `filterOptions` (`combobox-field.lib.ts`).
+
+```text
+options[]
+  → assembleComboboxOptionSearchDocument per option (@rpg/ui)
+  → matchSearchDocumentQuery for inclusion
+  → pin selected values (even when non-matching or stale)
+  → render filtered list in input order
+```
+
+Field mapping mirrors legacy `@rpg/ui` roles: `label` → `primary`, `value` →
+`keyword`, `description` → `secondary`. Gate parity:
+`packages/ui/src/components/ui/option-query.lib.test.ts`.
+
 ## Global search (principles only)
 
 Future global search should reuse `@rpg/search` matching language and
@@ -121,3 +138,6 @@ When migrating a surface, verify for representative queries:
 
 See `apps/dashboard/src/features/character/lib/equipment/equipment-picker-search.lib.test.ts`
 for equipment picker gate parity against legacy `@rpg/ui` label scoring.
+
+See `packages/ui/src/components/ui/option-query.lib.test.ts` for ComboboxField
+inclusion parity against legacy `scoreItem`.

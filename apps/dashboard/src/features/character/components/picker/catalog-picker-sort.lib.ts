@@ -1,16 +1,7 @@
 import { isEmptySearchQuery, normalizeSearchQuery } from '@rpg/search'
+import { chainComparators } from '@rpg/search/ranking'
 
-export function chainComparators<T>(
-  ...fns: Array<(left: T, right: T) => number>
-): (left: T, right: T) => number {
-  return (left, right) => {
-    for (const compare of fns) {
-      const diff = compare(left, right)
-      if (diff !== 0) return diff
-    }
-    return 0
-  }
-}
+export { chainComparators }
 
 export function compareName(
   collator: Intl.Collator,

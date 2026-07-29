@@ -511,6 +511,30 @@ describe('equipment-picker-drawer.lib', () => {
     ).toEqual(sortEquipmentPickerItems(shuffled).map((item) => item.equipment.name))
   })
 
+  it('ranks stronger search matches above higher recommendation tiers', () => {
+    const essentialLongsword: EquipmentPickerItem = {
+      ...equipmentPickerItemsFixture[0]!,
+      searchDocument: pickerSearchDocument(
+        equipmentPickerItemsFixture[0]!.equipment.id,
+        'auxiliary rope cord martial melee weapon',
+      ),
+    }
+    const neutralRope = {
+      ...equipmentPickerItemsFixture[2]!,
+      searchDocument: pickerSearchDocument(
+        equipmentPickerItemsFixture[2]!.equipment.id,
+        'rope adventuring gear',
+      ),
+    }
+
+    expect(
+      filterAndSortEquipmentPickerItems([essentialLongsword, neutralRope], {
+        searchQuery: 'rope',
+        sortMode: EQUIPMENT_PICKER_SORT_BEST_MATCH,
+      }).map((item) => item.equipment.name),
+    ).toEqual(['Rope', 'Longsword'])
+  })
+
   it('sorts by price ascending with best-match tiebreaker for equal prices', () => {
     const cheapRope: EquipmentPickerItem = {
       ...equipmentPickerItemsFixture[2]!,

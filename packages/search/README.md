@@ -35,4 +35,7 @@ Detail: [docs/matching-and-ranking.md](./docs/matching-and-ranking.md).
 ## Boundaries
 
 `@rpg/search` does not depend on React, `@rpg/contracts`, apps, or Zod.
-Production consumers migrate in later plan phases (equipment picker gate first).
+Production consumers:
+
+- **Equipment picker** (dashboard) — assembled `SearchDocument`, `@rpg/search` matching, `@rpg/search/ranking` sort composition.
+- **ComboboxField** (`@rpg/ui`) — `assembleComboboxOptionSearchDocument` adapter; filter-only (no score-based reorder).
