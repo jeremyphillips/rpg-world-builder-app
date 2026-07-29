@@ -104,7 +104,7 @@ pools, starting-equipment pools, fulfillment-aware gold elevation).
 
 **Search inclusion:** when the query is non-empty, rows with `@rpg/search`
 match score ≤ 0 on the assembled equipment picker `SearchDocument` (primary
-combined field during the equipment pilot) are excluded before sort.
+combined field) are excluded before sort.
 
 **Unknown cost:** rows without a known `equipment.cost` are not treated as zero
 or expensive. In price sorts, priced rows come first in both directions;

@@ -120,4 +120,4 @@ When migrating a surface, verify for representative queries:
 - equal-score ties follow label / surface source-order rules.
 
 See `apps/dashboard/src/features/character/lib/equipment/equipment-picker-search.lib.test.ts`
-for equipment parity coverage against legacy `@rpg/ui` label scoring.
+for equipment picker gate parity against legacy `@rpg/ui` label scoring.

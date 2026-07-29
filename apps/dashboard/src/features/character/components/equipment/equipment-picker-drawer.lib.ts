@@ -15,7 +15,6 @@ import {
 } from '@rpg/contracts'
 
 import { matchSearchDocumentQuery, normalizeSearchQuery } from '@rpg/search'
-import { chainComparators, compareNumberDescending } from '@rpg/search/ranking'
 
 import { buildEquipmentPickerRowViewModel } from '@/features/content'
 
@@ -267,23 +266,21 @@ export function compareEquipmentBestMatch(
   },
 ): number {
   const hasQuery = normalizeSearchQuery(options.searchQuery).text.length > 0
+  if (hasQuery) {
+    const scoreDiff = right.searchScore - left.searchScore
+    if (scoreDiff !== 0) return scoreDiff
+  }
 
-  return chainComparators<EquipmentPickerScoredItem>(
-    (leftRow, rightRow) => {
-      if (!hasQuery) return 0
-      return compareNumberDescending(leftRow.searchScore, rightRow.searchScore)
-    },
-    (leftRow, rightRow) => {
-      if (options.workflowMode !== 'magic_items') return 0
-      return compareMagicItemBestMatch(leftRow.item, rightRow.item)
-    },
-    (leftRow, rightRow) =>
-      compareEquipmentPickerItemsByRecommendation(
-        leftRow.item,
-        rightRow.item,
-        options.browseSortContext,
-      ),
-  )(left, right)
+  if (options.workflowMode === 'magic_items') {
+    const actionDiff = compareMagicItemBestMatch(left.item, right.item)
+    if (actionDiff !== 0) return actionDiff
+  }
+
+  return compareEquipmentPickerItemsByRecommendation(
+    left.item,
+    right.item,
+    options.browseSortContext,
+  )
 }
 
 function compareEquipmentPickerItemsByBestMatch(
