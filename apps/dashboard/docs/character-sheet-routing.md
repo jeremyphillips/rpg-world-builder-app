@@ -70,6 +70,18 @@ discover sheets through Party or direct links.
 - Admin user character list → standalone detail (admin is not a campaign
   viewer; owner-only standalone API applies).
 
+## Card display
+
+- Personal index cards show the campaign name (`showCampaign` default).
+  Campaign party and characters list surfaces pass `showCampaign={false}` because
+  the page already provides campaign context.
+- Controller copy (**No player assigned** / **Played by you** / **Played by
+  {name}**) is resolved by `resolveCharacterControllerDisplay()` in
+  `apps/dashboard/src/features/character/lib/display/character-controller-display.ts`
+  and rendered inside `CharacterListCard` via the `controllerLine` prop.
+  **Played by you** uses `controlledCharacterIds.includes(characterId)`, not
+  display-name comparison.
+
 ## Error copy (route shells)
 
 User-visible messages come from API responses via `resolveQueryErrorLabel`.

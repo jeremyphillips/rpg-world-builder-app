@@ -5,34 +5,40 @@ import { Text } from '@rpg/ui'
 import { ROUTES } from '@/app/routes'
 import { OverviewPageShell } from '@/components/layout/overview-page-shell'
 import { CharacterListCard } from '@/features/character'
-import { CAMPAIGN_CHARACTER_UNASSIGNED_LABEL } from '@/features/character/lib/character-list-routing'
+import {
+  normalizeListController,
+  resolveCharacterControllerDisplay,
+} from '@/features/character/lib/display/character-display'
 
 import { useCampaignBuildContext } from '../../character/hooks/use-campaign-build-context'
 import { resolveQueryErrorLabel } from '../../character/lib/resolve-query-error-label.lib'
 import { useCampaignCharacters } from '../hooks/use-campaign-characters'
 import { useCampaignCharactersNav } from '../hooks/use-campaign-characters-nav'
+import { useCampaigns } from '../hooks/use-campaigns'
 
 const CAMPAIGN_CHARACTERS_EMPTY_MESSAGE = 'No characters to show yet.'
 
 function CampaignCharacterListRow({
   campaignId,
   entry,
+  viewerControlledCharacterIds,
 }: {
   campaignId: string
   entry: CampaignCharacterListItem
+  viewerControlledCharacterIds: readonly string[]
 }) {
   return (
-    <li className="space-y-2">
+    <li>
       <CharacterListCard
         card={entry.character}
         detailHref={ROUTES.campaign.characters.detail(campaignId, entry.character.id)}
+        showCampaign={false}
+        controllerLine={resolveCharacterControllerDisplay({
+          controller: normalizeListController(entry.controller),
+          viewerControlsCharacter: viewerControlledCharacterIds.includes(entry.character.id),
+        })}
         rosterStatus={entry.roster.status}
       />
-      <Text variant="small" className="text-muted-foreground">
-        {entry.controller
-          ? `Played by ${entry.controller.displayName}`
-          : CAMPAIGN_CHARACTER_UNASSIGNED_LABEL}
-      </Text>
     </li>
   )
 }
@@ -40,6 +46,9 @@ function CampaignCharacterListRow({
 export function CampaignCharactersOverview() {
   const { campaignId = '' } = useParams<{ campaignId: string }>()
   const navModel = useCampaignCharactersNav(campaignId)
+  const { data: campaigns } = useCampaigns()
+  const campaign = campaigns?.find((item) => item.id === campaignId)
+  const viewerControlledCharacterIds = campaign?.controlledCharacterIds ?? []
   const {
     data: characters = [],
     isPending: isCharactersPending,
@@ -78,6 +87,7 @@ export function CampaignCharactersOverview() {
                 key={entry.character.id}
                 campaignId={campaignId}
                 entry={entry}
+                viewerControlledCharacterIds={viewerControlledCharacterIds}
               />
             ))}
           </ul>

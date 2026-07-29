@@ -21,6 +21,8 @@ export type CharacterListCardProps = {
   card: CharacterListCardData
   detailHref: string
   campaignLabel?: string
+  showCampaign?: boolean
+  controllerLine?: string
   rosterStatus?: CharacterRosterStatus
 }
 
@@ -29,6 +31,8 @@ export function CharacterListCard({
   card,
   detailHref,
   campaignLabel = CHARACTER_CARD_CAMPAIGN_LABEL,
+  showCampaign = true,
+  controllerLine,
   rosterStatus,
 }: CharacterListCardProps) {
   const rosterPresentation = rosterStatus
@@ -47,7 +51,12 @@ export function CharacterListCard({
           ) : null}
         </div>
         <CardDescription>{card.summary}</CardDescription>
-        {card.campaign ? (
+        {controllerLine ? (
+          <Text variant="small" className="text-muted-foreground">
+            {controllerLine}
+          </Text>
+        ) : null}
+        {showCampaign && card.campaign ? (
           <Text variant="small" className="text-muted-foreground">
             {campaignLabel}: {card.campaign.name}
           </Text>

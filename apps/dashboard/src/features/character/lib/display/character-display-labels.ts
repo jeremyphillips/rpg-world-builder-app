@@ -56,6 +56,12 @@ export const CHARACTER_DETAIL_TAB_LABELS = {
 export const CHARACTER_CARD_CAMPAIGN_LABEL = 'Campaign'
 export const UNAVAILABLE_ORGANIZATION_LABEL = 'Unavailable organization'
 
+export const CHARACTER_CONTROLLER_DISPLAY = {
+  noPlayerAssigned: 'No player assigned',
+  playedByYou: 'Played by you',
+  playedBy: (displayName: string) => `Played by ${displayName}`,
+} as const
+
 export const CHARACTER_PROFICIENCY_GROUP_LABELS = {
   skills: getProficiencyDomainCompactLabel('skill'),
   languages: 'Languages',
