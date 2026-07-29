@@ -4,8 +4,11 @@
  */
 
 import { resolveLandingCampaignId } from '@rpg/contracts'
+import type { CampaignListItem } from '@rpg/contracts'
 
 import { ROUTES } from '@/app/routes'
+
+import { isCampaignMembershipOnboardingIncomplete } from '../campaign-membership-onboarding'
 
 export { resolveActiveCampaignSummary, resolveLandingCampaignId } from '@rpg/contracts'
 
@@ -36,6 +39,31 @@ export function resolveLandingPath(
   ]
   const id = resolveLandingCampaignId(campaigns, candidates)
   return id ? ROUTES.campaign.detail(id) : null
+}
+
+/**
+ * Resolve a campaign the Dashboard Continue card may promote. The candidate must
+ * exist in the current campaigns query and have completed viewer onboarding.
+ */
+export function resolveContinueCampaign(
+  campaigns: readonly CampaignListItem[],
+  user: CampaignPreference | null | undefined,
+  storedId: string | null,
+): CampaignListItem | null {
+  const candidates = [
+    storedId,
+    user?.lastSelectedCampaignId,
+    campaigns.length === 1 ? campaigns[0]?.id : undefined,
+  ]
+  const id = resolveLandingCampaignId(campaigns, candidates)
+  if (!id) return null
+
+  const campaign = campaigns.find((item) => item.id === id)
+  if (!campaign || isCampaignMembershipOnboardingIncomplete(campaign)) {
+    return null
+  }
+
+  return campaign
 }
 
 /**

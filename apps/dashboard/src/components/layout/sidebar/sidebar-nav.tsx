@@ -1,24 +1,20 @@
-import { NavSection } from '@rpg/ui'
+import { useParams } from 'react-router-dom'
 
-import { ROUTES } from '@/app/routes'
-import { NavItem } from './nav-item'
-import { CampaignNavSection } from './campaign-nav-section'
-import { ManageNavSection } from './manage-nav-section'
-import { AdminNavSection } from './admin-nav-section'
+import { CampaignSidebarNav } from './campaign-sidebar-nav'
+import { GlobalSidebarNav } from './global-sidebar-nav'
+import { resolveSidebarNavigationScope } from './lib/resolve-sidebar-navigation-scope'
 
 export function SidebarNav() {
+  const { campaignId } = useParams<{ campaignId?: string }>()
+  const scope = resolveSidebarNavigationScope({ campaignId })
+
   return (
     <nav className="flex flex-col overflow-y-auto px-3 pb-4" aria-label="Primary">
-      <NavSection label="Main">
-        <NavItem to={ROUTES.home} label="Dashboard" end />
-        <NavItem to={ROUTES.characters.list} label="Characters" />
-      </NavSection>
-      <NavSection label="Tools">
-        <NavItem to={ROUTES.nameGenerator} label="Name Generator" />
-      </NavSection>
-      <CampaignNavSection />
-      <ManageNavSection />
-      <AdminNavSection />
+      {scope.kind === 'campaign' ? (
+        <CampaignSidebarNav campaignId={scope.campaignId} />
+      ) : (
+        <GlobalSidebarNav />
+      )}
     </nav>
   )
 }

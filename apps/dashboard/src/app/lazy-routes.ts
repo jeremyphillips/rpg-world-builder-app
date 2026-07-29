@@ -64,6 +64,9 @@ export const AdminSettingsRoute = withRouteSuspense(
 export const CampaignCreateRoute = withRouteSuspense(
   lazyNamed(() => import('@/features/campaign/routes/campaign-create'), 'CampaignCreate'),
 )
+export const CampaignsOverviewRoute = withRouteSuspense(
+  lazyNamed(() => import('@/features/campaign/routes/campaigns-overview'), 'CampaignsOverview'),
+)
 export const CampaignDetailRoute = withRouteSuspense(
   lazyNamed(() => import('@/features/campaign/routes/campaign-detail'), 'CampaignDetail'),
 )

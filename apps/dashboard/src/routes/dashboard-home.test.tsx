@@ -45,21 +45,36 @@ describe('DashboardHome', () => {
     expect(
       await screen.findByText('Create your first campaign to get started.'),
     ).toBeInTheDocument()
-    expect(screen.queryByText('Your campaigns')).not.toBeInTheDocument()
+    expect(screen.queryByText('View all campaigns')).not.toBeInTheDocument()
   })
 
-  it('renders a picker of campaigns when the user has several', async () => {
+  it('links to the campaigns index when the user has several campaigns', async () => {
     listCampaigns.mockResolvedValue([campaign('a', 'Arden'), campaign('b', 'Baldur')])
 
     renderHome()
 
-    expect(await screen.findByText('Your campaigns')).toBeInTheDocument()
-    expect(screen.getByText('Arden')).toBeInTheDocument()
-    expect(screen.getByText('Baldur')).toBeInTheDocument()
-    expect(screen.getAllByRole('button', { name: 'Open campaign' })).toHaveLength(2)
+    expect(await screen.findByRole('link', { name: 'View all campaigns' })).toHaveAttribute(
+      'href',
+      '/campaigns',
+    )
+    expect(screen.queryByText('Your campaigns')).not.toBeInTheDocument()
   })
 
-  it('shows incomplete onboarding status and continue setup CTA', async () => {
+  it('shows a continue card for a remembered campaign with completed onboarding', async () => {
+    listCampaigns.mockResolvedValue([
+      campaign('camp_active', 'Active Campaign'),
+      campaign('camp_other', 'Other Campaign'),
+    ])
+    localStorage.setItem('rpg.selectedCampaignId', 'camp_active')
+
+    renderHome()
+
+    expect(await screen.findByText('Continue campaign')).toBeInTheDocument()
+    expect(screen.getByText('Active Campaign')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Continue' })).toBeInTheDocument()
+  })
+
+  it('hides the continue card when the remembered campaign has incomplete onboarding', async () => {
     listCampaigns.mockResolvedValue([
       makeCampaignListItem({
         id: 'camp_incomplete',
@@ -74,16 +89,11 @@ describe('DashboardHome', () => {
         campaignRole: 'owner',
       }),
     ])
+    localStorage.setItem('rpg.selectedCampaignId', 'camp_incomplete')
 
     renderHome()
 
-    expect(await screen.findByText('Character setup incomplete')).toBeInTheDocument()
-    expect(
-      screen.getByText('Complete your character setup to finish joining this campaign.'),
-    ).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: 'Continue setup' })).toHaveAttribute(
-      'href',
-      '/campaigns/camp_incomplete/onboarding',
-    )
+    expect(await screen.findByRole('link', { name: 'View all campaigns' })).toBeInTheDocument()
+    expect(screen.queryByText('Continue campaign')).not.toBeInTheDocument()
   })
 })

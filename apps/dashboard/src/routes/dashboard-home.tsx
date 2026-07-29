@@ -3,22 +3,29 @@ import { buttonVariants, Heading, Spinner, Text } from '@rpg/ui'
 
 import { NarrowPage } from '@/components/layout/narrow-page'
 import { useSession } from '@/features/auth'
-import { CampaignPicker, useCampaigns, useSelectCampaign } from '@/features/campaign'
+import {
+  ContinueCampaignCard,
+  readStoredCampaignId,
+  resolveContinueCampaign,
+  useCampaigns,
+  useOpenCampaign,
+} from '@/features/campaign'
 import { ROUTES } from '@/app/routes'
 
-import { useLandingRedirect } from './use-landing-redirect'
-
 export function DashboardHome() {
-  const redirecting = useLandingRedirect()
-  const { data: session } = useSession()
+  const { data: session, isPending: sessionPending } = useSession()
   const user = session?.user
-  const { data: campaigns } = useCampaigns()
-  const selectCampaign = useSelectCampaign()
+  const { data: campaigns, isPending: campaignsPending } = useCampaigns()
+  const openCampaign = useOpenCampaign()
 
-  // Hold the picker back while the one-shot landing redirect is being decided.
-  if (redirecting) {
+  if (sessionPending || campaignsPending) {
     return <Spinner />
   }
+
+  const continueCampaign =
+    campaigns !== undefined
+      ? resolveContinueCampaign(campaigns, user, readStoredCampaignId())
+      : null
 
   const hasCampaigns = campaigns !== undefined && campaigns.length > 0
 
@@ -31,7 +38,7 @@ export function DashboardHome() {
           </Heading>
           <Text variant="muted">
             {hasCampaigns
-              ? 'Choose a campaign to continue, or start a new one.'
+              ? 'Pick up where you left off, browse all campaigns, or start a new one.'
               : 'Create your first campaign to get started.'}
           </Text>
         </div>
@@ -40,7 +47,18 @@ export function DashboardHome() {
         </Link>
       </div>
 
-      {hasCampaigns ? <CampaignPicker campaigns={campaigns} onSelect={selectCampaign} /> : null}
+      {continueCampaign ? (
+        <ContinueCampaignCard campaign={continueCampaign} onContinue={openCampaign} />
+      ) : null}
+
+      {hasCampaigns ? (
+        <Link
+          to={ROUTES.campaign.list}
+          className={buttonVariants({ variant: 'outline', size: 'sm' })}
+        >
+          View all campaigns
+        </Link>
+      ) : null}
     </NarrowPage>
   )
 }

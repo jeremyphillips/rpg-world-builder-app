@@ -13,6 +13,7 @@ export const ROUTES = {
   account: '/account',
   nameGenerator: '/name-generator',
   campaign: {
+    list: '/campaigns',
     create: '/campaigns/new',
     detail: (id: string) => `/campaigns/${id}`,
     sessions: (id: string) => `/campaigns/${id}/sessions`,

@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
-import { MemoryRouter } from 'react-router-dom'
+import { MemoryRouter, Route, Routes } from 'react-router-dom'
 
 import { VISIBLE_SIDEBAR_CONTENT } from '@/features/homebrew'
 import { ROUTES } from '@/app/routes'
@@ -11,8 +11,6 @@ vi.mock('@/features/campaign', async (importOriginal) => {
   const actual = (await importOriginal()) as Record<string, unknown>
   return {
     ...actual,
-    CampaignSwitcher: () => <div data-testid="campaign-switcher" />,
-    useActiveCampaignId: () => 'camp_1',
     useCampaignCharacterNavigationContext: () => ({
       nav: {
         showCharactersNav: true,
@@ -32,8 +30,10 @@ vi.mock('@/features/campaign', async (importOriginal) => {
 describe('CampaignNavSection', () => {
   it('lists visible-sidebar content entries and Homebrew after the final content entry', () => {
     render(
-      <MemoryRouter>
-        <CampaignNavSection />
+      <MemoryRouter initialEntries={['/campaigns/camp_1']}>
+        <Routes>
+          <Route path="/campaigns/:campaignId" element={<CampaignNavSection />} />
+        </Routes>
       </MemoryRouter>,
     )
 

@@ -10,15 +10,7 @@ import { resolveTargetPathOnSwitch } from '../lib/navigation/campaign-selection'
 import { writeStoredCampaignId } from '../lib/navigation/selected-campaign-storage'
 import { useCampaignStore } from '../store/campaign-store'
 
-/**
- * Returns a `selectCampaign(id)` action. Persists the user's preference and
- * navigates to the equivalent campaign section when already on a campaign route,
- * otherwise to the campaign overview landing page.
- */
-export function useSelectCampaign() {
-  const navigate = useNavigate()
-  const { pathname } = useLocation()
-  const { campaignId: currentCampaignId } = useParams<{ campaignId?: string }>()
+function usePersistCampaignSelection() {
   const queryClient = useQueryClient()
   const setPreferredCampaignId = useCampaignStore((state) => state.setPreferredCampaignId)
 
@@ -34,6 +26,35 @@ export function useSelectCampaign() {
       writeStoredCampaignId(campaignId)
       mutate(campaignId)
       setPreferredCampaignId(campaignId)
+    },
+    [mutate, setPreferredCampaignId],
+  )
+}
+
+/** Opens a campaign at Overview and persists the user's selection preference. */
+export function useOpenCampaign() {
+  const navigate = useNavigate()
+  const persistSelection = usePersistCampaignSelection()
+
+  return useCallback(
+    (campaignId: string) => {
+      persistSelection(campaignId)
+      navigate(ROUTES.campaign.detail(campaignId))
+    },
+    [navigate, persistSelection],
+  )
+}
+
+/** Switches campaigns while preserving the current section when on a campaign route. */
+export function useSwitchCampaign() {
+  const navigate = useNavigate()
+  const { pathname } = useLocation()
+  const { campaignId: currentCampaignId } = useParams<{ campaignId?: string }>()
+  const persistSelection = usePersistCampaignSelection()
+
+  return useCallback(
+    (campaignId: string) => {
+      persistSelection(campaignId)
 
       if (currentCampaignId) {
         navigate(resolveTargetPathOnSwitch(pathname, currentCampaignId, campaignId))
@@ -42,6 +63,13 @@ export function useSelectCampaign() {
 
       navigate(ROUTES.campaign.detail(campaignId))
     },
-    [mutate, navigate, pathname, currentCampaignId, setPreferredCampaignId],
+    [currentCampaignId, navigate, pathname, persistSelection],
   )
+}
+
+/**
+ * @deprecated Prefer `useOpenCampaign` or `useSwitchCampaign` for explicit intent.
+ */
+export function useSelectCampaign() {
+  return useOpenCampaign()
 }

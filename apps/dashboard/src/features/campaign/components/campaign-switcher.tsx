@@ -17,7 +17,7 @@ import {
 
 import { useCampaigns } from '../hooks/use-campaigns'
 import { useActiveCampaignId } from '../hooks/use-active-campaign-id'
-import { useSelectCampaign } from '../hooks/use-select-campaign'
+import { useSwitchCampaign } from '../hooks/use-select-campaign'
 import { getCampaignSwitcherLabel } from '../lib/navigation/campaign-selection'
 
 interface CampaignSwitcherProps {
@@ -63,7 +63,7 @@ function CampaignSwitcherList({ campaigns, activeId, onSelect }: CampaignSwitche
 export function CampaignSwitcher({ showLabel = true }: CampaignSwitcherProps) {
   const activeCampaignId = useActiveCampaignId()
   const navigate = useNavigate()
-  const selectCampaign = useSelectCampaign()
+  const switchCampaign = useSwitchCampaign()
   const { data: campaigns, isPending, isError } = useCampaigns()
 
   const active = campaigns?.find((campaign) => campaign.id === activeCampaignId)
@@ -101,7 +101,7 @@ export function CampaignSwitcher({ showLabel = true }: CampaignSwitcherProps) {
         <CampaignSwitcherList
           campaigns={campaigns}
           activeId={activeCampaignId ?? undefined}
-          onSelect={selectCampaign}
+          onSelect={switchCampaign}
         />
         <DropdownMenuSeparator />
         <DropdownMenuItem onSelect={() => navigate(ROUTES.campaign.create)}>

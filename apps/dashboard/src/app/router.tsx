@@ -21,6 +21,7 @@ import {
   CampaignCharacterDetailRoute,
   CampaignCharactersOverviewRoute,
   CampaignDetailRoute,
+  CampaignsOverviewRoute,
   CampaignLayoutRoute,
   CampaignOnboardingRoute,
   CampaignSessionsRoute,
@@ -165,6 +166,13 @@ const router = createBrowserRouter(
                   } satisfies CrumbHandle,
                 },
               ],
+            },
+            {
+              path: 'campaigns',
+              handle: {
+                crumb: () => ({ label: 'Campaigns', href: ROUTES.campaign.list }),
+              } satisfies CrumbHandle,
+              children: [{ index: true, element: <CampaignsOverviewRoute /> }],
             },
             {
               path: 'campaigns/:campaignId',
