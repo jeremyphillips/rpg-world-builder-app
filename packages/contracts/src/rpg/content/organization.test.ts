@@ -6,6 +6,7 @@ import {
   organizationBodyDraftSchema,
   organizationBodySchema,
   organizationDraftStoredSchema,
+  organizationReferenceResolutionSchema,
   organizationSchema,
   updateOrganizationDraftInputSchema,
   updateOrganizationInputSchema,
@@ -68,6 +69,17 @@ describe('organization stored contracts', () => {
       name: 'Untitled Organization',
       status: 'draft',
     })
+  })
+})
+
+describe('organization reference resolution', () => {
+  it('preserves a missing saved reference', () => {
+    expect(
+      organizationReferenceResolutionSchema.parse({
+        organizationId: 'organization-missing',
+        organization: null,
+      }),
+    ).toEqual({ organizationId: 'organization-missing', organization: null })
   })
 })
 

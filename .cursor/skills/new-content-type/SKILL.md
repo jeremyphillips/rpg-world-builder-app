@@ -48,7 +48,7 @@ Full checklist and file matrix → [reference.md](./reference.md). Policy depth
 3. **Contracts schema** — `packages/contracts/src/rpg/content/<type>.ts` + barrel export + co-located tests.
 4. **Catalog capability** — set manifest `catalog.bundledContent`; only bundled types add `packages/catalog/src/<type>/` JSON, loaders, tests, and package exports. Do not create empty seed packages for campaign-authored types.
 5. **API** — `*.config.ts` with an optional `system` capability for bundled content + one line in `content-types.ts`.
-6. **Dashboard** — sub-area folder: list/detail routes, `*-display.ts` view model, form def (if authoring), lazy routes, `CONTENT_ROUTES`, router tree.
+6. **Dashboard** — sub-area folder: list/detail routes, `*-display.ts` view model, form def (if authoring), lazy routes, `CONTENT_ROUTES`, router tree. Authorable types also register their API `routeKey` in `content-form-navigation.ts` so create flows can resolve the edit route.
    - Before `*-overview-columns.tsx`: run [Overview table UX](#overview-table-ux) if the user did not specify columns or filters.
 7. **Manifest flags** — set implemented dashboard capabilities (`formDefinitionPath`, `visibleInSidebar`, `routeSection`) and `catalog.bundledContent`; add `catalog.packageName` only for bundled content.
 8. **Form test registry** — side-effect import in [`content-form-test-registry.ts`](../../../apps/dashboard/src/features/content/lib/forms/content-form-test-registry.ts) (tests only — keep route-local production imports).

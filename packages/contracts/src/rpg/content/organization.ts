@@ -1,4 +1,4 @@
-import type { z } from 'zod'
+import { z } from 'zod'
 
 import { organizationKindSchema } from '../vocab/organization-kind'
 import { createDraftInputSchema, createPublishInputSchema } from './lib/content-input-schemas'
@@ -33,6 +33,14 @@ export const organizationDraftStoredSchema = contentMetaSchema.extend(
 )
 
 export type OrganizationDraft = z.infer<typeof organizationDraftStoredSchema>
+
+/** Saved-reference read result; null preserves an explicitly missing/deleted reference. */
+export const organizationReferenceResolutionSchema = z.object({
+  organizationId: z.string().min(1),
+  organization: z.union([organizationSchema, organizationDraftStoredSchema]).nullable(),
+})
+
+export type OrganizationReferenceResolution = z.infer<typeof organizationReferenceResolutionSchema>
 
 export const createOrganizationInputSchema = createPublishInputSchema(organizationBodySchema)
 

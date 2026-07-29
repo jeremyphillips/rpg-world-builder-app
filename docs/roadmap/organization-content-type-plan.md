@@ -1,6 +1,6 @@
 # Organization Content Type and Character Connections Plan
 
-Status: Phases 1–7 complete; Phase 8 proposed
+Status: Phases 1–8 complete
 
 Scope: top-level `organizations` content type plus character connections
 
@@ -395,7 +395,7 @@ pagination, and performance design.
    `{ organizationId }` connection records only.
 6. Add keyboard, interaction, restoration, navigation-order, and axe coverage.
 
-### 8. Finalization and character display
+### 8. Finalization and character display — complete
 
 1. Finalization verifies active draft selections against currently selectable
    organizations and copies normalized connection records into

@@ -33,6 +33,7 @@ patterns, and vocab rules → [`docs/content-types.md`](../../../docs/content-ty
 | 16   | Dashboard | Lazy route exports in `app/lazy-routes.ts`                                                                                                                |
 | 17   | Dashboard | Router tree in `app/router.tsx`                                                                                                                           |
 | 18   | Dashboard | `VISIBLE_SIDEBAR_CONTENT` when `visibleInSidebar: true`                                                                                                   |
+| —    | Dashboard | Authorable types: API `routeKey` mapping in `content-form-navigation.ts` for post-create edit navigation                                                  |
 | —    | Tests     | `content-form-test-registry.ts` import when form def exists                                                                                               |
 | —    | Gates     | All [layer drift tests](#drift-test-map) green                                                                                                            |
 

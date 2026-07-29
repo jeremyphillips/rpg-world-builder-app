@@ -1,10 +1,16 @@
 import { describe, expect, it } from 'vitest'
 
 import { makeTestCampaign } from '../../../test/fixtures/campaigns'
+import { minimalNpcRequestInput } from '../../../test/fixtures/npcs'
 import { useIntegrationDb } from '../../../test/setup/integration-db'
+import { createCampaignNpc } from '../../campaign'
+import { CharacterModel } from '../../character'
 import { createHomebrewContent } from '../lib/content-write.service'
 import { organizationWriteConfig } from './organizations.config'
-import { resolveOrganizationReference } from './resolve-organization-reference'
+import {
+  resolveCharacterOrganizationReferences,
+  resolveOrganizationReference,
+} from './resolve-organization-reference'
 
 useIntegrationDb()
 
@@ -60,5 +66,44 @@ describe('resolveOrganizationReference', () => {
         viewer: { kind: 'manage' },
       }),
     ).resolves.toBeNull()
+  })
+
+  it('bulk-resolves saved references and preserves missing entries', async () => {
+    const campaign = await makeTestCampaign()
+    const organization = await createHomebrewContent(
+      organizationWriteConfig,
+      campaign.id,
+      {
+        slug: 'hidden-society',
+        name: 'Hidden Society',
+      },
+      { status: 'draft' },
+    )
+    const { character } = await createCampaignNpc(campaign.id, minimalNpcRequestInput)
+    await CharacterModel.findByIdAndUpdate(character.id, {
+      connections: {
+        organizations: [
+          { organizationId: organization.id },
+          { organizationId: '000000000000000000000000' },
+        ],
+      },
+    })
+
+    await expect(
+      resolveCharacterOrganizationReferences({
+        campaignId: campaign.id,
+        characterId: character.id,
+        viewer: { kind: 'manage' },
+      }),
+    ).resolves.toEqual([
+      {
+        organizationId: organization.id,
+        organization: expect.objectContaining({ id: organization.id, status: 'draft' }),
+      },
+      {
+        organizationId: '000000000000000000000000',
+        organization: null,
+      },
+    ])
   })
 })

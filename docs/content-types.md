@@ -885,6 +885,13 @@ Add the new type to `CONTENT_ROUTES` (aggregated by `routes.ts` as `ROUTES.conte
 
 Note: URL segments and dashboard/API subfolders use the content type key (kebab-case when multi-word, e.g. `skill-proficiencies/`). `ROUTES.content.*` object keys and JSON response keys stay camelCase (`skillProficiencies`).
 
+For an authorable type, also map the form definition's API `routeKey` to its
+`CONTENT_ROUTES` section in
+`apps/dashboard/src/features/content/lib/forms/shells/content-form-navigation.ts`.
+The shared create shell uses this registration to navigate to the saved
+entity's edit route. Add a post-create navigation test for the new type; the
+route-manifest drift test only verifies the `CONTENT_ROUTES` entry itself.
+
 ### 16. Lazy routes (`apps/dashboard/src/app/lazy-routes.ts`)
 
 Register four lazy exports — import **route module paths directly**, never from

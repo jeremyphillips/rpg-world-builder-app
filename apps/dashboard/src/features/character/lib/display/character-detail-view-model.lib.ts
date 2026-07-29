@@ -5,6 +5,7 @@ import type {
   Equipment,
   MovementMode,
   ResolvedCharacterCreationRules,
+  OrganizationReferenceResolution,
   Species,
   XpProgressionBody,
 } from '@rpg/contracts'
@@ -16,6 +17,7 @@ import {
   formatWeaponDamageWithModifier,
   getCharacterTotalLevel,
   getMovementModeLabel,
+  getOrganizationKindLabel,
   MOVEMENT_MODES,
   proficiencyBonus,
   resolveCharacterXpDisplay,
@@ -41,6 +43,7 @@ import {
   CHARACTER_PROFICIENCY_GROUP_LABELS,
   CHARACTER_SECTION_LABELS,
   CHARACTER_STAT_LABELS,
+  UNAVAILABLE_ORGANIZATION_LABEL,
 } from './character-display-labels'
 import type {
   CharacterAbilityTile,
@@ -64,6 +67,7 @@ export type CharacterDisplayInput = {
   catalogIndex: CharacterBuildCatalogIndex
   rules: ResolvedCharacterCreationRules
   xpProgression: Pick<XpProgressionBody, 'entries'>
+  organizationReferences?: readonly OrganizationReferenceResolution[]
 }
 
 function isCharacterProficientWithWeapon(
@@ -408,6 +412,7 @@ export function buildCharacterDetailViewModel({
   catalogIndex,
   rules,
   xpProgression,
+  organizationReferences = [],
 }: CharacterDisplayInput): CharacterDetailViewModel {
   const level = getCharacterTotalLevel(character)
 
@@ -435,6 +440,19 @@ export function buildCharacterDetailViewModel({
     classFeatures: buildClassFeaturesSection(character, catalogIndex),
     speciesTraits: buildSpeciesTraitsSection(character, catalogIndex),
     feats: buildFeatsSection(character),
+    connections: {
+      title: CHARACTER_SECTION_LABELS.connections,
+      items: organizationReferences.map(({ organizationId, organization }) => ({
+        id: organizationId,
+        label: organization?.name ?? UNAVAILABLE_ORGANIZATION_LABEL,
+        detail: organization?.organizationKind
+          ? getOrganizationKindLabel(organization.organizationKind)
+          : organization
+            ? 'Type not set'
+            : 'This organization is missing or no longer available.',
+      })),
+      emptyText: CHARACTER_EMPTY_SECTION_TEXT.connections,
+    },
     narrative: character.narrative,
   }
 }

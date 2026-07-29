@@ -14,6 +14,7 @@ describe('routeKeyToContentRouteSection', () => {
   it('passes through keys that match CONTENT_ROUTES sections', () => {
     expect(routeKeyToContentRouteSection('spells')).toBe('spells')
     expect(routeKeyToContentRouteSection('equipment')).toBe('equipment')
+    expect(routeKeyToContentRouteSection('organizations')).toBe('organizations')
   })
 })
 
@@ -22,6 +23,12 @@ describe('resolveContentPostCreateEditHref', () => {
     expect(resolveContentPostCreateEditHref({ routeKey: 'spells' }, 'c1', { id: 'sp1' })).toBe(
       contentEditHref('spells', 'c1', 'sp1'),
     )
+  })
+
+  it('resolves organization edit href after create', () => {
+    expect(
+      resolveContentPostCreateEditHref({ routeKey: 'organizations' }, 'c1', { id: 'org1' }),
+    ).toBe(contentEditHref('organizations', 'c1', 'org1'))
   })
 
   it('resolves equipment edit href using form context family', () => {

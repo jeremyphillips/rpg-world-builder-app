@@ -8,6 +8,7 @@ import { createEmptyCharacterBuilderDraft } from '@rpg/contracts'
 import { createStandaloneBuilderContextFixture } from '../../lib/character-builder-fixtures'
 import { getBuilderChromeCopy } from '../../lib/builder/builder-chrome-copy'
 import { ReviewStep } from './review-step.client'
+import { lanternGuild } from '../connections/organization-picker-drawer.fixtures'
 
 describe('ReviewStep', () => {
   const context = createStandaloneBuilderContextFixture()
@@ -102,6 +103,30 @@ describe('ReviewStep', () => {
     )
 
     expect(screen.getByText(chrome.reviewReadyMessage)).toBeInTheDocument()
+  })
+
+  it('shows selected organization names and type labels', () => {
+    const organizationContext = {
+      ...context,
+      catalog: { ...context.catalog, organizations: [lanternGuild] },
+    }
+    const draft = {
+      ...createEmptyCharacterBuilderDraft(),
+      connections: { organizations: [{ organizationId: lanternGuild.id }] },
+    }
+
+    render(
+      <ReviewStep
+        context={organizationContext}
+        draft={draft}
+        preview={null}
+        resolvedChoiceSets={[]}
+        validationHeading={chrome.reviewValidationHeading}
+        onNavigateToStep={vi.fn()}
+      />,
+    )
+
+    expect(screen.getByText('Lantern Guild — Guild or professional')).toBeInTheDocument()
   })
 
   it('has no axe accessibility violations', async () => {

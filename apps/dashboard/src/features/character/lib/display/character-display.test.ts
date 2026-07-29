@@ -88,6 +88,25 @@ describe('buildCharacterDetailViewModel', () => {
       }),
     )
     expect(viewModel.proficiencies.groups).toEqual([])
+    expect(viewModel.connections.items).toEqual([])
     expect(viewModel.narrative?.backstory).toContain('hardy dwarf fighter')
+  })
+
+  it('maps saved organization reference resolutions for character detail', () => {
+    const viewModel = buildCharacterDetailViewModel({
+      character: SAMPLE_PC,
+      catalogIndex,
+      rules: context.characterCreationRules,
+      xpProgression: { entries: [{ level: 1, xpRequired: 0 }] },
+      organizationReferences: [{ organizationId: 'organization-missing', organization: null }],
+    })
+
+    expect(viewModel.connections.items).toEqual([
+      {
+        id: 'organization-missing',
+        label: 'Unavailable organization',
+        detail: 'This organization is missing or no longer available.',
+      },
+    ])
   })
 })

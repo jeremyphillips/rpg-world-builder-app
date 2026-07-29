@@ -110,6 +110,7 @@ export function CharacterDetailContent({
           classFeatures={viewModel.classFeatures}
           speciesTraits={viewModel.speciesTraits}
           feats={viewModel.feats}
+          connections={viewModel.connections}
           narrative={viewModel.narrative}
         />
       </div>
