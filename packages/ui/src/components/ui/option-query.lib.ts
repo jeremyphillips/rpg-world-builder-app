@@ -1,4 +1,4 @@
-import { scoreItem, type WeightedSearchField } from '../../lib/search'
+import { matchSearchDocumentQuery, type SearchDocument } from '@rpg/search'
 
 export interface LabelValueDescriptionOption {
   label: string
@@ -6,19 +6,23 @@ export interface LabelValueDescriptionOption {
   description?: string
 }
 
-function optionSearchFields(option: LabelValueDescriptionOption): WeightedSearchField[] {
-  const fields: WeightedSearchField[] = [
-    { text: option.label, weight: 1, role: 'label' },
-    { text: option.value, weight: 1, role: 'alias' },
+/** Maps ComboboxField options to `@rpg/search` documents (label → primary, value → keyword). */
+export function assembleComboboxOptionSearchDocument(
+  option: LabelValueDescriptionOption,
+): SearchDocument {
+  const fields = [
+    { key: 'label', text: option.label, role: 'primary' as const },
+    { key: 'value', text: option.value, role: 'keyword' as const },
+    ...(option.description
+      ? [{ key: 'description', text: option.description, role: 'secondary' as const }]
+      : []),
   ]
-  if (option.description) {
-    fields.push({ text: option.description, weight: 1, role: 'description' })
-  }
-  return fields
+
+  return { id: option.value, fields }
 }
 
 export function optionMatchesQuery(option: LabelValueDescriptionOption, query: string): boolean {
-  const normalized = query.trim().toLowerCase()
-  if (!normalized) return true
-  return scoreItem({ fields: optionSearchFields(option) }, normalized) > 0
+  return matchSearchDocumentQuery(assembleComboboxOptionSearchDocument(option), query, {
+    profile: 'forgiving',
+  }).matched
 }

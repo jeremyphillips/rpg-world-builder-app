@@ -33,6 +33,10 @@ import {
   type EquipmentPickerItem,
 } from './equipment-picker-drawer.types'
 
+function pickerSearchDocument(id: string, text: string) {
+  return { id, fields: [{ key: 'combined', text, role: 'primary' as const }] }
+}
+
 describe('equipment-picker-drawer.lib', () => {
   it('sorts items by recommendation tier with not-proficient gear last', () => {
     const sorted = sortEquipmentPickerItems([
@@ -54,7 +58,7 @@ describe('equipment-picker-drawer.lib', () => {
         slug: 'silk-rope',
         name: 'Silk Rope',
       },
-      searchText: 'silk rope adventuring gear',
+      searchDocument: pickerSearchDocument('srd-cc-5.2.1:silk-rope', 'silk rope adventuring gear'),
       state: {
         ...neutralRope.state,
         isRecommended: false,
@@ -177,7 +181,10 @@ describe('equipment-picker-drawer.lib', () => {
       ...equipmentPickerItemsFixture,
       {
         equipment: equipmentPickerRowboatFixture,
-        searchText: 'rowboat water vehicle',
+        searchDocument: pickerSearchDocument(
+          equipmentPickerRowboatFixture.id,
+          'rowboat water vehicle',
+        ),
         state: pickerState({
           isAvailable: true,
           isRecommended: false,
@@ -194,7 +201,10 @@ describe('equipment-picker-drawer.lib', () => {
       },
       {
         equipment: equipmentPickerSkilledHirelingFixture,
-        searchText: 'skilled hireling service',
+        searchDocument: pickerSearchDocument(
+          equipmentPickerSkilledHirelingFixture.id,
+          'skilled hireling service',
+        ),
         state: pickerState({
           isAvailable: true,
           isRecommended: false,
@@ -346,7 +356,10 @@ describe('equipment-picker-drawer.lib', () => {
         slug: 'bead-of-force',
         name: 'Bead of Force',
       },
-      searchText: 'bead of force magic item',
+      searchDocument: pickerSearchDocument(
+        'srd-cc-5.2.1:bead-of-force',
+        'bead of force magic item',
+      ),
       state: pickerState({
         isAvailable: true,
         isRecommended: false,
@@ -388,7 +401,10 @@ describe('equipment-picker-drawer.lib', () => {
         slug: 'bead-of-force',
         name: 'Bead of Force',
       },
-      searchText: 'bead of force magic item',
+      searchDocument: pickerSearchDocument(
+        'srd-cc-5.2.1:bead-of-force',
+        'bead of force magic item',
+      ),
       state: pickerState({
         isAvailable: true,
         isRecommended: false,
@@ -407,7 +423,7 @@ describe('equipment-picker-drawer.lib', () => {
         slug: 'other-relic',
         name: 'Other Relic',
       },
-      searchText: 'other relic magic item',
+      searchDocument: pickerSearchDocument('srd-cc-5.2.1:other-relic', 'other relic magic item'),
       state: pickerState({
         isAvailable: true,
         isRecommended: false,
@@ -432,7 +448,10 @@ describe('equipment-picker-drawer.lib', () => {
   it('orders magic-items workflow by action rank before recommendation', () => {
     const grantAvailable: EquipmentPickerItem = {
       equipment: equipmentPickerPotionFixture,
-      searchText: 'potion of healing magic item',
+      searchDocument: pickerSearchDocument(
+        equipmentPickerPotionFixture.id,
+        'potion of healing magic item',
+      ),
       state: pickerState({
         isAvailable: true,
         isRecommended: false,
@@ -451,7 +470,7 @@ describe('equipment-picker-drawer.lib', () => {
         slug: 'strong-relic',
         name: 'Strong Relic',
       },
-      searchText: 'strong relic magic item',
+      searchDocument: pickerSearchDocument('srd-cc-5.2.1:strong-relic', 'strong relic magic item'),
       state: pickerState({
         isAvailable: true,
         isRecommended: true,
@@ -492,6 +511,30 @@ describe('equipment-picker-drawer.lib', () => {
     ).toEqual(sortEquipmentPickerItems(shuffled).map((item) => item.equipment.name))
   })
 
+  it('ranks stronger search matches above higher recommendation tiers', () => {
+    const essentialLongsword: EquipmentPickerItem = {
+      ...equipmentPickerItemsFixture[0]!,
+      searchDocument: pickerSearchDocument(
+        equipmentPickerItemsFixture[0]!.equipment.id,
+        'auxiliary rope cord martial melee weapon',
+      ),
+    }
+    const neutralRope = {
+      ...equipmentPickerItemsFixture[2]!,
+      searchDocument: pickerSearchDocument(
+        equipmentPickerItemsFixture[2]!.equipment.id,
+        'rope adventuring gear',
+      ),
+    }
+
+    expect(
+      filterAndSortEquipmentPickerItems([essentialLongsword, neutralRope], {
+        searchQuery: 'rope',
+        sortMode: EQUIPMENT_PICKER_SORT_BEST_MATCH,
+      }).map((item) => item.equipment.name),
+    ).toEqual(['Rope', 'Longsword'])
+  })
+
   it('sorts by price ascending with best-match tiebreaker for equal prices', () => {
     const cheapRope: EquipmentPickerItem = {
       ...equipmentPickerItemsFixture[2]!,
@@ -502,7 +545,10 @@ describe('equipment-picker-drawer.lib', () => {
         name: 'Cheap Rope',
         cost: { amount: 1, currency: 'gp' },
       },
-      searchText: 'cheap rope adventuring gear',
+      searchDocument: pickerSearchDocument(
+        'srd-cc-5.2.1:cheap-rope',
+        'cheap rope adventuring gear',
+      ),
     }
     const priceyRope: EquipmentPickerItem = {
       ...equipmentPickerItemsFixture[2]!,
@@ -513,7 +559,10 @@ describe('equipment-picker-drawer.lib', () => {
         name: 'Pricey Rope',
         cost: { amount: 5, currency: 'gp' },
       },
-      searchText: 'pricey rope adventuring gear',
+      searchDocument: pickerSearchDocument(
+        'srd-cc-5.2.1:pricey-rope',
+        'pricey rope adventuring gear',
+      ),
     }
 
     const sorted = filterAndSortEquipmentPickerItems([priceyRope, cheapRope], {
@@ -535,7 +584,10 @@ describe('equipment-picker-drawer.lib', () => {
         name: 'Priceless Rope',
         cost: null,
       },
-      searchText: 'priceless rope adventuring gear',
+      searchDocument: pickerSearchDocument(
+        'srd-cc-5.2.1:priceless-rope',
+        'priceless rope adventuring gear',
+      ),
     }
 
     const asc = filterAndSortEquipmentPickerItems([priceless, priced], {

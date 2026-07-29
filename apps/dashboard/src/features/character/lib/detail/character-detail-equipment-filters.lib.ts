@@ -3,7 +3,6 @@ import {
   isEquipmentPickerSupportedKind,
   type EquipmentPickerSupportedKind,
 } from '@rpg/contracts'
-import { normalizeSearchQuery } from '@rpg/ui'
 import { applyFilterSchema, type FilterSchema } from '@rpg/ui/filters'
 
 import {
@@ -79,7 +78,7 @@ export function filterCharacterDetailEquipmentCards(
     searchQuery: string
   },
 ): CharacterSheetEquipmentCard[] {
-  const normalizedQuery = normalizeSearchQuery(options.searchQuery)
+  const normalizedQuery = options.searchQuery.trim()
   const searchFiltered = cards.filter((card) =>
     matchesCharacterDetailCatalogSearchQuery(card, normalizedQuery),
   )

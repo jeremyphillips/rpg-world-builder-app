@@ -14,9 +14,12 @@ import {
   type Money,
 } from '@rpg/contracts'
 
-import { normalizeSearchQuery, scoreItem } from '@rpg/ui'
+import { matchSearchDocumentQuery, normalizeSearchQuery } from '@rpg/search'
+import { chainComparators, compareNumberDescending, type Comparator } from '@rpg/search/ranking'
 
 import { buildEquipmentPickerRowViewModel } from '@/features/content'
+
+import { assembleEquipmentPickerSearchDocument } from '../../lib/equipment/equipment-picker-search.lib'
 
 import {
   resolveEquipmentOwnedQuantity,
@@ -155,7 +158,8 @@ function isEquipmentPickerItemPriced(item: EquipmentPickerItem): boolean {
 }
 
 function scoreEquipmentPickerItem(item: EquipmentPickerItem, searchQuery: string): number {
-  return scoreItem({ fields: [{ text: item.searchText, weight: 1, role: 'label' }] }, searchQuery)
+  const document = item.searchDocument ?? assembleEquipmentPickerSearchDocument(item.equipment)
+  return matchSearchDocumentQuery(document, searchQuery).score ?? 0
 }
 
 function filterEquipmentPickerItemsBySearch(
@@ -163,7 +167,7 @@ function filterEquipmentPickerItemsBySearch(
   searchQuery: string,
 ): EquipmentPickerItem[] {
   const normalizedQuery = normalizeSearchQuery(searchQuery)
-  if (!normalizedQuery) return [...items]
+  if (normalizedQuery.text.length === 0) return [...items]
 
   return items.filter((item) => scoreEquipmentPickerItem(item, searchQuery) > 0)
 }
@@ -194,7 +198,7 @@ function compareScoredItemsBySearchScore(
   hasQuery: boolean,
 ): number {
   if (!hasQuery) return 0
-  return right.searchScore - left.searchScore
+  return compareNumberDescending(left.searchScore, right.searchScore)
 }
 
 function compareScoredItemsByRecommendationTiebreaker(
@@ -214,10 +218,10 @@ function compareScoredItemsAfterPrimary(
 ): number {
   if (primaryCmp !== 0) return primaryCmp
 
-  const scoreCmp = compareScoredItemsBySearchScore(left, right, hasQuery)
-  if (scoreCmp !== 0) return scoreCmp
-
-  return compareScoredItemsByRecommendationTiebreaker(left, right, browseSortContext)
+  return chainComparators<EquipmentPickerScoredItem>(
+    (l, r) => compareScoredItemsBySearchScore(l, r, hasQuery),
+    (l, r) => compareScoredItemsByRecommendationTiebreaker(l, r, browseSortContext),
+  )(left, right)
 }
 
 function compareScoredItemsByPriceMode(
@@ -262,22 +266,22 @@ export function compareEquipmentBestMatch(
     workflowMode?: EquipmentPickerWorkflowMode
   },
 ): number {
-  const hasQuery = normalizeSearchQuery(options.searchQuery).length > 0
+  const hasQuery = normalizeSearchQuery(options.searchQuery).text.length > 0
+  const comparators: Comparator<EquipmentPickerScoredItem>[] = []
+
   if (hasQuery) {
-    const scoreDiff = right.searchScore - left.searchScore
-    if (scoreDiff !== 0) return scoreDiff
+    comparators.push((l, r) => compareNumberDescending(l.searchScore, r.searchScore))
   }
 
   if (options.workflowMode === 'magic_items') {
-    const actionDiff = compareMagicItemBestMatch(left.item, right.item)
-    if (actionDiff !== 0) return actionDiff
+    comparators.push((l, r) => compareMagicItemBestMatch(l.item, r.item))
   }
 
-  return compareEquipmentPickerItemsByRecommendation(
-    left.item,
-    right.item,
-    options.browseSortContext,
+  comparators.push((l, r) =>
+    compareEquipmentPickerItemsByRecommendation(l.item, r.item, options.browseSortContext),
   )
+
+  return chainComparators(...comparators)(left, right)
 }
 
 function compareEquipmentPickerItemsByBestMatch(
@@ -303,7 +307,7 @@ function compareEquipmentPickerScoredItems(
   },
 ): number {
   const { searchQuery, sortMode, browseSortContext, workflowMode } = options
-  const hasQuery = normalizeSearchQuery(searchQuery).length > 0
+  const hasQuery = normalizeSearchQuery(searchQuery).text.length > 0
 
   switch (sortMode) {
     case EQUIPMENT_PICKER_SORT_BEST_MATCH:
@@ -342,6 +346,8 @@ export function filterAndSortEquipmentPickerItems(
     .sort((left, right) => compareEquipmentPickerScoredItems(left, right, options))
     .map((row) => row.item)
 }
+
+export { getEquipmentPickerSearchText } from '../../lib/equipment/equipment-picker-search.lib'
 
 export function resolveEquipmentPickerAllowedKinds(
   allowedKinds?: readonly EquipmentPickerSupportedKind[],

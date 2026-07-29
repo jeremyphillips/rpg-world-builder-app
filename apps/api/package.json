@@ -16,6 +16,7 @@
     "@rpg/catalog": "workspace:*",
     "@rpg/contracts": "workspace:*",
     "@rpg/dev-bench-core": "workspace:*",
+    "@rpg/search": "workspace:*",
     "bcryptjs": "^3.0.3",
     "cookie-parser": "^1.4.7",
     "express": "^5.2.1",

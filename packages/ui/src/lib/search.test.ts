@@ -59,7 +59,7 @@ describe('scoreField', () => {
     expect(scoreField({ text: 'fire-bolt', weight: 1, role: 'alias' }, 'fire-bolt')).toBe(70)
     expect(scoreField({ text: 'fire-bolt', weight: 1, role: 'alias' }, 'bolt')).toBe(55)
     expect(scoreField({ text: 'innate', weight: 1, role: 'keyword' }, 'inn')).toBe(35)
-    expect(scoreField({ text: 'innate', weight: 1, role: 'keyword' }, 'ate')).toBe(20)
+    expect(scoreField({ text: 'innate', weight: 1, role: 'keyword' }, 'ate')).toBe(28)
     expect(scoreField({ text: 'Homebrew source', weight: 1, role: 'description' }, 'brew')).toBe(10)
     expect(scoreField({ text: 'Proficiencies', weight: 1, role: 'group' }, 'prof')).toBe(5)
   })

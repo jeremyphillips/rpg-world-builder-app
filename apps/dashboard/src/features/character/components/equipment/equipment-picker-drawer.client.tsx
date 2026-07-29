@@ -26,6 +26,7 @@ import {
   filterAndSortEquipmentPickerItems,
   filterEquipmentPickerItems,
   getEquipmentUnaffordableAmounts,
+  getEquipmentPickerSearchText,
   hasEquipmentPickerClearableCriteria,
   hasEquipmentPickerResetViewCriteria,
   resolveEquipmentKindFilterOptions,
@@ -464,7 +465,7 @@ export function EquipmentPickerDrawer({
       items={filteredItems}
       getItemKey={(item) => item.equipment.id}
       getItemToolbarLabel={(item) => item.equipment.name}
-      getSearchText={(item) => item.searchText}
+      getSearchText={(item) => getEquipmentPickerSearchText(item)}
       hasStructuredFilters={structuredFilterCount > 0}
       headerExtra={
         showWorkflowSegment && onWorkflowModeChange ? (

@@ -42,7 +42,10 @@ function makePickerItem(
 ): EquipmentPickerItem {
   return {
     equipment,
-    searchText: equipment.name.toLowerCase(),
+    searchDocument: {
+      id: equipment.id,
+      fields: [{ key: 'combined', text: equipment.name.toLowerCase(), role: 'primary' }],
+    },
     state: {
       isAvailable: true,
       isRecommended: recommendation.tier === 'essential' || recommendation.tier === 'strong',

@@ -5,6 +5,7 @@ import type {
 } from '@rpg/contracts'
 
 import { CampaignMembershipModel, findCampaignById } from '../campaign'
+import { matchesTextSearchQuery } from '../../lib/text-search.lib'
 
 type MembershipRecord = {
   campaignId: string
@@ -12,10 +13,6 @@ type MembershipRecord = {
   controlledCharacterIds?: string[]
   invitedAt: Date
   joinedAt?: Date | null
-}
-
-function escapeRegex(value: string): string {
-  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 }
 
 function buildRoleFilter(role: AdminUserCampaignListQuery['role']): Record<string, unknown> {
@@ -34,16 +31,13 @@ export async function listAdminUserCampaigns(
     .select('campaignId campaignRole controlledCharacterIds invitedAt joinedAt')
     .lean<MembershipRecord[]>()
 
-  const trimmedSearch = query.q?.trim()
-  const searchPattern = trimmedSearch ? new RegExp(escapeRegex(trimmedSearch), 'i') : null
-
   const items: AdminUserCampaignListItem[] = []
 
   for (const membership of memberships) {
     const campaign = await findCampaignById(membership.campaignId)
     if (!campaign) continue
 
-    if (searchPattern && !searchPattern.test(campaign.identity.name)) continue
+    if (!matchesTextSearchQuery(campaign.identity.name, query.q)) continue
 
     const joinedAt = membership.joinedAt ?? membership.invitedAt
 

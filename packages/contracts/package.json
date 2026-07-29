@@ -87,6 +87,7 @@
     "generate:json-schemas": "tsx scripts/generate-json-schemas.ts"
   },
   "dependencies": {
+    "@rpg/search": "workspace:*",
     "zod": "^4.4.3"
   },
   "devDependencies": {

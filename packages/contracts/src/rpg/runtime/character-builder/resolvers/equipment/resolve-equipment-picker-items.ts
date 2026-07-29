@@ -9,7 +9,6 @@ import type { EquipmentPickerItem } from '../picker/equipment-picker-item'
 import { isEquipmentPickerSupportedKind } from '../picker/equipment-picker-supported-kinds'
 import type { EquipmentBudgetSummary } from './equipment-budget'
 import { isEquipmentAffordableAtStartingBudget } from './equipment-budget'
-import { buildEquipmentPickerSearchText } from './format-equipment-picker-metadata'
 import { isEquipmentProficient } from './is-equipment-proficient'
 import { resolveEquipmentPurchaseAvailability } from './resolve-equipment-purchase-availability'
 
@@ -39,7 +38,6 @@ export function resolveEquipmentPickerItems({
 
       return {
         equipment: row,
-        searchText: buildEquipmentPickerSearchText(row),
         state: {
           isAvailable: true,
           isRecommended: isRecommendedEquipmentTier(recommendation.tier),

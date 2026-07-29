@@ -1,16 +1,7 @@
-import { normalizeSearchQuery } from '@rpg/ui'
+import { isEmptySearchQuery, normalizeSearchQuery } from '@rpg/search'
+import { chainComparators } from '@rpg/search/ranking'
 
-export function chainComparators<T>(
-  ...fns: Array<(left: T, right: T) => number>
-): (left: T, right: T) => number {
-  return (left, right) => {
-    for (const compare of fns) {
-      const diff = compare(left, right)
-      if (diff !== 0) return diff
-    }
-    return 0
-  }
-}
+export { chainComparators }
 
 export function compareName(
   collator: Intl.Collator,
@@ -36,5 +27,5 @@ export function scoreAndFilterPickerItems<T>(
     searchScore: options.scoreItem(item, options.searchQuery),
   }))
 
-  return normalizedQuery ? scored.filter((row) => row.searchScore > 0) : scored
+  return isEmptySearchQuery(normalizedQuery) ? scored : scored.filter((row) => row.searchScore > 0)
 }

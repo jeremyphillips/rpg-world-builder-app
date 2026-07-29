@@ -111,7 +111,10 @@ describe('EquipmentPickerItemDetails', () => {
   it('shows bundle copy for bundled adventuring gear purchases', () => {
     const arrowsItem = {
       equipment: equipmentPickerArrowsFixture,
-      searchText: 'arrows ammunition',
+      searchDocument: {
+        id: equipmentPickerArrowsFixture.id,
+        fields: [{ key: 'combined', text: 'arrows ammunition', role: 'primary' as const }],
+      },
       state: equipmentPickerItemsFixture[2]!.state,
     }
 
