@@ -48,6 +48,14 @@ export const CONTENT_TYPE_TERMS = {
     description: 'Training with a specific skill in the catalog.',
     sentence: SKILL_PROFICIENCY_SENTENCE,
   },
+  organizations: {
+    label: 'Organization',
+    description: 'A campaign-authored group, institution, faction, or association.',
+    sentence: {
+      singular: 'organization',
+      plural: 'organizations',
+    },
+  },
 } as const satisfies Record<ContentTypeKey, VocabularyTerm>
 
 /** Returns the catalog content-type term for a collection key. */
@@ -75,6 +83,7 @@ export const SPECIES_CONTENT_TYPE_TERM = CONTENT_TYPE_TERMS.species
 export const FEAT_CONTENT_TYPE_TERM = CONTENT_TYPE_TERMS.feats
 export const EQUIPMENT_CONTENT_TYPE_TERM = CONTENT_TYPE_TERMS.equipment
 export const SKILL_PROFICIENCY_CONTENT_TYPE_TERM = CONTENT_TYPE_TERMS['skill-proficiencies']
+export const ORGANIZATION_CONTENT_TYPE_TERM = CONTENT_TYPE_TERMS.organizations
 
 /** Every `ContentTypeKey` has a registered term — drift guard for new catalog types. */
 export const CONTENT_TYPE_TERM_KEYS = CONTENT_TYPE_KEYS

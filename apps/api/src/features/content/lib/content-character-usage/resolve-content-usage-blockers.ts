@@ -1,4 +1,4 @@
-import type { ContentTypeKey, ContentUsageBlocker } from '@rpg/contracts'
+import type { ApiContentTypeKey, ContentUsageBlocker } from '@rpg/contracts'
 
 import { listOpenParticipationsForCampaign } from '../../../campaign'
 import { CharacterModel } from '../../../character'
@@ -16,7 +16,7 @@ type CharacterUsageHit = {
  */
 export async function resolveContentUsageBlockers(
   campaignId: string,
-  contentType: ContentTypeKey,
+  contentType: ApiContentTypeKey,
   contentId: string,
   contentSlug: string,
 ): Promise<ContentUsageBlocker[]> {

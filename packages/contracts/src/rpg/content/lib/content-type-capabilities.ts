@@ -40,6 +40,10 @@ export const CONTENT_TYPE_CAPABILITIES: Record<ContentTypeKey, ContentTypeCapabi
     canDuplicate: true,
     nestedIdRegeneration: noNestedRegenerationRequired,
   },
+  organizations: {
+    canDuplicate: true,
+    nestedIdRegeneration: noNestedRegenerationRequired,
+  },
 }
 
 export function canDuplicateContentType(contentType: ContentTypeKey): boolean {

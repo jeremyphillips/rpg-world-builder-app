@@ -22,6 +22,13 @@ export function contentTypeKeysWithFormDefinition(): ContentTypeKey[] {
     .sort()
 }
 
+export function contentTypeKeysWithApiRegistration(): ContentTypeKey[] {
+  return integrationManifestEntries()
+    .filter(([, entry]) => entry.api)
+    .map(([key]) => key)
+    .sort()
+}
+
 export function contentTypeKeysWithVisibleInSidebar(): ContentTypeKey[] {
   return integrationManifestEntries()
     .filter(([, entry]) => entry.dashboard?.visibleInSidebar === true)

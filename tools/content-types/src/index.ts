@@ -5,6 +5,7 @@ export {
 } from './content-type-integration-manifest'
 export {
   catalogPackageNameToSrcPath,
+  contentTypeKeysWithApiRegistration,
   contentTypeKeysWithCatalogPackage,
   contentTypeKeysWithoutBundledContent,
   contentTypeKeysWithFormDefinition,

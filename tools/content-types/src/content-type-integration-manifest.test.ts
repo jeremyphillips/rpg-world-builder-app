@@ -1,11 +1,12 @@
 import { existsSync } from 'node:fs'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
-import { CONTENT_TYPE_KEYS } from '@rpg/contracts'
+import { API_CONTENT_TYPE_KEYS, CONTENT_TYPE_KEYS } from '@rpg/contracts'
 
 import {
   CONTENT_TYPE_INTEGRATION_MANIFEST,
   catalogPackageNameToSrcPath,
+  contentTypeKeysWithApiRegistration,
   contentTypeKeysWithCatalogPackage,
   contentTypeKeysWithoutBundledContent,
   contentTypeKeysWithFormDefinition,
@@ -27,6 +28,7 @@ describe('CONTENT_TYPE_INTEGRATION_MANIFEST', () => {
 
   it('resolves every declared API registration path', () => {
     for (const [key, entry] of integrationManifestEntries()) {
+      if (!entry.api) continue
       const absolute = join(repoRoot, entry.api.registrationPath)
       expect(
         existsSync(absolute),
@@ -62,23 +64,27 @@ describe('CONTENT_TYPE_INTEGRATION_MANIFEST', () => {
   })
 
   it('only requires packages for entries with bundled content', () => {
-    expect(contentTypeKeysWithoutBundledContent()).toEqual([])
+    expect(contentTypeKeysWithoutBundledContent()).toEqual(['organizations'])
     expect(contentTypeKeysWithCatalogPackage().map(({ key }) => key)).toEqual(
-      [...CONTENT_TYPE_KEYS].sort(),
+      [...API_CONTENT_TYPE_KEYS].sort(),
     )
   })
 
+  it('declares API registrations for every runtime API content type today', () => {
+    expect(contentTypeKeysWithApiRegistration()).toEqual([...API_CONTENT_TYPE_KEYS].sort())
+  })
+
   it('declares form definitions for every type with dashboard authoring today', () => {
-    expect(contentTypeKeysWithFormDefinition()).toEqual([...CONTENT_TYPE_KEYS].sort())
+    expect(contentTypeKeysWithFormDefinition()).toEqual([...API_CONTENT_TYPE_KEYS].sort())
   })
 
   it('declares sidebar visibility for every homebrew-summary type today', () => {
-    expect(contentTypeKeysWithVisibleInSidebar()).toEqual([...CONTENT_TYPE_KEYS].sort())
+    expect(contentTypeKeysWithVisibleInSidebar()).toEqual([...API_CONTENT_TYPE_KEYS].sort())
   })
 
   it('declares route sections for every type with dashboard routes today', () => {
     expect(contentTypeKeysWithRouteSection().map(({ key }) => key)).toEqual(
-      [...CONTENT_TYPE_KEYS].sort(),
+      [...API_CONTENT_TYPE_KEYS].sort(),
     )
   })
 

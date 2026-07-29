@@ -1,11 +1,11 @@
-import { equipmentInventoryUsageMongoOrClauses, type ContentTypeKey } from '@rpg/contracts'
+import { equipmentInventoryUsageMongoOrClauses, type ApiContentTypeKey } from '@rpg/contracts'
 
 /**
  * Returns a Mongo filter fragment merged into campaign participant character queries.
  * Skill proficiencies match on slug — characters store skill slugs, not envelope ids.
  */
 export function getContentCharacterUsageMatcher(
-  contentType: ContentTypeKey,
+  contentType: ApiContentTypeKey,
   contentId: string,
   contentSlug: string,
 ): Record<string, unknown> {

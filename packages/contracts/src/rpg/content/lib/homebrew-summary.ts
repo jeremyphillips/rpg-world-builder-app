@@ -1,9 +1,16 @@
 import { z } from 'zod'
 
-import { CONTENT_TYPE_KEYS } from './content-type-keys'
+import type { ContentTypeKey } from './content-type-keys'
 
 /** Visible-sidebar content types summarized on the Homebrew hub. */
-export const HOMEBREW_SUMMARY_CONTENT_TYPE_KEYS = [...CONTENT_TYPE_KEYS] as const
+export const HOMEBREW_SUMMARY_CONTENT_TYPE_KEYS = [
+  'classes',
+  'spells',
+  'species',
+  'feats',
+  'equipment',
+  'skill-proficiencies',
+] as const satisfies readonly ContentTypeKey[]
 
 export const homebrewSummaryContentTypeSchema = z.enum(HOMEBREW_SUMMARY_CONTENT_TYPE_KEYS)
 

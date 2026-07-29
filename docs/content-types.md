@@ -358,8 +358,10 @@ See [`tools/content-types/README.md`](../tools/content-types/README.md).
 
 When adding a type: extend `CONTENT_TYPE_KEYS` and terms in contracts, add a
 manifest entry (`satisfies Record<ContentTypeKey, …>` enforces completeness),
-then wire catalog, API, and dashboard layers. Per-layer drift tests fail when
-any surface drifts.
+then wire catalog, API, and dashboard layers. API and dashboard metadata are
+declared when those integrations exist, so contracts-first phases do not need
+placeholder files. Per-layer drift tests remain strict for every declared
+surface.
 
 ---
 

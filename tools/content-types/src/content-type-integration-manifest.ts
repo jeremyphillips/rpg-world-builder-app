@@ -16,8 +16,8 @@ export type ContentTypeIntegrationManifestEntry = {
     | {
         bundledContent: 'none'
       }
-  /** Always required for registered top-level types. */
-  api: {
+  /** Present once this contract type is wired into the API runtime registry. */
+  api?: {
     registrationPath: string
   }
   /** Present when a dashboard sub-area exists. */
@@ -122,6 +122,10 @@ export const CONTENT_TYPE_INTEGRATION_MANIFEST = {
         'apps/dashboard/src/features/content/skill-proficiencies/lib/skill-proficiency-form-def.ts',
       visibleInSidebar: true,
     },
+    capabilities: { required: true },
+  },
+  organizations: {
+    catalog: { bundledContent: 'none' },
     capabilities: { required: true },
   },
 } satisfies Record<ContentTypeKey, ContentTypeIntegrationManifestEntry>

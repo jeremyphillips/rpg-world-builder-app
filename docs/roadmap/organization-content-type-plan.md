@@ -1,6 +1,6 @@
 # Organization Content Type and Character Connections Plan
 
-Status: Phase 1 complete; Phases 2–8 proposed
+Status: Phases 1–2 complete; Phases 3–8 proposed
 
 Scope: top-level `organizations` content type plus character connections
 
@@ -262,12 +262,13 @@ must not reuse or overload publish state. Do not add that domain status in V1.
 7. Prove with tests that no-bundle content needs no catalog export and that
    source suppression does not alter persisted provenance or lifecycle actions.
 
-### 2. Add organization vocabulary and content contracts
+### 2. Add organization vocabulary and content contracts — complete
 
 1. Add organization-kind vocabulary and tests under
    `packages/contracts/src/rpg/vocab/`.
-2. Add `organizations` to content type keys, terms, capabilities, homebrew
-   summary coverage, and public barrels.
+2. Add `organizations` to content type keys, terms, capabilities, and public
+   barrels. Keep API and Homebrew-summary key sets capability-specific until
+   their runtime integrations land.
 3. Add `ORGANIZATION_CONTENT_TYPE_TERM`.
 4. Create `packages/contracts/src/rpg/content/organization.ts` with:
    - publish and draft body schemas;
@@ -276,11 +277,14 @@ must not reuse or overload publish state. Do not add that domain status in V1.
    - patch envelope only if shared public contract completeness requires it,
      while API system patching remains unsupported;
    - co-located parsing and vocabulary tests.
-5. Register organizations in the integration manifest with:
+5. Register organizations in the integration manifest with the capabilities
+   implemented in this phase:
    - `catalog: { bundledContent: 'none' }`;
-   - API registration path;
-   - dashboard folder, route section, form path, and sidebar visibility;
    - duplication capability.
+
+   API metadata is added in Phase 3; dashboard route, form, and sidebar metadata
+   is added in Phase 4. Drift checks remain strict for every declared
+   capability, avoiding placeholder files between phases.
 
 ### 3. Add API persistence and lifecycle behavior
 
@@ -290,7 +294,9 @@ must not reuse or overload publish state. Do not add that domain status in V1.
    - no seed loader and no system patch model.
 2. Persist `organizationKind` using `ORGANIZATION_KIND_IDS` and the shared
    campaign/slug identity fields.
-3. Register organizations in `content-types.ts`.
+3. Register organizations in `content-types.ts`, add `organizations` to
+   `API_CONTENT_TYPE_KEYS`, and declare the API registration path in the
+   integration manifest.
 4. Exercise generic campaign list, draft/publish, create/update, duplication,
    availability, and delete routes.
 5. Add organization usage matching:
@@ -326,8 +332,10 @@ vocabulary-aware overview template.
    - sortable Organization kind column;
    - Organization kind equals filter;
    - no Homebrew source badge/filter under the presentation policy.
-5. Wire content routes, lazy routes, router tree, content exports, sidebar/Homebrew
-   registry, and the test-only content form registry.
+5. Wire content routes, lazy routes, router tree, content exports,
+   sidebar/Homebrew registry, `HOMEBREW_SUMMARY_CONTENT_TYPE_KEYS`, and the
+   test-only content form registry. Add the implemented dashboard metadata to
+   the integration manifest.
 6. Add CSF3 stories, interaction tests, and axe checks for new visual and
    interactive surfaces.
 

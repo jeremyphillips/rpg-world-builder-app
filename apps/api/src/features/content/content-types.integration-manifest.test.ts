@@ -1,12 +1,15 @@
 import { describe, expect, it } from 'vitest'
 import { API_CONTENT_TYPE_KEYS } from '@rpg/contracts'
-import { CONTENT_TYPE_INTEGRATION_MANIFEST, integrationManifestEntries } from '@rpg/content-types'
+import {
+  CONTENT_TYPE_INTEGRATION_MANIFEST,
+  contentTypeKeysWithApiRegistration,
+} from '@rpg/content-types'
 
 import { isContentWriteType } from './content-types'
 
 describe('content-types integration manifest (API layer)', () => {
   it('registers every manifest content type in the API registry', () => {
-    for (const [key] of integrationManifestEntries()) {
+    for (const key of contentTypeKeysWithApiRegistration()) {
       expect(isContentWriteType(key), `API registry missing ${key}`).toBe(true)
     }
   })

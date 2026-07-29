@@ -12,7 +12,7 @@ patterns, and vocab rules → [`docs/content-types.md`](../../../docs/content-ty
 
 | Step | Layer     | Deliverable                                                                                                                                               |
 | ---- | --------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 0    | Tooling   | Entry in `CONTENT_TYPE_INTEGRATION_MANIFEST`                                                                                                              |
+| 0    | Tooling   | Entry in `CONTENT_TYPE_INTEGRATION_MANIFEST`; add API/dashboard capability metadata with the implementing phase                                           |
 | 1    | Contracts | `<type>.ts` schema, inputs, patch DTOs, tests, barrel export                                                                                              |
 | 1b   | Contracts | `CONTENT_TYPE_TERMS` entry; vocab maps if closed sets                                                                                                     |
 | 1c   | Contracts | `CONTENT_TYPE_CAPABILITIES` when duplication applies                                                                                                      |
@@ -100,7 +100,7 @@ type ContentTypeIntegrationManifestEntry = {
   catalog:
     | { bundledContent: 'bundled'; packageName: string } // @rpg/catalog/<segment>
     | { bundledContent: 'none' }
-  api: { registrationPath: string } // repo-relative *.config.ts
+  api?: { registrationPath: string } // present once registered in API runtime
   dashboard?: {
     folder: string // content feature subfolder
     routeSection?: string // CONTENT_ROUTES key (camelCase)

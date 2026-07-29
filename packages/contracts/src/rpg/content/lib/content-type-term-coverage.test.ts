@@ -46,5 +46,6 @@ describe('content type terms', () => {
     expect(getContentTypeSentenceForm('classes', 2)).toBe('classes')
     expect(getContentTypeCapitalizedSentenceLabel('classes')).toBe('Class')
     expect(getContentTypeCapitalizedSentenceLabel('classes', { plural: true })).toBe('Classes')
+    expect(getContentTypeSentenceForm('organizations', 2)).toBe('organizations')
   })
 })

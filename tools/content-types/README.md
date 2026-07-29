@@ -32,11 +32,18 @@ catalog: { bundledContent: 'none' }
 normal records are campaign-authored do not need fake empty seed packages;
 catalog export and path drift checks skip `bundledContent: 'none'`.
 
+## Incremental integration metadata
+
+API and dashboard metadata are capability declarations: add each field when
+that integration exists. Drift tests require every declared path or registry
+entry, while a contracts-first content type may omit integrations owned by a
+later implementation phase.
+
 ## Nested resources
 
-The manifest covers registered top-level `ContentTypeKey` values only. Nested
-resources such as **subclasses** stay outside until a separate nested-resource
-manifest exists.
+The manifest covers top-level `ContentTypeKey` values only. Nested resources
+such as **subclasses** stay outside until a separate nested-resource manifest
+exists.
 
 ## Drift-test ownership
 
