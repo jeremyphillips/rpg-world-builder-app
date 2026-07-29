@@ -1,6 +1,7 @@
 import { ROUTES } from '@/app/routes'
 
-import { compactSidebarSections, type SidebarNavSection } from './sidebar-nav-model'
+import { buildAdminSidebarItems } from './build-admin-sidebar-items'
+import { compactSidebarSections, type StaticSidebarNavSection } from './sidebar-nav-model'
 
 export type BuildGlobalSidebarSectionsInput = {
   isElevatedPlatformRole: boolean
@@ -9,8 +10,8 @@ export type BuildGlobalSidebarSectionsInput = {
 /** Pure global workspace sidebar sections for the AppShell. */
 export function buildGlobalSidebarSections(
   input: BuildGlobalSidebarSectionsInput,
-): SidebarNavSection[] {
-  const sections: SidebarNavSection[] = [
+): StaticSidebarNavSection[] {
+  const sections: StaticSidebarNavSection[] = [
     {
       id: 'main',
       label: 'Main',
@@ -34,10 +35,7 @@ export function buildGlobalSidebarSections(
       id: 'admin',
       label: 'Admin',
       collapsible: false,
-      items: [
-        { id: 'admin-users', label: 'Users', href: ROUTES.admin.users },
-        { id: 'admin-settings', label: 'Admin Settings', href: ROUTES.admin.settings },
-      ],
+      items: buildAdminSidebarItems(),
     })
   }
 

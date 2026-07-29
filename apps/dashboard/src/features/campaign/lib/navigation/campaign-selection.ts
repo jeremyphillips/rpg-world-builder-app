@@ -3,42 +3,19 @@
  * `@rpg/contracts` (`resolveLandingCampaignId`, `resolveActiveCampaignSummary`).
  */
 
-import { resolveLandingCampaignId } from '@rpg/contracts'
 import type { CampaignListItem } from '@rpg/contracts'
 
 import { ROUTES } from '@/app/routes'
 
 import { isCampaignMembershipOnboardingIncomplete } from '../campaign-membership-onboarding'
+import { resolvePreferredCampaignId } from './resolve-preferred-campaign-id'
 
 export { resolveActiveCampaignSummary, resolveLandingCampaignId } from '@rpg/contracts'
+export { resolvePreferredCampaignId } from './resolve-preferred-campaign-id'
 
 /** Just the campaign-selection preference fields read during resolution. */
 interface CampaignPreference {
   lastSelectedCampaignId?: string | null
-}
-
-/** Minimal shape needed to validate a campaign id; satisfied by `Campaign`. */
-interface CampaignIdentity {
-  id: string
-}
-
-/**
- * Resolve the path a returning user should land on: their stored choice, then
- * their server preference, then the sole campaign if they have exactly one.
- * Returns null when nothing valid resolves (the caller shows the picker).
- */
-export function resolveLandingPath(
-  campaigns: readonly CampaignIdentity[],
-  user: CampaignPreference | null | undefined,
-  storedId: string | null,
-): string | null {
-  const candidates = [
-    storedId,
-    user?.lastSelectedCampaignId,
-    campaigns.length === 1 ? campaigns[0]?.id : undefined,
-  ]
-  const id = resolveLandingCampaignId(campaigns, candidates)
-  return id ? ROUTES.campaign.detail(id) : null
 }
 
 /**
@@ -50,12 +27,7 @@ export function resolveContinueCampaign(
   user: CampaignPreference | null | undefined,
   storedId: string | null,
 ): CampaignListItem | null {
-  const candidates = [
-    storedId,
-    user?.lastSelectedCampaignId,
-    campaigns.length === 1 ? campaigns[0]?.id : undefined,
-  ]
-  const id = resolveLandingCampaignId(campaigns, candidates)
+  const id = resolvePreferredCampaignId(campaigns, user, storedId)
   if (!id) return null
 
   const campaign = campaigns.find((item) => item.id === id)

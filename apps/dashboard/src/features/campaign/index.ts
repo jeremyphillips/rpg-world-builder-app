@@ -54,7 +54,7 @@ export { useCampaignRules } from './hooks/use-campaign-rules'
 export { useCampaigns, campaignsQueryKey } from './hooks/use-campaigns'
 export { useCampaignTemplates, campaignTemplatesQueryKey } from './hooks/use-campaign-templates'
 export { useActiveCampaignId } from './hooks/use-active-campaign-id'
-export { useOpenCampaign, useSwitchCampaign, useSelectCampaign } from './hooks/use-select-campaign'
+export { useOpenCampaign, useSwitchCampaign } from './hooks/use-select-campaign'
 export { useSyncActiveCampaign } from './hooks/use-sync-active-campaign'
 export { useCanManageCampaign } from './hooks/use-can-manage-campaign'
 export { useUpdateCampaign } from './hooks/use-update-campaign'
@@ -64,7 +64,7 @@ export {
   resolveActiveCampaignSummary,
   resolveLandingCampaignId,
   resolveContinueCampaign,
-  resolveLandingPath,
+  resolvePreferredCampaignId,
   resolveTargetPathOnSwitch,
 } from './lib/navigation/campaign-selection'
 export { resolveActiveCampaignId } from './lib/navigation/resolve-active-campaign-id'

@@ -3,10 +3,11 @@ import type { CampaignCharacterNavModel } from '@/features/campaign'
 import { isCampaignCharactersNavActive } from '@/features/campaign'
 import { findVisibleSidebarContent, VISIBLE_SIDEBAR_CONTENT } from '@/features/homebrew'
 
+import { buildAdminSidebarItems } from './build-admin-sidebar-items'
 import {
   compactSidebarSections,
+  type CollapsibleSidebarNavSection,
   type SidebarNavItem,
-  type SidebarNavSection,
 } from './sidebar-nav-model'
 
 const GAME_LIBRARY_CONTENT = VISIBLE_SIDEBAR_CONTENT.filter(
@@ -87,10 +88,10 @@ function buildGameLibrarySectionItems(campaignId: string): SidebarNavItem[] {
 /** Pure campaign workspace sidebar sections for `CampaignLayoutRoute`. */
 export function buildCampaignSidebarSections(
   input: BuildCampaignSidebarSectionsInput,
-): SidebarNavSection[] {
+): CollapsibleSidebarNavSection[] {
   const { campaignId, canManageCampaign, isElevatedPlatformRole, characterNav } = input
 
-  const sections: SidebarNavSection[] = [
+  const sections: CollapsibleSidebarNavSection[] = [
     {
       id: 'campaign',
       label: 'Campaign',
@@ -131,10 +132,7 @@ export function buildCampaignSidebarSections(
       id: 'admin',
       label: 'Admin',
       collapsible: true,
-      items: [
-        { id: 'admin-users', label: 'Users', href: ROUTES.admin.users },
-        { id: 'admin-settings', label: 'Admin Settings', href: ROUTES.admin.settings },
-      ],
+      items: buildAdminSidebarItems(),
     })
   }
 

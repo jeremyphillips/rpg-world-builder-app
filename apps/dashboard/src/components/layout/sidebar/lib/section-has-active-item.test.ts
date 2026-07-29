@@ -2,12 +2,13 @@ import { describe, expect, it } from 'vitest'
 
 import { ROUTES } from '@/app/routes'
 
-import { isSidebarNavItemActive, sectionHasActiveItem } from './section-has-active-item'
-import type { SidebarNavSection } from './sidebar-nav-model'
+import { matchSidebarNavHref } from './match-sidebar-nav-href'
+import { sectionHasActiveItem } from './section-has-active-item'
+import type { CollapsibleSidebarNavSection } from './sidebar-nav-model'
 
 const campaignId = 'camp_1'
 
-describe('isSidebarNavItemActive', () => {
+describe('matchSidebarNavHref', () => {
   it('uses end matching for index routes', () => {
     const item = {
       id: 'overview',
@@ -16,8 +17,8 @@ describe('isSidebarNavItemActive', () => {
       end: true,
     }
 
-    expect(isSidebarNavItemActive(`/campaigns/${campaignId}`, item)).toBe(true)
-    expect(isSidebarNavItemActive(`/campaigns/${campaignId}/sessions`, item)).toBe(false)
+    expect(matchSidebarNavHref(`/campaigns/${campaignId}`, item)).toBe(true)
+    expect(matchSidebarNavHref(`/campaigns/${campaignId}/sessions`, item)).toBe(false)
   })
 
   it('uses prefix matching for section routes', () => {
@@ -27,9 +28,9 @@ describe('isSidebarNavItemActive', () => {
       href: ROUTES.content.spells.overview(campaignId),
     }
 
-    expect(isSidebarNavItemActive(`/campaigns/${campaignId}/spells`, item)).toBe(true)
-    expect(isSidebarNavItemActive(`/campaigns/${campaignId}/spells/fireball`, item)).toBe(true)
-    expect(isSidebarNavItemActive(`/campaigns/${campaignId}/feats`, item)).toBe(false)
+    expect(matchSidebarNavHref(`/campaigns/${campaignId}/spells`, item)).toBe(true)
+    expect(matchSidebarNavHref(`/campaigns/${campaignId}/spells/fireball`, item)).toBe(true)
+    expect(matchSidebarNavHref(`/campaigns/${campaignId}/feats`, item)).toBe(false)
   })
 
   it('delegates to custom matchers', () => {
@@ -40,12 +41,12 @@ describe('isSidebarNavItemActive', () => {
       isActive: (pathname: string) => pathname.includes('/characters'),
     }
 
-    expect(isSidebarNavItemActive(`/campaigns/${campaignId}/characters/abc`, item)).toBe(true)
+    expect(matchSidebarNavHref(`/campaigns/${campaignId}/characters/abc`, item)).toBe(true)
   })
 })
 
 describe('sectionHasActiveItem', () => {
-  const section: SidebarNavSection = {
+  const section: CollapsibleSidebarNavSection = {
     id: 'gameLibrary',
     label: 'Game Library',
     collapsible: true,

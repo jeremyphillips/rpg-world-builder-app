@@ -4,9 +4,9 @@ import type { CampaignListItem } from '@rpg/contracts'
 import {
   getCampaignSwitcherLabel,
   resolveContinueCampaign,
-  resolveLandingPath,
   resolveTargetPathOnSwitch,
 } from './campaign-selection'
+import { resolvePreferredCampaignId } from './resolve-preferred-campaign-id'
 
 const campaigns = [{ id: 'a' }, { id: 'b' }, { id: 'c' }]
 
@@ -16,27 +16,27 @@ const campaignListItems = [
   { id: 'c', viewerOnboardingState: 'incomplete', identity: { name: 'C' } },
 ] as CampaignListItem[]
 
-describe('resolveLandingPath', () => {
+describe('resolvePreferredCampaignId', () => {
   it('prefers the stored id over the server preference', () => {
-    expect(resolveLandingPath(campaigns, { lastSelectedCampaignId: 'a' }, 'b')).toBe('/campaigns/b')
+    expect(resolvePreferredCampaignId(campaigns, { lastSelectedCampaignId: 'a' }, 'b')).toBe('b')
   })
 
   it('falls back to the server preference when nothing is stored', () => {
-    expect(resolveLandingPath(campaigns, { lastSelectedCampaignId: 'c' }, null)).toBe(
-      '/campaigns/c',
-    )
+    expect(resolvePreferredCampaignId(campaigns, { lastSelectedCampaignId: 'c' }, null)).toBe('c')
   })
 
   it('defaults to the only campaign when the user has exactly one', () => {
-    expect(resolveLandingPath([{ id: 'solo' }], null, null)).toBe('/campaigns/solo')
+    expect(resolvePreferredCampaignId([{ id: 'solo' }], null, null)).toBe('solo')
   })
 
   it('returns null when multiple campaigns and no valid preference', () => {
-    expect(resolveLandingPath(campaigns, { lastSelectedCampaignId: null }, null)).toBeNull()
+    expect(resolvePreferredCampaignId(campaigns, { lastSelectedCampaignId: null }, null)).toBeNull()
   })
 
   it('ignores a stored/preferred id that is no longer a campaign', () => {
-    expect(resolveLandingPath(campaigns, { lastSelectedCampaignId: 'gone' }, 'stale')).toBeNull()
+    expect(
+      resolvePreferredCampaignId(campaigns, { lastSelectedCampaignId: 'gone' }, 'stale'),
+    ).toBeNull()
   })
 })
 

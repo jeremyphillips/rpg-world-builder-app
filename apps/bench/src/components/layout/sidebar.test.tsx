@@ -3,20 +3,25 @@ import { render, screen } from '@testing-library/react'
 import { expectNoAxeViolations } from '@rpg/ui/test-utils'
 import { MemoryRouter } from 'react-router-dom'
 
-import { BENCH_NAV_ITEMS } from '@/app/routes'
-
+import { buildBenchSidebarSections } from './lib/build-bench-sidebar-sections'
 import { Sidebar } from './sidebar'
 
 describe('Sidebar', () => {
-  it('renders primary navigation links', () => {
+  it('renders primary navigation links grouped by section', () => {
     render(
       <MemoryRouter>
         <Sidebar />
       </MemoryRouter>,
     )
 
-    for (const { label } of BENCH_NAV_ITEMS) {
-      expect(screen.getByRole('link', { name: label })).toBeInTheDocument()
+    const sections = buildBenchSidebarSections()
+    expect(screen.getAllByText('Work')).toHaveLength(1)
+    expect(screen.getAllByText('Settings')).toHaveLength(2)
+
+    for (const section of sections) {
+      for (const { label } of section.items) {
+        expect(screen.getByRole('link', { name: label })).toBeInTheDocument()
+      }
     }
   })
 

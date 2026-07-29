@@ -66,10 +66,3 @@ export function useSwitchCampaign() {
     [currentCampaignId, navigate, pathname, persistSelection],
   )
 }
-
-/**
- * @deprecated Prefer `useOpenCampaign` or `useSwitchCampaign` for explicit intent.
- */
-export function useSelectCampaign() {
-  return useOpenCampaign()
-}

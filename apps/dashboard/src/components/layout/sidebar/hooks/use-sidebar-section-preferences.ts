@@ -1,12 +1,8 @@
 import { useCallback, useState } from 'react'
 
 import { sectionHasActiveItem } from '../lib/section-has-active-item'
-import {
-  resolveStoredSectionExpanded,
-  sidebarPreferencesStore,
-  type SidebarPreferences,
-} from '../lib/sidebar-preferences'
-import type { CollapsibleSidebarSectionId, SidebarNavSection } from '../lib/sidebar-nav-model'
+import { sidebarPreferencesStore, type SidebarPreferences } from '../lib/sidebar-preferences'
+import type { CollapsibleSidebarNavSection } from '../lib/sidebar-nav-model'
 
 export function useSidebarSectionPreferences() {
   const [preferences, setPreferences] = useState<SidebarPreferences>(() =>
@@ -14,7 +10,7 @@ export function useSidebarSectionPreferences() {
   )
 
   const setSectionExpanded = useCallback(
-    (sectionId: CollapsibleSidebarSectionId, expanded: boolean) => {
+    (sectionId: CollapsibleSidebarNavSection['id'], expanded: boolean) => {
       setPreferences((current) => {
         const next: SidebarPreferences = {
           ...current,
@@ -30,21 +26,15 @@ export function useSidebarSectionPreferences() {
     [],
   )
 
-  const getEffectiveExpanded = useCallback(
-    (section: SidebarNavSection, pathname: string) => {
-      if (!section.collapsible) {
-        return true
-      }
-
-      const storedExpanded = resolveStoredSectionExpanded(
-        preferences.expandedSections,
-        section.id as CollapsibleSidebarSectionId,
-      )
-
-      return sectionHasActiveItem(pathname, section) || storedExpanded
+  const getSectionExpanded = useCallback(
+    (section: CollapsibleSidebarNavSection, pathname: string) => {
+      const storedCollapsed = preferences.expandedSections[section.id] === false
+      const isForcedOpen = sectionHasActiveItem(pathname, section)
+      const isExpanded = isForcedOpen || !storedCollapsed
+      return isExpanded
     },
     [preferences.expandedSections],
   )
 
-  return { getEffectiveExpanded, setSectionExpanded }
+  return { getSectionExpanded, setSectionExpanded }
 }

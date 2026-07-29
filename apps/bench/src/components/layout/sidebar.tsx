@@ -1,8 +1,6 @@
-import { NavLink } from 'react-router-dom'
+import { Heading } from '@rpg/ui'
 
-import { cn, Heading } from '@rpg/ui'
-
-import { BENCH_NAV_ITEMS } from '@/app/routes'
+import { BenchSidebarNav } from './bench-sidebar-nav'
 
 export function Sidebar() {
   return (
@@ -12,25 +10,7 @@ export function Sidebar() {
           Dev Bench
         </Heading>
       </div>
-      <nav aria-label="Dev Bench" className="flex flex-col gap-1 px-3 pb-6">
-        {BENCH_NAV_ITEMS.map(({ to, label, end }) => (
-          <NavLink
-            key={to}
-            to={to}
-            end={end}
-            className={({ isActive }) =>
-              cn(
-                'rounded-md px-3 py-2 text-sm font-medium transition-colors',
-                isActive
-                  ? 'bg-accent text-accent-foreground'
-                  : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground',
-              )
-            }
-          >
-            {label}
-          </NavLink>
-        ))}
-      </nav>
+      <BenchSidebarNav />
     </aside>
   )
 }
