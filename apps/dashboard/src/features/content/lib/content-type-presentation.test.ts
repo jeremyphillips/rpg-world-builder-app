@@ -1,4 +1,4 @@
-import { API_CONTENT_TYPE_KEYS, CONTENT_TYPE_KEYS } from '@rpg/contracts'
+import { CONTENT_TYPE_KEYS } from '@rpg/contracts'
 import { describe, expect, it } from 'vitest'
 
 import { CONTENT_TYPE_PRESENTATION, shouldPresentContentSource } from './content-type-presentation'
@@ -9,7 +9,9 @@ describe('content type presentation policy', () => {
   })
 
   it('retains source presentation for existing bundled content types', () => {
-    for (const contentType of API_CONTENT_TYPE_KEYS) {
+    for (const contentType of CONTENT_TYPE_KEYS.filter(
+      (registeredType) => registeredType !== 'organizations',
+    )) {
       expect(shouldPresentContentSource(contentType)).toBe(true)
     }
   })

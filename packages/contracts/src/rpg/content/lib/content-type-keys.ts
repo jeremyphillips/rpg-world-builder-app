@@ -25,6 +25,7 @@ export const API_CONTENT_TYPE_KEYS = [
   'feats',
   'equipment',
   'skill-proficiencies',
+  'organizations',
 ] as const satisfies readonly ContentTypeKey[]
 
 export type ApiContentTypeKey = (typeof API_CONTENT_TYPE_KEYS)[number]

@@ -1,7 +1,11 @@
 import { existsSync } from 'node:fs'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
-import { API_CONTENT_TYPE_KEYS, CONTENT_TYPE_KEYS } from '@rpg/contracts'
+import {
+  API_CONTENT_TYPE_KEYS,
+  CONTENT_TYPE_KEYS,
+  HOMEBREW_SUMMARY_CONTENT_TYPE_KEYS,
+} from '@rpg/contracts'
 
 import {
   CONTENT_TYPE_INTEGRATION_MANIFEST,
@@ -66,7 +70,9 @@ describe('CONTENT_TYPE_INTEGRATION_MANIFEST', () => {
   it('only requires packages for entries with bundled content', () => {
     expect(contentTypeKeysWithoutBundledContent()).toEqual(['organizations'])
     expect(contentTypeKeysWithCatalogPackage().map(({ key }) => key)).toEqual(
-      [...API_CONTENT_TYPE_KEYS].sort(),
+      CONTENT_TYPE_KEYS.filter(
+        (key) => CONTENT_TYPE_INTEGRATION_MANIFEST[key].catalog.bundledContent === 'bundled',
+      ).sort(),
     )
   })
 
@@ -75,16 +81,20 @@ describe('CONTENT_TYPE_INTEGRATION_MANIFEST', () => {
   })
 
   it('declares form definitions for every type with dashboard authoring today', () => {
-    expect(contentTypeKeysWithFormDefinition()).toEqual([...API_CONTENT_TYPE_KEYS].sort())
+    expect(contentTypeKeysWithFormDefinition()).toEqual(
+      [...HOMEBREW_SUMMARY_CONTENT_TYPE_KEYS].sort(),
+    )
   })
 
   it('declares sidebar visibility for every homebrew-summary type today', () => {
-    expect(contentTypeKeysWithVisibleInSidebar()).toEqual([...API_CONTENT_TYPE_KEYS].sort())
+    expect(contentTypeKeysWithVisibleInSidebar()).toEqual(
+      [...HOMEBREW_SUMMARY_CONTENT_TYPE_KEYS].sort(),
+    )
   })
 
   it('declares route sections for every type with dashboard routes today', () => {
     expect(contentTypeKeysWithRouteSection().map(({ key }) => key)).toEqual(
-      [...API_CONTENT_TYPE_KEYS].sort(),
+      [...HOMEBREW_SUMMARY_CONTENT_TYPE_KEYS].sort(),
     )
   })
 

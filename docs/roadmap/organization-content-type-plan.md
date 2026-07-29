@@ -1,6 +1,6 @@
 # Organization Content Type and Character Connections Plan
 
-Status: Phases 1–2 complete; Phases 3–8 proposed
+Status: Phases 1–3 complete; Phases 4–8 proposed
 
 Scope: top-level `organizations` content type plus character connections
 
@@ -286,7 +286,7 @@ must not reuse or overload publish state. Do not add that domain status in V1.
    is added in Phase 4. Drift checks remain strict for every declared
    capability, avoiding placeholder files between phases.
 
-### 3. Add API persistence and lifecycle behavior
+### 3. Add API persistence and lifecycle behavior — complete
 
 1. Add `apps/api/src/features/content/organizations/` with:
    - `homebrew-organization.model.ts`;

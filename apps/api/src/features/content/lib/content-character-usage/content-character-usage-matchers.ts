@@ -22,6 +22,8 @@ export function getContentCharacterUsageMatcher(
       return {
         $or: equipmentInventoryUsageMongoOrClauses(contentId),
       }
+    case 'organizations':
+      return { 'connections.organizations.organizationId': contentId }
     case 'skill-proficiencies':
       return { 'proficiencies.skills.skill': contentSlug }
     default: {

@@ -126,6 +126,9 @@ export const CONTENT_TYPE_INTEGRATION_MANIFEST = {
   },
   organizations: {
     catalog: { bundledContent: 'none' },
+    api: {
+      registrationPath: 'apps/api/src/features/content/organizations/organizations.config.ts',
+    },
     capabilities: { required: true },
   },
 } satisfies Record<ContentTypeKey, ContentTypeIntegrationManifestEntry>
