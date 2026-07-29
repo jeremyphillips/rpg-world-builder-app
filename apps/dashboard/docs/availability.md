@@ -43,6 +43,19 @@ field:
 
 See `apps/api/docs/campaign-invites.md` and `campaign-overview.service.ts`.
 
+### Viewer onboarding (campaign list / switcher)
+
+`GET /api/campaigns` includes `viewerOnboardingState` on each
+`CampaignListItem` — a three-value server projection for the **current viewer**:
+
+- `incomplete` — PC with no open control and no open participation (onboarding path)
+- `complete` — PC with open controlled character(s), or staff/observer roles
+- `invalid` — stale control without matching open participation
+
+Dashboard nav, layout alerts, and the campaign picker use
+`viewerOnboardingState === 'incomplete'` — not the overview member labels above.
+See [Character sheet routing](./character-sheet-routing.md).
+
 ### Settings (`campaign-settings-registry.ts`)
 
 Maps `CampaignSettingId` → rules-config location, built on the routes SSOT:

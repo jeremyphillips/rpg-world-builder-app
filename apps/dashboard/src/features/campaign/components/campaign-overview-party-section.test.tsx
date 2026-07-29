@@ -14,7 +14,7 @@ describe('CampaignOverviewPartySection', () => {
       <MemoryRouter>
         <CampaignOverviewPartySection
           campaignId="camp_1"
-          viewerControlledCharacterIds={[]}
+          openControlledCharacterIds={[]}
           party={[
             {
               character: {
@@ -48,7 +48,7 @@ describe('CampaignOverviewPartySection', () => {
       <MemoryRouter>
         <CampaignOverviewPartySection
           campaignId="camp_1"
-          viewerControlledCharacterIds={['char_1']}
+          openControlledCharacterIds={['char_1']}
           party={[
             {
               character: {
@@ -76,7 +76,7 @@ describe('CampaignOverviewPartySection', () => {
       <MemoryRouter>
         <CampaignOverviewPartySection
           campaignId="camp_1"
-          viewerControlledCharacterIds={[]}
+          openControlledCharacterIds={[]}
           party={[
             {
               character: {
@@ -102,7 +102,7 @@ describe('CampaignOverviewPartySection', () => {
       <MemoryRouter>
         <CampaignOverviewPartySection
           campaignId="camp_1"
-          viewerControlledCharacterIds={[]}
+          openControlledCharacterIds={[]}
           party={[]}
         />
       </MemoryRouter>,

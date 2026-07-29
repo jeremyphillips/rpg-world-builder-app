@@ -1,7 +1,7 @@
 import type { CampaignListItem } from '@rpg/contracts'
 
 export function isCampaignMembershipOnboardingIncomplete(
-  campaign: Pick<CampaignListItem, 'campaignRole' | 'openControlledCharacterIds'>,
+  campaign: Pick<CampaignListItem, 'viewerOnboardingState'>,
 ): boolean {
-  return campaign.campaignRole === 'pc' && campaign.openControlledCharacterIds.length === 0
+  return campaign.viewerOnboardingState === 'incomplete'
 }

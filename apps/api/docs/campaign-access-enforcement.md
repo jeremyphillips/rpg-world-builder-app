@@ -49,7 +49,9 @@ API list handlers build a viewer from `req.campaignMembership` via
 
 `pcCharacterIds` is `controlledCharacterIds` filtered to characters with an open
 participation in the route's campaign. Control without participation does not grant
-viewer access.
+viewer access. The same resolved ids are passed to campaign character list/detail
+handlers and organization-reference reads on the character — not raw
+`controlledCharacterIds`.
 
 `specific_players` grants match when **any** viewer `characterId` is listed in
 `participantIds`. Stale-id resolution uses campaign-wide open participation ids via

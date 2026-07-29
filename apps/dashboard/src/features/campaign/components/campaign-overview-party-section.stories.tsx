@@ -14,7 +14,7 @@ type Story = StoryObj<typeof CampaignOverviewPartySection>
 export const Empty: Story = {
   args: {
     campaignId: 'camp_1',
-    viewerControlledCharacterIds: [],
+    openControlledCharacterIds: [],
     party: [],
   },
 }
@@ -22,7 +22,7 @@ export const Empty: Story = {
 export const WithPartyPc: Story = {
   args: {
     campaignId: 'camp_1',
-    viewerControlledCharacterIds: [],
+    openControlledCharacterIds: [],
     party: [
       {
         character: {
@@ -44,7 +44,7 @@ export const WithPartyPc: Story = {
 export const PlayedByYou: Story = {
   args: {
     campaignId: 'camp_1',
-    viewerControlledCharacterIds: ['char_1'],
+    openControlledCharacterIds: ['char_1'],
     party: [
       {
         character: {
@@ -66,7 +66,7 @@ export const PlayedByYou: Story = {
 export const Unassigned: Story = {
   args: {
     campaignId: 'camp_1',
-    viewerControlledCharacterIds: [],
+    openControlledCharacterIds: [],
     party: [
       {
         character: {

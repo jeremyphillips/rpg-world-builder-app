@@ -17,6 +17,7 @@ describe('CampaignPicker', () => {
             identity: { name: 'Incomplete Campaign' },
             campaignRole: 'pc',
             controlledCharacterIds: [],
+            viewerOnboardingState: 'incomplete',
           }),
         ]}
         onSelect={() => undefined}

@@ -22,7 +22,7 @@ export async function listCharacterOrganizationReferences(
     characterId,
     viewerUserId: req.user!.id,
     viewerRole: membership.campaignRole,
-    viewerControlledCharacterIds: membership.controlledCharacterIds,
+    viewerControlledCharacterIds: membership.pcCharacterIds,
   })
 
   if (!access.ok) {

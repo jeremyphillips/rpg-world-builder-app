@@ -16,14 +16,14 @@ import {
 export type CampaignOverviewPartySectionProps = {
   campaignId: string
   party: CampaignPartyPcListItem[]
-  viewerControlledCharacterIds: readonly string[]
+  openControlledCharacterIds: readonly string[]
 }
 
 /** Campaign party PCs composed server-side with controlling member metadata. */
 export function CampaignOverviewPartySection({
   campaignId,
   party,
-  viewerControlledCharacterIds,
+  openControlledCharacterIds,
 }: CampaignOverviewPartySectionProps) {
   return (
     <section aria-labelledby="campaign-overview-party-heading" className="space-y-4">
@@ -43,9 +43,7 @@ export function CampaignOverviewPartySection({
                 showCampaign={false}
                 controllerLine={resolveCharacterControllerDisplay({
                   controller: normalizePartyController(entry.member),
-                  viewerControlsCharacter: viewerControlledCharacterIds.includes(
-                    entry.character.id,
-                  ),
+                  viewerControlsCharacter: openControlledCharacterIds.includes(entry.character.id),
                 })}
                 rosterStatus={entry.roster.status}
               />

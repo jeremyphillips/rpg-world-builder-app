@@ -66,6 +66,7 @@ describe('DashboardHome', () => {
         identity: { name: 'Incomplete Campaign' },
         campaignRole: 'pc',
         controlledCharacterIds: [],
+        viewerOnboardingState: 'incomplete',
       }),
       makeCampaignListItem({
         id: 'camp_active',

@@ -23,7 +23,6 @@ describe('buildCampaignCharacterNavigationContext', () => {
       nav: { showCharactersNav: false },
       list: {
         pageTitle: CAMPAIGN_CHARACTER_NAV_LABELS.characters,
-        listScope: 'controlled',
       },
     })
   })
@@ -46,7 +45,6 @@ describe('buildCampaignCharacterNavigationContext', () => {
       },
       list: {
         pageTitle: CAMPAIGN_CHARACTER_NAV_LABELS.characters,
-        listScope: 'all_participating',
         emptyState: 'no_participating_characters',
       },
     })
@@ -70,7 +68,6 @@ describe('buildCampaignCharacterNavigationContext', () => {
       },
       list: {
         pageTitle: CAMPAIGN_CHARACTER_NAV_LABELS.myCharacter,
-        listScope: 'controlled',
       },
     })
   })
@@ -93,7 +90,6 @@ describe('buildCampaignCharacterNavigationContext', () => {
       },
       list: {
         pageTitle: CAMPAIGN_CHARACTER_NAV_LABELS.myCharacters,
-        listScope: 'controlled',
       },
     })
   })
@@ -130,7 +126,6 @@ describe('buildCampaignCharacterNavigationContext', () => {
       },
       list: {
         pageTitle: CAMPAIGN_CHARACTER_NAV_LABELS.myCharacter,
-        listScope: 'controlled',
       },
     })
   })
@@ -153,7 +148,6 @@ describe('buildCampaignCharacterNavigationContext', () => {
       },
       list: {
         pageTitle: CAMPAIGN_CHARACTER_NAV_LABELS.myCharacter,
-        listScope: 'controlled',
         emptyState: 'no_controlled_character',
       },
     })

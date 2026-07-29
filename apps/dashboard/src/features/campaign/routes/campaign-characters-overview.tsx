@@ -34,11 +34,11 @@ function resolveCampaignCharactersEmptyMessage(
 function CampaignCharacterListRow({
   campaignId,
   entry,
-  viewerControlledCharacterIds,
+  openControlledCharacterIds,
 }: {
   campaignId: string
   entry: CampaignCharacterListItem
-  viewerControlledCharacterIds: readonly string[]
+  openControlledCharacterIds: readonly string[]
 }) {
   return (
     <li>
@@ -48,7 +48,7 @@ function CampaignCharacterListRow({
         showCampaign={false}
         controllerLine={resolveCharacterControllerDisplay({
           controller: normalizeListController(entry.controller),
-          viewerControlsCharacter: viewerControlledCharacterIds.includes(entry.character.id),
+          viewerControlsCharacter: openControlledCharacterIds.includes(entry.character.id),
         })}
         rosterStatus={entry.roster.status}
       />
@@ -61,7 +61,7 @@ export function CampaignCharactersOverview() {
   const { list: listContext } = useCampaignCharacterNavigationContext(campaignId)
   const { data: campaigns } = useCampaigns()
   const campaign = campaigns?.find((item) => item.id === campaignId)
-  const viewerControlledCharacterIds = campaign?.openControlledCharacterIds ?? []
+  const openControlledCharacterIds = campaign?.openControlledCharacterIds ?? []
   const {
     data: characters = [],
     isPending: isCharactersPending,
@@ -102,7 +102,7 @@ export function CampaignCharactersOverview() {
                 key={entry.character.id}
                 campaignId={campaignId}
                 entry={entry}
-                viewerControlledCharacterIds={viewerControlledCharacterIds}
+                openControlledCharacterIds={openControlledCharacterIds}
               />
             ))}
           </ul>

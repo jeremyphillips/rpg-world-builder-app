@@ -14,7 +14,7 @@ export async function listCampaignCharacters(req: Request, res: Response): Promi
   const characters = await listCampaignCharactersForViewer({
     campaignId,
     viewerRole: membership.campaignRole,
-    viewerControlledCharacterIds: membership.controlledCharacterIds,
+    viewerControlledCharacterIds: membership.pcCharacterIds,
   })
 
   res.status(200).json({ characters })
@@ -35,7 +35,7 @@ export async function getCampaignCharacter(req: Request, res: Response): Promise
     characterId,
     viewerUserId: req.user!.id,
     viewerRole: membership.campaignRole,
-    viewerControlledCharacterIds: membership.controlledCharacterIds,
+    viewerControlledCharacterIds: membership.pcCharacterIds,
   })
 
   if (!access.ok) {

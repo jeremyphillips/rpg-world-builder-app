@@ -23,7 +23,6 @@ vi.mock('@/features/campaign', async (importOriginal) => {
       },
       list: {
         pageTitle: 'Characters',
-        listScope: 'all_participating',
         emptyState: 'no_participating_characters',
       },
     }),

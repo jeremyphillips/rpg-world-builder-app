@@ -26,7 +26,6 @@ export type CampaignCharacterNavModel =
 
 export type CampaignCharactersListContextModel = {
   pageTitle: string
-  listScope: 'controlled' | 'all_participating'
   emptyState?: 'no_controlled_character' | 'no_participating_characters'
 }
 
@@ -90,7 +89,6 @@ export function buildCampaignCharacterNavigationContext(input: {
         nav: { showCharactersNav: false },
         list: {
           pageTitle: CAMPAIGN_CHARACTER_NAV_LABELS.characters,
-          listScope: 'controlled',
         },
       }
     case 'manager':
@@ -104,7 +102,6 @@ export function buildCampaignCharacterNavigationContext(input: {
         },
         list: {
           pageTitle: CAMPAIGN_CHARACTER_NAV_LABELS.characters,
-          listScope: 'all_participating',
           emptyState: 'no_participating_characters',
         },
       }
@@ -119,7 +116,6 @@ export function buildCampaignCharacterNavigationContext(input: {
         },
         list: {
           pageTitle: CAMPAIGN_CHARACTER_NAV_LABELS.myCharacter,
-          listScope: 'controlled',
         },
       }
     case 'multi_controlled':
@@ -133,7 +129,6 @@ export function buildCampaignCharacterNavigationContext(input: {
         },
         list: {
           pageTitle: CAMPAIGN_CHARACTER_NAV_LABELS.myCharacters,
-          listScope: 'controlled',
         },
       }
     case 'onboarding':
@@ -147,7 +142,6 @@ export function buildCampaignCharacterNavigationContext(input: {
         },
         list: {
           pageTitle: CAMPAIGN_CHARACTER_NAV_LABELS.myCharacter,
-          listScope: 'controlled',
         },
       }
     case 'empty_controlled':
@@ -161,7 +155,6 @@ export function buildCampaignCharacterNavigationContext(input: {
         },
         list: {
           pageTitle: CAMPAIGN_CHARACTER_NAV_LABELS.myCharacter,
-          listScope: 'controlled',
           emptyState: 'no_controlled_character',
         },
       }

@@ -181,6 +181,61 @@ describe('GET /api/campaigns/:campaignId/characters', () => {
     expect(managerList.body.characters).toHaveLength(1)
     expect(managerList.body.characters[0]?.controller).toBeNull()
   })
+
+  it('omits stale-control PCs for players while managers still see open roster characters', async () => {
+    const owner = await registerOwner('campaign-char-stale-control-owner@example.com')
+    const campaignId = await createTestCampaign(
+      owner.agent,
+      owner.csrfToken,
+      'Stale Control Campaign',
+    )
+    const managerVisibleCharacterId = await seedParticipatingPc({
+      campaignId,
+      ownerAgent: owner.agent,
+      ownerCsrfToken: owner.csrfToken,
+      ownerUserId: owner.userId,
+      characterName: 'Manager Visible PC',
+    })
+
+    const player = await registerCampaignMember(getApp(), {
+      campaignId,
+      email: 'campaign-char-stale-control-player@example.com',
+      campaignRole: 'pc',
+    })
+    const staleCharacterId = await createCharacter(player.agent, player.csrfToken, 'Stale PC')
+    await seedCharacterParticipation({ campaignId, characterId: staleCharacterId })
+    await setMembershipControlledPcs({
+      campaignId,
+      userId: player.userId,
+      controlledCharacterIds: [staleCharacterId],
+    })
+
+    await CampaignCharacterParticipationModel.updateOne(
+      { campaignId, characterId: staleCharacterId },
+      { $set: { leftAt: new Date() } },
+    )
+    await CampaignMembershipModel.updateOne(
+      { campaignId, userId: player.userId },
+      { $set: { controlledCharacterIds: [staleCharacterId] } },
+    )
+
+    const playerList = await player.agent.get(`/api/campaigns/${campaignId}/characters`).expect(200)
+    expect(playerList.body.characters).toEqual([])
+
+    const playerDetail = await player.agent
+      .get(`/api/campaigns/${campaignId}/characters/${staleCharacterId}`)
+      .expect(404)
+    expect(playerDetail.body.error.code).toBe('character_not_in_campaign')
+
+    const managerList = await owner.agent.get(`/api/campaigns/${campaignId}/characters`).expect(200)
+    expect(managerList.body.characters).toHaveLength(1)
+    expect(managerList.body.characters[0]?.character.id).toBe(managerVisibleCharacterId)
+
+    const managerDetail = await owner.agent
+      .get(`/api/campaigns/${campaignId}/characters/${managerVisibleCharacterId}`)
+      .expect(200)
+    expect(managerDetail.body.capabilities.canManage).toBe(true)
+  })
 })
 
 describe('GET /api/campaigns/:campaignId/characters/:characterId', () => {

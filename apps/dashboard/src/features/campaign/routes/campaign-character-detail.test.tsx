@@ -55,7 +55,6 @@ describe('CampaignCharacterDetail', () => {
       },
       list: {
         pageTitle: CAMPAIGN_CHARACTER_NAV_LABELS.myCharacter,
-        listScope: 'controlled',
         emptyState: 'no_controlled_character',
       },
     })

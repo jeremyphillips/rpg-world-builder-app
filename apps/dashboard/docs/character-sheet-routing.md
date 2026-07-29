@@ -124,7 +124,8 @@ assignments** — not raw membership control ids or a fixed list link.
 - **Open control source of truth:** `openControlledCharacterIds` on
   `CampaignListItem` from `GET /api/campaigns` — controlled ids intersected
   with open participations and deduped server-side. Navigation must not
-  re-intersect on the client.
+  re-intersect on the client. Campaign character list/detail API routes consume
+  the same invariant via middleware `req.campaignMembership.pcCharacterIds`.
 - **`activeSection` vs `mode`:** `mode` describes the nav destination (list,
   detail, onboarding). `activeSection` drives sidebar highlighting via prefix
   matching on `/campaigns/:campaignId/characters` (including detail routes) or
@@ -136,8 +137,8 @@ assignments** — not raw membership control ids or a fixed list link.
   detail load, the error shell links **Back to {nav label}** using refreshed
   nav context — not a stale detail href.
 
-See [Availability](./availability.md) for `onboarding_incomplete` campaign
-states.
+See [Availability](./availability.md) for `viewerOnboardingState` on campaign
+list rows.
 
 ## Error copy (route shells)
 

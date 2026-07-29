@@ -12,6 +12,7 @@ export function makeCampaignListItem(overrides: Partial<CampaignListItem> = {}):
     campaignRole: 'owner',
     controlledCharacterIds: [],
     openControlledCharacterIds: [],
+    viewerOnboardingState: 'complete',
     createdAt: '2026-01-01T00:00:00.000Z',
     updatedAt: '2026-01-01T00:00:00.000Z',
     ...overrides,
