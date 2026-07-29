@@ -82,6 +82,63 @@ discover sheets through Party or direct links.
   **Played by you** uses `controlledCharacterIds.includes(characterId)`, not
   display-name comparison.
 
+## Summary formatting
+
+Character card and detail-header summaries are **derived at read time** from
+structured sheet data — never persisted on character records.
+
+- **Canonical formatter:** `formatCharacterSummary()` in
+  `@rpg/contracts` (`packages/contracts/src/rpg/runtime/character/character-summary-format.ts`).
+  Input shape: `CharacterSummaryParts` (resolved species, heritage, and class
+  labels + levels).
+- **Label resolution:** API and dashboard adapters map content IDs to labels
+  from their local catalog indexes, then call the shared formatter.
+  - API: `buildCharacterCardSummaryDto()` in
+    `apps/api/src/features/character/lib/build-character-card-summary-dto.lib.ts`
+  - Dashboard: `formatCharacterSummaryFromCatalog()` in
+    `apps/dashboard/src/features/character/lib/display/character-summary.lib.ts`
+  - Builder preview: `preview-identity-summary.ts` uses the same formatter
+    primitives; partial drafts omit unresolved segments.
+- **Card DTOs:** `characterCardSummarySchema` is the base transport shape
+  (`id`, `name`, `summary`). Endpoint DTOs extend it by composition (campaign
+  card, organization card, personal card) rather than duplicating fields.
+
+Per-class levels appear in summaries **only for multiclass** characters
+(`Dwarf · Level 4 · Fighter 3 / Rogue 1`). Single-class rows use
+`Dwarf · Level 4 Fighter` — not `Fighter 4`.
+
+## Campaign character navigation
+
+Sidebar **My Character** / **My Characters** / **Characters** labels, hrefs,
+and active highlighting are resolved from the viewer's **open control
+assignments** — not raw membership control ids or a fixed list link.
+
+- **Combined context:** `buildCampaignCharacterNavigationContext()` in
+  `apps/dashboard/src/features/campaign/lib/build-campaign-character-navigation-context.ts`
+  returns sibling `nav` and `list` models from the same precedence evaluation.
+  `useCampaignCharacterNavigationContext()` is a thin hook over campaign list
+  data plus that builder.
+- **Precedence (first match wins):** observer (hidden) → manager → one or more
+  open controlled PCs → onboarding incomplete with zero open control → post-
+  onboarding empty control list.
+- **Open control source of truth:** `openControlledCharacterIds` on
+  `CampaignListItem` from `GET /api/campaigns` — controlled ids intersected
+  with open participations and deduped server-side. Navigation must not
+  re-intersect on the client.
+- **`activeSection` vs `mode`:** `mode` describes the nav destination (list,
+  detail, onboarding). `activeSection` drives sidebar highlighting via prefix
+  matching on `/campaigns/:campaignId/characters` (including detail routes) or
+  the onboarding route only.
+- **Cache invalidation:** control assign/remove and onboarding-complete flows
+  invalidate `campaignsQueryKey` through
+  `invalidateCampaignCharacterControlQueries()`.
+- **Detail race fallback:** when a sole controlled character disappears before
+  detail load, the error shell links **Back to {nav label}** using refreshed
+  nav context — not a stale detail href.
+
+See [Availability](./availability.md) for `onboarding_incomplete` campaign
+states.
+
 ## Error copy (route shells)
 
 User-visible messages come from API responses via `resolveQueryErrorLabel`.

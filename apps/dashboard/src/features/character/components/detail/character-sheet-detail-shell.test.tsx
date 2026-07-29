@@ -52,6 +52,32 @@ describe('CharacterSheetDetailShell', () => {
     )
   })
 
+  it('renders an optional back link beneath campaign errors', () => {
+    render(
+      <MemoryRouter>
+        <CharacterSheetDetailShell
+          scope="campaign"
+          campaignBreadcrumb={{
+            href: ROUTES.campaign.detail('camp-1'),
+            label: 'The Argent Road',
+          }}
+          errorBackLink={{
+            href: ROUTES.campaign.characters.list('camp-1'),
+            label: 'My Character',
+          }}
+          isPending={false}
+          isError
+          errorLabel={CHARACTER_SHEET_ERROR_LABELS.campaignNotFoundInCampaign}
+        />
+      </MemoryRouter>,
+    )
+
+    expect(screen.getByRole('link', { name: 'Back to My Character' })).toHaveAttribute(
+      'href',
+      ROUTES.campaign.characters.list('camp-1'),
+    )
+  })
+
   it('has no axe accessibility violations for campaign error state', async () => {
     const { container } = render(
       <MemoryRouter>

@@ -6,10 +6,8 @@ import type {
 import { characterContentReferenceMatch } from '@rpg/contracts'
 
 import { listOpenParticipationsForCampaign } from '../../../campaign'
-import {
-  buildCampaignContentEligibilityMap,
-  formatInviteCharacterSummary,
-} from '../../../campaign-invite'
+import { buildCharacterCardSummaryDto } from '../../../character/lib/build-character-card-summary-dto.lib'
+import { buildCampaignContentEligibilityIndex } from '../../../campaign-invite'
 import { CharacterModel } from '../../../character'
 
 type CharacterReferenceHit = {
@@ -56,7 +54,7 @@ export async function resolveCharacterReferences(input: {
 
   const skip = (page - 1) * pageSize
 
-  const [total, hits, campaignContentById] = await Promise.all([
+  const [total, hits, contentIndex] = await Promise.all([
     CharacterModel.countDocuments(matchQuery),
     CharacterModel.find(matchQuery)
       .collation(CHARACTER_REFERENCE_SORT_COLLATION)
@@ -65,17 +63,21 @@ export async function resolveCharacterReferences(input: {
       .limit(pageSize)
       .select(CHARACTER_REFERENCE_PROJECTION)
       .lean<CharacterReferenceHit[]>(),
-    buildCampaignContentEligibilityMap(campaignId),
+    buildCampaignContentEligibilityIndex(campaignId),
   ])
 
   return {
     items: hits.map((hit) => ({
       characterType: hit.characterType,
-      character: {
-        id: String(hit._id),
-        name: hit.name,
-        summary: formatInviteCharacterSummary(hit, campaignContentById),
-      },
+      character: buildCharacterCardSummaryDto({
+        character: {
+          id: String(hit._id),
+          name: hit.name,
+          classes: hit.classes,
+          species: hit.species,
+        },
+        contentIndex,
+      }),
     })),
     total,
   }

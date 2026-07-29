@@ -155,6 +155,8 @@ export const campaignListItemSchema = campaignSchema.extend({
   campaignRole: campaignRoleSchema,
   /** IDs of PCs this member controls in this campaign. */
   controlledCharacterIds: z.array(z.string()),
+  /** Controlled PC ids with open participation — source of truth for navigation. */
+  openControlledCharacterIds: z.array(z.string()),
 })
 
 export type CampaignListItem = z.infer<typeof campaignListItemSchema>

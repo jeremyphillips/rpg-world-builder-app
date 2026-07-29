@@ -18,11 +18,16 @@ import {
   assertValidInitialCampaignInviteRecipients,
 } from './create-campaign-invites.lib'
 import { findCampaignById, toCampaign } from './find-campaign-by-id'
+import { intersectControlledWithOpenParticipations } from './participation/campaign-character-participation.repository'
 
 type CampaignRecord = CampaignSchemaType & {
   _id: unknown
   createdAt: Date
   updatedAt: Date
+}
+
+function dedupeCharacterIds(ids: readonly string[]): string[] {
+  return [...new Set(ids)]
 }
 
 export async function createCampaign(
@@ -67,17 +72,23 @@ export async function listCampaignsForUser(userId: string): Promise<CampaignList
   if (campaignIds.length === 0) return []
 
   const docs = await CampaignModel.find({ _id: { $in: campaignIds } }).lean<CampaignRecord[]>()
-  return docs
-    .map((doc) => {
+  const campaigns = await Promise.all(
+    docs.map(async (doc) => {
       const campaign = toCampaign(doc)
       const membership = membershipByCampaignId.get(campaign.id)
+      const controlledCharacterIds = membership?.controlledCharacterIds ?? []
+      const openControlledCharacterIds = dedupeCharacterIds(
+        await intersectControlledWithOpenParticipations(campaign.id, controlledCharacterIds),
+      )
       return {
         ...campaign,
         campaignRole: membership?.campaignRole as CampaignRole,
-        controlledCharacterIds: membership?.controlledCharacterIds ?? [],
+        controlledCharacterIds,
+        openControlledCharacterIds,
       }
-    })
-    .sort((a, b) => a.identity.name.localeCompare(b.identity.name))
+    }),
+  )
+  return campaigns.sort((a, b) => a.identity.name.localeCompare(b.identity.name))
 }
 
 function buildIdentityUpdateSet(input: UpdateCampaignInput): Record<string, unknown> {

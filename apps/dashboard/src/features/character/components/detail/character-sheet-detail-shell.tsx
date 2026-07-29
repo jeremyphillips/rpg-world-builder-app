@@ -16,6 +16,10 @@ export type CharacterSheetDetailShellProps = Pick<
     href: string
     label: string
   }
+  errorBackLink?: {
+    href: string
+    label: string
+  }
   children?: ReactNode
 }
 
@@ -23,6 +27,7 @@ export type CharacterSheetDetailShellProps = Pick<
 export function CharacterSheetDetailShell({
   scope,
   campaignBreadcrumb,
+  errorBackLink,
   isPending,
   isError,
   errorLabel,
@@ -49,6 +54,7 @@ export function CharacterSheetDetailShell({
         isError={isError}
         errorLabel={errorLabel}
         defaultErrorLabel={CHARACTER_SHEET_ERROR_LABELS.loadFailed}
+        errorBackLink={errorBackLink}
       >
         {children}
       </PageLoadState>

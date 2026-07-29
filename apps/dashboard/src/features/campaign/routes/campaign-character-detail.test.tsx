@@ -14,12 +14,17 @@ import { CampaignCharacterDetail } from './campaign-character-detail'
 
 vi.mock('../hooks/use-campaign-character-detail')
 vi.mock('../hooks/use-campaigns')
+vi.mock('../hooks/use-campaign-character-navigation-context')
 
 import { useCampaignCharacterDetail as useCampaignCharacterDetailFn } from '../hooks/use-campaign-character-detail'
 import { useCampaigns as useCampaignsFn } from '../hooks/use-campaigns'
+import { useCampaignCharacterNavigationContext as useCampaignCharacterNavigationContextFn } from '../hooks/use-campaign-character-navigation-context'
+import { ROUTES } from '@/app/routes'
+import { CAMPAIGN_CHARACTER_NAV_LABELS } from '../lib/build-campaign-character-navigation-context'
 
 const useCampaignCharacterDetail = vi.mocked(useCampaignCharacterDetailFn)
 const useCampaigns = vi.mocked(useCampaignsFn)
+const useCampaignCharacterNavigationContext = vi.mocked(useCampaignCharacterNavigationContextFn)
 
 const context = createPopulatedStandaloneBuilderContextFixture()
 const catalogIndex = createStandaloneBuilderCatalogIndexFixture(context)
@@ -34,10 +39,26 @@ describe('CampaignCharacterDetail', () => {
   beforeEach(() => {
     useCampaignCharacterDetail.mockReset()
     useCampaigns.mockReset()
+    useCampaignCharacterNavigationContext.mockReset()
 
     useCampaigns.mockReturnValue({
       data: [{ id: 'camp-1', identity: { name: 'Test Campaign' } }],
     } as ReturnType<typeof useCampaigns>)
+
+    useCampaignCharacterNavigationContext.mockReturnValue({
+      nav: {
+        showCharactersNav: true,
+        label: CAMPAIGN_CHARACTER_NAV_LABELS.myCharacter,
+        href: ROUTES.campaign.characters.list('camp-1'),
+        mode: 'list',
+        activeSection: 'characters',
+      },
+      list: {
+        pageTitle: CAMPAIGN_CHARACTER_NAV_LABELS.myCharacter,
+        listScope: 'controlled',
+        emptyState: 'no_controlled_character',
+      },
+    })
   })
 
   it('renders the campaign character sheet for authorized viewers', () => {
@@ -118,6 +139,10 @@ describe('CampaignCharacterDetail', () => {
 
     expect(screen.getByRole('alert')).toHaveTextContent(
       'You do not have permission to view this character.',
+    )
+    expect(screen.getByRole('link', { name: 'Back to My Character' })).toHaveAttribute(
+      'href',
+      ROUTES.campaign.characters.list('camp-1'),
     )
   })
 })

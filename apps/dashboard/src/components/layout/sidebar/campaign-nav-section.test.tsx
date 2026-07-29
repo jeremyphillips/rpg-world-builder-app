@@ -13,11 +13,19 @@ vi.mock('@/features/campaign', async (importOriginal) => {
     ...actual,
     CampaignSwitcher: () => <div data-testid="campaign-switcher" />,
     useActiveCampaignId: () => 'camp_1',
-    useCampaignCharactersNav: () => ({
-      showCharactersNav: true,
-      sidebarLabel: 'Characters',
-      pageTitle: 'Characters',
-      listScope: 'all_participating',
+    useCampaignCharacterNavigationContext: () => ({
+      nav: {
+        showCharactersNav: true,
+        label: 'Characters',
+        href: ROUTES.campaign.characters.list('camp_1'),
+        mode: 'list',
+        activeSection: 'characters',
+      },
+      list: {
+        pageTitle: 'Characters',
+        listScope: 'all_participating',
+        emptyState: 'no_participating_characters',
+      },
     }),
   }
 })

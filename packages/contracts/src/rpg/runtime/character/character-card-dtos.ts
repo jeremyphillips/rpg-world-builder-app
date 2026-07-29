@@ -1,8 +1,18 @@
 import { z } from 'zod'
 
+import { characterRouteContextSchema } from '../campaign/character-route-context'
+
 // ---------------------------------------------------------------------------
-// Character list card — RPG view model for player-facing character pickers.
+// Character list card — reusable transport DTOs for player-facing pickers.
 // ---------------------------------------------------------------------------
+
+export const characterCardSummarySchema = z.object({
+  id: z.string().min(1),
+  name: z.string().min(1),
+  summary: z.string(),
+})
+
+export type CharacterCardSummaryDto = z.infer<typeof characterCardSummarySchema>
 
 export const characterCardCampaignSchema = z.object({
   id: z.string().min(1),
@@ -11,11 +21,26 @@ export const characterCardCampaignSchema = z.object({
 
 export type CharacterCardCampaign = z.infer<typeof characterCardCampaignSchema>
 
-export const characterCardViewModelSchema = z.object({
-  id: z.string().min(1),
-  name: z.string().min(1),
-  summary: z.string(),
+export const campaignCharacterCardSchema = characterCardSummarySchema.extend({
   campaign: characterCardCampaignSchema.optional(),
 })
 
-export type CharacterCardViewModelDto = z.infer<typeof characterCardViewModelSchema>
+export type CampaignCharacterCardDto = z.infer<typeof campaignCharacterCardSchema>
+
+/** @deprecated Prefer {@link campaignCharacterCardSchema} — retained for existing list DTO imports. */
+export const characterCardViewModelSchema = campaignCharacterCardSchema
+
+/** @deprecated Prefer {@link CampaignCharacterCardDto}. */
+export type CharacterCardViewModelDto = CampaignCharacterCardDto
+
+export const personalCharacterCardSchema = characterCardSummarySchema.extend({
+  routeContext: characterRouteContextSchema,
+})
+
+export type PersonalCharacterCardDto = z.infer<typeof personalCharacterCardSchema>
+
+export const organizationCharacterCardSchema = characterCardSummarySchema.extend({
+  characterType: z.enum(['pc', 'npc']),
+})
+
+export type OrganizationCharacterCardDto = z.infer<typeof organizationCharacterCardSchema>

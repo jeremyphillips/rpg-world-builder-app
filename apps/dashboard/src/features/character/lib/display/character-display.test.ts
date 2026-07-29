@@ -7,16 +7,18 @@ import {
 import {
   buildCharacterCardViewModel,
   buildCharacterDetailViewModel,
-  formatCharacterSummary,
+  formatCharacterSummaryFromCatalog,
 } from './character-display'
 import { SAMPLE_PC } from '../character-fixtures'
 
 const context = createPopulatedStandaloneBuilderContextFixture()
 const catalogIndex = createStandaloneBuilderCatalogIndexFixture(context)
 
-describe('formatCharacterSummary', () => {
+describe('formatCharacterSummaryFromCatalog', () => {
   it('formats a single-class character summary', () => {
-    expect(formatCharacterSummary(SAMPLE_PC, catalogIndex)).toBe('Dwarf · Level 1 Fighter')
+    expect(formatCharacterSummaryFromCatalog(SAMPLE_PC, catalogIndex)).toBe(
+      'Dwarf · Level 1 Fighter',
+    )
   })
 
   it('includes subclass labels when present', () => {
@@ -31,9 +33,35 @@ describe('formatCharacterSummary', () => {
       ],
     }
 
-    expect(formatCharacterSummary(character, catalogIndex)).toBe(
+    expect(formatCharacterSummaryFromCatalog(character, catalogIndex)).toBe(
       'Dwarf · Level 3 Fighter (Champion)',
     )
+  })
+
+  it('formats multiclass summaries with class allocation', () => {
+    const character = {
+      ...SAMPLE_PC,
+      classes: [
+        { classId: 'srd-cc-5.2.1:fighter', level: 3 },
+        { classId: 'srd-cc-5.2.1:rogue', level: 1 },
+      ],
+    }
+
+    expect(formatCharacterSummaryFromCatalog(character, catalogIndex)).toBe(
+      'Dwarf · Level 4 · Fighter 3 / Rogue 1',
+    )
+  })
+
+  it('does not append per-class level for single-class summaries', () => {
+    const character = {
+      ...SAMPLE_PC,
+      classes: [{ classId: 'srd-cc-5.2.1:fighter', level: 4 }],
+    }
+
+    expect(formatCharacterSummaryFromCatalog(character, catalogIndex)).toBe(
+      'Dwarf · Level 4 Fighter',
+    )
+    expect(formatCharacterSummaryFromCatalog(character, catalogIndex)).not.toContain('Fighter 4')
   })
 })
 

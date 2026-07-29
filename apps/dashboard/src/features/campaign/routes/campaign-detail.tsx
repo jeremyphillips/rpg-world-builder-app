@@ -55,7 +55,7 @@ export function CampaignDetail() {
             <CampaignOverviewPartySection
               campaignId={campaignId}
               party={overview.party}
-              viewerControlledCharacterIds={campaign?.controlledCharacterIds ?? []}
+              viewerControlledCharacterIds={campaign?.openControlledCharacterIds ?? []}
             />
           ) : null}
         </div>

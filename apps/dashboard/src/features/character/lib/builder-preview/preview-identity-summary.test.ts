@@ -42,7 +42,7 @@ describe('preview identity summary helpers', () => {
     }
 
     expect(getPreviewIdentityName(draft)).toBe('Tarin')
-    expect(getPreviewLevelClassLine(draft, catalogIndex)).toBe('Level 1 · Fighter')
+    expect(getPreviewLevelClassLine(draft, catalogIndex)).toBe('Level 1 Fighter')
     expect(getPreviewSpeciesLine(draft, catalogIndex)).toBe('Dwarf')
     expect(getPreviewAlignmentLine(draft)).toBe('Lawful Good')
   })
@@ -58,6 +58,6 @@ describe('preview identity summary helpers', () => {
       species: { speciesId: elf.id, heritageId: 'high-elf' },
     }
 
-    expect(getPreviewSpeciesLine(draft, catalogIndex)).toBe('Elf · High Elf')
+    expect(getPreviewSpeciesLine(draft, catalogIndex)).toBe('Elf (High Elf)')
   })
 })

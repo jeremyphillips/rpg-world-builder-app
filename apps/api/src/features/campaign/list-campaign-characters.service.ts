@@ -2,11 +2,9 @@ import type { CampaignCharacterListItem, CampaignRole } from '@rpg/contracts'
 import { isCampaignManager } from '@rpg/contracts'
 
 import { findPcsByIds } from '../character'
+import { buildCharacterCardSummaryDto } from '../character/lib/build-character-card-summary-dto.lib'
 import { HttpError } from '../../lib/http-error'
-import {
-  buildCampaignContentEligibilityMap,
-  formatInviteCharacterSummary,
-} from '../campaign-invite'
+import { buildCampaignContentEligibilityIndex } from '../campaign-invite'
 import { findUsersByIds } from '../user'
 import { CampaignMembershipModel } from './campaign-membership.model'
 import { findCampaignById } from './find-campaign-by-id'
@@ -51,12 +49,12 @@ export async function listCampaignCharactersForViewer(input: {
     throw new HttpError(404, 'campaign_not_found', 'Campaign not found.')
   }
 
-  const [participations, memberships, campaignContentById] = await Promise.all([
+  const [participations, memberships, contentIndex] = await Promise.all([
     listOpenParticipationsForCampaign(campaignId),
     CampaignMembershipModel.find({ campaignId })
       .select('userId controlledCharacterIds')
       .lean<MembershipRecord[]>(),
-    buildCampaignContentEligibilityMap(campaignId),
+    buildCampaignContentEligibilityIndex(campaignId),
   ])
 
   if (participations.length === 0) return []
@@ -90,9 +88,7 @@ export async function listCampaignCharactersForViewer(input: {
 
     characters.push({
       character: {
-        id: character.id,
-        name: character.name,
-        summary: formatInviteCharacterSummary(character, campaignContentById),
+        ...buildCharacterCardSummaryDto({ character, contentIndex }),
         campaign: {
           id: campaignId,
           name: campaign.identity.name,

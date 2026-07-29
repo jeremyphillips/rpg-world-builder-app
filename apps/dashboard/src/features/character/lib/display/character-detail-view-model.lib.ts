@@ -60,7 +60,7 @@ import type {
 } from './character-display-types'
 import { formatContentReferenceLabel } from './format-content-reference-label'
 import { resolveCharacterVitalStatusPresentation } from './character-vital-presentation'
-import { formatCharacterSummary } from './character-summary.lib'
+import { formatCharacterSummaryFromCatalog } from './character-summary.lib'
 
 export type CharacterDisplayInput = {
   character: Character
@@ -420,7 +420,7 @@ export function buildCharacterDetailViewModel({
     id: character.id,
     identity: {
       name: character.name,
-      summary: formatCharacterSummary(character, catalogIndex),
+      summary: formatCharacterSummaryFromCatalog(character, catalogIndex),
       xp: buildIdentityXp(character, xpProgression),
       vital: character.vital,
       vitalLabel: resolveCharacterVitalStatusPresentation(character.vital.status).label,

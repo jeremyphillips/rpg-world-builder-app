@@ -153,6 +153,7 @@ describe('campaign overview service', () => {
       character: {
         id: character.id,
         name: character.name,
+        summary: expect.stringMatching(/^Dwarf · Level 1 Fighter$/),
         campaign: { id: campaignId, name: 'Party Campaign' },
       },
       member: {

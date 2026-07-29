@@ -7,13 +7,18 @@ import { CharacterOrganizationsSummary } from '@/features/character/components/d
 import { CharacterSheetDetailShell } from '@/features/character/components/detail/character-sheet-detail-shell'
 
 import { useCampaignCharacterDetail } from '../hooks/use-campaign-character-detail'
+import { useCampaignCharacterNavigationContext } from '../hooks/use-campaign-character-navigation-context'
 import { useCampaigns } from '../hooks/use-campaigns'
 
 export function CampaignCharacterDetail() {
   const { campaignId, characterId } = useParams<{ campaignId: string; characterId: string }>()
   const { data: campaigns } = useCampaigns()
   const campaign = campaigns?.find((entry) => entry.id === campaignId)
+  const { nav } = useCampaignCharacterNavigationContext(campaignId)
   const detail = useCampaignCharacterDetail(campaignId, characterId)
+
+  const errorBackLink =
+    detail.isError && nav.showCharactersNav ? { href: nav.href, label: nav.label } : undefined
 
   return (
     <CharacterSheetDetailShell
@@ -22,6 +27,7 @@ export function CampaignCharacterDetail() {
         href: campaignId ? ROUTES.campaign.detail(campaignId) : ROUTES.home,
         label: campaign?.identity.name ?? 'Campaign',
       }}
+      errorBackLink={errorBackLink}
       isPending={detail.isPending}
       isError={detail.isError}
       errorLabel={detail.errorLabel}

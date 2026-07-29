@@ -8,7 +8,7 @@ describe('isCampaignMembershipOnboardingIncomplete', () => {
   it('returns true for a PC with no controlled characters', () => {
     expect(
       isCampaignMembershipOnboardingIncomplete(
-        makeCampaignListItem({ campaignRole: 'pc', controlledCharacterIds: [] }),
+        makeCampaignListItem({ campaignRole: 'pc', openControlledCharacterIds: [] }),
       ),
     ).toBe(true)
   })
@@ -16,12 +16,12 @@ describe('isCampaignMembershipOnboardingIncomplete', () => {
   it('returns false for staff roles and active PCs', () => {
     expect(
       isCampaignMembershipOnboardingIncomplete(
-        makeCampaignListItem({ campaignRole: 'owner', controlledCharacterIds: [] }),
+        makeCampaignListItem({ campaignRole: 'owner', openControlledCharacterIds: [] }),
       ),
     ).toBe(false)
     expect(
       isCampaignMembershipOnboardingIncomplete(
-        makeCampaignListItem({ campaignRole: 'pc', controlledCharacterIds: ['char_1'] }),
+        makeCampaignListItem({ campaignRole: 'pc', openControlledCharacterIds: ['char_1'] }),
       ),
     ).toBe(false)
   })

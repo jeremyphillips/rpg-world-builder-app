@@ -3,7 +3,6 @@ export { CampaignInviteModel } from './campaign-invite.model'
 export {
   buildCampaignContentEligibilityIndex,
   buildCampaignContentEligibilityMap,
-  formatInviteCharacterSummary,
 } from './campaign-invite-eligibility.lib'
 export { computeInviteExpiresAt, normalizeInviteEmail } from './campaign-invite.lib'
 export { generateInviteToken, hashInviteToken } from './campaign-invite-token'

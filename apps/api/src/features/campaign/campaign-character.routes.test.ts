@@ -90,6 +90,7 @@ describe('GET /api/campaigns/:campaignId/characters', () => {
 
     expect(response.body.characters).toHaveLength(1)
     expect(response.body.characters[0]?.character.id).toBe(playerCharacterId)
+    expect(response.body.characters[0]?.character.summary).toMatch(/^Dwarf · Level 1 Fighter$/)
     expect(response.body.characters[0]?.controller?.displayName).toBeTruthy()
   })
 

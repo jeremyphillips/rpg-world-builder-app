@@ -4,7 +4,8 @@ import { ROUTES } from '@/app/routes'
 import {
   CampaignSwitcher,
   useActiveCampaignId,
-  useCampaignCharactersNav,
+  useCampaignCharacterNavigationContext,
+  isCampaignCharactersNavActive,
 } from '@/features/campaign'
 import { VISIBLE_SIDEBAR_CONTENT } from '@/features/homebrew'
 
@@ -12,7 +13,7 @@ import { NavItem } from './nav-item'
 
 export function CampaignNavSection() {
   const activeCampaignId = useActiveCampaignId()
-  const charactersNav = useCampaignCharactersNav(activeCampaignId ?? undefined)
+  const { nav } = useCampaignCharacterNavigationContext(activeCampaignId ?? undefined)
 
   return (
     <NavSection label="Campaign">
@@ -23,10 +24,13 @@ export function CampaignNavSection() {
         <>
           <NavItem to={ROUTES.campaign.detail(activeCampaignId)} label="Overview" end />
           <NavItem to={ROUTES.campaign.sessions(activeCampaignId)} label="Sessions" />
-          {charactersNav.showCharactersNav ? (
+          {nav.showCharactersNav ? (
             <NavItem
-              to={ROUTES.campaign.characters.list(activeCampaignId)}
-              label={charactersNav.sidebarLabel}
+              to={nav.href}
+              label={nav.label}
+              isActive={(currentPathname) =>
+                isCampaignCharactersNavActive(currentPathname, nav, activeCampaignId)
+              }
             />
           ) : null}
           <NavItem to={ROUTES.campaign.npcs.list(activeCampaignId)} label="NPCs" />

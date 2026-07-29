@@ -12,11 +12,24 @@ import {
 
 import { useCampaignBuildContext } from '../../character/hooks/use-campaign-build-context'
 import { resolveQueryErrorLabel } from '../../character/lib/resolve-query-error-label.lib'
+import { useCampaignCharacterNavigationContext } from '../hooks/use-campaign-character-navigation-context'
 import { useCampaignCharacters } from '../hooks/use-campaign-characters'
-import { useCampaignCharactersNav } from '../hooks/use-campaign-characters-nav'
 import { useCampaigns } from '../hooks/use-campaigns'
+import type { CampaignCharactersListContextModel } from '../lib/build-campaign-character-navigation-context'
 
-const CAMPAIGN_CHARACTERS_EMPTY_MESSAGE = 'No characters to show yet.'
+const CAMPAIGN_CHARACTERS_LIST_EMPTY_MESSAGES = {
+  no_controlled_character: 'No character is currently assigned to you.',
+  no_participating_characters: 'No characters to show yet.',
+} as const satisfies Record<NonNullable<CampaignCharactersListContextModel['emptyState']>, string>
+
+function resolveCampaignCharactersEmptyMessage(
+  emptyState: CampaignCharactersListContextModel['emptyState'],
+): string {
+  if (!emptyState) {
+    return CAMPAIGN_CHARACTERS_LIST_EMPTY_MESSAGES.no_participating_characters
+  }
+  return CAMPAIGN_CHARACTERS_LIST_EMPTY_MESSAGES[emptyState]
+}
 
 function CampaignCharacterListRow({
   campaignId,
@@ -45,10 +58,10 @@ function CampaignCharacterListRow({
 
 export function CampaignCharactersOverview() {
   const { campaignId = '' } = useParams<{ campaignId: string }>()
-  const navModel = useCampaignCharactersNav(campaignId)
+  const { list: listContext } = useCampaignCharacterNavigationContext(campaignId)
   const { data: campaigns } = useCampaigns()
   const campaign = campaigns?.find((item) => item.id === campaignId)
-  const viewerControlledCharacterIds = campaign?.controlledCharacterIds ?? []
+  const viewerControlledCharacterIds = campaign?.openControlledCharacterIds ?? []
   const {
     data: characters = [],
     isPending: isCharactersPending,
@@ -71,7 +84,7 @@ export function CampaignCharactersOverview() {
 
   return (
     <OverviewPageShell
-      heading={navModel.pageTitle}
+      heading={listContext.pageTitle}
       isPending={isPending}
       isError={isError}
       errorLabel={errorLabel}
@@ -79,7 +92,9 @@ export function CampaignCharactersOverview() {
     >
       {catalogIndex ? (
         characters.length === 0 ? (
-          <Text variant="muted">{CAMPAIGN_CHARACTERS_EMPTY_MESSAGE}</Text>
+          <Text variant="muted">
+            {resolveCampaignCharactersEmptyMessage(listContext.emptyState)}
+          </Text>
         ) : (
           <ul className="grid gap-4 sm:grid-cols-2">
             {characters.map((entry) => (
