@@ -41,26 +41,6 @@ export function buildContentViewerFromCampaignContext(
   return { kind: 'none' }
 }
 
-/** @deprecated Use buildContentViewerFromCampaignContext with pre-resolved pcCharacterIds. */
-export type CampaignMembershipViewerContext = {
-  campaignRole: string
-  controlledCharacterIds: readonly string[]
-}
-
-/** @deprecated Use buildContentViewerFromCampaignContext. */
-export function buildContentViewerFromMembership(
-  membership: CampaignMembershipViewerContext | undefined,
-): ContentViewer {
-  if (!membership) {
-    return { kind: 'none' }
-  }
-
-  return buildContentViewerFromCampaignContext({
-    campaignRole: membership.campaignRole,
-    pcCharacterIds: membership.controlledCharacterIds,
-  })
-}
-
 /**
  * Whether a saved-character reference may be resolved for display. Campaign access
  * controls new discovery — it does not revoke reads for content already on a

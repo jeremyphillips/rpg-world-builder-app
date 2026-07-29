@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import {
-  buildContentViewerFromMembership,
+  buildContentViewerFromCampaignContext,
   canResolveSavedContentReference,
   type ContentViewer,
 } from './campaign-content-viewer'
@@ -10,22 +10,32 @@ const manageViewer: ContentViewer = { kind: 'manage' }
 const pcViewer: ContentViewer = { kind: 'pc', characterIds: ['char-a', 'char-b'] }
 const noneViewer: ContentViewer = { kind: 'none' }
 
-describe('buildContentViewerFromMembership', () => {
+describe('buildContentViewerFromCampaignContext', () => {
   it('maps campaign roles to viewer kinds', () => {
     expect(
-      buildContentViewerFromMembership({ campaignRole: 'owner', controlledCharacterIds: [] }),
+      buildContentViewerFromCampaignContext({ campaignRole: 'owner', pcCharacterIds: [] }),
     ).toEqual({
       kind: 'manage',
     })
     expect(
-      buildContentViewerFromMembership({
+      buildContentViewerFromCampaignContext({
+        campaignRole: 'co-owner',
+        pcCharacterIds: ['pc-1'],
+      }),
+    ).toEqual({ kind: 'manage' })
+    expect(
+      buildContentViewerFromCampaignContext({
         campaignRole: 'pc',
-        controlledCharacterIds: ['pc-1', 'pc-2'],
+        pcCharacterIds: ['pc-1', 'pc-2'],
       }),
     ).toEqual({ kind: 'pc', characterIds: ['pc-1', 'pc-2'] })
     expect(
-      buildContentViewerFromMembership({ campaignRole: 'observer', controlledCharacterIds: [] }),
+      buildContentViewerFromCampaignContext({ campaignRole: 'observer', pcCharacterIds: [] }),
     ).toEqual({ kind: 'none' })
+    expect(
+      buildContentViewerFromCampaignContext({ campaignRole: 'pc', pcCharacterIds: [] }),
+    ).toEqual({ kind: 'none' })
+    expect(buildContentViewerFromCampaignContext(undefined)).toEqual({ kind: 'none' })
   })
 })
 
