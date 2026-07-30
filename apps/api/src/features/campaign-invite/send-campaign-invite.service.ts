@@ -3,6 +3,7 @@ import type { CampaignInviteAdminListItem } from '@rpg/contracts'
 import { HttpError } from '../../lib/http-error'
 import type { EmailProvider } from '../../services/email/email.types'
 import { findCampaignMembershipByCampaignAndUser } from '../campaign'
+import { publishCampaignInviteReceivedNotification } from '../notification'
 import { findUserByEmail } from '../user'
 import {
   CAMPAIGN_INVITE_ROTATION_COOLDOWN_MS,
@@ -59,6 +60,25 @@ async function assertCanSendInvite(campaignId: string, normalizedEmail: string):
   }
 }
 
+async function notifyInviteReceivedBestEffort(input: {
+  invite: Awaited<ReturnType<typeof createInviteRecord>>
+  invitedByUserId: string
+  normalizedEmail: string
+}): Promise<void> {
+  try {
+    const invitedUser = await findUserByEmail(input.normalizedEmail)
+    if (!invitedUser) return
+
+    await publishCampaignInviteReceivedNotification({
+      invite: input.invite,
+      invitedByUserId: input.invitedByUserId,
+      inviteeUserId: invitedUser.id,
+    })
+  } catch (error) {
+    console.error('Failed to publish campaign invite received notification.', error)
+  }
+}
+
 export async function sendCampaignInvite(
   input: SendCampaignInviteInput,
 ): Promise<SendCampaignInviteResult> {
@@ -93,6 +113,11 @@ export async function sendCampaignInvite(
       input.invitedByUserId,
       input.provider,
     )
+    void notifyInviteReceivedBestEffort({
+      invite,
+      invitedByUserId: input.invitedByUserId,
+      normalizedEmail,
+    })
     return { invite: toAdminListItem(delivered) }
   }
 
@@ -120,5 +145,10 @@ export async function sendCampaignInvite(
     input.invitedByUserId,
     input.provider,
   )
+  void notifyInviteReceivedBestEffort({
+    invite: rotated,
+    invitedByUserId: input.invitedByUserId,
+    normalizedEmail,
+  })
   return { invite: toAdminListItem(delivered) }
 }

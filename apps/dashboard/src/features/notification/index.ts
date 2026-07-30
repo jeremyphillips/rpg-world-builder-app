@@ -1,3 +1,2 @@
-// fallow-ignore-file unused-file
-// `notification` feature — scaffold only. Export the public surface here as it's built.
-export {}
+export { NotificationBellMenu } from './components/notification-bell-menu'
+export { useNotifications } from './hooks/use-notifications'
