@@ -239,10 +239,10 @@ These modules support many content types but are **not** per-type form splits:
 Top-level content shells share `ContentFormFooter` (`content-form-footer.tsx`) wired through
 `ContentFormLayout` and `useContentFormActionState`:
 
-| Mode       | Footer                               | Submit enabled when                                                          | Success                                                                                      |
-| ---------- | ------------------------------------ | ---------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
-| **Create** | `[Cancel]` `[Create {type}]`         | Always (click validates) — disabled only while `pending` or read-only        | Navigate to `…/:id/edit` after POST; `TODO(toast)` for create copy                           |
-| **Edit**   | `[Discard changes]` `[Save changes]` | `hasDirtyFields(dirtyFields)` — disabled when clean, `pending`, or read-only | Stay on edit route; reset baseline from `def.toFormValues(saved)`; inline `"Changes saved."` |
+| Mode       | Footer                               | Submit enabled when                                                          | Success                                                                                                                                                                                                |
+| ---------- | ------------------------------------ | ---------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Create** | `[Cancel]` `[Create {type}]`         | Always (click validates) — disabled only while `pending` or read-only        | Navigate to `…/:id/edit` after POST; toast via `notifyContentCreated`                                                                                                                                  |
+| **Edit**   | `[Discard changes]` `[Save changes]` | `hasDirtyFields(dirtyFields)` — disabled when clean, `pending`, or read-only | Stay on edit route; reset baseline from `def.toFormValues(saved)`; one toast from coordinated save session (`onSaved`) — access-only uses availability copy, body or combined uses `notifySaveSuccess` |
 
 Create handoff URL: `resolveContentPostCreateEditHref` in `content-form-navigation.ts`.
 Submit/error wiring: `useSubmitHandler` in create/edit shells. Nested subclass editor remains

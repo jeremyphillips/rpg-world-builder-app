@@ -5,6 +5,7 @@ import { TabbedForm, FormSaveFooter, type TabbedFormTab } from '@rpg/ui/form'
 
 import { NarrowPage } from '@/components/layout/narrow-page'
 import { useSubmitHandler } from '@/lib/use-submit-handler'
+import { notifySaveSuccess } from '@/lib/notify'
 import { FormUnsavedChangesGuard } from '@/lib/form-unsaved-changes-guard'
 import { useExistingImageField } from '@/lib/use-existing-image-field'
 
@@ -34,7 +35,7 @@ export function CampaignSettings() {
 
   usePersistViewedCampaign(campaignId)
 
-  const { mutateAsync, isPending, isSuccess } = useUpdateCampaign(campaignId ?? '')
+  const { mutateAsync, isPending } = useUpdateCampaign(campaignId ?? '')
 
   const bannerField = useExistingImageField({
     fieldName: 'banner',
@@ -55,6 +56,7 @@ export function CampaignSettings() {
     const imageKey = await bannerField.resolveImageKey(values.banner)
     await mutateAsync(buildUpdateCampaignInput(values, imageKey))
     form.reset(values)
+    notifySaveSuccess()
   }, 'Could not save campaign.')
 
   let body: ReactNode
@@ -83,9 +85,7 @@ export function CampaignSettings() {
             <FormUnsavedChangesGuard />
             <FormSaveFooter
               pending={isPending || form.formState.isSubmitting}
-              isSuccess={isSuccess}
               submitLabel="Save changes"
-              successMessage="Changes saved."
             />
           </>
         )}

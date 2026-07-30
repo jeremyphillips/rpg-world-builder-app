@@ -127,6 +127,7 @@
   --color-sidebar: var(--sidebar);
   --color-sidebar-nav-item-fg: var(--sidebar-nav-item-fg);
   --spacing-sidebar: var(--sidebar-width);
+  --z-index-toast: var(--z-toast);
   --color-control-hover: var(--control-hover-bg);
   --color-control-selected: var(--control-selected-bg);
   --color-row-hover: var(--row-hover-bg);
@@ -307,6 +308,10 @@
  */
 @utility w-sidebar {
   width: var(--sidebar-width);
+}
+
+@utility z-toast {
+  z-index: var(--z-toast);
 }
 
 @utility border-input {

@@ -15,16 +15,19 @@ import {
   updateRouteContentCampaignAccess,
 } from '../campaign-access/campaign-access-api'
 import { resolvedToCampaignAccessPatch } from '../campaign-access/campaign-access-state'
+import { notifyCampaignAccessUpdated, notifyCampaignAccessUpdateFailed } from '@/lib/notify'
 import type { ContentBase } from './content-table-config'
+import { contentOverviewListQueryKey } from './content-overview-query-keys'
 
 function contentListQueryKey(campaignId: string, contentTypeKey: ContentTypeKey) {
-  return ['campaigns', campaignId, 'content', contentTypeKey] as const
+  return contentOverviewListQueryKey(campaignId, contentTypeKey)
 }
 
 export type UseContentCampaignAvailabilityToggleOptions = {
   campaignId: string
   contentTypeKey: ContentTypeKey
   entityId: string
+  entityName: string
   campaignAccess: ResolvedContentCampaignAccess
   campaignAvailabilityFilter: CampaignAvailabilityFilter
   onRowRemoved?: () => void
@@ -34,6 +37,7 @@ export function useContentCampaignAvailabilityToggle({
   campaignId,
   contentTypeKey,
   entityId,
+  entityName,
   campaignAccess,
   campaignAvailabilityFilter,
   onRowRemoved,
@@ -44,6 +48,15 @@ export function useContentCampaignAvailabilityToggle({
   const [blockers, setBlockers] = useState<ContentUsageBlocker[]>([])
   const onRowRemovedRef = useRef(onRowRemoved)
   onRowRemovedRef.current = onRowRemoved
+  const entityNameRef = useRef(entityName)
+  entityNameRef.current = entityName
+
+  const resolveEntityName = useCallback(() => {
+    const rows = queryClient.getQueryData<WithCampaignAccess<ContentBase & { id: string }>[]>(
+      contentListQueryKey(campaignId, contentTypeKey),
+    )
+    return rows?.find((row) => row.id === entityId)?.name ?? entityNameRef.current
+  }, [campaignId, contentTypeKey, entityId, queryClient])
 
   const updateCachedAccess = useCallback(
     (nextAccess: ResolvedContentCampaignAccess) => {
@@ -113,10 +126,15 @@ export function useContentCampaignAvailabilityToggle({
         if (!nextAvailable && campaignAvailabilityFilter === 'available') {
           onRowRemovedRef.current?.()
         }
-      } catch {
+
+        notifyCampaignAccessUpdated(resolveEntityName(), nextAvailable)
+      } catch (err) {
         if (nextAvailable) {
           updateCachedAccess(campaignAccess)
         }
+        notifyCampaignAccessUpdateFailed(entityId, nextAvailable, err, () => {
+          void handleAvailableChange(nextAvailable)
+        })
       } finally {
         setPending(false)
       }
@@ -128,6 +146,7 @@ export function useContentCampaignAvailabilityToggle({
       contentTypeKey,
       entityId,
       pending,
+      resolveEntityName,
       updateCachedAccess,
     ],
   )

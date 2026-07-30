@@ -49,13 +49,7 @@ function renderCreateFooter({
   ])
 }
 
-function renderEditFooter({
-  pending = false,
-  isSuccess = false,
-}: {
-  pending?: boolean
-  isSuccess?: boolean
-} = {}) {
+function renderEditFooter({ pending = false }: { pending?: boolean } = {}) {
   function FooterPage() {
     const form = useForm({ defaultValues: { name: 'Fireball' } })
 
@@ -63,13 +57,7 @@ function renderEditFooter({
       <FormProvider {...form}>
         <form>
           <input aria-label="Name" {...form.register('name')} />
-          <ContentFormFooter
-            mode="edit"
-            form={form}
-            submitLabel="Save changes"
-            pending={pending}
-            isSuccess={isSuccess}
-          />
+          <ContentFormFooter mode="edit" form={form} submitLabel="Save changes" pending={pending} />
         </form>
       </FormProvider>
     )
@@ -204,10 +192,10 @@ describe('ContentFormFooter', () => {
     expect(screen.getByRole('button', { name: 'Save changes' })).toBeEnabled()
   })
 
-  it('announces inline saved feedback on edit success', () => {
-    renderEditFooter({ isSuccess: true })
+  it('does not announce inline saved feedback on edit success', () => {
+    renderEditFooter()
 
-    expect(screen.getByRole('status')).toHaveTextContent('Changes saved.')
+    expect(screen.queryByRole('status')).not.toBeInTheDocument()
   })
 
   it('resets dirty state when Discard changes is clicked', async () => {

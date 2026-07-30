@@ -6,6 +6,8 @@
   /* Layout */
   --radius: 0.525rem;
   --radius-card: var(--radius-lg);
+  /* Layer stack: sticky chrome (20) < toast (45) < overlays/menus/dialogs (50) in CVA today. */
+  --z-toast: 45;
 
   /* Surfaces — page canvas, cards, popovers (`bg-background`, `bg-card`, `bg-popover`, …) */
   --background: var(--palette-surface-base);

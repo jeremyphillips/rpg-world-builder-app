@@ -52,6 +52,12 @@ export function formatContentCreatedMessage(key: ContentTypeKey): string {
   return `${label} created.`
 }
 
+/** Delete success message for toast — e.g. "Spell deleted." */
+export function formatContentDeletedMessage(key: ContentTypeKey): string {
+  const label = getContentTypeSentenceLabel(key)
+  return `${label} deleted.`
+}
+
 /** Generic not-found sentence when no message catalog entry exists. */
 export function formatContentNotFoundMessage(key: ContentTypeKey): string {
   return `${getContentTypeSentenceLabel(key)} not found.`

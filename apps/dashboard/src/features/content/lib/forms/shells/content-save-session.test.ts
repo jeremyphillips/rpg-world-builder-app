@@ -1,6 +1,8 @@
 import { describe, expect, it, vi } from 'vitest'
 
+import type { CampaignAccessSaveResult } from '../../campaign-access/campaign-access-form-context.client'
 import {
+  runCoordinatedContentSave,
   runContentSaveSession,
   type SaveResult,
   type SaveSurface,
@@ -110,6 +112,72 @@ describe('runContentSaveSession', () => {
 
     await expect(runContentSaveSession(access, body)).resolves.toEqual({ status: 'saved' })
     expect(body.save).toHaveBeenCalledOnce()
+  })
+})
+
+describe('runCoordinatedContentSave', () => {
+  const updatedAccess: CampaignAccessSaveResult = {
+    status: 'updated',
+    campaignAccess: {
+      available: true,
+      visibilityMode: 'all_players',
+      participantIds: [],
+      unavailableParticipantIds: [],
+      effectiveAudience: 'all_players',
+    },
+  }
+
+  it('reports access-only success with captured availability', async () => {
+    const readPendingAvailable = vi.fn(() => true)
+
+    const result = await runCoordinatedContentSave({
+      accessWasDirty: true,
+      bodyWasDirty: false,
+      readPendingAvailable,
+      access: { save: vi.fn(async () => updatedAccess) },
+      body: { save: vi.fn(async () => ({ status: 'saved' }) satisfies SaveResult) },
+    })
+
+    expect(readPendingAvailable).toHaveBeenCalledOnce()
+    expect(result).toEqual({
+      status: 'saved',
+      saved: { accessSaved: true, bodySaved: false, accessAvailable: true },
+    })
+  })
+
+  it('reports body-only success without access availability', async () => {
+    const result = await runCoordinatedContentSave({
+      accessWasDirty: false,
+      bodyWasDirty: true,
+      access: {
+        save: vi.fn(async () => ({ status: 'skipped' }) satisfies CampaignAccessSaveResult),
+      },
+      body: { save: vi.fn(async () => ({ status: 'saved' }) satisfies SaveResult) },
+    })
+
+    expect(result).toEqual({
+      status: 'saved',
+      saved: { accessSaved: false, bodySaved: true, accessAvailable: undefined },
+    })
+  })
+
+  it('reports combined save with bodySaved true', async () => {
+    const result = await runCoordinatedContentSave({
+      accessWasDirty: true,
+      bodyWasDirty: true,
+      readPendingAvailable: () => false,
+      access: { save: vi.fn(async () => updatedAccess) },
+      body: { save: vi.fn(async () => ({ status: 'saved' }) satisfies SaveResult) },
+    })
+
+    expect(result).toEqual({
+      status: 'saved',
+      saved: {
+        accessSaved: true,
+        bodySaved: true,
+        accessAvailable: false,
+      },
+    })
   })
 })
 

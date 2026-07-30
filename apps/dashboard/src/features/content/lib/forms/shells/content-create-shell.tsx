@@ -9,6 +9,7 @@ import { useRef, useState } from 'react'
 
 import { NarrowPage } from '@/components/layout/narrow-page'
 import { allowFormNavigationOnce } from '@/lib/form-unsaved-changes-guard'
+import { notifyContentCreated } from '@/lib/notify'
 import { useSubmitHandler } from '@/lib/use-submit-handler'
 import { formatContentCreateActionLabel } from '../../content-type-labels'
 import { useContentWriteMutation } from '../../list/use-content-mutations'
@@ -100,9 +101,9 @@ function ContentCreateFormBody({
     }
 
     const editHref = resolveContentPostCreateEditHref(def, campaignId, saved, formCtx)
-    // TODO(toast): show success feedback — formatContentCreatedMessage(contentTypeKey)
     allowFormNavigationOnce()
     navigate(editHref)
+    notifyContentCreated(contentTypeKey)
   }
 
   const { onSubmit: onPublish, formError: publishFormError } = useSubmitHandler(async (values) => {

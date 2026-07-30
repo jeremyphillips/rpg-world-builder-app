@@ -3,7 +3,7 @@
 import { useEffect, useId, useMemo, useRef } from 'react'
 import { FormProvider, useForm, useWatch } from 'react-hook-form'
 import type { ContentAccessTargetType, ContentTypeKey, WithCampaignAccess } from '@rpg/contracts'
-import { Button, Modal, Text } from '@rpg/ui'
+import { Button, Modal } from '@rpg/ui'
 import { FormFieldStack } from '@rpg/ui/form'
 
 import { CampaignAccessBlockedDialog } from '../campaign-access-blocked-dialog.client'
@@ -69,11 +69,10 @@ export function BulkCampaignAccessDialog({
       ),
     [fieldValues, selectedRows],
   )
-  const { apply, pending, resultSummary, blockedOpen, blockers, setBlockedOpen } =
-    useBulkUpdateCampaignAccess({
-      campaignId,
-      contentTypeKey,
-    })
+  const { apply, pending, blockedOpen, blockers, setBlockedOpen } = useBulkUpdateCampaignAccess({
+    campaignId,
+    contentTypeKey,
+  })
 
   useEffect(() => {
     if (!open) {
@@ -128,7 +127,6 @@ export function BulkCampaignAccessDialog({
                   </p>
                   <p>{BULK_CAMPAIGN_ACCESS_DRAFT_NOTE}</p>
                   <p>{BULK_CAMPAIGN_ACCESS_BLOCKED_PREVIEW_NOTE}</p>
-                  {resultSummary ? <Text variant="info">{resultSummary}</Text> : null}
                 </div>
               </FormFieldStack>
             </FormProvider>

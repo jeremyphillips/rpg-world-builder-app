@@ -82,7 +82,7 @@ describe('executeBulkCampaignAccessApply', () => {
       blockedIds: [],
       failedIds: [],
       fullSuccess: true,
-      summary: 'Updated 3 items.',
+      summary: '3 items are now available in this campaign.',
     })
   })
 })

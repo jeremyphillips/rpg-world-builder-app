@@ -13,6 +13,7 @@ import type { ZodType } from 'zod'
 import { NarrowPage } from '@/components/layout/narrow-page'
 import { useSetBreadcrumbLabel } from '@/components/layout/use-breadcrumb-label'
 import { useSubmitHandler } from '@/lib/use-submit-handler'
+import { notifyCoordinatedContentSaveSuccess } from '@/lib/notify'
 import { SubclassUnsavedEditsProvider } from '@/features/content/classes/hooks/subclass-unsaved-edits-context.client'
 import { stripEditEnvelopeFromFormDefaults } from '../content-form-key-helpers'
 import { useContentWriteMutation } from '../../list/use-content-mutations'
@@ -97,7 +98,6 @@ interface ContentEditEntityFormProps<
   schema: ZodType<FieldValues>
   defaultValues: DefaultValues<FieldValues>
   submitPending: boolean
-  submitSuccess: boolean
   formError: string | null
   onSubmit: (values: FieldValues, form: UseFormReturn<FieldValues>) => Promise<void>
 }
@@ -137,7 +137,6 @@ function ContentEditEntityFormBody<
   schema,
   defaultValues,
   submitPending,
-  submitSuccess,
   formError,
   onSubmit,
 }: ContentEditEntityFormProps<TEntity>) {
@@ -178,6 +177,13 @@ function ContentEditEntityFormBody<
       publishFlow.setPublishError(getErrorMessage(err, 'Could not publish this item.'))
     }
   }, [publishFlow.runPublishMutation, publishFlow.setPublishError])
+
+  const handleCoordinatedSaveSuccess = useCallback(
+    (event: Parameters<typeof notifyCoordinatedContentSaveSuccess>[0]) => {
+      notifyCoordinatedContentSaveSuccess(event, entity.name)
+    },
+    [entity.name],
+  )
 
   const headerError =
     deleteFlow.deleteError ?? publishFlow.publishError ?? demoteFlow.demoteError ?? formError
@@ -221,9 +227,9 @@ function ContentEditEntityFormBody<
           onCampaignAccessPersisted={setCampaignAccess}
           submitLabel="Save changes"
           submitPending={submitPending}
-          submitSuccess={submitSuccess}
           formError={headerError}
           onSubmit={onSubmit}
+          onSaved={handleCoordinatedSaveSuccess}
           publishSchema={entity.status === 'draft' ? publishSchema : undefined}
           onPublish={entity.status === 'draft' ? handlePublish : undefined}
           publishSuccess={publishFlow.publishSuccess}
@@ -360,7 +366,6 @@ function ContentEditFormBody({
       stripKind: layoutCtx.equipmentKind != null,
     })
     form.reset(baseline)
-    // TODO(toast): optionally supplement inline "Changes saved." with toast feedback
   }, `Could not update ${def.routeKey}.`)
 
   return (
@@ -375,7 +380,6 @@ function ContentEditFormBody({
       schema={schema}
       defaultValues={defaultValues}
       submitPending={mutation.isPending}
-      submitSuccess={mutation.isSuccess}
       formError={formError ?? null}
       onSubmit={onSubmit}
     />
