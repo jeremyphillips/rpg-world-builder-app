@@ -24,8 +24,7 @@ export const characterDetailStatTileCompactWidthClasses = 'w-[100px] shrink-0'
 export const characterDetailStatTileHitPointsWidthClasses = 'w-[200px] shrink-0'
 
 /** One visual step below `Eyebrow` `size="xs"` for dense stat tiles. */
-export const characterDetailStatTileEyebrowClasses =
-  'origin-top scale-[0.92] text-2xs-meta font-meta tracking-eyebrow-xs uppercase'
+export const characterDetailStatTileEyebrowClasses = 'origin-top scale-[0.92]'
 
 export const characterDetailStatTileFooterClasses =
   'flex h-5 w-full shrink-0 items-center justify-center'
@@ -33,8 +32,7 @@ export const characterDetailStatTileFooterClasses =
 export const characterDetailStatTileFooterMetaClasses =
   'heading-style-subsection font-body-emphasis text-muted-foreground'
 
-export const characterDetailStatTileFooterLabelClasses =
-  'origin-top scale-[0.92] text-2xs-meta font-meta tracking-eyebrow-xs uppercase text-muted-foreground'
+export const characterDetailStatTileFooterLabelClasses = 'origin-top scale-[0.92]'
 
 export const characterDetailStatTileHitPointsGridClasses =
   'grid w-full grid-cols-3 grid-rows-[auto_auto] items-start gap-x-2 gap-y-[4px]'

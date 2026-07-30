@@ -64,7 +64,7 @@ describe('MasterDetailListPanel', () => {
     ]
     render(<MasterDetailListPanel {...baseProps()} items={protectedItems} />)
 
-    expect(screen.getByText('Level 1')).toBeInTheDocument()
+    expect(screen.getByText('Level 1')).toHaveClass('eyebrow-style-sm')
     expect(screen.getByText('System')).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: /Remove Rage/i })).not.toBeInTheDocument()
   })

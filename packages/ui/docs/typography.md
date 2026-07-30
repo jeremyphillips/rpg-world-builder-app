@@ -16,26 +16,26 @@ styles, and list behavior on all descendants and fights layout utilities
 Document outline presets — pair each `variant` with the matching `as` level. Use **one
 h1 per page** (route title via `page`, or entity title via `display` on detail routes).
 
-| Variant / component           | `as`   | px   | Weight | Use case                                                      |
-| ----------------------------- | ------ | ---- | ------ | ------------------------------------------------------------- |
-| `Heading` `display`           | `h1`   | 42   | 700    | Hero, content detail entity titles                            |
-| `Heading` `page`              | `h1`   | 34   | 600    | Route titles (`PageHeader`)                                   |
-| `Heading` `section`           | `h2`   | 28   | 300    | Top-level in-page sections                                    |
-| `Heading` `subsection`        | `h3`   | 19   | 600    | Nested blocks within a section                                |
-| `Heading` `group`             | `h4`   | 16   | 500    | Headings inside subsections                                   |
-| `Heading` `card`              | Radix  | 19   | 600    | `CardTitle`, `Modal.Header` (chrome)                          |
-| `Heading` `nav` / `brand`     | `span` | 16   | 600    | Topbar title, sidebar product name                            |
-| `Heading` `alert`             | Radix  | 16   | 600    | Confirm dialog title                                          |
-| `Heading` `label`             | `p`    | 16   | 500    | Inline non-outline titles (trait names)                       |
-| `Text` `body`                 | `p`    | 16   | 400    | Default foreground copy                                       |
-| `Text` `muted`                | `p`    | 16   | 400    | Non-catalog plain copy (hints, errors)                        |
-| `Text` `small`                | `p`    | 15   | 400    | Helper text, secondary metadata                               |
-| `Text` `caption`              | `p`    | 12   | 400    | Form field hints                                              |
-| `Text` `lead`                 | `p`    | 18   | 400    | Marketing subheads                                            |
-| `Text` `destructive`          | `p`    | 15   | 400    | Inline errors — pair with `role="alert"`                      |
-| `Eyebrow` `xs` / `sm` / `md`  | `p`    | 9–13 | 300    | Uppercase section labels (`tone`: muted, foreground, primary) |
-| `RichTextContent` `size="md"` | `div`  | 15   | 400    | Catalog descriptions (TipTap / CMS HTML)                      |
-| `CardDescription`             | `div`  | 15   | 400    | Card header secondary line                                    |
+| Variant / component           | `as`   | px   | Weight               | Use case                                                      |
+| ----------------------------- | ------ | ---- | -------------------- | ------------------------------------------------------------- |
+| `Heading` `display`           | `h1`   | 42   | 700                  | Hero, content detail entity titles                            |
+| `Heading` `page`              | `h1`   | 34   | 600                  | Route titles (`PageHeader`)                                   |
+| `Heading` `section`           | `h2`   | 28   | 300                  | Top-level in-page sections                                    |
+| `Heading` `subsection`        | `h3`   | 19   | 600                  | Nested blocks within a section                                |
+| `Heading` `group`             | `h4`   | 16   | 500                  | Headings inside subsections                                   |
+| `Heading` `card`              | Radix  | 19   | 600                  | `CardTitle`, `Modal.Header` (chrome)                          |
+| `Heading` `nav` / `brand`     | `span` | 16   | 600                  | Topbar title, sidebar product name                            |
+| `Heading` `alert`             | Radix  | 16   | 600                  | Confirm dialog title                                          |
+| `Heading` `label`             | `p`    | 16   | 500                  | Inline non-outline titles (trait names)                       |
+| `Text` `body`                 | `p`    | 16   | 400                  | Default foreground copy                                       |
+| `Text` `muted`                | `p`    | 16   | 400                  | Non-catalog plain copy (hints, errors)                        |
+| `Text` `small`                | `p`    | 15   | 400                  | Helper text, secondary metadata                               |
+| `Text` `caption`              | `p`    | 12   | 400                  | Form field hints                                              |
+| `Text` `lead`                 | `p`    | 18   | 400                  | Marketing subheads                                            |
+| `Text` `destructive`          | `p`    | 15   | 400                  | Inline errors — pair with `role="alert"`                      |
+| `Eyebrow` `xs` / `sm` / `md`  | `p`    | 9–13 | 500 light / 300 dark | Uppercase section labels (`tone`: muted, foreground, primary) |
+| `RichTextContent` `size="md"` | `div`  | 15   | 400                  | Catalog descriptions (TipTap / CMS HTML)                      |
+| `CardDescription`             | `div`  | 15   | 400                  | Card header secondary line                                    |
 
 Preserve semantic headings and existing `id`s — content detail routes use
 `aria-labelledby` on sections.
@@ -190,19 +190,20 @@ for token inspection and docs — components use composites via `headingVariants
 
 Primitive weights and role aliases live in [`styles/globals.css`](../src/styles/globals.css).
 
-| Role utility / token            | Value | Typical use                               |
-| ------------------------------- | ----- | ----------------------------------------- |
-| `--font-weight-heading-display` | 700   | `Heading` display                         |
-| `--font-weight-heading`         | 600   | page, subsection, card, nav, brand, alert |
-| `--font-weight-heading-section` | 300   | `Heading` section                         |
-| `--font-weight-heading-group`   | 500   | `Heading` group                           |
-| `--font-weight-heading-label`   | 500   | `Heading` label                           |
-| `font-field-label`              | 600   | Form field labels (`fieldLabelVariants`)  |
-| `font-body-emphasis`            | 500   | Button, badge, `Text` emphasis            |
-| `font-body`                     | 400   | `Text` body default                       |
-| `font-meta`                     | 300   | Eyebrow, data-table meta cells            |
-| `font-data-name`                | 600   | Data-table name cells                     |
-| `font-data-stat`                | 500   | Data-table stat columns                   |
+| Role utility / token            | Value                | Typical use                               |
+| ------------------------------- | -------------------- | ----------------------------------------- |
+| `--font-weight-heading-display` | 700                  | `Heading` display                         |
+| `--font-weight-heading`         | 600                  | page, subsection, card, nav, brand, alert |
+| `--font-weight-heading-section` | 300                  | `Heading` section                         |
+| `--font-weight-heading-group`   | 500                  | `Heading` group                           |
+| `--font-weight-heading-label`   | 500                  | `Heading` label                           |
+| `font-field-label`              | 600                  | Form field labels (`fieldLabelVariants`)  |
+| `font-body-emphasis`            | 500                  | Button, badge, `Text` emphasis            |
+| `font-body`                     | 400                  | `Text` body default                       |
+| `font-meta`                     | 300                  | Data-table meta cells                     |
+| `--font-weight-eyebrow`         | 500 light / 300 dark | `eyebrow-style-*` composites              |
+| `font-data-name`                | 600                  | Data-table name cells                     |
+| `font-data-stat`                | 500                  | Data-table stat columns                   |
 
 ## Meta typography tokens
 
@@ -220,7 +221,8 @@ Secondary copy sizes sit one step below the Tailwind text scale (at 16px root):
 Compact-label vocabulary (`appearance`, `tone`, selected-control vs semantic soft) →
 [compact-labels.md](./compact-labels.md).
 
-Prefer semantic aliases (`text-eyebrow-sm`) in component variants; use
+Prefer `eyebrow-style-*` composites or `<Eyebrow>` for uppercase section labels; use
+semantic aliases (`text-eyebrow-sm`) only when a composite is not appropriate; use
 `text-xs-meta` / `text-sm-meta` directly for role-based typography (e.g. data-table meta).
 
 ## Internal primitives

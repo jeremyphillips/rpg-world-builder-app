@@ -9,7 +9,7 @@ describe('sidebarNavItemVariants', () => {
   })
 
   it('applies inactive styles when not active', () => {
-    expect(sidebarNavItemVariants({ active: false })).toContain('text-muted-foreground')
+    expect(sidebarNavItemVariants({ active: false })).toContain('text-sidebar-nav-item-fg')
     expect(sidebarNavItemVariants({ active: false })).toContain('hover:bg-accent')
   })
 })

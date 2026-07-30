@@ -19,7 +19,7 @@ import {
 } from '@dnd-kit/sortable'
 import { restrictToVerticalAxis } from '@dnd-kit/modifiers'
 import { CSS } from '@dnd-kit/utilities'
-import { cn, Button, Text } from '@rpg/ui'
+import { cn, Button, Eyebrow, Text } from '@rpg/ui'
 import { AlertCircle, GripVertical, Trash2 } from 'lucide-react'
 
 import {
@@ -186,9 +186,9 @@ function MasterDetailListRowSelectButton({
       )}
     >
       {item.eyebrow ? (
-        <span className="block text-xs font-medium uppercase tracking-wide text-muted-foreground">
+        <Eyebrow as="span" size="sm" className="block">
           {item.eyebrow}
-        </span>
+        </Eyebrow>
       ) : null}
       <span
         className={cn(

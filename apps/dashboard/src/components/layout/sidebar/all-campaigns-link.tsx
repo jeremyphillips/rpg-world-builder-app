@@ -10,7 +10,7 @@ export function AllCampaignsLink() {
     <Link
       to={ROUTES.campaign.list}
       className={cn(
-        'block px-3 py-1.5 text-sm font-medium text-muted-foreground transition-colors',
+        'block px-3 py-1.5 text-sm font-medium text-sidebar-nav-item-fg transition-colors',
         'rounded-md hover:bg-accent hover:text-accent-foreground',
       )}
     >

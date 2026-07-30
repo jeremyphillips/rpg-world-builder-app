@@ -25,6 +25,11 @@
   );
 
   /* Derived foreground scale */
+  --palette-fg-subtle: color-mix(
+    in oklch,
+    var(--palette-fg-default) 86%,
+    var(--palette-surface-base)
+  );
   --palette-fg-muted: color-mix(
     in oklch,
     var(--palette-fg-default) 72%,

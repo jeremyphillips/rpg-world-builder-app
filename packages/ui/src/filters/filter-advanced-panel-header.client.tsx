@@ -48,10 +48,7 @@ export function FilterAdvancedPanelHeader({
     <div className={filterAdvancedPanelHeaderVariants({ density })}>
       <div className="min-w-0 flex-1">
         {heading ? (
-          <HeadingElement
-            id={id}
-            className="text-eyebrow-sm font-semibold uppercase tracking-eyebrow text-muted-foreground"
-          >
+          <HeadingElement id={id} className="eyebrow-style-sm text-muted-foreground">
             {heading}
           </HeadingElement>
         ) : null}

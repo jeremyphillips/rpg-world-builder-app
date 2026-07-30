@@ -89,16 +89,18 @@ Focus and invalid states alias Layer 2 roles (`--primary`, `--ring`, `--destruct
 
 ## Sidebar
 
-| Token                       | Layer 2        |
-| --------------------------- | -------------- |
-| `--palette-sidebar-surface` | `--sidebar`    |
-| `--palette-sidebar-shade`   | Mix ingredient |
+| Token                       | Layer 2                                                                               |
+| --------------------------- | ------------------------------------------------------------------------------------- |
+| `--palette-sidebar-surface` | `--sidebar` (dark); light aliases `--surface-strong`                                  |
+| `--palette-sidebar-shade`   | Mix ingredient                                                                        |
+| `--sidebar-nav-item-fg`     | Inactive sidebar nav ink — `--foreground-subtle` (light), `--muted-foreground` (dark) |
 
 ## Foreground roles
 
 | Token                    | Layer 2 mapping (examples)                                      |
 | ------------------------ | --------------------------------------------------------------- |
 | `--palette-fg-default`   | `--foreground`, `--secondary-foreground`, `--accent-foreground` |
+| `--palette-fg-subtle`    | `--foreground-subtle` (between default and muted)               |
 | `--palette-fg-muted`     | `--muted-foreground` (derived toward canvas)                    |
 | `--palette-fg-disabled`  | `--field-control-fg-disabled` (stronger derived mix)            |
 | `--palette-fg-on-solid`  | `--primary-foreground`, destructive/info/success fg (light)     |

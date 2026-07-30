@@ -1,6 +1,6 @@
 'use client'
 
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Text, cn } from '@rpg/ui'
+import { Eyebrow, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, cn } from '@rpg/ui'
 
 export type RulesConfigNavSection = {
   id: string
@@ -30,9 +30,9 @@ export function RulesConfigFieldNav({
   return (
     <>
       <nav className="hidden w-56 shrink-0 lg:block" aria-label={navLabel}>
-        <Text variant="small" className="mb-2 px-3 font-medium uppercase tracking-wide">
+        <Eyebrow size="sm" className="mb-2 px-3">
           Sections
-        </Text>
+        </Eyebrow>
         <ul className="space-y-1">
           {sections.map((section) => (
             <li key={section.id}>

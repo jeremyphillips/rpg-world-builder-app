@@ -7,7 +7,7 @@ export const sidebarNavItemVariants = cva(
     variants: {
       active: {
         true: 'bg-accent text-accent-foreground',
-        false: 'text-muted-foreground hover:bg-accent hover:text-accent-foreground',
+        false: 'text-sidebar-nav-item-fg hover:bg-accent hover:text-accent-foreground',
       },
     },
     defaultVariants: {

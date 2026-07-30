@@ -103,6 +103,15 @@ describe('token contrast smoke checks', () => {
     }
   })
 
+  it('derives subtle foreground between default and muted (light + dark)', () => {
+    for (const css of [lightCss, darkCss]) {
+      const raw = readPaletteVar(css, '--palette-fg-subtle') ?? ''
+      expect(raw).toContain('color-mix')
+      expect(raw).toContain('var(--palette-fg-default)')
+      expect(raw).toContain('var(--palette-surface-base)')
+    }
+  })
+
   it('aliases on-muted field fill to surface-subtle in both semantic themes', () => {
     const semanticLight = readFileSync(join(tokensDir, 'semantic-light.css'), 'utf8')
     const semanticDark = readFileSync(join(tokensDir, 'semantic-dark.css'), 'utf8')
