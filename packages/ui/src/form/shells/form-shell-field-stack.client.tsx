@@ -12,7 +12,7 @@ import {
 import { FormValueSyncEffects } from '../chrome/form-value-sync-effects.client'
 import type { FormItem, FormValueSync } from '../field-config'
 
-export type FormFieldStackProps = {
+export type FormShellFieldStackProps = {
   formId: string
   fields: FormItem[]
   contentClassName?: string
@@ -23,7 +23,7 @@ export type FormFieldStackProps = {
   header?: ReactNode
 }
 
-export function FormFieldStack({
+export function FormShellFieldStack({
   formId,
   fields,
   contentClassName,
@@ -32,7 +32,7 @@ export function FormFieldStack({
   formError,
   valueSyncs,
   header,
-}: FormFieldStackProps) {
+}: FormShellFieldStackProps) {
   const stack = (
     <FormRhythmStack className={isSheetDockedFooter ? undefined : contentClassName}>
       {!stickyFooter && formError ? (
