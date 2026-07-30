@@ -14,6 +14,7 @@ import { navigateTabbedFormInvalidSubmit } from './navigate-tabbed-form-invalid-
 import { TabbedFormChromeContext } from './tabbed-form-chrome.context'
 import type { ValidateSilently } from '../context/form-ui.context'
 import { TabbedFormErrorSummary } from './tabbed-form-error-summary.client'
+import { FormRhythmStack } from '../context/form-section.context'
 import {
   resolveTabbedFormShellClassName,
   TabbedFormFooterRegion,
@@ -204,8 +205,10 @@ export function TabbedForm<TFieldValues extends FieldValues>({
         {valueSyncs && valueSyncs.length > 0 ? (
           <FormValueSyncEffects valueSyncs={valueSyncs} />
         ) : null}
-        {resolvedHeader}
-        {contentWrapper ? contentWrapper(panels) : panels}
+        <FormRhythmStack>
+          {resolvedHeader}
+          {contentWrapper ? contentWrapper(panels) : panels}
+        </FormRhythmStack>
         <TabbedFormFooterRegion
           footerWrapper={footerWrapper}
           hasFooterRegion={hasFooterRegion}

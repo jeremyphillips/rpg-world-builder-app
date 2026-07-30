@@ -25,6 +25,8 @@ export type CampaignAccessFormContextValue = {
   reset: () => void
   /** Read pending availability before save(); undefined when unavailable. */
   readPendingAvailable?: () => boolean | undefined
+  /** True when the availability flag differs from persisted baseline. */
+  readAccessAvailabilityChanged?: () => boolean | undefined
 }
 
 const defaultSave = async (): Promise<CampaignAccessSaveResult> => ({ status: 'skipped' })
@@ -59,6 +61,8 @@ export function CampaignAccessFormProvider({ children }: { children: ReactNode }
   const resetRef = useRef(DEFAULT_CAMPAIGN_ACCESS_PARTICIPANT.reset)
   const readPendingAvailableRef =
     useRef<CampaignAccessFormContextValue['readPendingAvailable']>(undefined)
+  const readAccessAvailabilityChangedRef =
+    useRef<CampaignAccessFormContextValue['readAccessAvailabilityChanged']>(undefined)
   const [snapshot, setSnapshot] = useState<ParticipantSnapshot>({
     isDirty: false,
     isPending: false,
@@ -68,6 +72,7 @@ export function CampaignAccessFormProvider({ children }: { children: ReactNode }
     saveRef.current = bindings.save
     resetRef.current = bindings.reset
     readPendingAvailableRef.current = bindings.readPendingAvailable
+    readAccessAvailabilityChangedRef.current = bindings.readAccessAvailabilityChanged
     setSnapshot({ isDirty: bindings.isDirty, isPending: bindings.isPending })
   }, [])
 
@@ -77,6 +82,7 @@ export function CampaignAccessFormProvider({ children }: { children: ReactNode }
       save: () => saveRef.current(),
       reset: () => resetRef.current(),
       readPendingAvailable: () => readPendingAvailableRef.current?.(),
+      readAccessAvailabilityChanged: () => readAccessAvailabilityChangedRef.current?.(),
     }),
     [snapshot],
   )
@@ -109,6 +115,7 @@ export function useCampaignAccessParticipantUpdater(bindings: CampaignAccessForm
       save: () => bindingsRef.current.save(),
       reset: () => bindingsRef.current.reset(),
       readPendingAvailable: () => bindingsRef.current.readPendingAvailable?.(),
+      readAccessAvailabilityChanged: () => bindingsRef.current.readAccessAvailabilityChanged?.(),
     })
     return () => register(DEFAULT_CAMPAIGN_ACCESS_PARTICIPANT)
   }, [bindings.isDirty, bindings.isPending, register])

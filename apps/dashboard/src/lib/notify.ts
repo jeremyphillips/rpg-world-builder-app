@@ -8,6 +8,7 @@ import {
   formatCampaignAccessAvailabilityToast,
 } from '@/features/content/lib/campaign-access/campaign-access-labels'
 import {
+  CONTENT_PUBLISHED_MESSAGE,
   formatContentCreatedMessage,
   formatContentDeletedMessage,
 } from '@/features/content/lib/content-type-labels'
@@ -23,6 +24,10 @@ export function notifyContentDeleted(contentTypeKey: ContentTypeKey): void {
 
 export function notifyContentCreated(contentTypeKey: ContentTypeKey): void {
   toast.success(formatContentCreatedMessage(contentTypeKey))
+}
+
+export function notifyPublishSuccess(): void {
+  toast.success(CONTENT_PUBLISHED_MESSAGE)
 }
 
 export function notifySaveSuccess(label?: string): void {
@@ -70,8 +75,13 @@ export function notifyCoordinatedContentSaveSuccess(
     return
   }
 
-  if (event.accessSaved && event.accessAvailable != null) {
+  if (event.accessSaved && event.accessAvailabilityChanged && event.accessAvailable != null) {
     notifyCampaignAccessUpdated(entityName, event.accessAvailable)
+    return
+  }
+
+  if (event.accessSaved) {
+    notifySaveSuccess()
   }
 }
 

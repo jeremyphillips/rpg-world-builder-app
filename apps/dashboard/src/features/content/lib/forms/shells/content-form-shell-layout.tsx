@@ -56,7 +56,6 @@ interface ContentFormLayoutProps<TFormValues extends FieldValues> {
   onSubmit: (values: TFormValues, form: UseFormReturn<TFormValues>) => Promise<void>
   onSaveDraft?: (values: TFormValues, form: UseFormReturn<TFormValues>) => Promise<void>
   saveDraftPending?: boolean
-  publishSuccess?: boolean
   publishSchema?: ZodType<TFormValues>
   onPublish?: () => Promise<void>
   campaignId: string
@@ -82,7 +81,6 @@ export function ContentFormLayout<TFormValues extends FieldValues>({
   onSubmit,
   onSaveDraft,
   saveDraftPending,
-  publishSuccess,
   publishSchema,
   onPublish,
   campaignId,
@@ -128,7 +126,6 @@ export function ContentFormLayout<TFormValues extends FieldValues>({
       onSubmit={resolvedOnSubmit}
       onSaveDraft={onSaveDraft}
       saveDraftPending={saveDraftPending}
-      publishSuccess={publishSuccess}
       onSaved={onSaved}
       publishSchema={publishSchema}
       onPublish={onPublish}

@@ -46,7 +46,10 @@ export function formatContentCreateActionLabel(key: ContentTypeKey): string {
   return `Create ${getContentTypeMidSentenceLabel(key)}`
 }
 
-/** Create success message for future toast — e.g. "Spell created." */
+/** Publish success message for toast — e.g. "Published." */
+export const CONTENT_PUBLISHED_MESSAGE = 'Published.'
+
+/** Create success message for toast — e.g. "Spell created." */
 export function formatContentCreatedMessage(key: ContentTypeKey): string {
   const label = getContentTypeSentenceLabel(key)
   return `${label} created.`

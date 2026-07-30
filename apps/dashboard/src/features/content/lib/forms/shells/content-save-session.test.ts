@@ -141,7 +141,12 @@ describe('runCoordinatedContentSave', () => {
     expect(readPendingAvailable).toHaveBeenCalledOnce()
     expect(result).toEqual({
       status: 'saved',
-      saved: { accessSaved: true, bodySaved: false, accessAvailable: true },
+      saved: {
+        accessSaved: true,
+        bodySaved: false,
+        accessAvailable: true,
+        accessAvailabilityChanged: undefined,
+      },
     })
   })
 
@@ -157,7 +162,12 @@ describe('runCoordinatedContentSave', () => {
 
     expect(result).toEqual({
       status: 'saved',
-      saved: { accessSaved: false, bodySaved: true, accessAvailable: undefined },
+      saved: {
+        accessSaved: false,
+        bodySaved: true,
+        accessAvailable: undefined,
+        accessAvailabilityChanged: undefined,
+      },
     })
   })
 
@@ -176,6 +186,31 @@ describe('runCoordinatedContentSave', () => {
         accessSaved: true,
         bodySaved: true,
         accessAvailable: false,
+        accessAvailabilityChanged: undefined,
+      },
+    })
+  })
+
+  it('captures availability change flag for access-only saves', async () => {
+    const readAccessAvailabilityChanged = vi.fn(() => true)
+
+    const result = await runCoordinatedContentSave({
+      accessWasDirty: true,
+      bodyWasDirty: false,
+      readPendingAvailable: () => true,
+      readAccessAvailabilityChanged,
+      access: { save: vi.fn(async () => updatedAccess) },
+      body: { save: vi.fn(async () => ({ status: 'saved' }) satisfies SaveResult) },
+    })
+
+    expect(readAccessAvailabilityChanged).toHaveBeenCalledOnce()
+    expect(result).toEqual({
+      status: 'saved',
+      saved: {
+        accessSaved: true,
+        bodySaved: false,
+        accessAvailable: true,
+        accessAvailabilityChanged: true,
       },
     })
   })

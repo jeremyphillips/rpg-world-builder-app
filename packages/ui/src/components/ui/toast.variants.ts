@@ -28,9 +28,11 @@ export const toastVariants = cva(
   },
 )
 
-export const toastViewportVariants = cva(
+export const toastViewportVariants = cva([
   'fixed z-toast flex max-h-screen flex-col gap-2 outline-none',
-)
+  'bottom-0 left-0 right-0 px-4 pb-[max(1rem,env(safe-area-inset-bottom,0px))]',
+  'sm:bottom-auto sm:left-auto sm:top-4 sm:right-4 sm:w-[min(100vw-2rem,26.25rem)] sm:min-w-[22.5rem] sm:px-0 sm:pb-0',
+])
 
 export const toastTitleVariants = cva('text-sm font-medium text-foreground')
 

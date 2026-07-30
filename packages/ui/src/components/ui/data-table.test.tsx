@@ -660,6 +660,34 @@ describe('RowActionsMenu', () => {
 
     expect(screen.getByText('Campaign footer')).toBeInTheDocument()
   })
+
+  it('omits the footer separator when there are no menu items', async () => {
+    const user = userEvent.setup()
+
+    render(
+      <RowActionsMenu triggerLabel="Open actions" items={[]} footer={<div>Campaign footer</div>} />,
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Open actions' }))
+
+    expect(screen.queryByRole('separator')).not.toBeInTheDocument()
+  })
+
+  it('renders a footer separator when menu items precede the footer', async () => {
+    const user = userEvent.setup()
+
+    render(
+      <RowActionsMenu
+        triggerLabel="Open actions"
+        items={[{ kind: 'action', id: 'edit', label: 'Edit', onSelect: vi.fn() }]}
+        footer={<div>Campaign footer</div>}
+      />,
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Open actions' }))
+
+    expect(screen.getByRole('separator')).toBeInTheDocument()
+  })
 })
 
 // ---------------------------------------------------------------------------

@@ -5,7 +5,12 @@ import type { ReactNode } from 'react'
 import { TOAST_DURATION, TOAST_MAX_VISIBLE, type ToastTone } from './toast.constants'
 
 export type { ToastTone } from './toast.constants'
-export { TOAST_DURATION, TOAST_MAX_VISIBLE, TOAST_DISMISS_LABEL } from './toast.constants'
+export {
+  TOAST_DURATION,
+  TOAST_MAX_VISIBLE,
+  TOAST_DISMISS_LABEL,
+  TOAST_REMOVE_DELAY_MS,
+} from './toast.constants'
 
 export type ToastAction = {
   label: string
@@ -33,7 +38,11 @@ type ToastState = {
   toasts: ToastRecord[]
 }
 
-const TOAST_LIMIT = TOAST_MAX_VISIBLE
+let toastVisibleLimit = TOAST_MAX_VISIBLE
+
+export function setToastVisibleLimit(limit: number): void {
+  toastVisibleLimit = limit
+}
 
 let toastCount = 0
 
@@ -66,10 +75,18 @@ export function resolveToastDuration(options: Pick<ToastOptions, 'duration' | 't
 
 function upsertToast(options: ToastOptions): string {
   const id = options.id ?? genToastId()
-  const openToasts = memoryState.toasts.filter((toast) => toast.open && toast.id !== id)
+  const withoutId = memoryState.toasts.filter((toast) => toast.id !== id)
+  const openToasts = withoutId.filter((toast) => toast.open)
+  const closedToasts = withoutId.filter((toast) => !toast.open)
+  let nextOpen = [{ ...options, id, open: true }, ...openToasts]
+
+  while (nextOpen.length > toastVisibleLimit) {
+    const evicted = nextOpen.pop()
+    evicted?.onDismiss?.()
+  }
 
   memoryState = {
-    toasts: [{ ...options, id, open: true }, ...openToasts].slice(0, TOAST_LIMIT),
+    toasts: [...nextOpen, ...closedToasts],
   }
 
   emitState()

@@ -34,11 +34,13 @@ const fields = [{ type: 'text' as const, name: 'name', label: 'Name', required: 
 function AccessParticipant({
   isDirty,
   pendingAvailable,
+  accessAvailabilityChanged = true,
   save,
   reset,
 }: {
   isDirty: boolean
   pendingAvailable: boolean
+  accessAvailabilityChanged?: boolean
   save: () => Promise<CampaignAccessSaveResult>
   reset: () => void
 }) {
@@ -48,6 +50,7 @@ function AccessParticipant({
     save,
     reset,
     readPendingAvailable: () => pendingAvailable,
+    readAccessAvailabilityChanged: () => accessAvailabilityChanged,
   })
   return null
 }
@@ -100,6 +103,7 @@ const updatedAccessResult = {
 function SaveSessionHarness({
   accessDirty,
   pendingAvailable = true,
+  accessAvailabilityChanged = true,
   accessSave,
   accessReset,
   onSubmit,
@@ -107,6 +111,7 @@ function SaveSessionHarness({
 }: {
   accessDirty: boolean
   pendingAvailable?: boolean
+  accessAvailabilityChanged?: boolean
   accessSave: () => Promise<CampaignAccessSaveResult>
   accessReset: () => void
   onSubmit: (values: { name: string }) => Promise<void>
@@ -117,6 +122,7 @@ function SaveSessionHarness({
       <AccessParticipant
         isDirty={accessDirty}
         pendingAvailable={pendingAvailable}
+        accessAvailabilityChanged={accessAvailabilityChanged}
         save={accessSave}
         reset={accessReset}
       />
@@ -286,5 +292,78 @@ describe('coordinated save success feedback', () => {
     expect(accessSave).toHaveBeenCalledOnce()
     expect(toastSuccess).toHaveBeenCalledOnce()
     expect(toastSuccess).toHaveBeenCalledWith('Changes saved.')
+  })
+
+  it('does not toast when body save fails', async () => {
+    const user = userEvent.setup()
+    const onSubmit = vi.fn(async () => {
+      throw new Error('Network error')
+    })
+
+    render(
+      <SaveSessionHarness
+        accessDirty={false}
+        accessSave={vi.fn(async () => ({ status: 'skipped' as const }))}
+        accessReset={vi.fn()}
+        onSubmit={onSubmit}
+      />,
+    )
+
+    await user.type(screen.getByRole('textbox', { name: 'Name' }), 'x')
+    await user.click(screen.getByRole('button', { name: 'Save changes' }))
+
+    await waitFor(() => {
+      expect(onSubmit).toHaveBeenCalledOnce()
+    })
+    expect(toastSuccess).not.toHaveBeenCalled()
+  })
+
+  it('does not toast or hang when body validation fails', async () => {
+    const user = userEvent.setup()
+    const onSubmit = vi.fn()
+
+    render(
+      <SaveSessionHarness
+        accessDirty={false}
+        accessSave={vi.fn(async () => ({ status: 'skipped' as const }))}
+        accessReset={vi.fn()}
+        onSubmit={onSubmit}
+      />,
+    )
+
+    await user.clear(screen.getByRole('textbox', { name: 'Name' }))
+    await user.click(screen.getByRole('button', { name: 'Save changes' }))
+
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: 'Save changes' })).toBeEnabled()
+    })
+    expect(onSubmit).not.toHaveBeenCalled()
+    expect(toastSuccess).not.toHaveBeenCalled()
+  })
+
+  it('shows changes-saved toast for visibility-only access edit', async () => {
+    const user = userEvent.setup()
+    const accessSave = vi.fn(async () => updatedAccessResult)
+    const onSubmit = vi.fn()
+
+    render(
+      <SaveSessionHarness
+        accessDirty
+        pendingAvailable
+        accessAvailabilityChanged={false}
+        accessSave={accessSave}
+        accessReset={vi.fn()}
+        onSubmit={onSubmit}
+        entityName="Fireball"
+      />,
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Save changes' }))
+
+    await waitFor(() => {
+      expect(toastSuccess).toHaveBeenCalledOnce()
+    })
+    expect(toastSuccess).toHaveBeenCalledWith('Changes saved.')
+    expect(onSubmit).not.toHaveBeenCalled()
   })
 })

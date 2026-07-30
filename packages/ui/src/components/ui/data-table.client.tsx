@@ -577,7 +577,7 @@ export function RowActionsMenu({
         })}
         {footer ? (
           <>
-            <DropdownMenuSeparator />
+            {items.length > 0 ? <DropdownMenuSeparator /> : null}
             {footer}
           </>
         ) : null}

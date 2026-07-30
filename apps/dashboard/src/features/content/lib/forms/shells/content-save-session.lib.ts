@@ -39,12 +39,15 @@ export type CoordinatedSaveSavedEvent = {
   bodySaved: boolean
   /** Captured before access.save(); present only when accessSaved. */
   accessAvailable?: boolean
+  /** True when the availability flag changed; false for visibility/participant-only edits. */
+  accessAvailabilityChanged?: boolean
 }
 
 export type CoordinatedContentSaveInput = {
   accessWasDirty: boolean
   bodyWasDirty: boolean
   readPendingAvailable?: () => boolean | undefined
+  readAccessAvailabilityChanged?: () => boolean | undefined
   access: { save: () => Promise<CampaignAccessSaveResult> }
   body: { save: () => Promise<SaveResult> }
 }
@@ -95,12 +98,15 @@ export async function runContentSaveSession(
 export async function runCoordinatedContentSave(
   input: CoordinatedContentSaveInput,
 ): Promise<CoordinatedContentSaveResult> {
-  const { accessWasDirty, bodyWasDirty, readPendingAvailable } = input
+  const { accessWasDirty, bodyWasDirty, readPendingAvailable, readAccessAvailabilityChanged } =
+    input
   let accessPersisted = false
   let capturedAvailable: boolean | undefined
+  let capturedAvailabilityChanged: boolean | undefined
 
   if (accessWasDirty) {
     capturedAvailable = readPendingAvailable?.()
+    capturedAvailabilityChanged = readAccessAvailabilityChanged?.()
   }
 
   const outcome = await runContentSaveSession(
@@ -130,6 +136,7 @@ export async function runCoordinatedContentSave(
       accessSaved: accessPersisted,
       bodySaved: bodyWasDirty,
       accessAvailable: accessPersisted ? capturedAvailable : undefined,
+      accessAvailabilityChanged: accessPersisted ? capturedAvailabilityChanged : undefined,
     },
   }
 }

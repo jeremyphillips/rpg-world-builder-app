@@ -1,6 +1,6 @@
 'use client'
 
-import { Button, Text } from '@rpg/ui'
+import { Button } from '@rpg/ui'
 
 import type { useContentDeleteFlow } from '../../delete/use-content-delete-flow.client'
 import type { useContentDemoteFlow } from '../../demotion/use-content-demote-flow.client'
@@ -30,11 +30,6 @@ export function ContentEditLifecycleActions({
           >
             {publishFlow.publishPending ? 'Publishing…' : 'Publish'}
           </Button>
-          {publishFlow.publishSuccess ? (
-            <Text variant="small" role="status">
-              Published.
-            </Text>
-          ) : null}
         </>
       ) : null}
       {demoteFlow.canDemote ? (

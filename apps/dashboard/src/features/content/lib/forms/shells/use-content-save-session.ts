@@ -76,6 +76,7 @@ export function useContentSaveSession<TFieldValues extends FieldValues>({
         accessWasDirty,
         bodyWasDirty,
         readPendingAvailable: campaignAccess.readPendingAvailable,
+        readAccessAvailabilityChanged: campaignAccess.readAccessAvailabilityChanged,
         access: {
           save: () => campaignAccess.save(),
         },
@@ -89,17 +90,20 @@ export function useContentSaveSession<TFieldValues extends FieldValues>({
             }
 
             return new Promise<SaveResult>((resolve) => {
-              schemaFormSubmit.requestSubmit(async (values, submitForm) => {
-                try {
-                  await onSubmit(values, submitForm)
-                  resolve({ status: 'saved' })
-                } catch (err) {
-                  resolve({
-                    status: 'failed',
-                    error: err instanceof Error ? err : new Error(String(err)),
-                  })
-                }
-              })
+              schemaFormSubmit.requestSubmit(
+                async (values, submitForm) => {
+                  try {
+                    await onSubmit(values, submitForm)
+                    resolve({ status: 'saved' })
+                  } catch (err) {
+                    resolve({
+                      status: 'failed',
+                      error: err instanceof Error ? err : new Error(String(err)),
+                    })
+                  }
+                },
+                () => resolve({ status: 'invalid' }),
+              )
             })
           },
         },

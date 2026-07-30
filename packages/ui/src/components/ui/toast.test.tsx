@@ -83,15 +83,27 @@ describe('toast manager', () => {
     expect(getToastState().toasts[0]?.title).toBe('Updated failure')
   })
 
-  it('limits visible open toasts to three', () => {
+  it('limits visible open toasts to three and invokes evicted onDismiss once', () => {
     toast.dismissAll()
-    toast({ title: 'One', tone: 'default' })
+    const onDismiss = vi.fn()
+    toast({ title: 'One', tone: 'default', onDismiss })
     toast({ title: 'Two', tone: 'default' })
     toast({ title: 'Three', tone: 'default' })
     toast({ title: 'Four', tone: 'default' })
 
     expect(getToastState().toasts.filter((record) => record.open)).toHaveLength(3)
     expect(getToastState().toasts[0]?.title).toBe('Four')
+    expect(onDismiss).toHaveBeenCalledOnce()
+  })
+
+  it('invokes onDismiss once when toast is dismissed', () => {
+    toast.dismissAll()
+    const onDismiss = vi.fn()
+    const id = toast({ title: 'Dismiss me', onDismiss })
+
+    toast.dismiss(id)
+
+    expect(onDismiss).toHaveBeenCalledOnce()
   })
 })
 
@@ -100,11 +112,7 @@ describe('ToastProvider', () => {
     toast.dismissAll()
 
     render(
-      <ToastProvider
-        viewport={
-          <ToastViewport className="top-4 right-4 w-[min(100vw-2rem,26.25rem)] min-w-[22.5rem]" />
-        }
-      >
+      <ToastProvider>
         <button type="button" onClick={() => toast.success('Character saved')}>
           Trigger toast
         </button>
@@ -113,5 +121,31 @@ describe('ToastProvider', () => {
 
     await userEvent.click(screen.getByRole('button', { name: 'Trigger toast' }))
     expect(await screen.findByText('Character saved')).toBeInTheDocument()
+  })
+
+  it('has no axe accessibility violations on the managed toast path', async () => {
+    toast.dismissAll()
+
+    const { container } = render(
+      <ToastProvider>
+        <button
+          type="button"
+          onClick={() =>
+            toast({
+              title: 'Could not save',
+              description: 'Try again.',
+              tone: 'destructive',
+              action: { label: 'Retry', onClick: vi.fn() },
+            })
+          }
+        >
+          Trigger toast
+        </button>
+      </ToastProvider>,
+    )
+
+    await userEvent.click(screen.getByRole('button', { name: 'Trigger toast' }))
+    expect(await screen.findByText('Could not save')).toBeInTheDocument()
+    await expectNoAxeViolations(container)
   })
 })

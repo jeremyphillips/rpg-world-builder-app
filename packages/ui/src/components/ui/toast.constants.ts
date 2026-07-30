@@ -11,4 +11,6 @@ export const TOAST_DURATION = {
 
 export const TOAST_MAX_VISIBLE = 3
 
+export const TOAST_REMOVE_DELAY_MS = 200
+
 export const TOAST_DISMISS_LABEL = 'Dismiss notification'

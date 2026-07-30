@@ -19,10 +19,6 @@ import { notifyCampaignAccessUpdated, notifyCampaignAccessUpdateFailed } from '@
 import type { ContentBase } from './content-table-config'
 import { contentOverviewListQueryKey } from './content-overview-query-keys'
 
-function contentListQueryKey(campaignId: string, contentTypeKey: ContentTypeKey) {
-  return contentOverviewListQueryKey(campaignId, contentTypeKey)
-}
-
 export type UseContentCampaignAvailabilityToggleOptions = {
   campaignId: string
   contentTypeKey: ContentTypeKey
@@ -31,6 +27,66 @@ export type UseContentCampaignAvailabilityToggleOptions = {
   campaignAccess: ResolvedContentCampaignAccess
   campaignAvailabilityFilter: CampaignAvailabilityFilter
   onRowRemoved?: () => void
+}
+
+type AvailabilityToggleContext = {
+  campaignId: string
+  contentTypeKey: ContentTypeKey
+  entityId: string
+  campaignAccess: ResolvedContentCampaignAccess
+  campaignAvailabilityFilter: CampaignAvailabilityFilter
+  updateCachedAccess: (nextAccess: ResolvedContentCampaignAccess) => void
+  resolveEntityName: () => string
+  onRowRemoved?: () => void
+  setBlockers: (blockers: ContentUsageBlocker[]) => void
+  setBlockedOpen: (open: boolean) => void
+}
+
+async function precheckMarkUnavailable(
+  ctx: Pick<AvailabilityToggleContext, 'campaignId' | 'contentTypeKey' | 'entityId'>,
+): Promise<{ status: 'clear' } | { status: 'blocked'; blockers: ContentUsageBlocker[] }> {
+  const availability = await fetchContentCampaignAccessAvailability(
+    ctx.campaignId,
+    ctx.contentTypeKey,
+    ctx.entityId,
+  )
+  if (availability.status === 'blocked') {
+    return { status: 'blocked', blockers: availability.blockers }
+  }
+  return { status: 'clear' }
+}
+
+async function persistAvailabilityChange(
+  ctx: AvailabilityToggleContext,
+  nextAvailable: boolean,
+): Promise<void> {
+  const patch = resolvedToCampaignAccessPatch({
+    ...ctx.campaignAccess,
+    available: nextAvailable,
+  })
+  const result = await updateRouteContentCampaignAccess(
+    ctx.campaignId,
+    ctx.contentTypeKey,
+    ctx.entityId,
+    patch,
+  )
+
+  if (result.status === 'blocked') {
+    if (nextAvailable) {
+      ctx.updateCachedAccess(ctx.campaignAccess)
+    }
+    ctx.setBlockers(result.blockers)
+    ctx.setBlockedOpen(true)
+    return
+  }
+
+  ctx.updateCachedAccess(result.campaignAccess)
+
+  if (!nextAvailable && ctx.campaignAvailabilityFilter === 'available') {
+    ctx.onRowRemoved?.()
+  }
+
+  notifyCampaignAccessUpdated(ctx.resolveEntityName(), nextAvailable)
 }
 
 export function useContentCampaignAvailabilityToggle({
@@ -53,7 +109,7 @@ export function useContentCampaignAvailabilityToggle({
 
   const resolveEntityName = useCallback(() => {
     const rows = queryClient.getQueryData<WithCampaignAccess<ContentBase & { id: string }>[]>(
-      contentListQueryKey(campaignId, contentTypeKey),
+      contentOverviewListQueryKey(campaignId, contentTypeKey),
     )
     return rows?.find((row) => row.id === entityId)?.name ?? entityNameRef.current
   }, [campaignId, contentTypeKey, entityId, queryClient])
@@ -61,7 +117,7 @@ export function useContentCampaignAvailabilityToggle({
   const updateCachedAccess = useCallback(
     (nextAccess: ResolvedContentCampaignAccess) => {
       queryClient.setQueryData<WithCampaignAccess<ContentBase & { id: string }>[]>(
-        contentListQueryKey(campaignId, contentTypeKey),
+        contentOverviewListQueryKey(campaignId, contentTypeKey),
         (current) =>
           current?.map((row) =>
             row.id === entityId ? { ...row, campaignAccess: nextAccess } : row,
@@ -75,19 +131,33 @@ export function useContentCampaignAvailabilityToggle({
     async (nextAvailable: boolean) => {
       if (pending) return
 
+      const toggleCtx: AvailabilityToggleContext = {
+        campaignId,
+        contentTypeKey,
+        entityId,
+        campaignAccess,
+        campaignAvailabilityFilter,
+        updateCachedAccess,
+        resolveEntityName,
+        onRowRemoved: () => onRowRemovedRef.current?.(),
+        setBlockers,
+        setBlockedOpen,
+      }
+
       if (!nextAvailable) {
         setPending(true)
         try {
-          const availability = await fetchContentCampaignAccessAvailability(
-            campaignId,
-            contentTypeKey,
-            entityId,
-          )
-          if (availability.status === 'blocked') {
-            setBlockers(availability.blockers)
+          const precheck = await precheckMarkUnavailable(toggleCtx)
+          if (precheck.status === 'blocked') {
+            setBlockers(precheck.blockers)
             setBlockedOpen(true)
             return
           }
+        } catch (err) {
+          notifyCampaignAccessUpdateFailed(entityId, nextAvailable, err, () => {
+            void handleAvailableChange(nextAvailable)
+          })
+          return
         } finally {
           setPending(false)
         }
@@ -101,33 +171,7 @@ export function useContentCampaignAvailabilityToggle({
 
       setPending(true)
       try {
-        const patch = resolvedToCampaignAccessPatch({
-          ...campaignAccess,
-          available: nextAvailable,
-        })
-        const result = await updateRouteContentCampaignAccess(
-          campaignId,
-          contentTypeKey,
-          entityId,
-          patch,
-        )
-
-        if (result.status === 'blocked') {
-          if (nextAvailable) {
-            updateCachedAccess(campaignAccess)
-          }
-          setBlockers(result.blockers)
-          setBlockedOpen(true)
-          return
-        }
-
-        updateCachedAccess(result.campaignAccess)
-
-        if (!nextAvailable && campaignAvailabilityFilter === 'available') {
-          onRowRemovedRef.current?.()
-        }
-
-        notifyCampaignAccessUpdated(resolveEntityName(), nextAvailable)
+        await persistAvailabilityChange(toggleCtx, nextAvailable)
       } catch (err) {
         if (nextAvailable) {
           updateCachedAccess(campaignAccess)

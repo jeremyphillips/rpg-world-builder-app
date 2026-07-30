@@ -232,7 +232,6 @@ function ContentEditEntityFormBody<
           onSaved={handleCoordinatedSaveSuccess}
           publishSchema={entity.status === 'draft' ? publishSchema : undefined}
           onPublish={entity.status === 'draft' ? handlePublish : undefined}
-          publishSuccess={publishFlow.publishSuccess}
         />
       </NarrowPage>
 
@@ -349,24 +348,28 @@ function ContentEditFormBody({
     entityId,
   })
 
-  const { onSubmit, formError } = useSubmitHandler(async (values, form) => {
-    const saved = await mutation.mutateAsync(
-      def.toInput(
-        values,
-        {
-          entity,
-          weaponCategoryBySlug: ctx.options?.weaponCategoryBySlug,
-          campaignRules: layoutCtx.campaignRules,
-          equipmentKind: layoutCtx.equipmentKind,
-        },
-        validationIntent,
-      ),
-    )
-    const baseline = stripEditEnvelopeFromFormDefaults(def.toFormValues(saved), {
-      stripKind: layoutCtx.equipmentKind != null,
-    })
-    form.reset(baseline)
-  }, `Could not update ${def.routeKey}.`)
+  const { onSubmit, formError } = useSubmitHandler({
+    submit: async (values, form) => {
+      const saved = await mutation.mutateAsync(
+        def.toInput(
+          values,
+          {
+            entity,
+            weaponCategoryBySlug: ctx.options?.weaponCategoryBySlug,
+            campaignRules: layoutCtx.campaignRules,
+            equipmentKind: layoutCtx.equipmentKind,
+          },
+          validationIntent,
+        ),
+      )
+      const baseline = stripEditEnvelopeFromFormDefaults(def.toFormValues(saved), {
+        stripKind: layoutCtx.equipmentKind != null,
+      })
+      form.reset(baseline)
+    },
+    fallbackMessage: `Could not update ${def.routeKey}.`,
+    propagateErrors: true,
+  })
 
   return (
     <ContentEditEntityForm

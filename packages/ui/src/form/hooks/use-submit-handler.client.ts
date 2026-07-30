@@ -23,6 +23,8 @@ export interface UseSubmitHandlerOptions<TValues extends FieldValues> {
   submit: FormSubmitHandler<TValues>
   fallbackMessage: string
   mapError?: (error: unknown) => string | undefined
+  /** Rethrow after mapping to `formError` so callers can detect failure. */
+  propagateErrors?: boolean
 }
 
 export interface UseSubmitHandlerResult<TValues extends FieldValues> {
@@ -60,6 +62,9 @@ export function useSubmitHandler<TValues extends FieldValues>(
       await options.submit(values, form)
     } catch (err) {
       setError(err)
+      if (options.propagateErrors) {
+        throw err
+      }
     }
   }
 
