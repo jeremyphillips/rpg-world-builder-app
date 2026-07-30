@@ -16,6 +16,8 @@ export type VocabularySetCapability = {
   bulkAvailability: boolean
   /** Attach usedBy to resolved options. */
   usageCounting: boolean
+  /** Overview loads may use a set-level count batch resolver (counts only). */
+  batchUsageCounting: boolean
   /** Block status → disabled when referenced (preflight + PATCH 409). */
   disableGuard: boolean
   /** Block DELETE when referenced. */
@@ -31,6 +33,7 @@ const disabledCapabilities = (): VocabularySetCapability => ({
   availability: false,
   bulkAvailability: false,
   usageCounting: false,
+  batchUsageCounting: false,
   disableGuard: false,
   deleteGuard: false,
 })
@@ -44,6 +47,7 @@ const enabledOverviewCapabilities = (): VocabularySetCapability => ({
   availability: true,
   bulkAvailability: true,
   usageCounting: true,
+  batchUsageCounting: true,
   disableGuard: true,
   deleteGuard: true,
 })
@@ -101,6 +105,12 @@ export function validateVocabularySetCapabilityImplications(
       message: 'delete requires create',
     })
   }
+  if (capabilities.batchUsageCounting && !capabilities.usageCounting) {
+    violations.push({
+      field: 'implication',
+      message: 'batchUsageCounting requires usageCounting',
+    })
+  }
 
   return violations
 }
@@ -142,6 +152,16 @@ export function vocabularySetIdsRequiringUsageResolver(
       capabilities[setId].disableGuard ||
       capabilities[setId].deleteGuard,
   )
+}
+
+/** Set ids that require a registered API batch count resolver for overview loads. */
+export function vocabularySetIdsRequiringBatchCountResolver(
+  capabilities: Record<
+    VocabularyOptionSetId,
+    VocabularySetCapability
+  > = VOCABULARY_SET_CAPABILITIES,
+): VocabularyOptionSetId[] {
+  return VOCABULARY_OPTION_SET_IDS.filter((setId) => capabilities[setId].batchUsageCounting)
 }
 
 /** Set ids that require a dashboard entry form definition. */

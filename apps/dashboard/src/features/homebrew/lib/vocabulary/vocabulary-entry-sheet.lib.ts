@@ -5,6 +5,7 @@ import type {
   VocabularyOptionWithUsage,
   VocabularyUsageReference,
 } from '@rpg/contracts'
+import { getVocabularySetCapability } from '@rpg/contracts'
 import type { FormItem } from '@rpg/ui/form'
 
 import { UsageReferencesSection } from '@/lib/usage-references/usage-references-section.client'
@@ -17,6 +18,18 @@ import {
   type VocabularyEntryFormValues,
   type VocabularyEntrySheetFormValues,
 } from './vocabulary-entry-form-fields'
+import { getVocabularyEntryFormDefinition } from './vocabulary-entry-form-registry'
+
+export function requireVocabularyEntryFormDefinition(setId: VocabularyOptionSetId): void {
+  const capability = getVocabularySetCapability(setId)
+  if (!capability.create && !capability.edit) {
+    return
+  }
+
+  if (!getVocabularyEntryFormDefinition(setId)) {
+    throw new Error(`Missing vocabulary form definition for "${setId}".`)
+  }
+}
 
 export function buildVocabularyEntrySheetDefaultValues(
   isEdit: boolean,
@@ -38,6 +51,7 @@ export function buildVocabularyEntrySheetDefaultValues(
 }
 
 export function buildVocabularyEntrySheetFieldItems(input: {
+  setId: VocabularyOptionSetId
   campaignId: string
   groupId: string
   isEdit: boolean
@@ -46,6 +60,8 @@ export function buildVocabularyEntrySheetFieldItems(input: {
   usageCounting: boolean
   references: VocabularyUsageReference[]
 }): FormItem[] {
+  requireVocabularyEntryFormDefinition(input.setId)
+
   const sheetFields = buildVocabularyEntrySheetFields({
     groupId: input.groupId,
     pending: input.isPending,

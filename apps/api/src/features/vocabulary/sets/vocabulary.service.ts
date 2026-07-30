@@ -23,7 +23,10 @@ import {
 } from '../lib/patch-document'
 import { resolveVocabularySet } from '../lib/resolve-vocabulary'
 import { buildVocabularyEntryUsageFromBlockers } from '../lib/map-vocabulary-usage-references'
-import { resolveVocabularyOptionUsage } from '../lib/vocabulary-usage-resolvers'
+import {
+  resolveVocabularyOptionUsage,
+  resolveVocabularyOptionUsageCountsBatch,
+} from '../lib/vocabulary-usage-resolvers'
 
 function assertSeedSetAvailable(rulesetId: SystemRulesetId, setId: VocabularyOptionSetId): void {
   if (!listSeedVocabularySetIds(rulesetId).includes(setId)) {
@@ -103,11 +106,30 @@ async function resolveVocabularyDeleteBlockers(
   return { status: 'allowed' }
 }
 
-function attachUsageCounts(
+async function attachUsageCounts(
   campaignId: string,
   setId: VocabularyOptionSetId,
   options: ReturnType<typeof resolveVocabularySet>,
 ): Promise<ResolvedVocabularyOptionSet['options']> {
+  const capability = getVocabularySetCapability(setId)
+
+  if (!capability.usageCounting) {
+    return options.map((option) => ({ ...option, usedBy: 0 }))
+  }
+
+  if (capability.batchUsageCounting) {
+    const counts = await resolveVocabularyOptionUsageCountsBatch(
+      campaignId,
+      setId,
+      options.map((option) => option.id),
+    )
+
+    return options.map((option) => ({
+      ...option,
+      usedBy: counts.get(option.id) ?? 0,
+    }))
+  }
+
   return Promise.all(
     options.map(async (option) => ({
       ...option,

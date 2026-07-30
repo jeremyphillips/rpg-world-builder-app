@@ -126,4 +126,38 @@ describe('vocabulary routes', () => {
 
     expect(availabilityRes.body.availability.status).toBe('allowed')
   })
+
+  it('forbids vocabulary mutations when set capabilities are disabled', async () => {
+    const { agent, csrfToken } = await registerAndLogin()
+    const campaignId = await createCampaign(agent, csrfToken)
+
+    await agent
+      .post(`/api/campaigns/${campaignId}/vocabulary/damage-types/entries`)
+      .set(CSRF_HEADER, csrfToken)
+      .send({ label: 'Psychic' })
+      .expect(403)
+
+    await agent
+      .patch(`/api/campaigns/${campaignId}/vocabulary/damage-types/entries/psychic`)
+      .set(CSRF_HEADER, csrfToken)
+      .send({ label: 'Psionic' })
+      .expect(403)
+
+    await agent
+      .delete(`/api/campaigns/${campaignId}/vocabulary/damage-types/entries/psychic`)
+      .set(CSRF_HEADER, csrfToken)
+      .expect(403)
+  })
+
+  it('returns not found for disable preflight when disableGuard is disabled', async () => {
+    const { agent, csrfToken } = await registerAndLogin()
+    const campaignId = await createCampaign(agent, csrfToken)
+
+    await agent
+      .get(
+        `/api/campaigns/${campaignId}/vocabulary/damage-types/entries/psychic/disable-availability`,
+      )
+      .set(CSRF_HEADER, csrfToken)
+      .expect(404)
+  })
 })

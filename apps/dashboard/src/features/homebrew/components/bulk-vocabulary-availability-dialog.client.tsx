@@ -1,14 +1,19 @@
 'use client'
 
-import { useCallback, useId, useMemo, useState } from 'react'
+import { useCallback, useEffect, useId, useMemo } from 'react'
 import type { VocabularyOptionSetId, VocabularyOptionStatus } from '@rpg/contracts'
 import { Button, Modal } from '@rpg/ui'
 import { FormProvider, useForm, useWatch } from 'react-hook-form'
 import { FormFieldStack } from '@rpg/ui/form'
 import type { VocabularyOptionWithUsage } from '@rpg/contracts'
 
-import { updateVocabularyEntry } from '../api/vocabulary-api'
-import { VOCABULARY_STATUS_LABELS } from '../lib/vocabulary/labels'
+import { VocabularyAvailabilityBlockedDialog } from './vocabulary-availability-blocked-dialog.client'
+import { useBulkUpdateVocabularyAvailability } from '../lib/vocabulary/bulk/use-bulk-update-vocabulary-availability.client'
+import type { BulkVocabularyAvailabilityApplyResult } from '../lib/vocabulary/bulk/bulk-apply-vocabulary-availability.lib'
+import {
+  VOCABULARY_BULK_AVAILABILITY_DIALOG_HEADLINE,
+  VOCABULARY_STATUS_LABELS,
+} from '../lib/vocabulary/labels'
 
 const STATUS_OPTIONS = (['active', 'disabled'] as const).map((value) => ({
   value,
@@ -25,11 +30,7 @@ export type BulkVocabularyAvailabilityDialogProps = {
   campaignId: string
   setId: VocabularyOptionSetId
   selectedRows: VocabularyOptionWithUsage[]
-  onApplyComplete: (result: {
-    updatedIds: string[]
-    failedIds: string[]
-    fullSuccess: boolean
-  }) => void
+  onApplyComplete: (result: BulkVocabularyAvailabilityApplyResult) => void
 }
 
 export function BulkVocabularyAvailabilityDialog({
@@ -41,11 +42,18 @@ export function BulkVocabularyAvailabilityDialog({
   onApplyComplete,
 }: BulkVocabularyAvailabilityDialogProps) {
   const formId = useId()
-  const [pending, setPending] = useState(false)
   const form = useForm<BulkVocabularyAvailabilityFormValues>({
     defaultValues: { status: 'active' },
   })
   const status = useWatch({ control: form.control, name: 'status' })
+  const { apply, pending, blockedOpen, blockedResults, setBlockedOpen } =
+    useBulkUpdateVocabularyAvailability({ campaignId, setId })
+
+  useEffect(() => {
+    if (!open) {
+      form.reset({ status: 'active' })
+    }
+  }, [form, open])
 
   const previewCount = useMemo(
     () => selectedRows.filter((row) => row.status !== status).length,
@@ -53,49 +61,36 @@ export function BulkVocabularyAvailabilityDialog({
   )
 
   const handleApply = useCallback(async () => {
-    if (pending || previewCount === 0) {
-      onApplyComplete({ updatedIds: [], failedIds: [], fullSuccess: true })
-      return
-    }
+    const result = await apply(selectedRows, status ?? 'active')
+    onApplyComplete(result)
+    onOpenChange(false)
+  }, [apply, onApplyComplete, onOpenChange, selectedRows, status])
 
-    setPending(true)
-    const updatedIds: string[] = []
-    const failedIds: string[] = []
-
-    for (const row of selectedRows) {
-      if (row.status === status) continue
-
-      try {
-        await updateVocabularyEntry(campaignId, setId, row.id, { status })
-        updatedIds.push(row.id)
-      } catch {
-        failedIds.push(row.id)
-      }
-    }
-
-    setPending(false)
-    onApplyComplete({
-      updatedIds,
-      failedIds,
-      fullSuccess: failedIds.length === 0,
-    })
-  }, [campaignId, onApplyComplete, pending, previewCount, selectedRows, setId, status])
+  const handleOpenAutoFocus = (event: Event) => {
+    event.preventDefault()
+    const content = event.currentTarget as HTMLElement
+    const firstField = content.querySelector<HTMLElement>('[role="combobox"], select, input')
+    firstField?.focus()
+  }
 
   return (
-    <Modal.Root open={open} onOpenChange={onOpenChange}>
-      <Modal.Content size="sm">
-        <Modal.Header
-          headline="Edit availability"
-          description={`Apply a new availability status to ${selectedRows.length} selected ${
-            selectedRows.length === 1 ? 'entry' : 'entries'
-          }.`}
-        />
+    <>
+      <Modal.Root open={open} onOpenChange={onOpenChange}>
+        <Modal.Content
+          size="sm"
+          aria-busy={pending || undefined}
+          onOpenAutoFocus={handleOpenAutoFocus}
+        >
+          <Modal.Header
+            headline={VOCABULARY_BULK_AVAILABILITY_DIALOG_HEADLINE}
+            description={`Apply a new availability status to ${selectedRows.length} selected ${
+              selectedRows.length === 1 ? 'entry' : 'entries'
+            }.`}
+          />
 
-        <Modal.Body>
-          <FormProvider {...form}>
-            <form id={formId} onSubmit={(event) => event.preventDefault()}>
+          <Modal.Body>
+            <FormProvider {...form}>
               <FormFieldStack
-                idPrefix="bulk-vocabulary-availability"
                 fields={[
                   {
                     type: 'select',
@@ -105,27 +100,42 @@ export function BulkVocabularyAvailabilityDialog({
                     required: true,
                   },
                 ]}
+                idPrefix={formId}
+                size="md"
+                rhythm="comfortable"
               />
-            </form>
-          </FormProvider>
-          <p className="mt-3 text-sm text-muted-foreground">
-            {previewCount} {previewCount === 1 ? 'entry' : 'entries'} will change.
-          </p>
-        </Modal.Body>
+            </FormProvider>
+            <p className="mt-3 text-sm text-muted-foreground">
+              {previewCount} {previewCount === 1 ? 'entry' : 'entries'} will change.
+            </p>
+          </Modal.Body>
 
-        <Modal.Footer>
-          <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-            Cancel
-          </Button>
-          <Button
-            type="button"
-            disabled={pending || previewCount === 0}
-            onClick={() => void handleApply()}
-          >
-            Apply
-          </Button>
-        </Modal.Footer>
-      </Modal.Content>
-    </Modal.Root>
+          <Modal.Footer>
+            <Button
+              type="button"
+              variant="outline"
+              disabled={pending}
+              onClick={() => onOpenChange(false)}
+            >
+              Cancel
+            </Button>
+            <Button
+              type="button"
+              disabled={pending || previewCount === 0}
+              onClick={() => void handleApply()}
+            >
+              Apply
+            </Button>
+          </Modal.Footer>
+        </Modal.Content>
+      </Modal.Root>
+
+      <VocabularyAvailabilityBlockedDialog
+        open={blockedOpen}
+        onOpenChange={setBlockedOpen}
+        campaignId={campaignId}
+        blockedResults={blockedResults}
+      />
+    </>
   )
 }

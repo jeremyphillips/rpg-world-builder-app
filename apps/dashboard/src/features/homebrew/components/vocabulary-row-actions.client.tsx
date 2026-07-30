@@ -49,9 +49,12 @@ export function VocabularyRowActions({
       entry,
     })
 
-  if (!canManage) return null
+  const canEdit = capabilities.edit
+  const canDeleteEntry = capabilities.delete && entry.source === 'campaign'
+  const canToggleAvailability = capabilities.availability
+  const hasMenuActions = canEdit || canDeleteEntry || canToggleAvailability
 
-  const canDelete = entry.source === 'campaign'
+  if (!canManage || !hasMenuActions) return null
 
   async function handleDeleteConfirm() {
     if (capabilities.deleteGuard) {
@@ -68,40 +71,48 @@ export function VocabularyRowActions({
     setConfirmDeleteOpen(false)
   }
 
-  return (
-    <>
-      <RowActionsMenu
-        triggerLabel={`Open actions for ${entry.label}`}
-        contentClassName="w-72"
-        items={[
+  const menuItems = [
+    ...(canEdit
+      ? [
           {
-            kind: 'action',
+            kind: 'action' as const,
             id: 'edit',
             label: 'Edit',
             icon: <Pencil />,
             onSelect: () => onEdit(entry),
           },
-          ...(canDelete
-            ? [
-                {
-                  kind: 'action' as const,
-                  id: 'delete',
-                  label: 'Delete',
-                  icon: <Trash2 />,
-                  destructive: true,
-                  separatorBefore: true,
-                  onSelect: () => setConfirmDeleteOpen(true),
-                },
-              ]
-            : []),
-        ]}
+        ]
+      : []),
+    ...(canDeleteEntry
+      ? [
+          {
+            kind: 'action' as const,
+            id: 'delete',
+            label: 'Delete',
+            icon: <Trash2 />,
+            destructive: true,
+            separatorBefore: canEdit,
+            onSelect: () => setConfirmDeleteOpen(true),
+          },
+        ]
+      : []),
+  ]
+
+  return (
+    <>
+      <RowActionsMenu
+        triggerLabel={`Open actions for ${entry.label}`}
+        contentClassName="w-72"
+        items={menuItems}
         footer={
-          <ContentCampaignAvailabilityAction
-            available={entry.status === 'active'}
-            pending={pending}
-            onAvailableChange={handleAvailableChange}
-            sectionLegend="Availability"
-          />
+          canToggleAvailability ? (
+            <ContentCampaignAvailabilityAction
+              available={entry.status === 'active'}
+              pending={pending}
+              onAvailableChange={handleAvailableChange}
+              sectionLegend="Availability"
+            />
+          ) : undefined
         }
       />
 
@@ -121,7 +132,7 @@ export function VocabularyRowActions({
         description={VOCABULARY_DELETE_BLOCKED_DESCRIPTION}
       />
 
-      {canDelete ? (
+      {canDeleteEntry ? (
         <ConfirmDialog
           open={confirmDeleteOpen}
           onOpenChange={setConfirmDeleteOpen}

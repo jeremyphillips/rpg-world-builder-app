@@ -90,20 +90,23 @@ export function useVocabularyOverviewPage({
     [],
   )
 
+  const showRowActions =
+    canManage && (capabilities.edit || capabilities.delete || capabilities.availability)
+
   const rowActions = useCallback(
     (row: VocabularyOptionWithUsage) => (
       <VocabularyRowActions
         campaignId={campaignId}
         setId={setId}
         entry={row}
-        canManage={canManage && capabilities.availability}
+        canManage={showRowActions}
         onEdit={onEdit}
         onDelete={(entry) => {
           void mutations.deleteEntry.mutateAsync(entry.id)
         }}
       />
     ),
-    [campaignId, canManage, capabilities.availability, mutations.deleteEntry, onEdit, setId],
+    [campaignId, mutations.deleteEntry, onEdit, setId, showRowActions],
   )
 
   const selectionConfig =

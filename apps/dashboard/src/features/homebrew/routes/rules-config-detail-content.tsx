@@ -46,6 +46,8 @@ import { useRulesetPatch } from '../hooks/use-ruleset-patch'
 
 const UNKNOWN_RULES_CONFIG_MESSAGE = 'This rules configuration page is not available.'
 
+const RULES_CONFIG_NOT_IMPLEMENTED_MESSAGE = 'This rules configuration page is not available yet.'
+
 const RULES_CONFIG_NAV: Record<
   RulesConfigId,
   {
@@ -259,7 +261,7 @@ export function RulesConfigDetailContent({ campaignId, configId }: RulesConfigDe
         <HomebrewDetailFallback
           status="disabled"
           heading={registryEntry.label}
-          message={UNKNOWN_RULES_CONFIG_MESSAGE}
+          message={RULES_CONFIG_NOT_IMPLEMENTED_MESSAGE}
         />
       )}
     </HomebrewDetailShell>

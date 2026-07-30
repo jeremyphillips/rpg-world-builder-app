@@ -62,6 +62,7 @@ export function useVocabularyEntrySheet({
   const fields = useMemo(
     () =>
       buildVocabularyEntrySheetFieldItems({
+        setId,
         campaignId,
         groupId,
         isEdit,
@@ -70,7 +71,16 @@ export function useVocabularyEntrySheet({
         usageCounting: capabilities.usageCounting,
         references: usage?.references ?? [],
       }),
-    [campaignId, capabilities.usageCounting, entry, groupId, isEdit, isPending, usage?.references],
+    [
+      campaignId,
+      capabilities.usageCounting,
+      entry,
+      groupId,
+      isEdit,
+      isPending,
+      setId,
+      usage?.references,
+    ],
   )
 
   const handleSubmit = useCallback(

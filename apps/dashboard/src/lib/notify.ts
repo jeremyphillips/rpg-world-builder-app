@@ -112,3 +112,31 @@ export function notifyBulkCampaignAccessResult(result: {
 
   toast.warning(result.summary)
 }
+
+export function notifyBulkVocabularyAvailabilityResult(result: {
+  summary: string | null
+  fullSuccess: boolean
+  updatedIds: string[]
+  blockedResults: Array<{ rowId: string }>
+  failedIds: string[]
+}): void {
+  if (!result.summary) {
+    return
+  }
+
+  if (
+    result.failedIds.length > 0 &&
+    result.updatedIds.length === 0 &&
+    result.blockedResults.length === 0
+  ) {
+    toast.error(result.summary)
+    return
+  }
+
+  if (result.fullSuccess) {
+    toast.success(result.summary)
+    return
+  }
+
+  toast.warning(result.summary)
+}

@@ -167,12 +167,10 @@ function VocabularyOverviewPage({
           campaignId={campaignId}
           setId={setId}
           selectedRows={overview.selectedRows}
-          onApplyComplete={({ updatedIds, fullSuccess }) => {
-            overview.removeFromSelection(updatedIds)
-            void overview.invalidateSet()
-            if (fullSuccess) {
-              overview.setBulkOpen(false)
-              overview.exitSelectionMode()
+          onApplyComplete={(result) => {
+            overview.removeFromSelection(result.updatedIds)
+            if (result.updatedIds.length > 0) {
+              void overview.invalidateSet()
             }
           }}
         />

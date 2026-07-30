@@ -6,6 +6,7 @@ import {
   type VocabularySetCapability,
   validateVocabularySetCapabilityImplications,
   vocabularySetIdsRequiringFormDefinition,
+  vocabularySetIdsRequiringBatchCountResolver,
   vocabularySetIdsRequiringUsageResolver,
   vocabularySetIdsWithHubCard,
   vocabularySetIdsWithOverview,
@@ -36,6 +37,10 @@ describe('VOCABULARY_SET_CAPABILITIES', () => {
     expect(vocabularySetIdsRequiringUsageResolver()).toEqual(['creature-types'])
   })
 
+  it('requires batch count resolver registration for creature-types only', () => {
+    expect(vocabularySetIdsRequiringBatchCountResolver()).toEqual(['creature-types'])
+  })
+
   it('requires form definitions for sets with create or edit', () => {
     expect(vocabularySetIdsRequiringFormDefinition()).toEqual(['creature-types'])
   })
@@ -52,6 +57,7 @@ describe('validateVocabularySetCapabilityImplications', () => {
       availability: false,
       bulkAvailability: true,
       usageCounting: false,
+      batchUsageCounting: false,
       disableGuard: false,
       deleteGuard: false,
     }
@@ -74,6 +80,7 @@ describe('capability derivation fixture', () => {
         availability: true,
         bulkAvailability: true,
         usageCounting: false,
+        batchUsageCounting: false,
         disableGuard: false,
         deleteGuard: false,
       },

@@ -278,6 +278,9 @@ describe('RulesConfigDetailContent', { timeout: 15_000 }, () => {
     expect(screen.getByRole('heading', { name: 'Mechanics' })).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: 'Not available yet' })).toBeInTheDocument()
     expect(
+      screen.getByText('This rules configuration page is not available yet.'),
+    ).toBeInTheDocument()
+    expect(
       screen.getByRole('navigation', { name: 'Mechanics configuration sections' }),
     ).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Save changes' })).not.toBeInTheDocument()
