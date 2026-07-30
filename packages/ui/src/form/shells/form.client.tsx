@@ -8,7 +8,7 @@ import { cn } from '../../lib/utils'
 import type { FieldSize } from '../../components/ui/field.client'
 import type { FieldStackRhythm } from '../../components/ui/field.variants'
 import { resolveSchemaFormFooter, SchemaFormShell } from './schema-form-shell.client'
-import { FormFieldStack, FormFooterRegion } from './form-field-stack.client'
+import { FormFooterRegion, FormShellFieldStack } from './form-shell-field-stack.client'
 import { createValidateSilently, makeResolver } from '../config/form-resolver'
 import type { ValidateSilently } from '../context/form-ui.context'
 import {
@@ -163,7 +163,7 @@ export function Form<TFieldValues extends FieldValues>({
       onSubmit={onSubmit}
       className={cn(isSheetDockedFooter && 'flex min-h-0 flex-1 flex-col', className)}
     >
-      <FormFieldStack
+      <FormShellFieldStack
         formId={formId}
         fields={fields}
         contentClassName={contentClassName}
