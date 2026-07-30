@@ -16,10 +16,7 @@ import {
   type BulkUpdateRow,
 } from './bulk-apply-campaign-access.lib'
 import { notifyBulkCampaignAccessResult } from '@/lib/notify'
-
-function contentListQueryKey(campaignId: string, contentTypeKey: ContentTypeKey) {
-  return ['campaigns', campaignId, 'content', contentTypeKey] as const
-}
+import { contentOverviewListQueryKey } from '../../overview/content-overview-query-keys'
 
 export type UseBulkUpdateCampaignAccessOptions = {
   campaignId: string
@@ -52,7 +49,7 @@ export function useBulkUpdateCampaignAccess({
   const updateCachedAccess = useCallback(
     (entityId: string, nextAccess: ResolvedContentCampaignAccess) => {
       queryClient.setQueryData<BulkUpdateRow[]>(
-        contentListQueryKey(campaignId, contentTypeKey),
+        contentOverviewListQueryKey(campaignId, contentTypeKey),
         (current) =>
           current?.map((row) =>
             row.id === entityId ? { ...row, campaignAccess: nextAccess } : row,

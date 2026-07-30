@@ -75,7 +75,6 @@ export interface ContentFormFooterProps<TFieldValues extends FieldValues> {
   pending: boolean
   onSaveDraft?: (values: TFieldValues, form: UseFormReturn<TFieldValues>) => void | Promise<void>
   saveDraftPending?: boolean
-  publishSuccess?: boolean
   /** Unified save session for edit mode — body + campaign access. */
   actionState?: ContentSaveActionState
   /** Create-mode guard: campaign access draft differs from default. */
@@ -91,7 +90,6 @@ export function ContentFormFooter<TFieldValues extends FieldValues>({
   pending,
   onSaveDraft,
   saveDraftPending = false,
-  publishSuccess = false,
   actionState,
   guardHasUnsavedEdits = false,
 }: ContentFormFooterProps<TFieldValues>) {
@@ -102,7 +100,6 @@ export function ContentFormFooter<TFieldValues extends FieldValues>({
     mode,
     submitLabel,
     pendingLabel,
-    publishSuccess,
   })
 
   const secondary =

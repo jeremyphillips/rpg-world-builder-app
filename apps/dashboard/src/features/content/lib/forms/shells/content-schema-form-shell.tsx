@@ -108,7 +108,6 @@ export function ContentSchemaFormShell<TFormValues extends FieldValues>({
   submitPending,
   onSaveDraft,
   saveDraftPending,
-  publishSuccess,
   onSaved,
 }: ContentSchemaFormShellProps<TFormValues>) {
   const handleSubmit = useContentSchemaSubmitHandler(onSubmit, beforeSubmit)
@@ -119,7 +118,6 @@ export function ContentSchemaFormShell<TFormValues extends FieldValues>({
     submitPending,
     onSaveDraft,
     saveDraftPending,
-    publishSuccess,
     onSubmit,
     onSaved,
   }

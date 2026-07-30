@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from 'react'
 import type { ContentSource } from '@rpg/contracts'
 import { getErrorMessage } from '@rpg/contracts'
 
+import { notifyPublishSuccess } from '@/lib/notify'
 import type { AnyContentFormDef } from '../forms/content-form-registry'
 import { usePublishContent } from '../list/use-content-mutations'
 import { useContentEditPublishRequest } from '../forms/shells/content-edit-publish-context.client'
@@ -26,16 +27,14 @@ export function useContentPublishFlow({
   const publishMutation = usePublishContent(def, campaignId)
   const publishRequest = useContentEditPublishRequest()
   const [publishError, setPublishError] = useState<string | null>(null)
-  const [publishSuccess, setPublishSuccess] = useState(false)
 
   useEffect(() => {
     setPublishError(null)
-    setPublishSuccess(false)
   }, [entityId])
 
   const runPublishMutation = useCallback(async () => {
     await publishMutation.mutateAsync(entityId)
-    setPublishSuccess(true)
+    notifyPublishSuccess()
   }, [entityId, publishMutation])
 
   const handlePublishClick = useCallback(async () => {
@@ -44,7 +43,6 @@ export function useContentPublishFlow({
     }
 
     setPublishError(null)
-    setPublishSuccess(false)
 
     if (publishRequest) {
       publishRequest.requestPublish()
@@ -64,7 +62,6 @@ export function useContentPublishFlow({
     canPublish,
     publishPending: publishMutation.isPending,
     publishError,
-    publishSuccess,
     handlePublishClick,
     runPublishMutation,
     setPublishError,

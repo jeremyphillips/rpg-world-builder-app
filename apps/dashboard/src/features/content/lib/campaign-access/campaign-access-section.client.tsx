@@ -226,6 +226,8 @@ export function CampaignAccessSection({
         save,
         reset,
         readPendingAvailable: () => form.getValues().available,
+        readAccessAvailabilityChanged: () =>
+          form.getValues().available !== persistedBaseline.available,
       }),
       [form, isDirty, pending, reset, save],
     ),

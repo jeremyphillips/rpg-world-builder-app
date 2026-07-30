@@ -152,6 +152,7 @@ async function saveExistingSubclass(args: {
     accessWasDirty: campaignAccessForm.isDirty,
     bodyWasDirty: !accessOnly && editor.modifiedIds.has(selectedId),
     readPendingAvailable: campaignAccessForm.readPendingAvailable,
+    readAccessAvailabilityChanged: campaignAccessForm.readAccessAvailabilityChanged,
     access: {
       save: () => campaignAccessForm.save(),
     },

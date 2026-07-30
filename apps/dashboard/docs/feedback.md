@@ -31,6 +31,7 @@ errors (e.g. delete confirmation), and sustained builder warnings.
 | `notifyContentCreated`                | Create success after navigate to edit                             |
 | `notifyDuplicateContentCreated`       | Duplicate dialog success                                          |
 | `notifySaveSuccess`                   | Form PATCH success when body surface saved in coordinated session |
+| `notifyPublishSuccess`                | Draft publish success from lifecycle actions                      |
 | `notifyCoordinatedContentSaveSuccess` | Edit save session — one toast from `onSaved` callback             |
 | `notifyCampaignAccessUpdated`         | Overview row availability toggle                                  |
 | `notifyCampaignAccessUpdateFailed`    | Row toggle network failure with Retry                             |

@@ -117,6 +117,23 @@ describe('TabbedForm', () => {
     )
   })
 
+  it('wraps hoisted header content and tab panels in a rhythm stack', () => {
+    render(
+      <TabbedForm<TestValues>
+        schema={schema}
+        tabs={tabs}
+        onSubmit={vi.fn()}
+        header={<p data-testid="form-header">Campaign access</p>}
+      />,
+    )
+
+    const header = screen.getByTestId('form-header')
+    const rhythmStack = header.parentElement
+
+    expect(rhythmStack).toHaveClass('gap-6')
+    expect(rhythmStack).toContainElement(screen.getByRole('tablist'))
+  })
+
   it('renders tab header content above fields', async () => {
     const tabsWithHeader: TabbedFormTab[] = [
       ...tabs,

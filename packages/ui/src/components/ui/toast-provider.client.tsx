@@ -11,11 +11,14 @@ import {
   getToastState,
   removeToast,
   resolveToastDuration,
+  setToastVisibleLimit,
   subscribeToasts,
   toast,
   type ToastRecord,
   type ToastTone,
+  TOAST_DISMISS_LABEL,
   TOAST_MAX_VISIBLE,
+  TOAST_REMOVE_DELAY_MS,
 } from './toast-manager.client'
 
 function ToastToneIcon({ tone }: { tone: ToastTone }) {
@@ -35,20 +38,20 @@ function ManagedToast({ record }: { record: ToastRecord }) {
   const tone = record.tone ?? 'default'
   const dismissible = record.dismissible ?? true
   const toneIcon = <ToastToneIcon tone={tone} />
+  const urgent = record.urgent ?? false
 
   return (
     <Toast.Root
       open={record.open}
       duration={resolveToastDuration(record)}
-      role={record.urgent ? 'alert' : 'status'}
+      type={urgent ? 'foreground' : 'background'}
       tone={tone}
       onOpenChange={(open) => {
         if (!open) {
-          record.onDismiss?.()
           toast.dismiss(record.id)
           window.setTimeout(() => {
             removeToast(record.id)
-          }, 200)
+          }, TOAST_REMOVE_DELAY_MS)
         }
       }}
     >
@@ -65,7 +68,7 @@ function ManagedToast({ record }: { record: ToastRecord }) {
             </Button>
           </Toast.Action>
         ) : null}
-        {dismissible ? <Toast.Close aria-label="Dismiss notification" /> : null}
+        {dismissible ? <Toast.Close aria-label={TOAST_DISMISS_LABEL} /> : null}
       </div>
     </Toast.Root>
   )
@@ -98,6 +101,11 @@ export function ToastProvider({
   maxVisible = TOAST_MAX_VISIBLE,
   viewport,
 }: ToastProviderProps) {
+  React.useEffect(() => {
+    setToastVisibleLimit(maxVisible)
+    return () => setToastVisibleLimit(TOAST_MAX_VISIBLE)
+  }, [maxVisible])
+
   return (
     <ToastPrimitive.Provider swipeDirection="right">
       {children}

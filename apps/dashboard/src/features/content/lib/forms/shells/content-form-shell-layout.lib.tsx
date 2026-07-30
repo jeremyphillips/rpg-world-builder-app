@@ -58,7 +58,6 @@ export interface ContentFormFooterShellProps<TFormValues extends FieldValues = F
   submitPending: boolean
   onSaveDraft?: (values: TFormValues, form: UseFormReturn<TFormValues>) => void | Promise<void>
   saveDraftPending?: boolean
-  publishSuccess?: boolean
   onSubmit: (values: TFormValues, form: UseFormReturn<TFormValues>) => Promise<void>
   onSaved?: (event: CoordinatedSaveSavedEvent) => void
 }
@@ -71,7 +70,6 @@ export function ContentFormSaveFooter<TFormValues extends FieldValues>({
   submitPending,
   onSaveDraft,
   saveDraftPending,
-  publishSuccess,
   onSubmit,
   onSaved,
 }: ContentFormFooterShellProps<TFormValues> & { form: UseFormReturn<TFormValues> }) {
@@ -92,7 +90,6 @@ export function ContentFormSaveFooter<TFormValues extends FieldValues>({
       pending={submitPending || form.formState.isSubmitting}
       onSaveDraft={onSaveDraft}
       saveDraftPending={saveDraftPending}
-      publishSuccess={publishSuccess}
       actionState={formMode === 'edit' ? actionState : undefined}
       guardHasUnsavedEdits={formMode === 'create' ? actionState.hasUnsavedEdits : false}
     />

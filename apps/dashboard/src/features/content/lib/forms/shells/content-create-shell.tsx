@@ -92,10 +92,12 @@ function ContentCreateFormBody({
     })) as { id: string; kind?: unknown }
 
     const pendingAccess = campaignAccessDraftRef.current
+    let deferredAccessFailed = false
     if (pendingAccess && !isDefaultCampaignAccessPatch(pendingAccess)) {
       try {
         await updateRouteContentCampaignAccess(campaignId, def.routeKey, saved.id, pendingAccess)
       } catch {
+        deferredAccessFailed = true
         setCampaignAccessDeferredError(CAMPAIGN_ACCESS_CREATE_DEFERRED_ERROR)
       }
     }
@@ -103,7 +105,9 @@ function ContentCreateFormBody({
     const editHref = resolveContentPostCreateEditHref(def, campaignId, saved, formCtx)
     allowFormNavigationOnce()
     navigate(editHref)
-    notifyContentCreated(contentTypeKey)
+    if (!deferredAccessFailed) {
+      notifyContentCreated(contentTypeKey)
+    }
   }
 
   const { onSubmit: onPublish, formError: publishFormError } = useSubmitHandler(async (values) => {

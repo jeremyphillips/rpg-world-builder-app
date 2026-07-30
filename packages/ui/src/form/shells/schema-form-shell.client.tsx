@@ -32,7 +32,7 @@ export type SchemaFormSubmitHandler<TFieldValues extends FieldValues> = (
 ) => void | Promise<void>
 
 type SchemaFormSubmitContextValue<TFieldValues extends FieldValues> = {
-  requestSubmit: (handler: SchemaFormSubmitHandler<TFieldValues>) => void
+  requestSubmit: (handler: SchemaFormSubmitHandler<TFieldValues>, onInvalid?: () => void) => void
 }
 
 const SchemaFormSubmitContext =
@@ -94,10 +94,11 @@ function SchemaFormElement<TFieldValues extends FieldValues>({
   const ui = React.useContext(FormUiContext)
 
   const requestSubmit = React.useCallback(
-    (handler: SchemaFormSubmitHandler<TFieldValues>) => {
+    (handler: SchemaFormSubmitHandler<TFieldValues>, onInvalid?: () => void) => {
       void form.handleSubmit(
         (values) => handler(values, form),
         (errors) => {
+          onInvalid?.()
           if (onInvalidSubmit) {
             onInvalidSubmit(form, fields, formId, ui, errors)
             return
