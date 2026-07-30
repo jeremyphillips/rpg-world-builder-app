@@ -1,13 +1,13 @@
 'use client'
 
-import { useState } from 'react'
+import { useCallback, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { buttonVariants, Heading, Text } from '@rpg/ui'
 import {
   vocabularyOptionSetIdSchema,
   type VocabularyOptionSetId,
   type VocabularyOptionWithUsage,
 } from '@rpg/contracts'
+import { buttonVariants, Heading, Text } from '@rpg/ui'
 
 import { PageHeader } from '@/components/layout/page-header'
 import { PageLoadState } from '@/components/layout/page-load-state'
@@ -16,36 +16,48 @@ import { ROUTES } from '@/app/routes'
 import { useCanManageCampaign } from '@/features/campaign'
 import { CatalogOverviewTable } from '@/lib/data-table/catalog-overview-table.client'
 
-import { vocabularyColumns } from '../lib/vocabulary/vocabulary-overview-columns'
+import { BulkVocabularyAvailabilityDialog } from '../components/bulk-vocabulary-availability-dialog.client'
 import {
   VocabularyEntrySheet,
   type VocabularyEntryFormValues,
 } from '../components/vocabulary-entry-sheet.client'
-import { VocabularyRowActions } from '../components/vocabulary-row-actions.client'
 import { VocabularySetNav } from '../components/vocabulary-set-nav.client'
 import { useVocabularyMutations, useVocabularySet } from '../hooks/use-vocabulary-set'
+import { useVocabularyOverviewPage } from '../hooks/use-vocabulary-overview-page.client'
+import { findVocabularySetEntry } from '../lib/hub/vocabulary-set-registry'
 import {
   UNKNOWN_VOCABULARY_SET_MESSAGE,
   VOCABULARY_NOT_IMPLEMENTED_MESSAGE,
 } from '../lib/vocabulary/labels'
-import { findVocabularySetEntry } from '../lib/hub/vocabulary-set-registry'
+import { VOCABULARY_OVERVIEW_FILTER_SCHEMA } from '../lib/vocabulary/vocabulary-overview-filter-schema'
 
 type SheetState =
   | { mode: 'closed' }
   | { mode: 'create' }
   | { mode: 'edit'; entry: VocabularyOptionWithUsage }
 
-type VocabularySetManagerProps = {
+type VocabularyOverviewPageProps = {
   campaignId: string
   setId: VocabularyOptionSetId
   setLabel: string
 }
 
-function VocabularySetManager({ campaignId, setId, setLabel }: VocabularySetManagerProps) {
+function VocabularyOverviewPage({ campaignId, setId, setLabel }: VocabularyOverviewPageProps) {
   const canManage = useCanManageCampaign(campaignId)
-  const { data: vocabularySet, isPending, isError } = useVocabularySet(campaignId, setId)
+  const { isPending, isError } = useVocabularySet(campaignId, setId)
   const mutations = useVocabularyMutations(campaignId, setId)
   const [sheet, setSheet] = useState<SheetState>({ mode: 'closed' })
+
+  const handleEdit = useCallback((entry: VocabularyOptionWithUsage) => {
+    setSheet({ mode: 'edit', entry })
+  }, [])
+
+  const overview = useVocabularyOverviewPage({
+    campaignId,
+    setId,
+    canManage,
+    onEdit: handleEdit,
+  })
 
   const isSheetOpen = sheet.mode !== 'closed'
   const isMutating =
@@ -75,15 +87,16 @@ function VocabularySetManager({ campaignId, setId, setLabel }: VocabularySetMana
     setSheet({ mode: 'closed' })
   }
 
-  const newAction = canManage ? (
-    <button
-      type="button"
-      className={buttonVariants({ size: 'sm' })}
-      onClick={() => setSheet({ mode: 'create' })}
-    >
-      New
-    </button>
-  ) : undefined
+  const newAction =
+    canManage && overview.capabilities.create ? (
+      <button
+        type="button"
+        className={buttonVariants({ size: 'sm' })}
+        onClick={() => setSheet({ mode: 'create' })}
+      >
+        New
+      </button>
+    ) : undefined
 
   return (
     <>
@@ -95,25 +108,17 @@ function VocabularySetManager({ campaignId, setId, setLabel }: VocabularySetMana
       >
         <CatalogOverviewTable
           tableKey={`vocabulary-${setId}`}
-          columns={vocabularyColumns()}
-          data={vocabularySet?.options ?? []}
+          columns={overview.columns}
+          data={overview.tableRows}
           caption={`${setLabel} available in this campaign`}
-          rowActions={(row) => (
-            <VocabularyRowActions
-              entry={row}
-              canManage={canManage}
-              onEdit={(entry) => setSheet({ mode: 'edit', entry })}
-              onToggleStatus={(entry) => {
-                void mutations.patchEntry.mutateAsync({
-                  entryId: entry.id,
-                  input: { status: entry.status === 'active' ? 'disabled' : 'active' },
-                })
-              }}
-              onDelete={(entry) => {
-                void mutations.deleteEntry.mutateAsync(entry.id)
-              }}
-            />
-          )}
+          filterSchema={VOCABULARY_OVERVIEW_FILTER_SCHEMA}
+          filterState={overview.filterState}
+          onFilterChange={overview.setFilterField}
+          onResetFilters={overview.resetFilters}
+          getRowClassName={overview.getRowClassName}
+          getCellClassName={overview.getCellClassName}
+          rowActions={overview.rowActions}
+          selection={overview.selectionConfig}
         />
       </PageLoadState>
 
@@ -129,6 +134,24 @@ function VocabularySetManager({ campaignId, setId, setLabel }: VocabularySetMana
           void handleSheetSubmit(values)
         }}
       />
+
+      {overview.capabilities.bulkAvailability ? (
+        <BulkVocabularyAvailabilityDialog
+          open={overview.bulkOpen}
+          onOpenChange={overview.setBulkOpen}
+          campaignId={campaignId}
+          setId={setId}
+          selectedRows={overview.selectedRows}
+          onApplyComplete={({ updatedIds, fullSuccess }) => {
+            overview.removeFromSelection(updatedIds)
+            void overview.invalidateSet()
+            if (fullSuccess) {
+              overview.setBulkOpen(false)
+              overview.exitSelectionMode()
+            }
+          }}
+        />
+      ) : null}
     </>
   )
 }
@@ -171,7 +194,7 @@ export function VocabularyDetailContent({
         <VocabularySetNav campaignId={campaignId} activeSetId={setId} />
         <div className="mx-auto min-w-0 w-full max-w-xl flex-1">
           {setEnabled ? (
-            <VocabularySetManager campaignId={campaignId} setId={setId} setLabel={setLabel} />
+            <VocabularyOverviewPage campaignId={campaignId} setId={setId} setLabel={setLabel} />
           ) : (
             <>
               <PageHeader heading={setLabel} />

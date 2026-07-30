@@ -81,7 +81,7 @@ describe('vocabulary routes', () => {
     await agent
       .post(`/api/campaigns/${campaignId}/vocabulary/${CREATURE_TYPE_SET_ID}/entries`)
       .set(CSRF_HEADER, csrfToken)
-      .send({ id: 'humanoid', label: 'Duplicate' })
+      .send({ label: 'Humanoid' })
       .expect(409)
 
     await agent

@@ -1,9 +1,13 @@
 import { describe, expect, it } from 'vitest'
 
-import { VOCABULARY_OPTION_SET_IDS, getVocabularyOptionSetTerm } from '@rpg/contracts'
+import {
+  VOCABULARY_OPTION_SET_IDS,
+  getVocabularyOptionSetTerm,
+  vocabularySetIdsWithOverview,
+} from '@rpg/contracts'
 
 import { vocabularyHubLabel } from '../vocabulary/term-labels'
-import { HOMEBREW_VOCABULARY_SETS } from './vocabulary-set-registry'
+import { ENABLED_VOCABULARY_SET_IDS, HOMEBREW_VOCABULARY_SETS } from './vocabulary-set-registry'
 
 describe('vocabulary-set-registry', () => {
   it('lists every contract vocabulary set id with a label', () => {
@@ -17,10 +21,11 @@ describe('vocabulary-set-registry', () => {
     }
   })
 
-  it('enables only creature types in this phase', () => {
+  it('derives enabled sets from overview capabilities', () => {
     const enabled = HOMEBREW_VOCABULARY_SETS.filter((entry) => entry.enabled).map(
       (entry) => entry.setId,
     )
-    expect(enabled).toEqual(['creature-types'])
+    expect(enabled).toEqual(vocabularySetIdsWithOverview())
+    expect(ENABLED_VOCABULARY_SET_IDS).toEqual(enabled)
   })
 })

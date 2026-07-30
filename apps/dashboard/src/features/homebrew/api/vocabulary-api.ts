@@ -2,6 +2,7 @@ import type {
   CreateVocabularyCampaignEntryInput,
   ResolvedVocabularyOptionSet,
   UpdateVocabularyEntryInput,
+  VocabularyDisableAvailability,
   VocabularyOptionSetId,
 } from '@rpg/contracts'
 
@@ -22,6 +23,20 @@ export async function getVocabularySet(
     'Could not load vocabulary set.',
   )
   return set
+}
+
+/** Advisory preflight for disabling a vocabulary entry. */
+export async function fetchVocabularyDisableAvailability(
+  campaignId: string,
+  setId: VocabularyOptionSetId,
+  entryId: string,
+): Promise<VocabularyDisableAvailability> {
+  const { availability } = await request<{ availability: VocabularyDisableAvailability }>(
+    `${vocabularySetPath(campaignId, setId)}/entries/${entryId}/disable-availability`,
+    undefined,
+    'Could not check vocabulary disable availability.',
+  )
+  return availability
 }
 
 /** Create a campaign vocabulary entry. */

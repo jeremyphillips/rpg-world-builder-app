@@ -1,17 +1,53 @@
-import { SortableHeader, TableBadgeCell, dataTableColumnMeta, dataTableWidthMeta } from '@rpg/ui'
+import {
+  SortableHeader,
+  TableBadgeCell,
+  dataTableColumnMeta,
+  dataTableNameLinkCellVariants,
+  dataTableWidthMeta,
+} from '@rpg/ui'
 import type { ColumnDef } from '@rpg/ui'
 import type { VocabularyOptionWithUsage } from '@rpg/contracts'
 
-import { buildNameColumn, buildSourceColumn } from '@/lib/data-table/column-builders'
+import { buildSourceColumn } from '@/lib/data-table/column-builders'
 
 import { getVocabularyStatusLabel, VOCABULARY_SOURCE_BADGE } from './labels'
 
-export function vocabularyColumns(): ColumnDef<VocabularyOptionWithUsage>[] {
+type VocabularyColumnsOptions = {
+  onNameClick?: (entry: VocabularyOptionWithUsage) => void
+}
+
+export function vocabularyColumns(
+  options: VocabularyColumnsOptions = {},
+): ColumnDef<VocabularyOptionWithUsage>[] {
+  const { onNameClick } = options
+
   return [
-    buildNameColumn<VocabularyOptionWithUsage>({
+    {
       accessorKey: 'label',
-      locked: true,
-    }),
+      header: ({ column }) => <SortableHeader column={column}>Name</SortableHeader>,
+      cell: ({ row }) => {
+        const label = row.getValue<string>('label')
+        if (!onNameClick) {
+          return label
+        }
+
+        return (
+          <button
+            type="button"
+            className={dataTableNameLinkCellVariants()}
+            onClick={() => onNameClick(row.original)}
+          >
+            {label}
+          </button>
+        )
+      },
+      meta: {
+        ...dataTableColumnMeta.identity,
+        ...dataTableWidthMeta('title'),
+        label: 'Name',
+        locked: true,
+      },
+    },
     buildSourceColumn<VocabularyOptionWithUsage, VocabularyOptionWithUsage['source']>({
       badgeMap: VOCABULARY_SOURCE_BADGE,
       width: 'badge',
