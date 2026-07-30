@@ -93,4 +93,37 @@ describe('vocabulary routes', () => {
   it('requires authentication for vocabulary reads', async () => {
     await request(getApp()).get('/api/campaigns/000000000000000000000000/vocabulary').expect(401)
   })
+
+  it('returns vocabulary entry usage with derived usedBy count', async () => {
+    const { agent, csrfToken } = await registerAndLogin()
+    const campaignId = await createCampaign(agent, csrfToken)
+
+    const usageRes = await agent
+      .get(`/api/campaigns/${campaignId}/vocabulary/${CREATURE_TYPE_SET_ID}/entries/humanoid/usage`)
+      .set(CSRF_HEADER, csrfToken)
+      .expect(200)
+
+    expect(usageRes.body.usage.usedBy).toBe(usageRes.body.usage.references.length)
+    expect(Array.isArray(usageRes.body.usage.references)).toBe(true)
+  })
+
+  it('returns delete availability preflight for campaign entries', async () => {
+    const { agent, csrfToken } = await registerAndLogin()
+    const campaignId = await createCampaign(agent, csrfToken)
+
+    await agent
+      .post(`/api/campaigns/${campaignId}/vocabulary/${CREATURE_TYPE_SET_ID}/entries`)
+      .set(CSRF_HEADER, csrfToken)
+      .send({ label: 'Robot' })
+      .expect(201)
+
+    const availabilityRes = await agent
+      .get(
+        `/api/campaigns/${campaignId}/vocabulary/${CREATURE_TYPE_SET_ID}/entries/robot/delete-availability`,
+      )
+      .set(CSRF_HEADER, csrfToken)
+      .expect(200)
+
+    expect(availabilityRes.body.availability.status).toBe('allowed')
+  })
 })

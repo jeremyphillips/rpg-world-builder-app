@@ -1,8 +1,10 @@
 import { z } from 'zod'
-import { slugSchema } from '@rpg/contracts'
-import { toOptions, type FormItem } from '@rpg/ui/form'
+import type { FormItem } from '@rpg/ui/form'
 
-import { VOCABULARY_STATUS_LABELS } from './labels'
+import {
+  buildCampaignAvailabilityFields,
+  resolveVocabularyAvailabilitySummary,
+} from '@/lib/campaign-availability/campaign-availability-form-fields'
 
 export const VOCABULARY_ENTRY_STATUSES = ['active', 'disabled'] as const
 
@@ -10,14 +12,12 @@ export type VocabularyEntryStatus = (typeof VOCABULARY_ENTRY_STATUSES)[number]
 
 /** Values passed to vocabulary create/patch handlers from the entry sheet. */
 export type VocabularyEntryFormValues = {
-  id: string
   label: string
   description: string
   status: VocabularyEntryStatus
 }
 
 export const vocabularyEntryCreateFormSchema = z.object({
-  id: slugSchema,
   label: z.string().min(1),
   description: z.string().optional(),
 })
@@ -25,15 +25,12 @@ export const vocabularyEntryCreateFormSchema = z.object({
 export type VocabularyEntryCreateFormValues = z.infer<typeof vocabularyEntryCreateFormSchema>
 
 export const vocabularyEntryEditFormSchema = z.object({
-  id: z.string().min(1),
   label: z.string().min(1),
   description: z.string().optional(),
-  status: z.enum(VOCABULARY_ENTRY_STATUSES),
+  available: z.boolean(),
 })
 
 export type VocabularyEntryEditFormValues = z.infer<typeof vocabularyEntryEditFormSchema>
-
-const STATUS_OPTIONS = toOptions(VOCABULARY_ENTRY_STATUSES, VOCABULARY_STATUS_LABELS)
 
 const sharedVocabularyEntryFields: FormItem[] = [
   {
@@ -49,30 +46,39 @@ const sharedVocabularyEntryFields: FormItem[] = [
   },
 ]
 
-export const vocabularyEntryCreateFields: FormItem[] = [
-  {
-    type: 'text',
-    name: 'id',
-    label: 'Id',
-    hint: 'Lowercase slug, e.g. fey-kin',
-    required: true,
-  },
-  ...sharedVocabularyEntryFields,
-]
+export const vocabularyEntryCreateFields: FormItem[] = [...sharedVocabularyEntryFields]
 
-export const vocabularyEntryEditFields: FormItem[] = [
-  {
-    type: 'text',
-    name: 'id',
-    label: 'Id',
-    disabled: true,
-  },
-  ...sharedVocabularyEntryFields,
-  {
-    type: 'select',
-    name: 'status',
-    label: 'Status',
-    options: STATUS_OPTIONS,
-    required: true,
-  },
-]
+export type VocabularyEntryEditFieldCtx = {
+  groupId: string
+  pending: boolean
+  available: boolean
+}
+
+export function buildVocabularyEntryEditFields(ctx: VocabularyEntryEditFieldCtx): FormItem[] {
+  return [
+    ...sharedVocabularyEntryFields,
+    ...buildCampaignAvailabilityFields({
+      groupId: ctx.groupId,
+      pending: ctx.pending,
+      groupRhythm: 'comfortable',
+      switchSize: 'md',
+      summaryDependsOn: ['available'],
+      resolveSummary: (values) => resolveVocabularyAvailabilitySummary(Boolean(values.available)),
+    }),
+  ]
+}
+
+export function vocabularyStatusFromAvailable(available: boolean): VocabularyEntryStatus {
+  return available ? 'active' : 'disabled'
+}
+
+export function vocabularyAvailableFromStatus(status: VocabularyEntryStatus): boolean {
+  return status === 'active'
+}
+
+/** @deprecated Use buildVocabularyEntryEditFields — kept for registry static coverage. */
+export const vocabularyEntryEditFields: FormItem[] = buildVocabularyEntryEditFields({
+  groupId: 'vocabulary-entry-availability',
+  pending: false,
+  available: true,
+})

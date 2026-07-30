@@ -4,11 +4,13 @@ import type {
   ResolvedVocabularyOptionSet,
   SystemRulesetId,
   UpdateVocabularyEntryInput,
+  VocabularyDeleteAvailability,
   VocabularyDisableAvailability,
+  VocabularyEntryUsage,
   VocabularyOptionSetId,
   VocabularyOptionSetPatch,
 } from '@rpg/contracts'
-import { getVocabularySetCapability } from '@rpg/contracts'
+import { getVocabularySetCapability, vocabularyEntryUsageSchema } from '@rpg/contracts'
 
 import { HttpError } from '../../../lib/http-error'
 import { assertVocabularyIdAvailable } from '../lib/assert-vocabulary-id-available'
@@ -20,6 +22,7 @@ import {
   type PatchDocument,
 } from '../lib/patch-document'
 import { resolveVocabularySet } from '../lib/resolve-vocabulary'
+import { buildVocabularyEntryUsageFromBlockers } from '../lib/map-vocabulary-usage-references'
 import { resolveVocabularyOptionUsage } from '../lib/vocabulary-usage-resolvers'
 
 function assertSeedSetAvailable(rulesetId: SystemRulesetId, setId: VocabularyOptionSetId): void {
@@ -71,6 +74,24 @@ async function resolveVocabularyDisableBlockers(
 ): Promise<VocabularyDisableAvailability> {
   const capability = getVocabularySetCapability(setId)
   if (!capability.disableGuard) {
+    return { status: 'allowed' }
+  }
+
+  const { blockers } = await resolveVocabularyOptionUsage(campaignId, setId, entryId)
+  if (blockers.length > 0) {
+    return { status: 'blocked', blockers }
+  }
+
+  return { status: 'allowed' }
+}
+
+async function resolveVocabularyDeleteBlockers(
+  campaignId: string,
+  setId: VocabularyOptionSetId,
+  entryId: string,
+): Promise<VocabularyDeleteAvailability> {
+  const capability = getVocabularySetCapability(setId)
+  if (!capability.deleteGuard) {
     return { status: 'allowed' }
   }
 
@@ -281,6 +302,53 @@ export async function getVocabularyDisableAvailability(
   return resolveVocabularyDisableBlockers(campaignId, setId, entryId)
 }
 
+export async function getVocabularyEntryUsage(
+  campaignId: string,
+  setId: VocabularyOptionSetId,
+  entryId: string,
+): Promise<VocabularyEntryUsage> {
+  if (!getVocabularySetCapability(setId).usageCounting) {
+    throw new HttpError(
+      404,
+      'not_found',
+      `Usage details are not available for vocabulary set "${setId}".`,
+    )
+  }
+
+  const current = await resolveVocabularySetForCampaign(campaignId, setId)
+  findResolvedOption(current, entryId)
+
+  const { blockers } = await resolveVocabularyOptionUsage(campaignId, setId, entryId)
+  return vocabularyEntryUsageSchema.parse(buildVocabularyEntryUsageFromBlockers(blockers))
+}
+
+export async function getVocabularyDeleteAvailability(
+  campaignId: string,
+  setId: VocabularyOptionSetId,
+  entryId: string,
+): Promise<VocabularyDeleteAvailability> {
+  if (!getVocabularySetCapability(setId).deleteGuard) {
+    throw new HttpError(
+      404,
+      'not_found',
+      `Delete preflight is not available for vocabulary set "${setId}".`,
+    )
+  }
+
+  const current = await resolveVocabularySetForCampaign(campaignId, setId)
+  const existing = findResolvedOption(current, entryId)
+
+  if (existing.source === 'system') {
+    throw new HttpError(
+      403,
+      'forbidden',
+      'System vocabulary entries cannot be deleted. Disable them instead.',
+    )
+  }
+
+  return resolveVocabularyDeleteBlockers(campaignId, setId, entryId)
+}
+
 export async function updateVocabularyEntry(
   campaignId: string,
   setId: VocabularyOptionSetId,
@@ -340,13 +408,13 @@ export async function deleteCampaignVocabularyEntry(
 
   const capability = getVocabularySetCapability(setId)
   if (capability.deleteGuard) {
-    const { count, blockers } = await resolveVocabularyOptionUsage(campaignId, setId, entryId)
-    if (count > 0) {
+    const deleteCheck = await resolveVocabularyDeleteBlockers(campaignId, setId, entryId)
+    if (deleteCheck.status === 'blocked') {
       throw new HttpError(
         409,
         'in_use',
-        `Vocabulary entry "${entryId}" is referenced by ${count} record(s) and cannot be deleted.`,
-        { blockers },
+        `Vocabulary entry "${entryId}" is referenced by ${deleteCheck.blockers.length} record(s) and cannot be deleted.`,
+        { blockers: deleteCheck.blockers },
       )
     }
   }

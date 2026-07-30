@@ -5,13 +5,20 @@ import { ConfirmDialog, RowActionsMenu } from '@rpg/ui'
 import { Pencil, Trash2 } from 'lucide-react'
 import type {
   CampaignAvailabilityFilter,
+  ContentUsageBlocker,
   VocabularyOptionSetId,
   VocabularyOptionWithUsage,
 } from '@rpg/contracts'
+import { getVocabularySetCapability } from '@rpg/contracts'
 
 import { ContentCampaignAvailabilityAction } from '@/features/content/lib/overview/content-campaign-availability-action.client'
 
+import { fetchVocabularyDeleteAvailability } from '../api/vocabulary-api'
 import { useVocabularyAvailabilityToggle } from '../hooks/use-vocabulary-availability-toggle.client'
+import {
+  VOCABULARY_DELETE_BLOCKED_DESCRIPTION,
+  VOCABULARY_DELETE_BLOCKED_HEADLINE,
+} from '../lib/vocabulary/labels'
 import { VocabularyAvailabilityBlockedDialog } from './vocabulary-availability-blocked-dialog.client'
 
 type VocabularyRowActionsProps = {
@@ -36,7 +43,10 @@ export function VocabularyRowActions({
   onDelete,
   onStatusChanged,
 }: VocabularyRowActionsProps) {
+  const capabilities = getVocabularySetCapability(setId)
   const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false)
+  const [deleteBlockedOpen, setDeleteBlockedOpen] = useState(false)
+  const [deleteBlockers, setDeleteBlockers] = useState<ContentUsageBlocker[]>([])
   const { pending, blockedOpen, setBlockedOpen, blockers, handleAvailableChange } =
     useVocabularyAvailabilityToggle({
       campaignId,
@@ -49,6 +59,21 @@ export function VocabularyRowActions({
   if (!canManage) return null
 
   const canDelete = entry.source === 'campaign'
+
+  async function handleDeleteConfirm() {
+    if (capabilities.deleteGuard) {
+      const availability = await fetchVocabularyDeleteAvailability(campaignId, setId, entry.id)
+      if (availability.status === 'blocked') {
+        setDeleteBlockers(availability.blockers)
+        setDeleteBlockedOpen(true)
+        setConfirmDeleteOpen(false)
+        return
+      }
+    }
+
+    onDelete(entry)
+    setConfirmDeleteOpen(false)
+  }
 
   return (
     <>
@@ -94,6 +119,15 @@ export function VocabularyRowActions({
         blockers={blockers}
       />
 
+      <VocabularyAvailabilityBlockedDialog
+        open={deleteBlockedOpen}
+        onOpenChange={setDeleteBlockedOpen}
+        campaignId={campaignId}
+        blockers={deleteBlockers}
+        headline={VOCABULARY_DELETE_BLOCKED_HEADLINE}
+        description={VOCABULARY_DELETE_BLOCKED_DESCRIPTION}
+      />
+
       {canDelete ? (
         <ConfirmDialog
           open={confirmDeleteOpen}
@@ -107,8 +141,7 @@ export function VocabularyRowActions({
           confirmLabel="Delete"
           confirmVariant="destructive"
           onConfirm={() => {
-            onDelete(entry)
-            setConfirmDeleteOpen(false)
+            void handleDeleteConfirm()
           }}
         />
       ) : null}

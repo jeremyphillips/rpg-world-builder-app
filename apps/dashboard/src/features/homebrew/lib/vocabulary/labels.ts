@@ -45,3 +45,6 @@ export const VOCABULARY_BULK_AVAILABILITY_DIALOG_HEADLINE = 'Edit availability'
 export const VOCABULARY_DISABLE_BLOCKED_HEADLINE = 'Cannot disable vocabulary entry'
 export const VOCABULARY_DISABLE_BLOCKED_DESCRIPTION =
   'This entry is referenced by campaign content and cannot be disabled yet.'
+export const VOCABULARY_DELETE_BLOCKED_HEADLINE = 'Cannot delete vocabulary entry'
+export const VOCABULARY_DELETE_BLOCKED_DESCRIPTION =
+  'This entry is referenced by campaign content and cannot be deleted yet.'

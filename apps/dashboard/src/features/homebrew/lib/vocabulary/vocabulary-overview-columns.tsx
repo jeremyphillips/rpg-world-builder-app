@@ -1,6 +1,5 @@
 import {
   SortableHeader,
-  TableBadgeCell,
   dataTableColumnMeta,
   dataTableNameLinkCellVariants,
   dataTableWidthMeta,
@@ -10,7 +9,8 @@ import type { VocabularyOptionWithUsage } from '@rpg/contracts'
 
 import { buildSourceColumn } from '@/lib/data-table/column-builders'
 
-import { getVocabularyStatusLabel, VOCABULARY_SOURCE_BADGE } from './labels'
+import { VocabularyAvailabilityMetadata } from '../../components/vocabulary-availability-metadata.client'
+import { VOCABULARY_SOURCE_BADGE } from './labels'
 
 type VocabularyColumnsOptions = {
   onNameClick?: (entry: VocabularyOptionWithUsage) => void
@@ -27,18 +27,25 @@ export function vocabularyColumns(
       header: ({ column }) => <SortableHeader column={column}>Name</SortableHeader>,
       cell: ({ row }) => {
         const label = row.getValue<string>('label')
-        if (!onNameClick) {
-          return label
-        }
+        const entry = row.original
 
         return (
-          <button
-            type="button"
-            className={dataTableNameLinkCellVariants()}
-            onClick={() => onNameClick(row.original)}
-          >
-            {label}
-          </button>
+          <div className="flex min-w-0 flex-col gap-0.5">
+            <span className="inline-flex items-center gap-2">
+              {onNameClick ? (
+                <button
+                  type="button"
+                  className={dataTableNameLinkCellVariants()}
+                  onClick={() => onNameClick(entry)}
+                >
+                  {label}
+                </button>
+              ) : (
+                <span className="font-medium text-foreground">{label}</span>
+              )}
+            </span>
+            <VocabularyAvailabilityMetadata status={entry.status} />
+          </div>
         )
       },
       meta: {
@@ -52,20 +59,6 @@ export function vocabularyColumns(
       badgeMap: VOCABULARY_SOURCE_BADGE,
       width: 'badge',
     }),
-    {
-      accessorKey: 'status',
-      header: 'Status',
-      cell: ({ row }) => {
-        const status = row.getValue<VocabularyOptionWithUsage['status']>('status')
-        return (
-          <TableBadgeCell appearance={status === 'active' ? 'neutral' : 'outline'} tone="neutral">
-            {getVocabularyStatusLabel(status)}
-          </TableBadgeCell>
-        )
-      },
-      enableSorting: false,
-      meta: { ...dataTableColumnMeta.data, label: 'Status', ...dataTableWidthMeta('badge') },
-    },
     {
       accessorKey: 'usedBy',
       header: ({ column }) => <SortableHeader column={column}>Used By</SortableHeader>,

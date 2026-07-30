@@ -100,3 +100,14 @@ export const vocabularyDisableResultSchema = z.discriminatedUnion('status', [
 ])
 
 export type VocabularyDisableResult = z.infer<typeof vocabularyDisableResultSchema>
+
+/** Advisory preflight for deleting a campaign vocabulary entry. */
+export const vocabularyDeleteAvailabilitySchema = z.discriminatedUnion('status', [
+  z.object({ status: z.literal('allowed') }),
+  z.object({
+    status: z.literal('blocked'),
+    blockers: z.array(contentUsageBlockerSchema),
+  }),
+])
+
+export type VocabularyDeleteAvailability = z.infer<typeof vocabularyDeleteAvailabilitySchema>

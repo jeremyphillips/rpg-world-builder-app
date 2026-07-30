@@ -3,6 +3,7 @@
 import { useCallback, useState } from 'react'
 import { Link } from 'react-router-dom'
 import {
+  deriveVocabularyEntryId,
   vocabularyOptionSetIdSchema,
   type VocabularyOptionSetId,
   type VocabularyOptionWithUsage,
@@ -69,7 +70,7 @@ function VocabularyOverviewPage({ campaignId, setId, setLabel }: VocabularyOverv
     if (sheet.mode === 'create') {
       await mutations.createEntry.mutateAsync({
         setId,
-        id: values.id,
+        id: deriveVocabularyEntryId(values.label),
         label: values.label,
         description: values.description || undefined,
       })
@@ -128,11 +129,11 @@ function VocabularyOverviewPage({ campaignId, setId, setLabel }: VocabularyOverv
           if (!open) setSheet({ mode: 'closed' })
         }}
         mode={sheet.mode === 'edit' ? 'edit' : 'create'}
+        campaignId={campaignId}
+        setId={setId}
         entry={sheet.mode === 'edit' ? sheet.entry : undefined}
         isPending={isMutating}
-        onSubmit={(values) => {
-          void handleSheetSubmit(values)
-        }}
+        onSubmit={(values) => handleSheetSubmit(values)}
       />
 
       {overview.capabilities.bulkAvailability ? (

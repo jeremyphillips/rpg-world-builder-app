@@ -1,0 +1,98 @@
+'use client'
+
+import { useCallback, useMemo } from 'react'
+import {
+  getVocabularySetCapability,
+  type ContentUsageBlocker,
+  type VocabularyOptionSetId,
+  type VocabularyOptionWithUsage,
+} from '@rpg/contracts'
+
+import { useVocabularyEntryUsage } from '../hooks/use-vocabulary-entry-usage'
+import {
+  buildVocabularyEntrySheetDefaultValues,
+  buildVocabularyEntrySheetFields,
+  resolveVocabularyEntrySheetHeadline,
+  submitVocabularyEntrySheet,
+} from '../lib/vocabulary/vocabulary-entry-sheet.lib'
+import {
+  vocabularyEntryCreateFormSchema,
+  vocabularyEntryEditFormSchema,
+  type VocabularyEntryFormValues,
+} from '../lib/vocabulary/vocabulary-entry-form-fields'
+
+type UseVocabularyEntrySheetOptions = {
+  open: boolean
+  mode: 'create' | 'edit'
+  campaignId: string
+  setId: VocabularyOptionSetId
+  entry?: VocabularyOptionWithUsage
+  isPending: boolean
+  onSubmit: (values: VocabularyEntryFormValues) => void | Promise<void>
+  onBlocked: (blockers: ContentUsageBlocker[]) => void
+}
+
+export function useVocabularyEntrySheet({
+  open,
+  mode,
+  campaignId,
+  setId,
+  entry,
+  isPending,
+  onSubmit,
+  onBlocked,
+}: UseVocabularyEntrySheetOptions) {
+  const isEdit = mode === 'edit'
+  const groupId = `vocabulary-entry-availability-${entry?.id ?? 'create'}`
+  const capabilities = getVocabularySetCapability(setId)
+
+  const { data: usage } = useVocabularyEntryUsage(
+    campaignId,
+    setId,
+    entry?.id,
+    open && isEdit && capabilities.usageCounting,
+  )
+
+  const defaultValues = useMemo(
+    () => buildVocabularyEntrySheetDefaultValues(isEdit, entry),
+    [entry, isEdit],
+  )
+
+  const fields = useMemo(
+    () =>
+      buildVocabularyEntrySheetFields({
+        campaignId,
+        groupId,
+        isEdit,
+        isPending,
+        entry,
+        usageCounting: capabilities.usageCounting,
+        references: usage?.references ?? [],
+      }),
+    [campaignId, capabilities.usageCounting, entry, groupId, isEdit, isPending, usage?.references],
+  )
+
+  const handleSubmit = useCallback(
+    (values: typeof defaultValues) =>
+      submitVocabularyEntrySheet({
+        values,
+        isEdit,
+        entry,
+        campaignId,
+        setId,
+        onSubmit,
+        onBlocked,
+      }),
+    [campaignId, entry, isEdit, onBlocked, onSubmit, setId],
+  )
+
+  return {
+    isEdit,
+    headline: resolveVocabularyEntrySheetHeadline(isEdit, entry),
+    formKey: isEdit && entry ? `edit-${entry.id}` : 'create',
+    schema: isEdit ? vocabularyEntryEditFormSchema : vocabularyEntryCreateFormSchema,
+    fields,
+    defaultValues,
+    handleSubmit,
+  }
+}

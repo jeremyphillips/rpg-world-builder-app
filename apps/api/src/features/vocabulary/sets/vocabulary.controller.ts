@@ -17,7 +17,9 @@ import { assertVocabularySetCapability } from '../lib/assert-vocabulary-set-capa
 import {
   createCampaignVocabularyEntry,
   deleteCampaignVocabularyEntry,
+  getVocabularyDeleteAvailability,
   getVocabularyDisableAvailability,
+  getVocabularyEntryUsage,
   listResolvedVocabularySetsForCampaign,
   resolveVocabularySetForCampaign,
   updateVocabularyEntry,
@@ -135,5 +137,38 @@ export async function getVocabularyDisableAvailabilityHandler(
   }
   const setId = parseSetId(rawSetId)
   const availability = await getVocabularyDisableAvailability(campaignId, setId, entryId)
+  res.status(200).json({ availability })
+}
+
+export async function getVocabularyEntryUsageHandler(req: Request, res: Response): Promise<void> {
+  const {
+    campaignId,
+    setId: rawSetId,
+    entryId,
+  } = req.params as {
+    campaignId: string
+    setId: string
+    entryId: string
+  }
+  const setId = parseSetId(rawSetId)
+  const usage = await getVocabularyEntryUsage(campaignId, setId, entryId)
+  res.status(200).json({ usage })
+}
+
+export async function getVocabularyDeleteAvailabilityHandler(
+  req: Request,
+  res: Response,
+): Promise<void> {
+  const {
+    campaignId,
+    setId: rawSetId,
+    entryId,
+  } = req.params as {
+    campaignId: string
+    setId: string
+    entryId: string
+  }
+  const setId = parseSetId(rawSetId)
+  const availability = await getVocabularyDeleteAvailability(campaignId, setId, entryId)
   res.status(200).json({ availability })
 }

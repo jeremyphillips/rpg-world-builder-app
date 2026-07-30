@@ -3,8 +3,9 @@
 import type { ContentUsageBlocker } from '@rpg/contracts'
 import { Button, Modal } from '@rpg/ui'
 
-import { UsageBlockedList } from '@/lib/usage-blocked/usage-blocked-list.client'
+import { UsageBlockedReferenceList } from '@/lib/usage-references/usage-blocked-reference-list.client'
 
+import { VOCABULARY_USAGE_REFERENCE_DISCLOSURE_LIMIT } from '../lib/vocabulary/usage-references.constants'
 import {
   VOCABULARY_DISABLE_BLOCKED_DESCRIPTION,
   VOCABULARY_DISABLE_BLOCKED_HEADLINE,
@@ -15,6 +16,8 @@ export type VocabularyAvailabilityBlockedDialogProps = {
   onOpenChange: (open: boolean) => void
   campaignId: string
   blockers: ContentUsageBlocker[]
+  headline?: string
+  description?: string
 }
 
 export function VocabularyAvailabilityBlockedDialog({
@@ -22,16 +25,21 @@ export function VocabularyAvailabilityBlockedDialog({
   onOpenChange,
   campaignId,
   blockers,
+  headline = VOCABULARY_DISABLE_BLOCKED_HEADLINE,
+  description = VOCABULARY_DISABLE_BLOCKED_DESCRIPTION,
 }: VocabularyAvailabilityBlockedDialogProps) {
   return (
     <Modal.Root open={open} onOpenChange={onOpenChange}>
       <Modal.Content size="sm">
-        <Modal.Header
-          headline={VOCABULARY_DISABLE_BLOCKED_HEADLINE}
-          description={VOCABULARY_DISABLE_BLOCKED_DESCRIPTION}
-        />
+        <Modal.Header headline={headline} description={description} />
 
-        <UsageBlockedList blockers={blockers} campaignId={campaignId} />
+        <Modal.Body>
+          <UsageBlockedReferenceList
+            campaignId={campaignId}
+            blockers={blockers}
+            disclosureLimit={VOCABULARY_USAGE_REFERENCE_DISCLOSURE_LIMIT}
+          />
+        </Modal.Body>
 
         <Modal.Footer>
           <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>

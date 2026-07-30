@@ -123,6 +123,8 @@ Routes (under `/api/campaigns/:campaignId`):
 | PATCH  | `/vocabulary/:setId/entries/:entryId`                      | owner / co-owner |
 | DELETE | `/vocabulary/:setId/entries/:entryId`                      | owner / co-owner |
 | GET    | `/vocabulary/:setId/entries/:entryId/disable-availability` | owner / co-owner |
+| GET    | `/vocabulary/:setId/entries/:entryId/delete-availability`  | owner / co-owner |
+| GET    | `/vocabulary/:setId/entries/:entryId/usage`                | member           |
 | GET    | `/ruleset-patch`                                           | member           |
 | PATCH  | `/ruleset-patch/character-creation`                        | owner / co-owner |
 | PATCH  | `/ruleset-patch/mechanics`                                 | owner / co-owner |
@@ -135,14 +137,16 @@ return **409** via `assertVocabularyIdAvailable` against **all resolved option i
 
 Mutating routes enforce `VOCABULARY_SET_CAPABILITIES` server-side:
 
-| Operation                            | Capability     | Failure        |
-| ------------------------------------ | -------------- | -------------- |
-| POST entry                           | `create`       | 403            |
-| PATCH label/description              | `edit`         | 403            |
-| PATCH status                         | `availability` | 403            |
-| DELETE entry                         | `delete`       | 403            |
-| GET disable-availability             | `disableGuard` | 404            |
-| PATCH status → disabled (referenced) | `disableGuard` | 409 + blockers |
+| Operation                            | Capability      | Failure        |
+| ------------------------------------ | --------------- | -------------- |
+| POST entry                           | `create`        | 403            |
+| PATCH label/description              | `edit`          | 403            |
+| PATCH status                         | `availability`  | 403            |
+| DELETE entry                         | `delete`        | 403            |
+| GET disable-availability             | `disableGuard`  | 404            |
+| GET delete-availability              | `deleteGuard`   | 404            |
+| GET usage                            | `usageCounting` | 404            |
+| PATCH status → disabled (referenced) | `disableGuard`  | 409 + blockers |
 
 Partial API registries (creature-types species resolver registered today):
 
@@ -154,12 +158,21 @@ Partial API registries (creature-types species resolver registered today):
 
 Shared dashboard extractions (dual consumers — content + vocabulary):
 
-| Module                    | Path                                                          |
-| ------------------------- | ------------------------------------------------------------- |
-| Unavailable row chrome    | `@/lib/overview/overview-unavailable-chrome.ts`               |
-| Availability filter field | `@/lib/overview/create-campaign-availability-filter-field.ts` |
-| Bulk actions menu shell   | `@/lib/overview/overview-bulk-actions-menu.client.tsx`        |
-| Usage blocked list        | `@/lib/usage-blocked/usage-blocked-list.client.tsx`           |
+| Module                      | Path                                                               |
+| --------------------------- | ------------------------------------------------------------------ |
+| Unavailable row chrome      | `@/lib/overview/overview-unavailable-chrome.ts`                    |
+| Availability filter field   | `@/lib/overview/create-campaign-availability-filter-field.ts`      |
+| Bulk actions menu shell     | `@/lib/overview/overview-bulk-actions-menu.client.tsx`             |
+| Usage blocked list          | `@/lib/usage-blocked/usage-blocked-list.client.tsx`                |
+| Campaign availability field | `@/lib/campaign-availability/campaign-availability-form-fields.ts` |
+| Usage reference primitives  | `@/lib/usage-references/*`                                         |
+
+### Phase 4 — entry sheet + Used by
+
+- **Deferred save** in the entry sheet: label, description, and availability save together on **Save**; disable preflight runs at save time. Row popover availability remains an immediate-action surface.
+- **Usage GET** (`…/entries/:entryId/usage`) returns neutral `VocabularyEntryUsage` with `references[]`; `usedBy` is always `references.length`. Unpaginated in Phase 4 — current resolvers (creature-type → species) return small full lists.
+- **Resolver SSOT:** usage GET, disable preflight, and delete preflight all delegate to `resolveVocabularyOptionUsage`; HTTP responses are not reused across surfaces.
+- **UI:** informational `UsageReferencesSection` in the edit sheet; blocked dialogs use `UsageBlockedReferenceList` with the same reference row primitives.
 
 ---
 
