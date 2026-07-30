@@ -16,6 +16,12 @@ export type CampaignsQueryState = {
   data: CampaignListItem[] | undefined
 }
 
+// Extraction monitor: if campaign-switcher adopts equivalent list lookup semantics
+// (hidden | loading | resolved | missing — no names, hrefs, or fallback copy), lift
+// resolveCampaignTopbarTitleState's lookup/classification into a shared
+// resolveListItemDisplayState helper. Until then, keep domain mapping in
+// mapCampaignTopbarTitleState and switcher-specific UX in campaign-switcher.tsx.
+
 export function resolveCampaignTopbarTitleState(
   campaignId: string | undefined,
   query: CampaignsQueryState,
