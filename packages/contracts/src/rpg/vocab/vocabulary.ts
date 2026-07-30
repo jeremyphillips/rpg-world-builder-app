@@ -142,6 +142,23 @@ export type VocabularyOptionSetPatch = z.infer<typeof vocabularyOptionSetPatchSc
 // Write DTOs — API input for vocabulary CRUD (Phase 3+)
 // ---------------------------------------------------------------------------
 
+/**
+ * POST body for `/vocabulary/:setId/entries`.
+ * `id` is an optional client preview — API re-derives from `label` and rejects mismatch.
+ */
+export const createVocabularyCampaignEntryRequestSchema = z
+  .object({
+    label: z.string().min(1),
+    description: z.string().optional(),
+    id: vocabularyOptionIdSchema.optional(),
+  })
+  .strict()
+
+export type CreateVocabularyCampaignEntryRequest = z.infer<
+  typeof createVocabularyCampaignEntryRequestSchema
+>
+
+/** Service-layer create input after API derives a canonical id. */
 export const createVocabularyCampaignEntryInputSchema = z
   .object({
     setId: vocabularyOptionSetIdSchema,

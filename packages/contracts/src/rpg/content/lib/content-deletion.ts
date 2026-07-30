@@ -1,5 +1,7 @@
 import { z } from 'zod'
 
+import { CONTENT_TYPE_KEYS } from './content-type-keys'
+
 /** Domain usage reference — dashboard resolves navigation from structured identity. */
 export const contentUsageReferenceSchema = z.object({
   kind: z.literal('character'),
@@ -16,6 +18,13 @@ export const contentUsageBlockerSchema = z.discriminatedUnion('kind', [
   z.object({
     kind: z.literal('usage'),
     usage: contentUsageReferenceSchema,
+  }),
+  z.object({
+    kind: z.literal('content'),
+    contentTypeKey: z.enum(CONTENT_TYPE_KEYS),
+    id: z.string(),
+    label: z.string(),
+    slug: z.string(),
   }),
   z.object({
     kind: z.literal('rule'),
@@ -69,3 +78,25 @@ export const contentDemotionResultSchema = z.discriminatedUnion('status', [
 ])
 
 export type ContentDemotionResult = z.infer<typeof contentDemotionResultSchema>
+
+/** Advisory preflight for disabling a vocabulary option (status → disabled). */
+export const vocabularyDisableAvailabilitySchema = z.discriminatedUnion('status', [
+  z.object({ status: z.literal('allowed') }),
+  z.object({
+    status: z.literal('blocked'),
+    blockers: z.array(contentUsageBlockerSchema),
+  }),
+])
+
+export type VocabularyDisableAvailability = z.infer<typeof vocabularyDisableAvailabilitySchema>
+
+/** Authoritative disable outcome — PATCH may return 409 with blockers on race. */
+export const vocabularyDisableResultSchema = z.discriminatedUnion('status', [
+  z.object({ status: z.literal('disabled') }),
+  z.object({
+    status: z.literal('blocked'),
+    blockers: z.array(contentUsageBlockerSchema),
+  }),
+])
+
+export type VocabularyDisableResult = z.infer<typeof vocabularyDisableResultSchema>

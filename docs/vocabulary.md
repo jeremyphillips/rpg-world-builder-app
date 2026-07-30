@@ -69,14 +69,16 @@ The UI may render `source: 'campaign'` vocabulary rows as **Custom** in tables.
 
 Shared shapes live in `@rpg/contracts`:
 
-| Symbol                                    | Layer                             | Role                                                |
-| ----------------------------------------- | --------------------------------- | --------------------------------------------------- |
-| `VOCABULARY_OPTION_SET_IDS`               | `rpg/vocab/vocabulary.ts`         | Known set ids (not all implemented in UI yet)       |
-| `vocabularyOptionIdSchema`                | `rpg/vocab/`                      | Slug shape for stored ids — **not** a closed enum   |
-| `vocabularyOptionSetPatchSchema`          | `rpg/vocab/`                      | Per-set delta inside a patch document               |
-| `campaignRulesetPatchSchema`              | `rpg/campaign/patches/ruleset.ts` | Full patch document (+ `rulesetId` from primitives) |
-| `createVocabularyMemberSchema(activeIds)` | `rpg/vocab/`                      | Validates a value against resolved **active** ids   |
-| `activeVocabularyOptionIds(set)`          | `rpg/vocab/`                      | Active id set from a resolved option set            |
+| Symbol                                    | Layer                                      | Role                                                 |
+| ----------------------------------------- | ------------------------------------------ | ---------------------------------------------------- |
+| `VOCABULARY_OPTION_SET_IDS`               | `rpg/vocab/vocabulary.ts`                  | Known set ids (not all implemented in UI yet)        |
+| `VOCABULARY_SET_CAPABILITIES`             | `rpg/vocab/vocabulary-set-capabilities.ts` | Exhaustive product capability matrix per set         |
+| `deriveVocabularyEntryId`                 | `rpg/vocab/vocabulary-entry-id.ts`         | Canonical slug derivation for create (API authority) |
+| `vocabularyOptionIdSchema`                | `rpg/vocab/`                               | Slug shape for stored ids — **not** a closed enum    |
+| `vocabularyOptionSetPatchSchema`          | `rpg/vocab/`                               | Per-set delta inside a patch document                |
+| `campaignRulesetPatchSchema`              | `rpg/campaign/patches/ruleset.ts`          | Full patch document (+ `rulesetId` from primitives)  |
+| `createVocabularyMemberSchema(activeIds)` | `rpg/vocab/`                               | Validates a value against resolved **active** ids    |
+| `activeVocabularyOptionIds(set)`          | `rpg/vocab/`                               | Active id set from a resolved option set             |
 
 **Closed reference vocab** (physical damage, weapon properties) remains in
 `rpg/vocab/*_ENTRIES` maps when the set is not campaign-customizable. Each closed
@@ -252,11 +254,15 @@ patch routes).
 
 ### Shape vs membership
 
-| Check             | When                              | How                                                            |
-| ----------------- | --------------------------------- | -------------------------------------------------------------- |
-| Slug shape        | Parse stored fields / API input   | `vocabularyOptionIdSchema`                                     |
-| Active membership | Create/update content or settings | `createVocabularyMemberSchema(activeIds)` or API assert helper |
-| Id availability   | Create vocabulary entry           | `assertVocabularyIdAvailable` (no shadowing seed ids)          |
+| Check             | When                              | How                                                                                                                                                   |
+| ----------------- | --------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Slug shape        | Parse stored fields / API input   | `vocabularyOptionIdSchema`                                                                                                                            |
+| Active membership | Create/update content or settings | `createVocabularyMemberSchema(activeIds)` or API assert helper                                                                                        |
+| Id availability   | Create vocabulary entry           | `assertVocabularyIdAvailable` — ids are **reserved within the set** regardless of `status` or `source` (system seed, disabled patch, or campaign row) |
+
+Create accepts an optional client-proposed id for preview; the API re-derives from
+`label` via `deriveVocabularyEntryId` and rejects a mismatch (**400**) or collision
+(**409**). Disabling an option does not free its id for reuse.
 
 Disabling a system option that is already referenced should be allowed in the
 first pass; enforcement of "cannot disable/delete while in use" is centralized in
@@ -275,6 +281,17 @@ settings, monsters, etc.).
 
 When adding a referencing feature, increment the stub for matching
 `(campaignId, setId, entryId)` queries rather than adding ad-hoc delete checks.
+
+### Set capabilities registry
+
+`VOCABULARY_SET_CAPABILITIES` in `@rpg/contracts` is the **runtime SSOT** for which
+operations each set supports (overview, create, availability, usage guards, …).
+Dashboard and API registries derive **enabled subsets** from this map; drift tests
+assert every contract set id has an explicit row. Catalog seed presence is
+**ruleset-specific** (`@rpg/catalog`) — not stored in capabilities.
+
+Integration ownership notes live in
+[`tools/vocab/set-integration`](tools/vocab/set-integration/) (discoverability only).
 
 ---
 
