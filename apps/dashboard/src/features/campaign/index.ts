@@ -1,5 +1,11 @@
 export { CampaignSwitcher } from './components/campaign-switcher'
 export { CampaignPicker } from './components/campaign-picker'
+export { CampaignDisplayName } from './components/campaign-display-name'
+export {
+  CampaignTopbarTitle,
+  CampaignTopbarTitleMissing,
+  CampaignTopbarTitleSkeleton,
+} from './components/campaign-topbar-title'
 export { ContinueCampaignCard } from './components/continue-campaign-card.client'
 export { CampaignCharacterEligibilityAlert } from './components/campaign-character-eligibility-alert.client'
 export { ExtendedProgressionEffects } from './components/extended-progression-effects.client'
@@ -68,3 +74,15 @@ export {
   resolveTargetPathOnSwitch,
 } from './lib/navigation/campaign-selection'
 export { resolveActiveCampaignId } from './lib/navigation/resolve-active-campaign-id'
+export {
+  buildCampaignDisplay,
+  CAMPAIGN_DISPLAY_FALLBACK_NAME,
+  normalizeCampaignDisplayName,
+  type CampaignDisplayInput,
+  type CampaignDisplayVM,
+} from './lib/campaign-display'
+export {
+  mapCampaignTopbarTitleState,
+  resolveCampaignTopbarTitleState,
+  type CampaignTopbarTitleState,
+} from './lib/resolve-campaign-topbar-title-state'

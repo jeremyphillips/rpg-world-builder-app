@@ -3,6 +3,9 @@
 import type { CampaignListItem } from '@rpg/contracts'
 import { Button, Text } from '@rpg/ui'
 
+import { CampaignDisplayName } from './campaign-display-name'
+import { buildCampaignDisplay } from '../lib/campaign-display'
+
 interface ContinueCampaignCardProps {
   campaign: CampaignListItem
   onContinue: (campaignId: string) => void
@@ -17,7 +20,7 @@ export function ContinueCampaignCard({ campaign, onContinue }: ContinueCampaignC
           <Text variant="small" as="h2">
             Continue campaign
           </Text>
-          <Text className="font-medium">{campaign.identity.name}</Text>
+          <CampaignDisplayName display={buildCampaignDisplay(campaign)} surface="card" />
         </div>
         <Button
           type="button"

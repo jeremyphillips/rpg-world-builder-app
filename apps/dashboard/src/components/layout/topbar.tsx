@@ -3,6 +3,7 @@ import { SidebarTrigger, cn } from '@rpg/ui'
 import { useSession } from '@/features/auth'
 
 import { appShellHorizontalPaddingClasses } from './app-shell.variants'
+import { CampaignTopbarTitleSlot } from './campaign-topbar-title-slot'
 import { TopbarUserMenu } from './topbar-user-menu'
 
 interface TopbarProps {
@@ -17,15 +18,22 @@ export function Topbar({ sidebarOpen, onToggleSidebar }: TopbarProps) {
   return (
     <header
       className={cn(
-        'flex h-12 items-center justify-between border-b border-border',
+        'flex h-12 items-center gap-3 border-b border-border',
         appShellHorizontalPaddingClasses,
       )}
     >
-      <div className="flex items-center gap-2">
-        <SidebarTrigger isOpen={sidebarOpen} onClick={onToggleSidebar} className="md:hidden" />
+      <div className="flex min-w-0 flex-1 items-center gap-2">
+        <SidebarTrigger
+          isOpen={sidebarOpen}
+          onClick={onToggleSidebar}
+          className="shrink-0 md:hidden"
+        />
+        <CampaignTopbarTitleSlot />
       </div>
 
-      {user ? <TopbarUserMenu user={user} /> : null}
+      <div className="flex shrink-0 items-center gap-2">
+        {user ? <TopbarUserMenu user={user} /> : null}
+      </div>
     </header>
   )
 }

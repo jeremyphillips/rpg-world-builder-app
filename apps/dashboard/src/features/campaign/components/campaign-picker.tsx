@@ -4,7 +4,9 @@ import { Link } from 'react-router-dom'
 
 import { ROUTES } from '@/app/routes'
 
+import { CampaignDisplayName } from './campaign-display-name'
 import { CAMPAIGN_ONBOARDING_INCOMPLETE_COPY } from '../lib/campaign-onboarding-copy'
+import { buildCampaignDisplay } from '../lib/campaign-display'
 import { isCampaignMembershipOnboardingIncomplete } from '../lib/campaign-membership-onboarding'
 
 interface CampaignPickerProps {
@@ -28,7 +30,7 @@ export function CampaignPicker({ campaigns, onSelect }: CampaignPickerProps) {
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div className="space-y-2">
                   <div className="flex flex-wrap items-center gap-2">
-                    <Text className="font-medium">{campaign.identity.name}</Text>
+                    <CampaignDisplayName display={buildCampaignDisplay(campaign)} surface="card" />
                     {incomplete ? (
                       <Badge appearance="outline" tone="warning" size="sm">
                         {CAMPAIGN_ONBOARDING_INCOMPLETE_COPY.label}

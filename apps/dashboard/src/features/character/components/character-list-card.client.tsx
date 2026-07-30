@@ -13,14 +13,14 @@ import {
   Text,
 } from '@rpg/ui'
 
+import { CampaignDisplayName, buildCampaignDisplay } from '@/features/campaign'
+
 import { resolveCharacterRosterStatusPresentation } from '../lib/campaign-roster-presentation'
-import { CHARACTER_CARD_CAMPAIGN_LABEL } from '../lib/display/character-display'
 import type { CharacterListCardData } from './character-list-card.lib'
 
 export type CharacterListCardProps = {
   card: CharacterListCardData
   detailHref: string
-  campaignLabel?: string
   showCampaign?: boolean
   controllerLine?: string
   rosterStatus?: CharacterRosterStatus
@@ -30,7 +30,6 @@ export type CharacterListCardProps = {
 export function CharacterListCard({
   card,
   detailHref,
-  campaignLabel = CHARACTER_CARD_CAMPAIGN_LABEL,
   showCampaign = true,
   controllerLine,
   rosterStatus,
@@ -57,9 +56,10 @@ export function CharacterListCard({
           </Text>
         ) : null}
         {showCampaign && card.campaign ? (
-          <Text variant="small" className="text-muted-foreground">
-            {campaignLabel}: {card.campaign.name}
-          </Text>
+          <CampaignDisplayName
+            display={buildCampaignDisplay(card.campaign)}
+            surface="inlineMuted"
+          />
         ) : null}
       </CardHeader>
       <CardFooter className="mt-auto">
