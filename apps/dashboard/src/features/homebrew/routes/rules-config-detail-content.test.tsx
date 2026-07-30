@@ -87,6 +87,7 @@ vi.mock('../hooks/use-patch-mechanics-mutation', () => ({
 
 import { useCanManageCampaign } from '@/features/campaign'
 
+import * as rulesConfigRegistry from '../lib/hub/rules-config-registry'
 import { RulesConfigDetailContent } from './rules-config-detail-content'
 
 const useCanManageCampaignMock = vi.mocked(useCanManageCampaign)
@@ -227,6 +228,10 @@ describe('RulesConfigDetailContent', { timeout: 15_000 }, () => {
     mockResolvedRulesData()
   })
 
+  afterEach(() => {
+    vi.restoreAllMocks()
+  })
+
   it('renders the character configuration form with section navigation', async () => {
     renderDetail()
     await expectCharacterConfigurationReady()
@@ -255,6 +260,27 @@ describe('RulesConfigDetailContent', { timeout: 15_000 }, () => {
 
     expect(screen.getByText(/not available/i)).toBeInTheDocument()
     expect(screen.getByRole('link', { name: 'Back to Homebrew' })).toBeInTheDocument()
+    expect(
+      screen.queryByRole('navigation', { name: 'Character configuration sections' }),
+    ).not.toBeInTheDocument()
+  })
+
+  it('shows a disabled state with section navigation', () => {
+    vi.spyOn(rulesConfigRegistry, 'findRulesConfigEntry').mockReturnValue({
+      id: 'mechanics',
+      label: 'Mechanics',
+      description: 'Configure edition presets, armor class, and attack resolution',
+      enabled: false,
+    })
+
+    renderDetail('mechanics')
+
+    expect(screen.getByRole('heading', { name: 'Mechanics' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Not available yet' })).toBeInTheDocument()
+    expect(
+      screen.getByRole('navigation', { name: 'Mechanics configuration sections' }),
+    ).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Save changes' })).not.toBeInTheDocument()
   })
 
   it('hides save actions for non-managers', async () => {

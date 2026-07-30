@@ -64,7 +64,18 @@ describe('VocabularyDetailContent', () => {
 
     expect(screen.getByRole('heading', { name: 'Damage Types' })).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: 'Not available yet' })).toBeInTheDocument()
+    expect(screen.getByRole('navigation', { name: 'Rules vocabulary sets' })).toBeInTheDocument()
     expect(screen.queryByRole('table')).not.toBeInTheDocument()
+  })
+
+  it('shows an unknown fallback for invalid set ids', () => {
+    renderDetail('not-a-set')
+
+    expect(screen.getByRole('heading', { name: 'Vocabulary' })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Back to Homebrew' })).toBeInTheDocument()
+    expect(
+      screen.queryByRole('navigation', { name: 'Rules vocabulary sets' }),
+    ).not.toBeInTheDocument()
   })
 
   it('opens the add sheet for managers', async () => {

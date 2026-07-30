@@ -198,6 +198,37 @@ describe('Form', () => {
     await submitAndExpectPayload(user, onSubmit, { name: 'Tasha', hasExtra: false })
   })
 
+  it('wraps sheet docked footers in a scroll region without growing the rhythm stack', () => {
+    const { container } = render(
+      <Form<Values>
+        schema={schema}
+        fields={[{ type: 'text', name: 'name', label: 'Name' }]}
+        onSubmit={vi.fn()}
+        stickyFooter
+        footerVariant="sheet"
+        contentClassName="px-6 pt-0"
+        footer={<button type="submit">Save</button>}
+      />,
+    )
+
+    const form = container.querySelector('form')
+    expect(form).toHaveClass('flex')
+    expect(form).toHaveClass('flex-1')
+
+    const scrollRegion = form?.firstElementChild
+    expect(scrollRegion).toHaveClass('overflow-y-auto')
+    expect(scrollRegion).toHaveClass('flex-1')
+    expect(scrollRegion).toHaveClass('px-6')
+    expect(scrollRegion).not.toHaveClass('gap-6')
+
+    const rhythmStack = scrollRegion?.firstElementChild
+    expect(rhythmStack).toHaveClass('gap-6')
+    expect(rhythmStack).not.toHaveClass('flex-1')
+    expect(rhythmStack).not.toHaveClass('overflow-y-auto')
+
+    expect(screen.getByRole('toolbar', { name: 'Form actions' })).toHaveClass('shrink-0')
+  })
+
   it('omits HTML min/max on number fields so values like 20 can be edited to 15', async () => {
     const levelSchema = z.object({
       level: z.number().int().min(1).max(30),

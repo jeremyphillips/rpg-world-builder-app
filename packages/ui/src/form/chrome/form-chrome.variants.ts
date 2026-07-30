@@ -14,8 +14,19 @@ export const formTabPanelsBottomPaddingClasses = ''
 export const formStickyActionsBarClasses =
   'sticky bottom-0 z-20 mt-6 border-t border-border bg-background pt-4 pb-4 supports-[backdrop-filter]:bg-background/95 supports-[backdrop-filter]:backdrop-blur-sm'
 
-/** Sheet/drawer forms — sticky footer with horizontal inset matching `contentClassName="px-6"`. */
-export const formStickyActionsBarSheetClasses = `${formStickyActionsBarClasses} px-6`
+/**
+ * Sheet/drawer scroll region — grows inside a flex column form; field rhythm stacks
+ * stay natural height inside this wrapper (do not put `flex-1` on `FormRhythmStack`).
+ */
+export const formSheetScrollRegionClasses = 'min-h-0 flex-1 overflow-y-auto'
+
+/**
+ * Sheet/drawer forms — docked footer with horizontal inset matching
+ * `contentClassName="px-6"`. Pair with {@link formSheetScrollRegionClasses} inside
+ * an `overflow-hidden` sheet body.
+ */
+export const formStickyActionsBarSheetClasses =
+  'shrink-0 border-t border-border bg-background px-6 pt-4 pb-4 supports-[backdrop-filter]:bg-background/95 supports-[backdrop-filter]:backdrop-blur-sm z-20'
 
 /** Transparent sticky actions bar surface — pair with `formStickyTabsTransparentClasses`. */
 export const formStickyActionsBarTransparentClasses =

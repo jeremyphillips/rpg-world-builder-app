@@ -45,6 +45,9 @@ describe('FormActionsBar', () => {
       </FormActionsBar>,
     )
 
-    expect(screen.getByRole('toolbar', { name: 'Form actions' })).toHaveClass('px-6')
+    const toolbar = screen.getByRole('toolbar', { name: 'Form actions' })
+    expect(toolbar).toHaveClass('px-6')
+    expect(toolbar).toHaveClass('shrink-0')
+    expect(toolbar).not.toHaveClass('sticky')
   })
 })

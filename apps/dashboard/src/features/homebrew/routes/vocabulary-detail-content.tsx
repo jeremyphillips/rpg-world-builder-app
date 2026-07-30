@@ -1,7 +1,6 @@
 'use client'
 
 import { useCallback, useState } from 'react'
-import { Link } from 'react-router-dom'
 import {
   deriveVocabularyEntryId,
   getVocabularyOptionSetTerm,
@@ -9,13 +8,11 @@ import {
   type VocabularyOptionSetId,
   type VocabularyOptionWithUsage,
 } from '@rpg/contracts'
-import { buttonVariants, Heading, Text } from '@rpg/ui'
+import { buttonVariants } from '@rpg/ui'
 
 import { PageHeader } from '@/components/layout/page-header'
 import { PageLoadState } from '@/components/layout/page-load-state'
-import { WidePage } from '@/components/layout/wide-page'
 import { useSetBreadcrumbLabel } from '@/components/layout/use-breadcrumb-label'
-import { ROUTES } from '@/app/routes'
 import { useCanManageCampaign } from '@/features/campaign'
 import { CatalogOverviewTable } from '@/lib/data-table/catalog-overview-table.client'
 
@@ -27,6 +24,9 @@ import {
 import { VocabularySetNav } from '../components/vocabulary-set-nav.client'
 import { useVocabularyMutations, useVocabularySet } from '../hooks/use-vocabulary-set'
 import { useVocabularyOverviewPage } from '../hooks/use-vocabulary-overview-page.client'
+import { HomebrewDetailFallback } from '../lib/detail/homebrew-detail-fallback'
+import { HomebrewDetailMain } from '../lib/detail/homebrew-detail-main'
+import { HomebrewDetailShell } from '../lib/detail/homebrew-detail-shell'
 import { findVocabularySetEntry } from '../lib/hub/vocabulary-set-registry'
 import {
   UNKNOWN_VOCABULARY_SET_MESSAGE,
@@ -114,7 +114,7 @@ function VocabularyOverviewPage({
 
   return (
     <>
-      <div className="flex flex-col gap-3">
+      <HomebrewDetailMain>
         <PageHeader heading={setLabel} actions={newAction} />
         <PageLoadState
           isPending={isPending}
@@ -144,7 +144,7 @@ function VocabularyOverviewPage({
             }
           />
         </PageLoadState>
-      </div>
+      </HomebrewDetailMain>
 
       <VocabularyEntrySheet
         open={isSheetOpen}
@@ -195,16 +195,12 @@ export function VocabularyDetailContent({
 
   if (!parsedSetId.success) {
     return (
-      <WidePage spacing="relaxed">
-        <PageHeader heading="Vocabulary" />
-        <Text variant="muted">{UNKNOWN_VOCABULARY_SET_MESSAGE}</Text>
-        <Link
-          to={ROUTES.homebrew.hub(campaignId)}
-          className={buttonVariants({ variant: 'outline' })}
-        >
-          Back to Homebrew
-        </Link>
-      </WidePage>
+      <HomebrewDetailFallback
+        status="unknown"
+        heading="Vocabulary"
+        message={UNKNOWN_VOCABULARY_SET_MESSAGE}
+        campaignId={campaignId}
+      />
     )
   }
 
@@ -219,29 +215,22 @@ export function VocabularyDetailContent({
   useSetBreadcrumbLabel(setLabel)
 
   return (
-    <WidePage spacing="list">
-      <div className="flex flex-col gap-6 lg:flex-row">
-        <VocabularySetNav campaignId={campaignId} activeSetId={setId} />
-        <div className="mx-auto min-w-0 w-full max-w-xl flex-1">
-          {setEnabled ? (
-            <VocabularyOverviewPage
-              campaignId={campaignId}
-              setId={setId}
-              setLabel={setLabel}
-              singularLabel={singularLabel}
-              pluralLabel={pluralLabel}
-            />
-          ) : (
-            <>
-              <PageHeader heading={setLabel} />
-              <Heading variant="section" as="h2">
-                Not available yet
-              </Heading>
-              <Text variant="muted">{VOCABULARY_NOT_IMPLEMENTED_MESSAGE}</Text>
-            </>
-          )}
-        </div>
-      </div>
-    </WidePage>
+    <HomebrewDetailShell nav={<VocabularySetNav campaignId={campaignId} activeSetId={setId} />}>
+      {setEnabled ? (
+        <VocabularyOverviewPage
+          campaignId={campaignId}
+          setId={setId}
+          setLabel={setLabel}
+          singularLabel={singularLabel}
+          pluralLabel={pluralLabel}
+        />
+      ) : (
+        <HomebrewDetailFallback
+          status="disabled"
+          heading={setLabel}
+          message={VOCABULARY_NOT_IMPLEMENTED_MESSAGE}
+        />
+      )}
+    </HomebrewDetailShell>
   )
 }

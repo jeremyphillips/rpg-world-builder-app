@@ -74,14 +74,13 @@ export function VocabularyEntrySheet(props: VocabularyEntrySheetProps) {
             }
           />
           {props.open ? (
-            <Sheet.Body className="flex min-h-0 flex-1 flex-col p-0">
+            <Sheet.Body className="flex min-h-0 flex-1 flex-col overflow-hidden p-0">
               <Form
                 key={sheet.formKey}
                 id="vocabulary-entry"
                 schema={sheet.schema}
                 fields={sheet.fields}
                 defaultValues={sheet.defaultValues}
-                className="flex flex-col"
                 contentClassName="px-6 pt-0"
                 rhythm="comfortable"
                 size="md"

@@ -33,14 +33,14 @@ function UsageReferenceGroupItems({
   const remainingCount = references.length - disclosureLimit
 
   return (
-    <ul className="space-y-2">
+    <ul className="list-disc space-y-2 pl-5" role="list">
       {visibleReferences.map((reference) => (
         <li key={`${reference.kind}:${reference.id}`}>
           <UsageReferenceRow reference={reference} campaignId={campaignId} />
         </li>
       ))}
       {references.length > disclosureLimit ? (
-        <li>
+        <li className="list-none">
           <Button
             type="button"
             variant="link"

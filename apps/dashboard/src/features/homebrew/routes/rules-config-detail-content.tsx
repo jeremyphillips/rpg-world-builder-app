@@ -1,15 +1,12 @@
 'use client'
 
 import { useMemo } from 'react'
-import { Link } from 'react-router-dom'
-import { buttonVariants, Heading, Text } from '@rpg/ui'
+import { Text } from '@rpg/ui'
 import { Form } from '@rpg/ui/form'
 
 import { PageHeader } from '@/components/layout/page-header'
 import { PageLoadState } from '@/components/layout/page-load-state'
-import { WidePage } from '@/components/layout/wide-page'
 import { useSetBreadcrumbLabel } from '@/components/layout/use-breadcrumb-label'
-import { ROUTES } from '@/app/routes'
 import { useSubmitHandler } from '@/lib/use-submit-handler'
 import { notifySaveSuccess } from '@/lib/notify'
 import {
@@ -35,6 +32,9 @@ import { buildAttackResolutionModeFieldOptions } from '../lib/vocabulary/sets/at
 import { buildActiveCreatureTypeFieldOptions } from '../lib/vocabulary/sets/creature-types'
 import { buildActiveLanguageFieldOptions } from '../lib/vocabulary/sets/languages'
 import { disableFormItems } from '@/lib/disable-form-items'
+import { HomebrewDetailFallback } from '../lib/detail/homebrew-detail-fallback'
+import { HomebrewDetailMain } from '../lib/detail/homebrew-detail-main'
+import { HomebrewDetailShell } from '../lib/detail/homebrew-detail-shell'
 import { findRulesConfigEntry, type RulesConfigId } from '../lib/hub/rules-config-registry'
 import { useAttackResolutionModeVocabulary } from '../hooks/use-attack-resolution-mode-vocabulary'
 import { useCreatureTypeVocabulary } from '../hooks/use-creature-type-vocabulary'
@@ -134,7 +134,7 @@ function CharacterConfigurationForm({ campaignId }: { campaignId: string }) {
       defaultErrorLabel="Could not load character configuration."
     >
       {defaultValues ? (
-        <>
+        <HomebrewDetailMain>
           <PageHeader heading="Character Configuration" />
           {!canManage ? <Text variant="muted">{READ_ONLY_RULES_MESSAGE}</Text> : null}
           <Form<RulesValues>
@@ -148,7 +148,7 @@ function CharacterConfigurationForm({ campaignId }: { campaignId: string }) {
             stickyFooter={canManage}
             footer={canManage ? saveFooter : undefined}
           />
-        </>
+        </HomebrewDetailMain>
       ) : null}
     </PageLoadState>
   )
@@ -201,7 +201,7 @@ function MechanicsConfigurationForm({ campaignId }: { campaignId: string }) {
       defaultErrorLabel="Could not load mechanics configuration."
     >
       {defaultValues ? (
-        <>
+        <HomebrewDetailMain>
           <PageHeader heading="Mechanics" />
           {!canManage ? <Text variant="muted">{READ_ONLY_RULES_MESSAGE}</Text> : null}
           <Form<MechanicsValues>
@@ -215,7 +215,7 @@ function MechanicsConfigurationForm({ campaignId }: { campaignId: string }) {
             stickyFooter={canManage}
             footer={canManage ? saveFooter : undefined}
           />
-        </>
+        </HomebrewDetailMain>
       ) : null}
     </PageLoadState>
   )
@@ -228,49 +228,40 @@ export function RulesConfigDetailContent({ campaignId, configId }: RulesConfigDe
 
   if (!registryEntry) {
     return (
-      <WidePage spacing="relaxed">
-        <PageHeader heading="Rules Configuration" />
-        <Text variant="muted">{UNKNOWN_RULES_CONFIG_MESSAGE}</Text>
-        <Link
-          to={ROUTES.homebrew.hub(campaignId)}
-          className={buttonVariants({ variant: 'outline' })}
-        >
-          Back to Homebrew
-        </Link>
-      </WidePage>
-    )
-  }
-
-  if (!registryEntry.enabled) {
-    return (
-      <WidePage spacing="relaxed">
-        <PageHeader heading={registryEntry.label} />
-        <Heading variant="section" as="h2">
-          Not available yet
-        </Heading>
-        <Text variant="muted">{UNKNOWN_RULES_CONFIG_MESSAGE}</Text>
-      </WidePage>
+      <HomebrewDetailFallback
+        status="unknown"
+        heading="Rules Configuration"
+        message={UNKNOWN_RULES_CONFIG_MESSAGE}
+        campaignId={campaignId}
+      />
     )
   }
 
   const nav = RULES_CONFIG_NAV[registryEntry.id]
 
   return (
-    <WidePage spacing="list">
-      <div className="flex flex-col gap-6 lg:flex-row">
+    <HomebrewDetailShell
+      nav={
         <RulesConfigFieldNav
           sections={nav.sections}
           navLabel={nav.navLabel}
           mobileSelectLabel={nav.mobileSelectLabel}
         />
-        <div className="mx-auto min-w-0 w-full max-w-xl flex-1">
-          {registryEntry.id === 'character-configuration' ? (
-            <CharacterConfigurationForm campaignId={campaignId} />
-          ) : (
-            <MechanicsConfigurationForm campaignId={campaignId} />
-          )}
-        </div>
-      </div>
-    </WidePage>
+      }
+    >
+      {registryEntry.enabled ? (
+        registryEntry.id === 'character-configuration' ? (
+          <CharacterConfigurationForm campaignId={campaignId} />
+        ) : (
+          <MechanicsConfigurationForm campaignId={campaignId} />
+        )
+      ) : (
+        <HomebrewDetailFallback
+          status="disabled"
+          heading={registryEntry.label}
+          message={UNKNOWN_RULES_CONFIG_MESSAGE}
+        />
+      )}
+    </HomebrewDetailShell>
   )
 }
