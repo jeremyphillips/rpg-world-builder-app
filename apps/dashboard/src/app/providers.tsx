@@ -1,8 +1,9 @@
 import { useState, type ReactNode } from 'react'
 import { QueryClientProvider } from '@tanstack/react-query'
 
-import { ThemeProvider } from '@rpg/ui'
+import { ThemeProvider, ToastProvider } from '@rpg/ui'
 
+import { DashboardToastViewport } from '@/components/feedback/dashboard-toast-viewport.client'
 import { createQueryClient } from './query-client'
 
 export function AppProviders({ children }: { children: ReactNode }) {
@@ -11,7 +12,9 @@ export function AppProviders({ children }: { children: ReactNode }) {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <ThemeProvider>{children}</ThemeProvider>
+      <ThemeProvider>
+        <ToastProvider viewport={<DashboardToastViewport />}>{children}</ToastProvider>
+      </ThemeProvider>
     </QueryClientProvider>
   )
 }

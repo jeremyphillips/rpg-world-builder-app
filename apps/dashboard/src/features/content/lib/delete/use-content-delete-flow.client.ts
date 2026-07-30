@@ -6,6 +6,7 @@ import type { ContentUsageBlocker, ContentSource, ContentTypeKey } from '@rpg/co
 import { getErrorMessage } from '@rpg/contracts'
 
 import type { AnyContentFormDef } from '../forms/content-form-registry'
+import { notifyContentDeleted } from '@/lib/notify'
 import { fetchContentDeletionAvailability, useDeleteContent } from '../list/use-content-mutations'
 
 type UseContentDeleteFlowOptions = {
@@ -79,14 +80,14 @@ export function useContentDeleteFlow({
       }
 
       setConfirmOpen(false)
-      // TODO: success toast once toast infra lands
       // TODO: preserve existing overview search/filter state when navigating back after delete
       navigate(overviewHref)
+      notifyContentDeleted(contentTypeKey)
     } catch (err) {
       setConfirmOpen(false)
       setDeleteError(getErrorMessage(err, 'Could not delete this item.'))
     }
-  }, [deleteMutation, entityId, navigate, overviewHref])
+  }, [contentTypeKey, deleteMutation, entityId, navigate, overviewHref])
 
   const canDelete = entitySource === 'homebrew'
   const deletePending = checkingAvailability || deleteMutation.isPending

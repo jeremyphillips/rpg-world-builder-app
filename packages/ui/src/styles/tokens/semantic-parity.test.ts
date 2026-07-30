@@ -14,7 +14,7 @@ import {
 const tokensDir = join(dirname(fileURLToPath(import.meta.url)), '.')
 
 /** Theme-invariant layout tokens live only in semantic-light.css. */
-const LAYOUT_SEMANTIC_ROLES = new Set(['--radius', '--radius-card', '--sidebar-width'])
+const LAYOUT_SEMANTIC_ROLES = new Set(['--radius', '--radius-card', '--sidebar-width', '--z-toast'])
 
 /** Component recipes and Layer 2 compositions may use color-mix — excluded from palette-only mapping checks. */
 const RECIPE_SEMANTIC_ROLES = new Set([
