@@ -1,7 +1,8 @@
 'use client'
 
-import { NavLink, useNavigate } from 'react-router-dom'
-import { cn, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Text } from '@rpg/ui'
+import { useNavigate, NavLink } from 'react-router-dom'
+
+import { Eyebrow, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, cn } from '@rpg/ui'
 import type { VocabularyOptionSetId } from '@rpg/contracts'
 
 import { ROUTES } from '@/app/routes'
@@ -31,9 +32,9 @@ export function VocabularySetNav({ campaignId, activeSetId }: VocabularySetNavPr
   return (
     <>
       <nav className="hidden w-56 shrink-0 lg:block" aria-label="Rules vocabulary sets">
-        <Text variant="small" className="mb-2 px-3 font-medium uppercase tracking-wide">
+        <Eyebrow size="sm" className="mb-2 px-3">
           Rules vocabulary
-        </Text>
+        </Eyebrow>
         <ul className="space-y-1">
           {HOMEBREW_VOCABULARY_SETS.map((entry) => (
             <li key={entry.setId}>

@@ -53,7 +53,6 @@ export const CHARACTER_DETAIL_TAB_LABELS = {
   narrative: 'Narrative',
 } as const
 
-export const CHARACTER_CARD_CAMPAIGN_LABEL = 'Campaign'
 export const UNAVAILABLE_ORGANIZATION_LABEL = 'Unavailable organization'
 
 export const CHARACTER_CONTROLLER_DISPLAY = {

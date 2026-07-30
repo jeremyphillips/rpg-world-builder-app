@@ -26,15 +26,11 @@ describe('CharacterSheetDetailShell', () => {
     )
   })
 
-  it('renders campaign breadcrumb and error copy', () => {
+  it('renders the campaign heading and error copy without a campaign back link', () => {
     render(
       <MemoryRouter>
         <CharacterSheetDetailShell
           scope="campaign"
-          campaignBreadcrumb={{
-            href: ROUTES.campaign.detail('camp-1'),
-            label: 'The Argent Road',
-          }}
           isPending={false}
           isError
           errorLabel={CHARACTER_SHEET_ERROR_LABELS.campaignPermissionDenied}
@@ -43,10 +39,7 @@ describe('CharacterSheetDetailShell', () => {
     )
 
     expect(screen.getByRole('heading', { name: 'Campaign character' })).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: 'The Argent Road' })).toHaveAttribute(
-      'href',
-      ROUTES.campaign.detail('camp-1'),
-    )
+    expect(screen.queryByRole('link', { name: 'The Argent Road' })).not.toBeInTheDocument()
     expect(screen.getByRole('alert')).toHaveTextContent(
       CHARACTER_SHEET_ERROR_LABELS.campaignPermissionDenied,
     )
@@ -57,10 +50,6 @@ describe('CharacterSheetDetailShell', () => {
       <MemoryRouter>
         <CharacterSheetDetailShell
           scope="campaign"
-          campaignBreadcrumb={{
-            href: ROUTES.campaign.detail('camp-1'),
-            label: 'The Argent Road',
-          }}
           errorBackLink={{
             href: ROUTES.campaign.characters.list('camp-1'),
             label: 'My Character',
@@ -83,10 +72,6 @@ describe('CharacterSheetDetailShell', () => {
       <MemoryRouter>
         <CharacterSheetDetailShell
           scope="campaign"
-          campaignBreadcrumb={{
-            href: ROUTES.campaign.detail('camp-1'),
-            label: 'The Argent Road',
-          }}
           isPending={false}
           isError
           errorLabel={CHARACTER_SHEET_ERROR_LABELS.campaignNotFoundInCampaign}

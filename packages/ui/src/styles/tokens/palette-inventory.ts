@@ -40,6 +40,7 @@ export const PALETTE_SIDEBAR_STEPS = ['sidebar-surface', 'sidebar-shade'] as con
 
 export const PALETTE_FG_STEPS = [
   'fg-default',
+  'fg-subtle',
   'fg-muted',
   'fg-disabled',
   'fg-on-solid',
@@ -160,7 +161,7 @@ export const PALETTE_PRIMITIVE_GROUPS: PalettePrimitiveGroup[] = [
   {
     id: 'foreground',
     label: 'Foreground',
-    description: 'Text roles — fg-muted/disabled derived from fg-default toward canvas.',
+    description: 'Text roles — fg-subtle/muted/disabled derived from fg-default toward canvas.',
     steps: PALETTE_FG_STEPS,
   },
   {

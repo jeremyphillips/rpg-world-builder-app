@@ -34,10 +34,15 @@ src/
   main.tsx
   index.css               # @rpg/ui preset
   app/                    # providers, router, lazy routes
-  components/layout/      # AppShell, sidebar
+  components/layout/      # AppShell, sidebar (NavSection + sidebarNavItemVariants)
   features/               # feature-first placeholders → CRUD in plans 04–06
   lib/api/                # shell API helper (feature clients in later plans)
 ```
+
+Sidebar IA is built by `buildBenchSidebarSections()` — Work (Bench, Epics,
+Backlog) and Settings sections. Shared nav primitives come from `@rpg/ui`;
+dashboard campaign nav validates `SidebarNavSectionDisclosure`. See
+[dashboard sidebar-navigation.md](../dashboard/docs/sidebar-navigation.md).
 
 Feature conventions: [src/features/README.md](src/features/README.md).
 

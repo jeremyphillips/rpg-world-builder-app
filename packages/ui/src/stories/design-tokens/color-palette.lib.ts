@@ -127,8 +127,8 @@ export const COLOR_TOKEN_GROUPS: ColorTokenGroup[] = [
         cssVar: '--sidebar',
         tailwind: 'bg-sidebar',
         usage: 'background',
-        foregroundVar: '--foreground',
-        foregroundTailwind: 'text-foreground',
+        foregroundVar: '--foreground-subtle',
+        foregroundTailwind: 'text-foreground-subtle',
       },
       {
         name: 'foreground',
@@ -237,6 +237,12 @@ export const COLOR_TOKEN_GROUPS: ColorTokenGroup[] = [
         cssVar: '--surface-strong',
         tailwind: 'bg-surface-strong',
         usage: 'background',
+      },
+      {
+        name: 'foreground-subtle',
+        cssVar: '--foreground-subtle',
+        tailwind: 'text-foreground-subtle',
+        usage: 'text',
       },
       {
         name: 'muted-foreground',

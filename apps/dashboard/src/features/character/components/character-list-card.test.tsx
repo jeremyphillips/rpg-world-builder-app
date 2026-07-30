@@ -3,7 +3,6 @@ import { MemoryRouter } from 'react-router-dom'
 import { describe, expect, it } from 'vitest'
 import { expectNoAxeViolations } from '@rpg/ui/test-utils'
 
-import { CHARACTER_CARD_CAMPAIGN_LABEL } from '../lib/display/character-display'
 import { CHARACTER_CONTROLLER_DISPLAY } from '../lib/display/character-display-labels'
 import { CharacterListCard } from './character-list-card.client'
 import { CharacterListCardPreview } from './character-list-card-preview.client'
@@ -40,9 +39,7 @@ describe('CharacterListCard', () => {
       </MemoryRouter>,
     )
 
-    expect(
-      screen.getByText(`${CHARACTER_CARD_CAMPAIGN_LABEL}: The Argent Road`),
-    ).toBeInTheDocument()
+    expect(screen.getByText('The Argent Road')).toBeInTheDocument()
   })
 
   it('renders optional roster status badge', () => {
@@ -73,9 +70,7 @@ describe('CharacterListCard', () => {
       </MemoryRouter>,
     )
 
-    expect(
-      screen.queryByText(`${CHARACTER_CARD_CAMPAIGN_LABEL}: The Argent Road`),
-    ).not.toBeInTheDocument()
+    expect(screen.queryByText('The Argent Road')).not.toBeInTheDocument()
   })
 
   it('renders controller line inside the card header', () => {

@@ -3,7 +3,6 @@ import { render, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { expectNoAxeViolations } from '@rpg/ui/test-utils'
 
-import { CHARACTER_CARD_CAMPAIGN_LABEL } from '@/features/character/lib/display/character-display'
 import { CHARACTER_CONTROLLER_DISPLAY } from '@/features/character/lib/display/character-display-labels'
 
 import { CampaignOverviewPartySection } from './campaign-overview-party-section'
@@ -38,9 +37,7 @@ describe('CampaignOverviewPartySection', () => {
     expect(
       screen.getByText(CHARACTER_CONTROLLER_DISPLAY.playedBy('Player One')),
     ).toBeInTheDocument()
-    expect(
-      screen.queryByText(`${CHARACTER_CARD_CAMPAIGN_LABEL}: The Argent Road`),
-    ).not.toBeInTheDocument()
+    expect(screen.queryByText('The Argent Road')).not.toBeInTheDocument()
   })
 
   it('renders played-by-you copy when the viewer controls the character', () => {

@@ -55,9 +55,9 @@ function ReviewSection({
 }) {
   return (
     <section aria-labelledby={id}>
-      <Text variant="small" as="h3" id={id} className="mb-3 font-semibold uppercase tracking-wide">
+      <h3 id={id} className="eyebrow-style-sm mb-3 text-foreground">
         {heading}
-      </Text>
+      </h3>
       <dl className="space-y-2 text-sm">
         {rows.map((row) => (
           <ReviewRow key={row.label} label={row.label} value={row.value} />

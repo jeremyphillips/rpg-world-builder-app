@@ -61,6 +61,14 @@ export { Avatar, type AvatarProps } from './components/ui/avatar.client'
 export { eyebrowVariants, type EyebrowVariantProps } from './components/ui/eyebrow.variants'
 export { Eyebrow, type EyebrowProps } from './components/ui/eyebrow'
 export { NavSection, type NavSectionProps } from './components/ui/nav-section'
+export {
+  sidebarNavItemVariants,
+  type SidebarNavItemVariantProps,
+} from './components/ui/sidebar-nav-item.variants'
+export {
+  SidebarNavSectionDisclosure,
+  type SidebarNavSectionDisclosureProps,
+} from './components/ui/sidebar-nav-section-disclosure.client'
 export { Button, type ButtonProps } from './components/ui/button.client'
 export { buttonVariants } from './components/ui/button.variants'
 export { Input, type InputProps } from './components/ui/input.client'

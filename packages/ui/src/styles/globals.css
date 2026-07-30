@@ -53,6 +53,7 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-foreground-subtle: var(--foreground-subtle);
   --color-card: var(--card);
   --color-card-foreground: var(--card-foreground);
   --color-popover: var(--popover);
@@ -124,6 +125,8 @@
   --color-selected-control-border: var(--selected-control-border);
   --color-catalog-picker-row-surface: var(--catalog-picker-row-surface);
   --color-sidebar: var(--sidebar);
+  --color-sidebar-nav-item-fg: var(--sidebar-nav-item-fg);
+  --spacing-sidebar: var(--sidebar-width);
   --color-control-hover: var(--control-hover-bg);
   --color-control-selected: var(--control-selected-bg);
   --color-row-hover: var(--row-hover-bg);
@@ -302,6 +305,10 @@
  * Tailwind maps one `--color-*` token to every utility prefix (`bg-`, `border-`, …).
  * State variants swap `--field-control-*` roles via the chrome recipe.
  */
+@utility w-sidebar {
+  width: var(--sidebar-width);
+}
+
 @utility border-input {
   border-color: var(--field-control-border);
 }
@@ -494,21 +501,21 @@
 
 @utility eyebrow-style-xs {
   font-size: var(--text-eyebrow-xs);
-  font-weight: var(--font-weight-meta);
+  font-weight: var(--font-weight-eyebrow);
   letter-spacing: var(--tracking-eyebrow-xs);
   text-transform: uppercase;
 }
 
 @utility eyebrow-style-sm {
   font-size: var(--text-eyebrow-sm);
-  font-weight: var(--font-weight-meta);
+  font-weight: var(--font-weight-eyebrow);
   letter-spacing: var(--tracking-eyebrow);
   text-transform: uppercase;
 }
 
 @utility eyebrow-style-md {
   font-size: var(--text-eyebrow-md);
-  font-weight: var(--font-weight-meta);
+  font-weight: var(--font-weight-eyebrow);
   letter-spacing: var(--tracking-eyebrow);
   text-transform: uppercase;
 }

@@ -23,6 +23,10 @@
 
   /* Text — default body copy (`text-foreground`, `text-muted-foreground`, …) */
   --foreground: var(--palette-fg-default);
+  --foreground-subtle: var(--palette-fg-subtle);
+
+  /* Typography — theme-scoped weight roles (`eyebrow-style-*` composites) */
+  --font-weight-eyebrow: var(--font-weight-light);
 
   /* Brand — primary actions, links, focus accents (`bg-primary`, `text-primary`, `ring-ring`, …) */
   --primary: var(--palette-primary);
@@ -57,6 +61,7 @@
   --ring: var(--palette-primary);
   --overlay: var(--palette-overlay);
   --sidebar: var(--palette-sidebar-surface);
+  --sidebar-nav-item-fg: var(--muted-foreground);
 
   /*
    * Field control chrome — text-like inputs and grouped field shells.

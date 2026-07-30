@@ -1,5 +1,14 @@
 export { CampaignSwitcher } from './components/campaign-switcher'
 export { CampaignPicker } from './components/campaign-picker'
+export { CampaignDisplayName } from './components/campaign-display-name'
+export {
+  CampaignTopbarTitle,
+  CampaignTopbarTitleError,
+  CampaignTopbarTitleMissing,
+  CampaignTopbarTitleSkeleton,
+} from './components/campaign-topbar-title'
+export { ContinueCampaignCard } from './components/continue-campaign-card.client'
+export { ResumeSetupCampaignCard } from './components/resume-setup-campaign-card.client'
 export { CampaignCharacterEligibilityAlert } from './components/campaign-character-eligibility-alert.client'
 export { ExtendedProgressionEffects } from './components/extended-progression-effects.client'
 export {
@@ -53,7 +62,7 @@ export { useCampaignRules } from './hooks/use-campaign-rules'
 export { useCampaigns, campaignsQueryKey } from './hooks/use-campaigns'
 export { useCampaignTemplates, campaignTemplatesQueryKey } from './hooks/use-campaign-templates'
 export { useActiveCampaignId } from './hooks/use-active-campaign-id'
-export { useSelectCampaign } from './hooks/use-select-campaign'
+export { useOpenCampaign, useSwitchCampaign } from './hooks/use-select-campaign'
 export { useSyncActiveCampaign } from './hooks/use-sync-active-campaign'
 export { useCanManageCampaign } from './hooks/use-can-manage-campaign'
 export { useUpdateCampaign } from './hooks/use-update-campaign'
@@ -62,7 +71,26 @@ export { readStoredCampaignId } from './lib/navigation/selected-campaign-storage
 export {
   resolveActiveCampaignSummary,
   resolveLandingCampaignId,
-  resolveLandingPath,
+  resolveContinueCampaign,
+  resolveResumeSetupCampaign,
+  resolvePreferredCampaignId,
   resolveTargetPathOnSwitch,
+  resolveCampaignSwitcherTriggerState,
+  getCampaignSwitcherTriggerLabel,
+  CAMPAIGN_SWITCHER_NO_SELECTION_LABEL,
 } from './lib/navigation/campaign-selection'
 export { resolveActiveCampaignId } from './lib/navigation/resolve-active-campaign-id'
+export {
+  buildCampaignDisplay,
+  CAMPAIGN_DISPLAY_FALLBACK_NAME,
+  CAMPAIGN_UNKNOWN_NAME,
+  CAMPAIGNS_QUERY_ERROR_MESSAGE,
+  normalizeCampaignDisplayName,
+  type CampaignDisplayInput,
+  type CampaignDisplayVM,
+} from './lib/campaign-display'
+export {
+  mapCampaignTopbarTitleState,
+  resolveCampaignTopbarTitleState,
+  type CampaignTopbarTitleState,
+} from './lib/resolve-campaign-topbar-title-state'

@@ -1,6 +1,5 @@
 import { useParams } from 'react-router-dom'
 
-import { ROUTES } from '@/app/routes'
 import { CampaignCharacterStatusSummary } from '@/features/character/components/detail/campaign-character-status-summary.client'
 import { CharacterDetailContent } from '@/features/character/components/detail/character-detail-content.client'
 import { CharacterOrganizationsSummary } from '@/features/character/components/detail/character-organizations-summary.client'
@@ -8,12 +7,9 @@ import { CharacterSheetDetailShell } from '@/features/character/components/detai
 
 import { useCampaignCharacterDetail } from '../hooks/use-campaign-character-detail'
 import { useCampaignCharacterNavigationContext } from '../hooks/use-campaign-character-navigation-context'
-import { useCampaigns } from '../hooks/use-campaigns'
 
 export function CampaignCharacterDetail() {
   const { campaignId, characterId } = useParams<{ campaignId: string; characterId: string }>()
-  const { data: campaigns } = useCampaigns()
-  const campaign = campaigns?.find((entry) => entry.id === campaignId)
   const { nav } = useCampaignCharacterNavigationContext(campaignId)
   const detail = useCampaignCharacterDetail(campaignId, characterId)
 
@@ -23,10 +19,6 @@ export function CampaignCharacterDetail() {
   return (
     <CharacterSheetDetailShell
       scope="campaign"
-      campaignBreadcrumb={{
-        href: campaignId ? ROUTES.campaign.detail(campaignId) : ROUTES.home,
-        label: campaign?.identity.name ?? 'Campaign',
-      }}
       errorBackLink={errorBackLink}
       isPending={detail.isPending}
       isError={detail.isError}

@@ -39,6 +39,17 @@ describe('Eyebrow', () => {
     expect(screen.getByText('Featured')).toHaveClass('eyebrow-style-sm', 'text-primary')
   })
 
+  it('renders as a span when nested inside phrasing-only parents', () => {
+    render(
+      <Eyebrow as="span" size="sm">
+        Level 1
+      </Eyebrow>,
+    )
+    const eyebrow = screen.getByText('Level 1')
+    expect(eyebrow.tagName).toBe('SPAN')
+    expect(eyebrow).toHaveClass('eyebrow-style-sm', 'text-muted-foreground')
+  })
+
   it('merges custom className', () => {
     render(<Eyebrow className="px-3 pb-1 pt-3">Navigation</Eyebrow>)
     expect(screen.getByText('Navigation')).toHaveClass('px-3', 'pb-1', 'pt-3')

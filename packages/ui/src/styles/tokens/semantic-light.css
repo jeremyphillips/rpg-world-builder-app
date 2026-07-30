@@ -27,6 +27,10 @@
 
   /* Text — default body copy (`text-foreground`, `text-muted-foreground`, …) */
   --foreground: var(--palette-fg-default);
+  --foreground-subtle: var(--palette-fg-subtle);
+
+  /* Typography — theme-scoped weight roles (`eyebrow-style-*` composites) */
+  --font-weight-eyebrow: var(--font-weight-medium);
 
   /* Brand — primary actions, links, focus accents (`bg-primary`, `text-primary`, `ring-ring`, …) */
   --primary: var(--palette-primary);
@@ -60,7 +64,9 @@
   --card-selected-border: var(--palette-border-selected);
   --ring: var(--palette-primary);
   --overlay: var(--palette-overlay);
-  --sidebar: var(--palette-sidebar-surface);
+  --sidebar: var(--surface-strong);
+  --sidebar-width: 15rem;
+  --sidebar-nav-item-fg: var(--foreground-subtle);
 
   /*
    * Field control chrome — text-like inputs and grouped field shells.

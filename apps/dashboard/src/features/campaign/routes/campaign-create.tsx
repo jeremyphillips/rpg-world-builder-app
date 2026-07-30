@@ -11,7 +11,7 @@ import {
   type CreateRulesValues,
 } from '../lib/rules/character-configuration/character-configuration-form'
 import { useCreateCampaign } from '../hooks/use-create-campaign'
-import { useSelectCampaign } from '../hooks/use-select-campaign'
+import { useOpenCampaign } from '../hooks/use-select-campaign'
 import {
   identitySchema,
   identityFields,
@@ -43,7 +43,7 @@ const STEPS: WizardStepDef[] = [
 
 export function CampaignCreate() {
   const { mutateAsync } = useCreateCampaign()
-  const selectCampaign = useSelectCampaign()
+  const openCampaign = useOpenCampaign()
   const templatesQuery = useCampaignTemplates()
   const [createError, setCreateError] = useState<string | null>(null)
   const [selectedTemplateId, setSelectedTemplateId] = useState(BLANK_CAMPAIGN_TEMPLATE_VALUE)
@@ -71,7 +71,7 @@ export function CampaignCreate() {
         buildCreateCampaignInput(createValues, imageKey, selectedTemplate?.metadata.id),
       )
 
-      selectCampaign(result.campaign.id)
+      openCampaign(result.campaign.id)
     } catch (err) {
       setCreateError(getErrorMessage(err, 'Could not create campaign.'))
     }

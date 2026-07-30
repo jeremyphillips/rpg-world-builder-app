@@ -1,34 +1,96 @@
 import { describe, expect, it } from 'vitest'
+import type { CampaignListItem } from '@rpg/contracts'
 
+import { makeCampaignListItem } from '@/test/fixtures/campaigns'
+
+import { CAMPAIGN_UNKNOWN_NAME, CAMPAIGNS_QUERY_ERROR_MESSAGE } from '../campaign-display'
 import {
-  getCampaignSwitcherLabel,
-  resolveLandingPath,
+  CAMPAIGN_SWITCHER_NO_SELECTION_LABEL,
+  getCampaignSwitcherTriggerLabel,
+  resolveCampaignSwitcherTriggerState,
+  resolveContinueCampaign,
+  resolveResumeSetupCampaign,
   resolveTargetPathOnSwitch,
 } from './campaign-selection'
+import { resolvePreferredCampaignId } from './resolve-preferred-campaign-id'
 
 const campaigns = [{ id: 'a' }, { id: 'b' }, { id: 'c' }]
 
-describe('resolveLandingPath', () => {
+const campaignListItems = [
+  { id: 'a', viewerOnboardingState: 'complete', identity: { name: 'A' } },
+  { id: 'b', viewerOnboardingState: 'complete', identity: { name: 'B' } },
+  { id: 'c', viewerOnboardingState: 'incomplete', identity: { name: 'C' } },
+] as CampaignListItem[]
+
+describe('resolvePreferredCampaignId', () => {
   it('prefers the stored id over the server preference', () => {
-    expect(resolveLandingPath(campaigns, { lastSelectedCampaignId: 'a' }, 'b')).toBe('/campaigns/b')
+    expect(resolvePreferredCampaignId(campaigns, { lastSelectedCampaignId: 'a' }, 'b')).toBe('b')
   })
 
   it('falls back to the server preference when nothing is stored', () => {
-    expect(resolveLandingPath(campaigns, { lastSelectedCampaignId: 'c' }, null)).toBe(
-      '/campaigns/c',
-    )
+    expect(resolvePreferredCampaignId(campaigns, { lastSelectedCampaignId: 'c' }, null)).toBe('c')
   })
 
   it('defaults to the only campaign when the user has exactly one', () => {
-    expect(resolveLandingPath([{ id: 'solo' }], null, null)).toBe('/campaigns/solo')
+    expect(resolvePreferredCampaignId([{ id: 'solo' }], null, null)).toBe('solo')
   })
 
   it('returns null when multiple campaigns and no valid preference', () => {
-    expect(resolveLandingPath(campaigns, { lastSelectedCampaignId: null }, null)).toBeNull()
+    expect(resolvePreferredCampaignId(campaigns, { lastSelectedCampaignId: null }, null)).toBeNull()
   })
 
   it('ignores a stored/preferred id that is no longer a campaign', () => {
-    expect(resolveLandingPath(campaigns, { lastSelectedCampaignId: 'gone' }, 'stale')).toBeNull()
+    expect(
+      resolvePreferredCampaignId(campaigns, { lastSelectedCampaignId: 'gone' }, 'stale'),
+    ).toBeNull()
+  })
+})
+
+describe('resolveContinueCampaign', () => {
+  it('returns the preferred campaign when it exists and onboarding is complete', () => {
+    expect(
+      resolveContinueCampaign(campaignListItems, { lastSelectedCampaignId: 'a' }, 'b'),
+    ).toMatchObject({ id: 'b' })
+  })
+
+  it('returns null when the resolved campaign has incomplete onboarding', () => {
+    expect(
+      resolveContinueCampaign(campaignListItems, { lastSelectedCampaignId: 'c' }, null),
+    ).toBeNull()
+  })
+
+  it('returns null when the stored id is not in the campaigns query', () => {
+    expect(resolveContinueCampaign(campaignListItems, null, 'gone')).toBeNull()
+  })
+
+  it('returns the sole campaign when valid', () => {
+    expect(
+      resolveContinueCampaign(
+        [
+          {
+            id: 'solo',
+            viewerOnboardingState: 'complete',
+            identity: { name: 'Solo' },
+          } as CampaignListItem,
+        ],
+        null,
+        null,
+      ),
+    ).toMatchObject({ id: 'solo' })
+  })
+})
+
+describe('resolveResumeSetupCampaign', () => {
+  it('returns the preferred campaign when onboarding is incomplete', () => {
+    expect(
+      resolveResumeSetupCampaign(campaignListItems, { lastSelectedCampaignId: 'c' }, null),
+    ).toMatchObject({ id: 'c' })
+  })
+
+  it('returns null when onboarding is complete', () => {
+    expect(
+      resolveResumeSetupCampaign(campaignListItems, { lastSelectedCampaignId: 'a' }, 'b'),
+    ).toBeNull()
   })
 })
 
@@ -54,18 +116,47 @@ describe('resolveTargetPathOnSwitch', () => {
   })
 })
 
-describe('getCampaignSwitcherLabel', () => {
-  it('shows an error label on failure', () => {
-    expect(getCampaignSwitcherLabel({ isError: true })).toBe('Couldn’t load campaigns')
+describe('resolveCampaignSwitcherTriggerState', () => {
+  const loadedQuery = {
+    isPending: false,
+    isError: false,
+    data: [makeCampaignListItem({ id: 'camp_1', identity: { name: 'Sunless Citadel' } })],
+  }
+
+  it('returns error on query failure', () => {
+    expect(
+      resolveCampaignSwitcherTriggerState('camp_1', {
+        isPending: false,
+        isError: true,
+        data: undefined,
+      }),
+    ).toEqual({ kind: 'error' })
   })
 
-  it('shows the active campaign name when available', () => {
-    expect(getCampaignSwitcherLabel({ isError: false, activeName: 'Sunless Citadel' })).toBe(
-      'Sunless Citadel',
+  it('returns missing when the active id is absent after a successful query', () => {
+    expect(resolveCampaignSwitcherTriggerState('camp_missing', loadedQuery)).toEqual({
+      kind: 'missing',
+    })
+  })
+
+  it('returns resolved when the campaign is present', () => {
+    expect(resolveCampaignSwitcherTriggerState('camp_1', loadedQuery)).toEqual({
+      kind: 'resolved',
+      campaign: loadedQuery.data[0],
+    })
+  })
+
+  it('returns noSelection when there is no active id', () => {
+    expect(resolveCampaignSwitcherTriggerState(null, loadedQuery)).toEqual({ kind: 'noSelection' })
+  })
+})
+
+describe('getCampaignSwitcherTriggerLabel', () => {
+  it('maps switcher states to shared copy', () => {
+    expect(getCampaignSwitcherTriggerLabel({ kind: 'error' })).toBe(CAMPAIGNS_QUERY_ERROR_MESSAGE)
+    expect(getCampaignSwitcherTriggerLabel({ kind: 'noSelection' })).toBe(
+      CAMPAIGN_SWITCHER_NO_SELECTION_LABEL,
     )
-  })
-
-  it('falls back to a prompt when no campaign is active', () => {
-    expect(getCampaignSwitcherLabel({ isError: false })).toBe('Select campaign')
+    expect(getCampaignSwitcherTriggerLabel({ kind: 'missing' })).toBe(CAMPAIGN_UNKNOWN_NAME)
   })
 })
