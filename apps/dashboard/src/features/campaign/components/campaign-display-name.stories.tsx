@@ -40,3 +40,17 @@ export const InlineMuted: Story = {
     surface: 'inlineMuted',
   },
 }
+
+export const SwitcherTrigger: Story = {
+  args: {
+    display,
+    surface: 'switcherTrigger',
+  },
+}
+
+export const MenuItem: Story = {
+  args: {
+    display,
+    surface: 'menuItem',
+  },
+}

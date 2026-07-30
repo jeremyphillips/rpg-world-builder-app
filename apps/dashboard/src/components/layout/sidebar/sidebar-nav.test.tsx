@@ -27,6 +27,6 @@ describe('SidebarNav', () => {
       ROUTES.characters.list,
     )
     expect(screen.queryByRole('link', { name: 'Overview' })).not.toBeInTheDocument()
-    expect(screen.queryByRole('link', { name: '← All campaigns' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('link', { name: 'All campaigns' })).not.toBeInTheDocument()
   })
 })

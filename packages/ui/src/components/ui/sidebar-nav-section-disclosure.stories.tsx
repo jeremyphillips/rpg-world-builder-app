@@ -26,6 +26,23 @@ export const Expanded: Story = {
   ),
 }
 
+export const DisabledActiveSection: Story = {
+  render: () => (
+    <div className="w-60 bg-sidebar p-3">
+      <SidebarNavSectionDisclosure
+        label="Campaign"
+        expanded
+        disabled
+        onExpandedChange={() => undefined}
+      >
+        <a href="/campaigns/demo" className="block rounded-md px-3 py-2 text-sm">
+          Overview
+        </a>
+      </SidebarNavSectionDisclosure>
+    </div>
+  ),
+}
+
 export const Collapsed: Story = {
   render: () => (
     <div className="w-60 bg-sidebar p-3">

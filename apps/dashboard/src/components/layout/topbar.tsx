@@ -3,7 +3,7 @@ import { SidebarTrigger, cn } from '@rpg/ui'
 import { useSession } from '@/features/auth'
 
 import { appShellHorizontalPaddingClasses } from './app-shell.variants'
-import { CampaignTopbarTitleSlot } from './campaign-topbar-title-slot'
+import { TopbarTitleSlot } from './topbar-title-slot'
 import { TopbarUserMenu } from './topbar-user-menu'
 
 interface TopbarProps {
@@ -28,7 +28,7 @@ export function Topbar({ sidebarOpen, onToggleSidebar }: TopbarProps) {
           onClick={onToggleSidebar}
           className="shrink-0 md:hidden"
         />
-        <CampaignTopbarTitleSlot />
+        <TopbarTitleSlot />
       </div>
 
       <div className="flex shrink-0 items-center gap-2">

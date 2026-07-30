@@ -12,6 +12,7 @@ import { useIsElevatedPlatformRole } from '@/features/auth'
 import { AllCampaignsLink } from './all-campaigns-link'
 import { useSidebarSectionPreferences } from './hooks/use-sidebar-section-preferences'
 import { buildCampaignSidebarSections } from './lib/build-campaign-sidebar-sections'
+import { sectionHasActiveItem } from './lib/section-has-active-item'
 import type { CollapsibleSidebarNavSection } from './lib/sidebar-nav-model'
 import { NavItem } from './nav-item'
 
@@ -23,22 +24,26 @@ function CollapsibleSidebarSection({
   section,
   expanded,
   onExpandedChange,
+  disabled,
 }: {
   section: CollapsibleSidebarNavSection
   expanded: boolean
   onExpandedChange: (expanded: boolean) => void
+  disabled: boolean
 }) {
   return (
     <SidebarNavSectionDisclosure
       label={section.label}
       expanded={expanded}
       onExpandedChange={onExpandedChange}
+      disabled={disabled}
     >
       {section.items.map((item) => (
         <NavItem
           key={item.id}
           to={item.href}
           label={item.label}
+          icon={item.icon}
           end={item.end}
           isActive={item.isActive}
         />
@@ -73,6 +78,7 @@ export function CampaignSidebarNav({ campaignId }: CampaignSidebarNavProps) {
           section={section}
           expanded={getSectionExpanded(section, pathname)}
           onExpandedChange={(expanded) => setSectionExpanded(section.id, expanded)}
+          disabled={sectionHasActiveItem(pathname, section)}
         />
       ))}
     </>

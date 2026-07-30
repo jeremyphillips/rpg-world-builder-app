@@ -12,4 +12,10 @@ describe('sidebarNavItemVariants', () => {
     expect(sidebarNavItemVariants({ active: false })).toContain('text-sidebar-nav-item-fg')
     expect(sidebarNavItemVariants({ active: false })).toContain('hover:bg-accent')
   })
+
+  it('includes icon row layout classes', () => {
+    expect(sidebarNavItemVariants({ active: false })).toContain('inline-flex')
+    expect(sidebarNavItemVariants({ active: false })).toContain('items-center')
+    expect(sidebarNavItemVariants({ active: false })).toContain('gap-2')
+  })
 })

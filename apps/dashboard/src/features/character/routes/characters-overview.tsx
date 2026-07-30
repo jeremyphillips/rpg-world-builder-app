@@ -1,21 +1,23 @@
 import { useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { DEFAULT_SYSTEM_RULESET_ID, type SystemRulesetId } from '@rpg/contracts'
-import { buttonVariants, Heading, Text } from '@rpg/ui'
+import { buttonVariants, Heading } from '@rpg/ui'
 
 import { ROUTES } from '@/app/routes'
 import { CharacterListCard } from '@/features/character'
+import { IndexPageEmptyState, IndexPageIntro } from '@/components/layout/index-page-intro'
 import { PageLoadState } from '@/components/layout/page-load-state'
 import { NarrowPage } from '@/components/layout/narrow-page'
 
 import { useBuildContext } from '../hooks/use-build-context'
 import { useCharacters } from '../hooks/use-characters'
 import { buildCharacterCardViewModel } from '../lib/display/character-display'
-import { CHARACTERS_INDEX_SECTION_LABELS } from '../lib/character-list-routing'
+import {
+  CHARACTERS_INDEX_SECTION_LABELS,
+  CHARACTERS_OVERVIEW_COPY,
+} from '../lib/character-list-routing'
 import { resolveCharacterDetailHref } from '@/lib/routing/resolve-character-detail-href'
 import { resolveQueryErrorLabel } from '../lib/resolve-query-error-label.lib'
-
-const CHARACTERS_EMPTY_MESSAGE = 'No characters yet. Create one to get started.'
 
 type CharacterListSectionProps = {
   heading: string
@@ -105,21 +107,25 @@ export function CharactersOverview() {
   ])
   const hasCharacters = groupedCards.inCampaigns.length > 0 || groupedCards.notInCampaign.length > 0
 
+  const characterActions = (
+    <>
+      <Link to={ROUTES.characters.import} className={buttonVariants({ variant: 'outline' })}>
+        {CHARACTERS_OVERVIEW_COPY.importLabel}
+      </Link>
+      <Link to={ROUTES.characters.new} className={buttonVariants({ variant: 'default' })}>
+        {CHARACTERS_OVERVIEW_COPY.createLabel}
+      </Link>
+    </>
+  )
+
   return (
     <NarrowPage spacing="list">
-      <div className="flex items-start justify-between gap-4">
-        <Heading variant="page" as="h1">
-          Characters
-        </Heading>
-        <div className="flex flex-wrap gap-2">
-          <Link to={ROUTES.characters.import} className={buttonVariants({ variant: 'outline' })}>
-            Import character
-          </Link>
-          <Link to={ROUTES.characters.new} className={buttonVariants({ variant: 'default' })}>
-            Create character
-          </Link>
-        </div>
-      </div>
+      <IndexPageIntro
+        title="Characters"
+        description={CHARACTERS_OVERVIEW_COPY.description}
+        actions={characterActions}
+        showActionsInHeader={hasCharacters}
+      />
 
       <PageLoadState
         isPending={isPending}
@@ -128,7 +134,11 @@ export function CharactersOverview() {
         defaultErrorLabel="Could not load characters."
       >
         {!hasCharacters ? (
-          <Text variant="muted">{CHARACTERS_EMPTY_MESSAGE}</Text>
+          <IndexPageEmptyState
+            heading={CHARACTERS_OVERVIEW_COPY.empty.heading}
+            body={CHARACTERS_OVERVIEW_COPY.empty.body}
+            actions={characterActions}
+          />
         ) : (
           <div className="space-y-8">
             <CharacterListSection

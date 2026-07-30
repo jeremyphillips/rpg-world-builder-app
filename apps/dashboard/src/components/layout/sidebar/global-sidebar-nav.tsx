@@ -14,6 +14,7 @@ function StaticSidebarSection({ section }: { section: StaticSidebarNavSection })
           key={item.id}
           to={item.href}
           label={item.label}
+          icon={item.icon}
           end={item.end}
           isActive={item.isActive}
         />

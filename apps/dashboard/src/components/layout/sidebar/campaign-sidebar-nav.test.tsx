@@ -67,7 +67,7 @@ describe('CampaignSidebarNav', () => {
       initialEntries: [`/campaigns/${campaignId}/spells`],
     })
 
-    expect(screen.getByRole('link', { name: '← All campaigns' })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: 'All campaigns' })).toHaveAttribute(
       'href',
       ROUTES.campaign.list,
     )

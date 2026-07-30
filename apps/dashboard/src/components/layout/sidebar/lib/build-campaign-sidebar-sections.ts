@@ -4,6 +4,7 @@ import { isCampaignCharactersNavActive } from '@/features/campaign'
 import { findVisibleSidebarContent, VISIBLE_SIDEBAR_CONTENT } from '@/features/homebrew'
 
 import { buildAdminSidebarItems } from './build-admin-sidebar-items'
+import { sidebarNavItem } from './sidebar-nav-icons'
 import {
   compactSidebarSections,
   type CollapsibleSidebarNavSection,
@@ -26,61 +27,71 @@ function buildCampaignSectionItems(
   characterNav: CampaignCharacterNavModel,
 ): SidebarNavItem[] {
   const items: SidebarNavItem[] = [
-    {
+    sidebarNavItem({
       id: 'overview',
       label: 'Overview',
       href: ROUTES.campaign.detail(campaignId),
       end: true,
-    },
+    }),
   ]
 
   if (characterNav.showCharactersNav) {
-    items.push({
-      id: 'characters',
-      label: characterNav.label,
-      href: characterNav.href,
-      isActive: (pathname) => isCampaignCharactersNavActive(pathname, characterNav, campaignId),
-    })
+    items.push(
+      sidebarNavItem({
+        id: 'characters',
+        label: characterNav.label,
+        href: characterNav.href,
+        isActive: (pathname) => isCampaignCharactersNavActive(pathname, characterNav, campaignId),
+      }),
+    )
   }
 
-  items.push({
-    id: 'sessions',
-    label: 'Sessions',
-    href: ROUTES.campaign.sessions(campaignId),
-  })
+  items.push(
+    sidebarNavItem({
+      id: 'sessions',
+      label: 'Sessions',
+      href: ROUTES.campaign.sessions(campaignId),
+    }),
+  )
 
   return items
 }
 
 function buildWorldSectionItems(campaignId: string): SidebarNavItem[] {
   const items: SidebarNavItem[] = [
-    { id: 'npcs', label: 'NPCs', href: ROUTES.campaign.npcs.list(campaignId) },
+    sidebarNavItem({ id: 'npcs', label: 'NPCs', href: ROUTES.campaign.npcs.list(campaignId) }),
   ]
 
   const organizations = findVisibleSidebarContent('organizations')
   if (organizations) {
-    items.push({
-      id: 'organizations',
-      label: organizations.label,
-      href: organizations.overview(campaignId),
-    })
+    items.push(
+      sidebarNavItem({
+        id: 'organizations',
+        label: organizations.label,
+        href: organizations.overview(campaignId),
+      }),
+    )
   }
 
   return items
 }
 
 function buildGameLibrarySectionItems(campaignId: string): SidebarNavItem[] {
-  const items: SidebarNavItem[] = GAME_LIBRARY_CONTENT.map((entry) => ({
-    id: entry.contentType,
-    label: entry.label,
-    href: entry.overview(campaignId),
-  }))
+  const items: SidebarNavItem[] = GAME_LIBRARY_CONTENT.map((entry) =>
+    sidebarNavItem({
+      id: entry.contentType,
+      label: entry.label,
+      href: entry.overview(campaignId),
+    }),
+  )
 
-  items.push({
-    id: 'homebrew',
-    label: 'Homebrew',
-    href: ROUTES.homebrew.hub(campaignId),
-  })
+  items.push(
+    sidebarNavItem({
+      id: 'homebrew',
+      label: 'Homebrew',
+      href: ROUTES.homebrew.hub(campaignId),
+    }),
+  )
 
   return items
 }
@@ -118,11 +129,11 @@ export function buildCampaignSidebarSections(
       label: 'Manage',
       collapsible: true,
       items: [
-        {
+        sidebarNavItem({
           id: 'campaign-settings',
           label: 'Campaign Settings',
           href: ROUTES.campaign.settings(campaignId),
-        },
+        }),
       ],
     })
   }

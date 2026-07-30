@@ -21,9 +21,12 @@ describe('CampaignTopbarTitle', () => {
 
     const link = screen.getByRole('link', { name: 'The Argent Road' })
     expect(link).toHaveAttribute('href', '/campaigns/camp_1')
-    expect(link).toHaveClass('min-w-0')
+    expect(link).toHaveClass('min-w-0', 'text-foreground-subtle')
     expect(link.querySelector('.truncate')).toBeTruthy()
-    expect(link.querySelector('[aria-hidden="true"]')).toHaveClass('shrink-0')
+    expect(link.querySelector('[aria-hidden="true"]')).toHaveClass(
+      'shrink-0',
+      'text-foreground-subtle',
+    )
   })
 
   it('renders the fallback name for missing campaigns', () => {

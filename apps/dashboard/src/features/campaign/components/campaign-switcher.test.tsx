@@ -3,6 +3,7 @@
  */
 import { describe, expect, it, vi, beforeEach } from 'vitest'
 import { screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 
 import { renderWithProviders } from '@/test/render'
 import { makeCampaignListItem } from '@/test/fixtures/campaigns'
@@ -23,6 +24,7 @@ import { useActiveCampaignId } from '../hooks/use-active-campaign-id'
 import { useCampaigns } from '../hooks/use-campaigns'
 import { useSwitchCampaign } from '../hooks/use-select-campaign'
 
+import { campaignSwitcherDropdownContentClasses } from './campaign-switcher.variants'
 import { CampaignSwitcher } from './campaign-switcher'
 
 const useCampaignsMock = vi.mocked(useCampaigns)
@@ -40,7 +42,7 @@ describe('CampaignSwitcher', () => {
     } as ReturnType<typeof useCampaigns>)
   })
 
-  it('uses compact trigger sizing and truncates the active campaign name', () => {
+  it('uses compact trigger sizing and renders the active campaign via display VM', () => {
     renderWithProviders(<CampaignSwitcher showLabel={false} />, {
       initialEntries: ['/campaigns/camp_1'],
     })
@@ -48,5 +50,40 @@ describe('CampaignSwitcher', () => {
     const trigger = screen.getByRole('button', { name: 'Sunless Citadel' })
     expect(trigger).toHaveClass('h-11')
     expect(trigger.querySelector('.truncate')).toHaveTextContent('Sunless Citadel')
+    expect(trigger.querySelector('[aria-hidden="true"]')).toBeInTheDocument()
+  })
+
+  it('uses a wider dropdown panel and shows full campaign names in menu items', async () => {
+    const user = userEvent.setup()
+
+    useCampaignsMock.mockReturnValue({
+      data: [
+        makeCampaignListItem({
+          id: 'camp_1',
+          identity: { name: 'The Extremely Long Campaign Name That Should Not Truncate' },
+        }),
+      ],
+      isPending: false,
+      isError: false,
+    } as ReturnType<typeof useCampaigns>)
+
+    renderWithProviders(<CampaignSwitcher showLabel={false} />, {
+      initialEntries: ['/campaigns/camp_1'],
+    })
+
+    await user.click(screen.getByRole('button', { name: /Extremely Long Campaign Name/ }))
+
+    const menuItem = screen.getByRole('menuitem', {
+      name: 'The Extremely Long Campaign Name That Should Not Truncate',
+    })
+    expect(menuItem.textContent).toContain(
+      'The Extremely Long Campaign Name That Should Not Truncate',
+    )
+    expect(menuItem.querySelector('.truncate')).not.toBeInTheDocument()
+
+    const menu = screen.getByRole('menu')
+    for (const className of campaignSwitcherDropdownContentClasses.split(' ')) {
+      expect(menu).toHaveClass(className)
+    }
   })
 })

@@ -18,7 +18,10 @@ import {
 import { useCampaigns } from '../hooks/use-campaigns'
 import { useActiveCampaignId } from '../hooks/use-active-campaign-id'
 import { useSwitchCampaign } from '../hooks/use-select-campaign'
+import { buildCampaignDisplay } from '../lib/campaign-display'
 import { getCampaignSwitcherLabel } from '../lib/navigation/campaign-selection'
+import { CampaignDisplayName } from './campaign-display-name'
+import { campaignSwitcherDropdownContentClasses } from './campaign-switcher.variants'
 
 interface CampaignSwitcherProps {
   showLabel?: boolean
@@ -47,7 +50,7 @@ function CampaignSwitcherList({ campaigns, activeId, onSelect }: CampaignSwitche
             onSelect={() => onSelect(campaign.id)}
             className="justify-between gap-2"
           >
-            <span className="truncate">{campaign.identity.name}</span>
+            <CampaignDisplayName display={buildCampaignDisplay(campaign)} surface="menuItem" />
             {isActive ? <Check className="size-4 shrink-0" /> : null}
           </DropdownMenuItem>
         )
@@ -67,10 +70,7 @@ export function CampaignSwitcher({ showLabel = true }: CampaignSwitcherProps) {
   const { data: campaigns, isPending, isError } = useCampaigns()
 
   const active = campaigns?.find((campaign) => campaign.id === activeCampaignId)
-  const triggerLabel = getCampaignSwitcherLabel({
-    isError,
-    activeName: active?.identity.name,
-  })
+  const fallbackLabel = getCampaignSwitcherLabel({ isError, activeName: undefined })
 
   return (
     <DropdownMenu modal={false}>
@@ -87,16 +87,19 @@ export function CampaignSwitcher({ showLabel = true }: CampaignSwitcherProps) {
           {showLabel && <Eyebrow>Campaign</Eyebrow>}
           {isPending ? (
             <Spinner />
+          ) : isError || !active ? (
+            <span className="truncate text-sm font-semibold">{fallbackLabel}</span>
           ) : (
-            <span className="truncate text-sm font-semibold">{triggerLabel}</span>
+            <CampaignDisplayName
+              display={buildCampaignDisplay(active)}
+              surface="switcherTrigger"
+              className="min-w-0"
+            />
           )}
         </span>
         <ChevronsUpDown className="size-4 shrink-0 text-muted-foreground" />
       </DropdownMenuTrigger>
-      <DropdownMenuContent
-        align="start"
-        className="w-[var(--radix-dropdown-menu-trigger-width)] min-w-56"
-      >
+      <DropdownMenuContent align="start" className={campaignSwitcherDropdownContentClasses}>
         <DropdownMenuLabel>Campaigns</DropdownMenuLabel>
         <CampaignSwitcherList
           campaigns={campaigns}

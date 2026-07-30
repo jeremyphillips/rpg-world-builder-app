@@ -2,7 +2,7 @@ import { cva, type VariantProps } from 'class-variance-authority'
 
 /** Sidebar nav link presentation — apps pass `active` from their router wrapper. */
 export const sidebarNavItemVariants = cva(
-  'rounded-md px-3 py-2 text-sm font-medium transition-colors',
+  'inline-flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors',
   {
     variants: {
       active: {

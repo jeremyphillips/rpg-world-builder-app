@@ -1,5 +1,6 @@
 export type SidebarSectionId =
   | 'main'
+  | 'personal'
   | 'tools'
   | 'admin'
   | 'campaign'
@@ -17,7 +18,9 @@ export const COLLAPSIBLE_SIDEBAR_SECTION_IDS = [
 
 export type CollapsibleSidebarSectionId = (typeof COLLAPSIBLE_SIDEBAR_SECTION_IDS)[number]
 
-export type StaticSidebarSectionId = 'main' | 'tools' | 'admin'
+export type StaticSidebarSectionId = 'main' | 'personal' | 'tools' | 'admin'
+
+import type { LucideIcon } from 'lucide-react'
 
 export type SidebarNavItem = {
   id: string
@@ -25,6 +28,7 @@ export type SidebarNavItem = {
   href: string
   end?: boolean
   isActive?: (pathname: string) => boolean
+  icon: LucideIcon
 }
 
 export type StaticSidebarNavSection = {

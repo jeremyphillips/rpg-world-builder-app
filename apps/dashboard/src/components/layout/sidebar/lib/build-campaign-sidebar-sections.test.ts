@@ -84,13 +84,11 @@ describe('buildCampaignSidebarSections', () => {
     const manage = buildSections({ canManageCampaign: true }).find(
       (section) => section.id === 'manage',
     )
-    expect(manage?.items).toEqual([
-      {
-        id: 'campaign-settings',
-        label: 'Campaign Settings',
-        href: ROUTES.campaign.settings(campaignId),
-      },
-    ])
+    expect(manage?.items[0]).toMatchObject({
+      id: 'campaign-settings',
+      label: 'Campaign Settings',
+      href: ROUTES.campaign.settings(campaignId),
+    })
   })
 
   it('includes Admin only for elevated platform roles', () => {
