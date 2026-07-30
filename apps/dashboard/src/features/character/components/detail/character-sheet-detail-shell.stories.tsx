@@ -6,11 +6,6 @@ import { ROUTES } from '@/app/routes'
 import { CHARACTER_SHEET_ERROR_LABELS } from '../../lib/character-sheet-error-labels'
 import { CharacterSheetDetailShell } from './character-sheet-detail-shell'
 
-const CAMPAIGN_BREADCRUMB = {
-  href: ROUTES.campaign.detail('camp-1'),
-  label: 'The Argent Road',
-} as const
-
 const meta = {
   title: 'Character/CharacterSheetDetailShell',
   component: CharacterSheetDetailShell,
@@ -61,7 +56,6 @@ export const StandaloneLoadFailed: Story = {
 export const CampaignLoading: Story = {
   args: {
     scope: 'campaign',
-    campaignBreadcrumb: CAMPAIGN_BREADCRUMB,
     isPending: true,
     isError: false,
   },
@@ -70,7 +64,6 @@ export const CampaignLoading: Story = {
 export const CampaignNotFoundInCampaign: Story = {
   args: {
     scope: 'campaign',
-    campaignBreadcrumb: CAMPAIGN_BREADCRUMB,
     isPending: false,
     isError: true,
     errorLabel: CHARACTER_SHEET_ERROR_LABELS.campaignNotFoundInCampaign,
@@ -78,7 +71,6 @@ export const CampaignNotFoundInCampaign: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     await expect(canvas.getByRole('heading', { name: 'Campaign character' })).toBeInTheDocument()
-    await expect(canvas.getByRole('link', { name: CAMPAIGN_BREADCRUMB.label })).toBeInTheDocument()
     await expect(canvas.getByRole('alert')).toHaveTextContent(
       CHARACTER_SHEET_ERROR_LABELS.campaignNotFoundInCampaign,
     )
@@ -88,7 +80,6 @@ export const CampaignNotFoundInCampaign: Story = {
 export const CampaignNotFound: Story = {
   args: {
     scope: 'campaign',
-    campaignBreadcrumb: CAMPAIGN_BREADCRUMB,
     isPending: false,
     isError: true,
     errorLabel: CHARACTER_SHEET_ERROR_LABELS.campaignNotFoundInCampaign,
@@ -98,7 +89,6 @@ export const CampaignNotFound: Story = {
 export const CampaignNotFoundCampaign: Story = {
   args: {
     scope: 'campaign',
-    campaignBreadcrumb: CAMPAIGN_BREADCRUMB,
     isPending: false,
     isError: true,
     errorLabel: CHARACTER_SHEET_ERROR_LABELS.campaignNotFound,
@@ -114,7 +104,6 @@ export const CampaignNotFoundCampaign: Story = {
 export const CampaignPermissionDenied: Story = {
   args: {
     scope: 'campaign',
-    campaignBreadcrumb: CAMPAIGN_BREADCRUMB,
     isPending: false,
     isError: true,
     errorLabel: CHARACTER_SHEET_ERROR_LABELS.campaignPermissionDenied,
@@ -130,7 +119,6 @@ export const CampaignPermissionDenied: Story = {
 export const CampaignLoadFailed: Story = {
   args: {
     scope: 'campaign',
-    campaignBreadcrumb: CAMPAIGN_BREADCRUMB,
     isPending: false,
     isError: true,
     errorLabel: CHARACTER_SHEET_ERROR_LABELS.loadFailed,
@@ -140,7 +128,6 @@ export const CampaignLoadFailed: Story = {
 export const CampaignCatalogLoadFailed: Story = {
   args: {
     scope: 'campaign',
-    campaignBreadcrumb: CAMPAIGN_BREADCRUMB,
     isPending: false,
     isError: true,
     errorLabel: CHARACTER_SHEET_ERROR_LABELS.catalogLoadFailed,
@@ -151,5 +138,18 @@ export const CampaignCatalogLoadFailed: Story = {
     await expect(canvas.getByRole('alert')).toHaveTextContent(
       CHARACTER_SHEET_ERROR_LABELS.catalogLoadFailed,
     )
+  },
+}
+
+export const CampaignErrorWithBackLink: Story = {
+  args: {
+    scope: 'campaign',
+    errorBackLink: {
+      href: ROUTES.campaign.characters.list('camp-1'),
+      label: 'My Character',
+    },
+    isPending: false,
+    isError: true,
+    errorLabel: CHARACTER_SHEET_ERROR_LABELS.campaignNotFoundInCampaign,
   },
 }

@@ -1,100 +1,127 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen } from '@testing-library/react'
-import { MemoryRouter, useMatches, type UIMatch } from 'react-router-dom'
+import { MemoryRouter } from 'react-router-dom'
 
-import type { CrumbHandle } from '@/app/breadcrumbs'
 import { AppBreadcrumb } from './app-breadcrumb'
-import { BreadcrumbLabelContext } from './breadcrumb-label-context'
-import type { BreadcrumbLabelContextValue } from './breadcrumb-label-context'
-
-vi.mock('@/features/campaign', () => ({
-  useCampaigns: () => ({
-    data: [{ id: 'c1', identity: { name: 'Lost Mines' } }],
-  }),
-}))
-
-vi.mock('react-router-dom', async (importOriginal) => {
-  const actual = (await importOriginal()) as Record<string, unknown>
-  return { ...actual, useMatches: vi.fn() }
-})
-
-const mockUseMatches = vi.mocked(useMatches)
-
-function makeMatch(
-  id: string,
-  params: Record<string, string>,
-  crumb?: CrumbHandle['crumb'],
-): UIMatch {
-  return {
-    id,
-    pathname: '/',
-    params,
-    data: undefined,
-    loaderData: undefined,
-    handle: crumb ? { crumb } : undefined,
-  }
-}
-
-function renderBreadcrumb(entityLabel?: string) {
-  const ctx: BreadcrumbLabelContextValue = {
-    entityLabel,
-    setEntityLabel: vi.fn(),
-  }
-  return render(
-    <BreadcrumbLabelContext.Provider value={ctx}>
-      <MemoryRouter>
-        <AppBreadcrumb />
-      </MemoryRouter>
-    </BreadcrumbLabelContext.Provider>,
-  )
-}
 
 describe('AppBreadcrumb', () => {
   beforeEach(() => vi.clearAllMocks())
 
-  it('renders nothing when no route has a crumb handle', () => {
-    mockUseMatches.mockReturnValue([makeMatch('root', {})])
-    const { container } = renderBreadcrumb()
+  it('renders nothing when crumbs are empty', () => {
+    const { container } = render(
+      <MemoryRouter>
+        <AppBreadcrumb crumbs={[]} />
+      </MemoryRouter>,
+    )
+
     expect(container).toBeEmptyDOMElement()
   })
 
-  it('renders a single current-page crumb with no link', () => {
-    mockUseMatches.mockReturnValue([makeMatch('profile', {}, () => ({ label: 'Profile' }))])
-    renderBreadcrumb()
+  it('renders a terminal crumb without href as the current page', () => {
+    render(
+      <MemoryRouter>
+        <AppBreadcrumb crumbs={[{ label: 'Profile' }]} />
+      </MemoryRouter>,
+    )
+
     const page = screen.getByText('Profile')
     expect(page).toBeInTheDocument()
     expect(page.tagName).not.toBe('A')
     expect(page).toHaveAttribute('aria-current', 'page')
   })
 
-  it('renders campaign > classes > entity chain with correct links', () => {
-    mockUseMatches.mockReturnValue([
-      makeMatch('campaign', { campaignId: 'c1' }, (params, { campaignName }) => ({
-        label: campaignName ?? 'Campaign',
-        href: `/campaigns/${params.campaignId}`,
-      })),
-      makeMatch('classes', { campaignId: 'c1' }, (params) => ({
-        label: 'Classes',
-        href: `/campaigns/${params.campaignId}/classes`,
-      })),
-      makeMatch('classDetail', { campaignId: 'c1', classId: 'x1' }, (_p, { entityLabel }) => ({
-        label: entityLabel ?? '…',
-      })),
-    ])
-    renderBreadcrumb('Wizard')
+  it('renders a terminal crumb with href as a link', () => {
+    render(
+      <MemoryRouter>
+        <AppBreadcrumb
+          crumbs={[
+            {
+              label: 'Classes',
+              href: '/campaigns/c1/classes',
+            },
+          ]}
+        />
+      </MemoryRouter>,
+    )
 
-    const campaignLink = screen.getByRole('link', { name: 'Lost Mines' })
-    expect(campaignLink).toHaveAttribute('href', '/campaigns/c1')
+    const link = screen.getByRole('link', { name: 'Classes' })
+    expect(link).toHaveAttribute('href', '/campaigns/c1/classes')
+    expect(link).toHaveAttribute('aria-current', 'page')
+  })
 
-    const classesLink = screen.getByRole('link', { name: 'Classes' })
-    expect(classesLink).toBeInTheDocument()
+  it('renders collection index crumbs without links and entity crumbs as current page', () => {
+    render(
+      <MemoryRouter>
+        <AppBreadcrumb
+          crumbs={[
+            {
+              label: 'Classes',
+              href: '/campaigns/c1/classes',
+            },
+            { label: 'Wizard' },
+          ]}
+        />
+      </MemoryRouter>,
+    )
 
-    expect(screen.getByText('Wizard')).toHaveAttribute('aria-current', 'page')
+    expect(screen.getByRole('link', { name: 'Classes' })).toBeInTheDocument()
+    const wizard = screen.getByText('Wizard')
+    expect(wizard).toHaveAttribute('aria-current', 'page')
+    expect(wizard.tagName).not.toBe('A')
+  })
+
+  it('renders entity edit crumbs with a terminal detail link', () => {
+    render(
+      <MemoryRouter>
+        <AppBreadcrumb
+          crumbs={[
+            {
+              label: 'Classes',
+              href: '/campaigns/c1/classes',
+            },
+            {
+              label: 'Wizard',
+              href: '/campaigns/c1/classes/wizard',
+            },
+          ]}
+        />
+      </MemoryRouter>,
+    )
+
+    expect(screen.getByRole('link', { name: 'Wizard' })).toHaveAttribute(
+      'href',
+      '/campaigns/c1/classes/wizard',
+    )
+    expect(screen.getByRole('link', { name: 'Wizard' })).toHaveAttribute('aria-current', 'page')
+    expect(screen.queryByText('Edit')).not.toBeInTheDocument()
+  })
+
+  it('does not render a campaign segment in supplied crumbs', () => {
+    render(
+      <MemoryRouter>
+        <AppBreadcrumb
+          crumbs={[
+            {
+              label: 'Classes',
+              href: '/campaigns/c1/classes',
+            },
+            { label: 'Wizard' },
+          ]}
+        />
+      </MemoryRouter>,
+    )
+
+    expect(screen.queryByText('Lost Mines')).not.toBeInTheDocument()
+    expect(screen.queryByText('Campaign')).not.toBeInTheDocument()
   })
 
   it('renders correct aria-label on the nav', () => {
-    mockUseMatches.mockReturnValue([makeMatch('profile', {}, () => ({ label: 'Profile' }))])
-    renderBreadcrumb()
+    render(
+      <MemoryRouter>
+        <AppBreadcrumb crumbs={[{ label: 'Profile' }]} />
+      </MemoryRouter>,
+    )
+
     expect(screen.getByRole('navigation', { name: 'breadcrumb' })).toBeInTheDocument()
   })
 })

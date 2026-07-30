@@ -1,5 +1,5 @@
 import { Fragment } from 'react'
-import { Link, useMatches } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -9,29 +9,14 @@ import {
   BreadcrumbSeparator,
 } from '@rpg/ui'
 
-import { useCampaigns } from '@/features/campaign'
-import { hasCrumb, type BreadcrumbData, type CrumbItem } from '@/app/breadcrumbs'
-import { useBreadcrumbEntityLabel } from './use-breadcrumb-label'
+import type { CrumbItem } from '@/app/breadcrumbs'
 
-/** Reads all matched routes, resolves crumb labels, and renders the breadcrumb nav. */
-export function AppBreadcrumb() {
-  const matches = useMatches()
-  const { data: campaigns = [] } = useCampaigns()
-  const entityLabel = useBreadcrumbEntityLabel()
+export type AppBreadcrumbProps = {
+  crumbs: CrumbItem[]
+}
 
-  const campaignId = matches.find((m) => 'campaignId' in m.params)?.params.campaignId
-  const campaign = campaigns.find((c) => c.id === campaignId)
-
-  const data: BreadcrumbData = {
-    campaignName: campaign?.identity.name,
-    entityLabel,
-  }
-
-  const crumbs: CrumbItem[] = matches
-    .filter((m) => hasCrumb(m.handle))
-    .map((m) => hasCrumb(m.handle) && m.handle.crumb(m.params, data))
-    .filter((c): c is CrumbItem => Boolean(c))
-
+/** Presentational breadcrumb nav — callers supply pre-resolved crumbs. */
+export function AppBreadcrumb({ crumbs }: AppBreadcrumbProps) {
   if (crumbs.length === 0) return null
 
   return (
@@ -39,15 +24,18 @@ export function AppBreadcrumb() {
       <BreadcrumbList>
         {crumbs.map((crumb, index) => {
           const isLast = index === crumbs.length - 1
+
           return (
             <Fragment key={`${crumb.label}-${index}`}>
               <BreadcrumbItem>
-                {isLast || !crumb.href ? (
-                  <BreadcrumbPage>{crumb.label}</BreadcrumbPage>
-                ) : (
+                {crumb.href ? (
                   <BreadcrumbLink asChild>
-                    <Link to={crumb.href}>{crumb.label}</Link>
+                    <Link to={crumb.href} aria-current={isLast ? 'page' : undefined}>
+                      {crumb.label}
+                    </Link>
                   </BreadcrumbLink>
+                ) : (
+                  <BreadcrumbPage>{crumb.label}</BreadcrumbPage>
                 )}
               </BreadcrumbItem>
               {!isLast && <BreadcrumbSeparator />}

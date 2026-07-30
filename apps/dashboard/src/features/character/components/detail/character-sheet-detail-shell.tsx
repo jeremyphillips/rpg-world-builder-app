@@ -1,5 +1,4 @@
 import type { ReactNode } from 'react'
-import { Link } from 'react-router-dom'
 import { Heading } from '@rpg/ui'
 
 import { PageLoadState, type PageLoadStateProps } from '@/components/layout/page-load-state'
@@ -12,10 +11,6 @@ export type CharacterSheetDetailShellProps = Pick<
   'isPending' | 'isError' | 'errorLabel'
 > & {
   scope: 'standalone' | 'campaign'
-  campaignBreadcrumb?: {
-    href: string
-    label: string
-  }
   errorBackLink?: {
     href: string
     label: string
@@ -26,7 +21,6 @@ export type CharacterSheetDetailShellProps = Pick<
 /** Presentational loading/error/ready chrome for standalone and campaign PC sheet routes. */
 export function CharacterSheetDetailShell({
   scope,
-  campaignBreadcrumb,
   errorBackLink,
   isPending,
   isError,
@@ -35,18 +29,10 @@ export function CharacterSheetDetailShell({
 }: CharacterSheetDetailShellProps) {
   return (
     <WidePage spacing="relaxed">
-      {scope === 'campaign' && campaignBreadcrumb ? (
-        <div className="mb-6 flex flex-col gap-2">
-          <Link
-            to={campaignBreadcrumb.href}
-            className="text-sm text-muted-foreground underline-offset-4 hover:underline"
-          >
-            {campaignBreadcrumb.label}
-          </Link>
-          <Heading variant="page" as="h1">
-            Campaign character
-          </Heading>
-        </div>
+      {scope === 'campaign' ? (
+        <Heading variant="page" as="h1" className="mb-6">
+          Campaign character
+        </Heading>
       ) : null}
 
       <PageLoadState
