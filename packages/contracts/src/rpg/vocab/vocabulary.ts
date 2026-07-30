@@ -151,6 +151,7 @@ export const createVocabularyCampaignEntryRequestSchema = z
     label: z.string().min(1),
     description: z.string().optional(),
     id: vocabularyOptionIdSchema.optional(),
+    status: vocabularyOptionStatusSchema.optional(),
   })
   .strict()
 
@@ -165,6 +166,7 @@ export const createVocabularyCampaignEntryInputSchema = z
     id: vocabularyOptionIdSchema,
     label: z.string().min(1),
     description: z.string().optional(),
+    status: vocabularyOptionStatusSchema.optional(),
   })
   .strict()
 

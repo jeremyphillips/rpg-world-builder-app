@@ -21,6 +21,7 @@ type VocabularyEntrySheetProps = {
   mode: 'create' | 'edit'
   campaignId: string
   setId: VocabularyOptionSetId
+  createHeadline: string
   entry?: VocabularyOptionWithUsage
   isPending: boolean
   onSubmit: (values: VocabularyEntryFormValues) => void | Promise<void>
@@ -85,6 +86,7 @@ export function VocabularyEntrySheet(props: VocabularyEntrySheetProps) {
                 rhythm="comfortable"
                 size="md"
                 stickyFooter
+                footerVariant="sheet"
                 onSubmit={(values) => {
                   void sheet.handleSubmit(values)
                 }}

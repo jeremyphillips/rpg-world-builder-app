@@ -2,23 +2,26 @@ import type { VocabularyOptionSetId } from '@rpg/contracts'
 import { vocabularySetIdsRequiringFormDefinition } from '@rpg/contracts'
 import type { FormItem } from '@rpg/ui/form'
 
-import {
-  vocabularyEntryCreateFields,
-  vocabularyEntryEditFields,
-} from './vocabulary-entry-form-fields'
+import { buildVocabularyEntrySheetFields } from './vocabulary-entry-form-fields'
 
 export type VocabularyEntryFormDefinition = {
   createFields: FormItem[]
   editFields: FormItem[]
 }
 
+const registrySheetFields = buildVocabularyEntrySheetFields({
+  groupId: 'vocabulary-entry-registry',
+  pending: false,
+  available: true,
+})
+
 /** Partial registry — only sets with create/edit capabilities register form defs. */
 export const VOCABULARY_ENTRY_FORM_REGISTRY: Partial<
   Record<VocabularyOptionSetId, VocabularyEntryFormDefinition>
 > = {
   'creature-types': {
-    createFields: vocabularyEntryCreateFields,
-    editFields: vocabularyEntryEditFields,
+    createFields: registrySheetFields,
+    editFields: registrySheetFields,
   },
 }
 

@@ -4,6 +4,7 @@ import { useCallback, useState } from 'react'
 import { Link } from 'react-router-dom'
 import {
   deriveVocabularyEntryId,
+  getVocabularyOptionSetTerm,
   vocabularyOptionSetIdSchema,
   type VocabularyOptionSetId,
   type VocabularyOptionWithUsage,
@@ -13,6 +14,7 @@ import { buttonVariants, Heading, Text } from '@rpg/ui'
 import { PageHeader } from '@/components/layout/page-header'
 import { PageLoadState } from '@/components/layout/page-load-state'
 import { WidePage } from '@/components/layout/wide-page'
+import { useSetBreadcrumbLabel } from '@/components/layout/use-breadcrumb-label'
 import { ROUTES } from '@/app/routes'
 import { useCanManageCampaign } from '@/features/campaign'
 import { CatalogOverviewTable } from '@/lib/data-table/catalog-overview-table.client'
@@ -31,6 +33,8 @@ import {
   VOCABULARY_NOT_IMPLEMENTED_MESSAGE,
 } from '../lib/vocabulary/labels'
 import { VOCABULARY_OVERVIEW_FILTER_SCHEMA } from '../lib/vocabulary/vocabulary-overview-filter-schema'
+import { buildVocabularyOverviewEmptyState } from '../lib/vocabulary/vocabulary-overview-availability-ui.lib'
+import { vocabularyFieldLabel } from '../lib/vocabulary/term-labels'
 
 type SheetState =
   | { mode: 'closed' }
@@ -41,9 +45,17 @@ type VocabularyOverviewPageProps = {
   campaignId: string
   setId: VocabularyOptionSetId
   setLabel: string
+  singularLabel: string
+  pluralLabel: string
 }
 
-function VocabularyOverviewPage({ campaignId, setId, setLabel }: VocabularyOverviewPageProps) {
+function VocabularyOverviewPage({
+  campaignId,
+  setId,
+  setLabel,
+  singularLabel,
+  pluralLabel,
+}: VocabularyOverviewPageProps) {
   const canManage = useCanManageCampaign(campaignId)
   const { isPending, isError } = useVocabularySet(campaignId, setId)
   const mutations = useVocabularyMutations(campaignId, setId)
@@ -73,6 +85,7 @@ function VocabularyOverviewPage({ campaignId, setId, setLabel }: VocabularyOverv
         id: deriveVocabularyEntryId(values.label),
         label: values.label,
         description: values.description || undefined,
+        status: values.status,
       })
     } else if (sheet.mode === 'edit') {
       await mutations.patchEntry.mutateAsync({
@@ -95,33 +108,43 @@ function VocabularyOverviewPage({ campaignId, setId, setLabel }: VocabularyOverv
         className={buttonVariants({ size: 'sm' })}
         onClick={() => setSheet({ mode: 'create' })}
       >
-        New
+        New {singularLabel.toLowerCase()}
       </button>
     ) : undefined
 
   return (
     <>
-      <PageHeader heading={setLabel} actions={newAction} />
-      <PageLoadState
-        isPending={isPending}
-        isError={isError}
-        defaultErrorLabel={`Could not load ${setLabel.toLowerCase()}.`}
-      >
-        <CatalogOverviewTable
-          tableKey={`vocabulary-${setId}`}
-          columns={overview.columns}
-          data={overview.tableRows}
-          caption={`${setLabel} available in this campaign`}
-          filterSchema={VOCABULARY_OVERVIEW_FILTER_SCHEMA}
-          filterState={overview.filterState}
-          onFilterChange={overview.setFilterField}
-          onResetFilters={overview.resetFilters}
-          getRowClassName={overview.getRowClassName}
-          getCellClassName={overview.getCellClassName}
-          rowActions={overview.rowActions}
-          selection={overview.selectionConfig}
-        />
-      </PageLoadState>
+      <div className="flex flex-col gap-3">
+        <PageHeader heading={setLabel} actions={newAction} />
+        <PageLoadState
+          isPending={isPending}
+          isError={isError}
+          defaultErrorLabel={`Could not load ${setLabel.toLowerCase()}.`}
+        >
+          <CatalogOverviewTable
+            tableKey={`vocabulary-${setId}`}
+            columns={overview.columns}
+            data={overview.tableRows}
+            caption={`${setLabel} available in this campaign`}
+            filterSchema={VOCABULARY_OVERVIEW_FILTER_SCHEMA}
+            filterState={overview.filterState}
+            onFilterChange={overview.setFilterField}
+            onResetFilters={overview.resetFilters}
+            getRowClassName={overview.getRowClassName}
+            getCellClassName={overview.getCellClassName}
+            rowActions={overview.rowActions}
+            selection={overview.selectionConfig}
+            availabilityEmptyState={({ scope, campaignAvailability, setFilterValue }) =>
+              buildVocabularyOverviewEmptyState({
+                campaignAvailability,
+                scope,
+                pluralNoun: pluralLabel.toLowerCase(),
+                actions: { setFilterValue },
+              })
+            }
+          />
+        </PageLoadState>
+      </div>
 
       <VocabularyEntrySheet
         open={isSheetOpen}
@@ -131,6 +154,7 @@ function VocabularyOverviewPage({ campaignId, setId, setLabel }: VocabularyOverv
         mode={sheet.mode === 'edit' ? 'edit' : 'create'}
         campaignId={campaignId}
         setId={setId}
+        createHeadline={`New ${singularLabel.toLowerCase()}`}
         entry={sheet.mode === 'edit' ? sheet.entry : undefined}
         isPending={isMutating}
         onSubmit={(values) => handleSheetSubmit(values)}
@@ -188,6 +212,11 @@ export function VocabularyDetailContent({
   const registryEntry = findVocabularySetEntry(setId)
   const setEnabled = registryEntry?.enabled ?? false
   const setLabel = registryEntry?.label ?? rawSetId
+  const setTerm = getVocabularyOptionSetTerm(setId)
+  const singularLabel = vocabularyFieldLabel(setTerm)
+  const pluralLabel = vocabularyFieldLabel(setTerm, { plural: true })
+
+  useSetBreadcrumbLabel(setLabel)
 
   return (
     <WidePage spacing="list">
@@ -195,7 +224,13 @@ export function VocabularyDetailContent({
         <VocabularySetNav campaignId={campaignId} activeSetId={setId} />
         <div className="mx-auto min-w-0 w-full max-w-xl flex-1">
           {setEnabled ? (
-            <VocabularyOverviewPage campaignId={campaignId} setId={setId} setLabel={setLabel} />
+            <VocabularyOverviewPage
+              campaignId={campaignId}
+              setId={setId}
+              setLabel={setLabel}
+              singularLabel={singularLabel}
+              pluralLabel={pluralLabel}
+            />
           ) : (
             <>
               <PageHeader heading={setLabel} />

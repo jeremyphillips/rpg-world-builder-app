@@ -22,35 +22,43 @@ export function buildVocabularyOverviewFilterSchema(): FilterSchema<
   VocabularyOptionWithUsage,
   VocabularyOverviewFilterState
 > {
-  return createFilterSchema([
-    createTextFilter<VocabularyOptionWithUsage, VocabularyOverviewFilterState, 'name'>({
-      id: 'name',
-      label: 'Name',
-      placeholder: 'Search…',
-      url: { key: 'q' },
-      getSearchText: (row) => row.label,
-    }),
-    createEqualsFilter<
-      VocabularyOptionWithUsage,
-      VocabularyOverviewFilterState,
-      'source',
-      VocabularyOptionSource
-    >({
-      id: 'source',
-      label: 'Source',
-      placement: 'advanced',
-      layout: 'stacked',
-      width: 'md',
-      options: (Object.keys(VOCABULARY_SOURCE_BADGE) as VocabularyOptionSource[]).map((value) => ({
-        value,
-        label: VOCABULARY_SOURCE_BADGE[value].label,
-      })),
-      getValue: (row) => row.source,
-    }) as FilterFieldDef<VocabularyOptionWithUsage, VocabularyOverviewFilterState>,
-    createCampaignAvailabilityFilterField<VocabularyOptionWithUsage, VocabularyOverviewFilterState>(
-      (row) => row.status === 'active',
-    ),
-  ])
+  return createFilterSchema(
+    [
+      createTextFilter<VocabularyOptionWithUsage, VocabularyOverviewFilterState, 'name'>({
+        id: 'name',
+        label: 'Name',
+        placeholder: 'Search…',
+        url: { key: 'q' },
+        getSearchText: (row) => row.label,
+      }),
+      createEqualsFilter<
+        VocabularyOptionWithUsage,
+        VocabularyOverviewFilterState,
+        'source',
+        VocabularyOptionSource
+      >({
+        id: 'source',
+        label: 'Source',
+        placement: 'advanced',
+        layout: 'stacked',
+        width: 'md',
+        options: (Object.keys(VOCABULARY_SOURCE_BADGE) as VocabularyOptionSource[]).map(
+          (value) => ({
+            value,
+            label: VOCABULARY_SOURCE_BADGE[value].label,
+          }),
+        ),
+        getValue: (row) => row.source,
+      }) as FilterFieldDef<VocabularyOptionWithUsage, VocabularyOverviewFilterState>,
+      createCampaignAvailabilityFilterField<
+        VocabularyOptionWithUsage,
+        VocabularyOverviewFilterState
+      >((row) => row.status === 'active'),
+    ],
+    {
+      availability: { isAvailable: (row) => row.status === 'active' },
+    },
+  )
 }
 
 export const VOCABULARY_OVERVIEW_FILTER_SCHEMA = buildVocabularyOverviewFilterSchema()

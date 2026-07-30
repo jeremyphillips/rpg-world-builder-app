@@ -37,4 +37,14 @@ describe('FormActionsBar', () => {
     )
     await expectNoAxeViolations(container)
   })
+
+  it('applies sheet variant horizontal inset', () => {
+    render(
+      <FormActionsBar variant="sheet">
+        <button type="button">Save</button>
+      </FormActionsBar>,
+    )
+
+    expect(screen.getByRole('toolbar', { name: 'Form actions' })).toHaveClass('px-6')
+  })
 })

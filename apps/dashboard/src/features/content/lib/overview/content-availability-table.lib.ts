@@ -5,6 +5,12 @@ import {
   type WithCampaignAccess,
 } from '@rpg/contracts'
 
+import {
+  campaignAvailabilityFilterFn,
+  deriveCampaignAvailabilityScope as deriveGenericCampaignAvailabilityScope,
+  type CampaignAvailabilityScope,
+} from '@/lib/overview/campaign-availability-scope.lib'
+
 import type { ContentBase } from './content-table-config'
 import { matchesPrimaryTextQuery } from '@rpg/ui/lib/search-document'
 
@@ -18,23 +24,12 @@ export type ContentOverviewFilterState = {
   campaignAvailability: CampaignAvailabilityFilter
 }
 
-export type CampaignAvailabilityScope = {
-  availableCount: number
-  unavailableCount: number
-  visibleCount: number
-}
+export type { CampaignAvailabilityScope }
+
+export { campaignAvailabilityFilterFn }
 
 export const DEFAULT_CONTENT_OVERVIEW_FILTER_STATE: ContentOverviewFilterState = {
   campaignAvailability: CAMPAIGN_AVAILABILITY_FILTER_DEFAULT,
-}
-
-export function campaignAvailabilityFilterFn(
-  available: boolean,
-  filter: CampaignAvailabilityFilter,
-): boolean {
-  if (filter === 'all') return true
-  if (filter === 'available') return available
-  return !available
 }
 
 export function matchesContentOverviewFilters<T extends WithCampaignAccess<ContentBase>>(
@@ -72,13 +67,10 @@ export function deriveCampaignAvailabilityScope<
   scopedRows: T[],
   filters: Pick<ContentOverviewFilterState, 'campaignAvailability'>,
 ): CampaignAvailabilityScope {
-  const availableCount = scopedRows.filter((row) => row.campaignAccess.available).length
-  const unavailableCount = scopedRows.length - availableCount
-  const visibleCount = scopedRows.filter((row) =>
-    campaignAvailabilityFilterFn(row.campaignAccess.available, filters.campaignAvailability),
-  ).length
-
-  return { availableCount, unavailableCount, visibleCount }
+  return deriveGenericCampaignAvailabilityScope(scopedRows, {
+    isAvailable: (row) => row.campaignAccess.available,
+    filterValue: filters.campaignAvailability,
+  })
 }
 
 export function getCampaignAccessFromRow<

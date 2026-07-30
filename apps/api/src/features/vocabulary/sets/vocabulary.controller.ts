@@ -69,6 +69,11 @@ export async function createVocabularyEntry(req: Request, res: Response): Promis
     id: canonicalId,
     label: parsed.data.label,
     description: parsed.data.description,
+    status: parsed.data.status,
+  }
+
+  if (input.status !== undefined) {
+    assertVocabularySetCapability(setId, 'availability')
   }
 
   const set = await createCampaignVocabularyEntry(campaignId, input)

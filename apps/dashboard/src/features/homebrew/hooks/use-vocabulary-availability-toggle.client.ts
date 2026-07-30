@@ -1,42 +1,67 @@
 'use client'
 
 import { useCallback, useRef, useState } from 'react'
+import { useQueryClient } from '@tanstack/react-query'
 import type {
-  CampaignAvailabilityFilter,
   ContentUsageBlocker,
+  ResolvedVocabularyOptionSet,
   VocabularyOptionSetId,
+  VocabularyOptionStatus,
   VocabularyOptionWithUsage,
 } from '@rpg/contracts'
 
 import { notifyCampaignAccessUpdateFailed, notifyCampaignAccessUpdated } from '@/lib/notify'
 
 import { fetchVocabularyDisableAvailability, updateVocabularyEntry } from '../api/vocabulary-api'
+import { vocabularySetQueryKey } from './use-vocabulary-set'
 
 export type UseVocabularyAvailabilityToggleOptions = {
   campaignId: string
   setId: VocabularyOptionSetId
   entry: VocabularyOptionWithUsage
-  campaignAvailabilityFilter: CampaignAvailabilityFilter
-  onStatusChanged?: () => void
 }
 
 export function useVocabularyAvailabilityToggle({
   campaignId,
   setId,
   entry,
-  campaignAvailabilityFilter,
-  onStatusChanged,
 }: UseVocabularyAvailabilityToggleOptions) {
+  const queryClient = useQueryClient()
+  const queryKey = vocabularySetQueryKey(campaignId, setId)
   const [pending, setPending] = useState(false)
   const [blockedOpen, setBlockedOpen] = useState(false)
   const [blockers, setBlockers] = useState<ContentUsageBlocker[]>([])
-  const onStatusChangedRef = useRef(onStatusChanged)
-  onStatusChangedRef.current = onStatusChanged
+  const entryLabelRef = useRef(entry.label)
+  entryLabelRef.current = entry.label
+
+  const updateCachedSet = useCallback(
+    (nextSet: ResolvedVocabularyOptionSet) => {
+      queryClient.setQueryData(queryKey, nextSet)
+    },
+    [queryClient, queryKey],
+  )
+
+  const updateCachedStatus = useCallback(
+    (nextStatus: VocabularyOptionStatus) => {
+      queryClient.setQueryData<ResolvedVocabularyOptionSet>(queryKey, (current) => {
+        if (!current) return current
+
+        return {
+          ...current,
+          options: current.options.map((option) =>
+            option.id === entry.id ? { ...option, status: nextStatus } : option,
+          ),
+        }
+      })
+    },
+    [entry.id, queryClient, queryKey],
+  )
 
   const handleAvailableChange = useCallback(
     async (nextAvailable: boolean) => {
       if (pending) return
 
+      const previousStatus = entry.status
       const nextStatus = nextAvailable ? 'active' : 'disabled'
 
       if (!nextAvailable) {
@@ -49,32 +74,34 @@ export function useVocabularyAvailabilityToggle({
             return
           }
         } catch (err) {
-          notifyCampaignAccessUpdateFailed(entry.label, nextAvailable, err, () => {
+          notifyCampaignAccessUpdateFailed(entryLabelRef.current, nextAvailable, err, () => {
             void handleAvailableChange(nextAvailable)
           })
           return
         } finally {
           setPending(false)
         }
+      } else {
+        updateCachedStatus(nextStatus)
       }
 
       setPending(true)
       try {
-        await updateVocabularyEntry(campaignId, setId, entry.id, { status: nextStatus })
-        notifyCampaignAccessUpdated(entry.label, nextAvailable)
-
-        if (!nextAvailable && campaignAvailabilityFilter === 'available') {
-          onStatusChangedRef.current?.()
-        }
+        const nextSet = await updateVocabularyEntry(campaignId, setId, entry.id, {
+          status: nextStatus,
+        })
+        updateCachedSet(nextSet)
+        notifyCampaignAccessUpdated(entryLabelRef.current, nextAvailable)
       } catch (err) {
-        notifyCampaignAccessUpdateFailed(entry.label, nextAvailable, err, () => {
+        updateCachedStatus(previousStatus)
+        notifyCampaignAccessUpdateFailed(entryLabelRef.current, nextAvailable, err, () => {
           void handleAvailableChange(nextAvailable)
         })
       } finally {
         setPending(false)
       }
     },
-    [campaignAvailabilityFilter, campaignId, entry.id, entry.label, pending, setId],
+    [campaignId, entry.id, entry.status, pending, setId, updateCachedSet, updateCachedStatus],
   )
 
   return {

@@ -188,7 +188,7 @@ export async function createCampaignVocabularyEntry(
     id: input.id,
     label: input.label,
     description: input.description,
-    status: 'active',
+    status: input.status ?? 'active',
   })
 
   const removedCampaignEntryIds = (setPatch.removedCampaignEntryIds ?? []).filter(

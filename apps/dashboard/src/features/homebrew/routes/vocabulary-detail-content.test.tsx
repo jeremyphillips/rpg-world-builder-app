@@ -71,14 +71,14 @@ describe('VocabularyDetailContent', () => {
     const user = userEvent.setup()
     renderDetail()
 
-    await user.click(screen.getByRole('button', { name: 'New' }))
-    expect(await screen.findByRole('dialog', { name: 'Add vocabulary entry' })).toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: 'New creature type' }))
+    expect(await screen.findByRole('dialog', { name: 'New creature type' })).toBeInTheDocument()
   })
 
   it('hides manager actions for non-managers', () => {
     useCanManageCampaignMock.mockReturnValue(false)
     renderDetail()
 
-    expect(screen.queryByRole('button', { name: 'New' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'New creature type' })).not.toBeInTheDocument()
   })
 })

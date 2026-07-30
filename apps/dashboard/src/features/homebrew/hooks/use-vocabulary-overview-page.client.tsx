@@ -2,13 +2,11 @@
 
 import { useCallback, useId, useMemo, useRef, useState } from 'react'
 import {
-  CAMPAIGN_AVAILABILITY_FILTER_DEFAULT,
   getVocabularySetCapability,
-  type CampaignAvailabilityFilter,
   type VocabularyOptionSetId,
   type VocabularyOptionWithUsage,
 } from '@rpg/contracts'
-import { getEffectiveFilterValue, useFilterState } from '@rpg/ui/filters'
+import { useFilterState } from '@rpg/ui/filters'
 
 import { useOverviewSelection } from '@/lib/data-table/use-overview-selection'
 import { OverviewBulkActionsMenu } from '@/lib/overview/overview-bulk-actions-menu.client'
@@ -56,12 +54,6 @@ export function useVocabularyOverviewPage({
     reset: resetFilters,
   } = useFilterState(VOCABULARY_OVERVIEW_FILTER_SCHEMA, { data: tableRows })
 
-  const campaignAvailability = (getEffectiveFilterValue(
-    VOCABULARY_OVERVIEW_FILTER_SCHEMA,
-    filterState,
-    'campaignAvailability',
-  ) ?? CAMPAIGN_AVAILABILITY_FILTER_DEFAULT) as CampaignAvailabilityFilter
-
   const {
     selectionMode,
     rowSelection,
@@ -105,22 +97,13 @@ export function useVocabularyOverviewPage({
         setId={setId}
         entry={row}
         canManage={canManage && capabilities.availability}
-        campaignAvailabilityFilter={campaignAvailability}
         onEdit={onEdit}
         onDelete={(entry) => {
           void mutations.deleteEntry.mutateAsync(entry.id)
         }}
       />
     ),
-    [
-      campaignAvailability,
-      campaignId,
-      canManage,
-      capabilities.availability,
-      mutations.deleteEntry,
-      onEdit,
-      setId,
-    ],
+    [campaignId, canManage, capabilities.availability, mutations.deleteEntry, onEdit, setId],
   )
 
   const selectionConfig =

@@ -11,13 +11,12 @@ import {
 import { useVocabularyEntryUsage } from '../hooks/use-vocabulary-entry-usage'
 import {
   buildVocabularyEntrySheetDefaultValues,
-  buildVocabularyEntrySheetFields,
+  buildVocabularyEntrySheetFieldItems,
   resolveVocabularyEntrySheetHeadline,
   submitVocabularyEntrySheet,
 } from '../lib/vocabulary/vocabulary-entry-sheet.lib'
 import {
-  vocabularyEntryCreateFormSchema,
-  vocabularyEntryEditFormSchema,
+  vocabularyEntrySheetFormSchema,
   type VocabularyEntryFormValues,
 } from '../lib/vocabulary/vocabulary-entry-form-fields'
 
@@ -26,6 +25,7 @@ type UseVocabularyEntrySheetOptions = {
   mode: 'create' | 'edit'
   campaignId: string
   setId: VocabularyOptionSetId
+  createHeadline: string
   entry?: VocabularyOptionWithUsage
   isPending: boolean
   onSubmit: (values: VocabularyEntryFormValues) => void | Promise<void>
@@ -37,6 +37,7 @@ export function useVocabularyEntrySheet({
   mode,
   campaignId,
   setId,
+  createHeadline,
   entry,
   isPending,
   onSubmit,
@@ -60,7 +61,7 @@ export function useVocabularyEntrySheet({
 
   const fields = useMemo(
     () =>
-      buildVocabularyEntrySheetFields({
+      buildVocabularyEntrySheetFieldItems({
         campaignId,
         groupId,
         isEdit,
@@ -88,9 +89,9 @@ export function useVocabularyEntrySheet({
 
   return {
     isEdit,
-    headline: resolveVocabularyEntrySheetHeadline(isEdit, entry),
+    headline: resolveVocabularyEntrySheetHeadline(isEdit, createHeadline, entry),
     formKey: isEdit && entry ? `edit-${entry.id}` : 'create',
-    schema: isEdit ? vocabularyEntryEditFormSchema : vocabularyEntryCreateFormSchema,
+    schema: vocabularyEntrySheetFormSchema,
     fields,
     defaultValues,
     handleSubmit,

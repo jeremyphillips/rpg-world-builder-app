@@ -11,19 +11,17 @@ import { UsageReferencesSection } from '@/lib/usage-references/usage-references-
 
 import { fetchVocabularyDisableAvailability } from '../../api/vocabulary-api'
 import {
-  buildVocabularyEntryEditFields,
+  buildVocabularyEntrySheetFields,
   vocabularyAvailableFromStatus,
-  vocabularyEntryCreateFields,
   vocabularyStatusFromAvailable,
-  type VocabularyEntryCreateFormValues,
-  type VocabularyEntryEditFormValues,
   type VocabularyEntryFormValues,
+  type VocabularyEntrySheetFormValues,
 } from './vocabulary-entry-form-fields'
 
 export function buildVocabularyEntrySheetDefaultValues(
   isEdit: boolean,
   entry?: VocabularyOptionWithUsage,
-): VocabularyEntryCreateFormValues | VocabularyEntryEditFormValues {
+): VocabularyEntrySheetFormValues {
   if (isEdit && entry) {
     return {
       label: entry.label,
@@ -35,10 +33,11 @@ export function buildVocabularyEntrySheetDefaultValues(
   return {
     label: '',
     description: '',
+    available: true,
   }
 }
 
-export function buildVocabularyEntrySheetFields(input: {
+export function buildVocabularyEntrySheetFieldItems(input: {
   campaignId: string
   groupId: string
   isEdit: boolean
@@ -47,22 +46,18 @@ export function buildVocabularyEntrySheetFields(input: {
   usageCounting: boolean
   references: VocabularyUsageReference[]
 }): FormItem[] {
-  if (!input.isEdit) {
-    return vocabularyEntryCreateFields
-  }
-
-  const editFields = buildVocabularyEntryEditFields({
+  const sheetFields = buildVocabularyEntrySheetFields({
     groupId: input.groupId,
     pending: input.isPending,
     available: input.entry ? vocabularyAvailableFromStatus(input.entry.status) : true,
   })
 
-  if (!input.usageCounting) {
-    return editFields
+  if (!input.isEdit || !input.usageCounting) {
+    return sheetFields
   }
 
   return [
-    ...editFields,
+    ...sheetFields,
     {
       kind: 'slot' as const,
       name: 'usageReferences',
@@ -76,7 +71,7 @@ export function buildVocabularyEntrySheetFields(input: {
 }
 
 export async function submitVocabularyEntrySheet(input: {
-  values: VocabularyEntryCreateFormValues | VocabularyEntryEditFormValues
+  values: VocabularyEntrySheetFormValues
   isEdit: boolean
   entry?: VocabularyOptionWithUsage
   campaignId: string
@@ -84,9 +79,9 @@ export async function submitVocabularyEntrySheet(input: {
   onSubmit: (values: VocabularyEntryFormValues) => void | Promise<void>
   onBlocked: (blockers: ContentUsageBlocker[]) => void
 }): Promise<void> {
+  const nextStatus = vocabularyStatusFromAvailable(input.values.available)
+
   if (input.isEdit && input.entry) {
-    const editValues = input.values as VocabularyEntryEditFormValues
-    const nextStatus = vocabularyStatusFromAvailable(editValues.available)
     const wasActive = input.entry.status === 'active'
 
     if (wasActive && nextStatus === 'disabled') {
@@ -102,27 +97,27 @@ export async function submitVocabularyEntrySheet(input: {
     }
 
     await input.onSubmit({
-      label: editValues.label,
-      description: editValues.description ?? '',
+      label: input.values.label,
+      description: input.values.description ?? '',
       status: nextStatus,
     })
     return
   }
 
-  const createValues = input.values as VocabularyEntryCreateFormValues
   await input.onSubmit({
-    label: createValues.label,
-    description: createValues.description ?? '',
-    status: 'active',
+    label: input.values.label,
+    description: input.values.description ?? '',
+    status: nextStatus,
   })
 }
 
 export function resolveVocabularyEntrySheetHeadline(
   isEdit: boolean,
+  createLabel: string,
   entry?: VocabularyOptionWithUsage,
 ): string {
   if (!isEdit) {
-    return 'Add vocabulary entry'
+    return createLabel
   }
 
   return `Edit ${entry?.label?.trim() || entry?.id || 'vocabulary entry'}`

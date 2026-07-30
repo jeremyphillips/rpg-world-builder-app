@@ -59,6 +59,7 @@ import {
   HomebrewHubRoute,
   NameGeneratorRoute,
   RulesConfigDetailRoute,
+  VocabularyLandingRoute,
   VocabularyDetailRoute,
   SpeciesCreateRoute,
   SpeciesDetailRoute,
@@ -594,13 +595,29 @@ const router = createBrowserRouter(
                   children: [
                     { index: true, element: <HomebrewHubRoute /> },
                     {
-                      path: 'vocabulary/:setId',
-                      element: <VocabularyDetailRoute />,
+                      path: 'vocabulary',
+                      element: <Outlet />,
                       handle: {
-                        crumb: (_params, { entityLabel }) => ({
-                          label: entityLabel ?? 'Vocabulary',
+                        crumb: (params, data) => ({
+                          label: 'Vocabulary',
+                          href: collectionCrumbHref(
+                            ROUTES.homebrew.vocabularyHub(params.campaignId!),
+                            data,
+                          ),
                         }),
                       } satisfies CrumbHandle,
+                      children: [
+                        { index: true, element: <VocabularyLandingRoute /> },
+                        {
+                          path: ':setId',
+                          element: <VocabularyDetailRoute />,
+                          handle: {
+                            crumb: (_params, { entityLabel }) => ({
+                              label: entityLabel ?? '…',
+                            }),
+                          } satisfies CrumbHandle,
+                        },
+                      ],
                     },
                     {
                       path: 'rules-config/:configId',

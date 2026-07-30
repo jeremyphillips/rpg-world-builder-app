@@ -93,15 +93,20 @@ export function buildContentFilterSchema<
   contentType: ContentTypeKey,
   contentFields: ReadonlyArray<FilterFieldDef<TData, TState>>,
 ): FilterSchema<TData, TState> {
-  return createFilterSchema([
-    createContentNameFilter<TData, TState>(),
-    ...contentFields,
-    ...(shouldPresentContentSource(contentType)
-      ? [createContentSourceFilter<TData, TState>()]
-      : []),
-    createContentStatusFilter<TData, TState>(),
-    createCampaignAvailabilityFilterField<TData, TState>(),
-  ])
+  return createFilterSchema(
+    [
+      createContentNameFilter<TData, TState>(),
+      ...contentFields,
+      ...(shouldPresentContentSource(contentType)
+        ? [createContentSourceFilter<TData, TState>()]
+        : []),
+      createContentStatusFilter<TData, TState>(),
+      createCampaignAvailabilityFilterField<TData, TState>(),
+    ],
+    {
+      availability: { isAvailable: (row) => row.campaignAccess.available },
+    },
+  )
 }
 
 /** Removes a field from a module-level schema constant. */

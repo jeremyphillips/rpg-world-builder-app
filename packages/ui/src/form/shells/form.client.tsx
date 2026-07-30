@@ -74,6 +74,8 @@ export interface FormProps<TFieldValues extends FieldValues> {
   mode?: 'onSubmit' | 'onChange' | 'onBlur' | 'onTouched' | 'all'
   /** When true, the footer sticks to the bottom while field content scrolls. */
   stickyFooter?: boolean
+  /** Footer chrome variant — use `sheet` inside drawers with `p-0` bodies. */
+  footerVariant?: 'default' | 'sheet'
   /**
    * Vertical gap between top-level fields/groups. Defaults to `comfortable`
    * (`gap-6`). Array sections default to `compact` regardless.
@@ -115,6 +117,7 @@ export function Form<TFieldValues extends FieldValues>({
   fileFieldProps,
   mode,
   stickyFooter = false,
+  footerVariant = 'default',
   rhythm,
   size,
   valueSyncs,
@@ -176,7 +179,9 @@ export function Form<TFieldValues extends FieldValues>({
         <FormItems items={fields} idPrefix={formId} />
       </FormRhythmStack>
       {stickyFooter ? (
-        <FormActionsBar formError={formError}>{resolvedFooter}</FormActionsBar>
+        <FormActionsBar formError={formError} variant={footerVariant}>
+          {resolvedFooter}
+        </FormActionsBar>
       ) : resolvedFooter ? (
         <div className={formFooterSpacingClasses}>{resolvedFooter}</div>
       ) : null}

@@ -4,7 +4,6 @@ import { useState } from 'react'
 import { ConfirmDialog, RowActionsMenu } from '@rpg/ui'
 import { Pencil, Trash2 } from 'lucide-react'
 import type {
-  CampaignAvailabilityFilter,
   ContentUsageBlocker,
   VocabularyOptionSetId,
   VocabularyOptionWithUsage,
@@ -26,10 +25,8 @@ type VocabularyRowActionsProps = {
   setId: VocabularyOptionSetId
   entry: VocabularyOptionWithUsage
   canManage: boolean
-  campaignAvailabilityFilter: CampaignAvailabilityFilter
   onEdit: (entry: VocabularyOptionWithUsage) => void
   onDelete: (entry: VocabularyOptionWithUsage) => void
-  onStatusChanged?: () => void
 }
 
 /** Row actions for vocabulary table — edit, availability toggle, delete custom entries. */
@@ -38,10 +35,8 @@ export function VocabularyRowActions({
   setId,
   entry,
   canManage,
-  campaignAvailabilityFilter,
   onEdit,
   onDelete,
-  onStatusChanged,
 }: VocabularyRowActionsProps) {
   const capabilities = getVocabularySetCapability(setId)
   const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false)
@@ -52,8 +47,6 @@ export function VocabularyRowActions({
       campaignId,
       setId,
       entry,
-      campaignAvailabilityFilter,
-      onStatusChanged,
     })
 
   if (!canManage) return null

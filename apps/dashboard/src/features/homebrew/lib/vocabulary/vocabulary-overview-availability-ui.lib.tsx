@@ -7,11 +7,9 @@ import {
   formatNoAvailableMatchesLabel,
   formatShowUnavailableAriaLabel,
   formatUnavailableMatchesLine,
-} from '../campaign-access/campaign-access-table-labels'
-import { buildOverviewAvailabilitySupplement } from '@/lib/overview/overview-availability-supplement.client'
+} from '@/features/content/lib/campaign-access/campaign-access-table-labels'
 import type { CampaignAvailabilityScope } from '@/lib/overview/campaign-availability-scope.lib'
-
-type AvailabilityScope = CampaignAvailabilityScope
+import { CAMPAIGN_AVAILABILITY_FILTER_FIELD_ID } from '@/lib/overview/overview-availability-supplement.client'
 
 type FilterNoticeActions<TFilters> = {
   setFilterValue: (
@@ -21,37 +19,15 @@ type FilterNoticeActions<TFilters> = {
   ) => void
 }
 
-/** Utility-row supplemental copy for filter-scoped hidden unavailable counts. */
-export function buildContentOverviewHiddenSupplement<TFilters>({
-  scope,
-  campaignAvailability,
-  campaignAvailabilityFilterId,
-  actions,
-}: {
-  scope: AvailabilityScope
-  campaignAvailability: CampaignAvailabilityFilter
-  campaignAvailabilityFilterId: FilterFieldId<TFilters>
-  actions: FilterNoticeActions<TFilters>
-}) {
-  return buildOverviewAvailabilitySupplement({
-    scope,
-    campaignAvailability,
-    campaignAvailabilityFilterId,
-    actions,
-  })
-}
-
-export function buildContentOverviewEmptyState<TFilters>({
+export function buildVocabularyOverviewEmptyState<TFilters>({
   campaignAvailability,
   scope,
   pluralNoun,
-  campaignAvailabilityFilterId,
   actions,
 }: {
   campaignAvailability: CampaignAvailabilityFilter
-  scope: AvailabilityScope
+  scope: Pick<CampaignAvailabilityScope, 'unavailableCount' | 'visibleCount'>
   pluralNoun: string
-  campaignAvailabilityFilterId: FilterFieldId<TFilters>
   actions: FilterNoticeActions<TFilters>
 }) {
   if (
@@ -59,6 +35,9 @@ export function buildContentOverviewEmptyState<TFilters>({
     scope.unavailableCount > 0 &&
     scope.visibleCount === 0
   ) {
+    const campaignAvailabilityFilterId =
+      CAMPAIGN_AVAILABILITY_FILTER_FIELD_ID as FilterFieldId<TFilters>
+
     return (
       <div className="space-y-1 text-center">
         <p>{formatNoAvailableMatchesLabel(pluralNoun)}</p>

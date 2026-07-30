@@ -14,6 +14,9 @@ export const formTabPanelsBottomPaddingClasses = ''
 export const formStickyActionsBarClasses =
   'sticky bottom-0 z-20 mt-6 border-t border-border bg-background pt-4 pb-4 supports-[backdrop-filter]:bg-background/95 supports-[backdrop-filter]:backdrop-blur-sm'
 
+/** Sheet/drawer forms — sticky footer with horizontal inset matching `contentClassName="px-6"`. */
+export const formStickyActionsBarSheetClasses = `${formStickyActionsBarClasses} px-6`
+
 /** Transparent sticky actions bar surface — pair with `formStickyTabsTransparentClasses`. */
 export const formStickyActionsBarTransparentClasses =
   'bg-transparent supports-[backdrop-filter]:bg-transparent backdrop-blur-none'

@@ -94,11 +94,28 @@ The frame **must not own**:
 - URL parameter schemas
 - Selection semantics beyond passthrough props
 - Bulk actions
-- Campaign availability
+- Campaign availability copy (nouns / empty-state messaging)
 - Authorization (public/private)
 - Loading and errors
 - Server fetching
 - Formatted count language, content name cells, discovery suppression
+
+### Campaign availability chrome (opt-in)
+
+When a filter schema declares explicit availability metadata, `CatalogOverviewTable`
+automatically wires hidden-unavailable counts and Show/Hide actions:
+
+```ts
+createFilterSchema(fields, {
+  availability: { isAvailable: (row) => row.status === 'active' },
+})
+```
+
+- **`availability.isAvailable`** is the SSOT for scope math — not inferred from filter field ids.
+- The shell renders count + action chrome only; feature pages supply nouns via
+  `availabilityEmptyState` when the filtered table is empty but hidden unavailable rows exist.
+
+Content overviews keep feature-owned empty-state copy; vocabulary uses the same pattern.
 
 ### Client-data assumption
 
