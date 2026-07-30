@@ -1,13 +1,13 @@
 import { ChevronLeft } from 'lucide-react'
 import { Link } from 'react-router-dom'
-import { cn, sidebarNavItemVariants } from '@rpg/ui'
+import { sidebarNavItemVariants } from '@rpg/ui'
 
 import { ROUTES } from '@/app/routes'
 
-export const allCampaignsLinkClasses = cn(
-  sidebarNavItemVariants({ active: false }),
-  'text-muted-foreground',
-)
+export const allCampaignsLinkClasses = sidebarNavItemVariants({
+  active: false,
+  tone: 'workspaceExit',
+})
 
 /** Exits campaign workspace scope back to the global campaigns index. */
 export function AllCampaignsLink() {

@@ -1,8 +1,9 @@
 import { cn } from '@rpg/ui'
 
-import { CAMPAIGN_DISPLAY_FALLBACK_NAME } from '../lib/campaign-display'
+import { CAMPAIGN_UNKNOWN_NAME, CAMPAIGNS_QUERY_ERROR_MESSAGE } from '../lib/campaign-display'
 import { CampaignDisplayName } from './campaign-display-name'
 import {
+  campaignTopbarTitleErrorClasses,
   campaignTopbarTitleLinkClasses,
   campaignTopbarTitleSkeletonClasses,
 } from './campaign-topbar-title.variants'
@@ -33,13 +34,12 @@ export type CampaignTopbarTitleMissingProps = {
 
 /** Fallback title when the route campaign id is absent from the loaded list. */
 export function CampaignTopbarTitleMissing({ href, campaignId }: CampaignTopbarTitleMissingProps) {
-  return (
-    <CampaignTopbarTitle
-      name={CAMPAIGN_DISPLAY_FALLBACK_NAME}
-      href={href}
-      campaignId={campaignId}
-    />
-  )
+  return <CampaignTopbarTitle name={CAMPAIGN_UNKNOWN_NAME} href={href} campaignId={campaignId} />
+}
+
+/** Error copy when the campaigns query fails on a campaign route. */
+export function CampaignTopbarTitleError() {
+  return <span className={campaignTopbarTitleErrorClasses}>{CAMPAIGNS_QUERY_ERROR_MESSAGE}</span>
 }
 
 /** Fixed-width loading placeholder for the topbar campaign title. */

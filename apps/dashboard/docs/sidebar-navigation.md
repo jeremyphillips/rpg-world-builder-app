@@ -18,7 +18,7 @@ sidebar/
     sidebar-nav-model.ts          # discriminated section model
     match-sidebar-nav-href.ts     # shared active-route matcher
     section-has-active-item.ts    # collapse forcing helper
-    resolve-sidebar-navigation-scope.ts
+    resolve-dashboard-navigation-scope.ts
     sidebar-preferences.ts
   hooks/
     use-sidebar-section-preferences.ts
@@ -26,7 +26,7 @@ sidebar/
 
 ## Scope ownership
 
-`resolveSidebarNavigationScope` mirrors the route tree: `campaignId` from
+`resolveDashboardNavigationScope` mirrors the route tree: `campaignId` from
 `useParams` is present only under `CampaignLayoutRoute` (`/campaigns/:campaignId/*`).
 Global AppShell routes (e.g. `/characters`) always render `GlobalSidebarNav`, even
 when `preferredCampaignId` is set in the campaign store.

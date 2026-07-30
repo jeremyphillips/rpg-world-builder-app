@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
+import { expectNoAxeViolations } from '@rpg/ui/test-utils'
 
 import { AppBreadcrumb } from './app-breadcrumb'
 
@@ -123,5 +124,23 @@ describe('AppBreadcrumb', () => {
     )
 
     expect(screen.getByRole('navigation', { name: 'breadcrumb' })).toBeInTheDocument()
+  })
+
+  it('has no axe accessibility violations', async () => {
+    const { container } = render(
+      <MemoryRouter>
+        <AppBreadcrumb
+          crumbs={[
+            {
+              label: 'Classes',
+              href: '/campaigns/c1/classes',
+            },
+            { label: 'Wizard' },
+          ]}
+        />
+      </MemoryRouter>,
+    )
+
+    await expectNoAxeViolations(container)
   })
 })

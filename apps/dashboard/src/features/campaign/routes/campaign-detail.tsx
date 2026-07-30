@@ -1,9 +1,9 @@
 import { useParams } from 'react-router-dom'
-import { Heading } from '@rpg/ui'
 
 import { NarrowPage } from '@/components/layout/narrow-page'
 import { PageLoadState } from '@/components/layout/page-load-state'
 
+import { CampaignDisplayName } from '../components/campaign-display-name'
 import { CampaignOverviewInvitationsSection } from '../components/campaign-overview-invitations-section'
 import { CampaignOverviewMembersSection } from '../components/campaign-overview-members-section'
 import { CampaignOverviewPartySection } from '../components/campaign-overview-party-section'
@@ -12,6 +12,7 @@ import { useCampaignOverviewData } from '../hooks/use-campaign-overview-data'
 import { useCampaigns } from '../hooks/use-campaigns'
 import { useCanManageCampaign } from '../hooks/use-can-manage-campaign'
 import { usePersistViewedCampaign } from '../hooks/use-persist-viewed-campaign'
+import { buildCampaignDisplay, CAMPAIGN_UNKNOWN_NAME } from '../lib/campaign-display'
 
 /** Campaign overview — members, invitations, and party sections. */
 export function CampaignDetail() {
@@ -23,13 +24,18 @@ export function CampaignDetail() {
   usePersistViewedCampaign(campaignId)
 
   const campaign = campaigns?.find((item) => item.id === campaignId)
+  const display = campaign
+    ? buildCampaignDisplay(campaign)
+    : {
+        id: campaignId ?? 'unknown',
+        name: CAMPAIGN_UNKNOWN_NAME,
+        imageUrl: null,
+      }
 
   return (
     <NarrowPage spacing="list">
       <div className="flex flex-wrap items-start justify-between gap-4">
-        <Heading variant="page" as="h1">
-          {campaign?.identity.name ?? 'Campaign'}
-        </Heading>
+        <CampaignDisplayName display={display} surface="page" />
         {canManage && campaignId ? <InviteMemberDialog campaignId={campaignId} /> : null}
       </div>
 

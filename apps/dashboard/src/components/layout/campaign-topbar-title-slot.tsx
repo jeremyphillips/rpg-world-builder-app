@@ -2,6 +2,7 @@ import { useParams } from 'react-router-dom'
 
 import {
   CampaignTopbarTitle,
+  CampaignTopbarTitleError,
   CampaignTopbarTitleMissing,
   CampaignTopbarTitleSkeleton,
   mapCampaignTopbarTitleState,
@@ -23,6 +24,8 @@ export function CampaignTopbarTitleSlot() {
       return null
     case 'loading':
       return <CampaignTopbarTitleSkeleton />
+    case 'error':
+      return <CampaignTopbarTitleError />
     case 'resolved':
       return (
         <CampaignTopbarTitle

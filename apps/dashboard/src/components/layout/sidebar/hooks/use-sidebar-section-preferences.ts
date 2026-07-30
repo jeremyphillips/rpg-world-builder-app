@@ -1,7 +1,11 @@
 import { useCallback, useState } from 'react'
 
 import { sectionHasActiveItem } from '../lib/section-has-active-item'
-import { sidebarPreferencesStore, type SidebarPreferences } from '../lib/sidebar-preferences'
+import {
+  resolveSectionExpanded,
+  sidebarPreferencesStore,
+  type SidebarPreferences,
+} from '../lib/sidebar-preferences'
 import type { CollapsibleSidebarNavSection } from '../lib/sidebar-nav-model'
 
 export function useSidebarSectionPreferences() {
@@ -30,8 +34,7 @@ export function useSidebarSectionPreferences() {
     (section: CollapsibleSidebarNavSection, pathname: string) => {
       const storedCollapsed = preferences.expandedSections[section.id] === false
       const isForcedOpen = sectionHasActiveItem(pathname, section)
-      const isExpanded = isForcedOpen || !storedCollapsed
-      return isExpanded
+      return resolveSectionExpanded({ storedCollapsed, isForcedOpen })
     },
     [preferences.expandedSections],
   )

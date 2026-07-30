@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom'
-import type { Campaign } from '@rpg/contracts'
+import type { CampaignListItem } from '@rpg/contracts'
 import { Check, ChevronsUpDown, Plus } from 'lucide-react'
 
 import { ROUTES } from '@/app/routes'
@@ -18,8 +18,11 @@ import {
 import { useCampaigns } from '../hooks/use-campaigns'
 import { useActiveCampaignId } from '../hooks/use-active-campaign-id'
 import { useSwitchCampaign } from '../hooks/use-select-campaign'
-import { buildCampaignDisplay } from '../lib/campaign-display'
-import { getCampaignSwitcherLabel } from '../lib/navigation/campaign-selection'
+import { buildCampaignDisplay, CAMPAIGN_UNKNOWN_NAME } from '../lib/campaign-display'
+import {
+  getCampaignSwitcherTriggerLabel,
+  resolveCampaignSwitcherTriggerState,
+} from '../lib/navigation/campaign-selection'
 import { CampaignDisplayName } from './campaign-display-name'
 import { campaignSwitcherDropdownContentClasses } from './campaign-switcher.variants'
 
@@ -28,10 +31,9 @@ interface CampaignSwitcherProps {
 }
 
 interface CampaignSwitcherListProps {
-  campaigns: Campaign[] | undefined
+  campaigns: CampaignListItem[] | undefined
   activeId: string | undefined
   onSelect: (campaignId: string) => void
-  showLabel?: boolean
 }
 
 /** The selectable campaign rows inside the switcher menu. */
@@ -69,8 +71,12 @@ export function CampaignSwitcher({ showLabel = true }: CampaignSwitcherProps) {
   const switchCampaign = useSwitchCampaign()
   const { data: campaigns, isPending, isError } = useCampaigns()
 
-  const active = campaigns?.find((campaign) => campaign.id === activeCampaignId)
-  const fallbackLabel = getCampaignSwitcherLabel({ isError, activeName: undefined })
+  const triggerState = resolveCampaignSwitcherTriggerState(activeCampaignId, {
+    isPending,
+    isError,
+    data: campaigns,
+  })
+  const triggerLabel = getCampaignSwitcherTriggerLabel(triggerState)
 
   return (
     <DropdownMenu modal={false}>
@@ -81,20 +87,27 @@ export function CampaignSwitcher({ showLabel = true }: CampaignSwitcherProps) {
           'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background',
           'disabled:cursor-not-allowed disabled:opacity-50',
         )}
-        disabled={isPending || isError}
+        disabled={triggerState.kind === 'loading' || triggerState.kind === 'error'}
+        aria-label={
+          triggerState.kind === 'resolved'
+            ? buildCampaignDisplay(triggerState.campaign).name
+            : triggerLabel
+        }
       >
         <span className="flex min-w-0 flex-col">
           {showLabel && <Eyebrow>Campaign</Eyebrow>}
-          {isPending ? (
+          {triggerState.kind === 'loading' ? (
             <Spinner />
-          ) : isError || !active ? (
-            <span className="truncate text-sm font-semibold">{fallbackLabel}</span>
-          ) : (
+          ) : triggerState.kind === 'resolved' ? (
             <CampaignDisplayName
-              display={buildCampaignDisplay(active)}
+              display={buildCampaignDisplay(triggerState.campaign)}
               surface="switcherTrigger"
               className="min-w-0"
             />
+          ) : (
+            <span className="truncate text-sm font-semibold">
+              {triggerState.kind === 'missing' ? CAMPAIGN_UNKNOWN_NAME : triggerLabel}
+            </span>
           )}
         </span>
         <ChevronsUpDown className="size-4 shrink-0 text-muted-foreground" />

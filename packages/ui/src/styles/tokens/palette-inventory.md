@@ -94,6 +94,7 @@ Focus and invalid states alias Layer 2 roles (`--primary`, `--ring`, `--destruct
 | `--palette-sidebar-surface` | `--sidebar` (dark); light aliases `--surface-strong`                                  |
 | `--palette-sidebar-shade`   | Mix ingredient                                                                        |
 | `--sidebar-nav-item-fg`     | Inactive sidebar nav ink — `--foreground-subtle` (light), `--muted-foreground` (dark) |
+| `--sidebar-width`           | Dashboard sidebar shell width (`15rem` / `w-sidebar`)                                 |
 
 ## Foreground roles
 

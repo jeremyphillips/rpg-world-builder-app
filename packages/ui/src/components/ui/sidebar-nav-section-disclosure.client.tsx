@@ -1,12 +1,12 @@
 'use client'
 
 import { useId } from 'react'
+import { ChevronDown } from 'lucide-react'
 
-import { cn } from '../../lib/utils'
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from './collapsible.client'
-import { eyebrowVariants } from './eyebrow.variants'
+import { Eyebrow } from './eyebrow'
 import {
-  sidebarNavSectionDisclosureCaretClasses,
+  sidebarNavSectionDisclosureCaretVariants,
   sidebarNavSectionDisclosureContentClasses,
   sidebarNavSectionDisclosureRootClasses,
   sidebarNavSectionDisclosureStaticHeaderClasses,
@@ -40,7 +40,7 @@ export function SidebarNavSectionDisclosure({
     >
       {disabled ? (
         <div className={sidebarNavSectionDisclosureStaticHeaderClasses}>
-          <span className={eyebrowVariants()}>{label}</span>
+          <Eyebrow as="span">{label}</Eyebrow>
         </div>
       ) : (
         <CollapsibleTrigger asChild>
@@ -50,13 +50,10 @@ export function SidebarNavSectionDisclosure({
             aria-expanded={expanded}
             aria-controls={contentId}
           >
-            <span className={eyebrowVariants()}>{label}</span>
-            <span
+            <Eyebrow as="span">{label}</Eyebrow>
+            <ChevronDown
               aria-hidden
-              className={cn(
-                sidebarNavSectionDisclosureCaretClasses,
-                expanded ? '-translate-y-0.5' : 'translate-y-0.5 rotate-[225deg]',
-              )}
+              className={sidebarNavSectionDisclosureCaretVariants({ expanded })}
             />
           </button>
         </CollapsibleTrigger>

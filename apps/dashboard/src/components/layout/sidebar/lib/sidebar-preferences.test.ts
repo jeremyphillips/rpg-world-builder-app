@@ -4,7 +4,8 @@
 import { beforeEach, describe, expect, it } from 'vitest'
 
 import {
-  resolveStoredSectionExpanded,
+  isSectionStoredExpanded,
+  resolveSectionExpanded,
   SIDEBAR_PREFERENCES_KEY,
   sidebarPreferencesStore,
 } from './sidebar-preferences'
@@ -14,10 +15,16 @@ describe('sidebarPreferencesStore', () => {
     localStorage.clear()
   })
 
-  it('defaults missing section keys to expanded', () => {
-    expect(resolveStoredSectionExpanded({}, 'campaign')).toBe(true)
-    expect(resolveStoredSectionExpanded({ world: false }, 'world')).toBe(false)
-    expect(resolveStoredSectionExpanded({ world: false }, 'campaign')).toBe(true)
+  it('defaults missing section keys to expanded in raw storage', () => {
+    expect(isSectionStoredExpanded({}, 'campaign')).toBe(true)
+    expect(isSectionStoredExpanded({ world: false }, 'world')).toBe(false)
+    expect(isSectionStoredExpanded({ world: false }, 'campaign')).toBe(true)
+  })
+
+  it('combines stored collapse with route force-open', () => {
+    expect(resolveSectionExpanded({ storedCollapsed: true, isForcedOpen: false })).toBe(false)
+    expect(resolveSectionExpanded({ storedCollapsed: true, isForcedOpen: true })).toBe(true)
+    expect(resolveSectionExpanded({ storedCollapsed: false, isForcedOpen: false })).toBe(true)
   })
 
   it('persists and hydrates expanded section state', () => {

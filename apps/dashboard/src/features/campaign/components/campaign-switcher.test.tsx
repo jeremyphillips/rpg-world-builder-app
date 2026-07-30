@@ -86,4 +86,33 @@ describe('CampaignSwitcher', () => {
       expect(menu).toHaveClass(className)
     }
   })
+
+  it('shows unknown campaign when the active id is missing from the loaded list', () => {
+    useActiveCampaignIdMock.mockReturnValue('camp_missing')
+    useCampaignsMock.mockReturnValue({
+      data: [makeCampaignListItem({ id: 'camp_1', identity: { name: 'Sunless Citadel' } })],
+      isPending: false,
+      isError: false,
+    } as ReturnType<typeof useCampaigns>)
+
+    renderWithProviders(<CampaignSwitcher showLabel={false} />, {
+      initialEntries: ['/campaigns/camp_missing'],
+    })
+
+    expect(screen.getByRole('button', { name: 'Unknown campaign' })).toBeInTheDocument()
+  })
+
+  it('shows query error copy when the campaigns query fails', () => {
+    useCampaignsMock.mockReturnValue({
+      data: undefined,
+      isPending: false,
+      isError: true,
+    } as ReturnType<typeof useCampaigns>)
+
+    renderWithProviders(<CampaignSwitcher showLabel={false} />, {
+      initialEntries: ['/campaigns/camp_1'],
+    })
+
+    expect(screen.getByRole('button', { name: "Couldn't load campaigns" })).toBeDisabled()
+  })
 })

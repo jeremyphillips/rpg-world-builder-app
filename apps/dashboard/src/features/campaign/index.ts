@@ -3,10 +3,12 @@ export { CampaignPicker } from './components/campaign-picker'
 export { CampaignDisplayName } from './components/campaign-display-name'
 export {
   CampaignTopbarTitle,
+  CampaignTopbarTitleError,
   CampaignTopbarTitleMissing,
   CampaignTopbarTitleSkeleton,
 } from './components/campaign-topbar-title'
 export { ContinueCampaignCard } from './components/continue-campaign-card.client'
+export { ResumeSetupCampaignCard } from './components/resume-setup-campaign-card.client'
 export { CampaignCharacterEligibilityAlert } from './components/campaign-character-eligibility-alert.client'
 export { ExtendedProgressionEffects } from './components/extended-progression-effects.client'
 export {
@@ -70,13 +72,19 @@ export {
   resolveActiveCampaignSummary,
   resolveLandingCampaignId,
   resolveContinueCampaign,
+  resolveResumeSetupCampaign,
   resolvePreferredCampaignId,
   resolveTargetPathOnSwitch,
+  resolveCampaignSwitcherTriggerState,
+  getCampaignSwitcherTriggerLabel,
+  CAMPAIGN_SWITCHER_NO_SELECTION_LABEL,
 } from './lib/navigation/campaign-selection'
 export { resolveActiveCampaignId } from './lib/navigation/resolve-active-campaign-id'
 export {
   buildCampaignDisplay,
   CAMPAIGN_DISPLAY_FALLBACK_NAME,
+  CAMPAIGN_UNKNOWN_NAME,
+  CAMPAIGNS_QUERY_ERROR_MESSAGE,
   normalizeCampaignDisplayName,
   type CampaignDisplayInput,
   type CampaignDisplayVM,

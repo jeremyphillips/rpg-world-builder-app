@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { screen } from '@testing-library/react'
 import type { CampaignListItem } from '@rpg/contracts'
 
@@ -7,6 +7,7 @@ vi.mock('@/features/campaign/api/campaign-client')
 
 import { fetchSession as fetchSessionFn } from '@/features/auth/api/auth-client'
 import { listCampaigns as listCampaignsFn } from '@/features/campaign/api/campaign-client'
+import { CAMPAIGNS_QUERY_ERROR_MESSAGE } from '@/features/campaign'
 import { makeCampaignListItem } from '@/test/fixtures/campaigns'
 import { makeAuthMe } from '@/test/fixtures/session'
 import { renderWithProviders } from '@/test/render'
@@ -34,10 +35,6 @@ describe('DashboardHome', () => {
     fetchSession.mockResolvedValue(authSession)
   })
 
-  afterEach(() => {
-    vi.clearAllMocks()
-  })
-
   it('renders the welcome header, starter cards, and invitation copy', async () => {
     listCampaigns.mockResolvedValue([])
 
@@ -53,6 +50,18 @@ describe('DashboardHome', () => {
       '/campaigns/new',
     )
     expect(screen.queryByRole('link', { name: 'View all campaigns' })).not.toBeInTheDocument()
+  })
+
+  it('shows an error alert without implying an empty campaign list', async () => {
+    listCampaigns.mockRejectedValue(new Error('network'))
+
+    renderHome()
+
+    expect(await screen.findByRole('alert')).toHaveTextContent(CAMPAIGNS_QUERY_ERROR_MESSAGE)
+    expect(screen.queryByText('Continue campaign')).not.toBeInTheDocument()
+    expect(screen.queryByText('Resume setup')).not.toBeInTheDocument()
+    expect(screen.queryByRole('link', { name: 'View all campaigns' })).not.toBeInTheDocument()
+    expect(screen.getByText(DASHBOARD_HOME_COPY.starterCards.campaign.title)).toBeInTheDocument()
   })
 
   it('hides the campaigns index link when the user has only one campaign', async () => {
@@ -89,7 +98,7 @@ describe('DashboardHome', () => {
     expect(screen.getByRole('button', { name: 'Continue' })).toBeInTheDocument()
   })
 
-  it('hides the continue card when the remembered campaign has incomplete onboarding', async () => {
+  it('shows a resume setup card for a remembered incomplete campaign', async () => {
     listCampaigns.mockResolvedValue([
       makeCampaignListItem({
         id: 'camp_incomplete',
@@ -108,7 +117,12 @@ describe('DashboardHome', () => {
 
     renderHome()
 
-    expect(await screen.findByRole('link', { name: 'View all campaigns' })).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { name: 'Resume setup' })).toBeInTheDocument()
+    expect(screen.getByText('Incomplete Campaign')).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Resume setup' })).toHaveAttribute(
+      'href',
+      '/campaigns/camp_incomplete/onboarding',
+    )
     expect(screen.queryByText('Continue campaign')).not.toBeInTheDocument()
   })
 })

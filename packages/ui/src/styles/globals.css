@@ -126,6 +126,7 @@
   --color-catalog-picker-row-surface: var(--catalog-picker-row-surface);
   --color-sidebar: var(--sidebar);
   --color-sidebar-nav-item-fg: var(--sidebar-nav-item-fg);
+  --spacing-sidebar: var(--sidebar-width);
   --color-control-hover: var(--control-hover-bg);
   --color-control-selected: var(--control-selected-bg);
   --color-row-hover: var(--row-hover-bg);
@@ -304,6 +305,10 @@
  * Tailwind maps one `--color-*` token to every utility prefix (`bg-`, `border-`, …).
  * State variants swap `--field-control-*` roles via the chrome recipe.
  */
+@utility w-sidebar {
+  width: var(--sidebar-width);
+}
+
 @utility border-input {
   border-color: var(--field-control-border);
 }

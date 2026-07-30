@@ -2,11 +2,16 @@ import type { CampaignListItem } from '@rpg/contracts'
 
 import { ROUTES } from '@/app/routes'
 
-import { buildCampaignDisplay, type CampaignDisplayVM } from './campaign-display'
+import {
+  buildCampaignDisplay,
+  CAMPAIGN_UNKNOWN_NAME,
+  type CampaignDisplayVM,
+} from './campaign-display'
 
 export type CampaignTopbarTitleState =
   | { kind: 'hidden' }
   | { kind: 'loading' }
+  | { kind: 'error' }
   | { kind: 'resolved'; campaignId: string; name: string }
   | { kind: 'missing'; campaignId: string }
 
@@ -16,11 +21,8 @@ export type CampaignsQueryState = {
   data: CampaignListItem[] | undefined
 }
 
-// Extraction monitor: if campaign-switcher adopts equivalent list lookup semantics
-// (hidden | loading | resolved | missing — no names, hrefs, or fallback copy), lift
-// resolveCampaignTopbarTitleState's lookup/classification into a shared
-// resolveListItemDisplayState helper. Until then, keep domain mapping in
-// mapCampaignTopbarTitleState and switcher-specific UX in campaign-switcher.tsx.
+// Extraction monitor: switcher now shares this lookup/classification. If a third
+// consumer appears, lift into resolveListItemDisplayState (no names, hrefs, or copy).
 
 export function resolveCampaignTopbarTitleState(
   campaignId: string | undefined,
@@ -31,7 +33,7 @@ export function resolveCampaignTopbarTitleState(
   }
 
   if (query.isError) {
-    return { kind: 'hidden' }
+    return { kind: 'error' }
   }
 
   if (query.isPending || query.data === undefined) {
@@ -53,8 +55,9 @@ export function resolveCampaignTopbarTitleState(
 export type MappedCampaignTopbarTitleState =
   | { kind: 'hidden' }
   | { kind: 'loading' }
+  | { kind: 'error' }
   | { kind: 'resolved'; display: CampaignDisplayVM; href: string }
-  | { kind: 'missing'; campaignId: string; href: string }
+  | { kind: 'missing'; campaignId: string; href: string; name: typeof CAMPAIGN_UNKNOWN_NAME }
 
 export function mapCampaignTopbarTitleState(
   state: CampaignTopbarTitleState,
@@ -62,6 +65,7 @@ export function mapCampaignTopbarTitleState(
   switch (state.kind) {
     case 'hidden':
     case 'loading':
+    case 'error':
       return state
     case 'resolved':
       return {
@@ -74,6 +78,7 @@ export function mapCampaignTopbarTitleState(
         kind: 'missing',
         campaignId: state.campaignId,
         href: ROUTES.campaign.detail(state.campaignId),
+        name: CAMPAIGN_UNKNOWN_NAME,
       }
   }
 }

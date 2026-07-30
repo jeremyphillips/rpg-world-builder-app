@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import {
-  sidebarNavSectionDisclosureCaretClasses,
+  sidebarNavSectionDisclosureCaretVariants,
   sidebarNavSectionDisclosureTriggerClasses,
 } from './sidebar-nav-section-disclosure.variants'
 
@@ -11,8 +11,8 @@ describe('sidebarNavSectionDisclosure variants', () => {
     expect(sidebarNavSectionDisclosureTriggerClasses).not.toContain('hover:bg-accent')
   })
 
-  it('uses a thicker caret border', () => {
-    expect(sidebarNavSectionDisclosureCaretClasses).toContain('border-r-[1.5px]')
-    expect(sidebarNavSectionDisclosureCaretClasses).toContain('border-b-[1.5px]')
+  it('rotates the lucide caret when expanded', () => {
+    expect(sidebarNavSectionDisclosureCaretVariants({ expanded: true })).toContain('rotate-180')
+    expect(sidebarNavSectionDisclosureCaretVariants({ expanded: false })).toContain('rotate-0')
   })
 })

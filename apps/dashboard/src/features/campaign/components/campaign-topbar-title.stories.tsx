@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 
-import { CAMPAIGN_DISPLAY_FALLBACK_NAME } from '../lib/campaign-display'
+import { CAMPAIGN_UNKNOWN_NAME } from '../lib/campaign-display'
 import {
   CampaignTopbarTitle,
   CampaignTopbarTitleMissing,
@@ -51,7 +51,7 @@ export const Missing: StoryObj<typeof CampaignTopbarTitleMissing> = {
   parameters: {
     docs: {
       description: {
-        story: `Shows ${CAMPAIGN_DISPLAY_FALLBACK_NAME} when the route id is absent from the loaded list.`,
+        story: `Shows ${CAMPAIGN_UNKNOWN_NAME} when the route id is absent from the loaded list.`,
       },
     },
   },

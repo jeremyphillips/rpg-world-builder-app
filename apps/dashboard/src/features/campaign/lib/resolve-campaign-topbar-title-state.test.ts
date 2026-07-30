@@ -6,6 +6,7 @@ import {
   mapCampaignTopbarTitleState,
   resolveCampaignTopbarTitleState,
 } from './resolve-campaign-topbar-title-state'
+import { CAMPAIGN_UNKNOWN_NAME, CAMPAIGNS_QUERY_ERROR_MESSAGE } from './campaign-display'
 
 describe('resolveCampaignTopbarTitleState', () => {
   it('returns hidden when the route has no campaign id', () => {
@@ -36,14 +37,14 @@ describe('resolveCampaignTopbarTitleState', () => {
     ).toEqual({ kind: 'loading' })
   })
 
-  it('returns hidden when the campaigns query fails', () => {
+  it('returns error when the campaigns query fails', () => {
     expect(
       resolveCampaignTopbarTitleState('camp_1', {
         isPending: false,
         isError: true,
         data: undefined,
       }),
-    ).toEqual({ kind: 'hidden' })
+    ).toEqual({ kind: 'error' })
   })
 
   it('returns resolved when the campaign is present', () => {
@@ -98,6 +99,18 @@ describe('mapCampaignTopbarTitleState', () => {
       kind: 'missing',
       campaignId: 'camp_missing',
       href: '/campaigns/camp_missing',
+      name: CAMPAIGN_UNKNOWN_NAME,
     })
+  })
+
+  it('passes through error state for visible topbar copy', () => {
+    expect(mapCampaignTopbarTitleState({ kind: 'error' })).toEqual({ kind: 'error' })
+  })
+})
+
+describe('campaign query copy constants', () => {
+  it('uses shared unknown and error labels', () => {
+    expect(CAMPAIGN_UNKNOWN_NAME).toBe('Unknown campaign')
+    expect(CAMPAIGNS_QUERY_ERROR_MESSAGE).toBe("Couldn't load campaigns")
   })
 })

@@ -1,4 +1,9 @@
-export const CAMPAIGN_DISPLAY_FALLBACK_NAME = 'Campaign' as const
+export const CAMPAIGN_UNKNOWN_NAME = 'Unknown campaign' as const
+
+/** @deprecated Use CAMPAIGN_UNKNOWN_NAME */
+export const CAMPAIGN_DISPLAY_FALLBACK_NAME = CAMPAIGN_UNKNOWN_NAME
+
+export const CAMPAIGNS_QUERY_ERROR_MESSAGE = "Couldn't load campaigns" as const
 
 export type CampaignDisplayVM = {
   id: string
@@ -12,7 +17,7 @@ export type CampaignDisplayInput = {
   name?: string
 }
 
-/** Trim campaign copy for display. Never substitutes the fallback name. */
+/** Trim campaign copy for display. Never substitutes the unknown name. */
 export function normalizeCampaignDisplayName(name: string): string {
   return name.trim()
 }

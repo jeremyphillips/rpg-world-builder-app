@@ -1,9 +1,15 @@
 import { describe, expect, it } from 'vitest'
 import type { CampaignListItem } from '@rpg/contracts'
 
+import { makeCampaignListItem } from '@/test/fixtures/campaigns'
+
+import { CAMPAIGN_UNKNOWN_NAME, CAMPAIGNS_QUERY_ERROR_MESSAGE } from '../campaign-display'
 import {
-  getCampaignSwitcherLabel,
+  CAMPAIGN_SWITCHER_NO_SELECTION_LABEL,
+  getCampaignSwitcherTriggerLabel,
+  resolveCampaignSwitcherTriggerState,
   resolveContinueCampaign,
+  resolveResumeSetupCampaign,
   resolveTargetPathOnSwitch,
 } from './campaign-selection'
 import { resolvePreferredCampaignId } from './resolve-preferred-campaign-id'
@@ -74,6 +80,20 @@ describe('resolveContinueCampaign', () => {
   })
 })
 
+describe('resolveResumeSetupCampaign', () => {
+  it('returns the preferred campaign when onboarding is incomplete', () => {
+    expect(
+      resolveResumeSetupCampaign(campaignListItems, { lastSelectedCampaignId: 'c' }, null),
+    ).toMatchObject({ id: 'c' })
+  })
+
+  it('returns null when onboarding is complete', () => {
+    expect(
+      resolveResumeSetupCampaign(campaignListItems, { lastSelectedCampaignId: 'a' }, 'b'),
+    ).toBeNull()
+  })
+})
+
 describe('resolveTargetPathOnSwitch', () => {
   it('substitutes the campaign id on the detail route', () => {
     expect(resolveTargetPathOnSwitch('/campaigns/abc', 'abc', 'xyz')).toBe('/campaigns/xyz')
@@ -96,18 +116,47 @@ describe('resolveTargetPathOnSwitch', () => {
   })
 })
 
-describe('getCampaignSwitcherLabel', () => {
-  it('shows an error label on failure', () => {
-    expect(getCampaignSwitcherLabel({ isError: true })).toBe('Couldn’t load campaigns')
+describe('resolveCampaignSwitcherTriggerState', () => {
+  const loadedQuery = {
+    isPending: false,
+    isError: false,
+    data: [makeCampaignListItem({ id: 'camp_1', identity: { name: 'Sunless Citadel' } })],
+  }
+
+  it('returns error on query failure', () => {
+    expect(
+      resolveCampaignSwitcherTriggerState('camp_1', {
+        isPending: false,
+        isError: true,
+        data: undefined,
+      }),
+    ).toEqual({ kind: 'error' })
   })
 
-  it('shows the active campaign name when available', () => {
-    expect(getCampaignSwitcherLabel({ isError: false, activeName: 'Sunless Citadel' })).toBe(
-      'Sunless Citadel',
+  it('returns missing when the active id is absent after a successful query', () => {
+    expect(resolveCampaignSwitcherTriggerState('camp_missing', loadedQuery)).toEqual({
+      kind: 'missing',
+    })
+  })
+
+  it('returns resolved when the campaign is present', () => {
+    expect(resolveCampaignSwitcherTriggerState('camp_1', loadedQuery)).toEqual({
+      kind: 'resolved',
+      campaign: loadedQuery.data[0],
+    })
+  })
+
+  it('returns noSelection when there is no active id', () => {
+    expect(resolveCampaignSwitcherTriggerState(null, loadedQuery)).toEqual({ kind: 'noSelection' })
+  })
+})
+
+describe('getCampaignSwitcherTriggerLabel', () => {
+  it('maps switcher states to shared copy', () => {
+    expect(getCampaignSwitcherTriggerLabel({ kind: 'error' })).toBe(CAMPAIGNS_QUERY_ERROR_MESSAGE)
+    expect(getCampaignSwitcherTriggerLabel({ kind: 'noSelection' })).toBe(
+      CAMPAIGN_SWITCHER_NO_SELECTION_LABEL,
     )
-  })
-
-  it('falls back to a prompt when no campaign is active', () => {
-    expect(getCampaignSwitcherLabel({ isError: false })).toBe('Select campaign')
+    expect(getCampaignSwitcherTriggerLabel({ kind: 'missing' })).toBe(CAMPAIGN_UNKNOWN_NAME)
   })
 })

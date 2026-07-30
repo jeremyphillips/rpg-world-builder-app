@@ -56,8 +56,16 @@ export const sidebarPreferencesStore = createPersistedPreference<
   validatePayload: validateSidebarPreferencesPayload,
 })
 
-/** Missing section keys default to expanded in the preference hook. */
-export function resolveStoredSectionExpanded(
+/** Combines stored collapse preference with route-driven force-open. */
+export function resolveSectionExpanded(input: {
+  storedCollapsed: boolean
+  isForcedOpen: boolean
+}): boolean {
+  return input.isForcedOpen || !input.storedCollapsed
+}
+
+/** Missing section keys default to expanded when reading raw preference storage. */
+export function isSectionStoredExpanded(
   expandedSections: SidebarPreferences['expandedSections'],
   sectionId: CollapsibleSidebarSectionId,
 ): boolean {

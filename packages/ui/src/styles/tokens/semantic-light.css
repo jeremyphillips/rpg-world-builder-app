@@ -65,6 +65,7 @@
   --ring: var(--palette-primary);
   --overlay: var(--palette-overlay);
   --sidebar: var(--surface-strong);
+  --sidebar-width: 15rem;
   --sidebar-nav-item-fg: var(--foreground-subtle);
 
   /*

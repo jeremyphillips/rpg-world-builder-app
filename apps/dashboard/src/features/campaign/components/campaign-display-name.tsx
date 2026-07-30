@@ -38,7 +38,7 @@ export function CampaignDisplayName({
         <Castle aria-hidden className={campaignDisplayNameIconVariants({ surface })} />
       )}
       <Text as="span" className={campaignDisplayNameTextVariants({ surface })}>
-        {display.name}
+        {display.name || display.id}
       </Text>
     </>
   )
@@ -47,10 +47,14 @@ export function CampaignDisplayName({
 
   if (asLink && href) {
     return (
-      <Link to={href} className={cn(rootClassName, 'hover:text-foreground')}>
+      <Link to={href} className={rootClassName}>
         {content}
       </Link>
     )
+  }
+
+  if (surface === 'page') {
+    return <h1 className={rootClassName}>{content}</h1>
   }
 
   return <span className={rootClassName}>{content}</span>

@@ -18,4 +18,10 @@ describe('sidebarNavItemVariants', () => {
     expect(sidebarNavItemVariants({ active: false })).toContain('items-center')
     expect(sidebarNavItemVariants({ active: false })).toContain('gap-2')
   })
+
+  it('applies workspace exit tone for muted exit links', () => {
+    expect(sidebarNavItemVariants({ active: false, tone: 'workspaceExit' })).toContain(
+      'text-muted-foreground',
+    )
+  })
 })

@@ -2,11 +2,11 @@ import { useParams } from 'react-router-dom'
 
 import { CampaignSidebarNav } from './campaign-sidebar-nav'
 import { GlobalSidebarNav } from './global-sidebar-nav'
-import { resolveSidebarNavigationScope } from './lib/resolve-sidebar-navigation-scope'
+import { resolveDashboardNavigationScope } from './lib/resolve-dashboard-navigation-scope'
 
 export function SidebarNav() {
   const { campaignId } = useParams<{ campaignId?: string }>()
-  const scope = resolveSidebarNavigationScope({ campaignId })
+  const scope = resolveDashboardNavigationScope({ campaignId })
 
   return (
     <nav className="flex flex-col overflow-y-auto px-3 pb-4" aria-label="Primary">
